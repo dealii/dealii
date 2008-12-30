@@ -388,7 +388,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Generate a sparsity pattern that
                                         * is completely stored locally,
-                                        * having #m rows and #n columns. The
+                                        * having $m$ rows and $n$ columns. The
                                         * resulting matrix will be
                                         * completely stored locally.
 					*
@@ -411,7 +411,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Generate a sparsity pattern that
                                         * is completely stored locally,
-                                        * having #m rows and #n columns. The
+                                        * having $m$ rows and $n$ columns. The
                                         * resulting matrix will be
                                         * completely stored locally.
 					*
@@ -552,7 +552,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Initialize a sparsity pattern that
                                         * is completely stored locally,
-                                        * having #m rows and #n columns. The
+                                        * having $m$ rows and $n$ columns. The
                                         * resulting matrix will be
                                         * completely stored locally.
 					*
@@ -576,7 +576,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Initialize a sparsity pattern that
                                         * is completely stored locally,
-                                        * having #m rows and #n columns. The
+                                        * having $m$ rows and $n$ columns. The
                                         * resulting matrix will be
                                         * completely stored locally.
 					*
