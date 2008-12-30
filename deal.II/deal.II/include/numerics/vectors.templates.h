@@ -469,9 +469,10 @@ void VectorTools::project (const Mapping<dim, spacedim>       &mapping,
   SparseMatrix<double> mass_matrix (sparsity);
   Vector<double> tmp (mass_matrix.n());
 
-  MatrixCreator::create_mass_matrix (mapping, dof, quadrature, mass_matrix);
-  
-  VectorTools::create_right_hand_side (mapping, dof, quadrature, function, tmp);
+				   // create mass matrix and rhs at once,
+				   // which is faster.
+  MatrixCreator::create_mass_matrix (mapping, dof, quadrature, mass_matrix,
+				     function, tmp);
 
   constraints.condense (mass_matrix);
   constraints.condense (tmp);
