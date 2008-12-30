@@ -449,8 +449,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Generate a matrix that is completely
                                         * stored locally, having #m rows and
-                                        * #n columns. The resulting matrix
-                                        * will be completely stored locally.
+                                        * #n columns.
 					*
 					* The number of columns entries per
 					* row is specified as the maximum
@@ -463,8 +462,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Generate a matrix that is completely
                                         * stored locally, having #m rows and
-                                        * #n columns. The resulting matrix
-                                        * will be completely stored locally.
+                                        * #n columns.
 					*
 					* The vector
 					* <tt>n_entries_per_row</tt>
