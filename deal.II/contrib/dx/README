@@ -17,3 +17,11 @@ single: visualization for files with all components in a
 single/scalar.net:
   extract one scalar from the data vector and visualize by
   shading and isolines
+
+
+
+License
+==================================================
+The files in this directory are under the same license
+as the main part of the library. See doc/license.html
+for details.
