@@ -897,14 +897,10 @@ MappingQ1<dim,spacedim>::compute_fill_face (const typename Triangulation<dim,spa
 		ExcDimensionMismatch(normal_vectors.size(), n_q_points));
       if (update_flags & update_JxW_values)
 	Assert (JxW_values.size() == n_q_points,
-		ExcDimensionMismatch(JxW_values.size(), n_q_points));
+		ExcDimensionMismatch(JxW_values.size(), n_q_points));      
       
-      
-      Assert (data.aux[0].size() <= data.unit_tangentials[face_no].size(),
-	      ExcInternalError());
-      transform_contravariant(data.unit_tangentials[face_no], 0,
-                              data.aux[0],
-			      data);
+      transform(data.unit_tangentials[face_no], data.aux[0],
+		data, mapping_contravariant);
 
       typename std::vector<Tensor<1,dim> >::iterator
 	result = boundary_forms.begin();
@@ -928,10 +924,8 @@ MappingQ1<dim,spacedim>::compute_fill_face (const typename Triangulation<dim,spa
             Assert (data.aux[1].size() <=
                     data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell].size(),
                     ExcInternalError());
-            transform_contravariant(data.unit_tangentials[
-                                      face_no+GeometryInfo<dim>::faces_per_cell], 0,
-                                    data.aux[1],
-                                    data);
+            transform(data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell],
+		      data.aux[1], data, mapping_contravariant);
             for (unsigned int i=0; result != end; ++result, ++i)
               cross_product (*result, data.aux[0][i], data.aux[1][i]);
 
@@ -1240,6 +1234,7 @@ MappingQ1<dim,spacedim>::transform (
 }
 
 
+// This function is deprecated and has been replaced by transform above
 template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::transform_covariant (
@@ -1271,6 +1266,7 @@ MappingQ1<dim,spacedim>::transform_covariant (
 
 
 
+// This function is deprecated and has been replaced by transform above
 template <int dim, int spacedim>
 void
 MappingQ1<dim, spacedim>::transform_covariant (
@@ -1297,6 +1293,8 @@ MappingQ1<dim, spacedim>::transform_covariant (
 
 #if deal_II_dimension == 1
 
+
+// This function is deprecated and has been replaced by transform above
 template <>
 void
 MappingQ1<1, 2>::transform_covariant (
@@ -1312,6 +1310,8 @@ MappingQ1<1, 2>::transform_covariant (
 
 #if deal_II_dimension == 2
 
+
+// This function is deprecated and has been replaced by transform above
 template <>
 void
 MappingQ1<2, 3>::transform_covariant (
@@ -1326,10 +1326,10 @@ MappingQ1<2, 3>::transform_covariant (
 #endif
 
 
+// This function is deprecated and has been replaced by transform above
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::
-transform_contravariant (
+MappingQ1<dim,spacedim>::transform_contravariant (
   const VectorSlice<const std::vector<Tensor<1,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
@@ -1357,6 +1357,7 @@ transform_contravariant (
 
 
 
+// This function is deprecated and has been replaced by transform above
 template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::transform_contravariant (
@@ -1382,6 +1383,7 @@ MappingQ1<dim,spacedim>::transform_contravariant (
 
 #if deal_II_dimension == 1
 
+// This function is deprecated and has been replaced by transform above
 template <>
 void
 MappingQ1<1, 2>::transform_contravariant (
@@ -1397,6 +1399,7 @@ MappingQ1<1, 2>::transform_contravariant (
 
 #if deal_II_dimension == 2
 
+// This function is deprecated and has been replaced by transform above
 template <>
 void
 MappingQ1<2, 3>::transform_contravariant (

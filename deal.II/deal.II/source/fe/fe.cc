@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1119,8 +1119,8 @@ FiniteElement<dim,spacedim>::compute_2nd (
             Assert (diff_quot2.size() <=
                     diff_quot[d].size(),
                     ExcInternalError());
-            mapping.transform_covariant (diff_quot[d], 0, diff_quot2,
-                                         mapping_internal);
+            mapping.transform (diff_quot[d], diff_quot2,
+			       mapping_internal, mapping_covariant);
             
             for (unsigned int q=0; q<n_q_points; ++q)
               for (unsigned int d1=0; d1<dim; ++d1)

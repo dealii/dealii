@@ -416,11 +416,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 						 // transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
 		if (mapping_type == covariant)
-		  mapping.transform_covariant(fe_data.shape_values[i], 0,
-					      shape_values, mapping_data);
+		  mapping.transform(fe_data.shape_values[i],
+				    shape_values, mapping_data, mapping_covariant);
 		else
-		  mapping.transform_contravariant(fe_data.shape_values[i], 0,
-						  shape_values, mapping_data);
+		  mapping.transform(fe_data.shape_values[i],
+				    shape_values, mapping_data, mapping_contravariant);
 		    
 						 // then copy over to target:
 		for (unsigned int k=0; k<n_q_points; ++k)
@@ -454,9 +454,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	      case independent:
 	      case independent_on_cartesian:
 	      {
-		mapping.transform_covariant(fe_data.shape_grads[i], 0,
-					    shape_grads1,
-					    mapping_data);
+		mapping.transform(fe_data.shape_grads[i], shape_grads1,
+				  mapping_data, mapping_covariant);
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
@@ -465,14 +464,13 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	      
 	      case covariant:
 	      {
-		mapping.transform_covariant(fe_data.shape_grads[i], 0,
-					    shape_grads1,
-					    mapping_data);
+		mapping.transform(fe_data.shape_grads[i], shape_grads1,
+				  mapping_data, mapping_covariant);
 		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 						 // do second transformation
-		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
-					    mapping_data);
+		mapping.transform(shape_grads2, shape_grads1,
+				  mapping_data, mapping_covariant);
 						 // transpose back
 		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
@@ -486,13 +484,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	      
 	      case contravariant:
 	      {
-		mapping.transform_covariant(fe_data.shape_grads[i], 0,
-					    shape_grads1,
-					    mapping_data);
-
-		mapping.transform_contravariant(shape_grads1, 0,
-						shape_grads2,
-						mapping_data);
+		mapping.transform(fe_data.shape_grads[i], shape_grads1,
+				  mapping_data, mapping_covariant);
+		
+		mapping.transform(shape_grads1, shape_grads2,
+				  mapping_data, mapping_contravariant);
 
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
@@ -594,11 +590,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 						 // for transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
 		if (mapping_type == covariant)
-		  mapping.transform_covariant(make_slice(fe_data.shape_values[i], offset, n_q_points),
-					      0, shape_values, mapping_data);
+		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+				    shape_values, mapping_data, mapping_covariant);
 		else
-		  mapping.transform_contravariant(make_slice(fe_data.shape_values[i], offset, n_q_points),
-						  0, shape_values, mapping_data);
+		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+				    shape_values, mapping_data, mapping_contravariant);
 		
 						 // then copy over to target:
 		for (unsigned int k=0; k<n_q_points; ++k)
@@ -643,8 +639,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 	      case independent:
 	      case independent_on_cartesian:
 	      {
-		mapping.transform_covariant(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-					    0, shape_grads1, mapping_data);
+		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
+				  shape_grads1, mapping_data, mapping_covariant);
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
@@ -653,13 +649,13 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 	      
 	      case covariant:
 	      {
-		mapping.transform_covariant(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-					    0, shape_grads1, mapping_data);
+		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
+				  shape_grads1, mapping_data, mapping_covariant);
 		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 						 // do second transformation
-		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
-					    mapping_data);
+		mapping.transform(shape_grads2, shape_grads1,
+				  mapping_data, mapping_covariant);
 						 // transpose back
 		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
@@ -672,13 +668,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 	      
 	      case contravariant:
 	      {
-		mapping.transform_covariant(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-					    0, shape_grads1,
-					    mapping_data);
+		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
+				  shape_grads1, mapping_data, mapping_covariant);
 
-		mapping.transform_contravariant(shape_grads1, 0,
-						shape_grads2,
-						mapping_data);
+		mapping.transform(shape_grads1, shape_grads2,
+				  mapping_data, mapping_contravariant);
 
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
@@ -777,11 +771,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 						 // transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
 		if (mapping_type == covariant)
-		  mapping.transform_covariant(make_slice(fe_data.shape_values[i], offset, n_q_points),
-					      0, shape_values, mapping_data);
+		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+				    shape_values, mapping_data, mapping_covariant);
 		else
-		  mapping.transform_contravariant(make_slice(fe_data.shape_values[i], offset, n_q_points),
-						  0, shape_values, mapping_data);
+		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+				    shape_values, mapping_data, mapping_contravariant);
 		    
 						 // then copy over to target:
 		for (unsigned int k=0; k<n_q_points; ++k)
@@ -826,8 +820,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 	      case independent:
 	      case independent_on_cartesian:
 	      {
-		mapping.transform_covariant(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-					    0, shape_grads1, mapping_data);
+		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
+				  shape_grads1, mapping_data, mapping_covariant);
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
@@ -836,14 +830,13 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 	      
 	      case covariant:
 	      {
-		mapping.transform_covariant(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-					    0, shape_grads1,
-					    mapping_data);
+		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
+				  shape_grads1, mapping_data, mapping_covariant);
 		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 						 // do second transformation
-		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
-					    mapping_data);
+		mapping.transform(shape_grads2, shape_grads1,
+				  mapping_data, mapping_covariant);
 						 // transpose back
 		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
@@ -856,13 +849,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 	      
 	      case contravariant:
 	      {
-		mapping.transform_covariant(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-					    0, shape_grads1,
-					    mapping_data);
+		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
+				  shape_grads1, mapping_data, mapping_covariant);
 
-		mapping.transform_contravariant(shape_grads1, 0,
-						shape_grads2,
-						mapping_data);
+		mapping.transform(shape_grads1, shape_grads2,
+				  mapping_data, mapping_contravariant);
 
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)

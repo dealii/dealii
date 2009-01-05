@@ -50,6 +50,14 @@ template <int dim, int spacedim> class FESubfaceValues;
                                       * the transform() functions of
                                       * inheriting classes in order to
                                       * work.
+				      *
+				      * Mappings are usually defined
+				      * for vectors. If such a
+				      * MappingType is applied to a
+				      * rank 2 tensor, it is implied
+				      * that the resulting Tensor
+				      * corresponds to the derivative
+				      * of the vector.
                                       */
 enum MappingType
 {

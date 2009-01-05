@@ -1035,9 +1035,8 @@ FE_Nedelec<dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>           
 					   // values...
 	  Assert (fe_data.shape_values[k].size() == n_q_points,
 		  ExcInternalError());
-	  mapping.transform_covariant(fe_data.shape_values[k], 0,
-                                      shape_values,
-                                      mapping_data);
+	  mapping.transform(fe_data.shape_values[k], shape_values,
+			    mapping_data, mapping_covariant);
 
 					   // then copy over to target:
 	  for (unsigned int q=0; q<n_q_points; ++q)
@@ -1085,15 +1084,14 @@ FE_Nedelec<dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>           
 	  Assert (fe_data.shape_gradients[k].size() == n_q_points,
 		  ExcInternalError());
                                            // do first transformation
-	  mapping.transform_covariant(fe_data.shape_gradients[k], 0,
-                                      shape_grads1,
-                                      mapping_data);
+	  mapping.transform(fe_data.shape_gradients[k], shape_grads1,
+			    mapping_data, mapping_covariant);
                                            // transpose matrix
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);
                                            // do second transformation
-	  mapping.transform_covariant(shape_grads2, 0, shape_grads1,
-                                      mapping_data);
+	  mapping.transform(shape_grads2, shape_grads1,
+			    mapping_data, mapping_covariant);
                                            // transpose back
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);
@@ -1178,10 +1176,8 @@ FE_Nedelec<dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>      
 	{
 					   // first transform shape
 					   // values...
-	  mapping.transform_covariant(make_slice(fe_data.shape_values[k], offset, n_q_points),
-				      0,
-                                      shape_values,
-                                      mapping_data);
+	  mapping.transform(make_slice(fe_data.shape_values[k], offset, n_q_points),
+			    shape_values, mapping_data, mapping_covariant);
 
 					   // then copy over to target:
 	  for (unsigned int q=0; q<n_q_points; ++q)
@@ -1236,15 +1232,14 @@ FE_Nedelec<dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>      
                                            // little in between
                                            // 
                                            // do first transformation
-	  mapping.transform_covariant(make_slice(fe_data.shape_gradients[k], offset, n_q_points),
-				      0, shape_grads1,
-                                      mapping_data);
+	  mapping.transform(make_slice(fe_data.shape_gradients[k], offset, n_q_points),
+			    shape_grads1, mapping_data, mapping_covariant);
                                            // transpose matrix
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);
                                            // do second transformation
-	  mapping.transform_covariant(shape_grads2, 0, shape_grads1,
-                                      mapping_data);
+	  mapping.transform(shape_grads2, shape_grads1,
+			    mapping_data, mapping_covariant);
                                            // transpose back
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);
@@ -1327,9 +1322,8 @@ FE_Nedelec<dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim>   
 	{
 					   // first transform shape
 					   // values...
-	  mapping.transform_covariant(make_slice(fe_data.shape_values[k], offset, n_q_points),
-				      0, shape_values,
-                                      mapping_data);
+	  mapping.transform(make_slice(fe_data.shape_values[k], offset, n_q_points),
+			    shape_values, mapping_data, mapping_covariant);
 
 					   // then copy over to target:
 	  for (unsigned int q=0; q<n_q_points; ++q)
@@ -1382,15 +1376,14 @@ FE_Nedelec<dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim>   
                                            // little in between
                                            // 
                                            // do first transformation
-	  mapping.transform_covariant(make_slice(fe_data.shape_gradients[k], offset, n_q_points),
-				      0, shape_grads1,
-                                      mapping_data);
+	  mapping.transform(make_slice(fe_data.shape_gradients[k], offset, n_q_points),
+			    shape_grads1, mapping_data, mapping_covariant);
                                            // transpose matrix
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);
                                            // do second transformation
-	  mapping.transform_covariant(shape_grads2, 0, shape_grads1,
-                                      mapping_data);
+	  mapping.transform(shape_grads2, shape_grads1,
+			    mapping_data, mapping_covariant);
                                            // transpose back
           for (unsigned int q=0; q<n_q_points; ++q)
             shape_grads2[q] = transpose(shape_grads1[q]);

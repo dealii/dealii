@@ -264,9 +264,9 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values (const Mapping<1,2> &ma
 	  Assert (data.shape_gradients[k].size() <=
  		  fe_data.shape_gradients[k].size(), 
  		  ExcInternalError()); 
- 	  mapping.transform_covariant(fe_data.shape_gradients[k], 0, 
- 				      data.shape_gradients[k], 
-				      mapping_data); 
+ 	  mapping.transform(fe_data.shape_gradients[k],
+			    data.shape_gradients[k], 
+			    mapping_data, mapping_covariant); 
 	}
     }
   
@@ -307,9 +307,9 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values (const Mapping<2,3> &ma
 	 Assert (data.shape_gradients[k].size() <=
 		 fe_data.shape_gradients[k].size(), 
 		 ExcInternalError());
-	 mapping.transform_covariant(fe_data.shape_gradients[k], 0,
-				     data.shape_gradients[k],
-				     mapping_data);
+	 mapping.transform(fe_data.shape_gradients[k],
+			   data.shape_gradients[k],
+			   mapping_data, mapping_covariant);
  	}
     }
   
@@ -350,19 +350,18 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (const Mapping<1,2> &/* mapping 
 	for (unsigned int i=0; i<quadrature.size(); ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
+// TODO: I would think this should work. Guido
+      
       if (flags & update_gradients)
 	{
 	  AssertThrow(false, ExcNotImplemented());
-/* 	  Assert (data.shape_gradients[k].size() */
-/* 		  fe_data.shape_gradients[k].size(), */
-/* 		  ExcInternalError()); */
-/* 	  mapping.transform_covariant(fe_data.shape_gradients[k], 0, */
-/* 				      data.shape_gradients[k], */
-/* 				      mapping_data); */
+//  	  mapping.transform(fe_data.shape_gradients[k], 0,
+// 			    data.shape_gradients[k],
+// 			    mapping_data, mapping_covariant);
 	}
     }
   
-  //  const typename QProjector<1>::DataSetDescriptor dsd;
+				   //  const typename QProjector<1>::DataSetDescriptor dsd;
   if (flags & update_hessians)
     {
       AssertThrow(false, ExcNotImplemented());
@@ -400,9 +399,9 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3> &/* mapping 
 /*  	  Assert (data.shape_gradients[k].size()  */
 /*  		  fe_data.shape_gradients[k].size(),  */
 /*  		  ExcInternalError());	    */
-/*  	  mapping.transform_covariant(fe_data.shape_gradients[k], 0,  */
+/*  	  mapping.transform(fe_data.shape_gradients[k], 0,  */
 /*  				      data.shape_gradients[k],  */
-/*  				      mapping_data);  */
+/*  				      mapping_data, mapping_covariant);  */
  	}
     }
   
@@ -443,14 +442,8 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>         
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
       if (flags & update_gradients)
-	{
-	  Assert (data.shape_gradients[k].size() <=
-		  fe_data.shape_gradients[k].size(),
-		  ExcInternalError());	  
-	  mapping.transform_covariant(fe_data.shape_gradients[k], 0,
-				      data.shape_gradients[k],
-				      mapping_data);
-	}
+	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
+			  mapping_data, mapping_covariant);
     }
   
   const typename QProjector<dim>::DataSetDescriptor dsd;
@@ -561,14 +554,9 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>    
 	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
-	{
-	  Assert (data.shape_gradients[k].size() + offset <=
-		  fe_data.shape_gradients[k].size(),
-		  ExcInternalError());
-	  mapping.transform_covariant(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-				      0, data.shape_gradients[k],
-				      mapping_data);
-	}
+	mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+			  data.shape_gradients[k],
+			  mapping_data, mapping_covariant);
     }
 
   if (flags & update_hessians)
@@ -686,9 +674,9 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
 	  Assert (data.shape_gradients[k].size() + offset <=
 		  fe_data.shape_gradients[k].size(),
 		  ExcInternalError());
-	  mapping.transform_covariant(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-				      0, data.shape_gradients[k],
-				      mapping_data);
+	  mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+			    data.shape_gradients[k],
+			    mapping_data, mapping_covariant);
 	}
     }
   
