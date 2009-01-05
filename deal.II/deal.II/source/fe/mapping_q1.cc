@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1163,6 +1163,49 @@ MappingQ1<1,2>::fill_fe_subface_values (const Triangulation<1,2>::cell_iterator 
 
 
 #endif
+
+
+template<int dim, int spacedim>
+void
+MappingQ1<dim,spacedim>::transform (
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+  const MappingType mapping_type) const
+{
+  switch (mapping_type)
+    {
+      case mapping_covariant:
+	    transform_covariant(input, 0, output, internal);
+	    return;
+//       case mapping_contravariant:
+// 	    transform_contravariant(input, 0, output, internal);
+// 	    return;
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+}
+
+template<int dim, int spacedim>
+void
+MappingQ1<dim,spacedim>::transform (
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+  const MappingType mapping_type) const
+{
+  switch (mapping_type)
+    {
+      case mapping_covariant:
+	    transform_covariant(input, 0, output, internal);
+	    return;
+//       case mapping_contravariant:
+// 	    transform_contravariant(input, 0, output, internal);
+// 	    return;
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+}
 
 
 template<int dim, int spacedim>

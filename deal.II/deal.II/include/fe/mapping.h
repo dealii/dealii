@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,6 +33,37 @@ template <int dim, int spacedim> class FEFaceValues;
 template <int dim, int spacedim> class FESubfaceValues;
 
 //TODO: Offset in transform functions should be replaced by initializing VectorSlice correctly
+
+                                     /**
+                                      * The transformation type used
+                                      * for the Mapping::transform() functions.
+                                      *
+                                      * Special finite elements may
+                                      * need special Mapping from the
+                                      * reference cell to the actual
+                                      * mesh cell. In order to be most
+                                      * flexible, this enum provides
+                                      * an extensible interface for
+                                      * arbitrary
+                                      * transformations. Nevertheless,
+                                      * these must be implemented in
+                                      * the transform() functions of
+                                      * inheriting classes in order to
+                                      * work.
+                                      */
+enum MappingType
+{
+/// Covariant mapping
+      mapping_covariant = 0x0001,
+/// Contravariant mapping
+      mapping_contravariant = 0x0002,
+/// The Piola transform usually used for Hdiv elements
+      mapping_piola = 0x0003,
+/// The mapping used for Raviart-Thomas elements
+      mapping_raviart_thomas = mapping_piola,
+/// The mapping used for BDM elements
+      mapping_bdm = mapping_piola
+};
 
 
 /**
@@ -256,6 +287,31 @@ class Mapping : public Subscriptor
         bool first_cell;
     };
     
+                                     /**
+                                      * Transform a field of
+                                      * vectors accorsing to
+                                      * the selected MappingType.
+                                      */
+    virtual
+    void
+    transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+               VectorSlice<std::vector<Tensor<1,spacedim> > >             output,
+               const InternalDataBase &internal,
+               const MappingType type) const = 0;
+
+
+                                     /**
+                                      * Transform a field of
+                                      * rank two tensors accorsing to
+                                      * the selected MappingType.
+                                      */
+    virtual
+    void
+    transform (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+               VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+               const InternalDataBase &internal,
+               const MappingType type) const = 0;
+    
 				     /**
 				      * Transform a field of covariant
 				      * vectors. The covariant
@@ -307,6 +363,8 @@ class Mapping : public Subscriptor
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<2,spacedim> > >      output,
 			 const InternalDataBase &internal) const = 0;
+
+//TODO: The argument list here seems wrong
     
 				     /**
 				      * Transform a field of

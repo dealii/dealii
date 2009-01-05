@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -92,6 +92,18 @@ class MappingCartesian : public Mapping<dim,spacedim>
 			    std::vector<Point<dim> >        &normal_vectors,
 			    std::vector<double>             &cell_JxW_values) const ;
 
+    virtual void
+    transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+               VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+               const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+	       const MappingType type) const;
+
+    virtual void
+    transform (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+               VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+               const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+	       const MappingType type) const;
+    
 
     virtual void
     transform_covariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
