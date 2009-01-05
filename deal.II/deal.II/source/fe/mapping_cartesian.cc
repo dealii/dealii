@@ -556,6 +556,9 @@ MappingCartesian<dim, spacedim>::transform_covariant (
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
@@ -580,6 +583,9 @@ MappingCartesian<dim, spacedim>::transform_covariant (
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
@@ -605,6 +611,9 @@ MappingCartesian<dim, spacedim>::transform_contravariant (
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
 				   // convert data object to internal
 				   // data for this class. fails with
 				   // an exception if that is not
@@ -633,6 +642,9 @@ MappingCartesian<dim, spacedim>::transform_contravariant (
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
 				   // convert data object to internal
 				   // data for this class. fails with
 				   // an exception if that is not

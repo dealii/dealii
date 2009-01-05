@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -565,8 +565,8 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>    
 	  Assert (data.shape_gradients[k].size() + offset <=
 		  fe_data.shape_gradients[k].size(),
 		  ExcInternalError());
-	  mapping.transform_covariant(fe_data.shape_gradients[k], offset,
-                                      data.shape_gradients[k],
+	  mapping.transform_covariant(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+				      0, data.shape_gradients[k],
 				      mapping_data);
 	}
     }
@@ -686,8 +686,8 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
 	  Assert (data.shape_gradients[k].size() + offset <=
 		  fe_data.shape_gradients[k].size(),
 		  ExcInternalError());
-	  mapping.transform_covariant(fe_data.shape_gradients[k], offset,
-                                      data.shape_gradients[k],
+	  mapping.transform_covariant(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+				      0, data.shape_gradients[k],
 				      mapping_data);
 	}
     }

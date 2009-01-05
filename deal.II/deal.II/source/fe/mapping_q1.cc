@@ -1216,6 +1216,9 @@ MappingQ1<dim,spacedim>::transform_covariant (
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
   // ensure that the following cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
 	  ExcInternalError());
@@ -1241,7 +1244,10 @@ MappingQ1<1,2>::transform_covariant (
   VectorSlice<std::vector<Tensor<1,2> > > output,
   const Mapping<1,2>::InternalDataBase &mapping_data) const
 {
-  // ensure that the following cast is really correct:
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+
+				   // ensure that the following cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
 	  ExcInternalError());
   const InternalData &data = static_cast<const InternalData&>(mapping_data);
@@ -1273,6 +1279,8 @@ MappingQ1<2,3>::transform_covariant (
   VectorSlice<std::vector<Tensor<1,3> > > output,
   const Mapping<2,3>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
   // ensure that the following cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
 	  ExcInternalError());
@@ -1305,6 +1313,8 @@ MappingQ1<dim, spacedim>::transform_covariant (
     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
   // ensure that the following cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
 	  ExcInternalError());

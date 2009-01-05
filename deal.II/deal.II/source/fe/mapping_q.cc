@@ -1254,12 +1254,13 @@ MappingQ<dim,spacedim>::transform_covariant (
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
   const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
 
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-  
   typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
   if (q1_data->is_mapping_q1_data)
@@ -1289,11 +1290,12 @@ MappingQ<dim,spacedim>::transform_covariant (
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
   const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
-
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
 
   typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
@@ -1324,12 +1326,13 @@ MappingQ<dim,spacedim>::transform_contravariant (
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
   const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
   
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-
   typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
   if (q1_data->is_mapping_q1_data)
@@ -1359,12 +1362,13 @@ MappingQ<dim,spacedim>::transform_contravariant (
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
+  Assert (offset == 0, ExcInternalError());
+  AssertDimension (input.size(), output.size());
+  
   const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
   
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-
   typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
   if (q1_data->is_mapping_q1_data)

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1178,7 +1178,8 @@ FE_Nedelec<dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>      
 	{
 					   // first transform shape
 					   // values...
-	  mapping.transform_covariant(fe_data.shape_values[k], offset,
+	  mapping.transform_covariant(make_slice(fe_data.shape_values[k], offset, n_q_points),
+				      0,
                                       shape_values,
                                       mapping_data);
 
@@ -1235,8 +1236,8 @@ FE_Nedelec<dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>      
                                            // little in between
                                            // 
                                            // do first transformation
-	  mapping.transform_covariant(fe_data.shape_gradients[k], offset,
-                                      shape_grads1,
+	  mapping.transform_covariant(make_slice(fe_data.shape_gradients[k], offset, n_q_points),
+				      0, shape_grads1,
                                       mapping_data);
                                            // transpose matrix
           for (unsigned int q=0; q<n_q_points; ++q)
@@ -1326,8 +1327,8 @@ FE_Nedelec<dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim>   
 	{
 					   // first transform shape
 					   // values...
-	  mapping.transform_covariant(fe_data.shape_values[k], offset,
-                                      shape_values,
+	  mapping.transform_covariant(make_slice(fe_data.shape_values[k], offset, n_q_points),
+				      0, shape_values,
                                       mapping_data);
 
 					   // then copy over to target:
@@ -1381,8 +1382,8 @@ FE_Nedelec<dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim>   
                                            // little in between
                                            // 
                                            // do first transformation
-	  mapping.transform_covariant(fe_data.shape_gradients[k], offset,
-                                      shape_grads1,
+	  mapping.transform_covariant(make_slice(fe_data.shape_gradients[k], offset, n_q_points),
+				      0, shape_grads1,
                                       mapping_data);
                                            // transpose matrix
           for (unsigned int q=0; q<n_q_points; ++q)
