@@ -237,46 +237,41 @@ namespace TrilinosWrappers
                                           */
         void reinit (const unsigned int num_blocks);
 
-				       /**
-					* This reinit function is
-					* meant to be used for
-					* parallel calculations where
-					* some non-local data has to
-					* be used. The typical
-					* situation where one needs
-					* this function is the call of
-					* the
-					* FEValues<dim>::get_function_values
-					* function (or of some
-					* derivatives) in
-					* parallel. Since it is
-					* usually faster to retrieve
-					* the data in advance, this
-					* function can be called
-					* before the assembly forks
-					* out to the different
-					* processors. What this
-					* function does is the
-					* following: It takes the
-					* information in the columns
-					* of the given matrix and
-					* looks which data couples
-					* between the different
-					* processors. That data is
-					* then queried from the input
-					* vector. Note that you should
-					* not write to the resulting
-					* vector any more, since the
-					* some data can be stored
-					* several times on different
-					* processors, leading to
-					* unpredictable results. In
-					* particular, such a vector
-					* cannot be used for
-					* matrix-vector products as
-					* for example done during the
-					* solution of linear systems.
-					*/
+				         /**
+					  * This reinit function is meant to
+					  * be used for parallel
+					  * calculations where some
+					  * non-local data has to be
+					  * used. The typical situation
+					  * where one needs this function is
+					  * the call of the
+					  * FEValues<dim>::get_function_values
+					  * function (or of some
+					  * derivatives) in parallel. Since
+					  * it is usually faster to retrieve
+					  * the data in advance, this
+					  * function can be called before
+					  * the assembly forks out to the
+					  * different processors. What this
+					  * function does is the following:
+					  * It takes the information in the
+					  * columns of the given matrix and
+					  * looks which data couples between
+					  * the different processors. That
+					  * data is then queried from the
+					  * input vector. Note that you
+					  * should not write to the
+					  * resulting vector any more, since
+					  * the some data can be stored
+					  * several times on different
+					  * processors, leading to
+					  * unpredictable results. In
+					  * particular, such a vector cannot
+					  * be used for matrix-vector
+					  * products as for example done
+					  * during the solution of linear
+					  * systems.
+					  */
 	void import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
 					  const BlockVector                         &v);
 

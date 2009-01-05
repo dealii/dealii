@@ -49,6 +49,7 @@ namespace TrilinosWrappers
 {
 				// forward declaration
   class VectorBase;
+  class SparseMatrix;
 
 
 				       /**
@@ -300,12 +301,11 @@ namespace TrilinosWrappers
       void clear ();
 
 				       /**
-					* Reinit functionality, sets
-					* the dimension and the
-					* possibly parallel
-					* partitioning (Epetra_Map) of
-					* the calling vector the value
-					* of the input vector.
+					* Reinit functionality, sets the
+					* dimension and possibly the
+					* parallel partitioning (Epetra_Map)
+					* of the calling vector to the
+					* settings of the input vector.
 					*/
       void reinit (const VectorBase &v,
 		   const bool        fast = false);

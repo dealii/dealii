@@ -131,7 +131,7 @@ namespace TrilinosWrappers
         this->components.resize(this->n_blocks());
   
       for (unsigned int i=0;i<this->n_blocks();++i)
-        block(i).clear();
+        components[i].clear();
 
       collect_sizes();
     }

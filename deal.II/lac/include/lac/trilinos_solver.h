@@ -18,15 +18,16 @@
 #include <lac/solver_control.h>
 #include <boost/shared_ptr.hpp>
 
+#include <lac/vector.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
 #include <Epetra_LinearProblem.h>
 #include <AztecOO.h>
 #include <Epetra_Operator.h>
+#include <Amesos.h>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 namespace TrilinosWrappers
 {
@@ -54,7 +55,7 @@ namespace TrilinosWrappers
  * deal.II class SolverSelector.
  *
  * @ingroup TrilinosWrappers
- * @author Martin Kronbichler, 2008
+ * @author Martin Kronbichler, 2008, 2009
  */
   class SolverBase
   {
@@ -81,18 +82,36 @@ namespace TrilinosWrappers
                                         * pipe additional data to the
                                         * solver.
                                         */
+
       struct AdditionalData
       {
 				       /**
-					* Restart parameter in case
-					* the derived class is
-					* GMRES.
+					* Sets the additional data field to
+					* the desired output format and puts
+					* the restart parameter in case the
+					* derived class is GMRES.
 					* 
 					* TODO: Find a better way for
-					* doing this.
+					* setting the GMRES restart
+					* parameter since it is quite
+					* inelegant to set a specific option
+					* of one solver in the base class
+					* for all solvers.
 					*/
-	AdditionalData (const unsigned int gmres_restart_parameter = 30);
+	AdditionalData (const bool         output_solver_details   = false,
+			const unsigned int gmres_restart_parameter = 30);
 
+				       /**
+				        * Enables/disables the output of
+					* solver details (residual in each
+					* iterations etc.).
+					*/
+	const bool output_solver_details;
+
+				       /**
+					* Restart parameter for GMRES
+					* solver.
+					*/
 	const unsigned int gmres_restart_parameter;
       };
 
@@ -135,6 +154,30 @@ namespace TrilinosWrappers
              VectorBase             &x,
              const VectorBase       &b,
              const PreconditionBase &preconditioner);
+
+                                       /**
+                                        * Solve the linear system
+                                        * <tt>Ax=b</tt>. Depending on the
+                                        * information provided by derived
+                                        * classes and the object passed as a
+                                        * preconditioner, one of the linear
+                                        * solvers and preconditioners of
+                                        * Trilinos is chosen. This class
+                                        * works with matrices according to
+                                        * the TrilinosWrappers format, but
+                                        * can take deal.II vectors as
+                                        * argument. Since deal.II are serial
+                                        * vectors (not distributed), this
+                                        * function does only what you expect
+                                        * in case the matrix is locally
+                                        * owned. Otherwise, an exception
+                                        * will be thrown.
+                                        */
+      void
+      solve (const SparseMatrix           &A,
+             dealii::Vector<double>       &x,
+             const dealii::Vector<double> &b,
+             const PreconditionBase       &preconditioner);
 
                                        /**
                                         * Access to object that controls
@@ -210,9 +253,23 @@ namespace TrilinosWrappers
                                         * pipe additional data to the
                                         * solver.
                                         */
+
       struct AdditionalData
-      {};
-	
+      {
+				       /**
+					* Sets the additional data field to
+					* the desired output format.
+					*/
+	AdditionalData (const bool output_solver_details = false);
+
+				       /**
+				        * Enables/disables the output of
+					* solver details (residual in each
+					* iterations etc.).
+					*/
+	bool output_solver_details;
+      };
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -252,7 +309,20 @@ namespace TrilinosWrappers
                                         * solver.
                                         */
       struct AdditionalData
-      {};
+      {
+				       /**
+					* Sets the additional data field to
+					* the desired output format.
+					*/
+	AdditionalData (const bool output_solver_details = false);
+
+				       /**
+				        * Enables/disables the output of
+					* solver details (residual in each
+					* iterations etc.).
+					*/
+	bool output_solver_details;
+      };
 	
                                        /**
                                         * Constructor. In contrast to
@@ -299,12 +369,20 @@ namespace TrilinosWrappers
                                             * 30, i.e. do a restart every 30
                                             * iterations.
                                             */
-          AdditionalData (const unsigned int restart_parameter = 30);
-	
-                                           /**
-                                            * Maximum number of
-                                            * tmp vectors.
-                                            */
+	  AdditionalData (const bool         output_solver_details = false,
+			  const unsigned int restart_parameter = 30);
+
+				       /**
+				        * Enables/disables the output of
+					* solver details (residual in each
+					* iterations etc.).
+					*/
+	  bool output_solver_details;
+
+                                       /**
+					* Maximum number of
+					* tmp vectors.
+					*/
           unsigned int restart_parameter;
       };
 	
@@ -347,7 +425,20 @@ namespace TrilinosWrappers
                                         * solver.
                                         */
       struct AdditionalData
-      {};
+      {
+				       /**
+					* Sets the additional data field to
+					* the desired output format.
+					*/
+	AdditionalData (const bool output_solver_details = false);
+
+				       /**
+				        * Enables/disables the output of
+					* solver details (residual in each
+					* iterations etc.).
+					*/
+	bool output_solver_details;
+      };
 	
                                        /**
                                         * Constructor. In contrast to
@@ -388,7 +479,20 @@ namespace TrilinosWrappers
                                         * solver.
                                         */
       struct AdditionalData
-      {};
+      {
+				       /**
+					* Sets the additional data field to
+					* the desired output format.
+					*/
+	AdditionalData (const bool output_solver_details = false);
+
+				       /**
+				        * Enables/disables the output of
+					* solver details (residual in each
+					* iterations etc.).
+					*/
+	bool output_solver_details;
+      };
 	
                                        /**
                                         * Constructor. In contrast to
@@ -409,6 +513,145 @@ namespace TrilinosWrappers
                                         * particular solver.
                                         */
       const AdditionalData additional_data;
+  };
+
+
+
+/**
+ * An implementation of the Trilinos KLU direct solver (using the Amesos
+ * package).
+ *
+ * @ingroup TrilinosWrappers
+ * @author Martin Kronbichler, 2009
+ */
+  class SolverDirect
+  {
+    public:
+
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional data to the
+                                        * solver.
+                                        */
+
+      struct AdditionalData
+      {
+				       /**
+					* Sets the additional data field to
+					* the desired output format.
+					*/
+	AdditionalData (const bool output_solver_details = false);
+
+				       /**
+				        * Enables/disables the output of
+					* solver details (residual in each
+					* iterations etc.).
+					*/
+	bool output_solver_details;
+      };
+
+                                       /**
+                                        * Constructor. Takes the
+                                        * solver control object and
+                                        * creates the solver.
+                                        */
+      SolverDirect (SolverControl  &cn,
+		    const AdditionalData &data = AdditionalData());
+      
+                                       /**
+                                        * Destructor.
+                                        */
+      virtual ~SolverDirect ();
+
+                                       /**
+                                        * Solve the linear system
+                                        * <tt>Ax=b</tt>. Creates a KLU
+                                        * factorization of the matrix and
+                                        * performs the solve. Note that
+                                        * there is no need for a
+                                        * preconditioner here.
+                                        */
+      void
+      solve (const SparseMatrix     &A,
+             VectorBase             &x,
+             const VectorBase       &b);
+
+                                       /**
+                                        * Solve the linear system
+                                        * <tt>Ax=b</tt>. Depending on the
+                                        * information provided by derived
+                                        * classes and the object passed as a
+                                        * preconditioner, one of the linear
+                                        * solvers and preconditioners of
+                                        * Trilinos is chosen. This class
+                                        * works with matrices according to
+                                        * the TrilinosWrappers format, but
+                                        * can take deal.II vectors as
+                                        * argument. Since deal.II are serial
+                                        * vectors (not distributed), this
+                                        * function does only what you expect
+                                        * in case the matrix is locally
+                                        * owned. Otherwise, an exception
+                                        * will be thrown.
+                                        */
+      void
+      solve (const SparseMatrix           &A,
+             dealii::Vector<double>       &x,
+             const dealii::Vector<double> &b);
+
+                                       /**
+                                        * Access to object that controls
+                                        * convergence.
+                                        */
+      SolverControl & control() const;
+
+                                       /**
+                                        * Exception
+                                        */
+      DeclException1 (ExcTrilinosError,
+                      int,
+                      << "An error with error number " << arg1
+                      << " occured while calling a Trilinos function");
+
+    private:
+
+                                       /**
+                                        * Reference to the object that
+                                        * controls convergence of the
+                                        * iterative solver. In fact,
+                                        * for these Trilinos wrappers,
+                                        * Trilinos does so itself, but
+                                        * we copy the data from this
+                                        * object before starting the
+                                        * solution process, and copy
+                                        * the data back into it
+                                        * afterwards.
+                                        */
+      SolverControl &solver_control;
+
+                                       /**
+					* A structure that collects
+					* the Trilinos sparse matrix,
+					* the right hand side vector
+					* and the solution vector,
+					* which is passed down to the
+					* Trilinos solver.
+					*/
+      std::auto_ptr<Epetra_LinearProblem> linear_problem;
+
+                                       /**
+                                        * A structure that contains
+                                        * the Trilinos solver and
+                                        * preconditioner objects.
+                                        */
+      std::auto_ptr<Amesos_BaseSolver> solver;
+
+                                       /**
+                                        * Store a copy of the flags for this
+                                        * particular solver.
+                                        */
+      const AdditionalData additional_data;
+
   };
 
 }

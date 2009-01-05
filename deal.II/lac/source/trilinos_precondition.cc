@@ -371,6 +371,60 @@ namespace TrilinosWrappers
 
 
 
+/* -------------------------- PreconditionILUT -------------------------- */
+
+  PreconditionILUT::AdditionalData::
+  AdditionalData (const double       ilut_drop,
+		  const unsigned int ilut_fill,
+		  const double       ilut_atol,
+		  const double       ilut_rtol,
+		  const unsigned int overlap)
+                  :
+                  ilut_drop (ilut_drop),
+                  ilut_fill (ilut_fill),
+		  ilut_atol (ilut_atol),
+		  ilut_rtol (ilut_rtol),
+		  overlap  (overlap)
+  {}
+
+
+
+  void
+  PreconditionILUT::initialize (const SparseMatrix   &matrix,
+				const AdditionalData &additional_data)
+  {
+    preconditioner.release();
+    ifpack.release();
+
+    ifpack = Teuchos::rcp (Ifpack().Create ("ILUT", &*matrix.matrix, 
+					    additional_data.overlap));
+
+    Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
+				       "preconditioner"));
+
+    int ierr;
+
+    Teuchos::ParameterList parameter_list;
+    parameter_list.set ("fact: drop value",additional_data.ilut_drop);  
+    parameter_list.set ("fact: level-of-fill",(int)additional_data.ilut_fill);  
+    parameter_list.set ("fact: absolute threshold",additional_data.ilut_atol); 
+    parameter_list.set ("fact: relative threshold",additional_data.ilut_rtol); 
+    parameter_list.set ("schwarz: combine mode", "Add");
+    
+    ierr = ifpack->SetParameters(parameter_list);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Initialize();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Compute();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    preconditioner = Teuchos::rcp (&*ifpack, false);
+  }
+
+
+
 /* ---------------------- PreconditionBlockDirect --------------------- */
 
   PreconditionBlockwiseDirect::AdditionalData::

@@ -882,6 +882,188 @@ namespace TrilinosWrappers
 
 
 
+
+
+
+/**
+ * A wrapper class for a thresholded incomplete LU factorization (ILU-T)
+ * preconditioner for Trilinos matrices. This preconditioner works both in
+ * serial and in parallel, depending on the matrix it is based on. In
+ * general, an incomplete factorization does not take all fill-in elements
+ * that would appear in a full factorization (that is the basis for a direct
+ * solve). For the ILU-T precondtioner, the parameter <tt>ilut_drop</tt>
+ * lets the user specify which elements should be dropped (i.e., should not
+ * be part of the incomplete decomposition). Trilinos calculates first the
+ * complete factorization for one row, and then skips those elements that
+ * are lower than the threshold. This is the main difference to the
+ * non-thresholded ILU preconditioner, where the parameter
+ * <tt>ilut_fill</tt> governs the incomplete factorization structure. This
+ * parameter is available here as well, but provides only some extra
+ * information here.
+ *
+ * The AdditionalData data structure allows to set preconditioner
+ * options. Besides the fill-in arguments, these options are some options
+ * for perturbations (see the documentation of the AdditionalData structure
+ * for details), and a parameter <tt>overlap</tt> that determines if and how
+ * much overlap there should be between the matrix partitions on the various
+ * MPI processes. The default settings are 0 for the additional fill-in, 0
+ * for the absolute augmentation tolerance, 1 for the relative augmentation
+ * tolerance, 0 for the overlap.
+ *
+ * Note that a parallel applicatoin of the ILU-T preconditioner is
+ * actually a block-Jacobi preconditioner with block size equal to the
+ * local matrix size. Spoken more technically, this parallel operation
+ * is an <a
+ * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+ * Schwarz method</a> with an ILU <em>approximate solve</em> as inner
+ * solver, based on the (outer) parallel partitioning.
+ *
+ * @ingroup TrilinosWrappers
+ * @ingroup Preconditioners
+ * @author Martin Kronbichler, 2009
+ */
+  class PreconditionILUT : public PreconditionBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to pipe
+                                        * additional parameters to the
+                                        * preconditioner. The Trilinos ILU-T
+                                        * decomposition allows for some
+                                        * fill-in, so it actually is a
+                                        * threshold incomplete LU
+                                        * factorization. The amount of
+                                        * fill-in, and hence, the amount of
+                                        * memory used by this
+                                        * preconditioner, is controlled by
+                                        * the parameters <tt>ilut_drop</tt>
+                                        * and <tt>ilut_fill</tt>, which
+                                        * specifies a threshold about which
+                                        * values should form the incomplete
+                                        * factorization and the level of
+                                        * additional fill-in. When forming
+                                        * the preconditioner, for certain
+                                        * problems bad conditioning (or just
+                                        * bad luck) can cause the
+                                        * preconditioner to be very poorly
+                                        * conditioned. Hence it can help to
+                                        * add diagonal perturbations to the
+                                        * original matrix and form the
+                                        * preconditioner for this slightly
+                                        * better matrix. <tt>ilut_atol</tt>
+                                        * is an absolute perturbation that
+                                        * is added to the diagonal before
+                                        * forming the prec, and
+                                        * <tt>ilu_rtol</tt> is a scaling
+                                        * factor $rtol \geq 1$. The last
+                                        * parameter specifies the overlap of
+                                        * the partitions when the
+                                        * preconditioner runs in parallel.
+                                        */      
+      struct AdditionalData
+      {
+                                       /**
+					* Constructor. By default, no
+					* element will be dropped, the level
+					* of extra fill-ins is set to be
+					* zero (just use the matrix
+					* structure, do not generate any
+					* additional fill-in except the one
+					* that results from non-dropping
+					* large elements), the tolerance
+					* level are 0 and 1, respectively,
+					* and the overlap in case of a
+					* parallel execution is zero. This
+					* overlap in a block-application of
+					* the ILU in the parallel case makes
+					* the preconditioner a so-called
+					* additive Schwarz preconditioner.
+					*/
+	AdditionalData (const double       ilut_drop = 0.,
+			const unsigned int ilut_fill = 0,
+			const double       ilut_atol = 0.,
+			const double       ilut_rtol = 1.,
+			const unsigned int overlap  = 0);
+
+                                       /**
+					* This specifies the relative size
+					* of elements which should be
+					* dropped when forming an incomplete
+					* LU decomposition with threshold.
+					*/
+	double ilut_drop;
+
+                                       /**
+					* This specifies the amount of
+					* additional fill-in elements
+					* besides the sparse matrix
+					* structure. When
+					* <tt>ilu_fill</tt> is large,
+					* this means that many
+					* fill-ins will be added, so
+					* that the ILU preconditioner
+					* comes closer to a (direct)
+					* sparse LU
+					* decomposition. Note,
+					* however, that this will
+					* drastically increase the
+					* memory requirement,
+					* especially when the
+					* preconditioner is used in
+					* 3D.
+					*/
+	unsigned int ilut_fill;
+
+                                       /**
+					* This specifies the amount of
+					* an absolute perturbation
+					* that will be added to the
+					* diagonal of the matrix,
+					* which sometimes can help to
+					* get better preconditioners.
+					*/
+	double ilut_atol;
+
+                                       /**
+					* This specifies the factor by
+					* which the diagonal of the
+					* matrix will be scaled, which
+					* sometimes can help to get
+					* better preconditioners.
+					*/
+	double ilut_rtol;
+
+                                       /**
+					* This determines how large
+					* the overlap of the local
+					* matrix portions on each
+					* processor in a parallel
+					* application should be.
+					*/
+	unsigned int overlap; 
+      };
+
+                                       /**
+                                        * Initialize function. Takes
+                                        * the matrix which is used to
+                                        * form the preconditioner, and
+                                        * additional flags if there
+                                        * are any.
+                                        */
+      void initialize (const SparseMatrix   &matrix,
+		       const AdditionalData &additional_data = AdditionalData());
+
+    private:
+				       /**
+					* This is a pointer to the
+					* Ifpack data contained in
+					* this preconditioner.
+					*/
+      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
+  };
+
+
+
 /**
  * A wrapper class for a sparse direct LU decomposition on parallel
  * blocks for Trilinos matrices. When run in serial, this corresponds

@@ -2316,7 +2316,7 @@ namespace TrilinosWrappers
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (unsigned int i=0; i<indices.size(); ++i)
-      add (indices[i], indices.size(), &indices[0], &values(i,0),
+      add (indices[i], indices.size(), &indices[0], &values(i,0), 
 	   elide_zero_values);
   }
 
@@ -2335,8 +2335,8 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
-      add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
-	   elide_zero_values);
+      add (row_indices[i], col_indices.size(), &col_indices[0], 
+	   &values(i,0), elide_zero_values);
   }
 
 
