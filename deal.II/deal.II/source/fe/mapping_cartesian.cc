@@ -509,17 +509,38 @@ void
 MappingCartesian<dim,spacedim>::transform (
   const VectorSlice<const std::vector<Tensor<1,dim> > > input,
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
 {
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());  
+  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
+  
   switch (mapping_type)
     {
       case mapping_covariant:
-	    transform_covariant(input, 0, output, internal);
-	    return;
-//       case mapping_contravariant:
-// 	    transform_contravariant(input, 0, output, internal);
-// 	    return;
+	    if (true)
+	      {
+		Assert (data.update_flags & update_covariant_transformation,
+			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+		
+		for (unsigned int i=0; i<output.size(); ++i)
+		  for (unsigned int d=0;d<dim;++d)
+		    output[i][d] = input[i][d]/data.length[d];
+		return;
+	      }
+      case mapping_contravariant:
+	    if (true)
+	      {
+		Assert (data.update_flags & update_contravariant_transformation,
+			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+		
+		for (unsigned int i=0; i<output.size(); ++i)
+		  for (unsigned int d=0;d<dim;++d)
+		    output[i][d] = input[i][d]*data.length[d];
+		return;
+	      }
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -538,9 +559,9 @@ MappingCartesian<dim,spacedim>::transform (
       case mapping_covariant:
 	    transform_covariant(input, 0, output, internal);
 	    return;
-//       case mapping_contravariant:
-// 	    transform_contravariant(input, 0, output, internal);
-// 	    return;
+       case mapping_contravariant:
+ 	    transform_contravariant(input, 0, output, internal);
+ 	    return;
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -551,7 +572,7 @@ MappingCartesian<dim,spacedim>::transform (
 template<int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
@@ -563,8 +584,6 @@ MappingCartesian<dim, spacedim>::transform_covariant (
 
   Assert (data.update_flags & update_covariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
   
 				   // simply scale by inverse Jacobian
 				   // (which is diagonal here)
@@ -578,7 +597,7 @@ MappingCartesian<dim, spacedim>::transform_covariant (
 template<int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
@@ -606,7 +625,7 @@ MappingCartesian<dim, spacedim>::transform_covariant (
 template<int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
@@ -637,7 +656,7 @@ MappingCartesian<dim, spacedim>::transform_contravariant (
 template<int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const

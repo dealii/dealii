@@ -313,30 +313,7 @@ class Mapping : public Subscriptor
                const MappingType type) const = 0;
     
 				     /**
-				      * Transform a field of covariant
-				      * vectors. The covariant
-				      * transformation multiplies a
-				      * vector from the right with the
-				      * inverse of the Jacobian matrix
-				      * of the transformation from
-				      * unit to real space
-				      * cell. Alternatively, this is
-				      * equivalent to a multiplication
-				      * from the left with the
-				      * transpose of the inverse
-				      * matrix.
-				      *
-				      * The list of arguments is as follows:
-				      * we transform as many elements in the
-				      * @p input field, starting from @p offset,
-				      * as there are elements in @p
-				      * output. The @p input array may hold
-				      * more elements than are needed (some
-				      * finite element classes use this for a
-				      * denser storage of data), but it needs
-				      * to have at least
-				      * <tt>output.size()</tt> elements
-				      * starting with element @p offset.
+				      * @deprecated Use transform() instead.
 				      */
     virtual
     void
@@ -346,16 +323,7 @@ class Mapping : public Subscriptor
 			 const InternalDataBase &internal) const = 0;
 
                                      /**
-                                      * Transform a set of matrices
-                                      * covariantly, i.e. multiply
-                                      * each function in the input
-                                      * range by the Jacobian matrices
-                                      * at the different quadrature
-                                      * points from the left.
-                                      *
-                                      * The same applies as to the
-                                      * function above regarding input
-                                      * and output arguments.
+				      * @deprecated Use transform() instead.
                                       */
     virtual
     void
@@ -364,58 +332,22 @@ class Mapping : public Subscriptor
 			 VectorSlice<std::vector<Tensor<2,spacedim> > >      output,
 			 const InternalDataBase &internal) const = 0;
 
-//TODO: The argument list here seems wrong
-    
 				     /**
-				      * Transform a field of
-				      * contravariant vectors. The
-				      * contravariant transformation
-				      * multiplies a vector from the
-				      * left with the Jacobian matrix
-				      * of the transformation from
-				      * unit to real space cell.
-				      * 
-				      * The list of arguments is as follows:
-				      * we transform as many elements in the
-				      * @p input field, starting from @p offset,
-				      * as there are elements in @p
-				      * output. The @p input array may hold
-				      * more elements than are needed (some
-				      * finite element classes use this for a
-				      * denser storage of data), but it needs
-				      * to have at least
-				      * <tt>output.size()</tt> elements
-				      * starting with element @p offset.
+				      * @deprecated Use transform() instead.
 				      */
     virtual
     void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<1,spacedim> > >      output,
 			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const = 0;
 
                                      /**
-                                      * Transform a set of matrices
-                                      * contravariantly, i.e. multiply
-                                      * each function in the input
-                                      * range by the inverse Jacobian
-                                      * matrices at the different
-                                      * quadrature points from the
-                                      * right. Note that here it is no
-                                      * more equivalent to
-                                      * multiplication with the
-                                      * transpose of the inverse
-                                      * matrices from the left, unless
-                                      * the matrices to be multiplied
-                                      * with are symmetric.
-                                      *
-                                      * The same applies as to the
-                                      * function above regarding input
-                                      * and output arguments.
+				      * @deprecated Use transform() instead.
                                       */
     
     virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,spacedim> > > intput,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > intput,
                              const unsigned int                 offset,
 			     const VectorSlice<std::vector<Tensor<2,spacedim> > > output,
 			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const = 0;

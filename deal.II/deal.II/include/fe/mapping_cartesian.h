@@ -106,25 +106,25 @@ class MappingCartesian : public Mapping<dim,spacedim>
     
 
     virtual void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+    transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<1,spacedim> > > output,
 			 const typename Mapping<dim, spacedim>::InternalDataBase &internal) const;
     
     virtual void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+    transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<2,spacedim> > > output,
 			 const typename Mapping<dim, spacedim>::InternalDataBase &internal) const;
     
     virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<1,spacedim> > > output,
 			     const typename Mapping<dim, spacedim>::InternalDataBase &internal) const;
     
     virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
 			     const typename Mapping<dim, spacedim>::InternalDataBase &internal) const;

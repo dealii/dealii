@@ -153,7 +153,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * interface in Mapping.
 				      */
     virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<1,spacedim> > > output,
 			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;    
@@ -163,7 +163,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * interface in Mapping.
 				      */
     virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
 			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;    

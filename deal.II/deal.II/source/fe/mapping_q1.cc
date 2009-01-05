@@ -1168,40 +1168,72 @@ MappingQ1<1,2>::fill_fe_subface_values (const Triangulation<1,2>::cell_iterator 
 template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+  const VectorSlice<const std::vector<Tensor<1, dim> > > input,
+  VectorSlice<std::vector<Tensor<1, spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
 {
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
+
+  Tensor<1, spacedim> auxiliary;  
+  
   switch (mapping_type)
     {
       case mapping_covariant:
-	    transform_covariant(input, 0, output, internal);
-	    return;
-//       case mapping_contravariant:
-// 	    transform_contravariant(input, 0, output, internal);
-// 	    return;
+	    if (true)
+	      {
+		Assert (data.update_flags & update_covariant_transformation,
+			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+		
+		for (unsigned int i=0; i<output.size(); ++i)
+		  {
+		    for (unsigned int d=0;d<dim;++d)
+		      auxiliary[d] = input[i][d];
+		    contract (output[i], auxiliary, data.covariant[i]);
+		  }
+		return;
+	      }
+      case mapping_contravariant:
+	    if (true)
+	      {
+		Assert (data.update_flags & update_contravariant_transformation,
+			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+		
+		for (unsigned int i=0; i<output.size(); ++i)
+		  {
+		    for (unsigned int d=0;d<dim;++d)
+		      auxiliary[d] = input[i][d];
+		    contract (output[i], data.contravariant[i], auxiliary);
+		  }
+		return;
+	      }
       default:
 	    Assert(false, ExcNotImplemented());
     }
 }
 
+
 template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
-  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+  const VectorSlice<const std::vector<Tensor<2, dim> > > input,
+  VectorSlice<std::vector<Tensor<2, spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &internal,
   const MappingType mapping_type) const
 {
+  AssertDimension (input.size(), output.size());
+  
   switch (mapping_type)
     {
       case mapping_covariant:
 	    transform_covariant(input, 0, output, internal);
 	    return;
-//       case mapping_contravariant:
-// 	    transform_contravariant(input, 0, output, internal);
-// 	    return;
+       case mapping_contravariant:
+ 	    transform_contravariant(input, 0, output, internal);
+ 	    return;
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -1227,82 +1259,16 @@ MappingQ1<dim,spacedim>::transform_covariant (
   Assert (data.update_flags & update_covariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-
+  Tensor<1, spacedim> auxiliary;
+  
   for (unsigned int i=0; i<output.size(); ++i)
-    contract (output[i], input[i+offset], data.covariant[i]);
+    {
+      for (unsigned int d=0;d<dim;++d)
+	auxiliary[d] = input[i][d];
+      contract (output[i], auxiliary, data.covariant[i]);
+    }
 }
 
-
-#if deal_II_dimension == 1
-
-template<>
-void
-MappingQ1<1,2>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<1,1> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,2> > > output,
-  const Mapping<1,2>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-  AssertDimension (input.size(), output.size());
-
-				   // ensure that the following cast is really correct:
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
-	  ExcInternalError());
-  const InternalData &data = static_cast<const InternalData&>(mapping_data);
-
-  Assert (data.update_flags & update_covariant_transformation,
-	  FEValuesBase<1>::ExcAccessToUninitializedField());
-
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-
-  Tensor<1,2> auxiliary;
-  auxiliary[1]=0.;
-
-  for (unsigned int i=0; i<output.size(); ++i)
-  {
-    auxiliary[0]=input[i+offset][0];
-    contract (output[i], auxiliary, data.covariant[i]);
-  }
-}
-
-#endif
-
-#if deal_II_dimension == 2
-
-template<>
-void
-MappingQ1<2,3>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<1,2> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,3> > > output,
-  const Mapping<2,3>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-  AssertDimension (input.size(), output.size());
-  // ensure that the following cast is really correct:
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
-	  ExcInternalError());
-  const InternalData &data = static_cast<const InternalData&>(mapping_data);
-
-  Assert (data.update_flags & update_covariant_transformation,
-	  FEValuesBase<2>::ExcAccessToUninitializedField());
-
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-
-  Tensor<1,3> auxiliary;
-  auxiliary[2]=0.;
-    
-  for (unsigned int i=0; i<output.size(); ++i)
-  {
-    auxiliary[0]=input[i+offset][0];
-    auxiliary[1]=input[i+offset][1];
-    contract (output[i], auxiliary, data.covariant[i]);
-  }
-}
-
-#endif
 
 
 template <int dim, int spacedim>
@@ -1315,16 +1281,16 @@ MappingQ1<dim, spacedim>::transform_covariant (
 {
   Assert (offset == 0, ExcInternalError());
   AssertDimension (input.size(), output.size());
-  // ensure that the following cast is really correct:
+  
+				   // ensure that the following cast
+				   // is really correct:
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
 	  ExcInternalError());
   const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-
+  
   for (unsigned int i=0; i<output.size(); ++i)
     contract (output[i], input[i+offset], data.covariant[i]);
 }
@@ -1364,7 +1330,7 @@ template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::
 transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
@@ -1378,9 +1344,15 @@ transform_contravariant (
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
-
+  
+  Tensor<1, spacedim> auxiliary;
+  
   for (unsigned int i=0; i<output.size(); ++i)
-    contract (output[i], data.contravariant[i], input[i+offset]);
+    {
+      for (unsigned int d=0;d<dim;++d)
+	auxiliary[d] = input[i][d];      
+      contract (output[i], data.contravariant[i], auxiliary);
+    }
 }
 
 
@@ -1388,7 +1360,7 @@ transform_contravariant (
 template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
@@ -1408,12 +1380,43 @@ MappingQ1<dim,spacedim>::transform_contravariant (
 }
 
 
+#if deal_II_dimension == 1
+
+template <>
+void
+MappingQ1<1, 2>::transform_contravariant (
+    const VectorSlice<const std::vector<Tensor<2,1> > > ,
+    const unsigned int,
+    VectorSlice<std::vector<Tensor<2,2> > > ,
+    const Mapping<1,2>::InternalDataBase &) const
+{
+    Assert(false, ExcNotImplemented());
+}
+
+#endif
+
+#if deal_II_dimension == 2
+
+template <>
+void
+MappingQ1<2, 3>::transform_contravariant (
+    const VectorSlice<const std::vector<Tensor<2,2> > > ,
+    const unsigned int,
+    VectorSlice<std::vector<Tensor<2,3> > > ,
+    const Mapping<2,3>::InternalDataBase &) const
+{
+    Assert(false, ExcNotImplemented());
+}
+
+#endif
+
+
 
 template<int dim, int spacedim>
 Point<spacedim>
-MappingQ1<dim,spacedim>::
-transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                             const Point<dim>                                 &p) const
+MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
+  const typename Triangulation<dim,spacedim>::cell_iterator& cell,
+  const Point<dim>& p) const
 {
 				   // Use the get_data function to
 				   // create an InternalData with data

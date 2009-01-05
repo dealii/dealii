@@ -302,15 +302,15 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::fill_fe_values (
-                               const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			       const Quadrature<dim>                                     &q,
-			       typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-			       std::vector<Point<spacedim> >                             &quadrature_points,
-			       std::vector<double>                                       &JxW_values,
-			       std::vector<Tensor<2,spacedim> >                          &jacobians,
-			       std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
-			       std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
-			       std::vector<Point<spacedim> >                             &cell_normal_vectors) const
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const Quadrature<dim>                                     &q,
+  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+  std::vector<Point<spacedim> >                             &quadrature_points,
+  std::vector<double>                                       &JxW_values,
+  std::vector<Tensor<2,spacedim> >                          &jacobians,
+  std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
+  std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+  std::vector<Point<spacedim> >                             &cell_normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -345,15 +345,16 @@ MappingQ<dim,spacedim>::fill_fe_values (
 
 template<int dim, int spacedim>
 void
-MappingQ<dim,spacedim>::fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				    const unsigned int       face_no,
-				    const Quadrature<dim-1> &q,
-				    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-				    std::vector<Point<dim> >     &quadrature_points,
-				    std::vector<double>          &JxW_values,
-				    std::vector<Tensor<1,dim> >  &exterior_forms,
-				    std::vector<Point<dim> >     &normal_vectors,
-				    std::vector<double>          &cell_JxW_values) const
+MappingQ<dim,spacedim>::fill_fe_face_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const unsigned int       face_no,
+  const Quadrature<dim-1> &q,
+  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  std::vector<Point<dim> >     &quadrature_points,
+  std::vector<double>          &JxW_values,
+  std::vector<Tensor<1,dim> >  &exterior_forms,
+  std::vector<Point<dim> >     &normal_vectors,
+  std::vector<double>          &cell_JxW_values) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -1214,9 +1215,9 @@ MappingQ<dim,spacedim>::transform (
       case mapping_covariant:
 	    transform_covariant(input, 0, output, internal);
 	    return;
-//       case mapping_contravariant:
-// 	    transform_contravariant(input, 0, output, internal);
-// 	    return;
+       case mapping_contravariant:
+ 	    transform_contravariant(input, 0, output, internal);
+ 	    return;
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -1236,9 +1237,9 @@ MappingQ<dim,spacedim>::transform (
       case mapping_covariant:
 	    transform_covariant(input, 0, output, internal);
 	    return;
-//       case mapping_contravariant:
-// 	    transform_contravariant(input, 0, output, internal);
-// 	    return;
+       case mapping_contravariant:
+ 	    transform_contravariant(input, 0, output, internal);
+ 	    return;
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -1275,9 +1276,15 @@ MappingQ<dim,spacedim>::transform_covariant (
       else
 	tensor = data->covariant.begin();    
     }
-
+  
+  Tensor<1, spacedim> auxiliary;
+  
   for (unsigned int i=0; i<output.size(); ++i)
-    contract (output[i], input[i+offset], *(tensor++));
+    {
+      for (unsigned int d=0;d<dim;++d)
+	auxiliary[d] = input[i][d];
+      contract (output[i], auxiliary, *(tensor++));
+    }
 }
 
 
@@ -1321,7 +1328,7 @@ MappingQ<dim,spacedim>::transform_covariant (
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
@@ -1348,8 +1355,14 @@ MappingQ<dim,spacedim>::transform_contravariant (
 	tensor = data->contravariant.begin();    
     }
   
+  Tensor<1, spacedim> auxiliary;
+  
   for (unsigned int i=0; i<output.size(); ++i)
-    contract (output[i], *(tensor++), input[i+offset]);
+    {
+      for (unsigned int d=0;d<dim;++d)
+	auxiliary[d] = input[i][d];
+      contract (output[i], *(tensor++), auxiliary);
+    }
 }
 
 
@@ -1357,7 +1370,7 @@ MappingQ<dim,spacedim>::transform_contravariant (
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
