@@ -49,7 +49,6 @@ namespace TrilinosWrappers
 {
 				// forward declaration
   class VectorBase;
-  class SparseMatrix;
 
 
 				       /**
