@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,13 +21,18 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// TODO: See if we can unify the class hierarchy a bit using partial
+//TODO: See if we can unify the class hierarchy a bit using partial
 // specialization of classes here, e.g. declare a general class
 // TriaObjects<dim,G>.
 // To consider for this: in that case we would have to duplicate quite a few
 // things, e.g. TriaObjectsHex is derived from TriaObjects<Hexahedron> and
 // declares mainly additional data. This would have to be changed in case of a
 // partial specialization.
+
+//TODO: The TriaObjects class contains a std::vector<G>. This is only an
+//efficient storage scheme if G is relatively well packed, i.e. it's not a
+//bool and then an integer and then a double, etc. Verify that this is
+//actually the case.
 
 template <int dim, int spacedim> class Triangulation;
 
@@ -39,7 +44,7 @@ namespace internal
 
 /**
  * General template for information belonging to the geometrical objects of a
- * triangulation, i.e. lines, quads, hexahedrons...  Apart from the vector of
+ * triangulation, i.e. lines, quads, hexahedra...  Apart from the vector of
  * objects additional information is included, namely vectors indicating the
  * children, the used-status, user-flags, material-ids..
  *
