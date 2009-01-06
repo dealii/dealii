@@ -13,8 +13,8 @@
 
 
 #include <base/memory_consumption.h>
-#include <grid/tria_objects.h>
 #include <grid/tria.h>
+#include <grid/tria_objects.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 
