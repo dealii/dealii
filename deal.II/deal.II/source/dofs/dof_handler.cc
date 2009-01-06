@@ -2032,6 +2032,7 @@ DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
 		    8*selected_fe->dofs_per_quad);
       default:
 	    Assert (false, ExcNotImplemented());
+	    return numbers::invalid_unsigned_int;
     }
 }
 

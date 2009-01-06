@@ -418,7 +418,7 @@ GridGenerator::subdivided_hyper_rectangle (
 				   // are >= 1, and calculate deltas
 				   // convert repetitions from double
 				   // to int by taking the ceiling.
-  double delta[dim];
+  Point<dim> delta;
   
   for (unsigned int i=0; i<dim; ++i)
     {
