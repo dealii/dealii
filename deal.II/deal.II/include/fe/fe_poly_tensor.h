@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,7 +106,7 @@ DEAL_II_NAMESPACE_OPEN
  * in #mapping_type. Therefore, each constructor should contain a line
  * like:
  * @verbatim
- * this->mapping_type = this->independent_on_cartesian;
+ * this->mapping_type = this->mapping_none;
  * @endverbatim
  *
  * @see PolynomialsBDM, PolynomialsRaviartThomas
@@ -220,56 +220,9 @@ class FE_PolyTensor : public FiniteElement<dim,spacedim>
     
   protected:
 				     /**
-				      * Different options for
-				      * transforming the basis
-				      * functions from the reference
-				      * cell to the actual mesh cell.
-				      *
-				      * Most vector valued elements
-				      * either transform shape
-				      * functions to keep node values
-				      * on edges meaningful. Still, in
-				      * special cases, it may be
-				      * possible to avoid the mapping.
-				      */
-    enum MappingType {
-					   /**
-					    * No mapping has been
-					    * selected, throw an error
-					    * if needed.
-					    */
-	  no_mapping,
-					   /**
-					    * Shape functions do not
-					    * depend on actual mesh
-					    * cell
-					    */
-	  independent,
-					   /**
-					    * Shape functions do not
-					    * depend on actual mesh
-					    * cell. The mapping class
-					    * must be
-					    * MappingCartesian.
-					    */
-	  independent_on_cartesian,
-					   /**
-					    * Shape functions are
-					    * transformed covariant.
-					    */ 
-	  covariant,
-					   /**
-					    * Shape functions are
-					    * transformed
-					    * contravariant.
-					    */
-	  contravariant
-    };
-
-				     /**
 				      * The mapping type to be used to
 				      * map shape functions from the
-				      * reference cell to the msh
+				      * reference cell to the mesh
 				      * cell.
 				      */
     MappingType mapping_type;

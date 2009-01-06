@@ -86,7 +86,7 @@ MappingCartesian<dim, spacedim>::get_data (const UpdateFlags      update_flags,
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);
   data->update_flags = data->update_once | data->update_each;
-
+  
   return data;
 }
 
@@ -103,7 +103,7 @@ MappingCartesian<dim, spacedim>::get_face_data (const UpdateFlags update_flags,
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);
   data->update_flags = data->update_once | data->update_each;
-
+  
   return data;
 }
 
@@ -120,7 +120,7 @@ MappingCartesian<dim, spacedim>::get_subface_data (const UpdateFlags update_flag
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);
   data->update_flags = data->update_once | data->update_each;
-
+  
   return data;
 }
 
@@ -325,13 +325,15 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
 				   // equal and are the product of the
 				   // local lengths in each coordinate
 				   // direction
-  if (data.current_update_flags() & update_JxW_values)
+  if (data.current_update_flags() & (update_JxW_values | update_volume_elements))
     {
       double J = data.length[0];
       for (unsigned int d=1;d<dim;++d)
 	J *= data.length[d];
-      for (unsigned int i=0; i<JxW_values.size();++i)
-	JxW_values[i] = J * q.weight(i);
+      data.volume_element = J;
+      if (data.current_update_flags() & update_JxW_values)
+	for (unsigned int i=0; i<JxW_values.size();++i)
+	  JxW_values[i] = J * q.weight(i);
     }
 				   // "compute" Jacobian at the quadrature
 				   // points, which are all the same
@@ -402,7 +404,13 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (const typename Triangulati
     for (unsigned int i=0; i<boundary_forms.size();++i)
       boundary_forms[i] = J * normal_vectors[i];
 
-  //TODO: Implement cell_JxW_values
+  if (data.current_update_flags() & update_volume_elements)
+    {
+      J = data.length[0];
+      for (unsigned int d=1;d<dim;++d)
+	J *= data.length[d];
+      data.volume_element = J;
+    }
 }
 
 
@@ -464,7 +472,13 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (const typename Triangul
     for (unsigned int i=0; i<boundary_forms.size();++i)
       boundary_forms[i] = J * normal_vectors[i];
 
-  //TODO: Implement cell_JxW_values
+  if (data.current_update_flags() & update_volume_elements)
+    {
+      J = data.length[0];
+      for (unsigned int d=1;d<dim;++d)
+	J *= data.length[d];
+      data.volume_element = J;
+    }
 }
 
 
@@ -539,6 +553,19 @@ MappingCartesian<dim,spacedim>::transform (
 		for (unsigned int i=0; i<output.size(); ++i)
 		  for (unsigned int d=0;d<dim;++d)
 		    output[i][d] = input[i][d]*data.length[d];
+		return;
+	      }
+      case mapping_piola:
+	    if (true)
+	      {
+		Assert (data.update_flags & update_contravariant_transformation,
+			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+		Assert (data.update_flags & update_volume_elements,
+			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+		
+		for (unsigned int i=0; i<output.size(); ++i)
+		  for (unsigned int d=0;d<dim;++d)
+		    output[i][d] = input[i][d] * data.length[d] / data.volume_element;
 		return;
 	      }
       default:

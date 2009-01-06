@@ -257,9 +257,10 @@ FE_PolyTensor<POLY,dim,spacedim>::shape_grad_grad_component (const unsigned int 
 
 template <class POLY, int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
-FE_PolyTensor<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
-			     const Mapping<dim,spacedim>    &mapping,
-			     const Quadrature<dim> &quadrature) const
+FE_PolyTensor<POLY,dim,spacedim>::get_data (
+  const UpdateFlags      update_flags,
+  const Mapping<dim,spacedim>    &mapping,
+  const Quadrature<dim> &quadrature) const
 {
 				   // generate a new data object and
 				   // initialize some fields
@@ -371,11 +372,6 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
-//   Assert(mapping_type == independent
-// 	 || ( mapping_type == independent_on_cartesian
-// 	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
-// 	 ExcNotImplemented());
-
   const unsigned int n_q_points = quadrature.size();
   const UpdateFlags flags(fe_data.current_update_flags());
   
@@ -400,8 +396,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	{
 	  switch (mapping_type)
 	    {
-	      case independent:
-	      case independent_on_cartesian:
+	      case mapping_none:
 	      {
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
@@ -409,13 +404,13 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 		break;
 	      }
 	      
-	      case covariant:
-	      case contravariant:
+	      case mapping_covariant:
+	      case mapping_contravariant:
 	      {
 						 // Use auxiliary vector for
 						 // transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
-		if (mapping_type == covariant)
+		if (mapping_type == mapping_covariant)
 		  mapping.transform(fe_data.shape_values[i],
 				    shape_values, mapping_data, mapping_covariant);
 		else
@@ -425,9 +420,12 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 						 // then copy over to target:
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  {
+//TODO: [GK] Remove this after change to Piola complete
+		    
 						     // Recompute determinant
+
 		    const double
-		      J = (mapping_type == contravariant ?
+		      J = (mapping_type == mapping_contravariant ?
 			   data.JxW_values[k] / quadrature.weight(k)
 			   :
 			   1.0);
@@ -438,6 +436,18 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 		  }
 		break;
 	      }
+	      case mapping_piola:
+		    if (true)
+		      {
+			std::vector<Tensor<1,dim> > shape_values (n_q_points);
+			mapping.transform(fe_data.shape_values[i], shape_values,
+					  mapping_data, mapping_piola);
+			for (unsigned int k=0; k<n_q_points; ++k)
+			  for (unsigned int d=0; d<dim; ++d)
+			    data.shape_values(first+d,k)
+			      = sign_change[i] * shape_values[k][d];
+			break;
+		      }
 	      
 	      default:
 		Assert(false, ExcNotImplemented());
@@ -451,8 +461,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
 	  switch (mapping_type)
 	    {
-	      case independent:
-	      case independent_on_cartesian:
+	      case mapping_none:
 	      {
 		mapping.transform(fe_data.shape_grads[i], shape_grads1,
 				  mapping_data, mapping_covariant);
@@ -462,7 +471,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 		break;
 	      }
 	      
-	      case covariant:
+	      case mapping_covariant:
 	      {
 		mapping.transform(fe_data.shape_grads[i], shape_grads1,
 				  mapping_data, mapping_covariant);
@@ -481,8 +490,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
 		break;
 	      }
-	      
-	      case contravariant:
+	      case mapping_piola:
+	      case mapping_contravariant:
 	      {
 		mapping.transform(fe_data.shape_grads[i], shape_grads1,
 				  mapping_data, mapping_covariant);
@@ -494,11 +503,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 		  for (unsigned int d=0; d<dim; ++d)
 		    {
 						       // Recompute determinant
-		      const double
-			J = (mapping_type == contravariant ?
-			     data.JxW_values[k] / quadrature.weight(k)
-			     :
-			     1.0);
+		      const double J = data.JxW_values[k] / quadrature.weight(k);
 		      data.shape_gradients[first+d][k] = sign_change[i] * 
 			shape_grads2[k][d] / J;
 		    }
@@ -574,8 +579,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 	{
 	  switch (mapping_type)
 	    {
-	      case independent:
-	      case independent_on_cartesian:
+	      case mapping_none:
 	      {
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
@@ -583,13 +587,13 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		break;
 	      }
 	      
-	      case covariant:
-	      case contravariant:
+	      case mapping_covariant:
+	      case mapping_contravariant:
 	      {
 						 // Use auxiliary vector
 						 // for transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
-		if (mapping_type == covariant)
+		if (mapping_type == mapping_covariant)
 		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
 				    shape_values, mapping_data, mapping_covariant);
 		else
@@ -611,7 +615,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 						     // face in
 						     // fill_fe_face_values
 		    const double
-		      J = (mapping_type == contravariant ?
+		      J = (mapping_type == mapping_contravariant ?
 			   data.cell_JxW_values[k] / quadrature.weight(k)
 			   :
 			   1.0);
@@ -623,6 +627,18 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		
 		break;
 	      }
+	      case mapping_piola:
+		    if (true)
+		      {
+			std::vector<Tensor<1,dim> > shape_values (n_q_points);
+			mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+					  shape_values, mapping_data, mapping_piola);
+			for (unsigned int k=0; k<n_q_points; ++k)
+			  for (unsigned int d=0; d<dim; ++d)
+			    data.shape_values(first+d,k)
+			      = sign_change[i] * shape_values[k][d];
+			break;
+		      }
 	      
 	      default:
 		Assert(false, ExcNotImplemented());
@@ -636,8 +652,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 
 	  switch (mapping_type)
 	    {
-	      case independent:
-	      case independent_on_cartesian:
+	      case mapping_none:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_covariant);
@@ -647,7 +662,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		break;
 	      }
 	      
-	      case covariant:
+	      case mapping_covariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_covariant);
@@ -665,8 +680,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
-	      
-	      case contravariant:
+	      case mapping_piola:
+	      case mapping_contravariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_covariant);
@@ -680,8 +695,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 						       // recompute
 						       // determinant in the
 						       // same way as above
-		      const double
-			J = data.cell_JxW_values[k] / quadrature.weight(k);
+		      const double J = data.cell_JxW_values[k] / quadrature.weight(k);
 		      data.shape_gradients[first+d][k]
 			= sign_change[i] * shape_grads2[k][d] / J;
 		    }
@@ -755,8 +769,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 	{
 	  switch (mapping_type)
 	    {
-	      case independent:
-	      case independent_on_cartesian:
+	      case mapping_none:
 	      {
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
@@ -764,13 +777,13 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		break;
 	      }
 	      
-	      case covariant:
-	      case contravariant:
+	      case mapping_covariant:
+	      case mapping_contravariant:
 	      {
 						 // Use auxiliary vector for
 						 // transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
-		if (mapping_type == covariant)
+		if (mapping_type == mapping_covariant)
 		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
 				    shape_values, mapping_data, mapping_covariant);
 		else
@@ -792,7 +805,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 						     // face in
 						     // fill_fe_face_values
 		    const double
-		      J = (mapping_type == contravariant ?
+		      J = (mapping_type == mapping_contravariant ?
 			   data.cell_JxW_values[k] / quadrature.weight(k)
 			   :
 			   1.0);
@@ -804,7 +817,18 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 
 		break;
 	      }
-	      
+	      case mapping_piola:
+		    if (true)
+		      {
+			std::vector<Tensor<1,dim> > shape_values (n_q_points);
+			mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+					  shape_values, mapping_data, mapping_piola);
+			for (unsigned int k=0; k<n_q_points; ++k)
+			  for (unsigned int d=0; d<dim; ++d)
+			    data.shape_values(first+d,k)
+			      = sign_change[i] * shape_values[k][d];
+			break;
+		      }
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
@@ -817,8 +841,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 
 	  switch (mapping_type)
 	    {
-	      case independent:
-	      case independent_on_cartesian:
+	      case mapping_none:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_covariant);
@@ -828,7 +851,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		break;
 	      }
 	      
-	      case covariant:
+	      case mapping_covariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_covariant);
@@ -846,8 +869,9 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
-	      
-	      case contravariant:
+
+	      case mapping_piola:
+	      case mapping_contravariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_covariant);
@@ -861,8 +885,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 						       // recompute
 						       // determinant in the
 						       // same way as above
-		      const double
-			J = data.cell_JxW_values[k] / quadrature.weight(k);
+		      const double J = data.cell_JxW_values[k] / quadrature.weight(k);
 		      data.shape_gradients[first+d][k]
 			= sign_change[i] * shape_grads2[k][d] / J;
 		    }
@@ -913,8 +936,7 @@ template <class POLY, int dim, int spacedim>
 UpdateFlags
 FE_PolyTensor<POLY,dim,spacedim>::update_once (const UpdateFlags flags) const
 {
-  Assert (mapping_type != no_mapping, ExcNotInitialized());
-  const bool values_once = (mapping_type == independent);
+  const bool values_once = (mapping_type == mapping_none);
   
   UpdateFlags out = update_default;
 
@@ -929,8 +951,7 @@ template <class POLY, int dim, int spacedim>
 UpdateFlags
 FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 {
-  Assert (mapping_type != no_mapping, ExcNotInitialized());
-  const bool values_once = (mapping_type == independent);
+  const bool values_once = (mapping_type == mapping_none);
   
   UpdateFlags out = update_default;
 

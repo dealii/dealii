@@ -188,6 +188,11 @@ class MappingCartesian : public Mapping<dim,spacedim>
 	Tensor<1,dim> length;
 
 					 /**
+					  * The volume element
+					  */
+	double volume_element;
+	
+					 /**
 					  * Vector of all quadrature
 					  * points. Especially, all
 					  * points on all faces.

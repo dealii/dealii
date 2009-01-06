@@ -32,8 +32,6 @@ template <int dim, int spacedim> class FEValues;
 template <int dim, int spacedim> class FEFaceValues;
 template <int dim, int spacedim> class FESubfaceValues;
 
-//TODO: Offset in transform functions should be replaced by initializing VectorSlice correctly
-
                                      /**
                                       * The transformation type used
                                       * for the Mapping::transform() functions.
@@ -55,18 +53,21 @@ template <int dim, int spacedim> class FESubfaceValues;
 				      * for vectors. If such a
 				      * MappingType is applied to a
 				      * rank 2 tensor, it is implied
-				      * that the resulting Tensor
-				      * corresponds to the derivative
-				      * of the vector.
+				      * that the mapping is applied to
+				      * each column.
                                       */
 enum MappingType
 {
+/// No mapping
+      mapping_none = 0x0000,
 /// Covariant mapping
       mapping_covariant = 0x0001,
 /// Contravariant mapping
       mapping_contravariant = 0x0002,
 /// The Piola transform usually used for Hdiv elements
-      mapping_piola = 0x0003,
+      mapping_piola = 0x0100,
+/// The Piola transform for the derivative of an Hdiv element
+      mapping_piola_gradient = 0x0101,
 /// The mapping used for Raviart-Thomas elements
       mapping_raviart_thomas = mapping_piola,
 /// The mapping used for BDM elements
@@ -261,6 +262,14 @@ class Mapping : public Subscriptor
 					  * object.
 					  */
 	virtual unsigned int memory_consumption () const;
+
+					 /**
+					  * The determinant of the
+					  * Jacobian in each
+					  * quadrature point. Filled
+					  * if #update_volume_elements.
+					  */
+	std::vector<double> volume_elements;
 	
 					 /**
 					  * The positions of the

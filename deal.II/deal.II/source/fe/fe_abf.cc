@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,7 +56,7 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
   
-  this->mapping_type = this->contravariant;
+  this->mapping_type = mapping_piola;
 				   // First, initialize the
 				   // generalized support points and
 				   // quadrature weights, since they
@@ -539,12 +539,12 @@ FE_ABF<dim>::update_each (const UpdateFlags flags) const
 
   if (flags & update_values)
     out |= update_values             | update_covariant_transformation
-                                     | update_contravariant_transformation 
+                                     | update_piola
                                      | update_cell_JxW_values
                                      | update_JxW_values;
   if (flags & update_gradients)
     out |= update_gradients          | update_covariant_transformation 
-                                     | update_contravariant_transformation
+                                     | update_piola
                                      | update_cell_JxW_values
                                      | update_JxW_values;
   //TODO: Set update flags appropriately and figure out, how the second

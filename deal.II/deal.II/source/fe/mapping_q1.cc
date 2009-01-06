@@ -393,6 +393,7 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 				      | update_cell_JxW_values
 				      | update_boundary_forms
 				      | update_normal_vectors
+				      | update_volume_elements
 				      | update_jacobians
 				      | update_jacobian_grads
 				      | update_inverse_jacobians));
@@ -477,6 +478,9 @@ MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
 
   if (flags & update_contravariant_transformation)
     data.contravariant.resize(n_original_q_points);
+
+  if (flags & update_volume_elements)
+    data.volume_elements.resize(n_original_q_points);
 
   if (flags & update_jacobian_grads)
     data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
@@ -675,6 +679,9 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
 	      data.contravariant[point][i][j] += data_derv[j] * supp_pts[i];
 	}
 
+  if (update_flags & update_volume_elements)
+    for (unsigned int point=0; point<n_q_points; ++point)
+      data.volume_elements[point] = determinant(data.contravariant[point]);
 
 				    // invert contravariant for
 			            // covariant transformation
@@ -1200,6 +1207,22 @@ MappingQ1<dim,spacedim>::transform (
 		  {
 		    for (unsigned int d=0;d<dim;++d)
 		      auxiliary[d] = input[i][d];
+		    contract (output[i], data.contravariant[i], auxiliary);
+		  }
+		return;
+	      }
+      case mapping_piola:
+	    if (true)
+	      {
+		Assert (data.update_flags & update_contravariant_transformation,
+			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+		Assert (data.update_flags & update_volume_elements,
+			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+		
+		for (unsigned int i=0; i<output.size(); ++i)
+		  {
+		    for (unsigned int d=0;d<dim;++d)
+		      auxiliary[d] = input[i][d] / data.volume_elements[i];
 		    contract (output[i], data.contravariant[i], auxiliary);
 		  }
 		return;

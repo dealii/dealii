@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -221,7 +221,12 @@ enum UpdateFlags
 					* the Mapping.
 					*/
       update_transformation_gradients     = 0x2000,
-
+				       //! Determinant of the Jacobian
+				       /**
+					* Compute the volume element
+					* in each quadrature point.
+					*/
+      update_volume_elements              = 0x4000,
 				       /**
 					* Compute the JxW values
 					* on faces for the cell mapping
@@ -231,25 +236,25 @@ enum UpdateFlags
 					* is used in conjunction with
 					* H_div subspaces like RT and ABF.
 					*/
-      update_cell_JxW_values              = 0x4000,
+      update_cell_JxW_values              = 0x8000,
 				       /**
 					* Update the location of the
 					* mapped generalized support
 					* points of the element.
 					*/
-      update_support_points               = 0x8000,
+      update_support_points               = 0x10000,
 				       /**
 					* Update the Jacobian of the
 					* mapping in generalized
 					* support points.
 					*/
-      update_support_jacobians            = 0x10000,
+      update_support_jacobians            = 0x20000,
 				       /**
 					* Update the inverse Jacobian
 					* of the mapping in
 					* generalized support points.
 					*/
-      update_support_inverse_jacobians    = 0x20000,
+      update_support_inverse_jacobians    = 0x40000,
 				       /**
 					* @deprecated Update
 					* quadrature points
@@ -266,8 +271,14 @@ enum UpdateFlags
 					* vectors. Use
 					* update_face_normal_vectors
 					*/
-      update_normal_vectors               = update_face_normal_vectors
-
+      update_normal_vectors               = update_face_normal_vectors,
+				       //! Values needed for Piola transform
+				       /**
+					* Combination of the flags
+					* needed for Piola transform
+					* of Hdiv elements.
+					*/
+      update_piola = update_volume_elements | update_contravariant_transformation
 };
 
 
