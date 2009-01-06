@@ -1,0 +1,16 @@
+
+DEAL::1D
+DEAL::Number of cells: 115
+DEAL::Number of dofs : 116
+DEAL::|A| = 118784.
+DEAL::|B| = 118784.
+DEAL::2D
+DEAL::Number of cells: 1186
+DEAL::Number of dofs : 1537
+DEAL::|A| = 2.33581e+08
+DEAL::|B| = 2.33581e+08
+DEAL::3D
+DEAL::Number of cells: 736
+DEAL::Number of dofs : 1311
+DEAL::|A| = 2.03219e+09
+DEAL::|B| = 2.03219e+09

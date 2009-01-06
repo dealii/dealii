@@ -98,7 +98,8 @@ tests_x = grid_generator_?? \
 	  max_n_cells_* \
 	  joa_* \
 	  neighboring_cells_at_two_faces \
-	  solution_transfer
+	  solution_transfer \
+          make_boundary_constraints_*
 
 # tests for the hp branch:
 #	  fe_collection_*
