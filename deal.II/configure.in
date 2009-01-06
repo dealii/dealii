@@ -62,7 +62,7 @@ AC_SUBST(DEAL_II_MINOR)
 AC_SUBST(DEAL_II_PATH)
 
 dnl    For backward compatibility, also have DEAL2_DIR alias DEAL_II_PATH
-DEAL2_DIR=$DEAL_II_PATH
+DEAL2_DIR="$DEAL_II_PATH"
 AC_SUBST(DEAL2_DIR)
 
 dnl    Check for machine type operating system
@@ -94,9 +94,9 @@ dnl
 dnl Note that on MIPS systems, the AC_PROG_CXX call erroneously sets
 dnl -g in CXXFLAGS, which is not exactly what we want, so we store
 dnl the old value temporarily
-OLDCFLAGS=$CFLAGS
+OLDCFLAGS="$CFLAGS"
 AC_PROG_CC
-CFLAGS=$OLDCFLAGS
+CFLAGS="$OLDCFLAGS"
 AC_PATH_PROG(CC,$CC)
 
 OLDCXXFLAGS="$CXXFLAGS"
@@ -270,7 +270,7 @@ AC_MSG_RESULT(-------------- configuring shared/static libs ---------------)
 
 AC_ARG_ENABLE(shared,
 [  --enable-shared         set compiler flags to generate shared libraries],
-    enableshared=$enableval,
+    enableshared="$enableval",
     enableshared=yes)
 
 dnl On AIX 4.x and alpha, shared libs don't work for us at present, so 
@@ -350,7 +350,7 @@ AC_ARG_ENABLE(parser,
               AS_HELP_STRING([--enable-parser],[While switched on by default, this option allows
                               to switch off support for the function parser
 			      in the contrib directory.]),
-	      [ enableparser=$enableval
+	      [ enableparser="$enableval"
 	        if test "x$enableval" = "xno" ; then
  	          AC_MSG_RESULT(Function parser disabled)
 		  AC_DEFINE(DEAL_II_DISABLE_PARSER, 1,

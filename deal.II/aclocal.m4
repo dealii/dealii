@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -223,7 +223,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
       dnl high...
       AC_MSG_RESULT(C++ compiler is IBM xlC)
       GXX_VERSION=ibm_xlc
-      GXX_VERSION_DETAILED=$GXX_VERSION
+      GXX_VERSION_DETAILED="$GXX_VERSION"
     else
   
       dnl Check whether we are dealing with the MIPSpro C++ compiler
@@ -236,28 +236,28 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             AC_MSG_RESULT(C++ compiler is $mips_pro)
             AC_MSG_ERROR(This compiler is not supported)
             GXX_VERSION=MIPSpro7.3
-            GXX_VERSION_DETAILED=$GXX_VERSION
+            GXX_VERSION_DETAILED="$GXX_VERSION"
             ;;
           *7.4)
             AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.4)
             AC_MSG_ERROR(This compiler is not supported. Use MIPSPro compiler 7.4x)
             GXX_VERSION=MIPSpro7.4
-            GXX_VERSION_DETAILED=$GXX_VERSION
+            GXX_VERSION_DETAILED="$GXX_VERSION"
             ;;
           *7.41* | *7.42* | *7.43* | *7.44*)
             AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.4x)
             GXX_VERSION=MIPSpro7.4x
-            GXX_VERSION_DETAILED=$GXX_VERSION
+            GXX_VERSION_DETAILED="$GXX_VERSION"
             ;;
           *"7.5"*)
             AC_MSG_RESULT(C++ compiler is MIPSpro compiler 7.5)
             GXX_VERSION=MIPSpro7.5
-            GXX_VERSION_DETAILED=$GXX_VERSION
+            GXX_VERSION_DETAILED="$GXX_VERSION"
             ;;
           *)
             AC_MSG_RESULT(C++ compiler is unknown version but accepted MIPSpro compiler version)
             GXX_VERSION=MIPSpro-other
-            GXX_VERSION_DETAILED=$GXX_VERSION
+            GXX_VERSION_DETAILED="$GXX_VERSION"
 	    ;;
         esac
       else
@@ -303,7 +303,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             AC_MSG_RESULT(C++ compiler is icc)
             GXX_VERSION=intel_icc
           fi fi fi fi fi fi
-          GXX_VERSION_DETAILED=$GXX_VERSION
+          GXX_VERSION_DETAILED="$GXX_VERSION"
         else
   
           dnl Or DEC's cxx compiler?
@@ -311,7 +311,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           if test "x$is_dec_cxx" != "x" ; then
             AC_MSG_RESULT(C++ compiler is Compaq-cxx)
             GXX_VERSION=compaq_cxx
-            GXX_VERSION_DETAILED=$GXX_VERSION
+            GXX_VERSION_DETAILED="$GXX_VERSION"
           else
   
       	    dnl Sun Workshop/Studio?
@@ -320,7 +320,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             if test "x$is_sun_cc_1$is_sun_cc_2" != "x" ; then
               AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
               GXX_VERSION=sun_workshop
-              GXX_VERSION_DETAILED=$GXX_VERSION
+              GXX_VERSION_DETAILED="$GXX_VERSION"
             else
   
   	      dnl Sun Forte?
@@ -328,7 +328,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
               if test "x$is_sun_forte_cc" != "x" ; then
                 AC_MSG_RESULT(C++ compiler is Sun Forte compiler)
                 GXX_VERSION=sun_forte
-                GXX_VERSION_DETAILED=$GXX_VERSION
+                GXX_VERSION_DETAILED="$GXX_VERSION"
               else
   
   	        dnl Portland Group C++?
@@ -336,7 +336,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	        if test "x$is_pgcc" != "x" ; then
   	          AC_MSG_RESULT(C++ compiler is Portland Group C++)
   	          GXX_VERSION=portland_group
-    	          GXX_VERSION_DETAILED=$GXX_VERSION
+    	          GXX_VERSION_DETAILED="$GXX_VERSION"
                 else
   
   	          dnl HP aCC?
@@ -344,7 +344,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	          if test "x$is_aCC" != "x" ; then
   	            AC_MSG_RESULT(C++ compiler is HP aCC)
   	            GXX_VERSION=hp_aCC
-  	            GXX_VERSION_DETAILED=$GXX_VERSION
+  	            GXX_VERSION_DETAILED="$GXX_VERSION"
                   else
   
   	            dnl Borland C++
@@ -352,7 +352,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	            if test "x$is_bcc" != "x" ; then
   	              AC_MSG_RESULT(C++ compiler is Borland C++)
   	              GXX_VERSION=borland_bcc
-  	              GXX_VERSION_DETAILED=$GXX_VERSION
+  	              GXX_VERSION_DETAILED="$GXX_VERSION"
                     else
   
   	              dnl KAI C++? It seems as if the documented options
@@ -369,7 +369,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	              if test "x$is_kai_cc" != "x" ; then
   	                AC_MSG_RESULT(C++ compiler is KAI C++)
   	                GXX_VERSION=kai_cc
-   	                GXX_VERSION_DETAILED=$GXX_VERSION
+   	                GXX_VERSION_DETAILED="$GXX_VERSION"
                       else
   
                         dnl Maybe PathScale's compiler?
@@ -377,12 +377,12 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
                         if test "x$is_pathscale" != "x" ; then
                           AC_MSG_RESULT(C++ compiler is PathScale C++)
   	                  GXX_VERSION=pathscale_cc
-   	                  GXX_VERSION_DETAILED=$GXX_VERSION
+   	                  GXX_VERSION_DETAILED="$GXX_VERSION"
                         else
                           dnl  Aw, nothing suitable found...
                           AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
                           GXX_VERSION=unknown_cc
-                          GXX_VERSION_DETAILED=$GXX_VERSION
+                          GXX_VERSION_DETAILED="$GXX_VERSION"
                         fi
                       fi
                     fi
@@ -1689,7 +1689,7 @@ dnl finds all libraries.
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_RPATH,
-[ OLD_LDFLAGS=$LDFLAGS
+[ OLD_LDFLAGS="$LDFLAGS"
   LDFLAGS="-Wl,-rpath,$DEAL_II_PATH/lib $LDFLAGS"
   AC_MSG_CHECKING([whether compiler understands option -Wl,-rpath])
   AC_LINK_IFELSE(
@@ -1698,7 +1698,7 @@ AC_DEFUN(DEAL_II_CHECK_RPATH,
    [ AC_MSG_RESULT(yes)
      LD_PATH_OPTION="-Wl,-rpath "],
    [ AC_MSG_RESULT(no)
-     LDFLAGS=$OLD_LDFLAGS
+     LDFLAGS="$OLD_LDFLAGS"
      LD_PATH_OPTION="no"])
 ])
 
@@ -1714,7 +1714,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
 [
   dnl First try -soname
-  OLD_LDFLAGS=$LDFLAGS
+  OLD_LDFLAGS="$LDFLAGS"
   LDFLAGS="-Wl,-soname,libbase.so.6.2.1 $LDFLAGS $SHLIBFLAGS"
   AC_MSG_CHECKING([whether compiler understands option -Wl,-soname])
   AC_LINK_IFELSE(
@@ -1728,11 +1728,11 @@ AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
      DEAL_II_LD_UNDERSTANDS_SONAME="no"
    ]
   )
-  LDFLAGS=$OLD_LDFLAGS
+  LDFLAGS="$OLD_LDFLAGS"
   AC_SUBST(DEAL_II_LD_UNDERSTANDS_SONAME)
 
   dnl Now try the -dylib_install_name thing
-  OLD_LDFLAGS=$LDFLAGS
+  OLD_LDFLAGS="$LDFLAGS"
   LDFLAGS="-Wl,-dynamic,-install_name -Wl,libbase.so.6.2.1 $LDFLAGS -shared"
   AC_MSG_CHECKING([whether compiler understands option -Wl,-dynamic,-install_name])
   AC_LINK_IFELSE(
@@ -1746,7 +1746,7 @@ AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
      DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME="no"
    ]
   )
-  LDFLAGS=$OLD_LDFLAGS
+  LDFLAGS="$OLD_LDFLAGS"
   AC_SUBST(DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME)
 ])
 
@@ -1769,7 +1769,7 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
   [  --with-cpu=cpu          Optimize specifically for the given CPU type,
                           rather than just generating code for this
 		          processor family.],
-      withcpu=$withval,
+      withcpu="$withval",
       withcpu="")
   AC_MSG_CHECKING(for CPU to optimize for)
   case "$withcpu" in
@@ -1886,7 +1886,7 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
     	  CXXFLAGS="$CXXFLAGSG -$i"
     	  DEAL_II_TRY_COMPILER_FLAG(
 	    [
-	     thread_flag=$i
+	     thread_flag="$i"
 	     CXXFLAGSG="$CXXFLAGSG -$i"
 	     CXXFLAGSO="$CXXFLAGSO -$i"
              LDFLAGS="$LDFLAGS -$i"
@@ -1923,7 +1923,7 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
   AC_ARG_ENABLE(multithreading,
   [  --enable-multithreading  set compiler flags to allow for
                           multithreaded programs],
-    enablemultithreading=$enableval,
+    enablemultithreading="$enableval",
     enablemultithreading=no)
 ])
 
@@ -2059,7 +2059,7 @@ AC_DEFUN(DEAL_II_CHECK_USE_MT, dnl
   AC_ARG_WITH(multithreading,
   [  --with-multithreading=name  If name==posix, or no name given, then use
                           POSIX threads.],
-      withmultithreading=$withval,
+      withmultithreading="$withval",
       withmultithreading=no)
 
 dnl Default (i.e. no arg) means POSIX
@@ -2203,7 +2203,7 @@ AC_DEFUN(DEAL_II_CHECK_COMPAT_BLOCKER, dnl
   AC_ARG_ENABLE(compat-blocker,
   [  --enable-compat-blocker=mapping  block functions that implicitely
                           assume a Q1 mapping],
-      enable_compat_blocker=$enableval,
+      enable_compat_blocker="$enableval",
       enable_compat_blocker="")
 
   dnl Replace the comma-separated list by a space-separated one
@@ -2408,7 +2408,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 [
   AC_MSG_CHECKING(whether isnan is declared with $1 flags)
   AC_LANG(C++)
-  CXXFLAGS=$2
+  CXXFLAGS="$2"
   deal_II_isnan_flag=""
   AC_TRY_COMPILE(
     [
@@ -2512,7 +2512,7 @@ AC_DEFUN(DEAL_II_CHECK_ISFINITE, dnl
 [
   AC_MSG_CHECKING(for std::isfinite)
   AC_LANG(C++)
-  CXXFLAGS=$CXXFLAGSG
+  CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
 #include <cmath>
@@ -2547,7 +2547,7 @@ AC_DEFUN(DEAL_II_CHECK_RAND_R, dnl
 [
   AC_MSG_CHECKING(for rand_r)
   AC_LANG(C++)
-  CXXFLAGS=$CXXFLAGSG
+  CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
 	[
 #include <cstdlib>
@@ -2585,7 +2585,7 @@ AC_DEFUN(DEAL_II_CHECK_ASSERT_THROW, dnl
 [
   AC_MSG_CHECKING(whether AssertThrow works with $1 flags)
   AC_LANG(C++)
-  CXXFLAGS=$2
+  CXXFLAGS="$2"
   AC_TRY_COMPILE(
     [
 #include <exception>
@@ -4926,44 +4926,6 @@ dnl    ])
 
 
 dnl -------------------------------------------------------------
-dnl Check for KDOC.
-dnl
-dnl Usage: DEAL_II_CHECK_KDOC
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_KDOC, dnl
-[
-  dnl    Find the kdoc directory for documentation. kdoc2 is in
-  dnl    the contrib directory, but you might want another one
-  AC_ARG_WITH(kdoc,
-  [  --with-kdoc=DIR         use kdoc installed in DIR],
-      kdocdir=$withval,
-      kdocdir=${DEAL2_DIR}/contrib/kdoc/bin)
-  AC_MSG_CHECKING(for kdoc)
-
-  dnl lets see whether the file exists if not the default was taken
-  if test "$kdocdir" != ${DEAL2_DIR}/contrib/kdoc/bin ; then
-    if test -r $kdocdir/kdoc ; then
-      AC_MSG_RESULT(found)
-    else
-      AC_MSG_RESULT(not found)
-      AC_MSG_ERROR(Invalid kdoc path $kdocdir/kdoc)
-    fi
-  
-    if test -r "$kdocdir/Version" ; then
-      kdocversion=`cat $kdocdir/Version` ;
-    else
-      kdocversion=1;
-    fi
-  else
-    kdocversion=`cat ${DEAL2_DIR}/contrib/kdoc/src/Version`
-    AC_MSG_RESULT(using default version $kdocversion)
-  fi
-])
-
-
-
-dnl -------------------------------------------------------------
 dnl Check for Doxygen.
 dnl
 dnl Usage: DEAL_II_CHECK_DOXYGEN
@@ -4973,7 +4935,7 @@ AC_DEFUN(DEAL_II_CHECK_DOXYGEN, dnl
 [
   AC_ARG_WITH(doxygen,
   [  --with-doxygen=filename  use 'filename' for doxygen],
-      DOXYGEN=$withval,
+      DOXYGEN="$withval",
       DOXYGEN=)
 
   dnl lets see whether the file exists
@@ -5089,7 +5051,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
 [
   for i [ in $TECHOME $TEC100HOME $TEC90HOME $TEC80HOME ] ; do
     AC_CHECK_FILE($i/lib/tecio.a,
-		  TECPLOT_LIB=$i/lib/tecio.a)
+		  TECPLOT_LIB="$i/lib/tecio.a")
     AC_CHECK_FILE($i/include/TECIO.h,
 		  TECPLOT_INCLUDE_DIR=-I$i/include,
 		  TECPLOT_LIB="")
@@ -5126,7 +5088,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
                           subdirs; use this if you want to override the
                           NETCDF_DIR environment variable.],
      [
-        DEAL_II_NETCDF_DIR=$withval
+        DEAL_II_NETCDF_DIR="$withval"
      ],
      [
         dnl Take something from the environment variables, if it is there
@@ -5142,7 +5104,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 			   use this if you want to override the
 			   NETCDF_INCLUDE_DIR environment variable.],
       [
-	 NETCDF_INCLUDE_DIR=$withval
+	 NETCDF_INCLUDE_DIR="$withval"
       ])
 
    AC_ARG_WITH(netcdf-libs,
@@ -5150,7 +5112,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 			   use this if you want to override the
 			   NETCDF_LIBDIR environment variable.],
       [
-	 NETCDF_LIBDIR=$withval
+	 NETCDF_LIBDIR="$withval"
       ])
  
 
@@ -5229,7 +5191,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
           USE_CONTRIB_PETSC=no
         else
 	  USE_CONTRIB_PETSC=yes
-          DEAL_II_PETSC_DIR=$withval
+          DEAL_II_PETSC_DIR="$withval"
 	  AC_MSG_RESULT($DEAL_II_PETSC_DIR)
 
           dnl Make sure that what was specified is actually correct
@@ -5323,7 +5285,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
                           installation; use this if you want to override
                           the PETSC_ARCH environment variable.],
      [
-        DEAL_II_PETSC_ARCH=$withval
+        DEAL_II_PETSC_ARCH="$withval"
 	AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
      ],
      [
@@ -5417,13 +5379,13 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
   AC_MSG_CHECKING(for PETSc libmpiuni library)
 
   if test -f $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.a ; then
-    DEAL_II_PETSC_MPIUNI_LIB=$DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.a ;
+    DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.a" ;
   else if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a ; then
-    DEAL_II_PETSC_MPIUNI_LIB=$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a ;
+    DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a" ;
   else if test -f $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.so ; then
-    DEAL_II_PETSC_MPIUNI_LIB=$DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.so ;
+    DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.so" ;
   else if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.so ; then
-    DEAL_II_PETSC_MPIUNI_LIB=$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.so ;
+    DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.so" ;
   fi fi fi fi
 
   AC_MSG_RESULT($DEAL_II_PETSC_MPIUNI_LIB)
@@ -5455,7 +5417,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
           USE_CONTRIB_SLEPC=no
         else
 	  USE_CONTRIB_SLEPC=yes
-          DEAL_II_SLEPC_DIR=$withval
+          DEAL_II_SLEPC_DIR="$withval"
 	  AC_MSG_RESULT($DEAL_II_SLEPC_DIR)
 
           dnl Make sure that what was specified is actually correct
@@ -5531,7 +5493,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_ARCH, dnl
                           installation; use this if you want to override
                           the SLEPC_ARCH environment variable.],
      [
-        DEAL_II_SLEPC_ARCH=$withval
+        DEAL_II_SLEPC_ARCH="$withval"
 	AC_MSG_RESULT($DEAL_II_SLEPC_ARCH)
      ],
      [
@@ -5628,7 +5590,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
           USE_CONTRIB_TRILINOS=no
         else
 	  USE_CONTRIB_TRILINOS=yes
-          DEAL_II_TRILINOS_DIR=$withval
+          DEAL_II_TRILINOS_DIR="$withval"
 	  AC_MSG_RESULT($DEAL_II_TRILINOS_DIR)
 
           dnl Make sure that what was specified is actually correct
@@ -5677,7 +5639,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
           USE_CONTRIB_TRILINOS=no
         else
 	  USE_CONTRIB_TRILINOS=yes
-          DEAL_II_TRILINOS_INCDIR=$withval
+          DEAL_II_TRILINOS_INCDIR="$withval"
 	  AC_MSG_RESULT($DEAL_II_TRILINOS_INCDIR)
 
           dnl Make sure that what was specified is actually correct
@@ -5725,7 +5687,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
           USE_CONTRIB_TRILINOS=no
         else
 	  USE_CONTRIB_TRILINOS=yes
-          DEAL_II_TRILINOS_LIBDIR=$withval
+          DEAL_II_TRILINOS_LIBDIR="$withval"
 	  AC_MSG_RESULT($DEAL_II_TRILINOS_LIBDIR)
 
           dnl Make sure that what was specified is actually correct
@@ -5993,7 +5955,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
                           the METIS_DIR environment variable.],
      [
 	USE_CONTRIB_METIS=yes
-        DEAL_II_METIS_DIR=$withval
+        DEAL_II_METIS_DIR="$withval"
 	AC_MSG_RESULT($DEAL_II_METIS_DIR)
 
         dnl Make sure that what was specified is actually correct
@@ -6031,7 +5993,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
                           use this if you want to override the
                           METIS_INCLUDE_DIR environment variable.],
      [
-        METIS_INCLUDE_DIR=$withval
+        METIS_INCLUDE_DIR="$withval"
 	DEAL_II_METIS_INCDIR="$METIS_INCLUDE_DIR"
      ])
      
@@ -6041,7 +6003,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
                           METIS_LIBDIR environment variable.],
      [
 	USE_CONTRIB_METIS=yes
-        DEAL_II_METIS_LIBDIR=$withval
+        DEAL_II_METIS_LIBDIR="$withval"
 	AC_MSG_RESULT($DEAL_II_METIS_LIBDIR)
 
         dnl Make sure that what was specified is actually correct
@@ -6106,7 +6068,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
           AC_MSG_RESULT(using included version)
           DEAL_II_USE_INTERNAL_UMFPACK=yes
         else
-          UMFPACK_DIR=$withval
+          UMFPACK_DIR="$withval"
           UMFPACK_INCLUDE_DIR="-I$withval/Include"
           AC_MSG_RESULT(trying version at $withval)
         fi
@@ -6120,7 +6082,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 			  use this if you want to override the
 			  UMFPACK_INCDIR environment variable.],
      [
-	UMFPACK_INCDIR=$withval
+	UMFPACK_INCDIR="$withval"
         acx_umfpack=yes
      ])
   
@@ -6129,7 +6091,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 			  use this if you want to override the
 			  UMFPACK_LIBDIR environment variable.],
      [
-	UMFPACK_LIBDIR=$withval
+	UMFPACK_LIBDIR="$withval"
         acx_umfpack=yes
      ])
 
