@@ -97,12 +97,12 @@ dnl the old value temporarily
 OLDCFLAGS="$CFLAGS"
 AC_PROG_CC
 CFLAGS="$OLDCFLAGS"
-AC_PATH_PROG(CC,$CC)
+DEAL_II_PATH_PROG(CC,$CC)
 
 OLDCXXFLAGS="$CXXFLAGS"
 AC_PROG_CXX
 CXXFLAGS="$OLDCXXFLAGS"
-AC_PATH_PROG(CXX,$CXX) 
+DEAL_II_PATH_PROG(CXX,$CXX) 
 
 dnl Next determine which C++ compiler we have here and set compilation
 dnl flags accordingly. Note that for historical reasons the name and

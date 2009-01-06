@@ -16,8 +16,7 @@ dnl $Id$
 
 
 dnl -------------------------------------------------------------
-dnl Helper macro to add libpaths to LIBS
-dnl
+dnl Helper macros to add libpaths to LIBS
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL, dnl
@@ -36,6 +35,38 @@ AC_DEFUN(DEAL_II_EXTERNAL_LIBS_RESTORE_VAL, dnl
 [
   LIBS="$OLD_LIBS"
 ])
+
+
+
+dnl -------------------------------------------------------------
+dnl Like AC_PATH_PROG, but do not discard arguments given to the
+dnl program. In other words, while 
+dnl    AC_PATH_PROG(CXX, [g++ -pg])
+dnl results in CXX=/usr/bin/g++, the result of the current
+dnl macro would be CXX="/usr/bin/g++ -pg".
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_PATH_PROG, dnl
+[
+  dnl First get at the name and arguments of the program in $2. Do
+  dnl so by having a loop over all components of $2 and putting the
+  dnl components either into $testprog or into $testargs
+  testprog=""
+  testargs=""
+  processingargs="no"
+  for i in $2 ; do
+    if test "$processingargs" = "no" ; then
+      testprog="$i" ;
+      processingargs="yes" ;
+    else
+      testargs="$testargs $i" ;
+    fi
+  done
+
+  AC_PATH_PROG([$1],[$testprog])
+  eval "$1=\"${$1} $testargs\""
+])
+
+
 
 dnl -------------------------------------------------------------
 dnl Determine the C++ compiler in use. Return the name and possibly
