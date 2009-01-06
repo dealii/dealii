@@ -536,6 +536,8 @@ MGDoFCellAccessor<dim,spacedim>::face (const unsigned int i) const
 	    return this->quad(i);
       default:
 	    Assert (false, ExcNotImplemented());
+	    return 
+	      typename internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator();
     }
 }
 
