@@ -326,6 +326,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The Timer class can now also return the wall time using the method 
+  Timer::wall_time(), as opposed to the CPU time returned by 
+  Timer::operator ().
+  <br> 
+  (Martin Kronbichler 2009/01/07)
+  </p>
+
+  <li>
+  <p>
   New: The new class types_are_equal allows to write some templates more
   efficient by allowing to figure out whether certain template types are,
   for example, equal to double or float (in which case we can use

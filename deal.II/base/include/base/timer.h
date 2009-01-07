@@ -38,7 +38,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  *   timer.stop ();
  *
- *   std::cout << "Elapsed time: " << timer() << " seconds.";
+ *   std::cout << "Elapsed CPU time: " << timer() << " seconds.";
+ *   std::cout << "Elapsed wall time: " << timer.wall_time() << " seconds.";
  *
  *   // reset timer for the next thing it shall do
  *   timer.reset();
@@ -87,11 +88,10 @@ class Timer
     void reset ();
 
 				     /**
-				      * Access to the current time
+				      * Access to the current CPU time
 				      * without disturbing time
-				      * measurement. The elapsed time
-				      * is returned in units of
-				      * seconds.
+				      * measurement. The elapsed time is
+				      * returned in units of seconds.
 				      */
     double operator() () const;
 
@@ -151,15 +151,13 @@ class Timer
 				      */
     double              cumulative_time;
 
-
 				     /**
-				      * Accumulated waoo time for all
+				      * Accumulated wall time for all
 				      * previous start()/stop() cycles. The
 				      * wall time for the present cycle is
 				      * not included.
 				      */
     double              cumulative_wall_time;
-
 
 				     /**
 				      * Store whether the timer is presently
