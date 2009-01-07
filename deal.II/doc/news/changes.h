@@ -144,6 +144,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Updated: The step-33 tutorial program now uses the Trilinos wrapper 
+  classes for accessing Trilinos linear algebra routines instead of
+  implementing that by hand.
+  <br>
+  (Martin Kronbichler 2009/01/07)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Updated: The version of the <a href="http://www.boost.org/">BOOST</a>
   library that is in the <code>contrib/</code> directory and is used in
   various places of the library has been upgraded to 1.37.

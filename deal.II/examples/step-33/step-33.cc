@@ -52,34 +52,21 @@
                                  // differentiation. These are in the
                                  // following include files.
                                  //
-                                 // In particular, Epetra is the basic
-                                 // trilinos vector/matrix library and comes
-                                 // with several header files pertaining to
-                                 // individual aspects of it that will become
-                                 // clear later on:
-#include <Epetra_SerialComm.h>
-#include <Epetra_Map.h>
-#include <Epetra_CrsGraph.h>
-#include <Epetra_CrsMatrix.h>
-#include <Epetra_Vector.h>
-                                 // Next, Teuchos is a Trilinos utility
-                                 // library that is used to set parameters
-                                 // within the Aztec solver library:
-#include <Teuchos_ParameterList.hpp>
+                                 // Since deal.II provides interfaces to the
+                                 // basic Trilinos matrices, vectors,
+                                 // preconditioners and solvers, we include
+                                 // them similarly as deal.II linear algebra
+                                 // structures.
+#include <lac/trilinos_sparse_matrix.h>
+#include <lac/trilinos_vector.h>
+#include <lac/trilinos_precondition.h>
+#include <lac/trilinos_solver.h>
 
-                                 // Aztec itself is the iterative solver
-                                 // library:
-#include <AztecOO.h>
-#include <AztecOO_Operator.h>
 
-                                 // Amesos is a direct solver package within
-                                 // Trilinos:
-#include <Amesos.h>
-
-                                 // Finally, Sacado is the automatic
-                                 // differentiation package, which is used to
-                                 // find the Jacobian for a fully implicit
-                                 // Newton iteration:
+                                 // Sacado is the automatic differentiation
+                                 // package within Trilinos, which is used
+                                 // to find the Jacobian for a fully
+                                 // implicit Newton iteration:
 #include <Sacado.hpp>
 
 
@@ -815,11 +802,9 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
 	  ExcInternalError());
 
   if (do_schlieren_plot == true)
-    Assert (computed_quantities[0].size() == dim+2,
-	    ExcInternalError())
-					   else
-					     Assert (computed_quantities[0].size() == dim+1,
-						     ExcInternalError());
+    Assert (computed_quantities[0].size() == dim+2, ExcInternalError())
+  else
+    Assert (computed_quantities[0].size() == dim+1, ExcInternalError());
 
 				   // Then loop over all quadrature points and
 				   // do our work there. The code should be
@@ -1316,72 +1301,65 @@ namespace Parameters
 				   // Note that this class also handles the
 				   // declaration of initial and boundary
 				   // conditions specified in the input
-				   // file. To this end, in both cases, there
-				   // are entries like "w_0 value" which
-				   // represent an expression in terms of
-				   // $x,y,z$ that describe the initial or
-				   // boundary condition as a formula that
-				   // will later be parsed by the
+				   // file. To this end, in both cases,
+				   // there are entries like "w_0 value"
+				   // which represent an expression in terms
+				   // of $x,y,z$ that describe the initial
+				   // or boundary condition as a formula
+				   // that will later be parsed by the
 				   // FunctionParser class. Similar
-				   // expressions exist for "w_1", "w_2", etc,
-				   // denoting the <code>dim+2</code>
+				   // expressions exist for "w_1", "w_2",
+				   // etc, denoting the <code>dim+2</code>
 				   // conserved variables of the Euler
 				   // system. Similarly, we allow up to
 				   // <code>max_n_boundaries</code> boundary
-				   // indicators to be used in the input file,
-				   // and each of these boundary indicators
-				   // can be associated with an inflow,
-				   // outflow, or pressure boundary condition,
-				   // with inhomogenous boundary conditions
-				   // being specified for each component and
-				   // each boundary indicator separately.
+				   // indicators to be used in the input
+				   // file, and each of these boundary
+				   // indicators can be associated with an
+				   // inflow, outflow, or pressure boundary
+				   // condition, with inhomogenous boundary
+				   // conditions being specified for each
+				   // component and each boundary indicator
+				   // separately.
 				   //
-				   // The data structure used to store
-				   // the boundary indicators is a bit
+				   // The data structure used to store the
+				   // boundary indicators is a bit
 				   // complicated. It is an array of
-				   // <code>max_n_boundaries</code>
-				   // elements indicating the range of
-				   // boundary indicators that will be
-				   // accepted. For each entry in this
-				   // array, we store a pair of data
-				   // in the
+				   // <code>max_n_boundaries</code> elements
+				   // indicating the range of boundary
+				   // indicators that will be accepted. For
+				   // each entry in this array, we store a
+				   // pair of data in the
 				   // <code>BoundaryCondition</code>
-				   // structure: first, an array of
-				   // size <code>n_components</code>
-				   // that for each component of the
-				   // solution vector indicates
-				   // whether it is an inflow,
-				   // outflow, or other kind of
-				   // boundary, and second a
-				   // FunctionParser object that
-				   // describes all components of the
-				   // solution vector for this
-				   // boundary id at once.
+				   // structure: first, an array of size
+				   // <code>n_components</code> that for
+				   // each component of the solution vector
+				   // indicates whether it is an inflow,
+				   // outflow, or other kind of boundary,
+				   // and second a FunctionParser object
+				   // that describes all components of the
+				   // solution vector for this boundary id
+				   // at once.
 				   //
-				   // The
-				   // <code>BoundaryCondition</code>
-				   // structure requires a constructor
-				   // since we need to tell the
-				   // function parser object at
-				   // construction time how many
+				   // The <code>BoundaryCondition</code>
+				   // structure requires a constructor since
+				   // we need to tell the function parser
+				   // object at construction time how many
 				   // vector components it is to
-				   // describe. This initialization
-				   // can therefore not wait till we
-				   // actually set the formulas the
-				   // FunctionParser object represents
-				   // later in
+				   // describe. This initialization can
+				   // therefore not wait till we actually
+				   // set the formulas the FunctionParser
+				   // object represents later in
 				   // <code>AllParameters::parse_parameters()</code>
 				   //
-				   // For the same reason of having to
-				   // tell Function objects their
-				   // vector size at construction
-				   // time, we have to have a
+				   // For the same reason of having to tell
+				   // Function objects their vector size at
+				   // construction time, we have to have a
 				   // constructor of the
-				   // <code>AllParameters</code> class
-				   // that at least initializes the
-				   // other FunctionParser object,
-				   // i.e. the one describing initial
-				   // conditions.
+				   // <code>AllParameters</code> class that
+				   // at least initializes the other
+				   // FunctionParser object, i.e. the one
+				   // describing initial conditions.
   template <int dim>
   struct AllParameters : public Solver,
 			 public Refinement,
@@ -1630,14 +1608,14 @@ class ConservationLaw
     void assemble_system ();
     void assemble_cell_term (const FEValues<dim>             &fe_v,
 			     const std::vector<unsigned int> &dofs);
-    void assemble_face_term (const unsigned int           face_no,
-			     const FEFaceValuesBase<dim> &fe_v,
-			     const FEFaceValuesBase<dim> &fe_v_neighbor,
-			     const std::vector<unsigned int>   &dofs,
-			     const std::vector<unsigned int>   &dofs_neighbor,
-			     const bool                   external_face,
-			     const unsigned int           boundary_id,
-			     const double                 face_diameter);
+    void assemble_face_term (const unsigned int               face_no,
+			     const FEFaceValuesBase<dim>     &fe_v,
+			     const FEFaceValuesBase<dim>     &fe_v_neighbor,
+			     const std::vector<unsigned int> &dofs,
+			     const std::vector<unsigned int> &dofs_neighbor,
+			     const bool                       external_face,
+			     const unsigned int               boundary_id,
+			     const double                     face_diameter);
 
     std::pair<unsigned int, double> solve (Vector<double> &solution);
 
@@ -1711,49 +1689,29 @@ class ConservationLaw
 
 				     // This final set of member variables
 				     // (except for the object holding all
-				     // run-time parameters at the very bottom
-				     // and a screen output stream that only
-				     // prints something if verbose output has
-				     // been requested) deals with the
-				     // interface we have in this program to
-				     // the Trilinos library that provides us
-				     // with linear solvers.
-				     //
-				     // Trilinos is designed to be a library
-				     // that also runs in parallel on
-				     // distributed memory systems, so
-				     // matrices and vectors need two things:
-				     // (i) a communicator object that
-				     // facilitates sending messages to remote
-				     // machines, and (ii) a description which
-				     // elements of a vector or matrix reside
-				     // locally on a machine and which are
-				     // stored remotely.
-				     //
-				     // We do not actually run the current
-				     // program in parallel, and so the
-				     // objects we use here are pretty much
-				     // dummy objects for this purpose: the
-				     // communicator below represents a system
-				     // that includes only a single machine,
-				     // and the index map encodes that all
-				     // elements are stored
-				     // locally. Nevertheless, we need them.
-				     //
-				     // Furthermore, we need a matrix object
-				     // for the system matrix to be used in
-				     // each Newton step. Note that map and
-				     // matrix need to be updated for their
-				     // sizes whenever we refine the mesh. In
-				     // Trilinos, this is easiest done by
-				     // simply deleting the previous object
-				     // and creating a new one. To minimize
-				     // hassle and avoid memory leaks, we use
-				     // a <code>std::auto_ptr</code> instead
-				     // of a plain pointer for this.
-    Epetra_SerialComm               communicator;
-    std::auto_ptr<Epetra_Map>       Map;
-    std::auto_ptr<Epetra_CrsMatrix> Matrix;
+				     // run-time parameters at the very
+				     // bottom and a screen output stream
+				     // that only prints something if
+				     // verbose output has been requested)
+				     // deals with the inteface we have in
+				     // this program to the Trilinos library
+				     // that provides us with linear
+				     // solvers. Similarly to including
+				     // PETSc matrices in @ref step_17
+				     // "step-17", @ref step_18 "step-18",
+				     // and @ref step_19 "step-19", all we
+				     // need to do is to create a Trilinos
+				     // sparse matrix instead of the
+				     // standard deal.II class. The system
+				     // matrix is used for the Jacobian in
+				     // each Newton step. Since we do not
+				     // intend to run this program in
+				     // parallel (which wouldn't be too hard
+				     // with Trilinos data structures,
+				     // though), we don't have to think
+				     // about anything else like
+				     // distributing the degrees of freedom.
+    TrilinosWrappers::SparseMatrix system_matrix;
 
     Parameters::AllParameters<dim>  parameters;
     ConditionalOStream              verbose_cout;
@@ -1790,74 +1748,20 @@ ConservationLaw<dim>::ConservationLaw (const char *input_filename)
 
 				 // @sect4{ConservationLaw::setup_system}
 				 //
-				 // The following function is called
-				 // each time the mesh is
-				 // changed. Essentially what it does
-				 // is to resize the Trilinos
-				 // matrix. In addition to just
-				 // resizing it, it also builds a
-				 // sparsity pattern, initializes the
-				 // row lengths of the matrix with the
-				 // ones from this sparsity pattern,
-				 // and finally puts zero entries into
-				 // the places where nonzero entries
-				 // will later be found. This will
-				 // make subsequent operations on the
-				 // matrix faster, because no new
-				 // memory will need to be allocated:
+				 // The following (easy) function is called
+				 // each time the mesh is changed. All it
+				 // does is to resize the Trilinos matrix
+				 // according to a sparsity pattern that we
+				 // generate as in all the previous tutorial
+				 // programs.
 template <int dim>
 void ConservationLaw<dim>::setup_system ()
 {
-  Map.reset (new Epetra_Map(dof_handler.n_dofs(), 0, communicator));
-
-
-				   // Now create a sparsity pattern,
-				   // condense it, and count the
-				   // number of nonzero entries per
-				   // row:
   CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
 					      dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  sparsity_pattern.compress();
 
-  std::vector<int> row_lengths (dof_handler.n_dofs());
-  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-    row_lengths[i] = sparsity_pattern.row_length (i);
-
-				   // Next we build the matrix, using
-				   // the constructor that optimizes
-				   // with the existing lengths per
-				   // row variable. After this, loop
-				   // over the individual rows of the
-				   // deal.II sparsity pattern and
-				   // create entries in the Trilinos
-				   // matrix in the corresponding
-				   // places. At the end, call the
-				   // <code>FillComplete()</code>
-				   // function that indicates that no
-				   // other matrix entries will be
-				   // needed:
-  Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
-
-  const unsigned int max_nonzero_entries
-    = *std::max_element (row_lengths.begin(), row_lengths.end());
-
-  std::vector<double> values(max_nonzero_entries, 0);
-  std::vector<int> row_indices(max_nonzero_entries);
-
-  for (unsigned int row=0; row<dof_handler.n_dofs(); ++row)
-    {
-      row_indices.resize (row_lengths[row], 0);
-      values.resize (row_lengths[row], 0.);
-
-      for (int i=0; i<row_lengths[row]; ++i)
-	row_indices[i] = sparsity_pattern.column_number (row, i);
-
-      Matrix->InsertGlobalValues(row, row_lengths[row],
-				 &values[0], &row_indices[0]);
-    }
-
-  Matrix->FillComplete();
+  system_matrix.reinit (sparsity_pattern);
 }
 
 
@@ -1879,26 +1783,28 @@ void ConservationLaw<dim>::setup_system ()
                                  // assembly on these objects is done
                                  // in the following functions.
 				 //
-				 // At the top of the function we do the usual
-				 // housekeeping: allocate FEValues,
-				 // FEFaceValues, and FESubfaceValues objects
-				 // necessary to do the integrations on cells,
-				 // faces, and subfaces (in case of adjoining
-				 // cells on different refinement
-				 // levels). Note that we don't need all
-				 // information (like values, gradients, or
-				 // real locations of quadrature points) for
-				 // all of these objects, so we only let the
-				 // FEValues classes whatever is actually
-				 // necessary by specifying the minimal set of
+				 // At the top of the function we do the
+				 // usual housekeeping: allocate FEValues,
+				 // FEFaceValues, and FESubfaceValues
+				 // objects necessary to do the integrations
+				 // on cells, faces, and subfaces (in case
+				 // of adjoining cells on different
+				 // refinement levels). Note that we don't
+				 // need all information (like values,
+				 // gradients, or real locations of
+				 // quadrature points) for all of these
+				 // objects, so we only let the FEValues
+				 // classes whatever is actually necessary
+				 // by specifying the minimal set of
 				 // UpdateFlags. For example, when using a
 				 // FEFaceValues object for the neighboring
-				 // cell we only need the shape values: Given
-				 // a specific face, the quadrature points and
-				 // <code>JxW</code> values are the same as
-				 // for the current cells, and the normal
-				 // vectors are known to be the negative of
-				 // the normal vectors of the current cell.
+				 // cell we only need the shape values:
+				 // Given a specific face, the quadrature
+				 // points and <code>JxW</code> values are
+				 // the same as for the current cells, and
+				 // the normal vectors are known to be the
+				 // negative of the normal vectors of the
+				 // current cell.
 template <int dim>
 void ConservationLaw<dim>::assemble_system ()
 {
@@ -2118,7 +2024,7 @@ void ConservationLaw<dim>::assemble_system ()
 				   // After all this assembling, notify the
 				   // Trilinos matrix object that the matrix
 				   // is done:
-  Matrix->FillComplete();
+  system_matrix.compress();
 }
 
 
@@ -2433,50 +2339,21 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 	}
 
 				       // At the end of the loop, we have to
-				       // add the sensitivities to the matrix
-				       // and subtract the residual from the
-				       // right hand side. Trilinos FAD data
-				       // type gives us access to the
-				       // derivatives using
-				       // <code>F_i.fastAccessDx(k)</code>. The
-				       // code to get Trilinos to add elements
-				       // to the matrix is made a bit more
-				       // awkward by the fact that the
-				       // function takes plain pointers as
-				       // arguments. The first one, taking a
-				       // pointer to
-				       // <code>dofs_per_cell</code>
-				       // <code>double</code> values as its
-				       // third argument is easy enough to
-				       // deal with by just taking the address
-				       // of the first element of the
-				       // <code>residual_derivatives</code>
-				       // variable. However, it also wants an
-				       // <code>int*</code> for the column
-				       // numbers to be written to; this is a
-				       // bit more strenuous because in
-				       // deal.II we always use <code>unsigned
-				       // int</code> to represent indices
-				       // (which are, after all, always
-				       // non-negative), and that the
-				       // <code>dof_indices</code> passed to
-				       // this function are a
-				       // <code>const</code> argument. Why
-				       // Trilinos wants this argument
-				       // non-const is unknown, but in any
-				       // case to make it work we have to
-				       // first cast away the constness, and
-				       // then reinterpret all numbers as
-				       // signed integers. Not pretty but
-				       // works:
+				       // add the sensitivities to the
+				       // matrix and subtract the residual
+				       // from the right hand side. Trilinos
+				       // FAD data type gives us access to
+				       // the derivatives using
+				       // <code>F_i.fastAccessDx(k)</code>,
+				       // so we store the data in a
+				       // temporary array. This information
+				       // about the whole row of local dofs
+				       // is then added to the Trilinos
+				       // matrix at once (which supports the
+				       // data types we have chosen).
       for (unsigned int k=0; k<dofs_per_cell; ++k)
 	residual_derivatives[k] = F_i.fastAccessDx(k);
-      Matrix->SumIntoGlobalValues(dof_indices[i],
-				  dofs_per_cell,
-				  &residual_derivatives[0],
-				  reinterpret_cast<int*>(
-				    const_cast<unsigned int*>(
-				      &dof_indices[0])));
+      system_matrix.add(dof_indices[i], dof_indices, residual_derivatives);
       right_hand_side(dof_indices[i]) -= F_i.val();
     }
 
@@ -2687,23 +2564,14 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 
 	for (unsigned int k=0; k<dofs_per_cell; ++k)
 	  residual_derivatives[k] = F_i.fastAccessDx(k);
-	Matrix->SumIntoGlobalValues(dof_indices[i],
-				    dofs_per_cell,
-				    &residual_derivatives[0],
-				    reinterpret_cast<int*>(
-				      const_cast<unsigned int*>(
-					&dof_indices[0])));
+	system_matrix.add(dof_indices[i], dof_indices, residual_derivatives);
 
 	if (external_face == false)
 	  {
 	    for (unsigned int k=0; k<dofs_per_cell; ++k)
 	      residual_derivatives[k] = F_i.fastAccessDx(dofs_per_cell+k);
-	    Matrix->SumIntoGlobalValues(dof_indices[i],
-					dofs_per_cell,
-					&residual_derivatives[0],
-					reinterpret_cast<int*>(
-					  const_cast<unsigned int*>(
-					    &dof_indices_neighbor[0])));
+	    system_matrix.add (dof_indices[i], dof_indices_neighbor,
+			       residual_derivatives);
 	  }
 
 	right_hand_side(dof_indices[i]) -= F_i.val();
@@ -2723,75 +2591,100 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
                                  // function. The result is a pair of number
                                  // of iterations and the final linear
                                  // residual.
-				 //
-				 // There are a number of practicalities:
-				 // Since we have built our right hand side
-				 // and solution vector as deal.II Vector
-				 // objects (as opposed to the matrix, which
-				 // is a Trilinos object), we must hand the
-				 // solvers Trilinos Epetra vectors.  Luckily,
-				 // they support the concept of a 'view', so
-				 // we just send in a pointer to our deal.II
-				 // vectors.
 
 template <int dim>
 std::pair<unsigned int, double>
 ConservationLaw<dim>::solve (Vector<double> &newton_update)
 {
-  Epetra_Vector x(View, *Map, newton_update.begin());
-  Epetra_Vector b(View, *Map, right_hand_side.begin());
-
-
   switch (parameters.solver)
     {
-				       // If the parameter file specified that
-				       // a direct solver shall be used, then
-				       // we'll get here. The process is
-				       // rather straightforward: There are
-				       // two parts to the direct solve.  the
-				       // symbolic part figures out the
-				       // sparsity patterns, and then the
-				       // numerical part actually performs the
-				       // LU decomposition. At the end we have
-				       // to delete the solver object and
-				       // return that no iterations have been
-				       // performed and that the final linear
-				       // residual is zero, absent any better
-				       // information that may be provided
-				       // here:
+				       // If the parameter file specified
+				       // that a direct solver shall be
+				       // used, then we'll get here. The
+				       // process is straightforward, since
+				       // deal.II provides a wrapper class
+				       // to the Amesos direct solver within
+				       // Trilinos. All we have to do is to
+				       // create a solver control object
+				       // (which is just a dummy object
+				       // here, since we won't perform any
+				       // iterations), and then create the
+				       // direct solver object. When
+				       // actually doing the solve, note
+				       // that we don't pass a
+				       // preconditioner. That wouldn't make
+				       // much sense for a direct solver
+				       // anyway.  At the end we return the
+				       // solver control statistics &mdash;
+				       // which will tell that no iterations
+				       // have been performed and that the
+				       // final linear residual is zero,
+				       // absent any better information that
+				       // may be provided here:
       case Parameters::Solver::direct:
       {
-	Epetra_LinearProblem prob;
-	prob.SetOperator (Matrix.get());
+	SolverControl solver_control (1,0);
+	TrilinosWrappers::SolverDirect direct (solver_control, 
+					       parameters.output == 
+					       Parameters::Solver::verbose);
 
-	Amesos_BaseSolver *solver = Amesos().Create ("Amesos_Klu", prob);
-	Assert (solver != NULL, ExcInternalError());
+	direct.solve (system_matrix, newton_update, right_hand_side);
 
-	verbose_cout << "Starting symbolic factorization" << std::endl;
-	solver->SymbolicFactorization();
-
-	verbose_cout << "Starting numeric factorization" << std::endl;
-	solver->NumericFactorization();
-
-	prob.SetRHS(&b);
-	prob.SetLHS(&x);
-
-	verbose_cout << "Starting solve" << std::endl;
-	solver->Solve();
-
-	delete solver;
-
-	return std::make_pair<unsigned int, double> (0, 0);
+	return std::make_pair<unsigned int, double> (solver_control.last_step(), 
+						     solver_control.last_value());
       }
 
 				       // Likewise, if we are to use an
 				       // iterative solver, we use Aztec's
-				       // GMRES solver. As preconditioner, we
-				       // use ILU-T and set a bunch of options
+				       // GMRES solver. We could use the
+				       // Trilinos wrapper classes for
+				       // iterative solvers and
+				       // preconditioners here as well, but
+				       // we choose to use an Aztec solver
+				       // directly. For the given problem,
+				       // Aztec's internal preconditioner
+				       // implementations are superior over
+				       // the ones deal.II has wrapper
+				       // classes to, so we use ILU-T
+				       // preconditioning within the AztecOO
+				       // solver and set a bunch of options
 				       // that can be changed from the
-				       // parameter file:
+				       // parameter file.
+				       // 
+                                       // There are two more practicalities:
+				       // Since we have built our right hand
+				       // side and solution vector as
+				       // deal.II Vector objects (as opposed
+				       // to the matrix, which is a Trilinos
+				       // object), we must hand the solvers
+				       // Trilinos Epetra vectors.  Luckily,
+				       // they support the concept of a
+				       // 'view', so we just send in a
+				       // pointer to our deal.II vectors. We
+				       // have to provide an Epetra_Map for
+				       // the vector that sets the parallel
+				       // distribution, which is just a
+				       // dummy object in serial. The
+				       // easiest way is to ask the matrix
+				       // for its map, and we're going to be
+				       // ready for matrix-vector products
+				       // with it.
+				       //
+				       // Secondly, the Aztec solver wants
+				       // us to pass a Trilinos
+				       // Epetra_CrsMatrix in, not the
+				       // deal.II wrapper class itself. So
+				       // we access to the actual Trilinos
+				       // matrix in the Trilinos wrapper
+				       // class, and create a plain pointer
+				       // when passing it in.
       case Parameters::Solver::gmres:
       {
+	Epetra_Vector x(View, system_matrix.matrix->RowMap(), 
+			newton_update.begin());
+	Epetra_Vector b(View, system_matrix.matrix->RowMap(), 
+			right_hand_side.begin());
+
 	AztecOO solver;
 	solver.SetAztecOption(AZ_output,
 			      (parameters.output ==
@@ -2814,7 +2707,7 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 	solver.SetAztecParam(AZ_athresh,   parameters.ilut_atol);
 	solver.SetAztecParam(AZ_rthresh,   parameters.ilut_rtol);
 
-	solver.SetUserMatrix(Matrix.get());
+	solver.SetUserMatrix(&*system_matrix.matrix);
 
 	solver.Iterate(parameters.max_iterations, parameters.linear_residual);
 
@@ -3118,8 +3011,7 @@ void ConservationLaw<dim>::run ()
       current_solution = predictor;
       while (true)
 	{
-	  Matrix->PutScalar(0);
-	  Matrix->FillComplete();
+	  system_matrix = 0;
 
 	  right_hand_side = 0;
 	  assemble_system ();
@@ -3218,6 +3110,7 @@ void ConservationLaw<dim>::run ()
 				 // command line.
 int main (int argc, char *argv[])
 {
+  deallog.depth_console(0);
   if (argc != 2)
     {
       std::cout << "Usage:" << argv[0] << " infile" << std::endl;
