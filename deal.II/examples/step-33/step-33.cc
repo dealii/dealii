@@ -3105,9 +3105,9 @@ void ConservationLaw<dim>::run ()
 				 // The following ``main'' function is
 				 // similar to previous examples and
 				 // need not to be commented on. Note
-				 // that the program aborts if no
-				 // input file name is given on the
-				 // command line.
+				 // that the program aborts if no input
+				 // file name is given on the command
+				 // line.
 int main (int argc, char *argv[])
 {
   deallog.depth_console(0);
@@ -3119,6 +3119,7 @@ int main (int argc, char *argv[])
 
   try
     {
+      Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
       ConservationLaw<2> cons (argv[1]);
       cons.run ();
     }
