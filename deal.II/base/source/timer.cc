@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,8 @@ DEAL_II_NAMESPACE_OPEN
 
 Timer::Timer()
                 :
-                cumulative_time (0.)
+                cumulative_time (0.),
+		cumulative_wall_time (0.)
 {
   start();
 }
@@ -45,6 +46,11 @@ Timer::Timer()
 void Timer::start ()
 {
   running    = true;
+
+  struct timeval wall_timer;
+  gettimeofday(&wall_timer, NULL);
+  start_wall_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec;
+
   rusage usage;
   getrusage (RUSAGE_SELF, &usage);
   start_time = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
@@ -71,6 +77,11 @@ double Timer::stop ()
       const double dtime_children =
 	usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
       cumulative_time += dtime_children - start_time_children;
+
+      struct timeval wall_timer;
+      gettimeofday(&wall_timer, NULL);
+      cumulative_wall_time += wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec 
+	- start_wall_time;
     }
   return cumulative_time;
 }
@@ -98,9 +109,25 @@ double Timer::operator() () const
 
 
 
+double Timer::wall_time () const
+{
+  if (running)
+    {
+      struct timeval wall_timer;
+      gettimeofday(&wall_timer, NULL);
+      return wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec - start_wall_time + 
+	cumulative_wall_time;
+    }
+  else
+    return cumulative_wall_time;
+}
+
+
+
 void Timer::reset ()
 {
   cumulative_time = 0.;
+  cumulative_wall_time = 0.;
   running         = false;
 }
 

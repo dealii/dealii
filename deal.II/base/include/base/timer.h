@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * @note Implementation of this class is system
  * dependent. Unfortunately, it does not work with multithreading
  * right now. In this case, we would like to sum up the time needed by
- * all children. Furthermore, a wall clock option would be nice.
+ * all children.
  *
  * @ingroup utilities
  * @author G. Kanschat, W. Bangerth
@@ -95,6 +95,14 @@ class Timer
 				      */
     double operator() () const;
 
+				     /**
+				      * Access to the current wall time
+				      * without disturbing time
+				      * measurement. The elapsed time is
+				      * returned in units of seconds.
+				      */
+    double wall_time () const;
+
   private:
 
 				     /**
@@ -129,11 +137,28 @@ class Timer
     double              start_time_children;
 
 				     /**
+				      * Value of the wall time when start()
+				      * was called the last time or when the
+				      * object was created and no stop() was
+				      * issued in between.
+				      */
+    double              start_wall_time;
+
+				     /**
 				      * Accumulated time for all previous
 				      * start()/stop() cycles. The time for
 				      * the present cycle is not included.
 				      */
     double              cumulative_time;
+
+
+				     /**
+				      * Accumulated waoo time for all
+				      * previous start()/stop() cycles. The
+				      * wall time for the present cycle is
+				      * not included.
+				      */
+    double              cumulative_wall_time;
 
 
 				     /**
