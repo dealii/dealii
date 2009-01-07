@@ -751,6 +751,19 @@ namespace TrilinosWrappers
       unsigned int row_length (const unsigned int row) const;
 
                                        /**
+					* Compute the bandwidth of the
+					* matrix represented by this
+					* structure. The bandwidth is the
+					* maximum of $|i-j|$ for which the
+					* index pair $(i,j)$ represents a
+					* nonzero entry of the
+					* matrix. Consequently, the maximum
+					* bandwidth a $n\times m$ matrix can
+					* have is $\max\{n-1,m-1\}$.
+                                        */
+      unsigned int bandwidth () const;
+
+                                       /**
                                         * Return whether the object is
                                         * empty. It is empty if no memory is
                                         * allocated, which is the same as
@@ -860,13 +873,40 @@ namespace TrilinosWrappers
 					* implemented.
 					*/
       void write_ascii ();
-      
+
 				       /**
 					* Print the sparsity pattern to the
 					* given stream, using the format
 					* <tt>(line,col)</tt>.
 					*/
       void print (std::ostream &out) const;
+
+				       /**
+					* Print the sparsity of the matrix
+					* in a format that <tt>gnuplot</tt>
+					* understands and which can be used
+					* to plot the sparsity pattern in a
+					* graphical way. The format consists
+					* of pairs <tt>i j</tt> of nonzero
+					* elements, each representing one
+					* entry of this matrix, one per line
+					* of the output file. Indices are
+					* counted from zero on, as
+					* usual. Since sparsity patterns are
+					* printed in the same way as
+					* matrices are displayed, we print
+					* the negative of the column index,
+					* which means that the
+					* <tt>(0,0)</tt> element is in the
+					* top left rather than in the bottom
+					* left corner.
+					*
+					* Print the sparsity pattern in
+					* gnuplot by setting the data style
+					* to dots or points and use the
+					* <tt>plot</tt> command.
+					*/
+      void print_gnuplot (std::ostream &out) const;
     
                                         // TODO: Write an overloading
                                         // of the operator << for output.

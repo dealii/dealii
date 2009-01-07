@@ -617,6 +617,28 @@ namespace TrilinosWrappers
 
 
   unsigned int
+  SparsityPattern::bandwidth () const
+  {
+    unsigned int local_b=0;
+    int global_b=0;
+    for (unsigned int i=0; i<local_size(); ++i)
+      {
+	int * indices;
+	int num_entries;
+	graph->ExtractMyRowView(i, num_entries, indices);
+	for (unsigned int j=0; j<(unsigned int)num_entries; ++j)
+	  {
+	    if (static_cast<unsigned int>(std::abs(static_cast<int>(i-indices[j]))) > local_b)
+	      local_b = std::abs(static_cast<signed int>(i-indices[j]));
+	  }
+      }
+    graph->Comm().MaxAll((int *)&local_b, &global_b, 1);
+    return static_cast<unsigned int>(global_b);
+  }
+
+
+
+  unsigned int
   SparsityPattern::n_rows () const
   {
     const int n_rows = graph -> NumGlobalRows();
@@ -727,6 +749,31 @@ namespace TrilinosWrappers
 	      << std::endl;
       }
   
+    AssertThrow (out, ExcIO());
+  }
+
+
+
+  void
+  SparsityPattern::print_gnuplot (std::ostream &out) const
+  { 
+    Assert (graph->Filled() == true, ExcInternalError());
+    for (unsigned int row=0; row<local_size(); ++row)
+      {
+	signed int * indices;
+	int num_entries;
+	graph->ExtractMyRowView (row, num_entries, indices);
+
+	for (unsigned int j=0; j<(unsigned int)num_entries; ++j)
+                                         // while matrix entries are usually
+                                         // written (i,j), with i vertical and
+                                         // j horizontal, gnuplot output is
+                                         // x-y, that is we have to exchange
+                                         // the order of output
+	  out << indices[graph->GRID(j)] << " " << -static_cast<signed int>(row) 
+	      << std::endl;
+      }      
+
     AssertThrow (out, ExcIO());
   }
 
