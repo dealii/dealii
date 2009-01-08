@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2007, 2008 by the deal.II authors and David Neckels */
+/*    Copyright (C) 2007, 2008, 2009 by the deal.II authors and David Neckels */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1697,9 +1697,8 @@ class ConservationLaw
 				     // this program to the Trilinos library
 				     // that provides us with linear
 				     // solvers. Similarly to including
-				     // PETSc matrices in @ref step_17
-				     // "step-17", @ref step_18 "step-18",
-				     // and @ref step_19 "step-19", all we
+				     // PETSc matrices in step-17,
+				     // step-18, and step-19, all we
 				     // need to do is to create a Trilinos
 				     // sparse matrix instead of the
 				     // standard deal.II class. The system
