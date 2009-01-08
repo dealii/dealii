@@ -2284,13 +2284,74 @@ GridGenerator::colorize_hyper_shell (
 // Implementation for 3D only
 template <int dim>
 void
-GridGenerator::half_hyper_shell (Triangulation<dim>&,
-				 const Point<dim>&,
-				 const double,
-				 const double,
-				 const unsigned int)
+GridGenerator::half_hyper_shell (Triangulation<dim>& tria,
+				 const Point<dim>& center,
+				 const double inner_radius,
+				 const double outer_radius,
+				 const unsigned int n)
 {
-  Assert (false, ExcNotImplemented());
+  Assert ((inner_radius > 0) && (inner_radius < outer_radius),
+	  ExcInvalidRadii ());
+
+  if (n <= 5)
+    {
+      // These are for the two lower squares
+      const double d = outer_radius/std::sqrt(2.0);
+      const double a = inner_radius/std::sqrt(2.0);
+      // These are for the two upper square
+      const double b = a/2.0;
+      const double c = d/2.0;
+      // And so are these
+      const double hb = inner_radius*std::sqrt(3.0)/2.0;
+      const double hc = outer_radius*std::sqrt(3.0)/2.0;
+
+      Point<dim> vertices[16] = {
+	center+Point<dim>( 0,  d, -d),
+	center+Point<dim>( 0, -d, -d),
+	center+Point<dim>( 0,  a, -a),
+	center+Point<dim>( 0, -a, -a),
+	center+Point<dim>( 0,  a,  a),
+	center+Point<dim>( 0, -a,  a),
+	center+Point<dim>( 0,  d,  d),
+	center+Point<dim>( 0, -d,  d),
+
+	center+Point<dim>(hc,  c, -c),
+	center+Point<dim>(hc, -c, -c),
+	center+Point<dim>(hb,  b, -b),
+	center+Point<dim>(hb, -b, -b),
+	center+Point<dim>(hb,  b,  b),
+	center+Point<dim>(hb, -b,  b),
+	center+Point<dim>(hc,  c,  c),
+	center+Point<dim>(hc, -c,  c),
+      };
+
+      int cell_vertices[5][8] = {
+	{0, 1, 8, 9, 2, 3, 10, 11},
+	{0, 2, 8, 10, 6, 4, 14, 12},
+	{1, 7, 9, 15, 3, 5, 11, 13},
+	{6, 4, 14, 12, 7, 5, 15, 13},
+	{8, 10, 9, 11, 14, 12, 15, 13}
+      };
+
+      std::vector<CellData<dim> > cells (5, CellData<dim>());
+
+      for (unsigned int i=0; i<5; ++i) 
+	{
+	  for (unsigned int j=0; j<8; ++j)
+	    cells[i].vertices[j] = cell_vertices[i][j];
+	  cells[i].material_id = 0;
+	};
+
+      tria.create_triangulation (
+	     std::vector<Point<dim> >(&vertices[0], &vertices[16]),
+	     cells,
+	     SubCellData());       // no boundary information
+    }
+  else
+    {
+      Assert(false, ExcIndexRange(n, 0, 5));
+    }
+
 }
 
 
