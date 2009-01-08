@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -533,7 +533,9 @@ GridGenerator::subdivided_hyper_rectangle (
 				       // compare numbers to avoid
 				       // roundoff problems.
       const double epsilon
-        = 0.01 * *std::min_element (&delta[0], &delta[dim]);
+        = 0.01 * *std::min_element (&delta[0], &delta[0]+dim);
+      Assert (epsilon > 0,
+	      ExcMessage ("The distance between corner points must be positive."))
     
                                        // actual code is external since
                                        // 1-D is different from 2/3D.
