@@ -1768,6 +1768,20 @@ class DoFTools
     convert_couplings_to_blocks (const DoFHandler<dim,spacedim>& dof_handler,
 				 const Table<2, Coupling>& table_by_component,
 				 std::vector<Table<2,Coupling> >& tables_by_block);
+
+				     /**
+				      * Given a finite element and a table how
+				      * the vector components of it couple
+				      * with each other, compute and return a
+				      * table that describes how the
+				      * individual shape functions couple with
+				      * each other.
+				      */
+    template <int dim, int spacedim>
+    static
+    Table<2,Coupling>
+    dof_couplings_from_component_couplings (const FiniteElement<dim,spacedim> &fe,
+					    const Table<2,Coupling> &component_couplings);
     
 				     /**
 				      * Exception
@@ -1813,20 +1827,6 @@ class DoFTools
 				      * Exception
 				      */
     DeclException0 (ExcInvalidBoundaryIndicator);
-
-  private:
-
-				     /**
-				      * Compute coupling of dofs from
-				      * coupling of components.
-				      */
-    template <int dim, int spacedim>
-    static void compute_dof_couplings (
-      Table<2,Coupling>& dof_couplings,
-      const Table<2,Coupling>& component_couplings,
-      const FiniteElement<dim,spacedim>& fe);
-
-    friend class MGTools;
 };
 
 

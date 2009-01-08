@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -685,11 +685,9 @@ MGTools::make_flux_sparsity_pattern (
   typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
-  Table<2,DoFTools::Coupling> int_dof_mask(total_dofs, total_dofs);
-  Table<2,DoFTools::Coupling> flux_dof_mask(total_dofs, total_dofs);
-
-  DoFTools::compute_dof_couplings(int_dof_mask, int_mask, fe);
-  DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
+  const Table<2,DoFTools::Coupling>
+    int_dof_mask  = DoFTools::dof_couplings_from_component_couplings(fe, int_mask),
+    flux_dof_mask = DoFTools::dof_couplings_from_component_couplings(fe, flux_mask);
   
   for (unsigned int i=0; i<total_dofs; ++i)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell;++f)
@@ -864,11 +862,10 @@ MGTools::make_flux_sparsity_pattern_edge (
   Table<2,bool> support_on_face(dofs_per_cell, GeometryInfo<dim>::faces_per_cell);
   
   typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
-					    endc = dof.end(level);
+						     endc = dof.end(level);
 
-   Table<2,DoFTools::Coupling> flux_dof_mask(dofs_per_cell, dofs_per_cell);
-
-   DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
+  const Table<2,DoFTools::Coupling> flux_dof_mask
+    = DoFTools::dof_couplings_from_component_couplings(fe, flux_mask);
   
   for (unsigned int i=0; i<dofs_per_cell; ++i)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell;++f)

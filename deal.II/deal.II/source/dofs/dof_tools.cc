@@ -681,65 +681,57 @@ DoFTools::make_flux_sparsity_pattern (
 #endif
 
 
-namespace internal
+template <int dim, int spacedim>
+Table<2,DoFTools::Coupling>
+DoFTools::dof_couplings_from_component_couplings
+(const FiniteElement<dim,spacedim> &fe,
+ const Table<2,Coupling> &component_couplings)
 {
-  namespace
-  {
-    template <int dim, int spacedim>
-    void
-    compute_dof_couplings(Table<2,DoFTools::Coupling>&        dof_couplings,
-			  const Table<2,DoFTools::Coupling>&  component_couplings,
-			  const FiniteElement<dim,spacedim>& fe)
-    {
-      Assert(component_couplings.n_rows() == fe.n_components(),
-	     ExcDimensionMismatch(component_couplings.n_rows(),
-				  fe.n_components()));
-      Assert(component_couplings.n_cols() == fe.n_components(),
-	     ExcDimensionMismatch(component_couplings.n_cols(),
-				  fe.n_components()));
+  Assert(component_couplings.n_rows() == fe.n_components(),
+	 ExcDimensionMismatch(component_couplings.n_rows(),
+			      fe.n_components()));
+  Assert(component_couplings.n_cols() == fe.n_components(),
+	 ExcDimensionMismatch(component_couplings.n_cols(),
+			      fe.n_components()));
   
-      const unsigned int n_dofs = fe.dofs_per_cell;
+  const unsigned int n_dofs = fe.dofs_per_cell;
 
-      Assert(dof_couplings.n_rows() == n_dofs,
-	     ExcDimensionMismatch(dof_couplings.n_rows(), n_dofs));
-      Assert(dof_couplings.n_cols() == n_dofs,
-	     ExcDimensionMismatch(dof_couplings.n_cols(), n_dofs));
+  Table<2,DoFTools::Coupling> dof_couplings (n_dofs, n_dofs);
 
-      for (unsigned int i=0; i<n_dofs; ++i)
+  for (unsigned int i=0; i<n_dofs; ++i)
+    {
+      const unsigned int ii
+	= (fe.is_primitive(i) ?
+	   fe.system_to_component_index(i).first
+	   :
+	   (std::find (fe.get_nonzero_components(i).begin(),
+		       fe.get_nonzero_components(i).end(),
+		       true)
+	    -
+	    fe.get_nonzero_components(i).begin())
+	);
+      Assert (ii < fe.n_components(),
+	      ExcInternalError());
+
+      for (unsigned int j=0; j<n_dofs; ++j)
 	{
-	  const unsigned int ii
-	    = (fe.is_primitive(i) ?
-	       fe.system_to_component_index(i).first
+	  const unsigned int jj
+	    = (fe.is_primitive(j) ?
+	       fe.system_to_component_index(j).first
 	       :
-	       (std::find (fe.get_nonzero_components(i).begin(),
-			   fe.get_nonzero_components(i).end(),
+	       (std::find (fe.get_nonzero_components(j).begin(),
+			   fe.get_nonzero_components(j).end(),
 			   true)
 		-
-		fe.get_nonzero_components(i).begin())
+		fe.get_nonzero_components(j).begin())
 	    );
-	  Assert (ii < fe.n_components(),
-		  ExcInternalError());
+	  Assert (jj < fe.n_components(),
+		  ExcInternalError());          
 
-	  for (unsigned int j=0; j<n_dofs; ++j)
-	    {
-	      const unsigned int jj
-		= (fe.is_primitive(j) ?
-		   fe.system_to_component_index(j).first
-		   :
-		   (std::find (fe.get_nonzero_components(j).begin(),
-			       fe.get_nonzero_components(j).end(),
-			       true)
-		    -
-		    fe.get_nonzero_components(j).begin())
-		);
-	      Assert (jj < fe.n_components(),
-		      ExcInternalError());          
-
-	      dof_couplings(i,j) = component_couplings(ii,jj);
-	    }
+	  dof_couplings(i,j) = component_couplings(ii,jj);
 	}
     }
-  }
+  return dof_couplings;
 }
 
 
@@ -778,11 +770,9 @@ DoFTools::make_flux_sparsity_pattern (
   typename DH::active_cell_iterator cell = dof.begin_active(),
 				    endc = dof.end();
   
-  Table<2,Coupling> int_dof_mask(total_dofs, total_dofs);
-  Table<2,Coupling> flux_dof_mask(total_dofs, total_dofs);
-  
-  internal::compute_dof_couplings(int_dof_mask, int_mask, fe);
-  internal::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
+  const Table<2,Coupling>
+    int_dof_mask  = dof_couplings_from_component_couplings(fe, int_mask),
+    flux_dof_mask = dof_couplings_from_component_couplings(fe, flux_mask);
   
   for (unsigned int i=0; i<total_dofs; ++i)
     for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell;++f)
