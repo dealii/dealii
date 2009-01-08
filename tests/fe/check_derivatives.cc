@@ -84,7 +84,7 @@ void check (const unsigned int min_degree,
 
 
 template <template <int> class FE>
-void check (const unsigned int min_degree,
+void check1 (const unsigned int min_degree,
             const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
@@ -101,7 +101,7 @@ void check (const unsigned int min_degree,
 
 // Nedelec exists only in 2d/3d
 template <>
-void check<FE_Nedelec> (const unsigned int min_degree,
+void check1<FE_Nedelec> (const unsigned int min_degree,
                         const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
@@ -115,7 +115,7 @@ void check<FE_Nedelec> (const unsigned int min_degree,
 // Raviart-Thomas doesn't exists 1d. so does the nodal variant of it. the
 // former is also not implemented in 3d
 template <>
-void check<FE_RaviartThomas> (const unsigned int min_degree,
+void check1<FE_RaviartThomas> (const unsigned int min_degree,
 			      const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
@@ -125,7 +125,7 @@ void check<FE_RaviartThomas> (const unsigned int min_degree,
 }
 
 template <>
-void check<FE_RaviartThomasNodal> (const unsigned int min_degree,
+void check1<FE_RaviartThomasNodal> (const unsigned int min_degree,
                                    const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
@@ -147,15 +147,15 @@ main()
   deallog.depth_console(0);
 
   check<FE_Q> (1,4);
-  check<FE_Q_Hierarchical> (1,4);
+  check1<FE_Q_Hierarchical> (1,4);
   check<FE_DGQ> (0,4);
   check<FE_DGP> (0,4);
   check<FE_DGPNonparametric> (0,4);
-  check<FE_DGPMonomial> (0,3);
+  check1<FE_DGPMonomial> (0,3);
 
-  check<FE_Nedelec> (1,1);
-  check<FE_RaviartThomas> (0,4);
-  check<FE_RaviartThomasNodal> (0,2);
+  check1<FE_Nedelec> (1,1);
+  check1<FE_RaviartThomas> (0,4);
+  check1<FE_RaviartThomasNodal> (0,2);
   
   return 0;
 }
