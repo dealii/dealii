@@ -475,6 +475,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: Added a few simple helper functions (to VectorBase) that allow 
+  some manipulation of PETSc vectors. These functions do what they say 
+  in the documentation.
+  <br>
+  (Toby D. Young 2009/01/08)
+  </p>
+
+  <li>
+  <p>
   New: There is now a class TrilinosWrappers::SparsityPattern that allows to 
   construct distributed sparsity patterns that can be used for initializing 
   Trilinos sparse matrices. This means that for large problems on several 

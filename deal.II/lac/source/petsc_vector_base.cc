@@ -399,6 +399,55 @@ namespace PETScWrappers
 
 
 
+  VectorBase::real_type
+  VectorBase::normalize () const
+  {
+    PetscScalar d;
+
+    const int ierr = VecNormalize (vector, &d);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return d;
+  }
+
+
+
+  VectorBase::real_type
+  VectorBase::max ()  const
+  {
+    PetscInt    p;
+    PetscScalar d;
+
+    const int ierr = VecMax (vector, &p, &d);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return d;
+  }
+
+
+
+  VectorBase &
+  VectorBase::abs () 
+  {
+    const int ierr = VecAbs (vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return *this;
+  }
+
+
+
+  VectorBase &
+  VectorBase::conjugate () 
+  {
+    const int ierr = VecConjugate (vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return *this;
+  }
+
+
+
   bool
   VectorBase::all_zero () const
   {

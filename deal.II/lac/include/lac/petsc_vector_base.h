@@ -430,6 +430,32 @@ namespace PETScWrappers
       real_type linfty_norm () const;
 
                                        /**
+                                        * Normalize vector by dividing
+                                        * by the $l_2$-norm of the
+                                        * vector. Return vector norm
+                                        * before normalization.
+                                        */
+      real_type normalize () const;
+
+                                       /**
+                                        * Return vector component with
+                                        * the maximal magnitude.
+                                        */
+      real_type max () const;
+
+                                       /**
+                                        * Replace every element in a
+                                        * vector with its absolute
+                                        * value.
+                                        */
+      VectorBase & abs ();
+
+                                       /**
+                                        * Conjugate a vector.
+                                        */
+      VectorBase & conjugate ();
+
+                                       /**
                                         * Return whether the vector contains
                                         * only elements with value zero. This
                                         * function is mainly for internal
