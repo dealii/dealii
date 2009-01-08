@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -681,6 +681,69 @@ DoFTools::make_flux_sparsity_pattern (
 #endif
 
 
+namespace internal
+{
+  namespace
+  {
+    template <int dim, int spacedim>
+    void
+    compute_dof_couplings(Table<2,DoFTools::Coupling>&        dof_couplings,
+			  const Table<2,DoFTools::Coupling>&  component_couplings,
+			  const FiniteElement<dim,spacedim>& fe)
+    {
+      Assert(component_couplings.n_rows() == fe.n_components(),
+	     ExcDimensionMismatch(component_couplings.n_rows(),
+				  fe.n_components()));
+      Assert(component_couplings.n_cols() == fe.n_components(),
+	     ExcDimensionMismatch(component_couplings.n_cols(),
+				  fe.n_components()));
+  
+      const unsigned int n_dofs = fe.dofs_per_cell;
+
+      Assert(dof_couplings.n_rows() == n_dofs,
+	     ExcDimensionMismatch(dof_couplings.n_rows(), n_dofs));
+      Assert(dof_couplings.n_cols() == n_dofs,
+	     ExcDimensionMismatch(dof_couplings.n_cols(), n_dofs));
+
+      for (unsigned int i=0; i<n_dofs; ++i)
+	{
+	  const unsigned int ii
+	    = (fe.is_primitive(i) ?
+	       fe.system_to_component_index(i).first
+	       :
+	       (std::find (fe.get_nonzero_components(i).begin(),
+			   fe.get_nonzero_components(i).end(),
+			   true)
+		-
+		fe.get_nonzero_components(i).begin())
+	    );
+	  Assert (ii < fe.n_components(),
+		  ExcInternalError());
+
+	  for (unsigned int j=0; j<n_dofs; ++j)
+	    {
+	      const unsigned int jj
+		= (fe.is_primitive(j) ?
+		   fe.system_to_component_index(j).first
+		   :
+		   (std::find (fe.get_nonzero_components(j).begin(),
+			       fe.get_nonzero_components(j).end(),
+			       true)
+		    -
+		    fe.get_nonzero_components(j).begin())
+		);
+	      Assert (jj < fe.n_components(),
+		      ExcInternalError());          
+
+	      dof_couplings(i,j) = component_couplings(ii,jj);
+	    }
+	}
+    }
+  }
+}
+
+
+
 template <class DH, class SparsityPattern>
 void
 DoFTools::make_flux_sparsity_pattern (
@@ -718,8 +781,8 @@ DoFTools::make_flux_sparsity_pattern (
   Table<2,Coupling> int_dof_mask(total_dofs, total_dofs);
   Table<2,Coupling> flux_dof_mask(total_dofs, total_dofs);
   
-  compute_dof_couplings(int_dof_mask, int_mask, fe);
-  compute_dof_couplings(flux_dof_mask, flux_mask, fe);
+  internal::compute_dof_couplings(int_dof_mask, int_mask, fe);
+  internal::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
   
   for (unsigned int i=0; i<total_dofs; ++i)
     for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell;++f)
@@ -4071,6 +4134,499 @@ DoFTools::count_dofs_per_component (
 }
 
 
+
+
+namespace internal
+{
+  namespace
+  {
+				     /**
+				      * This is a helper function that
+				      * is used in the computation of
+				      * integrid constraints. See the
+				      * function for a thorough
+				      * description of how it works.
+				      */
+    template <int dim, int spacedim>
+    unsigned int
+    compute_intergrid_weights_1 (
+      const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
+      const unsigned int                  coarse_component,
+      const dealii::DoFHandler<dim,spacedim>              &fine_grid,
+      const unsigned int                  fine_component,
+      const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
+      std::vector<std::map<unsigned int, float> > &weights,
+      std::vector<int>                   &weight_mapping)
+    {
+				       // aliases to the finite elements
+				       // used by the dof handlers:
+      const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe(),
+					&fine_fe   = fine_grid.get_fe();
+
+				       // global numbers of dofs
+      const unsigned int n_coarse_dofs = coarse_grid.n_dofs(),
+			 n_fine_dofs   = fine_grid.n_dofs();
+
+				       // local numbers of dofs
+      const unsigned int fine_dofs_per_cell   = fine_fe.dofs_per_cell;
+
+				       // alias the number of dofs per
+				       // cell belonging to the
+				       // coarse_component which is to be
+				       // the restriction of the fine
+				       // grid:
+      const unsigned int coarse_dofs_per_cell_component
+	= coarse_fe.base_element(coarse_fe.component_to_base_index(coarse_component).first).dofs_per_cell;
+  
+
+				       // Try to find out whether the
+				       // grids stem from the same coarse
+				       // grid. This is a rather crude
+				       // test, but better than nothing
+      Assert (coarse_grid.get_tria().n_cells(0) == fine_grid.get_tria().n_cells(0),
+	      dealii::DoFTools::ExcGridsDontMatch());
+
+				       // check whether the map correlates
+				       // the right objects
+      Assert (&coarse_to_fine_grid_map.get_source_grid() == &coarse_grid,
+	      dealii::DoFTools::ExcGridsDontMatch ());
+      Assert (&coarse_to_fine_grid_map.get_destination_grid() == &fine_grid,
+	      dealii::DoFTools::ExcGridsDontMatch ());
+  
+  
+				       // check whether component numbers
+				       // are valid
+      Assert (coarse_component < coarse_fe.n_components(),
+	      dealii::DoFTools::ExcInvalidComponent (coarse_component, coarse_fe.n_components()));
+      Assert (fine_component < fine_fe.n_components(),
+	      dealii::DoFTools::ExcInvalidComponent (fine_component, fine_fe.n_components()));
+				       // check whether respective finite
+				       // elements are equal
+      Assert (coarse_fe.base_element (coarse_fe.component_to_base_index(coarse_component).first)
+	      ==
+	      fine_fe.base_element (fine_fe.component_to_base_index(fine_component).first),
+	      dealii::DoFTools::ExcFiniteElementsDontMatch());
+
+#ifdef DEBUG
+				       // if in debug mode, check whether
+				       // the coarse grid is indeed
+				       // coarser everywhere than the fine
+				       // grid
+      for (typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
+	     cell=coarse_grid.begin_active();
+	   cell != coarse_grid.end(); ++cell)
+	Assert (cell->level() <= coarse_to_fine_grid_map[cell]->level(),
+		dealii::DoFTools::ExcGridNotCoarser());
+#endif
+
+  
+
+/*
+ * From here on: the term `parameter' refers to the selected component
+ * on the coarse grid and its analogon on the fine grid. The naming of
+ * variables containing this term is due to the fact that
+ * `selected_component' is longer, but also due to the fact that the
+ * code of this function was initially written for a program where the
+ * component which we wanted to match between grids was actually the
+ * `parameter' variable.
+ *
+ * Likewise, the terms `parameter grid' and `state grid' refer to the
+ * coarse and fine grids, respectively.
+ *
+ * Changing the names of variables would in principle be a good idea,
+ * but would not make things simpler and would be another source of
+ * errors. If anyone feels like doing so: patches would be welcome!
+ */
+
+
+  
+				       // set up vectors of cell-local
+				       // data; each vector represents one
+				       // degree of freedom of the
+				       // coarse-grid variable in the
+				       // fine-grid element
+      std::vector<Vector<double> > parameter_dofs (coarse_dofs_per_cell_component,
+						   Vector<double>(fine_dofs_per_cell));
+				       // for each coarse dof: find its
+				       // position within the fine element
+				       // and set this value to one in the
+				       // respective vector (all other values
+				       // are zero by construction)
+      for (unsigned int local_coarse_dof=0;
+	   local_coarse_dof<coarse_dofs_per_cell_component;
+	   ++local_coarse_dof)
+	for (unsigned int fine_dof=0; fine_dof<fine_fe.dofs_per_cell; ++fine_dof)
+	  if (fine_fe.system_to_component_index(fine_dof)
+	      ==
+	      std::make_pair (fine_component, local_coarse_dof))
+	    {
+	      parameter_dofs[local_coarse_dof](fine_dof) = 1.;
+	      break;
+	    };
+
+
+				       // find out how many DoFs there are
+				       // on the grids belonging to the
+				       // components we want to match
+      unsigned int n_parameters_on_fine_grid=0;
+      if (true)
+	{
+					   // have a flag for each dof on
+					   // the fine grid and set it
+					   // to true if this is an
+					   // interesting dof. finally count
+					   // how many true's there
+	  std::vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
+	  std::vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
+      
+	  for (typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
+		 cell=fine_grid.begin_active();
+	       cell!=fine_grid.end(); ++cell)
+	    {
+	      cell->get_dof_indices (local_dof_indices);
+	      for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
+		if (fine_fe.system_to_component_index(i).first == fine_component)
+		  dof_is_interesting[local_dof_indices[i]] = true;
+	    };
+
+	  n_parameters_on_fine_grid = std::count (dof_is_interesting.begin(),
+						  dof_is_interesting.end(),
+						  true);
+	};  
+  
+
+				       // set up the weights mapping
+      weights.clear ();
+      weights.resize (n_coarse_dofs);
+
+      weight_mapping.clear ();
+      weight_mapping.resize (n_fine_dofs, -1);
+  
+      if (true)
+	{
+	  std::vector<unsigned int> local_dof_indices(fine_fe.dofs_per_cell);
+	  unsigned int next_free_index=0;
+	  for (typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
+		 cell=fine_grid.begin_active();
+	       cell != fine_grid.end(); ++cell)
+	    {
+	      cell->get_dof_indices (local_dof_indices);
+	      for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
+						 // if this DoF is a
+						 // parameter dof and has
+						 // not yet been numbered,
+						 // then do so
+		if ((fine_fe.system_to_component_index(i).first == fine_component) &&
+		    (weight_mapping[local_dof_indices[i]] == -1))
+		  {
+		    weight_mapping[local_dof_indices[i]] = next_free_index;
+		    ++next_free_index;
+		  };
+	    };
+
+	  Assert (next_free_index == n_parameters_on_fine_grid,
+		  ExcInternalError());
+	};
+
+  
+				       // for each cell on the parameter grid:
+				       // find out which degrees of freedom on the
+				       // fine grid correspond in which way to
+				       // the degrees of freedom on the parameter
+				       // grid
+				       //
+				       // do this in a separate function
+				       // to allow for multithreading
+				       // there. see this function also if
+				       // you want to read more
+				       // information on the algorithm
+				       // used.
+      compute_intergrid_weights_2 (coarse_grid, coarse_component,
+				   coarse_to_fine_grid_map, parameter_dofs,
+				   weight_mapping, weights);
+
+
+				       // ok, now we have all weights for each
+				       // dof on the fine grid. if in debug
+				       // mode lets see if everything went smooth,
+				       // i.e. each dof has sum of weights one
+				       //
+				       // in other words this means that
+				       // if the sum of all shape
+				       // functions on the parameter grid
+				       // is one (which is always the
+				       // case), then the representation
+				       // on the state grid should be as
+				       // well (division of unity)
+				       //
+				       // if the parameter grid has more
+				       // than one component, then the
+				       // respective dofs of the other
+				       // components have sum of weights
+				       // zero, of course. we do not
+				       // explicitly ask which component
+				       // a dof belongs to, but this at
+				       // least tests some errors
+#ifdef DEBUG
+      for (unsigned int col=0; col<n_parameters_on_fine_grid; ++col)
+	{
+	  double sum=0;
+	  for (unsigned int row=0; row<n_coarse_dofs; ++row)
+	    if (weights[row].find(col) != weights[row].end())
+	      sum += weights[row][col];
+	  Assert ((std::fabs(sum-1) < 1.e-12) ||
+		  ((coarse_fe.n_components()>1) && (sum==0)), ExcInternalError());
+	};
+#endif
+
+  
+      return n_parameters_on_fine_grid;
+    }
+
+
+				     /**
+				      * This is a function that is
+				      * called by the _2 function and
+				      * that operates on a range of
+				      * cells only. It is used to
+				      * split up the whole range of
+				      * cells into chunks which are
+				      * then worked on in parallel, if
+				      * multithreading is available.
+				      */
+    template <int dim, int spacedim>
+    void
+    compute_intergrid_weights_3 (
+      const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
+      const unsigned int                  coarse_component,
+      const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
+      const std::vector<Vector<double> > &parameter_dofs,
+      const std::vector<int>             &weight_mapping,
+      std::vector<std::map<unsigned int, float> > &weights,
+      const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &begin,
+      const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &end)
+    {
+				       // aliases to the finite elements
+				       // used by the dof handlers:
+      const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe();    
+
+				       // for each cell on the parameter grid:
+				       // find out which degrees of freedom on the
+				       // fine grid correspond in which way to
+				       // the degrees of freedom on the parameter
+				       // grid
+				       //
+				       // since for continuous FEs some
+				       // dofs exist on more than one
+				       // cell, we have to track which
+				       // ones were already visited. the
+				       // problem is that if we visit a
+				       // dof first on one cell and
+				       // compute its weight with respect
+				       // to some global dofs to be
+				       // non-zero, and later visit the
+				       // dof again on another cell and
+				       // (since we are on another cell)
+				       // recompute the weights with
+				       // respect to the same dofs as
+				       // above to be zero now, we have to
+				       // preserve them. we therefore
+				       // overwrite all weights if they
+				       // are nonzero and do not enforce
+				       // zero weights since that might be
+				       // only due to the fact that we are
+				       // on another cell.
+				       //
+				       // example:
+				       // coarse grid
+				       //  |     |     |
+				       //  *-----*-----*
+				       //  | cell|cell |
+				       //  |  1  |  2  |
+				       //  |     |     |
+				       //  0-----1-----*
+				       //
+				       // fine grid
+				       //  |  |  |  |  |
+				       //  *--*--*--*--*
+				       //  |  |  |  |  |
+				       //  *--*--*--*--*
+				       //  |  |  |  |  |
+				       //  *--x--y--*--*
+				       //
+				       // when on cell 1, we compute the
+				       // weights of dof 'x' to be 1/2
+				       // from parameter dofs 0 and 1,
+				       // respectively. however, when
+				       // later we are on cell 2, we again
+				       // compute the prolongation of
+				       // shape function 1 restricted to
+				       // cell 2 to the globla grid and
+				       // find that the weight of global
+				       // dof 'x' now is zero. however, we
+				       // should not overwrite the old
+				       // value.
+				       //
+				       // we therefore always only set
+				       // nonzero values. why adding up is
+				       // not useful: dof 'y' would get
+				       // weight 1 from parameter dof 1 on
+				       // both cells 1 and 2, but the
+				       // correct weight is nevertheless
+				       // only 1.
+
+				       // vector to hold the representation of
+				       // a single degree of freedom on the
+				       // coarse grid (for the selected fe)
+				       // on the fine grid
+      const unsigned int n_fine_dofs = weight_mapping.size();
+      Vector<double> global_parameter_representation (n_fine_dofs);
+  
+      typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator cell;
+      std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
+  
+      for (cell=begin; cell!=end; ++cell)
+	{
+					   // get the global indices of the
+					   // parameter dofs on this parameter
+					   // grid cell
+	  cell->get_dof_indices (parameter_dof_indices);
+
+					   // loop over all dofs on this
+					   // cell and check whether they
+					   // are interesting for us
+	  for (unsigned int local_dof=0;
+	       local_dof<coarse_fe.dofs_per_cell;
+	       ++local_dof)
+	    if (coarse_fe.system_to_component_index(local_dof).first
+		==
+		coarse_component)
+	      {
+						 // the how-many-th
+						 // parameter is this on
+						 // this cell?
+		const unsigned int local_parameter_dof
+		  = coarse_fe.system_to_component_index(local_dof).second;
+	    
+		global_parameter_representation = 0;
+	    
+						 // distribute the representation of
+						 // @p{local_parameter_dof} on the
+						 // parameter grid cell @p{cell} to
+						 // the global data space
+		coarse_to_fine_grid_map[cell]->
+		  set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
+						   global_parameter_representation);
+						 // now that we've got the global
+						 // representation of each parameter
+						 // dof, we've only got to clobber the
+						 // non-zero entries in that vector and
+						 // store the result
+						 //
+						 // what we have learned: if entry @p{i}
+						 // of the global vector holds the value
+						 // @p{v[i]}, then this is the weight with
+						 // which the present dof contributes
+						 // to @p{i}. there may be several such
+						 // @p{i}s and their weights' sum should
+						 // be one. Then, @p{v[i]} should be
+						 // equal to @p{\sum_j w_{ij} p[j]} with
+						 // @p{p[j]} be the values of the degrees
+						 // of freedom on the coarse grid. we
+						 // can thus compute constraints which
+						 // link the degrees of freedom @p{v[i]}
+						 // on the fine grid to those on the
+						 // coarse grid, @p{p[j]}. Now to use
+						 // these as real constraints, rather
+						 // than as additional equations, we
+						 // have to identify representants
+						 // among the @p{i} for each @p{j}. this will
+						 // be done by simply taking the first
+						 // @p{i} for which @p{w_{ij}==1}.
+						 //
+						 // guard modification of
+						 // the weights array by a
+						 // Mutex. since it should
+						 // happen rather rarely
+						 // that there are several
+						 // threads operating on
+						 // different intergrid
+						 // weights, have only one
+						 // mutex for all of them
+		static Threads::ThreadMutex mutex;
+		Threads::ThreadMutex::ScopedLock lock (mutex);
+		for (unsigned int i=0; i<global_parameter_representation.size(); ++i)
+						   // set this weight if it belongs
+						   // to a parameter dof.
+		  if (weight_mapping[i] != -1)
+		    {
+						       // only overwrite old
+						       // value if not by
+						       // zero
+		      if (global_parameter_representation(i) != 0)
+			{
+			  const unsigned int wi = parameter_dof_indices[local_dof],
+					     wj = weight_mapping[i];
+			  weights[wi][wj] = global_parameter_representation(i);
+			};
+		    }
+		  else
+		    Assert (global_parameter_representation(i) == 0,
+			    ExcInternalError());
+	      }
+	}
+    }
+
+
+				     /**
+				      * This is a helper function that
+				      * is used in the computation of
+				      * integrid constraints. See the
+				      * function for a thorough
+				      * description of how it works.
+				      */
+    template <int dim, int spacedim>
+    void
+    compute_intergrid_weights_2 (
+      const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
+      const unsigned int                  coarse_component,
+      const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
+      const std::vector<Vector<double> > &parameter_dofs,
+      const std::vector<int>             &weight_mapping,
+      std::vector<std::map<unsigned int,float> > &weights)
+    {
+				       // simply distribute the range of
+				       // cells to different threads
+      typedef typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
+      std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
+	cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
+								     coarse_grid.end(),
+								     multithread_info.n_default_threads);
+
+      Threads::ThreadGroup<> threads;
+      void (*fun_ptr) (const dealii::DoFHandler<dim,spacedim>              &,
+		       const unsigned int                  ,
+		       const InterGridMap<dealii::DoFHandler<dim,spacedim> > &,
+		       const std::vector<Vector<double> > &,
+		       const std::vector<int>             &,
+		       std::vector<std::map<unsigned int, float> > &,
+		       const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &,
+		       const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &)
+	= &compute_intergrid_weights_3<dim>;
+      for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
+	threads += Threads::spawn (fun_ptr)(coarse_grid, coarse_component,
+					    coarse_to_fine_grid_map, parameter_dofs,
+					    weight_mapping, weights,
+					    cell_intervals[i].first,
+					    cell_intervals[i].second);
+
+				       // wait for the threads to finish
+      threads.join_all ();
+    }
+  }
+}
+
+
 template <int dim, int spacedim>
 void
 DoFTools::compute_intergrid_constraints (
@@ -4130,8 +4686,10 @@ DoFTools::compute_intergrid_constraints (
   std::vector<int> weight_mapping;
 
   const unsigned int n_parameters_on_fine_grid
-    = compute_intergrid_weights_1 (coarse_grid, coarse_component, fine_grid, fine_component,
-				   coarse_to_fine_grid_map, weights, weight_mapping);
+    = internal::compute_intergrid_weights_1 (coarse_grid, coarse_component,
+					     fine_grid, fine_component,
+					     coarse_to_fine_grid_map,
+					     weights, weight_mapping);
   
 				   // global numbers of dofs
   const unsigned int n_coarse_dofs = coarse_grid.n_dofs(),
@@ -4353,8 +4911,10 @@ compute_intergrid_transfer_representation (
 				   // indicating an error
   std::vector<int> weight_mapping;
 
-  compute_intergrid_weights_1 (coarse_grid, coarse_component, fine_grid, fine_component,
-			       coarse_to_fine_grid_map, weights, weight_mapping);
+  internal::compute_intergrid_weights_1 (coarse_grid, coarse_component,
+					 fine_grid, fine_component,
+					 coarse_to_fine_grid_map,
+					 weights, weight_mapping);
   
 				   // now compute the requested
 				   // representation
@@ -4402,470 +4962,6 @@ compute_intergrid_transfer_representation (
 	};
     };
 }
-
-
-
-template <int dim, int spacedim>
-unsigned int
-DoFTools::compute_intergrid_weights_1 (
-  const DoFHandler<dim,spacedim>              &coarse_grid,
-  const unsigned int                  coarse_component,
-  const DoFHandler<dim,spacedim>              &fine_grid,
-  const unsigned int                  fine_component,
-  const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-  std::vector<std::map<unsigned int, float> > &weights,
-  std::vector<int>                   &weight_mapping)
-{
-				   // aliases to the finite elements
-				   // used by the dof handlers:
-  const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe(),
-			   &fine_fe   = fine_grid.get_fe();
-
-				   // global numbers of dofs
-  const unsigned int n_coarse_dofs = coarse_grid.n_dofs(),
-		     n_fine_dofs   = fine_grid.n_dofs();
-
-				   // local numbers of dofs
-  const unsigned int fine_dofs_per_cell   = fine_fe.dofs_per_cell;
-
-				   // alias the number of dofs per
-				   // cell belonging to the
-				   // coarse_component which is to be
-				   // the restriction of the fine
-				   // grid:
-  const unsigned int coarse_dofs_per_cell_component
-    = coarse_fe.base_element(coarse_fe.component_to_base_index(coarse_component).first).dofs_per_cell;
-  
-
-				   // Try to find out whether the
-				   // grids stem from the same coarse
-				   // grid. This is a rather crude
-				   // test, but better than nothing
-  Assert (coarse_grid.get_tria().n_cells(0) == fine_grid.get_tria().n_cells(0),
-	  ExcGridsDontMatch());
-
-				   // check whether the map correlates
-				   // the right objects
-  Assert (&coarse_to_fine_grid_map.get_source_grid() == &coarse_grid,
-	  ExcGridsDontMatch ());
-  Assert (&coarse_to_fine_grid_map.get_destination_grid() == &fine_grid,
-	  ExcGridsDontMatch ());
-  
-  
-				   // check whether component numbers
-				   // are valid
-  Assert (coarse_component < coarse_fe.n_components(),
-	  ExcInvalidComponent (coarse_component, coarse_fe.n_components()));
-  Assert (fine_component < fine_fe.n_components(),
-	  ExcInvalidComponent (fine_component, fine_fe.n_components()));
-				   // check whether respective finite
-				   // elements are equal
-  Assert (coarse_fe.base_element (coarse_fe.component_to_base_index(coarse_component).first)
-	  ==
-	  fine_fe.base_element (fine_fe.component_to_base_index(fine_component).first),
-	  ExcFiniteElementsDontMatch());
-
-#ifdef DEBUG
-				   // if in debug mode, check whether
-				   // the coarse grid is indeed
-				   // coarser everywhere than the fine
-				   // grid
-  for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell=coarse_grid.begin_active();
-       cell != coarse_grid.end(); ++cell)
-    Assert (cell->level() <= coarse_to_fine_grid_map[cell]->level(),
-	    ExcGridNotCoarser());
-#endif
-
-  
-
-/*
- * From here on: the term `parameter' refers to the selected component
- * on the coarse grid and its analogon on the fine grid. The naming of
- * variables containing this term is due to the fact that
- * `selected_component' is longer, but also due to the fact that the
- * code of this function was initially written for a program where the
- * component which we wanted to match between grids was actually the
- * `parameter' variable.
- *
- * Likewise, the terms `parameter grid' and `state grid' refer to the
- * coarse and fine grids, respectively.
- *
- * Changing the names of variables would in principle be a good idea,
- * but would not make things simpler and would be another source of
- * errors. If anyone feels like doing so: patches would be welcome!
- */
-
-
-  
-				   // set up vectors of cell-local
-				   // data; each vector represents one
-				   // degree of freedom of the
-				   // coarse-grid variable in the
-				   // fine-grid element
-  std::vector<Vector<double> > parameter_dofs (coarse_dofs_per_cell_component,
-					       Vector<double>(fine_dofs_per_cell));
-				   // for each coarse dof: find its
-				   // position within the fine element
-				   // and set this value to one in the
-				   // respective vector (all other values
-				   // are zero by construction)
-  for (unsigned int local_coarse_dof=0;
-       local_coarse_dof<coarse_dofs_per_cell_component;
-       ++local_coarse_dof)
-    for (unsigned int fine_dof=0; fine_dof<fine_fe.dofs_per_cell; ++fine_dof)
-      if (fine_fe.system_to_component_index(fine_dof)
-          ==
-          std::make_pair (fine_component, local_coarse_dof))
-        {
-          parameter_dofs[local_coarse_dof](fine_dof) = 1.;
-          break;
-        };
-
-
-				   // find out how many DoFs there are
-				   // on the grids belonging to the
-				   // components we want to match
-  unsigned int n_parameters_on_fine_grid=0;
-  if (true)
-    {
-				       // have a flag for each dof on
-				       // the fine grid and set it
-				       // to true if this is an
-				       // interesting dof. finally count
-				       // how many true's there
-      std::vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
-      std::vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
-      
-      for (typename DoFHandler<dim,spacedim>::active_cell_iterator
-	     cell=fine_grid.begin_active();
-	   cell!=fine_grid.end(); ++cell)
-	{
-	  cell->get_dof_indices (local_dof_indices);
-	  for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
-	    if (fine_fe.system_to_component_index(i).first == fine_component)
-	      dof_is_interesting[local_dof_indices[i]] = true;
-	};
-
-      n_parameters_on_fine_grid = std::count (dof_is_interesting.begin(),
-					      dof_is_interesting.end(),
-					      true);
-    };  
-  
-
-				   // set up the weights mapping
-  weights.clear ();
-  weights.resize (n_coarse_dofs);
-
-  weight_mapping.clear ();
-  weight_mapping.resize (n_fine_dofs, -1);
-  
-  if (true)
-    {
-      std::vector<unsigned int> local_dof_indices(fine_fe.dofs_per_cell);
-      unsigned int next_free_index=0;
-      for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell=fine_grid.begin_active();
-	   cell != fine_grid.end(); ++cell)
-	{
-	  cell->get_dof_indices (local_dof_indices);
-	  for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
-					     // if this DoF is a
-					     // parameter dof and has
-					     // not yet been numbered,
-					     // then do so
-	    if ((fine_fe.system_to_component_index(i).first == fine_component) &&
-		(weight_mapping[local_dof_indices[i]] == -1))
-	      {
-		weight_mapping[local_dof_indices[i]] = next_free_index;
-		++next_free_index;
-	      };
-	};
-
-      Assert (next_free_index == n_parameters_on_fine_grid,
-	      ExcInternalError());
-    };
-
-  
-				   // for each cell on the parameter grid:
-				   // find out which degrees of freedom on the
-				   // fine grid correspond in which way to
-				   // the degrees of freedom on the parameter
-				   // grid
-				   //
-				   // do this in a separate function
-				   // to allow for multithreading
-				   // there. see this function also if
-				   // you want to read more
-				   // information on the algorithm
-				   // used.
-  compute_intergrid_weights_2 (coarse_grid, coarse_component,
-			       coarse_to_fine_grid_map, parameter_dofs,
-			       weight_mapping, weights);
-
-
-				   // ok, now we have all weights for each
-				   // dof on the fine grid. if in debug
-				   // mode lets see if everything went smooth,
-				   // i.e. each dof has sum of weights one
-				   //
-				   // in other words this means that
-				   // if the sum of all shape
-				   // functions on the parameter grid
-				   // is one (which is always the
-				   // case), then the representation
-				   // on the state grid should be as
-				   // well (division of unity)
-				   //
-				   // if the parameter grid has more
-				   // than one component, then the
-				   // respective dofs of the other
-				   // components have sum of weights
-				   // zero, of course. we do not
-				   // explicitly ask which component
-				   // a dof belongs to, but this at
-				   // least tests some errors
-#ifdef DEBUG
-  for (unsigned int col=0; col<n_parameters_on_fine_grid; ++col)
-    {
-      double sum=0;
-      for (unsigned int row=0; row<n_coarse_dofs; ++row)
-	if (weights[row].find(col) != weights[row].end())
-	  sum += weights[row][col];
-      Assert ((std::fabs(sum-1) < 1.e-12) ||
-	      ((coarse_fe.n_components()>1) && (sum==0)), ExcInternalError());
-    };
-#endif
-
-  
-  return n_parameters_on_fine_grid;
-}
-
-
-
-
-template <int dim, int spacedim>
-void
-DoFTools::compute_intergrid_weights_2 (
-  const DoFHandler<dim,spacedim>              &coarse_grid,
-  const unsigned int                  coarse_component,
-  const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-  const std::vector<Vector<double> > &parameter_dofs,
-  const std::vector<int>             &weight_mapping,
-  std::vector<std::map<unsigned int,float> > &weights)
-{
-				   // simply distribute the range of
-				   // cells to different threads
-  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-    cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
-								 coarse_grid.end(),
-								 multithread_info.n_default_threads);
-
-  Threads::ThreadGroup<> threads;
-  void (*fun_ptr) (const DoFHandler<dim,spacedim>              &,
-		   const unsigned int                  ,
-		   const InterGridMap<DoFHandler<dim,spacedim> > &,
-		   const std::vector<Vector<double> > &,
-		   const std::vector<int>             &,
-		   std::vector<std::map<unsigned int, float> > &,
-		   const typename DoFHandler<dim,spacedim>::active_cell_iterator &,
-		   const typename DoFHandler<dim,spacedim>::active_cell_iterator &)
-    = &DoFTools::template compute_intergrid_weights_3<dim>;
-  for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
-    threads += Threads::spawn (fun_ptr)(coarse_grid, coarse_component,
-                                        coarse_to_fine_grid_map, parameter_dofs,
-                                        weight_mapping, weights,
-                                        cell_intervals[i].first,
-                                        cell_intervals[i].second);
-
-				   // wait for the threads to finish
-  threads.join_all ();
-}
-
-
-
-template <int dim, int spacedim>
-void
-DoFTools::compute_intergrid_weights_3 (
-  const DoFHandler<dim,spacedim>              &coarse_grid,
-  const unsigned int                  coarse_component,
-  const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-  const std::vector<Vector<double> > &parameter_dofs,
-  const std::vector<int>             &weight_mapping,
-  std::vector<std::map<unsigned int, float> > &weights,
-  const typename DoFHandler<dim,spacedim>::active_cell_iterator &begin,
-  const typename DoFHandler<dim,spacedim>::active_cell_iterator &end)
-{
-				   // aliases to the finite elements
-				   // used by the dof handlers:
-  const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe();    
-
-				   // for each cell on the parameter grid:
-				   // find out which degrees of freedom on the
-				   // fine grid correspond in which way to
-				   // the degrees of freedom on the parameter
-				   // grid
-				   //
-				   // since for continuous FEs some
-				   // dofs exist on more than one
-				   // cell, we have to track which
-				   // ones were already visited. the
-				   // problem is that if we visit a
-				   // dof first on one cell and
-				   // compute its weight with respect
-				   // to some global dofs to be
-				   // non-zero, and later visit the
-				   // dof again on another cell and
-				   // (since we are on another cell)
-				   // recompute the weights with
-				   // respect to the same dofs as
-				   // above to be zero now, we have to
-				   // preserve them. we therefore
-				   // overwrite all weights if they
-				   // are nonzero and do not enforce
-				   // zero weights since that might be
-				   // only due to the fact that we are
-				   // on another cell.
-				   //
-				   // example:
-				   // coarse grid
-				   //  |     |     |
-				   //  *-----*-----*
-				   //  | cell|cell |
-				   //  |  1  |  2  |
-				   //  |     |     |
-				   //  0-----1-----*
-				   //
-				   // fine grid
-				   //  |  |  |  |  |
-				   //  *--*--*--*--*
-				   //  |  |  |  |  |
-				   //  *--*--*--*--*
-				   //  |  |  |  |  |
-				   //  *--x--y--*--*
-				   //
-				   // when on cell 1, we compute the
-				   // weights of dof 'x' to be 1/2
-				   // from parameter dofs 0 and 1,
-				   // respectively. however, when
-				   // later we are on cell 2, we again
-				   // compute the prolongation of
-				   // shape function 1 restricted to
-				   // cell 2 to the globla grid and
-				   // find that the weight of global
-				   // dof 'x' now is zero. however, we
-				   // should not overwrite the old
-				   // value.
-				   //
-				   // we therefore always only set
-				   // nonzero values. why adding up is
-				   // not useful: dof 'y' would get
-				   // weight 1 from parameter dof 1 on
-				   // both cells 1 and 2, but the
-				   // correct weight is nevertheless
-				   // only 1.
-
-				   // vector to hold the representation of
-				   // a single degree of freedom on the
-				   // coarse grid (for the selected fe)
-				   // on the fine grid
-  const unsigned int n_fine_dofs = weight_mapping.size();
-  Vector<double> global_parameter_representation (n_fine_dofs);
-  
-  typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
-  std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
-  
-  for (cell=begin; cell!=end; ++cell)
-    {
-				       // get the global indices of the
-				       // parameter dofs on this parameter
-				       // grid cell
-      cell->get_dof_indices (parameter_dof_indices);
-
-				       // loop over all dofs on this
-				       // cell and check whether they
-				       // are interesting for us
-      for (unsigned int local_dof=0;
-	   local_dof<coarse_fe.dofs_per_cell;
-	   ++local_dof)
-	if (coarse_fe.system_to_component_index(local_dof).first
-	    ==
-	    coarse_component)
-	  {
-					     // the how-many-th
-					     // parameter is this on
-					     // this cell?
-	    const unsigned int local_parameter_dof
-	      = coarse_fe.system_to_component_index(local_dof).second;
-	    
-	    global_parameter_representation = 0;
-	    
-					     // distribute the representation of
-					     // @p{local_parameter_dof} on the
-					     // parameter grid cell @p{cell} to
-					     // the global data space
-	    coarse_to_fine_grid_map[cell]->
-	      set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
-					       global_parameter_representation);
-					     // now that we've got the global
-					     // representation of each parameter
-					     // dof, we've only got to clobber the
-					     // non-zero entries in that vector and
-					     // store the result
-					     //
-					     // what we have learned: if entry @p{i}
-					     // of the global vector holds the value
-					     // @p{v[i]}, then this is the weight with
-					     // which the present dof contributes
-					     // to @p{i}. there may be several such
-					     // @p{i}s and their weights' sum should
-					     // be one. Then, @p{v[i]} should be
-					     // equal to @p{\sum_j w_{ij} p[j]} with
-					     // @p{p[j]} be the values of the degrees
-					     // of freedom on the coarse grid. we
-					     // can thus compute constraints which
-					     // link the degrees of freedom @p{v[i]}
-					     // on the fine grid to those on the
-					     // coarse grid, @p{p[j]}. Now to use
-					     // these as real constraints, rather
-					     // than as additional equations, we
-					     // have to identify representants
-					     // among the @p{i} for each @p{j}. this will
-					     // be done by simply taking the first
-					     // @p{i} for which @p{w_{ij}==1}.
-					     //
-					     // guard modification of
-					     // the weights array by a
-					     // Mutex. since it should
-					     // happen rather rarely
-					     // that there are several
-					     // threads operating on
-					     // different intergrid
-					     // weights, have only one
-					     // mutex for all of them
-	    static Threads::ThreadMutex mutex;
-            Threads::ThreadMutex::ScopedLock lock (mutex);
-	    for (unsigned int i=0; i<global_parameter_representation.size(); ++i)
-					       // set this weight if it belongs
-					       // to a parameter dof.
-	      if (weight_mapping[i] != -1)
-		{
-						   // only overwrite old
-						   // value if not by
-						   // zero
-		  if (global_parameter_representation(i) != 0)
-		    {
-		      const unsigned int wi = parameter_dof_indices[local_dof],
-					 wj = weight_mapping[i];
-		      weights[wi][wj] = global_parameter_representation(i);
-		    };
-		}
-	      else
-		Assert (global_parameter_representation(i) == 0,
-			ExcInternalError());
-	  };
-    };
-}
-
 
 
 
@@ -5073,63 +5169,6 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	support_points[local_dof_indices[i]] = points[i];
     };
-}
-
-
-template <int dim, int spacedim>
-void
-DoFTools::compute_dof_couplings(
-  Table<2,Coupling>&        dof_couplings,
-  const Table<2,Coupling>&  component_couplings,
-  const FiniteElement<dim,spacedim>& fe)
-{
-  Assert(component_couplings.n_rows() == fe.n_components(),
-	 ExcDimensionMismatch(component_couplings.n_rows(),
-			      fe.n_components()));
-  Assert(component_couplings.n_cols() == fe.n_components(),
-	 ExcDimensionMismatch(component_couplings.n_cols(),
-			      fe.n_components()));
-  
-  const unsigned int n_dofs = fe.dofs_per_cell;
-
-  Assert(dof_couplings.n_rows() == n_dofs,
-	 ExcDimensionMismatch(dof_couplings.n_rows(), n_dofs));
-  Assert(dof_couplings.n_cols() == n_dofs,
-	 ExcDimensionMismatch(dof_couplings.n_cols(), n_dofs));
-
-  for (unsigned int i=0; i<n_dofs; ++i)
-    {
-      const unsigned int ii
-        = (fe.is_primitive(i) ?
-           fe.system_to_component_index(i).first
-           :
-           (std::find (fe.get_nonzero_components(i).begin(),
-                       fe.get_nonzero_components(i).end(),
-                       true)
-            -
-	    fe.get_nonzero_components(i).begin())
-	);
-      Assert (ii < fe.n_components(),
-              ExcInternalError());
-
-      for (unsigned int j=0; j<n_dofs; ++j)
-	{
-          const unsigned int jj
-            = (fe.is_primitive(j) ?
-               fe.system_to_component_index(j).first
-               :
-               (std::find (fe.get_nonzero_components(j).begin(),
-                           fe.get_nonzero_components(j).end(),
-                           true)
-                -
-                fe.get_nonzero_components(j).begin())
-	    );
-          Assert (jj < fe.n_components(),
-                  ExcInternalError());          
-
-	  dof_couplings(i,j) = component_couplings(ii,jj);
-	}
-    }
 }
 
 
@@ -6369,12 +6408,6 @@ DoFTools::map_dofs_to_support_points<deal_II_dimension>
 (const Mapping<deal_II_dimension,deal_II_dimension>&,
  const DoFHandler<deal_II_dimension>&,
  std::vector<Point<deal_II_dimension> >&);
-
-template
-void
-DoFTools::compute_dof_couplings<deal_II_dimension>(
-  Table<2,Coupling>&, const Table<2,Coupling>&,
-  const FiniteElement<deal_II_dimension>&);
 
 template
 void

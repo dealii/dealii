@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1815,60 +1815,6 @@ class DoFTools
     DeclException0 (ExcInvalidBoundaryIndicator);
 
   private:
-
-				     /**
-				      * This is a helper function that
-				      * is used in the computation of
-				      * integrid constraints. See the
-				      * function for a thorough
-				      * description of how it works.
-				      */
-    template <int dim, int spacedim>
-    static unsigned int
-    compute_intergrid_weights_1 (const DoFHandler<dim,spacedim>              &coarse_grid,
-				 const unsigned int                  coarse_component,
-				 const DoFHandler<dim,spacedim>              &fine_grid,
-				 const unsigned int                  fine_component,
-				 const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-				 std::vector<std::map<unsigned int, float> > &weights,
-				 std::vector<int>                   &weight_mapping);
-    
-				     /**
-				      * This is a helper function that
-				      * is used in the computation of
-				      * integrid constraints. See the
-				      * function for a thorough
-				      * description of how it works.
-				      */
-    template <int dim, int spacedim>
-    static void
-    compute_intergrid_weights_2 (const DoFHandler<dim,spacedim>              &coarse_grid,
-				 const unsigned int                  coarse_component,
-				 const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-				 const std::vector<Vector<double> > &parameter_dofs,
-				 const std::vector<int>             &weight_mapping,
-				 std::vector<std::map<unsigned int, float> > &weights);
-
-				     /**
-				      * This is a function that is
-				      * called by the previous one and
-				      * that operates on a range of
-				      * cells only. It is used to
-				      * split up the whole range of
-				      * cells into chunks which are
-				      * then worked on in parallel, if
-				      * multithreading is available.
-				      */
-    template <int dim, int spacedim>
-    static void
-    compute_intergrid_weights_3 (const DoFHandler<dim,spacedim>              &coarse_grid,
-				 const unsigned int                  coarse_component,
-				 const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-				 const std::vector<Vector<double> > &parameter_dofs,
-				 const std::vector<int>             &weight_mapping,
-				 std::vector<std::map<unsigned int, float> > &weights,
-				 const typename DoFHandler<dim,spacedim>::active_cell_iterator &begin,
-				 const typename DoFHandler<dim,spacedim>::active_cell_iterator &end);
 
 				     /**
 				      * Compute coupling of dofs from
