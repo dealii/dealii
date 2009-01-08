@@ -64,10 +64,43 @@ enum MappingType
       mapping_covariant = 0x0001,
 /// Contravariant mapping
       mapping_contravariant = 0x0002,
+/// Mapping of the gradient of a covariant vector field
+      mapping_covariant_gradient = 0x0003,
+/// Mapping of the gradient of a contravariant vector field
+      mapping_contravariant_gradient = 0x0004,
 /// The Piola transform usually used for Hdiv elements
+				       /**
+					* Piola transform is the
+					* standard transformation of
+					* vector valued elements in
+					* H<sup>div</sup>. It amounts
+					* to a contravariant
+					* transformation scaled by the
+					* inverse of the volume
+					* element.
+					*
+					* If applied to a rank 2
+					* tensor, the mapping class
+					* will apply the correct
+					* transformation for the
+					* gradient of such a vector
+					* field.
+					*/
       mapping_piola = 0x0100,
-/// The Piola transform for the derivative of an Hdiv element
-      mapping_piola_gradient = 0x0101,
+/// The mapping used for Nedelec elements
+				       /**
+					* curl-conforming elements are
+					* mapped as covariant
+					* vectors. Nevertheless, we
+					* introduce a separate mapping
+					* type, such that we can use
+					* the same flag for the vector
+					* and its gradient (the
+					* transformation of the
+					* gradient differs from the
+					* one used by #mapping_covariant).
+					*/
+      mapping_nedelec = 0x0200,
 /// The mapping used for Raviart-Thomas elements
       mapping_raviart_thomas = mapping_piola,
 /// The mapping used for BDM elements
@@ -332,42 +365,39 @@ class Mapping : public Subscriptor
 				     /**
 				      * @deprecated Use transform() instead.
 				      */
-    virtual
     void
     transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                          const unsigned int                                    offset,
                          VectorSlice<std::vector<Tensor<1,spacedim> > >        output,
-			 const InternalDataBase &internal) const = 0;
+			 const InternalDataBase &internal) const;
 
                                      /**
 				      * @deprecated Use transform() instead.
                                       */
-    virtual
     void
     transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<2,spacedim> > >      output,
-			 const InternalDataBase &internal) const = 0;
+			 const InternalDataBase &internal) const;
 
 				     /**
 				      * @deprecated Use transform() instead.
 				      */
-    virtual
     void
     transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<1,spacedim> > >      output,
-			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const = 0;
+			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
 
                                      /**
 				      * @deprecated Use transform() instead.
                                       */
     
-    virtual void
+    void
     transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > intput,
                              const unsigned int                 offset,
 			     const VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const = 0;
+			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
 
 				     /**
 				      * The transformed (generalized)

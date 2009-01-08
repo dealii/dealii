@@ -534,40 +534,38 @@ MappingCartesian<dim,spacedim>::transform (
   switch (mapping_type)
     {
       case mapping_covariant:
-	    if (true)
-	      {
-		Assert (data.update_flags & update_covariant_transformation,
-			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-		
-		for (unsigned int i=0; i<output.size(); ++i)
-		  for (unsigned int d=0;d<dim;++d)
-		    output[i][d] = input[i][d]/data.length[d];
-		return;
-	      }
+      {
+	Assert (data.update_flags & update_covariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d=0;d<dim;++d)
+	    output[i][d] = input[i][d]/data.length[d];
+	return;
+      }
+      
       case mapping_contravariant:
-	    if (true)
-	      {
-		Assert (data.update_flags & update_contravariant_transformation,
-			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-		
-		for (unsigned int i=0; i<output.size(); ++i)
-		  for (unsigned int d=0;d<dim;++d)
-		    output[i][d] = input[i][d]*data.length[d];
-		return;
-	      }
+      {
+	Assert (data.update_flags & update_contravariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d=0;d<dim;++d)
+	    output[i][d] = input[i][d]*data.length[d];
+	return;
+      }
       case mapping_piola:
-	    if (true)
-	      {
-		Assert (data.update_flags & update_contravariant_transformation,
-			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-		Assert (data.update_flags & update_volume_elements,
-			typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-		
-		for (unsigned int i=0; i<output.size(); ++i)
-		  for (unsigned int d=0;d<dim;++d)
-		    output[i][d] = input[i][d] * data.length[d] / data.volume_element;
-		return;
-	      }
+      {
+	Assert (data.update_flags & update_contravariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	Assert (data.update_flags & update_volume_elements,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d=0;d<dim;++d)
+	    output[i][d] = input[i][d] * data.length[d] / data.volume_element;
+	return;
+      }
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -578,136 +576,82 @@ void
 MappingCartesian<dim,spacedim>::transform (
   const VectorSlice<const std::vector<Tensor<2,dim> > > input,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
 {
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
+  
   switch (mapping_type)
     {
       case mapping_covariant:
-	    transform_covariant(input, 0, output, internal);
-	    return;
-       case mapping_contravariant:
- 	    transform_contravariant(input, 0, output, internal);
- 	    return;
+      {
+	Assert (data.update_flags & update_covariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d1=0;d1<dim;++d1)
+	    for (unsigned int d2=0;d2<dim;++d2)
+	      output[i][d1][d2] = input[i][d1][d2] / data.length[d2];
+	return;
+      }
+      
+      case mapping_contravariant:
+      {
+	Assert (data.update_flags & update_contravariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d1=0;d1<dim;++d1)
+	    for (unsigned int d2=0;d2<dim;++d2)
+	      output[i][d1][d2] = input[i][d1][d2] * data.length[d2];
+	return;
+      }
+
+      case mapping_covariant_gradient:
+      {
+	Assert (data.update_flags & update_covariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d1=0;d1<dim;++d1)
+	    for (unsigned int d2=0;d2<dim;++d2)
+	      output[i][d1][d2] = input[i][d1][d2] / data.length[d2] / data.length[d1];
+	return;
+      }
+
+      case mapping_contravariant_gradient:
+      {
+	Assert (data.update_flags & update_contravariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d1=0;d1<dim;++d1)
+	    for (unsigned int d2=0;d2<dim;++d2)
+	      output[i][d1][d2] = input[i][d1][d2] * data.length[d2] / data.length[d1];
+	return;
+      }
+
+      case mapping_piola:
+      {
+	Assert (data.update_flags & update_contravariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	Assert (data.update_flags & update_volume_elements,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d1=0;d1<dim;++d1)
+	    for (unsigned int d2=0;d2<dim;++d2)
+	      output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
+				  / data.length[d1] / data.volume_element;
+	return;
+      }
+	    
       default:
 	    Assert(false, ExcNotImplemented());
     }
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingCartesian<dim, spacedim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-  AssertDimension (input.size(), output.size());
-  
-  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
-
-  Assert (data.update_flags & update_covariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-  
-				   // simply scale by inverse Jacobian
-				   // (which is diagonal here)
-  for (unsigned int i=0; i<output.size(); ++i)
-    for (unsigned int d=0;d<dim;++d)
-      output[i][d] = input[i+offset][d]/data.length[d];
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingCartesian<dim, spacedim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-  AssertDimension (input.size(), output.size());
-  
-  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
-
-  Assert (data.update_flags & update_covariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-  
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-  
-				   // simply scale by inverse Jacobian
-				   // (which is diagonal here)
-  for (unsigned int i=0; i<output.size(); ++i)
-    for (unsigned int d=0; d<dim; ++d)
-      for (unsigned int p=0; p<dim; ++p)
-      output[i][d][p] = input[i+offset][d][p]/data.length[p];
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingCartesian<dim, spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-  AssertDimension (input.size(), output.size());
-  
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
-
-  Assert (data.update_flags & update_contravariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-  
-				   // simply scale by inverse Jacobian
-				   // (which is diagonal here)
-  for (unsigned int i=0; i<output.size(); ++i)
-    for (unsigned int d=0;d<dim;++d)
-      output[i][d] = input[i+offset][d] * data.length[d];
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingCartesian<dim, spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-  AssertDimension (input.size(), output.size());
-  
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
-
-  Assert (data.update_flags & update_contravariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-
-  Assert (output.size() + offset <= input.size(), ExcInternalError());
-  
-				   // simply scale by inverse Jacobian
-				   // (which is diagonal here)
-  for (unsigned int i=0; i<output.size(); ++i)
-    for (unsigned int d=0; d<dim; ++d)
-      for (unsigned int p=0; p<dim; ++p)
-      output[i][d][p] = input[i+offset][d][p] * data.length[p];
 }
 
 

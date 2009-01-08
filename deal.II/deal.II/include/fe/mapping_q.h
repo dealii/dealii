@@ -129,46 +129,6 @@ class MappingQ : public MappingQ1<dim,spacedim>
 	       const MappingType type) const;
     
 				     /**
-				      * Implementation of the
-				      * interface in Mapping.
-				      */
-    virtual void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
-                         const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-			 const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-    
-				     /**
-				      * Implementation of the
-				      * interface in Mapping.
-				      */
-    virtual void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
-                         const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-			 const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-    
-				     /**
-				      * Implementation of the
-				      * interface in Mapping.
-				      */
-    virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-                             const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;    
-
-				     /**
-				      * Implementation of the
-				      * interface in Mapping.
-				      */
-    virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
-                             const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;    
-    
-				     /**
 				      * Return the degree of the
 				      * mapping, i.e. the value which
 				      * was passed to the constructor.

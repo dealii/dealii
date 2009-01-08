@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -442,6 +442,8 @@ class FE_RaviartThomasNodal
     virtual FiniteElementDomination::Domination
     compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
 
+    virtual UpdateFlags update_once (const UpdateFlags flags) const;
+    virtual UpdateFlags update_each (const UpdateFlags flags) const;
   private:
 				     /**
 				      * Only for internal use. Its

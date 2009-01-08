@@ -42,7 +42,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
   
-  this->mapping_type = mapping_none;
+  this->mapping_type = mapping_raviart_thomas;
 				   // These must be done first, since
 				   // they change the evaluation of
 				   // basis functions
@@ -767,6 +767,33 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
       delete quadrature;
     }
   Assert (current == this->dofs_per_cell, ExcInternalError());
+}
+
+
+template <int dim>
+UpdateFlags
+FE_RaviartThomasNodal<dim>::update_once (const UpdateFlags) const
+{
+  return update_default;
+}
+
+
+template <int dim>
+UpdateFlags
+FE_RaviartThomasNodal<dim>::update_each (const UpdateFlags flags) const
+{
+  UpdateFlags out = update_default;
+  
+  if (flags & update_values)
+    out |= update_values | update_piola;
+  
+  if (flags & update_gradients)
+    out |= update_gradients | update_piola | update_covariant_transformation;
+  
+  if (flags & update_hessians)
+    out |= update_hessians | update_piola | update_covariant_transformation;
+  
+  return out;
 }
 
 

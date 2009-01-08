@@ -89,30 +89,6 @@ class MappingQ1 : public Mapping<dim,spacedim>
                const typename Mapping<dim,spacedim>::InternalDataBase &internal,
 	       const MappingType type) const;
     
-    virtual void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-                         const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-			 const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-    
-    virtual void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
-                         const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-			 const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-    
-    virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-                             const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-    
-    virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
-                             const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-    
                                      /**
                                       * Return a pointer to a copy of the
                                       * present object. The caller of this

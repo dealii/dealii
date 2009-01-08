@@ -260,14 +260,8 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values (const Mapping<1,2> &ma
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
       if (flags & update_gradients)
-	{
-	  Assert (data.shape_gradients[k].size() <=
- 		  fe_data.shape_gradients[k].size(), 
- 		  ExcInternalError()); 
- 	  mapping.transform(fe_data.shape_gradients[k],
-			    data.shape_gradients[k], 
-			    mapping_data, mapping_covariant); 
-	}
+	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k], 
+			  mapping_data, mapping_covariant);
     }
   
   //  const typename QProjector<1>::DataSetDescriptor dsd;
@@ -303,14 +297,8 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values (const Mapping<2,3> &ma
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];     
 
        if (flags & update_gradients)
-       {
-	 Assert (data.shape_gradients[k].size() <=
-		 fe_data.shape_gradients[k].size(), 
-		 ExcInternalError());
-	 mapping.transform(fe_data.shape_gradients[k],
-			   data.shape_gradients[k],
+	 mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
 			   mapping_data, mapping_covariant);
- 	}
     }
   
 /*   const QProjector<2>::DataSetDescriptor dsd; */
@@ -327,12 +315,13 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values (const Mapping<2,3> &ma
 template <>
 inline
 void
-FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (const Mapping<1,2> &/* mapping */,
-				   const Triangulation<1,2>::cell_iterator   &/* cell */,
-				   const Quadrature<1>                       &quadrature,
-				   Mapping<1,2>::InternalDataBase            &/* mapping_data */,
-				   Mapping<1,2>::InternalDataBase            &fedata,
-				   FEValuesData<1,2>                         &data) const
+FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
+  const Mapping<1,2>& mapping,
+  const Triangulation<1,2>::cell_iterator& /*cell*/,
+  const Quadrature<1>& quadrature,
+  Mapping<1,2>::InternalDataBase& mapping_data,
+  Mapping<1,2>::InternalDataBase& fedata,
+  FEValuesData<1,2>& data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -353,12 +342,8 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (const Mapping<1,2> &/* mapping 
 // TODO: I would think this should work. Guido
       
       if (flags & update_gradients)
-	{
-	  AssertThrow(false, ExcNotImplemented());
-//  	  mapping.transform(fe_data.shape_gradients[k], 0,
-// 			    data.shape_gradients[k],
-// 			    mapping_data, mapping_covariant);
-	}
+	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
+			  mapping_data, mapping_covariant);
     }
   
 				   //  const typename QProjector<1>::DataSetDescriptor dsd;
@@ -374,10 +359,10 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (const Mapping<1,2> &/* mapping 
 template <>
 inline
 void
-FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3> &/* mapping */,
+FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3>& mapping,
 				   const Triangulation<2,3>::cell_iterator &/* cell */,
-				   const Quadrature<2> &quadrature,
-				   Mapping<2,3>::InternalDataBase &/* mapping_data */,
+				   const Quadrature<2>& quadrature,
+				   Mapping<2,3>::InternalDataBase& mapping_data,
 				   Mapping<2,3>::InternalDataBase &fedata,
 				   FEValuesData<2,3> &data) const
 {
@@ -394,15 +379,8 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3> &/* mapping 
       
 
        if (flags & update_gradients)
- 	{
-	  AssertThrow(false, ExcNotImplemented());
-/*  	  Assert (data.shape_gradients[k].size()  */
-/*  		  fe_data.shape_gradients[k].size(),  */
-/*  		  ExcInternalError());	    */
-/*  	  mapping.transform(fe_data.shape_gradients[k], 0,  */
-/*  				      data.shape_gradients[k],  */
-/*  				      mapping_data, mapping_covariant);  */
- 	}
+	 mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
+  				      mapping_data, mapping_covariant);
     }
   
 /*   const QProjector<2>::DataSetDescriptor dsd; */
@@ -670,14 +648,9 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
 	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
-	{
-	  Assert (data.shape_gradients[k].size() + offset <=
-		  fe_data.shape_gradients[k].size(),
-		  ExcInternalError());
-	  mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-			    data.shape_gradients[k],
-			    mapping_data, mapping_covariant);
-	}
+	mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+			  data.shape_gradients[k],
+			  mapping_data, mapping_covariant);
     }
   
   if (flags & update_hessians)

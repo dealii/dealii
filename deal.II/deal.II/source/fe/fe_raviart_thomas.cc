@@ -50,7 +50,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
   
-  this->mapping_type = mapping_piola;
+  this->mapping_type = mapping_raviart_thomas;
 				   // First, initialize the
 				   // generalized support points and
 				   // quadrature weights, since they
@@ -463,20 +463,14 @@ FE_RaviartThomas<dim>::update_each (const UpdateFlags flags) const
   UpdateFlags out = update_default;
 
   if (flags & update_values)
-    out |= update_values             | update_covariant_transformation
-                                     | update_piola 
-                                     | update_cell_JxW_values
-                                     | update_JxW_values;
+    out |= update_values | update_piola;
+  
   if (flags & update_gradients)
-    out |= update_gradients          | update_covariant_transformation 
-                                     | update_piola
-                                     | update_cell_JxW_values
-                                     | update_JxW_values;
+    out |= update_gradients | update_piola | update_covariant_transformation;
+  
   if (flags & update_hessians)
-    out |= update_hessians
-	   | update_contravariant_transformation
-	   | update_covariant_transformation;
-
+    out |= update_hessians | update_piola | update_covariant_transformation;
+  
   return out;
 }
 

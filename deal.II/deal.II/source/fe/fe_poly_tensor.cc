@@ -407,47 +407,27 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	      case mapping_covariant:
 	      case mapping_contravariant:
 	      {
-						 // Use auxiliary vector for
-						 // transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
-		if (mapping_type == mapping_covariant)
-		  mapping.transform(fe_data.shape_values[i],
-				    shape_values, mapping_data, mapping_covariant);
-		else
-		  mapping.transform(fe_data.shape_values[i],
-				    shape_values, mapping_data, mapping_contravariant);
-		    
-						 // then copy over to target:
+		mapping.transform(fe_data.shape_values[i],
+				  shape_values, mapping_data, mapping_type);
+		
 		for (unsigned int k=0; k<n_q_points; ++k)
-		  {
-//TODO: [GK] Remove this after change to Piola complete
-		    
-						     // Recompute determinant
-
-		    const double
-		      J = (mapping_type == mapping_contravariant ?
-			   data.JxW_values[k] / quadrature.weight(k)
-			   :
-			   1.0);
-
-		    for (unsigned int d=0; d<dim; ++d)
-		      data.shape_values(first+d,k)
-			= sign_change[i] * (shape_values[k][d] / J);
-		  }
+		  for (unsigned int d=0; d<dim; ++d)
+		    data.shape_values(first+d,k) = shape_values[k][d];
+		
 		break;
 	      }
 	      case mapping_piola:
-		    if (true)
-		      {
-			std::vector<Tensor<1,dim> > shape_values (n_q_points);
-			mapping.transform(fe_data.shape_values[i], shape_values,
-					  mapping_data, mapping_piola);
-			for (unsigned int k=0; k<n_q_points; ++k)
-			  for (unsigned int d=0; d<dim; ++d)
-			    data.shape_values(first+d,k)
-			      = sign_change[i] * shape_values[k][d];
-			break;
-		      }
+	      {
+		std::vector<Tensor<1,dim> > shape_values (n_q_points);
+		mapping.transform(fe_data.shape_values[i], shape_values,
+				  mapping_data, mapping_piola);
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
+		    data.shape_values(first+d,k)
+		      = sign_change[i] * shape_values[k][d];
+		break;
+	      }
 	      
 	      default:
 		Assert(false, ExcNotImplemented());
@@ -470,47 +450,40 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
-	      
 	      case mapping_covariant:
 	      {
 		mapping.transform(fe_data.shape_grads[i], shape_grads1,
-				  mapping_data, mapping_covariant);
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  shape_grads2[q] = transpose(shape_grads1[q]);
-						 // do second transformation
-		mapping.transform(shape_grads2, shape_grads1,
-				  mapping_data, mapping_covariant);
-						 // transpose back
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  shape_grads2[q] = transpose(shape_grads1[q]);
+				  mapping_data, mapping_covariant_gradient);
+		
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		
+		break;
+	      }
+	      case mapping_contravariant:
+	      {
+		mapping.transform(fe_data.shape_grads[i], shape_grads1,
+				  mapping_data, mapping_contravariant_gradient);
 		
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads2[k][d];
-
+		
 		break;
 	      }
 	      case mapping_piola:
-	      case mapping_contravariant:
 	      {
 		mapping.transform(fe_data.shape_grads[i], shape_grads1,
-				  mapping_data, mapping_covariant);
+				  mapping_data, mapping_piola);
 		
-		mapping.transform(shape_grads1, shape_grads2,
-				  mapping_data, mapping_contravariant);
-
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
-		    {
-						       // Recompute determinant
-		      const double J = data.JxW_values[k] / quadrature.weight(k);
-		      data.shape_gradients[first+d][k] = sign_change[i] * 
-			shape_grads2[k][d] / J;
-		    }
+		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
 		
 		break;
 	      }
-	      
+		    
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
@@ -593,52 +566,26 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 						 // Use auxiliary vector
 						 // for transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
-		if (mapping_type == mapping_covariant)
-		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-				    shape_values, mapping_data, mapping_covariant);
-		else
-		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-				    shape_values, mapping_data, mapping_contravariant);
+		mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+				  shape_values, mapping_data, mapping_type);
 		
-						 // then copy over to target:
 		for (unsigned int k=0; k<n_q_points; ++k)
-		  {
-						     // recompute
-						     // determinant. note that
-						     // we have to take the
-						     // *cell* transformation
-						     // (cell_JxW_values)
-						     // because the usual
-						     // JxW_values field
-						     // contains the
-						     // transformation of the
-						     // face in
-						     // fill_fe_face_values
-		    const double
-		      J = (mapping_type == mapping_contravariant ?
-			   data.cell_JxW_values[k] / quadrature.weight(k)
-			   :
-			   1.0);
-		    
-		    for (unsigned int d=0; d<dim; ++d)
-		      data.shape_values(first+d,k)
-			= sign_change[i] * (shape_values[k][d] / J);
-		  }
+		  for (unsigned int d=0; d<dim; ++d)
+		    data.shape_values(first+d,k) = shape_values[k][d];
 		
 		break;
 	      }
 	      case mapping_piola:
-		    if (true)
-		      {
-			std::vector<Tensor<1,dim> > shape_values (n_q_points);
-			mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-					  shape_values, mapping_data, mapping_piola);
-			for (unsigned int k=0; k<n_q_points; ++k)
-			  for (unsigned int d=0; d<dim; ++d)
-			    data.shape_values(first+d,k)
-			      = sign_change[i] * shape_values[k][d];
-			break;
-		      }
+	      {
+		std::vector<Tensor<1,dim> > shape_values (n_q_points);
+		mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+				  shape_values, mapping_data, mapping_piola);
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
+		    data.shape_values(first+d,k)
+		      = sign_change[i] * shape_values[k][d];
+		break;
+	      }
 	      
 	      default:
 		Assert(false, ExcNotImplemented());
@@ -665,40 +612,33 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 	      case mapping_covariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-				  shape_grads1, mapping_data, mapping_covariant);
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  shape_grads2[q] = transpose(shape_grads1[q]);
-						 // do second transformation
-		mapping.transform(shape_grads2, shape_grads1,
-				  mapping_data, mapping_covariant);
-						 // transpose back
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  shape_grads2[q] = transpose(shape_grads1[q]);
+				  shape_grads1, mapping_data, mapping_covariant_gradient);
 		
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
-	      case mapping_piola:
 	      case mapping_contravariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-				  shape_grads1, mapping_data, mapping_covariant);
-
-		mapping.transform(shape_grads1, shape_grads2,
-				  mapping_data, mapping_contravariant);
+				  shape_grads1, mapping_data, mapping_contravariant_gradient);
 
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
-		    {
-						       // recompute
-						       // determinant in the
-						       // same way as above
-		      const double J = data.cell_JxW_values[k] / quadrature.weight(k);
-		      data.shape_gradients[first+d][k]
-			= sign_change[i] * shape_grads2[k][d] / J;
-		    }
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		
+		break;
+	      }
+	      case mapping_piola:
+	      {
+		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
+				  shape_grads1, mapping_data, mapping_piola);
+		
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
+		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
+		
 		break;
 	      }
 	      
@@ -783,52 +723,26 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 						 // Use auxiliary vector for
 						 // transformation
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
-		if (mapping_type == mapping_covariant)
-		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-				    shape_values, mapping_data, mapping_covariant);
-		else
-		  mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-				    shape_values, mapping_data, mapping_contravariant);
-		    
-						 // then copy over to target:
+		mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+				  shape_values, mapping_data, mapping_type);
+		
 		for (unsigned int k=0; k<n_q_points; ++k)
-		  {
-						     // recompute
-						     // determinant. note that
-						     // we have to take the
-						     // *cell* transformation
-						     // (cell_JxW_values)
-						     // because the usual
-						     // JxW_values field
-						     // contains the
-						     // transformation of the
-						     // face in
-						     // fill_fe_face_values
-		    const double
-		      J = (mapping_type == mapping_contravariant ?
-			   data.cell_JxW_values[k] / quadrature.weight(k)
-			   :
-			   1.0);
-		    
 		    for (unsigned int d=0; d<dim; ++d)
-		      data.shape_values(first+d,k)
-			= sign_change[i] * (shape_values[k][d] / J);
-		  }
-
+		      data.shape_values(first+d,k) = shape_values[k][d];
+		
 		break;
 	      }
 	      case mapping_piola:
-		    if (true)
-		      {
-			std::vector<Tensor<1,dim> > shape_values (n_q_points);
-			mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-					  shape_values, mapping_data, mapping_piola);
-			for (unsigned int k=0; k<n_q_points; ++k)
-			  for (unsigned int d=0; d<dim; ++d)
-			    data.shape_values(first+d,k)
-			      = sign_change[i] * shape_values[k][d];
-			break;
-		      }
+	      {
+		std::vector<Tensor<1,dim> > shape_values (n_q_points);
+		mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+				  shape_values, mapping_data, mapping_piola);
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
+		    data.shape_values(first+d,k)
+		      = sign_change[i] * shape_values[k][d];
+		break;
+	      }
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
@@ -854,46 +768,41 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 	      case mapping_covariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-				  shape_grads1, mapping_data, mapping_covariant);
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  shape_grads2[q] = transpose(shape_grads1[q]);
-						 // do second transformation
-		mapping.transform(shape_grads2, shape_grads1,
-				  mapping_data, mapping_covariant);
-						 // transpose back
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  shape_grads2[q] = transpose(shape_grads1[q]);
-		
+				  shape_grads1, mapping_data, mapping_covariant_gradient);
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
 
-	      case mapping_piola:
 	      case mapping_contravariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-				  shape_grads1, mapping_data, mapping_covariant);
-
-		mapping.transform(shape_grads1, shape_grads2,
-				  mapping_data, mapping_contravariant);
-
+				  shape_grads1, mapping_data, mapping_contravariant_gradient);
+		
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
-		    {
-						       // recompute
-						       // determinant in the
-						       // same way as above
-		      const double J = data.cell_JxW_values[k] / quadrature.weight(k);
-		      data.shape_gradients[first+d][k]
-			= sign_change[i] * shape_grads2[k][d] / J;
-		    }
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		
 		break;
 	      }
 
+	      case mapping_piola:
+	      {
+		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
+				  shape_grads1,
+				  mapping_data, mapping_piola);
+		
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
+		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
+		
+		break;
+	      }
+	      
 	      default:
-		Assert(false, ExcNotImplemented());
+		    Assert(false, ExcNotImplemented());
 	    }
 	}
     }
