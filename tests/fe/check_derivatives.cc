@@ -101,8 +101,8 @@ void check1 (const unsigned int min_degree,
 
 // Nedelec exists only in 2d/3d
 template <>
-void check1<FE_Nedelec> (const unsigned int min_degree,
-                        const unsigned int max_degree)
+void check<FE_Nedelec> (const unsigned int min_degree,
+			 const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -153,7 +153,7 @@ main()
   check<FE_DGPNonparametric> (0,4);
   check1<FE_DGPMonomial> (0,3);
 
-  check1<FE_Nedelec> (1,1);
+  check<FE_Nedelec> (1,1);
   check1<FE_RaviartThomas> (0,4);
   check1<FE_RaviartThomasNodal> (0,2);
   
