@@ -144,7 +144,8 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Updated: The step-33 tutorial program now uses the Trilinos wrapper 
+  Updated: The @ref step_33 "step-33" tutorial program now uses the
+  Trilinos wrapper 
   classes for accessing Trilinos linear algebra routines instead of
   implementing that by hand.
   <br>
