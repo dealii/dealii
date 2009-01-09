@@ -273,6 +273,35 @@ FE_RaviartThomasNodal<dim>::get_ria_vector (const unsigned int deg)
 
 
 template <int dim>
+bool
+FE_RaviartThomasNodal<dim>::has_support_on_face (
+  const unsigned int shape_index,
+  const unsigned int face_index) const
+{
+  Assert (shape_index < this->dofs_per_cell,
+	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
+  Assert (face_index < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
+
+				   // The first degrees of freedom are
+				   // on the faces and each face has
+				   // degree degrees.
+  const unsigned int support_face = shape_index / this->degree;
+  
+				   // The only thing we know for sure
+				   // is that shape functions with
+				   // support on one face are zero on
+				   // the opposite face.
+  if (support_face < GeometryInfo<dim>::faces_per_cell)
+    return (face_index != GeometryInfo<dim>::opposite_face[support_face]);
+  
+				   // In all other cases, return true,
+				   // which is safe
+  return true;
+}
+
+
+template <int dim>
 void
 FE_RaviartThomasNodal<dim>::interpolate(
   std::vector<double>&,
@@ -328,7 +357,6 @@ FE_RaviartThomasNodal<dim>::interpolate(
     }
   Assert (fbase == this->dofs_per_cell, ExcInternalError());
 }
-
 
 
 template <int dim>

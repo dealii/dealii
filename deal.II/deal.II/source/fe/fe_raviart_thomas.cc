@@ -416,10 +416,12 @@ FE_RaviartThomas<dim>::initialize_restriction()
 
 template <>
 std::vector<unsigned int>
-FE_RaviartThomas<1>::get_dpo_vector (const unsigned int)
+FE_RaviartThomas<1>::get_dpo_vector (const unsigned int deg)
 {
-  Assert (false, ExcImpossibleInDim(1));
-  return std::vector<unsigned int>();
+  std::vector<unsigned int> dpo(2);
+  dpo[0] = 1;
+  dpo[1] = deg;
+  return dpo;
 }
 
 #endif
@@ -427,20 +429,17 @@ FE_RaviartThomas<1>::get_dpo_vector (const unsigned int)
 
 template <int dim>
 std::vector<unsigned int>
-FE_RaviartThomas<dim>::get_dpo_vector (const unsigned int rt_order)
+FE_RaviartThomas<dim>::get_dpo_vector (const unsigned int deg)
 {
-                                   // the element is face-based (not
-                                   // to be confused with George
-                                   // W. Bush's Faith Based
-                                   // Initiative...), and we have
-                                   // (rt_order+1)^(dim-1) DoFs per face
+                                   // the element is face-based and we have
+                                   // (deg+1)^(dim-1) DoFs per face
   unsigned int dofs_per_face = 1;
-  for (unsigned int d=0; d<dim-1; ++d)
-    dofs_per_face *= rt_order+1;
+  for (unsigned int d=1; d<dim; ++d)
+    dofs_per_face *= deg+1;
 
                                    // and then there are interior dofs
   const unsigned int
-    interior_dofs = dim*rt_order*dofs_per_face;
+    interior_dofs = dim*deg*dofs_per_face;
   
   std::vector<unsigned int> dpo(dim+1);
   dpo[dim-1] = dofs_per_face;
@@ -498,7 +497,6 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
 }
 
 
-
 template <int dim>
 void
 FE_RaviartThomas<dim>::interpolate(
@@ -507,7 +505,6 @@ FE_RaviartThomas<dim>::interpolate(
 {
   Assert(false, ExcNotImplemented());
 }
-
 
 
 template <int dim>

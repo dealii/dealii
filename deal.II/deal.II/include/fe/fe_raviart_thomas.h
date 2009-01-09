@@ -388,6 +388,17 @@ class FE_RaviartThomasNodal
     static std::vector<bool>
     get_ria_vector (const unsigned int degree);
 				     /**
+				      * Check whether a shape function
+				      * may be non-zero on a face.
+				      *
+				      * Right now, this is only
+				      * implemented for RT0 in
+				      * 1D. Otherwise, returns always
+				      * @p true.
+				      */
+    virtual bool has_support_on_face (const unsigned int shape_index,
+				      const unsigned int face_index) const;
+				     /**
 				      * Initialize the
 				      * FiniteElement<dim>::generalized_support_points
 				      * and FiniteElement<dim>::generalized_face_support_points
