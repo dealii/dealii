@@ -347,7 +347,7 @@ namespace LinearSolvers
   vmult (VectorType       &dst,
 	 const VectorType &src) const
   {
-    SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
+    SolverControl solver_control (src.size(), 5e-8*src.l2_norm());
     SolverCG<VectorType> cg (solver_control);
 
     dst = 0;
@@ -491,7 +491,7 @@ namespace LinearSolvers
 		  stokes_matrix           (&S),
 		  m_inverse               (&Mpinv),
 		  a_preconditioner        (Apreconditioner),
-		  tmp                     (stokes_matrix->block(1,1).matrix->RowMap())
+		  tmp                     (stokes_matrix->block(1,1).m())
   {}
 
 
@@ -2652,12 +2652,9 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 				   // data vectors for refinement (in this
 				   // order).
   std::vector<TrilinosWrappers::Vector> x_temperature (2);
-  x_temperature[0].reinit (temperature_solution);
   x_temperature[0] = temperature_solution;
-  x_temperature[1].reinit (temperature_solution);
   x_temperature[1] = old_temperature_solution;
-  TrilinosWrappers::BlockVector x_stokes(2);
-  x_stokes = stokes_solution;
+  TrilinosWrappers::BlockVector x_stokes = stokes_solution;
 
   SolutionTransfer<dim,TrilinosWrappers::Vector>
     temperature_trans(temperature_dof_handler);
@@ -2702,7 +2699,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 
   temperature_solution = tmp[0];
   old_temperature_solution = tmp[1];
-  
+
   stokes_trans.interpolate (x_stokes, stokes_solution);
 
   rebuild_stokes_matrix         = true;
