@@ -567,6 +567,8 @@ namespace TrilinosWrappers
       {
 	ML_Epetra::SetDefaults("SA",parameter_list);
 	parameter_list.set("smoother: type", "Chebyshev");
+	if (additional_data.higher_order_elements)
+	  parameter_list.set("aggregation: type", "MIS-Uncoupled");
       }
     else
       {
@@ -585,14 +587,11 @@ namespace TrilinosWrappers
     if (additional_data.output_details)
       parameter_list.set("ML output", 10);
     else
-      parameter_list.set("ML output", 0);
-  
-    if (additional_data.higher_order_elements)
-      parameter_list.set("aggregation: type", "MIS");
+      parameter_list.set("ML output", 0);  
 
-    const Epetra_Map * domain_map = &(matrix.matrix->DomainMap());
+    const Epetra_Map & domain_map = matrix.matrix->DomainMap();
     
-    Epetra_MultiVector distributed_constant_modes (*domain_map, 
+    Epetra_MultiVector distributed_constant_modes (domain_map, 
 						   constant_modes_dimension);
   
     if (constant_modes_dimension > 1)
@@ -604,9 +603,9 @@ namespace TrilinosWrappers
 		ExcDimensionMismatch(n_rows,
 				     distributed_constant_modes.GlobalLength()));
 
-	const unsigned int my_size = domain_map->NumMyElements();
-	Assert (my_size == (unsigned int)domain_map->MaxLID()+1,
-		ExcDimensionMismatch (my_size, domain_map->MaxLID()+1));
+	const unsigned int my_size = domain_map.NumMyElements();
+	Assert (my_size == (unsigned int)domain_map.MaxLID()+1,
+		ExcDimensionMismatch (my_size, domain_map.MaxLID()+1));
 	
 				        // Reshape null space as a
 				        // contiguous vector of
@@ -615,7 +614,7 @@ namespace TrilinosWrappers
 	for (unsigned int d=0; d<constant_modes_dimension; ++d)
 	  for (unsigned int row=0; row<my_size; ++row)
 	    {
-	      int global_row_id = domain_map->GID(row);
+	      int global_row_id = domain_map.GID(row);
 	      distributed_constant_modes.ReplaceMyValue(row, d, 
 		       (double)additional_data.constant_modes[d][global_row_id]);
 	    }
