@@ -585,8 +585,8 @@ namespace TrilinosWrappers
 				   // options?
 	if (additional_data.higher_order_elements)
 	  {
-	    if (matrix.local_size() < 5000)
-	      parameter_list.set("aggregation: type", "Uncoupled");
+	    if (matrix.m()/matrix.matrix->Comm().NumProc() < 5000)
+	      parameter_list.set("aggregation: type", "Uncoupled-MIS");
 	    else
 	      parameter_list.set("aggregation: type", "MIS");
 	  }
