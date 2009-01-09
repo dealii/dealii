@@ -1455,7 +1455,7 @@ namespace Threads
       boost::shared_ptr<internal::thread_description<RT> > thread_descriptor;
 
 #if !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2) && !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG)
-      template <typename> friend struct internal::fun_wrapper;
+      template <typename> friend struct internal::ThreadStarter;
 #endif
   };
 
@@ -1475,8 +1475,58 @@ namespace Threads
                                       * @author Wolfgang Bangerth, 2003
                                       */
     template <typename RT>
-    struct fun_wrapper
+    struct ThreadStarter
     {
+      public:
+                                         /**
+                                          * Start a new thread, wait
+                                          * until it has copied the
+                                          * data out of this object,
+                                          * and return the thread
+                                          * descriptor.
+					  *
+					  * In the non-multithreaded case,
+					  * simply call the function.
+                                          */
+	static
+	Thread<RT> start_thread (const boost::function<RT ()> &function)
+	  {
+	    ThreadStarter<RT> wrapper (function);
+	    wrapper.thread_descriptor =
+	      boost::shared_ptr<internal::thread_description<RT> >
+	      (new internal::thread_description<RT>());
+	    
+#if (DEAL_II_USE_MT == 1)
+	    ThreadMutex::ScopedLock lock (wrapper.mutex);
+	    wrapper.thread_descriptor->create (&ThreadStarter<RT>::entry_point,
+					       (void *)&wrapper);
+
+					     // wait for the newly created
+					     // thread to indicate that it has
+					     // copied the function
+					     // descriptor. note that the
+					     // POSIX description of
+					     // pthread_cond_wait says that
+					     // the function can return
+					     // spuriously and may have to be
+					     // called again; we guard against
+					     // this using the
+					     // data_has_been_copied variable
+					     // that indicates whether the
+					     // condition has actually been
+					     // met
+	    do
+	      {
+		wrapper.condition.wait (wrapper.mutex);
+	      }
+	    while (wrapper.data_has_been_copied == false);
+#else
+	    call (function, wrapper.thread_descriptor->ret_val);
+#endif
+	    return wrapper.thread_descriptor;
+	  }
+
+      private:
                                          /**
                                           * Constructor. Store the
                                           * necessary information
@@ -1494,68 +1544,19 @@ namespace Threads
                                           * their knowledge of the
                                           * types involved.
                                           */
-        fun_wrapper (const boost::function<RT ()> &function)
-                        : function (function)  {}
-
-
-                                         /**
-                                          * Start a new thread, wait
-                                          * until it has copied the
-                                          * data out of this object,
-                                          * and return the thread
-                                          * descriptor.
-					  *
-					  * In the non-multithreaded case,
-					  * simply call the function.
-                                          */
-        Thread<RT> fire_up ()
-	  {
-	    thread_descriptor =
-	      DescriptionPointer(new internal::thread_description<RT>());
-	    
-#if (DEAL_II_USE_MT == 1)
-	    ThreadMutex::ScopedLock lock (mutex);        
-	    thread_descriptor->create (&entry_point, (void *)this);
-	    condition.wait (mutex);	    
-#else
-	    call (function, thread_descriptor->ret_val);
-#endif
-	    return thread_descriptor;
-	  }
-
-      private:
-                                         /**
-                                          * Default constructor. Made
-                                          * private and not
-                                          * implemented to prevent
-                                          * calling.
-                                          */
-        fun_wrapper ();
-
-                                         /**
-                                          * Copy constructor. Made
-                                          * private and not
-                                          * implemented to prevent
-                                          * calling.
-                                          */
-        fun_wrapper (const fun_wrapper &);
-
-                                         /**
-                                          * Typedef for shared
-                                          * pointers to the objects
-                                          * describing threads on the
-                                          * OS level.
-                                          */
-        typedef
-        boost::shared_ptr<internal::thread_description<RT> >
-        DescriptionPointer;
+        ThreadStarter (const boost::function<RT ()> &function)
+                        :
+			function (function),
+			data_has_been_copied (false)
+	  {}
 
                                          /**
                                           * Shared pointer to the
                                           * unique object describing a
                                           * thread on the OS level.
                                           */
-        DescriptionPointer thread_descriptor;
+        boost::shared_ptr<internal::thread_description<RT> >
+	thread_descriptor;
 
                                          /**
                                           * Mutex and condition
@@ -1578,14 +1579,22 @@ namespace Threads
                                           */
 	const boost::function<RT ()> &function;
 
+					 /**
+					  * A variable that indicates whether
+					  * the called thread has copied the
+					  * function descriptor to its own
+					  * stack.
+					  */
+	mutable bool data_has_been_copied;
+	
                                          /**
                                           * Entry point for the new
                                           * thread.
                                           */
         static void * entry_point (void *arg)
           {
-            const fun_wrapper<RT> *wrapper
-              = reinterpret_cast<const fun_wrapper<RT>*> (arg);
+            const ThreadStarter<RT> *wrapper
+              = reinterpret_cast<const ThreadStarter<RT>*> (arg);
 
                                              // copy information from
                                              // the stack of the
@@ -1599,10 +1608,49 @@ namespace Threads
                                              // we have copied all the
                                              // information that is
                                              // needed
+					     //
+					     // note that we indicate success
+					     // of the operation not only
+					     // through the condition variable
+					     // but also through
+					     // data_has_been_copied because
+					     // pthread_cond_wait can return
+					     // spuriously and we need to
+					     // check there whether the return
+					     // is spurious or not
             {
+	      wrapper->data_has_been_copied = true;
               ThreadMutex::ScopedLock lock (wrapper->mutex);
               wrapper->condition.signal ();
             }
+
+					     // create a new scheduler object
+					     // so that we can start tasks on
+					     // the new thread. the scheduler
+					     // will go out of scope at the
+					     // end of the function, which
+					     // also coincides with the end of
+					     // the thread
+					     //
+					     // one may think that the
+					     // creation of a scheduler is
+					     // expensive, but just creating
+					     // one and then destroying it
+					     // again costs about 92
+					     // nanoseconds on my laptop
+					     // (early 2009), whereas thread
+					     // creation takes about 12000
+					     // nanoseconds, more than 100
+					     // times longer. there is
+					     // therefore no need to only
+					     // create the scheduler when this
+					     // is actually necessary because
+					     // we are spawning tasks on this
+					     // particular thread; rather, we
+					     // make our life simpler by
+					     // always having a scheduler
+					     // around
+	    tbb::task_scheduler_init scheduler;
 
                                              // call the
                                              // function. since an
@@ -1633,15 +1681,6 @@ namespace Threads
           
             return 0;
           }
-
-
-					 /**
-					  * Make the base class a
-					  * friend, so that it can
-					  * access the thread entry
-					  * point function.
-					  */
-	template <typename, typename> friend class wrapper_base;
     };  
   }
 
@@ -1718,7 +1757,7 @@ namespace Threads
     class fun_encapsulator;
 
 
-// ----------- encapsulators for member functions not taking any parameters
+// ----------- encapsulators for function objects
 
                                      /**
 				      * @internal
@@ -1741,7 +1780,7 @@ namespace Threads
         Thread<RT>
         operator() ()
 	  {
-	    return fun_wrapper<RT> (function).fire_up ();
+	    return ThreadStarter<RT>::start_thread (function);
 	  }
     
       private:
@@ -1769,8 +1808,10 @@ namespace Threads
         Thread<RT>
         operator() (typename boost::tuples::element<0,ArgList>::type arg1)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1)));
 	  }
     
       private:
@@ -1799,9 +1840,11 @@ namespace Threads
 	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
 		    typename boost::tuples::element<1,ArgList>::type arg2)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2)));
 	  }
     
       private:
@@ -1831,10 +1874,12 @@ namespace Threads
 		    typename boost::tuples::element<1,ArgList>::type arg2,
 		    typename boost::tuples::element<2,ArgList>::type arg3)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3)));
 	  }
     
       private:
@@ -1865,11 +1910,13 @@ namespace Threads
 		    typename boost::tuples::element<2,ArgList>::type arg3,
 		    typename boost::tuples::element<3,ArgList>::type arg4)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4)));
 	  }
     
       private:
@@ -1901,12 +1948,14 @@ namespace Threads
 		    typename boost::tuples::element<3,ArgList>::type arg4,
 		    typename boost::tuples::element<4,ArgList>::type arg5)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5)));
 	  }
     
       private:
@@ -1939,13 +1988,15 @@ namespace Threads
 		    typename boost::tuples::element<4,ArgList>::type arg5,
 		    typename boost::tuples::element<5,ArgList>::type arg6)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<5,ArgList>::type>::act(arg6))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<5,ArgList>::type>::act(arg6)));
 	  }
     
       private:
@@ -1979,14 +2030,16 @@ namespace Threads
 		    typename boost::tuples::element<5,ArgList>::type arg6,
 		    typename boost::tuples::element<6,ArgList>::type arg7)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<5,ArgList>::type>::act(arg6),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<6,ArgList>::type>::act(arg7))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<5,ArgList>::type>::act(arg6),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<6,ArgList>::type>::act(arg7)));
 	  }
     
       private:
@@ -2021,15 +2074,17 @@ namespace Threads
 		    typename boost::tuples::element<6,ArgList>::type arg7,
 		    typename boost::tuples::element<7,ArgList>::type arg8)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<5,ArgList>::type>::act(arg6),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<6,ArgList>::type>::act(arg7),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<7,ArgList>::type>::act(arg8))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<5,ArgList>::type>::act(arg6),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<6,ArgList>::type>::act(arg7),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<7,ArgList>::type>::act(arg8)));
 	  }
     
       private:
@@ -2065,16 +2120,18 @@ namespace Threads
 		    typename boost::tuples::element<7,ArgList>::type arg8,
 		    typename boost::tuples::element<8,ArgList>::type arg9)
 	  {
-	    return fun_wrapper<RT> (boost::bind (function,
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<5,ArgList>::type>::act(arg6),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<6,ArgList>::type>::act(arg7),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<7,ArgList>::type>::act(arg8),
-						 internal::maybe_make_boost_ref<typename boost::tuples::element<8,ArgList>::type>::act(arg9))).fire_up ();
+	    return
+	      ThreadStarter<RT>::start_thread
+	      (boost::bind (function,
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<4,ArgList>::type>::act(arg5),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<5,ArgList>::type>::act(arg6),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<6,ArgList>::type>::act(arg7),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<7,ArgList>::type>::act(arg8),
+			    internal::maybe_make_boost_ref<typename boost::tuples::element<8,ArgList>::type>::act(arg9)));
 	  }
     
       private:
