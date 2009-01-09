@@ -568,7 +568,7 @@ namespace TrilinosWrappers
 	ML_Epetra::SetDefaults("SA",parameter_list);
 	parameter_list.set("smoother: type", "Chebyshev");
 	if (additional_data.higher_order_elements)
-	  parameter_list.set("aggregation: type", "MIS-Uncoupled");
+	  parameter_list.set("aggregation: type", "Uncoupled-MIS");
       }
     else
       {
