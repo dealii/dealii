@@ -25,6 +25,7 @@
 
 #include <sstream>
 
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -43,14 +44,12 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
   const unsigned int n_dofs = this->dofs_per_cell;
   
   this->mapping_type = mapping_raviart_thomas;
-				   // These must be done first, since
-				   // they change the evaluation of
-				   // basis functions
-
-				   // Set up the generalized support
-				   // points
-  initialize_support_points (deg);
-				   //Now compute the inverse node
+				   // First, initialize the
+				   // generalized support points and
+				   // quadrature weights, since they
+				   // are required for interpolation.
+  initialize_support_points(deg);
+				   // Now compute the inverse node
 				   //matrix, generating the correct
 				   //basis functions from the raw
 				   //ones.
@@ -130,6 +129,147 @@ FE_RaviartThomasNodal<dim>::clone() const
   return new FE_RaviartThomasNodal<dim>(*this);
 }
 
+
+//---------------------------------------------------------------------------
+// Auxiliary and internal functions
+//---------------------------------------------------------------------------
+
+
+
+template <int dim>
+void
+FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
+{
+  this->generalized_support_points.resize (this->dofs_per_cell);
+  this->generalized_face_support_points.resize (this->dofs_per_face);
+
+				   // Number of the point being entered
+  unsigned int current = 0;
+
+				   // On the faces, we choose as many
+				   // Gauss points as necessary to
+				   // determine the normal component
+				   // uniquely. This is the deg of
+				   // the Raviart-Thomas element plus
+				   // one.
+  if (dim>1)
+    {
+      QGauss<dim-1> face_points (deg+1);
+      Assert (face_points.size() == this->dofs_per_face,
+	      ExcInternalError());
+      for (unsigned int k=0;k<this->dofs_per_face;++k)
+	this->generalized_face_support_points[k] = face_points.point(k);
+      Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
+      for (unsigned int k=0;
+	   k<this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
+	   ++k)
+	this->generalized_support_points[k] = faces.point(k+QProjector<dim>
+							  ::DataSetDescriptor::face(0,
+										    true,
+										    false,
+										    false,
+										    this->dofs_per_face));
+
+      current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
+    }
+  
+  if (deg==0) return;
+				   // In the interior, we need
+				   // anisotropic Gauss quadratures,
+				   // different for each direction.
+  QGauss<1> high(deg+1);
+  QGauss<1> low(deg);
+
+  for (unsigned int d=0;d<dim;++d)
+    {
+      QAnisotropic<dim>* quadrature;
+      if (dim == 1) quadrature = new QAnisotropic<dim>(high);
+      if (dim == 2) quadrature = new QAnisotropic<dim>(((d==0) ? low : high),
+						       ((d==1) ? low : high));
+      if (dim == 3) quadrature = new QAnisotropic<dim>(((d==0) ? low : high),
+						       ((d==1) ? low : high),
+						       ((d==2) ? low : high));
+      Assert(dim<=3, ExcNotImplemented());
+      
+      for (unsigned int k=0;k<quadrature->size();++k)
+	this->generalized_support_points[current++] = quadrature->point(k);
+      delete quadrature;
+    }
+  Assert (current == this->dofs_per_cell, ExcInternalError());
+}
+
+
+#if deal_II_dimension == 1
+
+template <>
+std::vector<unsigned int>
+FE_RaviartThomasNodal<1>::get_dpo_vector (const unsigned int deg)
+{
+  std::vector<unsigned int> dpo(2);
+  dpo[0] = 1;
+  dpo[1] = deg;
+  return dpo;
+}
+
+#endif
+
+
+template <int dim>
+std::vector<unsigned int>
+FE_RaviartThomasNodal<dim>::get_dpo_vector (const unsigned int deg)
+{
+                                   // the element is face-based and we have
+                                   // (deg+1)^(dim-1) DoFs per face
+  unsigned int dofs_per_face = 1;
+  for (unsigned int d=1; d<dim; ++d)
+    dofs_per_face *= deg+1;
+
+                                   // and then there are interior dofs
+  const unsigned int
+    interior_dofs = dim*deg*dofs_per_face;
+  
+  std::vector<unsigned int> dpo(dim+1);
+  dpo[dim-1] = dofs_per_face;
+  dpo[dim]   = interior_dofs;
+  
+  return dpo;
+}
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+std::vector<bool>
+FE_RaviartThomasNodal<1>::get_ria_vector (const unsigned int)
+{
+  Assert (false, ExcImpossibleInDim(1));
+  return std::vector<bool>();
+}
+
+#endif
+
+
+template <int dim>
+std::vector<bool>
+FE_RaviartThomasNodal<dim>::get_ria_vector (const unsigned int deg)
+{
+  const unsigned int dofs_per_cell = PolynomialsRaviartThomas<dim>::compute_n_pols(deg);
+  unsigned int dofs_per_face = deg+1;
+  for (unsigned int d=2;d<dim;++d)
+    dofs_per_face *= deg+1;
+				   // all face dofs need to be
+				   // non-additive, since they have
+				   // continuity requirements.
+				   // however, the interior dofs are
+				   // made additive
+  std::vector<bool> ret_val(dofs_per_cell,false);
+  for (unsigned int i=GeometryInfo<dim>::faces_per_cell*dofs_per_face;
+       i < dofs_per_cell; ++i)
+    ret_val[i] = true;
+
+  return ret_val;
+}
 
 
 template <int dim>
@@ -632,169 +772,6 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 #endif
 
-
-
-#if deal_II_dimension == 1
-
-template <>
-std::vector<unsigned int>
-FE_RaviartThomasNodal<1>::get_dpo_vector (const unsigned int deg)
-{
-  std::vector<unsigned int> dpo(2);
-  dpo[0] = 1;
-  dpo[1] = deg;
-  return dpo;
-}
-
-#endif
-
-
-template <int dim>
-std::vector<unsigned int>
-FE_RaviartThomasNodal<dim>::get_dpo_vector (const unsigned int deg)
-{
-                                   // the element is face-based and we have
-                                   // (deg+1)^(dim-1) DoFs per face
-  unsigned int dofs_per_face = 1;
-  for (unsigned int d=1; d<dim; ++d)
-    dofs_per_face *= deg+1;
-
-                                   // and then there are interior dofs
-  const unsigned int
-    interior_dofs = dim*deg*dofs_per_face;
-  
-  std::vector<unsigned int> dpo(dim+1);
-  dpo[dim-1] = dofs_per_face;
-  dpo[dim]   = interior_dofs;
-  
-  return dpo;
-}
-
-
-
-#if deal_II_dimension == 1
-
-template <>
-std::vector<bool>
-FE_RaviartThomasNodal<1>::get_ria_vector (const unsigned int)
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return std::vector<bool>();
-}
-
-#endif
-
-
-template <int dim>
-std::vector<bool>
-FE_RaviartThomasNodal<dim>::get_ria_vector (const unsigned int deg)
-{
-  const unsigned int dofs_per_cell = PolynomialsRaviartThomas<dim>::compute_n_pols(deg);
-  unsigned int dofs_per_face = deg+1;
-  for (unsigned int d=2;d<dim;++d)
-    dofs_per_face *= deg+1;
-				   // all face dofs need to be
-				   // non-additive, since they have
-				   // continuity requirements.
-				   // however, the interior dofs are
-				   // made additive
-  std::vector<bool> ret_val(dofs_per_cell,false);
-  for (unsigned int i=GeometryInfo<dim>::faces_per_cell*dofs_per_face;
-       i < dofs_per_cell; ++i)
-    ret_val[i] = true;
-
-  return ret_val;
-}
-
-
-template <int dim>
-void
-FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
-{
-  this->generalized_support_points.resize (this->dofs_per_cell);
-  this->generalized_face_support_points.resize (this->dofs_per_face);
-
-				   // Number of the point being entered
-  unsigned int current = 0;
-
-				   // On the faces, we choose as many
-				   // Gauss points as necessary to
-				   // determine the normal component
-				   // uniquely. This is the deg of
-				   // the Raviart-Thomas element plus
-				   // one.
-  if (dim>1)
-    {
-      QGauss<dim-1> face_points (deg+1);
-      Assert (face_points.size() == this->dofs_per_face,
-	      ExcInternalError());
-      for (unsigned int k=0;k<this->dofs_per_face;++k)
-	this->generalized_face_support_points[k] = face_points.point(k);
-      Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
-      for (unsigned int k=0;
-	   k<this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
-	   ++k)
-	this->generalized_support_points[k] = faces.point(k+QProjector<dim>
-							  ::DataSetDescriptor::face(0,
-										    true,
-										    false,
-										    false,
-										    this->dofs_per_face));
-
-      current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
-    }
-  
-  if (deg==0) return;
-				   // In the interior, we need
-				   // anisotropic Gauss quadratures,
-				   // different for each direction.
-  QGauss<1> high(deg+1);
-  QGauss<1> low(deg);
-
-  for (unsigned int d=0;d<dim;++d)
-    {
-      QAnisotropic<dim>* quadrature;
-      if (dim == 1) quadrature = new QAnisotropic<dim>(high);
-      if (dim == 2) quadrature = new QAnisotropic<dim>(((d==0) ? low : high),
-						       ((d==1) ? low : high));
-      if (dim == 3) quadrature = new QAnisotropic<dim>(((d==0) ? low : high),
-						       ((d==1) ? low : high),
-						       ((d==2) ? low : high));
-      Assert(dim<=3, ExcNotImplemented());
-      
-      for (unsigned int k=0;k<quadrature->size();++k)
-	this->generalized_support_points[current++] = quadrature->point(k);
-      delete quadrature;
-    }
-  Assert (current == this->dofs_per_cell, ExcInternalError());
-}
-
-
-template <int dim>
-UpdateFlags
-FE_RaviartThomasNodal<dim>::update_once (const UpdateFlags) const
-{
-  return update_default;
-}
-
-
-template <int dim>
-UpdateFlags
-FE_RaviartThomasNodal<dim>::update_each (const UpdateFlags flags) const
-{
-  UpdateFlags out = update_default;
-  
-  if (flags & update_values)
-    out |= update_values | update_piola;
-  
-  if (flags & update_gradients)
-    out |= update_gradients | update_piola | update_covariant_transformation;
-  
-  if (flags & update_hessians)
-    out |= update_hessians | update_piola | update_covariant_transformation;
-  
-  return out;
-}
 
 
 template class FE_RaviartThomasNodal<deal_II_dimension>;

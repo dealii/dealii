@@ -35,6 +35,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
 template <int dim>
 FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 		:
@@ -44,8 +45,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 					 dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
 		  std::vector<bool>(PolynomialsRaviartThomas<dim>::compute_n_pols(deg), true),
 		  std::vector<std::vector<bool> >(PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
-						  std::vector<bool>(dim,true))),
-		rt_order(deg)
+						  std::vector<bool>(dim,true)))
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
@@ -60,6 +60,12 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 				   //matrix, generating the correct
 				   //basis functions from the raw
 				   //ones.
+  
+				   // We use an auxiliary matrix in
+				   // this function. Therefore,
+				   // inverse_node_matrix is still
+				   // empty and shape_value_component
+				   // returns the 'raw' shape values.
   FullMatrix<double> M(n_dofs, n_dofs);
   FETools::compute_node_matrix(M, *this);
   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
@@ -82,9 +88,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
   for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
-  FETools::compute_face_embedding_matrices<dim,double>(*this, 
-						       face_embeddings, 
-						       0, 0);
+  FETools::compute_face_embedding_matrices<dim,double>(*this, face_embeddings, 0, 0);
   this->interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
 				     this->dofs_per_face);
   unsigned int target_row=0;
@@ -110,12 +114,15 @@ FE_RaviartThomas<dim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
+				   // note that this->degree is the maximal
+				   // polynomial degree and is thus one higher
+				   // than the argument given to the
+				   // constructor
   std::ostringstream namebuf;  
-  namebuf << "FE_RaviartThomas<" << dim << ">(" << rt_order << ")";
+  namebuf << "FE_RaviartThomas<" << dim << ">(" << this->degree-1 << ")";
 
   return namebuf.str();
 }
-
 
 
 template <int dim>
@@ -288,7 +295,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 {
   const unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
 
-  QGauss<dim-1> q_base (rt_order+1);
+  QGauss<dim-1> q_base (this->degree);
   const unsigned int n_face_points = q_base.size();
 				   // First, compute interpolation on
 				   // subfaces
@@ -354,7 +361,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 	}
     }
   
-  if (rt_order==0) return;
+  if (this->degree == 1) return;
   
 				   // Create Legendre basis for the
 				   // space D_xi Q_k. Here, we cannot
@@ -364,13 +371,13 @@ FE_RaviartThomas<dim>::initialize_restriction()
     {
       std::vector<std::vector<Polynomials::Polynomial<double> > > poly(dim);
       for (unsigned int d=0;d<dim;++d)
-	poly[d] = Polynomials::Legendre::generate_complete_basis(rt_order);
-      poly[dd] = Polynomials::Legendre::generate_complete_basis(rt_order-1);
+	poly[d] = Polynomials::Legendre::generate_complete_basis(this->degree-1);
+      poly[dd] = Polynomials::Legendre::generate_complete_basis(this->degree-2);
 
       polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
     }
   
-  QGauss<dim> q_cell(rt_order+1);
+  QGauss<dim> q_cell(this->degree);
   const unsigned int start_cell_dofs
     = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
 
@@ -444,70 +451,9 @@ FE_RaviartThomas<dim>::get_dpo_vector (const unsigned int rt_order)
 
 
 
-template <int dim>
-UpdateFlags
-FE_RaviartThomas<dim>::update_once (const UpdateFlags) const
-{
-				   // even the values have to be
-				   // computed on the real cell, so
-				   // nothing can be done in advance
-  return update_default;
-}
-
-
-
-template <int dim>
-UpdateFlags
-FE_RaviartThomas<dim>::update_each (const UpdateFlags flags) const
-{
-  UpdateFlags out = update_default;
-
-  if (flags & update_values)
-    out |= update_values | update_piola;
-  
-  if (flags & update_gradients)
-    out |= update_gradients | update_piola | update_covariant_transformation;
-  
-  if (flags & update_hessians)
-    out |= update_hessians | update_piola | update_covariant_transformation;
-  
-  return out;
-}
-
 //---------------------------------------------------------------------------
 // Data field initialization
 //---------------------------------------------------------------------------
-
-
-
-
-template <int dim>
-unsigned int
-FE_RaviartThomas<dim>::n_base_elements () const
-{
-  return 1;
-}
-
-
-
-template <int dim>
-const FiniteElement<dim> &
-FE_RaviartThomas<dim>::base_element (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return *this;
-}
-
-
-
-template <int dim>
-unsigned int
-FE_RaviartThomas<dim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return 1;
-}
-
 
 
 template <int dim>
@@ -523,9 +469,9 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
 				   // Return computed values if we
 				   // know them easily. Otherwise, it
 				   // is always safe to return true.
-  switch (rt_order)
+  switch (this->degree)
     {
-      case 0:
+      case 1:
       {
         switch (dim)
           {

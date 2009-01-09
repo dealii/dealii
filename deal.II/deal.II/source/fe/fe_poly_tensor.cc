@@ -860,19 +860,30 @@ template <class POLY, int dim, int spacedim>
 UpdateFlags
 FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 {
-  const bool values_once = (mapping_type == mapping_none);
-  
   UpdateFlags out = update_default;
 
-  if (!values_once && (flags & update_values))
-    out |= update_values             | update_covariant_transformation;
-  if (flags & update_gradients)
-    out |= update_gradients          | update_covariant_transformation;
-  if (flags & update_hessians)
-    out |= update_hessians | update_covariant_transformation;
-  if (flags & update_cell_normal_vectors)
-    out |= update_cell_normal_vectors | update_JxW_values;
-
+  switch (mapping_type)
+    {
+      case mapping_piola:
+      {
+	if (flags & update_values)
+	  out |= update_values | update_piola;
+	
+	if (flags & update_gradients)
+	  out |= update_gradients | update_piola | update_covariant_transformation;
+	
+	if (flags & update_hessians)
+	  out |= update_hessians | update_piola | update_covariant_transformation;
+	
+	break;
+      }
+      
+      default:
+      {
+	Assert (false, ExcNotImplemented());
+      }
+    }
+  
   return out;
 }
 

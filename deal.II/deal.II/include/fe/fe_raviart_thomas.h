@@ -113,34 +113,6 @@ class FE_RaviartThomas
 
 
 				     /**
-				      * Number of base elements in a
-				      * mixed discretization. Here,
-				      * this is of course equal to
-				      * one.
-				      */
-    virtual unsigned int n_base_elements () const;
-    
-				     /**
-				      * Access to base element
-				      * objects. Since this element is
-				      * atomic, <tt>base_element(0)</tt> is
-				      * @p this, and all other
-				      * indices throw an error.
-				      */
-    virtual const FiniteElement<dim> &
-    base_element (const unsigned int index) const;
-
-                                     /**
-                                      * Multiplicity of base element
-                                      * @p index. Since this is an
-                                      * atomic element,
-                                      * <tt>element_multiplicity(0)</tt>
-                                      * returns one, and all other
-                                      * indices will throw an error.
-                                      */
-    virtual unsigned int element_multiplicity (const unsigned int index) const;
-    
-				     /**
 				      * Check whether a shape function
 				      * may be non-zero on a face.
 				      *
@@ -164,17 +136,6 @@ class FE_RaviartThomas
     virtual FiniteElement<dim> * clone() const;
     
   private:
-				     /**
-				      * The order of the
-				      * Raviart-Thomas element. The
-				      * lowest order elements are
-				      * usually referred to as RT0,
-				      * even though their shape
-				      * functions are piecewise
-				      * linears.
-				      */  
-    const unsigned int rt_order;
-
     				     /**
 				      * Only for internal use. Its
 				      * full name is
@@ -212,45 +173,6 @@ class FE_RaviartThomas
 				      * weakly.
 				      */
     void initialize_restriction ();
-    
-				     /**
-				      * Given a set of flags indicating
-				      * what quantities are requested
-				      * from a @p FEValues object,
-				      * return which of these can be
-				      * precomputed once and for
-				      * all. Often, the values of
-				      * shape function at quadrature
-				      * points can be precomputed, for
-				      * example, in which case the
-				      * return value of this function
-				      * would be the logical and of
-				      * the input @p flags and
-				      * @p update_values.
-				      *
-				      * For the present kind of finite
-				      * element, this is exactly the
-				      * case.
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags flags) const;
-  
-				     /**
-				      * This is the opposite to the
-				      * above function: given a set of
-				      * flags indicating what we want
-				      * to know, return which of these
-				      * need to be computed each time
-				      * we visit a new cell.
-				      *
-				      * If for the computation of one
-				      * quantity something else is
-				      * also required (for example, we
-				      * often need the covariant
-				      * transformation when gradients
-				      * need to be computed), include
-				      * this in the result as well.
-				      */
-    virtual UpdateFlags update_each (const UpdateFlags flags) const;
     
 				     /**
 				      * Fields of cell-independent data.
@@ -442,8 +364,6 @@ class FE_RaviartThomasNodal
     virtual FiniteElementDomination::Domination
     compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
 
-    virtual UpdateFlags update_once (const UpdateFlags flags) const;
-    virtual UpdateFlags update_each (const UpdateFlags flags) const;
   private:
 				     /**
 				      * Only for internal use. Its
