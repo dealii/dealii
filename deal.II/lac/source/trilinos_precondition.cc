@@ -568,27 +568,30 @@ namespace TrilinosWrappers
 	ML_Epetra::SetDefaults("SA",parameter_list);
 	parameter_list.set("smoother: type", "Chebyshev");
 
-				   // uncoupled mode gives a lot of warnings
-				   // when there are too many entries per
-				   // row and aggreggation gets complicated,
-				   // but MIS does not work if too few
+				   // uncoupled mode can give a lot of
+				   // warnings or even fail when there
+				   // are too many entries per row and
+				   // aggreggation gets complicated, but
+				   // MIS does not work if too few
 				   // elements are located on one
-				   // processor. work around these warnings
-				   // by choosing the different strategies
-				   // in different situations: for low
-				   // order, always use the standard choice
-				   // uncoupled. if higher order, use
-				   // Uncoupled with few dofs and MIS
-				   // with many dofs per processor
+				   // processor. work around these
+				   // warnings by choosing the different
+				   // strategies in different
+				   // situations: for low order, always
+				   // use the standard choice
+				   // uncoupled. if higher order, right
+				   // now we also just use Uncoupled,
+				   // but we should be aware that maybe
+				   // MIS might be needed
 				   // 
-				   // TODO: Maybe there are some better
-				   // options?
+				   // TODO: Maybe there are any
+				   // other/better options?
 	if (additional_data.higher_order_elements)
 	  {
-	    if (matrix.m()/matrix.matrix->Comm().NumProc() < 5000)
-	      parameter_list.set("aggregation: type", "Uncoupled-MIS");
-	    else
-	      parameter_list.set("aggregation: type", "MIS");
+	    //if (matrix.m()/matrix.matrix->Comm().NumProc() < 50000)
+	    parameter_list.set("aggregation: type", "Uncoupled");
+	    //else
+	    //parameter_list.set("aggregation: type", "MIS");
 	  }
       }
     else
