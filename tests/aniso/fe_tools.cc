@@ -2,7 +2,7 @@
 //    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -87,7 +87,7 @@ void test_embedding (const FiniteElement<dim>& fe)
 	 ++c)
       {
 	deallog << fe.get_name() << " embedding, RefinementCase<dim>:: " << refine_case_names[ref_case] << ", child " << c << std::endl;
-	print_formatted(P[ref_case-1][c], 3, 6);
+	print_formatted(P[ref_case-1][c], 4, 6);
       }
 }
 
@@ -106,7 +106,7 @@ void test_projection (const FiniteElement<dim>& fe1,
   FullMatrix<double> P(n2,n1);
 
   FETools::get_projection_matrix(fe1, fe2, P);
-  P.print_formatted(out, 2, false, 5);
+  P.print_formatted(out, 3, false, 5);
 }
 
   
@@ -163,7 +163,7 @@ int main()
   std::ofstream logfile("fe_tools/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-8);
 
   test_projection<2>(logfile);
   test_projection<3>(logfile);
