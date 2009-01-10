@@ -2,7 +2,7 @@
 //    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,7 +77,7 @@ void test_embedding (const FiniteElement<dim>& fe)
   for (unsigned int i=0;i<nc;++i)
     {
       deallog << fe.get_name() << " embedding " << i << std::endl;
-      print_formatted(P[RefinementCase<dim>::isotropic_refinement-1][i], 3, 6);
+      print_formatted(P[RefinementCase<dim>::isotropic_refinement-1][i], 4, 6);
     }
 }
 
@@ -96,7 +96,7 @@ void test_projection (const FiniteElement<dim>& fe1,
   FullMatrix<double> P(n2,n1);
 
   FETools::get_projection_matrix(fe1, fe2, P);
-  P.print_formatted(out, 2, false, 5);
+  P.print_formatted(out, 3, false, 5);
 }
 
   
