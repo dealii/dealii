@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -693,8 +693,8 @@ void LaplaceProblem<dim>::run ()
 int main () 
 {
   std::ofstream logfile(logname);
-  logfile.precision (3);
-  deallog << std::setprecision(3);
+  logfile.precision (4);
+  deallog << std::setprecision(4);
   
   deallog.attach(logfile);
   deallog.depth_console(0);
