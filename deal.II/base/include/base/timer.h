@@ -18,11 +18,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This is a very simple class which provides information about the time
- * elapsed since the timer was started last time. Information is retrieved
- * from the system on the basis of clock cycles since last time the computer
- * was booted. On a SUN workstation, this information is exact to about a
- * microsecond. 
+ * This is a very simple class which provides information about both the
+ * CPU time and the wallclock time elapsed since the timer was started
+ * last time. Information is retrieved from the system on the basis of
+ * clock cycles since last time the computer was booted for the CPU
+ * time. On a SUN workstation, this information is exact to about a
+ * microsecond.
  *
  *
  * <h3>Usage</h3>
