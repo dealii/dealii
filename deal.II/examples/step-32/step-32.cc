@@ -1647,7 +1647,7 @@ void BoussinesqFlowProblem<dim>::run ()
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;      
     }
-  while (time <= 0);
+  while (time <= 100);
 
 }
 
