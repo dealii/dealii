@@ -14,6 +14,9 @@
 #define __deal2__timer_h
 
 #include <base/config.h>
+#include <base/conditional_ostream.h>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -165,6 +168,80 @@ class Timer
 				      * running.
 				      */
     bool                running;
+};
+
+
+
+/**
+ * This class can be used to generate formatted output from time
+ * measurements of different subsections in a program. It is possible to
+ * create several sections that perform certain aspects of the program. A
+ * section can be entered several times. By changing the options in
+ * OutputFrequency and OutputType, the user can choose whether output should
+ * be generated every time a section is joined or just in the end of the
+ * program. Moreover, it is possible to show CPU times, wall times or both.
+ *
+ * TODO: Write a more extensive documentation.
+ *
+ * @ingroup utilities
+ * @author M. Kronbichler, 2009.
+ */
+class TimerOutput
+{
+  public:
+				   // Sets whether to generate output every
+				   // time we exit a section, just in the
+				   // end, or both.
+    enum OutputFrequency {every_call, summary, every_call_and_summary}
+                                                             output_frequency;
+
+				   // Sets whether to show CPU times, wall
+				   // times, or both CPU and wall times.
+    enum OutputType      {cpu_times, wall_times, cpu_and_wall_times} 
+                                                             output_type;
+
+				   // Constructor that takes std::cout as
+				   // output stream.
+    TimerOutput (std::ostream              &stream, 
+		 const enum OutputFrequency output_frequency,
+		 const enum OutputType      output_type);
+
+				   // Constructor that takes a
+				   // ConditionalOStream to write output to.
+    TimerOutput (ConditionalOStream        &stream, 
+		 const enum OutputFrequency output_frequency,
+		 const enum OutputType      output_type);
+
+				   // Destructor. Calls print_summary() in
+				   // case the option for writing the
+				   // summary output is set.
+    ~TimerOutput();
+
+				   // Open a section by given a string name
+				   // of it. In case the name already
+				   // exists, that section is done once
+				   // again.
+    void enter_section (const std::string &section_name);
+
+				   // Leave a section. If no name is given,
+				   // the last section that was entered is
+				   // left.
+    void exit_section (const std::string &section_name = std::string());
+
+				   // Print a formatted table that
+				   // summarizes the time consumed in the
+				   // various sections.
+    void print_summary ();
+
+  private:
+    Timer              timer_all;
+    std::vector<Timer> section_timers;
+    std::vector<std::string> section_names;
+    std::vector<double> section_total_cpu_times;
+    std::vector<double> section_total_wall_times;
+    std::vector<unsigned int> section_n_calls;
+    ConditionalOStream out_stream;
+    std::vector<unsigned int> active_sections;
 };
 
 DEAL_II_NAMESPACE_CLOSE
