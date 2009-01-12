@@ -15,8 +15,10 @@
 
 #include <base/config.h>
 #include <base/conditional_ostream.h>
+
 #include <string>
-#include <vector>
+#include <list>
+#include <map>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -172,6 +174,7 @@ class Timer
 
 
 
+//TODO: The following class is not thread-safe
 /**
  * This class can be used to generate formatted output from time
  * measurements of different subsections in a program. It is possible to
@@ -189,59 +192,112 @@ class Timer
 class TimerOutput
 {
   public:
-				   // Sets whether to generate output every
-				   // time we exit a section, just in the
-				   // end, or both.
+				     /**
+				      * Sets whether to generate output every
+				      * time we exit a section, just in the
+				      * end, or both.
+				      */
     enum OutputFrequency {every_call, summary, every_call_and_summary}
-                                                             output_frequency;
+    output_frequency;
 
-				   // Sets whether to show CPU times, wall
-				   // times, or both CPU and wall times.
+				     /**
+				      * Sets whether to show CPU times, wall
+				      * times, or both CPU and wall times.
+				      */
     enum OutputType      {cpu_times, wall_times, cpu_and_wall_times} 
-                                                             output_type;
-
-				   // Constructor that takes std::cout as
-				   // output stream.
+    output_type;
+    
+				     /**
+				      * Constructor that takes std::cout as
+				      * output stream.
+				      */
     TimerOutput (std::ostream              &stream, 
 		 const enum OutputFrequency output_frequency,
 		 const enum OutputType      output_type);
 
-				   // Constructor that takes a
-				   // ConditionalOStream to write output to.
+				     /**
+				      * Constructor that takes a
+				      * ConditionalOStream to write output to.
+				      */
     TimerOutput (ConditionalOStream        &stream, 
 		 const enum OutputFrequency output_frequency,
 		 const enum OutputType      output_type);
 
-				   // Destructor. Calls print_summary() in
-				   // case the option for writing the
-				   // summary output is set.
+				     /**
+				      * Destructor. Calls print_summary() in
+				      * case the option for writing the
+				      * summary output is set.
+				      */
     ~TimerOutput();
 
-				   // Open a section by given a string name
-				   // of it. In case the name already
-				   // exists, that section is done once
-				   // again.
+				     /**
+				      * Open a section by given a string name
+				      * of it. In case the name already
+				      * exists, that section is done once
+				      * again.
+				      */
     void enter_section (const std::string &section_name);
 
-				   // Leave a section. If no name is given,
-				   // the last section that was entered is
-				   // left.
+				     /**				       
+				      * Leave a section. If no name is given,
+				      * the last section that was entered is
+				      * left.
+				      */
     void exit_section (const std::string &section_name = std::string());
 
-				   // Print a formatted table that
-				   // summarizes the time consumed in the
-				   // various sections.
+				     /**
+				      * Print a formatted table that
+				      * summarizes the time consumed in the
+				      * various sections.
+				      */
     void print_summary ();
 
   private:
+				     /**
+				      * A timer object for the overall
+				      * run time. If we are using MPI,
+				      * this timer also accumulates
+				      * over all MPI processes.
+				      */
     Timer              timer_all;
-    std::vector<Timer> section_timers;
-    std::vector<std::string> section_names;
-    std::vector<double> section_total_cpu_times;
-    std::vector<double> section_total_wall_times;
-    std::vector<unsigned int> section_n_calls;
+
+				     /**
+				      * A structure that groups all
+				      * information that we collect
+				      * about each of the sections.
+				      */
+    struct Section
+    {
+	Timer  timer;
+	double total_cpu_time;
+	double total_wall_time;
+	unsigned int n_calls;
+    };
+
+				     /**
+				      * A list of all the sections and
+				      * their information.
+				      */
+    std::map<std::string, Section> sections;
+
+				     /**
+				      * The stream object to which we
+				      * are to output.
+				      */
     ConditionalOStream out_stream;
-    std::vector<unsigned int> active_sections;
+
+				     /**
+				      * A list of the sections that
+				      * have been entered and not
+				      * exited. The list is kept in
+				      * the order in which sections
+				      * have been entered, but
+				      * elements may be removed in the
+				      * middle if an argument is given
+				      * to the exit_section()
+				      * function.
+				      */
+    std::list<std::string> active_sections;
 };
 
 DEAL_II_NAMESPACE_CLOSE

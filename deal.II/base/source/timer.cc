@@ -179,58 +179,22 @@ TimerOutput::enter_section (const std::string &section_name)
   Assert (section_name.empty() == false,
 	  ExcMessage ("Section string is empty."));
 
-  unsigned int this_section_number = numbers::invalid_unsigned_int;
-
-				   // check whether the requested section
-				   // already exists
-  for (unsigned int i=0; i<section_names.size(); ++i)
+  Assert (std::find (active_sections.begin(), active_sections.end(),
+		     section_name) == active_sections.end(),
+	  ExcMessage ("Cannot enter the already active section."));
+  
+  if (sections.find (section_name) == sections.end())
     {
-				   // if we found it, we have to have the
-				   // index into which we write the
-				   // data. ensure that the section was not
-				   // active before to avoid any mess
-      if (section_names[i].compare (section_name) == 0)
-	{
-	  this_section_number = i;
-	  for (unsigned int j=0; j<active_sections.size(); ++j)
-	    {
-	      if (active_sections[j] == i)
-		{
-#ifdef DEBUG
-		  std::string exc_text = "Cannot enter the already active section " 
-		    + section_name;
-		  Assert (active_sections[j] != i, ExcMessage (exc_text.data()));
-#endif
-		  exit_section(section_name);
-		}
-	    }
-	  break;
-	}
+      sections[section_name].total_cpu_time = 0;
+      sections[section_name].total_wall_time = 0;
+      sections[section_name].n_calls = 0;
     }
 
-				   // in case this is a new section, enlarge
-				   // our data storage by one, otherwise
-				   // just reset the timer
-  if (this_section_number == numbers::invalid_unsigned_int)
-    {
-      section_names.push_back(section_name);
-      section_total_cpu_times.push_back (0.);
-      section_total_wall_times.push_back (0.);
-      section_timers.push_back (Timer());
-      section_n_calls.push_back (0);
-      this_section_number = section_names.size() - 1;
-    }
-  else
-    {
-      section_timers[this_section_number].reset();
-      section_timers[this_section_number].start();
-    }
+  sections[section_name].timer.reset();
+  sections[section_name].timer.start();
+  sections[section_name].n_calls++;
 
-				   // now turn the current section into the
-				   // list of active sections and increase
-				   // the counter for that section
-  active_sections.push_back (this_section_number);
-  section_n_calls[this_section_number]++;
+  active_sections.push_back (section_name);
 }
 
 
@@ -238,42 +202,29 @@ TimerOutput::enter_section (const std::string &section_name)
 void 
 TimerOutput::exit_section (const std::string &section_name)
 {
-				// if no string is given, exit the last
-				// active section.
-  unsigned int active_index_to_delete = numbers::invalid_unsigned_int;
-  if (section_name.empty() == true)
-    active_index_to_delete = active_sections.size() - 1;
-				   // if we got a string, we need to find
-				   // the index in the list of active
-				   // functions
-  else
-    {
-      for (unsigned int i=0; i<active_sections.size(); ++i)
-	if (section_names[active_sections[i]].compare (section_name) == 0)
-	  {
-	    active_index_to_delete = i;
-	    break;
-	  }
-    }
-
-  Assert (active_index_to_delete != numbers::invalid_unsigned_int,
+  Assert (sections.find (section_name) != sections.end(),
 	  ExcMessage ("Cannot delete a section that was never created."));
+  Assert (std::find (active_sections.begin(), active_sections.end(),
+		     section_name) == active_sections.end(),
+	  ExcMessage ("Cannot delete a section that has not been entered."));
 
-  const unsigned int section_to_exit = active_sections[active_index_to_delete];
+				   // if no string is given, exit the last
+				   // active section.
+  const std::string actual_section_name = (section_name == "" ?
+					   active_sections.back () :
+					   section_name);
 
-  Assert (section_to_exit < section_names.size(),
-	  ExcInternalError());
+  sections[actual_section_name].timer.stop();
+  sections[actual_section_name].total_wall_time += sections[section_name].timer.wall_time();
 
-				// stop the timer for this section.
-  section_timers[section_to_exit].stop();
-  section_total_wall_times[section_to_exit] += section_timers[section_to_exit].wall_time();
-
-				// get cpu time. on MPI systems, add the
-				// local contributions.
-				// 
-				// TODO: this should rather be in the Timer
-				// class itself, shouldn't it?
-  double cpu_time = section_timers[section_to_exit]();
+				       // get cpu time. on MPI
+				       // systems, add the local
+				       // contributions.
+				       // 
+				       // TODO: this should rather be
+				       // in the Timer class itself,
+				       // shouldn't it?
+  double cpu_time = sections[section_name].timer();
   {
 
 				// On MPI, sum up all the local CPU
@@ -290,7 +241,7 @@ TimerOutput::exit_section (const std::string &section_name)
 	cpu_time = total_cpu_time;
       }
 #endif
-    section_total_cpu_times[section_to_exit] += cpu_time;
+    sections[actual_section_name].total_cpu_time += cpu_time;
   }
 
 
@@ -302,7 +253,7 @@ TimerOutput::exit_section (const std::string &section_name)
       std::ostringstream cpu;
       cpu << cpu_time << "s";
       std::ostringstream wall;
-      wall << section_timers[section_to_exit].wall_time() << "s";
+      wall << sections[actual_section_name].timer.wall_time() << "s";
       if (output_type == cpu_times)
 	output_time = " CPU time: " + cpu.str();
       else if (output_type == wall_times)
@@ -310,15 +261,14 @@ TimerOutput::exit_section (const std::string &section_name)
       else
 	output_time = ", CPU/wall time: " + cpu.str() + " / " + wall.str() + ".";
 
-      out_stream << section_names[section_to_exit] << output_time
+      out_stream << actual_section_name << output_time
 		 << std::endl;
     }
 
 				   // delete the index from the list of
 				   // active ones
-  std::vector<unsigned int>::iterator position_to_delete 
-    = active_sections.begin() + active_index_to_delete;
-  active_sections.erase(position_to_delete);
+  active_sections.erase (std::find (active_sections.begin(), active_sections.end(),
+				    section_name));
 }
 
 
@@ -355,10 +305,10 @@ TimerOutput::print_summary ()
 				   // generated a lot of overhead in this
 				   // function.
       double check_time = 0.;
-      for (unsigned int i=0; i<section_names.size(); ++i)
-	{
-	  check_time += section_total_cpu_times[i];
-	}
+      for (std::map<std::string, Section>::const_iterator
+	     i = sections.begin(); i!=sections.end(); ++i)
+	check_time += i->second.total_cpu_time;
+	
       if (check_time > total_cpu_time)
 	{
 	  total_cpu_time = check_time;
@@ -382,9 +332,10 @@ TimerOutput::print_summary ()
       out_stream << "  CPU time "  << " | % of total |\n";
       out_stream << "+---------------------------------------------+------------"
 		 << "+------------+";
-      for (unsigned int i=0; i<section_names.size(); ++i)
+      for (std::map<std::string, Section>::const_iterator
+	     i = sections.begin(); i!=sections.end(); ++i)
 	{
-	  std::string name_out = section_names[i];
+	  std::string name_out = i->first;
 
 				// resize the array so that it is always
 				// of the same size
@@ -395,13 +346,13 @@ TimerOutput::print_summary ()
 	  out_stream << "| " << name_out;
 	  out_stream << "| ";
 	  std::cout.width(9);
-	  out_stream << section_n_calls[i] << " |";
+	  out_stream << i->second.n_calls << " |";
 	  std::cout.width(10);
 	  std::cout.precision(3);
-	  out_stream << section_total_cpu_times[i] << "s |";
+	  out_stream << i->second.total_cpu_time << "s |";
 	  std::cout.width(10);
 	  std::cout.precision(2);
-	  out_stream << section_total_cpu_times[i]/total_cpu_time * 100 << "% |";
+	  out_stream << i->second.total_cpu_time/total_cpu_time * 100 << "% |";
 	}
       out_stream << std::endl
 		 << "+---------------------------------------------+"
@@ -420,10 +371,10 @@ TimerOutput::print_summary ()
 				   // generated a lot of overhead in this
 				   // function.
       double check_time = 0.;
-      for (unsigned int i=0; i<section_names.size(); ++i)
-	{
-	  check_time += section_total_wall_times[i];
-	}
+      for (std::map<std::string, Section>::const_iterator
+	     i = sections.begin(); i!=sections.end(); ++i)
+	check_time += i->second.total_wall_time;
+      
       if (check_time > total_wall_time)
 	{
 	  total_wall_time = check_time;
@@ -449,9 +400,10 @@ TimerOutput::print_summary ()
       out_stream << "  CPU time "  << " | % of total |\n";
       out_stream << "+---------------------------------------------+------------"
 		 << "+------------+";
-      for (unsigned int i=0; i<section_names.size(); ++i)
+      for (std::map<std::string, Section>::const_iterator
+	     i = sections.begin(); i!=sections.end(); ++i)
 	{
-	  std::string name_out = section_names[i];
+	  std::string name_out = i->first;
 
 				// resize the array so that it is always
 				// of the same size
@@ -462,13 +414,13 @@ TimerOutput::print_summary ()
 	  out_stream << "| " << name_out;
 	  out_stream << "| ";
 	  std::cout.width(9);
-	  out_stream << section_n_calls[i] << " |";
+	  out_stream << i->second.n_calls << " |";
 	  std::cout.width(10);
 	  std::cout.precision(3);
-	  out_stream << section_total_wall_times[i] << "s |";
+	  out_stream << i->second.total_wall_time << "s |";
 	  std::cout.width(10);
 	  std::cout.precision(2);
-	  out_stream << section_total_wall_times[i]/total_wall_time * 100 << "% |";
+	  out_stream << i->second.total_wall_time/total_wall_time * 100 << "% |";
 	}
       out_stream << std::endl
 		 << "+---------------------------------------------+"
