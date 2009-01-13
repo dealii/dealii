@@ -70,15 +70,11 @@
 #include <Sacado.hpp>
 
 
-				 // And this again is C++, as well as a header
-				 // file from BOOST that declares a class
-				 // representing an array of fixed size:
+				 // And this again is C++:
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <memory>
-
-#include <boost/array.hpp>
 
 				 // To end this section, introduce everythin
 				 // in the dealii library into the current
