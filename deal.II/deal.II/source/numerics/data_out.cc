@@ -385,9 +385,9 @@ add_data_vector (const VECTOR                             &vec,
   DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, names,
 						    data_component_interpretation);
   if (actual_type == type_dof_data)
-    dof_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
+    dof_data.push_back (std_cxx0x::shared_ptr<DataEntryBase>(new_entry));
   else
-    cell_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
+    cell_data.push_back (std_cxx0x::shared_ptr<DataEntryBase>(new_entry));
 }
 
 
@@ -416,7 +416,7 @@ add_data_vector (const VECTOR                           &vec,
 				dofs->get_tria().n_active_cells()));
 
   DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, &data_postprocessor);
-  dof_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
+  dof_data.push_back (std_cxx0x::shared_ptr<DataEntryBase>(new_entry));
 }
 
 
@@ -481,7 +481,7 @@ get_dataset_names () const
 				   // collect the names of dof
 				   // and cell data
   typedef
-    typename std::vector<boost::shared_ptr<DataEntryBase> >::const_iterator
+    typename std::vector<std_cxx0x::shared_ptr<DataEntryBase> >::const_iterator
     data_iterator;
   
   for (data_iterator  d=dof_data.begin();
@@ -501,16 +501,16 @@ get_dataset_names () const
 
 template <class DH,
 	  int patch_dim, int patch_space_dim>
-std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+std::vector<std_cxx0x::tuple<unsigned int, unsigned int, std::string> >
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 {
-  std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+  std::vector<std_cxx0x::tuple<unsigned int, unsigned int, std::string> >
     ranges;
   
 				   // collect the ranges of dof
 				   // and cell data
   typedef
-    typename std::vector<boost::shared_ptr<DataEntryBase> >::const_iterator
+    typename std::vector<std_cxx0x::shared_ptr<DataEntryBase> >::const_iterator
     data_iterator;
 
   unsigned int output_component = 0;
@@ -556,7 +556,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 
 					   // finally add a corresponding
 					   // range
-	  boost::tuple<unsigned int, unsigned int, std::string>
+	  std_cxx0x::tuple<unsigned int, unsigned int, std::string>
 	    range (output_component,
 		   output_component+patch_space_dim-1,
 		   name);

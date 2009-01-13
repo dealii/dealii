@@ -32,7 +32,7 @@
 
 #include <dofs/dof_handler.h>
 
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -149,7 +149,7 @@ class MGTransferComponentBase
     DeclException0(ExcMatricesNotBuilt);
     
   private:
-    std::vector<boost::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
+    std::vector<std_cxx0x::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
     
   protected:
     
@@ -161,7 +161,7 @@ class MGTransferComponentBase
 				      * while row indices belong to the
 				      * child cell, i.e. the fine level.
 				      */
-    std::vector<boost::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
+    std::vector<std_cxx0x::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
     
 				     /**
 				      * Unused now, but intended to

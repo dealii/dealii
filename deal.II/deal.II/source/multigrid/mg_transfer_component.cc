@@ -152,9 +152,9 @@ void MGTransferComponentBase::build_matrices (
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities
-	.push_back (boost::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
+	.push_back (std_cxx0x::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
       prolongation_matrices
-	.push_back (boost::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
+	.push_back (std_cxx0x::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
     }
 
 				   // two fields which will store the

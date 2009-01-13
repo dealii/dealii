@@ -67,7 +67,7 @@ namespace hp
                           "same number of vector components!"));
   
     finite_elements
-      .push_back (boost::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
+      .push_back (std_cxx0x::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
   }
 
 

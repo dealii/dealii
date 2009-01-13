@@ -58,7 +58,7 @@ namespace internal
     void
     ensure_existence_of_dof_identities (const FiniteElement<dim> &fe1,
 					const FiniteElement<dim> &fe2,
-					boost::shared_ptr<DoFIdentities> &identities)
+					std_cxx0x::shared_ptr<DoFIdentities> &identities)
     {
 				       // see if we need to fill this
 				       // entry, or whether it already
@@ -70,7 +70,7 @@ namespace internal
 	      case 0:
 	      {
 		identities =
-		  boost::shared_ptr<DoFIdentities>
+		  std_cxx0x::shared_ptr<DoFIdentities>
 		  (new DoFIdentities(fe1.hp_vertex_dof_identities(fe2)));
 		break;
 	      }
@@ -78,7 +78,7 @@ namespace internal
 	      case 1:
 	      {
 		identities =
-		  boost::shared_ptr<DoFIdentities>
+		  std_cxx0x::shared_ptr<DoFIdentities>
 		  (new DoFIdentities(fe1.hp_line_dof_identities(fe2)));
 		break;
 	      }
@@ -86,7 +86,7 @@ namespace internal
 	      case 2:
 	      {
 		identities =
-		  boost::shared_ptr<DoFIdentities>
+		  std_cxx0x::shared_ptr<DoFIdentities>
 		  (new DoFIdentities(fe1.hp_quad_dof_identities(fe2)));
 		break;
 	      }
@@ -2952,7 +2952,7 @@ namespace hp
                                      // vertices at all, I can't think
                                      // of a finite element that would
                                      // make that necessary...
-    Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
+    Table<2,std_cxx0x::shared_ptr<internal::hp::DoFIdentities> >
       vertex_dof_identities (get_fe().size(),
 			     get_fe().size());
 
@@ -3098,7 +3098,7 @@ namespace hp
 				     // and then only deal with those that are
 				     // not identical of which we can handle
 				     // at most 2
-    Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
+    Table<2,std_cxx0x::shared_ptr<internal::hp::DoFIdentities> >
       line_dof_identities (finite_elements->size(),
 			   finite_elements->size());
 	
@@ -3333,7 +3333,7 @@ namespace hp
                                      // for quads only in 4d and
                                      // higher, so this isn't a
                                      // particularly frequent case
-    Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
+    Table<2,std_cxx0x::shared_ptr<internal::hp::DoFIdentities> >
       quad_dof_identities (finite_elements->size(),
 			   finite_elements->size());
 	

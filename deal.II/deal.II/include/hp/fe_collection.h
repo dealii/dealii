@@ -14,7 +14,7 @@
 #define __deal2__fe_collection_h
 
 #include <base/config.h>
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 #include <fe/fe.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -215,7 +215,7 @@ namespace hp
                                         * Array of pointers to the finite
                                         * elements stored by this collection.
                                         */
-      std::vector<boost::shared_ptr<const FiniteElement<dim,spacedim> > > finite_elements;
+      std::vector<std_cxx0x::shared_ptr<const FiniteElement<dim,spacedim> > > finite_elements;
   };
 
 

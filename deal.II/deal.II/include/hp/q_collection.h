@@ -21,7 +21,7 @@
 #include <fe/fe.h>
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -146,7 +146,7 @@ namespace hp
                                         * pointers to the different quadrature
                                         * objects.
                                         */
-      std::vector<boost::shared_ptr<const Quadrature<dim> > > quadratures;
+      std::vector<std_cxx0x::shared_ptr<const Quadrature<dim> > > quadratures;
   };
 
 
@@ -205,7 +205,7 @@ namespace hp
   QCollection<dim>::QCollection (const Quadrature<dim> &quadrature)
   {
     quadratures
-      .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
+      .push_back (std_cxx0x::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
   }
 
   
@@ -248,7 +248,7 @@ namespace hp
   QCollection<dim>::push_back (const Quadrature<dim> &new_quadrature)
   {
     quadratures
-      .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
+      .push_back (std_cxx0x::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
   }
   
 } // namespace hp

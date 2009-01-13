@@ -19,7 +19,7 @@
 #include <fe/fe.h>
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -128,7 +128,7 @@ namespace hp
                                         * pointers to the different Mapping
                                         * objects.
                                         */
-      std::vector<boost::shared_ptr<const Mapping<dim,spacedim> > > mappings;
+      std::vector<std_cxx0x::shared_ptr<const Mapping<dim,spacedim> > > mappings;
   };
 
 

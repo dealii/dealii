@@ -45,7 +45,7 @@
 #include <dofs/dof_tools.h>
 #include <hp/dof_handler.h>
 
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -60,7 +60,7 @@ namespace
                                    // apparent memory leaks to
                                    // programs like valgrind
   typedef
-  boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> >
+  std_cxx0x::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> >
   FEFactoryPointer;
   
                                    // a function that returns the
@@ -142,7 +142,7 @@ namespace
                                    // issues here
   static
   std::map<std::string,
-	   boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
+	   std_cxx0x::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
   fe_name_map
   = get_default_fe_names ();
 }
@@ -1071,7 +1071,7 @@ FETools::interpolate (const DH1<dim, spacedim> &dof1,
                                    // that memory is released again
   std::map<const FiniteElement<dim,spacedim> *,
            std::map<const FiniteElement<dim,spacedim> *,
-                    boost::shared_ptr<FullMatrix<double> > > >
+                    std_cxx0x::shared_ptr<FullMatrix<double> > > >
     interpolation_matrices;
   
   typename DH1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
@@ -1119,7 +1119,7 @@ FETools::interpolate (const DH1<dim, spacedim> &dof1,
                                        // there
       if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()] == 0)
         {
-          boost::shared_ptr<FullMatrix<double> >
+          std_cxx0x::shared_ptr<FullMatrix<double> >
             interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
                                                           dofs_per_cell1));
           interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
@@ -1236,7 +1236,7 @@ FETools::back_interpolate(const DH<dim>            &dof1,
                                    // dof1 to the back_interpolation
                                    // matrices
   std::map<const FiniteElement<dim> *,
-           boost::shared_ptr<FullMatrix<double> > > interpolation_matrices;
+           std_cxx0x::shared_ptr<FullMatrix<double> > > interpolation_matrices;
   
   for (; cell!=endc; ++cell) 
     {
@@ -1267,7 +1267,7 @@ FETools::back_interpolate(const DH<dim>            &dof1,
       if (interpolation_matrices[&cell->get_fe()] != 0)
         {
           interpolation_matrices[&cell->get_fe()] =
-            boost::shared_ptr<FullMatrix<double> >
+            std_cxx0x::shared_ptr<FullMatrix<double> >
             (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
           get_back_interpolation_matrix(dof1.get_fe(), fe2,
                                         *interpolation_matrices[&cell->get_fe()]);

@@ -795,7 +795,7 @@ class MatrixCreator
 				      */
     template <int dim, int spacedim>
     static
-    void create_boundary_mass_matrix_1 (boost::tuple<const Mapping<dim,spacedim> &,
+    void create_boundary_mass_matrix_1 (std_cxx0x::tuple<const Mapping<dim,spacedim> &,
 					const DoFHandler<dim,spacedim> &,
 					const Quadrature<dim-1> & > commons,
 					SparseMatrix<double>     &matrix,
@@ -812,7 +812,7 @@ class MatrixCreator
 				      */
     template <int dim, int spacedim>
     static
-    void create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim,spacedim> &,
+    void create_boundary_mass_matrix_1 (std_cxx0x::tuple<const hp::MappingCollection<dim,spacedim> &,
 					const hp::DoFHandler<dim,spacedim>&,
 					const hp::QCollection<dim-1> & > commons,
 					SparseMatrix<double>     &matrix,

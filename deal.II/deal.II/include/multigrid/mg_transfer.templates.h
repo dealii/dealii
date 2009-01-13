@@ -95,8 +95,8 @@ MGTransferPrebuilt<VECTOR>::memory_consumption () const
   unsigned int result = sizeof(*this);
   result += sizeof(unsigned int) * sizes.size();
 #ifdef DEAL_PREFER_MATRIX_EZ
-  std::vector<boost::shared_ptr<SparseMatrixEZ<double> > >::const_iterator m;
-  const std::vector<boost::shared_ptr<SparseMatrixEZ<double> > >::const_iterator end = prolongation_matrices.end();
+  std::vector<std_cxx0x::shared_ptr<SparseMatrixEZ<double> > >::const_iterator m;
+  const std::vector<std_cxx0x::shared_ptr<SparseMatrixEZ<double> > >::const_iterator end = prolongation_matrices.end();
   for (m = prolongation_matrices.begin(); m != end ; ++m)
     result += *m->memory_consumption();
 #else

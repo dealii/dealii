@@ -93,7 +93,7 @@ namespace internal
       if (fe_values_table(present_fe_values_index) == 0)
         fe_values_table(present_fe_values_index)
           =
-          boost::shared_ptr<FEValues>
+          std_cxx0x::shared_ptr<FEValues>
           (new FEValues ((*mapping_collection)[mapping_index],
                          (*fe_collection)[fe_index],
                          q_collection[q_index],
