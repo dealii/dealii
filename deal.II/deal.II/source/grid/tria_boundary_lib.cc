@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -694,7 +694,8 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
 
 template <int dim>
-HyperShellBoundary<dim>::HyperShellBoundary (const Point<dim> &center) :
+HyperShellBoundary<dim>::HyperShellBoundary (const Point<dim> &center)
+		:
 		HyperBallBoundary<dim>(center, 0.)
 {
   this->compute_radius_automatically=true;
@@ -707,9 +708,20 @@ HyperShellBoundary<dim>::HyperShellBoundary (const Point<dim> &center) :
 
 
 template <int dim>
-HalfHyperShellBoundary<dim>::HalfHyperShellBoundary (const Point<dim> &center) :
-		HyperShellBoundary<dim> (center) 
-{}
+HalfHyperShellBoundary<dim>::HalfHyperShellBoundary (const Point<dim> &center,
+						     const double inner_radius,
+						     const double outer_radius)
+		:
+		HyperShellBoundary<dim> (center),
+		inner_radius (inner_radius),
+		outer_radius (outer_radius)
+{
+  if (dim > 2)
+    Assert ((inner_radius >= 0) &&
+	    (outer_radius > 0) &&
+	    (outer_radius > inner_radius),
+	    ExcMessage ("Inner and outer radii must be specified explicitly in 3d."));
+}
 
 
 
@@ -718,19 +730,61 @@ Point<dim>
 HalfHyperShellBoundary<dim>::
 get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
 {
-				   // first check whether the two end
-				   // points of the line are on the
-				   // axis of symmetry. if so, then
-				   // return the mid point
-  if ((line->vertex(0)(0) == this->center(0)) &&
-      (line->vertex(1)(0) == this->center(0)))
-    return (line->vertex(0) + line->vertex(1))/2;
-  
+  switch (dim)
+    {
+				       // in 2d, first check whether the two
+				       // end points of the line are on the
+				       // axis of symmetry. if so, then return
+				       // the mid point
+      case 2:
+      {
+	if ((line->vertex(0)(0) == this->center(0))
+	    &&
+	    (line->vertex(1)(0) == this->center(0)))
+	  return (line->vertex(0) + line->vertex(1))/2;
+	else
+					   // otherwise we are on the outer or
+					   // inner part of the shell. proceed
+					   // as in the base class
+	  return HyperShellBoundary<dim>::get_new_point_on_line (line);
+      }
+      
+					     // in 3d, a line is a straight
+					     // line if it is on the symmetry
+					     // plane and if not both of its
+					     // end points are on either the
+					     // inner or outer sphere
+      case 3:
+      {
+	
+	    if (((line->vertex(0)(0) == this->center(0))
+		 &&
+		 (line->vertex(1)(0) == this->center(0)))
+		&&
+		!(((std::fabs (line->vertex(0).distance (this->center)
+			       - inner_radius) < 1e-12 * outer_radius)
+		   &&
+		   (std::fabs (line->vertex(1).distance (this->center)
+			       - inner_radius) < 1e-12 * outer_radius))
+		  ||
+		  ((std::fabs (line->vertex(0).distance (this->center)
+			       - outer_radius) < 1e-12 * outer_radius)
+		   &&
+		   (std::fabs (line->vertex(1).distance (this->center)
+			       - outer_radius) < 1e-12 * outer_radius))))
+	  return (line->vertex(0) + line->vertex(1))/2;
+	else
+					   // otherwise we are on the outer or
+					   // inner part of the shell. proceed
+					   // as in the base class
+	  return HyperShellBoundary<dim>::get_new_point_on_line (line);
+      }
 
-				   // otherwise we are on the outer or
-				   // inner part of the shell. proceed
-				   // as in the base class
-  return HyperShellBoundary<dim>::get_new_point_on_line (line);
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+  
+  return Point<dim>();
 }
 
 
@@ -755,16 +809,46 @@ Point<dim>
 HalfHyperShellBoundary<dim>::
 get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
 {
-				   // same thing as for the new point
-				   // on the line
+				   // if this quad is on the symmetry plane,
+				   // take the center point and project it
+				   // outward to the same radius as the
+				   // centers of the two radial lines
   if ((quad->vertex(0)(0) == this->center(0)) &&
       (quad->vertex(1)(0) == this->center(0)) &&
       (quad->vertex(2)(0) == this->center(0)) &&
       (quad->vertex(3)(0) == this->center(0)))
-    return (quad->vertex(0) + quad->vertex(1) +
-	    quad->vertex(2) + quad->vertex(3)   )/4;
-  
+    {
+      const Point<dim> quad_center = (quad->vertex(0) + quad->vertex(1) +
+				      quad->vertex(2) + quad->vertex(3)   )/4;
+      const Point<dim> quad_center_offset = quad_center - this->center;
 
+      
+      if (std::fabs (quad->line(0)->center().distance(this->center) -
+		     quad->line(1)->center().distance(this->center))
+	  < 1e-12 * outer_radius)
+	{
+					   // lines 0 and 1 are radial
+	  const double needed_radius
+	    = quad->line(0)->center().distance(this->center);
+	  
+	  return (this->center +
+		  quad_center_offset/quad_center_offset.norm() * needed_radius);
+	}
+      else if (std::fabs (quad->line(2)->center().distance(this->center) -
+			  quad->line(3)->center().distance(this->center))
+	  < 1e-12 * outer_radius)
+	{
+					   // lines 2 and 3 are radial
+	  const double needed_radius
+	    = quad->line(2)->center().distance(this->center);
+	  
+	  return (this->center +
+		  quad_center_offset/quad_center_offset.norm() * needed_radius);
+	}
+      else
+	Assert (false, ExcInternalError());
+    }
+  
 				   // otherwise we are on the outer or
 				   // inner part of the shell. proceed
 				   // as in the base class
@@ -779,15 +863,59 @@ HalfHyperShellBoundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
 				 std::vector<Point<dim> > &points) const
 {
-				   // check whether center of object is
-				   // at x==0, since then it belongs
-				   // to the plane part of the
-				   // boundary
-  const Point<dim> line_center = line->center();
-  if (line_center(0) == this->center(0))
-    return StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
-  else
-    return HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
+  switch (dim)
+    {
+				       // in 2d, first check whether the two
+				       // end points of the line are on the
+				       // axis of symmetry. if so, then return
+				       // the mid point
+      case 2:
+      {
+	if ((line->vertex(0)(0) == this->center(0))
+	    &&
+	    (line->vertex(1)(0) == this->center(0)))
+	  StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
+	else
+					   // otherwise we are on the outer or
+					   // inner part of the shell. proceed
+					   // as in the base class
+	  HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
+      }
+      
+					     // in 3d, a line is a straight
+					     // line if it is on the symmetry
+					     // plane and if not both of its
+					     // end points are on either the
+					     // inner or outer sphere
+      case 3:
+      {
+	
+	    if (((line->vertex(0)(0) == this->center(0))
+		 &&
+		 (line->vertex(1)(0) == this->center(0)))
+		&&
+		!(((std::fabs (line->vertex(0).distance (this->center)
+			       - inner_radius) < 1e-12 * outer_radius)
+		   &&
+		   (std::fabs (line->vertex(1).distance (this->center)
+			       - inner_radius) < 1e-12 * outer_radius))
+		  ||
+		  ((std::fabs (line->vertex(0).distance (this->center)
+			       - outer_radius) < 1e-12 * outer_radius)
+		   &&
+		   (std::fabs (line->vertex(1).distance (this->center)
+			       - outer_radius) < 1e-12 * outer_radius))))
+	  StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
+	else
+					   // otherwise we are on the outer or
+					   // inner part of the shell. proceed
+					   // as in the base class
+	  HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
+      }
+
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
 }
 
 
@@ -798,6 +926,8 @@ HalfHyperShellBoundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
 				 std::vector<Point<dim> > &points) const
 {
+  Assert (dim < 3, ExcNotImplemented());
+  
 				   // check whether center of object is
 				   // at x==0, since then it belongs
 				   // to the plane part of the

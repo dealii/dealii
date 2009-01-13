@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -461,7 +461,7 @@ class HyperShellBoundary : public HyperBallBoundary<dim>
  *
  * @ingroup boundary
  *
- * @author Wolfgang Bangerth, 2000
+ * @author Wolfgang Bangerth, 2000, 2009
  */
 template <int dim>
 class HalfHyperShellBoundary : public HyperShellBoundary<dim> 
@@ -471,8 +471,17 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 				      * Constructor. The center of the
 				      * spheres defaults to the
 				      * origin.
+				      *
+				      * If the radii are not specified, the
+				      * class tries to infer them from the
+				      * location of points on the
+				      * boundary. This works in 2d, but not in
+				      * 3d. As a consequence, in 3d these
+				      * radii must be given.
 				      */
-    HalfHyperShellBoundary (const Point<dim> &center = Point<dim>());
+    HalfHyperShellBoundary (const Point<dim> &center = Point<dim>(),
+			    const double inner_radius = -1,
+			    const double outer_radius = -1);
     
 				     /**
 				      * Construct a new point on a line.
@@ -525,6 +534,13 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
     virtual void
     get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+
+  private:
+				     /**
+				      * Inner and outer radii of the shell.
+				      */
+    const double inner_radius;
+    const double outer_radius;
 };
 
 

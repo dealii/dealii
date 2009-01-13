@@ -664,6 +664,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The GridGenerator::half_hyper_shell function now also exists in 3d.
+  However, to use it with the HalfHyperShellBoundary class, one has to
+  pass inner and outer radii to the constructor.
+  <br>
+  (Martin Kronbichler, WB, 2009/01/13)
+  </p>
+
+  <li>
+  <p>
   New: The restriction and embedding matrices for FE_Q are now implemented.
   <br>
   (Tobias Leicht, RH, 2008/12/23)
