@@ -15,17 +15,22 @@
 
 
 #include <base/config.h>
+
+#ifdef DEAL_II_CAN_USE_CXX0X
+
+#  include <functional>
+
+#else
+
 #include <boost/function.hpp>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 namespace std_cxx0x
 {
   using boost::function;
 }
-
-
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif

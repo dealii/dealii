@@ -3896,6 +3896,68 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
 
         CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
+            OLD_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS=-std=c++0x
+
+    { echo "$as_me:$LINENO: checking whether compiler supports C++0x" >&5
+echo $ECHO_N "checking whether compiler supports C++0x... $ECHO_C" >&6; }
+    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+
+         { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+         CXXFLAGSG="$CXXFLAGSG -std=c++0x"
+         CXXFLAGSO="$CXXFLAGSO -std=c++0x"
+
+cat >>confdefs.h <<\_ACEOF
+#define DEAL_II_CAN_USE_CXX0X 1
+_ACEOF
+
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+         { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+    CXXFLAGS="${OLD_CXXFLAGS}"
+
+
                     CXXFLAGS="-Wreturn-type -Werror"
     { echo "$as_me:$LINENO: checking whether qualifiers in return types lead to a warning" >&5
 echo $ECHO_N "checking whether qualifiers in return types lead to a warning... $ECHO_C" >&6; }

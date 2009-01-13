@@ -15,17 +15,22 @@
 
 
 #include <base/config.h>
+
+#ifdef DEAL_II_CAN_USE_CXX0X
+
+#  include <array>
+
+#else
+
 #include <boost/array.hpp>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 namespace std_cxx0x
 {
   using boost::array;
 }
-
-
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif

@@ -489,6 +489,26 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
+    dnl See whether the gcc we use already supports C++0x features.
+    dnl 
+    OLD_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS=-std=c++0x
+
+    AC_MSG_CHECKING(whether compiler supports C++0x)
+    AC_TRY_COMPILE([], [;],
+       [
+         AC_MSG_RESULT(yes)
+         CXXFLAGSG="$CXXFLAGSG -std=c++0x"
+         CXXFLAGSO="$CXXFLAGSO -std=c++0x"
+         AC_DEFINE(DEAL_II_CAN_USE_CXX0X, 1,
+                   [Defined if the compiler we use supports the upcoming C++0x standard.])
+       ],
+       [
+         AC_MSG_RESULT(no)
+       ])
+    CXXFLAGS="${OLD_CXXFLAGS}"
+
+
     dnl On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
     dnl warning. This is unfortunate, since we happen to stumble on this
     dnl in some of our template trickery with iterator classes. If necessary,

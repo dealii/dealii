@@ -15,23 +15,40 @@
 
 
 #include <base/config.h>
+
+#ifdef DEAL_II_CAN_USE_CXX0X
+
+#  include <tuple>
+
+#else
+
 #include <boost/tuple/tuple.hpp>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 namespace std_cxx0x
 {
   using boost::tuple;
   using boost::get;
-  
-  namespace tuples
+
+				   // boost::tuples::length has been renamed
+				   // by the standard to std::tuple_size
+  template <typename T>
+  struct tuple_size 
   {
-    using namespace boost::tuples;
-  }
+      static const std::size_t value = boost::tuples::length<T>::value;
+  };
+
+				   // similarly, boost::tuples::element has
+				   // been renamed by the standard to
+				   // std::tuple_element
+  template <int N, typename T>
+  struct tuple_element
+  {
+      typedef boost::tuples::element<N,T> type;
+  };
 }
-
-
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif

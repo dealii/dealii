@@ -15,11 +15,23 @@
 
 
 #include <base/config.h>
-#include <boost/bind.hpp>
 
+#ifdef DEAL_II_CAN_USE_CXX0X
+
+#  include <functional>
 
 DEAL_II_NAMESPACE_OPEN
+// in boost, the placeholders _1, _2, ... are in the global namespace. in
+// C++0x, they are in namespace std::placeholders, which makes them awkward to
+// use. import them into the deal.II namespace
+using namespace std::placeholders;
+DEAL_II_NAMESPACE_CLOSE
 
+#else
+
+#include <boost/bind.hpp>
+
+DEAL_II_NAMESPACE_OPEN
 namespace std_cxx0x
 {
   using boost::bind;
@@ -27,8 +39,8 @@ namespace std_cxx0x
   using boost::cref;
   using boost::reference_wrapper;
 }
-
-
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif

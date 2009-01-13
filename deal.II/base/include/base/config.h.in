@@ -65,6 +65,9 @@
    floating point computations on cygwin systems. */
 #undef DEAL_II_BROKEN_SOCKETS
 
+/* Defined if the compiler we use supports the upcoming C++0x standard. */
+#undef DEAL_II_CAN_USE_CXX0X
+
 /* Backward compatibility support for functions and classes that do not take
    an explicit mapping variable, but rather use a default Q1 mapping instead
    */

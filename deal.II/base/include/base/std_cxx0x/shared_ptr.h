@@ -15,17 +15,22 @@
 
 
 #include <base/config.h>
+
+#ifdef DEAL_II_CAN_USE_CXX0X
+
+#  include <memory>
+
+#else
+
 #include <boost/shared_ptr.hpp>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 namespace std_cxx0x
 {
   using boost::shared_ptr;
 }
-
-
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif
