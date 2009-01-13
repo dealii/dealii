@@ -3881,22 +3881,21 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
   std::vector<bool> data_set_written (n_data_sets, false);
   for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
     {
-      
-      AssertThrow (vector_data_ranges[n_th_vector].template get<1>() >=
-		   vector_data_ranges[n_th_vector].template get<0>(),
-		   ExcLowerRange (vector_data_ranges[n_th_vector].template get<1>(),
-				  vector_data_ranges[n_th_vector].template get<0>()));
-      AssertThrow (vector_data_ranges[n_th_vector].template get<1>() < n_data_sets,
-		   ExcIndexRange (vector_data_ranges[n_th_vector].template get<1>(),
+      AssertThrow (std_cxx0x::get<1>(vector_data_ranges[n_th_vector]) >=
+		   std_cxx0x::get<0>(vector_data_ranges[n_th_vector]),
+		   ExcLowerRange (std_cxx0x::get<1>(vector_data_ranges[n_th_vector]),
+				  std_cxx0x::get<0>(vector_data_ranges[n_th_vector])));
+      AssertThrow (std_cxx0x::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
+		   ExcIndexRange (std_cxx0x::get<1>(vector_data_ranges[n_th_vector]),
 				  0, n_data_sets));
-      AssertThrow (vector_data_ranges[n_th_vector].template get<1>() + 1
-		   - vector_data_ranges[n_th_vector].template get<0>() <= 3,
+      AssertThrow (std_cxx0x::get<1>(vector_data_ranges[n_th_vector]) + 1
+		   - std_cxx0x::get<0>(vector_data_ranges[n_th_vector]) <= 3,
 		   ExcMessage ("Can't declare a vector with more than 3 components "
 			       "in VTK"));
 
 				       // mark these components as already written:
-      for (unsigned int i=vector_data_ranges[n_th_vector].template get<0>();
-	   i<=vector_data_ranges[n_th_vector].template get<1>();
+      for (unsigned int i=std_cxx0x::get<0>(vector_data_ranges[n_th_vector]);
+	   i<=std_cxx0x::get<1>(vector_data_ranges[n_th_vector]);
 	   ++i)
 	data_set_written[i] = true;
       
@@ -3907,15 +3906,15 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				       // name has been specified
       out << "VECTORS ";
 
-      if (vector_data_ranges[n_th_vector].template get<2>() != "")
-	out << vector_data_ranges[n_th_vector].template get<2>();
+      if (std_cxx0x::get<2>(vector_data_ranges[n_th_vector]) != "")
+	out << std_cxx0x::get<2>(vector_data_ranges[n_th_vector]);
       else
 	{
-	  for (unsigned int i=vector_data_ranges[n_th_vector].template get<0>();
-	       i<vector_data_ranges[n_th_vector].template get<1>();
+	  for (unsigned int i=std_cxx0x::get<0>(vector_data_ranges[n_th_vector]);
+	       i<std_cxx0x::get<1>(vector_data_ranges[n_th_vector]);
 	       ++i)
 	    out << data_names[i] << "__";
-	  out << data_names[vector_data_ranges[n_th_vector].template get<1>()];
+	  out << data_names[std_cxx0x::get<1>(vector_data_ranges[n_th_vector])];
 	}
       
       out << " double"
@@ -3926,23 +3925,23 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				       // components
       for (unsigned int n=0; n<n_nodes; ++n)
 	{
-	  switch (vector_data_ranges[n_th_vector].template get<1>() -
-		  vector_data_ranges[n_th_vector].template get<0>())
+	  switch (std_cxx0x::get<1>(vector_data_ranges[n_th_vector]) -
+		  std_cxx0x::get<0>(vector_data_ranges[n_th_vector]))
 	    {
 	      case 0:
-		    out << data_vectors(vector_data_ranges[n_th_vector].template get<0>(), n) << " 0 0"
+		    out << data_vectors(std_cxx0x::get<0>(vector_data_ranges[n_th_vector]), n) << " 0 0"
 			<< '\n';
 		    break;
 		    
 	      case 1:
-		    out << data_vectors(vector_data_ranges[n_th_vector].template get<0>(),   n) << ' '
-			<< data_vectors(vector_data_ranges[n_th_vector].template get<0>()+1, n) << " 0"
+		    out << data_vectors(std_cxx0x::get<0>(vector_data_ranges[n_th_vector]),   n) << ' '
+			<< data_vectors(std_cxx0x::get<0>(vector_data_ranges[n_th_vector])+1, n) << " 0"
 			<< '\n';
 		    break;
 	      case 2:
-		    out << data_vectors(vector_data_ranges[n_th_vector].template get<0>(),   n) << ' '
-			<< data_vectors(vector_data_ranges[n_th_vector].template get<0>()+1, n) << ' '
-			<< data_vectors(vector_data_ranges[n_th_vector].template get<0>()+2, n)
+		    out << data_vectors(std_cxx0x::get<0>(vector_data_ranges[n_th_vector]),   n) << ' '
+			<< data_vectors(std_cxx0x::get<0>(vector_data_ranges[n_th_vector])+1, n) << ' '
+			<< data_vectors(std_cxx0x::get<0>(vector_data_ranges[n_th_vector])+2, n)
 			<< '\n';
 		    break;
 
@@ -4017,9 +4016,9 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 
   out << vector_data_ranges.size() << '\n';
   for (unsigned int i=0; i<vector_data_ranges.size(); ++i)
-    out << vector_data_ranges[i].template get<0>() << ' '
-	<< vector_data_ranges[i].template get<1>() << '\n'
-	<< vector_data_ranges[i].template get<2>() << '\n';
+    out << std_cxx0x::get<0>(vector_data_ranges[i]) << ' '
+	<< std_cxx0x::get<1>(vector_data_ranges[i]) << '\n'
+	<< std_cxx0x::get<2>(vector_data_ranges[i]) << '\n';
   
   out << '\n';
 				   // make sure everything now gets to
@@ -4596,8 +4595,8 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
   vector_data_ranges.resize (n_vector_data_ranges);
   for (unsigned int i=0; i<n_vector_data_ranges; ++i)
     {
-      in >> vector_data_ranges[i].template get<0>()
-	 >> vector_data_ranges[i].template get<1>();
+      in >> std_cxx0x::get<0>(vector_data_ranges[i])
+	 >> std_cxx0x::get<1>(vector_data_ranges[i]);
 
 				       // read in the name of that vector
 				       // range. because it is on a separate
@@ -4610,7 +4609,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
       std::string name;
       getline(in, name);
       getline(in, name);
-      vector_data_ranges[i].template get<2>() = name;
+      std_cxx0x::get<2>(vector_data_ranges[i]) = name;
     }
   
   Assert (in, ExcIO());  
@@ -4641,16 +4640,16 @@ merge (const DataOutReader<dim,spacedim> &source)
 		      "as vectors."));
   for (unsigned int i=0; i<get_vector_data_ranges().size(); ++i)
     {
-      Assert (get_vector_data_ranges()[i].template get<0>() ==
-	      source.get_vector_data_ranges()[i].template get<0>(),
+      Assert (std_cxx0x::get<0>(get_vector_data_ranges()[i]) ==
+	      std_cxx0x::get<0>(source.get_vector_data_ranges()[i]),
 	      ExcMessage ("Both sources need to declare the same components "
 			  "as vectors."));
-      Assert (get_vector_data_ranges()[i].template get<1>() ==
-	      source.get_vector_data_ranges()[i].template get<1>(),
+      Assert (std_cxx0x::get<1>(get_vector_data_ranges()[i]) ==
+	      std_cxx0x::get<1>(source.get_vector_data_ranges()[i]),
 	      ExcMessage ("Both sources need to declare the same components "
 			  "as vectors."));
-      Assert (get_vector_data_ranges()[i].template get<2>() ==
-	      source.get_vector_data_ranges()[i].template get<2>(),
+      Assert (std_cxx0x::get<2>(get_vector_data_ranges()[i]) ==
+	      std_cxx0x::get<2>(source.get_vector_data_ranges()[i]),
 	      ExcMessage ("Both sources need to declare the same components "
 			  "as vectors."));
     }
