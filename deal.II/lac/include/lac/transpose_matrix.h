@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,7 +16,6 @@
 
 #include <base/subscriptor.h>
 #include <lac/pointer_matrix.h>
-#include <boost/shared_ptr.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,7 +34,6 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Matrix2
  * @author Guido Kanschat, 2006
  */
-
 template<class MATRIX, class VECTOR>
 class
 TransposeMatrix : public PointerMatrixBase<VECTOR>
