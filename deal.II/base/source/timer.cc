@@ -203,11 +203,14 @@ TimerOutput::enter_section (const std::string &section_name)
 void 
 TimerOutput::exit_section (const std::string &section_name)
 {
-  Assert (sections.find (section_name) != sections.end(),
-	  ExcMessage ("Cannot delete a section that was never created."));
-  Assert (std::find (active_sections.begin(), active_sections.end(),
-		     section_name) == active_sections.end(),
-	  ExcMessage ("Cannot delete a section that has not been entered."));
+  if (section_name != "")
+    {
+      Assert (sections.find (section_name) != sections.end(),
+	      ExcMessage ("Cannot delete a section that was never created."));
+      Assert (std::find (active_sections.begin(), active_sections.end(),
+			 section_name) != active_sections.end(),
+	      ExcMessage ("Cannot delete a section that has not been entered."));
+    }
 
 				   // if no string is given, exit the last
 				   // active section.
@@ -216,7 +219,8 @@ TimerOutput::exit_section (const std::string &section_name)
 					   section_name);
 
   sections[actual_section_name].timer.stop();
-  sections[actual_section_name].total_wall_time += sections[section_name].timer.wall_time();
+  sections[actual_section_name].total_wall_time 
+    += sections[actual_section_name].timer.wall_time();
 
 				       // get cpu time. on MPI
 				       // systems, add the local
@@ -225,7 +229,7 @@ TimerOutput::exit_section (const std::string &section_name)
 				       // TODO: this should rather be
 				       // in the Timer class itself,
 				       // shouldn't it?
-  double cpu_time = sections[section_name].timer();
+  double cpu_time = sections[actual_section_name].timer();
   {
 
 				// On MPI, sum up all the local CPU
@@ -256,9 +260,9 @@ TimerOutput::exit_section (const std::string &section_name)
       std::ostringstream wall;
       wall << sections[actual_section_name].timer.wall_time() << "s";
       if (output_type == cpu_times)
-	output_time = " CPU time: " + cpu.str();
+	output_time = ", CPU time: " + cpu.str();
       else if (output_type == wall_times)
-	output_time = " wall time: " + wall.str() + ".";
+	output_time = ", wall time: " + wall.str() + ".";
       else
 	output_time = ", CPU/wall time: " + cpu.str() + " / " + wall.str() + ".";
 
@@ -269,7 +273,7 @@ TimerOutput::exit_section (const std::string &section_name)
 				   // delete the index from the list of
 				   // active ones
   active_sections.erase (std::find (active_sections.begin(), active_sections.end(),
-				    section_name));
+				    actual_section_name));
 }
 
 
@@ -398,7 +402,7 @@ TimerOutput::print_summary ()
       out_stream << "| Section                         | no. calls |";
       std::cout.width(10);
       std::cout.precision(3);
-      out_stream << "  CPU time "  << " | % of total |\n";
+      out_stream << "  wall time | % of total |\n";
       out_stream << "+---------------------------------------------+------------"
 		 << "+------------+";
       for (std::map<std::string, Section>::const_iterator
