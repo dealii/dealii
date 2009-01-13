@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1655,9 +1655,6 @@ FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_p
   if (flags & update_normal_vectors)
     this->normal_vectors.resize(n_quadrature_points);
 
-  if (flags & update_cell_JxW_values)
-    this->cell_JxW_values.resize(n_quadrature_points);
-
   if (flags & update_cell_normal_vectors)
     this->cell_normal_vectors.resize(n_quadrature_points);
 }
@@ -3138,7 +3135,6 @@ FEValuesBase<dim,spacedim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (this->quadrature_points) +
 	  MemoryConsumption::memory_consumption (this->normal_vectors) +
 	  MemoryConsumption::memory_consumption (this->boundary_forms) +
-	  MemoryConsumption::memory_consumption (this->cell_JxW_values) +
 	  sizeof(this->update_flags) +
 	  MemoryConsumption::memory_consumption (n_quadrature_points) +
 	  MemoryConsumption::memory_consumption (dofs_per_cell) +
@@ -3714,8 +3710,7 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
 					  this->quadrature_points,
 					  this->JxW_values,
 					  this->boundary_forms,
-					  this->normal_vectors,
-					  this->cell_JxW_values);
+					  this->normal_vectors);
   
   this->get_fe().fill_fe_face_values(this->get_mapping(),
 				     *this->present_cell, face_no,
@@ -4036,8 +4031,7 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
 					     this->quadrature_points,
 					     this->JxW_values,
 					     this->boundary_forms,
-					     this->normal_vectors,
-					     this->cell_JxW_values);
+					     this->normal_vectors);
   
   this->get_fe().fill_fe_subface_values(this->get_mapping(),
 					*this->present_cell,

@@ -586,8 +586,7 @@ class Mapping : public Subscriptor
 			 std::vector<Point<dim> >                                  &quadrature_points,
 			 std::vector<double>                                       &JxW_values,
 			 std::vector<Tensor<1,dim> >                               &boundary_form,
-			 std::vector<Point<spacedim> >                             &normal_vectors,
-			 std::vector<double>                                       &cell_JxW_values) const = 0;
+			 std::vector<Point<spacedim> >                             &normal_vectors) const = 0;
 
 				     /**
 				      * See above.
@@ -601,8 +600,7 @@ class Mapping : public Subscriptor
 			    std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>                      &JxW_values,
 			    std::vector<Tensor<1,dim> >     &boundary_form,
-			    std::vector<Point<spacedim> >        &normal_vectors,
-			    std::vector<double>             &cell_JxW_values) const = 0;
+			    std::vector<Point<spacedim> >        &normal_vectors) const = 0;
 
 				     /**
 				      * Give class @p FEValues access

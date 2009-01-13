@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -983,31 +983,6 @@ class FEValuesData
 				      * at the quadrature points.
 				      */
     std::vector<Tensor<2,spacedim> > inverse_jacobians;
-
-				     /**
-				      * Store an array of weights
-				      * times the Jacobi determinant
-				      * at the quadrature points. This
-				      * function is reset each time
-				      * reinit() is called. The
-				      * Jacobi determinant is actually
-				      * the reciprocal value of the
-				      * Jacobi matrices stored in this
-				      * class, see the general
-				      * documentation of this class
-				      * for more information.
-				      *
-				      * In contrast to JxW_values,
-				      * this vector uses the transformation
-				      * of the cell even in case the
-				      * corresponding FEValues object
-				      * refers to a face. Currently the
-				      * only purpose is to provide
-				      * exactly this value to the
-				      * transformation which is used
-				      * for the PolyTensor elements.
-				      */
-    std::vector<double>       cell_JxW_values;
 
 				     /**
 				      * Array of quadrature points. This array

@@ -416,8 +416,8 @@ FE_RaviartThomasNodal<dim>::hp_constraints_are_implemented () const
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_RaviartThomasNodal<dim>::
-hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+FE_RaviartThomasNodal<dim>::hp_vertex_dof_identities (
+  const FiniteElement<dim> &fe_other) const
 {
 				   // we can presently only compute these
 				   // identities if both FEs are
@@ -495,8 +495,8 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_RaviartThomasNodal<dim>::
-hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
+FE_RaviartThomasNodal<dim>::hp_quad_dof_identities (
+  const FiniteElement<dim>& fe_other) const
 {
 				   // we can presently only compute
 				   // these identities if both FEs are
@@ -536,8 +536,8 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 
 template <int dim>
 FiniteElementDomination::Domination
-FE_RaviartThomasNodal<dim>::
-compare_for_face_domination (const FiniteElement<dim> &fe_other) const
+FE_RaviartThomasNodal<dim>::compare_for_face_domination (
+  const FiniteElement<dim>& fe_other) const
 {
   if (const FE_RaviartThomasNodal<dim> *fe_q_other
       = dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&fe_other))
@@ -559,26 +559,22 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 
 template <>
 void
-FE_RaviartThomasNodal<1>::
-get_face_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
-			       FullMatrix<double>     &/*interpolation_matrix*/) const
+FE_RaviartThomasNodal<1>::get_face_interpolation_matrix (
+  const FiniteElement<1> &/*x_source_fe*/,
+  FullMatrix<double>     &/*interpolation_matrix*/) const
 {
-  Assert (false,
-	  FiniteElement<1>::
-	  ExcInterpolationNotImplemented ());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
 template <>
 void
-FE_RaviartThomasNodal<1>::
-get_subface_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
-				  const unsigned int      /*subface*/,
-				  FullMatrix<double>     &/*interpolation_matrix*/) const
+FE_RaviartThomasNodal<1>::get_subface_interpolation_matrix (
+  const FiniteElement<1> &/*x_source_fe*/,
+  const unsigned int      /*subface*/,
+  FullMatrix<double>     &/*interpolation_matrix*/) const
 {
-  Assert (false,
-	  FiniteElement<1>::
-	  ExcInterpolationNotImplemented ());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif
@@ -588,9 +584,9 @@ get_subface_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
 
 template <int dim>
 void
-FE_RaviartThomasNodal<dim>::
-get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
-                               FullMatrix<double>       &interpolation_matrix) const
+FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix (
+  const FiniteElement<dim> &x_source_fe,
+  FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a
@@ -694,10 +690,10 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 template <int dim>
 void
-FE_RaviartThomasNodal<dim>::
-get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
-                                  const unsigned int subface,
-				  FullMatrix<double>       &interpolation_matrix) const
+FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix (
+  const FiniteElement<dim> &x_source_fe,
+  const unsigned int subface,
+  FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a

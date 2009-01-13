@@ -228,16 +228,6 @@ enum UpdateFlags
 					*/
       update_volume_elements              = 0x4000,
 				       /**
-					* Compute the JxW values
-					* on faces for the cell mapping
-					* and not the face mapping!
-					* This functionality is required
-					* for the Piola mapping which
-					* is used in conjunction with
-					* H_div subspaces like RT and ABF.
-					*/
-      update_cell_JxW_values              = 0x8000,
-				       /**
 					* Update the location of the
 					* mapped generalized support
 					* points of the element.

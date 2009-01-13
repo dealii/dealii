@@ -277,8 +277,6 @@ class MappingQ1 : public Mapping<dim,spacedim>
 	unsigned int n_shape_functions;
     };
 
-  protected:
-
                                      /**
                                       * Declare a convenience typedef
                                       * for the class that describes
@@ -317,8 +315,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			 typename std::vector<Point<dim> >                &quadrature_points,
 			 std::vector<double>                              &JxW_values,
 			 typename std::vector<Tensor<1,dim> >             &boundary_form,
-			 typename std::vector<Point<spacedim> >           &normal_vectors,
-			 std::vector<double>                              &cell_JxW_values) const ;
+			 typename std::vector<Point<spacedim> >           &normal_vectors) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -333,8 +330,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			    typename std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
 			    typename std::vector<Tensor<1,dim> >        &boundary_form,
-			    typename std::vector<Point<spacedim> >        &normal_vectors,
-			    std::vector<double>             &cell_JxW_values) const ;
+			    typename std::vector<Point<spacedim> >        &normal_vectors) const ;
     
 				     /**
 				      * Compute shape values and/or
@@ -405,8 +401,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			    std::vector<Point<dim> >    &quadrature_points,
 			    std::vector<double>         &JxW_values,
 			    std::vector<Tensor<1,dim> > &boundary_form,
-			    std::vector<Point<spacedim> > &normal_vectors,
-			    std::vector<double>         &cell_JxW_values) const;
+			    std::vector<Point<spacedim> > &normal_vectors) const;
     
 				     /**
 				      * Compute shape values and/or
@@ -705,46 +700,6 @@ MappingQ1<dim,spacedim>::InternalData::second_derivative (const unsigned int qpo
 
 /* -------------- declaration of explicit specializations ------------- */
 
-#ifndef DOXYGEN
-
-template <> void MappingQ1<1>::compute_fill_face (
-  const Triangulation<1>::cell_iterator &,
-  const unsigned int,
-  const unsigned int,
-  const unsigned int,
-  const DataSetDescriptor,
-  const std::vector<double> &,
-  InternalData &,
-  std::vector<Point<1> > &,
-  std::vector<double> &,
-  std::vector<Tensor<1,1> > &,
-  std::vector<Point<1> > &,
-  std::vector<double> &) const;
-
-template <> void MappingQ1<1>::fill_fe_face_values (
-  const Triangulation<1>::cell_iterator &,
-  const unsigned,
-  const Quadrature<0>&,
-  Mapping<1>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&,
-  std::vector<double>&) const;
-
-template <> void MappingQ1<1>::fill_fe_subface_values (
-  const Triangulation<1>::cell_iterator &,
-  const unsigned,
-  const unsigned,
-  const Quadrature<0>&,
-  Mapping<1>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&,
-  std::vector<double>&) const;
-
-#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

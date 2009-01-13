@@ -390,7 +390,6 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 				      | update_contravariant_transformation
 				      | update_JxW_values
 				      | update_cell_normal_vectors
-				      | update_cell_JxW_values
 				      | update_boundary_forms
 				      | update_normal_vectors
 				      | update_volume_elements
@@ -441,7 +440,7 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 				       // Therefore these values have to
 				       // updated for each cell.
       if (out & update_contravariant_transformation)
-	out |= update_JxW_values | update_cell_JxW_values;
+	out |= update_JxW_values;
 
       if (out & update_cell_normal_vectors)
 	out |= update_JxW_values | update_cell_normal_vectors;
@@ -869,28 +868,84 @@ MappingQ1<2,3>::compute_fill_face (const Triangulation<2,3>::cell_iterator &,
 				   std::vector<Point<2> >&,
 				   std::vector<double>&,
 				   std::vector<Tensor<1,2> > &,
-				   std::vector<Point<3> > &,
-				   std::vector<double>&) const 
+				   std::vector<Point<3> > &) const 
 {
 	Assert(false, ExcNotImplemented());
 }
 
 #endif
 
+#if (deal_II_dimension == 1)
+
+template <int dim, int spacedim>
+void
+MappingQ1<dim,spacedim>::compute_fill_face (
+  const typename Triangulation<dim,spacedim>::cell_iterator &,
+  const unsigned int,
+  const unsigned int,
+  const unsigned int,
+  const DataSetDescriptor,
+  const std::vector<double> &,
+  InternalData &,
+  std::vector<Point<dim> > &,
+  std::vector<double> &,
+  std::vector<Tensor<1,dim> > &,
+  std::vector<Point<spacedim> > &) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <int dim,int spacedim>
+void
+MappingQ1<dim,spacedim>::fill_fe_face_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &,
+  const unsigned,
+  const Quadrature<dim-1>&,
+  typename Mapping<dim,spacedim>::InternalDataBase&,
+  std::vector<Point<dim> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,dim> >&,
+  std::vector<Point<spacedim> >&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <int dim,int spacedim>
+void
+MappingQ1<dim,spacedim>::fill_fe_subface_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &,
+  const unsigned,
+  const unsigned,
+  const Quadrature<dim-1>&,
+  typename Mapping<dim,spacedim>::InternalDataBase&,
+  std::vector<Point<dim> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,dim> >&,
+  std::vector<Point<spacedim> >&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+#else
+// Implementation for 2D and 3D
+
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				   const unsigned int               face_no,
-				   const unsigned int               subface_no,
-				   const unsigned int               n_q_points,
-				   const DataSetDescriptor          data_set,
-				   const std::vector<double>        &weights,
-				   InternalData                     &data,
-				   std::vector<Point<dim> >         &quadrature_points,
-				   std::vector<double>              &JxW_values,
-				   std::vector<Tensor<1,dim> > &boundary_forms,
-				   std::vector<Point<spacedim> >    &normal_vectors,
-				   std::vector<double>              &cell_JxW_values) const
+MappingQ1<dim,spacedim>::compute_fill_face (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const unsigned int               face_no,
+  const unsigned int               subface_no,
+  const unsigned int               n_q_points,
+  const DataSetDescriptor          data_set,
+  const std::vector<double>        &weights,
+  InternalData                     &data,
+  std::vector<Point<dim> >         &quadrature_points,
+  std::vector<double>              &JxW_values,
+  std::vector<Tensor<1,dim> > &boundary_forms,
+  std::vector<Point<spacedim> >    &normal_vectors) const
 {
   compute_fill (cell, n_q_points, data_set, data, quadrature_points);
 
@@ -964,23 +1019,6 @@ MappingQ1<dim,spacedim>::compute_fill_face (const typename Triangulation<dim,spa
               normal_vectors[i] = boundary_forms[i] / f;
 	  }
     }
-
-  // If the Piola transformation is to be used, the
-  // new flag, update_cell_JxW_values has to be set.
-  // It triggers the creation of values for the determinant
-  // of the mapping function on 
-  if (update_flags & update_cell_JxW_values)
-    {      
-      Assert (cell_JxW_values.size() == n_q_points,
-	      ExcDimensionMismatch(cell_JxW_values.size(), n_q_points));
-      Assert (data.contravariant.size() == n_q_points,
-	      ExcDimensionMismatch(data.contravariant.size(), n_q_points));
-      Assert (weights.size() == n_q_points,
-	      ExcDimensionMismatch(weights.size(), n_q_points));
-      for (unsigned int point=0; point<n_q_points; ++point)
-	cell_JxW_values[point]
-	  = determinant(data.contravariant[point])*weights[point];
-    }
 }
 
 
@@ -993,8 +1031,7 @@ MappingQ1<dim,spacedim>::fill_fe_face_values (const typename Triangulation<dim,s
 				     std::vector<Point<dim> >                         &quadrature_points,
 				     std::vector<double>                              &JxW_values,
 				     std::vector<Tensor<1,dim> >                      &boundary_forms,
-				     std::vector<Point<spacedim> >                    &normal_vectors,
-				     std::vector<double>                              &cell_JxW_values) const
+				     std::vector<Point<spacedim> >                    &normal_vectors) const
 {
   // ensure that the following cast is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
@@ -1015,8 +1052,7 @@ MappingQ1<dim,spacedim>::fill_fe_face_values (const typename Triangulation<dim,s
 		     quadrature_points,
 		     JxW_values,
 		     boundary_forms,
-		     normal_vectors,
-		     cell_JxW_values);
+		     normal_vectors);
 }
 
 
@@ -1030,8 +1066,7 @@ MappingQ1<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<di
 					std::vector<Point<dim> >     &quadrature_points,
 					std::vector<double>          &JxW_values,
 					std::vector<Tensor<1,dim> >  &boundary_forms,
-					std::vector<Point<spacedim> >     &normal_vectors,
-					std::vector<double>          &cell_JxW_values) const
+					std::vector<Point<spacedim> >     &normal_vectors) const
 {
   // ensure that the following cast is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
@@ -1053,114 +1088,7 @@ MappingQ1<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<di
 		     quadrature_points,
 		     JxW_values,
 		     boundary_forms,
-		     normal_vectors,
-		     cell_JxW_values);
-}
-
-
-#if (deal_II_dimension == 1)
-
-template <>
-void
-MappingQ1<1>::compute_fill_face (const Triangulation<1>::cell_iterator &,
-				 const unsigned int,
-				 const unsigned int,
-				 const unsigned int,
-				 const DataSetDescriptor,
-				 const std::vector<double> &,
-				 InternalData &,
-				 std::vector<Point<1> > &,
-				 std::vector<double> &,
-				 std::vector<Tensor<1,1> > &,
-				 std::vector<Point<1> > &,
-				 std::vector<double>          &/*cell_JxW_values*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <>
-void
-MappingQ1<1>::fill_fe_face_values (const Triangulation<1>::cell_iterator &,
-				   const unsigned,
-				   const Quadrature<0>&,
-				   Mapping<1>::InternalDataBase&,
-				   std::vector<Point<1> >&,
-				   std::vector<double>&,
-				   std::vector<Tensor<1,1> >&,
-				   std::vector<Point<1> >&,
-				   std::vector<double>          &/*cell_JxW_values*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <>
-void
-MappingQ1<1>::fill_fe_subface_values (const Triangulation<1>::cell_iterator &,
-				      const unsigned,
-				      const unsigned,
-				      const Quadrature<0>&,
-				      Mapping<1>::InternalDataBase&,
-				      std::vector<Point<1> >&,
-				      std::vector<double>&,
-				      std::vector<Tensor<1,1> >&,
-				      std::vector<Point<1> >&,
-				      std::vector<double>          &/*cell_JxW_values*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <>
-void
-MappingQ1<1,2>::compute_fill_face (const Triangulation<1,2>::cell_iterator &,
-				 const unsigned int,
-				 const unsigned int,
-				 const unsigned int,
-				 const DataSetDescriptor,
-				 const std::vector<double> &,
-				 InternalData &,
-				 std::vector<Point<1> > &,
-				 std::vector<double> &,
-				 std::vector<Tensor<1,1> > &,
-				 std::vector<Point<2> > &,
-				 std::vector<double>          &/*cell_JxW_values*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <>
-void
-MappingQ1<1,2>::fill_fe_face_values (const Triangulation<1,2>::cell_iterator &,
-				   const unsigned,
-				   const Quadrature<0>&,
-				   Mapping<1,2>::InternalDataBase&,
-				   std::vector<Point<1> >&,
-				   std::vector<double>&,
-				   std::vector<Tensor<1,1> >&,
-				   std::vector<Point<2> >&,
-				   std::vector<double>          &/*cell_JxW_values*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <>
-void
-MappingQ1<1,2>::fill_fe_subface_values (const Triangulation<1,2>::cell_iterator &,
-				      const unsigned,
-				      const unsigned,
-				      const Quadrature<0>&,
-				      Mapping<1,2>::InternalDataBase&,
-				      std::vector<Point<1> >&,
-				      std::vector<double>&,
-				      std::vector<Tensor<1,1> >&,
-				      std::vector<Point<2> >&,
-				      std::vector<double>          &/*cell_JxW_values*/) const
-{
-  Assert(false, ExcNotImplemented());
+		     normal_vectors);
 }
 
 

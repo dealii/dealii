@@ -78,8 +78,7 @@ class MappingCartesian : public Mapping<dim,spacedim>
 			 std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
 			 std::vector<Tensor<1,dim> >        &boundary_form,
-			 std::vector<Point<dim> >        &normal_vectors,
-			 std::vector<double>             &cell_JxW_values) const ;
+			 std::vector<Point<spacedim> >        &normal_vectors) const ;
     virtual void
     fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int face_no,
@@ -89,8 +88,7 @@ class MappingCartesian : public Mapping<dim,spacedim>
 			    std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
 			    std::vector<Tensor<1,dim> >        &boundary_form,
-			    std::vector<Point<dim> >        &normal_vectors,
-			    std::vector<double>             &cell_JxW_values) const ;
+			    std::vector<Point<spacedim> >        &normal_vectors) const ;
 
     virtual void
     transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
@@ -201,33 +199,6 @@ class MappingCartesian : public Mapping<dim,spacedim>
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
-
-#ifndef DOXYGEN
-
-template <> void MappingCartesian<1>::fill_fe_face_values (
-  const Triangulation<1>::cell_iterator &,
-  const unsigned,
-  const Quadrature<0>&,
-  Mapping<1>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&,
-  std::vector<double>&) const;
-
-template <> void MappingCartesian<1>::fill_fe_subface_values (
-  const Triangulation<1>::cell_iterator &,
-  const unsigned,
-  const unsigned,
-  const Quadrature<0>&,
-  Mapping<1>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&,
-  std::vector<double>&) const;
-
-#endif // DOXYGEN  
 
 DEAL_II_NAMESPACE_CLOSE
 

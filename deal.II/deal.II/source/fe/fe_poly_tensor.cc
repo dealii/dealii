@@ -530,10 +530,6 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-//   Assert(mapping_type == independent
-// 	 || ( mapping_type == independent_on_cartesian
-// 	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
-// 	 ExcNotImplemented());
 //TODO: Size assertions
 
 // Create table with sign changes, due to the special structure of the RT elements.

@@ -353,8 +353,7 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
   std::vector<Point<dim> >     &quadrature_points,
   std::vector<double>          &JxW_values,
   std::vector<Tensor<1,dim> >  &exterior_forms,
-  std::vector<Point<dim> >     &normal_vectors,
-  std::vector<double>          &cell_JxW_values) const
+  std::vector<Point<dim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -400,10 +399,7 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
                            q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
-                           exterior_forms, normal_vectors,
-			   cell_JxW_values);
-
-  // TODO: Verify implementation of cell_JxW_values
+                           exterior_forms, normal_vectors);
 }
 
 
@@ -417,8 +413,7 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
 				       std::vector<Point<dim> >     &quadrature_points,
 				       std::vector<double>          &JxW_values,
 				       std::vector<Tensor<1,dim> >  &exterior_forms,
-				       std::vector<Point<dim> >     &normal_vectors,
-				       std::vector<double>          &cell_JxW_values) const
+				       std::vector<Point<dim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -464,10 +459,7 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
                            q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
-                           exterior_forms, normal_vectors,
-			   cell_JxW_values);
-
-  // TODO: Verify implementation of cell_JxW_values ...
+                           exterior_forms, normal_vectors);
 }
 
 

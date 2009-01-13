@@ -364,17 +364,56 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
 
 
 
+#if (deal_II_dimension == 1)
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim,spacedim>::fill_fe_face_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &,
+  const unsigned int,
+  const Quadrature<dim-1>&,
+  typename Mapping<dim,spacedim>::InternalDataBase&,
+  std::vector<Point<dim> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,dim> >&,
+  std::vector<Point<spacedim> >&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim,spacedim>::fill_fe_subface_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &,
+  const unsigned int,
+  const unsigned int,
+  const Quadrature<dim-1>&,
+  typename Mapping<dim,spacedim>::InternalDataBase&,
+  std::vector<Point<dim> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,dim> >&,
+  std::vector<Point<spacedim> >&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+#else
+
+// Implementation for dim != 1
+  
 template<int dim, int spacedim>
 void
-MappingCartesian<dim, spacedim>::fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-					    const unsigned int            face_no,
-					    const Quadrature<dim-1>      &q,
-					    typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-					    std::vector<Point<dim> >     &quadrature_points,
-					    std::vector<double>          &JxW_values,
-					    std::vector<Tensor<1,dim> >  &boundary_forms,
-					    std::vector<Point<dim> >     &normal_vectors,
-					    std::vector<double>          &/*cell_JxW_values*/) const
+MappingCartesian<dim, spacedim>::fill_fe_face_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const unsigned int            face_no,
+  const Quadrature<dim-1>      &q,
+  typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+  std::vector<Point<dim> >     &quadrature_points,
+  std::vector<double>          &JxW_values,
+  std::vector<Tensor<1,dim> >  &boundary_forms,
+  std::vector<Point<spacedim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -417,16 +456,16 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (const typename Triangulati
 
 template<int dim, int spacedim>
 void
-MappingCartesian<dim, spacedim>::fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-					       const unsigned int       face_no,
-					       const unsigned int       sub_no,
-					       const Quadrature<dim-1> &q,
-					       typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-					       std::vector<Point<dim> >     &quadrature_points,
-					       std::vector<double>          &JxW_values,
-					       std::vector<Tensor<1,dim> >  &boundary_forms,
-					       std::vector<Point<dim> >     &normal_vectors,
-					       std::vector<double>          &/*cell_JxW_values*/) const
+MappingCartesian<dim, spacedim>::fill_fe_subface_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const unsigned int       face_no,
+  const unsigned int       sub_no,
+  const Quadrature<dim-1> &q,
+  typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+  std::vector<Point<dim> >     &quadrature_points,
+  std::vector<double>          &JxW_values,
+  std::vector<Tensor<1,dim> >  &boundary_forms,
+  std::vector<Point<spacedim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -481,43 +520,10 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (const typename Triangul
     }
 }
 
-
-#if (deal_II_dimension == 1)
-
-template <>
-void
-MappingCartesian<1>::fill_fe_face_values (const Triangulation<1>::cell_iterator &,
-					  const unsigned,
-					  const Quadrature<0>&,
-					  Mapping<1>::InternalDataBase&,
-					  std::vector<Point<1> >&,
-					  std::vector<double>&,
-					  std::vector<Tensor<1,1> >&,
-					  std::vector<Point<1> >&,
-					  std::vector<double>          &/*cell_JxW_values*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <>
-void
-MappingCartesian<1>::fill_fe_subface_values (const Triangulation<1>::cell_iterator &,
-					     const unsigned,
-					     const unsigned,
-					     const Quadrature<0>&,
-					     Mapping<1>::InternalDataBase&,
-					     std::vector<Point<1> >&,
-					     std::vector<double>&,
-					     std::vector<Tensor<1,1> >&,
-					     std::vector<Point<1> >&,
-					     std::vector<double>          &/*cell_JxW_values*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
+  
 #endif
 
-
+  
 template<int dim, int spacedim>
 void
 MappingCartesian<dim,spacedim>::transform (

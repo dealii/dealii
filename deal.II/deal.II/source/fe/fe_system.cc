@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -834,7 +834,6 @@ compute_fill (const Mapping<dim,spacedim>                   &mapping,
 					   // the reference element to the global
 					   // coordinate system.
 	  base_data.JxW_values = data.JxW_values;
-	  base_data.cell_JxW_values = data.cell_JxW_values;
 
 
                                            // Make sure that in the

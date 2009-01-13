@@ -497,6 +497,8 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
 }
 
 
+// Since this is a vector valued element, we cannot interpolate a
+// scalar function
 template <int dim>
 void
 FE_RaviartThomas<dim>::interpolate(
