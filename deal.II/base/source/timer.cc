@@ -15,6 +15,7 @@
 #include <base/timer.h>
 #include <base/exceptions.h>
 #include <iostream>
+#include <algorithm>
 
 // these includes should probably be properly
 // ./configure'd using the AC_HEADER_TIME macro:
