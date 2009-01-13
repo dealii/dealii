@@ -2,7 +2,7 @@
 /* Author: Martin Kronbichler, Uppsala University,
            Wolfgang Bangerth, Texas A&M University 2007, 2008 */
 /*                                                                */
-/*    Copyright (C) 2008 by the deal.II authors */
+/*    Copyright (C) 2008, 2009 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -359,9 +359,9 @@ class BoussinesqFlowProblem
     double old_time_step;
     unsigned int timestep_number;
 
-    boost::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    boost::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
-    boost::shared_ptr<TrilinosWrappers::PreconditionIC>  T_preconditioner;
+    std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
+    std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
+    std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>  T_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_stokes_preconditioner;
@@ -841,7 +841,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
   assemble_stokes_preconditioner ();
 
-  Amg_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionAMG>
+  Amg_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionAMG>
 		       (new TrilinosWrappers::PreconditionAMG());
 
   std::vector<std::vector<bool> > null_space;
@@ -854,7 +854,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				 TrilinosWrappers::PreconditionAMG::AdditionalData
 				 (true, true, 1e-2, null_space, 3, 0, false));
 
-  Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionIC>
+  Mp_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>
                                    (new TrilinosWrappers::PreconditionIC());
 
   Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
@@ -1095,7 +1095,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
   if (rebuild_temperature_preconditioner == true)
     {
-      T_preconditioner =  boost::shared_ptr<TrilinosWrappers::PreconditionIC>
+      T_preconditioner =  std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>
                                    (new TrilinosWrappers::PreconditionIC());
       T_preconditioner->initialize (temperature_matrix);
 
