@@ -44,7 +44,7 @@ namespace std_cxx0x
   template <int N, typename T>
   struct tuple_element
   {
-      typedef boost::tuples::element<N,T> type;
+      typedef typename boost::tuples::element<N,T>::type type;
   };
 }
 DEAL_II_NAMESPACE_CLOSE
