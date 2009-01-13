@@ -19,7 +19,7 @@
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -1465,7 +1465,7 @@ namespace TrilinosWrappers
 					* A copy of the deal.II matrix
 					* into Trilinos format.
 					*/
-      boost::shared_ptr<SparseMatrix> Matrix;
+      std_cxx0x::shared_ptr<SparseMatrix> Matrix;
   };
 
 }

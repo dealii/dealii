@@ -16,7 +16,7 @@
 #include <base/config.h>
 #include <lac/exceptions.h>
 #include <lac/solver_control.h>
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 
 
 #ifdef DEAL_II_USE_PETSC
@@ -225,7 +225,7 @@ namespace PETScWrappers
                                         * the main solver routine if
                                         * necessary.
                                         */
-      boost::shared_ptr<SolverData> solver_data;
+      std_cxx0x::shared_ptr<SolverData> solver_data;
   };
 
 

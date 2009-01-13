@@ -18,7 +18,7 @@
 #include <base/subscriptor.h>
 #include <lac/exceptions.h>
 
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 #include <vector>
 #include <cmath>
 #include <memory>
@@ -149,7 +149,7 @@ namespace TrilinosWrappers
 					* than one accessor can access
 					* this data if necessary.
 					*/
-            boost::shared_ptr<const std::vector<unsigned int> > colnum_cache;
+            std_cxx0x::shared_ptr<const std::vector<unsigned int> > colnum_cache;
             
 	                               /**
 					* Discard the old row caches

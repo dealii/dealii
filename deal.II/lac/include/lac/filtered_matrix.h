@@ -612,7 +612,7 @@ class FilteredMatrix : public Subscriptor
 				      * it using the SmartPointer
 				      * class.
 				      */
-    boost::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
+    std_cxx0x::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
 
 				     /**
 				      * Sorted list of pairs denoting
@@ -812,7 +812,7 @@ inline
 void
 FilteredMatrix<VECTOR>::initialize (const MATRIX &m, bool ecs)
 {
-  matrix = boost::shared_ptr<PointerMatrixBase<VECTOR> > (
+  matrix = std_cxx0x::shared_ptr<PointerMatrixBase<VECTOR> > (
     new_pointer_matrix_base(m, VECTOR()));
   
   expect_constrained_source = ecs;

@@ -22,7 +22,7 @@
 #ifdef DEAL_II_USE_PETSC
 
 #include <petscmat.h>
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 #include <vector>
 #include <cmath>
 
@@ -150,13 +150,13 @@ namespace PETScWrappers
                                               * accessor can access this data
                                               * if necessary.
                                               */
-            boost::shared_ptr<const std::vector<unsigned int> > colnum_cache;
+            std_cxx0x::shared_ptr<const std::vector<unsigned int> > colnum_cache;
 
                                              /**
                                               * Similar cache for the values
                                               * of this row.
                                               */
-            boost::shared_ptr<const std::vector<PetscScalar> > value_cache;
+            std_cxx0x::shared_ptr<const std::vector<PetscScalar> > value_cache;
             
                                              /**
                                               * Discard the old row caches
