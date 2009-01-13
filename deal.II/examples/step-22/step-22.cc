@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2008 by the deal.II authors */
+/*    Copyright (C) 2008, 2009 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -159,7 +159,7 @@ class StokesProblem
 				     // memory leak, and can never produce a
 				     // dangling pointer to an already
 				     // destroyed object:
-    boost::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
+    std_cxx0x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
 };
 
 				 // @sect3{Boundary values and right hand side}
@@ -969,7 +969,7 @@ void StokesProblem<dim>::assemble_system ()
   std::cout << "   Computing preconditioner..." << std::endl << std::flush;
       
   A_preconditioner
-    = boost::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+    = std_cxx0x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
   A_preconditioner->initialize (system_matrix.block(0,0),
 				typename InnerPreconditioner<dim>::type::AdditionalData());
 
