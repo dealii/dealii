@@ -353,6 +353,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a class TimerOutput that allows to neatly measure computing
+  times in different sections of a program and write that information to screen.
+  <br> 
+  (Martin Kronbichler 2009/01/12)
+  </p>
+
+  <li>
+  <p>
   New: The Timer class can now also return the wall time using the method 
   Timer::wall_time(), as opposed to the CPU time returned by 
   Timer::operator ().
