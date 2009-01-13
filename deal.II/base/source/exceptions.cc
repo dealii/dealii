@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -209,7 +209,8 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 					    // off if they are
 					    // trailing a template
 					    // argument list
-	   while (realname.find (", boost::tuples::null_type>") != std::string::npos)
+	   while (realname.find (", boost::tuples::null_type>")
+		  != std::string::npos)
 	     realname.erase (realname.find (", boost::tuples::null_type>"),
 			     std::string (", boost::tuples::null_type").size());
 	   

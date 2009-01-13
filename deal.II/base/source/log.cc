@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -122,10 +122,10 @@ LogStream::get_stream()
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   unsigned int id = Threads::this_thread_id();
 
-  boost::shared_ptr<std::ostringstream>& sptr = outstreams[id];
+  std_cxx0x::shared_ptr<std::ostringstream>& sptr = outstreams[id];
   if (sptr == 0)
     {
-      sptr = boost::shared_ptr<std::ostringstream> (new std::ostringstream());
+      sptr = std_cxx0x::shared_ptr<std::ostringstream> (new std::ostringstream());
       sptr->setf(std::ios::showpoint | std::ios::left);
     } 
   return *sptr;

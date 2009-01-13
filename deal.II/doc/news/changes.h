@@ -144,6 +144,22 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Changed: Some parts of the library used to use classes and functions
+  from the <a href="http://www.boost.org/">BOOST</a> library. Since
+  many of the components of BOOST have been voted into what will be the
+  next C++ standard, we now use a namespace std_cxx0x (coined on the
+  provisional name C++0x used for the next C++ standard) into which we
+  import BOOST components as necessary. If a compiler supports C++0x,
+  we can then later replace BOOST components by elements from namespace
+  <code>std</code> in one central place, rather than all throughout the
+  code.
+  <br>
+  (WB 2009/01/12)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Updated: The @ref step_33 "step-33" tutorial program now uses the
   Trilinos wrapper 
   classes for accessing Trilinos linear algebra routines instead of

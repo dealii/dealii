@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,7 +15,7 @@
 
 
 #include <base/config.h>
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx0x/shared_ptr.h>
 #include <string>
 #include <vector>
 #include <utility>
@@ -371,7 +371,7 @@ namespace MemoryConsumption
     
 				   /**
 				    * Return the amount of memory used
-				    * by a boost shared pointer. Make
+				    * by a shared pointer. Make
 				    * sure that you are really
 				    * interested in this, and not the
 				    * amount of memory required by the
@@ -379,7 +379,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const boost::shared_ptr<T> &);
+  unsigned int memory_consumption (const std_cxx0x::shared_ptr<T> &);
     
 				   /**
 				    * For all other types which are
@@ -604,7 +604,7 @@ namespace MemoryConsumption
   template <typename T>
   inline
   unsigned int
-  memory_consumption (const boost::shared_ptr<T> &ptr)
+  memory_consumption (const std_cxx0x::shared_ptr<T> &ptr)
   {
     return sizeof(ptr);
   }

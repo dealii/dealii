@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,12 +16,12 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/std_cxx0x/shared_ptr.h>
 
 #include <string>
 #include <stack>
 #include <map>
 #include <cmath>
-#include <boost/shared_ptr.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 // we only need output streams, but older compilers did not provide
@@ -421,7 +421,7 @@ class LogStream
 				     /**
 				      * Type of the stream map
 				      */
-    typedef std::map<unsigned int, boost::shared_ptr<std::ostringstream> > stream_map_type;
+    typedef std::map<unsigned int, std_cxx0x::shared_ptr<std::ostringstream> > stream_map_type;
     
 				     /**
 				      * We generate a stringstream for
