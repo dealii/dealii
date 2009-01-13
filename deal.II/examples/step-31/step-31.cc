@@ -4,7 +4,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 2007, 2008, 2009 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -643,8 +643,8 @@ class BoussinesqFlowProblem
     double old_time_step;
     unsigned int timestep_number;
 
-    boost::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    boost::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
+    std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
+    std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
@@ -1465,7 +1465,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
       
   assemble_stokes_preconditioner ();
       
-  Amg_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionAMG>
+  Amg_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionAMG>
 		       (new TrilinosWrappers::PreconditionAMG());
 
   std::vector<std::vector<bool> > constant_modes;
@@ -1521,7 +1521,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // preconditioner with relaxation factor
 				   // around 1.2, but IC is cheaper for our
 				   // example. We wrap the preconditioners
-				   // into a <code>boost::shared_ptr</code>
+				   // into a <code>std_cxx0x::shared_ptr</code>
 				   // pointer, which makes it easier to
 				   // recreate the preconditioner next time
 				   // around since we do not have to care
@@ -1533,7 +1533,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 amg_data);
       
-  Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionIC>
+  Mp_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>
 		      (new TrilinosWrappers::PreconditionIC());
   Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1));
 
