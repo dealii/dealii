@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: function_parser.h 14594 2007-03-22 20:17:41Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2007, 2008 by the deal.II authors
