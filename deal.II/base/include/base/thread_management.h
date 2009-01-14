@@ -21,6 +21,10 @@
 #include <base/std_cxx0x/shared_ptr.h>
 #include <base/std_cxx0x/bind.h>
 
+#if (DEAL_II_USE_MT == 1)
+#  include <base/std_cxx0x/thread.h>
+#endif
+
 #include <iterator>
 #include <vector>
 #include <list>
@@ -1187,143 +1191,111 @@ namespace Threads
   namespace internal 
   {
 #if (DEAL_II_USE_MT == 1)
-#  if defined(DEAL_II_USE_MT_POSIX)
 
-                                     /**
-				      * @internal
-                                      * Base class describing a
-                                      * thread. This is the basic
-                                      * class abstracting the
-                                      * operating system's POSIX
-                                      * implementation into a C++
-                                      * class. It provides a mechanism
-                                      * to start a new thread, as well
-                                      * as for joining it.
-                                      *
-                                      * @author Wolfgang Bangerth, 2003
-                                      */
-    struct thread_description_base
+				     /**
+				      * A class that represents threads. For
+				      * each thread, we create exactly one of
+				      * these objects -- exactly one because
+				      * it carries the returned value of the
+				      * function called on the thread.
+				      *
+				      * While we have only one of these
+				      * objects per thread, several
+				      * Threads::Thread objects may refer to
+				      * this descriptor.
+				      */
+    template <typename RT>
+    struct ThreadDescriptor 
     {
-      private:
-                                         /**
-                                          * Variable holding the data
-                                          * the operating system needs
-                                          * to work with a thread.
-                                          */
-        pthread_t             thread;
-
-                                         /**
-                                          * Store whether the
-                                          * <tt>join()</tt> member function
-                                          * as already been called. If
-                                          * <tt>true</tt>, then <tt>join</tt>
-                                          * will return immediately,
-                                          * otherwise it needs to go
-                                          * through a call to the
-                                          * operating system.
-                                          *
-                                          * This class is generated
-                                          * exactly once per thread,
-                                          * but is kept in the
-                                          * background: user's should
-                                          * not directly access this
-                                          * class. Access to it is
-                                          * performed through counted
-                                          * pointers, both from
-                                          * <tt>Thread<></tt> objects as
-                                          * well as from the thread
-                                          * entry point function on
-                                          * the new thread. It is only
-                                          * deleted when all users
-                                          * have freed it, which means
-                                          * that also the new thread
-                                          * has ended.
-                                          */
-        mutable volatile bool was_joined;
-
-                                         /**
-                                          * Mutex used to synchronise
-                                          * calls to the <tt>join()</tt>
-                                          * function.
-                                          */
-        mutable ThreadMutex   join_mutex;
-
-      public:
-
-                                         /**
-                                          * Constructor.
-                                          */
-        thread_description_base ();
-
-                                         /**
-                                          * Destructor.
-                                          */
-        virtual ~thread_description_base ();
-
-                                         /**
-                                          * Create a new thread with
-                                          * the given thread entry
-                                          * point and arguments. Store
-                                          * the result of the
-                                          * operation in the
-                                          * <tt>thread</tt> member variable
-                                          * for further use.
-                                          */
-        void create (void * (*p) (void *), void *d);
-
-                                         /**
-                                          * Join a thread, i.e. wait
-                                          * for it to finish. This
-                                          * function can safely be
-                                          * called from different
-                                          * threads at the same time,
-                                          * and can also be called
-                                          * more than once.
-                                          */
-        void join () const;
+					 /**
+					  * An object that represents the
+					  * thread started.
+					  */
+	std_cxx0x::thread thread;
 
 					 /**
-					  * Exception
+					  * An object that will hold the value
+					  * returned by the function called on
+					  * the thread.
 					  */
-	DeclException1 (ExcThreadCreationError,
-			int,
-			<< "pthread_create return code is " << arg1);
-    };
-
-#  else       // some other threading model
-#    error Not Implemented
-#  endif     // defined(DEAL_II_USE_MT_POSIX)
-
-#else        // no threading enabled
-
-    struct thread_description_base
-    {
-	static void join () {}
-    };
-    
-#endif
-
-                                     /**
-				      * @internal
-                                      * Class derived from
-                                      * thread_description_base()
-                                      * that also provides the
-                                      * possibility to store a return
-                                      * value.
-                                      *
-                                      * @author Wolfgang Bangerth, 2003
-                                      */
-    template <typename RT>
-    struct thread_description : public thread_description_base
-    {
         return_value<RT> ret_val;
+
+					 /**
+					  * Constructor. Start the thread and
+					  * let it put its return value into
+					  * the ret_val object.
+					  */
+	ThreadDescriptor (const std_cxx0x::function<RT ()> &function)
+			:
+			thread (thread_entry_point, function, &ret_val)
+	  {}
+
+
+					 /**
+					  * Wait for the thread to end.
+					  */
+	void join ()
+	  {
+	    thread.join ();
+	  }
+	
+      private:
+
+					 /**
+					  * The function that runs on the
+					  * thread.
+					  */
+	static
+	void thread_entry_point (const std_cxx0x::function<RT ()> function,
+				 return_value<RT> *ret_val)
+	  {
+	    call (function, *ret_val);
+	  }
     };
-    
-                                     // forward declare another class
-    template <typename> struct ThreadStarter;
+
+#else
+				     /**
+				      * A class that represents threads. For
+				      * each thread, we create exactly one of
+				      * these objects -- exactly one because
+				      * it carries the returned value of the
+				      * function called on the thread.
+				      *
+				      * While we have only one of these
+				      * objects per thread, several
+				      * Threads::Thread objects may refer to
+				      * this descriptor.
+				      */
+    template <typename RT>
+    struct ThreadDescriptor 
+    {
+					 /**
+					  * An object that will hold the value
+					  * returned by the function called on
+					  * the thread.
+					  */
+        return_value<RT> ret_val;
+
+					 /**
+					  * Constructor. Start the thread and
+					  * let it put its return value into
+					  * the ret_val object.
+					  */
+	ThreadDescriptor (const std_cxx0x::function<RT ()> &function)
+	  {
+	    call (function, ret_val);
+	  }
+
+					 /**
+					  * Wait for the thread to end.
+					  */
+	void join ()
+	  {}
+    };
+  
+#endif
   }
-
-
+  
 
                                    /**
                                     * User visible class describing a
@@ -1342,39 +1314,22 @@ namespace Threads
                                     * return value, you can omit the
                                     * template argument.
                                     * 
-                                    * @author Wolfgang Bangerth, 2003
+                                    * @author Wolfgang Bangerth, 2003, 2009
+				    * @ingroup threads
                                     */
   template <typename RT = void>
   class Thread
   {
+    public:
                                        /**
                                         * Construct a thread object
-                                        * with a pointer to an
-                                        * internal thread object. This
-                                        * is the constructor used to
-                                        * the <tt>spawn</tt> family of
-                                        * functions.
-                                        *
-                                        * We would like to make this
-                                        * constructor private and only
-                                        * grant the
-                                        * <tt>fun_wrapper::fire_up</tt>
-                                        * function friendship, but
-                                        * granting friendship to
-                                        * functions in other
-                                        * namespaces doesn't work with
-                                        * some compilers, so only do
-                                        * so if the configure script
-                                        * decided that this is safe.
+                                        * with a function object.
                                         */
-#if defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2) || defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG)
-    public:
-#endif
-      Thread (const std_cxx0x::shared_ptr<internal::thread_description<RT> > &td)
-                      : thread_descriptor (td) {}
+      Thread (const std_cxx0x::function<RT ()> &function)
+		      :
+		      thread_descriptor (new internal::ThreadDescriptor<RT>(function))
+	{}
 
-    public:
-      
                                        /**
                                         * Default constructor. You
                                         * can't do much with a thread
@@ -1382,7 +1337,7 @@ namespace Threads
                                         * except for assigning it a
                                         * thread object that holds
                                         * data created by the
-                                        * <tt>spawn</tt> functions.
+                                        * <tt>new_thread</tt> functions.
                                         */
       Thread () {}
 
@@ -1451,210 +1406,10 @@ namespace Threads
                                         * as long as there is at least
                                         * one subscriber to it.
                                         */
-      std_cxx0x::shared_ptr<internal::thread_description<RT> > thread_descriptor;
-
-#if !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2) && !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG)
-      template <typename> friend struct internal::ThreadStarter;
-#endif
+      std_cxx0x::shared_ptr<internal::ThreadDescriptor<RT> > thread_descriptor;
   };
 
-
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Wrap the arguments to a
-                                      * non-member or static member
-                                      * function and provide an entry
-                                      * point for a new thread that
-                                      * unwraps this data and calls
-                                      * the function with them.
-                                      *
-                                      * @author Wolfgang Bangerth, 2003
-                                      */
-    template <typename RT>
-    struct ThreadStarter
-    {
-      public:
-                                         /**
-                                          * Start a new thread, wait
-                                          * until it has copied the
-                                          * data out of this object,
-                                          * and return the thread
-                                          * descriptor.
-					  *
-					  * In the non-multithreaded case,
-					  * simply call the function.
-                                          */
-	static
-	Thread<RT> start_thread (const std_cxx0x::function<RT ()> &function)
-	  {
-	    ThreadStarter<RT> wrapper (function);
-	    wrapper.thread_descriptor =
-	      std_cxx0x::shared_ptr<internal::thread_description<RT> >
-	      (new internal::thread_description<RT>());
-	    
-#if (DEAL_II_USE_MT == 1)
-	    ThreadMutex::ScopedLock lock (wrapper.mutex);
-	    wrapper.thread_descriptor->create (&ThreadStarter<RT>::entry_point,
-					       (void *)&wrapper);
-
-					     // wait for the newly created
-					     // thread to indicate that it has
-					     // copied the function
-					     // descriptor. note that the
-					     // POSIX description of
-					     // pthread_cond_wait says that
-					     // the function can return
-					     // spuriously and may have to be
-					     // called again; we guard against
-					     // this using the
-					     // data_has_been_copied variable
-					     // that indicates whether the
-					     // condition has actually been
-					     // met
-	    do
-	      {
-		wrapper.condition.wait (wrapper.mutex);
-	      }
-	    while (wrapper.data_has_been_copied == false);
-#else
-	    call (function, wrapper.thread_descriptor->ret_val);
-#endif
-	    return wrapper.thread_descriptor;
-	  }
-
-      private:
-                                         /**
-                                          * Constructor. Store the
-                                          * necessary information
-                                          * about the function to be
-                                          * called and with which
-                                          * arguments.
-                                          *
-                                          * Pass down the address of
-                                          * this class's thread entry
-                                          * point function. This way,
-                                          * we can ensure that object
-                                          * and thread entry point
-                                          * function always are in
-                                          * synch with respect to
-                                          * their knowledge of the
-                                          * types involved.
-                                          */
-        ThreadStarter (const std_cxx0x::function<RT ()> &function)
-                        :
-			function (function),
-			data_has_been_copied (false)
-	  {}
-
-                                         /**
-                                          * Shared pointer to the
-                                          * unique object describing a
-                                          * thread on the OS level.
-                                          */
-        std_cxx0x::shared_ptr<internal::thread_description<RT> >
-	thread_descriptor;
-
-                                         /**
-                                          * Mutex and condition
-                                          * variable used to
-                                          * synchronise calling and
-                                          * called thread.
-                                          */
-        mutable ThreadMutex     mutex;    
-        mutable ThreadCondition condition;
-
-                                         /**
-                                          * Pointer to the function to
-                                          * be called on the new
-                                          * thread.
-					  *
-					  * Note that it is enough to store a
-					  * reference to the function object
-					  * because of the way the creation of
-					  * threads is staged.
-                                          */
-	const std_cxx0x::function<RT ()> &function;
-
-					 /**
-					  * A variable that indicates whether
-					  * the called thread has copied the
-					  * function descriptor to its own
-					  * stack.
-					  */
-	mutable bool data_has_been_copied;
-	
-                                         /**
-                                          * Entry point for the new
-                                          * thread.
-                                          */
-        static void * entry_point (void *arg)
-          {
-            const ThreadStarter<RT> *wrapper
-              = reinterpret_cast<const ThreadStarter<RT>*> (arg);
-
-                                             // copy information from
-                                             // the stack of the
-                                             // calling thread
-            std_cxx0x::function<RT ()> function = wrapper->function;
-
-            std_cxx0x::shared_ptr<internal::thread_description<RT> >
-              thread_descriptor  = wrapper->thread_descriptor;
-          
-                                             // signal the fact that
-                                             // we have copied all the
-                                             // information that is
-                                             // needed
-					     //
-					     // note that we indicate success
-					     // of the operation not only
-					     // through the condition variable
-					     // but also through
-					     // data_has_been_copied because
-					     // pthread_cond_wait can return
-					     // spuriously and we need to
-					     // check there whether the return
-					     // is spurious or not
-            {
-	      wrapper->data_has_been_copied = true;
-              ThreadMutex::ScopedLock lock (wrapper->mutex);
-              wrapper->condition.signal ();
-            }
-
-                                             // call the
-                                             // function. since an
-                                             // exception that is
-                                             // thrown from one of the
-                                             // called functions will
-                                             // not propagate to the
-                                             // main thread, it will
-                                             // kill the program if
-                                             // not treated here
-                                             // before we return to
-                                             // the operating system's
-                                             // thread library
-            internal::register_thread ();
-            try 
-              {
-                internal::call (function, thread_descriptor->ret_val);
-              }
-            catch (const std::exception &exc)
-              {
-                internal::handle_std_exception (exc);
-              }
-            catch (...)
-              {
-                internal::handle_unknown_exception ();
-              }
-            internal::deregister_thread ();
-          
-            return 0;
-          }
-    };  
-  }
-
+  
   namespace internal
   {
 				     /**
@@ -1751,7 +1506,7 @@ namespace Threads
         Thread<RT>
         operator() ()
 	  {
-	    return ThreadStarter<RT>::start_thread (function);
+	    return Thread<RT> (function);
 	  }
     
       private:
@@ -1780,7 +1535,7 @@ namespace Threads
         operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1)));
 	  }
@@ -1812,7 +1567,7 @@ namespace Threads
 		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2)));
@@ -1846,7 +1601,7 @@ namespace Threads
 		    typename std_cxx0x::tuple_element<2,ArgList>::type arg3)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
@@ -1882,7 +1637,7 @@ namespace Threads
 		    typename std_cxx0x::tuple_element<3,ArgList>::type arg4)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
@@ -1920,7 +1675,7 @@ namespace Threads
 		    typename std_cxx0x::tuple_element<4,ArgList>::type arg5)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
@@ -1960,7 +1715,7 @@ namespace Threads
 		    typename std_cxx0x::tuple_element<5,ArgList>::type arg6)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
@@ -2002,7 +1757,7 @@ namespace Threads
 		    typename std_cxx0x::tuple_element<6,ArgList>::type arg7)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
@@ -2046,7 +1801,7 @@ namespace Threads
 		    typename std_cxx0x::tuple_element<7,ArgList>::type arg8)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
@@ -2092,7 +1847,7 @@ namespace Threads
 		    typename std_cxx0x::tuple_element<8,ArgList>::type arg9)
 	  {
 	    return
-	      ThreadStarter<RT>::start_thread
+	      Thread<RT>
 	      (std_cxx0x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
