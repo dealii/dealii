@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: thread_management.cc 18205 2009-01-13 13:53:08Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009 by the deal.II authors
@@ -11,14 +11,26 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/config.h>
 
-// include all the files that form BOOST's thread implementation so that we
-// don't have to build BOOST itself only to get at this small part of it. it
-// also ensures that we use the correct compiler and flags
+#ifndef DEAL_II_CAN_USE_CXX0X
 
-#define BOOST_THREAD_POSIX
-#define BOOST_THREAD_BUILD_LIB 1
+// of the C++ compiler doesn't completely support the C++0x standard (and
+// consequently we can't use std::thread, std::mutex, etc), then include all
+// the files that form BOOST's thread implementation so that we don't have to
+// build BOOST itself only to get at this small part of it. it also ensures
+// that we use the correct compiler and flags
+#  define BOOST_THREAD_POSIX
+#  define BOOST_THREAD_BUILD_LIB 1
 
-#include <../libs/thread/src/pthread/once.cpp>
-#include <../libs/thread/src/pthread/exceptions.cpp>
-#include <../libs/thread/src/pthread/thread.cpp>
+#  ifdef DEAL_II_USE_MT_POSIX
+#    include <../libs/thread/src/pthread/once.cpp>
+#    include <../libs/thread/src/pthread/exceptions.cpp>
+#    include <../libs/thread/src/pthread/thread.cpp>
+#  else
+#    include <../libs/thread/src/win32/once.cpp>
+#    include <../libs/thread/src/win32/exceptions.cpp>
+#    include <../libs/thread/src/win32/thread.cpp>
+#  endif
+
+#endif
