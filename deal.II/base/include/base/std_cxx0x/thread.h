@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: std_cxx0x_tuple.h 16094 2008-05-14 19:18:25Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009 by the deal.II authors
