@@ -20,10 +20,18 @@
 // the files that form BOOST's thread implementation so that we don't have to
 // build BOOST itself only to get at this small part of it. it also ensures
 // that we use the correct compiler and flags
-#  define BOOST_THREAD_POSIX
 #  define BOOST_THREAD_BUILD_LIB 1
+#  define DBOOST_ALL_NO_LIB 1
 
 #  ifdef DEAL_II_USE_MT_POSIX
+#    define BOOST_THREAD_POSIX
+#    include <cstdint>
+#    include <boost/cstdint.hpp>
+
+#    ifndef UINTMAX_C
+#      define UINTMAX_C(x) x ## ULL
+#    endif
+
 #    include <../libs/thread/src/pthread/once.cpp>
 #    include <../libs/thread/src/pthread/exceptions.cpp>
 #    include <../libs/thread/src/pthread/thread.cpp>
