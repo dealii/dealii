@@ -2727,7 +2727,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 				   // Array for z-coordinates of points.
 				   // The elevation determined by a function if spacedim=2
 				   // or the z-cooridate of the grid point if spacedim=3
-  double heights[4];
+  double heights[4] = { 0, 0, 0, 0 };
 
 				   // compute the cells for output and
 				   // enter them into the set above
