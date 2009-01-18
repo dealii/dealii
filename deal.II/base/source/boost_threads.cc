@@ -13,7 +13,7 @@
 
 #include <base/config.h>
 
-#ifndef DEAL_II_CAN_USE_CXX0X
+#if (DEAL_II_USE_MT == 1) && !defined(DEAL_II_CAN_USE_CXX0X)
 
 // of the C++ compiler doesn't completely support the C++0x standard (and
 // consequently we can't use std::thread, std::mutex, etc), then include all
