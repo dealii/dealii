@@ -1138,6 +1138,18 @@ AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
        [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
        )
 
+  dnl Make sure we don't run into GCC bug 35569
+  AC_MSG_CHECKING(for std::bind works with rvalues)
+  AC_TRY_COMPILE(
+       [#include <functional>
+        void f(int); ], 
+       [ using namespace std;
+         using namespace std::placeholders;
+         bind(multiplies<int>(),4,_1)(5); ;],
+       [ AC_MSG_RESULT(yes) ],
+       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       )
+
   AC_MSG_CHECKING(for std::shared_ptr)
   AC_TRY_COMPILE(
        [#include <memory>], 
