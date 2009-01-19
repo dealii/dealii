@@ -30,3 +30,14 @@ TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension>;
                                    DoFHandler<deal_II_dimension>;
                                    hp::DoFHandler<deal_II_dimension>;
 		                   MGDoFHandler<deal_II_dimension> }
+
+SPARSITY_PATTERNS := { SparsityPattern;
+                       CompressedSparsityPattern;
+                       CompressedSetSparsityPattern;
+                       CompressedSimpleSparsityPattern;
+                       @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@; }
+
+BLOCK_SPARSITY_PATTERNS := { BlockSparsityPattern;
+                             BlockCompressedSparsityPattern;
+                             BlockCompressedSetSparsityPattern;
+                             BlockCompressedSimpleSparsityPattern; }
