@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,6 +11,7 @@
 //
 //--------------------------------------------------------------------
 
+#include "../tests.h"
 
 #include <base/exceptions.h>
 #include <lac/vector_memory.h>
