@@ -353,6 +353,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Changed: The classes Threads::ThreadMutex and Threads::ThreadCondition have
+  been renamed Threads::Mutex and Threads::ConditionVariable. The old names
+  were somewhat redundant but have been retained as typedefs for compatibility.
+  <br> 
+  (Martin Kronbichler 2009/01/14)
+  </p>
+
+  <li>
+  <p>
   New: There is now a class TimerOutput that allows to neatly measure computing
   times in different sections of a program and write that information to screen.
   <br> 

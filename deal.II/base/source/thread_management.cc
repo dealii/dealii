@@ -143,31 +143,6 @@ namespace Threads
 #else
 #  ifdef DEAL_II_USE_MT_POSIX
 
-  PosixThreadMutex::PosixThreadMutex ()
-  {
-    pthread_mutex_init (&mutex, 0);
-  }
-
-
-
-  PosixThreadMutex::~PosixThreadMutex ()
-  {
-    pthread_mutex_destroy (&mutex);
-  }
-
-
-  PosixThreadCondition::PosixThreadCondition ()
-  {
-    pthread_cond_init (&cond, 0);
-  }
-
-
-
-  PosixThreadCondition::~PosixThreadCondition ()
-  {
-    pthread_cond_destroy (&cond);
-  }
-  
 
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,

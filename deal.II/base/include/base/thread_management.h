@@ -23,20 +23,14 @@
 
 #if (DEAL_II_USE_MT == 1)
 #  include <base/std_cxx0x/thread.h>
+#  include <base/std_cxx0x/mutex.h>
+#  include <base/std_cxx0x/condition_variable.h>
 #endif
 
 #include <iterator>
 #include <vector>
 #include <list>
 #include <utility>
-
-
-#if DEAL_II_USE_MT == 1
-#  if defined(DEAL_II_USE_MT_POSIX)
-#    include <pthread.h>
-#  endif
-#endif
-
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -268,15 +262,13 @@ namespace Threads
   
   
 #if DEAL_II_USE_MT == 1
-#  if defined(DEAL_II_USE_MT_POSIX)
 
 				   /**
-				    * Class implementing a Mutex with
-				    * the help of POSIX functions.
+				    * Class implementing a Mutex.
 				    *
-				    * @author Wolfgang Bangerth, 2002, 2003
+				    * @author Wolfgang Bangerth, 2002, 2003, 2009
 				    */
-  class PosixThreadMutex 
+  class Mutex 
   {
     public:
                                        /**
@@ -319,7 +311,7 @@ namespace Threads
                                             * Constructor. Lock the
                                             * mutex.
                                             */
-          ScopedLock (PosixThreadMutex &m) : mutex(m) { mutex.acquire(); }
+          ScopedLock (Mutex &m) : mutex(m) { mutex.acquire(); }
 
                                            /**
                                             * Destructor. Unlock the
@@ -334,85 +326,54 @@ namespace Threads
                                             * Store the address of the
                                             * mutex object.
                                             */
-          PosixThreadMutex &mutex;
+          Mutex &mutex;
       };
-      
-				       /**
-					* Constructor. Initialize the
-					* underlying POSIX mutex data
-					* structure.
-					*/
-      PosixThreadMutex ();
-
-				       /**
-					* Destructor. Release all
-					* resources.
-					*/
-      ~PosixThreadMutex ();
       
 				       /**
 					* Acquire a mutex.
 					*/
-      inline void acquire () { pthread_mutex_lock(&mutex); }
+      inline void acquire () { mutex.lock(); }
 
 				       /**
 					* Release the mutex again.
 					*/
-      inline void release () { pthread_mutex_unlock(&mutex); }
+      inline void release () { mutex.unlock(); }
 
     private:
 				       /**
 					* Data object storing the
-					* POSIX data which we need to
-					* call the POSIX functions.
+					* mutex data
 					*/
-      pthread_mutex_t mutex;
+      std_cxx0x::mutex mutex;
 
                                        /**
                                         * Make the class implementing
-                                        * condition variables a
-                                        * friend, since it needs
-                                        * access to the
-                                        * <tt>pthread_mutex_t</tt>
-                                        * structure.
+                                        * condition variables a friend, since
+                                        * it needs to access the mutex.
                                         */
-      friend class PosixThreadCondition;
+      friend class ConditionVariable;
   };
 
 
 				   /**
 				    * Class implementing a condition
-				    * variable with the help of POSIX
-				    * functions. The semantics of this
+				    * variable. The semantics of this
 				    * class and its member functions
 				    * are the same as those of the
 				    * POSIX functions.
 				    *
 				    * @author Wolfgang Bangerth, 2003
 				    */
-  class PosixThreadCondition
+  class ConditionVariable
   {
     public:
-				       /**
-					* Constructor. Initialize the
-					* underlying POSIX condition
-					* variable data structure.
-					*/
-      PosixThreadCondition ();
-
-				       /**
-					* Destructor. Release all
-					* resources.
-					*/
-      ~PosixThreadCondition ();
-      
 				       /**
 					* Signal to a single listener
 					* that a condition has been
 					* met, i.e. that some data
 					* will now be available.
 					*/
-      inline void signal () { pthread_cond_signal(&cond); }
+      inline void signal () { condition_variable.notify_one(); }
 
 				       /**
 					* Signal to multiple listener
@@ -420,7 +381,7 @@ namespace Threads
 					* met, i.e. that some data
 					* will now be available.
 					*/
-      inline void broadcast () { pthread_cond_broadcast(&cond); }
+      inline void broadcast () { condition_variable.notify_all(); }
 
 				       /**
 					* Wait for the condition to be
@@ -432,17 +393,24 @@ namespace Threads
 					* of <tt>posix_cond_wait</tt> for a
 					* description of the
 					* mechanisms.
+					*
+					* The mutex is assumed held at the
+					* entry to this function but is
+					* released upon exit.
 					*/
-      inline void wait (PosixThreadMutex &mutex)
-        { pthread_cond_wait(&cond, &mutex.mutex); }
+      inline void wait (Mutex &mutex)
+        {
+	  std_cxx0x::unique_lock<std_cxx0x::mutex> lock(mutex.mutex,
+							std_cxx0x::adopt_lock);
+	  condition_variable.wait (lock);
+	}
 
     private:
 				       /**
 					* Data object storing the
-					* POSIX data which we need to
-					* call the POSIX functions.
+					* necessary data.
 					*/
-      pthread_cond_t cond;
+      std_cxx0x::condition_variable condition_variable;
   };
 
 
@@ -521,20 +489,24 @@ namespace Threads
 
 
                                    /**
-                                    * If using POSIX functions, then
-                                    * alias the POSIX wrapper classes
-                                    * to the names we use throughout
-                                    * the library.
+                                    * Provide a backward compatible name (we
+                                    * used ThreadMutex up to release 6.1, but
+                                    * since it is already in a namespace
+                                    * Threads this seems redundant).
+				    *
+				    * @deprecated
                                     */
-  typedef PosixThreadMutex     ThreadMutex;
+  typedef Mutex     ThreadMutex;
 
                                    /**
-                                    * If using POSIX functions, then
-                                    * alias the POSIX wrapper classes
-                                    * to the names we use throughout
-                                    * the library.
+                                    * Provide a backward compatible name (we
+                                    * used ThreadCondition up to release 6.1,
+                                    * but since it is already in a namespace
+                                    * Threads this seems redundant).
+				    *
+				    * @deprecated
                                     */
-  typedef PosixThreadCondition ThreadCondition;  
+  typedef ConditionVariable ThreadCondition;  
 
                                    /**
                                     * If using POSIX functions, then
@@ -544,9 +516,6 @@ namespace Threads
                                     */
   typedef PosixThreadBarrier   Barrier;
 
-#  else
-#    error Not Implemented
-#  endif
 #else
 				   /**
 				    * In non-multithread mode, the
