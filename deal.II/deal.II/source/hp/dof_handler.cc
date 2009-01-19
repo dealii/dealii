@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,10 +54,10 @@ namespace internal
 				      * represented, i.e. zero for
 				      * vertices, one for lines, etc.
 				      */
-    template <int dim, int structdim>
+    template <int structdim, int dim, int spacedim>
     void
-    ensure_existence_of_dof_identities (const FiniteElement<dim> &fe1,
-					const FiniteElement<dim> &fe2,
+    ensure_existence_of_dof_identities (const FiniteElement<dim,spacedim> &fe1,
+					const FiniteElement<dim,spacedim> &fe2,
 					std_cxx0x::shared_ptr<DoFIdentities> &identities)
     {
 				       // see if we need to fill this
@@ -117,7 +117,7 @@ namespace internal
                                       * dominating finite element that
                                       * lives on this object.
                                       */
-    template <int dim, typename iterator>
+    template <int dim, int spacedim, typename iterator>
     unsigned int
     get_most_dominating_fe_index (const iterator &object)
     {
@@ -125,7 +125,7 @@ namespace internal
       for (; dominating_fe_index<object->n_active_fe_indices();
            ++dominating_fe_index)
         {
-          const FiniteElement<dim> &this_fe
+          const FiniteElement<dim, spacedim> &this_fe
             = object->get_fe (object->nth_active_fe_index(dominating_fe_index));
 			
           FiniteElementDomination::Domination
@@ -135,7 +135,8 @@ namespace internal
                ++other_fe_index)
             if (other_fe_index != dominating_fe_index)
               {
-                const FiniteElement<dim> &that_fe
+                const FiniteElement<dim, spacedim>
+		  &that_fe
                   = object->get_fe (object->nth_active_fe_index(other_fe_index));
 			      
                 domination = domination &
@@ -316,8 +317,8 @@ namespace internal
 	    {
 	      const unsigned int dim = 1;
 	      
-	      const FiniteElement<1> &fe       = cell->get_fe();
-	      const unsigned int      fe_index = cell->active_fe_index ();
+	      const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
+	      const unsigned int                 fe_index = cell->active_fe_index ();
     
 					       // number dofs on vertices. to do
 					       // so, check whether dofs for
@@ -361,8 +362,8 @@ namespace internal
 	    {
 	      const unsigned int dim = 2;
 
-	      const FiniteElement<2> &fe       = cell->get_fe();
-	      const unsigned int      fe_index = cell->active_fe_index ();
+	      const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
+	      const unsigned int                 fe_index = cell->active_fe_index ();
     
 					       // number dofs on vertices. to do
 					       // so, check whether dofs for
@@ -424,8 +425,8 @@ namespace internal
 	    {
 	      const unsigned int dim = 3;
 
-	      const FiniteElement<3> &fe       = cell->get_fe();
-	      const unsigned int      fe_index = cell->active_fe_index ();
+	      const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
+	      const unsigned int                 fe_index = cell->active_fe_index ();
     
 					       // number dofs on vertices. to do
 					       // so, check whether dofs for
@@ -2988,7 +2989,7 @@ namespace hp
 						 // entry in the
 						 // equivalence
 						 // table exists
-		internal::hp::ensure_existence_of_dof_identities<dim,0>
+		internal::hp::ensure_existence_of_dof_identities<0>
 		  (get_fe()[first_fe_index],
 		   get_fe()[other_fe_index],
 		   vertex_dof_identities[first_fe_index][other_fe_index]);
@@ -3053,7 +3054,13 @@ namespace hp
 
   template <>
   void
-  DoFHandler<1>::
+  DoFHandler<1,1>::
+  compute_line_dof_identities (std::vector<unsigned int> &) const
+  {}
+
+  template <>
+  void
+  DoFHandler<1,2>::
   compute_line_dof_identities (std::vector<unsigned int> &) const
   {}
 
@@ -3122,7 +3129,7 @@ namespace hp
 		  &&
 		  ((*finite_elements)[fe_index_1].dofs_per_line > 0))
 		{
-		  internal::hp::ensure_existence_of_dof_identities<dim,1>
+		  internal::hp::ensure_existence_of_dof_identities<1>
 		    ((*finite_elements)[fe_index_1],
 		     (*finite_elements)[fe_index_2],
 		     line_dof_identities[fe_index_1][fe_index_2]);
@@ -3226,7 +3233,7 @@ namespace hp
 					     // element of the ones that
 					     // are used on this line
 	    const unsigned int most_dominating_fe_index
-	      = internal::hp::get_most_dominating_fe_index<dim> (line);
+	      = internal::hp::get_most_dominating_fe_index<dim,spacedim> (line);
 
 	    const unsigned int n_active_fe_indices
 	      = line->n_active_fe_indices ();
@@ -3244,7 +3251,7 @@ namespace hp
 		  const unsigned int
 		    other_fe_index = line->nth_active_fe_index (f);
 
-		  internal::hp::ensure_existence_of_dof_identities<dim,1>
+		  internal::hp::ensure_existence_of_dof_identities<1>
 		    ((*finite_elements)[most_dominating_fe_index],
 		     (*finite_elements)[other_fe_index],
 		     line_dof_identities[most_dominating_fe_index][other_fe_index]);
@@ -3345,7 +3352,7 @@ namespace hp
                                            // element of the ones that
                                            // are used on this quad
           const unsigned int most_dominating_fe_index
-            = internal::hp::get_most_dominating_fe_index<dim> (quad);
+            = internal::hp::get_most_dominating_fe_index<dim,spacedim> (quad);
 
 	  const unsigned int n_active_fe_indices
 	    = quad->n_active_fe_indices ();
@@ -3363,7 +3370,7 @@ namespace hp
                 const unsigned int
                   other_fe_index = quad->nth_active_fe_index (f);
 
-                internal::hp::ensure_existence_of_dof_identities<dim,2>
+                internal::hp::ensure_existence_of_dof_identities<2>
                   ((*finite_elements)[most_dominating_fe_index],
                    (*finite_elements)[other_fe_index],
                    quad_dof_identities[most_dominating_fe_index][other_fe_index]);
@@ -3970,7 +3977,7 @@ namespace hp
   template class DoFHandler<deal_II_dimension>;
 
 #if deal_II_dimension != 3
-  //  template class DoFHandler<deal_II_dimension, deal_II_dimension+1>;
+  template class DoFHandler<deal_II_dimension, deal_II_dimension+1>;
 #endif
 
 
