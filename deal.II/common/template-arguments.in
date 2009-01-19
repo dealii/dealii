@@ -35,9 +35,10 @@ SPARSITY_PATTERNS := { SparsityPattern;
                        CompressedSparsityPattern;
                        CompressedSetSparsityPattern;
                        CompressedSimpleSparsityPattern;
-                       @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@; }
+                       @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@;
 
-BLOCK_SPARSITY_PATTERNS := { BlockSparsityPattern;
-                             BlockCompressedSparsityPattern;
-                             BlockCompressedSetSparsityPattern;
-                             BlockCompressedSimpleSparsityPattern; }
+                       BlockSparsityPattern;
+                       BlockCompressedSparsityPattern;
+                       BlockCompressedSetSparsityPattern;
+                       BlockCompressedSimpleSparsityPattern;
+                       @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
