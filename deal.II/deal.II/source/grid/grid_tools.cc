@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1343,24 +1343,32 @@ void GridTools::scale<deal_II_dimension, deal_II_dimension+1> (const double,
 
 
 
-template
-std::list<std::pair<Triangulation<deal_II_dimension,deal_II_dimension+1>::cell_iterator,
-                    Triangulation<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
-GridTools::
-get_finest_common_cells (const Triangulation<deal_II_dimension,deal_II_dimension+1> &mesh_1,
-                         const Triangulation<deal_II_dimension,deal_II_dimension+1> &mesh_2);
-
-template
-std::list<std::pair<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator,
-                    DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
-GridTools::
-get_finest_common_cells (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
-                         const DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
-
 #endif
 
 
 #include "grid_tools.inst"
+
+#if deal_II_dimension < 3
+
+template
+    std::list<std::pair<Triangulation<deal_II_dimension,deal_II_dimension+1>::cell_iterator, Triangulation<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
+    GridTools::
+    get_finest_common_cells (const Triangulation<deal_II_dimension,deal_II_dimension+1> &mesh_1,
+			     const Triangulation<deal_II_dimension,deal_II_dimension+1> &mesh_2);
+
+template
+    std::list<std::pair<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator, DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
+    GridTools::
+    get_finest_common_cells (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
+			     const DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
+
+template
+    std::list<std::pair<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator, hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
+    GridTools::
+    get_finest_common_cells (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
+			     const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
