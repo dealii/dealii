@@ -19,7 +19,6 @@
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
@@ -461,18 +460,12 @@ void VectorTools::project (const Mapping<dim, spacedim>       &mapping,
 
 				   // set up mass matrix and right hand side
   Vector<double> vec (dof.n_dofs());
-  SparsityPattern sparsity;
-
-				   // use csp to consume less memory and to
-				   // still be fast
-  {
-    CompressedSimpleSparsityPattern csp (dof.n_dofs(), dof.n_dofs());
-    DoFTools::make_sparsity_pattern (dof, csp);
-    constraints.condense(csp);
-
-    sparsity.copy_from (csp);
-  }
-
+  SparsityPattern sparsity(dof.n_dofs(),
+			   dof.n_dofs(),
+			   dof.max_couplings_between_dofs());
+  DoFTools::make_sparsity_pattern (dof, sparsity);
+  constraints.condense (sparsity);
+  
   SparseMatrix<double> mass_matrix (sparsity);
   Vector<double> tmp (mass_matrix.n());
 
