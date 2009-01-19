@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,8 @@ void test ()
     partition[i] = 3;
 
   dealii::BlockVector<double>	b(partition);
-  assert (b.n_blocks() == partition.size());
+  Assert (b.n_blocks() == partition.size(),
+	  ExcInternalError());
 
   unsigned int			size = 0;
   for (unsigned int i = 0; i < b.n_blocks(); ++i)
