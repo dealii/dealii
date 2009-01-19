@@ -1,0 +1,117 @@
+//---------------------------------------------------------------------------
+//    $Id: dof_accessor.cc 16656 2008-08-22 19:39:29Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 2009 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (SP : SPARSITY_PATTERNS)
+  {
+    template void
+    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension> &dof,
+     SP    &sparsity,
+     const ConstraintMatrix &,
+     const bool);
+
+    template void
+    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
+    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof,
+     SP    &sparsity,
+     const ConstraintMatrix &,
+     const bool);
+
+    template void 
+    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension>&,
+     const Table<2,Coupling>&,
+     SP &,
+     const ConstraintMatrix &,
+     const bool);
+
+    template void 
+    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
+    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension>&,
+     const Table<2,Coupling>&,
+     SP &,
+     const ConstraintMatrix &,
+     const bool);
+
+    template void
+    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension> &dof_row,
+     const DoFHandler<deal_II_dimension,deal_II_dimension> &dof_col,
+     SP    &sparsity);
+
+    template void
+    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
+    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof_row,
+     const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof_col,
+     SP    &sparsity);
+  }
+
+for (SP : SPARSITY_PATTERNS)
+  {
+#if deal_II_dimension < 3
+
+    template void
+    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+     SP    &sparsity,
+     const ConstraintMatrix &,
+     const bool);
+
+    template void
+    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
+    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+     SP    &sparsity,
+     const ConstraintMatrix &,
+     const bool);
+
+    template void 
+    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+     const Table<2,Coupling>&,
+     SP &,
+     const ConstraintMatrix &,
+     const bool);
+
+    template void 
+    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
+    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+     const Table<2,Coupling>&,
+     SP &,
+     const ConstraintMatrix &,
+     const bool);
+
+    template void
+    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+     const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+     SP    &sparsity);
+
+    template void
+    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
+    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+     const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+     SP    &sparsity);
+#endif
+  }
+
+
+
+
+for (DH : DOFHANDLERS)
+{
+  template
+  void
+  DoFTools::make_hanging_node_constraints (const DH &dof_handler,
+			 		   ConstraintMatrix &constraints);
+}
