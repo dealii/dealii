@@ -25,7 +25,6 @@
 
 #  ifdef DEAL_II_USE_MT_POSIX
 #    define BOOST_THREAD_POSIX
-#    include <cstdint>
 #    include <boost/cstdint.hpp>
 
 #    ifndef UINTMAX_C
