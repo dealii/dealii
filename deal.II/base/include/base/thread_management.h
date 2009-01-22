@@ -264,7 +264,30 @@ namespace Threads
 #if DEAL_II_USE_MT == 1
 
 				   /**
-				    * Class implementing a Mutex.
+				    * Class implementing a
+				    * Mutex. Mutexes are used to lock
+				    * data structures to ensure that
+				    * only a single thread of
+				    * execution can access them at the
+				    * same time.
+				    *
+				    * <h3>Copy semantics</h3>
+				    *
+				    * When copied, the receiving
+				    * object does not receive any
+				    * state from the object being
+				    * copied, i.e. an entirely new
+				    * mutex is created. This is
+				    * consistent with expectations if
+				    * a mutex is used as a member
+				    * variable to lock the other
+				    * member variables of a class: in
+				    * that case, the mutex of the
+				    * copied-to object should only
+				    * guard the members of the
+				    * copied-to object, not the
+				    * members of both the copied-to
+				    * and copied-from object.
 				    *
 				    * @author Wolfgang Bangerth, 2002, 2003, 2009
 				    */
@@ -328,6 +351,25 @@ namespace Threads
                                             */
           Mutex &mutex;
       };
+
+				       /**
+					* Default constructor.
+					*/
+      Mutex ()
+	{}
+
+				       /**
+					* Copy constructor. As
+					* discussed in this class's
+					* documentation, no state is
+					* copied from the object given
+					* as argument.
+					*/
+      Mutex (const Mutex &)
+		      :
+		      mutex()
+	{}
+      
       
 				       /**
 					* Acquire a mutex.
