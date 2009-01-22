@@ -1260,7 +1260,32 @@ namespace Threads
 	void thread_entry_point (const std_cxx0x::function<RT ()> function,
 				 return_value<RT> *ret_val)
 	  {
-	    call (function, *ret_val);
+					     // now call the function
+					     // in question. since an
+                                             // exception that is
+                                             // thrown from one of the
+                                             // called functions will
+                                             // not propagate to the
+                                             // main thread, it will
+                                             // kill the program if
+                                             // not treated here
+                                             // before we return to
+                                             // the operating system's
+                                             // thread library
+            internal::register_thread ();
+            try 
+              {
+                call (function, *ret_val);
+              }
+            catch (const std::exception &exc)
+              {
+                internal::handle_std_exception (exc);
+              }
+            catch (...)
+              {
+                internal::handle_unknown_exception ();
+              }
+            internal::deregister_thread ();
 	  }
     };
 
