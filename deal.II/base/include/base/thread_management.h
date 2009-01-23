@@ -568,6 +568,7 @@ namespace Threads
 				    * objects. Likewise for the
 				    * barrier class.
 				    */
+  typedef DummyThreadMutex     Mutex;
   typedef DummyThreadMutex     ThreadMutex;
 
 				   /**
@@ -579,7 +580,8 @@ namespace Threads
 				    * objects. Likewise for the
 				    * barrier class.
 				    */
-  typedef DummyThreadCondition ThreadCondition;  
+  typedef DummyThreadCondition ConditionVariable;
+  typedef DummyThreadCondition ThreadCondition;
 
 				   /**
 				    * In non-multithread mode, the
