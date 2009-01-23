@@ -28,6 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace std_cxx0x
 {
   using boost::shared_ptr;
+  using boost::enable_shared_from_this;
 }
 DEAL_II_NAMESPACE_CLOSE
 

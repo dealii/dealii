@@ -1214,10 +1214,49 @@ namespace Threads
 				      * objects per thread, several
 				      * Threads::Thread objects may refer to
 				      * this descriptor.
+				      *
+				      * Note, however, that since this
+				      * object holds the location
+				      * where we store the return
+				      * value of the thread, the
+				      * object has to live at least as
+				      * long as the thread
+				      * executes. This means that even
+				      * if all Threads::Thread objects
+				      * that refered to this
+				      * descriptor (through a
+				      * std::shared_ptr) have gone out
+				      * of scope, we must still hold
+				      * on to the object. We do this
+				      * by having the descriptor keep
+				      * a pointer to itself and reset
+				      * it to zero once it is done --
+				      * effectly keeping the use
+				      * pointer above zero as long as
+				      * work is going on.
+				      *
+				      * To enable the current class to
+				      * obtain a shared_ptr from
+				      * itself, we derive from the
+				      * class
+				      * std::enable_shared_from_this.
 				      */
     template <typename RT>
-    struct ThreadDescriptor 
+    struct ThreadDescriptor : public std_cxx0x::enable_shared_from_this<ThreadDescriptor<RT> >
     {
+					 /**
+					  * A pointer to the current
+					  * object, kept nonzero as
+					  * long as the thread is
+					  * executing to avoid
+					  * destroying the current
+					  * object while we are still
+					  * expecting to write
+					  * something into the return
+					  * value location.
+					  */
+	std_cxx0x::shared_ptr<ThreadDescriptor<RT> > self;
+
 					 /**
 					  * An object that represents the
 					  * thread started.
@@ -1232,14 +1271,39 @@ namespace Threads
         return_value<RT> ret_val;
 
 					 /**
-					  * Constructor. Start the thread and
-					  * let it put its return value into
-					  * the ret_val object.
+					  * Start the thread and let
+					  * it put its return value
+					  * into the ret_val object.
+					  *
+					  * Note that we cannot
+					  * already do this in the
+					  * constructor of this class:
+					  * we will call
+					  * enable_shared_from_this::shared_from_this
+					  * which requires that there
+					  * is already a shared_ptr
+					  * that owns this object;
+					  * however, at the time of
+					  * creation, there can of
+					  * course be no shared_ptr
+					  * that owns the object -- it
+					  * is, after all, just being
+					  * created and can not
+					  * already have been handed
+					  * off to a shared_ptr; as a
+					  * consequence, we first
+					  * create the object, give it
+					  * to a shared_ptr, and then
+					  * call shared_from_this.
 					  */
-	ThreadDescriptor (const std_cxx0x::function<RT ()> &function)
-			:
-			thread (thread_entry_point, function, &ret_val)
-	  {}
+	void start (const std_cxx0x::function<RT ()> &function)
+	  {
+					     // set the self pointer
+					     // and then start the
+					     // thread
+	    self = this->shared_from_this ();
+	    thread = std_cxx0x::thread (thread_entry_point, function, this);
+	  }
 
 
 					 /**
@@ -1258,7 +1322,7 @@ namespace Threads
 					  */
 	static
 	void thread_entry_point (const std_cxx0x::function<RT ()> function,
-				 return_value<RT> *ret_val)
+				 ThreadDescriptor<RT> *descriptor)
 	  {
 					     // now call the function
 					     // in question. since an
@@ -1275,7 +1339,7 @@ namespace Threads
             internal::register_thread ();
             try 
               {
-                call (function, *ret_val);
+                call (function, descriptor->ret_val);
               }
             catch (const std::exception &exc)
               {
@@ -1286,6 +1350,24 @@ namespace Threads
                 internal::handle_unknown_exception ();
               }
             internal::deregister_thread ();
+
+					     // once we are done,
+					     // we can release our
+					     // hold on the thread
+					     // descriptor
+					     // object. if all
+					     // Threads::Thread
+					     // object that
+					     // pointed here
+					     // should have gone
+					     // out of scope
+					     // already, then this
+					     // will trigger
+					     // destruction of the
+					     // descriptor object
+	    Assert (descriptor->self.use_count () > 0,
+		    ExcInternalError());
+	    descriptor->self.reset ();
 	  }
     };
 
@@ -1313,11 +1395,11 @@ namespace Threads
         return_value<RT> ret_val;
 
 					 /**
-					  * Constructor. Start the thread and
+					  * Start the thread and
 					  * let it put its return value into
 					  * the ret_val object.
 					  */
-	ThreadDescriptor (const std_cxx0x::function<RT ()> &function)
+	void start (const std_cxx0x::function<RT ()> &function)
 	  {
 	    call (function, ret_val);
 	  }
@@ -1334,14 +1416,30 @@ namespace Threads
   
 
                                    /**
-                                    * User visible class describing a
-                                    * thread. Relays all real calls to
-                                    * the internal thread object
-                                    * abstracting the operating
-                                    * system's functions, to which it
-                                    * keeps a shared pointer. This
-                                    * object can be freely copied
-                                    * around in user space.
+                                    * An object that represents a
+                                    * spawned thread. This object can
+                                    * be freely copied around in user
+                                    * space, and all instances will
+                                    * represent the same thread and
+                                    * can require to wait for its
+                                    * termination and access its
+                                    * return value.
+				    *
+				    * Threads can be abandoned,
+				    * i.e. if you just call
+				    * Threads::new_thread but don't
+				    * care about the returned object,
+				    * or if you assign the return
+				    * Threads::Thread object to an
+				    * object that subsequently goes
+				    * out of scope, then the thread
+				    * previously created will still
+				    * continue to do work. You will
+				    * simply not be able to access its
+				    * return value any more, and it
+				    * may also happen that your
+				    * program terminates before the
+				    * thread has finished its work.
                                     *
                                     * The default value of the
                                     * template argument is <tt>void</tt>,
@@ -1363,8 +1461,20 @@ namespace Threads
                                         */
       Thread (const std_cxx0x::function<RT ()> &function)
 		      :
-		      thread_descriptor (new internal::ThreadDescriptor<RT>(function))
-	{}
+		      thread_descriptor (new internal::ThreadDescriptor<RT>())
+	{
+					   // in a second step, start
+					   // the thread. this needs
+					   // to be done in two steps
+					   // because inside the start
+					   // function we call
+					   // enable_shared_from_this::shared_from_this
+					   // which requires that
+					   // there is already a
+					   // shared_ptr that owns the
+					   // object
+	  thread_descriptor->start (function);
+	}
 
                                        /**
                                         * Default constructor. You
@@ -1441,6 +1551,29 @@ namespace Threads
                                         * sure that that object lives
                                         * as long as there is at least
                                         * one subscriber to it.
+					*
+					* Note that since the
+					* descriptor holds the
+					* location where the return
+					* value is stored, even if all
+					* Threads::Thread objects that
+					* point to the descriptor go
+					* out of scope, we must make
+					* sure that the descriptor is
+					* not yet destroyed. Rather,
+					* the descriptor must be
+					* destroyed when the last
+					* Threads::Thread object that
+					* points to it goes out of
+					* scope or whenever the thread
+					* is finished, whatever
+					* happens later. We do this by
+					* having the descriptor keep a
+					* pointer to itself and reset
+					* it to zero once it is done
+					* -- effectly keeping the use
+					* pointer above zero as long
+					* as work is going on.
                                         */
       std_cxx0x::shared_ptr<internal::ThreadDescriptor<RT> > thread_descriptor;
   };
