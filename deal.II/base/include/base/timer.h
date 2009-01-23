@@ -16,6 +16,10 @@
 #include <base/config.h>
 #include <base/conditional_ostream.h>
 
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#include <mpi.h>
+#endif
+
 #include <string>
 #include <list>
 #include <map>
@@ -72,6 +76,24 @@ class Timer
 				      * Constructor. Starts the timer at 0 sec.
 				      */
     Timer ();
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+				     /**
+				      * Constructor that takes an MPI
+				      * communicator as input. A timer
+				      * constructed this way will sum up the
+				      * CPU times over all processors in the
+				      * MPI network when requested by the
+				      * operator ().
+				      * 
+				      * Starts the timer at 0 sec.
+				      *
+				      * This constructor is only available
+				      * if the deal.II compiler is an MPI
+				      * compiler.
+				      */
+    Timer (MPI_Comm mpi_communicator);
+#endif
 
 				     /**
 				      * Re-start the timer at the point where
@@ -170,6 +192,14 @@ class Timer
 				      * running.
 				      */
     bool                running;
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+				     /**
+				      * Store whether the timer is presently
+				      * running.
+				      */
+    MPI_Comm            mpi_communicator;
+#endif
 };
 
 
@@ -222,6 +252,40 @@ class TimerOutput
     TimerOutput (ConditionalOStream        &stream, 
 		 const enum OutputFrequency output_frequency,
 		 const enum OutputType      output_type);
+    
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+				     /**
+				      * Constructor that takes an MPI
+				      * communicator as input. A timer
+				      * constructed this way will sum up the
+				      * CPU times over all processors in the
+				      * MPI network for calculating the CPU
+				      * time.
+				      *
+				      * Meant for using std::cout as output
+				      * stream.
+				      */
+    TimerOutput (MPI_Comm                   mpi_comm,
+		 std::ostream              &stream, 
+		 const enum OutputFrequency output_frequency,
+		 const enum OutputType      output_type);
+
+				     /**
+				      * Constructor that takes an MPI
+				      * communicator as input. A timer
+				      * constructed this way will sum up the
+				      * CPU times over all processors in the
+				      * MPI network for calculating the CPU
+				      * time.
+				      *
+				      * Constructor that takes a
+				      * ConditionalOStream to write output to.
+				      */
+    TimerOutput (MPI_Comm                   mpi_comm,
+		 ConditionalOStream        &stream, 
+		 const enum OutputFrequency output_frequency,
+		 const enum OutputType      output_type);
+#endif
 
 				     /**
 				      * Destructor. Calls print_summary() in
@@ -298,6 +362,14 @@ class TimerOutput
 				      * function.
 				      */
     std::list<std::string> active_sections;
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+				     /**
+				      * Store whether the timer is presently
+				      * running.
+				      */
+    MPI_Comm            mpi_communicator;
+#endif
 };
 
 DEAL_II_NAMESPACE_CLOSE

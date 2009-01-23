@@ -255,6 +255,9 @@ namespace FEValuesViews
       if (shape_function_data[shape_function].is_nonzero_shape_function_component)
 	{
 	  const double value = dof_values(shape_function);
+	  if (value == 0.)
+	    continue;
+
 	  const double * shape_value_ptr = 
 	    &fe_values.shape_values(shape_function_data[shape_function].row_index, 0);
 	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
@@ -294,6 +297,9 @@ namespace FEValuesViews
       if (shape_function_data[shape_function].is_nonzero_shape_function_component)
 	{
 	  const double value = dof_values(shape_function);
+	  if (value == 0.)
+	    continue;
+
 	  const Tensor<1,spacedim> * shape_gradient_ptr = 
 	    &fe_values.shape_gradients[shape_function_data[shape_function].
 				       row_index][0];
@@ -334,6 +340,9 @@ namespace FEValuesViews
       if (shape_function_data[shape_function].is_nonzero_shape_function_component)
 	{
 	  const double value = dof_values(shape_function);
+	  if (value == 0.)
+	    continue;
+
 	  const Tensor<2,spacedim> * shape_hessian_ptr = 
 	    &fe_values.shape_hessians[shape_function_data[shape_function].
 				       row_index][0];
@@ -374,6 +383,9 @@ namespace FEValuesViews
       if (shape_function_data[shape_function].is_nonzero_shape_function_component)
 	{
 	  const double value = dof_values(shape_function);
+	  if (value == 0.)
+	    continue;
+
 	  const unsigned int row_index = shape_function_data[shape_function].row_index;
 	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
 	    laplacians[q_point] += 
@@ -419,6 +431,9 @@ namespace FEValuesViews
 	  continue;
 
 	const double value = dof_values(shape_function);
+	if (value == 0.)
+	  continue;
+
 	if (snc != -1)
 	  {
 	    const unsigned int comp =
@@ -478,6 +493,9 @@ namespace FEValuesViews
 	  continue;
 
 	const double value = dof_values(shape_function);
+	if (value == 0.)
+	  continue;
+
 	if (snc != -1)
 	  {
 	    const unsigned int comp = 
@@ -539,6 +557,9 @@ namespace FEValuesViews
 	  continue;
 
 	const double value = dof_values(shape_function);
+	if (value == 0.)
+	  continue;
+
 	if (snc != -1)
 	  {
 	    const unsigned int comp = 
@@ -600,6 +621,9 @@ namespace FEValuesViews
 	  continue;
 
 	const double value = dof_values(shape_function);
+	if (value == 0.)
+	  continue;
+
 	if (snc != -1)
 	  {
 	    const unsigned int comp = 
@@ -660,6 +684,9 @@ namespace FEValuesViews
 	  continue;
 
 	const double value = dof_values(shape_function);
+	if (value == 0.)
+	  continue;
+
 	if (snc != -1)
 	  {
 	    const unsigned int comp = 
@@ -720,6 +747,9 @@ namespace FEValuesViews
 	  continue;
 
 	const double value = dof_values(shape_function);
+	if (value == 0.)
+	  continue;
+
 	if (snc != -1)
 	  {
 	    const unsigned int comp =
@@ -1757,6 +1787,9 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = dof_values(shape_func);
+      if (value == 0.)
+	continue;
+
       const double *shape_value_ptr = &this->shape_values(shape_func, 0);
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	values[point] += value * *shape_value_ptr++;
@@ -1813,6 +1846,9 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = fe_function(indices[shape_func]);
+      if (value == 0.)
+	continue;
+
       const double *shape_value_ptr = &this->shape_values(shape_func, 0);
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	values[point] += value * *shape_value_ptr++;
@@ -1885,6 +1921,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = dof_values(shape_func);
+      if (value == 0.)
+	continue;
 
       if (fe->is_primitive(shape_func))
 	{
@@ -1987,6 +2025,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	if (value == 0.)
+	  continue;
 
 	if (fe->is_primitive(shape_func))
 	  {
@@ -2089,6 +2129,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	if (value == 0.)
+	  continue;
 
 	if (fe->is_primitive(shape_func))
 	  {
@@ -2187,9 +2229,11 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = dof_values(shape_func);
+      if (value == 0.)
+	continue;
+
       const Tensor<1,spacedim> *shape_gradient_ptr 
 	= &this->shape_gradients[shape_func][0];
-
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	gradients[point] += value * *shape_gradient_ptr++;
     }
@@ -2245,9 +2289,11 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = fe_function(indices[shape_func]);
+      if (value == 0.)
+	continue;
+
       const Tensor<1,spacedim> *shape_gradient_ptr 
 	= &this->shape_gradients[shape_func][0];
-
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	gradients[point] += value * *shape_gradient_ptr++;
     }
@@ -2296,6 +2342,8 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = dof_values(shape_func);
+      if (value == 0.)
+	continue;
 
       if (fe->is_primitive(shape_func))
 	{
@@ -2397,6 +2445,8 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	if (value == 0.)
+	  continue;
 
 	if (fe->is_primitive(shape_func))
 	  {
@@ -2479,9 +2529,11 @@ get_function_hessians (const InputVector           &fe_function,
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = dof_values(shape_func);
+      if (value == 0.)
+	continue;
+
       const Tensor<2,spacedim> *shape_hessians_ptr 
 	= &this->shape_hessians[shape_func][0];
-
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	hessians[point] += value * *shape_hessians_ptr++;
     }
@@ -2521,9 +2573,11 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = fe_function(indices[shape_func]);
+      if (value == 0.)
+	continue;
+
       const Tensor<2,spacedim> *shape_hessians_ptr 
 	= &this->shape_hessians[shape_func][0];
-
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	hessians[point] += value * *shape_hessians_ptr++;
     }
@@ -2569,6 +2623,8 @@ get_function_hessians (const InputVector                         &fe_function,
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = dof_values(shape_func);
+      if (value == 0.)
+	continue;
 
       if (fe->is_primitive(shape_func))
 	{
@@ -2680,6 +2736,8 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	if (value == 0.)
+	  continue;
 
 	if (fe->is_primitive(shape_func))
 	  {
@@ -2765,9 +2823,11 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = dof_values(shape_func);
+      if (value == 0.)
+	continue;
+
       const Tensor<2,spacedim> *shape_hessian_ptr 
 	= &this->shape_hessians[shape_func][0];
-
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	laplacians[point] += value * trace(*shape_hessian_ptr++);
     }
@@ -2810,9 +2870,11 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = fe_function(indices[shape_func]);
+      if (value == 0.)
+	continue;
+
       const Tensor<2,spacedim> *shape_hessian_ptr 
 	= &this->shape_hessians[shape_func][0];
-
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	laplacians[point] += value * trace(*shape_hessian_ptr++);
     }
@@ -2868,6 +2930,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
       const double value = dof_values(shape_func);
+      if (value == 0.)
+	continue;
 
       if (fe->is_primitive(shape_func))
 	{
@@ -2958,6 +3022,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	if (value == 0.)
+	  continue;
 
 	if (fe->is_primitive(shape_func))
 	  {
@@ -3062,6 +3128,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
 	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	if (value == 0.)
+	  continue;
 
 	if (fe->is_primitive(shape_func))
 	  {
