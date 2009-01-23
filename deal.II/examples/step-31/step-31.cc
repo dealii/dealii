@@ -347,7 +347,7 @@ namespace LinearSolvers
   vmult (VectorType       &dst,
 	 const VectorType &src) const
   {
-    SolverControl solver_control (src.size(), 5e-8*src.l2_norm());
+    SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
     SolverCG<VectorType> cg (solver_control);
 
     dst = 0;
@@ -1112,7 +1112,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 					     temperature_constraints);
     temperature_constraints.close ();
   }
-  
+
   std::vector<unsigned int> stokes_dofs_per_block (2);
   DoFTools::count_dofs_per_block (stokes_dof_handler, stokes_dofs_per_block,
 				  stokes_sub_blocks);
@@ -1481,33 +1481,36 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // need to tell the AMG setup that we use
 				   // quadratic basis functions for the
 				   // velocity matrix (this implies more
-				   // nonzero elements in the matrix, so that
-				   // a more rubust algorithm needs to be
-				   // chosen internally). Moreover, we want to
-				   // be able to control how the coarsening
-				   // structure is build up. The way AMG does
-				   // this is to look which matrix entries are
-				   // of similar size as the diagonal entry in
-				   // order to algebraically build a
-				   // coarse-grid structure. By setting the
-				   // parameter
+				   // nonzero elements in the matrix, so
+				   // that a more rubust algorithm needs to
+				   // be chosen internally). Moreover, we
+				   // want to be able to control how the
+				   // coarsening structure is build up. The
+				   // way the Trilinos smoothed aggregation
+				   // AMG does this is to look which matrix
+				   // entries are of similar size as the
+				   // diagonal entry in order to
+				   // algebraically build a coarse-grid
+				   // structure. By setting the parameter
 				   // <code>aggregation_threshold</code> to
-				   // 0.05, we specify that all entries that
-				   // are more than five precent of size of
-				   // some diagonal pivots in that row should
-				   // form one coarse grid point. This
-				   // parameter is rather ad-hoc, and some
-				   // fine-tuning of it can influence the
-				   // performance of the preconditioner. As a
-				   // rule of thumb, larger values of
-				   // <code>aggregation_threshold</code> will
-				   // decrease the number of iterations, but
-				   // increase the costs per iteration. A look
-				   // at the Trilinos documentation will
-				   // provide more information on these
-				   // parameters. With this data set, we then
-				   // initialize the preconditioner with the
-				   // matrix we want it to apply to.
+				   // 0.02, we specify that all entries that
+				   // are more than two precent of size of
+				   // some diagonal pivots in that row
+				   // should form one coarse grid
+				   // point. This parameter is rather
+				   // ad-hoc, and some fine-tuning of it can
+				   // influence the performance of the
+				   // preconditioner. As a rule of thumb,
+				   // larger values of
+				   // <code>aggregation_threshold</code>
+				   // will decrease the number of
+				   // iterations, but increase the costs per
+				   // iteration. A look at the Trilinos
+				   // documentation will provide more
+				   // information on these parameters. With
+				   // this data set, we then initialize the
+				   // preconditioner with the matrix we want
+				   // it to apply to.
 				   // 
 				   // Finally, we also initialize the
 				   // preconditioner for the inversion of
@@ -1529,7 +1532,8 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // object.
   amg_data.elliptic = true;
   amg_data.higher_order_elements = true;
-  amg_data.aggregation_threshold = 5e-2;
+  amg_data.smoother_sweeps = 2;
+  amg_data.aggregation_threshold = 0.02;
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 amg_data);
       

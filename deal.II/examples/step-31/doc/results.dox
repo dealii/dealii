@@ -69,7 +69,7 @@ Timestep 0:  t=0
 Timestep 1:  t=0.0610352
    Assembling...
    Solving...
-   30 GMRES iterations for Stokes subsystem.
+   33 GMRES iterations for Stokes subsystem.
    Time step: 0.0610352
    16 CG iterations for temperature.
    Temperature range: -0.0285735 0.153308
@@ -226,10 +226,10 @@ Timestep 0:  t=0
 Timestep 1:  t=0.325521
    Assembling...
    Solving...
-   60 GMRES iterations for Stokes subsystem.
+   55 GMRES iterations for Stokes subsystem.
    Time step: 0.325521
    26 CG iterations for temperature.
-   Temperature range: -0.488042 1.02058
+   Temperature range: -0.488053 1.02071
 
 ...
 </pre>
