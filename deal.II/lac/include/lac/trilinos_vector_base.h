@@ -1104,22 +1104,20 @@ namespace TrilinosWrappers
     if (last_action != Insert)
       last_action = Insert;
 
-    int ierr;
     for (unsigned int i=0; i<n_elements; ++i)
       {
 	const unsigned int row = indices[i];
 	const int local_row = vector->Map().LID(indices[i]);
 	if (local_row == -1)
 	  {
-	    ierr = vector->ReplaceGlobalValues (1, 
-						(const int*)(&row), 
-						&values[i]);
+	    const int ierr = vector->ReplaceGlobalValues (1, 
+							  (const int*)(&row), 
+							  &values[i]);
+	    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	    compressed = false;
 	  }
 	else
-	  ierr = vector->ReplaceMyValue (local_row, 0, values[i]);
-
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	  (*vector)[0][local_row] = values[i];
       }
   }
 
@@ -1163,22 +1161,20 @@ namespace TrilinosWrappers
     if (last_action != Add)
       last_action = Add;
 
-    int ierr;
     for (unsigned int i=0; i<n_elements; ++i)
       {
 	const unsigned int row = indices[i];
 	const int local_row = vector->Map().LID(indices[i]);
 	if (local_row == -1)
 	  {
-	    ierr = vector->SumIntoGlobalValues (1, 
-						(const int*)(&row), 
-						&values[i]);
+	    const int ierr = vector->SumIntoGlobalValues (1, 
+							  (const int*)(&row), 
+							  &values[i]);
+	    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	    compressed = false;
 	  }
 	else
-	  ierr = vector->SumIntoMyValue (local_row, 0, values[i]);
-
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	  (*vector)[0][local_row] += values[i];
       }
   }
 

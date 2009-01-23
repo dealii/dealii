@@ -238,6 +238,9 @@
 /* Define if the compiler provides __builtin_expect */
 #undef HAVE_BUILTIN_EXPECT
 
+/* Define to 1 if you have the `daxpy_' function. */
+#undef HAVE_DAXPY_
+
 /* Define to 1 if you have the `dgeevx_' function. */
 #undef HAVE_DGEEVX_
 
@@ -341,6 +344,9 @@
 
 /* Define to 1 if you have the <Sacado.hpp> header file. */
 #undef HAVE_SACADO_HPP
+
+/* Define to 1 if you have the `saxpy_' function. */
+#undef HAVE_SAXPY_
 
 /* Define to 1 if you have the `sgeevx_' function. */
 #undef HAVE_SGEEVX_

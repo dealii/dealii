@@ -9,7 +9,7 @@ dnl    is stored.
 dnl
 dnl
 dnl Copyright: The deal.II authors
-dnl          1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
+dnl          1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
 dnl
 
 
@@ -550,8 +550,9 @@ if test "x$with_blas" != "x" -a "x$with_blas" != "xno" ; then
   AC_CHECK_FUNC(daxpy_,,[AC_MSG_ERROR([BLAS library not installed correctly($with_blas)])])
 fi
 
-AC_CHECK_FUNCS([dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_ dgesvd_ sgesvd_])
-AC_CHECK_FUNCS([dgetrf_ sgetrf_ dgetri_ sgetri_ dgetrs_ sgetrs_ dstev_ sstev_])
+AC_CHECK_FUNCS([daxpy_ saxpy_ dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_])
+AC_CHECK_FUNCS([dgesvd_ sgesvd_ dgetrf_ sgetrf_ dgetri_ sgetri_])
+AC_CHECK_FUNCS([dgetrs_ sgetrs_ dstev_ sstev_])
 
 dnl -------------------------------------------------------------
 dnl       set include paths of several libraries

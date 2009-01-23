@@ -39,12 +39,15 @@ namespace TrilinosWrappers
                                         // these bounds by ourselves, so
                                         // we can use []. Note that we
                                         // can only get local values.
-      AssertThrow (vector.in_local_range(index),
-		   ExcAccessToNonLocalElement (index, 
-					       vector.vector->Map().MinMyGID(),
-					       vector.vector->Map().MaxMyGID()));
 
-      return (*(vector.vector))[0][index];
+      const int local_index = vector.vector->Map().LID(index);
+      Assert (local_index >= 0,
+	      ExcAccessToNonLocalElement (index, 
+					  vector.vector->Map().MinMyGID(),
+					  vector.vector->Map().MaxMyGID()));
+
+
+      return (*(vector.vector))[0][local_index];
     }
   }
 

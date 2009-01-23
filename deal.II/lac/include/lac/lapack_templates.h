@@ -23,6 +23,11 @@ using namespace dealii;
 
 extern "C"
 {
+// vector update of the form y += alpha*x with a scalar, x,y vectors
+void daxpy_ (const int* n, const double* alpha, const double* x,
+	     const int* incx, double* y, const int* incy);
+void saxpy_ (const int* n, const float* alpha, const float* x,
+	     const int* incx, float* y, const int* incy);
 // General Matrix
 // Matrix vector product
 void dgemv_ (const char* trans, const int* m, const int* n,
@@ -35,15 +40,15 @@ void sgemv_ (const char* trans, const int* m, const int* n,
 	     const float* b, float* y, const int* incy);
 // Matrix matrix product
 void dgemm_ (const char* transa, const char* transb,
-	const int* m, const int* n, const int* k,
-	const double* alpha, const double* A, const int* lda,
-	const double* B, const int* ldb,
-	const double* beta, double* C, const int* ldc);
+	     const int* m, const int* n, const int* k,
+	     const double* alpha, const double* A, const int* lda,
+	     const double* B, const int* ldb,
+	     const double* beta, double* C, const int* ldc);
 void sgemm_ (const char* transa, const char* transb,
-	const int* m, const int* n, const int* k,
-	const float* alpha, const float* A, const int* lda,
-	const float* B, const int* ldb,
-	const float* beta, float* C, const int* ldc);
+	     const int* m, const int* n, const int* k,
+	     const float* alpha, const float* A, const int* lda,
+	     const float* B, const int* ldb,
+	     const float* beta, float* C, const int* ldc);
 // Compute LU factorization
 void dgetrf_ (const int* m, const int* n, double* A,
 	      const int* lda, int* ipiv, int* info);
@@ -126,6 +131,36 @@ void sstev_ (const char* jobz, const int* n,
 
 }
 
+
+
+#ifdef HAVE_DAXPY_
+inline void
+axpy (const int* n, const double* alpha, const double* x, const int* incx, double* y, const int* incy)
+{
+  daxpy_ (n,alpha,x,incx,y,incy);
+}
+#else
+inline void
+axpy (const int*, const double*, const double*, const int*, double*, const int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("daxpy"));
+}
+#endif
+
+
+#ifdef HAVE_SAXPY_
+inline void
+axpy (const int* n, const float* alpha, const float* x, const int* incx, float* y, const int* incy)
+{
+  saxpy_ (n,alpha,x,incx,y,incy);
+}
+#else
+inline void
+axpy (const int*, const float*, const float*, const int*, float*, const int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("saxpy"));
+}
+#endif
 
 
 #ifdef HAVE_DGEMV_
