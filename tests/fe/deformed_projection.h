@@ -669,7 +669,7 @@ void plot_shapes (DoFHandler<2> &dof_handler)
       DataOut<2> *data_out = new DataOut<2>;
       data_out->attach_dof_handler (dof_handler);
       data_out->add_data_vector (solution, "solution");
-      data_out->build_patches (4, 0);
+      data_out->build_patches (4);
 
       data_out->write_gnuplot (deallog.get_file_stream());
 

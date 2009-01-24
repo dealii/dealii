@@ -1,4 +1,4 @@
-//----------------------------------------------------------------------
+/----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -45,6 +45,7 @@
 #include <fe/fe_system.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
+#include <base/multithread_info.h>
 #include <fstream>
 #include <cmath>
 #include <iostream>
