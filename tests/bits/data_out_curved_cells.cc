@@ -1,4 +1,4 @@
-/----------------------------------------------------------------------
+//----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -230,14 +230,14 @@ void curved_grid (std::ofstream &out)
   data_out.build_patches(5);
   data_out.write_gnuplot(out);
 				   // output with no curved cells
-  data_out.build_patches(euler,5,multithread_info.n_default_threads,DataOut<2>::no_curved_cells);
+  data_out.build_patches(euler,5,DataOut<2>::no_curved_cells);
   data_out.write_gnuplot(out);
   				   // output with curved cells at the boundary
   				   // (default)
   data_out.build_patches(euler,5);
   data_out.write_gnuplot(out);
   				   // output with all cells curved
-  data_out.build_patches(euler,5,multithread_info.n_default_threads,DataOut<2>::curved_inner_cells);
+  data_out.build_patches(euler,5,DataOut<2>::curved_inner_cells);
   data_out.write_gnuplot(out);
 }
 
