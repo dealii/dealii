@@ -1249,26 +1249,24 @@ namespace TrilinosWrappers
 
 
 /**
- * This class implements an algebraic multigrid (AMG) preconditioner
- * based on the Trilinos ML implementation, which is a black-box
- * preconditioner that works well for many PDE-based linear problems.
- * What this class does is twofold.  When the initialize() function is
- * invoked, a ML preconditioner object is created based on the matrix
- * that we want the preconditioner to be based on. A call of the
- * respective <code>vmult</code> function does call the respective
- * operation in the Trilinos package, where it is called
- * <code>ApplyInverse</code>. Use of this class is explained in the
- * @ref step_31 "step-31" tutorial program.
+ * This class implements an algebraic multigrid (AMG) preconditioner based
+ * on the Trilinos ML implementation, which is a black-box preconditioner
+ * that works well for many PDE-based linear problems.  What this class does
+ * is twofold.  When the initialize() function is invoked, a ML
+ * preconditioner object is created based on the matrix that we want the
+ * preconditioner to be based on. A call of the respective
+ * <code>vmult</code> function does call the respective operation in the
+ * Trilinos package, where it is called <code>ApplyInverse</code>. Use of
+ * this class is explained in the @ref step_31 "step-31" tutorial program.
  *
- * There are a few pecularities in initialize(). Since the Trilinos
- * objects we want to use are heavily dependent on Epetra objects, the
- * fundamental construction routines for vectors and matrices in
- * Trilinos, we do a copy of our deal.II preconditioner matrix to a
- * Epetra matrix. This is of course not optimal, but for the time
- * being there is no direct support for our data interface.  When
- * doing this time-consuming operation, we can still profit from the
- * fact that some of the entries in the preconditioner matrix are zero
- * and hence can be neglected.
+ * Since the Trilinos objects we want to use are heavily dependent on Epetra
+ * objects, we recommend using this class in conjunction with Trilinos
+ * (Epetra) sparse matrices and vectors. There is support for use with
+ * matrices of the deal.II::SparseMatrix class and corresponding vectors,
+ * too, but this requires generating a copy of the matrix, which is slower
+ * and takes (much) more memory. When doing such a copy operation, we can
+ * still profit from the fact that some of the entries in the preconditioner
+ * matrix are zero and hence can be neglected.
  *
  * The implementation is able to distinguish between matrices from elliptic
  * problems and convection dominated problems. We use the standard options
@@ -1277,7 +1275,16 @@ namespace TrilinosWrappers
  * most elliptic problems, Chebyshev provides a better damping of high
  * frequencies (in the algebraic sense) than Gauss-Seidel (SSOR), and is
  * faster (Chebyshev requires only some matrix-vector products, whereas SSOR
- * requires substitutions which are more expensive).
+ * requires substitutions which are more expensive). Moreover, Chebyshev is
+ * perfectly parallel in the sense that it does not degenerate when used on
+ * many processors. SSOR, on the other hand, gets more Jacobi-like on many
+ * processors.
+ *
+ * For proper functionality of this class we recommend using Trilinos v9.0
+ * and higher. Older versions may have problems with generating the
+ * coarse-matrix structure when using matrices with many nonzero entries per
+ * row (i.e., matrices stemming from higher order finite element
+ * discretizations).
  *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
@@ -1293,8 +1300,7 @@ namespace TrilinosWrappers
 					* Constructor. By default, we
 					* pretend to work on elliptic
 					* problems with linear finite
-					* elements on a scalar
-					* equation.
+					* elements on a scalar equation.
 					*/
 	AdditionalData (const bool                             elliptic = true,
 			const bool                             higher_order_elements = false,
@@ -1306,57 +1312,51 @@ namespace TrilinosWrappers
 
 				       /**
 					* Determines whether the AMG
-					* preconditioner should be
-					* optimized for elliptic
-					* problems (ML option smoothed
-					* aggregation SA, using a
+					* preconditioner should be optimized
+					* for elliptic problems (ML option
+					* smoothed aggregation SA, using a
 					* Chebyshev smoother) or for
-					* non-elliptic problems (ML
-					* option non-symmetric
-					* smoothed aggregation NSSA,
-					* smoother is SSOR with
+					* non-elliptic problems (ML option
+					* non-symmetric smoothed aggregation
+					* NSSA, smoother is SSOR with
 					* underrelaxation).
 					*/
 	bool elliptic;
 
 				       /**
-					* Determines whether the
-					* matrix that the
-					* preconditioner is built upon
+					* Determines whether the matrix that
+					* the preconditioner is built upon
 					* is generated from linear or
 					* higher-order elements.
 					*/
 	bool higher_order_elements;
 
 				       /**
-					* This threshold tells the AMG
-					* setup how the coarsening
-					* should be performed. In the
-					* AMG used by ML, all points
-					* that strongly couple with
-					* the tentative coarse-level
-					* point form one
-					* aggregate. The term
+					* This threshold tells the AMG setup
+					* how the coarsening should be
+					* performed. In the AMG used by ML,
+					* all points that strongly couple
+					* with the tentative coarse-level
+					* point form one aggregate. The term
 					* <em>strong coupling</em> is
 					* controlled by the variable
 					* <tt>aggregation_threshold</tt>,
-					* meaning that all elements
-					* that are not smaller than
+					* meaning that all elements that are
+					* not smaller than
 					* <tt>aggregation_threshold</tt>
-					* times the diagonal element
-					* do couple strongly.
+					* times the diagonal element do
+					* couple strongly.
 					*/
 	double aggregation_threshold;
 
 				       /**
-					* Specifies the constant modes
-					* (near null space) of the
-					* matrix. This parameter tells
-					* AMG whether we work on a
-					* scalar equation (where the
-					* near null space only
-					* consists of ones) or on a
-					* vector-valued equation.
+					* Specifies the constant modes (near
+					* null space) of the matrix. This
+					* parameter tells AMG whether we
+					* work on a scalar equation (where
+					* the near null space only consists
+					* of ones) or on a vector-valued
+					* equation.
 					*/
 	std::vector<std::vector<bool> > constant_modes;
 
@@ -1368,7 +1368,10 @@ namespace TrilinosWrappers
 					* elliptic or almost elliptic
 					* problems, the polynomial degree of
 					* the Chebyshev smoother is set to
-					* <tt>smoother_sweeps</tt>. In the
+					* <tt>smoother_sweeps</tt>. The term
+					* sweeps refers to the number of
+					* matrix-vector products performed
+					* in the Chebyshev case. In the
 					* non-elliptic case,
 					* <tt>smoother_sweeps</tt> sets the
 					* number of SSOR relaxation sweeps
@@ -1378,10 +1381,9 @@ namespace TrilinosWrappers
 	unsigned int smoother_sweeps;
 
 				       /**
-					* Determines the overlap in
-					* the SSOR/Chebyshev error
-					* smoother when run in
-					* parallel.
+					* Determines the overlap in the
+					* SSOR/Chebyshev error smoother when
+					* run in parallel.
 					*/
 	unsigned int smoother_overlap;
 
@@ -1390,80 +1392,73 @@ namespace TrilinosWrappers
 					* <tt>true</tt>, then internal
 					* information from the ML
 					* preconditioner is printed to
-					* screen. This can be useful
-					* when debugging the
-					* preconditioner.
+					* screen. This can be useful when
+					* debugging the preconditioner.
 					*/
 	bool output_details;
       };
 
 				       /**
-					* Let Trilinos compute a
-					* multilevel hierarchy for the
-					* solution of a linear system
-					* with the given matrix. The
-					* function uses the matrix
-					* format specified in
+					* Let Trilinos compute a multilevel
+					* hierarchy for the solution of a
+					* linear system with the given
+					* matrix. The function uses the
+					* matrix format specified in
 					* TrilinosWrappers::SparseMatrix.
 					*/
       void initialize (const SparseMatrix                    &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
 
 				       /**
-					* Let Trilinos compute a
-					* multilevel hierarchy for the
-					* solution of a linear system
-					* with the given matrix. This
-					* function takes a deal.ii
-					* matrix and copies the
-					* content into a Trilinos
-					* matrix, so the function can
-					* be considered rather
-					* inefficient.
+					* Let Trilinos compute a multilevel
+					* hierarchy for the solution of a
+					* linear system with the given
+					* matrix. This function takes a
+					* deal.ii matrix and copies the
+					* content into a Trilinos matrix, so
+					* the function can be considered
+					* rather inefficient.
 					*/
       void initialize (const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
 		       const AdditionalData                 &additional_data = AdditionalData(),
 		       const double                          drop_tolerance = 1e-13);
 
 				       /**
-					* This function can be used
-				        * for a faster recalculation
-				        * of the preconditioner
-				        * construction when the matrix
-				        * entries underlying the
-				        * preconditioner have changed,
-				        * but the matrix sparsity
-				        * pattern has remained the
-				        * same. What this function
-				        * does is taking the already
-				        * generated coarsening
+					* This function can be used for a
+				        * faster recalculation of the
+				        * preconditioner construction when
+				        * the matrix entries underlying the
+				        * preconditioner have changed, but
+				        * the matrix sparsity pattern has
+				        * remained the same. What this
+				        * function does is taking the
+				        * already generated coarsening
 				        * structure, computing the AMG
 				        * prolongation and restriction
 				        * according to a smoothed
-				        * aggregation strategy and
-				        * then building the whole
-				        * multilevel hiearchy. This
-				        * function can be considerably
-				        * faster than the initialize
-				        * function, since the
-				        * coarsening pattern is
-				        * usually the most difficult
-				        * thing to do when setting up
-				        * the AMG ML preconditioner.
+				        * aggregation strategy and then
+				        * building the whole multilevel
+				        * hiearchy. This function can be
+				        * considerably faster than the
+				        * initialize function, since the
+				        * coarsening pattern is usually the
+				        * most difficult thing to do when
+				        * setting up the AMG ML
+				        * preconditioner.
 					*/
       void reinit ();
 
     private:
 
 				       /**
-					* A pointer to the
-					* preconditioner object.
+					* A pointer to the preconditioner
+					* object.
 					*/
       Teuchos::RCP<ML_Epetra::MultiLevelPreconditioner> multilevel_operator;
 
 				       /**
-					* A copy of the deal.II matrix
-					* into Trilinos format.
+					* A copy of the deal.II matrix into
+					* Trilinos format.
 					*/
       std_cxx0x::shared_ptr<SparseMatrix> Matrix;
   };

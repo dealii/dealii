@@ -108,11 +108,8 @@ namespace TrilinosWrappers
     Epetra_Vector RHS (View, preconditioner->OperatorRangeMap(),
 		       const_cast<double*>(src.begin()));
   
-    const int res = preconditioner->ApplyInverse (RHS, LHS);
-  
-    Assert (res == 0,
-	    ExcMessage ("Trilinos AMG MultiLevel preconditioner returned "
-			"with an error!"));
+    const int ierr = preconditioner->ApplyInverse (RHS, LHS);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -602,9 +599,9 @@ namespace TrilinosWrappers
       }
   
     parameter_list.set("smoother: sweeps", 
-		       (int)additional_data.smoother_sweeps);
+		       static_cast<int>(additional_data.smoother_sweeps));
     parameter_list.set("smoother: ifpack overlap", 
-		       (int)additional_data.smoother_overlap);
+		       static_cast<int>(additional_data.smoother_overlap));
     parameter_list.set("aggregation: threshold", 
 		       additional_data.aggregation_threshold);
     
@@ -623,12 +620,13 @@ namespace TrilinosWrappers
 	Assert (n_rows == additional_data.constant_modes[0].size(),
 		ExcDimensionMismatch(n_rows,
 				     additional_data.constant_modes[0].size()));
-	Assert (n_rows == (unsigned int)distributed_constant_modes.GlobalLength(),
+	Assert (n_rows == 
+		static_cast<unsigned int>(distributed_constant_modes.GlobalLength()),
 		ExcDimensionMismatch(n_rows,
 				     distributed_constant_modes.GlobalLength()));
 
 	const unsigned int my_size = domain_map.NumMyElements();
-	Assert (my_size == (unsigned int)domain_map.MaxLID()+1,
+	Assert (my_size == static_cast<unsigned int>(domain_map.MaxLID()+1),
 		ExcDimensionMismatch (my_size, domain_map.MaxLID()+1));
 	
 				        // Reshape null space as a
@@ -640,7 +638,7 @@ namespace TrilinosWrappers
 	    {
 	      int global_row_id = domain_map.GID(row);
 	      distributed_constant_modes.ReplaceMyValue(row, d, 
-		       (double)additional_data.constant_modes[d][global_row_id]);
+		static_cast<double>(additional_data.constant_modes[d][global_row_id]));
 	    }
   
 	parameter_list.set("null space: type", "pre-computed");
