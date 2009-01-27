@@ -144,6 +144,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Changed: The subversion repository for deal.II development is now
+  located on commercially hosted space at <a
+  href="http://www.dealii.org/svn/dealii/">http://www.dealii.org/svn/dealii/</a>. 
+  <br>
+  (GK 2009/01/20)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Changed: Some parts of the library used to use classes and functions
   from the <a href="http://www.boost.org/">BOOST</a> library. Since
   many of the components of BOOST have been voted into what will be the
@@ -157,7 +167,7 @@ inconvenience this causes.
   (WB 2009/01/12)
   </p>
   </li>
-
+  
   <li>
   <p>
   Updated: The @ref step_33 "step-33" tutorial program now uses the

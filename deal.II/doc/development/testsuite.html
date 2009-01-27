@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II Testsuite</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
@@ -101,7 +101,7 @@
     export PATH=/my/compiler/path:$PATH
     export CXX=myCC
 
-    svn co http://wolfgang.math.tamu.edu/svn/public/deal.II/trunk/deal.II
+    svn co http://www.dealii.org/svn/dealii/trunk/deal.II
     cd deal.II
     svn update
     make build-test BUILDTEST=yes BUILDTESTFLAGS='CC=mycc CXX=myCC'
@@ -151,7 +151,7 @@
     To run the testsuite, go into your deal.II directory and do this:
     <pre>
        cd /path/to/deal.II
-       svn checkout http://wolfgang.math.tamu.edu/svn/public/deal.II/trunk/tests
+       svn checkout http://www.dealii.org/svn/dealii/trunk/tests
     </pre>
     This should generate a <code>tests/</code> directory parallel to
     the <code>base/</code>, <code>lac/</code>, etc directories. Then
