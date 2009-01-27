@@ -32,7 +32,7 @@ namespace TrilinosWrappers
     Vector::Vector ()
                    :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                   map (0,0,Epetra_MpiComm(MPI_COMM_WORLD))
+                   map (0,0,Epetra_MpiComm(MPI_COMM_SELF))
 #else
 		   map (0,0,Epetra_SerialComm())
 #endif
@@ -264,7 +264,7 @@ namespace TrilinosWrappers
   Vector::Vector ()
                  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                 map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))
+                 map (0, 0, Epetra_MpiComm(MPI_COMM_SELF))
 #else
 		 map (0, 0, Epetra_SerialComm())
 #endif
@@ -278,7 +278,7 @@ namespace TrilinosWrappers
   Vector::Vector (const unsigned int n)
                  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                 map ((int)n, 0, Epetra_MpiComm(MPI_COMM_WORLD))
+                 map ((int)n, 0, Epetra_MpiComm(MPI_COMM_SELF))
 #else
 		 map ((int)n, 0, Epetra_SerialComm())
 #endif
@@ -328,7 +328,7 @@ namespace TrilinosWrappers
 	vector.reset();
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-	map = Epetra_LocalMap ((int)n, 0, Epetra_MpiComm(MPI_COMM_WORLD));
+	map = Epetra_LocalMap ((int)n, 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
 	map = Epetra_LocalMap ((int)n, 0, Epetra_SerialComm());
 #endif

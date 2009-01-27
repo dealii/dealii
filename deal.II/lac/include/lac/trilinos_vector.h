@@ -460,7 +460,7 @@ namespace TrilinosWrappers
       if (size() != v.size())
 	{
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-	  map = Epetra_Map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD));
+	  map = Epetra_Map (v.size(), 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
 	  map = Epetra_Map (v.size(), 0, Epetra_SerialComm());
 #endif
@@ -647,7 +647,7 @@ namespace TrilinosWrappers
   Vector::Vector (const dealii::Vector<number> &v)
                  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                 map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD))
+                 map (v.size(), 0, Epetra_MpiComm(MPI_COMM_SELF))
 #else
 		 map (v.size(), 0, Epetra_SerialComm())
 #endif
@@ -675,7 +675,7 @@ namespace TrilinosWrappers
       {
 	vector.release();
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-	map = Epetra_LocalMap (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD));
+	map = Epetra_LocalMap (v.size(), 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
 	map = Epetra_LocalMap (v.size(), 0, Epetra_SerialComm());
 #endif

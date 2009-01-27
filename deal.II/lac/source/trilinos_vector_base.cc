@@ -60,7 +60,7 @@ namespace TrilinosWrappers
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 			vector(std::auto_ptr<Epetra_FEVector> 
 			  (new Epetra_FEVector(
-				 Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_WORLD)))))
+				 Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF)))))
 #else
 			vector(std::auto_ptr<Epetra_FEVector> 
                           (new Epetra_FEVector(
@@ -95,7 +95,7 @@ namespace TrilinosWrappers
     vector.reset();
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_Map map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD));
+    Epetra_Map map (0, 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
     Epetra_Map map (0, 0, Epetra_SerialComm());
 #endif

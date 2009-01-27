@@ -85,7 +85,7 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix ()
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+                  row_map (0, 0, Epetra_MpiComm(MPI_COMM_SELF)),
 #else
                   row_map (0, 0, Epetra_SerialComm()),
 #endif
@@ -165,8 +165,8 @@ namespace TrilinosWrappers
 			      const unsigned int n_max_entries_per_row)
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
-                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_SELF)),
+                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_SELF)),
 #else
                   row_map (m, 0, Epetra_SerialComm()),
                   col_map (n, 0, Epetra_SerialComm()),
@@ -185,8 +185,8 @@ namespace TrilinosWrappers
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
-                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_SELF)),
+                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_SELF)),
 #else
                   row_map (m, 0, Epetra_SerialComm()),
                   col_map (n, 0, Epetra_SerialComm()),
@@ -253,7 +253,7 @@ namespace TrilinosWrappers
   SparseMatrix::reinit (const SparsityType &sparsity_pattern)
   {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
+    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
 #else
     Epetra_SerialComm trilinos_communicator;
 #endif
@@ -544,7 +544,7 @@ namespace TrilinosWrappers
 			const double                          drop_tolerance)
   {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
+    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
 #else
     Epetra_SerialComm trilinos_communicator;
 #endif
@@ -682,7 +682,7 @@ namespace TrilinosWrappers
     matrix.reset();
  
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    row_map = Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD));
+    row_map = Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
     row_map = Epetra_Map (0, 0, Epetra_SerialComm());
 #endif

@@ -148,7 +148,7 @@ namespace TrilinosWrappers
 				     // produce a dummy local map and pass it
 				     // off to the other function
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
+    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
 #else
     Epetra_SerialComm trilinos_communicator;
 #endif
@@ -239,7 +239,7 @@ namespace TrilinosWrappers
 				     // produce a dummy local map and pass it
 				     // off to the other function
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
+    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
 #else
     Epetra_SerialComm trilinos_communicator;
 #endif
