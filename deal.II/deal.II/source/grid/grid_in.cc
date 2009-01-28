@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -806,8 +806,20 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 						 // but read the
 						 // number of nodes
 						 // given
-		for (unsigned int i=0; i<nod_num; ++i)
-		  in >> dummy;
+		switch (gmsh_file_format)
+		  {
+		    case 1:
+		    {
+		      for (unsigned int i=0; i<nod_num; ++i)
+			in >> dummy;
+		      break;
+		    }
+		    case 2:
+		    {
+		      in >> dummy;
+		      break;
+		    }
+		  }
 	      }
 	    else
 					       // cannot read this
