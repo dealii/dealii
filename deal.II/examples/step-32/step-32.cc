@@ -1307,7 +1307,7 @@ void BoussinesqFlowProblem<dim>::solve ()
   computing_timer.enter_section ("   Assemble temperature rhs");
 
   old_time_step = time_step;    
-  time_step = 1./(1.9*dim*std::sqrt(1.*dim)) /
+  time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
               std::max (get_maximal_velocity(), 0.01);
@@ -1522,7 +1522,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
-  const unsigned int initial_refinement = (dim == 2 ? 3 : 2);
+  const unsigned int initial_refinement = (dim == 2 ? 4 : 2);
   const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
 
   //GridGenerator::half_hyper_shell (triangulation,
@@ -1662,7 +1662,7 @@ int main (int argc, char *argv[])
       
       Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
-      BoussinesqFlowProblem<3> flow_problem;
+      BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();
     }
   catch (std::exception &exc)
