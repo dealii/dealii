@@ -558,8 +558,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const double                        global_T_variation,
 		   const double                        cell_diameter)
 {
-  const double beta = 0.04 * dim;
-  const double alpha = 2;
+  const double beta = 0.015 * dim;
+  const double alpha = 1;
   
   if (global_u_infty == 0)
     return 5e-3 * cell_diameter;
@@ -950,15 +950,14 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	    if (rebuild_stokes_matrix)
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  local_matrix(i,j) += (EquationData::eta *
+		  local_matrix(i,j) += (EquationData::eta * 2 *
 					grads_phi_u[i] * grads_phi_u[j]
 					- div_phi_u[i] * phi_p[j]
 					- phi_p[i] * div_phi_u[j])
 				      * stokes_fe_values.JxW(q);
 
-					     // use gravity radially outward
-	    const Point<dim> gravity = stokes_fe_values.quadrature_point(q) /
-				       stokes_fe_values.quadrature_point(q).norm();
+	    const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
+					 (Point<dim> (0,0,1)) );
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      local_rhs(i) += (EquationData::Rayleigh_number *
 			      gravity * phi_u[i] * old_temperature)*
@@ -1142,7 +1141,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   const double global_u_infty = get_maximal_velocity();
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
-  const double global_Omega_diameter = GridTools::diameter (triangulation);
 
   const TrilinosWrappers::BlockVector 
     localized_stokes_solution (stokes_solution);
@@ -1648,7 +1646,6 @@ void BoussinesqFlowProblem<dim>::run ()
       old_temperature_solution     = temperature_solution;      
     }
   while (time <= 100);
-
 }
 
 
