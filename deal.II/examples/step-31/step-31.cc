@@ -604,7 +604,7 @@ class BoussinesqFlowProblem
 		      const std::vector<double>          &gamma_values,
 		      const double                        global_u_infty,
 		      const double                        global_T_variation,
-		      const double                        cell_diameter);
+		      const double                        cell_diameter) const;
 
 
     Triangulation<dim>                  triangulation;
@@ -984,7 +984,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const std::vector<double>          &gamma_values,
 		   const double                        global_u_infty,
 		   const double                        global_T_variation,
-		   const double                        cell_diameter)
+		   const double                        cell_diameter) const
 {
   const double beta = 0.015 * dim;
   const double alpha = 1;
