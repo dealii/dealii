@@ -90,7 +90,7 @@ namespace TrilinosWrappers
 		  col_map (row_map),
 		  compressed (true),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
-			 (new Epetra_FECrsGraph(View, row_map, 0))),
+			 (new Epetra_FECrsGraph(View, row_map, col_map, 0))),
 		  cached_row_indices (1),
 		  n_cached_elements (0),
 		  row_in_cache (0)
@@ -104,24 +104,51 @@ namespace TrilinosWrappers
                   row_map (InputMap),
 		  col_map (row_map),
 		  compressed (false),
-		  graph (std::auto_ptr<Epetra_FECrsGraph>
-				  (new Epetra_FECrsGraph(Copy, row_map, 
-					int(n_entries_per_row), false))),
+				   // for more than one processor, need to
+				   // specify only row map first and let the
+				   // matrix entries decide about the column
+				   // map (which says which columns are
+				   // present in the matrix, not to be
+				   // confused with the col_map that tells
+				   // how the domain dofs of the matrix will
+				   // be distributed). for only one
+				   // processor, we can directly assign the
+				   // columns as well.
+		  graph (row_map.Comm().NumProc() > 1 ?
+			 (std::auto_ptr<Epetra_FECrsGraph>
+				   (new Epetra_FECrsGraph(Copy, row_map, 
+							  (int)n_entries_per_row, 
+							  false)))
+			 :
+			 (std::auto_ptr<Epetra_FECrsGraph>
+			           (new Epetra_FECrsGraph(Copy, row_map, col_map, 
+							  (int)n_entries_per_row, 
+							  false)))
+			 ),
 		  cached_row_indices (1),
 		  n_cached_elements (0),
 		  row_in_cache (0)
   {}
-
+ 
   SparsityPattern::SparsityPattern (const Epetra_Map                &InputMap,
 				    const std::vector<unsigned int> &n_entries_per_row)
 		  :
                   row_map (InputMap),
 		  col_map (row_map),
 		  compressed (false),
-		  graph (std::auto_ptr<Epetra_FECrsGraph>
-		    (new Epetra_FECrsGraph(Copy, row_map, 
-		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-					    false))),
+		  graph (row_map.Comm().NumProc() > 1 ?
+			 (std::auto_ptr<Epetra_FECrsGraph>
+			  (new Epetra_FECrsGraph(Copy, row_map, 
+						 (int*)const_cast<unsigned int*>
+						 (&(n_entries_per_row[row_map.MinMyGID()])),
+						 false)))
+			 :
+			 (std::auto_ptr<Epetra_FECrsGraph>
+			  (new Epetra_FECrsGraph(Copy, row_map, col_map, 
+						 (int*)const_cast<unsigned int*>
+						 (&(n_entries_per_row[row_map.MinMyGID()])),
+						 false)))
+			 ),
 		  cached_row_indices (1),
 		  n_cached_elements (0),
 		  row_in_cache (0)
@@ -134,9 +161,17 @@ namespace TrilinosWrappers
                   row_map (InputRowMap),
                   col_map (InputColMap),
 		  compressed (false),
-		  graph (std::auto_ptr<Epetra_FECrsGraph>
-			          (new Epetra_FECrsGraph(Copy, row_map, 
-					int(n_entries_per_row), false))),
+		  graph (row_map.Comm().NumProc() > 1 ?
+			 (std::auto_ptr<Epetra_FECrsGraph>
+				   (new Epetra_FECrsGraph(Copy, row_map, 
+							  (int)n_entries_per_row, 
+							  false)))
+			 :
+			 (std::auto_ptr<Epetra_FECrsGraph>
+			           (new Epetra_FECrsGraph(Copy, row_map, col_map, 
+							  (int)n_entries_per_row, 
+							  false)))
+			 ),
 		  cached_row_indices (1),
 		  n_cached_elements (0),
 		  row_in_cache (0)
@@ -149,10 +184,19 @@ namespace TrilinosWrappers
                   row_map (InputRowMap),
                   col_map (InputColMap),
 		  compressed (false),
-		  graph (std::auto_ptr<Epetra_FECrsGraph>
-		    (new Epetra_FECrsGraph(Copy, row_map, 
-		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-					    false))),
+		  graph (row_map.Comm().NumProc() > 1 ?
+			 (std::auto_ptr<Epetra_FECrsGraph>
+			  (new Epetra_FECrsGraph(Copy, row_map, 
+						 (int*)const_cast<unsigned int*>
+						 (&(n_entries_per_row[row_map.MinMyGID()])),
+						 false)))
+			 :
+			 (std::auto_ptr<Epetra_FECrsGraph>
+			  (new Epetra_FECrsGraph(Copy, row_map, col_map, 
+						 (int*)const_cast<unsigned int*>
+						 (&(n_entries_per_row[row_map.MinMyGID()])),
+						 false)))
+			 ),
 		  cached_row_indices (1),
 		  n_cached_elements (0),
 		  row_in_cache (0)
@@ -171,8 +215,8 @@ namespace TrilinosWrappers
 #endif
 		  compressed (false),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
-				(new Epetra_FECrsGraph(Copy, row_map, 
-					int(n_entries_per_row), false))),
+			 (new Epetra_FECrsGraph(Copy, row_map, col_map,
+						int(n_entries_per_row), false))),
 		  cached_row_indices (1),
 		  n_cached_elements (0),
 		  row_in_cache (0)
@@ -191,9 +235,9 @@ namespace TrilinosWrappers
 #endif
 		  compressed (false),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
-		     (new Epetra_FECrsGraph(Copy, row_map, 
-			(int*)const_cast<unsigned int*>(&(n_entries_per_row[0])), 
-					     false))),
+			 (new Epetra_FECrsGraph(Copy, row_map, col_map, 
+			  (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])), 
+						false))),
 		  cached_row_indices (1),
 		  n_cached_elements (0),
 		  row_in_cache (0)
@@ -201,8 +245,8 @@ namespace TrilinosWrappers
 
 				   // Copy function is currently not working
 				   // because the Trilinos Epetra_FECrsGraph
-				   // does not implement a reinit function
-				   // from another graph.
+				   // does not implement a constructor from
+				   // another graph.
   /*
   SparsityPattern::SparsityPattern (const SparsityPattern &InputSP)
   		  :
@@ -261,8 +305,22 @@ namespace TrilinosWrappers
     row_map = input_row_map;
     col_map = input_col_map;
 
-    graph = std::auto_ptr<Epetra_FECrsGraph>
-      (new Epetra_FECrsGraph(Copy, row_map, n_entries_per_row, false));
+				   // for more than one processor, need to
+				   // specify only row map first and let the
+				   // matrix entries decide about the column
+				   // map (which says which columns are
+				   // present in the matrix, not to be
+				   // confused with the col_map that tells
+				   // how the domain dofs of the matrix will
+				   // be distributed). for only one
+				   // processor, we can directly assign the
+				   // columns as well.
+    if (row_map.Comm().NumProc() > 1)
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, row_map, n_entries_per_row, false));
+    else
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, row_map, col_map, n_entries_per_row, false));
 
     n_cached_elements = 0;
     row_in_cache = 0;
@@ -312,10 +370,16 @@ namespace TrilinosWrappers
     row_map = input_row_map;
     col_map = input_col_map;
 
-    graph = std::auto_ptr<Epetra_FECrsGraph>
-      (new Epetra_FECrsGraph(Copy, row_map, 
-			     n_entries_per_row[input_row_map.MinMyGID()], 
-			     false));
+    if (row_map.Comm().NumProc() > 1)
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, row_map, 
+			       n_entries_per_row[input_row_map.MinMyGID()], 
+			       false));
+    else
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, row_map, col_map,
+			       n_entries_per_row[input_row_map.MinMyGID()], 
+			       false));      
 
     n_cached_elements = 0;
     row_in_cache = 0;
@@ -360,10 +424,16 @@ namespace TrilinosWrappers
     for (unsigned int row=0; row<n_rows; ++row)
       n_entries_per_row[row] = sp.row_length(row);
 
-    graph = std::auto_ptr<Epetra_FECrsGraph>
-      (new Epetra_FECrsGraph(Copy, row_map, 
-			     n_entries_per_row[input_row_map.MinMyGID()], 
-			     false));
+    if (row_map.Comm().NumProc() > 1)
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, row_map, 
+			       n_entries_per_row[input_row_map.MinMyGID()], 
+			       false));
+    else
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, row_map, col_map,
+			       n_entries_per_row[input_row_map.MinMyGID()], 
+			       false));      
 
     Assert (graph->NumGlobalRows() == (int)sp.n_rows(),
     	    ExcDimensionMismatch (graph->NumGlobalRows(),
@@ -417,10 +487,16 @@ namespace TrilinosWrappers
     for (unsigned int row=0; row<n_rows; ++row)
       n_entries_per_row[row] = sp.row_length(row);
 
-    graph = std::auto_ptr<Epetra_FECrsGraph>
-      (new Epetra_FECrsGraph(Copy, row_map, 
-			     n_entries_per_row[input_row_map.MinMyGID()], 
-			     false));
+    if (row_map.Comm().NumProc() > 1)
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, row_map, 
+			       n_entries_per_row[input_row_map.MinMyGID()], 
+			       false));
+    else
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, row_map, col_map,
+			       n_entries_per_row[input_row_map.MinMyGID()], 
+			       false));      
 
     Assert (graph->NumGlobalRows() == (int)sp.n_rows(),
     	    ExcDimensionMismatch (graph->NumGlobalRows(),

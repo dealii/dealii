@@ -93,7 +93,7 @@ namespace TrilinosWrappers
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(View, row_map, 0)))
+			  (new Epetra_FECrsMatrix(View, row_map, col_map, 0)))
   {
     matrix->FillComplete();
   }
@@ -153,7 +153,7 @@ namespace TrilinosWrappers
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-		    (new Epetra_FECrsMatrix(Copy, row_map, 
+		    (new Epetra_FECrsMatrix(Copy, row_map,
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
 					    false)))
   {}
@@ -173,9 +173,18 @@ namespace TrilinosWrappers
 #endif
 		  last_action (Zero),
 		  compressed (true),
+				   // on one processor only, we know how the
+				   // columns of the matrix will be
+				   // distributed (everything on one
+				   // processor), so we can hand in this
+				   // information to the constructor. we
+				   // can't do so in parallel, where the
+				   // information from columns is only
+				   // available when entries have been added
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, row_map, 
-					int(n_max_entries_per_row), false)))
+			  (new Epetra_FECrsMatrix(Copy, row_map, col_map,
+						  int(n_max_entries_per_row), 
+						  false)))
   {}
 
 
@@ -194,9 +203,9 @@ namespace TrilinosWrappers
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-		     (new Epetra_FECrsMatrix(Copy, row_map, 
-			(int*)const_cast<unsigned int*>(&(n_entries_per_row[0])), 
-					     false)))
+			  (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
+			   (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])), 
+						  false)))
   {}
 
 
@@ -232,8 +241,7 @@ namespace TrilinosWrappers
 
 
   SparseMatrix::~SparseMatrix ()
-  {
-  }
+  {}
 
 
 
@@ -331,9 +339,26 @@ namespace TrilinosWrappers
 				  // it were square. The call to
 				  // GlobalAssemble later will set the
 				  // correct values.
-    Epetra_CrsGraph graph (Copy, row_map, 
-			   &n_entries_per_row[input_row_map.MinMyGID()], true);
 
+				   // for more than one processor, need to
+				   // specify only row map first and let the
+				   // matrix entries decide about the column
+				   // map (which says which columns are
+				   // present in the matrix, not to be
+				   // confused with the col_map that tells
+				   // how the domain dofs of the matrix will
+				   // be distributed). for only one
+				   // processor, we can directly assign the
+				   // columns as well.
+    std::auto_ptr<Epetra_CrsGraph> graph;
+    if (row_map.Comm().NumProc() > 1)
+      graph = std::auto_ptr<Epetra_CrsGraph> 
+	(new Epetra_CrsGraph (Copy, row_map, 
+			      &n_entries_per_row[input_row_map.MinMyGID()], true));
+    else
+      graph = std::auto_ptr<Epetra_CrsGraph> 
+	(new Epetra_CrsGraph (Copy, row_map, col_map,
+			      &n_entries_per_row[input_row_map.MinMyGID()], true));
 
 				  // TODO: As of now, assume that the
 				  // sparsity pattern sits at the all
@@ -341,8 +366,8 @@ namespace TrilinosWrappers
 				  // each processor set its rows. Since
 				  // this is wasteful, a better solution
 				  // should be found in the future.
-    Assert (graph.NumGlobalRows() == (int)sparsity_pattern.n_rows(),
-    	    ExcDimensionMismatch (graph.NumGlobalRows(),
+    Assert (graph->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
+    	    ExcDimensionMismatch (graph->NumGlobalRows(),
     				  sparsity_pattern.n_rows()));
 
 				  // Trilinos has a bug for rectangular
@@ -368,16 +393,16 @@ namespace TrilinosWrappers
 	  for (int col=0; col < row_length; ++col)
 	    row_indices[col] = sparsity_pattern.column_number (row, col);
 
-	  graph.InsertGlobalIndices (row, row_length, &row_indices[0]);
+	  graph->InsertGlobalIndices (row, row_length, &row_indices[0]);
 	}
 
 				  // Now, fill the graph (sort indices, make
 				  // memory contiguous, etc).
-    graph.FillComplete(col_map, row_map);
+    graph->FillComplete(col_map, row_map);
 
 				  // And now finally generate the matrix.
     matrix =  std::auto_ptr<Epetra_FECrsMatrix>
-                       (new Epetra_FECrsMatrix(Copy, graph, false));
+                       (new Epetra_FECrsMatrix(Copy, *graph, false));
 
     last_action = Zero;
 
@@ -443,9 +468,15 @@ namespace TrilinosWrappers
 				  // it were square. The call to
 				  // GlobalAssemble later will set the
 				  // correct values.
-    Epetra_CrsGraph graph (Copy, row_map, 
-			   &n_entries_per_row[input_row_map.MinMyGID()], true);
-
+    std::auto_ptr<Epetra_CrsGraph> graph;
+    if (row_map.Comm().NumProc() > 1)
+      graph = std::auto_ptr<Epetra_CrsGraph> 
+	(new Epetra_CrsGraph (Copy, row_map, 
+			      &n_entries_per_row[input_row_map.MinMyGID()], true));
+    else
+      graph = std::auto_ptr<Epetra_CrsGraph> 
+	(new Epetra_CrsGraph (Copy, row_map, col_map,
+			      &n_entries_per_row[input_row_map.MinMyGID()], true));
 
 				  // TODO: As of now, assume that the
 				  // sparsity pattern sits at the all
@@ -453,8 +484,8 @@ namespace TrilinosWrappers
 				  // each processor set its rows. Since
 				  // this is wasteful, a better solution
 				  // should be found in the future.
-    Assert (graph.NumGlobalRows() == (int)sparsity_pattern.n_rows(),
-    	    ExcDimensionMismatch (graph.NumGlobalRows(),
+    Assert (graph->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
+    	    ExcDimensionMismatch (graph->NumGlobalRows(),
     				  sparsity_pattern.n_rows()));
 
 				  // Trilinos has a bug for rectangular
@@ -485,16 +516,16 @@ namespace TrilinosWrappers
 	       ++col_num, ++col)
 	    row_indices[col] = *col_num;
 
-	  graph.InsertGlobalIndices (row, row_length, &row_indices[0]);
+	  graph->InsertGlobalIndices (row, row_length, &row_indices[0]);
 	}
 
 				  // Now, fill the graph (sort indices, make
 				  // memory contiguous, etc).
-    graph.FillComplete(col_map, row_map);
+    graph->FillComplete(col_map, row_map);
 
 				  // And now finally generate the matrix.
     matrix =  std::auto_ptr<Epetra_FECrsMatrix>
-                       (new Epetra_FECrsMatrix(Copy, graph, false));
+                       (new Epetra_FECrsMatrix(Copy, *graph, false));
     
     last_action = Zero;
 
