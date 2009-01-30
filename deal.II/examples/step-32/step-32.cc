@@ -295,8 +295,9 @@ class BoussinesqFlowProblem
     void assemble_stokes_preconditioner ();
     void build_stokes_preconditioner ();
     void assemble_stokes_system ();
-    void assemble_temperature_system ();
     void assemble_temperature_matrix ();
+    void assemble_temperature_system ();
+    void project_temperature_field ();
     double get_maximal_velocity () const;
     std::pair<double,double> get_extrapolated_temperature_range () const;
     void solve ();
@@ -698,13 +699,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     sp.compress();
 
     stokes_matrix.reinit (sp);
-    /*std::cout << "Processor " << trilinos_communicator.MyPID() 
-	      << " stokes(0,0) rows: " 
-	      << stokes_matrix.block(0,0).matrix->NumMyRows()
-	      << ", nnz: " 
-	      << stokes_matrix.block(0,0).matrix->NumMyNonzeros() 
-	      << std::endl;*/
-
   }
 
   {
@@ -815,7 +809,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 				      +
 				      (1./EquationData::eta) *
 				      phi_p[i] * phi_p[j])
-				    * stokes_fe_values.JxW(q);
+		                     * stokes_fe_values.JxW(q);
 	  }
 
 	cell->get_dof_indices (local_dof_indices);
@@ -844,15 +838,21 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   Amg_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionAMG>
 		       (new TrilinosWrappers::PreconditionAMG());
 
-  std::vector<std::vector<bool> > null_space;
+  std::vector<std::vector<bool> > constant_modes;
   std::vector<bool>  velocity_components (dim+1,true);
   velocity_components[dim] = false;
   DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
-				    null_space);
-  
+				    constant_modes);
+
+  TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
+  amg_data.constant_modes = constant_modes;
+  amg_data.elliptic = true;
+  amg_data.higher_order_elements = true;
+  amg_data.smoother_sweeps = 2;
+  amg_data.aggregation_threshold = 0.02;
+
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
-				 TrilinosWrappers::PreconditionAMG::AdditionalData
-				 (true, true, 1e-2, null_space, 3, 0, false));
+				 amg_data);
 
   Mp_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>
                                    (new TrilinosWrappers::PreconditionIC());
@@ -1264,6 +1264,79 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
 
 
+				 // @sect4{BoussinesqFlowProblem::project_temperature_field}
+				 // Manually project the initial
+				 // conditions for the temperature in
+				 // parallel instead of doing that
+				 // completely on each processor. The
+				 // temperature mass matrix is already
+				 // available, and we need just to
+				 // compute a right hand side in
+				 // parallel, do a cg solve and
+				 // distribute the hanging node
+				 // constraints.
+template <int dim>
+void BoussinesqFlowProblem<dim>::project_temperature_field ()
+{
+  assemble_temperature_matrix ();
+
+  QGauss<dim> quadrature(temperature_degree+2);
+  UpdateFlags update_flags = UpdateFlags(update_values   |
+					 update_quadrature_points |
+					 update_JxW_values);
+  FEValues<dim> fe_values (temperature_fe, quadrature, update_flags);
+
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+    n_q_points    = fe_values.n_quadrature_points;
+
+  std::vector<unsigned int> dofs (dofs_per_cell);
+  Vector<double> cell_vector (dofs_per_cell);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = temperature_dof_handler.begin_active(),
+    endc = temperature_dof_handler.end();
+
+  std::vector<double> rhs_values(n_q_points);
+
+  TrilinosWrappers::MPI::Vector rhs (temperature_mass_matrix.matrix->RowMap()), 
+    sol (temperature_mass_matrix.matrix->RowMap());
+      
+  for (; cell!=endc; ++cell) 
+    if (cell->subdomain_id() == 
+	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
+      {
+	fe_values.reinit(cell);
+	  
+	const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	EquationData::TemperatureInitialValues<dim>().value_list 
+	  (fe_values.get_quadrature_points(), rhs_values);
+	  
+	cell_vector = 0;
+	for (unsigned int point=0; point<n_q_points; ++point)
+	  for (unsigned int i=0; i<dofs_per_cell; ++i) 
+	    cell_vector(i) += rhs_values[point] *
+	      fe_values.shape_value(i,point) *
+	      weights[point];
+
+	cell->get_dof_indices (dofs);
+	 
+	temperature_constraints.distribute_local_to_global (cell_vector,
+							    dofs,
+							    rhs);
+      }
+    
+  ReductionControl  control(5*rhs.size(), 0., 1e-12, false, false);
+  GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
+  SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
+
+  TrilinosWrappers::PreconditionIC prec;
+  prec.initialize(temperature_mass_matrix);
+
+  cg.solve (temperature_mass_matrix, sol, rhs, prec);
+  
+  old_temperature_solution = sol;
+  temperature_constraints.distribute (old_temperature_solution);
+}
 
 				 // @sect4{BoussinesqFlowProblem::solve}
 template <int dim>
@@ -1539,72 +1612,7 @@ void BoussinesqFlowProblem<dim>::run ()
   
   start_time_iteration:
 
-  //VectorTools::project (temperature_dof_handler,
-  //		temperature_constraints,
-  //		QGauss<dim>(temperature_degree+2),
-  //		EquationData::TemperatureInitialValues<dim>(),
-  //		old_temperature_solution);
-  assemble_temperature_matrix ();
-				// Create right hand side for projection
-  {
-    QGauss<dim> quadrature(temperature_degree+2);
-    UpdateFlags update_flags = UpdateFlags(update_values   |
-					   update_quadrature_points |
-					   update_JxW_values);
-    FEValues<dim> fe_values (temperature_fe, quadrature, update_flags);
-
-    const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-      n_q_points    = fe_values.n_quadrature_points;
-  
-    std::vector<unsigned int> dofs (dofs_per_cell);
-    Vector<double> cell_vector (dofs_per_cell);
-
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = temperature_dof_handler.begin_active(),
-      endc = temperature_dof_handler.end();
-
-    std::vector<double> rhs_values(n_q_points);
-
-    TrilinosWrappers::MPI::Vector rhs (temperature_mass_matrix.matrix->RowMap()), 
-      sol (temperature_mass_matrix.matrix->RowMap());
-      
-    for (; cell!=endc; ++cell) 
-      if (cell->subdomain_id() == 
-	  Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
-	{
-	  fe_values.reinit(cell);
-	  
-	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
-	  EquationData::TemperatureInitialValues<dim>().value_list 
-	    (fe_values.get_quadrature_points(), rhs_values);
-	  
-	  cell_vector = 0;
-	  for (unsigned int point=0; point<n_q_points; ++point)
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      cell_vector(i) += rhs_values[point] *
-				fe_values.shape_value(i,point) *
-				weights[point];
-
-	  cell->get_dof_indices (dofs);
-	 
-	  temperature_constraints.distribute_local_to_global (cell_vector,
-							      dofs,
-							      rhs);
-	}
-    
-    ReductionControl        control(5*rhs.size(), 0., 1e-12, false, false);
-    GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
-    SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
-
-    TrilinosWrappers::PreconditionIC prec;
-    prec.initialize(temperature_mass_matrix);
-				   // solve
-    cg.solve (temperature_mass_matrix, sol, rhs, prec);
-  
-				   // distribute solution
-    old_temperature_solution = sol;
-    temperature_constraints.distribute (old_temperature_solution);
-  }
+  project_temperature_field ();
   
   timestep_number           = 0;
   time_step = old_time_step = 0;
