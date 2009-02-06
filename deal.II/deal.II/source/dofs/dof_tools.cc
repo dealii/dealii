@@ -3966,23 +3966,34 @@ DoFTools::count_dofs_per_component (
   std::vector<unsigned int>  target_component)
 {
   const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
-  const unsigned int n_components = fe.n_components();
-  dofs_per_component.resize (n_components);
-  std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
   
+  std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
+
 				   // If the empty vector was given as
 				   // default argument, set up this
 				   // vector as identity.
   if (target_component.size()==0)
     {
-      target_component.resize(n_components);
-      for (unsigned int i=0;i<n_components;++i)
+      target_component.resize(fe.n_components());
+      for (unsigned int i=0; i<fe.n_components(); ++i)
 	target_component[i] = i;
     }
-  
-  Assert(target_component.size()==n_components,
-	 ExcDimensionMismatch(target_component.size(),n_components));
+  else
+    Assert (target_component.size()==fe.n_components(),
+	    ExcDimensionMismatch(target_component.size(),
+				 fe.n_components()));
 
+    
+
+  const unsigned int max_component
+    = *std::max_element (target_component.begin(),
+			 target_component.end());
+  const unsigned int n_target_components = max_component + 1;
+  const unsigned int n_components = fe.n_components();
+  
+  Assert (dofs_per_component.size() == n_target_components,
+	  ExcInternalError());
+  
 				   // special case for only one
 				   // component. treat this first
 				   // since it does not require any
@@ -4060,8 +4071,7 @@ DoFTools::count_dofs_per_block (
   std::vector<unsigned int>  target_block)
 {
   const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
-  const unsigned int n_blocks = fe.n_blocks();
-  dofs_per_block.resize (n_blocks);
+  
   std::fill (dofs_per_block.begin(), dofs_per_block.end(), 0U);
   
 				   // If the empty vector was given as
@@ -4069,13 +4079,25 @@ DoFTools::count_dofs_per_block (
 				   // vector as identity.
   if (target_block.size()==0)
     {
-      target_block.resize(n_blocks);
-      for (unsigned int i=0;i<n_blocks;++i)
+      target_block.resize(fe.n_blocks());
+      for (unsigned int i=0; i<fe.n_blocks(); ++i)
 	target_block[i] = i;
     }
+  else
+    Assert (target_block.size()==fe.n_blocks(),
+	    ExcDimensionMismatch(target_block.size(),
+				 fe.n_blocks()));
+
+    
+
+  const unsigned int max_block
+    = *std::max_element (target_block.begin(),
+			 target_block.end());
+  const unsigned int n_target_blocks = max_block + 1;
+  const unsigned int n_blocks = fe.n_blocks();
   
-  Assert(target_block.size()==n_blocks,
-	 ExcDimensionMismatch(target_block.size(),n_blocks));
+  Assert (dofs_per_block.size() == n_target_blocks,
+	  ExcInternalError());
 
 				   // special case for only one
 				   // block. treat this first

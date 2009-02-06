@@ -683,6 +683,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Changed: The DoFTools::count_dofs_per_component and
+  DoFTools::count_dofs_per_block erroneously resized the output argument
+  to the number of components or blocks in the finite element, respectively,
+  even if the target component/block list given as an additional argument
+  needed a different number of output elements. This is now fixed.
+  <br>
+  (WB 2009/02/05)
+  </p>
+
+  <li>
+  <p>
   New: The GridGenerator::half_hyper_shell function now also exists in 3d.
   However, to use it with the HalfHyperShellBoundary class, one has to
   pass inner and outer radii to the constructor.
