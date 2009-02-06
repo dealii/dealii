@@ -1334,6 +1334,12 @@ class DoFTools
 				      * size before calling this
 				      * function. If this is not the
 				      * case, an assertion is thrown.
+				      *
+				      * This function is used in the
+				      * @ref step_22 "step-22",
+				      * @ref step_31 "step-31", and
+				      * @ref step_32 "step-32" tutorial
+				      * programs.
 				      */
     template <int dim, int spacedim>
     static void
