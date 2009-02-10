@@ -617,6 +617,7 @@ class Mapping : public Subscriptor
 
 /* ------------------------- inline functions ------------------------- */
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 inline
@@ -690,6 +691,8 @@ Mapping<dim,spacedim>::support_point_inverse_gradient(
   return internal.support_point_inverse_gradients[index];
 }
 
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

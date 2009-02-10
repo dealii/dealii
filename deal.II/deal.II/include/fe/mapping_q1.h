@@ -615,6 +615,8 @@ struct StaticMappingQ1
 
 /*----------------------------------------------------------------------*/
 
+#ifndef DOXYGEN
+
 template<int dim, int spacedim>
 inline
 double
@@ -696,7 +698,7 @@ MappingQ1<dim,spacedim>::InternalData::second_derivative (const unsigned int qpo
 }
 
 
-
+#endif // DOXYGEN
 
 /* -------------- declaration of explicit specializations ------------- */
 
