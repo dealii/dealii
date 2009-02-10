@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 - 2007 by the deal.II authors
+//    Copyright (C) 2000 - 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,7 +57,8 @@ void check_select(const FiniteElement<dim>& fe,
   mgdof.distribute_dofs(fe);
   DoFRenumbering::component_wise(static_cast<DoFHandler<dim>&>(mgdof),
                                  target_component);
-  vector<unsigned int> ndofs(fe.n_components());
+  vector<unsigned int> ndofs(*std::max_element (target_component.begin(),
+						target_component.end()) + 1);
   DoFTools::count_dofs_per_component(mgdof, ndofs, true, target_component);
   
   for (unsigned int l=0;l<tr.n_levels();++l)
