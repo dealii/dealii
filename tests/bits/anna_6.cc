@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2008 by the deal.II authors and Anna Schneebeli
+//    Copyright (C) 2002, 2003, 2004, 2005, 2008, 2009 by the deal.II authors and Anna Schneebeli
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -155,7 +155,7 @@ template <int dim>
 void ImposeBC<dim>::get_ready () 
 {  
   dof_handler.distribute_dofs (fe);
-  std::vector<unsigned int>	dofs_per_comp;
+  std::vector<unsigned int>	dofs_per_comp (fe.n_components());
   DoFTools::count_dofs_per_component(dof_handler, dofs_per_comp);
 	
                                    // For an FESystem with Nedelec-elements as
