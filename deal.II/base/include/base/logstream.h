@@ -23,7 +23,6 @@
 #include <map>
 #include <cmath>
 
-DEAL_II_NAMESPACE_OPEN
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
 #ifdef HAVE_STD_OSTREAM_HEADER
@@ -32,6 +31,8 @@ DEAL_II_NAMESPACE_OPEN
 #  include <iostream>
 #endif
 
+
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * A class that simplifies the process of execution logging. It does so by
