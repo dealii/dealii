@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -367,26 +367,29 @@ inline
 void
 CompressedSimpleSparsityPattern::Line::add (const unsigned int j)
 {
-                /* first check the last element (or if line is still empty) */
-    if ( (entries.size()==0) || ( *(--entries.end()) < j) )
+				   // first check the last element (or if line
+				   // is still empty)
+  if ( (entries.size()==0) || ( entries.back() < j) )
     {
-        entries.push_back(j);
-        return;
+      entries.push_back(j);
+      return;
     }
 
-                   /* do a binary search to find the place where to insert: */
-    std::vector<unsigned int>::iterator it = std::lower_bound(entries.begin(),
-                                                              entries.end(),
-                                                              j);
+				   // do a binary search to find the place
+				   // where to insert:
+  std::vector<unsigned int>::iterator it = std::lower_bound(entries.begin(),
+							    entries.end(),
+							    j);
 
-                        /* If this entry is a duplicate, exit immediately */
-    if (*it == j)
-        return;
+				   // If this entry is a duplicate, exit
+				   // immediately
+  if (*it == j)
+    return;
 
-                                  /* Insert at the right place in the vector.
-                                          Vector grows automatically to fit
-                                        elements. Always doubles its size.*/
-    entries.insert(it, j);
+				   // Insert at the right place in the
+				   // vector. Vector grows automatically to
+				   // fit elements. Always doubles its size.
+  entries.insert(it, j);
 }
 
 
@@ -412,7 +415,7 @@ CompressedSimpleSparsityPattern::n_cols () const
 inline
 void
 CompressedSimpleSparsityPattern::add (const unsigned int i,
-				const unsigned int j)
+				      const unsigned int j)
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
@@ -442,7 +445,7 @@ CompressedSimpleSparsityPattern::row_length (const unsigned int row) const
 inline
 unsigned int
 CompressedSimpleSparsityPattern::column_number (const unsigned int row,
-					  const unsigned int index) const
+						const unsigned int index) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
   Assert (index < lines[row].entries.size(),
