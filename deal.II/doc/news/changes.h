@@ -144,6 +144,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: When linking with both Trilinos and BLAS, the BLAS libraries appeared
+  first on the command line; however, if the Trilinos libraries required BLAS
+  then this was the wrong order. This is now fixed.
+  <br>
+  (WB 2009/02/11)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Changed: The subversion repository for deal.II development is now
   located on commercially hosted space at <a
   href="http://www.dealii.org/svn/dealii/">http://www.dealii.org/svn/dealii/</a>. 

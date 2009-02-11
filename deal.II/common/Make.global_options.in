@@ -99,25 +99,6 @@ vpath %@shared_lib_suffix@ $(LIBDIR)
 OBJEXT     = @OBJEXT@
 EXEEXT     = @EXEEXT@
 
-lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
-lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
-
-lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix)
-lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix)
-
-ifeq ($(USE_CONTRIB_HSL),yes)
-  lib-lac.o += $(LIBDIR)/libhsl$(lib-suffix) 
-  lib-lac.g += $(LIBDIR)/libhsl$(lib-suffix) 
-endif
-
-lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
-lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
-lib-deal2-3d.o = $(LIBDIR)/libdeal_II_3d$(lib-suffix)
-
-lib-deal2-1d.g = $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
-lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
-lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
-
 # dealing with shared libraries
 ifeq ($(shared-lib-suffix),.so)
   DEAL_II_SHLIB_NAME = lib$(1)$(shared-lib-suffix).$(DEAL_II_VERSION)
@@ -148,57 +129,109 @@ endif
 # also sort of annoying is the fact that on Mac OS X, the trick with the
 # one library doesn't appear to work. Instead of a single library, we therefore
 # have to list all of them, at least if we are using shared libs.
-ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
-  lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
-  lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
-else
-  lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
-  lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
-endif
-ifeq ($(findstring darwin,$(TARGET)),)
-  lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
-  lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
-else
-  ifeq ($(enable-shared),yes)
-    lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
-    lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+ifeq ($(USE_CONTRIB_PETSC),yes)
+  ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
+    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
+    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
   else
+    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
+    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
+  endif
+  ifeq ($(findstring darwin,$(TARGET)),)
     lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
     lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
-  endif
-endif  
+  else
+    ifeq ($(enable-shared),yes)
+      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+    else
+      lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
+      lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
+    endif
+  endif  
+endif
 
 # similar (and simpler) for slepc
- lib-contrib-slepc = $(DEAL_II_SLEPC_DIR)/lib/$(DEAL_II_SLEPC_ARCH)/libslepc$(lib-suffix)
+ifeq ($(USE_CONTRIB_SLEPC),yes)
+  lib-contrib-slepc = $(DEAL_II_SLEPC_DIR)/lib/$(DEAL_II_SLEPC_ARCH)/libslepc$(lib-suffix)
+endif
 
 # same for metis, except that there is only one library in that case
-lib-contrib-metis = $(DEAL_II_METIS_LIBDIR)/libmetis.a
-
-# if PETSC is used, we need to add a number of libraries to what
-# we link for LAC
-ifeq ($(USE_CONTRIB_PETSC),yes)
-  lib-lac.g += $(lib-contrib-petsc.g)
-  lib-lac.o += $(lib-contrib-petsc.o)
-  LIBS += $(DEAL_II_PETSC_MPIUNI_LIB)
-endif
-
-# if SLEPC is used, we need to add one library to the lac libs
-ifeq ($(USE_CONTRIB_SLEPC),yes)
-  lib-lac.g += $(lib-contrib-slepc)
-  lib-lac.o += $(lib-contrib-slepc)
-endif
-
-# If METIS was detected, add it to the lac libs, since this is where we call
-# them
 ifeq ($(USE_CONTRIB_METIS),yes)
-  lib-lac.g += $(lib-contrib-metis)
-  lib-lac.o += $(lib-contrib-metis)
+  lib-contrib-metis = $(DEAL_II_METIS_LIBDIR)/libmetis.a
 endif
+
+# List all trilinos libraries that we want to link with. These must be sorted
+# in dependency order to allow for static linking where the order on the
+# command line matters. Note that we check the availability of all these
+# libraries in aclocal.m4; the two lists should therefore be kept in
+# sync.
+ifeq ($(USE_CONTRIB_TRILINOS),yes)
+  DEAL_II_TRILINOS_LIBS = \
+		stratimikosamesos \
+		stratimikosaztecoo \
+		stratimikosifpack \
+		stratimikosml \
+		stratimikos \
+		ml \
+		amesos \
+                aztecoo \
+		belos \
+		ifpack \
+		rtop \
+		sacado \
+		thyra \
+		thyraepetra \
+		thyraepetraext \
+		epetraext \
+		epetra \
+		teuchos \
+		triutils
+
+  ifeq ($(enable-shared),yes)
+    lib-contrib-trilinos = \
+       $(addsuffix $(shared-lib-suffix), $(addprefix $(DEAL_II_TRILINOS_LIBDIR)/lib, \
+                                                     $(DEAL_II_TRILINOS_LIBS)))
+  else
+    lib-contrib-trilinos = \
+       $(addsuffix $(static-lib-suffix), $(addprefix $(DEAL_II_TRILINOS_LIBDIR)/lib, \
+                                                     $(DEAL_II_TRILINOS_LIBS)))
+  endif
+endif
+
+# deal with HSL
+ifeq ($(USE_CONTRIB_HSL),yes)
+  lib-hsl = $(LIBDIR)/libhsl$(lib-suffix) 
+endif
+
+
+# set paths to all the libraries we need:
+lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
+lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
+
+lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) \
+		 $(lib-hsl) \
+		 $(lib-contrib-petsc.o) $(lib-contrib-slepc) $(DEAL_II_PETSC_MPIUNI_LIB) \
+		 $(lib-contrib-metis) \
+		 $(lib-contrib-trilinos)
+lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) \
+		 $(lib-hsl) \
+		 $(lib-contrib-petsc.g) $(lib-contrib-slepc) $(DEAL_II_PETSC_MPIUNI_LIB) \
+		 $(lib-contrib-metis) \
+		 $(lib-contrib-trilinos)
+
+lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
+lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
+lib-deal2-3d.o = $(LIBDIR)/libdeal_II_3d$(lib-suffix)
+
+lib-deal2-1d.g = $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
+lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
+lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
+
 
 # include paths. do not take into account a possibly existing
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
-
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
 include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
 include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
@@ -235,44 +268,6 @@ endif
 
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
   INCLUDE += -I$(include-path-trilinos)
-
-  # List all trilinos libraries that we want to link with. These must be sorted
-  # in dependency order to allow for static linking where the order on the
-  # command line matters. Note that we check the availability of all these
-  # libraries in aclocal.m4; the two lists should therefore be kept in
-  # sync.
-  DEAL_II_TRILINOS_LIBS = \
-		stratimikosamesos \
-		stratimikosaztecoo \
-		stratimikosifpack \
-		stratimikosml \
-		stratimikos \
-		ml \
-		amesos \
-                aztecoo \
-		belos \
-		ifpack \
-		rtop \
-		sacado \
-		thyra \
-		thyraepetra \
-		thyraepetraext \
-		epetraext \
-		epetra \
-		teuchos \
-		triutils
-
-  ifeq ($(enable-shared),yes)
-    lib-contrib-trilinos = \
-       $(addsuffix $(shared-lib-suffix), $(addprefix $(DEAL_II_TRILINOS_LIBDIR)/lib, \
-                                                     $(DEAL_II_TRILINOS_LIBS)))
-  else
-    lib-contrib-trilinos = \
-       $(addsuffix $(static-lib-suffix), $(addprefix $(DEAL_II_TRILINOS_LIBDIR)/lib, \
-                                                     $(DEAL_II_TRILINOS_LIBS)))
-  endif
-
-  LDFLAGS += $(lib-contrib-trilinos)
 endif
 
 ifeq ($(USE_CONTRIB_METIS),yes)
