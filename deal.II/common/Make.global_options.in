@@ -206,19 +206,19 @@ endif
 
 
 # set paths to all the libraries we need:
-lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
-lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
+lib-base.o     = $(LIBDIR)/libbase$(lib-suffix) \
+		 $(lib-contrib-trilinos)
+lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix) \
+		 $(lib-contrib-trilinos)
 
 lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) \
 		 $(lib-hsl) \
 		 $(lib-contrib-petsc.o) $(lib-contrib-slepc) $(DEAL_II_PETSC_MPIUNI_LIB) \
-		 $(lib-contrib-metis) \
-		 $(lib-contrib-trilinos)
+		 $(lib-contrib-metis)
 lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) \
 		 $(lib-hsl) \
 		 $(lib-contrib-petsc.g) $(lib-contrib-slepc) $(DEAL_II_PETSC_MPIUNI_LIB) \
-		 $(lib-contrib-metis) \
-		 $(lib-contrib-trilinos)
+		 $(lib-contrib-metis)
 
 lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
 lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
