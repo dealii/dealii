@@ -12,15 +12,13 @@ deal.II Mailinglist
 <HTML>
   <HEAD>
     <TITLE>$IDXTITLE$</TITLE>
-    <link href="../screen.css" rel="StyleSheet" media="screen">
+    <link href="http://www.dealii.org/screen.css" rel="StyleSheet" media="screen">
     <meta name="keywords" content="deal.II">
     <meta name="robots" content="nofollow">.
   </HEAD>
-  <BODY style="background-image:url(../pictures/title-background.jpg);" lang="en">
+  <BODY lang="en">
     <H1>$IDXTITLE$</H1>
 </IdxPgBegin>
-
-<!-- style="background-image:url(../pictures/title-background.jpg);" lang="en" -->
 
 <!-- End of main index page -->
 
@@ -38,7 +36,7 @@ deal.II Mailinglist
 <HTML>
   <HEAD>
     <TITLE>$TIDXTITLE$</TITLE>
-    <link href="../screen.css" rel="StyleSheet" media="screen">
+    <link href="http://www.dealii.org/screen.css" rel="StyleSheet" media="screen">
     <meta name="keywords" content="deal.II">
   </HEAD>
   <BODY style="background-image:url(../pictures/title-background.jpg);" lang="en">
@@ -60,7 +58,7 @@ deal.II Mailinglist
 <HTML>
   <HEAD>
     <TITLE>$SUBJECTNA:72$</TITLE>
-    <link href="../screen.css" rel="StyleSheet" media="screen">
+    <link href="http://www.dealii.org/screen.css" rel="StyleSheet" media="screen">
   </HEAD>
   <BODY>
 </MsgPgBegin>
