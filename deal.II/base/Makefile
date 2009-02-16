@@ -54,6 +54,11 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.g += $(lib-contrib-petsc.g) $(DEAL_II_PETSC_MPIUNI_LIB)
     deplibs.o += $(lib-contrib-petsc.o) $(DEAL_II_PETSC_MPIUNI_LIB)
   endif
+
+  ifeq ($(USE_CONTRIB_TRILINOS),yes)
+    deplibs.g += $(lib-contrib-trilinos)
+    deplibs.o += $(lib-contrib-trilinos)
+  endif
 else
   deplibs.g =
   deplibs.o =
