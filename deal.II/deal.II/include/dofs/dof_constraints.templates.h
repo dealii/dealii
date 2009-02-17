@@ -1102,7 +1102,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 					 // line was condensed away,
 					 // create it newly. first set
 					 // it to zero
-	uncondensed(line) = 0.;
+	uncondensed(line) = next_constraint->inhomogeneity;
 					 // then add the different
 					 // contributions
 	for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
@@ -1126,7 +1126,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
 				       // fill entry in line
 				       // next_constraint.line by adding the
 				       // different contributions
-      double new_value = 0;
+      double new_value = next_constraint->inhomogeneity;
       for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
 	new_value += (vec(next_constraint->entries[i].first) *
                       next_constraint->entries[i].second);

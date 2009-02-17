@@ -270,7 +270,7 @@ class BlockIndices;
  * a second step.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998, 2004, 2008
+ * @author Wolfgang Bangerth, Martin Kronbichler, 1998, 2004, 2008, 2009
  */
 class ConstraintMatrix : public Subscriptor
 {
@@ -330,6 +330,15 @@ class ConstraintMatrix : public Subscriptor
 				      */
     void add_entries (const unsigned int                                  line,
 		      const std::vector<std::pair<unsigned int,double> > &col_val_pairs);
+
+				     /**
+				      * Set an imhomogeneity to the
+				      * constraint line <i>i</i>,
+				      * according to the discussion in
+				      * the general class description.
+				      */
+    void set_inhomogeneity (const unsigned int line,
+			    const double       value);
 
 				     /**
 				      * Close the filling of
@@ -1073,7 +1082,7 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Delete hanging nodes in a
-				      * vector.  Sets all hanging node
+				      * vector. Sets all hanging node
 				      * values to zero. The @p
 				      * VectorType may be a
 				      * Vector<float>, Vector<double>,
@@ -1229,6 +1238,11 @@ class ConstraintMatrix : public Subscriptor
 					  * said for ConstraintMatrix@p ::lines.
 					  */
 	std::vector<std::pair<unsigned int,double> > entries;
+
+				         /**
+					  * Value of the inhomogeneity.
+					  */
+        double inhomogeneity;
 
 					 /**
 					  * This operator is a bit
@@ -1422,6 +1436,7 @@ ConstraintMatrix::add_line (const unsigned int line)
 				   // list
   lines.push_back (ConstraintLine());
   lines.back().line = line;
+  lines.back().inhomogeneity = 0.;
 }
 
 
@@ -1478,6 +1493,38 @@ ConstraintMatrix::add_entry (const unsigned int line,
       }
   
   line_ptr->entries.push_back (std::make_pair(column,value));
+}
+
+
+
+inline
+void
+ConstraintMatrix::set_inhomogeneity (const unsigned int line,
+				     const double       value)
+{
+  std::vector<ConstraintLine>::iterator line_ptr;
+  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
+
+  				   // the usual case is that the line where
+				   // a value is entered is the one we
+				   // added last, so we search backward
+  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
+    if (line_ptr->line == line)
+      break;
+
+				   // if the loop didn't break, then
+				   // line_ptr must be begin().
+				   // we have an error if that doesn't
+				   // point to 'line' then
+  Assert (line_ptr->line==line, ExcLineInexistant(line));
+				   // second check: the respective
+				   // flag in the
+				   // constraint_line_exists field
+				   // must exist
+  Assert (line < constraint_line_exists.size(), ExcInternalError());
+  Assert (constraint_line_exists[line] == true, ExcInternalError());
+
+  line_ptr->inhomogeneity = value;
 }
 
 
