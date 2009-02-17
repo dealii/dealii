@@ -401,11 +401,9 @@ DoFTools::make_boundary_sparsity_pattern (
 {
   const unsigned int n_dofs = dof.n_dofs();
 
-  Assert (dof_to_boundary_mapping.size() == n_dofs, ExcInternalError());
-  Assert (sparsity.n_rows() == dof.n_boundary_dofs(),
-	  ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs()));
-  Assert (sparsity.n_cols() == dof.n_boundary_dofs(),
-	  ExcDimensionMismatch (sparsity.n_cols(), dof.n_boundary_dofs()));
+  AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
+  AssertDimension (sparsity.n_rows(), dof.n_boundary_dofs());
+  AssertDimension (sparsity.n_cols(), dof.n_boundary_dofs());
 #ifdef DEBUG
   if (sparsity.n_rows() != 0)
     {
@@ -415,8 +413,7 @@ DoFTools::make_boundary_sparsity_pattern (
 	if ((*i != DH::invalid_dof_index) &&
 	    (*i > max_element))
 	  max_element = *i;
-      Assert (max_element  == sparsity.n_rows()-1,
-	      ExcInternalError());
+      AssertDimension (max_element, sparsity.n_rows()-1);
     };
 #endif
 
@@ -463,7 +460,7 @@ void DoFTools::make_boundary_sparsity_pattern (
 {
   const unsigned int n_dofs = dof.n_dofs();
 
-  Assert (dof_to_boundary_mapping.size() == n_dofs, ExcInternalError());
+  AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
   Assert (boundary_indicators.find(255) == boundary_indicators.end(),
 	  typename DH::ExcInvalidBoundaryIndicator());
   Assert (sparsity.n_rows() == dof.n_boundary_dofs (boundary_indicators),
@@ -479,8 +476,7 @@ void DoFTools::make_boundary_sparsity_pattern (
 	if ((*i != DH::invalid_dof_index) &&
 	    (*i > max_element))
 	  max_element = *i;
-      Assert (max_element  == sparsity.n_rows()-1,
-	      ExcInternalError());
+      AssertDimension (max_element, sparsity.n_rows()-1);
     };
 #endif
 
@@ -713,8 +709,7 @@ DoFTools::dof_couplings_from_component_couplings
 	    -
 	    fe.get_nonzero_components(i).begin())
 	);
-      Assert (ii < fe.n_components(),
-	      ExcInternalError());
+      Assert (ii < fe.n_components(), ExcInternalError());
 
       for (unsigned int j=0; j<n_dofs; ++j)
 	{
@@ -728,8 +723,7 @@ DoFTools::dof_couplings_from_component_couplings
 		-
 		fe.get_nonzero_components(j).begin())
 	    );
-	  Assert (jj < fe.n_components(),
-		  ExcInternalError());          
+	  Assert (jj < fe.n_components(), ExcInternalError());          
 
 	  dof_couplings(i,j) = component_couplings(ii,jj);
 	}
@@ -1165,8 +1159,7 @@ namespace internal
       {
 	Assert (fe1.dofs_per_face >= fe2.dofs_per_face,
 		ExcInternalError());
-	Assert (master_dof_mask.size() == fe1.dofs_per_face,
-		ExcInternalError());
+	AssertDimension (master_dof_mask.size(), fe1.dofs_per_face);
 
 	Assert (fe2.dofs_per_vertex <= fe1.dofs_per_vertex,
 		ExcInternalError());
@@ -1310,9 +1303,8 @@ namespace internal
 	    index += fe1.dofs_per_quad;
 	  }
 
-	Assert (index == fe1.dofs_per_face, ExcInternalError());
-	Assert (master_dof_list.size() == fe2.dofs_per_face,
-		ExcInternalError());
+	AssertDimension (index, fe1.dofs_per_face);
+	AssertDimension (master_dof_list.size(), fe2.dofs_per_face);
 	
 					 // finally copy the list into the
 					 // mask
@@ -1415,8 +1407,7 @@ namespace internal
 					     const std::vector<bool> &master_dof_mask,
 					     std_cxx0x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > &split_matrix)
       {
-	Assert (master_dof_mask.size() == face_interpolation_matrix.m(),
-		ExcInternalError());
+	AssertDimension (master_dof_mask.size(), face_interpolation_matrix.m());
 	Assert (std::count (master_dof_mask.begin(), master_dof_mask.end(), true) ==
 		static_cast<signed int>(face_interpolation_matrix.n()),
 		ExcInternalError());
@@ -1457,8 +1448,8 @@ namespace internal
 		  ++nth_slave_dof;
 		}
 
-	    Assert (nth_master_dof == n_master_dofs, ExcInternalError());
-	    Assert (nth_slave_dof == n_dofs-n_master_dofs, ExcInternalError());	    
+	    AssertDimension (nth_master_dof, n_master_dofs);
+	    AssertDimension (nth_slave_dof, n_dofs-n_master_dofs);	    
 
 //TODO[WB]: We should make sure very small entries are removed after inversion
 	    split_matrix->first.gauss_jordan ();
@@ -1875,8 +1866,7 @@ namespace internal
 									     fe_index);
 	      for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
 		dofs_on_mother[next_index++] = this_face->dof_index(dof, fe_index);
-	      Assert (next_index == dofs_on_mother.size(),
-		      ExcInternalError());
+	      AssertDimension (next_index, dofs_on_mother.size());
 	  
 	      next_index = 0;
 	      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
@@ -1886,8 +1876,7 @@ namespace internal
 		for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
 		  dofs_on_children[next_index++]
 		    = this_face->child(child)->dof_index(dof, fe_index);
-	      Assert (next_index == dofs_on_children.size(),
-		      ExcInternalError());
+	      AssertDimension (next_index, dofs_on_children.size());
 	  
 					       // for each row in the constraint
 					       // matrix for this line:
@@ -1983,14 +1972,12 @@ namespace internal
 					       // children can have
 					       // only one as
 					       // well. check this
-	      Assert (cell->face(face)->n_active_fe_indices() == 1,
-		      ExcInternalError());
+	      AssertDimension (cell->face(face)->n_active_fe_indices(), 1);
 	      Assert (cell->face(face)->fe_index_is_active(cell->active_fe_index())
 		      == true,
 		      ExcInternalError());
 	      for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
-		Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
-			ExcInternalError());
+		AssertDimension (cell->face(face)->child(c)->n_active_fe_indices(), 1);
 
 					       // right now, all that
 					       // is implemented is
@@ -2066,8 +2053,7 @@ namespace internal
 		    = this_face->line(line)->dof_index(dof, fe_index);
 	      for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
 		dofs_on_mother[next_index++] = this_face->dof_index(dof, fe_index);
-	      Assert (next_index == dofs_on_mother.size(),
-		      ExcInternalError());
+	      AssertDimension (next_index, dofs_on_mother.size());
 	  
 	      next_index = 0;
 
@@ -2123,8 +2109,7 @@ namespace internal
 		for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
 		  dofs_on_children[next_index++]
 		    = this_face->child(child)->dof_index(dof, fe_index);
-	      Assert (next_index == dofs_on_children.size(),
-		      ExcInternalError());
+	      AssertDimension (next_index, dofs_on_children.size());
 	  
 					       // for each row in the constraint
 					       // matrix for this line:
@@ -2568,11 +2553,9 @@ namespace internal
 		      else
 			slave_dofs.push_back (scratch_dofs[i]);
 		    
-		    Assert (master_dofs.size() == dominating_fe.dofs_per_face,
-			    ExcInternalError());
-		    Assert (slave_dofs.size() ==
-			    cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face,
-			    ExcInternalError());
+		    AssertDimension (master_dofs.size(), dominating_fe.dofs_per_face);
+		    AssertDimension (slave_dofs.size(),
+			    cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face);
 		    
 #ifdef WOLFGANG
 		    std::cout << "Constraints for cell=" << cell
@@ -2815,8 +2798,7 @@ namespace internal
 						 cell->neighbor(face)->active_fe_index ());
 
 			    for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
-			      Assert (master_dofs[i] == slave_dofs[i],
-				      ExcInternalError());
+			      AssertDimension (master_dofs[i], slave_dofs[i]);
 			  }
 		      
 			break;
@@ -3492,9 +3474,7 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
 					     // on the faces should be
 					     // equal to the number of DoFs
 					     // on the vertices.
-            Assert (fe.dofs_per_face == 
-		    fe.dofs_per_vertex,
-                    ExcInternalError());
+            AssertDimension (fe.dofs_per_face, fe.dofs_per_vertex);
             
             for (unsigned int i=0; i<fe.dofs_per_face; ++i)
               if (!check_vector_component)
@@ -3535,9 +3515,7 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
       if (check_right_vertex)
 	if (cell->neighbor(1) == dof_handler.end())
           {
-            Assert (fe.dofs_per_face ==
-                    fe.dofs_per_vertex,
-                    ExcInternalError());
+            AssertDimension (fe.dofs_per_face, fe.dofs_per_vertex);
             
             for (unsigned int i=0; i<fe.dofs_per_face; ++i)
               if (!check_vector_component)
@@ -3991,8 +3969,7 @@ DoFTools::count_dofs_per_component (
   const unsigned int n_target_components = max_component + 1;
   const unsigned int n_components = fe.n_components();
   
-  Assert (dofs_per_component.size() == n_target_components,
-	  ExcInternalError());
+  AssertDimension (dofs_per_component.size(), n_target_components);
   
 				   // special case for only one
 				   // component. treat this first
@@ -4096,8 +4073,7 @@ DoFTools::count_dofs_per_block (
   const unsigned int n_target_blocks = max_block + 1;
   const unsigned int n_blocks = fe.n_blocks();
   
-  Assert (dofs_per_block.size() == n_target_blocks,
-	  ExcInternalError());
+  AssertDimension (dofs_per_block.size(), n_target_blocks);
 
 				   // special case for only one
 				   // block. treat this first
@@ -5089,8 +5065,7 @@ DoFTools::map_dof_to_boundary_indices (const DH                  &dof_handler,
               mapping[dofs_on_face[i]] = next_boundary_index++;
         }
 
-  Assert (next_boundary_index == dof_handler.n_boundary_dofs(),
-	  ExcInternalError());
+  AssertDimension (next_boundary_index, dof_handler.n_boundary_dofs());
 }
 
 
@@ -5132,8 +5107,7 @@ void DoFTools::map_dof_to_boundary_indices (
 	      mapping[dofs_on_face[i]] = next_boundary_index++;
 	}
 
-  Assert (next_boundary_index == dof_handler.n_boundary_dofs (boundary_indicators),
-	  ExcInternalError());
+  AssertDimension (next_boundary_index, dof_handler.n_boundary_dofs (boundary_indicators));
 }
 
 #endif
