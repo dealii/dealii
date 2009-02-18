@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,251 +28,156 @@ template <int dim, int spacedim> class Triangulation;
 template <class T> class Vector;
 
 
-
 /**
- *   This class provides several function that flag certain cells for
- *   coarsening or refinement based on a vector of ``error''
- *   indicators and some selection algorithm.  The central function is
- *   <tt>refine (const Vector &criterion, const double threshold)</tt>:
- *   it takes a vector of values, one per active cell,
- *   which denote the criterion according to which the triangulation
- *   is to be refined. It marks all cells for which the criterion is
- *   greater than the threshold being given as the second
- *   argument. Analogously,
- *   <tt>coarsen (const Vector &criterion, const double threshold)</tt>
- *   flags those cells for
- *   coarsening for which the criterion is less than the threshold.
+ * Collection of functions controlling refinement and coarsening of
+ * Triangulation objects.
  *
- *   There are two variations of these functions, which rely on @p refine and
- *   @p coarsen by computing the thresholds from other information:
- *   <ul>
- *   <li> @p refine_and_coarsen_fixed_number: this function takes a vector as
- *     above and two values between zero and one denoting the fractions of cells to
- *     be refined and coarsened. For this purpose, it sorts the criteria per cell
- *     and takes the threshold to be the one belonging to the cell with the
- *     <tt>fraction times n_active_cells</tt> highest criterion. For example, if
- *     the fraction is $0.3$, the threshold is computed to a value such that
- *     30 per cent of cells have a criterion higher than the threshold and are
- *     thus flagged for refinement. The flagging for refinement is done through
- *     the central @p refine function. For coarsening, the same holds.
- *
- *     The sorting of criteria is not done actually, since we only need one
- *     value, in the example above the criterion of the cell which is at
- *     30 per cent in the sorted list of cells. The order of cells with higher
- *     and of those with lower criteria is irrelevant. Getting this value is
- *     accomplished by the @p nth_element function of the <tt>C++</tt> standard
- *     library, which takes only linear time in the number of elements, rather
- *     than <tt>N log N</tt> for sorting all values.
- *
- *     A typical value for the fraction of cells to be refined is 0.3.
- *     However, for singular functions or singular error functionals, you may
- *     want to chose a smaller value to avoid overrefinement in regions which
- *     do not contribute much to the error.
- *
- *     The function takes an additional last argument that can be used to
- *     specify a maximal number of cells. If this number is going to be
- *     exceeded upon refinement, then refinement and coarsening fractions are
- *     going to be adjusted in an attempt to reach the maximum number of
- *     cells. In practice, it is complicated to reach this number exactly, so
- *     the argument is only an indication. The default value of this argument
- *     is to impose no limit on the number of cells.
- *
- *   <li> @p refine_and_coarsen_fixed_fraction: this function computes the
- *     threshold such that the number of cells getting flagged for refinement
- *     makes up for a certain fraction of the total error. If this fraction is 50
- *     per cent, for example, the threshold is computed such that the cells with
- *     a criterion greater than the threshold together account for half of the
- *     total error. The definition of the fraction is a bit counterintuitive, since
- *     the total error is the sum over all cells of the local contribution
- *     squared. We define that the fraction $\alpha$ be such that those
- *     elements with the greatest error are refined for which the condition
- *     $\sum \eta_K^2 \le \alpha\eta^2$ holds. Note that $\alpha$ is not
- *     squared. The sum runs over the mentioned
- *     cells, $\eta_K$ are the local error indicators and $\eta$ is the global
- *     indicator with $\eta^2 = \sum \eta_K^2$, with here the sum running over
- *     all cells.
- *
- *     For the bottom fraction the same holds: the threshold for coarsening is
- *     computed such that the cells with criterion less than the threshold
- *     together make up for the fraction of the total error specified.
- *
- *     This strategy is more suited for singular functions and error
- *     functionals, but may lead to very slow convergence of the grid
- *     if only few cells are refined in each step.
- *
- *     The function takes an additional parameter indicating the maximum
- *     number of cells we want, just as the previous function. See there for
- *     more information.
- *
- *     From the point of view of implementation, this time we really need to
- *     sort the array of criteria.
- *     Just like the other strategy described above, this function only
- *     computes the threshold values and then passes over to @p refine and
- *     @p coarsen.
- *
- *     A typical value for the fraction of the total error is 0.5.
- *   </ul>
- *
- *   There are other functions relying on different methods to flag
- *   cells for refinement or coarsening. See their documentation for
- *   further information.
- *
- *   For a more thorough discussion of advantages and disadvantages of the
- *   different strategies for refinement, see the paper of R. Becker and
- *   R. Rannacher titled "A Feed-Back Approach to Error Control in Finite
- *   Element Methods: Basic Analysis and Examples".
- *
- *   It is assumed that the criterion is a value in a certain norm over each
- *   element, such that the square of the total error is the sum over the
- *   squares of the criteria on the cells. The criteria shall be positive.
- *
- *   You can suppress coarsening or refining by giving zero as the fraction
- *   for one of the operations.
+ * The functions in this namespace are in two classes. There are the
+ * auxiliary functions refine() and coarsen(). More important for
+ * users are the other functions, which implement refinement
+ * strategies, as being found in the literature on adaptive finite
+ * element methods. For mathematical discussion of these methods,
+ * consider works by D&ouml;rfler, Morin, Nochetto, Rannacher,
+ * Stevenson and many more.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 1998, 2000; Thomas Richter, 2000
+ * @author Wolfgang Bangerth, Thomas Richter, Guido Kanschat 1998, 2000, 2009
  */
-class GridRefinement
+namespace GridRefinement
 {
-  public:
-				     /**
-				      * Refine the triangulation
-				      * according to the given
-				      * criteria. The criterion is a
-				      * @p double value for each cell
-				      * which determines which cells
-				      * are to be refined by
-				      * comparison with the threshold:
-				      * if the value for a cell is
-				      * larger than the threshold, the
-				      * cell is flagged for
-				      * refinement. It is your duty to
-				      * guarantee that the threshold
-				      * value is in a resonable
-				      * range. Please note that the
-				      * @p criteria array may contain
-				      * negative values (sometimes,
-				      * error estimators are evaluated
-				      * in a way which produces
-				      * positive and negative values),
-				      * but the comparison with
-				      * @p threshold is done only on
-				      * the absolute values of the
-				      * criteria.
-				      *
-				      * The cells are only flagged for
-				      * refinement, they are not
-				      * actually refined. To do so,
-				      * you have to call the
-				      * @p execute_coarsening_and_refinement
-				      * function.
-				      *
-				      * There are more sophisticated
-				      * strategies for mesh
-				      * refinement; refer to the
-				      * following functions and to the
-				      * general doc for this class for
-				      * more information.
-				      */
+/**
+ * @brief Refinement strategy with predictable groth of the mesh
+ *
+ * This function takes a vector of refinement @p criteria and two values
+ * between zero and one denoting the fractions of cells to be refined
+ * and coarsened. It flags cells for further processing by
+ * Triangulation::execute_coarsening_and_refinement() according to the
+ * following greedy algorithm:
+ *
+ * <ol>
+ *
+ *  <li> Sort the cells according to descenting values of @p criteria.
+ *
+ *  <li> Set the refinement threshold to be the criterion belonging to
+ *  the cell at position @p top_fraction_of_cells times
+ *  Triangulation::n_active_cells().
+ *
+ * <li> Set the coarsening threshold accordingly using the cell @p
+ *  bottom_fraction_of_cells times Triangulation::n_active_cells()
+ *  from the end of the sorted list.
+ *
+ *  <li> Use these two thresholds in calls to refine() and coarsen(),
+ *  respectively.
+ *
+ * </ol>
+ *
+ * As an example, with no coarsening, setting @p top_fraction_of_cells
+ * to 1/3 will result in approximately doubling the number of cells in
+ * two dimensions. The same effect in three dimensions is achieved by
+ * refining 1/7th of the cells. These values are good initial guesses,
+ * but should be adjusted depending on the singularity of approximated
+ * function.
+ *
+ * The sorting of criteria is not done actually, since we only need
+ * the threshold values in order to call refine() and coarsen(). The
+ * order of cells with higher and of those with lower criteria is
+ * irrelevant. Getting this value is accomplished by the @p
+ * nth_element function of the <tt>C++</tt> standard library, which
+ * takes only linear time in the number of elements, rather than <tt>N
+ * log N</tt> for sorting all values.
+ *
+ * @warning This function only sets the coarsening and refinement
+ * flags. The mesh is not changed until you call
+ * Triangulation::execute_coarsening_and_refinement().
+ *
+ * @arg @p criteria: the refinement criterion computed on each mesh
+ * cell. Entries may not be negative.
+ *
+ * @arg @p top_fraction_of_cells is the fraction of cells to be
+ * refined. If this number is zero, no cells will be refined. If it
+ * equals one, the result will be flagging for global refinement.
+ *
+ * @arg @p bottom_fraction_of_cells is the fraction of cells to be
+ * coarsened. If this number is zero, no cells will be coarsened.
+ *
+ * @arg @p max_n_cells can be used to specify a maximal number of
+ * cells. If this number is going to be exceeded upon refinement, then
+ * refinement and coarsening fractions are going to be adjusted in an
+ * attempt to reach the maximum number of cells. Be aware though that
+ * through proliferation of refinement due to
+ * Triangulation::MeshSmoothing, this number is only an indicator. The
+ * default value of this argument is to impose no limit on the number
+ * of cells.
+ */
     template <int dim, class Vector, int spacedim>
-    static void refine (Triangulation<dim,spacedim> &tria,
-			const Vector                &criteria,
-			const double                threshold);
+    void
+    refine_and_coarsen_fixed_number (
+      Triangulation<dim,spacedim> &tria,
+      const Vector                &criteria,
+      const double                top_fraction_of_cells,
+      const double                bottom_fraction_of_cells,
+      const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
 
-				     /**
-				      * Analogue to the @p refine
-				      * function: flag all cells for
-				      * coarsening for which the
-				      * absolute value of the
-				      * criterion is less than the
-				      * given threshold.
-				      */
+/**
+ * @brief Refinement strategy controlling the reduction of the error estimate
+ *
+ * Also known as the <b>bulk criterion</b>, this function computes the
+ * thresholds for refinement and coarsening such that the @p criteria
+ * of cells getting flagged for refinement make up for a certain
+ * fraction of the total error. We explain its operation for
+ * refinement, coarsening works analogously.
+ *
+ * Let <i>c<sub>K</sub></i> be the criterion of cell <i>K</i>. Then
+ * the total error estimate is computed by the formula
+ * @f[
+ * E = \sum_{K\in \cal T} c_K.
+ * @f]
+ *
+ * If <i> 0 &lt; a &lt; 1</i> is @p top_fraction, then we refine the
+ * smallest subset $\cal M$ of the Triangulation $\cal T$ such that
+ * @f[
+ * a E \le \sum_{K\in \cal M} c_K
+ * @f]
+ *
+ * The algorithm is performed by the greedy algorithm described in
+ * refine_and_coarsen_fixed_number().
+ *
+ * @note The often used formula with squares on the left and right is
+ * recovered by actually storing the square of <i>c<sub>K</sub></i> in
+ * the vector @p criteria.
+ *
+ * From the point of view of implementation, this time we really need
+ * to sort the array of criteria.  Just like the other strategy
+ * described above, this function only computes the threshold values
+ * and then passes over to refine() and coarsen().
+ *  
+ * @arg @p criteria: the refinement criterion computed on each mesh
+ * cell. Entries may not be negative.
+ *
+ * @arg @p top_fraction is the fraction of the total estimate which
+ * should be refined. If this number is zero, no cells will be refined. If it
+ * equals one, the result will be flagging for global refinement.
+ *
+ * @arg @p bottom_fraction is the fraction of the estimate
+ * coarsened. If this number is zero, no cells will be coarsened.
+ *
+ * @arg @p max_n_cells can be used to specify a maximal number of
+ * cells. If this number is going to be exceeded upon refinement, then
+ * refinement and coarsening fractions are going to be adjusted in an
+ * attempt to reach the maximum number of cells. Be aware though that
+ * through proliferation of refinement due to
+ * Triangulation::MeshSmoothing, this number is only an indicator. The
+ * default value of this argument is to impose no limit on the number
+ * of cells.
+ */
     template <int dim, class Vector, int spacedim>
-    static void coarsen (Triangulation<dim,spacedim> &tria,
-			 const Vector                &criteria,
-			 const double                threshold);
-    
-				     /**
-				      * Refine the triangulation by
-				      * refining a certain fraction
-				      * @p top_fraction_of_cells with
-				      * the highest error. Likewise
-				      * coarsen the fraction
-				      * @p bottom_fraction_of_cells
-				      * with the least error. To
-				      * actually perform the
-				      * refinement, call
-				      * @p execute_coarsening_and_refinement.
-				      *
-				      * @p fraction_of_cells shall be
-				      * a value between zero and one.
-				      *
-				      * The last argument can be used to
-				      * specify a maximal number of cells. If
-				      * this number is going to be exceeded
-				      * upon refinement, then refinement and
-				      * coarsening fractions are going to be
-				      * adjusted in an attempt to reach the
-				      * maximum number of cells. In practice,
-				      * it is complicated to reach this number
-				      * exactly, so the argument is only an
-				      * indication. The default value of this
-				      * argument is to impose no limit on the
-				      * number of cells.
-				      *
-				      * Refer to the general doc of
-				      * this class for more
-				      * information.
-				      */
-    template <int dim, class Vector, int spacedim>
-    static
     void
-    refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tria,
-                                     const Vector                &criteria,
-                                     const double                top_fraction_of_cells,
-                                     const double                bottom_fraction_of_cells,
-				     const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
-    
-				     /**
-				      * Refine the triangulation by
-				      * flagging those cells which
-				      * make up a certain
-				      * @p top_fraction of the total
-				      * error.  Likewise, coarsen all
-				      * cells which make up only
-				      * @p bottom_fraction.  To
-				      * actually perform the
-				      * refinement, call
-				      * @p execute_coarsening_and_refinement.
-				      *
-				      * <tt>*_fraction</tt> shall be a
-				      * values between zero and one.
-				      *
-				      * The last argument can be used to
-				      * specify a maximal number of cells. If
-				      * this number is going to be exceeded
-				      * upon refinement, then refinement and
-				      * coarsening fractions are going to be
-				      * adjusted in an attempt to reach the
-				      * maximum number of cells. In practice,
-				      * it is complicated to reach this number
-				      * exactly, so the argument is only an
-				      * indication. The default value of this
-				      * argument is to impose no limit on the
-				      * number of cells.
-				      *
-				      * Refer to the general doc of
-				      * this class for more
-				      * information.
-				      */
-    template <int dim, class Vector, int spacedim>
-    static
-    void
-    refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &tria,
-                                       const Vector                &criteria,
-                                       const double                top_fraction,
-                                       const double                bottom_fraction,
-				       const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
+    refine_and_coarsen_fixed_fraction (
+      Triangulation<dim,spacedim> &tria,
+      const Vector                &criteria,
+      const double                top_fraction,
+      const double                bottom_fraction,
+      const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
 
 
 
@@ -298,16 +203,66 @@ class GridRefinement
 				      */
     
     template <int dim, class Vector, int spacedim>
-    static
     void
     refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
                                  const Vector                &criteria);
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidParameterValue);
-};
+/**
+ * Flag all mesh cells for which the value in @p criteria exceeds @p
+ * threshold for refinement.
+ *
+ * The vector @p criteria contains a nonnegative value for each active
+ * cell, ordered in the canonical order of of
+ * Triangulation::active_cell_iterator.
+ *
+ * The cells are only flagged for refinement, they are not actually
+ * refined. To do so, you have to call
+ * Triangulation::execute_coarsening_and_refinement().
+ *
+ * This function does not implement a refinement strategy, it is more
+ * a helper function for the actual strategies.
+ */
+    template <int dim, class Vector, int spacedim>
+    void refine (Triangulation<dim,spacedim> &tria,
+		 const Vector                &criteria,
+		 const double                threshold);
+  
+/**
+ * Flag all mesh cells for which the value in @p criteria
+ * is less than @p threshold for coarsening.
+ *
+ * The vector @p criteria contains a nonnegative value for each active cell,
+ * ordered in the canonical order of of
+ * Triangulation::active_cell_iterator.
+ *
+ * The cells are only flagged for coarsening, they are not actually
+ * coarsened. To do so, you have to call
+ * Triangulation::execute_coarsening_and_refinement().
+ *
+ * This function does not implement a refinement strategy, it is more
+ * a helper function for the actual strategies.
+ */
+    template <int dim, class Vector, int spacedim>
+    void coarsen (Triangulation<dim,spacedim> &tria,
+		  const Vector                &criteria,
+		  const double                threshold);
+  
+				   /**
+				    * An exception thrown if the
+				    * vector with cell criteria contains
+				    * negative values
+				    */
+  DeclException0(ExcNegativeCriteria);
+  
+				   /**
+				    * One of the threshold parameters
+				    * causes trouble. Or the
+				    * refinement and coarsening
+				    * thresholds overlap.
+				    */
+  DeclException0 (ExcInvalidParameterValue);
+}
+
 
 
 DEAL_II_NAMESPACE_CLOSE

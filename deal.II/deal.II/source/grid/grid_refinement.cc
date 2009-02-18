@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,7 +27,6 @@
 #include <fstream>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 
 namespace 
@@ -161,8 +160,8 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-  Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
-
+  Assert (criteria.is_non_negative (), ExcNegativeCriteria());
+  
 				   // when all indicators are zero we
 				   // do not need to refine but only
 				   // to coarsen
@@ -172,6 +171,8 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
   typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
 
+//TODO: This is undocumented, looks fishy and seems unnecessary
+  
   double new_threshold=threshold;
 				   // when threshold==0 find the
 				   // smallest value in criteria
@@ -199,7 +200,7 @@ void GridRefinement::coarsen (Triangulation<dim,spacedim> &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-  Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
+  Assert (criteria.is_non_negative (), ExcNegativeCriteria());
 
   typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
@@ -225,7 +226,7 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
-  Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
+  Assert (criteria.is_non_negative (), ExcNegativeCriteria());
 
   int refine_cells  = static_cast<int>(top_fraction*criteria.size());
   int coarsen_cells = static_cast<int>(bottom_fraction*criteria.size());
@@ -330,7 +331,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
-  Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
+  Assert (criteria.is_non_negative (), ExcNegativeCriteria());
   
 				   // let tmp be the cellwise square of the
 				   // error, which is what we have to sum
@@ -453,7 +454,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-  Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
+  Assert (criteria.is_non_negative (), ExcNegativeCriteria());
   
 				   // get an increasing order on
 				   // the error indicator
