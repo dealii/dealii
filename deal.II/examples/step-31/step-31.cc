@@ -1272,7 +1272,19 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // of the Stokes matrix &ndash; except
 				   // that it is much easier here since we
 				   // do not need to take care of any blocks
-				   // or coupling between components:
+				   // or coupling between components. Note
+				   // how we initialize the three
+				   // temperature matrices: We only use the
+				   // sparsity pattern for reinitialization
+				   // of the first matrix, whereas we use
+				   // the previously generated matrix for
+				   // the two remaining reinits. The reason
+				   // for doing so is that reinitialization
+				   // from an already generated matrix
+				   // allows Trilinos to reuse the sparsity
+				   // pattern instead of generating a new
+				   // one for each copy. This saves both
+				   // some time and memory.
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
@@ -1283,8 +1295,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				     temperature_constraints, false);
 
     temperature_matrix.reinit (csp);
-    temperature_mass_matrix.reinit (csp);
-    temperature_stiffness_matrix.reinit (csp);
+    temperature_mass_matrix.reinit (temperature_matrix);
+    temperature_stiffness_matrix.reinit (temperature_matrix);
   }
 
 				   // Lastly, we set the vectors for the

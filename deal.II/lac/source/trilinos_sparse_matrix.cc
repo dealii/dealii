@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -251,6 +251,7 @@ namespace TrilinosWrappers
     row_map = m.row_map;
     col_map = m.col_map;
     *matrix = *m.matrix;
+    compress();
     return *this;
   }
   
@@ -563,9 +564,10 @@ namespace TrilinosWrappers
 
     row_map = sparse_matrix.row_map;
     col_map = sparse_matrix.col_map;
-    matrix = std::auto_ptr<Epetra_FECrsMatrix>(new Epetra_FECrsMatrix(
-				                   *sparse_matrix.matrix));
-    compressed = true;
+    matrix = std::auto_ptr<Epetra_FECrsMatrix>
+      (new Epetra_FECrsMatrix(Copy, sparse_matrix.matrix->Graph(), false));
+
+    compress();
   }
 
 
