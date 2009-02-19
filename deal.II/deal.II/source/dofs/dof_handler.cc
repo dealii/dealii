@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -479,6 +479,61 @@ namespace internal
 				    56*dof_handler.selected_fe->dofs_per_line +
 				    16*dof_handler.selected_fe->dofs_per_quad;
 		      break;
+
+						       // the following
+						       // numbers are not
+						       // based on actual
+						       // counting but by
+						       // extrapolating the
+						       // number sequences
+						       // from the previous
+						       // ones (for example,
+						       // for dofs_per_vertex,
+						       // the sequence above
+						       // is 19, 21, 28, 30,
+						       // 37, and is continued
+						       // as follows):
+		case 9:
+		      max_couplings=39*selected_fe->dofs_per_vertex +
+				    59*selected_fe->dofs_per_line +
+				    17*selected_fe->dofs_per_quad;
+		      break;
+		case 10:
+		      max_couplings=46*selected_fe->dofs_per_vertex +
+				    70*selected_fe->dofs_per_line +
+				    20*selected_fe->dofs_per_quad;
+		      break;
+		case 11:
+		      max_couplings=48*selected_fe->dofs_per_vertex +
+				    73*selected_fe->dofs_per_line +
+				    21*selected_fe->dofs_per_quad;
+		      break;
+		case 12:
+		      max_couplings=55*selected_fe->dofs_per_vertex +
+				    84*selected_fe->dofs_per_line +
+				    24*selected_fe->dofs_per_quad;
+		      break;
+		case 13:
+		      max_couplings=57*selected_fe->dofs_per_vertex +
+				    87*selected_fe->dofs_per_line +
+				    25*selected_fe->dofs_per_quad;
+		      break;
+		case 14:
+		      max_couplings=63*selected_fe->dofs_per_vertex +
+				    98*selected_fe->dofs_per_line +
+				    28*selected_fe->dofs_per_quad;
+		      break;
+		case 15:
+		      max_couplings=65*selected_fe->dofs_per_vertex +
+				    103*selected_fe->dofs_per_line +
+				    29*selected_fe->dofs_per_quad;
+		      break;
+		case 16:
+		      max_couplings=72*selected_fe->dofs_per_vertex +
+				    114*selected_fe->dofs_per_line +
+				    32*selected_fe->dofs_per_quad;
+		      break;
+		      
 		default:
 		      Assert (false, ExcNotImplemented());
 		      max_couplings=0;
