@@ -494,44 +494,44 @@ namespace internal
 						       // 37, and is continued
 						       // as follows):
 		case 9:
-		      max_couplings=39*selected_fe->dofs_per_vertex +
-				    59*selected_fe->dofs_per_line +
-				    17*selected_fe->dofs_per_quad;
+		      max_couplings=39*dof_handler.selected_fe->dofs_per_vertex +
+				    59*dof_handler.selected_fe->dofs_per_line +
+				    17*dof_handler.selected_fe->dofs_per_quad;
 		      break;
 		case 10:
-		      max_couplings=46*selected_fe->dofs_per_vertex +
-				    70*selected_fe->dofs_per_line +
-				    20*selected_fe->dofs_per_quad;
+		      max_couplings=46*dof_handler.selected_fe->dofs_per_vertex +
+				    70*dof_handler.selected_fe->dofs_per_line +
+				    20*dof_handler.selected_fe->dofs_per_quad;
 		      break;
 		case 11:
-		      max_couplings=48*selected_fe->dofs_per_vertex +
-				    73*selected_fe->dofs_per_line +
-				    21*selected_fe->dofs_per_quad;
+		      max_couplings=48*dof_handler.selected_fe->dofs_per_vertex +
+				    73*dof_handler.selected_fe->dofs_per_line +
+				    21*dof_handler.selected_fe->dofs_per_quad;
 		      break;
 		case 12:
-		      max_couplings=55*selected_fe->dofs_per_vertex +
-				    84*selected_fe->dofs_per_line +
-				    24*selected_fe->dofs_per_quad;
+		      max_couplings=55*dof_handler.selected_fe->dofs_per_vertex +
+				    84*dof_handler.selected_fe->dofs_per_line +
+				    24*dof_handler.selected_fe->dofs_per_quad;
 		      break;
 		case 13:
-		      max_couplings=57*selected_fe->dofs_per_vertex +
-				    87*selected_fe->dofs_per_line +
-				    25*selected_fe->dofs_per_quad;
+		      max_couplings=57*dof_handler.selected_fe->dofs_per_vertex +
+				    87*dof_handler.selected_fe->dofs_per_line +
+				    25*dof_handler.selected_fe->dofs_per_quad;
 		      break;
 		case 14:
-		      max_couplings=63*selected_fe->dofs_per_vertex +
-				    98*selected_fe->dofs_per_line +
-				    28*selected_fe->dofs_per_quad;
+		      max_couplings=63*dof_handler.selected_fe->dofs_per_vertex +
+				    98*dof_handler.selected_fe->dofs_per_line +
+				    28*dof_handler.selected_fe->dofs_per_quad;
 		      break;
 		case 15:
-		      max_couplings=65*selected_fe->dofs_per_vertex +
-				    103*selected_fe->dofs_per_line +
-				    29*selected_fe->dofs_per_quad;
+		      max_couplings=65*dof_handler.selected_fe->dofs_per_vertex +
+				    103*dof_handler.selected_fe->dofs_per_line +
+				    29*dof_handler.selected_fe->dofs_per_quad;
 		      break;
 		case 16:
-		      max_couplings=72*selected_fe->dofs_per_vertex +
-				    114*selected_fe->dofs_per_line +
-				    32*selected_fe->dofs_per_quad;
+		      max_couplings=72*dof_handler.selected_fe->dofs_per_vertex +
+				    114*dof_handler.selected_fe->dofs_per_line +
+				    32*dof_handler.selected_fe->dofs_per_quad;
 		      break;
 		      
 		default:
