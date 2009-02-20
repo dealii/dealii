@@ -472,7 +472,7 @@ since the mass matrix $M_u$ on the pressure space is well-conditioned.
 
 
 On the other hand, for the Stokes equation we consider here, the Schur
-complement is $B^TA^{-1}B$ where the matrix $A$ is related to the
+complement is $BA^{-1}B^T$ where the matrix $A$ is related to the
 Laplace operator (it is, in fact, the matrix corresponding to the
 bilinear form $(\nabla^s \varphi_i, \nabla^s\varphi_j)$). Thus,
 solving with $A$ is a lot more complicated: the matrix is badly
