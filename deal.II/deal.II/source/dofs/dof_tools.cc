@@ -5979,6 +5979,13 @@ DoFTools::make_zero_boundary_constraints
  ConstraintMatrix                    &,
  const std::vector<bool>             &);
 
+template 
+void 
+DoFTools::make_zero_boundary_constraints
+(const hp::DoFHandler<deal_II_dimension> &, 
+ ConstraintMatrix                        &,
+ const std::vector<bool>                 &);
+
 
 #if deal_II_dimension < 3
 template void
