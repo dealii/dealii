@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -396,11 +396,11 @@ namespace TrilinosWrappers
   template void
   BlockSparseMatrix::reinit (const dealii::BlockSparsityPattern &);
   template void
-  BlockSparseMatrix::reinit (const BlockCompressedSparsityPattern &);
+  BlockSparseMatrix::reinit (const dealii::BlockCompressedSparsityPattern &);
   template void
-  BlockSparseMatrix::reinit (const BlockCompressedSetSparsityPattern &);
+  BlockSparseMatrix::reinit (const dealii::BlockCompressedSetSparsityPattern &);
   template void
-  BlockSparseMatrix::reinit (const BlockCompressedSimpleSparsityPattern &);
+  BlockSparseMatrix::reinit (const dealii::BlockCompressedSimpleSparsityPattern &);
 
 
   template void
@@ -408,13 +408,13 @@ namespace TrilinosWrappers
 			     const dealii::BlockSparsityPattern    &);
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-			     const BlockCompressedSparsityPattern &);
+			     const dealii::BlockCompressedSparsityPattern &);
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-			     const BlockCompressedSetSparsityPattern &);
+			     const dealii::BlockCompressedSetSparsityPattern &);
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-			     const BlockCompressedSimpleSparsityPattern &);
+			     const dealii::BlockCompressedSimpleSparsityPattern &);
 
 }
 
