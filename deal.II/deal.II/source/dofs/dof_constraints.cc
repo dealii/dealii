@@ -1997,6 +1997,14 @@ ConstraintMatrix::memory_consumption () const
   template void ConstraintMatrix::condense<VectorType >(const VectorType &uncondensed,\
 					               VectorType       &condensed) const;\
   template void ConstraintMatrix::condense<VectorType >(VectorType &vec) const;\
+  template void ConstraintMatrix::condense<float,VectorType >(const SparseMatrix<float> &uncondensed, \
+							      const VectorType &uncondensed_vector, \
+							      SparseMatrix<float> &condensed, \
+							      VectorType       &condensed_vector) const; \
+  template void ConstraintMatrix::condense<double,VectorType >(const SparseMatrix<double> &uncondensed, \
+							       const VectorType &uncondensed_vector, \
+							       SparseMatrix<double> &condensed, \
+							       VectorType       &condensed_vector) const; \
   template void ConstraintMatrix::set_zero<VectorType >(VectorType &vec) const;\
   template void ConstraintMatrix:: \
     distribute_local_to_global<VectorType > (const Vector<double>            &, \
@@ -2025,6 +2033,20 @@ VECTOR_FUNCTIONS(TrilinosWrappers::BlockVector);
 VECTOR_FUNCTIONS(TrilinosWrappers::MPI::Vector);
 VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
 #endif
+
+#define CONDENSE_FUNCTIONS(VectorType, number, MatrixType)		\
+  template void ConstraintMatrix::condense<number,VectorType >(MatrixType &uncondensed, \
+							       VectorType &vec) const \
+
+
+CONDENSE_FUNCTIONS(Vector<float>,float,SparseMatrix<float>);
+CONDENSE_FUNCTIONS(Vector<double>,float,SparseMatrix<float>);
+CONDENSE_FUNCTIONS(Vector<double>,double,SparseMatrix<double>);
+CONDENSE_FUNCTIONS(Vector<float>,double,SparseMatrix<double>);
+CONDENSE_FUNCTIONS(BlockVector<double>,float,BlockSparseMatrix<float>);
+CONDENSE_FUNCTIONS(BlockVector<float>,float,BlockSparseMatrix<float>);
+CONDENSE_FUNCTIONS(BlockVector<double>,double,BlockSparseMatrix<double>);
+CONDENSE_FUNCTIONS(BlockVector<float>,double,BlockSparseMatrix<double>);
 
 
 template
@@ -2056,28 +2078,41 @@ void
 ConstraintMatrix::condense<float>(BlockSparseMatrix<float> &uncondensed) const;
 
 
-#define MATRIX_FUNCTIONS(MatrixType) \
+#define MATRIX_FUNCTIONS(MatrixType, VectorType)	\
 template void ConstraintMatrix:: \
 distribute_local_to_global<MatrixType > (const FullMatrix<double>        &, \
                                          const std::vector<unsigned int> &, \
-                                         MatrixType                      &) const
+                                         MatrixType                      &) const; \
+template void ConstraintMatrix:: \
+distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>        &, \
+						    const Vector<double>            &, \
+						    const std::vector<unsigned int> &, \
+						    MatrixType                      &, \
+						    VectorType                      &) const
 
-MATRIX_FUNCTIONS(SparseMatrix<double>);
-MATRIX_FUNCTIONS(SparseMatrix<float>);
+MATRIX_FUNCTIONS(SparseMatrix<double>, Vector<double>);
+MATRIX_FUNCTIONS(SparseMatrix<float>, Vector<float>);
 
-MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
-MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
+MATRIX_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
+MATRIX_FUNCTIONS(BlockSparseMatrix<float>, BlockVector<float>);
 
 #ifdef DEAL_II_USE_PETSC
-MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
-MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
-MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
-MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
+MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix, PETScWrappers::Vector);
+MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix, PETScWrappers::BlockVector);
+MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Vector);
+MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappers::MPI::BlockVector);
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
-MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
+MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::VectorBase);
+MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::BlockVector);
+template void ConstraintMatrix::distribute_local_to_global
+<TrilinosWrappers::BlockSparseMatrix,TrilinosWrappers::MPI::BlockVector> 
+  (const FullMatrix<double>        &, 
+   const Vector<double>            &, 
+   const std::vector<unsigned int> &, 
+   TrilinosWrappers::BlockSparseMatrix &, 
+   TrilinosWrappers::MPI::BlockVector  &) const;
 #endif
 
 template void ConstraintMatrix::
