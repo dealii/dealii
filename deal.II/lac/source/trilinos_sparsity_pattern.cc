@@ -861,11 +861,11 @@ namespace TrilinosWrappers
   template void
   SparsityPattern::copy_from (const dealii::SparsityPattern &);
   template void
-  SparsityPattern::copy_from (const CompressedSparsityPattern &);
+  SparsityPattern::copy_from (const dealii::CompressedSparsityPattern &);
   template void
-  SparsityPattern::copy_from (const CompressedSetSparsityPattern &);
+  SparsityPattern::copy_from (const dealii::CompressedSetSparsityPattern &);
   template void
-  SparsityPattern::copy_from (const CompressedSimpleSparsityPattern &);
+  SparsityPattern::copy_from (const dealii::CompressedSimpleSparsityPattern &);
 
 
   template void
@@ -873,13 +873,13 @@ namespace TrilinosWrappers
 			   const dealii::SparsityPattern &);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
-			   const CompressedSparsityPattern &);
+			   const dealii::CompressedSparsityPattern &);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
-			   const CompressedSetSparsityPattern &);
+			   const dealii::CompressedSetSparsityPattern &);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
-			   const CompressedSimpleSparsityPattern &);
+			   const dealii::CompressedSimpleSparsityPattern &);
 
 
   template void
@@ -889,11 +889,11 @@ namespace TrilinosWrappers
   template void
   SparsityPattern::reinit (const Epetra_Map &,
 			   const Epetra_Map &,
-			   const CompressedSparsityPattern &);
+			   const dealii::CompressedSparsityPattern &);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
 			   const Epetra_Map &,
-			   const CompressedSimpleSparsityPattern &);
+			   const dealii::CompressedSimpleSparsityPattern &);
 
 }
 
