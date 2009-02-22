@@ -403,24 +403,20 @@ TimerOutput::print_summary ()
       total_cpu_time = timer_all();
 #endif
 
-				   // check that the sum of all times is
-				   // less or equal than the total
-				   // time. otherwise, we might have
-				   // generated a lot of overhead in this
-				   // function.
+				       // check that the sum of all times is
+				       // less or equal than the total
+				       // time. otherwise, we might have
+				       // generated a lot of overhead in this
+				       // function.
       double check_time = 0.;
       for (std::map<std::string, Section>::const_iterator
 	     i = sections.begin(); i!=sections.end(); ++i)
 	check_time += i->second.total_cpu_time;
 	
       if (check_time > total_cpu_time)
-	{
-	  total_cpu_time = check_time;
-	  out_stream << std::endl << "Sum of counted times is larger than total time. "
-		     << "Timer function may have introduced too much overhead." << std::endl;
-	}
-
-				   // now generate a nice table
+	total_cpu_time = check_time;
+      
+				       // generate a nice table
       out_stream << "\n\n"
 		 << "+---------------------------------------------+------------"
 		 << "+------------+\n"
@@ -441,8 +437,8 @@ TimerOutput::print_summary ()
 	{
 	  std::string name_out = i->first;
 
-				// resize the array so that it is always
-				// of the same size
+					   // resize the array so that it is always
+					   // of the same size
 	  unsigned int pos_non_space = name_out.find_first_not_of (" ");
 	  name_out.erase(0, pos_non_space);
 	  name_out.resize (32, ' ');
@@ -462,6 +458,12 @@ TimerOutput::print_summary ()
 		 << "+---------------------------------------------+"
 		 << "------------+------------+\n"
 		 << std::endl;
+
+      if (check_time > total_cpu_time)
+	out_stream << std::endl
+		   << "Note: The sum of counted times is larger than the total time.\n"
+		   << "(Timer function may have introduced too much overhead, or different\n"
+		   << "section timers may have run at the same time.)" << std::endl;
     }
 
 				// in case we want to write out wallclock times
@@ -480,16 +482,10 @@ TimerOutput::print_summary ()
 	check_time += i->second.total_wall_time;
       
       if (check_time > total_wall_time)
-	{
-	  total_wall_time = check_time;
-	  out_stream << std::endl 
-		     << "Sum of counted times is larger than total time. "
-		     << "Timer function may have introduced too much overhead." 
-		     << std::endl;
-	}
+	total_wall_time = check_time;
 
-				   // now generate a nice table
-     out_stream << "\n\n"
+				       // now generate a nice table
+      out_stream << "\n\n"
 		 << "+---------------------------------------------+------------"
 		 << "+------------+\n"
 		 << "| Total wallclock time elapsed from start     |";
@@ -530,8 +526,13 @@ TimerOutput::print_summary ()
 		 << "+---------------------------------------------+"
 		 << "------------+------------+\n"
 		 << std::endl;
-    }
 
+      if (check_time > total_wall_time)
+	out_stream << std::endl
+		   << "Note: The sum of counted times is larger than the total time.\n"
+		   << "(Timer function may have introduced too much overhead, or different\n"
+		   << "section timers may have run at the same time.)" << std::endl;
+    }
 }
 
 
