@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -472,9 +472,102 @@ class SparseMatrixEZ : public Subscriptor
 				      * finite number an exception
 				      * is thrown.
 				      */
-    void add (const unsigned int i, const unsigned int j,
+    void add (const unsigned int i,
+	      const unsigned int j,
 	      const number value);
     
+                                       /**
+                                        * Add all elements given in a
+                                        * FullMatrix<double> into sparse
+                                        * matrix locations given by
+                                        * <tt>indices</tt>. In other words,
+                                        * this function adds the elements in
+                                        * <tt>full_matrix</tt> to the
+                                        * respective entries in calling
+                                        * matrix, using the local-to-global
+                                        * indexing specified by
+                                        * <tt>indices</tt> for both the rows
+                                        * and the columns of the
+                                        * matrix. This function assumes a
+                                        * quadratic sparse matrix and a
+                                        * quadratic full_matrix, the usual
+                                        * situation in FE calculations.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    template <typename number2>
+    void add (const std::vector<unsigned int> &indices,
+	      const FullMatrix<number2>       &full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Same function as before, but now
+                                        * including the possibility to use
+                                        * rectangular full_matrices and
+                                        * different local-to-global indexing
+                                        * on rows and columns, respectively.
+					*/
+    template <typename number2>
+    void add (const std::vector<unsigned int> &row_indices,
+	      const std::vector<unsigned int> &col_indices,
+	      const FullMatrix<number2>       &full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    template <typename number2>
+    void add (const unsigned int               row,
+	      const std::vector<unsigned int> &col_indices,
+	      const std::vector<number2>      &values,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Add an array of values given by
+                                        * <tt>values</tt> in the given
+                                        * global matrix row at columns
+                                        * specified by col_indices in the
+                                        * sparse matrix.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    template <typename number2>
+    void add (const unsigned int  row,
+	      const unsigned int  n_cols,
+	      const unsigned int *col_indices,
+	      const number2      *values,
+	      const bool          elide_zero_values = true);
+
 				     /**
 				      * Copy the given matrix to this
 				      * one.  The operation throws an
@@ -1338,6 +1431,69 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
   Entry* entry = allocate(i,j);
   entry->value += value;
 }
+
+
+template <typename number>
+template <typename number2>
+void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &indices,
+				  const FullMatrix<number2>       &full_matrix,
+				  const bool                       elide_zero_values)
+{
+//TODO: This function can surely be made more efficient  
+  for (unsigned int i=0; i<indices.size(); ++i)
+    for (unsigned int j=0; j<indices.size(); ++j)
+      if ((full_matrix(i,j) != 0) || (elide_zero_values == false))
+	add (indices[i], indices[j], full_matrix(i,j));
+}
+
+
+
+template <typename number>
+template <typename number2>
+void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &row_indices,
+				  const std::vector<unsigned int> &col_indices,
+				  const FullMatrix<number2>       &full_matrix,
+				  const bool                       elide_zero_values)
+{
+//TODO: This function can surely be made more efficient  
+  for (unsigned int i=0; i<row_indices.size(); ++i)
+    for (unsigned int j=0; j<col_indices.size(); ++j)
+      if ((full_matrix(i,j) != 0) || (elide_zero_values == false))
+	add (row_indices[i], col_indices[j], full_matrix(i,j));
+}
+
+
+
+
+template <typename number>
+template <typename number2>
+void SparseMatrixEZ<number>::add (const unsigned int               row,
+				  const std::vector<unsigned int> &col_indices,
+				  const std::vector<number2>      &values,
+				  const bool                       elide_zero_values)
+{
+//TODO: This function can surely be made more efficient
+  for (unsigned int j=0; j<col_indices.size(); ++j)
+    if ((values[j] != 0) || (elide_zero_values == false))
+      add (row, col_indices[j], values[j]);
+}
+
+
+
+template <typename number>
+template <typename number2>
+void SparseMatrixEZ<number>::add (const unsigned int  row,
+				  const unsigned int  n_cols,
+				  const unsigned int *col_indices,
+				  const number2      *values,
+				  const bool          elide_zero_values)
+{
+//TODO: This function can surely be made more efficient
+  for (unsigned int j=0; j<n_cols; ++j)
+    if ((values[j] != 0) || (elide_zero_values == false))
+      add (row, col_indices[j], values[j]);
+}
+
 
 
 
