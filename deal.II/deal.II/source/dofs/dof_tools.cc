@@ -1679,6 +1679,7 @@ namespace internal
                                                master_dofs[i],
                                                face_constraints (row,i));
                       }
+		  constraints.set_inhomogeneity (slave_dofs[row], 0.);
                 }
             }      
       }
@@ -1887,6 +1888,8 @@ namespace internal
 		    constraints.add_entry (dofs_on_children[row],
 					   dofs_on_mother[i],
 					   fe.constraints()(row,i));
+
+		  constraints.set_inhomogeneity (dofs_on_children[row], 0.);
 		}
 	    }
 	  else
@@ -2120,6 +2123,8 @@ namespace internal
 		    constraints.add_entry (dofs_on_children[row],
 					   dofs_on_mother[i],
 					   fe.constraints()(row,i));
+
+		  constraints.set_inhomogeneity(dofs_on_children[row], 0.);
 		}
 	    }
 	  else
