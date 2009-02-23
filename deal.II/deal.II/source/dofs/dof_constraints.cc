@@ -289,50 +289,41 @@ void ConstraintMatrix::close ()
 		  }
 		else
 						   // the DoF that we
-						   // encountered is
-						   // not constrained
-						   // by a linear
-						   // combination of
-						   // other dofs but
-						   // is equal to zero
-						   // (i.e. its chain
-						   // of entries is
-						   // empty). in that
-						   // case, we can't
-						   // just overwrite
-						   // the current
-						   // entry, but we
+						   // encountered is not
+						   // constrained by a
+						   // linear combination of
+						   // other dofs but is
+						   // equal to zero
+						   // (i.e. its chain of
+						   // entries is empty). in
+						   // that case, we can't
+						   // just overwrite the
+						   // current entry, but we
 						   // have to actually
 						   // eliminate it
 		  {
 		    line->entries.erase (line->entries.begin()+entry);
 		  }
-		    
 
-		//line->inhomogeneity += constrained_line->inhomogeneity *
-		//                     weight;
-		//constrained_line->inhomogeneity = 0;
+		line->inhomogeneity += constrained_line->inhomogeneity *
+		                       weight;
 		
-						 // now that we're
-						 // here, do not
-						 // increase index by
-						 // one but rather
-						 // make another pass
-						 // for the present
-						 // entry because we
+						 // now that we're here, do
+						 // not increase index by
+						 // one but rather make
+						 // another pass for the
+						 // present entry because we
 						 // have replaced the
-						 // present entry by
-						 // another one, or
-						 // because we have
-						 // deleted it and
-						 // shifted all
-						 // following ones one
+						 // present entry by another
+						 // one, or because we have
+						 // deleted it and shifted
+						 // all following ones one
 						 // forward
 	      }
 	    else
 					       // entry not further
-					       // constrained. just
-					       // move ahead by one
+					       // constrained. just move
+					       // ahead by one
 	      ++entry;
 	}
 
@@ -342,41 +333,38 @@ void ConstraintMatrix::close ()
       if (chained_constraint_replaced == false)
 	break;
 
-				       // increase iteration
-				       // count. note that we should
-				       // not iterate more times than
-				       // there are constraints, since
-				       // this puts a natural upper
-				       // bound on the length of
-				       // constraint chains
+				       // increase iteration count. note
+				       // that we should not iterate more
+				       // times than there are constraints,
+				       // since this puts a natural upper
+				       // bound on the length of constraint
+				       // chains
       ++iteration;
       Assert (iteration <= lines.size(),
 	      ExcInternalError());
     }
 
-				   // finally sort the entries and
-				   // re-scale them if necessary. in
-				   // this step, we also throw out
-				   // duplicates as mentioned above
+				   // finally sort the entries and re-scale
+				   // them if necessary. in this step, we
+				   // also throw out duplicates as mentioned
+				   // above
   for (std::vector<ConstraintLine>::iterator line = lines.begin();
        line!=lines.end(); ++line)
     {
       std::sort (line->entries.begin(), line->entries.end());
 
-                                       // loop over the now sorted
-                                       // list and see whether any of
-                                       // the entries references the
-                                       // same dofs more than once
+                                       // loop over the now sorted list and
+                                       // see whether any of the entries
+                                       // references the same dofs more than
+                                       // once
       for (unsigned int i=1; i<line->entries.size(); ++i)
         if (line->entries[i].first == line->entries[i-1].first)
           {
                                              // ok, we've found a
-                                             // duplicate. go on to
-                                             // count how many
-                                             // duplicates there are
-                                             // so that we can
-                                             // allocate the right
-                                             // amount of memory
+                                             // duplicate. go on to count
+                                             // how many duplicates there
+                                             // are so that we can allocate
+                                             // the right amount of memory
             unsigned int duplicates = 1;
             for (unsigned int j=i+1; j<line->entries.size(); ++j)
               if (line->entries[j].first == line->entries[j-1].first)
@@ -461,8 +449,11 @@ void ConstraintMatrix::close ()
       for (unsigned int i=0; i<line->entries.size(); ++i)
 	sum += line->entries[i].second;
       if ((sum != 1.0) && (std::fabs (sum-1.) < 1.e-13))
-	for (unsigned int i=0; i<line->entries.size(); ++i)
-	  line->entries[i].second /= sum;
+	{
+	  for (unsigned int i=0; i<line->entries.size(); ++i)
+	    line->entries[i].second /= sum;
+	  line->inhomogeneity /= sum;
+	}
     }
   
 #ifdef DEBUG
@@ -692,8 +683,9 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 		   j!=tmp_other_lines[i]->entries.end(); ++j)
 		tmp.push_back (std::make_pair(j->first, j->second*weight));
 
-	      //line->inhomogeneity += tmp_other_lines[i]->inhomogeneity * weight;
 	    };
+	  line->inhomogeneity += tmp_other_lines[i]->inhomogeneity *  
+	    line->entries[i].second;
 	};
 				       // finally exchange old and
 				       // newly resolved line

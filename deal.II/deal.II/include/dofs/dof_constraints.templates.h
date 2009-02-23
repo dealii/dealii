@@ -458,14 +458,21 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                                                  // diagonal, zero otherwise
                 {
                   for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
-                    for (unsigned int q=0;
-                         q!=lines[distribute[column]].entries.size(); ++q)
-                      uncondensed.add (lines[distribute[row]].entries[p].first,
-                                       lines[distribute[column]].entries[q].first,
-                                       entry->value() *
-                                       lines[distribute[row]].entries[p].second *
-                                       lines[distribute[column]].entries[q].second);
-		
+		    {
+		      for (unsigned int q=0;
+			   q!=lines[distribute[column]].entries.size(); ++q)
+			uncondensed.add (lines[distribute[row]].entries[p].first,
+					 lines[distribute[column]].entries[q].first,
+					 entry->value() *
+					 lines[distribute[row]].entries[p].second *
+					 lines[distribute[column]].entries[q].second);
+
+		      if (use_vectors == true)
+			vec(lines[distribute[row]].entries[p].first) -= 
+			  entry->value() * lines[distribute[row]].entries[p].second *
+			  lines[distribute[row]].inhomogeneity;
+		    }
+
                                                    // set old entry to correct
                                                    // value
                   entry->value() = (row == column ? average_diagonal : 0. );
@@ -657,12 +664,19 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                       const double old_value = entry->value ();
 			  
                       for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
-                        for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
-                          uncondensed.add (lines[distribute[row]].entries[p].first,
-                                           lines[distribute[global_col]].entries[q].first,
-                                           old_value *
-                                           lines[distribute[row]].entries[p].second *
-                                           lines[distribute[global_col]].entries[q].second);
+			{
+			  for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
+			    uncondensed.add (lines[distribute[row]].entries[p].first,
+					     lines[distribute[global_col]].entries[q].first,
+					     old_value *
+					     lines[distribute[row]].entries[p].second *
+					     lines[distribute[global_col]].entries[q].second);
+
+			  if (use_vectors == true)
+			    vec(lines[distribute[row]].entries[p].first) -= 
+			      old_value * lines[distribute[row]].entries[p].second *
+			      lines[distribute[global_col]].inhomogeneity;
+			}
 
                       entry->value() = (row == global_col ? average_diagonal : 0. );
                     }
@@ -980,12 +994,19 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // the values again in
                                                    // the matrix directly
                   for (unsigned int p=0; p<position_i->entries.size(); ++p)
-                    for (unsigned int q=0; q<position_j->entries.size(); ++q)
-                      global_matrix.add (position_i->entries[p].first,
-                                         position_j->entries[q].first,
-                                         local_matrix(i,j) *
-                                         position_i->entries[p].second *
-                                         position_j->entries[q].second);
+		    {
+		      for (unsigned int q=0; q<position_j->entries.size(); ++q)
+			global_matrix.add (position_i->entries[p].first,
+					   position_j->entries[q].first,
+					   local_matrix(i,j) *
+					   position_i->entries[p].second *
+					   position_j->entries[q].second);
+
+		      if (use_vectors == true)
+			global_vector (position_i->entries[p].first) -=
+			  local_matrix(j,i) * position_i->entries[p].second *
+			  position_j->inhomogeneity;
+		    }
 
                                                    // to make sure that the
                                                    // global matrix remains
@@ -1031,7 +1052,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                   if (i == j)
 		    {
 		      column_indices[col_counter] = local_dof_indices[j];
-		      column_values[col_counter] = local_matrix(i,j);
+		      column_values[col_counter] = 
+			std::max(std::fabs(local_matrix(i,j)), 1e-10);
 		      col_counter++;
 		    }
                 }
