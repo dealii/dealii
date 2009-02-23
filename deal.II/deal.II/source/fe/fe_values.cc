@@ -795,8 +795,8 @@ namespace internal
       scalars.resize (n_scalars);
       for (unsigned int component=0; component<n_scalars; ++component)
 	{
-	  scalars[component].
-	    dealii::FEValuesViews::Scalar<dim,spacedim>::~Scalar ();
+	  typedef dealii::FEValuesViews::Scalar<dim,spacedim> ScalarView;
+	  scalars[component].ScalarView::~ScalarView ();
 	  new (&scalars[component])
 	    dealii::FEValuesViews::Scalar<dim,spacedim>(fe_values,
 							component);
@@ -808,8 +808,8 @@ namespace internal
       vectors.resize (n_vectors);
       for (unsigned int component=0; component<n_vectors; ++component)
 	{
-	  vectors[component].
-	    dealii::FEValuesViews::Vector<dim,spacedim>::~Vector ();
+	  typedef dealii::FEValuesViews::Vector<dim,spacedim> VectorView;
+	  vectors[component].VectorView::~VectorView ();
 	  new (&vectors[component])
 	    dealii::FEValuesViews::Vector<dim,spacedim>(fe_values,
 							component);
