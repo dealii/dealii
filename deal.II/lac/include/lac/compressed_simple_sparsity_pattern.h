@@ -347,7 +347,6 @@ class CompressedSimpleSparsityPattern : public Subscriptor
                                           * this line.
                                           */
         void add (const unsigned int col_num);
-
     };
 
 
