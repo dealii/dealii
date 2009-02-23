@@ -651,7 +651,8 @@ namespace TrilinosWrappers
     for (unsigned int row=0; row<n_rows; ++row)
       {
 	values.resize (n_entries_per_row[row],0.);
-	row_indices.resize (n_entries_per_row[row],-1);
+	row_indices.resize (n_entries_per_row[row],
+			    numbers::invalid_unsigned_int);
 	
 	unsigned int index = 0;
 	for (dealii::SparseMatrix<double>::const_iterator  
