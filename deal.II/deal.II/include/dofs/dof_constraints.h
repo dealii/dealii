@@ -351,180 +351,159 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Add a whole series of entries,
-				      * denoted by pairs of column
-				      * indices and values, to a line
-				      * of constraints. This function
-				      * is equivalent to calling the
-				      * preceeding function
-				      * several times, but is faster.
+				      * denoted by pairs of column indices
+				      * and values, to a line of
+				      * constraints. This function is
+				      * equivalent to calling the preceeding
+				      * function several times, but is
+				      * faster.
 				      */
     void add_entries (const unsigned int                                  line,
 		      const std::vector<std::pair<unsigned int,double> > &col_val_pairs);
 
 				     /**
 				      * Set an imhomogeneity to the
-				      * constraint line <i>i</i>,
-				      * according to the discussion in
-				      * the general class description.
+				      * constraint line <i>i</i>, according
+				      * to the discussion in the general
+				      * class description.
 				      */
     void set_inhomogeneity (const unsigned int line,
 			    const double       value);
 
 				     /**
-				      * Close the filling of
-				      * entries. Since the lines of a
-				      * matrix of this type are
-				      * usually filled in an arbitrary
-				      * order and since we do not want
-				      * to use associative constainers
-				      * to store the lines, we need to
-				      * sort the lines and within the
-				      * lines the columns before usage
-				      * of the matrix.  This is done
-				      * through this function.
+				      * Close the filling of entries. Since
+				      * the lines of a matrix of this type
+				      * are usually filled in an arbitrary
+				      * order and since we do not want to
+				      * use associative constainers to store
+				      * the lines, we need to sort the lines
+				      * and within the lines the columns
+				      * before usage of the matrix.  This is
+				      * done through this function.
 				      *
-				      * Also, zero entries are
-				      * discarded, since they are not
-				      * needed.
+				      * Also, zero entries are discarded,
+				      * since they are not needed.
 				      *
-				      * After closing, no more entries
-				      * are accepted. If the object
-				      * was already closed, then this
-				      * function returns immediately.
+				      * After closing, no more entries are
+				      * accepted. If the object was already
+				      * closed, then this function returns
+				      * immediately.
 				      *
-				      * This function also resolves
-				      * chains of constraints. For
-				      * example, degree of freedom 13
-				      * may be constrained to
-				      * $u_{13}=u_3/2+u_7/2$ while
-				      * degree of freedom 7 is itself
-				      * constrained as
+				      * This function also resolves chains
+				      * of constraints. For example, degree
+				      * of freedom 13 may be constrained to
+				      * $u_{13}=u_3/2+u_7/2$ while degree of
+				      * freedom 7 is itself constrained as
 				      * $u_7=u_2/2+u_4/2$. Then, the
 				      * resolution will be that
 				      * $u_{13}=u_3/2+u_2/4+u_4/4$. Note,
-				      * however, that cycles in this
-				      * graph of constraints are not
-				      * allowed, i.e. for example
-				      * $u_4$ may not be constrained,
-				      * directly or indirectly, to
-				      * $u_{13}$ again.
+				      * however, that cycles in this graph
+				      * of constraints are not allowed,
+				      * i.e. for example $u_4$ may not be
+				      * constrained, directly or indirectly,
+				      * to $u_{13}$ again.
 				      */
     void close ();
 
 				     /**
-				      * Merge the constraints
-				      * represented by the object
-				      * given as argument into the
-				      * constraints represented by
-				      * this object. Both objects may
-				      * or may not be closed (by
-				      * having their function
-				      * @p close called before). If
-				      * this object was closed before,
-				      * then it will be closed
-				      * afterwards as well. Note,
-				      * however, that if the other
-				      * argument is closed, then
-				      * merging may be significantly
-				      * faster.
+				      * Merge the constraints represented by
+				      * the object given as argument into
+				      * the constraints represented by this
+				      * object. Both objects may or may not
+				      * be closed (by having their function
+				      * @p close called before). If this
+				      * object was closed before, then it
+				      * will be closed afterwards as
+				      * well. Note, however, that if the
+				      * other argument is closed, then
+				      * merging may be significantly faster.
 				      *
-				      * Note that the constraints in
-				      * each of the two objects (the
-				      * old one represented by this
-				      * object and the argument) may
-				      * not refer to the same degree
-				      * of freedom, i.e. a degree of
-				      * freedom that is constrained in
-				      * one object may not be
-				      * constrained in the second. If
-				      * this is nevertheless the case,
-				      * an exception is thrown.
+				      * Note that the constraints in each of
+				      * the two objects (the old one
+				      * represented by this object and the
+				      * argument) may not refer to the same
+				      * degree of freedom, i.e. a degree of
+				      * freedom that is constrained in one
+				      * object may not be constrained in the
+				      * second. If this is nevertheless the
+				      * case, an exception is thrown.
 				      *
-				      * However, the following is
-				      * possible: if DoF @p x is
-				      * constrained to dofs @p x_i
-				      * for some set of indices @p i,
-				      * then the DoFs @p x_i may be
-				      * further constrained by the
-				      * constraints object given as
-				      * argument, although not to
-				      * other DoFs that are
-				      * constrained in either of the
-				      * two objects. Note that it is
-				      * not possible that the DoFs
-				      * @p x_i are constrained within
-				      * the present object.
-				      *
-				      * Because of simplicity of
-				      * implementation, and also to
-				      * avoid cycles, this operation
-				      * is not symmetric: degrees of
-				      * freedom that are constrained
-				      * in the given argument object
-				      * may not be constrained to DoFs
-				      * that are themselves
+				      * However, the following is possible:
+				      * if DoF @p x is constrained to dofs
+				      * @p x_i for some set of indices @p i,
+				      * then the DoFs @p x_i may be further
+				      * constrained by the constraints
+				      * object given as argument, although
+				      * not to other DoFs that are
+				      * constrained in either of the two
+				      * objects. Note that it is not
+				      * possible that the DoFs @p x_i are
 				      * constrained within the present
 				      * object.
 				      *
-				      * The aim of these merging
-				      * operations is that if, for
-				      * example, you have hanging
-				      * nodes that are constrained to
-				      * the degrees of freedom
-				      * adjacent to them, you cannot
-				      * originally, i.e. within one
-				      * object, constrain these
-				      * adjacent nodes
+				      * Because of simplicity of
+				      * implementation, and also to avoid
+				      * cycles, this operation is not
+				      * symmetric: degrees of freedom that
+				      * are constrained in the given
+				      * argument object may not be
+				      * constrained to DoFs that are
+				      * themselves constrained within the
+				      * present object.
+				      *
+				      * The aim of these merging operations
+				      * is that if, for example, you have
+				      * hanging nodes that are constrained
+				      * to the degrees of freedom adjacent
+				      * to them, you cannot originally,
+				      * i.e. within one object, constrain
+				      * these adjacent nodes
 				      * further. However, that may be
-				      * desirable in some cases, for
-				      * example if they belong to a
-				      * symmetry boundary for which
-				      * the nodes on one side of the
-				      * domain should have the same
-				      * values as those on the other
-				      * side. In that case, you would
-				      * first construct a costraints
-				      * object holding the hanging
-				      * nodes constraints, and a
-				      * second one that contains the
-				      * constraints due to the
-				      * symmetry boundary. You would
-				      * then finally merge this second
-				      * one into the first, possibly
-				      * eliminating constraints of
-				      * hanging nodes to adjacent
-				      * boundary nodes by constraints
-				      * to nodes at the opposite
+				      * desirable in some cases, for example
+				      * if they belong to a symmetry
+				      * boundary for which the nodes on one
+				      * side of the domain should have the
+				      * same values as those on the other
+				      * side. In that case, you would first
+				      * construct a costraints object
+				      * holding the hanging nodes
+				      * constraints, and a second one that
+				      * contains the constraints due to the
+				      * symmetry boundary. You would then
+				      * finally merge this second one into
+				      * the first, possibly eliminating
+				      * constraints of hanging nodes to
+				      * adjacent boundary nodes by
+				      * constraints to nodes at the opposite
 				      * boundary.
 				      */
     void merge (const ConstraintMatrix &other_constraints);
 
 				     /**
-				      * Shift all entries of this
-				      * matrix down @p offset rows
-				      * and over @p offset columns.
+				      * Shift all entries of this matrix
+				      * down @p offset rows and over @p
+				      * offset columns.
 				      *
-				      * This function is useful if you
-				      * are building block matrices,
-				      * where all blocks are built by
-				      * the same @p DoFHandler
-				      * object, i.e. the matrix size
-				      * is larger than the number of
-				      * degrees of freedom. Since
-				      * several matrix rows and
-				      * columns correspond to the same
-				      * degrees of freedom, you'd
-				      * generate several constraint
+				      * This function is useful if you are
+				      * building block matrices, where all
+				      * blocks are built by the same @p
+				      * DoFHandler object, i.e. the matrix
+				      * size is larger than the number of
+				      * degrees of freedom. Since several
+				      * matrix rows and columns correspond
+				      * to the same degrees of freedom,
+				      * you'd generate several constraint
 				      * objects, then shift them, and
-				      * finally @p merge them
-				      * together again.
+				      * finally @p merge them together
+				      * again.
 				      */
     void shift (const unsigned int offset);
     
 				     /**
-				      * Clear all entries of this matrix. Reset
-				      * the flag determining whether new entries
-				      * are accepted or not.
+				      * Clear all entries of this
+				      * matrix. Reset the flag determining
+				      * whether new entries are accepted or
+				      * not.
 				      *
 				      * This function may be called also on
 				      * objects which are empty or already
@@ -549,112 +528,102 @@ class ConstraintMatrix : public Subscriptor
     unsigned int n_constraints () const;
 
 				     /**
-				      * Return whether the degree of
-				      * freedom with number @p index is
-				      * a constrained one.
+				      * Return whether the degree of freedom
+				      * with number @p index is a
+				      * constrained one.
 				      *
-				      * Note that if @p close was
-				      * called before, then this
-				      * function is significantly
-				      * faster, since then the
-				      * constrained degrees of freedom
-				      * are sorted and we can do a
-				      * binary search, while before
-				      * @p close was called, we have to
-				      * perform a linear search
-				      * through all entries.
+				      * Note that if @p close was called
+				      * before, then this function is
+				      * significantly faster, since then the
+				      * constrained degrees of freedom are
+				      * sorted and we can do a binary
+				      * search, while before @p close was
+				      * called, we have to perform a linear
+				      * search through all entries.
 				      */
     bool is_constrained (const unsigned int index) const;
 
 				     /**
 				      * Return whether the dof is
 				      * constrained, and whether it is
-				      * constrained to only one other
-				      * degree of freedom with weight
-				      * one. The function therefore
-				      * returns whether the degree of
-				      * freedom would simply be
-				      * eliminated in favor of exactly
+				      * constrained to only one other degree
+				      * of freedom with weight one. The
+				      * function therefore returns whether
+				      * the degree of freedom would simply
+				      * be eliminated in favor of exactly
 				      * one other degree of freedom.
 				      *
-				      * The function returns @p false
-				      * if either the degree of
-				      * freedom is not constrained at
-				      * all, or if it is constrained
-				      * to more than one other degree
-				      * of freedom, or if it is
-				      * constrained to only one degree
-				      * of freedom but with a weight
-				      * different from one.
+				      * The function returns @p false if
+				      * either the degree of freedom is not
+				      * constrained at all, or if it is
+				      * constrained to more than one other
+				      * degree of freedom, or if it is
+				      * constrained to only one degree of
+				      * freedom but with a weight different
+				      * from one.
 				      */
     bool is_identity_constrained (const unsigned int index) const;
     
 				     /**
-				      * Return the maximum number of
-				      * other dofs that one dof is
-				      * constrained to. For example,
-				      * in 2d a hanging node is
-				      * constrained only to its two
-				      * neighbors, so the returned
-				      * value would be @p 2. However,
-				      * for higher order elements
-				      * and/or higher dimensions, or
-				      * other types of constraints,
-				      * this number is no more
+				      * Return the maximum number of other
+				      * dofs that one dof is constrained
+				      * to. For example, in 2d a hanging
+				      * node is constrained only to its two
+				      * neighbors, so the returned value
+				      * would be @p 2. However, for higher
+				      * order elements and/or higher
+				      * dimensions, or other types of
+				      * constraints, this number is no more
 				      * obvious.
 				      *
-				      * The name indicates that within
-				      * the system matrix, references
-				      * to a constrained node are
-				      * indirected to the nodes it is
-				      * constrained to.
+				      * The name indicates that within the
+				      * system matrix, references to a
+				      * constrained node are indirected to
+				      * the nodes it is constrained to.
 				      */
     unsigned int max_constraint_indirections () const;
 
     
     
 				     /**
-				      * Print the constraint lines. Mainly for
-				      * debugging purposes.
+				      * Print the constraint lines. Mainly
+				      * for debugging purposes.
 				      *
 				      * This function writes out all entries
 				      * in the constraint matrix lines with
-				      * their value in the form
-				      * <tt>row col : value</tt>. Unconstrained lines
-				      * containing only one identity entry are
-				      * not stored in this object and are not
-				      * printed.
+				      * their value in the form <tt>row col
+				      * : value</tt>. Unconstrained lines
+				      * containing only one identity entry
+				      * are not stored in this object and
+				      * are not printed.
 				      */
     void print (std::ostream &) const;
 
 				     /**
-				      * Write the graph of constraints
-				      * in 'dot' format. 'dot' is a
-				      * program that can take a list
-				      * of nodes and produce a
-				      * graphical representation of
-				      * the graph of constrained
-				      * degrees of freedom and the
-				      * degrees of freedom they are
-				      * constrained to.
+				      * Write the graph of constraints in
+				      * 'dot' format. 'dot' is a program
+				      * that can take a list of nodes and
+				      * produce a graphical representation
+				      * of the graph of constrained degrees
+				      * of freedom and the degrees of
+				      * freedom they are constrained to.
 				      *
-				      * The output of this function
-				      * can be used as input to the
-				      * 'dot' program that can convert
-				      * the graph into a graphical
-				      * representation in postscript,
-				      * png, xfig, and a number of
-				      * other formats.
+				      * The output of this function can be
+				      * used as input to the 'dot' program
+				      * that can convert the graph into a
+				      * graphical representation in
+				      * postscript, png, xfig, and a number
+				      * of other formats.
 				      *
-				      * This function exists mostly
-				      * for debugging purposes.
+				      * This function exists mostly for
+				      * debugging purposes.
 				      */
     void write_dot (std::ostream &) const;
 
 				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
+				      * Determine an estimate for the memory
+				      * consumption (in bytes) of this
+				      * object.
 				      */
     unsigned int memory_consumption () const;
 
@@ -669,53 +638,46 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Condense a given sparsity
-				      * pattern. This function assumes
-				      * the uncondensed matrix struct
-				      * to be compressed and the one
-				      * to be filled to be empty. The
-				      * condensed structure is
-				      * compressed afterwards.
+				      * pattern. This function assumes the
+				      * uncondensed matrix struct to be
+				      * compressed and the one to be filled
+				      * to be empty. The condensed structure
+				      * is compressed afterwards.
 				      *
-				      * The constraint matrix object
-				      * must be closed to call this
-				      * function.
+				      * The constraint matrix object must be
+				      * closed to call this function.
 				      *
 				      * @note The hanging nodes are
 				      * completely eliminated from the
 				      * linear system refering to
-				      * <tt>condensed</tt>. Therefore,
+				      * <tt>condensed</tt>. Therefore, the
+				      * dimension of <tt>condensed</tt> is
 				      * the dimension of
-				      * <tt>condensed</tt> is the
-				      * dimension of
 				      * <tt>uncondensed</tt> minus the
-				      * number of constrained degrees
-				      * of freedom.
+				      * number of constrained degrees of
+				      * freedom.
 				      */
     void condense (const SparsityPattern &uncondensed,
 		   SparsityPattern       &condensed) const;
 
 
 				     /**
-				      * This function does much the
-				      * same as the above one, except
-				      * that it condenses the matrix
-				      * struct 'in-place'. It does not
-				      * remove nonzero entries from
-				      * the matrix but adds those
-				      * needed for the process of
-				      * distribution of the
-				      * constrained degrees of
-				      * freedom.
+				      * This function does much the same as
+				      * the above one, except that it
+				      * condenses the matrix struct
+				      * 'in-place'. It does not remove
+				      * nonzero entries from the matrix but
+				      * adds those needed for the process of
+				      * distribution of the constrained
+				      * degrees of freedom.
 				      *
-				      * Since this function adds new
-				      * nonzero entries to the
-				      * sparsity pattern, the argument
-				      * must not be
-				      * compressed. However the
-				      * constraint matrix must be
-				      * closed.  The matrix struct is
-				      * compressed at the end of the
-				      * function.
+				      * Since this function adds new nonzero
+				      * entries to the sparsity pattern, the
+				      * argument must not be
+				      * compressed. However the constraint
+				      * matrix must be closed. The matrix
+				      * struct is compressed at the end of
+				      * the function.
 				      */
     void condense (SparsityPattern &sparsity) const;
 
@@ -728,8 +690,8 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Same function as above, but
-				      * condenses square compressed
-				      * sparsity patterns.
+				      * condenses square compressed sparsity
+				      * patterns.
 				      *
 				      * Given the data structure used by
 				      * CompressedSparsityPattern, this
@@ -755,58 +717,56 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Same function as above, but
-				      * condenses compressed
-				      * sparsity patterns, which are
-				      * based on the std::set container.
+				      * condenses compressed sparsity
+				      * patterns, which are based on the
+				      * std::set container.
 				      */
     void condense (CompressedSetSparsityPattern &sparsity) const;
 
 				     /**
 				      * Same function as above, but
-				      * condenses compressed
-				      * sparsity patterns, which are
-				      * based on the ''simple'' aproach.
+				      * condenses compressed sparsity
+				      * patterns, which are based on the
+				      * ''simple'' aproach.
 				      */
     void condense (CompressedSimpleSparsityPattern &sparsity) const;
 
 				     /**
 				      * Same function as above, but
-				      * condenses square compressed
-				      * sparsity patterns.
+				      * condenses square compressed sparsity
+				      * patterns.
 				      *
-				      * Given the data structure used
-				      * by BlockCompressedSparsityPattern,
-				      * this function becomes
-				      * quadratic in the number of
-				      * degrees of freedom for large
-				      * problems and can dominate
+				      * Given the data structure used by
+				      * BlockCompressedSparsityPattern, this
+				      * function becomes quadratic in the
+				      * number of degrees of freedom for
+				      * large problems and can dominate
 				      * setting up linear systems when
-				      * several hundred thousand or
-				      * millions of unknowns are
-				      * involved and for problems with
-				      * many nonzero elements per row
-				      * (for example for vector-valued
-				      * problems or hp finite
+				      * several hundred thousand or millions
+				      * of unknowns are involved and for
+				      * problems with many nonzero elements
+				      * per row (for example for
+				      * vector-valued problems or hp finite
 				      * elements). In this case, it is
 				      * advisable to use the
 				      * BlockCompressedSetSparsityPattern
-				      * class instead, see for example
-				      * @ref step_27 "step-27" and
-				      * @ref step_31 "step-31".
+				      * class instead, see for example @ref
+				      * step_27 "step-27" and @ref step_31
+				      * "step-31".
 				      */
     void condense (BlockCompressedSparsityPattern &sparsity) const;
 
 				     /**
 				      * Same function as above, but
-				      * condenses square compressed
-				      * sparsity patterns.
+				      * condenses square compressed sparsity
+				      * patterns.
 				      */
     void condense (BlockCompressedSetSparsityPattern &sparsity) const;
 
 				     /**
 				      * Same function as above, but
-				      * condenses square compressed
-				      * sparsity patterns.
+				      * condenses square compressed sparsity
+				      * patterns.
 				      */
     void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
     
@@ -828,10 +788,10 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * This function does much the same as
-				      * the above one, except that it condenses
-				      * the matrix 'in-place'. See the general
-				      * documentation of this class for more
-				      * detailed information.
+				      * the above one, except that it
+				      * condenses the matrix 'in-place'. See
+				      * the general documentation of this
+				      * class for more detailed information.
 				      */
     template<typename number>
     void condense (SparseMatrix<number> &matrix) const;
@@ -851,16 +811,17 @@ class ConstraintMatrix : public Subscriptor
 				      * guarantee that all entries of @p
 				      * condensed be zero. Note that this
 				      * function does not take any
-				      * inhomogeneity into account, use the
-				      * function using both a matrix and
+				      * inhomogeneity into account and
+				      * throws an exception in case there
+				      * are any inhomogeneities. Use
+				      * the function using both a matrix and
 				      * vector for that case.
 				      *
 				      * The @p VectorType may be a
 				      * Vector<float>, Vector<double>,
-				      * BlockVector<tt><...></tt>, a
-				      * PETSc or Trilinos vector
-				      * wrapper class, or any other
-				      * type having the same
+				      * BlockVector<tt><...></tt>, a PETSc
+				      * or Trilinos vector wrapper class, or
+				      * any other type having the same
 				      * interface.
 				      */
     template <class VectorType>
@@ -869,18 +830,18 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Condense the given vector
-				      * in-place. The @p VectorType
-				      * may be a Vector<float>,
-				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a
-				      * PETSc or Trilinos vector
-				      * wrapper class, or any other
-				      * type having the same
-				      * interface. Note that this
-				      * function does not take any
-				      * inhomogeneity into account, use the
-				      * function using both a matrix and
-				      * vector for that case.
+				      * in-place. The @p VectorType may be a
+				      * Vector<float>, Vector<double>,
+				      * BlockVector<tt><...></tt>, a PETSc
+				      * or Trilinos vector wrapper class, or
+				      * any other type having the same
+				      * interface. Note that this function
+				      * does not take any inhomogeneity into
+				      * account and throws an exception in
+				      * case there are any
+				      * inhomogeneities. Use the function
+				      * using both a matrix and vector for
+				      * that case.
 				      */
     template <class VectorType>
     void condense (VectorType &vec) const;
@@ -893,8 +854,8 @@ class ConstraintMatrix : public Subscriptor
 				      * responsibility to guarantee that all
 				      * entries in the @p condensed matrix
 				      * and vector be zero! This function is
-				      * capable of applying inhomogeneous
-				      * constraints.
+				      * the appropriate choice for applying
+				      * inhomogeneous constraints.
 				      *
 				      * The constraint matrix object must be
 				      * closed to call this function.

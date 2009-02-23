@@ -307,8 +307,9 @@ void ConstraintMatrix::close ()
 		  }
 		    
 
-		line->inhomogeneity += constrained_line->inhomogeneity *
-		                       weight;
+		//line->inhomogeneity += constrained_line->inhomogeneity *
+		//                     weight;
+		//constrained_line->inhomogeneity = 0;
 		
 						 // now that we're
 						 // here, do not
@@ -689,7 +690,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 		   j!=tmp_other_lines[i]->entries.end(); ++j)
 		tmp.push_back (std::make_pair(j->first, j->second*weight));
 
-	      line->inhomogeneity += tmp_other_lines[i]->inhomogeneity * weight;
+	      //line->inhomogeneity += tmp_other_lines[i]->inhomogeneity * weight;
 	    };
 	};
 				       // finally exchange old and
