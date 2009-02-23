@@ -97,8 +97,6 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-	template <int, int> friend class dealii::hp::DoFHandler;	
     };
 
 /**
