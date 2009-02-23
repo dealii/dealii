@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,6 +24,8 @@
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
+#include <lac/sparse_matrix_ez.h>
+#include <lac/block_sparse_matrix_ez.h>
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
 #include <lac/petsc_sparse_matrix.h>
@@ -2092,10 +2094,17 @@ distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>    
 						    VectorType                      &) const
 
 MATRIX_FUNCTIONS(SparseMatrix<double>, Vector<double>);
-MATRIX_FUNCTIONS(SparseMatrix<float>, Vector<float>);
+MATRIX_FUNCTIONS(SparseMatrix<float>,  Vector<float>);
 
 MATRIX_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
-MATRIX_FUNCTIONS(BlockSparseMatrix<float>, BlockVector<float>);
+MATRIX_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
+
+MATRIX_FUNCTIONS(SparseMatrixEZ<double>, Vector<double>);
+MATRIX_FUNCTIONS(SparseMatrixEZ<float>,  Vector<float>);
+
+// MATRIX_FUNCTIONS(BlockSparseMatrixEZ<double>, Vector<double>);
+// MATRIX_FUNCTIONS(BlockSparseMatrixEZ<float>,  Vector<float>);
+
 
 #ifdef DEAL_II_USE_PETSC
 MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix, PETScWrappers::Vector);
