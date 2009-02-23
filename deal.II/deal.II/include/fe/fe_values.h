@@ -2625,8 +2625,8 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * class, since they access internal
 				      * data.
 				      */
-    template <int> friend class FEValuesViews::Scalar;
-    template <int> friend class FEValuesViews::Vector;
+    template <int, int> friend class FEValuesViews::Scalar;
+    template <int, int> friend class FEValuesViews::Vector;
 };
 
 
