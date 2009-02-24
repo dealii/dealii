@@ -24,6 +24,7 @@ default: run-tests
 tests_x = block_matrices \
 	user_data_* \
 	constraints \
+	inhomogeneous_constraints \
 	constraints_zero \
 	constraints_zero_merge \
 	constraints_zero_condense \
