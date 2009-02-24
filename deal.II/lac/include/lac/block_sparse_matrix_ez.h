@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,8 @@
 #ifndef __deal2__block_sparse_matrix_ez_h
 #define __deal2__block_sparse_matrix_ez_h
 
+
+//TODO: Derive BlockSparseMatrixEZ from BlockMatrixBase, like all the other block matrices as well; this would allow to instantiate a few functions with this template argument as well (in particular ConstraintMatrix::distribute_local_to_global)
 
 #include <base/config.h>
 #include <base/exceptions.h>
