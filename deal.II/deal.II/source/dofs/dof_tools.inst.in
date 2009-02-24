@@ -55,6 +55,25 @@ for (SP : SPARSITY_PATTERNS)
     (const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof_row,
      const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof_col,
      SP    &sparsity);
+
+    template void
+    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
+    (const DoFHandler<deal_II_dimension> &dof,
+     SP    &sparsity);
+
+    template void
+    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
+    (const hp::DoFHandler<deal_II_dimension> &dof,
+     SP    &sparsity);
+
+#if deal_II_dimension > 1
+    template void
+    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
+    (const DoFHandler<deal_II_dimension> &dof,
+     SP    &,
+     const Table<2,Coupling>&,
+     const Table<2,Coupling>&);
+#endif
   }
 
 for (SP : SPARSITY_PATTERNS)
