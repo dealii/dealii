@@ -311,6 +311,13 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 				 uncondensed.global_entry(j) *
 				 next_constraint->entries[q].second *
 				 c->entries[p].second);
+
+	      if (use_vectors == true)
+		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
+		  condensed_vector (new_line[next_constraint->entries[q].first])
+		    -= uncondensed.global_entry(j) * 
+		       next_constraint->entries[q].second *
+		       c->inhomogeneity;
 	    };
 
 				   // condense the vector
@@ -406,8 +413,8 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
 				   // row of the inhomogeneous constraint in
 				   // the matrix with Gauss elimination
 		  if (use_vectors == true)
-		    vec(column) -= entry->value() * 
-		                   lines[distribute[column]].inhomogeneity;
+		    vec(row) -= 
+		      entry->value() * lines[distribute[column]].inhomogeneity;
 
                                                    // set old value to zero
                   entry->value() = 0.;
@@ -470,7 +477,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
 		      if (use_vectors == true)
 			vec(lines[distribute[row]].entries[p].first) -= 
 			  entry->value() * lines[distribute[row]].entries[p].second *
-			  lines[distribute[row]].inhomogeneity;
+			  lines[distribute[column]].inhomogeneity;
 		    }
 
                                                    // set old entry to correct
@@ -604,8 +611,8 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 				   // row of the inhomogeneous constraint in
 				   // the matrix with Gauss elimination
 		      if (use_vectors == true)
-			vec(global_col) -= entry->value() * 
-			                   lines[distribute[global_col]].inhomogeneity;
+			vec(row) -= entry->value() * 
+			            lines[distribute[global_col]].inhomogeneity;
 
                       entry->value() = 0.;
                     }
