@@ -1,4 +1,4 @@
-//----------------  inhomogeneous_constraints_nonsymmetric.cc  -------------------
+//----------------  inhomogeneous_constraints_block.cc  -------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,12 +9,13 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------  inhomogeneous_constraints_nonsymmetric.cc  -------------------
+//----------------  inhomogeneous_constraints_block.cc  -------------------
 
 
 // this function tests the correctness of the implementation of
 // inhomogeneous constraints on a nonsymmetric matrix that comes from a
-// discretization of the first derivative
+// discretization of the first derivative, based on block matrices instead
+// of standard matrices, by working on a vector-valued problem
 
 #include "../tests.h"
 
@@ -22,27 +23,27 @@
 #include <base/function.h>
 #include <base/logstream.h>
 #include <base/utilities.h>
-#include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_refinement.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <dofs/dof_constraints.h>
-#include <fe/fe_q.h>
+#include <fe/fe_system.h>
 #include <fe/fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/error_estimator.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
+#include <lac/block_sparsity_pattern.h>
 
 #include <fstream>
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("inhomogeneous_constraints_nonsymmetric/output");
+std::ofstream logfile("inhomogeneous_constraints_block/output");
 
 using namespace dealii;
 
@@ -62,20 +63,20 @@ class AdvectionProblem
     void assemble_test_1 ();
     void assemble_test_2 ();
 
-    Triangulation<dim>   triangulation;
+    Triangulation<dim>        triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    FE_Q<dim>            fe;
+    DoFHandler<dim>           dof_handler;
+    FESystem<dim>             fe;
 
-    ConstraintMatrix     hanging_nodes_only;
-    ConstraintMatrix     test_all_constraints;
+    ConstraintMatrix          hanging_nodes_only;
+    ConstraintMatrix          test_all_constraints;
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> reference_matrix;
-    SparseMatrix<double> test_matrix;
+    BlockSparsityPattern      sparsity_pattern;
+    BlockSparseMatrix<double> reference_matrix;
+    BlockSparseMatrix<double> test_matrix;
 
-    Vector<double>       reference_rhs;
-    Vector<double>       test_rhs;
+    BlockVector<double>       reference_rhs;
+    BlockVector<double>       test_rhs;
 };
 
 
@@ -107,7 +108,7 @@ template <int dim>
 AdvectionProblem<dim>::AdvectionProblem ()
 		:
                 dof_handler (triangulation),
-		fe (2)
+		fe (FE_Q<dim>(2),2)
 {}
 
 
@@ -123,21 +124,16 @@ void AdvectionProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
-  reference_rhs.reinit (dof_handler.n_dofs());
-  test_rhs.reinit (dof_handler.n_dofs());
-
   hanging_nodes_only.clear ();
   test_all_constraints.clear ();
 
 				   // add boundary conditions as
-				   // inhomogeneous constraints here. just
-				   // take the right hand side function as
-				   // boundary function
+				   // inhomogeneous constraints here.
   {
     std::map<unsigned int,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
-					      RightHandSide<dim>(),
+					      ConstantFunction<dim>(1.,2),
 					      boundary_values);
     std::map<unsigned int,double>::const_iterator boundary_value = 
       boundary_values.begin();
@@ -155,14 +151,28 @@ void AdvectionProblem<dim>::setup_system ()
   hanging_nodes_only.close ();
   test_all_constraints.close ();
 
-  CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-				       dof_handler.n_dofs());
+  BlockCompressedSimpleSparsityPattern csp (2,2);
+  {
+    const unsigned int dofs_per_block = dof_handler.n_dofs() / 2;
+    csp.block(0,0).reinit (dofs_per_block, dofs_per_block);
+    csp.block(0,1).reinit (dofs_per_block, dofs_per_block);
+    csp.block(1,0).reinit (dofs_per_block, dofs_per_block);
+    csp.block(1,1).reinit (dofs_per_block, dofs_per_block);
+    csp.collect_sizes();
+  }
+
   DoFTools::make_sparsity_pattern (dof_handler, csp,
 				   hanging_nodes_only, true);
   sparsity_pattern.copy_from (csp);
 
   reference_matrix.reinit (sparsity_pattern);
   test_matrix.reinit (sparsity_pattern);
+
+  reference_rhs.reinit (2);
+  reference_rhs.block(0).reinit (dof_handler.n_dofs() / 2);
+  reference_rhs.block(1).reinit (dof_handler.n_dofs() / 2);
+  reference_rhs.collect_sizes();
+  test_rhs.reinit (reference_rhs);
 }
 
 
@@ -174,24 +184,45 @@ void AdvectionProblem<dim>::test_equality ()
 {
 				   // need to manually go through the
 				   // matrix, since we can have different
-				   // entries in constrained lines.
+				   // entries in constrained lines because
+				   // the diagonal is set differently
+
+  const BlockIndices &
+    index_mapping = sparsity_pattern.get_column_indices();
+
   for (unsigned int i=0; i<reference_matrix.m(); ++i)
     {
-      SparseMatrix<double>::const_iterator reference = reference_matrix.begin(i);
-      SparseMatrix<double>::iterator test = test_matrix.begin(i);
-      if (test_all_constraints.is_constrained(i) == false)
+      const unsigned int block_row = index_mapping.global_to_local(i).first;
+      const unsigned int index_in_block = index_mapping.global_to_local(i).second;
+      for (unsigned int block_col=0; block_col<sparsity_pattern.n_block_cols(); 
+	   ++block_col)
 	{
-	  for ( ; test != test_matrix.end(i); ++test, ++reference)
-	      test->value() -= reference->value();
+	  SparseMatrix<double>::const_iterator reference = 
+	    reference_matrix.block(block_row,block_col).begin(index_in_block);
+	  SparseMatrix<double>::iterator test = 
+	    test_matrix.block(block_row,block_col).begin(index_in_block);
+	  if (test_all_constraints.is_constrained(i) == false)
+	    {
+	      for ( ; test != test_matrix.block(block_row,block_col).end(index_in_block); 
+		    ++test, ++reference)
+		test->value() -= reference->value();
+	    }
+	  else
+	    for ( ; test != test_matrix.block(block_row,block_col).end(index_in_block); 
+		  ++test)
+	      test->value() = 0;
 	}
-      else
-	for ( ; test != test_matrix.end(i); ++test)
-	  test->value() = 0;
     }
 
-  deallog << "  Matrix difference norm: " 
-	  << test_matrix.frobenius_norm() << std::endl;
-  Assert (test_matrix.frobenius_norm() < 1e-13, ExcInternalError());
+  double frobenius_norm = 0.;
+  for (unsigned int row=0;row<sparsity_pattern.n_block_rows(); ++row)
+    for (unsigned int col=0;col<sparsity_pattern.n_block_cols(); ++col)
+      frobenius_norm += test_matrix.block(row,col).frobenius_norm() *
+	test_matrix.block(row,col).frobenius_norm();
+  frobenius_norm = std::sqrt(frobenius_norm);
+
+  deallog << "  Matrix difference norm: " << frobenius_norm << std::endl;
+  Assert (frobenius_norm < 1e-13, ExcInternalError());
 
 				   // same here -- Dirichlet lines will have
 				   // nonzero rhs, whereas we will have zero
@@ -253,11 +284,16 @@ void AdvectionProblem<dim>::assemble_reference ()
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
+	    const unsigned int comp_i = fe.system_to_component_index(i).first;
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
-				   advection_direction *
-				   fe_values.shape_grad(j,q_point) *
-				   fe_values.JxW(q_point));
+	      {
+		const unsigned int comp_j = fe.system_to_component_index(j).first;
+		if (comp_i == comp_j)
+		  cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
+				       advection_direction *
+				       fe_values.shape_grad(j,q_point) *
+				       fe_values.JxW(q_point));
+	      }
 
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    rhs_values[q_point] *
@@ -279,7 +315,7 @@ void AdvectionProblem<dim>::assemble_reference ()
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
-					    RightHandSide<dim>(),
+					    ConstantFunction<dim>(1.,2),
 					    boundary_values);
   MatrixTools::apply_boundary_values (boundary_values,
 				      reference_matrix,
@@ -335,11 +371,16 @@ void AdvectionProblem<dim>::assemble_test_1 ()
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
+	    const unsigned int comp_i = fe.system_to_component_index(i).first;
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
-				   advection_direction *
-				   fe_values.shape_grad(j,q_point) *
-				   fe_values.JxW(q_point));
+	      {
+		const unsigned int comp_j = fe.system_to_component_index(j).first;
+		if (comp_i == comp_j)
+		  cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
+				       advection_direction *
+				       fe_values.shape_grad(j,q_point) *
+				       fe_values.JxW(q_point));
+	      }
 
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    rhs_values[q_point] *
@@ -406,11 +447,16 @@ void AdvectionProblem<dim>::assemble_test_2 ()
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
+	    const unsigned int comp_i = fe.system_to_component_index(i).first;
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
-				   advection_direction *
-				   fe_values.shape_grad(j,q_point) *
-				   fe_values.JxW(q_point));
+	      {
+		const unsigned int comp_j = fe.system_to_component_index(j).first;
+		if (comp_i == comp_j)
+		  cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
+				       advection_direction *
+				       fe_values.shape_grad(j,q_point) *
+				       fe_values.JxW(q_point));
+	      }
 
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    rhs_values[q_point] *
@@ -474,7 +520,7 @@ int main ()
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);
   deallog.attach(logfile);
-  deallog.depth_console(0);
+  //deallog.depth_console(0);
   deallog.threshold_double(1.e-12);
 
   {
