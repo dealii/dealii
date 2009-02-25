@@ -377,7 +377,7 @@ inconvenience this causes.
   been renamed Threads::Mutex and Threads::ConditionVariable. The old names
   were somewhat redundant but have been retained as typedefs for compatibility.
   <br> 
-  (Martin Kronbichler 2009/01/14)
+  (WB 2009/01/14)
   </p>
 
   <li>
@@ -691,6 +691,16 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  Changed: The ConstraintMatrix class can now also handle inhomogeneous 
+  constraints. This means that e.g. Dirichlet boundary conditions are now a
+  special case of algebraic constraints. There are new condense functions
+  that simultaneously act on matrices and vectors for use of this feature.
+  <br>
+  (Martin Kronbichler 2009/02/25)
+  </p>
+
   <li>
   <p>
   Changed: The DoFTools::count_dofs_per_component and
