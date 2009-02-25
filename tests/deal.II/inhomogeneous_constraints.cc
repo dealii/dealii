@@ -41,7 +41,6 @@
 #include <fe/fe_q.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
-#include <numerics/data_out.h>
 #include <numerics/error_estimator.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
 #include <hp/dof_handler.h>
@@ -214,20 +213,21 @@ void LaplaceProblem<dim>::test_equality ()
 	  test->value() = 0;
     }
 
-  deallog << "Matrix difference norm: " 
+  deallog << "  Matrix difference norm: " 
 	  << test_matrix.frobenius_norm() << std::endl;
   Assert (test_matrix.frobenius_norm() < 1e-13, ExcInternalError());
 
 				   // same here -- Dirichlet lines will have
-				   // nonzero rhs, whereas we will have
-				   // nonzero one.
+				   // nonzero rhs, whereas we will have zero
+				   // rhs when using inhomogeneous
+				   // constraints.
   for (unsigned int i=0; i<reference_matrix.m(); ++i)
     if (test_all_constraints.is_constrained(i) == false)
       test_rhs(i) -= reference_rhs(i);
     else
       test_rhs(i) = 0;
 
-  deallog << "rhs difference norm: " 
+  deallog << "  RHS difference norm: " 
 	  << test_rhs.l2_norm() << std::endl;
 
   Assert (test_rhs.l2_norm() < 1e-14, ExcInternalError());
@@ -299,10 +299,6 @@ void LaplaceProblem<dim>::assemble_reference ()
     }
 
   hanging_nodes_only.condense (reference_matrix, reference_rhs);
-  deallog << "Reference matrix nonzeros: " << reference_matrix.n_nonzero_elements() 
-	  << ", actually: " << reference_matrix.n_actually_nonzero_elements () 
-	  << std::endl;
-
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -312,6 +308,10 @@ void LaplaceProblem<dim>::assemble_reference ()
 				      reference_matrix,
 				      solution,
 				      reference_rhs);
+
+  deallog << "  Reference matrix nonzeros: " << reference_matrix.n_nonzero_elements() 
+	  << ", actually: " << reference_matrix.n_actually_nonzero_elements () 
+	  << std::endl;
 }
 
 
@@ -380,7 +380,7 @@ void LaplaceProblem<dim>::assemble_test_1 ()
     }
 
   test_all_constraints.condense (test_matrix, test_rhs);
-  deallog << "Test matrix 1 nonzeros: " << test_matrix.n_nonzero_elements() 
+  deallog << "  Test matrix 1 nonzeros: " << test_matrix.n_nonzero_elements() 
 	  << ", actually: " << test_matrix.n_actually_nonzero_elements () 
 	  << std::endl;
 
@@ -452,7 +452,7 @@ void LaplaceProblem<dim>::assemble_test_2 ()
 						       test_matrix,
 						       test_rhs);
     }
-  deallog << "Test matrix 2 nonzeros: " << test_matrix.n_nonzero_elements() 
+  deallog << "  Test matrix 2 nonzeros: " << test_matrix.n_nonzero_elements() 
 	  << ", actually: " << test_matrix.n_actually_nonzero_elements () 
 	  << std::endl;
   test_equality();
@@ -612,7 +612,7 @@ void LaplaceProblem<2>::create_coarse_grid ()
   triangulation.create_triangulation (vertices,
                                     cells,
                                     SubCellData());
-  triangulation.refine_global (3);
+  triangulation.refine_global (2);
 }
 
 

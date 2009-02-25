@@ -1,46 +1,46 @@
 
 DEAL::
 DEAL::
-DEAL::   Number of active cells:       768
-DEAL::   Number of degrees of freedom: 3264
+DEAL::   Number of active cells:       192
+DEAL::   Number of degrees of freedom: 864
 DEAL::   Number of constraints       : 0
-DEAL::Reference matrix nonzeros: 49920, actually: 49766
-DEAL::Test matrix 1 nonzeros: 49920, actually: 42514
-DEAL::Matrix difference norm: 0
-DEAL::rhs difference norm: 0
-DEAL::Test matrix 2 nonzeros: 49920, actually: 42514
-DEAL::Matrix difference norm: 0
-DEAL::rhs difference norm: 0
-DEAL:cg::Starting value 28.
-DEAL:cg::Convergence step 48 value 3.5e-07
+DEAL::  Reference matrix nonzeros: 12672, actually: 8974
+DEAL::  Test matrix 1 nonzeros: 12672, actually: 8974
+DEAL::  Matrix difference norm: 0
+DEAL::  RHS difference norm: 0
+DEAL::  Test matrix 2 nonzeros: 12672, actually: 8974
+DEAL::  Matrix difference norm: 0
+DEAL::  RHS difference norm: 0
+DEAL:cg::Starting value 20.
+DEAL:cg::Convergence step 25 value 2.5e-07
 DEAL::Distribute error: 0
 DEAL::
 DEAL::
-DEAL::   Number of active cells:       1173
-DEAL::   Number of degrees of freedom: 5732
-DEAL::   Number of constraints       : 492
-DEAL::Reference matrix nonzeros: 98166, actually: 87212
-DEAL::Test matrix 1 nonzeros: 98166, actually: 78146
-DEAL::Matrix difference norm: 0
-DEAL::rhs difference norm: 0
-DEAL::Test matrix 2 nonzeros: 98166, actually: 78146
-DEAL::Matrix difference norm: 0
-DEAL::rhs difference norm: 0
-DEAL:cg::Starting value 31.
-DEAL:cg::Convergence step 84 value 4.4e-07
+DEAL::   Number of active cells:       309
+DEAL::   Number of degrees of freedom: 1575
+DEAL::   Number of constraints       : 187
+DEAL::  Reference matrix nonzeros: 25901, actually: 17333
+DEAL::  Test matrix 1 nonzeros: 25901, actually: 17333
+DEAL::  Matrix difference norm: 0
+DEAL::  RHS difference norm: 0
+DEAL::  Test matrix 2 nonzeros: 25901, actually: 17333
+DEAL::  Matrix difference norm: 0
+DEAL::  RHS difference norm: 0
+DEAL:cg::Starting value 22.
+DEAL:cg::Convergence step 42 value 3.2e-07
 DEAL::Distribute error: 0
 DEAL::
 DEAL::
-DEAL::   Number of active cells:       1644
-DEAL::   Number of degrees of freedom: 9764
-DEAL::   Number of constraints       : 1434
-DEAL::Reference matrix nonzeros: 200326, actually: 161794
-DEAL::Test matrix 1 nonzeros: 200326, actually: 150182
-DEAL::Matrix difference norm: 0
-DEAL::rhs difference norm: 0
-DEAL::Test matrix 2 nonzeros: 200326, actually: 150182
-DEAL::Matrix difference norm: 0
-DEAL::rhs difference norm: 0
-DEAL:cg::Starting value 35.
-DEAL:cg::Convergence step 107 value 5.2e-07
+DEAL::   Number of active cells:       450
+DEAL::   Number of degrees of freedom: 2692
+DEAL::   Number of constraints       : 475
+DEAL::  Reference matrix nonzeros: 51910, actually: 33908
+DEAL::  Test matrix 1 nonzeros: 51910, actually: 33908
+DEAL::  Matrix difference norm: 0
+DEAL::  RHS difference norm: 0
+DEAL::  Test matrix 2 nonzeros: 51910, actually: 33908
+DEAL::  Matrix difference norm: 0
+DEAL::  RHS difference norm: 0
+DEAL:cg::Starting value 25.
+DEAL:cg::Convergence step 61 value 3.8e-07
 DEAL::Distribute error: 0
