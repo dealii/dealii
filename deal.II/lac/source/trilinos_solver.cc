@@ -81,9 +81,10 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std::auto_ptr<Epetra_LinearProblem> (
-			      new Epetra_LinearProblem(&*(A.matrix), &*x.vector,
-						       &*b.vector));
+    linear_problem = std::auto_ptr<Epetra_LinearProblem> 
+      (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), 
+				&x.trilinos_vector(),
+				const_cast<Epetra_MultiVector*>(&b.trilinos_vector())));
 
 					// Next we can allocate the
 					// AztecOO solver...
@@ -164,11 +165,11 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(b.size(), A.m()));
     Assert (A.local_range ().second == A.m(),
 	    ExcMessage ("Can only work in serial when using deal.II vectors."));
-    Assert (A.matrix->Filled(),
+    Assert (A.trilinos_matrix().Filled(),
 	    ExcMessage ("Matrix is not compressed. Call compress() method."));
 
-    Epetra_Vector ep_x (View, A.matrix->DomainMap(), x.begin());
-    Epetra_Vector ep_b (View, A.matrix->RangeMap(), const_cast<double*>(b.begin()));
+    Epetra_Vector ep_x (View, A.domain_partitioner(), x.begin());
+    Epetra_Vector ep_b (View, A.range_partitioner(), const_cast<double*>(b.begin()));
 
 					// We need an
 					// Epetra_LinearProblem object
@@ -176,7 +177,8 @@ namespace TrilinosWrappers
 					// know about the matrix and
 					// vectors.
     linear_problem = std::auto_ptr<Epetra_LinearProblem> 
-      (new Epetra_LinearProblem(&*(A.matrix), &ep_x, &ep_b));
+      (new Epetra_LinearProblem
+       (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), &ep_x, &ep_b));
 
 					// Next we can allocate the
 					// AztecOO solver...
@@ -398,9 +400,10 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std::auto_ptr<Epetra_LinearProblem> (
-			      new Epetra_LinearProblem(&*(A.matrix), &*x.vector,
-						       &*b.vector));
+    linear_problem = std::auto_ptr<Epetra_LinearProblem>
+      (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), 
+				&x.trilinos_vector(),
+				const_cast<Epetra_MultiVector*>(&b.trilinos_vector())));
 
 					// Next we can allocate the
 					// AztecOO solver...
@@ -456,8 +459,8 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(b.size(), A.m()));
     Assert (A.local_range ().second == A.m(),
 	    ExcMessage ("Can only work in serial when using deal.II vectors."));
-    Epetra_Vector ep_x (View, A.matrix->DomainMap(), x.begin());
-    Epetra_Vector ep_b (View, A.matrix->RangeMap(), const_cast<double*>(b.begin()));
+    Epetra_Vector ep_x (View, A.domain_partitioner(), x.begin());
+    Epetra_Vector ep_b (View, A.range_partitioner(), const_cast<double*>(b.begin()));
 
 					// We need an
 					// Epetra_LinearProblem object
@@ -465,7 +468,8 @@ namespace TrilinosWrappers
 					// know about the matrix and
 					// vectors.
     linear_problem = std::auto_ptr<Epetra_LinearProblem> 
-      (new Epetra_LinearProblem(&*(A.matrix), &ep_x, &ep_b));
+      (new Epetra_LinearProblem
+       (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), &ep_x, &ep_b));
 
 					// Next we can allocate the
 					// AztecOO solver...

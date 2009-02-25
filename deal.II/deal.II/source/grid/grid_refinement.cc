@@ -83,7 +83,7 @@ namespace
   max_element (const TrilinosWrappers::Vector &criteria)
   {
     TrilinosScalar m = 0;
-    criteria.vector->MaxValue(&m);
+    criteria.trilinos_vector().MaxValue(&m);
     return m;
   }
 
@@ -92,7 +92,7 @@ namespace
   min_element (const TrilinosWrappers::Vector &criteria)
   {
     TrilinosScalar m = 0;
-    criteria.vector->MinValue(&m);
+    criteria.trilinos_vector().MinValue(&m);
     return m;
   }
 #endif

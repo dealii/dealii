@@ -2671,13 +2671,16 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 				       // deal.II wrapper class itself. So
 				       // we access to the actual Trilinos
 				       // matrix in the Trilinos wrapper
-				       // class, and create a plain pointer
-				       // when passing it in.
+				       // class by the command
+				       // trilinos_matrix(). Trilinos wants
+				       // the matrix to be non-constant, so
+				       // we have to manually remove the
+				       // constantness using a const_cast.
       case Parameters::Solver::gmres:
       {
-	Epetra_Vector x(View, system_matrix.matrix->RowMap(), 
+	Epetra_Vector x(View, system_matrix.domain_partitioner(), 
 			newton_update.begin());
-	Epetra_Vector b(View, system_matrix.matrix->RowMap(), 
+	Epetra_Vector b(View, system_matrix.range_partitioner(), 
 			right_hand_side.begin());
 
 	AztecOO solver;
@@ -2702,7 +2705,8 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 	solver.SetAztecParam(AZ_athresh,   parameters.ilut_atol);
 	solver.SetAztecParam(AZ_rthresh,   parameters.ilut_rtol);
 
-	solver.SetUserMatrix(&*system_matrix.matrix);
+	solver.SetUserMatrix(const_cast<Epetra_CrsMatrix*>
+			     (&system_matrix.trilinos_matrix()));
 
 	solver.Iterate(parameters.max_iterations, parameters.linear_residual);
 

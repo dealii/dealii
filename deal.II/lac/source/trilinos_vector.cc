@@ -235,16 +235,16 @@ namespace TrilinosWrappers
     Vector::import_nonlocal_data_for_fe (const TrilinosWrappers::SparseMatrix &m,
 					 const Vector                         &v)
     {
-      Assert (m.matrix->Filled() == true,
+      Assert (m.trilinos_matrix().Filled() == true,
 	      ExcMessage ("Matrix is not compressed. "
 			  "Cannot find exchange information!"));
       Assert (v.vector->Map().UniqueGIDs() == true,
 	      ExcMessage ("The input vector has overlapping data, "
 			  "which is not allowed."));
 
-      if (vector->Map().SameAs(m.matrix->ColMap()) == false)
+      if (vector->Map().SameAs(m.col_partitioner()) == false)
 	{
-	  map = m.matrix->ColMap();
+	  map = m.col_partitioner();
 	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	}
 

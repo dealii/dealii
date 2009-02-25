@@ -798,6 +798,28 @@ namespace TrilinosWrappers
 					*/
 				       //@{
 
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos
+                                        * Epetra_MultiVector class.
+                                        */
+      const Epetra_MultiVector & trilinos_vector () const;
+
+                                       /**
+                                        * Return a (modifyable) reference to
+                                        * the underlying Trilinos
+                                        * Epetra_FEVector class.
+                                        */
+      Epetra_FEVector & trilinos_vector ();
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the parallel
+                                        * partitioning of the vector.
+                                        */
+      const Epetra_Map & vector_partitioner () const;
+
 				       /**
 					*  Output of vector in
 					*  user-defined format in analogy
@@ -914,13 +936,10 @@ namespace TrilinosWrappers
 					*/
       bool compressed;
 
-    public:
                                        /**
                                         * An Epetra distibuted vector
                                         * type. Requires an existing
                                         * Epetra_Map for storing data.
-                                        * TODO: Should become private
-                                        * at some point.
                                         */
       std::auto_ptr<Epetra_FEVector> vector;
 
@@ -1190,6 +1209,32 @@ namespace TrilinosWrappers
     return std::make_pair (begin, end);
   }
 
+
+
+  inline
+  const Epetra_MultiVector &
+  VectorBase::trilinos_vector () const
+  {
+    return static_cast<Epetra_MultiVector &>(*vector);
+  }
+
+
+
+  inline
+  Epetra_FEVector &
+  VectorBase::trilinos_vector ()
+  {
+    return *vector;
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  VectorBase::vector_partitioner () const
+  {
+    return (Epetra_Map &)vector->Map();
+  }
 
 #endif // DOXYGEN
 

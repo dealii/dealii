@@ -263,7 +263,7 @@ namespace LinearSolvers
 		  stokes_matrix           (&S),
 		  m_inverse               (&Mpinv),
 		  a_preconditioner        (Apreconditioner),
-		  tmp                     (stokes_matrix->block(1,1).matrix->RowMap())
+		  tmp                     (stokes_matrix->block(1,1).row_partitioner())
   {}
 
 
@@ -1298,8 +1298,8 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 
   std::vector<double> rhs_values(n_q_points);
 
-  TrilinosWrappers::MPI::Vector rhs (temperature_mass_matrix.matrix->RowMap()), 
-    sol (temperature_mass_matrix.matrix->RowMap());
+  TrilinosWrappers::MPI::Vector rhs (temperature_mass_matrix.row_partitioner()), 
+    sol (temperature_mass_matrix.row_partitioner());
       
   for (; cell!=endc; ++cell) 
     if (cell->subdomain_id() == 

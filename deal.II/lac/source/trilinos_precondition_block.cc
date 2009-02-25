@@ -61,7 +61,7 @@ namespace TrilinosWrappers
 					// (Thyra wrapper around the
 					// matrix).
     Teuchos::RCP<const Thyra::LinearOpBase<double> > tmpM = 
-      Thyra::epetraLinearOp(Teuchos::rcp(&*input_M.matrix, false));
+      Thyra::epetraLinearOp(Teuchos::rcp(&input_M.trilinos_matrix(), false));
 
     Teuchos::RCP<const Thyra::LinearOpSourceBase<double> > M 
       = Teuchos::rcp(new Thyra::DefaultLinearOpSource<double>(tmpM), true);
@@ -333,7 +333,8 @@ namespace TrilinosWrappers
     else
       {
 	Teuchos::RCP<const Thyra::LinearOpBase<double> >
-	  tmpFp = Thyra::epetraLinearOp(Teuchos::rcp(&*Fp_matrix.matrix,false));
+	  tmpFp = Thyra::epetraLinearOp(Teuchos::rcp(&Fp_matrix.trilinos_matrix(),
+						     false));
 	Fp_op = tmpFp;
       }
 
@@ -366,12 +367,12 @@ namespace TrilinosWrappers
 					// gradient and divergence
 					// operators in Thyra format.
     Teuchos::RCP<const Thyra::LinearOpBase<double> > tmpS01 = 
-      Thyra::epetraLinearOp(Teuchos::rcp(&*system_matrix.block(0,1).matrix, 
+      Thyra::epetraLinearOp(Teuchos::rcp(&system_matrix.block(0,1).trilinos_matrix(), 
 					 false));
     Thyra::ConstLinearOperator<double> S01 = tmpS01;
 
     Teuchos::RCP<const Thyra::LinearOpBase<double> > tmpS10 = 
-      Thyra::epetraLinearOp(Teuchos::rcp(&*system_matrix.block(1,0).matrix, 
+      Thyra::epetraLinearOp(Teuchos::rcp(&system_matrix.block(1,0).trilinos_matrix(), 
 					 false));
     Thyra::ConstLinearOperator<double> S10 = tmpS10;
 

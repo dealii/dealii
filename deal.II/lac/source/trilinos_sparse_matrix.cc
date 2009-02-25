@@ -53,8 +53,9 @@ namespace TrilinosWrappers
       TrilinosScalar *values = new TrilinosScalar(colnums);
       
       int ierr;
-      ierr = matrix->matrix->ExtractGlobalRowCopy((int)this->a_row, colnums,  
-						  ncols, &(values[0]));
+      ierr = matrix->trilinos_matrix().ExtractGlobalRowCopy((int)this->a_row, 
+							    colnums,  
+							    ncols, &(values[0]));
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 				  // copy it into our caches if the
@@ -213,14 +214,16 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix (const SparsityPattern &InputSP)
 		  :
                   Subscriptor(),
-                  row_map (InputSP.row_map),
-		  col_map (InputSP.col_map),
+                  row_map (InputSP.range_partitioner()),
+		  col_map (InputSP.domain_partitioner()),
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(Copy, *InputSP.graph, false)))
+			  (new Epetra_FECrsMatrix(Copy, 
+						  InputSP.trilinos_sparsity_pattern(), 
+						  false)))
   {
-    Assert(InputSP.graph->Filled() == true,
+    Assert(InputSP.trilinos_sparsity_pattern().Filled() == true,
 	   ExcMessage("The Trilinos sparsity pattern has not been compressed."));
     compress();
   }
@@ -543,14 +546,15 @@ namespace TrilinosWrappers
   {
     matrix.reset();
 
-    row_map = sparsity_pattern.row_map;
-    col_map = sparsity_pattern.col_map;
+    row_map = sparsity_pattern.range_partitioner();
+    col_map = sparsity_pattern.domain_partitioner();
 
-    Assert (sparsity_pattern.graph->Filled() == true,
+    Assert (sparsity_pattern.trilinos_sparsity_pattern().Filled() == true,
 	    ExcMessage("The Trilinos sparsity pattern has not been compressed"));
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-      (new Epetra_FECrsMatrix(Copy, *sparsity_pattern.graph, false));
+      (new Epetra_FECrsMatrix(Copy, sparsity_pattern.trilinos_sparsity_pattern(),
+			      false));
 
     compress();
   }
@@ -565,7 +569,8 @@ namespace TrilinosWrappers
     row_map = sparse_matrix.row_map;
     col_map = sparse_matrix.col_map;
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-      (new Epetra_FECrsMatrix(Copy, sparse_matrix.matrix->Graph(), false));
+      (new Epetra_FECrsMatrix(Copy, sparse_matrix.trilinos_sparsity_pattern(), 
+			      false));
 
     compress();
   }
@@ -1135,12 +1140,13 @@ namespace TrilinosWrappers
     if (matrix->Filled() == false)
       matrix->FillComplete(col_map, row_map, true);
 
-    Assert (src.vector->Map().SameAs(matrix->DomainMap()) == true,
+    Assert (src.vector_partitioner().SameAs(matrix->DomainMap()) == true,
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (dst.vector->Map().SameAs(matrix->RangeMap()) == true,
+    Assert (dst.vector_partitioner().SameAs(matrix->RangeMap()) == true,
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
-    const int ierr = matrix->Multiply (false, *(src.vector), *(dst.vector));
+    const int ierr = matrix->Multiply (false, src.trilinos_vector(), 
+				       dst.trilinos_vector());
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
@@ -1155,12 +1161,13 @@ namespace TrilinosWrappers
     if (matrix->Filled() == false)
       matrix->FillComplete(col_map, row_map, true);
 
-    Assert (src.vector->Map().SameAs(matrix->RangeMap()) == true,
+    Assert (src.vector_partitioner().SameAs(matrix->RangeMap()) == true,
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (dst.vector->Map().SameAs(matrix->DomainMap()) == true,
+    Assert (dst.vector_partitioner().SameAs(matrix->DomainMap()) == true,
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
-    const int ierr = matrix->Multiply (true, *(src.vector), *(dst.vector));
+    const int ierr = matrix->Multiply (true, src.trilinos_vector(), 
+				       dst.trilinos_vector());
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 

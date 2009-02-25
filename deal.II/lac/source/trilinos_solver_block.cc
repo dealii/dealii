@@ -104,9 +104,9 @@ namespace TrilinosWrappers
     MPI::BlockVector tmpb (b.n_blocks());
     for (unsigned int i=0; i<x.n_blocks(); ++i)
       {
-	tmpx.block(i).reinit (A.block(i,i).matrix->DomainMap(), false);
+	tmpx.block(i).reinit (A.block(i,i).domain_partitioner(), false);
 	tmpx.block(i) = x.block(i);
-	tmpb.block(i).reinit (A.block(i,i).matrix->RangeMap(), false);
+	tmpb.block(i).reinit (A.block(i,i).range_partitioner(), false);
 	tmpb.block(i) = b.block(i);
       }
     tmpx.collect_sizes();
@@ -153,9 +153,9 @@ namespace TrilinosWrappers
 
     for (unsigned int i=0; i<n_rows; ++i)
       {
-	AssertThrow (input_x.block(i).vector->Map().UniqueGIDs() == true,
+	AssertThrow (input_x.block(i).vector_partitioner().UniqueGIDs() == true,
 		     ExcOverlappingMaps("vector", "x"));
-	AssertThrow (input_b.block(i).vector->Map().UniqueGIDs() == true,
+	AssertThrow (input_b.block(i).vector_partitioner().UniqueGIDs() == true,
 		     ExcOverlappingMaps("vector", "b"));
 	for (unsigned int j=0; j<n_cols; ++j)
 	  {
@@ -164,8 +164,8 @@ namespace TrilinosWrappers
 	      i_str << i;
 	      std::ostringstream error_component;
 	      error_component << "x.block(" << i_str.str() << ")";
-	      AssertThrow (input_x.block(j).vector->Map().SameAs(
-			     input_A.block(i,j).matrix->DomainMap()) == true,
+	      AssertThrow (input_x.block(j).vector_partitioner().SameAs(
+			     input_A.block(i,j).domain_partitioner()) == true,
 			   ExcNonMatchingMaps (error_component.str()));
 	    }
 	    {
@@ -173,8 +173,8 @@ namespace TrilinosWrappers
 	      i_str << j;
 	      std::ostringstream error_component;
 	      error_component << "b.block(" << i_str.str() << ")";
-	      AssertThrow (input_b.block(i).vector->Map().SameAs(
-			     input_A.block(i,j).matrix->RangeMap()) == true,
+	      AssertThrow (input_b.block(i).vector_partitioner().SameAs(
+			     input_A.block(i,j).range_partitioner()) == true,
 			   ExcNonMatchingMaps (error_component.str()));
 	    }
 	  }
@@ -196,8 +196,8 @@ namespace TrilinosWrappers
       {
 	Teuchos::RCP<const Thyra::VectorSpaceBase<double> > tmp_space
 	  = Thyra::create_VectorSpace(
-		    Teuchos::rcp(&input_A.block(i,i).matrix->DomainMap(), 
-				 false));
+				      Teuchos::rcp(&input_A.block(i,i).domain_partitioner(), 
+						   false));
 
 	epetra_vector_spaces.push_back(tmp_space);
       }
@@ -212,7 +212,7 @@ namespace TrilinosWrappers
       for (unsigned int j=0; j<n_cols; ++j)
 	{
 	  Teuchos::RCP<const Thyra::LinearOpBase<double> > 
-	    A_ij = Thyra::epetraLinearOp(Teuchos::rcp(&*input_A.block(i,j).matrix, 
+	    A_ij = Thyra::epetraLinearOp(Teuchos::rcp(&input_A.block(i,j).trilinos_matrix(), 
 						      false));
 	  tmpA->setBlock(i, j, A_ij);
 	}
@@ -229,14 +229,15 @@ namespace TrilinosWrappers
     Thyra::Vector<double> sol = A.domain().createMember();
     for (unsigned int i=0; i<n_rows; ++i)
       {
-	Epetra_Vector *block_ptr = (*input_b.block(i).vector)(0);
+	Epetra_Vector *block_ptr = const_cast<Epetra_Vector*>
+	  ((input_b.block(i).trilinos_vector())(0));
 	Teuchos::RCP<Thyra::VectorBase<double> > tmp_rhs_i
 	  = Thyra::create_Vector(Teuchos::rcp(block_ptr, false), 
 				 epetra_vector_spaces[i]);
 	const Thyra::Vector<double> rhs_i = tmp_rhs_i;
 	rhs.setBlock(i, rhs_i);
 
-	block_ptr = (*input_x.block(i).vector)(0);
+	block_ptr = (input_x.block(i).trilinos_vector())(0);
 	Teuchos::RCP<Thyra::VectorBase<double> > tmp_sol_i
 	  = Thyra::create_Vector(Teuchos::rcp(block_ptr, false), 
 				 epetra_vector_spaces[i]);

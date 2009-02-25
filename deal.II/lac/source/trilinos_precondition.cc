@@ -65,12 +65,13 @@ namespace TrilinosWrappers
   PreconditionBase::vmult (VectorBase       &dst,
 			   const VectorBase &src) const
   {
-    Assert (dst.vector->Map().SameAs(preconditioner->OperatorRangeMap()),
+    Assert (dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
 	    ExcNonMatchingMaps("dst"));
-    Assert (src.vector->Map().SameAs(preconditioner->OperatorDomainMap()),
+    Assert (src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
 	    ExcNonMatchingMaps("src"));
     
-    const int ierr = preconditioner->ApplyInverse (*src.vector, *dst.vector);
+    const int ierr = preconditioner->ApplyInverse (src.trilinos_vector(), 
+						   dst.trilinos_vector());
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
@@ -133,8 +134,10 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create ("point relaxation", 
-					    &*matrix.matrix, 0));
+    ifpack = Teuchos::rcp (Ifpack().Create 
+			   ("point relaxation", 
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    0));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
@@ -183,9 +186,10 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create ("point relaxation",
-					    &*matrix.matrix, 
-					    additional_data.overlap));
+    ifpack = Teuchos::rcp (Ifpack().Create 
+			   ("point relaxation",
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
@@ -235,9 +239,10 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create ("point relaxation",
-					    &*matrix.matrix, 
-					    additional_data.overlap));
+    ifpack = Teuchos::rcp (Ifpack().Create 
+			   ("point relaxation",
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
@@ -289,8 +294,10 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create ("IC", &*matrix.matrix, 
-					    additional_data.overlap));
+    ifpack = Teuchos::rcp (Ifpack().Create 
+			   ("IC", 
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
@@ -340,8 +347,10 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create ("ILU", &*matrix.matrix, 
-					    additional_data.overlap));
+    ifpack = Teuchos::rcp (Ifpack().Create 
+			   ("ILU", 
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
@@ -393,8 +402,10 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create ("ILUT", &*matrix.matrix, 
-					    additional_data.overlap));
+    ifpack = Teuchos::rcp (Ifpack().Create 
+			   ("ILUT", 
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
@@ -439,8 +450,10 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create ("Amesos", &*matrix.matrix, 
-					    additional_data.overlap));
+    ifpack = Teuchos::rcp (Ifpack().Create 
+			   ("Amesos", 
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    additional_data.overlap));
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
 
@@ -490,7 +503,7 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (new Ifpack_Chebyshev(&*matrix.matrix));
+    ifpack = Teuchos::rcp (new Ifpack_Chebyshev (&matrix.trilinos_matrix()));
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
 
@@ -610,7 +623,7 @@ namespace TrilinosWrappers
     else
       parameter_list.set("ML output", 0);  
 
-    const Epetra_Map & domain_map = matrix.matrix->DomainMap();
+    const Epetra_Map & domain_map = matrix.domain_partitioner();
     
     Epetra_MultiVector distributed_constant_modes (domain_map, 
 						   constant_modes_dimension);
@@ -649,7 +662,8 @@ namespace TrilinosWrappers
       }
 
     multilevel_operator = Teuchos::rcp (new ML_Epetra::MultiLevelPreconditioner(
-				        *matrix.matrix, parameter_list, true));
+					matrix.trilinos_matrix(), parameter_list,
+					true));
 
     if (additional_data.output_details)
       multilevel_operator->PrintUnused(0);

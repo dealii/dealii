@@ -196,7 +196,7 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
                                        // and copy it
       TrilinosScalar **start_ptr;
 
-      int ierr = localized_vector.vector->ExtractView (&start_ptr);
+      int ierr = localized_vector.trilinos_vector().ExtractView (&start_ptr);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       
       std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
@@ -222,7 +222,7 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
                                        // and copy it
       TrilinosScalar **start_ptr;
 
-      int ierr = v.vector->ExtractView (&start_ptr);
+      int ierr = v.trilinos_vector().ExtractView (&start_ptr);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       
       std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
@@ -723,7 +723,7 @@ Vector<Number>::operator = (const TrilinosWrappers::Vector &v)
                                        // get a representation of the vector
                                        // and copy it
       TrilinosScalar **start_ptr;
-      int ierr = v.vector->ExtractView (&start_ptr);
+      int ierr = v.trilinos_vector().ExtractView (&start_ptr);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       
       std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());

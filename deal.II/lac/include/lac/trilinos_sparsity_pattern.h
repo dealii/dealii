@@ -812,6 +812,63 @@ namespace TrilinosWrappers
 		const unsigned int   *col_indices);
 //@}
 /**
+ * @name Access of underlying Trilinos data
+ */
+//@{
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos
+                                        * Epetra_CrsGraph data that stores
+                                        * the sparsity pattern.
+                                        */
+      const Epetra_CrsGraph & trilinos_sparsity_pattern () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the parallel
+                                        * partitioning of the domain space
+                                        * of this sparsity pattern, i.e.,
+                                        * the partitioning of the vectors
+                                        * matrices based on this sparsity
+                                        * pattern are multiplied with.
+                                        */
+      const Epetra_Map & domain_partitioner () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the partitioning of the
+                                        * range space of this sparsity
+                                        * pattern, i.e., the partitioning of
+                                        * the vectors that are result from
+                                        * matrix-vector products.
+                                        */
+      const Epetra_Map & range_partitioner () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the partitioning of the
+                                        * sparsity pattern rows. Equal to
+                                        * the partitioning of the range.
+                                        */
+      const Epetra_Map & row_partitioner () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the partitioning of the
+                                        * sparsity pattern columns. This is
+                                        * in general not equal to the
+                                        * partitioner Epetra_Map for the
+                                        * domain because of overlap in the
+                                        * matrix.
+                                        */
+      const Epetra_Map & col_partitioner () const;
+//@}
+/**
  * @name Iterators
  */
 //@{
@@ -1021,7 +1078,6 @@ namespace TrilinosWrappers
 					*/
       unsigned int row_in_cache;
 
-      friend class SparseMatrix;
       friend class SparsityPatternIterators::const_iterator;
       friend class SparsityPatternIterators::const_iterator::Accessor;
   };
@@ -1309,7 +1365,7 @@ namespace TrilinosWrappers
     if (n_cols == 0)
       return;
 
-    int * col_index_ptr = (int*)col_indices;
+    int * col_index_ptr = (int*)(col_indices);
     compressed = false;
 
     int ierr;
@@ -1320,29 +1376,66 @@ namespace TrilinosWrappers
 				   // Epetra_CrsGraph input function, which
 				   // is much faster than the
 				   // Epetra_FECrsGraph function.
-    if (row_map.MyGID(row) == true)
-      ierr = graph->Epetra_CrsGraph::InsertGlobalIndices(row, 
-							 n_cols,
-							 col_index_ptr);
-    else
+    //if (row_map.MyGID(row) == true)
+    //ierr = graph->Epetra_CrsGraph::InsertGlobalIndices(row, 
+    //						 n_cols,
+    //						 col_index_ptr);
+    //else
       {
 				   // When we're at off-processor data, we
 				   // have to stick with the standard
-				   // SumIntoGlobalValues
-				   // function. Nevertheless, the way we
-				   // call it is the fastest one (any other
-				   // will lead to repeated allocation and
-				   // deallocation of memory in order to
-				   // call the function we already use,
-				   // which is very unefficient if writing
-				   // one element at a time).
+				   // SumIntoGlobalValues method.
 
-	ierr = graph->InsertGlobalIndices (1, (int*)&row, n_cols, 
-					   col_index_ptr);
+	ierr = graph->InsertGlobalIndices (1, (int*)&row, n_cols, col_index_ptr);
       }
 
     //Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  inline
+  const Epetra_CrsGraph &
+  SparsityPattern::trilinos_sparsity_pattern () const
+  {
+    return static_cast<Epetra_CrsGraph&>(*graph);
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  SparsityPattern::domain_partitioner () const
+  {
+    return (Epetra_Map &) graph->DomainMap();
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  SparsityPattern::range_partitioner () const
+  {
+    return (Epetra_Map &) graph->RangeMap();
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  SparsityPattern::row_partitioner () const
+  {
+    return (Epetra_Map &) graph->RowMap();
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  SparsityPattern::col_partitioner () const
+  {
+    return (Epetra_Map &) graph->ColMap();
   }
 
 

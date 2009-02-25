@@ -1584,6 +1584,69 @@ namespace TrilinosWrappers
 
 //@}
 /**
+ * @name Access to underlying Trilinos data
+ */
+//@{
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos
+                                        * Epetra_CrsMatrix data.
+                                        */
+      const Epetra_CrsMatrix & trilinos_matrix () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos
+                                        * Epetra_CrsGraph data that stores
+                                        * the sparsity pattern of the
+                                        * matrix.
+                                        */
+      const Epetra_CrsGraph & trilinos_sparsity_pattern () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the partitioning of the
+                                        * domain space of this matrix, i.e.,
+                                        * the partitioning of the vectors
+                                        * this matrix has to be multiplied
+                                        * with.
+                                        */
+      const Epetra_Map & domain_partitioner () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the partitioning of the
+                                        * range space of this matrix, i.e.,
+                                        * the partitioning of the vectors
+                                        * that are result from matrix-vector
+                                        * products.
+                                        */
+      const Epetra_Map & range_partitioner () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the partitioning of the
+                                        * matrix rows. Equal to the
+                                        * partitioning of the range.
+                                        */
+      const Epetra_Map & row_partitioner () const;
+
+                                       /**
+                                        * Return a const reference to the
+                                        * underlying Trilinos Epetra_Map
+                                        * that sets the partitioning of the
+                                        * matrix columns. This is in general
+                                        * not equal to the partitioner
+                                        * Epetra_Map for the domain because
+                                        * of overlap in the matrix.
+                                        */
+      const Epetra_Map & col_partitioner () const;
+//@}
+/**
  * @name Iterators
  */
 //@{
@@ -1793,7 +1856,6 @@ namespace TrilinosWrappers
 					*/
       std::vector<TrilinosScalar> column_values;
 
-    public:
                                        /**
                                         * A sparse matrix object in
                                         * Trilinos to be used for
@@ -1803,9 +1865,6 @@ namespace TrilinosWrappers
                                         * elements.  The actual type,
                                         * a sparse matrix, is set in
                                         * the constructor.
-					*
-					* TODO: This object should
-					* finally become private.
                                         */
       std::auto_ptr<Epetra_FECrsMatrix> matrix;
 
@@ -2454,6 +2513,59 @@ namespace TrilinosWrappers
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
   }
 
+
+
+  inline
+  const Epetra_CrsMatrix &
+  SparseMatrix::trilinos_matrix () const
+  {
+    return static_cast<Epetra_CrsMatrix&>(*matrix);
+  }
+
+
+
+  inline
+  const Epetra_CrsGraph &
+  SparseMatrix::trilinos_sparsity_pattern () const
+  {
+    return matrix->Graph();
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  SparseMatrix::domain_partitioner () const
+  {
+    return matrix->DomainMap();
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  SparseMatrix::range_partitioner () const
+  {
+    return matrix->RangeMap();
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  SparseMatrix::row_partitioner () const
+  {
+    return matrix->RowMap();
+  }
+
+
+
+  inline
+  const Epetra_Map &
+  SparseMatrix::col_partitioner () const
+  {
+    return matrix->ColMap();
+  }
 
 #endif // DOXYGEN      
 }
