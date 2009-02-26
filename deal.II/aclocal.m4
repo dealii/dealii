@@ -4768,19 +4768,31 @@ AC_DEFUN(DEAL_II_HAVE_GLIBC_STACKTRACE, dnl
                  provides stacktrace debug information that can be
                  printed out in the exception class])
 
-      AC_MSG_CHECKING(whether compiler accepts -rdynamic)
+      dnl On Mac OS X, -rdynamic is accepted by the compiler (i.e.
+      dnl it doesn't produce an error) but we always get a warning
+      dnl that it isn't supported. That's pretty stupid because
+      dnl we can't test for it. Consequently, only run the test
+      dnl if not on OS X.
+      case "$target" in
+        *apple-darwin*)
+	  ;;
 
-      CXXFLAGS="$CXXFLAGSG -rdynamic"
-      AC_TRY_LINK(
-        [],
-        [;],
-        [
-          AC_MSG_RESULT(yes)
-          LDFLAGS="$LDFLAGS -rdynamic"
-        ],
-        [
-          AC_MSG_RESULT(no)
-        ])
+        *)
+          AC_MSG_CHECKING(whether compiler accepts -rdynamic)
+
+          CXXFLAGS="$CXXFLAGSG -rdynamic"
+          AC_TRY_LINK(
+            [],
+            [;],
+            [
+              AC_MSG_RESULT(yes)
+              LDFLAGS="$LDFLAGS -rdynamic"
+            ],
+            [
+              AC_MSG_RESULT(no)
+            ])
+          ;;
+      esac
     ],
     [
       AC_MSG_RESULT(no)
