@@ -33,8 +33,8 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 {
 				   // create two dummy vectors and enter the
 				   // other function
-  Vector<number> in (0), out(0);
-  condense (uncondensed, in, condensed, out);
+  Vector<number> dummy (0);
+  condense (uncondensed, dummy, condensed, dummy);
 }
 
 
@@ -805,9 +805,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                             const std::vector<unsigned int> &local_dof_indices,
                             MatrixType                      &global_matrix) const
 {
-  Vector<double> local_dummy(0), global_dummy (0);
-  distribute_local_to_global (local_matrix, local_dummy, local_dof_indices,
-			      global_matrix, global_dummy);
+  Vector<double> dummy(0);
+  distribute_local_to_global (local_matrix, dummy, local_dof_indices,
+			      global_matrix, dummy);
 }
 
 
