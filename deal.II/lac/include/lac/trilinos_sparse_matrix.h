@@ -2514,20 +2514,22 @@ namespace TrilinosWrappers
 #ifdef DEBUG
     if (ierr > 0)
       {
+	std::cout << "------------------------------------------"
+		  << std::endl;
 	std::cout << "Got error " << ierr << " in row " << row 
 		  << " of proc " << row_map.Comm().MyPID()
-		  << " with columns:" << std::endl;
+		  << " when trying to add the columns:" << std::endl;
 	for (int i=0; i<n_columns; ++i)
 	  std::cout << col_index_ptr[i] << " ";
-	std::cout << endl;
-	std::cout << " Matrix row has indices:" << std::endl;
+	std::cout << std::endl << std::endl;
+	std::cout << "Matrix row has the following indices:" << std::endl;
 	int n_indices, *indices;
 	trilinos_sparsity_pattern().ExtractMyRowView(row_map.LID(row),
 						     n_indices,
 						     indices);
 	for (int i=0; i<n_indices; ++i)
 	  std::cout << indices[i] << " ";
-	std::cout << endl;
+	std::cout << endl << std::endl;
 	Assert (ierr <= 0, 
 		ExcAccessToNonPresentElement(row, col_index_ptr[0]));
       }
