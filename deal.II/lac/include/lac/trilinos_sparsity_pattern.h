@@ -303,7 +303,7 @@ namespace TrilinosWrappers
 				        * sparsity pattern.
                                         */
       SparsityPattern (const Epetra_Map   &InputMap,
-		       const unsigned int  n_entries_per_row = 1);
+		       const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now use the
@@ -358,7 +358,7 @@ namespace TrilinosWrappers
                                         */
       SparsityPattern (const Epetra_Map   &InputRowMap,
 		       const Epetra_Map   &InputColMap,
-		       const unsigned int  n_entries_per_row = 1);
+		       const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * This constructor is similar to the
@@ -408,7 +408,7 @@ namespace TrilinosWrappers
                                         */
       SparsityPattern (const unsigned int  m,
 		       const unsigned int  n,
-		       const unsigned int  n_entries_per_row = 1);
+		       const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Generate a sparsity pattern that
@@ -466,7 +466,7 @@ namespace TrilinosWrappers
                                         */
       void  
       reinit (const Epetra_Map   &InputMap,
-	      const unsigned int  n_entries_per_row = 1);
+	      const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Same as before, but now use the
@@ -521,7 +521,7 @@ namespace TrilinosWrappers
       void  
       reinit (const Epetra_Map   &InputRowMap,
 	      const Epetra_Map   &InputColMap,
-	      const unsigned int  n_entries_per_row = 1);
+	      const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * This reinit function is similar to
@@ -573,7 +573,7 @@ namespace TrilinosWrappers
       void  
       reinit (const unsigned int  m,
 	      const unsigned int  n,
-	      const unsigned int  n_entries_per_row = 1);
+	      const unsigned int  n_entries_per_row = 0);
 
                                        /**
                                         * Initialize a sparsity pattern that
@@ -1368,28 +1368,9 @@ namespace TrilinosWrappers
     int * col_index_ptr = (int*)(col_indices);
     compressed = false;
 
-    int ierr;
+    const int ierr = graph->InsertGlobalIndices (1, (int*)&row, 
+						 n_cols, col_index_ptr);
 
-				   // If the calling sparsity pattern owns
-				   // the row to which we want to add
-				   // values, we can directly call the
-				   // Epetra_CrsGraph input function, which
-				   // is much faster than the
-				   // Epetra_FECrsGraph function.
-    //if (row_map.MyGID(row) == true)
-    //ierr = graph->Epetra_CrsGraph::InsertGlobalIndices(row, 
-    //						 n_cols,
-    //						 col_index_ptr);
-    //else
-      {
-				   // When we're at off-processor data, we
-				   // have to stick with the standard
-				   // SumIntoGlobalValues method.
-
-	ierr = graph->InsertGlobalIndices (1, (int*)&row, n_cols, col_index_ptr);
-      }
-
-    //Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
   }
 
@@ -1399,7 +1380,7 @@ namespace TrilinosWrappers
   const Epetra_CrsGraph &
   SparsityPattern::trilinos_sparsity_pattern () const
   {
-    return static_cast<Epetra_CrsGraph&>(*graph);
+    return static_cast<const Epetra_CrsGraph&>(*graph);
   }
 
 
@@ -1408,7 +1389,7 @@ namespace TrilinosWrappers
   const Epetra_Map &
   SparsityPattern::domain_partitioner () const
   {
-    return (Epetra_Map &) graph->DomainMap();
+    return static_cast<const Epetra_Map&>(graph->DomainMap());
   }
 
 
@@ -1417,7 +1398,7 @@ namespace TrilinosWrappers
   const Epetra_Map &
   SparsityPattern::range_partitioner () const
   {
-    return (Epetra_Map &) graph->RangeMap();
+    return static_cast<const Epetra_Map&>(graph->RangeMap());
   }
 
 
@@ -1426,7 +1407,7 @@ namespace TrilinosWrappers
   const Epetra_Map &
   SparsityPattern::row_partitioner () const
   {
-    return (Epetra_Map &) graph->RowMap();
+    return static_cast<const Epetra_Map&>(graph->RowMap());
   }
 
 
@@ -1435,7 +1416,7 @@ namespace TrilinosWrappers
   const Epetra_Map &
   SparsityPattern::col_partitioner () const
   {
-    return (Epetra_Map &) graph->ColMap();
+    return static_cast<const Epetra_Map&>(graph->ColMap());
   }
 
 

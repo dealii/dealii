@@ -2427,6 +2427,8 @@ namespace TrilinosWrappers
     int ierr;
     if (last_action == Insert)
       {
+	// TODO: this could lead to a dead lock when only one processor
+	// calls GlobalAssemble.
 	ierr = matrix->GlobalAssemble(col_map, row_map, false);
 
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -2509,7 +2511,27 @@ namespace TrilinosWrappers
 					    Epetra_FECrsMatrix::ROW_MAJOR);
       }
 
-    Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+#ifdef DEBUG
+    if (ierr > 0)
+      {
+	std::cout << "Got error " << ierr << " in row " << row 
+		  << " of proc " << row_map.Comm().MyPID()
+		  << " with columns:" << std::endl;
+	for (int i=0; i<n_columns; ++i)
+	  std::cout << col_index_ptr[i] << " ";
+	std::cout << endl;
+	std::cout << " Matrix row has indices:" << std::endl;
+	int n_indices, *indices;
+	trilinos_sparsity_pattern().ExtractMyRowView(row_map.LID(row),
+						     n_indices,
+						     indices);
+	for (int i=0; i<n_indices; ++i)
+	  std::cout << indices[i] << " ";
+	std::cout << endl;
+	Assert (ierr <= 0, 
+		ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+      }
+#endif 
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
   }
 
@@ -2519,7 +2541,7 @@ namespace TrilinosWrappers
   const Epetra_CrsMatrix &
   SparseMatrix::trilinos_matrix () const
   {
-    return static_cast<Epetra_CrsMatrix&>(*matrix);
+    return static_cast<const Epetra_CrsMatrix&>(*matrix);
   }
 
 

@@ -1215,7 +1215,7 @@ namespace TrilinosWrappers
   const Epetra_MultiVector &
   VectorBase::trilinos_vector () const
   {
-    return static_cast<Epetra_MultiVector &>(*vector);
+    return static_cast<const Epetra_MultiVector&>(*vector);
   }
 
 
@@ -1233,7 +1233,7 @@ namespace TrilinosWrappers
   const Epetra_Map &
   VectorBase::vector_partitioner () const
   {
-    return (Epetra_Map &)vector->Map();
+    return static_cast<const Epetra_Map&>(vector->Map());
   }
 
 #endif // DOXYGEN
