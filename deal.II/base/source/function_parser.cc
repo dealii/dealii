@@ -52,11 +52,28 @@ FunctionParser<dim>::~FunctionParser()
 
 
 #ifndef DEAL_II_DISABLE_PARSER
-
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string                   &variables,
+                      const std::vector<std::string>      &expressions,
+                      const std::map<std::string, double> &constants,
+                      const bool time_dependent,
+                      const bool use_degrees)
+{
+    initialize (variables,
+                expressions,
+                constants,
+                std::map< std::string, double >(),
+                time_dependent,
+                use_degrees);  
+}
+
+
+
+template <int dim>
+void FunctionParser<dim>::initialize (const std::string   &variables,
 				      const std::vector<std::string>      &expressions,
 				      const std::map<std::string, double> &constants,
+                      const std::map<std::string, double> &units,
 				      const bool time_dependent,
 				      const bool use_degrees)
 {
@@ -68,9 +85,26 @@ void FunctionParser<dim>::initialize (const std::string                   &varia
   AssertThrow(this->n_components == expressions.size(),
 	      ExcInvalidExpressionSize(this->n_components,
 				       expressions.size()) );
-  
+
+
+
   for (unsigned int i=0; i<this->n_components; ++i)
     {
+
+                       // Add the various units to
+                       // the parser.
+        std::map< std::string, double >::const_iterator
+            unit = units.begin(),
+            endu = units.end();
+        for (; unit != endu; ++unit)
+        {
+            const bool success = fp[i].AddUnit(unit->first, unit->second);
+            AssertThrow (success,
+                         ExcMessage("Invalid Unit Name [error adding a unit]"));
+        }
+
+
+                       
 				       // Add the various constants to
 				       // the parser.
       std::map< std::string, double >::const_iterator
@@ -137,8 +171,28 @@ void FunctionParser<dim>::initialize (const std::string &variables,
   initialize (variables,
               Utilities::split_string_list (expression, ';'),
               constants,
-	      time_dependent,
+              time_dependent,
               use_degrees);  
+}
+
+
+
+template <int dim>
+void FunctionParser<dim>::initialize (const std::string &variables,
+                      const std::string &expression,
+                      const std::map<std::string, double> &constants,
+                      const std::map<std::string, double> &units,
+                      const bool time_dependent,
+                      const bool use_degrees)
+{
+                   // initialize with the things
+                   // we got.
+  initialize (variables,
+              Utilities::split_string_list (expression, ';'),
+              constants,
+              units,
+              time_dependent,
+              use_degrees);
 }
 
 

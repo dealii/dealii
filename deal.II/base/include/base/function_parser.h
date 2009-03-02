@@ -77,6 +77,65 @@ template <typename> class Vector;
  			    expressions,
  			    constants); 
   @endverbatim
+
+ * FunctionParser also provides an option to use <b>units</b> in expressions.
+ * We can illustrate the use of this functionality with the following example:
+ * @verbatim
+ // Define some constants that will be used by the function parser
+  std::map<std::string> constants;
+  std::map<std::string> units;
+  constants["PI"] = numbers::PI;
+  units["cm"] = 10;
+  units["m"] = 1000;
+
+  // Define the variables that will be used inside the expressions
+  std::string variables = "x,y";
+
+  // Define the expressions of the individual components of a
+  // vector valued function with two components:
+  std::vector<std::string> expressions(1);
+  expressions[0] = "x cm + y m + PI cm;
+
+  // Generate an empty function for these two components.
+  FunctionParser<2> vector_function;
+
+  // And populate it with the newly created objects.
+  vector_function.initialize(variables,
+                expressions,
+                constants,
+                units); //An exptra argument here
+
+  // Point at which we want to evaluate the function
+  Point<2> point(2.0, 3.0);
+
+  // Output the evaluated function
+  std::cout << "Function " << "[" << expressions[0] << "]" <<
+    " @point " << "[" << point << "]" << " is " <<
+    "[" <<  vector_function.value(point) << "]" << std::endl;
+
+ * @endverbatim
+
+ * Units are similar to <b>constants</b> in the way they are passed to the
+ * parser, i.e. via std::map<std::string>.  But units are slightly different
+ * in that they have a higher precedence than any other operator
+ * (except parentheses). Thus for example "5/2in" is parsed as "5/(2*300)".
+ * (If 5/2 inches is what one wants, it has to be written "(5/2)in".)
+
+ * Overall, the main point of units is to make input expressions more readable
+ * since expressing, say, length as 10cm looks more natural than 10*cm.
+
+ * Beware that the user has full control over units as well as full
+ * responsibility for "sanity" of the parsed expressions, because the parser
+ * does NOT know anything about the physical nature of units and one would not
+ * be warned when adding kilometers to kilograms.
+
+ * <b>units</b> argument to the initialize function is <b>optional</b>, i.e. the
+ * user does NOT have to use this functionality.
+
+ * For more information on this feature, please see
+ * contrib/functionparser/fparser.txt
+
+ 
  * 
  * See http://warp.povusers.org/FunctionParser/ for an
  * explanation on how the underlying library works. 
@@ -369,6 +428,26 @@ class FunctionParser : public Function<dim>
                      const ConstMap                 &constants,
                      const bool time_dependent = false,
                      const bool use_degrees = false);
+
+
+                                     /**
+                                      * Initialize the function. Same as
+                                      * above, but with an additional argument
+                                      * <b> units </b> - a map of units passed to
+                                      * FunctionParser via AddUnint.
+                                      *
+                                      * Can be used as "3cm".
+                                      * Have higher precedence in parsing, i.e.
+                                      * if cm=10 then 3/2cm is 3 /(2*10).
+                                      * See contrib/functionparser/fparser.txt
+                                      * for more details.
+                                      */
+     void initialize (const std::string              &vars,
+                      const std::vector<std::string> &expressions,
+                      const ConstMap                 &constants,
+                      const ConstMap                 &units,
+                      const bool time_dependent = false,
+                      const bool use_degrees = false);
   
                                      /**
                                       * Initialize the function. Same as
@@ -385,6 +464,18 @@ class FunctionParser : public Function<dim>
     void initialize (const std::string &vars,
                      const std::string &expression,
                      const ConstMap    &constants,
+                     const bool time_dependent = false,
+                     const bool use_degrees = false);
+
+                                     /**
+                                      * Initialize the function. Same as
+                                      * above, but with <b>units</b>.
+                                      */
+
+    void initialize (const std::string &vars,
+                     const std::string &expression,
+                     const ConstMap    &constants,
+                     const ConstMap    &units,
                      const bool time_dependent = false,
                      const bool use_degrees = false);
 

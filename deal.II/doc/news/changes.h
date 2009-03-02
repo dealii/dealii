@@ -373,13 +373,22 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The FunctionParser class now supports the fparser library's interface to use
+  units (like cm, or km) in expressions. An example is given in the documentation of
+  that class.
+  <br> 
+  (Victor Prosolin 2009/03/01)
+  </p>
+
+  <li>
+  <p>
   Changed: The classes Threads::ThreadMutex and Threads::ThreadCondition have
   been renamed Threads::Mutex and Threads::ConditionVariable. The old names
   were somewhat redundant but have been retained as typedefs for compatibility.
   <br> 
   (WB 2009/01/14)
   </p>
-
+  
   <li>
   <p>
   New: There is now a class TimerOutput that allows to neatly measure computing
