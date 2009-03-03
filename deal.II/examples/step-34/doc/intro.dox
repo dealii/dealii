@@ -2,7 +2,7 @@
 
 <h1>Introduction</h1>
 
-<h3> Irrotational Flow </h3>
+<h3> Irrotational flow </h3>
 The motion of an inviscid fluid past a body (for example air past an
 airplane wing, or air or water past a propeller) is usually modeled by
 the Euler equations of fluid dynamics:
@@ -262,7 +262,7 @@ element $\hat K := [0,1]^n$, and we perform the integrations after a
 change of variables from the real element $K_i$ to the reference
 element $\hat K$.
 
-<h3> Singular Integrals in two dimension. </h3>
+<h3> Singular integrals in two dimension. </h3>
 
 In two dimensions it is not necessary to compute the diagonal elements
 $\mathbf{A}_{ii}$ of the system matrix, since, even if the denominator
