@@ -1,9 +1,394 @@
 <a name="Intro"></a>
+
 <h1>Introduction</h1>
 
-<h3>The problem</h3>
+<h3> Irrotational Flow </h3>
+The motion of an inviscid fluid past a body (for example air past an
+airplane wing, or air or water past a propeller) is usually modeled by
+the Euler equations of fluid dynamics:
 
-<h3>Galerkin BEM</h3>
+\f[
+  \left\{
+  \begin{array}{rclr}
+  \frac{\partial }{\partial t}\mathbf{v} + (\mathbf{v}\cdot\nabla)\mathbf{v}
+  &=&
+  -\frac{1}{\rho}\nabla p + \mathbf{g} 
+  &\qquad \text{in } \mathbb{R}^n \backslash \Omega
+  \\
+  \nabla \cdot \mathbf{v}&=&0  
+  &\qquad \text{in } \mathbb{R}^n\backslash\Omega
+%  \\
+%  \mathbf{n}\cdot\mathbf{v}&=& 0
+%  &\qquad \text{on } \partial\Omega,
+  \end{array}\right.,
+\f]
+where the fluid density $\rho$ and the acceleration $\mathbf{g}$ due
+to external forces are given and the velocity $\mathbf{v}$ and the
+pressure $p$ are the unknowns. Here $\Omega$ is a closed bounded
+region representing the body around which the fluid moves. 
+
+Uniqueness of the solution is ensured by adding the boundary conditions
+\f[
+  \label{eq:boundary-conditions}
+  \begin{aligned}
+    \mathbf{n}\cdot\mathbf{v}& =0 \qquad && \text{ on } \partial\Omega \\
+    \mathbf{v}& =0 && \text{ when } |\mathbf{x}| \to \infty,
+  \end{aligned}
+\f]
+which mean that the body is not permeable, and that the fluid is
+assumed at rest at infinity.
+
+The above equations can be derived from Navier-Stokes
+equations assuming that the effects due to viscosity are negligible
+compared to those due to the pressure gradient and to the external
+forces. 
+
+For both stationary and non stationary flow, the solution process
+starts by solving for the velocity in the second equation and
+substituting in the first equation in order to find the pressure.
+
+The solution of the stationary Euler equations is typically performed
+in order to understand the behavior of the given (possibly complex)
+geometry when a prescribed motion is enforced on the system. 
+
+The first step in this process is to change the frame of reference,
+putting it on the body $\Omega$, which sees a uniform background
+velocity field, and a perturbation due to its own presence:
+\f[
+\nabla\cdot\mathbf{v} = 
+\nabla\cdot(\mathbf{v_\infty} + \mathbf{v_p}) = 
+\nabla\cdot\mathbf{v_p} = 0.
+\f]
+
+If we assume that the fluid is irrotational, i.e., $\nabla \times
+\mathbf{v}=0$ in $\mathbb{R}^n\backslash\Omega$, we can represent the
+velocity, and consequently also the perturbation velocity, as the
+gradient of a scalar function:
+\f[
+  \mathbf{v_p}=\nabla\phi,
+\f]
+and so the second part of Euler equations above can be rewritten
+as the homogenous Laplace equation for the unknown $\phi$:
+\f[\label{laplace}
+\Delta\phi = 0.
+\f]
+
+We will now reformulate this equation in integral form using the
+ Green identity:
+\f[\label{green}
+  \int_{\mathbb{R}^n\backslash\Omega}
+  (-\Delta u)v\,dx - \int_{\partial\Omega} \frac{\partial u}{\partial \mathbf{n} }v \,ds
+  = 
+  \int_{\mathbb{R}^n\backslash\Omega}
+  (-\Delta v)u\,dx - \int_{\partial\Omega} u\frac{\partial v}{\partial \mathbf{n}} \,ds,
+\f]
+where $\mathbf{n}$ is the normal to the surface of $\Omega$ pointing
+towards the fluid. 
+
+We also remind the reader that the following functions,
+called fundamental solutions of Laplace equation:
+\f[
+\begin{aligned}
+  \label{eq:3}
+    G(\mathbf{x}-\mathbf{y}) = &
+    -\frac{1}{2\pi}\ln|\mathbf{x}-\mathbf{y}|  \qquad && \text{for } n=2
+    \\
+    G(\mathbf{x}-\mathbf{y}) = &
+    -\frac{1}{4\pi}\frac{1}{|\mathbf{x}-\mathbf{y}|}&& \text{for } n=3,  
+\end{aligned}
+\f]
+satisfy in variational sense: 
+\f[
+  -\Delta_x G(\mathbf{x}-\mathbf{y}) = \delta(\mathbf{x}-\mathbf{y}),
+\f]
+where the derivation is done in the variable $\mathbf{x}$.
+
+If we substitute $u$ and $v$ in the green identity with the solution
+$\phi$ and with the fundamental solution of Laplace equation
+respectively, we obtain:
+\f[
+  \phi(\mathbf{x})=\int_{\partial \Omega}G(\mathbf{x}-\mathbf{y})\frac{\partial \phi}{\partial \mathbf{n}_y}(\mathbf{y})\,ds_y
+  +
+  \int_{\partial \Omega}\frac{\partial G(\mathbf{x}-\mathbf{y})}{\partial \mathbf{n}_y}\phi(\mathbf{y})\,ds_y 
+  \quad \mathbf{x}\in \mathbf{R}^n\backslash\Omega,
+\f]
+that we can write more compactly using the Single and Double
+Layer Potential operators:
+\f[\label{integral}
+  \phi(\mathbf{x}) = \left(S \frac{\partial \phi}{\partial n_y}\right)(\mathbf{x})
+  + 
+  (D\phi)(\mathbf{x})
+  \quad \mathbf{x}\in \mathbf{R}^n\backslash\Omega.
+\f]
+
+It can be shown that this is equivalent to solving the homogeneous
+laplace equation with the given Neumann boundary values. Notice also
+that the last equation lets one calculate $\phi$ in any point of the
+domain once its expression on the boundary $\partial\Omega$ is known.
+If we take the limit for $\mathbf{x}$ tending to $\partial\Omega$ of
+the above equation, using well known properties of the SLP and DLP
+operators, we obtain an equation for $\phi$ just on the boundary of
+$\Omega$:
+
+\f[\label{SD}
+  \frac{1}{2}\phi(\mathbf{x}) = \left(S \frac{\partial \phi}{\partial \mathbf{n}_y}\right)(\mathbf{x})
+  + 
+  (D\phi)(\mathbf{x})
+  \quad \mathbf{x}\in \partial\Omega,
+\f]
+which is the integral formulation we were looking for. Imposing the 
+boundary conditions we obtain:
+\f[
+\mathbf{n} \cdot( \mathbf{v}_\infty + \mathbf{v}_p)=0
+\quad \Rightarrow \quad
+\mathbf{n}\cdot\mathbf{v_p}=-\mathbf{n}\cdot\mathbf{v_\infty}
+\quad \Rightarrow \quad
+\frac{\partial \phi}{\partial\mathbf{n}} = -\mathbf{n}\cdot\mathbf{v_\infty}
+\f]
+which can be substituted in the single layer potential equation to obtain:
+\f[               
+  \pi\phi(\mathbf{x})=
+  \int_{\partial \Omega}  \ln|\mathbf{x}-\mathbf{y}| \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
+  +
+  \int_{\partial \Omega}  \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }{ |\mathbf{x}-\mathbf{y}|^2 }\,ds_y 
+\f]                 
+for two dimensional flows and
+\f[               
+  2\pi\phi(\mathbf{x})=\int_{\partial \Omega} -\frac{1}{|\mathbf{x}-\mathbf{y}|} \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
+  +
+  \int_{\partial \Omega} \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }{ |\mathbf{x}-\mathbf{y}|^3 }\phi(\mathbf{y})\,ds_y 
+\f]                 
+for three dimensional flows, where the normal derivatives of the fundamental
+solutions have been written in a form that makes computation easier.
+
+<h3>The numerical approximation</h3>
+
+Numerical approximations of Boundary Integral Equations are commonly
+referred to as the boundary element method or panel method (the latter
+is used mostly in the computational fluid dynamics community).
+
+The goal of the following test problem is to solve the integral
+formulation of Laplace equation with Neumann boundary conditions,
+using a circle and a sphere respectively in two and three space
+dimensions, illustrating along the way the features that allow one to
+treat boundary value problems almost as easily as finite element
+problems using the deal.II library:
+
+\f[
+  \label{eq:strong-continuous}
+  \frac{1}{2}\phi(\mathbf{x})=
+  \int_{\partial \Omega}G(\mathbf{x}-\mathbf{y})\frac{\partial \phi}{\partial \mathbf{n}_y}(\mathbf{y})\,ds_y
+  +
+  \int_{\partial \Omega}\frac{\partial G(\mathbf{x}-\mathbf{y})}{\partial \mathbf{n}_y}\phi(\mathbf{y})\,ds_y 
+  \quad \mathbf{x}\in \partial \Omega.
+\f]
+
+Let $\mathcal{T}_h = \cup_{i=0}^M K_i$ be a subdivision of the
+manifold $\Gamma = \partial \Omega$ into $M$ segments if $n=2$ or $M$
+quadrilaterals if $n=3$. We will call each individual segment or
+quadrilateral an \emph{element} or \emph{cell}, independently on the
+dimension $n$ of the surrounding space $R^n$.
+
+We define the finite dimensional space $V_h$ as 
+\f[
+  \label{eq:definition-Vh}
+  V_h := \{ v \in L^2(\Gamma) \text{ s.t. } v|_{K_i} \in \mathcal{P}^0(K_i), 
+  i = 0, \dots, M\},
+\f]
+with basis functions $\psi_i(\mathbf{x}) = \chi_{K_i}(\mathbf{x})$,
+i.e., one if $\mathbf{x}$ belongs to $K_i$, and zero otherwise
+(section~\ref{sec:dofs}).  An element $\phi_h$ of $V_h$ is uniquely
+identified by the vector $\boldsymbol{\alpha}$ of its coefficients
+$\phi_i$, that is:
+\f[
+  \label{eq:definition-of-element}
+  \phi_h(\mathbf{x}) := \phi_i \psi_i(\mathbf{x}), \qquad 
+  \boldsymbol{\alpha} := \{ \phi_i \}_{i=0}^M,
+\f]
+where summation  is implied over repeated indexes.
+
+<h3> Galerkin boundary element method </h3>
+
+The usual Galerkin approach for the discretization of the above
+problem gives us the following variational formulation:
+
+Given the datum $\mathbf{v}_\infty$, find a function $\phi_h$ in $V_h$
+such that, for any $\eta$ in $V_h$ the following equation is
+satisfied:
+\f[
+  \label{eq:galerkin-continuous}
+  \begin{split}
+    \int_{\Gamma_x} \phi_h(\mathbf{x}) \eta(\mathbf{x})\,ds_x &=
+    \\
+    & \frac{1}{\pi} \int_{\Gamma_x} \int_{\Gamma_y}
+    G(\mathbf{x}-\mathbf{y}) \, \mathbf{n}_y\cdot\mathbf{v_\infty}
+    \eta(\mathbf{x}) \,ds_x\,ds_y +
+    \\
+    & \frac{1}{\pi} \int_{\Gamma_x}\int_{\Gamma_y} \frac{ \partial
+      G(\mathbf{x}-\mathbf{y})}{\partial\mathbf{n}_y }
+    \phi_h(\mathbf{y})\eta(\mathbf{x}) \,ds_x\,ds_y.
+  \end{split}
+\f]
+
+The linearity of the integral operator makes this problem equivalent 
+to solving the linear system
+\f[
+\label{eq:linear-system}
+(\mathbf{M}-\mathbf{A})\boldsymbol\alpha = \mathbf{b},
+\f]
+where
+\f[
+\begin{aligned}
+\mathbf{M}_{ij}&= |K_i|\delta_{ij}\\
+\mathbf{A}_{ij}&= \frac{1}{\pi} \int_{K_i}\int_{K_j}
+  \frac{\partial G(\mathbf{x}-\mathbf{y})}{\partial \mathbf{n}_y}
+  \psi_i(\mathbf{x})\psi_j(\mathbf{y}) \,ds_x\,ds_y 
+\\
+\mathbf{b}_i&= \frac{1}{\pi}\int_{K_i}  \int_{\Gamma_{h,y}}
+   G(\mathbf{x}-\mathbf{y})  \, \mathbf{n}_y\cdot\mathbf{v_\infty}
+  \psi_i(\mathbf{y}) \,ds_x\,ds_y.
+\end{aligned}
+\f]
+
+The computation of the entries of the matrix $\mathbf{A}$ and of the
+right hand side $\mathbf{b}$ require the evaluation of singular
+integrals on the elements $K_i$ of the triangulation $\mathcal{T}_h$.
+
+As usual in this cases, all integrations are performed on a reference
+simple domain, i.e., we assume that each element $K_i$ of
+$\mathcal{T}_h$ can be expressed as a linear (in two dimensions) or
+bi-linear (in three dimensions) transformation of the reference
+element $\hat K := [0,1]^n$, and we perform the integrations after a
+change of variables from the real element $K_i$ to the reference
+element $\hat K$.
+
+<h3> Singular Integrals in two dimension. </h3>
+
+In two dimensions it is not necessary to compute the diagonal elements
+$\mathbf{A}_{ii}$ of the system matrix, since, even if the denominator
+goes to zero when $\mathbf{x}=\mathbf{y}$, the numerator is always
+zero because $\mathbf{n}_y$ and $(\mathbf{x}-\mathbf{y})$ are
+orthogonal, and the only singular integral arises in the computation
+of $\mathbf{b}_i$ on the i-th element of $\mathcal{T}_h$:
+\f[
+  \frac{1}{\pi}
+  \int_{K_i}  \int_{K_i}
+  \ln|\mathbf{x}-\mathbf{y}| \, \mathbf{n}_y\cdot\mathbf{v_\infty}
+  \,ds_x\,ds_y \, .
+\f]
+
+Using the linear transformations above and defining
+$J=|\mathbf{V}^i_1-\mathbf{V}_0^i|$, we obtain
+\f[
+  \frac{1}{\pi}
+  \int_0^1 d\eta  \int_0^1 d\lambda \, J^2
+  (\ln|\lambda-\eta|+\ln(J)) \, 
+   \mathbf{n}_y\cdot\mathbf{v_\infty}
+  \, .
+\f]
+
+After another change of variables
+\f[
+\begin{aligned}
+\lambda-\eta=&\alpha
+\\
+\lambda+\eta=&\beta \, ,
+\end{aligned}
+\f]
+we end up with:
+\f[
+  \frac{J^2}{\pi}\ln(J) \mathbf{n}_y\cdot\mathbf{v_\infty}
+  \, + \,
+  \frac{2J^2}{\pi}
+  \int_{-1}^1 d\alpha  \int_0^2 d\beta
+  \ln|\alpha| \, \mathbf{n}_y\cdot\mathbf{v_\infty}
+   \, ,
+\f]
+which can be computed analytically with Gauss-log quadrature formulae.
+
+<h3>Singular integrals in three dimensions</h3>
+
+In three dimensions the computation of the integrals is somewhat more
+complicated. Some results in this direction can be found
+in~\cite{newman} and~\cite{morino-chen-suciu}, and even if the two
+methods are identical for low order elements, in~\cite{newman} the
+method is extended to higher order approximations, using multipole
+expansion.
+
+In this work we started with the implementation of a low order method,
+inspired by~\cite{morino-chen-suciu}.
+
+We are interested in calculating the integrals 
+\f[
+  \label{eq:slp-dlp-on-panel}
+  \begin{split}
+    S_i(x,y,z) =  & - \frac{1}{2\pi} \int_{K_i} \frac{1}{R} \mathtt{d}S \\
+    D_i(x,y,z) =  & - \frac{1}{2\pi} \int_{K_i} \frac{\mathbf{R}\cdot\mathbf{n}}{R^3} \mathtt{d}S,
+  \end{split}
+\f]
+where $R(x,y,z,\eta,\xi)$ is the distance from the point
+$\mathbf{x}=(x,y,z)$ and the point $\mathbf{y}(\eta, \xi)$ on the
+surface of the panel identified by the local coordinates $(\eta,
+\xi)$.
+
+Introducing the tangent vectors to the surface of the panels,
+\f[
+  \label{eq:tangential}
+  \mathbf{a}_1 = \frac{\partial \mathbf{y}}{\partial \eta}, 
+  \qquad \mathbf{a}_2  = \frac{\partial \mathbf{y}}{\partial \xi},
+\f]
+we can define the normal vector and the element differential area as
+\f[
+  \label{eq:normal-diff-area}
+  \mathbf{n}(\eta, \xi) = \frac{\mathbf{a}_1\times \mathbf{a}_2}% 
+  {|\mathbf{a}_1\times \mathbf{a}_2|}, \qquad
+  \mathtt{d} S = |\mathbf{a}_1\times \mathbf{a}_2| 
+  \mathtt{d} \eta \mathtt{d} \xi.
+\f]
+
+The single and double layer potential integrals on a panel can then be
+expressed analytically by rewriting them as
+\f[
+  \label{eq:kernels-by-parts}
+  \int_0^1 \int_0^1 \frac{\partial^2 I_X(\eta, \xi)}{\partial \eta \partial \xi} \mathtt{d} S, 
+\f]
+which implies
+\f[
+  \label{eq:integral-form-of-slp-and-dlp}
+  \begin{split}
+    S_i = & I_S(1,1)-I_S(1,0) + I_S(0,1) - I_S(0,0) \\
+    D_i = & I_D(1,1)-I_D(1,0) + I_D(0,1) - I_D(0,0).
+  \end{split}
+\f]
+
+The single and double layer integrals on a quadrilateral panel then
+take the form above, where the terms $I_S$ and $I_D$ are given by
+\f[
+  \label{eq:def-I-S}
+  \begin{split}
+    I_S(\eta,\xi) = - \frac{1}{2\pi} \Bigg( & -
+    \frac{(\mathbf{R}\times \mathbf{a}_1)\cdot
+      \mathbf{n}}{|\mathbf{a}_1|}
+    \sinh^{-1}\left( \frac{\mathbf{R}\cdot\mathbf{a}_1}{|\mathbf{R}\times \mathbf{a}_1|} \right) \\
+    & + \frac{(\mathbf{R}\times \mathbf{a}_2)\cdot
+      \mathbf{n}}{|\mathbf{a}_2|}
+    \sinh^{-1}\left( \frac{\mathbf{R}\cdot\mathbf{a}_2}{|\mathbf{R}\times \mathbf{a}_2|} \right) \\
+    & + \mathbf{R}\cdot \mathbf{n} \tan^{-1}
+    \left( \frac{(\mathbf{R}\times\mathbf{a}_1)\cdot(\mathbf{R}\times\mathbf{a}_2)}%
+      {R\mathbf{R}\cdot(\mathbf{a}_1\times\mathbf{a}_2)}\right) \Bigg),
+  \end{split}
+\f]
+and 
+\f[
+  \label{eq:def-I-D}
+  I_D(\eta,\xi) = \frac{1}{2\pi}  \tan^{-1}
+  \left( \frac{(\mathbf{R}\times\mathbf{a}_1)\cdot(\mathbf{R}\times\mathbf{a}_2)}%
+    {R\mathbf{R}\cdot(\mathbf{a}_1\times\mathbf{a}_2)}\right).
+\f]
+
+The resulting matrix $\mathbf{A}$ is full. Depending on its size, it
+might be convenient to use a direct solver or an iterative one.
+
 
 <h3>What the program does</h3>
 

@@ -1,0 +1,25 @@
+# Listing of Parameters
+# ---------------------
+
+set Number of cycles = 3
+
+subsection Outer quadrature rule
+  set Quadrature order = 0
+  set Quadrature type  = midpoint
+end
+
+
+subsection Wind function
+  # Any constant used inside the function which is not a variable name.
+  set Function constants  = angle=0
+
+  # Separate vector valued expressions by ';' as ',' is used internally by the
+  # function parser.
+  set Function expression = cos(angle); sin(angle); 0
+
+  # The name of the variables as they will be used in the function, separated
+  # by ','.
+  set Variable names      = x,y,z,t
+end
+
+
