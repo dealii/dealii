@@ -82,8 +82,16 @@ public:
     // \f]
     void compute_SD_integral_on_cell(vector<vector<vector<double> > > &dst,
 				     typename DoFHandler<dim-1,dim>::active_cell_iterator &cell,
-				     const vector<Point<dim> > &q);
+				     const vector<Point<dim> > &q,
+				     const Function<dim> &rhs);
 
+    // The following two functions are the actual calculations of the
+    // single and double layer potential kernels, with a minus sign in
+    // front of them. They are well defined only if the vector $r =
+    // x-y$ is different from zero.
+    double nS(const Point<dim> &R);
+    Point<dim> nD(const Point<dim> &R);
+    
 private:
     // The following two helper functions should only be called when
     // dim=3. If this is not the case, the default implementation is
@@ -170,7 +178,8 @@ private:
     // quadrature.  We use a parsed function, for its ease of
     // definition, and the quadrature formula
     Functions::ParsedFunction<dim> wind;
-    SmartPointer<Quadrature<dim-1> > quadrature_pointer;
+    SmartPointer<Quadrature<dim-1> > outer_quadrature_pointer;
+    SmartPointer<Quadrature<dim-1> > inner_quadrature_pointer;
     unsigned int n_cycles;
 };
 
@@ -204,6 +213,13 @@ void BEMProblem<dim>::read_parameters(std::string filename) {
 		      Patterns::Selection(QuadratureSelector<(dim-1)>::get_quadrature_names()));
     prm.declare_entry("Quadrature order", "0", Patterns::Integer());
     prm.leave_subsection();
+
+
+    prm.enter_subsection("Inner quadrature rule");
+    prm.declare_entry("Quadrature type", "midpoint", 
+		      Patterns::Selection(QuadratureSelector<(dim-1)>::get_quadrature_names()));
+    prm.declare_entry("Quadrature order", "0", Patterns::Integer());
+    prm.leave_subsection();
     
     prm.enter_subsection("Wind function");
     Functions::ParsedFunction<dim>::declare_parameters(prm, dim);
@@ -214,7 +230,14 @@ void BEMProblem<dim>::read_parameters(std::string filename) {
     n_cycles = prm.get_integer("Number of cycles");		      
 		      
     prm.enter_subsection("Outer quadrature rule");
-    static QuadratureSelector<dim-1> quadrature
+    static QuadratureSelector<dim-1> outer_quadrature
+		      (prm.get("Quadrature type"),
+		       prm.get_integer("Quadrature order"));
+    prm.leave_subsection();
+
+
+    prm.enter_subsection("Inner quadrature rule");
+    static QuadratureSelector<dim-1> inner_quadrature
 		      (prm.get("Quadrature type"),
 		       prm.get_integer("Quadrature order"));
     prm.leave_subsection();
@@ -223,8 +246,40 @@ void BEMProblem<dim>::read_parameters(std::string filename) {
     wind.parse_parameters(prm);
     prm.leave_subsection();
 
-    quadrature_pointer = &quadrature;
+    outer_quadrature_pointer = &outer_quadrature;
+    inner_quadrature_pointer = &inner_quadrature;
 }
+
+
+
+template <int dim>
+double LaplaceKernelIntegration<dim>::nS(const Point<dim> &R) {
+    if(dim == 2)
+	return (-std::log(R.norm()) / numbers::PI);
+    else if(dim == 3)
+	return (1./(R.norm()*numbers::PI) );
+    else {
+	Assert(false, ExcInternalError());
+    }
+    return 0.;
+}
+	
+
+
+template <int dim>
+Point<dim> LaplaceKernelIntegration<dim>::nD(const Point<dim> &R) {
+    Point<dim> D(R);
+    if(dim == 2)
+	D /= -numbers::PI * R.square();
+    else if(dim == 3)
+	D /= -2*numbers::PI * R.square() * R.norm();
+    else {
+	Assert(false, ExcInternalError());
+    }
+    return D;
+}
+	
+
 
 template <>
 LaplaceKernelIntegration<3>::LaplaceKernelIntegration(FiniteElement<2,3> &fe)
@@ -247,6 +302,7 @@ LaplaceKernelIntegration<3>::LaplaceKernelIntegration(FiniteElement<2,3> &fe)
     fe_values = new FEValues<2,3>(fe,quadrature,
 				  update_values | 
 				  update_jacobians |
+				  update_cell_normal_vectors |
 				  update_quadrature_points );
 }
 
@@ -312,12 +368,25 @@ template <>
 void
 LaplaceKernelIntegration<3>::compute_SD_integral_on_cell(vector<vector<vector<double> > > &dstvv,
 							 DoFHandler<2,3>::active_cell_iterator &cell,
-							 const vector<Point<3> > &q_points)
+							 const vector<Point<3> > &q_points, 
+							 const Function<3> &rhs)
 {
     fe_values->reinit(cell);
-    vector<Tensor<2,3> > jacobians = fe_values->get_jacobians();
-    vector<Point<3> > quad_points = fe_values->get_quadrature_points();
-
+    const vector<Tensor<2,3> > &jacobians = fe_values->get_jacobians();
+    const vector<Point<3> > &quad_points = fe_values->get_quadrature_points();
+    const vector<Point<3> > &normals = fe_values->get_cell_normal_vectors();
+    
+    static vector<Vector<double> > cell_wind
+	( (*fe_values).n_quadrature_points, Vector<double>(3) );
+    static vector<double> normal_wind(quad_points.size());
+    
+    rhs.vector_value_list(quad_points, cell_wind);
+    
+    for(unsigned int q=0; q<quad_points.size(); ++q) {
+	normal_wind[q] = 0;
+	for(unsigned int d=0; d<3; ++d)
+	    normal_wind[q] += normals[q][d] * cell_wind[q](d);
+    }
     Point<3> r,a1,a2,n,r_c,n_c;
     
     Assert(dstvv.size() == fe_values->dofs_per_cell,
@@ -348,7 +417,7 @@ LaplaceKernelIntegration<3>::compute_SD_integral_on_cell(vector<vector<vector<do
 		a1 = jacobians[inner_q_point][0];
 		a2 = jacobians[inner_q_point][1];
 		n =  jacobians[inner_q_point][2];
-		i_S[inner_q_point]= term_S(r,a1,a2,n,rn_c) * fe_values->shape_value(i,inner_q_point);
+		i_S[inner_q_point]= term_S(r,a1,a2,n,rn_c) * normal_wind[inner_q_point];
 		i_D[inner_q_point]= term_D(r,a1,a2) * fe_values->shape_value(i,inner_q_point);
 	    }
 	    dst[0] = (i_S[3]-i_S[1]-i_S[2]+i_S[0]);
@@ -410,39 +479,34 @@ void BEMProblem<dim>::assemble_system() {
     typename DoFHandler<dim-1,dim>::active_cell_iterator
 	celli = dh.begin_active(),
 	cellj = dh.begin_active(),
-	cellvi = dhv.begin_active(),
 	endc = dh.end();
     
     // Outer quadrature rule. If we choose midpoint quadrature rule,
     // then this is a collocation method. If we choose any other
     // Quadrature rule, then this is Galerkin method.
-    Quadrature<dim-1> &quadrature_outer = *quadrature_pointer;
-    QMidpoint<dim-1> quadrature_mid;
-
+    Quadrature<dim-1> &outer_quadrature = *outer_quadrature_pointer;
+    Quadrature<dim-1> &inner_quadrature = *inner_quadrature_pointer;
     
-    FEValues<dim-1,dim> fe_outer(fe, quadrature_outer,
+    FEValues<dim-1,dim> fe_outer(fe, outer_quadrature,
 				 update_values |
 				 update_cell_normal_vectors |
-				 update_quadrature_points);
+				 update_quadrature_points |
+				 update_JxW_values);
     
-    FEValues<dim-1,dim> fe_inner(fe, quadrature_mid,
+    FEValues<dim-1,dim> fe_inner(fe, inner_quadrature,
 				 update_values |
 				 update_cell_normal_vectors |
-				 update_quadrature_points);
+				 update_quadrature_points |
+				 update_JxW_values);
     
     const unsigned int n_q_points_outer = fe_outer.n_quadrature_points;
     const unsigned int n_q_points_inner = fe_inner.n_quadrature_points;
     
     vector<unsigned int> dofs_i(fe.dofs_per_cell);
     vector<unsigned int> dofs_j(fe.dofs_per_cell);
-    vector<unsigned int> dofs_v_i(fev.dofs_per_cell);
-    
-    vector<vector<vector<double> > > single_double_layer_potentials
-	(fe.dofs_per_cell, vector<vector<double> >
-	 (n_q_points_outer, vector<double> (2, 0.) ) ); 
 
-    vector<Vector<double> > cell_wind(n_q_points_inner, Vector<double>(dim) );
-    vector<double> normal_wind(n_q_points_inner);
+    vector<Vector<double> > inner_cell_wind(n_q_points_inner, Vector<double>(dim) );
+    double inner_normal_wind;
     
     Vector<double>	local_rhs(fe.dofs_per_cell);
     FullMatrix<double>  local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
@@ -450,28 +514,32 @@ void BEMProblem<dim>::assemble_system() {
     // The kernel.
     LaplaceKernelIntegration<dim> kernel(fe);
     
-    // i runs on outer integration, j runs on inner integration.
-    for(; celli != endc; ++celli, ++cellvi) {
+    vector<vector<vector<double> > > single_double_layer_potentials
+	(fe.dofs_per_cell, vector<vector<double> >
+	 (n_q_points_outer, vector<double> (2, 0.) ) ); 
+    
+    Point<dim> R;
+
+    
+    // The index i runs on outer integration, while j runs on inner integration.
+    for(; celli != endc; ++celli) {
 	fe_outer.reinit(celli);
 	
 	const vector<Point<dim> > &q_points_outer = fe_outer.get_quadrature_points();
 	const vector<Point<dim> > &normals_outer = fe_outer.get_cell_normal_vectors();
 
 	celli->get_dof_indices(dofs_i);
-	cellvi->get_dof_indices(dofs_v_i);
         
-	// Now the mass matrix and the single and double layer
-	// potentials. Notice that instead of integrating the single
-	// layer potential against the normal velocity, we integrate
-	// it against the average value of the velocity in the given
-	// cell.
-	//
-	// The reason for proceeding in this way is that in the
-	// current three-dimensional formulation we can only integrate
-	// the constants against the single layer potential. While
-	// this is certainly a rough approximation, it suffices for
-	// the purpose of this example.
 	for(cellj = dh.begin_active(); cellj != endc; ++cellj) {
+
+	    // If we are on the same cell, then the integrals we are
+	    // performing are singular, and they require a special
+	    // treatment, as explained in the introduction.
+	    //
+	    // In all other cases, standard Gauss quadrature rules can
+	    // be used.
+	    bool is_singular = (cellj->index() == celli->index());
+	    
 	    local_rhs = 0;
 	    local_matrix = 0;
 	    
@@ -480,40 +548,73 @@ void BEMProblem<dim>::assemble_system() {
 	    
 	    const vector<Point<dim> > &q_points_inner = fe_inner.get_quadrature_points();
 	    const vector<Point<dim> > &normals_inner = fe_inner.get_cell_normal_vectors();
-	    wind.vector_value_list(q_points_inner, cell_wind);
+	    wind.vector_value_list(q_points_inner, inner_cell_wind);
 	    
-	    
-	    for(unsigned int q=0; q<n_q_points_inner; ++q) {
-		normal_wind[q] = 0;
-		for(unsigned int d=0; d<dim; ++d)
-		    normal_wind[q] += normals_inner[q][d] * cell_wind[q](d);
-	    }
-	    
-	    kernel.compute_SD_integral_on_cell(single_double_layer_potentials, 
-					       cellj, q_points_outer);
-	    
-	    for(unsigned int i=0; i<fe.dofs_per_cell; ++i) {
-		for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
-		    for(unsigned int qo=0; qo<n_q_points_outer; ++qo) {
-			local_rhs(i) += ( - single_double_layer_potentials[j][qo][0]  * 
-					  normal_wind[qo]			*
-					  fe_outer.shape_value(i,qo)	       *
-					  fe_outer.JxW(qo) );
+	    if(is_singular == false) {
+		for(unsigned int q_inner=0; q_inner<n_q_points_inner; ++q_inner) {
+		    inner_normal_wind = 0;
+		    for(unsigned int d=0; d<dim; ++d) 
+			inner_normal_wind += normals_inner[q_inner][d]*inner_cell_wind[q_inner](d);
+		    
+		    for(unsigned int q_outer=0; q_outer<n_q_points_outer; ++q_outer) {
+		    
+			R = q_points_outer[q_outer]-q_points_inner[q_inner];
 			
-			if(celli->index() != cellj->index())
-			    local_matrix(i,j) += ( -single_double_layer_potentials[j][qo][1] * 
-						   fe_outer.shape_value(i,qo)		     *
-						   fe_outer.JxW(qo) );
-			// When the indices are the same, we assemble
-			// also the mass matrix.
-			if(celli->index() == cellj->index())
-			    local_matrix(i,j) += ( fe_outer.shape_value(i,qo)	     * 
-						   fe_outer.shape_value(j,qo)	     *
-						   fe_outer.JxW(qo) );
+			for(unsigned int i=0; i<fe.dofs_per_cell; ++i) {
+			    local_rhs(i) += ( fe_outer.shape_value(i,q_outer)   *
+					      fe_outer.JxW(q_outer)		*
+					      //
+					      kernel.nS(R)			* 
+					      inner_normal_wind			*
+					      fe_inner.JxW(q_inner) );
+				
+			    for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
+				
+				local_matrix(i,j) += ( fe_outer.shape_value(i,q_outer)  *
+						       fe_outer.JxW(q_outer)		*
+						       //
+						       ( kernel.nD(R)			* 
+							 normals_inner[q_inner] )	*
+						       fe_inner.shape_value(j,q_inner)  *
+						       fe_inner.JxW(q_inner)	);
+			    }
+			}
+		    }
+		}
+	    } else {
+		// Now we treat the more delicate case. If we are
+		// here, it means that the cell that runs on the j
+		// index and the one that runs on the i index are the
+		// same. In this case both the single and the double
+		// layer potential are singular, and they require a
+		// special treatment, as explained in the
+		// introduction. 
+
+		kernel.compute_SD_integral_on_cell(single_double_layer_potentials, 
+						   cellj, q_points_outer, wind);
+		
+		for(unsigned int i=0; i<fe.dofs_per_cell; ++i) {
+		    for(unsigned int q_outer=0; q_outer<n_q_points_outer; ++q_outer) {
+			local_rhs(i) += ( - single_double_layer_potentials[0][q_outer][0]  * 
+					  fe_outer.shape_value(i,q_outer)	           *
+					  fe_outer.JxW(q_outer) );
+			
+			for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
+			    
+			    // When the indices are the same, we
+			    // assemble also the mass matrix.
+			    local_matrix(i,j) += ( fe_outer.shape_value(i,q_outer)	     * 
+						   fe_outer.shape_value(j,q_outer)	     *
+						   fe_outer.JxW(q_outer) );
+			    
+			    local_matrix(i,j) += ( -single_double_layer_potentials[j][q_outer][1] * 
+						   fe_outer.shape_value(i,q_outer)		     *
+						   fe_outer.JxW(q_outer) );
+			}
 		    }
 		}
 	    }
-	    
+	    // Move the local matrix and rhs to the global one.
 	    for(unsigned int i=0; i<fe.dofs_per_cell; ++i) {
 		system_rhs(dofs_i[i]) += local_rhs(i);
 		for(unsigned int j=0; j<fe.dofs_per_cell; ++j) 
