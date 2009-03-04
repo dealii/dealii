@@ -908,10 +908,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				       // for the scratch array.
       n_max_entries_per_row += n_local_dofs;
       if (column_indices.size() < n_max_entries_per_row)
-        {
-	  column_indices.resize(n_max_entries_per_row);
-	  column_values.resize(n_max_entries_per_row);
-	}
+	column_indices.resize(n_max_entries_per_row);
+      if (column_values.size() < n_max_entries_per_row)
+	column_values.resize(n_max_entries_per_row);
 
                                        // now distribute entries row by row
       for (unsigned int i=0; i<n_local_dofs; ++i)
@@ -1070,13 +1069,13 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 				   // Check whether we did remain within the
 				   // arrays when adding elements into the
-				   // scratch arrays. Moreover, there should
-				   // be at least one element in the scratch
-				   // array (the element diagonal).
+				   // scratch arrays.
 	  Assert (col_counter <= n_max_entries_per_row, ExcInternalError());
 
 				   // Finally, write the scratch array into
-				   // the sparse matrix.
+				   // the sparse matrix. Of course, do it
+				   // only in case there is anything to
+				   // write...
 	  if (col_counter > 0)
 	    global_matrix.add(local_dof_indices[i], col_counter, 
 			      &column_indices[0], &column_values[0], 
@@ -1117,35 +1116,32 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	      ExcDimensionMismatch(dof_mask.n_cols(), n_local_dofs));
     }
 
+				   // A lock that allows only one thread at
+				   // time to go on in this function.
+  Threads::ThreadMutex::ScopedLock lock(mutex);
   if (lines.size() == 0)
     {
-      bool add_these_indices;
-      for (unsigned int i=0; i<n_local_dofs; ++i)
-        for (unsigned int j=0; j<n_local_dofs; ++j)
+      if (column_indices.size() < local_dof_indices.size())
+	column_indices.resize(local_dof_indices.size());
+
+				   // if the dof_mask is not active, we can
+				   // just submit the local_dof_indices
+				   // array for one row after the other.
+      if (dof_mask_is_active == false)
+	for (unsigned int i=0; i<n_local_dofs; ++i)
+	  sparsity_pattern.add_entries (local_dof_indices[i],
+					local_dof_indices.begin(),
+					local_dof_indices.end());
+      else
+	for (unsigned int i=0; i<n_local_dofs; ++i)
 	  {
-				        // There is one complication when 
-				        // we call this function with
-				        // dof_mask argument: When the
-				        // mask is empty, we cannot
-				        // access the respective
-				        // position, and it would even
-				        // be inefficient to create
-				        // such a mask. Hence, we need
-				        // to first check whether
-				        // there is some information
-				        // in the mask at all.
-	    if (dof_mask_is_active)
-	      {
-		if (dof_mask[i][j] == true)
-		  add_these_indices = true;
-		else
-		  add_these_indices = false;
-	      }
-	    else
-	      add_these_indices = true;
-	    if (add_these_indices == true)
-	      sparsity_pattern.add(local_dof_indices[i],
-				   local_dof_indices[j]);
+	    unsigned int col_counter = 0;
+	    for (unsigned int j=0; j<n_local_dofs; ++j)
+	      if (dof_mask[i][j] == true)
+		column_indices[col_counter++] = local_dof_indices[j];
+	    sparsity_pattern.add_entries (local_dof_indices[i],
+					  column_indices.begin(),
+					  column_indices.begin()+col_counter);
 	  }
     }
   else
@@ -1158,6 +1154,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				       // constraints, as above)
       Assert (sorted == true, ExcMatrixNotClosed());
 
+      unsigned int n_max_entries_per_row = 0;
       std::vector<const ConstraintLine *>
         constraint_lines (n_local_dofs,
                           static_cast<const ConstraintLine *>(0));
@@ -1173,15 +1170,23 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 
           if ((position != lines.end()) &&
               (position->line == local_dof_indices[i]))
-            constraint_lines[i] = &*position;
+	    {
+	      constraint_lines[i] = &*position;
+	      n_max_entries_per_row += position->entries.size();
+	    }
         }
 
+      n_max_entries_per_row += n_local_dofs;
+      if (column_indices.size() < n_max_entries_per_row)
+	column_indices.resize(n_max_entries_per_row);
 
       bool add_these_indices;
       for (unsigned int i=0; i<n_local_dofs; ++i)
         {
           const ConstraintLine *position_i = constraint_lines[i];
           const bool is_constrained_i = (position_i != 0);
+
+	  unsigned int col_counter = 0;
 
           for (unsigned int j=0; j<n_local_dofs; ++j)
 	    {
@@ -1206,21 +1211,22 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		const bool is_constrained_j = (position_j != 0);
 
 					       // if so requested, add the
-					       // entry unconditionally, even
-					       // if it is going to be
-					       // constrained away
+					       // entry unconditionally,
+					       // even if it is going to be
+					       // constrained away. note
+					       // that we can use the array
+					       // of column indices only for
+					       // those elements that are
+					       // going to get into the same
+					       // row.
 		if (keep_constrained_entries == true)
-		  sparsity_pattern.add (local_dof_indices[i],
-					local_dof_indices[j]);
+		  column_indices[col_counter++] = local_dof_indices[j];
 
 
 		if ((is_constrained_i == false) &&
 		    (is_constrained_j == false) &&
 		    (keep_constrained_entries == false))
-		  {
-		    sparsity_pattern.add (local_dof_indices[i],
-					  local_dof_indices[j]);
-		  }
+		  column_indices[col_counter++] = local_dof_indices[j];
 		else if ((is_constrained_i == true) &&
 			 (is_constrained_j == false))
 		  {
@@ -1232,8 +1238,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 			 (is_constrained_j == true))
 		  {
 		    for (unsigned int q=0; q<position_j->entries.size(); ++q)
-		      sparsity_pattern.add (local_dof_indices[i],
-					    position_j->entries[q].first);
+		      column_indices[col_counter++] = position_j->entries[q].first;
 		  }
 		else if ((is_constrained_i == true) &&
 			 (is_constrained_j == true))
@@ -1243,9 +1248,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 			sparsity_pattern.add (position_i->entries[p].first,
 					      position_j->entries[q].first);
 
-		    if (i == j)
-		      sparsity_pattern.add (local_dof_indices[i],
-					    local_dof_indices[i]);
+		    if (i == j && keep_constrained_entries == false)
+		      column_indices[col_counter++] = local_dof_indices[i];
 		  }
 		else
 						 // the only case that can
@@ -1257,6 +1261,20 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 			  ExcInternalError());
 	      }
 	    }
+
+				   // Check whether we did remain within the
+				   // arrays when adding elements into the
+				   // scratch arrays.
+	  Assert (col_counter <= n_max_entries_per_row, ExcInternalError());
+
+				   // Finally, write the scratch array into
+				   // the sparsity pattern. Of course, do it
+				   // only in case there is anything to
+				   // write...
+	  if (col_counter > 0)
+	    sparsity_pattern.add_entries (local_dof_indices[i],
+					  column_indices.begin(),
+					  column_indices.begin()+col_counter);
         }
     }
 }

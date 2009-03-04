@@ -280,7 +280,27 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * and then relays to that block.
 				      */
     void add (const unsigned int i, const unsigned int j);
-    
+
+				     /**
+				      * Add several nonzero entries to the
+				      * specified matrix row.  This function
+				      * may only be called for
+				      * non-compressed sparsity patterns.
+				      *
+				      * If some of the entries already
+				      * exist, nothing bad happens.
+				      *
+				      * This function simply finds out to
+				      * which blocks <tt>(row,col)</tt> for
+				      * <tt>col</tt> in the iterator range
+				      * belong and then relays to those
+				      * blocks.
+				      */
+    template <typename ForwardIterator>
+    void add_entries (const unsigned int row, 
+		      ForwardIterator    begin,
+		      ForwardIterator    end);
+
 				     /**
 				      * Return number of rows of this
 				      * matrix, which equals the
@@ -420,6 +440,23 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * sub-objects.
 				      */
     BlockIndices    column_indices;
+
+  private:
+                                       /**
+					* Temporary vector for counting the
+					* elements written into the
+					* individual blocks when doing a
+					* collective add or set.
+					*/
+    std::vector<unsigned int> counter_within_block; 
+
+                                       /**
+					* Temporary vector for column
+					* indices on each block when writing
+					* local to global data on each
+					* sparse matrix.
+					*/
+    std::vector<std::vector<unsigned int> > block_column_indices; 
 
 				     /**
 				      * Make the block sparse matrix a
@@ -1042,6 +1079,91 @@ BlockSparsityPatternBase<SparsityPatternBase>::add (const unsigned int i,
     col_index = column_indices.global_to_local (j);
   sub_objects[row_index.first][col_index.first]->add (row_index.second,
 						      col_index.second);
+}
+
+
+
+template <class SparsityPatternBase>
+template <typename ForwardIterator>
+void
+BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int row,
+							    ForwardIterator    begin,
+							    ForwardIterator    end)
+{
+				   // Resize scratch arrays
+  if (block_column_indices.size() < this->n_block_cols())
+    {
+      block_column_indices.resize (this->n_block_cols());
+      counter_within_block.resize (this->n_block_cols());
+    }
+
+  const unsigned int n_cols = static_cast<unsigned int>(end - begin);
+
+				   // Resize sub-arrays to n_cols. This
+				   // is a bit wasteful, but we resize
+				   // only a few times (then the maximum
+				   // row length won't increase that
+				   // much any more). At least we know
+				   // that all arrays are going to be of
+				   // the same size, so we can check
+				   // whether the size of one is large
+				   // enough before actually going
+				   // through all of them.
+  if (block_column_indices[0].size() < n_cols)
+    for (unsigned int i=0; i<this->n_block_cols(); ++i)
+      block_column_indices[i].resize(n_cols);
+
+				   // Reset the number of added elements
+				   // in each block to zero.
+  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+    counter_within_block[i] = 0;
+
+				   // Go through the column indices to
+				   // find out which portions of the
+				   // values should be set in which
+				   // block of the matrix. We need to
+				   // touch all the data, since we can't
+				   // be sure that the data of one block
+				   // is stored contiguously (in fact,
+				   // indices will be intermixed when it
+				   // comes from an element matrix).
+  for (ForwardIterator it = begin; it != end; ++it)
+    {
+      const unsigned int col = *it;
+
+      const std::pair<unsigned int, unsigned int>
+	col_index = this->column_indices.global_to_local(col);
+
+      const unsigned int local_index = counter_within_block[col_index.first]++;
+
+      block_column_indices[col_index.first][local_index] = col_index.second;
+    }
+
+#ifdef DEBUG
+				   // If in debug mode, do a check whether
+				   // the right length has been obtained.
+  unsigned int length = 0;
+  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+    length += counter_within_block[i];
+  Assert (length == n_cols, ExcInternalError());
+#endif
+
+				   // Now we found out about where the
+				   // individual columns should start and
+				   // where we should start reading out
+				   // data. Now let's write the data into
+				   // the individual blocks!
+  const std::pair<unsigned int,unsigned int> 
+    row_index = this->row_indices.global_to_local (row);
+  for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
+    {
+      if (counter_within_block[block_col] == 0)
+	continue;
+      sub_objects[row_index.first][block_col]->
+	add_entries (row_index.second,
+		     block_column_indices[block_col].begin(),
+		     block_column_indices[block_col].begin()+counter_within_block[block_col]);
+    }
 }
 
 

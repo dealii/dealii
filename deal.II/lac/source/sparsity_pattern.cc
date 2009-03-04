@@ -864,6 +864,19 @@ SparsityPattern::add (const unsigned int i,
 }
 
 
+
+template <typename ForwardIterator>
+void
+SparsityPattern::add_entries (const unsigned int row,
+			      ForwardIterator    begin,
+			      ForwardIterator    end)
+{
+  // right now, just forward to the other function.
+  for (ForwardIterator it = begin; it != end; ++it)
+    add (row, *it);
+}
+
+
 bool
 SparsityPattern::exists (const unsigned int i,
 			 const unsigned int j) const
@@ -1121,5 +1134,17 @@ partition (const unsigned int         n_partitions,
 // explicit instantiations
 template void SparsityPattern::copy_from<float> (const FullMatrix<float> &, bool);
 template void SparsityPattern::copy_from<double> (const FullMatrix<double> &, bool);
+
+template void SparsityPattern::add_entries<const unsigned int*> (const unsigned int,
+								 const unsigned int*,
+								 const unsigned int*);
+template void SparsityPattern::add_entries<std::vector<unsigned int>::const_iterator> 
+(const unsigned int,
+ std::vector<unsigned int>::const_iterator,
+ std::vector<unsigned int>::const_iterator);
+template void SparsityPattern::add_entries<std::vector<unsigned int>::iterator> 
+(const unsigned int,
+ std::vector<unsigned int>::iterator,
+ std::vector<unsigned int>::iterator);
 
 DEAL_II_NAMESPACE_CLOSE

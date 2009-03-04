@@ -187,6 +187,17 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 	      const unsigned int j);
 
 				     /**
+				      * Add several nonzero entries to the
+				      * specified row of the matrix. If the
+				      * entries already exist, nothing bad
+				      * happens.
+				      */
+    template <typename ForwardIterator>
+    void add_entries (const unsigned int row, 
+		      ForwardIterator    begin,
+		      ForwardIterator    end);
+
+				     /**
 				      * Check if a value at a certain
 				      * position may be non-zero.
 				      */
@@ -347,6 +358,14 @@ class CompressedSimpleSparsityPattern : public Subscriptor
                                           * this line.
                                           */
         void add (const unsigned int col_num);
+
+                                         /**
+                                          * Add the columns specified by the
+                                          * iterator range to this line.
+                                          */
+        template <typename ForwardIterator>
+	void add_entries (ForwardIterator begin,
+			  ForwardIterator end);
     };
 
 
@@ -393,6 +412,77 @@ CompressedSimpleSparsityPattern::Line::add (const unsigned int j)
 
 
 
+template <typename ForwardIterator>
+inline
+void
+CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
+						    ForwardIterator end)
+{
+  if (end - begin <= 0)
+    return;
+
+  ForwardIterator my_it = begin;
+  const unsigned int n_cols = static_cast<unsigned int>(end - begin);
+
+  // If necessary, increase the size of the array. In order to avoid
+  // allocating just a few entries every time, use five elements at a time
+  // at least.
+  const unsigned int stop_size = entries.size() + (n_cols > 5 ? n_cols : 5);
+  if (stop_size > entries.capacity())
+    entries.reserve (stop_size);
+
+  unsigned int col = *my_it;
+  std::vector<unsigned int>::iterator it, it2;
+  // insert the first element as for one entry only first check the last
+  // element (or if line is still empty)
+  if ( (entries.size()==0) || ( entries.back() < col) ) {
+    entries.push_back(col);
+    it = entries.end()-1;
+  }
+  else { 
+    // do a binary search to find the place where to insert:
+    it2 = std::lower_bound(entries.begin(), entries.end(), col); 
+
+    // If this entry is a duplicate, continue immediately Insert at the
+    // right place in the vector. Vector grows automatically to fit
+    // elements. Always doubles its size.
+    if (*it2 != col)
+      it = entries.insert(it2, col);
+    else
+      it = it2;
+  }
+
+  ++my_it;
+  // Now try to be smart and insert with bias in the direction we are
+  // walking. This has the advantage that for sorted lists, we always search
+  // in the right direction, what should decrease the work needed in here.
+  for ( ; my_it != end; ++my_it)
+    {
+      col = *my_it;
+      // need a special insertion command when we're at the end of the list
+      if (col > entries.back()) {
+	entries.push_back(col);
+	it = entries.end()-1;
+      }
+      // search to the right (preferred search direction)
+      else if (col > *it) {
+      	it2 = std::lower_bound(it++, entries.end(), col);
+	if (*it2 != col)
+	  it = entries.insert(it2, col);
+      }
+      // search to the left
+      else if (col < *it) {
+	it2 = std::lower_bound(entries.begin(), it, col);
+	if (*it2 != col)
+	  it = entries.insert(it2, col);
+      }
+      // if we're neither larger nor smaller, then this was a duplicate and
+      // we can just continue.
+    }
+}
+
+
+
 inline
 unsigned int
 CompressedSimpleSparsityPattern::n_rows () const
@@ -420,6 +510,20 @@ CompressedSimpleSparsityPattern::add (const unsigned int i,
   Assert (j<cols, ExcIndexRange(j, 0, cols));
 
   lines[i].add (j);
+}
+
+
+
+template <typename ForwardIterator>
+inline
+void
+CompressedSimpleSparsityPattern::add_entries (const unsigned int row,
+					      ForwardIterator begin,
+					      ForwardIterator end)
+{
+  Assert (row < rows, ExcIndexRange (row, 0, rows));
+
+  lines[row].add_entries (begin, end);
 }
 
 

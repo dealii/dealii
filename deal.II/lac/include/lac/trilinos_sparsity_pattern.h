@@ -807,9 +807,10 @@ namespace TrilinosWrappers
                                         * Add several elements in one row to
                                         * the sparsity pattern.
                                         */
-      void add (const unsigned int    row,
-		const unsigned int    n_cols,
-		const unsigned int   *col_indices);
+      template <typename ForwardIterator>
+      void add_entries (const unsigned int row,
+			ForwardIterator    begin,
+			ForwardIterator    end);
 //@}
 /**
  * @name Access of underlying Trilinos data
@@ -1055,28 +1056,6 @@ namespace TrilinosWrappers
                                         * elements to the pattern.
                                         */
       std::auto_ptr<Epetra_FECrsGraph> graph;
-
-                                       /**
-					* Scratch array that holds several
-					* indices that should be written
-					* into the same row of the sparsity
-					* pattern. This is to increase the
-					* speed of this function.
-					*/
-      std::vector<unsigned int> cached_row_indices;
-
-				       /**
-					* A number that tells how many
-					* indices currently are active in
-					* the cache.
-					*/
-      unsigned int n_cached_elements;
-
-				       /**
-					* The row that is currently in the
-					* cache.
-					*/
-      unsigned int row_in_cache;
 
       friend class SparsityPatternIterators::const_iterator;
       friend class SparsityPatternIterators::const_iterator::Accessor;
@@ -1329,43 +1308,23 @@ namespace TrilinosWrappers
   SparsityPattern::add (const unsigned int i,
 			const unsigned int j)
   {
-				   // if we want to write an element to the
-				   // row the cache is currently pointed to,
-				   // we just append the data to the cache
-    if (i == row_in_cache)
-      {
-				   // if the size is too small, extend the
-				   // cache by 10 elements
-	if (n_cached_elements >= cached_row_indices.size())
-	  cached_row_indices.resize(cached_row_indices.size() + 10);
-
-	cached_row_indices[n_cached_elements] = j;
-	++n_cached_elements;
-	return;
-      }
-
-				   // if we are to write another row data,
-				   // we write the cache data into the
-				   // sparsity pattern, and then call this
-				   // function again
-    add (row_in_cache, n_cached_elements, &cached_row_indices[0]);
-    row_in_cache = i;
-    n_cached_elements = 0;
-    add (i,j);
+    add_entries (i, &j, &j+1);
   }
 
 
 
+  template <typename ForwardIterator>
   inline
   void
-  SparsityPattern::add (const unsigned int    row,
-			const unsigned int    n_cols,
-			const unsigned int   *col_indices)
+  SparsityPattern::add_entries (const unsigned int row,
+				ForwardIterator    begin,
+				ForwardIterator    end)
   {
-    if (n_cols == 0)
+    if (begin == end)
       return;
 
-    int * col_index_ptr = (int*)(col_indices);
+    int * col_index_ptr = (int*)(&*begin);
+    const int n_cols = static_cast<int>(end - begin);
     compressed = false;
 
     const int ierr = graph->InsertGlobalIndices (1, (int*)&row, 

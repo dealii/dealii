@@ -1150,27 +1150,6 @@ class BlockMatrixBase : public Subscriptor
     void Tvmult_nonblock_nonblock (VectorType       &dst,
 		                   const VectorType &src) const;
     
-    
-				     /**
-				      * Make the iterator class a
-				      * friend. We have to work around
-				      * a compiler bug here again.
-				      */
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
-    template <typename, bool>
-    friend class BlockMatrixIterators::Accessor;
-
-    template <typename>
-    friend class MatrixIterator;
-#else
-    typedef BlockMatrixIterators::Accessor<BlockMatrixBase, true> ConstAccessor;
-    typedef BlockMatrixIterators::Accessor<BlockMatrixBase, false> Accessor;
-    friend class ConstAccessor;
-    
-    friend class const_iterator;
-#endif
-
-
   private:
                                        /**
 					* Temporary vector for counting the
@@ -1195,6 +1174,26 @@ class BlockMatrixBase : public Subscriptor
 					* global).
 					*/
     std::vector<std::vector<double> > column_values;
+
+    
+				     /**
+				      * Make the iterator class a
+				      * friend. We have to work around
+				      * a compiler bug here again.
+				      */
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+    template <typename, bool>
+    friend class BlockMatrixIterators::Accessor;
+
+    template <typename>
+    friend class MatrixIterator;
+#else
+    typedef BlockMatrixIterators::Accessor<BlockMatrixBase, true> ConstAccessor;
+    typedef BlockMatrixIterators::Accessor<BlockMatrixBase, false> Accessor;
+    friend class ConstAccessor;
+    
+    friend class const_iterator;
+#endif
 
 };
 

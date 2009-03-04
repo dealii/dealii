@@ -1054,6 +1054,20 @@ class SparsityPattern : public Subscriptor
 				      */
     void add (const unsigned int i, 
 	      const unsigned int j);
+
+				     /**
+				      * Add several nonzero entries to the
+				      * specified matrix row.  This function
+				      * may only be called for
+				      * non-compressed sparsity patterns.
+				      *
+				      * If some of the entries already
+				      * exist, nothing bad happens.
+				      */
+    template <typename ForwardIterator>
+    void add_entries (const unsigned int row, 
+		      ForwardIterator    begin,
+		      ForwardIterator    end);
     
 				     /**
 				      * Make the sparsity pattern

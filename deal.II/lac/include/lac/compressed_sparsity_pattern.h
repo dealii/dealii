@@ -189,7 +189,18 @@ class CompressedSparsityPattern : public Subscriptor
 				      */
     void add (const unsigned int i, 
 	      const unsigned int j);
-    
+
+				     /**
+				      * Add several nonzero entries to the
+				      * specified row of the matrix. If the
+				      * entries already exist, nothing bad
+				      * happens.
+				      */
+    template <typename ForwardIterator>
+    void add_entries (const unsigned int row, 
+		      ForwardIterator    begin,
+		      ForwardIterator    end);
+
 				     /**
 				      * Check if a value at a certain
 				      * position may be non-zero.
@@ -418,6 +429,14 @@ class CompressedSparsityPattern : public Subscriptor
         void add (const unsigned int col_num);
 
                                          /**
+                                          * Add the columns specified by the
+                                          * iterator range to this line.
+                                          */
+        template <typename ForwardIterator>
+	void add_entries (ForwardIterator begin,
+			  ForwardIterator end);
+
+                                         /**
                                           * Flush the cache my merging it with
                                           * the #entries array.
                                           */
@@ -460,6 +479,19 @@ CompressedSparsityPattern::Line::add (const unsigned int j)
 
 
 
+template <typename ForwardIterator>
+inline
+void
+CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
+					      ForwardIterator end)
+{
+  // right now, just forward to the individual function.
+  for (ForwardIterator it = begin; it != end; ++it)
+    add (*it);
+}
+
+
+
 inline
 unsigned int
 CompressedSparsityPattern::n_rows () const
@@ -487,6 +519,20 @@ CompressedSparsityPattern::add (const unsigned int i,
   Assert (j<cols, ExcIndexRange(j, 0, cols));
 
   lines[i].add (j);
+}
+
+
+
+template <typename ForwardIterator>
+inline
+void
+CompressedSparsityPattern::add_entries (const unsigned int row,
+					ForwardIterator begin,
+					ForwardIterator end)
+{
+  Assert (row < rows, ExcIndexRange (row, 0, rows));
+
+  lines[row].add_entries (begin, end);
 }
 
 

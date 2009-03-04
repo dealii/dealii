@@ -77,13 +77,18 @@ DoFTools::make_sparsity_pattern (const DH               &dof,
 				   // only have to do the work if the
 				   // current cell is owned by the calling
 				   // processor. Otherwise, just continue.
+				   // 
+				   // TODO: here, we should actually check
+				   // the communicator of the sparsity
+				   // pattern, not MPI_COMM_WORLD as the
+				   // Utilities function does!
   for (; cell!=endc; ++cell) 
 #ifdef DEAL_II_USE_TRILINOS
     if ((types_are_equal<SparsityPattern,TrilinosWrappers::SparsityPattern>::value
 	 ||
 	 types_are_equal<SparsityPattern,TrilinosWrappers::BlockSparsityPattern>::value)
 	&&
-	cell->subdomain_id() != 
+	cell->subdomain_id() !=
 	Utilities::Trilinos::get_this_mpi_process(Utilities::Trilinos::comm_world()))
       continue;
     else
@@ -265,9 +270,9 @@ DoFTools::make_sparsity_pattern (
           cell_row->get_dof_indices (local_dof_indices_row);
           cell_col->get_dof_indices (local_dof_indices_col);
           for (unsigned int i=0; i<dofs_per_cell_row; ++i)
-            for (unsigned int j=0; j<dofs_per_cell_col; ++j)
-              sparsity.add (local_dof_indices_row[i],
-                            local_dof_indices_col[j]);
+	    sparsity.add_entries (local_dof_indices_row[i],
+				  local_dof_indices_col.begin(),
+				  local_dof_indices_col.end());
         }
       else if (cell_row->has_children())
         {
@@ -288,9 +293,9 @@ DoFTools::make_sparsity_pattern (
               cell_row_child->get_dof_indices (local_dof_indices_row);
               cell_col->get_dof_indices (local_dof_indices_col);
               for (unsigned int i=0; i<dofs_per_cell_row; ++i)
-                for (unsigned int j=0; j<dofs_per_cell_col; ++j)
-                  sparsity.add (local_dof_indices_row[i],
-                                local_dof_indices_col[j]);
+		sparsity.add_entries (local_dof_indices_row[i],
+				      local_dof_indices_col.begin(),
+				      local_dof_indices_col.end());
             }
         }
       else
@@ -312,9 +317,9 @@ DoFTools::make_sparsity_pattern (
               cell_row->get_dof_indices (local_dof_indices_row);
               cell_col_child->get_dof_indices (local_dof_indices_col);
               for (unsigned int i=0; i<dofs_per_cell_row; ++i)
-                for (unsigned int j=0; j<dofs_per_cell_col; ++j)
-                  sparsity.add (local_dof_indices_row[i],
-                                local_dof_indices_col[j]);
+		sparsity.add_entries (local_dof_indices_row[i],
+				      local_dof_indices_col.begin(),
+				      local_dof_indices_col.end());
             }
         }
     }
@@ -361,9 +366,9 @@ DoFTools::make_boundary_sparsity_pattern (
 	  = dof_to_boundary_mapping[cell->vertex_dof_index(direction,i)];
 
       for (unsigned int i=0; i<dofs_per_vertex; ++i)
-	for (unsigned int j=0; j<dofs_per_vertex; ++j)
-	  sparsity.add (boundary_dof_boundary_indices[i],
-			boundary_dof_boundary_indices[j]);
+	sparsity.add_entries (boundary_dof_boundary_indices[i],
+			      boundary_dof_boundary_indices.begin(),
+			      boundary_dof_boundary_indices.end());
     };
 }
 
@@ -582,13 +587,14 @@ DoFTools::make_flux_sparsity_pattern (
 		      sub_neighbor->get_dof_indices (dofs_on_other_cell);
 
                       for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-                        for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
-                          {
-                            sparsity.add (dofs_on_this_cell[i],
-                                          dofs_on_other_cell[j]);
-                            sparsity.add (dofs_on_other_cell[j],
-                                          dofs_on_this_cell[i]);
-                          }
+			sparsity.add_entries (dofs_on_this_cell[i],
+					      dofs_on_other_cell.begin(),
+					      dofs_on_other_cell.end());
+		      for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
+			sparsity.add_entries (dofs_on_other_cell[j],
+					      dofs_on_this_cell.begin(),
+					      dofs_on_this_cell.end());
+
 		      sub_neighbor->face(neighbor_face)->set_user_flag ();
 		    }
 		}
@@ -605,14 +611,15 @@ DoFTools::make_flux_sparsity_pattern (
                   dofs_on_other_cell.resize (n_dofs_on_neighbor);
 
                   neighbor->get_dof_indices (dofs_on_other_cell);
+
 		  for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-                    for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
-                      {
-                        sparsity.add (dofs_on_this_cell[i],
-                                      dofs_on_other_cell[j]);
-                        sparsity.add (dofs_on_other_cell[j],
-                                      dofs_on_this_cell[i]);
-                      }
+		    sparsity.add_entries (dofs_on_this_cell[i],
+					  dofs_on_other_cell.begin(),
+					  dofs_on_other_cell.end());
+		  for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
+		    sparsity.add_entries (dofs_on_other_cell[j],
+					  dofs_on_this_cell.begin(),
+					  dofs_on_this_cell.end());
 		  neighbor->face(neighbor_face)->set_user_flag (); 
 		}
 	    } 
@@ -650,8 +657,9 @@ DoFTools::make_flux_sparsity_pattern (
       local_dof_indices.resize (n_dofs_on_this_cell);
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-	for (unsigned int j=0; j<n_dofs_on_this_cell; ++j)
-	  sparsity.add (local_dof_indices[i], local_dof_indices[j]);
+	sparsity.add_entries (local_dof_indices[i],
+			      local_dof_indices.begin(),
+			      local_dof_indices.end());
 
 				       // then do the same for the up
 				       // to 2 neighbors
@@ -671,8 +679,9 @@ DoFTools::make_flux_sparsity_pattern (
 
 					     // compute couplings
 	    for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-	      for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
-		sparsity.add (local_dof_indices[i], neighbor_dof_indices[j]);
+	      sparsity.add_entries (local_dof_indices[i],
+				    neighbor_dof_indices.begin(),
+				    neighbor_dof_indices.end());
 	  };
     };
 }
@@ -733,6 +742,8 @@ DoFTools::dof_couplings_from_component_couplings
 
 
 
+// TODO: look whether one can employ collective add operations in sparsity
+// pattern in this function.
 template <class DH, class SparsityPattern>
 void
 DoFTools::make_flux_sparsity_pattern (
