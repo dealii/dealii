@@ -35,7 +35,7 @@
 #include <lac/vector.h>
 #include <base/function.h>
 #include <base/quadrature_lib.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/dof_tools.h>
 
 #include <fe/fe_system.h>

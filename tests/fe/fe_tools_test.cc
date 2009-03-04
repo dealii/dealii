@@ -28,7 +28,7 @@
 #include <fe/fe_tools.h>
 #include <fe/mapping_q1.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <numerics/vectors.h>
 #include <numerics/data_out.h>
 

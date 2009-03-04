@@ -31,7 +31,7 @@ char logname[] = "face_orientation_and_fe_q_01/output";
 
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>

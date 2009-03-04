@@ -38,7 +38,7 @@ std::ofstream logfile("step-11_compressed_set_sparsity/output");
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>

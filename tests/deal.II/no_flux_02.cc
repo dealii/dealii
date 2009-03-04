@@ -24,7 +24,7 @@
 #include <lac/vector.h>
 #include <grid/grid_generator.h>
 #include <dofs/dof_handler.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <fe/mapping_q1.h>

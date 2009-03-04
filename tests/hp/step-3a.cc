@@ -21,7 +21,7 @@
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <grid/grid_generator.h>
 
 #include <grid/tria_accessor.h>

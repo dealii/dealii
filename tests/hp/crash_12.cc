@@ -34,7 +34,7 @@ char logname[] = "crash_12/output";
 
 #include <grid/tria.h>
 #include <hp/dof_handler.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>

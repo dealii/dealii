@@ -25,7 +25,7 @@
 #include <lac/sparse_matrix.h>
 #include <base/parameter_handler.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/dof_tools.h>
 #include <grid/grid_out.h>
 #include <base/logstream.h>

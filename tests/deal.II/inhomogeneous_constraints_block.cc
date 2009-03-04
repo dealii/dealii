@@ -31,7 +31,7 @@
 #include <grid/grid_refinement.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 #include <numerics/vectors.h>

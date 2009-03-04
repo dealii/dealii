@@ -23,7 +23,7 @@
 #include <grid/grid_tools.h>
 #include <dofs/dof_handler.h>
 #include <hp/dof_handler.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <fe/fe_q.h>
 #include <numerics/vectors.h>
 #include <dofs/dof_accessor.h>

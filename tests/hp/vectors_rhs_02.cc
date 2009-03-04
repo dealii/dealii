@@ -29,7 +29,7 @@
 #include <grid/grid_generator.h>
 #include <hp/dof_handler.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <fe/fe_raviart_thomas.h>
 #include <fe/fe_system.h>
 #include <hp/fe_collection.h>

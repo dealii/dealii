@@ -23,7 +23,7 @@
 
 #include "../tests.h"
 #include <base/logstream.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 
 #include <fstream>
 

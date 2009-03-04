@@ -36,7 +36,7 @@ const bool errors = false;
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>

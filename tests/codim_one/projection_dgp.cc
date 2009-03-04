@@ -31,7 +31,7 @@
 #include <base/quadrature_lib.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <numerics/vectors.h>
 #include <numerics/data_out.h>
 #include <base/function.h>

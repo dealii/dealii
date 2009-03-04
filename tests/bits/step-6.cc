@@ -50,7 +50,7 @@ std::ofstream logfile("step-6/output");
 #include <grid/grid_out.h>
 
 
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 
 #include <grid/grid_refinement.h>
 

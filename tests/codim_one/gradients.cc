@@ -30,7 +30,7 @@
 #include <base/quadrature_lib.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <fe/mapping.h>
 #include <fe/mapping_q1.h>
 #include <fe/fe_dgq.h>

@@ -42,7 +42,7 @@ std::ofstream logfile("step-8/output");
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <numerics/error_estimator.h>
 
 #include <fe/fe_system.h>

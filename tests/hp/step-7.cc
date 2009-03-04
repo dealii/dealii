@@ -36,7 +36,7 @@ std::ofstream logfile("step-7/output");
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
 #include <hp/dof_handler.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>

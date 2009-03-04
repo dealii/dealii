@@ -78,7 +78,7 @@
 				 // following file contains a class
 				 // which is used to handle these
 				 // constraints:
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 
 				 // In order to refine our grids
 				 // locally, we need a function from

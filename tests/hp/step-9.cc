@@ -38,7 +38,7 @@ std::ofstream logfile("step-9/output");
 #include <hp/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <hp/fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>

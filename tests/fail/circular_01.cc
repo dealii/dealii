@@ -49,7 +49,7 @@ char logname[] = "circular_01/output";
 
 #include <fe/fe_q.h>
 #include <grid/grid_out.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <grid/grid_refinement.h>
 #include <numerics/error_estimator.h>
 

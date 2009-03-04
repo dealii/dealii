@@ -21,7 +21,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <lac/sparse_matrix.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_renumbering.h>
 #include <dofs/dof_tools.h>

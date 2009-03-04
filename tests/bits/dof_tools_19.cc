@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.cc"
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <base/function.h>
 #include <base/quadrature_lib.h>
 #include <numerics/vectors.h>
