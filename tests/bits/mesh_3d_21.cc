@@ -44,6 +44,7 @@ void check_this (Triangulation<3> &tria)
     for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell;
          ++face_no)
       if (!cell->at_boundary(face_no))
+      {
 	if (cell->neighbor(face_no)->has_children())
 					   // we are coarser than the neighbor
 	  for (unsigned int subface_no=0;
@@ -81,6 +82,7 @@ void check_this (Triangulation<3> &tria)
 	    Assert (our_cell==cell, ExcInternalError());
 	    deallog << "from fine to coarse and back: OK" <<std::endl;
 	  }
+      }
   
 	  
 }
