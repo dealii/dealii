@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,7 @@
 #include <lac/block_vector.h>
 #include <lac/trilinos_vector.h>
 #include <lac/trilinos_block_vector.h>
+#include <lac/constraint_matrix.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_generator.h>
@@ -39,7 +40,6 @@
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_cartesian.h>
-#include <dofs/dof_constraints.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>

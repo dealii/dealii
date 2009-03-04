@@ -1,7 +1,7 @@
 /*    $Id$       */
 /*    Version: $Name:  $                                          */
 /*                                                                */
-/*    Copyright (C) 2006, 2007, 2008 by the deal.II authors and Yaqi Wang     */
+/*    Copyright (C) 2006, 2007, 2008, 2009 by the deal.II authors and Yaqi Wang     */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -26,6 +26,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
+#include <lac/constraint_matrix.h>
 #include <grid/tria.h>
 #include <grid/grid_refinement.h>
 #include <grid/grid_out.h>
@@ -36,7 +37,6 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
 #include <fe/fe_q.h>
 #include <fe/fe_values.h>
 #include <numerics/vectors.h>

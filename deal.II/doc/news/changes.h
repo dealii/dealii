@@ -32,6 +32,22 @@ inconvenience this causes.
 <ol>
   <li>
   <p> 
+  Changed: The files implementing the class ConstraintMatrix are now
+  saved in the lac/ subdirectory, named <code>constraint_matrix.h</code>
+  and included by the line <code>#include
+  <lac/constraint_matrix.h></code>. After all, constraints are just
+  algebraic objects and do not depend on anything in the deal.II
+  directory (in particular, they are dimension-independent).  The old
+  <code>#include <dofs/dof_constraints.h></code> include line is still
+  enabled by a reference to the new file, but users should try to adapt
+  their codes to the new file names as the reference might be removed in
+  the future.
+  <br>
+  (Martin Kronbichler 2009/03/04)
+  </p>
+
+  <li>
+  <p> 
   Changed: The function DoFTools::get_subdomain_association function used
   to assign degrees of freedom to the subdomain of the last cell on which
   the degree of freedom is a part. This introduced a bias for degrees of

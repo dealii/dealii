@@ -24,6 +24,7 @@
 #include <lac/full_matrix.h>
 #include <lac/solver_gmres.h>
 #include <lac/solver_cg.h>
+#include <lac/constraint_matrix.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -36,7 +37,6 @@
 #include <dofs/dof_renumbering.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
 
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>

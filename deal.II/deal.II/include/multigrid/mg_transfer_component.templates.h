@@ -2,7 +2,7 @@
 //    mg_transfer.templates.h,v 1.22 2006/01/29 15:03:55 guido Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,7 +17,7 @@
 #include <lac/sparse_matrix.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_tools.h>

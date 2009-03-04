@@ -18,18 +18,6 @@
 #include <base/table.h>
 #include <base/template_constraints.h>
 #include <base/utilities.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/intergrid_map.h>
-#include <grid/grid_tools.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_constraints.h>
-#include <fe/fe.h>
-#include <fe/fe_values.h>
-#include <fe/fe_tools.h>
-#include <hp/fe_collection.h>
-#include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
@@ -37,6 +25,18 @@
 #include <lac/trilinos_sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/vector.h>
+#include <lac/constraint_matrix.h>
+#include <grid/tria.h>
+#include <grid/tria_iterator.h>
+#include <grid/intergrid_map.h>
+#include <grid/grid_tools.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <fe/fe.h>
+#include <fe/fe_values.h>
+#include <fe/fe_tools.h>
+#include <hp/fe_collection.h>
+#include <dofs/dof_tools.h>
 #include <numerics/vectors.h>
 
 #include <multigrid/mg_dof_handler.h>

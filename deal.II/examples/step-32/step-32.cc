@@ -1,6 +1,6 @@
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
-           Wolfgang Bangerth, Texas A&M University 2007, 2008 */
+           Wolfgang Bangerth, Texas A&M University 2007, 2008, 2009 */
 /*                                                                */
 /*    Copyright (C) 2008, 2009 by the deal.II authors */
 /*                                                                */
@@ -24,6 +24,7 @@
 #include <lac/full_matrix.h>
 #include <lac/solver_gmres.h>
 #include <lac/solver_cg.h>
+#include <lac/constraint_matrix.h>
 #include <lac/trilinos_block_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_sparse_matrix.h>
@@ -41,7 +42,6 @@
 #include <dofs/dof_renumbering.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
 
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>

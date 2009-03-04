@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2000, 2004, 2005, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 2000, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -19,6 +19,7 @@
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
+#include <lac/constraint_matrix.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_refinement.h>
@@ -28,7 +29,6 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
 #include <fe/fe_values.h>
 #include <fe/fe_system.h>
 #include <fe/fe_q.h>

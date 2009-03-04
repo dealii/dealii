@@ -20,6 +20,7 @@
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/sparse_matrix.h>
+#include <lac/constraint_matrix.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_reordering.h>
 #include <grid/grid_tools.h>
@@ -29,7 +30,6 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
 #include <fe/mapping_q1.h>
 #include <fe/fe_q.h>
 #include <numerics/matrices.h>

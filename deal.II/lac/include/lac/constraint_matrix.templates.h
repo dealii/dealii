@@ -15,7 +15,7 @@
 
 
 #include <base/config.h>
-#include <dofs/dof_constraints.h>
+#include <lac/constraint_matrix.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparsity_pattern.h>

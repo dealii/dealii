@@ -23,6 +23,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
+#include <lac/constraint_matrix.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_refinement.h>
@@ -36,7 +37,6 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
-#include <dofs/dof_constraints.h>
 #include <numerics/error_estimator.h>
 
 				 // In this example, we need

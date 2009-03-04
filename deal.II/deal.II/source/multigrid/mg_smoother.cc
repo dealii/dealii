@@ -12,18 +12,18 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/tria.h>
-#include <dofs/dof_constraints.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
-#include <grid/tria_iterator.h>
-#include <fe/fe.h>
-#include <multigrid/mg_smoother.h>
-#include <multigrid/mg_smoother.templates.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
+#include <lac/constraint_matrix.h>
+#include <fe/fe.h>
+#include <grid/tria.h>
+#include <grid/tria_iterator.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
+#include <multigrid/mg_smoother.h>
+#include <multigrid/mg_smoother.templates.h>
 
 #include <algorithm>
 

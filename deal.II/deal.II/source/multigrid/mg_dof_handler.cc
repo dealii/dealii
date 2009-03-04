@@ -12,9 +12,10 @@
 //---------------------------------------------------------------------------
 
 #include <base/memory_consumption.h>
+#include <lac/sparse_matrix.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/dof_levels.h>
 #include <dofs/dof_faces.h>
-#include <dofs/dof_constraints.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_levels.h>
@@ -23,7 +24,6 @@
 #include <grid/tria.h>
 #include <base/geometry_info.h>
 #include <fe/fe.h>
-#include <lac/sparse_matrix.h>
 #include <base/exceptions.h>
 
 #include <algorithm>

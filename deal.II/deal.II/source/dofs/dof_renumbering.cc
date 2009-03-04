@@ -17,12 +17,12 @@
 #include <lac/sparsity_pattern.h>
 #include <lac/sparsity_tools.h>
 #include <lac/compressed_sparsity_pattern.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <hp/dof_handler.h>
-#include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>
 #include <dofs/dof_renumbering.h>

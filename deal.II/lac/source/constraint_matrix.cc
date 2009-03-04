@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <dofs/dof_constraints.h>
-#include <dofs/dof_constraints.templates.h>
+#include <lac/constraint_matrix.h>
+#include <lac/constraint_matrix.templates.h>
 
 #include <base/memory_consumption.h>
 #include <lac/sparsity_pattern.h>

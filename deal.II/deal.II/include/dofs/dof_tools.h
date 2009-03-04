@@ -17,8 +17,8 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/table.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/function_map.h>
-#include <dofs/dof_constraints.h>
 
 #include <vector>
 #include <set>
