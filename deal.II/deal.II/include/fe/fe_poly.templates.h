@@ -248,8 +248,9 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values (const Mapping<1,2> &ma
 				   // convert data object to internal
 				   // data for this class. fails with
 				   // an exception if that is not
-				   // possible 
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+				   // possible
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.current_update_flags());
   
@@ -286,7 +287,10 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values (const Mapping<2,3> &ma
 				   FEValuesData<2,3> &data) const
 {
 
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+				   // assert that the following dynamics
+				   // cast is really well-defined.
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.current_update_flags());
   
@@ -328,8 +332,8 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
 				   // an exception if that is not
 				   // possible
   	 
-
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.current_update_flags());
   
@@ -366,8 +370,8 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3>& mapping,
 				   Mapping<2,3>::InternalDataBase &fedata,
 				   FEValuesData<2,3> &data) const
 {
-
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.current_update_flags());
   
@@ -408,8 +412,8 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>         
 				   // an exception if that is not
 				   // possible
   	 
-
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.current_update_flags());
   
@@ -509,7 +513,8 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>    
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
 
 				   // offset determines which data set
 				   // to take (all data sets for all
@@ -624,11 +629,12 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
 
 				   // offset determines which data set
 				   // to take (all data sets for all
-				 // sub-faces are stored contiguously)
+				   // sub-faces are stored contiguously)
 
   const typename QProjector<dim>::DataSetDescriptor dsd;
   const typename QProjector<dim>::DataSetDescriptor offset
