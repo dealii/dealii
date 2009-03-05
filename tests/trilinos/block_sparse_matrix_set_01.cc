@@ -59,13 +59,12 @@ void test ()
   m2.reinit(3,2);
   for (unsigned int block_row = 0; block_row<m.n_block_rows(); ++block_row)
     for (unsigned int block_col = 0; block_col<m.n_block_cols(); ++block_col)
-      m.block(block_row, block_col).reinit(m_small);
+      m.block(block_row, block_col).copy_from(m_small);
   m.collect_sizes();
 
-				   // Set the small matrix to zero and fill
-				   // the second matrix with the sparsity
-				   // pattern (but not the values)
-  m_small = 0;
+				   // fill the second matrix with the
+				   // sparsity pattern (but not the
+				   // values)
   for (unsigned int block_row = 0; block_row<m.n_block_rows(); ++block_row)
     for (unsigned int block_col = 0; block_col<m.n_block_cols(); ++block_col)
       m2.block(block_row, block_col).reinit(m_small);
