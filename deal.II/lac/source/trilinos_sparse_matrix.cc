@@ -253,8 +253,16 @@ namespace TrilinosWrappers
   {
     row_map = m.row_map;
     col_map = m.col_map;
-    matrix = std::auto_ptr<Epetra_FECrsMatrix>
-      (new Epetra_FECrsMatrix(*m.matrix));
+				   // check whether we need to update the
+				   // communicator or can just copy the
+				   // data: in case we have the same
+				   // distribution, we can just copy the
+				   // data.
+    if (local_range() == m.local_range())
+      *matrix = *m.matrix;
+    else
+      matrix = std::auto_ptr<Epetra_FECrsMatrix>
+	(new Epetra_FECrsMatrix(*m.matrix));
     compress();
     return *this;
   }
