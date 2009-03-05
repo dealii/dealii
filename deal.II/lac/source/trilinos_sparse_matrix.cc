@@ -253,7 +253,8 @@ namespace TrilinosWrappers
   {
     row_map = m.row_map;
     col_map = m.col_map;
-    *matrix = *m.matrix;
+    matrix = std::auto_ptr<Epetra_FECrsMatrix>
+      (new Epetra_FECrsMatrix(*m.matrix));
     compress();
     return *this;
   }
@@ -1261,15 +1262,6 @@ namespace TrilinosWrappers
     const std::pair<unsigned int, unsigned int>
       local_range = rhs.local_range();
 
-    unsigned int max_row_length = 0;
-    for (unsigned int row=local_range.first;
-	 row < local_range.second; ++row)
-      max_row_length
-	= std::max (max_row_length,
-		    static_cast<unsigned int>(rhs.matrix->NumGlobalEntries(row)));
-    
-    std::vector<int>            column_indices (max_row_length);
-    std::vector<TrilinosScalar> values (max_row_length);
     int ierr;
 
 				   // If both matrices have been transformed
@@ -1340,47 +1332,61 @@ namespace TrilinosWrappers
 				   // data, multiply it by the factor and
 				   // then add it to the matrix using the
 				   // respective add() function.
-    else if (matrix->Filled() == true && rhs.matrix->Filled() == true &&
-	     this->local_range() == local_range)
-      for (unsigned int row=local_range.first;
-	   row < local_range.second; ++row)
-	{
-	  const int row_local = matrix->RowMap().LID(row);
-	  int n_entries;
-
-	  ierr = rhs.matrix->ExtractMyRowCopy (row_local, max_row_length,
-					       n_entries,
-					       &values[0],
-					       &column_indices[0]);
-	  Assert (ierr == 0, ExcTrilinosError(ierr));
-
-	  for (int i=0; i<n_entries; ++i)
-	    values[i] *= factor;
-
-	  TrilinosScalar *value_ptr = &values[0];
-
-	  ierr = matrix->SumIntoMyValues (row_local, n_entries, value_ptr,
-					  &column_indices[0]);
-	  Assert (ierr == 0, ExcTrilinosError(ierr));
-	}
-    else
+    else 
       {
+	unsigned int max_row_length = 0;
 	for (unsigned int row=local_range.first;
-	     row < local_range.second; ++row)
+	   row < local_range.second; ++row)
+	    max_row_length
+	      = std::max (max_row_length,
+			  static_cast<unsigned int>(rhs.matrix->NumGlobalEntries(row)));
+    
+	std::vector<int>            column_indices (max_row_length);
+	std::vector<TrilinosScalar> values (max_row_length);
+   
+	if (matrix->Filled() == true && rhs.matrix->Filled() == true &&
+	    this->local_range() == local_range)
+	  for (unsigned int row=local_range.first;
+	       row < local_range.second; ++row)
+	    {
+	      const int row_local = matrix->RowMap().LID(row);
+	      int n_entries;
+
+	      ierr = rhs.matrix->ExtractMyRowCopy (row_local, max_row_length,
+						   n_entries,
+						   &values[0],
+						   &column_indices[0]);
+	      Assert (ierr == 0, ExcTrilinosError(ierr));
+
+	      for (int i=0; i<n_entries; ++i)
+		values[i] *= factor;
+
+	      TrilinosScalar *value_ptr = &values[0];
+
+	      ierr = matrix->SumIntoMyValues (row_local, n_entries, value_ptr,
+					      &column_indices[0]);
+	      Assert (ierr == 0, ExcTrilinosError(ierr));
+	    }
+	else
 	  {
-	    int n_entries;
-	    ierr = rhs.matrix->Epetra_CrsMatrix::ExtractGlobalRowCopy 
-	      ((int)row, max_row_length, n_entries, &values[0], &column_indices[0]);
-	    Assert (ierr == 0, ExcTrilinosError(ierr));
+	    for (unsigned int row=local_range.first;
+		 row < local_range.second; ++row)
+	      {
+		int n_entries;
+		ierr = rhs.matrix->Epetra_CrsMatrix::ExtractGlobalRowCopy 
+		    ((int)row, max_row_length, n_entries, &values[0], &column_indices[0]);
+		Assert (ierr == 0, ExcTrilinosError(ierr));
 
-	    for (int i=0; i<n_entries; ++i)
-	      values[i] *= factor;
+		for (int i=0; i<n_entries; ++i)
+		  values[i] *= factor;
 
-	    ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues 
-	      ((int)row, n_entries, &values[0], &column_indices[0]);
-	    Assert (ierr == 0, ExcTrilinosError(ierr));
+		ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues 
+		    ((int)row, n_entries, &values[0], &column_indices[0]);
+		Assert (ierr == 0, ExcTrilinosError(ierr));
+	      }
+	    compress ();
+
 	  }
-	compress ();
       }
   }
   
