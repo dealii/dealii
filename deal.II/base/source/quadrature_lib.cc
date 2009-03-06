@@ -117,18 +117,26 @@ QGauss<1>::QGauss (const unsigned int n)
     double_eps      = 2.23-16;
 #endif
 
-				   // now check whether long double is
-				   // more accurate than double, and
-				   // set tolerances accordingly
+				   // now check whether long double is more
+				   // accurate than double, and set
+				   // tolerances accordingly. generate a one
+				   // that really is generated at run-time
+				   // and is not optimized away by the
+				   // compiler. that makes sure that the
+				   // tolerance is set at run-time with the
+				   // current behavior, not at compile-time
+				   // (not doing so leads to trouble with
+				   // valgrind for example).
+  volatile long double runtime_one = 1.0;
   const long double tolerance
-    = (static_cast<long double>(1.0) + long_double_eps != static_cast<long double>(1.0)
+    = (runtime_one + long_double_eps != runtime_one
        ?
        std::max (double_eps / 100, long_double_eps * 5)
        :
        double_eps * 5
        );
 
-  
+
   for (unsigned int i=1; i<=m; ++i)
     {
       long double z = std::cos(numbers::PI * (i-.25)/(n+.5));
@@ -212,8 +220,9 @@ compute_quadrature_points(const unsigned int q,
 				   // check whether long double is
 				   // more accurate than double, and
 				   // set tolerances accordingly
-  const long double epsilon
-    = (static_cast<long double>(1.0) + long_double_eps != static_cast<long double>(1.0)
+  volatile long double runtime_one = 1.0;
+  const long double tolerance
+    = (runtime_one + long_double_eps != runtime_one
        ?
        std::max (double_eps / 100, long_double_eps * 5)
        :
@@ -244,7 +253,7 @@ compute_quadrature_points(const unsigned int q,
 	  delta = f/(f*s- J_x);
 	  r += delta;
 	}
-      while (std::fabs(delta) >= epsilon);
+      while (std::fabs(delta) >= tolerance);
       
       x[k] = r;
     } // for
