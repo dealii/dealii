@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -446,28 +446,26 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
 
 
 template <typename number>
-void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
+void FullMatrix<number>::swap_row (const unsigned int i,
+				   const unsigned int j)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
-  number s;
-  for (unsigned int k=0; k<m(); ++k)
-  {
-    s = (*this)(i,k); (*this)(i,k) = (*this)(j,k); (*this)(j,k) = s;
-  }
+  for (unsigned int k=0; k<n(); ++k)
+    std::swap ((*this)(i,k),
+	       (*this)(j,k));
 }
 
 
 template <typename number>
-void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
+void FullMatrix<number>::swap_col (const unsigned int i,
+				   const unsigned int j)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
-  number s;
-  for (unsigned int k=0; k<n(); ++k)
-  {
-    s = (*this)(k,i); (*this)(k,i) = (*this)(k,j); (*this)(k,j) = s;
-  }
+  for (unsigned int k=0; k<m(); ++k)
+    std::swap ((*this)(k,i),
+	       (*this)(k,j));
 }
 
 

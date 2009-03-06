@@ -554,6 +554,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The FullMatrix::swap_row and FullMatrix::swap_col functions
+  had bugs that made them only work in case the matrix was square.
+  This is now fixed.
+  <br>
+  (WB 2009/03/05)
+  </p>
+
+  <li>
+  <p>
   New: Added a few simple helper functions (to VectorBase) that allow 
   some manipulation of PETSc vectors. These functions do what they say 
   in the documentation.
