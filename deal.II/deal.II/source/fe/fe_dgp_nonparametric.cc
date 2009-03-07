@@ -289,6 +289,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
   const Mapping<dim,spacedim>&,
   const typename Triangulation<dim,spacedim>::cell_iterator&,
   const Quadrature<dim>&,
+  const enum CellSimilarity::Similarity cell_similarity,
   typename Mapping<dim,spacedim>::InternalDataBase&,
   typename Mapping<dim,spacedim>::InternalDataBase& fedata,
   FEValuesData<dim,spacedim>& data) const
@@ -297,13 +298,15 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-  
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0,
+	  ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
+
   const UpdateFlags flags(fe_data.current_update_flags());
   Assert (flags & update_quadrature_points, ExcInternalError());
-  
+
   const unsigned int n_q_points = data.quadrature_points.size();
-  
+
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
@@ -338,7 +341,9 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0,
+	  ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
   Assert (flags & update_quadrature_points, ExcInternalError());
@@ -380,7 +385,9 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0,
+	  ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
   Assert (flags & update_quadrature_points, ExcInternalError());

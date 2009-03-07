@@ -79,7 +79,7 @@ MappingCartesian<dim, spacedim>::update_each (const UpdateFlags in) const
 template<int dim, int spacedim>
 typename Mapping<dim, spacedim>::InternalDataBase *
 MappingCartesian<dim, spacedim>::get_data (const UpdateFlags      update_flags,
-				 const Quadrature<dim> &q) const
+					   const Quadrature<dim> &q) const
 {
   InternalData* data = new InternalData (q);
 
@@ -95,7 +95,7 @@ MappingCartesian<dim, spacedim>::get_data (const UpdateFlags      update_flags,
 template<int dim, int spacedim>
 typename Mapping<dim, spacedim>::InternalDataBase *
 MappingCartesian<dim, spacedim>::get_face_data (const UpdateFlags update_flags,
-				      const Quadrature<dim-1>& quadrature) const
+						const Quadrature<dim-1>& quadrature) const
 {
   InternalData* data
     = new InternalData (QProjector<dim>::project_to_all_faces(quadrature));
@@ -112,7 +112,7 @@ MappingCartesian<dim, spacedim>::get_face_data (const UpdateFlags update_flags,
 template<int dim, int spacedim>
 typename Mapping<dim, spacedim>::InternalDataBase *
 MappingCartesian<dim, spacedim>::get_subface_data (const UpdateFlags update_flags,
-					 const Quadrature<dim-1> &quadrature) const
+						   const Quadrature<dim-1> &quadrature) const
 {
   InternalData* data
     = new InternalData (QProjector<dim>::project_to_all_subfaces(quadrature));
@@ -130,11 +130,12 @@ MappingCartesian<dim, spacedim>::get_subface_data (const UpdateFlags update_flag
 template<int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				     const unsigned int        face_no,
-				     const unsigned int        sub_no,
-				     InternalData             &data,
-				     std::vector<Point<dim> > &quadrature_points,
-				     std::vector<Point<dim> > &normal_vectors) const
+					       const unsigned int        face_no,
+					       const unsigned int        sub_no,
+					       const enum CellSimilarity::Similarity cell_similarity,
+					       InternalData             &data,
+					       std::vector<Point<dim> > &quadrature_points,
+					       std::vector<Point<dim> > &normal_vectors) const
 {
   const UpdateFlags update_flags(data.current_update_flags());
 
@@ -299,6 +300,7 @@ void
 MappingCartesian<dim, spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
                 const Quadrature<dim>& q, 
+		const enum CellSimilarity::Similarity cell_similarity,
 	        typename Mapping<dim,spacedim>::InternalDataBase& mapping_data,
                 std::vector<Point<spacedim> >& quadrature_points,
                 std::vector<double>& JxW_values,
@@ -311,11 +313,12 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
+  Assert (dynamic_cast<InternalData*> (&mapping_data) != 0, ExcInternalError());
+  InternalData &data = static_cast<InternalData&> (mapping_data);
 
   std::vector<Point<dim> > dummy;
   
-  compute_fill (cell, invalid_face_number, invalid_face_number,
+  compute_fill (cell, invalid_face_number, invalid_face_number, cell_similarity,
 		data,
 		quadrature_points,
 		dummy);
@@ -326,40 +329,44 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
 				   // local lengths in each coordinate
 				   // direction
   if (data.current_update_flags() & (update_JxW_values | update_volume_elements))
-    {
-      double J = data.length[0];
-      for (unsigned int d=1;d<dim;++d)
-	J *= data.length[d];
-      data.volume_element = J;
-      if (data.current_update_flags() & update_JxW_values)
-	for (unsigned int i=0; i<JxW_values.size();++i)
-	  JxW_values[i] = J * q.weight(i);
-    }
+    if (cell_similarity != CellSimilarity::translation)
+      {
+	double J = data.length[0];
+	for (unsigned int d=1;d<dim;++d)
+	  J *= data.length[d];
+	data.volume_element = J;
+	if (data.current_update_flags() & update_JxW_values)
+	  for (unsigned int i=0; i<JxW_values.size();++i)
+	    JxW_values[i] = J * q.weight(i);
+      }
 				   // "compute" Jacobian at the quadrature
 				   // points, which are all the same
   if (data.current_update_flags() & update_jacobians)
-    for (unsigned int i=0; i<jacobians.size();++i)
-      {
-	jacobians[i]=Tensor<2,dim>();
-	for (unsigned int j=0; j<dim; ++j)
-	  jacobians[j][j]=data.length[j];
-      }
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i=0; i<jacobians.size();++i)
+	{
+	  jacobians[i]=Tensor<2,dim>();
+	  for (unsigned int j=0; j<dim; ++j)
+	    jacobians[j][j]=data.length[j];
+	}
 				   // "compute" the derivative of the Jacobian
 				   // at the quadrature points, which are all
 				   // zero of course
   if (data.current_update_flags() & update_jacobian_grads)
-    for (unsigned int i=0; i<jacobian_grads.size();++i)
-      jacobian_grads[i]=Tensor<3,dim>();
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i=0; i<jacobian_grads.size();++i)
+	jacobian_grads[i]=Tensor<3,dim>();
 				   // "compute" inverse Jacobian at the 
 				   // quadrature points, which are all 
 				   // the same
   if (data.current_update_flags() & update_inverse_jacobians)
-    for (unsigned int i=0; i<inverse_jacobians.size();++i)
-      {
-	inverse_jacobians[i]=Tensor<2,dim>();
-	for (unsigned int j=0; j<dim; ++j)
-	  inverse_jacobians[j][j]=1./data.length[j];
-      }
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i=0; i<inverse_jacobians.size();++i)
+	{
+	  inverse_jacobians[i]=Tensor<2,dim>();
+	  for (unsigned int j=0; j<dim; ++j)
+	    inverse_jacobians[j][j]=1./data.length[j];
+	}
 }
 
 
@@ -419,9 +426,12 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
+  Assert (dynamic_cast<InternalData*> (&mapping_data) != 0,
+	  ExcInternalError());
+  InternalData &data = static_cast<InternalData&> (mapping_data);
 
-  compute_fill (cell, face_no, invalid_face_number,
+  compute_fill (cell, face_no, invalid_face_number, 
+		CellSimilarity::no_similarity,
 		data,
 		quadrature_points,
 		normal_vectors);
@@ -471,9 +481,10 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
+  Assert (dynamic_cast<InternalData*> (&mapping_data) != 0, ExcInternalError());
+  InternalData &data = static_cast<InternalData&> (mapping_data);
 
-  compute_fill (cell, face_no, sub_no,
+  compute_fill (cell, face_no, sub_no, CellSimilarity::no_similarity,
 		data,
 		quadrature_points,
 		normal_vectors);
@@ -535,7 +546,7 @@ MappingCartesian<dim,spacedim>::transform (
   AssertDimension (input.size(), output.size());
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
 	  ExcInternalError());  
-  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
+  const InternalData &data = static_cast<const InternalData&> (mapping_data);
   
   switch (mapping_type)
     {

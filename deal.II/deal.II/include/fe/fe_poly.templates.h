@@ -156,8 +156,8 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 template <class POLY, int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
-			     const Mapping<dim,spacedim>    &mapping,
-			     const Quadrature<dim> &quadrature) const
+				      const Mapping<dim,spacedim>    &mapping,
+				      const Quadrature<dim> &quadrature) const
 {
 				   // generate a new data object and
 				   // initialize some fields
@@ -238,12 +238,14 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
 template <>
 inline
 void
-FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values (const Mapping<1,2> &mapping,
-				   const Triangulation<1,2>::cell_iterator   &/*cell*/,
-				   const Quadrature<1>                       &quadrature,
- 				   Mapping<1,2>::InternalDataBase            &mapping_data,
-				   Mapping<1,2>::InternalDataBase            &fedata,
-				   FEValuesData<1,2>                         &data) const
+FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values 
+  (const Mapping<1,2> &mapping,
+   const Triangulation<1,2>::cell_iterator   &/*cell*/,
+   const Quadrature<1>                       &quadrature,
+   const enum CellSimilarity::Similarity      cell_similarity,
+   Mapping<1,2>::InternalDataBase            &mapping_data,
+   Mapping<1,2>::InternalDataBase            &fedata,
+   FEValuesData<1,2>                         &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -260,13 +262,13 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values (const Mapping<1,2> &ma
 	for (unsigned int i=0; i<quadrature.size(); ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
-      if (flags & update_gradients)
+      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k], 
 			  mapping_data, mapping_covariant);
     }
   
   //  const typename QProjector<1>::DataSetDescriptor dsd;
-  if (flags & update_hessians)
+  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       AssertThrow(false, ExcNotImplemented());
 /*       this->compute_2nd (mapping, cell, dsd.cell(), */
@@ -279,12 +281,14 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values (const Mapping<1,2> &ma
 template <>
 inline
 void
-FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values (const Mapping<2,3> &mapping,
-				   const Triangulation<2,3>::cell_iterator &/* cell */,
-				   const Quadrature<2> &quadrature,
-				   Mapping<2,3>::InternalDataBase & mapping_data,
-				   Mapping<2,3>::InternalDataBase &fedata,
-				   FEValuesData<2,3> &data) const
+FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values 
+  (const Mapping<2,3> &mapping,
+   const Triangulation<2,3>::cell_iterator &/* cell */,
+   const Quadrature<2> &quadrature,
+   const enum CellSimilarity::Similarity cell_similarity,
+   Mapping<2,3>::InternalDataBase & mapping_data,
+   Mapping<2,3>::InternalDataBase &fedata,
+   FEValuesData<2,3> &data) const
 {
 
 				   // assert that the following dynamics
@@ -300,13 +304,13 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values (const Mapping<2,3> &ma
 	for (unsigned int i=0; i<quadrature.size(); ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];     
 
-       if (flags & update_gradients)
+       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	 mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
 			   mapping_data, mapping_covariant);
     }
   
 /*   const QProjector<2>::DataSetDescriptor dsd; */
-  if (flags & update_hessians)
+  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       AssertThrow(false, ExcNotImplemented());
 /*       this->compute_2nd (mapping, cell, dsd.cell(), */
@@ -323,6 +327,7 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
   const Mapping<1,2>& mapping,
   const Triangulation<1,2>::cell_iterator& /*cell*/,
   const Quadrature<1>& quadrature,
+  const enum CellSimilarity::Similarity cell_similarity,
   Mapping<1,2>::InternalDataBase& mapping_data,
   Mapping<1,2>::InternalDataBase& fedata,
   FEValuesData<1,2>& data) const
@@ -345,13 +350,13 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
       
 // TODO: I would think this should work. Guido
       
-      if (flags & update_gradients)
+      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
 			  mapping_data, mapping_covariant);
     }
   
 				   //  const typename QProjector<1>::DataSetDescriptor dsd;
-  if (flags & update_hessians)
+  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       AssertThrow(false, ExcNotImplemented());
 /*       this->compute_2nd (mapping, cell, dsd.cell(), */
@@ -363,12 +368,14 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
 template <>
 inline
 void
-FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3>& mapping,
-				   const Triangulation<2,3>::cell_iterator &/* cell */,
-				   const Quadrature<2>& quadrature,
-				   Mapping<2,3>::InternalDataBase& mapping_data,
-				   Mapping<2,3>::InternalDataBase &fedata,
-				   FEValuesData<2,3> &data) const
+FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values 
+  (const Mapping<2,3>& mapping,
+   const Triangulation<2,3>::cell_iterator &/* cell */,
+   const Quadrature<2>& quadrature,
+   const enum CellSimilarity::Similarity cell_similarity,
+   Mapping<2,3>::InternalDataBase& mapping_data,
+   Mapping<2,3>::InternalDataBase &fedata,
+   FEValuesData<2,3> &data) const
 {
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
@@ -382,13 +389,13 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3>& mapping,
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
 
-       if (flags & update_gradients)
+       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	 mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
   				      mapping_data, mapping_covariant);
     }
   
 /*   const QProjector<2>::DataSetDescriptor dsd; */
-  if (flags & update_hessians)
+  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       AssertThrow(false, ExcNotImplemented());
 /*       this->compute_2nd (mapping, cell, dsd.cell(), */
@@ -400,18 +407,19 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3>& mapping,
 
 template <class POLY, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>                   &mapping,
-				   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				   const Quadrature<dim>                &quadrature,
-				   typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-				   typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-				   FEValuesData<dim,spacedim>                    &data) const
+FE_Poly<POLY,dim,spacedim>::fill_fe_values 
+  (const Mapping<dim,spacedim>                      &mapping,
+   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+   const Quadrature<dim>                            &quadrature,
+   const enum CellSimilarity::Similarity             cell_similarity,
+   typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+   typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+   FEValuesData<dim,spacedim>                       &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
 				   // an exception if that is not
-				   // possible
-  	 
+				   // possible	 
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
   
@@ -423,13 +431,13 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>         
 	for (unsigned int i=0; i<quadrature.size(); ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
-      if (flags & update_gradients)
+      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
 			  mapping_data, mapping_covariant);
     }
   
   const typename QProjector<dim>::DataSetDescriptor dsd;
-  if (flags & update_hessians)
+  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     this->compute_2nd (mapping, cell, dsd.cell(),
 		       mapping_data, fe_data, data);
 }
@@ -439,13 +447,14 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>         
 template <>
 inline
 void
-FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_face_values (const Mapping<1,2> &,
-							       const Triangulation<1,2>::cell_iterator &,
-							       const unsigned int,
-							       const Quadrature<0> &, 
-							       Mapping<1,2>::InternalDataBase &,
-							       Mapping<1,2>::InternalDataBase &,
-							       FEValuesData<1,2> &) const
+FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_face_values 
+  (const Mapping<1,2> &,
+   const Triangulation<1,2>::cell_iterator &,
+   const unsigned int,
+   const Quadrature<0> &, 
+   Mapping<1,2>::InternalDataBase &,
+   Mapping<1,2>::InternalDataBase &,
+   FEValuesData<1,2> &) const
 {
   AssertThrow(false, ExcNotImplemented());
 }  
@@ -472,12 +481,12 @@ template <>
 inline
 void
 FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_face_values (const Mapping<1,2> &,
-							       const Triangulation<1,2>::cell_iterator &,
-							       const unsigned int,
-							       const Quadrature<0> &, 
-							       Mapping<1,2>::InternalDataBase &,
-							       Mapping<1,2>::InternalDataBase &,
-							       FEValuesData<1,2> &) const
+						      const Triangulation<1,2>::cell_iterator &,
+						      const unsigned int,
+						      const Quadrature<0> &, 
+						      Mapping<1,2>::InternalDataBase &,
+						      Mapping<1,2>::InternalDataBase &,
+						      FEValuesData<1,2> &) const
 {
   AssertThrow(false, ExcNotImplemented());
 }  
@@ -488,12 +497,12 @@ template <>
 inline
 void
 FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_face_values (const Mapping<2,3> &,
-							       const Triangulation<2,3>::cell_iterator &,
-							       const unsigned int,
-							       const Quadrature<1> &, 
-							       Mapping<2,3>::InternalDataBase &,
-							       Mapping<2,3>::InternalDataBase &,
-							       FEValuesData<2,3> &) const
+						      const Triangulation<2,3>::cell_iterator &,
+						      const unsigned int,
+						      const Quadrature<1> &, 
+						      Mapping<2,3>::InternalDataBase &,
+						      Mapping<2,3>::InternalDataBase &,
+						      FEValuesData<2,3> &) const
 {
   AssertThrow(false, ExcNotImplemented());
 }  
@@ -501,13 +510,14 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_face_values (const Mapping<2,3> &,
 
 template <class POLY, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
-				const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				const unsigned int                    face,
-				const Quadrature<dim-1>              &quadrature,
-				typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-				typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
-				FEValuesData<dim,spacedim>                    &data) const
+FE_Poly<POLY,dim,spacedim>::
+fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
+		     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+		     const unsigned int                    face,
+		     const Quadrature<dim-1>              &quadrature,
+		     typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+		     typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+		     FEValuesData<dim,spacedim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

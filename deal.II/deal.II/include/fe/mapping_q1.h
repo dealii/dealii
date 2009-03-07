@@ -294,7 +294,8 @@ class MappingQ1 : public Mapping<dim,spacedim>
 				      */
     virtual void
     fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		    const Quadrature<dim>                                     & quadrature,
+		    const Quadrature<dim>                                     &quadrature,
+		    const enum CellSimilarity::Similarity           cell_similarity,
 		    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
 		    typename std::vector<Point<spacedim> >                    &quadrature_points,
 		    std::vector<double>                                       &JxW_values,
@@ -384,6 +385,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
     void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		       const unsigned int      npts,
 		       const DataSetDescriptor data_set,
+		       const enum CellSimilarity::Similarity cell_similarity,
 		       InternalData           &data,
 		       std::vector<Point<spacedim> > &quadrature_points) const;
     

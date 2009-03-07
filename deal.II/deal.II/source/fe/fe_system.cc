@@ -146,7 +146,7 @@ const unsigned int FESystem<dim,spacedim>::invalid_face_number;
 
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe,
-			 const unsigned int n_elements) :
+				  const unsigned int n_elements) :
 		FiniteElement<dim,spacedim> (multiply_dof_numbers(fe, n_elements),
 				    compute_restriction_is_additive_flags (fe, n_elements),
 				    compute_nonzero_components(fe, n_elements)),
@@ -161,9 +161,9 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe,
 
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
-			 const unsigned int        n1,
-			 const FiniteElement<dim,spacedim> &fe2,
-			 const unsigned int        n2) :
+				  const unsigned int        n1,
+				  const FiniteElement<dim,spacedim> &fe2,
+				  const unsigned int        n2) :
 		FiniteElement<dim,spacedim> (multiply_dof_numbers(fe1, n1, fe2, n2),
 				    compute_restriction_is_additive_flags (fe1, n1,
 									   fe2, n2),
@@ -183,12 +183,12 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
-			 const unsigned int        n1,
-			 const FiniteElement<dim,spacedim> &fe2,
-			 const unsigned int        n2,
-			 const FiniteElement<dim,spacedim> &fe3,
-			 const unsigned int        n3) :
-		FiniteElement<dim,spacedim> (multiply_dof_numbers(fe1, n1,
+				  const unsigned int        n1,
+				  const FiniteElement<dim,spacedim> &fe2,
+				  const unsigned int        n2,
+				  const FiniteElement<dim,spacedim> &fe3,
+				  const unsigned int        n3) :
+       FiniteElement<dim,spacedim> (multiply_dof_numbers(fe1, n1,
 							 fe2, n2,
 							 fe3, n3),
 				    compute_restriction_is_additive_flags (fe1, n1,
@@ -288,7 +288,7 @@ FESystem<dim,spacedim>::clone() const
 template <int dim, int spacedim>
 double
 FESystem<dim,spacedim>::shape_value (const unsigned int i,
-			    const Point<dim> &p) const
+				     const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i), 
@@ -303,8 +303,8 @@ FESystem<dim,spacedim>::shape_value (const unsigned int i,
 template <int dim, int spacedim>
 double
 FESystem<dim,spacedim>::shape_value_component (const unsigned int i,
-				      const Point<dim>  &p,
-				      const unsigned int component) const
+					       const Point<dim>  &p,
+					       const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component < this->n_components(),
@@ -340,7 +340,7 @@ FESystem<dim,spacedim>::shape_value_component (const unsigned int i,
 template <int dim, int spacedim>
 Tensor<1,dim>
 FESystem<dim,spacedim>::shape_grad (const unsigned int i,
-			   const Point<dim> &p) const
+				    const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i),
@@ -392,7 +392,7 @@ FESystem<dim,spacedim>::shape_grad_component (const unsigned int i,
 template <int dim, int spacedim>
 Tensor<2,dim>
 FESystem<dim,spacedim>::shape_grad_grad (const unsigned int i,
-				const Point<dim> &p) const
+					 const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i), 
@@ -577,8 +577,8 @@ FESystem<dim,spacedim>::update_each (const UpdateFlags flags) const
 template <int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
-			 const Mapping<dim,spacedim>    &mapping,
-			 const Quadrature<dim> &quadrature) const
+				  const Mapping<dim,spacedim>    &mapping,
+				  const Quadrature<dim> &quadrature) const
 {
   UpdateFlags flags = flags_;
   
@@ -664,15 +664,16 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
-fill_fe_values (const Mapping<dim,spacedim>                   &mapping,
+fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
                 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                const Quadrature<dim>                &quadrature,
+                const Quadrature<dim>                            &quadrature,
+		const enum CellSimilarity::Similarity             cell_similarity,
                 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                 typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-                FEValuesData<dim,spacedim>                    &data) const
+                FEValuesData<dim,spacedim>                       &data) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
-	       quadrature, mapping_data, fe_data, data);
+	       quadrature, cell_similarity, mapping_data, fe_data, data);
 }
 
 
@@ -688,8 +689,8 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
                      typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
                      FEValuesData<dim,spacedim>                    &data) const
 {
-  compute_fill (mapping, cell, face_no, invalid_face_number,
-                quadrature, mapping_data, fe_data, data);
+  compute_fill (mapping, cell, face_no, invalid_face_number, quadrature,
+                CellSimilarity::no_similarity, mapping_data, fe_data, data);
 }
 
 
@@ -698,17 +699,17 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
-fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
+fill_fe_subface_values (const Mapping<dim,spacedim>                      &mapping,
                         const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                        const unsigned int                    face_no,
-                        const unsigned int                    sub_no,
-                        const Quadrature<dim-1>              &quadrature,
+                        const unsigned int                                face_no,
+                        const unsigned int                                sub_no,
+                        const Quadrature<dim-1>                          &quadrature,
                         typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                         typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-                        FEValuesData<dim,spacedim>                    &data) const
+                        FEValuesData<dim,spacedim>                       &data) const
 {
-  compute_fill (mapping, cell, face_no, sub_no,
-                quadrature, mapping_data, fe_data, data);
+  compute_fill (mapping, cell, face_no, sub_no, quadrature,
+                CellSimilarity::no_similarity, mapping_data, fe_data, data);
 }
 
 
@@ -717,14 +718,15 @@ template <int dim, int spacedim>
 template <int dim_1>
 void
 FESystem<dim,spacedim>::
-compute_fill (const Mapping<dim,spacedim>                   &mapping,
+compute_fill (const Mapping<dim,spacedim>                      &mapping,
               const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-              const unsigned int                    face_no,
-              const unsigned int                    sub_no,
-              const Quadrature<dim_1>              &quadrature,
+              const unsigned int                                face_no,
+              const unsigned int                                sub_no,
+              const Quadrature<dim_1>                          &quadrature,
+	      const enum CellSimilarity::Similarity             cell_similarity,
               typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
               typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-              FEValuesData<dim,spacedim>                    &data) const
+              FEValuesData<dim,spacedim>                       &data) const
 {       
   const unsigned int n_q_points = quadrature.size();
   
@@ -732,7 +734,8 @@ compute_fill (const Mapping<dim,spacedim>                   &mapping,
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData & fe_data = dynamic_cast<InternalData&> (fedata);
+  Assert (dynamic_cast<InternalData*> (&fedata) != 0, ExcInternalError());
+  InternalData & fe_data = static_cast<InternalData&> (fedata);
   
 				   // Either dim_1==dim
 				   // (fill_fe_values) or dim_1==dim-1
@@ -800,16 +803,18 @@ compute_fill (const Mapping<dim,spacedim>                   &mapping,
       if (face_no==invalid_face_number)
 	{
 	  Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
+	  Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0, 
+		  ExcInternalError());
 	  cell_quadrature
-            = dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer);
-	  Assert (cell_quadrature != 0, ExcInternalError());
+            = static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
 	}
       else
 	{
 	  Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
+	  Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != 0, 
+		  ExcInternalError());
 	  face_quadrature
-            = dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
-	  Assert (face_quadrature != 0, ExcInternalError());
+            = static_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
 	}
 
                                        // let base elements update the
@@ -852,8 +857,8 @@ compute_fill (const Mapping<dim,spacedim>                   &mapping,
                                            // therefore use
                                            // base_fe_data.update_flags.
 	  if (face_no==invalid_face_number)
-	    base_fe.fill_fe_values(mapping, cell,
-				   *cell_quadrature, mapping_data, base_fe_data, base_data);
+	    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, cell_similarity, 
+				   mapping_data, base_fe_data, base_data);
 	  else if (sub_no==invalid_face_number)
 	    base_fe.fill_fe_face_values(mapping, cell, face_no,
 					*face_quadrature, mapping_data, base_fe_data, base_data);
@@ -892,14 +897,21 @@ compute_fill (const Mapping<dim,spacedim>                   &mapping,
                                            // base element
           const UpdateFlags base_flags(dim_1==dim ?
                                        base_fe_data.current_update_flags() :
-                                       base_fe_data.update_flags);          
-          for (unsigned int system_index=0; system_index<this->dofs_per_cell;
-               ++system_index)
-            if (this->system_to_base_table[system_index].first.first == base_no)
-              {
-                const unsigned int
-                  base_index = this->system_to_base_table[system_index].second;
-                Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
+                                       base_fe_data.update_flags);
+
+				           // if the current cell is just a
+				           // translation of the previous
+				           // one, the underlying data has
+				           // not changed, and we don't even
+				           // need to enter this section
+	  if (cell_similarity != CellSimilarity::translation)
+	    for (unsigned int system_index=0; system_index<this->dofs_per_cell;
+		 ++system_index)
+	      if (this->system_to_base_table[system_index].first.first == base_no)
+		{
+		  const unsigned int
+		    base_index = this->system_to_base_table[system_index].second;
+		  Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
 
                                                  // now copy. if the
                                                  // shape function is
@@ -917,30 +929,30 @@ compute_fill (const Mapping<dim,spacedim>                   &mapping,
                                                  // this one value, and
                                                  // to which index to
                                                  // put
-                unsigned int out_index = 0;
-                for (unsigned int i=0; i<system_index; ++i)
-                  out_index += this->n_nonzero_components(i);
-                unsigned int in_index = 0;
-                for (unsigned int i=0; i<base_index; ++i)
-                  in_index += base_fe.n_nonzero_components(i);
+		  unsigned int out_index = 0;
+		  for (unsigned int i=0; i<system_index; ++i)
+		    out_index += this->n_nonzero_components(i);
+		  unsigned int in_index = 0;
+		  for (unsigned int i=0; i<base_index; ++i)
+		    in_index += base_fe.n_nonzero_components(i);
                 
                                                  // then loop over the
                                                  // number of components
                                                  // to be copied
-                Assert (this->n_nonzero_components(system_index) ==
-                        base_fe.n_nonzero_components(base_index),
-                        ExcInternalError());
-                for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                  {
-                    if (base_flags & update_values)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        data.shape_values[out_index+s][q] =
-                          base_data.shape_values(in_index+s,q);
+		  Assert (this->n_nonzero_components(system_index) ==
+			  base_fe.n_nonzero_components(base_index),
+			  ExcInternalError());
+		  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+		    {
+		      if (base_flags & update_values)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  data.shape_values[out_index+s][q] =
+			    base_data.shape_values(in_index+s,q);
                     
-                    if (base_flags & update_gradients)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        data.shape_gradients[out_index+s][q]=
-                          base_data.shape_gradients[in_index+s][q];
+		      if (base_flags & update_gradients)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  data.shape_gradients[out_index+s][q]=
+			    base_data.shape_gradients[in_index+s][q];
 
                                                      // _we_ handle
                                                      // computation of
@@ -951,10 +963,10 @@ compute_fill (const Mapping<dim,spacedim>                   &mapping,
                                                      // should not
                                                      // have computed
                                                      // them!
-                    Assert (!(base_flags & update_hessians),
-                            ExcInternalError());
-                  };
-              };
+		      Assert (!(base_flags & update_hessians),
+			      ExcInternalError());
+		    };
+		};
         };
 
       if (fe_data.is_first_cell())
@@ -981,7 +993,7 @@ compute_fill (const Mapping<dim,spacedim>                   &mapping,
 	}
     }
   
-  if (fe_data.compute_hessians)
+  if (fe_data.compute_hessians && cell_similarity != CellSimilarity::translation)
     {
       unsigned int offset = 0;
       if (face_no != invalid_face_number)

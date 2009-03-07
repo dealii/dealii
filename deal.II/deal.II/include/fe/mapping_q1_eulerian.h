@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -143,6 +143,23 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 
 
   protected:
+				     /**
+				      * Implementation of the interface in
+				      * MappingQ1. Overrides the function in
+				      * the base class, since we cannot use
+				      * any cell similarity for this class.
+				      */
+    virtual void
+    fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+		    const Quadrature<dim>                                     &quadrature,
+		    enum CellSimilarity::Similarity                            cell_similarity,
+		    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+		    typename std::vector<Point<spacedim> >                    &quadrature_points,
+		    std::vector<double>                                       &JxW_values,
+		    std::vector<Tensor<2,spacedim> >                          &jacobians,
+		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
+		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+		    std::vector<Point<spacedim> >                             &cell_normal_vectors) const;
 
 				     /**
 				      * Reference to the vector of

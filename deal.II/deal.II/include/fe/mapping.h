@@ -32,6 +32,24 @@ template <int dim, int spacedim> class FEValues;
 template <int dim, int spacedim> class FEFaceValues;
 template <int dim, int spacedim> class FESubfaceValues;
 
+				     /**
+				      * An enum variable that can store
+				      * different states of the current cell
+				      * in comparison to the previously
+				      * visited cell. If wanted, additional
+				      * states can be checked here and used
+				      * in one of the methods used during
+				      * reinit.
+				      */
+namespace CellSimilarity
+{
+  enum Similarity 
+    {
+      no_similarity, 
+      translation
+    };
+}
+
                                      /**
                                       * The transformation type used
                                       * for the Mapping::transform() functions.
@@ -545,14 +563,15 @@ class Mapping : public Subscriptor
 				       */
     virtual void
     fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		    const Quadrature<dim>                         &quadrature,
-		    InternalDataBase                              &internal,
-		    std::vector<Point<spacedim> >                 &quadrature_points,
-		    std::vector<double>                           &JxW_values,
-		    std::vector<Tensor<2,spacedim> >              &jacobians,
-		    std::vector<Tensor<3,spacedim> >              &jacobian_grads,
-		    std::vector<Tensor<2,spacedim> >              &inverse_jacobians,
-		    std::vector<Point<spacedim> >                 &cell_normal_vectors
+		    const Quadrature<dim>                                     &quadrature,
+		    const enum CellSimilarity::Similarity                                  cell_similarity,
+		    InternalDataBase                                          &internal,
+		    std::vector<Point<spacedim> >                             &quadrature_points,
+		    std::vector<double>                                       &JxW_values,
+		    std::vector<Tensor<2,spacedim> >                          &jacobians,
+		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
+		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+		    std::vector<Point<spacedim> >                             &cell_normal_vectors
 	           ) const=0;
 
 

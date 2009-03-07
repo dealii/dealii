@@ -27,9 +27,9 @@ template <int dim, class EulerVectorType, int spacedim>
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
 		   const DoFHandler<dim> &shiftmap_dof_handler)
-                     :
-		     euler_transform_vectors(euler_transform_vectors),
-		     shiftmap_dof_handler(&shiftmap_dof_handler)
+                   :
+		   euler_transform_vectors(euler_transform_vectors),
+		   shiftmap_dof_handler(&shiftmap_dof_handler)
 {}
 
 
@@ -112,6 +112,33 @@ MappingQ1Eulerian<dim, EulerVectorType, spacedim>::clone () const
 {
   return new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(*this);
 }
+
+
+
+template<int dim, class EulerVectorType, int spacedim>
+void
+MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const Quadrature<dim>                                     &q,
+  enum CellSimilarity::Similarity                            cell_similarity,
+  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+  std::vector<Point<spacedim> >                             &quadrature_points,
+  std::vector<double>                                       &JxW_values,
+  std::vector<Tensor<2,spacedim> >                          &jacobians,
+  std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
+  std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+  std::vector<Point<spacedim> >                             &cell_normal_vectors) const
+{
+				   // disable any previously detected
+				   // similarity and hand on to the
+				   // respective function of the base class.
+  cell_similarity = CellSimilarity::no_similarity;
+  MappingQ1<dim,spacedim>::fill_fe_values (cell, q, cell_similarity, mapping_data,
+					   quadrature_points, JxW_values, jacobians,
+					   jacobian_grads, inverse_jacobians,
+					   cell_normal_vectors);
+}
+
 
 
 // explicit instantiation

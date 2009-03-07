@@ -1690,6 +1690,7 @@ FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_p
 }
 
 
+
 /*------------------------------- FEValuesBase ---------------------------*/
 
 
@@ -3238,7 +3239,6 @@ FEValuesBase<dim,spacedim>::compute_update_flags (const UpdateFlags update_flags
 }
 
 
-
 /*------------------------------- FEValues -------------------------------*/
 
 
@@ -3252,9 +3252,9 @@ const unsigned int FEValues<dim,spacedim>::integral_dimension;
 
 template <int dim, int spacedim>
 FEValues<dim,spacedim>::FEValues (const Mapping<dim,spacedim>       &mapping,
-			 const FiniteElement<dim,spacedim> &fe,
-			 const Quadrature<dim>    &q,
-			 const UpdateFlags         update_flags)
+				  const FiniteElement<dim,spacedim> &fe,
+				  const Quadrature<dim>             &q,
+				  const UpdateFlags                  update_flags)
 		:
 		FEValuesBase<dim,spacedim> (q.size(),
 					    fe.dofs_per_cell,
@@ -3270,15 +3270,15 @@ FEValues<dim,spacedim>::FEValues (const Mapping<dim,spacedim>       &mapping,
 
 template <int dim, int spacedim>
 FEValues<dim,spacedim>::FEValues (const FiniteElement<dim,spacedim> &fe,
-			 const Quadrature<dim>    &q,
-			 const UpdateFlags         update_flags)
+				  const Quadrature<dim>             &q,
+				  const UpdateFlags                  update_flags)
 		:
 		FEValuesBase<dim,spacedim> (q.size(),
-				   fe.dofs_per_cell,
-				   update_default,
+					    fe.dofs_per_cell,
+					    update_default,
 					    StaticMappingQ1<dim,spacedim>::mapping,
-				   fe),
-  quadrature (q)
+					    fe),
+		quadrature (q)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
@@ -3330,8 +3330,10 @@ FEValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_it
 
   typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
+ 	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
 	  typename FEVB::ExcFEDontMatch());
+
+  check_cell_similarity(cell);
 
                                    // set new cell. auto_ptr will take
                                    // care that old object gets
@@ -3360,10 +3362,12 @@ FEValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cel
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-    typedef FEValuesBase<dim,spacedim> FEVB;
+  typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
 	  typename FEVB::ExcFEDontMatch());
+
+  check_cell_similarity(cell);
 
                                    // set new cell. auto_ptr will take
                                    // care that old object gets
@@ -3420,6 +3424,8 @@ FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_
 //	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
 //	  typename FEValuesBase<dim,spacedim>::ExcFEDontMatch());
 
+  check_cell_similarity(cell);
+
                                    // set new cell. auto_ptr will take
                                    // care that old object gets
                                    // destroyed and also that this
@@ -3442,8 +3448,9 @@ FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_
 template <int dim, int spacedim>
 void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
 {
-                                   // no FE in this cell, so no check
+                                   // no FE in this cell, so no assertion
                                    // necessary here
+  check_cell_similarity(cell);
 
                                    // set new cell. auto_ptr will take
                                    // care that old object gets
@@ -3463,10 +3470,58 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
 
 
 template <int dim, int spacedim>
+inline
+void
+FEValues<dim,spacedim>::check_cell_similarity (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
+{
+				   // case that there has not been any cell
+				   // before
+  if (&*this->present_cell == 0)
+    {
+      cell_similarity = CellSimilarity::no_similarity;
+      return;
+    }
+
+  const typename Triangulation<dim,spacedim>::cell_iterator & present_cell = 
+    *this->present_cell;
+
+				   // test for translation
+  {
+				   // otherwise, go through the vertices and
+				   // check...
+    bool is_translation = true;
+    const Point<spacedim> dist = cell->vertex(0) - present_cell->vertex(0);
+    for (unsigned int i=1; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      {
+	Point<spacedim> dist_new = cell->vertex(i) - present_cell->vertex(i) - dist;
+	if (dist_new.norm_square() > 1e-28)
+	  {
+	    is_translation = false;
+	    break;
+	  }
+      }
+
+    cell_similarity = (is_translation == true 
+		       ? 
+		       CellSimilarity::translation 
+		       : 
+		       CellSimilarity::no_similarity);
+    return;
+  }
+
+				   // TODO: here, one could implement other
+				   // checks for similarity, e.g. for
+				   // children of a parallelogram.
+}
+
+
+
+template <int dim, int spacedim>
 void FEValues<dim,spacedim>::do_reinit ()
 {
   this->get_mapping().fill_fe_values(*this->present_cell,
 				     quadrature,
+				     this->cell_similarity,
 				     *this->mapping_data,
 				     this->quadrature_points,
 				     this->JxW_values,
@@ -3478,6 +3533,7 @@ void FEValues<dim,spacedim>::do_reinit ()
   this->get_fe().fill_fe_values(this->get_mapping(),
 				*this->present_cell,
 				quadrature,
+				this->cell_similarity,
 				*this->mapping_data,
 				*this->fe_data,
 				*this);
@@ -3502,11 +3558,11 @@ FEValues<dim,spacedim>::memory_consumption () const
 
 template <int dim, int spacedim>
 FEFaceValuesBase<dim,spacedim>::FEFaceValuesBase (const unsigned int n_q_points,
-					 const unsigned int dofs_per_cell,
-					 const UpdateFlags,
-					 const Mapping<dim,spacedim> &mapping,      
-					 const FiniteElement<dim,spacedim> &fe,
-					 const Quadrature<dim-1>& quadrature)
+						  const unsigned int dofs_per_cell,
+						  const UpdateFlags,
+						  const Mapping<dim,spacedim> &mapping,      
+						  const FiniteElement<dim,spacedim> &fe,
+						  const Quadrature<dim-1>& quadrature)
 		:
 		FEValuesBase<dim,spacedim> (n_q_points,
 				   dofs_per_cell,

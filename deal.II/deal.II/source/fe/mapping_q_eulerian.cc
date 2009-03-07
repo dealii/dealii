@@ -182,6 +182,32 @@ compute_mapping_support_points
 
 
 
+template<int dim, class EulerVectorType, int spacedim>
+void
+MappingQEulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const Quadrature<dim>                                     &q,
+  enum CellSimilarity::Similarity                            cell_similarity,
+  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+  std::vector<Point<spacedim> >                             &quadrature_points,
+  std::vector<double>                                       &JxW_values,
+  std::vector<Tensor<2,spacedim> >                          &jacobians,
+  std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
+  std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+  std::vector<Point<spacedim> >                             &cell_normal_vectors) const
+{
+				   // disable any previously detected
+				   // similarity and hand on to the respective
+				   // function of the base class.
+  cell_similarity = CellSimilarity::no_similarity;
+  MappingQ<dim,spacedim>::fill_fe_values (cell, q, cell_similarity, mapping_data,
+					  quadrature_points, JxW_values, jacobians,
+					  jacobian_grads, inverse_jacobians,
+					  cell_normal_vectors);
+}
+
+
+
 // explicit instantiation
 template class MappingQEulerian<deal_II_dimension, Vector<double> >;
 #ifdef DEAL_II_USE_PETSC

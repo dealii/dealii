@@ -2225,6 +2225,12 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     const FiniteElement<dim,spacedim> & get_fe () const;
 
 				     /**
+				      * Return the update flags set
+				      * for this object.
+				      */
+    UpdateFlags get_update_flags () const;
+    
+				     /**
 				      * Return a triangulation
 				      * iterator to the current cell.
 				      */
@@ -2808,6 +2814,28 @@ class FEValues : public FEValuesBase<dim,spacedim>
 				      * constructors.
 				      */
     void initialize (const UpdateFlags update_flags);
+
+				     /**
+				      * An enum variable that can store
+				      * different states of the current cell
+				      * in comparison to the previously
+				      * visited cell. If wanted, additional
+				      * states can be checked here and used
+				      * in one of the methods used during
+				      * reinit.
+				      */
+    enum CellSimilarity::Similarity cell_similarity;
+
+				     /**
+				      * A function that checks whether the
+				      * new cell is similar to the one
+				      * previously used. Then, a significant
+				      * amount of the data can be reused,
+				      * e.g. the derivatives of the basis
+				      * functions in real space, shape_grad.
+				      */
+    void
+    check_cell_similarity (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
 
                                      /**
                                       * The reinit() functions do
@@ -4083,6 +4111,15 @@ FEValuesBase<dim,spacedim>::get_mapping () const
 
 template <int dim, int spacedim>  
 inline
+UpdateFlags
+FEValuesBase<dim,spacedim>::get_update_flags () const
+{
+  return this->update_flags;
+}
+
+
+
+template <int dim, int spacedim>  
 const typename Triangulation<dim,spacedim>::cell_iterator
 FEValuesBase<dim,spacedim>::get_cell () const
 {

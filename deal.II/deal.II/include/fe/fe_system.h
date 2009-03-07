@@ -611,7 +611,8 @@ class FESystem : public FiniteElement<dim,spacedim>
     virtual void
     fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
 		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		    const Quadrature<dim>                   &quadrature,
+		    const Quadrature<dim>                            &quadrature,
+		    const enum CellSimilarity::Similarity             cell_similarity,
 		    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
 		    typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
 		    FEValuesData<dim,spacedim>                       &data) const;
@@ -679,14 +680,15 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * <tt>sub_no!=invalid_face_no</tt>.
 				      */
     template <int dim_1>
-    void compute_fill (const Mapping<dim,spacedim>                   &mapping,
+    void compute_fill (const Mapping<dim,spacedim>                      &mapping,
 		       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		       const unsigned int                    face_no,
-		       const unsigned int                    sub_no,
-		       const Quadrature<dim_1>              &quadrature,
+		       const unsigned int                                face_no,
+		       const unsigned int                                sub_no,
+		       const Quadrature<dim_1>                          &quadrature,
+		       const enum CellSimilarity::Similarity             cell_similarity,
 		       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
 		       typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-		       FEValuesData<dim,spacedim>                    &data) const ;
+		       FEValuesData<dim,spacedim>                       &data) const ;
 
   private:
 

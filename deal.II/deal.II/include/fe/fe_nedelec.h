@@ -412,11 +412,12 @@ class FE_Nedelec : public FiniteElement<dim,spacedim>
 				      * FiniteElement.
 				      */
     virtual void
-    fill_fe_values (const Mapping<dim,spacedim> &mapping,
+    fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
 		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-		    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+		    const Quadrature<dim>                            &quadrature,
+		    const enum CellSimilarity::Similarity             cell_similarity,
+		    typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+		    typename Mapping<dim,spacedim>::InternalDataBase &fe_internal,
 		    FEValuesData<dim,spacedim>& data) const;
     
 				     /**

@@ -198,7 +198,7 @@ MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-				       typename MappingQ1<dim,spacedim>::InternalData &data) const
+						typename MappingQ1<dim,spacedim>::InternalData &data) const
 {
   const unsigned int n_points=unit_points.size();
   std::vector<double> values;
@@ -250,7 +250,7 @@ MappingQ<dim,spacedim>::compute_shapes_virtual (const std::vector<Point<dim> > &
 template<int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
-			 const Quadrature<dim> &quadrature) const
+				  const Quadrature<dim> &quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
   this->compute_data (update_flags, quadrature,
@@ -266,7 +266,7 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
 template<int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
-			      const Quadrature<dim-1>& quadrature) const
+				       const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
@@ -284,7 +284,7 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
 template<int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
-				 const Quadrature<dim-1>& quadrature) const
+					  const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
@@ -298,12 +298,16 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 }
 
 
-
+                                   // Note that the CellSimilarity flag is
+                                   // modifyable, since MappingQ can need to
+                                   // recalculate data even when cells are
+                                   // similar.
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
+  enum CellSimilarity::Similarity                            cell_similarity,
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,
@@ -316,7 +320,8 @@ MappingQ<dim,spacedim>::fill_fe_values (
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
+  Assert (dynamic_cast<InternalData*> (&mapping_data) != 0, ExcInternalError());
+  InternalData &data = static_cast<InternalData&> (mapping_data);
 
 				   // check whether this cell needs
 				   // the full mapping or can be
@@ -326,16 +331,30 @@ MappingQ<dim,spacedim>::fill_fe_values (
   data.use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
 					  || cell->has_boundary_lines());
 
-				   // depending on this result, use
-				   // this or the other data object
-				   // for the mapping
+				   // depending on this result, use this or
+				   // the other data object for the
+				   // mapping. furthermore, we need to
+				   // ensure that the flag indicating
+				   // whether we can use some similarity has
+				   // to be modified - for a general
+				   // MappingQ, the data needs to be
+				   // recomputed anyway since then the
+				   // mapping changes the data. this needs
+				   // to be known also for later operations,
+				   // so modify the variable here. TODO:
+				   // still need to check how this will work
+				   // when the previous cell disabled this
+				   // flag.
   typename MappingQ1<dim,spacedim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
     p_data=&data.mapping_q1_data;
   else
-    p_data=&data;
+    {
+      p_data=&data;
+      cell_similarity = CellSimilarity::no_similarity;
+    }
   
-  MappingQ1<dim,spacedim>::fill_fe_values(cell, q, *p_data,
+  MappingQ1<dim,spacedim>::fill_fe_values(cell, q, cell_similarity, *p_data,
 	        			  quadrature_points, JxW_values,
 				          jacobians, jacobian_grads, inverse_jacobians,
 					  cell_normal_vectors);
@@ -359,7 +378,9 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
+  Assert (dynamic_cast<InternalData*> (&mapping_data) != 0,
+	  ExcInternalError());
+  InternalData &data = static_cast<InternalData&> (mapping_data);
   
 				   // check whether this cell needs
 				   // the full mapping or can be
@@ -419,7 +440,9 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
 				   // data for this class. fails with
 				   // an exception if that is not
 				   // possible
-  InternalData &data = dynamic_cast<InternalData&> (mapping_data);
+  Assert (dynamic_cast<InternalData*> (&mapping_data) != 0,
+	  ExcInternalError());
+  InternalData &data = static_cast<InternalData&> (mapping_data);
 
 				   // check whether this cell needs
 				   // the full mapping or can be

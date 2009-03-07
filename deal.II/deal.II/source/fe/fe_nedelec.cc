@@ -990,18 +990,22 @@ FE_Nedelec<dim,spacedim>::get_data (const UpdateFlags      update_flags,
 
 template <int dim, int spacedim>
 void
-FE_Nedelec<dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>                   &mapping,
-				 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				 const Quadrature<dim>                &quadrature,
-				 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-				 typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-				 FEValuesData<dim,spacedim>                    &data) const
+FE_Nedelec<dim,spacedim>::fill_fe_values 
+  (const Mapping<dim,spacedim>                      &mapping,
+   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+   const Quadrature<dim>                            &quadrature,
+   const enum CellSimilarity::Similarity             cell_similarity,
+   typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+   typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+   FEValuesData<dim,spacedim>                       &data) const
 {
  				   // convert data object to internal
  				   // data for this class. fails with
  				   // an exception if that is not
  				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<InternalData *> (&fedata) != 0,
+	  ExcInternalError());
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
 
 				   // get the flags indicating the
 				   // fields that have to be filled
