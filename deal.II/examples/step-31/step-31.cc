@@ -1792,12 +1792,14 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
       if (rebuild_stokes_matrix == true)
 	stokes_constraints.distribute_local_to_global (local_matrix,
+						       local_rhs,
 						       local_dof_indices,
-						       stokes_matrix);
-
-      stokes_constraints.distribute_local_to_global (local_rhs,
-						     local_dof_indices,
-						     stokes_rhs);
+						       stokes_matrix,
+						       stokes_rhs);
+      else
+	stokes_constraints.distribute_local_to_global (local_rhs,
+						       local_dof_indices,
+						       stokes_rhs);
     }
 
   rebuild_stokes_matrix = false;
