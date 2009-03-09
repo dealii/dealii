@@ -792,24 +792,30 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	stokes_fe_values.reinit (cell);
-	local_matrix = 0;
 
-	for (unsigned int q=0; q<n_q_points; ++q)
+				   // only need to recalculate local matrix
+				   // if FEValues data has changed.
+	if (stokes_fe_values.get_cell_similarity() != CellSimilarity::translation)
 	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		phi_grad_u[k] = stokes_fe_values[velocities].gradient(k,q);
-		phi_p[k]      = stokes_fe_values[pressure].value (k, q);
-	      }
+	    local_matrix = 0;
 
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		local_matrix(i,j) += (EquationData::eta *
-				      scalar_product (phi_grad_u[i], phi_grad_u[j])
-				      +
-				      (1./EquationData::eta) *
-				      phi_p[i] * phi_p[j])
-		                     * stokes_fe_values.JxW(q);
+	    for (unsigned int q=0; q<n_q_points; ++q)
+	      {
+		for (unsigned int k=0; k<dofs_per_cell; ++k)
+		  {
+		    phi_grad_u[k] = stokes_fe_values[velocities].gradient(k,q);
+		    phi_p[k]      = stokes_fe_values[pressure].value (k, q);
+		  }
+
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    local_matrix(i,j) += (EquationData::eta *
+					  scalar_product (phi_grad_u[i], phi_grad_u[j])
+					  +
+					  (1./EquationData::eta) *
+					  phi_p[i] * phi_p[j])
+		                         * stokes_fe_values.JxW(q);
+	      }
 	  }
 
 	cell->get_dof_indices (local_dof_indices);
@@ -926,7 +932,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	stokes_fe_values.reinit (cell);
 	temperature_fe_values.reinit (temperature_cell);
 	
-	local_matrix = 0;
+	if (stokes_fe_values.get_cell_similarity() != CellSimilarity::translation)
+	  local_matrix = 0;
 	local_rhs = 0;
   
 	temperature_fe_values.get_function_values (old_temperature_solution, 
@@ -939,7 +946,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	    for (unsigned int k=0; k<dofs_per_cell; ++k)
 	      {
 		phi_u[k] = stokes_fe_values[velocities].value (k,q);
-		if (rebuild_stokes_matrix)
+		if (rebuild_stokes_matrix && 
+		    stokes_fe_values.get_cell_similarity() != CellSimilarity::translation)
 		  {
 		    grads_phi_u[k] = stokes_fe_values[velocities].symmetric_gradient(k,q);
 		    div_phi_u[k]   = stokes_fe_values[velocities].divergence (k, q);
@@ -947,14 +955,15 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 		  }
 	      }
   
-	    if (rebuild_stokes_matrix)
+	    if (rebuild_stokes_matrix &&
+		stokes_fe_values.get_cell_similarity() != CellSimilarity::translation)
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
 		  local_matrix(i,j) += (EquationData::eta * 2 *
 					grads_phi_u[i] * grads_phi_u[j]
 					- div_phi_u[i] * phi_p[j]
 					- phi_p[i] * div_phi_u[j])
-				      * stokes_fe_values.JxW(q);
+		                       * stokes_fe_values.JxW(q);
 
 	    const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
 					 (Point<dim> (0,0,1)) );
@@ -968,12 +977,14 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   
 	if (rebuild_stokes_matrix == true)
 	  stokes_constraints.distribute_local_to_global (local_matrix,
+							 local_rhs,
 							 local_dof_indices,
-							 stokes_matrix);
-  
-	stokes_constraints.distribute_local_to_global (local_rhs,
-						       local_dof_indices,
-						       stokes_rhs);
+							 stokes_matrix,
+							 stokes_rhs);
+	else
+	  stokes_constraints.distribute_local_to_global (local_rhs,
+							 local_dof_indices,
+							 stokes_rhs);
       }
 
   stokes_matrix.compress();
@@ -1024,31 +1035,34 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
     if (cell->subdomain_id() == 
 	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) )
       {
-	local_mass_matrix = 0;
-	local_stiffness_matrix = 0;
-  
 	temperature_fe_values.reinit (cell);
 	
-	for (unsigned int q=0; q<n_q_points; ++q)
+	if (temperature_fe_values.get_cell_similarity() != CellSimilarity::translation)
 	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
+	    local_mass_matrix = 0;
+	    local_stiffness_matrix = 0;
+  
+	    for (unsigned int q=0; q<n_q_points; ++q)
 	      {
-		grad_phi_T[k] = temperature_fe_values.shape_grad (k,q);
-		phi_T[k]      = temperature_fe_values.shape_value (k, q);
+		for (unsigned int k=0; k<dofs_per_cell; ++k)
+		  {
+		    grad_phi_T[k] = temperature_fe_values.shape_grad (k,q);
+		    phi_T[k]      = temperature_fe_values.shape_value (k, q);
+		  }
+
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    {
+		      local_mass_matrix(i,j)
+			+= (phi_T[i] * phi_T[j]
+			    *
+			    temperature_fe_values.JxW(q));
+		      local_stiffness_matrix(i,j)
+			+= (EquationData::kappa * grad_phi_T[i] * grad_phi_T[j]
+			    *
+			    temperature_fe_values.JxW(q));
+		    }
 	      }
-	    
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		{
-		  local_mass_matrix(i,j)
-		    += (phi_T[i] * phi_T[j]
-			*
-			temperature_fe_values.JxW(q));
-		  local_stiffness_matrix(i,j)
-		    += (EquationData::kappa * grad_phi_T[i] * grad_phi_T[j]
-			*
-			temperature_fe_values.JxW(q));
-		}
 	  }
 	
 	cell->get_dof_indices (local_dof_indices);
