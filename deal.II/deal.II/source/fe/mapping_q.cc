@@ -307,7 +307,7 @@ void
 MappingQ<dim,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
-  enum CellSimilarity::Similarity                            cell_similarity,
+  enum CellSimilarity::Similarity                           &cell_similarity,
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,
@@ -341,17 +341,17 @@ MappingQ<dim,spacedim>::fill_fe_values (
 				   // recomputed anyway since then the
 				   // mapping changes the data. this needs
 				   // to be known also for later operations,
-				   // so modify the variable here. TODO:
-				   // still need to check how this will work
-				   // when the previous cell disabled this
-				   // flag.
+				   // so modify the variable here. this also
+				   // affects the calculation of the next
+				   // cell -- if we use Q1 data on the next
+				   // cell, the data will still be invalid.
   typename MappingQ1<dim,spacedim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
     p_data=&data.mapping_q1_data;
   else
     {
       p_data=&data;
-      cell_similarity = CellSimilarity::none;
+      cell_similarity = CellSimilarity::invalid_next_cell;
     }
   
   MappingQ1<dim,spacedim>::fill_fe_values(cell, q, cell_similarity, *p_data,

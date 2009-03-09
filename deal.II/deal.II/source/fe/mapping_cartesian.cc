@@ -185,22 +185,25 @@ MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,
 				   // along axes.  Strange vertex
 				   // numbering makes this complicated
 				   // again.
-  switch (dim)
+  if (cell_similarity != CellSimilarity::translation)
     {
-      case 1:
-	data.length[0] = cell->vertex(1)(0) - start(0);
-	break;
-      case 2:
-	data.length[0] = cell->vertex(1)(0) - start(0);
-	data.length[1] = cell->vertex(2)(1) - start(1);
-	break;
-      case 3:
-	data.length[0] = cell->vertex(1)(0) - start(0);
-	data.length[1] = cell->vertex(2)(1) - start(1);
-	data.length[2] = cell->vertex(4)(2) - start(2);
-	break;
-      default:
-	Assert(false, ExcNotImplemented());
+      switch (dim)
+	{
+	case 1:
+	  data.length[0] = cell->vertex(1)(0) - start(0);
+	  break;
+	case 2:
+	  data.length[0] = cell->vertex(1)(0) - start(0);
+	  data.length[1] = cell->vertex(2)(1) - start(1);
+	  break;
+	case 3:
+	  data.length[0] = cell->vertex(1)(0) - start(0);
+	  data.length[1] = cell->vertex(2)(1) - start(1);
+	  data.length[2] = cell->vertex(4)(2) - start(2);
+	  break;
+	default:
+	  Assert(false, ExcNotImplemented());
+	}
     }
   
 
@@ -300,7 +303,7 @@ void
 MappingCartesian<dim, spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
                 const Quadrature<dim>& q, 
-		const enum CellSimilarity::Similarity cell_similarity,
+		enum CellSimilarity::Similarity& cell_similarity,
 	        typename Mapping<dim,spacedim>::InternalDataBase& mapping_data,
                 std::vector<Point<spacedim> >& quadrature_points,
                 std::vector<double>& JxW_values,
@@ -347,7 +350,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
 	{
 	  jacobians[i]=Tensor<2,dim>();
 	  for (unsigned int j=0; j<dim; ++j)
-	    jacobians[j][j]=data.length[j];
+	    jacobians[i][j][j]=data.length[j];
 	}
 				   // "compute" the derivative of the Jacobian
 				   // at the quadrature points, which are all

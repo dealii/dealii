@@ -739,7 +739,7 @@ void
 MappingQ1<dim,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
-  const enum CellSimilarity::Similarity                      cell_similarity,
+  enum CellSimilarity::Similarity                           &cell_similarity,
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,

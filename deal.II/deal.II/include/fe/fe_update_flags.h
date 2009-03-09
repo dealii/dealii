@@ -354,7 +354,8 @@ namespace CellSimilarity
   enum Similarity 
     {
       none, 
-      translation
+      translation,
+      invalid_next_cell
     };
 }
 

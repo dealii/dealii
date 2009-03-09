@@ -3254,6 +3254,16 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
       return;
     }
 
+				   // in MappingQ, data can have been
+				   // modified during the last call. Then,
+				   // we can't use that data on the new
+				   // cell.
+  if (cell_similarity == CellSimilarity::invalid_next_cell)
+    {
+      cell_similarity = CellSimilarity::none;
+      return;
+    }
+
   const typename Triangulation<dim,spacedim>::cell_iterator & present_cell = 
     *this->present_cell;
 
@@ -3273,7 +3283,7 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
     for (unsigned int i=1; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       {
 	Point<spacedim> dist_new = cell->vertex(i) - present_cell->vertex(i) - dist;
-	if (dist_new.norm_square() > 1e-28)
+	if (dist_new.norm_square() > 1e-30)
 	  {
 	    is_translation = false;
 	    break;
