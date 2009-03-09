@@ -2244,7 +2244,6 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 
     const std::vector<Point<spacedim> > & get_cell_normal_vectors () const;
 
-
     				     /**
 				      * Return the outward normal vector to
 				      * the cell at the <tt>i</tt>th quadrature
@@ -2252,6 +2251,17 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * is normalized to one.
 				      */
     const Point<spacedim> & cell_normal_vector (const unsigned int i) const;
+
+				     /**
+				      * Return the relation of the current
+				      * cell to the previous cell. This
+				      * allows re-use of some cell data
+				      * (like local matrices for equations
+				      * with constant coefficients) if the
+				      * result is
+				      * <tt>CellSimilarity::translation</tt>.
+				      */
+    const enum CellSimilarity::Similarity get_cell_similarity () const;
 
 				     /**
 				      * Determine an estimate for the
@@ -2603,6 +2613,28 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      */
     UpdateFlags compute_update_flags (const UpdateFlags update_flags) const;
 
+				     /**
+				      * An enum variable that can store
+				      * different states of the current cell
+				      * in comparison to the previously
+				      * visited cell. If wanted, additional
+				      * states can be checked here and used
+				      * in one of the methods used during
+				      * reinit.
+				      */
+    enum CellSimilarity::Similarity cell_similarity;
+
+				     /**
+				      * A function that checks whether the
+				      * new cell is similar to the one
+				      * previously used. Then, a significant
+				      * amount of the data can be reused,
+				      * e.g. the derivatives of the basis
+				      * functions in real space, shape_grad.
+				      */
+    void
+    check_cell_similarity (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
+
   private:
                                      /**
                                       * Copy constructor. Since
@@ -2679,16 +2711,16 @@ class FEValues : public FEValuesBase<dim,spacedim>
 				      */
     FEValues (const Mapping<dim,spacedim>       &mapping,
 	      const FiniteElement<dim,spacedim> &fe,
-	      const Quadrature<dim>    &quadrature,
-	      const UpdateFlags         update_flags);
+	      const Quadrature<dim>             &quadrature,
+	      const UpdateFlags                  update_flags);
 
                                      /**
 				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
     FEValues (const FiniteElement<dim,spacedim> &fe,
-	      const Quadrature<dim>    &quadrature,
-	      const UpdateFlags         update_flags);
+	      const Quadrature<dim>             &quadrature,
+	      const UpdateFlags                  update_flags);
     
 				     /**
 				      * Reinitialize the gradients,
@@ -2815,28 +2847,6 @@ class FEValues : public FEValuesBase<dim,spacedim>
 				      */
     void initialize (const UpdateFlags update_flags);
 
-				     /**
-				      * An enum variable that can store
-				      * different states of the current cell
-				      * in comparison to the previously
-				      * visited cell. If wanted, additional
-				      * states can be checked here and used
-				      * in one of the methods used during
-				      * reinit.
-				      */
-    enum CellSimilarity::Similarity cell_similarity;
-
-				     /**
-				      * A function that checks whether the
-				      * new cell is similar to the one
-				      * previously used. Then, a significant
-				      * amount of the data can be reused,
-				      * e.g. the derivatives of the basis
-				      * functions in real space, shape_grad.
-				      */
-    void
-    check_cell_similarity (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
-
                                      /**
                                       * The reinit() functions do
                                       * only that part of the work
@@ -2895,12 +2905,12 @@ class FEFaceValuesBase : public FEValuesBase<dim,spacedim>
 				      * of faces times the number of subfaces
 				      * per face.
 				      */
-    FEFaceValuesBase (const unsigned int n_q_points,
-		      const unsigned int dofs_per_cell,
-		      const UpdateFlags         update_flags,
+    FEFaceValuesBase (const unsigned int                 n_q_points,
+		      const unsigned int                 dofs_per_cell,
+		      const UpdateFlags                  update_flags,
 		      const Mapping<dim,spacedim>       &mapping,
 		      const FiniteElement<dim,spacedim> &fe,
-		      const Quadrature<dim-1>& quadrature);
+		      const Quadrature<dim-1>&           quadrature);
 
     				     /**
 				      * Return the outward normal vector to
@@ -3026,16 +3036,16 @@ class FEFaceValues : public FEFaceValuesBase<dim,spacedim>
 				      */
     FEFaceValues (const Mapping<dim,spacedim>       &mapping,
 		  const FiniteElement<dim,spacedim> &fe,
-		  const Quadrature<dim-1>  &quadrature,
-		  const UpdateFlags         update_flags);
+		  const Quadrature<dim-1>           &quadrature,
+		  const UpdateFlags                  update_flags);
 
                                      /**
 				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
     FEFaceValues (const FiniteElement<dim,spacedim> &fe,
-		  const Quadrature<dim-1>  &quadrature,
-		  const UpdateFlags         update_flags);
+		  const Quadrature<dim-1>           &quadrature,
+		  const UpdateFlags                  update_flags);
 
 				     /**
 				      * Reinitialize the gradients, Jacobi
@@ -3044,7 +3054,7 @@ class FEFaceValues : public FEFaceValuesBase<dim,spacedim>
 				      * and the given finite element.
 				      */
     void reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
-		 const unsigned int                            face_no);
+		 const unsigned int                                      face_no);
 
 				     /**
 				      * Reinitialize the gradients,
@@ -3060,7 +3070,7 @@ class FEFaceValues : public FEFaceValuesBase<dim,spacedim>
 				      * object.
 				      */
     void reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-		 const unsigned int                              face_no);
+		 const unsigned int                                          face_no);
 
 				     /**
 				      * Reinitialize the gradients,
@@ -3076,7 +3086,7 @@ class FEFaceValues : public FEFaceValuesBase<dim,spacedim>
 				      * object.
 				      */
     void reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-		 const unsigned int                              face_no);
+		 const unsigned int                                        face_no);
 
 				     /**
 				      * Reinitialize the gradients,
@@ -3105,7 +3115,7 @@ class FEFaceValues : public FEFaceValuesBase<dim,spacedim>
 				      * handler type objects.
 				      */
     void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		 const unsigned int                    face_no);
+		 const unsigned int                                         face_no);
     
                                      /**
                                       * Return a reference to this

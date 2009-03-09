@@ -431,7 +431,7 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
   InternalData &data = static_cast<InternalData&> (mapping_data);
 
   compute_fill (cell, face_no, invalid_face_number, 
-		CellSimilarity::no_similarity,
+		CellSimilarity::none,
 		data,
 		quadrature_points,
 		normal_vectors);
@@ -484,7 +484,7 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
   Assert (dynamic_cast<InternalData*> (&mapping_data) != 0, ExcInternalError());
   InternalData &data = static_cast<InternalData&> (mapping_data);
 
-  compute_fill (cell, face_no, sub_no, CellSimilarity::no_similarity,
+  compute_fill (cell, face_no, sub_no, CellSimilarity::none,
 		data,
 		quadrature_points,
 		normal_vectors);

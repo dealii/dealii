@@ -962,7 +962,7 @@ MappingQ1<dim,spacedim>::compute_fill_face (
   std::vector<Tensor<1,dim> > &boundary_forms,
   std::vector<Point<spacedim> >    &normal_vectors) const
 {
-  compute_fill (cell, n_q_points, data_set, CellSimilarity::no_similarity,
+  compute_fill (cell, n_q_points, data_set, CellSimilarity::none,
 		data, quadrature_points);
 
   const UpdateFlags update_flags(data.current_update_flags());

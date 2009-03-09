@@ -690,7 +690,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
                      FEValuesData<dim,spacedim>                    &data) const
 {
   compute_fill (mapping, cell, face_no, invalid_face_number, quadrature,
-                CellSimilarity::no_similarity, mapping_data, fe_data, data);
+                CellSimilarity::none, mapping_data, fe_data, data);
 }
 
 
@@ -709,7 +709,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                      &mappin
                         FEValuesData<dim,spacedim>                       &data) const
 {
   compute_fill (mapping, cell, face_no, sub_no, quadrature,
-                CellSimilarity::no_similarity, mapping_data, fe_data, data);
+                CellSimilarity::none, mapping_data, fe_data, data);
 }
 
 

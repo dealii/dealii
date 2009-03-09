@@ -340,7 +340,28 @@ operator &= (UpdateFlags &f1, UpdateFlags f2)
 
 
 
+/**
+ * This enum definition is used for storing similarities of the current cell
+ * to the previously visited cell. This information is used for reusing data
+ * when calling the method FEValues::reinit() (like derivatives, which do
+ * not change if one cell is just a translation of the previous). Currently,
+ * this variable does only recognize a translation. However, this concept
+ * makes it easy to add additional staties to be detected in
+ * FEValues/FEFaceValues for making use of these similarities as well.
+ */
+namespace CellSimilarity
+{
+  enum Similarity 
+    {
+      none, 
+      translation
+    };
+}
+
+
 /*@}*/
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 

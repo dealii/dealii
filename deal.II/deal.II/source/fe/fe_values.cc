@@ -3239,6 +3239,70 @@ FEValuesBase<dim,spacedim>::compute_update_flags (const UpdateFlags update_flags
 }
 
 
+
+template <int dim, int spacedim>
+inline
+void
+FEValuesBase<dim,spacedim>::check_cell_similarity 
+  (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
+{
+				   // case that there has not been any cell
+				   // before
+  if (&*this->present_cell == 0)
+    {
+      cell_similarity = CellSimilarity::none;
+      return;
+    }
+
+  const typename Triangulation<dim,spacedim>::cell_iterator & present_cell = 
+    *this->present_cell;
+
+				   // test for translation
+  {
+				   // otherwise, go through the vertices and
+				   // check... The cell is a translation of
+				   // the previous one in case the distance
+				   // between the individual vertices in the
+				   // two cell is the same for all the
+				   // vertices. So do the check by first
+				   // getting the distance on the first
+				   // vertex, and then checking whether all
+				   // others have the same.
+    bool is_translation = true;
+    const Point<spacedim> dist = cell->vertex(0) - present_cell->vertex(0);
+    for (unsigned int i=1; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      {
+	Point<spacedim> dist_new = cell->vertex(i) - present_cell->vertex(i) - dist;
+	if (dist_new.norm_square() > 1e-28)
+	  {
+	    is_translation = false;
+	    break;
+	  }
+      }
+
+    cell_similarity = (is_translation == true 
+		       ? 
+		       CellSimilarity::translation 
+		       : 
+		       CellSimilarity::none);
+    return;
+  }
+
+				   // TODO: here, one could implement other
+				   // checks for similarity, e.g. for
+				   // children of a parallelogram.
+}
+
+
+
+template <int dim, int spacedim>
+const enum CellSimilarity::Similarity 
+FEValuesBase<dim,spacedim>::get_cell_similarity () const
+{
+  return cell_similarity;
+}
+
+
 /*------------------------------- FEValues -------------------------------*/
 
 
@@ -3465,53 +3529,6 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
                                    // pass on to the function doing
                                    // the real work.
   do_reinit ();
-}
-
-
-
-template <int dim, int spacedim>
-inline
-void
-FEValues<dim,spacedim>::check_cell_similarity (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
-{
-				   // case that there has not been any cell
-				   // before
-  if (&*this->present_cell == 0)
-    {
-      cell_similarity = CellSimilarity::no_similarity;
-      return;
-    }
-
-  const typename Triangulation<dim,spacedim>::cell_iterator & present_cell = 
-    *this->present_cell;
-
-				   // test for translation
-  {
-				   // otherwise, go through the vertices and
-				   // check...
-    bool is_translation = true;
-    const Point<spacedim> dist = cell->vertex(0) - present_cell->vertex(0);
-    for (unsigned int i=1; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-      {
-	Point<spacedim> dist_new = cell->vertex(i) - present_cell->vertex(i) - dist;
-	if (dist_new.norm_square() > 1e-28)
-	  {
-	    is_translation = false;
-	    break;
-	  }
-      }
-
-    cell_similarity = (is_translation == true 
-		       ? 
-		       CellSimilarity::translation 
-		       : 
-		       CellSimilarity::no_similarity);
-    return;
-  }
-
-				   // TODO: here, one could implement other
-				   // checks for similarity, e.g. for
-				   // children of a parallelogram.
 }
 
 

@@ -351,7 +351,7 @@ MappingQ<dim,spacedim>::fill_fe_values (
   else
     {
       p_data=&data;
-      cell_similarity = CellSimilarity::no_similarity;
+      cell_similarity = CellSimilarity::none;
     }
   
   MappingQ1<dim,spacedim>::fill_fe_values(cell, q, cell_similarity, *p_data,

@@ -199,7 +199,7 @@ MappingQEulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
 				   // disable any previously detected
 				   // similarity and hand on to the respective
 				   // function of the base class.
-  cell_similarity = CellSimilarity::no_similarity;
+  cell_similarity = CellSimilarity::none;
   MappingQ<dim,spacedim>::fill_fe_values (cell, q, cell_similarity, mapping_data,
 					  quadrature_points, JxW_values, jacobians,
 					  jacobian_grads, inverse_jacobians,

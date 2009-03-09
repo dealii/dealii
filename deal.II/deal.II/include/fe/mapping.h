@@ -32,24 +32,6 @@ template <int dim, int spacedim> class FEValues;
 template <int dim, int spacedim> class FEFaceValues;
 template <int dim, int spacedim> class FESubfaceValues;
 
-				     /**
-				      * An enum variable that can store
-				      * different states of the current cell
-				      * in comparison to the previously
-				      * visited cell. If wanted, additional
-				      * states can be checked here and used
-				      * in one of the methods used during
-				      * reinit.
-				      */
-namespace CellSimilarity
-{
-  enum Similarity 
-    {
-      no_similarity, 
-      translation
-    };
-}
-
                                      /**
                                       * The transformation type used
                                       * for the Mapping::transform() functions.

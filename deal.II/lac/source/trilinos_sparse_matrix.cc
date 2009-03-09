@@ -406,7 +406,9 @@ namespace TrilinosWrappers
 	  for (int col=0; col < row_length; ++col)
 	    row_indices[col] = sparsity_pattern.column_number (row, col);
 
-	  graph->InsertGlobalIndices (row, row_length, &row_indices[0]);
+	  graph->InsertGlobalIndices (static_cast<int>(row), 
+				      row_length, &row_indices[0]);
+
 	}
 
 				  // Now, fill the graph (sort indices, make
