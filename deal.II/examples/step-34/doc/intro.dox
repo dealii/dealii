@@ -186,7 +186,7 @@ problems using the deal.II library:
 Let $\mathcal{T}_h = \cup_{i=0}^M K_i$ be a subdivision of the
 manifold $\Gamma = \partial \Omega$ into $M$ segments if $n=2$ or $M$
 quadrilaterals if $n=3$. We will call each individual segment or
-quadrilateral an \emph{element} or \emph{cell}, independently on the
+quadrilateral an <i>element</i> or <i>cell</i>, independently on the
 dimension $n$ of the surrounding space $R^n$.
 
 We define the finite dimensional space $V_h$ as 
