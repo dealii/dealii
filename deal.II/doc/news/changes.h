@@ -34,11 +34,11 @@ inconvenience this causes.
   <p> 
   Changed: The files implementing the class ConstraintMatrix are now
   saved in the lac/ subdirectory, named <code>constraint_matrix.h</code>
-  and included by the line <code>#include
-  <lac/constraint_matrix.h></code>. After all, constraints are just
+  and included by the line <code>\#include
+  @<lac/constraint_matrix.h@></code>. After all, constraints are just
   algebraic objects and do not depend on anything in the deal.II
   directory (in particular, they are dimension-independent).  The old
-  <code>#include <dofs/dof_constraints.h></code> include line is still
+  <code>\#include @<dofs/dof_constraints.h@></code> include line is still
   enabled by a reference to the new file, but users should try to adapt
   their codes to the new file names as the reference might be removed in
   the future.
