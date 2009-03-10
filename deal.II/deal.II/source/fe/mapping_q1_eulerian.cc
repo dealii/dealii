@@ -120,23 +120,23 @@ void
 MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
-  enum CellSimilarity::Similarity                           &cell_similarity,
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,
   std::vector<Tensor<2,spacedim> >                          &jacobians,
   std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
   std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
-  std::vector<Point<spacedim> >                             &cell_normal_vectors) const
+  std::vector<Point<spacedim> >                             &cell_normal_vectors,
+  enum CellSimilarity::Similarity                           &cell_similarity) const
 {
 				   // disable any previously detected
-				   // similarity and hand on to the
+				   // similarity and then enter the
 				   // respective function of the base class.
   cell_similarity = CellSimilarity::invalid_next_cell;
-  MappingQ1<dim,spacedim>::fill_fe_values (cell, q, cell_similarity, mapping_data,
+  MappingQ1<dim,spacedim>::fill_fe_values (cell, q, mapping_data,
 					   quadrature_points, JxW_values, jacobians,
 					   jacobian_grads, inverse_jacobians,
-					   cell_normal_vectors);
+					   cell_normal_vectors, cell_similarity);
 }
 
 

@@ -612,10 +612,10 @@ class FESystem : public FiniteElement<dim,spacedim>
     fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
 		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		    const Quadrature<dim>                            &quadrature,
-		    const enum CellSimilarity::Similarity             cell_similarity,
 		    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
 		    typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-		    FEValuesData<dim,spacedim>                       &data) const;
+		    FEValuesData<dim,spacedim>                       &data,
+		    enum CellSimilarity::Similarity                  &cell_similarity) const;
 
 				     /**
 				      * Implementation of the same
@@ -685,7 +685,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 		       const unsigned int                                face_no,
 		       const unsigned int                                sub_no,
 		       const Quadrature<dim_1>                          &quadrature,
-		       const enum CellSimilarity::Similarity             cell_similarity,
+		       enum CellSimilarity::Similarity                   cell_similarity,
 		       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
 		       typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
 		       FEValuesData<dim,spacedim>                       &data) const ;

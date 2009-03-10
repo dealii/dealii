@@ -739,14 +739,14 @@ void
 MappingQ1<dim,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
-  enum CellSimilarity::Similarity                           &cell_similarity,
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,
   std::vector<Tensor<2,spacedim> >                          &jacobians,
   std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
   std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
-  std::vector<Point<spacedim> >                             &cell_normal_vectors) const
+  std::vector<Point<spacedim> >                             &cell_normal_vectors,
+  enum CellSimilarity::Similarity                           &cell_similarity) const
 {
   // ensure that the following cast is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
@@ -1363,7 +1363,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
                                      point_quadrature)));
 
   MappingQ1<dim,spacedim>::compute_mapping_support_points (cell,
-                                                  mdata->mapping_support_points);
+							   mdata->mapping_support_points);
   Assert(mdata->mapping_support_points.size() ==
          GeometryInfo<dim>::vertices_per_cell,
 	 ExcInternalError());

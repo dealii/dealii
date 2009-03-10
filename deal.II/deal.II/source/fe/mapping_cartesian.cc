@@ -303,14 +303,14 @@ void
 MappingCartesian<dim, spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
                 const Quadrature<dim>& q, 
-		enum CellSimilarity::Similarity& cell_similarity,
 	        typename Mapping<dim,spacedim>::InternalDataBase& mapping_data,
                 std::vector<Point<spacedim> >& quadrature_points,
                 std::vector<double>& JxW_values,
 		std::vector<Tensor<2,spacedim> >& jacobians,
 		std::vector<Tensor<3,spacedim> >& jacobian_grads,
 		std::vector<Tensor<2,spacedim> >& inverse_jacobians,
-	        std::vector<Point<spacedim> >       &) const
+	        std::vector<Point<spacedim> >       &,
+		enum CellSimilarity::Similarity& cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

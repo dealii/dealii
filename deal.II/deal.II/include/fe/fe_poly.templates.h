@@ -239,13 +239,13 @@ template <>
 inline
 void
 FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values 
-  (const Mapping<1,2> &mapping,
+  (const Mapping<1,2>                        &mapping,
    const Triangulation<1,2>::cell_iterator   &/*cell*/,
    const Quadrature<1>                       &quadrature,
-   const enum CellSimilarity::Similarity      cell_similarity,
    Mapping<1,2>::InternalDataBase            &mapping_data,
    Mapping<1,2>::InternalDataBase            &fedata,
-   FEValuesData<1,2>                         &data) const
+   FEValuesData<1,2>                         &data,
+   enum CellSimilarity::Similarity           &cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -282,13 +282,13 @@ template <>
 inline
 void
 FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values 
-  (const Mapping<2,3> &mapping,
+  (const Mapping<2,3>                      &mapping,
    const Triangulation<2,3>::cell_iterator &/* cell */,
-   const Quadrature<2> &quadrature,
-   const enum CellSimilarity::Similarity cell_similarity,
-   Mapping<2,3>::InternalDataBase & mapping_data,
-   Mapping<2,3>::InternalDataBase &fedata,
-   FEValuesData<2,3> &data) const
+   const Quadrature<2>                     &quadrature,
+   Mapping<2,3>::InternalDataBase          &mapping_data,
+   Mapping<2,3>::InternalDataBase          &fedata,
+   FEValuesData<2,3>                       &data,
+   enum CellSimilarity::Similarity         &cell_similarity) const
 {
 
 				   // assert that the following dynamics
@@ -324,13 +324,13 @@ template <>
 inline
 void
 FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
-  const Mapping<1,2>& mapping,
-  const Triangulation<1,2>::cell_iterator& /*cell*/,
-  const Quadrature<1>& quadrature,
-  const enum CellSimilarity::Similarity cell_similarity,
-  Mapping<1,2>::InternalDataBase& mapping_data,
-  Mapping<1,2>::InternalDataBase& fedata,
-  FEValuesData<1,2>& data) const
+  const Mapping<1,2>                      &mapping,
+  const Triangulation<1,2>::cell_iterator & /*cell*/,
+  const Quadrature<1>                     &quadrature,
+  Mapping<1,2>::InternalDataBase          &mapping_data,
+  Mapping<1,2>::InternalDataBase          &fedata,
+  FEValuesData<1,2>                       &data,
+  enum CellSimilarity::Similarity         &cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -369,13 +369,13 @@ template <>
 inline
 void
 FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values 
-  (const Mapping<2,3>& mapping,
+  (const Mapping<2,3>                      &mapping,
    const Triangulation<2,3>::cell_iterator &/* cell */,
-   const Quadrature<2>& quadrature,
-   const enum CellSimilarity::Similarity cell_similarity,
-   Mapping<2,3>::InternalDataBase& mapping_data,
-   Mapping<2,3>::InternalDataBase &fedata,
-   FEValuesData<2,3> &data) const
+   const Quadrature<2>                     &quadrature,
+   Mapping<2,3>::InternalDataBase          &mapping_data,
+   Mapping<2,3>::InternalDataBase          &fedata,
+   FEValuesData<2,3>                       &data,
+   enum CellSimilarity::Similarity         &cell_similarity) const
 {
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
@@ -411,10 +411,10 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
   (const Mapping<dim,spacedim>                      &mapping,
    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
    const Quadrature<dim>                            &quadrature,
-   const enum CellSimilarity::Similarity             cell_similarity,
    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
    typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-   FEValuesData<dim,spacedim>                       &data) const
+   FEValuesData<dim,spacedim>                       &data,
+   enum CellSimilarity::Similarity                  &cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

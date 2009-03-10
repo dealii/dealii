@@ -3266,7 +3266,7 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
 
   const typename Triangulation<dim,spacedim>::cell_iterator & present_cell = 
     *this->present_cell;
-
+ 
 				   // test for translation
   {
 				   // otherwise, go through the vertices and
@@ -3280,10 +3280,11 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
 				   // others have the same.
     bool is_translation = true;
     const Point<spacedim> dist = cell->vertex(0) - present_cell->vertex(0);
+    const double tolerance = 1e-30 * dist.norm_square();
     for (unsigned int i=1; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       {
 	Point<spacedim> dist_new = cell->vertex(i) - present_cell->vertex(i) - dist;
-	if (dist_new.norm_square() > 1e-30)
+	if (dist_new.norm_square() > tolerance)
 	  {
 	    is_translation = false;
 	    break;
@@ -3548,22 +3549,22 @@ void FEValues<dim,spacedim>::do_reinit ()
 {
   this->get_mapping().fill_fe_values(*this->present_cell,
 				     quadrature,
-				     this->cell_similarity,
 				     *this->mapping_data,
 				     this->quadrature_points,
 				     this->JxW_values,
 				     this->jacobians,
 				     this->jacobian_grads,
 				     this->inverse_jacobians,
-				     this->cell_normal_vectors);
-  
+				     this->cell_normal_vectors,
+				     this->cell_similarity);
+
   this->get_fe().fill_fe_values(this->get_mapping(),
 				*this->present_cell,
 				quadrature,
-				this->cell_similarity,
 				*this->mapping_data,
 				*this->fe_data,
-				*this);
+				*this,
+				this->cell_similarity);
 
   this->fe_data->clear_first_cell ();
   this->mapping_data->clear_first_cell ();
@@ -3862,7 +3863,7 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
 					  this->JxW_values,
 					  this->boundary_forms,
 					  this->normal_vectors);
-  
+
   this->get_fe().fill_fe_face_values(this->get_mapping(),
 				     *this->present_cell, face_no,
 				     this->quadrature,

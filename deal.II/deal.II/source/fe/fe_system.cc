@@ -667,10 +667,10 @@ FESystem<dim,spacedim>::
 fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
                 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const Quadrature<dim>                            &quadrature,
-		const enum CellSimilarity::Similarity             cell_similarity,
                 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                 typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-                FEValuesData<dim,spacedim>                       &data) const
+                FEValuesData<dim,spacedim>                       &data,
+		enum CellSimilarity::Similarity                  &cell_similarity) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
 	       quadrature, cell_similarity, mapping_data, fe_data, data);
@@ -723,7 +723,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
               const unsigned int                                face_no,
               const unsigned int                                sub_no,
               const Quadrature<dim_1>                          &quadrature,
-	      const enum CellSimilarity::Similarity             cell_similarity,
+	      enum CellSimilarity::Similarity                   cell_similarity,
               typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
               typename Mapping<dim,spacedim>::InternalDataBase &fedata,
               FEValuesData<dim,spacedim>                       &data) const
@@ -838,7 +838,8 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
 					   // to correctly map the RT space from
 					   // the reference element to the global
 					   // coordinate system.
-	  base_data.JxW_values = data.JxW_values;
+	  if (cell_similarity != CellSimilarity::translation)
+	    base_data.JxW_values = data.JxW_values;
 
 
                                            // Make sure that in the
@@ -857,8 +858,8 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
                                            // therefore use
                                            // base_fe_data.update_flags.
 	  if (face_no==invalid_face_number)
-	    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, cell_similarity, 
-				   mapping_data, base_fe_data, base_data);
+	    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, mapping_data, 
+				   base_fe_data, base_data, cell_similarity);
 	  else if (sub_no==invalid_face_number)
 	    base_fe.fill_fe_face_values(mapping, cell, face_no,
 					*face_quadrature, mapping_data, base_fe_data, base_data);

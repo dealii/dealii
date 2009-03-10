@@ -152,14 +152,14 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
     virtual void
     fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		    const Quadrature<dim>                                     &quadrature,
-		    enum CellSimilarity::Similarity                           &cell_similarity,
 		    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
 		    typename std::vector<Point<spacedim> >                    &quadrature_points,
 		    std::vector<double>                                       &JxW_values,
 		    std::vector<Tensor<2,spacedim> >                          &jacobians,
 		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
 		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
-		    std::vector<Point<spacedim> >                             &cell_normal_vectors) const;
+		    std::vector<Point<spacedim> >                             &cell_normal_vectors,
+		    enum CellSimilarity::Similarity                           &cell_similarity) const;
 
 				     /**
 				      * Reference to the vector of

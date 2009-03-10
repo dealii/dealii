@@ -362,10 +362,10 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
   const Mapping<dim,spacedim>                      &mapping,
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                            &quadrature,
-  const enum CellSimilarity::Similarity             cell_similarity,
   typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-  FEValuesData<dim,spacedim>                       &data) const
+  FEValuesData<dim,spacedim>                       &data,
+  enum CellSimilarity::Similarity                  &cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -390,13 +390,23 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
   // between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
   get_face_sign_change (cell, this->dofs_per_face, sign_change);
+
+				   // for Piola mapping, the similarity
+				   // concept cannot be used because of
+				   // possible sign changes from one cell to
+				   // the next.
+  if (mapping_type == mapping_piola)
+    if (cell_similarity == CellSimilarity::translation)
+      cell_similarity = CellSimilarity::none;
   
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = data.shape_function_to_row_table[i];
       
-      if (flags & update_values)
+      if (flags & update_values && cell_similarity != CellSimilarity::translation)
 	{
+	  if (cell_similarity == 1)
+	    std::cout << "hier";
 	  switch (mapping_type)
 	    {
 	      case mapping_none:
@@ -437,7 +447,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	    }
 	}
       
-      if (flags & update_gradients)
+      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
 	  std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
@@ -493,7 +503,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	}
     }
   
-  if (flags & update_hessians)
+  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     this->compute_2nd (mapping, cell,
 		       typename QProjector<dim>::DataSetDescriptor().cell(),
 		       mapping_data, fe_data, data);
