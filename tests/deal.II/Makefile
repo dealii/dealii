@@ -24,11 +24,7 @@ default: run-tests
 tests_x = block_matrices \
 	user_data_* \
 	constraints \
-	constraints_zero \
-	constraints_zero_merge \
-	constraints_zero_condense \
 	constraint_graph \
-	constraint_graph_zero \
 	inhomogeneous_constraints \
 	inhomogeneous_constraints_nonsymmetric \
 	inhomogeneous_constraints_block \
