@@ -21,7 +21,6 @@
 #include <iomanip>
 #include <vector>
 
-
 void test (Vector<double> &v,
            Vector<double> &w)
 {

@@ -173,7 +173,7 @@ void MappingTest<dim>::run_test ()
   }    
 
   table.set_precision("area", 8);
-    table.set_precision("error", 4);
+  table.set_precision("error", 4);
   table.set_scientific("error", true);
   table.evaluate_convergence_rates("error",
     ConvergenceTable::reduction_rate_log2); 

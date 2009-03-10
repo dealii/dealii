@@ -18,7 +18,6 @@
 #include <fe/fe_dgp.h>
 #include <fe/fe_nedelec.h>
 #include <fe/fe_system.h>
-#include <fe/fe_values.h>
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -79,7 +78,7 @@ check_support (const FiniteElement<dim>& finel, const char* name)
         
       for (unsigned int k=0; k<face_points.size(); ++k)
 	deallog << std::setprecision(3) << qp.point(k)
-	     << std::endl;
+		<< std::endl;
     }
 }
 
