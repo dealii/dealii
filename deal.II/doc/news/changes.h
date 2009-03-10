@@ -160,6 +160,18 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: A new tutorial program  @ref step_34 "step-34" was added to the 
+  library that shows the usage of the new codimension one functionality
+  recently added to the library. In this tutorial we show the use of 
+  bondary element methods on piecewise constant functions defined over
+  a surface, and we solve the irrotational flow problem, or exterior
+  Neumann Laplace problem.
+  <br>
+  (Luca Heltai 2009/03/10)
+  </p>
+
+  <li>
+  <p>
   Fixed: When linking with both Trilinos and BLAS, the BLAS libraries appeared
   first on the command line; however, if the Trilinos libraries required BLAS
   then this was the wrong order. This is now fixed.
@@ -216,6 +228,7 @@ inconvenience this causes.
   </li>
 
   <li>
+  <p>
   New: Based on work by Cataldo Manigrasso and Luca Heltai
   developed over the last few months on a branch, deal.II now
   supports meshes that are embedded in higher space
