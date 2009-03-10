@@ -682,53 +682,179 @@ class VectorTools
 			       const typename FunctionMap<DH::space_dimension>::type &function_map,
 			       std::map<unsigned int,double>         &boundary_values,
 			       const std::vector<bool>               &component_mask = std::vector<bool>());
+
+
+				     /**
+				      * Insert the (algebraic) constraints
+				      * due to Dirichlet boundary conditions
+				      * to the ConstraintMatrix. This
+				      * function makes up the list of
+				      * degrees of freedom subject to
+				      * Dirichlet boundary conditions and
+				      * the values to be assigned to them,
+				      * by interpolation around the
+				      * boundary. If the ConstraintMatrix @p
+				      * constraints contained values or
+				      * other constraints before, the new
+				      * ones are added, or the old ones
+				      * overwritten if a node of the
+				      * boundary part to be used was already
+				      * in the list of constraints. This is
+				      * handled by using inhomogeneous
+				      * constraints. Please note that when
+				      * combining adaptive meshes and this
+				      * kind of constraints, the Dirichlet
+				      * conditions should be set first, and
+				      * then completed by hanging node
+				      * constraints, in order to make sure
+				      * that the discretization remains
+				      * consistent.
+				      *
+				      * The parameter @p boundary_component
+				      * corresponds to the number @p
+				      * boundary_indicator of the face.  255
+				      * is an illegal value, since it is
+				      * reserved for interior faces.
+				      *
+				      * The flags in the last parameter, @p
+				      * component_mask denote which
+				      * components of the finite element
+				      * space shall be interpolated. If it
+				      * is left as specified by the default
+				      * value (i.e. an empty array), all
+				      * components are interpolated. If it
+				      * is different from the default value,
+				      * it is assumed that the number of
+				      * entries equals the number of
+				      * components in the boundary functions
+				      * and the finite element, and those
+				      * components in the given boundary
+				      * function will be used for which the
+				      * respective flag was set in the
+				      * component mask.
+				      *
+				      * It is assumed that the number of
+				      * components of the function in @p
+				      * boundary_function matches that of
+				      * the finite element used by @p dof.
+				      *
+				      * If the finite element used has shape
+				      * functions that are non-zero in more
+				      * than one component (in deal.II
+				      * speak: they are non-primitive), then
+				      * these components can presently not
+				      * be used for interpolating boundary
+				      * values. Thus, the elements in the
+				      * component mask corresponding to the
+				      * components of these non-primitive
+				      * shape functions must be @p false.
+				      *
+				      * See the general doc for more
+				      * information.
+				      */
+  template <class DH>
+  static
+  void
+  interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension>            &mapping,
+			       const DH                 &dof,
+			       const typename FunctionMap<DH::space_dimension>::type &function_map,
+			       ConstraintMatrix              &constraints,
+			       const std::vector<bool>       &component_mask = std::vector<bool>());
   
+				     /**
+				      * @deprecated This function is there
+				      * mainly for backward compatibility.
+				      *
+				      * Same function as above, but taking
+				      * only one pair of boundary indicator
+				      * and corresponding boundary
+				      * function. Calls the other function
+				      * with remapped arguments.
+				      *
+				      */
+  template <class DH>
+  static
+  void
+  interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension> &mapping,
+			       const DH                            &dof,
+			       const unsigned char                  boundary_component,
+			       const Function<DH::space_dimension> &boundary_function,
+			       ConstraintMatrix                    &constraints,
+			       const std::vector<bool>             &component_mask = std::vector<bool>());
+
+				     /**
+				      * Calls the other
+				      * interpolate_boundary_values()
+				      * function, see above, with
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      */
+  template <class DH>
+  static
+  void
+  interpolate_boundary_values (const DH                            &dof,
+			       const unsigned char                  boundary_component,
+			       const Function<DH::space_dimension> &boundary_function,
+			       ConstraintMatrix                    &constraints,
+			       const std::vector<bool>             &component_mask = std::vector<bool>());
+
     
 				     /**
+				      * Calls the other
+				      * interpolate_boundary_values()
+				      * function, see above, with
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      */
+  template <class DH>
+  static
+  void
+  interpolate_boundary_values (const DH                &dof,
+			       const typename FunctionMap<DH::space_dimension>::type &function_map,
+			       ConstraintMatrix        &constraints,
+			       const std::vector<bool> &component_mask = std::vector<bool>());
+
+
+				     /**
 				      * Project a function to the boundary
-				      * of the domain, using the given quadrature
-				      * formula for the faces. If the
-				      * @p boundary_values contained values
-				      * before, the new ones are added, or
-				      * the old one overwritten if a node
-				      * of the boundary part to be projected
-				      * on already was in the variable.
+				      * of the domain, using the given
+				      * quadrature formula for the faces. If
+				      * the @p boundary_values contained
+				      * values before, the new ones are
+				      * added, or the old one overwritten if
+				      * a node of the boundary part to be
+				      * projected on already was in the
+				      * variable.
 				      *
-				      * If @p component_mapping is
-				      * empty, it is assumed that the
-				      * number of components of @p
-				      * boundary_function matches that
-				      * of the finite element used by
-				      * @p dof.
+				      * If @p component_mapping is empty, it
+				      * is assumed that the number of
+				      * components of @p boundary_function
+				      * matches that of the finite element
+				      * used by @p dof.
 				      *
 				      * In 1d, projection equals
 				      * interpolation. Therefore,
 				      * interpolate_boundary_values is
 				      * called.
 				      *
-				      * @arg @p boundary_values: the
-				      * result of this function, a map
-				      * containing all indices of
-				      * degrees of freedom at the
-				      * boundary (as covered by the
+				      * @arg @p boundary_values: the result
+				      * of this function, a map containing
+				      * all indices of degrees of freedom at
+				      * the boundary (as covered by the
 				      * boundary parts in @p
-				      * boundary_functions) and the
-				      * computed dof value for this
-				      * degree of freedom.
+				      * boundary_functions) and the computed
+				      * dof value for this degree of
+				      * freedom.
 				      *
-				      * @arg @p component_mapping: if
-				      * the components in @p
-				      * boundary_functions and @p dof
-				      * do not coincide, this vector
-				      * allows them to be remapped. If
-				      * the vector is not empty, it
-				      * has to have one entry for each
-				      * component in @p dof. This
-				      * entry is the component number
-				      * in @p boundary_functions that
-				      * should be used for this
-				      * component in @p dof. By
-				      * default, no remapping is
+				      * @arg @p component_mapping: if the
+				      * components in @p boundary_functions
+				      * and @p dof do not coincide, this
+				      * vector allows them to be
+				      * remapped. If the vector is not
+				      * empty, it has to have one entry for
+				      * each component in @p dof. This entry
+				      * is the component number in @p
+				      * boundary_functions that should be
+				      * used for this component in @p
+				      * dof. By default, no remapping is
 				      * applied.
 				      */
   template <int dim, int spacedim>
@@ -750,6 +876,72 @@ class VectorTools
 				       const Quadrature<dim-1>  &q,
 				       std::map<unsigned int,double> &boundary_values,
 				       std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+
+				     /**
+				      * Project a function to the boundary
+				      * of the domain, using the given
+				      * quadrature formula for the faces. If
+				      * the ConstraintMatrix @p constraints
+				      * contained values or other
+				      * constraints before, the new ones are
+				      * added, or the old ones overwritten
+				      * if a node of the boundary part to be
+				      * used was already in the list of
+				      * constraints. This is handled by
+				      * using inhomogeneous
+				      * constraints. Please note that when
+				      * combining adaptive meshes and this
+				      * kind of constraints, the Dirichlet
+				      * conditions should be set first, and
+				      * then completed by hanging node
+				      * constraints, in order to make sure
+				      * that the discretization remains
+				      * consistent.
+				      *
+				      * If @p component_mapping is empty, it
+				      * is assumed that the number of
+				      * components of @p boundary_function
+				      * matches that of the finite element
+				      * used by @p dof.
+				      *
+				      * In 1d, projection equals
+				      * interpolation. Therefore,
+				      * interpolate_boundary_values is
+				      * called.
+				      *
+				      * @arg @p component_mapping: if the
+				      * components in @p boundary_functions
+				      * and @p dof do not coincide, this
+				      * vector allows them to be
+				      * remapped. If the vector is not
+				      * empty, it has to have one entry for
+				      * each component in @p dof. This entry
+				      * is the component number in @p
+				      * boundary_functions that should be
+				      * used for this component in @p
+				      * dof. By default, no remapping is
+				      * applied.
+				      */
+  template <int dim, int spacedim>
+  static void project_boundary_values (const Mapping<dim, spacedim>   &mapping,
+				       const DoFHandler<dim,spacedim> &dof,
+				       const typename FunctionMap<spacedim>::type &boundary_functions,
+				       const Quadrature<dim-1>        &q,
+				       ConstraintMatrix               &constraints,
+ 				       std::vector<unsigned int>       component_mapping = std::vector<unsigned int>());
+
+				     /**
+				      * Calls the project_boundary_values()
+				      * function, see above, with
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      */
+  template <int dim, int spacedim>
+  static void project_boundary_values (const DoFHandler<dim,spacedim> &dof,
+				       const typename FunctionMap<spacedim>::type &boundary_function,
+				       const Quadrature<dim-1>        &q,
+				       ConstraintMatrix               &constraints,
+				       std::vector<unsigned int>       component_mapping = std::vector<unsigned int>());
+
 
 				     /**
 				      * Compute the constraints that
