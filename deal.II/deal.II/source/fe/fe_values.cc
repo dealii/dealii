@@ -3269,18 +3269,27 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
  
 				   // test for translation
   {
-				   // otherwise, go through the vertices and
-				   // check... The cell is a translation of
-				   // the previous one in case the distance
-				   // between the individual vertices in the
-				   // two cell is the same for all the
+				   // otherwise, go through the vertices
+				   // and check... The cell is a
+				   // translation of the previous one in
+				   // case the distance between the
+				   // individual vertices in the two
+				   // cell is the same for all the
 				   // vertices. So do the check by first
 				   // getting the distance on the first
-				   // vertex, and then checking whether all
-				   // others have the same.
+				   // vertex, and then checking whether
+				   // all others have the same down to
+				   // rounding errors (we have to be
+				   // careful here because the
+				   // calculation of the displacement
+				   // between one cell and the next can
+				   // already result in the loss of one
+				   // or two digits), so we choose 1e-12
+				   // times the distance between the
+				   // zeroth vertices here.
     bool is_translation = true;
     const Point<spacedim> dist = cell->vertex(0) - present_cell->vertex(0);
-    const double tolerance = 1e-30 * dist.norm_square();
+    const double tolerance = 1e-24 * dist.norm_square();
     for (unsigned int i=1; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       {
 	Point<spacedim> dist_new = cell->vertex(i) - present_cell->vertex(i) - dist;
