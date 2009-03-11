@@ -645,16 +645,16 @@ QGaussLog<1>::QGaussLog(const unsigned int n,
 
   std::vector<double> p=set_quadrature_points(n);
   std::vector<double> w=set_quadrature_weights(n);
-  
-  if (revert == true)
-      revert_points_and_weights(p,w);
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
-      this->quadrature_points[i] = Point<1>(p[i]);
-      this->weights[i]           = w[i];
+	// Using the change of variables x=1-t, it's possible to show
+	// that int f(x)ln|1-x| = int f(1-t) ln|t|, which implies that
+	// we can use this quadrature formula also with weight ln|1-x|.
+	this->quadrature_points[i] = revert ? Point<1>(1-p[n-1-i]) : Point<1>(p[i]);
+	this->weights[i]           = revert ? w[n-1-i] : w[i];
     }
-
+  
 }
 
 template <>
@@ -925,29 +925,63 @@ QGaussLog<1>::set_quadrature_weights(const unsigned int n) const
 }
 
 
-template <> 
-void
-QGaussLog<1>::revert_points_and_weights(std::vector<double> &p,
-					std::vector<double> &w) const
+template<>
+QGaussLogR<1>::QGaussLogR(const unsigned int n, 
+			  const Point<1> origin,
+			  const double alpha) :
+    Quadrature<1>( ( (origin[0] == 0) || (origin[0] == 1) ) ? 
+		   (alpha == 1 ? n : 2*n ) : 4*n ),
+    fraction( ( (origin[0] == 0) || (origin[0] == 1.) ) ? 1. : origin[0] )
 {
+    // The three quadrature formulas that make this one up. There are
+    // at most two when the origin is one of the extremes, and there is
+    // only one if the origin is one of the extremes and alpha is
+    // equal to one.
+    //
+    // If alpha is different from one, then we need a correction which
+    // is performed with a standard Gauss quadrature rule on each
+    // segment. This is not needed in the standard case where alpha is
+    // equal to one and the origin is on one of the extremes. We
+    // integrate with weight ln|(x-o)/alpha|. In the easy cases, we
+    // only need n quadrature points. In the most difficult one, we
+    // need 2*n points for the first segment, and 2*n points for the
+    // second segment.
+    QGaussLog<1> quad1(n, origin[0] != 0);
+    QGaussLog<1> quad2(n);
+    QGauss<1> quad(n);
+    
+    // Check that the origin is inside 0,1
+    Assert( (fraction >= 0) && (fraction <= 1),
+	    ExcMessage("Origin is outside [0,1]."));
 
-  double temp;
-  const unsigned int sz = this->size();
+    // Non singular offset. This is the start of non singular quad
+    // points.
+    unsigned int ns_offset = (fraction == 1) ? n : 2*n;
+    
+    for(unsigned int i=0, j=ns_offset; i<n; ++i, ++j) {
+	// The first i quadrature points are the same as quad1, and
+	// are by default singular.
+	this->quadrature_points[i] = quad1.point(i)*fraction;
+	this->weights[i] = quad1.weight(i)*fraction;
+	
+	// We need to scale with -log|fraction*alpha|
+	if( (alpha != 1) || (fraction != 1) ) {
+	    this->quadrature_points[j] = quad.point(i)*fraction;
+	    this->weights[j] = -log(alpha/fraction)*quad.weight(i)*fraction;
+	}
 
-  for (unsigned int i=0; i<sz/2; i++)
-    {
-      temp = p[sz-1-i];
-      p[sz-1-i] = p[i];
-      p[i]=temp;
-      
-      temp = w[sz-1-i];
-      w[sz-1-i]=w[i];
-      w[i]=temp;      
+	// In case we need the second quadrature as well, do it now.
+	if(fraction != 1) {
+	    this->quadrature_points[i+n] = quad2.point(i)*(1-fraction)+Point<1>(fraction);
+	    this->weights[i+n] = quad2.weight(i)*(1-fraction);
+	    
+	    // We need to scale with -log|fraction*alpha|
+	    this->quadrature_points[j+n] = quad.point(i)*(1-fraction)+Point<1>(fraction);
+	    this->weights[j+n] = -log(alpha/(1-fraction))*quad.weight(i)*(1-fraction);
+	}
     }
-
 }
-
-
+	
 
 
 // construct the quadrature formulae in higher dimensions by

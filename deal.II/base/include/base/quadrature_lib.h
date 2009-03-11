@@ -309,24 +309,18 @@ class QWeddle : public Quadrature<dim>
 
 
 /**
- * Gauss Quadrature Formula to integrate <tt>ln[(x-a)/(b-a)]*f(x)</tt> on the
- * interval <tt>[a,b]</tt>, where f is a smooth function without
- * singularities. See <tt>Numerical Recipes</tt> for more information.  The
- * quadrature formula weights are chosen in order to integrate
- * <tt>f(x)*ln[(x-a)/(b-a)]</tt> (that is, the argument of the logarithm goes
- * linearly from 0 to 1 on the interval of integration). So, the only
- * thing one can specify is the function <tt>f(x)</tt>. Using logarithm
- * properties, one can add the integral of <tt>f(x)*ln(b-a)</tt> (calculated
- * with QGauss class formulas) to the integral of <tt>f(x)*ln[(x-a)/(b-a)]</tt>
- * to finally obtain the integral of <tt>f(x)*ln(x-a)</tt>.  It is also
- * possible to integrate with weighting function <tt>ln[(b-x)/(b-a)]</tt> if
- * revert is set to true.
- * 
- * It works up to <tt>n=12</tt>.
+ * Gauss Quadrature Formula with logarithmic weighting function. This
+ * formula is used to to integrate <tt>ln|x|*f(x)</tt> on the interval
+ * <tt>[0,1]</tt>, where f is a smooth function without
+ * singularities. The collection of quadrature points and weights has
+ * been obtained using <tt>Numerical Recipes</tt>.
  *
-//TODO: implement the calculation of points and weights as it is
-//described in Numerical Recipes, instead of passing them to set_*
-//functions, so that n can also be grater than 12.
+ * Notice that only the function <tt>f(x)</tt> should be provided,
+ * i.e., $\int_0^1 f(x) ln|x| dx = \sum_{i=0}^N w_i f(q_i)$. Setting
+ * the @p revert flag to true at construction time swithces the weight
+ * from <tt>ln|x|</tt> to <tt>ln|1-x|</tt>.
+ *
+ * The weights and functions have been tabulated up to order 12.
  *
  */
 template <int dim>
@@ -355,19 +349,52 @@ class QGaussLog : public Quadrature<dim>
   std::vector<double>
   set_quadrature_weights(const unsigned int n) const;
 
-                                    /**  
-				     * If the singularity is at the rightmost point 
-				     * of the interval just revert the vectors
-				     * of points and weights and everything 
-				     * works.
-				     */
-  void
-  revert_points_and_weights(std::vector<double> &p,
-			    std::vector<double> &w) const;
-
 };
 
 
+
+
+/**
+ * Gauss Quadrature Formula with arbitrary logarithmic weighting
+ * function. This formula is used to to integrate
+ * <tt>ln(|x-x0|/alpha)*f(x)</tt> on the interval <tt>[0,1]</tt>,
+ * where f is a smooth function without singularities, and x0 and
+ * alpha are given at construction time, and are the location of the
+ * singularity <tt>x0</tt> and an arbitrary scaling factor in the
+ * singularity.
+ *
+ * This quadrature formula is rather expensive, since it uses
+ * internally two Gauss quadrature formulas of order n to integrate
+ * the nonsingular part of the factor, and two GaussLog quadrature
+ * formulas to integrate on the separate segments [0,x0] and
+ * [x0,1]. If the singularity is one of the extremes and the factor
+ * alpha is 1, then this quadrature is the same as QGaussLog.
+ *
+ * Notice again that only the function <tt>f(x)</tt> should be
+ * provided, i.e., $\int_0^1 f(x) ln(|x-x0|/alpha) dx = \sum_{i=0}^N
+ * w_i f(q_i)$. 
+ *
+ * The weights and functions have been tabulated up to order 12.
+ *
+ */
+template<int dim>
+class QGaussLogR : public Quadrature<dim> {
+public:
+    /** The constructor takes three arguments arguments: the order of
+     * the gauss formula on each of the segments [0,x0] and [x0,1],
+     * the actual location of the singularity and the scale factor for
+     * the logarithmic function. */
+    QGaussLogR(const unsigned int n, 
+	       const Point<dim> x0 = Point<dim>(), 
+	       const double alpha = 1);
+    
+    double weight_correction(const Point<dim> &q);
+
+protected:
+    /** This is the length of interval (0,origin), or 1 if either of
+     * the two extremes have been selected. */
+    const double fraction;
+};
 
 
 
@@ -391,7 +418,6 @@ template <>
 unsigned int 
 QGaussLobatto<1>::gamma(const unsigned int n) const;
 
-template <> void QGaussLog<1>::revert_points_and_weights(std::vector<double> &, std::vector<double> &) const;
 template <> std::vector<double> QGaussLog<1>::set_quadrature_points(const unsigned int) const;
 template <> std::vector<double> QGaussLog<1>::set_quadrature_weights(const unsigned int) const;
 
@@ -407,6 +433,7 @@ template <> QSimpson<1>::QSimpson ();
 template <> QMilne<1>::QMilne ();
 template <> QWeddle<1>::QWeddle ();
 template <> QGaussLog<1>::QGaussLog (const unsigned int n, const bool revert);
+template <> QGaussLogR<1>::QGaussLogR (const unsigned int n, const Point<1> x0, const double alpha);
 
 
 

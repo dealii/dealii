@@ -402,6 +402,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a new QGaussLogR class, that generalizes the QGaussLog class to 
+  allow for arbitrary location of singularities, and singularity factors.
+  <br> 
+  (Luca Heltai 2009/03/11)
+  </p>
+
+  <li>
+  <p>
   New: The FunctionParser class now supports the fparser library's interface to use
   units (like cm, or km) in expressions. An example is given in the documentation of
   that class.
