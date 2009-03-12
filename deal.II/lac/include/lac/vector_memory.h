@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,7 +15,7 @@
 
 
 #include <base/config.h>
-#include <base/subscriptor.h>
+#include <base/smartpointer.h>
 #include <base/logstream.h>
 #include <base/thread_management.h>
 #include <lac/vector.h>
@@ -114,6 +114,54 @@ class VectorMemory : public Subscriptor
     DeclException0(ExcNotAllocatedHere);
 
 				     //@}
+/**
+ * Pointer to vectors allocated from VectorMemory objects. This
+ * pointer is safe in the sense that it automatically calls free()
+ * when it is destroyed, thus relieving the user from using vector
+ * management functions at all.
+ *
+ * @author Guido Kanschat, 2009
+ */
+    class Pointer
+    {
+      public:
+					 /**
+					  * Constructor, automatically
+					  * allocating a vector from
+					  * @p mem.
+					  */
+	Pointer(VectorMemory<VECTOR>& mem);
+					 /**
+					  * Destructor, automatically
+					  * releasing the vector from
+					  * the memory #pool.
+					  */
+	~Pointer();
+
+					 /**
+					  * Conversion to regular pointer.
+					  */
+	operator VECTOR* () const;
+	
+					 /**
+					  * Dereferencing operator.
+					  */
+	VECTOR& operator * () const;
+	
+					 /**
+					  * Dereferencing operator.
+					  */
+	VECTOR * operator -> () const;
+      private:
+					 /**
+					  * The memory pool used.
+					  */
+	SmartPointer<VectorMemory<VECTOR> > pool;
+					 /**
+					  * The pointer to the vector.
+					  */
+	VECTOR* v;
+    };    
 };
 
 
@@ -349,6 +397,48 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 
 #ifndef DOXYGEN
 /* --------------------- inline functions ---------------------- */
+
+
+template <typename VECTOR>
+inline
+VectorMemory<VECTOR>::Pointer::Pointer(VectorMemory<VECTOR>& mem)
+		:
+		pool(&mem), v(0)
+{
+  v = pool->alloc();
+}
+
+
+template <typename VECTOR>
+inline
+VectorMemory<VECTOR>::Pointer::~Pointer()
+{
+  pool->free(v);
+}
+
+
+template <typename VECTOR>
+inline
+VectorMemory<VECTOR>::Pointer::operator VECTOR* () const
+{
+  return v;
+}
+
+
+template <typename VECTOR>
+inline
+VECTOR & VectorMemory<VECTOR>::Pointer::operator * () const
+{
+  return *v;
+}
+
+
+template <typename VECTOR>
+inline
+VECTOR * VectorMemory<VECTOR>::Pointer::operator -> () const
+{
+  return v;
+}
 
 
 template <typename VECTOR>
