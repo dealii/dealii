@@ -1,6 +1,7 @@
 # Listing of Parameters
 # ---------------------
-set Number of cycles = 3
+set Number of cycles    = 3
+set External refinement = 5
 
 
 subsection Inner quadrature rule
@@ -14,8 +15,20 @@ subsection Outer quadrature rule
   set Quadrature type  = midpoint
 end
 
+subsection Wind function 2d
+  # Any constant used inside the function which is not a variable name.
+  set Function constants  = 
 
-subsection Wind function
+  # Separate vector valued expressions by ';' as ',' is used internally by the
+  # function parser.
+  set Function expression = 1; 0
+
+  # The name of the variables as they will be used in the function, separated
+  # by ','.
+  set Variable names      = x,y,t
+end
+
+subsection Wind function 3d
   # Any constant used inside the function which is not a variable name.
   set Function constants  = 
 

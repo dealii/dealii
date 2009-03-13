@@ -60,10 +60,12 @@ include $D/common/Make.global_options
 # program for other dimensions, or when using third party libraries
 libs.g   = $(lib-deal2-3d.g) \
 	   $(lib-deal2-2d.g) \
+	   $(lib-deal2-1d.g) \
 	   $(lib-lac.g)      \
            $(lib-base.g)
 libs.o   = $(lib-deal2-3d.o) \
 	   $(lib-deal2-2d.o) \
+	   $(lib-deal2-1d.o) \
 	   $(lib-lac.o)      \
            $(lib-base.o)
 
