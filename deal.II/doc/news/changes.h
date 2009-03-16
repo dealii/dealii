@@ -575,6 +575,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Updated: The local_to_global functions in ConstraintMatrix got smarter,
+  which imcreases the speed of sparsity pattern generation with
+  ConstraintMatrix argument, and makes writing into sparse matrices using
+  distribute_local_to_global faster, in case there are many constraints.
+  <br>
+  (Martin Kronbichler 2009/03/16)
+  </p>
+
+  <li>
+  <p>
   Fixed: The FullMatrix::swap_row and FullMatrix::swap_col functions
   had bugs that made them only work in case the matrix was square.
   This is now fixed.

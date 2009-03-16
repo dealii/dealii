@@ -1113,7 +1113,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 			     const Table<2,bool>             &dof_mask) const
 {
 				   // similar to the function for distributing
-				   // matrix entries; see there for comments.
+				   // matrix entries.
   const unsigned int n_local_dofs = local_dof_indices.size();
   bool dof_mask_is_active = false;
   if (dof_mask.n_rows() == n_local_dofs)
@@ -1187,11 +1187,19 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       if (column_indices.size() < n_max_entries_per_row)
 	column_indices.resize(n_max_entries_per_row);
 
-				// TODO (M.K.): Some rows are added
-				// several times in this function. Can
-				// do that more efficiently by keeping a
-				// list of which rows have already been
-				// added.
+				   // we might add the same row with some
+				   // column entries several times when
+				   // using constraints. To avoid doing so,
+				   // we keep a list of (global) rows that
+				   // have already been inserted, which is
+				   // then used to break the loop. This is
+				   // only useful for the case when we leave
+				   // out constrained dofs. Otherwise, there
+				   // are some more entries that we can't
+				   // keep track of that easily.
+      std::vector<unsigned int> already_inserted;
+      already_inserted.reserve(n_local_dofs);
+
       for (unsigned int i=0; i<n_local_dofs; ++i)
         {
           const ConstraintLine *position_i = constraint_lines[i];
@@ -1199,6 +1207,18 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 
 	  if (is_constrained_i == false)
 	    {
+				   // in case we are at a row that has
+				   // already been added, do not need to go
+				   // on. the way how we do it is to first
+				   // find an insertion point and then check
+				   // whether the element is already present
+	      std::vector<unsigned int>::iterator inserted_it = 
+		std::lower_bound(already_inserted.begin(), already_inserted.end(),
+				 local_dof_indices[i]);
+	      if (inserted_it != already_inserted.end())
+		if (*inserted_it == local_dof_indices[i])
+		  continue;
+
 	      unsigned int col_counter = 0;
 	      for (unsigned int j=0; j<n_local_dofs; ++j)
 		{
@@ -1246,6 +1266,10 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		sparsity_pattern.add_entries (local_dof_indices[i],
 					      column_indices.begin(),
 					      column_indices.begin()+col_counter);
+
+				   // now this row has been visited, so se
+	      if (keep_constrained_entries == false)
+		already_inserted.insert(inserted_it, local_dof_indices[i]);
 	    }
 	  else
 	    {
@@ -1302,8 +1326,19 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				// way as in the unconstrained rows.
 	      for (unsigned int p=0; p<position_i->entries.size(); ++p)
 		{
-		  unsigned int col_counter = 0;
 		  const unsigned int row = position_i->entries[p].first;
+
+				   // in case we are at a row that has
+				   // already been added, do not need to go
+				   // on
+		  std::vector<unsigned int>::iterator inserted_it = 
+		    std::lower_bound(already_inserted.begin(), already_inserted.end(),
+				     row);
+		  if (inserted_it != already_inserted.end())
+		    if (*inserted_it == row)
+		      continue;
+
+		  unsigned int col_counter = 0;
 		  for (unsigned int j=0; j<n_local_dofs; ++j)
 		    {
  				        // Again, first check whether
@@ -1338,6 +1373,9 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		    sparsity_pattern.add_entries (row,
 						  column_indices.begin(),
 						  column_indices.begin()+col_counter);
+
+		  if (keep_constrained_entries == false)
+		    already_inserted.insert(inserted_it, row);
 		}
 	    }
 	}
