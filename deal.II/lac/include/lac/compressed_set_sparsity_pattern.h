@@ -430,9 +430,7 @@ void
 CompressedSetSparsityPattern::Line::add_entries (ForwardIterator begin,
 						 ForwardIterator end)
 {
-  // right now, just forward to the individual function.
-  for (ForwardIterator it = begin; it != end; ++it)
-    add (*it);
+  entries.insert (begin, end);
 }
 
 
