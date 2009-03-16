@@ -491,7 +491,7 @@ namespace DoFRenumbering
       {
 	CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
 					     dof_handler.n_dofs());
-	DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
+	DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
 	sparsity.copy_from (csp);
       }
 
