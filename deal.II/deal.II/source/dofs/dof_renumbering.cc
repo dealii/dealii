@@ -16,7 +16,7 @@
 #include <base/utilities.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/sparsity_tools.h>
-#include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
 #include <lac/constraint_matrix.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
@@ -489,10 +489,9 @@ namespace DoFRenumbering
       }
     else
       {
-	CompressedSparsityPattern csp (dof_handler.n_dofs(),
-				       dof_handler.n_dofs());
-	DoFTools::make_sparsity_pattern (dof_handler, csp);
-	constraints.condense (csp);
+	CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
+					     dof_handler.n_dofs());
+	DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
 	sparsity.copy_from (csp);
       }
 
