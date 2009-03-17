@@ -1016,7 +1016,27 @@ namespace TrilinosWrappers
     const VectorReference &
     VectorReference::operator += (const TrilinosScalar &value) const
     {
-      vector.add (1, &index, &value);
+      const int local_row = vector.vector->Map().LID(index);
+      if (local_row == -1)
+	{
+				   // write the code explicitly here to make
+				   // it faster.
+	  if (vector.last_action != Add)
+	    {
+	      if (vector.last_action == Insert)
+		vector.vector->GlobalAssemble(Insert);
+	      vector.last_action = Add;
+	    }
+
+	  const int ierr = vector.vector->SumIntoGlobalValues (1, 
+							       (const int*)(&index), 
+							       &value);
+	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	  vector.compressed = false;
+	}
+      else
+	(*vector.vector)[0][local_row] += value;
+
       return *this;
     }
 
@@ -1174,16 +1194,17 @@ namespace TrilinosWrappers
 		   const unsigned int   *indices,
 		   const TrilinosScalar *values)
   {
-    if (last_action == Insert)
-      vector->GlobalAssemble(Insert);
-
     if (last_action != Add)
-      last_action = Add;
+      {
+	if (last_action == Insert)
+	  vector->GlobalAssemble(Insert);
+	last_action = Add;
+      }
 
     for (unsigned int i=0; i<n_elements; ++i)
       {
 	const unsigned int row = indices[i];
-	const int local_row = vector->Map().LID(indices[i]);
+	const int local_row = vector->Map().LID(row);
 	if (local_row == -1)
 	  {
 	    const int ierr = vector->SumIntoGlobalValues (1, 
