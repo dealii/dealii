@@ -924,6 +924,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	  if (is_constrained_i == false)
 	    {
 	      unsigned int col_counter = 0;
+	      double inhom_correction = 0;
 	      for (unsigned int j=0; j<n_local_dofs; ++j)
 		{
 				       // we don't need to proceed when the
@@ -951,22 +952,25 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // entries according to
                                                    // the information in the
                                                    // constraint line.
-		      for (unsigned int q=0; q<position_j->entries.size(); ++q)
+		      for (unsigned int p=0; p<position_j->entries.size(); ++p)
 			{
-			  column_indices[col_counter] = position_j->entries[q].first;
+			  column_indices[col_counter] = position_j->entries[p].first;
 			  column_values[col_counter] = local_matrix(i,j) *
-			                               position_j->entries[q].second;
+			                               position_j->entries[p].second;
 			  col_counter++;
 			}
 
-				   // need to subtract this element from the
-				   // vector. this corresponds to an
-				   // explicit elimination in the respective
-				   // row of the inhomogeneous constraint in
-				   // the matrix with Gauss elimination
-		      if (use_vectors == true)
-			global_vector(local_dof_indices[i]) -= local_matrix(i,j) * 
-		                                               position_j->inhomogeneity;
+				   // in case of an inhomogeneous
+				   // constraint, we need to take care of
+				   // the elimination of the matrix element
+				   // under consideration, so we safe a
+				   // correction due to inhomogeneity in the
+				   // respective vector. this corresponds to
+				   // an explicit elimination in the
+				   // respective row of the inhomogeneous
+				   // constraint in the matrix with Gauss
+				   // elimination
+		      inhom_correction += local_matrix(i,j) * position_j->inhomogeneity;
 		    }
 		}
 				   // Check whether we did remain within the
@@ -982,7 +986,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				  false);
 
 	      if (use_vectors == true)
-		global_vector(local_dof_indices[i]) += local_vector(i);
+		global_vector(local_dof_indices[i]) += local_vector(i) - inhom_correction;
 	    }
                                                    // ok, row is
                                                    // constrained. this
@@ -1003,6 +1007,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		  unsigned int col_counter = 0;
 		  const unsigned int row = position_i->entries[q].first;
 		  const double weight = position_i->entries[q].second;
+		  double inhom_correction = 0;
 
 		  for (unsigned int j=0; j<n_local_dofs; ++j)
 		    {
@@ -1033,10 +1038,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				                           position_j->entries[p].second;
 			      col_counter++;
 			    }
-
-			  if (use_vectors == true)
-			    global_vector (row) -= local_matrix(i,j) * weight * 
-			                           position_j->inhomogeneity;
+			  inhom_correction += local_matrix(i,j) *
+			                      position_j->inhomogeneity;
 			}
 		    }
 
@@ -1050,8 +1053,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 				   // And we take care of the vector
 		  if (use_vectors == true)
-		    global_vector(row) += local_vector(i) * weight;
-
+		    global_vector(row) += (local_vector(i) - inhom_correction) * weight;
 		}
 
                                                    // to make sure that the
@@ -1096,7 +1098,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 						   // actually do something
 						   // with this dof
 	      global_matrix.add(local_dof_indices[i],local_dof_indices[i],
-				std::max(std::fabs(local_matrix(i,i)), 1e-10));
+				std::fabs(local_matrix(i,i)));
 	    }
 	}
     }
