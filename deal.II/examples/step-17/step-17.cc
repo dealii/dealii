@@ -723,7 +723,7 @@ void ElasticProblem<dim>::assemble_system ()
                                    // programs before) and want to save
                                    // a few cycles during this
                                    // operation.
-  }
+}
 
 
 
