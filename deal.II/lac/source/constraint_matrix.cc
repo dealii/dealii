@@ -2106,8 +2106,15 @@ MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappers::MPI::Bloc
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::VectorBase);
+MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::Vector);
 MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::BlockVector);
+template void ConstraintMatrix::distribute_local_to_global
+<TrilinosWrappers::SparseMatrix,TrilinosWrappers::MPI::Vector> 
+  (const FullMatrix<double>        &, 
+   const Vector<double>            &, 
+   const std::vector<unsigned int> &, 
+   TrilinosWrappers::SparseMatrix &, 
+   TrilinosWrappers::MPI::Vector  &) const;
 template void ConstraintMatrix::distribute_local_to_global
 <TrilinosWrappers::BlockSparseMatrix,TrilinosWrappers::MPI::BlockVector> 
   (const FullMatrix<double>        &, 
