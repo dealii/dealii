@@ -27,10 +27,11 @@ tests_x = grid* \
 	surface* \
 	data_out* \
 	projection*\
-	integrate_log*\
+	integrate*\
 	gradients*\
 	tensor_matrix_conversion*\
 	bem*\
+	bspline*
 	
 	
 
