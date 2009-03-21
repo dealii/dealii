@@ -402,6 +402,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a new QGaussOneOverR class, that allows for integration
+  on the two dimensional reference element of arbitrary polynomial functions
+  with weight 1/R. This class is only instantiated for dim=2, and it is intended
+  for use with collocation type boundary element methods of order 1, where the 
+  singularities are collocated on the vertices of the quadrilaterals. 
+  <br> 
+  (Luca Heltai 2009/03/11)
+  </p>
+
+  <li>
+  <p>
   New: There is now a new QGaussLogR class, that generalizes the QGaussLog class to 
   allow for arbitrary location of singularities, and singularity factors.
   <br> 

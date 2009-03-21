@@ -981,7 +981,82 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 	}
     }
 }
-	
+
+
+
+template<>
+QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n, 
+				  const unsigned int vertex_index) :
+    Quadrature<2>(2*n*n)
+{
+    // Start with the gauss quadrature formula on the (u,v) reference
+    // element.
+    QGauss<2> gauss(n);
+    
+    Assert(gauss.size() == n*n, ExcInternalError());
+    
+    // For the moment we only implemented this for the vertices of a
+    // quadrilateral. We are planning to do this also for the support
+    // points of arbitrary FE_Q elements, to allow the use of this
+    // class in boundary element programs with higher order mappings.
+    Assert(vertex_index < 4, ExcIndexRange(vertex_index, 0, 4));
+    
+    // We create only the first one. All other pieces are rotation of
+    // this one.
+    // In this case the transformation is
+    // 
+    // (x,y) = (u, u tan(pi/4 v))
+    //
+    // with Jacobian
+    //
+    // J = pi/4 R / cos(pi/4 v)
+    //
+    // And we get rid of R to take into account the singularity.
+    std::vector<Point<2> >	&ps = this->quadrature_points;
+    std::vector<double>		&ws = this->weights;
+    double pi4 = numbers::PI/4;
+    
+    for(unsigned int q=0; q<gauss.size(); ++q) {
+	const Point<2> &gp = gauss.point(q);
+	ps[q][0] = gp[0];
+	ps[q][1] = gp[0] * std::tan(pi4*gp[1]);
+	ws[q]    = gauss.weight(q)*pi4/std::cos(pi4 *gp[1]);
+	// The other half of the quadrilateral is symmetric with
+	// respect to xy plane.
+	ws[gauss.size()+q]    = ws[q];
+	ps[gauss.size()+q][0] = ps[q][1];
+	ps[gauss.size()+q][1] = ps[q][0];
+    }
+    
+    // Now we distribute these vertices in the correct manner
+    double theta = 0;
+    switch(vertex_index) {
+    case 0:
+	theta = 0;
+	break;
+    case 1:
+	// 
+	theta = numbers::PI/2;
+	break;
+    case 2:
+	theta = -numbers::PI/2;
+	break;
+    case 3:
+	theta = numbers::PI;
+	break;
+    }
+    
+    double R00 =  std::cos(theta), R01 = -std::sin(theta);
+    double R10 =  std::sin(theta), R11 =  std::cos(theta);
+    
+    if(vertex_index != 0)
+	for(unsigned int q=0; q<size(); ++q) {
+	    double x = ps[q][0]-.5,  y = ps[q][1]-.5;
+	    
+	    ps[q][0] = R00*x + R01*y + .5;
+	    ps[q][1] = R10*x + R11*y + .5;
+	}
+}
 
 
 // construct the quadrature formulae in higher dimensions by

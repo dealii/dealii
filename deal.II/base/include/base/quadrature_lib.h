@@ -387,8 +387,6 @@ public:
     QGaussLogR(const unsigned int n, 
 	       const Point<dim> x0 = Point<dim>(), 
 	       const double alpha = 1);
-    
-    double weight_correction(const Point<dim> &q);
 
 protected:
     /** This is the length of interval (0,origin), or 1 if either of
@@ -396,6 +394,33 @@ protected:
     const double fraction;
 };
 
+
+/**
+ * Gauss Quadrature Formula with 1/R weighting function. This formula
+ * is used to to integrate <tt>1/(R)*f(x)</tt> on the reference
+ * element <tt>[0,1]^2</tt>, where f is a smooth function without
+ * singularities, and R is the distance from the point x to the vertex
+ * xi, given at construction time by specifying its index.
+ *
+ * This quadrature formula is obtained from two QGauss quadrature
+ * formula, upon transforming them into polar coordinate system
+ * centered at the singularity, and then again into another reference
+ * element. This allows for the singularity to be cancelled by part of
+ * the Jacobian of the transformation, which contains R. In practice
+ * the reference element is transformed into a triangle by collapsing
+ * one of the side adjacent to the singularity. The Jacobian of this
+ * transformation contains R, which is removed before scaling the
+ * original quadrature, and this process is repeated for the next
+ */
+template<int dim>
+class QGaussOneOverR : public Quadrature<dim> {
+public:
+    /** The constructor takes two arguments arguments: the order of
+     * the gauss formula, and the index of the vertex where the
+     * singularity is located. */
+    QGaussOneOverR(const unsigned int n, 
+		   const unsigned int vertex_index);
+};
 
 
 
@@ -434,6 +459,7 @@ template <> QMilne<1>::QMilne ();
 template <> QWeddle<1>::QWeddle ();
 template <> QGaussLog<1>::QGaussLog (const unsigned int n, const bool revert);
 template <> QGaussLogR<1>::QGaussLogR (const unsigned int n, const Point<1> x0, const double alpha);
+template <> QGaussOneOverR<2>::QGaussOneOverR (const unsigned int n, const unsigned int index);
 
 
 
