@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -317,7 +317,7 @@ class QWeddle : public Quadrature<dim>
  *
  * Notice that only the function <tt>f(x)</tt> should be provided,
  * i.e., $\int_0^1 f(x) ln|x| dx = \sum_{i=0}^N w_i f(q_i)$. Setting
- * the @p revert flag to true at construction time swithces the weight
+ * the @p revert flag to true at construction time switches the weight
  * from <tt>ln|x|</tt> to <tt>ln|1-x|</tt>.
  *
  * The weights and functions have been tabulated up to order 12.
