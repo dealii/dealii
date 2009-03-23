@@ -3316,7 +3316,7 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
 
 
 template <int dim, int spacedim>
-const enum CellSimilarity::Similarity 
+CellSimilarity::Similarity 
 FEValuesBase<dim,spacedim>::get_cell_similarity () const
 {
   return cell_similarity;
