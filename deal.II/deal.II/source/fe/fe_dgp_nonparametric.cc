@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -292,7 +292,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
   typename Mapping<dim,spacedim>::InternalDataBase&,
   typename Mapping<dim,spacedim>::InternalDataBase& fedata,
   FEValuesData<dim,spacedim>&data,
-  enum CellSimilarity::Similarity &cell_similarity) const
+  enum CellSimilarity::Similarity &/*cell_similarity*/) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
