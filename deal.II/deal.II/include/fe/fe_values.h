@@ -2261,7 +2261,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * result is
 				      * <tt>CellSimilarity::translation</tt>.
 				      */
-    const enum CellSimilarity::Similarity get_cell_similarity () const;
+    CellSimilarity::Similarity get_cell_similarity () const;
 
 				     /**
 				      * Determine an estimate for the
@@ -2622,7 +2622,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * in one of the methods used during
 				      * reinit.
 				      */
-    enum CellSimilarity::Similarity cell_similarity;
+    CellSimilarity::Similarity cell_similarity;
 
 				     /**
 				      * A function that checks whether the
