@@ -104,6 +104,12 @@ as the homogenous Laplace equation for the unknown $\phi$:
 \mathbf{n}\cdot\nabla\phi &= -\mathbf{n}\cdot\mathbf{v}_\infty 
 && \text{on}\ \partial\Omega
 \f}
+while the momentum equation reduces to the Bernoulli's equation 
+\f[
+\frac{p}{\rho} + \frac{\partial \phi}{\partial t} +g z 
++\frac{1}{2} | \nabla \phi |^2 = 0 \in \Omega,
+\f]
+and the pressure and velocity are uncoupled.
 
 We will now reformulate this equation in integral form using the
  Green identity:
@@ -174,29 +180,45 @@ operators, we obtain an equation for $\phi$ just on the boundary of
 $\Omega$:
 
 \f[\label{SD}
-  \frac{1}{2}\phi(\mathbf{x}) = - \left(S [\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
+  \alpha(\mathbf{x})\phi(\mathbf{x}) = 
+  - \left(S [\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
   + 
   (D\phi)(\mathbf{x})
   \quad \mathbf{x}\in \partial\Omega,
 \f]
-which is the integral formulation we were looking for. Substituting the single
+which is the integral formulation we were looking for, where the
+quantity $\alpha(\mathbf{x}_i)$ is the fraction of solid angle by
+which the point $\mathbf{x}_i$ sees the domain $\Omega$.
+
+Substituting the single
   and double layer operators we get:
 \f[               
-  \pi\phi(\mathbf{x})=
-  \int_{\partial \Omega}  \ln|\mathbf{x}-\mathbf{y}| \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
+  \alpha(\mathbf{x}) \phi(\mathbf{x})=
+  \frac{1}{2\pi}\int_{\partial \Omega}  \ln|\mathbf{x}-\mathbf{y}| \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
   +
-  \int_{\partial \Omega}  \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }{ |\mathbf{x}-\mathbf{y}|^2 }\,ds_y 
+  \frac{1}{2\pi}\int_{\partial \Omega}  \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }{ |\mathbf{x}-\mathbf{y}|^2 }\,ds_y 
 \f]                 
 for two dimensional flows and
 \f[               
-  2\pi\phi(\mathbf{x})=\int_{\partial \Omega} -\frac{1}{|\mathbf{x}-\mathbf{y}|} \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
+  \alpha(\mathbf{x}) \phi(\mathbf{x})=
+  \frac{1}{4\pi}\int_{\partial \Omega} -\frac{1}{|\mathbf{x}-\mathbf{y}|} \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
   +
-  \int_{\partial \Omega} \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }{ |\mathbf{x}-\mathbf{y}|^3 }\phi(\mathbf{y})\,ds_y 
+   \frac{1}{4\pi}\int_{\partial \Omega} \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }{ |\mathbf{x}-\mathbf{y}|^3 }\phi(\mathbf{y})\,ds_y 
 \f]                 
 for three dimensional flows, where the normal derivatives of the fundamental
 solutions have been written in a form that makes computation easier. In either
 case, $\phi$ is the solution of an integral equation posed entirely on the
 boundary since both $\mathbf{x},\mathbf{y}\in\partial\Omega$.
+
+Notice that the fraction of angle (in 2d) or solid angle (in 3d)
+$\alpha(\mathbf{x})$ by which the point $\mathbf{x}$ sees the domain
+$\Omega$ can be defined using the double layer potential itself:
+\f[
+\alpha(\mathbf{x}) := 
+\int_{\partial \Omega} \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }
+{ |\mathbf{x}-\mathbf{y}|^{dim} }\phi(\mathbf{y})\,ds_y =
+\int_{\partial \Omega} \frac{ \partial G(\mathbf{x}-\mathbf{y}) }{\partial \mathbf{n}_y} \, ds_y
+\f]
 
 While this example program is really only focused on the solution of the
 boundary integral equation, in a realistic setup one would still need to solve
@@ -216,7 +238,7 @@ $\phi$ on the boundary we have just computed). Finally, we can then recover
 the velocity as $\mathbf{\tilde v}=\nabla \phi$. 
 
 As a final test, let us verify that this velocity indeed satisfies the
-momentum balance equation for a stationary flow field, i.e. whether
+momentum balance equation for a stationary flow field, i.e., whether
 $\mathbf{v}\cdot\nabla\mathbf{v} = -\frac 1\rho \nabla p$ where
 $\mathbf{v}=\mathbf{\tilde
 v}+\mathbf{v}_\infty=\nabla\phi+\mathbf{v}_\infty$ for some (unknown) pressure
@@ -319,68 +341,79 @@ dimension $n$ of the surrounding space $\mathbb{R}^n$.
 We define the finite dimensional space $V_h$ as 
 \f[
   \label{eq:definition-Vh}
-  V_h := \{ v \in L^2(\Gamma) \text{ s.t. } v|_{K_i} \in \mathcal{P}^0(K_i), 
+  V_h := \{ v \in C^0(\Gamma) \text{ s.t. } v|_{K_i} \in \mathcal{Q}^1(K_i), 
   \forall i\},
 \f]
-with basis functions $\psi_i(\mathbf{x}) = \chi_{K_i}(\mathbf{x})$,
-i.e., one if $\mathbf{x}$ belongs to $K_i$, and zero otherwise.  An element
-$\phi_h$ of $V_h$ is uniquely 
-identified by the vector $\boldsymbol{\alpha}$ of its coefficients
+with basis functions $\psi_i(\mathbf{x})$ (the usual FE_Q finite element, 
+with the catch that this time it is defined on a manifold of codimension one).  
+An element $\phi_h$ of $V_h$ is uniquely 
+identified by the vector $\boldsymbol{\phi}$ of its coefficients
 $\phi_i$, that is:
 \f[
   \label{eq:definition-of-element}
   \phi_h(\mathbf{x}) := \phi_i \psi_i(\mathbf{x}), \qquad 
   \boldsymbol{\alpha} := \{ \phi_i \},
 \f]
-where summation  is implied over repeated indexes. Note that we use
+where summation  is implied over repeated indexes. Note that we could use
 discontinuous elements here &mdash; in fact, there is no real reason to use
-continuous ones in the first place since the integral formulation does not
-imply any derivatives on our trial functions so continuity is unnecessary.
+continuous ones since the integral formulation does not
+imply any derivatives on our trial functions so continuity is unnecessary, 
+and often in the literature only piecewise constant elements are used.
 
+<h3> Collocation boundary element method </h3>
 
-<h3> Galerkin boundary element method </h3>
+By far, the most common approximation of boundary integral equations,
+is by use of the collocation based boundary element method.
 
-The usual Galerkin approach for the discretization of the above
-problem gives us the following variational formulation:
+This method requires the evaluation of the boundary integral equation
+at a number of collocation points which is equal to the number of
+unknowns of the system. The choice of these points is a delicate
+matter, that requires a careful study. Assume that these points are
+known for the moment, and call them $\mathbf x_i$ with $i=0...n_dofs$.
+
+The problem then becomes:
 
 Given the datum $\mathbf{v}_\infty$, find a function $\phi_h$ in $V_h$
-such that, for any $\eta$ in $V_h$ the following equation is
-satisfied:
-\f{align*}
-  \label{eq:galerkin-continuous}
-    \int_{\Gamma_x} \phi_h(\mathbf{x}) \eta(\mathbf{x})\,ds_x =
-    & 2\int_{\Gamma_x} \int_{\Gamma_y}
-    G(\mathbf{x}-\mathbf{y}) \, \mathbf{n}_y\cdot\mathbf{v_\infty}
-    \eta(\mathbf{x}) \,ds_x\,ds_y 
-    \\
-    & + 2\int_{\Gamma_x}\int_{\Gamma_y} \frac{ \partial
-      G(\mathbf{x}-\mathbf{y})}{\partial\mathbf{n}_y }
-    \phi_h(\mathbf{y})\eta(\mathbf{x}) \,ds_x\,ds_y.
-\f}
+such that, the following $n_dofs$ equations are satisfied:
 
-The linearity of the integral operator makes this problem equivalent 
-to solving the linear system
+\f{align*}
+    \alpha(mathbf{x}_i) \phi_h(\mathbf{x}_i)  =
+    & \int_{\Gamma_y} G(\mathbf{x}_i-\mathbf{y}) \, 
+    \mathbf{n}_y\cdot\mathbf{v_\infty} \,ds_y 
+    \\
+    & + \int_{\Gamma_y} \frac{ \partial
+      G(\mathbf{x}_i-\mathbf{y})}{\partial\mathbf{n}_y }
+    \phi_h(\mathbf{y}) \,ds_y,
+\f}
+where the quantity $\alpha(\mathbf{x}_i)$ is the fraction of (solid)
+angle by which the point $\mathbf{x}_i$ sees the domain $\Omega$, as 
+explained above.
+
+If the $\mathbf{x}_i$ support points are chosen correctly, then the
+problem can be written as the following linear system:
 \f[
 \label{eq:linear-system}
-(\mathbf{M}-\mathbf{A})\boldsymbol\alpha = \mathbf{b},
+(\mathbf{A}-\mathbf{N})\boldsymbol\phi = \mathbf{b},
 \f]
 where
 \f[
 \begin{aligned}
-\mathbf{M}_{ij}&= |K_i|\delta_{ij}\\
-\mathbf{A}_{ij}&= 2\int_{K_i}\int_{K_j}
-  \frac{\partial G(\mathbf{x}-\mathbf{y})}{\partial \mathbf{n}_y}
-  \psi_i(\mathbf{x})\psi_j(\mathbf{y}) \,ds_x\,ds_y 
+\mathbf{A}_{ii}&= \int_\Gamma 
+\frac{\partial G(\mathbf{x}_i-\mathbf{y})}{\partial \mathbf{n}_y}\,ds_y \\
+\mathbf{N}_{ij}&= \int_\Gamma
+  \frac{\partial G(\mathbf{x}_i-\mathbf{y})}{\partial \mathbf{n}_y}
+  \psi_j(\mathbf{y}) \,ds_y 
 \\
-\mathbf{b}_i&= 2\int_{K_i}  \int_{\Gamma_{h,y}}
-   G(\mathbf{x}-\mathbf{y})  \, \mathbf{n}_y\cdot\mathbf{v_\infty}
-  \psi_i(\mathbf{y}) \,ds_x\,ds_y.
+\mathbf{b}_i&= \int_\Gamma 
+   G(\mathbf{x}_i-\mathbf{y})  \, \mathbf{n}_y\cdot\mathbf{v_\infty}
+  \psi_i(\mathbf{y}) ds_y.
 \end{aligned}
 \f]
 
-The computation of the entries of the matrix $\mathbf{A}$ and of the
-right hand side $\mathbf{b}$ require the evaluation of singular
-integrals on the elements $K_i$ of the triangulation $\mathcal{T}_h$.
+The computation of the entries of the matrices $\mathbf{A}$,
+$\mathbf{N}$ and of the right hand side $\mathbf{b}$ require the
+evaluation of singular integrals on the elements $K_i$ of the
+triangulation $\mathcal{T}_h$.
 
 As usual in these cases, all integrations are performed on a reference
 simple domain, i.e., we assume that each element $K_i$ of
@@ -393,7 +426,7 @@ element $\hat K$.
 <h3> Singular integrals in two dimension. </h3>
 
 In two dimensions it is not necessary to compute the diagonal elements
-$\mathbf{A}_{ii}$ of the system matrix, since, even if the denominator
+$\mathbf{N}_{ii}$ of the system matrix, since, even if the denominator
 goes to zero when $\mathbf{x}=\mathbf{y}$, the numerator is always
 zero because $\mathbf{n}_y$ and $(\mathbf{x}-\mathbf{y})$ are
 orthogonal (on our polygonal approximation of the boundary of $\Omega$), and

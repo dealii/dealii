@@ -1,19 +1,15 @@
 # Listing of Parameters
 # ---------------------
-set Number of cycles    = 3
-set External refinement = 5
+set Extend solution on the -2,2 box = false
+set External refinement             = 5
+set Number of cycles                = 3
 
 
-subsection Inner quadrature rule
-  set Quadrature order = 2
+subsection Quadrature rule
+  set Quadrature order = 5
   set Quadrature type  = gauss
 end
 
-
-subsection Outer quadrature rule
-  set Quadrature order = 0
-  set Quadrature type  = midpoint
-end
 
 subsection Wind function 2d
   # Any constant used inside the function which is not a variable name.
@@ -27,6 +23,7 @@ subsection Wind function 2d
   # by ','.
   set Variable names      = x,y,t
 end
+
 
 subsection Wind function 3d
   # Any constant used inside the function which is not a variable name.
