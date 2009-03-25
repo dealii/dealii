@@ -299,7 +299,8 @@ class BlockSparsityPatternBase : public Subscriptor
     template <typename ForwardIterator>
     void add_entries (const unsigned int row, 
 		      ForwardIterator    begin,
-		      ForwardIterator    end);
+		      ForwardIterator    end,
+		      const bool         indices_are_sorted = false);
 
 				     /**
 				      * Return number of rows of this
@@ -1088,7 +1089,8 @@ template <typename ForwardIterator>
 void
 BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int row,
 							    ForwardIterator    begin,
-							    ForwardIterator    end)
+							    ForwardIterator    end,
+							    const bool         indices_are_sorted)
 {
 				   // Resize scratch arrays
   if (block_column_indices.size() < this->n_block_cols())
@@ -1162,7 +1164,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int r
       sub_objects[row_index.first][block_col]->
 	add_entries (row_index.second,
 		     block_column_indices[block_col].begin(),
-		     block_column_indices[block_col].begin()+counter_within_block[block_col]);
+		     block_column_indices[block_col].begin()+counter_within_block[block_col],
+		     indices_are_sorted);
     }
 }
 
