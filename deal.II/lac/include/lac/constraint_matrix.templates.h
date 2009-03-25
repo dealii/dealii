@@ -22,6 +22,8 @@
 #include <lac/sparse_matrix.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_sparse_matrix.h>
+#include <lac/petsc_block_sparse_matrix.h>
+#include <lac/petsc_parallel_block_sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/block_sparse_matrix.h>
 
