@@ -226,7 +226,8 @@ class CompressedSetSparsityPattern : public Subscriptor
     template <typename ForwardIterator>
     void add_entries (const unsigned int row, 
 		      ForwardIterator    begin,
-		      ForwardIterator    end);
+		      ForwardIterator    end,
+		      const bool         indices_are_sorted = false);
 
 				     /**
 				      * Check if a value at a certain
@@ -471,7 +472,8 @@ inline
 void
 CompressedSetSparsityPattern::add_entries (const unsigned int row,
 					   ForwardIterator begin,
-					   ForwardIterator end)
+					   ForwardIterator end,
+					   const bool         /*indices_are_sorted*/)
 {
   Assert (row < rows, ExcIndexRange (row, 0, rows));
 

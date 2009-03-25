@@ -810,7 +810,8 @@ namespace TrilinosWrappers
       template <typename ForwardIterator>
       void add_entries (const unsigned int row,
 			ForwardIterator    begin,
-			ForwardIterator    end);
+			ForwardIterator    end,
+			const bool         indices_are_sorted = false);
 //@}
 /**
  * @name Access of underlying Trilinos data
@@ -1318,7 +1319,8 @@ namespace TrilinosWrappers
   void
   SparsityPattern::add_entries (const unsigned int row,
 				ForwardIterator    begin,
-				ForwardIterator    end)
+				ForwardIterator    end,
+				const bool         /*indices_are_sorted*/)
   {
     if (begin == end)
       return;

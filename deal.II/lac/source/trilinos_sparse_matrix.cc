@@ -1081,7 +1081,7 @@ namespace TrilinosWrappers
   SparseMatrix::l1_norm () const
   {
     if (matrix->Filled() == false)
-      matrix->FillComplete(col_map, row_map, true);
+      matrix->GlobalAssemble(col_map, row_map, true);
 
     TrilinosScalar result = matrix->NormOne();
 
@@ -1094,7 +1094,7 @@ namespace TrilinosWrappers
   SparseMatrix::linfty_norm () const
   {
     if (matrix->Filled() == false)
-      matrix->FillComplete(col_map, row_map, true);
+      matrix->GlobalAssemble(col_map, row_map, true);
 
     TrilinosScalar result = matrix->NormInf();
 
@@ -1107,7 +1107,7 @@ namespace TrilinosWrappers
   SparseMatrix::frobenius_norm () const
   {
     if (matrix->Filled() == false)
-      matrix->FillComplete(col_map, row_map, true);
+      matrix->GlobalAssemble(col_map, row_map, true);
 
     TrilinosScalar result = matrix->NormFrobenius();
 
@@ -1149,7 +1149,7 @@ namespace TrilinosWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     if (matrix->Filled() == false)
-      matrix->FillComplete(col_map, row_map, true);
+      matrix->GlobalAssemble(col_map, row_map, true);
 
     Assert (src.vector_partitioner().SameAs(matrix->DomainMap()) == true,
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
@@ -1170,7 +1170,7 @@ namespace TrilinosWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     if (matrix->Filled() == false)
-      matrix->FillComplete(col_map, row_map, true);
+      matrix->GlobalAssemble(col_map, row_map, true);
 
     Assert (src.vector_partitioner().SameAs(matrix->RangeMap()) == true,
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));

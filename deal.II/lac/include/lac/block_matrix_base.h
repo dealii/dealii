@@ -674,7 +674,8 @@ class BlockMatrixBase : public Subscriptor
 	      const unsigned int  n_cols,
 	      const unsigned int *col_indices,
 	      const number       *values,
-	      const bool          elide_zero_values = true);
+	      const bool          elide_zero_values = true,
+	      const bool          col_indices_are_sorted = false);
 
 				     /**
 				      * Return the value of the entry
@@ -882,6 +883,18 @@ class BlockMatrixBase : public Subscriptor
 				      * Final iterator of row <tt>r</tt>.
 				      */
     const_iterator end (const unsigned int r) const;
+
+				     /**
+				      * Return a reference to the underlying
+				      * BlockIndices data of the rows.
+				      */
+    const BlockIndices & get_row_indices () const;
+
+				     /**
+				      * Return a reference to the underlying
+				      * BlockIndices data of the rows.
+				      */
+    const BlockIndices & get_column_indices () const;
 
       				     /** @addtogroup Exceptions
 				      * @{ */
@@ -2047,11 +2060,59 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
 				  const unsigned int   n_cols,
 				  const unsigned int  *col_indices,
 				  const number        *values,
-				  const bool           elide_zero_values)
+				  const bool           elide_zero_values,
+				  const bool           col_indices_are_sorted)
 {
 				   // TODO: Look over this to find out
 				   // whether we can do that more
 				   // efficiently.
+  if (col_indices_are_sorted == true)
+    {
+#ifdef DEBUG
+				   // check whether indices really are
+				   // sorted.
+      unsigned int before = col_indices[0];
+      for (unsigned int i=1; i<n_cols; ++i)
+	if (col_indices[i] <= before)
+	  Assert (false, ExcMessage ("Flag col_indices_are_sorted is set, but "
+				     "indices appear to not be sorted."))
+	else
+	  before = col_indices[i];
+#endif
+      const std::pair<unsigned int,unsigned int> 
+	row_index = this->row_block_indices.global_to_local (row);
+
+      if (this->n_block_cols() > 1)
+	{
+	  const unsigned int * first_block = std::lower_bound (col_indices,
+							       col_indices+n_cols,
+							       this->column_block_indices.block_start(1));
+
+	  const unsigned int n_zero_block_indices = first_block - col_indices;
+	  block(row_index.first, 0).add (row_index.second, 
+					 n_zero_block_indices, 
+					 col_indices,
+					 values,
+					 elide_zero_values,
+					 col_indices_are_sorted);
+
+	  if (n_zero_block_indices < n_cols)
+	    this->add(row, n_cols - n_zero_block_indices, first_block,
+		      values + n_zero_block_indices, elide_zero_values,
+		      false);
+	}
+      else
+	{
+	  block(row_index.first, 0). add (row_index.second, 
+					  n_cols, 
+					  col_indices,
+					  values,
+					  elide_zero_values,
+					  col_indices_are_sorted);
+	}
+						     
+      return;
+    }
 
 				   // Resize scratch arrays
   if (column_indices.size() < this->n_block_cols())
@@ -2136,7 +2197,8 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
 	 counter_within_block[block_col], 
 	 &column_indices[block_col][0],
 	 &column_values[block_col][0],
-	 false);
+	 false,
+	 col_indices_are_sorted);
     }
 }
 
@@ -2232,6 +2294,24 @@ BlockMatrixBase<MatrixType>::operator /= (const value_type factor)
       block(r,c) *= factor_inv;
 
   return *this;
+}
+
+
+
+template <class MatrixType>
+const BlockIndices & 
+BlockMatrixBase<MatrixType>::get_row_indices () const
+{
+  return this->row_block_indices;
+}
+
+
+
+template <class MatrixType>
+const BlockIndices & 
+BlockMatrixBase<MatrixType>::get_column_indices () const
+{
+  return this->column_block_indices;
 }
 
 

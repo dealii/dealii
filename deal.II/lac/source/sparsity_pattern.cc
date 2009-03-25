@@ -869,7 +869,8 @@ template <typename ForwardIterator>
 void
 SparsityPattern::add_entries (const unsigned int row,
 			      ForwardIterator    begin,
-			      ForwardIterator    end)
+			      ForwardIterator    end,
+			      const bool         /*indices_are_sorted*/)
 {
   // right now, just forward to the other function.
   for (ForwardIterator it = begin; it != end; ++it)
@@ -1137,14 +1138,17 @@ template void SparsityPattern::copy_from<double> (const FullMatrix<double> &, bo
 
 template void SparsityPattern::add_entries<const unsigned int*> (const unsigned int,
 								 const unsigned int*,
-								 const unsigned int*);
+								 const unsigned int*,
+								 const bool);
 template void SparsityPattern::add_entries<std::vector<unsigned int>::const_iterator> 
 (const unsigned int,
  std::vector<unsigned int>::const_iterator,
- std::vector<unsigned int>::const_iterator);
+ std::vector<unsigned int>::const_iterator,
+ const bool);
 template void SparsityPattern::add_entries<std::vector<unsigned int>::iterator> 
 (const unsigned int,
  std::vector<unsigned int>::iterator,
- std::vector<unsigned int>::iterator);
+ std::vector<unsigned int>::iterator,
+ const bool);
 
 DEAL_II_NAMESPACE_CLOSE

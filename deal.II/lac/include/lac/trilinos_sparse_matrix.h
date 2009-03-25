@@ -1104,7 +1104,8 @@ namespace TrilinosWrappers
 		const unsigned int    n_cols,
 		const unsigned int   *col_indices,
 		const TrilinosScalar *values,
-		const bool            elide_zero_values = true);
+		const bool            elide_zero_values = true,
+		const bool            col_indices_are_sorted = false);
 
                                        /**
                                         * Multiply the entire matrix
@@ -2422,7 +2423,8 @@ namespace TrilinosWrappers
 		     const unsigned int    n_cols,
 		     const unsigned int   *col_indices,
 		     const TrilinosScalar *values,
-		     const bool            elide_zero_values)
+		     const bool            elide_zero_values,
+		     const bool            /*col_indices_are_sorted*/)
   {
     int ierr;
     if (last_action == Insert)

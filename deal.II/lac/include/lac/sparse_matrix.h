@@ -961,7 +961,8 @@ class SparseMatrix : public virtual Subscriptor
 	      const unsigned int  n_cols,
 	      const unsigned int *col_indices,
 	      const number2      *values,
-	      const bool          elide_zero_values = true);
+	      const bool          elide_zero_values = true,
+	      const bool          col_indices_are_sorted = false);
 
 				     /**
 				      * Multiply the entire matrix by a
@@ -2246,9 +2247,79 @@ SparseMatrix<number>::add (const unsigned int  row,
 			   const unsigned int  n_cols,
 			   const unsigned int *col_indices,
 			   const number2      *values,
-			   const bool          elide_zero_values)
+			   const bool          elide_zero_values,
+			   const bool          col_indices_are_sorted)
 {
   Assert (cols != 0, ExcNotInitialized());
+
+				   // if we have sufficiently many columns
+				   // and sorted indices it is faster to
+				   // just go through the column indices and
+				   // look whether we found one, rather than
+				   // doing a binary search for every column
+  if (col_indices_are_sorted == true)
+   if (n_cols * 8 > cols->row_length(row))
+    {
+				   // check whether the given indices are
+				   // really sorted
+#ifdef DEBUG
+      for (unsigned int i=1; i<n_cols; ++i)
+	Assert (col_indices[i] > col_indices[i-1], 
+		ExcMessage("Indices are not sorted."));
+#endif
+      if (cols->optimize_diagonal() == true)
+	{
+	  const unsigned int * this_cols = 
+	    &cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
+	  number * val_ptr = &val[cols->get_rowstart_indices()[row]];
+	  Assert (this_cols[0] == row, ExcInternalError());
+	  unsigned int counter = 1;
+	  for (unsigned int i=0; i<n_cols; ++i)
+	    {
+				   // diagonal
+	      if (col_indices[i] == row)
+		{
+		  if (values[i] != 0)
+		    val_ptr[0] += values[i];
+		  continue;
+		}
+	      
+	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
+
+	      while (this_cols[counter] < col_indices[i])
+		++counter;
+
+	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
+		      ExcInvalidIndex(row,col_indices[i]));
+
+	      if (values[i] != 0)
+		val_ptr[counter] += values[i];
+	    }
+	  Assert (counter < cols->row_length(row), ExcInternalError());
+	}
+      else
+	{
+	  const unsigned int * this_cols = 
+	    &cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
+	  number * val_ptr = &val[cols->get_rowstart_indices()[row]];
+	  unsigned int counter = 0;
+	  for (unsigned int i=0; i<n_cols; ++i)
+	    {
+	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
+	      
+	      while (this_cols[counter] < col_indices[i])
+		++counter;
+
+	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
+		      ExcInvalidIndex(row,col_indices[i]));
+
+	      if (values[i] != 0)
+		val_ptr[counter] += values[i];
+	    }
+	  Assert (counter < cols->row_length(row), ExcInternalError());
+	}
+      return;
+    }
 
   unsigned int n_columns = 0;
 
@@ -2261,7 +2332,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // First, search all the indices to find
 				   // out which values we actually need to
 				   // add.
-				   // TODO: Could probably made more
+				   // TODO: Could probably be made more
 				   // efficient.
   for (unsigned int j=0; j<n_cols; ++j)
     {

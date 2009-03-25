@@ -598,7 +598,8 @@ namespace PETScWrappers
 		const unsigned int  n_cols,
 		const unsigned int *col_indices,
 		const PetscScalar  *values,
-		const bool          elide_zero_values = true);
+		const bool          elide_zero_values = true,
+		const bool          col_indices_are_sorted = false);
 
                                        /**
                                         * Remove all elements from
@@ -1580,7 +1581,8 @@ namespace PETScWrappers
 		   const unsigned int  n_cols,
 		   const unsigned int *col_indices,
 		   const PetscScalar  *values,
-		   const bool          elide_zero_values)
+		   const bool          elide_zero_values,
+		   const bool          /*col_indices_are_sorted*/)
   {
     if (last_action != LastAction::add)
       {

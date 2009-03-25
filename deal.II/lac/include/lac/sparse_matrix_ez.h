@@ -566,7 +566,8 @@ class SparseMatrixEZ : public Subscriptor
 	      const unsigned int  n_cols,
 	      const unsigned int *col_indices,
 	      const number2      *values,
-	      const bool          elide_zero_values = true);
+	      const bool          elide_zero_values = true,
+	      const bool          col_indices_are_sorted = false);
 
 				     /**
 				      * Copy the given matrix to this
@@ -1486,7 +1487,8 @@ void SparseMatrixEZ<number>::add (const unsigned int  row,
 				  const unsigned int  n_cols,
 				  const unsigned int *col_indices,
 				  const number2      *values,
-				  const bool          elide_zero_values)
+				  const bool          elide_zero_values,
+				  const bool          /*col_indices_are_sorted*/)
 {
 //TODO: This function can surely be made more efficient
   for (unsigned int j=0; j<n_cols; ++j)
