@@ -149,7 +149,7 @@ namespace Evaluation
 
 	    evaluation_point_found = true;
 	    break;
-	  };
+	  }
 
     AssertThrow (evaluation_point_found,
 		 ExcEvaluationPointNotFound(evaluation_point));
@@ -350,7 +350,7 @@ namespace Evaluation
 					     // be at a following
 					     // vertex as well:
 	    break;
-	  };
+	  }
 
 				     // Now we have looped over all
 				     // cells and vertices, so check
@@ -711,7 +711,7 @@ namespace LaplaceSolver
 	    linear_system.matrix.add (local_dof_indices[i],
 				      local_dof_indices[j],
 				      cell_matrix(i,j));
-      };
+      }
   }
 
 
@@ -1464,7 +1464,7 @@ namespace Data
 	      100*std::sin(10*p(i)+5*p(0)*p(0)) * p(0)*p(0);
 	t3 += 100*std::cos(10*p(i)+5*p(0)*p(0))*std::cos(10*p(i)+5*p(0)*p(0)) -
 	      100*std::sin(10*p(i)+5*p(0)*p(0));
-      };
+      }
     t1 = t1*t1;
     
     return -u*(t1+t2+t3);
@@ -1669,7 +1669,7 @@ namespace Data
 	     ++j)
 	  cells[i].vertices[j] = cell_vertices[i][j];
 	cells[i].material_id = 0;
-      };
+      }
 
 				     // Finally pass all this
 				     // information to the library to
@@ -1928,7 +1928,7 @@ namespace DualFunctional
 					     // since we are finished:
 	    rhs(cell->vertex_dof_index(vertex,0)) = 1;
 	    return;
-	  };
+	  }
 
 				     // Finally, a sanity check: if we
 				     // somehow got here, then we must
@@ -2082,7 +2082,7 @@ namespace DualFunctional
 		cell_rhs(i) += fe_values.shape_grad(i,q)[0] *
 			       fe_values.JxW (q);
 	      total_volume += fe_values.JxW (q);
-	    };
+	    }
 
 					   // If we have the local
 					   // contributions,
@@ -2091,7 +2091,7 @@ namespace DualFunctional
 	  cell->get_dof_indices (local_dof_indices);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    rhs(local_dof_indices[i]) += cell_rhs(i);
-	};
+	}
 
 				     // After we have looped over all
 				     // cells, check whether we have
@@ -3023,7 +3023,7 @@ namespace LaplaceSolver
 		 ExcInternalError());
 	  error_indicators(present_cell)
 	    -= 0.5*face_integrals[cell->face(face_no)];
-	};
+	}
     std::cout << "   Estimated error="
 	      << std::accumulate (error_indicators.begin(),
 				  error_indicators.end(), 0.)
@@ -3158,7 +3158,7 @@ namespace LaplaceSolver
 	      {
 		face_integrals[cell->face(face_no)] = 0;
 		continue;
-	      };
+	      }
 	    
 					     // Next, note that since
 					     // we want to compute the
@@ -3571,7 +3571,7 @@ namespace LaplaceSolver
 			    face_data.fe_face_values_neighbor.JxW(p));
 	face_integrals[neighbor_child->face(neighbor_neighbor)]
 	  = face_integral;
-      };
+      }
 
 				     // Once the contributions of all
 				     // sub-faces are computed, loop
@@ -3595,7 +3595,7 @@ namespace LaplaceSolver
 		ExcInternalError());
       
 	sum += face_integrals[face->child(subface_no)];
-      };
+      }
 				     // Finally store the value with
 				     // the parent face.
     face_integrals[face] = sum;
@@ -3824,7 +3824,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 						      descriptor.data->get_boundary_values(),
 						      *descriptor.dual_functional);
 	break;
-      };
+      }
        
       case ProblemDescription::global_refinement:
       {
@@ -3836,7 +3836,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 						      descriptor.data->get_right_hand_side(),
 						      descriptor.data->get_boundary_values());
 	break;
-      };
+      }
        
       case ProblemDescription::kelly_indicator:
       {
@@ -3848,7 +3848,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 						     descriptor.data->get_right_hand_side(),
 						     descriptor.data->get_boundary_values());
 	break;
-      };
+      }
 
       case ProblemDescription::weighted_kelly_indicator:
       {
@@ -3861,11 +3861,11 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 							     descriptor.data->get_boundary_values(),
 							     *descriptor.kelly_weight);
 	break;
-      };
+      }
 	    
       default:
 	    AssertThrow (false, ExcInternalError());
-    };
+    }
   
 				   // Now that all objects are in
 				   // place, run the main loop. The
@@ -3899,14 +3899,14 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 	{
 	  (*e)->set_refinement_cycle (step);
 	  solver->postprocess (**e);
-	};
+	}
 
 	    
       if (solver->n_dofs() < descriptor.max_degrees_of_freedom)
 	solver->refine_grid ();
       else
 	break;
-    };
+    }
 
 				   // After the loop has run, clean up
 				   // the screen, and delete objects
@@ -4058,7 +4058,7 @@ int main ()
 		<< "----------------------------------------------------"
 		<< std::endl;
       return 1;
-    };
+    }
 
   return 0;
 }
