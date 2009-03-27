@@ -1426,27 +1426,6 @@ class ConstraintMatrix : public Subscriptor
 				      * time.
 				      */
     mutable Threads::ThreadMutex mutex;
-
-				     /**
-				      * A temporary array for the function
-				      * <tt>distribute_local_to_global()</tt>
-				      * that collects column indices for
-				      * values that should be written into
-				      * the same row (so that we can write
-				      * the values collectively into the
-				      * sparse matrix, which is faster).
-				      */
-    mutable std::vector<unsigned int> column_indices;
-
-				     /**
-				      * A temporary array for the function
-				      * <tt>distribute_local_to_global()</tt>
-				      * that collects values that should be
-				      * written into the same row (so that
-				      * we can write them collectively into
-				      * the sparse matrix, which is faster).
-				      */
-    mutable std::vector<double> column_values;
 };
 
 

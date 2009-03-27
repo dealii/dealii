@@ -738,37 +738,31 @@ distribute_local_to_global (const Vector<double>            &local_vector,
                                    // have a special case where there are no
                                    // constraints at all, since then we can be
                                    // a lot faster
-  if (lines.size() == 0)
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+  for (unsigned int i=0; i<n_local_dofs; ++i)
     {
-      for (unsigned int i=0; i<n_local_dofs; ++i)
-        global_vector(local_dof_indices[i]) += local_vector(i);
-    }
-  else
-    {
-      for (unsigned int i=0; i<n_local_dofs; ++i)
-        {
 				   // let's see if we can use the bool
 				   // vector that tells about whether a
 				   // certain constraint exists.
-	  if (constraint_line_exists.size() <= local_dof_indices[i])
-	    {
-	      global_vector(local_dof_indices[i]) += local_vector(i);
-	      continue;
-	    }
-	  if (constraint_line_exists[local_dof_indices[i]] == false)
-	    {
-	      global_vector(local_dof_indices[i]) += local_vector(i);
-	      continue;
-	    }
+      if (constraint_line_exists.size() <= local_dof_indices[i])
+	{
+	  global_vector(local_dof_indices[i]) += local_vector(i);
+	  continue;
+	}
+      if (constraint_line_exists[local_dof_indices[i]] == false)
+	{
+	  global_vector(local_dof_indices[i]) += local_vector(i);
+	  continue;
+	}
                                            // first figure out whether this
                                            // dof is constrained
-          ConstraintLine index_comparison;
-          index_comparison.line = local_dof_indices[i];
+      ConstraintLine index_comparison;
+      index_comparison.line = local_dof_indices[i];
 
-          const std::vector<ConstraintLine>::const_iterator
-            position = std::lower_bound (lines.begin(),
-                                         lines.end(),
-                                         index_comparison);
+      const std::vector<ConstraintLine>::const_iterator
+	position = std::lower_bound (lines.begin(),
+				     lines.end(),
+				     index_comparison);
 
                                            // if the line is not
                                            // constrained, then simply
@@ -799,12 +793,11 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 					   // the nodes to which it is
 					   // constrained are also
 					   // fixed
-	  Assert (position->line == local_dof_indices[i],
-		  ExcInternalError());
-	  for (unsigned int j=0; j<position->entries.size(); ++j)
-	    global_vector(position->entries[j].first)
-	      += local_vector(i) * position->entries[j].second;
-        }
+      Assert (position->line == local_dof_indices[i],
+	      ExcInternalError());
+      for (unsigned int j=0; j<position->entries.size(); ++j)
+	global_vector(position->entries[j].first)
+	  += local_vector(i) * position->entries[j].second;
     }
 }
 
@@ -1535,8 +1528,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // ints (for global columns) and internal
 				   // data (containing local columns +
 				   // possible jumps from
-				   // constraints). Choosing an STL map
-				   // would be much more expensive here!
+				   // constraints). Choosing an STL map or
+				   // anything else I know of would be much
+				   // more expensive here!
   typedef std::vector<std::pair<unsigned int,internals::distributing> > row_data;
   row_data my_indices;
   my_indices.reserve(n_local_dofs);
