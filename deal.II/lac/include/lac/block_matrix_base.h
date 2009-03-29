@@ -61,7 +61,7 @@ struct IsBlockMatrix
 				      * exception of BlockSparseMatrixEZ.
 				      */
     template <typename T>
-    static yes_type is_derived_from_BlockMatrixBase (const BlockMatrixBase<T> *);
+    static yes_type check_for_block_matrix (const BlockMatrixBase<T> *);
 
 				     /**
 				      * Overload for BlockSparseMatrixEZ,
@@ -70,14 +70,14 @@ struct IsBlockMatrix
 				      * time of writing this class.
 				      */
     template <typename T>
-    static yes_type is_derived_from_BlockMatrixBase (const BlockSparseMatrixEZ<T> *);
+    static yes_type check_for_block_matrix (const BlockSparseMatrixEZ<T> *);
 
 				     /**
 				      * Catch all for all other potential
 				      * matrix types that are not block
 				      * matrices.
 				      */
-    static no_type is_derived_from_BlockMatrixBase (...);
+    static no_type check_for_block_matrix (...);
 
   public:
 				     /**
@@ -87,7 +87,7 @@ struct IsBlockMatrix
 				      * matrix (in fact whether the type is
 				      * derived from BlockMatrix<T>).
 				      */
-    static const bool value = (sizeof(is_derived_from_BlockMatrixBase
+    static const bool value = (sizeof(check_for_block_matrix
 				      ((MatrixType*)0))
 			       ==
 			       sizeof(yes_type));
