@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -39,6 +39,7 @@ tests_x = vector-vector vector_memory \
 	block_vector \
 	block_vector_* \
 	block_matrices \
+	is_block_matrix \
 	matrix_lib \
 	matrix_out \
 	pointer_matrix \
