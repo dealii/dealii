@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,77 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename> class MatrixIterator;
+template <typename MatrixType> class BlockMatrixBase;
+template <typename number>     class BlockSparseMatrixEZ;
 
+/**
+ * A class that can be used to determine whether a given type is a block
+ * matrix type or not. For example,
+ * @code
+ *   IsBlockMatrix<SparseMatrix<double> >::value
+ * @encode
+ * has the value false, whereas
+ * @code
+ *   IsBlockMatrix<BlockSparseMatrix<double> >::value
+ * @encode
+ * is true. This is sometimes useful in template contexts where we may
+ * want to do things differently depending on whether a template type
+ * denotes a regular or a block matrix type.
+ *
+ * @author Wolfgang Bangerth, 2009
+ */
+template <typename MatrixType>
+struct IsBlockMatrix
+{
+  private:
+    struct yes_type { char c[1]; };
+    struct no_type  { char c[2]; };
+
+				     /**
+				      * Overload returning true if the class
+				      * is derived from BlockMatrixBase, which
+				      * is what block matrices do (with the
+				      * exception of BlockSparseMatrixEZ.
+				      */
+    template <typename T>
+    static yes_type is_derived_from_BlockMatrixBase (const BlockMatrixBase<T> *);
+
+				     /**
+				      * Overload for BlockSparseMatrixEZ,
+				      * which is the only block matrix not
+				      * derived from BlockMatrixBase at the
+				      * time of writing this class.
+				      */
+    template <typename T>
+    static yes_type is_derived_from_BlockMatrixBase (const BlockSparseMatrixEZ<T> *);
+
+				     /**
+				      * Catch all for all other potential
+				      * matrix types that are not block
+				      * matrices.
+				      */
+    static no_type is_derived_from_BlockMatrixBase (...);
+
+  public:
+				     /**
+				      * A statically computable value that
+				      * indicates whether the template
+				      * argument to this class is a block
+				      * matrix (in fact whether the type is
+				      * derived from BlockMatrix<T>).
+				      */
+    static const bool value = (sizeof(is_derived_from_BlockMatrixBase
+				      ((MatrixType*)0))
+			       ==
+			       sizeof(yes_type));
+};
+
+
+// instantiation of the static member
+template <typename MatrixType>
+const bool IsBlockMatrix<MatrixType>::value;
+
+    
 
 /*! @addtogroup Matrix1
  *@{
