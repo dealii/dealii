@@ -29,6 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename> class MatrixIterator;
 template <typename MatrixType> class BlockMatrixBase;
+template <typename SparsityType> class BlockSparsityPatternBase;
 template <typename number>     class BlockSparseMatrixEZ;
 
 /**
@@ -56,12 +57,22 @@ struct IsBlockMatrix
 
 				     /**
 				      * Overload returning true if the class
-				      * is derived from BlockMatrixBase, which
-				      * is what block matrices do (with the
-				      * exception of BlockSparseMatrixEZ.
+				      * is derived from BlockMatrixBase,
+				      * which is what block matrices do
+				      * (with the exception of
+				      * BlockSparseMatrixEZ).
 				      */
     template <typename T>
     static yes_type check_for_block_matrix (const BlockMatrixBase<T> *);
+
+				     /**
+				      * Overload returning true if the class
+				      * is derived from
+				      * BlockSparsityPatternBase, which is
+				      * what block sparsity patterns do.
+				      */
+    template <typename T>
+    static yes_type check_for_block_matrix (const BlockSparsityPatternBase<T> *);
 
 				     /**
 				      * Overload for BlockSparseMatrixEZ,

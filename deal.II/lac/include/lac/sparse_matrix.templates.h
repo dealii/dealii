@@ -1451,7 +1451,9 @@ template <typename number>
 unsigned int
 SparseMatrix<number>::memory_consumption () const
 {
-  return sizeof(*this) + max_len*sizeof(number);
+  return sizeof(*this) + max_len*sizeof(number) + 
+    global_indices.size()*sizeof(unsigned int) + 
+    column_values.size()*sizeof(number);
 }
 
 

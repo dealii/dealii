@@ -19,6 +19,7 @@
 #include <base/subscriptor.h>
 #include <base/table.h>
 #include <base/thread_management.h>
+#include <base/template_constraints.h>
 
 #include <vector>
 #include <map>
@@ -1426,6 +1427,60 @@ class ConstraintMatrix : public Subscriptor
 				      * time.
 				      */
     mutable Threads::ThreadMutex mutex;
+
+				     /**
+				      * This function actually implements
+				      * the local_to_global function for
+				      * standard (non-block) matrices.
+				      */
+    template <typename MatrixType, typename VectorType>
+    void
+    distribute_local_to_global (const FullMatrix<double>        &local_matrix,
+				const Vector<double>            &local_vector,
+                                const std::vector<unsigned int> &local_dof_indices,
+                                MatrixType                      &global_matrix,
+				VectorType                      &global_vector,
+				internal::bool2type<false>) const;
+
+				     /**
+				      * This function actually implements
+				      * the local_to_global function for
+				      * block matrices.
+				      */
+    template <typename MatrixType, typename VectorType>
+    void
+    distribute_local_to_global (const FullMatrix<double>        &local_matrix,
+				const Vector<double>            &local_vector,
+                                const std::vector<unsigned int> &local_dof_indices,
+                                MatrixType                      &global_matrix,
+				VectorType                      &global_vector,
+				internal::bool2type<true>) const;
+
+				     /**
+				      * This function actually implements
+				      * the local_to_global function for
+				      * standard (non-block) sparsity types.
+				      */
+    template <typename SparsityType>
+    void
+    add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
+				 SparsityType                    &sparsity_pattern,
+				 const bool                       keep_constrained_entries,
+				 const Table<2,bool>             &dof_mask,
+				 internal::bool2type<false>) const;
+
+				     /**
+				      * This function actually implements
+				      * the local_to_global function for
+				      * block sparsity types.
+				      */
+    template <typename SparsityType>
+    void
+    add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
+				 SparsityType                    &sparsity_pattern,
+				 const bool                       keep_constrained_entries,
+				 const Table<2,bool>             &dof_mask,
+				 internal::bool2type<true>) const;
 };
 
 
