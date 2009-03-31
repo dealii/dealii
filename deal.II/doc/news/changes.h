@@ -160,6 +160,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Updated: Configure mechanism and a few PETSc functions in the lac directory 
+  have been upgraded to support migration to PETSc version >=3.0.0 in anaology
+  to the existing interface.
+  <br>
+  (Toby D. Young 2009/03/31)
+  </p>
+
+  <li>
+  <p>
   New: A new tutorial program  @ref step_34 "step-34" was added to the 
   library that shows the usage of the new codimension one functionality
   recently added to the library. In this tutorial we show the use of 
@@ -282,7 +291,7 @@ inconvenience this causes.
   <li>
   <p> 
   New: The deal.II configure script now autodetects SLEPc, an eigenvalue
-  solver.
+  solver. Currently on SLEPc versions >=3.0.0 are supported.
   <br>
   (Toby D. Young 2008/11/27)
   </p>

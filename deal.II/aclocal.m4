@@ -5363,7 +5363,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
 
           dnl Make sure that what was specified is actually correct
           if test ! -d $DEAL_II_PETSC_DIR/include \
-               -o ! -d $DEAL_II_PETSC_DIR/lib ; then
+               ; then
             AC_MSG_ERROR([Path to PETSc specified with --with-petsc does not
  		  	  point to a complete PETSc installation])
 	  fi
@@ -5378,7 +5378,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
 
           dnl Make sure that what this is actually correct
           if test ! -d $DEAL_II_PETSC_DIR/include \
-               -o ! -d $DEAL_II_PETSC_DIR/lib ; then
+               ; then
             AC_MSG_ERROR([The path to PETSc specified in the PETSC_DIR
 	  		  environment variable does not
  			  point to a complete PETSc installation])
@@ -5497,6 +5497,14 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
         fi
         ;;
 
+      3.*)
+        if test ! -d $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib \
+             ; then
+          AC_MSG_ERROR([PETSc has not been compiled for the architecture
+                        specified with --with-petsc-arch])
+        fi
+        ;;
+
       *)
         AC_MSG_ERROR([Unknown PETSc version])
 	;;
@@ -5559,10 +5567,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
 ])
 
 
-
 dnl ------------------------------------------------------------
 dnl Check whether SLEPc is installed, and if so store the 
-dnl respective links
+dnl respective links. 
 dnl
 dnl Usage: DEAL_II_CONFIGURE_SLEPC
 dnl
@@ -5570,13 +5577,13 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
 [
   dnl First check for the SLEPc directory
-  AC_MSG_CHECKING(for SLEPc library directory)
+  AC_MSG_CHECKING(for SLEPc include directory)
 
   AC_ARG_WITH(slepc,
   [  --with-slepc=/path/to/slepc  Specify the path to the SLEPc installation,
-                          of which the include and library directories
-                          are subdirs; use this if you want to override
-                          the SLEPC_DIR environment variable.],
+                               for which the include directory is a subdir; 
+                               use this if you want to override the SLEPC_DIR 
+                               environment variable.],
      [
         dnl Special case when someone does --with-slepc=no
         if test "x$withval" = "xno" ; then
@@ -5588,8 +5595,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
 	  AC_MSG_RESULT($DEAL_II_SLEPC_DIR)
 
           dnl Make sure that what was specified is actually correct
-          if test ! -d $DEAL_II_SLEPC_DIR/include \
-               -o ! -d $DEAL_II_SLEPC_DIR/lib ; then
+          if test ! -d $DEAL_II_SLEPC_DIR \
+               -o ! -d $DEAL_II_SLEPC_DIR/include \
+               ; then
             AC_MSG_ERROR([Path to SLEPc specified with --with-slepc does not
  		  	  point to a complete SLEPc installation])
 	  fi
@@ -5603,11 +5611,12 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
 	  AC_MSG_RESULT($DEAL_II_SLEPC_DIR)
 
           dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_SLEPC_DIR/include \
-               -o ! -d $DEAL_II_SLEPC_DIR/lib ; then
+          if test ! -d $DEAL_II_SLEPC_DIR \
+               -o ! -d $DEAL_II_SLEPC_DIR/include \
+               ; then
             AC_MSG_ERROR([The path to SLEPc specified in the SLEPC_DIR
-	  		  environment variable does not
- 			  point to a complete SLEPc installation])
+	  		  environment variable does not point to a
+ 			  complete SLEPc installation])
 	  fi
         else
 	  USE_CONTRIB_SLEPC=no
@@ -5626,14 +5635,13 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
     dnl defining the string "DEAL_II_USE_SLEPC" for the preprocessor. If
     dnl we don't have no SLEPc, then it does not define this string.
     DEAL_II_DEFINE_DEAL_II_USE_SLEPC=DEAL_II_USE_SLEPC
-
   fi
 
-
   dnl If we have found SLEPc, determine additional pieces of data
-  if test "$USE_CONTRIB_SLEPC" = "yes" ; then
-    DEAL_II_CONFIGURE_SLEPC_VERSION
+  if test "$USE_CONTRIB_SLEPC" = "yes" \
+       ; then
     DEAL_II_CONFIGURE_SLEPC_ARCH
+    DEAL_II_CONFIGURE_SLEPC_VERSION
 
     dnl Finally set with_slepc if this hasn't happened yet
     if test "x$with_slepc" = "x" ; then
@@ -5645,8 +5653,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
 
 
 dnl ------------------------------------------------------------
-dnl Figure out the architecture used for SLEPc, since that determines
-dnl where object and configuration files will be found.
+dnl Figure out the architecture used for SLEPc and if the 
+dnl library directory exists, since that determines where object
+dnl and configuration files will be found.
 dnl
 dnl Usage: DEAL_II_CONFIGURE_SLEPC_ARCH
 dnl
@@ -5657,8 +5666,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_ARCH, dnl
 
   AC_ARG_WITH(slepc-arch,
   [  --with-slepc-arch=architecture  Specify the architecture for your SLEPc
-                          installation; use this if you want to override
-                          the SLEPC_ARCH environment variable.],
+                                  installation; use this if you want to  
+                                  override the SLEPC_ARCH environment variable.],
      [
         DEAL_II_SLEPC_ARCH="$withval"
 	AC_MSG_RESULT($DEAL_II_SLEPC_ARCH)
@@ -5675,10 +5684,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_ARCH, dnl
         fi
      ])
 
-
   if test "x$SLEPC_ARCH" != "x" ; then
     dnl Make sure that what was specified is actually correct.
-    if test ! -d $DEAL_II_SLEPC_DIR/lib/$DEAL_II_SLEPC_ARCH \
+    if test ! -d $DEAL_II_SLEPC_DIR/$DEAL_II_SLEPC_ARCH \
+         -o ! -d $DEAL_II_SLEPC_DIR/$DEAL_II_SLEPC_ARCH/lib \
          ; then
       AC_MSG_ERROR([SLEPc has not been compiled for the architecture
                     specified with --with-slepc-arch])
@@ -5687,7 +5696,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_ARCH, dnl
 
   dnl Then check that PETSc and SLEPc architectures are compatible 
   dnl ie. that they are the same.
-  if test "$DEAL_II_SLEPC_ARCH" != "$DEAL_II_PETSC_ARCH" ; then
+  if test "$DEAL_II_SLEPC_ARCH" != "$DEAL_II_PETSC_ARCH" \
+       ; then
       	  AC_MSG_ERROR([If SLEPc is used, you must specify the same 
                         architecture as your PETSc Installation either
                         through the SLEPC_ARCH environment variable,
@@ -5725,9 +5735,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_VERSION, dnl
 
   dnl Then check that PETSc and SLEPc versions are compatible 
   dnl ie. that they are equivalent.
-  if test "${DEAL_II_PETSC_VERSION_MAJOR}"    != "${DEAL_II_SLEPC_VERSION_MAJOR}" \
-       -o "${DEAL_II_PETSC_VERSION_MINOR}"    != "${DEAL_II_SLEPC_VERSION_MINOR}" \
-       -o "${DEAL_II_PETSC_VERSION_SUBMINOR}" != "${DEAL_II_SLEPC_VERSION_SUBMINOR}" ; then
+  if test "${PETSC_VERSION}" != "${SLEPC_VERSION}" \
+       ; then
       	  AC_MSG_ERROR([If SLEPc is used, you must use the same version
                         number as your PETSc Installation])
   fi 

@@ -124,36 +124,53 @@ endif
 # for all PETSc libraries in our own lib directory, and have this one
 # twiddle with whatever is necessary to link in PETSc.
 #
-# to make things more fun, the whole scheme was changed in petsc 2.3.0
+# to make things more fun, the whole scheme was changed in petsc 2.3.0 
+# and then again in petsc 3.0.0
 #
 # also sort of annoying is the fact that on Mac OS X, the trick with the
 # one library doesn't appear to work. Instead of a single library, we therefore
 # have to list all of them, at least if we are using shared libs.
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
-    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
-    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
-  else
-    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
-    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
-  endif
-  ifeq ($(findstring darwin,$(TARGET)),)
-    lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
-    lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
-  else
-    ifeq ($(enable-shared),yes)
-      lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
-      lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
+    ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
+      lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
+      lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
     else
+      lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
+      lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
+    endif
+    ifeq ($(findstring darwin,$(TARGET)),)
       lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
       lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
+    else
+      ifeq ($(enable-shared),yes)
+        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+      else
+        lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
+        lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
+      endif
+    endif  
+  else
+    lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
+    lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
+    ifeq ($(findstring darwin,$(TARGET)),)
+      lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
+      lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
+    else
+      ifeq ($(enable-shared),yes)
+        lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
+        lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
+      else
+        lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
+        lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
+      endif
     endif
-  endif  
+  endif
 endif
 
-# similar (and simpler) for slepc
 ifeq ($(USE_CONTRIB_SLEPC),yes)
-  lib-contrib-slepc = $(DEAL_II_SLEPC_DIR)/lib/$(DEAL_II_SLEPC_ARCH)/libslepc$(lib-suffix)
+  lib-contrib-slepc    = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_SLEPC_ARCH)/lib/libslepc$(lib-suffix)
 endif
 
 # same for metis, except that there is only one library in that case
@@ -233,9 +250,13 @@ lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
-include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
+ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
+  include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
+else
+  include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/include
+endif
 include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
-include-path-slepc-bmake     = $(DEAL_II_SLEPC_DIR)/bmake/$(DEAL_II_SLEPC_ARCH)
+include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_SLEPC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-metis           = $(DEAL_II_METIS_INCDIR)
 
@@ -263,7 +284,7 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
 endif
 
 ifeq ($(USE_CONTRIB_SLEPC),yes)
-  INCLUDE += -I$(include-path-slepc) -I$(include-path-slepc-bmake)
+  INCLUDE += -I$(include-path-slepc) -I$(include-path-slepc-conf)
 endif
 
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
@@ -290,10 +311,14 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   # set PETSC_DIR and PETSC_ARCH to be used in variables file
   PETSC_DIR  = $(DEAL_II_PETSC_DIR)
   PETSC_ARCH = $(DEAL_II_PETSC_ARCH)
-  ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
-    include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
+  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
+    ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
+      include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
+    else
+      include $(DEAL_II_PETSC_DIR)/bmake/common/variables
+    endif
   else
-    include $(DEAL_II_PETSC_DIR)/bmake/common/variables
+    include $(DEAL_II_PETSC_DIR)/conf/variables
   endif
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)
