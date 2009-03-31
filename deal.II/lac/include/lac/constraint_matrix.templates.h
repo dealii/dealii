@@ -1048,7 +1048,7 @@ namespace internals
   list_shellsort (std::vector<std::pair<unsigned int,distributing> > &my_indices)
   {
 				   // now sort the actual dofs using a shell
-				   // sort (which is very fast in case the
+				   // sort which is very fast in case the
 				   // indices are already sorted (which is
 				   // the usual case with DG elements)
     unsigned int i, j, j2, temp, templ, istep;
@@ -1120,6 +1120,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   Assert (sorted == true, ExcMatrixNotClosed());
 
   const unsigned int n_local_dofs = local_dof_indices.size();
+
+  double average_diagonal = 0;
+  for (unsigned int i=0; i<n_local_dofs; ++i)
+    average_diagonal += std::fabs (local_matrix(i,i));
+  average_diagonal /= n_local_dofs;
 
 				   // when distributing the local data to
 				   // the global matrix, we can quite
@@ -1234,9 +1239,10 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // hanging nodes in 3d). however, in the
 				   // line below, we do actually do
 				   // something with this dof
+      const double new_diagonal = std::fabs(local_matrix(local_row,local_row)) != 0 ?
+	std::fabs(local_matrix(local_row,local_row)) : average_diagonal;
       Threads::ThreadMutex::ScopedLock lock(mutex);
-      global_matrix.add(global_row,global_row,
-			std::fabs(local_matrix(local_row,local_row)));
+      global_matrix.add(global_row, global_row, new_diagonal);
     }
 
   const unsigned int n_actual_dofs = my_indices.size();
@@ -1460,6 +1466,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   const unsigned int n_local_dofs = local_dof_indices.size();
   const unsigned int num_blocks   = global_matrix.n_block_rows();
 
+  double average_diagonal = 0;
+  for (unsigned int i=0; i<n_local_dofs; ++i)
+    average_diagonal += std::fabs (local_matrix(i,i));
+  average_diagonal /= n_local_dofs;
+
   std::vector<std::pair<unsigned int,internals::distributing> > my_indices (n_local_dofs);
   std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
   constraint_lines.reserve(n_local_dofs);
@@ -1512,9 +1523,10 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				  (local_row, position->entries[q].second));
 	}
 
+      const double new_diagonal = std::fabs(local_matrix(local_row,local_row)) != 0 ?
+	std::fabs(local_matrix(local_row,local_row)) : average_diagonal;
       Threads::ThreadMutex::ScopedLock lock(mutex);
-      global_matrix.add(global_row,global_row,
-			std::fabs(local_matrix(local_row,local_row)));
+      global_matrix.add(global_row, global_row, new_diagonal);
     }
 
   const unsigned int n_actual_dofs = my_indices.size();

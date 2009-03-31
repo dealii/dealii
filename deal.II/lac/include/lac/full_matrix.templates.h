@@ -545,6 +545,37 @@ FullMatrix<number>::equ (const number               a,
 
 
 
+namespace internal
+{
+				   // a namespace into which we import
+				   // the global definitions of the
+				   // LAPACK functions getrf for
+				   // various data types and add
+				   // general templates for all other
+				   // types. this allows to call the
+				   // getrf function for all data
+				   // types but generated an exception
+				   // if something is called for a
+				   // data type not supported by
+				   // LAPACK.
+  namespace gemm_switch
+  {
+    using ::gemm;
+
+    template <typename T, typename T2>
+    void
+    gemm (const char*, const char*,  const int*, const int*, const int*,
+	  const T*, const T2*, const int*, const T*, const int*,
+	  const T*, T2*, const int*)
+    {
+      Assert (false, LAPACKSupport::ExcMissing("dgemm for this data type"));
+    }
+    
+  }
+}
+
+
+
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
@@ -555,6 +586,60 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
   Assert (n() == src.m(), ExcDimensionMismatch(n(), src.m()));
   Assert (dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
   Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
+
+				   // see if we can use Lapack algorithms
+				   // for this and if the type for 'number'
+				   // works for us (it is usually not
+				   // efficient to use Lapack for very small
+				   // matrices):
+#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+  if ((types_are_equal<number,double>::value
+       ||
+       types_are_equal<number,float>::value)
+      &&
+      types_are_equal<number,number2>::value)
+    if (this->n_cols() > 25)
+    {
+				       // In case we have the LAPACK
+				       // function gemm detected at
+				       // configure, we use that algorithms
+				       // for matrix-matrix multiplication
+				       // since it provides better
+				       // performance than the deal.II
+				       // native functions (it uses cache
+				       // and register blocking in order to
+				       // access local data).
+				       //
+				       // Note that BLAS/LAPACK stores
+				       // matrix elements column-wise (i.e.,
+				       // all values in one column, then all
+				       // in the next, etc.), whereas the
+				       // FullMatrix stores them row-wise.
+				       // We ignore that difference, and
+				       // give our row-wise data to LAPACK,
+				       // let LAPACK build the product of
+				       // transpose matrices, and read the
+				       // result as if it were row-wise
+				       // again. In other words, we calculate 
+				       // (B^T A^T)^T, which is AB.
+
+      const int m = src.n();
+      const int n = this->m();
+      const int k = this->n();
+      const char *notrans = "n";
+
+      const number alpha = 1.;
+      const number beta = (adding == true) ? 1. : 0.;
+
+				       // Use the LAPACK function getrf for 
+				       // calculating the LU factorization.
+      internal::gemm_switch::gemm(notrans, notrans, &m, &n, &k, &alpha, &src(0,0), &m,
+				  this->val, &k, &beta, &dst(0,0), &m);
+
+      return;
+    }
+
+#endif
 
   if (!adding)
     for (unsigned int i=0; i<m(); i++)
@@ -588,6 +673,63 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
   Assert (src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
+
+
+				   // see if we can use Lapack algorithms
+				   // for this and if the type for 'number'
+				   // works for us (it is usually not
+				   // efficient to use Lapack for very small
+				   // matrices):
+#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+  if ((types_are_equal<number,double>::value
+       ||
+       types_are_equal<number,float>::value)
+      &&
+      types_are_equal<number,number2>::value)
+    if (this->n_cols() > 25)
+    {
+				       // In case we have the LAPACK
+				       // function gemm detected at
+				       // configure, we use that algorithms
+				       // for matrix-matrix multiplication
+				       // since it provides better
+				       // performance than the deal.II
+				       // native functions (it uses cache
+				       // and register blocking in order to
+				       // access local data).
+				       //
+				       // Note that BLAS/LAPACK stores
+				       // matrix elements column-wise (i.e.,
+				       // all values in one column, then all
+				       // in the next, etc.), whereas the
+				       // FullMatrix stores them row-wise.
+				       // We ignore that difference, and
+				       // give our row-wise data to LAPACK,
+				       // let LAPACK build the product of
+				       // transpose matrices, and read the
+				       // result as if it were row-wise
+				       // again. In other words, we calculate 
+				       // (B^T A^T)^T, which is AB.
+
+      const int m = src.n();
+      const int n = this->n();
+      const int k = this->m();
+      const char *trans = "t";
+      const char *notrans = "n";
+
+      const number alpha = 1.;
+      const number beta = (adding == true) ? 1. : 0.;
+
+				       // Use the LAPACK function getrf for 
+				       // calculating the LU factorization.
+      internal::gemm_switch::gemm(notrans, trans, &m, &n, &k, &alpha, &src(0,0), &m,
+				  this->val, &n, &beta, &dst(0,0), &m);
+
+      return;
+    }
+
+#endif
+
 
   if (!adding)
     for (unsigned int i=0; i<n(); i++)
@@ -1392,14 +1534,17 @@ FullMatrix<number>::gauss_jordan ()
   Assert (!this->empty(), ExcEmptyMatrix());  
   Assert (this->n_cols() == this->n_rows(), ExcNotQuadratic());
 
-				   // see if we can use Lapack
-				   // algorithms for this and if the
-				   // type for 'number' works for us:
+				   // see if we can use Lapack algorithms
+				   // for this and if the type for 'number'
+				   // works for us (it is usually not
+				   // efficient to use Lapack for very small
+				   // matrices):
 #if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) && \
     defined(HAVE_DGETRI_) && defined (HAVE_SGETRI_)
   if (types_are_equal<number,double>::value
       ||
       types_are_equal<number,float>::value)
+    if (this->n_cols() > 15)
     {
 				       // In case we have the LAPACK functions 
 				       // getrf and getri detected at configure, 

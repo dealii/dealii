@@ -247,6 +247,9 @@
 /* Define to 1 if you have the `dgeev_' function. */
 #undef HAVE_DGEEV_
 
+/* Define to 1 if you have the `dgemm_' function. */
+#undef HAVE_DGEMM_
+
 /* Define to 1 if you have the `dgemv_' function. */
 #undef HAVE_DGEMV_
 
@@ -353,6 +356,9 @@
 
 /* Define to 1 if you have the `sgeev_' function. */
 #undef HAVE_SGEEV_
+
+/* Define to 1 if you have the `sgemm_' function. */
+#undef HAVE_SGEMM_
 
 /* Define to 1 if you have the `sgemv_' function. */
 #undef HAVE_SGEMV_

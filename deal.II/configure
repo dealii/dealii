@@ -16109,7 +16109,9 @@ done
 
 
 
-for ac_func in dgesvd_ sgesvd_ dgetrf_ sgetrf_ dgetri_ sgetri_
+
+
+for ac_func in dgesvd_ sgesvd_ dgemm_ sgemm_ dgetrf_ sgetrf_ dgetri_ sgetri_
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for $ac_func" >&5

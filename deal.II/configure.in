@@ -551,7 +551,7 @@ if test "x$with_blas" != "x" -a "x$with_blas" != "xno" ; then
 fi
 
 AC_CHECK_FUNCS([daxpy_ saxpy_ dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_])
-AC_CHECK_FUNCS([dgesvd_ sgesvd_ dgetrf_ sgetrf_ dgetri_ sgetri_])
+AC_CHECK_FUNCS([dgesvd_ sgesvd_ dgemm_ sgemm_ dgetrf_ sgetrf_ dgetri_ sgetri_])
 AC_CHECK_FUNCS([dgetrs_ sgetrs_ dstev_ sstev_])
 
 dnl -------------------------------------------------------------
