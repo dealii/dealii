@@ -526,10 +526,16 @@ namespace PETScWrappers
   }  
 
   void
-  MatrixBase::transpose () 
+  MatrixBase::transpose ()
   {
     int ierr;
+
+#if (PETSC_VERSION_MAJOR <= 2) 
     ierr = MatTranspose(matrix, PETSC_NULL);
+#else
+    ierr = MatTranspose(matrix, MAT_REUSE_MATRIX, &matrix);
+#endif
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -544,12 +550,17 @@ namespace PETScWrappers
   }  
 
   PetscTruth
-  MatrixBase::is_hermitian () 
+  MatrixBase::is_hermitian (const double tolerance) 
   {
     PetscTruth truth;
                                        // First flush PETSc caches
     compress ();
+
+#if (PETSC_VERSION_MAJOR <= 2) 
     MatIsHermitian (matrix, &truth);
+#else
+    MatIsHermitian (matrix, tolerance, &truth);
+#endif
     return truth;
   }  
 
@@ -559,10 +570,15 @@ namespace PETScWrappers
                                        // First flush PETSc caches
     compress ();
 
-                                       // Write to screen
+                                       // Set options
+#if (PETSC_VERSION_MAJOR <= 2) 
     PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
 			  PETSC_VIEWER_ASCII_DEFAULT);
-
+#else
+    PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+			  PETSC_VIEWER_DEFAULT);
+#endif
+                                       // Write to screen
     MatView (matrix,PETSC_VIEWER_STDOUT_WORLD);
   }
 

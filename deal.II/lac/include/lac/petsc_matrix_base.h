@@ -1092,9 +1092,10 @@ namespace PETScWrappers
                                         /** 
 					 * Test whether a matrix is Hermitian, 
 					 * i.e. it is the complex conjugate 
-					 * of its transpose. 
+					 * of its transpose. Default tolerance 
+					 * is zero. 
 					 */
-      PetscTruth is_hermitian ();
+      PetscTruth is_hermitian (const double tol = 0.0);
 
                                         /* 
 					 * Abstract PETSc object that helps view 
