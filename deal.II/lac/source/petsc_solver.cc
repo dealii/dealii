@@ -163,8 +163,15 @@ namespace PETScWrappers
                                          // checks with the solver_control
                                          // object we have in this object for
                                          // convergence
+#if (PETSC_VERSION_MAJOR <= 2) 
         KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                reinterpret_cast<void *>(&solver_control));
+#else
+        KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
+                               reinterpret_cast<void *>(&solver_control),
+			       PETSC_NULL);
+#endif
+
       }
     
                                      // then do the real work: set up solver
@@ -252,7 +259,6 @@ namespace PETScWrappers
     
 
 /* ---------------------- SolverRichardson ------------------------ */
-
 
   SolverRichardson::AdditionalData::
   AdditionalData (const double omega)
@@ -446,7 +452,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 */
                                      // so rather expand their macros by hand,
-                                     // and do some equally nast stuff that at
+                                     // and do some equally nasty stuff that at
                                      // least doesn't yield warnings...
     int (*fun_ptr)(KSP,int); 
     ierr = PetscObjectQueryFunction((PetscObject)(ksp),

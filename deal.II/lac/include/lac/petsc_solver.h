@@ -668,8 +668,6 @@ namespace PETScWrappers
       virtual void set_solver_type (KSP &ksp) const;
   };
 
-
-
 /**
  * An implementation of the solver interface using the PETSc CG Squared
  * solver.
