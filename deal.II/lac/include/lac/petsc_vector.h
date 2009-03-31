@@ -285,7 +285,7 @@ namespace PETScWrappers
     ierr = VecScatterCreateToAll (static_cast<const Vec &>(v), &ctx, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     
-#if ((PETSC_VERSION_MAJOR >= 2) && \
+#if ((PETSC_VERSION_MAJOR == 2) && \
     (PETSC_VERSION_MINOR < 3) &&  \
     (PETSC_VERSION_SUBMINOR < 3))
 

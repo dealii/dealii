@@ -234,7 +234,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
-#if (PETSC_VERSION_MAJOR >= 2) && (PETSC_VERSION_MINOR < 3) && (PETSC_VERSION_SUBMINOR < 1)
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 3) && (PETSC_VERSION_SUBMINOR < 1)
     PCICCSetLevels (pc, additional_data.levels);
 #else
     PCFactorSetLevels (pc, additional_data.levels);
@@ -274,7 +274,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
-#if (PETSC_VERSION_MAJOR >= 2) && (PETSC_VERSION_MINOR < 3) && (PETSC_VERSION_SUBMINOR < 1)
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 3) && (PETSC_VERSION_SUBMINOR < 1)
     PCILUSetLevels (pc, additional_data.levels);  
 #else
     PCFactorSetLevels (pc, additional_data.levels);
@@ -318,14 +318,14 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // set flags as given
-#if (PETSC_VERSION_MAJOR >= 2) && (PETSC_VERSION_MINOR >= 3) && (PETSC_VERSION_SUBMINOR >= 1)
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >= 3) && (PETSC_VERSION_SUBMINOR >= 1)
     ierr = PCLUSetPivoting (pc, additional_data.pivoting);
 #else
     ierr = PCFactorSetPivoting (pc, additional_data.pivoting);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if (PETSC_VERSION_MAJOR >= 2) && (PETSC_VERSION_MINOR < 3)
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 3)
     ierr = PCLUSetZeroPivot (pc, additional_data.zero_pivot);
 #else
     ierr = PCFactorSetZeroPivot (pc, additional_data.zero_pivot);
@@ -333,7 +333,7 @@ namespace PETScWrappers
     
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if (PETSC_VERSION_MAJOR >= 2) && (PETSC_VERSION_MINOR < 3)
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 3)
     ierr = PCLUSetDamping (pc, additional_data.damping);
 #else
     ierr = PCFactorSetShiftNonzero (pc, additional_data.damping);
