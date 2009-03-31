@@ -286,23 +286,25 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     
 #if ((PETSC_VERSION_MAJOR >= 2) && \
-    (PETSC_VERSION_MINOR >=3) &&  \
-    (PETSC_VERSION_SUBMINOR >=3))
+    (PETSC_VERSION_MINOR < 3) &&  \
+    (PETSC_VERSION_SUBMINOR < 3))
 
+    ierr = VecScatterBegin (static_cast<const Vec &>(v), vector,
+                            INSERT_VALUES, SCATTER_FORWARD, ctx);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+   
+    ierr = VecScatterEnd (static_cast<const Vec &>(v), vector,
+                          INSERT_VALUES, SCATTER_FORWARD, ctx);
+
+#else
+    
     ierr = VecScatterBegin (ctx,static_cast<const Vec &>(v), vector,
                             INSERT_VALUES, SCATTER_FORWARD);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = VecScatterEnd (ctx, static_cast<const Vec &>(v), vector,
                           INSERT_VALUES, SCATTER_FORWARD);
-#else
-    
-    ierr = VecScatterBegin (static_cast<const Vec &>(v), vector,
-                            INSERT_VALUES, SCATTER_FORWARD, ctx);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-    ierr = VecScatterEnd (static_cast<const Vec &>(v), vector,
-                          INSERT_VALUES, SCATTER_FORWARD, ctx);
 #endif        
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
