@@ -192,8 +192,14 @@ namespace PETScWrappers
                                        // set symmetric flag, if so requested
       if (is_symmetric == true)
         {
+#if (PETSC_VERSION_MAJOR <= 2) 
           const int ierr
             = MatSetOption (matrix, MAT_SYMMETRIC);
+#else
+	  const int ierr
+	    = MatSetOption (matrix, MAT_SYMMETRIC, PETSC_TRUE);
+#endif
+
           AssertThrow (ierr == 0, ExcPETScError(ierr));
         }
     }
@@ -246,8 +252,14 @@ namespace PETScWrappers
                                        // set symmetric flag, if so requested
       if (is_symmetric == true)
         {
+#if (PETSC_VERSION_MAJOR <= 2) 
           const int ierr
             = MatSetOption (matrix, MAT_SYMMETRIC);
+#else
+	  const int ierr
+	    = MatSetOption (matrix, MAT_SYMMETRIC, PETSC_TRUE);
+#endif
+
           AssertThrow (ierr == 0, ExcPETScError(ierr));
         }    
     }
@@ -453,7 +465,15 @@ namespace PETScWrappers
 				           // further entries, so PETSc can
 				           // internally optimize some data
 				           // structures.
-	  MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
+#if (PETSC_VERSION_MAJOR <= 2) 
+          const int ierr =
+	    MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
+#else
+          const int ierr =
+	    MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+#endif
+	  
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
         }
     }
 
