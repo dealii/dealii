@@ -448,6 +448,17 @@ namespace PETScWrappers
 
 
 
+  VectorBase &
+  VectorBase::mult () 
+  {
+    const int ierr = VecPointwiseMult (vector,vector,vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return *this;
+  }
+
+
+
   bool
   VectorBase::all_zero () const
   {

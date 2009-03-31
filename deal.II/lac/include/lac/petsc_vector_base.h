@@ -455,6 +455,14 @@ namespace PETScWrappers
                                         */
       VectorBase & conjugate ();
 
+				       /**
+                                        * A collective piecewise
+					* multiply operation. TODO:
+					* The model for this function
+					* should be similer to add ().
+                                        */
+      VectorBase & mult (); 
+
                                        /**
                                         * Return whether the vector contains
                                         * only elements with value zero. This
