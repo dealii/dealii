@@ -2153,10 +2153,16 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      *
 				      * For surface evaluations
 				      * (i.e. classes FEFaceValues or
-				      * FESubfaceValues), is the
+				      * FESubfaceValues), it is the
 				      * mapped surface element times
 				      * the weight of the quadrature
 				      * point.
+				      *
+				      * You can think of the quantity returned
+				      * by this function as the volume or
+				      * surface element $dx, ds$ in the
+				      * integral that we implement here by
+				      * quadrature.
 				      */
     double JxW (const unsigned int quadrature_point) const;
 
