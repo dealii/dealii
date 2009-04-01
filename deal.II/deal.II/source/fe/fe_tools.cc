@@ -2006,14 +2006,6 @@ void FETools::interpolate<deal_II_dimension>
 
 #if deal_II_dimension != 3
 template
-void FETools::compute_embedding_matrices<deal_II_dimension,double,deal_II_dimension+1>
-(const FiniteElement<deal_II_dimension,deal_II_dimension+1> &,
- std::vector<std::vector<FullMatrix<double> > >&,
- const bool);
-template
-void FETools::compute_projection_matrices<deal_II_dimension,double,deal_II_dimension+1>
-(const FiniteElement<deal_II_dimension,deal_II_dimension+1> &, std::vector<std::vector<FullMatrix<double> > >&);
-template
 void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<double> &,
  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, Vector<double> &);
