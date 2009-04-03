@@ -1921,9 +1921,9 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
 [
   AC_ARG_WITH(cpu,
-  [  --with-cpu=cpu          Optimize specifically for the given CPU type,
-                          rather than just generating code for this
-		          processor family.],
+  [  --with-cpu=cpu          Optimize specifically for the given CPU type, 
+     		          rather than just generating code for this processor
+			  family.],
       withcpu="$withval",
       withcpu="")
   AC_MSG_CHECKING(for CPU to optimize for)
@@ -2076,8 +2076,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 [
   AC_ARG_ENABLE(multithreading,
-  [  --enable-multithreading  set compiler flags to allow for
-                          multithreaded programs],
+  [  --enable-multithreading Set compiler flags to allow for multithreaded
+                          programs],
     enablemultithreading="$enableval",
     enablemultithreading=no)
 ])
@@ -2212,8 +2212,9 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_USE_MT, dnl
 [
   AC_ARG_WITH(multithreading,
-  [  --with-multithreading=name  If name==posix, or no name given, then use
-                          POSIX threads.],
+  [  --with-multithreading=name  
+                          If name==posix, or no name given, then use POSIX 
+		          threads.],
       withmultithreading="$withval",
       withmultithreading=no)
 
@@ -2356,8 +2357,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_COMPAT_BLOCKER, dnl
 [
   AC_ARG_ENABLE(compat-blocker,
-  [  --enable-compat-blocker=mapping  block functions that implicitely
-                          assume a Q1 mapping],
+  [  --enable-compat-blocker=mapping  
+                          Block functions that implicitely assume a Q1 mapping],
       enable_compat_blocker="$enableval",
       enable_compat_blocker="")
 
@@ -4261,9 +4262,11 @@ dnl -------------------------------------------------------------
 
 AC_DEFUN(DEAL_II_CHECK_BOOST, dnl
 [ AC_ARG_WITH(boost,
-   [  --with-boost=/path/to/boost use an installed boost library instead of the
-         contributed one. The optional argument points to the directory containing
-         the boost subdirectory for header files.],
+   [  --with-boost=/path/to/boost 
+                          Use an installed boost library instead of the 
+		          contributed one. The optional argument points to the 
+  			  directory containing the boost subdirectory for
+                          header files.],
   DEAL_II_WITH_BOOST($withval))
 
   CPPFLAGS="$BOOST_INCLUDE_DIR $CPPFLAGS"
@@ -5101,7 +5104,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_DOXYGEN, dnl
 [
   AC_ARG_WITH(doxygen,
-  [  --with-doxygen=filename  use 'filename' for doxygen],
+  [  --with-doxygen=filename Use 'filename' for doxygen.
+  ],
       DOXYGEN="$withval",
       DOXYGEN=)
 
@@ -5250,10 +5254,11 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 [
   AC_ARG_WITH(netcdf,
-  [  --with-netcdf=/path/to/netcdf  Specify the path to the NetCDF installation,
-                          of which the include and library directories are
-                          subdirs; use this if you want to override the
-                          NETCDF_DIR environment variable.],
+  [  --with-netcdf=/path/to/netcdf  
+                          Specify the path to the NetCDF installation, of which
+                          the include and library directories are subdirs; use
+                          this if you want to override the NETCDF_DIR 
+			  environment variable.],
      [
         DEAL_II_NETCDF_DIR="$withval"
      ],
@@ -5267,17 +5272,19 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
      ])
   
    AC_ARG_WITH(netcdf-include,
-   [  --with-netcdf-include=/path/to/netcdf  Specify the path to the NetCDF headers file; 
-			   use this if you want to override the
-			   NETCDF_INCLUDE_DIR environment variable.],
+   [  --with-netcdf-include=/path/to/netcdf  
+                          Specify the path to the NetCDF headers file; use this
+                          if you want to override the NETCDF_INCLUDE_DIR
+			  environment variable.],
       [
 	 NETCDF_INCLUDE_DIR="$withval"
       ])
 
    AC_ARG_WITH(netcdf-libs,
-   [  --with-netcdf-libs=/path/to/netcdf  Specify the path to the NetCDF libraries; 
-			   use this if you want to override the
-			   NETCDF_LIBDIR environment variable.],
+   [  --with-netcdf-libs=/path/to/netcdf  
+                          Specify the path to the NetCDF libraries; use this if
+			  you want to override the NETCDF_LIBDIR environment 
+			  variable.],
       [
 	 NETCDF_LIBDIR="$withval"
       ])
@@ -5347,10 +5354,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   AC_MSG_CHECKING(for PETSc library directory)
 
   AC_ARG_WITH(petsc,
-  [  --with-petsc=/path/to/petsc  Specify the path to the PETSc installation,
-                          of which the include and library directories
-                          are subdirs; use this if you want to override
-                          the PETSC_DIR environment variable.],
+  [  --with-petsc=/path/to/petsc  
+                          Specify the path to the PETSc installation, of which
+		          the include and library directories are subdirs; use 
+			  this if you want to override the PETSC_DIR environment
+			  variable.],
      [
         dnl Special case when someone does --with-petsc=no
         if test "x$withval" = "xno" ; then
@@ -5448,9 +5456,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
   AC_MSG_CHECKING(for PETSc library architecture)
 
   AC_ARG_WITH(petsc-arch,
-  [  --with-petsc-arch=architecture  Specify the architecture for your PETSc
-                          installation; use this if you want to override
-                          the PETSC_ARCH environment variable.],
+  [  --with-petsc-arch=architecture  
+                          Specify the architecture for your PETSc installation;
+		          use this if you want to override the PETSC_ARCH 
+			  environment variable.],
      [
         DEAL_II_PETSC_ARCH="$withval"
 	AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
@@ -5580,10 +5589,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
   AC_MSG_CHECKING(for SLEPc include directory)
 
   AC_ARG_WITH(slepc,
-  [  --with-slepc=/path/to/slepc  Specify the path to the SLEPc installation,
-                               for which the include directory is a subdir; 
-                               use this if you want to override the SLEPC_DIR 
-                               environment variable.],
+  [  --with-slepc=/path/to/slepc
+                          Specify the path to the SLEPc installation, for which
+                          the include directory is a subdir; use this if you 
+                          want to override the SLEPC_DIR environment variable.],
      [
         dnl Special case when someone does --with-slepc=no
         if test "x$withval" = "xno" ; then
@@ -5665,9 +5674,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_ARCH, dnl
   AC_MSG_CHECKING(for SLEPc library architecture)
 
   AC_ARG_WITH(slepc-arch,
-  [  --with-slepc-arch=architecture  Specify the architecture for your SLEPc
-                                  installation; use this if you want to  
-                                  override the SLEPC_ARCH environment variable.],
+  [  --with-slepc-arch=architecture  
+                          Specify the architecture for your SLEPc installation;
+                          use this if you want to override the SLEPC_ARCH 
+                          environment variable.],
      [
         DEAL_II_SLEPC_ARCH="$withval"
 	AC_MSG_RESULT($DEAL_II_SLEPC_ARCH)
@@ -5755,10 +5765,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 [
  AC_MSG_CHECKING(for Trilinos directory)
  AC_ARG_WITH(trilinos,
-  [  --with-trilinos=/path/to/trilinos  Specify the path to the Trilinos installation,
-                          of which the include and lib directories
-                          are subdirs; use this if you want to override
-                          the TRILINOS_DIR environment variable.],
+  [  --with-trilinos=/path/to/trilinos  
+                          Specify the path to the Trilinos installation, of 
+                          which the include and lib directories are subdirs; use
+                          this if you want to override the TRILINOS_DIR 
+		          environment variable.],
      [
         dnl Special case when someone does --with-petsc=no
         if test "x$withval" = "xno" ; then
@@ -5805,9 +5816,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
   AC_MSG_CHECKING(for Trilinos header directory)
   AC_ARG_WITH(trilinos-include,
-  [  --with-trilinos-include=/path/to/trilinos  Specify the path to the Trilinos include; 
-                          use this if you want to override
-                          the TRILINOS_INCDIR environment variable.],
+  [  --with-trilinos-include=/path/to/trilinos  
+                          Specify the path to the Trilinos include; use this if 
+                          you want to override the TRILINOS_INCDIR environment
+                          variable.],
      [
         dnl Special case when someone does --with-petsc=no
         if test "x$withval" = "xno" ; then
@@ -5853,9 +5865,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
   AC_MSG_CHECKING(for Trilinos library directory)
   AC_ARG_WITH(trilinos-libs,
-  [  --with-trilinos-libs=/path/to/trilinos  Specify the path to the Trilinos libraries; 
-                          use this if you want to override
-                          the TRILINOS_LIBDIR environment variable.],
+  [  --with-trilinos-libs=/path/to/trilinos  
+                          Specify the path to the Trilinos libraries; use this
+                          if you want to override the TRILINOS_LIBDIR 
+       		          environment variable.],
      [
         dnl Special case when someone does --with-petsc=no
         if test "x$withval" = "xno" ; then
@@ -6129,10 +6142,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
   dnl First check for the Metis directory
 
   AC_ARG_WITH(metis,
-  [  --with-metis=/path/to/metis  Specify the path to the Metis installation,
-                          of which the include and library directories
-                          are subdirs; use this if you want to override
-                          the METIS_DIR environment variable.],
+  [  --with-metis=/path/to/metis  
+                          Specify the path to the Metis installation, of which 
+                          the include and library directories are   subdirs; use
+                          this if you want to override the METIS_DIR environment
+                          variable.],
      [
 	USE_CONTRIB_METIS=yes
         DEAL_II_METIS_DIR="$withval"
@@ -6169,18 +6183,20 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
      ])
 
   AC_ARG_WITH(metis-include,
-  [  --with-metis-include=/path/to/metis  Specify the path to the METIS headers file; 
-                          use this if you want to override the
-                          METIS_INCLUDE_DIR environment variable.],
+  [  --with-metis-include=/path/to/metis  
+                          Specify the path to the METIS headers file; use this
+                          if you want to override the METIS_INCLUDE_DIR
+ 		          environment variable.],
      [
         METIS_INCLUDE_DIR="$withval"
 	DEAL_II_METIS_INCDIR="$METIS_INCLUDE_DIR"
      ])
      
   AC_ARG_WITH(metis-libs,
-  [  --with-metis-libs=/path/to/metis  Specify the path to the METIS libraries; 
-                          use this if you want to override the
-                          METIS_LIBDIR environment variable.],
+  [  --with-metis-libs=/path/to/metis  
+                          Specify the path to the METIS libraries; use this if
+		          you want to override the METIS_LIBDIR 
+			  environment variable.],
      [
 	USE_CONTRIB_METIS=yes
         DEAL_II_METIS_LIBDIR="$withval"
@@ -6234,11 +6250,12 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
   AC_ARG_WITH(umfpack,
-  [  --with-umfpack=umfpack-root-directory  Use installed UMFPack version.
-                          'umfpack-root-directory' should be the directory
-                          containing directories AMD and UMFPACK. The
-                          contributed UMFPack library is used if no argument
-                          is given. Default is not to use UMFPack.],
+  [  --with-umfpack=umfpack-root-directory  
+                          Use installed UMFPack version. 
+		          'umfpack-root-directory' should be the directory 
+			  containing directories AMD and UMFPACK. The 
+			  contributed UMFPack library is used if no argument is
+			  given. Default is not to use UMFPack.],
      [
         AC_MSG_CHECKING(UMFPACK library)
         USE_CONTRIB_UMFPACK='yes'
@@ -6258,18 +6275,20 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 
   acx_umfpack=no
   AC_ARG_WITH(umfpack-include,
-  [  --with-umfpack-include=/path/to/UMFPACK  Specify the path to the UMFPACK headers file; 
-			  use this if you want to override the
-			  UMFPACK_INCDIR environment variable.],
+  [  --with-umfpack-include=/path/to/UMFPACK  
+                          Specify the path to the UMFPACK headers file; use this
+                          if you want to override the UMFPACK_INCDIR 
+			  environment variable.],
      [
 	UMFPACK_INCDIR="$withval"
         acx_umfpack=yes
      ])
   
   AC_ARG_WITH(umfpack-libs,
-  [  --with-umfpack-libs=/path/to/UMFPACK  Specify the path to the UMFPACK libraries; 
-			  use this if you want to override the
-			  UMFPACK_LIBDIR environment variable.],
+  [  --with-umfpack-libs=/path/to/UMFPACK  
+                          Specify the path to the UMFPACK libraries; use this if
+			  you want to override the UMFPACK_LIBDIR environment
+			  variable.],
      [
 	UMFPACK_LIBDIR="$withval"
         acx_umfpack=yes

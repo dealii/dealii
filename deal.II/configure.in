@@ -269,7 +269,7 @@ AC_MSG_RESULT()
 AC_MSG_RESULT(-------------- configuring shared/static libs ---------------)
 
 AC_ARG_ENABLE(shared,
-[  --enable-shared         set compiler flags to generate shared libraries],
+[  --enable-shared         Set compiler flags to generate shared libraries],
     enableshared="$enableval",
     enableshared=yes)
 
@@ -347,9 +347,7 @@ dnl                       Optional features
 dnl --------------------------------------------------------------
 
 AC_ARG_ENABLE(parser,
-              AS_HELP_STRING([--enable-parser],[While switched on by default, this option allows
-                              to switch off support for the function parser
-			      in the contrib directory.]),
+              AS_HELP_STRING([--enable-parser],[While switched on by default, this option allows to switch off support for the function parser in the contrib directory.]),
 	      [ enableparser="$enableval"
 	        if test "x$enableval" = "xno" ; then
  	          AC_MSG_RESULT(Function parser disabled)
@@ -482,11 +480,11 @@ dnl -------------------------------------------------------------
 
 dnl Check for blas.
 AC_ARG_WITH(blas,
-  [  --with-blas=blaslib     use the blas library blaslib. Make sure
-                          the path to the libary is searched by ld, since
-                          it is included by the argument -lblaslib. If no
-                          argument is given, use -lblas. Default is to use
-                          -lblas only if required by other libraries.],
+  [  --with-blas=blaslib     Use the blas library blaslib. Make sure the path
+                          to the libary is searched by ld, since it is 
+			  included by the argument -lblaslib. If no argument
+			  is given, use -lblas. Default is to use -lblas only
+                          if required by other libraries.],
   DEAL_II_WITH_BLAS($withval))
 
 DEAL_II_CONFIGURE_HSL
@@ -513,9 +511,10 @@ if test "x$with_zlib" = "x" ; then
 fi
 
 AC_ARG_WITH(zlib,
-  [  --with-zlib=zlib use the compression library zlib for gzipped input and output
-         and link it with -lzlib (the default is -lz).
-         Make sure the library is in the search path of ld.],
+  [  --with-zlib=zlib        Use the compression library zlib for gzipped 
+                          input and output and link it with -lzlib (the 
+			  default is -lz). Make sure the library is in the 
+			  search path of ld],
   DEAL_II_WITH_ZLIB($withval))
 
 
@@ -537,11 +536,12 @@ AC_SUBST(USE_CONTRIB_UMFPACK)
 
 dnl Check for LAPACK
 AC_ARG_WITH(lapack,
-  [  --with-lapack=lapacklib  use the lapack library lapacklib. Make sure
-                          the path to the libary is searched by ld, since it
-                          is included by the argument -llapacklib. If no
-                          argument is given, use -llapack. Default is not to
-                          use -llapack.],
+  [  --with-lapack=lapacklib Use the lapack library lapacklib. Make sure the 
+	                  path to the libary is searched by ld, since it is 
+			  included by the argument -llapacklib. If no argument
+			  is given, use -llapack. Default is not to use 
+                          -llapack.],
+			  
   DEAL_II_WITH_LAPACK($withval))
 
 dnl Finally check if BLAS is really there. We have to do it this way, since
