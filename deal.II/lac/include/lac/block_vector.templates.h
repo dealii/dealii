@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <lac/block_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <cmath>
 #include <algorithm>
 
@@ -121,6 +122,17 @@ template <typename Number>
 BlockVector<Number>::~BlockVector ()
 {}
 
+
+#ifdef DEAL_II_USE_TRILINOS
+template <typename Number>
+inline
+BlockVector<Number> &
+BlockVector<Number>::operator = (const TrilinosWrappers::BlockVector &v)
+{
+  BaseClass::operator = (v);
+  return *this;
+}
+#endif
 
 
 template <typename Number>

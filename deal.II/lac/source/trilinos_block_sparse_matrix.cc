@@ -13,6 +13,7 @@
 
 #include <lac/trilinos_block_sparse_matrix.h>
 
+#include <lac/block_sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
 
 #ifdef DEAL_II_USE_TRILINOS

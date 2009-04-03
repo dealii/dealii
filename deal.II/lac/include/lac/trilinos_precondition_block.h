@@ -16,9 +16,8 @@
 
 #include <base/config.h>
 #include <lac/exceptions.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_block_sparse_matrix.h>
 #include <lac/trilinos_precondition.h>
+#include <lac/trilinos_sparse_matrix.h>
 
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -39,6 +38,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+				   // forward declarations
+  class BlockSparseMatrix;
 
 /**
  * This implements an interface class of preconditioners for block

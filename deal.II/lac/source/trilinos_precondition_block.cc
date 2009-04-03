@@ -13,6 +13,9 @@
 
 #include <lac/trilinos_precondition_block.h>
 
+#include <lac/trilinos_sparse_matrix.h>
+#include <lac/trilinos_block_sparse_matrix.h>
+
 #ifdef DEAL_II_USE_TRILINOS
 
 #include <Thyra_EpetraLinearOp.hpp>

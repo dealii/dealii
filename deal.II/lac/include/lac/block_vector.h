@@ -19,7 +19,6 @@
 #include <lac/vector.h>
 #include <lac/block_indices.h>
 #include <lac/block_vector_base.h>
-#include <lac/trilinos_block_vector.h>
 
 #include <cstdio>
 #include <vector>
@@ -503,16 +502,6 @@ BlockVector<Number>::operator = (const BlockVector<Number2> &v)
 }
 
 
-#ifdef DEAL_II_USE_TRILINOS
-template <typename Number>
-inline
-BlockVector<Number> &
-BlockVector<Number>::operator = (const TrilinosWrappers::BlockVector &v)
-{
-  BaseClass::operator = (v);
-  return *this;
-}
-#endif
 
 template <typename Number>
 void BlockVector<Number>::scale (const value_type factor)

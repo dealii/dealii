@@ -13,6 +13,7 @@
 
 #include <lac/trilinos_sparse_matrix.h>
 
+#include <lac/sparse_matrix.h>
 #include <lac/trilinos_sparsity_pattern.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>

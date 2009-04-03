@@ -12,6 +12,8 @@
 //---------------------------------------------------------------------------
 
 
+#include <lac/vector.h>
+#include <lac/sparse_matrix.h>
 #include <lac/trilinos_precondition.h>
 #include <lac/trilinos_vector_base.h>
 #include <lac/trilinos_sparse_matrix.h>

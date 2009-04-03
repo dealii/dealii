@@ -16,8 +16,6 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
-#include <lac/vector.h>
-#include <lac/sparse_matrix.h>
 
 #include <base/std_cxx0x/shared_ptr.h>
 
@@ -44,6 +42,10 @@ namespace ML_Epetra
 
 
 DEAL_II_NAMESPACE_OPEN
+
+// forward declarations
+template <typename number> class SparseMatrix;
+template <typename number> class Vector;
 
 /*! @addtogroup TrilinosWrappers
  *@{

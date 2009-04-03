@@ -2006,7 +2006,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // into the vector
       Threads::ThreadMutex::ScopedLock lock(mutex);
       if (col_counter > 0)
-	sparsity_pattern.add_entries(row, cols.begin(), cols.begin()+col_counter);
+	sparsity_pattern.add_entries(row, cols.begin(), cols.begin()+col_counter,
+				     true);
     }
 }
 
@@ -2337,7 +2338,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	    if (current_length > 0)
 	      sparsity_pattern.block(row_block.first, i).add_entries(row_block.second, 
 								     cols.begin()+col_begins, 
-								     cols.begin()+col_begins+current_length);
+								     cols.begin()+col_begins+current_length,
+								     true);
 	    col_begins = actual_block_ends[i];
 	  }
       }

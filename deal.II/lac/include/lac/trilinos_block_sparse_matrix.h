@@ -17,7 +17,6 @@
 #include <base/config.h>
 #include <base/table.h>
 #include <lac/block_matrix_base.h>
-#include <lac/block_sparse_matrix.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_vector.h>
 #include <lac/full_matrix.h>
@@ -37,6 +36,7 @@ class BlockSparsityPattern;
 class BlockCompressedSparsityPattern;
 class BlockCompressedSetSparsityPattern;
 class BlockCompressedSimpleSparsityPattern;
+template <typename number> class BlockSparseMatrix;
 
 
 namespace TrilinosWrappers

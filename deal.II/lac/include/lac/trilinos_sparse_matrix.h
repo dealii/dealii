@@ -16,7 +16,6 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
-#include <lac/sparse_matrix.h>
 #include <lac/full_matrix.h>
 #include <lac/exceptions.h>
 #include <lac/trilinos_vector_base.h>
@@ -41,6 +40,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// forward declaration
+template <typename number> class SparseMatrix;
 
 namespace TrilinosWrappers
 {
