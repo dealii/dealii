@@ -24,6 +24,7 @@
 #include <lac/full_matrix.h>
 #include <lac/solver_gmres.h>
 #include <lac/solver_cg.h>
+#include <lac/block_sparsity_pattern.h>
 #include <lac/constraint_matrix.h>
 
 #include <grid/tria.h>
@@ -1548,7 +1549,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   amg_data.aggregation_threshold = 0.02;
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 amg_data);
-      
+
   Mp_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>
 		      (new TrilinosWrappers::PreconditionIC());
   Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1));
@@ -2262,6 +2263,10 @@ void BoussinesqFlowProblem<dim>::solve ()
     SolverGMRES<TrilinosWrappers::BlockVector>
       gmres (solver_control,
 	     SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
+
+    for (unsigned int i=0; i<stokes_solution.size(); ++i)
+      if (stokes_constraints.is_constrained(i))
+	stokes_solution(i) = 0;
 
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
