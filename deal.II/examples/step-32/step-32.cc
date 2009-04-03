@@ -25,6 +25,7 @@
 #include <lac/solver_gmres.h>
 #include <lac/solver_cg.h>
 #include <lac/constraint_matrix.h>
+#include <lac/block_sparsity_pattern.h>
 #include <lac/trilinos_block_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_sparse_matrix.h>
