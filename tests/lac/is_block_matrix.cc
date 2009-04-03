@@ -15,6 +15,11 @@
 #include "../tests.h"
 #include <base/logstream.h>
 #include <lac/block_sparse_matrix.h>
+#include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
+#include <lac/compressed_set_sparsity_pattern.h>
+#include <lac/block_sparsity_pattern.h>
 #include <lac/block_sparse_matrix_ez.h>
 
 #include <fstream>
@@ -42,6 +47,16 @@ void test ()
 	  << IsBlockMatrix<BlockSparseMatrix<float> >::value << ' '
 	  << IsBlockMatrix<BlockSparseMatrixEZ<double> >::value << ' '
     	  << IsBlockMatrix<BlockSparseMatrixEZ<float> >::value << std::endl;
+
+  deallog << IsBlockMatrix<SparsityPattern>::value << ' '
+	  << IsBlockMatrix<CompressedSparsityPattern>::value << ' '
+	  << IsBlockMatrix<CompressedSetSparsityPattern>::value << ' '
+    	  << IsBlockMatrix<CompressedSimpleSparsityPattern>::value << std::endl;
+
+  deallog << IsBlockMatrix<BlockSparsityPattern>::value << ' '
+	  << IsBlockMatrix<BlockCompressedSparsityPattern>::value << ' '
+	  << IsBlockMatrix<BlockCompressedSetSparsityPattern>::value << ' '
+    	  << IsBlockMatrix<BlockCompressedSimpleSparsityPattern>::value << std::endl;
 }
 
 

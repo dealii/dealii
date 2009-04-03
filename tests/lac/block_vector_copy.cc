@@ -16,6 +16,7 @@
 #include <base/logstream.h>
 #include <lac/block_vector.h>
 #include <fstream>
+#include <iostream>
 #include <iomanip>
 #include <vector>
 #include <list>
