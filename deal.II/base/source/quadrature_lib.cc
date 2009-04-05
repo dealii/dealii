@@ -13,6 +13,7 @@
 
 
 #include <base/quadrature_lib.h>
+#include <base/geometry_info.h>
 #include <cmath>
 
 #ifdef HAVE_STD_NUMERIC_LIMITS
@@ -986,7 +987,8 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 
 template<>
 QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n, 
-				  const unsigned int vertex_index) :
+				  const unsigned int vertex_index,
+				  const bool factor_out_singularity) :
     Quadrature<2>(2*n*n)
 {
     // Start with the gauss quadrature formula on the (u,v) reference
@@ -1011,7 +1013,8 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
     //
     // J = pi/4 R / cos(pi/4 v)
     //
-    // And we get rid of R to take into account the singularity.
+    // And we get rid of R to take into account the singularity,
+    // unless specified differently in the constructor.
     std::vector<Point<2> >	&ps = this->quadrature_points;
     std::vector<double>		&ws = this->weights;
     double pi4 = numbers::PI/4;
@@ -1021,6 +1024,8 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
 	ps[q][0] = gp[0];
 	ps[q][1] = gp[0] * std::tan(pi4*gp[1]);
 	ws[q]    = gauss.weight(q)*pi4/std::cos(pi4 *gp[1]);
+	if(factor_out_singularity)
+	    ws[q] *= (ps[q]-GeometryInfo<2>::unit_cell_vertex(0)).norm();
 	// The other half of the quadrilateral is symmetric with
 	// respect to xy plane.
 	ws[gauss.size()+q]    = ws[q];
