@@ -54,7 +54,8 @@ tests_x = vector-vector vector_memory \
 	trace \
 	print_formatted_* \
 	bicgstab_early \
-	complex*
+	complex* \
+	vector_view*
 
 
 # from above list of regular expressions, generate the real set of
