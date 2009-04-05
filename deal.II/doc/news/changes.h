@@ -595,6 +595,20 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a new class VectorView<Number> that allows views of
+  arbitrary areas of memory to be seen as a Vector<Number>, simplifying 
+  a lot of works for portability issues between different libraries, and 
+  allowing for subviews of Vector<Number> classes without the need to 
+  copy back and forth large chunk of memories.
+  <br>
+  To be used with EXTREME caution, and only when you know exactly what you 
+  are doing, and speed is a necessity.
+  <br>
+  (Luca Heltai 2009/04/05)
+  </p>
+
+  <li>
+  <p>
   Updated: The local_to_global functions in ConstraintMatrix got smarter,
   which imcreases the speed of sparsity pattern generation with
   ConstraintMatrix argument, and makes writing into sparse matrices using

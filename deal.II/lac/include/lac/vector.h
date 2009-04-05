@@ -49,6 +49,8 @@ template<typename number> class LAPACKFullMatrix;
 
 template <typename> class BlockVector;
 
+template <typename> class VectorView;
+
 
 
 /*! @addtogroup Vectors
@@ -890,6 +892,11 @@ class Vector : public Subscriptor
 				      * the data.
 				      */
     friend class LAPACKFullMatrix<Number>;
+				     /*
+				      * VectorView will access the
+				      * pointer.
+				      */
+    friend class VectorView<Number>;
 };
 
 /*@}*/
