@@ -24,23 +24,22 @@ usually modeled by the Euler equations of fluid dynamics:
 where the fluid density $\rho$ and the acceleration $\mathbf{g}$ due
 to external forces are given and the velocity $\mathbf{v}$ and the
 pressure $p$ are the unknowns. Here $\Omega$ is a closed bounded
-region representing the body around which the fluid moves. $\rho$ is
-independent of the pressure: due to the second equation the flow field is
-incompressible and so the density can not depend on the pressure. 
-The above equations can be derived from Navier-Stokes
-equations assuming that the effects due to viscosity are negligible
-compared to those due to the pressure gradient, inertial forces and the external
-forces. This is the opposite case of the Stokes equations
-discussed in @ref step_22 "step-22" which are the limit case of dominant
-viscosity, i.e. where the velocity is so small that inertia forces can be
-neglected. On the other hand, owing to the assumed incompressibility, the
-equations are not suited for very high speed gas flows where compressibility
-and the equation of state of the gas have to be taken into account, leading
-to the Euler equations of gas dynamics, a hyperbolic system.
+region representing the body around which the fluid moves. 
+
+The above equations can be derived from Navier-Stokes equations
+assuming that the effects due to viscosity are negligible compared to
+those due to the pressure gradient, inertial forces and the external
+forces. This is the opposite case of the Stokes equations discussed in
+@ref step_22 "step-22" which are the limit case of dominant viscosity,
+i.e. where the velocity is so small that inertia forces can be
+neglected. On the other hand, owing to the assumed incompressibility,
+the equations are not suited for very high speed gas flows where
+compressibility and the equation of state of the gas have to be taken
+into account, leading to the Euler equations of gas dynamics, a
+hyperbolic system.
 
 For the purpose of this tutorial program, we will consider only stationary
-flow without external forces (i.e. $\mathbf{g}=0$, though we will consider 
-forces due to the obstacle $\Omega$):
+flow without external forces:
 \f{align*}
   (\mathbf{v}\cdot\nabla)\mathbf{v}
   &=
@@ -57,15 +56,19 @@ boundary conditions
 \f[
   \label{eq:boundary-conditions}
   \begin{aligned}
-    \mathbf{n}\cdot\mathbf{v}& = 0 \qquad && \text{ on } \partial\Omega \\
+    -\mathbf{n}\cdot\mathbf{v}& = 0 \qquad && \text{ on } \partial\Omega \\
     \mathbf{v}& = \mathbf{v}_\infty && \text{ when } |\mathbf{x}| \to \infty,
   \end{aligned}
 \f]
-which is to say that the body moves is at rest in our coordinate systems and
+
+which is to say that the body is at rest in our coordinate systems and
 is not permeable, and that the fluid has (constant) velocity
 $\mathbf{v}_\infty$ at infinity. An alternative viewpoint is that our
-coordinate system moves along with the body whereas the background fluid is at
-rest at infinity. 
+coordinate system moves along with the body whereas the background
+fluid is at rest at infinity. Notice that we define the normal
+$\mathbf{n}$ as the <i>outer</i> normal to the domain $\Omega$, which
+is the opposite of the outer normal to the integration domain. This
+explains the reason for the minus sign in the above equation.
 
 For both stationary and non stationary flow, the solution process
 starts by solving for the velocity in the second equation and
@@ -83,7 +86,7 @@ which we find that the same equations hold (because $\nabla\cdot
 \f[
   \label{eq:boundary-conditions-tilde}
   \begin{aligned}
-    \mathbf{n}\cdot\mathbf{\tilde{v}}& = -\mathbf{v}_\infty \qquad && \text{ on } \partial\Omega \\
+    -\mathbf{n}\cdot\mathbf{\tilde{v}}& = \mathbf{n}\cdot\mathbf{v}_\infty \qquad && \text{ on } \partial\Omega \\
     \mathbf{\tilde{v}}& = 0 && \text{ when } |\mathbf{x}| \to \infty,
   \end{aligned}
 \f]
@@ -101,13 +104,12 @@ as the homogenous Laplace equation for the unknown $\phi$:
 \label{laplace}
 \Delta\phi &= 0 \qquad &&\text{in}\ \mathbb{R}^n\backslash\Omega,
 	   \\
-\mathbf{n}\cdot\nabla\phi &= -\mathbf{n}\cdot\mathbf{v}_\infty 
-&& \text{on}\ \partial\Omega
+	   -\mathbf{n}\cdot\nabla\phi &= \mathbf{n}\cdot\mathbf{v}_\infty 
+	   && \text{on}\ \partial\Omega
 \f}
 while the momentum equation reduces to the Bernoulli's equation 
 \f[
-\frac{p}{\rho} + \frac{\partial \phi}{\partial t} +g z 
-+\frac{1}{2} | \nabla \phi |^2 = 0 \in \Omega,
+\frac{p}{\rho} +\frac{1}{2} | \nabla \phi |^2 = 0 \in \Omega,
 \f]
 and the pressure and velocity are uncoupled.
 
@@ -115,12 +117,12 @@ We will now reformulate this equation in integral form using the
  Green identity:
 \f[\label{green}
   \int_{\mathbb{R}^n\backslash\Omega}
-  (-\Delta u)v\,dx - \int_{\partial\Omega} \frac{\partial u}{\partial \mathbf{n} }v \,ds
+  (\Delta u)v\,dx + \int_{\partial\Omega} u\frac{\partial v}{\partial \mathbf{n}} \,ds, 
   = 
   \int_{\mathbb{R}^n\backslash\Omega}
-  (-\Delta v)u\,dx - \int_{\partial\Omega} u\frac{\partial v}{\partial \mathbf{n}} \,ds,
+  (\Delta v)u\,dx + \int_{\partial\Omega} \frac{\partial u}{\partial \mathbf{n} }v \,ds
 \f]
-where $\mathbf{n}$ is the normal to the surface of $\Omega$ pointing
+where, again, $\mathbf{n}$ is the normal to the surface of $\Omega$ pointing
 towards the fluid (note that the equality is typically stated with
 $\mathbf{n}$ pointing <i>outward</i> from the domain of integration whereas
 in our case it is pointing <i>inward</i>; the difference is only in the sign
@@ -130,34 +132,35 @@ called fundamental solutions of the Laplace equation,
 \f[
 \begin{aligned}
   \label{eq:3}
-    G(\mathbf{x}-\mathbf{y}) = &
-    -\frac{1}{2\pi}\ln|\mathbf{x}-\mathbf{y}|  \qquad && \text{for } n=2
+    G(\mathbf{y}-\mathbf{x}) = &
+    -\frac{1}{2\pi}\ln|\mathbf{y}-\mathbf{x}|  \qquad && \text{for } n=2
     \\
-    G(\mathbf{x}-\mathbf{y}) = &
-    -\frac{1}{4\pi}\frac{1}{|\mathbf{x}-\mathbf{y}|}&& \text{for } n=3,  
+    G(\mathbf{y}-\mathbf{x}) = &
+    \frac{1}{4\pi}\frac{1}{|\mathbf{y}-\mathbf{x}|}&& \text{for } n=3,  
 \end{aligned}
 \f]
-satisfy in a variational sense the equations: 
+satisfy in a variational sense the equation: 
 \f[
-  -\Delta_x G(\mathbf{x}-\mathbf{y}) = \delta(\mathbf{x}-\mathbf{y}),
+  \Delta_y G(\mathbf{y}-\mathbf{x}) = \delta(\mathbf{y}-\mathbf{x}),
 \f]
-where the derivation is done in the variable $\mathbf{x}$.
+where the derivation is done in the variable $\mathbf{y}$.
 
 If we substitute $u$ and $v$ in the Green identity with the solution
 $\phi$ and with the fundamental solution of the Laplace equation
-respectively, we obtain:
+respectively, as long as $\mathbf{x}$ is chosen in the region
+$\mathbb{R}^n\backslash\Omega$, we obtain:
 \f[
-  \phi(\mathbf{x})=\int_{\partial \Omega}G(\mathbf{x}-\mathbf{y})\frac{\partial \phi}{\partial \mathbf{n}_y}(\mathbf{y})\,ds_y
-  +
-  \int_{\partial \Omega}\frac{\partial G(\mathbf{x}-\mathbf{y})}{\partial \mathbf{n}_y}\phi(\mathbf{y})\,ds_y 
+  \phi(\mathbf{x}) +  
+  \int_{\partial \Omega}\frac{\partial G(\mathbf{y}-\mathbf{x})}{\partial \mathbf{n}_y}\phi(\mathbf{y})\,ds_y 
+  =
+  \int_{\partial \Omega}G(\mathbf{y}-\mathbf{x})\frac{\partial \phi}{\partial \mathbf{n}_y}(\mathbf{y})\,ds_y
   \qquad \forall\mathbf{x}\in \mathbb{R}^n\backslash\Omega.
 \f]
 We can write this more compactly using the so-called Single and Double
 Layer Potential operators:
 \f[\label{integral}
-  \phi(\mathbf{x}) = \left(S \frac{\partial \phi}{\partial n_y}\right)(\mathbf{x})
-  + 
-  (D\phi)(\mathbf{x})
+  \phi(\mathbf{x}) + (D\phi)(\mathbf{x}) =
+  \left(S \frac{\partial \phi}{\partial n_y}\right)(\mathbf{x})
   \qquad \forall\mathbf{x}\in \mathbb{R}^n\backslash\Omega.
 \f]
 (The name of these operators comes from the fact that they describe the
@@ -166,13 +169,12 @@ along a surface, and due to a double sheet of charges and anti-charges along
 the surface, respectively.)
 
 In our case, we know the Neumann values of $\phi$ on the boundary:
-$\mathbf{n}\cdot\nabla\phi = -\mathbf{n}\cdot\mathbf{v}_\infty$.
+$-\mathbf{n}\cdot\nabla\phi = \mathbf{n}\cdot\mathbf{v}_\infty$.
 Consequently,
 \f[
-  \phi(\mathbf{x}) = -\left(S[\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
-  + 
-  (D\phi)(\mathbf{x})
-  \qquad \forall\mathbf{x}\in \mathbb{R}^n\backslash\Omega.
+  \phi(\mathbf{x}) + (D\phi)(\mathbf{x}) = 
+   \left(S[\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
+   \qquad \forall\mathbf{x} \in \mathbb{R}^n\backslash\Omega.
 \f]
 If we take the limit for $\mathbf{x}$ tending to $\partial\Omega$ of
 the above equation, using well known properties of the single and double layer
@@ -180,30 +182,27 @@ operators, we obtain an equation for $\phi$ just on the boundary of
 $\Omega$:
 
 \f[\label{SD}
-  \alpha(\mathbf{x})\phi(\mathbf{x}) = 
-  - \left(S [\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
-  + 
-  (D\phi)(\mathbf{x})
+  \alpha(\mathbf{x})\phi(\mathbf{x}) + (D\phi)(\mathbf{x}) = 
+  \left(S [\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
   \quad \mathbf{x}\in \partial\Omega,
 \f]
 which is the integral formulation we were looking for, where the
-quantity $\alpha(\mathbf{x}_i)$ is the fraction of solid angle by
-which the point $\mathbf{x}_i$ sees the domain $\Omega$.
+quantity $\alpha(\mathbf{x}_i)$ is the fraction of angle or solid
+angle by which the point $\mathbf{x}_i$ sees the domain $\Omega$.
 
-Substituting the single
-  and double layer operators we get:
+Substituting the single and double layer operators we get:
 \f[               
-  \alpha(\mathbf{x}) \phi(\mathbf{x})=
-  \frac{1}{2\pi}\int_{\partial \Omega}  \ln|\mathbf{x}-\mathbf{y}| \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
-  +
-  \frac{1}{2\pi}\int_{\partial \Omega}  \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }{ |\mathbf{x}-\mathbf{y}|^2 }\,ds_y 
+  \alpha(\mathbf{x}) \phi(\mathbf{x}) 
+  - \frac{1}{2\pi}\int_{\partial \Omega}  \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }{ |\mathbf{y}-\mathbf{x}|^2 }\,ds_y
+  =
+  -\frac{1}{2\pi}\int_{\partial \Omega}  \ln|\mathbf{y}-\mathbf{x}| \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
 \f]                 
 for two dimensional flows and
 \f[               
-  \alpha(\mathbf{x}) \phi(\mathbf{x})=
-  \frac{1}{4\pi}\int_{\partial \Omega} -\frac{1}{|\mathbf{x}-\mathbf{y}|} \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
-  +
-   \frac{1}{4\pi}\int_{\partial \Omega} \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }{ |\mathbf{x}-\mathbf{y}|^3 }\phi(\mathbf{y})\,ds_y 
+  \alpha(\mathbf{x}) \phi(\mathbf{x}) 
+   - \frac{1}{4\pi}\int_{\partial \Omega} \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }{ |\mathbf{y}-\mathbf{x}|^3 }\phi(\mathbf{y})\,ds_y
+  =
+  \frac{1}{4\pi}\int_{\partial \Omega} \frac{1}{|\mathbf{y}-\mathbf{x}|} \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
 \f]                 
 for three dimensional flows, where the normal derivatives of the fundamental
 solutions have been written in a form that makes computation easier. In either
@@ -215,10 +214,16 @@ $\alpha(\mathbf{x})$ by which the point $\mathbf{x}$ sees the domain
 $\Omega$ can be defined using the double layer potential itself:
 \f[
 \alpha(\mathbf{x}) := 
-\int_{\partial \Omega} \frac{ (\mathbf{x}-\mathbf{y})\cdot\mathbf{n}_y  }
-{ |\mathbf{x}-\mathbf{y}|^{dim} }\phi(\mathbf{y})\,ds_y =
-\int_{\partial \Omega} \frac{ \partial G(\mathbf{x}-\mathbf{y}) }{\partial \mathbf{n}_y} \, ds_y
+\frac{1}{2(n-1)\pi}\int_{\partial \Omega} \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }
+{ |\mathbf{y}-\mathbf{x}|^{n} }\phi(\mathbf{y})\,ds_y =
+-\int_{\partial \Omega} \frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y.
 \f]
+
+The reason why this is possible can be understood if we consider the
+fact that the solution of a pure Neumann problem is known up to an
+arbitrary constant $c$, which means that, if we set the Neumann data
+to be zero, then any constant $\phi$ will be a solution, giving us an
+the explicit expression above for $\alpha(\mathbf{x})$.
 
 While this example program is really only focused on the solution of the
 boundary integral equation, in a realistic setup one would still need to solve
@@ -227,15 +232,21 @@ $\phi(\mathbf{x})$ for all $\mathbf{x}\in\partial\Omega$. In the next step, we
 can compute (analytically, if we want) the solution $\phi(\mathbf{x})$ in all
 of $\mathbb{R}^n\backslash\Omega$. To this end, recall that we had
 \f[
-  \phi(\mathbf{x}) = -\left(S[\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
-  + 
+  \phi(\mathbf{x}) + 
   (D\phi)(\mathbf{x})
+  = 
+  -\left(S[\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
   \qquad \forall\mathbf{x}\in \mathbb{R}^n\backslash\Omega.
 \f]
 where now we have everything that is on the right hand side ($S$ and $D$ are
 integrals we can evaluate, the normal velocity on the boundary is given, and
 $\phi$ on the boundary we have just computed). Finally, we can then recover
 the velocity as $\mathbf{\tilde v}=\nabla \phi$. 
+
+Notice that the evaluation of the above formula for $\mathbf{x} \in
+\Omega$ should yield zero as a result, since the integration of the
+the Dirac delta $\delta(\mathbf{x})$ in the domain
+$\mathbb{R}^n\backslash\Omega$ is always zero by definition.
 
 As a final test, let us verify that this velocity indeed satisfies the
 momentum balance equation for a stationary flow field, i.e., whether
@@ -330,7 +341,7 @@ The goal of the following test problem is to solve the integral
 formulation of the Laplace equation with Neumann boundary conditions,
 using a circle and a sphere respectively in two and three space
 dimensions, illustrating along the way the features that allow one to
-treat boundary value problems almost as easily as finite element
+treat boundary element problems almost as easily as finite element
 problems using the deal.II library.
 
 To this end, let $\mathcal{T}_h = \bigcup_i K_i$ be a subdivision of the
@@ -352,7 +363,7 @@ $\phi_i$, that is:
 \f[
   \label{eq:definition-of-element}
   \phi_h(\mathbf{x}) := \phi_i \psi_i(\mathbf{x}), \qquad 
-  \boldsymbol{\alpha} := \{ \phi_i \},
+  \boldsymbol{\phi} := \{ \phi_i \},
 \f]
 where summation  is implied over repeated indexes. Note that we could use
 discontinuous elements here &mdash; in fact, there is no real reason to use
@@ -362,28 +373,27 @@ and often in the literature only piecewise constant elements are used.
 
 <h3> Collocation boundary element method </h3>
 
-By far, the most common approximation of boundary integral equations,
+By far, the most common approximation of boundary integral equations
 is by use of the collocation based boundary element method.
 
 This method requires the evaluation of the boundary integral equation
 at a number of collocation points which is equal to the number of
 unknowns of the system. The choice of these points is a delicate
 matter, that requires a careful study. Assume that these points are
-known for the moment, and call them $\mathbf x_i$ with $i=0...n_dofs$.
+known for the moment, and call them $\mathbf x_i$ with $i=0...n\_dofs$.
 
 The problem then becomes:
 
 Given the datum $\mathbf{v}_\infty$, find a function $\phi_h$ in $V_h$
-such that, the following $n_dofs$ equations are satisfied:
+such that, the following $n\_dofs$ equations are satisfied:
 
 \f{align*}
-    \alpha(mathbf{x}_i) \phi_h(\mathbf{x}_i)  =
-    & \int_{\Gamma_y} G(\mathbf{x}_i-\mathbf{y}) \, 
+    \alpha(\mathbf{x}_i) \phi_h(\mathbf{x}_i)  
+    & + \int_{\Gamma_y} \frac{ \partial G(\mathbf{y}-\mathbf{x}_i)}{\partial\mathbf{n}_y }
+    \phi_h(\mathbf{y}) \,ds_y = \\
+    & \int_{\Gamma_y} G(\mathbf{y}-\mathbf{x}_i) \, 
     \mathbf{n}_y\cdot\mathbf{v_\infty} \,ds_y 
-    \\
-    & + \int_{\Gamma_y} \frac{ \partial
-      G(\mathbf{x}_i-\mathbf{y})}{\partial\mathbf{n}_y }
-    \phi_h(\mathbf{y}) \,ds_y,
+    &,
 \f}
 where the quantity $\alpha(\mathbf{x}_i)$ is the fraction of (solid)
 angle by which the point $\mathbf{x}_i$ sees the domain $\Omega$, as 
@@ -393,27 +403,33 @@ If the $\mathbf{x}_i$ support points are chosen correctly, then the
 problem can be written as the following linear system:
 \f[
 \label{eq:linear-system}
-(\mathbf{A}-\mathbf{N})\boldsymbol\phi = \mathbf{b},
+(\mathbf{A}+\mathbf{N})\boldsymbol\phi = \mathbf{b},
 \f]
 where
 \f[
 \begin{aligned}
-\mathbf{A}_{ii}&= \int_\Gamma 
-\frac{\partial G(\mathbf{x}_i-\mathbf{y})}{\partial \mathbf{n}_y}\,ds_y \\
+\mathbf{A}_{ii}&= -\int_\Gamma 
+\frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y = \sum_{j=0}^{n\_dofs} N_{ij}\\
 \mathbf{N}_{ij}&= \int_\Gamma
-  \frac{\partial G(\mathbf{x}_i-\mathbf{y})}{\partial \mathbf{n}_y}
+  \frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}
   \psi_j(\mathbf{y}) \,ds_y 
 \\
 \mathbf{b}_i&= \int_\Gamma 
-   G(\mathbf{x}_i-\mathbf{y})  \, \mathbf{n}_y\cdot\mathbf{v_\infty}
+   G(\mathbf{y}-\mathbf{x}_i)  \, \mathbf{n}_y\cdot\mathbf{v_\infty}
   \psi_i(\mathbf{y}) ds_y.
 \end{aligned}
 \f]
 
-The computation of the entries of the matrices $\mathbf{A}$,
-$\mathbf{N}$ and of the right hand side $\mathbf{b}$ require the
-evaluation of singular integrals on the elements $K_i$ of the
-triangulation $\mathcal{T}_h$.
+From a linear algebra point of view, the best possible choice of the
+collocation points is the one that renders the matrix
+$\mathbf{A}+\mathbf{N}$ the most diagonally dominant. A natural choice
+is then to select the $\mathbf{x}_i$ collocation points to be the
+support points of the nodal basis functions $\psi_i(\mathbf{x})$.
+
+With this choice of collocation points, the computation of the entries
+of the matrices $\mathbf{A}$, $\mathbf{N}$ and of the right hand side
+$\mathbf{b}$ requires the evaluation of singular integrals on the
+elements $K_i$ of the triangulation $\mathcal{T}_h$.
 
 As usual in these cases, all integrations are performed on a reference
 simple domain, i.e., we assume that each element $K_i$ of
@@ -423,137 +439,32 @@ boundary element $\hat K := [0,1]^{n-1}$, and we perform the integrations after 
 change of variables from the real element $K_i$ to the reference
 element $\hat K$.
 
-<h3> Singular integrals in two dimension. </h3>
+<h3> Treating the singular integrals. </h3>
 
 In two dimensions it is not necessary to compute the diagonal elements
 $\mathbf{N}_{ii}$ of the system matrix, since, even if the denominator
 goes to zero when $\mathbf{x}=\mathbf{y}$, the numerator is always
-zero because $\mathbf{n}_y$ and $(\mathbf{x}-\mathbf{y})$ are
+zero because $\mathbf{n}_y$ and $(\mathbf{y}-\mathbf{x})$ are
 orthogonal (on our polygonal approximation of the boundary of $\Omega$), and
 the only singular integral arises in the computation 
 of $\mathbf{b}_i$ on the i-th element of $\mathcal{T}_h$:
 \f[
   \frac{1}{\pi}
-  \int_{K_i}  \int_{K_i}
-  \ln|\mathbf{x}-\mathbf{y}| \, \mathbf{n}_y\cdot\mathbf{v_\infty}
-  \,ds_x\,ds_y \, .
+  \int_{K_i}
+  \ln|\mathbf{y}-\mathbf{x}_i| \, \mathbf{n}_y\cdot\mathbf{v_\infty} \,ds_y.
 \f]
 
-Using the linear transformations above and defining
-$J=|\mathbf{V}^i_1-\mathbf{V}_0^i|$, we obtain
-\f[
-  \frac{1}{\pi}
-  \int_0^1 d\eta  \int_0^1 d\lambda \, J^2
-  (\ln|\lambda-\eta|+\ln(J)) \, 
-   \mathbf{n}_y\cdot\mathbf{v_\infty}
-  \, .
-\f]
+This can be easily treated by the QGaussLogR quadrature
+formula.
 
-After another change of variables
-\f[
-\begin{aligned}
-\lambda-\eta=&\alpha
-\\
-\lambda+\eta=&\beta \, ,
-\end{aligned}
-\f]
-we end up with:
-\f[
-  \frac{J^2}{\pi}\ln(J) \mathbf{n}_y\cdot\mathbf{v_\infty}
-  \, + \,
-  \frac{2J^2}{\pi}
-  \int_{-1}^1 d\alpha  \int_0^2 d\beta
-  \ln|\alpha| \, \mathbf{n}_y\cdot\mathbf{v_\infty}
-   \, ,
-\f]
-which can be computed analytically with Gauss-log quadrature formulae
-(i.e. Gauss formula derived for integrals with a logarithmic weight; deal.II
-conveniently has the QGaussLog class for this).
+Similarly, it is possible to use the QGaussOneOverR quadrature formula
+to perform the singular integrations in three dimensions. The
+interested reader will find detailed explanations on how these
+quadrature rules work in their documentation.
 
-
-<h3>Singular integrals in three dimensions</h3>
-
-In three dimensions the computation of the integrals is somewhat more
-complicated. Some results in this direction can be found
-in~\cite{newman} and~\cite{morino-chen-suciu}, and even if the two
-methods are identical for low order elements, in~\cite{newman} the
-method is extended to higher order approximations, using multipole
-expansion.
-
-In this work we started with the implementation of a low order method,
-inspired by~\cite{morino-chen-suciu}.
-
-We are interested in calculating the integrals 
-\f[
-  \label{eq:slp-dlp-on-panel}
-  \begin{split}
-    S_i(x,y,z) =  & - \frac{1}{2\pi} \int_{K_i} \frac{1}{R} \mathtt{d}S \\
-    D_i(x,y,z) =  & - \frac{1}{2\pi} \int_{K_i} \frac{\mathbf{R}\cdot\mathbf{n}}{R^3} \mathtt{d}S,
-  \end{split}
-\f]
-where $\mathbf{R}(x,y,z,\eta,\xi)$ is the distance from the point
-$\mathbf{x}=(x,y,z)$ and the point $\mathbf{y}(\eta, \xi)$ on the
-surface of the panel identified by the local coordinates $(\eta,
-\xi)$.
-
-Introducing the tangent vectors to the surface of the panels,
-\f[
-  \label{eq:tangential}
-  \mathbf{a}_1 = \frac{\partial \mathbf{y}}{\partial \eta}, 
-  \qquad \mathbf{a}_2  = \frac{\partial \mathbf{y}}{\partial \xi},
-\f]
-we can define the normal vector and the element differential area as
-\f[
-  \label{eq:normal-diff-area}
-  \mathbf{n}(\eta, \xi) = \frac{\mathbf{a}_1\times \mathbf{a}_2} 
-  {|\mathbf{a}_1\times \mathbf{a}_2|}, \qquad
-  \mathtt{d} S = |\mathbf{a}_1\times \mathbf{a}_2| 
-  \mathtt{d} \eta \mathtt{d} \xi.
-\f]
-
-The single and double layer potential integrals on a panel can then be
-expressed analytically by rewriting them as
-\f[
-  \label{eq:kernels-by-parts}
-  \int_0^1 \int_0^1 \frac{\partial^2 I_X(\eta, \xi)}{\partial \eta \partial \xi} \mathtt{d} S, 
-\f]
-which implies
-\f[
-  \label{eq:integral-form-of-slp-and-dlp}
-  \begin{split}
-    S_i = & I_S(1,1)-I_S(1,0) + I_S(0,1) - I_S(0,0) \\
-    D_i = & I_D(1,1)-I_D(1,0) + I_D(0,1) - I_D(0,0).
-  \end{split}
-\f]
-
-The single and double layer integrals on a quadrilateral panel then
-take the form above, where the terms $I_S$ and $I_D$ are given by
-\f[
-  \label{eq:def-I-S}
-  \begin{split}
-    I_S(\eta,\xi) = - \frac{1}{2\pi} \Bigg( & -
-    \frac{(\mathbf{R}\times \mathbf{a}_1)\cdot
-      \mathbf{n}}{|\mathbf{a}_1|}
-    \sinh^{-1}\left( \frac{\mathbf{R}\cdot\mathbf{a}_1}{|\mathbf{R}\times \mathbf{a}_1|} \right) \\
-    & + \frac{(\mathbf{R}\times \mathbf{a}_2)\cdot
-      \mathbf{n}}{|\mathbf{a}_2|}
-    \sinh^{-1}\left( \frac{\mathbf{R}\cdot\mathbf{a}_2}{|\mathbf{R}\times \mathbf{a}_2|} \right) \\
-    & + \mathbf{R}\cdot \mathbf{n} \tan^{-1}
-    \left( \frac{(\mathbf{R}\times\mathbf{a}_1)\cdot(\mathbf{R}\times\mathbf{a}_2)}
-      {R\mathbf{R}\cdot(\mathbf{a}_1\times\mathbf{a}_2)}\right) \Bigg),
-  \end{split}
-\f]
-and 
-\f[
-  \label{eq:def-I-D}
-  I_D(\eta,\xi) = \frac{1}{2\pi}  \tan^{-1}
-  \left( \frac{(\mathbf{R}\times\mathbf{a}_1)\cdot(\mathbf{R}\times\mathbf{a}_2)}
-    {R\mathbf{R}\cdot(\mathbf{a}_1\times\mathbf{a}_2)}\right).
-\f]
-
-The resulting matrix $\mathbf{A}$ is full. Depending on its size, it
-might be convenient to use a direct solver or an iterative one.
-
-
-<h3>What the program does</h3>
-
+The resulting matrix $\mathbf{A}+\mathbf{N}$ is full. Depending on its
+size, it might be convenient to use a direct solver or an iterative
+one. For the purpose of this example code, we chose to use only a
+direct solver, which limits the applicability of this method to
+relatively small problems. Remember however that it is possible to
+obtain very accurate results with relatively few surface elements.

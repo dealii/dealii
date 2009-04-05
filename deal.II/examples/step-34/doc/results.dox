@@ -1,3 +1,81 @@
 <h1>Results</h1>
 
-<h3>Simple Example</h3>
+We ran the program using the following <code>parameters.prm</code> file:
+@verbatim
+# Listing of Parameters
+# ---------------------
+set Extend solution on the -2,2 box = true
+set External refinement             = 5
+set Number of cycles                = 4
+
+
+subsection Quadrature rules
+  set Quadrature order          = 4
+  set Quadrature type           = gauss
+  set Singular quadrature order = 5
+end
+
+
+subsection Wind function 2d
+  # Any constant used inside the function which is not a variable name.
+  set Function constants  = 
+
+  # Separate vector valued expressions by ';' as ',' is used internally by the
+  # function parser.
+  set Function expression = 1; 1
+
+  # The name of the variables as they will be used in the function, separated
+  # by ','.
+  set Variable names      = x,y,t
+end
+
+
+subsection Wind function 3d
+  # Any constant used inside the function which is not a variable name.
+  set Function constants  = 
+
+  # Separate vector valued expressions by ';' as ',' is used internally by the
+  # function parser.
+  set Function expression = 1; 1; 1
+
+  # The name of the variables as they will be used in the function, separated
+  # by ','.
+  set Variable names      = x,y,z,t
+end
+@endverbatim
+
+When we run the program, the following is printed on screen:
+@verbatim
+
+DEAL::Parsing parameter file parameters.prm
+DEAL::for a 2 dimensional simulation. 
+DEAL::Levels: 2, potential dofs: 20
+DEAL::Levels: 3, potential dofs: 40
+DEAL::Levels: 4, potential dofs: 80
+DEAL::Levels: 5, potential dofs: 160
+
+DEAL::Parsing parameter file parameters.prm
+DEAL::for a 3 dimensional simulation. 
+DEAL::Levels: 2, potential dofs: 26
+DEAL::Levels: 3, potential dofs: 98
+DEAL::Levels: 4, potential dofs: 386
+DEAL::Levels: 5, potential dofs: 1538
+@endverbatim
+
+The result of running these computations is a bunch of output files that we
+can pass to our visualization program of choice. 
+
+The output files are of two kind: the potential on the boundary
+element surface, and the potential extended to the outer and inner
+domain. The combination of the two for the two dimensional case look
+like
+
+@image html step-34_2d.png
+
+while in three dimensions we only show the potential on the surface,
+together with a countur plot:
+
+@image html step-34_3d.png
+
+The exact solution for this model problem should be $x+y$ or
+$x+y+z$ on the surface, which is precisely what we obtain. 
