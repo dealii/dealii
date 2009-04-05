@@ -1688,7 +1688,7 @@ class DoFTools
     static void
     map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
 				const DoFHandler<dim,spacedim>    &dof_handler,
-				std::vector<Point<dim> > &support_points);
+				std::vector<Point<spacedim> > &support_points);
 
 				     /**
 				      * This is the opposite function
@@ -1721,7 +1721,7 @@ class DoFTools
     static void
     map_support_points_to_dofs (const Mapping<DH::dimension, DH::space_dimension> &mapping,
 				const DH                     &dof_handler,
-				std::map<Point<DH::dimension>, unsigned int, Comp> &point_to_index_map);
+				std::map<Point<DH::space_dimension>, unsigned int, Comp> &point_to_index_map);
 
 				     /**
 				      * Map a coupling table from the
@@ -1997,12 +1997,12 @@ void
 DoFTools::map_support_points_to_dofs (
   const Mapping<DH::dimension,DH::space_dimension> &mapping,
   const DH                     &dof_handler,
-  std::map<Point<DH::dimension>, unsigned int, Comp> &point_to_index_map)
+  std::map<Point<DH::space_dimension>, unsigned int, Comp> &point_to_index_map)
 {
 				   // let the checking of arguments be
 				   // done by the function first
 				   // called
-  std::vector<Point<DH::dimension> > support_points (dof_handler.n_dofs());
+  std::vector<Point<DH::space_dimension> > support_points (dof_handler.n_dofs());
   map_dofs_to_support_points (mapping, dof_handler, support_points);
 				   // now copy over the results of the
 				   // previous function into the

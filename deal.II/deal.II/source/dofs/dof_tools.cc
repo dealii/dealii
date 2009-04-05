@@ -5134,7 +5134,7 @@ template <int dim, int spacedim>
 void
 DoFTools::map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
 				      const DoFHandler<dim,spacedim>    &dof_handler,
-				      std::vector<Point<dim> > &support_points)
+				      std::vector<Point<spacedim> > &support_points)
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   
@@ -5158,8 +5158,8 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping
 				   // rule are set to invalid values
 				   // by the used constructor.
   Quadrature<dim> q_dummy(dof_handler.get_fe().get_unit_support_points());
-  FEValues<dim> fe_values (mapping, dof_handler.get_fe(),
-			   q_dummy, update_quadrature_points);
+  FEValues<dim,spacedim> fe_values (mapping, dof_handler.get_fe(),
+				    q_dummy, update_quadrature_points);
   typename DoFHandler<dim,spacedim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -5169,7 +5169,7 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping
     {
       fe_values.reinit (cell);
       cell->get_dof_indices (local_dof_indices);
-      const std::vector<Point<dim> > & points
+      const std::vector<Point<spacedim> > & points
   	= fe_values.get_quadrature_points ();
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	support_points[local_dof_indices[i]] = points[i];
@@ -5856,6 +5856,17 @@ DoFTools::map_dofs_to_support_points<deal_II_dimension>
 (const Mapping<deal_II_dimension,deal_II_dimension>&,
  const DoFHandler<deal_II_dimension>&,
  std::vector<Point<deal_II_dimension> >&);
+
+#if deal_II_dimension != 3
+
+template
+void
+DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>&,
+ const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+ std::vector<Point<deal_II_dimension+1> >&);
+
+#endif
 
 template
 void
