@@ -2019,11 +2019,7 @@ unsigned int SparseMatrix<number>::n () const
 
 				        // Inline the set() and add()
 				        // functions, since they will be 
-                                        // called frequently, and the 
-				        // compiler can optimize away 
-				        // some unnecessary loops when
-					// the sizes are given at 
-				        // compile time.
+                                        // called frequently.
 template <typename number>  
 inline
 void
@@ -2031,12 +2027,25 @@ SparseMatrix<number>::set (const unsigned int i,
 			   const unsigned int j,
 			   const number       value)
 {
-
   Assert (numbers::is_finite(value),
 	  ExcMessage("The given value is not finite but either "
 		     "infinite or Not A Number (NaN)"));
 
-  set (i, 1, &j, &value, false);
+  const unsigned int index = cols->operator()(i, j);
+
+				   // it is allowed to set elements of
+				   // the matrix that are not part of
+				   // the sparsity pattern, if the
+				   // value to which we set it is zero
+  if (index == SparsityPattern::invalid_entry)
+    {
+      Assert ((index != SparsityPattern::invalid_entry) ||
+	      (value == 0.),
+	      ExcInvalidIndex(i, j));
+      return;
+    }
+
+  val[index] = value;
 }
 
 
@@ -2099,71 +2108,6 @@ SparseMatrix<number>::set (const unsigned int               row,
 
 
 
-template <typename number>
-template <typename number2>
-inline
-void
-SparseMatrix<number>::set (const unsigned int  row,
-			   const unsigned int  n_cols,
-			   const unsigned int *col_indices,
-			   const number2       *values,
-			   const bool          elide_zero_values)
-{
-  Assert (cols != 0, ExcNotInitialized());
-
-  unsigned int n_columns = 0;
-
-				   // Otherwise, extract nonzero values in
-				   // each row and pass on to the other 
-				   // function.
-  global_indices.resize(n_cols);
-  column_values.resize(n_cols);
-
-				   // First, search all the indices to find
-				   // out which values we actually need to
-				   // set.
-				   // TODO: Could probably made more
-				   // efficient.
-  for (unsigned int j=0; j<n_cols; ++j)
-    {
-      const number value = values[j];
-      Assert (numbers::is_finite(value),
-	      ExcMessage("The given value is not finite but either "
-			 "infinite or Not A Number (NaN)"));
-
-      if (value == 0 && elide_zero_values == true)
-	continue;
-
-      const unsigned int index = cols->operator()(row, col_indices[j]);
-
-				   // it is allowed to set elements in
-				   // the matrix that are not part of
-				   // the sparsity pattern, if the
-				   // value to which we set it is zero
-      if (index == SparsityPattern::invalid_entry)
-	{
-	  Assert ((index != SparsityPattern::invalid_entry) ||
-		  (value == 0.),
-		  ExcInvalidIndex(row,col_indices[j]));
-	  continue;
-	}
-
-      global_indices[n_columns] = index;
-      column_values[n_columns] = value;
-      n_columns++;
-    }
-
-  const unsigned int * index_ptr = &global_indices[0];
-  const number * value_ptr = &column_values[0];
-  
-				    // Finally, go through the index list 
-				    // and set the elements one by one.
-  for (unsigned int j=0; j<n_columns; ++j)
-    val[*index_ptr++] = *value_ptr++;
-}
-
-
-
 template <typename number>  
 inline
 void
@@ -2171,12 +2115,28 @@ SparseMatrix<number>::add (const unsigned int i,
 			   const unsigned int j,
 			   const number       value)
 {
-
   Assert (numbers::is_finite(value),
 	  ExcMessage("The given value is not finite but either "
 		     "infinite or Not A Number (NaN)"));
 
-  add (i, 1, &j, &value, false);
+  if (value == 0)
+    return;
+
+  const unsigned int index = cols->operator()(i, j);
+
+				   // it is allowed to add elements to
+				   // the matrix that are not part of
+				   // the sparsity pattern, if the
+				   // value to which we set it is zero
+  if (index == SparsityPattern::invalid_entry)
+    {
+      Assert ((index != SparsityPattern::invalid_entry) ||
+	      (value == 0.),
+	      ExcInvalidIndex(i, j));
+      return;
+    }
+
+  val[index] += value;
 }
 
 
@@ -2235,141 +2195,6 @@ SparseMatrix<number>::add (const unsigned int               row,
 
   add (row, col_indices.size(), &col_indices[0], &values[0],
        elide_zero_values);
-}
-
-
-
-template <typename number>
-template <typename number2>
-inline
-void
-SparseMatrix<number>::add (const unsigned int  row,
-			   const unsigned int  n_cols,
-			   const unsigned int *col_indices,
-			   const number2      *values,
-			   const bool          elide_zero_values,
-			   const bool          col_indices_are_sorted)
-{
-  Assert (cols != 0, ExcNotInitialized());
-
-				   // if we have sufficiently many columns
-				   // and sorted indices it is faster to
-				   // just go through the column indices and
-				   // look whether we found one, rather than
-				   // doing a binary search for every column
-  if (col_indices_are_sorted == true)
-   if (n_cols * 8 > cols->row_length(row))
-    {
-				   // check whether the given indices are
-				   // really sorted
-#ifdef DEBUG
-      for (unsigned int i=1; i<n_cols; ++i)
-	Assert (col_indices[i] > col_indices[i-1], 
-		ExcMessage("Indices are not sorted."));
-#endif
-      if (cols->optimize_diagonal() == true)
-	{
-	  const unsigned int * this_cols = 
-	    &cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
-	  number * val_ptr = &val[cols->get_rowstart_indices()[row]];
-	  Assert (this_cols[0] == row, ExcInternalError());
-	  unsigned int counter = 1;
-	  for (unsigned int i=0; i<n_cols; ++i)
-	    {
-				   // diagonal
-	      if (col_indices[i] == row)
-		{
-		  if (values[i] != 0)
-		    val_ptr[0] += values[i];
-		  continue;
-		}
-	      
-	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
-
-	      while (this_cols[counter] < col_indices[i])
-		++counter;
-
-	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
-		      ExcInvalidIndex(row,col_indices[i]));
-
-	      if (values[i] != 0)
-		val_ptr[counter] += values[i];
-	    }
-	  Assert (counter < cols->row_length(row), ExcInternalError());
-	}
-      else
-	{
-	  const unsigned int * this_cols = 
-	    &cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
-	  number * val_ptr = &val[cols->get_rowstart_indices()[row]];
-	  unsigned int counter = 0;
-	  for (unsigned int i=0; i<n_cols; ++i)
-	    {
-	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
-	      
-	      while (this_cols[counter] < col_indices[i])
-		++counter;
-
-	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
-		      ExcInvalidIndex(row,col_indices[i]));
-
-	      if (values[i] != 0)
-		val_ptr[counter] += values[i];
-	    }
-	  Assert (counter < cols->row_length(row), ExcInternalError());
-	}
-      return;
-    }
-
-  unsigned int n_columns = 0;
-
-  if (global_indices.size() < n_cols)
-    {
-      global_indices.resize(n_cols);
-      column_values.resize(n_cols);
-    }
-
-				   // First, search all the indices to find
-				   // out which values we actually need to
-				   // add.
-				   // TODO: Could probably be made more
-				   // efficient.
-  for (unsigned int j=0; j<n_cols; ++j)
-    {
-      const number value = values[j];
-      Assert (numbers::is_finite(value),
-	      ExcMessage("The given value is not finite but either "
-			 "infinite or Not A Number (NaN)"));
-
-      if (value == 0 && elide_zero_values == true)
-	continue;
-
-      const unsigned int index = cols->operator()(row, col_indices[j]);
-
-				   // it is allowed to add elements to
-				   // the matrix that are not part of
-				   // the sparsity pattern, if the
-				   // value to which we set it is zero
-      if (index == SparsityPattern::invalid_entry)
-	{
-	  Assert ((index != SparsityPattern::invalid_entry) ||
-		  (value == 0.),
-		  ExcInvalidIndex(row,col_indices[j]));
-	  continue;
-	}
-
-      global_indices[n_columns] = index;
-      column_values[n_columns] = value;
-      n_columns++;
-    }
-
-  const unsigned int * index_ptr = &global_indices[0];
-  const number * value_ptr = &column_values[0];
-
-				    // Finally, go through the index list 
-				    // and add the elements one by one.
-  for (unsigned int j=0; j<n_columns; ++j)
-    val[*index_ptr++] += *value_ptr++;
 }
 
 

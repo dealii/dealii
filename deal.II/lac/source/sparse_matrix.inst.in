@@ -29,6 +29,19 @@ for (S1, S2 : REAL_SCALARS)
 
     template void SparseMatrix<S1>::add<S2> (const S1,
 					     const SparseMatrix<S2> &);
+
+    template void SparseMatrix<S1>::add<S2> (const unsigned int,
+					     const unsigned int,    
+					     const unsigned int *,    
+					     const S2 *,
+					     const bool,    
+					     const bool);
+
+    template void SparseMatrix<S1>::set<S2> (const unsigned int,
+					     const unsigned int,    
+					     const unsigned int *,    
+					     const S2 *,
+					     const bool);
   }
 
 

@@ -197,7 +197,7 @@ class CompressedSimpleSparsityPattern : public Subscriptor
     void add_entries (const unsigned int row, 
 		      ForwardIterator    begin,
 		      ForwardIterator    end,
-		      const bool         indices_are_sorted = false);
+		      const bool         indices_are_unique_and_sorted = false);
 
 				     /**
 				      * Check if a value at a certain
@@ -411,133 +411,6 @@ CompressedSimpleSparsityPattern::Line::add (const unsigned int j)
 				   // vector. Vector grows automatically to
 				   // fit elements. Always doubles its size.
   entries.insert(it, j);
-}
-
-
-
-template <typename ForwardIterator>
-inline
-void
-CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
-						    ForwardIterator end,
-						    const bool      indices_are_sorted)
-{
-  const int n_elements = end - begin;
-  if (n_elements <= 0)
-    return;
-
-  const unsigned int n_cols = static_cast<unsigned int>(n_elements);
-  const unsigned int stop_size = entries.size() + n_cols;
-
-  if (indices_are_sorted == true && n_elements > 3)
-    {
-      if (entries.size() == 0 || entries.back() < *begin)
-	{
-	  entries.insert(entries.end(), begin, end);
-	  return;
-	}
-
-				   // resize vector by just inserting the
-				   // list
-      const unsigned int col = *begin;
-      std::vector<unsigned int>::iterator it = 
-	std::lower_bound(entries.begin(), entries.end(), col);
-      const unsigned int pos1 = it - entries.begin();
-      entries.insert (it, begin, end);
-      it = entries.begin() + pos1;
-
-				   // now merge the two lists.
-      ForwardIterator my_it = begin;
-      std::vector<unsigned int>::iterator it2 = it + n_cols;
-
-				   // as long as there are indices both in
-				   // the end of the entries list and in the
-				   // input list
-      while (my_it != end && it2 != entries.end())
-	{
-	  if (*my_it < *it2)
-	    *it++ = *my_it++;
-	  else if (*my_it == *it2)
-	    {
-	      *it++ = *it2++;
-	      ++my_it;
-	    }
-	  else
-	    *it++ = *it2++;
-	}
-				   // in case there are indices left in the
-				   // input list
-      while (my_it != end)
-	*it++ = *my_it++;
-
-				   // in case there are indices left in the
-				   // end of entries
-      while (it2 != entries.end())
-	*it++ = *it2++;
-
-				   // resize
-      const unsigned int new_size = it - entries.begin();
-      Assert (new_size <= stop_size, ExcInternalError());
-      entries.resize (new_size);
-      return;
-    }
-
-  ForwardIterator my_it = begin;
-
-  // If necessary, increase the size of the array. In order to avoid
-  // allocating just a few entries every time, use five elements at a time
-  // at least.
-  if (stop_size > entries.capacity())
-    entries.reserve (stop_size);
-
-  unsigned int col = *my_it;
-  std::vector<unsigned int>::iterator it, it2;
-  // insert the first element as for one entry only first check the last
-  // element (or if line is still empty)
-  if ( (entries.size()==0) || ( entries.back() < col) ) {
-    entries.push_back(col);
-    it = entries.end()-1;
-  }
-  else { 
-    // do a binary search to find the place where to insert:
-    it2 = std::lower_bound(entries.begin(), entries.end(), col); 
-
-    // If this entry is a duplicate, continue immediately Insert at the
-    // right place in the vector. Vector grows automatically to fit
-    // elements. Always doubles its size.
-    if (*it2 != col)
-      it = entries.insert(it2, col);
-    else
-      it = it2;
-  }
-
-  ++my_it;
-  // Now try to be smart and insert with bias in the direction we are
-  // walking. This has the advantage that for sorted lists, we always search
-  // in the right direction, what should decrease the work needed in here.
-  for ( ; my_it != end; ++my_it)
-    {
-      col = *my_it;
-      // need a special insertion command when we're at the end of the list
-      if (col > entries.back()) {
-	entries.push_back(col);
-	it = entries.end()-1;
-      }
-      // search to the right (preferred search direction)
-      else if (col > *it) {
-      	it2 = std::lower_bound(it++, entries.end(), col);
-	if (*it2 != col)
-	  it = entries.insert(it2, col);
-      }
-      // search to the left
-      else if (col < *it) {
-	it2 = std::lower_bound(entries.begin(), it, col);
-	if (*it2 != col)
-	  it = entries.insert(it2, col);
-      }
-      // if we're neither larger nor smaller, then this was a duplicate and
-      // we can just continue.
-    }
 }
 
 
