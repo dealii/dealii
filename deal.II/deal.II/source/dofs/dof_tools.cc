@@ -132,7 +132,7 @@ DoFTools::make_sparsity_pattern (
 	  ExcDimensionMismatch(couplings.n_cols(), dof.get_fe().n_components()));
 
   const hp::FECollection<DH::dimension,DH::space_dimension> fe_collection (dof.get_fe());
-  
+
 				   // first, for each finite element, build a
 				   // mask for each dof, not like the one
 				   // given which represents components. make
@@ -141,43 +141,55 @@ DoFTools::make_sparsity_pattern (
 				   // functions, which takes some additional
 				   // thought
   std::vector<Table<2,bool> > dof_mask(fe_collection.size());
-  for (unsigned int f=0; f<fe_collection.size(); ++f)
-    {
-      const unsigned int dofs_per_cell = fe_collection[f].dofs_per_cell;
 
-      dof_mask[f].reinit (dofs_per_cell, dofs_per_cell);
-      
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if (fe_collection[f].is_primitive(i) &&
-	      fe_collection[f].is_primitive(j))
-	    dof_mask[f][i][j]
-	      = (couplings(fe_collection[f].system_to_component_index(i).first,
-			   fe_collection[f].system_to_component_index(j).first) != none);
-	  else
-	    {
-	      const unsigned int first_nonzero_comp_i
-		= (std::find (fe_collection[f].get_nonzero_components(i).begin(),
-			      fe_collection[f].get_nonzero_components(i).end(),
-			      true)
-		   -
-		   fe_collection[f].get_nonzero_components(i).begin());
-	      const unsigned int first_nonzero_comp_j
-		= (std::find (fe_collection[f].get_nonzero_components(j).begin(),
-			      fe_collection[f].get_nonzero_components(j).end(),
-			      true)
-		   -
-		   fe_collection[f].get_nonzero_components(j).begin());
-	      Assert (first_nonzero_comp_i < fe_collection[f].n_components(),
-		      ExcInternalError());
-	      Assert (first_nonzero_comp_j < fe_collection[f].n_components(),
-		      ExcInternalError());          
-	      
+				   // check whether the table of couplings
+				   // contains only true arguments, i.e., we
+				   // do not exclude any index. that is the
+				   // easy case, since we don't have to set
+				   // up the tables
+  bool need_dof_mask = false;
+  for (unsigned int i=0; i<couplings.n_rows(); ++i)
+    for (unsigned int j=0; j<couplings.n_cols(); ++j)
+      if (couplings[i][j] == none)
+	need_dof_mask = true;
+
+  if (need_dof_mask == true)
+    for (unsigned int f=0; f<fe_collection.size(); ++f)
+      {
+	const unsigned int dofs_per_cell = fe_collection[f].dofs_per_cell;
+
+	dof_mask[f].reinit (dofs_per_cell, dofs_per_cell);
+
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    if (fe_collection[f].is_primitive(i) &&
+		fe_collection[f].is_primitive(j))
 	      dof_mask[f][i][j]
-		= (couplings(first_nonzero_comp_i,first_nonzero_comp_j) != none);
-	    }
-    }
-  
+		= (couplings(fe_collection[f].system_to_component_index(i).first,
+			     fe_collection[f].system_to_component_index(j).first) != none);
+	    else
+	      {
+		const unsigned int first_nonzero_comp_i
+		  = (std::find (fe_collection[f].get_nonzero_components(i).begin(),
+				fe_collection[f].get_nonzero_components(i).end(),
+				true)
+		     -
+		     fe_collection[f].get_nonzero_components(i).begin());
+		const unsigned int first_nonzero_comp_j
+		  = (std::find (fe_collection[f].get_nonzero_components(j).begin(),
+				fe_collection[f].get_nonzero_components(j).end(),
+				true)
+		     -
+		     fe_collection[f].get_nonzero_components(j).begin());
+		Assert (first_nonzero_comp_i < fe_collection[f].n_components(),
+			ExcInternalError());
+		Assert (first_nonzero_comp_j < fe_collection[f].n_components(),
+			ExcInternalError());          
+
+		dof_mask[f][i][j]
+		  = (couplings(first_nonzero_comp_i,first_nonzero_comp_j) != none);
+	      }
+      }
 
 
   std::vector<unsigned int> dofs_on_this_cell(fe_collection.max_dofs_per_cell());

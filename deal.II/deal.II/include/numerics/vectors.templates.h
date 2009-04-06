@@ -467,8 +467,7 @@ void VectorTools::project (const Mapping<dim, spacedim>       &mapping,
 				   // still be fast
   {
     CompressedSimpleSparsityPattern csp (dof.n_dofs(), dof.n_dofs());
-    DoFTools::make_sparsity_pattern (dof, csp);
-    constraints.condense(csp);
+    DoFTools::make_sparsity_pattern (dof, csp, constraints);
 
     sparsity.copy_from (csp);
   }
