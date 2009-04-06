@@ -566,8 +566,15 @@ SparsityPattern::copy_from (const CompressedSparsityPattern &csp,
   const bool is_square = optimize_diag && (csp.n_rows() == csp.n_cols());
   std::vector<unsigned int> row_lengths (csp.n_rows());
   for (unsigned int i=0; i<csp.n_rows(); ++i)
-    row_lengths[i] = csp.row_length(i) +
-                     (is_square ? 1 : 0);
+    {
+      unsigned int additional_diagonal = 0;
+      if (is_square)
+	if (csp.exists(i,i) == false)
+	  additional_diagonal = 1;
+
+      row_lengths[i] = csp.row_length(i) + additional_diagonal;
+    }
+
   reinit (csp.n_rows(), csp.n_cols(), row_lengths, is_square);
 
 				   // now enter all the elements into
@@ -588,10 +595,11 @@ SparsityPattern::copy_from (const CompressedSparsityPattern &csp,
 	}
     }
 
-				   // finally compress
-				   // everything. this also sorts the
-				   // entries within each row
-  compress ();
+				   // do not need to compress the sparsity
+				   // pattern since we already have
+				   // allocated the right amount of data,
+				   // and the CSP data is sorted, too.
+  compressed = true;
 }
 
 
@@ -613,8 +621,14 @@ SparsityPattern::copy_from (const CompressedSetSparsityPattern &csp,
   const bool is_square = optimize_diag && (csp.n_rows() == csp.n_cols());
   std::vector<unsigned int> row_lengths (csp.n_rows());
   for (unsigned int i=0; i<csp.n_rows(); ++i)
-    row_lengths[i] = csp.row_length(i) +
-                     (is_square ? 1 : 0);
+    {
+      unsigned int additional_diagonal = 0;
+      if (is_square)
+	if (csp.exists(i,i) == false)
+	  additional_diagonal = 1;
+
+      row_lengths[i] = csp.row_length(i) + additional_diagonal;
+    }
   reinit (csp.n_rows(), csp.n_cols(), row_lengths, is_square);
 
 				   // now enter all the elements into
@@ -637,10 +651,12 @@ SparsityPattern::copy_from (const CompressedSetSparsityPattern &csp,
 	}
     }
 
-				   // finally compress
-				   // everything. this also sorts the
-				   // entries within each row
-  compress ();
+				   // do not need to compress the sparsity
+				   // pattern since we already have
+				   // allocated the right amount of data,
+				   // and the CSP data is sorted, too.
+  //compress ();
+  compressed = true;
 }
 
 void
@@ -660,8 +676,14 @@ SparsityPattern::copy_from (const CompressedSimpleSparsityPattern &csp,
   const bool is_square = optimize_diag && (csp.n_rows() == csp.n_cols());
   std::vector<unsigned int> row_lengths (csp.n_rows());
   for (unsigned int i=0; i<csp.n_rows(); ++i)
-    row_lengths[i] = csp.row_length(i) +
-                     (is_square ? 1 : 0);
+    {
+      unsigned int additional_diagonal = 0;
+      if (is_square)
+	if (csp.exists(i,i) == false)
+	  additional_diagonal = 1;
+
+      row_lengths[i] = csp.row_length(i) + additional_diagonal;
+    }
   reinit (csp.n_rows(), csp.n_cols(), row_lengths, is_square);
 
                                    // now enter all the elements into
@@ -682,10 +704,11 @@ SparsityPattern::copy_from (const CompressedSimpleSparsityPattern &csp,
         }
     }
 
-                                   // finally compress
-                                   // everything. this also sorts the
-                                   // entries within each row
-  compress ();
+				   // do not need to compress the sparsity
+				   // pattern since we already have
+				   // allocated the right amount of data,
+				   // and the CSP data is sorted, too.
+  compressed = true;
 }
 
 
