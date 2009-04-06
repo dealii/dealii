@@ -200,7 +200,7 @@ class CompressedSparsityPattern : public Subscriptor
     void add_entries (const unsigned int row, 
 		      ForwardIterator    begin,
 		      ForwardIterator    end,
-		      const bool         indices_are_sorted = false);
+		      const bool         indices_are_unique_and_sorted = false);
 
 				     /**
 				      * Check if a value at a certain
@@ -435,7 +435,8 @@ class CompressedSparsityPattern : public Subscriptor
                                           */
         template <typename ForwardIterator>
 	void add_entries (ForwardIterator begin,
-			  ForwardIterator end);
+			  ForwardIterator end,
+			  const bool indices_are_sorted);
 
                                          /**
                                           * Flush the cache my merging it with
@@ -480,19 +481,6 @@ CompressedSparsityPattern::Line::add (const unsigned int j)
 
 
 
-template <typename ForwardIterator>
-inline
-void
-CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
-					      ForwardIterator end)
-{
-  // right now, just forward to the individual function.
-  for (ForwardIterator it = begin; it != end; ++it)
-    add (*it);
-}
-
-
-
 inline
 unsigned int
 CompressedSparsityPattern::n_rows () const
@@ -530,11 +518,11 @@ void
 CompressedSparsityPattern::add_entries (const unsigned int row,
 					ForwardIterator begin,
 					ForwardIterator end,
-					const bool         /*indices_are_sorted*/)
+					const bool      indices_are_sorted)
 {
   Assert (row < rows, ExcIndexRange (row, 0, rows));
 
-  lines[row].add_entries (begin, end);
+  lines[row].add_entries (begin, end, indices_are_sorted);
 }
 
 

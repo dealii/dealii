@@ -96,6 +96,12 @@ CompressedSparsityPattern::Line::flush_cache () const
       }
     }
 
+				   // TODO: could use the add_entries
+                                   // function of the constraint line for
+                                   // doing this, but that one is
+                                   // non-const. Still need to figure out
+                                   // how to do that.
+
                                    // next job is to merge the two
                                    // arrays. special case the case that the
                                    // original array is empty.
@@ -185,6 +191,126 @@ CompressedSparsityPattern::Line::flush_cache () const
     }
   
   cache_entries = 0;
+}
+
+
+
+template <typename ForwardIterator>
+void
+CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
+					      ForwardIterator end,
+					      const bool indices_are_sorted)
+{
+				   // use the same code as when flushing the
+				   // cache in case we have many (more than
+				   // three) entries in a sorted
+				   // list. Otherwise, go on to the single
+				   // add() function.
+  const int n_elements = end - begin;
+  if (n_elements <= 0)
+    return;
+
+  const unsigned int n_cols = static_cast<unsigned int>(n_elements);
+  const unsigned int stop_size = entries.size() + n_cols;
+
+  if (indices_are_sorted == true)
+    {
+
+                                   // next job is to merge the two
+                                   // arrays. special case the case that the
+                                   // original array is empty.
+      if (entries.size() == 0)
+	{
+	  entries.resize (n_cols);
+	  ForwardIterator my_it = begin;
+	  for (unsigned int i=0; i<n_cols; ++i)
+	    entries[i] = *my_it++;
+	}
+      else
+	{
+                                       // first count how many of the cache
+                                       // entries are already in the main
+                                       // array, so that we can efficiently
+                                       // allocate memory
+	  unsigned int n_new_entries = 0;
+	  {
+	    unsigned int entry_position = 0;
+	    ForwardIterator my_it = begin;
+	    while ((entry_position<entries.size()) &&
+		   (my_it != end))
+	      {
+		++n_new_entries;
+		if (entries[entry_position] < *my_it)
+		  ++entry_position;
+		else if (entries[entry_position] == *my_it)
+		  {
+		    ++entry_position;
+		    ++my_it;
+		  }
+		else
+		  ++my_it;
+	      }
+
+                                         // scoop up leftovers in arrays
+	    n_new_entries += (entries.size() - entry_position) +
+	                     (end - my_it);
+	  }
+
+                                       // then allocate new memory and merge
+                                       // arrays, if there are any entries at
+                                       // all that need to be merged
+	  Assert (n_new_entries >= entries.size(),
+		  ExcInternalError());
+	  if (n_new_entries > entries.size())
+	    {
+	      std::vector<unsigned int> new_entries;
+	      new_entries.reserve (n_new_entries);
+	      ForwardIterator my_it = begin;
+	      unsigned int entry_position = 0;
+	      while ((entry_position<entries.size()) &&
+		     (my_it != end))
+		if (entries[entry_position] < *my_it)
+		  {
+		    new_entries.push_back (entries[entry_position]);
+		    ++entry_position;
+		  }
+		else if (entries[entry_position] == *my_it)
+		  {
+		    new_entries.push_back (entries[entry_position]);
+		    ++entry_position;
+		    ++my_it;
+		  }
+		else
+		  {
+		    new_entries.push_back (*my_it);
+		    ++my_it;
+		  }
+
+					   // copy remaining elements from the
+					   // array that we haven't
+					   // finished. note that at most one
+					   // of the following loops will run
+					   // at all
+	      for (; entry_position < entries.size(); ++entry_position)
+		new_entries.push_back (entries[entry_position]);
+	      for (; my_it != end; ++my_it)
+		new_entries.push_back (*my_it);
+
+	      Assert (new_entries.size() == n_new_entries,
+		      ExcInternalError());
+
+					   // finally swap old and new array,
+					   // and set cache size to zero
+	      new_entries.swap (entries);
+	    }
+	}
+      return;
+    }
+
+				   // otherwise, insert the indices one
+				   // after each other
+  for (ForwardIterator it = begin; it != end; ++it)
+    add (*it);
 }
 
 
@@ -417,5 +543,15 @@ CompressedSparsityPattern::n_nonzero_elements () const
   
   return n;
 }
+
+
+// explicit instantiations
+template void CompressedSparsityPattern::Line::add_entries(unsigned int *,
+							   unsigned int *,
+							   const bool);
+template void CompressedSparsityPattern::Line::
+add_entries(std::vector<unsigned int>::iterator,
+	    std::vector<unsigned int>::iterator,
+	    const bool);
 
 DEAL_II_NAMESPACE_CLOSE
