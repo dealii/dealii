@@ -585,7 +585,7 @@ class BoussinesqFlowProblem
     void assemble_stokes_preconditioner ();
     void build_stokes_preconditioner ();
     void assemble_stokes_system ();
-    void assemble_temperature_system ();
+    void assemble_temperature_system (const double maximal_velocity);
     void assemble_temperature_matrix ();
     double get_maximal_velocity () const;
     std::pair<double,double> get_extrapolated_temperature_range () const;
@@ -1960,7 +1960,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 				 // FEValues object for the evaluation of the
 				 // velocity at the quadrature points.
 template <int dim>
-void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
+void BoussinesqFlowProblem<dim>::
+  assemble_temperature_system (const double maximal_velocity)
 {
   const bool use_bdf2_scheme = (timestep_number != 0);
 
@@ -2009,11 +2010,12 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 				   // and we again use shortcuts for the
 				   // temperature basis
 				   // functions. Eventually, we need to find
-				   // the maximum of velocity, temperature
-				   // and the diameter of the computational
-				   // domain which will be used for the
-				   // definition of the stabilization
-				   // parameter.
+				   // the temperature extrema and the
+				   // diameter of the computational domain
+				   // which will be used for the definition
+				   // of the stabilization parameter (we got
+				   // the maximal velocity as an input to
+				   // this function).
   std::vector<Tensor<1,dim> > old_velocity_values (n_q_points);
   std::vector<Tensor<1,dim> > old_old_velocity_values (n_q_points);
   std::vector<double>         old_temperature_values (n_q_points);
@@ -2029,7 +2031,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   std::vector<double>         phi_T      (dofs_per_cell);
   std::vector<Tensor<1,dim> > grad_phi_T (dofs_per_cell);
   
-  const double global_u_infty = get_maximal_velocity();
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
 
@@ -2126,7 +2127,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 			     old_velocity_values,
 			     old_old_velocity_values,
 			     gamma_values,
-			     global_u_infty,
+			     maximal_velocity,
 			     global_T_range.second - global_T_range.first,
 			     cell->diameter());
       
@@ -2322,11 +2323,12 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // Finally, we solve, distribute the
 				   // hanging node constraints and write out
 				   // the number of iterations.
-  old_time_step = time_step;    
+  old_time_step = time_step;
+  const double maximal_velocity = get_maximal_velocity();
   time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
-              std::max (get_maximal_velocity(), .01);
+              std::max (maximal_velocity, .01);
 
   std::cout << "   " << "Time step: " << time_step
 	    << std::endl;
@@ -2334,7 +2336,7 @@ void BoussinesqFlowProblem<dim>::solve ()
   temperature_solution = old_temperature_solution;
 
 
-  assemble_temperature_system ();
+  assemble_temperature_system (maximal_velocity);
   {
 
     SolverControl solver_control (temperature_matrix.m(),
