@@ -1554,27 +1554,26 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 				   // additional construct that also takes
 				   // care of block indices.
-  std::vector<unsigned int> block_ends(num_blocks, n_actual_dofs);
+  std::vector<unsigned int> block_starts(num_blocks+1, n_actual_dofs);
   {
     typedef std::vector<unsigned int>::iterator row_iterator;
     row_iterator col_indices = localized_indices.begin();
-    unsigned int n_cols = n_actual_dofs;
 
 				   // find end of rows.
-    for (unsigned int i=0;i<num_blocks-1;++i)
+    block_starts[0] = 0;
+    for (unsigned int i=1;i<num_blocks;++i)
       {
-	row_iterator first_block = std::lower_bound (col_indices,
-						     col_indices+n_cols,
-						     global_matrix.get_row_indices().block_start(i+1));
-	block_ends[i] = first_block - localized_indices.begin();
-	n_cols -= (first_block - col_indices); 
+	row_iterator first_block = 
+	  std::lower_bound (col_indices,
+			    localized_indices.end(),
+			    global_matrix.get_row_indices().block_start(i));
+	block_starts[i] = first_block - localized_indices.begin();
 	col_indices = first_block;
       }
-    block_ends[num_blocks-1] = n_actual_dofs;
 
 				   // transform row indices to local index
 				   // space
-    for (unsigned int i=block_ends[0]; i<localized_indices.size(); ++i)
+    for (unsigned int i=block_starts[1]; i<localized_indices.size(); ++i)
       localized_indices[i] = global_matrix.get_row_indices().
 	                       global_to_local(localized_indices[i]).second;
   }
@@ -1586,41 +1585,42 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // non-block variant from now onwards
 				   // is that we go through the blocks
 				   // of the matrix separately.
-  unsigned int block_start = 0;
   for (unsigned int block=0; block<num_blocks; ++block)
     {
-      for (unsigned int i=block_start; i<block_ends[block]; ++i)
+      const unsigned int next_block = block_starts[block+1];
+      for (unsigned int i=block_starts[block]; i<next_block; ++i)
 	{
 	  const unsigned int row = localized_indices[i];
 	  const unsigned int loc_row = my_indices[i].local_row;
 
-	  unsigned int block_col_start = 0;
 	  for (unsigned int block_col=0; block_col<num_blocks; ++block_col)
 	    {
-	      unsigned int col_counter = 0;
+	      const unsigned int next_block_col = block_starts[block_col+1];
+	      unsigned int * col_ptr = &cols[0];
+	      double * val_ptr = &vals[0];
 	      if (have_indirect_rows == false)
 		{
 		  Assert(loc_row >= 0 && loc_row < n_local_dofs,
 			 ExcInternalError());
 
-		  for (unsigned int j=block_col_start; j < block_ends[block_col]; ++j)
+		  for (unsigned int j=block_starts[block_col]; j < next_block_col; ++j)
 		    {
 		      const unsigned int loc_col = my_indices[j].local_row;
 		      Assert(loc_col >= 0 && loc_col < n_local_dofs,
 			     ExcInternalError());
 
-		      if (local_matrix(loc_row,loc_col) != 0)
+		      const double mat_val = local_matrix(loc_row, loc_col);
+		      if (mat_val != 0)
 			{
-			  vals[col_counter] = local_matrix(loc_row,loc_col);
-			  cols[col_counter] = localized_indices[j];
-			  col_counter++;
+			  *col_ptr++ = localized_indices[j];
+			  *val_ptr++ = mat_val;
 			}
 		    }
 		}
 
 	      else
 		{
-		  for (unsigned int j=block_col_start; j < block_ends[block_col]; ++j)
+		  for (unsigned int j=block_starts[block_col]; j < next_block_col; ++j)
 		    {
 		      double col_val;
 		      const unsigned int loc_col = my_indices[j].local_row;
@@ -1672,14 +1672,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 		      if (col_val != 0)
 			{
-			  cols[col_counter] = localized_indices[j];
-			  vals[col_counter] = col_val;
-			  col_counter++;
+			  *col_ptr++ = localized_indices[j];
+			  *val_ptr++ = col_val;
 			}
 		    }
 		}
-
-	      block_col_start = block_ends[block_col];
 
 				   // finally, write all the information
 				   // that accumulated under the given
@@ -1687,12 +1684,17 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // into the vector. For the block matrix,
 				   // go trough the individual blocks and
 				   // look which entries we need to set.
-	      Threads::ThreadMutex::ScopedLock lock(mutex);
-	      global_matrix.block(block, block_col).add(row, col_counter,
-							&cols[0], &vals[0],
-							false, true);
+	      const unsigned int n_values = col_ptr - &cols[0];
+	      Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
+		      ExcInternalError());
+	      if (n_values > 0)
+		{
+		  Threads::ThreadMutex::ScopedLock lock(mutex);
+		  global_matrix.block(block, block_col).add(row, n_values,
+							    &cols[0], &vals[0],
+							    false, true);
+		}
 	    }
-
 
 	  if (use_vectors == true)
 	    {
@@ -1723,7 +1725,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		}
 	    }
 	}
-      block_start = block_ends[block];
     }
 }
 
@@ -1879,7 +1880,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // out some local dofs.
   for (unsigned int i=0; i<n_actual_dofs; ++i)
     {
-      unsigned int col_counter = 0;
+      std::vector<unsigned int>::iterator col_ptr = cols.begin();
       const unsigned int row = my_indices[i].global_row;
       const unsigned int loc_row = my_indices[i].local_row;
 
@@ -1898,7 +1899,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		     ExcInternalError());
 
 	      if (dof_mask[loc_row][loc_col] == true)
-		cols[col_counter++] = my_indices[j].global_row;
+		*col_ptr++ = my_indices[j].global_row;
 	    }
 	}
 
@@ -1962,7 +1963,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	      if (add_this == true)
 		{
 		  add_this_index:
-		  cols[col_counter++] = my_indices[j].global_row;
+		  *col_ptr++ = my_indices[j].global_row;
 		}
 	    }
 	}
@@ -1972,8 +1973,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // process into the global matrix row and
 				   // into the vector
       Threads::ThreadMutex::ScopedLock lock(mutex);
-      if (col_counter > 0)
-	sparsity_pattern.add_entries(row, cols.begin(), cols.begin()+col_counter,
+      if (col_ptr != cols.begin())
+	sparsity_pattern.add_entries(row, cols.begin(), col_ptr,
 				     true);
     }
 }
@@ -2115,27 +2116,25 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 
 				   // additional construct that also takes
 				   // care of block indices.
-  std::vector<unsigned int> block_ends(num_blocks, n_actual_dofs);
+  std::vector<unsigned int> block_starts(num_blocks+1, n_actual_dofs);
   {
     typedef std::vector<unsigned int>::iterator row_iterator;
     row_iterator col_indices = localized_indices.begin();
-    unsigned int n_cols = n_actual_dofs;
 
 				   // find end of rows.
-    for (unsigned int i=0;i<num_blocks-1;++i)
+    block_starts[0] = 0;
+    for (unsigned int i=1;i<num_blocks;++i)
       {
 	row_iterator first_block = std::lower_bound (col_indices,
-						     col_indices+n_cols,
-						     sparsity_pattern.get_row_indices().block_start(i+1));
-	block_ends[i] = first_block - localized_indices.begin();
-	n_cols -= (first_block - col_indices); 
+						     localized_indices.end(),
+						     sparsity_pattern.get_row_indices().block_start(i));
+	block_starts[i] = first_block - localized_indices.begin();
 	col_indices = first_block;
       }
-    block_ends[num_blocks-1] = localized_indices.size();
 
 				   // transform row indices to local index
 				   // space
-    for (unsigned int i=block_ends[0]; i<localized_indices.size(); ++i)
+    for (unsigned int i=block_starts[1]; i<localized_indices.size(); ++i)
       localized_indices[i] = sparsity_pattern.get_row_indices().
 	                       global_to_local(localized_indices[i]).second;
   }
@@ -2144,11 +2143,11 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // unconditionally
   if (dof_mask_is_active == false)
     {
-      unsigned int block_start = 0;
       Threads::ThreadMutex::ScopedLock lock(mutex);
       for (unsigned int block=0; block<num_blocks; ++block)
 	{
-	  for (unsigned int i=block_start; i<block_ends[block]; ++i)
+	  const unsigned int next_block = block_starts[block+1];
+	  for (unsigned int i=block_starts[block]; i<next_block; ++i)
 	    {
 	      Assert (i<n_actual_dofs, ExcInternalError());
 	      const unsigned int row = localized_indices[i];
@@ -2158,16 +2157,14 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	      for (unsigned int block_col = 0; block_col<num_blocks; ++block_col)
 		{
 		  sparsity_pattern.block(block,block_col).
-		    add_entries(localized_indices[i],
+		    add_entries(row,
 				index_it, 
-				localized_indices.begin()+block_ends[block_col], 
+				localized_indices.begin() + next_block, 
 				true);
-		  index_it = localized_indices.begin() + block_ends[block_col];
+		  index_it = localized_indices.begin() + next_block;
 		}
 	    }
-	  block_start = block_ends[block];
 	}
-
       return;
     }
 
@@ -2177,31 +2174,31 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // non-block variant from now onwards
 				   // is that we go through the blocks
 				   // of the matrix separately.
-  unsigned int block_start = 0;
   for (unsigned int block=0; block<num_blocks; ++block)
     {
-      for (unsigned int i=block_start; i<block_ends[block]; ++i)
+      const unsigned int next_block = block_starts[block+1];
+      for (unsigned int i=block_starts[block]; i<next_block; ++i)
 	{
-	  const unsigned int row = my_indices[i].global_row;
+	  const unsigned int row = localized_indices[i];
 	  const unsigned int loc_row = my_indices[i].local_row;
 
-	  unsigned int block_col_start = 0;
 	  for (unsigned int block_col=0; block_col<num_blocks; ++block_col)
 	    {
-	      unsigned int col_counter = 0;
+	      const unsigned int next_block_col = block_starts[block_col+1];
+	      std::vector<unsigned int>::iterator col_ptr = cols.begin();
 	      if (have_indirect_rows == false)
 		{
 		  Assert(loc_row >= 0 && loc_row < n_local_dofs,
 			 ExcInternalError());
 
-		  for (unsigned int j=block_col_start; j < block_ends[block_col]; ++j)
+		  for (unsigned int j=block_starts[block_col]; j < next_block_col; ++j)
 		    {
 		      const unsigned int loc_col = my_indices[j].local_row;
 		      Assert(loc_col >= 0 && loc_col < n_local_dofs,
 			     ExcInternalError());
 
 		      if (dof_mask[loc_row][loc_col] == true)
-			cols[col_counter++] = localized_indices[j];
+			*col_ptr++ = localized_indices[j];
 		    }
 		}
 
@@ -2209,7 +2206,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // constraints, resolve them
 	      else
 		{
-		  for (unsigned int j=block_col_start; j < block_ends[block_col]; ++j)
+		  for (unsigned int j=block_starts[block_col]; j < next_block_col; ++j)
 		    {
 		      const unsigned int loc_col = my_indices[j].local_row;
 
@@ -2245,32 +2242,29 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
   
 			  for (unsigned int p=0; p<my_indices[j].constraints.size(); ++p)
 			    if (dof_mask[my_indices[i].constraints[q].first]
-			        [my_indices[j].constraints[p].first] == true)
+			                [my_indices[j].constraints[p].first] == true)
 			      goto add_this_index;
 			}
 
 		      if (add_this == true)
 			{
 			add_this_index:
-			  cols[col_counter++] = localized_indices[j];
+			  *col_ptr++ = localized_indices[j];
 			}
 		    }
 		}
-
-	      block_col_start = block_ends[block_col];
 
 				   // finally, write all the information
 				   // that accumulated under the given
 				   // process into the global matrix row and
 				   // into the vector
 	      Threads::ThreadMutex::ScopedLock lock(mutex);
-	      sparsity_pattern.block(block, block_col).add_entries(localized_indices[i], 
+	      sparsity_pattern.block(block, block_col).add_entries(row, 
 								   cols.begin(), 
-								   cols.begin()+col_counter,
+								   col_ptr,
 								   true);
 	    }
 	}
-      block_start = block_ends[block];
     }
 }
 
