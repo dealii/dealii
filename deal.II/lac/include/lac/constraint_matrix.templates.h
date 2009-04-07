@@ -1591,9 +1591,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
     {
       for (unsigned int i=block_start; i<block_ends[block]; ++i)
 	{
-	  const unsigned int row = my_indices[i].global_row;
+	  const unsigned int row = localized_indices[i];
 	  const unsigned int loc_row = my_indices[i].local_row;
-	  double val = 0;
 
 	  unsigned int block_col_start = 0;
 	  for (unsigned int block_col=0; block_col<num_blocks; ++block_col)
@@ -1616,15 +1615,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 			  cols[col_counter] = localized_indices[j];
 			  col_counter++;
 			}
-		    }
-
-		  if (use_vectors == true)
-		    {
-		      val = local_vector(loc_row);
-
-		      for (unsigned int i=0; i<constraint_lines.size(); ++i)
-			val -= constraint_lines[i].second->inhomogeneity *
-			  local_matrix(loc_row,constraint_lines[i].first);
 		    }
 		}
 
@@ -1687,29 +1677,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 			  col_counter++;
 			}
 		    }
-
-		  if (use_vectors == true)
-		    {
-		      if (loc_row != deal_II_numbers::invalid_unsigned_int)
-			{
-			  Assert (loc_row >= 0 && loc_row < n_local_dofs,
-				  ExcInternalError());
-			  val = local_vector(loc_row);
-			  for (unsigned int i=0; i<constraint_lines.size(); ++i)
-			    val -= constraint_lines[i].second->inhomogeneity *
-			      local_matrix(loc_row,constraint_lines[i].first);
-			}
-
-		      for (unsigned int q=0; q < my_indices[i].constraints.size(); ++q)
-			{
-			  const unsigned int loc_row_q = my_indices[i].constraints[q].first;
-			  double add_this = local_vector (loc_row_q);
-			  for (unsigned int k=0; k<constraint_lines.size(); ++k)
-			    add_this -= constraint_lines[k].second->inhomogeneity *
-			                local_matrix(loc_row_q,constraint_lines[k].first);
-			  val += add_this * my_indices[i].constraints[q].second;
-			}
-		    }
 		}
 
 	      block_col_start = block_ends[block_col];
@@ -1721,14 +1688,39 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // go trough the individual blocks and
 				   // look which entries we need to set.
 	      Threads::ThreadMutex::ScopedLock lock(mutex);
-	      global_matrix.block(block, block_col).add(localized_indices[i], col_counter,
+	      global_matrix.block(block, block_col).add(row, col_counter,
 							&cols[0], &vals[0],
 							false, true);
 	    }
-	  if (val != 0)
+
+
+	  if (use_vectors == true)
 	    {
-	      Threads::ThreadMutex::ScopedLock lock(mutex);
-	      global_vector(row) += val;
+	      double val = 0;
+	      if (loc_row != deal_II_numbers::invalid_unsigned_int)
+		{
+		  Assert (loc_row >= 0 && loc_row < n_local_dofs,
+			  ExcInternalError());
+		  val = local_vector(loc_row);
+		  for (unsigned int i=0; i<constraint_lines.size(); ++i)
+		    val -= constraint_lines[i].second->inhomogeneity *
+		      local_matrix(loc_row,constraint_lines[i].first);
+		}
+
+	      for (unsigned int q=0; q < my_indices[i].constraints.size(); ++q)
+		{
+		  const unsigned int loc_row_q = my_indices[i].constraints[q].first;
+		  double add_this = local_vector (loc_row_q);
+		  for (unsigned int k=0; k<constraint_lines.size(); ++k)
+		    add_this -= constraint_lines[k].second->inhomogeneity *
+		                local_matrix(loc_row_q,constraint_lines[k].first);
+		  val += add_this * my_indices[i].constraints[q].second;
+		}
+	      if (val != 0)
+		{
+		  Threads::ThreadMutex::ScopedLock lock(mutex);
+		  global_vector(my_indices[i].global_row) += val;
+		}
 	    }
 	}
       block_start = block_ends[block];
