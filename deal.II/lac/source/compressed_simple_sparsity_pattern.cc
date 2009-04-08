@@ -46,11 +46,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 	ForwardIterator test = begin, test1 = begin;
 	++test1;
 	for ( ; test1 != end; ++test, ++test1)
-	  {
-	    if (*test1 <= *test)
-	      std::cout << end-begin << " " << test1-begin << " " << *test1 << " " << *test << "  " << std::flush;
 	  Assert (*test1 > *test, ExcInternalError());
-	  }
       }
 #endif
 
