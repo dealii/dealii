@@ -35,8 +35,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
   if (n_elements <= 0)
     return;
 
-  const unsigned int n_cols = static_cast<unsigned int>(n_elements);
-  const unsigned int stop_size = entries.size() + n_cols;
+  const unsigned int stop_size = entries.size() + n_elements;
 
   if (indices_are_sorted == true && n_elements > 3)
     {
@@ -47,7 +46,11 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 	ForwardIterator test = begin, test1 = begin;
 	++test1;
 	for ( ; test1 != end; ++test, ++test1)
+	  {
+	    if (*test1 <= *test)
+	      std::cout << end-begin << " " << test1-begin << " " << *test1 << " " << *test << "  " << std::flush;
 	  Assert (*test1 > *test, ExcInternalError());
+	  }
       }
 #endif
 
@@ -57,18 +60,49 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 	  return;
 	}
 
-				   // resize vector by just inserting the
-				   // list
-      const unsigned int col = *begin;
+				   // find a possible insertion point for
+				   // the first entry. check whether the
+				   // first entry is a duplicate before
+				   // actually doing something.
+      ForwardIterator my_it = begin;
+      unsigned int col = *my_it;
       std::vector<unsigned int>::iterator it = 
 	std::lower_bound(entries.begin(), entries.end(), col);
+      while (*it == col) 
+	{
+	  ++my_it;
+	  if (my_it == end)
+	    break;
+	  col = *my_it;
+				   // check the very next entry in the
+				   // current array
+	  ++it;
+	  if (it == entries.end())
+	    break;
+	  if (*it > col)
+	    break;
+	  if (*it == col)
+	    continue;
+				   // ok, it wasn't the very next one, do a
+				   // binary search to find the insert point
+	  it = std::lower_bound(it, entries.end(), col);
+	  if (it == entries.end())
+	    break;
+	}
+				   // all input entries were duplicates.
+      if (my_it == end)
+	return;
+
+				   // resize vector by just inserting the
+				   // list
       const unsigned int pos1 = it - entries.begin();
-      entries.insert (it, begin, end);
+      Assert (pos1 <= entries.size(), ExcInternalError());
+      entries.insert (it, my_it, end);
       it = entries.begin() + pos1;
+      Assert (entries.size() >= (unsigned int)(it-entries.begin()), ExcInternalError());
 
 				   // now merge the two lists.
-      ForwardIterator my_it = begin;
-      std::vector<unsigned int>::iterator it2 = it + n_cols;
+      std::vector<unsigned int>::iterator it2 = it + (end-my_it);
 
 				   // as long as there are indices both in
 				   // the end of the entries list and in the
