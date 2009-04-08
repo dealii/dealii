@@ -226,6 +226,15 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	  *)                GXX_VERSION_DETAILED=gcc4.4.x ;;
         esac
   	;;
+      *version\ 4.5*)
+  	GXX_VERSION=gcc4.5
+        case "$GXX_VERSION_STRING" in
+	  *version\ 4.5.0*) GXX_VERSION_DETAILED=gcc4.5.0 ;;
+	  *version\ 4.5.1*) GXX_VERSION_DETAILED=gcc4.5.1 ;;
+	  *version\ 4.5.2*) GXX_VERSION_DETAILED=gcc4.5.2 ;;
+	  *)                GXX_VERSION_DETAILED=gcc4.5.x ;;
+        esac
+  	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	dnl These compilers are too old to support a useful subset
   	dnl of modern C++, so we don't support them
@@ -1281,6 +1290,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
       *version\ 4.4*)
   	AC_MSG_RESULT(C compiler is gcc-4.4)
   	CC_VERSION=gcc4.4
+  	;;
+      *version\ 4.5*)
+  	AC_MSG_RESULT(C compiler is gcc-4.5)
+  	CC_VERSION=gcc4.5
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	AC_MSG_RESULT(C compiler is $CC_VERSION_STRING)
