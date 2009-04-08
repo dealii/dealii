@@ -2156,12 +2156,13 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	      std::vector<unsigned int>::iterator index_it = localized_indices.begin();
 	      for (unsigned int block_col = 0; block_col<num_blocks; ++block_col)
 		{
+		  const unsigned int next_block_col = block_starts[block_col+1];
 		  sparsity_pattern.block(block,block_col).
 		    add_entries(row,
 				index_it, 
-				localized_indices.begin() + next_block, 
+				localized_indices.begin() + next_block_col, 
 				true);
-		  index_it = localized_indices.begin() + next_block;
+		  index_it = localized_indices.begin() + next_block_col;
 		}
 	    }
 	}
