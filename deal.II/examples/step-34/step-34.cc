@@ -353,7 +353,7 @@ double LaplaceKernel<dim>::single_layer(const Point<dim> &R,
     case 3:
         return (1./( R.norm()*4*numbers::PI ) );
         break;
-    defualt:
+    default:
         Assert(false, ExcInternalError());
         return 0.;
         break;
