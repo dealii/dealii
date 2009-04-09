@@ -336,7 +336,77 @@ can merge the first and third term into one:
   \partial_j [\partial_i (\partial_j\phi) \phi]
 @f}
 
-FINISH (use that velocity is rotation-free) FINISH
+We now only need to massage that last term a bit more. Using the product rule,
+we get 
+@f{align*}
+  \partial_j [\partial_i (\partial_j\phi) \phi]
+  &=
+  \partial_i [\partial_j \partial_j\phi] \phi
+  +
+  \partial_i [partial_j \phi] (\partial_j \phi).
+@f}
+The first of these terms is zero (because, again, the summation over $j$ gives
+$\Delta\phi$, which is zero). The last term can be written as $\frac 12
+\partial_i [(\partial_j\phi)(\partial_j\phi)]$ which is in the desired gradient
+form. As a consequence, we can now finally state that
+@f{align*}
+  [\mathbf{v}\cdot\nabla\mathbf{v}]_i
+  &=
+  \partial_i (\partial_j [(\partial_j\phi) \phi + v_{\infty,j} \partial_j \phi])
+  -
+  \partial_j [\partial_i (\partial_j\phi) \phi]
+  \\
+  &=
+  \partial_i 
+  \left[
+    (\partial_j\phi)(\partial_j \phi) + v_{\infty,j} \partial_j \phi
+    - 
+    \frac 12 (\partial_j\phi)(\partial_j\phi)
+  \right],
+  \\
+  &=
+  \partial_i 
+  \left[
+    \frac 12 (\partial_j\phi)(\partial_j \phi) + v_{\infty,j} \partial_j \phi
+  \right],
+@f}
+or in vector form:
+@f[
+  \mathbf{v}\cdot\nabla\mathbf{v}
+  =
+  \nabla 
+  \left[
+    \frac 12 \mathbf{\tilde v}^2
+    + \mathbf{v}_{\infty} \cdot \mathbf{\tilde v}
+  \right],
+@f]
+or in other words:
+@f[
+  p
+  =
+  -\rho 
+  \left[
+    \frac 12 \mathbf{\tilde v}^2
+    + \mathbf{v}_{\infty} \cdot \mathbf{\tilde v}
+  \right]
+  =
+  -\rho 
+  \left[
+    \frac 12 \mathbf{v}^2
+    -
+    \frac 12 \mathbf{v}_{\infty}^2
+  \right]
+  .
+@f]
+Because the pressure is only determined up to a constant (it appears only with
+a gradient in the equations), an equally valid definition is
+@f[
+  p
+  =
+  -\frac 12 \rho \mathbf{v}^2
+  .
+@f]
+This is exactly Bernoulli's law mentioned above.
 
 
 <h3>The numerical approximation</h3>
