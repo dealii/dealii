@@ -37,11 +37,11 @@ template <typename number>     class BlockSparseMatrixEZ;
  * matrix type or not. For example,
  * @code
  *   IsBlockMatrix<SparseMatrix<double> >::value
- * @encode
+ * @endcode
  * has the value false, whereas
  * @code
  *   IsBlockMatrix<BlockSparseMatrix<double> >::value
- * @encode
+ * @endcode
  * is true. This is sometimes useful in template contexts where we may
  * want to do things differently depending on whether a template type
  * denotes a regular or a block matrix type.
