@@ -107,12 +107,13 @@ as the homogenous Laplace equation for the unknown $\phi$:
 	   -\mathbf{n}\cdot\nabla\phi &= \mathbf{n}\cdot\mathbf{v}_\infty 
 	   && \text{on}\ \partial\Omega
 \f}
-while the momentum equation reduces to the Bernoulli's equation 
+while the momentum equation reduces to Bernoulli's equation that expresses the
+pressure $p$ as a function of the potential $\phi$:
 \f[
-\frac{p}{\rho} +\frac{1}{2} | \nabla \phi |^2 = 0 \in \Omega,
+\frac{p}{\rho} +\frac{1}{2} | \nabla \phi |^2 = 0 \in \Omega.
 \f]
-and the pressure and velocity are uncoupled.
 
+So we can solve the problem by solving the Laplace equation for the potential.
 We will now reformulate this equation in integral form using the
  Green identity:
 \f[\label{green}
@@ -139,11 +140,11 @@ called fundamental solutions of the Laplace equation,
     \frac{1}{4\pi}\frac{1}{|\mathbf{y}-\mathbf{x}|}&& \text{for } n=3,  
 \end{aligned}
 \f]
-satisfy in a variational sense the equation: 
+satisfy in a distributional sense the equation: 
 \f[
   \Delta_y G(\mathbf{y}-\mathbf{x}) = \delta(\mathbf{y}-\mathbf{x}),
 \f]
-where the derivation is done in the variable $\mathbf{y}$.
+where the derivative is done in the variable $\mathbf{y}$.
 
 If we substitute $u$ and $v$ in the Green identity with the solution
 $\phi$ and with the fundamental solution of the Laplace equation
@@ -187,8 +188,11 @@ $\Omega$:
   \quad \mathbf{x}\in \partial\Omega,
 \f]
 which is the integral formulation we were looking for, where the
-quantity $\alpha(\mathbf{x}_i)$ is the fraction of angle or solid
-angle by which the point $\mathbf{x}_i$ sees the domain $\Omega$.
+quantity $\alpha(\mathbf{x})$ is the fraction of angle or solid
+angle by which the point $\mathbf{x}$ sees the domain $\Omega$. In particular,
+at points $\mathbf{x}$ where the boundary $\partial\Omega$ is differentiable
+(i.e. smooth) we have $\alpha(\mathbf{x}(=\frac 12$, but the value may be
+smaller or larger at points where the boundary has a corner or an edge.
 
 Substituting the single and double layer operators we get:
 \f[               
@@ -232,10 +236,12 @@ $\phi(\mathbf{x})$ for all $\mathbf{x}\in\partial\Omega$. In the next step, we
 can compute (analytically, if we want) the solution $\phi(\mathbf{x})$ in all
 of $\mathbb{R}^n\backslash\Omega$. To this end, recall that we had
 \f[
-  \phi(\mathbf{x}) + 
+  \phi(\mathbf{x}) 
+  =
+  -
   (D\phi)(\mathbf{x})
-  = 
-  -\left(S[\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
+  +
+  \left(S[\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
   \qquad \forall\mathbf{x}\in \mathbb{R}^n\backslash\Omega.
 \f]
 where now we have everything that is on the right hand side ($S$ and $D$ are
@@ -253,8 +259,9 @@ momentum balance equation for a stationary flow field, i.e., whether
 $\mathbf{v}\cdot\nabla\mathbf{v} = -\frac 1\rho \nabla p$ where
 $\mathbf{v}=\mathbf{\tilde
 v}+\mathbf{v}_\infty=\nabla\phi+\mathbf{v}_\infty$ for some (unknown) pressure
-$p$ and given $\rho,\mathbf{g}$. The left hand side of this
-equation equates to
+$p$ and a given constant $\rho$. In other words, we would like to verify that
+Bernoulli's law as stated above indeed holds. To show this, we use that
+the left hand side of this equation equates to
 @f{align*}
   \mathbf{v}\cdot\nabla\mathbf{v}
   &=
@@ -329,14 +336,14 @@ can merge the first and third term into one:
   \partial_j [\partial_i (\partial_j\phi) \phi]
 @f}
 
+FINISH (use that velocity is rotation-free) FINISH
 
 
 <h3>The numerical approximation</h3>
 
-Numerical approximations of Boundary Integral Equations are commonly
+Numerical approximations of %Boundary Integral Equations (BIE) are commonly
 referred to as the boundary element method or panel method (the latter
-is used mostly in the computational fluid dynamics community).
-
+expression being used mostly in the computational fluid dynamics community).
 The goal of the following test problem is to solve the integral
 formulation of the Laplace equation with Neumann boundary conditions,
 using a circle and a sphere respectively in two and three space
@@ -345,7 +352,7 @@ treat boundary element problems almost as easily as finite element
 problems using the deal.II library.
 
 To this end, let $\mathcal{T}_h = \bigcup_i K_i$ be a subdivision of the
-manifold $\Gamma = \partial \Omega$ into $M$ segments if $n=2$ or $M$
+manifold $\Gamma = \partial \Omega$ into $M$ line segments if $n=2$, or $M$
 quadrilaterals if $n=3$. We will call each individual segment or
 quadrilateral an <i>element</i> or <i>cell</i>, independently of the
 dimension $n$ of the surrounding space $\mathbb{R}^n$.
@@ -355,8 +362,12 @@ We define the finite dimensional space $V_h$ as
   V_h := \{ v \in C^0(\Gamma) \text{ s.t. } v|_{K_i} \in \mathcal{Q}^1(K_i), 
   \forall i\},
 \f]
-with basis functions $\psi_i(\mathbf{x})$ (the usual FE_Q finite element, 
-with the catch that this time it is defined on a manifold of codimension one).  
+with basis functions $\psi_i(\mathbf{x})$ for which we will use the usual FE_Q
+finite element, with the catch that this time it is defined on a manifold of
+codimension one (which we do by using the second template argument that is
+usually defaulted to equal the first; here, we will create objects
+<code>FE_Q@<dim+1,dim@></code> to indicate that we have <code>dim-1</code>
+dimensional cells in a <code>dim</code> dimensional space).
 An element $\phi_h$ of $V_h$ is uniquely 
 identified by the vector $\boldsymbol{\phi}$ of its coefficients
 $\phi_i$, that is:
@@ -383,23 +394,21 @@ matter, that requires a careful study. Assume that these points are
 known for the moment, and call them $\mathbf x_i$ with $i=0...n\_dofs$.
 
 The problem then becomes:
-
 Given the datum $\mathbf{v}_\infty$, find a function $\phi_h$ in $V_h$
-such that, the following $n\_dofs$ equations are satisfied:
+such that the following $n\_dofs$ equations are satisfied:
 
 \f{align*}
     \alpha(\mathbf{x}_i) \phi_h(\mathbf{x}_i)  
-    & + \int_{\Gamma_y} \frac{ \partial G(\mathbf{y}-\mathbf{x}_i)}{\partial\mathbf{n}_y }
-    \phi_h(\mathbf{y}) \,ds_y = \\
-    & \int_{\Gamma_y} G(\mathbf{y}-\mathbf{x}_i) \, 
+    + \int_{\Gamma_y} \frac{ \partial G(\mathbf{y}-\mathbf{x}_i)}{\partial\mathbf{n}_y }
+    \phi_h(\mathbf{y}) \,ds_y = 
+    \int_{\Gamma_y} G(\mathbf{y}-\mathbf{x}_i) \, 
     \mathbf{n}_y\cdot\mathbf{v_\infty} \,ds_y 
-    &,
+    ,
 \f}
 where the quantity $\alpha(\mathbf{x}_i)$ is the fraction of (solid)
 angle by which the point $\mathbf{x}_i$ sees the domain $\Omega$, as 
 explained above.
-
-If the $\mathbf{x}_i$ support points are chosen correctly, then the
+If the support points $\mathbf{x}_i$ are chosen appropriately, then the
 problem can be written as the following linear system:
 \f[
 \label{eq:linear-system}
@@ -408,15 +417,20 @@ problem can be written as the following linear system:
 where
 \f[
 \begin{aligned}
-\mathbf{A}_{ii}&= -\int_\Gamma 
-\frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y = \sum_{j=0}^{n\_dofs} N_{ij}\\
+\mathbf{A}_{ij}&= 
+\alpha(\mathbf{x}_i) \psi_j(\mathbf{x}_i)
+=
+-\int_\Gamma 
+\frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y 
+\psi_j(\mathbf{x}_i)
+\\
 \mathbf{N}_{ij}&= \int_\Gamma
   \frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}
   \psi_j(\mathbf{y}) \,ds_y 
 \\
 \mathbf{b}_i&= \int_\Gamma 
    G(\mathbf{y}-\mathbf{x}_i)  \, \mathbf{n}_y\cdot\mathbf{v_\infty}
-  \psi_i(\mathbf{y}) ds_y.
+   ds_y.
 \end{aligned}
 \f]
 
@@ -424,8 +438,19 @@ From a linear algebra point of view, the best possible choice of the
 collocation points is the one that renders the matrix
 $\mathbf{A}+\mathbf{N}$ the most diagonally dominant. A natural choice
 is then to select the $\mathbf{x}_i$ collocation points to be the
-support points of the nodal basis functions $\psi_i(\mathbf{x})$.
-
+support points of the nodal basis functions $\psi_i(\mathbf{x})$. In that
+case, $\psi_j(\mathbf{x}_i)=\delta_{ij}$, and as a consequence the matrix
+$\mathbf{A}$ is diagonal with entries
+\f{
+  \mathbf{A}_{ii}
+  = 
+  -\int_\Gamma 
+  \frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y 
+  =
+  -\sum_j N_{ij},
+\f}
+where we have used that $\sum_j \psi_j(\mathbf{y})=1$ for the usual Lagrange
+elements. 
 With this choice of collocation points, the computation of the entries
 of the matrices $\mathbf{A}$, $\mathbf{N}$ and of the right hand side
 $\mathbf{b}$ requires the evaluation of singular integrals on the
@@ -468,3 +493,13 @@ one. For the purpose of this example code, we chose to use only a
 direct solver, which limits the applicability of this method to
 relatively small problems. Remember however that it is possible to
 obtain very accurate results with relatively few surface elements.
+
+If this were a production code rather than a demonstration of principles,
+there are techniques that are available to not store full matrices but instead
+store only those entries that are large and/or relevant. In the literature on
+boundary element methods, a plethory of methods is available that allows to
+determine which elements are important and which are not, leading to a
+significantly sparser representation of these matrices that also facilitates
+rapid evaluations of the scalar product between vectors and matrices. This not
+being the goal of this program, we leave this for more sophisticated
+implementations. 
