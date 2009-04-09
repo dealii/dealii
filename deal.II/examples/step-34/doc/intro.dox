@@ -441,14 +441,14 @@ is then to select the $\mathbf{x}_i$ collocation points to be the
 support points of the nodal basis functions $\psi_i(\mathbf{x})$. In that
 case, $\psi_j(\mathbf{x}_i)=\delta_{ij}$, and as a consequence the matrix
 $\mathbf{A}$ is diagonal with entries
-\f{
+\f[
   \mathbf{A}_{ii}
   = 
   -\int_\Gamma 
   \frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y 
   =
   -\sum_j N_{ij},
-\f}
+\f]
 where we have used that $\sum_j \psi_j(\mathbf{y})=1$ for the usual Lagrange
 elements. 
 With this choice of collocation points, the computation of the entries
