@@ -67,7 +67,7 @@ can pass to our visualization program of choice.
 
 The output files are of two kind: the potential on the boundary
 element surface, and the potential extended to the outer and inner
-domain. The combination of the two for the two dimensional case look
+domain. The combination of the two for the two dimensional case looks
 like
 
 @image html step-34_2d.png
