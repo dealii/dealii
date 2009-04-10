@@ -573,3 +573,23 @@ significantly sparser representation of these matrices that also facilitates
 rapid evaluations of the scalar product between vectors and matrices. This not
 being the goal of this program, we leave this for more sophisticated
 implementations. 
+
+
+<h3>Implementation</h3>
+
+The implementation is rather straight forward. The main point that hasn't been
+used in any of the previous tutorial programs is that most classes in deal.II
+are not only templated on the dimension, but in fact on the dimension of the
+manifold on which we pose the differential equation as well as the dimension
+of the space into which this manifold is embedded. By default, the second
+template argument equals the first, meaning for example that we want to solve
+on a two-dimensional region of two-dimensional space. The triangulation class
+to use in this case would be <code>Triangulation@<2@></code>, which is an
+equivalent way of writing <code>Triangulation@<2,2@></code>.
+
+However, this doesn't have to be so: in the current example, we will for
+example want to solve on the surface of a sphere, which is a two-dimensional
+manifold embedded in a three-dimensional space. Consequently, the right class
+will be <code>Triangulation@<2,3@></code>, and correspondingly we will use 
+<code>DoFHandler@<2,3@></code> as the DoF handler class and
+<code>FE_Q@<2,3@></code> for finite elements.
