@@ -67,6 +67,56 @@ for (VEC : SERIAL_VECTORS)
      const NormType&,
      const Function<deal_II_dimension>*,
      const double);
+
+#if deal_II_dimension != 3
+  template
+    void VectorTools::integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_dimension+1>
+    (const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+     const VEC&,
+     const Function<deal_II_dimension+1>&,
+     Vector<float>&,
+     const Quadrature<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension+1>*,
+     const double);
+
+  template
+    void VectorTools::integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_dimension+1 >
+    (const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+     const VEC&,
+     const Function<deal_II_dimension+1>&,
+     Vector<double>&,
+     const Quadrature<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension+1>*,
+     const double);
+
+  template
+    void VectorTools::integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_dimension+1>
+    (const Mapping<deal_II_dimension, deal_II_dimension+1>&, 
+     const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+     const VEC&,
+     const Function<deal_II_dimension+1>&,
+     Vector<float>&,
+     const Quadrature<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension+1>*,
+     const double);
+
+  template
+    void VectorTools::integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_dimension+1 >
+    (const Mapping<deal_II_dimension, deal_II_dimension+1>&, 
+     const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+     const VEC&,
+     const Function<deal_II_dimension+1>&,
+     Vector<double>&,
+     const Quadrature<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension+1>*,
+     const double);
+#endif
+
+
   template
     void VectorTools::integrate_difference<deal_II_dimension>
     (const DoFHandler<deal_II_dimension>&,

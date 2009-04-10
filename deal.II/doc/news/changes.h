@@ -792,6 +792,13 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: Integrate Difference now works also on codimension one grids. 
+  <br>
+  (Luca Heltai 2009/04/10)
+  </p>
+
+  <li>
+  <p>
   Changed: The ConstraintMatrix class can now also handle inhomogeneous 
   constraints. This means that e.g. Dirichlet boundary conditions are now a
   special case of algebraic constraints. There are new condense functions

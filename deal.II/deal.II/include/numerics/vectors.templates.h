@@ -847,7 +847,7 @@ void VectorTools::create_point_source_vector (const DoFHandler<dim,spacedim>    
 template <int dim, int spacedim>
 void VectorTools::create_point_source_vector (const hp::MappingCollection<dim,spacedim>       &mapping,
                                               const hp::DoFHandler<dim,spacedim>    &dof_handler,
-                                              const Point<dim>         &p,
+                                              const Point<spacedim>         &p,
                                               Vector<double>           &rhs_vector)
 {
    Assert (rhs_vector.size() == dof_handler.n_dofs(),
@@ -857,7 +857,7 @@ void VectorTools::create_point_source_vector (const hp::MappingCollection<dim,sp
    
    rhs_vector = 0;
 
-   std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
+   std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
       cell_point =
       GridTools::find_active_cell_around_point (mapping, dof_handler, p);
 
@@ -880,7 +880,7 @@ void VectorTools::create_point_source_vector (const hp::MappingCollection<dim,sp
 
 template <int dim, int spacedim>
 void VectorTools::create_point_source_vector (const hp::DoFHandler<dim,spacedim>    &dof_handler,
-                                              const Point<dim>         &p,
+                                              const Point<spacedim>         &p,
                                               Vector<double>           &rhs_vector)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -897,7 +897,7 @@ void
 VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>      &mapping,
 					      const DoFHandler<dim,spacedim>   &dof_handler,
 					      const Quadrature<dim-1> &quadrature,
-					      const Function<dim>     &rhs_function,
+					      const Function<spacedim>     &rhs_function,
 					      Vector<double>          &rhs_vector,
 					      const std::set<unsigned char> &boundary_indicators)
 {
@@ -1019,7 +1019,7 @@ void
 VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>    &,
 					      const DoFHandler<dim,spacedim> &,
 					      const Quadrature<dim-1> &,
-					      const Function<dim>   &,
+					      const Function<spacedim>   &,
 					      Vector<double>      &,
 					      const std::set<unsigned char> &)
 {
@@ -1032,7 +1032,7 @@ template <int dim, int spacedim>
 void
 VectorTools::create_boundary_right_hand_side (const DoFHandler<dim,spacedim>   &dof_handler,
 					      const Quadrature<dim-1> &quadrature,
-					      const Function<dim>     &rhs_function,
+					      const Function<spacedim>     &rhs_function,
 					      Vector<double>          &rhs_vector,
 					      const std::set<unsigned char> &boundary_indicators)
 {
@@ -1053,7 +1053,7 @@ void
 VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim>      &mapping,
 					      const hp::DoFHandler<dim,spacedim>   &dof_handler,
 					      const hp::QCollection<dim-1> &quadrature,
-					      const Function<dim>     &rhs_function,
+					      const Function<spacedim>     &rhs_function,
 					      Vector<double>          &rhs_vector,
 					      const std::set<unsigned char> &boundary_indicators)
 {
@@ -1186,7 +1186,7 @@ void
 VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim>    &,
 					      const hp::DoFHandler<dim,spacedim> &,
 					      const hp::QCollection<dim-1> &,
-					      const Function<dim>   &,
+					      const Function<spacedim>   &,
 					      Vector<double>      &,
 					      const std::set<unsigned char> &)
 {
@@ -1199,7 +1199,7 @@ template <int dim, int spacedim>
 void
 VectorTools::create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim>   &dof_handler,
 					      const hp::QCollection<dim-1> &quadrature,
-					      const Function<dim>     &rhs_function,
+					      const Function<spacedim>     &rhs_function,
 					      Vector<double>          &rhs_vector,
 					      const std::set<unsigned char> &boundary_indicators)
 {
@@ -1519,7 +1519,7 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 					     // face
             face_dofs.resize (fe.dofs_per_face);
 	    face->get_dof_indices (face_dofs, cell->active_fe_index());
-	    const std::vector<Point<dim> > &dof_locations
+	    const std::vector<Point<DH::space_dimension> > &dof_locations
               = fe_values.get_quadrature_points ();
 	    
 	    if (fe_is_system)
@@ -2032,7 +2032,7 @@ VectorTools::interpolate_boundary_values
 					     // of dofs on this face
             face_dofs.resize (fe.dofs_per_face);
 	    face->get_dof_indices (face_dofs, cell->active_fe_index());
-	    const std::vector<Point<dim> > &dof_locations
+	    const std::vector<Point<DH::space_dimension> > &dof_locations
               = fe_values.get_quadrature_points ();
 	    
 	    if (fe_is_system)
@@ -2930,7 +2930,7 @@ VectorTools::compute_no_normal_flux_constraints (const DH<dim,spacedim>         
   const FiniteElement<dim> &fe = dof_handler.get_fe();
 
   std::vector<unsigned int> face_dofs (fe.dofs_per_face);
-  std::vector<Point<dim> >  dof_locations  (fe.dofs_per_face);
+  std::vector<Point<spacedim> >  dof_locations  (fe.dofs_per_face);
 
 				   // have a map that stores normal vectors
 				   // for each vector-dof tuple we want to
@@ -3442,11 +3442,11 @@ namespace internal
     do_integrate_difference (const dealii::hp::MappingCollection<dim,spacedim>    &mapping,
                              const DH              &dof,
                              const InVector        &fe_function,
-                             const Function<dim>   &exact_solution,
+                             const Function<spacedim>   &exact_solution,
                              OutVector             &difference,
                              const dealii::hp::QCollection<dim> &q,
                              const dealii::VectorTools::NormType &norm,
-                             const Function<dim>   *weight,
+                             const Function<spacedim>   *weight,
                              const double           exponent_1)
     {
                                        // we mark the "exponent" parameter
@@ -3502,15 +3502,15 @@ namespace internal
                 break;
         }  
 
-      dealii::hp::FECollection<dim> fe_collection (dof.get_fe());
-      dealii::hp::FEValues<dim> x_fe_values(mapping, fe_collection, q, update_flags);
+      dealii::hp::FECollection<dim,spacedim> fe_collection (dof.get_fe());
+      dealii::hp::FEValues<dim,spacedim> x_fe_values(mapping, fe_collection, q, update_flags);
 
       const unsigned int max_n_q_points = q.max_n_quadrature_points ();
       
       std::vector< Vector<double> >
         function_values (max_n_q_points, Vector<double>(n_components));
-      std::vector<std::vector<Tensor<1,dim> > >
-        function_grads (max_n_q_points, std::vector<Tensor<1,dim> >(n_components));
+      std::vector<std::vector<Tensor<1,spacedim> > >
+        function_grads (max_n_q_points, std::vector<Tensor<1,spacedim> >(n_components));
 
       std::vector<double>
         weight_values (max_n_q_points);
@@ -3519,16 +3519,16 @@ namespace internal
 
       std::vector<Vector<double> >
         psi_values (max_n_q_points, Vector<double>(n_components));
-      std::vector<std::vector<Tensor<1,dim> > >
-        psi_grads (max_n_q_points, std::vector<Tensor<1,dim> >(n_components));
+      std::vector<std::vector<Tensor<1,spacedim> > >
+        psi_grads (max_n_q_points, std::vector<Tensor<1,spacedim> >(n_components));
       std::vector<double>
         psi_scalar (max_n_q_points);
 
                                        // tmp vector when we use the
-                                       // Function<dim> functions for
+                                       // Function<spacedim> functions for
                                        // scalar functions
       std::vector<double>         tmp_values (max_n_q_points);
-      std::vector<Tensor<1,dim> > tmp_gradients (max_n_q_points);
+      std::vector<Tensor<1,spacedim> > tmp_gradients (max_n_q_points);
   
                                        // loop over all cells
       typename DH::active_cell_iterator cell = dof.begin_active(),
@@ -3539,7 +3539,7 @@ namespace internal
                                            // initialize for this cell
           x_fe_values.reinit (cell);
 
-          const dealii::FEValues<dim> &fe_values  = x_fe_values.get_present_fe_values ();
+          const dealii::FEValues<dim, spacedim> &fe_values  = x_fe_values.get_present_fe_values ();
           const unsigned int   n_q_points = fe_values.n_quadrature_points;
           
                                            // resize all out scratch
@@ -3549,7 +3549,7 @@ namespace internal
           function_values.resize (n_q_points,
                                   Vector<double>(n_components));
           function_grads.resize (n_q_points,
-                                 std::vector<Tensor<1,dim> >(n_components));
+                                 std::vector<Tensor<1,spacedim> >(n_components));
 
           weight_values.resize (n_q_points);
           weight_vectors.resize (n_q_points,
@@ -3558,7 +3558,7 @@ namespace internal
           psi_values.resize (n_q_points,
                              Vector<double>(n_components));
           psi_grads.resize (n_q_points,
-                            std::vector<Tensor<1,dim> >(n_components));
+                            std::vector<Tensor<1,spacedim> >(n_components));
           psi_scalar.resize (n_q_points);
 
           tmp_values.resize (n_q_points);
@@ -3791,11 +3791,11 @@ void
 VectorTools::integrate_difference (const Mapping<dim, spacedim>    &mapping,
 				   const DoFHandler<dim,spacedim> &dof,
 				   const InVector        &fe_function,
-				   const Function<dim>   &exact_solution,
+				   const Function<spacedim>   &exact_solution,
 				   OutVector             &difference,
 				   const Quadrature<dim> &q,
 				   const NormType        &norm,
-				   const Function<dim>   *weight,
+				   const Function<spacedim>   *weight,
 				   const double           exponent)
 {
   internal::VectorTools
@@ -3810,16 +3810,16 @@ template <int dim, class InVector, class OutVector, int spacedim>
 void
 VectorTools::integrate_difference (const DoFHandler<dim,spacedim>    &dof,
 				   const InVector           &fe_function,
-				   const Function<dim>      &exact_solution,
+				   const Function<spacedim>      &exact_solution,
 				   OutVector                &difference,
 				   const Quadrature<dim>    &q,
 				   const NormType           &norm,
-				   const Function<dim>      *weight,
+				   const Function<spacedim>      *weight,
 				   const double              exponent)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   internal::VectorTools
-    ::do_integrate_difference(hp::StaticMappingQ1<dim>::mapping_collection,
+      ::do_integrate_difference(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                               dof, fe_function, exact_solution,
                               difference, hp::QCollection<dim>(q),
                               norm, weight, exponent);
@@ -3832,11 +3832,11 @@ void
 VectorTools::integrate_difference (const dealii::hp::MappingCollection<dim,spacedim>    &mapping,
 				   const dealii::hp::DoFHandler<dim,spacedim> &dof,
 				   const InVector        &fe_function,
-				   const Function<dim>   &exact_solution,
+				   const Function<spacedim>   &exact_solution,
 				   OutVector             &difference,
 				   const dealii::hp::QCollection<dim> &q,
 				   const NormType        &norm,
-				   const Function<dim>   *weight,
+				   const Function<spacedim>   *weight,
 				   const double           exponent)
 {
   internal::VectorTools
@@ -3851,11 +3851,11 @@ template <int dim, class InVector, class OutVector, int spacedim>
 void
 VectorTools::integrate_difference (const dealii::hp::DoFHandler<dim,spacedim>    &dof,
 				   const InVector           &fe_function,
-				   const Function<dim>      &exact_solution,
+				   const Function<spacedim>      &exact_solution,
 				   OutVector                &difference,
 				   const dealii::hp::QCollection<dim>    &q,
 				   const NormType           &norm,
-				   const Function<dim>      *weight,
+				   const Function<spacedim>      *weight,
 				   const double              exponent)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -3872,9 +3872,9 @@ template <int dim, class InVector, int spacedim>
 void
 VectorTools::point_difference (const DoFHandler<dim,spacedim> &dof,
 			       const InVector        &fe_function,
-			       const Function<dim>   &exact_function,
+			       const Function<spacedim>   &exact_function,
 			       Vector<double>        &difference,
-			       const Point<dim>      &point)
+			       const Point<spacedim>      &point)
 {
    point_difference(StaticMappingQ1<dim>::mapping,
                     dof,
@@ -3890,9 +3890,9 @@ void
 VectorTools::point_difference (const Mapping<dim, spacedim>    &mapping,
                                const DoFHandler<dim,spacedim> &dof,
 			       const InVector        &fe_function,
-			       const Function<dim>   &exact_function,
+			       const Function<spacedim>   &exact_function,
 			       Vector<double>        &difference,
-			       const Point<dim>      &point)
+			       const Point<spacedim>      &point)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
 
@@ -3902,7 +3902,7 @@ VectorTools::point_difference (const Mapping<dim, spacedim>    &mapping,
                                    // first find the cell in which this point
                                    // is, initialize a quadrature rule with
                                    // it, and then a FEValues object
-  const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
+  const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
     cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
 
   Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
@@ -3973,7 +3973,7 @@ VectorTools::point_value (const Mapping<dim, spacedim>    &mapping,
                                    // first find the cell in which this point
                                    // is, initialize a quadrature rule with
                                    // it, and then a FEValues object
-  const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
+  const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
     cell_point
     = GridTools::find_active_cell_around_point (mapping, dof, point);
 
@@ -4011,7 +4011,7 @@ VectorTools::point_value (const Mapping<dim, spacedim>    &mapping,
                                    // first find the cell in which this point
                                    // is, initialize a quadrature rule with
                                    // it, and then a FEValues object
-  const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
+  const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
     cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
 
   Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,

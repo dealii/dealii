@@ -1336,7 +1336,7 @@ class VectorTools
     template <int dim, int spacedim>
     static void create_point_source_vector(const hp::MappingCollection<dim,spacedim>    &mapping,
                                            const hp::DoFHandler<dim,spacedim> &dof,
-                                           const Point<dim>      &p,
+                                           const Point<spacedim>      &p,
                                            Vector<double>        &rhs_vector);
 
 				     /**
@@ -1351,7 +1351,7 @@ class VectorTools
 				      */
     template <int dim, int spacedim>
     static void create_point_source_vector(const hp::DoFHandler<dim,spacedim> &dof,
-                                           const Point<dim>      &p,
+                                           const Point<spacedim>      &p,
                                            Vector<double>        &rhs_vector);
     
                                      /**
@@ -1368,7 +1368,7 @@ class VectorTools
     static void create_boundary_right_hand_side (const Mapping<dim,spacedim>      &mapping,
 						 const DoFHandler<dim,spacedim>   &dof,
 						 const Quadrature<dim-1> &q,
-						 const Function<dim>     &rhs,
+						 const Function<spacedim>     &rhs,
 						 Vector<double>          &rhs_vector,
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
@@ -1381,7 +1381,7 @@ class VectorTools
     template <int dim, int spacedim>
     static void create_boundary_right_hand_side (const DoFHandler<dim,spacedim>   &dof,
 						 const Quadrature<dim-1> &q,
-						 const Function<dim>     &rhs,
+						 const Function<spacedim>     &rhs,
 						 Vector<double>          &rhs_vector,
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
@@ -1393,7 +1393,7 @@ class VectorTools
     static void create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim>      &mapping,
 						 const hp::DoFHandler<dim,spacedim>   &dof,
 						 const hp::QCollection<dim-1> &q,
-						 const Function<dim>     &rhs,
+						 const Function<spacedim>     &rhs,
 						 Vector<double>          &rhs_vector,
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
@@ -1410,7 +1410,7 @@ class VectorTools
     template <int dim, int spacedim>
     static void create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim>   &dof,
 						 const hp::QCollection<dim-1> &q,
-						 const Function<dim>     &rhs,
+						 const Function<spacedim>     &rhs,
 						 Vector<double>          &rhs_vector,
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
@@ -1491,11 +1491,11 @@ class VectorTools
     static void integrate_difference (const Mapping<dim,spacedim>    &mapping,
 				      const DoFHandler<dim,spacedim> &dof,
 				      const InVector        &fe_function,
-				      const Function<dim>   &exact_solution,
+				      const Function<spacedim>   &exact_solution,
 				      OutVector             &difference,
 				      const Quadrature<dim> &q,
 				      const NormType        &norm,
-				      const Function<dim>   *weight=0,
+				      const Function<spacedim>   *weight=0,
 				      const double exponent = 2.);
 
 				     /**
@@ -1506,22 +1506,22 @@ class VectorTools
     template <int dim, class InVector, class OutVector, int spacedim>
     static void integrate_difference (const DoFHandler<dim,spacedim> &dof,
 				      const InVector        &fe_function,
-				      const Function<dim>   &exact_solution,
+				      const Function<spacedim>   &exact_solution,
 				      OutVector             &difference,
 				      const Quadrature<dim> &q,
 				      const NormType        &norm,
-				      const Function<dim>   *weight=0,
+				      const Function<spacedim>   *weight=0,
 				      const double exponent = 2.);
 
     template <int dim, class InVector, class OutVector, int spacedim>
     static void integrate_difference (const hp::MappingCollection<dim,spacedim>    &mapping,
 				      const hp::DoFHandler<dim,spacedim> &dof,
 				      const InVector        &fe_function,
-				      const Function<dim>   &exact_solution,
+				      const Function<spacedim>   &exact_solution,
 				      OutVector             &difference,
 				      const hp::QCollection<dim> &q,
 				      const NormType        &norm,
-				      const Function<dim>   *weight=0,
+				      const Function<spacedim>   *weight=0,
 				      const double exponent = 2.);
 
 				     /**
@@ -1532,11 +1532,11 @@ class VectorTools
     template <int dim, class InVector, class OutVector, int spacedim>
     static void integrate_difference (const hp::DoFHandler<dim,spacedim> &dof,
 				      const InVector        &fe_function,
-				      const Function<dim>   &exact_solution,
+				      const Function<spacedim>   &exact_solution,
 				      OutVector             &difference,
 				      const hp::QCollection<dim> &q,
 				      const NormType        &norm,
-				      const Function<dim>   *weight=0,
+				      const Function<spacedim>   *weight=0,
 				      const double exponent = 2.);
     
 				     /**
@@ -1558,9 +1558,9 @@ class VectorTools
     template <int dim, class InVector, int spacedim>
     static void point_difference (const DoFHandler<dim,spacedim>& dof,
 				  const InVector&        fe_function,
-				  const Function<dim>&   exact_solution,
+				  const Function<spacedim>&   exact_solution,
 				  Vector<double>&        difference,
-				  const Point<dim>&      point);
+				  const Point<spacedim>&      point);
 
 				     /**
 				      * Point error evaluation. Find
@@ -1583,9 +1583,9 @@ class VectorTools
     static void point_difference (const Mapping<dim, spacedim>    &mapping,
                                   const DoFHandler<dim,spacedim>& dof,
 				  const InVector&        fe_function,
-				  const Function<dim>&   exact_solution,
+				  const Function<spacedim>&   exact_solution,
 				  Vector<double>&        difference,
-				  const Point<dim>&      point);
+				  const Point<spacedim>&      point);
 
                                      /**
 				      * Evaluate a possibly
