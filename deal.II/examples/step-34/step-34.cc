@@ -13,7 +13,6 @@
 //
 //----------------------------  step-34.cc  ---------------------------
 
-#include <base/logstream.h>
 #include <base/smartpointer.h>
 #include <base/convergence_table.h>
 #include <base/quadrature_lib.h>
@@ -21,6 +20,14 @@
 #include <base/table.h>
 #include <base/parsed_function.h>
 #include <base/utilities.h>
+
+#include <lac/full_matrix.h>
+#include <lac/precondition.h>
+#include <lac/solver_cg.h>
+#include <lac/vector.h>
+#include <lac/sparse_direct.h>
+#include <lac/lapack_full_matrix.h>
+#include <lac/matrix_lib.h>
 
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -30,22 +37,14 @@
 #include <grid/grid_out.h>
 #include <grid/tria_boundary_lib.h>
 
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
+
 #include <fe/fe_dgp.h>
 #include <fe/fe_system.h>
 #include <fe/fe_tools.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
-
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-
-#include <lac/full_matrix.h>
-#include <lac/precondition.h>
-#include <lac/solver_cg.h>
-#include <lac/vector.h>
-#include <lac/sparse_direct.h>
-#include <lac/lapack_full_matrix.h>
-#include <lac/matrix_lib.h>
 
 #include <numerics/data_out.h>
 #include <numerics/vectors.h>
