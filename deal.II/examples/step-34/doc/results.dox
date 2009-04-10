@@ -7,6 +7,36 @@ We ran the program using the following <code>parameters.prm</code> file:
 set Extend solution on the -2,2 box = true
 set External refinement             = 5
 set Number of cycles                = 4
+set Run 2d simulation               = true
+set Run 3d simulation               = true
+
+
+subsection Exact solution 2d
+  # Any constant used inside the function which is not a variable name.
+  set Function constants  = 
+
+  # Separate vector valued expressions by ';' as ',' is used internally by the
+  # function parser.
+  set Function expression = x+y   # default: 0
+
+  # The name of the variables as they will be used in the function, separated
+  # by ','.
+  set Variable names      = x,y,t
+end
+
+
+subsection Exact solution 3d
+  # Any constant used inside the function which is not a variable name.
+  set Function constants  = 
+
+  # Separate vector valued expressions by ';' as ',' is used internally by the
+  # function parser.
+  set Function expression = x+y+z   # default: 0
+
+  # The name of the variables as they will be used in the function, separated
+  # by ','.
+  set Variable names      = x,y,z,t
+end
 
 
 subsection Quadrature rules
@@ -22,7 +52,7 @@ subsection Wind function 2d
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
-  set Function expression = 1; 1
+  set Function expression = 1; 1  # default: 0; 0
 
   # The name of the variables as they will be used in the function, separated
   # by ','.
@@ -36,7 +66,7 @@ subsection Wind function 3d
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
-  set Function expression = 1; 1; 1
+  set Function expression = 1; 1; 1 # default: 0; 0; 0
 
   # The name of the variables as they will be used in the function, separated
   # by ','.
@@ -46,21 +76,64 @@ end
 
 When we run the program, the following is printed on screen:
 @verbatim
-
+DEAL::
 DEAL::Parsing parameter file parameters.prm
 DEAL::for a 2 dimensional simulation. 
-DEAL::Levels: 2, potential dofs: 20
-DEAL::Levels: 3, potential dofs: 40
-DEAL::Levels: 4, potential dofs: 80
-DEAL::Levels: 5, potential dofs: 160
-
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       20
+DEAL::   Number of degrees of freedom: 20
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       40
+DEAL::   Number of degrees of freedom: 40
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       80
+DEAL::   Number of degrees of freedom: 80
+DEAL::Cycle 3:
+DEAL::   Number of active cells:       160
+DEAL::   Number of degrees of freedom: 160
+DEAL::
+cycle cells dofs  L2(phi)  Linfty(alpha) 
+    0    20   20 1.149e-07             - 5.000e-02    - 
+    1    40   40 4.330e-08          1.41 2.500e-02 1.00 
+    2    80   80 1.848e-08          1.23 1.250e-02 1.00 
+    3   160  160 8.798e-09          1.07 6.250e-03 1.00 
+DEAL::
 DEAL::Parsing parameter file parameters.prm
 DEAL::for a 3 dimensional simulation. 
-DEAL::Levels: 2, potential dofs: 26
-DEAL::Levels: 3, potential dofs: 98
-DEAL::Levels: 4, potential dofs: 386
-DEAL::Levels: 5, potential dofs: 1538
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       24
+DEAL::   Number of degrees of freedom: 26
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       96
+DEAL::   Number of degrees of freedom: 98
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       384
+DEAL::   Number of degrees of freedom: 386
+DEAL::Cycle 3:
+DEAL::   Number of active cells:       1536
+DEAL::   Number of degrees of freedom: 1538
+DEAL::
+cycle cells dofs  L2(phi)  Linfty(alpha) 
+    0    24   26 3.415e-06             - 2.327e-01    - 
+    1    96   98 7.248e-07          2.24 1.239e-01 0.91 
+    2   384  386 1.512e-07          2.26 6.319e-02 0.97 
+    3  1536 1538 6.576e-08          1.20 3.176e-02 0.99 
+
 @endverbatim
+
+As we can see from the convergence table in 2d, if we choose
+quadrature formulas which are accurate enough, then the error we
+obtain for $\alpha(\mathbf{x})$ should be exactly the inverse of the
+number of elements. The approximation of the circle with N segments of
+equal size generates a regular polygon with N faces, whose angles are
+exactly $\pi-\frac {2\pi}{N}$, therefore the error we commit should be
+exactly $\frac 12 - (\frac 12 -\frac 1N) = \frac 1N$. In fact this is
+a very good indicator that we are performing the singular integrals in
+an appropiate manner. 
+
+The error in the approximation of the potential $\phi$ is largely due
+to approximation of the domain. A much better approximation could be
+obtained by using higher order mappings. 
 
 The result of running these computations is a bunch of output files that we
 can pass to our visualization program of choice. 
@@ -76,6 +149,3 @@ while in three dimensions we only show the potential on the surface,
 together with a countur plot:
 
 @image html step-34_3d.png
-
-The exact solution for this model problem should be $x+y$ or
-$x+y+z$ on the surface, which is precisely what we obtain. 

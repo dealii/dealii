@@ -191,7 +191,7 @@ which is the integral formulation we were looking for, where the
 quantity $\alpha(\mathbf{x})$ is the fraction of angle or solid
 angle by which the point $\mathbf{x}$ sees the domain $\Omega$. In particular,
 at points $\mathbf{x}$ where the boundary $\partial\Omega$ is differentiable
-(i.e. smooth) we have $\alpha(\mathbf{x}(=\frac 12$, but the value may be
+(i.e. smooth) we have $\alpha(\mathbf{x})=\frac 12$, but the value may be
 smaller or larger at points where the boundary has a corner or an edge.
 
 Substituting the single and double layer operators we get:
@@ -343,7 +343,7 @@ we get
   &=
   \partial_i [\partial_j \partial_j\phi] \phi
   +
-  \partial_i [partial_j \phi] (\partial_j \phi).
+  \partial_i [\partial_j \phi] (\partial_j \phi).
 @f}
 The first of these terms is zero (because, again, the summation over $j$ gives
 $\Delta\phi$, which is zero). The last term can be written as $\frac 12
