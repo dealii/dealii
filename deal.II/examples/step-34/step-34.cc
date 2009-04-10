@@ -55,7 +55,7 @@
 #include <math.h>
 #include <string>
 
-using namespace std;
+
 using namespace dealii;
 
 
@@ -553,7 +553,7 @@ void BEMProblem<dim>::assemble_system() {
     // centered at one of the vertices. Here we define a vector of
     // four such quadratures that will be used later on, only in the
     // three dimensional case.
-    vector<QGaussOneOverR<2> > sing_quadratures_3d; 
+    std::vector<QGaussOneOverR<2> > sing_quadratures_3d; 
     for(unsigned int i=0; i<4; ++i) {
         sing_quadratures_3d.push_back
             (QGaussOneOverR<2>(singular_quadrature_order, i, true));
@@ -567,9 +567,9 @@ void BEMProblem<dim>::assemble_system() {
     
     const unsigned int n_q_points = fe_v.n_quadrature_points;
     
-    vector<unsigned int> dofs(fe.dofs_per_cell);
+    std::vector<unsigned int> dofs(fe.dofs_per_cell);
 
-    vector<Vector<double> > cell_wind(n_q_points, Vector<double>(dim) );
+    std::vector<Vector<double> > cell_wind(n_q_points, Vector<double>(dim) );
     double normal_wind;
     
     // Unlike in finite element methods, if we use a collocation
@@ -608,8 +608,8 @@ void BEMProblem<dim>::assemble_system() {
         fe_v.reinit(cell);
         cell->get_dof_indices(dofs);
         
-        const vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
-        const vector<Point<dim> > &normals = fe_v.get_cell_normal_vectors();
+        const std::vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
+        const std::vector<Point<dim> > &normals = fe_v.get_cell_normal_vectors();
         wind.vector_value_list(q_points, cell_wind);
         
         
@@ -721,11 +721,11 @@ void BEMProblem<dim>::assemble_system() {
 
                         fe_v_singular.reinit(cell);
                     
-                        static vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(), 
+                        static std::vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(), 
                                                                            Vector<double>(dim) );
         
-                        const vector<Point<dim> > &singular_normals = fe_v_singular.get_cell_normal_vectors();
-                        const vector<Point<dim> > &singular_q_points = fe_v_singular.get_quadrature_points();
+                        const std::vector<Point<dim> > &singular_normals = fe_v_singular.get_cell_normal_vectors();
+                        const std::vector<Point<dim> > &singular_q_points = fe_v_singular.get_quadrature_points();
         
                         wind.vector_value_list(singular_q_points, singular_cell_wind);
                     
@@ -853,11 +853,11 @@ void BEMProblem<dim>::interpolate() {
     
     const unsigned int n_q_points = fe_v.n_quadrature_points;
     
-    vector<unsigned int> dofs(fe.dofs_per_cell);
+    std::vector<unsigned int> dofs(fe.dofs_per_cell);
     
-    vector<double> local_phi(n_q_points);
-    vector<double> normal_wind(n_q_points);
-    vector<Vector<double> > local_wind(n_q_points, Vector<double>(dim) );
+    std::vector<double> local_phi(n_q_points);
+    std::vector<double> normal_wind(n_q_points);
+    std::vector<Vector<double> > local_wind(n_q_points, Vector<double>(dim) );
     
     LaplaceKernel<dim> kernel;
     Point<dim> R;
@@ -874,8 +874,8 @@ void BEMProblem<dim>::interpolate() {
     for(cell = dh.begin_active(); cell != endc; ++cell) {
         fe_v.reinit(cell);
                     
-        const vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
-        const vector<Point<dim> > &normals = fe_v.get_cell_normal_vectors();
+        const std::vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
+        const std::vector<Point<dim> > &normals = fe_v.get_cell_normal_vectors();
         
         cell->get_dof_indices(dofs);
         fe_v.get_function_values(phi, local_phi);
