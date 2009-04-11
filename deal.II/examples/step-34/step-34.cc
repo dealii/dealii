@@ -398,7 +398,7 @@ void BEMProblem<dim>::read_parameters(std::string filename) {
                                          "d simulation");
 
     prm.enter_subsection("Quadrature rules");
-    QuadratureSelector<dim-1> quadrature
+    static QuadratureSelector<dim-1> quadrature
                       (prm.get("Quadrature type"),
                        prm.get_integer("Quadrature order"));
     singular_quadrature_order = prm.get_integer("Singular quadrature order");
