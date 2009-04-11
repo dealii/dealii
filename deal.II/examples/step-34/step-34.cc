@@ -76,7 +76,7 @@ public:
     // modules. The same applyes to boundary element methods, and we
     // won't comment too much on them, except on the differences.
 
-    void read_parameters(std::string filename);
+    void read_parameters (const std::string filename);
     
     void run();
     
@@ -227,7 +227,7 @@ private:
     Functions::ParsedFunction<dim> wind;
     Functions::ParsedFunction<dim> exact_solution;
 
-    SmartPointer<Quadrature<dim-1> > quadrature_pointer;
+    std_cxx0x::shared_ptr<Quadrature<dim-1> > quadrature_pointer;
     unsigned int singular_quadrature_order;
 
     unsigned int n_cycles;
@@ -327,23 +327,30 @@ BEMProblem<dim>::BEMProblem() :
 {}
 
 template <int dim> 
-void BEMProblem<dim>::read_parameters(std::string filename) {
+void BEMProblem<dim>::read_parameters (const std::string filename) {
     deallog << std::endl << "Parsing parameter file " << filename << std::endl
             << "for a " << dim << " dimensional simulation. " << std::endl;
     
     ParameterHandler prm;
     
-    prm.declare_entry("Number of cycles", "4", Patterns::Integer());
-    prm.declare_entry("External refinement", "5", Patterns::Integer());
-    prm.declare_entry("Extend solution on the -2,2 box", "true", Patterns::Bool());
-    prm.declare_entry("Run 2d simulation", "true", Patterns::Bool());
-    prm.declare_entry("Run 3d simulation", "true", Patterns::Bool());
+    prm.declare_entry("Number of cycles", "4",
+		      Patterns::Integer());
+    prm.declare_entry("External refinement", "5",
+		      Patterns::Integer());
+    prm.declare_entry("Extend solution on the -2,2 box", "true",
+		      Patterns::Bool());
+    prm.declare_entry("Run 2d simulation", "true",
+		      Patterns::Bool());
+    prm.declare_entry("Run 3d simulation", "true",
+		      Patterns::Bool());
     
     prm.enter_subsection("Quadrature rules");
-    prm.declare_entry("Quadrature type", "gauss", 
-                      Patterns::Selection(QuadratureSelector<(dim-1)>::get_quadrature_names()));
-    prm.declare_entry("Quadrature order", "4", Patterns::Integer());
-    prm.declare_entry("Singular quadrature order", "5", Patterns::Integer());
+    {
+      prm.declare_entry("Quadrature type", "gauss", 
+			Patterns::Selection(QuadratureSelector<(dim-1)>::get_quadrature_names()));
+      prm.declare_entry("Quadrature order", "4", Patterns::Integer());
+      prm.declare_entry("Singular quadrature order", "5", Patterns::Integer());
+    }
     prm.leave_subsection();
     
     // For both two and three dimensions, we set the default input
@@ -362,23 +369,31 @@ void BEMProblem<dim>::read_parameters(std::string filename) {
     // allows us to have only one parameter file for both 2 and 3
     // dimensional problems.
     prm.enter_subsection("Wind function 2d");
-    Functions::ParsedFunction<2>::declare_parameters(prm, 2);
-    prm.set("Function expression","1; 1");
+    {
+      Functions::ParsedFunction<2>::declare_parameters(prm, 2);
+      prm.set("Function expression", "1; 1");
+    }
     prm.leave_subsection();
 
     prm.enter_subsection("Wind function 3d");
-    Functions::ParsedFunction<3>::declare_parameters(prm, 3);
-    prm.set("Function expression","1; 1; 1");
+    {
+      Functions::ParsedFunction<3>::declare_parameters(prm, 3);
+      prm.set("Function expression", "1; 1; 1");
+    }
     prm.leave_subsection();
 
     prm.enter_subsection("Exact solution 2d");
-    Functions::ParsedFunction<2>::declare_parameters(prm);
-    prm.set("Function expression","x+y");
+    {
+      Functions::ParsedFunction<2>::declare_parameters(prm);
+      prm.set("Function expression", "x+y");
+    }
     prm.leave_subsection();
 
     prm.enter_subsection("Exact solution 3d");
-    Functions::ParsedFunction<3>::declare_parameters(prm);
-    prm.set("Function expression","x+y+z");
+    {
+      Functions::ParsedFunction<3>::declare_parameters(prm);
+      prm.set("Function expression", "x+y+z");
+    }
     prm.leave_subsection();
     
     prm.read_input(filename);
@@ -398,23 +413,28 @@ void BEMProblem<dim>::read_parameters(std::string filename) {
                                          "d simulation");
 
     prm.enter_subsection("Quadrature rules");
-    static QuadratureSelector<dim-1> quadrature
-                      (prm.get("Quadrature type"),
-                       prm.get_integer("Quadrature order"));
-    singular_quadrature_order = prm.get_integer("Singular quadrature order");
+    {
+      quadrature_pointer =
+	std_cxx0x::shared_ptr<Quadrature<dim-1> >
+	(new QuadratureSelector<dim-1> (prm.get("Quadrature type"),
+					prm.get_integer("Quadrature order")));
+      singular_quadrature_order = prm.get_integer("Singular quadrature order");
+    }
     prm.leave_subsection();
     
     prm.enter_subsection(std::string("Wind function ")+
                          Utilities::int_to_string(dim)+std::string("d"));
-    wind.parse_parameters(prm);
+    {
+      wind.parse_parameters(prm);
+    }
     prm.leave_subsection();
 
     prm.enter_subsection(std::string("Exact solution ")+
                          Utilities::int_to_string(dim)+std::string("d"));
-    exact_solution.parse_parameters(prm);
+    {
+      exact_solution.parse_parameters(prm);
+    }
     prm.leave_subsection();
-
-    quadrature_pointer = &quadrature;
 }
 
 
