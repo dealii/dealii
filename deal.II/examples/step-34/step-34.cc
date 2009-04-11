@@ -227,7 +227,7 @@ private:
     Functions::ParsedFunction<dim> wind;
     Functions::ParsedFunction<dim> exact_solution;
 
-    std_cxx0x::shared_ptr<Quadrature<dim-1> > quadrature_pointer;
+    std_cxx0x::shared_ptr<Quadrature<dim-1> > quadrature;
     unsigned int singular_quadrature_order;
 
     unsigned int n_cycles;
@@ -414,7 +414,7 @@ void BEMProblem<dim>::read_parameters (const std::string filename) {
 
     prm.enter_subsection("Quadrature rules");
     {
-      quadrature_pointer =
+      quadrature =
 	std_cxx0x::shared_ptr<Quadrature<dim-1> >
 	(new QuadratureSelector<dim-1> (prm.get("Quadrature type"),
 					prm.get_integer("Quadrature order")));
@@ -558,12 +558,6 @@ void BEMProblem<dim>::assemble_system() {
         cell = dh.begin_active(),
         endc = dh.end();
     
-    // Quadrature formula for the integration of the kernel in non
-    // singular cells. This quadrature is selected with the parameter
-    // file, and should be quite precise, since the functions we are
-    // integrating are not polynomial functions.
-    Quadrature<dim-1> &quadrature = *quadrature_pointer;
-    
     // We create initially the singular quadratures for the
     // threedimensional problem, since in this case they only
     // dependent on the reference element. This quadrature is a
@@ -578,7 +572,11 @@ void BEMProblem<dim>::assemble_system() {
             (QGaussOneOverR<2>(singular_quadrature_order, i, true));
     }
     
-    FEValues<dim-1,dim> fe_v(fe, quadrature,
+    // Initialize an FEValues object with the quadrature formula for the
+    // integration of the kernel in non singular cells. This quadrature is
+    // selected with the parameter file, and should be quite precise, since
+    // the functions we are integrating are not polynomial functions.
+    FEValues<dim-1,dim> fe_v(fe, *quadrature,
                              update_values |
                              update_cell_normal_vectors |
                              update_quadrature_points |
@@ -862,9 +860,7 @@ void BEMProblem<dim>::interpolate() {
         endc = dh.end();
 
 
-    Quadrature<dim-1> &quadrature = *quadrature_pointer;
-    
-    FEValues<dim-1,dim> fe_v(fe, quadrature,
+    FEValues<dim-1,dim> fe_v(fe, *quadrature,
                              update_values |
                              update_cell_normal_vectors |
                              update_quadrature_points |
