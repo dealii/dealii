@@ -800,9 +800,10 @@ void BEMProblem<dim>::assemble_system() {
 template <int dim>
 void BEMProblem<dim>::solve_system() {
     SparseDirectUMFPACK LU;
-    LU.initialize(system_matrix);
-    LU.vmult(phi, system_rhs);
-    
+    LU.initialize (system_matrix);
+    LU.vmult (phi, system_rhs);
+
+//TODO: is this true? it seems to me that the BIE is definite...    
     // Since we are solving a purely Neumann problem, the solution is
     // only known up to a constant potential. We solve this issue by
     // subtracting the mean value of the vector from each vector
