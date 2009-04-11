@@ -464,19 +464,20 @@ double LaplaceKernel<dim>::single_layer(const Point<dim> &R,
 template <int dim>
 Point<dim> LaplaceKernel<dim>::double_layer(const Point<dim> &R,
                                             bool factor_out_2d_singularity) {
-    Point<dim> D(R);
-    switch(dim) {
+  switch(dim) {
     case 2:
-        factor_out_2d_singularity ?  D *= 0  : D /=  -2*numbers::PI * R.square();
-        break;
+	  if (factor_out_2d_singularity)
+	    return Point<dim>();
+	  else
+	    return R / (-2*numbers::PI * R.square());
     case 3:
-        D /= ( -4*numbers::PI * R.square()*R.norm() );
-        break;
-    default:
+	  return R / ( -4*numbers::PI * R.square()*R.norm() );
+
+      default:
         Assert(false, ExcInternalError());
         break;
     }
-    return D;
+  return Point<dim>();
 }
         
 template <int dim>
@@ -512,15 +513,24 @@ void BEMProblem<dim>::read_domain() {
     
     static HyperBallBoundary<dim-1, dim> boundary(Point<dim>(),1.);    
 
+    std::ifstream in;
+    switch (dim)
+      {
+	case 2:
+	      in.open ("coarse_circle.inp");
+	      break;
+	      
+	case 3:
+	      in.open ("coarse_sphere.inp");
+	      break;
+
+	default:
+	      Assert (false, ExcNotImplemented());
+      }
+
     GridIn<dim-1, dim> gi;
     gi.attach_triangulation (tria);
-    if(dim == 3) {
-        std::ifstream in ("coarse_sphere.inp");
-        gi.read_ucd (in);
-    } else if(dim == 2) {
-        std::ifstream in ("coarse_circle.inp");
-        gi.read_ucd (in);
-    }
+    gi.read_ucd (in);
     tria.set_boundary(1, boundary);
 }
 
