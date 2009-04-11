@@ -398,7 +398,7 @@ void BEMProblem<dim>::read_parameters(std::string filename) {
                                          "d simulation");
 
     prm.enter_subsection("Quadrature rules");
-    static QuadratureSelector<dim-1> quadrature
+    QuadratureSelector<dim-1> quadrature
                       (prm.get("Quadrature type"),
                        prm.get_integer("Quadrature order"));
     singular_quadrature_order = prm.get_integer("Singular quadrature order");
@@ -490,8 +490,7 @@ void BEMProblem<dim>::read_domain() {
     // template parameter that specifies the embedding space
     // dimension. 
     
-    Point<dim> p;
-    static HyperBallBoundary<dim-1, dim> boundary(p,1.);    
+    static HyperBallBoundary<dim-1, dim> boundary(Point<dim>(),1.);    
 
     GridIn<dim-1, dim> gi;
     gi.attach_triangulation (tria);
@@ -721,8 +720,8 @@ void BEMProblem<dim>::assemble_system() {
 
                         fe_v_singular.reinit(cell);
                     
-                        static std::vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(), 
-                                                                           Vector<double>(dim) );
+                        std::vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(), 
+									 Vector<double>(dim) );
         
                         const std::vector<Point<dim> > &singular_normals = fe_v_singular.get_cell_normal_vectors();
                         const std::vector<Point<dim> > &singular_q_points = fe_v_singular.get_quadrature_points();
