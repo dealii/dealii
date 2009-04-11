@@ -197,7 +197,9 @@ smaller or larger at points where the boundary has a corner or an edge.
 Substituting the single and double layer operators we get:
 \f[               
   \alpha(\mathbf{x}) \phi(\mathbf{x}) 
-  - \frac{1}{2\pi}\int_{\partial \Omega}  \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }{ |\mathbf{y}-\mathbf{x}|^2 }\,ds_y
+  - \frac{1}{2\pi}\int_{\partial \Omega}  \frac{
+  (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }{ |\mathbf{y}-\mathbf{x}|^2 }
+  \phi(\mathbf{x}) \,ds_y 
   =
   -\frac{1}{2\pi}\int_{\partial \Omega}  \ln|\mathbf{y}-\mathbf{x}| \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
 \f]                 
