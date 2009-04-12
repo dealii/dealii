@@ -1,5 +1,5 @@
 //----------------------------  step-34.cc  ---------------------------
-//    $Id: testsuite.html 13373 2006-07-13 13:12:08Z manigrasso $
+//    $Id: testsuite.html 13373 2006-07-13 13:12:08Z heltai $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2009 by the deal.II authors 
@@ -446,7 +446,7 @@ void BEMProblem<dim>::read_parameters (const std::string filename) {
     // "Run 3d simulation" flag to false.
     //
     // This is another example of how to use parameter files in
-    // dimensio independent programming.
+    // dimension independent programming.
     run_in_this_dimension = prm.get_bool("Run " + 
                                          Utilities::int_to_string(dim) +
                                          "d simulation");
@@ -779,11 +779,12 @@ void BEMProblem<dim>::assemble_system() {
     }
     // One quick way to compute the diagonal matrix of the solid
     // angles, is to use the Neumann matrix itself. It is enough to
-    // multiply the matrix with the vector of ones, to get the
-    // diagonal matrix of the alpha solid angles.
+    // multiply the matrix with a vector of elements all equal to -1.,
+    // to get the diagonal matrix of the alpha angles, or solid
+    // angles.
     Vector<double> ones(dh.n_dofs());
-    for(unsigned int i=0; i<dh.n_dofs(); ++i) 
-        ones(i) = -1.;
+    ones.add(-1.);
+
     system_matrix.vmult(alpha, ones);
     for(unsigned int i = 0; i<dh.n_dofs(); ++i) {
         system_matrix.add(i,i,alpha(i));
@@ -948,14 +949,14 @@ void BEMProblem<dim>::output_results(unsigned int cycle) {
     std::ofstream file(filename.c_str());
     
     dataout.write_vtk(file);
-
-    convergence_table.set_precision("L2(phi)", 3);
-    convergence_table.set_precision("Linfty(alpha)", 3);
-    
-    convergence_table.set_scientific("L2(phi)", true);
-    convergence_table.set_scientific("Linfty(alpha)", true);
     
     if(cycle == n_cycles-1) {
+	convergence_table.set_precision("L2(phi)", 3);
+	convergence_table.set_precision("Linfty(alpha)", 3);
+	
+	convergence_table.set_scientific("L2(phi)", true);
+	convergence_table.set_scientific("Linfty(alpha)", true);
+	
 	convergence_table
 	    .evaluate_convergence_rates("L2(phi)", ConvergenceTable::reduction_rate_log2);
 	convergence_table

@@ -145,7 +145,11 @@ like
 
 @image html step-34_2d.png
 
-while in three dimensions we only show the potential on the surface,
-together with a countur plot:
+while in three dimensions we show first the potential on the surface,
+together with a contur plot,
 
 @image html step-34_3d.png
+
+and then the external contur plot of the potential, with opacity set to 25%:
+
+@image html step-34_3d-2.png
