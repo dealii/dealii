@@ -1,6 +1,7 @@
 <h1>Results</h1>
 
-We ran the program using the following <code>parameters.prm</code> file:
+We ran the program using the following <code>parameters.prm</code> file (which
+can also be found in the directory in which all the other source files are):
 @verbatim
 # Listing of Parameters
 # ---------------------
@@ -137,7 +138,6 @@ obtained by using higher order mappings.
 
 The result of running these computations is a bunch of output files that we
 can pass to our visualization program of choice. 
-
 The output files are of two kind: the potential on the boundary
 element surface, and the potential extended to the outer and inner
 domain. The combination of the two for the two dimensional case looks
