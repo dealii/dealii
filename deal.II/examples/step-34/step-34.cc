@@ -66,22 +66,23 @@ using namespace dealii;
 
 				 // @sect3{Single and double layer operator kernels}
 
+				 // First, let us define a bit of the boundary integral equation machinery.
+
     // The following two functions are the actual calculations of the
-    // single and double layer potential kernels, that is G and Grad
-    // G. They are well defined only if the vector $R = y-x$ is
+    // single and double layer potential kernels, that is $G$ and $\nabla
+    // G$. They are well defined only if the vector $R = \mathbf{y}-\mathbf{x}$ is
     // different from zero.
     // 
     // Whenever the integration is performed with the singularity
     // inside the given cell, then a special quadrature formula is
     // used that allows one to integrate arbitrary functions against a
     // singular weight on the reference cell.
-    //
     // There are two options when the integral is singular. One could
     // take into account the singularity inside the quadrature formula
     // as a weigthing function, or one could use a quadrature formula
     // that is taylored to integrate singular objects, but where the
     // actual weighting function is one. The use of the first method
-    // requires the user to provide a "desingularized" single and
+    // requires the user to provide "desingularized" single and
     // double layer potentials which can then be integrated on the
     // given cell. When the @p factor_out_singularity parameter is set
     // to true, then the computed kernels do not conatain the singular
@@ -90,6 +91,7 @@ using namespace dealii;
     // singular integrals are integrals along a segment of a
     // logarithmic singularity.
     //
+//TODO: Can you elaborate in formulas?
     // These integrals are somewhat delicate, because inserting a
     // factor Jx in the variable of integration does not result only
     // in a factor J appearing as a constant factor on the entire
@@ -102,10 +104,10 @@ using namespace dealii;
     // In the three dimensional case the singular integral is taken
     // care of using the QGaussOneOverR quadrature formula. We could
     // use the desingularized kernel here as well, but this would
-    // require us to be careful about the different scaling of r in
+    // require us to be careful about the different scaling of $r$ in
     // the reference cell and in real space. The quadrature formula
-    // uses as weight 1/r in local coordinates, while we need to
-    // integrate 1/R in real coordinates. A factor of r/R has to be
+    // uses as weight $1/r$ in local coordinates, while we need to
+    // integrate $1/R$ in real coordinates. A factor of $r/R$ has to be
     // introduced in the quadrature formula. This can be done
     // manually, or we simply calculate the standard kernels and then
     // use a desingularized quadrature formula, i.e., one which is
@@ -113,7 +115,7 @@ using namespace dealii;
     // of the singularity.
     //
     // Notice that the QGaussLog quadrature formula is made to
-    // integrate f(x)ln|x-x0|, but the kernel for two dimensional
+    // integrate $f(x)\ln |x-x0|$, but the kernel for two dimensional
     // problems has the opposite sign. This is taken care of by
     // switching the sign of the two dimensional desingularized
     // kernel.
@@ -131,16 +133,14 @@ double single_layer(const Point<dim> &R,
             return -1./(2*numbers::PI);
         else
             return (-std::log(R.norm()) / (2*numbers::PI) );
-        break;
+
     case 3:
         return (1./( R.norm()*4*numbers::PI ) );
-        break;
+
     default:
         Assert(false, ExcInternalError());
         return 0.;
-        break;
     }
-    return 0.;
 }
         
 
@@ -159,9 +159,8 @@ Point<dim> double_layer(const Point<dim> &R,
 
       default:
         Assert(false, ExcInternalError());
-        break;
+	return Point<dim>();
     }
-  return Point<dim>();
 }
 }
 
