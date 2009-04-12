@@ -59,8 +59,105 @@
 using namespace dealii;
 
 
+    // The following two functions are the actual calculations of the
+    // single and double layer potential kernels, that is G and Grad
+    // G. They are well defined only if the vector $R = y-x$ is
+    // different from zero.
+    // 
+    // Whenever the integration is performed with the singularity
+    // inside the given cell, then a special quadrature formula is
+    // used that allows one to integrate arbitrary functions against a
+    // singular weight on the reference cell.
+    //
+    // There are two options when the integral is singular. One could
+    // take into account the singularity inside the quadrature formula
+    // as a weigthing function, or one could use a quadrature formula
+    // that is taylored to integrate singular objects, but where the
+    // actual weighting function is one. The use of the first method
+    // requires the user to provide a "desingularized" single and
+    // double layer potentials which can then be integrated on the
+    // given cell. When the @p factor_out_singularity parameter is set
+    // to true, then the computed kernels do not conatain the singular
+    // factor, which is included in the quadrature formulas as a
+    // weighting function. This works best in two dimension, where the
+    // singular integrals are integrals along a segment of a
+    // logarithmic singularity.
+    //
+    // These integrals are somewhat delicate, because inserting a
+    // factor Jx in the variable of integration does not result only
+    // in a factor J appearing as a constant factor on the entire
+    // integral, but also on an additional integral to be added, that
+    // contains the logarithm of J. For this reason in two dimensions
+    // we opt for the desingularized kernel, and use the QGaussLogR
+    // quadrature formula, that takes care of integrating the correct
+    // weight for us. 
+    //
+    // In the three dimensional case the singular integral is taken
+    // care of using the QGaussOneOverR quadrature formula. We could
+    // use the desingularized kernel here as well, but this would
+    // require us to be careful about the different scaling of r in
+    // the reference cell and in real space. The quadrature formula
+    // uses as weight 1/r in local coordinates, while we need to
+    // integrate 1/R in real coordinates. A factor of r/R has to be
+    // introduced in the quadrature formula. This can be done
+    // manually, or we simply calculate the standard kernels and then
+    // use a desingularized quadrature formula, i.e., one which is
+    // taylored for singular integrals, but whose weight is 1 instead
+    // of the singularity.
+    //
+    // Notice that the QGaussLog quadrature formula is made to
+    // integrate f(x)ln|x-x0|, but the kernel for two dimensional
+    // problems has the opposite sign. This is taken care of by
+    // switching the sign of the two dimensional desingularized
+    // kernel.
+    //
+    // The last argument to both functions is simply ignored in three
+    // dimensions.
+namespace LaplaceKernel
+{
 template <int dim>
-class LaplaceKernel;
+double single_layer(const Point<dim> &R, 
+		    bool factor_out_2d_singularity = false) {
+    switch(dim) {
+    case 2:
+        if(factor_out_2d_singularity == true) 
+            return -1./(2*numbers::PI);
+        else
+            return (-std::log(R.norm()) / (2*numbers::PI) );
+        break;
+    case 3:
+        return (1./( R.norm()*4*numbers::PI ) );
+        break;
+    default:
+        Assert(false, ExcInternalError());
+        return 0.;
+        break;
+    }
+    return 0.;
+}
+        
+
+
+template <int dim>
+Point<dim> double_layer(const Point<dim> &R,
+			bool factor_out_2d_singularity = false) {
+  switch(dim) {
+    case 2:
+	  if (factor_out_2d_singularity)
+	    return Point<dim>();
+	  else
+	    return R / (-2*numbers::PI * R.square());
+    case 3:
+	  return R / ( -4*numbers::PI * R.square()*R.norm() );
+
+      default:
+        Assert(false, ExcInternalError());
+        break;
+    }
+  return Point<dim>();
+}
+}
+
 
 
 template <int dim> 
@@ -239,71 +336,6 @@ private:
 
 
 
-template <int dim>
-class LaplaceKernel
-{
-public:
-    // The following two functions are the actual calculations of the
-    // single and double layer potential kernels, that is G and Grad
-    // G. They are well defined only if the vector $R = y-x$ is
-    // different from zero.
-    // 
-    // Whenever the integration is performed with the singularity
-    // inside the given cell, then a special quadrature formula is
-    // used that allows one to integrate arbitrary functions against a
-    // singular weight on the reference cell.
-    //
-    // There are two options when the integral is singular. One could
-    // take into account the singularity inside the quadrature formula
-    // as a weigthing function, or one could use a quadrature formula
-    // that is taylored to integrate singular objects, but where the
-    // actual weighting function is one. The use of the first method
-    // requires the user to provide a "desingularized" single and
-    // double layer potentials which can then be integrated on the
-    // given cell. When the @p factor_out_singularity parameter is set
-    // to true, then the computed kernels do not conatain the singular
-    // factor, which is included in the quadrature formulas as a
-    // weighting function. This works best in two dimension, where the
-    // singular integrals are integrals along a segment of a
-    // logarithmic singularity.
-    //
-    // These integrals are somewhat delicate, because inserting a
-    // factor Jx in the variable of integration does not result only
-    // in a factor J appearing as a constant factor on the entire
-    // integral, but also on an additional integral to be added, that
-    // contains the logarithm of J. For this reason in two dimensions
-    // we opt for the desingularized kernel, and use the QGaussLogR
-    // quadrature formula, that takes care of integrating the correct
-    // weight for us. 
-    //
-    // In the three dimensional case the singular integral is taken
-    // care of using the QGaussOneOverR quadrature formula. We could
-    // use the desingularized kernel here as well, but this would
-    // require us to be careful about the different scaling of r in
-    // the reference cell and in real space. The quadrature formula
-    // uses as weight 1/r in local coordinates, while we need to
-    // integrate 1/R in real coordinates. A factor of r/R has to be
-    // introduced in the quadrature formula. This can be done
-    // manually, or we simply calculate the standard kernels and then
-    // use a desingularized quadrature formula, i.e., one which is
-    // taylored for singular integrals, but whose weight is 1 instead
-    // of the singularity.
-    //
-    // Notice that the QGaussLog quadrature formula is made to
-    // integrate f(x)ln|x-x0|, but the kernel for two dimensional
-    // problems has the opposite sign. This is taken care of by
-    // switching the sign of the two dimensional desingularized
-    // kernel.
-    //
-    // The last argument to both funcitons is simply ignored in three
-    // dimensions.
-    double single_layer(const Point<dim> &R, 
-                        bool factor_out_2d_singularity = false);
-    Point<dim> double_layer(const Point<dim> &R, 
-                            bool factor_out_2d_singularity = false);
-};
-
-
 // The constructor initializes the variuous object in the same way of
 // finite element problems. The only new ingredient here is the
 // ParsedFunction object, which needs, at construction time, the
@@ -438,47 +470,6 @@ void BEMProblem<dim>::read_parameters (const std::string filename) {
 }
 
 
-template <int dim>
-double LaplaceKernel<dim>::single_layer(const Point<dim> &R, 
-                                        bool factor_out_2d_singularity) {
-    switch(dim) {
-    case 2:
-        if(factor_out_2d_singularity == true) 
-            return -1./(2*numbers::PI);
-        else
-            return (-std::log(R.norm()) / (2*numbers::PI) );
-        break;
-    case 3:
-        return (1./( R.norm()*4*numbers::PI ) );
-        break;
-    default:
-        Assert(false, ExcInternalError());
-        return 0.;
-        break;
-    }
-    return 0.;
-}
-        
-
-
-template <int dim>
-Point<dim> LaplaceKernel<dim>::double_layer(const Point<dim> &R,
-                                            bool factor_out_2d_singularity) {
-  switch(dim) {
-    case 2:
-	  if (factor_out_2d_singularity)
-	    return Point<dim>();
-	  else
-	    return R / (-2*numbers::PI * R.square());
-    case 3:
-	  return R / ( -4*numbers::PI * R.square()*R.norm() );
-
-      default:
-        Assert(false, ExcInternalError());
-        break;
-    }
-  return Point<dim>();
-}
         
 template <int dim>
 void BEMProblem<dim>::read_domain() {
@@ -608,9 +599,6 @@ void BEMProblem<dim>::assemble_system() {
     // the matrix in the global row i.
     Vector<double>      local_matrix_row_i(fe.dofs_per_cell);
     
-    // The kernel.
-    LaplaceKernel<dim> kernel;
-    
     Point<dim> R;
 
     // The index i runs on the collocation points, which are the
@@ -668,13 +656,13 @@ void BEMProblem<dim>::assemble_system() {
                     // cell.
                     R = q_points[q] - support_points[i];
                         
-                    system_rhs(i) += ( kernel.single_layer(R)   * 
+                    system_rhs(i) += ( LaplaceKernel::single_layer(R)   * 
                                        normal_wind                      *
                                        fe_v.JxW(q) );
                         
                     for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
                         
-                        local_matrix_row_i(j) += ( ( kernel.double_layer(R)     * 
+		      local_matrix_row_i(j) += ( ( LaplaceKernel::double_layer(R)     * 
                                                         normals[q] )            *
                                                       fe_v.shape_value(j,q)     *
                                                       fe_v.JxW(q)       );
@@ -763,12 +751,12 @@ void BEMProblem<dim>::assemble_system() {
                                 normal_wind += (singular_cell_wind[q](d)*
                                                 singular_normals[q][d]);
                         
-                            system_rhs(i) += ( kernel.single_layer(R, is_singular) *
+                            system_rhs(i) += ( LaplaceKernel::single_layer(R, is_singular) *
                                                normal_wind                         *
                                                fe_v_singular.JxW(q) );
                         
                             for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
-                                local_matrix_row_i(j) += (( kernel.double_layer(R, is_singular) *
+                                local_matrix_row_i(j) += (( LaplaceKernel::double_layer(R, is_singular) *
 							    singular_normals[q])                *
 							  fe_v_singular.shape_value(j,q)        *
 							  fe_v_singular.JxW(q)       );
@@ -885,7 +873,6 @@ void BEMProblem<dim>::interpolate() {
     std::vector<double> normal_wind(n_q_points);
     std::vector<Vector<double> > local_wind(n_q_points, Vector<double>(dim) );
     
-    LaplaceKernel<dim> kernel;
     Point<dim> R;
 
 
@@ -920,10 +907,10 @@ void BEMProblem<dim>::interpolate() {
                 
                 R =  q_points[q] - external_support_points[i];
                         
-                external_phi(i) += ( ( kernel.single_layer(R)   * 
+                external_phi(i) += ( ( LaplaceKernel::single_layer(R)   * 
                                        normal_wind[q]   +
                                        //
-                                       (kernel.double_layer(R)        * 
+                                       (LaplaceKernel::double_layer(R)        * 
                                         normals[q] )            *
                                        local_phi[q] )           *
                                      fe_v.JxW(q) );
