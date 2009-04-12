@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -772,7 +772,8 @@ namespace Patterns
  *
  *   The ParameterHandler class is discussed in detail in the @ref
  *   step_19 "step-19" example program, and is used in more realistic
- *   situations in @ref step_29 "step-29" and @ref step_33 "step-33".
+ *   situations in @ref step_29 "step-29", @ref step_33 "step-33"
+ *   and @ref step_34 "step-34".
  *   
  *   <h3>Declaring entries</h3>
  *   
