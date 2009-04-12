@@ -117,7 +117,7 @@ namespace LaplaceKernel
 {
 template <int dim>
 double single_layer(const Point<dim> &R, 
-		    bool factor_out_2d_singularity = false) {
+		    const bool factor_out_2d_singularity = false) {
     switch(dim) {
     case 2:
         if(factor_out_2d_singularity == true) 
@@ -140,7 +140,7 @@ double single_layer(const Point<dim> &R,
 
 template <int dim>
 Point<dim> double_layer(const Point<dim> &R,
-			bool factor_out_2d_singularity = false) {
+			const bool factor_out_2d_singularity = false) {
   switch(dim) {
     case 2:
 	  if (factor_out_2d_singularity)
