@@ -2,7 +2,7 @@
 //    $Id: function_parser.h 14594 2007-03-22 20:17:41Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,10 @@ namespace Functions
 {
 /**
  *   Friendly interface to the FunctionParser class. This class is
- *   meant as a wrapper for the FunctionParser class. It provides two
+ *   meant as a wrapper for the FunctionParser class. It is used in the
+ *   @ref step_34 "step-34" tutorial program.
+ *
+ *   It provides two
  *   methods to declare and parse a ParameterHandler object and creates
  *   the Function object declared in the parameter file. This class is
  *   derived from the AutoDerivativeFunction class, so you don't need
