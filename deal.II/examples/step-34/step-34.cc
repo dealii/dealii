@@ -599,8 +599,6 @@ void BEMProblem<dim>::assemble_system() {
     // the matrix in the global row i.
     Vector<double>      local_matrix_row_i(fe.dofs_per_cell);
     
-    Point<dim> R;
-
     // The index i runs on the collocation points, which are the
     // support of the ith basis function, while j runs on inner
     // integration. We perform this check here to ensure that we are
@@ -654,7 +652,7 @@ void BEMProblem<dim>::assemble_system() {
                     // Distance between the external support point
                     // and the quadrature point on the internal
                     // cell.
-                    R = q_points[q] - support_points[i];
+                    const Point<dim> R = q_points[q] - support_points[i];
                         
                     system_rhs(i) += ( LaplaceKernel::single_layer(R)   * 
                                        normal_wind                      *
@@ -745,7 +743,7 @@ void BEMProblem<dim>::assemble_system() {
                         wind.vector_value_list(singular_q_points, singular_cell_wind);
                     
                         for(unsigned int q=0; q<singular_quadrature->size(); ++q) {
-                            R = singular_q_points[q]- support_points[i];
+			  const Point<dim> R = singular_q_points[q]- support_points[i];
                             double normal_wind = 0;
                             for(unsigned int d=0; d<dim; ++d)
                                 normal_wind += (singular_cell_wind[q](d)*
@@ -873,9 +871,6 @@ void BEMProblem<dim>::compute_exterior_solution() {
     std::vector<double> normal_wind(n_q_points);
     std::vector<Vector<double> > local_wind(n_q_points, Vector<double>(dim) );
     
-    Point<dim> R;
-
-
     typename DoFHandler<dim>::active_cell_iterator
         external_cell = external_dh.begin_active(),
         external_endc = external_dh.end();
@@ -905,7 +900,7 @@ void BEMProblem<dim>::compute_exterior_solution() {
             
             for(unsigned int q=0; q<n_q_points; ++q) {
                 
-                R =  q_points[q] - external_support_points[i];
+	      const Point<dim> R =  q_points[q] - external_support_points[i];
                         
                 external_phi(i) += ( ( LaplaceKernel::single_layer(R)   * 
                                        normal_wind[q]   +
