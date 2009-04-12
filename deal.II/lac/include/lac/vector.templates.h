@@ -239,16 +239,17 @@ void Vector<Number>::reinit (const Vector<Number2>& v,
   reinit (v.size(), fast);
 }
 
-
-
-template <typename Number>
-void
-Vector<Number>::swap (Vector<Number> &v)
-{
-  std::swap (vec_size,     v.vec_size);
-  std::swap (max_vec_size, v.max_vec_size);
-  std::swap (val,          v.val);
-}
+// Moved to vector.h as an inline function by Luca Heltai on
+// 2009/04/12 to prevent strange compiling errors, after making swap
+// virtual.
+// template <typename Number>
+// void
+// Vector<Number>::swap (Vector<Number> &v)
+// {
+//   std::swap (vec_size,     v.vec_size);
+//   std::swap (max_vec_size, v.max_vec_size);
+//   std::swap (val,          v.val);
+// }
 
 
 

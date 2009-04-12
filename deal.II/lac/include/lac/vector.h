@@ -308,9 +308,14 @@ class Vector : public Subscriptor
 				      * filled by zeros. Otherwise, the
 				      * elements are left an unspecified
 				      * state.
+				      *
+				      * This function is virtual in
+				      * order to allow for derived
+				      * classes to handle memory
+				      * separately.
 				      */ 
-    void reinit (const unsigned int N,
-		 const bool         fast=false);
+    virtual void reinit (const unsigned int N,
+			 const bool         fast=false);
     
 				     /**
 				      * Change the dimension to that of the
@@ -347,8 +352,13 @@ class Vector : public Subscriptor
 				      * <tt>swap(u,v)</tt> that simply calls
 				      * <tt>u.swap(v)</tt>, again in analogy
 				      * to standard functions.
-				      */
-    void swap (Vector<Number> &v);
+				      *
+				      * This function is virtual in
+				      * order to allow for derived
+				      * classes to handle memory
+				      * separately.
+				      */ 
+    virtual void swap (Vector<Number> &v);
     
 				     /**
                                       * Set all components of the vector to
@@ -1177,6 +1187,21 @@ inline
 void
 Vector<Number>::compress () const
 {}
+
+
+// Moved from vector.templates.h as an inline function by Luca Heltai
+// on 2009/04/12 to prevent strange compiling errors, after making
+// swap virtual.
+template <typename Number>
+inline
+void
+Vector<Number>::swap (Vector<Number> &v)
+{
+  std::swap (vec_size,     v.vec_size);
+  std::swap (max_vec_size, v.max_vec_size);
+  std::swap (val,          v.val);
+}
+
 
 
 

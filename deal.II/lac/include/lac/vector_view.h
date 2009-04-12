@@ -37,17 +37,32 @@ DEAL_II_NAMESPACE_OPEN
  * This is in the same style of the vector view in the Trilinos
  * library.
  *
+ * You should consider using the VectorView object ONLY when ALL of
+ * the following requirements are met:
+ *
+ * 1. Your application requires a Vector<Number> object.
+ *
+ * 2. All you have at your disposal is a Number* pointer.
+ *
+ * 3. You are ABSOLUTELY SURE that the above pointer points to a
+ * valid area of memory of the correct size.
+ *
+ * 4. You really believe that making a copy of that memory would be
+ * too expensive.
+ *
+ * 5. You really know what you are doing.
+ *
  * Notice that NO CHECKS are performed on the actual memory, and if
  * you try to access illegal areas of memory, your computer will
- * suffer from it. Use this class ONLY if you know exactly what you
- * are doing. Two constructors are provided. One for read-write
- * access, and one for read only access. 
+ * suffer from it. Once again, use this class ONLY if you know exactly
+ * what you are doing.
  *
- * You are allowed to use this class on objects of type const
- * Vector<Number>, however you should be aware of the fact that the
- * constness of pointed to array is casted away, which means that you
- * should only use the const constructor when the actual object you
- * are constructing is itself a constant object.
+ * Two constructors are provided. One for read-write access, and one
+ * for read only access, and you are allowed to use this class on
+ * objects of type const Number*, however you should be aware of the
+ * fact that the constness of pointed to array is casted away, which
+ * means that you should only use the const constructor when the
+ * actual object you are constructing is itself a constant object.
  *
  * You WILL be allowed to change the vector afterwards, so make sure
  * you know what you are doing, before you change data without
@@ -136,6 +151,56 @@ public:
     /** This desctructor will only reset the internal sizes and the
      * interanl pointers,  but it will NOT clear the memory. */
     ~VectorView();
+
+    /** The reinit function of this object has a behavior which is
+     * different from the one of the base class. VectorView does not
+     * handle memory, and you should not attempt to resize the memory
+     * that is pointed to by this object using the reinit
+     * function. You can, however, resize the view that you have of
+     * the original object. Notice that it is your own responsability
+     * to ensure that the memory you are pointing to is big enough.
+     *
+     * Similarly to what happens in the base class, if fast is false,
+     * then the entire content of the vector is set to 0, otherwise
+     * the content of the memory is left unchanged.
+     *
+     * Notice that the following snippet of code may not produce what
+     * you expect:
+     * <code>
+     // Create a vector of length 1.
+     Vector<double> long_vector(1);
+     
+     // Make a view of it
+     VectorView<double> view_of_long_vector(1, long_vector.begin());
+     
+     // Resize the original vector to a bigger size
+     long_vector.reinit(100);
+     
+     // And the view, leaving the memory untouched
+     view_of_long_vector.reinit(100, true);
+     </code>
+     *
+     * In the above case, the Vector<double>::reinit method is called,
+     * and a NEW area of memory is reserved, possibly not starting at
+     * the same place as before. Hoever, the VectorView<double> object
+     * keeps pointing to the same old area. After the two reinits, any
+     * call to view_of_long_vector(i), with i>0 might cause an attempt
+     * to access invalid areas of memory, or might function properly,
+     * depending on wether or not the system was able to allocate some
+     * memory consecutively after the original allocation.
+     *
+     * In any case, you should not rely on this behavior, and you
+     * should only call this reinit function if you really know what
+     * you are doing.
+     */ 
+    virtual void reinit (const unsigned int N,
+			 const bool         fast=false);
+    
+    
+    /** This function is here to prevent memory corruption. It should
+     * never be called, and will throw an exception if you try to do
+     * so. */ 
+    virtual void swap (Vector<Number> &v);
 };
 
 
@@ -173,6 +238,24 @@ VectorView<Number>::~VectorView() {
     this->vec_size = 0;
     this->max_vec_size = 0;
     this->val = 0;
+}
+
+
+
+template<typename Number>
+inline
+void VectorView<Number>::reinit(const unsigned int N, const bool fast) {
+    this->vec_size = N;
+    this->max_vec_size = N;
+    if(fast == false)
+	Vector<Number>::operator=(static_cast<Number>(0));
+}
+
+
+template<typename Number>
+inline
+void VectorView<Number>::swap(Vector<Number> &) {
+    AssertThrow(false, ExcMessage("Cant' swap a VectorView with a Vector!"));
 }
 
 DEAL_II_NAMESPACE_CLOSE
