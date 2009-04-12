@@ -13,21 +13,24 @@
 //
 //----------------------------  step-34.cc  ---------------------------
 
+
+				 // @sect3{Include files}
+
+				 // The program starts with including a bunch
+				 // of include files that we will use in the
+				 // various parts of the program. Most of them
+				 // have been discussed in previous tutorials
+				 // already:
 #include <base/smartpointer.h>
 #include <base/convergence_table.h>
 #include <base/quadrature_lib.h>
 #include <base/quadrature_selector.h>
-#include <base/table.h>
 #include <base/parsed_function.h>
 #include <base/utilities.h>
 
 #include <lac/full_matrix.h>
-#include <lac/precondition.h>
-#include <lac/solver_cg.h>
 #include <lac/vector.h>
 #include <lac/sparse_direct.h>
-#include <lac/lapack_full_matrix.h>
-#include <lac/matrix_lib.h>
 
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -37,27 +40,31 @@
 #include <grid/grid_out.h>
 #include <grid/tria_boundary_lib.h>
 
+#include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 
-#include <fe/fe_dgp.h>
-#include <fe/fe_system.h>
-#include <fe/fe_tools.h>
+#include <fe/fe_q.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
 
 #include <numerics/data_out.h>
 #include <numerics/vectors.h>
 
+				 // And here are a few C++ standard header
+				 // files that we will need:
 #include <cmath>
 #include <iostream>
 #include <fstream>
-#include <math.h>
 #include <string>
 
-
+				 // The last part of this preamble is to
+				 // import everything in the dealii namespace
+				 // into the global one for ease of use:
 using namespace dealii;
 
+
+				 // @sect3{Single and double layer operator kernels}
 
     // The following two functions are the actual calculations of the
     // single and double layer potential kernels, that is G and Grad
