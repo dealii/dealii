@@ -240,7 +240,7 @@ public:
     // Once we obtained a solution on the codimension one domain, we
     // want to interpolate it to the rest of the
     // space. This is done by performing again the convolution of the
-    // solution with the kernel in the interpolate() function.
+    // solution with the kernel in the compute_exterior_solution() function.
     //
     // We would like to plot the velocity variable which is the
     // gradient of the potential solution. The potential solution is
@@ -249,7 +249,7 @@ public:
     // dimensional continuous finite element space. The plot of the
     // gradient of the extrapolated solution will give us the velocity
     // we want.
-    void interpolate();
+    void compute_exterior_solution();
     
     void output_results(unsigned int cycle);
     
@@ -847,7 +847,7 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle) {
 // box $[-2,2]^{\text{dim}}$, and we extrapolate the actual solution
 // inside this box using the convolution with the fundamental solution.
 template <int dim>
-void BEMProblem<dim>::interpolate() {
+void BEMProblem<dim>::compute_exterior_solution() {
     // Generate the mesh, refine it and distribute dofs on it.
     GridGenerator::hyper_cube(external_tria, -2, 2);
     external_tria.refine_global(external_refinement);
@@ -978,7 +978,7 @@ void BEMProblem<dim>::run() {
             output_results(cycle);
         }
         if(extend_solution == true)
-            interpolate();
+            compute_exterior_solution();
     } else {
 	deallog << "Run in dimension " << dim 
                 << " explicitly disabled in parameter file. " 
