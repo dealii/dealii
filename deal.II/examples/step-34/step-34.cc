@@ -912,15 +912,15 @@ void BEMProblem<dim>::compute_exterior_solution() {
             }
         }
     }
-    DataOut<dim, DoFHandler<dim> > dataout;
+    DataOut<dim, DoFHandler<dim> > data_out;
     
-    dataout.attach_dof_handler(external_dh);
-    dataout.add_data_vector(external_phi, "external_phi");
-    dataout.build_patches();
+    data_out.attach_dof_handler(external_dh);
+    data_out.add_data_vector(external_phi, "external_phi");
+    data_out.build_patches();
     
-    std::string filename = Utilities::int_to_string(dim) + "d_external.vtk";
+    const std::string filename = Utilities::int_to_string(dim) + "d_external.vtk";
     std::ofstream file(filename.c_str());
-    dataout.write_vtk(file);
+    data_out.write_vtk(file);
 }
 
 
