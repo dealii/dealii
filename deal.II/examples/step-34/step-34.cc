@@ -754,20 +754,46 @@ void BEMProblem<dim>::assemble_system() {
                 // create it using the new operator of C++, we also need to
                 // destroy it using the dual of new: delete. This is done at
                 // the end, and only if dim == 2.
+					       //
+					       // Putting all this into a
+					       // dimension independent
+					       // framework requires a little
+					       // trick. The problem is that,
+					       // depending on dimension, we'd
+					       // like to either assign a
+					       // QGaussLogR<1> or a
+					       // QGaussOneOverR<2> to a
+					       // Quadrature<dim-1>. C++
+					       // doesn't allow this right
+					       // away, and neither is a
+					       // static_cast
+					       // possible. However, we can
+					       // attempt a dynamic_cast: the
+					       // implementation will then
+					       // look up at run time whether
+					       // the conversion is possible
+					       // (which we <em>know</em> it
+					       // is) and if that isn't the
+					       // case simply return a null
+					       // pointer. To be sure we can
+					       // then add a safety check at
+					       // the end:
                 Assert(singular_index != numbers::invalid_unsigned_int,
                        ExcInternalError());
 
-                Quadrature<dim-1> *
+                const Quadrature<dim-1> *
 		  singular_quadrature
 		  = (dim == 2
 		     ?
-		     new QGaussLogR<1>(singular_quadrature_order,
-				       Point<1>((double)singular_index),
-				       1./cell->measure())
+		     dynamic_cast<Quadrature<dim-1>*>(
+		       new QGaussLogR<1>(singular_quadrature_order,
+					 Point<1>((double)singular_index),
+					 1./cell->measure()))
 		     :
 		     (dim == 3
 		      ?
-		      &sing_quadratures_3d[singular_index]
+		      dynamic_cast<Quadrature<dim-1>*>(
+			&sing_quadratures_3d[singular_index])
 		      :
 		      0));
 		Assert(singular_quadrature, ExcInternalError());
@@ -844,11 +870,22 @@ void BEMProblem<dim>::assemble_system() {
       system_matrix.add(i,i,alpha(i));
 }
 
+
+				 // @sect3{BEMProblem::solve_system}
+
+				 // The next function simply solves the linear
+				 // system. As described, we use the
+				 // SparseDirectUMFPACK direct solver to
+				 // compute the inverse of the matrix (in
+				 // reality it only produces an LU
+				 // decomposition) and then apply this inverse
+				 // to the right hand side to yield the
+				 // solution:
 template <int dim>
 void BEMProblem<dim>::solve_system() {
-    SparseDirectUMFPACK LU;
-    LU.initialize (system_matrix);
-    LU.vmult (phi, system_rhs);
+    SparseDirectUMFPACK inverse_matrix;
+    inverse_matrix.initialize (system_matrix);
+    inverse_matrix.vmult (phi, system_rhs);
 
 //TODO: is this true? it seems to me that the BIE is definite...    
     // Since we are solving a purely Neumann problem, the solution is
@@ -859,14 +896,14 @@ void BEMProblem<dim>::solve_system() {
 }
 
 
+				 // @sect3{BEMProblem::solve_system}
 
-template <int dim>
-void BEMProblem<dim>::compute_errors(const unsigned int cycle) {
     // The computation of the errors is exactly the same in all other
     // example programs, and we won't comment too much. Notice how the
     // same methods that are used in the finite element methods can be
     // used here.
-    
+template <int dim>
+void BEMProblem<dim>::compute_errors(const unsigned int cycle) {
     Vector<float> difference_per_cell (tria.n_active_cells());
     VectorTools::integrate_difference (dh, phi,
 				       exact_solution,
@@ -876,9 +913,10 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle) {
     const double L2_error = difference_per_cell.l2_norm();
 
     
-    // The error in the alpha vector can be computed directly using
-    // the linfty_norm method of Vector<double>, since on each node,
-    // the value should be $\frac 12$.
+    // The error in the alpha vector can be computed directly using the
+    // Vector::linfty_norm() function, since on each node, the value should be
+    // $\frac 12$. All errors are then output and appended to our
+    // ConvergenceTable object for later computation of convergence rates:
     Vector<double> difference_per_node(alpha);
     difference_per_node.add(-.5);
     
@@ -902,24 +940,34 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle) {
     convergence_table.add_value("Linfty(alpha)", alpha_error);
 }
 
-// We assume here that the boundary element domain is contained in the
-// box $[-2,2]^{\text{dim}}$, and we extrapolate the actual solution
-// inside this box using the convolution with the fundamental solution.
+
+				 // @sect3{BEMProblem::compute_exterior_solution}
+
+				 // We'd like to also know something about the
+				 // value of the potential $\phi$ in the
+				 // exterior domain: after all our motivation
+				 // to consider the boundary integral problem
+				 // was that we wanted to know the velocity in
+				 // the exterior domain!
+				 //
+ // To this end, let us assume here that the boundary element domain is
+ // contained in the box $[-2,2]^{\text{dim}}$, and we extrapolate the actual
+ // solution inside this box using the convolution with the fundamental
+ // solution. The formula for this is given in the introduction.
+ //
+    // The reconstruction of the solution in the entire space is done on a
+    // continuous finite element grid of dimension dim. These are the usual
+    // ones, and we don't comment any further on them. At the end of the
+    // function, we output this exterior solution in, again, much the usual
+    // way.
 template <int dim>
 void BEMProblem<dim>::compute_exterior_solution() {
-    // The reconstruction of the solution in the entire space is done
-    // on a continuous finite element grid of dimension dim. These are
-    // the usual ones, and we don't comment any further on them.
-    
     Triangulation<dim>  external_tria;
-    // Generate the mesh, refine it and distribute dofs on it.
     GridGenerator::hyper_cube(external_tria, -2, 2);
-
 
     FE_Q<dim>           external_fe(1);
     DoFHandler<dim>     external_dh (external_tria);
-    Vector<double>      external_phi;
-    
+    Vector<double>      external_phi;    
   
     external_tria.refine_global(external_refinement);
     external_dh.distribute_dofs(external_fe);
@@ -975,28 +1023,37 @@ void BEMProblem<dim>::compute_exterior_solution() {
                 
 	      const Point<dim> R =  q_points[q] - external_support_points[i];
                         
-                external_phi(i) += ( ( LaplaceKernel::single_layer(R)   * 
-                                       normal_wind[q]   +
-                                       //
-                                       (LaplaceKernel::double_layer(R)        * 
+                external_phi(i) += ( ( LaplaceKernel::single_layer(R) * 
+                                       normal_wind[q]
+				       +
+                                       (LaplaceKernel::double_layer(R) * 
                                         normals[q] )            *
                                        local_phi[q] )           *
                                      fe_v.JxW(q) );
             }
         }
     }
-    DataOut<dim, DoFHandler<dim> > data_out;
+    
+    DataOut<dim> data_out;
     
     data_out.attach_dof_handler(external_dh);
     data_out.add_data_vector(external_phi, "external_phi");
     data_out.build_patches();
     
-    const std::string filename = Utilities::int_to_string(dim) + "d_external.vtk";
+    const std::string
+      filename = Utilities::int_to_string(dim) + "d_external.vtk";
     std::ofstream file(filename.c_str());
+
     data_out.write_vtk(file);
 }
 
 
+				 // @sect3{BEMProblem::output_results}
+
+				 // Outputting the results of our computations
+				 // is a rather mechanical tasks. All the
+				 // components of this function have been
+				 // discussed before.
 template <int dim>
 void BEMProblem<dim>::output_results(const unsigned int cycle) {
     
@@ -1031,31 +1088,45 @@ void BEMProblem<dim>::output_results(const unsigned int cycle) {
     }
 }
 
+
+				 // @sect3{BEMProblem::run}
+
+				 // This is the main function. It should be
+				 // self explanatory in its briefness:
 template <int dim>
 void BEMProblem<dim>::run() {
     
     read_parameters("parameters.prm");
-    if(run_in_this_dimension == true) {
-        read_domain();
-        
-        for(unsigned int cycle=0; cycle<n_cycles; ++cycle) {
-            refine_and_resize();
-            assemble_system();
-            solve_system();
-	    compute_errors(cycle);
-            output_results(cycle);
-        }
-        if(extend_solution == true)
-            compute_exterior_solution();
-    } else {
+
+    if(run_in_this_dimension == false)
+      {
 	deallog << "Run in dimension " << dim 
                 << " explicitly disabled in parameter file. " 
                 << std::endl;
+	return;
+      }
+    
+    read_domain();
+        
+    for(unsigned int cycle=0; cycle<n_cycles; ++cycle) {
+      refine_and_resize();
+      assemble_system();
+      solve_system();
+      compute_errors(cycle);
+      output_results(cycle);
     }
+    
+    if(extend_solution == true)
+      compute_exterior_solution();
 }
 
 
-int main () 
+				 // @sect3{The main() function}
+
+				 // This is the main function of this
+				 // program. It is exactly like all previous
+				 // tutorial programs:
+int main ()
 {
   try
   {
