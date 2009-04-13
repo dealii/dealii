@@ -114,11 +114,10 @@ using namespace dealii;
     // taylored for singular integrals, but whose weight is 1 instead
     // of the singularity.
     //
-    // Notice that the QGaussLog quadrature formula is made to
-    // integrate $f(x)\ln |x-x0|$, but the kernel for two dimensional
-    // problems has the opposite sign. This is taken care of by
-    // switching the sign of the two dimensional desingularized
-    // kernel.
+    // Notice that the QGaussLog quadrature formula is made to integrate
+    // $f(x)\ln |\mathbf{x}-\mathbf{x}_0|$, but the kernel for two dimensional
+    // problems has the opposite sign. This is taken care of by switching the
+    // sign of the two dimensional desingularized kernel.
     //
     // The last argument to both functions is simply ignored in three
     // dimensions.
@@ -129,7 +128,7 @@ double single_layer(const Point<dim> &R,
 		    const bool factor_out_2d_singularity = false) {
     switch(dim) {
     case 2:
-        if(factor_out_2d_singularity == true) 
+        if (factor_out_2d_singularity == true) 
             return -1./(2*numbers::PI);
         else
             return (-std::log(R.norm()) / (2*numbers::PI) );
@@ -165,23 +164,26 @@ Point<dim> double_layer(const Point<dim> &R,
 }
 
 
+				 // @sect3{The BEMProblem class}
 
+    // The structure of a boundary element method code is very similar to the
+    // structure of a finite element code, and so the member functions of this
+    // class are like those of most of the other tutorial programs. In
+    // particular, by now you should be familiar with reading parameters from
+    // an external file, and with the splitting of the different tasks into
+    // different modules. The same applies to boundary element methods, and we
+    // won't comment too much on them, except on the differences.
 template <int dim> 
 class BEMProblem 
 {
 public:
     BEMProblem();
     
-    // The structure of a boundary element method code is very similar
-    // to the structure of a finite element code. By now you should be
-    // familiar with reading paramaters from an external file, and
-    // with the splitting of the different tasks into different
-    // modules. The same applyes to boundary element methods, and we
-    // won't comment too much on them, except on the differences.
-
-    void read_parameters (const std::string filename);
-    
     void run();
+
+private:
+    
+    void read_parameters (const std::string &filename);
     
     void read_domain();
 
@@ -196,28 +198,32 @@ public:
     // The most noticeable difference is the fact that the final
     // matrix is full, and that we have a nested loop inside the usual
     // loop on cells that visits all support points of the degrees of
-    // freedom.  Moreover, when the support point lyes inside the cell
+    // freedom.  Moreover, when the support point lies inside the cell
     // which we are visiting, then the integral we perform becomes
     // singular.
     //
     // The practical consequence is that we have two sets of
     // quadrature formulas, finite element values and temporary
-    // elements, one for standard integration and one for the singular
+    // storage, one for standard integration and one for the singular
     // integration, which are used where necessary.
     void assemble_system();
 
-    // Notwithstanding the fact that the matrix is full, we use a
-    // SparseMatrix object and the SparseDirectUMFPACK solver, since
-    // in our experience it works better then using, for example, the
-    // LapackFullMatrix class. An alternative approach would be the
-    // use of GMRES method, however the construction of an efficient
+    // Notwithstanding the fact that the matrix is full, we use a SparseMatrix
+    // object and the SparseDirectUMFPACK solver, since in our experience it
+    // works better than using, for example, the LapackFullMatrix class. Of
+    // course, using a SparseMatrix object to store the matrix is wasteful,
+    // but at least for the moment that is all the SparseDirectUMFPACK class
+    // can deal with.
+    //
+    // An alternative approach would be the
+    // use of the GMRES method; however the construction of an efficient
     // preconditioner for boundary element methods is not a trivial
     // issue, and we won't treat this problem here.
     //
-    // We should notice moreover that the solution we will obtain will
-    // only be unique up to an additive constant. This is taken care
-    // of in the solve_system method, which filters out the mean value
-    // of the solution at the end of the computation.
+    // Moreover, we should notice that the solution we will obtain will only
+    // be unique up to an additive constant. This is taken care of in the
+    // <code>solve_system()</code> method, which filters out the mean value of
+    // the solution at the end of the computation.
     void solve_system();
 
     // Once we obtained the solution, we compute the $L^2$ error of
@@ -232,15 +238,17 @@ public:
     // computation of the angle, but a measure of how well we are
     // approximating the sphere and the circle.
     //
-    // Experimenting a little with the computation of the angles gives
-    // very accurate results for simpler geometries. To verify this
-    // you can comment out, in the read_domain() method, the
-    // tria.set_boundary(1, boundary) line, and check the alpha that
-    // is generated by the program. In the three dimensional case, the
-    // coarse grid of the sphere is obtained starting from a cube, and
-    // the obtained values of alphas are exactly $\frac 12$ on the
-    // nodes of the faces, $\frac 14$ on the nodes of the edges and
-    // $\frac 18$ on the 8 nodes of the vertices. 
+    // Experimenting a little with the computation of the angles gives very
+    // accurate results for simpler geometries. To verify this you can comment
+    // out, in the read_domain() method, the tria.set_boundary(1, boundary)
+    // line, and check the alpha that is generated by the program. By removing
+    // this call, whenever the mesh is refined new nodes will be placed along
+    // the straight lines that made up the coarse mesh, rather than be pulled
+    // onto the surface that we really want to approximate. In the three
+    // dimensional case, the coarse grid of the sphere is obtained starting
+    // from a cube, and the obtained values of alphas are exactly $\frac 12$
+    // on the nodes of the faces, $\frac 14$ on the nodes of the edges and
+    // $\frac 18$ on the 8 nodes of the vertices.
     void compute_errors(const unsigned int cycle);
     
     // Once we obtained a solution on the codimension one domain, we
@@ -255,14 +263,17 @@ public:
     // dimensional continuous finite element space. The plot of the
     // gradient of the extrapolated solution will give us the velocity
     // we want.
+    //
+    // In addition to the solution on the exterior domain, we also output the
+    // solution on the domain's boundary in the output_results() function, of
+    // course.
     void compute_exterior_solution();
     
-    void output_results(unsigned int cycle);
+    void output_results(const unsigned int cycle);
     
-private:
     // The usual deal.II classes can be used for boundary element
     // methods by specifying the "codimension" of the problem. This is
-    // done by setting the optional template arguments to
+    // done by setting the optional second template arguments to
     // Triangulation, FiniteElement and DoFHandler to the dimension of
     // the embedding space. In our case we generate either 1 or 2
     // dimensional meshes embedded in 2 or 3 dimensional spaces.
@@ -281,49 +292,48 @@ private:
     // methods. In this example we use the SparseDirectUMFPACK solver,
     // applied to a "fake" sparse matrix (a sparse matrix will all
     // entries different from zero). We found that this method is
-    // faster than using the LapackFullMatrix object.
+    // faster than using a LapackFullMatrix object.
 
     SparsityPattern             sparsity;
     SparseMatrix<double>        system_matrix;    
     Vector<double>              system_rhs;
+
+				     // The next two variables will denote the
+				     // solution $\phi$ as well as a vector
+				     // that will hold the values of
+				     // $\alpha(\mathbf x)$ (the fraction of
+				     // space visible from a point $\mathbf
+				     // x$) at the support points of our shape
+				     // functions.
     Vector<double>              phi;
     Vector<double>              alpha;
-    
-    // The reconstruction of the solution in the entire space is done
-    // on a continuous finite element grid of dimension dim. These are
-    // the usual ones, and we don't comment any further on them.
-    
-    Triangulation<dim>  external_tria;
-    FE_Q<dim>           external_fe;
-    DoFHandler<dim>     external_dh;
-    Vector<double>      external_phi;
     
     // The convergence table is used to output errors in the exact
     // solution and in the computed alphas. 
     ConvergenceTable	convergence_table;
     
-    // The following variables are the one that we fill through a
+    // The following variables are the ones that we fill through a
     // parameter file.  The new objects that we use in this example
-    // are the ParsedFunction object and the QuadratureSelector
+    // are the Functions::ParsedFunction object and the QuadratureSelector
     // object.
     //
-    // The ParsedFunction class allows us to easily and quickly define
-    // new function objects via parameter files, with custom
-    // definitions which can be very complex (see the documentation of
-    // that class for all the available options).
+    // The Functions::ParsedFunction class allows us to easily and quickly
+    // define new function objects via parameter files, with custom
+    // definitions which can be very complex (see the documentation of that
+    // class for all the available options).
     //
-    // The QuadratureSelector class allows us to generate quadrature
-    // formulas based on an identifying string and on the possible
-    // degree of the formula itself. We used this to allow custom
-    // selection of the quadrature formulas for the standard
-    // integration, and to define the order of the singular quadrature
-    // rule.
+    // We will allocate the quadrature object using the QuadratureSelector
+    // class that allows us to generate quadrature formulas based on an
+    // identifying string and on the possible degree of the formula itself. We
+    // used this to allow custom selection of the quadrature formulas for the
+    // standard integration, and to define the order of the singular
+    // quadrature rule.
     //
     // Notice that the pointer given below for the quadrature rule is
     // only used for non singular integrals. Whenever the integral is
     // singular, then only the degree of the quadrature pointer is
     // used, and the integration is a special one (see the
-    // assemble_matrix below for further details).
+    // assemble_matrix() function below for further details).
     //
     // We also define a couple of parameters which are used in case we
     // wanted to extend the solution to the entire domain. 
@@ -341,31 +351,30 @@ private:
 };
 
 
+				 // @sect3{BEMProblem::BEMProblem and BEMProblem::read_parameters}
 
-// The constructor initializes the variuous object in the same way of
-// finite element problems. The only new ingredient here is the
-// ParsedFunction object, which needs, at construction time, the
-// specification of the number of components.
+// The constructor initializes the variuous object in much the same way as
+// done in the finite element programs such as step-4 or step-6. The only new
+// ingredient here is the ParsedFunction object, which needs, at construction
+// time, the specification of the number of components.
 //
-// For the exact solution this is one, and no action is required since
-// one is the default value for a ParsedFunction object. The wind,
-// however, requires dim components to be specified. Notice that when
-// declaring entries in a parameter file for the expression of the
-// ParsedFunction, we need to specify the number of components
+// For the exact solution the number of vector components is one, and no
+// action is required since one is the default value for a ParsedFunction
+// object. The wind, however, requires dim components to be specified. Notice
+// that when declaring entries in a parameter file for the expression of the
+// Functions::ParsedFunction, we need to specify the number of components
 // explicitly, since the function
-// ParsedFunction<dim>::declare_parameters is static, and has no
-// knowledge of the number of components. 
+// Functions::ParsedFunction::declare_parameters is static, and has no
+// knowledge of the number of components.
 template <int dim>
 BEMProblem<dim>::BEMProblem() :
     fe(1),
     dh(tria),
-    external_fe(1),
-    external_dh(external_tria),
     wind(dim)
 {}
 
 template <int dim> 
-void BEMProblem<dim>::read_parameters (const std::string filename) {
+void BEMProblem<dim>::read_parameters (const std::string &filename) {
     deallog << std::endl << "Parsing parameter file " << filename << std::endl
             << "for a " << dim << " dimensional simulation. " << std::endl;
     
@@ -391,20 +400,25 @@ void BEMProblem<dim>::read_parameters (const std::string filename) {
     }
     prm.leave_subsection();
     
-    // For both two and three dimensions, we set the default input
-    // data to be such that the solution is $x+y+c$ or $x+y+z+c$.
+    // For both two and three dimensions, we set the default input data to be
+    // such that the solution is $x+y$ or $x+y+z$. The actually computed
+    // solution will differ from this by a constant (remember that for the
+    // velocity $\mathbf{\tilde v}$ we only need the gradient of the potential
+    // $\phi$, so an additive constant is of no concern to us) but we will
+    // remove it after solving for $\phi$ to make the solution function have a
+    // mean value of zero.
     //
-    // The use of the ParsedFunction object is pretty straight
-    // forward. The declare parameters function takes an additional
-    // integer argument that specifies the number of components of the
-    // given function. Its default value is one. When the
-    // correspending parse_parameters method is called, the calling
-    // object has to have the same number of components defined here,
-    // otherwise an exception is thrown.
+    // The use of the Functions::ParsedFunction object is pretty straight
+    // forward. The Functions::ParsedFunction::declare_parameters function
+    // takes an additional integer argument that specifies the number of
+    // components of the given function. Its default value is one. When the
+    // corresponding Functions::ParsedFunction::parse_parameters method is
+    // called, the calling object has to have the same number of components
+    // defined here, otherwise an exception is thrown.
     //
     // When declaring entries, we declare both 2 and three dimensional
-    // functions. However only the dim-dimensional one is parsed. This
-    // allows us to have only one parameter file for both 2 and 3
+    // functions. However only the dim-dimensional one is ultimately
+    // parsed. This allows us to have only one parameter file for both 2 and 3
     // dimensional problems.
     prm.enter_subsection("Wind function 2d");
     {
@@ -433,23 +447,19 @@ void BEMProblem<dim>::read_parameters (const std::string filename) {
       prm.set("Function expression", "x+y+z");
     }
     prm.leave_subsection();
-    
+
+				     // After declaring all these parameters
+				     // to the ParameterHandler object, let's
+				     // read an input file that will give the
+				     // parameters their values. We then
+				     // proceed to extract these values from
+				     // the ParameterHandler object:
     prm.read_input(filename);
 
     n_cycles = prm.get_integer("Number of cycles");                   
     external_refinement = prm.get_integer("External refinement");
     extend_solution = prm.get_bool("Extend solution on the -2,2 box");
     
-    // If we wanted to switch off one of the two simulations, we could
-    // do this by setting the corresponding "Run 2d simulation" or
-    // "Run 3d simulation" flag to false.
-    //
-    // This is another example of how to use parameter files in
-    // dimension independent programming.
-    run_in_this_dimension = prm.get_bool("Run " + 
-                                         Utilities::int_to_string(dim) +
-                                         "d simulation");
-
     prm.enter_subsection("Quadrature rules");
     {
       quadrature =
@@ -473,41 +483,49 @@ void BEMProblem<dim>::read_parameters (const std::string filename) {
       exact_solution.parse_parameters(prm);
     }
     prm.leave_subsection();
+
+    // Finally, here's another example of how to use parameter files in
+    // dimension independent programming.  If we wanted to switch off one of
+    // the two simulations, we could do this by setting the corresponding "Run
+    // 2d simulation" or "Run 3d simulation" flag to false:
+    run_in_this_dimension = prm.get_bool("Run " + 
+                                         Utilities::int_to_string(dim) +
+                                         "d simulation");
+
 }
 
 
+				 // @sect3{BEMProblem::read_domain}
+    
+    // A boundary element method triangulation is basically the same
+    // as a (dim-1) dimensional triangulation, with the difference that the
+    // vertices belong to a (dim) dimensional space.
+    //
+    // Some of the mesh formats supported in deal.II use by default three
+    // dimensional points to describe meshes. These are the formats which are
+    // compatible with the boundary element method capabilities of deal.II. In
+    // particular we can use either UCD or GMSH formats. In both cases, we
+    // have to be particularly careful with the orientation of the mesh,
+    // because, unlike in the standard finite element case, no reordering or
+    // compatibility check is performed here.  All meshes are considered as
+    // oriented, because they are embedded in a higher dimensional space. (See
+    // the documentation of the GridIn and of the Triangulation for further
+    // details on orientation of cells in a triangulation.) In our case, the
+    // normals to the mesh are external to both the circle in 2d or the sphere
+    // in 3d.
+    //
+    // The other detail that is required for appropriate refinement of the
+    // boundary element mesh, is an accurate description of the manifold that
+    // the mesh is approximating. We already saw this several times for the
+    // boundary of standard finite element meshes (for example in step-5 and
+    // step-6), and here the principle and usage is the same, except that the
+    // HyperBallBoundary class takes an additional template parameter that
+    // specifies the embedding space dimension. The function object still has
+    // to be static to live at least as long as the triangulation object to
+    // which it is attached.
         
 template <int dim>
 void BEMProblem<dim>::read_domain() {
-    
-    // A boundary element method triangulation is basically the same
-    // as a (dim-1) triangulation, with the difference that the
-    // vertices belong to a (dim) dimensional space.
-    //
-    // Some of the mesh formats supported in deal.II use by default
-    // three dimensional points to describe meshes. These are the
-    // formats which are compatible with the boundary element method
-    // capabilities of deal.II. In particular we can use either UCD or
-    // GMSH formats. In both cases, we have to be particularly careful
-    // with the orientation of the mesh, because, unlike in the
-    // standard finite element case, no reordering or compatibility
-    // check is performed here.
-    //
-    // All meshes are considered as oriented, because they are
-    // embedded in a higher dimensional space. See the documentation
-    // of the GridIn and of the Triangulation for further details on
-    // the orientation. In our case, the normals to the mesh are
-    // external to both the circle and the sphere. 
-    //
-    // The other detail that is required for appropriate refinement of
-    // the boundary element mesh, is an accurate description of the
-    // manifold that the mesh is approximating. We already saw this
-    // several times for the boundary of standard finite element
-    // meshes, and here the principle and usage is the same, except
-    // that the Boundary description class takes an additional
-    // template parameter that specifies the embedding space
-    // dimension. 
-    
     static HyperBallBoundary<dim-1, dim> boundary(Point<dim>(),1.);    
 
     std::ifstream in;
@@ -532,6 +550,19 @@ void BEMProblem<dim>::read_domain() {
 }
 
 
+				 // @sect3{BEMProblem::refine_and_resize}
+
+				 // This function globally refines the mesh,
+				 // distributes degrees of freedom, and
+				 // resizes matrices and vectors.
+				 //
+    // Note that the matrix is a full matrix and that consequently we have to
+    // build a sparsity pattern that contains every single
+    // entry. Notwithstanding this fact, the SparseMatrix class coupled with
+    // the SparseDirectUMFPACK solver are still faster than Lapack solvers for
+    // full matrices. The drawback is that we need to assemble a full
+    // SparsityPattern, which is not the most efficient way to store a full
+    // matrix.
 
 template <int dim>
 void BEMProblem<dim>::refine_and_resize() {
@@ -541,10 +572,6 @@ void BEMProblem<dim>::refine_and_resize() {
     
     const unsigned int n_dofs =  dh.n_dofs();
     
-    // The matrix is a full matrix. Notwithstanding this fact, the
-    // SparseMatrix class coupled with the SparseDirectUMFPACK solver
-    // are still faster than Lapack solvers. The drawback is that we
-    // need to assemble a full SparsityPattern.
     system_matrix.clear();
     sparsity.reinit(n_dofs, n_dofs, n_dofs);
     for(unsigned int i=0; i<n_dofs;++i)
@@ -558,30 +585,35 @@ void BEMProblem<dim>::refine_and_resize() {
     alpha.reinit(n_dofs);
 }    
 
+
+				 // @sect3{BEMProblem::assemble_system}
+
+				 // The following is the main function of this
+				 // program, assembling the matrix that
+				 // corresponds to the boundary integral
+				 // equation.
+				 //
+    // At the beginning, we create the singular quadratures for the three
+    // dimensional problem (note that a 3d boundary integral problem requires
+    // a 2d quadrature formula!), since in this case they only depend on the
+    // reference element. This quadrature is a standard Gauss quadrature
+    // formula reparametrized in such a way that allows one to integrate
+    // singularities of the kind $1/R$ centered at one of the vertices. Here
+    // we define a vector of four such quadratures (one per vertex of the two
+    // dimensional cells for a surface in 3d) that will be used later on;
+    // note, however, that these objects will only be used in the three
+    // dimensional case.
 template <int dim>
-void BEMProblem<dim>::assemble_system() {
-    
-    typename DoFHandler<dim-1,dim>::active_cell_iterator
-        cell = dh.begin_active(),
-        endc = dh.end();
-    
-    // We create initially the singular quadratures for the
-    // threedimensional problem, since in this case they only
-    // dependent on the reference element. This quadrature is a
-    // standard Gauss quadrature formula reparametrized in such a way
-    // that allows one to integrate singularities of the kind 1/R
-    // centered at one of the vertices. Here we define a vector of
-    // four such quadratures that will be used later on, only in the
-    // three dimensional case.
+void BEMProblem<dim>::assemble_system() {    
     std::vector<QGaussOneOverR<2> > sing_quadratures_3d; 
     for(unsigned int i=0; i<4; ++i) {
         sing_quadratures_3d.push_back
             (QGaussOneOverR<2>(singular_quadrature_order, i, true));
     }
     
-    // Initialize an FEValues object with the quadrature formula for the
-    // integration of the kernel in non singular cells. This quadrature is
-    // selected with the parameter file, and should be quite precise, since
+    // Next, we initialize an FEValues object with the quadrature formula for
+    // the integration of the kernel in non singular cells. This quadrature is
+    // selected with the parameter file, and needs to be quite precise, since
     // the functions we are integrating are not polynomial functions.
     FEValues<dim-1,dim> fe_v(fe, *quadrature,
                              update_values |
@@ -591,73 +623,95 @@ void BEMProblem<dim>::assemble_system() {
     
     const unsigned int n_q_points = fe_v.n_quadrature_points;
     
-    std::vector<unsigned int> dofs(fe.dofs_per_cell);
+    std::vector<unsigned int> local_dof_indices(fe.dofs_per_cell);
 
     std::vector<Vector<double> > cell_wind(n_q_points, Vector<double>(dim) );
     double normal_wind;
     
-    // Unlike in finite element methods, if we use a collocation
-    // boundary element method, then in each assembly loop we only
-    // assemble the informations that refer to the coupling between
-    // one degree of freedom (the degree associated with support point
-    // i) and the current cell. This is done using a vector of
-    // fe.dofs_per_cell elements, which will then be distributed to
-    // the matrix in the global row i.
+    // Unlike in finite element methods, if we use a collocation boundary
+    // element method, then in each assembly loop we only assemble the
+    // information that refers to the coupling between one degree of freedom
+    // (the degree associated with support point $i$) and the current
+    // cell. This is done using a vector of fe.dofs_per_cell elements, which
+    // will then be distributed to the matrix in the global row $i$. The
+    // following object will hold this information:
     Vector<double>      local_matrix_row_i(fe.dofs_per_cell);
     
-    // The index i runs on the collocation points, which are the
-    // support of the ith basis function, while j runs on inner
-    // integration. We perform this check here to ensure that we are
-    // not trying to use this code for high order elements. It will
-    // only work with Q1 elements, that is, for fe.dofs_per_cell ==
+    // The index $i$ runs on the collocation points, which are the support
+    // points of the $i$th basis function, while $j$ runs on inner integration
+    // points. We perform the following check to ensure that we are not trying
+    // to use this code for high order elements. It will only work with Q1
+    // elements, that is, for fe.dofs_per_cell ==
     // GeometryInfo<dim>::vertices_per_cell.
     AssertThrow(fe.dofs_per_cell == GeometryInfo<dim-1>::vertices_per_cell,
-                ExcDimensionMismatch(fe.dofs_per_cell, 
-                                     GeometryInfo<dim-1>::vertices_per_cell));
+                ExcMessage("The code in this function can only be used for "
+			   "the usual Q1 elements."));
     
-    // Now that we checked that the number of vertices is equal to the
+    // Now that we have checked that the number of vertices is equal to the
     // number of degrees of freedom, we construct a vector of support
-    // points which will be used in the local integrations.
+    // points which will be used in the local integrations:
     std::vector<Point<dim> > support_points(dh.n_dofs());
     DoFTools::map_dofs_to_support_points<dim-1, dim>( StaticMappingQ1<dim-1, dim>::mapping,
                                                       dh, support_points);
+
+				     // After doing so, we can start the
+				     // integration loop over all cells, where
+				     // we first initialize the FEValues
+				     // object and get the values of
+				     // $\mathbf{\tilde v}$ at the quadrature
+				     // points (this vector field should be
+				     // constant, but it doesn't hurt to be
+				     // more general):
+    typename DoFHandler<dim-1,dim>::active_cell_iterator
+        cell = dh.begin_active(),
+        endc = dh.end();
     
     for(cell = dh.begin_active(); cell != endc; ++cell) {
 
         fe_v.reinit(cell);
-        cell->get_dof_indices(dofs);
+        cell->get_dof_indices(local_dof_indices);
         
         const std::vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
         const std::vector<Point<dim> > &normals = fe_v.get_cell_normal_vectors();
         wind.vector_value_list(q_points, cell_wind);
         
         
+            // We then form the integral over the current cell for all degrees
+            // of freedom (note that this includes degrees of freedom not
+            // located on the current cell, a deviation from the usual finite
+            // element integrals). The integral that we need to perform is
+            // singular if one of the local degrees of freedom is the same as
+            // the support point $i$. A the beginning of the loop we therefore
+            // check wether this is the case, and we store which one is the
+            // singular index:
         for(unsigned int i=0; i<dh.n_dofs() ; ++i) {
             
             local_matrix_row_i = 0;
             
-            // The integral that we need to perform is singular if one
-            // of the local degrees of freedom is the same of the
-            // support point i. Here we check wether this is the case,
-            // and we store which one is the singular index.
             bool is_singular = false; 
             unsigned int singular_index = numbers::invalid_unsigned_int;
             
             for(unsigned int j=0; j<fe.dofs_per_cell; ++j) 
-                if(dofs[j] == i) {
+                if(local_dof_indices[j] == i) {
                     singular_index = j;
                     is_singular = true;
+		    break;
                 }
 
+					     // We then perform the
+					     // integral. If the index $i$ is
+					     // not one of the local degrees
+					     // of freedom, we simply have to
+					     // add the single layer terms to
+					     // the right hand side, and the
+					     // double layer terms to the
+					     // matrix:
             if(is_singular == false) {
                 for(unsigned int q=0; q<n_q_points; ++q) {
                     normal_wind = 0;
                     for(unsigned int d=0; d<dim; ++d) 
                         normal_wind += normals[q][d]*cell_wind[q](d);
                     
-                    // Distance between the external support point
-                    // and the quadrature point on the internal
-                    // cell.
                     const Point<dim> R = q_points[q] - support_points[i];
                         
                     system_rhs(i) += ( LaplaceKernel::single_layer(R)   * 
@@ -674,120 +728,120 @@ void BEMProblem<dim>::assemble_system() {
                 }
             } else {
                 // Now we treat the more delicate case. If we are
-                // here, it means that the cell that runs on the j
-                // index contains the support_point[i]. In this case
+                // here, this means that the cell that runs on the $j$
+                // index contains support_point[i]. In this case
                 // both the single and the double layer potential are
-                // singular, and they require a special treatment, as
+                // singular, and they require special treatment, as
                 // explained in the introduction.
                 //
                 // In the two dimensional case we perform the integration
                 // using a QGaussLogR quadrature formula, which is
                 // specifically designed to integrate logarithmic
                 // singularities on the unit interval, while in three
-                // dimensions we use the QGaussOneOverR, which allows us to
+                // dimensions we use the QGaussOneOverR class, which allows us to
                 // integrate 1/R singularities on the vertices of the
                 // reference element. Since we don't want to rebuild the two
                 // dimensional quadrature formula at each singular
-                // integration, we built them outside the loop on the cells,
+                // integration, we have built them outside the loop on the cells,
                 // and we only use a pointer to that quadrature here.
                 //
                 // Notice that in one dimensional integration this is not
                 // possible, since we need to know the scaling parameter for
-                // the quadrature, which is not known a priori.
-                //
-                // Dimension independent programming here is a little tricky,
-                // but can be achieved via dynamic casting. We check that
-                // everything went ok with an assertion at the end of this
-                // block. Notice that the dynamic cast will only work when the
-                // dimension is the correct one, in which case it is possible
-                // to cast a QGaussLogR and QGaussOneOverR to a Quadrature<1>
-                // and Quadrature<2> object.
-                //
-                // In the other cases this won't be called, and even if it
-                // was, the dynamic_cast function would just return a null
-                // pointer. We check that this is not the case with the Assert
-                // at the end.
-                //
-                // Notice that in two dimensions the singular quadrature rule
-                // depends also on the size of the current cell. For this
-                // reason, it is necessary to create a new quadrature for each
-                // singular integration. Since we create it using the new
-                // operator of C++, we also need to destroy it using the dual
-                // of new: delete. This is done at the end, and only if dim ==
-                // 2.
+                // the quadrature, which is not known a priori. Here, the
+                // singular quadrature rule depends also on the size of the
+                // current cell. For this reason, it is necessary to create a
+                // new quadrature for each singular integration. Since we
+                // create it using the new operator of C++, we also need to
+                // destroy it using the dual of new: delete. This is done at
+                // the end, and only if dim == 2.
                 Assert(singular_index != numbers::invalid_unsigned_int,
                        ExcInternalError());
 
-                Quadrature<dim-1> * singular_quadrature;
-                
-                if(dim == 2) {
-                    singular_quadrature = dynamic_cast<Quadrature<dim-1> *>(
-                        new QGaussLogR<1>(singular_quadrature_order,
-                                          Point<1>((double)singular_index),
-                                          1./cell->measure()));
-                        } else {
-                            singular_quadrature = dynamic_cast<Quadrature<dim-1> *>(
-                                & sing_quadratures_3d[singular_index]);
-                        }
+                Quadrature<dim-1> *
+		  singular_quadrature
+		  = (dim == 2
+		     ?
+		     new QGaussLogR<1>(singular_quadrature_order,
+				       Point<1>((double)singular_index),
+				       1./cell->measure())
+		     :
+		     (dim == 3
+		      ?
+		      &sing_quadratures_3d[singular_index]
+		      :
+		      0));
+		Assert(singular_quadrature, ExcInternalError());
+                        
+		FEValues<dim-1,dim> fe_v_singular (fe, *singular_quadrature, 
+						   update_jacobians |
+						   update_values |
+						   update_cell_normal_vectors |
+						   update_quadrature_points );
 
-                        Assert(singular_quadrature, ExcInternalError());
-                        
-                        FEValues<dim-1,dim> fe_v_singular (fe, *singular_quadrature, 
-                                                           update_jacobians |
-                                                           update_values |
-                                                           update_cell_normal_vectors |
-                                                           update_quadrature_points );
-
-                        fe_v_singular.reinit(cell);
+		fe_v_singular.reinit(cell);
                     
-                        std::vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(), 
-									 Vector<double>(dim) );
+		std::vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(), 
+								 Vector<double>(dim) );
         
-                        const std::vector<Point<dim> > &singular_normals = fe_v_singular.get_cell_normal_vectors();
-                        const std::vector<Point<dim> > &singular_q_points = fe_v_singular.get_quadrature_points();
+		const std::vector<Point<dim> > &singular_normals = fe_v_singular.get_cell_normal_vectors();
+		const std::vector<Point<dim> > &singular_q_points = fe_v_singular.get_quadrature_points();
         
-                        wind.vector_value_list(singular_q_points, singular_cell_wind);
+		wind.vector_value_list(singular_q_points, singular_cell_wind);
                     
-                        for(unsigned int q=0; q<singular_quadrature->size(); ++q) {
-			  const Point<dim> R = singular_q_points[q]- support_points[i];
-                            double normal_wind = 0;
-                            for(unsigned int d=0; d<dim; ++d)
-                                normal_wind += (singular_cell_wind[q](d)*
-                                                singular_normals[q][d]);
+		for(unsigned int q=0; q<singular_quadrature->size(); ++q) {
+		  const Point<dim> R = singular_q_points[q]- support_points[i];
+		  double normal_wind = 0;
+		  for(unsigned int d=0; d<dim; ++d)
+		    normal_wind += (singular_cell_wind[q](d)*
+				    singular_normals[q][d]);
                         
-                            system_rhs(i) += ( LaplaceKernel::single_layer(R, is_singular) *
-                                               normal_wind                         *
-                                               fe_v_singular.JxW(q) );
+		  system_rhs(i) += ( LaplaceKernel::single_layer(R, is_singular) *
+				     normal_wind                         *
+				     fe_v_singular.JxW(q) );
                         
-                            for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
-                                local_matrix_row_i(j) += (( LaplaceKernel::double_layer(R, is_singular) *
-							    singular_normals[q])                *
-							  fe_v_singular.shape_value(j,q)        *
-							  fe_v_singular.JxW(q)       );
-                            }
-                        }
-                        if(dim==2) {
-                            delete singular_quadrature;
-                        }
+		  for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
+		    local_matrix_row_i(j) += (( LaplaceKernel::double_layer(R, is_singular) *
+						singular_normals[q])                *
+					      fe_v_singular.shape_value(j,q)        *
+					      fe_v_singular.JxW(q)       );
+		  }
+		}
+		if(dim==2) {
+		  delete singular_quadrature;
+		}
             }
             
-            // Move the local matrix row to the global matrix.
+            // Finally, we need to add the contributions of the current cell
+            // to the global matrix:
             for(unsigned int j=0; j<fe.dofs_per_cell; ++j) 
-                system_matrix.add(i,dofs[j], local_matrix_row_i(j));
+                system_matrix.add(i,
+				  local_dof_indices[j],
+				  local_matrix_row_i(j));
         }
     }
-    // One quick way to compute the diagonal matrix of the solid
-    // angles, is to use the Neumann matrix itself. It is enough to
-    // multiply the matrix with a vector of elements all equal to -1.,
-    // to get the diagonal matrix of the alpha angles, or solid
-    // angles.
+
+				     // The second part of the integral
+				     // operator is the term
+				     // $\alpha(\mathbf{x}_i)
+				     // \phi_j(\mathbf{x}_i)$. Since we use a
+				     // collocation scheme,
+				     // $\phi_j(\mathbf{x}_i)=\delta_{ij}$ and
+				     // the corresponding matrix is a diagonal
+				     // one with entries equal to
+				     // $\alpha(\mathbf{x}_i)$.
+    
+    // One quick way to compute this diagonal matrix of the solid angles, is
+    // to use the Neumann matrix itself. It is enough to multiply the matrix
+    // with a vector of elements all equal to -1, to get the diagonal matrix
+    // of the alpha angles, or solid angles (see the formula in the
+    // introduction for this). The result is then added back onto the system
+    // matrix object to yield the final form of the matrix:
     Vector<double> ones(dh.n_dofs());
     ones.add(-1.);
 
     system_matrix.vmult(alpha, ones);
-    for(unsigned int i = 0; i<dh.n_dofs(); ++i) {
-        system_matrix.add(i,i,alpha(i));
-    }
+    for(unsigned int i = 0; i<dh.n_dofs(); ++i)
+      system_matrix.add(i,i,alpha(i));
 }
 
 template <int dim>
@@ -853,8 +907,20 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle) {
 // inside this box using the convolution with the fundamental solution.
 template <int dim>
 void BEMProblem<dim>::compute_exterior_solution() {
+    // The reconstruction of the solution in the entire space is done
+    // on a continuous finite element grid of dimension dim. These are
+    // the usual ones, and we don't comment any further on them.
+    
+    Triangulation<dim>  external_tria;
     // Generate the mesh, refine it and distribute dofs on it.
     GridGenerator::hyper_cube(external_tria, -2, 2);
+
+
+    FE_Q<dim>           external_fe(1);
+    DoFHandler<dim>     external_dh (external_tria);
+    Vector<double>      external_phi;
+    
+  
     external_tria.refine_global(external_refinement);
     external_dh.distribute_dofs(external_fe);
     external_phi.reinit(external_dh.n_dofs());
@@ -932,7 +998,7 @@ void BEMProblem<dim>::compute_exterior_solution() {
 
 
 template <int dim>
-void BEMProblem<dim>::output_results(unsigned int cycle) {
+void BEMProblem<dim>::output_results(const unsigned int cycle) {
     
     DataOut<dim-1, DoFHandler<dim-1, dim> > dataout;
     
