@@ -396,33 +396,35 @@ protected:
 
 
 /**
- * Gauss Quadrature Formula with 1/R weighting function. This formula
- * can be used to to integrate <tt>1/(R)*f(x)</tt> on the reference
- * element <tt>[0,1]^2</tt>, where f is a smooth function without
- * singularities, and R is the distance from the point x to the vertex
- * xi, given at construction time by specifying its index. Notice that
+ * Gauss Quadrature Formula with $1/R$ weighting function. This formula
+ * can be used to to integrate $1/R \ f(x)$ on the reference
+ * element $[0,1]^2$, where $f$ is a smooth function without
+ * singularities, and $R$ is the distance from the point $x$ to the vertex
+ * $\xi$, given at construction time by specifying its index. Notice that
  * this distance is evaluated in the reference element. 
  *
  * This quadrature formula is obtained from two QGauss quadrature
- * formula, upon transforming them into polar coordinate system
+ * formulas, upon transforming them into polar coordinate system
  * centered at the singularity, and then again into another reference
  * element. This allows for the singularity to be cancelled by part of
- * the Jacobian of the transformation, which contains R. In practice
+ * the Jacobian of the transformation, which contains $R$. In practice
  * the reference element is transformed into a triangle by collapsing
- * one of the side adjacent to the singularity. The Jacobian of this
- * transformation contains R, which is removed before scaling the
+ * one of the sides adjacent to the singularity. The Jacobian of this
+ * transformation contains $R$, which is removed before scaling the
  * original quadrature, and this process is repeated for the next half
  * element.
  *
  * Upon construction it is possible to specify wether we want the
  * singularity removed, or not. In other words, this quadrature can be
- * used to integrate f(x) = 1/R*g(x), or simply g(x), with the 1/R
+ * used to integrate $g(x) = 1/R\ f(x)$, or simply $f(x)$, with the $1/R$
  * factor already included in the quadrature weights. 
  */
 template<int dim>
-class QGaussOneOverR : public Quadrature<dim> {
-public:
-    /** The constructor takes three arguments: the order of the gauss
+class QGaussOneOverR : public Quadrature<dim>
+{
+  public:
+    /**
+     * The constructor takes three arguments: the order of the Gauss
      * formula, the index of the vertex where the singularity is
      * located, and whether we include the weighting singular function
      * inside the quadrature, or we leave it in the user function to
@@ -438,22 +440,22 @@ public:
      * In other words, you can use this function in either of
      * the following way, obtaining the same result:
      *
-     <code> 
-     QGaussOneOverR singular_quad(order, vertex_id, false);
-     // This will produce the integral of f(x)/R
-     for(unsigned int i=0; i<singular_quad.size(); ++i)
-	integral += f(singular_quad.point(i))*singular_quad.weight(i);
-     
-     // And the same here
-     QGaussOneOverR singular_quad_noR(order, vertex_id, true);
-
-     // This also will produce the integral of f(x)/R, but 1/R has to
-     // be specified.
-     for(unsigned int i=0; i<singular_quad.size(); ++i) {
-        double R = (singular_quad_noR.point(i)-cell->vertex(vertex_id)).norm();
-	integral += f(singular_quad_noR.point(i))*singular_quad_noR.weight(i)/R;
-     }
-     </code>
+     * @code
+     * QGaussOneOverR singular_quad(order, vertex_id, false);
+     * // This will produce the integral of f(x)/R
+     * for(unsigned int i=0; i<singular_quad.size(); ++i)
+     * 	 integral += f(singular_quad.point(i))*singular_quad.weight(i);
+     *
+     * // And the same here
+     * QGaussOneOverR singular_quad_noR(order, vertex_id, true);
+     *
+     * // This also will produce the integral of f(x)/R, but 1/R has to
+     * // be specified.
+     * for(unsigned int i=0; i<singular_quad.size(); ++i) {
+     *   double R = (singular_quad_noR.point(i)-cell->vertex(vertex_id)).norm();
+     *   integral += f(singular_quad_noR.point(i))*singular_quad_noR.weight(i)/R;
+     * }
+     * @endcode
      */
     QGaussOneOverR(const unsigned int n, 
 		   const unsigned int vertex_index,
