@@ -351,7 +351,7 @@ private:
 };
 
 
-				 // @sect3{BEMProblem::BEMProblem and BEMProblem::read_parameters}
+				 // @sect4{BEMProblem::BEMProblem and BEMProblem::read_parameters}
 
 // The constructor initializes the variuous object in much the same way as
 // done in the finite element programs such as step-4 or step-6. The only new
@@ -495,7 +495,7 @@ void BEMProblem<dim>::read_parameters (const std::string &filename) {
 }
 
 
-				 // @sect3{BEMProblem::read_domain}
+				 // @sect4{BEMProblem::read_domain}
     
     // A boundary element method triangulation is basically the same
     // as a (dim-1) dimensional triangulation, with the difference that the
@@ -550,7 +550,7 @@ void BEMProblem<dim>::read_domain() {
 }
 
 
-				 // @sect3{BEMProblem::refine_and_resize}
+				 // @sect4{BEMProblem::refine_and_resize}
 
 				 // This function globally refines the mesh,
 				 // distributes degrees of freedom, and
@@ -586,7 +586,7 @@ void BEMProblem<dim>::refine_and_resize() {
 }    
 
 
-				 // @sect3{BEMProblem::assemble_system}
+				 // @sect4{BEMProblem::assemble_system}
 
 				 // The following is the main function of this
 				 // program, assembling the matrix that
@@ -871,7 +871,7 @@ void BEMProblem<dim>::assemble_system() {
 }
 
 
-				 // @sect3{BEMProblem::solve_system}
+				 // @sect4{BEMProblem::solve_system}
 
 				 // The next function simply solves the linear
 				 // system. As described, we use the
@@ -896,7 +896,7 @@ void BEMProblem<dim>::solve_system() {
 }
 
 
-				 // @sect3{BEMProblem::solve_system}
+				 // @sect4{BEMProblem::solve_system}
 
     // The computation of the errors is exactly the same in all other
     // example programs, and we won't comment too much. Notice how the
@@ -941,7 +941,7 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle) {
 }
 
 
-				 // @sect3{BEMProblem::compute_exterior_solution}
+				 // @sect4{BEMProblem::compute_exterior_solution}
 
 				 // We'd like to also know something about the
 				 // value of the potential $\phi$ in the
@@ -1048,7 +1048,7 @@ void BEMProblem<dim>::compute_exterior_solution() {
 }
 
 
-				 // @sect3{BEMProblem::output_results}
+				 // @sect4{BEMProblem::output_results}
 
 				 // Outputting the results of our computations
 				 // is a rather mechanical tasks. All the
@@ -1089,7 +1089,7 @@ void BEMProblem<dim>::output_results(const unsigned int cycle) {
 }
 
 
-				 // @sect3{BEMProblem::run}
+				 // @sect4{BEMProblem::run}
 
 				 // This is the main function. It should be
 				 // self explanatory in its briefness:
