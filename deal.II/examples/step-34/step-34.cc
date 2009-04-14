@@ -880,18 +880,20 @@ void BEMProblem<dim>::assemble_system() {
 				 // reality it only produces an LU
 				 // decomposition) and then apply this inverse
 				 // to the right hand side to yield the
-				 // solution:
+				 // solution.
+				 //
+				 // As mentioned in the introduction,
+				 // the solution is only known up to a
+				 // constant potential. We solve this
+				 // issue by subtracting the mean
+				 // value of the vector from each
+				 // vector entry to normalize it.
 template <int dim>
 void BEMProblem<dim>::solve_system() {
     SparseDirectUMFPACK inverse_matrix;
     inverse_matrix.initialize (system_matrix);
     inverse_matrix.vmult (phi, system_rhs);
 
-//TODO: is this true? it seems to me that the BIE is definite...    
-    // Since we are solving a purely Neumann problem, the solution is
-    // only known up to a constant potential. We solve this issue by
-    // subtracting the mean value of the vector from each vector
-    // entry.
     phi.add(-phi.mean_value());
 }
 
