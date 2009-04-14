@@ -378,8 +378,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
 		      ExcInvalidIndex(row,col_indices[i]));
 
-	      if (values[i] != 0)
-		val_ptr[counter] += values[i];
+	      val_ptr[counter] += values[i];
 	    }
 	  Assert (counter < cols->row_length(row), ExcInternalError());
 	}
@@ -399,8 +398,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
 		      ExcInvalidIndex(row,col_indices[i]));
 
-	      if (values[i] != 0)
-		val_ptr[counter] += values[i];
+	      val_ptr[counter] += values[i];
 	    }
 	  Assert (counter < cols->row_length(row), ExcInternalError());
 	}
