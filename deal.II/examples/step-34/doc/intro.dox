@@ -527,14 +527,32 @@ With this choice of collocation points, the computation of the entries
 of the matrices $\mathbf{A}$, $\mathbf{N}$ and of the right hand side
 $\mathbf{b}$ requires the evaluation of singular integrals on the
 elements $K_i$ of the triangulation $\mathcal{T}_h$.
-
 As usual in these cases, all integrations are performed on a reference
 simple domain, i.e., we assume that each element $K_i$ of
 $\mathcal{T}_h$ can be expressed as a linear (in two dimensions) or
 bi-linear (in three dimensions) transformation of the reference
 boundary element $\hat K := [0,1]^{n-1}$, and we perform the integrations after a
 change of variables from the real element $K_i$ to the reference
-element $\hat K$.
+element $\hat K$. 
+
+Before discussing specifics of this integration in the
+next section, let us point out that the matrix $\mathbf{A}+\mathbf{N}$
+is rank deficient. This is mostly easily seen by realizing that
+$\mathbf{A}=-(\mathbf{N}\mathbf{e})\mathbf{e}^T$ where $\mathbf{e}$ is a
+vector of all ones. Consequently,
+$\mathbf{A}+\mathbf{N} =
+\mathbf{N}(\mathbf{I}-\mathbf{e}\mathbf{e}^T)$. Even if $\mathbf{N}$
+has full rank, the resulting matrix has then clearly co-rank 1 with a
+null space in the direction of $\mathbf{e}$, which is the space of
+constant functions. 
+
+As a consequence we will have to subtract the constant functions from
+our numerical solution (which the linear solvers thankfully still
+provides) to normalize it. On the other hand, the presence of
+this kernel of the operator is irrelevant for our original purpose:
+all we are interested in is the velocity, which equals the gradient of
+$\phi$! 
+
 
 <h3> Treating the singular integrals. </h3>
 
