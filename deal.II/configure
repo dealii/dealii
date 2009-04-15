@@ -4729,7 +4729,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
           ;;
 
       intel_icc*)
-                    	  	      	  case "$GXX_VERSION" in
+                              	  	  	      	  case "$GXX_VERSION" in
 	    intel_icc5 | intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
 	      CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -DDEBUG -inline_debug_info"
               CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll"
@@ -4738,7 +4738,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
               ;;
 
 	    intel_icc*)
-	      CXXFLAGSG="$CXXFLAGS -DDEBUG -inline_debug_info"
+	      CXXFLAGSG="$CXXFLAGS -DDEBUG"
               CXXFLAGSO="$CXXFLAGS -O2 -unroll"
               CXXFLAGSPIC="-fPIC"
 	      LDFLAGS="$LDFLAGS -lstdc++ -lpthread"

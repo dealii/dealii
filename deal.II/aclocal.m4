@@ -738,7 +738,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   
       intel_icc*)
           dnl Earlier icc versions used -Kxxx for flags. Later versions use
-          dnl the gcc convention -fxxx
+          dnl the gcc convention -fxxx. Also, at least since icc11, the
+          dnl flag -inline_debug_info has been deprecated, so don't use
+	  dnl it any more
 	  dnl
 	  dnl Exception handling is also standard in later versions, as is rtti
     	  case "$GXX_VERSION" in
@@ -750,7 +752,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
               ;;
 
 	    intel_icc*)
-	      CXXFLAGSG="$CXXFLAGS -DDEBUG -inline_debug_info"
+	      CXXFLAGSG="$CXXFLAGS -DDEBUG"
               CXXFLAGSO="$CXXFLAGS -O2 -unroll"
               CXXFLAGSPIC="-fPIC"
 	      LDFLAGS="$LDFLAGS -lstdc++ -lpthread"
