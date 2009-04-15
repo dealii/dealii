@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -3180,7 +3180,6 @@ template <> unsigned int Triangulation<1,1>::n_quads () const;
 template <> unsigned int Triangulation<1,1>::n_quads (const unsigned int level) const;
 template <> unsigned int Triangulation<1,1>::n_raw_quads (const unsigned int level) const;
 template <> unsigned int Triangulation<2,2>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,1>::n_raw_quads () const;
 template <> unsigned int Triangulation<1,1>::n_raw_hexs (const unsigned int level) const;
 template <> unsigned int Triangulation<1,1>::n_active_quads (const unsigned int level) const;
 template <> unsigned int Triangulation<1,1>::n_active_quads () const;
@@ -3196,7 +3195,6 @@ template <> unsigned int Triangulation<1,2>::n_quads () const;
 template <> unsigned int Triangulation<1,2>::n_quads (const unsigned int level) const;
 template <> unsigned int Triangulation<1,2>::n_raw_quads (const unsigned int level) const;
 template <> unsigned int Triangulation<2,3>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,2>::n_raw_quads () const;
 template <> unsigned int Triangulation<1,2>::n_raw_hexs (const unsigned int level) const;
 template <> unsigned int Triangulation<1,2>::n_active_quads (const unsigned int level) const;
 template <> unsigned int Triangulation<1,2>::n_active_quads () const;
