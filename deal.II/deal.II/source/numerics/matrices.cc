@@ -2828,6 +2828,17 @@ void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
  const Function<deal_II_dimension> * const a,
  std::vector<unsigned int>);
 
+template
+void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
+(const Mapping<deal_II_dimension> &,
+ const DoFHandler<deal_II_dimension>     &dof,
+ const Quadrature<deal_II_dimension-1>   &q,
+ SparseMatrix<double>      &matrix,
+ const FunctionMap<deal_II_dimension>::type &rhs,
+ Vector<double>            &rhs_vector,
+ std::vector<unsigned int> &dof_to_boundary_mapping,
+ const Function<deal_II_dimension> * const a,
+ std::vector<unsigned int>);
 
 template
 void
@@ -2991,6 +3002,18 @@ void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_dimension
 template
 void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension,deal_II_dimension+1>
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1>     &dof,
+ const Quadrature<deal_II_dimension-1>   &q,
+ SparseMatrix<double>      &matrix,
+ const FunctionMap<deal_II_dimension+1>::type &rhs,
+ Vector<double>            &rhs_vector,
+ std::vector<unsigned int> &dof_to_boundary_mapping,
+ const Function<deal_II_dimension+1> * const a,
+ std::vector<unsigned int>);
+
+template
+void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1>     &dof,
  const Quadrature<deal_II_dimension-1>   &q,
  SparseMatrix<double>      &matrix,
  const FunctionMap<deal_II_dimension+1>::type &rhs,
