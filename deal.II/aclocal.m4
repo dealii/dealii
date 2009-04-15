@@ -321,6 +321,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	  version8="`echo $version_string | grep 'Version 8'`"
 	  version9="`echo $version_string | grep 'Version 9'`"
 	  version10="`echo $version_string | grep 'Version 10'`"
+	  version11="`echo $version_string | grep 'Version 11'`"
           if test "x$version5" != "x" ; then
             AC_MSG_RESULT(C++ compiler is icc-5)
             GXX_VERSION=intel_icc5
@@ -339,10 +340,13 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           else if test "x$version10" != "x" ; then
             AC_MSG_RESULT(C++ compiler is icc-10)
             GXX_VERSION=intel_icc10
+          else if test "x$version11" != "x" ; then
+            AC_MSG_RESULT(C++ compiler is icc-11)
+            GXX_VERSION=intel_icc11
           else
             AC_MSG_RESULT(C++ compiler is icc)
             GXX_VERSION=intel_icc
-          fi fi fi fi fi fi
+          fi fi fi fi fi fi fi
           GXX_VERSION_DETAILED="$GXX_VERSION"
         else
   
