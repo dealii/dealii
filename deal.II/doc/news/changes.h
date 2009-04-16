@@ -272,6 +272,9 @@ inconvenience this causes.
   if you intend two-dimensional triangulations of two-dimensional
   domains.
   <br>
+  The new functionality is described in the @ref step_34 "step-34"
+  tutorial program.
+  <br>
   (Cataldo Manigrasso, Luca Heltai 2008/12/05)
   </p>
 
