@@ -415,6 +415,7 @@ namespace TrilinosWrappers
 				  // Now, fill the graph (sort indices, make
 				  // memory contiguous, etc).
     graph->FillComplete(col_map, row_map);
+    graph->OptimizeStorage();
 
 				  // And now finally generate the matrix.
     matrix =  std::auto_ptr<Epetra_FECrsMatrix>
@@ -517,7 +518,7 @@ namespace TrilinosWrappers
 //				      sparsity_pattern.n_cols()));
 
     std::vector<int>   row_indices;
-    
+
     for (unsigned int row=0; row<n_rows; ++row)
       if (row_map.MyGID(row))
 	{
@@ -538,6 +539,7 @@ namespace TrilinosWrappers
 				  // Now, fill the graph (sort indices, make
 				  // memory contiguous, etc).
     graph->FillComplete(col_map, row_map);
+    graph->OptimizeStorage();
 
 				  // And now finally generate the matrix.
     matrix =  std::auto_ptr<Epetra_FECrsMatrix>
