@@ -561,7 +561,7 @@ inconvenience this causes.
   <li>
   <p>
   New: The new
-  <tt>GeometryInfo<dim>::n_children(refinement_case)</tt>
+  <tt>GeometryInfo::n_children(refinement_case)</tt>
   function returns the number of children a cell/face has when
   refined with the RefinementCase <tt>refinement_case</tt>.
   <br> 
