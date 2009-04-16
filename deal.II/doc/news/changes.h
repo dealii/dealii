@@ -160,6 +160,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a program, contributed by Jean-Paul Pelteret, that can
+  convert Cubit generated meshes into UCD format that the GridIn class can
+  read. The program along with a description is in the contrib/mesh_conversion
+  directory.
+  <br>
+  (Jean-Paul Pelteret 2009/04/16)
+  </p>
+
+  <li>
+  <p>
   Updated: Configure mechanism and a few PETSc functions in the lac directory 
   have been upgraded to support migration to PETSc version >=3.0.0 in anaology
   to the existing interface.
