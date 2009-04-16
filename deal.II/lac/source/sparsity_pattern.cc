@@ -585,9 +585,10 @@ SparsityPattern::copy_from (const CompressedSparsityPattern &csp,
   for (unsigned int row = 0; row<csp.n_rows(); ++row)
     {
       unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
-      for (unsigned int j=0; j<csp.row_length(row); ++j)
-	{
-	  const unsigned int col = csp.column_number(row,j);
+      const unsigned int row_length = csp.row_length(row);
+      for (unsigned int j=0; j<row_length; ++j)
+        {
+          const unsigned int col = csp.column_number(row,j);
 	  Assert (col < csp.n_cols(), ExcInvalidIndex(col,csp.n_cols()));
 	  
 	  if ((col!=row) || !is_square)
@@ -644,7 +645,7 @@ SparsityPattern::copy_from (const CompressedSetSparsityPattern &csp,
       for (; col_num != csp.row_end (row); ++col_num)
 	{
 	  const unsigned int col = *col_num;
-	  //	  Assert (col < csp.n_cols(), ExcInvalidIndex(col,csp.n_cols()));
+	  //Assert (col < csp.n_cols(), ExcInvalidIndex(col,csp.n_cols()));
 	  
 	  if ((col!=row) || !is_square)
 	    *cols++ = col;
@@ -655,7 +656,6 @@ SparsityPattern::copy_from (const CompressedSetSparsityPattern &csp,
 				   // pattern since we already have
 				   // allocated the right amount of data,
 				   // and the CSP data is sorted, too.
-  //compress ();
   compressed = true;
 }
 
@@ -694,9 +694,10 @@ SparsityPattern::copy_from (const CompressedSimpleSparsityPattern &csp,
   for (unsigned int row = 0; row<csp.n_rows(); ++row)
     {
       unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
-      for (unsigned int j=0; j<csp.row_length(row); ++j)
-        {
-          const unsigned int col = csp.column_number(row,j);
+      const unsigned int row_length = csp.row_length(row);
+      for (unsigned int j=0; j<row_length; ++j)
+	{
+	  const unsigned int col = csp.column_number(row,j);
           Assert (col < csp.n_cols(), ExcInvalidIndex(col,csp.n_cols()));
 
           if ((col!=row) || !is_square)
