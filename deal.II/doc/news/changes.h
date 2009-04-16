@@ -814,7 +814,7 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Fixed: Integrate Difference now works also on codimension one grids. 
+  Fixed: VectorTools::integrate_difference now works also on codimension one grids. 
   <br>
   (Luca Heltai 2009/04/10)
   </p>
