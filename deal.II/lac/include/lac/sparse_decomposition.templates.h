@@ -178,6 +178,18 @@ template <typename somenumber>
 void
 SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber>& matrix)
 {
+				   // check whether we use the same sparsity
+				   // pattern as the input matrix
+  if (&this->get_sparsity_pattern() == &matrix.get_sparsity_pattern())
+    {
+      const somenumber * input_ptr = matrix.val;
+      number * this_ptr = this->val;
+      const number * const end_ptr = this_ptr + this->n_nonzero_elements();
+      for ( ; this_ptr != end_ptr; ++input_ptr, ++this_ptr)
+	*this_ptr = *input_ptr;
+      return;
+    }
+
                                    // preset the elements
   std::fill_n (&this->global_entry(0),
                this->n_nonzero_elements(),

@@ -595,6 +595,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Updated: The SparseILU::vmult kernel has been re-written using the same
+  data structures as in SparseMatrix::vmult, which reduces the count of
+  operations by one third and the execution times on typical problems by
+  ten to twenty precent.
+  <br>
+  (Martin Kronbichler 2009/04/16)
+  </p>
+
+  <li>
+  <p>
   New: There is now a new class VectorView<Number> that allows views of
   arbitrary areas of memory to be seen as a Vector<Number>, simplifying 
   a lot of works for portability issues between different libraries, and 
@@ -610,7 +620,7 @@ inconvenience this causes.
   <li>
   <p>
   Updated: The local_to_global functions in ConstraintMatrix got smarter,
-  which imcreases the speed of sparsity pattern generation with
+  which increases the speed of sparsity pattern generation with
   ConstraintMatrix argument, and makes writing into sparse matrices using
   distribute_local_to_global faster, in case there are many constraints.
   <br>
