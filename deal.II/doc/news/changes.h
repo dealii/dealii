@@ -595,8 +595,8 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Updated: The SparseILU::vmult kernel has been re-written using the same
-  data structures as in SparseMatrix::vmult, which reduces the count of
+  Updated: The SparseILU::vmult kernel has been re-written to use similar 
+  data structures as SparseMatrix::vmult, which reduces the count of
   operations by one third and the execution times on typical problems by
   ten to twenty precent.
   <br>
@@ -620,9 +620,8 @@ inconvenience this causes.
   <li>
   <p>
   Updated: The local_to_global functions in ConstraintMatrix got smarter,
-  which increases the speed of sparsity pattern generation with
-  ConstraintMatrix argument, and makes writing into sparse matrices using
-  distribute_local_to_global faster, in case there are many constraints.
+  which accelerates sparsity pattern generation and makes writing into 
+  sparse matrices using distribute_local_to_global faster.
   <br>
   (Martin Kronbichler 2009/03/16)
   </p>
