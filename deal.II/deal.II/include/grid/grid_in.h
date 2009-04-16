@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -144,6 +144,23 @@ class SubCellData;
  * plugin script can be found on the deal.II wiki page,
  * http://www-dimat.unipv.it/heltai/wikideal/, in the
  * section on external tools.
+ *
+ * There is also a little program, written by Jean-Paul Pelteret, that
+ * can be found in the contrib/mesh_conversion directory and that can
+ * convert Cubit ABAQUS files into UCD format that can be read in as
+ * discussed above. The program was designed with the intention of
+ * exporting geometries with complex boundary condition surfaces and
+ * multiple materials from Cubit - information which is currently not
+ * easily obtained through Cubit's python interface. Using the the
+ * program is simple: to use it, it needs to be built and run with the
+ * command
+ * @code
+ * ./convert_mesh <spatial_dimension> /path/to/input_file.inp /path/to/output_file.ucd
+ * @endcode.
+ * More information is available in the readme file included with the
+ * program. Note that the program's copyright remains with its author
+ * and that it is under a separate license than the rest of the
+ * library.
  * </ul>
  *
  *
