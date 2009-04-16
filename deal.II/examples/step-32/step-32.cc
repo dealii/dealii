@@ -970,7 +970,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 					 (Point<dim> (0,0,1)) );
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      local_rhs(i) += (EquationData::Rayleigh_number *
-			      gravity * phi_u[i] * old_temperature)*
+			       gravity * phi_u[i] * old_temperature)*
 			      stokes_fe_values.JxW(q);
 	  }
   
@@ -1376,6 +1376,11 @@ void BoussinesqFlowProblem<dim>::solve ()
       gmres (solver_control,
 	     SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
 
+				   // currently, have a problem with
+				   // constrained dofs that are nonzero when
+				   // entering the solver (see step-31). set
+				   // the vector to zero for the moment.
+    stokes_solution = 0;
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
     pcout << "   "
