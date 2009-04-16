@@ -1,0 +1,25 @@
+*HEADING
+cubit(t/Geometry/Mesh_conversion/mesh/Test_cube/test_cube_1.inp): 11/06/2008: 09
+*NODE
+       1,  -1.000000e+00,  -1.000000e+00,   1.000000e+00
+       2,  -1.000000e+00,  -1.000000e+00,  -1.000000e+00
+       3,  -1.000000e+00,   1.000000e+00,  -1.000000e+00
+       4,  -1.000000e+00,   1.000000e+00,   1.000000e+00
+       5,   1.000000e+00,  -1.000000e+00,   1.000000e+00
+       6,   1.000000e+00,  -1.000000e+00,  -1.000000e+00
+       7,   1.000000e+00,   1.000000e+00,  -1.000000e+00
+       8,   1.000000e+00,   1.000000e+00,   1.000000e+00
+*ELEMENT, TYPE=C3D8R, ELSET=EB1
+       1,       1,       2,       3,       4,       5,       6,       7,       8
+*SURFACE, NAME=SS1
+       1,     S6
+*SURFACE, NAME=SS2
+       1,     S4
+*SURFACE, NAME=SS3
+       1,     S3
+*SURFACE, NAME=SS4
+       1,     S1
+*SURFACE, NAME=SS5
+       1,     S5
+*SURFACE, NAME=SS6
+       1,     S2
