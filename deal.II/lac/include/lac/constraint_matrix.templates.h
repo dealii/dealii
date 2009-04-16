@@ -979,16 +979,19 @@ namespace internals
     mutable std::vector<std::pair<unsigned int,double> > *constraints;
   };
 
+  inline
   distributing::distributing (const unsigned int global_row,
 			      const unsigned int local_row) :
     global_row (global_row),
     local_row (local_row),
     constraints (0) {}
 
+  inline
   distributing::distributing (const distributing &in) :
     constraints (0)
   {*this = (in);}
 
+  inline
   distributing::~distributing ()
   {
     if (constraints != 0)
@@ -1003,11 +1006,9 @@ namespace internals
   {
     global_row = in.global_row;
     local_row = in.local_row;
-    if (constraints != 0)
-      {
-	delete constraints;
-	constraints = 0;
-      }
+				   // the constraints pointer should not
+				   // contain any data here.
+    Assert (constraints == 0, ExcInternalError());
 
     if (in.constraints != 0)
       {
@@ -1039,7 +1040,7 @@ namespace internals
   {
     typedef std::vector<distributing>::iterator index_iterator;
     index_iterator pos, pos1;
-    distributing row_comparison (row);
+    distributing row_value (row);
 
 				   // check whether the list was really
 				   // sorted before entering here
@@ -1050,23 +1051,21 @@ namespace internals
 
     if (my_indices.size() == 0 || my_indices.back().global_row < row)
       {
-	my_indices.push_back(row_comparison);
+	my_indices.push_back(row_value);
 	pos1 = my_indices.end()-1;
       }
     else
       {
-	pos = std::lower_bound (my_indices.begin(),
-				my_indices.end(),
-				row_comparison);
-
+	pos = std::lower_bound (my_indices.begin(),my_indices.end(), row_value);
 	if (pos->global_row == row)
 	  pos1 = pos;
 	else
-	  pos1 = my_indices.insert(pos, row_comparison);
-      }    
+	  pos1 = my_indices.insert(pos, row_value);
+      }
 
     if (&*pos1->constraints == 0)
-      pos1->constraints = new std::vector<std::pair<unsigned int,double> > (1,constraint);
+      pos1->constraints = 
+	new std::vector<std::pair<unsigned int,double> > (1,constraint);
     else
       pos1->constraints->push_back (constraint);
   }
@@ -2113,7 +2112,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // append it to the array of values.
 	      if (add_this == true)
 		{
-		  add_this_index:
+		add_this_index:
 		  *col_ptr++ = my_indices[j].global_row;
 		}
 	    }
@@ -2479,7 +2478,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		      if (add_this == true)
 			{
 			add_this_index:
-			  *col_ptr++ = my_indices[j].global_row;
+			  *col_ptr++ = localized_indices[j];
 			}
 		    }
 		}
