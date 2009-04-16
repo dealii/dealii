@@ -342,7 +342,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // and sorted indices it is faster to
 				   // just go through the column indices and
 				   // look whether we found one, rather than
-				   // doing a binary search for every column
+				   // doing many binary searches
   if (col_indices_are_sorted == true)
    if (n_cols * 8 > cols->row_length(row))
     {
@@ -359,17 +359,23 @@ SparseMatrix<number>::add (const unsigned int  row,
 	    &cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
 	  number * val_ptr = &val[cols->get_rowstart_indices()[row]];
 	  Assert (this_cols[0] == row, ExcInternalError());
-	  unsigned int counter = 1;
-	  for (unsigned int i=0; i<n_cols; ++i)
+
+				   // find diagonal and add it if found
+	  const unsigned int * diag_pos = std::lower_bound (col_indices,
+							    col_indices+n_cols,
+							    row);
+	  const unsigned int diag = diag_pos - col_indices;
+	  unsigned int post_diag = diag;
+	  if (diag != n_cols && *diag_pos == row)
 	    {
-				   // diagonal
-	      if (col_indices[i] == row)
-		{
-		  if (values[i] != 0)
-		    val_ptr[0] += values[i];
-		  continue;
-		}
-	      
+	      val_ptr[0] += *(values+(diag_pos-col_indices));
+	      ++post_diag;
+	    }
+
+				   // add indices before diagonal
+	  unsigned int counter = 1;
+	  for (unsigned int i=0; i<diag; ++i)
+	    {
 	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
 
 	      while (this_cols[counter] < col_indices[i])
@@ -380,6 +386,21 @@ SparseMatrix<number>::add (const unsigned int  row,
 
 	      val_ptr[counter] += values[i];
 	    }
+
+				   // add indices after diagonal
+	  for (unsigned int i=post_diag; i<n_cols; ++i)
+	    {
+	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
+
+	      while (this_cols[counter] < col_indices[i])
+		++counter;
+
+	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
+		      ExcInvalidIndex(row,col_indices[i]));
+
+	      val_ptr[counter] += values[i];
+	    }
+
 	  Assert (counter < cols->row_length(row), ExcInternalError());
 	}
       else
@@ -405,17 +426,11 @@ SparseMatrix<number>::add (const unsigned int  row,
       return;
     }
 
-  unsigned int n_columns = 0;
-
-  if (global_indices.size() < n_cols)
-    {
-      global_indices.resize(n_cols);
-      column_values.resize(n_cols);
-    }
-
-				   // First, search all the indices to find
-				   // out which values we actually need to
-				   // add.
+				   // unsorted case: first, search all the
+				   // indices to find out which values we
+				   // actually need to add.
+  const unsigned int * const my_cols = cols->get_column_numbers();
+  unsigned int index = cols->get_rowstart_indices()[row];
   for (unsigned int j=0; j<n_cols; ++j)
     {
       const number value = values[j];
@@ -426,12 +441,20 @@ SparseMatrix<number>::add (const unsigned int  row,
       if (value == 0 && elide_zero_values == true)
 	continue;
 
-      const unsigned int index = cols->operator()(row, col_indices[j]);
+				   // check whether the next index to add is
+				   // the next present index in the sparsity
+				   // pattern (otherwise, do a binary
+				   // search)
+      if (index != cols->get_rowstart_indices()[row+1] &&
+	  my_cols[index] == col_indices[j])
+	goto add_value;
+
+      index = cols->operator()(row, col_indices[j]);
 
 				   // it is allowed to add elements to
 				   // the matrix that are not part of
 				   // the sparsity pattern, if the
-				   // value to which we set it is zero
+				   // value we add is zero
       if (index == SparsityPattern::invalid_entry)
 	{
 	  Assert ((index != SparsityPattern::invalid_entry) ||
@@ -440,18 +463,10 @@ SparseMatrix<number>::add (const unsigned int  row,
 	  continue;
 	}
 
-      global_indices[n_columns] = index;
-      column_values[n_columns] = value;
-      n_columns++;
+    add_value:
+      val[index] += value;
+      ++index;
     }
-
-  const unsigned int * index_ptr = &global_indices[0];
-  const number * value_ptr = &column_values[0];
-
-				    // Finally, go through the index list 
-				    // and add the elements one by one.
-  for (unsigned int j=0; j<n_columns; ++j)
-    val[*index_ptr++] += *value_ptr++;
 }
 
 
@@ -467,17 +482,11 @@ SparseMatrix<number>::set (const unsigned int  row,
 {
   Assert (cols != 0, ExcNotInitialized());
 
-  unsigned int n_columns = 0;
-
-				   // Otherwise, extract nonzero values in
-				   // each row and pass on to the other 
-				   // function.
-  global_indices.resize(n_cols);
-  column_values.resize(n_cols);
-
 				   // First, search all the indices to find
 				   // out which values we actually need to
 				   // set.
+  const unsigned int * my_cols = cols->get_column_numbers();
+  unsigned int index = cols->get_rowstart_indices()[row];
   for (unsigned int j=0; j<n_cols; ++j)
     {
       const number value = values[j];
@@ -488,7 +497,15 @@ SparseMatrix<number>::set (const unsigned int  row,
       if (value == 0 && elide_zero_values == true)
 	continue;
 
-      const unsigned int index = cols->operator()(row, col_indices[j]);
+				   // check whether the next index to set is
+				   // the next present index in the sparsity
+				   // pattern (otherwise, do a binary
+				   // search)
+      if (index != cols->get_rowstart_indices()[row+1] &&
+	  my_cols[index] == col_indices[j])
+	goto set_value;
+
+      index = cols->operator()(row, col_indices[j]);
 
 				   // it is allowed to set elements in
 				   // the matrix that are not part of
@@ -502,18 +519,10 @@ SparseMatrix<number>::set (const unsigned int  row,
 	  continue;
 	}
 
-      global_indices[n_columns] = index;
-      column_values[n_columns] = value;
-      n_columns++;
+    set_value:
+      val[index] = value;
+      ++index;
     }
-
-  const unsigned int * index_ptr = &global_indices[0];
-  const number * value_ptr = &column_values[0];
-  
-				    // Finally, go through the index list 
-				    // and set the elements one by one.
-  for (unsigned int j=0; j<n_columns; ++j)
-    val[*index_ptr++] = *value_ptr++;
 }
 
 
@@ -1644,9 +1653,7 @@ template <typename number>
 unsigned int
 SparseMatrix<number>::memory_consumption () const
 {
-  return sizeof(*this) + max_len*sizeof(number) + 
-    global_indices.size()*sizeof(unsigned int) + 
-    column_values.size()*sizeof(number);
+  return sizeof(*this) + max_len*sizeof(number);
 }
 
 

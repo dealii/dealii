@@ -1898,26 +1898,6 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     unsigned int max_len;
 
-				       /**
-					* An internal array of integer
-					* values that is used to store the
-					* indices in the global value array
-					* val when adding/inserting local
-					* data into the (large) sparse
-					* matrix.
-					*/
-    std::vector<unsigned int> global_indices;
-
-				       /**
-					* An internal array of double values
-					* that is used to store the column
-					* indices when adding/inserting
-					* local data into the (large) sparse
-					* matrix.
-					*/
-    std::vector<number> column_values;
-
-
 				     /**
 				      * Version of vmult() which only
 				      * performs its actions on the
@@ -1990,6 +1970,8 @@ class SparseMatrix : public virtual Subscriptor
 				     // make all other sparse matrices
 				     // friends
     template <typename somenumber> friend class SparseMatrix;
+    template <typename somenumber> friend class SparseLUDecomposition;
+    template <typename> friend class SparseILU;
 };
 
 /*@}*/
