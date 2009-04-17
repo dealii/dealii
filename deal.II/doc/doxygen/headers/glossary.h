@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -129,7 +129,19 @@
  * tricky points that have to be considered for hp finite elements using continuous
  * elements.
  *
- * The paper is accepted for publication in ACM Transactions on Mathematical Software (TOMS).
+ * The full reference for this paper is as follows:
+ * @code
+@Article{BK07,
+  author = 	 {Wolfgang Bangerth and Oliver Kayser-Herold},
+  title = 	 {Data Structures and Requirements for $hp$ Finite Element
+                  Software},
+  journal = 	 {ACM Trans. Math. Softw.},
+  year = 	 2009,
+  volume = 	 36,
+  number = 	 1,
+  pages = 	 {4/1--4/31}
+} 
+ * @endcode
  * It is available as Technical Report ISC-07-04-MATH from the
  * <a href="http://www.isc.tamu.edu/publications-reports/technical_reports">Institute
  * for Scientific Computation, Texas A&amp;M University</a>, and also
