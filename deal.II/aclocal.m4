@@ -3528,7 +3528,7 @@ dnl and the second is then its definition. There is therefore no
 dnl reason to report a doubly defined variable (Intel ICC 6.0), or
 dnl to choke on these lines at all (Sun Forte)
 dnl
-dnl Usage: DEAL_II_CHECK_MEMBER_VARIALIZATION_SPEC_BUG
+dnl Usage: DEAL_II_CHECK_MEMBER_VAR_SPECIALIZATION_SPEC_BUG
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_MEMBER_VAR_SPECIALIZATION_BUG, dnl
@@ -3555,6 +3555,60 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_VAR_SPECIALIZATION_BUG, dnl
                      [Defined if the compiler refuses to allow the
                       explicit specialization of static member 
                       variables. For the exact failure mode, look at
+                      aclocal.m4 in the top-level directory.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl This is a variant of the previous test. Some icc 11.0
+dnl builds (sub-releases) on Windows apparently don't allow
+dnl the declaration of an explicit specialization of member
+dnl arrays of templates:
+dnl ---------------------------------
+dnl template <int dim>
+dnl struct X
+dnl {
+dnl    static const int N = 2*dim;
+dnl    static const int x[N];
+dnl };
+dnl template <> const int X<2>::x[N];
+dnl ---------------------------------
+dnl That version of icc requests that there be an initialization,
+dnl i.e. it thinks that this is the *definition*, not merely a
+dnl *declaration* of an explicit specialization. This is wrong,
+dnl however.
+dnl
+dnl Usage: DEAL_II_CHECK_MEMBER_ARRAY_SPECIALIZATION_SPEC_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_MEMBER_ARRAY_SPECIALIZATION_BUG, dnl
+[
+  AC_MSG_CHECKING(for member array specialization bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      template <int dim>
+      struct X
+      {
+        static const int N = 2*dim;
+        static const int x[N];
+      };
+
+      template <> const int X<2>::x[N];
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG, 1, 
+                     [Defined if the compiler refuses to allow the
+                      explicit specialization of static member 
+                      arrays. For the exact failure mode, look at
                       aclocal.m4 in the top-level directory.])
     ])
 ])
