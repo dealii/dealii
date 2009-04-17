@@ -45,14 +45,22 @@ class BlockIndices;
 
 /**
  * This class implements dealing with linear (possibly inhomogeneous)
- * constraints on degrees of freedom. In particular, it handles constraints
- * of the form $x_{i_1} = \sum_{j=2}^M a_{i_j} x_{i_j} + b_i$. In the
- * context of adaptive finite elements, such constraints appear most
- * frequently as "hanging nodes" and for implementing Dirichlet boundary
- * conditions in strong form. 
+ * constraints on degrees of freedom. In particular, it handles constraints of
+ * the form $x_{i_1} = \sum_{j=2}^M a_{i_j} x_{i_j} + b_i$. In the context of
+ * adaptive finite elements, such constraints appear most frequently as
+ * "hanging nodes" and for implementing Dirichlet boundary conditions in
+ * strong form. The class is meant to deal with a limited number of
+ * constraints relative to the total number of degrees of freedom, for example
+ * a few per cent up to maybe 30 per cent; and with a linear combination of
+ * $M$ other degrees of freedom where $M$ is also relatively small (no larger
+ * than at most around the average number of entries per row of a linear
+ * system). It is <em>not</em> meant to describe full rank linear systems.
+ *
+ * The algorithms used in the implementation of this class are described in
+ * some detail in the @ref hp_paper "hp paper".
  *
  *
- * <h3>Using the ConstraintMatrix for hanging nodes</h3>
+ * <h3>Using the %ConstraintMatrix for hanging nodes</h3>
  *
  * For example, when using Q1 and Q2 elements (i.e. using
  * FE_Q&lt;dim,spacedim&gt;(1) and FE_Q&lt;dim,spacedim&gt;(2)) on the two
@@ -68,11 +76,14 @@ class BlockIndices;
  * the given form appear also in other contexts, see for example the
  * application the @ref step_11 "step-11" tutorial program.
  *
- * The algorithms used in the implementation of this class are described in
- * some detail in the @ref hp_paper "hp paper".
+ * Homogenous constraints of this form also arise in the context of vector-valued
+ * fields, for example if one wants to enforce boundary conditions of the form
+ * $\vec{v}\cdot\vec{n}=0$. For example, the
+ * VectorTools::compute_no_normal_flux_constraints function computes
+ * such constraints.
  *
  *
- * <h3>Using the ConstraintMatrix for Dirichlet boundary conditions</h3>
+ * <h3>Using the %ConstraintMatrix for Dirichlet boundary conditions</h3>
  *
  * The ConstraintMatrix provides an alternative for implementinging
  * Dirichlet boundary conditions (the standard way that is extensively
@@ -84,18 +95,20 @@ class BlockIndices;
  *
  * <h3>Description of constraints</h3>
  *
- * Each "line" in objects of this class corresponds to one constrained
- * degree of freedom, with the number of the line being $i_1$, and the
- * entries in this line being pairs $(i_j,a_{i_j})$. Note that the
- * constraints are linear in the $x_i$, and that there might be a constant
- * (non-homogeneous) term in the constraint. This is exactly the form we
- * need for hanging node constraints, where we need to constrain one degree
- * of freedom in terms of others. There are other conditions of this form
- * possible, for example for implementing mean value conditions as is done
- * in the @ref step_11 "step-11" tutorial program. The name of the class
- * stems from the fact that these constraints can be represented in matrix
- * form as $X x = b$, and this object then describes the matrix $X$. The
- * most frequent way to create/fill objects of this type is using the
+ * Each "line" in objects of this class corresponds to one constrained degree
+ * of freedom, with the number of the line being $i_1$, and the entries in
+ * this line being pairs $(i_j,a_{i_j})$. Note that the constraints are linear
+ * in the $x_i$, and that there might be a constant (non-homogeneous) term in
+ * the constraint. This is exactly the form we need for hanging node
+ * constraints, where we need to constrain one degree of freedom in terms of
+ * others. There are other conditions of this form possible, for example for
+ * implementing mean value conditions as is done in the @ref step_11 "step-11"
+ * tutorial program. The name of the class stems from the fact that these
+ * constraints can be represented in matrix form as $X x = b$, and this object
+ * then describes the matrix $X$ (as well as, incidentally, the vector $b$ --
+ * originally, the ConstraintMatrix class was only meant to handle homogenous
+ * constraints where $b=0$, thus the name). The most frequent way to
+ * create/fill objects of this type is using the
  * DoFTools::make_hanging_node_constraints() function. The use of these
  * objects is first explained in @ref step_6 "step-6".
  *
@@ -103,9 +116,10 @@ class BlockIndices;
  * lines are stored where constraints are present. New constraints are added
  * by adding new lines using the add_line() function, and then populating it
  * using the add_entry() function to a given line, or add_entries() to add
- * more than one entry at a time. After all constraints have been added, you
- * need to call close(), which compresses the storage format and sorts the
- * entries.
+ * more than one entry at a time. The right hand side element, if nonzero, can
+ * be set using the set_inhomogeneity() function. After all constraints have
+ * been added, you need to call close(), which compresses the storage format
+ * and sorts the entries.
  *
  * <h3>Eliminating constraints</h3>
  *
@@ -116,7 +130,7 @@ class BlockIndices;
  * actual calculations, you have to 'condense' the linear system: eliminate
  * constrained degrees of freedom and distribute the appropriate values to the
  * unconstrained dofs. This changes the sparsity pattern of the sparse
- * matrices used in finite element calculations und is thus a quite expensive
+ * matrices used in finite element calculations and is thus a quite expensive
  * operation. The general scheme of things is then that you build your system,
  * you eliminate (condense) away constrained nodes using the condense()
  * functions of this class, then you solve the remaining system, and finally
@@ -174,7 +188,7 @@ class BlockIndices;
  * average of the magnitudes of the other diagonal elements, so as to make
  * sure that the new diagonal entry has the same order of magnitude as the
  * other entries; this preserves the scaling properties of the matrix). The
- * appropriate value in the right hand sides is set to zero. This way, the
+ * corresponding value in the right hand sides is set to zero. This way, the
  * constrained node will always get the value zero upon solution of the
  * equation system and will not couple to other nodes any more.
  *
