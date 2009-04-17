@@ -602,6 +602,90 @@ surface that sucks material all the way to the top surface to fill the gap
 left by the outward motion of material at this location.
 
 
+<h3>Using imhomogeneous constraints for implementing Dirichlet boundary conditions</h3>
+
+In all the previous tutorial programs, we used the ConstraintMatrix merely
+for handling hanging node constraints (with exception of step-11). However,
+the class can also be used to implement Dirichlet boundary conditions, as we
+will show in this program, by fixing some node values $x_i = b_i$. Note that
+these are inhomogeneous constraints, and we have to pay some special
+attention to that. The way we are going to implement this is to first read
+in the boundary values into the ConstraintMatrix object by using the call
+
+@code
+  VectorTools::interpolate_boundary_values (dof_handler,
+                                            1,
+                                            BoundaryValues<dim>(),
+                                            constraints);
+@endcode 
+
+very similar to how we were making the list of boundary nodes
+before (note that we set Dirichlet conditions only on boundaries with
+boundary flag 1). The actual application of the boundary values is then
+handled by the ConstraintMatrix object directly, without any additional
+interference.
+
+We could then proceed as before, namely by filling the matrix, and then
+calling a condense function on the constraints object of the form
+@code
+  constraints.condense (system_matrix, system_rhs);
+@endcode
+
+Note that we call this on the system matrix and system right hand side
+simultaneously, since resolving inhomogeneous constraints requires knowledge
+about both the matrix entries and the right hand side. For efficiency
+reasons, though, we choose another strategy: all the constraints collected
+in the ConstraintMatrix can be resolved on the fly while writing local data
+into the global matrix, by using the call
+@code
+  constraints.distribute_local_to_global (local_matrix, local_rhs,
+                                          local_dof_indices,
+                                          system_matrix, system_rhs);
+@endcode
+
+This technique is further discussed in the @ref step_27 "step-27" tutorial
+program. All we need to know here is that this functions does three things
+at once: it writes the local data into the global matrix and right hand
+side, it distributes the hanging node constraints and additionally
+implements (inhomogeneous) Dirichlet boundary conditions. That's nice, isn't
+it?
+
+As results from this discussion, we can conclude that the ConstraintMatrix
+provides an alternative to using MatrixTools::apply_boundary_values for
+implementing Dirichlet boundary conditions.
+
+
+<a name="constraint-matrix">
+Other ConstraintMatrix-related optimizations
+</a>
+
+Usually, the sparse matrix contains a substantial amount of elements that
+acutally are zero when we are about to start a linear solve. They are
+introduced when we eliminate constraints or implement Dirichlet conditions,
+we usually delete all entries in constrained rows and columns, i.e., we set
+them to zero. The fraction of such elements that are present in the sparsity
+pattern, but do not really contain any information, can be up to one fourth
+of the total number of elements in the matrix for the 3D application
+considered in this tutorial program. Remember that matrix-vector products or
+preconditioners operate on all these elements that are zero, which is an
+inefficiency we have chosen to eliminate in the tutorial program.
+
+Another advantage of directly resolving constrained degrees of freedom is
+that we can avoid having all these entries that actually are zero in our
+sparse matrix &mdash; we do not need them during matrix construction (as
+opposed to the traditional algorithms, which first fill the matrix, and only
+resolve constraints afterwards). The way we are going to do that is to pass
+the information about constraints to the function that generates the
+sparsity pattern, and then set a <tt>false</tt> argument specifying that we
+do not intend to use constrained entries:
+@code
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
+                                   constraints, false);
+@endcode
+This functions saves, by the way, also the call to the <tt>condense()</tt>
+function on the sparsity pattern.
+
+
 <h3>Implementation</h3>
 
 The program developed below has seen a lot of TLC. We have run it over
@@ -613,7 +697,7 @@ visualization) to see where the bottlenecks are. This has paid off:
 through this effort, the program has become almost twice as fast when
 considering the runtime of the refinement cycles zero through three,
 reducing the overall number of CPU instructions executed from
-869,574,060,348 to 474,507,755,764. For higher refinement levels, the
+869,574,060,348 to 199,853,005,625. For higher refinement levels, the
 gain is probably even larger since some algorithms that are not ${\cal
 O}(N)$ have been eliminated.
 
@@ -635,18 +719,22 @@ the <a href="#improved-solver">section on improved solvers in the
 results part</a> of this program, along with code showing alternative
 solvers and a comparison of their results.
 
-Apart from this, many other algorithms have been tested and improved
-during the creation of this program. For example, in building the
-sparsity pattern, we originally used a BlockCompressedSparsityPattern
-object; however, its data structures are poorly adapted for the large
-numbers of nonzero entries per row created by our discretization in
-3d, leading to a quadratic behavior. Replacing it with a
-BlockCompressedSetSparsityPattern removed this bottleneck at the price
-of some more memory consumption, by using a better adapted data
-structure. Likewise, the implementation of the decomposition step in
-the SparseILU class was very inefficient and has been replaced by one
-that is about 10 times faster. Small improvements were applied here
-and there.
+Apart from this, many other algorithms have been tested and improved during
+the creation of this program. For example, in building the sparsity pattern,
+we originally used a BlockCompressedSparsityPattern object that added one
+element at a time; however, its data structures are poorly adapted for the
+large numbers of nonzero entries per row created by our discretization in
+3d, leading to a quadratic behavior. Replacing the internal algorithms in
+deal.II to set many elements at a time, and using a
+BlockCompressedSimpleSparsityPattern as a better adapted data structure,
+removed this bottleneck at the price of some more memory
+consumption. Likewise, the implementation of the decomposition step in the
+SparseILU class was very inefficient and has been replaced by one that is
+about 10 times faster. Small improvements were applied here and
+there. Moreover, the ConstraintMatrix object has been used to eliminate a
+lot of entries in the sparse matrix that are eventually going to be zero,
+see <a href="#constraint-matrix">the section on new features of
+constraint matrix</a>.
 
 A profile of how many CPU instructions are spent at the various
 different places in the program during refinement cycles
@@ -654,40 +742,37 @@ zero through three in 3d is shown here:
 
 @image html step-22.profile-3.png
 
-As can be seen, at this refinement level approximately one sixth of the
-instruction count is spent on matrix assembly and sparse ILU
-computation (third quarter from left to right), about one half on the
-actual solver (the SparseILU::vmult calls on
-the left), and the rest on other things. Since floating point
-operations such as in the SparseILU::vmult calls typically take much
-longer than many of the logical operations and table lookups in matrix
-assembly, the fraction of the run time taken up by matrix assembly is
-actually significantly less than the fraction of instructions, as will become
-apparent in the comparison we make in the results section.
+As can be seen, at this refinement level approximately three quarters of the
+instruction count is spent on the actual solver (the SparseILU::vmult calls
+on the left, the SparseMatrix<double>::vmult call in the middle, and another
+box including multiplications with SparseILU and SparseMatrix stemming from
+the solve for <i>U</i>). About one fifth of the instruction count is spent
+on matrix assembly and sparse ILU computation (box in the lower right
+corner) and the rest on other things. Since floating point operations such
+as in the SparseILU::vmult calls typically take much longer than many of the
+logical operations and table lookups in matrix assembly, the fraction of the
+run time taken up by matrix assembly is actually significantly less than the
+fraction of instructions, as will become apparent in the comparison we make
+in the results section.
 
-For higher refinement levels, the boxes representing the solver as
-well as the beige box at the top right representing the stemming from
-reordering algorithm are going to grow at the expense of the other
-parts of the program, since they don't scale linearly. The fact that
-at this moderate refinement level (3168 cells and 93176 degrees of
-freedom) the linear solver already makes up more than half the
-instructions is a good sign that most of the algorithms used in this
-program are well-tuned and that major improvements in speeding up the
-program are most likely not to come from hand-optimizing individual
-aspects but by changing solver algorithms. We will address this point
-in the discussion of results below as well.
+For higher refinement levels, the boxes representing the solver as well as
+the blue box at the top right stemming from reordering algorithm are going
+to grow at the expense of the other parts of the program, since they don't
+scale linearly. The fact that at this moderate refinement level (3168 cells
+and 93176 degrees of freedom) the linear solver already makes up about three
+quarters of the instructions is a good sign that most of the algorithms used
+in this program are well-tuned and that major improvements in speeding up
+the program are most likely not to come from hand-optimizing individual
+aspects but by changing solver algorithms. We will address this point in the
+discussion of results below as well.
 
-As a final point, and as a point of reference, the following picture
-also shows how the profile looked at an early stage of optimizing this
-program: 
+As a final point, and as a point of reference, the following picture also
+shows how the profile looked at an early stage of optimizing this program:
 
 @image html step-22.profile-3.original.png
 
-As mentioned above, the runtime of this version was about twice as
-long as for the first profile, with the SparseILU decomposition taking
-up about 30% of the instruction count, and operations on the ill-suited
-CompressedSparsityPattern about 10%. Both these bottlenecks have since
-been completely removed with the exception of the use of the
-CompressedSparsityPattern through the DoFRenumbering::Cuthill_McKee
-algorithm. (The latter at least applies as of the time of writing of
-this program; the problem may be solved in the future.)
+As mentioned above, the runtime of this version was about four times as long
+as for the first profile, with the SparseILU decomposition taking up about
+30% of the instruction count, and operations on the ill-suited
+CompressedSparsityPattern about 10%. Both these bottlenecks have since been
+completely removed.

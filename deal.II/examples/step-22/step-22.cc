@@ -104,10 +104,17 @@ struct InnerPreconditioner<3>
 				 // @sect3{The <code>StokesProblem</code> class template}
                     
 				 // This is an adaptation of step-20, so the
-				 // main class and the data types are the same
-				 // as used there. In this example we also use
-				 // adaptive grid refinement, which is handled
-				 // in complete analogy to step-6:
+				 // main class and the data types are the
+				 // same as used there. In this example we
+				 // also use adaptive grid refinement, which
+				 // is handled in analogy to
+				 // step-6. According to the discussion in
+				 // the introduction, we are also going to
+				 // use the ConstraintMatrix for
+				 // implementing Dirichlet boundary
+				 // conditions. Hence, we change the name
+				 // <code>hanging_node_constraints</code>
+				 // into <code>constraints</code>.
 template <int dim>
 class StokesProblem 
 {
@@ -128,7 +135,7 @@ class StokesProblem
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
-    ConstraintMatrix     hanging_node_constraints;
+    ConstraintMatrix     constraints;
     
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
@@ -563,14 +570,55 @@ void StokesProblem<dim>::setup_dofs ()
   block_component[dim] = 1;
   DoFRenumbering::component_wise (dof_handler, block_component);
 
-				   // Since we use adaptively refined grids
-				   // the constraint matrix for hanging node
-				   // constraints is generated from the DoF
-				   // handler.
-  hanging_node_constraints.clear ();
-  DoFTools::make_hanging_node_constraints (dof_handler,
-                                           hanging_node_constraints);
-  hanging_node_constraints.close ();
+				   // Now comes the implementation of
+				   // Dirichlet boundary conditions, which
+				   // should be evident after the discussion
+				   // in the introduction. All that changed
+				   // is that the function already appears
+				   // in the setup functions, whereas we
+				   // were used to see it in some assembly
+				   // routine. Further down below where we
+				   // set up the mesh, we will associate the
+				   // top boundary where we impose Dirichlet
+				   // boundary conditions with boundary
+				   // indicator 1.  We will have to pass
+				   // this boundary indicator as second
+				   // argument to the function below
+				   // interpolating boundary values.  There
+				   // is one more thing, though.  The
+				   // function describing the Dirichlet
+				   // conditions was defined for all
+				   // components, both velocity and
+				   // pressure. However, the Dirichlet
+				   // conditions are to be set for the
+				   // velocity only.  To this end, we use a
+				   // <code>component_mask</code> that
+				   // filters out the pressure component, so
+				   // that the condensation is performed on
+				   // velocity degrees of freedom
+				   // only. Since we use adaptively refined
+				   // grids the constraint matrix needs then
+				   // also be filled with hanging node
+				   // constraints needs to generated from
+				   // the DoF handler. Note the order of the
+				   // two functions &mdash; we first insert
+				   // the boundary values into the
+				   // constraint matrix, and then introduce
+				   // the hanging node constraints.
+  {
+    constraints.clear ();
+    std::vector<bool> component_mask (dim+1, true);
+    component_mask[dim] = false;
+    VectorTools::interpolate_boundary_values (dof_handler,
+					      1,
+					      BoundaryValues<dim>(),
+					      constraints,
+					      component_mask);
+    DoFTools::make_hanging_node_constraints (dof_handler,
+					     constraints);
+  }
+
+  constraints.close ();
 
 				   // In analogy to step-20, we count the dofs
 				   // in the individual components.  We could
@@ -652,15 +700,12 @@ void StokesProblem<dim>::setup_dofs ()
 				   // (and its block variant
 				   // BlockCompressedSimpleSparsityPattern)
 				   // has exactly the same interface, uses a
-				   // different internal data structure, is
-				   // slightly slower for smaller numbers of
-				   // degrees of freedom (but there we don't
-				   // care that much anyway) but is linear
-				   // in the number of degrees of freedom
-				   // and therefore much more efficient for
-				   // large problems. As another
-				   // alternative, we could also have chosen
-				   // the class
+				   // different internal data structure and
+				   // is linear in the number of degrees of
+				   // freedom and therefore much more
+				   // efficient for large problems. As
+				   // another alternative, we could also
+				   // have chosen the class
 				   // BlockCompressedSetSparsityPattern that
 				   // uses yet another strategy for internal
 				   // memory management. Though, that class
@@ -687,8 +732,7 @@ void StokesProblem<dim>::setup_dofs ()
   
     csp.collect_sizes();    
   
-    DoFTools::make_sparsity_pattern (dof_handler, csp);
-    hanging_node_constraints.condense (csp);
+    DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
     sparsity_pattern.copy_from (csp);
   }
   
@@ -872,85 +916,33 @@ void StokesProblem<dim>::assemble_system ()
 				       // the local matrix
 				       // contribution.
 
-				       // The final step is, as usual, the
-				       // transfer of the local contributions
-				       // to the global system matrix. This
-				       // works in the case of block
-				       // vectors and matrices just the way
-				       // we are used it to be, and also the
-				       // terms constituting the pressure mass
-				       // matrix are written into the correct
-				       // position without any further
-				       // interaction. We have to be careful
-				       // about one thing, though. We have
-				       // only build up half of the local
-				       // matrix because of symmetry, but
-				       // we're going to save the full system
-				       // matrix in order to use the standard
-				       // functions for solution. This is 
-				       // done by flipping the indices in
-				       // case we are pointing into the
-				       // empty part of the local matrix.
+				       // Before we can write the local data
+				       // into the global matrix (and
+				       // simultaneously use the
+				       // ConstraintMatrix object to apply
+				       // Dirichlet boundary conditions and
+				       // eliminate hanging node
+				       // constraints, as we discussed in
+				       // the introduction), we have to be
+				       // careful about one thing,
+				       // though. We have only build up half
+				       // of the local matrix because of
+				       // symmetry, but we're going to save
+				       // the full system matrix in order to
+				       // use the standard functions for
+				       // solution. This is done by flipping
+				       // the indices in case we are
+				       // pointing into the empty part of
+				       // the local matrix.
       cell->get_dof_indices (local_dof_indices);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=i+1; j<dofs_per_cell; ++j)
+	  local_matrix(i,j) = local_matrix(j,i);
 
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  {
-	    if (j <= i)
-	      system_matrix.add (local_dof_indices[i],
-            	               	 local_dof_indices[j],
-				 local_matrix(i,j));
-	    else
-	      system_matrix.add (local_dof_indices[i],
-            	               	 local_dof_indices[j],
-				 local_matrix(j,i));
-	  }
-      
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        system_rhs(local_dof_indices[i]) += local_rhs(i);
+      constraints.distribute_local_to_global (local_matrix, local_rhs,
+					      local_dof_indices, 
+					      system_matrix, system_rhs);
     }
-
-				   // After the addition of the local
-				   // contributions, we have to condense the
-				   // hanging node constraints and
-				   // interpolate Dirichlet boundary
-				   // conditions.  Further down below where
-				   // we set up the mesh, we will associate
-				   // the top boundary where we impose
-				   // Dirichlet boundary conditions with
-				   // boundary indicator 1.  We will have to
-				   // pass this boundary indicator as second
-				   // argument to the function below
-				   // interpolating boundary values.  There
-				   // is one more thing, though.  The
-				   // function describing the Dirichlet
-				   // conditions was defined for all
-				   // components, both velocity and
-				   // pressure. However, the Dirichlet
-				   // conditions are to be set for the
-				   // velocity only.  To this end, we use a
-				   // <code>component_mask</code> that
-				   // filters out the pressure component, so
-				   // that the condensation is performed on
-				   // velocity degrees of freedom only:
-  hanging_node_constraints.condense (system_matrix);
-  hanging_node_constraints.condense (system_rhs);  
-
-  {
-    std::map<unsigned int,double> boundary_values;
-    std::vector<bool> component_mask (dim+1, true);
-    component_mask[dim] = false;
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              1,
-                                              BoundaryValues<dim>(),
-                                              boundary_values,
-                                              component_mask);
-
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix,
-                                        solution,
-                                        system_rhs);
-  }
   
 				   // Before we're going to solve this
 				   // linear system, we generate a
@@ -1088,7 +1080,7 @@ void StokesProblem<dim>::solve ()
 				     // distributed to the solution in order
 				     // to achieve a consistent pressure
 				     // field.
-    hanging_node_constraints.distribute (solution);
+    constraints.distribute (solution);
   
     std::cout << "  "
 	      << solver_control.last_step()
@@ -1115,7 +1107,7 @@ void StokesProblem<dim>::solve ()
   
     A_inverse.vmult (solution.block(0), tmp);
 
-    hanging_node_constraints.distribute (solution);
+    constraints.distribute (solution);
   }
 }
 
