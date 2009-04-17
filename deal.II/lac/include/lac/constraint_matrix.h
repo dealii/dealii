@@ -60,17 +60,13 @@ class BlockIndices;
  *
  * @image html hp-refinement-simple.png
  *
- * there are three constraints: first $x_2=\frac 12 x_0 + \frac 12
- * x_1$, then $x_4=\frac 14 x_0 + \frac 34 x_1$, and finally the
- * identity $x_3=x_1$. All three constraints fit the form given
- * above. Similar constraints occur as hanging nodes even if all used
- * finite elements are identical. While they are most frequent for
- * hanging nodes, constraints of the given form appear also in other
- * contexts, see for example the application the @ref step_11
- * "step-11" tutorial program. A special case also covered by the
- * current class is the constraint $x_i=0$ although this constraint on
- * linear systems is better and more efficiently handled by the
- * MatrixTools::apply_boundary_values function.
+ * there are three constraints: first $x_2=\frac 12 x_0 + \frac 12 x_1$,
+ * then $x_4=\frac 14 x_0 + \frac 34 x_1$, and finally the identity
+ * $x_3=x_1$. All three constraints fit the form given above. Similar
+ * constraints occur as hanging nodes even if all used finite elements are
+ * identical. While they are most frequent for hanging nodes, constraints of
+ * the given form appear also in other contexts, see for example the
+ * application the @ref step_11 "step-11" tutorial program.
  *
  * The algorithms used in the implementation of this class are described in
  * some detail in the @ref hp_paper "hp paper".
@@ -78,12 +74,12 @@ class BlockIndices;
  *
  * <h3>Using the ConstraintMatrix for Dirichlet boundary conditions</h3>
  *
- * The ConstraintMatrix provides an alternative to implementing Dirichlet
- * boundary conditions (where the alternative is to use the functions
- * VectorTools::interpolate_boundary_values and
+ * The ConstraintMatrix provides an alternative for implementinging
+ * Dirichlet boundary conditions (the standard way that is extensively
+ * discussed in the tutorial programs is to use
  * MatrixTools::apply_boundary_values). The general principle of Dirichlet
  * conditions are algebraic constraints of the form $x_{i} = b_i$, which
- * fits into the form as described above.
+ * fits into the form described above.
  *
  *
  * <h3>Description of constraints</h3>
