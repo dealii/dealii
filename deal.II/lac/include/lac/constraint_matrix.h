@@ -239,6 +239,9 @@ class BlockIndices;
  * called without any matrix (or if the matrix has already been condensed
  * before).
  *
+ * The use of ConstraintMatrix for implementing Dirichlet boundary conditions
+ * is discussed in the @ref step_22 "step-22" tutorial program.
+ *
  * 
  * <h3>Avoiding explicit condensation</h3>
  *
@@ -246,15 +249,18 @@ class BlockIndices;
  * after it has been built at all. There are two main reasons for wanting to
  * do so:
  *
- * <ul>
- * <li>Condensation is an expensive operation, in particular if there are
- * many constraints and/or if the matrix has many nonzero entries. Both is
- * typically the case for 3d, or high polynomial degree computations, as well
- * as for hp finite element methods, see for example the @ref hp_paper "hp
- * paper". This is the case discussed in the hp tutorial program,
- * @ref step_27 "step-27", as well as in @ref step_31 "step-31".
+ * <ul> 
+ * <li>
+ * Condensation is an expensive operation, in particular if there
+ * are many constraints and/or if the matrix has many nonzero entries. Both
+ * is typically the case for 3d, or high polynomial degree computations, as
+ * well as for hp finite element methods, see for example the @ref hp_paper
+ * "hp paper". This is the case discussed in the hp tutorial program, @ref
+ * step_27 "step-27", as well as in @ref step_22 "step-22" and @ref step_31
+ * "step-31".
  *
- * <li> There may not be a condense() function for the matrix you use (this
+ * <li>
+ * There may not be a condense() function for the matrix you use (this
  * is, for example, the case for the PETSc and Trilinos wrapper classes,
  * where we have no access to the underlying representation of the matrix,
  * and therefore cannot efficiently implement the condense()
