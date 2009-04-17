@@ -15,6 +15,7 @@
 
 #include <base/config.h>
 #include <base/conditional_ostream.h>
+#include <base/thread_management.h>
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #include <mpi.h>
@@ -370,6 +371,14 @@ class TimerOutput
 				      */
     MPI_Comm            mpi_communicator;
 #endif
+
+				     /**
+				      * A lock that makes sure that this
+				      * class gives reasonable results even
+				      * when used with several threads.
+				      */
+
+    Threads::ThreadMutex mutex;
 };
 
 DEAL_II_NAMESPACE_CLOSE

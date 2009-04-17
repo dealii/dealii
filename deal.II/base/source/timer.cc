@@ -22,8 +22,6 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#include <base/thread_management.h>
-
 
 // on SunOS 4.x, getrusage is stated in the man pages and exists, but
 // is not declared in resource.h. declare it ourselves
@@ -272,8 +270,7 @@ TimerOutput::~TimerOutput()
 void 
 TimerOutput::enter_section (const std::string &section_name)
 {
-  Threads::Mutex mutex;
-  Threads::Mutex::ScopedLock lock (mutex);
+  Threads::ThreadMutex::ScopedLock lock (mutex);
 
   Assert (section_name.empty() == false,
 	  ExcMessage ("Section string is empty."));
@@ -301,8 +298,7 @@ TimerOutput::enter_section (const std::string &section_name)
 void 
 TimerOutput::exit_section (const std::string &section_name)
 {
-  Threads::Mutex mutex;
-  Threads::Mutex::ScopedLock lock (mutex);
+  Threads::ThreadMutex::ScopedLock lock (mutex);
 
   if (section_name != "")
     {
@@ -430,7 +426,7 @@ TimerOutput::print_summary ()
       std::cout.width(10);
       std::cout.precision(3);
       out_stream << "  CPU time "  << " | % of total |\n";
-      out_stream << "+---------------------------------------------+------------"
+      out_stream << "+---------------------------------+-----------+------------"
 		 << "+------------+";
       for (std::map<std::string, Section>::const_iterator
 	     i = sections.begin(); i!=sections.end(); ++i)
@@ -455,7 +451,7 @@ TimerOutput::print_summary ()
 	  out_stream << i->second.total_cpu_time/total_cpu_time * 100 << "% |";
 	}
       out_stream << std::endl
-		 << "+---------------------------------------------+"
+		 << "+---------------------------------+-----------+"
 		 << "------------+------------+\n"
 		 << std::endl;
 
@@ -488,7 +484,7 @@ TimerOutput::print_summary ()
       out_stream << "\n\n"
 		 << "+---------------------------------------------+------------"
 		 << "+------------+\n"
-		 << "| Total wallclock time elapsed from start     |";
+		 << "| Total wallclock time elapsed since start    |";
       std::cout.width(10);
       std::cout.precision(3);
       out_stream << total_wall_time << "s |            |\n";
@@ -498,7 +494,7 @@ TimerOutput::print_summary ()
       std::cout.width(10);
       std::cout.precision(3);
       out_stream << "  wall time | % of total |\n";
-      out_stream << "+---------------------------------------------+------------"
+      out_stream << "+---------------------------------+-----------+------------"
 		 << "+------------+";
       for (std::map<std::string, Section>::const_iterator
 	     i = sections.begin(); i!=sections.end(); ++i)
@@ -523,7 +519,7 @@ TimerOutput::print_summary ()
 	  out_stream << i->second.total_wall_time/total_wall_time * 100 << "% |";
 	}
       out_stream << std::endl
-		 << "+---------------------------------------------+"
+		 << "+---------------------------------+-----------+"
 		 << "------------+------------+\n"
 		 << std::endl;
 
