@@ -961,7 +961,6 @@ void BEMProblem<dim>::assemble_system()
 					     // functions against a
 					     // singular weight on the
 					     // reference cell.
-				     	     //
 				     	     // Notice that singular
 				     	     // integration requires a
 				     	     // careful selection of
@@ -988,11 +987,17 @@ void BEMProblem<dim>::assemble_system()
 				     	     // possible to write
 				     	     //
 				     	     // \f[
-				     	     //   \int_K f(x) s(x) dx = \Sum_{i=1}^N w_i f(q_i)
+				     	     //   \int_K f(x) s(x) dx = \sum_{i=1}^N w_i f(q_i)
 				     	     // \f]
 				     	     //
-				     	     // where $s(x)$ is a
-				     	     // given singularity.
+				     	     // where $s(x)$ is a given
+				     	     // singularity, and the weights
+				     	     // and quadrature points
+				     	     // $w_i,q_i$ are carefully
+				     	     // selected to make the formula
+				     	     // above an equality for a
+				     	     // certain class of functions
+				     	     // $f(x)$.
 				     	     //
 				     	     // In all the finite
 				     	     // element examples we
@@ -1002,7 +1007,6 @@ void BEMProblem<dim>::assemble_system()
 				     	     // (namely, the function
 				     	     // $s(x)$), was always
 				     	     // constantly equal to 1.
-				     	     //
 				     	     // For singular
 				     	     // integration, we have
 				     	     // two choices: we can
@@ -1021,7 +1025,7 @@ void BEMProblem<dim>::assemble_system()
 				     	     //
 				     	     // \f[
 				     	     //   \int_K f(x) s(x) dx =
-				     	     //   \int_K g(x) dx = \Sum_{i=1}^N \frac{w_i}{s(q_i)} g(q_i)
+				     	     //   \int_K g(x) dx = \sum_{i=1}^N \frac{w_i}{s(q_i)} g(q_i)
 				     	     // \f]
 				     	     //
 				     	     // We use this second
@@ -1085,12 +1089,12 @@ void BEMProblem<dim>::assemble_system()
 				     	     // linearly with the
 				     	     // determinant of the
 				     	     // transformation. This
-				     	     // allows us to built the
+				     	     // allows us to build the
 				     	     // singular two
 				     	     // dimensional quadrature
 				     	     // rules once and for all
-				     	     // outside the loop on
-				     	     // the cells, using only
+				     	     // outside the loop over
+				     	     // all cells, using only
 				     	     // a pointer where needed.
 					     //
 					     // Notice that in one
