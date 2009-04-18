@@ -78,135 +78,40 @@ using namespace dealii;
 				 // the vector $R =
 				 // \mathbf{y}-\mathbf{x}$ is
 				 // different from zero.
-				 // 
-				 // Whenever the integration is
-				 // performed with the singularity
-				 // inside the given cell, then a
-				 // special quadrature formula is used
-				 // that allows one to integrate
-				 // arbitrary functions against a
-				 // singular weight on the reference
-				 // cell.  There are two options when
-				 // the integral is singular. One
-				 // could take into account the
-				 // singularity inside the quadrature
-				 // formula as a weigthing function,
-				 // or one could use a quadrature
-				 // formula that is taylored to
-				 // integrate singular objects, but
-				 // where the actual weighting
-				 // function is one. The use of the
-				 // first method requires the user to
-				 // provide "desingularized" single
-				 // and double layer potentials which
-				 // can then be integrated on the
-				 // given cell. When the @p
-				 // factor_out_singularity parameter
-				 // is set to true, then the computed
-				 // kernels do not conatain the
-				 // singular factor, which is included
-				 // in the quadrature formulas as a
-				 // weighting function. This works
-				 // best in two dimension, where the
-				 // singular integrals are integrals
-				 // along a segment of a logarithmic
-				 // singularity.
-				 //
-//TODO: Can you elaborate in formulas?
-				 // These integrals are somewhat
-				 // delicate, because inserting a
-				 // factor Jx in the variable of
-				 // integration does not result only
-				 // in a factor J appearing as a
-				 // constant factor on the entire
-				 // integral, but also on an
-				 // additional integral to be added,
-				 // that contains the logarithm of
-				 // J. For this reason in two
-				 // dimensions we opt for the
-				 // desingularized kernel, and use the
-				 // QGaussLogR quadrature formula,
-				 // that takes care of integrating the
-				 // correct weight for us.
-				 //
-				 // In the three dimensional case the
-				 // singular integral is taken care of
-				 // using the QGaussOneOverR
-				 // quadrature formula. We could use
-				 // the desingularized kernel here as
-				 // well, but this would require us to
-				 // be careful about the different
-				 // scaling of $r$ in the reference
-				 // cell and in real space. The
-				 // quadrature formula uses as weight
-				 // $1/r$ in local coordinates, while
-				 // we need to integrate $1/R$ in real
-				 // coordinates. A factor of $r/R$ has
-				 // to be introduced in the quadrature
-				 // formula. This can be done
-				 // manually, or we simply calculate
-				 // the standard kernels and then use
-				 // a desingularized quadrature
-				 // formula, i.e., one which is
-				 // taylored for singular integrals,
-				 // but whose weight is 1 instead of
-				 // the singularity.
-				 //
-				 // Notice that the QGaussLog
-				 // quadrature formula is made to
-				 // integrate $f(x)\ln
-				 // |\mathbf{x}-\mathbf{x}_0|$, but
-				 // the kernel for two dimensional
-				 // problems has the opposite
-				 // sign. This is taken care of by
-				 // switching the sign of the two
-				 // dimensional desingularized kernel.
-				 //
-				 // The last argument to both
-				 // functions is simply ignored in
-				 // three dimensions.
 namespace LaplaceKernel
 {
   template <int dim>
-  double single_layer(const Point<dim> &R, 
-		      const bool factor_out_2d_singularity = false)
+  double single_layer(const Point<dim> &R)
   {
     switch(dim)
       {
 	case 2:
-	      if (factor_out_2d_singularity == true) 
-		return -1./(2*numbers::PI);
-	      else
-		return (-std::log(R.norm()) / (2*numbers::PI) );
+	    return (-std::log(R.norm()) / (2*numbers::PI) );
 
 	case 3:
-	      return (1./( R.norm()*4*numbers::PI ) );
+	    return (1./( R.norm()*4*numbers::PI ) );
 
 	default:
-	      Assert(false, ExcInternalError());
-	      return 0.;
+	    Assert(false, ExcInternalError());
+	    return 0.;
       }
   }
         
 
 
   template <int dim>
-  Point<dim> double_layer(const Point<dim> &R,
-			  const bool factor_out_2d_singularity = false)
+  Point<dim> double_layer(const Point<dim> &R)
   {
     switch(dim)
       {
 	case 2:
-	      if (factor_out_2d_singularity)
-		return Point<dim>();
-	      else
-		return R / (-2*numbers::PI * R.square());
+	    return R / ( -2*numbers::PI * R.square());
 	case 3:
-	      return R / ( -4*numbers::PI * R.square()*R.norm() );
+	    return R / ( -4*numbers::PI * R.square()*R.norm() );
 
 	default:
-	      Assert(false, ExcInternalError());
-	      return Point<dim>();
+	    Assert(false, ExcInternalError());
+	    return Point<dim>();
       }
   }
 }
@@ -452,10 +357,10 @@ class BEMProblem
 				     // well as a vector that will
 				     // hold the values of
 				     // $\alpha(\mathbf x)$ (the
-				     // fraction of space visible from
-				     // a point $\mathbf x$) at the
-				     // support points of our shape
-				     // functions.
+				     // fraction of $\Omega$ visible
+				     // from a point $\mathbf x$) at
+				     // the support points of our
+				     // shape functions.
     Vector<double>              phi;
     Vector<double>              alpha;
     
@@ -1031,65 +936,189 @@ void BEMProblem<dim>::assemble_system()
 		}
 	    } else {
 					     // Now we treat the more
-					     // delicate case. If we are
-					     // here, this means that the
-					     // cell that runs on the $j$
-					     // index contains
-					     // support_point[i]. In this
-					     // case both the single and
-					     // the double layer potential
-					     // are singular, and they
-					     // require special treatment,
-					     // as explained in the
-					     // introduction.
+					     // delicate case. If we
+					     // are here, this means
+					     // that the cell that
+					     // runs on the $j$ index
+					     // contains
+					     // support_point[i]. In
+					     // this case both the
+					     // single and the double
+					     // layer potential are
+					     // singular, and they
+					     // require special
+					     // treatment.
 					     //
-					     // In the two dimensional
-					     // case we perform the
-					     // integration using a
-					     // QGaussLogR quadrature
-					     // formula, which is
-					     // specifically designed to
-					     // integrate logarithmic
-					     // singularities on the unit
-					     // interval, while in three
-					     // dimensions we use the
-					     // QGaussOneOverR class,
-					     // which allows us to
-					     // integrate 1/R
-					     // singularities on the
-					     // vertices of the reference
-					     // element. Since we don't
-					     // want to rebuild the two
-					     // dimensional quadrature
-					     // formula at each singular
-					     // integration, we have built
-					     // them outside the loop on
-					     // the cells, and we only use
-					     // a pointer to that
-					     // quadrature here.
+					     // Whenever the
+					     // integration is
+					     // performed with the
+					     // singularity inside the
+					     // given cell, then a
+					     // special quadrature
+					     // formula is used that
+					     // allows one to
+					     // integrate arbitrary
+					     // functions against a
+					     // singular weight on the
+					     // reference cell.
+				     	     //
+				     	     // Notice that singular
+				     	     // integration requires a
+				     	     // careful selection of
+				     	     // the quadrature
+				     	     // rules. In particular
+				     	     // the deal.II library
+				     	     // provides quadrature
+				     	     // rules which are
+				     	     // taylored for
+				     	     // logarithmic
+				     	     // singularities
+				     	     // (QGaussLog,
+				     	     // QGaussLogR), as well
+				     	     // as for 1/R
+				     	     // singularities
+				     	     // (QGaussOneOverR).
+				     	     //
+				     	     // Singular integration
+				     	     // is typically obtained
+				     	     // by constructing
+				     	     // weighted quadrature
+				     	     // formulas with singular
+				     	     // weights, so that it is
+				     	     // possible to write
+				     	     //
+				     	     // \f[
+				     	     //   \int_K f(x) s(x) dx = \Sum_{i=1}^N w_i f(q_i)
+				     	     // \f]
+				     	     //
+				     	     // where $s(x)$ is a
+				     	     // given singularity.
+				     	     //
+				     	     // In all the finite
+				     	     // element examples we
+				     	     // have seen so far, the
+				     	     // weight of the
+				     	     // quadrature itself
+				     	     // (namely, the function
+				     	     // $s(x)$), was always
+				     	     // constantly equal to 1.
+				     	     //
+				     	     // For singular
+				     	     // integration, we have
+				     	     // two choices: we can
+				     	     // use the definition
+				     	     // above, factoring out
+				     	     // the singularity from
+				     	     // the integrand (i.e.,
+				     	     // integrating $f(x)$
+				     	     // with the special
+				     	     // quadrature rule), or
+				     	     // we can ask the
+				     	     // quadrature rule to
+				     	     // "normalize" the
+				     	     // weights $w_i$ with
+				     	     // $s(q_i)$:
+				     	     //
+				     	     // \f[
+				     	     //   \int_K f(x) s(x) dx =
+				     	     //   \int_K g(x) dx = \Sum_{i=1}^N \frac{w_i}{s(q_i)} g(q_i)
+				     	     // \f]
+				     	     //
+				     	     // We use this second
+				     	     // option, through the @p
+				     	     // factor_out_singularity
+				     	     // parameter of both
+				     	     // QGaussLogR and
+				     	     // QGaussOneOverR.
+				     	     //
+				     	     // These integrals are
+				     	     // somewhat delicate,
+				     	     // especially in two
+				     	     // dimensions, due to the
+				     	     // transformation from
+				     	     // the real to the
+				     	     // reference cell, where
+				     	     // the variable of
+				     	     // integration is scaled
+				     	     // with the determinant
+				     	     // of the transformation.
+				     	     //
+				     	     // In two dimensions this
+				     	     // process does not
+				     	     // result only in a
+				     	     // factor appearing as a
+				     	     // constant factor on the
+				     	     // entire integral, but
+				     	     // also on an additional
+				     	     // integral alltogether
+				     	     // that needs to be
+				     	     // evaluated:
+				     	     // 
+				     	     // \f[
+				     	     //  \int_0^1 f(x)\ln(x/\alpha) dx =
+				     	     //  \int_0^1 f(x)\ln(x) dx - \int_0^1 f(x) \ln(\alpha) dx.
+				     	     // \f]
+				     	     //
+				     	     // This process is taken care of by
+				     	     // the constructor of the QGaussLogR
+				     	     // class, which adds additional
+				     	     // quadrature points and weights to
+				     	     // take into consideration also the
+				     	     // second part of the integral.
+				     	     // 
+				     	     // A similar reasoning
+				     	     // should be done in the
+				     	     // three dimensional
+				     	     // case, since the
+				     	     // singular quadrature is
+				     	     // taylored on the
+				     	     // inverse of the radius
+				     	     // $r$ in the reference
+				     	     // cell, while our
+				     	     // singular function
+				     	     // lives in real space,
+				     	     // however in the three
+				     	     // dimensional case
+				     	     // everything is simpler
+				     	     // because the
+				     	     // singularity scales
+				     	     // linearly with the
+				     	     // determinant of the
+				     	     // transformation. This
+				     	     // allows us to built the
+				     	     // singular two
+				     	     // dimensional quadrature
+				     	     // rules once and for all
+				     	     // outside the loop on
+				     	     // the cells, using only
+				     	     // a pointer where needed.
 					     //
 					     // Notice that in one
-					     // dimensional integration
-					     // this is not possible,
-					     // since we need to know the
-					     // scaling parameter for the
-					     // quadrature, which is not
-					     // known a priori. Here, the
-					     // singular quadrature rule
-					     // depends also on the size
-					     // of the current cell. For
-					     // this reason, it is
-					     // necessary to create a new
+					     // dimensional
+					     // integration this is
+					     // not possible, since we
+					     // need to know the
+					     // scaling parameter for
+					     // the quadrature, which
+					     // is not known a
+					     // priori. Here, the
+					     // quadrature rule itself
+					     // depends also on the
+					     // size of the current
+					     // cell. For this reason,
+					     // it is necessary to
+					     // create a new
 					     // quadrature for each
 					     // singular
 					     // integration. Since we
-					     // create it using the new
-					     // operator of C++, we also
-					     // need to destroy it using
-					     // the dual of new:
-					     // delete. This is done at
-					     // the end, and only if dim
-					     // == 2.
+					     // create it using the
+					     // new operator of C++,
+					     // we also need to
+					     // destroy it using the
+					     // dual of new:
+					     // delete. This is done
+					     // at the end, and only
+					     // if dim == 2.
 					     //
 					     // Putting all this into a
 					     // dimension independent
@@ -1124,7 +1153,7 @@ void BEMProblem<dim>::assemble_system()
 		 dynamic_cast<Quadrature<dim-1>*>(
 		   new QGaussLogR<1>(singular_quadrature_order,
 				     Point<1>((double)singular_index),
-				     1./cell->measure()))
+				     1./cell->measure(), true))
 		 :
 		 (dim == 3
 		  ?
@@ -1158,15 +1187,15 @@ void BEMProblem<dim>::assemble_system()
 		  normal_wind += (singular_cell_wind[q](d)*
 				  singular_normals[q][d]);
                         
-		system_rhs(i) += ( LaplaceKernel::single_layer(R, is_singular) *
+		system_rhs(i) += ( LaplaceKernel::single_layer(R) *
 				   normal_wind                         *
 				   fe_v_singular.JxW(q) );
                         
 		for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
-		  local_matrix_row_i(j) += (( LaplaceKernel::double_layer(R, is_singular) *
-					      singular_normals[q])                *
-					    fe_v_singular.shape_value(j,q)        *
-					    fe_v_singular.JxW(q)       );
+		    local_matrix_row_i(j) += (( LaplaceKernel::double_layer(R) *
+						singular_normals[q])                *
+					      fe_v_singular.shape_value(j,q)        *
+					      fe_v_singular.JxW(q)       );
 		}
 	      }
 	    if(dim==2) 
