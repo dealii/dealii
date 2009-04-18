@@ -363,6 +363,10 @@ class QGaussLog : public Quadrature<dim>
  * singularity <tt>x0</tt> and an arbitrary scaling factor in the
  * singularity.
  *
+ * You have to make sure that the point x0 is not one of the Gauss
+ * quadrature points of order $N$, otherwise an exception is thrown,
+ * since the quadrature weights cannot be computed correctly.
+ *
  * This quadrature formula is rather expensive, since it uses
  * internally two Gauss quadrature formulas of order n to integrate
  * the nonsingular part of the factor, and two GaussLog quadrature
@@ -370,9 +374,25 @@ class QGaussLog : public Quadrature<dim>
  * [x0,1]. If the singularity is one of the extremes and the factor
  * alpha is 1, then this quadrature is the same as QGaussLog.
  *
- * Notice again that only the function <tt>f(x)</tt> should be
- * provided, i.e., $\int_0^1 f(x) ln(|x-x0|/alpha) dx = \sum_{i=0}^N
- * w_i f(q_i)$. 
+ * The last argument from the constructor allows you to use this
+ * quadrature rule in one of two possible ways: 
+ * \f[
+ * \int_0^1 g(x) dx =
+ * int_0^1 f(x) \ln\left(\frac{|x-x_0|}{\alpha}\right) dx
+ * = \sum_{i=0}^N w_i g(q_i) = \sum_{i=0}^N \bar{w}_i f(q_i)
+ * \f]
+ *
+ * Which one of the two sets of weights is provided, can be selected
+ * by the @p factor_out_singular_weight parameter. If it is false (the
+ * default), then the $\bar{w}_i$ weigths are computed, and you should
+ * provide only the smooth function $f(x)$, since the singularity is
+ * included inside the quadrature. If the parameter is set to true,
+ * then the singularity is factored out of the quadrature formula, and
+ * you should provide a function $g(x)$, which should at least be
+ * similar to $\ln(|x-x_0|/\alpha)$.
+ *
+ * Notice that this quadrature rule is worthless if you try to use it
+ * for regular functions once you factored out the singularity.
  *
  * The weights and functions have been tabulated up to order 12.
  *
@@ -380,13 +400,16 @@ class QGaussLog : public Quadrature<dim>
 template<int dim>
 class QGaussLogR : public Quadrature<dim> {
 public:
-    /** The constructor takes three arguments arguments: the order of
-     * the gauss formula on each of the segments [0,x0] and [x0,1],
-     * the actual location of the singularity and the scale factor for
-     * the logarithmic function. */
+    /** The constructor takes four arguments: the order of the gauss
+     * formula on each of the segments [0,x0] and [x0,1], the actual
+     * location of the singularity, the scale factor inside the
+     * logarithmic function and a flag that decides wether the
+     * singularity is left inside the quadrature formula or it is
+     * factored out, to be included in the integrand. */
     QGaussLogR(const unsigned int n, 
 	       const Point<dim> x0 = Point<dim>(), 
-	       const double alpha = 1);
+	       const double alpha = 1,
+	       const bool factor_out_singular_weight=false);
 
 protected:
     /** This is the length of interval (0,origin), or 1 if either of
@@ -498,7 +521,7 @@ template <> QSimpson<1>::QSimpson ();
 template <> QMilne<1>::QMilne ();
 template <> QWeddle<1>::QWeddle ();
 template <> QGaussLog<1>::QGaussLog (const unsigned int n, const bool revert);
-template <> QGaussLogR<1>::QGaussLogR (const unsigned int n, const Point<1> x0, const double alpha);
+template <> QGaussLogR<1>::QGaussLogR (const unsigned int n, const Point<1> x0, const double alpha, const bool flag);
 template <> QGaussOneOverR<2>::QGaussOneOverR (const unsigned int n, const unsigned int index, const bool flag);
 
 

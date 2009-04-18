@@ -929,7 +929,8 @@ QGaussLog<1>::set_quadrature_weights(const unsigned int n) const
 template<>
 QGaussLogR<1>::QGaussLogR(const unsigned int n, 
 			  const Point<1> origin,
-			  const double alpha) :
+			  const double alpha,
+			  const bool factor_out_singularity) :
     Quadrature<1>( ( (origin[0] == 0) || (origin[0] == 1) ) ? 
 		   (alpha == 1 ? n : 2*n ) : 4*n ),
     fraction( ( (origin[0] == 0) || (origin[0] == 1.) ) ? 1. : origin[0] )
@@ -968,19 +969,25 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 	// We need to scale with -log|fraction*alpha|
 	if( (alpha != 1) || (fraction != 1) ) {
 	    this->quadrature_points[j] = quad.point(i)*fraction;
-	    this->weights[j] = -log(alpha/fraction)*quad.weight(i)*fraction;
+	    this->weights[j] = -std::log(alpha/fraction)*quad.weight(i)*fraction;
 	}
 
 	// In case we need the second quadrature as well, do it now.
 	if(fraction != 1) {
 	    this->quadrature_points[i+n] = quad2.point(i)*(1-fraction)+Point<1>(fraction);
-	    this->weights[i+n] = quad2.weight(i)*(1-fraction);
+	    this->weights[i+n] = quad2.weight(i)*(1-fraction); 
 	    
 	    // We need to scale with -log|fraction*alpha|
 	    this->quadrature_points[j+n] = quad.point(i)*(1-fraction)+Point<1>(fraction);
-	    this->weights[j+n] = -log(alpha/(1-fraction))*quad.weight(i)*(1-fraction);
+	    this->weights[j+n] = -std::log(alpha/(1-fraction))*quad.weight(i)*(1-fraction);
 	}
     }
+    if(factor_out_singularity == true) 
+	for(unsigned int i=0; i<size(); ++i) {
+	    Assert( this->quadrature_points[i] != origin,
+		    ExcMessage("The singularity cannot be on a Gauss point of the same order!") );
+	    this->weights[i] /= std::log(std::abs( (this->quadrature_points[i]-origin)[0] )/alpha );
+	}
 }
 
 
