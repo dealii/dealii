@@ -357,28 +357,28 @@ class QGaussLog : public Quadrature<dim>
 /**
  * Gauss Quadrature Formula with arbitrary logarithmic weighting
  * function. This formula is used to to integrate
- * <tt>ln(|x-x0|/alpha)*f(x)</tt> on the interval <tt>[0,1]</tt>,
- * where f is a smooth function without singularities, and x0 and
- * alpha are given at construction time, and are the location of the
- * singularity <tt>x0</tt> and an arbitrary scaling factor in the
+ * $\ln(|x-x_0|/\alpha)\;f(x)$ on the interval $[0,1]$,
+ * where $f$ is a smooth function without singularities, and $x_0$ and
+ * $\alpha$ are given at construction time, and are the location of the
+ * singularity $x_0$ and an arbitrary scaling factor in the
  * singularity.
  *
- * You have to make sure that the point x0 is not one of the Gauss
+ * You have to make sure that the point $x_0$ is not one of the Gauss
  * quadrature points of order $N$, otherwise an exception is thrown,
  * since the quadrature weights cannot be computed correctly.
  *
  * This quadrature formula is rather expensive, since it uses
  * internally two Gauss quadrature formulas of order n to integrate
  * the nonsingular part of the factor, and two GaussLog quadrature
- * formulas to integrate on the separate segments [0,x0] and
- * [x0,1]. If the singularity is one of the extremes and the factor
+ * formulas to integrate on the separate segments $[0,x_0]$ and
+ * $[x_0,1]$. If the singularity is one of the extremes and the factor
  * alpha is 1, then this quadrature is the same as QGaussLog.
  *
  * The last argument from the constructor allows you to use this
  * quadrature rule in one of two possible ways: 
  * \f[
  * \int_0^1 g(x) dx =
- * int_0^1 f(x) \ln\left(\frac{|x-x_0|}{\alpha}\right) dx
+ * \int_0^1 f(x) \ln\left(\frac{|x-x_0|}{\alpha}\right) dx
  * = \sum_{i=0}^N w_i g(q_i) = \sum_{i=0}^N \bar{w}_i f(q_i)
  * \f]
  *
@@ -398,22 +398,32 @@ class QGaussLog : public Quadrature<dim>
  *
  */
 template<int dim>
-class QGaussLogR : public Quadrature<dim> {
-public:
-    /** The constructor takes four arguments: the order of the gauss
-     * formula on each of the segments [0,x0] and [x0,1], the actual
-     * location of the singularity, the scale factor inside the
-     * logarithmic function and a flag that decides wether the
-     * singularity is left inside the quadrature formula or it is
-     * factored out, to be included in the integrand. */
+class QGaussLogR : public Quadrature<dim>
+{
+  public:
+				     /**
+				      * The constructor takes four arguments:
+				      * the order of the gauss formula on each
+				      * of the segments $[0,x_0]$ and
+				      * $[x_0,1]$, the actual location of the
+				      * singularity, the scale factor inside
+				      * the logarithmic function and a flag
+				      * that decides wether the singularity is
+				      * left inside the quadrature formula or
+				      * it is factored out, to be included in
+				      * the integrand.
+				      */
     QGaussLogR(const unsigned int n, 
 	       const Point<dim> x0 = Point<dim>(), 
 	       const double alpha = 1,
 	       const bool factor_out_singular_weight=false);
 
-protected:
-    /** This is the length of interval (0,origin), or 1 if either of
-     * the two extremes have been selected. */
+  protected:
+				     /**
+				      * This is the length of interval
+				      * $(0,origin)$, or 1 if either of the two
+				      * extremes have been selected.
+				      */
     const double fraction;
 };
 
