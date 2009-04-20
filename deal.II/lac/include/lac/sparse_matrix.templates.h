@@ -224,11 +224,15 @@ SparseMatrix<number>::n_nonzero_elements () const
 
 template <typename number>
 unsigned int
-SparseMatrix<number>::n_actually_nonzero_elements () const
+SparseMatrix<number>::n_actually_nonzero_elements (const double threshold) const
 {
   Assert (cols != 0, ExcNotInitialized());
-  return std::count_if(&val[0], &val[n_nonzero_elements ()],
-		       std::bind2nd(std::not_equal_to<double>(), 0));
+  Assert (threshold >= 0, ExcMessage ("Negative threshold!"));
+  unsigned int nnz = 0;
+  for (unsigned int i=0; i<n_nonzero_elements(); ++i)
+    if (std::fabs(val[i]) > threshold)
+      ++nnz;
+  return nnz;
 }
 
 
@@ -1188,12 +1192,13 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
 								   row)
 	   -
 	   &cols->colnums[0]);
-      
+
+      double s = *dst_ptr;
       for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
-	*dst_ptr -= om* val[j] * dst(cols->colnums[j]);
+	s -= val[j] * dst(cols->colnums[j]);
 
 				       // divide by diagonal element
-      *dst_ptr /= val[*rowstart_ptr];
+      *dst_ptr = s * om / val[*rowstart_ptr];
     };
   
   rowstart_ptr = &cols->rowstart[0];
@@ -1206,16 +1211,17 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
   dst_ptr      = &dst(n-1);
   for (int row=n-1; row>=0; --row, --rowstart_ptr, --dst_ptr)
     {
+      const unsigned int end_row = *(rowstart_ptr+1);
       const unsigned int first_right_of_diagonal_index
 	= (internals::SparsityPatternTools::optimized_lower_bound (&cols->colnums[*rowstart_ptr+1],
-								   &cols->colnums[*(rowstart_ptr+1)],
+								   &cols->colnums[end_row],
 								   static_cast<unsigned int>(row)) -
 	   &cols->colnums[0]);
-      for (unsigned int j=first_right_of_diagonal_index; j<*(rowstart_ptr+1); ++j)
-	if (cols->colnums[j] > static_cast<unsigned int>(row))
-	  *dst_ptr -= om* val[j] * dst(cols->colnums[j]);
+      double s = *dst_ptr;
+      for (unsigned int j=first_right_of_diagonal_index; j<end_row; ++j)
+	s -= val[j] * dst(cols->colnums[j]);
       
-      *dst_ptr /= val[*rowstart_ptr];
+      *dst_ptr = s * om / val[*rowstart_ptr];
     };
 }
 
@@ -1276,7 +1282,7 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst,
 	{
 	  const unsigned int col = cols->colnums[j];
 	  if (col < row)
-	  s -= val[j] * dst(col);
+	    s -= val[j] * dst(col);
 	}
       
       dst(row) = s * om / val[cols->rowstart[row]];
