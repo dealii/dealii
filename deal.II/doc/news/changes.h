@@ -160,6 +160,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Updated: The @ref step_22 "step-22" tutorial program now uses some 
+  advanced features of the ConstraintMatrix such as imhomogeneities 
+  for implementing Dirichlet boundary condition and condensation of 
+  constraints on the fly.
+  <br>
+  (Martin Kronbichler 2009/04/20)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: There is now a program, contributed by Jean-Paul Pelteret, that can
   convert Cubit generated meshes into UCD format that the GridIn class can
   read. The program along with a description is in the contrib/mesh_conversion
@@ -224,7 +235,7 @@ inconvenience this causes.
   (WB 2009/01/12)
   </p>
   </li>
-  
+
   <li>
   <p>
   Updated: The @ref step_33 "step-33" tutorial program now uses the

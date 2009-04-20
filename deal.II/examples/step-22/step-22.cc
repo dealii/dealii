@@ -934,11 +934,11 @@ void StokesProblem<dim>::assemble_system ()
 				       // the indices in case we are
 				       // pointing into the empty part of
 				       // the local matrix.
-      cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=i+1; j<dofs_per_cell; ++j)
 	  local_matrix(i,j) = local_matrix(j,i);
 
+      cell->get_dof_indices (local_dof_indices);
       constraints.distribute_local_to_global (local_matrix, local_rhs,
 					      local_dof_indices, 
 					      system_matrix, system_rhs);

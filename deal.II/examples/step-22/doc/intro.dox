@@ -602,7 +602,9 @@ surface that sucks material all the way to the top surface to fill the gap
 left by the outward motion of material at this location.
 
 
-<h3>Using imhomogeneous constraints for implementing Dirichlet boundary conditions</h3>
+<h3>Implementation</h3>
+
+<h4>Using imhomogeneous constraints for implementing Dirichlet boundary conditions</h4>
 
 In all the previous tutorial programs, we used the ConstraintMatrix merely
 for handling hanging node constraints (with exception of step-11). However,
@@ -650,13 +652,13 @@ side, it distributes the hanging node constraints and additionally
 implements (inhomogeneous) Dirichlet boundary conditions. That's nice, isn't
 it?
 
-As results from this discussion, we can conclude that the ConstraintMatrix
-provides an alternative to using MatrixTools::apply_boundary_values for
-implementing Dirichlet boundary conditions.
+We can conclude that the ConstraintMatrix provides an alternative to using
+MatrixTools::apply_boundary_values for implementing Dirichlet boundary
+conditions.
 
 
 <a name="constraint-matrix">
-Other ConstraintMatrix-related optimizations
+<h4>Using ConstraintMatrix for performance optimizations</h4>
 </a>
 
 Usually, the sparse matrix contains a substantial amount of elements that
@@ -670,54 +672,56 @@ considered in this tutorial program. Remember that matrix-vector products or
 preconditioners operate on all these elements that are zero, which is an
 inefficiency we have chosen to eliminate in the tutorial program.
 
-Another advantage of directly resolving constrained degrees of freedom is
-that we can avoid having all these entries that actually are zero in our
-sparse matrix &mdash; we do not need them during matrix construction (as
-opposed to the traditional algorithms, which first fill the matrix, and only
-resolve constraints afterwards). The way we are going to do that is to pass
-the information about constraints to the function that generates the
-sparsity pattern, and then set a <tt>false</tt> argument specifying that we
-do not intend to use constrained entries:
+An advantage of directly resolving constrained degrees of freedom is that we
+can avoid having all these entries that actually are zero in our sparse
+matrix &mdash; we do not need them during matrix construction (as opposed to
+the traditional algorithms, which first fill the matrix, and only resolve
+constraints afterwards). This will save both memory and time when forming
+matrix-vector products. The way we are going to do that is to pass the
+information about constraints to the function that generates the sparsity
+pattern, and then set a <tt>false</tt> argument specifying that we do not
+intend to use constrained entries:
 @code
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
                                    constraints, false);
 @endcode
-This functions saves, by the way, also the call to the <tt>condense()</tt>
-function on the sparsity pattern.
+This functions obviates, by the way, also the call to the
+<tt>condense()</tt> function on the sparsity pattern.
 
 
-<h3>Implementation</h3>
+<h4>Performance optimizations</h4>
 
-The program developed below has seen a lot of TLC. We have run it over
-and over under profiling tools (mainly <a
-href="http://www.valgrind.org/">valgrind</a>'s cachegrind and
-callgrind tools, as well as the KDE <a
+The program developed below has seen a lot of TLC. We have run it over and
+over under profiling tools (mainly <a
+href="http://www.valgrind.org/">valgrind</a>'s cachegrind and callgrind
+tools, as well as the KDE <a
 href="http://kcachegrind.sourceforge.net/">KCachegrind</a> program for
-visualization) to see where the bottlenecks are. This has paid off:
-through this effort, the program has become almost twice as fast when
+visualization) to see where the bottlenecks are. This has paid off: through
+this effort, the program has become about four times as fast when
 considering the runtime of the refinement cycles zero through three,
 reducing the overall number of CPU instructions executed from
-869,574,060,348 to 199,853,005,625. For higher refinement levels, the
-gain is probably even larger since some algorithms that are not ${\cal
-O}(N)$ have been eliminated.
+869,574,060,348 to 199,853,005,625. For higher refinement levels, the gain
+is probably even larger since some algorithms that are not ${\cal O}(N)$
+have been eliminated.
 
-Essentially, there are currently two algorithms in the program that do
-not scale linearly with the number of degrees of freedom: renumbering
-of degrees of freedom, and the linear solver. As for the first, while
-reordering degrees of freedom may not scale linearly, it is an
-indispensible part of the overall algorithm as it greatly improves the
-quality of the sparse ILU, easily making up for the time spent on
-computing the renumbering; graphs and timings to demonstrate this are
-shown in the documentation of the DoFRenumbering namespace, also
-underlining the choice of the King reordering algorithm chosen below.
+Essentially, there are currently two algorithms in the program that do not
+scale linearly with the number of degrees of freedom: renumbering of degrees
+of freedom (which is ${\val O}(N \log N)$, and the linear solver (which is
+{\val O}(N^{4/3})$). As for the first, while reordering degrees of freedom
+may not scale linearly, it is an indispensible part of the overall algorithm
+as it greatly improves the quality of the sparse ILU, easily making up for
+the time spent on computing the renumbering; graphs and timings to
+demonstrate this are shown in the documentation of the DoFRenumbering
+namespace, also underlining the choice of the King reordering algorithm
+chosen below.
 
-As for the linear solver: as mentioned above, our implementation here
-uses a Schur complement formulation. This is not necessarily the very
-best choice but demonstrates various important techniques available in
-deal.II. The question of which solver is best is again discussed in
-the <a href="#improved-solver">section on improved solvers in the
-results part</a> of this program, along with code showing alternative
-solvers and a comparison of their results.
+As for the linear solver: as mentioned above, our implementation here uses a
+Schur complement formulation. This is not necessarily the very best choice
+but demonstrates various important techniques available in deal.II. The
+question of which solver is best is again discussed in the <a
+href="#improved-solver">section on improved solvers in the results part</a>
+of this program, along with code showing alternative solvers and a
+comparison of their results.
 
 Apart from this, many other algorithms have been tested and improved during
 the creation of this program. For example, in building the sparsity pattern,
@@ -727,14 +731,15 @@ large numbers of nonzero entries per row created by our discretization in
 3d, leading to a quadratic behavior. Replacing the internal algorithms in
 deal.II to set many elements at a time, and using a
 BlockCompressedSimpleSparsityPattern as a better adapted data structure,
-removed this bottleneck at the price of some more memory
+removed this bottleneck at the price of a slightly higher memory
 consumption. Likewise, the implementation of the decomposition step in the
 SparseILU class was very inefficient and has been replaced by one that is
-about 10 times faster. Small improvements were applied here and
-there. Moreover, the ConstraintMatrix object has been used to eliminate a
-lot of entries in the sparse matrix that are eventually going to be zero,
-see <a href="#constraint-matrix">the section on new features of
-constraint matrix</a>.
+about 10 times faster. Even the vmult function of the SparseILU has been
+improved to save about twenty precent of time. Small improvements were
+applied here and there. Moreover, the ConstraintMatrix object has been used
+to eliminate a lot of entries in the sparse matrix that are eventually going
+to be zero, see <a href="#constraint-matrix">the section on using advanced
+features of the ConstraintMatrix class</a>.
 
 A profile of how many CPU instructions are spent at the various
 different places in the program during refinement cycles
@@ -744,16 +749,16 @@ zero through three in 3d is shown here:
 
 As can be seen, at this refinement level approximately three quarters of the
 instruction count is spent on the actual solver (the SparseILU::vmult calls
-on the left, the SparseMatrix<double>::vmult call in the middle, and another
-box including multiplications with SparseILU and SparseMatrix stemming from
-the solve for <i>U</i>). About one fifth of the instruction count is spent
-on matrix assembly and sparse ILU computation (box in the lower right
-corner) and the rest on other things. Since floating point operations such
-as in the SparseILU::vmult calls typically take much longer than many of the
-logical operations and table lookups in matrix assembly, the fraction of the
-run time taken up by matrix assembly is actually significantly less than the
-fraction of instructions, as will become apparent in the comparison we make
-in the results section.
+on the left, the SparseMatrix::vmult call in the middle for the Schur
+complement solve, and another box representing the multiplications with
+SparseILU and SparseMatrix in the solve for <i>U</i>). About one fifth of
+the instruction count is spent on matrix assembly and sparse ILU computation
+(box in the lower right corner) and the rest on other things. Since floating
+point operations such as in the SparseILU::vmult calls typically take much
+longer than many of the logical operations and table lookups in matrix
+assembly, the fraction of the run time taken up by matrix assembly is
+actually significantly less than the fraction of instructions, as will
+become apparent in the comparison we make in the results section.
 
 For higher refinement levels, the boxes representing the solver as well as
 the blue box at the top right stemming from reordering algorithm are going
