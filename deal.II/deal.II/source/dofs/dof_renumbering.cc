@@ -174,22 +174,23 @@ namespace DoFRenumbering
 			 types::property_map<types::Graph,types::vertex_degree_t>::type &graph_degree)
       {
 	Assert (use_constraints == false, ExcNotImplemented());
-    
-	std::vector<unsigned int> dofs_on_this_cell;
-	dofs_on_this_cell.reserve (DoFTools::max_dofs_per_cell(dof_handler));
-	typename DH::active_cell_iterator cell = dof_handler.begin_active(),
-					  endc = dof_handler.end();
-	for (; cell!=endc; ++cell) 
-	  {
-	    const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-	    dofs_on_this_cell.resize (dofs_per_cell);
-	    cell->get_dof_indices (dofs_on_this_cell);
+	{
+				   // create intermediate sparsity pattern
+				   // (faster than directly submitting
+				   // indices)
+	  ConstraintMatrix constraints;
+	  if (use_constraints) 
+	    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+	  constraints.close ();
+	  CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
+					       dof_handler.n_dofs());
+	  DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
 
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		add_edge(dofs_on_this_cell[i], dofs_on_this_cell[j], graph);
-	  }
-
+				   // submit the entries to the boost graph
+	  for (unsigned int row=0;row<csp.n_rows(); ++row)
+	    for (unsigned int col=0; col < csp.row_length(row); ++col)
+	      add_edge (row, csp.column_number (row, col), graph);
+	}
 
 	types::graph_traits<types::Graph>::vertex_iterator ui, ui_end;
 
