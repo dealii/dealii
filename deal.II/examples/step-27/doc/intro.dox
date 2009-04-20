@@ -719,10 +719,10 @@ Note the last <tt>false</tt> argument we pass when creating the sparsity
 pattern. It tells the sparsity pattern that constrained entries should not
 be inserted into the sparsity pattern. This makes sense for the way we're
 going to do assembly, which does the elimination of constraints already
-locally. Hence, we will never write touch the constrained entries. This is
-the second key to increase this program's performance, since the system
-matrix will have less entries &mdash; this saves both memory and computing
-time when doing matrix-vector multiplications or applying a preconditioner.
+locally. Hence, we will never write the constrained entries. This is the
+second key to increase this program's performance, since the system matrix
+will have less entries &mdash; this saves both memory and computing time
+when doing matrix-vector multiplications or applying a preconditioner.
 
 In a similar vein, we have to slightly modify the way we copy local
 contributions into global matrices and vectors. In previous tutorial programs,
@@ -750,7 +750,7 @@ we have always used a process like this:
   hanging_node_constraints.condense (system_rhs);
 @endcode
 We now replace copying and later condensing into one step, as already shown in
-@ref step_17 "step-17" and @ref step_18 "step-18":
+@ref step_17 "step-17", @ref step_18 "step-18", and @ref step_22 "step-22":
 @code
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -762,25 +762,28 @@ We now replace copying and later condensing into one step, as already shown in
       cell->get_dof_indices (local_dof_indices);
 
       hanging_node_constraints
-	.distribute_local_to_global (cell_matrix,
+	.distribute_local_to_global (cell_matrix, cell_rhs,
 				     local_dof_indices,
-				     system_matrix);
-	  
-      hanging_node_constraints
-	.distribute_local_to_global (cell_rhs,
-				     local_dof_indices,
-				     system_rhs);
+				     system_matrix, system_rhs);
     }
 @endcode
 Essentially, what the
-<code>hanging_node_constraints.distribute_local_to_global</code> calls do is
-to implement the same loop as before, but whenever we hit a constrained degree
+<code>hanging_node_constraints.distribute_local_to_global</code> call does is
+to implement the same loops as before, but whenever we hit a constrained degree
 of freedom, the function does the right thing and already condenses it away.
 
 Using this technique of eliminating constrained nodes already when
 transferring local contributions into the global objects, we avoid the problem
 of having to go back later and change these objects. Timing these operations
 shows that this makes the overall algorithms faster.
+
+In our program, we will also treat the boundary conditions as (possibly
+inhomogeneous) constraints and eliminate the matrix rows and columns to
+those as well. All we have to do for this is to call the function that
+interpolates the Dirichlet boundary conditions already in the setup phase in
+order to tell the ConstraintMatrix object about them, and then do the
+transfer from local to global data on matrix and vector simultaneously. This
+is exactly what we've shown in the @ref step_22 "step-22" tutorial program.
 
 
 <h3>The test case</h3>

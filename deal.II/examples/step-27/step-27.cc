@@ -118,7 +118,7 @@ class LaplaceProblem
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim-1>   face_quadrature_collection;
 
-    ConstraintMatrix     hanging_node_constraints;
+    ConstraintMatrix     constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -212,25 +212,35 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 				 //
 				 // This function is again an almost
 				 // verbatim copy of what we already did in
-				 // step-6, with the main difference that we
-				 // don't directly build the sparsity
-				 // pattern, but first create an
-				 // intermediate object that we later copy
-				 // into the right data structure. In
+				 // step-6. The first change is that we
+				 // append the Dirichlet boundary conditions
+				 // to the ConstraintMatrix object, which we
+				 // consequently call just
+				 // <code>constraints</code> instead of
+				 // <code>hanging_node_constraints</code>. The
+				 // second difference is that we don't
+				 // directly build the sparsity pattern, but
+				 // first create an intermediate object that
+				 // we later copy into the usual
+				 // SparsityPattern data structure, since
+				 // this is more efficient for the problem
+				 // with many entries per row (and different
+				 // number of entries in different rows). In
 				 // another slight deviation, we do not
-				 // first build the sparsity pattern then
-				 // condense away constrained degrees of
-				 // freedom, but pass the constraint matrix
-				 // object directly to the function that
-				 // builds the sparsity pattern. We disable
-				 // the insertion of constrained entries
-				 // with <tt>false</tt> as fourth argument
-				 // in the DoFTools::make_sparsity_pattern
-				 // function. Both of these changes are
+				 // first build the sparsity pattern and
+				 // then condense away constrained degrees
+				 // of freedom, but pass the constraint
+				 // matrix object directly to the function
+				 // that builds the sparsity pattern. We
+				 // disable the insertion of constrained
+				 // entries with <tt>false</tt> as fourth
+				 // argument in the
+				 // DoFTools::make_sparsity_pattern
+				 // function. All of these changes are
 				 // explained in the introduction of this
 				 // program.
 				 //
-				 // The second change, maybe hidden in plain
+				 // The last change, maybe hidden in plain
 				 // sight, is that the dof_handler variable
 				 // here is an hp object -- nevertheless all
 				 // the function calls we had before still
@@ -244,15 +254,18 @@ void LaplaceProblem<dim>::setup_system ()
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 
-  hanging_node_constraints.clear ();
+  constraints.clear ();
+  VectorTools::interpolate_boundary_values (dof_handler,
+					    0,
+					    ZeroFunction<dim>(),
+					    constraints);
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
-  hanging_node_constraints.close ();
+					   constraints);
+  constraints.close ();
 
   CompressedSetSparsityPattern csp (dof_handler.n_dofs(),
 				    dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, csp,
-				   hanging_node_constraints, false);
+  DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
   sparsity_pattern.copy_from (csp);
 
   system_matrix.reinit (sparsity_pattern);
@@ -319,7 +332,7 @@ void LaplaceProblem<dim>::assemble_system ()
   Vector<double>       cell_rhs;
 
   std::vector<unsigned int> local_dof_indices;
-  
+
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -359,31 +372,21 @@ void LaplaceProblem<dim>::assemble_system ()
       local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
 
-      hanging_node_constraints
-	.distribute_local_to_global (cell_matrix,
-				     local_dof_indices,
-				     system_matrix);
-	  
-      hanging_node_constraints
-	.distribute_local_to_global (cell_rhs,
-				     local_dof_indices,
-				     system_rhs);
+      constraints.distribute_local_to_global (cell_matrix, cell_rhs,
+					      local_dof_indices,
+					      system_matrix, system_rhs);
     }
 
-				   // After the steps already discussed above,
-				   // all we still have to do is to treat
-				   // Dirichlet boundary values
-				   // correctly. This works in exactly the
-				   // same way as for non-<i>hp</i> objects:
-  std::map<unsigned int,double> boundary_values;
-  VectorTools::interpolate_boundary_values (dof_handler,
-					    0,
-					    ZeroFunction<dim>(),
-					    boundary_values);
-  MatrixTools::apply_boundary_values (boundary_values,
-				      system_matrix,
-				      solution,
-				      system_rhs);
+				   // Now with the loop over all cells
+				   // finished, we are done for this
+				   // function. The steps we still had to do
+				   // at this point in earlier tutorial
+				   // programs, namely condensing hanging
+				   // node constraints and applying
+				   // Dirichlet boundary conditions, have
+				   // been taken care of by the
+				   // ConstraintMatrix object
+				   // <code>constraints</code> on the fly.
 }
 
 
@@ -409,7 +412,7 @@ void LaplaceProblem<dim>::solve ()
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
 
-  hanging_node_constraints.distribute (solution);
+  constraints.distribute (solution);
 }
 
 
@@ -515,9 +518,9 @@ void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
 				     // VTK format):
     const std::string filename = "solution-" +
 				 Utilities::int_to_string (cycle, 2) +
-				 ".gmv";
+				 ".vtk";
     std::ofstream output (filename.c_str());
-    data_out.write_gmv (output);
+    data_out.write_vtk (output);
   }
 
 				   // After this, we would like to actually
@@ -739,7 +742,7 @@ void LaplaceProblem<dim>::run ()
 		<< dof_handler.n_dofs()
 		<< std::endl
 		<< "   Number of constraints       : "
-		<< hanging_node_constraints.n_constraints()
+		<< constraints.n_constraints()
 		<< std::endl;
 
       assemble_system ();
