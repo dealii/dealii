@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1155,9 +1155,10 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
-					 const Vector<somenumber> &src,
-					 const number              om) const
+SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
+					 const Vector<somenumber>        &src,
+					 const number                     om,
+					 const std::vector<unsigned int> &pos_right_of_diagonal) const
 {
 				   // to understand how this function works
 				   // you may want to take a look at the CVS
@@ -1175,6 +1176,55 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
   const std::size_t  *rowstart_ptr = &cols->rowstart[0];
   somenumber         *dst_ptr      = &dst(0);
 
+				   // case when we have stored the position
+				   // just right of the diagonal (then we
+				   // don't have to search for it).
+  if (pos_right_of_diagonal.size() != 0)
+    {
+      Assert (pos_right_of_diagonal.size() == dst.size(),
+	      ExcDimensionMismatch (pos_right_of_diagonal.size(), dst.size()));
+
+				   // forward sweep
+      for (unsigned int row=0; row<n; ++row, ++dst_ptr, ++rowstart_ptr)
+	{
+	  *dst_ptr = src(row);
+	  const unsigned int first_right_of_diagonal_index = 
+	    pos_right_of_diagonal[row];
+	  Assert (first_right_of_diagonal_index <= *(rowstart_ptr+1),
+		  ExcInternalError());
+	  double s = *dst_ptr;
+	  for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
+	    s -= val[j] * dst(cols->colnums[j]);
+
+				   // divide by diagonal element
+	  *dst_ptr = s * om / val[*rowstart_ptr];
+	};
+  
+      rowstart_ptr = &cols->rowstart[0];
+      dst_ptr      = &dst(0);
+      for (unsigned int row=0; row<n; ++row, ++rowstart_ptr, ++dst_ptr)
+	*dst_ptr *= (2.-om)*val[*rowstart_ptr];
+
+				   // backward sweep
+      rowstart_ptr = &cols->rowstart[n-1];
+      dst_ptr      = &dst(n-1);
+      for (int row=n-1; row>=0; --row, --rowstart_ptr, --dst_ptr)
+	{
+	  const unsigned int end_row = *(rowstart_ptr+1);
+	  const unsigned int first_right_of_diagonal_index
+	    = pos_right_of_diagonal[row];
+	  double s = *dst_ptr;
+	  for (unsigned int j=first_right_of_diagonal_index; j<end_row; ++j)
+	    s -= val[j] * dst(cols->colnums[j]);
+      
+	  *dst_ptr = s * om / val[*rowstart_ptr];
+	};
+      return;
+    }
+
+				   // case when we need to get the position
+				   // of the first element right of the
+				   // diagonal manually for each sweep.
 				   // forward sweep
   for (unsigned int row=0; row<n; ++row, ++dst_ptr, ++rowstart_ptr)
     {

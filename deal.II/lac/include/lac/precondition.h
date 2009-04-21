@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -459,6 +459,26 @@ template <class MATRIX = SparseMatrix<double> >
 class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 {
   public:
+
+				     /**
+				      * A typedef to the base class.
+				      */
+    typedef PreconditionRelaxation<MATRIX> BaseClass;
+
+	
+				     /**
+				      * Initialize matrix and
+				      * relaxation parameter. The
+				      * matrix is just stored in the
+				      * preconditioner object. The
+				      * relaxation parameter should be
+				      * larger than zero and smaller
+				      * than 2 for numerical
+				      * reasons. It defaults to 1.
+				      */
+    void initialize (const MATRIX &A,
+		     typename BaseClass::AdditionalData parameters = BaseClass::AdditionalData());
+
 				     /**
 				      * Apply preconditioner.
 				      */
@@ -474,6 +494,14 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+
+  private:
+				     /**
+				      * An array that stores for each matrix
+				      * row where the first position after
+				      * the diagonal is located.
+				      */
+    std::vector<unsigned int> pos_right_of_diagonal;
 };
 
 
@@ -894,12 +922,45 @@ PreconditionSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 //---------------------------------------------------------------------------
 
 template <class MATRIX>
+inline void
+PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
+				      typename BaseClass::AdditionalData parameters)
+{
+  this->PreconditionRelaxation<MATRIX>::initialize (rA, parameters);
+
+				   // calculate the positions first after
+				   // the diagonal.
+  const std::size_t  * rowstart_ptr = 
+    this->A->get_sparsity_pattern().get_rowstart_indices();
+  const unsigned int * const colnums = 
+    this->A->get_sparsity_pattern().get_column_numbers();
+  const unsigned int n = this->A->n();
+  pos_right_of_diagonal.resize(n);
+  for (unsigned int row=0; row<n; ++row, ++rowstart_ptr)
+    {
+				       // find the first element in this line
+				       // which is on the right of the diagonal.
+				       // we need to precondition with the
+				       // elements on the left only.
+				       // note: the first entry in each
+				       // line denotes the diagonal element,
+				       // which we need not check.
+      pos_right_of_diagonal[row] = 
+	std::lower_bound (&colnums[*rowstart_ptr+1],
+			  &colnums[*(rowstart_ptr+1)],
+			  row)
+	- colnums;
+    }
+}
+
+
+template <class MATRIX>
 template<class VECTOR>
 inline void
 PreconditionSSOR<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
-  this->A->precondition_SSOR (dst, src, this->relaxation);
+  this->A->precondition_SSOR (dst, src, this->relaxation, pos_right_of_diagonal);
 }
 
 

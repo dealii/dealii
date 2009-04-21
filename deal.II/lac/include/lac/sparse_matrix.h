@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -714,17 +714,20 @@ class SparseMatrix : public virtual Subscriptor
 
 				     /**
 				      * Return the number of actually
-				      * nonzero elements of this
-				      * matrix.
+				      * nonzero elements of this matrix. It
+				      * is possible to specify the parameter
+				      * <tt>threshold</tt> in order to count
+				      * only the elements that have absolute
+				      * value greater than the threshold.
 				      *
-				      * Note, that this function does
-				      * (in contrary to
-				      * n_nonzero_elements()) not
-				      * count all entries of the
-				      * sparsity pattern but only the
-				      * ones that are nonzero.
+				      * Note, that this function does (in
+				      * contrary to n_nonzero_elements())
+				      * not count all entries of the
+				      * sparsity pattern but only the ones
+				      * that are nonzero (or whose absolute
+				      * value is greater than threshold).
 				      */
-    unsigned int n_actually_nonzero_elements () const;
+    unsigned int n_actually_nonzero_elements (const double threshold = 0.) const;
     
 				     /**
 				      * Return a (constant) reference
@@ -1472,9 +1475,10 @@ class SparseMatrix : public virtual Subscriptor
 				      * <tt>src</tt>.
 				      */
     template <typename somenumber>
-    void precondition_SSOR (Vector<somenumber>       &dst,
-			    const Vector<somenumber> &src,
-			    const number              om = 1.) const;
+    void precondition_SSOR (Vector<somenumber>             &dst,
+			    const Vector<somenumber>       &src,
+			    const number                    om = 1.,
+			    const std::vector<unsigned int>&pos_right_of_diagonal=std::vector<unsigned int>()) const;
 
 				     /**
 				      * Apply SOR preconditioning

@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
  * 
- * @author Wolfgang Bangerth, 2008; unified interface: Ralf Hartmann
+ * @author Wolfgang Bangerth, 2008, 2009; unified interface: Ralf Hartmann
  */
 template <typename number>
 class SparseILU : public SparseLUDecomposition<number>
