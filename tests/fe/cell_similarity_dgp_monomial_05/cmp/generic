@@ -1,0 +1,49 @@
+
+DEAL::FE=FE_DGPMonomial<2>(1)
+DEAL::Mapping=Q2
+DEAL::Mass matrices are not equal.
+DEAL::Laplace matrices are not equal.
+DEAL::cell=0
+DEAL::mass_matrix:
+DEAL::0.9296 0.3715 0.3446 
+DEAL::0.3715 0.2166 0.1883 
+DEAL::0.3446 0.1883 0.1897 
+DEAL::laplace_matrix:
+DEAL::0 0 0 
+DEAL::0 1.930 1.352 
+DEAL::0 1.352 4.800 
+DEAL::cell=1
+DEAL::mass_matrix:
+DEAL::1.000 0.5000 0.5000 
+DEAL::0.5000 0.3333 0.2500 
+DEAL::0.5000 0.2500 0.3333 
+DEAL::laplace_matrix:
+DEAL::0 0 0 
+DEAL::0 1.000 0 
+DEAL::0 0 1.000 
+DEAL::FE=FE_DGPMonomial<3>(1)
+DEAL::Mapping=Q2
+DEAL::Mass matrices are not equal.
+DEAL::Laplace matrices are not equal.
+DEAL::cell=0
+DEAL::mass_matrix:
+DEAL::0.8419 0.3942 0.3606 0.3606 
+DEAL::0.3942 0.2539 0.1892 0.1892 
+DEAL::0.3606 0.1892 0.2203 0.1794 
+DEAL::0.3606 0.1892 0.1794 0.2203 
+DEAL::laplace_matrix:
+DEAL::0 0 0 0 
+DEAL::0 1.041 0.4212 0.4212 
+DEAL::0 0.4212 1.312 0.4953 
+DEAL::0 0.4212 0.4953 1.312 
+DEAL::cell=1
+DEAL::mass_matrix:
+DEAL::1.000 0.5000 0.5000 0.5000 
+DEAL::0.5000 0.3333 0.2500 0.2500 
+DEAL::0.5000 0.2500 0.3333 0.2500 
+DEAL::0.5000 0.2500 0.2500 0.3333 
+DEAL::laplace_matrix:
+DEAL::0 0 0 0 
+DEAL::0 1.000 0 0 
+DEAL::0 0 1.000 0 
+DEAL::0 0 0 1.000 
