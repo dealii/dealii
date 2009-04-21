@@ -163,6 +163,7 @@ int main()
   std::ofstream logfile("fe_tools/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog << std::setprecision(5);
   deallog.threshold_double(1.e-8);
 
   test_projection<2>(logfile);
