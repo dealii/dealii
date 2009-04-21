@@ -2,7 +2,7 @@
 //    transfer.cc,v 1.13 2005/12/30 16:07:03 guido Exp
 //    Version: 
 //
-//    Copyright (C) 2000 - 2007 by the deal.II authors
+//    Copyright (C) 2000 - 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -121,7 +121,7 @@ void check_simple(const FiniteElement<dim>& fe)
 int main()
 {
   std::ofstream logfile("transfer/output");
-  deallog << std::setprecision(3);
+  deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
