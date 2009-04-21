@@ -18,6 +18,7 @@
 #include <base/config.h>
 #include <lac/vector_memory.h>
 #include <base/smartpointer.h>
+#include <base/template_constraints.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -928,16 +929,24 @@ PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
 {
   this->PreconditionRelaxation<MATRIX>::initialize (rA, parameters);
 
+				   // in case we have a SparseMatrix class,
+				   // we can extract information about the
+				   // diagonal.
+  const SparseMatrix<typename MATRIX::value_type> * mat = 
+    dynamic_cast<const SparseMatrix<typename MATRIX::value_type> *>(&*this->A);   
+
 				   // calculate the positions first after
 				   // the diagonal.
-  const std::size_t  * rowstart_ptr = 
-    this->A->get_sparsity_pattern().get_rowstart_indices();
-  const unsigned int * const colnums = 
-    this->A->get_sparsity_pattern().get_column_numbers();
-  const unsigned int n = this->A->n();
-  pos_right_of_diagonal.resize(n);
-  for (unsigned int row=0; row<n; ++row, ++rowstart_ptr)
+  if (mat != 0)
     {
+      const std::size_t  * rowstart_ptr = 
+	mat->get_sparsity_pattern().get_rowstart_indices();
+      const unsigned int * const colnums = 
+	mat->get_sparsity_pattern().get_column_numbers();
+      const unsigned int n = this->A->n();
+      pos_right_of_diagonal.resize(n);
+      for (unsigned int row=0; row<n; ++row, ++rowstart_ptr)
+	{
 				       // find the first element in this line
 				       // which is on the right of the diagonal.
 				       // we need to precondition with the
@@ -945,11 +954,12 @@ PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
 				       // note: the first entry in each
 				       // line denotes the diagonal element,
 				       // which we need not check.
-      pos_right_of_diagonal[row] = 
-	std::lower_bound (&colnums[*rowstart_ptr+1],
-			  &colnums[*(rowstart_ptr+1)],
-			  row)
-	- colnums;
+	  pos_right_of_diagonal[row] = 
+	    std::lower_bound (&colnums[*rowstart_ptr+1],
+			      &colnums[*(rowstart_ptr+1)],
+			      row)
+	    - colnums;
+	}
     }
 }
 
@@ -971,7 +981,7 @@ inline void
 PreconditionSSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
-  this->A->precondition_SSOR (dst, src, this->relaxation);
+  this->A->precondition_SSOR (dst, src, this->relaxation, pos_right_of_diagonal);
 }
 
 

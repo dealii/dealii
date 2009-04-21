@@ -1192,7 +1192,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 	    pos_right_of_diagonal[row];
 	  Assert (first_right_of_diagonal_index <= *(rowstart_ptr+1),
 		  ExcInternalError());
-	  double s = *dst_ptr;
+	  number s = *dst_ptr;
 	  for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
 	    s -= val[j] * dst(cols->colnums[j]);
 
@@ -1213,7 +1213,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 	  const unsigned int end_row = *(rowstart_ptr+1);
 	  const unsigned int first_right_of_diagonal_index
 	    = pos_right_of_diagonal[row];
-	  double s = *dst_ptr;
+	  number s = *dst_ptr;
 	  for (unsigned int j=first_right_of_diagonal_index; j<end_row; ++j)
 	    s -= val[j] * dst(cols->colnums[j]);
       
@@ -1243,7 +1243,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 	   -
 	   &cols->colnums[0]);
 
-      double s = *dst_ptr;
+      number s = *dst_ptr;
       for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
 	s -= val[j] * dst(cols->colnums[j]);
 
@@ -1267,10 +1267,9 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 								   &cols->colnums[end_row],
 								   static_cast<unsigned int>(row)) -
 	   &cols->colnums[0]);
-      double s = *dst_ptr;
+      number s = *dst_ptr;
       for (unsigned int j=first_right_of_diagonal_index; j<end_row; ++j)
 	s -= val[j] * dst(cols->colnums[j]);
-      
       *dst_ptr = s * om / val[*rowstart_ptr];
     };
 }

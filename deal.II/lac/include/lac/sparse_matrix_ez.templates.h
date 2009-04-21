@@ -326,7 +326,8 @@ template <typename somenumber>
 void
 SparseMatrixEZ<number>::precondition_SSOR (Vector<somenumber>       &dst,
 					   const Vector<somenumber> &src,
-					   const number              om) const
+					   const number              om,
+					   const std::vector<unsigned int> &) const
 {
   Assert (m() == n(), ExcNotQuadratic());
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
@@ -344,9 +345,9 @@ SparseMatrixEZ<number>::precondition_SSOR (Vector<somenumber>       &dst,
       number s = *src_ptr;
       const unsigned int end_row = ri->start + ri->diagonal;
       for (unsigned int i=ri->start;i<end_row;++i)
-	s -= om * data[i].value * dst(data[i].column);
+	s -= data[i].value * dst(data[i].column);
       
-      *dst_ptr = s / data[ri->start + ri->diagonal].value;
+      *dst_ptr = s * om / data[ri->start + ri->diagonal].value;
     }
 				   // Diagonal
   dst_ptr = dst.begin();
@@ -361,9 +362,11 @@ SparseMatrixEZ<number>::precondition_SSOR (Vector<somenumber>       &dst,
    for (rri = row_info.rbegin(); rri != rend; --dst_ptr, ++rri)
      {
       const unsigned int end_row = rri->start + rri->length;
+      number s = *dst_ptr;
       for (unsigned int i=rri->start+rri->diagonal+1;i<end_row;++i)
-	*dst_ptr -= om * data[i].value * dst(data[i].column);
-      *dst_ptr /= data[rri->start + rri->diagonal].value;
+	s -= om * data[i].value * dst(data[i].column);
+
+      *dst_ptr = s * om / data[rri->start + rri->diagonal].value;
      }
 }
 

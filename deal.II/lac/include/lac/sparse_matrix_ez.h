@@ -713,7 +713,8 @@ class SparseMatrixEZ : public Subscriptor
     template <typename somenumber>
     void precondition_SSOR (Vector<somenumber>       &dst,
 			    const Vector<somenumber> &src,
-			    const number              om = 1.) const;
+			    const number              om = 1.,
+			    const std::vector<unsigned int> &pos_right_of_diagonal = std::vector<unsigned int>()) const;
 
 				     /**
 				      * Apply SOR preconditioning matrix to @p src.
