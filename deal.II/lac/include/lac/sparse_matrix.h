@@ -441,7 +441,7 @@ namespace internals
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
  *
- * @author Essentially everyone who has ever worked on deal.II, 1994-2004
+ * @author Essentially everyone who has ever worked on deal.II, 1994-2007
  */
 template <typename number>
 class SparseMatrix : public virtual Subscriptor
@@ -453,6 +453,27 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     typedef number value_type;
 
+				     /**
+				      * Declare a type that has holds
+				      * real-valued numbers with the
+				      * same precision as the template
+				      * argument to this class. If the
+				      * template argument of this
+				      * class is a real data type,
+				      * then real_type equals the
+				      * template argument. If the
+				      * template argument is a
+				      * std::complex type then
+				      * real_type equals the type
+				      * underlying the complex
+				      * numbers.
+				      *
+				      * This typedef is used to
+				      * represent the return type of
+				      * norms.
+				      */
+    typedef typename numbers::NumberTraits<number>::real_type real_type;
+    
                                      /**
                                       * Typedef of an STL conforming iterator
                                       * class walking over all the nonzero
@@ -1376,8 +1397,17 @@ class SparseMatrix : public virtual Subscriptor
 				      * nodal values of the finite
 				      * element function.
 				      *
-				      * Obviously, the matrix needs to
-				      * be quadratic for this operation.
+				      * Obviously, the matrix needs to be
+				      * quadratic for this operation, and for
+				      * the result to actually be a norm it
+				      * also needs to be either real symmetric
+				      * or complex hermitian.
+				      *
+				      * The underlying template types of both
+				      * this matrix and the given vector
+				      * should either both be real or
+				      * complex-valued, but not mixed, for
+				      * this function to make sense.
 				      */
     template <typename somenumber>
     somenumber matrix_norm_square (const Vector<somenumber> &v) const;
@@ -1389,6 +1419,7 @@ class SparseMatrix : public virtual Subscriptor
     template <typename somenumber>
     somenumber matrix_scalar_product (const Vector<somenumber> &u,
 				      const Vector<somenumber> &v) const;
+    
 				     /**
 				      * Compute the residual of an
 				      * equation <i>Mx=b</i>, where
@@ -1426,7 +1457,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * $|Mv|_1\leq |M|_1 |v|_1$.
 				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
 				      */
-    number l1_norm () const;
+    real_type l1_norm () const;
 
     				     /**
 				      * Return the linfty-norm of the
@@ -1440,7 +1471,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * $|Mv|_infty \leq |M|_infty |v|_infty$.
 				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
 				      */
-    number linfty_norm () const;
+    real_type linfty_norm () const;
 
                                      /**
                                       * Return the frobenius norm of the
@@ -1448,7 +1479,7 @@ class SparseMatrix : public virtual Subscriptor
                                       * sum of squares of all entries in the
                                       * matrix.
                                       */
-    number frobenius_norm () const;
+    real_type frobenius_norm () const;
 //@}
 /**
  * @name Preconditioning methods

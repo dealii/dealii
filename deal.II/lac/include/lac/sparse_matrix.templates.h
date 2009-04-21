@@ -41,6 +41,7 @@
 #include <base/thread_management.h>
 #include <base/multithread_info.h>
 
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -778,11 +779,11 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 	  while (val_ptr != val_end_of_row)
 	    s += *val_ptr++ * v(*colnum_ptr++);
 	  
-	  sum += s* v(row);
-	};
+	  sum += v(row) * numbers::NumberTraits<somenumber>::conjugate(s);
+	}
       
       return sum;
-    };
+    }
 }
 
 
@@ -810,8 +811,9 @@ threaded_matrix_norm_square (const Vector<somenumber> &v,
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * v(*colnum_ptr++);
 
-      sum += s* v(row);
-    };
+      sum += v(row) * numbers::NumberTraits<somenumber>::conjugate(s);
+    }
+  
   *partial_sum = sum;
 }
 
@@ -891,11 +893,11 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 	  while (val_ptr != val_end_of_row)
 	    s += *val_ptr++ * v(*colnum_ptr++);
 	  
-	  sum += s* u(row);
-	};
+	  sum += u(row) * numbers::NumberTraits<somenumber>::conjugate(s);
+	}
       
       return sum;
-    };
+    }
 }
 
 
@@ -924,8 +926,9 @@ threaded_matrix_scalar_product (const Vector<somenumber> &u,
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * v(*colnum_ptr++);
 
-      sum += s* u(row);
-    };
+      sum += u(row) * numbers::NumberTraits<somenumber>::conjugate(s);
+    }
+  
   *partial_sum = sum;
 }
 
@@ -934,16 +937,17 @@ threaded_matrix_scalar_product (const Vector<somenumber> &u,
 
 
 template <typename number>
-number SparseMatrix<number>::l1_norm () const
+typename SparseMatrix<number>::real_type
+SparseMatrix<number>::l1_norm () const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
 
-  Vector<number> column_sums(n());
+  Vector<real_type> column_sums(n());
   const unsigned int n_rows = m();
   for (unsigned int row=0; row<n_rows; ++row)
     for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1] ; ++j)
-      column_sums(cols->colnums[j]) += std::fabs(val[j]);
+      column_sums(cols->colnums[j]) += numbers::NumberTraits<number>::abs(val[j]);
 
   return column_sums.linfty_norm();
 }
@@ -951,21 +955,22 @@ number SparseMatrix<number>::l1_norm () const
 
 
 template <typename number>
-number SparseMatrix<number>::linfty_norm () const
+typename SparseMatrix<number>::real_type
+SparseMatrix<number>::linfty_norm () const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
 
   const number *val_ptr = &val[cols->rowstart[0]];
 
-  number sum, max=0;
+  real_type max=0;
   const unsigned int n_rows = m();
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      sum=0;
+      real_type sum = 0;
       const number *const val_end_of_row = &val[cols->rowstart[row+1]];
       while (val_ptr != val_end_of_row)
-	sum += std::fabs(*val_ptr++);
+	sum += numbers::NumberTraits<number>::abs(*val_ptr++);
       if (sum > max)
 	max = sum;
     }
@@ -975,16 +980,17 @@ number SparseMatrix<number>::linfty_norm () const
 
 
 template <typename number>
-number SparseMatrix<number>::frobenius_norm () const
+typename SparseMatrix<number>::real_type
+SparseMatrix<number>::frobenius_norm () const
 {
                                    // simply add up all entries in the
                                    // sparsity pattern, without taking any
                                    // reference to rows or columns
-  number norm_sqr = 0;
+  real_type norm_sqr = 0;
   const unsigned int n_rows = m();
   for (const number *ptr = &val[0];
        ptr != &val[cols->rowstart[n_rows]]; ++ptr)
-    norm_sqr += *ptr * *ptr;
+    norm_sqr +=  numbers::NumberTraits<number>::abs_square(*ptr);
 
   return std::sqrt (norm_sqr);
 }
