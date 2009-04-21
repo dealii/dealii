@@ -287,7 +287,7 @@ void AdvectionProblem<dim>::assemble_reference ()
 				      reference_rhs);
 
   deallog << "  Reference matrix nonzeros: " << reference_matrix.n_nonzero_elements() 
-	  << ", actually: " << reference_matrix.n_actually_nonzero_elements () 
+	  << ", actually: " << reference_matrix.n_actually_nonzero_elements (1e-12) 
 	  << std::endl;
 }
 
@@ -357,7 +357,7 @@ void AdvectionProblem<dim>::assemble_test_1 ()
 
   test_all_constraints.condense (test_matrix, test_rhs);
   deallog << "  Test matrix 1 nonzeros: " << test_matrix.n_nonzero_elements() 
-	  << ", actually: " << test_matrix.n_actually_nonzero_elements () 
+	  << ", actually: " << test_matrix.n_actually_nonzero_elements (1e-12) 
 	  << std::endl;
 
   test_equality();
@@ -427,7 +427,7 @@ void AdvectionProblem<dim>::assemble_test_2 ()
 						       test_rhs);
     }
   deallog << "  Test matrix 2 nonzeros: " << test_matrix.n_nonzero_elements() 
-	  << ", actually: " << test_matrix.n_actually_nonzero_elements () 
+	  << ", actually: " << test_matrix.n_actually_nonzero_elements (1e-12) 
 	  << std::endl;
   test_equality();
 }
