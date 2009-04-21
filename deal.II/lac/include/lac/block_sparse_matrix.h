@@ -204,11 +204,12 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 
 				     /**
 				      * Return the number of actually
-				      * nonzero elements. Just counts
-				      * the number of actually nonzero
-				      * elements of all the blocks.
+				      * nonzero elements. Just counts the
+				      * number of actually nonzero elements
+				      * (with absolute value larger than
+				      * threshold) of all the blocks.
 				      */
-    unsigned int n_actually_nonzero_elements () const;    
+    unsigned int n_actually_nonzero_elements (const double threshold = 0.0) const;    
 
 				     /**
 				      * Matrix-vector multiplication:
