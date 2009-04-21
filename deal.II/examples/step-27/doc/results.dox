@@ -13,41 +13,43 @@ examples/step-27> make run
 Cycle 0:
    Number of active cells:       768
    Number of degrees of freedom: 3264
-   Number of constraints       : 0
+   Number of constraints       : 384
 Cycle 1:
    Number of active cells:       996
    Number of degrees of freedom: 5327
-   Number of constraints       : 494
+   Number of constraints       : 962
 Cycle 2:
    Number of active cells:       1335
    Number of degrees of freedom: 8947
-   Number of constraints       : 1496
+   Number of constraints       : 2056
 Cycle 3:
    Number of active cells:       1626
    Number of degrees of freedom: 12994
-   Number of constraints       : 2707
+   Number of constraints       : 3355
 Cycle 4:
    Number of active cells:       1911
    Number of degrees of freedom: 17988
-   Number of constraints       : 4112
+   Number of constraints       : 4860
 Cycle 5:
    Number of active cells:       2577
    Number of degrees of freedom: 26936
-   Number of constraints       : 6196
+   Number of constraints       : 7074
 @endcode
 
-The first thing we learn from this is that the number of constrained
-degrees of freedom is on the order of 20-25% of the total number of
-degrees of freedom, at least on the later grids when we have elements
-of relatively high order (in 3d, the fraction of constrained degrees of
-freedom can be up to 30%). This is, in fact, on the same order of
-magnitude as for non-$hp$ discretizations. For example, in the last
-step of the @ref step_6 "step-6" program, we have 18401 degrees of
-freedom, 4104 of which are constrained. The difference is that in the
-latter program, each constrained hanging node is constrained against
-only the two adjacent degrees of freedom, whereas in the $hp$ case,
-constrained nodes are constrained against many more degrees of
-freedom. 
+The first thing we learn from this is that the number of constrained degrees
+of freedom is on the order of 20-25% of the total number of degrees of
+freedom, at least on the later grids when we have elements of relatively
+high order (in 3d, the fraction of constrained degrees of freedom can be up
+to 30%). This is, in fact, on the same order of magnitude as for non-$hp$
+discretizations. For example, in the last step of the @ref step_6 "step-6"
+program, we have 18401 degrees of freedom, 4104 of which are
+constrained. The difference is that in the latter program, each constrained
+hanging node is constrained against only the two adjacent degrees of
+freedom, whereas in the $hp$ case, constrained nodes are constrained against
+many more degrees of freedom. Note also that the current program also
+includes nodes subject to Dirichlet boundary conditions in the list of
+constraints. In cycle 0, all the constraints are actually because of
+boundary conditions.
 
 Of maybe more interest is to look at the graphical output. First, here is the
 solution of the problem:
