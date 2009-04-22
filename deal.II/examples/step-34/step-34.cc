@@ -29,8 +29,11 @@
 #include <base/utilities.h>
 
 #include <lac/full_matrix.h>
+#include <lac/matrix_lib.h>
 #include <lac/vector.h>
-#include <lac/sparse_direct.h>
+#include <lac/solver_control.h>
+#include <lac/solver_gmres.h>
+#include <lac/precondition.h>
 
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -85,15 +88,15 @@ namespace LaplaceKernel
   {
     switch(dim)
       {
-	case 2:
-	    return (-std::log(R.norm()) / (2*numbers::PI) );
-
-	case 3:
-	    return (1./( R.norm()*4*numbers::PI ) );
-
-	default:
-	    Assert(false, ExcInternalError());
-	    return 0.;
+      case 2:
+	return (-std::log(R.norm()) / (2*numbers::PI) );
+	
+      case 3:
+	return (1./( R.norm()*4*numbers::PI ) );
+	
+      default:
+	Assert(false, ExcInternalError());
+	return 0.;
       }
   }
         
@@ -104,14 +107,14 @@ namespace LaplaceKernel
   {
     switch(dim)
       {
-	case 2:
-	    return R / ( -2*numbers::PI * R.square());
-	case 3:
-	    return R / ( -4*numbers::PI * R.square()*R.norm() );
-
-	default:
-	    Assert(false, ExcInternalError());
-	    return Point<dim>();
+      case 2:
+	return R / ( -2*numbers::PI * R.square());
+      case 3:
+	return R / ( -4*numbers::PI * R.square() * R.norm() );
+	
+      default:
+	Assert(false, ExcInternalError());
+	return Point<dim>();
       }
   }
 }
@@ -140,6 +143,8 @@ class BEMProblem
 {
   public:
     BEMProblem();
+
+    ~BEMProblem();
     
     void run();
 
@@ -185,38 +190,51 @@ class BEMProblem
 				     // are used where necessary.
     void assemble_system();
 
-				     // Notwithstanding the fact that
-				     // the matrix is full, we use a
-				     // SparseMatrix object and the
-				     // SparseDirectUMFPACK solver,
-				     // since in our experience it
-				     // works better than using, for
-				     // example, the LapackFullMatrix
-				     // class. Of course, using a
-				     // SparseMatrix object to store
-				     // the matrix is wasteful, but at
-				     // least for the moment that is
-				     // all the SparseDirectUMFPACK
-				     // class can deal with.
+				     // There are two options for the
+				     // solution of this problem. The
+				     // first is to use a direct
+				     // solver, and the second is to
+				     // use an iterative solver. We
+				     // opt for the second option.
 				     //
-				     // An alternative approach would
-				     // be the use of the GMRES
-				     // method; however the
-				     // construction of an efficient
-				     // preconditioner for boundary
-				     // element methods is not a
-				     // trivial issue, and we won't
-				     // treat this problem here.
+				     // The matrix that we assemble is
+				     // not symmetric, and we opt to
+				     // use the GMRES method; however
+				     // the construction of an
+				     // efficient preconditioner for
+				     // boundary element methods is
+				     // not a trivial issue. Here we
+				     // use a non preconditioned GMRES
+				     // solver. The options for the
+				     // iterative solver, such as the
+				     // tolerance, the maximum number
+				     // of iterations, are selected
+				     // through the parameter file.
 				     //
-				     // Moreover, we should notice
-				     // that the solution we will
-				     // obtain will only be unique up
-				     // to an additive constant. This
+				     // There is a catch, however. The
+				     // iterative solver has some
+				     // difficulties in treating our
+				     // matrix, because of its special
+				     // structure. The solution we are
+				     // trying to obtain will only be
+				     // unique up to an additive
+				     // constant: unless we eliminate
+				     // the constants from the
+				     // computation of the residuals,
+				     // the GMRES solver will not be
+				     // able to find a solution. This
 				     // is taken care of in the
 				     // <code>solve_system()</code>
-				     // method, which filters out the
-				     // mean value of the solution at
-				     // the end of the computation.
+				     // method, which constructs a
+				     // ProductMatrix between the
+				     // system matrix and a
+				     // MeanValueFilter class to
+				     // eliminate the mean value at
+				     // each iteration of GMRES. The
+				     // solution we obtain is already
+				     // with zero mean value, and the
+				     // solver converges very quickly,
+				     // even without a preconditioner.
     void solve_system();
 
 				     // Once we obtained the solution,
@@ -339,18 +357,35 @@ class BEMProblem
 				     // system might be solved by
 				     // direct LU decomposition, or by
 				     // iterative methods. In this
-				     // example we use the
-				     // SparseDirectUMFPACK solver,
-				     // applied to a "fake" sparse
-				     // matrix (a sparse matrix will
-				     // all entries different from
-				     // zero). We found that this
-				     // method is faster than using a
-				     // LapackFullMatrix object.
+				     // example we use an
+				     // unpreconditioned GMRES
+				     // method. Building a
+				     // preconditioner for BEM method
+				     // is non trivial, and we don't
+				     // treat this subject here.
+				     //
+				     // Notice, moreover, that
+				     // FullMatrix objects require
+				     // their dimensions to be passed
+				     // at construction time. We don't
+				     // know yet what dimension the
+				     // matrix will have, and we
+				     // instantiate only a
+				     // SmartPointer, which will later
+				     // be initialized to a new
+				     // FullMatrix. Since we construct
+				     // the actual matrix using the
+				     // new operator, we have to take
+				     // care of freeing the used
+				     // memory whenever we exit or
+				     // whenever we refine the
+				     // triangulation. This is done
+				     // both in the distructor and in
+				     // the refine_and_resize()
+				     // function.
 
-    SparsityPattern             sparsity;
-    SparseMatrix<double>        system_matrix;    
-    Vector<double>              system_rhs;
+    SmartPointer<FullMatrix<double> >        system_matrix;    
+    Vector<double>                           system_rhs;
 
 				     // The next two variables will
 				     // denote the solution $\phi$ as
@@ -424,6 +459,8 @@ class BEMProblem
 
     std_cxx0x::shared_ptr<Quadrature<dim-1> > quadrature;
     unsigned int singular_quadrature_order;
+    
+    SolverControl solver_control;
 
     unsigned int n_cycles;
     unsigned int external_refinement;
@@ -468,6 +505,17 @@ BEMProblem<dim>::BEMProblem()
 		dh(tria),
 		wind(dim)
 {}
+
+
+template <int dim>
+BEMProblem<dim>::~BEMProblem() {
+  if(system_matrix != 0) {
+      FullMatrix<double> * ptr = system_matrix;
+      system_matrix = 0;
+      delete ptr;
+  }
+}
+
 
 template <int dim> 
 void BEMProblem<dim>::read_parameters (const std::string &filename)
@@ -538,6 +586,19 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
 				   // us to have only one parameter
 				   // file for both 2 and 3
 				   // dimensional problems.
+				   //
+				   // Notice that from a mathematical
+				   // point of view, the wind function
+				   // on the boundary should satisfy
+				   // the condition
+				   // $\int_{\partial\Omega}
+				   // \mathbf{v}\cdot \mathbf{n} d
+				   // \Gamma = 0$, for the problem to
+				   // have a solution. If this
+				   // condition is not satisfied, then
+				   // no solution can be found, and
+				   // the solver will answer
+				   // erratically. 
   prm.enter_subsection("Wind function 2d");
   {
     Functions::ParsedFunction<2>::declare_parameters(prm, 2);
@@ -551,19 +612,28 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
     prm.set("Function expression", "1; 1; 1");
   }
   prm.leave_subsection();
-
+  
   prm.enter_subsection("Exact solution 2d");
   {
     Functions::ParsedFunction<2>::declare_parameters(prm);
-    prm.set("Function expression", "x+y");
+    prm.set("Function expression", "-x-y");
   }
   prm.leave_subsection();
 
   prm.enter_subsection("Exact solution 3d");
   {
     Functions::ParsedFunction<3>::declare_parameters(prm);
-    prm.set("Function expression", "x+y+z");
+    prm.set("Function expression", "-x-y-z");
   }
+  prm.leave_subsection();
+
+
+				   // In the solver section, we set
+				   // all SolverControl
+				   // parameters. The object will be
+				   // fed to the GMRES solver.
+  prm.enter_subsection("Solver");
+  SolverControl::declare_parameters(prm);
   prm.leave_subsection();
 
 				   // After declaring all these
@@ -603,6 +673,11 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
     exact_solution.parse_parameters(prm);
   }
   prm.leave_subsection();
+
+  prm.enter_subsection("Solver");
+  solver_control.parse_parameters(prm);
+  prm.leave_subsection();
+
 
 				   // Finally, here's another example
 				   // of how to use parameter files in
@@ -707,20 +782,10 @@ void BEMProblem<dim>::read_domain()
 				 // freedom, and resizes matrices and
 				 // vectors.
 				 //
-				 // Note that the matrix is a full
-				 // matrix and that consequently we
-				 // have to build a sparsity pattern
-				 // that contains every single
-				 // entry. Notwithstanding this fact,
-				 // the SparseMatrix class coupled
-				 // with the SparseDirectUMFPACK
-				 // solver are still faster than
-				 // Lapack solvers for full
-				 // matrices. The drawback is that we
-				 // need to assemble a full
-				 // SparsityPattern, which is not the
-				 // most efficient way to store a full
-				 // matrix.
+				 // Note that we need to handle the
+				 // FullMatrix system_matrix
+				 // carefully, since it requires the
+				 // size.
 
 template <int dim>
 void BEMProblem<dim>::refine_and_resize()
@@ -730,14 +795,13 @@ void BEMProblem<dim>::refine_and_resize()
   dh.distribute_dofs(fe);
     
   const unsigned int n_dofs =  dh.n_dofs();
-    
-  system_matrix.clear();
-  sparsity.reinit(n_dofs, n_dofs, n_dofs);
-  for(unsigned int i=0; i<n_dofs;++i)
-    for(unsigned int j=0; j<n_dofs; ++j)
-      sparsity.add(i,j);
-  sparsity.compress();
-  system_matrix.reinit(sparsity);
+  
+  if(system_matrix != 0) {
+      FullMatrix<double> * ptr = system_matrix;
+      system_matrix = 0;
+      delete ptr;
+  }
+  system_matrix = new FullMatrix<double> (n_dofs, n_dofs);
     
   system_rhs.reinit(n_dofs);
   phi.reinit(n_dofs);
@@ -1206,13 +1270,13 @@ void BEMProblem<dim>::assemble_system()
 	      delete singular_quadrature;
 	  }
             
-					   // Finally, we need to add the
-					   // contributions of the current
-					   // cell to the global matrix:
+					   // Finally, we need to add
+					   // the contributions of the
+					   // current cell to the
+					   // global matrix.
 	  for(unsigned int j=0; j<fe.dofs_per_cell; ++j) 
-	    system_matrix.add(i,
-			      local_dof_indices[j],
-			      local_matrix_row_i(j));
+	      (*system_matrix)(i,local_dof_indices[j]) 
+		  += local_matrix_row_i(j);
 	}
     }
 
@@ -1242,39 +1306,47 @@ void BEMProblem<dim>::assemble_system()
 				   // matrix:
   Vector<double> ones(dh.n_dofs());
   ones.add(-1.);
-
-  system_matrix.vmult(alpha, ones);
+  
+  system_matrix->vmult(alpha, ones);
+  alpha.add(1);
   for(unsigned int i = 0; i<dh.n_dofs(); ++i)
-    system_matrix.add(i,i,alpha(i));
+      (*system_matrix)(i,i) +=  alpha(i);
 }
 
 
 				 // @sect4{BEMProblem::solve_system}
 
 				 // The next function simply solves
-				 // the linear system. As described,
-				 // we use the SparseDirectUMFPACK
-				 // direct solver to compute the
-				 // inverse of the matrix (in reality
-				 // it only produces an LU
-				 // decomposition) and then apply this
-				 // inverse to the right hand side to
-				 // yield the solution.
+				 // the linear system.
 				 //
 				 // As mentioned in the introduction,
-				 // the solution is only known up to a
-				 // constant potential. We solve this
-				 // issue by subtracting the mean
-				 // value of the vector from each
-				 // vector entry to normalize it.
+				 // the fact that the system matrix
+				 // has a non null kernel, requires us
+				 // to be careful in case we wish to
+				 // use an iterative solver. To
+				 // address this issue, we use two new
+				 // instruments of the library: the
+				 // MeanValueFilter class, and the
+				 // ProductMatrix class. The
+				 // MeanValueFilter has the same
+				 // interface of a matrix, with the
+				 // effect of subtracting the mean
+				 // value to source vector. We cascade
+				 // this operator with the system
+				 // matrix, and we obtain a matrix
+				 // whose result is renormalized to a
+				 // zero mean value Vector. This
+				 // object is then passed to a GMRES
+				 // solver.
 template <int dim>
 void BEMProblem<dim>::solve_system()
 {
-  SparseDirectUMFPACK inverse_matrix;
-  inverse_matrix.initialize (system_matrix);
-  inverse_matrix.vmult (phi, system_rhs);
-
-  phi.add(-phi.mean_value());
+    PrimitiveVectorMemory<Vector<double> > mem;
+    MeanValueFilter filter;
+    ProductMatrix<Vector<double> > system(filter, *system_matrix, mem);
+	
+    SolverGMRES<Vector<double> > solver (solver_control);
+    solver.solve (system, phi, system_rhs, PreconditionIdentity());
 }
 
 
