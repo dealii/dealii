@@ -173,7 +173,6 @@ namespace DoFRenumbering
 			 types::Graph                                                   &graph,
 			 types::property_map<types::Graph,types::vertex_degree_t>::type &graph_degree)
       {
-	Assert (use_constraints == false, ExcNotImplemented());
 	{
 				   // create intermediate sparsity pattern
 				   // (faster than directly submitting

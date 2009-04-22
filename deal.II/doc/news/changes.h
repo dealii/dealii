@@ -32,6 +32,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p> 
+  Changed: The implementation of the reordering algorithms in the boost
+  namespace created multiple edges between two nodes. The new implementation 
+  submits not more than one edge, but that affects the ordering of the
+  degrees of freedom and deviates from previous behavior.
+  <br>
+  (Martin Kronbichler 2009/04/22)
+  </p>
+
+  <li>
+  <p> 
   Changed: The files implementing the class ConstraintMatrix are now
   saved in the lac/ subdirectory, named <code>constraint_matrix.h</code>
   and included by the line <code>\#include
@@ -619,10 +629,20 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Updated: The SparseMatrix::precondition_SSOR function was implemented 
+  inefficiently. The new implementation uses about half the instruction 
+  count and reduces execution times on typical applications by ten to 
+  thirty percent.
+  <br>
+  (Martin Kronbichler 2009/04/21)
+  </p>
+
+  <li>
+  <p>
   Updated: The SparseILU::vmult kernel has been re-written to use similar 
   data structures as SparseMatrix::vmult, which reduces the count of
-  operations by one third and the execution times on typical problems by
-  ten to twenty precent.
+  operations by one third and the execution times on typical applications
+  by ten to twenty percent.
   <br>
   (Martin Kronbichler 2009/04/16)
   </p>
