@@ -478,7 +478,7 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 				      * reasons. It defaults to 1.
 				      */
     void initialize (const MATRIX &A,
-		     typename BaseClass::AdditionalData parameters = BaseClass::AdditionalData());
+		     typename BaseClass::AdditionalData parameters = typename BaseClass::AdditionalData());
 
 				     /**
 				      * Apply preconditioner.
