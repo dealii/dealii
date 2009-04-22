@@ -111,41 +111,6 @@ namespace DoFRenumbering
 	T::operator++;
 	T::operator==;
     };
-
-
-
-/**
- * Provide comparator for DoFCellAccessors: it returns @p true if the center
- * of the second cell is downstream of the center of the first one with
- * respect to the direction given to the constructor.
- */
-    template <int dim>
-    struct CompareDownstream
-    {
-					 /**
-					  * Constructor.
-					  */
-	CompareDownstream (const Point<dim> &dir)
-			:
-			dir(dir) 
-	  {}
-					 /**
-					  * Return true if c1 < c2.
-					  */
-	template <class DHCellIterator>
-	bool operator () (const DHCellIterator &c1,
-			  const DHCellIterator &c2) const
-	  {
-	    const Point<dim> diff = c2->center() - c1->center();
-	    return (diff*dir > 0);
-	  }
-
-      private:
-					 /**
-					  * Flow direction.
-					  */
-	const Point<dim> dir;
-    };
   }
   
   namespace boost
@@ -1173,7 +1138,7 @@ namespace DoFRenumbering
   {
     std::vector<typename DH::cell_iterator>
       ordered_cells(dof.get_tria().n_active_cells());
-    const internal::CompareDownstream<dim> comparator(direction);
+    const CompareDownstream<typename DH::cell_iterator, dim> comparator(direction);
   
     typename DH::active_cell_iterator begin = dof.begin_active();
     typename DH::active_cell_iterator end = dof.end();
@@ -1197,7 +1162,7 @@ namespace DoFRenumbering
   {
     std::vector<typename DH::cell_iterator>
       ordered_cells(dof.get_tria().n_active_cells());
-    const internal::CompareDownstream<dim> comparator(direction);
+    const CompareDownstream<typename DH::cell_iterator, dim> comparator(direction);
   
     typename DH::active_cell_iterator begin = dof.begin_active();
     typename DH::active_cell_iterator end = dof.end();
@@ -1219,7 +1184,7 @@ namespace DoFRenumbering
   {
     std::vector<typename DH::cell_iterator>
       ordered_cells(dof.get_tria().n_active_cells());
-    const internal::CompareDownstream<dim> comparator(direction);
+    const CompareDownstream<typename DH::cell_iterator, dim> comparator(direction);
   
     typename DH::active_cell_iterator begin = dof.begin_active();
     typename DH::active_cell_iterator end = dof.end();
@@ -1271,7 +1236,7 @@ namespace DoFRenumbering
   {
     std::vector<typename MGDoFHandler<dim>::cell_iterator>
       ordered_cells(dof.get_tria().n_cells(level));
-    const internal::CompareDownstream<dim> comparator(direction);
+    const CompareDownstream<typename MGDoFHandler<dim>::cell_iterator, dim> comparator(direction);
   
     typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
     typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
@@ -1295,7 +1260,7 @@ namespace DoFRenumbering
   {
     std::vector<typename MGDoFHandler<dim>::cell_iterator>
       ordered_cells(dof.get_tria().n_cells(level));
-    const internal::CompareDownstream<dim> comparator(direction);
+    const CompareDownstream<typename MGDoFHandler<dim>::cell_iterator, dim> comparator(direction);
   
     typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
     typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);

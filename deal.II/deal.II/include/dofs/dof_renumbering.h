@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -365,6 +365,41 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace DoFRenumbering 
 {
+				   /**
+				    * Direction based comparator for
+				    * cell iterators: it returns @p
+				    * true if the center of the second
+				    * cell is downstream of the center
+				    * of the first one with respect to
+				    * the direction given to the
+				    * constructor.
+				    */
+  template <class Iterator, int dim>
+  struct CompareDownstream
+  {
+				       /**
+					* Constructor.
+					*/
+      CompareDownstream (const Point<dim> &dir)
+		      :
+		      dir(dir) 
+	{}
+				       /**
+					* Return true if c1 less c2.
+					*/
+      bool operator () (const Iterator &c1, const Iterator &c2) const
+	{
+	  const Point<dim> diff = c2->center() - c1->center();
+	  return (diff*dir > 0);
+	}
+      
+    private:
+				       /**
+					* Flow direction.
+					*/
+      const Point<dim> dir;
+  };
+  
 				   /**
 				    * A namespace for the
 				    * implementation of some
