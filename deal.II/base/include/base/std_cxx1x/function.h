@@ -10,26 +10,24 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__std_cxx0x_condition_variable_h
-#define __deal2__std_cxx0x_condition_variable_h
+#ifndef __deal2__std_cxx1x_function_h
+#define __deal2__std_cxx1x_function_h
 
 
 #include <base/config.h>
 
-#ifdef DEAL_II_CAN_USE_CXX0X
+#ifdef DEAL_II_CAN_USE_CXX1X
 
-#  include <condition_variable>
+#  include <functional>
 
 #else
 
-#  include <boost/thread/condition_variable.hpp>
+#include <boost/function.hpp>
 
 DEAL_II_NAMESPACE_OPEN
-namespace std_cxx0x
+namespace std_cxx1x
 {
-  using boost::condition_variable;
-  using boost::unique_lock;
-  using boost::adopt_lock;
+  using boost::function;
 }
 DEAL_II_NAMESPACE_CLOSE
 

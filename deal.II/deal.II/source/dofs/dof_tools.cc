@@ -1350,11 +1350,11 @@ namespace internal
       ensure_existence_of_master_dof_mask (const FiniteElement<dim,spacedim> &fe1,
 					   const FiniteElement<dim,spacedim> &fe2,
 					   const FullMatrix<double> &face_interpolation_matrix,
-					   std_cxx0x::shared_ptr<std::vector<bool> > &master_dof_mask)
+					   std_cxx1x::shared_ptr<std::vector<bool> > &master_dof_mask)
       {
 	if (master_dof_mask == 0)
 	  {
-	    master_dof_mask = std_cxx0x::shared_ptr<std::vector<bool> >
+	    master_dof_mask = std_cxx1x::shared_ptr<std::vector<bool> >
 			      (new std::vector<bool> (fe1.dofs_per_face));
 	    select_master_dofs_for_face_restriction (fe1,
 						     fe2,
@@ -1377,11 +1377,11 @@ namespace internal
       void
       ensure_existence_of_face_matrix (const FiniteElement<dim,spacedim> &fe1,
                                        const FiniteElement<dim,spacedim> &fe2,
-                                       std_cxx0x::shared_ptr<FullMatrix<double> > &matrix)
+                                       std_cxx1x::shared_ptr<FullMatrix<double> > &matrix)
       {
         if (matrix == 0)
           {
-            matrix = std_cxx0x::shared_ptr<FullMatrix<double> >
+            matrix = std_cxx1x::shared_ptr<FullMatrix<double> >
                      (new FullMatrix<double> (fe2.dofs_per_face,
                                               fe1.dofs_per_face));
             fe1.get_face_interpolation_matrix (fe2,
@@ -1400,11 +1400,11 @@ namespace internal
       ensure_existence_of_subface_matrix (const FiniteElement<dim,spacedim> &fe1,
                                           const FiniteElement<dim,spacedim> &fe2,
                                           const unsigned int        subface,
-                                          std_cxx0x::shared_ptr<FullMatrix<double> > &matrix)
+                                          std_cxx1x::shared_ptr<FullMatrix<double> > &matrix)
       {
         if (matrix == 0)
           {
-            matrix = std_cxx0x::shared_ptr<FullMatrix<double> >
+            matrix = std_cxx1x::shared_ptr<FullMatrix<double> >
                      (new FullMatrix<double> (fe2.dofs_per_face,
                                               fe1.dofs_per_face));
             fe1.get_subface_interpolation_matrix (fe2,
@@ -1428,7 +1428,7 @@ namespace internal
       void
       ensure_existence_of_split_face_matrix (const FullMatrix<double> &face_interpolation_matrix,
 					     const std::vector<bool> &master_dof_mask,
-					     std_cxx0x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > &split_matrix)
+					     std_cxx1x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > &split_matrix)
       {
 	AssertDimension (master_dof_mask.size(), face_interpolation_matrix.m());
 	Assert (std::count (master_dof_mask.begin(), master_dof_mask.end(), true) ==
@@ -1438,7 +1438,7 @@ namespace internal
         if (split_matrix == 0)
           {
             split_matrix
-	      = std_cxx0x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > >
+	      = std_cxx1x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > >
 	      (new std::pair<FullMatrix<double>,FullMatrix<double> >());
 
 	    const unsigned int n_master_dofs = face_interpolation_matrix.n();
@@ -2211,10 +2211,10 @@ namespace internal
                                        // only once, namely the first
                                        // time they are needed, and
                                        // then just reuse them
-      Table<2,std_cxx0x::shared_ptr<FullMatrix<double> > >
+      Table<2,std_cxx1x::shared_ptr<FullMatrix<double> > >
         face_interpolation_matrices (n_finite_elements (dof_handler),
                                      n_finite_elements (dof_handler));
-      Table<3,std_cxx0x::shared_ptr<FullMatrix<double> > >
+      Table<3,std_cxx1x::shared_ptr<FullMatrix<double> > >
         subface_interpolation_matrices (n_finite_elements (dof_handler),
                                         n_finite_elements (dof_handler),
                                         GeometryInfo<dim>::max_children_per_face);
@@ -2228,7 +2228,7 @@ namespace internal
 				       // are derived from the face
 				       // interpolation matrix as
 				       // described in the @ref hp_paper "hp paper"
-      Table<2,std_cxx0x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > >
+      Table<2,std_cxx1x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > >
         split_face_interpolation_matrices (n_finite_elements (dof_handler),
 					   n_finite_elements (dof_handler));
 
@@ -2237,7 +2237,7 @@ namespace internal
 				       // which of the degrees of freedom on
 				       // the coarse side of a refined face
 				       // will act as master dofs.
-      Table<2,std_cxx0x::shared_ptr<std::vector<bool> > >
+      Table<2,std_cxx1x::shared_ptr<std::vector<bool> > >
 	master_dof_masks (n_finite_elements (dof_handler),
 			  n_finite_elements (dof_handler));
       

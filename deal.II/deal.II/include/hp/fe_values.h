@@ -21,7 +21,7 @@
 #include <fe/fe_values.h>
 
 #include <map>
-#include <base/std_cxx0x/shared_ptr.h>
+#include <base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -163,7 +163,7 @@ namespace internal
                                           * as needed in
                                           * select_fe_values().
                                           */
-        Table<3,std_cxx0x::shared_ptr<FEValues> > fe_values_table;
+        Table<3,std_cxx1x::shared_ptr<FEValues> > fe_values_table;
 
                                          /**
                                           * Set of indices pointing at

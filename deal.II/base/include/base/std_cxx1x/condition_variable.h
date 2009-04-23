@@ -10,24 +10,26 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__std_cxx0x_mutex_h
-#define __deal2__std_cxx0x_mutex_h
+#ifndef __deal2__std_cxx1x_condition_variable_h
+#define __deal2__std_cxx1x_condition_variable_h
 
 
 #include <base/config.h>
 
-#ifdef DEAL_II_CAN_USE_CXX0X
+#ifdef DEAL_II_CAN_USE_CXX1X
 
-#  include <mutex>
+#  include <condition_variable>
 
 #else
 
-#  include <boost/thread/mutex.hpp>
+#  include <boost/thread/condition_variable.hpp>
 
 DEAL_II_NAMESPACE_OPEN
-namespace std_cxx0x
+namespace std_cxx1x
 {
-  using boost::mutex;
+  using boost::condition_variable;
+  using boost::unique_lock;
+  using boost::adopt_lock;
 }
 DEAL_II_NAMESPACE_CLOSE
 

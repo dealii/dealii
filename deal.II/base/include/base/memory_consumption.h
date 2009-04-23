@@ -15,7 +15,7 @@
 
 
 #include <base/config.h>
-#include <base/std_cxx0x/shared_ptr.h>
+#include <base/std_cxx1x/shared_ptr.h>
 #include <string>
 #include <vector>
 #include <utility>
@@ -379,7 +379,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const std_cxx0x::shared_ptr<T> &);
+  unsigned int memory_consumption (const std_cxx1x::shared_ptr<T> &);
     
 				   /**
 				    * For all other types which are
@@ -604,7 +604,7 @@ namespace MemoryConsumption
   template <typename T>
   inline
   unsigned int
-  memory_consumption (const std_cxx0x::shared_ptr<T> &ptr)
+  memory_consumption (const std_cxx1x::shared_ptr<T> &ptr)
   {
     return sizeof(ptr);
   }

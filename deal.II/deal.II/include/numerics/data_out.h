@@ -24,7 +24,7 @@
 #include <numerics/data_postprocessor.h>
 #include <numerics/data_component_interpretation.h>
 
-#include <base/std_cxx0x/shared_ptr.h>
+#include <base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1002,13 +1002,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * List of data elements with vectors of
 				      * values for each degree of freedom.
 				      */
-    std::vector<std_cxx0x::shared_ptr<DataEntryBase> >  dof_data;
+    std::vector<std_cxx1x::shared_ptr<DataEntryBase> >  dof_data;
 
 				     /**
 				      * List of data elements with vectors of
 				      * values for each cell.
 				      */
-    std::vector<std_cxx0x::shared_ptr<DataEntryBase> >  cell_data;
+    std::vector<std_cxx1x::shared_ptr<DataEntryBase> >  cell_data;
 
 				     /**
 				      * This is a list of patches that is
@@ -1044,7 +1044,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * extensive documentation.
 				      */
     virtual
-    std::vector<std_cxx0x::tuple<unsigned int, unsigned int, std::string> >
+    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const;
     
 				     /**

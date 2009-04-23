@@ -122,10 +122,10 @@ LogStream::get_stream()
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   unsigned int id = Threads::this_thread_id();
 
-  std_cxx0x::shared_ptr<std::ostringstream>& sptr = outstreams[id];
+  std_cxx1x::shared_ptr<std::ostringstream>& sptr = outstreams[id];
   if (sptr == 0)
     {
-      sptr = std_cxx0x::shared_ptr<std::ostringstream> (new std::ostringstream());
+      sptr = std_cxx1x::shared_ptr<std::ostringstream> (new std::ostringstream());
       sptr->setf(std::ios::showpoint | std::ios::left);
     } 
   return *sptr;

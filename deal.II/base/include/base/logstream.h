@@ -16,7 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
-#include <base/std_cxx0x/shared_ptr.h>
+#include <base/std_cxx1x/shared_ptr.h>
 
 #include <string>
 #include <stack>
@@ -414,7 +414,7 @@ class LogStream
 				     /**
 				      * Type of the stream map
 				      */
-    typedef std::map<unsigned int, std_cxx0x::shared_ptr<std::ostringstream> > stream_map_type;
+    typedef std::map<unsigned int, std_cxx1x::shared_ptr<std::ostringstream> > stream_map_type;
     
 				     /**
 				      * We generate a stringstream for

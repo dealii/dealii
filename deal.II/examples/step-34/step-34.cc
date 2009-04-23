@@ -435,7 +435,7 @@ class BEMProblem
     Functions::ParsedFunction<dim> wind;
     Functions::ParsedFunction<dim> exact_solution;
 
-    std_cxx0x::shared_ptr<Quadrature<dim-1> > quadrature;
+    std_cxx1x::shared_ptr<Quadrature<dim-1> > quadrature;
     unsigned int singular_quadrature_order;
     
     SolverControl solver_control;
@@ -622,7 +622,7 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
   prm.enter_subsection("Quadrature rules");
   {
     quadrature =
-      std_cxx0x::shared_ptr<Quadrature<dim-1> >
+      std_cxx1x::shared_ptr<Quadrature<dim-1> >
       (new QuadratureSelector<dim-1> (prm.get("Quadrature type"),
 				      prm.get_integer("Quadrature order")));
     singular_quadrature_order = prm.get_integer("Singular quadrature order");

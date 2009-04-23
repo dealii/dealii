@@ -16,15 +16,15 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
-#include <base/std_cxx0x/tuple.h>
-#include <base/std_cxx0x/function.h>
-#include <base/std_cxx0x/shared_ptr.h>
-#include <base/std_cxx0x/bind.h>
+#include <base/std_cxx1x/tuple.h>
+#include <base/std_cxx1x/function.h>
+#include <base/std_cxx1x/shared_ptr.h>
+#include <base/std_cxx1x/bind.h>
 
 #if (DEAL_II_USE_MT == 1)
-#  include <base/std_cxx0x/thread.h>
-#  include <base/std_cxx0x/mutex.h>
-#  include <base/std_cxx0x/condition_variable.h>
+#  include <base/std_cxx1x/thread.h>
+#  include <base/std_cxx1x/mutex.h>
+#  include <base/std_cxx1x/condition_variable.h>
 #endif
 
 #include <iterator>
@@ -386,7 +386,7 @@ namespace Threads
 					* Data object storing the
 					* mutex data
 					*/
-      std_cxx0x::mutex mutex;
+      std_cxx1x::mutex mutex;
 
                                        /**
                                         * Make the class implementing
@@ -442,8 +442,8 @@ namespace Threads
 					*/
       inline void wait (Mutex &mutex)
         {
-	  std_cxx0x::unique_lock<std_cxx0x::mutex> lock(mutex.mutex,
-							std_cxx0x::adopt_lock);
+	  std_cxx1x::unique_lock<std_cxx1x::mutex> lock(mutex.mutex,
+							std_cxx1x::adopt_lock);
 	  condition_variable.wait (lock);
 	}
 
@@ -452,7 +452,7 @@ namespace Threads
 					* Data object storing the
 					* necessary data.
 					*/
-      std_cxx0x::condition_variable condition_variable;
+      std_cxx1x::condition_variable condition_variable;
   };
 
 
@@ -938,14 +938,14 @@ namespace Threads
   namespace internal
   {
     template <typename RT>
-    inline void call (const std_cxx0x::function<RT ()> &function,
+    inline void call (const std_cxx1x::function<RT ()> &function,
 		      internal::return_value<RT> &ret_val)
     {
       ret_val.set (function());
     }  
 
 
-    inline void call (const std_cxx0x::function<void ()> &function,
+    inline void call (const std_cxx1x::function<void ()> &function,
 		      internal::return_value<void> &)
     {
       function();
@@ -970,7 +970,7 @@ namespace Threads
                                       * for each number of arguments.
                                       */
     template <typename RT, typename ArgList,
-              int length = std_cxx0x::tuple_size<ArgList>::value>
+              int length = std_cxx1x::tuple_size<ArgList>::value>
     struct fun_ptr_helper;
   
 
@@ -998,7 +998,7 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 1>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type);
     };
 
 
@@ -1012,8 +1012,8 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 2>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type);
     };
 
 
@@ -1027,9 +1027,9 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 3>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type,
-			   typename std_cxx0x::tuple_element<2,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type,
+			   typename std_cxx1x::tuple_element<2,ArgList>::type);
     };
 
 
@@ -1043,10 +1043,10 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 4>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type,
-			   typename std_cxx0x::tuple_element<2,ArgList>::type,
-			   typename std_cxx0x::tuple_element<3,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type,
+			   typename std_cxx1x::tuple_element<2,ArgList>::type,
+			   typename std_cxx1x::tuple_element<3,ArgList>::type);
     };
 
 
@@ -1060,11 +1060,11 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 5>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type,
-			   typename std_cxx0x::tuple_element<2,ArgList>::type,
-			   typename std_cxx0x::tuple_element<3,ArgList>::type,
-			   typename std_cxx0x::tuple_element<4,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type,
+			   typename std_cxx1x::tuple_element<2,ArgList>::type,
+			   typename std_cxx1x::tuple_element<3,ArgList>::type,
+			   typename std_cxx1x::tuple_element<4,ArgList>::type);
     };
 
 
@@ -1078,12 +1078,12 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 6>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type,
-			   typename std_cxx0x::tuple_element<2,ArgList>::type,
-			   typename std_cxx0x::tuple_element<3,ArgList>::type,
-			   typename std_cxx0x::tuple_element<4,ArgList>::type,
-			   typename std_cxx0x::tuple_element<5,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type,
+			   typename std_cxx1x::tuple_element<2,ArgList>::type,
+			   typename std_cxx1x::tuple_element<3,ArgList>::type,
+			   typename std_cxx1x::tuple_element<4,ArgList>::type,
+			   typename std_cxx1x::tuple_element<5,ArgList>::type);
     };
 
 
@@ -1097,13 +1097,13 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 7>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type,
-			   typename std_cxx0x::tuple_element<2,ArgList>::type,
-			   typename std_cxx0x::tuple_element<3,ArgList>::type,
-			   typename std_cxx0x::tuple_element<4,ArgList>::type,
-			   typename std_cxx0x::tuple_element<5,ArgList>::type,
-			   typename std_cxx0x::tuple_element<6,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type,
+			   typename std_cxx1x::tuple_element<2,ArgList>::type,
+			   typename std_cxx1x::tuple_element<3,ArgList>::type,
+			   typename std_cxx1x::tuple_element<4,ArgList>::type,
+			   typename std_cxx1x::tuple_element<5,ArgList>::type,
+			   typename std_cxx1x::tuple_element<6,ArgList>::type);
     };
 
 
@@ -1117,14 +1117,14 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 8>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type,
-			   typename std_cxx0x::tuple_element<2,ArgList>::type,
-			   typename std_cxx0x::tuple_element<3,ArgList>::type,
-			   typename std_cxx0x::tuple_element<4,ArgList>::type,
-			   typename std_cxx0x::tuple_element<5,ArgList>::type,
-			   typename std_cxx0x::tuple_element<6,ArgList>::type,
-			   typename std_cxx0x::tuple_element<7,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type,
+			   typename std_cxx1x::tuple_element<2,ArgList>::type,
+			   typename std_cxx1x::tuple_element<3,ArgList>::type,
+			   typename std_cxx1x::tuple_element<4,ArgList>::type,
+			   typename std_cxx1x::tuple_element<5,ArgList>::type,
+			   typename std_cxx1x::tuple_element<6,ArgList>::type,
+			   typename std_cxx1x::tuple_element<7,ArgList>::type);
     };
 
 
@@ -1138,15 +1138,15 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 9>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type,
-			   typename std_cxx0x::tuple_element<2,ArgList>::type,
-			   typename std_cxx0x::tuple_element<3,ArgList>::type,
-			   typename std_cxx0x::tuple_element<4,ArgList>::type,
-			   typename std_cxx0x::tuple_element<5,ArgList>::type,
-			   typename std_cxx0x::tuple_element<6,ArgList>::type,
-			   typename std_cxx0x::tuple_element<7,ArgList>::type,
-			   typename std_cxx0x::tuple_element<8,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type,
+			   typename std_cxx1x::tuple_element<2,ArgList>::type,
+			   typename std_cxx1x::tuple_element<3,ArgList>::type,
+			   typename std_cxx1x::tuple_element<4,ArgList>::type,
+			   typename std_cxx1x::tuple_element<5,ArgList>::type,
+			   typename std_cxx1x::tuple_element<6,ArgList>::type,
+			   typename std_cxx1x::tuple_element<7,ArgList>::type,
+			   typename std_cxx1x::tuple_element<8,ArgList>::type);
     };
 
 
@@ -1161,16 +1161,16 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 10>
     {
-        typedef RT (type) (typename std_cxx0x::tuple_element<0,ArgList>::type,
-			   typename std_cxx0x::tuple_element<1,ArgList>::type,
-			   typename std_cxx0x::tuple_element<2,ArgList>::type,
-			   typename std_cxx0x::tuple_element<3,ArgList>::type,
-			   typename std_cxx0x::tuple_element<4,ArgList>::type,
-			   typename std_cxx0x::tuple_element<5,ArgList>::type,
-			   typename std_cxx0x::tuple_element<6,ArgList>::type,
-			   typename std_cxx0x::tuple_element<7,ArgList>::type,
-			   typename std_cxx0x::tuple_element<8,ArgList>::type,
-			   typename std_cxx0x::tuple_element<9,ArgList>::type);
+        typedef RT (type) (typename std_cxx1x::tuple_element<0,ArgList>::type,
+			   typename std_cxx1x::tuple_element<1,ArgList>::type,
+			   typename std_cxx1x::tuple_element<2,ArgList>::type,
+			   typename std_cxx1x::tuple_element<3,ArgList>::type,
+			   typename std_cxx1x::tuple_element<4,ArgList>::type,
+			   typename std_cxx1x::tuple_element<5,ArgList>::type,
+			   typename std_cxx1x::tuple_element<6,ArgList>::type,
+			   typename std_cxx1x::tuple_element<7,ArgList>::type,
+			   typename std_cxx1x::tuple_element<8,ArgList>::type,
+			   typename std_cxx1x::tuple_element<9,ArgList>::type);
     };
 
   
@@ -1244,7 +1244,7 @@ namespace Threads
 				      * std::enable_shared_from_this.
 				      */
     template <typename RT>
-    struct ThreadDescriptor : public std_cxx0x::enable_shared_from_this<ThreadDescriptor<RT> >
+    struct ThreadDescriptor : public std_cxx1x::enable_shared_from_this<ThreadDescriptor<RT> >
     {
 					 /**
 					  * A pointer to the current
@@ -1257,13 +1257,13 @@ namespace Threads
 					  * something into the return
 					  * value location.
 					  */
-	std_cxx0x::shared_ptr<ThreadDescriptor<RT> > self;
+	std_cxx1x::shared_ptr<ThreadDescriptor<RT> > self;
 
 					 /**
 					  * An object that represents the
 					  * thread started.
 					  */
-	std_cxx0x::thread thread;
+	std_cxx1x::thread thread;
 
 					 /**
 					  * An object that will hold the value
@@ -1298,13 +1298,13 @@ namespace Threads
 					  * to a shared_ptr, and then
 					  * call shared_from_this.
 					  */
-	void start (const std_cxx0x::function<RT ()> &function)
+	void start (const std_cxx1x::function<RT ()> &function)
 	  {
 					     // set the self pointer
 					     // and then start the
 					     // thread
 	    self = this->shared_from_this ();
-	    thread = std_cxx0x::thread (thread_entry_point, function, this);
+	    thread = std_cxx1x::thread (thread_entry_point, function, this);
 	  }
 
 
@@ -1323,7 +1323,7 @@ namespace Threads
 					  * thread.
 					  */
 	static
-	void thread_entry_point (const std_cxx0x::function<RT ()> function,
+	void thread_entry_point (const std_cxx1x::function<RT ()> function,
 				 ThreadDescriptor<RT> *descriptor)
 	  {
 					     // now call the function
@@ -1401,7 +1401,7 @@ namespace Threads
 					  * let it put its return value into
 					  * the ret_val object.
 					  */
-	void start (const std_cxx0x::function<RT ()> &function)
+	void start (const std_cxx1x::function<RT ()> &function)
 	  {
 	    call (function, ret_val);
 	  }
@@ -1461,7 +1461,7 @@ namespace Threads
                                         * Construct a thread object
                                         * with a function object.
                                         */
-      Thread (const std_cxx0x::function<RT ()> &function)
+      Thread (const std_cxx1x::function<RT ()> &function)
 		      :
 		      thread_descriptor (new internal::ThreadDescriptor<RT>())
 	{
@@ -1577,7 +1577,7 @@ namespace Threads
 					* pointer above zero as long
 					* as work is going on.
                                         */
-      std_cxx0x::shared_ptr<internal::ThreadDescriptor<RT> > thread_descriptor;
+      std_cxx1x::shared_ptr<internal::ThreadDescriptor<RT> > thread_descriptor;
   };
 
   
@@ -1585,7 +1585,7 @@ namespace Threads
   {
 				     /**
 				      * A general template that returns
-				      * std_cxx0x::ref(t) if t is of reference
+				      * std_cxx1x::ref(t) if t is of reference
 				      * type, and t otherwise.
 				      *
 				      * The case that t is of reference type
@@ -1605,7 +1605,7 @@ namespace Threads
 
 				     /**
 				      * A general template that returns
-				      * std_cxx0x::ref(t) if t is of reference
+				      * std_cxx1x::ref(t) if t is of reference
 				      * type, and t otherwise.
 				      *
 				      * The case that t is of reference type
@@ -1615,9 +1615,9 @@ namespace Threads
     template <typename T>
     struct maybe_make_ref<T &>
     {
-	static std_cxx0x::reference_wrapper<T> act (T &t)
+	static std_cxx1x::reference_wrapper<T> act (T &t)
 	  {
-	    return std_cxx0x::ref(t);
+	    return std_cxx1x::ref(t);
 	  }
     };
   }
@@ -1669,7 +1669,7 @@ namespace Threads
 			: function (*function)
 	  {}
 
-        fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+        fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
                         : function (function)
 	  {}
 
@@ -1681,7 +1681,7 @@ namespace Threads
 	  }
     
       private:
-        std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+        std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   
                                      /**
@@ -1697,22 +1697,22 @@ namespace Threads
 			: function (*function)
 	  {}
 
-        fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+        fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
                         : function (function)
 	  {}
 
         inline
         Thread<RT>
-        operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1)
+        operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
 
 				     /**
@@ -1728,24 +1728,24 @@ namespace Threads
 			: function (*function)
 	  {}
 
-	fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+	fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
 			: function (function)
 	  {}
 
 	inline
 	Thread<RT>
-	operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1,
-		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2)
+	operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1,
+		    typename std_cxx1x::tuple_element<1,ArgList>::type arg2)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   
 				     /**
@@ -1761,26 +1761,26 @@ namespace Threads
 			: function (*function)
 	  {}
 
-	fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+	fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
 			: function (function)
 	  {}
 
 	inline
 	Thread<RT>
-	operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1,
-		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2,
-		    typename std_cxx0x::tuple_element<2,ArgList>::type arg3)
+	operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1,
+		    typename std_cxx1x::tuple_element<1,ArgList>::type arg2,
+		    typename std_cxx1x::tuple_element<2,ArgList>::type arg3)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<2,ArgList>::type>::act(arg3)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   
 				     /**
@@ -1796,28 +1796,28 @@ namespace Threads
 			: function (*function)
 	  {}
 
-	fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+	fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
 			: function (function)
 	  {}
 
 	inline
 	Thread<RT>
-	operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1,
-		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2,
-		    typename std_cxx0x::tuple_element<2,ArgList>::type arg3,
-		    typename std_cxx0x::tuple_element<3,ArgList>::type arg4)
+	operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1,
+		    typename std_cxx1x::tuple_element<1,ArgList>::type arg2,
+		    typename std_cxx1x::tuple_element<2,ArgList>::type arg3,
+		    typename std_cxx1x::tuple_element<3,ArgList>::type arg4)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<2,ArgList>::type>::act(arg3),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<3,ArgList>::type>::act(arg4)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<3,ArgList>::type>::act(arg4)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   
 				     /**
@@ -1833,30 +1833,30 @@ namespace Threads
 			: function (*function)
 	  {}
 
-	fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+	fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
 			: function (function)
 	  {}
 
 	inline
 	Thread<RT>
-	operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1,
-		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2,
-		    typename std_cxx0x::tuple_element<2,ArgList>::type arg3,
-		    typename std_cxx0x::tuple_element<3,ArgList>::type arg4,
-		    typename std_cxx0x::tuple_element<4,ArgList>::type arg5)
+	operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1,
+		    typename std_cxx1x::tuple_element<1,ArgList>::type arg2,
+		    typename std_cxx1x::tuple_element<2,ArgList>::type arg3,
+		    typename std_cxx1x::tuple_element<3,ArgList>::type arg4,
+		    typename std_cxx1x::tuple_element<4,ArgList>::type arg5)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<2,ArgList>::type>::act(arg3),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<3,ArgList>::type>::act(arg4),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<4,ArgList>::type>::act(arg5)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<4,ArgList>::type>::act(arg5)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   
 				     /**
@@ -1872,32 +1872,32 @@ namespace Threads
 			: function (*function)
 	  {}
 
-	fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+	fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
 			: function (function)
 	  {}
 
 	inline
 	Thread<RT>
-	operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1,
-		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2,
-		    typename std_cxx0x::tuple_element<2,ArgList>::type arg3,
-		    typename std_cxx0x::tuple_element<3,ArgList>::type arg4,
-		    typename std_cxx0x::tuple_element<4,ArgList>::type arg5,
-		    typename std_cxx0x::tuple_element<5,ArgList>::type arg6)
+	operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1,
+		    typename std_cxx1x::tuple_element<1,ArgList>::type arg2,
+		    typename std_cxx1x::tuple_element<2,ArgList>::type arg3,
+		    typename std_cxx1x::tuple_element<3,ArgList>::type arg4,
+		    typename std_cxx1x::tuple_element<4,ArgList>::type arg5,
+		    typename std_cxx1x::tuple_element<5,ArgList>::type arg6)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<2,ArgList>::type>::act(arg3),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<3,ArgList>::type>::act(arg4),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<4,ArgList>::type>::act(arg5),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<5,ArgList>::type>::act(arg6)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<4,ArgList>::type>::act(arg5),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<5,ArgList>::type>::act(arg6)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   
 				     /**
@@ -1913,34 +1913,34 @@ namespace Threads
 			: function (*function)
 	  {}
 
-	fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+	fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
 			: function (function)
 	  {}
 
 	inline
 	Thread<RT>
-	operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1,
-		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2,
-		    typename std_cxx0x::tuple_element<2,ArgList>::type arg3,
-		    typename std_cxx0x::tuple_element<3,ArgList>::type arg4,
-		    typename std_cxx0x::tuple_element<4,ArgList>::type arg5,
-		    typename std_cxx0x::tuple_element<5,ArgList>::type arg6,
-		    typename std_cxx0x::tuple_element<6,ArgList>::type arg7)
+	operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1,
+		    typename std_cxx1x::tuple_element<1,ArgList>::type arg2,
+		    typename std_cxx1x::tuple_element<2,ArgList>::type arg3,
+		    typename std_cxx1x::tuple_element<3,ArgList>::type arg4,
+		    typename std_cxx1x::tuple_element<4,ArgList>::type arg5,
+		    typename std_cxx1x::tuple_element<5,ArgList>::type arg6,
+		    typename std_cxx1x::tuple_element<6,ArgList>::type arg7)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<2,ArgList>::type>::act(arg3),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<3,ArgList>::type>::act(arg4),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<4,ArgList>::type>::act(arg5),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<5,ArgList>::type>::act(arg6),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<6,ArgList>::type>::act(arg7)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<4,ArgList>::type>::act(arg5),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<5,ArgList>::type>::act(arg6),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<6,ArgList>::type>::act(arg7)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
 
 				     /**
@@ -1956,36 +1956,36 @@ namespace Threads
 			: function (*function)
 	  {}
 
-	fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+	fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
 			: function (function)
 	  {}
 
 	inline
 	Thread<RT>
-	operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1,
-		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2,
-		    typename std_cxx0x::tuple_element<2,ArgList>::type arg3,
-		    typename std_cxx0x::tuple_element<3,ArgList>::type arg4,
-		    typename std_cxx0x::tuple_element<4,ArgList>::type arg5,
-		    typename std_cxx0x::tuple_element<5,ArgList>::type arg6,
-		    typename std_cxx0x::tuple_element<6,ArgList>::type arg7,
-		    typename std_cxx0x::tuple_element<7,ArgList>::type arg8)
+	operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1,
+		    typename std_cxx1x::tuple_element<1,ArgList>::type arg2,
+		    typename std_cxx1x::tuple_element<2,ArgList>::type arg3,
+		    typename std_cxx1x::tuple_element<3,ArgList>::type arg4,
+		    typename std_cxx1x::tuple_element<4,ArgList>::type arg5,
+		    typename std_cxx1x::tuple_element<5,ArgList>::type arg6,
+		    typename std_cxx1x::tuple_element<6,ArgList>::type arg7,
+		    typename std_cxx1x::tuple_element<7,ArgList>::type arg8)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<2,ArgList>::type>::act(arg3),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<3,ArgList>::type>::act(arg4),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<4,ArgList>::type>::act(arg5),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<5,ArgList>::type>::act(arg6),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<6,ArgList>::type>::act(arg7),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<7,ArgList>::type>::act(arg8)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<4,ArgList>::type>::act(arg5),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<5,ArgList>::type>::act(arg6),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<6,ArgList>::type>::act(arg7),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<7,ArgList>::type>::act(arg8)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   
 				     /**
@@ -2001,38 +2001,38 @@ namespace Threads
 			: function (*function)
 	  {}
 
-	fun_encapsulator (const std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+	fun_encapsulator (const std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
 			: function (function)
 	  {}
 
 	inline
 	Thread<RT>
-	operator() (typename std_cxx0x::tuple_element<0,ArgList>::type arg1,
-		    typename std_cxx0x::tuple_element<1,ArgList>::type arg2,
-		    typename std_cxx0x::tuple_element<2,ArgList>::type arg3,
-		    typename std_cxx0x::tuple_element<3,ArgList>::type arg4,
-		    typename std_cxx0x::tuple_element<4,ArgList>::type arg5,
-		    typename std_cxx0x::tuple_element<5,ArgList>::type arg6,
-		    typename std_cxx0x::tuple_element<6,ArgList>::type arg7,
-		    typename std_cxx0x::tuple_element<7,ArgList>::type arg8,
-		    typename std_cxx0x::tuple_element<8,ArgList>::type arg9)
+	operator() (typename std_cxx1x::tuple_element<0,ArgList>::type arg1,
+		    typename std_cxx1x::tuple_element<1,ArgList>::type arg2,
+		    typename std_cxx1x::tuple_element<2,ArgList>::type arg3,
+		    typename std_cxx1x::tuple_element<3,ArgList>::type arg4,
+		    typename std_cxx1x::tuple_element<4,ArgList>::type arg5,
+		    typename std_cxx1x::tuple_element<5,ArgList>::type arg6,
+		    typename std_cxx1x::tuple_element<6,ArgList>::type arg7,
+		    typename std_cxx1x::tuple_element<7,ArgList>::type arg8,
+		    typename std_cxx1x::tuple_element<8,ArgList>::type arg9)
 	  {
 	    return
 	      Thread<RT>
-	      (std_cxx0x::bind (function,
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<0,ArgList>::type>::act(arg1),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<1,ArgList>::type>::act(arg2),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<2,ArgList>::type>::act(arg3),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<3,ArgList>::type>::act(arg4),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<4,ArgList>::type>::act(arg5),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<5,ArgList>::type>::act(arg6),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<6,ArgList>::type>::act(arg7),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<7,ArgList>::type>::act(arg8),
-			    internal::maybe_make_ref<typename std_cxx0x::tuple_element<8,ArgList>::type>::act(arg9)));
+	      (std_cxx1x::bind (function,
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<3,ArgList>::type>::act(arg4),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<4,ArgList>::type>::act(arg5),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<5,ArgList>::type>::act(arg6),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<6,ArgList>::type>::act(arg7),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<7,ArgList>::type>::act(arg8),
+			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<8,ArgList>::type>::act(arg9)));
 	  }
     
       private:
-	std_cxx0x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   }
 
@@ -2048,7 +2048,7 @@ namespace Threads
                                     */
   template <typename RT>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<>,0>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
   spawn (RT (*fun_ptr)())
   {
     return fun_ptr;
@@ -2062,12 +2062,12 @@ namespace Threads
                                     */
   template <typename RT, typename C>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<>,0>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
   spawn (C &c, RT (C::*fun_ptr)())
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c)));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c)));
   }
 
                                    /**
@@ -2077,12 +2077,12 @@ namespace Threads
                                     */
   template <typename RT, typename C>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<>,0>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
   spawn (const C &c, RT (C::*fun_ptr)() const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c)));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c)));
   }
   
 
@@ -2097,7 +2097,7 @@ namespace Threads
                                     */
   template <typename RT, typename Arg1>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1>,1>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
   spawn (RT (*fun_ptr)(Arg1))
   {
     return fun_ptr;
@@ -2112,12 +2112,12 @@ namespace Threads
 				    */
   template <typename RT, typename C, typename Arg1>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1>,1>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
   spawn (C &c, RT (C::*fun_ptr)(Arg1))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1));
   }
 
 				   /**
@@ -2127,12 +2127,12 @@ namespace Threads
 				    */
   template <typename RT, typename C, typename Arg1>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1>,1>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1));
   }
 
 
@@ -2145,7 +2145,7 @@ namespace Threads
                                     */
   template <typename RT, typename Arg1, typename Arg2>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2>,2>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
   spawn (RT (*fun_ptr)(Arg1,Arg2))
   {
     return fun_ptr;
@@ -2160,12 +2160,12 @@ namespace Threads
 				    */
   template <typename RT, typename C, typename Arg1, typename Arg2>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2>,2>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1,Arg2> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1, _2));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2));
   }
 
 				   /**
@@ -2175,12 +2175,12 @@ namespace Threads
 				    */
   template <typename RT, typename C, typename Arg1, typename Arg2>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2>,2>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1,Arg2> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1, _2));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2));
   }  
 
 
@@ -2194,7 +2194,7 @@ namespace Threads
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3>,3>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3))
   {
     return fun_ptr;
@@ -2210,12 +2210,12 @@ namespace Threads
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3>,3>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1,Arg2,Arg3> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1, _2, _3));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2,Arg3> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3));
   }
 
 				   /**
@@ -2226,12 +2226,12 @@ namespace Threads
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3>,3>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1,Arg2,Arg3> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1, _2, _3));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2,Arg3> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3));
   }  
 
 
@@ -2246,7 +2246,7 @@ namespace Threads
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4))
   {
     return fun_ptr;
@@ -2262,12 +2262,12 @@ namespace Threads
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1, _2, _3, _4));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4));
   }
 
 				   /**
@@ -2278,12 +2278,12 @@ namespace Threads
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1, _2, _3, _4));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4));
   }
 
 
@@ -2298,7 +2298,7 @@ namespace Threads
             typename Arg1, typename Arg2, typename Arg3,
             typename Arg4, typename Arg5>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5))
   {
     return fun_ptr;
@@ -2315,12 +2315,12 @@ namespace Threads
 	    typename Arg1, typename Arg2, typename Arg3,
 	    typename Arg4, typename Arg5>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1, _2, _3, _4, _5));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5));
   }
 
 				   /**
@@ -2332,12 +2332,12 @@ namespace Threads
 	    typename Arg1, typename Arg2, typename Arg3,
 	    typename Arg4, typename Arg5>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1, _2, _3, _4, _5));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5));
   }
   
 
@@ -2352,7 +2352,7 @@ namespace Threads
             typename Arg1, typename Arg2, typename Arg3,
             typename Arg4, typename Arg5, typename Arg6>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6))
   {
     return fun_ptr;
@@ -2369,12 +2369,12 @@ namespace Threads
 	    typename Arg1, typename Arg2, typename Arg3,
 	    typename Arg4, typename Arg5, typename Arg6>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1, _2, _3, _4, _5, _6));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5, _6));
   }
 
 				   /**
@@ -2387,12 +2387,12 @@ namespace Threads
 	    typename Arg4, typename Arg5, typename Arg6>
   inline
   internal::fun_encapsulator<RT,
-			     std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
+			     std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1, _2, _3, _4, _5, _6));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6));
   }
   
 
@@ -2408,7 +2408,7 @@ namespace Threads
             typename Arg4, typename Arg5, typename Arg6,
             typename Arg7>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3,
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					     Arg4, Arg5, Arg6, Arg7>,7>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7))
   {
@@ -2427,13 +2427,13 @@ namespace Threads
 	    typename Arg4, typename Arg5, typename Arg6,
 	    typename Arg7>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3,
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					     Arg4, Arg5, Arg6, Arg7>,7>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1, _2, _3, _4, _5, _6, _7));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5, _6, _7));
   }
 
 				   /**
@@ -2447,13 +2447,13 @@ namespace Threads
 	    typename Arg7>
   inline
   internal::fun_encapsulator<RT,
-			     std_cxx0x::tuple<Arg1, Arg2, Arg3,
+			     std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					  Arg4, Arg5, Arg6, Arg7>,7>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1, _2, _3, _4, _5, _6, _7));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7));
   }
   
 
@@ -2469,7 +2469,7 @@ namespace Threads
             typename Arg4, typename Arg5, typename Arg6,
             typename Arg7, typename Arg8>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3,
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					     Arg4, Arg5, Arg6,
 					     Arg7, Arg8>,8>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -2490,15 +2490,15 @@ namespace Threads
 	    typename Arg4, typename Arg5, typename Arg6,
 	    typename Arg7, typename Arg8>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3,
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					     Arg4, Arg5, Arg6,
 					     Arg7, Arg8>,8>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
 				Arg6,Arg7,Arg8))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1, _2, _3, _4, _5, _6, _7, _8));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5, _6, _7, _8));
   }
 
 				   /**
@@ -2512,15 +2512,15 @@ namespace Threads
 	    typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,
-			     std_cxx0x::tuple<Arg1, Arg2, Arg3,
+			     std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					  Arg4, Arg5, Arg6,
 					  Arg7, Arg8>,8>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
 				      Arg6,Arg7,Arg8) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1, _2, _3, _4, _5, _6, _7, _8));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7, _8));
   }
   
 
@@ -2536,7 +2536,7 @@ namespace Threads
             typename Arg4, typename Arg5, typename Arg6,
             typename Arg7, typename Arg8, typename Arg9>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3,
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					     Arg4, Arg5, Arg6,
 					     Arg7, Arg8, Arg9>,9>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -2557,15 +2557,15 @@ namespace Threads
 	    typename Arg4, typename Arg5, typename Arg6,
 	    typename Arg7, typename Arg8, typename Arg9>
   inline
-  internal::fun_encapsulator<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3,
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					     Arg4, Arg5, Arg6,
 					     Arg7, Arg8, Arg9>,9>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
 				Arg6,Arg7,Arg8,Arg9))
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::ref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
   }
 
 				   /**
@@ -2579,15 +2579,15 @@ namespace Threads
 	    typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,
-			     std_cxx0x::tuple<Arg1, Arg2, Arg3,
+			     std_cxx1x::tuple<Arg1, Arg2, Arg3,
 					  Arg4, Arg5, Arg6,
 					  Arg7, Arg8, Arg9>,9>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
 				      Arg6,Arg7,Arg8,Arg9) const)
   {
     return
-      std_cxx0x::function<typename internal::fun_ptr<RT,std_cxx0x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
-      (std_cxx0x::bind(fun_ptr, std_cxx0x::cref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
+      std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
   }
   
 

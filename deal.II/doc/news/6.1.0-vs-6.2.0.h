@@ -235,7 +235,7 @@ inconvenience this causes.
   Changed: Some parts of the library used to use classes and functions
   from the <a href="http://www.boost.org/">BOOST</a> library. Since
   many of the components of BOOST have been voted into what will be the
-  next C++ standard, we now use a namespace std_cxx0x (coined on the
+  next C++ standard, we now use a namespace std_cxx1x (coined on the
   provisional name C++0x used for the next C++ standard) into which we
   import BOOST components as necessary. If a compiler supports C++0x,
   we can then later replace BOOST components by elements from namespace

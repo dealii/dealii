@@ -675,12 +675,12 @@ AH_BOTTOM(
 #include <base/numbers.h>
 
 /**
- * If the compiler supports the upcoming C++0x standard, allow us to refer
- * to things in namespace std through namespace std_cxx0x (the namespace
- * into which we import BOOST components if we don't have C++0x support).
+ * If the compiler supports the upcoming C++1x standard, allow us to refer
+ * to things in namespace std through namespace std_cxx1x (the namespace
+ * into which we import BOOST components if we don't have C++1x support).
  */
-#ifdef DEAL_II_CAN_USE_CXX0X
-namespace std_cxx0x = std;
+#ifdef DEAL_II_CAN_USE_CXX1X
+namespace std_cxx1x = std;
 #endif
 
 #endif

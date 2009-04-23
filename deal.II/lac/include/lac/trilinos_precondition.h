@@ -17,7 +17,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 
-#include <base/std_cxx0x/shared_ptr.h>
+#include <base/std_cxx1x/shared_ptr.h>
 
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -1462,7 +1462,7 @@ namespace TrilinosWrappers
 					* A copy of the deal.II matrix into
 					* Trilinos format.
 					*/
-      std_cxx0x::shared_ptr<SparseMatrix> Matrix;
+      std_cxx1x::shared_ptr<SparseMatrix> Matrix;
   };
 
 }

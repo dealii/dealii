@@ -16,7 +16,7 @@
 #include <base/subscriptor.h>
 #include <vector>
 
-#include <base/std_cxx0x/shared_ptr.h>
+#include <base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -113,7 +113,7 @@ class MGLevelObject : public Subscriptor
 				     /**
 				      * Array of the objects to be held.
 				      */
-    std::vector<std_cxx0x::shared_ptr<Object> > objects;
+    std::vector<std_cxx1x::shared_ptr<Object> > objects;
 };
 
 /*@}*/
@@ -165,7 +165,7 @@ MGLevelObject<Object>::resize (const unsigned int new_minlevel,
 
   minlevel = new_minlevel;
   for (unsigned int i=0; i<new_maxlevel-new_minlevel+1; ++i)
-    objects.push_back(std_cxx0x::shared_ptr<Object> (new Object)); 
+    objects.push_back(std_cxx1x::shared_ptr<Object> (new Object)); 
 }
 
 
@@ -173,7 +173,7 @@ template<class Object>
 MGLevelObject<Object> &
 MGLevelObject<Object>::operator = (const double d)
 {
-  typename std::vector<std_cxx0x::shared_ptr<Object> >::iterator v;
+  typename std::vector<std_cxx1x::shared_ptr<Object> >::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
     **v=d;
   return *this;
@@ -184,7 +184,7 @@ template<class Object>
 void
 MGLevelObject<Object>::clear ()
 {
-  typename std::vector<std_cxx0x::shared_ptr<Object> >::iterator v;
+  typename std::vector<std_cxx1x::shared_ptr<Object> >::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
     (*v)->clear();
 }
@@ -211,7 +211,7 @@ unsigned int
 MGLevelObject<Object>::memory_consumption () const
 {
   unsigned int result = sizeof(*this);
-  typedef typename std::vector<std_cxx0x::shared_ptr<Object> >::const_iterator Iter;
+  typedef typename std::vector<std_cxx1x::shared_ptr<Object> >::const_iterator Iter;
   const Iter end = objects.end();
   for (Iter o=objects.begin(); o!=end; ++o)
     result += (*o)->memory_consumption();

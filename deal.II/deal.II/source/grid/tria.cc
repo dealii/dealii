@@ -31,7 +31,7 @@
 #include <iostream>
 #include <functional>
 
-#include <base/std_cxx0x/array.h>
+#include <base/std_cxx1x/array.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1951,7 +1951,7 @@ namespace internal
 					     // this file
 	    std::map<internal::Triangulation::TriaObject<2>,
 		     std::pair<typename Triangulation<dim,spacedim>::quad_iterator,
-			       std_cxx0x::array<bool,GeometryInfo<dim>::lines_per_face> >,
+			       std_cxx1x::array<bool,GeometryInfo<dim>::lines_per_face> >,
 		     QuadComparator>
 	      needed_quads;
 	    for (unsigned int cell=0; cell<cells.size(); ++cell) 
@@ -1982,7 +1982,7 @@ namespace internal
 		std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell],
 		  inverse_line_list[GeometryInfo<dim>::lines_per_cell];
 		unsigned int face_line_list[GeometryInfo<dim>::lines_per_face];
-		std_cxx0x::array<bool,GeometryInfo<dim>::lines_per_face> orientation;
+		std_cxx1x::array<bool,GeometryInfo<dim>::lines_per_face> orientation;
       
 		for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 		  {
@@ -2103,7 +2103,7 @@ namespace internal
 		quad = triangulation.begin_raw_quad();
 	      typename std::map<internal::Triangulation::TriaObject<2>,
 		std::pair<typename Triangulation<dim,spacedim>::quad_iterator,
-		std_cxx0x::array<bool,GeometryInfo<dim>::lines_per_face> >,
+		std_cxx1x::array<bool,GeometryInfo<dim>::lines_per_face> >,
 		QuadComparator>
 		::iterator q;
 	      for (q = needed_quads.begin(); quad!=triangulation.end_quad(); ++quad, ++q)

@@ -502,24 +502,24 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
-    dnl See whether the gcc we use already has a flag for C++0x features.
+    dnl See whether the gcc we use already has a flag for C++1x features.
     OLD_CXXFLAGS="$CXXFLAGS"
     CXXFLAGS=-std=c++0x
 
-    AC_MSG_CHECKING(whether compiler has a flag to support C++0x)
+    AC_MSG_CHECKING(whether compiler has a flag to support C++1x)
     AC_TRY_COMPILE([], [;],
        [
          AC_MSG_RESULT(yes)
-         test_cxx0x=yes
+         test_cxx1x=yes
        ],
        [
          AC_MSG_RESULT(no)
-         test_cxx0x=no
+         test_cxx1x=no
        ])
     CXXFLAGS="${OLD_CXXFLAGS}"
 
-    if test "x$test_cxx0x" = "xyes" ; then
-      DEAL_II_CHECK_CXX0X_COMPONENTS("-std=c++0x")
+    if test "x$test_cxx1x" = "xyes" ; then
+      DEAL_II_CHECK_CXX1X_COMPONENTS("-std=c++0x")
     fi
 
     dnl On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
@@ -1113,26 +1113,26 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
 
 dnl -------------------------------------------------------------
 dnl Given the command line flag specified as argument to this macro,
-dnl test whether all components that we need from the C++0X 
+dnl test whether all components that we need from the C++1X 
 dnl standard are actually available. If so, add the flag to
 dnl CXXFLAGS.g and CXXFLAGS.o, and set a flag in config.h
 dnl 
-dnl Usage: DEAL_II_CHECK_CXX0X_COMPONENTS(cxxflag)
+dnl Usage: DEAL_II_CHECK_CXX1X_COMPONENTS(cxxflag)
 dnl
 dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
+AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 [
   OLD_CXXFLAGS="$CXXFLAGS"
   CXXFLAGS="$1"
 
-  all_cxx0x_available=yes
+  all_cxx1x_available=yes
 
   AC_MSG_CHECKING(for std::array)
   AC_TRY_COMPILE(
        [#include <array>], 
        [ std::array<int,3> p; p[0];],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
 
   AC_MSG_CHECKING(for std::condition_variable)
@@ -1140,7 +1140,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
        [#include <condition_variable> ], 
        [ std::condition_variable c; c.notify_all()],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
 
   AC_MSG_CHECKING(for std::function and std::bind)
@@ -1150,7 +1150,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
        [ std::function<void (int)> 
             g = std::bind (f, std::placeholders::_1, 1.1) ;],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
 
   dnl Make sure we don't run into GCC bug 35569
@@ -1162,7 +1162,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
          using namespace std::placeholders;
          bind(multiplies<int>(),4,_1)(5); ;],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
 
   AC_MSG_CHECKING(for std::shared_ptr)
@@ -1170,7 +1170,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
        [#include <memory>], 
        [ std::shared_ptr<int> p(new int(3))],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
 
   AC_MSG_CHECKING(for std::thread)
@@ -1179,7 +1179,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
         void f(int); ], 
        [ std::thread t(f,1); t.join();],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
 
   AC_MSG_CHECKING(for std::mutex)
@@ -1187,7 +1187,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
        [#include <mutex> ], 
        [ std::mutex m; m.lock();],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
 
   AC_MSG_CHECKING(for std::tuple)
@@ -1195,20 +1195,20 @@ AC_DEFUN(DEAL_II_CHECK_CXX0X_COMPONENTS, dnl
        [#include <tuple>], 
        [ std::tuple<int,double,char> p(1,1.1,'a')],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx0x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
 
   CXXFLAGS="${OLD_CXXFLAGS}"
 
-  AC_MSG_CHECKING(whether C++0x support is complete enough)
-  if test "x$all_cxx0x_available" = "xyes" ; then
+  AC_MSG_CHECKING(whether C++1x support is complete enough)
+  if test "x$all_cxx1x_available" = "xyes" ; then
     AC_MSG_RESULT(yes)
 
     CXXFLAGSG="$CXXFLAGSG $1"
     CXXFLAGSO="$CXXFLAGSO $1"
 
-    AC_DEFINE(DEAL_II_CAN_USE_CXX0X, 1,
-              [Defined if the compiler we use supports the upcoming C++0x standard.])
+    AC_DEFINE(DEAL_II_CAN_USE_CXX1X, 1,
+              [Defined if the compiler we use supports the upcoming C++1x standard.])
   else
     AC_MSG_RESULT(no)
   fi

@@ -361,9 +361,9 @@ class BoussinesqFlowProblem
     double old_time_step;
     unsigned int timestep_number;
 
-    std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
-    std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>  T_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  T_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_stokes_preconditioner;
@@ -842,7 +842,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
   assemble_stokes_preconditioner ();
 
-  Amg_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionAMG>
+  Amg_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>
 		       (new TrilinosWrappers::PreconditionAMG());
 
   std::vector<std::vector<bool> > constant_modes;
@@ -861,7 +861,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 amg_data);
 
-  Mp_preconditioner = std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>
+  Mp_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
                                    (new TrilinosWrappers::PreconditionIC());
 
   Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
@@ -1109,7 +1109,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 
   if (rebuild_temperature_preconditioner == true)
     {
-      T_preconditioner =  std_cxx0x::shared_ptr<TrilinosWrappers::PreconditionIC>
+      T_preconditioner =  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
                                    (new TrilinosWrappers::PreconditionIC());
       T_preconditioner->initialize (temperature_matrix);
 

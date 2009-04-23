@@ -10,13 +10,13 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__std_cxx0x_tuple_h
-#define __deal2__std_cxx0x_tuple_h
+#ifndef __deal2__std_cxx1x_tuple_h
+#define __deal2__std_cxx1x_tuple_h
 
 
 #include <base/config.h>
 
-#ifdef DEAL_II_CAN_USE_CXX0X
+#ifdef DEAL_II_CAN_USE_CXX1X
 
 #  include <tuple>
 
@@ -25,7 +25,7 @@
 #include <boost/tuple/tuple.hpp>
 
 DEAL_II_NAMESPACE_OPEN
-namespace std_cxx0x
+namespace std_cxx1x
 {
   using boost::tuple;
   using boost::get;

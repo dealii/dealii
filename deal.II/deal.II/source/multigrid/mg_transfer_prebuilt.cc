@@ -58,9 +58,9 @@ void MGTransferPrebuilt<number>::build_matrices (
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities
-	.push_back (std_cxx0x::shared_ptr<SparsityPattern> (new SparsityPattern));
+	.push_back (std_cxx1x::shared_ptr<SparsityPattern> (new SparsityPattern));
       prolongation_matrices
-	.push_back (std_cxx0x::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
+	.push_back (std_cxx1x::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
     }
   
 				   // two fields which will store the

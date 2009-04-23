@@ -10,25 +10,24 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__std_cxx0x_shared_ptr_h
-#define __deal2__std_cxx0x_shared_ptr_h
+#ifndef __deal2__std_cxx1x_array_h
+#define __deal2__std_cxx1x_array_h
 
 
 #include <base/config.h>
 
-#ifdef DEAL_II_CAN_USE_CXX0X
+#ifdef DEAL_II_CAN_USE_CXX1X
 
-#  include <memory>
+#  include <array>
 
 #else
 
-#include <boost/shared_ptr.hpp>
+#include <boost/array.hpp>
 
 DEAL_II_NAMESPACE_OPEN
-namespace std_cxx0x
+namespace std_cxx1x
 {
-  using boost::shared_ptr;
-  using boost::enable_shared_from_this;
+  using boost::array;
 }
 DEAL_II_NAMESPACE_CLOSE
 

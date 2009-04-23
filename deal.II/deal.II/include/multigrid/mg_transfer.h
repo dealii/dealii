@@ -32,7 +32,7 @@
 
 #include <dofs/dof_handler.h>
 
-#include <base/std_cxx0x/shared_ptr.h>
+#include <base/std_cxx1x/shared_ptr.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -156,7 +156,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * Sparsity patterns for transfer
 				      * matrices.
 				      */
-    std::vector<std_cxx0x::shared_ptr<SparsityPattern> >   prolongation_sparsities;
+    std::vector<std_cxx1x::shared_ptr<SparsityPattern> >   prolongation_sparsities;
 
 				     /**
 				      * The actual prolongation matrix.
@@ -166,7 +166,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * while row indices belong to the
 				      * child cell, i.e. the fine level.
 				      */
-    std::vector<std_cxx0x::shared_ptr<SparseMatrix<double> > > prolongation_matrices;    
+    std::vector<std_cxx1x::shared_ptr<SparseMatrix<double> > > prolongation_matrices;    
     
 				     /**
 				      * Mapping for the

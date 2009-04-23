@@ -10,34 +10,24 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__std_cxx0x_bin_h
-#define __deal2__std_cxx0x_bind_h
+#ifndef __deal2__std_cxx1x_thread_h
+#define __deal2__std_cxx1x_thread_h
 
 
 #include <base/config.h>
 
-#ifdef DEAL_II_CAN_USE_CXX0X
+#ifdef DEAL_II_CAN_USE_CXX1X
 
-#  include <functional>
-
-DEAL_II_NAMESPACE_OPEN
-// in boost, the placeholders _1, _2, ... are in the global namespace. in
-// C++0x, they are in namespace std::placeholders, which makes them awkward to
-// use. import them into the deal.II namespace
-using namespace std::placeholders;
-DEAL_II_NAMESPACE_CLOSE
+#  include <thread>
 
 #else
 
-#include <boost/bind.hpp>
+#  include <boost/thread.hpp>
 
 DEAL_II_NAMESPACE_OPEN
-namespace std_cxx0x
+namespace std_cxx1x
 {
-  using boost::bind;
-  using boost::ref;
-  using boost::cref;
-  using boost::reference_wrapper;
+  using boost::thread;
 }
 DEAL_II_NAMESPACE_CLOSE
 

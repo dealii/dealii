@@ -1080,7 +1080,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mappi
 				   // the matrix
   Threads::ThreadMutex mutex;
 
-  typedef std_cxx0x::tuple<const Mapping<dim,spacedim>&,
+  typedef std_cxx1x::tuple<const Mapping<dim,spacedim>&,
     const DoFHandler<dim,spacedim>&,
     const Quadrature<dim-1>&> Commons;
   
@@ -1111,7 +1111,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mappi
 template <>
 void
 MatrixCreator::
-create_boundary_mass_matrix_1<2,3> (std_cxx0x::tuple<const Mapping<2,3> &,
+create_boundary_mass_matrix_1<2,3> (std_cxx1x::tuple<const Mapping<2,3> &,
 				    const DoFHandler<2,3> &,
 			            const Quadrature<1> & > ,
 			            SparseMatrix<double>  &,
@@ -1132,7 +1132,7 @@ create_boundary_mass_matrix_1<2,3> (std_cxx0x::tuple<const Mapping<2,3> &,
 template <int dim, int spacedim>
 void
 MatrixCreator::
-create_boundary_mass_matrix_1 (std_cxx0x::tuple<const Mapping<dim, spacedim> &,
+create_boundary_mass_matrix_1 (std_cxx1x::tuple<const Mapping<dim, spacedim> &,
 			       const DoFHandler<dim,spacedim> &,
 			       const Quadrature<dim-1> & >  commons,
 			       SparseMatrix<double>      &matrix,
@@ -1147,9 +1147,9 @@ create_boundary_mass_matrix_1 (std_cxx0x::tuple<const Mapping<dim, spacedim> &,
 				   // All assertions for this function
 				   // are in the calling function
 				   // before creating threads.
-  const Mapping<dim,spacedim>& mapping = std_cxx0x::get<0>(commons);
-  const DoFHandler<dim,spacedim>& dof = std_cxx0x::get<1>(commons);
-  const Quadrature<dim-1>& q = std_cxx0x::get<2>(commons);
+  const Mapping<dim,spacedim>& mapping = std_cxx1x::get<0>(commons);
+  const DoFHandler<dim,spacedim>& dof = std_cxx1x::get<1>(commons);
+  const Quadrature<dim-1>& q = std_cxx1x::get<2>(commons);
   
   const FiniteElement<dim,spacedim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
@@ -1482,7 +1482,7 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim,spac
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
 
-  typedef std_cxx0x::tuple<const hp::MappingCollection<dim>&,
+  typedef std_cxx1x::tuple<const hp::MappingCollection<dim>&,
     const hp::DoFHandler<dim>&,
     const hp::QCollection<dim-1>&> Commons;
   
@@ -1516,7 +1516,7 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim,spac
 template <int dim, int spacedim>
 void
 MatrixCreator::
-create_boundary_mass_matrix_1 (std_cxx0x::tuple<const hp::MappingCollection<dim,spacedim> &,
+create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim> &,
 			       const hp::DoFHandler<dim,spacedim> &,
 			       const hp::QCollection<dim-1> &> commons,
 			       SparseMatrix<double>      &matrix,
@@ -1528,9 +1528,9 @@ create_boundary_mass_matrix_1 (std_cxx0x::tuple<const hp::MappingCollection<dim,
 			       const IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
 			       Threads::ThreadMutex      &mutex)
 {
-  const hp::MappingCollection<dim>& mapping = std_cxx0x::get<0>(commons);
-  const hp::DoFHandler<dim>& dof = std_cxx0x::get<1>(commons);
-  const hp::QCollection<dim-1>& q = std_cxx0x::get<2>(commons);
+  const hp::MappingCollection<dim>& mapping = std_cxx1x::get<0>(commons);
+  const hp::DoFHandler<dim>& dof = std_cxx1x::get<1>(commons);
+  const hp::QCollection<dim-1>& q = std_cxx1x::get<2>(commons);
   const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
   const unsigned int n_components  = fe_collection.n_components();
   const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
