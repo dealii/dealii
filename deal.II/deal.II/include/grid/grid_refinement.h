@@ -46,7 +46,7 @@ template <class T> class Vector;
 namespace GridRefinement
 {
 /**
- * @brief Refinement strategy with predictable groth of the mesh
+ * @brief Refinement strategy with predictable growth of the mesh
  *
  * This function takes a vector of refinement @p criteria and two values
  * between zero and one denoting the fractions of cells to be refined
