@@ -342,12 +342,13 @@ SparseMatrixEZ<number>::precondition_SSOR (Vector<somenumber>       &dst,
   for (ri = row_info.begin(); ri != end; ++dst_ptr, ++src_ptr, ++ri)
     {
       Assert (ri->diagonal != RowInfo::invalid_diagonal, ExcNoDiagonal());
-      number s = *src_ptr;
+      number s = 0;
       const unsigned int end_row = ri->start + ri->diagonal;
       for (unsigned int i=ri->start;i<end_row;++i)
-	s -= data[i].value * dst(data[i].column);
+	s += data[i].value * dst(data[i].column);
       
-      *dst_ptr = s * om / data[ri->start + ri->diagonal].value;
+      *dst_ptr = *src_ptr - s * om;
+      *dst_ptr /= data[ri->start + ri->diagonal].value;
     }
 				   // Diagonal
   dst_ptr = dst.begin();
@@ -362,11 +363,12 @@ SparseMatrixEZ<number>::precondition_SSOR (Vector<somenumber>       &dst,
    for (rri = row_info.rbegin(); rri != rend; --dst_ptr, ++rri)
      {
       const unsigned int end_row = rri->start + rri->length;
-      number s = *dst_ptr;
+      number s = 0;
       for (unsigned int i=rri->start+rri->diagonal+1;i<end_row;++i)
-	s -= om * data[i].value * dst(data[i].column);
+	s += data[i].value * dst(data[i].column);
 
-      *dst_ptr = s * om / data[rri->start + rri->diagonal].value;
+      *dst_ptr -= s * om;
+      *dst_ptr /= data[rri->start + rri->diagonal].value;
      }
 }
 

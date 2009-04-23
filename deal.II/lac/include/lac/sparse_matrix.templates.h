@@ -1198,12 +1198,13 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 	    pos_right_of_diagonal[row];
 	  Assert (first_right_of_diagonal_index <= *(rowstart_ptr+1),
 		  ExcInternalError());
-	  number s = *dst_ptr;
+	  number s = 0;
 	  for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
-	    s -= val[j] * dst(cols->colnums[j]);
+	    s += val[j] * dst(cols->colnums[j]);
 
 				   // divide by diagonal element
-	  *dst_ptr = s * om / val[*rowstart_ptr];
+	  *dst_ptr -= s * om;
+	  *dst_ptr /= val[*rowstart_ptr];
 	};
   
       rowstart_ptr = &cols->rowstart[0];
@@ -1219,11 +1220,12 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 	  const unsigned int end_row = *(rowstart_ptr+1);
 	  const unsigned int first_right_of_diagonal_index
 	    = pos_right_of_diagonal[row];
-	  number s = *dst_ptr;
+	  number s = 0;
 	  for (unsigned int j=first_right_of_diagonal_index; j<end_row; ++j)
-	    s -= val[j] * dst(cols->colnums[j]);
+	    s += val[j] * dst(cols->colnums[j]);
       
-	  *dst_ptr = s * om / val[*rowstart_ptr];
+	  *dst_ptr -= s * om;
+	  *dst_ptr /= val[*rowstart_ptr];
 	};
       return;
     }
@@ -1249,12 +1251,13 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 	   -
 	   &cols->colnums[0]);
 
-      number s = *dst_ptr;
+      number s = 0;
       for (unsigned int j=(*rowstart_ptr)+1; j<first_right_of_diagonal_index; ++j)
-	s -= val[j] * dst(cols->colnums[j]);
+	s += val[j] * dst(cols->colnums[j]);
 
 				       // divide by diagonal element
-      *dst_ptr = s * om / val[*rowstart_ptr];
+      *dst_ptr -= s * om;
+      *dst_ptr /= val[*rowstart_ptr];
     };
   
   rowstart_ptr = &cols->rowstart[0];
@@ -1273,10 +1276,11 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 								   &cols->colnums[end_row],
 								   static_cast<unsigned int>(row)) -
 	   &cols->colnums[0]);
-      number s = *dst_ptr;
+      number s = 0;
       for (unsigned int j=first_right_of_diagonal_index; j<end_row; ++j)
-	s -= val[j] * dst(cols->colnums[j]);
-      *dst_ptr = s * om / val[*rowstart_ptr];
+	s += val[j] * dst(cols->colnums[j]);
+      *dst_ptr -= s * om;
+      *dst_ptr /= val[*rowstart_ptr];
     };
 }
 
