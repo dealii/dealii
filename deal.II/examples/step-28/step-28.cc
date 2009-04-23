@@ -2181,8 +2181,6 @@ void NeutronDiffusionProblem<dim>::run ()
 		   ();
       threads.join_all ();
 
-      double max_old = 0;
-
       double error;
       unsigned int iteration = 1;
       do
