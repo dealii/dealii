@@ -638,3 +638,13 @@ manifold embedded in a three-dimensional space. Consequently, the right class
 will be <code>Triangulation@<2,3@></code>, and correspondingly we will use 
 <code>DoFHandler@<2,3@></code> as the DoF handler class and
 <code>FE_Q@<2,3@></code> for finite elements.
+
+
+<h3>Testcase</h3>
+
+The testcase we will be solving is for a circular (in 2d) or spherical
+(in 3d) obstacle. Meshes for these geometries will be read in from
+files in the current directory and an object of type HyperBallBoundary
+will then be attached to the triangulation to allow mesh refinement
+that respects the continuous geometry behind the discrete initial
+mesh.
