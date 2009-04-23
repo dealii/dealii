@@ -1350,7 +1350,7 @@ void BEMProblem<dim>::solve_system()
 }
 
 
-				 // @sect4{BEMProblem::solve_system}
+				 // @sect4{BEMProblem::compute_errors}
 
 				 // The computation of the errors is
 				 // exactly the same in all other
