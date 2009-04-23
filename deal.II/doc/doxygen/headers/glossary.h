@@ -131,9 +131,9 @@
  *
  * The full reference for this paper is as follows:
  * @code
-@Article{BK07,
+Article{BK07,
   author = 	 {Wolfgang Bangerth and Oliver Kayser-Herold},
-  title = 	 {Data Structures and Requirements for $hp$ Finite Element
+  title = 	 {Data Structures and Requirements for hp Finite Element
                   Software},
   journal = 	 {ACM Trans. Math. Softw.},
   year = 	 2009,
