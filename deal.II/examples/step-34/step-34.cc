@@ -1328,19 +1328,57 @@ void BEMProblem<dim>::assemble_system()
 				 // address this issue, we use two new
 				 // instruments of the library: the
 				 // MeanValueFilter class, and the
-				 // ProductMatrix class. The
-				 // MeanValueFilter has the interface
-				 // of a matrix (i.e. it has a
-				 // function MeanValueFilter::vmult),
-				 // with the effect that the output
-				 // vector equals the input vector
-				 // minus its mean value. We cascade
-				 // this operator with the system
-				 // matrix, and we obtain a matrix
-				 // whose result is renormalized to a
-				 // zero mean value Vector. In other
-				 // words, vectors that are multiplied
-				 // have mean value zero and therefore
+				 // ProductMatrix class.
+				 //
+				 // In essence, the idea is this: all
+				 // Krylov subspace solvers construct
+				 // an approximation the solution in
+				 // the space $\text{span}
+				 // \{b,Ab,A^2b,A^3b,\ldots,A^{n-1}b\}$
+				 // in the $n$-th iteration. We would
+				 // like the vectors in this space to
+				 // have mean value zero. To guarantee
+				 // this sort of thing, we should
+				 // instead consider the problem
+				 // $FAx=Fb$ where $F=I-\frac 1n
+				 // \mathbf{e}\mathbf{e}^T$ (with
+				 // $\mathbf e$ a vector of length $n$
+				 // with all entries equal to
+				 // one). $F$ is the matrix that given
+				 // a vector filters out its mean
+				 // value. The Krylov subspace that
+				 // GMRES constructs from this is
+				 // $\text{span}
+				 // \{Fb,FAb,FA^2b,FA^3b,\ldots,FA^{n-1}b\}$
+				 // (note here that $(FA)^k=FA^k$
+				 // because $A$ maps any vector $t$ to
+				 // exactly the same result as it
+				 // would map $Ft$ - that's the
+				 // definition of its kernel!). So
+				 // each of the elements of Krylov
+				 // subspace has mean value zero, and
+				 // as a consequence so does the
+				 // approximation $x^{(n)}$
+				 // constructed in the $n$-th
+				 // iteration.
+				 //
+				 // To implement this, we need a class
+				 // that represents the action of the
+				 // filter $F$. Sure enough, deal.II
+				 // has one of these: the
+				 // MeanValueFilter class has the
+				 // interface of a matrix (i.e. it has
+				 // a function
+				 // MeanValueFilter::vmult), with the
+				 // effect that the output vector
+				 // equals the input vector minus its
+				 // mean value. We cascade this
+				 // operator with the system matrix,
+				 // and we obtain a matrix $FA$ whose
+				 // result is renormalized to a zero
+				 // mean value vector. In other words,
+				 // vectors that are multiplied have
+				 // mean value zero and therefore
 				 // never feel the fact that the
 				 // system matrix has a kernel for
 				 // these. The combined matrix object
