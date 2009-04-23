@@ -11,7 +11,8 @@ INPUT    = headers/ \
 	../../deal.II/include/numerics \
 	tutorial/doxygen \
 	../news/changes.h \
-	../news/6.0.0-vs-6.1.0.h
+	../news/6.0.0-vs-6.1.0.h \
+	../news/6.1.0-vs-6.2.0.h
 
 HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = LaTeX/deal.II
