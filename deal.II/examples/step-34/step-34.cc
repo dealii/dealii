@@ -1320,24 +1320,31 @@ void BEMProblem<dim>::assemble_system()
 				 // the linear system.
 				 //
 				 // As mentioned in the introduction,
-				 // the fact that the system matrix
-				 // has a non null kernel, requires us
-				 // to be careful in case we wish to
-				 // use an iterative solver. To
+				 // the system matrix is singular with
+				 // a kernel that contains the
+				 // constant functions. This requires
+				 // us to be careful in case we wish
+				 // to use an iterative solver. To
 				 // address this issue, we use two new
 				 // instruments of the library: the
 				 // MeanValueFilter class, and the
 				 // ProductMatrix class. The
-				 // MeanValueFilter has the same
-				 // interface of a matrix, with the
-				 // effect of subtracting the mean
-				 // value to source vector. We cascade
+				 // MeanValueFilter has the interface
+				 // of a matrix (i.e. it has a
+				 // function MeanValueFilter::vmult),
+				 // with the effect that the output
+				 // vector equals the input vector
+				 // minus its mean value. We cascade
 				 // this operator with the system
 				 // matrix, and we obtain a matrix
 				 // whose result is renormalized to a
-				 // zero mean value Vector. This
-				 // object is then passed to a GMRES
-				 // solver.
+				 // zero mean value Vector. In other
+				 // words, vectors that are multiplied
+				 // have mean value zero and therefore
+				 // never feel the fact that the
+				 // system matrix has a kernel for
+				 // these. The combined matrix object
+				 // is then passed to a GMRES solver.
 template <int dim>
 void BEMProblem<dim>::solve_system()
 {
