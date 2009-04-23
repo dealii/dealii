@@ -438,7 +438,7 @@ This is exactly Bernoulli's law mentioned above.
 
 <h3>The numerical approximation</h3>
 
-Numerical approximations of Boundary Integral Equations (BIE) are commonly
+Numerical approximations of %Boundary Integral Equations (BIE) are commonly
 referred to as the boundary element method or panel method (the latter
 expression being used mostly in the computational fluid dynamics community).
 The goal of the following test problem is to solve the integral
