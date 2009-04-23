@@ -1275,6 +1275,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   }
   internals::list_shellsort (my_indices);
 
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+
 				   // now in the second step actually
 				   // resolve the constraints
   const unsigned int n_constrained_dofs = constraint_lines.size();
@@ -1318,7 +1320,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // something with this dof
       const double new_diagonal = std::fabs(local_matrix(local_row,local_row)) != 0 ?
 	std::fabs(local_matrix(local_row,local_row)) : average_diagonal;
-      Threads::ThreadMutex::ScopedLock lock(mutex);
       global_matrix.add(global_row, global_row, new_diagonal);
     }
 
@@ -1509,7 +1510,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // that accumulated under the given
 				   // process into the global matrix row and
 				   // into the vector
-      Threads::ThreadMutex::ScopedLock lock(mutex);
       const unsigned int n_values = col_ptr - &cols[0];
       Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
 	      ExcInternalError());
@@ -1601,6 +1601,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   }
   internals::list_shellsort (my_indices);
 
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+
   const unsigned int n_constrained_dofs = constraint_lines.size();
   for (unsigned int i=0; i<n_constrained_dofs; ++i)
     {
@@ -1617,7 +1619,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
       const double new_diagonal = std::fabs(local_matrix(local_row,local_row)) != 0 ?
 	std::fabs(local_matrix(local_row,local_row)) : average_diagonal;
-      Threads::ThreadMutex::ScopedLock lock(mutex);
       global_matrix.add(global_row, global_row, new_diagonal);
     }
 
@@ -1751,12 +1752,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	      Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
 		      ExcInternalError());
 	      if (n_values > 0)
-		{
-		  Threads::ThreadMutex::ScopedLock lock(mutex);
-		  global_matrix.block(block, block_col).add(row, n_values,
-							    &cols[0], &vals[0],
-							    false, true);
-		}
+		global_matrix.block(block, block_col).add(row, n_values,
+							  &cols[0], &vals[0],
+							  false, true);
 	    }
 
 	  if (use_vectors == true)
@@ -1788,10 +1786,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		    }
 		}
 	      if (val != 0)
-		{
-		  Threads::ThreadMutex::ScopedLock lock(mutex);
-		  global_vector(my_indices[i].global_row) += val;
-		}
+		global_vector(my_indices[i].global_row) += val;
 	    }
 	}
     }
@@ -1861,6 +1856,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       actual_dof_indices.resize (added_rows);
       std::sort (actual_dof_indices.begin(), actual_dof_indices.end());
 
+      Threads::ThreadMutex::ScopedLock lock(mutex);
+
       const unsigned int n_constrained_dofs = constraint_lines.size();
       for (unsigned int i=0; i<n_constrained_dofs; ++i)
 	{
@@ -1886,8 +1883,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		}
 	    }
 
-	  Threads::ThreadMutex::ScopedLock lock(mutex);
-
 	  if (keep_constrained_entries == true)
 	    {
 	      for (unsigned int j=0; j<n_local_dofs; ++j)
@@ -1908,7 +1903,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // to the sparsity pattern. Very easy
 				   // here - just add the same array to all
 				   // the columns...
-      Threads::ThreadMutex::ScopedLock lock(mutex);
       for (unsigned int i=0; i<n_actual_dofs; ++i)
 	sparsity_pattern.add_entries(actual_dof_indices[i],
 				     actual_dof_indices.begin(),
@@ -1966,6 +1960,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
   }
   internals::list_shellsort (my_indices);
 
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+
 				   // now in the second step actually
 				   // resolve the constraints
   const unsigned int n_constrained_dofs = constraint_lines.size();
@@ -1981,8 +1977,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				  std::make_pair<unsigned int,double> 
 				  (local_row, position->entries[q].second));
 	}
-
-      Threads::ThreadMutex::ScopedLock lock(mutex);
 
                                    // need to add the whole row and column
                                    // structure in case we keep constrained
@@ -2122,7 +2116,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // that accumulated under the given
 				   // process into the global matrix row and
 				   // into the vector
-      Threads::ThreadMutex::ScopedLock lock(mutex);
       if (col_ptr != cols.begin())
 	sparsity_pattern.add_entries(row, cols.begin(), col_ptr,
 				     true);
@@ -2202,6 +2195,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       actual_dof_indices.resize (added_rows);
       std::sort (actual_dof_indices.begin(), actual_dof_indices.end());
 
+      Threads::ThreadMutex::ScopedLock lock(mutex);
+
       const unsigned int n_constrained_dofs = constraint_lines.size();
       for (unsigned int i=0; i<n_constrained_dofs; ++i)
 	{
@@ -2226,8 +2221,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		    actual_dof_indices.insert(it, new_index);
 		}
 	    }
-
-	  Threads::ThreadMutex::ScopedLock lock(mutex);
 
 	  if (keep_constrained_entries == true)
 	    {
@@ -2254,7 +2247,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // easy operation - just go trough the
 				   // individual blocks and add the same
 				   // array for each row
-      Threads::ThreadMutex::ScopedLock lock(mutex);
       for (unsigned int block=0; block<num_blocks; ++block)
 	{
 	  const unsigned int next_block = block_starts[block+1];
@@ -2326,6 +2318,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
   }
   internals::list_shellsort (my_indices);
 
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+
 				   // now in the second step actually
 				   // resolve the constraints
   const unsigned int n_constrained_dofs = constraint_lines.size();
@@ -2341,8 +2335,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				  std::make_pair<unsigned int,double> 
 				  (local_row, position->entries[q].second));
 	}
-
-      Threads::ThreadMutex::ScopedLock lock(mutex);
 
       if (keep_constrained_entries == true)
 	{
@@ -2487,7 +2479,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // that accumulated under the given
 				   // process into the global matrix row and
 				   // into the vector
-	      Threads::ThreadMutex::ScopedLock lock(mutex);
 	      sparsity_pattern.block(block, block_col).add_entries(row, 
 								   cols.begin(), 
 								   col_ptr,
