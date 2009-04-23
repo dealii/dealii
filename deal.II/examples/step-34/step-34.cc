@@ -1335,13 +1335,9 @@ void BEMProblem<dim>::assemble_system()
 				 // operator with the system matrix,
 				 // and we obtain a matrix $FA$ whose
 				 // result is renormalized to a zero
-				 // mean value vector. In other words,
-				 // vectors that are multiplied have
-				 // mean value zero and therefore
-				 // never feel the fact that the
-				 // system matrix has a kernel for
-				 // these. The combined matrix object
-				 // is then passed to a GMRES solver.
+				 // mean value vector. The combined
+				 // matrix object is then passed to a
+				 // GMRES solver.
 template <int dim>
 void BEMProblem<dim>::solve_system()
 {
