@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -156,13 +156,6 @@ void test_projection (const Triangulation<dim>& tr,
 			  | update_values);
   double err = integrate_error(dof, feval, u, f);
   deallog << err << std::endl;
-
-  DataOut<dim> dout;
-  dout.attach_dof_handler(dof);
-  std::ofstream of("T.gnuplot");
-  dout.add_data_vector(u, "u");
-  dout.build_patches(3);
-  dout.write_gnuplot(of);
 }
 
 
