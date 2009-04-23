@@ -16,23 +16,15 @@ usually modeled by the Euler equations of fluid dynamics:
   \frac{\partial }{\partial t}\mathbf{v} + (\mathbf{v}\cdot\nabla)\mathbf{v}
   &=
   -\frac{1}{\rho}\nabla p + \mathbf{g} 
-  \qquad &\text{in } \Omega
+  \qquad &\text{in } \mathbb{R}^n \backslash \Omega
   \\
   \nabla \cdot \mathbf{v}&=0  
-  &\text{in } \Omega
+  &\text{in } \mathbb{R}^n\backslash\Omega
 \f}
-
 where the fluid density $\rho$ and the acceleration $\mathbf{g}$ due
 to external forces are given and the velocity $\mathbf{v}$ and the
-pressure $p$ are the unknowns. Here $\bar \Omega =
-\mathbb{R}^n\backslash \Omega$ is a closed bounded region representing
-the body around which the fluid moves.  
-
-The boundary of our exterior domain is defined as $\Gamma \cup
-\Gamma_\infty = \partial \Omega$ where $\Gamma = \partial \bar \Omega$
-while $\Gamma_\infty = \lim_{r\to\infty} \partial B_r(0)$. Notice that
-the outer normal to the domain of integration is inner to the body
-around which the fluid moves.
+pressure $p$ are the unknowns. Here $\Omega$ is a closed bounded
+region representing the body around which the fluid moves. 
 
 The above equations can be derived from Navier-Stokes equations
 assuming that the effects due to viscosity are negligible compared to
@@ -52,10 +44,10 @@ flow without external forces:
   (\mathbf{v}\cdot\nabla)\mathbf{v}
   &=
   -\frac{1}{\rho}\nabla p
-  \qquad &\text{in } \Omega
+  \qquad &\text{in } \mathbb{R}^n \backslash \Omega
   \\
   \nabla \cdot \mathbf{v}&=0  
-  &\text{in } \Omega
+  &\text{in } \mathbb{R}^n\backslash\Omega
 \f}
 
 
@@ -64,8 +56,8 @@ boundary conditions
 \f[
   \label{eq:boundary-conditions}
   \begin{aligned}
-    \mathbf{n}\cdot\mathbf{v}& = 0 \qquad && \text{ on } \Gamma = \partial \bar \Omega \\
-    \mathbf{v}& = \mathbf{v}_\infty && \text{ on } \Gamma_\infty,
+    \mathbf{n}\cdot\mathbf{v}& = 0 \qquad && \text{ on } \partial\Omega \\
+    \mathbf{v}& = \mathbf{v}_\infty && \text{ when } |\mathbf{x}| \to \infty,
   \end{aligned}
 \f]
 
@@ -73,7 +65,9 @@ which is to say that the body is at rest in our coordinate systems and
 is not permeable, and that the fluid has (constant) velocity
 $\mathbf{v}_\infty$ at infinity. An alternative viewpoint is that our
 coordinate system moves along with the body whereas the background
-fluid is at rest at infinity.
+fluid is at rest at infinity. Notice that we define the normal
+$\mathbf{n}$ as the <i>outer</i> normal to the domain $\Omega$, which
+is the opposite of the outer normal to the integration domain. 
 
 For both stationary and non stationary flow, the solution process
 starts by solving for the velocity in the second equation and
@@ -91,13 +85,13 @@ which we find that the same equations hold (because $\nabla\cdot
 \f[
   \label{eq:boundary-conditions-tilde}
   \begin{aligned}
-    \mathbf{n}\cdot\mathbf{\tilde{v}}& = -\mathbf{n}\cdot\mathbf{v}_\infty \qquad && \text{ on } \Gamma \\
-    \mathbf{\tilde{v}}& = 0 && \text{ on } \Gamma_\infty,
+    \mathbf{n}\cdot\mathbf{\tilde{v}}& = -\mathbf{n}\cdot\mathbf{v}_\infty \qquad && \text{ on } \partial\Omega \\
+    \mathbf{\tilde{v}}& = 0 && \text{ when } |\mathbf{x}| \to \infty,
   \end{aligned}
 \f]
 
 If we assume that the fluid is irrotational, i.e., $\nabla \times
-\mathbf{v}=0$ in $\Omega$, we can represent the
+\mathbf{v}=0$ in $\mathbb{R}^n\backslash\Omega$, we can represent the
 velocity, and consequently also the perturbation velocity, as the
 gradient of a scalar function:
 \f[
@@ -107,12 +101,10 @@ and so the second part of Euler equations above can be rewritten
 as the homogenous Laplace equation for the unknown $\phi$:
 \f{align*}
 \label{laplace}
-\Delta\phi &= 0 \qquad &&\text{ in } \Omega,
+\Delta\phi &= 0 \qquad &&\text{in}\ \mathbb{R}^n\backslash\Omega,
 	   \\
 	   \mathbf{n}\cdot\nabla\phi &= -\mathbf{n}\cdot\mathbf{v}_\infty 
-	   && \text{ on }\ \Gamma\\
-	   \mathbf{n}\cdot\nabla\phi &= 0 
-	   && \text{ on }\ \Gamma_\infty
+	   && \text{on}\ \partial\Omega
 \f}
 while the momentum equation reduces to Bernoulli's equation that expresses the
 pressure $p$ as a function of the potential $\phi$:
@@ -120,24 +112,12 @@ pressure $p$ as a function of the potential $\phi$:
 \frac{p}{\rho} +\frac{1}{2} | \nabla \phi |^2 = 0 \in \Omega.
 \f]
 
-So we can solve the problem by solving the Laplace equation for the potential.
-We will now reformulate this equation in integral form using the
- Green identity:
-\f[\label{green}
-  \int_{\Omega}
-  (\Delta u)v\,dx - \int_{\partial\Omega} \frac{\partial u}{\partial \mathbf{n} }v \,ds
-  = 
-  \int_{\Omega}
-  (\Delta v)u\,dx - \int_{\partial\Omega} u\frac{\partial v}{\partial \mathbf{n}} \,ds,
-\f]
+So we can solve the problem by solving the Laplace equation for the
+potential.  We recall that the following functions, called fundamental
+solutions of the Laplace equation, 
 
-where $\mathbf{n}$ is normal to the surface of $\Omega$ pointing
-outwards from fluid (note that this normal is pointing <i>inward</i>
-the body around which the fluid moves).  We also recall that the
-following functions, called fundamental solutions of the Laplace
-equation, 
-
-\f[ \begin{aligned} \label{eq:3} G(\mathbf{y}-\mathbf{x}) = &
+\f[ \begin{aligned} 
+\label{eq:3} G(\mathbf{y}-\mathbf{x}) = &
 -\frac{1}{2\pi}\ln|\mathbf{y}-\mathbf{x}| \qquad && \text{for } n=2 \\
 G(\mathbf{y}-\mathbf{x}) = &
 \frac{1}{4\pi}\frac{1}{|\mathbf{y}-\mathbf{x}|}&& \text{for } n=3,
@@ -147,45 +127,79 @@ G(\mathbf{y}-\mathbf{x}) = &
 satisfy in a distributional sense the equation: 
 
 \f[ 
-\Delta_y G(\mathbf{y}-\mathbf{x}) = \delta(\mathbf{y}-\mathbf{x}),
+-\Delta_y G(\mathbf{y}-\mathbf{x}) = \delta(\mathbf{y}-\mathbf{x}), 
 \f] 
 
-where the derivative is done in the variable $\mathbf{y}$.
+where the derivative is done in the variable $\mathbf{y}$. By using
+the usual Green identities, our problem can be written on the boundary
+$\partial\Omega = \Gamma$ only. We recall the general definition of
+the second Green identity:
+
+\f[\label{green}
+  \int_{\omega}
+  (-\Delta u)v\,dx + \int_{\partial\omega} \frac{\partial u}{\partial \mathbf{n} }v \,ds
+  = 
+  \int_{\omega}
+  (-\Delta v)u\,dx + \int_{\partial\omega} u\frac{\partial v}{\partial \mathbf{n}} \,ds, 
+\f]
+
+where $\mathbf{n}$ is the normal to the surface of $\omega$ pointing
+outwards from the domain of integration $\omega$.
+
+In our case the domain of integration is the domain
+$\mathbb{R}^n\backslash\Omega$, whose boundary is $ \Gamma_\infty \cup
+\Gamma$, where the "boundary" at infinity is defined as
+
+\f[
+\Gamma_\infty := \lim_{r\to\infty} \partial B_r(0).
+\f]
+
+In our program the normals are defined as <i>outer</i> to the domain
+$\Omega$, that is, they are in fact <i>inner</i> to the integration
+domain, and some care is required in defining the various integrals
+with the correct signs for the normals.
 
 If we substitute $u$ and $v$ in the Green identity with the solution
 $\phi$ and with the fundamental solution of the Laplace equation
-respectively, as long as $\mathbf{x}$ is chosen inside $\Omega$, we
-obtain:
-
+respectively, as long as $\mathbf{x}$ is chosen in the region
+$\mathbb{R}^n\backslash\Omega$, we obtain:
 \f[
-  \phi(\mathbf{x}) - 
-  \int_{\partial \Omega}\frac{\partial G(\mathbf{y}-\mathbf{x})}{\partial \mathbf{n}_y}\phi(\mathbf{y})\,ds_y 
+  \phi(\mathbf{x}) -  
+  \int_{\Gamma\cup\Gamma_\infty}\frac{\partial G(\mathbf{y}-\mathbf{x})}{\partial \mathbf{n}_y}\phi(\mathbf{y})\,ds_y 
   =
-  - \int_{\partial \Omega}G(\mathbf{y}-\mathbf{x})\frac{\partial \phi}{\partial \mathbf{n}_y}(\mathbf{y})\,ds_y
-  \qquad \forall\mathbf{x}\in \Omega.
+  -\int_{\Gamma\cup\Gamma_\infty}G(\mathbf{y}-\mathbf{x})\frac{\partial \phi}{\partial \mathbf{n}_y}(\mathbf{y})\,ds_y
+  \qquad \forall\mathbf{x}\in \mathbb{R}^n\backslash\Omega
 \f]
 
-We notice here that on $\Gamma_\infty$ we have that $\nabla \phi$ is
-zero, implying that $\phi_\infty$ is constant. It is a simple fact to
-verify that this in turn implies that
+where the normals are now pointing <i>inward</i> the domain of
+integration.
+
+Notice that in the above equation, we also have the integrals on the
+portion of the boundary at $\Gamma_\infty$. Using the boundary
+conditions of our problem, we have that $\nabla \phi$ is zero at
+infinity (which simplifies the integral on $\Gamma_\infty$ on the
+right hand side).
+
+The integral on $\Gamma_\infty$ that appears on the left hand side can
+be treated by observing that $\nabla\phi=0$ implies that $\phi$ at
+infinity is necessarily constant. We define its value to be
+$\phi_\infty$.  It is an easy exercise to prove that
 
 \f[
-   \int_{\Gamma_\infty}\frac{\partial G(\mathbf{y}-\mathbf{x})}
-   {\partial \mathbf{n}_y}\phi(\mathbf{y})\,ds_y =
-    \phi_\infty \qquad \forall \mathbf{x} \in \mathbb{R}^n,
+-\int_{\Gamma_\infty} \frac{\partial G(\mathbf{y}-\mathbf{x})}
+{\partial \mathbf{n}_y}\phi_\infty \,ds_y = 
+\lim_{r\to\infty} \int_{\partial B_r(0)} \frac{\mathbf{r}}{r} \cdot \nabla G(\mathbf{y}-\mathbf{x}) 
+\phi_\infty \,ds_y = -\phi_\infty.
 \f]
 
-both in two and in three dimensions.
-
-We can then write the final problem in a more compatc way using the
-so-called Single and Double Layer Potential operators, which are
-integral operators defined only on the finite part of the
-boundary of $\Omega$:
+Using this result, we can reduce the above equation only on the
+boundary $\Gamma$ using the so-called Single and Double Layer
+Potential operators:
 
 \f[\label{integral}
-  \phi(\mathbf{x}) -\phi_\infty - (D\phi)(\mathbf{x}) =
+  \phi(\mathbf{x}) - (D\phi)(\mathbf{x}) = \phi_\infty
   -\left(S \frac{\partial \phi}{\partial n_y}\right)(\mathbf{x})
-  \qquad \forall\mathbf{x}\in \Omega.
+  \qquad \forall\mathbf{x}\in \mathbb{R}^n\backslash\Omega.
 \f]
 
 (The name of these operators comes from the fact that they describe the
@@ -193,69 +207,71 @@ electric potential in $\mathbb{R}^n$ due to a single thin sheet of charges
 along a surface, and due to a double sheet of charges and anti-charges along
 the surface, respectively.)
 
-In our case, we know the Neumann values of $\phi$ on the boundary $\Gamma$:
+In our case, we know the Neumann values of $\phi$ on the boundary:
 $\mathbf{n}\cdot\nabla\phi = -\mathbf{n}\cdot\mathbf{v}_\infty$.
 Consequently,
-
 \f[
-  \phi(\mathbf{x}) -\phi_\infty - (D\phi)(\mathbf{x}) = 
+  \phi(\mathbf{x}) - (D\phi)(\mathbf{x}) = \phi_\infty + 
    \left(S[\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
-     \qquad \forall\mathbf{x} \in \Omega.
+   \qquad \forall\mathbf{x} \in \mathbb{R}^n\backslash\Omega.
 \f]
-
-If we take the limit for $\mathbf{x}$ going to $\Gamma$ of
+If we take the limit for $\mathbf{x}$ tending to $\Gamma$ of
 the above equation, using well known properties of the single and double layer
-operators, we obtain an equation for $\phi$ just on $\Gamma$:
+operators, we obtain an equation for $\phi$ just on the boundary $\Gamma$ of
+$\Omega$:
 
 \f[\label{SD}
-  \alpha(\mathbf{x})\phi(\mathbf{x}) -\phi_\infty - (D\phi)(\mathbf{x}) = 
+  \alpha(\mathbf{x})\phi(\mathbf{x}) - (D\phi)(\mathbf{x}) = \phi_\infty +
   \left(S [\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
-    \quad \mathbf{x}\in \partial\Omega,
+  \quad \mathbf{x}\in \partial\Omega,
 \f]
-which is the integral formulation we were looking for, where the
-quantity $\alpha(\mathbf{x})$ is the fraction of exterior angle or solid
-angle by which the point $\mathbf{x}$ sees the domain $\Omega$. In particular,
-at points $\mathbf{x}$ where the boundary $\Gamma$ is differentiable
-(i.e. smooth) we have $\alpha(\mathbf{x})=\frac 12$, but the value may be
-smaller or larger at points where the boundary has a corner or an edge.
+
+which is the Boundary Integral Equation (BIE) we were looking for,
+where the quantity $\alpha(\mathbf{x})$ is the fraction of angle or
+solid angle by which the point $\mathbf{x}$ sees the domain of
+integration $\mathbb{R}^n\backslash\Omega$.
+
+In particular, at points $\mathbf{x}$ where the boundary
+$\partial\Omega$ is differentiable (i.e. smooth) we have
+$\alpha(\mathbf{x})=\frac 12$, but the value may be smaller or larger
+at points where the boundary has a corner or an edge.
 
 Substituting the single and double layer operators we get:
 \f[               
-  \alpha(\mathbf{x}) \phi(\mathbf{x}) -\phi_\infty
-  + \frac{1}{2\pi}\int_{\Gamma}  \frac{
+  \alpha(\mathbf{x}) \phi(\mathbf{x}) 
+  + \frac{1}{2\pi}\int_{\partial \Omega}  \frac{
   (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }{ |\mathbf{y}-\mathbf{x}|^2 }
   \phi(\mathbf{x}) \,ds_y 
-  =
-   -\frac{1}{2\pi}\int_{\Gamma}  \ln|\mathbf{y}-\mathbf{x}| \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
+  = \phi_\infty
+    -\frac{1}{2\pi}\int_{\partial \Omega}  \ln|\mathbf{y}-\mathbf{x}| \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
 \f]                 
 for two dimensional flows and
 \f[               
-  \alpha(\mathbf{x}) \phi(\mathbf{x})  -\phi_\infty
-   + \frac{1}{4\pi}\int_{\Gamma} \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }{ |\mathbf{y}-\mathbf{x}|^3 }\phi(\mathbf{y})\,ds_y
-  =
-  \frac{1}{4\pi}\int_{\Gamma} \frac{1}{|\mathbf{y}-\mathbf{x}|} \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
+  \alpha(\mathbf{x}) \phi(\mathbf{x}) 
+   + \frac{1}{4\pi}\int_{\partial \Omega} \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }{ |\mathbf{y}-\mathbf{x}|^3 }\phi(\mathbf{y})\,ds_y
+  = \phi_\infty +
+  \frac{1}{4\pi}\int_{\partial \Omega} \frac{1}{|\mathbf{y}-\mathbf{x}|} \, \mathbf{n}\cdot\mathbf{v_\infty}\,ds_y
 \f]                 
 for three dimensional flows, where the normal derivatives of the fundamental
 solutions have been written in a form that makes computation easier. In either
 case, $\phi$ is the solution of an integral equation posed entirely on the
-boundary since both $\mathbf{x},\mathbf{y}\in\Gamma$.
+boundary since both $\mathbf{x},\mathbf{y}\in\partial\Omega$.
 
 Notice that the fraction of angle (in 2d) or solid angle (in 3d)
 $\alpha(\mathbf{x})$ by which the point $\mathbf{x}$ sees the domain
 $\Omega$ can be defined using the double layer potential itself:
 \f[
 \alpha(\mathbf{x}) := 1 -
-\frac{1}{2(n-1)\pi}\int_{\Gamma} \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }
-{ |\mathbf{y}-\mathbf{x}|^{n} }\phi(\mathbf{y})\,ds_y =
-1 + \int_{\Gamma} \frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y.
+\frac{1}{2(n-1)\pi}\int_{\partial \Omega} \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }
+{ |\mathbf{y}-\mathbf{x}|^{n} }\phi(\mathbf{y})\,ds_y = 1+
+\int_{\partial \Omega} \frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y.
 \f]
 
 The reason why this is possible can be understood if we consider the
 fact that the solution of a pure Neumann problem is known up to an
-arbitrary constant $\phi_\infty$, which means that, if we set the
-Neumann data to be zero, then any constant $\phi = \phi_\infty$ will
-be a solution, giving us an the explicit expression above for
-$\alpha(\mathbf{x})$.
+arbitrary constant $c$, which means that, if we set the Neumann data
+to be zero, then any constant $\phi = \phi_\infty$ will be a solution,
+giving us an the explicit expression above for $\alpha(\mathbf{x})$.
 
 While this example program is really only focused on the solution of the
 boundary integral equation, in a realistic setup one would still need to solve
@@ -264,8 +280,9 @@ $\phi(\mathbf{x})$ for all $\mathbf{x}\in\partial\Omega$. In the next step, we
 can compute (analytically, if we want) the solution $\phi(\mathbf{x})$ in all
 of $\mathbb{R}^n\backslash\Omega$. To this end, recall that we had
 \f[
-  \phi(\mathbf{x}) - \phi_\infty
+  \phi(\mathbf{x}) 
   =
+  \phi_\infty +
   (D\phi)(\mathbf{x})
   +
   \left(S[\mathbf{n}\cdot\mathbf{v}_\infty]\right)(\mathbf{x})
@@ -277,8 +294,8 @@ $\phi$ on the boundary we have just computed). Finally, we can then recover
 the velocity as $\mathbf{\tilde v}=\nabla \phi$. 
 
 Notice that the evaluation of the above formula for $\mathbf{x} \in
-\Omega$ should yield $\phi_\infty$ as a result, since the integration
-of the the Dirac delta $\delta(\mathbf{x})$ in the domain
+\Omega$ should yield zero as a result, since the integration of the
+the Dirac delta $\delta(\mathbf{x})$ in the domain
 $\mathbb{R}^n\backslash\Omega$ is always zero by definition.
 
 As a final test, let us verify that this velocity indeed satisfies the
@@ -449,7 +466,7 @@ treat boundary element problems almost as easily as finite element
 problems using the deal.II library.
 
 To this end, let $\mathcal{T}_h = \bigcup_i K_i$ be a subdivision of the
-manifold $\Gamma$ into $M$ line segments if $n=2$, or $M$
+manifold $\Gamma = \partial \Omega$ into $M$ line segments if $n=2$, or $M$
 quadrilaterals if $n=3$. We will call each individual segment or
 quadrilateral an <i>element</i> or <i>cell</i>, independently of the
 dimension $n$ of the surrounding space $\mathbb{R}^n$.
@@ -495,33 +512,37 @@ Given the datum $\mathbf{v}_\infty$, find a function $\phi_h$ in $V_h$
 such that the following $n\_dofs$ equations are satisfied:
 
 \f{align*}
-    \alpha(\mathbf{x}_i) \phi_h(\mathbf{x}_i)
+    \alpha(\mathbf{x}_i) \phi_h(\mathbf{x}_i)  
     - \int_{\Gamma_y} \frac{ \partial G(\mathbf{y}-\mathbf{x}_i)}{\partial\mathbf{n}_y }
-    \phi_h(\mathbf{y}) \,ds_y = 
+    \phi_h(\mathbf{y}) \,ds_y = \phi_\infty +
     \int_{\Gamma_y} G(\mathbf{y}-\mathbf{x}_i) \, 
-      \mathbf{n}_y\cdot\mathbf{v_\infty} \,ds_y 
+    \mathbf{n}_y\cdot\mathbf{v_\infty} \,ds_y 
     ,
 \f}
+
 where the quantity $\alpha(\mathbf{x}_i)$ is the fraction of (solid)
-angle by which the point $\mathbf{x}_i$ sees the domain $\Omega$, as 
-explained above, and we arbitrarily set  $\phi_\infty$ to be zero.
-If the support points $\mathbf{x}_i$ are chosen appropriately, then the
-problem can be written as the following linear system:
+angle by which the point $\mathbf{x}_i$ sees the domain $\Omega$, as
+explained above, and $\phi_\infty$ is the arbitrary value of $\phi$ at
+infinity.  If the support points $\mathbf{x}_i$ are chosen
+appropriately, then the problem can be written as the following linear
+system:
+
 \f[
 \label{eq:linear-system}
 (\mathbf{A}+\mathbf{N})\boldsymbol\phi = \mathbf{b},
 \f]
+
 where
+
 \f[
 \begin{aligned}
 \mathbf{A}_{ij}&= 
 \alpha(\mathbf{x}_i) \psi_j(\mathbf{x}_i)
-=
- 1+\int_\Gamma 
- \frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y 
- \psi_j(\mathbf{x}_i)
- \\
- \mathbf{N}_{ij}&= -\int_\Gamma
+= 1+\int_\Gamma 
+\frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y 
+\psi_j(\mathbf{x}_i)
+\\
+\mathbf{N}_{ij}&= - \int_\Gamma
   \frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}
   \psi_j(\mathbf{y}) \,ds_y 
 \\
@@ -563,10 +584,10 @@ element $\hat K$.
 Before discussing specifics of this integration in the
 next section, let us point out that the matrix $\mathbf{A}+\mathbf{N}$
 is rank deficient. This is mostly easily seen by realizing that
-$\mathbf{A}=1-(\mathbf{N}\mathbf{e})\mathbf{e}^T$ where $\mathbf{e}$ is a
-vector of all ones. Consequently,
+$\mathbf{A}=\mathbf{I}-(\mathbf{N}\mathbf{e})\mathbf{e}^T$ where $\mathbf{e}$ is a
+vector of all ones and $\mathbf{I}$ is the identity matrix. Consequently,
 $\mathbf{A}+\mathbf{N} =
-\mathbf{N}(\mathbf{I}-\mathbf{e}\mathbf{e}^T)$. Even if $\mathbf{N}$
+\mathbf{I}+\mathbf{N}(\mathbf{I}-\mathbf{e}\mathbf{e}^T)$. Even if $\mathbf{N}$
 has full rank, the resulting matrix has then clearly co-rank 1 with a
 null space in the direction of $\mathbf{e}$, which is the space of
 constant functions. 

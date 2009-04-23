@@ -144,8 +144,6 @@ class BEMProblem
   public:
     BEMProblem();
 
-    ~BEMProblem();
-    
     void run();
 
   private:
@@ -363,29 +361,9 @@ class BEMProblem
 				     // preconditioner for BEM method
 				     // is non trivial, and we don't
 				     // treat this subject here.
-				     //
-				     // Notice, moreover, that
-				     // FullMatrix objects require
-				     // their dimensions to be passed
-				     // at construction time. We don't
-				     // know yet what dimension the
-				     // matrix will have, and we
-				     // instantiate only a
-				     // SmartPointer, which will later
-				     // be initialized to a new
-				     // FullMatrix. Since we construct
-				     // the actual matrix using the
-				     // new operator, we have to take
-				     // care of freeing the used
-				     // memory whenever we exit or
-				     // whenever we refine the
-				     // triangulation. This is done
-				     // both in the distructor and in
-				     // the refine_and_resize()
-				     // function.
 
-    SmartPointer<FullMatrix<double> >        system_matrix;    
-    Vector<double>                           system_rhs;
+    FullMatrix<double>    system_matrix;    
+    Vector<double>        system_rhs;
 
 				     // The next two variables will
 				     // denote the solution $\phi$ as
@@ -447,7 +425,7 @@ class BEMProblem
 				     // quadrature pointer is used,
 				     // and the integration is a
 				     // special one (see the
-				     // assemble_matrix() function
+				     // assemble_system() function
 				     // below for further details).
 				     //
 				     // We also define a couple of
@@ -505,16 +483,6 @@ BEMProblem<dim>::BEMProblem()
 		dh(tria),
 		wind(dim)
 {}
-
-
-template <int dim>
-BEMProblem<dim>::~BEMProblem() {
-  if(system_matrix != 0) {
-      FullMatrix<double> * ptr = system_matrix;
-      system_matrix = 0;
-      delete ptr;
-  }
-}
 
 
 template <int dim> 
@@ -616,22 +584,23 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
   prm.enter_subsection("Exact solution 2d");
   {
     Functions::ParsedFunction<2>::declare_parameters(prm);
-    prm.set("Function expression", "-x-y");
+    prm.set("Function expression", "x+y");
   }
   prm.leave_subsection();
 
   prm.enter_subsection("Exact solution 3d");
   {
     Functions::ParsedFunction<3>::declare_parameters(prm);
-    prm.set("Function expression", "-x-y-z");
+    prm.set("Function expression", "x+y+z");
   }
   prm.leave_subsection();
 
 
 				   // In the solver section, we set
 				   // all SolverControl
-				   // parameters. The object will be
-				   // fed to the GMRES solver.
+				   // parameters. The object will then
+				   // be fed to the GMRES solver in
+				   // the solve_system() function.
   prm.enter_subsection("Solver");
   SolverControl::declare_parameters(prm);
   prm.leave_subsection();
@@ -781,11 +750,6 @@ void BEMProblem<dim>::read_domain()
 				 // mesh, distributes degrees of
 				 // freedom, and resizes matrices and
 				 // vectors.
-				 //
-				 // Note that we need to handle the
-				 // FullMatrix system_matrix
-				 // carefully, since it requires the
-				 // size.
 
 template <int dim>
 void BEMProblem<dim>::refine_and_resize()
@@ -796,12 +760,7 @@ void BEMProblem<dim>::refine_and_resize()
     
   const unsigned int n_dofs =  dh.n_dofs();
   
-  if(system_matrix != 0) {
-      FullMatrix<double> * ptr = system_matrix;
-      system_matrix = 0;
-      delete ptr;
-  }
-  system_matrix = new FullMatrix<double> (n_dofs, n_dofs);
+  system_matrix.reinit(n_dofs, n_dofs);
     
   system_rhs.reinit(n_dofs);
   phi.reinit(n_dofs);
@@ -993,7 +952,7 @@ void BEMProblem<dim>::assemble_system()
                         
 		  for(unsigned int j=0; j<fe.dofs_per_cell; ++j)
                         
-		    local_matrix_row_i(j) += ( ( LaplaceKernel::double_layer(R)     * 
+		    local_matrix_row_i(j) -= ( ( LaplaceKernel::double_layer(R)     * 
 						 normals[q] )            *
 					       fe_v.shape_value(j,q)     *
 					       fe_v.JxW(q)       );
@@ -1260,7 +1219,7 @@ void BEMProblem<dim>::assemble_system()
 				   fe_v_singular.JxW(q) );
                         
 		for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
-		    local_matrix_row_i(j) += (( LaplaceKernel::double_layer(R) *
+		    local_matrix_row_i(j) -= (( LaplaceKernel::double_layer(R) *
 						singular_normals[q])                *
 					      fe_v_singular.shape_value(j,q)        *
 					      fe_v_singular.JxW(q)       );
@@ -1275,7 +1234,7 @@ void BEMProblem<dim>::assemble_system()
 					   // current cell to the
 					   // global matrix.
 	  for(unsigned int j=0; j<fe.dofs_per_cell; ++j) 
-	      (*system_matrix)(i,local_dof_indices[j]) 
+	      system_matrix(i,local_dof_indices[j]) 
 		  += local_matrix_row_i(j);
 	}
     }
@@ -1307,10 +1266,10 @@ void BEMProblem<dim>::assemble_system()
   Vector<double> ones(dh.n_dofs());
   ones.add(-1.);
   
-  system_matrix->vmult(alpha, ones);
+  system_matrix.vmult(alpha, ones);
   alpha.add(1);
   for(unsigned int i = 0; i<dh.n_dofs(); ++i)
-      (*system_matrix)(i,i) +=  alpha(i);
+      system_matrix(i,i) +=  alpha(i);
 }
 
 
@@ -1388,7 +1347,7 @@ void BEMProblem<dim>::solve_system()
 {
     PrimitiveVectorMemory<Vector<double> > mem;
     MeanValueFilter filter;
-    ProductMatrix<Vector<double> > system(filter, *system_matrix, mem);
+    ProductMatrix<Vector<double> > system(filter, system_matrix, mem);
 	
     SolverGMRES<Vector<double> > solver (solver_control);
     solver.solve (system, phi, system_rhs, PreconditionIdentity());
