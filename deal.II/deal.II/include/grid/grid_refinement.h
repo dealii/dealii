@@ -46,9 +46,9 @@ template <class T> class Vector;
 namespace GridRefinement
 {
 /**
- * @brief Refinement strategy with predictable growth of the mesh
+ * This function provides a refinement strategy with predictable growth of the mesh.
  *
- * This function takes a vector of refinement @p criteria and two values
+ * The function takes a vector of refinement @p criteria and two values
  * between zero and one denoting the fractions of cells to be refined
  * and coarsened. It flags cells for further processing by
  * Triangulation::execute_coarsening_and_refinement() according to the
@@ -119,7 +119,8 @@ namespace GridRefinement
       const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
 
 /**
- * @brief Refinement strategy controlling the reduction of the error estimate
+ * This function provides a refinement strategy controlling the
+ * reduction of the error estimate.
  *
  * Also known as the <b>bulk criterion</b>, this function computes the
  * thresholds for refinement and coarsening such that the @p criteria
