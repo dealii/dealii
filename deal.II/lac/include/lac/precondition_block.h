@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -982,6 +982,8 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 /*@}*/
 //---------------------------------------------------------------------------
 
+#ifndef DOXYGEN
+
 template<class MATRIX, typename inverse_type>
 inline
 PreconditionBlock<MATRIX, inverse_type>::AdditionalData::
@@ -1232,6 +1234,8 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::end (
   Assert (r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r+1);
 }
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
