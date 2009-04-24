@@ -749,6 +749,9 @@ class PreconditionedMatrix : public Subscriptor
 /*@}*/
 /* ---------------------------------- Inline functions ------------------- */
 
+#ifndef DOXYGEN
+
+
 template<class VECTOR>
 inline void
 PreconditionIdentity::vmult (VECTOR &dst, const VECTOR &src) const
@@ -1149,6 +1152,8 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
   dst.sadd(-1.,1.,rhs);
   return dst.l2_norm ();
 }
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
