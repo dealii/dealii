@@ -77,61 +77,64 @@ end
 
 When we run the program, the following is printed on screen:
 @verbatim
+DEAL::
+DEAL::Parsing parameter file parameters.prm
+DEAL::for a 2 dimensional simulation. 
 DEAL:GMRES::Starting value 2.21576
-DEAL:GMRES::Convergence step 1 value 2.41954e-13
+DEAL:GMRES::Convergence step 1 value 2.37635e-13
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       20
 DEAL::   Number of degrees of freedom: 20
 DEAL:GMRES::Starting value 3.15543
-DEAL:GMRES::Convergence step 1 value 2.90310e-13
+DEAL:GMRES::Convergence step 1 value 2.89310e-13
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       40
 DEAL::   Number of degrees of freedom: 40
 DEAL:GMRES::Starting value 4.46977
-DEAL:GMRES::Convergence step 1 value 3.11950e-13
+DEAL:GMRES::Convergence step 1 value 3.11815e-13
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       80
 DEAL::   Number of degrees of freedom: 80
 DEAL:GMRES::Starting value 6.32373
-DEAL:GMRES::Convergence step 1 value 3.22659e-13
+DEAL:GMRES::Convergence step 1 value 3.22474e-13
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       160
 DEAL::   Number of degrees of freedom: 160
 DEAL::
 cycle cells dofs  L2(phi)  Linfty(alpha) 
-    0    20   20 1.149e-07             - 5.000e-02    - 
-    1    40   40 4.330e-08          1.41 2.500e-02 1.00 
-    2    80   80 1.848e-08          1.23 1.250e-02 1.00 
-    3   160  160 8.798e-09          1.07 6.250e-03 1.00 
+    0    20   20 4.465e-02             - 5.000e-02    - 
+    1    40   40 1.081e-02          2.05 2.500e-02 1.00 
+    2    80   80 2.644e-03          2.03 1.250e-02 1.00 
+    3   160  160 6.529e-04          2.02 6.250e-03 1.00 
 DEAL::
 DEAL::Parsing parameter file parameters.prm
 DEAL::for a 3 dimensional simulation. 
-DEAL:GMRES::Starting value 1.42333
-DEAL:GMRES::Convergence step 3 value 7.74202e-17
+DEAL:GMRES::Starting value 2.84666
+DEAL:GMRES::Convergence step 3 value 8.68638e-18
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       24
 DEAL::   Number of degrees of freedom: 26
-DEAL:GMRES::Starting value 3.17144
-DEAL:GMRES::Convergence step 5 value 8.31039e-11
+DEAL:GMRES::Starting value 6.34288
+DEAL:GMRES::Convergence step 5 value 1.38740e-11
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       96
 DEAL::   Number of degrees of freedom: 98
-DEAL:GMRES::Starting value 6.48898
-DEAL:GMRES::Convergence step 5 value 8.89146e-11
+DEAL:GMRES::Starting value 12.9780
+DEAL:GMRES::Convergence step 5 value 3.29225e-11
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       384
 DEAL::   Number of degrees of freedom: 386
-DEAL:GMRES::Starting value 13.0437
-DEAL:GMRES::Convergence step 6 value 3.50193e-12
+DEAL:GMRES::Starting value 26.0874
+DEAL:GMRES::Convergence step 6 value 1.47271e-12
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       1536
 DEAL::   Number of degrees of freedom: 1538
 DEAL::
 cycle cells dofs  L2(phi)  Linfty(alpha) 
-    0    24   26 3.415e-06             - 2.327e-01    - 
-    1    96   98 7.248e-07          2.24 1.239e-01 0.91 
-    2   384  386 1.512e-07          2.26 6.319e-02 0.97 
-    3  1536 1538 6.576e-08          1.20 3.176e-02 0.99 
+    0    24   26 6.873e-01             - 2.327e-01    - 
+    1    96   98 1.960e-01          1.81 1.239e-01 0.91 
+    2   384  386 4.837e-02          2.02 6.319e-02 0.97 
+    3  1536 1538 1.176e-02          2.04 3.176e-02 0.99 
 @endverbatim
 
 As we can see from the convergence table in 2d, if we choose
