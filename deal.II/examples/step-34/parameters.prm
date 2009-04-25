@@ -71,7 +71,7 @@ subsection Wind function 3d
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
-  set Function expression = 1; 1; 1 # default: 0; 0; 0
+  set Function expression = 2; 2; 2 # default: 0; 0; 0
 
   # The name of the variables as they will be used in the function, separated
   # by ','.

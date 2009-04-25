@@ -29,7 +29,6 @@
 #include <base/utilities.h>
 
 #include <lac/full_matrix.h>
-#include <lac/matrix_lib.h>
 #include <lac/vector.h>
 #include <lac/solver_control.h>
 #include <lac/solver_gmres.h>
@@ -208,31 +207,6 @@ class BEMProblem
 				     // tolerance, the maximum number
 				     // of iterations, are selected
 				     // through the parameter file.
-				     //
-				     // There is a catch, however. The
-				     // iterative solver has some
-				     // difficulties in treating our
-				     // matrix, because of its special
-				     // structure. The solution we are
-				     // trying to obtain will only be
-				     // unique up to an additive
-				     // constant: unless we eliminate
-				     // the constants from the
-				     // computation of the residuals,
-				     // the GMRES solver will not be
-				     // able to find a solution. This
-				     // is taken care of in the
-				     // <code>solve_system()</code>
-				     // method, which constructs a
-				     // ProductMatrix between the
-				     // system matrix and a
-				     // MeanValueFilter class to
-				     // eliminate the mean value at
-				     // each iteration of GMRES. The
-				     // solution we obtain is already
-				     // with zero mean value, and the
-				     // solver converges very quickly,
-				     // even without a preconditioner.
     void solve_system();
 
 				     // Once we obtained the solution,
@@ -282,8 +256,8 @@ class BEMProblem
 				     // cube, and the obtained values
 				     // of alphas are exactly $\frac
 				     // 12$ on the nodes of the faces,
-				     // $\frac 14$ on the nodes of the
-				     // edges and $\frac 18$ on the 8
+				     // $\frac 34$ on the nodes of the
+				     // edges and $\frac 78$ on the 8
 				     // nodes of the vertices.
     void compute_errors(const unsigned int cycle);
     
@@ -518,16 +492,18 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
 				   // input data to be such that the
 				   // solution is $x+y$ or
 				   // $x+y+z$. The actually computed
-				   // solution will differ from this
-				   // by a constant (remember that for
-				   // the velocity $\mathbf{\tilde v}$
-				   // we only need the gradient of the
-				   // potential $\phi$, so an additive
-				   // constant is of no concern to us)
-				   // but we will remove it after
-				   // solving for $\phi$ to make the
-				   // solution function have a mean
-				   // value of zero.
+				   // solution will have value zero at
+				   // infinity. In this case, this
+				   // coincide with the exact
+				   // solution, and no additional
+				   // corrections are needed, but you
+				   // should be aware of the fact that
+				   // we arbitrarily set
+				   // $\phi_\infty$, and the exact
+				   // solution we pass to the program
+				   // needs to have the same value at
+				   // infinity for the error to be
+				   // computed correctly. 
 				   //
 				   // The use of the
 				   // Functions::ParsedFunction object
@@ -565,8 +541,7 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
 				   // have a solution. If this
 				   // condition is not satisfied, then
 				   // no solution can be found, and
-				   // the solver will answer
-				   // erratically. 
+				   // the solver will not converge.
   prm.enter_subsection("Wind function 2d");
   {
     Functions::ParsedFunction<2>::declare_parameters(prm, 2);
@@ -944,7 +919,7 @@ void BEMProblem<dim>::assemble_system()
 		  for(unsigned int d=0; d<dim; ++d) 
 		    normal_wind += normals[q][d]*cell_wind[q](d);
                     
-		  const Point<dim> R = support_points[i] - q_points[q];
+		  const Point<dim> R = q_points[q] - support_points[i];
                         
 		  system_rhs(i) += ( LaplaceKernel::single_layer(R)   * 
 				     normal_wind                      *
@@ -1208,7 +1183,7 @@ void BEMProblem<dim>::assemble_system()
                     
 	    for(unsigned int q=0; q<singular_quadrature->size(); ++q)
 	      {
-		const Point<dim> R = support_points[i] - singular_q_points[q];
+		const Point<dim> R = singular_q_points[q] - support_points[i];
 		double normal_wind = 0;
 		for(unsigned int d=0; d<dim; ++d)
 		  normal_wind += (singular_cell_wind[q](d)*
@@ -1267,6 +1242,7 @@ void BEMProblem<dim>::assemble_system()
   ones.add(-1.);
   
   system_matrix.vmult(alpha, ones);
+  alpha.add(1);
   for(unsigned int i = 0; i<dh.n_dofs(); ++i)
       system_matrix(i,i) +=  alpha(i);
 }
@@ -1276,76 +1252,11 @@ void BEMProblem<dim>::assemble_system()
 
 				 // The next function simply solves
 				 // the linear system.
-				 //
-				 // As mentioned in the introduction,
-				 // the system matrix is singular with
-				 // a kernel that contains the
-				 // constant functions. This requires
-				 // us to be careful in case we wish
-				 // to use an iterative solver. To
-				 // address this issue, we use two new
-				 // instruments of the library: the
-				 // MeanValueFilter class, and the
-				 // ProductMatrix class.
-				 //
-				 // In essence, the idea is this: all
-				 // Krylov subspace solvers construct
-				 // an approximation the solution in
-				 // the space $\text{span}
-				 // \{b,Ab,A^2b,A^3b,\ldots,A^{n-1}b\}$
-				 // in the $n$-th iteration. We would
-				 // like the vectors in this space to
-				 // have mean value zero. To guarantee
-				 // this sort of thing, we should
-				 // instead consider the problem
-				 // $FAx=Fb$ where $F=I-\frac 1n
-				 // \mathbf{e}\mathbf{e}^T$ (with
-				 // $\mathbf e$ a vector of length $n$
-				 // with all entries equal to
-				 // one). $F$ is the matrix that given
-				 // a vector filters out its mean
-				 // value. The Krylov subspace that
-				 // GMRES constructs from this is
-				 // $\text{span}
-				 // \{Fb,FAb,FA^2b,FA^3b,\ldots,FA^{n-1}b\}$
-				 // (note here that $(FA)^k=FA^k$
-				 // because $A$ maps any vector $t$ to
-				 // exactly the same result as it
-				 // would map $Ft$ - that's the
-				 // definition of its kernel!). So
-				 // each of the elements of Krylov
-				 // subspace has mean value zero, and
-				 // as a consequence so does the
-				 // approximation $x^{(n)}$
-				 // constructed in the $n$-th
-				 // iteration.
-				 //
-				 // To implement this, we need a class
-				 // that represents the action of the
-				 // filter $F$. Sure enough, deal.II
-				 // has one of these: the
-				 // MeanValueFilter class has the
-				 // interface of a matrix (i.e. it has
-				 // a function
-				 // MeanValueFilter::vmult), with the
-				 // effect that the output vector
-				 // equals the input vector minus its
-				 // mean value. We cascade this
-				 // operator with the system matrix,
-				 // and we obtain a matrix $FA$ whose
-				 // result is renormalized to a zero
-				 // mean value vector. The combined
-				 // matrix object is then passed to a
-				 // GMRES solver.
 template <int dim>
 void BEMProblem<dim>::solve_system()
 {
-    PrimitiveVectorMemory<Vector<double> > mem;
-    MeanValueFilter filter;
-    ProductMatrix<Vector<double> > system(filter, system_matrix, mem);
-	
     SolverGMRES<Vector<double> > solver (solver_control);
-    solver.solve (system, phi, system_rhs, PreconditionIdentity());
+    solver.solve (system_matrix, phi, system_rhs, PreconditionIdentity());
 }
 
 
