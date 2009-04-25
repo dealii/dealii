@@ -944,7 +944,7 @@ void BEMProblem<dim>::assemble_system()
 		  for(unsigned int d=0; d<dim; ++d) 
 		    normal_wind += normals[q][d]*cell_wind[q](d);
                     
-		  const Point<dim> R = q_points[q] - support_points[i];
+		  const Point<dim> R = support_points[i] - q_points[q];
                         
 		  system_rhs(i) += ( LaplaceKernel::single_layer(R)   * 
 				     normal_wind                      *
@@ -1208,7 +1208,7 @@ void BEMProblem<dim>::assemble_system()
                     
 	    for(unsigned int q=0; q<singular_quadrature->size(); ++q)
 	      {
-		const Point<dim> R = singular_q_points[q]- support_points[i];
+		const Point<dim> R = support_points[i] - singular_q_points[q];
 		double normal_wind = 0;
 		for(unsigned int d=0; d<dim; ++d)
 		  normal_wind += (singular_cell_wind[q](d)*
@@ -1267,7 +1267,6 @@ void BEMProblem<dim>::assemble_system()
   ones.add(-1.);
   
   system_matrix.vmult(alpha, ones);
-  alpha.add(1);
   for(unsigned int i = 0; i<dh.n_dofs(); ++i)
       system_matrix(i,i) +=  alpha(i);
 }

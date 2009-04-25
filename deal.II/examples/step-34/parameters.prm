@@ -42,6 +42,15 @@ subsection Quadrature rules
 end
 
 
+subsection Solver
+  set Log frequency = 1
+  set Log history   = false
+  set Log result    = true
+  set Max steps     = 100
+  set Tolerance     = 1.e-10
+end
+
+
 subsection Wind function 2d
   # Any constant used inside the function which is not a variable name.
   set Function constants  = 
