@@ -606,6 +606,7 @@ class FiniteElementData
 // --------- inline and template functions ---------------
 
 
+#ifndef DOXYGEN
 
 namespace FiniteElementDomination
 {
@@ -828,6 +829,7 @@ face_to_equivalent_cell_index (const unsigned int index) const
   return face_to_cell_index(index, 0, true);
 }
 
+#endif // DOXYGEN
 
 
 DEAL_II_NAMESPACE_CLOSE
