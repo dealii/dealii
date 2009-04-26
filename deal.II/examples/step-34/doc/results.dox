@@ -47,6 +47,15 @@ subsection Quadrature rules
 end
 
 
+subsection Solver
+  set Log frequency = 1
+  set Log history   = false
+  set Log result    = true
+  set Max steps     = 100
+  set Tolerance     = 1.e-10
+end
+
+
 subsection Wind function 2d
   # Any constant used inside the function which is not a variable name.
   set Function constants  = 
@@ -67,7 +76,7 @@ subsection Wind function 3d
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
-  set Function expression = 1; 1; 1 # default: 0; 0; 0
+  set Function expression = 2; 2; 2 # default: 0; 0; 0
 
   # The name of the variables as they will be used in the function, separated
   # by ','.

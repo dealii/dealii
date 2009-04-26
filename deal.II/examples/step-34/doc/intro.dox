@@ -12,7 +12,7 @@ wrong. There is a factor of $1/2$ that appears, and we haven't figured
 out where it comes from yet. For the moment this issue is "solved" by
 multiplying the wind function in the parameter file by two. 
 
-If you think you have spot the mistake, please let us know.
+If you think you have spotted the mistake, please let us know.
 
 <h1>Introduction</h1>
 
