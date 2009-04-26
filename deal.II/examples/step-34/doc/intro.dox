@@ -235,7 +235,7 @@ $\Omega$:
   \quad \mathbf{x}\in \partial\Omega,
 \f]
 
-which is the Boundary Integral Equation (BIE) we were looking for,
+which is the %Boundary Integral Equation (BIE) we were looking for,
 where the quantity $\alpha(\mathbf{x})$ is the fraction of angle or
 solid angle by which the point $\mathbf{x}$ sees the domain of
 integration $\mathbb{R}^n\backslash\Omega$.
