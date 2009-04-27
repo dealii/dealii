@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -122,7 +122,7 @@ void test ()
   
   deallog << "Number of dofs = " << dof_handler.n_dofs() << std::endl;
   
-  std::vector<unsigned int> size;
+  std::vector<unsigned int> size (dim);
   DoFTools::count_dofs_per_component(dof_handler, size);
   
   BlockSparsityPattern b_sparsity_pattern;
