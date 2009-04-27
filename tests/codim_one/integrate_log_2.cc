@@ -51,7 +51,7 @@ double log_integral(const unsigned int N, const double point, const double alpha
 int main()
 {
   deallog.attach(logfile);
-  deallog.depth_console(1);
+  deallog.depth_console(0);
   deallog<<std::fixed;
   deallog<<std::setprecision(10);
 

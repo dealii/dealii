@@ -42,7 +42,7 @@ ofstream logfile("integrate_one_over_r/output");
 int main()
 {
     deallog.attach(logfile);
-    deallog.depth_console(1);
+    deallog.depth_console(0);
     deallog<< std::fixed;
     
     deallog << endl 
