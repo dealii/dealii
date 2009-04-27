@@ -39,9 +39,10 @@ std::ofstream logfile("mapping_q1_eulerian/output");
 template <int dim, int spacedim>
 void test(std::string filename) {
   Triangulation<dim, spacedim> tria;
-  DoFHandler<dim, spacedim> shift_dh(tria);
   FE_Q<dim, spacedim> base_fe(1);
   FESystem<dim, spacedim> fe(base_fe, spacedim);
+
+  DoFHandler<dim, spacedim> shift_dh(tria);
   
   GridIn<dim, spacedim> gi;
   gi.attach_triangulation (tria);
@@ -51,6 +52,8 @@ void test(std::string filename) {
   shift_dh.distribute_dofs(fe);
   
   Vector<double> shift(shift_dh.n_dofs());
+
+  shift.add(+1);
 
   GridOut grid_out;
   grid_out.set_flags (GridOutFlags::Ucd(true));
