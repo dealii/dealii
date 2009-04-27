@@ -14,12 +14,12 @@ DEAL::absolute norms = 0 94764.3
 DEAL::relative norm distance = 0
 DEAL::absolute norms = 0 236911.
 DEAL::relative norm distance = 0
-DEAL::absolute norms = 1.92069e-10 473822.
+DEAL::absolute norms = 0 473822.
 DEAL::3d
 DEAL::Number of dofs = 1333
 DEAL::relative norm distance = 0
 DEAL::absolute norms = 0 56165.6
 DEAL::relative norm distance = 0
-DEAL::absolute norms = 1.33445e-10 140414.
+DEAL::absolute norms = 0 140414.
 DEAL::relative norm distance = 0
-DEAL::absolute norms = 2.66890e-10 280828.
+DEAL::absolute norms = 0 280828.
