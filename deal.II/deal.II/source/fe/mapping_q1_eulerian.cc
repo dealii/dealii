@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, class EulerVectorType, int spacedim>
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
-		   const DoFHandler<dim> &shiftmap_dof_handler)
+		   const DoFHandler<dim,spacedim> &shiftmap_dof_handler)
                    :
 		   euler_transform_vectors(euler_transform_vectors),
 		   shiftmap_dof_handler(&shiftmap_dof_handler)
@@ -37,8 +37,8 @@ MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
 template <int dim, class EulerVectorType, int spacedim>
 void
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
-compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator &cell,
-			       std::vector<Point<dim> > &a) const
+compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+			       std::vector<Point<spacedim> > &a) const
 {
 
 				   // The assertions can not be in the
@@ -48,9 +48,9 @@ compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator 
 				   // *before* the mapping object is
 				   // constructed, which is not
 				   // necessarily what we want.
-  Assert (dim == shiftmap_dof_handler->get_fe().n_dofs_per_vertex(),
+  Assert (spacedim == shiftmap_dof_handler->get_fe().n_dofs_per_vertex(),
           ExcWrongNoOfComponents());
-  Assert (shiftmap_dof_handler->get_fe().n_components() == dim,
+  Assert (shiftmap_dof_handler->get_fe().n_components() == spacedim,
 	  ExcWrongNoOfComponents());
 
   Assert (shiftmap_dof_handler->n_dofs() == euler_transform_vectors.size(),
@@ -63,8 +63,8 @@ compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator 
 				   // DoFHandler<dim>::cell_iterator
 				   // which is necessary for access to
 				   // DoFCellAccessor::get_dof_values()
-  typename DoFHandler<dim>::cell_iterator
-    dof_cell (const_cast<Triangulation<dim> *> (&(cell->get_triangulation())),
+  typename DoFHandler<dim,spacedim>::cell_iterator
+    dof_cell (const_cast<Triangulation<dim,spacedim> *> (&(cell->get_triangulation())),
 	      cell->level(),
 	      cell->index(),
 	      shiftmap_dof_handler);
@@ -87,15 +87,15 @@ compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator 
 
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     {
-      Point<dim> shift_vector;
+      Point<spacedim> shift_vector;
 
 				       // pick out the value of the
 				       // shift vector at the present
 				       // vertex. since vertex dofs
 				       // are always numbered first,
 				       // we can access them easily
-      for (unsigned int j=0; j<dim; ++j)
-	shift_vector[j] = mapping_values(i*dim+j);
+      for (unsigned int j=0; j<spacedim; ++j)
+	shift_vector[j] = mapping_values(i*spacedim+j);
 
 				       // compute new support point by
 				       // old (reference) value and
@@ -145,6 +145,14 @@ MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
 template class MappingQ1Eulerian<deal_II_dimension, Vector<double> >;
 #ifdef DEAL_II_USE_PETSC
 template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector>;
+#endif
+
+// Explicit instantiation for codimension one problems.
+#if deal_II_dimension != 3
+template class MappingQ1Eulerian<deal_II_dimension, Vector<double>, deal_II_dimension+1 >;
+#	ifdef DEAL_II_USE_PETSC
+template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector, deal_II_dimension+1>;
+#	endif
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

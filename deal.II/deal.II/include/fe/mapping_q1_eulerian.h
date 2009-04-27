@@ -111,7 +111,7 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 				      * <tt>DoFAccessor::set_dof_values()</tt>.
 				      */
     MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
-                       const DoFHandler<dim> &shiftmap_dof_handler);
+                       const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
     
                                      /**
                                       * Return a pointer to a copy of the
@@ -172,7 +172,7 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 				      * which the mapping vector is
 				      * associated.
 				      */
-    const SmartPointer<const DoFHandler<dim> > shiftmap_dof_handler;
+    const SmartPointer<const DoFHandler<dim,spacedim> > shiftmap_dof_handler;
     
 
   private:    
@@ -183,8 +183,8 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 				      * are the vertices.
 				      */
     virtual void compute_mapping_support_points(
-      const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
+	const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+      std::vector<Point<spacedim> > &a) const;
     
 };
 
