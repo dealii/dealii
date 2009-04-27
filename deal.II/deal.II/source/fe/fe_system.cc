@@ -1839,6 +1839,15 @@ initialize_unit_face_support_points ()
 				   // no faces no work
 }
 
+
+template <>
+void
+FESystem<1,2>::
+initialize_unit_face_support_points ()
+{
+				   // no faces no work
+}
+
 #endif
 
 
