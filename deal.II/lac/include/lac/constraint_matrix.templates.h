@@ -973,7 +973,7 @@ namespace internals
     distributing (const distributing &in);
     ~distributing ();
     distributing & operator = (const distributing &in);
-    bool operator < (const distributing &in);
+    bool operator < (const distributing &in) const;
     unsigned int global_row;
     unsigned int local_row;
     mutable std::vector<std::pair<unsigned int,double> > *constraints;
@@ -1019,7 +1019,7 @@ namespace internals
   }
 
   inline
-  bool distributing::operator < (const distributing &in)
+  bool distributing::operator < (const distributing &in) const
   {
     return global_row < in.global_row;
   }
