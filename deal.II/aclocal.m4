@@ -4349,28 +4349,26 @@ AC_DEFUN(DEAL_II_CHECK_CTOR_DTOR_PRIVACY, dnl
     CXXFLAGS="-Wctor-dtor-privacy -Werror"
     AC_TRY_COMPILE(
       [
+        template <typename T>
+        struct IsInt
+        {
+          private:
+            struct yes_type { char c[1]; };
+            struct no_type  { char c[2]; };
+
+            static yes_type check_for_int (const int *);
+
+            static no_type check_for_int (...);
+
+          public:
+            static const bool value = (sizeof(check_for_int((T*)0))
+        			       ==
+        			       sizeof(yes_type));
+        };
+        
+        const bool x = IsInt<double>::value;
       ],
       [
-template <typename T>
-struct IsInt
-{
-  private:
-    struct yes_type { char c[1]; };
-    struct no_type  { char c[2]; };
-
-    template <typename T>
-    static yes_type check_for_int (const T *);
-
-    static no_type check_for_int (...);
-
-  public:
-    static const bool value = (sizeof(check_for_block_matrix
-				      ((MatrixType*)0))
-			       ==
-			       sizeof(yes_type));
-};
-
-const bool x = IsInt<double>::value;
       ],
       [
         AC_MSG_RESULT(no)
