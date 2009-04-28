@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -234,7 +234,10 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 3) && (PETSC_VERSION_SUBMINOR < 1)
+#if ((PETSC_VERSION_MAJOR == 2) && \
+     ((PETSC_VERSION_MINOR < 3) || \
+      ((PETSC_VERSION_MINOR == 3) && \
+       (PETSC_VERSION_SUBMINOR < 1))))
     PCICCSetLevels (pc, additional_data.levels);
 #else
     PCFactorSetLevels (pc, additional_data.levels);
@@ -274,7 +277,10 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 3) && (PETSC_VERSION_SUBMINOR < 1)
+#if ((PETSC_VERSION_MAJOR == 2) && \
+     ((PETSC_VERSION_MINOR < 3) || \
+      ((PETSC_VERSION_MINOR == 3) && \
+       (PETSC_VERSION_SUBMINOR < 1))))
     PCILUSetLevels (pc, additional_data.levels);  
 #else
     PCFactorSetLevels (pc, additional_data.levels);
@@ -318,7 +324,10 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // set flags as given
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR >= 3) && (PETSC_VERSION_SUBMINOR >= 1)
+#if ((PETSC_VERSION_MAJOR == 2) && \
+     ((PETSC_VERSION_MINOR < 3) || \
+      ((PETSC_VERSION_MINOR == 3) && \
+       (PETSC_VERSION_SUBMINOR < 1))))
     ierr = PCLUSetPivoting (pc, additional_data.pivoting);
 #else
     ierr = PCFactorSetPivoting (pc, additional_data.pivoting);

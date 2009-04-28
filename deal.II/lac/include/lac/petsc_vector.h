@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -286,9 +286,9 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     
 #if ((PETSC_VERSION_MAJOR == 2) && \
-    (PETSC_VERSION_MINOR < 3) &&  \
-    (PETSC_VERSION_SUBMINOR < 3))
-
+     ((PETSC_VERSION_MINOR < 3) || \
+      ((PETSC_VERSION_MINOR == 3) &&		\
+       (PETSC_VERSION_SUBMINOR < 3))))
     ierr = VecScatterBegin (static_cast<const Vec &>(v), vector,
                             INSERT_VALUES, SCATTER_FORWARD, ctx);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
