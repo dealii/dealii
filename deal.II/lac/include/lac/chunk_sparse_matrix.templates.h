@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -278,7 +278,6 @@ ChunkSparseMatrix<number>::operator = (const double d)
     {
       const unsigned int chunk_size = cols->get_chunk_size();
       std::fill_n (val,
-		   val +
 		   cols->sparsity_pattern.n_nonzero_elements() *
 		   chunk_size * chunk_size,
 		   0.);
