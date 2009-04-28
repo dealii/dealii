@@ -4329,6 +4329,60 @@ AC_DEFUN(DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX, dnl
 ])
 
 
+
+dnl -------------------------------------------------------------
+dnl Older gcc version appear to frown upon the way we write the
+dnl IsBlockMatrix<MatrixType> template. If that's the case,
+dnl remove the -Wctor-dtor-privacy flag.
+dnl
+dnl This is gcc bug 18644:
+dnl   http://gcc.gnu.org/bugzilla/show_bug.cgi?id=18644
+dnl
+dnl Usage: DEAL_II_CHECK_CTOR_DTOR_PRIVACY
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_CTOR_DTOR_PRIVACY, dnl
+[
+  if test "x$GXX" = "xyes" ; then
+    AC_MSG_CHECKING(for problem with -Wctor-dtor-privacy)
+    AC_LANG(C++)
+    CXXFLAGS="-Wctor-dtor-privacy -Werror"
+    AC_TRY_COMPILE(
+      [
+      ],
+      [
+template <typename T>
+struct IsInt
+{
+  private:
+    struct yes_type { char c[1]; };
+    struct no_type  { char c[2]; };
+
+    template <typename T>
+    static yes_type check_for_int (const T *);
+
+    static no_type check_for_int (...);
+
+  public:
+    static const bool value = (sizeof(check_for_block_matrix
+				      ((MatrixType*)0))
+			       ==
+			       sizeof(yes_type));
+};
+
+const bool x = IsInt<double>::value;
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ],
+      [
+        AC_MSG_RESULT(yes)
+	CXXFLAGSG="$CXXFLAGSG -Wno-ctor-dtor-privacy"
+      ])
+  fi
+])
+
+
 dnl -------------------------------------------------------------
 dnl Check for boost option and find pre-installed boost
 dnl -------------------------------------------------------------
