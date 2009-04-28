@@ -4346,7 +4346,7 @@ AC_DEFUN(DEAL_II_CHECK_CTOR_DTOR_PRIVACY, dnl
   if test "x$GXX" = "xyes" ; then
     AC_MSG_CHECKING(for problem with -Wctor-dtor-privacy)
     AC_LANG(C++)
-    CXXFLAGS="-Wctor-dtor-privacy -Werror"
+    CXXFLAGS="$CXXFLAGSG -Werror"
     AC_TRY_COMPILE(
       [
         template <typename T>
