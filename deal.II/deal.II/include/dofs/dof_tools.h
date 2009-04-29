@@ -617,8 +617,13 @@ class DoFTools
 				      * @deprecated This is the old
 				      * form of the previous
 				      * function. It generates a table
-				      * of DoFTools::Coupling values and calls
-				      * it.
+				      * of DoFTools::Coupling values
+				      * (where a <code>true</code>
+				      * value in the mask is
+				      * translated into a
+				      * Coupling::always value in the
+				      * table) and calls the function
+				      * above.
 				      */
     template <class DH, class SparsityPattern>
     static
@@ -2007,10 +2012,9 @@ DoFTools::fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh)
 template <class DH, class SparsityPattern>
 inline
 void
-DoFTools::make_sparsity_pattern (
-  const DH                              &dof,
-  const std::vector<std::vector<bool> > &mask,
-  SparsityPattern                       &sparsity_pattern)
+DoFTools::make_sparsity_pattern (const DH                              &dof,
+				 const std::vector<std::vector<bool> > &mask,
+				 SparsityPattern                       &sparsity_pattern)
 {
   const unsigned int ncomp = dof.get_fe().n_components();
   
@@ -2025,6 +2029,9 @@ DoFTools::make_sparsity_pattern (
     for (unsigned int j=0;j<ncomp;++j)
       if (mask[i][j])
 	couplings(i,j) = always;
+      else
+	couplings(i,j) = none;
+  
 				   // Call the new function
   make_sparsity_pattern(dof, couplings, sparsity_pattern);
 }
