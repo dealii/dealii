@@ -1503,12 +1503,19 @@ class SparseMatrix : public virtual Subscriptor
 
 				     /**
 				      * Apply SSOR preconditioning to
-				      * <tt>src</tt>.
+				      * <tt>src</tt> with damping
+				      * <tt>omega</tt>. The optional
+				      * argument
+				      * <tt>pos_right_of_diagonal</tt> is
+				      * supposed to provide an array where
+				      * each entry specifies the position
+				      * just right of the diagonal in the
+				      * global array of nonzeros.
 				      */
     template <typename somenumber>
     void precondition_SSOR (Vector<somenumber>             &dst,
 			    const Vector<somenumber>       &src,
-			    const number                    om = 1.,
+			    const number                    omega = 1.,
 			    const std::vector<unsigned int>&pos_right_of_diagonal=std::vector<unsigned int>()) const;
 
 				     /**
