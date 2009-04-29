@@ -204,9 +204,9 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber>& matrix
     = matrix.get_sparsity_pattern().get_column_numbers();
 
   for (unsigned int row=0; row<this->m(); ++row)
-    for (const unsigned int * col = &column_numbers[rowstart_indices[row]];
-         col != &column_numbers[rowstart_indices[row+1]]; ++col)
-      this->set (row, *col, matrix.global_entry(col-column_numbers));
+    this->set (row, rowstart_indices[row+1]-rowstart_indices[row],
+	       &column_numbers[rowstart_indices[row]],
+	       &matrix.val[rowstart_indices[row]], false);
 }
 
 
