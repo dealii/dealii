@@ -1,0 +1,43 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells: 22
+DEAL::   Total number of cells: 29
+DEAL::   Number of degrees of freedom: 34
+DEAL:Bicgstab::Starting value 4.8
+DEAL:Bicgstab::Convergence step 7 value 0
+DEAL::   7 Bicgstab iterations needed to obtain convergence.
+DEAL::Cycle 1:
+DEAL::   Number of active cells: 88
+DEAL::   Total number of cells: 117
+DEAL::   Number of degrees of freedom: 111
+DEAL:Bicgstab::Starting value 6.3
+DEAL:Bicgstab::Convergence step 10 value 0
+DEAL::   10 Bicgstab iterations needed to obtain convergence.
+DEAL::Cycle 2:
+DEAL::   Number of active cells: 352
+DEAL::   Total number of cells: 469
+DEAL::   Number of degrees of freedom: 397
+DEAL:Bicgstab::Starting value 8.7
+DEAL:Bicgstab::Convergence step 18 value 0
+DEAL::   18 Bicgstab iterations needed to obtain convergence.
+DEAL::Cycle 0:
+DEAL::   Number of active cells: 78
+DEAL::   Total number of cells: 89
+DEAL::   Number of degrees of freedom: 158
+DEAL:Bicgstab::Starting value 4.9
+DEAL:Bicgstab::Convergence step 7 value 0
+DEAL::   7 Bicgstab iterations needed to obtain convergence.
+DEAL::Cycle 1:
+DEAL::   Number of active cells: 624
+DEAL::   Total number of cells: 713
+DEAL::   Number of degrees of freedom: 909
+DEAL:Bicgstab::Starting value 4.9
+DEAL:Bicgstab::Convergence step 10 value 0
+DEAL::   10 Bicgstab iterations needed to obtain convergence.
+DEAL::Cycle 2:
+DEAL::   Number of active cells: 4992
+DEAL::   Total number of cells: 5705
+DEAL::   Number of degrees of freedom: 6065
+DEAL:Bicgstab::Starting value 4.9
+DEAL:Bicgstab::Convergence step 16 value 0
+DEAL::   16 Bicgstab iterations needed to obtain convergence.

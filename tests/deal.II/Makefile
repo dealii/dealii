@@ -28,6 +28,7 @@ tests_x = block_matrices \
 	inhomogeneous_constraints \
 	inhomogeneous_constraints_nonsymmetric \
 	inhomogeneous_constraints_block \
+	inhomogeneous_constraints_vector \
 	data_out \
 	derivative_* \
 	derivatives \
