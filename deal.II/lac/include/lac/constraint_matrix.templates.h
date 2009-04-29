@@ -727,35 +727,39 @@ void
 ConstraintMatrix::
 distribute_local_to_global (const Vector<double>            &local_vector,
                             const std::vector<unsigned int> &local_dof_indices,
-                            VectorType                      &global_vector) const
+                            VectorType                      &global_vector,
+			    const FullMatrix<double>        &local_matrix) const
 {
   Assert (local_vector.size() == local_dof_indices.size(),
           ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
   Assert (sorted == true, ExcMatrixNotClosed());
+  const bool use_matrix = local_matrix.m() != 0 ? true : false;
+  if (local_matrix.m() != 0)
+    {
+      Assert (local_matrix.m() == local_dof_indices.size(),
+	      ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
+      Assert (local_matrix.n() == local_dof_indices.size(),
+	      ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
+    }
 
   const unsigned int n_local_dofs = local_vector.size();
   
-                                   // have a special case where there are no
-                                   // constraints at all, since then we can be
-                                   // a lot faster
   Threads::ThreadMutex::ScopedLock lock(mutex);
   for (unsigned int i=0; i<n_local_dofs; ++i)
     {
 				   // let's see if we can use the bool
 				   // vector that tells about whether a
-				   // certain constraint exists.
-      if (constraint_line_exists.size() <= local_dof_indices[i])
+				   // certain constraint exists. then, we
+				   // simply copy over the data.
+      if (is_constrained (local_dof_indices[i]) == false)
 	{
 	  global_vector(local_dof_indices[i]) += local_vector(i);
 	  continue;
 	}
-      if (constraint_line_exists[local_dof_indices[i]] == false)
-	{
-	  global_vector(local_dof_indices[i]) += local_vector(i);
-	  continue;
-	}
-                                           // first figure out whether this
-                                           // dof is constrained
+
+				   // if the dof is constrained, we
+				   // have to find it in the list of
+				   // all constraints.
       ConstraintLine index_comparison;
       index_comparison.line = local_dof_indices[i];
 
@@ -764,40 +768,61 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 				     lines.end(),
 				     index_comparison);
 
-                                           // if the line is not
-                                           // constrained, then simply
-                                           // copy the data. otherwise
-                                           // distribute it, but make
-                                           // sure we don't touch the
-                                           // entries of fixed dofs
-					   //
-					   // there is one critical
-					   // point: sometimes a dof
-					   // may be both constrained
-					   // and fixed, for example
-					   // hanging nodes in 3d at
-					   // the boundary. in that
-					   // case, we don't quite
-					   // know what to do --
-					   // handle the constraint or
-					   // the fixed
-					   // value. however, this
-					   // isn't so hard if all the
-					   // nodes that this node is
-					   // constrained to are also
-					   // fixed nodes, in which
-					   // case we could do both
-					   // but opt to copy the
-					   // element. however, we
-					   // have to check that all
-					   // the nodes to which it is
-					   // constrained are also
-					   // fixed
+				   // check whether we've really found the
+				   // right constraint.
       Assert (position->line == local_dof_indices[i],
 	      ExcInternalError());
+
+      if (use_matrix)
+	{
+	  const double val = position->inhomogeneity;
+	  if (val != 0)
+	    for (unsigned int j=0; j<n_local_dofs; ++j)
+	      if (is_constrained (local_dof_indices[j]) == false)
+		{
+		  global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
+		}
+	      else
+		{
+		  const double matrix_entry = local_matrix(j,i);
+		  if (matrix_entry == 0)
+		    continue;
+
+		  ConstraintLine index_comparison_j;
+		  index_comparison_j.line = local_dof_indices[j];
+
+		  const std::vector<ConstraintLine>::const_iterator
+		    position_j = std::lower_bound (lines.begin(),
+						   lines.end(),
+						   index_comparison_j);
+		  for (unsigned int q=0; q<position_j->entries.size(); ++q)
+		    {
+		      Assert (is_constrained(position_j->entries[q].first) == false,
+			      ExcMessage ("Tried to distribute to a fixed dof."));
+		      global_vector(position_j->entries[j].first)
+			-= val * position_j->entries[q].second * matrix_entry;
+		    }
+		}
+	}
+      else
+				   // in case the constraint is
+				   // inhomogeneous and we have no matrix
+				   // available, this function is not
+				   // appropriate. Throw an exception.
+	Assert (position->inhomogeneity == 0.,
+		ExcMessage ("Inhomogeneous constraint cannot be condensed "
+			    "without any matrix specified."));
+
+				   // now distribute the constraint,
+				   // but make sure we don't touch
+				   // the entries of fixed dofs
       for (unsigned int j=0; j<position->entries.size(); ++j)
-	global_vector(position->entries[j].first)
-	  += local_vector(i) * position->entries[j].second;
+	{
+	  Assert (is_constrained(position->entries[j].first) == false,
+		  ExcMessage ("Tried to distribute to a fixed dof."));
+	  global_vector(position->entries[j].first)
+	    += local_vector(i) * position->entries[j].second;
+	}
     }
 }
 

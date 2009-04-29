@@ -2004,7 +2004,8 @@ ConstraintMatrix::memory_consumption () const
   template void ConstraintMatrix:: \
     distribute_local_to_global<VectorType > (const Vector<double>            &, \
                                              const std::vector<unsigned int> &, \
-                                             VectorType                      &) const; \
+                                             VectorType                      &, \
+					     const FullMatrix<double>        &) const; \
   template void ConstraintMatrix::distribute<VectorType >(const VectorType &condensed,\
 					                 VectorType       &uncondensed) const;\
   template void ConstraintMatrix::distribute<VectorType >(VectorType &vec) const

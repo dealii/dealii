@@ -928,12 +928,7 @@ class ConstraintMatrix : public Subscriptor
                                       * local_dof_indices have the same
                                       * number of elements, this function is
                                       * happy with whatever it is
-                                      * given. Note that this function will
-                                      * apply all constraints as if they
-                                      * were homogeneous. For correctly
-                                      * setting inhomogeneous constraints,
-                                      * use the function with both matrix
-                                      * and vector arguments.
+                                      * given.
                                       *
                                       * In contrast to the similar function
                                       * in the DoFAccessor class, this
@@ -956,32 +951,47 @@ class ConstraintMatrix : public Subscriptor
                                       * vectors and matrices are fully
                                       * assembled.
 				      *
-				      * In order to do its work properly,
-				      * this function has to know which
-				      * degrees of freedom are fixed, for
-				      * example boundary values. For this,
-				      * the third argument is a map between
-				      * the numbers of the DoFs that are
-				      * fixed and the values they are fixed
-				      * to. One can pass an empty map in for
-				      * this argument, but note that you
-				      * will then have to fix these nodes
-				      * later on again, for example by using
-				      * MatrixTools::apply_boundary_values
-				      * to the resulting matrix. However,
-				      * since the present function was
-				      * written for the express purpose of
-				      * not having to use tools that later
-				      * modify the matrix, it is advisable
-				      * to have the list of fixed nodes
-				      * available when calling the present
-				      * function.
+				      * Note that, unless an optional
+                                      * FullMatrix object is provided, this
+                                      * function will apply all constraints
+                                      * as if they were homogeneous and
+                                      * throw an exception in case it
+                                      * encounters inhomogeneous
+                                      * constraints. For correctly setting
+                                      * inhomogeneous constraints, you
+                                      * should provide an additional matrix
+                                      * argument or use one of the functions
+                                      * with both matrix and vector
+                                      * arguments.
+				      *
+				      * The optional argument
+				      * <tt>local_matrix</tt> is intended to
+				      * be used in case one wants to apply
+				      * inhomogeneous constraints on the
+				      * vector only. Such a situation could
+				      * be where one wants to assemble of a
+				      * right hand side vector on a problem
+				      * with inhomogeneous constraints, but
+				      * the global matrix has been assembled
+				      * previously. A typical example of
+				      * this is a time stepping algorithm
+				      * where the stiffness matrix is
+				      * assembled once, and the right hand
+				      * side updated every time step. Note
+				      * that, however, the entries in the
+				      * columns of the local matrix have to
+				      * be exactly the same as those that
+				      * have been written into the global
+				      * matrix. Otherwise, this function
+				      * will not be able to correctly handle
+				      * inhomogeneities.
                                       */
     template <typename VectorType>
     void
     distribute_local_to_global (const Vector<double>            &local_vector,
                                 const std::vector<unsigned int> &local_dof_indices,
-                                VectorType                      &global_vector) const;
+                                VectorType                      &global_vector,
+				const FullMatrix<double>        &local_matrix = FullMatrix<double>()) const;
 
                                      /**
                                       * This function takes a matrix of
