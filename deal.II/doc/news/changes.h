@@ -79,6 +79,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The DoFTools::make_sparsity_pattern functions have acquired a
+  new paramater <code>subdomain_id</code>. If a value other than the
+  default value is passed for it, the function only assembles the
+  sparsity pattern on those cells that have the given subdomain id.
+  This is useful, for example, in conjunction with the
+  TrilinosWrappers::SparsityPattern class that can hold a sparsity
+  pattern distributed across several MPI processes; in that case, it is
+  not necessary that each process builds the entire sparsity pattern.
+  <br>
+  (WB 2009/04/29)
   </p>
   </li>
 </ol>
