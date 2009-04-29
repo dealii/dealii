@@ -58,7 +58,8 @@ void
 DoFTools::make_sparsity_pattern (const DH               &dof,
 				 SparsityPattern        &sparsity,
 				 const ConstraintMatrix &constraints,
-				 const bool              keep_constrained_dofs)
+				 const bool              keep_constrained_dofs,
+				 const unsigned int      subdomain_id)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -77,48 +78,35 @@ DoFTools::make_sparsity_pattern (const DH               &dof,
 				   // only have to do the work if the
 				   // current cell is owned by the calling
 				   // processor. Otherwise, just continue.
-				   // 
-				   // TODO: here, we should actually check
-				   // the communicator of the sparsity
-				   // pattern, not MPI_COMM_WORLD as the
-				   // Utilities function does!
-  for (; cell!=endc; ++cell) 
-#ifdef DEAL_II_USE_TRILINOS
-    if ((types_are_equal<SparsityPattern,TrilinosWrappers::SparsityPattern>::value
-	 ||
-	 types_are_equal<SparsityPattern,TrilinosWrappers::BlockSparsityPattern>::value)
-	&&
-	cell->subdomain_id() !=
-	Utilities::Trilinos::get_this_mpi_process(Utilities::Trilinos::comm_world()))
-      continue;
-    else
-	 
-#endif
-    {
-      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-      dofs_on_this_cell.resize (dofs_per_cell);
-      cell->get_dof_indices (dofs_on_this_cell);
+  for (; cell!=endc; ++cell)
+    if ((subdomain_id == numbers::invalid_unsigned_int)
+	||
+	(subdomain_id == cell->subdomain_id()))
+      {
+	const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+	dofs_on_this_cell.resize (dofs_per_cell);
+	cell->get_dof_indices (dofs_on_this_cell);
 
-				       // make sparsity pattern for this
-				       // cell. if no constraints pattern was
-				       // given, then the following call acts
-				       // as if simply no constraints existed
-      constraints.add_entries_local_to_global (dofs_on_this_cell,
-					       sparsity,
-					       keep_constrained_dofs);
-    }
+					 // make sparsity pattern for this
+					 // cell. if no constraints pattern was
+					 // given, then the following call acts
+					 // as if simply no constraints existed
+	constraints.add_entries_local_to_global (dofs_on_this_cell,
+						 sparsity,
+						 keep_constrained_dofs);
+      }
 }
 
 
 
 template <class DH, class SparsityPattern>
 void
-DoFTools::make_sparsity_pattern (
-  const DH                &dof,
-  const Table<2,Coupling> &couplings,
-  SparsityPattern         &sparsity,
-  const ConstraintMatrix  &constraints,
-  const bool               keep_constrained_dofs)
+DoFTools::make_sparsity_pattern (const DH                &dof,
+				 const Table<2,Coupling> &couplings,
+				 SparsityPattern         &sparsity,
+				 const ConstraintMatrix  &constraints,
+				 const bool               keep_constrained_dofs,
+				 const unsigned int       subdomain_id)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -202,37 +190,29 @@ DoFTools::make_sparsity_pattern (
 				   // current cell is owned by the calling
 				   // processor. Otherwise, just continue.
   for (; cell!=endc; ++cell)
-#ifdef DEAL_II_USE_TRILINOS
-    if ((types_are_equal<SparsityPattern,TrilinosWrappers::SparsityPattern>::value
-	 ||
-	 types_are_equal<SparsityPattern,TrilinosWrappers::BlockSparsityPattern>::value)
-	&&
-	cell->subdomain_id() != 
-	Utilities::Trilinos::get_this_mpi_process(Utilities::Trilinos::comm_world()))
-      continue;
-    else
-	 
-#endif
-    {
-      const unsigned int fe_index
-	= cell->active_fe_index();
+    if ((subdomain_id == numbers::invalid_unsigned_int)
+	||
+	(subdomain_id == cell->subdomain_id()))
+      {
+	const unsigned int fe_index
+	  = cell->active_fe_index();
 
-      const unsigned int dofs_per_cell
-	= fe_collection[fe_index].dofs_per_cell;
+	const unsigned int dofs_per_cell
+	  = fe_collection[fe_index].dofs_per_cell;
 
-      dofs_on_this_cell.resize (dofs_per_cell);
-      cell->get_dof_indices (dofs_on_this_cell);
+	dofs_on_this_cell.resize (dofs_per_cell);
+	cell->get_dof_indices (dofs_on_this_cell);
 
 
-				       // make sparsity pattern for this
-				       // cell. if no constraints pattern was
-				       // given, then the following call acts
-				       // as if simply no constraints existed
-      constraints.add_entries_local_to_global (dofs_on_this_cell,
-					       sparsity,
-					       keep_constrained_dofs,
-					       dof_mask[fe_index]);
-    }
+					 // make sparsity pattern for this
+					 // cell. if no constraints pattern was
+					 // given, then the following call acts
+					 // as if simply no constraints existed
+	constraints.add_entries_local_to_global (dofs_on_this_cell,
+						 sparsity,
+						 keep_constrained_dofs,
+						 dof_mask[fe_index]);
+      }
 }
 
 

@@ -428,6 +428,24 @@ class DoFTools
 				      * <tt>keep_constrained_dofs</tt>
 				      * needs to be set to
 				      * <tt>false</tt>.
+				      *
+				      * If the @p subdomain_id parameter is
+				      * given, the sparsity pattern is built
+				      * only on cells that have a subdomain_id
+				      * equal to the given argument. This is
+				      * useful in parallel contexts where the
+				      * matrix and sparsity pattern (for
+				      * example a
+				      * TrilinosWrappers::SparsityPattern) may
+				      * be distributed and not every MPI
+				      * process needs to build the entire
+				      * sparsity pattern; in that case, it is
+				      * sufficient if every process only
+				      * builds that part of the sparsity
+				      * pattern that corresponds to the
+				      * subdomain_id for which it is
+				      * responsible. This feature is
+				      * @ref step_32 "step-32".
 				      */
     template <class DH, class SparsityPattern>
     static
@@ -435,7 +453,8 @@ class DoFTools
     make_sparsity_pattern (const DH               &dof,
 			   SparsityPattern        &sparsity_pattern,
 			   const ConstraintMatrix &constraints = ConstraintMatrix(),
-			   const bool              keep_constrained_dofs = true);
+			   const bool              keep_constrained_dofs = true,
+			   const unsigned int      subdomain_id = numbers::invalid_unsigned_int);
 
 				     /**
 				      * Locate non-zero entries for
@@ -565,6 +584,24 @@ class DoFTools
 				      * <tt>keep_constrained_dofs</tt>
 				      * needs to be set to
 				      * <tt>false</tt>.
+				      *
+				      * If the @p subdomain_id parameter is
+				      * given, the sparsity pattern is built
+				      * only on cells that have a subdomain_id
+				      * equal to the given argument. This is
+				      * useful in parallel contexts where the
+				      * matrix and sparsity pattern (for
+				      * example a
+				      * TrilinosWrappers::SparsityPattern) may
+				      * be distributed and not every MPI
+				      * process needs to build the entire
+				      * sparsity pattern; in that case, it is
+				      * sufficient if every process only
+				      * builds that part of the sparsity
+				      * pattern that corresponds to the
+				      * subdomain_id for which it is
+				      * responsible. This feature is
+				      * @ref step_32 "step-32".
 				      */
     template <class DH, class SparsityPattern>
     static
@@ -573,7 +610,8 @@ class DoFTools
 			   const Table<2, Coupling> &coupling,
 			   SparsityPattern          &sparsity_pattern,
 			   const ConstraintMatrix   &constraints = ConstraintMatrix(),
-			   const bool                keep_constrained_dofs = true);
+			   const bool                keep_constrained_dofs = true,
+			   const unsigned int        subdomain_id = numbers::invalid_unsigned_int);
     
 				     /**
 				      * @deprecated This is the old
