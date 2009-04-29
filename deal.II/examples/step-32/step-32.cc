@@ -381,7 +381,8 @@ template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
                 trilinos_communicator (Utilities::Trilinos::comm_world()),
-		pcout (std::cout, Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)==0),
+		pcout (std::cout,
+		       Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)==0),
 
 		triangulation (Triangulation<dim>::maximum_smoothing),
 
@@ -668,7 +669,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     std::vector<unsigned int> local_dofs (dim+1);
     DoFTools::
       count_dofs_with_subdomain_association (stokes_dof_handler,
-					     Utilities::Trilinos::get_this_mpi_process(trilinos_communicator),
+					     Utilities::Trilinos::
+					     get_this_mpi_process(trilinos_communicator),
 					     local_dofs);
     unsigned int n_local_velocities = 0;
     for (unsigned int c=0; c<dim; ++c)
@@ -696,7 +698,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	  coupling[c][d] = DoFTools::none;
 
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
-				     stokes_constraints, false);
+				     stokes_constraints, false,
+				     Utilities::Trilinos::
+				     get_this_mpi_process(trilinos_communicator));
     sp.compress();
 
     stokes_matrix.reinit (sp);
@@ -718,7 +722,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	  coupling[c][d] = DoFTools::none;
 
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
-				     stokes_constraints, false);
+				     stokes_constraints, false,
+				     Utilities::Trilinos::
+				     get_this_mpi_process(trilinos_communicator));
     sp.compress();
 
     stokes_preconditioner_matrix.reinit (sp);
@@ -739,7 +745,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     TrilinosWrappers::SparsityPattern sp (temperature_partitioner);
     DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
-				     temperature_constraints, false);
+				     temperature_constraints, false,
+				     Utilities::Trilinos::
+				     get_this_mpi_process(trilinos_communicator));
     sp.compress();
 
     temperature_matrix.reinit (sp);
