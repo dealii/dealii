@@ -436,15 +436,19 @@ void AdvectionProblem<dim>::assemble_test_2 ()
 template <int dim>
 void AdvectionProblem<dim>::run () 
 {
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (2);
+  GridGenerator::hyper_ball (triangulation);
+  triangulation.refine_global (3-dim);
 
-				   // manually refine the first two cells to
-				   // create some hanging nodes
+				   // manually refine the first two cells
+				   // and then one of these cells once again
+				   // to create some hanging nodes
   {
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
     cell->set_refine_flag();
-    cell++;
+  }
+  triangulation.execute_coarsening_and_refinement();
+  {
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.last();
     cell->set_refine_flag();
   }
   triangulation.execute_coarsening_and_refinement();  

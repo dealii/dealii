@@ -30,15 +30,15 @@
 #include <lac/solver_bicgstab.h>
 #include <lac/precondition.h>
 #include <lac/constraint_matrix.h>
-#include <grid/tria.h>
 #include <dofs/dof_handler.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
 #include <fe/fe_values.h>
+#include <grid/tria.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <grid/grid_generator.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
@@ -213,10 +213,23 @@ void LaplaceProblem<dim>::assemble_system ()
 
       cell->get_dof_indices (local_dof_indices);
 
-      constraints.distribute_local_to_global(cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
-      constraints.distribute_local_to_global(cell_rhs, local_dof_indices, test, cell_matrix);
+				   // use standard function with matrix and
+				   // vector argument
+      constraints.distribute_local_to_global(cell_matrix, cell_rhs, 
+					     local_dof_indices, 
+					     system_matrix, system_rhs);
+
+				   // now do just the right hand side (with
+				   // local matrix for eliminating
+				   // inhomogeneities)
+      constraints.distribute_local_to_global(cell_rhs, 
+					     local_dof_indices, 
+					     test, cell_matrix);
 
     }
+
+				   // and compare whether we really got the
+				   // same right hand side vector
   test -= system_rhs;
   Assert (test.l2_norm() <= 1e-12, ExcInternalError());
 }
@@ -254,14 +267,17 @@ void LaplaceProblem<dim>::run ()
       else
 	{
 	  GridGenerator::hyper_cube (triangulation, -1, 1);
-	  triangulation.refine_global (2);
+	  triangulation.refine_global (4-dim);
 	  {
 	    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
 	    cell->set_refine_flag();
-	    cell++;
+	  }
+	  triangulation.execute_coarsening_and_refinement();
+	  {
+	    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.last();
 	    cell->set_refine_flag();
 	  }
-	  triangulation.execute_coarsening_and_refinement();  
+	  triangulation.execute_coarsening_and_refinement();
 	}
 
       deallog << "   Number of active cells: "
