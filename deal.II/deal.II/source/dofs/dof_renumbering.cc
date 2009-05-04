@@ -444,13 +444,13 @@ namespace DoFRenumbering
     constraints.close ();
     
     SparsityPattern sparsity;
-    if (DH::dimension <= 2)
+    if (DH::dimension < 2)
       {
 	sparsity.reinit (dof_handler.n_dofs(),
 			 dof_handler.n_dofs(),
 			 dof_handler.max_couplings_between_dofs());
-	DoFTools::make_sparsity_pattern (dof_handler, sparsity);
-	constraints.condense (sparsity);
+	DoFTools::make_sparsity_pattern (dof_handler, sparsity, constraints);
+	sparsity.compress();
       }
     else
       {
