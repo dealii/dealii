@@ -1439,7 +1439,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		    col_val = 0;
 
 				   // account for indirect contributions by
-				   // constraints
+				   // constraints in column
 		  if (my_indices[j].constraints != 0)
 		    {
 		      constraint_format &constraint_j = *my_indices[j].constraints;

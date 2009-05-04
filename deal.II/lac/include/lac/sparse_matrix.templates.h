@@ -20,6 +20,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
 
 
 // we only need output streams, but older compilers did not provide
@@ -348,27 +349,30 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // just go through the column indices and
 				   // look whether we found one, rather than
 				   // doing many binary searches
-  if (col_indices_are_sorted == true)
-   if (n_cols * 8 > cols->row_length(row))
+  if (elide_zero_values == false && col_indices_are_sorted == true && 
+      n_cols > 3)
     {
 				   // check whether the given indices are
 				   // really sorted
 #ifdef DEBUG
       for (unsigned int i=1; i<n_cols; ++i)
 	Assert (col_indices[i] > col_indices[i-1], 
-		ExcMessage("Indices are not sorted."));
+		ExcMessage("List of indices not sorted or with duplicates."));
 #endif
+
+      const unsigned int * this_cols = 
+	&cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
+      number * val_ptr = &val[cols->get_rowstart_indices()[row]];
+
       if (cols->optimize_diagonal() == true)
 	{
-	  const unsigned int * this_cols = 
-	    &cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
-	  number * val_ptr = &val[cols->get_rowstart_indices()[row]];
-	  Assert (this_cols[0] == row, ExcInternalError());
 
 				   // find diagonal and add it if found
-	  const unsigned int * diag_pos = std::lower_bound (col_indices,
-							    col_indices+n_cols,
-							    row);
+	  Assert (this_cols[0] == row, ExcInternalError());
+	  const unsigned int * diag_pos = 
+	    internals::SparsityPatternTools::optimized_lower_bound (col_indices,
+								    col_indices+n_cols,
+								    row);
 	  const unsigned int diag = diag_pos - col_indices;
 	  unsigned int post_diag = diag;
 	  if (diag != n_cols && *diag_pos == row)
@@ -410,9 +414,6 @@ SparseMatrix<number>::add (const unsigned int  row,
 	}
       else
 	{
-	  const unsigned int * this_cols = 
-	    &cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
-	  number * val_ptr = &val[cols->get_rowstart_indices()[row]];
 	  unsigned int counter = 0;
 	  for (unsigned int i=0; i<n_cols; ++i)
 	    {
@@ -605,6 +606,7 @@ SparseMatrix<number>::vmult (OutVector& dst,
 }
 
 
+
 template <typename number>
 template <class OutVector, class InVector>
 void
@@ -629,6 +631,7 @@ SparseMatrix<number>::threaded_vmult (OutVector       &dst,
       *dst_ptr++ = s;
     };
 }
+
 
 
 template <typename number>
@@ -657,6 +660,7 @@ SparseMatrix<number>::Tvmult (OutVector& dst,
 }
 
 
+
 template <typename number>
 template <class OutVector, class InVector>
 void
@@ -676,13 +680,14 @@ SparseMatrix<number>::vmult_add (OutVector& dst,
   typename OutVector::iterator dst_ptr    = dst.begin();
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      typename OutVector::value_type s = 0.;
+      typename OutVector::value_type s = *dst_ptr;
       const number *const val_end_of_row = &val[cols->rowstart[row+1]];
       while (val_ptr != val_end_of_row)
 	s += *val_ptr++ * src(*colnum_ptr++);
-      *dst_ptr++ += s;
+      *dst_ptr++ = s;
     };
 }
+
 
 
 template <typename number>
@@ -706,6 +711,141 @@ SparseMatrix<number>::Tvmult_add (OutVector& dst,
       }
 }
 
+
+
+template <typename number>
+template <typename numberB, typename numberC, typename numberV>
+void
+SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
+			     const SparseMatrix<numberB> &B,
+			     const Vector<numberV>       &V,
+			     const bool                   rebuild_sparsity_C) const
+{
+  const bool use_vector = V.size() == n() ? true : false;
+  Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
+  Assert (cols != 0, ExcNotInitialized());
+  Assert (B.cols != 0, ExcNotInitialized());
+  Assert (C.cols != 0, ExcNotInitialized());
+
+  const SparsityPattern & sp_A = *cols;
+  const SparsityPattern & sp_B = *B.cols;
+
+				   // clear previous content of C
+  if  (rebuild_sparsity_C == true)
+    {
+				   // need to change the sparsity pattern of
+				   // C, so cast away const-ness.
+      SparsityPattern & sp_C = 
+	*(const_cast<SparsityPattern *>(&C.get_sparsity_pattern()));
+      C.clear();
+      sp_C.reinit (0,0,0);
+
+				   // create a sparsity pattern for the
+				   // matrix. we will go through all the
+				   // rows in the matrix A, and for each
+				   // column in a row we add the whole row
+				   // of matrix B with that row number. This
+				   // means that we will insert a lot of
+				   // entries to each row, which is best
+				   // handled by the
+				   // CompressedSimpleSparsityPattern class.
+      {
+	CompressedSimpleSparsityPattern csp (m(), B.n());
+	for (unsigned int i = 0; i < csp.n_rows(); ++i)
+	  {
+	    const unsigned int * rows = 
+	      &sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[i]];
+	    const unsigned int *const end_rows = 
+	      &sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[i+1]];
+	    for (; rows != end_rows; ++rows)
+	      {
+		const unsigned int col = *rows;
+		unsigned int * new_cols = const_cast<unsigned int*>
+		  (&sp_B.get_column_numbers()
+		   [sp_B.get_rowstart_indices()[col]]);
+		unsigned int * end_new_cols = const_cast<unsigned int*>
+		  (&sp_B.get_column_numbers()
+		   [sp_B.get_rowstart_indices()[col+1]]);
+
+				   // if B has a diagonal, need to add that
+				   // manually. this way, we maintain
+				   // sortedness.
+		if (sp_B.optimize_diagonal() == true)
+		  {
+		    ++new_cols;
+		    csp.add(i, col);
+		  }
+
+		csp.add_entries (i, new_cols, end_new_cols, true);
+	      }
+	  }
+	sp_C.copy_from (csp);
+      }
+
+				   // reinit matrix C from that information
+      C.reinit (sp_C);
+    }
+
+  Assert (C.m() == m(), ExcDimensionMismatch(C.m(), m()));
+  Assert (C.n() == B.n(), ExcDimensionMismatch(C.n(), B.n()));
+
+				   // create an array that caches some
+				   // elements that are going to be written
+				   // into the new matrix.
+  unsigned int max_n_cols_B = 0;
+  for (unsigned int i=0; i<B.m(); ++i)
+    max_n_cols_B = std::max (max_n_cols_B, sp_B.row_length(i));
+  std::vector<numberC> new_entries(max_n_cols_B);
+
+				   // now compute the actual entries: a
+				   // matrix-matrix product involves three
+				   // nested loops. One over the rows of A,
+				   // for each row we then loop over all the
+				   // columns, and then we need to multiply
+				   // each element with all the elements in
+				   // that row in B.
+  for (unsigned int i=0; i<C.m(); ++i)
+    {
+      const unsigned int * rows = 
+	&sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[i]];
+      const unsigned int *const end_rows = 
+	&sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[i+1]];
+      for (; rows != end_rows; ++rows)
+	{
+	  const double A_val = global_entry 
+	    (rows-&sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[0]]);
+	  const unsigned int col = *rows;
+	  const unsigned int * new_cols = 
+	    (&sp_B.get_column_numbers()[sp_B.get_rowstart_indices()[col]]);
+
+				   // special treatment for diagonal
+	  if (sp_B.optimize_diagonal())
+	    {
+	      C.add (i, *new_cols, A_val * 
+		     B.global_entry(new_cols-&sp_B.get_column_numbers()
+				    [sp_B.get_rowstart_indices()[0]]) * 
+		     (use_vector ? V(col) : 1));
+	      ++new_cols;
+	    }
+
+				   // now the innermost loop that goes over
+				   // all the elements in row 'col' of
+				   // matrix B. Cache the elements, and then
+				   // write them into C at once
+	  numberC * new_ptr = &new_entries[0];
+	  const numberB * B_val_ptr = 
+	    &B.val[new_cols-&sp_B.get_column_numbers()[sp_B.get_rowstart_indices()[0]]];
+	  const numberB * const end_cols = 
+	    &B.val[&sp_B.get_column_numbers()[sp_B.get_rowstart_indices()[col+1]]-
+		   &sp_B.get_column_numbers()[sp_B.get_rowstart_indices()[0]]];
+	  for (; B_val_ptr != end_cols; ++B_val_ptr)
+	    *new_ptr++ = A_val * *B_val_ptr * (use_vector ? V(col) : 1);
+
+	  C.add (i, new_ptr-&new_entries[0], new_cols, &new_entries[0],
+		 false, true);
+	}
+    }
+}
 
 template <typename number>
 template <typename somenumber>
