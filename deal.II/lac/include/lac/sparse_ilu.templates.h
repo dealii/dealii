@@ -200,12 +200,12 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
 				       // right of the diagonal starts
       const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
 
-      somenumber dst_row = 0;
+      somenumber dst_row = dst(row);
       const number * luval = this->SparseMatrix<number>::val + 
 	                     (rowstart - column_numbers);
       for (const unsigned int * col=rowstart; col!=first_after_diagonal; ++col, ++luval)
-	dst_row += *luval * dst(*col);
-      dst(row) -= dst_row;
+	dst_row -= *luval * dst(*col);
+      dst(row) = dst_row;
     }
 
 				   // now the backward solve. same
@@ -224,18 +224,16 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
 				       // right of the diagonal starts
       const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
       
-      somenumber dst_row = 0;
+      somenumber dst_row = dst(row);
       const number * luval = this->SparseMatrix<number>::val + 
 	                     (first_after_diagonal - column_numbers);
       for (const unsigned int * col=first_after_diagonal; col!=rowend; ++col, ++luval)
-	dst_row += *luval * dst(*col);
-
-      dst(row) -= dst_row;
+	dst_row -= *luval * dst(*col);
 
 				       // scale by the diagonal element.
 				       // note that the diagonal element
 				       // was stored inverted
-      dst(row) *= this->diag_element(row);
+      dst(row) = dst_row * this->diag_element(row);
     }
 }
 
