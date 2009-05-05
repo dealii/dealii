@@ -1534,6 +1534,34 @@ namespace TrilinosWrappers
 			       const VectorBase &x,
 			       const VectorBase &b) const;
 
+				     /**
+				      * Perform the matrix-matrix
+				      * multiplication <tt>C = A * B</tt>,
+				      * or, if an optional vector argument
+				      * is given, <tt>C = A * diag(V) *
+				      * B</tt>, where <tt>diag(V)</tt>
+				      * defines a diagonal matrix with the
+				      * vector entries.
+				      *
+				      * This function assumes that the
+				      * calling matrix <tt>A</tt> and
+				      * <tt>B</tt> have compatible
+				      * sizes. The size of <tt>C</tt> will
+				      * be set within this function.
+				      *
+				      * The content as well as the sparsity
+				      * pattern of the matrix C will be
+				      * changed by this function, so make
+				      * sure that the sparsity pattern is
+				      * not used somewhere else in your
+				      * program. This is an expensive
+				      * operation, so think twice before you
+				      * use this function.
+				      */
+    void mmult (SparseMatrix       &C,
+		const SparseMatrix &B,
+		const VectorBase   &V = VectorBase()) const;
+
 //@}
 /**
  * @name Matrix norms
@@ -1545,8 +1573,8 @@ namespace TrilinosWrappers
                                         * <i>l</i><sub>1</sub>-norm of
                                         * the matrix, that is
                                         * $|M|_1=
-					* \max_{\mathrm{all columns } j}
-					* \sum_{\mathrm{all rows } i} 
+					* \max_{\mathrm{all\ columns\ } j}
+					* \sum_{\mathrm{all\ rows\ } i} 
 					* |M_{ij}|$, (max. sum
                                         * of columns).  This is the
                                         * natural matrix norm that is
@@ -1561,9 +1589,9 @@ namespace TrilinosWrappers
                                        /**
                                         * Return the linfty-norm of the
                                         * matrix, that is
-                                        * $|M|_\infty=\max_{\mathrm{all
-                                        * rows} i}\sum_{\mathrm{all
-                                        * columns} j} |M_{ij}|$,
+                                        * $|M|_\infty=\max_{\mathrm{all\ 
+                                        * rows\ } i}\sum_{\mathrm{all\ 
+                                        * columns\ } j} |M_{ij}|$,
                                         * (max. sum of rows).  This is
                                         * the natural matrix norm that
                                         * is compatible to the

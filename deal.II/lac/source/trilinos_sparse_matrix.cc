@@ -22,6 +22,9 @@
 
 #ifdef DEAL_II_USE_TRILINOS
 
+#include <ml_epetra_utils.h>
+#include <ml_struct.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
@@ -710,16 +713,11 @@ namespace TrilinosWrappers
 
     matrix->FillComplete (col_map, row_map, true);
 
-    int length;
-    int *row_indices;
-    TrilinosScalar *values;
-    for (unsigned int row=0; row<m(); ++row)
-      if (row_map.MyGID(row))
-	{
-	  const int local_row = row_map.LID(row);
-	  input_matrix.ExtractMyRowView(local_row, length, values, row_indices);
-	  matrix->ReplaceMyValues(local_row, length, values, row_indices);
-	}
+    const TrilinosScalar * in_values = input_matrix[0];
+    TrilinosScalar * values = (*matrix)[0];
+    const unsigned int my_nonzeros = input_matrix.NumMyNonzeros();
+    for (unsigned int i=0; i<my_nonzeros; ++i)
+      values[i] = in_values[0];
 
     compress();
   }
@@ -1261,6 +1259,69 @@ namespace TrilinosWrappers
     dst *= -1.;
 
     return dst.l2_norm();
+  }
+
+
+
+  void
+  SparseMatrix::mmult (SparseMatrix       &C,
+		       const SparseMatrix &B,
+		       const VectorBase   &V) const
+  {
+    const bool use_vector = V.size() == n() ? true : false;
+    Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
+    Assert (this->matrix->DomainMap().SameAs(B.matrix->RangeMap()),
+	    ExcMessage ("Parallel partitioning of A and B does not fit."));
+
+    C.clear();
+				   // use ML built-in method for performing
+				   // the matrix-matrix product.
+
+				   // create ML operators on top of the
+				   // Epetra matrix.
+    ML_Comm* comm;
+    ML_Comm_Create(&comm);
+    ML_Operator *A_ = ML_Operator_Create(comm);
+    ML_Operator *B_ = ML_Operator_Create(comm);
+    ML_Operator *C_ = ML_Operator_Create(comm);
+
+    ML_Operator_WrapEpetraCrsMatrix(&*matrix,A_,false);
+    ML_Operator_WrapEpetraCrsMatrix(&*B.matrix,B_,false);
+
+				   // create an Epetra_CrsMatrix with the
+				   // vector content on the diagonal.
+    Epetra_CrsMatrix Vmat (Copy, this->matrix->DomainMap(), 
+			   B.matrix->RangeMap(), 1, true);
+    const int min_my_gid = this->matrix->DomainMap().MinMyGID();
+    const int max_my_gid = this->matrix->DomainMap().MaxMyGID() + 1;
+    for (int i=min_my_gid; i<max_my_gid; ++i)
+      {
+	double V_val = use_vector ? V(i) : 1;
+	Vmat.InsertGlobalValues (i, 1, &V_val, &i);
+      }
+    Vmat.FillComplete();
+    Vmat.OptimizeStorage();
+
+				   // wrap even this matrix into ML format
+    ML_Operator *V_ = ML_Operator_Create (comm);
+    ML_Operator_WrapEpetraCrsMatrix (&Vmat, V_, false);
+
+				   // perform triple matrix-vector product
+    ML_rap (A_, V_, B_, C_, ML_CSR_MATRIX);
+
+    ML_Operator_Destroy (&V_);
+
+				   // create an Epetra matrix from the ML
+				   // matrix that we got as a result.
+    Epetra_CrsMatrix * C_mat;
+    ML_Operator2EpetraCrsMatrix(C_, C_mat);
+    C_mat->FillComplete();
+    C_mat->OptimizeStorage();
+    C.reinit (*C_mat);
+
+    ML_Operator_Destroy (&A_);
+    ML_Operator_Destroy (&B_);
+    ML_Operator_Destroy (&C_);
   }
 
 

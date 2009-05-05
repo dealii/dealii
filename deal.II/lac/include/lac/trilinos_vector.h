@@ -305,7 +305,7 @@ namespace TrilinosWrappers
 					* exception will be thrown.
 					*/
 	Vector &
-	  operator = (const ::dealii::TrilinosWrappers::Vector &V);
+	operator = (const ::dealii::TrilinosWrappers::Vector &V);
 
                                        /**
 					* Another copy function. This
