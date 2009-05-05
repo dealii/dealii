@@ -1486,29 +1486,31 @@ class SparseMatrix : public virtual Subscriptor
 //@{
     
     				     /**
-				      * Return the l1-norm of the matrix, that is
-				      * $|M|_1=max_{all columns j}\sum_{all 
-				      * rows i} |M_ij|$,
-				      * (max. sum of columns).
-				      * This is the
-				      * natural matrix norm that is compatible
-				      * to the l1-norm for vectors, i.e.
+				      * Return the $l_1$-norm of the matrix,
+				      * that is $|M|_1=\max_{\mathrm{all\
+				      * columns\ }j}\sum_{\mathrm{all\ rows\
+				      * } i} |M_{ij}|$, (max. sum of
+				      * columns).  This is the natural
+				      * matrix norm that is compatible to
+				      * the $l_1$-norm for vectors, i.e.
 				      * $|Mv|_1\leq |M|_1 |v|_1$.
-				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
+				      * (cf. Haemmerlin-Hoffmann :
+				      * Numerische Mathematik)
 				      */
     real_type l1_norm () const;
 
     				     /**
-				      * Return the linfty-norm of the
+				      * Return the $l_\infty$-norm of the
 				      * matrix, that is
-				      * $|M|_infty=max_{all rows i}\sum_{all 
-				      * columns j} |M_ij|$,
-				      * (max. sum of rows).
-				      * This is the
-				      * natural matrix norm that is compatible
-				      * to the linfty-norm of vectors, i.e.
-				      * $|Mv|_infty \leq |M|_infty |v|_infty$.
-				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
+				      * $|M|_\infty=\max_{\mathrm{all\ rows\
+				      * }i}\sum_{\mathrm{all\ columns\ }j}
+				      * |M_{ij}|$, (max. sum of rows).  This
+				      * is the natural matrix norm that is
+				      * compatible to the $l_\infty$-norm of
+				      * vectors, i.e.  $|Mv|_\infty \leq
+				      * |M|_\infty |v|_\infty$.
+				      * (cf. Haemmerlin-Hoffmann :
+				      * Numerische Mathematik)
 				      */
     real_type linfty_norm () const;
 
