@@ -616,13 +616,22 @@ namespace TrilinosWrappers
 				        * threshold (so zeros in the deal.II
 				        * matrix can be filtered away).
 					*
+					* The optional parameter
+					* <tt>copy_values</tt> decides
+					* whether only the sparsity
+					* structure of the input matrix
+					* should be used or the matrix
+					* entries should be copied, too.
+					*
 					* This is a collective operation
 				        * that needs to be called on all
 				        * processors in order to avoid a
 				        * dead lock.
                                         */
-      void reinit (const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
-		   const double                          drop_tolerance=1e-13);
+      template <typename number>
+      void reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+		   const double                          drop_tolerance=1e-13,
+		   const bool                            copy_values=true);
 
 				       /**
                                         * This function initializes the
@@ -640,14 +649,23 @@ namespace TrilinosWrappers
 				        * specified by the user instead of
 				        * internally generating one.
 					*
+					* The optional parameter
+					* <tt>copy_values</tt> decides
+					* whether only the sparsity
+					* structure of the input matrix
+					* should be used or the matrix
+					* entries should be copied, too.
+					*
 					* This is a collective operation
 				        * that needs to be called on all
 				        * processors in order to avoid a
 				        * dead lock.
                                         */
+      template <typename number>
       void reinit (const Epetra_Map                     &input_map,
-		   const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
-		   const double                          drop_tolerance=1e-13);
+		   const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+		   const double                          drop_tolerance=1e-13,
+		   const bool                            copy_values=true);
 
  				       /**
                                         * This function is similar to the
@@ -658,22 +676,34 @@ namespace TrilinosWrappers
 				        * matrix. Chosen for rectangular
 				        * matrices.
 					*
+					* The optional parameter
+					* <tt>copy_values</tt> decides
+					* whether only the sparsity
+					* structure of the input matrix
+					* should be used or the matrix
+					* entries should be copied, too.
+					*
 					* This is a collective operation
 				        * that needs to be called on all
 				        * processors in order to avoid a
 				        * dead lock.
                                         */
+      template <typename number>
       void reinit (const Epetra_Map                      &input_row_map,
 		   const Epetra_Map                      &input_col_map,
-		   const ::dealii::SparseMatrix<double>  &dealii_sparse_matrix,
-		   const double                           drop_tolerance=1e-13);
+		   const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
+		   const double                           drop_tolerance=1e-13,
+		   const bool                             copy_values=true);
 
                                        /**
 					* This reinit function takes as
 					* input a Trilinos Epetra_CrsMatrix
-					* and copies its content.
+					* and copies its sparsity
+					* pattern. If so requested, even the
+					* content (values) will be copied.
 					*/
-      void reinit (const Epetra_CrsMatrix &input_matrix);
+      void reinit (const Epetra_CrsMatrix &input_matrix,
+		   const bool              copy_values = true);
 
                                        /**
                                         * This operator assigns a scalar to

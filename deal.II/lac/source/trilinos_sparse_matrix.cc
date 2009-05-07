@@ -258,10 +258,9 @@ namespace TrilinosWrappers
     row_map = m.row_map;
     col_map = m.col_map;
 				   // check whether we need to update the
-				   // communicator or can just copy the
-				   // data: in case we have the same
-				   // distribution, we can just copy the
-				   // data.
+				   // partitioner or can just copy the data:
+				   // in case we have the same distribution,
+				   // we can just copy the data.
     if (local_range() == m.local_range())
       *matrix = *m.matrix;
     else
@@ -342,20 +341,8 @@ namespace TrilinosWrappers
 				  // faster than directly filling elements
 				  // into the matrix. Moreover, it consumes
 				  // less memory, since the internal
-				  // reordering does not need to be done on
-				  // all the double values.
-
-				  // TODO: There seems to be problem in
-				  // Epetra when a Graph/matrix is
-				  // initialized with both row and column
-				  // map. Maybe find something more out
-				  // about this... It could be related to
-				  // the bug #4123. For the moment, just
-				  // ignore the column information and
-				  // generate the graph to the matrix as if
-				  // it were square. The call to
-				  // GlobalAssemble later will set the
-				  // correct values.
+				  // reordering is done on ints only, and we
+				  // can leave the doubles aside.
 
 				   // for more than one processor, need to
 				   // specify only row map first and let the
@@ -366,7 +353,8 @@ namespace TrilinosWrappers
 				   // how the domain dofs of the matrix will
 				   // be distributed). for only one
 				   // processor, we can directly assign the
-				   // columns as well.
+				   // columns as well. Compare this with bug
+				   // # 4123 in the Sandia Bugzilla.
     std::auto_ptr<Epetra_CrsGraph> graph;
     if (row_map.Comm().NumProc() > 1)
       graph = std::auto_ptr<Epetra_CrsGraph> 
@@ -377,28 +365,16 @@ namespace TrilinosWrappers
 	(new Epetra_CrsGraph (Copy, row_map, col_map,
 			      &n_entries_per_row[input_row_map.MinMyGID()], true));
 
-				  // TODO: As of now, assume that the
-				  // sparsity pattern sits at the all
-				  // processors (completely), and let
-				  // each processor set its rows. Since
-				  // this is wasteful, a better solution
-				  // should be found in the future.
+				  // This functions assumes that the
+				  // sparsity pattern sits on all processors
+				  // (completely). The parallel version uses
+				  // an Epetra graph that is already
+				  // distributed.
     Assert (graph->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
     	    ExcDimensionMismatch (graph->NumGlobalRows(),
     				  sparsity_pattern.n_rows()));
 
-				  // Trilinos has a bug for rectangular
-				  // matrices at this point, so do not
-				  // check for consistent column numbers
-				  // here.
-				  //
-				  // this bug is filed in the Sandia
-				  // bugzilla under #4123 and should be
-				  // fixed for version 9.0
-//        Assert (graph.NumGlobalCols() == (int)sparsity_pattern.n_cols(),
-//		ExcDimensionMismatch (graph.NumGlobalCols(),
-//				      sparsity_pattern.n_cols()));
-
+				   // now insert the indices
     std::vector<int>   row_indices;
     
     for (unsigned int row=0; row<n_rows; ++row)
@@ -415,10 +391,17 @@ namespace TrilinosWrappers
 
 	}
 
-				  // Now, fill the graph (sort indices, make
-				  // memory contiguous, etc).
+				  // Eventually, optimize the graph
+				  // structure (sort indices, make memory
+				  // contiguous, etc).
     graph->FillComplete(col_map, row_map);
     graph->OptimizeStorage();
+
+				   // check whether we got the number of
+				   // columns right.
+    Assert (graph->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
+	    ExcDimensionMismatch (graph->NumGlobalCols(),
+				  sparsity_pattern.n_cols()));
 
 				  // And now finally generate the matrix.
     matrix =  std::auto_ptr<Epetra_FECrsMatrix>
@@ -445,6 +428,10 @@ namespace TrilinosWrappers
 			const Epetra_Map                    &input_col_map,
 			const CompressedSetSparsityPattern  &sparsity_pattern)
   {
+				   // this function is similar to the other
+				   // reinit function with sparsity pattern
+				   // argument. See there for additional
+				   // comments.
     matrix.reset();
 
     const unsigned int n_rows = sparsity_pattern.n_rows();
@@ -467,27 +454,6 @@ namespace TrilinosWrappers
     for (unsigned int row=0; row<n_rows; ++row)
       n_entries_per_row[row] = sparsity_pattern.row_length(row);
 
-
-				  // The deal.II notation of a Sparsity
-				  // pattern corresponds to the Epetra
-				  // concept of a Graph. Hence, we generate
-				  // a graph by copying the sparsity pattern
-				  // into it, and then build up the matrix
-				  // from the graph. This is considerable
-				  // faster than directly filling elements
-				  // into the matrix.
-
-				  // TODO: There seems to be problem in
-				  // Epetra when a Graph/matrix is
-				  // initialized with both row and column
-				  // map. Maybe find something more out
-				  // about this... It could be related to
-				  // the bug #4123. For the moment, just
-				  // ignore the column information and
-				  // generate the graph to the matrix as if
-				  // it were square. The call to
-				  // GlobalAssemble later will set the
-				  // correct values.
     std::auto_ptr<Epetra_CrsGraph> graph;
     if (row_map.Comm().NumProc() > 1)
       graph = std::auto_ptr<Epetra_CrsGraph> 
@@ -498,27 +464,9 @@ namespace TrilinosWrappers
 	(new Epetra_CrsGraph (Copy, row_map, col_map,
 			      &n_entries_per_row[input_row_map.MinMyGID()], true));
 
-				  // TODO: As of now, assume that the
-				  // sparsity pattern sits at the all
-				  // processors (completely), and let
-				  // each processor set its rows. Since
-				  // this is wasteful, a better solution
-				  // should be found in the future.
     Assert (graph->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
     	    ExcDimensionMismatch (graph->NumGlobalRows(),
     				  sparsity_pattern.n_rows()));
-
-				  // Trilinos has a bug for rectangular
-				  // matrices at this point, so do not
-				  // check for consistent column numbers
-				  // here.
-				  //
-				  // this bug is filed in the Sandia
-				  // bugzilla under #4123 and should be
-				  // fixed for version 9.0
-//        Assert (graph.NumGlobalCols() == (int)sparsity_pattern.n_cols(),
-//		ExcDimensionMismatch (graph.NumGlobalCols(),
-//				      sparsity_pattern.n_cols()));
 
     std::vector<int>   row_indices;
 
@@ -539,20 +487,17 @@ namespace TrilinosWrappers
 	  graph->InsertGlobalIndices (row, row_length, &row_indices[0]);
 	}
 
-				  // Now, fill the graph (sort indices, make
-				  // memory contiguous, etc).
     graph->FillComplete(col_map, row_map);
     graph->OptimizeStorage();
 
-				  // And now finally generate the matrix.
+    Assert (graph->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
+	    ExcDimensionMismatch (graph->NumGlobalCols(),
+				  sparsity_pattern.n_cols()));
+
     matrix =  std::auto_ptr<Epetra_FECrsMatrix>
                        (new Epetra_FECrsMatrix(Copy, *graph, false));
     
     last_action = Zero;
-
-				  // In the end, the matrix needs to
-				  // be compressed in order to be
-				  // really ready.
     compress();
   }
 
@@ -561,18 +506,19 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const SparsityPattern &sparsity_pattern)
   {
+				   // reinit with a (parallel) Trilinos
+				   // sparsity pattern.
     matrix.reset();
 
     row_map = sparsity_pattern.range_partitioner();
     col_map = sparsity_pattern.domain_partitioner();
 
-    Assert (sparsity_pattern.trilinos_sparsity_pattern().Filled() == true,
-	    ExcMessage("The Trilinos sparsity pattern has not been compressed"));
+    AssertThrow (sparsity_pattern.trilinos_sparsity_pattern().Filled() == true,
+		 ExcMessage("The Trilinos sparsity pattern has not been compressed"));
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
       (new Epetra_FECrsMatrix(Copy, sparsity_pattern.trilinos_sparsity_pattern(),
 			      false));
-
     compress();
   }
 
@@ -594,9 +540,11 @@ namespace TrilinosWrappers
 
 
 
+  template <typename number>
   void
-  SparseMatrix::reinit (const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
-			const double                          drop_tolerance)
+  SparseMatrix::reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+			const double                          drop_tolerance,
+			const bool                            copy_values)
   {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
@@ -610,28 +558,42 @@ namespace TrilinosWrappers
     const Epetra_Map columns (dealii_sparse_matrix.n(),
 			      0,
 			      trilinos_communicator);
-    reinit (rows, columns, dealii_sparse_matrix, drop_tolerance);
+    reinit (rows, columns, dealii_sparse_matrix, drop_tolerance, copy_values);
   }
 
 
 
+  template <typename number>
   void
   SparseMatrix::reinit (const Epetra_Map                     &input_map,
-			const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
-			const double                          drop_tolerance)
+			const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+			const double                          drop_tolerance,
+			const bool                            copy_values)
   {
-    reinit (input_map, input_map, dealii_sparse_matrix, drop_tolerance);
+    reinit (input_map, input_map, dealii_sparse_matrix, drop_tolerance, 
+	    copy_values);
   }
 
 
 
+  template <typename number>
   void
   SparseMatrix::reinit (const Epetra_Map                     &input_row_map,
 			const Epetra_Map                     &input_col_map,
-			const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
-			const double                          drop_tolerance)
+			const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+			const double                          drop_tolerance,
+			const bool                            copy_values)
   {
     matrix.reset();
+
+    if (copy_values == false)
+      {
+				   // in case we do not copy values, just
+				   // call the other function.
+	reinit (input_row_map, input_col_map, 
+		dealii_sparse_matrix.get_sparsity_pattern());
+	return;
+      }
 
     unsigned int n_rows = dealii_sparse_matrix.m();
 
@@ -651,21 +613,10 @@ namespace TrilinosWrappers
       n_entries_per_row[(int)row] = 
 	  dealii_sparse_matrix.get_sparsity_pattern().row_length(row);
 
-				  // TODO: There seems to be problem
-				  // in Epetra when a matrix is
-				  // initialized with both row and
-				  // column map. Maybe find something
-				  // more out about this... It could
-				  // be related to the bug #4123. For
-				  // the moment, just ignore the
-				  // column information and generate
-				  // the matrix as if it were
-				  // square. The call to
-				  // GlobalAssemble later will set the
-				  // correct values.
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	        (new Epetra_FECrsMatrix(Copy, row_map,
-					&n_entries_per_row[0], false));
+					&n_entries_per_row[row_map.MinMyGID()], 
+					false));
 
     std::vector<TrilinosScalar> values;
     std::vector<unsigned int>   row_indices;
@@ -677,7 +628,7 @@ namespace TrilinosWrappers
 			    numbers::invalid_unsigned_int);
 	
 	unsigned int index = 0;
-	for (dealii::SparseMatrix<double>::const_iterator  
+	for (typename ::dealii::SparseMatrix<number>::const_iterator  
 	      p  = dealii_sparse_matrix.begin(row);
 	      p != dealii_sparse_matrix.end(row); ++p)
 	  if (std::fabs(p->value()) > drop_tolerance)
@@ -696,7 +647,8 @@ namespace TrilinosWrappers
 
 
   void 
-  SparseMatrix::reinit (const Epetra_CrsMatrix &input_matrix)
+  SparseMatrix::reinit (const Epetra_CrsMatrix &input_matrix,
+			const bool              copy_values)
   {
     matrix.reset();
 
@@ -713,11 +665,14 @@ namespace TrilinosWrappers
 
     matrix->FillComplete (col_map, row_map, true);
 
-    const TrilinosScalar * in_values = input_matrix[0];
-    TrilinosScalar * values = (*matrix)[0];
-    const unsigned int my_nonzeros = input_matrix.NumMyNonzeros();
-    for (unsigned int i=0; i<my_nonzeros; ++i)
-      values[i] = in_values[0];
+    if (copy_values == true)
+      {
+	const TrilinosScalar * in_values = input_matrix[0];
+	TrilinosScalar * values = (*matrix)[0];
+	const unsigned int my_nonzeros = input_matrix.NumMyNonzeros();
+	for (unsigned int i=0; i<my_nonzeros; ++i)
+	  values[i] = in_values[0];
+      }
 
     compress();
   }
@@ -1288,28 +1243,93 @@ namespace TrilinosWrappers
     ML_Operator_WrapEpetraCrsMatrix(&*matrix,A_,false);
     ML_Operator_WrapEpetraCrsMatrix(&*B.matrix,B_,false);
 
+				   // Case where we only have two
+				   // matrices. We do this by hand since we
+				   // can save some operations compared to
+				   // just calling ml/src/Operator/ml_rap.c
+				   // that multiplies three matrices. This
+				   // code is still similar to the one found
+				   // in ml/src/Operator/ml_rap.c
+    if (use_vector == false)
+      {
+				   // import data if necessary
+	ML_Operator *Btmp, *Ctmp, *Ctmp2, *tptr;
+	ML_CommInfoOP *getrow_comm; 
+	int max_per_proc;
+	int N_input_vector = B_->invec_leng;
+	getrow_comm = B_->getrow->pre_comm;
+	if ( getrow_comm != NULL)
+	  for (int i = 0; i < getrow_comm->N_neighbors; i++)
+	    for (int j = 0; j < getrow_comm->neighbors[i].N_send; j++)
+	      AssertThrow (getrow_comm->neighbors[i].send_list[j] < N_input_vector,
+			   ExcInternalError());
+
+	ML_create_unique_col_id(N_input_vector, &(B_->getrow->loc_glob_map),
+				getrow_comm, &max_per_proc, B_->comm);
+	B_->getrow->use_loc_glob_map = ML_YES;
+	if (A_->getrow->pre_comm != NULL) 
+	  ML_exchange_rows( B_, &Btmp, A_->getrow->pre_comm);
+	else Btmp = B_;
+
+				   // perform matrix-matrix product
+	ML_matmat_mult(A_, Btmp , &Ctmp);
+
+				   // release temporary structures we needed
+				   // for multiplication
+	ML_free(B_->getrow->loc_glob_map);
+	B_->getrow->loc_glob_map = NULL;
+	B_->getrow->use_loc_glob_map = ML_NO;
+	if (A_->getrow->pre_comm != NULL) {
+	  tptr = Btmp;
+	  while ( (tptr!= NULL) && (tptr->sub_matrix != B_)) 
+	    tptr = tptr->sub_matrix;
+	  if (tptr != NULL) tptr->sub_matrix = NULL;
+	  ML_RECUR_CSR_MSRdata_Destroy(Btmp);
+	  ML_Operator_Destroy(&Btmp);
+	}
+
+				   // make correct data structures
+	if (A_->getrow->post_comm != NULL) {
+	  ML_exchange_rows(Ctmp, &Ctmp2, A_->getrow->post_comm);
+	}
+	else Ctmp2 = Ctmp;
+
+	ML_back_to_csrlocal(Ctmp2, C_, max_per_proc);
+
+	ML_RECUR_CSR_MSRdata_Destroy (Ctmp);
+	ML_Operator_Destroy (&Ctmp);
+
+	if (A_->getrow->post_comm != NULL) {
+	  ML_RECUR_CSR_MSRdata_Destroy(Ctmp2);
+	  ML_Operator_Destroy (&Ctmp2);
+	}
+      }
+    else
+      {
 				   // create an Epetra_CrsMatrix with the
 				   // vector content on the diagonal.
-    Epetra_CrsMatrix Vmat (Copy, this->matrix->DomainMap(), 
-			   B.matrix->RangeMap(), 1, true);
-    const int min_my_gid = this->matrix->DomainMap().MinMyGID();
-    const int max_my_gid = this->matrix->DomainMap().MaxMyGID() + 1;
-    for (int i=min_my_gid; i<max_my_gid; ++i)
-      {
-	double V_val = use_vector ? V(i) : 1;
-	Vmat.InsertGlobalValues (i, 1, &V_val, &i);
-      }
-    Vmat.FillComplete();
-    Vmat.OptimizeStorage();
+	Epetra_CrsMatrix Vmat (Copy, this->matrix->DomainMap(), 
+			       B.matrix->RangeMap(), 1, true);
+	const int min_my_gid = this->matrix->DomainMap().MinMyGID();
+	const int max_my_gid = this->matrix->DomainMap().MaxMyGID() + 1;
+	for (int i=min_my_gid; i<max_my_gid; ++i)
+	  {
+	    double V_val = use_vector ? V(i) : 1;
+	    Vmat.InsertGlobalValues (i, 1, &V_val, &i);
+	  }
+	Vmat.FillComplete();
+	Vmat.OptimizeStorage();
 
 				   // wrap even this matrix into ML format
-    ML_Operator *V_ = ML_Operator_Create (comm);
-    ML_Operator_WrapEpetraCrsMatrix (&Vmat, V_, false);
+	ML_Operator *V_ = ML_Operator_Create (comm);
+	ML_Operator_WrapEpetraCrsMatrix (&Vmat, V_, false);
 
 				   // perform triple matrix-vector product
-    ML_rap (A_, V_, B_, C_, ML_CSR_MATRIX);
+				   // using ml/src/Operator/ml_rap.c
+	ML_rap (A_, V_, B_, C_, ML_CSR_MATRIX);
 
-    ML_Operator_Destroy (&V_);
+	ML_Operator_Destroy (&V_);
+      }
 
 				   // create an Epetra matrix from the ML
 				   // matrix that we got as a result.
@@ -1319,9 +1339,12 @@ namespace TrilinosWrappers
     C_mat->OptimizeStorage();
     C.reinit (*C_mat);
 
+				   // destroy allocated memory
+    delete C_mat;
     ML_Operator_Destroy (&A_);
     ML_Operator_Destroy (&B_);
     ML_Operator_Destroy (&C_);
+    ML_Comm_Destroy (&comm);
   }
 
 
@@ -1555,7 +1578,6 @@ namespace TrilinosWrappers
   template void
   SparseMatrix::reinit (const CompressedSimpleSparsityPattern &);
 
-
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const dealii::SparsityPattern &);
@@ -1582,6 +1604,55 @@ namespace TrilinosWrappers
   SparseMatrix::reinit (const Epetra_Map &,
 			const Epetra_Map &,
 			const CompressedSimpleSparsityPattern &);
+
+  template void
+  SparseMatrix::reinit (const dealii::SparseMatrix<float> &,
+			const double,
+			const bool);
+  template void
+  SparseMatrix::reinit (const dealii::SparseMatrix<double> &,
+			const double,
+			const bool);
+  template void
+  SparseMatrix::reinit (const dealii::SparseMatrix<long double> &,
+			const double,
+			const bool);
+
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const dealii::SparseMatrix<float> &,
+			const double,
+			const bool);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const dealii::SparseMatrix<double> &,
+			const double,
+			const bool);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const dealii::SparseMatrix<long double> &,
+			const double,
+			const bool);
+
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const Epetra_Map &,
+			const dealii::SparseMatrix<float> &,
+			const double,
+			const bool);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const Epetra_Map &,
+			const dealii::SparseMatrix<double> &,
+			const double,
+			const bool);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const Epetra_Map &,
+			const dealii::SparseMatrix<long double> &,
+			const double,
+			const bool);
+
 
 }
 
