@@ -1310,13 +1310,11 @@ namespace TrilinosWrappers
 				   // vector content on the diagonal.
 	Epetra_CrsMatrix Vmat (Copy, this->matrix->DomainMap(), 
 			       B.matrix->RangeMap(), 1, true);
-	const int min_my_gid = this->matrix->DomainMap().MinMyGID();
-	const int max_my_gid = this->matrix->DomainMap().MaxMyGID() + 1;
-	for (int i=min_my_gid; i<max_my_gid; ++i)
-	  {
-	    double V_val = use_vector ? V(i) : 1;
-	    Vmat.InsertGlobalValues (i, 1, &V_val, &i);
-	  }
+	Assert (Vmat.DomainMap().SameAs(V.trilinos_vector().Map()),
+		ExcMessage ("Column map of matrix does not fit with vector map!"));
+	const int num_my_rows = B.local_size();
+	for (int i=0; i<num_my_rows; ++i)
+	  Vmat.InsertGlobalValues (i, 1, &V.trilinos_vector()[0][i], &i);
 	Vmat.FillComplete();
 	Vmat.OptimizeStorage();
 
