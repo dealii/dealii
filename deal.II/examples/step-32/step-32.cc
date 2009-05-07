@@ -250,7 +250,6 @@ namespace LinearSolvers
 					     PreconditionerMp > > m_inverse;
       const PreconditionerA &a_preconditioner;
       mutable TrilinosWrappers::MPI::Vector tmp;
-
 };
 
 
@@ -1383,11 +1382,15 @@ void BoussinesqFlowProblem<dim>::solve ()
       gmres (solver_control,
 	     SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
 
-				   // currently, have a problem with
-				   // constrained dofs that are nonzero when
-				   // entering the solver (see step-31). set
-				   // the vector to zero for the moment.
-    stokes_solution = 0;
+				   // now treat the hanging nodes correctly.
+    const unsigned int start = stokes_solution.block(1).local_range().first + 
+      stokes_solution.block(0).size();
+    const unsigned int end = stokes_solution.block(1).local_range().second + 
+      stokes_solution.block(0).size();
+    for (unsigned int i=start; i<end; ++i)
+      if (stokes_constraints.is_constrained (i))
+	stokes_solution(i) = 0;
+
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
     pcout << "   "
