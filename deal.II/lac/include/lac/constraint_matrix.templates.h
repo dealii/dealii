@@ -743,8 +743,6 @@ distribute_local_to_global (const Vector<double>            &local_vector,
     }
 
   const unsigned int n_local_dofs = local_vector.size();
-  
-  Threads::ThreadMutex::ScopedLock lock(mutex);
   for (unsigned int i=0; i<n_local_dofs; ++i)
     {
 				   // let's see if we can use the bool
@@ -1300,8 +1298,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   }
   internals::list_shellsort (my_indices);
 
-  Threads::ThreadMutex::ScopedLock lock(mutex);
-
 				   // now in the second step actually
 				   // resolve the constraints
   const unsigned int n_constrained_dofs = constraint_lines.size();
@@ -1626,8 +1622,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   }
   internals::list_shellsort (my_indices);
 
-  Threads::ThreadMutex::ScopedLock lock(mutex);
-
   const unsigned int n_constrained_dofs = constraint_lines.size();
   for (unsigned int i=0; i<n_constrained_dofs; ++i)
     {
@@ -1881,8 +1875,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       actual_dof_indices.resize (added_rows);
       std::sort (actual_dof_indices.begin(), actual_dof_indices.end());
 
-      Threads::ThreadMutex::ScopedLock lock(mutex);
-
       const unsigned int n_constrained_dofs = constraint_lines.size();
       for (unsigned int i=0; i<n_constrained_dofs; ++i)
 	{
@@ -1984,8 +1976,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
     my_indices.resize (added_rows);
   }
   internals::list_shellsort (my_indices);
-
-  Threads::ThreadMutex::ScopedLock lock(mutex);
 
 				   // now in the second step actually
 				   // resolve the constraints
@@ -2220,8 +2210,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       actual_dof_indices.resize (added_rows);
       std::sort (actual_dof_indices.begin(), actual_dof_indices.end());
 
-      Threads::ThreadMutex::ScopedLock lock(mutex);
-
       const unsigned int n_constrained_dofs = constraint_lines.size();
       for (unsigned int i=0; i<n_constrained_dofs; ++i)
 	{
@@ -2342,8 +2330,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
     my_indices.resize (added_rows);
   }
   internals::list_shellsort (my_indices);
-
-  Threads::ThreadMutex::ScopedLock lock(mutex);
 
 				   // now in the second step actually
 				   // resolve the constraints

@@ -18,7 +18,6 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/table.h>
-#include <base/thread_management.h>
 #include <base/template_constraints.h>
 
 #include <vector>
@@ -985,6 +984,11 @@ class ConstraintMatrix : public Subscriptor
 				      * matrix. Otherwise, this function
 				      * will not be able to correctly handle
 				      * inhomogeneities.
+				      *
+				      * Note: This function is not
+				      * thread-safe, so you will need to
+				      * make sure that only on process at a
+				      * time calls this function.
                                       */
     template <typename VectorType>
     void
@@ -1054,6 +1058,11 @@ class ConstraintMatrix : public Subscriptor
                                       * call to the condense function after
                                       * the vectors and matrices are fully
                                       * assembled.
+				      *
+				      * Note: This function is not
+				      * thread-safe, so you will need to
+				      * make sure that only on process at a
+				      * time calls this function.
                                       */
     template <typename MatrixType>
     void
@@ -1069,6 +1078,11 @@ class ConstraintMatrix : public Subscriptor
 				      * ConstraintMatrix. This function can
 				      * correctly handle inhomogeneous
 				      * constraints as well.
+				      *
+				      * Note: This function is not
+				      * thread-safe, so you will need to
+				      * make sure that only on process at a
+				      * time calls this function.
 				      */
     template <typename MatrixType, typename VectorType>
     void
@@ -1445,14 +1459,6 @@ class ConstraintMatrix : public Subscriptor
 				      * <tt>add_entries_local_to_global()</tt>.
 				      */
     static const Table<2,bool> default_empty_table;
-
-				     /**
-				      * A mutex that makes the function
-				      * <tt>distribute_local_to_global()</tt>
-				      * only accessible to one process at
-				      * time.
-				      */
-    mutable Threads::ThreadMutex mutex;
 
 				     /**
 				      * This function actually implements
