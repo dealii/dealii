@@ -1348,6 +1348,144 @@ namespace TrilinosWrappers
 
 
   void
+  SparseMatrix::Tmmult (SparseMatrix       &C,
+			const SparseMatrix &B,
+			const VectorBase   &V) const
+  {
+    const bool use_vector = V.size() == m() ? true : false;
+    Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+    Assert (this->matrix->RangeMap().SameAs(B.matrix->RangeMap()),
+	    ExcMessage ("Parallel partitioning of A and B does not fit."));
+
+    C.clear();
+				   // use ML built-in method for performing
+				   // the matrix-matrix product.
+
+				   // create ML operators on top of the
+				   // Epetra matrix.
+    ML_Comm* comm;
+    ML_Comm_Create(&comm);
+    ML_Operator *A_nontrans = ML_Operator_Create(comm);
+    ML_Operator *A_ = ML_Operator_Create(comm);
+    ML_Operator *B_ = ML_Operator_Create(comm);
+    ML_Operator *C_ = ML_Operator_Create(comm);
+
+    ML_Operator_WrapEpetraCrsMatrix(&*matrix,A_nontrans,false);
+    ML_Operator_Transpose_byrow(A_nontrans,A_);
+    ML_Operator_WrapEpetraCrsMatrix(&*B.matrix,B_,false);
+
+				   // Case where we only have two
+				   // matrices. We do this by hand since we
+				   // can save some operations compared to
+				   // just calling ml/src/Operator/ml_rap.c
+				   // that multiplies three matrices. This
+				   // code is still similar to the one found
+				   // in ml/src/Operator/ml_rap.c
+    if (use_vector == false)
+      {
+				   // import data if necessary
+	ML_Operator *Btmp, *Ctmp, *Ctmp2, *tptr;
+	ML_CommInfoOP *getrow_comm; 
+	int max_per_proc;
+	int N_input_vector = B_->invec_leng;
+	getrow_comm = B_->getrow->pre_comm;
+	if ( getrow_comm != NULL)
+	  for (int i = 0; i < getrow_comm->N_neighbors; i++)
+	    for (int j = 0; j < getrow_comm->neighbors[i].N_send; j++)
+	      AssertThrow (getrow_comm->neighbors[i].send_list[j] < N_input_vector,
+			   ExcInternalError());
+
+	ML_create_unique_col_id(N_input_vector, &(B_->getrow->loc_glob_map),
+				getrow_comm, &max_per_proc, B_->comm);
+	B_->getrow->use_loc_glob_map = ML_YES;
+	if (A_->getrow->pre_comm != NULL) 
+	  ML_exchange_rows( B_, &Btmp, A_->getrow->pre_comm);
+	else Btmp = B_;
+
+				   // perform matrix-matrix product
+	ML_matmat_mult(A_, Btmp , &Ctmp);
+
+				   // release temporary structures we needed
+				   // for multiplication
+	ML_free(B_->getrow->loc_glob_map);
+	B_->getrow->loc_glob_map = NULL;
+	B_->getrow->use_loc_glob_map = ML_NO;
+	if (A_->getrow->pre_comm != NULL) {
+	  tptr = Btmp;
+	  while ( (tptr!= NULL) && (tptr->sub_matrix != B_)) 
+	    tptr = tptr->sub_matrix;
+	  if (tptr != NULL) tptr->sub_matrix = NULL;
+	  ML_RECUR_CSR_MSRdata_Destroy(Btmp);
+	  ML_Operator_Destroy(&Btmp);
+	}
+
+				   // make correct data structures
+	if (A_->getrow->post_comm != NULL) {
+	  ML_exchange_rows(Ctmp, &Ctmp2, A_->getrow->post_comm);
+	}
+	else Ctmp2 = Ctmp;
+
+	ML_back_to_csrlocal(Ctmp2, C_, max_per_proc);
+
+	ML_RECUR_CSR_MSRdata_Destroy (Ctmp);
+	ML_Operator_Destroy (&Ctmp);
+
+	if (A_->getrow->post_comm != NULL) {
+	  ML_RECUR_CSR_MSRdata_Destroy(Ctmp2);
+	  ML_Operator_Destroy (&Ctmp2);
+	}
+      }
+    else
+      {
+				   // create an Epetra_CrsMatrix with the
+				   // vector content on the diagonal.
+	Epetra_CrsMatrix Vmat (Copy, this->matrix->RangeMap(), 
+			       B.matrix->RangeMap(), 1, true);
+	Assert (Vmat.DomainMap().SameAs(V.trilinos_vector().Map()),
+		ExcMessage ("Column map of matrix does not fit with vector map!"));
+	const int num_my_rows = B.local_size();
+	for (int i=0; i<num_my_rows; ++i)
+	  Vmat.InsertGlobalValues (i, 1, &V.trilinos_vector()[0][i], &i);
+	Vmat.FillComplete();
+	Vmat.OptimizeStorage();
+
+				   // wrap even this matrix into ML format
+	ML_Operator *V_ = ML_Operator_Create (comm);
+	ML_Operator_WrapEpetraCrsMatrix (&Vmat, V_, false);
+
+				   // perform triple matrix-vector product
+				   // using ml/src/Operator/ml_rap.c
+	ML_rap (A_, V_, B_, C_, ML_CSR_MATRIX);
+
+	ML_Operator_Destroy (&V_);
+      }
+
+				   // create an Epetra matrix from the ML
+				   // matrix that we got as a result.
+    Epetra_CrsMatrix * C_mat;
+    ML_Operator2EpetraCrsMatrix(C_, C_mat);
+    C_mat->FillComplete();
+    C_mat->OptimizeStorage();
+    C.reinit (*C_mat);
+
+				   // Sanity check
+    Assert (this->matrix->DomainMap().SameAs(C.matrix->RangeMap()),
+	    ExcInternalError());
+    Assert (B.matrix->DomainMap().SameAs(C.matrix->DomainMap()),
+	    ExcInternalError());
+
+				   // destroy allocated memory
+    delete C_mat;
+    ML_Operator_Destroy (&A_);
+    ML_Operator_Destroy (&A_nontrans);
+    ML_Operator_Destroy (&B_);
+    ML_Operator_Destroy (&C_);
+    ML_Comm_Destroy (&comm);
+  }
+
+
+
+  void
   SparseMatrix::add (const TrilinosScalar  factor,
 		     const SparseMatrix   &rhs)
   {

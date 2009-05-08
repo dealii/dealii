@@ -135,6 +135,9 @@ for (S1, S2, S3, S4: REAL_SCALARS)
     template void SparseMatrix<S1>::
       mmult (SparseMatrix<S2> &, const SparseMatrix<S3> &, const Vector<S4>&,
              const bool) const;
+    template void SparseMatrix<S1>::
+      Tmmult (SparseMatrix<S2> &, const SparseMatrix<S3> &, const Vector<S4>&,
+       	      const bool) const;
   }
 
 

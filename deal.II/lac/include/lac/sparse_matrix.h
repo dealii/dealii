@@ -1266,7 +1266,7 @@ class SparseMatrix : public virtual Subscriptor
 
 //@}
 /**
- * @name Matrix vector multiplications
+ * @name Multiplications
  */
 //@{
 				     /**
@@ -1475,6 +1475,47 @@ class SparseMatrix : public virtual Subscriptor
 		const SparseMatrix<numberB> &B,
 		const Vector<numberV>       &V = Vector<numberV>(),
 		const bool                   rebuild_sparsity_pattern = true) const;
+    
+				     /**
+				      * Perform the matrix-matrix
+				      * multiplication with the transpose of
+				      * <tt>this</tt>, i.e., <tt>C =
+				      * A<sup>T</sup> * B</tt>, or, if an
+				      * optional vector argument is given,
+				      * <tt>C = A<sup>T</sup> * diag(V) *
+				      * B</tt>, where <tt>diag(V)</tt>
+				      * defines a diagonal matrix with the
+				      * vector entries.
+				      *
+				      * This function assumes that the
+				      * calling matrix <tt>A</tt> and
+				      * <tt>B</tt> have compatible
+				      * sizes. The size of <tt>C</tt> will
+				      * be set within this function.
+				      *
+				      * The content as well as the sparsity
+				      * pattern of the matrix C will be
+				      * changed by this function, so make
+				      * sure that the sparsity pattern is
+				      * not used somewhere else in your
+				      * program. This is an expensive
+				      * operation, so think twice before you
+				      * use this function.
+				      *
+				      * There is an optional flag
+				      * <tt>rebuild_sparsity_pattern</tt>
+				      * that can be used to bypass the
+				      * creation of a new sparsity pattern
+				      * and instead uses the sparsity
+				      * pattern stored in <tt>C</tt>. In
+				      * that case, make sure that it really
+				      * fits.
+				      */
+    template <typename numberB, typename numberC, typename numberV>
+    void Tmmult (SparseMatrix<numberC>       &C,
+		 const SparseMatrix<numberB> &B,
+		 const Vector<numberV>       &V = Vector<numberV>(),
+		 const bool                   rebuild_sparsity_pattern = true) const;
     
 //@}
 /**

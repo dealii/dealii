@@ -1298,7 +1298,7 @@ namespace TrilinosWrappers
 
 //@}
 /**
- * @name Matrix vector multiplications
+ * @name Multiplications
  */
 //@{
 
@@ -1591,6 +1591,37 @@ namespace TrilinosWrappers
     void mmult (SparseMatrix       &C,
 		const SparseMatrix &B,
 		const VectorBase   &V = VectorBase()) const;
+
+
+				     /**
+				      * Perform the matrix-matrix
+				      * multiplication with the transpose of
+				      * <tt>this</tt>, i.e., <tt>C =
+				      * A<sup>T</sup> * B</tt>, or, if an
+				      * optional vector argument is given,
+				      * <tt>C = A<sup>T</sup> * diag(V) *
+				      * B</tt>, where <tt>diag(V)</tt>
+				      * defines a diagonal matrix with the
+				      * vector entries.
+				      *
+				      * This function assumes that the
+				      * calling matrix <tt>A</tt> and
+				      * <tt>B</tt> have compatible
+				      * sizes. The size of <tt>C</tt> will
+				      * be set within this function.
+				      *
+				      * The content as well as the sparsity
+				      * pattern of the matrix C will be
+				      * changed by this function, so make
+				      * sure that the sparsity pattern is
+				      * not used somewhere else in your
+				      * program. This is an expensive
+				      * operation, so think twice before you
+				      * use this function.
+				      */
+    void Tmmult (SparseMatrix       &C,
+		 const SparseMatrix &B,
+		 const VectorBase   &V = VectorBase()) const;
 
 //@}
 /**
