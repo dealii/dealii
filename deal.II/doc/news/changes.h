@@ -68,7 +68,7 @@ inconvenience this causes.
   <li>
   <p>
   New: The SparseMatrix class has now a function <code>mmult</code> that
-  can multiply two sparse matrix with each other.
+  can multiply two sparse matrices with each other.
   <br>
   (Martin Kronbichler 2009/05/04)
   </p>
