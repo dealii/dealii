@@ -1151,7 +1151,7 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
       C.reinit (sp_C);
     }
 
-  Assert (C.m() == m(), ExcDimensionMismatch(C.m(), m()));
+  Assert (C.m() == n(), ExcDimensionMismatch(C.m(), n()));
   Assert (C.n() == B.n(), ExcDimensionMismatch(C.n(), B.n()));
 
 				   // create an array that caches some
