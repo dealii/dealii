@@ -349,7 +349,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 		rebuild_stokes_preconditioner (true),
 		rebuild_temperature_matrices (true),
 		rebuild_temperature_preconditioner (true),
-		computing_timer (pcout, TimerOutput::every_call_and_summary,
+		computing_timer (pcout, TimerOutput::summary,
 				 TimerOutput::wall_times)
 {}
 
