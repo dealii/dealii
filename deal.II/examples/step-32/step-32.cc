@@ -179,76 +179,22 @@ namespace EquationData
 
 namespace LinearSolvers
 {
-  template <class Matrix, class Preconditioner>
-  class InverseMatrix : public Subscriptor
-  {
-    public:
-      InverseMatrix (const Matrix         &m,
-		     const Preconditioner &preconditioner);
-
-
-      template <typename VectorType>
-      void vmult (VectorType       &dst,
-		  const VectorType &src) const;
-
-    private:
-      const SmartPointer<const Matrix> matrix;
-      const Preconditioner &preconditioner;
-  };
-
-
-  template <class Matrix, class Preconditioner>
-  InverseMatrix<Matrix,Preconditioner>::
-  InverseMatrix (const Matrix &m,
-		 const Preconditioner &preconditioner)
-		  :
-		  matrix (&m),
-		  preconditioner (preconditioner)
-  {}
-
-
-
-  template <class Matrix, class Preconditioner>
-  template <typename VectorType>
-  void
-  InverseMatrix<Matrix,Preconditioner>::
-  vmult (VectorType       &dst,
-	 const VectorType &src) const
-  {
-    SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
-    SolverCG<VectorType> cg (solver_control);
-
-    dst = 0;
-
-    try
-      {
-	cg.solve (*matrix, dst, src, preconditioner);
-      }
-    catch (std::exception &e)
-      {
-	Assert (false, ExcMessage(e.what()));
-      }
-  }
-
-
-
   template <class PreconditionerA, class PreconditionerMp>
   class BlockSchurPreconditioner : public Subscriptor
   {
     public:
       BlockSchurPreconditioner (
-	const TrilinosWrappers::BlockSparseMatrix     &S,
-	const InverseMatrix<TrilinosWrappers::SparseMatrix,PreconditionerMp>  &Mpinv,
-	const PreconditionerA                         &Apreconditioner);
+	const TrilinosWrappers::BlockSparseMatrix  &S,
+	const PreconditionerMp                     &Mppreconditioner,
+	const PreconditionerA                      &Apreconditioner);
 
       void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
 		  const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
-      const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
-					     PreconditionerMp > > m_inverse;
-      const PreconditionerA &a_preconditioner;
+      const PreconditionerMp &mp_preconditioner;
+      const PreconditionerA  &a_preconditioner;
       mutable TrilinosWrappers::MPI::Vector tmp;
 };
 
@@ -256,12 +202,12 @@ namespace LinearSolvers
 
   template <class PreconditionerA, class PreconditionerMp>
   BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-  BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
-			   const InverseMatrix<TrilinosWrappers::SparseMatrix,PreconditionerMp> &Mpinv,
-			   const PreconditionerA                      &Apreconditioner)
+  BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix &S,
+			   const PreconditionerMp                    &Mppreconditioner,
+			   const PreconditionerA                     &Apreconditioner)
 		  :
 		  stokes_matrix           (&S),
-		  m_inverse               (&Mpinv),
+		  mp_preconditioner       (Mppreconditioner),
 		  a_preconditioner        (Apreconditioner),
 		  tmp                     (stokes_matrix->block(1,1).row_partitioner())
   {}
@@ -276,7 +222,7 @@ namespace LinearSolvers
     a_preconditioner.vmult (dst.block(0), src.block(0));
     stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
     tmp *= -1;
-    m_inverse->vmult (dst.block(1), tmp);
+    mp_preconditioner.vmult (dst.block(1), tmp);
   }
 }
 
@@ -361,8 +307,8 @@ class BoussinesqFlowProblem
     unsigned int timestep_number;
 
     std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  T_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU> Mp_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU> T_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_stokes_preconditioner;
@@ -403,7 +349,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 		rebuild_stokes_preconditioner (true),
 		rebuild_temperature_matrices (true),
 		rebuild_temperature_preconditioner (true),
-		computing_timer (pcout, TimerOutput::summary,
+		computing_timer (pcout, TimerOutput::every_call_and_summary,
 				 TimerOutput::wall_times)
 {}
 
@@ -868,8 +814,8 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 amg_data);
 
-  Mp_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
-                                   (new TrilinosWrappers::PreconditionIC());
+  Mp_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>
+                                   (new TrilinosWrappers::PreconditionILU());
 
   Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
 
@@ -1116,8 +1062,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 
   if (rebuild_temperature_preconditioner == true)
     {
-      T_preconditioner =  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
-                                   (new TrilinosWrappers::PreconditionIC());
+      T_preconditioner =  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>
+                                   (new TrilinosWrappers::PreconditionILU());
       T_preconditioner->initialize (temperature_matrix);
 
       rebuild_temperature_preconditioner = false;
@@ -1350,10 +1296,10 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
   SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
 
-  TrilinosWrappers::PreconditionIC prec;
-  prec.initialize(temperature_mass_matrix);
+  TrilinosWrappers::PreconditionILU preconditioner_mass;
+  preconditioner_mass.initialize(temperature_mass_matrix);
 
-  cg.solve (temperature_mass_matrix, sol, rhs, prec);
+  cg.solve (temperature_mass_matrix, sol, rhs, preconditioner_mass);
   
   old_temperature_solution = sol;
   temperature_constraints.distribute (old_temperature_solution);
@@ -1367,13 +1313,9 @@ void BoussinesqFlowProblem<dim>::solve ()
   pcout << "   Solving..." << std::endl;
 
   {
-    const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-		 		       TrilinosWrappers::PreconditionIC>
-      mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
-
     const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                                                  TrilinosWrappers::PreconditionIC>
-      preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
+                                                  TrilinosWrappers::PreconditionILU>
+      preconditioner (stokes_matrix, *Mp_preconditioner, *Amg_preconditioner);
 
     SolverControl solver_control (stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
