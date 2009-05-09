@@ -49,6 +49,13 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
       for (IT i= copy_indices[level].begin();
 	   i != copy_indices[level].end();++i)
 	dst[level](i->second) = src(i->first);
+				       // For non-DG: degrees of
+				       // freedom in the refinement
+				       // face may need special
+				       // attention, since they belong
+				       // to the coarse level, but
+				       // have fine level basis
+				       // functions
       if (!first)
 	restrict_and_add (level+1, dst[level], dst[level+1]);
       first = false;
@@ -65,6 +72,13 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   OutVector&                     dst,
   const MGLevelObject<VECTOR>& src) const
 {
+				       // For non-DG: degrees of
+				       // freedom in the refinement
+				       // face may need special
+				       // attention, since they belong
+				       // to the coarse level, but
+				       // have fine level basis
+				       // functions
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
     for (IT i= copy_indices[level].begin();
 	 i != copy_indices[level].end();++i)
@@ -81,6 +95,13 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
   OutVector                            &dst,
   const MGLevelObject<VECTOR> &src) const
 {
+				       // For non-DG: degrees of
+				       // freedom in the refinement
+				       // face may need special
+				       // attention, since they belong
+				       // to the coarse level, but
+				       // have fine level basis
+				       // functions
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
     for (IT i= copy_indices[level].begin();
 	 i != copy_indices[level].end();++i)
