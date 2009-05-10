@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,20 +53,25 @@ void check_point (const Point<dim>& x,
 }
 
 
-void check_bdm2 ()
+template<int dim>
+void check_bdm ()
 {
-  Point<2> x;
+  Point<dim> x;
   
-  PolynomialsBDM<2> p1(1);
-  PolynomialsBDM<2> p2(2);
+  PolynomialsBDM<dim> p1(1);
+  PolynomialsBDM<dim> p2(2);
+  PolynomialsBDM<dim> p3(3);
+  PolynomialsBDM<dim> p4(4);
   
   x(0) = 2.;
   x(1) = 3.;
-//   if (dim>2)
-//     x(2) = 4;
+  if (dim>2)
+    x(2) = 4;
   
   check_point(x, p1);
   check_point(x, p2);
+  check_point(x, p3);
+  check_point(x, p4);
 }
 
 template<int dim>
@@ -99,7 +104,8 @@ int main()
   deallog.threshold_double(1.e-10);
 
   deallog.push("BDM");
-  check_bdm2();
+  check_bdm<2>();
+  check_bdm<3>();
   deallog.pop();
   deallog.push("RT");
   check_rt<2>();

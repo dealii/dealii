@@ -23,6 +23,315 @@ DEAL:BDM::p[10] value 0 45  first 0 0 30 18
 DEAL:BDM::p[11] value 0 83  first 0 0 0 67 
 DEAL:BDM::p[12] value 8 -35  first 12 0 -35 -11 
 DEAL:BDM::p[13] value -53 27  first -26 -35 0 27 
+DEAL:BDM::Point 2. 3.
+DEAL:BDM::p[0] value 1 0  first 0 0 0 0 
+DEAL:BDM::p[1] value 5 0  first 3 0 0 0 
+DEAL:BDM::p[2] value 29 0  first 40 0 0 0 
+DEAL:BDM::p[3] value 167 0  first 349 0 0 0 
+DEAL:BDM::p[4] value 9 0  first 0 3 0 0 
+DEAL:BDM::p[5] value 45 0  first 30 18 0 0 
+DEAL:BDM::p[6] value 252 0  first 349 101 0 0 
+DEAL:BDM::p[7] value 83 0  first 0 67 0 0 
+DEAL:BDM::p[8] value 430 0  first 287 349 0 0 
+DEAL:BDM::p[9] value 807 0  first 0 984 0 0 
+DEAL:BDM::p[10] value 0 1  first 0 0 0 0 
+DEAL:BDM::p[11] value 0 5  first 0 0 3 0 
+DEAL:BDM::p[12] value 0 29  first 0 0 40 0 
+DEAL:BDM::p[13] value 0 167  first 0 0 349 0 
+DEAL:BDM::p[14] value 0 9  first 0 0 0 3 
+DEAL:BDM::p[15] value 0 45  first 0 0 30 18 
+DEAL:BDM::p[16] value 0 252  first 0 0 349 101 
+DEAL:BDM::p[17] value 0 83  first 0 0 0 67 
+DEAL:BDM::p[18] value 0 430  first 0 0 287 349 
+DEAL:BDM::p[19] value 0 807  first 0 0 0 984 
+DEAL:BDM::p[20] value 16 -95  first 32 0 -143 -31 
+DEAL:BDM::p[21] value -215 81  first -107 -215 0 108 
+DEAL:BDM::Point 2. 3.
+DEAL:BDM::p[0] value 1 0  first 0 0 0 0 
+DEAL:BDM::p[1] value 5 0  first 3 0 0 0 
+DEAL:BDM::p[2] value 29 0  first 40 0 0 0 
+DEAL:BDM::p[3] value 167 0  first 349 0 0 0 
+DEAL:BDM::p[4] value 963 0  first 2700 0 0 0 
+DEAL:BDM::p[5] value 9 0  first 0 3 0 0 
+DEAL:BDM::p[6] value 45 0  first 30 18 0 0 
+DEAL:BDM::p[7] value 252 0  first 349 101 0 0 
+DEAL:BDM::p[8] value 1444 0  first 3024 577 0 0 
+DEAL:BDM::p[9] value 83 0  first 0 67 0 0 
+DEAL:BDM::p[10] value 430 0  first 287 349 0 0 
+DEAL:BDM::p[11] value 2405 0  first 3330 1950 0 0 
+DEAL:BDM::p[12] value 807 0  first 0 984 0 0 
+DEAL:BDM::p[13] value 4193 0  first 2795 5114 0 0 
+DEAL:BDM::p[14] value 7923 0  first 0 12900 0 0 
+DEAL:BDM::p[15] value 0 1  first 0 0 0 0 
+DEAL:BDM::p[16] value 0 5  first 0 0 3 0 
+DEAL:BDM::p[17] value 0 29  first 0 0 40 0 
+DEAL:BDM::p[18] value 0 167  first 0 0 349 0 
+DEAL:BDM::p[19] value 0 963  first 0 0 2700 0 
+DEAL:BDM::p[20] value 0 9  first 0 0 0 3 
+DEAL:BDM::p[21] value 0 45  first 0 0 30 18 
+DEAL:BDM::p[22] value 0 252  first 0 0 349 101 
+DEAL:BDM::p[23] value 0 1444  first 0 0 3024 577 
+DEAL:BDM::p[24] value 0 83  first 0 0 0 67 
+DEAL:BDM::p[25] value 0 430  first 0 0 287 349 
+DEAL:BDM::p[26] value 0 2405  first 0 0 3330 1950 
+DEAL:BDM::p[27] value 0 807  first 0 0 0 984 
+DEAL:BDM::p[28] value 0 4193  first 0 0 2795 5114 
+DEAL:BDM::p[29] value 0 7923  first 0 0 0 12900 
+DEAL:BDM::p[30] value 32 -239  first 80 0 -479 -79 
+DEAL:BDM::p[31] value -809 243  first -404 -1079 0 405 
+DEAL:BDM::Point 2. 3. 4.
+DEAL:BDM::p[0] value 1 0 0  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[1] value 5 0 0  first 3 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[2] value 9 0 0  first 0 3 0 0 0 0 0 0 0 
+DEAL:BDM::p[3] value 12 0 0  first 0 0 3 0 0 0 0 0 0 
+DEAL:BDM::p[4] value 0 1 0  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[5] value 0 5 0  first 0 0 0 3 0 0 0 0 0 
+DEAL:BDM::p[6] value 0 9 0  first 0 0 0 0 3 0 0 0 0 
+DEAL:BDM::p[7] value 0 12 0  first 0 0 0 0 0 3 0 0 0 
+DEAL:BDM::p[8] value 0 0 1  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[9] value 0 0 5  first 0 0 0 0 0 0 3 0 0 
+DEAL:BDM::p[10] value 0 0 9  first 0 0 0 0 0 0 0 3 0 
+DEAL:BDM::p[11] value 0 0 12  first 0 0 0 0 0 0 0 0 3 
+DEAL:BDM::p[12] value 32 -47 0  first 16 0 16 0 -15 -23 0 0 0 
+DEAL:BDM::p[13] value 0 12 -15  first 0 0 0 12 4 0 -15 0 -3 
+DEAL:BDM::p[14] value -17 0 36  first -8 -11 0 0 0 0 0 24 9 
+DEAL:BDM::p[15] value 48 -35 0  first 24 16 12 0 -23 -8 0 0 0 
+DEAL:BDM::p[16] value 0 48 -31  first 0 0 0 24 16 12 -15 0 -15 
+DEAL:BDM::p[17] value -11 0 48  first -11 -3 0 0 0 0 24 16 12 
+DEAL:BDM::Point 2. 3. 4.
+DEAL:BDM::p[0] value 1 0 0  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[1] value 5 0 0  first 3 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[2] value 29 0 0  first 40 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[3] value 9 0 0  first 0 3 0 0 0 0 0 0 0 
+DEAL:BDM::p[4] value 45 0 0  first 30 18 0 0 0 0 0 0 0 
+DEAL:BDM::p[5] value 83 0 0  first 0 67 0 0 0 0 0 0 0 
+DEAL:BDM::p[6] value 12 0 0  first 0 0 3 0 0 0 0 0 0 
+DEAL:BDM::p[7] value 63 0 0  first 42 0 18 0 0 0 0 0 0 
+DEAL:BDM::p[8] value 105 0 0  first 0 42 30 0 0 0 0 0 0 
+DEAL:BDM::p[9] value 163 0 0  first 0 0 94 0 0 0 0 0 0 
+DEAL:BDM::p[10] value 0 1 0  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[11] value 0 5 0  first 0 0 0 3 0 0 0 0 0 
+DEAL:BDM::p[12] value 0 29 0  first 0 0 0 40 0 0 0 0 0 
+DEAL:BDM::p[13] value 0 9 0  first 0 0 0 0 3 0 0 0 0 
+DEAL:BDM::p[14] value 0 45 0  first 0 0 0 30 18 0 0 0 0 
+DEAL:BDM::p[15] value 0 83 0  first 0 0 0 0 67 0 0 0 0 
+DEAL:BDM::p[16] value 0 12 0  first 0 0 0 0 0 3 0 0 0 
+DEAL:BDM::p[17] value 0 63 0  first 0 0 0 42 0 18 0 0 0 
+DEAL:BDM::p[18] value 0 105 0  first 0 0 0 0 42 30 0 0 0 
+DEAL:BDM::p[19] value 0 163 0  first 0 0 0 0 0 94 0 0 0 
+DEAL:BDM::p[20] value 0 0 1  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[21] value 0 0 5  first 0 0 0 0 0 0 3 0 0 
+DEAL:BDM::p[22] value 0 0 29  first 0 0 0 0 0 0 40 0 0 
+DEAL:BDM::p[23] value 0 0 9  first 0 0 0 0 0 0 0 3 0 
+DEAL:BDM::p[24] value 0 0 45  first 0 0 0 0 0 0 30 18 0 
+DEAL:BDM::p[25] value 0 0 83  first 0 0 0 0 0 0 0 67 0 
+DEAL:BDM::p[26] value 0 0 12  first 0 0 0 0 0 0 0 0 3 
+DEAL:BDM::p[27] value 0 0 63  first 0 0 0 0 0 0 42 0 18 
+DEAL:BDM::p[28] value 0 0 105  first 0 0 0 0 0 0 0 42 30 
+DEAL:BDM::p[29] value 0 0 163  first 0 0 0 0 0 0 0 0 94 
+DEAL:BDM::p[30] value 128 -191 0  first 64 0 96 0 -63 -143 0 0 0 
+DEAL:BDM::p[31] value 0 24 -31  first 0 0 0 36 8 0 -47 0 -7 
+DEAL:BDM::p[32] value -53 0 108  first -26 -53 0 0 0 0 0 108 27 
+DEAL:BDM::p[33] value 192 -143 0  first 96 64 96 0 -95 -71 0 0 0 
+DEAL:BDM::p[34] value 0 96 -63  first 0 0 0 96 32 24 -63 0 -31 
+DEAL:BDM::p[35] value -35 0 144  first -35 -23 0 0 0 0 72 96 36 
+DEAL:BDM::p[36] value 216 -107 0  first 108 144 54 0 -107 -26 0 0 0 
+DEAL:BDM::p[37] value 0 288 -127  first 0 0 0 144 96 144 -63 0 -95 
+DEAL:BDM::p[38] value -23 0 144  first -35 -7 0 0 0 0 144 48 36 
+DEAL:BDM::Point 2. 3. 4.
+DEAL:BDM::p[0] value 1 0 0  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[1] value 5 0 0  first 3 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[2] value 29 0 0  first 40 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[3] value 167 0 0  first 349 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[4] value 9 0 0  first 0 3 0 0 0 0 0 0 0 
+DEAL:BDM::p[5] value 45 0 0  first 30 18 0 0 0 0 0 0 0 
+DEAL:BDM::p[6] value 252 0 0  first 349 101 0 0 0 0 0 0 0 
+DEAL:BDM::p[7] value 83 0 0  first 0 67 0 0 0 0 0 0 0 
+DEAL:BDM::p[8] value 430 0 0  first 287 349 0 0 0 0 0 0 0 
+DEAL:BDM::p[9] value 807 0 0  first 0 984 0 0 0 0 0 0 0 
+DEAL:BDM::p[10] value 12 0 0  first 0 0 3 0 0 0 0 0 0 
+DEAL:BDM::p[11] value 63 0 0  first 42 0 18 0 0 0 0 0 0 
+DEAL:BDM::p[12] value 352 0 0  first 488 0 101 0 0 0 0 0 0 
+DEAL:BDM::p[13] value 105 0 0  first 0 42 30 0 0 0 0 0 0 
+DEAL:BDM::p[14] value 546 0 0  first 364 218 156 0 0 0 0 0 0 
+DEAL:BDM::p[15] value 1003 0 0  first 0 813 287 0 0 0 0 0 0 
+DEAL:BDM::p[16] value 163 0 0  first 0 0 94 0 0 0 0 0 0 
+DEAL:BDM::p[17] value 848 0 0  first 565 0 488 0 0 0 0 0 0 
+DEAL:BDM::p[18] value 1414 0 0  first 0 565 813 0 0 0 0 0 0 
+DEAL:BDM::p[19] value 2241 0 0  first 0 0 1937 0 0 0 0 0 0 
+DEAL:BDM::p[20] value 0 1 0  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[21] value 0 5 0  first 0 0 0 3 0 0 0 0 0 
+DEAL:BDM::p[22] value 0 29 0  first 0 0 0 40 0 0 0 0 0 
+DEAL:BDM::p[23] value 0 167 0  first 0 0 0 349 0 0 0 0 0 
+DEAL:BDM::p[24] value 0 9 0  first 0 0 0 0 3 0 0 0 0 
+DEAL:BDM::p[25] value 0 45 0  first 0 0 0 30 18 0 0 0 0 
+DEAL:BDM::p[26] value 0 252 0  first 0 0 0 349 101 0 0 0 0 
+DEAL:BDM::p[27] value 0 83 0  first 0 0 0 0 67 0 0 0 0 
+DEAL:BDM::p[28] value 0 430 0  first 0 0 0 287 349 0 0 0 0 
+DEAL:BDM::p[29] value 0 807 0  first 0 0 0 0 984 0 0 0 0 
+DEAL:BDM::p[30] value 0 12 0  first 0 0 0 0 0 3 0 0 0 
+DEAL:BDM::p[31] value 0 63 0  first 0 0 0 42 0 18 0 0 0 
+DEAL:BDM::p[32] value 0 352 0  first 0 0 0 488 0 101 0 0 0 
+DEAL:BDM::p[33] value 0 105 0  first 0 0 0 0 42 30 0 0 0 
+DEAL:BDM::p[34] value 0 546 0  first 0 0 0 364 218 156 0 0 0 
+DEAL:BDM::p[35] value 0 1003 0  first 0 0 0 0 813 287 0 0 0 
+DEAL:BDM::p[36] value 0 163 0  first 0 0 0 0 0 94 0 0 0 
+DEAL:BDM::p[37] value 0 848 0  first 0 0 0 565 0 488 0 0 0 
+DEAL:BDM::p[38] value 0 1414 0  first 0 0 0 0 565 813 0 0 0 
+DEAL:BDM::p[39] value 0 2241 0  first 0 0 0 0 0 1937 0 0 0 
+DEAL:BDM::p[40] value 0 0 1  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[41] value 0 0 5  first 0 0 0 0 0 0 3 0 0 
+DEAL:BDM::p[42] value 0 0 29  first 0 0 0 0 0 0 40 0 0 
+DEAL:BDM::p[43] value 0 0 167  first 0 0 0 0 0 0 349 0 0 
+DEAL:BDM::p[44] value 0 0 9  first 0 0 0 0 0 0 0 3 0 
+DEAL:BDM::p[45] value 0 0 45  first 0 0 0 0 0 0 30 18 0 
+DEAL:BDM::p[46] value 0 0 252  first 0 0 0 0 0 0 349 101 0 
+DEAL:BDM::p[47] value 0 0 83  first 0 0 0 0 0 0 0 67 0 
+DEAL:BDM::p[48] value 0 0 430  first 0 0 0 0 0 0 287 349 0 
+DEAL:BDM::p[49] value 0 0 807  first 0 0 0 0 0 0 0 984 0 
+DEAL:BDM::p[50] value 0 0 12  first 0 0 0 0 0 0 0 0 3 
+DEAL:BDM::p[51] value 0 0 63  first 0 0 0 0 0 0 42 0 18 
+DEAL:BDM::p[52] value 0 0 352  first 0 0 0 0 0 0 488 0 101 
+DEAL:BDM::p[53] value 0 0 105  first 0 0 0 0 0 0 0 42 30 
+DEAL:BDM::p[54] value 0 0 546  first 0 0 0 0 0 0 364 218 156 
+DEAL:BDM::p[55] value 0 0 1003  first 0 0 0 0 0 0 0 813 287 
+DEAL:BDM::p[56] value 0 0 163  first 0 0 0 0 0 0 0 0 94 
+DEAL:BDM::p[57] value 0 0 848  first 0 0 0 0 0 0 565 0 488 
+DEAL:BDM::p[58] value 0 0 1414  first 0 0 0 0 0 0 0 565 813 
+DEAL:BDM::p[59] value 0 0 2241  first 0 0 0 0 0 0 0 0 1937 
+DEAL:BDM::p[60] value 512 -767 0  first 256 0 512 0 -255 -767 0 0 0 
+DEAL:BDM::p[61] value 0 48 -63  first 0 0 0 96 16 0 -127 0 -15 
+DEAL:BDM::p[62] value -161 0 324  first -80 -215 0 0 0 0 0 432 81 
+DEAL:BDM::p[63] value 768 -575 0  first 384 256 576 0 -383 -431 0 0 0 
+DEAL:BDM::p[64] value 0 192 -127  first 0 0 0 288 64 48 -191 0 -63 
+DEAL:BDM::p[65] value -107 0 432  first -107 -107 0 0 0 0 216 432 108 
+DEAL:BDM::p[66] value 864 -431 0  first 432 576 432 0 -431 -215 0 0 0 
+DEAL:BDM::p[67] value 0 576 -255  first 0 0 0 576 192 288 -255 0 -191 
+DEAL:BDM::p[68] value -71 0 432  first -107 -47 0 0 0 0 432 288 108 
+DEAL:BDM::p[69] value 864 -323 0  first 432 864 216 0 -431 -80 0 0 0 
+DEAL:BDM::p[70] value 0 1536 -511  first 0 0 0 768 512 1152 -255 0 -511 
+DEAL:BDM::p[71] value -47 0 384  first -95 -15 0 0 0 0 576 128 96 
+DEAL:BDM::Point 2. 3. 4.
+DEAL:BDM::p[0] value 1 0 0  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[1] value 5 0 0  first 3 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[2] value 29 0 0  first 40 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[3] value 167 0 0  first 349 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[4] value 963 0 0  first 2700 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[5] value 9 0 0  first 0 3 0 0 0 0 0 0 0 
+DEAL:BDM::p[6] value 45 0 0  first 30 18 0 0 0 0 0 0 0 
+DEAL:BDM::p[7] value 252 0 0  first 349 101 0 0 0 0 0 0 0 
+DEAL:BDM::p[8] value 1444 0 0  first 3024 577 0 0 0 0 0 0 0 
+DEAL:BDM::p[9] value 83 0 0  first 0 67 0 0 0 0 0 0 0 
+DEAL:BDM::p[10] value 430 0 0  first 287 349 0 0 0 0 0 0 0 
+DEAL:BDM::p[11] value 2405 0 0  first 3330 1950 0 0 0 0 0 0 0 
+DEAL:BDM::p[12] value 807 0 0  first 0 984 0 0 0 0 0 0 0 
+DEAL:BDM::p[13] value 4193 0 0  first 2795 5114 0 0 0 0 0 0 0 
+DEAL:BDM::p[14] value 7923 0 0  first 0 12900 0 0 0 0 0 0 0 
+DEAL:BDM::p[15] value 12 0 0  first 0 0 3 0 0 0 0 0 0 
+DEAL:BDM::p[16] value 63 0 0  first 42 0 18 0 0 0 0 0 0 
+DEAL:BDM::p[17] value 352 0 0  first 488 0 101 0 0 0 0 0 0 
+DEAL:BDM::p[18] value 2021 0 0  first 4234 0 577 0 0 0 0 0 0 
+DEAL:BDM::p[19] value 105 0 0  first 0 42 30 0 0 0 0 0 0 
+DEAL:BDM::p[20] value 546 0 0  first 364 218 156 0 0 0 0 0 0 
+DEAL:BDM::p[21] value 3052 0 0  first 4226 1221 872 0 0 0 0 0 0 
+DEAL:BDM::p[22] value 1003 0 0  first 0 813 287 0 0 0 0 0 0 
+DEAL:BDM::p[23] value 5212 0 0  first 3475 4226 1489 0 0 0 0 0 0 
+DEAL:BDM::p[24] value 9784 0 0  first 0 11933 2795 0 0 0 0 0 0 
+DEAL:BDM::p[25] value 163 0 0  first 0 0 94 0 0 0 0 0 0 
+DEAL:BDM::p[26] value 848 0 0  first 565 0 488 0 0 0 0 0 0 
+DEAL:BDM::p[27] value 4745 0 0  first 6570 0 2730 0 0 0 0 0 0 
+DEAL:BDM::p[28] value 1414 0 0  first 0 565 813 0 0 0 0 0 0 
+DEAL:BDM::p[29] value 7345 0 0  first 4897 2938 4226 0 0 0 0 0 0 
+DEAL:BDM::p[30] value 13505 0 0  first 0 10950 7770 0 0 0 0 0 0 
+DEAL:BDM::p[31] value 2241 0 0  first 0 0 1937 0 0 0 0 0 0 
+DEAL:BDM::p[32] value 11644 0 0  first 7763 0 10063 0 0 0 0 0 0 
+DEAL:BDM::p[33] value 19407 0 0  first 0 7763 16772 0 0 0 0 0 0 
+DEAL:BDM::p[34] value 30963 0 0  first 0 0 35700 0 0 0 0 0 0 
+DEAL:BDM::p[35] value 0 1 0  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[36] value 0 5 0  first 0 0 0 3 0 0 0 0 0 
+DEAL:BDM::p[37] value 0 29 0  first 0 0 0 40 0 0 0 0 0 
+DEAL:BDM::p[38] value 0 167 0  first 0 0 0 349 0 0 0 0 0 
+DEAL:BDM::p[39] value 0 963 0  first 0 0 0 2700 0 0 0 0 0 
+DEAL:BDM::p[40] value 0 9 0  first 0 0 0 0 3 0 0 0 0 
+DEAL:BDM::p[41] value 0 45 0  first 0 0 0 30 18 0 0 0 0 
+DEAL:BDM::p[42] value 0 252 0  first 0 0 0 349 101 0 0 0 0 
+DEAL:BDM::p[43] value 0 1444 0  first 0 0 0 3024 577 0 0 0 0 
+DEAL:BDM::p[44] value 0 83 0  first 0 0 0 0 67 0 0 0 0 
+DEAL:BDM::p[45] value 0 430 0  first 0 0 0 287 349 0 0 0 0 
+DEAL:BDM::p[46] value 0 2405 0  first 0 0 0 3330 1950 0 0 0 0 
+DEAL:BDM::p[47] value 0 807 0  first 0 0 0 0 984 0 0 0 0 
+DEAL:BDM::p[48] value 0 4193 0  first 0 0 0 2795 5114 0 0 0 0 
+DEAL:BDM::p[49] value 0 7923 0  first 0 0 0 0 12900 0 0 0 0 
+DEAL:BDM::p[50] value 0 12 0  first 0 0 0 0 0 3 0 0 0 
+DEAL:BDM::p[51] value 0 63 0  first 0 0 0 42 0 18 0 0 0 
+DEAL:BDM::p[52] value 0 352 0  first 0 0 0 488 0 101 0 0 0 
+DEAL:BDM::p[53] value 0 2021 0  first 0 0 0 4234 0 577 0 0 0 
+DEAL:BDM::p[54] value 0 105 0  first 0 0 0 0 42 30 0 0 0 
+DEAL:BDM::p[55] value 0 546 0  first 0 0 0 364 218 156 0 0 0 
+DEAL:BDM::p[56] value 0 3052 0  first 0 0 0 4226 1221 872 0 0 0 
+DEAL:BDM::p[57] value 0 1003 0  first 0 0 0 0 813 287 0 0 0 
+DEAL:BDM::p[58] value 0 5212 0  first 0 0 0 3475 4226 1489 0 0 0 
+DEAL:BDM::p[59] value 0 9784 0  first 0 0 0 0 11933 2795 0 0 0 
+DEAL:BDM::p[60] value 0 163 0  first 0 0 0 0 0 94 0 0 0 
+DEAL:BDM::p[61] value 0 848 0  first 0 0 0 565 0 488 0 0 0 
+DEAL:BDM::p[62] value 0 4745 0  first 0 0 0 6570 0 2730 0 0 0 
+DEAL:BDM::p[63] value 0 1414 0  first 0 0 0 0 565 813 0 0 0 
+DEAL:BDM::p[64] value 0 7345 0  first 0 0 0 4897 2938 4226 0 0 0 
+DEAL:BDM::p[65] value 0 13505 0  first 0 0 0 0 10950 7770 0 0 0 
+DEAL:BDM::p[66] value 0 2241 0  first 0 0 0 0 0 1937 0 0 0 
+DEAL:BDM::p[67] value 0 11644 0  first 0 0 0 7763 0 10063 0 0 0 
+DEAL:BDM::p[68] value 0 19407 0  first 0 0 0 0 7763 16772 0 0 0 
+DEAL:BDM::p[69] value 0 30963 0  first 0 0 0 0 0 35700 0 0 0 
+DEAL:BDM::p[70] value 0 0 1  first 0 0 0 0 0 0 0 0 0 
+DEAL:BDM::p[71] value 0 0 5  first 0 0 0 0 0 0 3 0 0 
+DEAL:BDM::p[72] value 0 0 29  first 0 0 0 0 0 0 40 0 0 
+DEAL:BDM::p[73] value 0 0 167  first 0 0 0 0 0 0 349 0 0 
+DEAL:BDM::p[74] value 0 0 963  first 0 0 0 0 0 0 2700 0 0 
+DEAL:BDM::p[75] value 0 0 9  first 0 0 0 0 0 0 0 3 0 
+DEAL:BDM::p[76] value 0 0 45  first 0 0 0 0 0 0 30 18 0 
+DEAL:BDM::p[77] value 0 0 252  first 0 0 0 0 0 0 349 101 0 
+DEAL:BDM::p[78] value 0 0 1444  first 0 0 0 0 0 0 3024 577 0 
+DEAL:BDM::p[79] value 0 0 83  first 0 0 0 0 0 0 0 67 0 
+DEAL:BDM::p[80] value 0 0 430  first 0 0 0 0 0 0 287 349 0 
+DEAL:BDM::p[81] value 0 0 2405  first 0 0 0 0 0 0 3330 1950 0 
+DEAL:BDM::p[82] value 0 0 807  first 0 0 0 0 0 0 0 984 0 
+DEAL:BDM::p[83] value 0 0 4193  first 0 0 0 0 0 0 2795 5114 0 
+DEAL:BDM::p[84] value 0 0 7923  first 0 0 0 0 0 0 0 12900 0 
+DEAL:BDM::p[85] value 0 0 12  first 0 0 0 0 0 0 0 0 3 
+DEAL:BDM::p[86] value 0 0 63  first 0 0 0 0 0 0 42 0 18 
+DEAL:BDM::p[87] value 0 0 352  first 0 0 0 0 0 0 488 0 101 
+DEAL:BDM::p[88] value 0 0 2021  first 0 0 0 0 0 0 4234 0 577 
+DEAL:BDM::p[89] value 0 0 105  first 0 0 0 0 0 0 0 42 30 
+DEAL:BDM::p[90] value 0 0 546  first 0 0 0 0 0 0 364 218 156 
+DEAL:BDM::p[91] value 0 0 3052  first 0 0 0 0 0 0 4226 1221 872 
+DEAL:BDM::p[92] value 0 0 1003  first 0 0 0 0 0 0 0 813 287 
+DEAL:BDM::p[93] value 0 0 5212  first 0 0 0 0 0 0 3475 4226 1489 
+DEAL:BDM::p[94] value 0 0 9784  first 0 0 0 0 0 0 0 11933 2795 
+DEAL:BDM::p[95] value 0 0 163  first 0 0 0 0 0 0 0 0 94 
+DEAL:BDM::p[96] value 0 0 848  first 0 0 0 0 0 0 565 0 488 
+DEAL:BDM::p[97] value 0 0 4745  first 0 0 0 0 0 0 6570 0 2730 
+DEAL:BDM::p[98] value 0 0 1414  first 0 0 0 0 0 0 0 565 813 
+DEAL:BDM::p[99] value 0 0 7345  first 0 0 0 0 0 0 4897 2938 4226 
+DEAL:BDM::p[100] value 0 0 13505  first 0 0 0 0 0 0 0 10950 7770 
+DEAL:BDM::p[101] value 0 0 2241  first 0 0 0 0 0 0 0 0 1937 
+DEAL:BDM::p[102] value 0 0 11644  first 0 0 0 0 0 0 7763 0 10063 
+DEAL:BDM::p[103] value 0 0 19407  first 0 0 0 0 0 0 0 7763 16772 
+DEAL:BDM::p[104] value 0 0 30963  first 0 0 0 0 0 0 0 0 35700 
+DEAL:BDM::p[105] value 2048 -3071 0  first 1024 0 2560 0 -1023 -3839 0 0 0 
+DEAL:BDM::p[106] value 0 96 -127  first 0 0 0 240 32 0 -319 0 -31 
+DEAL:BDM::p[107] value -485 0 972  first -242 -809 0 0 0 0 0 1620 243 
+DEAL:BDM::p[108] value 3072 -2303 0  first 1536 1024 3072 0 -1535 -2303 0 0 0 
+DEAL:BDM::p[109] value 0 384 -255  first 0 0 0 768 128 96 -511 0 -127 
+DEAL:BDM::p[110] value -323 0 1296  first -323 -431 0 0 0 0 648 1728 324 
+DEAL:BDM::p[111] value 3456 -1727 0  first 1728 2304 2592 0 -1727 -1295 0 0 0 
+DEAL:BDM::p[112] value 0 1152 -511  first 0 0 0 1728 384 576 -767 0 -383 
+DEAL:BDM::p[113] value -215 0 1296  first -323 -215 0 0 0 0 1296 1296 324 
+DEAL:BDM::p[114] value 3456 -1295 0  first 1728 3456 1728 0 -1727 -647 0 0 0 
+DEAL:BDM::p[115] value 0 3072 -1023  first 0 0 0 3072 1024 2304 -1023 0 -1023 
+DEAL:BDM::p[116] value -143 0 1152  first -287 -95 0 0 0 0 1728 768 288 
+DEAL:BDM::p[117] value 3240 -971 0  first 1620 4320 810 0 -1619 -242 0 0 0 
+DEAL:BDM::p[118] value 0 7680 -2047  first 0 0 0 3840 2560 7680 -1023 0 -2559 
+DEAL:BDM::p[119] value -95 0 960  first -239 -31 0 0 0 0 1920 320 240 
 DEAL:RT::Point 2. 3.
 DEAL:RT::p[0] value 0 0  first 0 0 0 0 
 DEAL:RT::p[1] value 2 0  first 1 0 0 0 
