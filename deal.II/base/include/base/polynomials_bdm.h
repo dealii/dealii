@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,19 +43,19 @@ DEAL_II_NAMESPACE_OPEN
  * vector valued polynomials:
  *
  * <dl>
- * <dt>In 2D:
+ * <dt> In 2D:
  * <dd> The 2D-curl of the functions <i>x<sup>k+1</sup>y</i>
  * and <i>xy<sup>k+1</sup></i>.
- * <dt>In 3D:
+ * <dt>In 3D: 
  * <dd> For any <i>i=0,...,k</i> the curls of
  * <i>(0,0,xy<sup>i+1</sup>z<sup>k-i</sup>)</i>,
- * <i>(0,x<sup>k-i</sup>yz<sup>i+1</sup>,0)</i> and
- * <i>(x<sup>i+1</sup>y<sup>k-i</sup>z,0,0)</i>
+ * <i>(x<sup>k-i</sup>yz<sup>i+1</sup>,0,0)</i> and
+ * <i>(0,x<sup>i+1</sup>y<sup>k-i</sup>z,0)</i>
  * </dl>
  *
- * Right now, they are implemented in two dimensions only.
+ * @todo Second derivatives in 3D are missing.
  *
- * @author Guido Kanschat, 2003, 2005
+ * @author Guido Kanschat, 2003, 2005, 2009
  */
 template <int dim>
 class PolynomialsBDM
@@ -137,7 +137,11 @@ class PolynomialsBDM
     const PolynomialSpace<dim> polynomial_space;
 
 				     /**
-				      * Storage for monomials
+				      * Storage for monomials. In 2D,
+				      * this is just the polynomial of
+				      * order <i>k</i>. In 3D, we
+				      * need all polynomials from
+				      * degree zero to <i>k</i>.
 				      */
     std::vector<Polynomials::Polynomial<double> > monomials;
     
