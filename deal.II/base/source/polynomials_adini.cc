@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-AdiniPoly::AdiniPoly() :
+PolynomialsAdini::PolynomialsAdini() :
   coef(12,12),
   dx(12,12),
   dy(12,12),
@@ -112,7 +112,7 @@ AdiniPoly::AdiniPoly() :
 }
 
 void 
-AdiniPoly::compute (const Point<2> &unit_point, 
+PolynomialsAdini::compute (const Point<2> &unit_point, 
                    std::vector<double> &values,
                    std::vector<Tensor<1,2> > &grads,
                    std::vector< Tensor<2,2> > &grad_grads) const
@@ -143,7 +143,7 @@ AdiniPoly::compute (const Point<2> &unit_point,
   return;
 }
 
-double AdiniPoly::compute_value (const unsigned int i, const Point<2> &p) const
+double PolynomialsAdini::compute_value (const unsigned int i, const Point<2> &p) const
 {
   const double x = p(0);
   const double y = p(1);
@@ -161,7 +161,7 @@ double AdiniPoly::compute_value (const unsigned int i, const Point<2> &p) const
          coef(11,i)*x*y*y*y;
 }
 
-Tensor<1,2> AdiniPoly::compute_grad (const unsigned int i, const Point<2> &p) const
+Tensor<1,2> PolynomialsAdini::compute_grad (const unsigned int i, const Point<2> &p) const
 {
   const double x = p(0);
   const double y = p(1);
@@ -194,7 +194,7 @@ Tensor<1,2> AdiniPoly::compute_grad (const unsigned int i, const Point<2> &p) co
   return tensor;
 }  
 
-Tensor<2,2> AdiniPoly::compute_grad_grad (const unsigned int i, const Point<2> &p) const
+Tensor<2,2> PolynomialsAdini::compute_grad_grad (const unsigned int i, const Point<2> &p) const
 {
   const double x = p(0);
   const double y = p(1);

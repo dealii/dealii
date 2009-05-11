@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Bärbel Janssen, 2007
  */
 
-class AdiniPoly 
+class PolynomialsAdini 
 {
   public:
                                      /**
@@ -43,7 +43,7 @@ class AdiniPoly
                                       * the polynomials of 
                                       * the described space
                                       */
-    AdiniPoly ();
+    PolynomialsAdini ();
                                      /**
                                       * Computes the value and the
                                       * first and second derivatives
