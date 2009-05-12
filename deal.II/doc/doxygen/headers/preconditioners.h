@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,13 +21,10 @@
  * decompositions (ILU). In addition, sparse direct solvers can be used as
  * preconditioners when available.
  * 
- * In principle, and in the mathematical literature, preconditioners are
- * treated as matrices in the sense that one can do a matrix-vector
- * multiplication with them. On the other hand, one doesn't usually have an
- * element-by-element representation of these matrices, only their action on a
- * vector. The preconditioner classes therefore often have a <tt>vmult()</tt>
- * function that symbolizes the ability to perform matrix-vector
- * multiplications, just like the real matrix classes.
+ * In order to be used by deal.II solvers, preconditioners must
+ * conform to the standard matrix interface. Solvers use the function
+ * <tt>vmult()</tt> of the preconditioner. Some solvers may also use
+ * <tt>Tvmult()</tt>.
  *
  * @ingroup LAC
  * @ingroup Matrices
