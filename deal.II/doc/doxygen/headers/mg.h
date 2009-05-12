@@ -39,6 +39,7 @@
  * Finally, we have several auxiliary classes, namely MGLevelObject,
  * which stores an object on each level
  * 
- * See the step-16 example program on how to use this functionality.
+ * See the @ref step_16 "step-16" example program on how to use this
+ * functionality.
  */
 
