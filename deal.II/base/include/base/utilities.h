@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -248,6 +248,20 @@ namespace Utilities
 				      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
 
+				     /**
+				      * Given a communicator, generate a new
+				      * communicator that contains the same
+				      * set of processors but that has a
+				      * different, unique identifier.
+				      *
+				      * This functionality can be used to
+				      * ensure that different objects, such as
+				      * distributed matrices, each have unique
+				      * communicators over which they can
+				      * interact without interfering with each
+				      * other.
+				      */
+    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
 
 				     /**
 				      * A class that is used to initialize the

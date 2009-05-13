@@ -2,7 +2,7 @@
 //      $Id$   
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -485,6 +485,15 @@ namespace Utilities
       
       return rank;
     }
+
+
+    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
+    {
+      MPI_Comm new_communicator;
+      MPI_Comm_Dup (mpi_communicator, &new_communicator);
+      return new_communicator;
+    }
+    
     
 #else
     
@@ -493,9 +502,18 @@ namespace Utilities
       return 1;
     }
 
+
+    
     unsigned int get_this_mpi_process (const MPI_Comm &)
     {
       return 0;
+    }
+
+
+    
+    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
+    {
+      return mpi_communicator;
     }
 #endif
 

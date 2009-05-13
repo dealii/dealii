@@ -55,6 +55,10 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The new function Utilities::duplicate_communicator can be used
+  to duplicate an MPI communicator to produce a unique duplicate.
+  <br>
+  (WB 2009/05/13)
   </p>
   </li>
 </ol>
@@ -67,7 +71,7 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  New: The SparseMatrix class has now a function <code>mmult</code> that
+  New: The SparseMatrix class has now a function SparseMatrix::mmult that
   can multiply two sparse matrices with each other.
   <br>
   (Martin Kronbichler 2009/05/04)
