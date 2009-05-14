@@ -490,7 +490,7 @@ namespace Utilities
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
     {
       MPI_Comm new_communicator;
-      MPI_Comm_Dup (mpi_communicator, &new_communicator);
+      MPI_Comm_dup (mpi_communicator, &new_communicator);
       return new_communicator;
     }
     
