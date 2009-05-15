@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -230,14 +230,14 @@ void curved_grid (std::ofstream &out)
   data_out.build_patches(5);
   data_out.write_gnuplot(out);
 				   // output with no curved cells
-  data_out.build_patches(euler,5,1,DataOut<2>::no_curved_cells);
+  data_out.build_patches(euler,5,DataOut<2>::no_curved_cells);
   data_out.write_gnuplot(out);
   				   // output with curved cells at the boundary
   				   // (default)
   data_out.build_patches(euler,5);
   data_out.write_gnuplot(out);
   				   // output with all cells curved
-  data_out.build_patches(euler,5,1,DataOut<2>::curved_inner_cells);
+  data_out.build_patches(euler,5,DataOut<2>::curved_inner_cells);
   data_out.write_gnuplot(out);
 }
 

@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -18,10 +18,48 @@ default: run-tests
 
 ############################################################
 
-threads.cc : threads.pl
+# rules to generate the threading tests. the .cc files are
+# automatically generated; note that for the output generation, we
+# have to sort the output since otherwise in MT mode things would come
+# out in a random order. the same holds for a few other tests
+threads_01.cc : threads.pl
 	@echo =====regenerating== $@
 	@$(PERL) $^ > $@
 
+threads_02.cc : threads_01.cc
+	@echo =====regenerating== $@
+	@cat $^ \
+	   | $(PERL) -pi -e 's/spawn \((.*), (.*)\) \(/new_thread (\2, \1, /g;' \
+	   | $(PERL) -pi -e 's/(new_thread.*), \)/\1)/g;' \
+	   | $(PERL) -pi -e 's/threads_01/threads_02/g;' \
+	   > $@
+
+threads_%/output : threads_%/exe
+	@echo =====Running======= $<
+	@echo Running > $(dir $@)/status
+	@$(ULIMIT) -t 2400 ; ./$< ; \
+	  if test ! $$? = 0 ; then rm $@ ; false ; fi
+	@perl -pi $(normalize)  $@
+	@sort $@ -o $@
+
+thread_validity_07/output : thread_validity_07/exe
+	@echo =====Running======= $<
+	@echo Running > $(dir $@)/status
+	@$(ULIMIT) -t 2400 ; ./$< ; \
+	  if test ! $$? = 0 ; then rm $@ ; false ; fi
+	@perl -pi $(normalize)  $@
+	@sort $@ -o $@
+
+task_%/output : task_%/exe
+	@echo =====Running======= $<
+	@echo Running > $(dir $@)/status
+	@$(ULIMIT) -t 2400 ; ./$< ; \
+	  if test ! $$? = 0 ; then rm $@ ; false ; fi
+	@perl -pi $(normalize)  $@
+	@sort $@ -o $@
+
+
+############################################################
 tests_x =  geometry_info_* \
 	   logtest \
 	   log_* \
@@ -50,12 +88,19 @@ tests_x =  geometry_info_* \
 	   function_* \
            functions_* \
 	   utilities_* \
+	   work_stream_* \
 	   is_finite* \
-	   number_traits_*
+	   number_traits_* \
+	   thread_validity_* \
+	   task_* \
+	   parallel_* \
+	   mutex_*
 
-ifeq ($(enable-multithreading),no)
-  tests_x += threads
-endif
+# add threading tests. note that we have
+# to list them individually, without wildcards, because the .cc files are
+# generated and don't exist yet (so wildcard expansion will fail)
+tests_x += threads_01 threads_02
+
 
 ifeq (tecio, $(findstring tecio, $LIBS))
   tests_x += data_out_base_tecplot_bin

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -337,11 +337,13 @@ void AdvectionProblem<dim>::assemble_system ()
 						  n_threads);
 
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (*this, &AdvectionProblem<dim>::assemble_system_interval)
-               (thread_ranges[thread].first,
-                thread_ranges[thread].second);
+    {
+      threads += Threads::spawn (*this, &AdvectionProblem<dim>::assemble_system_interval)
+		 (thread_ranges[thread].first,
+		  thread_ranges[thread].second);
 
-  threads.join_all ();  
+      threads.join_all ();
+    }
 
 
   hanging_node_constraints.condense (system_matrix);
@@ -580,10 +582,12 @@ GradientEstimation::estimate (const hp::DoFHandler<dim> &dof_handler,
 				 Vector<float> &)
     = &GradientEstimation::template estimate_interval<dim>;
   for (unsigned int i=0; i<n_threads; ++i)
-    threads += Threads::spawn (estimate_interval_ptr)(dof_handler, solution,
-                                                      index_intervals[i],
-                                                      error_per_cell);
-  threads.join_all ();
+    {
+      threads += Threads::spawn (estimate_interval_ptr)(dof_handler, solution,
+							index_intervals[i],
+							error_per_cell);
+      threads.join_all ();
+    }
 }
 
 

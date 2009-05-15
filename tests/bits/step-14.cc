@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -450,11 +450,14 @@ namespace LaplaceSolver
     Threads::ThreadMutex mutex;
     Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
-                 (linear_system,
-                  thread_ranges[thread].first,
-                  thread_ranges[thread].second,
-                  mutex);
+      {
+	threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
+		   (linear_system,
+		    thread_ranges[thread].first,
+		    thread_ranges[thread].second,
+		    mutex);
+	threads.join_all();
+      }
 
     assemble_rhs (linear_system.rhs);
     linear_system.hanging_node_constraints.condense (linear_system.rhs);
@@ -1540,6 +1543,7 @@ namespace LaplaceSolver
   {
     Threads::ThreadGroup<> threads;
     threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_primal_problem)();
+    threads.join_all ();
     threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_dual_problem)();
     threads.join_all ();
   }
@@ -1682,13 +1686,15 @@ namespace LaplaceSolver
     const unsigned int n_threads = multithread_info.n_default_threads;
     Threads::ThreadGroup<> threads;
     for (unsigned int i=0; i<n_threads; ++i)
-      threads += Threads::spawn (*this, &WeightedResidual<dim>::estimate_some)
-                 (primal_solution,
-                  dual_weights,
-                  n_threads, i,
-                  error_indicators,
-                  face_integrals);
-    threads.join_all();    
+      {
+	threads += Threads::spawn (*this, &WeightedResidual<dim>::estimate_some)
+		   (primal_solution,
+		    dual_weights,
+		    n_threads, i,
+		    error_indicators,
+		    face_integrals);
+	threads.join_all();
+      }
 
     unsigned int present_cell=0;  
     for (active_cell_iterator cell=dual_solver.dof_handler.begin_active();

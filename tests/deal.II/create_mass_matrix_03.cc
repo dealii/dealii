@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,9 +17,11 @@
 // rhs vector was nested in the wrong loop. this was fixed by Moritz' commit
 // 14428
 //
-// the function internally has four branches, with different code used for the
-// cases with/without coefficient and scalar/vector-valued finite element. we
-// test these four cases through the _01, _02, _03, and _04 tests
+// the function internally has four branches, with different code used
+// for the cases with/without coefficient and scalar/vector-valued
+// finite element. we test these four cases through the _01, _02, _03,
+// and _04 tests. the version without creating a right hand side
+// vector is tested in the _0[1234]a tests
 
 
 
@@ -87,15 +89,15 @@ check ()
   SparseMatrix<double> matrix;
   matrix.reinit (sparsity);
 
-  Functions::ExpFunction<dim> coefficient;
+  Functions::ExpFunction<dim> rhs_function;
   
   Vector<double> rhs (dof.n_dofs());
   
   MatrixTools::
     create_mass_matrix (mapping, dof,
 			quadrature, matrix,
-			coefficient, rhs,
-			&coefficient);
+			rhs_function, rhs,
+			&rhs_function);
 
 				   // since we only generate
 				   // output with two digits after

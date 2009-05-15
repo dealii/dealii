@@ -1,7 +1,7 @@
 ######################################################################
 # Makefile.rules,v 1.11 2001/04/24 13:18:09 wolf Exp
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, the deal.II authors
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, the deal.II authors
 #
 # Common make rules for test files. To be included by the Makefiles
 # in the subdirectories.
@@ -14,7 +14,7 @@ normalize = $D/common/scripts/normalize.pl
 # in the report with it. for a branch, prefix everything
 # with x-branch-name/ so that tests run from the branch will show up
 # in different folders on the webpage.
-WORKDIR = $(notdir $(shell pwd))
+WORKDIR = x-branch_threading_building_blocks/$(notdir $(shell pwd))
 
 verbose = off
 
@@ -37,12 +37,12 @@ endif
 
 %/obj.g.$(OBJEXT) : %.cc
 	@echo =====debug========= $<
-	@echo Compiling > $*/status
+	@echo Compiling > $(dir $@)/status
 	@$(CXX) $(flags) -c $< -o $@
 
 %/obj.$(OBJEXT) : %.cc
 	@echo =====optimized===== $<
-	@echo Compiling > $*/status
+	@echo Compiling > $(dir $@)/status
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 ######################################################################
@@ -50,7 +50,7 @@ endif
 ######################################################################
 %/exe : %/obj.g.$(OBJEXT)
 	@echo =====linking======= $@
-	@echo Linking > $*/status
+	@echo Linking > $(dir $@)/status
 	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 
@@ -74,7 +74,7 @@ endif
 
 %/output : %/exe
 	@echo =====Running======= $<
-	@echo Running > $*/status
+	@echo Running > $(dir $@)/status
 	@$(ULIMIT) -t 2400 ; ./$< ; \
 	  if test ! $$? = 0 ; then rm $@ ; false ; fi
 	@perl -pi $(normalize)  $@
@@ -104,7 +104,7 @@ endif
 
 %/OK : %/output
 	@echo '=====Checking======' $<
-	@echo Checking > $*/status
+	@echo Checking > $(dir $@)/status
 	@$(PERL) -pi $(normalize)  $<
 	@for i in $(PLATFORM-HIERARCHY) ; do \
 	    testname=$(<:%/output=%) ; \
@@ -117,7 +117,7 @@ endif
 		 fi ; \
 		 if eval $$cmd ; then \
 			echo '=====OK============' $@ ; \
-			echo 'diff ok' > $*/status ; \
+			echo 'diff ok' > $(dir $@)/status ; \
 			echo $$i > $@ ; \
 		 else \
 			if test "x$(verbose)" = "xon" ; then \

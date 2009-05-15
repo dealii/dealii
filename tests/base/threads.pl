@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 2003, 2004, 2005, 2007, 2008 by the deal.II authors
+#    Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 by the deal.II authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -11,7 +11,7 @@
 #
 #----------------------------  threads.pl  ---------------------------
 
-# This is the script with which threads.cc is generated
+# This is the script with which threads_01.cc is generated
 #
 # The idea of the generated file is: have classes X<N> which
 # are not convertible into each other, and have functions with
@@ -191,7 +191,7 @@ print "};\n";
 
 
 print "int main () {\n";
-print "  std::ofstream logfile(\"threads/output\");\n";
+print "  std::ofstream logfile(\"threads_01/output\");\n";
 print "  deallog.attach(logfile);\n";
 print "  deallog.depth_console(0);\n";
 

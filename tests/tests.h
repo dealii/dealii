@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,8 +52,8 @@ LogStream & operator << (LogStream &logstream,
 
 
 
-#ifndef DEAL_II_STACKTACE_SWITCH
-#define DEAL_II_STACKTACE_SWITCH
+#ifndef DEAL_II_STACKTRACE_SWITCH
+#define DEAL_II_STACKTRACE_SWITCH
 
 // A structure and a variable that are used to make sure that we do
 // not show a stacktrace in out testcases, since this would lead to
@@ -68,5 +68,46 @@ struct SwitchOffStacktrace
 } deal_II_stacktrace_dummy;
 
 #endif
+
+DEAL_II_NAMESPACE_OPEN
+namespace internal
+{
+
+    namespace Vector
+    {
+
+      extern unsigned int minimum_parallel_grain_size;
+
+    }
+
+    namespace SparseMatrix
+    {
+
+      extern unsigned int minimum_parallel_grain_size;
+
+    }
+
+}
+
+DEAL_II_NAMESPACE_CLOSE
+
+// A structure and a variable that are used to set grainsizes for parallel
+// mode smaller than they would otherwise be. this is used to test that the
+// parallel algorithms in lac/ work alright.
+struct SetGrainSizes
+{
+
+    SetGrainSizes ()
+      {
+
+	internal::Vector::minimum_parallel_grain_size = 2;
+
+	internal::SparseMatrix::minimum_parallel_grain_size = 2;
+
+      }
+
+}
+set_grain_sizes;
+
 
 #endif // __tests_tests_h

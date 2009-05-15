@@ -1,5 +1,5 @@
 //----------------------------  full_matrix_common.h  ---------------------------
-//    $Id:$
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2007, 2008 by the deal.II authors
