@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,40 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+namespace internal
+{
+  namespace DataOutFaces
+  {
+				     /**
+				      * A derived class for use in the
+				      * DataOutFaces class. This is
+				      * a class for the
+				      * AdditionalData kind of data
+				      * structure discussed in the
+				      * documentation of the
+				      * WorkStream context.
+				      */
+    template <int dim, int spacedim>
+    struct ParallelData : public internal::DataOut::ParallelDataBase<dim,spacedim>
+    {
+	template <class FE>
+	ParallelData (const Quadrature<dim-1> &quadrature,
+		      const unsigned int n_components,
+		      const unsigned int n_datasets,
+		      const unsigned int n_subdivisions,
+		      const std::vector<unsigned int> &n_postprocessor_outputs,
+		      const FE &finite_elements,
+		      const UpdateFlags update_flags);
+
+	const dealii::hp::QCollection<dim-1> q_collection;
+	dealii::hp::FEFaceValues<dim> x_fe_values;
+
+	std::vector<Point<dim> > patch_normals;
+    };
+  }
+}
 
 
 /**
@@ -110,8 +144,7 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
 				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
     virtual void
-    build_patches (const unsigned int n_subdivisions = 0,
-		   const unsigned int n_threads      = multithread_info.n_default_threads);
+    build_patches (const unsigned int n_subdivisions = 0);
 
 				     /**
 				      * Declare a way to describe a
@@ -182,14 +215,13 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
     
   private:
 				     /**
-				      * Builds every @p n_threads's
-				      * patch. This function may be
-				      * called in parallel.
-				      * If multithreading is not
-				      * used, the function is called
-				      * once and generates all patches.
+				      * Build one patch. This function
+				      * is called in a WorkStream
+				      * context.
 				      */
-    void build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data);
+    void build_one_patch (const FaceDescriptor *cell_and_face,
+			  internal::DataOutFaces::ParallelData<DH::dimension, DH::dimension> &data,
+			  DataOutBase::Patch<DH::dimension-1,DH::space_dimension> &patch);
 };
 
 

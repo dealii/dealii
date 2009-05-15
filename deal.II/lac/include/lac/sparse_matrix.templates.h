@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,9 +14,11 @@
 #define __deal2__sparse_matrix_templates_h
 
 
-//TODO[WB]: the threaded functions can now be converted to return a value, rather than use an additional argument
-
+#include <base/config.h>
 #include <base/template_constraints.h>
+#include <base/parallel.h>
+#include <base/thread_management.h>
+#include <base/multithread_info.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -35,12 +37,10 @@
 #include <algorithm>
 #include <functional>
 #include <cmath>
-
 #include <vector>
 #include <numeric>
+#include <base/std_cxx1x/bind.h>
 
-#include <base/thread_management.h>
-#include <base/multithread_info.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -331,6 +331,59 @@ SparseMatrix<number>::add (const number factor,
 }
 
 
+namespace internal
+{
+  namespace SparseMatrix
+  {
+				     /**
+				      * Perform a vmult using the SparseMatrix
+				      * data structures, but only using a
+				      * subinterval for the row indices.
+				      *
+				      * In the sequential case, this function
+				      * is called on all rows, in the parallel
+				      * case it may be called on a subrange,
+				      * at the discretion of the task
+				      * scheduler.
+				      */
+    template <typename number,
+	      typename InVector,
+	      typename OutVector>
+    void vmult_on_subrange (const unsigned int  begin_row,
+			    const unsigned int  end_row,
+			    const number       *values,
+			    const std::size_t  *rowstart,
+			    const unsigned int *colnums,
+			    const InVector     &src,
+			    OutVector          &dst,
+			    const bool          add)
+    {
+      const number       *val_ptr    = &values[rowstart[begin_row]];
+      const unsigned int *colnum_ptr = &colnums[rowstart[begin_row]];
+      typename OutVector::iterator dst_ptr = dst.begin() + begin_row;
+
+      if (add == false)
+	for (unsigned int row=begin_row; row<end_row; ++row)
+	  {
+	    typename OutVector::value_type s = 0.;
+	    const number *const val_end_of_row = &values[rowstart[row+1]];
+	    while (val_ptr != val_end_of_row)
+	      s += *val_ptr++ * src(*colnum_ptr++);
+	    *dst_ptr++ = s;
+	  }
+      else
+	for (unsigned int row=begin_row; row<end_row; ++row)
+	  {
+	    typename OutVector::value_type s = 0.;
+	    const number *const val_end_of_row = &values[rowstart[row+1]];
+	    while (val_ptr != val_end_of_row)
+	      s += *val_ptr++ * src(*colnum_ptr++);
+	    *dst_ptr++ += s;
+	  }
+    }
+  }
+}
+
 
 template <typename number>
 template <typename number2>
@@ -545,91 +598,18 @@ SparseMatrix<number>::vmult (OutVector& dst,
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
-  
-  const unsigned int n_rows = m();
 
-				   // in MT mode: start new threads
-				   // only if the matrix is
-				   // sufficiently large.  the limit
-				   // is mostly artificial
-  if (DEAL_II_USE_MT &&
-      (multithread_info.n_default_threads > 1) &&
-      (n_rows/multithread_info.n_default_threads > 2000))
-    {
-      const unsigned int n_threads = multithread_info.n_default_threads;
-
-				       // then spawn threads. since
-				       // some compilers have trouble
-				       // finding out which
-				       // 'encapsulate' function to
-				       // take of all those possible
-				       // ones if we simply drop in
-				       // the address of an overloaded
-				       // template member function,
-				       // make it simpler for the
-				       // compiler by giving it the
-				       // correct type right away:
-      typedef
-	void (SparseMatrix<number>::*mem_fun_p)
-	(OutVector &,
-	 const InVector &,
-	 const unsigned int        ,
-	 const unsigned int) const;
-      const mem_fun_p comp
-	= (&SparseMatrix<number>::
-           template threaded_vmult<OutVector,InVector>);
-      Threads::ThreadGroup<> threads;
-      for (unsigned int i=0; i<n_threads; ++i)
-	threads += Threads::spawn<void, SparseMatrix<number> > (*this, comp) (dst, src,
-                                                 n_rows * i / n_threads,
-                                                 n_rows * (i+1) / n_threads);
-      threads.join_all();
-
-      return;
-    }
-  else
-    {
-				       // if not in MT mode or size<2000
-				       // do it in an oldfashioned way
-      const number       *val_ptr    = &val[cols->rowstart[0]];
-      const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-      typename OutVector::iterator dst_ptr = dst.begin();
-      for (unsigned int row=0; row<n_rows; ++row)
-	{
-	  typename OutVector::value_type s = 0.;
-	  const number *const val_end_of_row = &val[cols->rowstart[row+1]];
-	  while (val_ptr != val_end_of_row)
-	    s += *val_ptr++ * src(*colnum_ptr++);
-	  *dst_ptr++ = s;
-	};
-    };
-}
-
-
-
-template <typename number>
-template <class OutVector, class InVector>
-void
-SparseMatrix<number>::threaded_vmult (OutVector       &dst,
-				      const InVector &src,
-				      const unsigned int        begin_row,
-				      const unsigned int        end_row) const
-{
-				   // this function should not be called
-				   // when not in parallel mode.
-  Assert (DEAL_II_USE_MT, ExcInternalError());
-
-  const number       *val_ptr    = &val[cols->rowstart[begin_row]];
-  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
-  typename OutVector::iterator dst_ptr = dst.begin() + begin_row;
-  for (unsigned int row=begin_row; row<end_row; ++row)
-    {
-      typename OutVector::value_type s = 0.;
-      const number *const val_end_of_row = &val[cols->rowstart[row+1]];
-      while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * src(*colnum_ptr++);
-      *dst_ptr++ = s;
-    };
+  parallel::apply_to_subranges (0U, m(),
+				std_cxx1x::bind (internal::SparseMatrix::vmult_on_subrange
+						 <number,InVector,OutVector>,
+						 _1, _2,
+						 val,
+						 cols->rowstart,
+						 cols->colnums,
+						 std_cxx1x::cref(src),
+						 std_cxx1x::ref(dst),
+						 false),
+				internal::SparseMatrix::minimum_parallel_grain_size);
 }
 
 
@@ -674,18 +654,17 @@ SparseMatrix<number>::vmult_add (OutVector& dst,
 
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
-  const unsigned int  n_rows     = m();
-  const number       *val_ptr    = &val[cols->rowstart[0]];
-  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-  typename OutVector::iterator dst_ptr    = dst.begin();
-  for (unsigned int row=0; row<n_rows; ++row)
-    {
-      typename OutVector::value_type s = *dst_ptr;
-      const number *const val_end_of_row = &val[cols->rowstart[row+1]];
-      while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * src(*colnum_ptr++);
-      *dst_ptr++ = s;
-    };
+  parallel::apply_to_subranges (0U, m(),
+				std_cxx1x::bind (internal::SparseMatrix::vmult_on_subrange
+						 <number,InVector,OutVector>,
+						 _1, _2,
+						 val,
+						 cols->rowstart,
+						 cols->colnums,
+						 std_cxx1x::cref(src),
+						 std_cxx1x::ref(dst),
+						 true),
+				internal::SparseMatrix::minimum_parallel_grain_size);
 }
 
 
@@ -712,6 +691,45 @@ SparseMatrix<number>::Tvmult_add (OutVector& dst,
 }
 
 
+namespace internal
+{
+  namespace SparseMatrix
+  {
+				     /**
+				      * Perform a vmult using the SparseMatrix
+				      * data structures, but only using a
+				      * subinterval for the row indices.
+				      *
+				      * In the sequential case, this function
+				      * is called on all rows, in the parallel
+				      * case it may be called on a subrange,
+				      * at the discretion of the task
+				      * scheduler.
+				      */
+    template <typename number,
+	      typename InVector>
+    number matrix_norm_sqr_on_subrange (const unsigned int  begin_row,
+					const unsigned int  end_row,
+					const number       *values,
+					const std::size_t  *rowstart,
+					const unsigned int *colnums,
+					const InVector     &v)
+    {
+      number norm_sqr=0.;
+  
+      for (unsigned int i=begin_row; i<end_row; ++i)
+	{
+	  number s = 0;
+	  for (unsigned int j=rowstart[i]; j<rowstart[i+1] ;j++)
+	    s += values[j] * v(colnums[j]);
+	  norm_sqr += v(i)*numbers::NumberTraits<number>::conjugate(s);
+	}
+      return norm_sqr;
+    }
+  }
+}
+
+
 
 template <typename number>
 template <typename somenumber>
@@ -723,104 +741,56 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
   Assert(m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
-  const unsigned int n_rows = m();
-
-				   // if in MT mode and size sufficiently
-				   // large: do it in parallel; the limit
-				   // is mostly artificial
-  if (DEAL_II_USE_MT &&
-      (multithread_info.n_default_threads > 1) &&
-      (n_rows/multithread_info.n_default_threads > 2000))
-    {
-      const unsigned int n_threads = multithread_info.n_default_threads;
-
-				       // space for the norms of
-				       // the different parts
-      std::vector<somenumber> partial_sums (n_threads, 0);
-				       // then spawn threads. since
-				       // some compilers have trouble
-				       // finding out which
-				       // 'encapsulate' function to
-				       // take of all those possible
-				       // ones if we simply drop in
-				       // the address of an overloaded
-				       // template member function,
-				       // make it simpler for the
-				       // compiler by giving it the
-				       // correct type right away:
-      typedef
-	void (SparseMatrix<number>::*mem_fun_p)
-	(const Vector<somenumber> &,
-	 const unsigned int        ,
-	 const unsigned int        ,
-	 somenumber               *) const;
-      const mem_fun_p comp
-	= (&SparseMatrix<number>::
-           template threaded_matrix_norm_square<somenumber>);
-      Threads::ThreadGroup<> threads;
-      for (unsigned int i=0; i<n_threads; ++i)
-	threads += Threads::spawn<void, SparseMatrix<number> > (*this, comp)(v,
-                                                n_rows * i / n_threads,
-                                                n_rows * (i+1) / n_threads,
-                                                &partial_sums[i]);
-
-				       // ... and wait until they're finished
-      threads.join_all ();
-				       // accumulate the partial results
-      return std::accumulate (partial_sums.begin(),
-			      partial_sums.end(),
-			      static_cast<somenumber>(0.));
-    }
-  else
-    {
-				       // if not in MT mode or the matrix is
-				       // too small: do it one-by-one
-      somenumber          sum        = 0.;
-      const number       *val_ptr    = &val[cols->rowstart[0]];
-      const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-      for (unsigned int row=0; row<n_rows; ++row)
-	{
-	  somenumber s = 0.;
-	  const number *val_end_of_row = &val[cols->rowstart[row+1]];
-	  while (val_ptr != val_end_of_row)
-	    s += *val_ptr++ * v(*colnum_ptr++);
-	  
-	  sum += v(row) * numbers::NumberTraits<somenumber>::conjugate(s);
-	}
-      
-      return sum;
-    }
+  return
+    parallel::accumulate_from_subranges<number>
+    (std_cxx1x::bind (internal::SparseMatrix::matrix_norm_sqr_on_subrange
+		      <number,Vector<somenumber> >,
+		      _1, _2,
+		      val, cols->rowstart, cols->colnums,
+		      std_cxx1x::cref(v)),
+     0, m(),
+     internal::SparseMatrix::minimum_parallel_grain_size);
 }
 
 
 
-template <typename number>
-template <typename somenumber>
-void
-SparseMatrix<number>::
-threaded_matrix_norm_square (const Vector<somenumber> &v,
-                             const unsigned int        begin_row,
-                             const unsigned int        end_row,
-                             somenumber               *partial_sum) const
+namespace internal
 {
-				   // this function should not be called
-				   // when not in parallel mode.
-  Assert (DEAL_II_USE_MT, ExcInternalError());
-
-  somenumber sum = 0.;
-  const number       *val_ptr    = &val[cols->rowstart[begin_row]];
-  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
-  for (unsigned int row=begin_row; row<end_row; ++row)
+  namespace SparseMatrix
+  {
+				     /**
+				      * Perform a vmult using the SparseMatrix
+				      * data structures, but only using a
+				      * subinterval for the row indices.
+				      *
+				      * In the sequential case, this function
+				      * is called on all rows, in the parallel
+				      * case it may be called on a subrange,
+				      * at the discretion of the task
+				      * scheduler.
+				      */
+    template <typename number,
+	      typename InVector>
+    number matrix_scalar_product_on_subrange (const unsigned int  begin_row,
+					      const unsigned int  end_row,
+					      const number       *values,
+					      const std::size_t  *rowstart,
+					      const unsigned int *colnums,
+					      const InVector     &u,
+					      const InVector     &v)
     {
-      somenumber s = 0.;
-      const number *val_end_of_row = &val[cols->rowstart[row+1]];
-      while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * v(*colnum_ptr++);
-
-      sum += v(row) * numbers::NumberTraits<somenumber>::conjugate(s);
-    }
+      number norm_sqr=0.;
   
-  *partial_sum = sum;
+      for (unsigned int i=begin_row; i<end_row; ++i)
+	{
+	  number s = 0;
+	  for (unsigned int j=rowstart[i]; j<rowstart[i+1] ;j++)
+	    s += values[j] * v(colnums[j]);
+	  norm_sqr += u(i)*numbers::NumberTraits<number>::conjugate(s);
+	}
+      return norm_sqr;
+    }
+  }
 }
 
 
@@ -836,106 +806,16 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
   Assert(m() == u.size(), ExcDimensionMismatch(m(),u.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
-  const unsigned int n_rows = m();
-
-				   // if in MT mode and size sufficiently
-				   // large: do it in parallel; the limit
-				   // is mostly artificial
-  if (DEAL_II_USE_MT &&
-      (multithread_info.n_default_threads != 1) &&
-      (n_rows/multithread_info.n_default_threads > 2000))
-    {
-      const unsigned int n_threads = multithread_info.n_default_threads;
-
-				       // space for the norms of
-				       // the different parts
-      std::vector<somenumber> partial_sums (n_threads, 0);
-				       // then spawn threads. since
-				       // some compilers have trouble
-				       // finding out which
-				       // 'encapsulate' function to
-				       // take of all those possible
-				       // ones if we simply drop in
-				       // the address of an overloaded
-				       // template member function,
-				       // make it simpler for the
-				       // compiler by giving it the
-				       // correct type right away:
-      typedef
-	void (SparseMatrix<number>::*mem_fun_p)
-	(const Vector<somenumber> &,
-	 const Vector<somenumber> &,
-	 const unsigned int        ,
-	 const unsigned int        ,
-	 somenumber               *) const;
-      const mem_fun_p comp
-	= (&SparseMatrix<number>::
-           template threaded_matrix_scalar_product<somenumber>);
-      Threads::ThreadGroup<> threads;
-      for (unsigned int i=0; i<n_threads; ++i)
-	threads += Threads::spawn<void, SparseMatrix<number> > (*this, comp)(u, v,
-                                                n_rows * i / n_threads,
-                                                n_rows * (i+1) / n_threads,
-                                                &partial_sums[i]);
-  
-				       // ... and wait until they're finished
-      threads.join_all ();
-				       // accumulate the partial results
-      return std::accumulate (partial_sums.begin(),
-			      partial_sums.end(),
-			      static_cast<somenumber>(0.));
-    }
-  else
-    {
-				       // if not in MT mode or the matrix is
-				       // too small: do it one-by-one
-      somenumber          sum        = 0.;
-      const number       *val_ptr    = &val[cols->rowstart[0]];
-      const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
-      for (unsigned int row=0; row<n_rows; ++row)
-	{
-	  somenumber s = 0.;
-	  const number *val_end_of_row = &val[cols->rowstart[row+1]];
-	  while (val_ptr != val_end_of_row)
-	    s += *val_ptr++ * v(*colnum_ptr++);
-	  
-	  sum += u(row) * numbers::NumberTraits<somenumber>::conjugate(s);
-	}
-      
-      return sum;
-    }
-}
-
-
-
-template <typename number>
-template <typename somenumber>
-void
-SparseMatrix<number>::
-threaded_matrix_scalar_product (const Vector<somenumber> &u,
-                                const Vector<somenumber> &v,
-                                const unsigned int        begin_row,
-                                const unsigned int        end_row,
-                                somenumber               *partial_sum) const
-{
-				   // this function should not be called
-				   // when not in parallel mode.
-  Assert (DEAL_II_USE_MT, ExcInternalError());
-
-  somenumber sum = 0.;
-  const number       *val_ptr    = &val[cols->rowstart[begin_row]];
-  const unsigned int *colnum_ptr = &cols->colnums[cols->rowstart[begin_row]];
-  for (unsigned int row=begin_row; row<end_row; ++row)
-    {
-      somenumber s = 0.;
-      const number *val_end_of_row = &val[cols->rowstart[row+1]];
-      while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * v(*colnum_ptr++);
-
-      sum += u(row) * numbers::NumberTraits<somenumber>::conjugate(s);
-    }
-  
-  *partial_sum = sum;
+  return
+    parallel::accumulate_from_subranges<number>
+    (std_cxx1x::bind (internal::SparseMatrix::matrix_scalar_product_on_subrange
+		      <number,Vector<somenumber> >,
+		      _1, _2,
+		      val, cols->rowstart, cols->colnums,
+		      std_cxx1x::cref(u),
+		      std_cxx1x::cref(v)),
+     0, m(),
+     internal::SparseMatrix::minimum_parallel_grain_size);
 }
 
 
@@ -1276,6 +1156,49 @@ SparseMatrix<number>::frobenius_norm () const
 
 
 
+namespace internal
+{
+  namespace SparseMatrix
+  {
+				     /**
+				      * Perform a vmult using the SparseMatrix
+				      * data structures, but only using a
+				      * subinterval for the row indices.
+				      *
+				      * In the sequential case, this function
+				      * is called on all rows, in the parallel
+				      * case it may be called on a subrange,
+				      * at the discretion of the task
+				      * scheduler.
+				      */
+    template <typename number,
+	      typename InVector,
+	      typename OutVector>
+    number residual_sqr_on_subrange (const unsigned int  begin_row,
+				     const unsigned int  end_row,
+				     const number       *values,
+				     const std::size_t  *rowstart,
+				     const unsigned int *colnums,
+				     const InVector     &u,
+				     const InVector     &b,
+				     OutVector          &dst)
+    {
+      number norm_sqr=0.;
+  
+      for (unsigned int i=begin_row; i<end_row; ++i)
+	{
+	  number s = b(i);
+	  for (unsigned int j=rowstart[i]; j<rowstart[i+1] ;j++)
+	    s -= values[j] * u(colnums[j]);
+	  dst(i) = s;
+	  norm_sqr += s*numbers::NumberTraits<number>::conjugate(s);
+	}
+      return norm_sqr;
+    }
+  }
+}
+
+
 template <typename number>
 template <typename somenumber>
 somenumber
@@ -1291,107 +1214,17 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 
   Assert (&u != &dst, ExcSourceEqualsDestination());
 
-  const unsigned int n_rows = m();
-
-				   // if in MT mode and size sufficiently
-				   // large: do it in parallel; the limit
-				   // is mostly artificial
-  if (DEAL_II_USE_MT &&
-      (multithread_info.n_default_threads > 1) &&
-      (n_rows/multithread_info.n_default_threads > 2000))
-    {
-      const unsigned int n_threads = multithread_info.n_default_threads;
- 
-				       // space for the square norms of
-				       // the different parts
-      std::vector<somenumber> partial_norms (n_threads, 0);
-
-				       // then spawn threads. since
-				       // some compilers have trouble
-				       // finding out which
-				       // 'encapsulate' function to
-				       // take of all those possible
-				       // ones if we simply drop in
-				       // the address of an overloaded
-				       // template member function,
-				       // make it simpler for the
-				       // compiler by giving it the
-				       // correct type right away:
-      typedef
-	void (SparseMatrix<number>::*mem_fun_p)
-	(Vector<somenumber>       &,
-	 const Vector<somenumber> &,
-	 const Vector<somenumber> &,
-	 const std::pair<unsigned int,unsigned int>,
-	 somenumber               *) const;
-      const mem_fun_p comp_residual = &SparseMatrix<number>::
-				     template threaded_residual<somenumber>;
-      Threads::ThreadGroup<> threads;
-      for (unsigned int i=0; i<n_threads; ++i)
-	threads += Threads::spawn<void, SparseMatrix<number> > (*this, comp_residual)(dst, u, b,
-                                                         std::pair<unsigned int,unsigned int>
-                                                         (n_rows * i / n_threads,
-                                                          n_rows * (i+1) / n_threads),
-                                                         &partial_norms[i]);
-
-				       // ... and wait until they're finished
-      threads.join_all ();
-				       // accumulate the partial results
-      return std::sqrt(std::accumulate (partial_norms.begin(),
-					partial_norms.end(),
-					static_cast<somenumber>(0.)));
-    }
-  else
-    {
-      somenumber norm=0.;   
-  
-      for (unsigned int i=0; i<n_rows; ++i)
-	{
-	  somenumber s = b(i);
-	  for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
-	    {
-	      const unsigned int p = cols->colnums[j];
-	      s -= val[j] * u(p);
-	    }
-	  dst(i) = s;
-	  norm += dst(i)*dst(i);
-	}
-      return std::sqrt(norm);
-    };
-}
-
-
-template <typename number>
-template <typename somenumber>
-void
-SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
-					 const Vector<somenumber> &u,
-					 const Vector<somenumber> &b,
-					 const std::pair<unsigned int, unsigned int> interval,
-					 somenumber               *partial_norm) const
-{
-				   // this function should not be called
-				   // when not in parallel mode.
-  Assert (DEAL_II_USE_MT, ExcInternalError());
-
-  const unsigned int begin_row = interval.first,
-		     end_row   = interval.second;
-  
-  somenumber norm=0.;   
-  
-  for (unsigned int i=begin_row; i<end_row; ++i)
-    {
-      somenumber s = b(i);
-      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
-	{
-	  const unsigned int p = cols->colnums[j];
-	  s -= val[j] * u(p);
-	}
-      dst(i) = s;
-      norm += dst(i)*dst(i);
-    };
-
-  *partial_norm = norm;
+  return
+    std::sqrt (parallel::accumulate_from_subranges<number>
+	       (std_cxx1x::bind (internal::SparseMatrix::residual_sqr_on_subrange
+				 <number,Vector<somenumber>,Vector<somenumber> >,
+				 _1, _2,
+				 val, cols->rowstart, cols->colnums,
+				 std_cxx1x::cref(u),
+				 std_cxx1x::cref(b),
+				 std_cxx1x::ref(dst)),
+		0, m(),
+		internal::SparseMatrix::minimum_parallel_grain_size));
 }
 
 

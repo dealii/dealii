@@ -1,18 +1,10 @@
 # $Id$
-# Copyright (C) 2005 by Wolfgang Bangerth
+# Copyright (C) 2005, 2008 by Wolfgang Bangerth
 
 
 D = ../..
 
 include $D/common/Make.global_options
-
-ifneq ($(with-multithreading),no)
-  MT = MT
-else
-  MT = ==
-endif
-
-
 
 # rules
 $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT): fparser.cc fparser.h

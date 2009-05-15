@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -118,8 +118,9 @@ SparseVanka<number>::compute_inverses ()
                                        // Now spawn the threads
       Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-        threads += Threads::spawn (*this, fun_ptr)(blocking[i].first,
-                                                   blocking[i].second);
+        threads += Threads::new_thread (fun_ptr, *this,
+					blocking[i].first,
+					blocking[i].second);
       threads.join_all ();
     };
 }
@@ -604,8 +605,9 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
             = &SparseVanka<number>::template apply_preconditioner<number2>;
           Threads::ThreadGroup<> threads;
           for (unsigned int block=0; block<n_blocks; ++block)
-            threads += Threads::spawn<void,SparseVanka<number> >(*static_cast<const SparseVanka<number>*>(this), comp)
-                       (dst, src,&dof_masks[block]);
+            threads += Threads::new_thread (comp,
+					    *static_cast<const SparseVanka<number>*>(this),
+					    dst, src,&dof_masks[block]);
           threads.join_all ();
         }
       else

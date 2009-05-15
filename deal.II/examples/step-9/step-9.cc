@@ -39,23 +39,21 @@
 #include <fe/fe_q.h>
 #include <grid/grid_out.h>
 
-				 // The following two files provide
-				 // classes and information for
-				 // multi-threaded programs. In the
-				 // first one, the classes and
-				 // functions are declared which we
-				 // need to start new threads and to
-				 // wait for threads to return
-				 // (i.e. the <code>Thread</code> class
-				 // and the <code>spawn</code> functions). The
+				 // The following two files provide classes
+				 // and information for multi-threaded
+				 // programs. In the first one, the classes
+				 // and functions are declared which we need
+				 // to start new threads and to wait for
+				 // threads to return (i.e. the
+				 // <code>Thread</code> class and the
+				 // <code>new_thread</code> functions). The
 				 // second file has a class
 				 // <code>MultithreadInfo</code> (and a global
 				 // object <code>multithread_info</code> of
-				 // that type) which can be used to
-				 // query the number of processors in
-				 // your system, which is often useful
-				 // when deciding how many threads to
-				 // start in parallel.
+				 // that type) which can be used to query the
+				 // number of processors in your system, which
+				 // is often useful when deciding how many
+				 // threads to start in parallel.
 #include <base/thread_management.h>
 #include <base/multithread_info.h>
 
@@ -122,6 +120,18 @@ class AdvectionProblem
 				     // which denote the first cell on
 				     // which it shall operate, and
 				     // the one past the last.
+				     //
+				     // The strategy for parallelization we
+				     // choose here is one of the
+				     // possibilities mentioned in detail in
+				     // the @ref threads module in the
+				     // documentation. While it is a
+				     // straightforward way to distribute the
+				     // work for assembling the system onto
+				     // multiple processor cores. As mentioned
+				     // in the module, there are other, and
+				     // possibly better suited, ways to
+				     // achieve the same goal.
     void assemble_system ();
     void assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
 			 	   const typename DoFHandler<dim>::active_cell_iterator &end);
@@ -733,26 +743,39 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // another value. This variable is
 				   // also queried by functions inside
 				   // the library to determine how
-				   // many threads they shall spawn.
+				   // many threads they shall create.
   const unsigned int n_threads = multithread_info.n_default_threads;
+				   // It is worth noting, however, that this
+				   // setup determines the load distribution
+				   // onto processor in a static way: it does
+				   // not take into account that some other
+				   // part of our program may also be running
+				   // something in parallel at the same time
+				   // as we get here (this is not the case in
+				   // the current program, but may easily be
+				   // the case in more complex
+				   // applications). A discussion of how to
+				   // deal with this case can be found in the
+				   // @ref threads module.
+				   //
 				   // Next, we need an object which is
 				   // capable of keeping track of the
 				   // threads we created, and allows
 				   // us to wait until they all have
 				   // finished (to <code>join</code> them in
 				   // the language of threads). The
-				   // <code>Threads::ThreadGroup</code> class
+				   // Threads::ThreadGroup class
 				   // does this, which is basically
 				   // just a container for objects of
-				   // type <code>Threads::Thread</code> that
+				   // type Threads::Thread that
 				   // represent a single thread;
-				   // <code>Threads::Thread</code> is what the
-				   // <code>spawn</code> function below will
+				   // Threads::Thread is what the
+				   // Threads::new_thread function below will
 				   // return when we start a new
 				   // thread.
 				   //
-				   // Note that both <code>ThreadGroup</code>
-				   // and <code>Thread</code> have a template
+				   // Note that both Threads::ThreadGroup
+				   // and Threads::Thread have a template
 				   // argument that represents the
 				   // return type of the function
 				   // being called on a separate
@@ -769,7 +792,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   //
 				   // If you did not configure for
 				   // multi-threading, then the
-				   // <code>spawn</code> function that is
+				   // <code>new_thread</code> function that is
 				   // supposed to start a new thread
 				   // in parallel only executes the
 				   // function which should be run in
@@ -781,7 +804,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // <code>join</code> that is supposed to
 				   // wait for all spawned threads to
 				   // return, returns immediately, as
-				   // there can't be threads running.
+				   // there can't be any threads running.
   Threads::ThreadGroup<> threads;
 
 				   // Now we have to split the range
@@ -848,24 +871,25 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // using the following sequence of
 				   // function calls:
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (*this, &AdvectionProblem<dim>::assemble_system_interval)
-               (thread_ranges[thread].first,
-                thread_ranges[thread].second);
+    threads += Threads::new_thread (&AdvectionProblem<dim>::assemble_system_interval,
+				    *this,
+				    thread_ranges[thread].first,
+				    thread_ranges[thread].second);
 				   // The reasons and internal
 				   // workings of these functions can
 				   // be found in the report on the
 				   // subject of multi-threading,
 				   // which is available online as
 				   // well. Suffice it to say that we
-				   // spawn a new thread that calls
+				   // create a new thread that calls
 				   // the <code>assemble_system_interval</code>
 				   // function on the present object
 				   // (the <code>this</code> pointer), with the
 				   // arguments following in the
 				   // second set of parentheses passed
-				   // as parameters. The <code>spawn</code>
-				   // function return an object of
-				   // type <code>Threads::Thread</code>, which
+				   // as parameters. The Threads::new_thread
+				   // function returns an object of
+				   // type Threads::Thread, which
 				   // we put into the <code>threads</code>
 				   // container. If a thread exits,
 				   // the return value of the function
@@ -1471,16 +1495,15 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
 
-				   // In the same way as before, we
-				   // use a <code>Threads::ThreadGroup</code>
-				   // object to collect the descriptor
-				   // objects of different
-				   // threads. Note that as the
+				   // In the same way as before, we use a
+				   // <code>Threads::ThreadGroup</code> object
+				   // to collect the descriptor objects of
+				   // different threads. Note that as the
 				   // function called is not a member
-				   // function, but rather a static
-				   // function, we need not (and can
-				   // not) pass a <code>this</code> pointer to
-				   // the <code>spawn</code> function in this
+				   // function, but rather a static function,
+				   // we need not (and can not) pass a
+				   // <code>this</code> pointer to the
+				   // <code>new_thread</code> function in this
 				   // case.
 				   //
 				   // Taking pointers to templated
@@ -1508,9 +1531,10 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				 Vector<float> &)
     = &GradientEstimation::template estimate_interval<dim>;
   for (unsigned int i=0; i<n_threads; ++i)
-    threads += Threads::spawn (estimate_interval_ptr)(dof_handler, solution,
-                                                      index_intervals[i],
-                                                      error_per_cell);
+    threads += Threads::new_thread (estimate_interval_ptr,
+				    dof_handler, solution,
+				    index_intervals[i],
+				    error_per_cell);
 				   // Ok, now the threads are at work,
 				   // and we only have to wait for
 				   // them to finish their work:

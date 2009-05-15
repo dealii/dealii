@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -636,8 +636,6 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
 
-  Threads::ThreadGroup<> threads;
-  
   typedef void (*FunPtr) (const Mapping<dim,spacedim>    &,
                           const DH<dim,spacedim>         &,
                           const InputVector     &,
@@ -647,13 +645,16 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
   FunPtr fun_ptr = &DerivativeApproximation::
 		   template approximate<DerivativeDescription,dim,
 		   DH,InputVector>;
-  
+
+//TODO: Use WorkStream here  
+  Threads::TaskGroup<> tasks;  
   for (unsigned int i=0; i<n_threads; ++i)
-    threads += Threads::spawn (fun_ptr)
-	       (mapping, dof_handler, solution, component,
-		index_intervals[i],
-		derivative_norm);
-  threads.join_all ();
+    tasks += Threads::new_task (fun_ptr,
+				mapping, dof_handler,
+				solution, component,
+				index_intervals[i],
+				derivative_norm);
+  tasks.join_all ();
 }
 
 

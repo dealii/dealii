@@ -102,6 +102,65 @@ template <typename T> struct constraint_and_return_value<false,T>
 
 
 /**
+ * A template class that simply exports its template argument as a local
+ * typedef. This class, while at first appearing useless, makes sense in the
+ * following context: if you have a function template as follows:
+ * @code
+ *   template <typename T> void f(T, T);
+ * @endcode
+ * then it can't be called in an expression like <code>f(1, 3.141)</code>
+ * because the type <code>T</code> of the template can not be deduced
+ * in a unique way from the types of the arguments. However, if the
+ * template is written as
+ * @code
+ *   template <typename T> void f(T, typename identity<T>::type);
+ * @endcode
+ * then the call becomes valid: the type <code>T</code> is not deducible
+ * from the second argument to the function, so only the first argument
+ * participates in template type resolution.
+ *
+ * The context for this feature is as follows: consider
+ * @code
+ * template <typename RT, typename A>
+ * void forward_call(RT (*p) (A), A a)  { p(a); }
+ *
+ * void h (double);
+ *
+ * void g()
+ * {
+ *   forward_call(&h, 1);
+ * }
+ * @endcode
+ * This code fails to compile because the compiler can't decide whether the
+ * template type <code>A</code> should be <code>double</code> (from the
+ * signature of the function given as first argument to
+ * <code>forward_call</code>, or <code>int</code> because the expression
+ * <code>1</code> has that type. Of course, what we would like the compiler
+ * to do is simply cast the <code>1</code> to <code>double</code>. We can
+ * achieve this by writing the code as follows:
+ * @code
+ * template <typename RT, typename A>
+ * void forward_call(RT (*p) (A), typename identity<A>::type a)  { p(a); }
+ *
+ * void h (double);
+ *
+ * void g()
+ * {
+ *   forward_call(&h, 1);
+ * }
+ * @endcode
+ *
+ * @author Wolfgang Bangerth, 2008
+ */
+template <typename T>
+struct identity
+{
+    typedef T type;
+};
+
+
+
+/**
  * A class to perform comparisons of arbitrary pointers for equality. In some
  * circumstances, one would like to make sure that two arguments to a function
  * are not the same object. One would, in this case, make sure that their

@@ -20,6 +20,7 @@
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <base/utilities.h>
+#include <base/work_stream.h>
 
 #include <lac/full_matrix.h>
 #include <lac/solver_gmres.h>
@@ -534,6 +535,116 @@ namespace LinearSolvers
 
 
 
+namespace AssemblerData
+{
+  template <int dim>
+  struct StokesPreconditioner 
+  {
+      StokesPreconditioner (const FiniteElement<dim> &stokes_fe,
+			    const Quadrature<dim>    &stokes_quadrature,
+			    const UpdateFlags         update_flags);
+      StokesPreconditioner (const StokesPreconditioner &data);
+	
+      FEValues<dim>               stokes_fe_values;
+
+      FullMatrix<double>          local_matrix;
+      std::vector<unsigned int>   local_dof_indices;
+
+      std::vector<Tensor<2,dim> > grad_phi_u;
+      std::vector<double>         phi_p;
+  };
+
+  template <int dim>
+  StokesPreconditioner<dim>::
+  StokesPreconditioner (const FiniteElement<dim> &stokes_fe,
+			const Quadrature<dim>    &stokes_quadrature,
+			const UpdateFlags         update_flags)
+		  :
+		  stokes_fe_values (stokes_fe, stokes_quadrature, update_flags),
+		  local_matrix (stokes_fe.dofs_per_cell, stokes_fe.dofs_per_cell),
+		  local_dof_indices (stokes_fe.dofs_per_cell),
+		  grad_phi_u (stokes_fe.dofs_per_cell),
+		  phi_p (stokes_fe.dofs_per_cell)
+  {}
+
+
+
+  template <int dim>
+  StokesPreconditioner<dim>::
+  StokesPreconditioner (const StokesPreconditioner &data)
+		  :
+		  stokes_fe_values (data.stokes_fe_values.get_fe(),
+				    data.stokes_fe_values.get_quadrature(),
+				    data.stokes_fe_values.get_update_flags()),
+		  local_matrix (data.local_matrix),
+		  local_dof_indices (data.local_dof_indices),
+		  grad_phi_u (data.grad_phi_u),
+		  phi_p (data.phi_p)
+  {}
+
+
+
+  template <int dim>
+  struct StokesSystem : public StokesPreconditioner<dim>
+  {
+      StokesSystem (const FiniteElement<dim> &stokes_fe,
+		    const Quadrature<dim>    &stokes_quadrature,
+		    const UpdateFlags         stokes_update_flags,
+		    const FiniteElement<dim> &temperature_fe,
+		    const UpdateFlags         temperature_update_flags);
+
+      StokesSystem (const StokesSystem<dim> &data);
+      
+      FEValues<dim>  temperature_fe_values;
+      Vector<double> local_rhs;
+
+      std::vector<Tensor<1,dim> >          phi_u;
+      std::vector<SymmetricTensor<2,dim> > grads_phi_u;
+      std::vector<double>                  div_phi_u;
+
+      std::vector<double>                  old_temperature_values;
+  };
+  
+
+  template <int dim>
+  StokesSystem<dim>::
+  StokesSystem (const FiniteElement<dim> &stokes_fe,
+		const Quadrature<dim>    &stokes_quadrature,
+		const UpdateFlags         stokes_update_flags,
+		const FiniteElement<dim> &temperature_fe,
+		const UpdateFlags         temperature_update_flags)
+		  :
+		  StokesPreconditioner<dim> (stokes_fe, stokes_quadrature,
+					     stokes_update_flags),
+		  temperature_fe_values (temperature_fe, stokes_quadrature,
+					 temperature_update_flags),
+		  local_rhs (stokes_fe.dofs_per_cell),
+		  phi_u (stokes_fe.dofs_per_cell),
+		  grads_phi_u (stokes_fe.dofs_per_cell),
+		  div_phi_u (stokes_fe.dofs_per_cell),
+		  old_temperature_values (stokes_quadrature.n_quadrature_points)
+  {}
+
+
+  template <int dim>
+  StokesSystem<dim>::
+  StokesSystem (const StokesSystem<dim> &data)
+		  :
+		  StokesPreconditioner<dim> (data),
+		  temperature_fe_values (data.temperature_fe_values.get_fe(),
+					 data.temperature_fe_values.get_quadrature(),
+					 data.temperature_fe_values.get_update_flags()),
+		  local_rhs (data.local_rhs),
+		  phi_u (data.phi_u),
+		  grads_phi_u (data.grads_phi_u),
+		  div_phi_u (data.div_phi_u),
+		  old_temperature_values (data.old_temperature_values)
+  {}
+}
+
+  
+
+
 				 // @sect3{The <code>BoussinesqFlowProblem</code> class template}
 
 				 // The definition of the class that defines
@@ -607,7 +718,6 @@ class BoussinesqFlowProblem
 		      const double                        global_T_variation,
 		      const double                        cell_diameter) const;
 
-
     Triangulation<dim>                  triangulation;
     double                              global_Omega_diameter;
 
@@ -650,6 +760,19 @@ class BoussinesqFlowProblem
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
     bool rebuild_stokes_preconditioner;
+
+    void
+    local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cell_iterator &cell,
+					  AssemblerData::StokesPreconditioner<dim> &data);
+    
+    void copy_local_to_global_stokes_preconditioner (const AssemblerData::StokesPreconditioner<dim> &data);
+
+
+    void
+    local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
+				  AssemblerData::StokesSystem<dim> &data);
+    
+    void copy_local_to_global_stokes_system (const AssemblerData::StokesSystem<dim> &data);
 };
 
 
@@ -1321,6 +1444,79 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 
 
+
+  
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::
+local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cell_iterator &cell,
+				      AssemblerData::StokesPreconditioner<dim> &data)
+{
+  const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
+  const unsigned int   n_q_points      = data.stokes_fe_values.n_quadrature_points;
+
+  const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
+
+  data.stokes_fe_values.reinit (cell);
+  data.local_matrix = 0;
+
+				   // The creation of the local matrix is
+				   // rather simple. There are only a
+				   // Laplace term (on the velocity) and a
+				   // mass matrix weighted by $\eta^{-1}$
+				   // to be generated, so the creation of
+				   // the local matrix is done in two
+				   // lines. Once the local matrix is
+				   // ready (loop over rows and columns in
+				   // the local matrix on each quadrature
+				   // point), we get the local DoF indices
+				   // and write the local information into
+				   // the global matrix. We do this as in
+				   // step-27, i.e. we directly apply the
+				   // constraints from hanging nodes
+				   // locally. By doing so, we don't have
+				   // to do that afterwards, and we don't
+				   // also write into entries of the
+				   // matrix that will actually be set to
+				   // zero again later when eliminating
+				   // constraints.
+  for (unsigned int q=0; q<n_q_points; ++q)
+    {
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+	  data.grad_phi_u[k] = data.stokes_fe_values[velocities].gradient(k,q);
+	  data.phi_p[k]      = data.stokes_fe_values[pressure].value (k, q);
+	}
+	  
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  data.local_matrix(i,j) += (EquationData::eta *
+				     scalar_product (data.grad_phi_u[i], data.grad_phi_u[j])
+				     +
+				     (1./EquationData::eta) *
+				     data.phi_p[i] * data.phi_p[j])
+				    * data.stokes_fe_values.JxW(q);
+    }
+
+  cell->get_dof_indices (data.local_dof_indices);
+}
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::
+copy_local_to_global_stokes_preconditioner (const AssemblerData::StokesPreconditioner<dim> &data)
+{
+  stokes_constraints.distribute_local_to_global (data.local_matrix,
+						 data.local_dof_indices,
+						 stokes_preconditioner_matrix);
+}
+
+
+
+
 				 // @sect4{BoussinesqFlowProblem::assemble_stokes_preconditioner}
 				 // 
                                  // This function assembles the matrix we use
@@ -1336,7 +1532,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
                                  // we create data structures for the cell
                                  // matrix and the relation between local and
                                  // global DoFs. The vectors
-                                 // <code>phi_grad_u</code> and
+                                 // <code>grad_phi_u</code> and
                                  // <code>phi_p</code> are going to hold the
                                  // values of the basis functions in order to
                                  // faster build up the local matrices, as was
@@ -1351,74 +1547,25 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
   stokes_preconditioner_matrix = 0;
 
   const QGauss<dim> quadrature_formula(stokes_degree+2);
-  FEValues<dim>     stokes_fe_values (stokes_fe, quadrature_formula,
-				      update_JxW_values |
-				      update_values |
-				      update_gradients);
 
-  const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
-  const unsigned int   n_q_points      = quadrature_formula.size();
+  AssemblerData::StokesPreconditioner<dim>
+    data_template (stokes_fe, quadrature_formula,
+		   update_JxW_values |
+		   update_values |
+		   update_gradients);
 
-  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-  std::vector<Tensor<2,dim> > phi_grad_u (dofs_per_cell);
-  std::vector<double>         phi_p      (dofs_per_cell);
-
-  const FEValuesExtractors::Vector velocities (0);
-  const FEValuesExtractors::Scalar pressure (dim);
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = stokes_dof_handler.begin_active(),
-    endc = stokes_dof_handler.end();
-  for (; cell!=endc; ++cell)
-    {
-      stokes_fe_values.reinit (cell);
-      local_matrix = 0;
-
-				       // The creation of the local matrix is
-				       // rather simple. There are only a
-				       // Laplace term (on the velocity) and a
-				       // mass matrix weighted by $\eta^{-1}$
-				       // to be generated, so the creation of
-				       // the local matrix is done in two
-				       // lines. Once the local matrix is
-				       // ready (loop over rows and columns in
-				       // the local matrix on each quadrature
-				       // point), we get the local DoF indices
-				       // and write the local information into
-				       // the global matrix. We do this as in
-				       // step-27, i.e. we directly apply the
-				       // constraints from hanging nodes
-				       // locally. By doing so, we don't have
-				       // to do that afterwards, and we don't
-				       // also write into entries of the
-				       // matrix that will actually be set to
-				       // zero again later when eliminating
-				       // constraints.
-      for (unsigned int q=0; q<n_q_points; ++q)
-	{
-	  for (unsigned int k=0; k<dofs_per_cell; ++k)
-	    {
-	      phi_grad_u[k] = stokes_fe_values[velocities].gradient(k,q);
-	      phi_p[k]      = stokes_fe_values[pressure].value (k, q);
-	    }
-	  
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      local_matrix(i,j) += (EquationData::eta *
-				    scalar_product (phi_grad_u[i], phi_grad_u[j])
-				    +
-				    (1./EquationData::eta) *
-				    phi_p[i] * phi_p[j])
-				   * stokes_fe_values.JxW(q);
-	}
-
-      cell->get_dof_indices (local_dof_indices);
-      stokes_constraints.distribute_local_to_global (local_matrix,
-						     local_dof_indices,
-						     stokes_preconditioner_matrix);
-    }
+  WorkStream().run (stokes_dof_handler.begin_active(),
+		    stokes_dof_handler.end(),
+		    std_cxx0x::bind (&BoussinesqFlowProblem<dim>::
+				     local_assemble_stokes_preconditioner,
+				     this,
+				     _1,
+				     _2),
+		    std_cxx0x::bind (&BoussinesqFlowProblem<dim>::
+				     copy_local_to_global_stokes_preconditioner,
+				     this,
+				     _1),
+		    data_template);  
 }
 
 
@@ -1623,37 +1770,14 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				 // the local dofs compared to the global
 				 // system.
 template <int dim>
-void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
+void
+BoussinesqFlowProblem<dim>::
+local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
+			      AssemblerData::StokesSystem<dim> &data)
 {
-  std::cout << "   Assembling..." << std::flush;
-
-  if (rebuild_stokes_matrix == true)
-    stokes_matrix=0;
-
-  stokes_rhs=0;
-
-  const QGauss<dim> quadrature_formula (stokes_degree+2);
-  FEValues<dim>     stokes_fe_values (stokes_fe, quadrature_formula,
-				      update_values    |
-				      update_quadrature_points  |
-				      update_JxW_values |
-				      (rebuild_stokes_matrix == true
-				       ?
-				       update_gradients
-				       :
-				       UpdateFlags(0)));
+  const unsigned int   dofs_per_cell   = data.stokes_fe_values.get_fe().dofs_per_cell;
+  const unsigned int   n_q_points      = data.stokes_fe_values.n_quadrature_points;
   
-  FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
-					   update_values);
-
-  const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
-  const unsigned int   n_q_points      = quadrature_formula.size();
-
-  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       local_rhs    (dofs_per_cell);
-
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
 				   // Next we need a vector that will contain
 				   // the values of the temperature solution
 				   // at the previous time level at the
@@ -1677,12 +1801,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				   // extract the individual blocks
 				   // (velocity, pressure, temperature) from
 				   // the total FE system.
-  std::vector<double>               old_temperature_values(n_q_points);
-
-  std::vector<Tensor<1,dim> >          phi_u       (dofs_per_cell);
-  std::vector<SymmetricTensor<2,dim> > grads_phi_u (dofs_per_cell);
-  std::vector<double>                  div_phi_u   (dofs_per_cell);
-  std::vector<double>                  phi_p       (dofs_per_cell);
 
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
@@ -1706,102 +1824,146 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				   // quadrature points. Then we are ready to
 				   // loop over the quadrature points on the
 				   // cell.
+  data.stokes_fe_values.reinit (cell);
+
   typename DoFHandler<dim>::active_cell_iterator
-    cell = stokes_dof_handler.begin_active(),
-    endc = stokes_dof_handler.end();
-  typename DoFHandler<dim>::active_cell_iterator
-    temperature_cell = temperature_dof_handler.begin_active();
-  
-  for (; cell!=endc; ++cell, ++temperature_cell)
-    {
-      stokes_fe_values.reinit (cell);
-      temperature_fe_values.reinit (temperature_cell);
+    temperature_cell (&triangulation,
+		      cell->level(),
+		      cell->index(),
+		      &temperature_dof_handler);
+  data.temperature_fe_values.reinit (temperature_cell);
       
-      local_matrix = 0;
-      local_rhs = 0;
+  data.local_matrix = 0;
+  data.local_rhs = 0;
 
-      temperature_fe_values.get_function_values (old_temperature_solution, 
-						 old_temperature_values);
+  data.temperature_fe_values.get_function_values (old_temperature_solution, 
+						  data.old_temperature_values);
 
-      for (unsigned int q=0; q<n_q_points; ++q)
+  for (unsigned int q=0; q<n_q_points; ++q)
+    {
+      const double old_temperature = data.old_temperature_values[q];
+
+				       // Next we extract the values and
+				       // gradients of basis functions
+				       // relevant to the terms in the
+				       // inner products. As shown in
+				       // step-22 this helps accelerate
+				       // assembly.
+				       // 
+				       // Once this is done, we start the
+				       // loop over the rows and columns
+				       // of the local matrix and feed the
+				       // matrix with the relevant
+				       // products. The right hand side is
+				       // filled with the forcing term
+				       // driven by temperature in
+				       // direction of gravity (which is
+				       // vertical in our example).  Note
+				       // that the right hand side term is
+				       // always generated, whereas the
+				       // matrix contributions are only
+				       // updated when it is requested by
+				       // the
+				       // <code>rebuild_matrices</code>
+				       // flag.
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
 	{
-	  const double old_temperature = old_temperature_values[q];
-
-					   // Next we extract the values and
-					   // gradients of basis functions
-					   // relevant to the terms in the
-					   // inner products. As shown in
-					   // step-22 this helps accelerate
-					   // assembly.
-					   // 
-					   // Once this is done, we start the
-					   // loop over the rows and columns
-					   // of the local matrix and feed the
-					   // matrix with the relevant
-					   // products. The right hand side is
-					   // filled with the forcing term
-					   // driven by temperature in
-					   // direction of gravity (which is
-					   // vertical in our example).  Note
-					   // that the right hand side term is
-					   // always generated, whereas the
-					   // matrix contributions are only
-					   // updated when it is requested by
-					   // the
-					   // <code>rebuild_matrices</code>
-					   // flag.
-	  for (unsigned int k=0; k<dofs_per_cell; ++k)
-	    {
-	      phi_u[k] = stokes_fe_values[velocities].value (k,q);
-	      if (rebuild_stokes_matrix)
-	        {
-		  grads_phi_u[k] = stokes_fe_values[velocities].symmetric_gradient(k,q);
-		  div_phi_u[k]   = stokes_fe_values[velocities].divergence (k, q);
-		  phi_p[k]       = stokes_fe_values[pressure].value (k, q);
-		}
-	    }
-
+	  data.phi_u[k] = data.stokes_fe_values[velocities].value (k,q);
 	  if (rebuild_stokes_matrix)
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		local_matrix(i,j) += (EquationData::eta * 2 *
-				      grads_phi_u[i] * grads_phi_u[j]
-				      - div_phi_u[i] * phi_p[j]
-				      - phi_p[i] * div_phi_u[j])
-				     * stokes_fe_values.JxW(q);
-
-	  const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
-				       (Point<dim> (0,0,1)) );
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    local_rhs(i) += (EquationData::Rayleigh_number *
-			     gravity * phi_u[i] * old_temperature)*
-			    stokes_fe_values.JxW(q);
+	    {
+	      data.grads_phi_u[k] = data.stokes_fe_values[velocities].symmetric_gradient(k,q);
+	      data.div_phi_u[k]   = data.stokes_fe_values[velocities].divergence (k, q);
+	      data.phi_p[k]       = data.stokes_fe_values[pressure].value (k, q);
+	    }
 	}
 
-				       // The last step in the loop over all
-				       // cells is to enter the local
-				       // contributions into the global matrix
-				       // and vector structures to the
-				       // positions specified in
-				       // <code>local_dof_indices</code>.
-				       // Again, we let the ConstraintMatrix
-				       // class do the insertion of the cell
-				       // matrix elements to the global
-				       // matrix, which already condenses the
-				       // hanging node constraints.
-      cell->get_dof_indices (local_dof_indices);
+      if (rebuild_stokes_matrix)
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    data.local_matrix(i,j) += (EquationData::eta * 2 *
+				       data.grads_phi_u[i] * data.grads_phi_u[j]
+				       - data.div_phi_u[i] * data.phi_p[j]
+				       - data.phi_p[i] * data.div_phi_u[j])
+				      * data.stokes_fe_values.JxW(q);
 
-      if (rebuild_stokes_matrix == true)
-	stokes_constraints.distribute_local_to_global (local_matrix,
-						       local_rhs,
-						       local_dof_indices,
-						       stokes_matrix,
-						       stokes_rhs);
-      else
-	stokes_constraints.distribute_local_to_global (local_rhs,
-						       local_dof_indices,
-						       stokes_rhs);
+      const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
+				   (Point<dim> (0,0,1)) );
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	data.local_rhs(i) += (EquationData::Rayleigh_number *
+			      gravity * data.phi_u[i] * old_temperature)*
+			     data.stokes_fe_values.JxW(q);
     }
+
+				   // The last step in the loop over all
+				   // cells is to enter the local
+				   // contributions into the global matrix
+				   // and vector structures to the
+				   // positions specified in
+				   // <code>local_dof_indices</code>.
+				   // Again, we let the ConstraintMatrix
+				   // class do the insertion of the cell
+				   // matrix elements to the global
+				   // matrix, which already condenses the
+				   // hanging node constraints.
+  cell->get_dof_indices (data.local_dof_indices);
+}
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::
+copy_local_to_global_stokes_system (const AssemblerData::StokesSystem<dim> &data)
+{
+  if (rebuild_stokes_matrix == true)
+    stokes_constraints.distribute_local_to_global (local_matrix,
+						   local_rhs,
+						   local_dof_indices,
+						   stokes_matrix,
+						   stokes_rhs);
+  else
+    stokes_constraints.distribute_local_to_global (local_rhs,
+						   local_dof_indices,
+						   stokes_rhs);
+}
+
+
+
+template <int dim>
+void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
+{
+  std::cout << "   Assembling..." << std::flush;
+
+  if (rebuild_stokes_matrix == true)
+    stokes_matrix=0;
+
+  stokes_rhs=0;
+
+  const QGauss<dim> quadrature_formula (stokes_degree+2);
+
+  AssemblerData::StokesSystem<dim>
+    data_template (stokes_fe, quadrature_formula,
+		   (update_values    |
+		    update_quadrature_points  |
+		    update_JxW_values |
+		    (rebuild_stokes_matrix == true
+		     ?
+		     update_gradients
+		     :
+		     UpdateFlags(0))),
+		   temperature_fe,
+		   update_values);
+
+  WorkStream().run (stokes_dof_handler.begin_active(),
+		    stokes_dof_handler.end(),
+		    std_cxx0x::bind (&BoussinesqFlowProblem<dim>::
+				     local_assemble_stokes_system,
+				     this,
+				     _1,
+				     _2),
+		    std_cxx0x::bind (&BoussinesqFlowProblem<dim>::
+				     copy_local_to_global_stokes_system,
+				     this,
+				     _1),
+		    data_template);  
 
   rebuild_stokes_matrix = false;
 
@@ -1994,7 +2156,6 @@ void BoussinesqFlowProblem<dim>::
   const unsigned int   n_q_points      = quadrature_formula.size();
 
   Vector<double>       local_rhs (dofs_per_cell);
-  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 

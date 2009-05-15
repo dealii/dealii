@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,42 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+namespace internal
+{
+  namespace DataOutRotation
+  {
+				     /**
+				      * A derived class for use in the
+				      * DataOutFaces class. This is
+				      * a class for the
+				      * AdditionalData kind of data
+				      * structure discussed in the
+				      * documentation of the
+				      * WorkStream class.
+				      */
+    template <int dim, int spacedim>
+    struct ParallelData : public internal::DataOut::ParallelDataBase<dim,spacedim>
+    {
+	template <class FE>
+	ParallelData (const Quadrature<dim> &quadrature,
+		      const unsigned int n_components,
+		      const unsigned int n_datasets,
+		      const unsigned int n_subdivisions,
+		      const unsigned int n_patches_per_circle,
+		      const std::vector<unsigned int> &n_postprocessor_outputs,
+		      const FE &finite_elements,
+		      const UpdateFlags update_flags);
+
+	const unsigned int n_patches_per_circle;
+	
+	const dealii::hp::QCollection<dim> q_collection;
+	dealii::hp::FEValues<dim,spacedim> x_fe_values;
+    };
+  }
+}
+
 
 
 /**
@@ -119,8 +155,7 @@ class DataOutRotation : public DataOut_DoFData<DH,DH::dimension+1>
 				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
     virtual void build_patches (const unsigned int n_patches_per_circle,
-				const unsigned int n_subdivisions = 0,
-				const unsigned int n_threads      = multithread_info.n_default_threads);
+				const unsigned int n_subdivisions = 0);
 
 				     /**
 				      * Return the first cell which we
@@ -177,7 +212,10 @@ class DataOutRotation : public DataOut_DoFData<DH,DH::dimension+1>
 				      * used, the function is called
 				      * once and generates all patches.
 				      */
-    void build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data);
+    void
+    build_one_patch (const cell_iterator *cell,
+		     internal::DataOutRotation::ParallelData<DH::dimension, DH::space_dimension> &data,
+		     std::vector<DataOutBase::Patch<DH::dimension+1,DH::space_dimension+1> > &patches);
 };
 
 

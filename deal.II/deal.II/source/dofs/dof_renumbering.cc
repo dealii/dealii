@@ -563,7 +563,7 @@ namespace DoFRenumbering
   
     Assert (result == dof_handler.n_dofs(level),
 	    ExcRenumberingIncomplete());
-  
+
     if (renumbering.size()!=0)
       dof_handler.renumber_dofs (level, renumbering);
   }
@@ -575,19 +575,23 @@ namespace DoFRenumbering
   component_wise (MGDoFHandler<dim> &dof_handler,
 		  const std::vector<unsigned int> &component_order_arg)
   {
-    Threads::ThreadGroup<> threads;
-
+				     // renumber the non-MG part of
+				     // the DoFHandler in parallel to
+				     // the MG part. Because
+				     // MGDoFHandler::renumber_dofs
+				     // uses the user flags we can't
+				     // run renumbering on individual
+				     // levels in parallel to the
+				     // other levels
     void (*non_mg_part) (DoFHandler<dim> &, const std::vector<unsigned int> &)
       = &component_wise<dim>;
-    void (*mg_part) (MGDoFHandler<dim> &, unsigned int, const std::vector<unsigned int> &)
-      = &component_wise<dim>;
-  
-    threads += Threads::spawn (non_mg_part) (static_cast<DoFHandler<dim>&> (dof_handler),
-					     component_order_arg);
+    Threads::Task<>
+      task = Threads::new_task (non_mg_part, dof_handler, component_order_arg);
+    
     for (unsigned int level=0; level<dof_handler.get_tria().n_levels(); ++level)
-      threads += Threads::spawn (mg_part) (dof_handler, level, component_order_arg);
+      component_wise (dof_handler, level, component_order_arg);
 
-    threads.join_all();
+    task.join();
   }
 
 

@@ -134,6 +134,9 @@ clean-base clean-lac clean-1d clean-2d clean-3d:
 
 clean-contrib:
 	-rm contrib/*/*.$(OBJEXT)
+	-rm -r contrib/tbb/*debug
+	-rm -r contrib/tbb/*release
+	-rm libtbb*
 
 clean-bin:
 	-rm bin/detached_ma27

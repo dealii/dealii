@@ -691,8 +691,7 @@ SHLIBLD
 SHLIBFLAGS
 CC_VERSION
 CFLAGSPIC
-enablemultithreading
-withmultithreading
+enablethreads
 CXXCPP
 GREP
 EGREP
@@ -1347,8 +1346,7 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-multithreading Set compiler flags to allow for multithreaded
-                          programs
+  --enable-threads  Use multiple threads inside deal.II
   --enable-shared         Set compiler flags to generate shared libraries
   --enable-parser         While switched on by default, this option allows to
                           switch off support for the function parser in the
@@ -1359,9 +1357,6 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-multithreading=name
-                          If name==posix, or no name given, then use POSIX
-		          threads.
   --with-boost=/path/to/boost
                           Use an installed boost library instead of the
 		          contributed one. The optional argument points to the
@@ -4588,7 +4583,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
     fi
 
         case "$target" in
-                        *apple-darwin*)
+                                                      *apple-darwin*)
         OLD_CXXFLAGS="$CXXFLAGS"
         CXXFLAGS=-Wno-long-double
 
@@ -4643,6 +4638,13 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        if test "`/usr/sbin/sysctl -n hw.optional.x86_64`" = "1" ; then
+          CXXFLAGS="$CXXFLAGS -m64"
+          CXXFLAGSG="$CXXFLAGSG -m64"
+          CXXFLAGSO="$CXXFLAGSO -m64"
+          LDFLAGS="$LDFLAGS -m64"
+        fi
 
         CXXFLAGS="${OLD_CXXFLAGS}"
         ;;
@@ -5426,6 +5428,12 @@ echo "${ECHO_T}Unrecognized compiler -- still trying" >&6; }
         CFLAGSPIC=
         ;;
 
+      *apple-darwin*)
+                                        if test "`/usr/sbin/sysctl -n hw.optional.x86_64`" = "1" ; then
+          CFLAGS="$CFLAGS -m64"
+        fi
+        ;;
+
       *)
 	CFLAGSPIC="-fPIC"
 	;;
@@ -5619,16 +5627,35 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
 
 
 
-  # Check whether --enable-multithreading was given.
-if test "${enable_multithreading+set}" = set; then
-  enableval=$enable_multithreading; enablemultithreading="$enableval"
+  # Check whether --enable-threads was given.
+if test "${enable_threads+set}" = set; then
+  enableval=$enable_threads;
+      enablethreads="$enableval"
+
 else
-  enablemultithreading=no
+
+                  case "$target" in
+        *cygwin* )
+          enablethreads=no
+	  ;;
+
+	* )
+          enablethreads=yes
+          ;;
+      esac
+
 fi
 
 
+  if test "$enablethreads" = yes ; then
+        case "$target" in
+      *cygwin* )
+        { { echo "$as_me:$LINENO: error: Multithreading is not supported on CygWin" >&5
+echo "$as_me: error: Multithreading is not supported on CygWin" >&2;}
+   { (exit 1); exit 1; }; }
+        ;;
+    esac
 
-  if test "$enablemultithreading" = yes ; then
     if test "$GXX" = yes ; then
 
   case "$target" in
@@ -5789,96 +5816,7 @@ echo "$as_me: error: No threading compiler options for this C++ compiler
 	    ;;
       esac
     fi
-  fi
 
-
-  if test "$enablemultithreading" = yes ; then
-    case "$GXX_VERSION" in
-      gcc*)
-  	{ echo "$as_me:$LINENO: checking for only partly bracketed mutex initializer" >&5
-echo $ECHO_N "checking for only partly bracketed mutex initializer... $ECHO_C" >&6; }
-	ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-	CXXFLAGS="$CXXFLAGSG -Werror"
-	cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#	include <vector>
-
-int
-main ()
-{
-;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-
-	  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-
-	  { echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }
-	  CXXFLAGSG="$CXXFLAGSG -Wno-missing-braces"
-	  CXXFLAGSO="$CXXFLAGSO -Wno-missing-braces"
-
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-	;;
-      *)
-        ;;
-    esac
-  fi
-
-
-
-
-
-# Check whether --with-multithreading was given.
-if test "${with_multithreading+set}" = set; then
-  withval=$with_multithreading; withmultithreading="$withval"
-else
-  withmultithreading=no
-fi
-
-
-  if test "x$withmultithreading" = "xyes" ; then
-    withmultithreading=posix
-  fi
-
-  if test "x$withmultithreading" != "xno" ; then
-    if test "x$withmultithreading" = "xposix" ; then
 
   { echo "$as_me:$LINENO: checking for posix thread functions" >&5
 echo $ECHO_N "checking for posix thread functions... $ECHO_C" >&6; }
@@ -6154,12 +6092,11 @@ cat >>confdefs.h <<\_ACEOF
 #define DEAL_II_USE_MT_POSIX 1
 _ACEOF
 
-    else
-      { { echo "$as_me:$LINENO: error: Invalid flag for --with-multithreading" >&5
-echo "$as_me: error: Invalid flag for --with-multithreading" >&2;}
-   { (exit 1); exit 1; }; }
-    fi
 
+            LDFLAGS="$LDFLAGS -ldl"
+  fi
+
+  if test "x$enablethreads" != "xno" ; then
     DEAL_II_USE_MT_VAL=1
   else
     DEAL_II_USE_MT_VAL=0
@@ -6170,6 +6107,76 @@ cat >>confdefs.h <<_ACEOF
 #define DEAL_II_USE_MT $DEAL_II_USE_MT_VAL
 _ACEOF
 
+
+
+  if test "$enablethreads" = yes ; then
+    case "$GXX_VERSION" in
+      gcc*)
+  	{ echo "$as_me:$LINENO: checking for only partly bracketed mutex initializer" >&5
+echo $ECHO_N "checking for only partly bracketed mutex initializer... $ECHO_C" >&6; }
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	CXXFLAGS="$CXXFLAGSG -Werror"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#	include <vector>
+
+int
+main ()
+{
+;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+
+	  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+	  { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+	  CXXFLAGSG="$CXXFLAGSG -Wno-missing-braces"
+	  CXXFLAGSO="$CXXFLAGSO -Wno-missing-braces"
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+	;;
+      *)
+        ;;
+    esac
+  fi
 
 
 
@@ -8081,6 +8088,80 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
       { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+  { echo "$as_me:$LINENO: checking for const member deduction bug" >&5
+echo $ECHO_N "checking for const member deduction bug... $ECHO_C" >&6; }
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+  CXXFLAGS="$CXXFLAGSG"
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+      template <typename T> struct identity { typedef T type; };
+
+      template <typename C> void new_thread (void (C::*fun_ptr)(),
+				       typename identity<C>::type &c);
+      template <typename C> void new_thread (void (C::*fun_ptr)() const,
+				       const typename identity<C>::type &c);
+      struct X { void f() const; };
+
+int
+main ()
+{
+
+      X x;
+      new_thread (&X::f, x);
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+
+      { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+      { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+
+cat >>confdefs.h <<\_ACEOF
+#define DEAL_II_CONST_MEMBER_DEDUCTION_BUG 1
+_ACEOF
+
 
 fi
 
@@ -12214,7 +12295,7 @@ if test "x$enableshared" = "xyes" ; then
 
 
     OLD_LDFLAGS="$LDFLAGS"
-  LDFLAGS="-Wl,-soname,libbase.so.6.2.1 $LDFLAGS $SHLIBFLAGS"
+  LDFLAGS="-Wl,-soname,libbase.so.6.2.1 $LDFLAGS $LDFLAGSPIC $SHLIBFLAGS"
   { echo "$as_me:$LINENO: checking whether compiler understands option -Wl,-soname" >&5
 echo $ECHO_N "checking whether compiler understands option -Wl,-soname... $ECHO_C" >&6; }
   cat >conftest.$ac_ext <<_ACEOF
@@ -17536,8 +17617,7 @@ SHLIBLD!$SHLIBLD$ac_delim
 SHLIBFLAGS!$SHLIBFLAGS$ac_delim
 CC_VERSION!$CC_VERSION$ac_delim
 CFLAGSPIC!$CFLAGSPIC$ac_delim
-enablemultithreading!$enablemultithreading$ac_delim
-withmultithreading!$withmultithreading$ac_delim
+enablethreads!$enablethreads$ac_delim
 CXXCPP!$CXXCPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
@@ -17560,6 +17640,7 @@ DEAL_II_DISABLE_PARSER!$DEAL_II_DISABLE_PARSER$ac_delim
 DEAL_II_EXPAND_PETSC_VECTOR!$DEAL_II_EXPAND_PETSC_VECTOR$ac_delim
 DEAL_II_EXPAND_PETSC_BLOCKVECTOR!$DEAL_II_EXPAND_PETSC_BLOCKVECTOR$ac_delim
 USE_CONTRIB_PETSC!$USE_CONTRIB_PETSC$ac_delim
+DEAL_II_PETSC_DIR!$DEAL_II_PETSC_DIR$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -17601,7 +17682,6 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
-DEAL_II_PETSC_DIR!$DEAL_II_PETSC_DIR$ac_delim
 DEAL_II_PETSC_ARCH!$DEAL_II_PETSC_ARCH$ac_delim
 DEAL_II_PETSC_VERSION_MAJOR!$DEAL_II_PETSC_VERSION_MAJOR$ac_delim
 DEAL_II_PETSC_VERSION_MINOR!$DEAL_II_PETSC_VERSION_MINOR$ac_delim
@@ -17647,7 +17727,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 44; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 43; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

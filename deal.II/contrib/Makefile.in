@@ -7,7 +7,7 @@ include ../common/Make.global_options
 # by default make sublibs. the functionparser is not part of the
 # default make list, since it needs to be built *before* the rest of
 # this stuff as it is needed by libbase
-default: hsl umfpack 
+default: hsl umfpack functionparser tbb
 
 
 ifeq ($(USE_CONTRIB_HSL),yes)
@@ -38,8 +38,19 @@ functionparser:
 endif
 
 
-# generic targets
-clean: hsl-clean
-	@-rm -f ../lib/contrib/*/*.o	
+ifeq ($(enable-threads),yes)
+tbb:
+	@cd tbb ; $(MAKE)
 
-.PHONY: default hsl clean umfpack functionparser
+tbb-clean:
+	@cd tbb ; $(MAKE) clean
+else
+tbb tbb-clean:
+endif
+
+
+# generic targets
+clean: hsl-clean tbb-clean
+	@-rm -f ../lib/contrib/*/*.o
+
+.PHONY: default hsl clean hsl-clean umfpack tbb tbb-clean functionparser

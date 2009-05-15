@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/template_constraints.h>
 #include <base/std_cxx1x/tuple.h>
 #include <base/std_cxx1x/function.h>
 #include <base/std_cxx1x/shared_ptr.h>
@@ -33,7 +34,20 @@
 #include <utility>
 
 
+#if DEAL_II_USE_MT == 1
+#  if defined(DEAL_II_USE_MT_POSIX)
+#    include <pthread.h>
+#  endif
+#  include <tbb/task.h>
+#  include <tbb/task_scheduler_init.h>
+#endif
+
+
+
 DEAL_II_NAMESPACE_OPEN
+
+/*!@addtogroup threads */
+/*@{*/
 
 
 /**
@@ -48,14 +62,14 @@ namespace Threads
 {
 /**
  * This class is used instead of a true lock class when not using
- * multithreading. It allows to write programs such that they start
- * new threads and/or lock objects in multithreading mode, and use
- * dummy thread management and synchronisation classes instead when
- * running in single-thread mode. Specifically, the <tt>spawn</tt> functions
- * only call the function but wait for it to return instead of running
- * in on another thread, and the mutices do nothing really. The only
- * reason to provide such a function is that the program can be
- * compiled both in MT and non-MT mode without difference.
+ * multithreading. It allows to write programs such that they start new
+ * threads and/or lock objects in multithreading mode, and use dummy thread
+ * management and synchronisation classes instead when running in
+ * single-thread mode. Specifically, the <tt>new_thread</tt> functions only
+ * call the function but wait for it to return instead of running in on
+ * another thread, and the mutices do nothing really. The only reason to
+ * provide such a function is that the program can be compiled both in MT and
+ * non-MT mode without difference.
  *
  * @author Wolfgang Bangerth, 2000, 2003
  */
@@ -142,7 +156,7 @@ namespace Threads
  * programs such that they start new threads and/or lock objects in
  * multithreading mode, and use dummy thread management and
  * synchronisation classes instead when running in single-thread
- * mode. Specifically, the <tt>spawn</tt> functions only call the function
+ * mode. Specifically, the <tt>new_thread</tt> functions only call the function
  * but wait for it to return instead of running in on another thread,
  * and the mutices do nothing really. The only reason to provide such
  * a function is that the program can be compiled both in MT and
@@ -626,9 +640,8 @@ namespace Threads
                                     * Upon program start, this number
                                     * is one. It is increased each
                                     * time a thread is created using
-                                    * the Threads::spawn or
-                                    * Threads::spawn_n()
-                                    * functions. It is decreased once
+                                    * the Threads::new_thread
+                                    * function. It is decreased once
                                     * a thread terminates by returning
                                     * from the function that was
                                     * spawned.
@@ -649,6 +662,8 @@ namespace Threads
                                     * thread), then these events are
                                     * not registered and counted for
                                     * the result of this function.
+				    *
+				    * @ingroup threads
                                     */
   unsigned int n_existing_threads ();
 
@@ -666,6 +681,8 @@ namespace Threads
 				    * systems seems to support
 				    * <tt>gettid</tt>, so that part of
 				    * the code is untested yet.
+				    *
+				    * @ingroup threads
 				    */
   unsigned int this_thread_id ();
   
@@ -689,6 +706,8 @@ namespace Threads
 				    * iterators, where each pair
 				    * denotes the range
 				    * <tt>[begin[i],end[i])</tt>.
+				    *
+				    * @ingroup threads
 				    */
   template <typename ForwardIterator>
   std::vector<std::pair<ForwardIterator,ForwardIterator> >
@@ -704,6 +723,8 @@ namespace Threads
 				    * the difference that instead of
 				    * iterators, now values are taken
 				    * that define the whole interval.
+				    *
+				    * @ingroup threads				    
 				    */
   std::vector<std::pair<unsigned int,unsigned int> >
   split_interval (const unsigned int begin,
@@ -1326,6 +1347,34 @@ namespace Threads
 	void thread_entry_point (const std_cxx1x::function<RT ()> function,
 				 ThreadDescriptor<RT> *descriptor)
 	  {
+					     // create a new scheduler object
+					     // so that we can start tasks on
+					     // the new thread. the scheduler
+					     // will go out of scope at the
+					     // end of the function, which
+					     // also coincides with the end of
+					     // the thread
+					     //
+					     // one may think that the
+					     // creation of a scheduler is
+					     // expensive, but just creating
+					     // one and then destroying it
+					     // again costs about 92
+					     // nanoseconds on my laptop
+					     // (early 2009), whereas thread
+					     // creation takes about 12000
+					     // nanoseconds, more than 100
+					     // times longer. there is
+					     // therefore no need to only
+					     // create the scheduler when this
+					     // is actually necessary because
+					     // we are spawning tasks on this
+					     // particular thread; rather, we
+					     // make our life simpler by
+					     // always having a scheduler
+					     // around
+	    tbb::task_scheduler_init scheduler;
+
 					     // now call the function
 					     // in question. since an
                                              // exception that is
@@ -1451,6 +1500,7 @@ namespace Threads
                                     * template argument.
                                     * 
                                     * @author Wolfgang Bangerth, 2003, 2009
+				    * @ingroup threads
 				    * @ingroup threads
                                     */
   template <typename RT = void>
@@ -2045,6 +2095,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with no arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT>
   inline
@@ -2059,6 +2111,8 @@ namespace Threads
                                     * Overload of the non-const spawn
                                     * function for member functions with
                                     * no arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT, typename C>
   inline
@@ -2074,6 +2128,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * const member functions with no
                                     * arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT, typename C>
   inline
@@ -2094,6 +2150,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 1 argument.
+				    *
+				    * @deprecated
                                     */
   template <typename RT, typename Arg1>
   inline
@@ -2109,6 +2167,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 1 argument.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C, typename Arg1>
   inline
@@ -2124,6 +2184,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 1
 				    * argument.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C, typename Arg1>
   inline
@@ -2142,6 +2204,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 2 arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT, typename Arg1, typename Arg2>
   inline
@@ -2157,6 +2221,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 2 arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C, typename Arg1, typename Arg2>
   inline
@@ -2172,6 +2238,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 2
 				    * arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C, typename Arg1, typename Arg2>
   inline
@@ -2190,6 +2258,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 3 arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3>
@@ -2206,6 +2276,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 3 arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3>
@@ -2222,6 +2294,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 3
 				    * arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3>
@@ -2242,6 +2316,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 4 arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -2258,6 +2334,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 4 arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -2274,6 +2352,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 4
 				    * arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -2293,6 +2373,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 5 arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -2310,6 +2392,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 5 arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2327,6 +2411,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 5
 				    * arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2347,6 +2433,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 6 arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -2364,6 +2452,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 6 arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2381,6 +2471,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 6
 				    * arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2402,6 +2494,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 7 arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -2421,6 +2515,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 7 arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2440,6 +2536,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 7
 				    * arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2463,6 +2561,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 8 arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -2484,6 +2584,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 8 arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2505,6 +2607,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 8
 				    * arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2530,6 +2634,8 @@ namespace Threads
                                     * Overload of the spawn function for
                                     * non-member or static member
                                     * functions with 9 arguments.
+				    *
+				    * @deprecated
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -2551,6 +2657,8 @@ namespace Threads
 				    * Overload of the non-const spawn
 				    * function for member functions with
 				    * 9 arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2572,6 +2680,8 @@ namespace Threads
 				    * Overload of the spawn function for
 				    * const member functions with 9
 				    * arguments.
+				    *
+				    * @deprecated
 				    */
   template <typename RT, typename C,
 	    typename Arg1, typename Arg2, typename Arg3,
@@ -2589,8 +2699,940 @@ namespace Threads
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
   }
+
+
+
+// ----------- thread starters for functions not taking any parameters
+
+				   /**
+                                    * Overload of the new_thread function for
+                                    * objects that can be converted to
+                                    * std_cxx1x::function<RT ()>, i.e. anything
+                                    * that can be called like a function
+                                    * object without arguments and returning
+                                    * an object of type RT (or void).
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT>
+  inline
+  Thread<RT>
+  new_thread (const std_cxx1x::function<RT ()> &function)
+  {
+    return Thread<RT>(function);
+  }
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with no arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)())
+  {
+    return Thread<RT>(fun_ptr);
+  }
   
 
+                                   /**
+                                    * Overload of the non-const new_thread
+                                    * function for member functions with
+                                    * no arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(),
+	      typename identity<C>::type &c)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c)));
+  }
+
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * const member functions with no
+                                    * arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)() const,
+	      const typename identity<C>::type &c)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c)));
+  }
+#endif  
+
+
+
+// ----------- thread starters for unary functions
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 1 argument.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename Arg1>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1),
+	      typename identity<Arg1>::type arg1)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 1 argument.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 1
+				    * argument.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1)));
+  }
+#endif
+
+// ----------- thread starters for binary functions
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 2 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename Arg1, typename Arg2>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1,Arg2),
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 2 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 2
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2)));
+  }  
+#endif
+
+// ----------- thread starters for ternary functions
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 3 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3),
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 3 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 3
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3)));
+  }  
+#endif
+
+
+// ----------- thread starters for functions with 4 arguments
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 4 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4),
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 4 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 4
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4)));
+  }
+#endif
+
+// ----------- thread starters for functions with 5 arguments
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 5 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5),
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 5 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 5
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5)));
+  }
+#endif  
+
+// ----------- thread starters for functions with 6 arguments
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 6 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6),
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 6 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 6
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6)));
+  }
+#endif  
+
+// ----------- thread starters for functions with 7 arguments
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 7 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7),
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 7 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 7
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7)));
+  }
+#endif  
+
+// ----------- thread starters for functions with 8 arguments
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 8 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			    Arg6,Arg7,Arg8),
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7,
+	      typename identity<Arg8>::type arg8)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7),
+		   internal::maybe_make_ref<Arg8>::act(arg8)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 8 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			       Arg6,Arg7,Arg8),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7,
+	      typename identity<Arg8>::type arg8)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7),
+		   internal::maybe_make_ref<Arg8>::act(arg8)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 8
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			       Arg6,Arg7,Arg8) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7,
+	      typename identity<Arg8>::type arg8)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7),
+		   internal::maybe_make_ref<Arg8>::act(arg8)));
+  }
+#endif  
+
+// ----------- thread starters for functions with 9 arguments
+
+                                   /**
+                                    * Overload of the new_thread function for
+                                    * non-member or static member
+                                    * functions with 9 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
+  inline
+  Thread<RT>
+  new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			    Arg6,Arg7,Arg8,Arg9),
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7,
+	      typename identity<Arg8>::type arg8,
+	      typename identity<Arg9>::type arg9)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr,
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7),
+		   internal::maybe_make_ref<Arg8>::act(arg8),
+		   internal::maybe_make_ref<Arg9>::act(arg9)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_thread
+				    * function for member functions with
+				    * 9 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8, typename Arg9>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			       Arg6,Arg7,Arg8,Arg9),
+	      typename identity<C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7,
+	      typename identity<Arg8>::type arg8,
+	      typename identity<Arg9>::type arg9)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7),
+		   internal::maybe_make_ref<Arg8>::act(arg8),
+		   internal::maybe_make_ref<Arg9>::act(arg9)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_thread function for
+				    * const member functions with 9
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8, typename Arg9>
+  inline
+  Thread<RT>
+  new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			       Arg6,Arg7,Arg8,Arg9) const,
+	      typename identity<const C>::type &c,
+	      typename identity<Arg1>::type arg1,
+	      typename identity<Arg2>::type arg2,
+	      typename identity<Arg3>::type arg3,
+	      typename identity<Arg4>::type arg4,
+	      typename identity<Arg5>::type arg5,
+	      typename identity<Arg6>::type arg6,
+	      typename identity<Arg7>::type arg7,
+	      typename identity<Arg8>::type arg8,
+	      typename identity<Arg9>::type arg9)
+  {
+    return
+      Thread<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		   internal::maybe_make_ref<Arg1>::act(arg1),
+		   internal::maybe_make_ref<Arg2>::act(arg2),
+		   internal::maybe_make_ref<Arg3>::act(arg3),
+		   internal::maybe_make_ref<Arg4>::act(arg4),
+		   internal::maybe_make_ref<Arg5>::act(arg5),
+		   internal::maybe_make_ref<Arg6>::act(arg6),
+		   internal::maybe_make_ref<Arg7>::act(arg7),
+		   internal::maybe_make_ref<Arg8>::act(arg8),
+		   internal::maybe_make_ref<Arg9>::act(arg9)));
+  }  
+#endif
+  
+// ------------------------ ThreadGroup -------------------------------------  
 
                                    /**
                                     * A container for thread
@@ -2601,6 +3643,7 @@ namespace Threads
                                     * value for the called function.
                                     *
                                     * @author Wolfgang Bangerth, 2003
+				    * @ingroup threads
                                     */
   template <typename RT = void>
   class ThreadGroup 
@@ -2641,9 +3684,1468 @@ namespace Threads
       std::list<Thread<RT> > threads;
   };
   
+
+  template <typename> class Task;
+
+  
+  namespace internal 
+  {
+#if (DEAL_II_USE_MT == 1)
+
+    template <typename> class TaskDescriptor;
+
+    
+				     /**
+				      * The task class for TBB that is
+				      * used by the TaskDescriptor
+				      * class.
+				      */
+    template <typename RT>
+    struct TaskEntryPoint : public tbb::task
+    {
+	TaskEntryPoint (TaskDescriptor<RT> &task_descriptor)
+			:
+			task_descriptor (task_descriptor)
+	  {}
+
+	virtual tbb::task * execute ()
+	  {
+					     // call the function object
+					     // and put the return value
+					     // into the proper place
+	    call (task_descriptor.function, task_descriptor.ret_val);
+
+					     // indicate that the task
+					     // has finished, both
+					     // through the flag and
+					     // through the mutex that
+					     // was locked before we
+					     // started and that now
+					     // needs to be
+					     // released. this may
+					     // also wake up all
+					     // threads that may be
+					     // waiting for the task's
+					     // demise by blocking on
+					     // completion_mutex.acquire()
+					     // in
+					     // TaskDescriptor::join().
+	    task_descriptor.task_is_done = true;
+	    task_descriptor.completion_mutex.release ();
+		
+	    return 0;
+	  }
+
+					 /**
+					  * A reference to the descriptor
+					  * object of this task.
+					  */
+	TaskDescriptor<RT> &task_descriptor;
+    };  
+    
+                                     /**
+				      * @internal
+                                      * Base class describing a
+                                      * task. This is the basic
+                                      * class abstracting the
+                                      * Threading Building Blocks
+                                      * implementation of tasks.
+                                      * It provides a mechanism
+                                      * to start a new task, as well
+                                      * as for joining it.
+				      *
+				      * Internally, the way things are
+				      * implemented is that all Task<>
+				      * objects keep a shared pointer
+				      * to the task descriptor. When
+				      * the last Task<> object goes
+				      * out of scope, the destructor
+				      * of the descriptor is
+				      * called. Since tasks can not be
+				      * abandoned, the destructor
+				      * makes sure that the task is
+				      * finished before it can
+				      * continue to destroy the
+				      * object.
+                                      *
+				      * Note that unlike threads,
+				      * tasks are not always started
+				      * right away, and so the
+				      * starting thread can't rely on
+				      * the fact that the started task
+				      * can copy things off the
+				      * spawning thread's stack
+				      * frame. As a consequence, the
+				      * task description needs to
+				      * include a way to store the
+				      * function and its arguments
+				      * that shall be run on the task.
+				      *
+                                      * @author Wolfgang Bangerth, 2009
+                                      */
+    template <typename RT>
+    struct TaskDescriptor
+    {
+      private:
+					 /**
+					  * The function and its arguments
+					  * that are to be run on the task.
+					  */
+	std_cxx1x::function<RT ()> function;
+	
+                                         /**
+                                          * Variable holding the data the TBB
+                                          * needs to work with a task. Set by
+                                          * the queue_up_task() function. Note
+                                          * that the object behind this
+                                          * pointer will be deleted upon
+                                          * termination of the task, so we do
+                                          * not have to do so ourselves. In
+                                          * particular, if all objects with
+                                          * pointers to this task_description
+                                          * object go out of scope then no
+                                          * action is needed on our behalf.
+                                          */
+	tbb::task *task;
+
+					 /**
+					  * A place where the task will
+					  * deposit its return value.
+					  */
+        return_value<RT> ret_val;
+	
+					 /**
+					  * A flag indicating whether the task
+					  * has terminated.
+					  */
+	bool task_is_done;
+
+                                         /**
+                                          * Mutex used to indicate
+                                          * when the task is done. It
+                                          * is locked before the task
+                                          * is spawned; the join()
+                                          * function tries to acquire
+                                          * it, but that will fail
+                                          * unless the task has
+                                          * unlocked it, which it does
+                                          * upon completion.
+                                          */
+        mutable ThreadMutex completion_mutex;
+
+      public:
+
+					 /**
+					  * Constructor. Take the function to
+					  * be run on this task as argument.
+					  */
+	TaskDescriptor (const std_cxx1x::function<RT ()> &function);
+
+					 /**
+					  * Default
+					  * constructor. Throws an
+					  * exception since we want to
+					  * queue a task immediately
+					  * upon construction of these
+					  * objects to make sure that
+					  * each TaskDescriptor object
+					  * corresponds to exactly one
+					  * task.
+					  */
+	TaskDescriptor ();
+	
+					 /**
+					  * Copy constructor. Throws
+					  * an exception since we want
+					  * to make sure that each
+					  * TaskDescriptor object
+					  * corresponds to exactly one
+					  * task.
+					  */
+	TaskDescriptor (const TaskDescriptor &);
+	
+                                         /**
+                                          * Destructor.
+                                          */
+        ~TaskDescriptor ();
+
+					 /**
+					  * Queue up the task to the
+					  * scheduler. We need to do
+					  * this in a separate
+					  * function since we the new
+					  * tasks needs to access
+					  * objects from the current
+					  * object and that can only
+					  * reliably happen if the
+					  * current object is
+					  * completely constructed
+					  * already.
+					  */
+	void queue_task ();
+	
+                                         /**
+                                          * Join a task, i.e. wait
+                                          * for it to finish. This
+                                          * function can safely be
+                                          * called from different
+                                          * threads at the same time,
+                                          * and can also be called
+                                          * more than once.
+                                          */
+        void join ();
+
+
+	template <typename> friend struct TaskEntryPoint;
+	template <typename> friend struct Task;
+    };
+
+
+
+    template <typename RT>
+    inline
+    TaskDescriptor<RT>::TaskDescriptor (const std_cxx1x::function<RT ()> &function)
+		    :
+		    function (function),
+		    task_is_done (false)		    
+    {}
+
+
+    template <typename RT>
+    inline
+    void
+    TaskDescriptor<RT>::queue_task ()
+    {
+				       // lock the mutex. it will
+				       // become unlocked when the
+				       // task is done
+      completion_mutex.acquire ();
+      
+				       // use the pattern described in
+				       // the TBB book on pages
+				       // 230/231 ("Start a large task
+				       // in parallel with the main
+				       // program)
+      task = new (tbb::task::allocate_root()) tbb::empty_task;
+      task->set_ref_count (2);
+
+      tbb::task *worker = new (task->allocate_child()) TaskEntryPoint<RT>(*this);
+      task->spawn (*worker);
+    }
+
+
+
+    template <typename RT>
+    TaskDescriptor<RT>::TaskDescriptor ()
+    {
+      Assert (false, ExcInternalError());
+    }
+
+
+
+    template <typename RT>
+    TaskDescriptor<RT>::TaskDescriptor (const TaskDescriptor &)
+    {
+      Assert (false, ExcInternalError());
+    }
+    
+
+
+    template <typename RT>
+    inline
+    TaskDescriptor<RT>::~TaskDescriptor ()
+    {
+				       // wait for the task to
+				       // complete for sure
+      join ();
+
+				       // now destroy the empty task
+				       // structure. the book
+				       // recommends to spawn it as
+				       // well and let the scheduler
+				       // destroy the object when
+				       // done, but this has the
+				       // disadvantage that the
+				       // scheduler may not get to
+				       // actually finishing the task
+				       // before it goes out of scope
+				       // (at the end of the program,
+				       // or if a thread is done on
+				       // which it was run) and then
+				       // we would get a
+				       // hard-to-decipher warning
+				       // about unfinished tasks when
+				       // the scheduler "goes out of
+				       // the arena". rather, let's
+				       // explicitly destroy the empty
+				       // task object
+      Assert (task != 0, ExcInternalError());
+      task->wait_for_all ();
+      task->destroy (*task);
+    }
+
+    
+    template <typename RT>
+    inline
+    void
+    TaskDescriptor<RT>::join ()
+    {
+                                       // use Schmidt's double checking
+                                       // pattern: if thread has already
+                                       // indicated that it is done, then
+                                       // return immediately
+      if (task_is_done)
+	return;
+
+				       // acquire the lock; this can
+				       // only succeed when the task
+				       // is done
+      completion_mutex.acquire ();
+
+				       // release it again; at this
+				       // point the task must have
+				       // finished
+      completion_mutex.release ();
+      Assert (task_is_done == true, ExcInternalError());
+    }
+
+
+
+#else        // no threading enabled
+
+				     /**
+				      * A way to describe tasks. Since
+				      * we are in non-MT mode at this
+				      * place, things are a lot
+				      * simpler than in MT mode.
+				      */
+    template <typename RT>
+    struct TaskDescriptor
+    {
+					 /**
+					  * A place where the task will
+					  * deposit its return value.
+					  */
+        return_value<RT> ret_val;
+
+					 /**
+					  * Constructor. Call the
+					  * given function and emplace
+					  * the return value into the
+					  * slot reserved for this
+					  * purpose.
+					  */
+	TaskDescriptor (const std_cxx1x::function<RT ()> &function)
+	  {
+	    call (function, ret_val);
+	  }
+					 /**
+					  * Wait for the task to
+					  * return. Since we are in
+					  * non-MT mode here, there is
+					  * nothing to do.
+					  */
+	static void join () {}
+
+					 /**
+					  * Run the task. Since we are
+					  * here in non-MT mode, there
+					  * is nothing to do that the
+					  * constructor hasn't already
+					  * done.
+					  */
+	static void queue_task () {}
+    };
+    
+#endif
+    
+  }
+
+  
+  template <typename RT = void>
+  class Task
+  {
+                                       /**
+                                        * Construct a task object
+                                        * given a function object to
+                                        * execute on the task.
+                                        */
+    public:
+      Task (const std_cxx1x::function<RT ()> &function_object)
+	{
+					   // create a task descriptor and tell it
+					   // to queue itself up with the scheduling
+					   // system
+	  task_descriptor =
+	    std_cxx1x::shared_ptr<internal::TaskDescriptor<RT> >
+	    (new internal::TaskDescriptor<RT>(function_object));
+	  task_descriptor->queue_task ();
+	}
+
+                                       /**
+                                        * Default constructor. You
+                                        * can't do much with a task
+                                        * object constructed this way,
+                                        * except for assigning it a
+                                        * task object that holds
+                                        * data created by the
+                                        * <tt>spawn</tt> functions.
+                                        */
+      Task () {}
+
+                                       /**
+                                        * Join the task represented
+                                        * by this object, i.e. wait
+                                        * for it to finish. You can't
+                                        * call this function if you
+                                        * have used the default
+                                        * constructor of this class
+                                        * and have not assigned a
+                                        * task object to it.
+                                        */
+      void join () const
+	{
+	  AssertThrow (task_descriptor != 0, ExcNoTask());
+	  task_descriptor->join ();
+	}
+
+                                       /**
+                                        * Get the return value of the
+                                        * function of the
+                                        * task. Since this is only
+                                        * available once the task
+                                        * finishes, this implicitely
+                                        * also calls <tt>join()</tt>.
+                                        */
+      RT return_value ()
+	{
+	  join ();
+	  return task_descriptor->ret_val.get();
+	}
+
+
+                                       /**
+                                        * Check for equality of task
+                                        * objects. Since objects of
+                                        * this class store an implicit
+                                        * pointer to an object that
+                                        * exists exactly once for each
+                                        * task, the check is simply
+                                        * to compare these pointers.
+                                        */
+      bool operator == (const Task &t)
+	{
+	  AssertThrow (task_descriptor != 0, ExcNoTask());
+	  return task_descriptor == t.task_descriptor;
+	}
+
+				       /** @addtogroup Exceptions
+					* @{ */
+      
+                                       /**
+                                        * Exception
+                                        */
+      DeclException0 (ExcNoTask);
+				       //@}
+    private:
+                                       /**
+                                        * Shared pointer to the object
+                                        * representing the task. Boost's
+                                        * shared pointer implementation will
+                                        * make sure that that object lives as
+                                        * long as there is at least one
+                                        * subscriber to it.
+                                        */
+      std_cxx1x::shared_ptr<internal::TaskDescriptor<RT> > task_descriptor;
+  };
+
+
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * objects that can be converted to
+                                    * std_cxx1x::function<RT ()>, i.e. anything
+                                    * that can be called like a function
+                                    * object without arguments and returning
+                                    * an object of type RT (or void).
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT>
+  inline
+  Task<RT>
+  new_task (const std_cxx1x::function<RT ()> &function)
+  {
+    return Task<RT>(function);
+  }
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with no arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)())
+  {
+    return new_task<RT>(std_cxx1x::function<RT ()>(fun_ptr));
+  }
+  
+ 
+                                   /**
+                                    * Overload of the non-const new_task
+                                    * function for member functions with
+                                    * no arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(),
+	    typename identity<C>::type &c)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+                                   /**
+                                    * Overload of the new_task function for
+                                    * const member functions with no
+                                    * arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)() const,
+	    const typename identity<C>::type &c)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c)));
+  }
+#endif  
+
+
+
+// ----------- thread starters for unary functions
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 1 argument.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename Arg1>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1),
+	    typename identity<Arg1>::type arg1)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 1 argument.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 1
+				    * argument.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1)));
+  }
+#endif
+
+// ----------- thread starters for binary functions
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 2 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename Arg1, typename Arg2>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1,Arg2),
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 2 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 2
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2)));
+  }  
+#endif
+
+// ----------- thread starters for ternary functions
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 3 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3),
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 3 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 3
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3)));
+  }  
+#endif
+
+
+// ----------- thread starters for functions with 4 arguments
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 4 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4),
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 4 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 4
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4)));
+  }
+#endif
+
+// ----------- thread starters for functions with 5 arguments
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 5 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5),
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 5 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 5
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5)));
+  }
+#endif  
+
+// ----------- thread starters for functions with 6 arguments
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 6 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6),
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 6 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 6
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6)));
+  }
+#endif  
+
+// ----------- thread starters for functions with 7 arguments
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 7 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7),
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 7 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 7
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7)));
+  }
+#endif  
+
+// ----------- thread starters for functions with 8 arguments
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 8 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			  Arg6,Arg7,Arg8),
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7,
+	    typename identity<Arg8>::type arg8)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7),
+		       internal::maybe_make_ref<Arg8>::act(arg8)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 8 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			     Arg6,Arg7,Arg8),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7,
+	    typename identity<Arg8>::type arg8)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7),
+		       internal::maybe_make_ref<Arg8>::act(arg8)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 8
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			     Arg6,Arg7,Arg8) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7,
+	    typename identity<Arg8>::type arg8)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7),
+		       internal::maybe_make_ref<Arg8>::act(arg8)));
+  }
+#endif  
+
+// ----------- thread starters for functions with 9 arguments
+
+                                   /**
+                                    * Overload of the new_task function for
+                                    * non-member or static member
+                                    * functions with 9 arguments.
+                                    *
+				    * @ingroup threads
+				    */
+  template <typename RT,
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
+  inline
+  Task<RT>
+  new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			  Arg6,Arg7,Arg8,Arg9),
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7,
+	    typename identity<Arg8>::type arg8,
+	    typename identity<Arg9>::type arg9)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr,
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7),
+		       internal::maybe_make_ref<Arg8>::act(arg8),
+		       internal::maybe_make_ref<Arg9>::act(arg9)));
+  }
+
+
+
+				   /**
+				    * Overload of the non-const new_task
+				    * function for member functions with
+				    * 9 arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8, typename Arg9>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			     Arg6,Arg7,Arg8,Arg9),
+	    typename identity<C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7,
+	    typename identity<Arg8>::type arg8,
+	    typename identity<Arg9>::type arg9)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7),
+		       internal::maybe_make_ref<Arg8>::act(arg8),
+		       internal::maybe_make_ref<Arg9>::act(arg9)));
+  }
+
+#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+				   /**
+				    * Overload of the new_task function for
+				    * const member functions with 9
+				    * arguments.
+				    *
+				    * @ingroup threads
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8, typename Arg9>
+  inline
+  Task<RT>
+  new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+			     Arg6,Arg7,Arg8,Arg9) const,
+	    typename identity<const C>::type &c,
+	    typename identity<Arg1>::type arg1,
+	    typename identity<Arg2>::type arg2,
+	    typename identity<Arg3>::type arg3,
+	    typename identity<Arg4>::type arg4,
+	    typename identity<Arg5>::type arg5,
+	    typename identity<Arg6>::type arg6,
+	    typename identity<Arg7>::type arg7,
+	    typename identity<Arg8>::type arg8,
+	    typename identity<Arg9>::type arg9)
+  {
+    return
+      new_task<RT>
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
+		       internal::maybe_make_ref<Arg1>::act(arg1),
+		       internal::maybe_make_ref<Arg2>::act(arg2),
+		       internal::maybe_make_ref<Arg3>::act(arg3),
+		       internal::maybe_make_ref<Arg4>::act(arg4),
+		       internal::maybe_make_ref<Arg5>::act(arg5),
+		       internal::maybe_make_ref<Arg6>::act(arg6),
+		       internal::maybe_make_ref<Arg7>::act(arg7),
+		       internal::maybe_make_ref<Arg8>::act(arg8),
+		       internal::maybe_make_ref<Arg9>::act(arg9)));
+  }  
+#endif
+
+
+// ------------------------ TaskGroup -------------------------------------  
+
+                                   /**
+                                    * A container for task
+                                    * objects. Allows to add new
+                                    * task objects and wait for them
+                                    * all together. The task objects
+                                    * need to have the same return
+                                    * value for the called function.
+                                    *
+                                    * @author Wolfgang Bangerth, 2003
+				    * @ingroup tasks
+                                    */
+  template <typename RT = void>
+  class TaskGroup 
+  {
+    public:
+                                       /**
+                                        * Add another task object to
+                                        * the collection.
+                                        */
+      TaskGroup & operator += (const Task<RT> &t)
+	{
+	  tasks.push_back (t);
+	  return *this;
+	}
+
+                                       /**
+                                        * Wait for all tasks in the
+                                        * collection to finish. It is
+                                        * not a problem if some of
+                                        * them have already been
+                                        * waited for, i.e. you may
+                                        * call this function more than
+                                        * once, and you can also add
+                                        * new task objects between
+                                        * subsequent calls to this
+                                        * function if you want.
+                                        */
+      void join_all () const {
+        for (typename std::list<Task<RT> >::const_iterator
+               t=tasks.begin(); t!=tasks.end(); ++t)
+          t->join ();
+      }
+    
+    private:
+                                       /**
+                                        * List of task objects.
+                                        */
+      std::list<Task<RT> > tasks;
+  };
   
 }   // end of implementation of namespace Threads
 
+/**
+ * @}
+ */
 
 
 //---------------------------------------------------------------------------

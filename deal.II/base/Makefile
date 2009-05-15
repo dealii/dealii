@@ -17,20 +17,16 @@ h-files      = $(sort $(shell echo include/base/*.h))
 # get options which hold for all files of the project
 include $D/common/Make.global_options
 
-# there's an extra .o file for the function parser that we need to link into
-# libbase
-ifeq ($(enable-parser),yes)
-  extra-o-files = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
-endif
 
+# there's an extra .o file for the function parser that we need to link into
+# libbase. do similarly for the threading building block things if threading
+# is enabled
+ifeq ($(enable-parser),yes)
+  extra-o-files  = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
+  extra-g.o-files = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
+endif
 
 # production rules
-ifneq ($(with-multithreading),no)
-  MT = MT
-else
-  MT = ==
-endif
-
 $(LIBDIR)/base/%.g.$(OBJEXT) :
 	@echo "=====base=============debug======$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
@@ -59,6 +55,12 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.g += $(lib-contrib-trilinos)
     deplibs.o += $(lib-contrib-trilinos)
   endif
+
+  ifeq ($(enable-threads),yes)
+    deplibs.g += $D/lib/libtbb_debug$(shared-lib-suffix)
+    deplibs.o += $D/lib/libtbb$(shared-lib-suffix)
+  endif
+
 else
   deplibs.g =
   deplibs.o =
@@ -77,7 +79,7 @@ $(LIBDIR)/libbase$(static-lib-suffix): $(o-files)
 
 $(LIBDIR)/libbase.g$(static-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@$(AR) ru $@ $(go-files) $(extra-o-files)
+	@$(AR) ru $@ $(go-files) $(extra-g.o-files)
 	@$(RANLIB) $@
 
 
@@ -88,7 +90,7 @@ $(LIBDIR)/libbase$(shared-lib-suffix): $(o-files)
 
 $(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,base.g) $(call DEAL_II_ADD_SONAME,base.g) $(go-files) $(extra-o-files)  $(deplibs.g)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,base.g) $(call DEAL_II_ADD_SONAME,base.g) $(go-files) $(extra-g.o-files)  $(deplibs.g)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,base.g) $@
 
 

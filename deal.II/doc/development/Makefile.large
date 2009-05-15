@@ -64,17 +64,6 @@ libs.o   = $(lib-deal2-$(deal_II_dimension)d.o) \
 
 
 
-# Define a nifty string to indicate in the output of the compile
-# commands whether the program is compiled in multithread mode or not:
-ifneq ($(with-multithreading),no)
-  MT = MT
-else
-  MT = ==
-endif
-
-
-
-
 # Now use the information from above to define the set of libraries to
 # link with and the flags to be passed to the compiler:
 ifeq ($(debug-mode),on)

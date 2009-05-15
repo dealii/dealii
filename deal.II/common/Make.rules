@@ -11,7 +11,7 @@ include $D/common/Make.global_options
 # Targets for compilation
 ############################################################
 
-ifneq ($(with-multithreading),no)
+ifneq ($(enable-threads),no)
   MT = MT
 else
   MT = ==

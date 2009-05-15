@@ -38,8 +38,7 @@ F77LIBS              = @F77LIBS@
 LIBS                 = @LIBS@
 LIBDIR               = $D/lib
 PERL                 = @PERL@
-enable-multithreading= @enablemultithreading@
-with-multithreading  = @withmultithreading@
+enable-threads       = @enablethreads@
 enable-shared        = @enableshared@
 enable-parser        = @enableparser@
 DEAL_II_VERSION      = @PACKAGE_VERSION@
@@ -221,12 +220,20 @@ ifeq ($(USE_CONTRIB_HSL),yes)
   lib-hsl = $(LIBDIR)/libhsl$(lib-suffix) 
 endif
 
+# need to link with libtbb if we're using threads
+ifeq ($(enable-threads),yes)
+  lib-contrib-tbb.g = $D/lib/libtbb_debug$(lib-suffix)
+  lib-contrib-tbb.o = $D/lib/libtbb$(lib-suffix)
+endif
+
 
 # set paths to all the libraries we need:
 lib-base.o     = $(LIBDIR)/libbase$(lib-suffix) \
-		 $(lib-contrib-trilinos)
+		 $(lib-contrib-trilinos) \
+		 $(lib-contrib-tbb.o)
 lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix) \
-		 $(lib-contrib-trilinos)
+		 $(lib-contrib-trilinos) \
+		 $(lib-contrib-tbb.g)
 
 lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) \
 		 $(lib-hsl) \
@@ -295,6 +302,9 @@ ifeq ($(USE_CONTRIB_METIS),yes)
   INCLUDE += -I$(include-path-metis)
 endif
 
+ifeq ($(enable-threads),yes)
+  INCLUDE += -I$(shell echo $D/contrib/tbb/tbb*/include)
+endif
 
 # compiler flags for debug and optimized mode
 CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)
@@ -305,6 +315,12 @@ F77FLAGS.o   = @DEFS@ @F77FLAGSO@  $(INCLUDE)
 
 # compile flags for C compiler
 CFLAGS = @CFLAGS@
+
+# if in debug mode, add TBB assertions
+ifeq ($(enable-threads),yes)
+  CXXFLAGS.g += -DTBB_DO_ASSERT=1
+endif
+
 
 # PETSc wants to see a whole lot of other flags being passed...
 ifeq ($(USE_CONTRIB_PETSC),yes)
@@ -324,3 +340,8 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)
 endif
 
+ifneq ($(enable-threads),no)
+  MT = MT
+else
+  MT = ==
+endif

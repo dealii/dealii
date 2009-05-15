@@ -3507,18 +3507,18 @@ namespace internal
 
       const unsigned int max_n_q_points = q.max_n_quadrature_points ();
       
-      std::vector< Vector<double> >
-        function_values (max_n_q_points, Vector<double>(n_components));
+      std::vector< dealii::Vector<double> >
+        function_values (max_n_q_points, dealii::Vector<double>(n_components));
       std::vector<std::vector<Tensor<1,spacedim> > >
         function_grads (max_n_q_points, std::vector<Tensor<1,spacedim> >(n_components));
 
       std::vector<double>
         weight_values (max_n_q_points);
-      std::vector<Vector<double> >
-        weight_vectors (max_n_q_points, Vector<double>(n_components));
+      std::vector<dealii::Vector<double> >
+        weight_vectors (max_n_q_points, dealii::Vector<double>(n_components));
 
-      std::vector<Vector<double> >
-        psi_values (max_n_q_points, Vector<double>(n_components));
+      std::vector<dealii::Vector<double> >
+        psi_values (max_n_q_points, dealii::Vector<double>(n_components));
       std::vector<std::vector<Tensor<1,spacedim> > >
         psi_grads (max_n_q_points, std::vector<Tensor<1,spacedim> >(n_components));
       std::vector<double>
@@ -3547,16 +3547,16 @@ namespace internal
                                            // quadrature points we use
                                            // for the present cell
           function_values.resize (n_q_points,
-                                  Vector<double>(n_components));
+                                  dealii::Vector<double>(n_components));
           function_grads.resize (n_q_points,
                                  std::vector<Tensor<1,spacedim> >(n_components));
 
           weight_values.resize (n_q_points);
           weight_vectors.resize (n_q_points,
-                                 Vector<double>(n_components));
+                                 dealii::Vector<double>(n_components));
 
           psi_values.resize (n_q_points,
-                             Vector<double>(n_components));
+                             dealii::Vector<double>(n_components));
           psi_grads.resize (n_q_points,
                             std::vector<Tensor<1,spacedim> >(n_components));
           psi_scalar.resize (n_q_points);

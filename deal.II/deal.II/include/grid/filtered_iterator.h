@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -406,9 +406,28 @@ class FilteredIterator : public BaseIterator
 				      * Constructor. Use the given
 				      * predicate for filtering and
 				      * initialize the iterator with
-				      * the given value. This initial
-				      * value has to satisfy the
-				      * predicate.
+				      * the given value.
+				      *
+				      * If the initial value @p bi does
+				      * not satisfy the predicate @p p
+				      * then it is advanced until we
+				      * either hit the the
+				      * past-the-end iterator, or the
+				      * predicate is satisfied. This
+				      * allows, for example, to write
+				      * code like
+				      * @code
+				      *   FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
+				      *     cell (IteratorFilters::SubdomainEqualTo(13),
+				      *           triangulation.begin_active());
+				      * @endcode
+				      *
+				      * If the cell
+				      * <code>triangulation.begin_active()</code>
+				      * does not have a subdomain_id
+				      * equal to 13, then the iterator
+				      * will automatically be advanced
+				      * to the first cell that has.
 				      */
     template <typename Predicate>    
     FilteredIterator (Predicate           p,
@@ -595,7 +614,7 @@ class FilteredIterator : public BaseIterator
 		    BaseIterator,
 		    << "The element " << arg1
 		    << " with which you want to compare or which you want to"
-		    << " assign is invalid since it does not satisfy the predicate.");
+		    << " assign from is invalid since it does not satisfy the predicate.");
     
   private:
 
@@ -712,6 +731,28 @@ class FilteredIterator : public BaseIterator
 
 
 
+/**
+ * Create an object of type FilteredIterator given the base iterator
+ * and predicate.  This function makes the creation of temporary
+ * objects (for example as function arguments) a lot simpler because
+ * one does not have to explicitly specify the type of the base
+ * iterator by hand -- it is deduced automatically here.
+ *
+ * @author Wolfgang Bangerth
+ * @relates FilteredIterator
+ */
+template <typename BaseIterator, typename Predicate>
+FilteredIterator<BaseIterator>
+make_filtered_iterator (const BaseIterator &i,
+			const Predicate    &p)
+{
+  FilteredIterator<BaseIterator> fi(p);
+  fi.set_to_next_positive (i);
+  return fi;
+}
+
+
+
 /* ------------------ Inline functions and templates ------------ */
 
 
@@ -736,8 +777,9 @@ FilteredIterator (Predicate          p,
 		BaseIterator (bi),
 		predicate (new PredicateTemplate<Predicate>(p))
 {
-  Assert ((this->state() != IteratorState::valid) || (*predicate) (*this),
-	  ExcInvalidElement(bi));
+  if ((this->state() == IteratorState::valid) &&
+      ! (*predicate) (*this))
+    set_to_next_positive (bi);
 }
 
 

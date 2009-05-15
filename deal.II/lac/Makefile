@@ -30,12 +30,6 @@ endif
 
 
 # production rules
-ifneq ($(with-multithreading),no)
-  MT = MT
-else
-  MT = ==
-endif
-
 $(LIBDIR)/lac/%.g.$(OBJEXT) :
 	@echo "=====lac==============debug======$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@

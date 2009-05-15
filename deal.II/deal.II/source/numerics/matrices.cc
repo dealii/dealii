@@ -15,6 +15,7 @@
 #include <base/function.h>
 #include <base/quadrature.h>
 #include <base/thread_management.h>
+#include <base/work_stream.h>
 #include <base/multithread_info.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
@@ -42,6 +43,626 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+namespace internal
+{
+  namespace MatrixCreator
+  {
+    namespace AssemblerData
+    {
+      template <int dim,
+		int spacedim>
+      struct Scratch
+      {
+	  Scratch (const FiniteElement<dim,spacedim> &fe,
+		   const UpdateFlags         update_flags,
+		   const Function<spacedim>      *coefficient,
+		   const Function<spacedim>      *rhs_function,
+		   const Quadrature<dim>    &quadrature,
+		   const Mapping<dim,spacedim>       &mapping)
+			  :
+			  fe_collection (fe),
+			  quadrature_collection (quadrature),
+			  mapping_collection (mapping),
+			  x_fe_values (mapping_collection,
+				       fe_collection,
+				       quadrature_collection,
+				       update_flags),
+			  coefficient_values(quadrature_collection.max_n_quadrature_points()),
+			  coefficient_vector_values (quadrature_collection.max_n_quadrature_points(),
+						     dealii::Vector<double> (fe_collection.n_components())),
+			  rhs_values(quadrature_collection.max_n_quadrature_points()),
+			  rhs_vector_values (quadrature_collection.max_n_quadrature_points(),
+					     dealii::Vector<double> (fe_collection.n_components())),
+			  coefficient (coefficient),
+			  rhs_function (rhs_function),
+			  update_flags (update_flags)
+	    {}
+
+	  Scratch (const ::dealii::hp::FECollection<dim,spacedim> &fe,
+		   const UpdateFlags         update_flags,
+		   const Function<spacedim>      *coefficient,
+		   const Function<spacedim>      *rhs_function,
+		   const ::dealii::hp::QCollection<dim>    &quadrature,
+		   const ::dealii::hp::MappingCollection<dim,spacedim>       &mapping)
+			  :
+			  fe_collection (fe),
+			  quadrature_collection (quadrature),
+			  mapping_collection (mapping),
+			  x_fe_values (mapping_collection,
+				       fe_collection,
+				       quadrature_collection,
+				       update_flags),
+			  coefficient_values(quadrature_collection.max_n_quadrature_points()),
+			  coefficient_vector_values (quadrature_collection.max_n_quadrature_points(),
+						     dealii::Vector<double> (fe_collection.n_components())),
+			  rhs_values(quadrature_collection.max_n_quadrature_points()),
+			  rhs_vector_values(quadrature_collection.max_n_quadrature_points(),
+					    dealii::Vector<double> (fe_collection.n_components())),
+			  coefficient (coefficient),
+			  rhs_function (rhs_function),
+			  update_flags (update_flags)
+	    {}
+	
+	  Scratch (const Scratch &data)
+			  :
+			  fe_collection (data.fe_collection),
+			  quadrature_collection (data.quadrature_collection),
+			  mapping_collection (data.mapping_collection),
+			  x_fe_values (mapping_collection,
+				       fe_collection,
+				       quadrature_collection,
+				       data.update_flags),
+			  coefficient_values (data.coefficient_values),
+			  coefficient_vector_values (data.coefficient_vector_values),
+			  rhs_values (data.rhs_values),
+			  rhs_vector_values (data.rhs_vector_values),
+			  coefficient (data.coefficient),
+			  rhs_function (data.rhs_function),
+			  update_flags (data.update_flags)
+	    {}
+	
+	  const ::dealii::hp::FECollection<dim,spacedim> fe_collection;
+	  const ::dealii::hp::QCollection<dim> quadrature_collection;
+	  const ::dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
+	
+	  ::dealii::hp::FEValues<dim,spacedim> x_fe_values;
+	
+	  std::vector<double>                  coefficient_values;
+	  std::vector<dealii::Vector<double> > coefficient_vector_values;
+	  std::vector<double>                  rhs_values;
+	  std::vector<dealii::Vector<double> > rhs_vector_values;
+
+	  const Function<spacedim>   *coefficient;
+	  const Function<spacedim>   *rhs_function;
+
+	  const UpdateFlags update_flags;
+      };
+
+
+      struct CopyData
+      {
+	  std::vector<unsigned int> dof_indices;
+	  FullMatrix<double>        cell_matrix;
+	  dealii::Vector<double>    cell_rhs;
+      };
+      
+
+      
+    }
+    
+
+    template <int dim,
+	      int spacedim,
+	      typename CellIterator>
+    void mass_assembler (const CellIterator &cell,
+			 internal::MatrixCreator::AssemblerData::Scratch<dim,spacedim> &data,
+			 internal::MatrixCreator::AssemblerData::CopyData              &copy_data)
+    {
+      data.x_fe_values.reinit (cell);
+      const FEValues<dim,spacedim> &fe_values = data.x_fe_values.get_present_fe_values ();
+      
+      const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+			 n_q_points    = fe_values.n_quadrature_points;
+      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
+      const unsigned int n_components  = fe.n_components();
+
+      Assert(data.rhs_function == 0 ||
+	     data.rhs_function->n_components==1 ||
+	     data.rhs_function->n_components==n_components,
+	     ::dealii::MatrixCreator::ExcComponentMismatch());
+      Assert(data.coefficient == 0 ||
+	     data.coefficient->n_components==1 ||
+	     data.coefficient->n_components==n_components,
+	     ::dealii::MatrixCreator::ExcComponentMismatch());
+
+      copy_data.cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+      copy_data.cell_matrix = 0;
+
+      copy_data.cell_rhs.reinit (dofs_per_cell);
+      copy_data.cell_rhs = 0;
+      
+      copy_data.dof_indices.resize (dofs_per_cell);
+      cell->get_dof_indices (copy_data.dof_indices);
+
+      if (data.rhs_function != 0)
+	{
+	  if (data.rhs_function->n_components==1)
+	    {
+	      data.rhs_values.resize (n_q_points);
+	      data.rhs_function->value_list (fe_values.get_quadrature_points(),
+					     data.rhs_values);
+	    }
+	  else
+	    {
+	      data.rhs_vector_values.resize (n_q_points, 
+					     dealii::Vector<double>(n_components));
+	      data.rhs_function->vector_value_list (fe_values.get_quadrature_points(),
+						    data.rhs_vector_values);
+	    }
+	}
+
+      if (data.coefficient != 0)
+	{
+	  if (data.coefficient->n_components==1)
+	    {
+	      data.coefficient_values.resize (n_q_points);
+ 	      data.coefficient->value_list (fe_values.get_quadrature_points(),
+					    data.coefficient_values);
+	    }
+	  else
+	    {
+	      data.coefficient_vector_values.resize (n_q_points, 
+						     dealii::Vector<double>(n_components));
+	      data.coefficient->vector_value_list (fe_values.get_quadrature_points(),
+						   data.coefficient_vector_values);
+	    }
+	}
+
+
+      if (data.coefficient != 0)
+	{
+	  if (data.coefficient->n_components==1)
+	    {
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  const unsigned int component_i =
+		    fe.system_to_component_index(i).first;
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    if ((n_components==1) ||
+			(fe.system_to_component_index(j).first ==
+			 component_i))
+		      for (unsigned int point=0; point<n_q_points; ++point)
+			copy_data.cell_matrix(i,j)
+			  += (fe_values.shape_value(i,point) * 
+			      fe_values.shape_value(j,point) * 
+			      fe_values.JxW(point) *
+			      data.coefficient_values[point]);
+
+		  if (data.rhs_function != 0)
+		    {
+		      if (data.rhs_function->n_components==1)
+			for (unsigned int point=0; point<n_q_points; ++point)
+			  copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+			    data.rhs_values[point] * fe_values.JxW(point);
+		      else
+			for (unsigned int point=0; point<n_q_points; ++point)
+			  copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+			    data.rhs_vector_values[point](component_i) * 
+			    fe_values.JxW(point);
+		    }
+		}
+	    }
+	  else
+	    {
+	      if (fe.is_primitive ())
+		{
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
+		    {
+		      const unsigned int component_i =
+			fe.system_to_component_index(i).first;
+		      for (unsigned int j=0; j<dofs_per_cell; ++j)
+			if ((n_components==1) ||
+			    (fe.system_to_component_index(j).first ==
+			     component_i))
+			  for (unsigned int point=0; point<n_q_points; ++point)
+			    copy_data.cell_matrix(i,j) +=
+			      (fe_values.shape_value(i,point) * 
+			       fe_values.shape_value(j,point) * 
+			       fe_values.JxW(point) *
+			       data.coefficient_vector_values[point](component_i));
+
+		      if (data.rhs_function != 0)
+			{
+			  if (data.rhs_function->n_components==1)
+			    for (unsigned int point=0; point<n_q_points; ++point)
+			      copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+				data.rhs_values[point] * fe_values.JxW(point);
+			  else
+			    for (unsigned int point=0; point<n_q_points; ++point)
+			      copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+				data.rhs_vector_values[point](component_i) * 
+				fe_values.JxW(point);
+			}
+		    }
+		}
+	      else
+						 // non-primitive vector-valued FE
+		{
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
+		    for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+		      if (fe.get_nonzero_components(i)[comp_i])
+			{
+			  for (unsigned int j=0; j<dofs_per_cell; ++j)
+			    for (unsigned int comp_j = 0; comp_j < n_components; ++comp_j)
+			      if (fe.get_nonzero_components(j)[comp_j])
+				if (comp_i == comp_j)
+				  for (unsigned int point=0; point<n_q_points; ++point)
+				    copy_data.cell_matrix(i,j) += 
+				      (fe_values.shape_value_component(i,point,comp_i) * 
+				       fe_values.shape_value_component(j,point,comp_j) * 
+				       fe_values.JxW(point) *
+				       data.coefficient_vector_values[point](comp_i));
+			      
+			  if (data.rhs_function != 0)
+			    {
+			      if (data.rhs_function->n_components==1)
+				for (unsigned int point=0; point<n_q_points; ++point)
+				  copy_data.cell_rhs(i) += 
+				    fe_values.shape_value_component(i,point,comp_i) *
+				    data.rhs_values[point] * fe_values.JxW(point);
+			      else
+				for (unsigned int point=0; point<n_q_points; ++point)
+				  copy_data.cell_rhs(i) += 
+				    fe_values.shape_value_component(i,point,comp_i) *
+				    data.rhs_vector_values[point](comp_i) * 
+				    fe_values.JxW(point);
+			    }
+			}
+		}
+	    }
+	}
+      else
+					 // no coefficient
+	{
+	  if (fe.is_primitive ())
+	    {
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  const unsigned int component_i =
+		    fe.system_to_component_index(i).first;
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    if ((n_components==1) ||
+			(fe.system_to_component_index(j).first ==
+			 component_i))
+		      for (unsigned int point=0; point<n_q_points; ++point)
+			copy_data.cell_matrix(i,j) +=
+			  (fe_values.shape_value(i,point) * 
+			   fe_values.shape_value(j,point) * 
+			   fe_values.JxW(point));
+
+		  if (data.rhs_function != 0)
+		    {
+		      if (data.rhs_function->n_components==1)
+			for (unsigned int point=0; point<n_q_points; ++point)
+			  copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+			    data.rhs_values[point] * fe_values.JxW(point);
+		      else
+			for (unsigned int point=0; point<n_q_points; ++point)
+			  copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+			    data.rhs_vector_values[point](component_i) * 
+			    fe_values.JxW(point);
+		    }
+		}
+	    }
+	  else
+					     // non-primitive FE, no coefficient
+	    {
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+		  if (fe.get_nonzero_components(i)[comp_i])
+		    {
+		      for (unsigned int j=0; j<dofs_per_cell; ++j)
+			for (unsigned int comp_j = 0; comp_j < n_components; ++comp_j)
+			  if (fe.get_nonzero_components(j)[comp_j])
+			    if (comp_i == comp_j)
+			      for (unsigned int point=0; point<n_q_points; ++point)
+				copy_data.cell_matrix(i,j) += 
+				  (fe_values.shape_value_component(i,point,comp_i) * 
+				   fe_values.shape_value_component(j,point,comp_j) * 
+				   fe_values.JxW(point));
+
+		      if (data.rhs_function != 0)
+			{
+			  if (data.rhs_function->n_components==1)
+			    for (unsigned int point=0; point<n_q_points; ++point)
+			      copy_data.cell_rhs(i) += 
+				fe_values.shape_value_component(i,point,comp_i) *
+				data.rhs_values[point] * fe_values.JxW(point);
+			  else
+			    for (unsigned int point=0; point<n_q_points; ++point)
+			      copy_data.cell_rhs(i) += 
+				fe_values.shape_value_component(i,point,comp_i) *
+				data.rhs_vector_values[point](comp_i) * 
+				fe_values.JxW(point);
+			}
+		    }
+	    }
+	}
+    }
+
+
+
+    template <int dim,
+	      int spacedim,
+	      typename CellIterator>
+    void laplace_assembler (const CellIterator &cell,
+			    internal::MatrixCreator::AssemblerData::Scratch<dim,spacedim> &data,
+			    internal::MatrixCreator::AssemblerData::CopyData              &copy_data)
+    {
+      data.x_fe_values.reinit (cell);
+      const FEValues<dim,spacedim> &fe_values = data.x_fe_values.get_present_fe_values ();      
+
+      const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+			 n_q_points    = fe_values.n_quadrature_points;
+      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
+      const unsigned int n_components  = fe.n_components();
+
+      Assert(data.rhs_function == 0 ||
+	     data.rhs_function->n_components==1 ||
+	     data.rhs_function->n_components==n_components,
+	     ::dealii::MatrixCreator::ExcComponentMismatch());
+      Assert(data.coefficient == 0 ||
+	     data.coefficient->n_components==1 ||
+	     data.coefficient->n_components==n_components,
+	     ::dealii::MatrixCreator::ExcComponentMismatch());
+
+      copy_data.cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+      copy_data.cell_matrix = 0;
+
+      copy_data.cell_rhs.reinit (dofs_per_cell);
+      copy_data.cell_rhs = 0;
+      
+      copy_data.dof_indices.resize (dofs_per_cell);
+      cell->get_dof_indices (copy_data.dof_indices);
+
+
+      if (data.rhs_function != 0)
+	{
+	  if (data.rhs_function->n_components==1)
+	    {
+	      data.rhs_values.resize (n_q_points);
+	      data.rhs_function->value_list (fe_values.get_quadrature_points(),
+					     data.rhs_values);
+	    }
+	  else
+	    {
+	      data.rhs_vector_values.resize (n_q_points, 
+					     dealii::Vector<double>(n_components));
+	      data.rhs_function->vector_value_list (fe_values.get_quadrature_points(),
+						    data.rhs_vector_values);
+	    }
+	}
+
+      if (data.coefficient != 0)
+	{
+	  if (data.coefficient->n_components==1)
+	    {
+	      data.coefficient_values.resize (n_q_points);
+ 	      data.coefficient->value_list (fe_values.get_quadrature_points(),
+					    data.coefficient_values);
+	    }
+	  else
+	    {
+	      data.coefficient_vector_values.resize (n_q_points, 
+						     dealii::Vector<double>(n_components));
+	      data.coefficient->vector_value_list (fe_values.get_quadrature_points(),
+						   data.coefficient_vector_values);
+	    }
+	}
+
+      
+      if (data.coefficient != 0)
+	{
+	  if (data.coefficient->n_components==1)
+	    {
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  const unsigned int component_i =
+		    fe.system_to_component_index(i).first;
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    if ((n_components==1) ||
+			(fe.system_to_component_index(j).first ==
+			 component_i))
+		      for (unsigned int point=0; point<n_q_points; ++point)
+			copy_data.cell_matrix(i,j)
+			  += (fe_values.shape_grad(i,point) * 
+			      fe_values.shape_grad(j,point) * 
+			      fe_values.JxW(point) *
+			      data.coefficient_values[point]);
+
+		  if (data.rhs_function != 0)
+		    {
+		      if (data.rhs_function->n_components==1)
+			for (unsigned int point=0; point<n_q_points; ++point)
+			  copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+			    data.rhs_values[point] * fe_values.JxW(point);
+		      else
+			for (unsigned int point=0; point<n_q_points; ++point)
+			  copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+			    data.rhs_vector_values[point](component_i) * 
+			    fe_values.JxW(point);
+		    }
+		}
+	    }
+	  else
+	    {
+	      if (fe.is_primitive ())
+		{
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
+		    {
+		      const unsigned int component_i =
+			fe.system_to_component_index(i).first;
+		      for (unsigned int j=0; j<dofs_per_cell; ++j)
+			if ((n_components==1) ||
+			    (fe.system_to_component_index(j).first ==
+			     component_i))
+			  for (unsigned int point=0; point<n_q_points; ++point)
+			    copy_data.cell_matrix(i,j) +=
+			      (fe_values.shape_grad(i,point) * 
+			       fe_values.shape_grad(j,point) * 
+			       fe_values.JxW(point) *
+			       data.coefficient_vector_values[point](component_i));
+
+		      if (data.rhs_function != 0)
+			{
+			  if (data.rhs_function->n_components==1)
+			    for (unsigned int point=0; point<n_q_points; ++point)
+			      copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+				data.rhs_values[point] * fe_values.JxW(point);
+			  else
+			    for (unsigned int point=0; point<n_q_points; ++point)
+			      copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+				data.rhs_vector_values[point](component_i) * 
+				fe_values.JxW(point);
+			}
+		    }
+		}
+	      else
+						 // non-primitive vector-valued FE
+		{
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
+		    for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+		      if (fe.get_nonzero_components(i)[comp_i])
+			{
+			  for (unsigned int j=0; j<dofs_per_cell; ++j)
+			    for (unsigned int comp_j = 0; comp_j < n_components; ++comp_j)
+			      if (fe.get_nonzero_components(j)[comp_j])
+				if (comp_i == comp_j)
+				  for (unsigned int point=0; point<n_q_points; ++point)
+				    copy_data.cell_matrix(i,j) += 
+				      (fe_values.shape_grad_component(i,point,comp_i) * 
+				       fe_values.shape_grad_component(j,point,comp_j) * 
+				       fe_values.JxW(point) *
+				       data.coefficient_vector_values[point](comp_i));
+			      
+			  if (data.rhs_function != 0)
+			    {
+			      if (data.rhs_function->n_components==1)
+				for (unsigned int point=0; point<n_q_points; ++point)
+				  copy_data.cell_rhs(i) += 
+				    fe_values.shape_value_component(i,point,comp_i) *
+				    data.rhs_values[point] * fe_values.JxW(point);
+			      else
+				for (unsigned int point=0; point<n_q_points; ++point)
+				  copy_data.cell_rhs(i) += 
+				    fe_values.shape_value_component(i,point,comp_i) *
+				    data.rhs_vector_values[point](comp_i) * 
+				    fe_values.JxW(point);
+			    }
+			}
+		}
+	    }
+	}
+      else
+					 // no coefficient
+	{
+	  if (fe.is_primitive ())
+	    {
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  const unsigned int component_i =
+		    fe.system_to_component_index(i).first;
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    if ((n_components==1) ||
+			(fe.system_to_component_index(j).first ==
+			 component_i))
+		      for (unsigned int point=0; point<n_q_points; ++point)
+			copy_data.cell_matrix(i,j) +=
+			  (fe_values.shape_grad(i,point) * 
+			   fe_values.shape_grad(j,point) * 
+			   fe_values.JxW(point));
+
+		  if (data.rhs_function != 0)
+		    {
+		      if (data.rhs_function->n_components==1)
+			for (unsigned int point=0; point<n_q_points; ++point)
+			  copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+			    data.rhs_values[point] * fe_values.JxW(point);
+		      else
+			for (unsigned int point=0; point<n_q_points; ++point)
+			  copy_data.cell_rhs(i) += fe_values.shape_value(i, point) *
+			    data.rhs_vector_values[point](component_i) * 
+			    fe_values.JxW(point);
+		    }
+		}
+	    }
+	  else
+					     // non-primitive FE, no coefficient
+	    {
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+		  if (fe.get_nonzero_components(i)[comp_i])
+		    {
+		      for (unsigned int j=0; j<dofs_per_cell; ++j)
+			for (unsigned int comp_j = 0; comp_j < n_components; ++comp_j)
+			  if (fe.get_nonzero_components(j)[comp_j])
+			    if (comp_i == comp_j)
+			      for (unsigned int point=0; point<n_q_points; ++point)
+				copy_data.cell_matrix(i,j) += 
+				  (fe_values.shape_grad_component(i,point,comp_i) * 
+				   fe_values.shape_grad_component(j,point,comp_j) * 
+				   fe_values.JxW(point));
+
+		      if (data.rhs_function != 0)
+			{
+			  if (data.rhs_function->n_components==1)
+			    for (unsigned int point=0; point<n_q_points; ++point)
+			      copy_data.cell_rhs(i) += 
+				fe_values.shape_value_component(i,point,comp_i) *
+				data.rhs_values[point] * fe_values.JxW(point);
+			  else
+			    for (unsigned int point=0; point<n_q_points; ++point)
+			      copy_data.cell_rhs(i) += 
+				fe_values.shape_value_component(i,point,comp_i) *
+				data.rhs_vector_values[point](comp_i) * 
+				fe_values.JxW(point);
+			}
+		    }
+	    }
+	}
+    }
+    
+
+    
+    template <typename MatrixType,
+	      typename VectorType>
+    void copy_local_to_global (const AssemblerData::CopyData &data,
+			       MatrixType *matrix,
+			       VectorType *right_hand_side)
+    {
+      const unsigned int dofs_per_cell = data.dof_indices.size();
+
+      Assert (data.cell_matrix.m() == dofs_per_cell,
+	      ExcInternalError());
+      Assert (data.cell_matrix.n() == dofs_per_cell,
+	      ExcInternalError());
+      Assert ((right_hand_side == 0)
+	      ||
+	      (data.cell_rhs.size() == dofs_per_cell),
+	      ExcInternalError());
+
+      matrix->add (data.dof_indices, data.cell_matrix);
+
+      if (right_hand_side != 0)
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  (*right_hand_side)(data.dof_indices[i]) += data.cell_rhs(i);
+    }
+  }
+}
+
+
+
 template <typename DH>
 inline
 MatrixCreator::IteratorRange<DH>::
@@ -66,7 +687,7 @@ MatrixCreator::IteratorRange<DH>::IteratorRange (const iterator_pair &ip)
 
 
 template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
+void MatrixCreator::create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
 					const DoFHandler<dim,spacedim>    &dof,
 					const Quadrature<dim>    &q,
 					SparseMatrix<number>     &matrix,
@@ -77,210 +698,29 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim, spacedim>       &mapp
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
-
-				   // define starting and end point
-				   // for each thread
-  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
-  const std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-    thread_ranges = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-								 dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
+  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
+    assembler_data (dof.get_fe(),
+		    update_values | update_JxW_values |
+		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
+		    coefficient, /*rhs_function=*/0,
+		    q, mapping);
   
-				   // then assemble in parallel
-  typedef void (*create_mass_matrix_1_t) (const Mapping<dim, spacedim>       &mapping,
-					  const DoFHandler<dim,spacedim>    &dof,
-					  const Quadrature<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim> * const coefficient,
-					  const IteratorRange<DoFHandler<dim,spacedim> >  range,
-					  Threads::ThreadMutex     &mutex);
-  create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim,number,spacedim>;
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix, coefficient,
-                                  thread_ranges[thread], mutex);
-  threads.join_all ();  
+  internal::MatrixCreator::AssemblerData::CopyData copy_data;
+  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+			 assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+
+  WorkStream::run (dof.begin_active(),
+		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+		   std_cxx1x::bind (&internal::MatrixCreator::
+				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+				    _1, &matrix, (Vector<double>*)0),
+		   assembler_data,
+		   copy_data);
 }
 
-
-
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix_1 (const Mapping<dim, spacedim>       &mapping,
-					  const DoFHandler<dim,spacedim>    &dof,
-					  const Quadrature<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim> * const coefficient,
-					  const IteratorRange<DoFHandler<dim,spacedim> >  range,
-					  Threads::ThreadMutex     &mutex)
-{
-  UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values);
-  if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_quadrature_points);
-  
-  FEValues<dim,spacedim> fe_values (mapping, dof.get_fe(), q, update_flags);
-    
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-  Assert(coefficient == 0 ||
-	 coefficient->n_components==1 ||
-	 coefficient->n_components==n_components, ExcComponentMismatch());
-  
-  FullMatrix<number>  cell_matrix (dofs_per_cell, dofs_per_cell);
-  std::vector<double> coefficient_values (n_q_points);
-  std::vector<Vector<double> > coefficient_vector_values (n_q_points,
-							  Vector<double> (n_components));
-  
-  std::vector<unsigned int> dof_indices (dofs_per_cell);
-  
-  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    {
-      fe_values.reinit (cell);
-      
-      cell_matrix = 0;
-      cell->get_dof_indices (dof_indices);
-      
-      if (coefficient != 0)
-	{
-	  if (coefficient->n_components==1)
-	    {
-	      // Version for variable coefficient with 1 component
-	      coefficient->value_list (fe_values.get_quadrature_points(),
-				       coefficient_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    {
-		      const double v = fe_values.shape_value(i,point);
-		      const unsigned int component_i = 
-			fe.system_to_component_index(i).first;
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			if ((n_components==1) ||
-			    (fe.system_to_component_index(j).first ==
-			     component_i))
-			  {
-			    const double u = fe_values.shape_value(j,point);
-			    cell_matrix(i,j) +=
-			      (u * v * weight * coefficient_values[point]);
-			  }
-		    }
-		}
-	    }
-	  else
-	    {
-	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					      coefficient_vector_values);
-	      if (fe.is_primitive ())
-		{
-		  // Version for variable coefficient with multiple components
-		  for (unsigned int point=0; point<n_q_points; ++point)
-		    {
-		      const double weight = fe_values.JxW(point);
-		      for (unsigned int i=0; i<dofs_per_cell; ++i)
-			{
-			  const double v = fe_values.shape_value(i,point);
-			  const unsigned int component_i=
-			    fe.system_to_component_index(i).first;
-			  for (unsigned int j=0; j<dofs_per_cell; ++j)
-			    if ((n_components==1) ||
-				(fe.system_to_component_index(j).first == 
-				 component_i))
-			      {
-				const double u = fe_values.shape_value(j,point);
-				cell_matrix(i,j) +=
-				  (u * v * weight *
-				   coefficient_vector_values[point](component_i));
-			      }
-			}
-		    }
-		}
-	      else
-		{
-		  // Version for variable coefficient with multiple components and
-		  // vector values FE.
-		  for (unsigned int point=0; point<n_q_points; ++point)
-		    {
-		      const double weight = fe_values.JxW(point);
-		      for (unsigned int i=0; i<dofs_per_cell; ++i)
-			for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-			  if (fe.get_nonzero_components(i)[comp_i])
-			    {
-			      const double v = fe_values.shape_value_component(i,point,comp_i);
-			      for (unsigned int j=0; j<dofs_per_cell; ++j)
-				for (unsigned int comp_j = 0; comp_j < n_components; ++comp_j)
-				  if (fe.get_nonzero_components(j)[comp_j])
-				    {
-				      const double u = fe_values.shape_value_component(j,point,comp_j);
-				      if (comp_i == comp_j)
-					cell_matrix(i,j) +=
-					  (u * v * weight *
-					   coefficient_vector_values[point](comp_i));
-				    }
-			    }
-		    }
-		}
-	    }
-	}
-      else
-	{
-	  if (fe.is_primitive ())
-	    {
-	      // Version for primitive FEs
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    {
-		      const double v = fe_values.shape_value(i,point); 
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			if ((n_components==1) ||
-			    (fe.system_to_component_index(i).first ==
-			     fe.system_to_component_index(j).first))
-			  {
-			    const double u = fe_values.shape_value(j,point);
-			    cell_matrix(i,j) += (u * v * weight);
-			  }
-		    }
-		}
-	    }
-	  else
-	    {
-	      // Version for vector valued FEs
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-		      if (fe.get_nonzero_components(i)[comp_i])
-			{
-			  const double v = fe_values.shape_value_component(i,point,comp_i); 
-			  for (unsigned int j=0; j<dofs_per_cell; ++j)
-			    for (unsigned int comp_j = 0; comp_j < n_components; ++comp_j)
-			      if (fe.get_nonzero_components(j)[comp_j])
-				{
-				  const double u = fe_values.shape_value_component(j,point,comp_j);
-				  if (comp_i == comp_j)
-				    cell_matrix(i,j) += (u * v * weight);
-				}
-			}
-		}
-	    }
-	}
-				       // transfer everything into the
-				       // global object
-      mutex.acquire ();
-      matrix.add(dof_indices, cell_matrix);
-      mutex.release ();
-    };
-}
 
 
 template <int dim, typename number, int spacedim>
@@ -290,12 +730,14 @@ void MatrixCreator::create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
 					const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
+  create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof,
+		     q, matrix, coefficient);
 }
 
 
+
 template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
+void MatrixCreator::create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
 					const DoFHandler<dim,spacedim>    &dof,
 					const Quadrature<dim>    &q,
 					SparseMatrix<number>     &matrix,
@@ -308,272 +750,28 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim, spacedim>       &mapp
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
+  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
+    assembler_data (dof.get_fe(),
+		    update_values |
+		    update_JxW_values | update_quadrature_points,
+		    coefficient, &rhs,
+		    q, mapping);
+  internal::MatrixCreator::AssemblerData::CopyData copy_data;
+  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+			 assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());  
 
-				   // define starting and end point
-				   // for each thread
-  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
-  
-				   // then assemble in parallel
-  typedef void (*create_mass_matrix_2_t) (const Mapping<dim, spacedim>       &mapping,
-					  const DoFHandler<dim,spacedim>    &dof,
-					  const Quadrature<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim>      &rhs,
-					  Vector<double>           &rhs_vector,
-					  const Function<spacedim> * const coefficient,
-					  const IteratorRange<DoFHandler<dim,spacedim> >  range,
-					  Threads::ThreadMutex     &mutex);
-  create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim,number,spacedim>;
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix, rhs,
-                                  rhs_vector, coefficient,
-                                  thread_ranges[thread], mutex);
-  threads.join_all ();  
+  WorkStream::run (dof.begin_active(),
+		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+		   std_cxx1x::bind(&internal::MatrixCreator::
+				   copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+				   _1, &matrix, &rhs_vector),
+		   assembler_data,
+		   copy_data);
 }
 
-
-
-template <int dim, typename number, int spacedim>
-void
-MatrixCreator::create_mass_matrix_2 (const Mapping<dim, spacedim>       &mapping,
-				     const DoFHandler<dim,spacedim>    &dof,
-				     const Quadrature<dim>    &q,
-				     SparseMatrix<number>     &matrix,
-				     const Function<spacedim> &rhs,
-				     Vector<double>           &rhs_vector,
-				     const Function<spacedim> * const coefficient,
-				     const IteratorRange<DoFHandler<dim,spacedim> >  range,
-				     Threads::ThreadMutex     &mutex)
-{
-  UpdateFlags update_flags = UpdateFlags(update_values |
-					 update_quadrature_points |
-					 update_JxW_values);
-  if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_quadrature_points);
-
-  FEValues<dim,spacedim> fe_values (mapping, dof.get_fe(), q, update_flags);
-    
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-  Assert(coefficient == 0 ||
-	 coefficient->n_components==1 ||
-	 coefficient->n_components==n_components, ExcComponentMismatch());
-  Assert (rhs.n_components == 1 ||
-	  rhs.n_components == n_components,ExcComponentMismatch());
-  Assert (rhs_vector.size() == dof.n_dofs(),
-	  ExcDimensionMismatch(rhs_vector.size(), dof.n_dofs()));
-  
-  FullMatrix<number>  cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>      local_rhs (dofs_per_cell);
-  std::vector<double> coefficient_values (n_q_points);
-  std::vector<Vector<double> > coefficient_vector_values (n_q_points,
-						 Vector<double> (n_components));
-  std::vector<double> rhs_values(n_q_points);
-  std::vector<Vector<double> > rhs_vector_values(n_q_points,
-						 Vector<double> (n_components));
-
-  std::vector<unsigned int> dof_indices (dofs_per_cell);
-
-  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-
-  for (; cell!=range.second; ++cell)
-    {
-      fe_values.reinit (cell);
-
-      cell_matrix = 0;
-      local_rhs = 0;
-      cell->get_dof_indices (dof_indices);
-
-				   // value_list for one component rhs,
-				   // vector_value_list otherwise
-      if (rhs.n_components==1)
-	rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
-      else
-	rhs.vector_value_list (fe_values.get_quadrature_points(),
-			       rhs_vector_values);
-
-				   // Case with coefficient
-      if (coefficient != 0)
-	{
-	  if (coefficient->n_components == 1)
-	    {
-	      // Version for variable coefficient with 1 component
-	      coefficient->value_list (fe_values.get_quadrature_points(),
-				       coefficient_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    {
-		      const double v = fe_values.shape_value(i,point);
-		      const unsigned int component_i =
-			fe.system_to_component_index(i).first;
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			if ((n_components==1) ||
-			    (fe.system_to_component_index(j).first ==
-			     component_i))
-			  {
-			    const double u = fe_values.shape_value(j,point);
-			    cell_matrix(i,j) +=
-			      (u * v * weight * coefficient_values[point]);
-			  }
-
-		      if (rhs.n_components == 1)
-			local_rhs(i) += v * rhs_values[point] * weight;
-		      else
-			local_rhs(i) += v * rhs_vector_values[point](component_i) 
-			                  * weight;
-		    }
-		}
-	    }
-	  else
-	    {
-	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					      coefficient_vector_values);
-	      if (fe.is_primitive ())
-		{
-		  // Version for variable coefficient with multiple components
-		  for (unsigned int point=0; point<n_q_points; ++point)
-		    {
-		      const double weight = fe_values.JxW(point);
-		      for (unsigned int i=0; i<dofs_per_cell; ++i)
-			{
-			  const double v = fe_values.shape_value(i,point);
-			  const unsigned int component_i=
-			    fe.system_to_component_index(i).first;
-			  for (unsigned int j=0; j<dofs_per_cell; ++j)
-			    if ((n_components==1) ||
-				(fe.system_to_component_index(j).first == 
-				 component_i))
-			      {
-				const double u = fe_values.shape_value(j,point);
-				cell_matrix(i,j) +=
-				  (u * v * weight *
-				   coefficient_vector_values[point](component_i));
-			      }
-
-			  if (rhs.n_components == 1)
-			    local_rhs(i) += v * rhs_values[point] * weight;
-			  else
-			    local_rhs(i) += v * rhs_vector_values[point](component_i) 
-			                      * weight;
-			}
-		    }
-		}
-	      else
-		{
-		  // Version for variable coefficient with multiple components and
-		  // vector valued FE.
-		  for (unsigned int point=0; point<n_q_points; ++point)
-		    {
-		      const double weight = fe_values.JxW(point);
-		      for (unsigned int i=0; i<dofs_per_cell; ++i)
-			for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-			  if (fe.get_nonzero_components(i)[comp_i])
-			    {
-			      const double v = fe_values.shape_value_component(i,point,comp_i);
-			      for (unsigned int j=0; j<dofs_per_cell; ++j)
-				for (unsigned int comp_j = 0; comp_j < n_components; ++comp_j)
-				  if (fe.get_nonzero_components(j)[comp_j])
-				    {
-				      const double u = fe_values.shape_value_component(j,point,comp_j);
-				      if (comp_i == comp_j)
-					cell_matrix(i,j) +=
-					  (u * v * weight *
-					   coefficient_vector_values[point](comp_i));
-				    }
-
-			      if (rhs.n_components == 1)
-				local_rhs(i) += v * rhs_values[point] * weight;
-			      else
-				local_rhs(i) += v * rhs_vector_values[point](comp_i) 
-				                  * weight;
-			    }
-		    }
-		}
-	    }
-	}
-      else
-	{
-	  if (fe.is_primitive ())
-	    {
-	      // Version for primitive FEs
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    {
-		      const double v = fe_values.shape_value(i,point);
-		      const unsigned int component_i = 
-			fe.system_to_component_index(i).first;
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			if ((n_components==1) ||
-			    (fe.system_to_component_index(j).first ==
-			     component_i))
-			  {
-			    const double u = fe_values.shape_value(j,point);
-			    cell_matrix(i,j) += (u * v * weight);
-			  }
-
-		      if (rhs.n_components == 1)
-			local_rhs(i) += v * rhs_values[point] * weight;
-		      else
-			local_rhs(i) += v * rhs_vector_values[point](component_i) 
-			                  * weight;
-		    }
-		}
-	    }
-	  else
-	    {
-	      // Version for vector valued FEs
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-		      if (fe.get_nonzero_components(i)[comp_i])
-			{
-			  const double v = fe_values.shape_value_component(i,point,comp_i); 
-			  for (unsigned int j=0; j<dofs_per_cell; ++j)
-			    for (unsigned int comp_j = 0; comp_j < n_components; ++comp_j)
-			      if (fe.get_nonzero_components(j)[comp_j])
-				{
-				  const double u = fe_values.shape_value_component(j,point,comp_j);
-				  if (comp_i == comp_j)
-				    cell_matrix(i,j) += (u * v * weight);
-				}
-
-			  if (rhs.n_components == 1)
-			    local_rhs(i) += v * rhs_values[point] * weight;
-			  else
-			    local_rhs(i) += v * rhs_vector_values[point](comp_i) 
-				              * weight;
-			}
-		}
-	    }
-	}
-
-				       // transfer everything into the
-				       // global object. lock the
-				       // matrix meanwhile
-      Threads::ThreadMutex::ScopedLock lock (mutex);
-      matrix.add(dof_indices, cell_matrix);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	rhs_vector(dof_indices[i]) += local_rhs(i);
-    }
-}
 
 
 template <int dim, typename number, int spacedim>
@@ -592,7 +790,7 @@ void MatrixCreator::create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
 
 
 template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
 					const hp::DoFHandler<dim,spacedim>    &dof,
 					const hp::QCollection<dim>    &q,
 					SparseMatrix<number>     &matrix,
@@ -603,164 +801,26 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
-
-				   // define starting and end point
-				   // for each thread
-  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
+  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
+    assembler_data (dof.get_fe(),
+		    update_values | update_JxW_values |
+		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
+		    coefficient, /*rhs_function=*/0,
+		    q, mapping);
+  internal::MatrixCreator::AssemblerData::CopyData copy_data;
+  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+			 assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
   
-				   // then assemble in parallel
-  typedef void (*create_mass_matrix_1_t) (const hp::MappingCollection<dim,spacedim>       &mapping,
-					  const hp::DoFHandler<dim,spacedim>    &dof,
-					  const hp::QCollection<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim> * const coefficient,
-					  const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-					  Threads::ThreadMutex     &mutex);
-  create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim>;
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix, coefficient,
-                                  thread_ranges[thread], mutex);
-  threads.join_all ();  
-}
-
-
-
-template <int dim, typename number, int spacedim>
-void
-MatrixCreator::create_mass_matrix_1 (const hp::MappingCollection<dim,spacedim>       &mapping,
-				     const hp::DoFHandler<dim,spacedim>    &dof,
-				     const hp::QCollection<dim>    &q,
-				     SparseMatrix<number>     &matrix,
-				     const Function<spacedim> * const coefficient,
-				     const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-				     Threads::ThreadMutex     &mutex)
-{
-  UpdateFlags update_flags = UpdateFlags(update_values |
-					 update_JxW_values);
-  if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_quadrature_points);
-
-  hp::FEValues<dim,spacedim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
-    
-  const unsigned int n_components  = dof.get_fe().n_components();
-
-  Assert(coefficient == 0 ||
-	 coefficient->n_components==1 ||
-	 coefficient->n_components==n_components, ExcComponentMismatch());
-
-  FullMatrix<double>  cell_matrix;
-  std::vector<double> coefficient_values;
-  std::vector<Vector<double> > coefficient_vector_values;
-  
-  std::vector<unsigned int> dof_indices;
-  
-  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    {
-      x_fe_values.reinit (cell);
-      const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
-
-      const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-			 n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
-
-      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
-      coefficient_values.resize (n_q_points);
-      coefficient_vector_values.resize (n_q_points,
-					Vector<double> (n_components));
-      dof_indices.resize (dofs_per_cell);
-
-      
-      cell_matrix = 0;
-      cell->get_dof_indices (dof_indices);
-      
-      if (coefficient != 0)
-	{
-	  if (coefficient->n_components==1)
-	    {
-	      coefficient->value_list (fe_values.get_quadrature_points(),
-				       coefficient_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		    {
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			{
-			  if ((n_components==1) ||
-			      (fe.system_to_component_index(i).first ==
-			       fe.system_to_component_index(j).first))
-			    cell_matrix(i,j) += (fe_values.shape_value(i,point) *
-						 fe_values.shape_value(j,point) *
-						 weight *
-						 coefficient_values[point]);
-			}
-		    }
-		}
-	    }
-	  else
-	    {
-	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					      coefficient_vector_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		    {
-		      const unsigned int component_i=
-			fe.system_to_component_index(i).first;		    
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			{
-			  if ((n_components==1) ||
-			      (fe.system_to_component_index(j).first == component_i))
-			    cell_matrix(i,j) += (fe_values.shape_value(i,point) *
-						 fe_values.shape_value(j,point) *
-						 weight *
-						 coefficient_vector_values[point](component_i));
-			}
-		    }
-		}
-	    }
-	}
-      else
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  {
-	    const double weight = fe_values.JxW(point);
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      {
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  {
-		    if ((n_components==1) ||
-			(fe.system_to_component_index(i).first ==
-			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (fe_values.shape_value(i,point) *
-					   fe_values.shape_value(j,point) *
-					   weight);
-		  }
-	      }
-	  }
-
-				       // transfer everything into the
-				       // global object. lock the
-				       // matrix meanwhile
-      Threads::ThreadMutex::ScopedLock lock (mutex);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if ((n_components==1) ||
-	      (fe.system_to_component_index(i).first ==
-	       fe.system_to_component_index(j).first))
-	    matrix.add (dof_indices[i], dof_indices[j],
-			cell_matrix(i,j));
-    }
+  WorkStream::run (dof.begin_active(),
+		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+		   std_cxx1x::bind (&internal::MatrixCreator::
+				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+				    _1, &matrix, (Vector<double>*)0),
+		   assembler_data,
+		   copy_data);
 }
 
 
@@ -772,7 +832,7 @@ void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &d
 					const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q, matrix, coefficient);
+  create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
 }
 
 
@@ -791,185 +851,26 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
+  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
+    assembler_data (dof.get_fe(),
+		    update_values |
+		    update_JxW_values | update_quadrature_points,
+		    coefficient, &rhs,
+		    q, mapping);
+  internal::MatrixCreator::AssemblerData::CopyData copy_data;
+  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+			 assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
 
-				   // define starting and end point
-				   // for each thread
-  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
-  
-				   // then assemble in parallel
-  typedef void (*create_mass_matrix_2_t) (const hp::MappingCollection<dim,spacedim>       &mapping,
-					  const hp::DoFHandler<dim,spacedim>    &dof,
-					  const hp::QCollection<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim>      &rhs,
-					  Vector<double>           &rhs_vector,
-					  const Function<spacedim> * const coefficient,
-					  const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-					  Threads::ThreadMutex     &mutex);
-  create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim>;
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix, rhs,
-                                  rhs_vector, coefficient,
-                                  thread_ranges[thread], mutex);
-  threads.join_all ();  
-}
-
-
-
-template <int dim, typename number, int spacedim>
-void
-MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim,spacedim>       &mapping,
-				     const hp::DoFHandler<dim,spacedim>    &dof,
-				     const hp::QCollection<dim>    &q,
-				     SparseMatrix<number>     &matrix,
-				     const Function<spacedim>      &rhs,
-				     Vector<double>           &rhs_vector,
-				     const Function<spacedim> * const coefficient,
-				     const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-				     Threads::ThreadMutex     &mutex)
-{
-  UpdateFlags update_flags = UpdateFlags(update_values    |
-					 update_quadrature_points  |
-					 update_JxW_values);
-  if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_quadrature_points);
-
-  hp::FEValues<dim,spacedim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
-    
-  const unsigned int n_components  = dof.get_fe().n_components();
-
-  Assert(coefficient == 0 ||
-	 coefficient->n_components==1 ||
-	 coefficient->n_components==n_components, ExcComponentMismatch());
-
-  FullMatrix<double>  cell_matrix;
-  Vector<double>      local_rhs;
-  std::vector<double> rhs_values;
-  std::vector<double> coefficient_values;
-  std::vector<Vector<double> > coefficient_vector_values;
-  
-  std::vector<unsigned int> dof_indices;
-  
-  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    {
-      x_fe_values.reinit (cell);
-      const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
-
-      const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-			 n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
-
-      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
-      local_rhs.reinit (dofs_per_cell);
-      rhs_values.resize (fe_values.n_quadrature_points);
-      coefficient_values.resize (n_q_points);
-      coefficient_vector_values.resize (n_q_points,
-					Vector<double> (n_components));
-      dof_indices.resize (dofs_per_cell);
-
-      
-      cell_matrix = 0;
-      local_rhs = 0;
-      cell->get_dof_indices (dof_indices);
-      
-      rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
-      
-      if (coefficient != 0)
-	{
-	  if (coefficient->n_components==1)
-	    {
-	      coefficient->value_list (fe_values.get_quadrature_points(),
-				       coefficient_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		    {
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			{
-			  if ((n_components==1) ||
-			      (fe.system_to_component_index(i).first ==
-			       fe.system_to_component_index(j).first))
-			    cell_matrix(i,j) += (fe_values.shape_value(i,point) *
-						 fe_values.shape_value(j,point) *
-						 weight *
-						 coefficient_values[point]);
-			}
-		      local_rhs(i) += fe_values.shape_value(i,point) *
-				      rhs_values[point] * weight;
-		    }
-		}
-	    }
-	  else
-	    {
-	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					      coefficient_vector_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		    {
-		      const unsigned int component_i=
-			fe.system_to_component_index(i).first;		    
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			{
-			  if ((n_components==1) ||
-			      (fe.system_to_component_index(j).first == component_i))
-			    cell_matrix(i,j) += (fe_values.shape_value(i,point) *
-						 fe_values.shape_value(j,point) *
-						 weight *
-						 coefficient_vector_values[point](component_i));
-			}			  
-		      local_rhs(i) += fe_values.shape_value(i,point) *
-				      rhs_values[point] * weight;
-		    }
-		}
-	    }
-	}
-      else
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  {
-	    const double weight = fe_values.JxW(point);
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      {
-		const double v = fe_values.shape_value(i,point);
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  {
-		    if ((n_components==1) ||
-			(fe.system_to_component_index(i).first ==
-			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (fe_values.shape_value(i,point) *
-					   fe_values.shape_value(j,point) *
-					   weight);
-		  }
-		local_rhs(i) += v * rhs_values[point] * weight;
-	      }
-	  }
-
-				       // transfer everything into the
-				       // global object. lock the
-				       // matrix meanwhile
-      Threads::ThreadMutex::ScopedLock lock (mutex);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if ((n_components==1) ||
-	      (fe.system_to_component_index(i).first ==
-	       fe.system_to_component_index(j).first))
-	    matrix.add (dof_indices[i], dof_indices[j],
-			cell_matrix(i,j));
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	rhs_vector(dof_indices[i]) += local_rhs(i);
-    }
+  WorkStream::run (dof.begin_active(),
+		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+		   std_cxx1x::bind (&internal::MatrixCreator::
+				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+				    _1, &matrix, &rhs_vector),
+		   assembler_data,
+		   copy_data);
 }
 
 
@@ -983,7 +884,7 @@ void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &d
 					const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q,
+  create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
 		     matrix, rhs, rhs_vector, coefficient);
 }
 
@@ -1096,12 +997,15 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mappi
        const IteratorRange<DoFHandler<dim,spacedim> >   range,
        Threads::ThreadMutex      &mutex);
   create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim,spacedim>;
+
+//TODO: Use WorkStream here  
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(Commons(mapping, dof, q), matrix,
-                                  boundary_functions, rhs_vector,
-                                  dof_to_boundary_mapping, coefficient,
-				  component_mapping,
-                                  thread_ranges[thread], mutex);
+    threads += Threads::new_thread (p,
+				    Commons(mapping, dof, q), matrix,
+				    boundary_functions, rhs_vector,
+				    dof_to_boundary_mapping, coefficient,
+				    component_mapping,
+				    thread_ranges[thread], mutex);
   threads.join_all ();  
 }
 
@@ -1168,7 +1072,7 @@ create_boundary_mass_matrix_1 (std_cxx1x::tuple<const Mapping<dim, spacedim> &,
 					  update_JxW_values |
 					  update_normal_vectors |
 					  update_quadrature_points);
-  FEFaceValues<dim> fe_values (mapping, fe, q, update_flags);
+  FEFaceValues<dim,spacedim> fe_values (mapping, fe, q, update_flags);
 
 				   // two variables for the coefficient,
 				   // one for the two cases indicated in
@@ -1449,7 +1353,7 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim,spac
 					    const Function<spacedim> * const coefficient,
 					    std::vector<unsigned int> component_mapping)
 {
-  const hp::FECollection<dim> &fe_collection = dof.get_fe();
+  const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
   const unsigned int n_components  = fe_collection.n_components();
   
   Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
@@ -1482,8 +1386,8 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim,spac
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
 
-  typedef std_cxx1x::tuple<const hp::MappingCollection<dim>&,
-    const hp::DoFHandler<dim>&,
+  typedef std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim>&,
+    const hp::DoFHandler<dim,spacedim>&,
     const hp::QCollection<dim-1>&> Commons;
   
 				   // mutex to synchronise access to
@@ -1502,12 +1406,15 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim,spac
        const IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
        Threads::ThreadMutex      &mutex);
   create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim,spacedim>;
+
+//TODO: Use WorkStream here  
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(Commons(mapping, dof, q), matrix,
-                                  boundary_functions, rhs_vector,
-                                  dof_to_boundary_mapping, coefficient,
-				  component_mapping,
-                                  thread_ranges[thread], mutex);
+    threads += Threads::new_thread (p,
+				    Commons(mapping, dof, q), matrix,
+				    boundary_functions, rhs_vector,
+				    dof_to_boundary_mapping, coefficient,
+				    component_mapping,
+				    thread_ranges[thread], mutex);
   threads.join_all ();  
 }
 
@@ -1528,8 +1435,8 @@ create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,
 			       const IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
 			       Threads::ThreadMutex      &mutex)
 {
-  const hp::MappingCollection<dim>& mapping = std_cxx1x::get<0>(commons);
-  const hp::DoFHandler<dim>& dof = std_cxx1x::get<1>(commons);
+  const hp::MappingCollection<dim,spacedim>& mapping = std_cxx1x::get<0>(commons);
+  const hp::DoFHandler<dim,spacedim>& dof = std_cxx1x::get<1>(commons);
   const hp::QCollection<dim-1>& q = std_cxx1x::get<2>(commons);
   const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
   const unsigned int n_components  = fe_collection.n_components();
@@ -1587,7 +1494,7 @@ create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,
 	{
 	  x_fe_values.reinit (cell, face);
 
-	  const FEFaceValues<dim> &fe_values = x_fe_values.get_present_fe_values ();
+	  const FEFaceValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
 
 	  const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 	  const unsigned int dofs_per_cell = fe.dofs_per_cell;
@@ -1621,15 +1528,14 @@ create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,
 			    {
 			      const double v = fe_values.shape_value(i,point);
 			      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-				{
-				  const double u = fe_values.shape_value(j,point);
-				  if (fe.system_to_component_index(i).first ==
-				      fe.system_to_component_index(j).first)
-				    {
-				      cell_matrix(i,j)
-					+= (u * v * weight * coefficient_values[point]);
-				    }
-				}
+				if (fe.system_to_component_index(i).first ==
+				    fe.system_to_component_index(j).first)
+				  {
+				    const double u = fe_values.shape_value(j,point);
+				    cell_matrix(i,j)
+				      += (u * v * weight * coefficient_values[point]);
+				  }
+			      
 			      cell_vector(i) += v *
 						rhs_values_system[point](
 						  component_mapping[fe.system_to_component_index(i).first]) * weight;
@@ -1651,15 +1557,13 @@ create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,
 			      const unsigned int component_i=
 				fe.system_to_component_index(i).first;
 			      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-				{
-				  const double u = fe_values.shape_value(j,point);
-				  if (fe.system_to_component_index(j).first ==
-				      component_i)
-				    {
-				      cell_matrix(i,j) +=
-					(u * v * weight * coefficient_vector_values[point](component_i));
-				    }
-				} 
+				if (fe.system_to_component_index(j).first ==
+				    component_i)
+				  {
+				    const double u = fe_values.shape_value(j,point);
+				    cell_matrix(i,j) +=
+				      (u * v * weight * coefficient_vector_values[point](component_i));
+				  }
 			      cell_vector(i) += v * rhs_values_system[point](component_mapping[component_i]) * weight;
 			    }
 			}
@@ -1673,14 +1577,12 @@ create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,
 		      {
 			const double v = fe_values.shape_value(i,point);
 			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-			  {
-			    const double u = fe_values.shape_value(j,point);
-			    if (fe.system_to_component_index(i).first ==
-				fe.system_to_component_index(j).first)
-			      {
-				cell_matrix(i,j) += (u * v * weight);
-			      }
-			  }
+			  if (fe.system_to_component_index(i).first ==
+			      fe.system_to_component_index(j).first)
+			    {
+			      const double u = fe_values.shape_value(j,point);
+			      cell_matrix(i,j) += (u * v * weight);
+			    }
 			cell_vector(i) += v *
 					  rhs_values_system[point](
 					    fe.system_to_component_index(i).first) *
@@ -1914,156 +1816,26 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &m
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
+  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
+    assembler_data (dof.get_fe(),
+		    update_gradients  | update_JxW_values |
+		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
+		    coefficient, /*rhs_function=*/0,
+		    q, mapping);
+  internal::MatrixCreator::AssemblerData::CopyData copy_data;
+  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+			 assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());  
 
-				   // define starting and end point
-				   // for each thread
-  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
-  
-				   // then assemble in parallel
-  typedef void (*create_laplace_matrix_1_t) (const Mapping<dim, spacedim>       &mapping,
-					     const DoFHandler<dim,spacedim>    &dof,
-					     const Quadrature<dim>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<spacedim> * const coefficient,
-					     const IteratorRange<DoFHandler<dim,spacedim> >  range,
-					     Threads::ThreadMutex     &mutex);
-  create_laplace_matrix_1_t p = &MatrixCreator::template create_laplace_matrix_1<dim>;
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix, coefficient,
-                                  thread_ranges[thread], mutex);
-  threads.join_all ();  
-}
-
-
-
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim, spacedim>       &mapping,
-					     const DoFHandler<dim,spacedim>    &dof,
-					     const Quadrature<dim>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<spacedim> * const coefficient,
-					     const IteratorRange<DoFHandler<dim,spacedim> >  range,
-					     Threads::ThreadMutex     &mutex)
-{
-  UpdateFlags update_flags = UpdateFlags(update_JxW_values |
-					 update_gradients);
-  if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_quadrature_points);
-
-  FEValues<dim,spacedim> fe_values (mapping, dof.get_fe(), q, update_flags);
-    
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-  Assert(coefficient == 0 ||
-	 coefficient->n_components==1 ||
-	 coefficient->n_components==n_components, ExcComponentMismatch());
-
-  FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
-  std::vector<double> coefficient_values (n_q_points);
-  std::vector<Vector<double> > coefficient_vector_values (n_q_points,
-							  Vector<double> (n_components));
-  
-  std::vector<unsigned int> dof_indices (dofs_per_cell);
-  
-  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    {
-      fe_values.reinit (cell);
-      
-      cell_matrix = 0;
-      cell->get_dof_indices (dof_indices);
-      
-      if (coefficient != 0)
-	{
-	  if (coefficient->n_components==1)
-	    {
-	      coefficient->value_list (fe_values.get_quadrature_points(),
-				       coefficient_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    {
-		      const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			{
-			  const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-			  if ((n_components==1) ||
-			      (fe.system_to_component_index(i).first ==
-			       fe.system_to_component_index(j).first))
-			    cell_matrix(i,j) += (Du * Dv * weight *
-						 coefficient_values[point]);
-			}
-		    }
-		}
-	    }
-	  else
-	    {
-	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					      coefficient_vector_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    {
-		      const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-		      const unsigned int component_i=
-			fe.system_to_component_index(i).first;
-		      for (unsigned int j=0; j<dofs_per_cell; ++j)
-			{
-			  const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-			  if ((n_components==1) ||
-			      (fe.system_to_component_index(j).first == component_i))
-			    cell_matrix(i,j) += (Du * Dv * weight *
-						 coefficient_vector_values[point](component_i));
-			  
-			}
-		    }
-		}
-	    }
-	}
-      else
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  {
-	    const double weight = fe_values.JxW(point);
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      {
-		const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  {
-		    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-		    if ((n_components==1) ||
-			(fe.system_to_component_index(i).first ==
-			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (Du * Dv * weight);
-		  }
-	      }
-	  }
-    
-				       // transfer everything into the
-				       // global object. lock the
-				       // matrix meanwhile
-      Threads::ThreadMutex::ScopedLock lock (mutex);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if ((n_components==1) ||
-	      (fe.system_to_component_index(i).first ==
-	       fe.system_to_component_index(j).first))
-	    matrix.add (dof_indices[i], dof_indices[j],
-			cell_matrix(i,j));
-    }
+  WorkStream::run (dof.begin_active(),
+		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+		   std_cxx1x::bind (&internal::MatrixCreator::
+				    copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+				    _1, &matrix, (Vector<double>*)0),
+		   assembler_data,
+		   copy_data);
 }
 
 
@@ -2075,7 +1847,7 @@ void MatrixCreator::create_laplace_matrix (const DoFHandler<dim,spacedim>    &do
 					   const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof, q, matrix, coefficient);
+  create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
 }
 
 
@@ -2094,176 +1866,25 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &m
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
-
-				   // define starting and end point
-				   // for each thread
-  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
-  
-				   // then assemble in parallel
-  typedef void (*create_laplace_matrix_2_t) (const Mapping<dim, spacedim>       &mapping,
-					     const DoFHandler<dim,spacedim>    &dof,
-					     const Quadrature<dim>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<spacedim>      &rhs,
-					     Vector<double>           &rhs_vector,
-					     const Function<spacedim> * const coefficient,
-					     const IteratorRange<DoFHandler<dim,spacedim> >  range,
-					     Threads::ThreadMutex     &mutex);
-  create_laplace_matrix_2_t p = &MatrixCreator::template create_laplace_matrix_2<dim>;
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix, rhs,
-                                  rhs_vector, coefficient,
-                                  thread_ranges[thread], mutex);
-  threads.join_all ();  
-}
-
-
-
-template <int dim, int spacedim>
-void
-MatrixCreator::create_laplace_matrix_2 (const Mapping<dim, spacedim>       &mapping,
-					const DoFHandler<dim,spacedim>    &dof,
-					const Quadrature<dim>    &q,
-					SparseMatrix<double>     &matrix,
-					const Function<spacedim>      &rhs,
-					Vector<double>           &rhs_vector,
-					const Function<spacedim> * const coefficient,
-					const IteratorRange<DoFHandler<dim,spacedim> >  range,
-					Threads::ThreadMutex     &mutex)
-{
-  UpdateFlags update_flags = UpdateFlags(update_values    |
-					 update_gradients |
-					 update_quadrature_points  |
-					 update_JxW_values);
-  if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_quadrature_points);
-
-  FEValues<dim,spacedim> fe_values (mapping, dof.get_fe(), q, update_flags);
-    
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
-  const unsigned int n_components  = fe.n_components();
-
-  Assert(coefficient == 0 ||
-	 coefficient->n_components==1 ||
-	 coefficient->n_components==n_components, ExcComponentMismatch());
-
-  FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>      local_rhs (dofs_per_cell);
-  std::vector<double> rhs_values (fe_values.n_quadrature_points);
-  std::vector<double> coefficient_values (n_q_points);
-  std::vector<Vector<double> > coefficient_vector_values (n_q_points,
-							  Vector<double> (n_components));
-  
-  std::vector<unsigned int> dof_indices (dofs_per_cell);
-  
-  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    {
-      fe_values.reinit (cell);
-      
-      cell_matrix = 0;
-      local_rhs = 0;
-      cell->get_dof_indices (dof_indices);
-      
-      rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
-      
-      if (coefficient != 0)
-	{
-	  if (coefficient->n_components==1)
-	    {
-	      coefficient->value_list (fe_values.get_quadrature_points(),
-				       coefficient_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		      {
-			const double v = fe_values.shape_value(i,point);
-			const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-			for (unsigned int j=0; j<dofs_per_cell; ++j)
-			  {
-			    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-			    if ((n_components==1) ||
-				(fe.system_to_component_index(i).first ==
-				 fe.system_to_component_index(j).first))
-			      cell_matrix(i,j) += (Du * Dv * weight *
-						   coefficient_values[point]);
-			  }
-			local_rhs(i) += v * rhs_values[point] * weight;  
-		      }
-		  }
-	    }
-	  else
-	    {
-	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					      coefficient_vector_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		      {
-			const double v = fe_values.shape_value(i,point);
-			const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-			const unsigned int component_i=
-			  fe.system_to_component_index(i).first;		    
-			for (unsigned int j=0; j<dofs_per_cell; ++j)
-			  {
-			    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-			    if ((n_components==1) ||
-				(fe.system_to_component_index(j).first == component_i))
-			      cell_matrix(i,j) += (Du * Dv * weight *
-						   coefficient_vector_values[point](component_i));
-			  }
-			local_rhs(i) += v * rhs_values[point] * weight;
-		      }
-		  }
-	    }
-	}
-      else
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  {
-	    const double weight = fe_values.JxW(point);
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      {
-		const double v = fe_values.shape_value(i,point);
-		const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  {
-		    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-		    if ((n_components==1) ||
-			(fe.system_to_component_index(i).first ==
-			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (Du * Dv * weight);
-		  }
-		local_rhs(i) += v * rhs_values[point] * weight;
-	      }
-	  }
-
-				       // transfer everything into the
-				       // global object. lock the
-				       // matrix meanwhile
-      Threads::ThreadMutex::ScopedLock lock (mutex);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if ((n_components==1) ||
-	      (fe.system_to_component_index(i).first ==
-	       fe.system_to_component_index(j).first))
-	    matrix.add (dof_indices[i], dof_indices[j],
-			cell_matrix(i,j));
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	rhs_vector(dof_indices[i]) += local_rhs(i);
-    };
+  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
+    assembler_data (dof.get_fe(),
+		    update_gradients  | update_values |
+		    update_JxW_values | update_quadrature_points,
+		    coefficient, &rhs,
+		    q, mapping);
+  internal::MatrixCreator::AssemblerData::CopyData copy_data;
+  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+			 assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+  WorkStream::run (dof.begin_active(),
+		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+		   std_cxx1x::bind (&internal::MatrixCreator::
+				    copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+				    _1, &matrix, &rhs_vector),
+		   assembler_data,
+		   copy_data);
 }
 
 
@@ -2277,7 +1898,7 @@ void MatrixCreator::create_laplace_matrix (const DoFHandler<dim,spacedim>    &do
 					   const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof, q,
+  create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
 			matrix, rhs, rhs_vector, coefficient);
 }
 
@@ -2295,164 +1916,26 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,space
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
+  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
+    assembler_data (dof.get_fe(),
+		    update_gradients  | update_JxW_values |
+		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
+		    coefficient, /*rhs_function=*/0,
+		    q, mapping);
+  internal::MatrixCreator::AssemblerData::CopyData copy_data;
+  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+			 assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());  
 
-				   // define starting and end point
-				   // for each thread
-  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
-  
-				   // then assemble in parallel
-  typedef void (*create_laplace_matrix_1_t) (const hp::MappingCollection<dim,spacedim>       &mapping,
-					     const hp::DoFHandler<dim,spacedim>    &dof,
-					     const hp::QCollection<dim>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<spacedim> * const coefficient,
-					     const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-					     Threads::ThreadMutex     &mutex);
-  create_laplace_matrix_1_t p = &MatrixCreator::template create_laplace_matrix_1<dim>;
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix, coefficient,
-                                  thread_ranges[thread], mutex);
-  threads.join_all ();  
-}
-
-
-
-template <int dim, int spacedim>
-void
-MatrixCreator::create_laplace_matrix_1 (const hp::MappingCollection<dim,spacedim>       &mapping,
-					const hp::DoFHandler<dim,spacedim>    &dof,
-					const hp::QCollection<dim>    &q,
-					SparseMatrix<double>     &matrix,
-					const Function<spacedim> * const coefficient,
-					const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-					Threads::ThreadMutex     &mutex)
-{
-  UpdateFlags update_flags = UpdateFlags(update_gradients |
-					 update_JxW_values);
-  if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_quadrature_points);
-
-  hp::FEValues<dim,spacedim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
-    
-  const unsigned int n_components  = dof.get_fe().n_components();
-
-  Assert(coefficient == 0 ||
-	 coefficient->n_components==1 ||
-	 coefficient->n_components==n_components, ExcComponentMismatch());
-
-  FullMatrix<double>  cell_matrix;
-  std::vector<double> coefficient_values;
-  std::vector<Vector<double> > coefficient_vector_values;
-  
-  std::vector<unsigned int> dof_indices;
-  
-  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    {
-      x_fe_values.reinit (cell);
-      const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
-
-      const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-			 n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
-
-      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
-      coefficient_values.resize (n_q_points);
-      coefficient_vector_values.resize (n_q_points,
-					Vector<double> (n_components));
-      dof_indices.resize (dofs_per_cell);
-
-      
-      cell_matrix = 0;
-      cell->get_dof_indices (dof_indices);
-      
-      if (coefficient != 0)
-	{
-	  if (coefficient->n_components==1)
-	    {
-	      coefficient->value_list (fe_values.get_quadrature_points(),
-				       coefficient_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		      {
-			const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-			for (unsigned int j=0; j<dofs_per_cell; ++j)
-			  {
-			    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-			    if ((n_components==1) ||
-				(fe.system_to_component_index(i).first ==
-				 fe.system_to_component_index(j).first))
-			      cell_matrix(i,j) += (Du * Dv * weight *
-						   coefficient_values[point]);
-			  }
-		      }
-		  }
-	    }
-	  else
-	    {
-	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					      coefficient_vector_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		      {
-			const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-			const unsigned int component_i=
-			  fe.system_to_component_index(i).first;		    
-			for (unsigned int j=0; j<dofs_per_cell; ++j)
-			  {
-			    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-			    if ((n_components==1) ||
-				(fe.system_to_component_index(j).first == component_i))
-			      cell_matrix(i,j) += (Du * Dv * weight *
-						   coefficient_vector_values[point](component_i));
-			  }
-		      }
-		  }
-	    }
-	}
-      else
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  {
-	    const double weight = fe_values.JxW(point);
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      {
-		const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  {
-		    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-		    if ((n_components==1) ||
-			(fe.system_to_component_index(i).first ==
-			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (Du * Dv * weight);
-		  }
-	      }
-	  }
-
-				       // transfer everything into the
-				       // global object. lock the
-				       // matrix meanwhile
-      Threads::ThreadMutex::ScopedLock lock (mutex);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if ((n_components==1) ||
-	      (fe.system_to_component_index(i).first ==
-	       fe.system_to_component_index(j).first))
-	    matrix.add (dof_indices[i], dof_indices[j],
-			cell_matrix(i,j));
-    }
+  WorkStream::run (dof.begin_active(),
+		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+		   std_cxx1x::bind (&internal::MatrixCreator::
+				    copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+				    _1, &matrix, (Vector<double>*)0),
+		   assembler_data,
+		   copy_data);
 }
 
 
@@ -2464,7 +1947,7 @@ void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim,spacedim>   
 					   const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_laplace_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q, matrix, coefficient);
+  create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
 }
 
 
@@ -2483,186 +1966,26 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,space
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
-
-				   // define starting and end point
-				   // for each thread
-  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
+  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
+    assembler_data (dof.get_fe(),
+		    update_gradients  | update_values |
+		    update_JxW_values | update_quadrature_points,
+		    coefficient, &rhs,
+		    q, mapping);
+  internal::MatrixCreator::AssemblerData::CopyData copy_data;
+  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+			 assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
   
-				   // then assemble in parallel
-  typedef void (*create_laplace_matrix_2_t) (const hp::MappingCollection<dim,spacedim>       &mapping,
-					     const hp::DoFHandler<dim,spacedim>    &dof,
-					     const hp::QCollection<dim>    &q,
-					     SparseMatrix<double>     &matrix,
-					     const Function<spacedim>      &rhs,
-					     Vector<double>           &rhs_vector,
-					     const Function<spacedim> * const coefficient,
-					     const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-					     Threads::ThreadMutex     &mutex);
-  create_laplace_matrix_2_t p = &MatrixCreator::template create_laplace_matrix_2<dim>;
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix, rhs,
-                                  rhs_vector, coefficient,
-                                  thread_ranges[thread], mutex);
-  threads.join_all ();  
-}
-
-
-
-template <int dim, int spacedim>
-void
-MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim,spacedim>       &mapping,
-					const hp::DoFHandler<dim,spacedim>    &dof,
-					const hp::QCollection<dim>    &q,
-					SparseMatrix<double>     &matrix,
-					const Function<spacedim>      &rhs,
-					Vector<double>           &rhs_vector,
-					const Function<spacedim> * const coefficient,
-					const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-					Threads::ThreadMutex     &mutex)
-{
-  UpdateFlags update_flags = UpdateFlags(update_values    |
-					 update_gradients |
-					 update_quadrature_points  |
-					 update_JxW_values);
-  if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_quadrature_points);
-
-  hp::FEValues<dim,spacedim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
-    
-  const unsigned int n_components  = dof.get_fe().n_components();
-
-  Assert(coefficient == 0 ||
-	 coefficient->n_components==1 ||
-	 coefficient->n_components==n_components, ExcComponentMismatch());
-
-  FullMatrix<double>  cell_matrix;
-  Vector<double>      local_rhs;
-  std::vector<double> rhs_values;
-  std::vector<double> coefficient_values;
-  std::vector<Vector<double> > coefficient_vector_values;
-  
-  std::vector<unsigned int> dof_indices;
-  
-  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    {
-      x_fe_values.reinit (cell);
-      const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
-
-      const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-			 n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
-
-      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
-      local_rhs.reinit (dofs_per_cell);
-      rhs_values.resize (fe_values.n_quadrature_points);
-      coefficient_values.resize (n_q_points);
-      coefficient_vector_values.resize (n_q_points,
-					Vector<double> (n_components));
-      dof_indices.resize (dofs_per_cell);
-
-      
-      cell_matrix = 0;
-      local_rhs = 0;
-      cell->get_dof_indices (dof_indices);
-      
-      rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
-      
-      if (coefficient != 0)
-	{
-	  if (coefficient->n_components==1)
-	    {
-	      coefficient->value_list (fe_values.get_quadrature_points(),
-				       coefficient_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		      {
-			const double v = fe_values.shape_value(i,point);
-			const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-			for (unsigned int j=0; j<dofs_per_cell; ++j)
-			  {
-			    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-			    if ((n_components==1) ||
-				(fe.system_to_component_index(i).first ==
-				 fe.system_to_component_index(j).first))
-			      cell_matrix(i,j) += (Du * Dv * weight *
-						   coefficient_values[point]);
-			  }
-			local_rhs(i) += v * rhs_values[point] * weight;
-		      }
-		  }
-	    }
-	  else
-	    {
-	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-					      coefficient_vector_values);
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		      {
-			const double v = fe_values.shape_value(i,point);
-			const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-			const unsigned int component_i=
-			  fe.system_to_component_index(i).first;		    
-			for (unsigned int j=0; j<dofs_per_cell; ++j)
-			  {
-			    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-			    if ((n_components==1) ||
-				(fe.system_to_component_index(j).first == component_i))
-			      cell_matrix(i,j) += (Du * Dv * weight *
-						   coefficient_vector_values[point](component_i));
-			  }
-			local_rhs(i) += v * rhs_values[point] * weight;
-		      }
-		  }
-	    }
-	}
-      else
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  {
-	    const double weight = fe_values.JxW(point);
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      {
-		const double v = fe_values.shape_value(i,point);
-		const Tensor<1,dim>& Dv = fe_values.shape_grad(i,point);
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  {
-		    const Tensor<1,dim>& Du = fe_values.shape_grad(j,point);
-		    if ((n_components==1) ||
-			(fe.system_to_component_index(i).first ==
-			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (Du * Dv * weight);
-		  }
-		local_rhs(i) += v * rhs_values[point] * weight;
-	      }
-	  }
-
-				       // transfer everything into the
-				       // global object. lock the
-				       // matrix meanwhile
-      Threads::ThreadMutex::ScopedLock lock (mutex);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if ((n_components==1) ||
-	      (fe.system_to_component_index(i).first ==
-	       fe.system_to_component_index(j).first))
-	    matrix.add (dof_indices[i], dof_indices[j],
-			cell_matrix(i,j));
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	rhs_vector(dof_indices[i]) += local_rhs(i);
-    }
+  WorkStream::run (dof.begin_active(),
+		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+		   std_cxx1x::bind (&internal::MatrixCreator::
+				    copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+				    _1, &matrix, &rhs_vector),
+		   assembler_data,
+		   copy_data);
 }
 
 
@@ -2676,7 +1999,7 @@ void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim,spacedim>   
 					   const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_laplace_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q,
+  create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
 			matrix, rhs, rhs_vector, coefficient);
 }
 

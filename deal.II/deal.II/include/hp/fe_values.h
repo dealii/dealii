@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -81,7 +81,15 @@ namespace internal
       FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension> &fe_collection,
                       const dealii::hp::QCollection<q_dim> &q_collection,
                       const UpdateFlags         update_flags);
-        
+
+					 /**
+					  * Get a reference to the
+					  * collection of finite
+					  * element objects used here.
+					  */
+	const dealii::hp::FECollection<dim,FEValues::space_dimension> &
+	get_fe_collection () const;
+	
                                          /**
                                           * Return a reference to the @p
                                           * FEValues object selected by the
@@ -1087,6 +1095,16 @@ namespace internal
     FEValuesBase<dim,q_dim,FEValues>::get_present_fe_values () const
     {
       return *fe_values_table(present_fe_values_index);
+    }
+
+
+
+    template <int dim, int q_dim, class FEValues>
+    inline
+    const dealii::hp::FECollection<dim,FEValues::space_dimension> &
+    FEValuesBase<dim,q_dim,FEValues>::get_fe_collection () const
+    {
+      return *fe_collection;
     }
   }
   

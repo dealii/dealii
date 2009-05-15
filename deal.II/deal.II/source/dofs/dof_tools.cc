@@ -3999,7 +3999,7 @@ DoFTools::count_dofs_per_component (
   std::vector<std::vector<bool> >
     component_select (n_components,
                       std::vector<bool>(n_components, false));
-  Threads::ThreadGroup<> threads;
+  Threads::TaskGroup<> tasks;
   for (unsigned int i=0; i<n_components; ++i)
     {
       void (*fun_ptr) (const DoFHandler<dim,spacedim>   &,
@@ -4008,10 +4008,11 @@ DoFTools::count_dofs_per_component (
 		       bool)
         = &DoFTools::template extract_dofs<dim>;
       component_select[i][i] = true;
-      threads += Threads::spawn (fun_ptr)(dof_handler, component_select[i],
-                                          dofs_in_component[i], false);
-    };
-  threads.join_all ();
+      tasks += Threads::new_task (fun_ptr,
+				  dof_handler, component_select[i],
+				  dofs_in_component[i], false);
+    }
+  tasks.join_all ();
 
 				   // next count what we got
   unsigned int component = 0;
@@ -4099,7 +4100,7 @@ DoFTools::count_dofs_per_block (
     dofs_in_block (n_blocks, std::vector<bool>(dof_handler.n_dofs(), false));
   std::vector<std::vector<bool> >
     block_select (n_blocks, std::vector<bool>(n_blocks, false));
-  Threads::ThreadGroup<> threads;
+  Threads::TaskGroup<> tasks;
   for (unsigned int i=0; i<n_blocks; ++i)
     {
       void (*fun_ptr) (const DoFHandler<dim,spacedim>   &,
@@ -4108,10 +4109,11 @@ DoFTools::count_dofs_per_block (
 		       bool)
         = &DoFTools::template extract_dofs<dim>;
       block_select[i][i] = true;
-      threads += Threads::spawn (fun_ptr)(dof_handler, block_select[i],
-                                          dofs_in_block[i], true);
+      tasks += Threads::new_task (fun_ptr,
+				  dof_handler, block_select[i],
+				  dofs_in_block[i], true);
     };
-  threads.join_all ();
+  tasks.join_all ();
 
 				   // next count what we got
   for (unsigned int block=0;block<fe.n_blocks();++block)
@@ -4244,8 +4246,9 @@ namespace internal
 				       // degree of freedom of the
 				       // coarse-grid variable in the
 				       // fine-grid element
-      std::vector<Vector<double> > parameter_dofs (coarse_dofs_per_cell_component,
-						   Vector<double>(fine_dofs_per_cell));
+      std::vector<dealii::Vector<double> >
+	parameter_dofs (coarse_dofs_per_cell_component,
+			dealii::Vector<double>(fine_dofs_per_cell));
 				       // for each coarse dof: find its
 				       // position within the fine element
 				       // and set this value to one in the
@@ -4399,7 +4402,7 @@ namespace internal
       const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
       const unsigned int                  coarse_component,
       const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-      const std::vector<Vector<double> > &parameter_dofs,
+      const std::vector<dealii::Vector<double> > &parameter_dofs,
       const std::vector<int>             &weight_mapping,
       std::vector<std::map<unsigned int, float> > &weights,
       const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &begin,
@@ -4479,7 +4482,7 @@ namespace internal
 				       // coarse grid (for the selected fe)
 				       // on the fine grid
       const unsigned int n_fine_dofs = weight_mapping.size();
-      Vector<double> global_parameter_representation (n_fine_dofs);
+      dealii::Vector<double> global_parameter_representation (n_fine_dofs);
   
       typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator cell;
       std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
@@ -4590,7 +4593,7 @@ namespace internal
       const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
       const unsigned int                  coarse_component,
       const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-      const std::vector<Vector<double> > &parameter_dofs,
+      const std::vector<dealii::Vector<double> > &parameter_dofs,
       const std::vector<int>             &weight_mapping,
       std::vector<std::map<unsigned int,float> > &weights)
     {
@@ -4602,25 +4605,27 @@ namespace internal
 								     coarse_grid.end(),
 								     multithread_info.n_default_threads);
 
-      Threads::ThreadGroup<> threads;
+//TODO: use WorkStream here      
+      Threads::TaskGroup<> tasks;
       void (*fun_ptr) (const dealii::DoFHandler<dim,spacedim>              &,
 		       const unsigned int                  ,
 		       const InterGridMap<dealii::DoFHandler<dim,spacedim> > &,
-		       const std::vector<Vector<double> > &,
+		       const std::vector<dealii::Vector<double> > &,
 		       const std::vector<int>             &,
 		       std::vector<std::map<unsigned int, float> > &,
 		       const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &,
 		       const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &)
 	= &compute_intergrid_weights_3<dim>;
       for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
-	threads += Threads::spawn (fun_ptr)(coarse_grid, coarse_component,
-					    coarse_to_fine_grid_map, parameter_dofs,
-					    weight_mapping, weights,
-					    cell_intervals[i].first,
-					    cell_intervals[i].second);
+	tasks += Threads::new_task (fun_ptr,
+				    coarse_grid, coarse_component,
+				    coarse_to_fine_grid_map, parameter_dofs,
+				    weight_mapping, weights,
+				    cell_intervals[i].first,
+				    cell_intervals[i].second);
 
-				       // wait for the threads to finish
-      threads.join_all ();
+				       // wait for the tasks to finish
+      tasks.join_all ();
     }
   }
 }

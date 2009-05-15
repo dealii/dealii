@@ -1134,13 +1134,15 @@ namespace LaplaceSolver
   }
   
 
-				   // The following function assembles
-				   // matrix and right hand side of
-				   // the linear system to be solved
-				   // in each step. It goes along the
-				   // same lines as used in previous
+				   // The following function assembles matrix
+				   // and right hand side of the linear system
+				   // to be solved in each step. It goes along
+				   // the same lines as used in previous
 				   // examples, so we explain it only
-				   // briefly:
+				   // briefly. Note that we do a number of
+				   // things in parallel, a process described
+				   // in more detail in the @ref threads
+				   // module.
   template <int dim>
   void
   Solver<dim>::assemble_linear_system (LinearSystem &linear_system)
@@ -1183,13 +1185,14 @@ namespace LaplaceSolver
     Threads::ThreadMutex mutex;
     Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
-                 (linear_system,
-                  thread_ranges[thread].first,
-                  thread_ranges[thread].second,
-                  mutex);
+      threads += Threads::new_thread (&Solver<dim>::assemble_matrix,
+				      *this,
+				      linear_system,
+				      thread_ranges[thread].first,
+				      thread_ranges[thread].second,
+				      mutex);
 
-				     // While the spawned threads
+				     // While the new threads
 				     // assemble the system matrix, we
 				     // can already compute the right
 				     // hand side vector in the main
@@ -1199,8 +1202,8 @@ namespace LaplaceSolver
     assemble_rhs (linear_system.rhs);
     linear_system.hanging_node_constraints.condense (linear_system.rhs);
 
-				     // And while we're already at it
-				     // to compute things in parallel,
+				     // And while we're already
+				     // computing things in parallel,
 				     // interpolating boundary values
 				     // is one more thing that can be
 				     // done independently, so we do
@@ -1389,7 +1392,7 @@ namespace LaplaceSolver
 				   // concurrency, at least;
 				   // otherwise, the actions are
 				   // performed sequentially). Note
-				   // that we spawn only one thread,
+				   // that we start only one thread,
 				   // and do the second action in the
 				   // main thread. Since only one
 				   // thread is generated, we don't
@@ -1446,8 +1449,9 @@ namespace LaplaceSolver
       = &DoFTools::make_hanging_node_constraints;
     
     Threads::Thread<>
-      mhnc_thread = Threads::spawn (mhnc_p)(dof_handler,
-                                            hanging_node_constraints);
+      mhnc_thread = Threads::new_thread (mhnc_p,
+					 dof_handler,
+					 hanging_node_constraints);
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
 			     dof_handler.n_dofs(),

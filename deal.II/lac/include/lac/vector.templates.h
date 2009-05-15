@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 
 #include <base/template_constraints.h>
 #include <base/numbers.h>
+#include <base/parallel.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 
@@ -27,6 +28,8 @@
 #ifdef DEAL_II_USE_TRILINOS
 #  include <lac/trilinos_vector.h>
 #endif
+
+#include <boost/lambda/lambda.hpp>
 
 #include <cmath>
 #include <cstring>
@@ -411,8 +414,12 @@ Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] -= v.val[i];
+  parallel::transform (val,
+		       val+vec_size,
+		       v.val,
+		       val,
+		       (boost::lambda::_1 - boost::lambda::_2),
+		       internal::Vector::minimum_parallel_grain_size);
 
   return *this;
 }
@@ -423,8 +430,11 @@ void Vector<Number>::add (const Number v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] += v;
+  parallel::transform (val,
+		       val+vec_size,
+		       val,
+		       (boost::lambda::_1 + v),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -434,8 +444,12 @@ void Vector<Number>::add (const Vector<Number>& v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] += v.val[i];
+  parallel::transform (val,
+		       val+vec_size,
+		       v.val,
+		       val,
+		       (boost::lambda::_1 + boost::lambda::_2),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -452,8 +466,13 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] += a*v.val[i] + b*w.val[i];
+  parallel::transform (val,
+		       val+vec_size,
+		       v.val,
+		       w.val,
+		       val,
+		       (boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -467,8 +486,12 @@ void Vector<Number>::sadd (const Number x,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] = x*val[i] + v.val[i];
+  parallel::transform (val,
+		       val+vec_size,
+		       v.val,
+		       val,
+		       (x*boost::lambda::_1 + boost::lambda::_2),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -489,8 +512,13 @@ void Vector<Number>::sadd (const Number x, const Number a,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] = x*val[i] + a*v.val[i] + b*w.val[i];
+  parallel::transform (val,
+		       val+vec_size,
+		       v.val,
+		       w.val,
+		       val,
+		       (x*boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 

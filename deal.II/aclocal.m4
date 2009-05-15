@@ -644,6 +644,11 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
       dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary
       dnl warnings. However, newer gccs on that platform do not have 
       dnl this flag any more, so check whether we can indeed do this
+      dnl
+      dnl Also, the TBB tries to determine whether the system is
+      dnl 64-bit enabled and if so, it builds the object files in 64bit.
+      dnl In order to be able to link with these files, we then have to
+      dnl link with -m64 as well
       *apple-darwin*)
         OLD_CXXFLAGS="$CXXFLAGS"
         CXXFLAGS=-Wno-long-double
@@ -658,6 +663,13 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           [
             AC_MSG_RESULT(no)
           ])
+
+        if test "`/usr/sbin/sysctl -n hw.optional.x86_64`" = "1" ; then
+          CXXFLAGS="$CXXFLAGS -m64"
+          CXXFLAGSG="$CXXFLAGSG -m64"
+          CXXFLAGSO="$CXXFLAGSO -m64"
+          LDFLAGS="$LDFLAGS -m64"
+        fi
 
         CXXFLAGS="${OLD_CXXFLAGS}"
         ;;
@@ -1516,6 +1528,16 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
         CFLAGSPIC=
         ;;
 
+      *apple-darwin*)
+        dnl The TBB tries to determine whether the system is
+        dnl 64-bit enabled and if so, it builds the object files in 64bit.
+        dnl In order to be able to link with these files, we then have to
+        dnl link with -m64 as well
+        if test "`/usr/sbin/sysctl -n hw.optional.x86_64`" = "1" ; then
+          CFLAGS="$CFLAGS -m64"
+        fi
+        ;;
+
       *)
 	CFLAGSPIC="-fPIC"
 	;;
@@ -2082,28 +2104,8 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Test whether multithreading support is requested. This
-dnl does not tell deal.II to actually use it, but the
-dnl compiler flags can be set to allow for it. If the user specified
-dnl --enable-multithreading, then set $enablemultithreading=yes,
-dnl otherwise $enablemultithreading=no.
+dnl Test whether multithreading support is requested.
 dnl
-dnl Usage:
-dnl   DEAL_II_CHECK_MULTITHREADING
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
-[
-  AC_ARG_ENABLE(multithreading,
-  [  --enable-multithreading Set compiler flags to allow for multithreaded
-                          programs],
-    enablemultithreading="$enableval",
-    enablemultithreading=no)
-])
-
-
-
-dnl -------------------------------------------------------------
 dnl If multithreading support is requested, figure out the right
 dnl compiler flags to use:
 dnl - Use the right -threads/-pthread/-mthread option
@@ -2121,12 +2123,38 @@ dnl better to put the flags into the command line, since then we have them
 dnl defined for all include files.
 dnl
 dnl Usage:
-dnl   DEAL_II_SET_MULTITHREADING_FLAGS
+dnl   DEAL_II_CHECK_MULTITHREADING
 dnl
 dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
+AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 [
-  if test "$enablemultithreading" = yes ; then
+  AC_ARG_ENABLE(threads,
+    [  --enable-threads  Use multiple threads inside deal.II],
+    [
+      enablethreads="$enableval"
+    ],
+    [
+      dnl Set default to yes unless on cygwin where the TBB is
+      dnl currently not yet ported to
+      case "$target" in
+        *cygwin* )
+          enablethreads=no
+	  ;;
+
+	* )
+          enablethreads=yes
+          ;;
+      esac
+    ])
+
+  if test "$enablethreads" = yes ; then
+    dnl On cygwin, the TBB does not compile. Error out.
+    case "$target" in
+      *cygwin* )
+        AC_MSG_ERROR(Multithreading is not supported on CygWin)
+        ;;
+    esac
+
     if test "$GXX" = yes ; then
       DEAL_II_GET_THREAD_FLAGS
       DEAL_II_THREAD_CPPFLAGS
@@ -2166,7 +2194,27 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
 	    ;;
       esac
     fi
+
+    DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS
+    AC_DEFINE(DEAL_II_USE_MT_POSIX, 1,
+              [Defined if multi-threading is to be achieved by using
+               the POSIX functions])
+
+    dnl In any case, we need to link with libdl since the Threading 
+    dnl Building Blocks require this
+    LDFLAGS="$LDFLAGS -ldl"
   fi
+
+  if test "x$enablethreads" != "xno" ; then
+    DEAL_II_USE_MT_VAL=1
+  else
+    DEAL_II_USE_MT_VAL=0
+  fi
+
+  AC_DEFINE_UNQUOTED(DEAL_II_USE_MT, $DEAL_II_USE_MT_VAL, 
+                     [Flag indicating whether the library shall be
+                      compiled for multithreaded applications. If so,
+		      then it is set to one, otherwise to zero.])
 ])
 
 
@@ -2188,7 +2236,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_PARTLY_BRACKETED_INITIALIZER, dnl
 [
-  if test "$enablemultithreading" = yes ; then
+  if test "$enablethreads" = yes ; then
     case "$GXX_VERSION" in
       gcc*)
   	AC_MSG_CHECKING(for only partly bracketed mutex initializer)
@@ -2212,55 +2260,6 @@ AC_DEFUN(DEAL_II_CHECK_PARTLY_BRACKETED_INITIALIZER, dnl
         ;;
     esac
   fi
-])
-
-
-
-dnl -------------------------------------------------------------
-dnl Test which library the MT code shall use to support threads.
-dnl We used to support either POSIX or ACE, but support for ACE
-dnl has now been deleted and we only use POSIX these days. However,
-dnl the code to pass another name than "posix" remains here in 
-dnl case someone wants to hook in support for other thread
-dnl implementations
-dnl
-dnl Usage:
-dnl   DEAL_II_CHECK_USE_MT
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_USE_MT, dnl
-[
-  AC_ARG_WITH(multithreading,
-  [  --with-multithreading=name  
-                          If name==posix, or no name given, then use POSIX 
-		          threads.],
-      withmultithreading="$withval",
-      withmultithreading=no)
-
-dnl Default (i.e. no arg) means POSIX
-  if test "x$withmultithreading" = "xyes" ; then
-    withmultithreading=posix
-  fi
-
-  if test "x$withmultithreading" != "xno" ; then
-    if test "x$withmultithreading" = "xposix" ; then
-      DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS
-      AC_DEFINE(DEAL_II_USE_MT_POSIX, 1,
-                [Defined if multi-threading is to be achieved by using
-                 the POSIX functions])
-    else
-      AC_MSG_ERROR(Invalid flag for --with-multithreading)
-    fi
-  
-    DEAL_II_USE_MT_VAL=1
-  else
-    DEAL_II_USE_MT_VAL=0
-  fi
-
-  AC_DEFINE_UNQUOTED(DEAL_II_USE_MT, $DEAL_II_USE_MT_VAL, 
-                     [Flag indicating whether the library shall be
-                      compiled for multithreaded applications. If so,
-		      then it is set to one, otherwise to zero.])
 ])
 
 
@@ -4233,6 +4232,48 @@ AC_DEFUN(DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG, dnl
     ],
     [
       AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Some older versions of gcc deduce pointers to const functions in
+dnl template contexts to pointer-to-function of const objects.
+dnl This is not correct
+dnl 
+dnl Check for this misfeature.
+dnl 
+dnl Usage: DEAL_II_CHECK_CONST_MEMBER_DEDUCTION_BUG
+dnl 
+dnl --------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_CONST_MEMBER_DEDUCTION_BUG, dnl
+[
+  AC_MSG_CHECKING(for const member deduction bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      template <typename T> struct identity { typedef T type; };
+
+      template <typename C> void new_thread (void (C::*fun_ptr)(),
+				       typename identity<C>::type &c);
+      template <typename C> void new_thread (void (C::*fun_ptr)() const,
+				       const typename identity<C>::type &c);
+      struct X { void f() const; };
+    ],
+    [
+      X x;
+      new_thread (&X::f, x);
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(DEAL_II_CONST_MEMBER_DEDUCTION_BUG, 1, 
+                     [Defined if the compiler has a bug in deducing
+		      the type of pointers to const member functions.])
     ])
 ])
 

@@ -454,12 +454,13 @@
 
     <li>
       <p>
-      <code>--enable-multithreading --with-multithreading</code>: The
-      first of these flags instructs the compiler to generate code
-      that can be run from multiple threads. The second switches on
-      code in the library that actually creates multiple threads for
-      some tasks, making programs significantly faster on machines
-      with multiple cores or processors.
+      <code>--enable-threads</code>: This flag indicates that those
+      parts of the library that support this compute in parallel,
+      using multiple threads, making programs significantly faster on
+      machines with multiple cores or processors. The default is to
+      use multiple threads since most machines today have several
+      processor cores. If this is not desired,
+      use <code>--disable-threads</code>.
 
     <li>
       <p>

@@ -76,6 +76,10 @@
 /* Defined if the compiler supports including <mpi.h> */
 #undef DEAL_II_COMPILER_SUPPORTS_MPI
 
+/* Defined if the compiler has a bug in deducing the type of pointers to const
+   member functions. */
+#undef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+
 /* disable the function parser in contrib */
 #undef DEAL_II_DISABLE_PARSER
 

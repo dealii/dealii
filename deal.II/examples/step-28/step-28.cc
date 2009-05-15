@@ -1551,10 +1551,12 @@ EnergyGroup<dim>::output_results (const unsigned int cycle) const
                                  // doing all the rest. In several
                                  // places, we have to do something
                                  // for all energy groups, in which
-                                 // case we will spawn threads for
+                                 // case we will start threads for
                                  // each group to let these things run
                                  // in parallel if deal.II was
                                  // configured for multithreading.
+				 // For strategies of parallelization,
+				 // take a look at the @ref threads module.
                                  //
                                  // The biggest difference to previous
                                  // example programs is that we also
@@ -2025,30 +2027,27 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
                                  // iteration. The total power then is
                                  // used to renew k-effective.
 				 //
-				 // Since the total fission source is
-				 // a sum over all the energy groups,
-				 // and since each of these sums can
-				 // be computed independently, we
-				 // actually do this in parallel. One
-				 // of the problems is that the
-				 // function in the
-				 // <code>EnergyGroup</code> class
-				 // that computes the fission source
-				 // returns a value. If we now simply
-				 // spin off a new thread, we have to
-				 // later capture the return value of
-				 // the function run on that
-				 // thread. The way this can be done
-				 // is to use the return value of the
-				 // Threads::spawn function, which is
-				 // of type Threads::Thread@<double@>
-				 // if the function spawned returns a
-				 // double. We can the later ask this
-				 // object for the returned value
+				 // Since the total fission source is a sum
+				 // over all the energy groups, and since each
+				 // of these sums can be computed
+				 // independently, we actually do this in
+				 // parallel. One of the problems is that the
+				 // function in the <code>EnergyGroup</code>
+				 // class that computes the fission source
+				 // returns a value. If we now simply spin off
+				 // a new thread, we have to later capture the
+				 // return value of the function run on that
+				 // thread. The way this can be done is to use
+				 // the return value of the
+				 // Threads::new_thread function, which
+				 // returns an object of type
+				 // Threads::Thread@<double@> if the function
+				 // spawned returns a double. We can then later
+				 // ask this object for the returned value
 				 // (when doing so, the
 				 // Threads::Thread@<double@>::return_value
-				 // function first waits for the
-				 // thread to finish).
+				 // function first waits for the thread to
+				 // finish if it hasn't done so already).
 				 //
 				 // The way this function then works
 				 // is to first spawn one thread for
@@ -2061,8 +2060,8 @@ double NeutronDiffusionProblem<dim>::get_total_fission_source () const
 {
   std::vector<Threads::Thread<double> > threads;
   for (unsigned int group=0; group<parameters.n_groups; ++group)
-    threads.push_back (Threads::spawn (*energy_groups[group],
-				       &EnergyGroup<dim>::get_fission_source) ());
+    threads.push_back (Threads::new_thread (&EnergyGroup<dim>::get_fission_source,
+					    *energy_groups[group]));
   
   double fission_source = 0;
   for (unsigned int group=0; group<parameters.n_groups; ++group)
@@ -2103,8 +2102,9 @@ void NeutronDiffusionProblem<dim>::refine_grid ()
   {  
     Threads::ThreadGroup<> threads;
     for (unsigned int group=0; group<parameters.n_groups; ++group)
-      threads += Threads::spawn (*energy_groups[group], &EnergyGroup<dim>::estimate_errors)
-		 (group_error_indicators.block(group));
+      threads += Threads::new_thread (&EnergyGroup<dim>::estimate_errors,
+				      *energy_groups[group],
+				      group_error_indicators.block(group));
     threads.join_all ();
   }
   
@@ -2115,10 +2115,11 @@ void NeutronDiffusionProblem<dim>::refine_grid ()
   {  
     Threads::ThreadGroup<> threads;
     for (unsigned int group=0; group<parameters.n_groups; ++group)
-      threads += Threads::spawn (*energy_groups[group], &EnergyGroup<dim>::refine_grid)
-		 (group_error_indicators.block(group),
-		  refine_threshold,
-		  coarsen_threshold);
+      threads += Threads::new_thread (&EnergyGroup<dim>::refine_grid,
+				      *energy_groups[group], 
+				      group_error_indicators.block(group),
+				      refine_threshold,
+				      coarsen_threshold);
     threads.join_all ();
   }
 }
@@ -2176,9 +2177,9 @@ void NeutronDiffusionProblem<dim>::run ()
       
       Threads::ThreadGroup<> threads;
       for (unsigned int group=0; group<parameters.n_groups; ++group)
-	threads += Threads::spawn
-		   (*energy_groups[group], &EnergyGroup<dim>::assemble_system_matrix)
-		   ();
+	threads += Threads::new_thread
+		   (&EnergyGroup<dim>::assemble_system_matrix,
+		    *energy_groups[group]);
       threads.join_all ();
 
       double error;

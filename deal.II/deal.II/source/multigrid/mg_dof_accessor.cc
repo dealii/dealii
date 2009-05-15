@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -253,12 +253,12 @@ namespace internal
     void
     get_mg_dof_values (const dealii::MGDoFAccessor<1, dim, spacedim> &accessor,
 		       const int level,
-		       const Vector<number> &values,
-		       Vector<number>       &dof_values)
+		       const dealii::Vector<number> &values,
+		       dealii::Vector<number>       &dof_values)
     {
       const unsigned int dofs_per_vertex = accessor.get_dof_handler().get_fe().dofs_per_vertex,
 			 dofs_per_line   = accessor.get_dof_handler().get_fe().dofs_per_line;
-      typename Vector<number>::iterator next_dof_value=dof_values.begin();
+      typename dealii::Vector<number>::iterator next_dof_value=dof_values.begin();
       for (unsigned int vertex=0; vertex<2; ++vertex)
 	for (unsigned int d=0; d<dofs_per_vertex; ++d)
 	  *next_dof_value++ = values(accessor.mg_vertex_dof_index(level,vertex,d));
@@ -300,13 +300,13 @@ namespace internal
     void
     get_mg_dof_values (const dealii::MGDoFAccessor<2, dim, spacedim> &accessor,
 		       const int level,
-		       const Vector<number> &values,
-		       Vector<number>       &dof_values)
+		       const dealii::Vector<number> &values,
+		       dealii::Vector<number>       &dof_values)
     {
       const unsigned int dofs_per_vertex = accessor.get_dof_handler().get_fe().dofs_per_vertex,
 			 dofs_per_line   = accessor.get_dof_handler().get_fe().dofs_per_line,
 			 dofs_per_quad   = accessor.get_dof_handler().get_fe().dofs_per_quad;
-      typename Vector<number>::iterator next_dof_value=dof_values.begin();
+      typename dealii::Vector<number>::iterator next_dof_value=dof_values.begin();
       for (unsigned int vertex=0; vertex<4; ++vertex)
 	for (unsigned int d=0; d<dofs_per_vertex; ++d)
 	  *next_dof_value++ = values(accessor.mg_vertex_dof_index(level,vertex,d));
@@ -353,14 +353,14 @@ namespace internal
     void
     get_mg_dof_values (const dealii::MGDoFAccessor<3, dim, spacedim> &accessor,
 		       const int level,
-		       const Vector<number> &values,
-		       Vector<number>       &dof_values)
+		       const dealii::Vector<number> &values,
+		       dealii::Vector<number>       &dof_values)
     {
       const unsigned int dofs_per_vertex = accessor.get_dof_handler().get_fe().dofs_per_vertex,
 			 dofs_per_line   = accessor.get_dof_handler().get_fe().dofs_per_line,
 			 dofs_per_quad   = accessor.get_dof_handler().get_fe().dofs_per_quad,
 			 dofs_per_hex    = accessor.get_dof_handler().get_fe().dofs_per_hex;
-      typename Vector<number>::iterator next_dof_value=dof_values.begin();
+      typename dealii::Vector<number>::iterator next_dof_value=dof_values.begin();
       for (unsigned int vertex=0; vertex<8; ++vertex)
 	for (unsigned int d=0; d<dofs_per_vertex; ++d)
 	  *next_dof_value++ = values(accessor.mg_vertex_dof_index(level,vertex,d));

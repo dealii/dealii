@@ -49,12 +49,6 @@ go-files = $(go-files-1d) $(go-files-2d) $(go-files-3d)
 # rules how to generate object files from source files. note that
 # there are some files which needs exceptional rules; these are
 # listed immediately below
-ifneq ($(with-multithreading),no)
-  MT = MT
-else
-  MT = ==
-endif
-
 $(LIBDIR)/1d/%.g.$(OBJEXT) :
 	@echo "=====deal.II====1d====debug======$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@

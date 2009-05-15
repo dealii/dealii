@@ -52,16 +52,16 @@ deps: common/scripts/make_dependencies common/scripts/expand_instantiations
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/lib && $(MAKE) $(MAKEOPTIONS) external-links
 
-baseg: deps contrib-functionparser
+baseg: deps contrib
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) libg
 
-baseo: deps contrib-functionparser
+baseo: deps contrib
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) libo
 
-lacg: deps baseg contrib
+lacg: deps baseg
 	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libg
 
-laco: deps baseo contrib
+laco: deps baseo
 	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libo
 
 1dg: deps baseg lacg
@@ -92,7 +92,7 @@ lac: lacg laco
 $(LIBDIR):
 	@mkdir $@
 
-baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib -functionparser : $(LIBDIR) deps
+baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib functionparser : $(LIBDIR) deps
 
 all: debug optimized
 debug: contrib baseg lacg 2dg 1dg 3dg
@@ -214,8 +214,7 @@ build-test:
 	-(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
 	if test -f common/Make.global_options ; then \
 	   grep '^enable-shared' common/Make.global_options | grep = ; \
-	   grep enable-multithreading common/Make.global_options | grep = ; \
-	   grep with-multithreading common/Make.global_options | grep = ; \
+	   grep enable-threads common/Make.global_options | grep = ; \
 	   grep USE_CONTRIB_PETSC common/Make.global_options | grep = ; \
 	   grep USE_CONTRIB_METIS common/Make.global_options | grep = ; \
 	   grep USE_CONTRIB_HSL common/Make.global_options | grep = ; \

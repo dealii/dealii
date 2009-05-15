@@ -250,8 +250,17 @@ namespace Threads
 	  return_values[i].second = end;
       };
     return return_values;
-  }
-  
+  }  
 }   // end namespace Thread
+
+
+
+#if DEAL_II_USE_MT == 1
+/**
+ * A scheduler for tasks. 
+ */
+tbb::task_scheduler_init scheduler;
+#endif
+
 
 DEAL_II_NAMESPACE_CLOSE

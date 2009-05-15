@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -168,7 +168,7 @@ void SwappableVector<number>::alert ()
 				     // data has not been preloaded so
 				     // far, so go on! For this, start
 				     // a detached thread
-    Threads::spawn (*this, &SwappableVector<number>::reload_vector)(true);
+    Threads::new_thread (&SwappableVector<number>::reload_vector, *this, true);
 				   // note that reload_vector also
 				   // releases the lock
 }

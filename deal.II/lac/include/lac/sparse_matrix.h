@@ -30,6 +30,21 @@ template<typename number> class FullMatrix;
  *@{
  */
 
+namespace internal
+{
+  namespace SparseMatrix
+  {
+				     /**
+				      * Like
+				      * internal::Vector::minimum_parallel_grain_size,
+				      * but now denoting the number of rows of
+				      * a matrix that should be worked on as a
+				      * minimum.
+				      */
+    extern unsigned int minimum_parallel_grain_size;
+  }
+}
+
 namespace SparseMatrixIterators
 {
 				   // forward declaration
@@ -2018,75 +2033,6 @@ class SparseMatrix : public virtual Subscriptor
 				      * function.
 				      */
     unsigned int max_len;
-
-				     /**
-				      * Version of vmult() which only
-				      * performs its actions on the
-				      * region defined by
-				      * <tt>[begin_row,end_row)</tt>. This
-				      * function is called by vmult()
-				      * in the case of enabled
-				      * multithreading.
-				      */
-    template <class OutVector, class InVector>
-    void threaded_vmult (OutVector& dst,
-			 const InVector& src,
-			 const unsigned int        begin_row,
-			 const unsigned int        end_row) const;
-
-				     /**
-				      * Version of
-				      * matrix_norm_square() which
-				      * only performs its actions on
-				      * the region defined by
-				      * <tt>[begin_row,end_row)</tt>. This
-				      * function is called by
-				      * matrix_norm_square() in the
-				      * case of enabled
-				      * multithreading.
-				      */
-    template <typename somenumber>
-    void threaded_matrix_norm_square (const Vector<somenumber> &v,
-				      const unsigned int        begin_row,
-				      const unsigned int        end_row,
-				      somenumber               *partial_sum) const;
-
-    				     /**
-				      * Version of
-				      * matrix_scalar_product() which
-				      * only performs its actions on
-				      * the region defined by
-				      * <tt>[begin_row,end_row)</tt>. This
-				      * function is called by
-				      * matrix_scalar_product() in the
-				      * case of enabled
-				      * multithreading.
-				      */
-    template <typename somenumber>
-    void threaded_matrix_scalar_product (const Vector<somenumber> &u,
-					 const Vector<somenumber> &v,
-					 const unsigned int        begin_row,
-					 const unsigned int        end_row,
-					 somenumber               *partial_sum) const;
-
-				     /**
-				      * Version of residual() which
-				      * only performs its actions on
-				      * the region defined by
-				      * <tt>[begin_row,end_row)</tt>
-				      * (these numbers are the
-				      * components of
-				      * <tt>interval</tt>). This
-				      * function is called by
-				      * residual() in the case of
-				      * enabled multithreading.
-				      */
-    template <typename somenumber>
-    void threaded_residual (Vector<somenumber>       &dst,
-			    const Vector<somenumber> &u,
-			    const Vector<somenumber> &b,
-			    const std::pair<unsigned int,unsigned int> interval,
-			    somenumber               *partial_norm) const;
 
 				     // make all other sparse matrices
 				     // friends

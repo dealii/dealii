@@ -32,9 +32,6 @@ namespace hp
 {
   template <int, int> class DoFHandler;
   template <int> class QCollection;
-  template <int, int> class MappingCollection;
-  template <int dim> class FEFaceValues;
-  template <int dim> class FESubfaceValues;
 }
 
 
@@ -256,19 +253,6 @@ class KellyErrorEstimator
 				      * entries, or an empty
 				      * bit-vector.
 				      *
-				      * The estimator supports
-				      * multithreading and splits the
-				      * cells to
-				      * <tt>multithread_info.n_default_threads</tt>
-				      * (default) threads. The number
-				      * of threads to be used in
-				      * multithreaded mode can be set
-				      * with the last parameter of the
-				      * error estimator.
-				      * Multithreading is only
-				      * implemented in two and three
-				      * dimensions.
-				      *
 				      * The @p subdomain_id parameter
 				      * indicates whether we shall compute
 				      * indicators for all cells (in case its
@@ -307,6 +291,16 @@ class KellyErrorEstimator
 				      * indicators will only be computed for
 				      * cells with this particular material
 				      * id.
+				      *
+				      * The @p n_threads parameter used to
+				      * indicate the number of threads to be
+				      * used to compute the error
+				      * estimator. This parameter is now
+				      * ignored, with the number of threads
+				      * determined automatically. The
+				      * parameter is retained for
+				      * compatibility with old versions of the
+				      * library.
 				      */
     template <typename InputVector, class DH>
     static void estimate (const Mapping<dim, spacedim>      &mapping,
@@ -505,280 +499,6 @@ class KellyErrorEstimator
 				      * Exception
 				      */
     DeclException0 (ExcNoSolutions);
-
-  private:
-
-
-				     /**
-				      * Declare a data type to
-				      * represent the mapping between
-				      * faces and integrated jumps of
-				      * gradients of each of the
-				      * solution vectors. See the
-				      * general documentation of this
-				      * class for more information.
-				      */
-    template <class DH>
-    struct FaceIntegrals 
-    {
-      typedef
-      std::map<typename DH::face_iterator,std::vector<double> >
-      type;
-    };
-    
-
-				     /**
-				      * All small temporary data
-				      * objects that are needed once
-				      * per thread by the several
-				      * functions of the error
-				      * estimator are gathered in this
-				      * struct. The reason for this
-				      * structure is mainly that we
-				      * have a number of functions
-				      * that operate on cells or faces
-				      * and need a number of small
-				      * temporary data objects. Since
-				      * these functions may run in
-				      * parallel, we cannot make these
-				      * objects member variables of
-				      * the enclosing class. On the
-				      * other hand, declaring them
-				      * locally in each of these
-				      * functions would require their
-				      * reallocating every time we
-				      * visit the next cell or face,
-				      * which we found can take a
-				      * significant amount of time if
-				      * it happens often even in the
-				      * single threaded case (10-20
-				      * per cent in our measurements);
-				      * however, most importantly,
-				      * memory allocation requires
-				      * synchronisation in
-				      * multithreaded mode. While that
-				      * is done by the C++ library and
-				      * has not to be handcoded, it
-				      * nevertheless seriously damages
-				      * the ability to efficiently run
-				      * the functions of this class in
-				      * parallel, since they are quite
-				      * often blocked by these
-				      * synchronisation points,
-				      * slowing everything down by a
-				      * factor of two or three.
-				      *
-				      * Thus, every thread gets an
-				      * instance of this class to work
-				      * with and needs not allocate
-				      * memory itself, or synchronise
-				      * with other threads.
-				      *
-				      * The sizes of the arrays are
-				      * initialized with the maximal number of
-				      * entries necessary for the hp
-				      * case. Within the loop over individual
-				      * cells, we then resize the arrays as
-				      * necessary. Since for std::vector
-				      * resizing to a smaller size doesn't
-				      * imply memory allocation, this is fast.
-				      */
-    struct PerThreadData
-    {
-					 /**
-					  * A vector to store the jump
-					  * of the normal vectors in
-					  * the quadrature points for
-					  * each of the solution
-					  * vectors (i.e. a temporary
-					  * value). This vector is not
-					  * allocated inside the
-					  * functions that use it, but
-					  * rather globally, since
-					  * memory allocation is slow,
-					  * in particular in presence
-					  * of multiple threads where
-					  * synchronisation makes
-					  * things even slower.
-					  */ 
-	std::vector<std::vector<std::vector<double> > >         phi;
-
-					 /**
-					  * A vector for the gradients of
-					  * the finite element function
-					  * on one cell
-					  *
-					  * Let psi be a short name
-					  * for <tt>a grad u_h</tt>, where
-					  * the third index be the
-					  * component of the finite
-					  * element, and the second
-					  * index the number of the
-					  * quadrature point. The
-					  * first index denotes the
-					  * index of the solution
-					  * vector.
-					  */
-	std::vector<std::vector<std::vector<Tensor<1,dim> > > > psi;
-
-					 /**
-					  * The same vector for a neighbor cell
-					  */
-	std::vector<std::vector<std::vector<Tensor<1,dim> > > > neighbor_psi;
-
-					 /**
-					  * The normal vectors of the finite
-					  * element function on one face
-					  */
-	std::vector<Point<dim> > normal_vectors;
-
-					 /**
-					  * Two arrays needed for the
-					  * values of coefficients in
-					  * the jumps, if they are
-					  * given.
-					  */
-	std::vector<double>          coefficient_values1;
-	std::vector<Vector<double> > coefficient_values;
-
-					 /**
-					  * Array for the products of
-					  * Jacobian determinants and
-					  * weights of quadraturs
-					  * points.
-					  */
-	std::vector<double>          JxW_values;
-
-                                         /**
-                                          * The subdomain id we are to care
-                                          * for.
-                                          */
-        const unsigned int subdomain_id;
-                                         /**
-                                          * The material id we are to care
-                                          * for.
-                                          */
-        const unsigned int material_id;
-        
-					 /**
-					  * Constructor.
-					  */
-	PerThreadData (const unsigned int n_solution_vectors,
-		       const unsigned int n_components,
-		       const unsigned int max_n_q_points,
-                       const unsigned int subdomain_id,
-                       const unsigned int material_id);
-
-					 /**
-					  * Constructor.
-					  */
-	void resize (const unsigned int n_components,
-		     const unsigned int max_n_q_points);
-    };
-
-
-				     /**
-				      * Computates the error on all cells
-				      * of the domain with the number n,
-				      * satisfying
-				      * <tt>n=this_thread (mod n_threads)</tt>
-				      * This enumeration is chosen to
-				      * generate a random distribution
-				      * of all cells.
-				      *
-				      * This function is only needed
-				      * in two or three dimensions.
-				      * The error estimator in one
-				      * dimension is implemented
-				      * seperatly.
-				      */
-    template <typename InputVector, class DH>
-    static void estimate_some (const hp::MappingCollection<dim, spacedim>    &mapping,
-                               const DH                            &dof_handler,
-                               const hp::QCollection<dim-1>         &quadrature,
-                               const typename FunctionMap<dim>::type &neumann_bc,
-                               const std::vector<const InputVector *> &solutions,
-			       const std::pair<const std::vector<bool>*,const Function<dim>*> &component_mask_and_coefficients,
-                               const std::pair<unsigned int, unsigned int> this_thread,
-                               typename FaceIntegrals<DH>::type    &face_integrals,
-                               PerThreadData                       &per_thread_data);
-    				
-				     /**
-				      * Actually do the computation on
-				      * a face which has no hanging
-				      * nodes (it is regular), i.e.
-				      * either on the other side there
-				      * is nirvana (face is at
-				      * boundary), or the other side's
-				      * refinement level is the same
-				      * as that of this side, then
-				      * handle the integration of
-				      * these both cases together.
-				      *
-				      * The meaning of the parameters
-				      * becomes clear when looking at
-				      * the source code. This function
-				      * is only externalized from
-				      * @p estimate_error to avoid
-				      * ending up with a function of
-				      * 500 lines of code.
-				      */
-    template <typename InputVector, class DH>
-    static
-    void
-    integrate_over_regular_face (const DH                             &dof_handler,
-                                 const hp::QCollection<dim-1>         &quadrature,
-                                 const typename FunctionMap<dim>::type &neumann_bc,
-                                 const std::vector<const InputVector *> &solutions,
-                                 const std::vector<bool>                  &component_mask,
-                                 const Function<dim>                 *coefficients,
-                                 typename FaceIntegrals<DH>::type    &face_integrals,
-                                 PerThreadData              &per_thread_data,
-                                 const typename DH::active_cell_iterator &cell,
-                                 const unsigned int          face_no,
-                                 hp::FEFaceValues<dim>          &fe_face_values_cell,
-                                 hp::FEFaceValues<dim>          &fe_face_values_neighbor);
-
-
-				     /**
-				      * The same applies as for the
-				      * function above, except that
-				      * integration is over face
-				      * @p face_no of @p cell, where
-				      * the respective neighbor is
-				      * refined, so that the
-				      * integration is a bit more
-				      * complex.
-				      */
-    template <typename InputVector, class DH>
-    static
-    void
-    integrate_over_irregular_face (const DH                             &dof_handler,
-                                   const hp::QCollection<dim-1>         &quadrature,
-                                   const std::vector<const InputVector *> &solutions,
-                                   const std::vector<bool>                  &component_mask,
-                                   const Function<dim>                 *coefficients,
-                                   typename FaceIntegrals<DH>::type    &face_integrals,
-                                   PerThreadData              &per_thread_data,
-                                   const typename DH::active_cell_iterator &cell,
-                                   const unsigned int          face_no,
-                                   hp::FEFaceValues<dim>          &fe_face_values,
-                                   hp::FESubfaceValues<dim>       &fe_subface_values);
-
-				     /** 
-				      * By the resolution of Defect
-				      * Report 45 to the ISO C++ 1998
-				      * standard, nested classes
-				      * automatically have access to
-				      * members of the enclosing
-				      * class. Nevertheless, some
-				      * compilers don't implement this
-				      * resolution yet, so we have to
-				      * make them @p friend, which
-				      * doesn't hurt on the other
-				      * compilers as well.
-				      */
-    friend class PerThreadData;
 };
 
 

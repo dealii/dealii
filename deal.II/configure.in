@@ -145,13 +145,8 @@ dnl Test whether multithreading support is requested. This
 dnl does not tell deal.II to actually use it, but the
 dnl compiler flags are set to allow for it.
 DEAL_II_CHECK_MULTITHREADING
-DEAL_II_SET_MULTITHREADING_FLAGS
 DEAL_II_CHECK_PARTLY_BRACKETED_INITIALIZER
-AC_SUBST(enablemultithreading)
-
-dnl Next also check whether the MT code shall be used through POSIX
-DEAL_II_CHECK_USE_MT
-AC_SUBST(withmultithreading)
+AC_SUBST(enablethreads)
 
 
 
@@ -192,6 +187,7 @@ DEAL_II_CHECK_SFINAE_BUG
 DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG
 DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG
 DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG
+DEAL_II_CHECK_CONST_MEMBER_DEDUCTION_BUG
 DEAL_II_CHECK_TYPE_QUALIFIER_BUG
 DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX
 DEAL_II_CHECK_CTOR_DTOR_PRIVACY

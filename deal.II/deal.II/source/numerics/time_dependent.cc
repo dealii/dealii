@@ -212,10 +212,10 @@ void TimeDependent::end_sweep (const unsigned int n_threads)
       void (TimeDependent::*p) (const unsigned int, const unsigned int)
         = &TimeDependent::end_sweep;
       for (unsigned int i=0; i<n_threads; ++i)
-        threads += Threads::spawn (*this, p)(i*stride,
-                                             (i == n_threads-1 ?
-                                              timesteps.size() :
-                                              (i+1)*stride));
+        threads += Threads::new_thread (p, *this, i*stride,
+					(i == n_threads-1 ?
+					 timesteps.size() :
+					 (i+1)*stride));
       threads.join_all();
     }
   else

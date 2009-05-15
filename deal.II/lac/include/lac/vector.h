@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,6 +50,33 @@ template<typename number> class LAPACKFullMatrix;
 template <typename> class BlockVector;
 
 template <typename> class VectorView;
+
+namespace internal
+{
+  namespace Vector
+  {
+				     /**
+				      * If we do computations on vectors in
+				      * parallel (say, we add two vectors to
+				      * get a third, and we do the loop over
+				      * all elements in parallel), then this
+				      * variable determines the minimum number
+				      * of elements for which it is profitable
+				      * to split a range of elements any
+				      * further to distribute to different
+				      * threads.
+				      *
+				      * This variable is available as a global
+				      * writable variable in order to allow
+				      * the testsuite to also test the
+				      * parallel case. By default, it is set
+				      * to several thousand elements, which is
+				      * a case that the testsuite would not
+				      * normally encounter.
+				      */
+    extern unsigned int minimum_parallel_grain_size;
+  }
+}
 
 
 
@@ -117,6 +144,8 @@ class Vector : public Subscriptor
 				      */
     typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
+  public:
+    
 				     /**
 				      * @name 1: Basic Object-handling 
 				      */

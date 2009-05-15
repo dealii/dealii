@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,27 @@
 #include <lac/vector.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+namespace internal
+{
+  namespace Vector
+  {
+				     // set minimum grain size. this value is
+				     // roughly in accordance with the curve
+				     // in the TBB book (fig 3.2) that shows
+				     // run time as a function of grain size
+				     // -- there, values from 200 upward are
+				     // so that the scheduling overhead
+				     // amortizes well (for very large values
+				     // in that example, the grain size is too
+				     // large to split the work load into
+				     // enough chunks and the problem becomes
+				     // badly balanced)
+    unsigned int minimum_parallel_grain_size = 1000;
+  }
+}
+
 
 #include "vector.inst"
 

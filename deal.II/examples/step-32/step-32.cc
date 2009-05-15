@@ -20,9 +20,10 @@
 #include <base/function.h>
 #include <base/utilities.h>
 #include <base/conditional_ostream.h>
+#include <base/work_stream.h>
 
 #include <lac/full_matrix.h>
-#include <lac/solver_gmres.h>
+#include <lac/solver_bicgstab.h>
 #include <lac/solver_cg.h>
 #include <lac/constraint_matrix.h>
 #include <lac/block_sparsity_pattern.h>
@@ -35,6 +36,7 @@
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/filtered_iterator.h>
 #include <grid/tria_boundary_lib.h>
 #include <grid/grid_tools.h>
 #include <grid/grid_refinement.h>
@@ -57,7 +59,7 @@
 
 #include <Epetra_Map.h>
 
-                                       // Time measurements. 
+				 // Time measurements. 
 #include <base/timer.h>
 
 #include <fstream>
@@ -196,7 +198,7 @@ namespace LinearSolvers
       const PreconditionerMp &mp_preconditioner;
       const PreconditionerA  &a_preconditioner;
       mutable TrilinosWrappers::MPI::Vector tmp;
-};
+  };
 
 
 
@@ -206,10 +208,10 @@ namespace LinearSolvers
 			   const PreconditionerMp                    &Mppreconditioner,
 			   const PreconditionerA                     &Apreconditioner)
 		  :
-		  stokes_matrix           (&S),
-		  mp_preconditioner       (Mppreconditioner),
-		  a_preconditioner        (Apreconditioner),
-		  tmp                     (stokes_matrix->block(1,1).row_partitioner())
+		  stokes_matrix     (&S),
+		  mp_preconditioner (Mppreconditioner),
+		  a_preconditioner  (Apreconditioner),
+		  tmp               (stokes_matrix->block(1,1).row_partitioner())
   {}
 
 
@@ -224,6 +226,356 @@ namespace LinearSolvers
     tmp *= -1;
     mp_preconditioner.vmult (dst.block(1), tmp);
   }
+}
+
+
+
+namespace Assembly
+{
+  namespace Scratch
+  {
+    template <int dim>
+    struct StokesPreconditioner 
+    {
+	StokesPreconditioner (const FiniteElement<dim> &stokes_fe,
+			      const Quadrature<dim>    &stokes_quadrature,
+			      const UpdateFlags         update_flags);
+	StokesPreconditioner (const StokesPreconditioner &data);
+	
+	FEValues<dim>               stokes_fe_values;
+
+	std::vector<Tensor<2,dim> > grad_phi_u;
+	std::vector<double>         phi_p;
+    };
+
+    template <int dim>
+    StokesPreconditioner<dim>::
+    StokesPreconditioner (const FiniteElement<dim> &stokes_fe,
+			  const Quadrature<dim>    &stokes_quadrature,
+			  const UpdateFlags         update_flags)
+		    :
+		    stokes_fe_values (stokes_fe, stokes_quadrature,
+				      update_flags),
+		    grad_phi_u (stokes_fe.dofs_per_cell),
+		    phi_p (stokes_fe.dofs_per_cell)
+    {}
+
+
+
+    template <int dim>
+    StokesPreconditioner<dim>::
+    StokesPreconditioner (const StokesPreconditioner &scratch)
+		    :
+		    stokes_fe_values (scratch.stokes_fe_values.get_fe(),
+				      scratch.stokes_fe_values.get_quadrature(),
+				      scratch.stokes_fe_values.get_update_flags()),
+		    grad_phi_u (scratch.grad_phi_u),
+		    phi_p (scratch.phi_p)
+    {}
+
+
+
+    template <int dim>
+    struct StokesSystem : public StokesPreconditioner<dim>
+    {
+	StokesSystem (const FiniteElement<dim> &stokes_fe,
+		      const Quadrature<dim>    &stokes_quadrature,
+		      const UpdateFlags         stokes_update_flags,
+		      const FiniteElement<dim> &temperature_fe,
+		      const UpdateFlags         temperature_update_flags);
+
+	StokesSystem (const StokesSystem<dim> &data);
+      
+	FEValues<dim>  temperature_fe_values;
+
+	std::vector<Tensor<1,dim> >          phi_u;
+	std::vector<SymmetricTensor<2,dim> > grads_phi_u;
+	std::vector<double>                  div_phi_u;
+
+	std::vector<double>                  old_temperature_values;
+    };
+  
+
+    template <int dim>
+    StokesSystem<dim>::
+    StokesSystem (const FiniteElement<dim> &stokes_fe,
+		  const Quadrature<dim>    &stokes_quadrature,
+		  const UpdateFlags         stokes_update_flags,
+		  const FiniteElement<dim> &temperature_fe,
+		  const UpdateFlags         temperature_update_flags)
+		    :
+		    StokesPreconditioner<dim> (stokes_fe, stokes_quadrature,
+					       stokes_update_flags),
+		    temperature_fe_values (temperature_fe, stokes_quadrature,
+					   temperature_update_flags),
+		    phi_u (stokes_fe.dofs_per_cell),
+		    grads_phi_u (stokes_fe.dofs_per_cell),
+		    div_phi_u (stokes_fe.dofs_per_cell),
+		    old_temperature_values (stokes_quadrature.n_quadrature_points)
+    {}
+
+
+    template <int dim>
+    StokesSystem<dim>::
+    StokesSystem (const StokesSystem<dim> &scratch)
+		    :
+		    StokesPreconditioner<dim> (scratch),
+		    temperature_fe_values (scratch.temperature_fe_values.get_fe(),
+					   scratch.temperature_fe_values.get_quadrature(),
+					   scratch.temperature_fe_values.get_update_flags()),
+		    phi_u (scratch.phi_u),
+		    grads_phi_u (scratch.grads_phi_u),
+		    div_phi_u (scratch.div_phi_u),
+		    old_temperature_values (scratch.old_temperature_values)
+    {}
+
+
+
+    template <int dim>
+    struct TemperatureMatrix 
+    {
+	TemperatureMatrix (const FiniteElement<dim> &temperature_fe,
+			   const Quadrature<dim>    &temperature_quadrature);
+	TemperatureMatrix (const TemperatureMatrix &data);
+	
+	FEValues<dim>               temperature_fe_values;
+
+	std::vector<double>         phi_T;
+	std::vector<Tensor<1,dim> > grad_phi_T;
+    };
+
+    template <int dim>
+    TemperatureMatrix<dim>::
+    TemperatureMatrix (const FiniteElement<dim> &temperature_fe,
+		       const Quadrature<dim>    &temperature_quadrature)
+		    :
+		    temperature_fe_values (temperature_fe, temperature_quadrature,
+					   update_values    | update_gradients |
+					   update_JxW_values),
+		    phi_T (temperature_fe.dofs_per_cell),
+		    grad_phi_T (temperature_fe.dofs_per_cell)
+    {}
+
+
+    template <int dim>
+    TemperatureMatrix<dim>::
+    TemperatureMatrix (const TemperatureMatrix &scratch)
+		    :
+		    temperature_fe_values (scratch.temperature_fe_values.get_fe(),
+					   scratch.temperature_fe_values.get_quadrature(),
+					   scratch.temperature_fe_values.get_update_flags()),
+		    phi_T (scratch.phi_T),
+		    grad_phi_T (scratch.grad_phi_T)
+    {}
+
+
+    template <int dim>
+    struct TemperatureRHS 
+    {
+	TemperatureRHS (const FiniteElement<dim> &temperature_fe,
+			const FiniteElement<dim> &stokes_fe,
+			const Quadrature<dim>    &quadrature);
+	TemperatureRHS (const TemperatureRHS &data);
+	
+	FEValues<dim>               temperature_fe_values;
+	FEValues<dim>               stokes_fe_values;
+
+	std::vector<double>         phi_T;
+	std::vector<Tensor<1,dim> > grad_phi_T;
+
+	std::vector<Tensor<1,dim> > old_velocity_values;
+	std::vector<Tensor<1,dim> > old_old_velocity_values;
+  
+	std::vector<double>         old_temperature_values;
+	std::vector<double>         old_old_temperature_values;
+	std::vector<Tensor<1,dim> > old_temperature_grads;
+	std::vector<Tensor<1,dim> > old_old_temperature_grads;
+	std::vector<double>         old_temperature_laplacians;
+	std::vector<double>         old_old_temperature_laplacians;
+
+	std::vector<double>         gamma_values;
+    };
+
+    template <int dim>
+    TemperatureRHS<dim>::
+    TemperatureRHS (const FiniteElement<dim> &temperature_fe,
+		    const FiniteElement<dim> &stokes_fe,
+		    const Quadrature<dim>    &quadrature)
+		    :
+		    temperature_fe_values (temperature_fe, quadrature,
+					   update_values    |
+					   update_gradients |
+					   update_hessians  |
+					   update_quadrature_points |
+					   update_JxW_values),
+		    stokes_fe_values (stokes_fe, quadrature,
+				      update_values),
+		    phi_T (temperature_fe.dofs_per_cell),
+		    grad_phi_T (temperature_fe.dofs_per_cell),
+		
+		    old_velocity_values (quadrature.n_quadrature_points),
+		    old_old_velocity_values (quadrature.n_quadrature_points),
+		
+		    old_temperature_values (quadrature.n_quadrature_points),
+		    old_old_temperature_values(quadrature.n_quadrature_points),
+		    old_temperature_grads(quadrature.n_quadrature_points),
+		    old_old_temperature_grads(quadrature.n_quadrature_points),
+		    old_temperature_laplacians(quadrature.n_quadrature_points),
+		    old_old_temperature_laplacians(quadrature.n_quadrature_points),
+		
+		    gamma_values (quadrature.n_quadrature_points)		
+    {}
+
+
+    template <int dim>
+    TemperatureRHS<dim>::
+    TemperatureRHS (const TemperatureRHS &scratch)
+		    :
+		    temperature_fe_values (scratch.temperature_fe_values.get_fe(),
+					   scratch.temperature_fe_values.get_quadrature(),
+					   scratch.temperature_fe_values.get_update_flags()),
+		    stokes_fe_values (scratch.stokes_fe_values.get_fe(),
+				      scratch.stokes_fe_values.get_quadrature(),
+				      scratch.stokes_fe_values.get_update_flags()),
+		    phi_T (scratch.phi_T),
+		    grad_phi_T (scratch.grad_phi_T),
+		
+		    old_velocity_values (scratch.old_velocity_values),
+		    old_old_velocity_values (scratch.old_old_velocity_values),
+		
+		    old_temperature_values (scratch.old_temperature_values),
+		    old_old_temperature_values (scratch.old_old_temperature_values),
+		    old_temperature_grads (scratch.old_temperature_grads),
+		    old_old_temperature_grads (scratch.old_old_temperature_grads),
+		    old_temperature_laplacians (scratch.old_temperature_laplacians),
+		    old_old_temperature_laplacians (scratch.old_old_temperature_laplacians),
+		
+		    gamma_values (scratch.gamma_values)
+    {}
+  }
+
+  namespace CopyData
+  {
+    template <int dim>
+    struct StokesPreconditioner 
+    {
+	StokesPreconditioner (const FiniteElement<dim> &stokes_fe);
+	StokesPreconditioner (const StokesPreconditioner &data);
+
+	FullMatrix<double>          local_matrix;
+	std::vector<unsigned int>   local_dof_indices;
+    };
+
+    template <int dim>
+    StokesPreconditioner<dim>::
+    StokesPreconditioner (const FiniteElement<dim> &stokes_fe)
+		    :
+		    local_matrix (stokes_fe.dofs_per_cell, 
+				  stokes_fe.dofs_per_cell),
+		    local_dof_indices (stokes_fe.dofs_per_cell)
+    {}
+
+
+
+    template <int dim>
+    StokesPreconditioner<dim>::
+    StokesPreconditioner (const StokesPreconditioner &data)
+		    :
+		    local_matrix (data.local_matrix),
+		    local_dof_indices (data.local_dof_indices)
+    {}
+
+
+
+    template <int dim>
+    struct StokesSystem : public StokesPreconditioner<dim>
+    {
+	StokesSystem (const FiniteElement<dim> &stokes_fe);
+	StokesSystem (const StokesSystem<dim> &data);
+      
+	Vector<double> local_rhs;
+    };
+  
+
+    template <int dim>
+    StokesSystem<dim>::
+    StokesSystem (const FiniteElement<dim> &stokes_fe)
+		    :
+		    StokesPreconditioner<dim> (stokes_fe),
+		    local_rhs (stokes_fe.dofs_per_cell)
+    {}
+
+
+    template <int dim>
+    StokesSystem<dim>::
+    StokesSystem (const StokesSystem<dim> &data)
+		    :
+		    StokesPreconditioner<dim> (data),
+		    local_rhs (data.local_rhs)
+    {}
+
+
+
+    template <int dim>
+    struct TemperatureMatrix 
+    {
+	TemperatureMatrix (const FiniteElement<dim> &temperature_fe);
+	TemperatureMatrix (const TemperatureMatrix &data);
+	
+	FullMatrix<double>          local_mass_matrix;
+	FullMatrix<double>          local_stiffness_matrix;
+	std::vector<unsigned int>   local_dof_indices;
+    };
+
+    template <int dim>
+    TemperatureMatrix<dim>::
+    TemperatureMatrix (const FiniteElement<dim> &temperature_fe)
+		    :
+		    local_mass_matrix (temperature_fe.dofs_per_cell,
+				       temperature_fe.dofs_per_cell),
+		    local_stiffness_matrix (temperature_fe.dofs_per_cell,
+					    temperature_fe.dofs_per_cell),
+		    local_dof_indices (temperature_fe.dofs_per_cell)
+    {}
+
+
+    template <int dim>
+    TemperatureMatrix<dim>::
+    TemperatureMatrix (const TemperatureMatrix &data)
+		    :
+		    local_mass_matrix (data.local_mass_matrix),
+		    local_stiffness_matrix (data.local_stiffness_matrix),
+		    local_dof_indices (data.local_dof_indices)
+    {}
+
+
+    template <int dim>
+    struct TemperatureRHS 
+    {
+	TemperatureRHS (const FiniteElement<dim> &temperature_fe);
+	TemperatureRHS (const TemperatureRHS &data);
+	
+	Vector<double>              local_rhs;
+	std::vector<unsigned int>   local_dof_indices;
+    };
+
+    template <int dim>
+    TemperatureRHS<dim>::
+    TemperatureRHS (const FiniteElement<dim> &temperature_fe)
+		    :
+		    local_rhs (temperature_fe.dofs_per_cell),
+		    local_dof_indices (temperature_fe.dofs_per_cell)
+    {}
+
+
+    template <int dim>
+    TemperatureRHS<dim>::
+    TemperatureRHS (const TemperatureRHS &data)
+		    :
+		    local_rhs (data.local_rhs),
+		    local_dof_indices (data.local_dof_indices)
+    {}
+  }  
 }
 
 
@@ -281,7 +633,7 @@ class BoussinesqFlowProblem
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
-    TrilinosWrappers::MPI::BlockVector  stokes_solution;
+    TrilinosWrappers::BlockVector       stokes_solution;
     TrilinosWrappers::BlockVector       old_stokes_solution;
     TrilinosWrappers::MPI::BlockVector  stokes_rhs;
 
@@ -296,7 +648,7 @@ class BoussinesqFlowProblem
     TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
     TrilinosWrappers::SparseMatrix      temperature_matrix;
 
-    TrilinosWrappers::MPI::Vector       temperature_solution;
+    TrilinosWrappers::Vector            temperature_solution;
     TrilinosWrappers::Vector            old_temperature_solution;
     TrilinosWrappers::Vector            old_old_temperature_solution;
     TrilinosWrappers::MPI::Vector       temperature_rhs;
@@ -307,8 +659,8 @@ class BoussinesqFlowProblem
     unsigned int timestep_number;
 
     std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU> Mp_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU> T_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>  Mp_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>  T_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_stokes_preconditioner;
@@ -316,6 +668,44 @@ class BoussinesqFlowProblem
     bool rebuild_temperature_preconditioner;
 
     TimerOutput computing_timer;
+
+    void setup_stokes_matrix ();
+    void setup_stokes_preconditioner ();
+    void setup_temperature_matrices ();
+    
+    void
+    local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cell_iterator &cell,
+					  Assembly::Scratch::StokesPreconditioner<dim> &scratch,
+					  Assembly::CopyData::StokesPreconditioner<dim> &data);
+    
+    void copy_local_to_global_stokes_preconditioner (const Assembly::CopyData::StokesPreconditioner<dim> &data);
+
+
+    void
+    local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
+				  Assembly::Scratch::StokesSystem<dim>  &scratch,
+				  Assembly::CopyData::StokesSystem<dim> &data);
+    
+    void copy_local_to_global_stokes_system (const Assembly::CopyData::StokesSystem<dim> &data);
+
+
+    void
+    local_assemble_temperature_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
+				       Assembly::Scratch::TemperatureMatrix<dim>  &scratch,
+				       Assembly::CopyData::TemperatureMatrix<dim> &data);
+    
+    void copy_local_to_global_temperature_matrix (const Assembly::CopyData::TemperatureMatrix<dim> &data);
+
+
+
+    void
+    local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
+				    const double                   global_max_velocity,
+				    const typename DoFHandler<dim>::active_cell_iterator &cell,
+				    Assembly::Scratch::TemperatureRHS<dim> &scratch,
+				    Assembly::CopyData::TemperatureRHS<dim> &data);
+    
+    void copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<dim> &data);
 };
 
 
@@ -326,8 +716,7 @@ template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
                 trilinos_communicator (Utilities::Trilinos::comm_world()),
-		pcout (std::cout,
-		       Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)==0),
+		pcout (std::cout, Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)==0),
 
 		triangulation (Triangulation<dim>::maximum_smoothing),
 
@@ -363,8 +752,6 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 					   stokes_degree+1);
   const unsigned int n_q_points = quadrature_formula.size();
 
-  BlockVector<double> localized_stokes_solution (stokes_solution);
-
   FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
   std::vector<Tensor<1,dim> > velocity_values(n_q_points);
 
@@ -380,7 +767,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	fe_values.reinit (cell);
-	fe_values[velocities].get_function_values (localized_stokes_solution,
+	fe_values[velocities].get_function_values (stokes_solution,
 						   velocity_values);
 
 	for (unsigned int q=0; q<n_q_points; ++q)
@@ -551,6 +938,89 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 }
 
 
+template <int dim>
+void BoussinesqFlowProblem<dim>::setup_stokes_matrix ()
+{
+  stokes_matrix.clear ();
+
+  TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioner);
+
+  Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
+
+  for (unsigned int c=0; c<dim+1; ++c)
+    for (unsigned int d=0; d<dim+1; ++d)
+      if (! ((c==dim) && (d==dim)))
+	coupling[c][d] = DoFTools::always;
+      else
+	coupling[c][d] = DoFTools::none;
+
+  DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
+				   stokes_constraints, false,
+				   Utilities::Trilinos::
+				   get_this_mpi_process(trilinos_communicator));
+  sp.compress();
+
+  stokes_matrix.reinit (sp);
+				   /*std::cout << "Processor " << trilinos_communicator.MyPID() 
+				     << " stokes(0,0) rows: " 
+				     << stokes_matrix.block(0,0).matrix->NumMyRows()
+				     << ", nnz: " 
+				     << stokes_matrix.block(0,0).matrix->NumMyNonzeros() 
+				     << std::endl;*/
+
+}
+
+
+
+template <int dim>
+void BoussinesqFlowProblem<dim>::setup_stokes_preconditioner ()
+{
+  Amg_preconditioner.reset ();
+  Mp_preconditioner.reset ();
+    
+  stokes_preconditioner_matrix.clear ();
+
+  TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioner);
+
+  Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
+  for (unsigned int c=0; c<dim+1; ++c)
+    for (unsigned int d=0; d<dim+1; ++d)
+      if (c == d)
+	coupling[c][d] = DoFTools::always;
+      else
+	coupling[c][d] = DoFTools::none;
+
+  DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
+				   stokes_constraints, false,
+				   Utilities::Trilinos::
+				   get_this_mpi_process(trilinos_communicator));
+  sp.compress();
+
+  stokes_preconditioner_matrix.reinit (sp);
+}
+
+
+template <int dim>
+void BoussinesqFlowProblem<dim>::setup_temperature_matrices ()
+{
+  T_preconditioner.reset ();
+  temperature_mass_matrix.clear ();
+  temperature_stiffness_matrix.clear ();
+  temperature_matrix.clear ();
+
+  TrilinosWrappers::SparsityPattern sp (temperature_partitioner);
+  DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
+				   temperature_constraints, false,
+				   Utilities::Trilinos::
+				   get_this_mpi_process(trilinos_communicator));
+  sp.compress();
+
+  temperature_matrix.reinit (sp);
+  temperature_mass_matrix.reinit (sp);
+  temperature_stiffness_matrix.reinit (sp);
+}
+
+
 
 
 				 // @sect4{BoussinesqFlowProblem::setup_dofs}
@@ -561,7 +1031,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
   stokes_sub_blocks[dim] = 1;
 
-  GridTools::partition_triangulation (Utilities::Trilinos::get_n_mpi_processes(trilinos_communicator), 
+  GridTools::partition_triangulation (Utilities::Trilinos::
+				      get_n_mpi_processes(trilinos_communicator), 
 				      triangulation);
 
   {
@@ -588,7 +1059,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 					     temperature_constraints);
     temperature_constraints.close ();
   }
-  
+
   std::vector<unsigned int> stokes_dofs_per_block (2);
   DoFTools::count_dofs_per_block (stokes_dof_handler, stokes_dofs_per_block,
 				  stokes_sub_blocks);
@@ -628,53 +1099,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     Epetra_Map map_p(n_p, n_local_pressures, 0, trilinos_communicator);
     stokes_partitioner.push_back (map_p);
   }
-  {
-    stokes_matrix.clear ();
-
-    TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioner);
-
-    Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
-
-    for (unsigned int c=0; c<dim+1; ++c)
-      for (unsigned int d=0; d<dim+1; ++d)
-	if (! ((c==dim) && (d==dim)))
-	  coupling[c][d] = DoFTools::always;
-	else
-	  coupling[c][d] = DoFTools::none;
-
-    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
-				     stokes_constraints, false,
-				     Utilities::Trilinos::
-				     get_this_mpi_process(trilinos_communicator));
-    sp.compress();
-
-    stokes_matrix.reinit (sp);
-  }
-
-  {
-    Amg_preconditioner.reset ();
-    Mp_preconditioner.reset ();
-    stokes_preconditioner_matrix.clear ();
-
-    TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioner);
-
-    Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
-    for (unsigned int c=0; c<dim+1; ++c)
-      for (unsigned int d=0; d<dim+1; ++d)
-	if (c == d)
-	  coupling[c][d] = DoFTools::always;
-	else
-	  coupling[c][d] = DoFTools::none;
-
-    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
-				     stokes_constraints, false,
-				     Utilities::Trilinos::
-				     get_this_mpi_process(trilinos_communicator));
-    sp.compress();
-
-    stokes_preconditioner_matrix.reinit (sp);
-  }
-
+  
   temperature_partitioner
     = Epetra_Map (n_T,
 		  DoFTools::count_dofs_with_subdomain_association
@@ -682,23 +1107,24 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 		   Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
 		  0,
 		  trilinos_communicator);
-  {
-    T_preconditioner.reset ();
-    temperature_mass_matrix.clear ();
-    temperature_stiffness_matrix.clear ();
-    temperature_matrix.clear ();
 
-    TrilinosWrappers::SparsityPattern sp (temperature_partitioner);
-    DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
-				     temperature_constraints, false,
-				     Utilities::Trilinos::
-				     get_this_mpi_process(trilinos_communicator));
-    sp.compress();
-
-    temperature_matrix.reinit (sp);
-    temperature_mass_matrix.reinit (sp);
-    temperature_stiffness_matrix.reinit (sp);
-  }
+  if (Utilities::Trilinos::get_n_mpi_processes(trilinos_communicator) == 1)
+    {
+      Threads::TaskGroup<> tasks;
+      tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_stokes_matrix,
+				  *this);
+      tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_stokes_preconditioner,
+				  *this);
+      tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_temperature_matrices,
+				  *this);
+      tasks.join_all ();
+    }
+  else
+    {
+      setup_stokes_matrix ();
+      setup_stokes_preconditioner ();
+      setup_temperature_matrices ();
+    } 
 
   stokes_solution.reinit (stokes_partitioner);
   old_stokes_solution.reinit (stokes_partitioner);
@@ -716,68 +1142,91 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 template <int dim>
 void
-BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
+BoussinesqFlowProblem<dim>::
+local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cell_iterator &cell,
+				      Assembly::Scratch::StokesPreconditioner<dim> &scratch,
+				      Assembly::CopyData::StokesPreconditioner<dim> &data)
 {
-  stokes_preconditioner_matrix = 0;
-
-  const QGauss<dim> quadrature_formula (stokes_degree+2);
-  FEValues<dim>     stokes_fe_values (stokes_fe, quadrature_formula,
-				      update_JxW_values |
-				      update_values |
-				      update_gradients);
   const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
-
-  const unsigned int   n_q_points      = quadrature_formula.size();
-
-  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-  std::vector<Tensor<2,dim> > phi_grad_u (dofs_per_cell);
-  std::vector<double>         phi_p      (dofs_per_cell);
+  const unsigned int   n_q_points      = scratch.stokes_fe_values.n_quadrature_points;
 
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
 
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = stokes_dof_handler.begin_active(),
-    endc = stokes_dof_handler.end();
-  for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == 
-	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
-      {
-	stokes_fe_values.reinit (cell);
+  scratch.stokes_fe_values.reinit (cell);
+  cell->get_dof_indices (data.local_dof_indices);
 
-				   // only need to recalculate local matrix
-				   // if FEValues data has changed.
-	if (stokes_fe_values.get_cell_similarity() != CellSimilarity::translation)
-	  {
-	    local_matrix = 0;
+  data.local_matrix = 0;
 
-	    for (unsigned int q=0; q<n_q_points; ++q)
-	      {
-		for (unsigned int k=0; k<dofs_per_cell; ++k)
-		  {
-		    phi_grad_u[k] = stokes_fe_values[velocities].gradient(k,q);
-		    phi_p[k]      = stokes_fe_values[pressure].value (k, q);
-		  }
+  for (unsigned int q=0; q<n_q_points; ++q)
+    {
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+	  scratch.grad_phi_u[k] = scratch.stokes_fe_values[velocities].gradient(k,q);
+	  scratch.phi_p[k]      = scratch.stokes_fe_values[pressure].value (k, q);
+	}
+	  
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  data.local_matrix(i,j) += (EquationData::eta *
+				     scalar_product (scratch.grad_phi_u[i], scratch.grad_phi_u[j])
+				     +
+				     (1./EquationData::eta) *
+				     scratch.phi_p[i] * scratch.phi_p[j])
+				    * scratch.stokes_fe_values.JxW(q);
+    }
+}
 
-		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  for (unsigned int j=0; j<dofs_per_cell; ++j)
-		    local_matrix(i,j) += (EquationData::eta *
-					  scalar_product (phi_grad_u[i], phi_grad_u[j])
-					  +
-					  (1./EquationData::eta) *
-					  phi_p[i] * phi_p[j])
-		                         * stokes_fe_values.JxW(q);
-	      }
-	  }
 
-	cell->get_dof_indices (local_dof_indices);
-	stokes_constraints.distribute_local_to_global (local_matrix,
-						       local_dof_indices,
-						       stokes_preconditioner_matrix);
-      }
 
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::
+copy_local_to_global_stokes_preconditioner (const Assembly::CopyData::StokesPreconditioner<dim> &data)
+{
+  stokes_constraints.distribute_local_to_global (data.local_matrix,
+						 data.local_dof_indices,
+						 stokes_preconditioner_matrix);
+}
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
+{
+  stokes_preconditioner_matrix = 0;
+
+  const QGauss<dim> quadrature_formula(stokes_degree+2);
+
+  typedef
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+    SubdomainFilter;
+  
+  WorkStream::
+    run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			   stokes_dof_handler.begin_active()),
+	 SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			   stokes_dof_handler.end()),
+	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			   local_assemble_stokes_preconditioner,
+			   this,
+			   _1,
+			   _2,
+			   _3),
+	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			   copy_local_to_global_stokes_preconditioner,
+			   this,
+			   _1),
+	  Assembly::Scratch::
+	  StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
+				     update_JxW_values |
+				     update_values |
+				     update_gradients),
+	  Assembly::CopyData::
+	 StokesPreconditioner<dim> (stokes_fe));
+  
   stokes_preconditioner_matrix.compress();
 }
 
@@ -795,29 +1244,27 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
   assemble_stokes_preconditioner ();
 
-  Amg_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>
-		       (new TrilinosWrappers::PreconditionAMG());
-
   std::vector<std::vector<bool> > constant_modes;
   std::vector<bool>  velocity_components (dim+1,true);
   velocity_components[dim] = false;
   DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
 				    constant_modes);
 
-  TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
-  amg_data.constant_modes = constant_modes;
-  amg_data.elliptic = true;
-  amg_data.higher_order_elements = true;
-  amg_data.smoother_sweeps = 2;
-  amg_data.aggregation_threshold = 0.02;
+  Mp_preconditioner  = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>
+		       (new TrilinosWrappers::PreconditionILU());
+  Amg_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>
+		       (new TrilinosWrappers::PreconditionAMG());
 
-  Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
-				 amg_data);
-
-  Mp_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>
-                                   (new TrilinosWrappers::PreconditionILU());
+  TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
+  Amg_data.constant_modes = constant_modes;
+  Amg_data.elliptic = true;
+  Amg_data.higher_order_elements = true;
+  Amg_data.smoother_sweeps = 2;
+  Amg_data.aggregation_threshold = 0.02;
 
   Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
+  Amg_preconditioner->initialize (stokes_preconditioner_matrix.block(0,0),
+				  Amg_data);
 
   rebuild_stokes_preconditioner = false;
 
@@ -827,7 +1274,92 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
 
 
-				 // @sect4{BoussinesqFlowProblem::assemble_stokes_system}
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::
+local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
+			      Assembly::Scratch::StokesSystem<dim> &scratch,
+			      Assembly::CopyData::StokesSystem<dim> &data)
+{
+  const unsigned int dofs_per_cell = scratch.stokes_fe_values.get_fe().dofs_per_cell;
+  const unsigned int n_q_points    = scratch.stokes_fe_values.n_quadrature_points;
+  
+  const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
+
+  scratch.stokes_fe_values.reinit (cell);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    temperature_cell (&triangulation,
+		      cell->level(),
+		      cell->index(),
+		      &temperature_dof_handler);
+  scratch.temperature_fe_values.reinit (temperature_cell);
+      
+  if (rebuild_stokes_matrix)
+    data.local_matrix = 0;
+  data.local_rhs = 0;
+
+  scratch.temperature_fe_values.get_function_values (old_temperature_solution, 
+						     scratch.old_temperature_values);
+
+  for (unsigned int q=0; q<n_q_points; ++q)
+    {
+      const double old_temperature = scratch.old_temperature_values[q];
+
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+	  scratch.phi_u[k] = scratch.stokes_fe_values[velocities].value (k,q);
+	  if (rebuild_stokes_matrix)
+	    {
+	      scratch.grads_phi_u[k] = scratch.stokes_fe_values[velocities].symmetric_gradient(k,q);
+	      scratch.div_phi_u[k]   = scratch.stokes_fe_values[velocities].divergence (k, q);
+	      scratch.phi_p[k]       = scratch.stokes_fe_values[pressure].value (k, q);
+	    }
+	}
+
+      if (rebuild_stokes_matrix)
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    data.local_matrix(i,j) += (EquationData::eta * 2 *
+				       scratch.grads_phi_u[i] * scratch.grads_phi_u[j]
+				       - scratch.div_phi_u[i] * scratch.phi_p[j]
+				       - scratch.phi_p[i] * scratch.div_phi_u[j])
+				      * scratch.stokes_fe_values.JxW(q);
+
+      const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
+				   (Point<dim> (0,0,1)) );
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	data.local_rhs(i) += (EquationData::Rayleigh_number *
+			      gravity * scratch.phi_u[i] * old_temperature)*
+			     scratch.stokes_fe_values.JxW(q);
+    }
+
+  cell->get_dof_indices (data.local_dof_indices);
+}
+
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::
+copy_local_to_global_stokes_system (const Assembly::CopyData::StokesSystem<dim> &data)
+{
+  if (rebuild_stokes_matrix == true)
+    stokes_constraints.distribute_local_to_global (data.local_matrix,
+						   data.local_rhs,
+						   data.local_dof_indices,
+						   stokes_matrix,
+						   stokes_rhs);
+  else
+    stokes_constraints.distribute_local_to_global (data.local_rhs,
+						   data.local_dof_indices,
+						   stokes_rhs);
+}
+
+
+
+// @sect4{BoussinesqFlowProblem::assemble_stokes_system}
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 {
@@ -841,106 +1373,43 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   stokes_rhs=0;
 
   const QGauss<dim> quadrature_formula(stokes_degree+2);
-  FEValues<dim>     stokes_fe_values (stokes_fe, quadrature_formula,
-				      update_values    |
-				      update_quadrature_points  |
-				      update_JxW_values |
-				      (rebuild_stokes_matrix == true
-				       ?
-				       update_gradients
-				       :
-				       UpdateFlags(0)));
+
+  typedef
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+    SubdomainFilter;
+
+  WorkStream::
+    run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			   stokes_dof_handler.begin_active()),
+	  SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			   stokes_dof_handler.end()),
+	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			   local_assemble_stokes_system,
+			   this,
+			   _1,
+			   _2,
+			   _3),
+	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			   copy_local_to_global_stokes_system,
+			   this,
+			   _1),
+	  Assembly::Scratch::
+	  StokesSystem<dim> (stokes_fe, quadrature_formula,
+			     (update_values    |
+			      update_quadrature_points  |
+			      update_JxW_values |
+			      (rebuild_stokes_matrix == true
+			       ?
+			       update_gradients
+			       :
+			       UpdateFlags(0))),
+			     temperature_fe,
+			     update_values),
+	  Assembly::CopyData::
+	 StokesSystem<dim> (stokes_fe));
   
-  FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
-					   update_values);
-
-  const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
-
-  const unsigned int   n_q_points      = quadrature_formula.size();
-
-  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       local_rhs (dofs_per_cell);
-
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-  std::vector<double>               old_temperature_values(n_q_points);
-
-  std::vector<Tensor<1,dim> >          phi_u       (dofs_per_cell);
-  std::vector<SymmetricTensor<2,dim> > grads_phi_u (dofs_per_cell);
-  std::vector<double>                  div_phi_u   (dofs_per_cell);
-  std::vector<double>                  phi_p       (dofs_per_cell);
-
-  const FEValuesExtractors::Vector velocities (0);
-  const FEValuesExtractors::Scalar pressure (dim);
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = stokes_dof_handler.begin_active(),
-    endc = stokes_dof_handler.end();
-  typename DoFHandler<dim>::active_cell_iterator
-    temperature_cell = temperature_dof_handler.begin_active();
-  
-  for (; cell!=endc; ++cell, ++temperature_cell)
-    if (cell->subdomain_id() == 
-	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
-      {
-	stokes_fe_values.reinit (cell);
-	temperature_fe_values.reinit (temperature_cell);
-	
-	if (stokes_fe_values.get_cell_similarity() != CellSimilarity::translation)
-	  local_matrix = 0;
-	local_rhs = 0;
-  
-	temperature_fe_values.get_function_values (old_temperature_solution, 
-						   old_temperature_values);
-  
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    const double old_temperature = old_temperature_values[q];
-  
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		phi_u[k] = stokes_fe_values[velocities].value (k,q);
-		if (rebuild_stokes_matrix && 
-		    stokes_fe_values.get_cell_similarity() != CellSimilarity::translation)
-		  {
-		    grads_phi_u[k] = stokes_fe_values[velocities].symmetric_gradient(k,q);
-		    div_phi_u[k]   = stokes_fe_values[velocities].divergence (k, q);
-		    phi_p[k]       = stokes_fe_values[pressure].value (k, q);
-		  }
-	      }
-  
-	    if (rebuild_stokes_matrix &&
-		stokes_fe_values.get_cell_similarity() != CellSimilarity::translation)
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  local_matrix(i,j) += (EquationData::eta * 2 *
-					grads_phi_u[i] * grads_phi_u[j]
-					- div_phi_u[i] * phi_p[j]
-					- phi_p[i] * div_phi_u[j])
-		                       * stokes_fe_values.JxW(q);
-
-	    const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
-					 (Point<dim> (0,0,1)) );
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      local_rhs(i) += (EquationData::Rayleigh_number *
-			       gravity * phi_u[i] * old_temperature)*
-			      stokes_fe_values.JxW(q);
-	  }
-  
-	cell->get_dof_indices (local_dof_indices);
-  
-	if (rebuild_stokes_matrix == true)
-	  stokes_constraints.distribute_local_to_global (local_matrix,
-							 local_rhs,
-							 local_dof_indices,
-							 stokes_matrix,
-							 stokes_rhs);
-	else
-	  stokes_constraints.distribute_local_to_global (local_rhs,
-							 local_dof_indices,
-							 stokes_rhs);
-      }
-
   stokes_matrix.compress();
   stokes_rhs.compress();
 
@@ -957,6 +1426,61 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
 				 // @sect4{BoussinesqFlowProblem::assemble_temperature_system}
 template <int dim>
+void BoussinesqFlowProblem<dim>::
+local_assemble_temperature_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
+				   Assembly::Scratch::TemperatureMatrix<dim> &scratch,
+				   Assembly::CopyData::TemperatureMatrix<dim> &data)
+{
+  const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_fe().dofs_per_cell;
+  const unsigned int n_q_points    = scratch.temperature_fe_values.n_quadrature_points;
+
+  scratch.temperature_fe_values.reinit (cell);
+  cell->get_dof_indices (data.local_dof_indices);
+
+  data.local_mass_matrix = 0;
+  data.local_stiffness_matrix = 0;
+  
+	
+  for (unsigned int q=0; q<n_q_points; ++q)
+    {
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+	  scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad (k,q);
+	  scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value (k, q);
+	}
+	    
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  {
+	    data.local_mass_matrix(i,j)
+	      += (scratch.phi_T[i] * scratch.phi_T[j]
+		  *
+		  scratch.temperature_fe_values.JxW(q));
+	    data.local_stiffness_matrix(i,j)
+	      += (EquationData::kappa * scratch.grad_phi_T[i] * scratch.grad_phi_T[j]
+		  *
+		  scratch.temperature_fe_values.JxW(q));
+	  }
+    }
+}
+
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::
+copy_local_to_global_temperature_matrix (const Assembly::CopyData::TemperatureMatrix<dim> &data)
+{
+  temperature_constraints.distribute_local_to_global (data.local_mass_matrix,
+						      data.local_dof_indices,
+						      temperature_mass_matrix);
+  temperature_constraints.distribute_local_to_global (data.local_stiffness_matrix,
+						      data.local_dof_indices,
+						      temperature_stiffness_matrix);
+}
+
+
+template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 {
   if (rebuild_temperature_matrices == false)
@@ -967,67 +1491,32 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
   temperature_stiffness_matrix = 0;
   
   const QGauss<dim> quadrature_formula(temperature_degree+2);
-  FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
-					   update_values    | update_gradients |
-					   update_JxW_values);
 
-  const unsigned int   dofs_per_cell   = temperature_fe.dofs_per_cell;
-  const unsigned int   n_q_points      = quadrature_formula.size();
+  typedef
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+    SubdomainFilter;
 
-  FullMatrix<double>   local_mass_matrix (dofs_per_cell, dofs_per_cell);
-  FullMatrix<double>   local_stiffness_matrix (dofs_per_cell, dofs_per_cell);
-
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-  std::vector<double>                  phi_T       (dofs_per_cell);
-  std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = temperature_dof_handler.begin_active(),
-    endc = temperature_dof_handler.end();
-  for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == 
-	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) )
-      {
-	temperature_fe_values.reinit (cell);
-	
-	if (temperature_fe_values.get_cell_similarity() != CellSimilarity::translation)
-	  {
-	    local_mass_matrix = 0;
-	    local_stiffness_matrix = 0;
-  
-	    for (unsigned int q=0; q<n_q_points; ++q)
-	      {
-		for (unsigned int k=0; k<dofs_per_cell; ++k)
-		  {
-		    grad_phi_T[k] = temperature_fe_values.shape_grad (k,q);
-		    phi_T[k]      = temperature_fe_values.shape_value (k, q);
-		  }
-
-		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  for (unsigned int j=0; j<dofs_per_cell; ++j)
-		    {
-		      local_mass_matrix(i,j)
-			+= (phi_T[i] * phi_T[j]
-			    *
-			    temperature_fe_values.JxW(q));
-		      local_stiffness_matrix(i,j)
-			+= (EquationData::kappa * grad_phi_T[i] * grad_phi_T[j]
-			    *
-			    temperature_fe_values.JxW(q));
-		    }
-	      }
-	  }
-	
-	cell->get_dof_indices (local_dof_indices);
-  
-	temperature_constraints.distribute_local_to_global (local_mass_matrix,
-							    local_dof_indices,
-							    temperature_mass_matrix);
-	temperature_constraints.distribute_local_to_global (local_stiffness_matrix,
-							    local_dof_indices,
-							    temperature_stiffness_matrix);
-      }
+  WorkStream::
+    run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			   temperature_dof_handler.begin_active()),
+	  SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			   temperature_dof_handler.end()),
+	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			   local_assemble_temperature_matrix,
+			   this,
+			   _1,
+			   _2,
+			   _3),
+	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			   copy_local_to_global_temperature_matrix,
+			   this,
+			   _1),
+	  Assembly::Scratch::
+	  TemperatureMatrix<dim> (temperature_fe, quadrature_formula),
+	  Assembly::CopyData::
+	 TemperatureMatrix<dim> (temperature_fe));
 
   temperature_mass_matrix.compress();
   temperature_stiffness_matrix.compress();
@@ -1038,6 +1527,138 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
   computing_timer.exit_section();
 }
 
+
+
+template <int dim>
+void BoussinesqFlowProblem<dim>::
+local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
+				const double                   global_max_velocity,
+				const typename DoFHandler<dim>::active_cell_iterator &cell,
+				Assembly::Scratch::TemperatureRHS<dim> &scratch,
+				Assembly::CopyData::TemperatureRHS<dim> &data)
+{
+  const bool use_bdf2_scheme = (timestep_number != 0);
+
+  const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_fe().dofs_per_cell;
+  const unsigned int n_q_points    = scratch.temperature_fe_values.n_quadrature_points;
+
+  EquationData::TemperatureRightHandSide<dim>  temperature_right_hand_side;
+
+  const FEValuesExtractors::Vector velocities (0);
+  
+  data.local_rhs = 0;
+  
+  scratch.temperature_fe_values.reinit (cell);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    stokes_cell (&triangulation,
+		 cell->level(),
+		 cell->index(),
+		 &stokes_dof_handler);
+  scratch.stokes_fe_values.reinit (stokes_cell);
+  
+  scratch.temperature_fe_values.get_function_values (old_temperature_solution,
+						     scratch.old_temperature_values);
+  scratch.temperature_fe_values.get_function_values (old_old_temperature_solution,
+						     scratch.old_old_temperature_values);
+  
+  scratch.temperature_fe_values.get_function_gradients (old_temperature_solution,
+							scratch.old_temperature_grads);
+  scratch.temperature_fe_values.get_function_gradients (old_old_temperature_solution,
+							scratch.old_old_temperature_grads);
+	
+  scratch.temperature_fe_values.get_function_laplacians (old_temperature_solution,
+							 scratch.old_temperature_laplacians);
+  scratch.temperature_fe_values.get_function_laplacians (old_old_temperature_solution,
+							 scratch.old_old_temperature_laplacians);
+	
+  temperature_right_hand_side.value_list (scratch.temperature_fe_values.get_quadrature_points(),
+					  scratch.gamma_values);
+
+  scratch.stokes_fe_values[velocities].get_function_values (stokes_solution,
+							    scratch.old_velocity_values);
+  scratch.stokes_fe_values[velocities].get_function_values (old_stokes_solution,
+							    scratch.old_old_velocity_values);
+	
+  const double nu
+    = compute_viscosity (scratch.old_temperature_values,
+			 scratch.old_old_temperature_values,
+			 scratch.old_temperature_grads,
+			 scratch.old_old_temperature_grads,
+			 scratch.old_temperature_laplacians,
+			 scratch.old_old_temperature_laplacians,
+			 scratch.old_velocity_values,
+			 scratch.old_old_velocity_values,
+			 scratch.gamma_values,
+			 global_max_velocity,
+			 global_T_range.second - global_T_range.first,
+			 cell->diameter());
+	
+  for (unsigned int q=0; q<n_q_points; ++q)
+    {
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+	  scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value (k, q);
+	  scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad (k,q);
+	}
+  
+
+      const double old_Ts
+	= (use_bdf2_scheme ?
+	   (scratch.old_temperature_values[q] *
+	    (time_step + old_time_step) / old_time_step
+	    -
+	    scratch.old_old_temperature_values[q] *
+	    (time_step * time_step) /
+	    (old_time_step * (time_step + old_time_step)))
+	   :
+	   scratch.old_temperature_values[q]);
+
+      const Tensor<1,dim> ext_grad_T
+	= (use_bdf2_scheme ? 
+	   (scratch.old_temperature_grads[q] *
+	    (1+time_step/old_time_step) 
+	    -
+	    scratch.old_old_temperature_grads[q] *
+	    time_step / old_time_step) 
+	   :
+	   scratch.old_temperature_grads[q]);
+	  
+      const Tensor<1,dim> extrapolated_u
+	= (use_bdf2_scheme ? 
+	   (scratch.old_velocity_values[q] * (1+time_step/old_time_step) - 
+	    scratch.old_old_velocity_values[q] * time_step/old_time_step)
+	   :
+	   scratch.old_velocity_values[q]);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	data.local_rhs(i) += (old_Ts * scratch.phi_T[i]
+			      -
+			      time_step *
+			      extrapolated_u * ext_grad_T * scratch.phi_T[i]
+			      -
+			      time_step *
+			      nu * ext_grad_T * scratch.grad_phi_T[i]
+			      +
+			      time_step *
+			      scratch.gamma_values[q] * scratch.phi_T[i])
+			     *
+			     scratch.temperature_fe_values.JxW(q);
+    }
+	
+  cell->get_dof_indices (data.local_dof_indices);
+}
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::
+copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<dim> &data)
+{
+  temperature_constraints.distribute_local_to_global (data.local_rhs,
+						      data.local_dof_indices,
+						      temperature_rhs);
+}
 
 
 
@@ -1072,159 +1693,36 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
   temperature_rhs = 0;
   
   const QGauss<dim> quadrature_formula(temperature_degree+2);
-  FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
-					   update_values    |
-					   update_gradients |
-					   update_hessians  |
-					   update_quadrature_points |
-					   update_JxW_values);
-  FEValues<dim> stokes_fe_values (stokes_fe, quadrature_formula,
-				  update_values);
-
-  const unsigned int   dofs_per_cell   = temperature_fe.dofs_per_cell;
-  const unsigned int   n_q_points      = quadrature_formula.size();
-
-  Vector<double>       local_rhs (dofs_per_cell);
-  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-  std::vector<Tensor<1,dim> > old_velocity_values (n_q_points);
-  std::vector<Tensor<1,dim> > old_old_velocity_values (n_q_points);
-  
-  std::vector<double>         old_temperature_values (n_q_points);
-  std::vector<double>         old_old_temperature_values(n_q_points);
-  std::vector<Tensor<1,dim> > old_temperature_grads(n_q_points);
-  std::vector<Tensor<1,dim> > old_old_temperature_grads(n_q_points);
-  std::vector<double>         old_temperature_laplacians(n_q_points);
-  std::vector<double>         old_old_temperature_laplacians(n_q_points);
-
-  
-  EquationData::TemperatureRightHandSide<dim>  temperature_right_hand_side;
-  std::vector<double> gamma_values (n_q_points);
-
-  std::vector<double>                  phi_T       (dofs_per_cell);
-  std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
-  
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
 
-  const TrilinosWrappers::BlockVector 
-    localized_stokes_solution (stokes_solution);
-  const TrilinosWrappers::BlockVector 
-    localized_old_stokes_solution (old_stokes_solution);
+  typedef
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+    SubdomainFilter;
 
-  const FEValuesExtractors::Vector velocities (0);
-  
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = temperature_dof_handler.begin_active(),
-    endc = temperature_dof_handler.end();
-  typename DoFHandler<dim>::active_cell_iterator
-    stokes_cell = stokes_dof_handler.begin_active();
-
-  for (; cell!=endc; ++cell, ++stokes_cell)
-    if (cell->subdomain_id() == 
-	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) )
-      {
-	local_rhs = 0;
-  
-	temperature_fe_values.reinit (cell);
-	stokes_fe_values.reinit (stokes_cell);
-  
-	temperature_fe_values.get_function_values (old_temperature_solution,
-						   old_temperature_values);
-	temperature_fe_values.get_function_values (old_old_temperature_solution,
-						   old_old_temperature_values);
-  
-	temperature_fe_values.get_function_gradients (old_temperature_solution,
-						      old_temperature_grads);
-	temperature_fe_values.get_function_gradients (old_old_temperature_solution,
-						      old_old_temperature_grads);
-	
-	temperature_fe_values.get_function_laplacians (old_temperature_solution,
-						       old_temperature_laplacians);
-	temperature_fe_values.get_function_laplacians (old_old_temperature_solution,
-						       old_old_temperature_laplacians);
-	
-	temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
-						gamma_values);
-
-	stokes_fe_values[velocities].get_function_values (localized_stokes_solution,
-							  old_velocity_values);
-	stokes_fe_values[velocities].get_function_values (localized_old_stokes_solution,
-							  old_old_velocity_values);
-	
-	const double nu
-	  = compute_viscosity (old_temperature_values,
-			       old_old_temperature_values,
-			       old_temperature_grads,
-			       old_old_temperature_grads,
-			       old_temperature_laplacians,
-			       old_old_temperature_laplacians,
-			       old_velocity_values,
-			       old_old_velocity_values,
-			       gamma_values,
-			       maximal_velocity,
-			       global_T_range.second - global_T_range.first,
-			       cell->diameter());
-	
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		grad_phi_T[k] = temperature_fe_values.shape_grad (k,q);
-		phi_T[k]      = temperature_fe_values.shape_value (k, q);
-	      }
-  
-
-	  const double old_Ts
-	    = (use_bdf2_scheme ?
-	       (old_temperature_values[q] *
-		(time_step + old_time_step) / old_time_step
-		-
-		old_old_temperature_values[q] *
-		(time_step * time_step) /
-		(old_time_step * (time_step + old_time_step)))
-	       :
-	       old_temperature_values[q]);
-
-	  const Tensor<1,dim> ext_grad_T
-	    = (use_bdf2_scheme ? 
-	       (old_temperature_grads[q] *
-		(1+time_step/old_time_step) 
-		-
-		old_old_temperature_grads[q] *
-		time_step / old_time_step) 
-	       :
-	       old_temperature_grads[q]);
-	  
-	  const Tensor<1,dim> extrapolated_u
-	    = (use_bdf2_scheme ? 
-	       (old_velocity_values[q] * (1+time_step/old_time_step) - 
-		old_old_velocity_values[q] * time_step/old_time_step)
-	       :
-	       old_velocity_values[q]);
-
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    local_rhs(i) += (old_Ts * phi_T[i]
-			     -
-			     time_step *
-			     extrapolated_u * ext_grad_T * phi_T[i]
-			     -
-			     time_step *
-			     nu * ext_grad_T * grad_phi_T[i]
-			     +
-			     time_step *
-			     gamma_values[q] * phi_T[i])
-	                    *
-	                    temperature_fe_values.JxW(q);
-	  }
-	
-	cell->get_dof_indices (local_dof_indices);
-	temperature_constraints.distribute_local_to_global (local_rhs,
-							    local_dof_indices,
-							    temperature_rhs);
-      }
+  WorkStream::
+    run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			   temperature_dof_handler.begin_active()),
+	  SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			   temperature_dof_handler.end()),
+	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			   local_assemble_temperature_rhs,
+			   this,
+			   global_T_range,
+			   maximal_velocity,
+			   _1,
+			   _2,
+			   _3),
+	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			   copy_local_to_global_temperature_rhs,
+			   this,
+			   _1),
+	  Assembly::Scratch::
+	  TemperatureRHS<dim> (temperature_fe, stokes_fe, quadrature_formula),
+	  Assembly::CopyData::
+	 TemperatureRHS<dim> (temperature_fe));
 
   temperature_rhs.compress();
 }
@@ -1320,29 +1818,35 @@ void BoussinesqFlowProblem<dim>::solve ()
     SolverControl solver_control (stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
 
-    SolverGMRES<TrilinosWrappers::MPI::BlockVector>
-      gmres (solver_control,
-	     SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
+    SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
+      bicgstab (solver_control, false);
+
+    TrilinosWrappers::MPI::BlockVector
+      distributed_stokes_solution (stokes_partitioner);
+    distributed_stokes_solution = stokes_solution;
 
 				   // now treat the hanging nodes correctly.
-    const unsigned int start = stokes_solution.block(1).local_range().first + 
-      stokes_solution.block(0).size();
-    const unsigned int end = stokes_solution.block(1).local_range().second + 
-      stokes_solution.block(0).size();
+    const unsigned int start = 
+      distributed_stokes_solution.block(1).local_range().first + 
+      distributed_stokes_solution.block(0).size();
+    const unsigned int end = 
+      distributed_stokes_solution.block(1).local_range().second + 
+      distributed_stokes_solution.block(0).size();
     for (unsigned int i=start; i<end; ++i)
       if (stokes_constraints.is_constrained (i))
-	stokes_solution(i) = 0;
+	distributed_stokes_solution(i) = 0;
+    
+    bicgstab.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs, 
+		   preconditioner);
 
-    gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
-
+    stokes_solution = distributed_stokes_solution;
+    
     pcout << "   "
 	  << solver_control.last_step()
-	  << " GMRES iterations for Stokes subsystem."
+	  << " BiCGStab iterations for Stokes subsystem."
 	  << std::endl;
 
-    TrilinosWrappers::BlockVector localized_stokes_solution (stokes_solution);
-    stokes_constraints.distribute (localized_stokes_solution);
-    stokes_solution = localized_stokes_solution;
+    stokes_constraints.distribute (stokes_solution);
   }
   computing_timer.exit_section();
 
@@ -1372,26 +1876,29 @@ void BoussinesqFlowProblem<dim>::solve ()
 				  1e-8*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
 
-    cg.solve (temperature_matrix, temperature_solution,
+    TrilinosWrappers::MPI::Vector
+      distributed_temperature_solution (temperature_partitioner);
+    distributed_temperature_solution = temperature_solution;
+
+    cg.solve (temperature_matrix, distributed_temperature_solution,
 	      temperature_rhs, *T_preconditioner);
 
-    TrilinosWrappers::Vector localized_temperature_solution (temperature_solution);
-    temperature_constraints.distribute (localized_temperature_solution);
-    temperature_solution = localized_temperature_solution;
+    temperature_solution = distributed_temperature_solution;
+    temperature_constraints.distribute (temperature_solution);
 
     pcout << "   "
 	  << solver_control.last_step()
 	  << " CG iterations for temperature" << std::endl;
     computing_timer.exit_section();
 
-    double min_temperature = localized_temperature_solution(0),
-	   max_temperature = localized_temperature_solution(0);
+    double min_temperature = temperature_solution(0),
+	   max_temperature = temperature_solution(0);
     for (unsigned int i=1; i<temperature_solution.size(); ++i)
       {
 	min_temperature = std::min<double> (min_temperature,
-					    localized_temperature_solution(i));
+					    temperature_solution(i));
 	max_temperature = std::max<double> (max_temperature,
-					    localized_temperature_solution(i));
+					    temperature_solution(i));
       }
     
     pcout << "   Temperature range: "
@@ -1418,8 +1925,6 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 	  ExcInternalError());
 
   Vector<double> joint_solution (joint_dof_handler.n_dofs());
-  TrilinosWrappers::BlockVector localized_stokes_solution (stokes_solution);
-  TrilinosWrappers::Vector localized_temperature_solution (temperature_solution);
 
   if (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) == 0)
     {
@@ -1448,7 +1953,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 			  local_stokes_dof_indices.size(),
 			  ExcInternalError());
 		  joint_solution(local_joint_dof_indices[i])
-		    = localized_stokes_solution(local_stokes_dof_indices[joint_fe.system_to_base_index(i).second]);
+		    = stokes_solution(local_stokes_dof_indices[joint_fe.system_to_base_index(i).second]);
 		}
 	      else
 		{
@@ -1459,7 +1964,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 			  local_stokes_dof_indices.size(),
 			  ExcInternalError());
 		  joint_solution(local_joint_dof_indices[i])
-		    = localized_temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
+		    = temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
 		}
 	  }
       }
@@ -1501,12 +2006,10 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   computing_timer.enter_section ("Refine mesh structure, part 1");
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-  TrilinosWrappers::Vector localized_temperature_solution (temperature_solution);
-
   KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
 				      QGauss<dim-1>(temperature_degree+1),
 				      typename FunctionMap<dim>::type(),
-				      localized_temperature_solution,
+				      temperature_solution,
 				      estimated_error_per_cell);
 
   GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,

@@ -2547,10 +2547,11 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
     us[i].reinit (dof_handler.n_dofs());
   
 				   // solve linear systems in parallel
-  Threads::ThreadGroup<> threads;
+  Threads::TaskGroup<> tasks;
   for (unsigned int i=0; i<dim; ++i)
-    threads += Threads::spawn (&GridGenerator::laplace_solve)(S, m[i], us[i]);
-  threads.join_all ();
+    tasks += Threads::new_task (&GridGenerator::laplace_solve,
+				S, m[i], us[i]);
+  tasks.join_all ();
   
 				   // change the coordinates of the
 				   // points of the triangulation

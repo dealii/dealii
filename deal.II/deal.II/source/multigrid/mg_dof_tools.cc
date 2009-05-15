@@ -956,7 +956,7 @@ MGTools::count_dofs_per_component (
 	  std::vector<std::vector<bool> >
 	    component_select (n_components,
 			      std::vector<bool>(n_components, false));
-	  Threads::ThreadGroup<> threads;
+	  Threads::TaskGroup<> tasks;
 	  for (unsigned int i=0; i<n_components; ++i)
 	    {
 	      void (*fun_ptr) (const unsigned int       level,
@@ -966,10 +966,12 @@ MGTools::count_dofs_per_component (
 			       bool)
 		= &DoFTools::template extract_level_dofs<dim>;
 	      component_select[i][i] = true;
-	      threads += Threads::spawn (fun_ptr)(l, dof_handler, component_select[i],
-                                                  dofs_in_component[i], false);
+	      tasks += Threads::new_task (fun_ptr,
+					  l, dof_handler,
+					  component_select[i],
+					  dofs_in_component[i], false);
 	    }
-	  threads.join_all();
+	  tasks.join_all();
 
 					   // next count what we got
 	  unsigned int component = 0;
@@ -1067,7 +1069,7 @@ MGTools::count_dofs_per_block (
 	dofs_in_block (n_blocks, std::vector<bool>(dof_handler.n_dofs(l), false));
       std::vector<std::vector<bool> >
 	block_select (n_blocks, std::vector<bool>(n_blocks, false));
-      Threads::ThreadGroup<> threads;
+      Threads::TaskGroup<> tasks;
       for (unsigned int i=0; i<n_blocks; ++i)
 	{
 	  void (*fun_ptr) (const unsigned int level,
@@ -1077,10 +1079,11 @@ MGTools::count_dofs_per_block (
 			   bool)
 	    = &DoFTools::template extract_level_dofs<dim>;
 	  block_select[i][i] = true;
-	  threads += Threads::spawn (fun_ptr)(l, dof_handler, block_select[i],
-					      dofs_in_block[i], true);
+	  tasks += Threads::new_task (fun_ptr,
+				      l, dof_handler, block_select[i],
+				      dofs_in_block[i], true);
 	};
-      threads.join_all ();
+      tasks.join_all ();
       
 				       // next count what we got
       for (unsigned int block=0;block<fe.n_blocks();++block)

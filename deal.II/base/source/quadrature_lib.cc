@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -971,7 +971,6 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 	    this->quadrature_points[j] = quad.point(i)*fraction;
 	    this->weights[j] = -std::log(alpha/fraction)*quad.weight(i)*fraction;
 	}
-
 	// In case we need the second quadrature as well, do it now.
 	if(fraction != 1) {
 	    this->quadrature_points[i+n] = quad2.point(i)*(1-fraction)+Point<1>(fraction);

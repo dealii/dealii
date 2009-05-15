@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,10 +17,13 @@
 
 #include <base/config.h>
 #include <base/smartpointer.h>
-#include <base/multithread_info.h>
 #include <base/data_out_base.h>
 #include <dofs/dof_handler.h>
 #include <fe/mapping.h>
+#include <hp/q_collection.h>
+#include <hp/fe_collection.h>
+#include <hp/mapping_collection.h>
+#include <hp/fe_values.h>
 #include <numerics/data_postprocessor.h>
 #include <numerics/data_component_interpretation.h>
 
@@ -42,45 +45,85 @@ namespace internal
 				      * structures are created
 				      * globally rather than on each
 				      * cell to avoid allocation of
-				      * memory in the threads.
+				      * memory in the threads. This is
+				      * a base class for the
+				      * AdditionalData kind of data
+				      * structure discussed in the
+				      * documentation of the
+				      * WorkStream class.
 				      *
-				      * The #cell_to_patch_index_map is
-				      * an array that stores for index
+				      * The
+				      * <code>cell_to_patch_index_map</code>
+				      * is an array that stores for index
 				      * <tt>[i][j]</tt> the number of the
-				      * patch that associated with the
-				      * cell with index @p j on level
-				      * @p i. This information is set
-				      * up prior to generation of the
-				      * patches, and is needed to
-				      * generate neighborship
+				      * patch that associated with the cell
+				      * with index @p j on level @p i. This
+				      * information is set up prior to
+				      * generation of the patches, and is
+				      * needed to generate neighborship
 				      * information.
 				      *
 				      * This structure is used by
 				      * several of the DataOut*
-				      * classes, not all of which use
-				      * all fields.
+				      * classes, which derived their
+				      * own ParallelData classes from
+				      * it for additional fields.
 				      */
     template <int dim, int spacedim>
-    struct ParallelData
+    struct ParallelDataBase
     {
-	unsigned int n_threads;
-	unsigned int this_thread;
-	unsigned int n_components;
-	unsigned int n_datasets;
-	unsigned int n_subdivisions;
-	unsigned int n_patches_per_circle;
-	SmartPointer<const Mapping<dim,spacedim> >     mapping;
-	std::vector<double>                            patch_values;
-	std::vector<Vector<double> >                   patch_values_system;
-	std::vector<Tensor<1,spacedim> >               patch_gradients;
-	std::vector<std::vector<Tensor<1,spacedim> > > patch_gradients_system;
-	std::vector<Tensor<2,spacedim> >               patch_hessians;
-	std::vector<std::vector<Tensor<2,spacedim> > > patch_hessians_system;
-	std::vector<Point<spacedim> >                  dummy_normals;
-	std::vector<Point<dim> >                       patch_normals;
-	std::vector<std::vector<Vector<double> > >     postprocessed_values;
+	template <class FE>
+	ParallelDataBase (const unsigned int n_components,
+			  const unsigned int n_datasets,
+			  const unsigned int n_subdivisions,
+			  const unsigned int n_q_points,
+			  const std::vector<unsigned int> &n_postprocessor_outputs,
+			  const FE &finite_elements);
+			  
+	const unsigned int n_components;
+	const unsigned int n_datasets;
+	const unsigned int n_subdivisions;
 
-	std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
+	std::vector<double>                                patch_values;
+	std::vector<dealii::Vector<double> >               patch_values_system;
+	std::vector<Tensor<1,spacedim> >                   patch_gradients;
+	std::vector<std::vector<Tensor<1,spacedim> > >     patch_gradients_system;
+	std::vector<Tensor<2,spacedim> >                   patch_hessians;
+	std::vector<std::vector<Tensor<2,spacedim> > >     patch_hessians_system;
+	std::vector<std::vector<dealii::Vector<double> > > postprocessed_values;
+
+	const dealii::hp::FECollection<dim,spacedim>      fe_collection;	
+    };
+
+
+				     /**
+				      * A derived class for use in the
+				      * DataOut class. This is
+				      * a class for the
+				      * AdditionalData kind of data
+				      * structure discussed in the
+				      * documentation of the
+				      * WorkStream context.
+				      */
+    template <int dim, int spacedim>
+    struct ParallelData : public ParallelDataBase<dim,spacedim>
+    {
+	template <class FE>
+	ParallelData (const Quadrature<dim> &quadrature,
+		      const unsigned int n_components,
+		      const unsigned int n_datasets,
+		      const unsigned int n_subdivisions,
+		      const std::vector<unsigned int> &n_postprocessor_outputs,
+		      const Mapping<dim,spacedim> &mapping,
+		      const std::vector<std::vector<unsigned int> > &cell_to_patch_index_map,
+		      const FE &finite_elements,
+		      const UpdateFlags update_flags);
+
+	const dealii::hp::QCollection<dim> q_collection;
+	const dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
+	dealii::hp::FEValues<dim,spacedim> x_fe_values;
+
+	const std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
     };
   }
 }
@@ -1199,17 +1242,8 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
 				      * stored in
 				      * DataOutInterface::default_subdivisions
 				      * is to be used.
-				      *
-				      * The function supports
-				      * multithreading, if deal.II is
-				      * compiled in multithreading
-				      * mode. The default number of
-				      * threads to be used to build
-				      * the patches is set to
-				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
-    virtual void build_patches (const unsigned int n_subdivisions = 0,
-				const unsigned int n_threads      = multithread_info.n_default_threads);
+    virtual void build_patches (const unsigned int n_subdivisions = 0);
 
 				     /**
 				      * Same as above, except that the
@@ -1261,9 +1295,8 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
 				      * replaced by a hp::MappingCollection in
 				      * case of a hp::DoFHandler.
 				      */
-  virtual void build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
+    virtual void build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
 				const unsigned int n_subdivisions = 0,
-				const unsigned int n_threads      = multithread_info.n_default_threads,
 				const CurvedCellRegion curved_region = curved_boundary);
     
 				     /**
@@ -1309,25 +1342,63 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
     
   private:
 				     /**
-				      * Builds every @p n_threads's
-				      * patch. This function may be
-				      * called in parallel.
-				      * If multithreading is not
-				      * used, the function is called
-				      * once and generates all patches.
+				      * Build one patch. This function
+				      * is called in a WorkStream
+				      * context.
 				      */
-    void build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data);
-
-				     /**
-				      * Store in which region cells shall be
-				      * curved, if a Mapping is provided.
-				      */
-    CurvedCellRegion curved_cell_region;
+    void build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
+			  internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
+			  DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
+			  const CurvedCellRegion curved_cell_region);
 };
 
 
 
 // -------------------- template and inline functions ------------------------
+
+
+namespace internal
+{
+  namespace DataOut
+  {
+    template <int dim, int spacedim>
+    template <class FE>
+    ParallelDataBase<dim,spacedim>::
+    ParallelDataBase (const unsigned int n_components,
+		      const unsigned int n_datasets,
+		      const unsigned int n_subdivisions,
+		      const unsigned int n_q_points,
+		      const std::vector<unsigned int> &n_postprocessor_outputs,
+		      const FE &finite_elements)
+		    :
+		    n_components (n_components),
+		    n_datasets (n_datasets),
+		    n_subdivisions (n_subdivisions),
+		    patch_values (n_q_points),
+		    patch_values_system (n_q_points),
+		    patch_gradients (n_q_points),
+		    patch_gradients_system (n_q_points),
+		    patch_hessians (n_q_points),
+		    patch_hessians_system (n_q_points),
+		    postprocessed_values (n_postprocessor_outputs.size()),
+		    fe_collection (finite_elements)
+    {
+      for (unsigned int k=0; k<n_q_points; ++k)
+	{
+	  patch_values_system[k].reinit(n_components);
+	  patch_gradients_system[k].resize(n_components);
+	  patch_hessians_system[k].resize(n_components);
+	}
+
+      for (unsigned int dataset=0; dataset<n_postprocessor_outputs.size(); ++dataset)
+	if (n_postprocessor_outputs[dataset] != 0)
+	  postprocessed_values[dataset]
+	    .resize(n_q_points,
+		    dealii::Vector<double>(n_postprocessor_outputs[dataset]));
+    }
+  }
+}
+
 
 template <class DH, int patch_dim, int patch_space_dim>
 template <class DH2>
