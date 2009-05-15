@@ -927,13 +927,13 @@ template<int dim> void Navier_Stokes_Projection<dim>::projection_step( const boo
 // @sect4{ <code>Navier_Stokes_Projection::update_pressure</code> }
 // This is the pressure update step of the projection method. It implements the
 // standard formulation of the method, that is
-// $$
+// @f[
 //      p^{n+1} = p^n + \phi^{n+1},
-// $$
+// @f]
 // or the rotational form, which is
-// $$
+// @f[
 //      p^{n+1} = p^n + \phi^{n+1} - \frac{1}{Re} \nabla\cdot u^{n+1}.
-// $$
+// @f]
 template<int dim> void Navier_Stokes_Projection<dim>::update_pressure( const bool reinit_prec ){
   pres_n_minus_1 = pres_n;
   switch( type ){
