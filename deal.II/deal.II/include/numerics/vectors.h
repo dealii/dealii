@@ -1703,9 +1703,12 @@ class VectorTools
 				      * freedom values as given by the input
 				      * vector; they are not weighted by the
 				      * area of cells, i.e. the mean is
-				      * computed as <tt>sum_i v_i</tt>, rather
-				      * than as <tt>int_Omega v(x) = int_Omega
-				      * sum_i v_i phi_i(x)</tt>.
+				      * computed as $\sum_i v_i$, rather than
+				      * as $\int_\Omega v(x) = \int_\Omega
+				      * \sum_i v_i \phi_i(x)$. The latter can
+				      * be obtained from the
+				      * VectorTools::compute_mean_function,
+				      * however.
 				      *
 				      * Apart from the vector @p v to operate
 				      * on, this function takes a bit
@@ -1729,24 +1732,37 @@ class VectorTools
 				      * This function integrates the
 				      * chosen component over the
 				      * whole domain and returns the
-				      * result.
+				      * result, i.e. it computes
+				      * $\int_\Omega [u_h(x)]_c \; dx$
+				      * where $c$ is the vector component
+				      * and $u_h$ is the function
+				      * representation of the nodal
+				      * vector given as fourth
+				      * argument. The integral is evaluated
+				      * numerically using the quadrature
+				      * formula given as third argument.
 				      *
-				      * Subtracting this mean value
-				      * from the node vector does not
-				      * generally yield the desired
-				      * result of a finite element
-				      * function with mean value
-				      * zero. In fact, it only works
-				      * for Lagrangian
-				      * elements. Therefore, it is
-				      * necessary to compute the mean
-				      * value and subtract it in the
+				      * This function is used in the
+				      * "Possibilities for extensions" part of
+				      * the results section of @ref step_3
+				      * "step-3".
+				      *
+				      * @note The function is most often used
+				      * when solving a problem whose solution
+				      * is only defined up to a constant, for
+				      * example a pure Neumann problem or the
+				      * pressure in a Stokes or Navier-Stokes
+				      * problem. In both cases, subtracting
+				      * the mean value as computed by the
+				      * current function, from the nodal
+				      * vector does not generally yield the
+				      * desired result of a finite element
+				      * function with mean value zero. In
+				      * fact, it only works for Lagrangian
+				      * elements. For all other elements, you
+				      * will need to compute the mean value
+				      * and subtract it right inside the
 				      * evaluation routine.
-				      *
-				      * So far, this is needed only in
-				      * the error evaluation for
-				      * Stokes with complete Dirichlet
-				      * boundaries for the velocities.
 				      */
     template <int dim, class InVector, int spacedim>
     static double compute_mean_value (const Mapping<dim, spacedim>    &mapping,
@@ -1756,7 +1772,7 @@ class VectorTools
 				      const unsigned int     component);
 
 				     /**
-				      * Calls the compute_mean_value()
+				      * Calls the other compute_mean_value()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
