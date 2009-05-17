@@ -10,10 +10,13 @@
 /*    further information on this license.                        */
 
 
-// @sect3{Include Files}
-// We start by including all the necessary dealii header files and some C++ related ones. Each
-// one of them has been discussed in previous tutorial programs,
-// so we will not get into details here.
+				 // @sect3{Include Files}
+
+				 // We start by including all the necessary
+				 // dealii header files and some C++ related
+				 // ones. Each one of them has been discussed
+				 // in previous tutorial programs, so we will
+				 // not get into details here.
 #include <base/parameter_handler.h>
 #include <base/point.h>
 #include <base/function.h>
