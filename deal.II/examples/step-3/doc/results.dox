@@ -159,7 +159,7 @@ suggestions:
                                            Point<2>(1./3, 1./3))
               << std::endl;
   @endcode
-  For 1 through 8 global refinement steps, we then get the following sequence
+  For 1 through 9 global refinement steps, we then get the following sequence
   of point values:
   <table align="center">
     <tr> <td># of refinements</td> <td>$u_h(\frac 13,\frac13)$</td> </tr>
@@ -185,4 +185,35 @@ suggestions:
   elements. All you need to do is to set the polynomial degree of the finite
   element to two in the constructor
   <code>LaplaceProblem::LaplaceProblem</code>.
+
+  <li>Convergence of the mean: A different way to see that the solution
+  actually converges (to something &mdash we can't tell whether it's really
+  the correct value!) is to compute the mean of the solution. To this end, add
+  the following code to <code>LaplaceProblem::output_results</code>:
+  @code
+    std::cout << "Mean value: "
+              << VectorTools::compute_mean_value (dof_handler, 
+						  QGauss<2>(3),
+						  solution,
+						  0)
+              << std::endl;
+  @endcode
+  The documentation of the function explains what the second and fourth
+  parameters mean, while the first and third should be obvious. Doing the same
+  study again where we change the number of global refinement steps, we get
+  the following result:
+  <table align="center">
+    <tr> <td># of refinements</td> <td>$\int_\Omega u_h(x)\; dx$</td> </tr>
+    <tr> <td>1</td> <td>0.093750</td> </tr>
+    <tr> <td>2</td> <td>0.127902</td> </tr>
+    <tr> <td>3</td> <td>0.139761</td> </tr>
+    <tr> <td>4</td> <td>0.139761</td> </tr>
+    <tr> <td>5</td> <td>0.140373</td> </tr>
+    <tr> <td>6</td> <td>0.140526</td> </tr>
+    <tr> <td>7</td> <td>0.140564</td> </tr>
+    <tr> <td>8</td> <td>0.140574</td> </tr>
+    <tr> <td>9</td> <td>0.140576</td> </tr>
+  </table>
+  Again, the difference between two adjacent values goes down by about a
+  factor of four, indicating convergence as ${\cal O}(h^2)$.
 </ul>
