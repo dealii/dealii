@@ -3936,7 +3936,7 @@ VectorTools::point_value (const DoFHandler<dim,spacedim> &dof,
 			  Vector<double>        &value)
 {
 
-  point_value(StaticMappingQ1<dim,spacedim>::mapping,
+  point_value (StaticMappingQ1<dim,spacedim>::mapping,
                dof,
                fe_function,
                point,
@@ -3951,7 +3951,7 @@ VectorTools::point_value (const DoFHandler<dim,spacedim> &dof,
 			  const InVector        &fe_function,
 			  const Point<spacedim>      &point)
 {
-  return point_value(StaticMappingQ1<dim,spacedim>::mapping,
+  return point_value (StaticMappingQ1<dim,spacedim>::mapping,
                       dof,
                       fe_function,
                       point);
