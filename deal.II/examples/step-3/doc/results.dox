@@ -143,4 +143,46 @@ suggestions:
   computed for boundary indicator 0. The result will be that we will get
   discontinuous boundary values, zero on three sides of the square, and one on
   the fourth.
+
+  <li>
+  Observe convergence: We will only discuss computing errors in norms in
+  @ref step_7 "step-7", but it is easy to check that computations converge
+  already here. For example, we could evaluate the value of the solution in a
+  single point and compare the value for different %numbers of global
+  refinement (the number of global refinement steps is set in
+  <code>LaplaceProblem::make_grid_and_dofs</code> above). To evaluate the
+  solution at a point, say at $(\frac 13, \frac 13)$, we could add the
+  following code to the <code>LaplaceProblem::output_results</code> function:
+  @code
+    std::cout << "Solution at (1/3,1/3): "
+              << VectorTools::point_value (dof_handler, solution,
+                                           Point<2>(1./3, 1./3))
+              << std::endl;
+  @endcode
+  For 1 through 8 global refinement steps, we then get the following sequence
+  of point values:
+  <table align="center">
+    <tr> <td># of refinements</td> <td>$u_h(\frac 13,\frac13)$</td> </tr>
+    <tr> <td>1</td> <td>0.166667</td> </tr>
+    <tr> <td>2</td> <td>0.227381</td> </tr>
+    <tr> <td>3</td> <td>0.237375</td> </tr>
+    <tr> <td>4</td> <td>0.240435</td> </tr>
+    <tr> <td>5</td> <td>0.241140</td> </tr>
+    <tr> <td>6</td> <td>0.241324</td> </tr>
+    <tr> <td>7</td> <td>0.241369</td> </tr>
+    <tr> <td>8</td> <td>0.241380</td> </tr>
+    <tr> <td>9</td> <td>0.241383</td> </tr>
+  </table>
+  By noticing that the difference between each two consecutive values reduces
+  by about a factor of 4, we can conjecture that the "correct" value may be
+  $u(\frac 13, \frac 13)\approx 0.241384$. In fact, if we assumed this to be
+  the correct value, we could show that the sequence above indeed shows ${\cal
+  O}(h^2)$ convergence &mdash; theoretically, the convergence order should be
+  ${\cal O}(h^2 |\log h|)$ but the symmetry of the domain and the mesh may lead
+  to the better convergence order observed.
+
+  A slight variant of this would be to repeat the test with quadratic
+  elements. All you need to do is to set the polynomial degree of the finite
+  element to two in the constructor
+  <code>LaplaceProblem::LaplaceProblem</code>.
 </ul>
