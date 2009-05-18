@@ -106,52 +106,6 @@ namespace TrilinosWrappers
 
 
 
-  void
-  VectorBase::reinit (const VectorBase &v,
-		      const bool        fast)
-  {
-    Assert (&*vector != 0,
-	    ExcMessage("Vector has not been constructed properly."));
-
-    if (fast == false || local_range() != v.local_range())
-      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
-  }
-
-
-
-  void
-  VectorBase::compress ()
-  {
-				 // Now pass over the information about
-				 // what we did last to the vector.
-    const int ierr = vector->GlobalAssemble(last_action);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    last_action = Zero;
-  
-    compressed = true;
-  }
-
-
-
-  VectorBase &
-  VectorBase::operator = (const TrilinosScalar s)
-  {
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but either "
-		       "infinite or Not A Number (NaN)"));
-
-    compress();
-
-    const int ierr = vector->PutScalar(s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
   VectorBase &
   VectorBase::operator = (const VectorBase &v)
   {
@@ -202,61 +156,10 @@ namespace TrilinosWrappers
 				     // particularly frequent operation
     std::pair<unsigned int, unsigned int>
       local_range = this->local_range ();
-    std::vector<unsigned int>   indices (local_range.second -
-					 local_range.first);
-    std::vector<TrilinosScalar> values (local_range.second -
-					local_range.first);
+    for (unsigned int i=local_range.first; i<local_range.second; ++i)
+      (*vector)[0][i-local_range.first] = v(i);
 
-    for (unsigned int i=0; i<local_range.second-local_range.first; ++i)
-      {
-	indices[i] = i + local_range.first;
-	values[i] = v(i + local_range.first);
-      }
-    
-    set (indices.size(), &indices[0], &values[0]);
-      
     return *this;
-  }
-  
-
-
-  bool
-  VectorBase::operator == (const VectorBase &v) const
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-    unsigned int i;
-    for (i=0; i<size(); i++) 
-      if ((*(v.vector))[0][i]!=(*vector)[0][i]) return false;
-
-    return true;
-  }
-
-
-
-  bool
-  VectorBase::operator != (const VectorBase &v) const
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-
-    return (!(*this==v));
-  }
-
-
-
-  unsigned int
-  VectorBase::size () const
-  {
-    return (unsigned int) vector->Map().NumGlobalElements();
-  }
-
-
-
-  unsigned int
-  VectorBase::local_size () const
-  {
-    return (unsigned int) vector->Map().NumMyElements();
   }
 
 
@@ -315,110 +218,53 @@ namespace TrilinosWrappers
 
 
 
-  TrilinosScalar
-  VectorBase::operator * (const VectorBase &vec) const
+  inline
+  void
+  VectorBase::add (const VectorBase &v,
+		   const bool        allow_different_maps)
   {
-    Assert (local_range() == vec.local_range(),
-	    ExcDimensionMismatch(size(), vec.size()));
+    if (allow_different_maps == false)
+      *this += v;
+    else
+      {
+	AssertThrow (size() == v.size(),
+		     ExcDimensionMismatch (size(), v.size()));
 
-    TrilinosScalar result;
+	Epetra_Import data_exchange (vector->Map(), v.vector->Map());
 
-    const int ierr = vector->Dot(*(vec.vector), &result);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	int ierr = vector->Import(*v.vector, data_exchange, Add);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    return result;
+	last_action = Insert;
+      }
   }
 
 
 
-  VectorBase::real_type
-  VectorBase::norm_sqr () const
+  bool
+  VectorBase::operator == (const VectorBase &v) const
   {
-    const TrilinosScalar d = l2_norm();
-    return d*d;
+    Assert (size() == v.size(),
+	    ExcDimensionMismatch(size(), v.size()));
+    if (local_size() != v.local_size())
+      return false;
+
+    unsigned int i;
+    for (i=0; i<local_size(); i++) 
+      if ((*(v.vector))[0][i]!=(*vector)[0][i]) return false;
+
+    return true;
   }
 
 
 
-  TrilinosScalar
-  VectorBase::mean_value () const
+  bool
+  VectorBase::operator != (const VectorBase &v) const
   {
-    TrilinosScalar mean;
+    Assert (size() == v.size(),
+	    ExcDimensionMismatch(size(), v.size()));
 
-    const int ierr = vector->MeanValue (&mean);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return mean;
-  }
-
-
-
-  VectorBase::real_type
-  VectorBase::l1_norm () const
-  {
-    TrilinosScalar d;
-
-    const int ierr = vector->Norm1 (&d);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return d;
-  }
-
-
-
-  VectorBase::real_type
-  VectorBase::l2_norm () const
-  {
-    TrilinosScalar d;
-
-    const int ierr = vector->Norm2 (&d);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return d;
-  }
-
-
-
-  VectorBase::real_type
-  VectorBase::lp_norm (const TrilinosScalar p) const
-  {
-                                        // get a representation of the
-                                        // vector and loop over all
-                                        // the elements
-    TrilinosScalar *start_ptr;
-    int leading_dimension;
-    int ierr = vector->ExtractView (&start_ptr, &leading_dimension);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    TrilinosScalar norm = 0;
-    TrilinosScalar sum=0;
-
-    const TrilinosScalar * ptr  = start_ptr;
-
-                                       // add up elements 
-				       // TODO: This
-				       // won't work in parallel like
-				       // this. Find out a better way to
-				       // this in that case.
-    while (ptr != start_ptr+size())
-      sum += std::pow(std::fabs(*ptr++), p);
-
-    norm = std::pow(sum, static_cast<TrilinosScalar>(1./p));
-
-    return norm;
-  }
-
-
-
-  VectorBase::real_type
-  VectorBase::linfty_norm () const
-  {
-    TrilinosScalar d;
-
-    const int ierr = vector->NormInf (&d);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return d;
+    return (!(*this==v));
   }
 
 
@@ -487,380 +333,6 @@ namespace TrilinosWrappers
 
 
 
-  VectorBase &
-  VectorBase::operator *= (const TrilinosScalar a)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Scale(a);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  VectorBase &
-  VectorBase::operator /= (const TrilinosScalar a)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const TrilinosScalar factor = 1./a;
-
-    Assert (numbers::is_finite(factor),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Scale(factor);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  VectorBase &
-  VectorBase::operator += (const VectorBase &v)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-
-    const int ierr = vector->Update (1.0, *(v.vector), 1.0);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  VectorBase &
-  VectorBase::operator -= (const VectorBase &v)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-
-    const int ierr = vector->Update (-1.0, *(v.vector), 1.0);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  void
-  VectorBase::add (const TrilinosScalar s)
-  {
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    unsigned int n_local = local_size();
-    int ierr;
-
-    for (unsigned int i=0; i<n_local; i++)
-      {
-	ierr = vector->SumIntoMyValue(i,0,s);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      }
-  }
-
-
-
-  void
-  VectorBase::add (const VectorBase &v,
-		   const bool        allow_different_maps)
-  {
-    if (allow_different_maps == false)
-      *this += v;
-    else
-      {
-	AssertThrow (size() == v.size(),
-		     ExcDimensionMismatch (size(), v.size()));
-
-	Epetra_Import data_exchange (vector->Map(), v.vector->Map());
-
-	int ierr = vector->Import(*v.vector, data_exchange, Add);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-	last_action = Insert;
-      }
-  }
-
-
-
-  void
-  VectorBase::add (const TrilinosScalar  a,
-		   const VectorBase     &v)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(a, *(v.vector), 1.);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  VectorBase::add (const TrilinosScalar  a,
-		   const VectorBase     &v,
-		   const TrilinosScalar  b,
-		   const VectorBase     &w)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-    Assert (size() == w.size(),
-	    ExcDimensionMismatch(size(), w.size()));
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), 1.);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  VectorBase::sadd (const TrilinosScalar  s,
-		    const VectorBase     &v)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(1., *(v.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  VectorBase::sadd (const TrilinosScalar  s,
-		    const TrilinosScalar  a,
-		    const VectorBase     &v)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(a, *(v.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  VectorBase::sadd (const TrilinosScalar  s,
-		    const TrilinosScalar  a,
-		    const VectorBase     &v,
-		    const TrilinosScalar  b,
-		    const VectorBase     &w)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-    Assert (size() == w.size(),
-	    ExcDimensionMismatch(size(), w.size()));
-
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  VectorBase::sadd (const TrilinosScalar  s,
-		    const TrilinosScalar  a,
-		    const VectorBase     &v,
-		    const TrilinosScalar  b,
-		    const VectorBase     &w,
-		    const TrilinosScalar  c,
-		    const VectorBase     &x)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(), v.size()));
-    Assert (size() == w.size(),
-	    ExcDimensionMismatch(size(), w.size()));
-    Assert (size() == x.size(),
-	    ExcDimensionMismatch(size(), x.size()));
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(c),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-                                        // Update member can only
-				        // input two other vectors so
-				        // do it in two steps
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    const int jerr = vector->Update(c, *(x.vector), 1.);
-    Assert (jerr == 0, ExcTrilinosError(jerr));
-  }
-
-
-
-  void
-  VectorBase::scale (const VectorBase &factors)
-  {
-    Assert (size() == factors.size(),
-	    ExcDimensionMismatch(size(), factors.size()));
-
-    const int ierr = vector->Multiply (1.0, *(factors.vector), *vector, 0.0);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  VectorBase::equ (const TrilinosScalar  a,
-		   const VectorBase     &v)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-				   // If we don't have the same map, copy.
-    if (local_range() != v.local_range())
-      {
-	vector.reset();
-	last_action = Zero;
-	*vector = *v.vector;
-	*this *= a;
-      }
-    else
-      {
-				   // Otherwise, just update
-	Assert (vector->Map().SameAs(v.vector->Map()) == true,
-		ExcMessage ("The Epetra maps in the assignment operator ="
-			    " do not match, even though the local_range "
-			    " seems to be the same. Check vector setup!"));
-	int ierr;
-	ierr = vector->GlobalAssemble(last_action);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-	ierr = vector->Update(a, *v.vector, 0.0);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-	last_action = Zero;
-      }
-
-  }
-
-
-
-  void
-  VectorBase::equ (const TrilinosScalar  a,
-		   const VectorBase     &v,
-		   const TrilinosScalar  b,
-		   const VectorBase     &w)
-  {
-
-    Assert (v.size() == w.size(),
-	    ExcDimensionMismatch (v.size(), w.size()));
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-				   // If we don't have the same map, copy.
-    if (local_range() != v.local_range())
-      {
-	vector.reset();
-	last_action = Zero;
-	*vector = *v.vector;
-	sadd (a, b, w);
-      }
-    else
-      {
-				   // Otherwise, just update
-	Assert (vector->Map().SameAs(v.vector->Map()) == true,
-		ExcMessage ("The Epetra maps in the assignment operator ="
-			    " do not match, even though the local_range "
-			    " seems to be the same. Check vector setup!"));
-	int ierr;
-	ierr = vector->GlobalAssemble(last_action);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-	ierr = vector->Update(a, *v.vector, b, *w.vector, 0.0);
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-	last_action = Zero;
-      }
-  }
-
-
-
-  void
-  VectorBase::ratio (const VectorBase &v,
-		     const VectorBase &w)
-  {
-    Assert (v.size() == w.size(),
-	    ExcDimensionMismatch (v.size(), w.size()));
-
-    Assert (size() == w.size(),
-	    ExcDimensionMismatch (size(), w.size()));
-
-    const int ierr = vector->ReciprocalMultiply(1.0, *(w.vector), 
-						*(v.vector), 0.0);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-  
 				        // TODO: up to now only local
                                         // data printed out! Find a
                                         // way to neatly output

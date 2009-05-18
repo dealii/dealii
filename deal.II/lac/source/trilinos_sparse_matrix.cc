@@ -706,40 +706,6 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::compress ()
-  {
-				  // flush buffers
-    int ierr;
-    ierr = matrix->GlobalAssemble (col_map, row_map, true);
-    
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    ierr = matrix->OptimizeStorage ();
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    last_action = Zero;
-
-    compressed = true;
-  }
-
-
-
-  SparseMatrix &
-  SparseMatrix::operator = (const double d)
-  {
-    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
-
-    compress ();
-
-    const int ierr = matrix->PutScalar(d);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  void
   SparseMatrix::clear_row (const unsigned int   row,
 			   const TrilinosScalar new_diag_value)
   {
@@ -959,57 +925,6 @@ namespace TrilinosWrappers
 
 
   unsigned int
-  SparseMatrix::m () const
-  {
-    int n_rows = matrix -> NumGlobalRows();
-
-    return n_rows;
-  }
-
-
-
-  unsigned int
-  SparseMatrix::n () const
-  {
-    unsigned int n_cols = matrix -> NumGlobalCols();
-    return n_cols;
-  }
-
-
-
-  unsigned int
-  SparseMatrix::local_size () const
-  {
-    unsigned int n_rows = matrix -> NumMyRows();
-
-    return n_rows;
-  }
-
-
-
-  std::pair<unsigned int, unsigned int>
-  SparseMatrix::local_range () const
-  {
-    unsigned int begin, end;
-    begin = matrix -> RowMap().MinMyGID();
-    end = matrix -> RowMap().MaxMyGID()+1;
-    
-    return std::make_pair (begin, end);
-  }
-
-
-
-  unsigned int
-  SparseMatrix::n_nonzero_elements () const
-  {
-    unsigned int nnz = matrix->NumGlobalNonzeros();
-
-    return nnz;
-  }
-
-
-
-  unsigned int
   SparseMatrix::row_length (const unsigned int row) const
   {
     Assert (row < m(), ExcInternalError());
@@ -1029,191 +944,6 @@ namespace TrilinosWrappers
       }
 
     return ncols;
-  }
-
-
-
-  TrilinosScalar
-  SparseMatrix::l1_norm () const
-  {
-    if (matrix->Filled() == false)
-      matrix->GlobalAssemble(col_map, row_map, true);
-
-    TrilinosScalar result = matrix->NormOne();
-
-    return result;
-  }
-  
-  
-
-  TrilinosScalar
-  SparseMatrix::linfty_norm () const
-  {
-    if (matrix->Filled() == false)
-      matrix->GlobalAssemble(col_map, row_map, true);
-
-    TrilinosScalar result = matrix->NormInf();
-
-    return result;
-  }
-
-
-
-  TrilinosScalar
-  SparseMatrix::frobenius_norm () const
-  {
-    if (matrix->Filled() == false)
-      matrix->GlobalAssemble(col_map, row_map, true);
-
-    TrilinosScalar result = matrix->NormFrobenius();
-
-    return result;
-  }
-
-
-
-  SparseMatrix &
-  SparseMatrix::operator *= (const TrilinosScalar a)
-  {
-    const int ierr = matrix->Scale (a);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  SparseMatrix &
-  SparseMatrix::operator /= (const TrilinosScalar a)
-  {
-    Assert (a !=0, ExcDivideByZero());
-
-    const TrilinosScalar factor = 1./a;
-
-    const int ierr = matrix->Scale (factor);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  void
-  SparseMatrix::vmult (VectorBase       &dst,
-		       const VectorBase &src) const
-  {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-
-    if (matrix->Filled() == false)
-      matrix->GlobalAssemble(col_map, row_map, true);
-
-    Assert (src.vector_partitioner().SameAs(matrix->DomainMap()) == true,
-	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (dst.vector_partitioner().SameAs(matrix->RangeMap()) == true,
-	    ExcMessage ("Row map of matrix does not fit with vector map!"));
-
-    const int ierr = matrix->Multiply (false, src.trilinos_vector(), 
-				       dst.trilinos_vector());
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  SparseMatrix::Tvmult (VectorBase       &dst,
-			const VectorBase &src) const
-  {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-
-    if (matrix->Filled() == false)
-      matrix->GlobalAssemble(col_map, row_map, true);
-
-    Assert (src.vector_partitioner().SameAs(matrix->RangeMap()) == true,
-	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (dst.vector_partitioner().SameAs(matrix->DomainMap()) == true,
-	    ExcMessage ("Row map of matrix does not fit with vector map!"));
-
-    const int ierr = matrix->Multiply (true, src.trilinos_vector(), 
-				       dst.trilinos_vector());
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  SparseMatrix::vmult_add (VectorBase       &dst,
-			   const VectorBase &src) const
-  {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-
-				   // Choose to reinit the vector with fast
-				   // argument set, which does not overwrite
-				   // the content -- this is what we need
-				   // since we're going to overwrite that
-				   // anyway in the vmult operation.
-    temp_vector.reinit(dst, true);
-
-    vmult (temp_vector, src);
-    dst += temp_vector;
-  }
-
-
-
-  void
-  SparseMatrix::Tvmult_add (VectorBase       &dst,
-			    const VectorBase &src) const
-  {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-
-    temp_vector.reinit(dst, true);
-
-    vmult (temp_vector, src);
-    dst += temp_vector;
-  }
-
-
-
-  TrilinosScalar
-  SparseMatrix::matrix_norm_square (const VectorBase &v) const
-  {
-    Assert (row_map.SameAs(col_map),
-	    ExcDimensionMismatch(row_map.NumGlobalElements(),
-				 col_map.NumGlobalElements()));
-
-    temp_vector.reinit(v);
-
-    vmult (temp_vector, v);
-    return temp_vector*v;
-  }
-
-
-
-  TrilinosScalar
-  SparseMatrix::matrix_scalar_product (const VectorBase &u,
-				       const VectorBase &v) const
-  {
-    Assert (row_map.SameAs(col_map),
-	    ExcDimensionMismatch(row_map.NumGlobalElements(),
-				 col_map.NumGlobalElements()));
-
-    temp_vector.reinit(v);
-
-    vmult (temp_vector, v);
-    return u*temp_vector;
-  }
-
-
-
-  TrilinosScalar
-  SparseMatrix::residual (VectorBase       &dst,
-			  const VectorBase &x,
-			  const VectorBase &b) const
-  {
-    vmult (dst, x);
-    dst -= b;
-    dst *= -1.;
-
-    return dst.l2_norm();
   }
 
 
@@ -1625,15 +1355,14 @@ namespace TrilinosWrappers
   
 
 
-				  // TODO: Currently this only flips a
-				  // flag that tells Trilinos that any
-				  // application should be done with
-				  // the transpose. However, the
-				  // matrix structure is not
-				  // reset. Can we leave it like this?
   void
   SparseMatrix::transpose () 
   {
+				  // This only flips a flag that tells
+				  // Trilinos that any vmult operation
+				  // should be done with the
+				  // transpose. However, the matrix
+				  // structure is not reset.
     int ierr;
 
     if (!matrix->UseTranspose())

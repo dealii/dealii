@@ -2203,6 +2203,41 @@ namespace TrilinosWrappers
 
 
 
+  inline
+  void
+  SparseMatrix::compress ()
+  {
+				  // flush buffers
+    int ierr;
+    ierr = matrix->GlobalAssemble (col_map, row_map, true);
+    
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = matrix->OptimizeStorage ();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    last_action = Zero;
+
+    compressed = true;
+  }
+
+
+
+  inline
+  SparseMatrix &
+  SparseMatrix::operator = (const double d)
+  {
+    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+    compress ();
+
+    const int ierr = matrix->PutScalar(d);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    return *this;
+  }
+
+
+
 				        // Inline the set() and add()
 				        // functions, since they will be 
                                         // called frequently, and the 
@@ -2629,6 +2664,248 @@ namespace TrilinosWrappers
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
   }
 
+
+
+				   // inline "simple" functions that are
+				   // called frequently and do only involve
+				   // a call to some Trilinos function.
+  inline
+  unsigned int
+  SparseMatrix::m () const
+  {
+    return matrix -> NumGlobalRows();
+  }
+
+
+
+  inline
+  unsigned int
+  SparseMatrix::n () const
+  {
+    return matrix -> NumGlobalCols();
+  }
+
+
+
+  inline
+  unsigned int
+  SparseMatrix::local_size () const
+  {
+    return matrix -> NumMyRows();
+  }
+
+
+
+  inline
+  std::pair<unsigned int, unsigned int>
+  SparseMatrix::local_range () const
+  {
+    unsigned int begin, end;
+    begin = matrix -> RowMap().MinMyGID();
+    end = matrix -> RowMap().MaxMyGID()+1;
+    
+    return std::make_pair (begin, end);
+  }
+
+
+
+  inline
+  unsigned int
+  SparseMatrix::n_nonzero_elements () const
+  {
+    return matrix->NumGlobalNonzeros();
+  }
+
+
+
+  inline
+  TrilinosScalar
+  SparseMatrix::l1_norm () const
+  {
+    if (matrix->Filled() == false)
+      matrix->GlobalAssemble(col_map, row_map, true);
+
+    return matrix->NormOne();
+  }
+  
+  
+
+  inline
+  TrilinosScalar
+  SparseMatrix::linfty_norm () const
+  {
+    if (matrix->Filled() == false)
+      matrix->GlobalAssemble(col_map, row_map, true);
+
+    return matrix->NormInf();
+  }
+
+
+
+  inline
+  TrilinosScalar
+  SparseMatrix::frobenius_norm () const
+  {
+    if (matrix->Filled() == false)
+      matrix->GlobalAssemble(col_map, row_map, true);
+
+    return matrix->NormFrobenius();
+  }
+
+
+
+  inline
+  SparseMatrix &
+  SparseMatrix::operator *= (const TrilinosScalar a)
+  {
+    const int ierr = matrix->Scale (a);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+
+    return *this;
+  }
+
+
+
+  inline
+  SparseMatrix &
+  SparseMatrix::operator /= (const TrilinosScalar a)
+  {
+    Assert (a !=0, ExcDivideByZero());
+
+    const TrilinosScalar factor = 1./a;
+
+    const int ierr = matrix->Scale (factor);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+
+    return *this;
+  }
+
+
+
+  inline
+  void
+  SparseMatrix::vmult (VectorBase       &dst,
+		       const VectorBase &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+
+    if (matrix->Filled() == false)
+      matrix->GlobalAssemble(col_map, row_map, true);
+
+    Assert (src.vector_partitioner().SameAs(matrix->DomainMap()) == true,
+	    ExcMessage ("Column map of matrix does not fit with vector map!"));
+    Assert (dst.vector_partitioner().SameAs(matrix->RangeMap()) == true,
+	    ExcMessage ("Row map of matrix does not fit with vector map!"));
+
+    const int ierr = matrix->Multiply (false, src.trilinos_vector(), 
+				       dst.trilinos_vector());
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  inline
+  void
+  SparseMatrix::Tvmult (VectorBase       &dst,
+			const VectorBase &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+
+    if (matrix->Filled() == false)
+      matrix->GlobalAssemble(col_map, row_map, true);
+
+    Assert (src.vector_partitioner().SameAs(matrix->RangeMap()) == true,
+	    ExcMessage ("Column map of matrix does not fit with vector map!"));
+    Assert (dst.vector_partitioner().SameAs(matrix->DomainMap()) == true,
+	    ExcMessage ("Row map of matrix does not fit with vector map!"));
+
+    const int ierr = matrix->Multiply (true, src.trilinos_vector(), 
+				       dst.trilinos_vector());
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  inline
+  void
+  SparseMatrix::vmult_add (VectorBase       &dst,
+			   const VectorBase &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+
+				   // Choose to reinit the vector with fast
+				   // argument set, which does not overwrite
+				   // the content -- this is what we need
+				   // since we're going to overwrite that
+				   // anyway in the vmult operation.
+    temp_vector.reinit(dst, true);
+
+    vmult (temp_vector, src);
+    dst += temp_vector;
+  }
+
+
+
+  inline
+  void
+  SparseMatrix::Tvmult_add (VectorBase       &dst,
+			    const VectorBase &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+
+    temp_vector.reinit(dst, true);
+
+    vmult (temp_vector, src);
+    dst += temp_vector;
+  }
+
+
+
+  inline
+  TrilinosScalar
+  SparseMatrix::matrix_norm_square (const VectorBase &v) const
+  {
+    Assert (row_map.SameAs(col_map),
+	    ExcDimensionMismatch(row_map.NumGlobalElements(),
+				 col_map.NumGlobalElements()));
+
+    temp_vector.reinit(v);
+
+    vmult (temp_vector, v);
+    return temp_vector*v;
+  }
+
+
+
+  inline
+  TrilinosScalar
+  SparseMatrix::matrix_scalar_product (const VectorBase &u,
+				       const VectorBase &v) const
+  {
+    Assert (row_map.SameAs(col_map),
+	    ExcDimensionMismatch(row_map.NumGlobalElements(),
+				 col_map.NumGlobalElements()));
+
+    temp_vector.reinit(v);
+
+    vmult (temp_vector, v);
+    return u*temp_vector;
+  }
+
+
+
+  inline
+  TrilinosScalar
+  SparseMatrix::residual (VectorBase       &dst,
+			  const VectorBase &x,
+			  const VectorBase &b) const
+  {
+    vmult (dst, x);
+    dst -= b;
+    dst *= -1.;
+
+    return dst.l2_norm();
+  }
 
 
   inline
