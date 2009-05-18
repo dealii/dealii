@@ -218,7 +218,6 @@ namespace TrilinosWrappers
 
 
 
-  inline
   void
   VectorBase::add (const VectorBase &v,
 		   const bool        allow_different_maps)
