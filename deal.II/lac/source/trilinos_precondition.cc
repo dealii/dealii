@@ -15,7 +15,6 @@
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/trilinos_precondition.h>
-#include <lac/trilinos_vector_base.h>
 #include <lac/trilinos_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -23,9 +22,7 @@
 #include <Ifpack.h>
 #include <Ifpack_Chebyshev.h>
 #include <Teuchos_ParameterList.hpp>
-#include <Epetra_Vector.h>
 #include <Epetra_MultiVector.h>
-#include <Epetra_Vector.h>
 #include <ml_include.h>
 #include <ml_MultiLevelPreconditioner.h>
 
@@ -59,60 +56,6 @@ namespace TrilinosWrappers
   PreconditionBase::~PreconditionBase()
   {
     preconditioner.release();
-  }
-
-
-
-  void
-  PreconditionBase::vmult (VectorBase       &dst,
-			   const VectorBase &src) const
-  {
-    Assert (dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
-	    ExcNonMatchingMaps("dst"));
-    Assert (src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
-	    ExcNonMatchingMaps("src"));
-    
-    const int ierr = preconditioner->ApplyInverse (src.trilinos_vector(), 
-						   dst.trilinos_vector());
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-				        // For the implementation of
-				        // the <code>vmult</code>
-				        // function with deal.II data
-				        // structures we note that
-				        // invoking a call of the
-				        // Trilinos preconditioner
-				        // requires us to use Epetra
-				        // vectors as well. We do this
-				        // by providing a view, i.e.,
-				        // feed Trilinos with a
-				        // pointer to the data, so we
-				        // avoid copying the content
-				        // of the vectors during the
-				        // iteration (this function is
-				        // only useful when used in
-				        // serial anyway). In the
-				        // declaration of the right
-				        // hand side, we need to cast
-				        // the source vector (that is
-				        // <code>const</code> in all
-				        // deal.II calls) to
-				        // non-constant value, as this
-				        // is the way Trilinos wants
-				        // to have them.
-  void PreconditionBase::vmult (dealii::Vector<double>       &dst,
-				const dealii::Vector<double> &src) const
-  {
-    
-    Epetra_Vector LHS (View, preconditioner->OperatorDomainMap(),
-		       dst.begin());
-    Epetra_Vector RHS (View, preconditioner->OperatorRangeMap(),
-		       const_cast<double*>(src.begin()));
-  
-    const int ierr = preconditioner->ApplyInverse (RHS, LHS);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -699,8 +642,7 @@ namespace TrilinosWrappers
   }
   
   
-  void PreconditionAMG::
-  reinit ()
+  void PreconditionAMG::reinit ()
   {
     multilevel_operator->ReComputePreconditioner();
   }

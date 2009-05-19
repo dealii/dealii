@@ -16,9 +16,9 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
-
 #include <base/std_cxx1x/shared_ptr.h>
 
+#include <lac/trilinos_vector_base.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
@@ -31,6 +31,7 @@
 
 #include <Teuchos_RCP.hpp>
 #include <Epetra_Operator.h>
+#include <Epetra_Vector.h>
 
 // forward declarations
 class Ifpack_Preconditioner;
@@ -53,8 +54,7 @@ template <typename number> class Vector;
 
 namespace TrilinosWrappers
 {
-
-  class VectorBase;
+  // forward declarations
   class SparseMatrix;
   class BlockSparseMatrix;
   class SolverBase;
@@ -113,8 +113,9 @@ namespace TrilinosWrappers
 				        * in the Trilinos wrapper
 				        * class.
 					*/
-      void vmult (dealii::Vector<double>       &dst,
-		  const dealii::Vector<double> &src) const;
+      template <typename number>
+      void vmult (dealii::Vector<number>       &dst,
+		  const dealii::Vector<number> &src) const;
 
                                        /**
 					* Exception.
@@ -1465,7 +1466,72 @@ namespace TrilinosWrappers
       std_cxx1x::shared_ptr<SparseMatrix> Matrix;
   };
 
+
+
+// -------------------------- inline and template functions ----------------------
+
+
+#ifndef DOXYGEN
+
+  inline
+  void
+  PreconditionBase::vmult (VectorBase       &dst,
+			   const VectorBase &src) const
+  {
+    Assert (dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
+	    ExcNonMatchingMaps("dst"));
+    Assert (src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
+	    ExcNonMatchingMaps("src"));
+    
+    const int ierr = preconditioner->ApplyInverse (src.trilinos_vector(), 
+						   dst.trilinos_vector());
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+				        // For the implementation of
+				        // the <code>vmult</code>
+				        // function with deal.II data
+				        // structures we note that
+				        // invoking a call of the
+				        // Trilinos preconditioner
+				        // requires us to use Epetra
+				        // vectors as well. We do this
+				        // by providing a view, i.e.,
+				        // feed Trilinos with a
+				        // pointer to the data, so we
+				        // avoid copying the content
+				        // of the vectors during the
+				        // iteration (this function is
+				        // only useful when used in
+				        // serial anyway). In the
+				        // declaration of the right
+				        // hand side, we need to cast
+				        // the source vector (that is
+				        // <code>const</code> in all
+				        // deal.II calls) to
+				        // non-constant value, as this
+				        // is the way Trilinos wants
+				        // to have them.
+  template <typename number>
+  inline
+  void PreconditionBase::vmult (dealii::Vector<number>       &dst,
+				const dealii::Vector<number> &src) const
+  {
+    
+    Epetra_Vector LHS (View, preconditioner->OperatorDomainMap(),
+		       dst.begin());
+    Epetra_Vector RHS (View, preconditioner->OperatorRangeMap(),
+		       const_cast<double*>(src.begin()));
+  
+    const int ierr = preconditioner->ApplyInverse (RHS, LHS);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+#endif
+
 }
+
 
 /*@}*/
 
