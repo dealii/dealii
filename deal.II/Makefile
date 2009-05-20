@@ -106,8 +106,7 @@ optimized: contrib baseo laco 2do 1do 3do
 # make sure the function parser is also built (it isn't in the default
 # build list of the subdirectory, since it needs to be built before
 # libbase
-contrib: $(subst no,,$(subst yes,base,$(USE_CONTRIB_HSL))) \
-         contrib-functionparser
+contrib: contrib-functionparser
 	cd $D/contrib && $(MAKE)
 
 contrib-functionparser:
