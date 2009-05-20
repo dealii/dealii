@@ -127,6 +127,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The new function TriaAccessor::is_translation_of computes
+  whether a cell, face, or edge is a translation of another.
+  <br>
+  (Martin Kronbichler, WB 2009/05/19)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The DoFTools::make_sparsity_pattern functions have acquired a
   new paramater <code>subdomain_id</code>. If a value other than the
   default value is passed for it, the function only assembles the
@@ -139,7 +148,7 @@ inconvenience this causes.
   (WB 2009/04/29)
   </p>
   </li>
-
+  
    <li>
    <p>
    Fixed: The DoFRenumbering::component_wise function for MGDoFHandler objects

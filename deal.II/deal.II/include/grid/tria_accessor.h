@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1045,7 +1045,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * Return the RefinementCase
 				      * of this cell.
 				      */
-    RefinementCase<structdim> refinement_case() const;
+    RefinementCase<structdim> refinement_case () const;
 
 				     /**
 				      *  Index of the @p ith child.
@@ -1367,6 +1367,36 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * used.
 				      */
     double measure () const;
+
+				     /**
+				      * Return true if the current object is a
+				      * translation of the given argument.
+				      *
+				      * @note For the purpose of a
+				      * triangulation, cells, faces, etc are
+				      * only characterized by their
+				      * vertices. The current function
+				      * therefore only compares the locations
+				      * of vertices. For many practical
+				      * applications, however, it is not only
+				      * the vertices that determine whether
+				      * one cell is a translation of another,
+				      * but also how the cell is mapped from
+				      * the reference cell to its location in
+				      * real space. For example, if we are
+				      * using higher order mappings, then not
+				      * only do the vertices have to be
+				      * translations of each other, but also
+				      * the points along edges. In these
+				      * questions, therefore, it would be
+				      * appropriate to ask the mapping, not
+				      * the current function, whether two
+				      * objects are translations of each
+				      * other.
+				      */
+    bool
+    is_translation_of (const TriaIterator<TriaAccessor<structdim,dim,spacedim> > &o) const;
+    
 				     /**
 				      * @}
 				      */

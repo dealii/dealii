@@ -3249,65 +3249,22 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
 				   // case that there has not been any cell
 				   // before
   if (&*this->present_cell == 0)
-    {
+    cell_similarity = CellSimilarity::none;
+  else
+				     // in MappingQ, data can have been
+				     // modified during the last call. Then,
+				     // we can't use that data on the new
+				     // cell.
+    if (cell_similarity == CellSimilarity::invalid_next_cell)
       cell_similarity = CellSimilarity::none;
-      return;
-    }
-
-				   // in MappingQ, data can have been
-				   // modified during the last call. Then,
-				   // we can't use that data on the new
-				   // cell.
-  if (cell_similarity == CellSimilarity::invalid_next_cell)
-    {
-      cell_similarity = CellSimilarity::none;
-      return;
-    }
-
-  const typename Triangulation<dim,spacedim>::cell_iterator & present_cell = 
-    *this->present_cell;
- 
-				   // test for translation
-  {
-				   // otherwise, go through the vertices
-				   // and check... The cell is a
-				   // translation of the previous one in
-				   // case the distance between the
-				   // individual vertices in the two
-				   // cell is the same for all the
-				   // vertices. So do the check by first
-				   // getting the distance on the first
-				   // vertex, and then checking whether
-				   // all others have the same down to
-				   // rounding errors (we have to be
-				   // careful here because the
-				   // calculation of the displacement
-				   // between one cell and the next can
-				   // already result in the loss of one
-				   // or two digits), so we choose 1e-12
-				   // times the distance between the
-				   // zeroth vertices here.
-    bool is_translation = true;
-    const Point<spacedim> dist = cell->vertex(0) - present_cell->vertex(0);
-    const double tolerance = 1e-24 * dist.norm_square();
-    for (unsigned int i=1; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-      {
-	Point<spacedim> dist_new = cell->vertex(i) - present_cell->vertex(i) - dist;
-	if (dist_new.norm_square() > tolerance)
-	  {
-	    is_translation = false;
-	    break;
-	  }
-      }
-
-    cell_similarity = (is_translation == true 
-		       ? 
-		       CellSimilarity::translation 
-		       : 
-		       CellSimilarity::none);
-    return;
-  }
-
+    else
+      cell_similarity = (cell->is_translation_of
+			 (static_cast<const typename Triangulation<dim,spacedim>::cell_iterator>(*this->present_cell))
+			 ? 
+			 CellSimilarity::translation 
+			 : 
+			 CellSimilarity::none);
+  
 				   // TODO: here, one could implement other
 				   // checks for similarity, e.g. for
 				   // children of a parallelogram.

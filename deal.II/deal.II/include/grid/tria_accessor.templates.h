@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1894,6 +1894,43 @@ TriaAccessor<structdim, dim, spacedim>::center () const
     p += vertex(v);
   return p/GeometryInfo<structdim>::vertices_per_cell;
 }
+
+
+template <int structdim, int dim, int spacedim>
+bool
+TriaAccessor<structdim, dim, spacedim>::
+is_translation_of (const TriaIterator<TriaAccessor<structdim,dim,spacedim> > &o) const
+{
+				   // go through the vertices and check... The
+				   // cell is a translation of the previous
+				   // one in case the distance between the
+				   // individual vertices in the two cell is
+				   // the same for all the vertices. So do the
+				   // check by first getting the distance on
+				   // the first vertex, and then checking
+				   // whether all others have the same down to
+				   // rounding errors (we have to be careful
+				   // here because the calculation of the
+				   // displacement between one cell and the
+				   // next can already result in the loss of
+				   // one or two digits), so we choose 1e-12
+				   // times the distance between the zeroth
+				   // vertices here.
+  bool is_translation = true;
+  const Point<spacedim> dist = o->vertex(0) - this->vertex(0);
+  const double tol_square = 1e-24 * dist.norm_square();
+  for (unsigned int i=1; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+    {
+      const Point<spacedim> dist_new = (o->vertex(i) - this->vertex(i)) - dist;
+      if (dist_new.norm_square() > tol_square)
+	{
+	  is_translation = false;
+	  break;
+	}
+    }
+  return is_translation;
+}
+
 
 
 /*------------------------ Functions: CellAccessor<dim,spacedim> -----------------------*/
