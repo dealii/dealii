@@ -14,7 +14,7 @@ normalize = $D/common/scripts/normalize.pl
 # in the report with it. for a branch, prefix everything
 # with x-branch-name/ so that tests run from the branch will show up
 # in different folders on the webpage.
-WORKDIR = x-branch_threading_building_blocks/$(notdir $(shell pwd))
+WORKDIR = $(notdir $(shell pwd))
 
 verbose = off
 
