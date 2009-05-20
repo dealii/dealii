@@ -1765,7 +1765,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
 		local_matrix(i,j) += (EquationData::eta * 2 *
-				      grads_phi_u[i] * grads_phi_u[j]
+				      (grads_phi_u[i] * grads_phi_u[j])
 				      - div_phi_u[i] * phi_p[j]
 				      - phi_p[i] * div_phi_u[j])
 				     * stokes_fe_values.JxW(q);
