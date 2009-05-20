@@ -659,8 +659,8 @@ class BoussinesqFlowProblem
     unsigned int timestep_number;
 
     std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>  Mp_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>  T_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU> Mp_preconditioner;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  T_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_stokes_preconditioner;
@@ -1322,7 +1322,7 @@ local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterat
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    data.local_matrix(i,j) += (EquationData::eta * 2 *
-				       scratch.grads_phi_u[i] * scratch.grads_phi_u[j]
+				       (scratch.grads_phi_u[i] * scratch.grads_phi_u[j])
 				       - scratch.div_phi_u[i] * scratch.phi_p[j]
 				       - scratch.phi_p[i] * scratch.div_phi_u[j])
 				      * scratch.stokes_fe_values.JxW(q);
@@ -1683,8 +1683,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 
   if (rebuild_temperature_preconditioner == true)
     {
-      T_preconditioner =  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>
-                                   (new TrilinosWrappers::PreconditionILU());
+      T_preconditioner =  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
+                                   (new TrilinosWrappers::PreconditionIC());
       T_preconditioner->initialize (temperature_matrix);
 
       rebuild_temperature_preconditioner = false;
@@ -1794,7 +1794,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
   SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
 
-  TrilinosWrappers::PreconditionILU preconditioner_mass;
+  TrilinosWrappers::PreconditionIC preconditioner_mass;
   preconditioner_mass.initialize(temperature_mass_matrix);
 
   cg.solve (temperature_mass_matrix, sol, rhs, preconditioner_mass);
