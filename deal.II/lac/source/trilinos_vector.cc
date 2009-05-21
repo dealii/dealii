@@ -191,11 +191,11 @@ namespace TrilinosWrappers
 		  ExcMessage ("The Epetra maps in the assignment operator ="
 			      " do not match, even though the local_range "
 			      " seems to be the same. Check vector setup!"));
-	  vector->GlobalAssemble(last_action);
+
 	  const int ierr = vector->Update(1.0, *v.vector, 0.0);
 	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-	  last_action = Insert;
+	  last_action = Zero;
 	}
       else
 	{
