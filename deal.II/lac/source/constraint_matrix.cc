@@ -2088,9 +2088,22 @@ distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>    
 
 MATRIX_FUNCTIONS(SparseMatrix<double>, Vector<double>);
 MATRIX_FUNCTIONS(SparseMatrix<float>,  Vector<float>);
+template void ConstraintMatrix::distribute_local_to_global<SparseMatrix<float>,Vector<double> > 
+(const FullMatrix<double>        &,
+ const Vector<double>            &,
+ const std::vector<unsigned int> &,
+ SparseMatrix<float>             &,
+ Vector<double>                  &) const;
 
 MATRIX_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
 MATRIX_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
+template void ConstraintMatrix::distribute_local_to_global<BlockSparseMatrix<float>,Vector<double> > 
+(const FullMatrix<double>        &,
+ const Vector<double>            &,
+ const std::vector<unsigned int> &,
+ BlockSparseMatrix<float>        &,
+ Vector<double>                  &) const;
+
 
 MATRIX_FUNCTIONS(SparseMatrixEZ<double>, Vector<double>);
 MATRIX_FUNCTIONS(SparseMatrixEZ<float>,  Vector<float>);
