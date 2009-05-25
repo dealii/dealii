@@ -587,10 +587,10 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
   Assert (dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
   Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
 
-				   // see if we can use Lapack algorithms
+				   // see if we can use BLAS algorithms
 				   // for this and if the type for 'number'
 				   // works for us (it is usually not
-				   // efficient to use Lapack for very small
+				   // efficient to use BLAS for very small
 				   // matrices):
 #if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
   if ((types_are_equal<number,double>::value
@@ -598,15 +598,15 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
        types_are_equal<number,float>::value)
       &&
       types_are_equal<number,number2>::value)
-    if (this->n_cols() > 25)
+    if (this->m() > 15)
     {
-				       // In case we have the LAPACK
+				       // In case we have the BLAS
 				       // function gemm detected at
-				       // configure, we use that algorithms
+				       // configure, we use that algorithm
 				       // for matrix-matrix multiplication
 				       // since it provides better
 				       // performance than the deal.II
-				       // native functions (it uses cache
+				       // native function (it uses cache
 				       // and register blocking in order to
 				       // access local data).
 				       //
@@ -616,8 +616,8 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 				       // in the next, etc.), whereas the
 				       // FullMatrix stores them row-wise.
 				       // We ignore that difference, and
-				       // give our row-wise data to LAPACK,
-				       // let LAPACK build the product of
+				       // give our row-wise data to BLAS,
+				       // let BLAS build the product of
 				       // transpose matrices, and read the
 				       // result as if it were row-wise
 				       // again. In other words, we calculate 
@@ -631,8 +631,9 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
       const number alpha = 1.;
       const number beta = (adding == true) ? 1. : 0.;
 
-				       // Use the LAPACK function getrf for 
-				       // calculating the LU factorization.
+				       // Use the BLAS function gemm for
+				       // calculating the matrix-matrix
+				       // product.
       internal::gemm_switch::gemm(notrans, notrans, &m, &n, &k, &alpha, &src(0,0), &m,
 				  this->val, &k, &beta, &dst(0,0), &m);
 
@@ -675,10 +676,10 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
   Assert (src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
 
 
-				   // see if we can use Lapack algorithms
+				   // see if we can use BLAS algorithms
 				   // for this and if the type for 'number'
 				   // works for us (it is usually not
-				   // efficient to use Lapack for very small
+				   // efficient to use BLAS for very small
 				   // matrices):
 #if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
   if ((types_are_equal<number,double>::value
@@ -686,15 +687,15 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
        types_are_equal<number,float>::value)
       &&
       types_are_equal<number,number2>::value)
-    if (this->n_cols() > 25)
+    if (this->n() > 15)
     {
-				       // In case we have the LAPACK
+				       // In case we have the BLAS
 				       // function gemm detected at
-				       // configure, we use that algorithms
+				       // configure, we use that algorithm
 				       // for matrix-matrix multiplication
 				       // since it provides better
 				       // performance than the deal.II
-				       // native functions (it uses cache
+				       // native function (it uses cache
 				       // and register blocking in order to
 				       // access local data).
 				       //
@@ -704,12 +705,12 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 				       // in the next, etc.), whereas the
 				       // FullMatrix stores them row-wise.
 				       // We ignore that difference, and
-				       // give our row-wise data to LAPACK,
-				       // let LAPACK build the product of
+				       // give our row-wise data to BLAS,
+				       // let BLAS build the product of
 				       // transpose matrices, and read the
 				       // result as if it were row-wise
 				       // again. In other words, we calculate 
-				       // (B^T A^T)^T, which is AB.
+				       // (B^T A)^T, which is A^T B.
 
       const int m = src.n();
       const int n = this->n();
@@ -720,8 +721,9 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
       const number alpha = 1.;
       const number beta = (adding == true) ? 1. : 0.;
 
-				       // Use the LAPACK function getrf for 
-				       // calculating the LU factorization.
+				       // Use the BLAS function gemm for
+				       // calculating the matrix-matrix
+				       // product.
       internal::gemm_switch::gemm(notrans, trans, &m, &n, &k, &alpha, &src(0,0), &m,
 				  this->val, &n, &beta, &dst(0,0), &m);
 
