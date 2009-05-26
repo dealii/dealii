@@ -28,7 +28,7 @@
  * this frequently leads to significant savings in compute time on
  * multiprocessor machines.
  *
- * deal.II supports operations running in %parallel on on shared-memory (SMP)
+ * deal.II supports operations running in %parallel on shared-memory (SMP)
  * machines through the functions and classes in the Threads namespace. The
  * MultithreadInfo class allows to query certain properties of the system,
  * such as the number of CPUs. These facilities for %parallel computing are
@@ -87,7 +87,7 @@
  * they could be run in any order, or in %parallel. In essence, we have
  * identified four <i>tasks</i>, some of which are dependent on each other,
  * whereas others are independent. In the current example, tasks are
- * identified with individual C++ statements, but oftentimes they more
+ * identified with individual C++ statements, but often they more
  * generally coincide with entire code blocks.
  *
  * The point here is this: To exploit the independence of tasks 2 and 3, we
@@ -123,7 +123,7 @@
  * program could, for example, start one thread per processor core and then
  * let threads work on tasks. Tasks would run to completion, rather than
  * concurrently, avoiding the overhead of interrupting threads to run a
- * different thread. In this model, if two processor cores would be available,
+ * different thread. In this model, if two processor cores are available,
  * tasks 2 and 3 above would run in %parallel; if only one is available, the
  * scheduler would first completely execute task 2 before doing task 3, or the
  * other way around. This model is able to execute much more efficiently in
@@ -333,12 +333,12 @@
  * threads; threads then execute sub-ranges and, if they are done with
  * their work, steal entire or parts of sub-ranges from other threads
  * to keep busy. This way, work is load-balanced even if not every
- * loop iteration takes equally much work, or if some of the CPUs fall
- * behind because the operating system interrupted it for some other
+ * loop iteration takes equally much work, or if some of the CPU cores fall
+ * behind because the operating system interrupted them for some other
  * work.
  *
  * The TBB library primitives for this are a bit clumsy so deal.II has
- * wrapper routines for the most frequently use operations. The
+ * wrapper routines for the most frequently used operations. The
  * simplest one is akin to the what the std::transform does: it takes
  * one or more ranges of input operators, one output iterator, and a
  * function object. A typical implementation of std::transform would
@@ -429,8 +429,8 @@
  * know how data is stored in compressed row format like in the SparseMatrix
  * class, then a matrix-vector product function looks like this:
  * @code
-    void SparseMatrix::vmult (const Vector &src,
-                              Vector       &dst) const
+    void SparseMatrix::vmult_one_row (const Vector &src,
+                                      Vector       &dst) const
     {
       const double       *val_ptr    = &values[0];
       const unsigned int *colnum_ptr = &colnums[0];
@@ -786,7 +786,7 @@
  *
  *   As a consequence, the way the WorkStream class is designed is to use two
  *   functions: the <code>MyClass::assemble_on_one_cell</code> computes the
- *   local contributions and stores it somewhere (we'll get to that next), and
+ *   local contributions and stores them somewhere (we'll get to that next), and
  *   a second function, say <code>MyClass::copy_local_to_global</code>, that
  *   copies the results computed on each cell into the global objects. The
  *   trick implemented in the WorkStream class is that (i) the
@@ -1001,7 +1001,7 @@
  * but left the three arguments open for later.
  *
  * Similarly, let us assume that <code>MyClass::assemble_on_one_cell</code>
- * has the following signature in a solver of nonlinear, time-dependent problem:
+ * has the following signature in the solver of a nonlinear, time-dependent problem:
  * @code
    template <int dim>
    void
@@ -1031,7 +1031,7 @@
 		      per_task_data);
  * @endcode
  * Here, we bind the object, the linearization point argument, and the
- * current time argument to the function before we have it off to
+ * current time argument to the function before we hand it off to
  * WorkStream::run(). WorkStream::run() will then simply call the
  * function with the cell and scratch and per task objects which will be filled
  * in at the positions indicated by <code>_1, _2</code> and <code>_3</code>.
@@ -1041,11 +1041,12 @@
  * <h3>Thread-based parallelism</h3>
  *
  * Even though tasks are a higher-level way to describe things, there are
- * cases where they are poorly suited to a task. The main reason for not using
- * tasks even for computations that are independent are listed in the section
- * on
- * @ref MTHow "How scheduling tasks works and when task-based programming is not efficient"
- * above. Primarily, jobs that are not able to fully utilize are bad fits for tasks.
+ * cases where they are poorly suited to a task. The main reason for not
+ * using tasks even for computations that are independent are listed in the
+ * section on 
+ * @ref MTHow "How scheduling tasks works and when task-based programming is not efficient" 
+ * above. Primarily, jobs that are not able to fully utilize the CPU are bad
+ * fits for tasks.
  *
  * In a case like this, you can resort to explicitly start threads, rather
  * than tasks, using pretty much the same syntax as above. For example, if you
@@ -1081,7 +1082,7 @@
  * DataOut::build_patches() and KellyErrorEstimator::estimate() already use
  * WorkStream and will therefore utilize pretty much all available compute
  * resources. In %parallel to the KellyErrorEstimator::estimate() function, the
- * DataOut::write_vtk() function will run on a %parallel thread, independent of
+ * DataOut::write_vtk() function will run on a separate thread, independent of
  * the scheduler that takes care of the tasks, but that is not a problem
  * because writing lots of data to a file is not something that will keep a
  * CPU very busy.
