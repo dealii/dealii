@@ -351,7 +351,8 @@ MappingQ<dim,spacedim>::fill_fe_values (
   else
     {
       p_data=&data;
-      cell_similarity = CellSimilarity::invalid_next_cell;
+      if (get_degree() > 1)
+	cell_similarity = CellSimilarity::invalid_next_cell;
     }
   
   MappingQ1<dim,spacedim>::fill_fe_values(cell, q, *p_data,

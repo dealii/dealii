@@ -718,7 +718,6 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int point=0; point<n_q_points; ++point)
 	data.volume_elements[point] = determinant(data.contravariant[point]);
-  
 }
 
 
@@ -777,6 +776,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
       Assert( !(update_flags & update_cell_normal_vectors ) ||
 	      (cell_normal_vectors.size() == n_q_points),
 	     ExcDimensionMismatch(cell_normal_vectors.size(), n_q_points));
+
       if (cell_similarity != CellSimilarity::translation)
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  { 
@@ -826,9 +826,8 @@ MappingQ1<dim,spacedim>::fill_fe_values (
       Assert (jacobians.size() == n_q_points,
 	      ExcDimensionMismatch(jacobians.size(), n_q_points));
       if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int point=0; point<n_q_points; ++point)
-	jacobians[point]
-	  = data.contravariant[point];
+	for (unsigned int point=0; point<n_q_points; ++point)
+	  jacobians[point] = data.contravariant[point];
     }
 				   // calculate values of the derivatives of the
 				   // Jacobians. do it here, since we only do it
@@ -863,8 +862,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 	      ExcDimensionMismatch(inverse_jacobians.size(), n_q_points));
       if (cell_similarity != CellSimilarity::translation)
 	for (unsigned int point=0; point<n_q_points; ++point)
-	  inverse_jacobians[point]
-	    = transpose(data.covariant[point]);
+	  inverse_jacobians[point] = transpose(data.covariant[point]);
     }
 }
 
