@@ -2097,7 +2097,7 @@ template void ConstraintMatrix::distribute_local_to_global<SparseMatrix<float>,V
 
 MATRIX_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
 MATRIX_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
-template void ConstraintMatrix::distribute_local_to_global<BlockSparseMatrix<float>,Vector<double> > 
+template void ConstraintMatrix::distribute_local_to_global<BlockSparseMatrix<float>,BlockVector<double> > 
 (const FullMatrix<double>        &,
  const Vector<double>            &,
  const std::vector<unsigned int> &,
