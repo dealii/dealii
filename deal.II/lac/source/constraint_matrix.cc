@@ -2102,7 +2102,7 @@ template void ConstraintMatrix::distribute_local_to_global<BlockSparseMatrix<flo
  const Vector<double>            &,
  const std::vector<unsigned int> &,
  BlockSparseMatrix<float>        &,
- Vector<double>                  &) const;
+ BlockVector<double>             &) const;
 
 
 MATRIX_FUNCTIONS(SparseMatrixEZ<double>, Vector<double>);
