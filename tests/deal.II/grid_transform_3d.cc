@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -88,6 +88,8 @@ int main ()
   
   GridOut grid_out;
   std::ofstream out("grid_transform_3d/output");
+  out.precision (5);
+  out << std::fixed;
   grid_out.write_gnuplot(tria, out);
   
   tria.clear();
