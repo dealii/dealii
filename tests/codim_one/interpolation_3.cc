@@ -2,7 +2,7 @@
 //    $Id: testsuite.html 13373 2006-07-13 13:12:08Z manigrasso $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2008 by the deal.II authors 
+//    Copyright (C) 2005, 2008, 2009 by the deal.II authors 
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,6 +42,7 @@
 
 std::ofstream logfile("interpolation_3/output");
 
+// Test interpolation on system of finite elements. 
 
 template <int dim, int spacedim>
 void test(std::string filename) {

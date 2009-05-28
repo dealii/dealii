@@ -66,11 +66,12 @@ int main()
 
   vector<double> alphas;
   alphas.push_back(1.);
-  alphas.push_back(1/3.);
+  alphas.push_back(1./3.);
   alphas.push_back(3./2.);
 
   
   double exact_integral;   
+  double eps = 1e-10;
   
   for(unsigned int nos = 0; nos< origins.size(); ++nos) {
       for(unsigned int nas = 0; nas < alphas.size(); ++nas) {
@@ -83,16 +84,23 @@ int main()
 		      << exact_integral << endl; 
 	      for(unsigned int nq = 1; nq < 13; ++nq) {
 		  QGaussLogR<1> quad(nq, origins[nos], alphas[nas]);
+		  QGaussLogR<1> factored_quad(nq, origins[nos], alphas[nas], true);
 		  
 		  double approx_integral = 0;
+		  double approx_integral_factored = 0;
 		  for(unsigned int q=0; q<quad.size(); ++q) {
 		      double qpow = pow(quad.point(q)[0], (double) power);
 		      approx_integral += qpow  * quad.weight(q);
+		      qpow *= log(abs( (factored_quad.point(q)-origins[nos])[0] )/alphas[nas] );
+		      approx_integral_factored += qpow * factored_quad.weight(q);
 		  }	      
-
+ 
 		  deallog << "   Error(n=" << quad.size()
-			  << ") = " << (approx_integral - exact_integral) 
-			  << endl;
+			  << ") = " << (approx_integral - exact_integral);
+		  if( abs(approx_integral - approx_integral_factored) > eps )
+		      deallog << ", difference between factored and unfactored: " 
+			      << abs(approx_integral - approx_integral_factored);
+		  deallog << endl;
 	      }
 	  }
 	  deallog << "==================================================" << endl;
