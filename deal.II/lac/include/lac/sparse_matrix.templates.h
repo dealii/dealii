@@ -374,11 +374,11 @@ namespace internal
       else
 	for (unsigned int row=begin_row; row<end_row; ++row)
 	  {
-	    typename OutVector::value_type s = 0.;
+	    typename OutVector::value_type s = *dst_ptr;
 	    const number *const val_end_of_row = &values[rowstart[row+1]];
 	    while (val_ptr != val_end_of_row)
 	      s += *val_ptr++ * src(*colnum_ptr++);
-	    *dst_ptr++ += s;
+	    *dst_ptr++ = s;
 	  }
     }
   }

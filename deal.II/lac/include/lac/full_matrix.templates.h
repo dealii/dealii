@@ -198,27 +198,17 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
   const number* e = this->data();
-  const unsigned int size_m = m(),
-		     size_n = n();
-  if (!adding)
+				   // get access to the data in order to
+				   // avoid copying it when using the ()
+				   // operator
+  const number2* src_ptr = &(*const_cast<Vector<number2>*>(&src))(0);
+  const unsigned int size_m = m(), size_n = n();
+  for (unsigned int i=0; i<size_m; ++i)
     {
-      for (unsigned int i=0; i<size_m; ++i)
-	{
-	  number2 s = 0.;
-	  for (unsigned int j=0; j<size_n; ++j)
-	    s += number2(src(j)) * number2(*(e++));
-	  dst(i) = s;
-	};
-    }
-  else
-    {
-      for (unsigned int i=0; i<size_m; ++i)
-	{
-	  number2 s = 0.;
-	  for (unsigned int j=0; j<size_n; ++j)
-	    s += number2(src(j)) * number2(*(e++));
-	  dst(i) += s;
-	}
+      number2 s = adding ? dst(i) : 0.;
+      for (unsigned int j=0; j<size_n; ++j)
+	s += src_ptr[j] * number2(*(e++));
+      dst(i) = s;
     }
 }
 
@@ -231,35 +221,29 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 				 const bool             adding) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
-  
+
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
   Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
 
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
-  const unsigned int size_m = m(),
-		     size_n = n();
+  const number* e = this->data();
+  number2* dst_ptr = &dst(0);
+  const unsigned int size_m = m(), size_n = n();
 
+				   // zero out data if we are not adding
   if (!adding)
+    for (unsigned int j=0; j<size_n; ++j)
+      dst_ptr[j] = 0.;
+
+				   // write the loop in a way that we can
+				   // access the data contiguously
+  for (unsigned int i=0; i<size_m; ++i)
     {
-      for (unsigned int i=0; i<size_n; ++i)
-	{
-	  number s = 0.;
-	  for (unsigned int j=0; j<size_m; ++j)
-	    s += number(src(j)) * (*this)(j,i);
-	  dst(i) = s;
-	};
-    }
-  else
-    {
-      for (unsigned int i=0; i<size_n; ++i)
-	{
-	  number s = 0.;
-	  for (unsigned int j=0; j<size_m; ++j)
-	    s += number(src(j)) * (*this)(j,i);
-	  dst(i) += s;
-	}
-    }
+      const number2 d = src(i);
+      for (unsigned int j=0; j<size_n; ++j)
+	dst_ptr[j] += d * number2(*(e++));
+    };
 }
 
 

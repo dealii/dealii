@@ -114,25 +114,28 @@ Householder<number>::Householder()
 {}
 
 
+
 template <typename number>
 template <typename number2>
 void
 Householder<number>::initialize(const FullMatrix<number2>& M)
 {
-  this->reinit(M.n_rows(), M.n_cols());
+  const unsigned int m = M.n_rows(), n = M.n_cols();
+  this->reinit(m, n);
   this->fill(M);
-  diagonal.resize(M.n_rows());
   Assert (!this->empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
+  diagonal.resize(m);
+
 				   // m > n, src.n() = m
   Assert (this->n_cols() <= this->n_rows(),
 	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
 
-  for (unsigned int j=0 ; j<this->n() ; ++j)
+  for (unsigned int j=0 ; j<n ; ++j)
   {
     number2 sigma = 0;
     unsigned int i;
 				     // sigma = ||v||^2
-    for (i=j ; i<this->m() ; ++i)
+    for (i=j ; i<m ; ++i)
       sigma += this->el(i,j)*this->el(i,j);
 				     // We are ready if the column is
 				     // empty. Are we?
@@ -148,20 +151,20 @@ Householder<number>::initialize(const FullMatrix<number2>& M)
     diagonal[j] = beta*(this->el(j,j) - s);
     this->el(j,j) = s;
 
-    for (i=j+1 ; i<this->m() ; ++i)
+    for (i=j+1 ; i<m ; ++i)
       this->el(i,j) *= beta;
 
 
 				     // For all subsequent columns do
 				     // the Householder reflexion
-    for (unsigned int k=j+1 ; k<this->n() ; ++k)
+    for (unsigned int k=j+1 ; k<n ; ++k)
     {
       number2 sum = diagonal[j]*this->el(j,k);
-      for (i=j+1 ; i<this->m() ; ++i)
+      for (i=j+1 ; i<m ; ++i)
 	sum += this->el(i,j)*this->el(i,k);
 
       this->el(j,k) -= sum*this->diagonal[j];
-      for (i=j+1 ; i<this->m() ; ++i)
+      for (i=j+1 ; i<m ; ++i)
 	this->el(i,k) -= sum*this->el(i,j);
     }    
   }
@@ -185,6 +188,8 @@ Householder<number>::least_squares (Vector<number2>& dst,
   Assert (!this->empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
   AssertDimension(dst.size(), this->n());
   AssertDimension(src.size(), this->m());
+
+  const unsigned int m = this->m(), n = this->n();
   
   GrowingVectorMemory<Vector<number2> > mem;
   Vector<number2>* aux = mem.alloc();
@@ -194,20 +199,20 @@ Householder<number>::least_squares (Vector<number2>& dst,
 
 				   // Multiply Q_n ... Q_2 Q_1 src
 				   // Where Q_i = I-v_i v_i^T
-  for (unsigned int j=0;j<this->n();++j)
+  for (unsigned int j=0;j<n;++j)
     {
 				       // sum = v_i^T dst
       number2 sum = diagonal[j]* (*aux)(j);
-      for (unsigned int i=j+1 ; i<this->m() ; ++i)
+      for (unsigned int i=j+1 ; i<m ; ++i)
 	sum += this->el(i,j)*(*aux)(i);
 				       // dst -= v * sum
       (*aux)(j) -= sum*diagonal[j];
-      for (unsigned int i=j+1 ; i<this->m() ; ++i)
+      for (unsigned int i=j+1 ; i<m ; ++i)
 	(*aux)(i) -= sum*this->el(i,j);
     }
 				   // Compute norm of residual
   number2 sum = 0.;
-  for (unsigned int i=this->n() ; i<this->m() ; ++i)
+  for (unsigned int i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
 				   // Compute solution
   this->backward(dst, *aux);
