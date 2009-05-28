@@ -2,12 +2,12 @@
 //    $Id$
 //    Version: $Name$
 //
-//    This file was automatically generated from blas.h.in
+//    This file was automatically generated from lapack_templates.h.in
 //    See blastemplates in the deal.II contrib directory
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal authors
 //
-//    This file is subject to QPL and may not be  distributed
+//    This file is subject to QPL and may not be distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
@@ -54,11 +54,6 @@ void dgetrf_ (const int* m, const int* n, double* A,
 	      const int* lda, int* ipiv, int* info);
 void sgetrf_ (const int* m, const int* n, float* A,
 	      const int* lda, int* ipiv, int* info);
-// Invert matrix from LU factorization
-void dgetri_ (const int* n, double* A, const int* lda, 
-	      int* ipiv, double* inv_work, const int* lwork, int* info);
-void sgetri_ (const int* n, float* A, const int* lda, 
-	      int* ipiv, float* inv_work, const int* lwork, int* info);
 // Apply forward/backward substitution to LU factorization
 void dgetrs_ (const char* trans, const int* n, const int* nrhs,
 	      const double* A, const int* lda, const int* ipiv,
@@ -66,6 +61,43 @@ void dgetrs_ (const char* trans, const int* n, const int* nrhs,
 void sgetrs_ (const char* trans, const int* n, const int* nrhs,
 	      const float* A, const int* lda, const int* ipiv,
 	      float* b, const int* ldb, int* info);
+// Invert matrix from LU factorization
+void dgetri_ (const int* n, double* A, const int* lda, 
+	      int* ipiv, double* inv_work, const int* lwork, int* info);
+void sgetri_ (const int* n, float* A, const int* lda, 
+	      int* ipiv, float* inv_work, const int* lwork, int* info);
+// Compute QR factorization (Householder)
+void dgeqrf_ (const int* m, const int* n, double* A,
+	      const int* lda, double* tau, double* work,
+	      const int* lwork, int* info);
+void sgeqrf_ (const int* m, const int* n, float* A,
+	      const int* lda, float* tau, float* work,
+	      const int* lwork, int* info);
+// Compute vector Q^T B, where Q is the result from dgeqrf_
+void dormqr_ (const char* side, const char* trans, const int* m, 
+	      const int* n, const int* k, const double* A, const int* lda, 
+	      const double* tau, double* B, const int* ldb,
+	      double* work, const int* lwork, int* info);
+void sormqr_ (const char* side, const char* trans, const int* m, 
+	      const int* n, const int* k, const float* A, const int* lda, 
+	      const float* tau, float* B, const int* ldb,
+	      float* work, const int* lwork, int* info);
+// Compute matrix Q from the result of dgeqrf_
+void dorgqr_ (const int* m, const int* n, const int* k, const double* A, 
+	      const int* lda, const double* tau, double* work, const int* lwork, 
+	      int* info);
+void sorgqr_ (const int* m, const int* n, const int* k, const float* A, 
+	      const int* lda, const float* tau, float* work, const int* lwork, 
+	      int* info);
+// Compute Rx = b
+void dtrtrs_ (const char* uplo, const char* trans,
+	      const char* diag, const int* n, const int* n_rhs,
+	      const double* A, const int* lda, double* B, const int* ldb,
+	      int* info);
+void strtrs_ (const char* uplo, const char* trans,
+	      const char* diag, const int* n, const int* n_rhs,
+	      const float* A, const int* lda, float* B, const int* ldb,
+	      int* info);
 // Compute eigenvalues and vectors
 void dgeev_ (const char* jobvl, const char* jobvr,
 	     const int* n, double* A, const int* lda,
@@ -104,6 +136,13 @@ void sgeevx_ (const char* balanc, const char* jobvl, const char* jobvr,
 	      float* rconde, float* rcondv,
 	      float* work, const int* lwork,
 	      int* iwork, int* info);
+// Eigenvalues for a symmetric matrix
+void dsyev_ (const char *jobz, const char *uplo, const int *n,
+	     double *A, const int *lda, double *w,
+	     double *work, const int *lwork, int *info);
+void ssyev_ (const char *jobz, const char *uplo, const int *n,
+	     float *A, const int *lda, float *w,
+	     float *work, const int *lwork, int *info);
 // Compute singular value decomposition
 void dgesvd_ (int* jobu, int* jobvt,
 	      const int* n, const int* m, double* A, const int* lda,
@@ -253,6 +292,36 @@ getrf (const int*, const int*, float*, const int*, int*, int*)
 #endif
 
 
+#ifdef HAVE_DGETRS_
+inline void
+getrs (const char* trans, const int* n, const int* nrhs, const double* A, const int* lda, const int* ipiv, double* b, const int* ldb, int* info)
+{
+  dgetrs_ (trans,n,nrhs,A,lda,ipiv,b,ldb,info);
+}
+#else
+inline void
+getrs (const char*, const int*, const int*, const double*, const int*, const int*, double*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dgetrs"));
+}
+#endif
+
+
+#ifdef HAVE_SGETRS_
+inline void
+getrs (const char* trans, const int* n, const int* nrhs, const float* A, const int* lda, const int* ipiv, float* b, const int* ldb, int* info)
+{
+  sgetrs_ (trans,n,nrhs,A,lda,ipiv,b,ldb,info);
+}
+#else
+inline void
+getrs (const char*, const int*, const int*, const float*, const int*, const int*, float*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("sgetrs"));
+}
+#endif
+
+
 #ifdef HAVE_DGETRI_
 inline void
 getri (const int* n, double* A, const int* lda, int* ipiv, double* inv_work, const int* lwork, int* info)
@@ -283,32 +352,122 @@ getri (const int*, float*, const int*, int*, float*, const int*, int*)
 #endif
 
 
-#ifdef HAVE_DGETRS_
+#ifdef HAVE_DGEQRF_
 inline void
-getrs (const char* trans, const int* n, const int* nrhs, const double* A, const int* lda, const int* ipiv, double* b, const int* ldb, int* info)
+geqrf (const int* m, const int* n, double* A, const int* lda, double* tau, double* work, const int* lwork, int* info)
 {
-  dgetrs_ (trans,n,nrhs,A,lda,ipiv,b,ldb,info);
+  dgeqrf_ (m,n,A,lda,tau,work,lwork,info);
 }
 #else
 inline void
-getrs (const char*, const int*, const int*, const double*, const int*, const int*, double*, const int*, int*)
+geqrf (const int*, const int*, double*, const int*, double*, double*, const int*, int*)
 {
-  Assert (false, LAPACKSupport::ExcMissing("dgetrs"));
+  Assert (false, LAPACKSupport::ExcMissing("dgeqrf"));
 }
 #endif
 
 
-#ifdef HAVE_SGETRS_
+#ifdef HAVE_SGEQRF_
 inline void
-getrs (const char* trans, const int* n, const int* nrhs, const float* A, const int* lda, const int* ipiv, float* b, const int* ldb, int* info)
+geqrf (const int* m, const int* n, float* A, const int* lda, float* tau, float* work, const int* lwork, int* info)
 {
-  sgetrs_ (trans,n,nrhs,A,lda,ipiv,b,ldb,info);
+  sgeqrf_ (m,n,A,lda,tau,work,lwork,info);
 }
 #else
 inline void
-getrs (const char*, const int*, const int*, const float*, const int*, const int*, float*, const int*, int*)
+geqrf (const int*, const int*, float*, const int*, float*, float*, const int*, int*)
 {
-  Assert (false, LAPACKSupport::ExcMissing("sgetrs"));
+  Assert (false, LAPACKSupport::ExcMissing("sgeqrf"));
+}
+#endif
+
+
+#ifdef HAVE_DORMQR_
+inline void
+ormqr (const char* side, const char* trans, const int* m, const int* n, const int* k, const double* A, const int* lda, const double* tau, double* B, const int* ldb, double* work, const int* lwork, int* info)
+{
+  dormqr_ (side,trans,m,n,k,A,lda,tau,B,ldb,work,lwork,info);
+}
+#else
+inline void
+ormqr (const char*, const char*, const int*, const int*, const int*, const double*, const int*, const double*, double*, const int*, double*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dormqr"));
+}
+#endif
+
+
+#ifdef HAVE_SORMQR_
+inline void
+ormqr (const char* side, const char* trans, const int* m, const int* n, const int* k, const float* A, const int* lda, const float* tau, float* B, const int* ldb, float* work, const int* lwork, int* info)
+{
+  sormqr_ (side,trans,m,n,k,A,lda,tau,B,ldb,work,lwork,info);
+}
+#else
+inline void
+ormqr (const char*, const char*, const int*, const int*, const int*, const float*, const int*, const float*, float*, const int*, float*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("sormqr"));
+}
+#endif
+
+
+#ifdef HAVE_DORGQR_
+inline void
+orgqr (const int* m, const int* n, const int* k, const double* A, const int* lda, const double* tau, double* work, const int* lwork, int* info)
+{
+  dorgqr_ (m,n,k,A,lda,tau,work,lwork,info);
+}
+#else
+inline void
+orgqr (const int*, const int*, const int*, const double*, const int*, const double*, double*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dorgqr"));
+}
+#endif
+
+
+#ifdef HAVE_SORGQR_
+inline void
+orgqr (const int* m, const int* n, const int* k, const float* A, const int* lda, const float* tau, float* work, const int* lwork, int* info)
+{
+  sorgqr_ (m,n,k,A,lda,tau,work,lwork,info);
+}
+#else
+inline void
+orgqr (const int*, const int*, const int*, const float*, const int*, const float*, float*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("sorgqr"));
+}
+#endif
+
+
+#ifdef HAVE_DTRTRS_
+inline void
+trtrs (const char* uplo, const char* trans, const char* diag, const int* n, const int* n_rhs, const double* A, const int* lda, double* B, const int* ldb, int* info)
+{
+  dtrtrs_ (uplo,trans,diag,n,n_rhs,A,lda,B,ldb,info);
+}
+#else
+inline void
+trtrs (const char*, const char*, const char*, const int*, const int*, const double*, const int*, double*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dtrtrs"));
+}
+#endif
+
+
+#ifdef HAVE_STRTRS_
+inline void
+trtrs (const char* uplo, const char* trans, const char* diag, const int* n, const int* n_rhs, const float* A, const int* lda, float* B, const int* ldb, int* info)
+{
+  strtrs_ (uplo,trans,diag,n,n_rhs,A,lda,B,ldb,info);
+}
+#else
+inline void
+trtrs (const char*, const char*, const char*, const int*, const int*, const float*, const int*, float*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("strtrs"));
 }
 #endif
 
@@ -369,6 +528,36 @@ inline void
 geevx (const char*, const char*, const char*, const char*, const int*, float*, const int*, float*, float*, float*, const int*, float*, const int*, int*, int*, float*, float*, float*, float*, float*, const int*, int*, int*)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgeevx"));
+}
+#endif
+
+
+#ifdef HAVE_DSYEV_
+inline void
+syev (const char *jobz, const char *uplo, const int *n, double *A, const int *lda, double *w, double *work, const int *lwork, int *info)
+{
+  dsyev_ (char*jobz,char*uplo,int*n,double*A,int*lda,double*w,double*work,int*lwork,int*info);
+}
+#else
+inline void
+syev (const char *, const char *, const int *, double *, const int *, double *, double *, const int *, int *)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dsyev"));
+}
+#endif
+
+
+#ifdef HAVE_SSYEV_
+inline void
+syev (const char *jobz, const char *uplo, const int *n, float *A, const int *lda, float *w, float *work, const int *lwork, int *info)
+{
+  ssyev_ (char*jobz,char*uplo,int*n,double*A,int*lda,double*w,double*work,int*lwork,int*info);
+}
+#else
+inline void
+syev (const char *, const char *, const int *, float *, const int *, float *, float *, const int *, int *)
+{
+  Assert (false, LAPACKSupport::ExcMissing("ssyev"));
 }
 #endif
 

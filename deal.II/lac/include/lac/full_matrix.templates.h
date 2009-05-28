@@ -1512,7 +1512,7 @@ namespace internal
     void
     getrf (const int*, const int*, T*, const int*, int*, int*)
     {
-      Assert (false, LAPACKSupport::ExcMissing("dgetr for this data type"));
+      Assert (false, LAPACKSupport::ExcMissing("dgetrf for this data type"));
     }
     
 

@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 2005, 2006, 2007, 2008 by the deal authors
+#    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -20,12 +20,12 @@ print << 'EOT'
 //    $Id$
 //    Version: $Name$
 //
-//    This file was automatically generated from blas.h.in
+//    This file was automatically generated from lapack_templates.h.in
 //    See blastemplates in the deal.II contrib directory
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal authors
 //
-//    This file is subject to QPL and may not be  distributed
+//    This file is subject to QPL and may not be distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.

@@ -19,13 +19,32 @@ void dgemm_ (const char* transa, const char* transb,
 // Compute LU factorization
 void dgetrf_ (const int* m, const int* n, double* A,
 	      const int* lda, int* ipiv, int* info);
-// Invert matrix from LU factorization
-void dgetri_ (const int* n, double* A, const int* lda, 
-	      int* ipiv, double* inv_work, const int* lwork, int* info);
 // Apply forward/backward substitution to LU factorization
 void dgetrs_ (const char* trans, const int* n, const int* nrhs,
 	      const double* A, const int* lda, const int* ipiv,
 	      double* b, const int* ldb, int* info);
+// Invert matrix from LU factorization
+void dgetri_ (const int* n, double* A, const int* lda, 
+	      int* ipiv, double* inv_work, const int* lwork, int* info);
+
+// Compute QR factorization (Householder)
+void dgeqrf_ (const int* m, const int* n, double* A,
+	      const int* lda, double* tau, double* work,
+	      const int* lwork, int* info);
+// Compute vector Q^T B, where Q is the result from dgeqrf_
+void dormqr_ (const char* side, const char* trans, const int* m, 
+	      const int* n, const int* k, const double* A, const int* lda, 
+	      const double* tau, double* B, const int* ldb,
+	      double* work, const int* lwork, int* info);
+// Compute matrix Q from the result of dgeqrf_
+void dorgqr_ (const int* m, const int* n, const int* k, const double* A, 
+	      const int* lda, const double* tau, double* work, const int* lwork, 
+	      int* info);
+// Compute Rx = b
+void dtrtrs_ (const char* uplo, const char* trans,
+	      const char* diag, const int* n, const int* n_rhs,
+	      const double* A, const int* lda, double* B, const int* ldb,
+	      int* info);
 
 // Compute eigenvalues and vectors
 void dgeev_ (const char* jobvl, const char* jobvr,
@@ -47,6 +66,10 @@ void dgeevx_ (const char* balanc, const char* jobvl, const char* jobvr,
 	      double* rconde, double* rcondv,
 	      double* work, const int* lwork,
 	      int* iwork, int* info);
+// Eigenvalues for a symmetric matrix
+void dsyev_ (const char *jobz, const char *uplo, const int *n,
+	     double *A, const int *lda, double *w,
+	     double *work, const int *lwork, int *info);
 // Compute singular value decomposition
 void dgesvd_ (int* jobu, int* jobvt,
 	      const int* n, const int* m, double* A, const int* lda,

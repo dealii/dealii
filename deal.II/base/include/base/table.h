@@ -729,7 +729,7 @@ class TableBase : public Subscriptor
 /**
  * A class representing a table with arbitrary but fixed number of
  * indices. This general template implements some additional functions
- * over those provided bythe TableBase class, such as indexing
+ * over those provided by the TableBase class, such as indexing
  * functions taking the correct number of arguments, etc.
  *
  * Rather than this general template, these functions are implemented

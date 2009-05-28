@@ -262,6 +262,9 @@
 /* Define to 1 if you have the `dgemv_' function. */
 #undef HAVE_DGEMV_
 
+/* Define to 1 if you have the `dgeqrf_' function. */
+#undef HAVE_DGEQRF_
+
 /* Define to 1 if you have the `dgesvd_' function. */
 #undef HAVE_DGESVD_
 
@@ -274,8 +277,17 @@
 /* Define to 1 if you have the `dgetrs_' function. */
 #undef HAVE_DGETRS_
 
+/* Define to 1 if you have the `dorgqr_' function. */
+#undef HAVE_DORGQR_
+
+/* Define to 1 if you have the `dormqr_' function. */
+#undef HAVE_DORMQR_
+
 /* Define to 1 if you have the `dstev_' function. */
 #undef HAVE_DSTEV_
+
+/* Define to 1 if you have the `dtrtrs_' function. */
+#undef HAVE_DTRTRS_
 
 /* Define to 1 if you have the <Epetra_CrsGraph.h> header file. */
 #undef HAVE_EPETRA_CRSGRAPH_H
@@ -372,6 +384,9 @@
 /* Define to 1 if you have the `sgemv_' function. */
 #undef HAVE_SGEMV_
 
+/* Define to 1 if you have the `sgeqrf_' function. */
+#undef HAVE_SGEQRF_
+
 /* Define to 1 if you have the `sgesvd_' function. */
 #undef HAVE_SGESVD_
 
@@ -383,6 +398,12 @@
 
 /* Define to 1 if you have the `sgetrs_' function. */
 #undef HAVE_SGETRS_
+
+/* Define to 1 if you have the `sorgqr_' function. */
+#undef HAVE_SORGQR_
+
+/* Define to 1 if you have the `sormqr_' function. */
+#undef HAVE_SORMQR_
 
 /* Define to 1 if you have the `sstev_' function. */
 #undef HAVE_SSTEV_
@@ -416,6 +437,9 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strtrs_' function. */
+#undef HAVE_STRTRS_
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
