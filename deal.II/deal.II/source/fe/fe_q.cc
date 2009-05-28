@@ -1530,6 +1530,60 @@ FE_Q<dim,spacedim>::initialize_embedding ()
   const std::vector<unsigned int> &index_map=
     this->poly_space.get_numbering();
 
+  const double zero_threshold = 2e-13*this->degree*this->degree*dim;
+
+				   // precompute subcell interpolation
+				   // matrix
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+      {
+	const Point<dim> p_subcell
+	  = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
+					      dealii::internal::int2type<dim>());
+	const double
+	  subcell_value = this->poly_space.compute_value (i, p_subcell);
+
+						 // cut off values that are
+						 // too small. note that we
+						 // have here Lagrange
+						 // interpolation functions,
+						 // so they should be zero
+						 // at almost all points,
+						 // and one at the others,
+						 // at least on the
+						 // subcells. so set them to
+						 // their exact values
+						 //
+						 // the actual cut-off value
+						 // is somewhat fuzzy, but
+						 // it works for
+						 // 2e-13*degree^2*dim (see
+						 // above), which is kind of
+						 // reasonable given that we
+						 // compute the values of
+						 // the polynomials via an
+						 // degree-step recursion
+						 // and then multiply the
+						 // 1d-values. this gives us
+						 // a linear growth in
+						 // degree*dim, times a
+						 // small constant.
+	if (std::fabs(subcell_value) < zero_threshold)
+	  subcell_interpolation(j, i) = 0.;
+	else if (std::fabs(subcell_value-1) < zero_threshold)
+	  subcell_interpolation(j, i) = 1.;
+	else			
+						     // we have put our
+						     // evaluation
+						     // points onto the
+						     // interpolation
+						     // points, so we
+						     // should either
+						     // get zeros or
+						     // ones!
+	  Assert (false, ExcInternalError());
+      }
+
   for (unsigned int ref=0; ref<RefinementCase<dim>::isotropic_refinement; ++ref)
     for (unsigned int child=0; child<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref+1)); ++child)
       {
@@ -1543,66 +1597,43 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 	      = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
 						  dealii::internal::int2type<dim>());
 	    const Point<dim> p_cell =
-	      GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child, RefinementCase<dim>(ref+1));
+	      GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child, 
+							    RefinementCase<dim>(ref+1));
 
 	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	      {
 		const double
-		  cell_value    = this->poly_space.compute_value (i, p_cell),
-		  subcell_value = this->poly_space.compute_value (i, p_subcell);
+		  cell_value    = this->poly_space.compute_value (i, p_cell);
 
-						 // cut off values that
-						 // are too small. note
-						 // that we have here
-						 // Lagrange
-						 // interpolation
-						 // functions, so they
-						 // should be zero at
-						 // almost all points,
-						 // and one at the
-						 // others, at least on
-						 // the subcells. so set
-						 // them to their exact
-						 // values
+						 // cut off values that are
+						 // too small. note that we
+						 // have here Lagrange
+						 // interpolation functions,
+						 // so they should be zero
+						 // at almost all points,
+						 // and one at the others,
+						 // at least on the
+						 // subcells. so set them to
+						 // their exact values
 						 //
-						 // the actual cut-off
-						 // value is somewhat
-						 // fuzzy, but it works
-						 // for
-						 // 1e-14*degree*dim,
-						 // which is kind of
-						 // reasonable given
-						 // that we compute the
-						 // values of the
-						 // polynomials via an
-						 // degree-step
-						 // recursion and then
-						 // multiply the
-						 // 1d-values. this
-						 // gives us a linear
-						 // growth in
+						 // the actual cut-off value
+						 // is somewhat fuzzy, but
+						 // it works for
+						 // 2e-13*degree^2*dim (see
+						 // above), which is kind of
+						 // reasonable given that we
+						 // compute the values of
+						 // the polynomials via an
+						 // degree-step recursion
+						 // and then multiply the
+						 // 1d-values. this gives us
+						 // a linear growth in
 						 // degree*dim, times a
 						 // small constant.
-		if (std::fabs(cell_value) < 2e-13*this->degree*this->degree*dim)
+		if (std::fabs(cell_value) < zero_threshold)
 		  cell_interpolation(j, i) = 0.;
 		else
 		  cell_interpolation(j, i) = cell_value;
-
-		if (std::fabs(subcell_value) < 2e-13*this->degree*this->degree*dim)
-		  subcell_interpolation(j, i) = 0.;
-		else
-		  if (std::fabs(subcell_value-1) < 2e-13*this->degree*this->degree*dim)
-		    subcell_interpolation(j, i) = 1.;
-		  else			
-						     // we have put our
-						     // evaluation
-						     // points onto the
-						     // interpolation
-						     // points, so we
-						     // should either
-						     // get zeros or
-						     // ones!
-		    Assert (false, ExcInternalError());
 	      }
 	  }
 
@@ -1631,7 +1662,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 					 // here
 	for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	    if (std::fabs(this->prolongation[ref][child](i,j)) < 2e-13*this->degree*dim)
+	    if (std::fabs(this->prolongation[ref][child](i,j)) < zero_threshold)
 	      this->prolongation[ref][child](i,j) = 0.;
 
 					 // and make sure that the row
@@ -1643,7 +1674,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 	    double sum = 0;
 	    for (unsigned int col=0; col<this->dofs_per_cell; ++col)
 	      sum += this->prolongation[ref][child](row,col);
-	    Assert (std::fabs(sum-1.) < 2e-13*this->degree*this->degree*dim,
+	    Assert (std::fabs(sum-1.) < zero_threshold,
 		    ExcInternalError());
 	  }
       }

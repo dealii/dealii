@@ -330,8 +330,12 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
 		data->shape_values[i][k] = values[i];
 	    else
 	      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-		for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-		  data->shape_values[i][k] += inverse_node_matrix(j,i) * values[j];
+		{
+		  Tensor<1,dim> add_values;
+		  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+		    add_values += inverse_node_matrix(j,i) * values[j];
+		  data->shape_values[i][k] = add_values;
+		}
 	  }
 	
 	if (flags & update_gradients)
@@ -341,8 +345,12 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
 		data->shape_grads[i][k] = grads[i];
 	    else
 	      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-		for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-		  data->shape_grads[i][k] += inverse_node_matrix(j,i) * grads[j];
+		{
+		  Tensor<2,dim> add_grads;
+		  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+		    add_grads += inverse_node_matrix(j,i) * grads[j];
+		  data->shape_grads[i][k] = add_grads;
+		}
 	  }
 	
       }
