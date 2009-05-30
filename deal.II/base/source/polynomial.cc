@@ -53,23 +53,6 @@ namespace Polynomials
 
 
   template <typename number>
-  number
-  Polynomial<number>::value (const number x) const
-  {
-    Assert (coefficients.size() > 0, ExcEmptyObject());
-    const unsigned int m=coefficients.size();
-
-                                     // Horner scheme
-    number value = coefficients.back();
-    for (int k=m-2; k>=0; --k)
-      value = value*x + coefficients[k];
-
-    return value;
-  }
-
-
-
-  template <typename number>
   void
   Polynomial<number>::value (const number         x,
                              std::vector<number> &values) const

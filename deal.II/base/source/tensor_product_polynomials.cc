@@ -23,6 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 /* ------------------- TensorProductPolynomials -------------- */
 
 template <>
+inline
 void
 TensorProductPolynomials<1>::
 compute_index (const unsigned int i,
@@ -35,6 +36,7 @@ compute_index (const unsigned int i,
 
 
 template <>
+inline
 void
 TensorProductPolynomials<2>::
 compute_index (const unsigned int i,
@@ -51,6 +53,7 @@ compute_index (const unsigned int i,
 
 
 template <>
+inline
 void
 TensorProductPolynomials<3>::
 compute_index (const unsigned int i,

@@ -562,6 +562,24 @@ namespace Polynomials
     Assert (coefficients.size()>0, ExcEmptyObject());
     return coefficients.size() - 1;
   }
+
+
+
+  template <typename number>
+  inline
+  number
+  Polynomial<number>::value (const number x) const
+  {
+    Assert (coefficients.size() > 0, ExcEmptyObject());
+    const unsigned int m=coefficients.size();
+
+                                     // Horner scheme
+    number value = coefficients.back();
+    for (int k=m-2; k>=0; --k)
+      value = value*x + coefficients[k];
+
+    return value;
+  }
 }
 DEAL_II_NAMESPACE_CLOSE
 
