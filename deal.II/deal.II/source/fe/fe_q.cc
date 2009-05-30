@@ -1517,23 +1517,37 @@ template <int dim, int spacedim>
 void
 FE_Q<dim,spacedim>::initialize_embedding ()
 {
-				   // compute the interpolation
-				   // matrices in much the same way as
-				   // we do for the constraints. it's
-				   // actually simpler here, since we
-				   // don't have this weird
-				   // renumbering stuff going on
+				   // compute the interpolation matrices
+				   // in much the same way as we do for
+				   // the constraints. it's actually
+				   // simpler here, since we don't have
+				   // this weird renumbering stuff going
+				   // on. The trick is again that we the
+				   // interpolation matrix is formed by
+				   // a permutation of the indices of
+				   // the cell matrix.
   FullMatrix<double> cell_interpolation (this->dofs_per_cell,
 					 this->dofs_per_cell);
-  FullMatrix<double> subcell_interpolation (this->dofs_per_cell,
-					    this->dofs_per_cell);
   const std::vector<unsigned int> &index_map=
     this->poly_space.get_numbering();
 
-  const double zero_threshold = 2e-13*this->degree*this->degree*dim;
+  const double eps = 2e-13*this->degree*this->degree*dim;
 
+  unsigned n_ones = 0;
 				   // precompute subcell interpolation
-				   // matrix
+				   // information, which will give us a
+				   // vector of permutations. it
+				   // actually is a matrix (the inverse
+				   // of which we'd need to multiply the
+				   // celL interpolation matrix with),
+				   // but since we use Lagrangian basis
+				   // functions here, we know that each
+				   // basis function will just one at
+				   // one node and zero on all the
+				   // others. this makes this process
+				   // much cheaper.
+  std::vector<unsigned int> subcell_permutations (this->dofs_per_cell,
+						  deal_II_numbers::invalid_unsigned_int);
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     for (unsigned int j=0; j<this->dofs_per_cell; ++j)
       {
@@ -1543,47 +1557,34 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 	const double
 	  subcell_value = this->poly_space.compute_value (i, p_subcell);
 
-						 // cut off values that are
-						 // too small. note that we
-						 // have here Lagrange
-						 // interpolation functions,
-						 // so they should be zero
-						 // at almost all points,
-						 // and one at the others,
-						 // at least on the
-						 // subcells. so set them to
-						 // their exact values
-						 //
-						 // the actual cut-off value
-						 // is somewhat fuzzy, but
-						 // it works for
-						 // 2e-13*degree^2*dim (see
-						 // above), which is kind of
-						 // reasonable given that we
-						 // compute the values of
-						 // the polynomials via an
-						 // degree-step recursion
-						 // and then multiply the
-						 // 1d-values. this gives us
-						 // a linear growth in
-						 // degree*dim, times a
-						 // small constant.
-	if (std::fabs(subcell_value) < zero_threshold)
-	  subcell_interpolation(j, i) = 0.;
-	else if (std::fabs(subcell_value-1) < zero_threshold)
-	  subcell_interpolation(j, i) = 1.;
-	else			
-						     // we have put our
-						     // evaluation
-						     // points onto the
-						     // interpolation
-						     // points, so we
-						     // should either
-						     // get zeros or
-						     // ones!
-	  Assert (false, ExcInternalError());
+	if (std::fabs(subcell_value-1) < eps)
+	  {
+	    subcell_permutations[i] = j;
+#ifndef DEBUG
+	    break;
+#else
+	    n_ones++;
+#endif
+	  }
+	else
+	  Assert (std::fabs(subcell_value) < eps,
+		  ExcInternalError());
       }
+					     // make sure that we only
+					     // extracted a single one
+					     // per row, and that each
+					     // row actually got one
+					     // value
+  Assert (n_ones == this->dofs_per_cell,
+	  ExcDimensionMismatch(n_ones, this->dofs_per_cell));
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    Assert (subcell_permutations[i] < this->dofs_per_cell,
+	    ExcInternalError());
 
+					     // next evaluate the
+					     // functions for the
+					     // different refinement
+					     // cases.
   for (unsigned int ref=0; ref<RefinementCase<dim>::isotropic_refinement; ++ref)
     for (unsigned int child=0; child<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref+1)); ++child)
       {
@@ -1630,7 +1631,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 						 // a linear growth in
 						 // degree*dim, times a
 						 // small constant.
-		if (std::fabs(cell_value) < zero_threshold)
+		if (std::fabs(cell_value) < eps)
 		  cell_interpolation(j, i) = 0.;
 		else
 		  cell_interpolation(j, i) = cell_value;
@@ -1638,32 +1639,21 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 	  }
 
 					 // then compute the embedding
-					 // matrix for this child and
-					 // this coordinate
-					 // direction. by the same trick
-					 // as with the constraint
-					 // matrices, don't compute the
-					 // inverse of
-					 // subcell_interpolation, but
-					 // use the fact that we have
-					 // put our interpolation points
-					 // onto the interpolation
-					 // points of the Lagrange
-					 // polynomials used here. then,
-					 // the subcell_interpolation
-					 // matrix is just a permutation
-					 // of the identity matrix and
-					 // its inverse is also its
-					 // transpose
-	subcell_interpolation.Tmmult (this->prolongation[ref][child],
-				      cell_interpolation);
-
-					 // cut off very small values
-					 // here
+					 // matrix by applying the
+					 // inverse of the subcell
+					 // matrix on the
+					 // cell_interpolation
+					 // matrix. since the subcell
+					 // matrix is actually only a
+					 // permutation vector, all we
+					 // need to do is to switch the
+					 // rows we store. moreover, cut
+					 // off very small values here
 	for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	    if (std::fabs(this->prolongation[ref][child](i,j)) < zero_threshold)
-	      this->prolongation[ref][child](i,j) = 0.;
+	    if (std::fabs(cell_interpolation(i,j)) > eps)
+	      this->prolongation[ref][child](subcell_permutations[i],j) = 
+		cell_interpolation(i,j);
 
 					 // and make sure that the row
 					 // sum is 1. this must be so
@@ -1674,7 +1664,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 	    double sum = 0;
 	    for (unsigned int col=0; col<this->dofs_per_cell; ++col)
 	      sum += this->prolongation[ref][child](row,col);
-	    Assert (std::fabs(sum-1.) < zero_threshold,
+	    Assert (std::fabs(sum-1.) < eps,
 		    ExcInternalError());
 	  }
       }
@@ -1732,7 +1722,7 @@ FE_Q<dim,spacedim>::initialize_restriction ()
                                    // (compute on a later child), so
                                    // we don't have to care about this
 
-  const double zero_threshold = 2e-13*this->degree*this->degree*dim;
+  const double eps = 2e-13*this->degree*this->degree*dim;
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
@@ -1744,7 +1734,7 @@ FE_Q<dim,spacedim>::initialize_restriction ()
         {
           const double val
             = this->poly_space.compute_value(mother_dof, p_cell);
-          if (std::fabs (val-1.) < zero_threshold)
+          if (std::fabs (val-1.) < eps)
                                              // ok, this is the right
                                              // dof
             break;
@@ -1752,13 +1742,13 @@ FE_Q<dim,spacedim>::initialize_restriction ()
                                              // make sure that all
                                              // other shape functions
                                              // are zero there
-            Assert (std::fabs(val) < zero_threshold, ExcInternalError());
+            Assert (std::fabs(val) < eps, ExcInternalError());
         }
                                        // check also the shape
                                        // functions after tat
       for (unsigned int j=mother_dof+1; j<this->dofs_per_cell; ++j)
         Assert (std::fabs (this->poly_space.compute_value(j, p_cell))
-                < zero_threshold,
+                < eps,
                 ExcInternalError());
 
                                        // then find the children on
@@ -1790,15 +1780,15 @@ FE_Q<dim,spacedim>::initialize_restriction ()
 		  {
 		    const double val
 		      = this->poly_space.compute_value(child_dof, p_subcell);
-		    if (std::fabs (val-1.) < zero_threshold)
+		    if (std::fabs (val-1.) < eps)
 		      break;
 		    else
-		      Assert (std::fabs(val) < zero_threshold,
+		      Assert (std::fabs(val) < eps,
 			      ExcInternalError());
 		  }
 		for (unsigned int j=child_dof+1; j<this->dofs_per_cell; ++j)
 		  Assert (std::fabs (this->poly_space.compute_value(j, p_subcell))
-			  < zero_threshold,
+			  < eps,
 			  ExcInternalError());
 
 						 // so now that we have
