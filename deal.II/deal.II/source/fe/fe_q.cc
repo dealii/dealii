@@ -1731,6 +1731,9 @@ FE_Q<dim,spacedim>::initialize_restriction ()
                                    // one child) by the same value
                                    // (compute on a later child), so
                                    // we don't have to care about this
+
+  const double zero_threshold = 2e-13*this->degree*this->degree*dim;
+
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const Point<dim> p_cell
@@ -1741,7 +1744,7 @@ FE_Q<dim,spacedim>::initialize_restriction ()
         {
           const double val
             = this->poly_space.compute_value(mother_dof, p_cell);
-          if (std::fabs (val-1.) < 2e-13*this->degree*this->degree*dim)
+          if (std::fabs (val-1.) < zero_threshold)
                                              // ok, this is the right
                                              // dof
             break;
@@ -1749,14 +1752,13 @@ FE_Q<dim,spacedim>::initialize_restriction ()
                                              // make sure that all
                                              // other shape functions
                                              // are zero there
-            Assert (std::fabs(val) < 2e-13*this->degree*this->degree*dim,
-                    ExcInternalError());
+            Assert (std::fabs(val) < zero_threshold, ExcInternalError());
         }
                                        // check also the shape
                                        // functions after tat
       for (unsigned int j=mother_dof+1; j<this->dofs_per_cell; ++j)
         Assert (std::fabs (this->poly_space.compute_value(j, p_cell))
-                < 2e-13*this->degree*this->degree*dim,
+                < zero_threshold,
                 ExcInternalError());
 
                                        // then find the children on
@@ -1788,15 +1790,15 @@ FE_Q<dim,spacedim>::initialize_restriction ()
 		  {
 		    const double val
 		      = this->poly_space.compute_value(child_dof, p_subcell);
-		    if (std::fabs (val-1.) < 2e-13*this->degree*this->degree*dim)
+		    if (std::fabs (val-1.) < zero_threshold)
 		      break;
 		    else
-		      Assert (std::fabs(val) < 2e-13*this->degree*this->degree*dim,
+		      Assert (std::fabs(val) < zero_threshold,
 			      ExcInternalError());
 		  }
 		for (unsigned int j=child_dof+1; j<this->dofs_per_cell; ++j)
 		  Assert (std::fabs (this->poly_space.compute_value(j, p_subcell))
-			  < 2e-13*this->degree*this->degree*dim,
+			  < zero_threshold,
 			  ExcInternalError());
 
 						 // so now that we have
