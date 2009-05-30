@@ -626,24 +626,26 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 
 #endif
 
+  const unsigned int m = this->m(), n = src.n(), l = this->n();
+
+					// arrange the loops in a way 
+					// that we can access contiguous 
+					// fields at the innermost loop 
+					// (even though this introduces 
+					// a lot of writing into the 
+					// destination matrix)
   if (!adding)
-    for (unsigned int i=0; i<m(); i++)
-      for (unsigned int j=0; j<src.n(); j++)
-	{
-	  number s = 0.;
-	  for (unsigned k=0; k<n(); k++)
-	    s += (*this)(i,k) * number(src(k,j));
-	  dst(i,j) = s;
+    dst = (number2)0;
+  for (unsigned int i=0; i<m; i++)
+    {
+      number2 * dst_ptr = &dst(i,0);
+      for (unsigned int k=0; k<l; k++)
+        {
+	  const number2 mult = (number2)(*this)(i,k);
+	  for (unsigned int j=0; j<n; j++)
+	    dst_ptr[j] += mult * (number2)(src(k,j));
 	}
-  else
-    for (unsigned int i=0; i<m(); i++)
-      for (unsigned int j=0; j<src.n(); j++)
-	{
-	  number s = 0.;
-	  for (unsigned k=0; k<n(); k++)
-	    s += (*this)(i,k) * number(src(k,j));
-	  dst(i,j) += s;
-	}
+    }
 }
 
 
@@ -716,25 +718,26 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 
 #endif
 
+  const unsigned int m = n(), n = src.n(), l = this->m();
 
+					// arrange the loops in a way 
+					// that we can access contiguous 
+					// fields at the innermost loop 
+					// (even though this introduces 
+					// a lot of writing into the 
+					// destination matrix)
   if (!adding)
-    for (unsigned int i=0; i<n(); i++)
-      for (unsigned int j=0; j<src.n(); j++)
-	{
-	  number s = 0;
-	  for (unsigned int k=0; k<m(); k++)
-	    s += (*this)(k,i) * number(src(k,j));
-	  dst(i,j) = s;
+    dst = (number2)0;
+  for (unsigned int i=0; i<m; i++)
+    {
+      number2 * dst_ptr = &dst(i,0);
+      for (unsigned int k=0; k<l; k++)
+        {
+	  const number2 mult = (number2)(*this)(k,i);
+	  for (unsigned int j=0; j<n; j++)
+	    dst_ptr[j] += mult * (number2)(src(k,j));
 	}
-  else
-    for (unsigned int i=0; i<n(); i++)
-      for (unsigned int j=0; j<src.n(); j++)
-	{
-	  number s = 0;
-	  for (unsigned int k=0; k<m(); k++)
-	    s += (*this)(k,i) * number(src(k,j));
-	  dst(i,j) += s;
-	}
+    }
 }
 
 
