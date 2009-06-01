@@ -1517,17 +1517,17 @@ template <int dim, int spacedim>
 void
 FE_Q<dim,spacedim>::initialize_embedding ()
 {
-				   // compute the interpolation matrices
-				   // in much the same way as we do for
-				   // the constraints. it's actually
-				   // simpler here, since we don't have
-				   // this weird renumbering stuff going
-				   // on. The trick is again that we the
-				   // interpolation matrix is formed by
-				   // a permutation of the indices of
-				   // the cell matrix.
-  FullMatrix<double> cell_interpolation (this->dofs_per_cell,
-					 this->dofs_per_cell);
+				   // compute the interpolation matrices in
+				   // much the same way as we do for the
+				   // constraints. it's actually simpler
+				   // here, since we don't have this weird
+				   // renumbering stuff going on. The trick
+				   // is again that we the interpolation
+				   // matrix is formed by a permutation of
+				   // the indices of the cell matrix. The
+				   // value eps is used a threshold to
+				   // decide when certain evaluations of the
+				   // Lagrange polynomials are zero or one.
   const std::vector<unsigned int> &index_map=
     this->poly_space.get_numbering();
 
@@ -1536,16 +1536,15 @@ FE_Q<dim,spacedim>::initialize_embedding ()
   unsigned n_ones = 0;
 				   // precompute subcell interpolation
 				   // information, which will give us a
-				   // vector of permutations. it
-				   // actually is a matrix (the inverse
-				   // of which we'd need to multiply the
-				   // celL interpolation matrix with),
-				   // but since we use Lagrangian basis
-				   // functions here, we know that each
-				   // basis function will just one at
-				   // one node and zero on all the
-				   // others. this makes this process
-				   // much cheaper.
+				   // vector of permutations. it actually is
+				   // a matrix (the inverse of which we'd
+				   // need to multiply the celL
+				   // interpolation matrix with), but since
+				   // we use Lagrangian basis functions
+				   // here, we know that each basis function
+				   // will just one at one node and zero on
+				   // all the others. this makes this
+				   // process much cheaper.
   std::vector<unsigned int> subcell_permutations (this->dofs_per_cell,
 						  deal_II_numbers::invalid_unsigned_int);
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
@@ -1560,6 +1559,9 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 	if (std::fabs(subcell_value-1) < eps)
 	  {
 	    subcell_permutations[i] = j;
+				   // in debug mode, still want to check
+				   // whether we're not getting any strange
+				   // results with more than one 1 per row.
 #ifndef DEBUG
 	    break;
 #else
@@ -1571,29 +1573,26 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 		  ExcInternalError());
       }
 					     // make sure that we only
-					     // extracted a single one
-					     // per row, and that each
-					     // row actually got one
-					     // value
+					     // extracted a single one per
+					     // row, and that each row
+					     // actually got one value
   Assert (n_ones == this->dofs_per_cell,
 	  ExcDimensionMismatch(n_ones, this->dofs_per_cell));
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     Assert (subcell_permutations[i] < this->dofs_per_cell,
 	    ExcInternalError());
 
-					     // next evaluate the
-					     // functions for the
-					     // different refinement
+					     // next evaluate the functions
+					     // for the different refinement
 					     // cases.
   for (unsigned int ref=0; ref<RefinementCase<dim>::isotropic_refinement; ++ref)
     for (unsigned int child=0; child<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref+1)); ++child)
       {
 	for (unsigned int j=0; j<this->dofs_per_cell; ++j)
 	  {
-					     // generate a point on
-					     // the child cell and
-					     // evaluate the shape
-					     // functions there
+					     // generate a point on the
+					     // child cell and evaluate the
+					     // shape functions there
 	    const Point<dim> p_subcell
 	      = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
 						  dealii::internal::int2type<dim>());
@@ -1606,59 +1605,44 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 		const double
 		  cell_value    = this->poly_space.compute_value (i, p_cell);
 
-						 // cut off values that are
-						 // too small. note that we
-						 // have here Lagrange
-						 // interpolation functions,
-						 // so they should be zero
-						 // at almost all points,
-						 // and one at the others,
-						 // at least on the
-						 // subcells. so set them to
-						 // their exact values
-						 //
-						 // the actual cut-off value
-						 // is somewhat fuzzy, but
-						 // it works for
-						 // 2e-13*degree^2*dim (see
-						 // above), which is kind of
-						 // reasonable given that we
-						 // compute the values of
-						 // the polynomials via an
-						 // degree-step recursion
-						 // and then multiply the
-						 // 1d-values. this gives us
-						 // a linear growth in
-						 // degree*dim, times a
-						 // small constant.
+				   // cut off values that are too
+				   // small. note that we have here Lagrange
+				   // interpolation functions, so they
+				   // should be zero at almost all points,
+				   // and one at the others, at least on the
+				   // subcells. so set them to their exact
+				   // values
+				   //
+				   // the actual cut-off value is somewhat
+				   // fuzzy, but it works for
+				   // 2e-13*degree^2*dim (see above), which
+				   // is kind of reasonable given that we
+				   // compute the values of the polynomials
+				   // via an degree-step recursion and then
+				   // multiply the 1d-values. this gives us
+				   // a linear growth in degree*dim, times a
+				   // small constant.
+				   //
+				   // the embedding matrix is given by
+				   // applying the inverse of the subcell
+				   // matrix on the cell_interpolation
+				   // matrix. since the subcell matrix is
+				   // actually only a permutation vector,
+				   // all we need to do is to switch the
+				   // rows we write the data into. moreover,
+				   // cut off very small values here
 		if (std::fabs(cell_value) < eps)
-		  cell_interpolation(j, i) = 0.;
+		  this->prolongation[ref][child](subcell_permutations[j],i) = 0;
 		else
-		  cell_interpolation(j, i) = cell_value;
+		  this->prolongation[ref][child](subcell_permutations[j],i) = 
+		    cell_value;
 	      }
 	  }
 
-					 // then compute the embedding
-					 // matrix by applying the
-					 // inverse of the subcell
-					 // matrix on the
-					 // cell_interpolation
-					 // matrix. since the subcell
-					 // matrix is actually only a
-					 // permutation vector, all we
-					 // need to do is to switch the
-					 // rows we store. moreover, cut
-					 // off very small values here
-	for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	    if (std::fabs(cell_interpolation(i,j)) > eps)
-	      this->prolongation[ref][child](subcell_permutations[i],j) = 
-		cell_interpolation(i,j);
-
-					 // and make sure that the row
-					 // sum is 1. this must be so
-					 // since for this element, the
-					 // shape functions add up to on
+				   // and make sure that the row sum is
+				   // 1. this must be so since for this
+				   // element, the shape functions add up to
+				   // on
 	for (unsigned int row=0; row<this->dofs_per_cell; ++row)
 	  {
 	    double sum = 0;
