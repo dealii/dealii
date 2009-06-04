@@ -12,7 +12,7 @@ MAJOR=$1
 MINOR=$2
 PATCH=$3
 
-svn export http://wolfgang.math.tamu.edu/svn/public/deal.II/tags/Version-$MAJOR-$MINOR-$PATCH/deal.II
+svn export http://www.dealii.org/svn/dealii/tags/Version-$MAJOR-$MINOR-$PATCH/deal.II
 
 # Generate distribution tarfile
 
