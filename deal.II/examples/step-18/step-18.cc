@@ -2509,11 +2509,10 @@ namespace QuasiStaticElasticity
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell = triangulation.begin_active();
 	 cell != triangulation.end(); ++cell)
-      {
-	cell->clear_user_pointer();
-	if (cell->subdomain_id() == this_mpi_process)
-	  ++our_cells;
-      }
+      if (cell->subdomain_id() == this_mpi_process)
+	++our_cells;
+      
+    triangulation.clear_user_data();
 
 				     // Next, allocate as many quadrature
 				     // objects as we need. Since the
