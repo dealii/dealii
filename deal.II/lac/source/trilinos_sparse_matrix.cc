@@ -24,6 +24,7 @@
 
 #include <ml_epetra_utils.h>
 #include <ml_struct.h>
+#include <Teuchos_RCP.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -948,68 +949,128 @@ namespace TrilinosWrappers
 
 
 
-  void
-  SparseMatrix::mmult (SparseMatrix       &C,
-		       const SparseMatrix &B,
-		       const VectorBase   &V) const
+  namespace internals 
   {
-    const bool use_vector = V.size() == n() ? true : false;
-    Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
-    Assert (this->matrix->DomainMap().SameAs(B.matrix->RangeMap()),
-	    ExcMessage ("Parallel partitioning of A and B does not fit."));
+    void perform_mmult (const SparseMatrix &inputleft,
+			const SparseMatrix &inputright,
+			SparseMatrix       &result,
+			const VectorBase   &V,
+			const bool          transpose_left)
+    {
+      const bool use_vector = V.size() == inputright.m() ? true : false;
+      if (transpose_left == false)
+	{
+	  Assert (inputleft.n() == inputright.m(), 
+		  ExcDimensionMismatch(inputleft.n(), inputright.m()));
+	  Assert (inputleft.domain_partitioner().SameAs(inputright.range_partitioner()),
+		  ExcMessage ("Parallel partitioning of A and B does not fit."));
+	}
+      else
+	{
+	  Assert (inputleft.m() == inputright.m(), 
+		  ExcDimensionMismatch(inputleft.m(), inputright.m()));
+	  Assert (inputleft.range_partitioner().SameAs(inputright.range_partitioner()),
+		  ExcMessage ("Parallel partitioning of A and B does not fit."));
+	}
 
-    C.clear();
+      result.clear();
+
+				   // create a suitable operator B: in case
+				   // we do not use a vector, all we need to
+				   // do is to set the pointer. Otherwise,
+				   // we insert insert the data from B, but
+				   // multiply each row with the respective
+				   // vector element.
+      Teuchos::RCP<Epetra_CrsMatrix> mod_B;
+      if (use_vector == false)
+	{
+	  mod_B = Teuchos::rcp(const_cast<Epetra_CrsMatrix*>(&inputright.trilinos_matrix()),
+			       false);
+	}
+      else
+	{
+	  mod_B = Teuchos::rcp(new Epetra_CrsMatrix (Copy, 
+						     inputright.trilinos_sparsity_pattern()),
+			       true);
+	  mod_B->FillComplete(inputright.domain_partitioner(), 
+			      inputright.range_partitioner());
+	  Assert (inputright.local_range() == V.local_range(),
+		  ExcMessage ("Parallel distribution of matrix B and vector V "
+			      "does not match."));
+
+	  const int local_N = inputright.local_size();
+	  for (int i=0; i<local_N; ++i)
+	    {
+	      int N_entries = -1;
+	      double *new_data, *B_data;
+	      mod_B->ExtractMyRowView (i, N_entries, new_data);
+	      inputright.trilinos_matrix().ExtractMyRowView (i, N_entries, B_data);
+	      double value = V.trilinos_vector()[0][i];
+	      for (int j=0; j<N_entries; ++j)
+		new_data[j] = value * B_data[j];
+	    }
+	}
+
 				   // use ML built-in method for performing
 				   // the matrix-matrix product.
-
 				   // create ML operators on top of the
 				   // Epetra matrix.
-    ML_Comm* comm;
-    ML_Comm_Create(&comm);
-    ML_Operator *A_ = ML_Operator_Create(comm);
-    ML_Operator *B_ = ML_Operator_Create(comm);
-    ML_Operator *C_ = ML_Operator_Create(comm);
+      ML_Comm* comm;
+      ML_Comm_Create(&comm);
+      ML_Operator *A_ = ML_Operator_Create(comm);
+      ML_Operator *Anotrans_ = ML_Operator_Create(comm);
+      ML_Operator *B_ = ML_Operator_Create(comm);
+      ML_Operator *C_ = ML_Operator_Create(comm);
 
-    ML_Operator_WrapEpetraCrsMatrix(&*matrix,A_,false);
-    ML_Operator_WrapEpetraCrsMatrix(&*B.matrix,B_,false);
+      if (transpose_left == false)
+	ML_Operator_WrapEpetraCrsMatrix
+	  (const_cast<Epetra_CrsMatrix*>(&inputleft.trilinos_matrix()),A_,false);
+      else
+	{
+	  ML_Operator_WrapEpetraCrsMatrix
+	    (const_cast<Epetra_CrsMatrix*>(&inputleft.trilinos_matrix()),Anotrans_,false);
+	  ML_Operator_Transpose_byrow(Anotrans_,A_);
+	}
 
-				   // Case where we only have two
-				   // matrices. We do this by hand since we
-				   // can save some operations compared to
-				   // just calling ml/src/Operator/ml_rap.c
-				   // that multiplies three matrices. This
-				   // code is still similar to the one found
-				   // in ml/src/Operator/ml_rap.c
-    if (use_vector == false)
-      {
+      ML_Operator_WrapEpetraCrsMatrix(&*mod_B,B_,false);
+
+				   // We do the multiplication by hand since
+				   // we can save some operations compared
+				   // to just calling
+				   // ml/src/Operator/ml_rap.c that
+				   // multiplies three matrices. This code
+				   // is still similar to the one found in
+				   // ml/src/Operator/ml_rap.c
+
 				   // import data if necessary
-	ML_Operator *Btmp, *Ctmp, *Ctmp2, *tptr;
-	ML_CommInfoOP *getrow_comm; 
-	int max_per_proc;
-	int N_input_vector = B_->invec_leng;
-	getrow_comm = B_->getrow->pre_comm;
-	if ( getrow_comm != NULL)
-	  for (int i = 0; i < getrow_comm->N_neighbors; i++)
-	    for (int j = 0; j < getrow_comm->neighbors[i].N_send; j++)
-	      AssertThrow (getrow_comm->neighbors[i].send_list[j] < N_input_vector,
-			   ExcInternalError());
+      ML_Operator *Btmp, *Ctmp, *Ctmp2, *tptr;
+      ML_CommInfoOP *getrow_comm; 
+      int max_per_proc;
+      int N_input_vector = B_->invec_leng;
+      getrow_comm = B_->getrow->pre_comm;
+      if ( getrow_comm != NULL)
+	for (int i = 0; i < getrow_comm->N_neighbors; i++)
+	  for (int j = 0; j < getrow_comm->neighbors[i].N_send; j++)
+	    AssertThrow (getrow_comm->neighbors[i].send_list[j] < N_input_vector,
+			 ExcInternalError());
 
-	ML_create_unique_col_id(N_input_vector, &(B_->getrow->loc_glob_map),
-				getrow_comm, &max_per_proc, B_->comm);
-	B_->getrow->use_loc_glob_map = ML_YES;
-	if (A_->getrow->pre_comm != NULL) 
-	  ML_exchange_rows( B_, &Btmp, A_->getrow->pre_comm);
-	else Btmp = B_;
+      ML_create_unique_col_id(N_input_vector, &(B_->getrow->loc_glob_map),
+			      getrow_comm, &max_per_proc, B_->comm);
+      B_->getrow->use_loc_glob_map = ML_YES;
+      if (A_->getrow->pre_comm != NULL) 
+	ML_exchange_rows( B_, &Btmp, A_->getrow->pre_comm);
+      else Btmp = B_;
 
 				   // perform matrix-matrix product
-	ML_matmat_mult(A_, Btmp , &Ctmp);
+      ML_matmat_mult(A_, Btmp , &Ctmp);
 
 				   // release temporary structures we needed
 				   // for multiplication
-	ML_free(B_->getrow->loc_glob_map);
-	B_->getrow->loc_glob_map = NULL;
-	B_->getrow->use_loc_glob_map = ML_NO;
-	if (A_->getrow->pre_comm != NULL) {
+      ML_free(B_->getrow->loc_glob_map);
+      B_->getrow->loc_glob_map = NULL;
+      B_->getrow->use_loc_glob_map = ML_NO;
+      if (A_->getrow->pre_comm != NULL) 
+	{
 	  tptr = Btmp;
 	  while ( (tptr!= NULL) && (tptr->sub_matrix != B_)) 
 	    tptr = tptr->sub_matrix;
@@ -1019,60 +1080,47 @@ namespace TrilinosWrappers
 	}
 
 				   // make correct data structures
-	if (A_->getrow->post_comm != NULL) {
-	  ML_exchange_rows(Ctmp, &Ctmp2, A_->getrow->post_comm);
-	}
-	else Ctmp2 = Ctmp;
+      if (A_->getrow->post_comm != NULL)
+	ML_exchange_rows(Ctmp, &Ctmp2, A_->getrow->post_comm);
+      else 
+	Ctmp2 = Ctmp;
 
-	ML_back_to_csrlocal(Ctmp2, C_, max_per_proc);
+      ML_back_to_csrlocal(Ctmp2, C_, max_per_proc);
 
-	ML_RECUR_CSR_MSRdata_Destroy (Ctmp);
-	ML_Operator_Destroy (&Ctmp);
+      ML_RECUR_CSR_MSRdata_Destroy (Ctmp);
+      ML_Operator_Destroy (&Ctmp);
 
-	if (A_->getrow->post_comm != NULL) {
+      if (A_->getrow->post_comm != NULL) 
+	{
 	  ML_RECUR_CSR_MSRdata_Destroy(Ctmp2);
 	  ML_Operator_Destroy (&Ctmp2);
 	}
-      }
-    else
-      {
-				   // create an Epetra_CrsMatrix with the
-				   // vector content on the diagonal.
-	Epetra_CrsMatrix Vmat (Copy, this->matrix->DomainMap(), 
-			       B.matrix->RangeMap(), 1, true);
-	Assert (Vmat.DomainMap().SameAs(V.trilinos_vector().Map()),
-		ExcMessage ("Column map of matrix does not fit with vector map!"));
-	const int num_my_rows = B.local_size();
-	for (int i=0; i<num_my_rows; ++i)
-	  Vmat.InsertGlobalValues (i, 1, &V.trilinos_vector()[0][i], &i);
-	Vmat.FillComplete();
-	Vmat.OptimizeStorage();
-
-				   // wrap even this matrix into ML format
-	ML_Operator *V_ = ML_Operator_Create (comm);
-	ML_Operator_WrapEpetraCrsMatrix (&Vmat, V_, false);
-
-				   // perform triple matrix-vector product
-				   // using ml/src/Operator/ml_rap.c
-	ML_rap (A_, V_, B_, C_, ML_CSR_MATRIX);
-
-	ML_Operator_Destroy (&V_);
-      }
 
 				   // create an Epetra matrix from the ML
 				   // matrix that we got as a result.
-    Epetra_CrsMatrix * C_mat;
-    ML_Operator2EpetraCrsMatrix(C_, C_mat);
-    C_mat->FillComplete();
-    C_mat->OptimizeStorage();
-    C.reinit (*C_mat);
+      Epetra_CrsMatrix * C_mat;
+      ML_Operator2EpetraCrsMatrix(C_, C_mat);
+      C_mat->FillComplete();
+      C_mat->OptimizeStorage();
+      result.reinit (*C_mat);
 
 				   // destroy allocated memory
-    delete C_mat;
-    ML_Operator_Destroy (&A_);
-    ML_Operator_Destroy (&B_);
-    ML_Operator_Destroy (&C_);
-    ML_Comm_Destroy (&comm);
+      delete C_mat;
+      ML_Operator_Destroy (&A_);
+      ML_Operator_Destroy (&Anotrans_);
+      ML_Operator_Destroy (&B_);
+      ML_Operator_Destroy (&C_);
+      ML_Comm_Destroy (&comm);
+    }
+  }
+
+
+  void
+  SparseMatrix::mmult (SparseMatrix       &C,
+		       const SparseMatrix &B,
+		       const VectorBase   &V) const
+  {
+    internals::perform_mmult (*this, B, C, V, false);
   }
 
 
@@ -1082,135 +1130,7 @@ namespace TrilinosWrappers
 			const SparseMatrix &B,
 			const VectorBase   &V) const
   {
-    const bool use_vector = V.size() == m() ? true : false;
-    Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-    Assert (this->matrix->RangeMap().SameAs(B.matrix->RangeMap()),
-	    ExcMessage ("Parallel partitioning of A and B does not fit."));
-
-    C.clear();
-				   // use ML built-in method for performing
-				   // the matrix-matrix product.
-
-				   // create ML operators on top of the
-				   // Epetra matrix.
-    ML_Comm* comm;
-    ML_Comm_Create(&comm);
-    ML_Operator *A_nontrans = ML_Operator_Create(comm);
-    ML_Operator *A_ = ML_Operator_Create(comm);
-    ML_Operator *B_ = ML_Operator_Create(comm);
-    ML_Operator *C_ = ML_Operator_Create(comm);
-
-    ML_Operator_WrapEpetraCrsMatrix(&*matrix,A_nontrans,false);
-    ML_Operator_Transpose_byrow(A_nontrans,A_);
-    ML_Operator_WrapEpetraCrsMatrix(&*B.matrix,B_,false);
-
-				   // Case where we only have two
-				   // matrices. We do this by hand since we
-				   // can save some operations compared to
-				   // just calling ml/src/Operator/ml_rap.c
-				   // that multiplies three matrices. This
-				   // code is still similar to the one found
-				   // in ml/src/Operator/ml_rap.c
-    if (use_vector == false)
-      {
-				   // import data if necessary
-	ML_Operator *Btmp, *Ctmp, *Ctmp2, *tptr;
-	ML_CommInfoOP *getrow_comm; 
-	int max_per_proc;
-	int N_input_vector = B_->invec_leng;
-	getrow_comm = B_->getrow->pre_comm;
-	if ( getrow_comm != NULL)
-	  for (int i = 0; i < getrow_comm->N_neighbors; i++)
-	    for (int j = 0; j < getrow_comm->neighbors[i].N_send; j++)
-	      AssertThrow (getrow_comm->neighbors[i].send_list[j] < N_input_vector,
-			   ExcInternalError());
-
-	ML_create_unique_col_id(N_input_vector, &(B_->getrow->loc_glob_map),
-				getrow_comm, &max_per_proc, B_->comm);
-	B_->getrow->use_loc_glob_map = ML_YES;
-	if (A_->getrow->pre_comm != NULL) 
-	  ML_exchange_rows( B_, &Btmp, A_->getrow->pre_comm);
-	else Btmp = B_;
-
-				   // perform matrix-matrix product
-	ML_matmat_mult(A_, Btmp , &Ctmp);
-
-				   // release temporary structures we needed
-				   // for multiplication
-	ML_free(B_->getrow->loc_glob_map);
-	B_->getrow->loc_glob_map = NULL;
-	B_->getrow->use_loc_glob_map = ML_NO;
-	if (A_->getrow->pre_comm != NULL) {
-	  tptr = Btmp;
-	  while ( (tptr!= NULL) && (tptr->sub_matrix != B_)) 
-	    tptr = tptr->sub_matrix;
-	  if (tptr != NULL) tptr->sub_matrix = NULL;
-	  ML_RECUR_CSR_MSRdata_Destroy(Btmp);
-	  ML_Operator_Destroy(&Btmp);
-	}
-
-				   // make correct data structures
-	if (A_->getrow->post_comm != NULL) {
-	  ML_exchange_rows(Ctmp, &Ctmp2, A_->getrow->post_comm);
-	}
-	else Ctmp2 = Ctmp;
-
-	ML_back_to_csrlocal(Ctmp2, C_, max_per_proc);
-
-	ML_RECUR_CSR_MSRdata_Destroy (Ctmp);
-	ML_Operator_Destroy (&Ctmp);
-
-	if (A_->getrow->post_comm != NULL) {
-	  ML_RECUR_CSR_MSRdata_Destroy(Ctmp2);
-	  ML_Operator_Destroy (&Ctmp2);
-	}
-      }
-    else
-      {
-				   // create an Epetra_CrsMatrix with the
-				   // vector content on the diagonal.
-	Epetra_CrsMatrix Vmat (Copy, this->matrix->RangeMap(), 
-			       B.matrix->RangeMap(), 1, true);
-	Assert (Vmat.DomainMap().SameAs(V.trilinos_vector().Map()),
-		ExcMessage ("Column map of matrix does not fit with vector map!"));
-	const int num_my_rows = B.local_size();
-	for (int i=0; i<num_my_rows; ++i)
-	  Vmat.InsertGlobalValues (i, 1, &V.trilinos_vector()[0][i], &i);
-	Vmat.FillComplete();
-	Vmat.OptimizeStorage();
-
-				   // wrap even this matrix into ML format
-	ML_Operator *V_ = ML_Operator_Create (comm);
-	ML_Operator_WrapEpetraCrsMatrix (&Vmat, V_, false);
-
-				   // perform triple matrix-vector product
-				   // using ml/src/Operator/ml_rap.c
-	ML_rap (A_, V_, B_, C_, ML_CSR_MATRIX);
-
-	ML_Operator_Destroy (&V_);
-      }
-
-				   // create an Epetra matrix from the ML
-				   // matrix that we got as a result.
-    Epetra_CrsMatrix * C_mat;
-    ML_Operator2EpetraCrsMatrix(C_, C_mat);
-    C_mat->FillComplete();
-    C_mat->OptimizeStorage();
-    C.reinit (*C_mat);
-
-				   // Sanity check
-    Assert (this->matrix->DomainMap().SameAs(C.matrix->RangeMap()),
-	    ExcInternalError());
-    Assert (B.matrix->DomainMap().SameAs(C.matrix->DomainMap()),
-	    ExcInternalError());
-
-				   // destroy allocated memory
-    delete C_mat;
-    ML_Operator_Destroy (&A_);
-    ML_Operator_Destroy (&A_nontrans);
-    ML_Operator_Destroy (&B_);
-    ML_Operator_Destroy (&C_);
-    ML_Comm_Destroy (&comm);
+    internals::perform_mmult (*this, B, C, V, true);
   }
 
 
