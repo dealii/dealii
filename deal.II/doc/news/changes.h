@@ -95,6 +95,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Improved: The gamma function now returns a long double instead of an
+  unsigned int, otherwise we will get an overflow and thus meaningless
+  weights for higher QGaussLobatto quadrature rules.  
+  <br>
+  (Tobias Leicht, RH 2009/06/05)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The new function Utilities::duplicate_communicator can be used
   to duplicate an MPI communicator to produce a unique duplicate.
   <br>
@@ -125,6 +135,15 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  New: For empty triangulations the new Triangulation::set_mesh_smoothing
+  function allows to override the MeshSmoothing given to the constructor.  
+  <br>
+  (RH 2009/06/05)
+  </p>
+  </li>
+
   <li>
   <p>
   New: The new function TriaAccessor::is_translation_of computes

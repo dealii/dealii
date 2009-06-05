@@ -1430,6 +1430,16 @@ class Triangulation : public Subscriptor
 				      * using it.
 				      */
     void clear ();
+
+				     /**
+				      * Sets the mesh smoothing to @p
+				      * mesh_smoothing. This overrides
+				      * the MeshSmoothing given to the
+				      * constructor. It is allow to
+				      * call this function only if
+				      * triangulation is empty.
+				      */
+    void set_mesh_smoothing(const MeshSmoothing mesh_smoothing);
     
 				     /**					
 				      * If @p dim==spacedim, assign a boundary
