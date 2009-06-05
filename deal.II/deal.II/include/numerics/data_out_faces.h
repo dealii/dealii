@@ -45,10 +45,12 @@ namespace internal
 		      const unsigned int n_datasets,
 		      const unsigned int n_subdivisions,
 		      const std::vector<unsigned int> &n_postprocessor_outputs,
+		      const Mapping<dim,spacedim> &mapping,
 		      const FE &finite_elements,
 		      const UpdateFlags update_flags);
 
 	const dealii::hp::QCollection<dim-1> q_collection;
+	const dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
 	dealii::hp::FEFaceValues<dim> x_fe_values;
 
 	std::vector<Point<dim> > patch_normals;
@@ -145,6 +147,50 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
 				      */
     virtual void
     build_patches (const unsigned int n_subdivisions = 0);
+
+				     /**
+				      * Same as above, except that the
+				      * additional first parameter
+				      * defines a mapping that is to
+				      * be used in the generation of
+				      * output. If
+				      * <tt>n_subdivisions>1</tt>, the
+				      * points interior of subdivided
+				      * patches which originate from
+				      * cells at the boundary of the
+				      * domain can be computed using the
+				      * mapping, i.e. a higher order
+				      * mapping leads to a
+				      * representation of a curved
+				      * boundary by using more
+				      * subdivisions.
+				      *
+				      * Even for non-curved cells the
+				      * mapping argument can be used
+				      * for the Eulerian mappings (see
+				      * class MappingQ1Eulerian) where
+				      * a mapping is used not only to
+				      * determine the position of
+				      * points interior to a cell, but
+				      * also of the vertices.  It
+				      * offers an opportunity to watch
+				      * the solution on a deformed
+				      * triangulation on which the
+				      * computation was actually
+				      * carried out, even if the mesh
+				      * is internally stored in its
+				      * undeformed configuration and
+				      * the deformation is only
+				      * tracked by an additional
+				      * vector that holds the
+				      * deformation of each vertex.
+				      *
+				      * @todo The @p mapping argument should be
+				      * replaced by a hp::MappingCollection in
+				      * case of a hp::DoFHandler.
+				      */
+    virtual void build_patches (const Mapping<DH::dimension> &mapping,
+				const unsigned int n_subdivisions = 0);
 
 				     /**
 				      * Declare a way to describe a

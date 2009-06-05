@@ -41,6 +41,7 @@ namespace internal
 		  const unsigned int n_datasets,
 		  const unsigned int n_subdivisions,
 		  const std::vector<unsigned int> &n_postprocessor_outputs,
+		  const Mapping<dim,spacedim> &mapping,
 		  const FE &finite_elements,
 		  const UpdateFlags update_flags)
 		  :
@@ -52,7 +53,9 @@ namespace internal
 						  n_postprocessor_outputs,
 						  finite_elements),
 		  q_collection (quadrature),
-		  x_fe_values (this->fe_collection,
+		  mapping_collection (mapping),	    
+		  x_fe_values (this->mapping_collection,
+			       this->fe_collection,
 			       q_collection,
 			       update_flags)
     {}
@@ -84,8 +87,24 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 		 internal::DataOutFaces::ParallelData<DH::dimension, DH::dimension> &data,
 		 DataOutBase::Patch<DH::dimension-1,DH::space_dimension>  &patch)
 {
+				   // we use the mapping to transform the
+				   // vertices. However, the mapping works on
+				   // cells, not faces, so transform the face
+				   // vertex to a cell vertex, that to a unit
+				   // cell vertex and then, finally, that to
+				   // the mapped vertex. In most cases this
+				   // complicated procedure will be the
+				   // identity.
   for (unsigned int vertex=0; vertex<GeometryInfo<DH::dimension-1>::vertices_per_cell; ++vertex)
-    patch.vertices[vertex] = cell_and_face->first->face(cell_and_face->second)->vertex(vertex);
+    patch.vertices[vertex] = data.mapping_collection[0].transform_unit_to_real_cell
+			     (cell_and_face->first,
+			      GeometryInfo<DH::dimension>::unit_cell_vertex
+			      (GeometryInfo<dim>::face_to_cell_vertices
+			       (cell_and_face->second,
+				vertex,
+				cell_and_face->first->face_orientation(cell_and_face->second),
+				cell_and_face->first->face_flip(cell_and_face->second),
+				cell_and_face->first->face_rotation(cell_and_face->second))));
       
   if (data.n_datasets > 0)
     {
@@ -94,8 +113,25 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 	= data.x_fe_values.get_present_fe_values ();
 
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
-  
-	  
+      
+				       // store the intermediate points
+      Assert(patch.space_dim==DH::dimension, ExcInternalError());
+      const std::vector<Point<DH::dimension> > & q_points=fe_patch_values.get_quadrature_points();
+				       // resize the patch.data member
+				       // in order to have enough memory
+				       // for the quadrature points as
+				       // well
+      patch.data.reinit(patch.data.size(0)+DH::dimension,
+			patch.data.size(1));
+				       // set the flag indicating that
+				       // for this cell the points are
+				       // explicitly given
+      patch.points_are_available=true;
+				       // copy points to patch.data
+      for (unsigned int i=0; i<DH::dimension; ++i)
+	for (unsigned int q=0; q<n_q_points; ++q)
+	  patch.data(patch.data.size(0)-DH::dimension+i,q)=q_points[q][i];
+      
 				       // counter for data records
       unsigned int offset=0;
 	  
@@ -231,6 +267,15 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 template <int dim, class DH>
 void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions_)
 {
+  build_patches (StaticMappingQ1<DH::dimension>::mapping, n_subdivisions_);
+}
+
+
+
+template <int dim, class DH>
+void DataOutFaces<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
+					  const unsigned int n_subdivisions_)
+{
 				   // Check consistency of redundant
 				   // template parameter
   Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
@@ -286,11 +331,14 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions_)
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     if (this->dof_data[i]->postprocessor)
       update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();
+  update_flags |= update_quadrature_points;
   
   internal::DataOutFaces::ParallelData<DH::dimension, DH::dimension>
     thread_data (patch_points, n_components, n_datasets,
 		 n_subdivisions, 
-		 n_postprocessor_outputs, this->dofs->get_fe(),
+		 n_postprocessor_outputs,
+		 mapping,
+		 this->dofs->get_fe(),
 		 update_flags);
   DataOutBase::Patch<DH::dimension-1,DH::space_dimension> sample_patch;
   sample_patch.n_subdivisions = n_subdivisions;
@@ -388,7 +436,7 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 
 
 // explicit instantiations
-// don't instantiate anything for the 1d and 2d cases
+// don't instantiate anything for the 1d
 #if deal_II_dimension >=2
 template class DataOutFaces<deal_II_dimension, DoFHandler<deal_II_dimension> >;
 template class DataOutFaces<deal_II_dimension, hp::DoFHandler<deal_II_dimension> >;
