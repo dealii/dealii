@@ -1642,7 +1642,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 				   // and make sure that the row sum is
 				   // 1. this must be so since for this
 				   // element, the shape functions add up to
-				   // on
+				   // one
 	for (unsigned int row=0; row<this->dofs_per_cell; ++row)
 	  {
 	    double sum = 0;
