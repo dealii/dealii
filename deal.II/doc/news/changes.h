@@ -137,6 +137,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a new DataOutFaces::build_patches function which
+  takes a Mapping argument. For higher order mappings this allows to
+  represent curved boundaries by using more subdivisions. This function
+  is also useful in the context of MappingQ1Eulerian.  
+  <br>
+  (Tobias Leicht, RH 2009/06/05)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: For empty triangulations the new Triangulation::set_mesh_smoothing
   function allows to override the MeshSmoothing given to the constructor.  
   <br>
