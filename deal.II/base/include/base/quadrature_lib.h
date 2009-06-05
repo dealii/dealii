@@ -134,7 +134,7 @@ class QGaussLobatto : public Quadrature<dim>
 				      * $ \Gamma(n) = (n-1)! $. 
 				      * @param n  point of evaluation (integer).
 				      */
-    unsigned int gamma(const unsigned int n) const;
+    long double gamma(const unsigned int n) const;
 };
 
   
@@ -513,7 +513,7 @@ template <>
 long double QGaussLobatto<1>::
 JacobiP(const long double, const int, const int, const unsigned int) const;
 template <>
-unsigned int 
+long double 
 QGaussLobatto<1>::gamma(const unsigned int n) const;
 
 template <> std::vector<double> QGaussLog<1>::set_quadrature_points(const unsigned int) const;

@@ -328,9 +328,9 @@ long double QGaussLobatto<1>::JacobiP(const long double x,
 
 
 template <>
-unsigned int QGaussLobatto<1>::gamma(const unsigned int n) const
+long double QGaussLobatto<1>::gamma(const unsigned int n) const
 {
-  unsigned int result = n - 1;
+  long double result = n - 1;
   for (int i=n-2; i>1; --i)
     result *= i;
   return result;
