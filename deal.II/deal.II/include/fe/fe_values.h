@@ -1298,8 +1298,8 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * the quadrature point at which
 				      * function is to be computed
 				      */
-    double shape_value (const unsigned int function_no,
-			const unsigned int point_no) const;
+    const double & shape_value (const unsigned int function_no,
+				const unsigned int point_no) const;
 
 				     /**
 				      * Compute one vector component of
@@ -3789,7 +3789,7 @@ operator[] (const FEValuesExtractors::Vector &vector) const
 
 template <int dim, int spacedim>  
 inline
-double
+const double &
 FEValuesBase<dim,spacedim>::shape_value (const unsigned int i,
 					 const unsigned int j) const
 {
