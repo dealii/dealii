@@ -1513,12 +1513,10 @@ namespace TrilinosWrappers
 				        // non-constant value, as this
 				        // is the way Trilinos wants
 				        // to have them.
-  template <typename number>
   inline
-  void PreconditionBase::vmult (dealii::Vector<number>       &dst,
-				const dealii::Vector<number> &src) const
+  void PreconditionBase::vmult (dealii::Vector<double>       &dst,
+				const dealii::Vector<double> &src) const
   {
-    
     Epetra_Vector LHS (View, preconditioner->OperatorDomainMap(),
 		       dst.begin());
     Epetra_Vector RHS (View, preconditioner->OperatorRangeMap(),

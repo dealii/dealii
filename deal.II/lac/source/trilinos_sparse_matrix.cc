@@ -978,7 +978,7 @@ namespace TrilinosWrappers
 				   // create a suitable operator B: in case
 				   // we do not use a vector, all we need to
 				   // do is to set the pointer. Otherwise,
-				   // we insert insert the data from B, but
+				   // we insert the data from B, but
 				   // multiply each row with the respective
 				   // vector element.
       Teuchos::RCP<Epetra_CrsMatrix> mod_B;
@@ -1014,7 +1014,8 @@ namespace TrilinosWrappers
 				   // use ML built-in method for performing
 				   // the matrix-matrix product.
 				   // create ML operators on top of the
-				   // Epetra matrix.
+				   // Epetra matrices. if we use a
+				   // transposed matrix, let ML know it
       ML_Comm* comm;
       ML_Comm_Create(&comm);
       ML_Operator *A_ = ML_Operator_Create(comm);
@@ -1034,13 +1035,12 @@ namespace TrilinosWrappers
 
       ML_Operator_WrapEpetraCrsMatrix(&*mod_B,B_,false);
 
-				   // We do the multiplication by hand since
-				   // we can save some operations compared
-				   // to just calling
-				   // ml/src/Operator/ml_rap.c that
-				   // multiplies three matrices. This code
-				   // is still similar to the one found in
-				   // ml/src/Operator/ml_rap.c
+				   // We implement the multiplication by
+				   // hand in a similar way as is done in
+				   // ml/src/Operator/ml_rap.c for a triple
+				   // matrix product. This means that the
+				   // code is very similar to the one found
+				   // in ml/src/Operator/ml_rap.c
 
 				   // import data if necessary
       ML_Operator *Btmp, *Ctmp, *Ctmp2, *tptr;
