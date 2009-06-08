@@ -113,9 +113,8 @@ namespace TrilinosWrappers
 				        * in the Trilinos wrapper
 				        * class.
 					*/
-      template <typename number>
-      void vmult (dealii::Vector<number>       &dst,
-		  const dealii::Vector<number> &src) const;
+      void vmult (dealii::Vector<double>       &dst,
+		  const dealii::Vector<double> &src) const;
 
                                        /**
 					* Exception.
