@@ -362,7 +362,7 @@ class TimerOutput
 				      * summarizes the time consumed in the
 				      * various sections.
 				      */
-    void print_summary ();
+    void print_summary () const;
 
   private:
 				     /**

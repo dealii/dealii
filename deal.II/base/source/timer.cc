@@ -374,7 +374,7 @@ TimerOutput::exit_section (const std::string &section_name)
 
 
 void 
-TimerOutput::print_summary ()
+TimerOutput::print_summary () const
 {
 				// in case we want to write CPU times
   if (output_type != wall_times)
