@@ -215,7 +215,54 @@ class Timer
  * be generated every time a section is joined or just in the end of the
  * program. Moreover, it is possible to show CPU times, wall times or both.
  *
- * TODO: Write a more extensive documentation.
+ * <h3>Usage</h3>
+ *
+ * Use of this class could be as follows:
+ * @code
+ *   TimerOuput timer (std::cout, TimerOutput::summary, 
+ *                     TimerOutput::wall_times);
+ *
+ *   timer.enter_section ("Setup dof system");
+ *   setup_dofs();
+ *   timer.exit_section();
+ *
+ *   timer.enter_section ("Assemble");
+ *   assemble_system_1();
+ *   timer.exit_section();
+ *
+ *   timer.enter_section ("Solve");
+ *   solve_system_1();
+ *   timer.exit_section();
+ *
+ *   timer.enter_section ("Assemble");
+ *   assemble_system_2();
+ *   timer.exit_section();
+ *
+ *   timer.enter_section ("Solve");
+ *   solve_system_2();
+ *   timer.exit_section();
+ *
+ *   // do something else...   
+ * @endcode
+ * When run, this program will return an output like this:
+ * @code
+ * +---------------------------------------------+------------+------------+
+ * | Total wallclock time elapsed since start    |      88.8s |            |
+ * |                                             |            |            |
+ * | Section                         | no. calls |  wall time | % of total |
+ * +---------------------------------+-----------+------------+------------+
+ * | Assemble                        |         2 |      19.7s |        22% |
+ * | Solve                           |         2 |      3.03s |       3.4% |
+ * | Setup dof system                |         1 |      3.97s |       4.5% |
+ * +---------------------------------+-----------+------------+------------+
+ * @endcode
+ * The output will see that we entered the assembly and solve section
+ * twice, and reports how much time we spent there. Moreover, the class 
+ * measures the total time spent from start to termination of the TimerOutput
+ * object. In this case, we did a lot of other stuff, so that the time
+ * proportions of the functions we measured are far away from 100 precent.
+ *
+ * See the @ref step_32 "step-32" tutorial program for usage of this class. 
  *
  * @ingroup utilities
  * @author M. Kronbichler, 2009.
