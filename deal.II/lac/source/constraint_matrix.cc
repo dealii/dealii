@@ -1988,6 +1988,9 @@ ConstraintMatrix::memory_consumption () const
 // VectorType/MatrixType. note that we need a space between "VectorType" and
 // ">" to disambiguate ">>" when VectorType trails in an angle bracket
 
+// TODO: The way we define all the instantiations is probably not the very
+// best one. Try to find a better description.
+
 #define VECTOR_FUNCTIONS(VectorType) \
   template void ConstraintMatrix::condense<VectorType >(const VectorType &uncondensed,\
 					               VectorType       &condensed) const;\
@@ -2010,12 +2013,25 @@ ConstraintMatrix::memory_consumption () const
 					                 VectorType       &uncondensed) const;\
   template void ConstraintMatrix::distribute<VectorType >(VectorType &vec) const
 
+#define PARALLEL_VECTOR_FUNCTIONS(VectorType) \
+  template void ConstraintMatrix:: \
+    distribute_local_to_global<VectorType > (const Vector<double>            &, \
+                                             const std::vector<unsigned int> &, \
+                                             VectorType                      &, \
+					     const FullMatrix<double>        &) const
+
+
 
 VECTOR_FUNCTIONS(Vector<float>);
 VECTOR_FUNCTIONS(Vector<double>);
 VECTOR_FUNCTIONS(BlockVector<double>);
 VECTOR_FUNCTIONS(BlockVector<float>);
 
+// TODO: Can PETSc really do all the operations required by the above
+// condense/distribute function etc also on distributed vectors? Trilinos
+// can't do that - we have to rewrite those functions by hand if we want to
+// use them. The key is to use local ranges etc., which still needs to be
+// implemented.
 #ifdef DEAL_II_USE_PETSC
 VECTOR_FUNCTIONS(PETScWrappers::Vector);
 VECTOR_FUNCTIONS(PETScWrappers::BlockVector);
@@ -2026,8 +2042,8 @@ VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockVector);
 #ifdef DEAL_II_USE_TRILINOS
 VECTOR_FUNCTIONS(TrilinosWrappers::Vector);
 VECTOR_FUNCTIONS(TrilinosWrappers::BlockVector);
-VECTOR_FUNCTIONS(TrilinosWrappers::MPI::Vector);
-VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
+PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::Vector);
+PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
 #endif
 
 #define CONDENSE_FUNCTIONS(VectorType, number, MatrixType)		\
@@ -2138,62 +2154,26 @@ template void ConstraintMatrix::distribute_local_to_global
    TrilinosWrappers::MPI::BlockVector  &) const;
 #endif
 
-template void ConstraintMatrix::
-add_entries_local_to_global<SparsityPattern> (const std::vector<unsigned int> &,
-					      SparsityPattern                 &,
-					      const bool,
-					      const Table<2,bool> &) const;
-template void ConstraintMatrix::
-add_entries_local_to_global<CompressedSparsityPattern> (const std::vector<unsigned int> &,
-					      CompressedSparsityPattern       &,
-					      const bool,
-					      const Table<2,bool> &) const;
-template void ConstraintMatrix::
-add_entries_local_to_global<CompressedSetSparsityPattern> (const std::vector<unsigned int> &,
-					      CompressedSetSparsityPattern       &,
-					      const bool,
-					      const Table<2,bool> &) const;
-template void ConstraintMatrix::
-add_entries_local_to_global<CompressedSimpleSparsityPattern> (const std::vector<unsigned int> &,
-					      CompressedSimpleSparsityPattern       &,
-					      const bool,
-					      const Table<2,bool> &) const;
-#ifdef DEAL_II_USE_TRILINOS
-template void ConstraintMatrix::
-add_entries_local_to_global<TrilinosWrappers::SparsityPattern>
-                                             (const std::vector<unsigned int> &,
-					      TrilinosWrappers::SparsityPattern &,
-					      const bool,
-					      const Table<2,bool> &) const;
-#endif
 
-template void ConstraintMatrix::
-add_entries_local_to_global<BlockSparsityPattern> (const std::vector<unsigned int> &,
-					      BlockSparsityPattern &,
-					      const bool,
-					      const Table<2,bool> &) const;
-template void ConstraintMatrix::
-add_entries_local_to_global<BlockCompressedSparsityPattern> (const std::vector<unsigned int> &,
-					      BlockCompressedSparsityPattern       &,
-					      const bool,
-					      const Table<2,bool> &) const;
-template void ConstraintMatrix::
-add_entries_local_to_global<BlockCompressedSetSparsityPattern> (const std::vector<unsigned int> &,
-					      BlockCompressedSetSparsityPattern &,
-					      const bool,
-					      const Table<2,bool> &) const;
-template void ConstraintMatrix::
-add_entries_local_to_global<BlockCompressedSimpleSparsityPattern> (const std::vector<unsigned int> &,
-                                              BlockCompressedSimpleSparsityPattern &,
-                                              const bool,
-					      const Table<2,bool> &) const;
+#define SPARSITY_FUNCTIONS(SparsityType) \
+  template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
+    const std::vector<unsigned int> &, \
+    SparsityType &,		       \
+    const bool,			       \
+    const Table<2,bool> &) const
+
+SPARSITY_FUNCTIONS(SparsityPattern);
+SPARSITY_FUNCTIONS(CompressedSparsityPattern);
+SPARSITY_FUNCTIONS(CompressedSetSparsityPattern);
+SPARSITY_FUNCTIONS(CompressedSimpleSparsityPattern);
+SPARSITY_FUNCTIONS(BlockSparsityPattern);
+SPARSITY_FUNCTIONS(BlockCompressedSparsityPattern);
+SPARSITY_FUNCTIONS(BlockCompressedSetSparsityPattern);
+SPARSITY_FUNCTIONS(BlockCompressedSimpleSparsityPattern);
+
 #ifdef DEAL_II_USE_TRILINOS
-template void ConstraintMatrix::
-add_entries_local_to_global<TrilinosWrappers::BlockSparsityPattern> 
-                                             (const std::vector<unsigned int> &,
-					      TrilinosWrappers::BlockSparsityPattern &,
-					      const bool,
-					      const Table<2,bool> &) const;
+SPARSITY_FUNCTIONS(TrilinosWrappers::SparsityPattern);
+SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
 #endif
 
 DEAL_II_NAMESPACE_CLOSE
