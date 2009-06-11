@@ -79,6 +79,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   number * luval = this->SparseMatrix<number>::val;
 
   const unsigned int N = this->m();
+  unsigned int jrow;
   
   std::vector<unsigned int> iw (N, numbers::invalid_unsigned_int);
   
@@ -102,9 +103,16 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				       // half
       unsigned int j = j1+1;
 
+				       // pathological case: the current row
+				       // of the matrix has only the
+				       // diagonal entry. then we have
+				       // nothing to do.
+      if (j > j2)
+	goto label_200;
+
       label_150:
       
-      unsigned int jrow = ja[j];
+      jrow = ja[j];
       if (jrow >= k)
 	goto label_200;
 
