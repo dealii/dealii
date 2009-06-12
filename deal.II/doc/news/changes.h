@@ -95,9 +95,9 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Improved: The gamma function now returns a long double instead of an
-  unsigned int, otherwise we will get an overflow and thus meaningless
-  weights for higher QGaussLobatto quadrature rules.  
+  Improved: The QGaussLobatto::gamma function now returns a long double
+  instead of an unsigned int, otherwise we will get an overflow and thus
+  meaningless weights for higher QGaussLobatto quadrature rules.  
   <br>
   (Tobias Leicht, RH 2009/06/05)
   </p>
