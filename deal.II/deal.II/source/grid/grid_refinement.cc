@@ -503,28 +503,32 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 template
 void
 GridRefinement::
-refine (Triangulation<deal_II_dimension> &,
+refine<deal_II_dimension,Vector<float>,deal_II_dimension>
+       (Triangulation<deal_II_dimension> &,
         const Vector<float> &,
         const double);
 
 template
 void
 GridRefinement::
-refine (Triangulation<deal_II_dimension> &,
+refine<deal_II_dimension,Vector<double>,deal_II_dimension>
+       (Triangulation<deal_II_dimension> &,
         const Vector<double> &,
         const double);
 
 template
 void
 GridRefinement::
-coarsen (Triangulation<deal_II_dimension> &,
+coarsen<deal_II_dimension,Vector<float>,deal_II_dimension>
+       (Triangulation<deal_II_dimension> &,
          const Vector<float> &,
          const double);
 
 template
 void
 GridRefinement::
-coarsen (Triangulation<deal_II_dimension> &,
+coarsen<deal_II_dimension,Vector<double>,deal_II_dimension>
+       (Triangulation<deal_II_dimension> &,
          const Vector<double> &,
          const double);
 
@@ -532,93 +536,149 @@ coarsen (Triangulation<deal_II_dimension> &,
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
-                                 const Vector<double> &,
-                                 const double,
-                                 const double,
-				 const unsigned int);
+refine_and_coarsen_fixed_number<deal_II_dimension,Vector<double>,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const Vector<double> &,
+ const double,
+ const double,
+ const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
-                                 const Vector<float> &,
-                                 const double,
-                                 const double,
-				 const unsigned int);
+refine_and_coarsen_fixed_number<deal_II_dimension,Vector<float>,deal_II_dimension>
+ (Triangulation<deal_II_dimension> &,
+  const Vector<float> &,
+  const double,
+  const double,
+  const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
-                                   const Vector<double> &,
-                                   const double,
-                                   const double,
-				   const unsigned int);
+refine_and_coarsen_fixed_fraction<deal_II_dimension,Vector<double>,deal_II_dimension>
+ (Triangulation<deal_II_dimension> &,
+  const Vector<double> &,
+  const double,
+  const double,
+  const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
-                                   const Vector<float> &,
-                                   const double,
-                                   const double,
-				   const unsigned int);
+refine_and_coarsen_fixed_fraction<deal_II_dimension,Vector<float>,deal_II_dimension>
+ (Triangulation<deal_II_dimension> &,
+  const Vector<float> &,
+  const double,
+  const double,
+  const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
-                             const Vector<float> &);
+refine_and_coarsen_optimize<deal_II_dimension,Vector<float>,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const Vector<float> &);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
-                             const Vector<double> &);
+refine_and_coarsen_optimize<deal_II_dimension,Vector<double>,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const Vector<double> &);
 
 #ifdef DEAL_II_USE_PETSC
 template
 void
 GridRefinement::
-refine (Triangulation<deal_II_dimension> &,
-        const PETScWrappers::Vector &,
-        const double);
+refine<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
+ (Triangulation<deal_II_dimension> &,
+  const PETScWrappers::Vector &,
+  const double);
 
 template
 void
 GridRefinement::
-coarsen (Triangulation<deal_II_dimension> &,
-         const PETScWrappers::Vector &,
-         const double);
+coarsen<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const PETScWrappers::Vector &,
+ const double);
 
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
-                                 const PETScWrappers::Vector &,
-                                 const double,
-                                 const double,
-				 const unsigned int);
+refine_and_coarsen_fixed_number<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const PETScWrappers::Vector &,
+ const double,
+ const double,
+ const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
-                                   const PETScWrappers::Vector &,
-                                   const double,
-                                   const double,
-				   const unsigned int);
+refine_and_coarsen_fixed_fraction<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const PETScWrappers::Vector &,
+ const double,
+ const double,
+ const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
-                             const PETScWrappers::Vector &);
+refine_and_coarsen_optimize<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const PETScWrappers::Vector &);
 #endif
 
-//<<<<<<< .working
+#ifdef DEAL_II_USE_TRILINOS
+template
+void
+GridRefinement::
+refine<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
+ (Triangulation<deal_II_dimension> &,
+  const TrilinosWrappers::Vector &,
+  const double);
+
+template
+void
+GridRefinement::
+coarsen<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const TrilinosWrappers::Vector &,
+ const double);
+
+
+template
+void
+GridRefinement::
+refine_and_coarsen_fixed_number<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const TrilinosWrappers::Vector &,
+ const double,
+ const double,
+ const unsigned int);
+
+template
+void
+GridRefinement::
+refine_and_coarsen_fixed_fraction<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const TrilinosWrappers::Vector &,
+ const double,
+ const double,
+ const unsigned int);
+
+template
+void
+GridRefinement::
+refine_and_coarsen_optimize<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
+(Triangulation<deal_II_dimension> &,
+ const TrilinosWrappers::Vector &);
+#endif
+
 
 
 #if deal_II_dimension != 3
@@ -626,28 +686,32 @@ refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
 template
 void
 GridRefinement::
-refine (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+refine<deal_II_dimension,Vector<float>,deal_II_dimension+1>
+       (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
         const Vector<float> &,
         const double);
 
 template
 void
 GridRefinement::
-refine (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+refine<deal_II_dimension,Vector<double>,deal_II_dimension+1>
+       (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
         const Vector<double> &,
         const double);
 
 template
 void
 GridRefinement::
-coarsen (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+coarsen<deal_II_dimension,Vector<float>,deal_II_dimension+1>
+       (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
          const Vector<float> &,
          const double);
 
 template
 void
 GridRefinement::
-coarsen (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+coarsen<deal_II_dimension,Vector<double>,deal_II_dimension+1>
+       (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
          const Vector<double> &,
          const double);
 
@@ -655,135 +719,150 @@ coarsen (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                                 const Vector<double> &,
-                                 const double,
-                                 const double,
-				 const unsigned int);
+refine_and_coarsen_fixed_number<deal_II_dimension,Vector<double>,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const Vector<double> &,
+ const double,
+ const double,
+ const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                                 const Vector<float> &,
-                                 const double,
-                                 const double,
-				 const unsigned int);
+refine_and_coarsen_fixed_number<deal_II_dimension,Vector<float>,deal_II_dimension+1>
+ (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+  const Vector<float> &,
+  const double,
+  const double,
+  const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                                   const Vector<double> &,
-                                   const double,
-                                   const double,
-				   const unsigned int);
+refine_and_coarsen_fixed_fraction<deal_II_dimension,Vector<double>,deal_II_dimension+1>
+ (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+  const Vector<double> &,
+  const double,
+  const double,
+  const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                                   const Vector<float> &,
-                                   const double,
-                                   const double,
-				   const unsigned int);
+refine_and_coarsen_fixed_fraction<deal_II_dimension,Vector<float>,deal_II_dimension+1>
+ (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+  const Vector<float> &,
+  const double,
+  const double,
+  const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_optimize (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                             const Vector<float> &);
+refine_and_coarsen_optimize<deal_II_dimension,Vector<float>,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const Vector<float> &);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_optimize (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                             const Vector<double> &);
+refine_and_coarsen_optimize<deal_II_dimension,Vector<double>,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const Vector<double> &);
 
 #ifdef DEAL_II_USE_PETSC
 template
 void
 GridRefinement::
-refine (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-        const PETScWrappers::Vector &,
-        const double);
+refine<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
+ (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+  const PETScWrappers::Vector &,
+  const double);
 
 template
 void
 GridRefinement::
-coarsen (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-         const PETScWrappers::Vector &,
-         const double);
+coarsen<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const PETScWrappers::Vector &,
+ const double);
 
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                                 const PETScWrappers::Vector &,
-                                 const double,
-                                 const double,
-				 const unsigned int);
+refine_and_coarsen_fixed_number<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const PETScWrappers::Vector &,
+ const double,
+ const double,
+ const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                                   const PETScWrappers::Vector &,
-                                   const double,
-                                   const double,
-				   const unsigned int);
+refine_and_coarsen_fixed_fraction<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const PETScWrappers::Vector &,
+ const double,
+ const double,
+ const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_optimize (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-                             const PETScWrappers::Vector &);
+refine_and_coarsen_optimize<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const PETScWrappers::Vector &);
 #endif
-
-#endif
-
-//=======
 
 #ifdef DEAL_II_USE_TRILINOS
 template
 void
 GridRefinement::
-refine (Triangulation<deal_II_dimension> &,
-        const TrilinosWrappers::Vector &,
-        const double);
+refine<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
+ (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+  const TrilinosWrappers::Vector &,
+  const double);
 
 template
 void
 GridRefinement::
-coarsen (Triangulation<deal_II_dimension> &,
-         const TrilinosWrappers::Vector &,
-         const double);
+coarsen<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const TrilinosWrappers::Vector &,
+ const double);
 
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
-                                 const TrilinosWrappers::Vector &,
-                                 const double,
-                                 const double,
-				 const unsigned int);
+refine_and_coarsen_fixed_number<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const TrilinosWrappers::Vector &,
+ const double,
+ const double,
+ const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
-                                   const TrilinosWrappers::Vector &,
-                                   const double,
-                                   const double,
-				   const unsigned int);
+refine_and_coarsen_fixed_fraction<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const TrilinosWrappers::Vector &,
+ const double,
+ const double,
+ const unsigned int);
 
 template
 void
 GridRefinement::
-refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
-                             const TrilinosWrappers::Vector &);
+refine_and_coarsen_optimize<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
+(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+ const TrilinosWrappers::Vector &);
+#endif
+
+
 #endif
 
 DEAL_II_NAMESPACE_CLOSE
