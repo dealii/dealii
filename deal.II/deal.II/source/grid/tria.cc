@@ -9316,7 +9316,7 @@ namespace internal
 							     // the empirical value
 							     // allowed. if it is
 							     // too big, flag the
-							     // cell for isotropic
+							     // face for isotropic
 							     // refinement
 			    const double allowed=0.25;
  			
