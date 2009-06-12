@@ -137,6 +137,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The new Triangulation::n_raw_faces() function forwards
+  to Triangulation::n_raw_lines() in 2d and
+  Triangulation::n_raw_quads() in 3d.  
+  <br>
+  (Tobias Leicht, RH 2009/06/12)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: There is now a new DataOutFaces::build_patches function which
   takes a Mapping argument. For higher order mappings this allows to
   represent curved boundaries by using more subdivisions. This function

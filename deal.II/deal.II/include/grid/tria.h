@@ -2788,6 +2788,14 @@ class Triangulation : public Subscriptor
     unsigned int n_active_cells (const unsigned int level) const;
 
 				     /**
+				      *  Return total number of faces,
+				      *  used or not. In 2d, the result
+				      *  equals n_raw_lines(), while in 3d it
+				      *  equals n_raw_quads().
+				      */
+    unsigned int n_raw_faces () const;
+
+				     /**
 				      *  Return total number of used faces,
 				      *  active or not.  In 2D, the result
 				      *  equals n_lines(), while in 3D it

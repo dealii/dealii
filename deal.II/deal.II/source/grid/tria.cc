@@ -11997,6 +11997,22 @@ unsigned int Triangulation<dim, spacedim>::n_faces () const
 
 
 template <int dim, int spacedim>
+unsigned int Triangulation<dim, spacedim>::n_raw_faces () const
+{
+  switch (dim)
+    {
+      case 2:
+	    return n_raw_lines();
+      case 3:
+	    return n_raw_quads();
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+  return 0;
+}
+
+
+template <int dim, int spacedim>
 unsigned int Triangulation<dim, spacedim>::n_active_faces () const
 {
   switch (dim)
