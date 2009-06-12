@@ -30,6 +30,7 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_q.h>
 
 #include <fstream>
 
@@ -37,10 +38,11 @@
 // these objects which is considerable
 FE_DGQ<3> fe(1);
 QGauss<2> quadrature(3);
-FEFaceValues<3> fe_face_values1 (fe, quadrature,
+MappingQ<3> mapping(2);
+FEFaceValues<3> fe_face_values1 (mapping, fe, quadrature,
 				 update_q_points | update_JxW_values |
 				 update_normal_vectors);
-FESubfaceValues<3> fe_face_values2 (fe, quadrature,
+FESubfaceValues<3> fe_face_values2 (mapping, fe, quadrature,
 				    update_q_points | update_JxW_values |
 				    update_normal_vectors);
 
@@ -77,7 +79,7 @@ void check_this (Triangulation<3> &tria)
                         ExcInternalError());
 
                 Assert (std::fabs(fe_face_values1.JxW(q)-
-                                  fe_face_values2.JxW(q)) < 1e-15,
+                                  fe_face_values2.JxW(q)) < 1e-14,
                         ExcInternalError());
                 Assert ((fe_face_values1.normal_vector(q) +
                          fe_face_values2.normal_vector(q)).square()
