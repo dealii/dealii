@@ -3397,6 +3397,44 @@ namespace hp
 	}
   }
   
+
+  
+  template <int dim, int spacedim>
+  void DoFHandler<dim,spacedim>::set_active_fe_indices (const std::vector<unsigned int>& active_fe_indices)
+  {
+    Assert(active_fe_indices.size()==get_tria().n_active_cells(),
+	   ExcDimensionMismatch(active_fe_indices.size(), get_tria().n_active_cells()));
+
+    create_active_fe_table ();
+				     // we could set the values directly, since
+				     // they are stored as protected data of
+				     // this object, but for simplicity we use
+				     // the cell-wise access. this way we also
+				     // have to pass some debug-mode tests which
+				     // we would have to duplicate ourselves
+				     // otherwise
+    active_cell_iterator cell=begin_active(),
+			 endc=end();
+    for (unsigned int i=0; cell!=endc; ++cell, ++i)
+      cell->set_active_fe_index(active_fe_indices[i]);
+  }
+
+  
+
+  template <int dim, int spacedim>
+  void DoFHandler<dim,spacedim>::get_active_fe_indices (std::vector<unsigned int>& active_fe_indices) const
+  {
+    active_fe_indices.resize(get_tria().n_active_cells());
+
+				     // we could try to extract the values directly, since
+				     // they are stored as protected data of
+				     // this object, but for simplicity we use
+				     // the cell-wise access.
+    active_cell_iterator cell=begin_active(),
+			 endc=end();
+    for (unsigned int i=0; cell!=endc; ++cell, ++i)
+      active_fe_indices[i]=cell->active_fe_index();
+  }
   
 
   

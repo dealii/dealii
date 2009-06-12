@@ -137,6 +137,20 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The new hp::DoFHandler::set_active_fe_indices function allows
+  to distribute all active FE indices at once based on a given
+  vector. This might be useful if this information is stored
+  somewhere and has to be reconstructed or else if two DoFHandler
+  objects with the same FE index distribution should be created.
+  There is now also a corresponding
+  hp::DoFHandler::get_active_fe_indices function.  
+  <br>
+  (Tobias Leicht, RH 2009/06/12)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Fix: The projection of quadrature points to subfaces in
   MappingQ in case of 3d anisotropic refinement did not respect
   non-standard face orientation/flip/rotation cases. This

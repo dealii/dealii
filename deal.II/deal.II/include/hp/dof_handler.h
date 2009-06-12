@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -172,8 +172,8 @@ namespace hp
                                         * Go through the triangulation and
                                         * distribute the degrees of freedoms
                                         * needed for the given finite element
-                                        * according to the given distribution
-                                        * method.
+                                        * according to the current distribution
+                                        * of active fe indices.
                                         *
                                         * A pointer of the transferred
                                         * finite element is
@@ -188,6 +188,23 @@ namespace hp
                                         * object to the finite element.
                                         */
       virtual void distribute_dofs (const hp::FECollection<dim,spacedim> &fe);
+
+                                       /**
+                                        * Go through the triangulation and set
+                                        * the active FE indices of all active
+                                        * cells to the values given in @p
+                                        * active_fe_indices.
+                                        */
+      void set_active_fe_indices (const std::vector<unsigned int>& active_fe_indices);
+
+                                       /**
+                                        * Go through the triangulation and
+                                        * store the active FE indices of all
+                                        * active cells to the vector @p
+                                        * active_fe_indices. This vector is
+                                        * resized, if necessary.
+                                        */
+      void get_active_fe_indices (std::vector<unsigned int>& active_fe_indices) const;
 
                                        /**
                                         * Clear all data of this object and
@@ -1084,7 +1101,7 @@ namespace hp
                                         * Store the number of dofs
                                         * created last time.
                                         */
-      unsigned int              used_dofs;
+      unsigned int used_dofs;
 
                                        /**
                                         * Array to store the indices
