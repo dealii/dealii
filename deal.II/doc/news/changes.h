@@ -137,6 +137,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fix: The projection of quadrature points to subfaces in
+  MappingQ in case of 3d anisotropic refinement did not respect
+  non-standard face orientation/flip/rotation cases. This
+  has now been fixed.  
+  <br>
+  (Tobias Leicht, RH 2009/06/12)
+  </p>
+  </li>
+  
+  <li>
+  <p>
   New: The new Triangulation::n_raw_faces() function forwards
   to Triangulation::n_raw_lines() in 2d and
   Triangulation::n_raw_quads() in 3d.  
