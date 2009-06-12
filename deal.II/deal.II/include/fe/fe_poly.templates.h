@@ -245,7 +245,7 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values
    Mapping<1,2>::InternalDataBase            &mapping_data,
    Mapping<1,2>::InternalDataBase            &fedata,
    FEValuesData<1,2>                         &data,
-   enum CellSimilarity::Similarity           &cell_similarity) const
+   CellSimilarity::Similarity           &cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -288,7 +288,7 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values
    Mapping<2,3>::InternalDataBase          &mapping_data,
    Mapping<2,3>::InternalDataBase          &fedata,
    FEValuesData<2,3>                       &data,
-   enum CellSimilarity::Similarity         &cell_similarity) const
+   CellSimilarity::Similarity         &cell_similarity) const
 {
 
 				   // assert that the following dynamics
@@ -330,7 +330,7 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
   Mapping<1,2>::InternalDataBase          &mapping_data,
   Mapping<1,2>::InternalDataBase          &fedata,
   FEValuesData<1,2>                       &data,
-  enum CellSimilarity::Similarity         &cell_similarity) const
+  CellSimilarity::Similarity         &cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -375,7 +375,7 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values
    Mapping<2,3>::InternalDataBase          &mapping_data,
    Mapping<2,3>::InternalDataBase          &fedata,
    FEValuesData<2,3>                       &data,
-   enum CellSimilarity::Similarity         &cell_similarity) const
+   CellSimilarity::Similarity         &cell_similarity) const
 {
   Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
   InternalData &fe_data = static_cast<InternalData &> (fedata);
@@ -414,7 +414,7 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
    typename Mapping<dim,spacedim>::InternalDataBase &fedata,
    FEValuesData<dim,spacedim>                       &data,
-   enum CellSimilarity::Similarity                  &cell_similarity) const
+   CellSimilarity::Similarity                  &cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

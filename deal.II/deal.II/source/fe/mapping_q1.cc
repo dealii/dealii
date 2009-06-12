@@ -606,7 +606,7 @@ void
 MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			               const unsigned int  n_q_points,
        		                       const DataSetDescriptor  data_set,
-				       const enum CellSimilarity::Similarity cell_similarity,
+				       const CellSimilarity::Similarity cell_similarity,
 	      	                       InternalData  &data,
 		                       std::vector<Point<spacedim> > &quadrature_points) const
 {
@@ -745,7 +745,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
   std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
   std::vector<Point<spacedim> >                             &cell_normal_vectors,
-  enum CellSimilarity::Similarity                           &cell_similarity) const
+  CellSimilarity::Similarity                           &cell_similarity) const
 {
   // ensure that the following cast is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 

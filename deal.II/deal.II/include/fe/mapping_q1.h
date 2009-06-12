@@ -302,7 +302,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
 		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
 		    std::vector<Point<spacedim> >                             &cell_normal_vectors,
-		    enum CellSimilarity::Similarity                           &cell_similarity) const;
+		    CellSimilarity::Similarity                           &cell_similarity) const;
 
 				     /**
 				      * Implementation of the interface in
@@ -385,7 +385,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
     void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		       const unsigned int      npts,
 		       const DataSetDescriptor data_set,
-		       const enum CellSimilarity::Similarity cell_similarity,
+		       const CellSimilarity::Similarity cell_similarity,
 		       InternalData           &data,
 		       std::vector<Point<spacedim> > &quadrature_points) const;
     

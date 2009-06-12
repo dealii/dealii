@@ -127,7 +127,7 @@ MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
   std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
   std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
   std::vector<Point<spacedim> >                             &cell_normal_vectors,
-  enum CellSimilarity::Similarity                           &cell_similarity) const
+  CellSimilarity::Similarity                           &cell_similarity) const
 {
 				   // disable any previously detected
 				   // similarity and then enter the

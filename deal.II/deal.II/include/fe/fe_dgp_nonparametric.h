@@ -484,7 +484,7 @@ class FE_DGPNonparametric : public FiniteElement<dim,spacedim>
 		    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
 		    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
 		    FEValuesData<dim,spacedim>                            &data,
-		    enum CellSimilarity::Similarity                       &cell_similarity) const;
+		    CellSimilarity::Similarity                       &cell_similarity) const;
     
 				     /**
 				      * Implementation of the same

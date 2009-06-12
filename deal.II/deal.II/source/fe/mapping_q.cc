@@ -314,7 +314,7 @@ MappingQ<dim,spacedim>::fill_fe_values (
   std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
   std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
   std::vector<Point<spacedim> >                             &cell_normal_vectors,
-  enum CellSimilarity::Similarity                           &cell_similarity) const
+  CellSimilarity::Similarity                           &cell_similarity) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

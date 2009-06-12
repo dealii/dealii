@@ -2594,7 +2594,7 @@ class FiniteElement : public Subscriptor,
 		    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_internal,
 		    typename Mapping<dim,spacedim>::InternalDataBase          &fe_internal,
 		    FEValuesData<dim,spacedim>                                &data,
-		    enum CellSimilarity::Similarity                           &cell_similarity) const = 0;
+		    CellSimilarity::Similarity                           &cell_similarity) const = 0;
     
 				     /**
 				      * Fill the fields of

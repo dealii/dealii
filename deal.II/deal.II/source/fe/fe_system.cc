@@ -670,7 +670,7 @@ fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
                 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                 typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
                 FEValuesData<dim,spacedim>                       &data,
-		enum CellSimilarity::Similarity                  &cell_similarity) const
+		CellSimilarity::Similarity                  &cell_similarity) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
 	       quadrature, cell_similarity, mapping_data, fe_data, data);
@@ -723,7 +723,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
               const unsigned int                                face_no,
               const unsigned int                                sub_no,
               const Quadrature<dim_1>                          &quadrature,
-	      enum CellSimilarity::Similarity                   cell_similarity,
+	      CellSimilarity::Similarity                   cell_similarity,
               typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
               typename Mapping<dim,spacedim>::InternalDataBase &fedata,
               FEValuesData<dim,spacedim>                       &data) const

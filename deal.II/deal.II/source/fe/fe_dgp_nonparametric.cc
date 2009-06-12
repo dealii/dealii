@@ -292,7 +292,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
   typename Mapping<dim,spacedim>::InternalDataBase&,
   typename Mapping<dim,spacedim>::InternalDataBase& fedata,
   FEValuesData<dim,spacedim>&data,
-  enum CellSimilarity::Similarity &/*cell_similarity*/) const
+  CellSimilarity::Similarity &/*cell_similarity*/) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

@@ -212,7 +212,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
 		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
                     std::vector<Point<spacedim> >                             &cell_normal_vectors,
-		    enum CellSimilarity::Similarity                           &cell_similarity) const ;
+		    CellSimilarity::Similarity                           &cell_similarity) const ;
 
 				     /**
 				      * Implementation of the interface in

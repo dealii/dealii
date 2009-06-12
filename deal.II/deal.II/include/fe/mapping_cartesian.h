@@ -68,7 +68,7 @@ class MappingCartesian : public Mapping<dim,spacedim>
 		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
 		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
 	 	    std::vector<Point<spacedim> >   &,
-		    enum CellSimilarity::Similarity                           &cell_similarity) const ;
+		    CellSimilarity::Similarity                           &cell_similarity) const ;
 
 
     virtual void
@@ -181,7 +181,7 @@ class MappingCartesian : public Mapping<dim,spacedim>
     void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		       const unsigned int face_no,
 		       const unsigned int sub_no,
-		       const enum CellSimilarity::Similarity cell_similarity,
+		       const CellSimilarity::Similarity cell_similarity,
 		       InternalData& data,
 		       std::vector<Point<dim> > &quadrature_points,
 		       std::vector<Point<dim> >& normal_vectors) const;
