@@ -10,8 +10,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__dof_constraints_h
-#define __deal2__dof_constraints_h
+#ifndef __deal2__constraint_matrix_h
+#define __deal2__constraint_matrix_h
 
 
 #include <base/config.h>
@@ -19,6 +19,8 @@
 #include <base/subscriptor.h>
 #include <base/table.h>
 #include <base/template_constraints.h>
+
+#include <lac/trilinos_vector.h>
 
 #include <vector>
 #include <map>
@@ -1513,6 +1515,14 @@ class ConstraintMatrix : public Subscriptor
 				 const bool                       keep_constrained_entries,
 				 const Table<2,bool>             &dof_mask,
 				 internal::bool2type<true>) const;
+
+#ifdef DEAL_II_USE_TRILINOS
+				      /**
+				       * This vector is used to import data
+				       * within the distribute function.
+				       */
+    mutable TrilinosWrappers::MPI::Vector vec_distribute;
+#endif
 };
 
 

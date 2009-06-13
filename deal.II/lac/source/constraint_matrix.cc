@@ -740,6 +740,13 @@ void ConstraintMatrix::clear ()
     std::vector<bool> tmp;
     constraint_line_exists.swap (tmp);
   }
+
+#ifdef DEAL_II_USE_TRILINOS
+  {
+				   // reset distribute vector
+    vec_distribute.clear();
+  }
+#endif
   
   sorted = false;
 }
@@ -1850,6 +1857,88 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
     };
 }
 
+
+
+#ifdef DEAL_II_USE_TRILINOS
+
+				   // this is a specialization for a
+				   // parallel (non-block) Trilinos
+				   // vector. The basic idea is to just work
+				   // on the local range of the vector. But
+				   // we need access to values that the
+				   // local nodes are constrained to.
+template<>
+void
+ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
+{
+  Assert (sorted == true, ExcMatrixNotClosed());
+  ConstraintLine index_comparison;
+  index_comparison.line = vec.local_range().first;
+
+  std::vector<ConstraintLine>::const_iterator next_constraint = 
+    std::lower_bound (lines.begin(),lines.end(),index_comparison);
+
+  index_comparison.line = vec.local_range().second;
+  
+  std::vector<ConstraintLine>::const_iterator end_constraint
+    = std::lower_bound(lines.begin(),lines.end(),index_comparison);
+
+				   // Here we search all the indices that we
+				   // need to have read-access to - the
+				   // local nodes and all the nodes that the
+				   // constraints indicate. Do this only at
+				   // the first call and provide the class
+				   // with a vector for further use.
+  if (vec_distribute.size()!=vec.size())
+    {
+      std::vector<int> my_indices(vec.local_size());
+      unsigned int index2 = 0;
+      for(unsigned int i=vec.local_range().first;i<vec.local_range().second;i++,index2++)
+        {
+          my_indices[index2]=i;
+        }
+      for (; next_constraint != end_constraint; ++next_constraint) 
+        {
+          for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
+            my_indices.push_back (next_constraint->entries[i].first);
+        }
+
+				   // sort and compress out duplicates
+      std::sort(my_indices.begin(),my_indices.end());
+      index2 = 1;
+      for(unsigned int index1=1;index1<my_indices.size();index1++)
+        {
+          if(my_indices[index1]!=my_indices[index1-1])
+            {
+              my_indices[index2++] = my_indices[index1];
+            }
+        }
+
+      my_indices.resize(index2);
+
+      Epetra_Map map_exchange = Epetra_Map(-1,index2,(int*)&my_indices[0],0,vec.trilinos_vector().Comm());
+      vec_distribute.reinit(map_exchange);
+    }
+				   // here we import the data
+  vec_distribute.reinit(vec,false,true);
+
+  next_constraint = 
+    std::lower_bound (lines.begin(),lines.end(),index_comparison);
+
+  for (; next_constraint != end_constraint; ++next_constraint) 
+    {
+				       // fill entry in line
+				       // next_constraint.line by adding the
+				       // different contributions
+      double new_value = next_constraint->inhomogeneity;
+      for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
+	new_value += (vec_distribute(next_constraint->entries[i].first) *
+                      next_constraint->entries[i].second);
+      vec(next_constraint->line) = new_value;
+    }
+}
+
+#endif
 
 
 unsigned int ConstraintMatrix::n_constraints () const
