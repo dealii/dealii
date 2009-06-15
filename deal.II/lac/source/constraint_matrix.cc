@@ -2014,10 +2014,17 @@ void ConstraintMatrix::print (std::ostream &out) const
 				       // constraints as pairs of dofs
 				       // and their weights
       if (lines[i].entries.size() > 0)
-	for (unsigned int j=0; j<lines[i].entries.size(); ++j)
-	  out << "    " << lines[i].line
-	      << " " << lines[i].entries[j].first
-	      << ":  " << lines[i].entries[j].second << "\n";
+	{
+	  for (unsigned int j=0; j<lines[i].entries.size(); ++j)
+	    out << "    " << lines[i].line
+		<< " " << lines[i].entries[j].first
+		<< ":  " << lines[i].entries[j].second << "\n";
+
+				       // print out inhomogeneity. 
+	  if (lines[i].inhomogeneity != 0)
+	    out << "    " << lines[i].line
+		<< ": " << lines[i].inhomogeneity << "\n";
+	}
       else
 					 // but also output something
 					 // if the constraint simply
@@ -2026,7 +2033,7 @@ void ConstraintMatrix::print (std::ostream &out) const
 					 // a linear combination of
 					 // other dofs
 	out << "    " << lines[i].line
-	    << " = 0"
+	    << " = " << lines[i].inhomogeneity
 	    << "\n";
     }
   
