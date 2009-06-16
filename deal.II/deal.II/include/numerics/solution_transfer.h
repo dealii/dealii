@@ -89,7 +89,7 @@ DEAL_II_NAMESPACE_OPEN
  * <li> If the grid will be refined AND coarsened
  * then use @p SolutionTransfer as follows
  * @verbatim
- * SolutionTransfer<dim, double> soltrans(*dof_handler);
+ * SolutionTransfer<dim, Vector<double> > soltrans(*dof_handler);
  *                                     // flag some cells for refinement
  *                                     // and coarsening, e.g.
  * GridRefinement::refine_and_coarsen_fixed_fraction(

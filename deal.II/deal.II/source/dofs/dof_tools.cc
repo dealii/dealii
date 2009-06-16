@@ -5779,6 +5779,14 @@ DoFTools::count_dofs_per_component<deal_II_dimension> (
   const DoFHandler<deal_II_dimension>&,
   std::vector<unsigned int>&, bool, std::vector<unsigned int>);
 
+#if deal_II_dimension < 3
+template
+void
+DoFTools::count_dofs_per_component<deal_II_dimension, deal_II_dimension+1> (
+  const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+#endif
+
 template
 void
 DoFTools::count_dofs_per_block<deal_II_dimension> (

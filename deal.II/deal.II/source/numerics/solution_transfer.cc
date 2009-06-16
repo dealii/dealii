@@ -473,6 +473,11 @@ template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::BlockV
 template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::BlockVector, hp::DoFHandler<deal_II_dimension> >;
 #endif
 
+#if deal_II_dimension < 3
+template class SolutionTransfer<deal_II_dimension, Vector<double>, DoFHandler<deal_II_dimension, deal_II_dimension+1> >;
+template class SolutionTransfer<deal_II_dimension, BlockVector<double>, hp::DoFHandler<deal_II_dimension, deal_II_dimension+1> >;
+
+#endif
 /*----------------------------   solution_transfer.cc     ----------------------*/
 
 DEAL_II_NAMESPACE_CLOSE
