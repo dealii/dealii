@@ -1681,6 +1681,12 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * into the present class.
 				      */
     typedef typename TriaAccessor<dim,dim,spacedim>::AccessorData AccessorData;
+
+				     /**
+				      * Define the type of the
+				      * container this is part of.
+				      */
+    typedef Triangulation<dim, spacedim> Container;
     
 				     /**
 				      *  @name Constructors
