@@ -678,7 +678,7 @@ class FullMatrix : public Table<2,number>
 				      * inverse of the given factor.
 				      */
     FullMatrix & operator /= (const number factor);
-    
+
                                      /**
 				      * Simple addition of a scaled
 				      * matrix, i.e. <tt>*this +=
@@ -694,7 +694,7 @@ class FullMatrix : public Table<2,number>
     template<typename number2>
     void add (const number               a,
 	      const FullMatrix<number2> &A);
-    
+
                                      /**
 				      * Multiple addition of scaled
 				      * matrices, i.e. <tt>*this +=
@@ -713,7 +713,7 @@ class FullMatrix : public Table<2,number>
 	      const FullMatrix<number2> &A,
 	      const number               b,
 	      const FullMatrix<number2> &B);
-    
+
                                      /**
 				      * Multiple addition of scaled
 				      * matrices, i.e. <tt>*this +=
@@ -734,7 +734,7 @@ class FullMatrix : public Table<2,number>
 	      const FullMatrix<number2> &B,
 	      const number               c,
 	      const FullMatrix<number2> &C);
-    
+
 				     /**
 				      * Add rectangular block.
 				      *
@@ -759,7 +759,7 @@ class FullMatrix : public Table<2,number>
 	      const unsigned int dst_offset_j = 0,
 	      const unsigned int src_offset_i = 0,
 	      const unsigned int src_offset_j = 0);
-    
+
 				     /**
 				      * Weighted addition of the
 				      * transpose of <tt>B</tt> to
@@ -770,7 +770,7 @@ class FullMatrix : public Table<2,number>
     template<typename number2>
     void Tadd (const number               s,
 	       const FullMatrix<number2> &B);
-    
+
 				     /**
 				      * Add transose of a rectangular block.
 				      *
@@ -1023,9 +1023,17 @@ class FullMatrix : public Table<2,number>
 				      * if (!adding)
 				      *  <i>C = A*B</i>
 				      *
-				      * Assumes that <tt>A</tt> and <tt>B</tt> have
-				      * compatible sizes and that <tt>C</tt>
-				      * already has the right size.
+				      * Assumes that <tt>A</tt> and
+				      * <tt>B</tt> have compatible sizes and
+				      * that <tt>C</tt> already has the
+				      * right size.
+				      *
+				      * This function uses the BLAS function
+				      * Xgemm if the calling matrix has more
+				      * than 15 rows and BLAS was detected
+				      * during configuration. Using BLAS
+				      * usually results in considerable
+				      * performance gains.
 				      */
     template<typename number2>
     void mmult (FullMatrix<number2>       &C,
@@ -1051,6 +1059,13 @@ class FullMatrix : public Table<2,number>
 				      * <tt>B</tt> have compatible
 				      * sizes and that <tt>C</tt>
 				      * already has the right size.
+				      *
+				      * This function uses the BLAS function
+				      * Xgemm if the calling matrix has more
+				      * than 15 columns and BLAS was
+				      * detected during configuration. Using
+				      * BLAS usually results in considerable
+				      * performance gains.
 				      */
     template<typename number2>
     void Tmmult (FullMatrix<number2>       &C,
