@@ -17,6 +17,7 @@
 #include <base/function.h>
 #include <base/function_parser.h>
 #include <base/parameter_handler.h>
+#include <base/utilities.h>
 #include <lac/full_matrix.h>
 #include <lac/petsc_sparse_matrix.h>
 #include <lac/petsc_vector.h>
@@ -184,7 +185,7 @@ void EigenvalueProblem<dim>::assemble_system ()
 template <int dim>
 void EigenvalueProblem<dim>::solve () 
 {
-// do whatever is necessary here  
+// do whatever is necessary here
 }
 
 
@@ -193,7 +194,19 @@ void EigenvalueProblem<dim>::solve ()
 template <int dim>
 void EigenvalueProblem<dim>::output_results () const
 {
-// do whatever is necessary here  
+  DataOut<dim> data_out;
+
+  data_out.attach_dof_handler (dof_handler);
+
+  for (unsigned int i=0; i<eigenfunctions.size(); ++i)
+    data_out.add_data_vector (eigenfunctions[i],
+			      std::string("solution") +
+			      Utilities::int_to_string(i));
+
+  data_out.build_patches ();
+
+  std::ofstream output ("eigenvectors.vtk");
+  data_out.write_vtk (output);
 }
 
 
