@@ -196,7 +196,8 @@ void EigenvalueProblem<dim>::assemble_system ()
 template <int dim>
 void EigenvalueProblem<dim>::solve () 
 {
-// do whatever is necessary here
+// do whatever is necessary here. use stiffness_matrix, mass_matrix, and the
+// eigenfunctions[] array
 }
 
 
