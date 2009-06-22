@@ -1,0 +1,2 @@
+set Number of eigenvalues/eigenfunctions = 5
+set Potential = if (x^2 + y^2 < 0.5^2, -2, 0)
