@@ -145,6 +145,7 @@ void EigenvalueProblem<dim>::assemble_system ()
 					    0,
 					    ZeroFunction<dim>(),
 					    constraints);
+  constraints.close ();
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
