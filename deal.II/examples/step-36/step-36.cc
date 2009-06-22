@@ -230,11 +230,13 @@ void EigenvalueProblem<dim>::run ()
 
                                  // @sect3{The <code>main</code> function}
 
-int main () 
+int main (int argc, char **argv) 
 {
   try
     {
+      PetscInitialize(&argc,&argv,0,0);
       deallog.depth_console (0);
+      
       EigenvalueProblem<2> laplace_problem_2d;
       laplace_problem_2d.run ();
     }
