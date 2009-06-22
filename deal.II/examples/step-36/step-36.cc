@@ -53,7 +53,7 @@ template <int dim>
 class EigenvalueProblem 
 {
   public:
-    EigenvalueProblem ();
+    EigenvalueProblem (const std::string &prm_file);
     void run ();
     
   private:
@@ -79,7 +79,7 @@ class EigenvalueProblem
                                  // @sect4{EigenvalueProblem::EigenvalueProblem}
 
 template <int dim>
-EigenvalueProblem<dim>::EigenvalueProblem ()
+EigenvalueProblem<dim>::EigenvalueProblem (const std::string &prm_file)
 		:
                 fe (1),
 		dof_handler (triangulation)
@@ -91,6 +91,8 @@ EigenvalueProblem<dim>::EigenvalueProblem ()
   parameters.declare_entry ("Potential", "0",
 			    Patterns::Anything(),
 			    "A functional description of the potential.");
+
+  parameters.read_input (prm_file);
 }
 
 
@@ -123,7 +125,7 @@ void EigenvalueProblem<dim>::assemble_system ()
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
-                           update_JxW_values);
+                           update_quadrature_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -139,6 +141,7 @@ void EigenvalueProblem<dim>::assemble_system ()
 			 "x,y,z"),
 			parameters.get ("Potential"),
 			typename FunctionParser<dim>::ConstMap());
+  std::vector<double> potential_values (n_q_points);
 
   ConstraintMatrix constraints;
   VectorTools::interpolate_boundary_values (dof_handler,
@@ -156,13 +159,20 @@ void EigenvalueProblem<dim>::assemble_system ()
       cell_stiffness_matrix = 0;
       cell_mass_matrix = 0;
 
+      potential.value_list (fe_values.get_quadrature_points(),
+			    potential_values);
+      
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    {
 	      cell_stiffness_matrix(i,j)
-		+= (fe_values.shape_grad (i, q_point) *
-		    fe_values.shape_grad (j, q_point) *
+		+= ((fe_values.shape_grad (i, q_point) *
+		     fe_values.shape_grad (j, q_point)
+		     +
+		     potential_values[q_point] *
+		     fe_values.shape_value (i, q_point) *
+		     fe_values.shape_value (j, q_point)) *
 		    fe_values.JxW (q_point));
 	      cell_mass_matrix(i,j)
 		+= (fe_values.shape_value (i, q_point) *
@@ -238,8 +248,8 @@ int main (int argc, char **argv)
       PetscInitialize(&argc,&argv,0,0);
       deallog.depth_console (0);
       
-      EigenvalueProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
+      EigenvalueProblem<2> problem ("step-36.prm");
+      problem.run ();
     }
   catch (std::exception &exc)
     {
