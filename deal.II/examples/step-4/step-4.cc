@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -445,7 +445,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // world they look alike and you will
 				   // probably never see a difference although
 				   // the classes that this typedef stands for
-				   // are in fact completelye unrelated:
+				   // are in fact completely unrelated:
   typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
