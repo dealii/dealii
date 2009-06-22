@@ -55,7 +55,6 @@ DEAL_II_PETSC_MPIUNI_LIB = @DEAL_II_PETSC_MPIUNI_LIB@
 
 USE_CONTRIB_SLEPC    = @USE_CONTRIB_SLEPC@
 DEAL_II_SLEPC_DIR    = @DEAL_II_SLEPC_DIR@
-DEAL_II_SLEPC_ARCH   = @DEAL_II_SLEPC_ARCH@
 DEAL_II_SLEPC_VERSION_MAJOR    = @DEAL_II_SLEPC_VERSION_MAJOR@
 DEAL_II_SLEPC_VERSION_MINOR    = @DEAL_II_SLEPC_VERSION_MINOR@
 DEAL_II_SLEPC_VERSION_SUBMINOR = @DEAL_II_SLEPC_VERSION_SUBMINOR@
@@ -169,7 +168,7 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
 endif
 
 ifeq ($(USE_CONTRIB_SLEPC),yes)
-  lib-contrib-slepc    = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_SLEPC_ARCH)/lib/libslepc$(lib-suffix)
+  lib-contrib-slepc    = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libslepc$(lib-suffix)
 endif
 
 # same for metis, except that there is only one library in that case
@@ -263,7 +262,7 @@ else
   include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 endif
 include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
-include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_SLEPC_ARCH)/conf
+include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-metis           = $(DEAL_II_METIS_INCDIR)
 

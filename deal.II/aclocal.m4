@@ -497,7 +497,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
-    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Woverloaded-virtual -Wsign-compare -Wswitch -ftemplate-depth-128"
+    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Woverloaded-virtual -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
 
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
@@ -4328,6 +4328,50 @@ AC_DEFUN(DEAL_II_CHECK_TYPE_QUALIFIER_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl In the gcc libstdc++ headers for std::complex, there is 
+dnl no defined default copy constructor, but a templated copy 
+dnl constructor. So when using using a normal assignment 
+dnl between identical types, the compiler synthesizes the 
+dnl default operator, rather than using the template. 
+dnl The code will still be ok, though.
+dnl
+dnl With -Wsynth in gcc we then get a warning. So if we find that
+dnl this is still the case, disable -Wsynth, i.e. remove it from
+dnl the list of warning flags.
+dnl
+dnl This is gcc bug 18644:
+dnl   http://gcc.gnu.org/bugzilla/show_bug.cgi?id=18644
+dnl
+dnl Usage: DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX, dnl
+[
+  if test "x$GXX" = "xyes" ; then
+    AC_MSG_CHECKING(for problem with -Wsynth and std::complex)
+    AC_LANG(C++)
+    CXXFLAGS="-Wsynth -Werror"
+    AC_TRY_COMPILE(
+      [
+#       include <complex>
+      ],
+      [
+	std::complex<double> x;
+  	x = std::complex<double>(1,0);
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ],
+      [
+        AC_MSG_RESULT(yes)
+	CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-Wsynth\s*//g;'`"
+      ])
+  fi
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Older gcc version appear to frown upon the way we write the
 dnl IsBlockMatrix<MatrixType> template. If that's the case,
 dnl remove the -Wctor-dtor-privacy flag.
@@ -4400,7 +4444,51 @@ AC_DEFUN(DEAL_II_CHECK_BOOST, dnl
     [AC_MSG_ERROR([Your boost installation is incomplete!])])
   AC_CHECK_HEADER(boost/tuple/tuple.hpp,,
     [AC_MSG_ERROR([Your boost installation is incomplete!])])
+  DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT
 ])
+
+dnl -------------------------------------------------------------
+dnl The boost::shared_ptr class has a templated assignment operator
+dnl but no assignment operator matching the default operator
+dnl signature (this if for boost 1.29 at least). So when using
+dnl using a normal assignment between identical types, the
+dnl compiler synthesizes teh default operator, rather than using
+dnl the template. It doesn't matter here, but is probably an
+dnl oversight on behalf of the operators. It should be fixed in newer
+dnl versions of boost.
+dnl
+dnl With -Wsynth in gcc we then get a warning. So if we find that
+dnl this is still the case, disable -Wsynth, i.e. remove it from
+dnl the list of warning flags.
+dnl
+dnl Usage: DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT, dnl
+[
+  if test "x$GXX" = "xyes" ; then
+    AC_MSG_CHECKING(for boost::shared_ptr assignment operator= template buglet)
+    AC_LANG(C++)
+    CXXFLAGS="-Wsynth -Werror"
+    AC_TRY_COMPILE(
+      [
+#       include <boost/shared_ptr.hpp>
+      ],
+      [
+        boost::shared_ptr<int> a,b;
+        a = b;
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ],
+      [
+        AC_MSG_RESULT(yes)
+	CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-Wsynth\s*//g;'`"
+      ])
+  fi
+])
+
+
 
 dnl -------------------------------------------------------------
 dnl Some versions of icc on some platforms issue a lot of warnings
@@ -5688,6 +5776,12 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
             AC_MSG_ERROR([Path to SLEPc specified with --with-slepc does not
  		  	  point to a complete SLEPc installation])
 	  fi
+
+	  if test ! -d $DEAL_II_SLEPC_DIR/$DEAL_II_PETSC_ARCH \
+               -o ! -d $DEAL_II_SLEPC_DIR/$DEAL_II_PETSC_ARCH/lib \
+               ; then
+      	    AC_MSG_ERROR([SLEPc has not been compiled for the PETSc architecture])
+          fi
         fi
      ],
      [
@@ -5727,7 +5821,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
   dnl If we have found SLEPc, determine additional pieces of data
   if test "$USE_CONTRIB_SLEPC" = "yes" \
        ; then
-    DEAL_II_CONFIGURE_SLEPC_ARCH
     DEAL_II_CONFIGURE_SLEPC_VERSION
 
     dnl Finally set with_slepc if this hasn't happened yet
@@ -5736,64 +5829,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
     fi
   fi
 ])
-
-
-
-dnl ------------------------------------------------------------
-dnl Figure out the architecture used for SLEPc and if the 
-dnl library directory exists, since that determines where object
-dnl and configuration files will be found.
-dnl
-dnl Usage: DEAL_II_CONFIGURE_SLEPC_ARCH
-dnl
-dnl ------------------------------------------------------------
-AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_ARCH, dnl
-[
-  AC_MSG_CHECKING(for SLEPc library architecture)
-
-  AC_ARG_WITH(slepc-arch,
-  [  --with-slepc-arch=architecture  
-                          Specify the architecture for your SLEPc installation;
-                          use this if you want to override the SLEPC_ARCH 
-                          environment variable.],
-     [
-        DEAL_II_SLEPC_ARCH="$withval"
-	AC_MSG_RESULT($DEAL_II_SLEPC_ARCH)
-     ],
-     [
-        dnl Take something from the environment variables, if it is there
-        if test "x$SLEPC_ARCH" != "x" ; then
-          DEAL_II_SLEPC_ARCH="$SLEPC_ARCH"
-	  AC_MSG_RESULT($DEAL_II_SLEPC_ARCH)
-        else
-    	  AC_MSG_ERROR([If SLEPc is used, you must specify the architecture
-                        either through the SLEPC_ARCH environment variable,
-                        or through the --with-slepc-arch flag])
-        fi
-     ])
-
-  if test "x$SLEPC_ARCH" != "x" ; then
-    dnl Make sure that what was specified is actually correct.
-    if test ! -d $DEAL_II_SLEPC_DIR/$DEAL_II_SLEPC_ARCH \
-         -o ! -d $DEAL_II_SLEPC_DIR/$DEAL_II_SLEPC_ARCH/lib \
-         ; then
-      AC_MSG_ERROR([SLEPc has not been compiled for the architecture
-                    specified with --with-slepc-arch])
-    fi
-  fi
-
-  dnl Then check that PETSc and SLEPc architectures are compatible 
-  dnl ie. that they are the same.
-  if test "$DEAL_II_SLEPC_ARCH" != "$DEAL_II_PETSC_ARCH" \
-       ; then
-      	  AC_MSG_ERROR([If SLEPc is used, you must specify the same 
-                        architecture as your PETSc Installation either
-                        through the SLEPC_ARCH environment variable,
-                        or through the --with-slepc-arch flag])
-  fi 
-])
-
-
 
 dnl ------------------------------------------------------------
 dnl Figure out the version numbers of SLEPc and compare with 
