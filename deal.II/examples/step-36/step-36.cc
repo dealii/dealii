@@ -101,7 +101,7 @@ template <int dim>
 void EigenvalueProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (4);
+  triangulation.refine_global (5);
   dof_handler.distribute_dofs (fe);
 
   CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
@@ -215,6 +215,16 @@ void EigenvalueProblem<dim>::output_results () const
 			      std::string("solution") +
 			      Utilities::int_to_string(i));
 
+  Vector<double> projected_potential (dof_handler.n_dofs());
+  FunctionParser<dim> potential;
+  potential.initialize ((dim == 2 ?
+			 "x,y" :
+			 "x,y,z"),
+			parameters.get ("Potential"),
+			typename FunctionParser<dim>::ConstMap());
+  VectorTools::interpolate (dof_handler, potential, projected_potential);
+  data_out.add_data_vector (projected_potential, "interpolated_potential");
+  
   data_out.build_patches ();
 
   std::ofstream output ("eigenvectors.vtk");
