@@ -215,6 +215,7 @@ build-test:
 	   grep '^enable-shared' common/Make.global_options | grep = ; \
 	   grep enable-threads common/Make.global_options | grep = ; \
 	   grep USE_CONTRIB_PETSC common/Make.global_options | grep = ; \
+	   grep USE_CONTRIB_SLEPC common/Make.global_options | grep = ; \
 	   grep USE_CONTRIB_METIS common/Make.global_options | grep = ; \
 	   grep USE_CONTRIB_HSL common/Make.global_options | grep = ; \
 	   grep USE_CONTRIB_UMFPACK common/Make.global_options | grep = ; \
