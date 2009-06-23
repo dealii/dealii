@@ -412,48 +412,44 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
       const unsigned int first = data.shape_function_to_row_table[i];
       
       if (flags & update_values && cell_similarity != CellSimilarity::translation)
-	{
-	  if (cell_similarity == 1)
-	    std::cout << "hier";
-	  switch (mapping_type)
+	switch (mapping_type)
+	  {
+	  case mapping_none:
 	    {
-	      case mapping_none:
-	      {
-		for (unsigned int k=0; k<n_q_points; ++k)
-		  for (unsigned int d=0; d<dim; ++d)
-		    data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
-		break;
-	      }
-	      
-	      case mapping_covariant:
-	      case mapping_contravariant:
-	      {
-		std::vector<Tensor<1,dim> > shape_values (n_q_points);
-		mapping.transform(fe_data.shape_values[i],
-				  shape_values, mapping_data, mapping_type);
-		
-		for (unsigned int k=0; k<n_q_points; ++k)
-		  for (unsigned int d=0; d<dim; ++d)
-		    data.shape_values(first+d,k) = shape_values[k][d];
-		
-		break;
-	      }
-	      case mapping_piola:
-	      {
-		std::vector<Tensor<1,dim> > shape_values (n_q_points);
-		mapping.transform(fe_data.shape_values[i], shape_values,
-				  mapping_data, mapping_piola);
-		for (unsigned int k=0; k<n_q_points; ++k)
-		  for (unsigned int d=0; d<dim; ++d)
-		    data.shape_values(first+d,k)
-		      = sign_change[i] * shape_values[k][d];
-		break;
-	      }
-	      
-	      default:
-		Assert(false, ExcNotImplemented());
+	      for (unsigned int k=0; k<n_q_points; ++k)
+		for (unsigned int d=0; d<dim; ++d)
+		  data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
+	      break;
 	    }
-	}
+ 
+	  case mapping_covariant:
+	  case mapping_contravariant:
+	    {
+	      std::vector<Tensor<1,dim> > shape_values (n_q_points);
+	      mapping.transform(fe_data.shape_values[i],
+				shape_values, mapping_data, mapping_type);
+
+	      for (unsigned int k=0; k<n_q_points; ++k)
+		for (unsigned int d=0; d<dim; ++d)
+		  data.shape_values(first+d,k) = shape_values[k][d];
+
+	      break;
+	    }
+	  case mapping_piola:
+	    {
+	      std::vector<Tensor<1,dim> > shape_values (n_q_points);
+	      mapping.transform(fe_data.shape_values[i], shape_values,
+				mapping_data, mapping_piola);
+	      for (unsigned int k=0; k<n_q_points; ++k)
+		for (unsigned int d=0; d<dim; ++d)
+		  data.shape_values(first+d,k)
+		    = sign_change[i] * shape_values[k][d];
+	      break;
+	    }
+
+	  default:
+	    Assert(false, ExcNotImplemented());
+	  }
       
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	{
