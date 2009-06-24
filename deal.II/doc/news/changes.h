@@ -121,6 +121,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The TrilinosWrappers::BlockVector class declares an assignment
+  operator from the non-Trilinos BlockVector class but it wasn't implemented.
+  This is now fixed.
+  <br>
+  (WB 2009/06/24)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The SparseMatrix class has now a function SparseMatrix::mmult that
   can multiply two sparse matrices with each other.
   <br>
