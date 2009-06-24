@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -397,6 +397,27 @@ namespace TrilinosWrappers
       return compressed;
     }
 
+
+
+    template <typename Number>
+    BlockVector &
+    BlockVector::operator = (const ::dealii::BlockVector<Number> &v)
+    {
+      if (n_blocks() != v.n_blocks())
+	{
+	  std::vector<unsigned int> block_sizes (v.n_blocks(), 0);
+	  block_indices.reinit (block_sizes);
+	  if (components.size() != n_blocks())
+	    components.resize(n_blocks());
+	}
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+	this->components[i] = v.block(i);
+
+      collect_sizes();
+
+      return *this;
+    }
 
 
     inline
@@ -850,6 +871,27 @@ namespace TrilinosWrappers
       block(row).swap (v.block(row));
   }
 
+
+  template <typename Number>
+  BlockVector &
+  BlockVector::operator = (const ::dealii::BlockVector<Number> &v)
+  {
+    if (n_blocks() != v.n_blocks())
+      {
+	std::vector<unsigned int> block_sizes (v.n_blocks(), 0);
+	block_indices.reinit (block_sizes);
+	if (components.size() != n_blocks())
+	  components.resize(n_blocks());
+      }
+
+    for (unsigned int i=0; i<this->n_blocks(); ++i)
+      this->components[i] = v.block(i);
+
+    collect_sizes();
+
+    return *this;
+  }
+  
 
 /**
  * Global function which overloads the default implementation
