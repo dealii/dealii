@@ -129,6 +129,15 @@ inconvenience this causes.
   </li>
 </ol>
 
+<ol>
+  <li>
+  <p>
+  New: Based on work with Rickard Armiento, Francisco Alvaro, and Jose E. Roman, SLEPcWrappers that give a handle on some of the features of SLEPc (Scalable Library for Eigenvalue Problem Computations): (1) The SLEPcWrappers::SolverBase class can be used for specifying an eigenvalue problem, either in standard or generalized form, on serial or parallel architectures with support for a few solver types; and (2) The SLEPcWrappers::TransformationBase class encapsulates a variety of spectral transformations providing some functionality required for acceleration techniques based on the transformation of the spectrum.
+  <br>
+  (Toby D. Young 2009/06/25)
+  </p>
+  </li>
+</ol>
 
 
 <a name="deal.II"></a>
