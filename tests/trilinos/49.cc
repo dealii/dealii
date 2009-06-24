@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,7 @@
 //----------------------------  trilinos_49.cc  ---------------------------
 
 
-// check TrilinosWrappers::operator = (Vector<PetscVector>)
+// check TrilinosWrappers::operator = (dealii::Vector<TrilinosScalar>)
 
 #include "../tests.h" 
 #include <base/utilities.h>
@@ -25,7 +25,7 @@
 
 void test (TrilinosWrappers::Vector &v)
 {
-  Vector<TrilinosScalar> w (v.size());
+  dealii::Vector<TrilinosScalar> w (v.size());
 
   for (unsigned int i=0; i<w.size(); ++i)
     w(i) = i;
