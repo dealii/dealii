@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -708,6 +708,10 @@ GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells);
 
 template<>
 void
+GridReordering<3>::reorder_cells (std::vector<CellData<3> > &original_cells);
+
+template<>
+void
 GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
 						     std::vector<CellData<2> >    &cells);
 
@@ -716,6 +720,10 @@ void
 GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &all_vertices,
 						     std::vector<CellData<2> >    &cells);
 
+template<>
+void
+GridReordering<3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &all_vertices,
+						     std::vector<CellData<3> >    &cells);
 
 DEAL_II_NAMESPACE_CLOSE
 
