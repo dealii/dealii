@@ -12,7 +12,7 @@
 //----------------------------  trilinos_49.cc  ---------------------------
 
 
-// check TrilinosWrappers::operator = (dealii::Vector<TrilinosScalar>)
+// check TrilinosWrappers::Vector::operator = (dealii::Vector<TrilinosScalar>)
 
 #include "../tests.h" 
 #include <base/utilities.h>
