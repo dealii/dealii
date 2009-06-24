@@ -44,6 +44,16 @@ void test (TrilinosWrappers::BlockVector &v)
       Assert (v(i) == i, ExcInternalError());
     }
 
+				   // now also check the reverse assignment
+  w = 0;
+  w = v;
+  for (unsigned int i=0; i<v.size(); ++i)
+    {
+      Assert (w(i) == i, ExcInternalError());
+      Assert (v(i) == i, ExcInternalError());
+    }
+  
+  
   deallog << "OK" << std::endl;
 }
 
