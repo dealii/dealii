@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,21 +43,6 @@ namespace TrilinosWrappers
 
       collect_sizes();
 	
-      return *this;
-    }
-
-
-
-    template <typename Number>
-    BlockVector &
-    BlockVector::operator = (const ::dealii::BlockVector<Number> &v)
-    {
-      Assert (n_blocks() == v.n_blocks(),
-	      ExcDimensionMismatch(n_blocks(),v.n_blocks()));
-
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
-	this->components[i] = v.block(i);
-
       return *this;
     }
 
