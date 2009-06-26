@@ -32,6 +32,7 @@ tests_x = vector-vector vector_memory \
 	compressed_simple_sparsity_pattern_* \
 	compressed_set_sparsity_pattern_* \
 	constraints_zero* \
+	constraints_inhomogeneous \
 	constraint_graph_zero \
 	sparse_matrices matrices \
 	block_sparsity_pattern_01 \
