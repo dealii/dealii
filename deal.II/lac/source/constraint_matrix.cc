@@ -2032,9 +2032,14 @@ void ConstraintMatrix::print (std::ostream &out) const
 					 // the right hand side is not
 					 // a linear combination of
 					 // other dofs
-	out << "    " << lines[i].line
-	    << " = " << lines[i].inhomogeneity
-	    << "\n";
+	{
+	  if (lines[i].inhomogeneity != 0)
+	    out << "    " << lines[i].line
+		<< " = " << lines[i].inhomogeneity
+		<< "\n";
+	  else
+	    out << "    " << lines[i].line << " = 0\n";
+	}
     }
   
   AssertThrow (out, ExcIO());
