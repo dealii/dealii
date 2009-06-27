@@ -1561,7 +1561,9 @@ struct GeometryInfo
 				      * of a cell (or face) refined
 				      * with <tt>ref_case</tt>.
 				      */
-    static unsigned int n_children(const RefinementCase<dim> &refinement_case);
+    static
+    unsigned int
+    n_children(const RefinementCase<dim> &refinement_case);
 
 				     /**
 				      * Return the number of subfaces
@@ -1569,7 +1571,9 @@ struct GeometryInfo
 				      * internal::SubfaceCase
 				      * @p face_ref_case.
 				      */
-    static unsigned int n_subfaces(const internal::SubfaceCase<dim> &subface_case);
+    static
+    unsigned int
+    n_subfaces(const internal::SubfaceCase<dim> &subface_case);
 
 				     /**
 				      * Given a face on the reference
@@ -1586,8 +1590,10 @@ struct GeometryInfo
 				      * the ratio is 1/4 for each of
 				      * the subfaces.
 				      */
-    static double subface_ratio(const internal::SubfaceCase<dim> &subface_case,
-				const unsigned int subface_no);
+    static
+    double
+    subface_ratio(const internal::SubfaceCase<dim> &subface_case,
+		  const unsigned int subface_no);
 
 				     /**
 				      * Given a cell refined with the
@@ -1597,12 +1603,13 @@ struct GeometryInfo
 				      * <code>SubfaceCase</code> of
 				      * the @p face_no th face.
 				      */
-    static RefinementCase<dim-1> face_refinement_case(
-      const RefinementCase<dim> &cell_refinement_case,
-      const unsigned int face_no,
-      const bool face_orientation = true,
-      const bool face_flip        = false,
-      const bool face_rotation    = false);
+    static
+    RefinementCase<dim-1>
+    face_refinement_case (const RefinementCase<dim> &cell_refinement_case,
+			  const unsigned int face_no,
+			  const bool face_orientation = true,
+			  const bool face_flip        = false,
+			  const bool face_rotation    = false);
 
 				     /**
 				      * Given the SubfaceCase @p
@@ -1612,12 +1619,14 @@ struct GeometryInfo
 				      * cell, which corresponds to
 				      * that refinement of the face.
 				      */
-    static RefinementCase<dim> min_cell_refinement_case_for_face_refinement(
-      const RefinementCase<dim-1> &face_refinement_case,
-      const unsigned int face_no,
-      const bool face_orientation = true,
-      const bool face_flip        = false,
-      const bool face_rotation    = false);
+    static
+    RefinementCase<dim>
+    min_cell_refinement_case_for_face_refinement
+    (const RefinementCase<dim-1> &face_refinement_case,
+     const unsigned int face_no,
+     const bool face_orientation = true,
+     const bool face_flip        = false,
+     const bool face_rotation    = false);
 
 				     /**
 				      * Given a cell refined with the
@@ -1626,8 +1635,10 @@ struct GeometryInfo
 				      * the RefinementCase of the @p
 				      * line_no th face.
 				      */
-    static RefinementCase<1> line_refinement_case(const RefinementCase<dim> &cell_refinement_case,
-						  const unsigned int line_no);
+    static
+    RefinementCase<1>
+    line_refinement_case(const RefinementCase<dim> &cell_refinement_case,
+			 const unsigned int line_no);
 
 				     /**
 				      * Return the minimal / smallest
@@ -1635,7 +1646,9 @@ struct GeometryInfo
 				      * ensures refinement of line
 				      * @p line_no.
 				      */
-    static RefinementCase<dim> min_cell_refinement_case_for_line_refinement(const unsigned int line_no);
+    static
+    RefinementCase<dim>
+    min_cell_refinement_case_for_line_refinement(const unsigned int line_no);
 
                                      /**
 				      * This field stores which child
@@ -1702,13 +1715,16 @@ struct GeometryInfo
 				      * argument, defaulting to isotropic
 				      * refinement of the face.
 				      */
-    static unsigned int child_cell_on_face (const RefinementCase<dim> &ref_case,
-					    const unsigned int face,
-					    const unsigned int subface,
-					    const bool face_orientation = true,
-					    const bool face_flip        = false,
-					    const bool face_rotation    = false,
-					    const RefinementCase<dim-1> &face_refinement_case = RefinementCase<dim-1>::isotropic_refinement);
+    static
+    unsigned int
+    child_cell_on_face (const RefinementCase<dim> &ref_case,
+			const unsigned int face,
+			const unsigned int subface,
+			const bool face_orientation = true,
+			const bool face_flip        = false,
+			const bool face_rotation    = false,
+			const RefinementCase<dim-1> &face_refinement_case
+			= RefinementCase<dim-1>::isotropic_refinement);
     
 				     /**
 				      * Map line vertex number to cell
@@ -1731,8 +1747,10 @@ struct GeometryInfo
 				      * face_to_cell_vertices()
 				      * function.
 				      */
-    static unsigned int line_to_cell_vertices (const unsigned int line,
-					       const unsigned int vertex);
+    static
+    unsigned int
+    line_to_cell_vertices (const unsigned int line,
+			   const unsigned int vertex);
 
 				     /**
 				      * Map face vertex number to cell
@@ -1763,11 +1781,13 @@ struct GeometryInfo
 				      * child_cell_on_face() giving it
 				      * a suggestive name.
 				      */
-    static unsigned int face_to_cell_vertices (const unsigned int face,
-					       const unsigned int vertex,
-					       const bool face_orientation = true,
-					       const bool face_flip        = false,
-					       const bool face_rotation    = false);
+    static
+    unsigned int
+    face_to_cell_vertices (const unsigned int face,
+			   const unsigned int vertex,
+			   const bool face_orientation = true,
+			   const bool face_flip        = false,
+			   const bool face_rotation    = false);
 
 				     /**
 				      * Map face line number to cell
@@ -1788,11 +1808,13 @@ struct GeometryInfo
 				      * <tt>false</tt> (standard orientation)
 				      * and has no effect in 2d.
 				      */
-    static unsigned int face_to_cell_lines (const unsigned int face,
-					    const unsigned int line,
-					    const bool face_orientation = true,
-					    const bool face_flip        = false,
-					    const bool face_rotation    = false);
+    static
+    unsigned int
+    face_to_cell_lines (const unsigned int face,
+			const unsigned int line,
+			const bool face_orientation = true,
+			const bool face_flip        = false,
+			const bool face_rotation    = false);
 
 				     /**
 				      * Map the vertex index @p vertex of a face
@@ -1807,10 +1829,12 @@ struct GeometryInfo
 				      *
 				      * This function is only implemented in 3D.
 				      */
-    static unsigned int standard_to_real_face_vertex (const unsigned int vertex,
-						      const bool face_orientation = true,
-						      const bool face_flip        = false,
-						      const bool face_rotation    = false);
+    static
+    unsigned int
+    standard_to_real_face_vertex (const unsigned int vertex,
+				  const bool face_orientation = true,
+				  const bool face_flip        = false,
+				  const bool face_rotation    = false);
     
 				     /**
 				      * Map the vertex index @p vertex of a face
@@ -1825,10 +1849,12 @@ struct GeometryInfo
 				      *
 				      * This function is only implemented in 3D.
 				      */
-    static unsigned int real_to_standard_face_vertex (const unsigned int vertex,
-						      const bool face_orientation = true,
-						      const bool face_flip        = false,
-						      const bool face_rotation    = false);
+    static
+    unsigned int
+    real_to_standard_face_vertex (const unsigned int vertex,
+				  const bool face_orientation = true,
+				  const bool face_flip        = false,
+				  const bool face_rotation    = false);
     
 				     /**
 				      * Map the line index @p line of a face
@@ -1843,10 +1869,12 @@ struct GeometryInfo
 				      *
 				      * This function is only implemented in 3D.
 				      */
-    static unsigned int standard_to_real_face_line (const unsigned int line,
-						    const bool face_orientation = true,
-						    const bool face_flip        = false,
-						    const bool face_rotation    = false);
+    static
+    unsigned int
+    standard_to_real_face_line (const unsigned int line,
+				const bool face_orientation = true,
+				const bool face_flip        = false,
+				const bool face_rotation    = false);
     
 				     /**
 				      * Map the line index @p line of a face
@@ -1861,10 +1889,12 @@ struct GeometryInfo
 				      *
 				      * This function is only implemented in 3D.
 				      */
-    static unsigned int real_to_standard_face_line (const unsigned int line,
-						    const bool face_orientation = true,
-						    const bool face_flip        = false,
-						    const bool face_rotation    = false);
+    static
+    unsigned int
+    real_to_standard_face_line (const unsigned int line,
+				const bool face_orientation = true,
+				const bool face_flip        = false,
+				const bool face_rotation    = false);
     
 				     /**
 				      * Return the position of the @p ith
@@ -1873,7 +1903,9 @@ struct GeometryInfo
 				      * deal.II, as described in the general
 				      * documentation of this class.
 				      */
-    static Point<dim> unit_cell_vertex (const unsigned int vertex);
+    static
+    Point<dim>
+    unit_cell_vertex (const unsigned int vertex);
 
 				     /**
 				      * Given a point @p p in unit
@@ -1890,7 +1922,9 @@ struct GeometryInfo
 				      * the general documentation of this
 				      * class.
 				      */
-    static unsigned int child_cell_from_point (const Point<dim> &p);
+    static
+    unsigned int
+    child_cell_from_point (const Point<dim> &p);
 
 				     /**
 				      * Given coordinates @p p on the
@@ -1906,9 +1940,12 @@ struct GeometryInfo
 				      * depends on the number of the
 				      * child.
 				      */
-    static Point<dim> cell_to_child_coordinates (const Point<dim>          &p,
-						 const unsigned int         child_index,
-						 const RefinementCase<dim>  refine_case=RefinementCase<dim>::isotropic_refinement);
+    static
+    Point<dim>
+    cell_to_child_coordinates (const Point<dim>          &p,
+			       const unsigned int         child_index,
+			       const RefinementCase<dim>  refine_case
+			       = RefinementCase<dim>::isotropic_refinement);
 
 				     /**
 				      * The reverse function to the
@@ -1918,16 +1955,21 @@ struct GeometryInfo
 				      * coordinate system of the
 				      * mother cell.
 				      */
-    static Point<dim> child_to_cell_coordinates (const Point<dim>          &p,
-						 const unsigned int         child_index,
-						 const RefinementCase<dim>  refine_case=RefinementCase<dim>::isotropic_refinement);
+    static
+    Point<dim>
+    child_to_cell_coordinates (const Point<dim>          &p,
+			       const unsigned int         child_index,
+			       const RefinementCase<dim>  refine_case
+			       = RefinementCase<dim>::isotropic_refinement);
 
 				     /**
 				      * Return true if the given point
 				      * is inside the unit cell of the
 				      * present space dimension.
 				      */
-    static bool is_inside_unit_cell (const Point<dim> &p);
+    static
+    bool
+    is_inside_unit_cell (const Point<dim> &p);
     
 				     /**
 				      * Return true if the given point
@@ -1951,8 +1993,10 @@ struct GeometryInfo
 				      * that the point should be
 				      * safely inside the cell.
 				      */
-    static bool is_inside_unit_cell (const Point<dim> &p,
-                                     const double eps);
+    static
+    bool
+    is_inside_unit_cell (const Point<dim> &p,
+			 const double eps);
 
 				     /**
 				      * Projects a given point onto the
@@ -1960,7 +2004,9 @@ struct GeometryInfo
                                       * outside [0..1] is modified
                                       * to lie within that interval.
 				      */
-    static Point<dim> project_to_unit_cell (const Point<dim> &p);
+    static
+    Point<dim>
+    project_to_unit_cell (const Point<dim> &p);
 
                                      /**
                                       * Returns the infinity norm of
@@ -1970,7 +2016,9 @@ struct GeometryInfo
                                       * For points inside the cell, this is
                                       * defined as zero.
                                       */
-    static double distance_to_unit_cell (const Point<dim> &p);
+    static
+    double
+    distance_to_unit_cell (const Point<dim> &p);
 
                                      /**
 				      * For each face of the reference
