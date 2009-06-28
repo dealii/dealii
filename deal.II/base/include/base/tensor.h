@@ -1436,13 +1436,13 @@ double determinant (const Tensor<2,dim> &t)
 	for (unsigned int j=0; j<dim-1; ++j)
 	  minor[i][j] = t[i][j<k ? j : j+1];
 
-      const double cofactor = std::pow (-1, k+1) *
+      const double cofactor = std::pow (-1., static_cast<double>(k+1)) *
 			      determinant (minor);
 
       det += t[dim-1][k] * cofactor;
     }
   
-  return std::pow (-1, dim) * det;
+  return std::pow (-1., static_cast<double>(dim)) * det;
 }
 
 
