@@ -1614,8 +1614,8 @@ d_linear_shape_function_gradient (const Point<3> &xi,
 template <int dim>
 Tensor<1,dim>
 GeometryInfo<dim>::
-d_linear_shape_function_gradient (const Point<dim> &xi,
-				  const unsigned int i)
+d_linear_shape_function_gradient (const Point<dim> &,
+				  const unsigned int)
 {
   Assert (false, ExcNotImplemented());
   return Tensor<1,dim>();
