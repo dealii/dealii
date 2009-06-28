@@ -1514,7 +1514,7 @@ d_linear_shape_function (const Point<dim> &xi,
 template <>
 Tensor<1,1>
 GeometryInfo<1>::
-d_linear_shape_function_gradient (const Point<1> &xi,
+d_linear_shape_function_gradient (const Point<1> &,
 				  const unsigned int i)
 {
   Assert (i < GeometryInfo<1>::vertices_per_cell,
