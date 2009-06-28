@@ -1330,15 +1330,6 @@ template <int rank>
 inline
 double determinant (const Tensor<rank,1> &t)
 {
-				   // determinant of tensors of
-				   // dimension one and arbitrary rank
-				   // can be computed by recursion. we
-				   // need therefore not try to access
-				   // the number itself, which is
-				   // difficult since it needs <tt>rank</tt>
-				   // indirections, which is not
-				   // computable in the general
-				   // template
   return determinant(t[0]);
 }
 
@@ -1356,6 +1347,22 @@ inline
 double determinant (const Tensor<1,1> &t)
 {
   return t[0];
+}
+
+
+
+/**
+ * Compute the determinant of a tensor of rank two and dimension
+ * one. Since this is a number, the return value is, of course, the
+ * number itself.
+ *
+ * @relates Tensor
+ * @author Wolfgang Bangerth, 1998
+ */
+inline
+double determinant (const Tensor<2,1> &t)
+{
+  return t[0][0];
 }
 
 
