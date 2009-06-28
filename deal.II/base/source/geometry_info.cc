@@ -1520,7 +1520,6 @@ d_linear_shape_function_gradient (const Point<1> &xi,
   Assert (i < GeometryInfo<1>::vertices_per_cell,
 	  ExcIndexRange (i, 0, GeometryInfo<1>::vertices_per_cell));
     
-  const double x = xi[0];
   switch (i)
     {
       case 0:
