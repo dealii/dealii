@@ -12,7 +12,7 @@
 //----------------------------  geometry_info_5.cc  ---------------------------
 
 
-// check GeometryInfo::bilinear_shape_function_gradient
+// check GeometryInfo::d_linear_shape_function_gradient
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -33,7 +33,7 @@ void test ()
       {
 	const Tensor<1,dim>
 	  phi_i_grad
-	  = GeometryInfo<dim>::bilinear_shape_function_gradient(GeometryInfo<dim>::unit_cell_vertex(v),i);
+	  = GeometryInfo<dim>::d_linear_shape_function_gradient(GeometryInfo<dim>::unit_cell_vertex(v),i);
 	
 	deallog << phi_i_grad << std::endl;
       }
@@ -48,7 +48,7 @@ void test ()
     {
       Tensor<1,dim> s;
       for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell;++i)
-	s += GeometryInfo<dim>::bilinear_shape_function_gradient(GeometryInfo<dim>::unit_cell_vertex(v),i);
+	s += GeometryInfo<dim>::d_linear_shape_function_gradient(GeometryInfo<dim>::unit_cell_vertex(v),i);
       Assert (s.norm() == 0, ExcInternalError());
 
       deallog << "Sum of shape functions: " << s << std::endl;
@@ -60,7 +60,7 @@ void test ()
     
     Tensor<1,dim> s;
     for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell;++i)
-      s += GeometryInfo<dim>::bilinear_shape_function_gradient(center,i);
+      s += GeometryInfo<dim>::d_linear_shape_function_gradient(center,i);
     Assert (s.norm() == 0, ExcInternalError());
 
     deallog << "Sum of shape functions: " << s << std::endl;

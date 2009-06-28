@@ -12,7 +12,7 @@
 //----------------------------  geometry_info_4.cc  ---------------------------
 
 
-// check GeometryInfo::bilinear_shape_function
+// check GeometryInfo::d_linear_shape_function
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -32,7 +32,7 @@ void test ()
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       {
 	const double
-	  phi_i = GeometryInfo<dim>::bilinear_shape_function(GeometryInfo<dim>::unit_cell_vertex(v),i);
+	  phi_i = GeometryInfo<dim>::d_linear_shape_function(GeometryInfo<dim>::unit_cell_vertex(v),i);
 	
 	deallog << phi_i << std::endl;
 	Assert (phi_i == (i==v ? 1 : 0),
@@ -47,7 +47,7 @@ void test ()
     {
       double s = 0;
       for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell;++i)
-	s += GeometryInfo<dim>::bilinear_shape_function(GeometryInfo<dim>::unit_cell_vertex(v),i);
+	s += GeometryInfo<dim>::d_linear_shape_function(GeometryInfo<dim>::unit_cell_vertex(v),i);
       Assert (s == 1, ExcInternalError());
 
       deallog << "Sum of shape functions: " << s << std::endl;
@@ -59,7 +59,7 @@ void test ()
     
     double s = 0;
     for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell;++i)
-      s += GeometryInfo<dim>::bilinear_shape_function(center,i);
+      s += GeometryInfo<dim>::d_linear_shape_function(center,i);
     Assert (s == 1, ExcInternalError());
 
     deallog << "Sum of shape functions: " << s << std::endl;
