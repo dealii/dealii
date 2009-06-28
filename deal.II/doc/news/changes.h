@@ -95,6 +95,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The determinant() function is now implemented for rank-2 Tensor
+  arguments of all sizes. The implementation is not efficient for very large
+  matrix sizes, however.
+  <br>
+  (WB 2009/06/28)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Improved: The QGaussLobatto::gamma function now returns a long double
   instead of an unsigned int, otherwise we will get an overflow and thus
   meaningless weights for higher QGaussLobatto quadrature rules.  

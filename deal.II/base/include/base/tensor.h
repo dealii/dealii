@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1397,6 +1397,45 @@ double determinant (const Tensor<2,3> &t)
 	   +t[1][0]*t[0][2]*t[2][1]
 	   +t[2][0]*t[0][1]*t[1][2]
 	   -t[2][0]*t[0][2]*t[1][1] );
+}
+
+
+
+/**
+ * Compute the determinant of a tensor or rank 2, here for all dimensions for
+ * which no explicit specialization is available above.
+ *
+ * @relates Tensor
+ * @author Wolfgang Bangerth, 2009
+ */
+template <int dim>
+inline
+double determinant (const Tensor<2,dim> &t)
+{
+				   // compute the determinant using the
+				   // Laplace expansion of the
+				   // determinant. this may not be the most
+				   // efficient algorithm, but it does for
+				   // small n.
+				   //
+				   // for some algorithmic simplicity, we use
+				   // the expansion along the last row
+  double det = 0;
+  
+  for (unsigned int k=0; k<dim; ++k)
+    {
+      Tensor<2,dim-1> minor;
+      for (unsigned int i=0; i<dim-1; ++i)
+	for (unsigned int j=0; j<dim-1; ++j)
+	  minor[i][j] = t[i][j<k ? j : j+1];
+
+      const double cofactor = std::pow (-1, k+1) *
+			      determinant (minor);
+
+      det += t[dim-1][k] * cofactor;
+    }
+  
+  return std::pow (-1, dim) * det;
 }
 
 
