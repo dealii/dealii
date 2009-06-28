@@ -1,0 +1,105 @@
+
+DEAL::Checking in 1d
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Checking in 2d
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Checking in 3d
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::0
+DEAL::1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000
+DEAL::Sum of shape functions: 1.00000

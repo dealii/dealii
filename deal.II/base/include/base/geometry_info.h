@@ -2020,6 +2020,57 @@ struct GeometryInfo
     double
     distance_to_unit_cell (const Point<dim> &p);
 
+				     /**
+				      * Compute the value of the $i$-th
+				      * $d$-linear (i.e. (bi-,tri-)linear)
+				      * shape function at location $\xi$.
+				      */
+    static
+    double
+    d_linear_shape_function (const Point<dim> &xi,
+			     const unsigned int i);
+
+				     /**
+				      * Compute the gradient of the $i$-th
+				      * $d$-linear (i.e. (bi-,tri-)linear)
+				      * shape function at location $\xi$.
+				      */
+    static
+    Tensor<1,dim>
+    d_linear_shape_function_gradient (const Point<dim> &xi,
+				      const unsigned int i);
+    
+				     /**
+				      * For a (bi-, tri-)linear mapping from
+				      * the reference cell, face, or edge to
+				      * the object specified by the given
+				      * vertices, compute the determinant of
+				      * the Jacobian at the vertices. Note
+				      * that it is the actual determinant, not
+				      * its absolute value as often used in
+				      * transforming integrals from one
+				      * coordinate system to another.
+				      *
+				      * This function is used in order to
+				      * determine how distorted a cell is: if
+				      * all of the determinants are of roughly
+				      * equal value and on the order of
+				      * $h^\text{dim}$ then the cell is
+				      * well-shaped. For example, a square
+				      * cell or face has determinants equal to
+				      * $h^\text{dim}$ whereas a strongly
+				      * sheared parallelogram has a
+				      * determinant much smaller. Similarly, a
+				      * cell with very unequal edge lengths
+				      * will have widely varying
+				      * determinants. Finally, an inverted
+				      * cell will have negative determinants.
+				      */
+    static
+    void
+    jacobian_determinants_at_vertices (const Point<dim> (&vertices)[vertices_per_cell],
+				       double (&determinants)[vertices_per_cell]);
+    
                                      /**
 				      * For each face of the reference
 				      * cell, this field stores the
@@ -2135,6 +2186,26 @@ const unsigned int GeometryInfo<3>::opposite_face[faces_per_cell];
 template <>
 const unsigned int GeometryInfo<4>::opposite_face[faces_per_cell];
 #endif
+
+
+template <>
+Tensor<1,1>
+GeometryInfo<1>::
+d_linear_shape_function_gradient (const Point<1> &xi,
+				  const unsigned int i);
+template <>
+Tensor<1,2>
+GeometryInfo<2>::
+d_linear_shape_function_gradient (const Point<2> &xi,
+				  const unsigned int i);
+template <>
+Tensor<1,3>
+GeometryInfo<3>::
+d_linear_shape_function_gradient (const Point<3> &xi,
+				  const unsigned int i);
+
+
+
 
 /* -------------- inline functions ------------- */
 
@@ -2475,9 +2546,11 @@ GeometryInfo<3>::cell_to_child_coordinates (const Point<3>         &p,
 	  ExcIndexRange (child_index, 0, GeometryInfo<3>::n_children(refine_case)));
 
   Point<3> point=p;
-				   // there might be a cleverer way to do this, but since this function is
-				   // called in very few places for initialization purposes only, I don't
-				   // care at the moment
+				   // there might be a cleverer way to do
+				   // this, but since this function is called
+				   // in very few places for initialization
+				   // purposes only, I don't care at the
+				   // moment
   switch (refine_case)
     {
       case RefinementCase<3>::cut_x:
@@ -2580,9 +2653,11 @@ GeometryInfo<3>::child_to_cell_coordinates (const Point<3>         &p,
 	  ExcIndexRange (child_index, 0, GeometryInfo<3>::n_children(refine_case)));
 
   Point<3> point=p;
-				   // there might be a cleverer way to do this, but since this function is
-				   // called in very few places for initialization purposes only, I don't
-				   // care at the moment
+				   // there might be a cleverer way to do
+				   // this, but since this function is called
+				   // in very few places for initialization
+				   // purposes only, I don't care at the
+				   // moment
   switch (refine_case)
     {
       case RefinementCase<3>::cut_x:

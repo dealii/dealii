@@ -95,6 +95,27 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The GeometryInfo::jacobian_determinants_at_vertices can be used
+  to investigate the degree of distortion of cells.
+  <br>
+  (WB 2009/06/28)
+  </p>
+  </li>
+
+  <li>
+  <p>
+  New: The GeometryInfo::d_linear_shape_function and
+  GeometryInfo::d_linear_shape_function_gradient functions can be used
+  to represent the $d$-linear shape functions that are frequently
+  used to map the reference cell to real cells (though the
+  Mapping class hierarchy also allows to use higher order mappings).
+  <br>
+  (WB 2009/06/28)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The determinant() function is now implemented for rank-2 Tensor
   arguments of all sizes. The implementation is not efficient for very large
   matrix sizes, however.

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,7 @@
 
 
 #include <base/geometry_info.h>
+#include <base/tensor.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1432,6 +1433,228 @@ GeometryInfo<dim>::distance_to_unit_cell (const Point<dim> &p)
          result = (p[i] - 1.);
 
    return result;
+}
+
+
+
+template <int dim>
+double
+GeometryInfo<dim>::
+d_linear_shape_function (const Point<dim> &xi,
+			 const unsigned int i)
+{
+  Assert (i < GeometryInfo<dim>::vertices_per_cell,
+	  ExcIndexRange (i, 0, GeometryInfo<dim>::vertices_per_cell));
+    
+  switch (dim)
+    {
+      case 1:
+      {
+	const double x = xi[0];
+	switch (i)
+	  {
+	    case 0:
+		  return 1-x;
+	    case 1:
+		  return x;
+	  }
+      }
+	
+      case 2:
+      {
+	const double x = xi[0];
+	const double y = xi[1];
+	switch (i)
+	  {
+	    case 0:
+		  return (1-x)*(1-y);
+	    case 1:
+		  return x*(1-y);
+	    case 2:
+		  return (1-x)*y;
+	    case 3:
+		  return x*y;
+	  }
+      }
+
+      case 3:
+      {
+	const double x = xi[0];
+	const double y = xi[1];
+	const double z = xi[2];
+	switch (i)
+	  {
+	    case 0:
+		  return (1-x)*(1-y)*(1-z);
+	    case 1:
+		  return x*(1-y)*(1-z);
+	    case 2:
+		  return (1-x)*y*(1-z);
+	    case 3:
+		  return x*y*(1-z);
+	    case 4:
+		  return (1-x)*(1-y)*z;
+	    case 5:
+		  return x*(1-y)*z;
+	    case 6:
+		  return (1-x)*y*z;
+	    case 7:
+		  return x*y*z;
+	  }
+      }
+
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+  return -1e9;
+}
+
+
+
+template <>
+Tensor<1,1>
+GeometryInfo<1>::
+d_linear_shape_function_gradient (const Point<1> &xi,
+				  const unsigned int i)
+{
+  Assert (i < GeometryInfo<1>::vertices_per_cell,
+	  ExcIndexRange (i, 0, GeometryInfo<1>::vertices_per_cell));
+    
+  const double x = xi[0];
+  switch (i)
+    {
+      case 0:
+	    return Point<1>(-1.);
+      case 1:
+	    return Point<1>(1.);
+    }
+
+  return Point<1>(-1e9);
+}
+
+
+
+template <>
+Tensor<1,2>
+GeometryInfo<2>::
+d_linear_shape_function_gradient (const Point<2> &xi,
+				  const unsigned int i)
+{
+  Assert (i < GeometryInfo<2>::vertices_per_cell,
+	  ExcIndexRange (i, 0, GeometryInfo<2>::vertices_per_cell));
+    
+  const double x = xi[0];
+  const double y = xi[1];
+  switch (i)
+    {
+      case 0:
+	    return Point<2>(-(1-y),-(1-x));
+      case 1:
+	    return Point<2>(1-y,-x);
+      case 2:
+	    return Point<2>(-y, 1-x);
+      case 3:
+	    return Point<2>(y,x);
+    }
+  return Point<2> (-1e9, -1e9);
+}
+
+
+
+template <>
+Tensor<1,3>
+GeometryInfo<3>::
+d_linear_shape_function_gradient (const Point<3> &xi,
+				  const unsigned int i)
+{
+  Assert (i < GeometryInfo<3>::vertices_per_cell,
+	  ExcIndexRange (i, 0, GeometryInfo<3>::vertices_per_cell));
+    
+  const double x = xi[0];
+  const double y = xi[1];
+  const double z = xi[2];
+  switch (i)
+    {
+      case 0:
+	    return Point<3>(-(1-y)*(1-z),
+			    -(1-x)*(1-z),
+			    -(1-x)*(1-y));
+      case 1:
+	    return Point<3>((1-y)*(1-z),
+			    -x*(1-z),
+			    -x*(1-y));
+      case 2:
+	    return Point<3>(-y*(1-z),
+			    (1-x)*(1-z),
+			    -(1-x)*y);
+      case 3:
+	    return Point<3>(y*(1-z),
+			    x*(1-z),
+			    -x*y);
+      case 4:
+	    return Point<3>(-(1-y)*z,
+			    -(1-x)*z,
+			    (1-x)*(1-y));
+      case 5:
+	    return Point<3>((1-y)*z,
+			    -x*z,
+			    x*(1-y));
+      case 6:
+	    return Point<3>(-y*z,
+			    (1-x)*z,
+			    (1-x)*y);
+      case 7:
+	    return Point<3>(y*z, x*z, x*y);
+    }
+
+  return Point<3> (-1e9, -1e9, -1e9);
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+GeometryInfo<dim>::
+d_linear_shape_function_gradient (const Point<dim> &xi,
+				  const unsigned int i)
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<1,dim>();
+}
+
+
+
+
+
+template <int dim>
+void
+GeometryInfo<dim>::
+jacobian_determinants_at_vertices (const Point<dim> (&vertices)[vertices_per_cell],
+				   double (&determinants)[vertices_per_cell])
+{
+				   // for each of the vertices, form the
+				   // Jacobian matrix and compute its
+				   // determinant
+				   //
+				   // note that the transformation is
+				   //    \vec x = sum_i \vec v_i phi_i(\vec xi)
+				   // and we have to take the gradient
+				   // with respect to \vec \xi.
+  for (unsigned int i=0; i<vertices_per_cell; ++i)
+    {
+      Tensor<2,dim> jacobian;
+      for (unsigned int j=0; j<vertices_per_cell; ++j)
+	{
+	  Tensor<2,dim> x;
+	  outer_product (x,
+			 vertices[j],
+			 d_linear_shape_function_gradient (unit_cell_vertex(i),
+							   j));
+	  jacobian += x;
+	}
+      
+      determinants[i] = determinant (jacobian);
+    }
 }
 
 
