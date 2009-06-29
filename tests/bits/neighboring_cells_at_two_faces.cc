@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,7 +38,7 @@
 //  *-------*
 //
 // looking from cell 1 at face a and asking for the corresponding face (number)
-// of cell 2 neighbor_of_neighbor returns something corrwesponding to face b,
+// of cell 2 neighbor_of_neighbor returns something corresponding to face b,
 // not a, as it should. Simply looking at the identity of the neighboring cell
 // is not enough, we have to look at the (index of the) face instead.
 
