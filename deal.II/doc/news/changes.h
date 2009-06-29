@@ -152,6 +152,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The TrilinosWrappers::MPI::BlockVector class declares an assignment
+  operator from the non-Trilinos BlockVector class but it could not be
+  compiled due to an oversight. This is now fixed.
+  <br>
+  (WB 2009/06/29)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Fixed: The TrilinosWrappers::BlockVector class declares an assignment
   operator from the non-Trilinos BlockVector class but it wasn't implemented.
   This is now fixed.
