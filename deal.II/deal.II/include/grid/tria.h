@@ -1767,16 +1767,22 @@ class Triangulation : public Subscriptor
     bool prepare_coarsening_and_refinement ();
     
 				     /**
-				      *  Add a RefinementListener. Adding listeners
-				      *  to the Triangulation allows other classes to
-				      *  be informed, when the Triangulation is refined.
+				      *  Add a
+				      *  RefinementListener. Adding
+				      *  listeners to the
+				      *  Triangulation allows other
+				      *  classes to be informed, when
+				      *  the Triangulation is refined.
 				      */
     void add_refinement_listener (RefinementListener &listener) const;
 
 				     /**
-				      *  Removes a RefinementListener. When some class
-				      *  needs no longer to be informed about refinements,
-				      *  the listener should be removed from the
+				      *  Removes a
+				      *  RefinementListener. When some
+				      *  class needs no longer to be
+				      *  informed about refinements,
+				      *  the listener should be
+				      *  removed from the
 				      *  Triangulation.
 				      */
     void remove_refinement_listener (RefinementListener &listener) const;
@@ -2633,14 +2639,20 @@ class Triangulation : public Subscriptor
 				     /*@{*/
 
 				     /**
-				      * In the following, most functions are provided in two
-				      * versions, with and without an argument describing
-				      * the level. The versions with this argument are only
-				      * applicable for objects descibing the cells of the
-				      * present triangulation. For example: in 2D
-				      * <tt>n_lines(level)</tt> cannot be called, only
-				      * <tt>n_lines()</tt>, as lines are faces in 2D and
-				      * therefore have no level.
+				      * In the following, most
+				      * functions are provided in two
+				      * versions, with and without an
+				      * argument describing the
+				      * level. The versions with this
+				      * argument are only applicable
+				      * for objects descibing the
+				      * cells of the present
+				      * triangulation. For example: in
+				      * 2D <tt>n_lines(level)</tt>
+				      * cannot be called, only
+				      * <tt>n_lines()</tt>, as lines
+				      * are faces in 2D and therefore
+				      * have no level.
 				      */
     
 				     /**
