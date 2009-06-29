@@ -72,7 +72,7 @@ class LaplaceProblem
     void solve ();
     void create_coarse_grid ();
     void estimate_smoothness (Vector<float> &smoothness_indicators) const;
-    void postprocess (const unsigned int cycle);
+    void postprocess ();
 
     Triangulation<dim>   triangulation;
 
@@ -487,7 +487,7 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
+void LaplaceProblem<dim>::postprocess ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
   KellyErrorEstimator<dim>::estimate (dof_handler,
@@ -643,7 +643,7 @@ void LaplaceProblem<dim>::run ()
       assemble_test_2 ();
 
       solve ();
-      postprocess (cycle);
+      postprocess ();
     }
 }
 
