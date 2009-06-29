@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -471,8 +471,6 @@ class FETools
     static void compute_projection_matrices(const FiniteElement<dim,spacedim> &fe,
 					    std::vector<std::vector<FullMatrix<number> > >& matrices);
 
-//TODO:[WB] Replace this documentation by something comprehensible
-    
 				     /**
                                       * Projects scalar data defined in
                                       * quadrature points to a finite element
