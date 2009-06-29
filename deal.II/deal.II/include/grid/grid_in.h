@@ -221,18 +221,18 @@ class SubCellData;
  * <h3>Dealing with distorted mesh cells</h3>
  *
  * For each of the mesh reading functions, the last call is always to
- * Triangulation::create_triangulation(). That function checks whether
- * all the cells it creates as part of the coarse mesh are distorted or
- * not (where distortion here means that the Jacobian of the mapping
- * from the reference cell to the real cell has a non-positive determinant,
- * i.e. the cell is pinched or twisted). If it finds any such cells, it
- * throws an exception. This exception is not caught in the grid reader
- * functions of the current class, and so will propagate through to the
- * function that called it. There, you can catch and ignore the
- * exception if you are certain that there is no harm in dealing with
- * such cells. If you were not aware that your mesh had such cells, your
- * results will likely be of dubious quality at best if you ignore the
- * exception.
+ * Triangulation::create_triangulation(). That function checks whether all the
+ * cells it creates as part of the coarse mesh are distorted or not (where
+ * distortion here means that the Jacobian of the mapping from the reference
+ * cell to the real cell has a non-positive determinant, i.e. the cell is
+ * pinched or twisted; see the entry on @ref GlossDistorted "distorted cells"
+ * in the glossary). If it finds any such cells, it throws an exception. This
+ * exception is not caught in the grid reader functions of the current class,
+ * and so will propagate through to the function that called it. There, you
+ * can catch and ignore the exception if you are certain that there is no harm
+ * in dealing with such cells. If you were not aware that your mesh had such
+ * cells, your results will likely be of dubious quality at best if you ignore
+ * the exception.
  *
  *
  * @ingroup grid

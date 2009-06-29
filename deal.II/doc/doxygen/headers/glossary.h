@@ -64,6 +64,38 @@
  * FiniteElementData::n_components() and the documentation of
  * FiniteElement</dd>
  *
+ *
+ * <dt class="glossary">@anchor GlossDistorted Distorted cells</dt>
+ *
+ * <dd>A <i>distorted cell</i> is a cell for which the mapping from
+ * the reference cell to real cell has a Jacobian whose determinant is
+ * non-positive somewhere in the cell. Typically, we only check the sign
+ * of this determinant at the vertices of the cell. The function
+ * GeometryInfo::jacobian_determinants_at_vertices computes these
+ * determinants at the vertices, and the function
+ * Triangulation::create_triangulation (along with the various grid
+ * readers in the GridIn class) will reject meshes with distorted cells
+ * by default.
+ *
+ * By way of example, if all of the determinants are of roughly equal value
+ * and on the order of $h^\text{dim}$ then the cell is well-shaped. For
+ * example, a square cell or face has determinants equal to $h^\text{dim}$
+ * whereas a strongly sheared parallelogram has a determinant much
+ * smaller. Similarly, a cell with very unequal edge lengths will have widely
+ * varying determinants. Conversely, a pinched cell in which the location of
+ * two or more vertices is collapsed to a single point has a zero determinant
+ * at this location. Finally, an inverted or twisted cell in which the
+ * location of two vertices is out of order will have negative determinants.
+ *
+ * The following two images show a well-formed, a pinched, and a twisted cell
+ * for both 2d and 3d:
+ *
+ * @image html distorted_2d.png "A well-formed, a pinched, and a twisted cell in 2d."
+ *
+ * @image html distorted_3d.png "A well-formed, a pinched, and a twisted cell in 3d."
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossFaceOrientation Face orientation</dt>
  * <dd>In a triangulation, the normal vector to a face
  * can be deduced from the face orientation by

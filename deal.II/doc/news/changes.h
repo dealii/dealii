@@ -36,8 +36,9 @@ inconvenience this causes.
   accepted input meshes with inverted cells (i.e. cells with a zero or negative
   determinant of the Jacobian of the mapping from the reference cell to the
   real cell). This has been changed now: The function checks whether cells
-  are distorted or inverted, and may throw a list of cells for which this
-  is the case as an exception. If you know that this is harmless, for example
+  are distorted or inverted (see the entry on @ref GlossDistorted "distorted cells"
+  in the glossary), and may throw an exception containing a list of cells for which this
+  is the case. If you know that this is harmless, for example
   if you have cells with collapsed vertices in your mesh but you do not intend
   to integrate on them, then you can catch and ignore this message. In all
   other cases, the output of your computations are likely to be wrong anyway.

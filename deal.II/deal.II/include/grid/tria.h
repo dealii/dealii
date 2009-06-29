@@ -1364,11 +1364,12 @@ class Triangulation : public Subscriptor
 				     /**
 				      * A structure that is used as an
 				      * exception object by the
-				      * create_triangulation()
-				      * function to indicate which
-				      * cells among the coarse mesh
-				      * cells are inverted or severely
-				      * distorted.
+				      * create_triangulation() function to
+				      * indicate which cells among the coarse
+				      * mesh cells are inverted or severely
+				      * distorted (see the entry on
+				      * @ref GlossDistorted "distorted cells"
+				      * in the glossary).
 				      *
 				      * Objects of this kind are
 				      * thrown by the
@@ -1648,7 +1649,9 @@ class Triangulation : public Subscriptor
 				      * operation, this function walks
 				      * over all cells and verifies
 				      * that none of the cells is
-				      * deformed, where we call a cell
+				      * deformed (see
+				      * the entry on @ref GlossDistorted in
+				      * the glossary), where we call a cell
 				      * deformed if the determinant of
 				      * the Jacobian of the mapping
 				      * from reference cell to real

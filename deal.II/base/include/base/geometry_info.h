@@ -2052,19 +2052,10 @@ struct GeometryInfo
 				      * coordinate system to another.
 				      *
 				      * This function is used in order to
-				      * determine how distorted a cell is: if
-				      * all of the determinants are of roughly
-				      * equal value and on the order of
-				      * $h^\text{dim}$ then the cell is
-				      * well-shaped. For example, a square
-				      * cell or face has determinants equal to
-				      * $h^\text{dim}$ whereas a strongly
-				      * sheared parallelogram has a
-				      * determinant much smaller. Similarly, a
-				      * cell with very unequal edge lengths
-				      * will have widely varying
-				      * determinants. Finally, an inverted
-				      * cell will have negative determinants.
+				      * determine how distorted a cell is (see
+				      * the entry on
+				      * @ref GlossDistorted "distorted cells"
+				      * in the glossary).
 				      */
     static
     void
