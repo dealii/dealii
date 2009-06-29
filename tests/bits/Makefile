@@ -100,7 +100,8 @@ tests_x = grid_generator_?? \
 	  neighboring_cells_at_two_faces \
 	  solution_transfer \
           make_boundary_constraints_* \
-	  count_dofs_per_block*
+	  count_dofs_per_block* \
+	  distorted_cells_*
 
 # tests for the hp branch:
 #	  fe_collection_*

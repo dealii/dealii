@@ -1360,6 +1360,44 @@ class Triangulation : public Subscriptor
         copy_notification (const Triangulation<dim, spacedim> &old_tria,
 			   const Triangulation<dim, spacedim> &new_tria);
     };
+
+				     /**
+				      * A structure that is used as an
+				      * exception object by the
+				      * create_triangulation()
+				      * function to indicate which
+				      * cells among the coarse mesh
+				      * cells are inverted or severely
+				      * distorted.
+				      *
+				      * Objects of this kind are
+				      * thrown by the
+				      * create_triangulation()
+				      * function, and they can be
+				      * caught in user code if this
+				      * condition is to be ignored.
+				      *
+				      * A cell is called
+				      * <i>deformed</i> if the
+				      * determinant of the Jacobian of
+				      * the mapping from reference
+				      * cell to real cell is negative
+				      * at least at one vertex. This
+				      * computation is done using the
+				      * GeometryInfo::jacobian_determinants_at_vertices
+				      * function.
+				      */
+    struct DistortedCellList : public dealii::ExceptionBase
+    {
+					 /**
+					  * A list of those cells
+					  * among the coarse mesh
+					  * cells that are deformed.
+					  */
+	std::list<typename Triangulation<dim,spacedim>::active_cell_iterator>
+	distorted_cells;
+    };
+    
     
 				     /**
 				      * Make the dimension available
@@ -1599,17 +1637,53 @@ class Triangulation : public Subscriptor
 				      * see the general class
 				      * documentation for this.
 				      *
-				      * This function is made
-				      * @p virtual to allow derived
-				      * classes to set up some data
-				      * structures as well.
-				      *
 				      * For conditions when this
 				      * function can generate a valid
 				      * triangulation, see the
 				      * documentation of this class,
 				      * and the GridIn and
 				      * GridReordering class.
+				      *
+				      * At the very end of its
+				      * operation, this function walks
+				      * over all cells and verifies
+				      * that none of the cells is
+				      * deformed, where we call a cell
+				      * deformed if the determinant of
+				      * the Jacobian of the mapping
+				      * from reference cell to real
+				      * cell is negative at least at
+				      * one of the vertices (this
+				      * computation is done using the
+				      * GeometryInfo::jacobian_determinants_at_vertices
+				      * function). If there are
+				      * deformed cells, this function
+				      * throws an exception of kind
+				      * DistortedCellList. Since this
+				      * happens after all data
+				      * structures have been set up,
+				      * you can catch and ignore this
+				      * exception if you know what you
+				      * do -- for example, it may be
+				      * that the determinant is zero
+				      * (indicating that you have
+				      * collapsed edges in a cell) but
+				      * that this is ok because you
+				      * didn't intend to integrate on
+				      * this cell anyway. On the other
+				      * hand, deformed cells are often
+				      * a sign of a mesh that is too
+				      * coarse to resolve the geometry
+				      * of the domain, and in this
+				      * case ignoring the exception is
+				      * probably unwise.
+				      *
+				      * @note: The check for distorted
+				      * cells is only done if
+				      * dim==spacedim, as otherwise
+				      * cells can legitimately be
+				      * twisted if the manifold they
+				      * describe is twisted.
 				      */
     virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
 				       const std::vector<CellData<dim> > &cells,
@@ -1624,6 +1698,12 @@ class Triangulation : public Subscriptor
 				      * new (lexicographic) ordering
 				      * and calls
 				      * create_triangulation().
+				      *
+				      * @note This function internally
+				      * calls create_triangulation and
+				      * therefore can throw the same
+				      * exception as the other
+				      * function.
 				      */
     virtual void create_triangulation_compatibility (
       const std::vector<Point<spacedim> >    &vertices,

@@ -1132,6 +1132,63 @@ namespace
       }
     return numbers::invalid_unsigned_int;
   }
+
+
+				   /**
+				    * Collect all coarse mesh cells
+				    * with at least one vertex at
+				    * which the determinant of the
+				    * Jacobian is zero or
+				    * negative. This is the function
+				    * for the case dim==spacedim.
+				    */
+  template <int dim>
+  typename Triangulation<dim,dim>::DistortedCellList
+  collect_distorted_coarse_cells (const Triangulation<dim,dim> &triangulation)
+  {
+    typename Triangulation<dim,dim>::DistortedCellList distorted_cells;
+    for (typename Triangulation<dim,dim>::cell_iterator
+	   cell = triangulation.begin(0); cell != triangulation.end(0); ++cell)
+      {
+	Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
+	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	  vertices[i] = cell->vertex(i);
+
+	double determinants[GeometryInfo<dim>::vertices_per_cell];
+	GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
+							      determinants);
+
+	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	  if (determinants[i] <= 1e-9 * std::pow (cell->diameter(),
+						  1.*dim))
+	    {
+	      distorted_cells.distorted_cells.push_back (cell);
+	      break;
+	    }
+      }
+
+    return distorted_cells;
+  }
+
+
+				   /**
+				    * Collect all coarse mesh cells
+				    * with at least one vertex at
+				    * which the determinant of the
+				    * Jacobian is zero or
+				    * negative. This is the function
+				    * for the case dim!=spacedim,
+				    * where we can not determine
+				    * whether a cell is twisted as it
+				    * may, for example, discretize a
+				    * manifold with a twist.
+				    */
+  template <int dim, int spacedim>
+  typename Triangulation<dim,spacedim>::DistortedCellList
+  collect_distorted_coarse_cells (const Triangulation<dim,spacedim> &)
+  {
+    return typename Triangulation<dim,spacedim>::DistortedCellList();
+  }
   
 }// end of anonymous namespace
 
@@ -9879,6 +9936,21 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
     }
   
   compute_number_cache (*this, number_cache);
+
+				   // now verify that there are indeed
+				   // no distorted cells. as per the
+				   // documentation of this class, we
+				   // first collect all distorted
+				   // cells and then throw an
+				   // exception if there are any
+  DistortedCellList distorted_cells = collect_distorted_coarse_cells (*this);
+				   // throw the array (and fill the
+				   // various location fields) if
+				   // there are distorted
+				   // cells. otherwise, just fall off
+				   // the end of the function
+  AssertThrow (distorted_cells.distorted_cells.size() == 0,
+	       distorted_cells);
 }
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -86,6 +86,14 @@ void test (const char *filename)
   try
     {
       gi.read_xda (in);
+    }
+  catch (typename Triangulation<dim>::DistortedCellList &dcv)
+    {
+				       // ignore the exception that we
+				       // get because the mesh has
+				       // distorted cells
+      deallog << dcv.distorted_cells.size() << " cells are distorted."
+	      << std::endl;
     }
   catch (std::exception &exc)
     {

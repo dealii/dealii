@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,7 +53,18 @@ void test2 ()
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in ("grid_in_02/2d.xda");
-  gi.read_xda (in);
+  try
+    {
+      gi.read_xda (in);
+    }
+  catch (typename Triangulation<dim>::DistortedCellList &dcv)
+    {
+				       // ignore the exception that we
+				       // get because the mesh has
+				       // distorted cells
+      deallog << dcv.distorted_cells.size() << " cells are distorted."
+	      << std::endl;
+    }
 
   Triangulation<2>::active_cell_iterator
     cell = tria.begin_active(),

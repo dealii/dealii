@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,7 +69,19 @@ void test2 ()
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in ("grid_in/2d.xda");
-  gi.read_xda (in);
+  try
+    {
+      gi.read_xda (in);
+    }
+  catch (typename Triangulation<dim>::DistortedCellList &dcv)
+    {
+				       // ignore the exception that we
+				       // get because the mesh has
+				       // distorted cells
+      deallog << dcv.distorted_cells.size() << " cells are distorted."
+	      << std::endl;
+    }
+      
 
   int hash = 0;
   int index = 0;
@@ -102,7 +114,17 @@ void check_file (const std::string name,
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  gi.read(name, format);
+  try
+    {
+      gi.read(name, format);
+    }
+  catch (typename Triangulation<dim>::DistortedCellList &dcv)
+    {
+				       // ignore the exception
+      deallog << dcv.distorted_cells.size() << " cells are distorted."
+	      << std::endl;
+    }
+      
   deallog << name
 	  << '\t' << tria.n_vertices()
 	  << '\t' << tria.n_cells()

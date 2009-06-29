@@ -67,7 +67,14 @@ void create_grid (Triangulation<2> &tria)
                                    // generate a triangulation
                                    // out of this
   GridReordering<2>::reorder_cells (cells);
-  tria.create_triangulation_compatibility (vertices, cells, SubCellData());
+  try
+    {
+      tria.create_triangulation_compatibility (vertices, cells, SubCellData());
+    }
+  catch (Triangulation<2>::DistortedCellList &dcv)
+    {
+				       // ignore the exception
+    }
 }
 
 
