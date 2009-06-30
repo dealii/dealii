@@ -676,16 +676,16 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 	    {
 	      Assert (tmp_other_lines[i]->line == line->entries[i].first,
 		      ExcInternalError());
-	      
+
 	      const double weight = line->entries[i].second;
 	      for (std::vector<std::pair<unsigned int, double> >::const_iterator
 		     j=tmp_other_lines[i]->entries.begin();
 		   j!=tmp_other_lines[i]->entries.end(); ++j)
 		tmp.push_back (std::make_pair(j->first, j->second*weight));
 
+	      line->inhomogeneity += tmp_other_lines[i]->inhomogeneity *  
+		line->entries[i].second;
 	    };
-	  line->inhomogeneity += tmp_other_lines[i]->inhomogeneity *  
-	    line->entries[i].second;
 	};
 				       // finally exchange old and
 				       // newly resolved line
