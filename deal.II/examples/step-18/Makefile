@@ -47,7 +47,7 @@ include $D/common/Make.global_options
 
 ################################################################ 
 # This example program will only work if PETSc is installed. If this
-# is not the case, then simply redefine the main targets to to nothing
+# is not the case, then simply redefine the main targets to do nothing
 ifneq ($(USE_CONTRIB_PETSC),yes)
 default run clean:
 	@echo
