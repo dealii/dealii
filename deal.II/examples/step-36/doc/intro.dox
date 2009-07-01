@@ -1,10 +1,14 @@
 <br>
 
-<i>This program was contributed by Toby Young and Wolfgang
-Bangerth. 
-</i>
+<i>This program was contributed by Toby D. Young and Wolfgang
+Bangerth.  </i>
 
 
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+@f[
+	( \frac{1}{2} \partial_x \partial_y + f(x,y) ) \Phi
+  	= 
+	\varepsilon \Psi \quad,
+@f]
