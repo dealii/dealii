@@ -215,6 +215,20 @@ void EigenvalueProblem<dim>::assemble_system ()
                                 // vectors in an assembled state.
   stiffness_matrix.compress();
   mass_matrix.compress();
+
+				   // make sure that the diagonal entries of
+				   // constrained degrees of freedom are
+				   // non-zero to ensure that the matrix is
+				   // actually invertible
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    if (constraints.is_constrained(i))
+      {
+	stiffness_matrix.set (i, i, 1);
+	mass_matrix.set (i, i, 1);
+      }
+  
+  stiffness_matrix.compress();
+  mass_matrix.compress();  
 }
 
 
@@ -230,7 +244,7 @@ void EigenvalueProblem<dim>::solve ()
                                 // choose which part of the spectrum to
                                 // solve for
 
-  //  eigensolver.set_which_eigenpairs ();
+  eigensolver.set_which_eigenpairs (EPS_SMALLEST_MAGNITUDE);
 
                                 // then actually solve the system,
 
