@@ -46,9 +46,9 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk
 include $D/common/Make.global_options
 
 ################################################################ 
-# This example program will only work if PETSc is installed. If this
-# is not the case, then simply redefine the main targets to to nothing
-ifneq ($(USE_CONTRIB_PETSC),yes)
+# This example program will only work if PETSc and SLEPc are both installed.
+# If this is not the case, then simply redefine the main targets to do nothing
+ifneq ($(USE_CONTRIB_PETSC)$(USE_CONTRIB_SLEPC),yesyes)
 default run clean:
 	@echo
 	@echo "===========================================================" 
