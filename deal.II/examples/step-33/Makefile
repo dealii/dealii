@@ -54,7 +54,7 @@ include $D/common/Make.global_options
 
 ################################################################ 
 # This example program will only work if Trilinos is installed. If this
-# is not the case, then simply redefine the main targets to to nothing
+# is not the case, then simply redefine the main targets to do nothing
 ifneq ($(USE_CONTRIB_TRILINOS),yes)
 default run clean:
 	@echo
