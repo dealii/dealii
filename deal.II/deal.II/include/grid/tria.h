@@ -1391,6 +1391,19 @@ class Triangulation : public Subscriptor
     struct DistortedCellList : public dealii::ExceptionBase
     {
 					 /**
+					  * Destructor. Empty, but needed
+					  * for the sake of exception
+					  * specification, since the base
+					  * class has this exception
+					  * specification and the
+					  * automatically generated
+					  * destructor would have a
+					  * different one due to member
+					  * objects.
+					  */
+	virtual ~DistortedCellList () throw();
+
+					 /**
 					  * A list of those cells
 					  * among the coarse mesh
 					  * cells that are deformed.

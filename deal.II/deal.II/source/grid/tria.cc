@@ -14525,6 +14525,19 @@ Triangulation<dim, spacedim>::RefinementListener::~RefinementListener ()
 
 
 
+template<int dim, int spacedim>
+Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () throw ()
+{
+				   // don't do anything here. the compiler
+				   // will automatically convert any
+				   // exceptions created by the destructors of
+				   // the member variables into abort() in
+				   // order to satisfy the throw()
+				   // specification
+}
+
+
+
 
 template<int dim, int spacedim>
 void Triangulation<dim, spacedim>::
