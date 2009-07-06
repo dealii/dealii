@@ -310,7 +310,7 @@ void EigenvalueProblem<dim>::solve ()
    		     eigenfunctions.size());
 
 				   // Now rescale eigenfunctions so that they
-				   // have $\|\phi_i(\vec
+				   // have $\|\phi_i(\mathbf
 				   // x)\|_{L^\infty(\Omega)}=1$ instead of
 				   // $\|\Phi\|_{l_2}=1$:
   for (unsigned int i=0; i<eigenfunctions.size(); ++i)
