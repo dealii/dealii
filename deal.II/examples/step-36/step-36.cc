@@ -100,6 +100,10 @@ EigenvalueProblem<dim>::EigenvalueProblem (const std::string &prm_file)
                                 // Declare some of the needed data
                                 // from a file; you can always change
                                 // this!
+  parameters.declare_entry ("Global mesh refinement steps", "5",
+			    Patterns::Integer (0, 20),
+			    "The number number of times the 1-cell coarse mesh should "
+			    "be refined globally for our computations.");
   parameters.declare_entry ("Number of eigenvalues/eigenfunctions", "10",
 			    Patterns::Integer (0, 100),
 			    "The number of eigenvalues/eigenfunctions "
@@ -118,8 +122,8 @@ EigenvalueProblem<dim>::EigenvalueProblem (const std::string &prm_file)
 template <int dim>
 void EigenvalueProblem<dim>::make_grid_and_dofs ()
 {
-  GridGenerator::hyper_cube (triangulation, -0.5, 0.5);
-  triangulation.refine_global (5);
+  GridGenerator::hyper_cube (triangulation, -1, 1);
+  triangulation.refine_global (parameters.get_integer ("Global mesh refinement steps"));
   dof_handler.distribute_dofs (fe);
 
   CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
@@ -223,7 +227,6 @@ void EigenvalueProblem<dim>::assemble_system ()
 	    {
 	      cell_stiffness_matrix (i, j)
 		+= (fe_values.shape_grad (i, q_point) *
-		    0.5                               *
 		    fe_values.shape_grad (j, q_point) 
 		    + 
 		    fe_values.shape_value (i, q_point) *
@@ -306,6 +309,13 @@ void EigenvalueProblem<dim>::solve ()
   eigensolver.solve (stiffness_matrix, mass_matrix, 
    		     eigenvalues, eigenfunctions, 
    		     eigenfunctions.size());
+
+				   // Now rescale eigenfunctions so that they
+				   // have $\|\phi_i(\vec
+				   // x)\|_{L^\infty(\Omega)}=1$ instead of
+				   // $\|\Phi\|_{l_2}=1$:
+  for (unsigned int i=0; i<eigenfunctions.size(); ++i)
+    eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
 }
 
 
@@ -319,7 +329,7 @@ void EigenvalueProblem<dim>::output_results () const
 
   for (unsigned int i=0; i<eigenfunctions.size(); ++i)
     data_out.add_data_vector (eigenfunctions[i],
-			      std::string("solution") +
+			      std::string("eigenfunction_") +
 			      Utilities::int_to_string(i));
 
                                 // How does this work?
@@ -334,13 +344,7 @@ void EigenvalueProblem<dim>::output_results () const
   data_out.build_patches ();
 
   std::ofstream output ("eigenvectors.vtk");
-  data_out.write_vtk (output);
-
-  for (unsigned int i=0; i<eigenvalues.size(); ++i)
-    std::cout << std::endl 
-	      << "      eigenvalue " << i 
-	      << " : " << eigenvalues[i];
-
+  data_out.write_gnuplot (output);
 }
 
 
@@ -369,6 +373,11 @@ void EigenvalueProblem<dim>::run ()
   assemble_system ();
   solve ();
   output_results ();
+
+  for (unsigned int i=0; i<eigenvalues.size(); ++i)
+    std::cout << std::endl 
+	      << "      eigenvalue " << i 
+	      << " : " << eigenvalues[i] * 4 / 3.1415926 / 3.1415926;
 }
 
 
