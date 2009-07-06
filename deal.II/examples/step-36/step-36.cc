@@ -332,45 +332,110 @@ void EigenvalueProblem<dim>::assemble_system ()
 
 
 				 // @sect4{EigenvalueProblem::solve}
-				 // Now that the system is set up, here
-				 // is a good time to actually solve
-				 // the problem: As with other examples
-				 // this is done using a "solve"
-				 // routine
+
+				 // This is the key new functionality of the
+				 // program. Now that the system is set up,
+				 // here is a good time to actually solve the
+				 // problem: As with other examples this is
+				 // done using a "solve" routine. Essentially,
+				 // it works as in other programs: you set up
+				 // a SolverControl object that describes the
+				 // accuracy to which we want to solve the
+				 // linear systems, and then we select the
+				 // kind of solver we want. Here we choose the
+				 // Krylov-Schur solver of SLEPc, a pretty
+				 // fast and robust choice for this kind of
+				 // problem:
+
 template <int dim>
 void EigenvalueProblem<dim>::solve () 
 {
-				   // We start by assigning the accuracy
-				   // to which we would like to solve the
-				   // system,
-  SolverControl solver_control (1000, 1e-6);
+  SolverControl solver_control (dof_handler.n_dofs(), 1e-9);
 
-				   // and assign our solver of
-				   // choice. Here we want to use the
-				   // Krylov-Schur solver, which is
-				   // pretty darn fast and robust:
   SLEPcWrappers::SolverKrylovSchur eigensolver (solver_control);
 
-				   // Lets assign the solver which part
-				   // of the spectrum we want to solve
-  eigensolver.set_which_eigenpairs (EPS_SMALLEST_MAGNITUDE);
+				   // Before we actually solve for the
+				   // eigenfunctions and -values, we have to
+				   // also select which set of eigenvalues to
+				   // solve for. Lets select those eigenvalues
+				   // and corresponding eigenfunctions with
+				   // the smallest real part (in fact, the
+				   // problem we solve here is symmetric and
+				   // so the eigenvalues are purely
+				   // real). After that, we can actually let
+				   // SLEPc do its work:
+  eigensolver.set_which_eigenpairs (EPS_SMALLEST_REAL);
 
-				   // Finally, we actually solve the
-				   // generalized eigenproblem:
   eigensolver.solve (stiffness_matrix, mass_matrix, 
    		     eigenvalues, eigenfunctions, 
    		     eigenfunctions.size());
 
-				   // Now rescale eigenfunctions so that they
-				   // have $\|\phi_i(\mathbf
+				   // The output of the call above is a set of
+				   // vectors and values. In eigenvalue
+				   // problems, the eigenfunctions are only
+				   // determined up to a constant that can be
+				   // fixed pretty arbitrarily. Knowing
+				   // nothing about the origin of the
+				   // eigenvalue problem, SLEPc has no other
+				   // choice than to normalize the
+				   // eigenvectors to one in the $l_2$
+				   // (vector) norm. Unfortunately this norm
+				   // has little to do with any norm we may be
+				   // interested from a eigenfunction
+				   // perspective: the $L_2(\Omega)$ norm, or
+				   // maybe the $L_\infty(\Omega)$ norm.
+				   //
+				   // Let us choose the latter and rescale
+				   // eigenfunctions so that they have
+				   // $\|\phi_i(\mathbf
 				   // x)\|_{L^\infty(\Omega)}=1$ instead of
-				   // $\|\Phi\|_{l_2}=1$:
+				   // $\|\Phi\|_{l_2}=1$ (where $\phi_i$ is
+				   // the $i$th eigen<i>function</i> and
+				   // $\Phi_i$ the corresponding vector of
+				   // nodal values). For the $Q_1$ elements
+				   // chosen here, we know that the maximum of
+				   // the function $\phi_i(\mathbf x)$ is
+				   // attained at one of the nodes, so
+				   // $\max_{\mathbf x}\phi_i(\mathbf
+				   // x)=\max_j (\Phi_i)_j$, making the
+				   // normalization in the $L_\infty$ norm
+				   // trivial. Note that this doesn't work as
+				   // easily if we had chosen $Q_k$ elements
+				   // with $k>1$: there, the maximum of a
+				   // function does not necessarily have to be
+				   // attained at a node, and so
+				   // $\max_{\mathbf x}\phi_i(\mathbf
+				   // x)\ge\max_j (\Phi_i)_j$ (although the
+				   // equality is usually nearly true).
   for (unsigned int i=0; i<eigenfunctions.size(); ++i)
     eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
 }
 
 
 				 // @sect4{EigenvalueProblem::output_results}
+
+				 // This is the last significant function of
+				 // this program. It uses the DataOut class to
+				 // generate graphical output from the
+				 // eigenfunctions for later visualization. It
+				 // works as in many of the other tutorial
+				 // programs.
+				 //
+				 // The only thing worth discussing may be
+				 // that because the potential is specified as
+				 // a function expression in the input file,
+				 // it would be nice to also have it as a
+				 // graphical representation along with the
+				 // eigenfunctions. The process to achieve
+				 // this is relatively straightforward: we
+				 // build an object that represents $V(\mathbf
+				 // x)$ and then we interpolate this
+				 // continuous function onto the finite
+				 // element space. The result we also attach
+				 // to the DataOut object for visualization.
+				 //
+				 // The whole collection of functions is then
+				 // output as a single VTK file.
 template <int dim>
 void EigenvalueProblem<dim>::output_results () const
 {
@@ -385,11 +450,13 @@ void EigenvalueProblem<dim>::output_results () const
 
 				   // How does this work?
   Vector<double> projected_potential (dof_handler.n_dofs());
-  FunctionParser<dim> potential;
-  potential.initialize (FunctionParser<dim>::default_variable_names (),
-			parameters.get ("Potential"),
-			typename FunctionParser<dim>::ConstMap());
-  VectorTools::interpolate (dof_handler, potential, projected_potential);
+  {
+    FunctionParser<dim> potential;
+    potential.initialize (FunctionParser<dim>::default_variable_names (),
+			  parameters.get ("Potential"),
+			  typename FunctionParser<dim>::ConstMap());
+    VectorTools::interpolate (dof_handler, potential, projected_potential);
+  }
   data_out.add_data_vector (projected_potential, "interpolated_potential");
   
   data_out.build_patches ();
@@ -402,33 +469,29 @@ void EigenvalueProblem<dim>::output_results () const
                                  // @sect4{EigenvalueProblem::run}
 
                                  // This is the function which has the
-				 // top-level control over
-				 // everything. It is very similar as
-				 // for the previous examples.
+				 // top-level control over everything. It is
+				 // almost exactly the same as in step-4:
 template <int dim>
 void EigenvalueProblem<dim>::run () 
 {
-  std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
-  
   make_grid_and_dofs ();
 
-				   // While we are here, lets count the
-				   // number of active cells and degrees
-				   // of freedom like we always do.
   std::cout << "   Number of active cells:       "
 	    << triangulation.n_active_cells()
 	    << std::endl
 	    << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs();
+	    << dof_handler.n_dofs()
+	    << std::endl
+	    << std::endl;
   
   assemble_system ();
   solve ();
   output_results ();
 
   for (unsigned int i=0; i<eigenvalues.size(); ++i)
-    std::cout << std::endl 
-	      << "      eigenvalue " << i 
-	      << " : " << eigenvalues[i];
+    std::cout << "   Eigenvalue " << i 
+	      << " : " << eigenvalues[i]
+	      << std::endl;
 }
 
 
