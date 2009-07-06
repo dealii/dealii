@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,7 +73,7 @@ template <int dim>
 void FunctionParser<dim>::initialize (const std::string   &variables,
 				      const std::vector<std::string>      &expressions,
 				      const std::map<std::string, double> &constants,
-                      const std::map<std::string, double> &units,
+				      const std::map<std::string, double> &units,
 				      const bool time_dependent,
 				      const bool use_degrees)
 {
