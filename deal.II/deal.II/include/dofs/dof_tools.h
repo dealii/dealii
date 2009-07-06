@@ -1788,8 +1788,11 @@ class DoFTools
 				 std::vector<Table<2,Coupling> >& tables_by_block);
 
                                      /** 
-				      * Make a constraint matrix with 
-				      * zero boundary values.
+				      * Make a constraint matrix for the
+				      * constraints that result from zero
+				      * boundary values. This function is used
+				      * in @ref step_36 "step-36", for
+				      * example.
 				      */
     template <int dim, int spacedim, template <int, int> class DH> 
     static void 
