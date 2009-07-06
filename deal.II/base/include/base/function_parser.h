@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,7 +47,8 @@ template <typename> class Vector;
  * from the fparser.txt file that comes with the fparser library. Please refer
  * also to that file both for clarifications on how this wrapper works, as
  * well as for any issue regarding the licence that applies to this class.
- * This class is used in the @ref step_33 "step-33" tutorial program.
+ * This class is used in the @ref step_33 "step-33" and @ref step_36 "step-36"
+ * tutorial programs (the latter being much simpler to understand).
  *
  * By using this class you indicate that you accept the terms of the licence
  * that comes with the fparser library. If you do not agree with them, you
