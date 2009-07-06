@@ -7,8 +7,21 @@ Bangerth.  </i>
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+Everything here is built on top of classes provided by deal.II that
+wrap around the linear algebra implementation of the <a
+href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a>
+library; which wraps itself around the <a
+href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library.
+
+Start with the wave equation of Schr\"odinger:
 @f[
-	( \frac{1}{2} \partial_x \partial_y + f(x,y) ) \Phi
+	( \frac{1}{2} \partial_x \partial_y + V(x,y) ) \Phi
   	= 
 	\varepsilon \Psi \quad,
 @f]
+Then transform using the finite element {\it ansatz}
+@f[
+	\phi = \tilde{\phi} \quad,
+@f]
+where $\tilde{\phi_i}$ is known as the reduced wavefunction of the
+state $i$.
