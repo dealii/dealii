@@ -41,6 +41,12 @@ The program below is essentially just a slightly modified version of
   @ref step_18 "step-18" since that is what the SLEPc eigenvalue
   solvers require.
 
+- The function <code>EigenvalueProblem::solve</code> is entirely
+  different from anything seen so far in the tutorial, as it does not
+  just solve a linear system but actually solves the eigenvalue problem.
+  It is built on the SLEPc library, and more immediately on the deal.II
+  SLEPc wrappers in the class SLEPcWrappers::SolverKrylovSchur.
+
 - We use the ParameterHandler class to describe a few input parameters,
   such as the exact form of the potential $V(\mathbf x)$, the number of
   global refinement steps of the mesh, or the number of eigenvalues
