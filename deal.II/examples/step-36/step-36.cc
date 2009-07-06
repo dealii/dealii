@@ -35,7 +35,7 @@
 #include <numerics/data_out.h>
 
                                 // PETSc appears here because SLEPc
-                                // depends on him:
+                                // depends on this library:
 #include <lac/petsc_sparse_matrix.h>
 #include <lac/petsc_vector.h>
 
@@ -114,7 +114,7 @@ EigenvalueProblem<dim>::EigenvalueProblem (const std::string &prm_file)
 }
 
 
-                                // @sect4{EigenvalueProblem::make_grid_and_dofs}
+                                // @sect3{EigenvalueProblem::make_grid_and_dofs}
 template <int dim>
 void EigenvalueProblem<dim>::make_grid_and_dofs ()
 {
@@ -122,19 +122,34 @@ void EigenvalueProblem<dim>::make_grid_and_dofs ()
   triangulation.refine_global (5);
   dof_handler.distribute_dofs (fe);
 
-  //   CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-  // 				       dof_handler.n_dofs());
-  //   DoFTools::make_sparsity_pattern (dof_handler, csp);
+  CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
+       				       dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, csp);
+  csp.compress ();
+
+  // What is going on here?
+
+  // This does not work!
   //   stiffness_matrix.reinit (csp);
   //   mass_matrix.reinit (csp);
-
-  stiffness_matrix.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
-  mass_matrix.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(),
-		      dof_handler.max_couplings_between_dofs());
   
-                                // Set the collective eigenfunction
-                                // block to be as big as we wanted!
+  // But this does... TODO: Fix it!
+  stiffness_matrix.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(),
+  			   dof_handler.max_couplings_between_dofs());
+  mass_matrix.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(),
+  		      dof_handler.max_couplings_between_dofs());
+
+                                // with this done we stream-out the
+                                // sparsity pattern
+  std::ofstream out ("constrained_sparsity_pattern.gpl");
+  csp.print_gnuplot (out);
+  
+                                // The next step is to take care of
+                                // the eigenspectrum. In this case,
+                                // the outputs are eigenfunctions and
+                                // eigenvalues. Set the collective
+                                // eigenfunction block to be as big as
+                                // we wanted!
   eigenfunctions
     .resize (parameters.get_integer ("Number of eigenvalues/eigenfunctions"));
   for (unsigned int i=0; i<eigenfunctions.size (); ++i)
@@ -146,10 +161,11 @@ void EigenvalueProblem<dim>::make_grid_and_dofs ()
                                 // block
   eigenvalues
     .resize (eigenfunctions.size ());
+
 }
 
 
-                                // @sect5{EigenvalueProblem::assemble_system}
+                                // @sect3{EigenvalueProblem::assemble_system}
 template <int dim>
 void EigenvalueProblem<dim>::assemble_system () 
 {  
@@ -263,7 +279,7 @@ void EigenvalueProblem<dim>::assemble_system ()
 }
 
 
-                                // @sect6{EigenvalueProblem::solve}
+                                // @sect3{EigenvalueProblem::solve}
                                 // Now that the system is set up, here
                                 // is a good time to actually solve
                                 // the problem: As with other examples
@@ -295,7 +311,7 @@ void EigenvalueProblem<dim>::solve ()
 }
 
 
-                                // @sect7{EigenvalueProblem::output_results}
+                                // @sect3{EigenvalueProblem::output_results}
 template <int dim>
 void EigenvalueProblem<dim>::output_results () const
 {
@@ -332,7 +348,7 @@ void EigenvalueProblem<dim>::output_results () const
 }
 
 
-                                 // @sect8{EigenvalueProblem::run}
+                                 // @sect3{EigenvalueProblem::run}
 
                                  // This is the function which has the
 				 // top-level control over
@@ -360,7 +376,7 @@ void EigenvalueProblem<dim>::run ()
 }
 
 
-                                 // @sect9{The <code>main</code> function}
+                                 // @sect3{The <code>main</code> function}
 int main (int argc, char **argv) 
 {
   try
