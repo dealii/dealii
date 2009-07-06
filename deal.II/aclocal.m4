@@ -6272,7 +6272,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 	fi
 	
 	DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
-	DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/Lib"
      ],
      [
         dnl Take something from the environment variables, if it is there
@@ -6288,7 +6287,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
  			  point to a complete Metis installation])
 	  fi
 	  DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
-	  DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/Lib"
         else
 	  USE_CONTRIB_METIS=no
           DEAL_II_METIS_DIR=""
@@ -6301,8 +6299,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
                           if you want to override the METIS_INCLUDE_DIR
  		          environment variable.],
      [
-        METIS_INCLUDE_DIR="$withval"
-	DEAL_II_METIS_INCDIR="$METIS_INCLUDE_DIR"
+        AC_MSG_ERROR([The --with-metis-include directive is no longer supported])
      ])
      
   AC_ARG_WITH(metis-libs,

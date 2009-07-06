@@ -66,7 +66,6 @@ DEAL_II_TRILINOS_SHARED = @DEAL_II_TRILINOS_SHARED@
 DEAL_II_TRILINOS_STATIC = @DEAL_II_TRILINOS_STATIC@
 
 USE_CONTRIB_METIS    = @USE_CONTRIB_METIS@
-DEAL_II_METIS_INCDIR    = @DEAL_II_METIS_INCDIR@
 DEAL_II_METIS_LIBDIR    = @DEAL_II_METIS_LIBDIR@
 
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
@@ -264,7 +263,6 @@ endif
 include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
 include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
-include-path-metis           = $(DEAL_II_METIS_INCDIR)
 
 # include paths as command line flags. while compilers allow a space between
 # the '-I' and the actual path, we also send these flags to the 
@@ -274,7 +272,7 @@ INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
           @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@ \
 	  -I$D/contrib
 
-# add PETSc, SLEPSc, Trilinos and METIS include path if necessary. this rule
+# add PETSc, SLEPSc, and Trilinos include paths if necessary. this rule
 # (and the one further down below to get correct flags) should eventually
 # be replaced by something where we do not blindly include PETSc make files
 # (and thus import all of its variables), but rather set up a scheme to
@@ -295,10 +293,6 @@ endif
 
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
   INCLUDE += -I$(include-path-trilinos)
-endif
-
-ifeq ($(USE_CONTRIB_METIS),yes)
-  INCLUDE += -I$(include-path-metis)
 endif
 
 ifeq ($(enable-threads),yes)
