@@ -184,9 +184,7 @@ void EigenvalueProblem<dim>::assemble_system ()
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   
   FunctionParser<dim> potential;
-  potential.initialize ((dim == 2 ?
-			 "x,y" :
-			 "x,y,z"),
+  potential.initialize (FunctionParser<dim>::default_variable_names (),
 			parameters.get ("Potential"),
 			typename FunctionParser<dim>::ConstMap());
 
