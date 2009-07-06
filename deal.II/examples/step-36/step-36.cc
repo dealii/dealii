@@ -325,9 +325,7 @@ void EigenvalueProblem<dim>::output_results () const
                                 // How does this work?
   Vector<double> projected_potential (dof_handler.n_dofs());
   FunctionParser<dim> potential;
-  potential.initialize ((dim == 2 ?
-			 "x,y" :
-			 "x,y,z"),
+  potential.initialize (FunctionParser<dim>::default_variable_names (),
 			parameters.get ("Potential"),
 			typename FunctionParser<dim>::ConstMap());
   VectorTools::interpolate (dof_handler, potential, projected_potential);
