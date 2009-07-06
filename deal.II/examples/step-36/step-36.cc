@@ -343,7 +343,7 @@ void EigenvalueProblem<dim>::output_results () const
   data_out.build_patches ();
 
   std::ofstream output ("eigenvectors.vtk");
-  data_out.write_gnuplot (output);
+  data_out.write_vtk (output);
 }
 
 
