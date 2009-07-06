@@ -7,16 +7,16 @@ with a few suggestions:
 
 <ul> 
 
-<li><u> What happens to the world of the particle in a box if the box
+<li> What happens to the world of the particle in a box if the box
 is bigger than we have considered in this application?</u></li>
 
-<li><u> What happens if we investigate the simple harmonic oscillator
-problem?</u> This is a hyper-ballic symmetric function and as such it
+<li> What happens if we investigate the simple harmonic oscillator
+problem? This is a hyper-ballic symmetric function and as such it
 may be worth trying to change the geometry of the mesh to reflect the
 underlying potential which governs quantum mechanical problems.</li>
 
-<li><u> What happens if the particle in the box has <i>internal</i>
+<li> What happens if the particle in the box has <i>internal</i>
 degrees of freedom? For example, if the particle were a spin-$1/2$
-particle?</u></li>
+particle?</li>
 
 </ul>
