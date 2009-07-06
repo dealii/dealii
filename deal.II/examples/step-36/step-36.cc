@@ -229,9 +229,8 @@ void EigenvalueProblem<dim>::assemble_system ()
 		+= (fe_values.shape_grad (i, q_point) *
 		    fe_values.shape_grad (j, q_point) 
 		    + 
+		    potential_values[q_point] *
 		    fe_values.shape_value (i, q_point) *
-		    //		     potential_values[q_point] *
-		    0 * // infinite potential well
 		    fe_values.shape_value (j, q_point)
 		    ) * fe_values.JxW (q_point);
 	      
@@ -377,7 +376,7 @@ void EigenvalueProblem<dim>::run ()
   for (unsigned int i=0; i<eigenvalues.size(); ++i)
     std::cout << std::endl 
 	      << "      eigenvalue " << i 
-	      << " : " << eigenvalues[i] * 4 / 3.1415926 / 3.1415926;
+	      << " : " << eigenvalues[i];
 }
 
 
