@@ -45,7 +45,7 @@
 extern "C" 
 {
 // the following is from Metis-4.0/Lib/struct.h:
-  typedef int idxtype
+  typedef int idxtype;
 // and this is from proto.h
   void
   METIS_PartGraphKway(int *, idxtype *, idxtype *,
