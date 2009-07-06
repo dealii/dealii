@@ -25,3 +25,34 @@ Then transform using the finite element {\it ansatz}
 @f]
 where $\tilde{\phi_i}$ is known as the reduced wavefunction of the
 state $i$.
+
+
+
+<h3>Implementation details</h3>
+
+The program below is essentially just a slightly modified version of 
+@ref step_4 "step-4". The things that are different are the following:
+
+- The main class (now named <code>EigenvalueProblem</code>) now no
+  longer has a single solution vector, but a whole set of vectors for 
+  the various eigenfunctions we want to compute.
+
+- We use PETSc matrices and vectors as in @ref step_17 "step-17" and
+  @ref step_18 "step-18" since that is what the SLEPc eigenvalue
+  solvers require.
+
+- We use the ParameterHandler class to describe a few input parameters,
+  such as the exact form of the potential $V(\vec x)$, the number of
+  global refinement steps of the mesh, or the number of eigenvalues
+  we want to solve for. We could go much further with this but
+  stop at making only a few of the things that one could select at
+  run time actual input file parameters. In order to see what could be
+  done in this regard, take a look at @ref step_29 "step-29",
+  @ref step_33 "step-33", and in particular @ref step_19 "step-19".
+
+- We use the FunctionParser class to make the potential $V(\vec x)$
+  a run-time parameter that can be specified in the input file as
+  a formula.
+
+The rest of the program follows in a pretty straightforward way from 
+@ref step_4 "step-4".
