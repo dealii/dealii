@@ -53,7 +53,18 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li>
+   <li>
+   <p> 
+   Changed: When configuring to use METIS for partitioning meshes in parallel,
+   the METIS header files had to be modified by hand. In addition, with some
+   MPI implementations one would get into trouble if <code>mpi.h</code>
+   included <code>mpicxx.h</code>. These two problems have now been
+   worked around.
+   <br>
+   (WB 2009/07/06)
+   </p>
+ 
+   <li>
    <p> 
    Changed: Previously, one had to give the two flags
    <code>--enable-multithreading --with-multithreading</code> to
