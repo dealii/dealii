@@ -173,9 +173,10 @@ EigenvalueProblem<dim>::EigenvalueProblem (const std::string &prm_file)
 				 //   csp.compress ();
 				 //   stiffness_matrix.reinit (csp);
 				 //   mass_matrix.reinit (csp);
-				 // @code
+				 // @endcode
 				 // instead of the two <code>reinit()</code>
-				 // calls for the stiffness and mass matrices.
+				 // calls for the stiffness and mass matrices
+                                 // below.
 				 //
 				 // This doesn't quite work,
 				 // unfortunately. The code above may lead to
