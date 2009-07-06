@@ -19,7 +19,7 @@ Start with the wave equation of Schr\"odinger:
   	= 
 	\varepsilon \Psi \quad,
 @f]
-Then transform using the finite element {\it ansatz}
+Then transform using the finite element ansatz
 @f[
 	\phi = \tilde{\phi} \quad,
 @f]
