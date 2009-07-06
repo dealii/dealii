@@ -42,7 +42,7 @@ The program below is essentially just a slightly modified version of
   solvers require.
 
 - We use the ParameterHandler class to describe a few input parameters,
-  such as the exact form of the potential $V(\vec x)$, the number of
+  such as the exact form of the potential $V(\mathbf x)$, the number of
   global refinement steps of the mesh, or the number of eigenvalues
   we want to solve for. We could go much further with this but
   stop at making only a few of the things that one could select at
@@ -50,7 +50,7 @@ The program below is essentially just a slightly modified version of
   done in this regard, take a look at @ref step_29 "step-29",
   @ref step_33 "step-33", and in particular @ref step_19 "step-19".
 
-- We use the FunctionParser class to make the potential $V(\vec x)$
+- We use the FunctionParser class to make the potential $V(\mathbf x)$
   a run-time parameter that can be specified in the input file as
   a formula.
 
