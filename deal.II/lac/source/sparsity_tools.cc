@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,8 +19,42 @@
 #include <algorithm>
 
 #ifdef DEAL_II_USE_METIS
-extern "C" {
-#  include <metis.h>
+// This is sorta stupid. what we really would like to do here is this:
+//   extern "C" {
+//   #  include <metis.h>
+//   }
+// The problem with this is that (i) metis.h declares a couple of
+// functions with different exception specifications than are
+// declared in standard header files (in particular the drand48
+// function every one who's worked with Metis seems to know about);
+// and (ii) metis.h may include <mpi.h> which if we run a C++
+// compiler may include mpicxx.h -- but that leads to trouble
+// because we have wrapped an
+//   extern "C" {...}
+// around the whole block that now also includes a C++ header :-(
+//
+// The correct solution, of course, would be if Metis would produce
+// a new dot release after 10 years that would remove the unnecessary
+// function prototypes, and that would wrap the contents into
+//   #ifdef __C_PLUSPLUS__
+//   extern "C" {
+//   #endif
+// But that appears to not be happening, and so we have to do the
+// following hack where we just forward declare everything ourselves :-(
+
+extern "C" 
+{
+// the following is from Metis-4.0/Lib/struct.h:
+  typedef int idxtype
+// and this is from proto.h
+  void
+  METIS_PartGraphKway(int *, idxtype *, idxtype *,
+		      idxtype *, idxtype *, int *,
+		      int *, int *, int *, int *, idxtype *);
+  void
+  METIS_PartGraphRecursive(int *, idxtype *, idxtype *,
+			   idxtype *, idxtype *, int *,
+			   int *, int *, int *, int *, idxtype *); 
 }
 #endif
 
