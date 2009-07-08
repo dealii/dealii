@@ -84,12 +84,12 @@ namespace internal
  * Currently the code selects the nearest support points to a given point to extract data from. This makes the 
  * code run at each time step very short, since looping over the mesh to extract the needed dof_index
  * can be done just once at the start. However this does lead to problems when FiniteElements which do not 
- * assign dofs to actual mesh locations are used, (FEs without support points). The FEFieldFunction class
- * allows users to evaluate a solution at any point in dof handler and will work even for FEs without support
+ * assign dofs to actual mesh locations are used (i.e. FEs without support points). The Functions::FEFieldFunction class
+ * allows users to evaluate a solution at any point in a domain and will work even for FEs without support
  * points. This functionality is not currently offered through this class since it has more overhead per iteration
  * than the approach implemented, but this class can be extended to offer it.
  *
- * Code snippets showing common usage of the class flows:
+ * Following is a little code snippet that shows a common usage of this class:
  *
  * @code
  * #include <numerics/point_value_history.h>
@@ -101,16 +101,14 @@ namespace internal
  * // call the constructor
  * unsigned int n_inputs = 1; // just one independent value, which happens to be an input
  * PointValueHistory<dim> node_monitor(dof_handler, n_inputs);
- * // or if node_monitor_2 is defined in class
- * node_monitor_2 = PointValueHistory<dim> (dof_handler, n_inputs);
  *
  * // setup fields and points required
  * node_monitor.add_field_name("Solution");
- * std::vector <Point <dim> > point_vector(2, Point <dim> ::Point());
- * point_vector[0] = Point <dim> ::Point(0, 0);
- * point_vector[1] = Point <dim> ::Point(0.25, 0);
+ * std::vector <Point <dim> > point_vector(2);
+ * point_vector[0] = Point <dim>(0, 0);
+ * point_vector[1] = Point <dim>(0.25, 0);
  * node_monitor.add_points(point_vector); // multiple points at once
- * node_monitor.add_point(Point<dim>::Point(1, 0.2)); // add a single point
+ * node_monitor.add_point(Point<dim>(1, 0.2)); // add a single point
  * node_monitor.close(); // close the class once the setup is complete
  * node_monitor.status(std::cout); // print out status to check if desired
  *
@@ -126,7 +124,6 @@ namespace internal
  * // ... end of iterative loop ...
  *
  * node_monitor.write_gnuplot("node"); // write out data files
- * node_monitor_2.clear (); //clear dof_handler (only if required)
  *
  * @endcode
  */
@@ -144,7 +141,7 @@ public:
      * Constructor linking the class to a specific @p DoFHandler. Since this class reads specific
      * data from the @p DoFHandler and stores it internally for quick access (in particular dof indices 
      * of closest neighbors to requested points) the class is fairly intolerant to changes to the @p DoFHandler.
-     * Triangulation refinement and @p DoFRenumbering methods should be performed before the @p add_points method is
+     * Mesh refinement and @p DoFRenumbering methods should be performed before the @p add_points method is
      * called and adaptive grid refinement is not supported (unless it is completed before points are added). 
      * Changes to the @p DoFHandler are tested for by looking for a change in the number of dofs, which may not
      * always occur so the user must be aware of these limitations.
