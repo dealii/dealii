@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: dof_objects.cc 14220 2006-12-04 23:49:48Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2006 by the deal.II authors

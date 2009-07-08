@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: vectors.h 18862 2009-05-17 13:20:52Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009 by Michael Rapson and the deal.II authors
