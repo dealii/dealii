@@ -644,6 +644,31 @@ class FETools
     compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
                                                        const Quadrature<dim>    &quadrature,
                                                        FullMatrix<double>       &I_q);
+
+
+
+
+				     /**
+				      * This method implements the 
+				      * FETools::compute_projection_from_quadrature_points_matrix
+				      * method for faces of a mesh. 
+				      * The matrix that it returns, X, is face specific
+				      * and its size is fe.dofs_per_cell by
+				      * rhs_quadrature.size().
+				      * The dimension, dim must be larger than 1 for this class,
+				      * since Quadrature<dim-1> objects are required. See the 
+				      * documentation on the Quadrature class for more information.
+				      */
+    template <int dim, int spacedim>
+    static
+    void
+    compute_projection_from_face_quadrature_points_matrix (const FiniteElement<dim, spacedim> &fe,
+						const Quadrature<dim-1>    &lhs_quadrature,
+						const Quadrature<dim-1>    &rhs_quadrature,
+						const typename DoFHandler<dim, spacedim>::active_cell_iterator & cell,
+						unsigned int face,
+						FullMatrix<double>       &X);
+
     
 
 				     //@}
@@ -1330,6 +1355,17 @@ class FETools
 				      */
     DeclException1(ExcLeastSquaresError, double,
 		   << "Least squares fit leaves a gap of " << arg1);
+
+				     /**
+				      * Exception thrown if one variable
+				      * may not be greater than another.
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException2 (ExcNotGreaterThan,
+	           int,	int,
+		   << arg1 << " must be greater than " << arg2);
+
   private:
 				     /**
 				      * Return a finite element that

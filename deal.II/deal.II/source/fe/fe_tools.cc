@@ -1958,6 +1958,68 @@ compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim,space
 
 
 
+template <int dim, int spacedim>
+void
+FETools::
+compute_projection_from_face_quadrature_points_matrix (const FiniteElement<dim, spacedim> &fe,
+						const Quadrature<dim-1>    &lhs_quadrature,
+						const Quadrature<dim-1>    &rhs_quadrature,
+						const typename DoFHandler<dim, spacedim>::active_cell_iterator & cell,
+						unsigned int face,
+						FullMatrix<double>       &X)
+{
+  Assert (fe.n_components() == 1, ExcNotImplemented());
+  Assert (lhs_quadrature.size () > fe.degree, ExcNotGreaterThan (lhs_quadrature.size (), fe.degree));
+
+
+
+                                   // build the matrices M and Q
+                                   // described in the documentation
+  FullMatrix<double> M (fe.dofs_per_cell, fe.dofs_per_cell);
+  FullMatrix<double> Q (fe.dofs_per_cell, rhs_quadrature.size());
+
+  {
+				// need an FEFaceValues object to evaluate shape function
+				// values on the specified face.
+    FEFaceValues <dim> fe_face_values (fe, lhs_quadrature, update_values); 
+    fe_face_values.reinit (cell, face); // setup shape_value on this face.
+
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+        for (unsigned int q=0; q<lhs_quadrature.size(); ++q)
+          M(i,j) += fe_face_values.shape_value (i, q) *
+                    fe_face_values.shape_value (j, q) *
+                    lhs_quadrature.weight(q);
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+    {
+      M(i,i) = (M(i,i) == 0 ? 1 : M(i,i));
+    }
+  }
+
+  {
+    FEFaceValues <dim> fe_face_values (fe, rhs_quadrature, update_values); 
+    fe_face_values.reinit (cell, face); // setup shape_value on this face.
+
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      for (unsigned int q=0; q<rhs_quadrature.size(); ++q)
+        Q(i,q) += fe_face_values.shape_value (i, q) *
+                  rhs_quadrature.weight(q);
+  }
+                                   // then invert M
+  FullMatrix<double> M_inverse (fe.dofs_per_cell, fe.dofs_per_cell);
+  M_inverse.invert (M);
+
+                                   // finally compute the result
+  X.reinit (fe.dofs_per_cell, rhs_quadrature.size());
+  M_inverse.mmult (X, Q);
+
+  Assert (X.m() == fe.dofs_per_cell, ExcInternalError());
+  Assert (X.n() == rhs_quadrature.size(), ExcInternalError());
+}
+
+
+
+
 /*-------------- Explicit Instantiations -------------------------------*/
 
 
@@ -2411,6 +2473,18 @@ FETools::
 compute_interpolation_to_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &fe,
                                                    const Quadrature<deal_II_dimension>    &quadrature,
                                                    FullMatrix<double>       &I_q);
+
+#if deal_II_dimension != 1
+template
+void
+FETools::
+compute_projection_from_face_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &fe,
+						const Quadrature<deal_II_dimension-1>    &lhs_quadrature,
+						const Quadrature<deal_II_dimension-1>    &rhs_quadrature,
+						const DoFHandler<deal_II_dimension>::active_cell_iterator & cell,
+						unsigned int face,
+						FullMatrix<double>       &X);
+#endif
 
 
 

@@ -1,0 +1,7 @@
+for (VEC : SERIAL_VECTORS)
+{  
+  template
+  void PointValueHistory<deal_II_dimension>::evaluate_field 
+  (const std::string &,
+   const VEC &);
+}
