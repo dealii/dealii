@@ -60,7 +60,8 @@ namespace internal
     class PointGeometryData
     {
       public:
-	PointGeometryData(std::vector <Point <dim> > new_locations, std::vector <int> new_sol_indices);
+	PointGeometryData(const std::vector <Point <dim> > &new_locations,
+			  const std::vector <int> &new_sol_indices);
 	std::vector <Point <dim> > locations;
 	std::vector <int> solution_indices;
     };
@@ -148,7 +149,7 @@ class PointValueHistory
 				      * external input or logging solver
 				      * performance data.
 				      */
-    PointValueHistory (unsigned int n_independent_variables = 0);
+    PointValueHistory (const unsigned int n_independent_variables = 0);
     
 				     /**
 				      * Constructor linking the class to a
@@ -181,7 +182,8 @@ class PointValueHistory
 				      * external input or logging solver
 				      * performance data.
 				      */
-    PointValueHistory (const DoFHandler<dim> & dof_handler, unsigned int n_independent_variables = 0);
+    PointValueHistory (const DoFHandler<dim> & dof_handler,
+		       const unsigned int n_independent_variables = 0);
  
 				     /**
 				      * Copy constructor explicitly provided,
