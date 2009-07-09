@@ -477,8 +477,9 @@ class PointValueHistory
 
   private:
 				     /**
-				      * Commonly time, but possibly time step,
-				      * iteration etc
+				      * Stores keys, values on the abscissa. 
+                                      * This will often be time, but possibly 
+                                      * time step, iteration etc.
 				      */
     std::vector <double> dataset_key;
 
@@ -491,7 +492,7 @@ class PointValueHistory
 				     /**
 				      * Saves data for each mnemonic entry.
 				      * data_store: mnemonic -> [component]
-				      * [time_instance]
+				      * [key]
 				      */
     std::map <std::string, std::vector <std::vector <double> > > data_store;
 
@@ -503,29 +504,46 @@ class PointValueHistory
     point_geometry_data;
 
 				     /**
-				      * Could possibly be removed, just used
-				      * as the value to be added to
-				      * data_store.
+				      * A tempory pair used when adding to 
+                                      * @p data_store.
 				      */
-    std::pair<std::string, std::vector <std::vector <double> > > pair_data;
+    std::pair<std::string, std::vector <std::vector <double> > > pair_data; // could possibly be removed
     
+                                    /**
+                                     * Used to enforce @p closed state for some 
+                                     * methods.
+                                     */
     bool closed;
-
+                                    
+                                    /**
+                                     * Used to enforce @p !cleared state for 
+                                     * some methods.
+                                     */
     bool cleared; 
-
+    
+    
+                                    /**
+                                     * A smart pointer to the dof_handler 
+                                     * supplied to the constructor. This can be 
+                                     * released by calling @p clear().
+                                     */
     SmartPointer<const DoFHandler<dim> > dof_handler;
     
-				     /*
+				     /**
 				      * Variable to check that number of dofs
-				      * in the dof_handler does not change. A
-				      * cheap way to check that the
+				      * in the dof_handler does not change.
+                                      */
+                                     /* A cheap way to check that the
 				      * triangulation has not been refined in
 				      * anyway since the class was set up.
 				      * Refinement will invalidate stored dof
 				      * indices linked to support points.
 				      */
     unsigned int n_dofs;
-    
+                                    /**
+                                     * Stores the number of independent 
+                                     * variables requested.
+                                     */
     unsigned int n_indep;
 
 };
