@@ -206,7 +206,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  New: Based on work with Rickard Armiento, Francisco Alvaro, and Jose E. Roman, SLEPcWrappers that give a handle on some of the features of SLEPc (Scalable Library for Eigenvalue Problem Computations): (1) The SLEPcWrappers::SolverBase class can be used for specifying an eigenvalue problem, either in standard or generalized form, on serial or parallel architectures with support for a few solver types; and (2) The SLEPcWrappers::TransformationBase class encapsulates a variety of spectral transformations providing some functionality required for acceleration techniques based on the transformation of the spectrum.
+  New: Based on work with Rickard Armiento, Francisco Alvaro, and Jose E. Roman,
+  SLEPcWrappers that give a handle on some of the features of SLEPc (Scalable Library
+  for Eigenvalue Problem Computations): (1) The SLEPcWrappers::SolverBase class can be
+  used for specifying an eigenvalue problem, either in standard or generalized form,
+  on serial or parallel architectures with support for a few solver types; and
+  (2) The SLEPcWrappers::TransformationBase class encapsulates a variety of spectral
+  transformations providing some functionality required for acceleration techniques
+  based on the transformation of the spectrum. 
   <br>
   (Toby D. Young 2009/06/25)
   </p>
@@ -218,6 +225,15 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  Fixed: The GridIn class sometimes had problems with input files that had
+  whitespace at the end of lines. This should now be fixed.
+  <br>
+  (WB 2009/07/10)
+  </p>
+  </li>
+
   <li>
   <p>
   New: The new hp::DoFHandler::set_active_fe_indices function allows
@@ -234,7 +250,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Fix: The projection of quadrature points to subfaces in
+  Fixed: The projection of quadrature points to subfaces in
   MappingQ in case of 3d anisotropic refinement did not respect
   non-standard face orientation/flip/rotation cases. This
   has now been fixed.  

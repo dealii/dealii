@@ -22,11 +22,14 @@
 #include <map>
 #include <algorithm>
 #include <fstream>
+#include <functional>
 #include <cctype>
+
 
 #ifdef HAVE_LIBNETCDF
 #include <netcdfcpp.h>
 #endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1805,22 +1808,23 @@ void GridIn<dim, spacedim>::skip_empty_lines (std::istream &in)
     {
 				       // get line
       getline (in, line);
-				       // eat all spaces from the back
-      while ((line.length()>0) && (line[line.length()-1]==' '))
-	line.erase (line.length()-1, 1);
-				       // if still non-null, then this
-				       // is a non-empty line. put
-				       // back all info and leave
-      if (line.length() > 0)
+
+				       // check if this is a line that
+				       // consists only of spaces, and
+				       // if not put the whole thing
+				       // back and return
+      if (std::find_if (line.begin(), line.end(),
+			std::bind2nd (std::not_equal_to<char>(),' '))
+	  != line.end())
 	{
 	  in.putback ('\n');
 	  for (int i=line.length()-1; i>=0; --i)
 	    in.putback (line[i]);
 	  return;
-	};
+	}
 
 				       // else: go on with next line
-    };
+    }
 }
 
 
