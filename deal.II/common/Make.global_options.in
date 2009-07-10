@@ -220,8 +220,8 @@ endif
 
 # need to link with libtbb if we're using threads
 ifeq ($(enable-threads),yes)
-  lib-contrib-tbb.g = $D/lib/libtbb_debug$(lib-suffix)
-  lib-contrib-tbb.o = $D/lib/libtbb$(lib-suffix)
+  lib-contrib-tbb.g = $D/lib/libtbb_debug$(shared-lib-suffix)
+  lib-contrib-tbb.o = $D/lib/libtbb$(shared-lib-suffix)
 endif
 
 
