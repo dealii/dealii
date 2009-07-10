@@ -62,6 +62,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
      >> dummy         // number of data vectors
      >> dummy         // cell data
      >> dummy;        // model data
+  AssertThrow (in, ExcIO());
 
 				   // set up array of vertices
   std::vector<Point<spacedim> >     vertices (n_vertices);
@@ -76,6 +77,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
       double x[3];
 
 				       // read vertex
+      AssertThrow (in, ExcIO());
       in >> vertex_number
 	 >> x[0] >> x[1] >> x[2];
 
