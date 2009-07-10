@@ -2495,15 +2495,6 @@ namespace internal
 		for (unsigned int l=0; l<4; ++l)
 		  quad->line(l)->set_boundary_indicator (0);
   
-					     // Check that all cells have
-					     // positive volume. As the input
-					     // CellData already passed this
-					     // test we don't really expect
-					     // negative measures here
-	    for (typename Triangulation<dim,spacedim>::active_cell_iterator
-		   cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
-	      Assert(cell->measure()>0, ExcInternalError());
-      
 					     ///////////////////////////////////////
 					     // now set boundary indicators
 					     // where given
