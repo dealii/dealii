@@ -5,8 +5,8 @@ CPP = g++ -g -ansi -pedantic -Wall
 PROG = convert_mesh
 
 #SUFFIX RULES
-.SUFFIXES: .o .cpp
-.cpp.o:
+.SUFFIXES: .o .cc
+.cc.o:
 	$(CPP) -c $<
 
 all: $(PROG)
