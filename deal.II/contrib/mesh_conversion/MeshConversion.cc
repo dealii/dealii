@@ -1,5 +1,8 @@
 #include "MeshConversion.h"
 
+#include <cstdlib>
+
+
 //--------------------------------------------------------------------------------
 
 MeshConversion::MeshConversion (const unsigned int dimension):
@@ -171,14 +174,14 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 				       (from_string<float> (temp_float, temp_data[k + 3 + j*(data_per_cell)], std::dec) == true))
 				{
 					// Initilise storage variables
-					std::vector <double> cell (data_per_cell);
+					std::vector <int> cell (data_per_cell);
 					
 					// Material id
 					cell[0] = material_id;
 					
 					// Convert from string to the variable types
 					for (int i = 1; i < data_per_cell; ++i)
-						from_string<double> (cell[i], temp_data[k + 3 + j*(data_per_cell) + i], std::dec);
+						from_string<int> (cell[i], temp_data[k + 3 + j*(data_per_cell) + i], std::dec);
 						
 					// Add to the global node number vector
 					cell_list.push_back(cell);
@@ -229,8 +232,8 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 						face_cell_face_no += (face_cell_face_no_temp[face_cell_face_no_temp.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
 					
 					// Initilise storage variables
-					std::vector <double> quad (data_per_quad);
-					std::vector <double> quad_node_list (node_per_face);
+					std::vector <int> quad (data_per_quad);
+					std::vector <int> quad_node_list (node_per_face);
 					
 					quad_node_list = get_global_node_numbers(face_cell_no, face_cell_face_no);
 					
@@ -259,9 +262,9 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 
 //--------------------------------------------------------------------------------
 
-std::vector <double> MeshConversion::get_global_node_numbers (const int face_cell_no, const int face_cell_face_no) 
+std::vector <int> MeshConversion::get_global_node_numbers (const int face_cell_no, const int face_cell_face_no) 
 {
-	std::vector <double> quad_node_list (node_per_face);
+	std::vector <int> quad_node_list (node_per_face);
 	
 	if (dimension == 2)
 	{
@@ -409,7 +412,7 @@ bool MeshConversion::write_out_avs_ucd (const std::string filename)
 	// Write out cell node numbers
 	for (unsigned int ii = 0; ii < cell_list.size(); ++ii)
 	{
-		output << ii + 1 << "\t" << cell_list[ii][0] << "\t" << (dimension==2 ? "quad" : "hex") << "\t";
+	  output << ii + 1 << "\t" << cell_list[ii][0] << "\t" << (dimension==2 ? "quad" : "hex") << "\t";
 		for (unsigned int jj = 1; jj < node_per_cell + 1; ++jj)
 			output << cell_list[ii][jj] << "\t";
 		
@@ -419,7 +422,7 @@ bool MeshConversion::write_out_avs_ucd (const std::string filename)
 	// Write out quad node numbers
 	for (unsigned int ii = 0; ii < face_list.size(); ++ii)
 	{
-		output << ii + 1 << "\t" << face_list[ii][0] << "\t" << (dimension==2 ? "line" : "quad") << "\t";
+	  output << ii + 1 << "\t" << (int)face_list[ii][0] << "\t" << (dimension==2 ? "line" : "quad") << "\t";
 		for (unsigned int jj = 1; jj < node_per_face + 1; ++jj)
 			output << face_list[ii][jj] << "\t";
 		
