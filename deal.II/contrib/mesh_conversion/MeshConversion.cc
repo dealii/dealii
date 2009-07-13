@@ -3,8 +3,8 @@
 //--------------------------------------------------------------------------------
 
 MeshConversion::MeshConversion (const unsigned int dimension):
-dimension (dimension),
-tolerance (5e-16) // Used to offset Cubit tolerance error when outputting value close to zero
+tolerance (5e-16), // Used to offset Cubit tolerance error when outputting value close to zero
+dimension (dimension)
 {
 	greeting ();
 	
@@ -90,7 +90,7 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 		// Loop over all the contents of the fibre data file and read it into buffer
 		while (input_stream >> buffer)
 		{
-			for(int i = 0; i < buffer.length(); ++i)
+			for(unsigned int i = 0; i < buffer.length(); ++i)
 				if (buffer[i] == ',')	// Get rid of the .inp file's useless comma's
 				{
 					buffer.erase(i);
@@ -108,14 +108,14 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 			std::ofstream output;
 			output.open(filename_out.c_str());
 			
-			for (int ii = 0; ii < temp_data.size(); ii++ )
+			for (unsigned int ii = 0; ii < temp_data.size(); ii++ )
 				output << temp_data[ii] << std::endl;
 			
 			output.close();
 			// =========== TEMP ===========
 		}
 		
-		for (int k = 0; k < temp_data.size(); ++k)
+		for (unsigned int k = 0; k < temp_data.size(); ++k)
 		{
 			// ================================ NODES ===================================
 			// ABAQUS formatting
@@ -134,7 +134,7 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 					std::vector <double> node (dimension+1);
 					
 					// Convert from string to the variable types
-					for (int i = 0; i < dimension+1; ++i)
+					for (unsigned int i = 0; i < dimension+1; ++i)
 						from_string<double> (node[i], temp_data[k + 1 + j*(dimension+1+(dimension==2 ? 1 : 0)) + i], std::dec);
 						
 					// Add to the global node number vector
@@ -159,11 +159,11 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 				// Get material id
 				std::string material_id_line = temp_data[k+ 2];
 				std::string material_id_temp;
-				for (int ll = 8 /*Characters in "ELSET=EB" */; ll < material_id_line.length(); ++ll)
+				for (unsigned int ll = 8 /*Characters in "ELSET=EB" */; ll < material_id_line.length(); ++ll)
 					material_id_temp += material_id_line[ll];
 				
 				int material_id = 0;
-				for (int ll = 0; ll < material_id_temp.length(); ++ll)
+				for (unsigned int ll = 0; ll < material_id_temp.length(); ++ll)
 					material_id += (material_id_temp[material_id_temp.length() - ll - 1] - 48 /* ASCII TRICKS */) * pow(10.0,ll);
 				
 				while ((k + 3 + j*(data_per_cell) < temp_data.size())
@@ -201,11 +201,11 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 				// Get sideset id
 				std::string sideset_id_line = temp_data[k + 1];
 				std::string sideset_id_temp;
-				for (int m = 7 /*Characters in "NAME=SS" */; m < sideset_id_line.length(); ++m)
+				for (unsigned int m = 7 /*Characters in "NAME=SS" */; m < sideset_id_line.length(); ++m)
 					sideset_id_temp += sideset_id_line[m];
 				
 				int sideset_id = 0;
-				for (int m = 0; m < sideset_id_temp.length(); ++m)
+				for (unsigned int m = 0; m < sideset_id_temp.length(); ++m)
 					sideset_id += (sideset_id_temp[sideset_id_temp.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
 				
 				const int data_per_face = 2;
@@ -215,17 +215,17 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 					// Get cell to which the face belongs
 					std::string face_cell_no_line = temp_data[(k + 2) + j * data_per_face];
 					int face_cell_no = 0;
-					for (int m = 0; m < face_cell_no_line.length(); ++m)
+					for (unsigned int m = 0; m < face_cell_no_line.length(); ++m)
 						face_cell_no += (face_cell_no_line[face_cell_no_line.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
 					
 					// Get ABAQUS cell face number
 					std::string face_cell_face_no_line = temp_data[(k + 2) + j * data_per_face + 1];
 					std::string face_cell_face_no_temp;
-					for (int m = 1 /*Characters in "S" */; m < face_cell_face_no_line.length(); ++m)
+					for (unsigned int m = 1 /*Characters in "S" */; m < face_cell_face_no_line.length(); ++m)
 						face_cell_face_no_temp += face_cell_face_no_line[m];
 					
 					int face_cell_face_no = 0;
-					for (int m = 0; m < face_cell_face_no_temp.length(); ++m)
+					for (unsigned int m = 0; m < face_cell_face_no_temp.length(); ++m)
 						face_cell_face_no += (face_cell_face_no_temp[face_cell_face_no_temp.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
 					
 					// Initilise storage variables
@@ -238,7 +238,7 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 					quad[0] = sideset_id;
 					
 					// Global node numbers
-					for (int m = 0; m < node_per_face; ++m)
+					for (unsigned int m = 0; m < node_per_face; ++m)
 						quad[m + 1] = quad_node_list[m];
 					
 					// Add to the global quad vector
@@ -379,9 +379,9 @@ bool MeshConversion::write_out_avs_ucd (const std::string filename)
 	output << node_list.size() << "\t" << (cell_list.size() + face_list.size()) << "\t0\t0\t0" << std::endl;
 	
 	// Write out node numbers
-	for (int ii = 0; ii < node_list.size(); ++ii) // Loop over all nodes
+	for (unsigned int ii = 0; ii < node_list.size(); ++ii) // Loop over all nodes
 	{
-		for (int jj = 0; jj < dimension + 1; ++jj) // Loop over entries to be outputted
+		for (unsigned int jj = 0; jj < dimension + 1; ++jj) // Loop over entries to be outputted
 		{
 			if (jj == 0) 	// Node number
 			{
@@ -407,20 +407,20 @@ bool MeshConversion::write_out_avs_ucd (const std::string filename)
 	}
 	
 	// Write out cell node numbers
-	for (int ii = 0; ii < cell_list.size(); ++ii)
+	for (unsigned int ii = 0; ii < cell_list.size(); ++ii)
 	{
 		output << ii + 1 << "\t" << cell_list[ii][0] << "\t" << (dimension==2 ? "quad" : "hex") << "\t";
-		for (int jj = 1; jj < node_per_cell + 1; ++jj)
+		for (unsigned int jj = 1; jj < node_per_cell + 1; ++jj)
 			output << cell_list[ii][jj] << "\t";
 		
 		output << std::endl;
 	}
 	
 	// Write out quad node numbers
-	for (int ii = 0; ii < face_list.size(); ++ii)
+	for (unsigned int ii = 0; ii < face_list.size(); ++ii)
 	{
 		output << ii + 1 << "\t" << face_list[ii][0] << "\t" << (dimension==2 ? "line" : "quad") << "\t";
-		for (int jj = 1; jj < node_per_face + 1; ++jj)
+		for (unsigned int jj = 1; jj < node_per_face + 1; ++jj)
 			output << face_list[ii][jj] << "\t";
 		
 		output << std::endl;
