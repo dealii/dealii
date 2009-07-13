@@ -1767,21 +1767,19 @@ class Triangulation : public Subscriptor
     void set_all_refine_flags ();
 
 				     /**
-				      *  Refine all cells @p times
-				      *  times, by alternatingly
-				      *  calling
-				      *  <tt>set_all_refine_flags()</tt>
-				      *  and
-				      *  <tt>execute_coarsening_and_refinement()</tt>.
-				      *  This function actually starts
-				      *  the refinement process, so
-				      *  you have no way to store the
-				      *  refinement flags unless you
-				      *  overload the
-				      *  @p execute_coarsening_and_refinement
-				      *  function.
+				      * Refine all cells @p times times, by
+				      * alternatingly calling
+				      * set_all_refine_flags and
+				      * execute_coarsening_and_refinement.
 				      *
-				      * 
+				      * The latter function may throw an
+				      * exception if it creates cells that are
+				      * distorted (see its documentation for
+				      * an explanation). This exception will
+				      * be propagated through this function if
+				      * that happens, and you may not get the
+				      * actual number of refinement steps in
+				      * that case.
 				      */
     void refine_global (const unsigned int times);
 
