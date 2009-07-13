@@ -131,7 +131,7 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 				int j = 0;
 				float temp_float;
 				
-				while (from_string<float> (temp_float, temp_data[k + 1 + j*(dimension+1+(dimension==2 ? 1 : 0))], std::dec) == true)
+				while (from_string<float> (temp_float, temp_data[k + 1 + j*(dimension+1)], std::dec) == true)
 				{
 					// Initilise storage variables
 					std::vector <double> node (dimension+1);
@@ -142,7 +142,7 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 						
 					// Add to the global node number vector
 					node_list.push_back(node);
-					
+
 					++j;
 				}
 			}
