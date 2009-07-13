@@ -138,7 +138,7 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 					
 					// Convert from string to the variable types
 					for (unsigned int i = 0; i < dimension+1; ++i)
-						from_string<double> (node[i], temp_data[k + 1 + j*(dimension+1+(dimension==2 ? 1 : 0)) + i], std::dec);
+						from_string<double> (node[i], temp_data[k + 1 + j*(dimension+1) + i], std::dec);
 						
 					// Add to the global node number vector
 					node_list.push_back(node);
