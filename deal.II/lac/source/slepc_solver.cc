@@ -44,7 +44,14 @@ namespace SLEPcWrappers
     if( solver_data != 0 )
       solver_data.reset ();
   }
-  
+
+  void
+  SolverBase::set_matrices (const PETScWrappers::MatrixBase &A)
+  {
+    opA = &A;
+    opB = NULL;
+  }
+
   void
   SolverBase::set_matrices (const PETScWrappers::MatrixBase &A,
 			    const PETScWrappers::MatrixBase &B)
@@ -84,19 +91,22 @@ namespace SLEPcWrappers
     ierr = EPSCreate (mpi_communicator, &solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    AssertThrow (opA && opB, ExcSLEPcWrappersUsageError());
-    ierr = EPSSetOperators (solver_data->eps, *opA, *opB);
+    AssertThrow (opA, ExcSLEPcWrappersUsageError());
+    if (opB)
+      ierr = EPSSetOperators (solver_data->eps, *opA, *opB);
+    else
+      ierr = EPSSetOperators (solver_data->eps, *opA, PETSC_NULL);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
-
-    if( ini_vec && ini_vec->size() != 0 ) 
+    
+    if (ini_vec && ini_vec->size() != 0) 
       {
 	ierr = EPSSetInitialVector(solver_data->eps, *ini_vec);
 	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
     
-    if( transform )
+    if (transform)
       transform->set_context(solver_data->eps);
-
+    
                                     // set runtime options.
     set_solver_type (solver_data->eps);
 
@@ -118,7 +128,8 @@ namespace SLEPcWrappers
 
                                     // get number of converged
                                     // eigenstates
-    ierr = EPSGetConverged (solver_data->eps, reinterpret_cast<int *>(n_converged));
+    ierr = EPSGetConverged (solver_data->eps, 
+			    reinterpret_cast<int *>(n_converged));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -276,8 +287,6 @@ namespace SLEPcWrappers
   }
 
 }
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

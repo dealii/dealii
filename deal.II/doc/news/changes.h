@@ -183,6 +183,18 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: Based on work by Francisco Alvaro, the existing SLEPcWrappers now 
+  have a handle on the generalized eigenvalue problem where B=I.
+  <br>
+  (Toby D. Young 2009/06/25)
+  </p>
+  </li>
+</ol>
+
+
+<ol>
+  <li>
+  <p>
   Fixed: The TrilinosWrappers::MPI::BlockVector class declares an assignment
   operator from the non-Trilinos BlockVector class but it could not be
   compiled due to an oversight. This is now fixed.
@@ -214,14 +226,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  New: Based on work with Rickard Armiento, Francisco Alvaro, and Jose E. Roman,
-  SLEPcWrappers that give a handle on some of the features of SLEPc (Scalable Library
-  for Eigenvalue Problem Computations): (1) The SLEPcWrappers::SolverBase class can be
-  used for specifying an eigenvalue problem, either in standard or generalized form,
-  on serial or parallel architectures with support for a few solver types; and
-  (2) The SLEPcWrappers::TransformationBase class encapsulates a variety of spectral
-  transformations providing some functionality required for acceleration techniques
-  based on the transformation of the spectrum. 
+  New: Based on work with Rickard Armiento, Francisco Alvaro, and Jose
+  E. Roman, SLEPcWrappers that give a handle on some of the features
+  of SLEPc (Scalable Library for Eigenvalue Problem Computations): (1)
+  The SLEPcWrappers::SolverBase class can be used for specifying an
+  eigenvalue problem, either in standard or generalized form, on
+  serial or parallel architectures with support for a few solver
+  types; and (2) The SLEPcWrappers::TransformationBase class
+  encapsulates a variety of spectral transformations providing some
+  functionality required for acceleration techniques based on the
+  transformation of the spectrum.  
   <br>
   (Toby D. Young 2009/06/25)
   </p>

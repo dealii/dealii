@@ -19,8 +19,9 @@ DEAL_II_NAMESPACE_OPEN
  * Base class for solver classes using the SLEPc solvers which are
  * selected based on flags passed to the eigenvalue problem solver
  * context. Derived classes set the right flags to set the right
- * solver -- in particular, note that the AdditionalData structure is
- * a dummy structure and is there for backward compatibility.
+ * solver. On the other hand, note that: the AdditionalData structure
+ * is a dummy structure and is there for backward/forward
+ * compatibility.
  *
  * SLEPcWrappers can be implemented in application codes in the
  * following way:
@@ -30,13 +31,14 @@ DEAL_II_NAMESPACE_OPEN
                         mpi_communicator);
   system.solve (A, B, lambda, x, n_eigenvectors);
  @endverbatim
- * for the generalized eigenvalue problem $Ax=B\lambda x$.
+ * for the generalized eigenvalue problem $Ax=B\lambda x$. See also
+ * @ref step 36 "step-36" for a hands-on example.
  *
  * An alternative implementation to the one above is to use the API
  * internals directly within the application code. In this way the
  * calling sequence requires calling several of SolverBase functions
- * rather than just one. This freedom is intended for use by users of
- * the SLEPcWrappers that require a greater handle on the eigenvalue
+ * rather than just one. This freedom is intended for use of the
+ * SLEPcWrappers that require a greater handle on the eigenvalue
  * problem solver context. See also:
  @verbatim
   template <typename OutputVector>
@@ -45,8 +47,8 @@ DEAL_II_NAMESPACE_OPEN
 	             const PETScWrappers::MatrixBase &B,
 		     std::vector<double>             &kr,
 		     std::vector<OutputVector>       &vr,
-		     const unsigned int               n_eigenvectors
- )
+		     const unsigned int               n_eigenvectors) 
+  {<code>code...</code>}
  @endverbatim
  * as an example on how to do this. 
  *
@@ -92,13 +94,13 @@ namespace SLEPcWrappers
 
                                    /**
                                     * Composite method that solves the
-                                    * linear system $Ax=\lambda
-                                    * Bx$. The eigenvector sent in has
-                                    * to have at least one element
-                                    * that we can use as a template
-                                    * when resizing, since we do not
-                                    * know the parameters of the
-                                    * specific vector class used
+                                    * eigensystem $Ax=\lambda x$. The
+                                    * eigenvector sent in has to have
+                                    * at least one element that we can
+                                    * use as a template when resizing,
+                                    * since we do not know the
+                                    * parameters of the specific
+                                    * vector class used
                                     * (i.e. local_dofs for MPI
                                     * vectors). However, while copying
                                     * eigenvectors, at least twice the
@@ -113,9 +115,9 @@ namespace SLEPcWrappers
                                     * reset.
                                     * 
                                     * Note that the number of
-                                    * converged eigenstates can be
+                                    * converged eigenvectors can be
                                     * larger than the number of
-                                    * eigenstates requested; this is
+                                    * eigenvectors requested; this is
                                     * due to a round off error
                                     * (success) of the eigenvalue
                                     * solver context. If this is found
@@ -127,6 +129,18 @@ namespace SLEPcWrappers
       template <typename OutputVector>
 	void
 	solve (const PETScWrappers::MatrixBase &A,
+	       std::vector<double>             &kr,
+	       std::vector<OutputVector>       &vr,
+	       const unsigned int              n_eigenvectors);
+
+                                   /** 
+				    * Same as above, but here is a
+                                    * composite method for solving the
+                                    * system $A x=\lambda B x$.
+                                    */
+      template <typename OutputVector>
+	void
+	solve (const PETScWrappers::MatrixBase &A,
 	       const PETScWrappers::MatrixBase &B,
 	       std::vector<double>             &kr,
 	       std::vector<OutputVector>       &vr,
@@ -134,23 +148,32 @@ namespace SLEPcWrappers
       
                                    /**
                                     * Initialize solver for the linear
-                                    * system $Ax=\lambda
-                                    * Bx$. (required before calling
-                                    * solve)
+                                    * system $Ax=\lambda x$. (Note:
+                                    * this is required before calling
+                                    * solve ())
+                                    */
+      void
+	set_matrices (const PETScWrappers::MatrixBase &A);   
+
+                                   /** 
+				    * Same as above, but here is a
+                                    * composite method for solving the
+                                    * system $A x=\lambda B x$.
                                     */
       void
 	set_matrices (const PETScWrappers::MatrixBase &A,
 		      const PETScWrappers::MatrixBase &B);   
 
                                    /**
-                                    * Set the initial vector for the solver.
+                                    * Set the initial vector for the
+                                    * solver.
                                     */
       void
 	set_initial_vector (const PETScWrappers::VectorBase &initial_vec);
 
                                    /**
 				    * Set the spectral transformation
-				    * to be used.  By default SLEPc
+				    * to be used.
                                     */
       void
 	set_transformation (SLEPcWrappers::TransformationBase &trans);
@@ -170,9 +193,10 @@ namespace SLEPcWrappers
                                     * Solve the linear system for
 				    * n_eigenvectors
 				    * eigenstates. Parameter
-				    * n_converged contains the actual
-				    * number of eigenstates that have
-				    * .  converged; this can be both
+				    * <code>n_converged</code>
+				    * contains the actual number of
+				    * eigenstates that have .
+				    * converged; this can be both
 				    * fewer or more than
 				    * n_eigenvectors, depending on the
 				    * SLEPc eigensolver used.
@@ -211,7 +235,7 @@ namespace SLEPcWrappers
                                     * Access to object that controls
                                     * convergence.
                                     */
-      SolverControl & control() const;
+      SolverControl &control() const;
       
                                    /**
                                     * Exceptions.
@@ -458,44 +482,70 @@ namespace SLEPcWrappers
 
 
   // --------------------------- inline and template functions -----------                                                                       
-
-  /**                                                                                                           
-   * This is declared here to make it                                                                           
-   * possible to take a std::vector                                                                             
-   * of different PETScWrappers vector                                                                          
-   * types                                                                                                      
+  /**
+   * This is declared here to make it possible to take a std::vector
+   * of different PETScWrappers vector types
    */
+ 
   template <typename OutputVector>
     void
     SolverBase::solve (const PETScWrappers::MatrixBase &A,
-                       const PETScWrappers::MatrixBase &B,
                        std::vector<double>             &kr,
                        std::vector<OutputVector>       &vr,
-                       const unsigned int               n_eigenvectors = 0)
+                       const unsigned int               n_eigenvectors = 1)
     {
       unsigned int n_converged;
-
-      set_matrices(A,B);
-
+      
+      set_matrices(A);
       solve(n_eigenvectors,&n_converged);
-
+      
       if (n_converged > n_eigenvectors)
         {
           n_converged = n_eigenvectors;
         }
-
+      
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
       vr.resize(n_converged, vr.front());
       kr.resize(n_converged);
-
+      
       for (unsigned int index=0; index < n_converged; 
 	   ++index)
         {
           get_eigenpair(index, kr[index], vr[index]);
         }
     }
-
-
+  
+  
+  template <typename OutputVector>
+    void
+    SolverBase::solve (const PETScWrappers::MatrixBase &A,
+                       const PETScWrappers::MatrixBase &B,
+                       std::vector<double>             &kr,
+                       std::vector<OutputVector>       &vr,
+                       const unsigned int               n_eigenvectors = 1)
+    {
+      unsigned int n_converged;
+      
+      set_matrices(A,B);
+      solve(n_eigenvectors,&n_converged);
+      
+      if (n_converged > n_eigenvectors)
+        {
+          n_converged = n_eigenvectors;
+        }
+      
+      AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
+      vr.resize(n_converged, vr.front());
+      kr.resize(n_converged);
+      
+      for (unsigned int index=0; index < n_converged; 
+	   ++index)
+        {
+          get_eigenpair(index, kr[index], vr[index]);
+        }
+    }
+  
+  
 }
 
 DEAL_II_NAMESPACE_CLOSE
