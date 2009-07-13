@@ -1780,6 +1780,8 @@ class Triangulation : public Subscriptor
 				      *  overload the
 				      *  @p execute_coarsening_and_refinement
 				      *  function.
+				      *
+				      * 
 				      */
     void refine_global (const unsigned int times);
 
@@ -1793,6 +1795,28 @@ class Triangulation : public Subscriptor
 				      * user flags for internal purposes. They
 				      * will therefore be overwritten by
 				      * undefined content.
+				      *
+				      * If the boundary description is
+				      * sufficiently irregular, it can
+				      * happen that some of the
+				      * children produced by mesh
+				      * refinement are distorted (see
+				      * the extensive discussion on
+				      * @ref GlossDistorted "distorted cells").
+				      *
+				      * To allow user programs to fix
+				      * up these cells if that is
+				      * desired, this function after
+				      * completing all other work may
+				      * throw an exception of type
+				      * DistortedCellList that
+				      * contains a list of those cells
+				      * that have been refined and
+				      * have at least one child that
+				      * is distorted. The function
+				      * does not create such an
+				      * exception if no cells have
+				      * created distorted children.
 				      *
                                       * See the general docs for more
                                       * information.
@@ -3161,8 +3185,14 @@ class Triangulation : public Subscriptor
 				      *  for <tt>dim=2,3</tt> and the
 				      *  <tt>quad->user_flags</tt> for
 				      *  <tt>dim=3</tt>.
+				      *
+				      *  The function returns a list
+				      *  of cells that have produced
+				      *  children that satisfy the
+				      *  criteria of
+				      *  @ref GlossDistorted "distorted cells".
 				      */ 
-    void execute_refinement ();
+    DistortedCellList execute_refinement ();
 
 				     /**
 				      * Coarsen all cells which were flagged for

@@ -32,16 +32,24 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Changed: Previously, the Triangulation::create_triangulation function silently
-  accepted input meshes with inverted cells (i.e. cells with a zero or negative
-  determinant of the Jacobian of the mapping from the reference cell to the
-  real cell). This has been changed now: The function checks whether cells
-  are distorted or inverted (see the entry on @ref GlossDistorted "distorted cells"
-  in the glossary), and may throw an exception containing a list of cells for which this
-  is the case. If you know that this is harmless, for example
-  if you have cells with collapsed vertices in your mesh but you do not intend
-  to integrate on them, then you can catch and ignore this message. In all
-  other cases, the output of your computations are likely to be wrong anyway.
+  Changed: Previously, the Triangulation::create_triangulation
+  function silently accepted input meshes with inverted cells
+  (i.e. cells with a zero or negative determinant of the Jacobian of
+  the mapping from the reference cell to the real cell). This has been
+  changed now: The function checks whether cells are distorted or
+  inverted, and may throw an exception containing a list of cells
+  for which this is the case. If you know that this is harmless, for
+  example if you have cells with collapsed vertices in your mesh but
+  you do not intend to integrate on them, then you can catch and
+  ignore this message. In all other cases, the output of your
+  computations are likely to be wrong anyway.
+  <br>
+  The same is true for the Triangulation::execute_coarsening_and_refinement
+  function: if it creates cells that are distorted, it throws a list of cells
+  whose children are distorted.
+  <br>
+  The whole issue is described in some detail in the entry on
+  @ref GlossDistorted "distorted cells" in the glossary.
   <br>
   (WB 2009/06/29)
   </p>

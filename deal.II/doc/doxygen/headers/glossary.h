@@ -72,10 +72,7 @@
  * non-positive somewhere in the cell. Typically, we only check the sign
  * of this determinant at the vertices of the cell. The function
  * GeometryInfo::jacobian_determinants_at_vertices computes these
- * determinants at the vertices, and the function
- * Triangulation::create_triangulation (along with the various grid
- * readers in the GridIn class) will reject meshes with distorted cells
- * by default.
+ * determinants at the vertices.
  *
  * By way of example, if all of the determinants are of roughly equal value
  * and on the order of $h^\text{dim}$ then the cell is well-shaped. For
@@ -94,6 +91,73 @@
  *
  * @image html distorted_3d.png "A well-formed, a pinched, and a twisted cell in 3d."
  * </dd>
+ *
+ * Distorted cells can appear in two different ways: The original
+ * coarse mesh can already contain such cells, or they can be created
+ * as the result of mesh refinement if the boundary description in use
+ * is sufficiently irregular.
+ *
+ * The function Triangulation::create_triangulation, which is called
+ * by the various functions in GridGenerator and GridIn (but can also
+ * be called from user code, see @ref step_14 "step-14" will signal
+ * the creation of coarse meshes with distorted cells by throwing an
+ * exception of type Triangulation::DistortedCellList. There are
+ * legitimate cases for creating meshes with distorted cells (in
+ * particular collapsed/pinched cells) if you don't intend to assemble
+ * anything on these cells. For example, consider a case where one
+ * would like to simulate the behavior of an elastic material with a
+ * fluid-filled crack such as an oil reservoir. If the pressure
+ * becomes too large, the crack is closed -- and the cells that
+ * discretize the crack volume are collapsed to zero volume. As long
+ * as you don't integrate over these cells to simulate the behavior of
+ * the fluid (of which there isn't any if the crack has zero volume),
+ * such meshes are perfectly legitimate. As a consequence,
+ * Triangulation::create_triangulation does not simply abort the
+ * program, but throws an exception that contains a list of cells that
+ * are distorted; this exception can be caught and, if you believe
+ * that you can ignore this condition, you can react by doing nothing
+ * with the caught exception.
+ *
+ * The second case in which distorted cells can appear is through mesh
+ * refinement when we have curved boundaries. Consider, for example,
+ * the following case where he dashed line shows the exact boundary
+ * that the lower edge of the cell is supposed to approximate (let's
+ * assume that the left, top and right edges are interior edges and
+ * therefore will be considered as straight):
+ *
+ * @image html distorted_2d_refinement_01.png "One cell with a edge approximating a curved boundary"
+ *
+ * Now, if this cell is refined, we first split all edges and place
+ * new mid-points on them. For the left, top and right edge, this is
+ * trivial: because they are considered straight, we just take the
+ * point in the middle between the two vertices. For the lower edge,
+ * the Triangulation class asks the Boundary object associated with
+ * this boundary (and in particular the Boundary::new_point_on_line
+ * function) where the new point should lie. The four old vertices and
+ * the four new points are shown here:
+ *
+ * @image html distorted_2d_refinement_02.png "Cell after edge refinement"
+ *
+ * The last step is to compute the location of the new point in the
+ * interior of the cell. By default, it is chosen as the average
+ * location (arithmetic mean of the coordinates) of these 8 points:
+ *
+ * @image html distorted_2d_refinement_03.png "Cell after edge refinement"
+ *
+ * The problem with that is, of course, that the bottom two child cells are
+ * twisted, whereas the top two children are well-shaped. While such
+ * meshes can happen with sufficiently irregular boundary descriptions
+ * (and if the coarse mesh is entirely inadequate to resolve the
+ * complexity of the boundary), the Triangulation class does not know
+ * what to do in such situations. Consequently, the
+ * Triangulation::execute_coarsening_and_refinement function does
+ * create such meshes, but it keeps a list of cells whose children are
+ * distorted. If this list is non-empty at the end of a refinement
+ * step, it will throw an exception of type
+ * Triangualtion::DistortedCellList that contains those cells that
+ * have distorted children. The caller of
+ * Triangulation::execute_coarsening_and_refinement can then decide
+ * what to do with this situation.
  *
  *
  * <dt class="glossary">@anchor GlossFaceOrientation Face orientation</dt>

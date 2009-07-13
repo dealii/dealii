@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,7 +67,10 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
   this->save_refine_flags (refine_flags.back());
   this->save_coarsen_flags (coarsen_flags.back());
 
-				   // then refine triangulation
+				   // then refine triangulation. if
+				   // this function throws an
+				   // exception, that's fine since it
+				   // is the last call here
   Triangulation<dim>::execute_coarsening_and_refinement ();
 }
 
@@ -107,7 +110,7 @@ PersistentTriangulation<dim>::restore (const unsigned int step)
       this->load_coarsen_flags (coarsen_flags[step-1]);
 
       Triangulation<dim>::execute_coarsening_and_refinement ();
-    };
+    }
 }
 
 

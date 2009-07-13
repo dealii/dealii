@@ -1189,6 +1189,59 @@ namespace
   {
     return typename Triangulation<dim,spacedim>::DistortedCellList();
   }
+
+
+
+				   /**
+				    * Return whether any of the
+				    * children of the given cell is
+				    * distorted or not. This is the
+				    * function for dim==spacedim.
+				    */
+  template <int dim>
+  bool
+  has_distorted_children (const typename Triangulation<dim,dim>::cell_iterator &cell,
+			  internal::int2type<dim>,
+			  internal::int2type<dim>)
+  {
+    Assert (cell->has_children(), ExcInternalError());
+
+    for (unsigned int c=0; c<cell->n_children(); ++c)
+      {
+	Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
+	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	  vertices[i] = cell->child(c)->vertex(i);
+
+	double determinants[GeometryInfo<dim>::vertices_per_cell];
+	GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
+							      determinants);
+
+	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	  if (determinants[i] <= 1e-9 * std::pow (cell->child(c)->diameter(),
+						  1.*dim))
+	    return true;
+      }
+
+    return false;
+  }
+
+
+				   /**
+				    * Function for dim!=spacedim. As
+				    * for
+				    * collect_distorted_coarse_cells,
+				    * there is nothing that we can do
+				    * in this case.
+				    */
+  template <int dim, int spacedim>
+  bool
+  has_distorted_children (const typename Triangulation<dim,spacedim>::cell_iterator &,
+			  internal::int2type<dim>,
+			  internal::int2type<spacedim>)
+  {
+    return false;
+  }
+  
   
 }// end of anonymous namespace
 
@@ -4564,7 +4617,7 @@ namespace internal
 					  */
 	template <int spacedim>
 	static
-	void
+	typename Triangulation<1,spacedim>::DistortedCellList
 	execute_refinement (Triangulation<1,spacedim> &triangulation)
 	  {
 	    const unsigned int dim = 1;
@@ -4814,6 +4867,17 @@ namespace internal
 			  }
 		    }      
 	      }
+
+					     // in 1d, we can not have
+					     // distorted children
+					     // unless the parent was
+					     // already distorted
+					     // (that is because we
+					     // don't use boundary
+					     // information for 1d
+					     // triangulations). so
+					     // return an empty list
+	    return typename Triangulation<1,spacedim>::DistortedCellList();
 	  }
 
 
@@ -4823,7 +4887,7 @@ namespace internal
 					  */
 	template <int spacedim>
 	static
-	void
+	typename Triangulation<2,spacedim>::DistortedCellList
 	execute_refinement (Triangulation<2,spacedim> &triangulation)
 	  {
 	    const unsigned int dim = 2;
@@ -5073,7 +5137,8 @@ namespace internal
 							   // the two vertices:
 			  if (line->at_boundary())
 			    triangulation.vertices[next_unused_vertex]
-			      = triangulation.boundary[line->boundary_indicator()]->get_new_point_on_line (line);
+			      = triangulation.boundary[line->boundary_indicator()]
+			      ->get_new_point_on_line (line);
 			  else
 			    triangulation.vertices[next_unused_vertex]
 			      = (line->vertex(0) + line->vertex(1)) / 2;
@@ -5163,6 +5228,9 @@ namespace internal
 	    triangulation.faces->lines.
 	      reserve_space (0,n_single_lines);
 
+	    typename Triangulation<2,spacedim>::DistortedCellList
+	      cells_with_distorted_children;
+	    
 					     // reset next_unused_line, as
 					     // now also single empty places
 					     // in the vector can be used
@@ -5203,8 +5271,15 @@ namespace internal
 				       next_unused_line,
 				       next_unused_cell,
 				       cell);
+
+		      if (has_distorted_children (cell,
+						  internal::int2type<dim>(),
+						  internal::int2type<spacedim>()))
+			cells_with_distorted_children.distorted_cells.push_back (cell);
 		    }
 	      }
+
+	    return cells_with_distorted_children;
 	  }
 
 
@@ -5214,7 +5289,7 @@ namespace internal
 					  */
 	template <int spacedim>
 	static
-	void
+	typename Triangulation<3,spacedim>::DistortedCellList
 	execute_refinement (Triangulation<3,spacedim> &triangulation)
 	  {
 	    const unsigned int dim = 3;
@@ -6520,6 +6595,10 @@ namespace internal
 					     // Now, finally, set up the new
 					     // cells
 					     ///////////////////////////////////
+
+	    typename Triangulation<3,spacedim>::DistortedCellList
+	      cells_with_distorted_children;
+
 	    for (unsigned int level=0; level!=triangulation.levels.size()-1; ++level)
 	      {
 						 // only active objects can be
@@ -9256,6 +9335,20 @@ namespace internal
 						       // separate function
 		      update_neighbors<spacedim> (hex, true);
 
+						       // now see if
+						       // we have
+						       // created
+						       // cells that
+						       // are
+						       // distorted
+						       // and if so
+						       // add them to
+						       // our list
+		      if (has_distorted_children (hex,
+						  internal::int2type<dim>(),
+						  internal::int2type<spacedim>()))
+			cells_with_distorted_children.distorted_cells.push_back (hex);
+		      
 						       // note that the
 						       // refinement flag was
 						       // already cleared at the
@@ -9270,7 +9363,10 @@ namespace internal
 					     // whether we used indices or pointers is
 					     // still present. reset it now to enable the
 					     // user to use whichever he likes later on.
-	    triangulation.faces->quads.clear_user_data();	
+	    triangulation.faces->quads.clear_user_data();
+
+					     // return the list with distorted children
+	    return cells_with_distorted_children;
 	  }
 
 
@@ -12624,7 +12720,10 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
     (*ref_listener)->pre_refinement_notification (*this);
 
   execute_coarsening();
-  execute_refinement();
+
+  const DistortedCellList
+    cells_with_distorted_children
+    = execute_refinement();
 
 				   // verify a case with which we have had
 				   // some difficulty in the past (see the
@@ -12638,6 +12737,9 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
   for (ref_listener = refinement_listeners.begin ();
        ref_listener != end_listener; ++ref_listener)
     (*ref_listener)->post_refinement_notification (*this);
+
+  AssertThrow (cells_with_distorted_children.distorted_cells.size() == 0,
+	       cells_with_distorted_children);
 }
 
 
@@ -12666,10 +12768,12 @@ Triangulation<dim, spacedim>::clear_despite_subscriptions()
 
 
 template <int dim, int spacedim>
-void
+typename Triangulation<dim,spacedim>::DistortedCellList
 Triangulation<dim,spacedim>::execute_refinement ()
 {
-  internal::Triangulation::Implementation::execute_refinement (*this);
+  const DistortedCellList
+    cells_with_distorted_children
+    = internal::Triangulation::Implementation::execute_refinement (*this);
 
 
 
@@ -12693,7 +12797,9 @@ Triangulation<dim,spacedim>::execute_refinement ()
 		endc = end();
   while (cell != endc)
     Assert (!(cell++)->refine_flag_set(), ExcInternalError ());  
-#endif  
+#endif
+
+  return cells_with_distorted_children;
 }
 
 
