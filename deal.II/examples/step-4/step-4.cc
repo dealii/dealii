@@ -490,7 +490,9 @@ void LaplaceProblem<dim>::assemble_system ()
 	  }
                                        // As a final remark to these loops:
                                        // when we assemble the local
-                                       // contributions, we have to multiply
+                                       // contributions into
+				       // <code>cell_matrix(i,j)<\code>,
+				       // we have to multiply
                                        // the gradients of shape functions i
                                        // and j at point q_point and multiply
                                        // it with the scalar weights JxW. This
