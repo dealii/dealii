@@ -3,62 +3,107 @@
 <i>This program was contributed by Toby D. Young and Wolfgang
 Bangerth.  </i>
 
+<a name="Preamble"></a>
+<h1>Preamble</h1>
 
-<a name="Intro"></a>
-<h1>Introduction</h1>
+The problem we want to solve in this example is an eigenspectrum
+problem which no longer contains a single solution, but a set of
+solutions for the various eigenfunctions we want to compute. The
+problem of finding all eigenvalues (eigenfunctions) of a generalized
+eigenvalue problem is a formidable challange; however, most of the
+time we are really only interested in a small subset of these values
+(functions). Fortunately, the interface to the SLEPc library allows us
+to select which portion of the eigenspectrum and how many solutions we
+want to solve for.
 
-Everything here is built on top of classes provided by deal.II that
-wrap around the linear algebra implementation of the <a
+To do this, everything here is built on top of classes provided by
+deal.II that wrap around the linear algebra implementation of the <a
 href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a>
-library; which wraps itself around the <a
+library; which links to some the underlying features of the <a
 href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library.
 
-Start with the wave equation of Schr\"odinger:
-@f[
-	( \frac{1}{2} \partial_x \partial_y + V(x,y) ) \Phi
-  	= 
-	\varepsilon \Psi \quad,
-@f]
-Then transform using the finite element ansatz
-@f[
-	\phi = \tilde{\phi} \quad,
-@f]
-where $\tilde{\phi_i}$ is known as the reduced wavefunction of the
-state $i$.
+<a name="Introduction"></a>
+<h1>Introduction</h1>
 
+Start with a differential operator equation
+@f[
+	L(x,y) \Psi = \varepsilon \Psi \quad,
+@f]
+where $L$ is a differential operator. In the usual way in finite
+elements we multiply both sides with a test function and then replace
+$\Psi$ and the test function with discrete shape functions.
+@f[
+	\sum_j (\phi_i, L\phi_j) \tilde{\psi}_j =
+	\varepsilon \sum_j (\phi_i, \phi_j) \tilde{\psi}_j \quad,
+@f]
+where $\tilde{\psi}_j$, the reduced wavefunction, are the expansion
+coefficients of the approximation
 
+@f[
+	\psi_i = \sum_j \phi_j \tilde{\psi}_j \quad.
+@f]
+It can easily be shown that the consequence of this, is that we want
+to solve the generalized eigenvalue problem
+@f[
+	A \tilde{\Phi} = \varepsilon M \tilde{\Phi} \quad,
+@f]
+where $A$ si the stiffness matrix arising from the differential
+operator $L$, and $M$ is the mass matrix. The solution to the
+eigenvalue problem is an eigenspectrum $\varepsilon_j$, with
+associated eigenfunctions $\tilde{\Phi}=\sum_j \tilde{\phi}_j$.
+
+To solve an actual physical problem we next define the differential
+operator $L$ in a way that mimicks the wave-equation of Schr\"odinger:
+@f[
+	L({\mathbf x}) = K({\mathbf x}) 
+	+ V({\mathbf x})\quad,
+@f]
+and let $K({\mathbf x}) = \partial^2_{\mathbf x}$, and
+@f[
+	V({\mathbf x}) = \quad,
+@f]
+
+In the parlance of Schroedinger eigenvalue problems, the solutions
+sought are the wavefunctions $\phi_j$. In finite elements the
+solutions are $\tilde{\phi}_j$, known as a reduced (or tilde-basis)
+wavefunctions.
 
 <h3>Implementation details</h3>
 
 The program below is essentially just a slightly modified version of 
 @ref step_4 "step-4". The things that are different are the following:
 
-- The main class (now named <code>EigenvalueProblem</code>) now no
-  longer has a single solution vector, but a whole set of vectors for 
-  the various eigenfunctions we want to compute.
+<ul> 
 
-- We use PETSc matrices and vectors as in @ref step_17 "step-17" and
-  @ref step_18 "step-18" since that is what the SLEPc eigenvalue
-  solvers require.
+<li>The main class (now named <code>EigenvalueProblem</code>) now no
+longer has a single solution vector, but a whole set of vectors for
+the various eigenfunctions we want to compute.</li>
 
-- The function <code>EigenvalueProblem::solve</code> is entirely
-  different from anything seen so far in the tutorial, as it does not
-  just solve a linear system but actually solves the eigenvalue problem.
-  It is built on the SLEPc library, and more immediately on the deal.II
-  SLEPc wrappers in the class SLEPcWrappers::SolverKrylovSchur.
+<li>We use PETSc matrices and vectors as in @ref step_17 "step-17" and
+@ref step_18 "step-18" since that is what the SLEPc eigenvalue solvers
+require.</li>
 
-- We use the ParameterHandler class to describe a few input parameters,
-  such as the exact form of the potential $V(\mathbf x)$, the number of
-  global refinement steps of the mesh, or the number of eigenvalues
-  we want to solve for. We could go much further with this but
-  stop at making only a few of the things that one could select at
-  run time actual input file parameters. In order to see what could be
-  done in this regard, take a look at @ref step_29 "step-29",
-  @ref step_33 "step-33", and in particular @ref step_19 "step-19".
+<li>The function <code>EigenvalueProblem::solve</code> is entirely
+different from anything seen so far in the tutorial, as it does not
+just solve a linear system but actually solves the eigenvalue problem.
+It is built on the SLEPc library, and more immediately on the deal.II
+SLEPc wrappers in the class SLEPcWrappers::SolverKrylovSchur.</li>
 
-- We use the FunctionParser class to make the potential $V(\mathbf x)$
-  a run-time parameter that can be specified in the input file as
-  a formula.
+<li>We use the ParameterHandler class to describe a few input
+parameters, such as the exact form of the potential $V({\mathbf
+x})$, the number of global refinement steps of the mesh,
+or the number of eigenvalues we want to solve for. We could go much
+further with this but stop at making only a few of the things that one
+could select at run time actual input file parameters. In order to see
+what could be done in this regard, take a look at @ref step_29
+"step-29", @ref step_33 "step-33", and in particular @ref step_19
+"step-19".</li>
+
+<li>We use the FunctionParser class to make the potential $V(\mathbf
+x)$ a run-time parameter that can be specified in the input file as a
+formula.</li>
+
+</ul>
 
 The rest of the program follows in a pretty straightforward way from 
 @ref step_4 "step-4".
