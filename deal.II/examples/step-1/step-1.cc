@@ -1,6 +1,6 @@
 /* $Id$
  *
- * Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+ * Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009 by the deal.II authors
  *
  * This file is subject to QPL and may not be  distributed
  * without copyright and license information. Please refer
@@ -68,14 +68,14 @@ void first_grid ()
                                    // two-dimensional domain:
   Triangulation<2> triangulation;
 				   // Here and in many following
-                                   // cases, the string "@<2@>" after a
+                                   // cases, the string "<2>" after a
                                    // class name indicates that this
                                    // is an object that shall work in
                                    // two space dimensions. Likewise,
                                    // there are versions of the
                                    // triangulation class that are
-                                   // working in one ("@<1@>") and three
-                                   // ("@<3@>") space dimensions. The
+                                   // working in one ("<1>") and three
+                                   // ("<3>") space dimensions. The
                                    // way this works is through some
                                    // template magic that we will
                                    // investigate in some more detail
