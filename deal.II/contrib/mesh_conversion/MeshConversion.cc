@@ -166,7 +166,9 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 				for (int ll = 0; ll < material_id_temp.length(); ++ll)
 					material_id += (material_id_temp[material_id_temp.length() - ll - 1] - 48 /* ASCII TRICKS */) * pow(10.0,ll);
 				
-				while (from_string<float> (temp_float, temp_data[k + 3 + j*(data_per_cell)], std::dec) == true)
+				while ((k + 3 + j*(data_per_cell) < temp_data.size())
+				       &&
+				       (from_string<float> (temp_float, temp_data[k + 3 + j*(data_per_cell)], std::dec) == true))
 				{
 					// Initilise storage variables
 					std::vector <double> cell (data_per_cell);
