@@ -59,9 +59,7 @@
 				 // namespace:
 using namespace dealii;
 
-				 // @sect3{The
-				 // <code>EigenvalueProblem</code>
-				 // class template}
+				 // @sect3{The <code>EigenvalueProblem</code> class template}
 
 				 // Following is the class declaration
 				 // for the main class template. It
@@ -119,9 +117,7 @@ class EigenvalueProblem
     ConstraintMatrix constraints;
 };
 
-				 // @sect3{Implementation of the
-				 // <code>EigenvalueProblem</code>
-				 // class}
+				 // @sect3{Implementation of the <code>EigenvalueProblem</code> class}
 
 				 // @sect4{EigenvalueProblem::EigenvalueProblem}
 
