@@ -7,66 +7,91 @@ Bangerth.  </i>
 <h1>Preamble</h1>
 
 The problem we want to solve in this example is an eigenspectrum
-problem which no longer contains a single solution, but a set of
-solutions for the various eigenfunctions we want to compute. The
-problem of finding all eigenvalues (eigenfunctions) of a generalized
-eigenvalue problem is a formidable challange; however, most of the
-time we are really only interested in a small subset of these values
-(functions). Fortunately, the interface to the SLEPc library allows us
-to select which portion of the eigenspectrum and how many solutions we
-want to solve for.
+problem. Eigenvalue problems appear in a wide context of problems, for example
+in the computation of electromagnetic standing waves in cavities, vibration
+modes of drum membranes, or oscillations of lakes and estuaries. One of the
+most enigmatic applications is probably the computation of stationary or
+quasi-static wave functions in quantum mechanics. The latter application is
+what we would like to investigate here, though the general techniques outlined
+in this program are of course equally applicable to the other applications
+above. 
 
-To do this, everything here is built on top of classes provided by
-deal.II that wrap around the linear algebra implementation of the <a
-href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a>
-library; which links to some the underlying features of the <a
-href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library.
+Eigenspectrum problems have the general form
+@f{align*}
+	L \Psi &= \varepsilon \Psi \qquad &&\text{in}\ \Omega,
+	\\
+	\Psi &= 0 &&\text{on}\ \partial\Omega,
+@f}
+where the Dirichlet boundary condition on $\Psi=\Psi(\mathbf x)$ could also be
+replaced by Neumann or Robin conditions; $L$ is an operator that generally
+also contains differential operators.
+
+Under suitable conditions, above equations have a set of solutions
+$\Psi_\ell,\varepsilon_\ell$, $\ell\in {\cal I}$, where $\cal I$ can be a finite or
+infinite set. In either case, let us note that there is no longer just a
+single solution, but a set of solutions (the various eigenfunctions and
+corresponding eigenvalues) that we want to compute. The problem of finding all
+eigenvalues (eigenfunctions) of such eigenvalue problems is a formidable
+challange; however, most of the time we are really only interested in a small
+subset of these values (functions). Fortunately, the interface to the SLEPc
+library that we will use for this tutorial program allows us to select which
+portion of the eigenspectrum and how many solutions we want to solve for.
+
+In this program, the eigenspectrum solvers we use are classes
+provided by deal.II that wrap around the linear algebra implementation of the
+<a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a> library;
+SLEPc itself builds on the <a
+href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library for
+linear algebra contents.
+
 
 <a name="Introduction"></a>
 <h1>Introduction</h1>
 
-Start with a differential operator equation
-@f[
-	L(x,y) \Psi = \varepsilon \Psi \quad,
-@f]
-where $L$ is a differential operator. In the usual way in finite
-elements we multiply both sides with a test function and then replace
-$\Psi$ and the test function with discrete shape functions.
-@f[
-	\sum_j (\phi_i, L\phi_j) \tilde{\psi}_j =
-	\varepsilon \sum_j (\phi_i, \phi_j) \tilde{\psi}_j \quad,
-@f]
-where $\tilde{\psi}_j$, the reduced wavefunction, are the expansion
-coefficients of the approximation
+The basic equation of stationary quantum mechanics is the Schr&ouml;dinger
+equation. The Copenhagen interpretation of quantum mechanics posits that the
+motion of particles in an external potential $V(\mathbf x)$ is governed a wave
+function $\Psi(\mathbf x)$ that satisfies this Schr&ouml;dinger
+equation of the (non-dimensionalized) form
+@f{align*}
+  [-\Delta + V(\mathbf x)] \Psi(\mathbf x) &= \varepsilon \Psi(\mathbf x)
+  \qquad &&\text{in}\ \Omega,
+  \\
+  \Psi &= 0 &&\text{on}\ \partial\Omega.
+@f}
+As a consequence of this eigenvalue problem, this particle can only exist in a
+certain number of eigenstates that correspond to the energy eigenvalues
+$\varepsilon_\ell$ admitted as solutions of this equation, and if a particle has
+energy $\varepsilon_\ell$ then the probability of finding it at location $\mathbf
+x$ is proportional to $|\Psi_\ell(\mathbf x)|^2$ where $\Psi_\ell$ is the
+eigenfunction that corresponds to this eigenvalue.
 
+In order to numerically find solutions to this equation, i.e. a set of pairs
+of eigenvalue/eigenfunction, we use the usual finite element approach of
+multiplying the equation from the left with testfunctions, integrating by
+parts, and searching for solutions in finite dimensional spaces by
+approximating $\Psi(\mathbf x)\approx\Psi_h(\mathbf x)=\sum_{j}\phi_j(\mathbf
+x)\tilde\psi_j$, where $\tilde\psi$ is a vector of expansion coefficients. We
+then immediately arrive at the following equation that discretizes the
+continuous eigenvalue problem:
 @f[
-	\psi_i = \sum_j \phi_j \tilde{\psi}_j \quad.
+	\sum_j [(\nabla\phi_i, \nabla\phi_j)+(V(\mathbf x)\phi_i,\phi_j)]
+          \tilde{\psi}_j =
+	\varepsilon_h \sum_j (\phi_i, \phi_j) \tilde{\psi}_j.
 @f]
-It can easily be shown that the consequence of this, is that we want
-to solve the generalized eigenvalue problem
+In matrix and vector notation, this equation then reads:
 @f[
-	A \tilde{\Phi} = \varepsilon M \tilde{\Phi} \quad,
+	A \tilde{\Psi} = \varepsilon_h M \tilde{\Psi} \quad,
 @f]
-where $A$ si the stiffness matrix arising from the differential
+where $A$ is the stiffness matrix arising from the differential
 operator $L$, and $M$ is the mass matrix. The solution to the
-eigenvalue problem is an eigenspectrum $\varepsilon_j$, with
-associated eigenfunctions $\tilde{\Phi}=\sum_j \tilde{\phi}_j$.
+eigenvalue problem is an eigenspectrum $\varepsilon_{h,\ell}$, with
+associated eigenfunctions $\tilde{\Psi}_\ell=\sum_j \phi_j\tilde{\psi}_j$.
 
-To solve an actual physical problem we next define the differential
-operator $L$ in a way that mimicks the wave-equation of Schr\"odinger:
-@f[
-	L({\mathbf x}) = K({\mathbf x}) 
-	+ V({\mathbf x})\quad,
-@f]
-and let $K({\mathbf x}) = \partial^2_{\mathbf x}$, and
-@f[
-	V({\mathbf x}) = \quad,
-@f]
+It is this form of the eigenvalue problem that involves both matrices $A$ and
+$M$ that we will solve in the current tutorial program. We will want to solve
+it for the lowermost few eigenvalue/eigenfunction pairs.
 
-In the parlance of Schroedinger eigenvalue problems, the solutions
-sought are the wavefunctions $\phi_j$. In finite elements the
-solutions are $\tilde{\phi}_j$, known as a reduced (or tilde-basis)
-wavefunctions.
 
 <h3>Implementation details</h3>
 
