@@ -1338,7 +1338,7 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
 
 				   // loop over all cells that we have
 				   // to fix up
-  for (typename std::list<typename Triangulation<dim,spacedim>::active_cell_iterator>::const_iterator
+  for (typename std::list<typename Triangulation<dim,spacedim>::cell_iterator>::const_iterator
 	 cell_ptr = distorted_cells.distorted_cells.begin();
        cell_ptr != distorted_cells.distorted_cells.end(); ++cell_ptr)
     {

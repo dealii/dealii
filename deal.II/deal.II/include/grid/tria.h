@@ -1373,8 +1373,9 @@ class Triangulation : public Subscriptor
 				      *
 				      * Objects of this kind are
 				      * thrown by the
-				      * create_triangulation()
-				      * function, and they can be
+				      * create_triangulation() and
+				      * execute_coarsening_and_refinement()
+				      * functions, and they can be
 				      * caught in user code if this
 				      * condition is to be ignored.
 				      *
@@ -1406,9 +1407,11 @@ class Triangulation : public Subscriptor
 					 /**
 					  * A list of those cells
 					  * among the coarse mesh
-					  * cells that are deformed.
+					  * cells that are deformed or
+					  * whose children are
+					  * deformed.
 					  */
-	std::list<typename Triangulation<dim,spacedim>::active_cell_iterator>
+	std::list<typename Triangulation<dim,spacedim>::cell_iterator>
 	distorted_cells;
     };
     
