@@ -159,6 +159,11 @@
  * Triangulation::execute_coarsening_and_refinement can then decide
  * what to do with this situation.
  *
+ * One way to deal with this problem is to use the
+ * GridTools::fix_up_distorted_child_cells function that attempts to
+ * fix up exactly these cells if possible by moving around the node at
+ * the center of the cell.
+ *
  *
  * <dt class="glossary">@anchor GlossFaceOrientation Face orientation</dt>
  * <dd>In a triangulation, the normal vector to a face

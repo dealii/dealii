@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -485,8 +485,9 @@ class GridTools
                                       */
     template <int dim, int spacedim>
     static
-    void partition_triangulation (const unsigned int  n_partitions,
-                                  Triangulation<dim, spacedim> &triangulation);
+    void
+    partition_triangulation (const unsigned int  n_partitions,
+			     Triangulation<dim, spacedim> &triangulation);
 
 				     /**
 				      * This function does the same as the
@@ -566,9 +567,10 @@ class GridTools
 				      */
     template <int dim, int spacedim>
     static
-    void partition_triangulation (const unsigned int     n_partitions,
-				  const SparsityPattern &cell_connection_graph,
-                                  Triangulation<dim,spacedim>    &triangulation);
+    void
+    partition_triangulation (const unsigned int     n_partitions,
+			     const SparsityPattern &cell_connection_graph,
+			     Triangulation<dim,spacedim>    &triangulation);
     
                                      /**
                                       * For each active cell, return in the
@@ -756,6 +758,37 @@ class GridTools
     create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
 				const Triangulation<dim, spacedim> &triangulation_2,
 				Triangulation<dim, spacedim>       &result);
+
+				     /**
+				      * Given a triangulation and a
+				      * list of cells whose children
+				      * have become distorted as a
+				      * result of mesh refinement, try
+				      * to fix these cells up by
+				      * moving the center node around.
+				      *
+				      * The function returns a list of
+				      * cells with distorted children
+				      * that couldn't be fixed up for
+				      * whatever reason. The returned
+				      * list is therefore a subset of
+				      * the input argument.
+				      *
+				      * For a definition of the
+				      * concept of distorted cells,
+				      * see the
+				      * @ref GlossDistorted "glossary entry".
+				      * The first argument passed to the
+				      * current function is typically
+				      * the exception thrown by the
+				      * Triangulation::execute_coarsening_and_refinement
+				      * function.
+				      */
+    template <int dim, int spacedim>
+    static
+    typename Triangulation<dim,spacedim>::DistortedCellList
+    fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
+				  Triangulation<dim,spacedim> &triangulation);
     
                                      /**
                                       * Exception

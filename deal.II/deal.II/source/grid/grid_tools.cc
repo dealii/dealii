@@ -31,6 +31,8 @@
 #include <multigrid/mg_dof_accessor.h>
 
 #include <cmath>
+#include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1232,6 +1234,258 @@ GridTools::create_union_triangulation (const Triangulation<dim, spacedim> &trian
 }
 
 
+namespace internal
+{
+  namespace GridTools
+  {
+    namespace FixUpDistortedChildCells
+    {
+      template <int dim, int spacedim>
+      double
+      objective_function (const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+			  const Point<spacedim> &cell_mid_point)
+      {
+					 // everything below is wrong
+					 // if not for the following
+					 // condition
+	Assert (cell->refinement_case() == RefinementCase<dim>::isotropic_refinement,
+		ExcNotImplemented());
+					 // first calculate the
+					 // average jacobian
+					 // determinant for the parent
+					 // cell
+	Point<spacedim> parent_vertices
+	  [GeometryInfo<dim>::vertices_per_cell];
+	double parent_determinants
+	  [GeometryInfo<dim>::vertices_per_cell];
+
+	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	  parent_vertices[i] = cell->vertex(i);
+
+	GeometryInfo<dim>::jacobian_determinants_at_vertices (parent_vertices,
+							      parent_determinants);
+
+	const double average_parent_jacobian
+	  = std::accumulate (&parent_determinants[0],
+			     &parent_determinants[GeometryInfo<dim>::vertices_per_cell],
+			     0.);
+	
+					 // now do the same
+					 // computation for the
+					 // children where we use the
+					 // given location for the
+					 // cell mid point instead of
+					 // the one the triangulation
+					 // currently reports
+	Point<spacedim> child_vertices
+	  [GeometryInfo<dim>::max_children_per_cell]
+	  [GeometryInfo<dim>::vertices_per_cell];
+	double child_determinants
+	  [GeometryInfo<dim>::max_children_per_cell]
+	  [GeometryInfo<dim>::vertices_per_cell];
+	
+	for (unsigned int c=0; c<cell->n_children(); ++c)
+	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	    child_vertices[c][i] = cell->child(c)->vertex(i);
+
+					 // replace mid-cell
+					 // vertex. note that for
+					 // child i, the mid-cell
+					 // vertex happens to have the
+					 // number
+					 // max_children_per_cell-i
+	for (unsigned int c=0; c<cell->n_children(); ++c)
+	  child_vertices[c][GeometryInfo<dim>::max_children_per_cell-c-1]
+	    = cell_mid_point;
+	
+	for (unsigned int c=0; c<cell->n_children(); ++c)
+	  GeometryInfo<dim>::jacobian_determinants_at_vertices (child_vertices[c],
+								child_determinants[c]);
+
+					 // on a uniformly refined
+					 // hypercube cell, the child
+					 // jacobians should all be
+					 // smaller by a factor of
+					 // 2^dim than the ones of the
+					 // parent. as a consequence,
+					 // we'll use the squared
+					 // deviation from this ideal
+					 // value as an objective
+					 // function
+	double objective = 0;
+	for (unsigned int c=0; c<cell->n_children(); ++c)
+	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	    objective += std::pow (child_determinants[c][i] -
+				   average_parent_jacobian/std::pow(2.,1.*dim),
+				   2);
+	
+	return objective;
+      }
+
+    }
+  }
+}
+
+
+
+template <int dim, int spacedim>
+typename Triangulation<dim,spacedim>::DistortedCellList
+GridTools::
+fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
+			      Triangulation<dim,spacedim> &/*triangulation*/)
+{
+  typename Triangulation<dim,spacedim>::DistortedCellList unfixable_subset;
+
+				   // loop over all cells that we have
+				   // to fix up
+  for (typename std::list<typename Triangulation<dim,spacedim>::active_cell_iterator>::const_iterator
+	 cell_ptr = distorted_cells.distorted_cells.begin();
+       cell_ptr != distorted_cells.distorted_cells.end(); ++cell_ptr)
+    {
+      const typename Triangulation<dim,spacedim>::cell_iterator
+	cell = *cell_ptr;
+
+				       // right now we can only deal
+				       // with cells that have been
+				       // refined isotropically
+				       // because that is the only
+				       // case where we have a cell
+				       // mid-point that can be moved
+				       // around without having to
+				       // consider boundary
+				       // information
+      Assert (cell->has_children(), ExcInternalError());      
+      Assert (cell->refinement_case() == RefinementCase<dim>::isotropic_refinement,
+	      ExcNotImplemented());
+
+				       // get the current location of
+				       // the cell mid-vertex:
+      Point<spacedim> cell_mid_point
+	= cell->child(0)->vertex (GeometryInfo<dim>::max_children_per_cell-1);
+
+				       // now do a few steepest
+				       // descent steps to reduce the
+				       // objective function
+      unsigned int iteration = 0;
+      do
+	{
+					   // choose a step length
+					   // that is initially 1/10
+					   // of the child cells'
+					   // diameter, and a sequence
+					   // whose sum does not
+					   // converge (to avoid
+					   // premature termination of
+					   // the iteration)
+	  const double step_length = cell->diameter() / 10 / (iteration + 1);
+      
+				       // compute the objective
+				       // function and its derivative
+	  const double val = internal::GridTools::FixUpDistortedChildCells::
+			     objective_function<dim,spacedim> (cell, cell_mid_point);
+
+	  Tensor<1,dim> gradient;
+	  for (unsigned int d=0; d<dim; ++d)
+	    {
+	      Point<dim> h;
+	      h[d] = step_length/2;
+	      gradient[d] = (internal::GridTools::FixUpDistortedChildCells::
+			     objective_function<dim,spacedim> (cell,
+							       cell_mid_point + h)
+			     -
+			     internal::GridTools::FixUpDistortedChildCells::
+			     objective_function<dim,spacedim> (cell,
+							       cell_mid_point - h))
+			    /
+			    step_length;
+	    }
+
+					   // so we need to go in
+					   // direction -gradient. the
+					   // optimal value of the
+					   // objective function is
+					   // zero, so assuming that
+					   // the model is quadratic
+					   // we would have to go
+					   // -2*val/||gradient|| in
+					   // this direction, make
+					   // sure we go at most
+					   // step_length into this
+					   // direction
+	  cell_mid_point -= std::min(2*val / (gradient*gradient),
+				     step_length / gradient.norm()) *
+			    gradient;
+
+	  ++iteration;
+	}
+      while (iteration < 10);
+
+
+				       // verify that the new location
+				       // is indeed better than the
+				       // one before in terms of the
+				       // minimal jacobian determinant
+      double old_min_jacobian, new_min_jacobian;
+
+      for (unsigned int test=0; test<2; ++test)
+	{
+	  Point<spacedim> child_vertices
+	    [GeometryInfo<dim>::max_children_per_cell]
+	    [GeometryInfo<dim>::vertices_per_cell];
+	  double child_determinants
+	    [GeometryInfo<dim>::max_children_per_cell]
+	    [GeometryInfo<dim>::vertices_per_cell];
+
+	  if (test == 1)
+	    for (unsigned int c=0; c<cell->n_children(); ++c)
+	      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+		child_vertices[c][i] = cell->child(c)->vertex(i);
+
+					   // replace mid-cell
+					   // vertex. note that for
+					   // child i, the mid-cell
+					   // vertex happens to have the
+					   // number
+					   // max_children_per_cell-i
+	  for (unsigned int c=0; c<cell->n_children(); ++c)
+	    child_vertices[c][GeometryInfo<dim>::max_children_per_cell-c-1]
+	      = cell_mid_point;
+	
+	  for (unsigned int c=0; c<cell->n_children(); ++c)
+	    GeometryInfo<dim>::jacobian_determinants_at_vertices (child_vertices[c],
+								  child_determinants[c]);
+	
+	  double min = child_determinants[0][0];
+	  for (unsigned int c=0; c<cell->n_children(); ++c)
+	    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	      min = std::min (min,
+			      child_determinants[c][i]);
+
+	  if (test == 0)
+	    old_min_jacobian = min;
+	  else
+	    new_min_jacobian = min;
+	}
+
+				       // if new minimum jacobian is
+				       // better than before, and if
+				       // it is positive, then set the
+				       // new mid point. otherwise
+				       // return this cell as one of
+				       // those that can't apparently
+				       // be fixed
+      if ((new_min_jacobian > old_min_jacobian)
+	  &&
+	  (new_min_jacobian > 0))
+	cell->child(0)->vertex (GeometryInfo<dim>::max_children_per_cell-1)
+	  = cell_mid_point;
+      else
+	unfixable_subset.distorted_cells.push_back (cell);
+    }
+  
+  return unfixable_subset;
+}
+
 
 
 // explicit instantiations
@@ -1318,6 +1572,13 @@ GridTools::create_union_triangulation (const Triangulation<deal_II_dimension> &t
 				       const Triangulation<deal_II_dimension> &triangulation_2,
 				       Triangulation<deal_II_dimension>       &result);
 
+template
+Triangulation<deal_II_dimension,deal_II_dimension>::DistortedCellList
+GridTools::
+fix_up_distorted_child_cells (const Triangulation<deal_II_dimension,deal_II_dimension>::DistortedCellList &distorted_cells,
+			      Triangulation<deal_II_dimension,deal_II_dimension> &triangulation);
+
+
 
 #if deal_II_dimension != 3
 
@@ -1340,7 +1601,6 @@ void GridTools::shift<deal_II_dimension, deal_II_dimension+1> (const Point<deal_
 template
 void GridTools::scale<deal_II_dimension, deal_II_dimension+1> (const double,
 					  Triangulation<deal_II_dimension, deal_II_dimension+1> &);
-
 
 
 #endif
