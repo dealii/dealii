@@ -138,9 +138,10 @@
  *
  * @image html distorted_2d_refinement_02.png "Cell after edge refinement"
  *
- * The last step is to compute the location of the new point in the
- * interior of the cell. By default, it is chosen as the average
- * location (arithmetic mean of the coordinates) of these 8 points:
+ * The last step is to compute the location of the new point in the interior
+ * of the cell. By default, it is chosen as the average location (arithmetic
+ * mean of the coordinates) of these 8 points (in 3d, the 26 surrounding
+ * points have different weights, but the idea is the same):
  *
  * @image html distorted_2d_refinement_03.png "Cell after edge refinement"
  *
