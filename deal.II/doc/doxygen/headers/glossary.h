@@ -119,11 +119,15 @@
  * with the caught exception.
  *
  * The second case in which distorted cells can appear is through mesh
- * refinement when we have curved boundaries. Consider, for example,
- * the following case where he dashed line shows the exact boundary
- * that the lower edge of the cell is supposed to approximate (let's
- * assume that the left, top and right edges are interior edges and
- * therefore will be considered as straight):
+ * refinement when we have curved boundaries. Consider, for example, the
+ * following case where the dashed line shows the exact boundary that the
+ * lower edge of the cell is supposed to approximate (let's assume for
+ * simplicity that the left, top and right edges are interior edges and
+ * therefore will be considered as straight; in fact, for this particular case
+ * in 2d where only one side of a cell is at the boundary we have special code
+ * that avoids the situation depicted, but you will get the general idea of
+ * the problem that holds in 3d or if more than one side of the cell is at the
+ * boundary):
  *
  * @image html distorted_2d_refinement_01.png "One cell with a edge approximating a curved boundary"
  *
