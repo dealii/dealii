@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,7 @@
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_out.h>
+#include <grid/grid_tools.h>
 #include <base/logstream.h>
 #include <cmath>
 #include <cstdlib>
@@ -39,7 +40,24 @@ void check (double r1, double r2, unsigned int n, bool)
   static const HyperShellBoundary<dim> boundary(center);
   tria.set_boundary(0, boundary);
 
-  tria.refine_global(2);
+  for (unsigned int i=0; i<2; ++i)
+    {
+      try
+	{
+	  tria.refine_global(1);
+	}
+      catch (typename Triangulation<dim>::DistortedCellList &dcv)
+	{
+	  deallog << "Found " << dcv.distorted_cells.size()
+		  << " distorted cells" << std::endl;
+      
+	  typename Triangulation<dim>::DistortedCellList
+	    subset = GridTools::fix_up_distorted_child_cells (dcv,
+							      tria);
+	  Assert (subset.distorted_cells.size() == 0,
+		  ExcInternalError());
+	}
+    }
   
   GridOut grid_out;
   GridOutFlags::DX flags;
