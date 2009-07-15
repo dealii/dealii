@@ -553,6 +553,7 @@ GridTools::scale (const double        scaling_factor,
 }
 
 
+
 template <int dim, template <int, int> class Container, int spacedim>
 unsigned int
 GridTools::find_closest_vertex (const Container<dim,spacedim> &container,
@@ -562,37 +563,37 @@ GridTools::find_closest_vertex (const Container<dim,spacedim> &container,
                                    // triangulation from the
                                    // container and determine vertices
                                    // and used vertices
-   const Triangulation<dim, spacedim> &tria = get_tria(container);
+  const Triangulation<dim, spacedim> &tria = get_tria(container);
 
-   const std::vector< Point<spacedim> > &vertices = tria.get_vertices();
-   const std::vector< bool       > &used     = tria.get_used_vertices();
+  const std::vector< Point<spacedim> > &vertices = tria.get_vertices();
+  const std::vector< bool       > &used     = tria.get_used_vertices();
 
                                    // At the beginning, the first
                                    // used vertex is the closest one
-   std::vector<bool>::const_iterator first =
-      std::find(used.begin(), used.end(), true);
+  std::vector<bool>::const_iterator first =
+    std::find(used.begin(), used.end(), true);
 
                                    // Assert that at least one vertex
                                    // is actually used
-   Assert(first != used.end(), ExcInternalError());
+  Assert(first != used.end(), ExcInternalError());
    
-   unsigned int best_vertex = std::distance(used.begin(), first);
-   double       best_dist   = (p - vertices[best_vertex]).square();
+  unsigned int best_vertex = std::distance(used.begin(), first);
+  double       best_dist   = (p - vertices[best_vertex]).square();
 
                                    // For all remaining vertices, test
                                    // whether they are any closer
-   for(unsigned int j = best_vertex+1; j < vertices.size(); j++)
-      if(used[j])
-         {
-            double dist = (p - vertices[j]).square();
-            if(dist < best_dist)
-               {
-                  best_vertex = j;
-                  best_dist   = dist;
-               }
-         }
+  for(unsigned int j = best_vertex+1; j < vertices.size(); j++)
+    if(used[j])
+      {
+	double dist = (p - vertices[j]).square();
+	if(dist < best_dist)
+	  {
+	    best_vertex = j;
+	    best_dist   = dist;
+	  }
+      }
 
-   return best_vertex;
+  return best_vertex;
 }
 
 
@@ -604,105 +605,107 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim,spacedim> &containe
                                    // make sure that the given vertex is
                                    // an active vertex of the underlying
                                    // triangulation
-   Assert(vertex < get_tria(container).n_vertices(),
-          ExcIndexRange(0,get_tria(container).n_vertices(),vertex));
-   Assert(get_tria(container).get_used_vertices()[vertex],
-          ExcVertexNotUsed(vertex));
+  Assert(vertex < get_tria(container).n_vertices(),
+	 ExcIndexRange(0,get_tria(container).n_vertices(),vertex));
+  Assert(get_tria(container).get_used_vertices()[vertex],
+	 ExcVertexNotUsed(vertex));
 
-				  // We use a set instead of a vector
-				  // to ensure that cells are inserted only 
-				  // once. A bug in the previous version 
-				  // prevented some cases to be 
-				  // treated correctly
-	     std::set<typename Container<dim,spacedim>::active_cell_iterator> adj_cells_set;
+				   // We use a set instead of a vector
+				   // to ensure that cells are inserted only 
+				   // once. A bug in the previous version 
+				   // prevented some cases to be 
+				   // treated correctly
+  std::set<typename Container<dim,spacedim>::active_cell_iterator> adj_cells_set;
    
-   typename Container<dim,spacedim>::active_cell_iterator
-      cell = container.begin_active(),
-      endc = container.end();
+  typename Container<dim,spacedim>::active_cell_iterator
+    cell = container.begin_active(),
+    endc = container.end();
    
                                    // go through all active cells and look
                                    // if the vertex is part of that cell
-   for (; cell != endc; ++cell)
-      for (unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
-         if (cell->vertex_index(v) == vertex)
-            {
-                                   // OK, we found a cell that contains
-                                   // the particular vertex. We add it
-                                   // to the list.
-               adj_cells_set.insert(cell);
+  for (; cell != endc; ++cell)
+    for (unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+      if (cell->vertex_index(v) == vertex)
+	{
+					   // OK, we found a cell that contains
+					   // the particular vertex. We add it
+					   // to the list.
+	  adj_cells_set.insert(cell);
 
-                                   // Now we need to make sure that the
-                                   // vertex is not a locally refined
-                                   // vertex not being part of the
-                                   // neighboring cells. So we loop over
-                                   // all faces to which this vertex
-                                   // belongs, check the level of
-                                   // the neighbor, and if it is coarser,
-                                   // then check whether the vertex is
-                                   // part of that neighbor or not.
-               for (unsigned vface = 0; vface < dim; vface++)
-                  {
-                     const unsigned face =
-                        GeometryInfo<dim>::vertex_to_face[v][vface];
-                     if (!cell->at_boundary(face))
-		       {
-			 typename Container<dim,spacedim>::cell_iterator
-                           nb = cell->neighbor(face);
+					   // Now we need to make sure that the
+					   // vertex is not a locally refined
+					   // vertex not being part of the
+					   // neighboring cells. So we loop over
+					   // all faces to which this vertex
+					   // belongs, check the level of
+					   // the neighbor, and if it is coarser,
+					   // then check whether the vertex is
+					   // part of that neighbor or not.
+	  for (unsigned vface = 0; vface < dim; vface++)
+	    {
+	      const unsigned face =
+		GeometryInfo<dim>::vertex_to_face[v][vface];
+	      if (!cell->at_boundary(face))
+		{
+		  typename Container<dim,spacedim>::cell_iterator
+		    nb = cell->neighbor(face);
                         
-							  // Here we
-							  // check
-							  // whether
-							  // the
-							  // neighbor
-							  // is
-							  // coarser. If
-							  // it is, we
-							  // search
-							  // for the
-							  // vertex in
-							  // this
-							  // coarser
-							  // cell and
-							  // only if
-							  // not found
-							  // we will
-							  // add the
-							  // coarser
-							  // cell
-							  // itself
-                           if (nb->level() < cell->level())
-			     {
-			       bool found = false;
-			       for (unsigned v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
-                                 if (nb->vertex_index(v) == vertex)
-				   {
-				     found = true;
-				     break;
-				   }
-			       if (!found)
-				   adj_cells_set.insert(nb);
-			     }
-		       }
-                  }
+						   // Here we
+						   // check
+						   // whether
+						   // the
+						   // neighbor
+						   // is
+						   // coarser. If
+						   // it is, we
+						   // search
+						   // for the
+						   // vertex in
+						   // this
+						   // coarser
+						   // cell and
+						   // only if
+						   // not found
+						   // we will
+						   // add the
+						   // coarser
+						   // cell
+						   // itself
+		  if (nb->level() < cell->level())
+		    {
+		      bool found = false;
+		      for (unsigned v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
+			if (nb->vertex_index(v) == vertex)
+			  {
+			    found = true;
+			    break;
+			  }
+		      if (!found)
+			adj_cells_set.insert(nb);
+		    }
+		}
+	    }
                
-               break;
-            }
+	  break;
+	}
    
-   std::vector<typename Container<dim,spacedim>::active_cell_iterator> adjacent_cells;
+  std::vector<typename Container<dim,spacedim>::active_cell_iterator>
+    adjacent_cells;
 
-					// We now produce the output vector
-					// from the set that we assembled above.
-   typename std::set<typename Container<dim,spacedim>::active_cell_iterator>::iterator 
-       it = adj_cells_set.begin(), 
-       endit = adj_cells_set.end();
-   for(; it != endit; ++it) 
-       adjacent_cells.push_back(*it);
+				   // We now produce the output vector
+				   // from the set that we assembled above.
+  typename std::set<typename Container<dim,spacedim>::active_cell_iterator>::iterator 
+    it = adj_cells_set.begin(), 
+    endit = adj_cells_set.end();
+  for(; it != endit; ++it) 
+    adjacent_cells.push_back(*it);
    
    
-   Assert(adjacent_cells.size() > 0, ExcInternalError());
+  Assert(adjacent_cells.size() > 0, ExcInternalError());
    
-   return adjacent_cells;
+  return adjacent_cells;
 }  
+
 
 
 template <int dim, template<int, int> class Container, int spacedim>
@@ -710,8 +713,8 @@ typename Container<dim,spacedim>::active_cell_iterator
 GridTools::find_active_cell_around_point (const Container<dim,spacedim>  &container,
                                           const Point<spacedim> &p)
 {
-   return find_active_cell_around_point(StaticMappingQ1<dim,spacedim>::mapping,
-					container, p).first;
+  return find_active_cell_around_point(StaticMappingQ1<dim,spacedim>::mapping,
+				       container, p).first;
 }
 
 
@@ -721,52 +724,52 @@ GridTools::find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping
                                           const Container<dim,spacedim> &container,
                                           const Point<spacedim>     &p)
 {
-   typedef typename Container<dim,spacedim>::active_cell_iterator cell_iterator;
+  typedef typename Container<dim,spacedim>::active_cell_iterator cell_iterator;
 
                                    // The best distance is set to the
                                    // maximum allowable distance from
                                    // the unit cell; we assume a
                                    // max. deviation of 1e-10
-   double best_distance = 1e-10;
-   int    best_level = -1;
-   std::pair<cell_iterator, Point<spacedim> > best_cell;
+  double best_distance = 1e-10;
+  int    best_level = -1;
+  std::pair<cell_iterator, Point<spacedim> > best_cell;
 
                                    // Find closest vertex and determine
                                    // all adjacent cells
-   unsigned int vertex = find_closest_vertex(container, p);
+  unsigned int vertex = find_closest_vertex(container, p);
    
-   std::vector<cell_iterator> adjacent_cells =
-      find_cells_adjacent_to_vertex(container, vertex);
+  std::vector<cell_iterator> adjacent_cells =
+    find_cells_adjacent_to_vertex(container, vertex);
 
-   typename std::vector<cell_iterator>::const_iterator
-      cell = adjacent_cells.begin(),
-      endc = adjacent_cells.end();
+  typename std::vector<cell_iterator>::const_iterator
+    cell = adjacent_cells.begin(),
+    endc = adjacent_cells.end();
 
-   for(; cell != endc; ++cell)
-      {
-         const Point<spacedim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
+  for(; cell != endc; ++cell)
+    {
+      const Point<spacedim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
 
-                                   // calculate the infinity norm of
-                                   // the distance vector to the unit cell.
-         const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+				       // calculate the infinity norm of
+				       // the distance vector to the unit cell.
+      const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
-                                   // We compare if the point is inside the
-                                   // unit cell (or at least not too far
-                                   // outside). If it is, it is also checked
-                                   // that the cell has a more refined state
-         if (dist < best_distance ||
-	     (dist == best_distance && (*cell)->level() > best_level))
-            {
-               best_distance = dist;
-               best_level    = (*cell)->level();
-               best_cell     = std::make_pair(*cell, p_cell);
-            }
-      }
+				       // We compare if the point is inside the
+				       // unit cell (or at least not too far
+				       // outside). If it is, it is also checked
+				       // that the cell has a more refined state
+      if (dist < best_distance ||
+	  (dist == best_distance && (*cell)->level() > best_level))
+	{
+	  best_distance = dist;
+	  best_level    = (*cell)->level();
+	  best_cell     = std::make_pair(*cell, p_cell);
+	}
+    }
 
-   Assert (best_cell.first.state() == IteratorState::valid,
-	   ExcPointNotFound<dim>(p));
+  Assert (best_cell.first.state() == IteratorState::valid,
+	  ExcPointNotFound<dim>(p));
 
-   return best_cell;
+  return best_cell;
 }
 
 
@@ -777,53 +780,53 @@ GridTools::find_active_cell_around_point (const hp::MappingCollection<dim,spaced
                                           const hp::DoFHandler<dim,spacedim> &container,
                                           const Point<spacedim>     &p)
 {
-   typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell_iterator;
+  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell_iterator;
 
                                    // The best distance is set to the
                                    // maximum allowable distance from
                                    // the unit cell; we assume a
                                    // max. deviation of 1e-10
-   double best_distance = 1e-10;
-   int    best_level = -1;
-   std::pair<cell_iterator, Point<spacedim> > best_cell;
+  double best_distance = 1e-10;
+  int    best_level = -1;
+  std::pair<cell_iterator, Point<spacedim> > best_cell;
 
                                    // Find closest vertex and determine
                                    // all adjacent cells
-   unsigned int vertex = find_closest_vertex(container, p);
+  unsigned int vertex = find_closest_vertex(container, p);
    
-   std::vector<cell_iterator> adjacent_cells =
-      find_cells_adjacent_to_vertex(container, vertex);
+  std::vector<cell_iterator> adjacent_cells =
+    find_cells_adjacent_to_vertex(container, vertex);
 
-   typename std::vector<cell_iterator>::const_iterator
-      cell = adjacent_cells.begin(),
-      endc = adjacent_cells.end();
+  typename std::vector<cell_iterator>::const_iterator
+    cell = adjacent_cells.begin(),
+    endc = adjacent_cells.end();
 
-   for(; cell != endc; ++cell)
-      {
-         const Point<spacedim> p_cell
-	   = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
+  for(; cell != endc; ++cell)
+    {
+      const Point<spacedim> p_cell
+	= mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
 
-                                   // calculate the infinity norm of
-                                   // the distance vector to the unit cell.
-         const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+				       // calculate the infinity norm of
+				       // the distance vector to the unit cell.
+      const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
-                                   // We compare if the point is inside the
-                                   // unit cell (or at least not too far
-                                   // outside). If it is, it is also checked
-                                   // that the cell has a more refined state
-         if (dist < best_distance ||
-	     (dist == best_distance && (*cell)->level() > best_level))
-            {
-               best_distance = dist;
-               best_level    = (*cell)->level();
-               best_cell     = std::make_pair(*cell, p_cell);
-            }
-      }
+				       // We compare if the point is inside the
+				       // unit cell (or at least not too far
+				       // outside). If it is, it is also checked
+				       // that the cell has a more refined state
+      if (dist < best_distance ||
+	  (dist == best_distance && (*cell)->level() > best_level))
+	{
+	  best_distance = dist;
+	  best_level    = (*cell)->level();
+	  best_cell     = std::make_pair(*cell, p_cell);
+	}
+    }
 
-   Assert (best_cell.first.state() == IteratorState::valid,
-	   ExcPointNotFound<dim>(p));
+  Assert (best_cell.first.state() == IteratorState::valid,
+	  ExcPointNotFound<dim>(p));
 
-   return best_cell;
+  return best_cell;
 }
 
 
