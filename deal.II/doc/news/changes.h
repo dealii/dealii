@@ -249,6 +249,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The CellAccessor::recursively_set_material_id function did not
+  set the material id for all children, but only for the first two, which
+  is obviously a bug. This should now be fixed.
+  <br>
+  (WB 2009/07/14)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Fixed: The GridIn class sometimes had problems with input files that had
   whitespace at the end of lines. This should now be fixed.
   <br>
