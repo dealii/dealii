@@ -1243,11 +1243,15 @@ namespace internal
   {
     namespace FixUpDistortedChildCells
     {
-      template <int dim, int spacedim>
+      template <typename Iterator, int spacedim>
       double
-      objective_function (const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+      objective_function (const Iterator &cell,
 			  const Point<spacedim> &cell_mid_point)
       {
+	const unsigned int dim = Iterator::AccessorType::structure_dimension;
+	Assert (spacedim == Iterator::AccessorType::dimension,
+		ExcInternalError());
+	
 					 // everything below is wrong
 					 // if not for the following
 					 // condition
@@ -1371,18 +1375,16 @@ namespace internal
       
 					     // compute the objective
 					     // function and its derivative
-	    const double val = objective_function<dim,spacedim> (cell, cell_mid_point);
+	    const double val = objective_function (cell, cell_mid_point);
 
 	    Tensor<1,dim> gradient;
 	    for (unsigned int d=0; d<dim; ++d)
 	      {
 		Point<dim> h;
 		h[d] = step_length/2;
-		gradient[d] = (objective_function<dim,spacedim> (cell,
-								 cell_mid_point + h)
+		gradient[d] = (objective_function (cell, cell_mid_point + h)
 			       -
-			       objective_function<dim,spacedim> (cell,
-								 cell_mid_point - h))
+			       objective_function (cell, cell_mid_point - h))
 			      /
 			      step_length;
 	      }
