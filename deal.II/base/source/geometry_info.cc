@@ -1684,6 +1684,17 @@ namespace internal
     }
 
 
+    inline
+    Tensor<1,3>
+    wedge_product_of_columns (const Tensor<1,3> (&derivative)[2])
+    {
+      Tensor<1,3> result;
+      cross_product (result, derivative[0], derivative[1]);
+
+      return result;
+    }
+    
+
 				     /**
 				      * Alternating form for quads in 3d.
 				      */
@@ -1695,11 +1706,40 @@ namespace internal
     {
 				       // for each of the vertices,
 				       // form the scaled normal
-				       // vector. since the mapping is
-				       // linear, all normals are the
-				       // same
-      (void)vertices;
-      (void)forms;
+				       // vector. to do so, we need to
+				       // see how the infinitesimal
+				       // vectors (d\xi_1,0) and (0,d\xi_2)
+				       // are transformed into
+				       // spacedim-dimensional space
+				       // and then form their cross
+				       // product. to this end, note that
+				       //    \vec x = sum_i \vec v_i phi_i(\vec xi)
+				       // so the transformed vectors are
+				       //   [x(\xi+(d\xi_1,0))-x(\xi)]/d\xi_1
+				       // and
+				       //   [x(\xi+(0,d\xi_2))-x(\xi)]/d\xi_2
+				       // which boils down to the columns
+				       // of the 3x2 matrix \grad_\xi x(\xi)
+      const unsigned int dim      = 2;
+      const unsigned int spacedim = 3;
+
+      for (unsigned int i=0; i<dealii::GeometryInfo<dim>::vertices_per_cell; ++i)
+	{
+	  Tensor<1,spacedim> derivatives[dim];
+      
+	  for (unsigned int j=0; j<dealii::GeometryInfo<dim>::vertices_per_cell; ++j)
+	    {
+	      const Tensor<1,dim> grad_phi_j
+		= (dealii::GeometryInfo<dim>::
+		   d_linear_shape_function_gradient (dealii::GeometryInfo<dim>::
+						     unit_cell_vertex(i),
+						     j));
+	      for (unsigned int l=0; l<dim; ++l)
+		derivatives[l] += vertices[j] * grad_phi_j[l];
+	    }
+
+	  forms[i] = wedge_product_of_columns (derivatives);
+	}
     }
   }
 }

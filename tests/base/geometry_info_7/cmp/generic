@@ -1,0 +1,163 @@
+
+DEAL::Checking in 2d
+DEAL::Reference cell: face 0: 1.00000 0.00000
+DEAL::Reference cell: face 0: 1.00000 0.00000
+DEAL::Reference cell: face 1: 1.00000 0.00000
+DEAL::Reference cell: face 1: 1.00000 0.00000
+DEAL::Reference cell: face 2: 0.00000 -1.00000
+DEAL::Reference cell: face 2: 0.00000 -1.00000
+DEAL::Reference cell: face 3: 0.00000 -1.00000
+DEAL::Reference cell: face 3: 0.00000 -1.00000
+DEAL::Squashed cell: face 0: 1.00000 0.00000
+DEAL::Squashed cell: face 0: 1.00000 0.00000
+DEAL::Squashed cell: face 1: 1.00000 0.00000
+DEAL::Squashed cell: face 1: 1.00000 0.00000
+DEAL::Squashed cell: face 2: 0.00000 -0.100000
+DEAL::Squashed cell: face 2: 0.00000 -0.100000
+DEAL::Squashed cell: face 3: 0.00000 -0.100000
+DEAL::Squashed cell: face 3: 0.00000 -0.100000
+DEAL::Squashed+rotated cell: face 0: 0.00000 -1.00000
+DEAL::Squashed+rotated cell: face 0: 0.00000 -1.00000
+DEAL::Squashed+rotated cell: face 1: 0.00000 -1.00000
+DEAL::Squashed+rotated cell: face 1: 0.00000 -1.00000
+DEAL::Squashed+rotated cell: face 2: -0.100000 0.00000
+DEAL::Squashed+rotated cell: face 2: -0.100000 0.00000
+DEAL::Squashed+rotated cell: face 3: -0.100000 0.00000
+DEAL::Squashed+rotated cell: face 3: -0.100000 0.00000
+DEAL::Pinched cell: face 0: 1.00000 0.00000
+DEAL::Pinched cell: face 0: 1.00000 0.00000
+DEAL::Pinched cell: face 1: 1.00000 -0.900000
+DEAL::Pinched cell: face 1: 1.00000 -0.900000
+DEAL::Pinched cell: face 2: 0.00000 -0.100000
+DEAL::Pinched cell: face 2: 0.00000 -0.100000
+DEAL::Pinched cell: face 3: 0.00000 -1.00000
+DEAL::Pinched cell: face 3: 0.00000 -1.00000
+DEAL::Inverted cell: face 0: 1.00000 1.00000
+DEAL::Inverted cell: face 0: 1.00000 1.00000
+DEAL::Inverted cell: face 1: 1.00000 -1.00000
+DEAL::Inverted cell: face 1: 1.00000 -1.00000
+DEAL::Inverted cell: face 2: 0.00000 1.00000
+DEAL::Inverted cell: face 2: 0.00000 1.00000
+DEAL::Inverted cell: face 3: 0.00000 -1.00000
+DEAL::Inverted cell: face 3: 0.00000 -1.00000
+DEAL::Checking in 3d
+DEAL::Reference cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Reference cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Reference cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Reference cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Reference cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Reference cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Reference cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Reference cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Reference cell: face 2: 0.00000 1.00000 0.00000
+DEAL::Reference cell: face 2: 0.00000 1.00000 0.00000
+DEAL::Reference cell: face 2: 0.00000 1.00000 0.00000
+DEAL::Reference cell: face 2: 0.00000 1.00000 0.00000
+DEAL::Reference cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Reference cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Reference cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Reference cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Reference cell: face 4: 0.00000 0.00000 1.00000
+DEAL::Reference cell: face 4: 0.00000 0.00000 1.00000
+DEAL::Reference cell: face 4: 0.00000 0.00000 1.00000
+DEAL::Reference cell: face 4: 0.00000 0.00000 1.00000
+DEAL::Reference cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Reference cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Reference cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Reference cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Squashed cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Squashed cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Squashed cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Squashed cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Squashed cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Squashed cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Squashed cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Squashed cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Squashed cell: face 2: 0.00000 0.100000 0.00000
+DEAL::Squashed cell: face 2: 0.00000 0.100000 0.00000
+DEAL::Squashed cell: face 2: 0.00000 0.100000 0.00000
+DEAL::Squashed cell: face 2: 0.00000 0.100000 0.00000
+DEAL::Squashed cell: face 3: 0.00000 0.100000 0.00000
+DEAL::Squashed cell: face 3: 0.00000 0.100000 0.00000
+DEAL::Squashed cell: face 3: 0.00000 0.100000 0.00000
+DEAL::Squashed cell: face 3: 0.00000 0.100000 0.00000
+DEAL::Squashed cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Squashed cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Squashed cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Squashed cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Squashed cell: face 5: 0.00000 0.00000 0.100000
+DEAL::Squashed cell: face 5: 0.00000 0.00000 0.100000
+DEAL::Squashed cell: face 5: 0.00000 0.00000 0.100000
+DEAL::Squashed cell: face 5: 0.00000 0.00000 0.100000
+DEAL::Squashed+rotated cell: face 0: 0.00000 -1.00000 0.00000
+DEAL::Squashed+rotated cell: face 0: 0.00000 -1.00000 0.00000
+DEAL::Squashed+rotated cell: face 0: 0.00000 -1.00000 0.00000
+DEAL::Squashed+rotated cell: face 0: 0.00000 -1.00000 0.00000
+DEAL::Squashed+rotated cell: face 1: 0.00000 -1.00000 0.00000
+DEAL::Squashed+rotated cell: face 1: 0.00000 -1.00000 0.00000
+DEAL::Squashed+rotated cell: face 1: 0.00000 -1.00000 0.00000
+DEAL::Squashed+rotated cell: face 1: 0.00000 -1.00000 0.00000
+DEAL::Squashed+rotated cell: face 2: 0.100000 0.00000 0.00000
+DEAL::Squashed+rotated cell: face 2: 0.100000 0.00000 0.00000
+DEAL::Squashed+rotated cell: face 2: 0.100000 0.00000 0.00000
+DEAL::Squashed+rotated cell: face 2: 0.100000 0.00000 0.00000
+DEAL::Squashed+rotated cell: face 3: 0.100000 0.00000 0.00000
+DEAL::Squashed+rotated cell: face 3: 0.100000 0.00000 0.00000
+DEAL::Squashed+rotated cell: face 3: 0.100000 0.00000 0.00000
+DEAL::Squashed+rotated cell: face 3: 0.100000 0.00000 0.00000
+DEAL::Squashed+rotated cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Squashed+rotated cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Squashed+rotated cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Squashed+rotated cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Squashed+rotated cell: face 5: 0.00000 0.00000 0.100000
+DEAL::Squashed+rotated cell: face 5: 0.00000 0.00000 0.100000
+DEAL::Squashed+rotated cell: face 5: 0.00000 0.00000 0.100000
+DEAL::Squashed+rotated cell: face 5: 0.00000 0.00000 0.100000
+DEAL::Pinched cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Pinched cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Pinched cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Pinched cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Pinched cell: face 1: 1.00000 -0.900000 -0.900000
+DEAL::Pinched cell: face 1: 1.00000 -0.900000 0.00000
+DEAL::Pinched cell: face 1: 1.00000 0.00000 -0.900000
+DEAL::Pinched cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Pinched cell: face 2: 0.00000 0.100000 0.00000
+DEAL::Pinched cell: face 2: 0.00000 1.00000 0.00000
+DEAL::Pinched cell: face 2: 0.00000 0.100000 0.00000
+DEAL::Pinched cell: face 2: 0.00000 1.00000 0.00000
+DEAL::Pinched cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Pinched cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Pinched cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Pinched cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Pinched cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Pinched cell: face 4: 0.00000 0.00000 0.100000
+DEAL::Pinched cell: face 4: 0.00000 0.00000 1.00000
+DEAL::Pinched cell: face 4: 0.00000 0.00000 1.00000
+DEAL::Pinched cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Pinched cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Pinched cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Pinched cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Inverted cell: face 0: 1.00000 1.00000 1.00000
+DEAL::Inverted cell: face 0: 1.00000 1.00000 0.00000
+DEAL::Inverted cell: face 0: 1.00000 0.00000 1.00000
+DEAL::Inverted cell: face 0: 1.00000 0.00000 0.00000
+DEAL::Inverted cell: face 1: 1.00000 -1.00000 -1.00000
+DEAL::Inverted cell: face 1: 1.00000 -1.00000 0.00000
+DEAL::Inverted cell: face 1: 1.00000 0.00000 -1.00000
+DEAL::Inverted cell: face 1: 1.00000 0.00000 0.00000
+DEAL::Inverted cell: face 2: 0.00000 -1.00000 0.00000
+DEAL::Inverted cell: face 2: 0.00000 1.00000 0.00000
+DEAL::Inverted cell: face 2: 0.00000 -1.00000 0.00000
+DEAL::Inverted cell: face 2: 0.00000 1.00000 0.00000
+DEAL::Inverted cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Inverted cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Inverted cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Inverted cell: face 3: 0.00000 1.00000 0.00000
+DEAL::Inverted cell: face 4: 0.00000 0.00000 -1.00000
+DEAL::Inverted cell: face 4: 0.00000 0.00000 -1.00000
+DEAL::Inverted cell: face 4: 0.00000 0.00000 1.00000
+DEAL::Inverted cell: face 4: 0.00000 0.00000 1.00000
+DEAL::Inverted cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Inverted cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Inverted cell: face 5: 0.00000 0.00000 1.00000
+DEAL::Inverted cell: face 5: 0.00000 0.00000 1.00000
