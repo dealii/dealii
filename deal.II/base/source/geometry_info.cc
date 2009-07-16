@@ -1629,117 +1629,48 @@ namespace internal
 {
   namespace GeometryInfo
   {
-    template <int dim>
+				     // wedge product of a single
+				     // vector in 2d: we just have to
+				     // rotate it by 90 degrees to the
+				     // right
     inline
-    void
-    alternating_form_at_vertices
-    (const Point<dim> (&vertices)[dealii::GeometryInfo<dim>::vertices_per_cell],
-     Tensor<0,dim> (&determinants)[dealii::GeometryInfo<dim>::vertices_per_cell])
+    Tensor<1,2>
+    wedge_product (const Tensor<1,2> (&derivative)[1])
     {
-				       // for each of the vertices, form the
-				       // Jacobian matrix and compute its
-				       // determinant
-				       //
-				       // note that the transformation is
-				       //    \vec x = sum_i \vec v_i phi_i(\vec xi)
-				       // and we have to take the gradient
-				       // with respect to \vec \xi.
-      for (unsigned int i=0; i<dealii::GeometryInfo<dim>::vertices_per_cell; ++i)
-	{
-	  Tensor<2,dim> jacobian;
-	  for (unsigned int j=0; j<dealii::GeometryInfo<dim>::vertices_per_cell; ++j)
-	    {
-	      Tensor<2,dim> x;
-	      outer_product (x,
-			     vertices[j],
-			     dealii::GeometryInfo<dim>::
-			     d_linear_shape_function_gradient (dealii::GeometryInfo<dim>::
-							       unit_cell_vertex(i),
-							       j));
-	      jacobian += x;
-	    }
+      Tensor<1,2> result;
+      result[0] = derivative[0][1];
+      result[1] = -derivative[0][0];
       
-	  determinants[i] = determinant (jacobian);
-	}
-    }
-
-				     /**
-				      * Alternating form for lines in 2d.
-				      */
-    inline
-    void
-    alternating_form_at_vertices
-    (const Point<2> (&vertices)[dealii::GeometryInfo<1>::vertices_per_cell],
-     Tensor<1,2> (&forms)[dealii::GeometryInfo<1>::vertices_per_cell])
-    {
-				       // for each of the vertices,
-				       // form the scaled normal
-				       // vector. since the mapping is
-				       // linear, all normals are the
-				       // same
-      const Point<2> d = vertices[1]-vertices[0];
-
-				       // choose the right normal
-      forms[0] = forms[1] = Point<2> (d[1], -d[0]);
+      return result;
     }
 
 
+				     // wedge product of 2 vectors in
+				     // 3d is the cross product
     inline
     Tensor<1,3>
-    wedge_product_of_columns (const Tensor<1,3> (&derivative)[2])
+    wedge_product (const Tensor<1,3> (&derivative)[2])
     {
       Tensor<1,3> result;
       cross_product (result, derivative[0], derivative[1]);
 
       return result;
     }
-    
 
-				     /**
-				      * Alternating form for quads in 3d.
-				      */
+
+				     // wedge product of dim vectors
+				     // in dim-d: that's the
+				     // determinant of the matrix
+    template <int dim>
     inline
-    void
-    alternating_form_at_vertices
-    (const Point<3> (&vertices)[dealii::GeometryInfo<2>::vertices_per_cell],
-     Tensor<1,3> (&forms)[dealii::GeometryInfo<2>::vertices_per_cell])
+    Tensor<0,dim>
+    wedge_product (const Tensor<1,dim> (&derivative)[dim])
     {
-				       // for each of the vertices,
-				       // form the scaled normal
-				       // vector. to do so, we need to
-				       // see how the infinitesimal
-				       // vectors (d\xi_1,0) and (0,d\xi_2)
-				       // are transformed into
-				       // spacedim-dimensional space
-				       // and then form their cross
-				       // product. to this end, note that
-				       //    \vec x = sum_i \vec v_i phi_i(\vec xi)
-				       // so the transformed vectors are
-				       //   [x(\xi+(d\xi_1,0))-x(\xi)]/d\xi_1
-				       // and
-				       //   [x(\xi+(0,d\xi_2))-x(\xi)]/d\xi_2
-				       // which boils down to the columns
-				       // of the 3x2 matrix \grad_\xi x(\xi)
-      const unsigned int dim      = 2;
-      const unsigned int spacedim = 3;
+      Tensor<2,dim> jacobian;
+      for (unsigned int i=0; i<dim; ++i)
+	jacobian[i] = derivative[i];
 
-      for (unsigned int i=0; i<dealii::GeometryInfo<dim>::vertices_per_cell; ++i)
-	{
-	  Tensor<1,spacedim> derivatives[dim];
-      
-	  for (unsigned int j=0; j<dealii::GeometryInfo<dim>::vertices_per_cell; ++j)
-	    {
-	      const Tensor<1,dim> grad_phi_j
-		= (dealii::GeometryInfo<dim>::
-		   d_linear_shape_function_gradient (dealii::GeometryInfo<dim>::
-						     unit_cell_vertex(i),
-						     j));
-	      for (unsigned int l=0; l<dim; ++l)
-		derivatives[l] += vertices[j] * grad_phi_j[l];
-	    }
-
-	  forms[i] = wedge_product_of_columns (derivatives);
-	}
+      return determinant (jacobian);
     }
   }
 }
@@ -1752,9 +1683,51 @@ GeometryInfo<dim>::
 alternating_form_at_vertices (const Point<spacedim> (&vertices)[vertices_per_cell],
 			      Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell])
 {
-				   // forward to a template that we
-				   // can specialize
-  internal::GeometryInfo::alternating_form_at_vertices (vertices, forms);
+				   // for each of the vertices,
+				   // compute the alternating form
+				   // of the mapped unit
+				   // vectors. consider for
+				   // example the case of a quad
+				   // in spacedim==3: to do so, we
+				   // need to see how the
+				   // infinitesimal vectors
+				   // (d\xi_1,0) and (0,d\xi_2)
+				   // are transformed into
+				   // spacedim-dimensional space
+				   // and then form their cross
+				   // product (i.e. the wedge product
+				   // of two vectors). to this end, note
+				   // that
+				   //    \vec x = sum_i \vec v_i phi_i(\vec xi)
+				   // so the transformed vectors are
+				   //   [x(\xi+(d\xi_1,0))-x(\xi)]/d\xi_1
+				   // and
+				   //   [x(\xi+(0,d\xi_2))-x(\xi)]/d\xi_2
+				   // which boils down to the columns
+				   // of the 3x2 matrix \grad_\xi x(\xi)
+				   //
+				   // a similar reasoning would
+				   // hold for all dim,spacedim
+				   // pairs -- we only have to
+				   // compute the wedge product of
+				   // the columns of the
+				   // derivatives
+  for (unsigned int i=0; i<vertices_per_cell; ++i)
+    {
+      Tensor<1,spacedim> derivatives[dim];
+      
+      for (unsigned int j=0; j<vertices_per_cell; ++j)
+	{
+	  const Tensor<1,dim> grad_phi_j
+	    = (
+	       d_linear_shape_function_gradient (unit_cell_vertex(i),
+						 j));
+	  for (unsigned int l=0; l<dim; ++l)
+	    derivatives[l] += vertices[j] * grad_phi_j[l];
+	}
+
+      forms[i] = internal::GeometryInfo::wedge_product (derivatives);
+    }
 }
 
 
