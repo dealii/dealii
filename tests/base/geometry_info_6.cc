@@ -38,7 +38,7 @@ void test ()
 
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-							  determinants);
+						     determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       {
 	deallog << "Reference cell: " << determinants[v]
@@ -59,7 +59,7 @@ void test ()
 
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-							  determinants);
+						     determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       {
 	deallog << "Squashed cell: " << determinants[v]
@@ -89,7 +89,7 @@ void test ()
 
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-							  determinants);
+						     determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       {
 	deallog << "Squashed+rotated cell: " << determinants[v]
@@ -107,7 +107,7 @@ void test ()
     
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-							  determinants);
+						     determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       deallog << "Pinched cell: " << determinants[v]
 	      << std::endl;
@@ -123,7 +123,7 @@ void test ()
     
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-							  determinants);
+						     determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       deallog << "Inverted cell: " << determinants[v]
 	      << std::endl;
