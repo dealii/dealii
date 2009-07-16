@@ -911,7 +911,7 @@ struct GeometryInfo<0>
  * point 0 towards point 1 and is always in one of the coordinate
  * directions
  * 
- * N4/ face lines in 3d are ordered, such that the induced 2d local
+ * N4) face lines in 3d are ordered, such that the induced 2d local
  * coordinate system (x,y) implies (right hand rule) a normal in
  * face normal direction, see N2/.
  *
@@ -1758,7 +1758,10 @@ struct GeometryInfo
 				      * cell vertex number of the
 				      * <tt>vertex</tt>th vertex of
 				      * face <tt>face</tt>, e.g.
-				      * <tt>GeometryInfo<2>::face_to_cell_vertices(3,0)=2</tt>.
+				      * <tt>GeometryInfo<2>::face_to_cell_vertices(3,0)=2</tt>,
+				      * see the image under point N4
+				      * in the 2d section of this
+				      * class's documentation.
 				      *
 				      * Through the <tt>face_orientation</tt>,
 				      * <tt>face_flip</tt> and
