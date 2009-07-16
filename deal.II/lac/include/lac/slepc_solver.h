@@ -56,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  * SLEPcWrappers depend, for additional explanations.
  *
  * @ingroup SLEPcWrappers
- * @author Toby D. Young 2008, 2009
+ * @author Toby D. Young and Rickard Armiento 2008, 2009
  */
 namespace SLEPcWrappers
 {
