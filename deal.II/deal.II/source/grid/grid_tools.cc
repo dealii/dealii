@@ -1243,88 +1243,109 @@ namespace internal
   {
     namespace FixUpDistortedChildCells
     {
+				       // compute the mean square
+				       // deviation of the alternating
+				       // forms of the children of the
+				       // given object from that of
+				       // the object itself. for
+				       // objects with
+				       // structdim==spacedim, the
+				       // alternating form is the
+				       // determinant of the jacobian,
+				       // whereas for faces with
+				       // structdim==spacedim-1, the
+				       // alternating form is the
+				       // (signed and scaled) normal
+				       // vector
+				       //
+				       // this average square
+				       // deviation is computed for an
+				       // object where the center node
+				       // has been replaced by the
+				       // second argument to this
+				       // function
       template <typename Iterator, int spacedim>
       double
-      objective_function (const Iterator &cell,
-			  const Point<spacedim> &cell_mid_point)
+      objective_function (const Iterator &object,
+			  const Point<spacedim> &object_mid_point)
       {
-	const unsigned int dim = Iterator::AccessorType::structure_dimension;
+	const unsigned int structdim = Iterator::AccessorType::structure_dimension;
 	Assert (spacedim == Iterator::AccessorType::dimension,
 		ExcInternalError());
 	
 					 // everything below is wrong
 					 // if not for the following
 					 // condition
-	Assert (cell->refinement_case() == RefinementCase<dim>::isotropic_refinement,
+	Assert (object->refinement_case() == RefinementCase<structdim>::isotropic_refinement,
 		ExcNotImplemented());
 					 // first calculate the
-					 // average jacobian
-					 // determinant for the parent
-					 // cell
+					 // average alternating form
+					 // for the parent cell/face
 	Point<spacedim> parent_vertices
-	  [GeometryInfo<dim>::vertices_per_cell];
-	Tensor<0,dim> parent_determinants
-	  [GeometryInfo<dim>::vertices_per_cell];
+	  [GeometryInfo<structdim>::vertices_per_cell];
+	Tensor<spacedim-structdim,spacedim> parent_alternating_forms
+	  [GeometryInfo<structdim>::vertices_per_cell];
 
-	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	  parent_vertices[i] = cell->vertex(i);
+	for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+	  parent_vertices[i] = object->vertex(i);
 
-	GeometryInfo<dim>::alternating_form_at_vertices (parent_vertices,
-							 parent_determinants);
+	GeometryInfo<structdim>::alternating_form_at_vertices (parent_vertices,
+							       parent_alternating_forms);
 
-	const double average_parent_jacobian
-	  = std::accumulate (&parent_determinants[0],
-			     &parent_determinants[GeometryInfo<dim>::vertices_per_cell],
-			     0.);
+	const Tensor<spacedim-structdim,spacedim>
+	  average_parent_alternating_form
+	  = std::accumulate (&parent_alternating_forms[0],
+			     &parent_alternating_forms[GeometryInfo<structdim>::vertices_per_cell],
+			     Tensor<spacedim-structdim,spacedim>());
 	
 					 // now do the same
 					 // computation for the
 					 // children where we use the
 					 // given location for the
-					 // cell mid point instead of
+					 // object mid point instead of
 					 // the one the triangulation
 					 // currently reports
 	Point<spacedim> child_vertices
-	  [GeometryInfo<dim>::max_children_per_cell]
-	  [GeometryInfo<dim>::vertices_per_cell];
-	Tensor<0,dim> child_determinants
-	  [GeometryInfo<dim>::max_children_per_cell]
-	  [GeometryInfo<dim>::vertices_per_cell];
+	  [GeometryInfo<structdim>::max_children_per_cell]
+	  [GeometryInfo<structdim>::vertices_per_cell];
+	Tensor<spacedim-structdim,spacedim> child_alternating_forms
+	  [GeometryInfo<structdim>::max_children_per_cell]
+	  [GeometryInfo<structdim>::vertices_per_cell];
 	
-	for (unsigned int c=0; c<cell->n_children(); ++c)
-	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	    child_vertices[c][i] = cell->child(c)->vertex(i);
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+	    child_vertices[c][i] = object->child(c)->vertex(i);
 
-					 // replace mid-cell
+					 // replace mid-object
 					 // vertex. note that for
-					 // child i, the mid-cell
+					 // child i, the mid-object
 					 // vertex happens to have the
 					 // number
 					 // max_children_per_cell-i
-	for (unsigned int c=0; c<cell->n_children(); ++c)
-	  child_vertices[c][GeometryInfo<dim>::max_children_per_cell-c-1]
-	    = cell_mid_point;
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  child_vertices[c][GeometryInfo<structdim>::max_children_per_cell-c-1]
+	    = object_mid_point;
 	
-	for (unsigned int c=0; c<cell->n_children(); ++c)
-	  GeometryInfo<dim>::alternating_form_at_vertices (child_vertices[c],
-							   child_determinants[c]);
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
+								 child_alternating_forms[c]);
 
 					 // on a uniformly refined
-					 // hypercube cell, the child
-					 // jacobians should all be
-					 // smaller by a factor of
-					 // 2^dim than the ones of the
-					 // parent. as a consequence,
-					 // we'll use the squared
-					 // deviation from this ideal
-					 // value as an objective
-					 // function
+					 // hypercube object, the child
+					 // alternating forms should
+					 // all be smaller by a factor
+					 // of 2^structdim than the
+					 // ones of the parent. as a
+					 // consequence, we'll use the
+					 // squared deviation from
+					 // this ideal value as an
+					 // objective function
 	double objective = 0;
-	for (unsigned int c=0; c<cell->n_children(); ++c)
-	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	    objective += std::pow (static_cast<double>(child_determinants[c][i]) -
-				   average_parent_jacobian/std::pow(2.,1.*dim),
-				   2);
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+	    objective += (child_alternating_forms[c][i] -
+			  average_parent_alternating_form/std::pow(2.,1.*structdim))
+			 .norm_square();
 	
 	return objective;
       }
@@ -1335,10 +1356,13 @@ namespace internal
 					* Try to fix up a single cell. Return
 					* whether we succeeded with this.
 					*/
-      template <int dim, int spacedim>
+      template <typename Iterator>
       bool
-      fix_up_cell (const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell)
+      fix_up_cell (const Iterator &cell)
       {
+	const unsigned int structdim = Iterator::AccessorType::structure_dimension;
+	const unsigned int spacedim  = Iterator::AccessorType::space_dimension;
+	
 					 // right now we can only deal
 					 // with cells that have been
 					 // refined isotropically
@@ -1349,13 +1373,13 @@ namespace internal
 					 // consider boundary
 					 // information
 	Assert (cell->has_children(), ExcInternalError());      
-	Assert (cell->refinement_case() == RefinementCase<dim>::isotropic_refinement,
+	Assert (cell->refinement_case() == RefinementCase<structdim>::isotropic_refinement,
 		ExcNotImplemented());
 
 					 // get the current location of
 					 // the cell mid-vertex:
 	Point<spacedim> cell_mid_point
-	  = cell->child(0)->vertex (GeometryInfo<dim>::max_children_per_cell-1);
+	  = cell->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1);
 
 					 // now do a few steepest
 					 // descent steps to reduce the
@@ -1377,10 +1401,10 @@ namespace internal
 					     // function and its derivative
 	    const double val = objective_function (cell, cell_mid_point);
 
-	    Tensor<1,dim> gradient;
-	    for (unsigned int d=0; d<dim; ++d)
+	    Tensor<1,spacedim> gradient;
+	    for (unsigned int d=0; d<spacedim; ++d)
 	      {
-		Point<dim> h;
+		Point<spacedim> h;
 		h[d] = step_length/2;
 		gradient[d] = (objective_function (cell, cell_mid_point + h)
 			       -
@@ -1419,15 +1443,15 @@ namespace internal
 	for (unsigned int test=0; test<2; ++test)
 	  {
 	    Point<spacedim> child_vertices
-	      [GeometryInfo<dim>::max_children_per_cell]
-	      [GeometryInfo<dim>::vertices_per_cell];
-	    Tensor<0,dim> child_determinants
-	      [GeometryInfo<dim>::max_children_per_cell]
-	      [GeometryInfo<dim>::vertices_per_cell];
+	      [GeometryInfo<structdim>::max_children_per_cell]
+	      [GeometryInfo<structdim>::vertices_per_cell];
+	    Tensor<spacedim-structdim,spacedim> child_determinants
+	      [GeometryInfo<structdim>::max_children_per_cell]
+	      [GeometryInfo<structdim>::vertices_per_cell];
 
 	    if (test == 1)
 	      for (unsigned int c=0; c<cell->n_children(); ++c)
-		for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+		for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
 		  child_vertices[c][i] = cell->child(c)->vertex(i);
 
 					     // replace mid-cell
@@ -1437,16 +1461,16 @@ namespace internal
 					     // number
 					     // max_children_per_cell-i
 	    for (unsigned int c=0; c<cell->n_children(); ++c)
-	      child_vertices[c][GeometryInfo<dim>::max_children_per_cell-c-1]
+	      child_vertices[c][GeometryInfo<structdim>::max_children_per_cell-c-1]
 		= cell_mid_point;
 	
 	    for (unsigned int c=0; c<cell->n_children(); ++c)
-	      GeometryInfo<dim>::alternating_form_at_vertices (child_vertices[c],
-							       child_determinants[c]);
+	      GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
+								     child_determinants[c]);
 	
 	    double min = child_determinants[0][0];
 	    for (unsigned int c=0; c<cell->n_children(); ++c)
-	      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	      for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
 		min = std::min<double> (min,
 					child_determinants[c][i]);
 
@@ -1467,7 +1491,7 @@ namespace internal
 	    &&
 	    (new_min_jacobian > 0))
 	  {
-	    cell->child(0)->vertex (GeometryInfo<dim>::max_children_per_cell-1)
+	    cell->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1)
 	      = cell_mid_point;
 	    return true;
 	  }
@@ -1493,7 +1517,7 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
   for (typename std::list<typename Triangulation<dim,spacedim>::cell_iterator>::const_iterator
 	 cell_ptr = distorted_cells.distorted_cells.begin();
        cell_ptr != distorted_cells.distorted_cells.end(); ++cell_ptr)
-    if (! internal::GridTools::FixUpDistortedChildCells::fix_up_cell<dim,spacedim> (*cell_ptr))
+    if (! internal::GridTools::FixUpDistortedChildCells::fix_up_cell (*cell_ptr))
       unfixable_subset.distorted_cells.push_back (*cell_ptr);
   
   return unfixable_subset;
