@@ -160,6 +160,43 @@ namespace TriaAccessorExceptions
 template <int structdim, int dim, int spacedim=dim>
 class TriaAccessorBase
 {
+  public:
+				     /**
+				      *  Dimension of the space the
+				      *  object represented by this
+				      *  accessor lives in. For
+				      *  example, if this accessor
+				      *  represents a quad that is
+				      *  part of a two-dimensional
+				      *  surface in four-dimensional
+				      *  space, then this value is
+				      *  four.
+				      */  
+    static const unsigned int space_dimension = spacedim; 
+
+				     /**
+				      * Dimensionality of the object
+				      * that the thing represented by
+				      * this accessopr is part of. For
+				      * example, if this accessor
+				      * represents a line that is part
+				      * of a hexahedron, then this
+				      * value will be three.
+				      */
+    static const unsigned int dimension = dim;
+
+				     /**
+				      * Dimensionality of the current
+				      * object represented by this
+				      * accessor. For example, if it
+				      * is line (irrespective of
+				      * whether it is part of a quad
+				      * or hex, and what dimension we
+				      * are in), then this value
+				      * equals 1.
+				      */
+    static const unsigned int structure_dimension = structdim;
+    
   protected:
 				     /**
 				      * Declare the data type that
@@ -345,15 +382,6 @@ class TriaAccessorBase
     
   private:
     
-				     /**
-				      *  Space dimension of the Accessor
-				      */  
-    static const unsigned int space_dimension = spacedim; 
-
-    static const unsigned int dimension = dim;
-
-    static const unsigned int structure_dimension = structdim;
-
     template <typename Accessor> friend class TriaRawIterator;
     template <typename Accessor> friend class TriaIterator;
     template <typename Accessor> friend class TriaActiveIterator;
@@ -392,6 +420,43 @@ class TriaAccessorBase
 template <int dim, int spacedim>
 class TriaAccessorBase<dim,dim,spacedim>
 {
+  public:
+				     /**
+				      *  Dimension of the space the
+				      *  object represented by this
+				      *  accessor lives in. For
+				      *  example, if this accessor
+				      *  represents a quad that is
+				      *  part of a two-dimensional
+				      *  surface in four-dimensional
+				      *  space, then this value is
+				      *  four.
+				      */  
+    static const unsigned int space_dimension = spacedim; 
+
+				     /**
+				      * Dimensionality of the object
+				      * that the thing represented by
+				      * this accessopr is part of. For
+				      * example, if this accessor
+				      * represents a line that is part
+				      * of a hexahedron, then this
+				      * value will be three.
+				      */
+    static const unsigned int dimension = dim;
+
+				     /**
+				      * Dimensionality of the current
+				      * object represented by this
+				      * accessor. For example, if it
+				      * is line (irrespective of
+				      * whether it is part of a quad
+				      * or hex, and what dimension we
+				      * are in), then this value
+				      * equals 1.
+				      */
+    static const unsigned int structure_dimension = dim;
+    
   protected:
 				     /**
 				      * Declare the data type that
@@ -579,15 +644,6 @@ class TriaAccessorBase<dim,dim,spacedim>
 				      *  which we act on.
 				      */
     const Triangulation<dim,spacedim> *tria;
-
-				     /**
-				      *  Space dimension of the Accessor
-				      */  
-    static const unsigned int space_dimension = spacedim; 
-
-    static const unsigned int dimension = dim;
-
-    static const unsigned int structure_dimension = dim;
 
   private:
     
