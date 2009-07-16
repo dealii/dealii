@@ -1179,6 +1179,22 @@ Tensor<1,dim>::memory_consumption ()
 
 
 /**
+ * Output operator for tensors of rank 0. Since such tensors are
+ * scalars, we simply print this one value.
+ *
+ * @relates Tensor<0,dim>
+ */
+template <int dim>
+inline
+std::ostream & operator << (std::ostream &out, const Tensor<0,dim> &p)
+{
+  out << static_cast<double>(p);
+  return out;
+}
+
+
+
+/**
  * Output operator for tensors of rank 1. Print the elements
  * consecutively, with a space in between.
  *
