@@ -1720,7 +1720,7 @@ alternating_form_at_vertices (const Point<spacedim> (&vertices)[vertices_per_cel
 	{
 	  const Tensor<1,dim> grad_phi_j
 	    = d_linear_shape_function_gradient (unit_cell_vertex(i),
-						j));
+						j);
 	  for (unsigned int l=0; l<dim; ++l)
 	    derivatives[l] += vertices[j] * grad_phi_j[l];
 	}
