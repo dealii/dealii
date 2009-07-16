@@ -136,7 +136,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: The GeometryInfo::jacobian_determinants_at_vertices can be used
+  New: The GeometryInfo::alternating_form_at_vertices can be used
   to investigate the degree of distortion of cells.
   <br>
   (WB 2009/06/28)

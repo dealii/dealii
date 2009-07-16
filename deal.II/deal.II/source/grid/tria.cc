@@ -1154,9 +1154,9 @@ namespace
 	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	  vertices[i] = cell->vertex(i);
 
-	double determinants[GeometryInfo<dim>::vertices_per_cell];
-	GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
-							      determinants);
+	Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+	GeometryInfo<dim>::alternating_form_at_vertices (vertices,
+							 determinants);
 
 	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	  if (determinants[i] <= 1e-9 * std::pow (cell->diameter(),
@@ -1212,9 +1212,9 @@ namespace
 	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	  vertices[i] = cell->child(c)->vertex(i);
 
-	double determinants[GeometryInfo<dim>::vertices_per_cell];
-	GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
-							      determinants);
+	Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+	GeometryInfo<dim>::alternating_form_at_vertices (vertices,
+							 determinants);
 
 	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	  if (determinants[i] <= 1e-9 * std::pow (cell->child(c)->diameter(),

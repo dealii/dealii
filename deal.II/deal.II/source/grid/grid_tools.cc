@@ -1259,14 +1259,14 @@ namespace internal
 					 // cell
 	Point<spacedim> parent_vertices
 	  [GeometryInfo<dim>::vertices_per_cell];
-	double parent_determinants
+	Tensor<0,dim> parent_determinants
 	  [GeometryInfo<dim>::vertices_per_cell];
 
 	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	  parent_vertices[i] = cell->vertex(i);
 
-	GeometryInfo<dim>::jacobian_determinants_at_vertices (parent_vertices,
-							      parent_determinants);
+	GeometryInfo<dim>::alternating_form_at_vertices (parent_vertices,
+							 parent_determinants);
 
 	const double average_parent_jacobian
 	  = std::accumulate (&parent_determinants[0],
@@ -1283,7 +1283,7 @@ namespace internal
 	Point<spacedim> child_vertices
 	  [GeometryInfo<dim>::max_children_per_cell]
 	  [GeometryInfo<dim>::vertices_per_cell];
-	double child_determinants
+	Tensor<0,dim> child_determinants
 	  [GeometryInfo<dim>::max_children_per_cell]
 	  [GeometryInfo<dim>::vertices_per_cell];
 	
@@ -1302,8 +1302,8 @@ namespace internal
 	    = cell_mid_point;
 	
 	for (unsigned int c=0; c<cell->n_children(); ++c)
-	  GeometryInfo<dim>::jacobian_determinants_at_vertices (child_vertices[c],
-								child_determinants[c]);
+	  GeometryInfo<dim>::alternating_form_at_vertices (child_vertices[c],
+							   child_determinants[c]);
 
 					 // on a uniformly refined
 					 // hypercube cell, the child
@@ -1318,7 +1318,7 @@ namespace internal
 	double objective = 0;
 	for (unsigned int c=0; c<cell->n_children(); ++c)
 	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	    objective += std::pow (child_determinants[c][i] -
+	    objective += std::pow (static_cast<double>(child_determinants[c][i]) -
 				   average_parent_jacobian/std::pow(2.,1.*dim),
 				   2);
 	
@@ -1419,7 +1419,7 @@ namespace internal
 	    Point<spacedim> child_vertices
 	      [GeometryInfo<dim>::max_children_per_cell]
 	      [GeometryInfo<dim>::vertices_per_cell];
-	    double child_determinants
+	    Tensor<0,dim> child_determinants
 	      [GeometryInfo<dim>::max_children_per_cell]
 	      [GeometryInfo<dim>::vertices_per_cell];
 
@@ -1439,14 +1439,14 @@ namespace internal
 		= cell_mid_point;
 	
 	    for (unsigned int c=0; c<cell->n_children(); ++c)
-	      GeometryInfo<dim>::jacobian_determinants_at_vertices (child_vertices[c],
-								    child_determinants[c]);
+	      GeometryInfo<dim>::alternating_form_at_vertices (child_vertices[c],
+							       child_determinants[c]);
 	
 	    double min = child_determinants[0][0];
 	    for (unsigned int c=0; c<cell->n_children(); ++c)
 	      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-		min = std::min (min,
-				child_determinants[c][i]);
+		min = std::min<double> (min,
+					child_determinants[c][i]);
 
 	    if (test == 0)
 	      old_min_jacobian = min;

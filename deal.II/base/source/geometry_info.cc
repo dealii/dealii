@@ -1625,35 +1625,96 @@ d_linear_shape_function_gradient (const Point<dim> &,
 
 
 
+namespace internal
+{
+  namespace GeometryInfo
+  {
+    template <int dim>
+    inline
+    void
+    alternating_form_at_vertices
+    (const Point<dim> (&vertices)[dealii::GeometryInfo<dim>::vertices_per_cell],
+     Tensor<0,dim> (&determinants)[dealii::GeometryInfo<dim>::vertices_per_cell])
+    {
+				       // for each of the vertices, form the
+				       // Jacobian matrix and compute its
+				       // determinant
+				       //
+				       // note that the transformation is
+				       //    \vec x = sum_i \vec v_i phi_i(\vec xi)
+				       // and we have to take the gradient
+				       // with respect to \vec \xi.
+      for (unsigned int i=0; i<dealii::GeometryInfo<dim>::vertices_per_cell; ++i)
+	{
+	  Tensor<2,dim> jacobian;
+	  for (unsigned int j=0; j<dealii::GeometryInfo<dim>::vertices_per_cell; ++j)
+	    {
+	      Tensor<2,dim> x;
+	      outer_product (x,
+			     vertices[j],
+			     dealii::GeometryInfo<dim>::
+			     d_linear_shape_function_gradient (dealii::GeometryInfo<dim>::
+							       unit_cell_vertex(i),
+							       j));
+	      jacobian += x;
+	    }
+      
+	  determinants[i] = determinant (jacobian);
+	}
+    }
+
+				     /**
+				      * Alternating form for lines in 2d.
+				      */
+    inline
+    void
+    alternating_form_at_vertices
+    (const Point<2> (&vertices)[dealii::GeometryInfo<1>::vertices_per_cell],
+     Tensor<1,2> (&forms)[dealii::GeometryInfo<1>::vertices_per_cell])
+    {
+				       // for each of the vertices,
+				       // form the scaled normal
+				       // vector. since the mapping is
+				       // linear, all normals are the
+				       // same
+      const Point<2> d = vertices[1]-vertices[0];
+
+				       // choose the right normal
+      forms[0] = forms[1] = Point<2> (d[1], -d[0]);
+    }
+
+
+				     /**
+				      * Alternating form for quads in 3d.
+				      */
+    inline
+    void
+    alternating_form_at_vertices
+    (const Point<3> (&vertices)[dealii::GeometryInfo<2>::vertices_per_cell],
+     Tensor<1,3> (&forms)[dealii::GeometryInfo<2>::vertices_per_cell])
+    {
+				       // for each of the vertices,
+				       // form the scaled normal
+				       // vector. since the mapping is
+				       // linear, all normals are the
+				       // same
+      (void)vertices;
+      (void)forms;
+    }
+  }
+}
+
+
 template <int dim>
+template <int spacedim>
 void
 GeometryInfo<dim>::
-jacobian_determinants_at_vertices (const Point<dim> (&vertices)[vertices_per_cell],
-				   double (&determinants)[vertices_per_cell])
+alternating_form_at_vertices (const Point<spacedim> (&vertices)[vertices_per_cell],
+			      Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell])
 {
-				   // for each of the vertices, form the
-				   // Jacobian matrix and compute its
-				   // determinant
-				   //
-				   // note that the transformation is
-				   //    \vec x = sum_i \vec v_i phi_i(\vec xi)
-				   // and we have to take the gradient
-				   // with respect to \vec \xi.
-  for (unsigned int i=0; i<vertices_per_cell; ++i)
-    {
-      Tensor<2,dim> jacobian;
-      for (unsigned int j=0; j<vertices_per_cell; ++j)
-	{
-	  Tensor<2,dim> x;
-	  outer_product (x,
-			 vertices[j],
-			 d_linear_shape_function_gradient (unit_cell_vertex(i),
-							   j));
-	  jacobian += x;
-	}
-      
-      determinants[i] = determinant (jacobian);
-    }
+				   // forward to a template that we
+				   // can specialize
+  internal::GeometryInfo::alternating_form_at_vertices (vertices, forms);
 }
 
 
@@ -1661,5 +1722,37 @@ template class GeometryInfo<1>;
 template class GeometryInfo<2>;
 template class GeometryInfo<3>;
 template class GeometryInfo<4>;
+
+template
+void
+GeometryInfo<1>::
+alternating_form_at_vertices (const Point<1> (&vertices)[vertices_per_cell],
+			      Tensor<1-1,1> (&forms)[vertices_per_cell]);
+
+template
+void
+GeometryInfo<1>::
+alternating_form_at_vertices (const Point<2> (&vertices)[vertices_per_cell],
+			      Tensor<2-1,2> (&forms)[vertices_per_cell]);
+
+template
+void
+GeometryInfo<2>::
+alternating_form_at_vertices (const Point<2> (&vertices)[vertices_per_cell],
+			      Tensor<2-2,2> (&forms)[vertices_per_cell]);
+
+template
+void
+GeometryInfo<2>::
+alternating_form_at_vertices (const Point<3> (&vertices)[vertices_per_cell],
+			      Tensor<3-2,3> (&forms)[vertices_per_cell]);
+
+template
+void
+GeometryInfo<3>::
+alternating_form_at_vertices (const Point<3> (&vertices)[vertices_per_cell],
+			      Tensor<3-3,3> (&forms)[vertices_per_cell]);
+
+
 
 DEAL_II_NAMESPACE_CLOSE

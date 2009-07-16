@@ -2041,15 +2041,68 @@ struct GeometryInfo
 				      const unsigned int i);
     
 				     /**
-				      * For a (bi-, tri-)linear mapping from
-				      * the reference cell, face, or edge to
-				      * the object specified by the given
-				      * vertices, compute the determinant of
-				      * the Jacobian at the vertices. Note
-				      * that it is the actual determinant, not
-				      * its absolute value as often used in
-				      * transforming integrals from one
-				      * coordinate system to another.
+				      * For a (bi-, tri-)linear
+				      * mapping from the reference
+				      * cell, face, or edge to the
+				      * object specified by the given
+				      * vertices, compute the
+				      * alternating form of the
+				      * transformed unit vectors
+				      * vertices. For an object of
+				      * dimensionality @p dim, there
+				      * are @p dim vectors with @p
+				      * spacedim components each, and
+				      * the alternating form is a
+				      * tensor of rank spacedim-dim
+				      * that corresponds to the wedge
+				      * product of the @p dim unit
+				      * vectors, and it corresponds to
+				      * the volume and normal vectors
+				      * of the mapping from reference
+				      * element to the element
+				      * described by the vertices.
+				      *
+				      * For example, if
+				      * dim==spacedim==2, then the
+				      * alternating form is a scalar
+				      * (because spacedim-dim=0) and
+				      * its value equals $\mathbf
+				      * v_1\wedge \mathbf v_2=\mathbf
+				      * v_1\cdot\mathbf v_2$. If
+				      * dim==spacedim==3, then the
+				      * result is again a scalar with
+				      * value $\mathbf v_1\wedge
+				      * \mathbf v_2 \wedge \mathbf v_3
+				      * = (\mathbf v_1\times \mathbf
+				      * v_2)\cdot \mathbf v_3$, where
+				      * $\mathbf v_1, \mathbf v_2,
+				      * \mathbf v_3$ are the images of
+				      * the unit vectors at a vertex
+				      * of the unit dim-dimensional
+				      * cell under transformation to
+				      * the dim-dimensional cell in
+				      * spacedim-dimensional space. In
+				      * both cases, i.e. for dim==2 or
+				      * 3, the result happens to equal
+				      * the determinant of the
+				      * Jacobian of the mapping from
+				      * reference cell to cell in real
+				      * space. Note that it is the
+				      * actual determinant, not its
+				      * absolute value as often used
+				      * in transforming integrals from
+				      * one coordinate system to
+				      * another. In particular, if the
+				      * object specified by the
+				      * vertices is a parallelogram
+				      * (i.e. a linear transformation
+				      * of the reference cell) then
+				      * the computed values are the
+				      * same at all vertices and equal
+				      * the (signed) area of the cell;
+				      * similarly, for
+				      * parallel-epipeds, it is the
+				      * volume of the cell.
 				      *
 				      * This function is used in order to
 				      * determine how distorted a cell is (see
@@ -2057,10 +2110,11 @@ struct GeometryInfo
 				      * @ref GlossDistorted "distorted cells"
 				      * in the glossary).
 				      */
+    template <int spacedim>
     static
     void
-    jacobian_determinants_at_vertices (const Point<dim> (&vertices)[vertices_per_cell],
-				       double (&determinants)[vertices_per_cell]);
+    alternating_form_at_vertices (const Point<spacedim> (&vertices)[vertices_per_cell],
+				  Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell]);
     
                                      /**
 				      * For each face of the reference

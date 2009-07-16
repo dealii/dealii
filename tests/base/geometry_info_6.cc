@@ -12,7 +12,7 @@
 //----------------------------  geometry_info_6.cc  ---------------------------
 
 
-// check GeometryInfo::jacobian_determinants_at_vertices
+// check GeometryInfo::alternating_form_at_vertices
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -36,14 +36,14 @@ void test ()
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
 
-    double determinants[GeometryInfo<dim>::vertices_per_cell];
-    GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
+    Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+    GeometryInfo<dim>::alternating_form_at_vertices (vertices,
 							  determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       {
 	deallog << "Reference cell: " << determinants[v]
 		<< std::endl;
-	Assert (determinants[v] == 1, ExcInternalError());
+	Assert (static_cast<double>(determinants[v]) == 1, ExcInternalError());
       }
   }
 
@@ -57,14 +57,14 @@ void test ()
 	vertices[v][0] /= 10;
       }
 
-    double determinants[GeometryInfo<dim>::vertices_per_cell];
-    GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
+    Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+    GeometryInfo<dim>::alternating_form_at_vertices (vertices,
 							  determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       {
 	deallog << "Squashed cell: " << determinants[v]
 		<< std::endl;
-	Assert (determinants[v] == 0.1, ExcInternalError());
+	Assert (static_cast<double>(determinants[v]) == 0.1, ExcInternalError());
       }
   }
 
@@ -87,14 +87,14 @@ void test ()
 	  }
       }
 
-    double determinants[GeometryInfo<dim>::vertices_per_cell];
-    GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
+    Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+    GeometryInfo<dim>::alternating_form_at_vertices (vertices,
 							  determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       {
 	deallog << "Squashed+rotated cell: " << determinants[v]
 		<< std::endl;
-	Assert (determinants[v] == 0.1, ExcInternalError());
+	Assert (static_cast<double>(determinants[v]) == 0.1, ExcInternalError());
       }
   }
 
@@ -105,8 +105,8 @@ void test ()
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     vertices[1] /= 10;
     
-    double determinants[GeometryInfo<dim>::vertices_per_cell];
-    GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
+    Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+    GeometryInfo<dim>::alternating_form_at_vertices (vertices,
 							  determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       deallog << "Pinched cell: " << determinants[v]
@@ -121,8 +121,8 @@ void test ()
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     std::swap (vertices[0], vertices[1]);
     
-    double determinants[GeometryInfo<dim>::vertices_per_cell];
-    GeometryInfo<dim>::jacobian_determinants_at_vertices (vertices,
+    Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+    GeometryInfo<dim>::alternating_form_at_vertices (vertices,
 							  determinants);
     for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
       deallog << "Inverted cell: " << determinants[v]
