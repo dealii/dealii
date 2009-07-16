@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,7 +41,237 @@ template <int dim> class Point;
 // general template; specialized for rank==1; the general template is in
 // tensor.h
 template <int rank, int dim> class Tensor;
+template <int dim> class Tensor<0,dim>;
 template <int dim> class Tensor<1,dim>;
+
+
+
+/**
+ * This class is a specialized version of the
+ * <tt>Tensor<rank,dim></tt> class.  It handles tensors of rank zero,
+ * i.e. scalars. The second template argument is ignored.
+ *
+ * This class exists because in some cases we want to construct
+ * objects of type Tensor@<spacedim-dim,dim@>, which should expand to
+ * scalars, vectors, matrices, etc, depending on the values of the
+ * template arguments @p dim and @p spacedim. We therefore need a
+ * class that acts as a scalar (i.e. @p double) for all purposes but
+ * is part of the Tensor template family.
+ *
+ * @ingroup geomprimitives
+ * @author Wolfgang Bangerth, 2009
+ */
+template <int dim>
+class Tensor<0,dim>
+{
+  public:
+				     /**
+				      * Provide a way to get the
+				      * dimension of an object without
+				      * explicit knowledge of it's
+				      * data type. Implementation is
+				      * this way instead of providing
+				      * a function <tt>dimension()</tt>
+				      * because now it is possible to
+				      * get the dimension at compile
+				      * time without the expansion and
+				      * preevaluation of an inlined
+				      * function; the compiler may
+				      * therefore produce more
+				      * efficient code and you may use
+				      * this value to declare other
+				      * data types.
+				      */
+    static const unsigned int dimension = dim;
+
+				     /**
+				      * Publish the rank of this tensor to
+				      * the outside world.
+				      */
+    static const unsigned int rank      = 0;
+
+				     /**
+				      * Type of stored objects. This
+				      * is a double for a rank 1 tensor.
+				      */
+
+    typedef double value_type;
+    
+				     /**
+				      * Constructor. Set to zero.
+				      */
+    Tensor ();
+
+				     /**
+				      * Copy constructor, where the
+				      * data is copied from a C-style
+				      * array.
+				      */
+    Tensor (const value_type &initializer);
+    
+    				     /**
+				      * Copy constructor.
+				      */
+    Tensor (const Tensor<0,dim> &);
+
+				     /**
+				      * Conversion to double. Since
+				      * rank-0 tensors are scalars,
+				      * this is a natural operation.
+				      */
+    operator double () const;
+
+				     /**
+				      * Conversion to double. Since
+				      * rank-0 tensors are scalars,
+				      * this is a natural operation.
+				      *
+				      * This is the non-const
+				      * conversion operator that
+				      * returns a writable reference.
+				      */
+    operator double& ();
+
+				     /**
+				      * Assignment operator.
+				      */
+    Tensor<0,dim> & operator = (const Tensor<0,dim> &);
+
+    				     /**
+				      * Assignment operator.
+				      */
+    Tensor<0,dim> & operator = (const double d);
+
+				     /**
+				      * Test for equality of two
+				      * tensors.
+				      */
+    bool operator == (const Tensor<0,dim> &) const;
+
+    				     /**
+				      * Test for inequality of two
+				      * tensors.
+				      */
+    bool operator != (const Tensor<0,dim> &) const;
+
+				     /**
+				      * Add another vector, i.e. move
+				      * this point by the given
+				      * offset.
+				      */
+    Tensor<0,dim> & operator += (const Tensor<0,dim> &);
+    
+				     /**
+				      * Subtract another vector.
+				      */
+    Tensor<0,dim> & operator -= (const Tensor<0,dim> &);
+
+				     /**
+				      * Scale the vector by
+				      * <tt>factor</tt>, i.e. multiply all
+				      * coordinates by <tt>factor</tt>.
+				      */
+    Tensor<0,dim> & operator *= (const double factor);
+
+				     /**
+				      * Scale the vector by <tt>1/factor</tt>.
+				      */
+    Tensor<0,dim> & operator /= (const double factor);
+
+				     /**
+				      * Returns the scalar product of
+				      * two vectors.
+				      */
+    double          operator * (const Tensor<0,dim> &) const;
+
+				     /**
+				      * Add two tensors. If possible,
+				      * use <tt>operator +=</tt> instead
+				      * since this does not need to
+				      * copy a point at least once.
+				      */
+    Tensor<0,dim>   operator + (const Tensor<0,dim> &) const;
+
+				     /**
+				      * Subtract two tensors. If
+				      * possible, use <tt>operator +=</tt>
+				      * instead since this does not
+				      * need to copy a point at least
+				      * once.
+				      */
+    Tensor<0,dim>   operator - (const Tensor<0,dim> &) const;
+
+				     /**
+				      * Tensor with inverted entries.
+				      */
+    Tensor<0,dim>   operator - () const;
+    
+                                     /**
+                                      * Return the Frobenius-norm of a
+                                      * tensor, i.e. the square root
+                                      * of the sum of squares of all
+                                      * entries. For the present case
+                                      * of rank-1 tensors, this equals
+                                      * the usual
+                                      * <tt>l<sub>2</sub></tt> norm of
+                                      * the vector.
+                                      */
+    double norm () const;
+
+                                     /**
+                                      * Return the square of the
+                                      * Frobenius-norm of a tensor,
+                                      * i.e. the square root of the
+                                      * sum of squares of all entries.
+				      *
+				      * This function mainly exists
+				      * because it makes computing the
+				      * norm simpler recursively, but
+				      * may also be useful in other
+				      * contexts.
+                                      */
+    double norm_square () const;
+
+				     /**
+				      * Reset all values to zero.
+				      *
+				      * Note that this is partly inconsistent
+				      * with the semantics of the @p clear()
+				      * member functions of the STL and of
+				      * several other classes within deal.II
+				      * which not only reset the values of
+				      * stored elements to zero, but release
+				      * all memory and return the object into
+				      * a virginial state. However, since the
+				      * size of objects of the present type is
+				      * determined by its template parameters,
+				      * resizing is not an option, and indeed
+				      * the state where all elements have a
+				      * zero value is the state right after
+				      * construction of such an object.
+				      */
+    void clear ();
+
+                                     /**
+                                      * Only tensors with a positive
+				      * dimension are implemented. This
+				      * exception is thrown by the
+				      * constructor if the template
+				      * argument <tt>dim</tt> is zero or
+				      * less.
+				      *
+				      * @ingroup Exceptions
+                                      */
+    DeclException1 (ExcDimTooSmall,
+                    int,
+                    << "dim must be positive, but was " << arg1);
+
+  private:
+				     /**
+				      * The value of this scalar object.
+				      */
+    double value;
+};
 
 
 /**
@@ -373,15 +603,216 @@ class Tensor<1,dim>
 
 
 				 /**
-				  *  Prints the values of this point in the
+				  *  Prints the value of this scalar.
+				  */
+template <int dim>
+std::ostream & operator << (std::ostream &out, const Tensor<0,dim> &p);
+
+				 /**
+				  *  Prints the values of this tensor in the
 				  *  form <tt>x1 x2 x3 etc</tt>.
 				  */
 template <int dim>
 std::ostream & operator << (std::ostream &out, const Tensor<1,dim> &p);
 
+
 #ifndef DOXYGEN
 
-/*------------------------------- Inline functions: Tensor ---------------------------*/
+/*---------------------------- Inline functions: Tensor<0,dim> ------------------------*/
+
+template <int dim>
+inline
+Tensor<0,dim>::Tensor ()
+{
+  Assert (dim>0, ExcDimTooSmall(dim));
+
+  value = 0;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim>::Tensor (const value_type &initializer)
+{
+  Assert (dim>0, ExcDimTooSmall(dim));
+
+  value = initializer;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim>::Tensor (const Tensor<0,dim> &p)
+{
+  Assert (dim>0, ExcDimTooSmall(dim));
+  
+  value = p.value;
+}
+
+
+
+
+template <int dim>
+inline
+Tensor<0,dim>::operator double () const
+{
+  return value;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim>::operator double & ()
+{
+  return value;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> & Tensor<0,dim>::operator = (const Tensor<0,dim> &p)
+{
+  value = p.value;
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> & Tensor<0,dim>::operator = (const double d)
+{
+  value = d;
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+bool Tensor<0,dim>::operator == (const Tensor<0,dim> &p) const
+{
+  return (value == p.value);
+}
+
+
+
+template <int dim>
+inline
+bool Tensor<0,dim>::operator != (const Tensor<0,dim> &p) const
+{
+  return !((*this) == p);
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> & Tensor<0,dim>::operator += (const Tensor<0,dim> &p)
+{
+  value += p.value;
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> & Tensor<0,dim>::operator -= (const Tensor<0,dim> &p)
+{
+  value -= p.value;
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> & Tensor<0,dim>::operator *= (const double s)
+{
+  value *= s;
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> & Tensor<0,dim>::operator /= (const double s)
+{
+  value /= s;
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+double Tensor<0,dim>::operator * (const Tensor<0,dim> &p) const
+{
+  return value*p.value;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> Tensor<0,dim>::operator + (const Tensor<0,dim> &p) const
+{
+  return value+p.value;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> Tensor<0,dim>::operator - (const Tensor<0,dim> &p) const
+{
+  return value-p.value;
+}
+
+
+
+template <int dim>
+inline
+Tensor<0,dim> Tensor<0,dim>::operator - () const
+{
+  return -value;
+}
+
+
+
+template <int dim>
+inline
+double Tensor<0,dim>::norm () const
+{
+  return std::abs (value);
+}
+
+
+
+template <int dim>
+inline
+double Tensor<0,dim>::norm_square () const
+{
+  return value*value;
+}
+
+
+
+template <int dim>
+inline
+void Tensor<0,dim>::clear ()
+{
+  value = 0;
+}
+
+
+/*---------------------------- Inline functions: Tensor<1,dim> ------------------------*/
 
 
 template <int dim>

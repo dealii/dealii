@@ -126,6 +126,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a specialization Tensor<0,dim> of tensors of rank 0. Since rank-0
+  tensors are scalars, this class essentially acts like a scalar, but it allows for
+  some neat template tricks that involve tensors of arbitrary rank.
+  <br>
+  (WB 2009/09/15)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The GeometryInfo::jacobian_determinants_at_vertices can be used
   to investigate the degree of distortion of cells.
   <br>
