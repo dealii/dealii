@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
   system.solve (A, B, lambda, x, n_eigenvectors);
  @endverbatim
  * for the generalized eigenvalue problem $Ax=B\lambda x$. See also
- * @ref step 36 "step-36" for a hands-on example.
+ * @ref step_36 "step-36" for a hands-on example.
  *
  * An alternative implementation to the one above is to use the API
  * internals directly within the application code. In this way the
