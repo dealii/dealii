@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -119,58 +119,46 @@ namespace internal
  * Minimal Residual Method. The stopping criterion is the norm of the
  * residual.
  *
- * You have to give the maximum number of temporary vectors to the
- * constructor which are to be used to do the orthogonalization. If
- * the number of iterations needed to solve the problem to the given
- * criterion, an intermediate solution is computed and a restart is
- * performed. If you don't want to use the restarted method, you can
- * limit the number of iterations (stated in the @p SolverControl
- * object given to the constructor) to be below the number of
- * temporary vectors minus three. Note the subtraction, which is due
- * to the fact that three vectors are used for other purposes, so the
- * number of iterations before a restart occurs is less by three than
- * the total number of temporary vectors. If the size of the matrix is
- * smaller than the maximum number of temporary vectors, then fewer
- * vectors are allocated since GMRES can then be used as a direct
- * solver.
+ * The AdditionalData structure contains the number of temporary
+ * vectors used. The size of the Arnoldi basis is this number minus
+ * three. Addinitonally, it allows you to choose bet right or left
+ * preconditioning. The default is left preconditioning. Finally it
+ * includes a flag indicating whether or not the default residual is
+ * used as stopping criterion.
+ 
+ * <h3>Left versus right preconditioning</h3>
  *
- * Note that restarts don't compensate temporary vectors very well,
- * i.e.  giving too few temporary vectors will increase the necessary
- * iteration steps greatly; it is not uncommon that you will need more
- * iterations than there are degrees of freedom in your solution
- * vector, if the number of temporary vectors is lower than the size
- * of the vector, even though GMRES is an exact solver if a sufficient
- * number of temporary vectors is given. You should therefore always
- * give as many temporary vectors as you can, unless you are limited
- * by the available memory; only then should you start to trade
- * computational speed against memory. One of the few other
- * possibilities is to use a good preconditioner.
+ * @p AdditionalData allows you to choose between left and right
+ * preconditioning. As expected, this switches between solving for the
+ * systems <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>,
+ * respectively.
  *
- * Like all other solver classes, this class has a local structure
- * called @p AdditionalData which is used to pass additional
- * parameters to the solver, like the number of temporary vectors for
- * example. We use this additional structure instead of passing these
- * values directly to the constructor because this makes the use of
- * the @p SolverSelector and other classes much easier and guarantees
- * that these will continue to work even if number or type of the
- * additional parameters for a certain solver changes.
+ * A second consequence is the type of residual which is used to
+ * measure convergence. With left preconditioning, this is the
+ * <b>preconditioned</b> residual, while with right preconditioning,
+ * it is the residual of the unpreconditioned system.
  *
- * For the GMRes method, the @p AdditionalData structure contains the number
- * of temporary vectors as commented upon above. By default, the number of
- * these vectors is set to 30. The @p AdditionalData also containes a flag
- * indicating the use of right or left preconditioning. The default is left
- * preconditioning. Finally it includes a flag indicating whether or not the
- * default residual is used as stopping criterion. By default, the left
- * preconditioned GMRes uses the preconditioned residual and the right
- * preconditioned GMRes uses the normal, i.e. unpreconditioned, residual as
- * stopping criterion. If the @p use_default_residual flag is @p false, the
- * left preconditioned GMRes uses as stopping criterion the unpreconditioned
- * residual and the right preconditioned GMRes the preconditioned
- * residual. But be aware that the non-default residuals are not automatically
- * computed by the GMRes method but need to be computed in addition. This
- * (especially for the left preconditioned GMRes) might lead to a significant
- * loss in the solver performance. Therefore, the user should set
- * <tt>use_default_residual=false</tt> only for debugging/testing purposes.
+ * Optionally, this behavior can be overridden by using the flag
+ * AdditionalData::use_default_residual. A <tt>true</tt> value refers
+ * to the behavior described in the previous paragraph, while
+ * <tt>false</tt> reverts it. Be aware though that additional
+ * residuals have to be computed in this case, impeding the overall
+ * performance of the solver.
+ *
+ * <h3>The size of the Arnoldi basis</h3>
+ *
+ * The maximal basis size is controlled by
+ * AdditionalData::max_n_tmp_vectors, and it is this number minus 2.
+ * If the number of iteration steps exceeds this number, all basis
+ * vectors are discarded and the iteration starts anew from the
+ * approximation obtained so far.
+ *
+ * Note that the minimizing property of GMRes only pertains to the
+ * Krylov space spanned by the Arnoldi basis. Therefore, restarted
+ * GMRes is <b>not</b> minimizing anymore. The choice of the basis
+ * length is a trade-off between memory consumption and convergence
+ * speed, since a longer basis means minimization over a larger
+ * space.
  *
  * For the requirements on matrices and vectors in order to work with
  * this class, see the documentation of the Solver base class.
@@ -192,11 +180,10 @@ class SolverGMRES : public Solver<VECTOR>
 					  * Constructor. By default, set the
 					  * number of temporary vectors to 30,
 					  * i.e. do a restart every
-					  * approximately 30 iterations. Also
+					  * 28 iterations. Also
 					  * set preconditioning from left and
 					  * the residual of the stopping
-					  * criterion to the default residual
-					  * (cf. class documentation).
+					  * criterion to the default residual.
 					  */
 	AdditionalData (const unsigned int max_n_tmp_vectors = 30,
                         const bool right_preconditioning = false,
@@ -204,20 +191,33 @@ class SolverGMRES : public Solver<VECTOR>
 	
 					 /**
 					  * Maximum number of
-					  * tmp vectors.
+					  * temporary vectors. This
+					  * parameter controls the
+					  * size of the Arnoldi basis,
+					  * which for historical
+					  * reasons is
+					  * #max_n_tmp_vectors-2.
 					  */
 	unsigned int    max_n_tmp_vectors;
 
 					 /**
 					  * Flag for right
 					  * preconditioning.
+					  *
+					  * @note Change between left
+					  * and right preconditioning
+					  * will also change the way
+					  * residuals are
+					  * evaluated. See the
+					  * corresponding section in
+					  * the SolverGMRES.
 					  */
 	bool right_preconditioning;
 
 					 /**
 					  * Flag for the default
-					  * residual that is used as
-					  * stopping criterion.
+					  * residual that is used to
+					  * measure convergence.
 					  */
 	bool use_default_residual;
     };
