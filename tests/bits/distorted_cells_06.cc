@@ -1,0 +1,126 @@
+//----------------------------  distorted_cells_06.cc  ---------------------------
+//    $Id$
+//    Version: $Name$ 
+//
+//    Copyright (C) 2003, 2004, 2005, 2009 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  distorted_cells_06.cc  ---------------------------
+
+
+// check that we can fix up faces if we get distorted cells because a
+// face is out of whack
+
+#include "../tests.h"
+#include <base/logstream.h>
+#include <base/quadrature_lib.h>
+#include <grid/tria.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <grid/grid_reordering.h>
+#include <grid/grid_tools.h>
+#include <grid/grid_generator.h>
+#include <grid/tria_boundary.h>
+#include <grid/grid_out.h>
+#include <dofs/dof_handler.h>
+#include <fe/fe_q.h>
+#include <fe/fe_values.h>
+
+#include <fstream>
+
+
+template <int dim>
+class MyBoundary : public Boundary<dim>
+{
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+      {
+	deallog << "Finding point between "
+		<< line->vertex(0) << " and "
+		<< line->vertex(1) << std::endl;
+
+	return Point<dim>(0,0.5,0.9);
+      }
+
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
+      {
+	Assert (false, ExcInternalError());
+	return Point<dim>(0,0,1.25);
+      }
+};
+
+
+
+template <int dim>
+void check ()
+{
+  MyBoundary<dim> my_boundary;
+  
+				   // create two cubes
+  Triangulation<dim> coarse_grid;
+
+  std::vector<unsigned int> sub(dim, 1);
+  sub[0] = 2;
+  Point<dim> p1 (-1,0,0), p2(1,1,1);
+  GridGenerator::subdivided_hyper_rectangle(coarse_grid, sub, p1, p2, true);
+  
+				   // set bottom middle edge to use MyBoundary
+  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    for (unsigned int e=0; e<GeometryInfo<dim-1>::faces_per_cell; ++e)
+      if (coarse_grid.begin_active()->face(f)->line(e)->center()[0] == 0)
+	if (coarse_grid.begin_active()->face(f)->line(e)->center()[1] == 0.5)
+	  if (coarse_grid.begin_active()->face(f)->line(e)->center()[2] == 0)
+	    coarse_grid.begin_active()->face(f)->line(e)->set_boundary_indicator (99);
+  coarse_grid.set_boundary (99, my_boundary);
+
+				   // now try to refine this one
+				   // cell. we should get an exception
+  try
+    {
+      coarse_grid.refine_global(1);
+    }
+  catch (typename Triangulation<dim>::DistortedCellList &dcv)
+    {
+      deallog << "Found " << dcv.distorted_cells.size() << " distorted cells"
+	      << std::endl;
+
+      Assert (dcv.distorted_cells.size() == 2,
+	      ExcInternalError());
+      
+      typename Triangulation<dim>::DistortedCellList
+	subset = GridTools::fix_up_distorted_child_cells (dcv,
+							  coarse_grid);
+      deallog << "Found " << subset.distorted_cells.size()
+	      << " cells that are still distorted"
+	      << std::endl;
+
+      Assert (subset.distorted_cells.size() == 0,
+	      ExcInternalError());
+    }
+
+  Assert (coarse_grid.n_levels() == 2, ExcInternalError());
+  Assert (coarse_grid.n_active_cells() == 2*1<<dim, ExcInternalError());
+
+				   // output the coordinates of the
+				   // child cells
+  GridOut().write_gnuplot (coarse_grid, deallog.get_file_stream());
+}
+
+
+int main () 
+{
+  std::ofstream logfile("distorted_cells_06/output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
+
+  check<3> ();
+}
+
+  
+  
