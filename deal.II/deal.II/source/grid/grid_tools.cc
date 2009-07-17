@@ -1358,7 +1358,7 @@ namespace internal
 					*/
       template <typename Iterator>
       bool
-      fix_up_cell (const Iterator &cell)
+      fix_up_object (const Iterator &object)
       {
 	const unsigned int structdim = Iterator::AccessorType::structure_dimension;
 	const unsigned int spacedim  = Iterator::AccessorType::space_dimension;
@@ -1372,14 +1372,14 @@ namespace internal
 					 // around without having to
 					 // consider boundary
 					 // information
-	Assert (cell->has_children(), ExcInternalError());      
-	Assert (cell->refinement_case() == RefinementCase<structdim>::isotropic_refinement,
+	Assert (object->has_children(), ExcInternalError());      
+	Assert (object->refinement_case() == RefinementCase<structdim>::isotropic_refinement,
 		ExcNotImplemented());
 
 					 // get the current location of
-					 // the cell mid-vertex:
-	Point<spacedim> cell_mid_point
-	  = cell->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1);
+					 // the object mid-vertex:
+	Point<spacedim> object_mid_point
+	  = object->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1);
 
 					 // now do a few steepest
 					 // descent steps to reduce the
@@ -1389,26 +1389,26 @@ namespace internal
 	  {
 					     // choose a step length
 					     // that is initially 1/10
-					     // of the child cells'
+					     // of the child objects'
 					     // diameter, and a sequence
 					     // whose sum does not
 					     // converge (to avoid
 					     // premature termination of
 					     // the iteration)
-	    const double step_length = cell->diameter() / 10 / (iteration + 1);
+	    const double step_length = object->diameter() / 10 / (iteration + 1);
       
 					     // compute the objective
 					     // function and its derivative
-	    const double val = objective_function (cell, cell_mid_point);
+	    const double val = objective_function (object, object_mid_point);
 
 	    Tensor<1,spacedim> gradient;
 	    for (unsigned int d=0; d<spacedim; ++d)
 	      {
 		Point<spacedim> h;
 		h[d] = step_length/2;
-		gradient[d] = (objective_function (cell, cell_mid_point + h)
+		gradient[d] = (objective_function (object, object_mid_point + h)
 			       -
-			       objective_function (cell, cell_mid_point - h))
+			       objective_function (object, object_mid_point - h))
 			      /
 			      step_length;
 	      }
@@ -1425,7 +1425,7 @@ namespace internal
 					     // sure we go at most
 					     // step_length into this
 					     // direction
-	    cell_mid_point -= std::min(2*val / (gradient*gradient),
+	    object_mid_point -= std::min(2*val / (gradient*gradient),
 				       step_length / gradient.norm()) *
 			      gradient;
 
@@ -1434,69 +1434,147 @@ namespace internal
 	while (iteration < 10);
 
 
-					 // verify that the new location
-					 // is indeed better than the
-					 // one before in terms of the
-					 // minimal jacobian determinant
-	double old_min_jacobian, new_min_jacobian;
+					 // verify that the new
+					 // location is indeed better
+					 // than the one before. check
+					 // this by comparing whether
+					 // the minimum value of the
+					 // products of parent and
+					 // child alternating forms is
+					 // positive. for cells this
+					 // means that the
+					 // determinants have the same
+					 // sign, for faces that the
+					 // face normals of parent and
+					 // children point in the same
+					 // general direction
+	double old_min_product, new_min_product;
 
 	for (unsigned int test=0; test<2; ++test)
 	  {
 	    Point<spacedim> child_vertices
 	      [GeometryInfo<structdim>::max_children_per_cell]
 	      [GeometryInfo<structdim>::vertices_per_cell];
+
+	    for (unsigned int c=0; c<object->n_children(); ++c)
+	      for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+		child_vertices[c][i] = object->child(c)->vertex(i);
+
+					     // replace mid-object
+					     // vertex. note that for
+					     // child i, the mid-object
+					     // vertex happens to have the
+					     // number
+					     // max_children_per_cell-i
+	    if (test == 1)
+	      for (unsigned int c=0; c<object->n_children(); ++c)
+		child_vertices[c][GeometryInfo<structdim>::max_children_per_cell-c-1]
+		  = object_mid_point;
+	
 	    Tensor<spacedim-structdim,spacedim> child_determinants
 	      [GeometryInfo<structdim>::max_children_per_cell]
 	      [GeometryInfo<structdim>::vertices_per_cell];
 
-	    if (test == 1)
-	      for (unsigned int c=0; c<cell->n_children(); ++c)
-		for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
-		  child_vertices[c][i] = cell->child(c)->vertex(i);
-
-					     // replace mid-cell
-					     // vertex. note that for
-					     // child i, the mid-cell
-					     // vertex happens to have the
-					     // number
-					     // max_children_per_cell-i
-	    for (unsigned int c=0; c<cell->n_children(); ++c)
-	      child_vertices[c][GeometryInfo<structdim>::max_children_per_cell-c-1]
-		= cell_mid_point;
-	
-	    for (unsigned int c=0; c<cell->n_children(); ++c)
+	    for (unsigned int c=0; c<object->n_children(); ++c)
 	      GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
 								     child_determinants[c]);
 	
 	    double min = child_determinants[0][0];
-	    for (unsigned int c=0; c<cell->n_children(); ++c)
+	    for (unsigned int c=0; c<object->n_children(); ++c)
 	      for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
 		min = std::min<double> (min,
 					child_determinants[c][i]);
 
 	    if (test == 0)
-	      old_min_jacobian = min;
+	      old_min_product = min;
 	    else
-	      new_min_jacobian = min;
+	      new_min_product = min;
 	  }
 
-					 // if new minimum jacobian is
+					 // if new minimum value is
 					 // better than before, and if
 					 // it is positive, then set the
 					 // new mid point. otherwise
-					 // return this cell as one of
+					 // return this object as one of
 					 // those that can't apparently
 					 // be fixed
-	if ((new_min_jacobian > old_min_jacobian)
+	if ((new_min_product > old_min_product)
 	    &&
-	    (new_min_jacobian > 0))
+	    (new_min_product > 0))
 	  {
-	    cell->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1)
-	      = cell_mid_point;
+	    object->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1)
+	      = object_mid_point;
 	    return true;
 	  }
 	else
 	  return false;
+      }
+    
+
+				       // possibly fix up the faces of
+				       // a cell by moving around its
+				       // mid-points
+      template <int structdim, int spacedim>
+      void fix_up_faces (const typename dealii::Triangulation<structdim,spacedim>::cell_iterator &cell)
+      {
+					 // see if we first can fix up
+					 // some of the faces of this
+					 // object. we can mess with
+					 // faces if and only if it is
+					 // not at the boundary (since
+					 // otherwise the location of
+					 // the face mid-point has been
+					 // determined by the boundary
+					 // object) and if the
+					 // neighboring cell is not even
+					 // more refined than we are
+					 // (since in that case the
+					 // sub-faces have themselves
+					 // children that we can't move
+					 // around any more). however,
+					 // the latter case shouldn't
+					 // happen anyway: if the
+					 // current face is distorted
+					 // but the neighbor is even
+					 // more refined, then the face
+					 // had been deformed before
+					 // already, and had been
+					 // ignored at the time; we
+					 // should then also be able to
+					 // ignore it this time as well
+	for (unsigned int f=0; f<GeometryInfo<structdim>::faces_per_cell; ++f)
+	  {
+	    Assert (cell->face(f)->has_children(), ExcInternalError());
+	    Assert (cell->face(f)->refinement_case() ==
+		    RefinementCase<structdim-1>::isotropic_refinement,
+		    ExcInternalError());
+
+	    if (cell->face(f)->at_boundary())
+	      continue;
+	  
+	    bool subface_is_more_refined = false;
+	    for (unsigned int g=0; g<GeometryInfo<structdim>::max_children_per_face; ++g)
+	      if (cell->face(f)->child(g)->has_children())
+		{
+		  subface_is_more_refined = true;
+		  break;
+		}
+
+	    if (subface_is_more_refined == true)
+	      continue;
+	  
+					     // so, now we finally know
+					     // that we can do something
+					     // about this face
+	    fix_up_object (cell->face(f));
+	  }
+      }
+
+
+      template <int structdim, int spacedim>
+      void fix_up_faces (const typename dealii::Triangulation<1,spacedim>::cell_iterator &)
+      {
+					 // nothing to do for the faces of cells in 1d
       }
     }
   }
@@ -1517,8 +1595,15 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
   for (typename std::list<typename Triangulation<dim,spacedim>::cell_iterator>::const_iterator
 	 cell_ptr = distorted_cells.distorted_cells.begin();
        cell_ptr != distorted_cells.distorted_cells.end(); ++cell_ptr)
-    if (! internal::GridTools::FixUpDistortedChildCells::fix_up_cell (*cell_ptr))
-      unfixable_subset.distorted_cells.push_back (*cell_ptr);
+    {
+      const typename Triangulation<dim,spacedim>::cell_iterator
+	cell = *cell_ptr;
+
+//      internal::GridTools::FixUpDistortedChildCells::fix_up_faces<dim,spacedim> (cell);
+      
+      if (! internal::GridTools::FixUpDistortedChildCells::fix_up_object (cell))
+	unfixable_subset.distorted_cells.push_back (cell);
+    }
   
   return unfixable_subset;
 }
