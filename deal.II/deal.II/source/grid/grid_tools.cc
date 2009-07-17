@@ -1450,6 +1450,16 @@ namespace internal
 					 // general direction
 	double old_min_product, new_min_product;
 
+	Point<spacedim> parent_vertices
+	  [GeometryInfo<structdim>::vertices_per_cell];
+	for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+	  parent_vertices[i] = object->vertex(i);
+
+	Tensor<spacedim-structdim,spacedim> parent_alternating_forms
+	  [GeometryInfo<structdim>::vertices_per_cell];
+	GeometryInfo<structdim>::alternating_form_at_vertices (parent_vertices,
+							       parent_alternating_forms);
+	
 	for (unsigned int test=0; test<2; ++test)
 	  {
 	    Point<spacedim> child_vertices
@@ -1471,19 +1481,21 @@ namespace internal
 		child_vertices[c][GeometryInfo<structdim>::max_children_per_cell-c-1]
 		  = object_mid_point;
 	
-	    Tensor<spacedim-structdim,spacedim> child_determinants
+	    Tensor<spacedim-structdim,spacedim> child_alternating_forms
 	      [GeometryInfo<structdim>::max_children_per_cell]
 	      [GeometryInfo<structdim>::vertices_per_cell];
 
 	    for (unsigned int c=0; c<object->n_children(); ++c)
 	      GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
-								     child_determinants[c]);
+								     child_alternating_forms[c]);
 	
-	    double min = child_determinants[0][0];
+	    double min = child_alternating_forms[0][0] * parent_alternating_forms[0];
 	    for (unsigned int c=0; c<object->n_children(); ++c)
 	      for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
-		min = std::min<double> (min,
-					child_determinants[c][i]);
+		for (unsigned int j=0; j<GeometryInfo<structdim>::vertices_per_cell; ++j)
+		min = std::min (min,
+				child_alternating_forms[c][i] *
+				parent_alternating_forms[j]);
 
 	    if (test == 0)
 	      old_min_product = min;
@@ -1570,12 +1582,20 @@ namespace internal
 	  }
       }
 
-
+#if deal_II_dimension == 1
       template <int structdim, int spacedim>
       void fix_up_faces (const typename dealii::Triangulation<1,spacedim>::cell_iterator &)
       {
 					 // nothing to do for the faces of cells in 1d
       }
+
+
+      template <int structdim, int spacedim>
+      void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &)
+      {
+					 // nothing to do for the faces of cells in 1d
+      }
+#endif
     }
   }
 }
@@ -1599,7 +1619,7 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
       const typename Triangulation<dim,spacedim>::cell_iterator
 	cell = *cell_ptr;
 
-//      internal::GridTools::FixUpDistortedChildCells::fix_up_faces<dim,spacedim> (cell);
+      internal::GridTools::FixUpDistortedChildCells::fix_up_faces<dim,spacedim> (cell);
       
       if (! internal::GridTools::FixUpDistortedChildCells::fix_up_object (cell))
 	unfixable_subset.distorted_cells.push_back (cell);
