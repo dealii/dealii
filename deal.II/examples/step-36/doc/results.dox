@@ -28,11 +28,10 @@ examples/step-36> make run
    Eigenvalue 3 : 19.8027
    Eigenvalue 4 : 24.837
 
-Job done.
-@endcode
-These eigenvalues are exactly the ones that correspond to pairs $(m,n)=(1,1)$,
-$(1,2)$ and $(2,1)$, $(2,2)$, and $(3,1)$. A visualization of the
-corresponding eigenfunctions would look like this:
+Job done.  @endcode These eigenvalues are exactly the ones that
+correspond to pairs $(m,n)=(1,1)$, $(1,2)$ and $(2,1)$, $(2,2)$, and
+$(3,1)$. A visualization of the corresponding eigenfunctions would
+look like this:
 
 <TABLE WIDTH="100%">
 <tr>
@@ -62,8 +61,6 @@ corresponding eigenfunctions would look like this:
 </tr>
 </table>
 
-
-
 <h2>Possibilities for extensions</h2>
 
 It is always worth playing a few games in the playground! So here goes
@@ -71,24 +68,25 @@ with a few suggestions:
 
 <ul> 
 
-<li> The potential used above (called the <i>infinite well</i> because it is a
-flat potential surrounded by infinitely high walls, see below) is interesting
-because it allows for analytically known solutions. Apart from that, it is
-rather boring, however. That said, it is trivial to play around with the
-potential by just setting it to something different in the input file. For
-example, let us assume that we wanted to work with the following potential in
+<li> The potential used above (called the <i>infinite well</i> because
+it is a flat potential surrounded by infinitely high walls) is
+interesting because it allows for analytically known solutions. Apart
+from that, it is rather boring, however. That said, it is trivial to
+play around with the potential by just setting it to something
+different in the input file. For example, let us assume that we wanted
+to work with the following potential in
 2d: 
 @f[
   V(x,y) = \left\{ 
        \begin{array}{ll}
          -100 & \text{if}\ \sqrt{x^2+y^2}<\frac 34 \ \text{and} 
-                         \ xy>0,
+                         \ xy>0
          \\
          -5 & \text{if}\ \sqrt{x^2+y^2}<\frac 34 \ \text{and} 
-                         \ xy\le 0,
+                         \ xy\le 0
          \\
-         0 & \text{otherwise.}
-      \end{array} \right.
+         0 & \text{otherwise}
+      \end{array} \right.\quad.
 @f]
 In other words, the potential is -100 in two sectors of a circle of radius
 0.75, -5 in the other two sectors, and zero outside the circle. We can achieve
@@ -149,20 +147,20 @@ The first five eigenfunctions are now like this:
 </tr>
 </table>
 
-
-<li> In our derivation of the problem we have assumed that the particle is
-confined to a domain $\Omega$ and that at the boundary of this domain its
-probability $|\Psi|^2$ of being is zero. This is equivalent to solving the
-eigenvalue problem on all of ${\mathbb R}^d$ and assuming that
-the energy potential is finite only inside a region $\Omega$ and infinite
-outside. It is relatively easy to show that $|\Psi(\mathbf x)|^2$ at all
-locations $\mathbf x$ where $V(\mathbf x)=\infty$. So the question is what
-happens if our potential is not of this form, i.e. there is no bounded domain
-outside of which the potential is infinite? In that case, it may be worth to
-just consider a very large domain at the boundary of which $V(\mathbf x)$ is
-at least very large, if not infinite. Play around with a few cases like this
-and explore how spectrum and eigenfunction change as we make the computational
-region larger and larger.
+<li> In our derivation of the problem we have assumed that the
+particle is confined to a domain $\Omega$ and that at the boundary of
+this domain its probability $|\Psi|^2$ of being is zero. This is
+equivalent to solving the eigenvalue problem on all of ${\mathbb R}^d$
+and assuming that the energy potential is finite only inside a region
+$\Omega$ and infinite outside. It is relatively easy to show that
+$|\Psi(\mathbf x)|^2$ at all locations $\mathbf x$ where $V(\mathbf
+x)=\infty$. So the question is what happens if our potential is not of
+this form, i.e. there is no bounded domain outside of which the
+potential is infinite? In that case, it may be worth to just consider
+a very large domain at the boundary of which $V(\mathbf x)$ is at
+least very large, if not infinite. Play around with a few cases like
+this and explore how the spectrum and eigenfunctions change as we make
+the computational region larger and larger.
 
 <li> What happens if we investigate the simple harmonic oscillator
 problem $V(\mathbf x)=c|\mathbf x|^2$? This potential is exactly of the form
@@ -171,6 +169,7 @@ domain to approximate the whole-space problem.
 
 <li> What happens if the particle in the box has <i>internal</i>
 degrees of freedom? For example, if the particle were a spin-$1/2$
-particle?</li>
+particle? In that case, we may want to start solving a vector-valued
+problem instead.</li>
 
 </ul>

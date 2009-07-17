@@ -90,10 +90,10 @@ class EigenvalueProblem
 				     // a mass matrix for the right
 				     // hand side. We also need not
 				     // just one solution function,
-				     // but a whole set of those for
+				     // but a whole set of these for
 				     // the eigenfunctions we want to
 				     // compute, along with the
-				     // corresponding eigenvectors:
+				     // corresponding eigenvalues:
     PETScWrappers::SparseMatrix        stiffness_matrix, mass_matrix;
     std::vector<PETScWrappers::Vector> eigenfunctions;
     std::vector<double>                eigenvalues;   
@@ -122,7 +122,7 @@ class EigenvalueProblem
 				 // @sect4{EigenvalueProblem::EigenvalueProblem}
 
 				 // First up, the constructor. The
-				 // main, new part is handling the
+				 // main new part is handling the
 				 // run-time input parameters. We need
 				 // to declare their existence first,
 				 // and then read their values from
@@ -258,22 +258,25 @@ void EigenvalueProblem<dim>::make_grid_and_dofs ()
 				 // \int_K \nabla\varphi_i(\mathbf x)
 				 // \cdot \nabla\varphi_j(\mathbf x) +
 				 // V(\mathbf x)\varphi_i(\mathbf
-				 // x)\varphi_j(\mathbf x)$. The
-				 // function should be immediately
-				 // familiar if you've seen previous
-				 // tutorial programs. The only thing
-				 // new would be setting up an object
-				 // that described the potential
-				 // $V(\mathbf x)$ using the
-				 // expression that we got from the
-				 // input file. We then need to
-				 // evaluate this object at the
-				 // quadrature points on each cell. If
-				 // you've seen how to evaluate
-				 // function objects (see, for example
-				 // the coefficient in step-5), the
-				 // code here will also look rather
-				 // familiar.
+				 // x)\varphi_j(\mathbf x)$ and
+				 // $M^K_{ij} = \int_K
+				 // \varphi_i(\mathbf
+				 // x)\varphi_j(\mathbf x)$
+				 // respectively. This function should
+				 // be immediately familiar if you've
+				 // seen previous tutorial
+				 // programs. The only thing new would
+				 // be setting up an object that
+				 // described the potential $V(\mathbf
+				 // x)$ using the expression that we
+				 // got from the input file. We then
+				 // need to evaluate this object at
+				 // the quadrature points on each
+				 // cell. If you've seen how to
+				 // evaluate function objects (see,
+				 // for example the coefficient in
+				 // step-5), the code here will also
+				 // look rather familiar.
 template <int dim>
 void EigenvalueProblem<dim>::assemble_system () 
 {  
@@ -467,6 +470,21 @@ void EigenvalueProblem<dim>::solve ()
 				 // visualization. It works as in many
 				 // of the other tutorial programs.
 				 //
+				 // The whole collection of functions
+				 // is then output as a single VTK
+				 // file.
+template <int dim>
+void EigenvalueProblem<dim>::output_results () const
+{
+  DataOut<dim> data_out;
+
+  data_out.attach_dof_handler (dof_handler);
+
+  for (unsigned int i=0; i<eigenfunctions.size(); ++i)
+    data_out.add_data_vector (eigenfunctions[i],
+			      std::string("eigenfunction_") +
+			      Utilities::int_to_string(i));
+
 				 // The only thing worth discussing
 				 // may be that because the potential
 				 // is specified as a function
@@ -483,23 +501,6 @@ void EigenvalueProblem<dim>::solve ()
 				 // space. The result we also attach
 				 // to the DataOut object for
 				 // visualization.
-				 //
-				 // The whole collection of functions
-				 // is then output as a single VTK
-				 // file.
-template <int dim>
-void EigenvalueProblem<dim>::output_results () const
-{
-  DataOut<dim> data_out;
-
-  data_out.attach_dof_handler (dof_handler);
-
-  for (unsigned int i=0; i<eigenfunctions.size(); ++i)
-    data_out.add_data_vector (eigenfunctions[i],
-			      std::string("eigenfunction_") +
-			      Utilities::int_to_string(i));
-
-				   // How does this work?
   Vector<double> projected_potential (dof_handler.n_dofs());
   {
     FunctionParser<dim> potential;
@@ -604,8 +605,10 @@ int main (int argc, char **argv)
       return 1;
     }
   
-				   // ...or show that we are happy by
-				   // exiting nicely:
+				   // If no exceptions are thrown,
+				   // then we can tell the program to
+				   // stop monkeying around and exit
+				   // nicely:
   std::cout << std::endl 
 	    << "Job done." 
 	    << std::endl;
