@@ -71,7 +71,7 @@
  * the reference cell to real cell has a Jacobian whose determinant is
  * non-positive somewhere in the cell. Typically, we only check the sign
  * of this determinant at the vertices of the cell. The function
- * GeometryInfo::jacobian_determinants_at_vertices computes these
+ * GeometryInfo::alternating_form_at_vertices computes these
  * determinants at the vertices.
  *
  * By way of example, if all of the determinants are of roughly equal value
