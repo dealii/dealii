@@ -2101,6 +2101,38 @@ struct GeometryInfo
 				      * parallel-epipeds, it is the volume of
 				      * the cell.
 				      *
+				      * Likewise, if we have dim==spacedim-1
+				      * (e.g. we have a quad in 3d space, or a
+				      * line in 2d), then the alternating
+				      * product denotes the normal vector
+				      * (i.e. a rank-1 tensor, since
+				      * spacedim-dim=1) to the object at each
+				      * vertex, where the normal vector's
+				      * magnitude denotes the area element of
+				      * the transformation from the reference
+				      * object to the object given by the
+				      * vertices. In particular, if again the
+				      * mapping from reference object to the
+				      * object under consideration here is
+				      * linear (not bi- or trilinear), then
+				      * the returned vectors are all
+				      * %parallel, perpendicular to the mapped
+				      * object described by the vertices, and
+				      * have a magnitude equal to the
+				      * area/volume of the mapped object. If
+				      * dim=1, spacedim=2, then the returned
+				      * value is $\mathbf v_1^\perp$, where
+				      * $\mathbf v_1$ is the image of the sole
+				      * unit vector of a line mapped to the
+				      * line in 2d given by the vertices; if
+				      * dim=2, spacedim=3, then the returned
+				      * values are $\mathbf v_1 \wedge \mathbf
+				      * v_2=\mathbf v_1 \times \mathbf v_2$
+				      * where $\mathbf v_1,\mathbf v_2$ are
+				      * the two three-dimensional vectors that
+				      * are tangential to the quad mapped into
+				      * three-dimensional space.
+				      *
 				      * This function is used in order to
 				      * determine how distorted a cell is (see
 				      * the entry on
