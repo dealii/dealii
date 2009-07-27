@@ -1459,49 +1459,52 @@ namespace internal
 	  [GeometryInfo<structdim>::vertices_per_cell];
 	GeometryInfo<structdim>::alternating_form_at_vertices (parent_vertices,
 							       parent_alternating_forms);
+
+	Point<spacedim> child_vertices
+	  [GeometryInfo<structdim>::max_children_per_cell]
+	  [GeometryInfo<structdim>::vertices_per_cell];
+
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+	    child_vertices[c][i] = object->child(c)->vertex(i);
+
+	Tensor<spacedim-structdim,spacedim> child_alternating_forms
+	  [GeometryInfo<structdim>::max_children_per_cell]
+	  [GeometryInfo<structdim>::vertices_per_cell];
+
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
+								 child_alternating_forms[c]);
 	
-	for (unsigned int test=0; test<2; ++test)
-	  {
-	    Point<spacedim> child_vertices
-	      [GeometryInfo<structdim>::max_children_per_cell]
-	      [GeometryInfo<structdim>::vertices_per_cell];
+	old_min_product = child_alternating_forms[0][0] * parent_alternating_forms[0];
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+	    for (unsigned int j=0; j<GeometryInfo<structdim>::vertices_per_cell; ++j)
+	      old_min_product = std::min (old_min_product,
+					  child_alternating_forms[c][i] *
+					  parent_alternating_forms[j]);
 
-	    for (unsigned int c=0; c<object->n_children(); ++c)
-	      for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
-		child_vertices[c][i] = object->child(c)->vertex(i);
-
+					     // for the new minimum value,
 					     // replace mid-object
-					     // vertex. note that for
-					     // child i, the mid-object
-					     // vertex happens to have the
-					     // number
+					     // vertex. note that for child
+					     // i, the mid-object vertex
+					     // happens to have the number
 					     // max_children_per_cell-i
-	    if (test == 1)
-	      for (unsigned int c=0; c<object->n_children(); ++c)
-		child_vertices[c][GeometryInfo<structdim>::max_children_per_cell-c-1]
-		  = object_mid_point;
-	
-	    Tensor<spacedim-structdim,spacedim> child_alternating_forms
-	      [GeometryInfo<structdim>::max_children_per_cell]
-	      [GeometryInfo<structdim>::vertices_per_cell];
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  child_vertices[c][GeometryInfo<structdim>::max_children_per_cell-c-1]
+	    = object_mid_point;
 
-	    for (unsigned int c=0; c<object->n_children(); ++c)
-	      GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
-								     child_alternating_forms[c]);
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
+								 child_alternating_forms[c]);
 	
-	    double min = child_alternating_forms[0][0] * parent_alternating_forms[0];
-	    for (unsigned int c=0; c<object->n_children(); ++c)
-	      for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
-		for (unsigned int j=0; j<GeometryInfo<structdim>::vertices_per_cell; ++j)
-		min = std::min (min,
-				child_alternating_forms[c][i] *
-				parent_alternating_forms[j]);
-
-	    if (test == 0)
-	      old_min_product = min;
-	    else
-	      new_min_product = min;
-	  }
+	new_min_product = child_alternating_forms[0][0] * parent_alternating_forms[0];
+	for (unsigned int c=0; c<object->n_children(); ++c)
+	  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+	    for (unsigned int j=0; j<GeometryInfo<structdim>::vertices_per_cell; ++j)
+	      new_min_product = std::min (new_min_product,
+					  child_alternating_forms[c][i] *
+					  parent_alternating_forms[j]);
 
 					 // if new minimum value is
 					 // better than before, and if
