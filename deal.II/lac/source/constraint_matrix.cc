@@ -744,7 +744,7 @@ void ConstraintMatrix::clear ()
 #ifdef DEAL_II_USE_TRILINOS
   {
 				   // reset distribute vector
-    vec_distribute.clear();
+    vec_distribute.reset();
   }
 #endif
   
@@ -1889,7 +1889,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 				   // constraints indicate. Do this only at
 				   // the first call and provide the class
 				   // with a vector for further use.
-  if (vec_distribute.size()!=vec.size())
+  if (&*vec_distribute!=0 || vec_distribute->size()!=vec.size())
     {
       std::vector<int> my_indices(vec.local_size());
       unsigned int index2 = 0;
@@ -1917,10 +1917,11 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
       my_indices.resize(index2);
 
       Epetra_Map map_exchange = Epetra_Map(-1,index2,(int*)&my_indices[0],0,vec.trilinos_vector().Comm());
-      vec_distribute.reinit(map_exchange);
+      vec_distribute = std::auto_ptr<TrilinosWrappers::MPI::Vector> 
+	(new TrilinosWrappers::MPI::Vector(map_exchange));
     }
 				   // here we import the data
-  vec_distribute.reinit(vec,false,true);
+  vec_distribute->reinit(vec,false,true);
 
   next_constraint = 
     std::lower_bound (lines.begin(),lines.end(),index_comparison);
@@ -1932,7 +1933,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 				       // different contributions
       double new_value = next_constraint->inhomogeneity;
       for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
-	new_value += (vec_distribute(next_constraint->entries[i].first) *
+	new_value += ((*vec_distribute)(next_constraint->entries[i].first) *
                       next_constraint->entries[i].second);
       vec(next_constraint->line) = new_value;
     }
