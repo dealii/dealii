@@ -71,19 +71,7 @@ inconvenience this causes.
    <br>
    (WB 2009/07/06)
    </p>
- 
-   <li>
-   <p> 
-   Changed: Previously, one had to give the two flags
-   <code>--enable-multithreading --with-multithreading</code> to
-   <code>./configure</code> to enable thread usage throughout the library.
-   This has now been simplified: only the flag <code>--enable-threads</code>
-   is now necessary. Furthermore, since most current machines have multiple
-   cores these days, the default is now to use threads. This can be switched
-   off using <code>--disable-threads</code>, however.
-   <br>
-   (WB 2008/09/29)
-   </p>
+   </li>
  
    <li>
    <p>
@@ -116,6 +104,20 @@ inconvenience this causes.
    (WB 2009/01/09)
    </p>
    </li>   
+
+   <li>
+   <p> 
+   Changed: Previously, one had to give the two flags
+   <code>--enable-multithreading --with-multithreading</code> to
+   <code>./configure</code> to enable thread usage throughout the library.
+   This has now been simplified: only the flag <code>--enable-threads</code>
+   is now necessary. Furthermore, since most current machines have multiple
+   cores these days, the default is now to use threads. This can be switched
+   off using <code>--disable-threads</code>, however.
+   <br>
+   (WB 2008/09/29)
+   </p>
+   </li>
 </ol>
 
 
@@ -130,7 +132,7 @@ inconvenience this causes.
   tensors are scalars, this class essentially acts like a scalar, but it allows for
   some neat template tricks that involve tensors of arbitrary rank.
   <br>
-  (WB 2009/09/15)
+  (WB 2009/07/15)
   </p>
   </li>
 
@@ -199,10 +201,24 @@ inconvenience this causes.
   (Toby D. Young 2009/06/25)
   </p>
   </li>
-</ol>
 
+  <li> 
+  <p> 
+  New: Based on work with Francisco Alvaro and Jose
+  E. Roman, the new SLEPcWrappers give a handle on some of the
+  features of SLEPc (Scalable Library for Eigenvalue Problem
+  Computations): (1) The SLEPcWrappers::SolverBase class can be used
+  for specifying an eigenvalue problem, either in standard or
+  generalized form, on serial or parallel architectures with support
+  for a few solver types; and (2) The
+  SLEPcWrappers::TransformationBase class encapsulates a variety of
+  spectral transformations providing some functionality required for
+  acceleration techniques based on the transformation of the spectrum.
+  <br> 
+  (Toby D. Young 2009/06/25) 
+  </p> 
+  </li>
 
-<ol>
   <li>
   <p>
   Fixed: The TrilinosWrappers::MPI::BlockVector class declares an assignment
@@ -232,18 +248,6 @@ inconvenience this causes.
   </p>
   </li>
 </ol>
-
-<ol> <li> <p> New: Based on work with Francisco Alvaro and Jose
-  E. Roman, the new SLEPcWrappers give a handle on some of the
-  features of SLEPc (Scalable Library for Eigenvalue Problem
-  Computations): (1) The SLEPcWrappers::SolverBase class can be used
-  for specifying an eigenvalue problem, either in standard or
-  generalized form, on serial or parallel architectures with support
-  for a few solver types; and (2) The
-  SLEPcWrappers::TransformationBase class encapsulates a variety of
-  spectral transformations providing some functionality required for
-  acceleration techniques based on the transformation of the spectrum.
-  <br> (Toby D. Young 2009/06/25) </p> </li> </ol>
 
 
 <a name="deal.II"></a>
