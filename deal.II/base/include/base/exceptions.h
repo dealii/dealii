@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -590,20 +590,20 @@ namespace StandardExceptions
 				    * where all allocated objects
 				    * should have been released. Since
 				    * this exception is thrown, some
-				    * where still allocated.
+				    * were still allocated.
 				    */
   DeclException1 (ExcMemoryLeak, int,
 		  << "Destroying memory handler while " << arg1
 		  << " objects are still allocated");
   
 				   /**
-				    * An error occured reading or
+				    * An error occurred reading or
 				    * writing a file.
 				    */
   DeclException0 (ExcIO);
 
 				   /**
-				    * An error occured opening the named file.
+				    * An error occurred opening the named file.
 				    *
 				    * The constructor takes a single
 				    * argument of type <tt>char*</tt>

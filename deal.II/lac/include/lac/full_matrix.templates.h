@@ -1281,6 +1281,7 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 	
 	break;
       }
+      
 
       default:
 					     // if no inversion is
@@ -1291,6 +1292,70 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 	    gauss_jordan();
     };    
 }
+
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::cholesky (const FullMatrix<number2> &A)
+{
+  Assert (!A.empty(), ExcEmptyMatrix());
+  Assert (A.n() == A.m(),
+	  ExcNotQuadratic());
+					// Matrix must be symmetric.
+  Assert(A.relative_symmetry_norm2() < 1.0e-10, ExcMessage("A must be symmetric."));
+
+  if (PointerComparison::equal(&A, this))
+    {
+				       // avoid overwriting source
+				       // by destination matrix:
+      FullMatrix<number2> A2 = A;
+      cholesky(A2);
+    }
+  else 
+    {
+				   /* reinit *this to 0 */
+      this->reinit(A.m(), A.n());
+
+      double SLik2 = 0.0, SLikLjk = 0.0;
+      for (unsigned int i=0; i< this->n_cols(); i++){
+	SLik2 = 0.0;
+	for (unsigned int j = 0; j < i; j++){
+	  SLik2 += (*this)(i,j)*(*this)(i,j);
+	  SLikLjk = 0.0;
+	  for (unsigned int k =0; k<j; k++)
+	    {
+	      SLikLjk = (*this)(i,k)*(*this)(j,k);
+	    };
+	  (*this)(i,j) = (1./(*this)(j,j))*(A(i,j) - SLikLjk);
+	}
+	AssertThrow (A(i,i) - SLik2 >= 0,
+		     ExcMatrixNotPositiveDefinite());
+	
+	(*this)(i,i) = std::sqrt(A(i,i) - SLik2);
+      }
+    }
+  }
+
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::outer_product (const Vector<number2> &V,
+				   const Vector<number2> &W)
+{
+  Assert (V.size() == W.size(), ExcMessage("Vectors V, W must be the same size."));
+  this->reinit(V.size(), V.size());
+
+  for(unsigned int i = 0; i<this->n(); i++)
+    {
+      for(unsigned int j = 0; j< this->n(); j++)
+	{
+	  (*this)(i,j) = V(i)*W(j);
+	}
+    }
+}
+
 
 template <typename number>
 template <typename number2>

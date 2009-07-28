@@ -195,6 +195,28 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There are new functions FullMatrix::cholesky and 
+  FullMatrix::outer_product.  FullMatrix::cholesky finds the Cholesky 
+  decomposition of a matrix in lower triangular form.  
+  FullMatrix::outer_product calculates <tt>*this</tt> $= VW^T$ where $V$ 
+  and $W$ are vectors.
+  <br>
+  (Jean Marie Linhart 2009/07/27)
+  </p>
+  </li>
+
+  <li>
+  <p>
+  Fixed: The TrilinosWrappers::MPI::BlockVector class declares an assignment
+  operator from the non-Trilinos BlockVector class but it could not be
+  compiled due to an oversight. This is now fixed.
+  <br>
+  (WB 2009/06/29)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: Based on work by Francisco Alvaro, the existing SLEPcWrappers now 
   have a handle on the generalized eigenvalue problem where B=I.
   <br>
@@ -217,16 +239,6 @@ inconvenience this causes.
   <br> 
   (Toby D. Young 2009/06/25) 
   </p> 
-  </li>
-
-  <li>
-  <p>
-  Fixed: The TrilinosWrappers::MPI::BlockVector class declares an assignment
-  operator from the non-Trilinos BlockVector class but it could not be
-  compiled due to an oversight. This is now fixed.
-  <br>
-  (WB 2009/06/29)
-  </p>
   </li>
 
   <li>

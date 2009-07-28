@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,13 +23,13 @@ for (S : REAL_SCALARS)
 
     template void FullMatrix<S>::copy_from<1>(
       Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
-						
+
     template void FullMatrix<S>::copy_from<2>(
       Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
-						
+
     template void FullMatrix<S>::copy_from<3>(
       Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
-						
+
     template void FullMatrix<S>::copy_to<1>(
       Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
 
@@ -116,6 +116,13 @@ for (S1, S2 : REAL_SCALARS)
     template
       void FullMatrix<S1>::precondition_Jacobi<S2> (
 	Vector<S2> &, const Vector<S2> &, const S1) const;
+
+    template
+      void FullMatrix<S1>::cholesky<S2> (const FullMatrix<S2>&);
+
+    template
+      void FullMatrix<S1>::outer_product<S2> (const Vector<S2>&,
+                                              const Vector<S2>&);
   }
 
 for (S1, S2, S3 : REAL_SCALARS)

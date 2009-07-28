@@ -772,7 +772,7 @@ class FullMatrix : public Table<2,number>
 	       const FullMatrix<number2> &B);
 
 				     /**
-				      * Add transose of a rectangular block.
+				      * Add transpose of a rectangular block.
 				      *
 				      * A rectangular block of the
 				      * matrix <tt>src</tt> is
@@ -940,6 +940,27 @@ class FullMatrix : public Table<2,number>
     template <typename number2>
     void invert (const FullMatrix<number2> &M);
 
+				     /**
+				      * Assign the Cholesky decomposition
+				      * of the given matrix to <tt>*this</tt>. 
+				      * The given matrix must be symmetric
+				      * positive definite.
+				      *
+				      * ExcMatrixNotPositiveDefinite
+				      * will be thrown in the case that the
+				      * matrix is not positive definite.
+				      */
+    template <typename number2>
+    void cholesky (const FullMatrix<number2> &A);
+
+				     /**
+				      * <tt>*this</tt> = $V W^T$ where $V,W$
+				      * are vectors of the same length.
+				      */
+    template <typename number2>
+    void outer_product (const Vector<number2> &V,
+			const Vector<number2> &W);
+    
 				     /**
 				      * Assign the left_inverse of the given matrix
 				      * to <tt>*this</tt>. The calculation being 
@@ -1234,6 +1255,10 @@ class FullMatrix : public Table<2,number>
                                       * Exception
                                       */
     DeclException0 (ExcSourceEqualsDestination);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcMatrixNotPositiveDefinite);
 				     //@}
     
     friend class Accessor;
