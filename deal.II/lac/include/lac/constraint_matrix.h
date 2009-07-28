@@ -1521,7 +1521,7 @@ class ConstraintMatrix : public Subscriptor
 				       * This vector is used to import data
 				       * within the distribute function.
 				       */
-    mutable std::auto_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
+    mutable std_cxx1x::shared_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
 #endif
 };
 

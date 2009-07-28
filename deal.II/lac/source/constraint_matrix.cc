@@ -1917,7 +1917,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
       my_indices.resize(index2);
 
       Epetra_Map map_exchange = Epetra_Map(-1,index2,(int*)&my_indices[0],0,vec.trilinos_vector().Comm());
-      vec_distribute = std::auto_ptr<TrilinosWrappers::MPI::Vector> 
+      vec_distribute = std_cxx1x::shared_ptr<TrilinosWrappers::MPI::Vector> 
 	(new TrilinosWrappers::MPI::Vector(map_exchange));
     }
 				   // here we import the data
