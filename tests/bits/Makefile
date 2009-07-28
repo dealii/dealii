@@ -103,9 +103,6 @@ tests_x = grid_generator_?? \
 	  count_dofs_per_block* \
 	  distorted_cells_*
 
-# tests for the hp branch:
-#	  fe_collection_*
-
 ifeq ($(USE_CONTRIB_METIS),yes)
   tests_x += metis_*
 endif
