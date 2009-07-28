@@ -329,6 +329,11 @@ class ConstraintMatrix : public Subscriptor
     ConstraintMatrix ();
 
 				     /**
+				      * Copy constructor
+				      */
+    ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
+
+				     /**
 				      * @name Adding constraints
 				      * @{
 				      */
@@ -1521,7 +1526,7 @@ class ConstraintMatrix : public Subscriptor
 				       * This vector is used to import data
 				       * within the distribute function.
 				       */
-    mutable std_cxx1x::shared_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
+    mutable std::auto_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
 #endif
 };
 
@@ -1534,6 +1539,19 @@ ConstraintMatrix::ConstraintMatrix ()
 		:
 		lines (),
 		sorted (false)
+{}
+
+
+
+inline
+ConstraintMatrix::ConstraintMatrix (const ConstraintMatrix &constraint_matrix)
+		:
+		lines (constraint_matrix.lines),
+		constraint_line_exists (constraint_matrix.constraint_line_exists),
+		sorted (constraint_matrix.sorted)
+#ifdef DEAL_II_USE_TRILINOS
+		,vec_distribute ()
+#endif
 {}
 
 
