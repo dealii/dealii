@@ -1546,6 +1546,7 @@ ConstraintMatrix::ConstraintMatrix ()
 inline
 ConstraintMatrix::ConstraintMatrix (const ConstraintMatrix &constraint_matrix)
 		:
+		Subscriptor (),
 		lines (constraint_matrix.lines),
 		constraint_line_exists (constraint_matrix.constraint_line_exists),
 		sorted (constraint_matrix.sorted)
