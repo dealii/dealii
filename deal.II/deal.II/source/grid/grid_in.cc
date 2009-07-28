@@ -583,7 +583,8 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 
       in >> version >> file_type >> data_size;
 
-      Assert (version == 2.0, ExcNotImplemented());
+      Assert ( (version >= 2.0) &&
+	       (version <= 2.1), ExcNotImplemented());
       Assert (file_type == 0, ExcNotImplemented());
       Assert (data_size == sizeof(double), ExcNotImplemented());
 
@@ -637,6 +638,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 	       ExcInvalidGMSHInput(line));
 
   in >> n_cells;
+  
 				   // set up array of cells
   std::vector<CellData<dim> > cells;
   SubCellData                 subcelldata;
@@ -842,7 +844,12 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 
   AssertThrow (in, ExcIO());
 
-				   // do some clean-up on vertices...
+				   // check that we actually read some
+				   // cells.
+  AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
+  
+				   // do some clean-up on
+				   // vertices...
   GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
   if(dim==spacedim)

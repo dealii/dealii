@@ -433,6 +433,9 @@ class GridIn
 		    << "3 Quadrilateral (4 nodes, 4 edges).\n"
 		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces).\n"
 		    << "15 Point (1 node, ignored when read)");
+
+    
+    DeclException0 (ExcGmshNoCellInformation);
   protected:
 				     /**
 				      * Store address of the triangulation to
