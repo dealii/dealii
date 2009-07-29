@@ -358,8 +358,8 @@ void EigenvalueProblem<dim>::assemble_system ()
 				   // representation can now be
 				   // compressed as no more entries
 				   // will be added:
-  stiffness_matrix.compress();
-  mass_matrix.compress();
+  stiffness_matrix.compress ();
+  mass_matrix.compress ();
 }
 
 
@@ -530,10 +530,10 @@ void EigenvalueProblem<dim>::run ()
   make_grid_and_dofs ();
 
   std::cout << "   Number of active cells:       "
-	    << triangulation.n_active_cells()
+	    << triangulation.n_active_cells ()
 	    << std::endl
 	    << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
+	    << dof_handler.n_dofs ()
 	    << std::endl
 	    << std::endl;
   
@@ -561,7 +561,7 @@ int main (int argc, char **argv)
 				       // initializes the PETSc work
 				       // space, run the whole
 				       // program, ...
-      SlepcInitialize (&argc,&argv,0,0);
+      SlepcInitialize (&argc, &argv, 0, 0);
 
       {
 	deallog.depth_console (0);
@@ -606,8 +606,8 @@ int main (int argc, char **argv)
     }
   
 				   // If no exceptions are thrown,
-				   // then we can tell the program to
-				   // stop monkeying around and exit
+				   // then we tell the program to stop
+				   // monkeying around and exit
 				   // nicely:
   std::cout << std::endl 
 	    << "Job done." 
