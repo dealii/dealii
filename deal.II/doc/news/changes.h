@@ -63,6 +63,16 @@ inconvenience this causes.
 <ol>
    <li>
    <p> 
+   New: There is now a new tutorial program, @ref step_36 "step-36",
+   contributed by Toby D. Young and Wolfgang Bangerth, that demonstrates
+   solving eigenvalue problems.
+   <br>
+   (Toby D. Young, WB 2009/07/29)
+   </p>
+   </li>
+ 
+   <li>
+   <p> 
    Changed: When configuring to use METIS for partitioning meshes in parallel,
    the METIS header files had to be modified by hand. In addition, with some
    MPI implementations one would get into trouble if <code>mpi.h</code>
