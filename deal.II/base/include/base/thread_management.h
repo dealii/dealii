@@ -653,15 +653,22 @@ namespace Threads
                                     * threads are created by directly
                                     * calling the respective functions
                                     * of the operating system
-                                    * (e.g. <tt>pthread_create</tt> for the
-                                    * POSIX thread interface), or if
-                                    * they are killed (e.g. either
-                                    * through <tt>pthread_exit</tt> from
-                                    * the spawned thread, or
-                                    * <tt>pthread_kill</tt> from another
-                                    * thread), then these events are
-                                    * not registered and counted for
-                                    * the result of this function.
+                                    * (e.g. <tt>pthread_create</tt>
+                                    * for the POSIX thread interface),
+                                    * or if they are killed
+                                    * (e.g. either through
+                                    * <tt>pthread_exit</tt> from the
+                                    * spawned thread, or
+                                    * <tt>pthread_kill</tt> from
+                                    * another thread), then these
+                                    * events are not registered and
+                                    * counted for the result of this
+                                    * function. Likewise, threads that
+                                    * the Threading Building Blocks
+                                    * library may have created to work
+                                    * on tasks created using the
+                                    * Threads::new_task functions are
+                                    * not counted.
 				    *
 				    * @ingroup threads
                                     */
