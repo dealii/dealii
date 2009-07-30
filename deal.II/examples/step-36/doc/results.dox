@@ -165,13 +165,23 @@ the computational region larger and larger.
 <li> What happens if we investigate the simple harmonic oscillator
 problem $V(\mathbf x)=c|\mathbf x|^2$? This potential is exactly of
 the form discussed in the previous paragraph and has hyper spherical
-symmetry. Oone may want to use a large spherical domain with a large
+symmetry. One may want to use a large spherical domain with a large
 outer radius, to approximate the whole-space problem (say, by invoking
 GridGenerator::hyper_ball).
+
+<li> The plots above show the wave function $\Psi(\mathbf x)$, but the
+physical quantity of interest is actually the probability density
+$|\Psi(\mathbf x)|^2$ for the particle to be at location $\mathbf x$.
+Some visualization programs can compute derived quantities from the data in
+an input file, but we can also do so right away when creating the output
+file. The facility to do that is the DataPostprocessor class that can
+be used in conjunction with the DataOut class. Examples of how this
+can be done can be found in @ref step_29 "step-29" and
+@ref step_33 "step-33".
 
 <li> What happens if the particle in the box has internal degrees of
 freedom? For example, if the particle were a spin-$1/2$ particle? In
 that case, we may want to start solving a vector-valued problem
-instead.</li>
+instead.
 
 </ul>
