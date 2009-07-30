@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,7 +73,7 @@ template <int dim, int space_dim> class Triangulation;
  *   around a given center point.
  *
  * @ingroup boundary
- *   @author Wolfgang Bangerth, 1999, 2001, Ralf Hartmann, 2001, 2008
+ * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008
  */
 template <int dim, int spacedim=dim>
 class Boundary : public Subscriptor
@@ -280,6 +280,46 @@ class Boundary : public Subscriptor
     virtual void
     get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
 			     FaceVertexNormals &face_vertex_normals) const;
+
+				     /**
+				      * Given a candidate point and a
+				      * line segment characterized by
+				      * the iterator, return a point
+				      * that lies on the surface
+				      * described by this object. This
+				      * function is used in some mesh
+				      * smoothing algorithms that try
+				      * to move around points in order
+				      * to improve the mesh quality
+				      * but need to ensure that points
+				      * that were on the boundary
+				      * remain on the boundary.
+				      *
+				      * Derived classes do not need to
+				      * implement this function unless
+				      * mesh smoothing algorithms are
+				      * used with a particular
+				      * boundary object. The default
+				      * implementation of this
+				      * function throws an exception
+				      * of type ExcPureFunctionCalled.
+				      */
+    virtual
+    Point<spacedim>
+    project_to_surface (const typename Triangulation<dim,spacedim>::line_iterator &line,
+			const Point<spacedim> &candidate) const;
+
+				     /**
+				      * Same function as above but for
+				      * a point that is to be
+				      * projected onto the area
+				      * characterized by the given
+				      * quad.
+				      */
+    virtual
+    Point<spacedim>
+    project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
+			const Point<spacedim> &candidate) const;
 };
 
 
@@ -387,6 +427,50 @@ class StraightBoundary : public Boundary<dim,spacedim>
     virtual void
     get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
 			     typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
+
+				     /**
+				      * Given a candidate point and a
+				      * line segment characterized by
+				      * the iterator, return a point
+				      * that lies on the surface
+				      * described by this object. This
+				      * function is used in some mesh
+				      * smoothing algorithms that try
+				      * to move around points in order
+				      * to improve the mesh quality
+				      * but need to ensure that points
+				      * that were on the boundary
+				      * remain on the boundary.
+				      *
+				      * The point returned is the
+				      * projection of the candidate
+				      * point onto the line through
+				      * the two vertices of the given
+				      * line iterator.
+				      */
+    virtual
+    Point<spacedim>
+    project_to_surface (const typename Triangulation<dim,spacedim>::line_iterator &line,
+			const Point<spacedim> &candidate) const;
+
+				     /**
+				      * Same function as above but for
+				      * a point that is to be
+				      * projected onto the area
+				      * characterized by the given
+				      * quad.
+				      *
+				      * The point returned is the
+				      * projection of the candidate
+				      * point onto the bilinear
+				      * surface spanned by the four
+				      * vertices of the given quad
+				      * iterator.
+				      */
+    virtual
+    Point<spacedim>
+    project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
+			const Point<spacedim> &candidate) const;
 };
 
 

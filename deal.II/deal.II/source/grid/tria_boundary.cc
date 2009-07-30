@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -159,6 +159,30 @@ get_normals_at_vertices (const typename Triangulation<dim, spacedim>::face_itera
 			 FaceVertexNormals                                &) const
 {
   Assert (false, ExcPureFunctionCalled());
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+Boundary<dim, spacedim>::
+project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &,
+		    const Point<spacedim>                                &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return Point<spacedim>();
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+Boundary<dim, spacedim>::
+project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &,
+		    const Point<spacedim>                                &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return Point<spacedim>();
 }
 
 
@@ -459,6 +483,30 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
 }
 
 #endif
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+StraightBoundary<dim, spacedim>::
+project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &,
+		    const Point<spacedim>                                &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return Point<spacedim>();
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+StraightBoundary<dim, spacedim>::
+project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &,
+		    const Point<spacedim>                                &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return Point<spacedim>();
+}
+
 
 
 // explicit instantiations
