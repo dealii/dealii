@@ -167,10 +167,15 @@ template <int dim, int spacedim>
 Point<spacedim>
 Boundary<dim, spacedim>::
 project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &,
-		    const Point<spacedim>                                &) const
+		    const Point<spacedim>                                &trial_point) const
 {
-  Assert (false, ExcPureFunctionCalled());
-  return Point<spacedim>();
+  if (spacedim <= 1)
+    return trial_point;
+  else
+    {
+      Assert (false, ExcPureFunctionCalled());
+      return Point<spacedim>();
+    }
 }
 
 
@@ -179,10 +184,15 @@ template <int dim, int spacedim>
 Point<spacedim>
 Boundary<dim, spacedim>::
 project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &,
-		    const Point<spacedim>                                &) const
+		    const Point<spacedim>                                &trial_point) const
 {
-  Assert (false, ExcPureFunctionCalled());
-  return Point<spacedim>();
+  if (spacedim <= 2)
+    return trial_point;
+  else
+    {
+      Assert (false, ExcPureFunctionCalled());
+      return Point<spacedim>();
+    }
 }
 
 
@@ -489,10 +499,15 @@ template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
 project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &,
-		    const Point<spacedim>                                &) const
+		    const Point<spacedim>                                &trial_point) const
 {
-  Assert (false, ExcPureFunctionCalled());
-  return Point<spacedim>();
+  if (spacedim <= 1)
+    return trial_point;
+  else
+    {
+      Assert (false, ExcPureFunctionCalled());
+      return Point<spacedim>();
+    }
 }
 
 
@@ -501,10 +516,15 @@ template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
 project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &,
-		    const Point<spacedim>                                &) const
+		    const Point<spacedim>                                &trial_point) const
 {
-  Assert (false, ExcPureFunctionCalled());
-  return Point<spacedim>();
+  if (spacedim <= 2)
+    return trial_point;
+  else
+    {
+      Assert (false, ExcPureFunctionCalled());
+      return Point<spacedim>();
+    }
 }
 
 
