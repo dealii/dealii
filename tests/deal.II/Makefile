@@ -68,6 +68,7 @@ tests_x = block_matrices \
 	get_finest_common_cells_* \
 	project_*[0-9] \
 	project_boundary_* \
+	project_to_surface_* \
 	minimal_cell_diameter \
 	maximal_cell_diameter \
 	union_triangulation \

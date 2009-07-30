@@ -324,7 +324,7 @@ class Boundary : public Subscriptor
 				      * characterized by the given
 				      * quad.
 				      *
-				      * If spacedim==2, then the line
+				      * If spacedim<=2, then the surface
 				      * represented by the quad
 				      * iterator is the entire space
 				      * (i.e. it is a cell, not a part
@@ -335,6 +335,26 @@ class Boundary : public Subscriptor
     virtual
     Point<spacedim>
     project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
+			const Point<spacedim> &candidate) const;
+
+				     /**
+				      * Same function as above but for
+				      * a point that is to be
+				      * projected onto the area
+				      * characterized by the given
+				      * quad.
+				      *
+				      * If spacedim<=3, then the manifold
+				      * represented by the hex
+				      * iterator is the entire space
+				      * (i.e. it is a cell, not a part
+				      * of the boundary), and the
+				      * returned point equals the
+				      * given input point.
+				      */
+    virtual
+    Point<spacedim>
+    project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
 			const Point<spacedim> &candidate) const;
 };
 
@@ -491,7 +511,7 @@ class StraightBoundary : public Boundary<dim,spacedim>
 				      * vertices of the given quad
 				      * iterator.
 				      *
-				      * If spacedim==2, then the line
+				      * If spacedim<=2, then the surface
 				      * represented by the quad
 				      * iterator is the entire space
 				      * (i.e. it is a cell, not a part
@@ -502,6 +522,33 @@ class StraightBoundary : public Boundary<dim,spacedim>
     virtual
     Point<spacedim>
     project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
+			const Point<spacedim> &candidate) const;
+
+				     /**
+				      * Same function as above but for
+				      * a point that is to be
+				      * projected onto the area
+				      * characterized by the given
+				      * quad.
+				      *
+				      * The point returned is the
+				      * projection of the candidate
+				      * point onto the trilinear
+				      * manifold spanned by the eight
+				      * vertices of the given hex
+				      * iterator.
+				      *
+				      * If spacedim<=3, then the manifold
+				      * represented by the hex
+				      * iterator is the entire space
+				      * (i.e. it is a cell, not a part
+				      * of the boundary), and the
+				      * returned point equals the
+				      * given input point.
+				      */
+    virtual
+    Point<spacedim>
+    project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
 			const Point<spacedim> &candidate) const;
 };
 

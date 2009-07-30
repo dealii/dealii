@@ -197,6 +197,22 @@ project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &
 
 
 
+template <int dim, int spacedim>
+Point<spacedim>
+Boundary<dim, spacedim>::
+project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
+		    const Point<spacedim>                                &trial_point) const
+{
+  if (spacedim <= 3)
+    return trial_point;
+  else
+    {
+      Assert (false, ExcPureFunctionCalled());
+      return Point<spacedim>();
+    }
+}
+
+
 /* -------------------------- StraightBoundary --------------------- */
 
 
@@ -498,15 +514,23 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
 template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
-project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &,
+project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &line,
 		    const Point<spacedim>                                &trial_point) const
 {
   if (spacedim <= 1)
     return trial_point;
   else
     {
-      Assert (false, ExcPureFunctionCalled());
-      return Point<spacedim>();
+				       // find the point that lies on
+				       // the line p1--p2. the
+				       // formulas pan out to
+				       // something rather simple
+				       // because the mapping to the
+				       // line is linear
+      const Point<spacedim> p1 = line->vertex(0),
+			    p2 = line->vertex(1);
+      const double s = (trial_point-p1)*(p2-p1) / ((p2-p1)*(p2-p1));
+      return p1 + s*(p2-p1);
     }
 }
 
@@ -522,7 +546,24 @@ project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &
     return trial_point;
   else
     {
-      Assert (false, ExcPureFunctionCalled());
+      Assert (false, ExcNotImplemented());
+      return Point<spacedim>();
+    }
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+StraightBoundary<dim, spacedim>::
+project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
+		    const Point<spacedim>                                &trial_point) const
+{
+  if (spacedim <= 3)
+    return trial_point;
+  else
+    {
+      Assert (false, ExcNotImplemented());
       return Point<spacedim>();
     }
 }
