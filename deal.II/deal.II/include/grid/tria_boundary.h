@@ -295,6 +295,14 @@ class Boundary : public Subscriptor
 				      * that were on the boundary
 				      * remain on the boundary.
 				      *
+				      * If spacedim==1, then the line
+				      * represented by the line
+				      * iterator is the entire space
+				      * (i.e. it is a cell, not a part
+				      * of the boundary), and the
+				      * returned point equals the
+				      * given input point.
+				      *
 				      * Derived classes do not need to
 				      * implement this function unless
 				      * mesh smoothing algorithms are
@@ -315,6 +323,14 @@ class Boundary : public Subscriptor
 				      * projected onto the area
 				      * characterized by the given
 				      * quad.
+				      *
+				      * If spacedim==2, then the line
+				      * represented by the quad
+				      * iterator is the entire space
+				      * (i.e. it is a cell, not a part
+				      * of the boundary), and the
+				      * returned point equals the
+				      * given input point.
 				      */
     virtual
     Point<spacedim>
@@ -447,6 +463,14 @@ class StraightBoundary : public Boundary<dim,spacedim>
 				      * point onto the line through
 				      * the two vertices of the given
 				      * line iterator.
+				      *
+				      * If spacedim==1, then the line
+				      * represented by the line
+				      * iterator is the entire space
+				      * (i.e. it is a cell, not a part
+				      * of the boundary), and the
+				      * returned point equals the
+				      * given input point.
 				      */
     virtual
     Point<spacedim>
@@ -466,6 +490,14 @@ class StraightBoundary : public Boundary<dim,spacedim>
 				      * surface spanned by the four
 				      * vertices of the given quad
 				      * iterator.
+				      *
+				      * If spacedim==2, then the line
+				      * represented by the quad
+				      * iterator is the entire space
+				      * (i.e. it is a cell, not a part
+				      * of the boundary), and the
+				      * returned point equals the
+				      * given input point.
 				      */
     virtual
     Point<spacedim>
