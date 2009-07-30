@@ -658,29 +658,29 @@ conditions.
 
 
 <a name="constraint-matrix">
-<h4>Using ConstraintMatrix for performance optimizations</h4>
+<h4>Using ConstraintMatrix for increasing performance</h4>
 </a>
 
-Usually, the sparse matrix contains a substantial amount of elements that
-acutally are zero when we are about to start a linear solve. They are
+Frequently, a sparse matrix contains a substantial amount of elements that
+acutally are zero when we are about to start a linear solve. Such elements are
 introduced when we eliminate constraints or implement Dirichlet conditions,
-we usually delete all entries in constrained rows and columns, i.e., we set
-them to zero. The fraction of such elements that are present in the sparsity
+where we usually delete all entries in constrained rows and columns, i.e., we
+set them to zero. The fraction of elements that are present in the sparsity
 pattern, but do not really contain any information, can be up to one fourth
 of the total number of elements in the matrix for the 3D application
 considered in this tutorial program. Remember that matrix-vector products or
-preconditioners operate on all these elements that are zero, which is an
-inefficiency we have chosen to eliminate in the tutorial program.
+preconditioners operate on all the elements of a sparse matrix (even those 
+that are zero), which is an inefficiency we will avoid here.
 
 An advantage of directly resolving constrained degrees of freedom is that we
-can avoid having all these entries that actually are zero in our sparse
-matrix &mdash; we do not need them during matrix construction (as opposed to
-the traditional algorithms, which first fill the matrix, and only resolve
-constraints afterwards). This will save both memory and time when forming
-matrix-vector products. The way we are going to do that is to pass the
-information about constraints to the function that generates the sparsity
-pattern, and then set a <tt>false</tt> argument specifying that we do not
-intend to use constrained entries:
+can avoid having most of the entries that are going to be zero in our sparse
+matrix &mdash; we do not need constrained entries during matrix construction 
+(as opposed to the traditional algorithms, which first fill the matrix, and 
+only resolve constraints afterwards). This will save both memory and time 
+when forming matrix-vector products. The way we are going to do that is to 
+pass the information about constraints to the function that generates the 
+sparsity pattern, and then set a <tt>false</tt> argument specifying that we 
+do not intend to use constrained entries:
 @code
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
                                    constraints, false);
@@ -712,8 +712,8 @@ may not scale linearly, it is an indispensible part of the overall algorithm
 as it greatly improves the quality of the sparse ILU, easily making up for
 the time spent on computing the renumbering; graphs and timings to
 demonstrate this are shown in the documentation of the DoFRenumbering
-namespace, also underlining the choice of the King reordering algorithm
-chosen below.
+namespace, also underlining the choice of the Cuthill-McKee reordering
+algorithm chosen below.
 
 As for the linear solver: as mentioned above, our implementation here uses a
 Schur complement formulation. This is not necessarily the very best choice
