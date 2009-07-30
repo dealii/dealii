@@ -49,7 +49,7 @@ namespace internal
   template <int dim>
   void define_variables () 
   { 
-    foo(&GeometryInfo<dim>::vertices_per_cell);
+    foo(&::dealii::GeometryInfo<dim>::vertices_per_cell);
   }
 
   template void define_variables<2> ();
