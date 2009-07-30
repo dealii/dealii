@@ -1,7 +1,7 @@
-/* $Id$ */
+/* $Id$   */
 /* Author: Toby D. Young, Polish Academy of Sciences,             */
 /*         Wolfgang Bangerth, Texas A&M University                */
-/*    $Id$        */
+/*    $Id$*/
 /*                                                                */
 /*    Copyright (C) 2009 by the deal.II authors */
 /*                                                                */
@@ -137,9 +137,9 @@ EigenvalueProblem<dim>::EigenvalueProblem (const std::string &prm_file)
 {
   parameters.declare_entry ("Global mesh refinement steps", "5",
 			    Patterns::Integer (0, 20),
-			    "The number number of times the 1-cell coarse mesh should "
+			    "The number of times the 1-cell coarse mesh should "
 			    "be refined globally for our computations.");
-  parameters.declare_entry ("Number of eigenvalues/eigenfunctions", "10",
+  parameters.declare_entry ("Number of eigenvalues/eigenfunctions", "5",
 			    Patterns::Integer (0, 100),
 			    "The number of eigenvalues/eigenfunctions "
 			    "to be computed.");

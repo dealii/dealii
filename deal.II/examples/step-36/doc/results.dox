@@ -163,13 +163,15 @@ this and explore how the spectrum and eigenfunctions change as we make
 the computational region larger and larger.
 
 <li> What happens if we investigate the simple harmonic oscillator
-problem $V(\mathbf x)=c|\mathbf x|^2$? This potential is exactly of the form
-discussed in the previous paragraph and one may want to use a large spherical
-domain to approximate the whole-space problem.
+problem $V(\mathbf x)=c|\mathbf x|^2$? This potential is exactly of
+the form discussed in the previous paragraph and has hyper spherical
+symmetry. Oone may want to use a large spherical domain with a large
+outer radius, to approximate the whole-space problem (say, by invoking
+GridGenerator::hyper_ball).
 
-<li> What happens if the particle in the box has <i>internal</i>
-degrees of freedom? For example, if the particle were a spin-$1/2$
-particle? In that case, we may want to start solving a vector-valued
-problem instead.</li>
+<li> What happens if the particle in the box has internal degrees of
+freedom? For example, if the particle were a spin-$1/2$ particle? In
+that case, we may want to start solving a vector-valued problem
+instead.</li>
 
 </ul>
