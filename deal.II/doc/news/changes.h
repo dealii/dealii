@@ -278,6 +278,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: Instead of asking face or edge iterators for their boundary indicator
+  using TriaAccessor::boundary_indicator() and then the triangulation for
+  the boundary object using Triangulation::get_boundary(), you can now directly
+  ask the iterator for the boundary object using TriaAccessor::get_boundary().
+  <br>
+  (WB 2009/07/31)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Fixed: The CellAccessor::recursively_set_material_id function did not
   set the material id for all children, but only for the first two, which
   is obviously a bug. This should now be fixed.

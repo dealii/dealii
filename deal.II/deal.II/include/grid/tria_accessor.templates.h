@@ -1863,6 +1863,19 @@ TriaAccessor<structdim, dim, spacedim>::at_boundary () const
 
 
 template <int structdim, int dim, int spacedim>
+const Boundary<dim,spacedim> &
+TriaAccessor<structdim, dim, spacedim>::get_boundary () const
+{
+  Assert (structdim<dim, ExcImpossibleInDim(dim));
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+
+  return this->tria->get_boundary(this->objects()
+				  .material_id[this->present_index]);
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 double
 TriaAccessor<structdim, dim, spacedim>::diameter () const
 {

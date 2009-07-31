@@ -36,6 +36,8 @@ template <typename Accessor> class TriaRawIterator;
 template <typename Accessor> class TriaIterator;
 template <typename Accessor> class TriaActiveIterator;
 
+template <int dim, int spacedim> class Boundary;
+
 
 namespace internal
 {
@@ -1217,6 +1219,18 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     bool at_boundary () const;
 
+				     /**
+				      * Return a constant reference to a
+				      * boundary object used for this
+				      * object. This function is a shortcut to
+				      * retrieving the boundary indicator
+				      * using boundary_indicator() and then
+				      * asking the
+				      * Triangulation::get_boundary() function
+				      * for the boundary object.
+				      */
+    const Boundary<dim,spacedim> & get_boundary () const;
+    
 				     /**
 				      * @}
 				      */
