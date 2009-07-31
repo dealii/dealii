@@ -1,0 +1,195 @@
+
+DEAL::Original Matrix:
+DEAL::================
+DEAL::2x2 matrix
+DEAL::0.8147 0.5164 
+DEAL::0.5164 0.9134 
+DEAL::
+DEAL::Cholesky Decomposition Matrix:
+DEAL::==============================
+DEAL::2x2 matrix
+DEAL::0.9026 0 
+DEAL::0.5721 0.7656 
+DEAL::
+DEAL::Transposed Cholesky Decomposition Matrix:
+DEAL::=========================================
+DEAL::2x2 matrix
+DEAL::0.9026 0.5721 
+DEAL::0 0.7656 
+DEAL::
+DEAL::Reconstructed Matrix:
+DEAL::=====================
+DEAL::2x2 matrix
+DEAL::0.8147 0.5164 
+DEAL::0.5164 0.9134 
+DEAL::
+DEAL::the SAME to 1e-10 tolerance
+DEAL::
+DEAL::
+DEAL::Original Matrix:
+DEAL::================
+DEAL::3x3 matrix
+DEAL::1.8086 0.8459 0.6671 
+DEAL::0.8459 1.3989 0.2817 
+DEAL::0.6671 0.2817 0.7418 
+DEAL::
+DEAL::Cholesky Decomposition Matrix:
+DEAL::==============================
+DEAL::3x3 matrix
+DEAL::1.3449 0 0 
+DEAL::0.6290 1.0016 0 
+DEAL::0.4960 -0.0302 0.7034 
+DEAL::
+DEAL::Transposed Cholesky Decomposition Matrix:
+DEAL::=========================================
+DEAL::3x3 matrix
+DEAL::1.3449 0.6290 0.4960 
+DEAL::0 1.0016 -0.0302 
+DEAL::0 0 0.7034 
+DEAL::
+DEAL::Reconstructed Matrix:
+DEAL::=====================
+DEAL::3x3 matrix
+DEAL::1.8086 0.8459 0.6671 
+DEAL::0.8459 1.3989 0.2817 
+DEAL::0.6671 0.2817 0.7418 
+DEAL::
+DEAL::the SAME to 1e-10 tolerance
+DEAL::
+DEAL::
+DEAL::Original Matrix:
+DEAL::================
+DEAL::5x5 matrix
+DEAL::5.5862 0.5230 0.1500 0.6561 0.5712 
+DEAL::0.5230 5.5897 0.5640 0.5585 0.6221 
+DEAL::0.1500 0.5640 5.5445 0.3284 0.6072 
+DEAL::0.6561 0.5585 0.3284 5.5875 0.2760 
+DEAL::0.5712 0.6221 0.6072 0.2760 5.8955 
+DEAL::
+DEAL::Cholesky Decomposition Matrix:
+DEAL::==============================
+DEAL::5x5 matrix
+DEAL::2.3635 0 0 0 0 
+DEAL::0.2213 2.3539 0 0 0 
+DEAL::0.0634 0.2337 2.3422 0 0 
+DEAL::0.2776 0.2112 0.1116 2.3353 0 
+DEAL::0.2417 0.2416 0.2286 0.0567 2.3923 
+DEAL::
+DEAL::Transposed Cholesky Decomposition Matrix:
+DEAL::=========================================
+DEAL::5x5 matrix
+DEAL::2.3635 0.2213 0.0634 0.2776 0.2417 
+DEAL::0 2.3539 0.2337 0.2112 0.2416 
+DEAL::0 0 2.3422 0.1116 0.2286 
+DEAL::0 0 0 2.3353 0.0567 
+DEAL::0 0 0 0 2.3923 
+DEAL::
+DEAL::Reconstructed Matrix:
+DEAL::=====================
+DEAL::5x5 matrix
+DEAL::5.5862 0.5230 0.1500 0.6561 0.5712 
+DEAL::0.5230 5.5897 0.5640 0.5585 0.6221 
+DEAL::0.1500 0.5640 5.5445 0.3284 0.6072 
+DEAL::0.6561 0.5585 0.3284 5.5875 0.2760 
+DEAL::0.5712 0.6221 0.6072 0.2760 5.8955 
+DEAL::
+DEAL::the SAME to 1e-10 tolerance
+DEAL::
+DEAL::
+DEAL::Original Matrix:
+DEAL::================
+DEAL::2x2 matrix
+DEAL::0.8147 0.5164 
+DEAL::0.5164 0.9134 
+DEAL::
+DEAL::Cholesky Decomposition Matrix:
+DEAL::==============================
+DEAL::2x2 matrix
+DEAL::0.9026 0 
+DEAL::0.5721 0.7656 
+DEAL::
+DEAL::Transposed Cholesky Decomposition Matrix:
+DEAL::=========================================
+DEAL::2x2 matrix
+DEAL::0.9026 0.5721 
+DEAL::0 0.7656 
+DEAL::
+DEAL::Reconstructed Matrix:
+DEAL::=====================
+DEAL::2x2 matrix
+DEAL::0.8147 0.5164 
+DEAL::0.5164 0.9134 
+DEAL::
+DEAL::the SAME to 1e-10 tolerance
+DEAL::
+DEAL::
+DEAL::Original Matrix:
+DEAL::================
+DEAL::3x3 matrix
+DEAL::1.8086 0.8459 0.6671 
+DEAL::0.8459 1.3989 0.2817 
+DEAL::0.6671 0.2817 0.7418 
+DEAL::
+DEAL::Cholesky Decomposition Matrix:
+DEAL::==============================
+DEAL::3x3 matrix
+DEAL::1.3449 0 0 
+DEAL::0.6290 1.0016 0 
+DEAL::0.4960 -0.0302 0.7034 
+DEAL::
+DEAL::Transposed Cholesky Decomposition Matrix:
+DEAL::=========================================
+DEAL::3x3 matrix
+DEAL::1.3449 0.6290 0.4960 
+DEAL::0 1.0016 -0.0302 
+DEAL::0 0 0.7034 
+DEAL::
+DEAL::Reconstructed Matrix:
+DEAL::=====================
+DEAL::3x3 matrix
+DEAL::1.8086 0.8459 0.6671 
+DEAL::0.8459 1.3989 0.2817 
+DEAL::0.6671 0.2817 0.7418 
+DEAL::
+DEAL::the SAME to 1e-10 tolerance
+DEAL::
+DEAL::
+DEAL::Original Matrix:
+DEAL::================
+DEAL::5x5 matrix
+DEAL::5.5862 0.5230 0.1500 0.6561 0.5712 
+DEAL::0.5230 5.5897 0.5640 0.5585 0.6221 
+DEAL::0.1500 0.5640 5.5445 0.3284 0.6072 
+DEAL::0.6561 0.5585 0.3284 5.5875 0.2760 
+DEAL::0.5712 0.6221 0.6072 0.2760 5.8955 
+DEAL::
+DEAL::Cholesky Decomposition Matrix:
+DEAL::==============================
+DEAL::5x5 matrix
+DEAL::2.3635 0 0 0 0 
+DEAL::0.2213 2.3539 0 0 0 
+DEAL::0.0634 0.2337 2.3422 0 0 
+DEAL::0.2776 0.2112 0.1116 2.3353 0 
+DEAL::0.2417 0.2416 0.2286 0.0567 2.3923 
+DEAL::
+DEAL::Transposed Cholesky Decomposition Matrix:
+DEAL::=========================================
+DEAL::5x5 matrix
+DEAL::2.3635 0.2213 0.0634 0.2776 0.2417 
+DEAL::0 2.3539 0.2337 0.2112 0.2416 
+DEAL::0 0 2.3422 0.1116 0.2286 
+DEAL::0 0 0 2.3353 0.0567 
+DEAL::0 0 0 0 2.3923 
+DEAL::
+DEAL::Reconstructed Matrix:
+DEAL::=====================
+DEAL::5x5 matrix
+DEAL::5.5862 0.5230 0.1500 0.6561 0.5712 
+DEAL::0.5230 5.5897 0.5640 0.5585 0.6221 
+DEAL::0.1500 0.5640 5.5445 0.3284 0.6072 
+DEAL::0.6561 0.5585 0.3284 5.5875 0.2760 
+DEAL::0.5712 0.6221 0.6072 0.2760 5.8955 
+DEAL::
+DEAL::the SAME to 1e-10 tolerance
+DEAL::
+DEAL::
