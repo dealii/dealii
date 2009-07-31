@@ -1,0 +1,21 @@
+
+DEAL::dim=2
+DEAL::  Case 0
+DEAL::    Quad 0, projected point=1.500 1.500  (quad is from 1.000 1.000 to 3.000 1.000 to 1.000 3.000 to 3.000 3.000)
+DEAL::  Case 1
+DEAL::    Quad 0, projected point=1.500 1.500  (quad is from 0.000 1.414 to 1.414 2.828 to -1.414 2.828 to 0.000 4.243)
+DEAL::dim=3
+DEAL::  Case 0
+DEAL::    Quad 0, projected point=1.000 1.500 1.500  (quad is from 1.000 1.000 1.000 to 1.000 3.000 1.000 to 1.000 1.000 3.000 to 1.000 3.000 3.000)
+DEAL::    Quad 1, projected point=3.000 1.500 1.500  (quad is from 3.000 1.000 1.000 to 3.000 3.000 1.000 to 3.000 1.000 3.000 to 3.000 3.000 3.000)
+DEAL::    Quad 2, projected point=1.500 1.000 1.500  (quad is from 1.000 1.000 1.000 to 1.000 1.000 3.000 to 3.000 1.000 1.000 to 3.000 1.000 3.000)
+DEAL::    Quad 3, projected point=1.500 3.000 1.500  (quad is from 1.000 3.000 1.000 to 1.000 3.000 3.000 to 3.000 3.000 1.000 to 3.000 3.000 3.000)
+DEAL::    Quad 4, projected point=1.500 1.500 1.000  (quad is from 1.000 1.000 1.000 to 3.000 1.000 1.000 to 1.000 3.000 1.000 to 3.000 3.000 1.000)
+DEAL::    Quad 5, projected point=1.500 1.500 3.000  (quad is from 1.000 1.000 3.000 to 3.000 1.000 3.000 to 1.000 3.000 3.000 to 3.000 3.000 3.000)
+DEAL::  Case 1
+DEAL::    Quad 0, projected point=0.707 0.707 1.500  (quad is from 0.000 1.414 1.000 to -1.414 2.828 1.000 to 0.000 1.414 3.000 to -1.414 2.828 3.000)
+DEAL::    Quad 1, projected point=2.121 2.121 1.500  (quad is from 1.414 2.828 1.000 to 0.000 4.243 1.000 to 1.414 2.828 3.000 to 0.000 4.243 3.000)
+DEAL::    Quad 2, projected point=0.793 2.207 1.500  (quad is from 0.000 1.414 1.000 to 0.000 1.414 3.000 to 1.414 2.828 1.000 to 1.414 2.828 3.000)
+DEAL::    Quad 3, projected point=-0.621 3.621 1.500  (quad is from -1.414 2.828 1.000 to -1.414 2.828 3.000 to 0.000 4.243 1.000 to 0.000 4.243 3.000)
+DEAL::    Quad 4, projected point=1.500 1.500 1.000  (quad is from 0.000 1.414 1.000 to 1.414 2.828 1.000 to -1.414 2.828 1.000 to 0.000 4.243 1.000)
+DEAL::    Quad 5, projected point=1.500 1.500 3.000  (quad is from 0.000 1.414 3.000 to 1.414 2.828 3.000 to -1.414 2.828 3.000 to 0.000 4.243 3.000)

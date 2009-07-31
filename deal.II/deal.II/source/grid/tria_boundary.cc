@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <iostream>
 
 #include <base/tensor.h>
 #include <grid/tria_boundary.h>
@@ -536,19 +537,140 @@ project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &
 
 
 
+namespace internal
+{
+  template <typename Iterator, int spacedim, int dim>
+  Point<spacedim>
+  compute_projection (const Iterator        &object,
+		      const Point<spacedim> &y,
+		      internal::int2type<dim>)
+  {
+				     // let's look at this for
+				     // simplicity for a quad (dim==2)
+				     // in a space with spacedim>2:
+
+				     // all points on the surface are given by
+				     //   x(\xi) = sum_i v_i phi_x(\xi)
+				     // where v_i are the vertices of the quad,
+				     // and \xi=(\xi_1,\xi_2) are the reference
+				     // coordinates of the quad. so what we are
+				     // trying to do is find a point x on
+				     // the surface that is closest to the point
+				     // y. there are different ways
+				     // to solve this problem, but in the end
+				     // it's a nonlinear problem and we have to
+				     // find reference coordinates \xi so that
+				     //   J(\xi) = 1/2 || x(\xi)-y ||^2
+				     // is minimal. x(\xi) is a function that
+				     // is dim-linear in \xi, so J(\xi) is
+				     // a polynomial of degree 2*dim that
+				     // we'd like to minimize. unless dim==1,
+				     // we'll have to use a Newton
+				     // method to find the
+				     // answer. This leads to the
+				     // following formulation of
+				     // Newton steps:
+				     //
+				     // Given \xi_k, find \delta\xi_k so that
+				     //   H_k \delta\xi_k = - F_k
+				     // where H_k is an approximation to the
+				     // second derivatives of J at \xi_k, and
+				     // F_k is the first derivative of J.
+				     // We'll iterate this a number of times
+				     // until the right hand side is small
+				     // enough. As a stopping criterion, we
+				     // terminate if ||\delta\xi||<eps.
+				     //
+				     // As for the Hessian, the best choice
+				     // would be
+				     //   H_k = J''(\xi_k)
+				     // but we'll opt for the simpler
+				     // Gauss-Newton form
+				     //   H_k = A^T A
+				     // i.e.
+				     //   (H_k)_{nm} = \sum_{i,j} v_i*v_j *
+				     //                   \partial_n phi_i *
+				     //                   \partial_m phi_j
+				     // we start at xi=(0.5,0.5).
+    Point<dim> xi;
+    for (unsigned int d=0; d<dim; ++d)
+      xi[d] = 0.5;
+
+    Point<spacedim> x_k;
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      x_k += object->vertex(i) *
+	     GeometryInfo<dim>::d_linear_shape_function (xi, i);
+
+    do 
+      {
+	Tensor<1,dim> F_k;
+	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	  F_k += (x_k-y)*object->vertex(i) *
+		GeometryInfo<dim>::d_linear_shape_function_gradient (xi, i);
+
+	Tensor<2,dim> H_k;
+	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	  for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
+	    {
+	      Tensor<2,dim> tmp;
+	      outer_product (tmp,
+			     GeometryInfo<dim>::d_linear_shape_function_gradient (xi, i),
+			     GeometryInfo<dim>::d_linear_shape_function_gradient (xi, j));
+	      H_k += object->vertex(i) * object->vertex(j) * tmp;
+	    }
+
+	const Point<dim> delta_xi = - invert(H_k) * F_k;
+	xi += delta_xi;
+
+	Point<spacedim> old_xk = x_k;
+	x_k = Point<spacedim>();
+	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	  x_k += object->vertex(i) *
+		 GeometryInfo<dim>::d_linear_shape_function (xi, i);
+
+	if (delta_xi.norm() < 1e-5)
+	  break;
+      }
+    while (true);
+
+    return x_k;
+  }
+
+
+				   // specialization for a quad in 1d
+  template <typename Iterator>
+  Point<1>
+  compute_projection (const Iterator &,
+		      const Point<1> &y,
+		      /* it's a quad: */internal::int2type<2>)
+  {
+    return y;
+  }
+
+				   // specialization for a quad in 2d
+  template <typename Iterator>
+  Point<2>
+  compute_projection (const Iterator &,
+		      const Point<2> &y,
+		      /* it's a quad: */internal::int2type<2>)
+  {
+    return y;
+  }
+}
+
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
-project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &,
-		    const Point<spacedim>                                &trial_point) const
+project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &quad,
+		    const Point<spacedim>  &y) const
 {
   if (spacedim <= 2)
-    return trial_point;
+    return y;
   else
-    {
-      Assert (false, ExcNotImplemented());
-      return Point<spacedim>();
-    }
+    return internal::compute_projection (quad, y,
+					 /* it's a quad */internal::int2type<2>());
 }
 
 
@@ -563,6 +685,12 @@ project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
     return trial_point;
   else
     {
+				       // we can presumably call the
+				       // same function as above (it's
+				       // written in a generic way)
+				       // but someone needs to check
+				       // whether that actually yields
+				       // the correct result
       Assert (false, ExcNotImplemented());
       return Point<spacedim>();
     }
