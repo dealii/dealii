@@ -13,10 +13,11 @@
 
 
 
-#include <grid/grid_tools.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/tria_boundary.h>
+#include <grid/grid_tools.h>
 #include <grid/intergrid_map.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/sparsity_tools.h>
@@ -1351,15 +1352,126 @@ namespace internal
       }
 
 
+				       /**
+					* Return the location of the midpoint
+					* of the 'f'th face (vertex) of this 1d
+					* object.
+					*/
+      template <typename Iterator>
+      Point<Iterator::AccessorType::space_dimension>
+      get_face_midpoint (const Iterator &object,
+			 const unsigned int f,
+			 internal::int2type<1>)
+      {
+	return object->vertex(f);
+      }
+
+
+
+				       /**
+					* Return the location of the midpoint
+					* of the 'f'th face (line) of this 2d
+					* object.
+					*/
+      template <typename Iterator>
+      Point<Iterator::AccessorType::space_dimension>
+      get_face_midpoint (const Iterator &object,
+			 const unsigned int f,
+			 internal::int2type<2>)
+      {
+	return object->line(f)->center();
+      }
+      
+
+
+				       /**
+					* Return the location of the midpoint
+					* of the 'f'th face (quad) of this 3d
+					* object.
+					*/
+      template <typename Iterator>
+      Point<Iterator::AccessorType::space_dimension>
+      get_face_midpoint (const Iterator &object,
+			 const unsigned int f,
+			 internal::int2type<3>)
+      {
+	return object->face(f)->center();
+      }
+      
+
+
+
+				       /**
+					* Compute the minimal diameter of an
+					* object by looking for the minimal
+					* distance between the mid-points of
+					* its faces. This minimal diameter is
+					* used to determine the step length
+					* for our grid cell improvement
+					* algorithm, and it should be small
+					* enough that the point moves around
+					* within the cell even if it is highly
+					* elongated -- thus, the diameter of
+					* the object is not a good measure,
+					* while the minimal diameter is. Note
+					* that the algorithm below works for
+					* both cells that are long rectangles
+					* with parallel sides where the
+					* nearest distance is between opposite
+					* edges as well as highly slanted
+					* parallelograms where the shortest
+					* distance is between neighboring
+					* edges.
+					*/
+      template <typename Iterator>
+      double
+      minimal_diameter (const Iterator &object)
+      {
+	const unsigned int
+	  structdim = Iterator::AccessorType::structure_dimension;
+	
+	double diameter = object->diameter();
+	for (unsigned int f=0;
+	     f<GeometryInfo<structdim>::faces_per_cell;
+	     ++f)
+	  for (unsigned int e=f+1;
+	       e<GeometryInfo<structdim>::faces_per_cell;
+	       ++e)
+	    diameter = std::min (diameter,
+				 get_face_midpoint
+				 (object, f,
+				  internal::int2type<structdim>())
+				 .distance (get_face_midpoint
+					    (object,
+					     e,
+					     internal::int2type<structdim>())));
+
+	return diameter;
+      }
+      
+
 
 				       /**
 					* Try to fix up a single cell. Return
 					* whether we succeeded with this.
+					*
+					* The second argument indicates
+					* whether we need to respect the
+					* manifold/boundary on which this
+					* object lies when moving around its
+					* mid-point.
 					*/
       template <typename Iterator>
       bool
-      fix_up_object (const Iterator &object)
+      fix_up_object (const Iterator &object,
+		     const bool respect_manifold)
       {
+	const Boundary<Iterator::AccessorType::dimension,
+	               Iterator::AccessorType::space_dimension>
+	  *manifold = (respect_manifold ?
+		       &object->get_boundary() :
+		       0);
+	  
 	const unsigned int structdim = Iterator::AccessorType::structure_dimension;
 	const unsigned int spacedim  = Iterator::AccessorType::space_dimension;
 	
@@ -1381,21 +1493,23 @@ namespace internal
 	Point<spacedim> object_mid_point
 	  = object->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1);
 
-					 // now do a few steepest
-					 // descent steps to reduce the
-					 // objective function
+					 // now do a few steepest descent
+					 // steps to reduce the objective
+					 // function. compute the diameter in
+					 // the helper function above
 	unsigned int iteration = 0;
+	const double diameter = minimal_diameter (object);
 	do
 	  {
 					     // choose a step length
-					     // that is initially 1/10
+					     // that is initially 1/4
 					     // of the child objects'
 					     // diameter, and a sequence
 					     // whose sum does not
 					     // converge (to avoid
 					     // premature termination of
 					     // the iteration)
-	    const double step_length = object->diameter() / 10 / (iteration + 1);
+	    const double step_length = diameter / 4 / (iteration + 1);
       
 					     // compute the objective
 					     // function and its derivative
@@ -1406,11 +1520,25 @@ namespace internal
 	      {
 		Point<spacedim> h;
 		h[d] = step_length/2;
-		gradient[d] = (objective_function (object, object_mid_point + h)
-			       -
-			       objective_function (object, object_mid_point - h))
-			      /
-			      step_length;
+
+		if (respect_manifold == false)
+		  gradient[d]
+		    = ((objective_function (object, object_mid_point + h)
+			-
+			objective_function (object, object_mid_point - h))
+		       /
+		       step_length);
+		else
+		  gradient[d]
+		    = ((objective_function (object,
+					    manifold->project_to_surface(object,
+									 object_mid_point + h))
+			-
+			objective_function (object,
+					    manifold->project_to_surface(object,
+									 object_mid_point - h)))
+		       /
+		       step_length);
 	      }
 
 					     // so we need to go in
@@ -1429,9 +1557,15 @@ namespace internal
 				       step_length / gradient.norm()) *
 			      gradient;
 
+	    if (respect_manifold == true)
+	      object_mid_point = manifold->project_to_surface(object,
+							      object_mid_point);
+	    
 	    ++iteration;
+
+//TODO: implement a stopping criterion	    
 	  }
-	while (iteration < 10);
+	while (iteration < 40);
 
 
 					 // verify that the new
@@ -1507,22 +1641,28 @@ namespace internal
 					  parent_alternating_forms[j]);
 
 					 // if new minimum value is
-					 // better than before, and if
-					 // it is positive, then set the
+					 // better than before, then set the
 					 // new mid point. otherwise
 					 // return this object as one of
 					 // those that can't apparently
 					 // be fixed
-	if ((new_min_product > old_min_product)
-	    &&
-	    (new_min_product > 0))
+	if (new_min_product >= old_min_product)
+	  object->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1)
+	    = object_mid_point;
+
+	if (std::max (new_min_product, old_min_product) <= 0)
 	  {
-	    object->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1)
-	      = object_mid_point;
-	    return true;
+	    if (structdim == 2)
+	    std::cout << "Giving up: "
+		      << old_min_product << "-->" << new_min_product
+		      << std::endl;
 	  }
-	else
-	  return false;
+	
+	    
+					 // return whether after this
+					 // operation we have an object that
+					 // is well oriented
+	return (std::max (new_min_product, old_min_product) > 0);
       }
     
 
@@ -1564,9 +1704,6 @@ namespace internal
 		    RefinementCase<structdim-1>::isotropic_refinement,
 		    ExcInternalError());
 
-	    if (cell->face(f)->at_boundary())
-	      continue;
-	  
 	    bool subface_is_more_refined = false;
 	    for (unsigned int g=0; g<GeometryInfo<structdim>::max_children_per_face; ++g)
 	      if (cell->face(f)->child(g)->has_children())
@@ -1577,28 +1714,30 @@ namespace internal
 
 	    if (subface_is_more_refined == true)
 	      continue;
-	  
+	    
 					     // so, now we finally know
 					     // that we can do something
 					     // about this face
-	    fix_up_object (cell->face(f));
+	    fix_up_object (cell->face(f), cell->at_boundary(f));
 	  }
       }
+
 
 #if deal_II_dimension == 1
       template <int structdim, int spacedim>
       void fix_up_faces (const typename dealii::Triangulation<1,spacedim>::cell_iterator &)
       {
-					 // nothing to do for the faces of cells in 1d
+					 // nothing to do for the faces of
+					 // cells in 1d
       }
-
+#endif
 
       template <int structdim, int spacedim>
       void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &)
       {
-					 // nothing to do for the faces of cells in 1d
+					 // nothing to do for the faces of
+					 // cells in 1d
       }
-#endif
     }
   }
 }
@@ -1623,8 +1762,15 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
 	cell = *cell_ptr;
 
       internal::GridTools::FixUpDistortedChildCells::fix_up_faces<dim,spacedim> (cell);
-      
-      if (! internal::GridTools::FixUpDistortedChildCells::fix_up_object (cell))
+
+				       // fix up the object. we need to
+				       // respect the manifold if the cell is
+				       // embedded in a higher dimensional
+				       // space; otherwise, like a hex in 3d,
+				       // every point within the cell interior
+				       // is fair game
+      if (! internal::GridTools::FixUpDistortedChildCells::fix_up_object (cell,
+									  (dim < spacedim)))
 	unfixable_subset.distorted_cells.push_back (cell);
     }
   
