@@ -11,7 +11,6 @@
 //
 //---------------------------------------------------------------------------
 
-#include <iostream>
 
 #include <base/tensor.h>
 #include <grid/tria_boundary.h>
