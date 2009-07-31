@@ -21,6 +21,7 @@
 #include <base/utilities.h>
 #include <base/conditional_ostream.h>
 #include <base/work_stream.h>
+#include <base/timer.h>
 
 #include <lac/full_matrix.h>
 #include <lac/solver_bicgstab.h>
@@ -57,14 +58,18 @@
 #include <numerics/error_estimator.h>
 #include <numerics/solution_transfer.h>
 
-#include <Epetra_Map.h>
-
-				 // Time measurements. 
-#include <base/timer.h>
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+				   // This is the only include file that is
+				   // new: We use Trilinos for defining the
+				   // parallel partitioning of the matrices
+				   // and vectors, and an Epetra_Map is the
+				   // Trilinos data structure for the
+				   // definition of which part of a
+				   // distributed vector is stored locally.
+#include <Epetra_Map.h>
 
 
 				 // Next, we import all deal.II
@@ -73,17 +78,17 @@ using namespace dealii;
 
 				 // @sect3{Equation data}
 
-
-				 // @sect4{Boundary values}
+				   // This program is mainly an extension of
+				   // step-31 to operate in parallel, so the
+				   // equation data remains the same.
 namespace EquationData
 {
-				   // define viscosity
   const double eta = 1;
   const double kappa = 1e-6;
   const double Rayleigh_number = 10;
 
 
-				   // @sect4{Initial values}
+
   template <int dim>
   class TemperatureInitialValues : public Function<dim>
   {
@@ -98,12 +103,16 @@ namespace EquationData
   };
 
 
+
   template <int dim>
   double
   TemperatureInitialValues<dim>::value (const Point<dim>  &,
 					const unsigned int) const
   {
-    //return (p.norm() < 0.55+0.02*std::sin(p[0]*20) ? 1 : 0);
+				   // Data for shell problem
+    /*return (p.norm() < 0.55+0.02*std::sin(p[0]*20) ? 1 : 0);*/
+
+				   // Data for cube problem
     return 0.;
   }
 
@@ -119,7 +128,6 @@ namespace EquationData
 
 
 
-				   // @sect4{Right hand side}
   template <int dim>
   class TemperatureRightHandSide : public Function<dim>
   {
@@ -134,12 +142,16 @@ namespace EquationData
   };
 
 
+
   template <int dim>
   double
   TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
 					const unsigned int component) const
   {
-    //    return 0;
+				   // Data for shell problem.
+    /*    return 0; */
+
+				   // Data for cube problem.
     Assert (component == 0,
 	    ExcMessage ("Invalid operation for a scalar function."));
     
@@ -161,7 +173,6 @@ namespace EquationData
 	    1
 	    :
 	    0);
-
   }
 
 
@@ -179,6 +190,26 @@ namespace EquationData
 
 				   // @sect3{Linear solvers and preconditioners}
 
+				   // In comparison to step-31, we did one
+				   // change in the linear algebra of the
+				   // problem: We exchange the InverseMatrix
+				   // that previously held the approximation
+				   // of the Schur complement by a
+				   // preconditioner only (we will choose
+				   // ILU in the application code
+				   // below). This is the same trick we
+				   // already did for the velocity block -
+				   // the idea of this is that the outer
+				   // iterations will eventually also make
+				   // the inner approximation for the Schur
+				   // complement good. If the preconditioner
+				   // we're using is good enough, there will
+				   // be no increase in the iteration
+				   // count. All we need to do for
+				   // implementing this change here is to
+				   // give the respective variable in the
+				   // BlockSchurPreconditioner class another
+				   // name.
 namespace LinearSolvers
 {
   template <class PreconditionerA, class PreconditionerMp>

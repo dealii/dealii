@@ -64,7 +64,7 @@
 #include <sstream>
 
 				 // As in all programs, the namespace dealii
-				 // in included:
+				 // is included:
 using namespace dealii;
 
 				 // @sect3{Defining the inner preconditioner type}
@@ -72,10 +72,10 @@ using namespace dealii;
 				 // As explained in the introduction, we are
 				 // going to use different preconditioners for
 				 // two and three space dimensions,
-				 // respectively. We differentiate between
+				 // respectively. We distinguish between
 				 // them by the use of the spatial dimension
 				 // as a template parameter. See step-4 for
-				 // details on templates.  We are not going to
+				 // details on templates. We are not going to
 				 // create any preconditioner object here, all
 				 // we do is to create class that holds a
 				 // local typedef determining the
