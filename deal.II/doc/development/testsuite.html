@@ -285,7 +285,7 @@
     <pre>
       make hierarchical/OK
     </pre>
-    If the output isn't equal, then you'll get to see something like
+    If the output isn't equal, then you'll see something like
     this:
     <pre>
       =====Checking====== hierarchical/output
@@ -317,12 +317,12 @@
     <h3>Adding new tests</h3>
 
     <p>
-    As mentioned above, we usually add a new test these days every
+    As mentioned above, we add a new test every
     time we add new functionality to the library or fix a bug. If you
-    want to contribute code to the library, you should consider this
-    as well. Here's how: you need a testcase, an entry in the
+    want to contribute code to the library, you should do this
+    as well. Here's how: you need a testcase, 
+    a subdirectory with the same name as the test, an entry in the
     Makefile, and an expected output.
-    .
     </p>
 
     <h4>The testcase</h4>
@@ -365,21 +365,23 @@ int main ()
   return 0;
 }
     </pre>
-    The basic idea is that you open an output file in a directory with the same
-    name as your test (don't forget to create this directory), and then write
+
+    <p>You open an output file in a directory with the same
+    name as your test, and then write
     all output you generate to it, 
-    through the <code>deallog</code> stream (which works just like any
+    through the <code>deallog</code> stream.   The <code>deallog</code>
+    stream works like any
     other <code>std::ostream</code> except that it does a few more
-    things behind the scenes that are helpful in this context). In
-    above case, we only (nonsensically) write a zero to the output
+    things behind the scenes that are helpful in this context. In
+    above case, we only write a zero to the output
     file. Most tests actually write computed data to the output file
     to make sure that whatever we compute is what we got when the
     test was first written.
     </p>
 
     <p>
-    There are a number of directories where you can put tests
-    in. Extensive tests of individual classes or groups of classes
+    There are a number of directories where you can put a new test.
+    Extensive tests of individual classes or groups of classes
     have traditionally been into the <code>base/</code>,
     <code>lac/</code>, <code>deal.II/</code>, <code>fe/</code>, 
     <code>hp/</code>, or <code>multigrid/</code> directories, depending on
@@ -387,16 +389,26 @@ int main ()
     </p>
 
     <p>
-    More recently, we have started to create more atomic tests, that
+    We have started to create more atomic tests which
     are usually very small and test only a single aspect of the
     library, often only a single function. These tests go into the
     <code>bits/</code> directory and often have names that are
     composed of the name of the class being tested and a two-digit
-    number (for example, <code>dof_tools_11</code>). There are also
+    number, e.g., <code>dof_tools_11</code>. There are
     directories for PETSc and Trilinos wrapper functionality.
     </p>
 
-    
+    <h4>A directory with the same name as the test</h4>
+
+    <p> You have to create a subdirectory
+    with the same name as your test to hold the output from the test.
+
+    <p> One convenient way to create this subdirectory with the correct
+    properties is to use svn copy.
+<pre>
+svn copy existing_test_directory my_new_test
+</pre>
+
     <h4>An entry in the Makefile</h4>
 
     <p>
@@ -405,8 +417,8 @@ int main ()
     where tests reside, there is a separate Makefile that contains a
     list of the tests to be run in a variable called
     <code>tests_x</code>. You should add your test to the bottom of
-    this list, by adding the base name of your testfile (i.e. without
-    the extension <code>.cc</code>). Note that the entries can contain
+    this list, by adding the base name of your testfile, i.e., without
+    the extension <code>.cc</code>.  The entries can contain
     wildcards: for example, in the <code>tests/bits/</code> directory,
     the <code>tests_x</code> variable contains the entry
     <code>petsc_*</code> which at the time of this writing tests 120
@@ -418,7 +430,7 @@ int main ()
     <pre>
       make my_new_test/output
     </pre>
-    which should compile, link, and run your test. Running your test
+    This should compile, link, and run your test. Running your test
     should generate the desired output file.
     </p>
 
@@ -450,7 +462,7 @@ int main ()
     </p>
 
     <p>
-    So why <code>generic</code>? The reason is that sometimes test results
+    Why <code>generic</code>? The reason is that sometimes test results
     differ slightly from platform to platform, for example because numerical
     roundoff is different due to different floating point implementations on
     different CPUs. What this means is that sometimes a single stored output is
@@ -469,7 +481,7 @@ int main ()
     first file it found in this process. To make things a bit clearer, if you
     are, for example, on a <code>i686-pc-linux-gnu</code> box and use
     <code>gcc4.0</code> as your compiler, then the following files will be
-    searched for (in this order): 
+    sought (in this order): 
     <pre>
 testname/cmp/i686-pc-linux-gnu+gcc4.0 
 testname/cmp/i686-pc-linux-gnu+gcc3.4 
@@ -489,7 +501,7 @@ testname/cmp/generic
     Most of the time, you will be able to generate output files only
     for your own platform and compiler, and that's alright: someone
     else will create the output files for other platforms
-    eventually. You therefore only have to copy your output file to
+    eventually. You only have to copy your output file to
     <code>testname/cmp/generic</code>. 
     </p>
 

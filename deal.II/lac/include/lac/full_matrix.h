@@ -954,7 +954,8 @@ class FullMatrix : public Table<2,number>
     void cholesky (const FullMatrix<number2> &A);
 
 				     /**
-				      * <tt>*this</tt> = $V W^T$ where $V,W$
+				      * <tt>*this(i,j)</tt> = $V(i) W(j)$ 
+				      * where $V,W$
 				      * are vectors of the same length.
 				      */
     template <typename number2>

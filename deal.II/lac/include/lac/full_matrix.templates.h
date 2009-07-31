@@ -1321,13 +1321,13 @@ FullMatrix<number>::cholesky (const FullMatrix<number2> &A)
       for (unsigned int i=0; i< this->n_cols(); i++){
 	SLik2 = 0.0;
 	for (unsigned int j = 0; j < i; j++){
-	  SLik2 += (*this)(i,j)*(*this)(i,j);
 	  SLikLjk = 0.0;
 	  for (unsigned int k =0; k<j; k++)
 	    {
-	      SLikLjk = (*this)(i,k)*(*this)(j,k);
+	      SLikLjk += (*this)(i,k)*(*this)(j,k);
 	    };
 	  (*this)(i,j) = (1./(*this)(j,j))*(A(i,j) - SLikLjk);
+	  SLik2 += (*this)(i,j)*(*this)(i,j);
 	}
 	AssertThrow (A(i,i) - SLik2 >= 0,
 		     ExcMatrixNotPositiveDefinite());
