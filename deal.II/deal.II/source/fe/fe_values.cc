@@ -345,7 +345,7 @@ namespace FEValuesViews
 
 	  const Tensor<2,spacedim> * shape_hessian_ptr = 
 	    &fe_values.shape_hessians[shape_function_data[shape_function].
-				       row_index][0];
+				      row_index][0];
 	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
 	    hessians[q_point] += value * *shape_hessian_ptr++;
 	}
@@ -511,7 +511,7 @@ namespace FEValuesViews
 	      {
 		const Tensor<1,spacedim> * shape_gradient_ptr = 
 		  &fe_values.shape_gradients[shape_function_data[shape_function].
-					    row_index[d]][0];
+					     row_index[d]][0];
 		for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
 		  gradients[q_point][d] += value * *shape_gradient_ptr++;
 	      }
@@ -525,7 +525,7 @@ namespace FEValuesViews
   void
   Vector<dim,spacedim>::
   get_function_symmetric_gradients (const InputVector &fe_function, 
-	  std::vector<symmetric_gradient_type> &symmetric_gradients) const
+				    std::vector<symmetric_gradient_type> &symmetric_gradients) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
@@ -1626,8 +1626,8 @@ get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &,
 template <int dim, int spacedim>
 void
 FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_points,
-			       const FiniteElement<dim,spacedim> &fe,
-			       const UpdateFlags         flags)
+					const FiniteElement<dim,spacedim> &fe,
+					const UpdateFlags         flags)
 {
   this->update_flags = flags;
 
@@ -1662,7 +1662,7 @@ FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_p
 
   if (flags & update_hessians)
     this->shape_hessians.resize (n_nonzero_shape_components,
-                                        std::vector<Tensor<2,spacedim> > (n_quadrature_points));
+				 std::vector<Tensor<2,spacedim> > (n_quadrature_points));
   
   if (flags & update_quadrature_points)
     this->quadrature_points.resize(n_quadrature_points);
@@ -1696,10 +1696,10 @@ FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_p
 
 template <int dim, int spacedim>
 FEValuesBase<dim,spacedim>::FEValuesBase (const unsigned int n_q_points,
-				 const unsigned int dofs_per_cell,
-				 const UpdateFlags flags,
-				 const Mapping<dim,spacedim>       &mapping,
-				 const FiniteElement<dim,spacedim> &fe)
+					  const unsigned int dofs_per_cell,
+					  const UpdateFlags flags,
+					  const Mapping<dim,spacedim>       &mapping,
+					  const FiniteElement<dim,spacedim> &fe)
 		:
 		n_quadrature_points (n_q_points),
 		dofs_per_cell (dofs_per_cell),
@@ -1927,29 +1927,29 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
       if (fe->is_primitive(shape_func))
 	{
-				   // compared to the scalar
-				   // functions, finding the correct
-				   // index in the shape_value table
-				   // is more involved, since we have
-				   // to find the row in shape_values
-				   // that corresponds to the present
-				   // shape_func. this is done
-				   // manually in the same way as in
-				   // shape_value_component() (that
-				   // function can't be used because
-				   // it doesn't return us a pointer
-				   // to the data).
+					   // compared to the scalar
+					   // functions, finding the correct
+					   // index in the shape_value table
+					   // is more involved, since we have
+					   // to find the row in shape_values
+					   // that corresponds to the present
+					   // shape_func. this is done
+					   // manually in the same way as in
+					   // shape_value_component() (that
+					   // function can't be used because
+					   // it doesn't return us a pointer
+					   // to the data).
 	  const unsigned int 
 	    row = fe->is_primitive() ? 
-	          shape_func : this->shape_function_to_row_table[shape_func];
+	    shape_func : this->shape_function_to_row_table[shape_func];
 
 	  const double *shape_value_ptr = &this->shape_values(row, 0);
 	  const unsigned int comp = fe->system_to_component_index(shape_func).first;
 	  for (unsigned int point=0; point<n_quadrature_points; ++point)
 	    values[point](comp) += value * *shape_value_ptr++;
 	}
-			           // non-primitive case (vector-valued
-				   // element)
+				       // non-primitive case (vector-valued
+				       // element)
       else
 	for (unsigned int c=0; c<n_components; ++c)
 	  {
@@ -2033,11 +2033,11 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 	  {
 	    const unsigned int 
 	      row = fe->is_primitive() ? 
-	            shape_func : this->shape_function_to_row_table[shape_func];
+	      shape_func : this->shape_function_to_row_table[shape_func];
 
 	    const double *shape_value_ptr = &this->shape_values(row, 0);
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first 
-	                               + mc * n_components;
+				      + mc * n_components;
 	    for (unsigned int point=0; point<n_quadrature_points; ++point)
 	      values[point](comp) += value * *shape_value_ptr++;
 	  }
@@ -2137,11 +2137,11 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 	  {
 	    const unsigned int 
 	      row = fe->is_primitive() ? 
-	            shape_func : this->shape_function_to_row_table[shape_func];
+	      shape_func : this->shape_function_to_row_table[shape_func];
 
 	    const double *shape_value_ptr = &this->shape_values(row, 0);
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first 
-	                               + mc * n_components;
+				      + mc * n_components;
 
 	    if (quadrature_points_fastest)
 	      for (unsigned int point=0; point<n_quadrature_points; ++point)
@@ -2350,7 +2350,7 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
 	{
 	  const unsigned int 
 	    row = fe->is_primitive() ? 
-	          shape_func : this->shape_function_to_row_table[shape_func];
+	    shape_func : this->shape_function_to_row_table[shape_func];
 	  const Tensor<1,spacedim> *shape_gradient_ptr 
 	    = &this->shape_gradients[row][0];
 	  const unsigned int comp = fe->system_to_component_index(shape_func).first;
@@ -2453,18 +2453,18 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
 	  {
 	    const unsigned int 
 	      row = fe->is_primitive() ? 
-	            shape_func : this->shape_function_to_row_table[shape_func];
+	      shape_func : this->shape_function_to_row_table[shape_func];
 	    const Tensor<1,spacedim> *shape_gradient_ptr 
 	      = &this->shape_gradients[row][0];
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first
-	                               + mc * n_components;
+				      + mc * n_components;
 
-	  if (quadrature_points_fastest)
-	    for (unsigned int point=0; point<n_quadrature_points; ++point)
-	      gradients[comp][point] += value * *shape_gradient_ptr++;
-	  else
-	    for (unsigned int point=0; point<n_quadrature_points; ++point)
-	      gradients[point][comp] += value * *shape_gradient_ptr++;
+	    if (quadrature_points_fastest)
+	      for (unsigned int point=0; point<n_quadrature_points; ++point)
+		gradients[comp][point] += value * *shape_gradient_ptr++;
+	    else
+	      for (unsigned int point=0; point<n_quadrature_points; ++point)
+		gradients[point][comp] += value * *shape_gradient_ptr++;
 	  }
 	else
 	  for (unsigned int c=0; c<n_components; ++c)
@@ -2631,7 +2631,7 @@ get_function_hessians (const InputVector                         &fe_function,
 	{
 	  const unsigned int 
 	    row = fe->is_primitive() ? 
-	          shape_func : this->shape_function_to_row_table[shape_func];
+	    shape_func : this->shape_function_to_row_table[shape_func];
 
 	  const Tensor<2,spacedim> *shape_hessian_ptr 
 	    = &this->shape_hessians[row][0];
@@ -2744,19 +2744,19 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
 	  {
 	    const unsigned int 
 	      row = fe->is_primitive() ? 
-	            shape_func : this->shape_function_to_row_table[shape_func];
+	      shape_func : this->shape_function_to_row_table[shape_func];
 
 	    const Tensor<2,spacedim> *shape_hessian_ptr 
 	      = &this->shape_hessians[row][0];
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first
-	                               + mc * n_components;
+				      + mc * n_components;
 
-	  if (quadrature_points_fastest)
-	    for (unsigned int point=0; point<n_quadrature_points; ++point)
-	      hessians[comp][point] += value * *shape_hessian_ptr++;
-	  else
-	    for (unsigned int point=0; point<n_quadrature_points; ++point)
-	      hessians[point][comp] += value * *shape_hessian_ptr++;
+	    if (quadrature_points_fastest)
+	      for (unsigned int point=0; point<n_quadrature_points; ++point)
+		hessians[comp][point] += value * *shape_hessian_ptr++;
+	    else
+	      for (unsigned int point=0; point<n_quadrature_points; ++point)
+		hessians[point][comp] += value * *shape_hessian_ptr++;
 	  }
 	else
 	  for (unsigned int c=0; c<n_components; ++c)
@@ -2938,7 +2938,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 	{
 	  const unsigned int 
 	    row = fe->is_primitive() ? 
-	          shape_func : this->shape_function_to_row_table[shape_func];
+	    shape_func : this->shape_function_to_row_table[shape_func];
 
 	  const Tensor<2,spacedim> *shape_hessian_ptr 
 	    = &this->shape_hessians[row][0];
@@ -3030,12 +3030,12 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 	  {
 	    const unsigned int 
 	      row = fe->is_primitive() ? 
-	            shape_func : this->shape_function_to_row_table[shape_func];
+	      shape_func : this->shape_function_to_row_table[shape_func];
 
 	    const Tensor<2,spacedim> *shape_hessian_ptr
 	      = &this->shape_hessians[row][0];
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first 
-	                               + mc * n_components;
+				      + mc * n_components;
 	    for (unsigned int point=0; point<n_quadrature_points; ++point)
 	      laplacians[point](comp) += value * trace(*shape_hessian_ptr++);
 	  }
@@ -3136,12 +3136,12 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 	  {
 	    const unsigned int 
 	      row = fe->is_primitive() ? 
-	            shape_func : this->shape_function_to_row_table[shape_func];
+	      shape_func : this->shape_function_to_row_table[shape_func];
 
 	    const Tensor<2,spacedim> *shape_hessian_ptr 
 	      = &this->shape_hessians[row][0];
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first 
-	                               + mc * n_components;
+				      + mc * n_components;
 	    if (quadrature_points_fastest)
 	      for (unsigned int point=0; point<n_quadrature_points; ++point)
 		laplacians[comp][point] += value * trace(*shape_hessian_ptr++);
@@ -3244,7 +3244,7 @@ template <int dim, int spacedim>
 inline
 void
 FEValuesBase<dim,spacedim>::check_cell_similarity 
-  (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell)
 {
 				   // case that there has not been any cell
 				   // before
@@ -3559,10 +3559,10 @@ FEFaceValuesBase<dim,spacedim>::FEFaceValuesBase (const unsigned int n_q_points,
 						  const Quadrature<dim-1>& quadrature)
 		:
 		FEValuesBase<dim,spacedim> (n_q_points,
-				   dofs_per_cell,
-				   update_default,
-				   mapping,
-				   fe),
+					    dofs_per_cell,
+					    update_default,
+					    mapping,
+					    fe),
                 quadrature(quadrature)
 {}
 
@@ -3612,15 +3612,15 @@ const unsigned int FEFaceValues<dim,spacedim>::integral_dimension;
 
 template <int dim, int spacedim>
 FEFaceValues<dim,spacedim>::FEFaceValues (const Mapping<dim,spacedim>       &mapping,
-				 const FiniteElement<dim,spacedim> &fe,
-				 const Quadrature<dim-1>  &quadrature,
-				 const UpdateFlags         update_flags)
+					  const FiniteElement<dim,spacedim> &fe,
+					  const Quadrature<dim-1>  &quadrature,
+					  const UpdateFlags         update_flags)
 		:
 		FEFaceValuesBase<dim,spacedim> (quadrature.size(),
-				       fe.dofs_per_cell,
-				       update_flags,
-				       mapping,
-				       fe, quadrature)
+						fe.dofs_per_cell,
+						update_flags,
+						mapping,
+						fe, quadrature)
 {
   initialize (update_flags);
 }
@@ -3629,14 +3629,14 @@ FEFaceValues<dim,spacedim>::FEFaceValues (const Mapping<dim,spacedim>       &map
 
 template <int dim, int spacedim>
 FEFaceValues<dim,spacedim>::FEFaceValues (const FiniteElement<dim,spacedim> &fe,
-				 const Quadrature<dim-1>  &quadrature,
-				 const UpdateFlags         update_flags)
+					  const Quadrature<dim-1>  &quadrature,
+					  const UpdateFlags         update_flags)
 		:
 		FEFaceValuesBase<dim,spacedim> (quadrature.size(),
-				       fe.dofs_per_cell,
-				       update_flags,
-				       StaticMappingQ1<dim>::mapping,
-				       fe, quadrature)
+						fe.dofs_per_cell,
+						update_flags,
+						StaticMappingQ1<dim>::mapping,
+						fe, quadrature)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
@@ -3665,7 +3665,7 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 template <int dim, int spacedim>
 void FEFaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
-				const unsigned int              face_no)
+					 const unsigned int              face_no)
 {
 				   // assert that the finite elements
 				   // passed to the constructor and
@@ -3699,7 +3699,7 @@ void FEFaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>
 
 template <int dim, int spacedim>
 void FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-				const unsigned int              face_no)
+					 const unsigned int              face_no)
 {
 				   // assert that the finite elements
 				   // passed to the constructor and
@@ -3756,7 +3756,7 @@ void FEFaceValues<2,3>::reinit (const MGDoFHandler<2,3>::cell_iterator &,
 
 template <int dim, int spacedim>
 void FEFaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-				const unsigned int              face_no)
+					 const unsigned int              face_no)
 {
 				   // assert that the finite elements
 				   // passed to the constructor and
@@ -3790,7 +3790,7 @@ void FEFaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedi
 
 template <int dim, int spacedim>
 void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				const unsigned int              face_no)
+					 const unsigned int              face_no)
 {
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
@@ -3855,15 +3855,15 @@ const unsigned int FESubfaceValues<dim,spacedim>::integral_dimension;
 
 template <int dim, int spacedim>
 FESubfaceValues<dim,spacedim>::FESubfaceValues (const Mapping<dim,spacedim>       &mapping,
-				       const FiniteElement<dim,spacedim> &fe,
-				       const Quadrature<dim-1>  &quadrature,
-				       const UpdateFlags         update_flags)
+						const FiniteElement<dim,spacedim> &fe,
+						const Quadrature<dim-1>  &quadrature,
+						const UpdateFlags         update_flags)
 		:
 		FEFaceValuesBase<dim,spacedim> (quadrature.size(),
-				       fe.dofs_per_cell,
-				       update_flags,
-				       mapping,
-				       fe, quadrature)
+						fe.dofs_per_cell,
+						update_flags,
+						mapping,
+						fe, quadrature)
 {
   initialize (update_flags);
 }
@@ -3872,14 +3872,14 @@ FESubfaceValues<dim,spacedim>::FESubfaceValues (const Mapping<dim,spacedim>     
 
 template <int dim, int spacedim>
 FESubfaceValues<dim,spacedim>::FESubfaceValues (const FiniteElement<dim,spacedim> &fe,
-				       const Quadrature<dim-1>  &quadrature,
-				       const UpdateFlags         update_flags)
+						const Quadrature<dim-1>  &quadrature,
+						const UpdateFlags         update_flags)
 		:
 		FEFaceValuesBase<dim,spacedim> (quadrature.size(),
-				       fe.dofs_per_cell,
-				       update_flags,
-				       StaticMappingQ1<dim>::mapping,
-				       fe, quadrature)
+						fe.dofs_per_cell,
+						update_flags,
+						StaticMappingQ1<dim>::mapping,
+						fe, quadrature)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
@@ -3910,8 +3910,8 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 template <int dim, int spacedim>
 void FESubfaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
-				   const unsigned int         face_no,
-				   const unsigned int         subface_no)
+					    const unsigned int         face_no,
+					    const unsigned int         subface_no)
 {
 				   // assert that the finite elements
 				   // passed to the constructor and
@@ -3963,8 +3963,8 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spaced
 
 template <int dim, int spacedim>
 void FESubfaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-				   const unsigned int         face_no,
-				   const unsigned int         subface_no)
+					    const unsigned int         face_no,
+					    const unsigned int         subface_no)
 {
 				   // assert that the finite elements
 				   // passed to the constructor and
@@ -4004,13 +4004,13 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,sp
   
 template <int dim, int spacedim>
 void FESubfaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-				   const unsigned int         face_no,
-				   const unsigned int         subface_no)
+					    const unsigned int         face_no,
+					    const unsigned int         subface_no)
 {
   typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-	   static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-	   typename FEVB::ExcFEDontMatch());
+	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
+	  typename FEVB::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
   Assert (subface_no < cell->face(face_no)->number_of_children(),
@@ -4041,8 +4041,8 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spac
 
 template <int dim, int spacedim>
 void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				   const unsigned int         face_no,
-				   const unsigned int         subface_no)
+					    const unsigned int         face_no,
+					    const unsigned int         subface_no)
 {
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
@@ -4170,9 +4170,9 @@ template class FEValuesData<deal_II_dimension>;
 template class FEValuesBase<deal_II_dimension>;
 template class FEValues<deal_II_dimension>;
 template class FEValuesBase<deal_II_dimension>::
-  CellIterator<DoFHandler<deal_II_dimension>::cell_iterator>;
+CellIterator<DoFHandler<deal_II_dimension>::cell_iterator>;
 template class FEValuesBase<deal_II_dimension>::
-  CellIterator<MGDoFHandler<deal_II_dimension>::cell_iterator>;
+CellIterator<MGDoFHandler<deal_II_dimension>::cell_iterator>;
 
 #if deal_II_dimension >= 2
 template class FEFaceValuesBase<deal_II_dimension>;
@@ -4185,7 +4185,7 @@ template class FEValuesData<deal_II_dimension,deal_II_dimension+1>;
 template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>;
 template class FEValues<deal_II_dimension,deal_II_dimension+1>;
 template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>:: 
-  CellIterator<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>; 
+CellIterator<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>; 
 //template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
 //  CellIterator<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
 
