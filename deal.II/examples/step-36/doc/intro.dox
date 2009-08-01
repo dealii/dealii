@@ -28,7 +28,9 @@ also contains differential operators.
 
 Under suitable conditions, the above equations have a set of solutions
 $\Psi_\ell,\varepsilon_\ell$, $\ell\in {\cal I}$, where $\cal I$ can
-be a finite or infinite set. In either case, let us note that there is
+be a finite or infinite set (and in the latter case it may be a discrete or
+sometimes at least in part a continuous set). In either case, let us note that
+there is 
 no longer just a single solution, but a set of solutions (the various
 eigenfunctions and corresponding eigenvalues) that we want to
 compute. The problem of numerically finding all eigenvalues
