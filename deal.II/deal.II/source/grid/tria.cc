@@ -14686,6 +14686,15 @@ template class Triangulation<deal_II_dimension>;
 
 #if deal_II_dimension == 1
 template class Triangulation<1,2>;
+
+// this is a hack: we need to instantiate this one function because
+// TriaAccessor<1,1,3> uses it. We could instead instantiate
+// Triangulation<1,3>, but that requires a lot more specializations of
+// functions that currently only exist for <1,1> and <1,2>
+template
+const Boundary<1,3> &
+Triangulation<1,3>::get_boundary (const unsigned int number) const;
+
 #else 
 #  if deal_II_dimension == 2
 template class Triangulation<2,3>;
