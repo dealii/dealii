@@ -33,8 +33,8 @@ no longer just a single solution, but a set of solutions (the various
 eigenfunctions and corresponding eigenvalues) that we want to
 compute. The problem of numerically finding all eigenvalues
 (eigenfunctions) of such eigenvalue problems is a formidable
-challange. In fact, if the set $\cal I$ is infinite, the callange is
-insurmountable.  Most of the time however we are really only
+challenge. In fact, if the set $\cal I$ is infinite, the challenge is
+of course intractable.  Most of the time however we are really only
 interested in a small subset of these values (functions); and
 fortunately, the interface to the SLEPc library that we will use for
 this tutorial program allows us to select which portion of the
