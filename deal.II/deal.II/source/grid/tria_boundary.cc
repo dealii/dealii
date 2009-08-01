@@ -615,7 +615,7 @@ namespace internal
 	      outer_product (tmp,
 			     GeometryInfo<dim>::d_linear_shape_function_gradient (xi, i),
 			     GeometryInfo<dim>::d_linear_shape_function_gradient (xi, j));
-	      H_k += object->vertex(i) * object->vertex(j) * tmp;
+	      H_k += (object->vertex(i) * object->vertex(j)) * tmp;
 	    }
 
 	const Point<dim> delta_xi = - invert(H_k) * F_k;
@@ -631,7 +631,7 @@ namespace internal
 	  break;
       }
     while (true);
-
+    
     return x_k;
   }
 
