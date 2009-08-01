@@ -1541,6 +1541,18 @@ namespace internal
 		       step_length);
 	      }
 
+					     // sometimes, the
+					     // (unprojected) gradient
+					     // is perpendicular to
+					     // the manifold, but we
+					     // can't go there if
+					     // respect_manifold==true. in
+					     // that case, gradient=0,
+					     // and we simply need to
+					     // quite the loop here
+	    if (gradient.norm() == 0)
+	      break;
+	    
 					     // so we need to go in
 					     // direction -gradient. the
 					     // optimal value of the
