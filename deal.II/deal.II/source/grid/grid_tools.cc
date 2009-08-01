@@ -1499,6 +1499,12 @@ namespace internal
 					 // the helper function above
 	unsigned int iteration = 0;
 	const double diameter = minimal_diameter (object);
+
+					 // current value of objective
+					 // function and initial delta
+	double current_value = objective_function (object, object_mid_point);
+	double initial_delta = 0;
+	
 	do
 	  {
 					     // choose a step length
@@ -1512,14 +1518,16 @@ namespace internal
 	    const double step_length = diameter / 4 / (iteration + 1);
       
 					     // compute the objective
-					     // function and its derivative
-	    const double val = objective_function (object, object_mid_point);
-
+					     // function's derivative using a
+					     // two-sided difference formula
+					     // with eps=step_length/10
 	    Tensor<1,spacedim> gradient;
 	    for (unsigned int d=0; d<spacedim; ++d)
 	      {
+		const double eps = step_length/10;
+		
 		Point<spacedim> h;
-		h[d] = step_length/2;
+		h[d] = eps/2;
 
 		if (respect_manifold == false)
 		  gradient[d]
@@ -1527,7 +1535,7 @@ namespace internal
 			-
 			objective_function (object, object_mid_point - h))
 		       /
-		       step_length);
+		       eps);
 		else
 		  gradient[d]
 		    = ((objective_function (object,
@@ -1538,7 +1546,7 @@ namespace internal
 					    manifold->project_to_surface(object,
 									 object_mid_point - h)))
 		       /
-		       step_length);
+		       eps);
 	      }
 
 					     // sometimes, the
@@ -1565,19 +1573,38 @@ namespace internal
 					     // sure we go at most
 					     // step_length into this
 					     // direction
-	    object_mid_point -= std::min(2*val / (gradient*gradient),
-				       step_length / gradient.norm()) *
-			      gradient;
+	    const Point<spacedim> old_point = object_mid_point;
+	    object_mid_point -= std::min(2 * current_value / (gradient*gradient),
+					 step_length / gradient.norm()) *
+				gradient;
 
 	    if (respect_manifold == true)
 	      object_mid_point = manifold->project_to_surface(object,
 							      object_mid_point);
-	    
-	    ++iteration;
 
-//TODO: implement a stopping criterion	    
+					     // compute current value of the
+					     // objective function
+	    const double previous_value = current_value;
+	    current_value = objective_function (object, object_mid_point);
+
+	    if (iteration == 0)
+	      initial_delta = (previous_value - current_value);
+	    
+					     // stop if we aren't moving much
+					     // any more
+	    if ((iteration >= 1) &&
+		((previous_value - current_value < 0)
+		 ||
+		 (std::fabs (previous_value - current_value)
+		  <
+		  0.001 * initial_delta)))
+	      break;
+
+	    ++iteration;
 	  }
-	while (iteration < 40);
+	while (iteration < 20);
+
+//	std::cout << "# iterations=" << iteration << std::endl;
 
 
 					 // verify that the new
@@ -1662,15 +1689,6 @@ namespace internal
 	  object->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1)
 	    = object_mid_point;
 
-	if (std::max (new_min_product, old_min_product) <= 0)
-	  {
-	    if (structdim == 2)
-	    std::cout << "Giving up: "
-		      << old_min_product << "-->" << new_min_product
-		      << std::endl;
-	  }
-	
-	    
 					 // return whether after this
 					 // operation we have an object that
 					 // is well oriented
