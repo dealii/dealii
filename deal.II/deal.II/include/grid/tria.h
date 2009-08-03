@@ -65,26 +65,40 @@ template <int dim, int spacedim> class MGDoFHandler;
 /*------------------------------------------------------------------------*/
 
 /**
- *  Structure which is passed to the
- *  <tt>Triangulation<dim,spacedim>::create_triangulation</tt> function. It
- *  contains all data needed to construct a cell, namely the indices
- *  of the vertices and the material indicator.
+ * Structure which is passed to Triangulation::create_triangulation. It
+ * contains all data needed to construct a cell, namely the indices of the
+ * vertices and the material indicator.
+ *
+ * This structure is also used to represent data for faces and edge as part of
+ * the SubCellData class. In that case the #vertices array needs to represent
+ * the vertices of a face or edge of a cell listed in the argument to
+ * Triangulation::create_triangulation that denotes the cells. It can be used
+ * to attach boundary indicators to faces.
  *
  * @ingroup grid
  */
-template <int dim>
+template <int structdim>
 struct CellData
 {
 				     /**
 				      * Indices of the vertices of
 				      * this cell.
 				      */
-    unsigned int vertices[GeometryInfo<dim>::vertices_per_cell];
+    unsigned int vertices[GeometryInfo<structdim>::vertices_per_cell];
 
 				     /**
 				      * Material indicator of this
 				      * cell. May be used to denote
 				      * different coefficients, etc.
+				      *
+				      * Note that if this object is part of a
+				      * SubCellData object, then it represents
+				      * a face or edge of a cell. Since
+				      * deal.II only allows material_id tags
+				      * on cells, this field is re-interpreted
+				      * to indicate the boundary_indicator of
+				      * a face or edge. In other words, for
+				      * faces, this field is a misnomer.
 				      */
     unsigned char material_id;
 };
@@ -92,8 +106,8 @@ struct CellData
 
 
 /**
- *  Structure to be passed to the Triangulation<dim,spacedim>::create_triangulation
- *  function to describe boundary information.
+ *  Structure to be passed to Triangulation::create_triangulation function to
+ *  describe boundary information.
  *
  *  This structure is the same for all dimensions, since we use an input
  *  function which is the same for all dimensions. The content of objects
