@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,7 +45,7 @@ template <typename number> class SparseBlockVanka;
  * some diagonal elements are zero in the rows of the Lagrange multiplier.
  * The approach of Vanka is to solve a small (usually indefinite) system
  * of equations for each Langrange multiplie variable (we will also call
- * the pressure in Stoke's equation a Langrange multiplier since it
+ * the pressure in Stokes' equation a Langrange multiplier since it
  * can be interpreted as such).
  *
  * Objects of this class are constructed by passing a vector of indices
