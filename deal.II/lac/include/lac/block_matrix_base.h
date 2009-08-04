@@ -1245,28 +1245,28 @@ class BlockMatrixBase : public Subscriptor
 		                   const VectorType &src) const;
     
   private:
-                                       /**
-					* Temporary vector for counting the
-					* elements written into the
-					* individual blocks when doing a
-					* collective add or set.
-					*/
+				     /**
+				      * Temporary vector for counting the
+				      * elements written into the
+				      * individual blocks when doing a
+				      * collective add or set.
+				      */
     std::vector<unsigned int> counter_within_block; 
 
-                                       /**
-					* Temporary vector for column
-					* indices on each block when writing
-					* local to global data on each
-					* sparse matrix.
-					*/
+				     /**
+				      * Temporary vector for column
+				      * indices on each block when writing
+				      * local to global data on each
+				      * sparse matrix.
+				      */
     std::vector<std::vector<unsigned int> > column_indices; 
 
-                                       /**
-					* Temporary vector for storing the
-					* local values (they need to be
-					* reordered when writing local to
-					* global).
-					*/
+				     /**
+				      * Temporary vector for storing the
+				      * local values (they need to be
+				      * reordered when writing local to
+				      * global).
+				      */
     std::vector<std::vector<double> > column_values;
 
     
@@ -1404,8 +1404,8 @@ namespace BlockMatrixIterators
 		  matrix(other.matrix),
 		  base_iterator(other.base_iterator)
   {
-     this->row_block = other.row_block;
-     this->col_block = other.col_block;    
+    this->row_block = other.row_block;
+    this->col_block = other.col_block;    
   }
   
 
@@ -1807,7 +1807,7 @@ template <class MatrixType>
 inline
 const typename BlockMatrixBase<MatrixType>::BlockType &
 BlockMatrixBase<MatrixType>::block (const unsigned int row,
-                                   const unsigned int column) const
+				    const unsigned int column) const
 {
   Assert (row<n_block_rows(),
           ExcIndexRange (row, 0, n_block_rows()));
@@ -1858,9 +1858,9 @@ BlockMatrixBase<MatrixType>::n_block_rows () const
 
 
 
-                                   // Write the single set manually,
-                                   // since the other function has a lot
-                                   // of overhead in that case.
+				 // Write the single set manually,
+				 // since the other function has a lot
+				 // of overhead in that case.
 template <class MatrixType>
 inline
 void
@@ -1940,9 +1940,9 @@ BlockMatrixBase<MatrixType>::set (const unsigned int               row,
 
 
 
-				   // This is a very messy function, since
-				   // we need to calculate to each position 
-				   // the location in the global array.
+				 // This is a very messy function, since
+				 // we need to calculate to each position 
+				 // the location in the global array.
 template <class MatrixType>
 template <typename number>
 inline
@@ -2130,9 +2130,9 @@ BlockMatrixBase<MatrixType>::add (const unsigned int               row,
 
 
 
-				   // This is a very messy function, since
-				   // we need to calculate to each position 
-				   // the location in the global array.
+				 // This is a very messy function, since
+				 // we need to calculate to each position 
+				 // the location in the global array.
 template <class MatrixType>
 template <typename number>
 inline
@@ -2150,15 +2150,15 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
   if (col_indices_are_sorted == true)
     {
 #ifdef DEBUG
-				   // check whether indices really are
-				   // sorted.
+				       // check whether indices really are
+				       // sorted.
       unsigned int before = col_indices[0];
       for (unsigned int i=1; i<n_cols; ++i)
 	if (col_indices[i] <= before)
 	  Assert (false, ExcMessage ("Flag col_indices_are_sorted is set, but "
 				     "indices appear to not be sorted."))
-	else
-	  before = col_indices[i];
+	  else
+	    before = col_indices[i];
 #endif
       const std::pair<unsigned int,unsigned int> 
 	row_index = this->row_block_indices.global_to_local (row);
