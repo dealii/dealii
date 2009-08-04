@@ -1924,8 +1924,8 @@ namespace internal
 					     // GridReordering before creating
 					     // the triangulation
 	    for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-	      AssertThrow (GridTools::cell_measure(triangulation.vertices,
-						   cells[cell_no].vertices) >= 0,
+	      AssertThrow (dealii::GridTools::cell_measure(triangulation.vertices,
+							   cells[cell_no].vertices) >= 0,
 			   ExcGridHasInvalidCell(cell_no));
 
 					     ///////////////////////////////////////
