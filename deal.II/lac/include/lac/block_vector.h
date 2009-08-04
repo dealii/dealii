@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -141,12 +141,12 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
 
 
 #ifdef DEAL_II_USE_TRILINOS
-				       /**
-					* A copy constructor taking a
-					* (parallel) Trilinos block
-					* vector and copying it into
-					* the deal.II own format.
-					*/
+				     /**
+				      * A copy constructor taking a
+				      * (parallel) Trilinos block
+				      * vector and copying it into
+				      * the deal.II own format.
+				      */
     BlockVector (const TrilinosWrappers::BlockVector &v);
 
 #endif
