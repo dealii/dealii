@@ -270,6 +270,28 @@ namespace
 				     // MappingQ requests the midpoint of a
 				     // face, though, and it is for these cases
 				     // that we need to have the check available
+				     //
+				     // note that the factor of 1/8 for each
+				     // of the 8 surrounding points isn't
+				     // chosen arbitrarily. rather, we may ask
+				     // where the harmonic map would place the
+				     // point (0,0) if we map the square
+				     // [-1,1]^2 onto the domain that is
+				     // described using the 4 vertices and 4
+				     // edge point points of this quad. we can
+				     // then discretize the harmonic map using
+				     // four cells and Q1 elements on each of
+				     // the quadrants of the square [-1,1]^2
+				     // and see where the midpoint would land
+				     // (this is the procedure we choose, for
+				     // example, in
+				     // GridGenerator::laplace_solve) and it
+				     // turns out that it will land at the
+				     // mean of the 8 surrounding
+				     // points. whether a discretization of
+				     // the harmonic map with only 4 cells is
+				     // adequate is a different question
+				     // altogether, of course.
     return (quad->vertex(0) + quad->vertex(1) +
 	    quad->vertex(2) + quad->vertex(3) +
 	    (quad->line(0)->has_children() ?
