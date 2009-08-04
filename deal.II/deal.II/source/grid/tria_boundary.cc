@@ -266,7 +266,7 @@ namespace
 				     // which of the two cells is refined first.
 				     //
 				     // the situation where the edges aren't
-				     // refined happens when the a higher order
+				     // refined happens when a higher order
 				     // MappingQ requests the midpoint of a
 				     // face, though, and it is for these cases
 				     // that we need to have the check available
