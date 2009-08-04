@@ -1565,6 +1565,40 @@ SparseMatrix<number>::TPSOR (Vector<somenumber>& dst,
 template <typename number>
 template <typename somenumber>
 void
+SparseMatrix<number>::Jacobi_step (Vector<somenumber> &v,
+				   const Vector<somenumber> &b,
+				   const number        om) const
+{
+  Assert (cols != 0, ExcNotInitialized());
+  Assert (val != 0, ExcNotInitialized());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcDiagonalNotOptimized());
+  
+  Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
+  Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
+
+  GrowingVectorMemory<Vector<somenumber> > mem;
+  typename VectorMemory<Vector<somenumber> >::Pointer w(mem);
+  w->reinit(v);
+  
+  for (unsigned int row=0; row<m(); ++row)
+    {
+      somenumber s = b(row);
+      for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
+	{
+	  s -= val[j] * v(cols->colnums[j]);
+	}
+      (*w)(row) = v(row) + s * om / val[cols->rowstart[row]];
+    }
+  for (unsigned int row=0; row<m(); ++row)
+    v(row) = (*w)(row);
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+void
 SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
                                 const Vector<somenumber> &b,
                                 const number        om) const

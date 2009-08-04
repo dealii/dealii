@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,6 +36,12 @@ for (S1, S2, S3 : REAL_SCALARS)
     template
       void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult_add<S3>
       (Vector<S3> &, const Vector<S3> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::step<S3>
+      (Vector<S3> &, const Vector<S3> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tstep<S3>
+      (Vector<S3> &, const Vector<S3> &) const;
 
 // ------------ PreconditionBlockSOR -----------------
     template
@@ -44,6 +50,18 @@ for (S1, S2, S3 : REAL_SCALARS)
     template
       void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tvmult<S3>
       (Vector<S3> &, const Vector<S3> &) const;
+    template
+      void PreconditionBlockSOR<SparseMatrix<S1>, S2>::vmult_add<S3>
+      (Vector<S3> &, const Vector<S3> &) const;
+    template
+      void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tvmult_add<S3>
+      (Vector<S3> &, const Vector<S3> &) const;
+    template
+      void PreconditionBlockSOR<SparseMatrix<S1>, S2>::step<S3>
+      (Vector<S3> &, const Vector<S3> &) const;
+    template
+      void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tstep<S3>
+      (Vector<S3> &, const Vector<S3> &) const;
 
 // ------------ PreconditionBlockSSOR -----------------
     template
@@ -51,6 +69,12 @@ for (S1, S2, S3 : REAL_SCALARS)
       (Vector<S3> &, const Vector<S3> &) const;
     template
       void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::Tvmult<S3>
+      (Vector<S3> &, const Vector<S3> &) const;
+    template
+      void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::step<S3>
+      (Vector<S3> &, const Vector<S3> &) const;
+    template
+      void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::Tstep<S3>
       (Vector<S3> &, const Vector<S3> &) const;
   }
 

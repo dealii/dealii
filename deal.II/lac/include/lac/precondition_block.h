@@ -182,6 +182,16 @@ class PreconditionBlock : public virtual Subscriptor
 		     const AdditionalData parameters);
 
 				     /**
+				      * Set the permutation and its
+				      * inverse. These vectors are
+				      * copied into private data, so
+				      * they can be reused or deleted
+				      * after a call to this function.
+				      */
+    void set_permutation(const std::vector<unsigned int>& permutation,
+			 const std::vector<unsigned int>& inverse_permutation);
+
+				     /**
 				      * Replacement of
 				      * invert_diagblocks() for
 				      * permuted preconditioning.
@@ -263,6 +273,55 @@ class PreconditionBlock : public virtual Subscriptor
 				      * precondition another matrix.
 				      */
     void invert_diagblocks();
+
+				     /**
+				      * Perform one block relaxation
+				      * step in forward numbering.
+				      *
+				      * Depending on the arguments @p
+				      * dst and @p pref, this performs
+				      * an SOR step (both reference
+				      * the same vector) of a Jacobi
+				      * step (botha different
+				      * vectors). For the Jacobi step,
+				      * the calling function must copy
+				      * @p dst to @p pref after this.
+				      *
+				      * @note If a permutation is set,
+				      * it is automatically honored by
+				      * this function.
+				      */
+    template <typename number2>
+    void forward_step (
+      Vector<number2>       &dst,
+      const Vector<number2> &prev,
+      const Vector<number2> &src,
+      const bool transpose_diagonal) const;
+    
+				     /**
+				      * Perform one block relaxation
+				      * step in backward numbering.
+				      *
+				      * Depending on the arguments @p
+				      * dst and @p pref, this performs
+				      * an SOR step (both reference
+				      * the same vector) of a Jacobi
+				      * step (botha different
+				      * vectors). For the Jacobi step,
+				      * the calling function must copy
+				      * @p dst to @p pref after this.
+				      *
+				      * @note If a permutation is set,
+				      * it is automatically honored by
+				      * this function.
+				      */
+    template <typename number2>
+    void backward_step (
+      Vector<number2>       &dst,
+      const Vector<number2> &prev,
+      const Vector<number2> &src,
+      const bool transpose_diagonal) const;
+    
 
 				     /**
 				      * Return the size of the blocks.
@@ -371,6 +430,21 @@ class PreconditionBlock : public virtual Subscriptor
 				      * Number of blocks.
 				      */
     unsigned int nblocks;
+
+				     /**
+				      * The permutation vector
+				      */
+    std::vector<unsigned int> permutation;
+    
+				     /**
+				      * The inverse permutation vector
+				      */
+    std::vector<unsigned int> inverse_permutation;
+    
+				     /**
+				      * Flag for diagonal compression.
+				      * @ref set_same_diagonal()
+				      */
   private:
     
 				     /**
@@ -394,10 +468,6 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     std::vector<FullMatrix<inverse_type> > var_diagonal;
 				      
-				     /**
-				      * Flag for diagonal compression.
-				      * @ref set_same_diagonal()
-				      */
     bool var_same_diagonal;
 };
 
@@ -637,11 +707,26 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     void vmult_add (Vector<number2>&, const Vector<number2>&) const;
 
 				     /**
-				      * Same as @p vmult_add, since Jacobi is symmetric.
+				      * Same as @p vmult_add, since
+				      * Jacobi is symmetric.
 				      */
     template <typename number2>
     void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
 
+				     /**
+				      * Perform one step of the Jacobi
+				      * iteration.
+				      */
+    template <typename number2>
+    void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
+    
+				     /**
+				      * Perform one step of the Jacobi
+				      * iteration.
+				      */
+    template <typename number2>
+    void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
+    
     				     /**
 				      * STL-like iterator with the
 				      * first entry.
@@ -718,15 +803,6 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 			     protected PreconditionBlock<MATRIX, inverse_type>
 {
   public:
-				     /**
-				      * Set the permutation and its
-				      * inverse. These vectors are
-				      * copied into private data, so
-				      * they can be reused or deleted
-				      * after a call to this function.
-				      */
-    void set_permutation(const std::vector<unsigned int>& permutation,
-			 const std::vector<unsigned int>& inverse_permutation);
 				     /**
 				      * Define number type of matrix.
 				      */
@@ -839,6 +915,20 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     template <typename number2>
     void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
 
+				     /**
+				      * Perform one step of the SOR
+				      * iteration.
+				      */
+    template <typename number2>
+    void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
+    
+				     /**
+				      * Perform one step of the
+				      * transposed SOR iteration.
+				      */
+    template <typename number2>
+    void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
+    
   protected:
 				     /**
 				      * Implementation of the forward
@@ -877,18 +967,6 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 		   const Vector<number2>&,
 		   const bool transpose_diagonal,
 		   const bool adding) const;
-
-  private:
-				     /**
-				      * The permutation vector
-				      */
-    std::vector<unsigned int> permutation;
-    
-				     /**
-				      * The inverse permutation vector
-				      */
-    std::vector<unsigned int> inverse_permutation;
-    
 };
 
 
@@ -977,6 +1055,20 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
+    
+				     /**
+				      * Perform one step of the SOR
+				      * iteration.
+				      */
+    template <typename number2>
+    void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
+    
+				     /**
+				      * Perform one step of the
+				      * transposed SOR iteration.
+				      */
+    template <typename number2>
+    void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
 };
 
 /*@}*/

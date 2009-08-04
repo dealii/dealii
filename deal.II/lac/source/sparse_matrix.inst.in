@@ -104,6 +104,10 @@ for (S1, S2 : REAL_SCALARS)
 		 const std::vector<unsigned int>&,
 		 const S1) const;
     template void SparseMatrix<S1>::
+      Jacobi_step<S2> (Vector<S2> &,
+		       const Vector<S2> &,
+		       const S1) const;
+    template void SparseMatrix<S1>::
       SOR_step<S2> (Vector<S2> &,
 		    const Vector<S2> &,
 		    const S1) const;

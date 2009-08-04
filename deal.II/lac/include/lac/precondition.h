@@ -382,6 +382,22 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Perform one step of the
+				      * preconditioned Richardson
+				      * iteration.
+				      */
+    template<class VECTOR>
+    void step (VECTOR& x, const VECTOR& rhs) const;
+
+				     /**
+				      * Perform one transposed step of
+				      * the preconditioned Richardson
+				      * iteration.
+				      */
+    template<class VECTOR>
+    void Tstep (VECTOR& x, const VECTOR& rhs) const;
 };
 
 
@@ -427,6 +443,22 @@ class PreconditionSOR : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Perform one step of the
+				      * preconditioned Richardson
+				      * iteration.
+				      */
+    template<class VECTOR>
+    void step (VECTOR& x, const VECTOR& rhs) const;
+
+				     /**
+				      * Perform one transposed step of
+				      * the preconditioned Richardson
+				      * iteration.
+				      */
+    template<class VECTOR>
+    void Tstep (VECTOR& x, const VECTOR& rhs) const;
 };
 
 
@@ -495,6 +527,23 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+
+
+				     /**
+				      * Perform one step of the
+				      * preconditioned Richardson
+				      * iteration
+				      */
+    template<class VECTOR>
+    void step (VECTOR& x, const VECTOR& rhs) const;
+
+				     /**
+				      * Perform one transposed step of
+				      * the preconditioned Richardson
+				      * iteration.
+				      */
+    template<class VECTOR>
+    void Tstep (VECTOR& x, const VECTOR& rhs) const;
 
   private:
 				     /**
@@ -900,6 +949,28 @@ PreconditionJacobi<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 }
 
 
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionJacobi<MATRIX>::step (VECTOR &dst, const VECTOR &src) const
+{
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->Jacobi_step (dst, src, this->relaxation);
+}
+
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionJacobi<MATRIX>::Tstep (VECTOR &dst, const VECTOR &src) const
+{
+  step (dst, src);
+}
+
+
+
 //---------------------------------------------------------------------------
 
 template <class MATRIX>
@@ -921,6 +992,29 @@ PreconditionSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_TSOR (dst, src, this->relaxation);
 }
+
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionSOR<MATRIX>::step (VECTOR &dst, const VECTOR &src) const
+{
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->SOR_step (dst, src, this->relaxation);
+}
+
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionSOR<MATRIX>::Tstep (VECTOR &dst, const VECTOR &src) const
+{
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->TSOR_step (dst, src, this->relaxation);
+}
+
 
 
 //---------------------------------------------------------------------------
@@ -986,6 +1080,28 @@ PreconditionSSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_SSOR (dst, src, this->relaxation, pos_right_of_diagonal);
 }
+
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionSSOR<MATRIX>::step (VECTOR &dst, const VECTOR &src) const
+{
+  Assert (this->A!=0, ExcNotInitialized());
+  this->A->SSOR_step (dst, src, this->relaxation);
+}
+
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionSSOR<MATRIX>::Tstep (VECTOR &dst, const VECTOR &src) const
+{
+  step (dst, src);
+}
+
 
 
 //---------------------------------------------------------------------------

@@ -344,6 +344,9 @@ dnl --------------------------------------------------------------
 dnl                       Optional features
 dnl --------------------------------------------------------------
 
+AC_MSG_RESULT()
+AC_MSG_RESULT(-------------- configuring optional features ---------------)
+
 AC_ARG_ENABLE(parser,
               AS_HELP_STRING([--enable-parser],[While switched on by default, this option allows to switch off support for the function parser in the contrib directory.]),
 	      [ enableparser="$enableval"
@@ -359,6 +362,14 @@ AC_ARG_ENABLE(parser,
 
 AC_SUBST(enableparser)
 AC_SUBST(DEAL_II_DISABLE_PARSER)
+
+AC_ARG_ENABLE(mgcompatibility,
+	AS_HELP_STRING([--enable-mgcompatibility],
+	[Use preconditioner interface in MGSmootherRelaxation instead of the new interface using the function step. Defaults to disabled.]),
+	[ if test "x$enableval" = "xyes" ; then
+	    AC_MSG_RESULT(enable multigrid compatibility mode)
+	    AC_DEFINE(DEAL_II_MULTIGRID_COMPATIBILITY, 1, [enable multigrid compatibility mode])
+	  fi])
 
 dnl --------------------------------------------------------------
 dnl                   Backward compatibility functions

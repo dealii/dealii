@@ -1712,6 +1712,20 @@ class SparseMatrix : public virtual Subscriptor
 	      const number        om = 1.) const;
 
 				     /**
+				      * Do one Jacobi step on
+				      * <tt>v</tt>.  Performs a direct
+				      * Jacobi step with right hand
+				      * side <tt>b</tt>. This function
+				      * will need an auxiliary vector,
+				      * which is acquired from
+				      * GrowingVectorMemory.
+				      */
+    template <typename somenumber>
+    void Jacobi_step (Vector<somenumber> &v,
+		      const Vector<somenumber> &b,
+		      const number        om = 1.) const;
+
+				     /**
 				      * Do one SOR step on <tt>v</tt>.
 				      * Performs a direct SOR step
 				      * with right hand side

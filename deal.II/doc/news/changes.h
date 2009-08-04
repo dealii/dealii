@@ -32,6 +32,27 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Changed: The class MGSmootherRelaxation now instead of a
+  preconditioner takes a relaxation method with the functions
+  <code>step</code> and <code>Tstep</code>. These perform a complete
+  relaxation step, thus saving an auxiliary vector and computational
+  effort for Gauss-Seidel type methods.
+
+  While all relaxation preconditioners have been provided with the new
+  two functions, you may have used MGSmootherRelaxation with your own
+  preconditioner. In that case, you have two options:
+  <ol>
+    <li> Configure deal.II with <tt>--enable-mgcompatibility</tt>,
+    which restores the old behavior of MGSmootherRelaxation.
+    <li> Use MGSmootherPrecondition, which does what
+    MGSmootherRelaxation did before.
+  </ol>
+  <br>
+  (GK 2009/08/04)
+  </p>
+  
+  <li>
+  <p>
   Changed: Previously, the Triangulation::create_triangulation
   function silently accepted input meshes with inverted cells
   (i.e. cells with a zero or negative determinant of the Jacobian of
@@ -203,6 +224,14 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>New: The relaxation preconditioners PreconditionJacobi, PreconditionSOR and
+  PreconditionSSOR, as well as their blocked versions PreconditionBlockJacobi,
+  PreconditionBlockSOR and PreconditionBlockSSOR now have functions <code>step</code>
+  and <tt>Tstep</tt> performing one complete step of these methods.
+  <br>
+  (GK 2009/08/04)
+  </p>
+
   <li>
   <p>
   New: There are new functions FullMatrix::cholesky and 
