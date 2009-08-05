@@ -2008,7 +2008,42 @@ class SparseMatrix : public virtual Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcSourceEqualsDestination);
-				     //@}    
+				     //@}
+
+  protected:
+                                     /**
+                                      * For some matrix storage
+                                      * formats, in particular for the
+                                      * PETSc distributed blockmatrices,
+                                      * set and add operations on
+                                      * individual elements can not be
+                                      * freely mixed. Rather, one has
+                                      * to synchronize operations when
+                                      * one wants to switch from
+                                      * setting elements to adding to
+                                      * elements.
+                                      * BlockMatrixBase automatically
+                                      * synchronizes the access by
+                                      * calling this helper function
+                                      * for each block.
+                                      * This function ensures that the
+                                      * matrix is in a state that
+                                      * allows adding elements; if it
+                                      * previously already was in this
+                                      * state, the function does
+                                      * nothing.
+                                      */
+    void prepare_add();
+
+                                     /**
+                                      * Same as prepare_add() but
+                                      * prepare the matrix for setting
+                                      * elements if the representation
+                                      * of elements in this class
+                                      * requires such an operation.
+                                      */
+    void prepare_set();
+    
   private:
 				     /**
 				      * Pointer to the sparsity
@@ -2053,6 +2088,13 @@ class SparseMatrix : public virtual Subscriptor
     template <typename somenumber> friend class SparseMatrix;
     template <typename somenumber> friend class SparseLUDecomposition;
     template <typename> friend class SparseILU;
+    
+    				       /**
+				        * To allow it calling private
+                                        * prepare_add() and
+                                        * prepare_set().
+				        */  
+    template <typename> friend class BlockMatrixBase;
 };
 
 /*@}*/
@@ -2860,6 +2902,28 @@ SparseMatrix<number>::end (const unsigned int r)
                                    // if there is no such line, then take the
                                    // end iterator of the matrix
   return end();
+}
+
+
+
+template <typename number>
+inline
+void
+SparseMatrix<number>::
+prepare_add()
+{
+                                   //nothing to do here
+}
+
+
+
+template <typename number>
+inline
+void
+SparseMatrix<number>::
+prepare_set()
+{
+                                   //nothing to do here
 }
 
 #endif // DOXYGEN

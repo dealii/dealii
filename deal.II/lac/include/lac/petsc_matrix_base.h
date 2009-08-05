@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1157,6 +1157,49 @@ namespace PETScWrappers
                                         */
       LastAction::Values last_action;
 
+				       /**
+					* Flush buffers on all CPUs when
+					* switching between inserting and
+					* adding to elements, no-op otherwise.
+					* Should be called from all internal
+					* functions accessing matrix elements.
+					*/
+      void prepare_action(const LastAction::Values new_action);
+
+				       /**
+				        * For some matrix storage
+                                        * formats, in particular for the
+                                        * PETSc distributed blockmatrices,
+                                        * set and add operations on
+                                        * individual elements can not be
+                                        * freely mixed. Rather, one has
+                                        * to synchronize operations when
+                                        * one wants to switch from
+                                        * setting elements to adding to
+                                        * elements.
+                                        * BlockMatrixBase automatically
+                                        * synchronizes the access by
+                                        * calling this helper function
+                                        * for each block.
+                                        * This function ensures that the
+                                        * matrix is in a state that
+                                        * allows adding elements; if it
+                                        * previously already was in this
+                                        * state, the function does
+                                        * nothing.
+                                        */
+      void prepare_add();
+				       /**
+                                        * Same as prepare_add() but
+                                        * prepare the matrix for setting
+                                        * elements if the representation
+                                        * of elements in this class
+                                        * requires such an operation.
+                                        */
+      void prepare_set();
+      
+
+      
     private:
 				       /**
 					* An internal array of integer
@@ -1175,6 +1218,13 @@ namespace PETScWrappers
 					* matrix.
 					*/
       std::vector<PetscScalar> column_values;
+
+
+				       /**
+				        *  To allow calling protected prepare_add()
+				        *  and prepare_set().
+				        */ 
+      template <class> friend class BlockMatrixBase;
 
   };
 
@@ -1417,18 +1467,7 @@ namespace PETScWrappers
 		   const PetscScalar  *values,
 		   const bool          elide_zero_values)
   {
-
-    if (last_action != LastAction::insert)
-      {
-        int ierr;
-        ierr = MatAssemblyBegin(matrix,MAT_FLUSH_ASSEMBLY);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        ierr = MatAssemblyEnd(matrix,MAT_FLUSH_ASSEMBLY);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-	last_action = LastAction::insert;
-      }
+    prepare_action(LastAction::insert);
     
     const signed int petsc_i = row;
     int * col_index_ptr;
@@ -1504,17 +1543,7 @@ namespace PETScWrappers
 				  // zero. However, these actions are done
 				  // in case we pass on to the other
 				  // function.
-	if (last_action != LastAction::add)
-	  {
-	    int ierr;
-	    ierr = MatAssemblyBegin(matrix,MAT_FLUSH_ASSEMBLY);
-	    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-	    ierr = MatAssemblyEnd(matrix,MAT_FLUSH_ASSEMBLY);
-	    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-	    last_action = LastAction::add;
-	  }
+	prepare_action(LastAction::add);
 
 	return;
       }
@@ -1585,18 +1614,7 @@ namespace PETScWrappers
 		   const bool          elide_zero_values,
 		   const bool          /*col_indices_are_sorted*/)
   {
-    if (last_action != LastAction::add)
-      {
-        int ierr;
-        ierr = MatAssemblyBegin(matrix,MAT_FLUSH_ASSEMBLY);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        ierr = MatAssemblyEnd(matrix,MAT_FLUSH_ASSEMBLY);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        last_action = LastAction::add;
-      }
-    
+    prepare_action(LastAction::add);
     
     const signed int petsc_i = row;
     int * col_index_ptr;
@@ -1723,6 +1741,44 @@ namespace PETScWrappers
             (index < static_cast<unsigned int>(end)));
   }
 
+  
+
+  inline
+  void
+  MatrixBase::prepare_action(const LastAction::Values new_action)
+  {
+				     // flush PETSc buffers when switching
+				     // actions, otherwise just return.
+    if (last_action == new_action) return;
+
+    int ierr;
+    ierr = MatAssemblyBegin(matrix, MAT_FLUSH_ASSEMBLY);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = MatAssemblyEnd(matrix, MAT_FLUSH_ASSEMBLY);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    last_action = new_action;
+  }
+
+
+  
+  inline
+  void
+  MatrixBase::prepare_add()
+  {
+    prepare_action(LastAction::add);
+  }
+
+
+  
+  inline
+  void
+  MatrixBase::prepare_set()
+  {
+    prepare_action(LastAction::insert);
+  }
+  
 #endif // DOXYGEN      
 }
 

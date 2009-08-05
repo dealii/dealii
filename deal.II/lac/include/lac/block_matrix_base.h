@@ -1244,6 +1244,29 @@ class BlockMatrixBase : public Subscriptor
     void Tvmult_nonblock_nonblock (VectorType       &dst,
 		                   const VectorType &src) const;
     
+
+  protected:
+
+				     /**
+				      * Some matrix types, in particular PETSc,
+				      * need to synchronize set and add
+				      * operations. This has to be done for all
+				      * matrices in the BlockMatrix.
+				      * This routine prepares adding of elements
+				      * by notifying all blocks. Called by all
+				      * internal routines before adding
+				      * elements.
+				      */ 
+    void prepare_add_operation();
+
+				     /**
+				      * Notifies all blocks to let them prepare
+				      * for setting elements, see
+				      * prepare_add_operation().
+				      */
+    void prepare_set_operation();
+
+
   private:
 				     /**
 				      * Temporary vector for counting the
@@ -1868,6 +1891,7 @@ BlockMatrixBase<MatrixType>::set (const unsigned int i,
                                   const unsigned int j,
                                   const value_type value)
 {
+  prepare_set_operation();
 
   Assert (numbers::is_finite(value), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
@@ -1953,6 +1977,8 @@ BlockMatrixBase<MatrixType>::set (const unsigned int  row,
 				  const number       *values,
 				  const bool          elide_zero_values)
 {
+  prepare_set_operation();
+	
 				   // Resize scratch arrays
   if (column_indices.size() < this->n_block_cols())
     {
@@ -2053,6 +2079,8 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
   Assert (numbers::is_finite(value), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
+  prepare_add_operation();
+
                                    // save some cycles for zero additions, but
                                    // only if it is safe for the matrix we are
                                    // working with
@@ -2144,6 +2172,8 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
 				  const bool           elide_zero_values,
 				  const bool           col_indices_are_sorted)
 {
+  prepare_add_operation();
+	
 				   // TODO: Look over this to find out
 				   // whether we can do that more
 				   // efficiently.
@@ -2822,6 +2852,28 @@ BlockMatrixBase<MatrixType>::collect_sizes ()
                                    // finally initialize the row
                                    // indices with this array
   this->column_block_indices.reinit (col_sizes);
+}
+
+
+
+template <class MatrixType>
+void
+BlockMatrixBase<MatrixType>::prepare_add_operation ()
+{
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    for (unsigned int col=0; col<n_block_cols(); ++col)
+      block(row, col).prepare_add();
+
+}
+
+template <class MatrixType>
+void
+BlockMatrixBase<MatrixType>::prepare_set_operation ()
+{
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    for (unsigned int col=0; col<n_block_cols(); ++col)
+      block(row, col).prepare_set();
+
 }
 
 #endif // DOXYGEN

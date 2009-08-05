@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,9 @@
 #ifdef DEAL_II_USE_PETSC
 
 DEAL_II_NAMESPACE_OPEN
+                                 // forward declaration
+template <typename MatrixType>
+class BlockMatrixBase;
 
 
 namespace PETScWrappers
@@ -318,6 +321,12 @@ namespace PETScWrappers
       template <typename SparsityType>
       void do_reinit (const SparsityType &sparsity_pattern,
                       const bool          preset_nonzero_locations);
+                      
+				       /**
+				        *  To allow calling protected prepare_add()
+				        *  and prepare_set().
+				        */                       
+	  friend class BlockMatrixBase<SparseMatrix>;
   };
 }
 

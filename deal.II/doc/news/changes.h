@@ -224,6 +224,18 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li>
+  <p>
+  Fixed: Crash or strange behaviour (wrong matrix entries written) in
+  PETScWrappers::MPI::BlockSparseMatrix when adding or setting elements
+  through any of the set() and add() routines. This happened when different
+  CPUs access different blocks at the start of assembly or when switching
+  between adding and setting.
+  <br>
+  (Timo Heister 2009/08/05)
+  </p>
+  </li>
+  
   <li> <p>New: The relaxation preconditioners PreconditionJacobi, PreconditionSOR and
   PreconditionSSOR, as well as their blocked versions PreconditionBlockJacobi,
   PreconditionBlockSOR and PreconditionBlockSSOR now have functions <code>step</code>
@@ -231,6 +243,7 @@ inconvenience this causes.
   <br>
   (GK 2009/08/04)
   </p>
+  </li>
 
   <li>
   <p>

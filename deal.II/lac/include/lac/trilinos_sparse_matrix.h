@@ -40,7 +40,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// forward declaration
+				 // forward declarations
+template <typename MatrixType>
+class BlockMatrixBase;
+
 template <typename number> class SparseMatrix;
 
 namespace TrilinosWrappers
@@ -1862,9 +1865,50 @@ namespace TrilinosWrappers
 		      << "/" << arg2 << ")"
 		      << " of a sparse matrix, but it appears to not"
 		      << " exist in the Trilinos sparsity pattern.");
-				     //@}    
+				     //@}
+				 
+
+
+    protected:    
+
+                                      /**
+                                      * For some matrix storage
+                                      * formats, in particular for the
+                                      * PETSc distributed blockmatrices,
+                                      * set and add operations on
+                                      * individual elements can not be
+                                      * freely mixed. Rather, one has
+                                      * to synchronize operations when
+                                      * one wants to switch from
+                                      * setting elements to adding to
+                                      * elements.
+                                      * BlockMatrixBase automatically
+                                      * synchronizes the access by
+                                      * calling this helper function
+                                      * for each block.
+                                      * This function ensures that the
+                                      * matrix is in a state that
+                                      * allows adding elements; if it
+                                      * previously already was in this
+                                      * state, the function does
+                                      * nothing.
+                                      */
+      void prepare_add();
+
+				      /**
+                                      * Same as prepare_add() but
+                                      * prepare the matrix for setting
+                                      * elements if the representation
+                                      * of elements in this class
+                                      * requires such an operation.
+                                      */
+      void prepare_set();
+
+
+      
     private:
-                                       /**
+      
+				       /**
 				        * Epetra Trilinos
 				        * mapping of the matrix rows
 				        * that assigns parts of the
@@ -1959,6 +2003,11 @@ namespace TrilinosWrappers
                                         */
       std::auto_ptr<Epetra_FECrsMatrix> matrix;
 
+				       /**
+				        *  To allow calling protected prepare_add()
+				        *  and prepare_set().
+				        */ 
+	  friend class BlockMatrixBase<SparseMatrix>;
   };
 
 
@@ -2959,6 +3008,26 @@ namespace TrilinosWrappers
   {
     return matrix->ColMap();
   }
+
+  
+
+  inline
+  void
+  SparseMatrix::prepare_add()
+  {
+                                   //nothing to do here
+  }
+
+
+  
+  inline
+  void
+  SparseMatrix::prepare_set()
+  {
+                                   //nothing to do here
+  }
+
+  
 
 #endif // DOXYGEN      
 }
