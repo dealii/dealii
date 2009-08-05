@@ -402,7 +402,27 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
 
 
 /**
- * SOR preconditioner using matrix built-in function.  The MATRIX
+ * SOR preconditioner using matrix built-in function.
+ *
+ * Assuming the matrix <i>A = D + L + U</i> is split into its diagonal
+ * <i>D</i> as well as the strict lower and upper triangles <i>L</i>
+ * and <i>U</i>, then the SOR preconditioner with relaxation parameter
+ * <i>r</i> is
+ * @f[
+ *  P^{-1} = r (D+rL)^{-1}.
+ * @f]
+ * It is this operator <i>P<sup>-1</sup></i>, which is implemented by
+ * vmult() through forward substitution. Analogously, Tvmult()
+ * implements the operation of <i>r(D+rU)<sup>-1</sup></i>.
+ *
+ * The SOR iteration itself can be directly written as
+ * @f[
+ *  x^{k+1} = x^k - r D^{-1} \bigl(L x^{k+1} + U x^k - b\bigr).
+ * @f]
+ * Using the right hand side <i>b</i> and the previous iterate
+ * <i>x</i>, this is the operation implemented by step().
+ *
+ * The MATRIX
  * class used is required to have functions
  * <tt>precondition_SOR(VECTOR&, const VECTOR&, double)</tt> and
  * <tt>precondition_TSOR(VECTOR&, const VECTOR&, double)</tt>.
