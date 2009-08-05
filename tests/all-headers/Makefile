@@ -9,6 +9,7 @@
 include ../Makefile.paths
 include $D/common/Make.global_options
 
+
 ############################################################
 # First how to create executables, including all necessary
 # flags:
@@ -20,20 +21,28 @@ ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)
 flags += -Wno-missing-noreturn
 endif
 
-%.g.$(OBJEXT) : %.cc Makefile
-	@echo =====debug========= $<
+%.g.$(OBJEXT) : %.cc
+	@echo =====debug========= $@
 	@$(CXX) $(flags) -c $< -o $@
 
-%.$(OBJEXT) : %.cc Makefile
-	@echo =====optimized===== $<
+%.$(OBJEXT) : %.cc
+	@echo =====optimized===== $@
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
+%.cc :
+	@echo "=================== $@"
+	@echo "#include <$^>" > $@
 
-default:all
+%.OK : %.g.$(OBJEXT)
+	@echo "=================== $@"
+	@touch $@
+
+
+default: all
 
 # collect all headers
 HEADERS = $(shell cd $D; echo */include/*/*.h)
-TESTS   = $(HEADERS:%=test-%)
+TESTS   = $(shell for i in $(HEADERS) ; do echo test-$$i | $(PERL) -pi -e 's/.h$$/.OK/g; s/\//-/g;' ; done)
 
 
 # we need two auxiliary functions. the first one takes a filename and replaces
@@ -51,16 +60,10 @@ normalize = $(shell echo $(1) | $(PERL) -pi -e 's/.*include.//g;')
 # files as the head of the rule, followed by a colon. Then the actual rule
 # that includes writing the .cc file that only includes a single header file,
 # compiles it, and then deletes everything again
-Makefile.dep: $(HEADERS:%=$D/%) Makefile
+Makefile.dep: $(HEADERS:%=$D/%)
 	@for i in $(HEADERS) ; do \
-		echo test-$$i \\ ; \
+		echo `echo test-$$i | $(PERL) -pi -e 's/\.h/.cc/g; s/\//-/g;'` : $D/$$i ; \
 	 done > Makefile.dep
-	@echo : >> Makefile.dep
-	@echo '	@echo "=================== $$(call subst_slashes,$$@).cc"' >> Makefile.dep
-	@echo '	@echo "#include <$$(call normalize,$$@)>" > $$(call subst_slashes,$$@).cc' >> Makefile.dep
-	@echo '	@$$(MAKE) $$(call subst_slashes,$$@).g.o' >> Makefile.dep
-	@echo '	@rm -f $$(call subst_slashes,$$@).g.o' >> Makefile.dep
-	@echo '	@rm -f $$(call subst_slashes,$$@).cc' >> Makefile.dep
 
 include Makefile.dep
 
@@ -69,20 +72,19 @@ include Makefile.dep
 all: $(TESTS)
 
 
-# create a report, where we get exactly one line per test. unfortunately, this
-# is currently only sequential, even with -jN. we'd need something like the
-# status files in the other directories...
+# create a report, where we get exactly one line per test.
 report:
+	@-$(MAKE) -k
 	@for test in $(TESTS) ; do \
 		testname=all-headers/`echo $$test | perl -pi -e 's/.*include.//g; s/\//-/g;'` ; \
-		if (($(MAKE) $$test 2>&1) > /dev/null); then \
+		if test -f $$test ; then \
 			echo "`date -u +"%Y-%m-%d %H:%M"`  + $$testname" ; \
 		else \
 			echo "`date -u +"%Y-%m-%d %H:%M"` 0  $$testname" ; \
 		fi ; \
 	done
 
-report+mail:
+report+mail: all
 	@$(MAKE) report | tee testresults
 	@cat testresults | mail regression-tests@dealii.org
 	@rm testresults
@@ -90,7 +92,7 @@ report+mail:
 
 clean:
 	-rm -f Makefile.dep *.$(OBJEXT) \
-               *.g.$(OBJEXT) *.output *~
+               *.g.$(OBJEXT) *.output *~ *.OK *.cc
 
 
-.PHONY: report clean distclean
+.PHONY: report clean distclean all default report report+mail
