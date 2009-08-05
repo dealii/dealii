@@ -670,6 +670,10 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      * Make function accessible to iterator.
 				      */
     PreconditionBlock<MATRIX, inverse_type>::inverse;
+				     /**
+				      * Make function accessible.
+				      */
+    PreconditionBlock<MATRIX, inverse_type>::set_permutation;
     
 				     /**
 				      * Execute block Jacobi
@@ -838,6 +842,10 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * Make function of base class public again.
 				      */
     PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
+				     /**
+				      * Make function accessible.
+				      */
+    PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
 				     /**
 				      * Execute block SOR
