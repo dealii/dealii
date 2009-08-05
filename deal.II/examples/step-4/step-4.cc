@@ -491,12 +491,12 @@ void LaplaceProblem<dim>::assemble_system ()
                                        // As a final remark to these loops:
                                        // when we assemble the local
                                        // contributions into
-				       // <code>cell_matrix(i,j)<\code>,
+				       // <code>cell_matrix(i,j)</code>,
 				       // we have to multiply
                                        // the gradients of shape functions i
                                        // and j at point q_point and multiply
                                        // it with the scalar weights JxW. This
-                                       // is actually what happens:
+                                       // is what actually happens:
                                        // <code>fe_values.shape_grad(i,q_point)</code>
                                        // returns a <code>dim</code> dimensional
                                        // vector, represented by a
@@ -540,7 +540,7 @@ void LaplaceProblem<dim>::assemble_system ()
   
 				   // As the final step in this function, we
 				   // wanted to have non-homogeneous boundary
-				   // values in this example, contrary to the
+				   // values in this example, unlike the
 				   // one before. This is a simple task, we
 				   // only have to replace the
 				   // <code>ZeroFunction</code> used there by an object
