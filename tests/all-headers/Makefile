@@ -44,6 +44,8 @@ default: all
 HEADERS = $(shell cd $D; echo */include/*/*.h)
 TESTS   = $(shell for i in $(HEADERS) ; do echo test-$$i | $(PERL) -pi -e 's/.h$$/.OK/g; s/\//-/g;' ; done)
 
+ID = `id -un`"@"`hostname`
+
 
 # we need two auxiliary functions. the first one takes a filename and replaces
 # all occurrences of slashes by hyphens, so that we can create a .cc file that
@@ -75,6 +77,9 @@ all: $(TESTS)
 # create a report, where we get exactly one line per test.
 report:
 	@-$(MAKE) -k
+	@-svn info $D | grep '^Revision'
+	@echo 'Date: ' `date -u +"%Y %j  %F  %U-%w"`
+	@echo 'Id: ' $(ID)
 	@for test in $(TESTS) ; do \
 		testname=all-headers/`echo $$test | perl -pi -e 's/.*include.//g; s/\//-/g;'` ; \
 		if test -f $$test ; then \
