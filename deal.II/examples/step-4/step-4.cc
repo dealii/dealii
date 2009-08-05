@@ -493,8 +493,8 @@ void LaplaceProblem<dim>::assemble_system ()
                                        // contributions into
 				       // <code>cell_matrix(i,j)</code>,
 				       // we have to multiply
-                                       // the gradients of shape functions i
-                                       // and j at point q_point and multiply
+                                       // the gradients of shape functions $i$
+                                       // and $j$ at point q_point and multiply
                                        // it with the scalar weights JxW. This
                                        // is what actually happens:
                                        // <code>fe_values.shape_grad(i,q_point)</code>
