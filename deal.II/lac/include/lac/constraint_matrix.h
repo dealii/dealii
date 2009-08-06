@@ -606,8 +606,15 @@ class ConstraintMatrix : public Subscriptor
 				      */
     unsigned int max_constraint_indirections () const;
 
-    
-    
+				     /**
+				      * Returns <tt>false</tt> if all
+				      * constraints in the ConstraintMatrix
+				      * are homogeneous ones, and
+				      * <tt>true</tt> if there is at least
+				      * one inhomogeneity.
+				      */
+    bool has_inhomogeneities () const;
+
 				     /**
 				      * Print the constraint lines. Mainly
 				      * for debugging purposes.

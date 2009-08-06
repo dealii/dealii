@@ -2005,6 +2005,17 @@ unsigned int ConstraintMatrix::max_constraint_indirections () const
   return return_value;
 }
 
+
+
+bool ConstraintMatrix::has_inhomogeneities () const
+{
+  for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
+       i!=lines.end(); ++i)
+    if (i->inhomogeneity != 0.)
+      return true;
+
+  return false;
+}
     
 
 void ConstraintMatrix::print (std::ostream &out) const
