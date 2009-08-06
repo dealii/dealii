@@ -159,6 +159,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The Utilities::Trilinos::duplicate_communicator function allows to duplicate
+  an Epetra_Comm object to get a unique parallel MPI communicator out of an
+  existing one.
+  <br>
+  (WB 2009/08/06)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: There is now a specialization Tensor<0,dim> of tensors of rank 0. Since rank-0
   tensors are scalars, this class essentially acts like a scalar, but it allows for
   some neat template tricks that involve tensors of arbitrary rank.

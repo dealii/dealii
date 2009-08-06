@@ -365,6 +365,63 @@ namespace Utilities
 				      */
     const Epetra_Comm& comm_world();
 
+				     /**
+				      * Given a communicator, duplicate it. If
+				      * the given communicator is serial, that
+				      * means to just return a copy of
+				      * itself. On the other hand, if it is
+				      * parallel, we duplicate the underlying
+				      * MPI_Comm object: we create a separate
+				      * MPI communicator that contains the
+				      * same processors and in the same order
+				      * but has a separate identifier distinct
+				      * from the given communicator. The
+				      * function returns a pointer to a new
+				      * object of a class derived from
+				      * Epetra_Comm. The caller of this
+				      * function needs to assume ownership of
+				      * this function.
+				      *
+				      * This facility is used to separate
+				      * streams of communication. For example,
+				      * a program could simply use
+				      * MPI_Comm_World for everything. But it
+				      * is easy to come up with scenarios
+				      * where sometimes not all processors
+				      * participate in a communication that is
+				      * intended to be global -- for example
+				      * if we assemble a matrix on a coarse
+				      * mesh with fewer cells than there are
+				      * processors, some processors may not
+				      * sync their matrices with the rest
+				      * because they haven't written into it
+				      * because they own no cells. That's
+				      * clearly a bug. However, if these
+				      * processors just continue their work,
+				      * and the next parallel operation
+				      * happens to be a sync on a different
+				      * matrix, then the sync could succeed --
+				      * by accident, since different
+				      * processors are talking about different
+				      * matrices.
+				      *
+				      * This kind of situation can be avoided
+				      * if we use different communicators for
+				      * different matrices which reduces the
+				      * likelihood that communications meant
+				      * to be separate aren't recognized as
+				      * such just because they happen on the
+				      * same communicator. In addition, it is
+				      * conceivable that some MPI operations
+				      * can be parallelized using multiple
+				      * threads because their communicators
+				      * identifies the communication in
+				      * question, not their relative timing as
+				      * is the case in a sequential program
+				      * that just uses a single communicator.
+				      */
+    Epetra_Comm *
+    duplicate_communicator (const Epetra_Comm &communicator);
 
 				     /**
 				      * Return the number of MPI processes

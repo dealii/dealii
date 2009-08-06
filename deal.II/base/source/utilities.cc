@@ -32,6 +32,15 @@
 #  include <limits.h>
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#    include <Epetra_MpiComm.h>
+#  endif
+#  include "Epetra_SerialComm.h"
+#endif
+
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -598,6 +607,32 @@ namespace Utilities
       return *communicator;
     }
 
+
+
+    Epetra_Comm *
+    duplicate_communicator (const Epetra_Comm &communicator)
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+
+				       // see if the communicator is in fact a
+				       // parallel MPI communicator; if so,
+				       // return a duplicate of it
+      Epetra_MpiComm
+	*mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&communicator);
+      if (mpi_comm != 0)
+	return new Epetra_MpiComm(duplicate_communicator(mpi_comm->GetMpiComm()));
+#endif
+
+				       // if we don't support MPI, or if the
+				       // communicator in question was in fact
+				       // not an MPI communicator, return a
+				       // copy of the same object again
+      Assert (dynamic_cast<const Epetra_SerialComm*>(&communicator)
+	      != 0,
+	      ExcInternalError());
+      return new Epetra_SerialComm(dynamic_cast<const Epetra_SerialComm&>(communicator));
+    }
+    
 
     unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator)
     {
