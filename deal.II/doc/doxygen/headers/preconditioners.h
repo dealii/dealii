@@ -75,16 +75,17 @@
  * themselves. For them, an additional interface exists, consisting of
  * the functions
  * @code
- * void  step (VECTOR& dst, const VECTOR& src) const;
- * void  Tstep (VECTOR& dst, const VECTOR& src) const;
+ * void  step (VECTOR& dst, const VECTOR& rhs) const;
+ * void  Tstep (VECTOR& dst, const VECTOR& rhs) const;
  * @endcode
  *
  * Here, $src$ is a residual vector and $dst$ is the iterate that is
  * supposed to be updated. In other words, the operation performed by
  * these functions is
- * $dst = dst - P^{-1} src$ and $dst = dst - P^{-T} src$. The
+ * $dst = dst - P^{-1} (A dst - rhs)$ and $dst = dst - P^{-T} (A dst - rhs)$. The
  * functions are called this way because they perform <i>one step</i>
- * of a fixed point iteration.
+ * of a fixed point (Richardson) iteration. Note that preconditioners
+ * store a reference to the original matrix $A$ during initialization.
  *
  * @ingroup LAC
  * @ingroup Matrices
