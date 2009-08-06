@@ -617,10 +617,11 @@ namespace Utilities
 				       // see if the communicator is in fact a
 				       // parallel MPI communicator; if so,
 				       // return a duplicate of it
-      Epetra_MpiComm
+      const Epetra_MpiComm
 	*mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&communicator);
       if (mpi_comm != 0)
-	return new Epetra_MpiComm(duplicate_communicator(mpi_comm->GetMpiComm()));
+	return new Epetra_MpiComm(Utilities::System::
+				  duplicate_communicator(mpi_comm->GetMpiComm()));
 #endif
 
 				       // if we don't support MPI, or if the
