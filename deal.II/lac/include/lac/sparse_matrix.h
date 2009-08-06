@@ -23,8 +23,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<typename number> class Vector;
-template<typename number> class FullMatrix;
+template <typename number> class Vector;
+template <typename number> class FullMatrix;
+template <typename Matrix> class BlockMatrixBase;
+
 
 /*! @addtogroup Matrix1
  *@{
