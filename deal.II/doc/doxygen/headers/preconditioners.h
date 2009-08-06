@@ -22,15 +22,18 @@
  * preconditioners when available.
  *
  * When talking of preconditioners, we usually expect them to be used
- * in Krylov-space methods. Nevertheless, the concept becomes clearer
- * in the standard linear defect correction
+ * in Krylov-space methods. In that case, the act as operators: given
+ * a vector $x$, produce the result $y=P^{-1}x$ of the multiplication
+ * with the preconditioning operator $P^{-1}$.
+ *
+ * However, some preconditioners can also be used
+ * in the standard linear defect correction iteration,
  * @f[
  *  x^{k+1} = x^k - P^{-1} \bigl(A x^k - b\bigr),
  * @f]
- * where <i>P<sup>-1</sup></i> is the preconditioner. Thus,
+ * where <i>P<sup>-1</sup></i> is again the preconditioner. Thus,
  * preconditioning amounts to applying a linear operator to the
- * residual. For this reason, the interface of preconditioners equals
- * the one for matrices.
+ * residual.
  *
  * <h3>The interface</h3>
  *
@@ -59,20 +62,29 @@
  * void  vmult (VECTOR& dst, const VECTOR& src) const;
  * void  Tvmult (VECTOR& dst, const VECTOR& src) const;
  * @endcode
- * Solvers use the function
- * <tt>vmult()</tt> of the preconditioner. Some solvers may also use
- * <tt>Tvmult()</tt>.
+ * These functions apply the preconditioning operator to the source
+ * vector $src$ and return the result in $dst$ as $dst=P^{-1}src$ or
+ * $dst=P^{-T}src$. Preconditioned iterative
+ * dolvers use these <tt>vmult()</tt> functions of the preconditioner.
+ * Some solvers may also use <tt>Tvmult()</tt>.
  *
  * <h4>Relaxation methods</h4>
  *
- * Additional to the interface described below, some preconditioners
- * like SOR and Jacobi have benn known as iterative methods
+ * Additional to the interface described above, some preconditioners
+ * like SOR and Jacobi have been known as iterative methods
  * themselves. For them, an additional interface exists, consisting of
  * the functions
  * @code
  * void  step (VECTOR& dst, const VECTOR& src) const;
  * void  Tstep (VECTOR& dst, const VECTOR& src) const;
  * @endcode
+ *
+ * Here, $src$ is a residual vector and $dst$ is the iterate that is
+ * supposed to be updated. In other words, the operation performed by
+ * these functions is
+ * $dst = dst - P^{-1} src$ and $dst = dst - P^{-T} src$. The
+ * functions are called this way because they perform <i>one step</i>
+ * of a fixed point iteration.
  *
  * @ingroup LAC
  * @ingroup Matrices
