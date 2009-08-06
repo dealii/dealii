@@ -2863,8 +2863,9 @@ BlockMatrixBase<MatrixType>::prepare_add_operation ()
   for (unsigned int row=0; row<n_block_rows(); ++row)
     for (unsigned int col=0; col<n_block_cols(); ++col)
       block(row, col).prepare_add();
-
 }
+
+
 
 template <class MatrixType>
 void
@@ -2873,7 +2874,6 @@ BlockMatrixBase<MatrixType>::prepare_set_operation ()
   for (unsigned int row=0; row<n_block_rows(); ++row)
     for (unsigned int col=0; col<n_block_cols(); ++col)
       block(row, col).prepare_set();
-
 }
 
 #endif // DOXYGEN
