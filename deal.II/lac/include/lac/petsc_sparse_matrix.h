@@ -24,8 +24,7 @@
 
 DEAL_II_NAMESPACE_OPEN
                                  // forward declaration
-template <typename MatrixType>
-class BlockMatrixBase;
+template <typename MatrixType> class BlockMatrixBase;
 
 
 namespace PETScWrappers
@@ -323,10 +322,11 @@ namespace PETScWrappers
                       const bool          preset_nonzero_locations);
                       
 				       /**
-				        *  To allow calling protected prepare_add()
-				        *  and prepare_set().
+				        *  To allow calling protected
+				        *  prepare_add() and
+				        *  prepare_set().
 				        */                       
-	  friend class BlockMatrixBase<SparseMatrix>;
+      friend class BlockMatrixBase<SparseMatrix>;
   };
 }
 

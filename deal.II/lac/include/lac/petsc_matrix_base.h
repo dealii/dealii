@@ -28,6 +28,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <typename Matrix> class BlockMatrixBase;
+
 
 namespace PETScWrappers
 {
@@ -1221,11 +1223,11 @@ namespace PETScWrappers
 
 
 				       /**
-				        *  To allow calling protected prepare_add()
-				        *  and prepare_set().
+				        *  To allow calling protected
+				        *  prepare_add() and
+				        *  prepare_set().
 				        */ 
       template <class> friend class BlockMatrixBase;
-
   };
 
 

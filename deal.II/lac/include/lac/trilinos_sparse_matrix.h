@@ -41,8 +41,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 				 // forward declarations
-template <typename MatrixType>
-class BlockMatrixBase;
+template <typename MatrixType> class BlockMatrixBase;
 
 template <typename number> class SparseMatrix;
 
@@ -2004,10 +2003,11 @@ namespace TrilinosWrappers
       std::auto_ptr<Epetra_FECrsMatrix> matrix;
 
 				       /**
-				        *  To allow calling protected prepare_add()
-				        *  and prepare_set().
+				        *  To allow calling protected
+				        *  prepare_add() and
+				        *  prepare_set().
 				        */ 
-	  friend class BlockMatrixBase<SparseMatrix>;
+      friend class BlockMatrixBase<SparseMatrix>;
   };
 
 
