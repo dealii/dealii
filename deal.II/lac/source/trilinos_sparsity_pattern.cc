@@ -83,7 +83,8 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern ()
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		  communicator (Utilities::Trilinos::duplicate_communicator (MPI_COMM_SELF)),
+                  communicator (Utilities::Trilinos::
+				duplicate_communicator (Epetra_MpiComm(MPI_COMM_SELF))),
 #else
 		  communicator (new Epetra_SerialComm()),
 #endif
@@ -198,7 +199,7 @@ namespace TrilinosWrappers
 				    const unsigned int n_entries_per_row)
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		  communicator (Utilities::Trilinos::duplicate_communicator (MPI_COMM_SELF)),
+		  communicator (Utilities::Trilinos::duplicate_communicator (Epetra_MpiComm(MPI_COMM_SELF))),
 #else
 		  communicator (new Epetra_SerialComm()),
 #endif
@@ -216,7 +217,7 @@ namespace TrilinosWrappers
 				    const std::vector<unsigned int> &n_entries_per_row)
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		  communicator (Utilities::Trilinos::duplicate_communicator (MPI_COMM_SELF)),
+		  communicator (Utilities::Trilinos::duplicate_communicator (Epetra_MpiComm(MPI_COMM_SELF))),
 #else
 		  communicator (new Epetra_SerialComm()),
 #endif
