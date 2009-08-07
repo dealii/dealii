@@ -82,12 +82,8 @@ namespace TrilinosWrappers
 				  // interface.
   SparsityPattern::SparsityPattern ()
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  communicator (Utilities::Trilinos::
-				duplicate_communicator (Epetra_MpiComm(MPI_COMM_SELF))),
-#else
-		  communicator (new Epetra_SerialComm()),
-#endif
+		  communicator (Utilities::Trilinos::duplicate_communicator
+				(Utilities::Trilinos::comm_self())),
                   row_map (0, 0, *communicator),
 		  col_map (0, 0, *communicator),
 		  compressed (true),
@@ -198,11 +194,8 @@ namespace TrilinosWrappers
 				    const unsigned int n,
 				    const unsigned int n_entries_per_row)
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		  communicator (Utilities::Trilinos::duplicate_communicator (Epetra_MpiComm(MPI_COMM_SELF))),
-#else
-		  communicator (new Epetra_SerialComm()),
-#endif
+		  communicator (Utilities::Trilinos::duplicate_communicator
+				(Utilities::Trilinos::comm_self())),
                   row_map (m, 0, *communicator),
                   col_map (n, 0, *communicator),
 		  compressed (false),
@@ -216,11 +209,8 @@ namespace TrilinosWrappers
 				    const unsigned int               n,
 				    const std::vector<unsigned int> &n_entries_per_row)
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		  communicator (Utilities::Trilinos::duplicate_communicator (Epetra_MpiComm(MPI_COMM_SELF))),
-#else
-		  communicator (new Epetra_SerialComm()),
-#endif
+		  communicator (Utilities::Trilinos::duplicate_communicator
+				(Utilities::Trilinos::comm_self())),
                   row_map (m, 0, *communicator),
                   col_map (n, 0, *communicator),
 		  compressed (false),
@@ -266,14 +256,8 @@ namespace TrilinosWrappers
 			   const unsigned int  n,
 			   const unsigned int  n_entries_per_row)
   {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
-#else
-    Epetra_SerialComm trilinos_communicator;
-#endif
-
-    const Epetra_Map rows (m, 0, trilinos_communicator);
-    const Epetra_Map columns (n, 0, trilinos_communicator);
+    const Epetra_Map rows (m, 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (n, 0, Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, n_entries_per_row);
   }
@@ -284,11 +268,16 @@ namespace TrilinosWrappers
 			   const Epetra_Map   &input_col_map,
 			   const unsigned int  n_entries_per_row)
   {
+    communicator.reset (Utilities::Trilinos::
+			duplicate_communicator (input_row_map.Comm()));
+
+    row_map = Utilities::Trilinos::duplicate_map (input_row_map,
+						  *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (input_col_map,
+						  *communicator);
+
     graph.reset();
-
-    row_map = input_row_map;
-    col_map = input_col_map;
-
+    
 				   // for more than one processor, need to
 				   // specify only row map first and let the
 				   // matrix entries decide about the column
@@ -323,14 +312,8 @@ namespace TrilinosWrappers
 			   const unsigned int  n,
 			   const std::vector<unsigned int> &n_entries_per_row)
   {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
-#else
-    Epetra_SerialComm trilinos_communicator;
-#endif
-
-    const Epetra_Map rows (m, 0, trilinos_communicator);
-    const Epetra_Map columns (n, 0, trilinos_communicator);
+    const Epetra_Map rows (m, 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (n, 0, Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, n_entries_per_row);
   }
@@ -342,14 +325,20 @@ namespace TrilinosWrappers
 			   const Epetra_Map   &input_col_map,
 			   const std::vector<unsigned int> &n_entries_per_row)
   {
-    graph.reset();
-
     Assert (n_entries_per_row.size() == 
 	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
 	    ExcDimensionMismatch (n_entries_per_row.size(),
 				  input_row_map.NumGlobalElements()));
-    row_map = input_row_map;
-    col_map = input_col_map;
+
+    communicator.reset (Utilities::Trilinos::
+			duplicate_communicator (input_row_map.Comm()));
+
+    row_map = Utilities::Trilinos::duplicate_map (input_row_map,
+						  *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (input_col_map,
+						  *communicator);
+
+    graph.reset();
 
     if (row_map.Comm().NumProc() > 1)
       graph = std::auto_ptr<Epetra_FECrsGraph>
@@ -381,8 +370,6 @@ namespace TrilinosWrappers
 			   const Epetra_Map   &input_col_map,
 			   const SparsityType &sp)
   {
-    graph.reset();
-
     Assert (sp.n_rows() == 
 	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
 	    ExcDimensionMismatch (sp.n_rows(),
@@ -392,8 +379,15 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (sp.n_cols(),
 				  input_col_map.NumGlobalElements()));
 
-    row_map = input_row_map;
-    col_map = input_col_map;
+    communicator.reset (Utilities::Trilinos::
+			duplicate_communicator (input_row_map.Comm()));
+
+    row_map = Utilities::Trilinos::duplicate_map (input_row_map,
+						  *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (input_col_map,
+						  *communicator);
+
+    graph.reset();
 
     const unsigned int n_rows = sp.n_rows();
 
@@ -444,8 +438,6 @@ namespace TrilinosWrappers
 			   const Epetra_Map   &input_col_map,
 			   const CompressedSetSparsityPattern &sp)
   {
-    graph.reset();
-
     Assert (sp.n_rows() == 
 	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
 	    ExcDimensionMismatch (sp.n_rows(),
@@ -455,8 +447,15 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (sp.n_cols(),
 				  input_col_map.NumGlobalElements()));
 
-    row_map = input_row_map;
-    col_map = input_col_map;
+    communicator.reset (Utilities::Trilinos::
+			duplicate_communicator (input_row_map.Comm()));
+
+    row_map = Utilities::Trilinos::duplicate_map (input_row_map,
+						  *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (input_col_map,
+						  *communicator);
+
+    graph.reset();
 
     const unsigned int n_rows = sp.n_rows();
 
@@ -518,14 +517,8 @@ namespace TrilinosWrappers
   void 
   SparsityPattern::copy_from (const SparsityType &sp)
   {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
-#else
-    Epetra_SerialComm trilinos_communicator;
-#endif
-
-    const Epetra_Map rows (sp.n_rows(), 0, trilinos_communicator);
-    const Epetra_Map columns (sp.n_cols(), 0, trilinos_communicator);
+    const Epetra_Map rows (sp.n_rows(), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (sp.n_cols(), 0, Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, sp);
   }
@@ -540,12 +533,7 @@ namespace TrilinosWrappers
 				  // empty matrix.
     graph.reset();
  
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    row_map = Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_SELF));
-#else
-    row_map = Epetra_Map (0, 0, Epetra_SerialComm());
-#endif
-
+    row_map = Epetra_Map (0, 0, Utilities::Trilinos::comm_self());
     col_map = row_map;
 
     graph = std::auto_ptr<Epetra_FECrsGraph> 
