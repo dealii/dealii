@@ -19,13 +19,15 @@
 #include <base/subscriptor.h>
 #include <base/table.h>
 #include <base/template_constraints.h>
-#include <base/std_cxx1x/shared_ptr.h>
 
 #include <lac/trilinos_vector.h>
 
 #include <vector>
 #include <map>
 #include <utility>
+
+#include <boost/scoped_ptr.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1535,7 +1537,7 @@ class ConstraintMatrix : public Subscriptor
 				       * This vector is used to import data
 				       * within the distribute function.
 				       */
-    mutable std_cxx1x::unique_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
+    mutable boost::scoped_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
 #endif
 };
 
