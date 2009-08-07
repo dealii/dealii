@@ -20,6 +20,8 @@
 #include <lac/trilinos_vector_base.h>
 #include <lac/trilinos_sparse_matrix.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #ifdef DEAL_II_USE_TRILINOS
 
 #  include "Epetra_Map.h"
@@ -373,16 +375,27 @@ namespace TrilinosWrappers
 	   const Vector                                 &vector);
 
       private:
-                                       /**
-                                        * The Epetra map is used to map
-                                        * (or rather, partition) vector
-                                        * data accross multiple
-                                        * processes. This is the
-                                        * communicator and data
-                                        * distribution object common to
-                                        * all Trilinos objects used by
-                                        * deal.II.
-                                        */
+					 /**
+					  * A pointer to the communicator used
+					  * for all operations in this object.
+					  *
+					  * Note that we create a new
+					  * communicator (with a unique MPI ID)
+					  * for each object if we are running in
+					  * parallel.
+					  */
+      boost::scoped_ptr<Epetra_Comm> communicator;
+
+					 /**
+					  * The Epetra map is used to map
+					  * (or rather, partition) vector
+					  * data accross multiple
+					  * processes. This is the
+					  * communicator and data
+					  * distribution object common to
+					  * all Trilinos objects used by
+					  * deal.II.
+					  */
 	Epetra_Map map;
     };
 

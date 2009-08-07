@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 
+#include <base/utilities.h>
 #include <lac/trilinos_vector.h>
 
 #include <cmath>
@@ -32,10 +33,11 @@ namespace TrilinosWrappers
     Vector::Vector ()
                    :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                   map (0,0,Epetra_MpiComm(MPI_COMM_SELF))
+		    communicator (Utilities::Trilinos::duplicate_communicator(MPI_COMM_SELF)),
 #else
-		   map (0,0,Epetra_SerialComm())
+		    communicator (new Epetra_SerialComm()),
 #endif
+		    map (0, 0, *communicator)
     {
       last_action = Zero;
       vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
@@ -45,7 +47,10 @@ namespace TrilinosWrappers
   
     Vector::Vector (const Epetra_Map &InputMap)
                     :
-		    map (InputMap)
+		    communicator (Utilities::Trilinos::
+				  duplicate_communicator (InputMap.Comm())),
+		    map (Utilities::Trilinos::
+			 duplicate_map (InputMap, *communicator))
     {
       last_action = Zero;
       vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
@@ -56,7 +61,10 @@ namespace TrilinosWrappers
     Vector::Vector (const Vector &v)
                     :
                     VectorBase(),
-		    map (v.map)
+		    communicator (Utilities::Trilinos::
+				  duplicate_communicator (*v.communicator)),
+		    map (Utilities::Trilinos::duplicate_map (v.map,
+							     *communicator))
     {
       last_action = Zero;
       vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
@@ -68,7 +76,10 @@ namespace TrilinosWrappers
 		    const VectorBase &v)
                     :
                     VectorBase(),
-		    map (InputMap)
+		    communicator (Utilities::Trilinos::
+				  duplicate_communicator (InputMap.Comm())),
+		    map (Utilities::Trilinos::
+			 duplicate_map (InputMap, *communicator))
     {
       AssertThrow (map.NumGlobalElements() == v.vector->Map().NumGlobalElements(),
 		   ExcDimensionMismatch (map.NumGlobalElements(),
@@ -83,7 +94,6 @@ namespace TrilinosWrappers
 	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	  reinit (v, false, true);
 	}
-
     }
 
 
@@ -92,14 +102,16 @@ namespace TrilinosWrappers
     Vector::reinit (const Epetra_Map &input_map,
 		    const bool        fast)
     {
-      if (vector->Map().SameAs(input_map) == false)
-	{
-	  vector.reset();
-	  map = input_map;
+      vector.reset();
+
+      communicator.reset (Utilities::Trilinos::
+			  duplicate_communicator(input_map.Comm()));
+      map = Utilities::Trilinos::duplicate_map (input_map, *communicator);
       
-	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-	}
-      else if (fast == false)
+      
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+
+      if (fast == false)
 	{
 	  const int ierr = vector->PutScalar(0.);
 	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -127,10 +139,11 @@ namespace TrilinosWrappers
 	  if (local_range() != v.local_range())
 	    {
 	      vector.reset();
-	      map = Epetra_Map(v.vector->Map().NumGlobalElements(),
-			       v.vector->Map().NumMyElements(),
-			       v.vector->Map().IndexBase(),
-			       v.vector->Map().Comm());
+	      communicator.reset (Utilities::Trilinos::
+				  duplicate_communicator(v.trilinos_vector()
+							 .Map().Comm()));
+	      map = Utilities::Trilinos::
+		    duplicate_map (v.trilinos_vector().Map(), *communicator);
 
 	      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	      last_action = Zero;
@@ -200,10 +213,14 @@ namespace TrilinosWrappers
       else
 	{
 	  vector.reset();
-	  map = Epetra_Map(v.vector->Map().NumGlobalElements(),
-			   v.vector->Map().NumMyElements(),
-			   v.vector->Map().IndexBase(),
-			   v.vector->Map().Comm());
+
+	  communicator.reset (Utilities::Trilinos::
+			      duplicate_communicator(v.trilinos_vector().
+						     Map().Comm()));
+	  map = Utilities::Trilinos::
+		duplicate_map (v.trilinos_vector().Map(),
+			       *communicator);
+
 	  vector = std::auto_ptr<Epetra_FEVector> 
 	                    (new Epetra_FEVector(*v.vector));
 	  last_action = Zero;
