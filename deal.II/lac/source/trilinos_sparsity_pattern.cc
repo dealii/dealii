@@ -505,6 +505,7 @@ namespace TrilinosWrappers
 
 
 
+  void
   SparsityPattern::copy_from (const SparsityPattern &sp)
   {
     Assert (false, ExcNotImplemented());
