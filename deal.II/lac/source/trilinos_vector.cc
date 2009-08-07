@@ -31,12 +31,9 @@ namespace TrilinosWrappers
 
 
     Vector::Vector ()
-                   :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		    communicator (Utilities::Trilinos::duplicate_communicator(MPI_COMM_SELF)),
-#else
-		    communicator (new Epetra_SerialComm()),
-#endif
+		    :
+		    communicator (Utilities::Trilinos::
+				  duplicate_communicator(Utilities::Trilinos::comm_self())),
 		    map (0, 0, *communicator)
     {
       last_action = Zero;
@@ -279,12 +276,9 @@ namespace TrilinosWrappers
 
 
   Vector::Vector ()
-                 :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                 map (0, 0, Epetra_MpiComm(MPI_COMM_SELF))
-#else
-		 map (0, 0, Epetra_SerialComm())
-#endif
+		  :
+		  map (0, 0,
+		       Utilities::Trilinos::comm_self())
   {
     last_action = Zero;
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
@@ -294,11 +288,8 @@ namespace TrilinosWrappers
 
   Vector::Vector (const unsigned int n)
                  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                 map ((int)n, 0, Epetra_MpiComm(MPI_COMM_SELF))
-#else
-		 map ((int)n, 0, Epetra_SerialComm())
-#endif
+		  map ((int)n, 0,
+		       Utilities::Trilinos::comm_self())
   {
     last_action = Zero;
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
@@ -344,11 +335,8 @@ namespace TrilinosWrappers
       {
 	vector.reset();
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-	map = Epetra_LocalMap ((int)n, 0, Epetra_MpiComm(MPI_COMM_SELF));
-#else
-	map = Epetra_LocalMap ((int)n, 0, Epetra_SerialComm());
-#endif
+	map = Epetra_LocalMap ((int)n, 0,
+			       Utilities::Trilinos::comm_self());
 
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
       }
