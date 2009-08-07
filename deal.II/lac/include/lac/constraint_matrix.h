@@ -19,6 +19,7 @@
 #include <base/subscriptor.h>
 #include <base/table.h>
 #include <base/template_constraints.h>
+#include <base/std_cxx1x/shared_ptr.h>
 
 #include <lac/trilinos_vector.h>
 
@@ -1529,11 +1530,12 @@ class ConstraintMatrix : public Subscriptor
 				 internal::bool2type<true>) const;
 
 #ifdef DEAL_II_USE_TRILINOS
+//TODO: Make use of the following member thread safe    
 				      /**
 				       * This vector is used to import data
 				       * within the distribute function.
 				       */
-    mutable std::auto_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
+    mutable std_cxx1x::unique_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
 #endif
 };
 
