@@ -159,9 +159,19 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The Utilities::System::comm_self function return an MPI
+  communicator that consists only of the current processor.
+  <br>
+  (WB 2009/08/07)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The Utilities::Trilinos::duplicate_communicator function allows to duplicate
   an Epetra_Comm object to get a unique parallel MPI communicator out of an
-  existing one.
+  existing one. Utilities::Trilinos::duplicate_map creates a map that has
+  the same members as the given template but uses a separate communicator.
   <br>
   (WB 2009/08/06)
   </p>
