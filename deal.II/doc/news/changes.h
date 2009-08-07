@@ -159,7 +159,7 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  New: The Utilities::System::comm_self function return an MPI
+  New: The Utilities::Trilinos::comm_self function return an MPI
   communicator that consists only of the current processor.
   <br>
   (WB 2009/08/07)
