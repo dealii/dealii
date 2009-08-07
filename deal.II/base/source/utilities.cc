@@ -609,6 +609,22 @@ namespace Utilities
 
 
 
+    const Epetra_Comm&
+    comm_self()
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      static Teuchos::RCP<Epetra_MpiComm>
+	communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_SELF), true);
+#else
+      static Teuchos::RCP<Epetra_SerialComm>
+	communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
+#endif
+    
+      return *communicator;
+    }
+
+
+
     Epetra_Comm *
     duplicate_communicator (const Epetra_Comm &communicator)
     {
