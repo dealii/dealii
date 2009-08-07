@@ -29,6 +29,7 @@ typedef int MPI_Comm;
 #ifdef DEAL_II_USE_TRILINOS
 #  include <Teuchos_RCP.hpp>
 #  include <Epetra_Comm.h>
+#  include <Epetra_Map.h>
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #    include <Epetra_MpiComm.h>
 #  else
@@ -442,6 +443,25 @@ namespace Utilities
 				      * get_n_mpi_processes()).
 				      */
     unsigned int get_this_mpi_process (const Epetra_Comm &mpi_communicator);
+
+				     /**
+				      * Given a Trilinos Epetra map, create a
+				      * new map that has the same subdivision
+				      * of elements to processors but uses the
+				      * given communicator object instead of
+				      * the one stored in the first
+				      * argument. In essence, this means that
+				      * we create a map that communicates
+				      * among the same processors in the same
+				      * way, but using a separate channel.
+				      *
+				      * This function is typically used with a
+				      * communicator that has been obtained by
+				      * the duplicate_communicator() function.
+				      */
+    Epetra_Map
+    duplicate_map (const Epetra_Map  &map,
+		   const Epetra_Comm &comm);
   }
 
 #endif

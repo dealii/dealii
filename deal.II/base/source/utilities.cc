@@ -645,6 +645,24 @@ namespace Utilities
     {
       return (unsigned int)mpi_communicator.MyPID();
     }
+
+
+    
+    Epetra_Map
+    duplicate_map (const Epetra_Map  &map,
+		   const Epetra_Comm &comm)
+    {
+				       // assume that each processor stores a
+				       // contiguous range of elements in the
+				       // following constructor call
+      Assert (map.LinearMap() == true,
+	      ExcNotImplemented());
+      return
+	Epetra_Map (map.NumGlobalElements(),
+		    map.NumMyElements(),
+		    map.IndexBase(),
+		    comm);
+    }
   }
   
 #endif
