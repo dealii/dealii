@@ -61,12 +61,39 @@ namespace SparseMatrixIterators
 				    * matrix.
 				    *
 				    * The general template is not
-				    * implemented, only the specializations
-				    * for the two possible values of the
-				    * second template argument.
+				    * implemented, only the
+				    * specializations for the two
+				    * possible values of the second
+				    * template argument. Therefore,
+				    * the interface listed here only
+				    * serves as a template provided
+				    * since doxygen does not link the
+				    * specializations.
 				    */
   template <typename number, bool Constness>
-  class Accessor;
+  class Accessor : public SparsityPatternIterators::Accessor
+  {
+    public:
+    				       /**
+					* Value of this matrix entry.
+					*/
+      number value() const;
+   
+    				       /**
+					* Value of this matrix entry.
+					*/
+      number& value();
+   
+				       /**
+					* Return a reference to the matrix
+					* into which this accessor
+					* points. Note that in the present
+					* case, this is a constant
+					* reference.
+					*/
+      const SparseMatrix<number>& get_matrix () const;
+  };
+  
   
   
 				   /**

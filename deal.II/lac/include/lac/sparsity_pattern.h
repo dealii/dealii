@@ -301,10 +301,6 @@ namespace SparsityPatternIterators
 				       /** @addtogroup Exceptions
 					* @{ */
 	
-				       /**
-					* Exception
-					*/
-      DeclException0 (ExcInvalidIterator);
 				       //@}        
     protected:
 				       /**
@@ -1435,20 +1431,8 @@ class SparsityPattern : public Subscriptor
 				     /** @addtogroup Exceptions
 				      * @{ */
 				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidNumber,
-		    int,
-		    << "The provided number is invalid here: " << arg1);
-    				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The given index " << arg1
-		    << " should be less than " << arg2 << ".");
-				     /**
-				      * Exception
+				      * You tried to add an element to
+				      * a row, but there was no space left.
 				      */
     DeclException2 (ExcNotEnoughSpace,
 		    int, int,
@@ -1457,17 +1441,20 @@ class SparsityPattern : public Subscriptor
 		    << "(Maximum number of entries for this row: "
 		    << arg2 << "; maybe the matrix is already compressed?)");
 				     /**
-				      * Exception
+				      * The operation is only allowed
+				      * after the SparsityPattern has
+				      * been set up and compress() was
+				      * called.
 				      */
     DeclException0 (ExcNotCompressed);
 				     /**
-				      * Exception
+				      * This operation changes the
+				      * structure of the
+				      * SparsityPattern and is not
+				      * possible after compress() has
+				      * been called.
 				      */
     DeclException0 (ExcMatrixIsCompressed);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcEmptyObject);
 				     /**
 				      * Exception
 				      */
@@ -1496,13 +1483,6 @@ class SparsityPattern : public Subscriptor
                     int,
                     << "The number of partitions you gave is " << arg1
                     << ", but must be greater than zero.");
-                                     /**
-                                      * Exception
-                                      */
-    DeclException2 (ExcInvalidArraySize,
-                    int, int,
-                    << "The array has size " << arg1 << " but should have size "
-                    << arg2);
 				     //@}
   private:
 				     /**
@@ -1688,6 +1668,17 @@ namespace SparsityPatternIterators
 
 
   inline
+  bool
+  Accessor::is_valid_entry () const
+  {
+    return (sparsity_pattern
+	    ->get_column_numbers()[sparsity_pattern
+				   ->get_rowstart_indices()[a_row]+a_index]
+	    != SparsityPattern::invalid_entry);
+  }
+
+
+  inline
   unsigned int
   Accessor::row() const
   {
@@ -1718,17 +1709,6 @@ namespace SparsityPatternIterators
     return a_index;
   }
 
-
-
-  inline
-  bool
-  Accessor::is_valid_entry () const
-  {
-    return (sparsity_pattern
-	    ->get_column_numbers()[sparsity_pattern
-				   ->get_rowstart_indices()[a_row]+a_index]
-	    != SparsityPattern::invalid_entry);
-  }
 
 
 
@@ -2094,7 +2074,7 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 	{
 	  const unsigned int col
 	    = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
-	  Assert (col < n_cols, ExcInvalidIndex(col,n_cols));
+	  Assert (col < n_cols, ExcIndexRange(col,0,n_cols));
 	  
 	  if ((col!=row) || !is_square)
 	    *cols++ = col;

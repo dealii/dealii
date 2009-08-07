@@ -802,6 +802,23 @@ namespace StandardExceptions
 		  
 				   /**
 				    * This exception is thrown if the
+				    * iterator you access has
+				    * corrupted data. It might for
+				    * instance be, that the container
+				    * it refers does not have an entry
+				    * at the point the iterator
+				    * refers.
+				    *
+				    * Typically, this will be an
+				    * internal error of deal.II,
+				    * because the increment and
+				    * decrement operators should never
+				    * yield an invalid iterator.
+				    */
+  DeclException0 (ExcInvalidIterator);
+  
+				   /**
+				    * This exception is thrown if the
 				    * iterator you incremented or
 				    * decremented was already at its
 				    * final state.

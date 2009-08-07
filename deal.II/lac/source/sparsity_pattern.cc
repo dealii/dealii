@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -279,7 +279,7 @@ SparsityPattern::reinit (
   const VectorSlice<const std::vector<unsigned int> >&row_lengths,
   const bool optimize_diag)
 {
-  Assert (row_lengths.size() == m, ExcInvalidNumber (m));
+  AssertDimension (row_lengths.size(), m);
 	  
   rows = m;
   cols = n;
@@ -589,7 +589,7 @@ SparsityPattern::copy_from (const CompressedSparsityPattern &csp,
       for (unsigned int j=0; j<row_length; ++j)
         {
           const unsigned int col = csp.column_number(row,j);
-	  Assert (col < csp.n_cols(), ExcInvalidIndex(col,csp.n_cols()));
+	  Assert (col < csp.n_cols(), ExcIndexRange(col,0,csp.n_cols()));
 	  
 	  if ((col!=row) || !is_square)
 	    *cols++ = col;
@@ -645,8 +645,6 @@ SparsityPattern::copy_from (const CompressedSetSparsityPattern &csp,
       for (; col_num != csp.row_end (row); ++col_num)
 	{
 	  const unsigned int col = *col_num;
-	  //Assert (col < csp.n_cols(), ExcInvalidIndex(col,csp.n_cols()));
-	  
 	  if ((col!=row) || !is_square)
 	    *cols++ = col;
 	}
@@ -698,7 +696,7 @@ SparsityPattern::copy_from (const CompressedSimpleSparsityPattern &csp,
       for (unsigned int j=0; j<row_length; ++j)
 	{
 	  const unsigned int col = csp.column_number(row,j);
-          Assert (col < csp.n_cols(), ExcInvalidIndex(col,csp.n_cols()));
+          Assert (col < csp.n_cols(), ExcIndexRange(col,0,csp.n_cols()));
 
           if ((col!=row) || !is_square)
             *cols++ = col;
@@ -816,8 +814,8 @@ SparsityPattern::operator () (const unsigned int i,
 			      const unsigned int j) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
-  Assert (i<rows, ExcInvalidIndex(i,rows));
-  Assert (j<cols, ExcInvalidIndex(j,cols));
+  Assert (i<rows, ExcIndexRange(i,0,rows));
+  Assert (j<cols, ExcIndexRange(j,0,cols));
   Assert (compressed, ExcNotCompressed());
 
 				   // let's see whether there is
@@ -864,8 +862,8 @@ SparsityPattern::add (const unsigned int i,
 		      const unsigned int j)
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
-  Assert (i<rows, ExcInvalidIndex(i,rows));
-  Assert (j<cols, ExcInvalidIndex(j,cols));
+  Assert (i<rows, ExcIndexRange(i,0,rows));
+  Assert (j<cols, ExcIndexRange(j,0,cols));
   Assert (compressed==false, ExcMatrixIsCompressed());
 
   for (unsigned int k=rowstart[i]; k<rowstart[i+1]; k++)
