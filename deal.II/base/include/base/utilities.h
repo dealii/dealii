@@ -476,7 +476,7 @@ namespace Utilities
 				      * the duplicate_communicator() function.
 				      */
     Epetra_Map
-    duplicate_map (const Epetra_Map  &map,
+    duplicate_map (const Epetra_BlockMap  &map,
 		   const Epetra_Comm &comm);
   }
 

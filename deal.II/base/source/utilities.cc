@@ -665,8 +665,8 @@ namespace Utilities
 
     
     Epetra_Map
-    duplicate_map (const Epetra_Map  &map,
-		   const Epetra_Comm &comm)
+    duplicate_map (const Epetra_BlockMap &map,
+		   const Epetra_Comm     &comm)
     {
 				       // assume that each processor stores a
 				       // contiguous range of elements in the
