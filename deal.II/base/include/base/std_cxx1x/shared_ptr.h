@@ -23,12 +23,26 @@
 #else
 
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x
 {
   using boost::shared_ptr;
   using boost::enable_shared_from_this;
+
+				   // boost doesn't have boost::unique_ptr,
+				   // but its scoped_ptr comes close so
+				   // re-implement unique_ptr using scoped_ptr
+  template<class T> class unique_ptr : public boost::scoped_ptr<T>
+  {
+    public:
+      explicit unique_ptr(T * p = 0)
+		      :
+		      boost::scoped_ptr<T> (p)
+	{}
+  };
+
 }
 DEAL_II_NAMESPACE_CLOSE
 
