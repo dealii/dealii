@@ -18,10 +18,12 @@
 #include <base/subscriptor.h>
 #include <lac/exceptions.h>
 
-#include <base/std_cxx1x/shared_ptr.h>
 #include <vector>
 #include <cmath>
 #include <memory>
+
+#include <base/std_cxx1x/shared_ptr.h>
+#include <boost/scoped_ptr.hpp>
 
 #ifdef DEAL_II_USE_TRILINOS
 
@@ -636,6 +638,18 @@ namespace TrilinosWrappers
       void  
       copy_from (const SparsityType &SP);
 
+				       /**
+					* Copy operator. This operation is
+					* only allowed for empty objects, to
+					* avoid potentially very costly
+					* operations automatically synthesized
+					* by the compiler. Use copy_from()
+					* instead if you know that you really
+					* want to copy a sparsity pattern with
+					* non-trivial content.
+					*/
+      void operator = (const SparsityPattern &sp);
+      
                                        /**
                                         * Release all memory and
                                         * return to a state just like
@@ -1021,6 +1035,17 @@ namespace TrilinosWrappers
 		      << " exist in the Trilinos sparsity pattern.");
 				     //@}    
     private:
+				       /**
+					* A pointer to the communicator used
+					* for all operations in this object.
+					*
+					* Note that we create a new
+					* communicator (with a unique MPI ID)
+					* for each object if we are running in
+					* parallel.
+					*/
+      boost::scoped_ptr<Epetra_Comm> communicator;
+
                                        /**
 				        * Epetra Trilinos
 				        * mapping of the matrix rows

@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/utilities.h>
 #include <lac/trilinos_sparsity_pattern.h>
-
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
@@ -83,11 +83,12 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern ()
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (0, 0, Epetra_MpiComm(MPI_COMM_SELF)),
+		  communicator (Utilities::Trilinos::duplicate_communicator (MPI_COMM_SELF)),
 #else
-                  row_map (0, 0, Epetra_SerialComm()),
+		  communicator (new Epetra_SerialComm()),
 #endif
-		  col_map (row_map),
+                  row_map (0, 0, *communicator),
+		  col_map (0, 0, *communicator),
 		  compressed (true),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 			 (new Epetra_FECrsGraph(View, row_map, col_map, 0)))
@@ -95,10 +96,12 @@ namespace TrilinosWrappers
     graph->FillComplete();
   }
 
+  
   SparsityPattern::SparsityPattern (const Epetra_Map  &InputMap,
 				    const unsigned int n_entries_per_row)
 		  :
-                  row_map (InputMap),
+		  communicator (Utilities::Trilinos::duplicate_communicator (InputMap.Comm())),
+                  row_map (Utilities::Trilinos::duplicate_map (InputMap, *communicator)),
 		  col_map (row_map),
 		  compressed (false),
 				   // for more than one processor, need to
@@ -127,7 +130,8 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern (const Epetra_Map                &InputMap,
 				    const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  row_map (InputMap),
+		  communicator (Utilities::Trilinos::duplicate_communicator (InputMap.Comm())),
+                  row_map (Utilities::Trilinos::duplicate_map (InputMap, *communicator)),
 		  col_map (row_map),
 		  compressed (false),
 		  graph (row_map.Comm().NumProc() > 1 ?
@@ -149,8 +153,9 @@ namespace TrilinosWrappers
 				    const Epetra_Map  &InputColMap,
 				    const unsigned int n_entries_per_row)
 		  :
-                  row_map (InputRowMap),
-                  col_map (InputColMap),
+		  communicator (Utilities::Trilinos::duplicate_communicator (InputRowMap.Comm())),
+                  row_map (Utilities::Trilinos::duplicate_map (InputRowMap, *communicator)),
+                  col_map (Utilities::Trilinos::duplicate_map (InputColMap, *communicator)),
 		  compressed (false),
 		  graph (row_map.Comm().NumProc() > 1 ?
 			 (std::auto_ptr<Epetra_FECrsGraph>
@@ -169,8 +174,9 @@ namespace TrilinosWrappers
 				    const Epetra_Map                &InputColMap,
 				    const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  row_map (InputRowMap),
-                  col_map (InputColMap),
+		  communicator (Utilities::Trilinos::duplicate_communicator (InputRowMap.Comm())),
+                  row_map (Utilities::Trilinos::duplicate_map (InputRowMap, *communicator)),
+                  col_map (Utilities::Trilinos::duplicate_map (InputColMap, *communicator)),
 		  compressed (false),
 		  graph (row_map.Comm().NumProc() > 1 ?
 			 (std::auto_ptr<Epetra_FECrsGraph>
@@ -192,29 +198,30 @@ namespace TrilinosWrappers
 				    const unsigned int n_entries_per_row)
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_SELF)),
-                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_SELF)),
+		  communicator (Utilities::Trilinos::duplicate_communicator (MPI_COMM_SELF)),
 #else
-                  row_map (m, 0, Epetra_SerialComm()),
-                  col_map (n, 0, Epetra_SerialComm()),
+		  communicator (new Epetra_SerialComm()),
 #endif
+                  row_map (m, 0, *communicator),
+                  col_map (n, 0, *communicator),
 		  compressed (false),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 			 (new Epetra_FECrsGraph(Copy, row_map, col_map,
 						int(n_entries_per_row), false)))
   {}
 
+  
   SparsityPattern::SparsityPattern (const unsigned int               m,
 				    const unsigned int               n,
 				    const std::vector<unsigned int> &n_entries_per_row)
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_SELF)),
-                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_SELF)),
+		  communicator (Utilities::Trilinos::duplicate_communicator (MPI_COMM_SELF)),
 #else
-                  row_map (m, 0, Epetra_SerialComm()),
-                  col_map (n, 0, Epetra_SerialComm()),
+		  communicator (new Epetra_SerialComm()),
 #endif
+                  row_map (m, 0, *communicator),
+                  col_map (n, 0, *communicator),
 		  compressed (false),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 			 (new Epetra_FECrsGraph(Copy, row_map, col_map, 
@@ -498,17 +505,12 @@ namespace TrilinosWrappers
 
 
 
-  /*  void
   SparsityPattern::copy_from (const SparsityPattern &sp)
   {
-    graph.reset();
-    row_map = sp.row_map;
-    col_map = sp.col_map;
-
-    graph = std::auto_ptr<Epetra_FECrsGraph> (new Epetra_FECrsGraph(*sp.graph));
+    Assert (false, ExcNotImplemented());
   }
-  */
 
+  
 
   template <typename SparsityType>
   void 
