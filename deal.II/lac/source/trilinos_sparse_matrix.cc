@@ -13,6 +13,7 @@
 
 #include <lac/trilinos_sparse_matrix.h>
 
+#include <base/utilities.h>
 #include <lac/sparse_matrix.h>
 #include <lac/trilinos_sparsity_pattern.h>
 #include <lac/sparsity_pattern.h>
@@ -90,12 +91,10 @@ namespace TrilinosWrappers
 				  // interface.
   SparseMatrix::SparseMatrix ()
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (0, 0, Epetra_MpiComm(MPI_COMM_SELF)),
-#else
-                  row_map (0, 0, Epetra_SerialComm()),
-#endif
-		  col_map (row_map),
+		  communicator (Utilities::Trilinos::duplicate_communicator
+				(Utilities::Trilinos::comm_self())),
+                  row_map (0, 0, *communicator),
+		  col_map (0, 0, *communicator),
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
@@ -109,7 +108,8 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
 			      const unsigned int n_max_entries_per_row)
 		  :
-                  row_map (InputMap),
+		  communicator (Utilities::Trilinos::duplicate_communicator (InputMap.Comm())),
+                  row_map (Utilities::Trilinos::duplicate_map (InputMap, *communicator)),
 		  col_map (row_map),
 		  last_action (Zero),
 		  compressed (true),
@@ -123,7 +123,8 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix (const Epetra_Map                &InputMap,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  row_map (InputMap),
+		  communicator (Utilities::Trilinos::duplicate_communicator (InputMap.Comm())),
+                  row_map (Utilities::Trilinos::duplicate_map (InputMap, *communicator)),
 		  col_map (row_map),
 		  last_action (Zero),
 		  compressed (true),
@@ -139,8 +140,9 @@ namespace TrilinosWrappers
 			      const Epetra_Map  &InputColMap,
 			      const unsigned int n_max_entries_per_row)
 		  :
-                  row_map (InputRowMap),
-                  col_map (InputColMap),
+		  communicator (Utilities::Trilinos::duplicate_communicator (InputRowMap.Comm())),
+                  row_map (Utilities::Trilinos::duplicate_map (InputRowMap, *communicator)),
+		  col_map (Utilities::Trilinos::duplicate_map (InputColMap, *communicator)),
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
@@ -154,8 +156,9 @@ namespace TrilinosWrappers
 			      const Epetra_Map                &InputColMap,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  row_map (InputRowMap),
-                  col_map (InputColMap),
+		  communicator (Utilities::Trilinos::duplicate_communicator (InputRowMap.Comm())),
+                  row_map (Utilities::Trilinos::duplicate_map (InputRowMap, *communicator)),
+                  col_map (Utilities::Trilinos::duplicate_map (InputColMap, *communicator)),
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
@@ -170,13 +173,10 @@ namespace TrilinosWrappers
 			      const unsigned int n,
 			      const unsigned int n_max_entries_per_row)
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_SELF)),
-                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_SELF)),
-#else
-                  row_map (m, 0, Epetra_SerialComm()),
-                  col_map (n, 0, Epetra_SerialComm()),
-#endif
+		  communicator (Utilities::Trilinos::duplicate_communicator
+				(Utilities::Trilinos::comm_self())),
+                  row_map (m, 0, *communicator),
+                  col_map (n, 0, *communicator),
 		  last_action (Zero),
 		  compressed (true),
 				   // on one processor only, we know how the
@@ -199,13 +199,10 @@ namespace TrilinosWrappers
 			      const unsigned int               n,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_SELF)),
-                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_SELF)),
-#else
-                  row_map (m, 0, Epetra_SerialComm()),
-                  col_map (n, 0, Epetra_SerialComm()),
-#endif
+		  communicator (Utilities::Trilinos::duplicate_communicator
+				(Utilities::Trilinos::comm_self())),
+                  row_map (m, 0, *communicator),
+                  col_map (n, 0, *communicator),
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
@@ -219,8 +216,14 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix (const SparsityPattern &InputSP)
 		  :
                   Subscriptor(),
-                  row_map (InputSP.range_partitioner()),
-		  col_map (InputSP.domain_partitioner()),
+		  communicator (Utilities::Trilinos::duplicate_communicator
+				(InputSP.range_partitioner().Comm())),
+                  row_map (Utilities::Trilinos::
+			   duplicate_map (InputSP.range_partitioner(),
+					  *communicator)),
+		  col_map (Utilities::Trilinos::
+			   duplicate_map (InputSP.domain_partitioner(),
+					  *communicator)),
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
@@ -238,8 +241,14 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix (const SparseMatrix &InputMatrix)
 		  :
                   Subscriptor(),
-                  row_map (InputMatrix.row_map),
-		  col_map (InputMatrix.col_map),
+		  communicator (Utilities::Trilinos::duplicate_communicator
+				(InputMatrix.row_map.Comm())),
+                  row_map (Utilities::Trilinos::
+			   duplicate_map (InputMatrix.row_map,
+					  *communicator)),
+		  col_map (Utilities::Trilinos::
+			   duplicate_map (InputMatrix.col_map,
+					  *communicator)),
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
@@ -256,8 +265,8 @@ namespace TrilinosWrappers
   SparseMatrix &
   SparseMatrix::copy_from (const SparseMatrix &m)
   {
-    row_map = m.row_map;
-    col_map = m.col_map;
+    row_map = Utilities::Trilinos::duplicate_map (m.row_map, *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (m.col_map, *communicator);
 				   // check whether we need to update the
 				   // partitioner or can just copy the data:
 				   // in case we have the same distribution,
@@ -277,18 +286,12 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const SparsityType &sparsity_pattern)
   {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
-#else
-    Epetra_SerialComm trilinos_communicator;
-#endif
-
     const Epetra_Map rows (sparsity_pattern.n_rows(),
 			   0,
-			   trilinos_communicator);
+			   Utilities::Trilinos::comm_self());
     const Epetra_Map columns (sparsity_pattern.n_cols(),
 			      0,
-			      trilinos_communicator);
+			      Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, sparsity_pattern);
   }
@@ -325,8 +328,8 @@ namespace TrilinosWrappers
 				      sparsity_pattern.n_cols()));
       }
 
-    row_map = input_row_map;
-    col_map = input_col_map;
+    row_map = Utilities::Trilinos::duplicate_map (input_row_map, *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (input_col_map, *communicator);
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -447,8 +450,8 @@ namespace TrilinosWrappers
 				      sparsity_pattern.n_cols()));
       }
 
-    row_map = input_row_map;
-    col_map = input_col_map;
+    row_map = Utilities::Trilinos::duplicate_map (input_row_map, *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (input_col_map, *communicator);
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -511,8 +514,10 @@ namespace TrilinosWrappers
 				   // sparsity pattern.
     matrix.reset();
 
-    row_map = sparsity_pattern.range_partitioner();
-    col_map = sparsity_pattern.domain_partitioner();
+    row_map = Utilities::Trilinos::duplicate_map (sparsity_pattern.range_partitioner(),
+						  *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (sparsity_pattern.domain_partitioner(),
+						  *communicator);
 
     AssertThrow (sparsity_pattern.trilinos_sparsity_pattern().Filled() == true,
 		 ExcMessage("The Trilinos sparsity pattern has not been compressed"));
@@ -530,8 +535,11 @@ namespace TrilinosWrappers
   {
     matrix.reset();
 
-    row_map = sparse_matrix.row_map;
-    col_map = sparse_matrix.col_map;
+    row_map = Utilities::Trilinos::duplicate_map (sparse_matrix.range_partitioner(),
+						  *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (sparse_matrix.domain_partitioner(),
+						  *communicator);
+
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
       (new Epetra_FECrsMatrix(Copy, sparse_matrix.trilinos_sparsity_pattern(), 
 			      false));
@@ -547,18 +555,12 @@ namespace TrilinosWrappers
 			const double                          drop_tolerance,
 			const bool                            copy_values)
   {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
-#else
-    Epetra_SerialComm trilinos_communicator;
-#endif
-
     const Epetra_Map rows (dealii_sparse_matrix.m(),
 			   0,
-			   trilinos_communicator);
+			   Utilities::Trilinos::comm_self());
     const Epetra_Map columns (dealii_sparse_matrix.n(),
 			      0,
-			      trilinos_communicator);
+			      Utilities::Trilinos::comm_self());
     reinit (rows, columns, dealii_sparse_matrix, drop_tolerance, copy_values);
   }
 
@@ -605,8 +607,8 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (input_col_map.NumGlobalElements(),
 				  dealii_sparse_matrix.n()));
 
-    row_map = input_row_map;
-    col_map = input_col_map;
+    row_map = Utilities::Trilinos::duplicate_map (input_row_map, *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (input_col_map, *communicator);
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -656,8 +658,8 @@ namespace TrilinosWrappers
     Assert (input_matrix.Filled()==true,
 	    ExcMessage("Input CrsMatrix has not called FillComplete()!"));
 
-    row_map = input_matrix.RangeMap();
-    col_map = input_matrix.DomainMap();
+    row_map = Utilities::Trilinos::duplicate_map (input_matrix.RangeMap(), *communicator);
+    col_map = Utilities::Trilinos::duplicate_map (input_matrix.DomainMap(), *communicator);
 
     const Epetra_CrsGraph *graph = &input_matrix.Graph();
 
@@ -687,12 +689,9 @@ namespace TrilinosWrappers
 				  // the pointer and generate an
 				  // empty matrix.
     matrix.reset();
- 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    row_map = Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_SELF));
-#else
-    row_map = Epetra_Map (0, 0, Epetra_SerialComm());
-#endif
+
+    row_map = Epetra_Map (0, 0,
+			  Utilities::Trilinos::comm_self());
 
     col_map = row_map;
 

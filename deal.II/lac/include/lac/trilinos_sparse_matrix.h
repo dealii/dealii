@@ -20,10 +20,12 @@
 #include <lac/exceptions.h>
 #include <lac/trilinos_vector_base.h>
 
-#include <base/std_cxx1x/shared_ptr.h>
 #include <vector>
 #include <cmath>
 #include <memory>
+
+#include <boost/scoped_ptr.hpp>
+
 
 #ifdef DEAL_II_USE_TRILINOS
 
@@ -1906,6 +1908,17 @@ namespace TrilinosWrappers
 
       
     private:
+
+				       /**
+					* A pointer to the communicator used
+					* for all operations in this object.
+					*
+					* Note that we create a new
+					* communicator (with a unique MPI ID)
+					* for each object if we are running in
+					* parallel.
+					*/
+      boost::scoped_ptr<Epetra_Comm> communicator;
       
 				       /**
 				        * Epetra Trilinos
