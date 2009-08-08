@@ -206,7 +206,8 @@ TimerOutput::TimerOutput (std::ostream &stream,
                           :
                           output_frequency (output_frequency),
 			  output_type (output_type),
-                          out_stream (stream, true)
+                          out_stream (stream, true),
+			  output_is_enabled (true)
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 			  , mpi_communicator (MPI_COMM_SELF)
 #endif
@@ -220,7 +221,8 @@ TimerOutput::TimerOutput (ConditionalOStream &stream,
                           :
                           output_frequency (output_frequency),
 			  output_type (output_type),
-                          out_stream (stream)
+                          out_stream (stream),
+			  output_is_enabled (true)
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 			  , mpi_communicator (MPI_COMM_SELF)
 #endif
@@ -236,7 +238,8 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
                           :
                           output_frequency (output_frequency),
 			  output_type (output_type),
-                          out_stream (stream, true), 
+                          out_stream (stream, true),
+			  output_is_enabled (true), 
 			  mpi_communicator (mpi_communicator)
 {}
 
@@ -250,6 +253,7 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
                           output_frequency (output_frequency),
 			  output_type (output_type),
                           out_stream (stream),
+			  output_is_enabled (true),
 			  mpi_communicator (mpi_communicator)
 {}
 
@@ -261,7 +265,7 @@ TimerOutput::~TimerOutput()
   while (active_sections.size() > 0)
     exit_section();
 
-  if (output_frequency != every_call)
+  if (output_frequency != every_call && output_is_enabled == true)
     print_summary();
 }
 
@@ -298,6 +302,9 @@ TimerOutput::enter_section (const std::string &section_name)
 void 
 TimerOutput::exit_section (const std::string &section_name)
 {
+  Assert (active_sections.size() > 0,
+	  ExcMessage("Cannot exit any section because none has been entered!"));
+
   Threads::ThreadMutex::ScopedLock lock (mutex);
 
   if (section_name != "")
@@ -347,7 +354,7 @@ TimerOutput::exit_section (const std::string &section_name)
 
 				   // in case we have to print out
 				   // something, do that here...
-  if (output_frequency != summary)
+  if (output_frequency != summary && output_is_enabled == true)
     {
       std::string output_time;
       std::ostringstream cpu;
@@ -529,6 +536,22 @@ TimerOutput::print_summary () const
 		   << "(Timer function may have introduced too much overhead, or different\n"
 		   << "section timers may have run at the same time.)" << std::endl;
     }
+}
+
+
+
+void 
+TimerOutput::disable_output ()
+{
+  output_is_enabled = false;
+}
+
+
+
+void
+TimerOutput::enable_output ()
+{
+  output_is_enabled = true;
 }
 
 

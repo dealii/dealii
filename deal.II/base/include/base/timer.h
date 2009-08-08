@@ -364,6 +364,30 @@ class TimerOutput
 				      */
     void print_summary () const;
 
+				     /**
+				      * By calling this function, all output
+				      * can be disabled. This function
+				      * together with enable_output() can be
+				      * useful if one wants to control the
+				      * output in a flexible way without
+				      * putting a lot of <tt>if</tt> clauses
+				      * in the program.
+				      */
+    void disable_output ();
+
+				     /**
+				      * This function re-enables output of
+				      * this class if it was previously
+				      * disabled with disable_output(). This
+				      * function together with
+				      * disable_output() can be useful if
+				      * one wants to control the output in a
+				      * flexible way without putting a lot
+				      * of <tt>if</tt> clauses in the
+				      * program.
+				      */
+    void enable_output ();
+
   private:
 				     /**
 				      * A timer object for the overall
@@ -399,6 +423,13 @@ class TimerOutput
     ConditionalOStream out_stream;
 
 				     /**
+				      * A boolean variable that sets whether
+				      * output of this class is currently on
+				      * or off.
+				      */
+    bool output_is_enabled;
+
+				     /**
 				      * A list of the sections that
 				      * have been entered and not
 				      * exited. The list is kept in
@@ -424,7 +455,6 @@ class TimerOutput
 				      * class gives reasonable results even
 				      * when used with several threads.
 				      */
-
     Threads::ThreadMutex mutex;
 };
 
