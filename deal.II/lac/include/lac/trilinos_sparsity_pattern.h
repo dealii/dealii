@@ -883,6 +883,13 @@ namespace TrilinosWrappers
                                         * matrix.
                                         */
       const Epetra_Map & col_partitioner () const;
+
+				       /**
+					* Return a const reference to
+					* the communicator used for
+					* this object.
+					*/
+      const Epetra_Comm & trilinos_communicator () const;
 //@}
 /**
  * @name Iterators
@@ -1403,6 +1410,14 @@ namespace TrilinosWrappers
   SparsityPattern::col_partitioner () const
   {
     return static_cast<const Epetra_Map&>(graph->ColMap());
+  }
+
+
+  inline
+  const Epetra_Comm &
+  SparsityPattern::trilinos_communicator () const
+  {
+    return *communicator;
   }
 
 
