@@ -2,9 +2,9 @@
  * @page changes_after_6.2 Changes after Version 6.2
 
 <p>
-This is the list of changes made after the release of 
+This is the list of changes made after the release of
 deal.II version 6.2. It is subdivided into changes
-made to the three sub-libraries <a href="#base">base</a>, 
+made to the three sub-libraries <a href="#base">base</a>,
 <a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
 documentation, etc</a>.
@@ -50,7 +50,7 @@ inconvenience this causes.
   <br>
   (GK 2009/08/04)
   </p>
-  
+
   <li>
   <p>
   Changed: Previously, the Triangulation::create_triangulation
@@ -83,7 +83,19 @@ inconvenience this causes.
 
 <ol>
    <li>
-   <p> 
+   <p>
+   Changed: When using Trilinos wrapper objects in parallel through MPI, each
+   object now uses a separate and distinct MPI communicator object. This
+   ensures that different objects (such as different matrices, or different
+   vectors) communicate on separate channels, thereby simplifying debugging
+   and possibly the parallelization of programs.
+   <br>
+   (WB 2009/08/10)
+   </p>
+   </li>
+
+   <li>
+   <p>
    New: There is now a new tutorial program, @ref step_36 "step-36",
    contributed by Toby D. Young and Wolfgang Bangerth, that demonstrates
    solving eigenvalue problems.
@@ -91,9 +103,9 @@ inconvenience this causes.
    (Toby D. Young, WB 2009/07/29)
    </p>
    </li>
- 
+
    <li>
-   <p> 
+   <p>
    Changed: When configuring to use METIS for partitioning meshes in parallel,
    the METIS header files had to be modified by hand. In addition, with some
    MPI implementations one would get into trouble if <code>mpi.h</code>
@@ -103,7 +115,7 @@ inconvenience this causes.
    (WB 2009/07/06)
    </p>
    </li>
- 
+
    <li>
    <p>
    New: As a primary means of parallelizing programs, deal.II now uses
@@ -123,7 +135,7 @@ inconvenience this causes.
    (WB 2009/01/09)
    </p>
    </li>
- 
+
    <li>
    <p>
    Changed: The support for threading has been completely re-written. In
@@ -134,10 +146,10 @@ inconvenience this causes.
    <br>
    (WB 2009/01/09)
    </p>
-   </li>   
+   </li>
 
    <li>
-   <p> 
+   <p>
    Changed: Previously, one had to give the two flags
    <code>--enable-multithreading --with-multithreading</code> to
    <code>./configure</code> to enable thread usage throughout the library.
@@ -222,7 +234,7 @@ inconvenience this causes.
   <p>
   Improved: The QGaussLobatto::gamma function now returns a long double
   instead of an unsigned int, otherwise we will get an overflow and thus
-  meaningless weights for higher QGaussLobatto quadrature rules.  
+  meaningless weights for higher QGaussLobatto quadrature rules.
   <br>
   (Tobias Leicht, RH 2009/06/05)
   </p>
@@ -255,7 +267,7 @@ inconvenience this causes.
   (Timo Heister 2009/08/05)
   </p>
   </li>
-  
+
   <li> <p>New: The relaxation preconditioners PreconditionJacobi, PreconditionSOR and
   PreconditionSSOR, as well as their blocked versions PreconditionBlockJacobi,
   PreconditionBlockSOR and PreconditionBlockSSOR now have functions <code>step</code>
@@ -267,10 +279,10 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: There are new functions FullMatrix::cholesky and 
-  FullMatrix::outer_product.  FullMatrix::cholesky finds the Cholesky 
-  decomposition of a matrix in lower triangular form.  
-  FullMatrix::outer_product calculates <tt>*this</tt> $= VW^T$ where $V$ 
+  New: There are new functions FullMatrix::cholesky and
+  FullMatrix::outer_product.  FullMatrix::cholesky finds the Cholesky
+  decomposition of a matrix in lower triangular form.
+  FullMatrix::outer_product calculates <tt>*this</tt> $= VW^T$ where $V$
   and $W$ are vectors.
   <br>
   (Jean Marie Linhart 2009/07/27)
@@ -289,15 +301,15 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: Based on work by Francisco Alvaro, the existing SLEPcWrappers now 
+  New: Based on work by Francisco Alvaro, the existing SLEPcWrappers now
   have a handle on the generalized eigenvalue problem where B=I.
   <br>
   (Toby D. Young 2009/06/25)
   </p>
   </li>
 
-  <li> 
-  <p> 
+  <li>
+  <p>
   New: Based on work with Francisco Alvaro and Jose
   E. Roman, the new SLEPcWrappers give a handle on some of the
   features of SLEPc (Scalable Library for Eigenvalue Problem
@@ -308,9 +320,9 @@ inconvenience this causes.
   SLEPcWrappers::TransformationBase class encapsulates a variety of
   spectral transformations providing some functionality required for
   acceleration techniques based on the transformation of the spectrum.
-  <br> 
-  (Toby D. Young 2009/06/25) 
-  </p> 
+  <br>
+  (Toby D. Young 2009/06/25)
+  </p>
   </li>
 
   <li>
@@ -376,7 +388,7 @@ inconvenience this causes.
   somewhere and has to be reconstructed or else if two DoFHandler
   objects with the same FE index distribution should be created.
   There is now also a corresponding
-  hp::DoFHandler::get_active_fe_indices function.  
+  hp::DoFHandler::get_active_fe_indices function.
   <br>
   (Tobias Leicht, RH 2009/06/12)
   </p>
@@ -387,17 +399,17 @@ inconvenience this causes.
   Fixed: The projection of quadrature points to subfaces in
   MappingQ in case of 3d anisotropic refinement did not respect
   non-standard face orientation/flip/rotation cases. This
-  has now been fixed.  
+  has now been fixed.
   <br>
   (Tobias Leicht, RH 2009/06/12)
   </p>
   </li>
-  
+
   <li>
   <p>
   New: The new Triangulation::n_raw_faces() function forwards
   to Triangulation::n_raw_lines() in 2d and
-  Triangulation::n_raw_quads() in 3d.  
+  Triangulation::n_raw_quads() in 3d.
   <br>
   (Tobias Leicht, RH 2009/06/12)
   </p>
@@ -408,7 +420,7 @@ inconvenience this causes.
   New: There is now a new DataOutFaces::build_patches function which
   takes a Mapping argument. For higher order mappings this allows to
   represent curved boundaries by using more subdivisions. This function
-  is also useful in the context of MappingQ1Eulerian.  
+  is also useful in the context of MappingQ1Eulerian.
   <br>
   (Tobias Leicht, RH 2009/06/05)
   </p>
@@ -417,7 +429,7 @@ inconvenience this causes.
   <li>
   <p>
   New: For empty triangulations the new Triangulation::set_mesh_smoothing
-  function allows to override the MeshSmoothing given to the constructor.  
+  function allows to override the MeshSmoothing given to the constructor.
   <br>
   (RH 2009/06/05)
   </p>
@@ -446,7 +458,7 @@ inconvenience this causes.
   (WB 2009/04/29)
   </p>
   </li>
-  
+
    <li>
    <p>
    Fixed: The DoFRenumbering::component_wise function for MGDoFHandler objects
@@ -454,9 +466,9 @@ inconvenience this causes.
    <br>
    (WB, 2009/01/20)
    </p>
- 
+
    <li>
-   <p> 
+   <p>
    Changed: The two DataOut::build_patches, DataOutFaces::build_patches, and
    DataOutRotation::build_patches functions have lost the argument
    that indicated the number of threads with which they should build the
@@ -476,7 +488,7 @@ inconvenience this causes.
    <br>
    (WB, 2008/12/29)
    </p>
- 
+
    <li>
    <p>
    New: The new function internal::hp::FEValuesBase::get_fe_collection function
@@ -484,8 +496,8 @@ inconvenience this causes.
    hp::FEFaceValues, or hp::FESubfaceValues object.
    <br>
    (WB 2008/09/30)
-   </p> 
- 
+   </p>
+
    <li>
    <p>
    New: The new function FEValuesBase::get_update_flags allows to query
@@ -493,7 +505,7 @@ inconvenience this causes.
    FESubfaceValues object.
    <br>
    (WB 2008/09/29)
-   </p> 
+   </p>
 </ol>
 
 
