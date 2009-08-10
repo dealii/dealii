@@ -514,6 +514,12 @@ namespace TrilinosWrappers
 				   // sparsity pattern.
     matrix.reset();
 
+				     // model the communicator on the
+				     // one used for the sparsity
+				     // pattern
+    communicator.reset (Utilities::Trilinos::
+			duplicate_communicator (sparsity_pattern.trilinos_communicator()));
+    
     row_map = Utilities::Trilinos::duplicate_map (sparsity_pattern.range_partitioner(),
 						  *communicator);
     col_map = Utilities::Trilinos::duplicate_map (sparsity_pattern.domain_partitioner(),
@@ -523,7 +529,7 @@ namespace TrilinosWrappers
 		 ExcMessage("The Trilinos sparsity pattern has not been compressed"));
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-      (new Epetra_FECrsMatrix(Copy, sparsity_pattern.trilinos_sparsity_pattern(),
+	     (new Epetra_FECrsMatrix(Copy, sparsity_pattern.trilinos_sparsity_pattern(),
 			      false));
     compress();
   }
