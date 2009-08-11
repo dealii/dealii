@@ -14,3 +14,115 @@ California Institute of Technology.
 
 <a name="Intro"></a>
 <h1>Introduction</h1>
+
+This program does pretty much exactly what @ref step_31 "step-31" already
+does: it solves the Boussinesq equations that describe the motion of a fluid
+whose temperature is not in equilibrium. As such, all the equations we have
+described in @ref step_31 "step-31" still hold: we solve the same partial
+differential equation, using the same finite element scheme, the same time
+stepping algorithm, and the same stabilization method for the temperature
+advection-diffusion equation. As a consequence, you may first want to
+understand that program before you work on the current one.
+
+The difference between @ref step_31 "step-31" and the current program is that
+here we want to do things in %parallel, using both the availability of many
+machines in a cluster (with parallelization based on MPI) as well as many
+processor cores within a single machine (with parallelization based on
+threads). This program's main job is therefore to discuss the changes that are
+necessary to utilize the availability of these %parallel compute resources.
+
+
+<h3> Parallelization on clusters </h3>
+
+Parallelization of scientific codes across multiple machines in a cluster of
+computers is almost always done using the Message Passing Interface
+(MPI). This program is no exception to that, and it follows the
+@ref step_17 "step-17" and @ref step_18 "step-18" programs in this. 
+
+MPI is a rather awkward interface to program with, and so we usually try to
+not use it directly but through an interface layer that abstracts most of the
+MPI operations into a friendlier interface. In the two programs mentioned
+above, this was achieved by using the PETSc library that provides support for
+%parallel linear algebra in a way that almost completely hides the MPI layer
+under it. PETSc is powerful, providing a large number of functions that deal
+with matrices, vectors, and iterative solvers and preconditioners, along with
+lots of other stuff, most of which runs quite well in %parallel. It is,
+however, a few years old already, written in C, and generally not quite as
+easy to use as some other libraries. As a consequence, deal.II also has
+interfaces to Trilinos, a library similar to PETSc in its aims and with a lot
+of the same functionality. It is, however, a project that is several years
+younger, is written in C++ and by people who generally have put a significant
+emphasis on software design. We have already used Trilinos in 
+@ref step_31 "step-31", and will do so again here, with the difference that we
+will use its %parallel capabilities.
+
+deal.II's Trilinos interfaces encapsulate pretty much everything Trilinos
+provides into wrapper classes (in namespace TrilinosWrappers) that make the
+Trilinos matrix, vector, solver and preconditioner classes look very much the
+same as deal.II's own implementations of this functionality. However, as
+opposed to deal.II's classes, they can be used in %parallel if we give them the
+necessary information. As a consequence, there are two Trilinos classes that
+we have to deal with directly (rather than through wrappers), both of which
+are part of Trilinos' Epetra library of basic linear algebra and tool classes: 
+<ul>
+<li> The Epetra_Comm class is an abstraction of an MPI "communicator", i.e.
+  it describes how many and which machines can communicate with each other.
+  Each distributed object, such as a sparse matrix or a vector for which we
+  may want to store parts on different machines, needs to have a communicator
+  object to know how many parts there are, where they can be found, and how
+  they can be accessed.
+
+  In this program, we only really use one communicator object -- based on the
+  MPI variable <code>MPI_COMM_WORLD</code> -- that encompasses <i>all</i>
+  processes that work together. It would be perfectly legitimate to start a
+  process on $N$ machines but only store vectors on a subset of these by
+  producing a communicator object that only encompasses this subset of
+  machines; there is really no compelling reason to do so here, however. As a
+  second note, while we use <code>MPI_COMM_WORLD</code> as communicator in the
+  program's source code, every time we create a Trilinos object in the wrapper
+  classes in namespace TrilinosWrappers, we don't use the given communicator
+  but instead create a new and unique communicator that happens to have the
+  same machines but has a distinct communicator ID. This way, we can ensure
+  that all communications that have to do with this, say, sparse matrix really
+  only occur on a channel associated with only this one object, while all
+  other objects communicate on other channels of their own. This helps in
+  debugging, and may also allow some communications to be reordered for better
+  %parallel performance because they can be told apart by their communicator
+  number, not just their relative timing.
+
+<li> The Epetra_Map class is used to describe which elements of a vector or which
+  rows of a matrix reside on a given machine that is part of a
+  communicator. To create such an object, you need to know (i) the total
+  number of elements or rows, (ii) the number of elements or rows you want to
+  store on the current machine, and (iii) which communicator enumerates the
+  machines that we want this matrix or vector be stored on. We will set up
+  these maps (which we call <code>partitioners</code> in our code, since we
+  believe this is a better word) in the
+  <code>BoussinesqFlowProblem::setup_dofs</code> function below and then hand
+  it to every %parallel object we create.
+</ul>
+
+The only other things specific to programming using MPI that we will use in
+this program are the following facilities deal.II provides:
+<ul>
+<li> We need to subdivide the domain into subdomains, each of which will
+  represent the cells that one of the processors coupled by MPI shall consider
+  its own and work on. This is done using the
+  GridTools::partition_triangulation function.
+<li> In order to know which elements of a vector or rows of a matrix shall be
+  stored on each of the processors, we need to know how many degrees of
+  freedom each of the owners of certain subdomains call their own. This is
+  conveniently returned by the DoFTools::count_dofs_with_subdomain_association
+  function.
+</ul>
+The rest of the program is almost completely agnostic about the fact that we
+don't store all objects completely locally. There will be a few points where
+we can not use certain programming techniques (though without making explicit
+reference to MPI or parallelization) or where we need access to <i>all</i>
+elements of a vector and therefore need to <i>localize</i> its elements
+(i.e. create a vector that has all its elements stored on the current
+machine), but we will comment on these locations as we get to them in the
+program code.
+
+
+<h3> Parallelization within individual nodes of a cluster </h3>
