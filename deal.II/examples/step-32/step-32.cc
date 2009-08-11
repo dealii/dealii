@@ -109,10 +109,10 @@ namespace EquationData
   TemperatureInitialValues<dim>::value (const Point<dim>  &,
 					const unsigned int) const
   {
-				   // Data for shell problem
+				   /* Data for shell problem */
     /*return (p.norm() < 0.55+0.02*std::sin(p[0]*20) ? 1 : 0);*/
 
-				   // Data for cube problem
+				   /* Data for cube problem */
     return 0.;
   }
 
@@ -148,10 +148,10 @@ namespace EquationData
   TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
 					const unsigned int component) const
   {
-				   // Data for shell problem.
+				   /* Data for shell problem. */
     /*    return 0; */
 
-				   // Data for cube problem.
+				   /* Data for cube problem. */
     Assert (component == 0,
 	    ExcMessage ("Invalid operation for a scalar function."));
     
@@ -204,8 +204,8 @@ namespace EquationData
 				   // the inner approximation for the Schur
 				   // complement good. If the preconditioner
 				   // we're using is good enough, there will
-				   // be no increase in the iteration
-				   // count. All we need to do for
+				   // be no increase in the (outer)
+				   // iteration count. All we need to do for
 				   // implementing this change here is to
 				   // give the respective variable in the
 				   // BlockSchurPreconditioner class another
@@ -261,6 +261,57 @@ namespace LinearSolvers
 
 
 
+				   // @sect3{Definition of assembly data structures}
+				   // 
+				   // This is a collection of data
+				   // structures that we use for assembly in
+				   // %parallel. The concept of this
+				   // task-based parallelization is
+				   // described in detail @ref MTWorkStream
+				   // "here". Each assembly routine gets two
+				   // sets of data: a Scratch array that
+				   // collects all the classes and arrays
+				   // that are used for the calculation of
+				   // the cell contribution, and a CopyData
+				   // array that keeps local matrices and
+				   // vectors which will be written into the
+				   // global matrix. Whereas CopyData is a
+				   // container for the final data that is
+				   // written into the global matrices and
+				   // vector (and, thus, absolutely
+				   // necessary), the Scratch arrays are
+				   // merely there for performance reasons
+				   // &mdash; it would be much more
+				   // expensive to set up a FEValues object
+				   // on each cell, then creating it only
+				   // once and updating some derivative
+				   // data.
+				   //
+				   // Using the program in step-31, we have
+				   // four assembly routines. One for the
+				   // preconditioner matrix of the Stokes
+				   // system, one for the Stokes matrix and
+				   // right hand side, one for the
+				   // temperature matrices and one for the
+				   // right hand side of the temperature
+				   // equation. We organize the scratch
+				   // arrays and a CopyData arrays for each
+				   // of those four assembly components
+				   // using a <code>struct</code>
+				   // environment.
+				   //
+				   // Regarding the Scratch array, each
+				   // struct is equipped with a constructor
+				   // that create an FEValues object for a
+				   // @ref FiniteElement "finite element", a
+				   // @ref Quadrature "quadrature formula"
+				   // and some @ref UpdateFlags "update
+				   // flags". Moreover, we manually
+				   // implement a copy constructor (since
+				   // the FEValues class is not copyable by
+				   // itself), and provide some additional
+				   // vector fields that are used to improve
+				   // performance of assembly.
 namespace Assembly
 {
   namespace Scratch
@@ -306,6 +357,21 @@ namespace Assembly
 
 
 
+				   // Observe that we derive the
+				   // StokesSystem scratch array from the
+				   // StokesPreconditioner array. We do this
+				   // because all the objects that are
+				   // necessary for the assembly of the
+				   // preconditioner are also needed for the
+				   // actual matrix system and right hand
+				   // side, plus some extra data. This makes
+				   // the program more compact. Note also
+				   // that the assembly of the Stokes system
+				   // and the temperature right hand side
+				   // further down requires data from
+				   // temperature and velocity,
+				   // respectively, so we actually need two
+				   // FEValues objects for those two cases.
     template <int dim>
     struct StokesSystem : public StokesPreconditioner<dim>
     {
@@ -485,6 +551,14 @@ namespace Assembly
     {}
   }
 
+
+				   // The CopyData arrays are similar to the
+				   // Scratch arrays. They provide a
+				   // constructor, a copy operation, and
+				   // some arrays for local matrix, local
+				   // vectors and the relation between local
+				   // and global degrees of freedom (aka
+				   // <code>local_dof_indices</code>).
   namespace CopyData
   {
     template <int dim>
@@ -611,7 +685,32 @@ namespace Assembly
 
 
 
-				 // @sect3{The <code>BoussinesqFlowProblem</code> class template}
+				   // @sect3{The <code>BoussinesqFlowProblem</code> class template}
+				   // 
+				   // This is the declaration of the main
+				   // class. It is very similar to
+				   // step-31. Following the @ref
+				   // MTWorkStream "task-based
+				   // parallilization", we split all the
+				   // assembly routines into two parts: a
+				   // first part that can do all the
+				   // calculations on a certain cell without
+				   // taking care of other threads, and a
+				   // second part (which is writing the
+				   // local data into the global matrices
+				   // and vectors) which can be entered by
+				   // only one thread at a time. In order to
+				   // implement that, we provide functions
+				   // for each of those two steps for all
+				   // the four assembly routines that we use
+				   // in this program.
+				   // 
+				   // Moreover, we include an MPI
+				   // communicator and a so-called
+				   // Epetra_Map that are needed for
+				   // communication and data exchange if the
+				   // Trilinos matrices and vectors are
+				   // distributed over several processors.
 template <int dim>
 class BoussinesqFlowProblem
 {
@@ -740,9 +839,58 @@ class BoussinesqFlowProblem
 };
 
 
-				 // @sect3{BoussinesqFlowProblem class implementation}
+				   // @sect3{BoussinesqFlowProblem class implementation}
 
-				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
+				   // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
+				   // 
+				   // The constructor of the problem is very
+				   // similar to the constructor in
+				   // step-31. What is different is the
+				   // parallel communication: Trilins uses a
+				   // message passing interface (MPI) for
+				   // data distribution. When entering the
+				   // BoussinesqFlowProblem class, we have
+				   // to decide how the parallization is to
+				   // be done. We choose a rather simple
+				   // strategy and let all processors
+				   // running the program work together,
+				   // specified by the communicator
+				   // <code>comm_world()</code>. Next, we
+				   // create some modified output stream as
+				   // we already did in step-18. In MPI, all
+				   // the processors run the same program
+				   // individually (they simply operate on
+				   // different chunks of data and exchange
+				   // some data from time to time). Since we
+				   // do not want each processor to write
+				   // the same information to screen (like
+				   // the number of degrees of freedom), we
+				   // only use one processor for writing
+				   // that output to terminal windows. The
+				   // implementation of this idea is to
+				   // check if the process number when
+				   // entering the program. If we are on
+				   // processor 0, then the data field
+				   // <code>pcout</code> gets a true
+				   // argument, and it uses the
+				   // <code>std::cout</code> stream for
+				   // output. If we are one processor five,
+				   // for instance, then we will give a
+				   // <code>false</code> argument to
+				   // <code>pcout</code>, which means that
+				   // the output of that processor will not
+				   // be printed anywhere.
+				   // 
+				   // Finally, we use a TimerOutput object
+				   // for summarizing the time we spend in
+				   // different sections of the program,
+				   // which we need to initialize. First, we
+				   // restrict it to the <code>pcout</code>
+				   // stream, and then we specify that we
+				   // want to get a summary table in the end
+				   // of the program which shows us
+				   // wallclock times (as opposed to CPU
+				   // times).
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
@@ -778,7 +926,43 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 
 
 
-				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
+				   // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
+				   //
+				   // Except two small details, this
+				   // function is the very same as in
+				   // step-31. The first detail is actually
+				   // common to all functions that implement
+				   // loop over all cells in the
+				   // triangulation: When operating in
+				   // parallel, each processor only works on
+				   // a chunk of cells. This chunk of cells
+				   // is identified via a so-called
+				   // subdomain_id, as we also did in
+				   // step-18. All we need to change is
+				   // hence to perform the cell-related
+				   // operations only on the process with
+				   // the correct ID. The second difference
+				   // is the way we calculate the maximum
+				   // value. Before, we could simply have a
+				   // <code>double</code> variable that we
+				   // checked against on each quadrature
+				   // point for each cell. Now, we have to
+				   // be a bit more careful since each
+				   // processor only operates on a subset of
+				   // cells. What we do is to first let each
+				   // processor calculate the maximum among
+				   // its cells, and then do a global
+				   // communication operation called
+				   // <code>MaxAll</code> that searches for
+				   // the maximum value among all the
+				   // maximum values of the individual
+				   // processors. The call to
+				   // <code>MaxAll</code> needs three
+				   // arguments, namely the local maximum
+				   // (input), a field for the global
+				   // maximum (output), and an integer value
+				   // one that says that we only work on one
+				   // double.
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
@@ -791,7 +975,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 
   const FEValuesExtractors::Vector velocities (0);
   
-  double max_local_velocity = 0, max_velocity = 0;
+  double max_local_velocity = 0;
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
@@ -809,6 +993,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 					 velocity_values[q].norm());
       }
 
+  double max_velocity = 0.;
   trilinos_communicator.MaxAll(&max_local_velocity, &max_velocity, 1);
 
   return max_velocity;
@@ -817,7 +1002,16 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 
 
 
-				 // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
+				   // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
+				   // Again, this is only a slight
+				   // modification of the respective
+				   // function in step-31. What is new is
+				   // that each processor works on its
+				   // partition of cells, and gets a minimum
+				   // and maximum temperature on that
+				   // partition. Two global communication
+				   // steps synchronize the data among the
+				   // processors.
 template <int dim>
 std::pair<double,double>
 BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
@@ -911,6 +1105,9 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
 
 
+				   // The function that calculates the
+				   // viscosity is purely local, so this is
+				   // the same code as in step-31.
 template <int dim>
 double
 BoussinesqFlowProblem<dim>::
@@ -970,6 +1167,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		    std::pow(cell_diameter,alpha) *
 		    max_residual / global_scaling));
 }
+
 
 
 template <int dim>
