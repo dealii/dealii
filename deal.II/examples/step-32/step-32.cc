@@ -808,7 +808,8 @@ class BoussinesqFlowProblem
 					  Assembly::Scratch::StokesPreconditioner<dim> &scratch,
 					  Assembly::CopyData::StokesPreconditioner<dim> &data);
     
-    void copy_local_to_global_stokes_preconditioner (const Assembly::CopyData::StokesPreconditioner<dim> &data);
+    void
+    copy_local_to_global_stokes_preconditioner (const Assembly::CopyData::StokesPreconditioner<dim> &data);
 
 
     void
@@ -816,7 +817,8 @@ class BoussinesqFlowProblem
 				  Assembly::Scratch::StokesSystem<dim>  &scratch,
 				  Assembly::CopyData::StokesSystem<dim> &data);
     
-    void copy_local_to_global_stokes_system (const Assembly::CopyData::StokesSystem<dim> &data);
+    void
+    copy_local_to_global_stokes_system (const Assembly::CopyData::StokesSystem<dim> &data);
 
 
     void
@@ -824,7 +826,8 @@ class BoussinesqFlowProblem
 				       Assembly::Scratch::TemperatureMatrix<dim>  &scratch,
 				       Assembly::CopyData::TemperatureMatrix<dim> &data);
     
-    void copy_local_to_global_temperature_matrix (const Assembly::CopyData::TemperatureMatrix<dim> &data);
+    void
+    copy_local_to_global_temperature_matrix (const Assembly::CopyData::TemperatureMatrix<dim> &data);
 
 
 
@@ -835,7 +838,8 @@ class BoussinesqFlowProblem
 				    Assembly::Scratch::TemperatureRHS<dim> &scratch,
 				    Assembly::CopyData::TemperatureRHS<dim> &data);
     
-    void copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<dim> &data);
+    void
+    copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<dim> &data);
 };
 
 
