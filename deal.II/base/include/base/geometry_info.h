@@ -300,7 +300,7 @@ class RefinementCase : public RefinementPossibilities<dim>
 				      * explicit.
 				      */
    explicit RefinementCase (const unsigned char refinement_case);
-    
+
 				     /**
 				      * Return the numeric value
 				      * stored by this class. While
@@ -335,7 +335,7 @@ class RefinementCase : public RefinementPossibilities<dim>
 				      * one given as argument.
 				      */
     RefinementCase operator | (const RefinementCase &r) const;
-    
+
 				     /**
 				      * Return the intersection of the
 				      * refinement flags represented
@@ -373,7 +373,7 @@ class RefinementCase : public RefinementPossibilities<dim>
 				      */
     static
     RefinementCase cut_axis (const unsigned int i);
-    
+
 				     /**
 				      * Return the amount of memory
 				      * occupied by an object of this
@@ -388,7 +388,7 @@ class RefinementCase : public RefinementPossibilities<dim>
 		    int,
 		    << "The refinement flags given (" << arg1 << ") contain set bits that do not "
 		    << "make sense for the space dimension of the object to which they are applied.");
-    
+
   private:
 				     /**
 				      * Store the refinement case as a
@@ -579,55 +579,55 @@ namespace internal
  |   0   |    case_none
  |       |
  *-------*
- 
+
  *---*---*
  |   |   |
  | 0 | 1 |    case_x
  |   |   |
  *---*---*
- 
+
  *---*---*
  | 1 |   |
  *---* 2 |    case_x1y
  | 0 |   |
  *---*---*
- 
+
  *---*---*
  |   | 2 |
  | 0 *---*    case_x2y
  |   | 1 |
  *---*---*
- 
+
  *---*---*
  | 1 | 3 |
  *---*---*    case_x1y2y   (successive refinement: first cut_x, then cut_y for both children)
  | 0 | 2 |
  *---*---*
- 
+
  *-------*
  |   1   |
  *-------*    case_y
  |   0   |
  *-------*
- 
+
  *-------*
  |   2   |
  *---*---*    case_y1x
  | 0 | 1 |
  *---*---*
- 
+
  *---*---*
  | 1 | 2 |
  *---*---*    case_y2x
  |   0   |
  *-------*
- 
+
  *---*---*
  | 2 | 3 |
  *---*---*    case_y1x2x   (successive refinement: first cut_y, then cut_x for both children)
  | 0 | 1 |
  *---+---*
- 
+
  *---*---*
  | 2 | 3 |
  *---*---*    case_xy      (one isotropic refinement step)
@@ -693,7 +693,7 @@ namespace internal
 					* specified in the base class.
 					*/
       SubfaceCase (const typename SubfacePossibilities<dim>::Possibilities subface_possibility);
-    
+
 				       /**
 					* Return the numeric value
 					* stored by this class. While
@@ -720,7 +720,7 @@ namespace internal
 					* values (the array indices).
 					*/
       operator unsigned char () const;
-    
+
 				       /**
 					* Return the amount of memory
 					* occupied by an object of this
@@ -735,7 +735,7 @@ namespace internal
 		      int,
 		      << "The subface case given (" << arg1 << ") does not make sense "
 		      << "for the space dimension of the object to which they are applied.");
-    
+
     private:
 				       /**
 					* Store the refinement case as a
@@ -745,7 +745,7 @@ namespace internal
 					*/
       unsigned char value : (dim == 3 ? 4 : 1);
   };
-  
+
 } // namespace internal
 
 
@@ -776,7 +776,7 @@ template <int dim> class GeometryInfo;
  * @author Wolfgang Bangerth, 1998
  */
 template <>
-struct GeometryInfo<0> 
+struct GeometryInfo<0>
 {
 
                                      /**
@@ -819,7 +819,7 @@ struct GeometryInfo<0>
 				      * is equal to one.
 				      */
     static unsigned int n_children(const RefinementCase<0> &refinement_case);
-    
+
 				     /**
 				      * Number of vertices a cell has.
 				      */
@@ -840,7 +840,7 @@ struct GeometryInfo<0>
 				      * Number of lines each face has.
 				      */
     static const unsigned int lines_per_face    = 0;
-    
+
 				     /**
 				      * Number of quads on each face.
 				      */
@@ -891,7 +891,7 @@ struct GeometryInfo<0>
  *
  *
  * <h3>Implementation conventions for two spatial dimensions</h3>
- * 
+ *
  * From version 5.2 onwards deal.II is based on a numbering scheme
  * that uses a lexicographic ordering (with x running fastest)
  * wherever possible, hence trying to adopt a kind of 'canonical'
@@ -910,7 +910,7 @@ struct GeometryInfo<0>
  * N3) the direction of a line is represented by the direction of
  * point 0 towards point 1 and is always in one of the coordinate
  * directions
- * 
+ *
  * N4) face lines in 3d are ordered, such that the induced 2d local
  * coordinate system (x,y) implies (right hand rule) a normal in
  * face normal direction, see N2/.
@@ -926,7 +926,7 @@ struct GeometryInfo<0>
  *    0-->--1
  *        2
  * @endverbatim
- * 
+ *
  * Note that the orientation of lines has to be correct upon construction of a
  * grid; however, it is automatically preserved upon refinement.
  *
@@ -957,7 +957,7 @@ struct GeometryInfo<0>
  *   |   0-----1
  *   *------------>x
  * @endverbatim
- * 
+ *
  * Here, vertex 0 is the origin of the coordinate system, vertex 1 has
  * coordinates <tt>(1,0)</tt>, vertex 2 at <tt>(0,1)</tt> and vertex 3 at
  * <tt>(1,1)</tt>. The GeometryInfo<dim>::unit_cell_vertex() function can be
@@ -992,13 +992,13 @@ struct GeometryInfo<0>
  * member functions and variables of the present class.
  *
  * <h4>Vertices</h4>
- *  
+ *
  * The ordering of vertices in 3d is defined by the same rules as in
  * the 2d case, i.e.
  *
  * N1) vertices are numbered in lexicographic ordering.
  *
- * Hence, the vertices are numbered as follows   
+ * Hence, the vertices are numbered as follows
  * @verbatim
  *       6-------7        6-------7
  *      /|       |       /       /|
@@ -1011,14 +1011,14 @@ struct GeometryInfo<0>
  *   |/       /       |       |/
  *   0-------1        0-------1
  * @endverbatim
- * 
+ *
  * We note, that first the vertices on the bottom face (z=0) are numbered
  * exactly the same way as are the vertices on a quadrilateral. Then the
  * vertices on the top face (z=1) are numbered similarly by moving the bottom
  * face to the top. Again, the GeometryInfo<dim>::unit_cell_vertex() function
  * can be used to query this information at run-time.
  *
- * 
+ *
  * <h4>Lines</h4>
  *
  * Here, the same holds as for the vertices:
@@ -1067,7 +1067,7 @@ struct GeometryInfo<0>
  * globally according to above convention. However, the GridReordering
  * class can do this for you, by reorienting cells and edges of an
  * arbitrary list of input cells that need not be already sorted.
- * 
+ *
  * <h4>Faces</h4>
  *
  * The numbering of faces in 3d is defined by a rule analogous to 2d:
@@ -1113,7 +1113,7 @@ struct GeometryInfo<0>
  *    |/       /       |       |/
  *    *-------*        *-------*
  *  @endverbatim
- * 
+ *
  * <li> Faces 2 and 3:
  *  @verbatim
  *        x Face 3           Face 2
@@ -1127,8 +1127,8 @@ struct GeometryInfo<0>
  *    | /       /      2       | /
  *    |/       /       |       |/
  *    *-------*        *---0---*y
- *  @endverbatim 
- * 
+ *  @endverbatim
+ *
  * <li> Faces 4 and 5:
  *  @verbatim
  *          Face 4         y Face 5
@@ -1390,7 +1390,7 @@ struct GeometryInfo<0>
  *    <li> Vertex 7: <tt>(1,1,1)</tt>.
  * </ul>
  *
- * 
+ *
  *
  * @note Instantiations for this template are provided for dimensions 1,2,3,4,
  * and there is a specialization for dim=0 (see the section on @ref
@@ -1402,7 +1402,7 @@ struct GeometryInfo<0>
 template <int dim>
 struct GeometryInfo
 {
-    
+
                                      /**
                                       * Maximum number of children of
                                       * a refined cell, i.e. the
@@ -1450,7 +1450,7 @@ struct GeometryInfo
 				      */
     static const unsigned int lines_per_face
     = GeometryInfo<dim-1>::lines_per_cell;
-    
+
 				     /**
 				      * Number of quads on each face.
 				      */
@@ -1555,7 +1555,7 @@ struct GeometryInfo
                                       * the vertex belongs
                                       */
     static const unsigned int vertex_to_face[vertices_per_cell][dim];
- 
+
 				     /**
 				      * Return the number of children
 				      * of a cell (or face) refined
@@ -1709,7 +1709,7 @@ struct GeometryInfo
 				      * In the case of anisotropically refined
 				      * cells and faces, the @p RefinementCase of
 				      * the face, <tt>face_ref_case</tt>,
-				      * might have an influence on 
+				      * might have an influence on
 				      * which child is behind which given
 				      * subface, thus this is an additional
 				      * argument, defaulting to isotropic
@@ -1725,7 +1725,7 @@ struct GeometryInfo
 			const bool face_rotation    = false,
 			const RefinementCase<dim-1> &face_refinement_case
 			= RefinementCase<dim-1>::isotropic_refinement);
-    
+
 				     /**
 				      * Map line vertex number to cell
 				      * vertex number, i.e. give the
@@ -1838,7 +1838,7 @@ struct GeometryInfo
 				  const bool face_orientation = true,
 				  const bool face_flip        = false,
 				  const bool face_rotation    = false);
-    
+
 				     /**
 				      * Map the vertex index @p vertex of a face
 				      * with arbitrary @p face_orientation, @p
@@ -1858,7 +1858,7 @@ struct GeometryInfo
 				  const bool face_orientation = true,
 				  const bool face_flip        = false,
 				  const bool face_rotation    = false);
-    
+
 				     /**
 				      * Map the line index @p line of a face
 				      * in standard orientation to one of a face
@@ -1878,7 +1878,7 @@ struct GeometryInfo
 				const bool face_orientation = true,
 				const bool face_flip        = false,
 				const bool face_rotation    = false);
-    
+
 				     /**
 				      * Map the line index @p line of a face
 				      * with arbitrary @p face_orientation, @p
@@ -1898,7 +1898,7 @@ struct GeometryInfo
 				const bool face_orientation = true,
 				const bool face_flip        = false,
 				const bool face_rotation    = false);
-    
+
 				     /**
 				      * Return the position of the @p ith
 				      * vertex on the unit cell. The order of
@@ -1973,7 +1973,7 @@ struct GeometryInfo
     static
     bool
     is_inside_unit_cell (const Point<dim> &p);
-    
+
 				     /**
 				      * Return true if the given point
 				      * is inside the unit cell of the
@@ -2042,7 +2042,7 @@ struct GeometryInfo
     Tensor<1,dim>
     d_linear_shape_function_gradient (const Point<dim> &xi,
 				      const unsigned int i);
-    
+
 				     /**
 				      * For a (bi-, tri-)linear
 				      * mapping from the reference
@@ -2142,9 +2142,16 @@ struct GeometryInfo
     template <int spacedim>
     static
     void
-    alternating_form_at_vertices (const Point<spacedim> (&vertices)[vertices_per_cell],
-				  Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell]);
-    
+    alternating_form_at_vertices
+#ifndef DEAL_II_ARRAY_ARG_BUG
+    (const Point<spacedim> (&vertices)[vertices_per_cell],
+     Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell])
+#else
+    (const Point<spacedim> *vertices,
+     Tensor<spacedim-dim,spacedim> *forms)
+#endif
+      ;
+
                                      /**
 				      * For each face of the reference
 				      * cell, this field stores the
@@ -2214,7 +2221,7 @@ struct GeometryInfo
 		    double,
 		    << "The coordinates must satisfy 0 <= x_i <= 1, "
 		    << "but here we have x_i=" << arg1);
-            
+
                                      /**
                                       * Exception
                                       */
@@ -2292,18 +2299,18 @@ namespace internal
 		  :
 		  value (subface_possibility)
   {}
-  
-  
+
+
   template <int dim>
   inline
   SubfaceCase<dim>::operator unsigned char () const
   {
     return value;
   }
-  
-  
+
+
 } // namespace internal
-  
+
 
 template <int dim>
 inline
@@ -2490,7 +2497,7 @@ GeometryInfo<dim>::unit_cell_vertex (const unsigned int)
 {
   Assert(false, ExcNotImplemented());
 
-  return Point<dim> ();  
+  return Point<dim> ();
 }
 
 
@@ -2501,7 +2508,7 @@ unsigned int
 GeometryInfo<1>::child_cell_from_point (const Point<1> &p)
 {
   Assert ((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
-  
+
   return (p[0] <= 0.5 ? 0 : 1);
 }
 
@@ -2514,7 +2521,7 @@ GeometryInfo<2>::child_cell_from_point (const Point<2> &p)
 {
   Assert ((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
   Assert ((p[1] >= 0) && (p[1] <= 1), ExcInvalidCoordinate(p[1]));
-  
+
   return (p[0] <= 0.5 ?
 	  (p[1] <= 0.5 ? 0 : 2) :
 	  (p[1] <= 0.5 ? 1 : 3));
@@ -2530,7 +2537,7 @@ GeometryInfo<3>::child_cell_from_point (const Point<3> &p)
   Assert ((p[0] >= 0) && (p[0] <= 1), ExcInvalidCoordinate(p[0]));
   Assert ((p[1] >= 0) && (p[1] <= 1), ExcInvalidCoordinate(p[1]));
   Assert ((p[2] >= 0) && (p[2] <= 1), ExcInvalidCoordinate(p[2]));
-  
+
   return (p[0] <= 0.5 ?
 	  (p[1] <= 0.5 ?
 	   (p[2] <= 0.5 ? 0 : 4) :

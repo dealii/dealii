@@ -57,6 +57,10 @@
    linking. For the details, look at aclocal.m4 in the top-level directory. */
 #undef DEAL_II_ANON_NAMESPACE_LINKAGE_BUG
 
+/* Defined if the compiler has a problem with using arrays as arguments in
+   functions */
+#undef DEAL_II_ARRAY_ARG_BUG
+
 /* Defined if the compiler has a problem with assigning arrays in conditionals
    */
 #undef DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG

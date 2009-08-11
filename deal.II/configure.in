@@ -19,7 +19,7 @@ dnl -------------------------------------------------------------
 
 dnl switch off caching, since that leads to insurmountable trouble if
 dnl you call ./configure subsequently on different systems without
-dnl clearing the cache 
+dnl clearing the cache
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 
@@ -50,9 +50,9 @@ DEAL_II_PATH=`pwd`
 dnl    Split version number in major and minor
 DEAL_II_MAJOR=`echo $PACKAGE_VERSION | perl -pi -e 's/^(\d+)\..*/$1/;'`
 DEAL_II_MINOR=`echo $PACKAGE_VERSION | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
-AC_DEFINE_UNQUOTED(DEAL_II_MAJOR, $DEAL_II_MAJOR, 
+AC_DEFINE_UNQUOTED(DEAL_II_MAJOR, $DEAL_II_MAJOR,
                    [Major version number of deal.II])
-AC_DEFINE_UNQUOTED(DEAL_II_MINOR, $DEAL_II_MINOR, 
+AC_DEFINE_UNQUOTED(DEAL_II_MINOR, $DEAL_II_MINOR,
                    [Minor version number of deal.II])
 AC_DEFINE_UNQUOTED(DEAL_II_PATH, "$DEAL_II_PATH",
                    [Path to the deal.II directory])
@@ -87,7 +87,7 @@ dnl Find a C compiler. This modifies the variable CC.
 dnl In order to get the absolute path of the compiler, use the
 dnl second line
 dnl
-dnl Likewise, find the right C++ compiler. Note that for historical 
+dnl Likewise, find the right C++ compiler. Note that for historical
 dnl reasons, the compiler name and version is in the name GXX_VERSION,
 dnl even if the compiler is not GCC.
 dnl
@@ -102,7 +102,7 @@ DEAL_II_PATH_PROG(CC,$CC)
 OLDCXXFLAGS="$CXXFLAGS"
 AC_PROG_CXX
 CXXFLAGS="$OLDCXXFLAGS"
-DEAL_II_PATH_PROG(CXX,$CXX) 
+DEAL_II_PATH_PROG(CXX,$CXX)
 
 dnl Next determine which C++ compiler we have here and set compilation
 dnl flags accordingly. Note that for historical reasons the name and
@@ -155,14 +155,14 @@ dnl                   Kludges and C++ compatibility
 dnl --------------------------------------------------------------
 
 dnl Various kludges for various systems: some systems need special
-dnl treatment for some things. Since they sometimes depend on 
+dnl treatment for some things. Since they sometimes depend on
 dnl whether other flags are set (e.g. the need for defining
 dnl -D__EXTENSIONS__ depends on whether we use/not use threading
 dnl options), this is done after checking for multithreading
 
-DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG, 
+DEAL_II_CHECK_ASSERT_THROW(debug, $CXXFLAGSG,
                            [CXXFLAGSG="-DDISABLE_ASSERT_THROW $CXXFLAGSG"])
-DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO, 
+DEAL_II_CHECK_ASSERT_THROW(optimized, $CXXFLAGSO,
                            [CXXFLAGSO="-DDISABLE_ASSERT_THROW $CXXFLAGSO"])
 DEAL_II_CHECK_LOCAL_TYPEDEF_COMP
 DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS
@@ -186,6 +186,7 @@ DEAL_II_CHECK_WEAK_LINKAGE_BUG
 DEAL_II_CHECK_SFINAE_BUG
 DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG
 DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG
+DEAL_II_CHECK_ARRAY_ARG_BUG
 DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG
 DEAL_II_CHECK_CONST_MEMBER_DEDUCTION_BUG
 DEAL_II_CHECK_TYPE_QUALIFIER_BUG
@@ -271,16 +272,16 @@ AC_ARG_ENABLE(shared,
     enableshared="$enableval",
     enableshared=yes)
 
-dnl On AIX 4.x and alpha, shared libs don't work for us at present, so 
+dnl On AIX 4.x and alpha, shared libs don't work for us at present, so
 dnl disable them (we should probably use libtool there). Likewise on
 dnl a few other systems.
 dnl
-dnl For Cygwin Windows systems, the shared library suffix becomes ".dll", 
+dnl For Cygwin Windows systems, the shared library suffix becomes ".dll",
 dnl on Mac OS X it is .dylib.
 case "$target" in
    *-aix4* | alpha*-linux* | alpha*-osf[45]* | hppa64-unknown-linux-gnu )
 	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
-	   enableshared=no 
+	   enableshared=no
 	   ;;
    *cygwin )
            shared_lib_suffix=".dll"
@@ -294,7 +295,7 @@ case "$target" in
            shared_lib_suffix=".so"
            static_lib_suffix=".a"
            ;;
-esac  
+esac
 
 if test "x$enableshared" = "xyes" ; then
   CFLAGS="$CFLAGS $CFLAGSPIC"
@@ -325,7 +326,7 @@ AC_SUBST(static_lib_suffix)
 AC_SUBST(shared_lib_suffix)
 
 dnl Also look for RANLIB, since some rather old systems (ah, and MAC OS X!)
-dnl still require it for statically linked libraries. On other systems, 
+dnl still require it for statically linked libraries. On other systems,
 dnl RANLIB is not available, so skip the second check that tries to get
 dnl the full path for the executable that was found in the first one.
 dnl We also check for AR, since on some systems we will want to pass different
@@ -489,7 +490,7 @@ dnl -------------------------------------------------------------
 dnl Check for blas.
 AC_ARG_WITH(blas,
   [  --with-blas=blaslib     Use the blas library blaslib. Make sure the path
-                          to the libary is searched by ld, since it is 
+                          to the libary is searched by ld, since it is
 			  included by the argument -lblaslib. If no argument
 			  is given, use -lblas. Default is to use -lblas only
                           if required by other libraries.],
@@ -519,9 +520,9 @@ if test "x$with_zlib" = "x" ; then
 fi
 
 AC_ARG_WITH(zlib,
-  [  --with-zlib=zlib        Use the compression library zlib for gzipped 
-                          input and output and link it with -lzlib (the 
-			  default is -lz). Make sure the library is in the 
+  [  --with-zlib=zlib        Use the compression library zlib for gzipped
+                          input and output and link it with -lzlib (the
+			  default is -lz). Make sure the library is in the
 			  search path of ld],
   DEAL_II_WITH_ZLIB($withval))
 
@@ -543,12 +544,12 @@ AC_SUBST(USE_CONTRIB_UMFPACK)
 
 dnl Check for LAPACK
 AC_ARG_WITH(lapack,
-  [  --with-lapack=lapacklib Use the lapack library lapacklib. Make sure the 
-	                  path to the libary is searched by ld, since it is 
+  [  --with-lapack=lapacklib Use the lapack library lapacklib. Make sure the
+	                  path to the libary is searched by ld, since it is
 			  included by the argument -llapacklib. If no argument
-			  is given, use -llapack. Default is not to use 
+			  is given, use -llapack. Default is not to use
                           -llapack.],
-			  
+
   DEAL_II_WITH_LAPACK($withval))
 
 dnl Finally check if BLAS is really there. We have to do it this way, since
@@ -704,11 +705,11 @@ AC_SUBST(LDFLAGSPIC)
 
 dnl Write output to the global options file and modify other files as well
 dnl that need some information
-process_files="common/Make.global_options 
-               common/Makefile.template 
+process_files="common/Make.global_options
+               common/Makefile.template
                common/scripts/make_dependencies.pl
 	       Version
-               doc/Makefile 
+               doc/Makefile
 	       doc/doxygen/Makefile
                doc/doxygen/options.dox
                doc/doxygen/options.136

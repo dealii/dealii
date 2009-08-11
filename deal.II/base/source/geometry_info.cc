@@ -40,15 +40,15 @@ template <int dim> const unsigned int GeometryInfo<dim>::hexes_per_cell;
 
 using namespace numbers;
 
-// make sure that also the icc compiler defines (and not only declares) 
+// make sure that also the icc compiler defines (and not only declares)
 // these variables
 namespace internal
 {
   void foo (const unsigned int *) {}
 
   template <int dim>
-  void define_variables () 
-  { 
+  void define_variables ()
+  {
     foo(&::dealii::GeometryInfo<dim>::vertices_per_cell);
   }
 
@@ -284,7 +284,7 @@ GeometryInfo<1>::subface_ratio(const internal::SubfaceCase<1> &,
   return 1;
 }
 
-  
+
 template<>
 double
 GeometryInfo<2>::subface_ratio(const internal::SubfaceCase<2> &subface_case,
@@ -322,7 +322,7 @@ GeometryInfo<2>::subface_ratio(const internal::SubfaceCase<2> &subface_case,
 	    Assert(false, ExcInternalError());
 	    break;
     }
-  
+
   return ratio;
 }
 
@@ -381,7 +381,7 @@ GeometryInfo<3>::subface_ratio(const internal::SubfaceCase<3> &subface_case,
 	    Assert(false, ExcInternalError());
 	    break;
     }
-  
+
   return ratio;
 }
 
@@ -419,17 +419,17 @@ GeometryInfo<2>::face_refinement_case(const RefinementCase<2> &cell_refinement_c
     ref_cases[RefinementCase<dim>::isotropic_refinement+1][GeometryInfo<dim>::faces_per_cell/2]=
     {{RefinementCase<dim-1>::no_refinement,  // no_refinement
       RefinementCase<dim-1>::no_refinement},
-     
+
      {RefinementCase<dim-1>::no_refinement,
       RefinementCase<dim-1>::cut_x},
-     
+
      {RefinementCase<dim-1>::cut_x,
       RefinementCase<dim-1>::no_refinement},
-     
+
      {RefinementCase<dim-1>::cut_x,          // cut_xy
-      RefinementCase<dim-1>::cut_x}     
+      RefinementCase<dim-1>::cut_x}
     };
-  
+
   return ref_cases[cell_refinement_case][face_no/2];
 }
 
@@ -453,23 +453,23 @@ GeometryInfo<3>::face_refinement_case(const RefinementCase<3> &cell_refinement_c
     {{RefinementCase<dim-1>::no_refinement,  // no_refinement
       RefinementCase<dim-1>::no_refinement,
       RefinementCase<dim-1>::no_refinement},
-     
+
      {RefinementCase<dim-1>::no_refinement,  // cut_x
       RefinementCase<dim-1>::cut_y,
       RefinementCase<dim-1>::cut_x},
-     
+
      {RefinementCase<dim-1>::cut_x,          // cut_y
       RefinementCase<dim-1>::no_refinement,
       RefinementCase<dim-1>::cut_y},
-     
+
      {RefinementCase<dim-1>::cut_x,          // cut_xy
       RefinementCase<dim-1>::cut_y,
       RefinementCase<dim-1>::cut_xy},
-     
+
      {RefinementCase<dim-1>::cut_y,          // cut_z
       RefinementCase<dim-1>::cut_x,
       RefinementCase<dim-1>::no_refinement},
-     
+
      {RefinementCase<dim-1>::cut_y,          // cut_xz
       RefinementCase<dim-1>::cut_xy,
       RefinementCase<dim-1>::cut_x},
@@ -480,17 +480,17 @@ GeometryInfo<3>::face_refinement_case(const RefinementCase<3> &cell_refinement_c
 
      {RefinementCase<dim-1>::cut_xy,         // cut_xyz
       RefinementCase<dim-1>::cut_xy,
-      RefinementCase<dim-1>::cut_xy},     
+      RefinementCase<dim-1>::cut_xy},
     };
 
   const RefinementCase<dim-1> ref_case=ref_cases[cell_refinement_case][face_no/2];
-  
+
   static const RefinementCase<dim-1> flip[4]=
     {RefinementCase<dim-1>::no_refinement,
      RefinementCase<dim-1>::cut_y,
      RefinementCase<dim-1>::cut_x,
      RefinementCase<dim-1>::cut_xy};
-  
+
 				   // correct the ref_case for face_orientation
 				   // and face_rotation. for face_orientation,
 				   // 'true' is the default value whereas for
@@ -518,7 +518,7 @@ GeometryInfo<1>::line_refinement_case(const RefinementCase<1> &cell_refinement_c
 	 ExcIndexRange(cell_refinement_case, 0, RefinementCase<dim>::isotropic_refinement+1));
   Assert(line_no<GeometryInfo<dim>::lines_per_cell,
 	 ExcIndexRange(line_no, 0, GeometryInfo<dim>::lines_per_cell));
-  
+
   return cell_refinement_case;
 }
 
@@ -528,7 +528,7 @@ RefinementCase<1>
 GeometryInfo<2>::line_refinement_case(const RefinementCase<2> &cell_refinement_case,
 				      const unsigned int line_no)
 {
-				   // Assertions are in face_refinement_case() 
+				   // Assertions are in face_refinement_case()
   return face_refinement_case(cell_refinement_case, line_no);
 }
 
@@ -560,7 +560,7 @@ GeometryInfo<3>::line_refinement_case(const RefinementCase<3> &cell_refinement_c
 				   // 0->x, 1->y, 2->z
   static const unsigned int direction[lines_per_cell]=
     {1,1,0,0,1,1,0,0,2,2,2,2};
-  
+
   return ((cell_refinement_case & cut_one[direction[line_no]]) ?
     RefinementCase<1>::cut_x : RefinementCase<1>::no_refinement);
 }
@@ -577,7 +577,7 @@ GeometryInfo<1>::min_cell_refinement_case_for_face_refinement(const RefinementCa
 {
   const unsigned int dim = 1;
   Assert(false, ExcImpossibleInDim(dim));
-  
+
   return RefinementCase<dim>::no_refinement;
 }
 
@@ -643,12 +643,12 @@ GeometryInfo<3>::min_cell_refinement_case_for_face_refinement(const RefinementCa
       RefinementCase<dim>::cut_y,          // cut_x in face 0 means cut_y for the cell
       RefinementCase<dim>::cut_z,
       RefinementCase<dim>::cut_yz},
-     
+
      {RefinementCase<dim>::no_refinement,  // faces 2 and 3 (note that x and y are "exchanged on faces 2 and 3")
       RefinementCase<dim>::cut_z,
       RefinementCase<dim>::cut_x,
       RefinementCase<dim>::cut_xz},
-     
+
      {RefinementCase<dim>::no_refinement,  // faces 4 and 5
       RefinementCase<dim>::cut_x,
       RefinementCase<dim>::cut_y,
@@ -664,7 +664,7 @@ RefinementCase<1>
 GeometryInfo<1>::min_cell_refinement_case_for_line_refinement(const unsigned int line_no)
 {
   Assert(line_no==0, ExcIndexRange(line_no,0,1));
-  
+
   return RefinementCase<1>::cut_x;
 }
 
@@ -729,7 +729,7 @@ GeometryInfo<3>::standard_to_real_face_vertex(const unsigned int vertex,
 				   //
 				   // forth index: face_rotation: 0: standard,
 				   // 1: face rotated by 90 degrees
-  
+
   static const unsigned int vertex_translation[4][2][2][2] =
     { { { { 0, 2 },  // vertex 0, face_orientation=false, face_flip=false, face_rotation=false and true
 	  { 3, 1 }}, // vertex 0, face_orientation=false, face_flip=true, face_rotation=false and true
@@ -798,7 +798,7 @@ GeometryInfo<3>::real_to_standard_face_vertex(const unsigned int vertex,
 				   //
 				   // forth index: face_rotation: 0: standard,
 				   // 1: face rotated by 90 degrees
-  
+
   static const unsigned int vertex_translation[4][2][2][2] =
     { { { { 0, 2 },  // vertex 0, face_orientation=false, face_flip=false, face_rotation=false and true
 	  { 3, 1 }}, // vertex 0, face_orientation=false, face_flip=true, face_rotation=false and true
@@ -850,7 +850,7 @@ GeometryInfo<3>::standard_to_real_face_line(const unsigned int line,
   Assert(line<GeometryInfo<3>::lines_per_face,
 	 ExcIndexRange(line,0,GeometryInfo<3>::lines_per_face));
 
-  
+
 				   // make sure we handle
                                    // non-standard faces correctly
                                    //
@@ -867,7 +867,7 @@ GeometryInfo<3>::standard_to_real_face_line(const unsigned int line,
 				   //
 				   // forth index: face_rotation: 0: standard,
 				   // 1: face rotated by 90 degrees
-  
+
   static const unsigned int line_translation[4][2][2][2] =
     { { { { 2, 0 },  // line 0, face_orientation=false, face_flip=false, face_rotation=false and true
 	  { 3, 1 }}, // line 0, face_orientation=false, face_flip=true, face_rotation=false and true
@@ -917,7 +917,7 @@ GeometryInfo<3>::real_to_standard_face_line(const unsigned int line,
   Assert(line<GeometryInfo<3>::lines_per_face,
 	 ExcIndexRange(line,0,GeometryInfo<3>::lines_per_face));
 
-  
+
 				   // make sure we handle
                                    // non-standard faces correctly
                                    //
@@ -934,7 +934,7 @@ GeometryInfo<3>::real_to_standard_face_line(const unsigned int line,
 				   //
 				   // forth index: face_rotation: 0: standard,
 				   // 1: face rotated by 90 degrees
-  
+
   static const unsigned int line_translation[4][2][2][2] =
     { { { { 2, 0 },  // line 0, face_orientation=false, face_flip=false, face_rotation=false and true
 	  { 3, 1 }}, // line 0, face_orientation=false, face_flip=true, face_rotation=false and true
@@ -1015,7 +1015,7 @@ GeometryInfo<2>::child_cell_on_face (const RefinementCase<2> &ref_case,
   {{{0,0},{1,1},{0,1},{0,1}},          // cut_x
    {{0,1},{0,1},{0,0},{1,1}},          // cut_y
    {{0,2},{1,3},{0,1},{2,3}}};         // cut_xy
-  
+
   return subcells[ref_case-1][face][subface];
 }
 
@@ -1051,7 +1051,7 @@ GeometryInfo<3>::child_cell_on_face (const RefinementCase<3> &ref_case,
 				   // orientation, flip and rotation of the face
 				   // is quite complicated. thus, we break it
 				   // down into several steps.
-  
+
 				   // first step: convert the given face refine
 				   // case to a face refine case concerning the
 				   // face in standard orientation (, flip and
@@ -1086,7 +1086,7 @@ GeometryInfo<3>::child_cell_on_face (const RefinementCase<3> &ref_case,
 					   // no_refinement (subface 0 stays 0,
 					   // all others are invalid)
 	  {{{{0,e,e,e},
-	     {0,e,e,e}}, 
+	     {0,e,e,e}},
 	    {{0,e,e,e},
 	     {0,e,e,e}}},
 	   {{{0,e,e,e},
@@ -1107,7 +1107,7 @@ GeometryInfo<3>::child_cell_on_face (const RefinementCase<3> &ref_case,
 					   // conversion to a 'standard face
 					   // refine case')
 	  {{{{0,1,e,e},
-	     {0,1,e,e}}, 
+	     {0,1,e,e}},
 	    {{1,0,e,e},
 	     {1,0,e,e}}},
 	   {{{0,1,e,e},
@@ -1117,7 +1117,7 @@ GeometryInfo<3>::child_cell_on_face (const RefinementCase<3> &ref_case,
 					   // cut_y (the same applies as for
 					   // cut_x)
 	  {{{{0,1,e,e},
-	     {1,0,e,e}}, 
+	     {1,0,e,e}},
 	    {{1,0,e,e},
 	     {0,1,e,e}}},
 	   {{{0,1,e,e},
@@ -1163,13 +1163,13 @@ GeometryInfo<3>::child_cell_on_face (const RefinementCase<3> &ref_case,
 	 {0, 1, 0, 1},  // face 4, subfaces 0,1,2,3
 	 {0, 1, 0, 1}}, // face 5, subfaces 0,1,2,3
 					 // cut_y
-	{{0, 1, 0, 1},  
+	{{0, 1, 0, 1},
 	 {0, 1, 0, 1},
 	 {0, 0, 0, 0},
 	 {1, 1, 1, 1},
 	 {0, 0, 1, 1},
 	 {0, 0, 1, 1}},
-					 // cut_xy	
+					 // cut_xy
 	{{0, 2, 0, 2},
 	 {1, 3, 1, 3},
 	 {0, 0, 1, 1},
@@ -1294,8 +1294,8 @@ GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
 					const unsigned int vertex)
 {
   Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
-  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));  
-  
+  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
+
   static const unsigned
     vertices[lines_per_cell][2] = {{0, 2},  // bottom face
 				   {1, 3},
@@ -1331,7 +1331,7 @@ GeometryInfo<1>::face_to_cell_lines (const unsigned int face,
 {
   Assert (face+1<faces_per_cell+1, ExcIndexRange(face, 0, faces_per_cell));
   Assert (line+1<lines_per_face+1, ExcIndexRange(line, 0, lines_per_face));
-  
+
 				   // There is only a single line, so
 				   // it must be this.
   return 0;
@@ -1425,7 +1425,7 @@ double
 GeometryInfo<dim>::distance_to_unit_cell (const Point<dim> &p)
 {
    double result = 0.0;
-   
+
    for(unsigned i=0; i<dim; i++)
       if ((-p[i]) > result)
          result = -p[i];
@@ -1445,7 +1445,7 @@ d_linear_shape_function (const Point<dim> &xi,
 {
   Assert (i < GeometryInfo<dim>::vertices_per_cell,
 	  ExcIndexRange (i, 0, GeometryInfo<dim>::vertices_per_cell));
-    
+
   switch (dim)
     {
       case 1:
@@ -1459,7 +1459,7 @@ d_linear_shape_function (const Point<dim> &xi,
 		  return x;
 	  }
       }
-	
+
       case 2:
       {
 	const double x = xi[0];
@@ -1519,7 +1519,7 @@ d_linear_shape_function_gradient (const Point<1> &,
 {
   Assert (i < GeometryInfo<1>::vertices_per_cell,
 	  ExcIndexRange (i, 0, GeometryInfo<1>::vertices_per_cell));
-    
+
   switch (i)
     {
       case 0:
@@ -1541,7 +1541,7 @@ d_linear_shape_function_gradient (const Point<2> &xi,
 {
   Assert (i < GeometryInfo<2>::vertices_per_cell,
 	  ExcIndexRange (i, 0, GeometryInfo<2>::vertices_per_cell));
-    
+
   const double x = xi[0];
   const double y = xi[1];
   switch (i)
@@ -1568,7 +1568,7 @@ d_linear_shape_function_gradient (const Point<3> &xi,
 {
   Assert (i < GeometryInfo<3>::vertices_per_cell,
 	  ExcIndexRange (i, 0, GeometryInfo<3>::vertices_per_cell));
-    
+
   const double x = xi[0];
   const double y = xi[1];
   const double z = xi[2];
@@ -1640,7 +1640,7 @@ namespace internal
       Tensor<1,2> result;
       result[0] = derivative[0][1];
       result[1] = -derivative[0][0];
-      
+
       return result;
     }
 
@@ -1680,8 +1680,14 @@ template <int dim>
 template <int spacedim>
 void
 GeometryInfo<dim>::
-alternating_form_at_vertices (const Point<spacedim> (&vertices)[vertices_per_cell],
-			      Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell])
+alternating_form_at_vertices
+#ifndef DEAL_II_ARRAY_ARG_BUG
+    (const Point<spacedim> (&vertices)[vertices_per_cell],
+     Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell])
+#else
+    (const Point<spacedim> *vertices,
+     Tensor<spacedim-dim,spacedim> *forms)
+#endif
 {
 				   // for each of the vertices,
 				   // compute the alternating form
@@ -1715,7 +1721,7 @@ alternating_form_at_vertices (const Point<spacedim> (&vertices)[vertices_per_cel
   for (unsigned int i=0; i<vertices_per_cell; ++i)
     {
       Tensor<1,spacedim> derivatives[dim];
-      
+
       for (unsigned int j=0; j<vertices_per_cell; ++j)
 	{
 	  const Tensor<1,dim> grad_phi_j
@@ -1738,33 +1744,68 @@ template class GeometryInfo<4>;
 template
 void
 GeometryInfo<1>::
-alternating_form_at_vertices (const Point<1> (&vertices)[vertices_per_cell],
-			      Tensor<1-1,1> (&forms)[vertices_per_cell]);
+alternating_form_at_vertices
+#ifndef DEAL_II_ARRAY_ARG_BUG
+(const Point<1> (&vertices)[vertices_per_cell],
+ Tensor<1-1,1> (&forms)[vertices_per_cell])
+#else
+  (const Point<1> *vertices,
+   Tensor<1-1,1> *forms)
+#endif
+  ;
 
 template
 void
 GeometryInfo<1>::
-alternating_form_at_vertices (const Point<2> (&vertices)[vertices_per_cell],
-			      Tensor<2-1,2> (&forms)[vertices_per_cell]);
+alternating_form_at_vertices
+#ifndef DEAL_II_ARRAY_ARG_BUG
+(const Point<2> (&vertices)[vertices_per_cell],
+ Tensor<2-1,2> (&forms)[vertices_per_cell])
+#else
+  (const Point<2> *vertices,
+   Tensor<2-1,2> *forms)
+#endif
+  ;
 
 template
 void
 GeometryInfo<2>::
-alternating_form_at_vertices (const Point<2> (&vertices)[vertices_per_cell],
-			      Tensor<2-2,2> (&forms)[vertices_per_cell]);
+alternating_form_at_vertices
+#ifndef DEAL_II_ARRAY_ARG_BUG
+(const Point<2> (&vertices)[vertices_per_cell],
+ Tensor<2-2,2> (&forms)[vertices_per_cell])
+#else
+  (const Point<2> *vertices,
+   Tensor<2-2,2> *forms)
+#endif
+  ;
 
 template
 void
 GeometryInfo<2>::
-alternating_form_at_vertices (const Point<3> (&vertices)[vertices_per_cell],
-			      Tensor<3-2,3> (&forms)[vertices_per_cell]);
+alternating_form_at_vertices
+#ifndef DEAL_II_ARRAY_ARG_BUG
+(const Point<3> (&vertices)[vertices_per_cell],
+ Tensor<3-2,3> (&forms)[vertices_per_cell])
+#else
+(const Point<3> *vertices,
+ Tensor<3-2,3> *forms)
+#endif
+  ;
+
 
 template
 void
 GeometryInfo<3>::
-alternating_form_at_vertices (const Point<3> (&vertices)[vertices_per_cell],
-			      Tensor<3-3,3> (&forms)[vertices_per_cell]);
-
+alternating_form_at_vertices
+#ifndef DEAL_II_ARRAY_ARG_BUG
+(const Point<3> (&vertices)[vertices_per_cell],
+ Tensor<3-3,3> (&forms)[vertices_per_cell])
+#else
+(const Point<3> *vertices,
+ Tensor<3-3,3> *forms)
+#endif
+ ;
 
 
 DEAL_II_NAMESPACE_CLOSE

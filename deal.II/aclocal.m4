@@ -40,7 +40,7 @@ AC_DEFUN(DEAL_II_EXTERNAL_LIBS_RESTORE_VAL, dnl
 
 dnl -------------------------------------------------------------
 dnl Like AC_PATH_PROG, but do not discard arguments given to the
-dnl program. In other words, while 
+dnl program. In other words, while
 dnl    AC_PATH_PROG(CXX, [g++ -pg])
 dnl results in CXX=/usr/bin/g++, the result of the current
 dnl macro would be CXX="/usr/bin/g++ -pg".
@@ -251,7 +251,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 
   else
     dnl Check other (non-gcc) compilers
-  
+
     dnl Check for IBM xlC. For some reasons, depending on some environment
     dnl variables, moon position, and other reasons unknown to me, the
     dnl compiler displays different names in the first line of output, so
@@ -265,7 +265,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
       GXX_VERSION=ibm_xlc
       GXX_VERSION_DETAILED="$GXX_VERSION"
     else
-  
+
       dnl Check whether we are dealing with the MIPSpro C++ compiler
       mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
       if test "x$mips_pro" != "x" ; then
@@ -301,7 +301,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	    ;;
         esac
       else
-  
+
         dnl Intel's ICC C++ compiler? On Linux, it uses -V, on Windows
 	dnl it is -help
         is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel'`"
@@ -349,7 +349,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           fi fi fi fi fi fi fi
           GXX_VERSION_DETAILED="$GXX_VERSION"
         else
-  
+
           dnl Or DEC's cxx compiler?
           is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
           if test "x$is_dec_cxx" != "x" ; then
@@ -357,7 +357,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             GXX_VERSION=compaq_cxx
             GXX_VERSION_DETAILED="$GXX_VERSION"
           else
-  
+
       	    dnl Sun Workshop/Studio?
             is_sun_cc_1="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
             is_sun_cc_2="`($CXX -V 2>&1) | grep 'Sun C++'`"
@@ -366,7 +366,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
               GXX_VERSION=sun_workshop
               GXX_VERSION_DETAILED="$GXX_VERSION"
             else
-  
+
   	      dnl Sun Forte?
               is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
               if test "x$is_sun_forte_cc" != "x" ; then
@@ -374,7 +374,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
                 GXX_VERSION=sun_forte
                 GXX_VERSION_DETAILED="$GXX_VERSION"
               else
-  
+
   	        dnl Portland Group C++?
   	        is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
   	        if test "x$is_pgcc" != "x" ; then
@@ -382,7 +382,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	          GXX_VERSION=portland_group
     	          GXX_VERSION_DETAILED="$GXX_VERSION"
                 else
-  
+
   	          dnl HP aCC?
   	          is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
   	          if test "x$is_aCC" != "x" ; then
@@ -390,7 +390,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	            GXX_VERSION=hp_aCC
   	            GXX_VERSION_DETAILED="$GXX_VERSION"
                   else
-  
+
   	            dnl Borland C++
   	            is_bcc="`($CXX -h 2>&1) | grep 'Borland'`"
   	            if test "x$is_bcc" != "x" ; then
@@ -398,7 +398,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	              GXX_VERSION=borland_bcc
   	              GXX_VERSION_DETAILED="$GXX_VERSION"
                     else
-  
+
   	              dnl KAI C++? It seems as if the documented options
 		      dnl -V and --version are not always supported, so give
 	              dnl the whole thing a second try by looking for /KCC/
@@ -415,7 +415,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	                GXX_VERSION=kai_cc
    	                GXX_VERSION_DETAILED="$GXX_VERSION"
                       else
-  
+
                         dnl Maybe PathScale's compiler?
                         is_pathscale="`($CXX -v 2>&1) | grep PathScale`"
                         if test "x$is_pathscale" != "x" ; then
@@ -475,7 +475,7 @@ AC_DEFUN(DEAL_II_DETERMINE_IF_SUPPORTS_MPI, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Set C++ compiler flags to their default values. They will be 
+dnl Set C++ compiler flags to their default values. They will be
 dnl modified according to other options in later steps of
 dnl configuration
 dnl
@@ -565,7 +565,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	;;
 
       *cygwin* )
-        dnl On Cygwin, when using shared libraries, there might occur 
+        dnl On Cygwin, when using shared libraries, there might occur
         dnl difficulties when linking libraries for several dimensions,
         dnl as some symbols are defined in all of them. This leads to a
         dnl linker error. We force the linker to ignore multiple symbols,
@@ -590,47 +590,47 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl - after egcs1.1, the optimization flag -fstrict-aliasing was
     dnl   introduced, which enables better optimizations for
     dnl   well-written C++ code. we believe that deal.II falls into that
-    dnl   category and thus enable the flag 
+    dnl   category and thus enable the flag
     dnl - egcs1.1 yielded incorrect code with vtable-thunks. thus disable
     dnl   them for egcs1.1. however, if on Linux, disabling them
     dnl   prevents programs from being linked, so take the risk of broken
     dnl   thunks on this platform
-  
+
     case "$GXX_VERSION" in
       egcs1.1)
           case "$target" in
             *linux*)
                 ;;
-  
+
             *)
                 CXXFLAGSG="$CXXFLAGSG -fno-vtable-thunks"
                 CXXFLAGSO="$CXXFLAGSO -fno-vtable-thunks"
                 ;;
           esac
           ;;
-  
+
       dnl All other gcc versions
       *)
           CXXFLAGSO="$CXXFLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
           ;;
     esac
-  
+
     dnl - after gcc2.95, some flags were deemed obsolete for C++
     dnl   (and are only supported for C any more), so only define them for
     dnl   previous compilers
-  
+
     case "$GXX_VERSION" in
       egcs1.1 | gcc2.95)
           CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs -Wno-non-template-friend"
           CXXFLAGSO="$CXXFLAGSO -fnonnull-objects -Wno-non-template-friend"
           ;;
-  
+
       *)
           ;;
     esac
-  
+
     dnl Some gcc compiler versions have a problem when using an unsigned count
-    dnl in the std::advance function. Unfortunately, this also happens 
+    dnl in the std::advance function. Unfortunately, this also happens
     dnl occasionally from within the standard library, so we can't prevent the
     dnl warning messages. Since this is annoying, switch of the flag -W which
     dnl causes this.
@@ -642,7 +642,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl Some system specific things
     case "$target" in
       dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary
-      dnl warnings. However, newer gccs on that platform do not have 
+      dnl warnings. However, newer gccs on that platform do not have
       dnl this flag any more, so check whether we can indeed do this
       dnl
       dnl Also, the TBB tries to determine whether the system is
@@ -705,14 +705,14 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     if test "$GXX_VERSION" = "gcc2.95"; then
       SHLIBLD="$CC"
     fi
-  
+
   else
     dnl Non-gcc compilers. By default, use the C++ compiler also for linking
     dnl shared libraries. If some compiler cannot do that and needs something
     dnl different, then this must be specified in the respective section
     dnl below, overriding this define:
     SHLIBLD="$CXX"
-  
+
     case "$GXX_VERSION" in
       ibm_xlc)
           CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907"
@@ -720,7 +720,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSPIC="-qpic"
           LDFLAGSPIC="-qpic"
           ;;
-  
+
       MIPSpro*)
           dnl Disable some compiler warnings, as they trigger some warnings in
           dnl system and compiler include files
@@ -751,7 +751,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl linker command, therefore it cannot be included into LDFLAGS
           DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lm)
           ;;
-  
+
       intel_icc*)
           dnl Earlier icc versions used -Kxxx for flags. Later versions use
           dnl the gcc convention -fxxx. Also, at least since icc11, the
@@ -798,7 +798,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGSO -w0 -wd424 -wd11"
 
           dnl To reduce output, use -opt_report_levelmin where possible,
-          dnl i.e. post icc5. from icc10 onwards, this flag is called 
+          dnl i.e. post icc5. from icc10 onwards, this flag is called
 	  dnl -opt-report, and -vec-report controls output of the
           dnl autovectorizer (to make things simpler, one of the two options
           dnl wants a space between option and level, whereas the other does
@@ -825,7 +825,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           esac
 
 	  dnl Some versions of icc on some platforms issue a lot of warnings
-	  dnl about the unreliability of floating point comparisons. Check 
+	  dnl about the unreliability of floating point comparisons. Check
 	  dnl whether we can switch that off
 	  DEAL_II_ICC_WD_1572
 
@@ -836,7 +836,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl segfault), at least with versions prior to 7.0. So only
           dnl use these flags with versions we know are safe
           dnl
-          dnl Second thing: icc7 allows using alias information for 
+          dnl Second thing: icc7 allows using alias information for
           dnl optimization. Use this.
           if test "x$GXX_VERSION" = "xintel_icc7"; then
             CXXFLAGSG="$CXXFLAGSG -Xc -ansi"
@@ -847,7 +847,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           else if test "x$GXX_VERSION" = "xintel_icc8" ; then
             CXXFLAGSO="$CXXFLAGSO -ansi_alias -vec_report0"
           fi fi
-	
+
 	  dnl If we are on an x86 platform, add -tpp6 to optimization
 	  dnl flags (for version <10), or the equivalent for later
 	  dnl processors
@@ -870,7 +870,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 		;;
 	  esac
           ;;
-  
+
       compaq_cxx)
           dnl Disable some warning messages:
 	  dnl  #11: ` unrecognized preprocessing directive" (we use
@@ -912,28 +912,28 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl instantiations of template with the `weak' link flag) since
           dnl otherwise not all templates are instantiated (also some from the
           dnl standards library are missing).
-  
+
           CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
           CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -fast"
-  
+
           for i in 11 175 236 237 381 487 1136 1156 111 1182 265 450 ; do
             CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
             CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
           done
-  
+
 
           dnl If we use -model ansi to compile the files, we also have to
           dnl specify it for linking
           LDFLAGS="$LDFLAGS -model ansi"
-  
+
           dnl For some reason, cxx also forgets to add the math lib to the
           dnl linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
-  
+
           CXXFLAGSPIC="-shared"
           LDFLAGSPIC=""
           ;;
-  
+
       sun_workshop | sun_forte)
 
           CXXFLAGSG="$CXXFLAGS -DDEBUG -w"
@@ -947,7 +947,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  AC_TRY_COMPILE(
             [
 	    ],
-            [ 
+            [
 	      ;
             ],
             [
@@ -959,11 +959,11 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
               AC_MSG_RESULT(no)
             ])
  	  ;;
-  
+
       portland_group)
 	  dnl Suppress warnings:
 	  dnl  #68: "integer conversion resulted in a change of sign". This
-	  dnl       is what we get every time we use 
+	  dnl       is what we get every time we use
 	  dnl       numbers::invalid_unsigned_int
           dnl #111: "Statement unreachable": we use return statements
 	  dnl       occasionally after case-switches where you cannot
@@ -1003,7 +1003,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSPIC="+Z"
 	  # for linking shared libs, -b is also necessary...
           ;;
-  
+
       borland_bcc)
           CXXFLAGSG="$CXXFLAGS -q -DDEBUG -w -w-use -w-amp -w-prc"
           CXXFLAGSO="$CXXFLAGS -q -O2"
@@ -1033,16 +1033,16 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
 dnl -------------------------------------------------------------
 dnl Depending on what compiler we use, set the flag necessary to
-dnl obtain debug output. We will usually use -ggdb, but on DEC Alpha 
-dnl OSF1, this leads to stabs symbols that are too long for the system 
+dnl obtain debug output. We will usually use -ggdb, but on DEC Alpha
+dnl OSF1, this leads to stabs symbols that are too long for the system
 dnl assembler. We will therefore check whether the assembler can handle
-dnl these symbols by a rather perverse function with many templates, 
-dnl and if the assembler can't handle them, then use -gstabs 
+dnl these symbols by a rather perverse function with many templates,
+dnl and if the assembler can't handle them, then use -gstabs
 dnl instead. This reduces debugging possibilities, but no other
 dnl way is known at present.
 dnl
 dnl For all compilers other than gcc, use -g instead and don't check.
-dnl 
+dnl
 dnl Usage: DEAL_II_SET_CXX_DEBUG_FLAG
 dnl
 dnl -------------------------------------------------------------
@@ -1083,7 +1083,7 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
                AC_MSG_RESULT(no -- using -gstabs instead)
              ])
            ;;
-  
+
        dnl For all other systems test whether -ggdb works at all, and if
        dnl not fall back on -g instead. This test is mainly used to
        dnl accomodate for a failure on Mac OS X, where -ggdb leads to
@@ -1105,7 +1105,7 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
              ])
            ;;
     esac
-  
+
   else
     dnl Non-gcc compilers use -g instead of -ggdb, except for Borland C++
     dnl which wants something entirely different
@@ -1125,10 +1125,10 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
 
 dnl -------------------------------------------------------------
 dnl Given the command line flag specified as argument to this macro,
-dnl test whether all components that we need from the C++1X 
+dnl test whether all components that we need from the C++1X
 dnl standard are actually available. If so, add the flag to
 dnl CXXFLAGS.g and CXXFLAGS.o, and set a flag in config.h
-dnl 
+dnl
 dnl Usage: DEAL_II_CHECK_CXX1X_COMPONENTS(cxxflag)
 dnl
 dnl -------------------------------------------------------------
@@ -1141,7 +1141,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 
   AC_MSG_CHECKING(for std::array)
   AC_TRY_COMPILE(
-       [#include <array>], 
+       [#include <array>],
        [ std::array<int,3> p; p[0];],
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
@@ -1149,7 +1149,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 
   AC_MSG_CHECKING(for std::condition_variable)
   AC_TRY_COMPILE(
-       [#include <condition_variable> ], 
+       [#include <condition_variable> ],
        [ std::condition_variable c; c.notify_all()],
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
@@ -1158,8 +1158,8 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
   AC_MSG_CHECKING(for std::function and std::bind)
   AC_TRY_COMPILE(
        [#include <functional>
-        void f(int, double); ], 
-       [ std::function<void (int)> 
+        void f(int, double); ],
+       [ std::function<void (int)>
             g = std::bind (f, std::placeholders::_1, 1.1) ;],
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
@@ -1169,7 +1169,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
   AC_MSG_CHECKING(for std::bind works with rvalues)
   AC_TRY_COMPILE(
        [#include <functional>
-        void f(int); ], 
+        void f(int); ],
        [ using namespace std;
          using namespace std::placeholders;
          bind(multiplies<int>(),4,_1)(5); ;],
@@ -1179,7 +1179,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 
   AC_MSG_CHECKING(for std::shared_ptr)
   AC_TRY_COMPILE(
-       [#include <memory>], 
+       [#include <memory>],
        [ std::shared_ptr<int> p(new int(3))],
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
@@ -1188,7 +1188,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
   AC_MSG_CHECKING(for std::thread)
   AC_TRY_COMPILE(
        [#include <thread>
-        void f(int); ], 
+        void f(int); ],
        [ std::thread t(f,1); t.join();],
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
@@ -1196,7 +1196,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 
   AC_MSG_CHECKING(for std::mutex)
   AC_TRY_COMPILE(
-       [#include <mutex> ], 
+       [#include <mutex> ],
        [ std::mutex m; m.lock();],
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
@@ -1204,7 +1204,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 
   AC_MSG_CHECKING(for std::tuple)
   AC_TRY_COMPILE(
-       [#include <tuple>], 
+       [#include <tuple>],
        [ std::tuple<int,double,char> p(1,1.1,'a')],
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
@@ -1324,7 +1324,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
     esac
   else
     dnl Check other (non-gcc) compilers
-  
+
     dnl Check for IBM xlC. For some reasons, depending on some environment
     dnl variables, moon position, and other reasons unknown to me, the
     dnl compiler displays different names in the first line of output, so
@@ -1337,7 +1337,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
       AC_MSG_RESULT(C compiler is IBM xlC)
       CC_VERSION=ibm_xlc
     else
-  
+
       dnl Check whether we are dealing with the MIPSpro C compiler
       mips_pro="`($CC -version 2>&1) | grep MIPSpro`"
       if test "x$mips_pro" != "x" ; then
@@ -1368,7 +1368,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
             ;;
         esac
       else
-  
+
         dnl Intel's ICC C compiler? On Linux, it uses -V, on Windows
 	dnl it is -help
 	dnl
@@ -1417,49 +1417,49 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
             CC_VERSION=intel_icc
           fi fi fi fi fi fi
         else
-  
+
           dnl Or DEC's cxx compiler?
           is_dec_cxx="`($CC -V 2>&1) | grep 'Compaq C'`"
           if test "x$is_dec_cxx" != "x" ; then
             AC_MSG_RESULT(C compiler is Compaq cxx)
             CC_VERSION=compaq_cxx
           else
-  
+
       	    dnl Sun Workshop?
             is_sun_cc="`($CC -V 2>&1) | grep 'Sun WorkShop'`"
             if test "x$is_sun_cc" != "x" ; then
               AC_MSG_RESULT(C compiler is Sun Workshop compiler)
               CC_VERSION=sun_workshop
             else
-  
+
   	      dnl Sun Forte?
               is_sun_forte_cc="`($CC -V 2>&1) | grep 'Forte'`"
               if test "x$is_sun_forte_cc" != "x" ; then
                 AC_MSG_RESULT(C compiler is Sun Forte compiler)
                 CC_VERSION=sun_forte
               else
-  
+
   	        dnl Portland Group C?
   	        is_pgcc="`($CC -V 2>&1) | grep 'Portland Group'`"
   	        if test "x$is_pgcc" != "x" ; then
   	          AC_MSG_RESULT(C compiler is Portland Group C)
   	          CC_VERSION=portland_group
   	        else
-  
+
   	          dnl HP aCC?
   	          is_aCC="`($CC -V 2>&1) | grep 'aCC'`"
   	          if test "x$is_aCC" != "x" ; then
   	            AC_MSG_RESULT(C compiler is HP aCC)
   	            CC_VERSION=hp_aCC
   	          else
-  
+
   	            dnl Borland C
   	            is_bcc="`($CC -h 2>&1) | grep 'Borland'`"
   	            if test "x$is_bcc" != "x" ; then
   	              AC_MSG_RESULT(C compiler is Borland C)
   	              CC_VERSION=borland_bcc
   	            else
-  
+
   	              dnl KAI C? It seems as if the documented options
 		      dnl -V and --version are not always supported, so give
 	              dnl the whole thing a second try by looking for /KCC/
@@ -1475,7 +1475,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
   	                AC_MSG_RESULT(C compiler is KAI C)
   	                CC_VERSION=kai_cc
   	              else
-  
+
                         dnl  Aw, nothing suitable found...
                         AC_MSG_RESULT([Unrecognized compiler -- still trying])
 			CC_VERSION=unknown_cc
@@ -1497,7 +1497,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Set C compiler flags to their default values. They will be 
+dnl Set C compiler flags to their default values. They will be
 dnl modified according to other options in later steps of
 dnl configuration
 dnl
@@ -1549,19 +1549,19 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
     dnl different, then this must be specified in the respective section
     dnl below, overriding this define:
     SHLIBLD="$CC"
-  
+
     case "$CC_VERSION" in
       ibm_xlc)
           CFLAGS="$CFLAGS -O2"
           CFLAGSPIC="-fPIC"
 	  SHLIBLD="$CXX"
           ;;
-  
+
       MIPSpro*)
           CFLAGS="$CFLAGS -O2"
           CFLAGSPIC="-KPIC"
           ;;
-  
+
       intel_icc*)
           CFLAGS="$CFLAGS -O2 -unroll"
     	  case "$CC_VERSION" in
@@ -1575,7 +1575,7 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 	  esac
 
           dnl To reduce output, use -opt_report_levelmin where possible,
-          dnl i.e. post icc5. from icc10 onwards, this flag is called 
+          dnl i.e. post icc5. from icc10 onwards, this flag is called
 	  dnl -opt-report, and -vec-report controls output of the
           dnl autovectorizer (to make things simpler, one of the two options
           dnl wants a space between option and level, whereas the other does
@@ -1592,7 +1592,7 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
           esac
 
           CFLAGS="$CFLAGS -ansi_alias -vec_report0"
-	
+
 	  dnl If we are on an x86 platform, add -tpp6 to optimization
 	  dnl flags
 	  case "$target" in
@@ -1715,18 +1715,18 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
   	  F77_VERSION=gcc-other
   	  ;;
       esac
-  
+
     else
-  
+
       dnl No GNU g77 version, something else. Try to find out what it is:
       if test -n "`echo $F77_VERSION_STRING | grep \"XL Fortran for AIX\"`" ; then
-  
+
         dnl This is the "XL Fortran for AIX" compiler
         F77_VERSION=AIXF77
         AC_MSG_RESULT(F77 compiler is AIX Fortran77)
-  
+
       else
-  
+
         dnl Umh, still something else unknown. Try to find it out by a
         dnl different method (-V instead of -v):
         F77_VERSION_STRING=`($F77 -V 2>&1)`
@@ -1738,9 +1738,9 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
           dnl OK, this is the Sun Fortran77 compiler
   	  AC_MSG_RESULT(F77 compiler is Sun WorkShop f77)
   	  F77_VERSION="SunF77"
-  
+
         else
-  
+
           dnl If we can detect IRIX's f77 somehow, then the following flags
           dnl might be appropriate:
           F77_VERSION_STRING=`($F77 -version 2>&1)`
@@ -1758,7 +1758,7 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
 
             else
 
-  
+
               dnl Now, this is a hard case, we have no more clues...
               F77_VERSION="UnknownF77"
   	      AC_MSG_RESULT(F77 compiler is unkown. no flags set!)
@@ -1790,14 +1790,14 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
     egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc[[34]].*)
         F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
         F77FLAGSO="$FFLAGS -O2"
-  
+
         dnl Some flags can only be set for some compilers as others either
         dnl did not accept them or were buggy on them (see the explanation
         dnl for CXXFLAGS for an explanation of some of these cases)
         if test "x$F77_VERSION" != "xegcs1.1" ; then
           F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
         fi
-  
+
         case "$target" in
            *cygwin* )
                 F77FLAGSPIC=
@@ -1829,11 +1829,11 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 	dnl we expect when linking with FORTRAN functions
         F77FLAGSG="$FFLAGS -g -qextname"
         F77FLAGSO="$FFLAGS -O3 -w -qextname"
-        F77LIBS="$F77LIBS -lxlf90"  
+        F77LIBS="$F77LIBS -lxlf90"
 
         F77FLAGSPIC="unknown!"
         ;;
-  
+
     SunF77)
   	F77FLAGSG="$FFLAGS -silent -g"
   	F77FLAGSO="$FFLAGS -silent -O3 -w"
@@ -1845,12 +1845,12 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
   	F77FLAGSG="$FFLAGS -ansi -g"
   	F77FLAGSO="$FFLAGS -O3 -woffall"
   	F77LIBS="$F77LIBS -lftn"
-  
+
   	F77FLAGSPIC="shared -KPIC"
 	;;
 
     INTEL_F77*)
-            F77FLAGSG="$FFLAGS"  
+            F77FLAGSG="$FFLAGS"
             F77FLAGSO="$FFLAGS -O3"
 	    ;;
 
@@ -1861,7 +1861,7 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 	F77="UnknownF77"
         F77FLAGSG="$FFLAGS -g"
         F77FLAGSO="$FFLAGS -O2"
-        F77LIBS="$F77LIBS"  
+        F77LIBS="$F77LIBS"
 
         F77FLAGSPIC="unknown!"
 	AC_MSG_RESULT(Unknown FORTRAN compiler has been disabled!)
@@ -1902,8 +1902,8 @@ AC_DEFUN(DEAL_II_CHECK_RPATH,
 
 dnl -------------------------------------------------------------
 dnl
-dnl Check whether we can use -soname for linking in the shared 
-dnl library version. On Mac OS X, -soname is called 
+dnl Check whether we can use -soname for linking in the shared
+dnl library version. On Mac OS X, -soname is called
 dnl -dylib_install_name
 dnl
 dnl -------------------------------------------------------------
@@ -1915,11 +1915,11 @@ AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
   AC_MSG_CHECKING([whether compiler understands option -Wl,-soname])
   AC_LINK_IFELSE(
    [ AC_LANG_PROGRAM([[]],[[]])],
-   [ 
+   [
      AC_MSG_RESULT(yes)
      DEAL_II_LD_UNDERSTANDS_SONAME="yes"
    ],
-   [ 
+   [
      AC_MSG_RESULT(no)
      DEAL_II_LD_UNDERSTANDS_SONAME="no"
    ]
@@ -1933,11 +1933,11 @@ AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
   AC_MSG_CHECKING([whether compiler understands option -Wl,-dynamic,-install_name])
   AC_LINK_IFELSE(
    [ AC_LANG_PROGRAM([[]],[[]])],
-   [ 
+   [
      AC_MSG_RESULT(yes)
      DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME="yes"
    ],
-   [ 
+   [
      AC_MSG_RESULT(no)
      DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME="no"
    ]
@@ -1962,7 +1962,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
 [
   AC_ARG_WITH(cpu,
-  [  --with-cpu=cpu          Optimize specifically for the given CPU type, 
+  [  --with-cpu=cpu          Optimize specifically for the given CPU type,
      		          rather than just generating code for this processor
 			  family.],
       withcpu="$withval",
@@ -2022,7 +2022,7 @@ dnl -------------------------------------------------------------
 dnl In some cases, -threads (or whatever else command line option)
 dnl switches on some preprocessor flags. If this is not the case,
 dnl then define them explicitely.
-dnl 
+dnl
 dnl Usage: DEAL_II_THREAD_CPPFLAGS
 dnl
 dnl -------------------------------------------------------------
@@ -2057,7 +2057,7 @@ AC_DEFUN(DEAL_II_THREAD_CPPFLAGS, dnl
 dnl -------------------------------------------------------------
 dnl Versions of gcc on different platforms use a multitude of flags to
 dnl denote thread safe libraries and the like. They are, for example
-dnl -threads/-pthread/-mthread, sometimes *thread, sometimes *threads. 
+dnl -threads/-pthread/-mthread, sometimes *thread, sometimes *threads.
 dnl On some other platforms, such as Mac OS X, no flags are necessary
 dnl and none are understood by the compiler.
 dnl
@@ -2086,7 +2086,7 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 	     CXXFLAGSG="$CXXFLAGSG -$i"
 	     CXXFLAGSO="$CXXFLAGSO -$i"
              LDFLAGS="$LDFLAGS -$i"
- 	
+
 	     dnl The right parameter was found, so exit
 	     break
    	   ])
@@ -2158,7 +2158,7 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
     if test "$GXX" = yes ; then
       DEAL_II_GET_THREAD_FLAGS
       DEAL_II_THREAD_CPPFLAGS
-  
+
       CXXFLAGSG="$CXXFLAGSG -D_REENTRANT"
       CXXFLAGSO="$CXXFLAGSO -D_REENTRANT"
       if test "$GXX_VERSION" = "gcc2.95" \
@@ -2170,12 +2170,12 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
     else
       case "$GXX_VERSION" in
 	ibm_xlc)
-            CXXFLAGSG="$CXXFLAGSG -threaded"  
+            CXXFLAGSG="$CXXFLAGSG -threaded"
             CXXFLAGSO="$CXXFLAGSO -threaded"
             ;;
 
 	compaq_cxx)
-            CXXFLAGSG="$CXXFLAGSG -pthread"  
+            CXXFLAGSG="$CXXFLAGSG -pthread"
             CXXFLAGSO="$CXXFLAGSO -pthread"
 	    ;;
 
@@ -2200,7 +2200,7 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
               [Defined if multi-threading is to be achieved by using
                the POSIX functions])
 
-    dnl In any case, we need to link with libdl since the Threading 
+    dnl In any case, we need to link with libdl since the Threading
     dnl Building Blocks require this
     LDFLAGS="$LDFLAGS -ldl"
   fi
@@ -2211,7 +2211,7 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
     DEAL_II_USE_MT_VAL=0
   fi
 
-  AC_DEFINE_UNQUOTED(DEAL_II_USE_MT, $DEAL_II_USE_MT_VAL, 
+  AC_DEFINE_UNQUOTED(DEAL_II_USE_MT, $DEAL_II_USE_MT_VAL,
                      [Flag indicating whether the library shall be
                       compiled for multithreaded applications. If so,
 		      then it is set to one, otherwise to zero.])
@@ -2267,7 +2267,7 @@ AC_DEFUN(DEAL_II_CHECK_PARTLY_BRACKETED_INITIALIZER, dnl
 dnl -------------------------------------------------------------
 dnl Check whether the POSIX functions needed for multi-threading
 dnl are available on this system
-dnl 
+dnl
 dnl Usage: DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS
 dnl
 dnl -------------------------------------------------------------
@@ -2375,7 +2375,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_COMPAT_BLOCKER, dnl
 [
   AC_ARG_ENABLE(compat-blocker,
-  [  --enable-compat-blocker=mapping  
+  [  --enable-compat-blocker=mapping
                           Block functions that implicitely assume a Q1 mapping],
       enable_compat_blocker="$enableval",
       enable_compat_blocker="")
@@ -2384,12 +2384,12 @@ AC_DEFUN(DEAL_II_CHECK_COMPAT_BLOCKER, dnl
   disable_compat=`echo $enable_compat_blocker | perl -pi -e 's/,/ /g;'`
 
   dnl Check that each entry is an allowed one
-  for i in $disable_compat ; do 
+  for i in $disable_compat ; do
     case $i in
       mapping)
         AC_MSG_RESULT(Disabling backward compatibility feature: "$i")
         ;;
-      *) 
+      *)
         AC_MSG_ERROR(Backward compatibility feature "$i" unknown)
         ;;
     esac
@@ -2407,7 +2407,7 @@ AC_DEFUN(DEAL_II_CHECK_COMPAT_BLOCKER, dnl
     else
       compat_value=true
     fi
-  
+
     case $i in
       mapping)
         AC_DEFINE_UNQUOTED(DEAL_II_COMPAT_MAPPING,$compat_value,
@@ -2444,7 +2444,7 @@ AC_DEFUN(DEAL_II_TRY_COMPILER_FLAG, dnl
   dnl lets see whether the compiler generates output to stdout or stderr
   deal_II_compiler_output=`eval $ac_compile 2>&1`
   if test ! "$deal_II_compiler_output"; then
-    ifelse([$1], , :, 
+    ifelse([$1], , :,
 	   [
 		rm -rf conftest*
     		$1
@@ -2452,7 +2452,7 @@ AC_DEFUN(DEAL_II_TRY_COMPILER_FLAG, dnl
   else
     echo "configure: failed program was:" >&AC_FD_CC
     cat conftest.$ac_ext >&AC_FD_CC
-    ifelse([$2], , ,  
+    ifelse([$2], , ,
 	   [
 		rm -rf conftest*
 		$2
@@ -2466,7 +2466,7 @@ AC_DEFUN(DEAL_II_TRY_COMPILER_FLAG, dnl
 dnl -------------------------------------------------------------
 dnl On SunOS 4.x, the `getrusage' function exists, but is not declared
 dnl in the respective header file `resource.h', as one would think when
-dnl reading the man pages. Then we have to declare this function 
+dnl reading the man pages. Then we have to declare this function
 dnl ourselves in those files that use this function. The question whether
 dnl we have to do so is controlled by a preprocessor variable.
 dnl
@@ -2494,8 +2494,8 @@ AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
     ],
     [
 	AC_MSG_RESULT(no)
-	AC_DEFINE(NO_HAVE_GETRUSAGE, 1, 
-                  [On SunOS 4.x, the getrusage() function exists, but 
+	AC_DEFINE(NO_HAVE_GETRUSAGE, 1,
+                  [On SunOS 4.x, the getrusage() function exists, but
 		   is not declared in the respective header file
 		   <resource.h>, as one would think when reading the
 		   man pages. Then we have to declare this function
@@ -2504,7 +2504,7 @@ AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
 		   by the preprocessor variable.])
     ])
 ]
-)      
+)
 
 
 
@@ -2535,12 +2535,12 @@ extern "C" void abort () { for(;;) ; }
     ],
     [
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(DEAL_II_ABORT_NOTHROW_EXCEPTION, 1, 
+	AC_DEFINE(DEAL_II_ABORT_NOTHROW_EXCEPTION, 1,
                   [Defined if the prototype of abort() has a no-throw
                    exception specification.])
     ])
 ]
-)      
+)
 
 
 
@@ -2550,7 +2550,7 @@ dnl We'd like to use the `isnan' function. On some systems, this is
 dnl simply declared in <math.h> (or <cmath>, for what it's worth), but
 dnl on Linux for example, it is only declared if we specifically require
 dnl support for ISO C 99. This macro checks whether `isnan' is declared
-dnl or whether we have to pass special compiler flags, namely 
+dnl or whether we have to pass special compiler flags, namely
 dnl -D_ISOC99_SOURCE (Linux) or -D__EXTENSIONS__ (Sun). Note that when
 dnl checking we have to use the two sets of compiler flags.
 dnl
@@ -2570,7 +2570,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
 
 dnl -------------------------------------------------------------
 dnl The following function actually performs the check for the right flag
-dnl for `isnan'. If a flag is found, the third argument is executed, and 
+dnl for `isnan'. If a flag is found, the third argument is executed, and
 dnl the right flag is available in $deal_II_isnan_flag.
 dnl
 dnl Usage: DEAL_II_CHECK_ISNAN_FLAG("description of options set",
@@ -2620,10 +2620,10 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 
   dnl Let's see whether we _now_ have found something
   if test "x$deal_II_isnan_flag" = "x" ; then
-    dnl We need to define something. Unfortunately, this is system 
+    dnl We need to define something. Unfortunately, this is system
     dnl dependent (argh!)
     deal_II_isnan_flag=""
-    for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
+    for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do
       CXXFLAGS="$2 $testflag"
       AC_TRY_COMPILE(
         [
@@ -2670,7 +2670,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
       $3
     fi
   fi
-])      
+])
 
 
 
@@ -2732,7 +2732,7 @@ int i=rand_r(&i);
 	],
 	[
 	  AC_MSG_RESULT(yes)
-	  AC_DEFINE(HAVE_RAND_R, 1, 
+	  AC_DEFINE(HAVE_RAND_R, 1,
                     [Define if you have the rand_r function])
 	],
 	[
@@ -2799,7 +2799,7 @@ void __IssueError_Assert (const char *file,
   e.PrintExcData (std::cerr);
   e.PrintInfo (std::cerr);
   std::cerr << "--------------------------------------------------------"
-	    << std::endl;  
+	    << std::endl;
   std::abort ();
 }
 
@@ -2826,7 +2826,7 @@ void __IssueError_Throw (const char *file,
 #define DeclException0(Exception0)  \
 class Exception0 :  public ExceptionBase {}
 
-namespace StandardExceptions 
+namespace StandardExceptions
 {
   DeclException0 (ExcInternalError);
 }
@@ -2856,7 +2856,7 @@ dnl names.
 dnl
 dnl If __PRETTY_FUNCTION__ is not available, try to find out whether
 dnl __func__ is available and use the preprocessor to set the first
-dnl thing to the second. If this is also not the case, then set it 
+dnl thing to the second. If this is also not the case, then set it
 dnl to something indicating non-availability.
 dnl
 dnl Usage: DEAL_II_HAVE_PRETTY_FUNCTION
@@ -2894,8 +2894,8 @@ AC_DEFUN(DEAL_II_HAVE_PRETTY_FUNCTION, dnl
         [
           AC_MSG_RESULT(no)
 	  x="\"(not available)\""
-        ]) 
-      AC_DEFINE_UNQUOTED(__PRETTY_FUNCTION__, $x, 
+        ])
+      AC_DEFINE_UNQUOTED(__PRETTY_FUNCTION__, $x,
                 [If already available, do not define at all. Otherwise, define
                  to __func__ if that is available. In all other cases,
                  indicate that no information about the present function
@@ -2909,7 +2909,7 @@ dnl -------------------------------------------------------------
 dnl Sun's Forte compiler (at least up to the Version 7 Early Access
 dnl release) has a problem with the following code, when compiling
 dnl with debug output:
-dnl 
+dnl
 dnl /* ---------------------------------------------------------- */
 dnl /* Internal compiler error in abi2_mangler::entity_expression */
 dnl /* when compiled with -g.                                     */
@@ -2917,9 +2917,9 @@ dnl template < int dim > struct T {
 dnl     typedef T<dim-1> SubT;
 dnl     T (SubT);
 dnl };
-dnl 
+dnl
 dnl template <int dim> T<dim>::T (SubT) {};
-dnl 
+dnl
 dnl template class T<3> ;
 dnl /* ---------------------------------------------------------- */
 dnl
@@ -2951,7 +2951,7 @@ AC_DEFUN(DEAL_II_CHECK_LOCAL_TYPEDEF_COMP, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND, 1, 
+      AC_DEFINE(DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND, 1,
                 [Define if we have to work around a bug in Sun's Forte compiler.
                  See the aclocal.m4 file in the top-level directory for a
                  description of this bug.])
@@ -2964,23 +2964,23 @@ dnl -------------------------------------------------------------
 dnl Sun's Forte compiler (at least up to the Version 7 Early Access
 dnl release) have a problem with the following code, when compiling
 dnl with debug output:
-dnl 
+dnl
 dnl /* ----------------------------------------------- */
 dnl /* Problem 14: Access control. Friendship is not   */
 dnl /* granted although explicitly declared.           */
 dnl template <int N, int M> class T      {    int bar ();  };
-dnl 
-dnl template <int M>        class T<1,M> { 
+dnl
+dnl template <int M>        class T<1,M> {
 dnl   private:
 dnl     static int i;
 dnl     template <int N1, int N2> friend class T;
 dnl };
-dnl 
-dnl template <int N,int M> int T<N,M>::bar () { 
-dnl   return T<N-1,M>::i; 
+dnl
+dnl template <int N,int M> int T<N,M>::bar () {
+dnl   return T<N-1,M>::i;
 dnl };
-dnl 
-dnl template class T<2,1> ; 
+dnl
+dnl template class T<2,1> ;
 dnl /* ---------------------------------------------------------- */
 dnl
 dnl The compiler does not allow access to T<1,1>::i, although the
@@ -2998,15 +2998,15 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS, dnl
     [
 	template <int N, int M> struct T      {    int bar ();  };
 
-	template <int M>        struct T<1,M> { 
+	template <int M>        struct T<1,M> {
             T ();
 	  private:
 	    static int i;
 	    template <int N1, int N2> friend class T;
 	};
 
-	template <int N,int M> int T<N,M>::bar () { 
-	  return T<N-1,M>::i; 
+	template <int N,int M> int T<N,M>::bar () {
+	  return T<N-1,M>::i;
 	}
 
 	template class T<2,1>;
@@ -3017,7 +3017,7 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND, 1, 
+      AC_DEFINE(DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND, 1,
                 [Define if we have to work around a bug in Sun's Forte compiler.
                  See the aclocal.m4 file in the top-level directory for a
                  description of this bug.])
@@ -3032,19 +3032,19 @@ dnl Versions of GCC before 3.0 had a problem with the explicit
 dnl instantiation of member templates when the member was in fact
 dnl an operator. In that case, they needed the "template" keyword,
 dnl which is actually not allowed at this place. Test case is
-dnl 
+dnl
 dnl /* ----------------------------------------------- */
 dnl struct X
 dnl {
 dnl     template <typename T2>
 dnl     X operator = (T2 &) { return X(); };
 dnl };
-dnl 
+dnl
 dnl template X X::operator=<float> (float &);
 dnl /* ---------------------------------------------------------- */
 dnl
 dnl The compiler only groks this if the "operator=" is prepended
-dnl by "template". We detect this, and either set the 
+dnl by "template". We detect this, and either set the
 dnl DEAL_II_MEMBER_OP_TEMPLATE_INST to "template" or nothing, so
 dnl that it gets expanded to the right string needed in this place.
 dnl
@@ -3075,7 +3075,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
       AC_MSG_RESULT(yes. using workaround)
       x="template"
     ])
-  AC_DEFINE_UNQUOTED(DEAL_II_MEMBER_OP_TEMPLATE_INST, $x, 
+  AC_DEFINE_UNQUOTED(DEAL_II_MEMBER_OP_TEMPLATE_INST, $x,
                      [Define if we have to work around a bug in gcc with
                       explicitly instantiating template member operators.
                       See the aclocal.m4 file in the top-level directory
@@ -3087,7 +3087,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
 dnl -------------------------------------------------------------
 dnl Versions of GCC before 3.0 had a problem with the following
 dnl code:
-dnl 
+dnl
 dnl /* ----------------------------------------------- */
 dnl namespace NS {
 dnl   template <typename T>  class C  {
@@ -3152,7 +3152,7 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG, 1, 
+      AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG, 1,
                          [Define if we have to work around a bug in gcc with
                           marking all instances of a template class as friends
 		          to this class if the class is inside a namespace.
@@ -3164,22 +3164,22 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Another bug in gcc with template and namespaces (fixed since 3.2, 
+dnl Another bug in gcc with template and namespaces (fixed since 3.2,
 dnl but present in 3.0):
-dnl 
+dnl
 dnl /* ----------------------------------------------- */
 dnl namespace NS {
 dnl   template <typename> struct Foo;
 dnl }
-dnl 
+dnl
 dnl class Bar {
 dnl     template <typename Y> friend struct NS::Foo;
 dnl };
-dnl 
+dnl
 dnl namespace NS {
 dnl   template <typename> struct Foo { Foo (); };
 dnl }
-dnl 
+dnl
 dnl template struct NS::Foo<int>;
 dnl /* ----------------------------------------------- */
 dnl
@@ -3216,7 +3216,7 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG2, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2, 1, 
+      AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2, 1,
                          [Define if we have to work around another bug in gcc with
                           marking all instances of a template class as friends
 		          to this class if the class is inside a namespace.
@@ -3276,7 +3276,7 @@ template class X<1,int>;
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE_UNQUOTED(DEAL_II_TEMPL_SPEC_FRIEND_BUG, 1, 
+      AC_DEFINE_UNQUOTED(DEAL_II_TEMPL_SPEC_FRIEND_BUG, 1,
                          [Define if we have to work around a bug with some
 			  compilers that will not allow us to specify a
 			  fully specialized class of a template as a friend.
@@ -3332,7 +3332,7 @@ AC_DEFUN(DEAL_II_CHECK_IMPLEMENTED_PURE_FUNCTION_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG, 1, 
+      AC_DEFINE(DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG, 1,
                      [Defined if the compiler refuses to compile the definition
 		      of a function that was previously declared abstract.])
     ])
@@ -3386,7 +3386,7 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_TEMPLATE_TYPEDEF_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG, 1, 
+      AC_DEFINE(DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG, 1,
                      [Defined if the compiler refuses to allow a typedef
                       to a template template class template parameter. For
                       the exact failure mode, look at aclocal.m4 in the
@@ -3408,7 +3408,7 @@ dnl struct X {
 dnl     X ();
 dnl   private:
 dnl     static int f();
-dnl     
+dnl
 dnl     struct Y {
 dnl         int g() { return f(); };
 dnl     };
@@ -3431,7 +3431,7 @@ AC_DEFUN(DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG, dnl
             X ();
 	  private:
 	    static int f();
-	    
+
 	    struct Y {
 	        int g() { return f(); };
 	    };
@@ -3443,7 +3443,7 @@ AC_DEFUN(DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_NESTED_CLASS_FRIEND_BUG, 1, 
+      AC_DEFINE(DEAL_II_NESTED_CLASS_FRIEND_BUG, 1,
                      [Defined if the compiler does not properly implement
                       the resolution of defect report #45 to the C++
                       standard, which makes nested types implicit friends
@@ -3458,18 +3458,18 @@ dnl gcc up to 3.3 won't accept the following code:
 dnl -----------------------------
 dnl template <typename> class X {
 dnl     template <typename> class Y {};
-dnl 
+dnl
 dnl     template <typename T>
 dnl     template <typename>
 dnl     friend class X<T>::Y;
 dnl };
-dnl 
+dnl
 dnl X<int> x;
 dnl -----------------------------
 dnl
 dnl They don't accept the X<T>::Y here, probably because the class is
 dnl not complete at this point. gcc3.4 gets it right, though. One
-dnl can work around by simply saying 
+dnl can work around by simply saying
 dnl   template <typename> friend class Y;
 dnl but then icc doesn't understand this :-( So everyone's got a bug
 dnl here. Also, note that the standard says that Y is an implicit friend
@@ -3502,7 +3502,7 @@ AC_DEFUN(DEAL_II_CHECK_NESTED_CLASS_TEMPL_FRIEND_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG, 1, 
+      AC_DEFINE(DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG, 1,
                      [Defined if the compiler does not understand friend
 	              declarations for nested member classes when giving
                       a full class specification.])
@@ -3550,9 +3550,9 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_VAR_SPECIALIZATION_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG, 1, 
+      AC_DEFINE(DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG, 1,
                      [Defined if the compiler refuses to allow the
-                      explicit specialization of static member 
+                      explicit specialization of static member
                       variables. For the exact failure mode, look at
                       aclocal.m4 in the top-level directory.])
     ])
@@ -3604,9 +3604,9 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_ARRAY_SPECIALIZATION_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG, 1, 
+      AC_DEFINE(DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG, 1,
                      [Defined if the compiler refuses to allow the
-                      explicit specialization of static member 
+                      explicit specialization of static member
                       arrays. For the exact failure mode, look at
                       aclocal.m4 in the top-level directory.])
     ])
@@ -3629,7 +3629,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_TEMPLATE_SPECIALIZATION_BUG, dnl
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
-      template <int dim> struct X 
+      template <int dim> struct X
       {
         template <typename T> void f(T);
       };
@@ -3647,7 +3647,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_TEMPLATE_SPECIALIZATION_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_MEMBER_TEMPLATE_SPECIALIZATION_BUG, 1, 
+      AC_DEFINE(DEAL_II_MEMBER_TEMPLATE_SPECIALIZATION_BUG, 1,
                      [Defined if the compiler refuses to specialize
                       an outer class template while keeping a member
                       as a template. For the exact failure mode, look at
@@ -3662,7 +3662,7 @@ dnl gcc3.1 (and maybe later compilers) has a bug with long double
 dnl and optimization (see code below), when compiling on Sparc
 dnl machines. Since it affects only one platform and one compiler,
 dnl we take the liberty to disable the function in which the problem
-dnl occurs (Polynomial::shift in base/source/polynomial.cc), since 
+dnl occurs (Polynomial::shift in base/source/polynomial.cc), since
 dnl this is a function that is rarely used anyway.
 dnl
 dnl For more information: the bug just described is reported to
@@ -3703,7 +3703,7 @@ AC_DEFUN(DEAL_II_CHECK_LONG_DOUBLE_LOOP_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. disabling respective functions)
-      AC_DEFINE(DEAL_II_LONG_DOUBLE_LOOP_BUG, 1, 
+      AC_DEFINE(DEAL_II_LONG_DOUBLE_LOOP_BUG, 1,
                      [Defined if the compiler gets an internal compiler
                       upon some code involving long doubles, and with
                       optimization. For the details, look at
@@ -3736,7 +3736,7 @@ AC_DEFUN(DEAL_II_CHECK_FUNPTR_TEMPLATE_TEMPLATE_BUG, dnl
       void f(T<dim>);
 
       template <int dim, template <int> class T>
-      void* g() 
+      void* g()
       {
         void (*p) (T<dim>) = &f<dim,T>;
         return (void*)p;
@@ -3750,9 +3750,9 @@ AC_DEFUN(DEAL_II_CHECK_FUNPTR_TEMPLATE_TEMPLATE_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG, 1, 
+      AC_DEFINE(DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG, 1,
                      [Defined if the compiler needs a workaround for
-		      certain problems with taking the address of 
+		      certain problems with taking the address of
                       template template functions. For the details, look at
                       aclocal.m4 in the top-level directory.])
     ])
@@ -3800,7 +3800,7 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG, dnl
       AC_MSG_RESULT(no)
   else
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_ANON_NAMESPACE_BUG, 1, 
+      AC_DEFINE(DEAL_II_ANON_NAMESPACE_BUG, 1,
                      [Defined if the compiler needs to see the static
 	              keyword even for functions in anonymous namespaces,
                       to avoid duplicate symbol errors when linking.
@@ -3845,20 +3845,20 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG2, dnl
       AC_MSG_RESULT(no)
   else
       AC_MSG_RESULT(yes)
-      AC_DEFINE(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG, 1, 
+      AC_DEFINE(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG, 1,
                      [Another test if the compiler needs to see the static
 	              keyword even for functions in anonymous namespaces,
                       to avoid duplicate symbol errors when linking.
                       For the details, look at aclocal.m4 in the
                       top-level directory.])
   fi
-  rm -f conftest.$ac_objext 
+  rm -f conftest.$ac_objext
 ])
 
 
 
 dnl -------------------------------------------------------------
-dnl A third test: MIPSpro gives a bogus warning about unused code 
+dnl A third test: MIPSpro gives a bogus warning about unused code
 dnl on code that is clearly used, when inline member functions
 dnl are in classes in anonymous namespaces. Check for this to allow
 dnl us to work around this problem
@@ -3889,33 +3889,33 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG3, dnl
        public:
          Point() {};
      };
-     
+
      class GridTools {
        public:
          template <int dim> static void shift (const Point<dim> &s);
-         
+
          template <typename Predicate>
          static void transform (const Predicate    &predicate);
      };
-     
+
      namespace {
        template <int dim> class ShiftPoint {
          public:
            ShiftPoint (const Point<dim>   &) {};
            void g() const;
        };
-     
+
        template<int dim> void ShiftPoint<dim>::g() const {}
      }
-     
+
      template <typename Predicate>
      void GridTools::transform (const Predicate &predicate)
      { predicate.g(); }
-     
+
      template <int dim>
      void GridTools::shift (const Point<dim>   &s)
      { transform (ShiftPoint<dim>(s)); }
-     
+
      template void GridTools::shift (const Point<1>   &);
    ],
    [
@@ -3940,7 +3940,7 @@ dnl A test to identify Apples buggy gcc3.3 version. If the
 dnl explicit instantiations are placed at the end of a source
 dnl file, sometimes only weak symbols are generated, which
 dnl lead to linker problems.
-dnl For more information, see 
+dnl For more information, see
 dnl http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
 dnl As this bug can be easily avoided by applying the
 dnl "november2004gccupdate" Patch which can be found
@@ -3993,7 +3993,7 @@ AC_DEFUN(DEAL_II_CHECK_WEAK_LINKAGE_BUG, dnl
     else
         AC_MSG_RESULT(yes)
         DARWIN_GCC_WEAK_LINKAGE_BUG="yes"
-        AC_DEFINE(DEAL_II_WEAK_LINKAGE_BUG, 1, 
+        AC_DEFINE(DEAL_II_WEAK_LINKAGE_BUG, 1,
                        [This error appears in the Apple edition of the
   		        gcc 3.3, which ships with Darwin7.9.0 and
  		        probably previous version. It leads to
@@ -4001,7 +4001,7 @@ AC_DEFUN(DEAL_II_CHECK_WEAK_LINKAGE_BUG, dnl
                         For the details, look at aclocal.m4 in the
                         top-level directory.])
     fi
-    rm -f conftest.$ac_objext 
+    rm -f conftest.$ac_objext
     rm -f symb1 symb2
     ;;
   esac
@@ -4015,7 +4015,7 @@ dnl to make it clear with which types a template parameter can
 dnl be instantiated. There is a neat trick to do this: SFINAE
 dnl (substitution failure is not an error). The idea is this: the
 dnl C++ standard prescribes that a template function is only
-dnl considered in a call, if all parts of its signature can be 
+dnl considered in a call, if all parts of its signature can be
 dnl instantiated with the template parameter replaced by the
 dnl respective types/values in this particular call. Example:
 dnl   template <typename T>
@@ -4027,7 +4027,7 @@ dnl The compiler should detect that in this call, the template
 dnl parameter T must be identified with the type "int". However,
 dnl the return type T::type does not exist. The trick now is
 dnl that this is not considered an error: this template is simply
-dnl not considered, the compiler keeps on looking for another 
+dnl not considered, the compiler keeps on looking for another
 dnl possible function foo.
 dnl
 dnl That allows for a neat trick to rule out a template for certain
@@ -4083,8 +4083,8 @@ AC_DEFUN(DEAL_II_CHECK_SFINAE_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. disabling template constraints)
-      AC_DEFINE(DEAL_II_SFINAE_BUG, 1, 
-                     [Defined if the compiler does not support the 
+      AC_DEFINE(DEAL_II_SFINAE_BUG, 1,
+                     [Defined if the compiler does not support the
 		      substitution-failure-is-not-an-error paradigm.
                       For the details, look at aclocal.m4 in the
                       top-level directory.])
@@ -4095,7 +4095,7 @@ AC_DEFUN(DEAL_II_CHECK_SFINAE_BUG, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Old versions of gcc had a problem with arrays inside ?: 
+dnl Old versions of gcc had a problem with arrays inside ?:
 dnl expressions: they decayed too quickly to pointers. This then
 dnl leads to erroneous warnings :-(
 dnl
@@ -4120,9 +4120,46 @@ AC_DEFUN(DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG, 1, 
+      AC_DEFINE(DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG, 1,
                      [Defined if the compiler has a problem with
 	              assigning arrays in conditionals])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Old versions of gcc (in particular gcc 3.3.3) has a problem
+dnl if an argument to a member function is an array with bounds
+dnl that depend on a static const variable inside that class.
+dnl
+dnl Usage: DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ARRAY_ARG_BUG, dnl
+[
+  AC_MSG_CHECKING(for array argument bug)
+  AC_LANG(C++)
+  CXXFLAGS="-W -Wall -Werror"
+  AC_TRY_COMPILE(
+    [
+      template <int dim> struct X {
+        static const unsigned int N = 1<<dim;
+        void f(int (&)[N]);
+      };
+
+      template <int dim> void X<dim>::f(int (&)[N]) {}
+    ],
+    [
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(DEAL_II_ARRAY_ARG_BUG, 1,
+                     [Defined if the compiler has a problem with
+	              using arrays as arguments in functions])
     ])
 ])
 
@@ -4135,7 +4172,7 @@ dnl struct X
 dnl {
 dnl     template <typename T> void operator << (T);
 dnl };
-dnl 
+dnl
 dnl void f()
 dnl {
 dnl   X x;
@@ -4164,7 +4201,7 @@ AC_DEFUN(DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG, dnl
       {
           template <typename T> void operator << (T);
       };
-      
+
       void f()
       {
         X x;
@@ -4177,7 +4214,7 @@ AC_DEFUN(DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG, 1, 
+      AC_DEFINE(DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG, 1,
                      [Defined if the compiler requires the use of the
                       template keyword for disambiguation keyword in
                       certain contexts in which it is not supposed to
@@ -4196,16 +4233,16 @@ dnl struct X {
 dnl     template <typename T>
 dnl     explicit X(T);
 dnl };
-dnl 
+dnl
 dnl void f(X);
-dnl 
+dnl
 dnl int main () { f(1); }
 dnl ---------------------------------
-dnl 
+dnl
 dnl Check for this misfeature.
-dnl 
+dnl
 dnl Usage: DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG
-dnl 
+dnl
 dnl --------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG, dnl
 [
@@ -4226,7 +4263,7 @@ AC_DEFUN(DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. disabling some functions)
-      AC_DEFINE(DEAL_II_EXPLICIT_CONSTRUCTOR_BUG, 1, 
+      AC_DEFINE(DEAL_II_EXPLICIT_CONSTRUCTOR_BUG, 1,
                      [Defined if the compiler does not honor the explicit
                       keyword on template constructors.])
     ],
@@ -4241,11 +4278,11 @@ dnl -------------------------------------------------------------
 dnl Some older versions of gcc deduce pointers to const functions in
 dnl template contexts to pointer-to-function of const objects.
 dnl This is not correct
-dnl 
+dnl
 dnl Check for this misfeature.
-dnl 
+dnl
 dnl Usage: DEAL_II_CHECK_CONST_MEMBER_DEDUCTION_BUG
-dnl 
+dnl
 dnl --------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_CONST_MEMBER_DEDUCTION_BUG, dnl
 [
@@ -4271,7 +4308,7 @@ AC_DEFUN(DEAL_II_CHECK_CONST_MEMBER_DEDUCTION_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(DEAL_II_CONST_MEMBER_DEDUCTION_BUG, 1, 
+      AC_DEFINE(DEAL_II_CONST_MEMBER_DEDUCTION_BUG, 1,
                      [Defined if the compiler has a bug in deducing
 		      the type of pointers to const member functions.])
     ])
@@ -4282,9 +4319,9 @@ AC_DEFUN(DEAL_II_CHECK_CONST_MEMBER_DEDUCTION_BUG, dnl
 dnl -------------------------------------------------------------
 dnl Check for GCC bug 36052, see
 dnl   http://gcc.gnu.org/bugzilla/show_bug.cgi?id=36052
-dnl 
+dnl
 dnl Usage: DEAL_II_CHECK_TYPE_QUALIFIER_BUG
-dnl 
+dnl
 dnl --------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_TYPE_QUALIFIER_BUG, dnl
 [
@@ -4298,17 +4335,17 @@ AC_DEFUN(DEAL_II_CHECK_TYPE_QUALIFIER_BUG, dnl
           struct S {
               typedef double value_type;
           };
-    
+
           template <typename T> struct Traits {
               typedef const typename T::value_type dereference_type;
           };
-    
+
           template <class BlockVectorType> struct ConstIterator {
               typedef typename Traits<BlockVectorType>::dereference_type dereference_type;
-        
+
               dereference_type operator * () const  { return 0; }
           };
-    
+
           template class ConstIterator<S>;
         ],
         [
@@ -4328,11 +4365,11 @@ AC_DEFUN(DEAL_II_CHECK_TYPE_QUALIFIER_BUG, dnl
 
 
 dnl -------------------------------------------------------------
-dnl In the gcc libstdc++ headers for std::complex, there is 
-dnl no defined default copy constructor, but a templated copy 
-dnl constructor. So when using using a normal assignment 
-dnl between identical types, the compiler synthesizes the 
-dnl default operator, rather than using the template. 
+dnl In the gcc libstdc++ headers for std::complex, there is
+dnl no defined default copy constructor, but a templated copy
+dnl constructor. So when using using a normal assignment
+dnl between identical types, the compiler synthesizes the
+dnl default operator, rather than using the template.
 dnl The code will still be ok, though.
 dnl
 dnl With -Wsynth in gcc we then get a warning. So if we find that
@@ -4406,7 +4443,7 @@ AC_DEFUN(DEAL_II_CHECK_CTOR_DTOR_PRIVACY, dnl
         			       ==
         			       sizeof(yes_type));
         };
-        
+
         const bool x = IsInt<double>::value;
       ],
       [
@@ -4428,9 +4465,9 @@ dnl -------------------------------------------------------------
 
 AC_DEFUN(DEAL_II_CHECK_BOOST, dnl
 [ AC_ARG_WITH(boost,
-   [  --with-boost=/path/to/boost 
-                          Use an installed boost library instead of the 
-		          contributed one. The optional argument points to the 
+   [  --with-boost=/path/to/boost
+                          Use an installed boost library instead of the
+		          contributed one. The optional argument points to the
   			  directory containing the boost subdirectory for
                           header files.],
   DEAL_II_WITH_BOOST($withval))
@@ -4492,10 +4529,10 @@ AC_DEFUN(DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT, dnl
 
 dnl -------------------------------------------------------------
 dnl Some versions of icc on some platforms issue a lot of warnings
-dnl about the unreliability of floating point comparisons. Check 
+dnl about the unreliability of floating point comparisons. Check
 dnl whether we can switch that off by checking whether the compiler
 dnl allows -wdXXXX for this warning:
-dnl #1572: `floating-point equality and inequality comparisons are 
+dnl #1572: `floating-point equality and inequality comparisons are
 dnl        unreliable'
 dnl        (while true, this warning also triggers on comparisons
 dnl        with zero, or comparing two variables for which one is
@@ -4603,7 +4640,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_STRINGSTREAM, dnl
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_STD_STRINGSTREAM, 1, 
+      AC_DEFINE(HAVE_STD_STRINGSTREAM, 1,
                 [Define if the compiler's library in use provides
                  std::i/ostringstream classes (early gcc versions did not)])
     ],
@@ -4623,7 +4660,7 @@ dnl
 dnl Annoyingly, the Portland Group compiler compiles code with
 dnl __builtin_expect just fine, but then doesn't want to link it,
 dnl saying it doesn't know this function. So simply not test for
-dnl __builtin_expect with that compiler, and to be extrasure make 
+dnl __builtin_expect with that compiler, and to be extrasure make
 dnl sure we're doing the right thing also link .
 dnl
 dnl Usage: DEAL_II_HAVE_BUILTIN_EXPECT
@@ -4644,7 +4681,7 @@ AC_DEFUN(DEAL_II_HAVE_BUILTIN_EXPECT, dnl
       ],
       [
         AC_MSG_RESULT(yes)
-        AC_DEFINE(HAVE_BUILTIN_EXPECT, 1, 
+        AC_DEFINE(HAVE_BUILTIN_EXPECT, 1,
                   [Define if the compiler provides __builtin_expect])
       ],
       [
@@ -4698,7 +4735,7 @@ static preload_terminate_dummy dummy;
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_VERBOSE_TERMINATE, 1, 
+      AC_DEFINE(HAVE_VERBOSE_TERMINATE, 1,
                 [Define if the compiler provides __verbose_terminate_handler])
     ],
     [
@@ -4780,7 +4817,7 @@ int main () {
 	[
 	  result="$?"
 	  AC_MSG_RESULT($result)
-          AC_DEFINE_UNQUOTED(DEAL_II_MIN_VECTOR_CAPACITY, $result, 
+          AC_DEFINE_UNQUOTED(DEAL_II_MIN_VECTOR_CAPACITY, $result,
                    [Set to the minimal number of elements a std::vector<T> can
 	            always hold, i.e. its minimal capacity.])
 	]
@@ -4805,7 +4842,7 @@ int main () {
 	[
 	  result="$?"
 	  AC_MSG_RESULT($result)
-          AC_DEFINE_UNQUOTED(DEAL_II_MIN_BOOL_VECTOR_CAPACITY, $result, 
+          AC_DEFINE_UNQUOTED(DEAL_II_MIN_BOOL_VECTOR_CAPACITY, $result,
                    [Set to the minimal number of elements a std::vector<bool> can
 	            always hold, i.e. its minimal capacity.])
 	]
@@ -4834,7 +4871,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_NUMERIC_LIMITS, dnl
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_STD_NUMERIC_LIMITS, 1, 
+      AC_DEFINE(HAVE_STD_NUMERIC_LIMITS, 1,
                 [Define if the compiler's library in use provides
                  std::numeric_limits classes in the appropriate header file])
     ],
@@ -4865,7 +4902,7 @@ void f (const std::ostream &out);
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_STD_OSTREAM_HEADER, 1, 
+      AC_DEFINE(HAVE_STD_OSTREAM_HEADER, 1,
                 [Define if the compiler provides an <ostream> header file])
     ],
     [
@@ -4895,7 +4932,7 @@ void f (const std::ostream &out);
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_STD_IOSFWD_HEADER, 1, 
+      AC_DEFINE(HAVE_STD_IOSFWD_HEADER, 1,
                 [Define if the compiler provides an <iosfwd> header file])
     ],
     [
@@ -4932,7 +4969,7 @@ AC_DEFUN(DEAL_II_HAVE_GLIBC_STACKTRACE, dnl
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_GLIBC_STACKTRACE, 1, 
+      AC_DEFINE(HAVE_GLIBC_STACKTRACE, 1,
                 [Define if deal.II is linked against a libc that
                  provides stacktrace debug information that can be
                  printed out in the exception class])
@@ -5022,7 +5059,7 @@ template <typename T, int N>
     ],
     [
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_LIBSTDCXX_DEMANGLER, 1, 
+      AC_DEFINE(HAVE_LIBSTDCXX_DEMANGLER, 1,
                 [Define if the std c++ library provides a demangler conforming
                  to the GCC libstdc++ interface.])
     ],
@@ -5039,11 +5076,11 @@ dnl   #define quad quad_t
 dnl This is of course silly, but beyond that it also hurts as
 dnl since we have member functions and variables with that name
 dnl and we get compile errors depending or not we have this
-dnl particular header file included. 
+dnl particular header file included.
 dnl
 dnl Fortunately, the define is only active is _POSIX_SOURCE is
 dnl not set, so check for this define, and if necessary set
-dnl this flag. We check on all systems, since maybe there are 
+dnl this flag. We check on all systems, since maybe there are
 dnl other such systems elsewhere...
 dnl
 dnl Usage: DEAL_II_CHECK_QUAD_DEFINE
@@ -5080,7 +5117,7 @@ dnl On DEC OSF1, when we specify "-std strict_ansi", we can include
 dnl errno.h, and still not get the definition of the error codes
 dnl such as EINTR, EPIPE, etc.
 dnl
-dnl In this case, use a workaround by explicitly including 
+dnl In this case, use a workaround by explicitly including
 dnl /usr/include/errno.h, instead of just errno.h, which the compiler
 dnl maps to one of its own C/C++ compatibility headers, which only
 dnl define 3 error codes (for reasons unknown)
@@ -5107,7 +5144,7 @@ using namespace std;
     ],
     [
       AC_MSG_RESULT(no. working around)
-      AC_DEFINE(DEAL_II_USE_DIRECT_ERRNO_H, 1, 
+      AC_DEFINE(DEAL_II_USE_DIRECT_ERRNO_H, 1,
                 [Define if the compiler provides a <errno.g> header file
 		 which does not define all error codes such as EINTR. In
 		 that case, use the system include file at /usr/include
@@ -5165,9 +5202,9 @@ int main()
     ],
     [
       AC_MSG_RESULT([yes. disabling socket functions])
-      AC_DEFINE(DEAL_II_BROKEN_SOCKETS, 1, 
+      AC_DEFINE(DEAL_II_BROKEN_SOCKETS, 1,
                 [Define if the use of socket functionality leads to strange
-                 results with floating point computations on cygwin 
+                 results with floating point computations on cygwin
                  systems.])
     ])
 ])
@@ -5196,7 +5233,7 @@ AC_DEFUN(DEAL_II_CHECK_CXXFLAGS_CONSISTENCY, dnl
       AC_MSG_ERROR(invalid combination of flags!)
       exit 1;
     ])
-  
+
   AC_MSG_CHECKING(for consistency of CXXFLAGSO flags)
   CXXFLAGS="$CXXFLAGSO"
   AC_TRY_COMPILE(
@@ -5243,7 +5280,7 @@ dnl    [
 dnl      AC_MSG_ERROR(invalid combination of flags!)
 dnl      exit 1;
 dnl    ])
-dnl  
+dnl
 dnl  FFLAGS="$F77FLAGSO"
 dnl  AC_MSG_CHECKING(for consistency of F77FLAGSO flags)
 dnl  AC_TRY_COMPILE(
@@ -5350,17 +5387,17 @@ AC_DEFUN(DEAL_II_CONFIGURE_HSL, dnl
   hsl_subroutines=""
   if test -r contrib/hsl/source/ma27.f ; then
     hsl_subroutines="$hsl_subroutines MA27"
-    AC_DEFINE(HAVE_HSL_MA27, 1, 
+    AC_DEFINE(HAVE_HSL_MA27, 1,
               [Availability of the MA27 algorithm from HSL])
   fi
-  
+
   if (test -r contrib/hsl/source/ma47.f && \
       test -r contrib/hsl/source/ma47dep.f) ; then
     hsl_subroutines="$hsl_subroutines MA47"
-    AC_DEFINE(HAVE_HSL_MA47, 1, 
+    AC_DEFINE(HAVE_HSL_MA47, 1,
               [Availability of the MA47 algorithm from HSL])
   fi
-  
+
   if test "x$hsl_subroutines" != "x" ; then
     AC_MSG_RESULT($hsl_subroutines)
     USE_CONTRIB_HSL=yes
@@ -5371,7 +5408,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_HSL, dnl
   fi
 ])
 
-  
+
 
 dnl -------------------------------------------------------------
 dnl Check for the Tecplot API. If it is found we will be able to write
@@ -5420,10 +5457,10 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 [
   AC_ARG_WITH(netcdf,
-  [  --with-netcdf=/path/to/netcdf  
+  [  --with-netcdf=/path/to/netcdf
                           Specify the path to the NetCDF installation, of which
                           the include and library directories are subdirs; use
-                          this if you want to override the NETCDF_DIR 
+                          this if you want to override the NETCDF_DIR
 			  environment variable.],
      [
         DEAL_II_NETCDF_DIR="$withval"
@@ -5436,9 +5473,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 	  DEAL_II_NETCDF_DIR=""
         fi
      ])
-  
+
    AC_ARG_WITH(netcdf-include,
-   [  --with-netcdf-include=/path/to/netcdf  
+   [  --with-netcdf-include=/path/to/netcdf
                           Specify the path to the NetCDF headers file; use this
                           if you want to override the NETCDF_INCLUDE_DIR
 			  environment variable.],
@@ -5447,14 +5484,14 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
       ])
 
    AC_ARG_WITH(netcdf-libs,
-   [  --with-netcdf-libs=/path/to/netcdf  
+   [  --with-netcdf-libs=/path/to/netcdf
                           Specify the path to the NetCDF libraries; use this if
-			  you want to override the NETCDF_LIBDIR environment 
+			  you want to override the NETCDF_LIBDIR environment
 			  variable.],
       [
 	 NETCDF_LIBDIR="$withval"
       ])
- 
+
 
   if test "x$DEAL_II_NETCDF_DIR" != "x" ; then
     if test "x$NETCDF_INCLUDE_DIR" != "x" ; then
@@ -5471,7 +5508,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
       if test "$LD_PATH_OPTION" != "no" ; then
 	LDFLAGS="$LD_PATH_OPTION$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
       fi
-    fi 
+    fi
   else
     if test "x$NETCDF_INCLUDE_DIR" != "x" ; then
       CPPFLAGS="-I$NETCDF_INCLUDE_DIR $CPPFLAGS"
@@ -5481,12 +5518,12 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
       LDFLAGS="$LDFLAGS -L$NETCDF_LIBDIR"
     fi
   fi
-  
+
   dnl Check for header, if found check for C library,
   dnl if found check for C++ library,
   dnl if successful, HAVE_LIBNETCDF will be set
   AC_CHECK_HEADER(netcdfcpp.h)
-      
+
   AC_CHECK_LIB(netcdf, nc_open,
   [ DEAL_II_EXTERNAL_LIBS_SAVE_VAL()
     DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-lnetcdf_c++ -lnetcdf)
@@ -5501,14 +5538,14 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
     ],
     [ AC_MSG_RESULT(no)
       DEAL_II_EXTERNAL_LIBS_RESTORE_VAL()
-    ])   
+    ])
   ])
-  
+
 ])
 
 
 dnl ------------------------------------------------------------
-dnl Check whether PETSc is installed, and if so store the 
+dnl Check whether PETSc is installed, and if so store the
 dnl respective links
 dnl
 dnl Usage: DEAL_II_CONFIGURE_PETSC
@@ -5520,9 +5557,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   AC_MSG_CHECKING(for PETSc library directory)
 
   AC_ARG_WITH(petsc,
-  [  --with-petsc=/path/to/petsc  
+  [  --with-petsc=/path/to/petsc
                           Specify the path to the PETSc installation, of which
-		          the include and library directories are subdirs; use 
+		          the include and library directories are subdirs; use
 			  this if you want to override the PETSC_DIR environment
 			  variable.],
      [
@@ -5622,9 +5659,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
   AC_MSG_CHECKING(for PETSc library architecture)
 
   AC_ARG_WITH(petsc-arch,
-  [  --with-petsc-arch=architecture  
+  [  --with-petsc-arch=architecture
                           Specify the architecture for your PETSc installation;
-		          use this if you want to override the PETSC_ARCH 
+		          use this if you want to override the PETSC_ARCH
 			  environment variable.],
      [
         DEAL_II_PETSC_ARCH="$withval"
@@ -5663,7 +5700,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
           fi
         fi
         ;;
-  
+
       2.3*)
         if test ! -d $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH \
              ; then
@@ -5743,8 +5780,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
 
 
 dnl ------------------------------------------------------------
-dnl Check whether SLEPc is installed, and if so store the 
-dnl respective links. 
+dnl Check whether SLEPc is installed, and if so store the
+dnl respective links.
 dnl
 dnl Usage: DEAL_II_CONFIGURE_SLEPC
 dnl
@@ -5757,7 +5794,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
   AC_ARG_WITH(slepc,
   [  --with-slepc=/path/to/slepc
                           Specify the path to the SLEPc installation, for which
-                          the include directory is a subdir; use this if you 
+                          the include directory is a subdir; use this if you
                           want to override the SLEPC_DIR environment variable.],
      [
         dnl Special case when someone does --with-slepc=no
@@ -5831,7 +5868,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC, dnl
 ])
 
 dnl ------------------------------------------------------------
-dnl Figure out the version numbers of SLEPc and compare with 
+dnl Figure out the version numbers of SLEPc and compare with
 dnl version numbers of PETSc. This is not strictly necessary
 dnl but highly recommended that major, minor, and subminor
 dnl version match. We blissfully ignor patch versions and hope
@@ -5856,19 +5893,19 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_VERSION, dnl
   SLEPC_VERSION="$DEAL_II_SLEPC_VERSION_MAJOR.$DEAL_II_SLEPC_VERSION_MINOR.$DEAL_II_SLEPC_VERSION_SUBMINOR"
   AC_MSG_RESULT($SLEPC_VERSION)
 
-  dnl Then check that PETSc and SLEPc versions are compatible 
+  dnl Then check that PETSc and SLEPc versions are compatible
   dnl ie. that they are equivalent.
   if test "${PETSC_VERSION}" != "${SLEPC_VERSION}" \
        ; then
       	  AC_MSG_ERROR([If SLEPc is used, you must use the same version
                         number as your PETSc Installation])
-  fi 
+  fi
 ])
 
 
 
 dnl ------------------------------------------------------------
-dnl Check whether Trilinos is installed, and if so store the 
+dnl Check whether Trilinos is installed, and if so store the
 dnl respective links
 dnl
 dnl Usage: DEAL_II_CONFIGURE_TRILINOS
@@ -5878,10 +5915,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 [
  AC_MSG_CHECKING(for Trilinos directory)
  AC_ARG_WITH(trilinos,
-  [  --with-trilinos=/path/to/trilinos  
-                          Specify the path to the Trilinos installation, of 
+  [  --with-trilinos=/path/to/trilinos
+                          Specify the path to the Trilinos installation, of
                           which the include and lib directories are subdirs; use
-                          this if you want to override the TRILINOS_DIR 
+                          this if you want to override the TRILINOS_DIR
 		          environment variable.],
      [
         dnl Special case when someone does --with-petsc=no
@@ -5899,7 +5936,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
             AC_MSG_ERROR([Path to Trilinos specified with --with-trilinos does not
  		  	  point to a complete Trilinos installation])
 	  fi
-	  
+
 	  DEAL_II_TRILINOS_INCDIR="$DEAL_II_TRILINOS_DIR/include"
 	  DEAL_II_TRILINOS_LIBDIR="$DEAL_II_TRILINOS_DIR/lib"
         fi
@@ -5929,8 +5966,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
   AC_MSG_CHECKING(for Trilinos header directory)
   AC_ARG_WITH(trilinos-include,
-  [  --with-trilinos-include=/path/to/trilinos  
-                          Specify the path to the Trilinos include; use this if 
+  [  --with-trilinos-include=/path/to/trilinos
+                          Specify the path to the Trilinos include; use this if
                           you want to override the TRILINOS_INCDIR environment
                           variable.],
      [
@@ -5978,9 +6015,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
   AC_MSG_CHECKING(for Trilinos library directory)
   AC_ARG_WITH(trilinos-libs,
-  [  --with-trilinos-libs=/path/to/trilinos  
+  [  --with-trilinos-libs=/path/to/trilinos
                           Specify the path to the Trilinos libraries; use this
-                          if you want to override the TRILINOS_LIBDIR 
+                          if you want to override the TRILINOS_LIBDIR
        		          environment variable.],
      [
         dnl Special case when someone does --with-petsc=no
@@ -6025,7 +6062,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
           fi
         fi
      ])
-     
+
   dnl If we have found Trilinos, determine and set additional pieces of data
   if test "$USE_CONTRIB_TRILINOS" = "yes" ; then
     AC_DEFINE(DEAL_II_USE_TRILINOS, 1,
@@ -6244,7 +6281,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
 
 
 dnl ------------------------------------------------------------
-dnl Check whether Metis is installed, and if so store the 
+dnl Check whether Metis is installed, and if so store the
 dnl respective links
 dnl
 dnl Usage: DEAL_II_CONFIGURE_METIS
@@ -6255,8 +6292,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
   dnl First check for the Metis directory
 
   AC_ARG_WITH(metis,
-  [  --with-metis=/path/to/metis  
-                          Specify the path to the Metis installation, of which 
+  [  --with-metis=/path/to/metis
+                          Specify the path to the Metis installation, of which
                           the include and library directories are   subdirs; use
                           this if you want to override the METIS_DIR environment
                           variable.],
@@ -6270,7 +6307,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
           AC_MSG_ERROR([Path to Metis specified with --with-metis does not
  			point to a complete Metis installation])
 	fi
-	
+
 	DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
      ],
      [
@@ -6294,18 +6331,18 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
      ])
 
   AC_ARG_WITH(metis-include,
-  [  --with-metis-include=/path/to/metis  
+  [  --with-metis-include=/path/to/metis
                           Specify the path to the METIS headers file; use this
                           if you want to override the METIS_INCLUDE_DIR
  		          environment variable.],
      [
         AC_MSG_ERROR([The --with-metis-include directive is no longer supported])
      ])
-     
+
   AC_ARG_WITH(metis-libs,
-  [  --with-metis-libs=/path/to/metis  
+  [  --with-metis-libs=/path/to/metis
                           Specify the path to the METIS libraries; use this if
-		          you want to override the METIS_LIBDIR 
+		          you want to override the METIS_LIBDIR
 			  environment variable.],
      [
 	USE_CONTRIB_METIS=yes
@@ -6340,7 +6377,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
           fi
         fi
      ])
-     
+
   if test "x$USE_CONTRIB_METIS" = "xyes" ; then
     AC_DEFINE(DEAL_II_USE_METIS, 1,
               [Defined if a Metis installation was found and is going
@@ -6360,10 +6397,10 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
   AC_ARG_WITH(umfpack,
-  [  --with-umfpack=umfpack-root-directory  
-                          Use installed UMFPack version. 
-		          'umfpack-root-directory' should be the directory 
-			  containing directories AMD and UMFPACK. The 
+  [  --with-umfpack=umfpack-root-directory
+                          Use installed UMFPack version.
+		          'umfpack-root-directory' should be the directory
+			  containing directories AMD and UMFPACK. The
 			  contributed UMFPack library is used if no argument is
 			  given. Default is not to use UMFPack.],
      [
@@ -6385,17 +6422,17 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 
   acx_umfpack=no
   AC_ARG_WITH(umfpack-include,
-  [  --with-umfpack-include=/path/to/UMFPACK  
+  [  --with-umfpack-include=/path/to/UMFPACK
                           Specify the path to the UMFPACK headers file; use this
-                          if you want to override the UMFPACK_INCDIR 
+                          if you want to override the UMFPACK_INCDIR
 			  environment variable.],
      [
 	UMFPACK_INCDIR="$withval"
         acx_umfpack=yes
      ])
-  
+
   AC_ARG_WITH(umfpack-libs,
-  [  --with-umfpack-libs=/path/to/UMFPACK  
+  [  --with-umfpack-libs=/path/to/UMFPACK
                           Specify the path to the UMFPACK libraries; use this if
 			  you want to override the UMFPACK_LIBDIR environment
 			  variable.],
@@ -6416,12 +6453,12 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
     dnl internal version, which we will first have to compile
     dnl before the libs are there)
     if test "x$DEAL_II_USE_INTERNAL_UMFPACK" != "xyes" ; then
-      dnl Try old naming scheme for umfpack/amd libraries (before 
+      dnl Try old naming scheme for umfpack/amd libraries (before
       dnl Tim Davis incorporated everything into SuiteSparse)
       OLD_LDFLAGS="$LDFLAGS"
       LDFLAGS="-L${UMFPACK_DIR}/UMFPACK $LDFLAGS"
       AC_CHECK_LIB(
-        [umfpack], 
+        [umfpack],
         [umfpack_di_defaults],
         [
           DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lumfpack)
@@ -6433,7 +6470,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
           dnl Old naming scheme failed, try the new one
           LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
           AC_CHECK_LIB(
-            [umfpack], 
+            [umfpack],
             [umfpack_di_defaults],
             [
               DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lumfpack)
@@ -6447,13 +6484,13 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
           )
         ]
       )
-  
+
       dnl Now do the same for amd. this one comes second since on the linker
       dnl line, -lumfpack has to preceded -lamd
       OLD_LDFLAGS="$LDFLAGS"
       LDFLAGS="-L${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
       AC_CHECK_LIB(
-        [amd], 
+        [amd],
         [amd_info],
         [
           DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lamd)
@@ -6465,7 +6502,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
           dnl Old naming scheme failed, try the new one
           LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
           AC_CHECK_LIB(
-            [amd], 
+            [amd],
             [amd_info],
             [
               DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lamd)
@@ -6487,13 +6524,13 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
       [
         UMFPACK_INCLUDE_DIR=-I${UMFPACK_DIR}/UMFPACK/Include
       ],
-      [  
+      [
         AC_CHECK_FILE(
           [${UMFPACK_DIR}/include/suitesparse/umfpack.h],
           [
             UMFPACK_INCLUDE_DIR=-I${UMFPACK_DIR}/include/suitesparse
           ],
-          [  
+          [
             AC_MSG_ERROR(installation of UMFPACK could not be determined)
           ]
         )
@@ -6505,13 +6542,13 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
       [
         UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/AMD/Include"
       ],
-      [  
+      [
         AC_CHECK_FILE(
           [${UMFPACK_DIR}/include/suitesparse/umfpack.h],
           [
             UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/include/suitesparse"
           ],
-          [  
+          [
             AC_MSG_ERROR(installation of UMFPACK could not be determined)
           ]
         )
@@ -6527,7 +6564,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
         [
           UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/UFconfig"
         ],
-        [  
+        [
           AC_MSG_ERROR(not found)
         ]
       )
@@ -6535,7 +6572,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 
   else
 
-    if test "x$UMFPACK_INCDIR" != "x" ; then  
+    if test "x$UMFPACK_INCDIR" != "x" ; then
        dnl Something has been passed to --with-umfpack-include
 
        UMFPACK_INCLUDE_DIR="-I${UMFPACK_INCDIR}"
@@ -6544,18 +6581,18 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
        CXXFLAGS="-I$UMFPACK_INCDIR $CXXFLAGS"
        CPPFLAGS="-I$UMFPACK_INCDIR $CPPFLAGS"
        AC_CHECK_HEADER(
-               [umfpack.h], 
-               [], 
+               [umfpack.h],
+               [],
                [AC_MSG_ERROR(installation of UMFPACK could not be determined)]
        )
-       AC_CHECK_HEADER([amd.h], [], 
+       AC_CHECK_HEADER([amd.h], [],
                        [AC_MSG_ERROR(installation of UMFPACK could not be determined)])
-       AC_CHECK_HEADER([UFconfig.h], [], 
+       AC_CHECK_HEADER([UFconfig.h], [],
                        [AC_MSG_ERROR(installation of UMFPACK could not be determined)])
 
-       if test "x$UMFPACK_LIBDIR" != "x" ; then  
+       if test "x$UMFPACK_LIBDIR" != "x" ; then
           AC_CHECK_LIB(
-               [amd], 
+               [amd],
                [amd_info],
                [
                     DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lamd)
@@ -6566,7 +6603,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
                [AC_MSG_ERROR(installation of AMD could not be determined)]
           )
           AC_CHECK_LIB(
-               [umfpack], 
+               [umfpack],
                [umfpack_di_defaults],
                [
                     DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lumfpack)
@@ -6578,7 +6615,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
           )
        else
           AC_CHECK_LIB(
-               [amd], 
+               [amd],
                [amd_info],
                [
                     DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lamd)
@@ -6586,7 +6623,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
                [AC_MSG_ERROR(installation of AMD could not be determined)]
           )
           AC_CHECK_LIB(
-               [umfpack], 
+               [umfpack],
                [umfpack_di_defaults],
                [
                     DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lumfpack)
@@ -6594,7 +6631,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
                [AC_MSG_ERROR(installation of UMFPACK could not be determined)]
           )
        fi
-    fi 
+    fi
   fi
 ])
 
@@ -6608,7 +6645,7 @@ AC_DEFUN(DEAL_II_WITH_LAPACK, dnl
     if test "x$1" != "xyes" ; then lapack="$1"; else lapack="lapack"; fi
     AC_CHECK_LIB($lapack, dgbsv_,
       [ DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$lapack)
-        AC_DEFINE([HAVE_LIBLAPACK], [1], 
+        AC_DEFINE([HAVE_LIBLAPACK], [1],
                   [Defined if deal.II was configured with LAPACK support])
       ],
       [AC_MSG_ERROR([LAPACK library $lapack not found])]
@@ -6670,11 +6707,11 @@ AC_DEFUN(DEAL_II_CHECK_BLAS_FRAMEWORK, dnl
               [  AC_LANG_PROGRAM([[extern "C" void daxpy(int,double,double*,int,double*,int);]],
                                  [[daxpy(0,0.,0,0,0,0);]])
               ],
-              [ 
+              [
                 AC_MSG_RESULT(yes)
                 framework_works=yes
               ],
-              [ 
+              [
                 AC_MSG_RESULT(no)
               ])
 
@@ -6686,11 +6723,11 @@ AC_DEFUN(DEAL_II_CHECK_BLAS_FRAMEWORK, dnl
                 [  AC_LANG_PROGRAM([[extern "C" void daxpy(int,double,double*,int,double*,int);]],
                                    [[daxpy(0,0.,0,0,0,0);]])
                 ],
-                [ 
+                [
                   AC_MSG_RESULT(yes)
                   framework_works=yes
                 ],
-                [ 
+                [
                   AC_MSG_RESULT(no)
                 ])
     fi
@@ -6706,26 +6743,26 @@ AC_DEFUN(DEAL_II_CHECK_BLAS_FRAMEWORK, dnl
 AC_DEFUN(DEAL_II_WITH_BLAS, dnl
 [
   if test "x$1" != "xno" ; then
-    if test "x$1" != "xyes" ; then 
+    if test "x$1" != "xyes" ; then
       blas="$1"
       AC_CHECK_LIB($blas, daxpy_,
-                   [ 
+                   [
                      DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$blas)
-                     AC_DEFINE([HAVE_LIBBLAS], [1], 
+                     AC_DEFINE([HAVE_LIBBLAS], [1],
                                [Defined if deal.II was configured with BLAS support])
                    ],,$F77LIBS)
       AC_SUBST(NEEDS_F77LIBS, "yes")
     else
       DEAL_II_CHECK_BLAS_FRAMEWORK
       if test "x$framework_works" != "xyes"; then
-        blas="blas"; 
+        blas="blas";
         AC_CHECK_LIB($blas, daxpy_,
-                     [ 
+                     [
                        DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$blas)
-                       AC_DEFINE([HAVE_LIBBLAS], [1], 
+                       AC_DEFINE([HAVE_LIBBLAS], [1],
                                  [Defined if deal.II was configured with BLAS support])
                      ],,$F77LIBS)
-     
+
         AC_SUBST(NEEDS_F77LIBS, "yes")
       fi
     fi
