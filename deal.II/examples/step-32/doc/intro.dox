@@ -126,3 +126,98 @@ program code.
 
 
 <h3> Parallelization within individual nodes of a cluster </h3>
+
+The second strategy to parallelize a program is to make use of the fact that
+most computers today have more than one processor that all have access to the
+same memory. In other words, in this model, we don't explicitly have to say
+which pieces of data reside where -- all of the data we need is directly
+accessible and all we have to do is split <i>processing</i> this data between
+the available processors. We will then couple this with the MPI
+parallelization outlined above, i.e. we will have all the processors on a
+machine work together to, for example, assemble the local contributions to the
+global matrix for the cells that this machine actually "owns" but not for
+those cells that are owned by other machines. We will use this strategy for
+four kinds of operations we frequently do in this program: assembly of the
+Stokes and temperature matrices, assembly of the matrix that forms the Stokes
+preconditioner, and assembly of the right hand side of the temperature system.
+
+All of these operations essentially look as follows: we need to loop over all
+cells for which <code>cell-@>subdomain_id()</code> equals the index our
+machine has within the communicator object used for all communication
+(i.e. essentially <code>MPI_COMM_WORLD</code>, as explained above), on each
+cell we need to assemble the local contributions to the global matrix or
+vector, and then we have to copy each cell's contribution into the global
+matrix or vector. Note that the first part of this (the loop) defines a range
+of iterators on which something has to happen. The second part, assembly of
+local contributions is something that takes the majority of CPU time in this
+sequence of steps, is a typical example of things that can be done in
+%parallel: each cell's contribution is entirely independent of all other cells'
+contributions. The third part, copying into the global matrix, must not happen
+in %parallel since we are modifying one object and so several threads can not
+at the same time read an existing matrix element, add their contribution, and
+write the sum back into memory without danger of producing a <a
+href="http://en.wikipedia.org/wiki/Race_condition">race condition</a>. 
+
+deal.II has a class that is made for exactly this workflow: WorkStream. Its
+use is extensively documented in the module on @ref threads (in the section
+on @ref MTWorkStream "the WorkStream class") and we won't repeat here the
+rationale and detailed instructions laid out there, though you will want to
+read through this module to understand the distinction between scratch space
+and per-cell data. Suffice it to mention that we need the following:
+
+- An iterator range for those cells on which we are supposed to work. This is
+  provided by the FilteredIterator class which acts just like every other cell
+  iterator in deal.II with the exception that it skips all cells that do not
+  satisfy a particular predicate (i.e. a criterion that evaluates to true or
+  false). In our case, the predicate is whether a cell has the correct
+  subdomain id.
+
+- A function that does the work on each cell for each of the tasks identified
+  above, i.e. functions that assemble the local contributions to Stokes matrix
+  and preconditioner, temperature matrix, and temperature right hand
+  side. These are the
+  <code>BoussinesqProblem::local_assemble_stokes_system</code>,
+  <code>BoussinesqProblem::local_assemble_stokes_preconditioner</code>,
+  <code>BoussinesqProblem::local_assemble_temperature_matrix</code>, and
+  <code>BoussinesqProblem::local_assemble_temperature_rhs</code> functions in
+  the code below. These four functions can all have several instances of each
+  running in %parallel.
+
+- %Functions that copy the result of the previous ones into the global object
+  and that run sequentially to avoid race conditions. These are the
+  <code>BoussinesqProblem::copy_local_to_global_stokes_system</code>,
+  <code>BoussinesqProblem::copy_local_to_global_stokes_preconditioner</code>,
+  <code>BoussinesqProblem::copy_local_to_global_temperature_matrix</code>, and
+  <code>BoussinesqProblem::copy_local_to_global_temperature_rhs</code>
+  functions.
+
+We will comment on a few more points in the actual code, but in general their
+general structure should be clear from the discussion in @ref threads.
+
+The underlying technology for WorkStream identifies "tasks" that need to be
+worked on (e.g. assembling local contributions on a cell) and schedules these
+tasks automatically to available processors. WorkStream creates these tasks
+automatically, by splitting the iterator range into suitable chunks, but as
+outlined in @ref threads, one can also create tasks explicitly. We use this in
+one place in the program, namely where we set up the Stokes system and
+preconditioner matrices as well as the temperature matrix. These are
+independent operations that, if enough processors are available, can be worked
+on in parallel (if not enough processors are available -- because the system
+has only one, or because the others are working on something else for us --
+then these tasks will be worked on sequentially). Consequently, 
+<code>BoussinesqProblem::setup_dofs</code> creates tasks for the three calls
+to <code>BoussinesqProblem::setup_stokes_matrix</code>,
+<code>BoussinesqProblem::setup_stokes_preconditioner</code>, and
+<code>BoussinesqProblem::setup_temperature_matrices</code> that are then
+scheduled to available resources. There is one problem with this, however: if
+we have more than MPI process running in parallel, then all of these processes
+need to communicate in a certain order and that requires that the various
+<code>setup_*</code> functions can't run in parallel. For these setup
+operations, we will therefore only be able to make use of multiple processor
+cores within the same machine if there is only a single MPI process in use.
+
+
+
+<h3> The testcase </h3>
+
+To be written.
