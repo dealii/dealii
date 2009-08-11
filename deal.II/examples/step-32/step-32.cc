@@ -747,7 +747,10 @@ template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
                 trilinos_communicator (Utilities::Trilinos::comm_world()),
-		pcout (std::cout, Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)==0),
+		pcout (std::cout,
+		       (Utilities::Trilinos::
+			get_this_mpi_process(trilinos_communicator)
+			== 0)),
 
 		triangulation (Triangulation<dim>::maximum_smoothing),
 
@@ -1119,16 +1122,16 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 					     Utilities::Trilinos::
 					     get_this_mpi_process(trilinos_communicator),
 					     local_dofs);
-    unsigned int n_local_velocities = 0;
-    for (unsigned int c=0; c<dim; ++c)
-      n_local_velocities += local_dofs[c];
+    const unsigned int
+      n_local_velocities = std::accumulate (&local_dofs[0],
+					    &local_dofs[dim],
+					    0),
+      n_local_pressures  = local_dofs[dim];
 
-    const unsigned int n_local_pressures = local_dofs[dim];
-
-    Epetra_Map map_u(n_u, n_local_velocities, 0, trilinos_communicator);
-    stokes_partitioner.push_back (map_u);
-    Epetra_Map map_p(n_p, n_local_pressures, 0, trilinos_communicator);
-    stokes_partitioner.push_back (map_p);
+    stokes_partitioner.push_back (Epetra_Map(n_u, n_local_velocities,
+					     0, trilinos_communicator));
+    stokes_partitioner.push_back (Epetra_Map(n_p, n_local_pressures,
+					     0, trilinos_communicator));
   }
   
   temperature_partitioner
