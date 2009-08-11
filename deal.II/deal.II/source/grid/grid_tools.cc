@@ -190,7 +190,7 @@ GridTools::cell_measure<3>(const std::vector<Point<3> > &all_vertices,
   with (linalg):
   J := matrix(3,3, [[diff(x_real, xi), diff(x_real, eta), diff(x_real, zeta)],
   [diff(y_real, xi), diff(y_real, eta), diff(y_real, zeta)],
-  [diff(z_real, xi), diff(z_real, eta), diff(z_real, zeta)]]): 
+  [diff(z_real, xi), diff(z_real, eta), diff(z_real, zeta)]]):
   detJ := det (J):
 
   measure := simplify ( int ( int ( int (detJ, xi=0..1), eta=0..1), zeta=0..1)):
@@ -270,7 +270,7 @@ GridTools::cell_measure(const std::vector<Point<2> > &all_vertices,
   \int_K 1 dx dy  = \int_{\hat K} |det J| d(xi) d(eta)
 
   # x and y are arrays holding the x- and y-values of the four vertices
-  # of this cell in real space. 
+  # of this cell in real space.
   x := array(0..3);
   y := array(0..3);
   z := array(0..3);
@@ -281,10 +281,10 @@ GridTools::cell_measure(const std::vector<Point<2> > &all_vertices,
   x_real := sum(x[s]*tphi[s], s=0..3):
   y_real := sum(y[s]*tphi[s], s=0..3):
   z_real := sum(z[s]*tphi[s], s=0..3):
-  
+
   Jxi := <diff(x_real,xi)  | diff(y_real,xi) | diff(z_real,xi)>;
   Jeta := <diff(x_real,eta)| diff(y_real,eta)| diff(z_real,eta)>;
-  with(VectorCalculus):  
+  with(VectorCalculus):
   J := CrossProduct(Jxi, Jeta);
   detJ := sqrt(J[1]^2 + J[2]^2 +J[3]^2);
 
@@ -428,7 +428,7 @@ GridTools::delete_duplicated_vertices (std::vector<Point<spacedim> >    &vertice
 	      // vertex, so break here
 	      break;
 	    }
-	}		
+	}
     }
 
 				   // now we got a renumbering list. simply
@@ -520,7 +520,7 @@ GridTools::shift (const Point<spacedim>   &shift_vector,
   transform (TRANS::ShiftPoint<spacedim>(shift_vector), triangulation);
 #else
   transform (ShiftPoint<spacedim>(shift_vector), triangulation);
-#endif  
+#endif
 }
 
 
@@ -534,7 +534,7 @@ GridTools::rotate (const double      angle,
   transform (TRANS::Rotate2d(angle), triangulation);
 #else
   transform (Rotate2d(angle), triangulation);
-#endif  
+#endif
 }
 
 #endif
@@ -550,7 +550,7 @@ GridTools::scale (const double        scaling_factor,
   transform (TRANS::ScalePoint<spacedim>(scaling_factor), triangulation);
 #else
   transform (ScalePoint<spacedim>(scaling_factor), triangulation);
-#endif  
+#endif
 }
 
 
@@ -577,7 +577,7 @@ GridTools::find_closest_vertex (const Container<dim,spacedim> &container,
                                    // Assert that at least one vertex
                                    // is actually used
   Assert(first != used.end(), ExcInternalError());
-   
+
   unsigned int best_vertex = std::distance(used.begin(), first);
   double       best_dist   = (p - vertices[best_vertex]).square();
 
@@ -612,16 +612,16 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim,spacedim> &containe
 	 ExcVertexNotUsed(vertex));
 
 				   // We use a set instead of a vector
-				   // to ensure that cells are inserted only 
-				   // once. A bug in the previous version 
-				   // prevented some cases to be 
+				   // to ensure that cells are inserted only
+				   // once. A bug in the previous version
+				   // prevented some cases to be
 				   // treated correctly
   std::set<typename Container<dim,spacedim>::active_cell_iterator> adj_cells_set;
-   
+
   typename Container<dim,spacedim>::active_cell_iterator
     cell = container.begin_active(),
     endc = container.end();
-   
+
                                    // go through all active cells and look
                                    // if the vertex is part of that cell
   for (; cell != endc; ++cell)
@@ -650,7 +650,7 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim,spacedim> &containe
 		{
 		  typename Container<dim,spacedim>::cell_iterator
 		    nb = cell->neighbor(face);
-                        
+
 						   // Here we
 						   // check
 						   // whether
@@ -686,26 +686,26 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim,spacedim> &containe
 		    }
 		}
 	    }
-               
+
 	  break;
 	}
-   
+
   std::vector<typename Container<dim,spacedim>::active_cell_iterator>
     adjacent_cells;
 
 				   // We now produce the output vector
 				   // from the set that we assembled above.
-  typename std::set<typename Container<dim,spacedim>::active_cell_iterator>::iterator 
-    it = adj_cells_set.begin(), 
+  typename std::set<typename Container<dim,spacedim>::active_cell_iterator>::iterator
+    it = adj_cells_set.begin(),
     endit = adj_cells_set.end();
-  for(; it != endit; ++it) 
+  for(; it != endit; ++it)
     adjacent_cells.push_back(*it);
-   
-   
+
+
   Assert(adjacent_cells.size() > 0, ExcInternalError());
-   
+
   return adjacent_cells;
-}  
+}
 
 
 
@@ -738,7 +738,7 @@ GridTools::find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping
                                    // Find closest vertex and determine
                                    // all adjacent cells
   unsigned int vertex = find_closest_vertex(container, p);
-   
+
   std::vector<cell_iterator> adjacent_cells =
     find_cells_adjacent_to_vertex(container, vertex);
 
@@ -794,7 +794,7 @@ GridTools::find_active_cell_around_point (const hp::MappingCollection<dim,spaced
                                    // Find closest vertex and determine
                                    // all adjacent cells
   unsigned int vertex = find_closest_vertex(container, p);
-   
+
   std::vector<cell_iterator> adjacent_cells =
     find_cells_adjacent_to_vertex(container, vertex);
 
@@ -896,7 +896,7 @@ get_face_connectivity_of_cells (const Triangulation<dim,spacedim> &triangulation
 				   index);
 	  }
     }
-  
+
 				   // now compress the so-built connectivity
 				   // pattern and restore user indices. the
 				   // const-cast is necessary since we treat
@@ -904,7 +904,7 @@ get_face_connectivity_of_cells (const Triangulation<dim,spacedim> &triangulation
 				   // return it to its original state)
   cell_connectivity.compress ();
   const_cast<Triangulation<dim,spacedim>&>(triangulation)
-    .load_user_indices (saved_user_indices);  
+    .load_user_indices (saved_user_indices);
 }
 
 
@@ -935,7 +935,7 @@ partition_triangulation (const unsigned int           n_partitions,
 				   // partitioning and assigning subdomain ids
   SparsityPattern cell_connectivity;
   get_face_connectivity_of_cells (triangulation, cell_connectivity);
-  
+
   partition_triangulation (n_partitions,
 			   cell_connectivity,
 			   triangulation);
@@ -954,8 +954,8 @@ partition_triangulation (const unsigned int           n_partitions,
   Assert (cell_connection_graph.n_rows() == triangulation.n_active_cells(),
 	  ExcMessage ("Connectivity graph has wrong size"));
   Assert (cell_connection_graph.n_cols() == triangulation.n_active_cells(),
-	  ExcMessage ("Connectivity graph has wrong size"));  
-  
+	  ExcMessage ("Connectivity graph has wrong size"));
+
                                    // check for an easy return
   if (n_partitions == 1)
     {
@@ -1054,7 +1054,7 @@ GridTools::get_finest_common_cells (const Container &mesh_1,
     std::list<std::pair<typename Container::cell_iterator,
                         typename Container::cell_iterator> >
     CellList;
-  
+
   CellList cell_list;
 
                                    // first push the coarse level cells
@@ -1273,7 +1273,7 @@ namespace internal
 	const unsigned int structdim = Iterator::AccessorType::structure_dimension;
 	Assert (spacedim == Iterator::AccessorType::dimension,
 		ExcInternalError());
-	
+
 					 // everything below is wrong
 					 // if not for the following
 					 // condition
@@ -1298,7 +1298,7 @@ namespace internal
 	  = std::accumulate (&parent_alternating_forms[0],
 			     &parent_alternating_forms[GeometryInfo<structdim>::vertices_per_cell],
 			     Tensor<spacedim-structdim,spacedim>());
-	
+
 					 // now do the same
 					 // computation for the
 					 // children where we use the
@@ -1312,7 +1312,7 @@ namespace internal
 	Tensor<spacedim-structdim,spacedim> child_alternating_forms
 	  [GeometryInfo<structdim>::max_children_per_cell]
 	  [GeometryInfo<structdim>::vertices_per_cell];
-	
+
 	for (unsigned int c=0; c<object->n_children(); ++c)
 	  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
 	    child_vertices[c][i] = object->child(c)->vertex(i);
@@ -1326,7 +1326,7 @@ namespace internal
 	for (unsigned int c=0; c<object->n_children(); ++c)
 	  child_vertices[c][GeometryInfo<structdim>::max_children_per_cell-c-1]
 	    = object_mid_point;
-	
+
 	for (unsigned int c=0; c<object->n_children(); ++c)
 	  GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
 								 child_alternating_forms[c]);
@@ -1347,7 +1347,7 @@ namespace internal
 	    objective += (child_alternating_forms[c][i] -
 			  average_parent_alternating_form/std::pow(2.,1.*structdim))
 			 .norm_square();
-	
+
 	return objective;
       }
 
@@ -1381,7 +1381,7 @@ namespace internal
       {
 	return object->line(f)->center();
       }
-      
+
 
 
 				       /**
@@ -1397,7 +1397,7 @@ namespace internal
       {
 	return object->face(f)->center();
       }
-      
+
 
 
 
@@ -1429,7 +1429,7 @@ namespace internal
       {
 	const unsigned int
 	  structdim = Iterator::AccessorType::structure_dimension;
-	
+
 	double diameter = object->diameter();
 	for (unsigned int f=0;
 	     f<GeometryInfo<structdim>::faces_per_cell;
@@ -1448,7 +1448,7 @@ namespace internal
 
 	return diameter;
       }
-      
+
 
 
 				       /**
@@ -1471,10 +1471,10 @@ namespace internal
 	  *manifold = (respect_manifold ?
 		       &object->get_boundary() :
 		       0);
-	  
+
 	const unsigned int structdim = Iterator::AccessorType::structure_dimension;
 	const unsigned int spacedim  = Iterator::AccessorType::space_dimension;
-	
+
 					 // right now we can only deal
 					 // with cells that have been
 					 // refined isotropically
@@ -1484,7 +1484,7 @@ namespace internal
 					 // around without having to
 					 // consider boundary
 					 // information
-	Assert (object->has_children(), ExcInternalError());      
+	Assert (object->has_children(), ExcInternalError());
 	Assert (object->refinement_case() == RefinementCase<structdim>::isotropic_refinement,
 		ExcNotImplemented());
 
@@ -1504,7 +1504,7 @@ namespace internal
 					 // function and initial delta
 	double current_value = objective_function (object, object_mid_point);
 	double initial_delta = 0;
-	
+
 	do
 	  {
 					     // choose a step length
@@ -1516,7 +1516,7 @@ namespace internal
 					     // premature termination of
 					     // the iteration)
 	    const double step_length = diameter / 4 / (iteration + 1);
-      
+
 					     // compute the objective
 					     // function's derivative using a
 					     // two-sided difference formula
@@ -1525,7 +1525,7 @@ namespace internal
 	    for (unsigned int d=0; d<spacedim; ++d)
 	      {
 		const double eps = step_length/10;
-		
+
 		Point<spacedim> h;
 		h[d] = eps/2;
 
@@ -1560,7 +1560,7 @@ namespace internal
 					     // quite the loop here
 	    if (gradient.norm() == 0)
 	      break;
-	    
+
 					     // so we need to go in
 					     // direction -gradient. the
 					     // optimal value of the
@@ -1589,7 +1589,7 @@ namespace internal
 
 	    if (iteration == 0)
 	      initial_delta = (previous_value - current_value);
-	    
+
 					     // stop if we aren't moving much
 					     // any more
 	    if ((iteration >= 1) &&
@@ -1648,7 +1648,7 @@ namespace internal
 	for (unsigned int c=0; c<object->n_children(); ++c)
 	  GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
 								 child_alternating_forms[c]);
-	
+
 	old_min_product = child_alternating_forms[0][0] * parent_alternating_forms[0];
 	for (unsigned int c=0; c<object->n_children(); ++c)
 	  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
@@ -1670,7 +1670,7 @@ namespace internal
 	for (unsigned int c=0; c<object->n_children(); ++c)
 	  GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
 								 child_alternating_forms[c]);
-	
+
 	new_min_product = child_alternating_forms[0][0] * parent_alternating_forms[0];
 	for (unsigned int c=0; c<object->n_children(); ++c)
 	  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
@@ -1694,13 +1694,15 @@ namespace internal
 					 // is well oriented
 	return (std::max (new_min_product, old_min_product) > 0);
       }
-    
+
 
 				       // possibly fix up the faces of
 				       // a cell by moving around its
 				       // mid-points
       template <int structdim, int spacedim>
-      void fix_up_faces (const typename dealii::Triangulation<structdim,spacedim>::cell_iterator &cell)
+      void fix_up_faces (const typename dealii::Triangulation<structdim,spacedim>::cell_iterator &cell,
+			 internal::int2type<structdim>,
+			 internal::int2type<spacedim>)
       {
 					 // see if we first can fix up
 					 // some of the faces of this
@@ -1744,7 +1746,7 @@ namespace internal
 
 	    if (subface_is_more_refined == true)
 	      continue;
-	    
+
 					     // so, now we finally know
 					     // that we can do something
 					     // about this face
@@ -1754,20 +1756,24 @@ namespace internal
 
 
 #if deal_II_dimension == 1
-      template <int structdim, int spacedim>
-      void fix_up_faces (const typename dealii::Triangulation<1,spacedim>::cell_iterator &)
+      template <int spacedim>
+      void fix_up_faces (const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
+			 internal::int2type<1>,
+			 internal::int2type<spacedim>)
+      {
+					 // nothing to do for the faces of
+					 // cells in 1d
+      }
+
+
+      void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &,
+			 internal::int2type<1>,
+			 internal::int2type<1>)
       {
 					 // nothing to do for the faces of
 					 // cells in 1d
       }
 #endif
-
-      template <int structdim, int spacedim>
-      void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &)
-      {
-					 // nothing to do for the faces of
-					 // cells in 1d
-      }
     }
   }
 }
@@ -1791,7 +1797,10 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
       const typename Triangulation<dim,spacedim>::cell_iterator
 	cell = *cell_ptr;
 
-      internal::GridTools::FixUpDistortedChildCells::fix_up_faces<dim,spacedim> (cell);
+      internal::GridTools::FixUpDistortedChildCells
+	::fix_up_faces (cell,
+			internal::int2type<dim>(),
+			internal::int2type<spacedim>());
 
 				       // fix up the object. we need to
 				       // respect the manifold if the cell is
@@ -1803,7 +1812,7 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
 									  (dim < spacedim)))
 	unfixable_subset.distorted_cells.push_back (cell);
     }
-  
+
   return unfixable_subset;
 }
 
