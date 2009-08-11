@@ -64,7 +64,7 @@
 
 				   // This is the only include file that is
 				   // new: We use Trilinos for defining the
-				   // parallel partitioning of the matrices
+				   // %parallel partitioning of the matrices
 				   // and vectors, and an Epetra_Map is the
 				   // Trilinos data structure for the
 				   // definition of which part of a
@@ -79,7 +79,7 @@ using namespace dealii;
 				 // @sect3{Equation data}
 
 				   // This program is mainly an extension of
-				   // step-31 to operate in parallel, so the
+				   // step-31 to operate in %parallel, so the
 				   // equation data remains the same.
 namespace EquationData
 {
@@ -1763,12 +1763,12 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 				 // @sect4{BoussinesqFlowProblem::project_temperature_field}
 				 // Manually project the initial
 				 // conditions for the temperature in
-				 // parallel instead of doing that
+				 // %parallel instead of doing that
 				 // completely on each processor. The
 				 // temperature mass matrix is already
 				 // available, and we need just to
 				 // compute a right hand side in
-				 // parallel, do a cg solve and
+				 // %parallel, do a CG solve and
 				 // distribute the hanging node
 				 // constraints.
 template <int dim>
