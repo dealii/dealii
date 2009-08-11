@@ -74,7 +74,7 @@ namespace
 
 namespace internal
 {
-  namespace 
+  namespace
   {
 				     /**
 				      * All small temporary data
@@ -137,7 +137,7 @@ namespace internal
     {
 	static const unsigned int dim      = DH::dimension;
 	static const unsigned int spacedim = DH::space_dimension;
-	
+
 					 /**
 					  * The finite element to be used.
 					  */
@@ -157,7 +157,7 @@ namespace internal
 	dealii::hp::FEFaceValues<dim>    fe_face_values_cell;
 	dealii::hp::FEFaceValues<dim>    fe_face_values_neighbor;
 	dealii::hp::FESubfaceValues<dim> fe_subface_values;
-    
+
 					 /**
 					  * A vector to store the jump
 					  * of the normal vectors in
@@ -173,7 +173,7 @@ namespace internal
 					  * of multiple threads where
 					  * synchronisation makes
 					  * things even slower.
-					  */ 
+					  */
 	std::vector<std::vector<std::vector<double> > > phi;
 
 					 /**
@@ -221,7 +221,7 @@ namespace internal
 					  * points.
 					  */
 	std::vector<double>          JxW_values;
-    
+
 					 /**
 					  * The subdomain id we are to care
 					  * for.
@@ -241,21 +241,21 @@ namespace internal
 	const typename FunctionMap<dim>::type *neumann_bc;
 	const std::vector<bool>                component_mask;
 	const Function<dim>                   *coefficients;
-    
+
 					 /**
 					  * Constructor.
 					  */
 	template <class FE>
 	ParallelData (const FE                                           &fe,
-		      const dealii::hp::QCollection<dim-1>               &face_quadratures,
-		      const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+		      const dealii::hp::QCollection<DH::dimension-1>               &face_quadratures,
+		      const dealii::hp::MappingCollection<DH::dimension, DH::space_dimension> &mapping,
 		      const bool         need_quadrature_points,
 		      const unsigned int n_solution_vectors,
 		      const unsigned int subdomain_id,
 		      const unsigned int material_id,
-		      const typename FunctionMap<dim>::type *neumann_bc,
+		      const typename FunctionMap<DH::dimension>::type *neumann_bc,
 		      const std::vector<bool>                component_mask,
-		      const Function<dim>                   *coefficients);
+		      const Function<DH::dimension>                   *coefficients);
 
 					 /**
 					  * Resize the arrays so that they fit the
@@ -271,15 +271,15 @@ namespace internal
     template <class FE>
     ParallelData<DH>::
     ParallelData (const FE                                           &fe,
-		  const dealii::hp::QCollection<dim-1>               &face_quadratures,
-		  const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+		  const dealii::hp::QCollection<DH::dimension-1>     &face_quadratures,
+		  const dealii::hp::MappingCollection<DH::dimension, DH::space_dimension> &mapping,
 		  const bool     need_quadrature_points,
 		  const unsigned int n_solution_vectors,
 		  const unsigned int subdomain_id,
 		  const unsigned int material_id,
-		  const typename FunctionMap<dim>::type *neumann_bc,
+		  const typename FunctionMap<DH::dimension>::type *neumann_bc,
 		  const std::vector<bool>                component_mask,
-		  const Function<dim>                   *coefficients)
+		  const Function<DH::dimension>         *coefficients)
 		    :
 		    finite_element (fe),
 		    face_quadratures (face_quadratures),
@@ -332,11 +332,11 @@ namespace internal
     {
       const unsigned int n_q_points   = face_quadratures[active_fe_index].n_quadrature_points;
       const unsigned int n_components = finite_element.n_components();
-  
+
       normal_vectors.resize(n_q_points);
       coefficient_values1.resize(n_q_points);
       coefficient_values.resize(n_q_points);
-      JxW_values.resize(n_q_points);  
+      JxW_values.resize(n_q_points);
 
       for (unsigned int i=0; i<phi.size(); ++i)
 	{
@@ -370,7 +370,7 @@ namespace internal
     copy_local_to_global (const	std::map<typename DH::face_iterator,std::vector<double> > &local_face_integrals,
 			  std::map<typename DH::face_iterator,std::vector<double> > &face_integrals)
     {
-  
+
 				       // now copy locally computed elements
 				       // into the global map
       for (typename std::map<typename DH::face_iterator,std::vector<double> >::const_iterator
@@ -385,7 +385,7 @@ namespace internal
 		  ExcInternalError());
 	  for (unsigned int i=0; i<p->second.size(); ++i)
 	    Assert (p->second[i] >= 0, ExcInternalError());
-      
+
 	  face_integrals[p->first] = p->second;
 	}
     }
@@ -402,9 +402,9 @@ namespace internal
 				      * as that of this side, then
 				      * handle the integration of
 				      * these both cases together.
-				      */    
+				      */
     template <typename InputVector, class DH>
-    void 
+    void
     integrate_over_regular_face (const std::vector<const InputVector*>   &solutions,
 				 ParallelData<DH>                        &parallel_data,
 				 std::map<typename DH::face_iterator,std::vector<double> > &local_face_integrals,
@@ -414,25 +414,25 @@ namespace internal
 				 dealii::hp::FEFaceValues<DH::dimension> &fe_face_values_neighbor)
     {
       const unsigned int dim = DH::dimension;
-      
+
       const typename DH::face_iterator face = cell->face(face_no);
       const unsigned int n_q_points         = parallel_data.face_quadratures[cell->active_fe_index()]
 					      .n_quadrature_points,
 			 n_components       = parallel_data.finite_element.n_components(),
 			 n_solution_vectors = solutions.size();
-  
-  
+
+
 				       // initialize data of the restriction
 				       // of this cell to the present face
       fe_face_values_cell.reinit (cell, face_no,
 				  cell->active_fe_index());
-  
+
 				       // get gradients of the finite element
 				       // function on this cell
       for (unsigned int n=0; n<n_solution_vectors; ++n)
 	fe_face_values_cell.get_present_fe_values()
 	  .get_function_grads (*solutions[n], parallel_data.psi[n]);
-  
+
 				       // now compute over the other side of
 				       // the face
       if (face->at_boundary() == false)
@@ -440,10 +440,10 @@ namespace internal
 					 // of gradient across this face
 	{
 	  Assert (cell->neighbor(face_no).state() == IteratorState::valid,
-		  ExcInternalError());      
-      
+		  ExcInternalError());
+
 	  const typename DH::active_cell_iterator neighbor = cell->neighbor(face_no);
-      
+
 					   // find which number the
 					   // current face has relative to
 					   // the neighboring cell
@@ -451,7 +451,7 @@ namespace internal
 	    = cell->neighbor_of_neighbor (face_no);
 	  Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell,
 		  ExcInternalError());
-      
+
 					   // get restriction of finite element
 					   // function of @p{neighbor} to the
 					   // common face. in the hp case, use the
@@ -460,14 +460,14 @@ namespace internal
 					   // cell
 	  fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor,
 					  cell->active_fe_index());
-      
+
 					   // get gradients on neighbor cell
 	  for (unsigned int n=0; n<n_solution_vectors; ++n)
 	    {
 	      fe_face_values_neighbor.get_present_fe_values()
 		.get_function_grads (*solutions[n],
 				     parallel_data.neighbor_psi[n]);
-      
+
 					       // compute the jump in the gradients
 	      for (unsigned int component=0; component<n_components; ++component)
 		for (unsigned int p=0; p<n_q_points; ++p)
@@ -483,7 +483,7 @@ namespace internal
 				       // each component being the
 				       // mentioned value at one of the
 				       // quadrature points
-  
+
 				       // next we have to multiply this with
 				       // the normal vector. Since we have
 				       // taken the difference of gradients
@@ -492,17 +492,17 @@ namespace internal
 				       // taking that of the neighbor
 				       // would only change the sign. We take
 				       // the outward normal.
-  
+
       parallel_data.normal_vectors =
 	fe_face_values_cell.get_present_fe_values().get_normal_vectors();
-  
+
       for (unsigned int n=0; n<n_solution_vectors; ++n)
 	for (unsigned int component=0; component<n_components; ++component)
 	  for (unsigned int point=0; point<n_q_points; ++point)
 	    parallel_data.phi[n][point][component]
 	      = (parallel_data.psi[n][point][component] *
 		 parallel_data.normal_vectors[point]);
-  
+
 				       // if a coefficient was given: use that
 				       // to scale the jump in the gradient
       if (parallel_data.coefficients != 0)
@@ -510,7 +510,7 @@ namespace internal
 					   // scalar coefficient
 	  if (parallel_data.coefficients->n_components == 1)
 	    {
-	  
+
 	      parallel_data.coefficients
 		->value_list (fe_face_values_cell.get_present_fe_values()
 			      .get_quadrature_points(),
@@ -543,7 +543,7 @@ namespace internal
 					 // derivative and boundary function
 	{
 	  const unsigned char boundary_indicator = face->boundary_indicator();
-      
+
 	  Assert (parallel_data.neumann_bc->find(boundary_indicator) !=
 		  parallel_data.neumann_bc->end(),
 		  ExcInternalError ());
@@ -556,7 +556,7 @@ namespace internal
 	      parallel_data.neumann_bc->find(boundary_indicator)->second
 		->value_list (fe_face_values_cell.get_present_fe_values()
 			      .get_quadrature_points(), g);
-	  
+
 	      for (unsigned int n=0; n<n_solution_vectors; ++n)
 		for (unsigned int point=0; point<n_q_points; ++point)
 		  parallel_data.phi[n][point][0] -= g[point];
@@ -569,7 +569,7 @@ namespace internal
 		->vector_value_list (fe_face_values_cell.get_present_fe_values()
 				     .get_quadrature_points(),
 				     g);
-	  
+
 	      for (unsigned int n=0; n<n_solution_vectors; ++n)
 		for (unsigned int component=0; component<n_components; ++component)
 		  for (unsigned int point=0; point<n_q_points; ++point)
@@ -588,7 +588,7 @@ namespace internal
 
       parallel_data.JxW_values
 	= fe_face_values_cell.get_present_fe_values().get_JxW_values();
-  
+
 				       // take the square of the phi[i]
 				       // for integration, and sum up
       std::vector<double> face_integral (n_solution_vectors, 0);
@@ -626,7 +626,7 @@ namespace internal
 				   dealii::hp::FESubfaceValues<DH::dimension> &fe_subface_values)
     {
       const unsigned int dim = DH::dimension;
-      
+
       const typename DH::cell_iterator neighbor = cell->neighbor(face_no);
       const unsigned int n_q_points         = parallel_data.face_quadratures[cell->active_fe_index()]
 					      .n_quadrature_points,
@@ -648,7 +648,7 @@ namespace internal
 				       // finite element, and the first
 				       // index the number of the
 				       // quadrature point
-  
+
 				       // store which number @p{cell} has
 				       // in the list of neighbors of
 				       // @p{neighbor}
@@ -656,7 +656,7 @@ namespace internal
 	= cell->neighbor_of_neighbor (face_no);
       Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell,
 	      ExcInternalError());
-  
+
 				       // loop over all subfaces
       for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
 	{
@@ -666,7 +666,7 @@ namespace internal
 	    = cell->neighbor_child_on_subface (face_no, subface_no);
 	  Assert (!neighbor_child->has_children(),
 		  ExcInternalError());
-      
+
 					   // restrict the finite element
 					   // on the present cell to the
 					   // subface
@@ -691,7 +691,7 @@ namespace internal
 	  for (unsigned int n=0; n<n_solution_vectors; ++n)
 	    fe_face_values.get_present_fe_values()
 	      .get_function_grads (*solutions[n], parallel_data.neighbor_psi[n]);
-      
+
 					   // compute the jump in the gradients
 	  for (unsigned int n=0; n<n_solution_vectors; ++n)
 	    for (unsigned int component=0; component<n_components; ++component)
@@ -706,7 +706,7 @@ namespace internal
 					   // have not to take care of
 					   // boundary faces here, since
 					   // they always are regular.
-      
+
 					   // next we have to multiply this with
 					   // the normal vector. Since we have
 					   // taken the difference of gradients
@@ -717,7 +717,7 @@ namespace internal
 					   // the outward normal.
 					   //
 					   // let phi be the name of the integrand
-     
+
 	  parallel_data.normal_vectors
 	    = fe_face_values.get_present_fe_values().get_normal_vectors();
 
@@ -727,7 +727,7 @@ namespace internal
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		parallel_data.phi[n][point][component] = (parallel_data.psi[n][point][component]*
 							  parallel_data.normal_vectors[point]);
-      
+
 					   // if a coefficient was given: use that
 					   // to scale the jump in the gradient
 	  if (parallel_data.coefficients != 0)
@@ -772,7 +772,7 @@ namespace internal
 					   // face of the big cell here
 	  parallel_data.JxW_values
 	    = fe_face_values.get_present_fe_values().get_JxW_values();
-      
+
 					   // take the square of the phi[i]
 					   // for integration, and sum up
 	  std::vector<double> face_integral (n_solution_vectors, 0);
@@ -793,14 +793,14 @@ namespace internal
 				       // subfaces and store them with the
 				       // mother face
       std::vector<double> sum (n_solution_vectors, 0);
-      for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no) 
+      for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
 	{
 	  Assert (local_face_integrals.find(face->child(subface_no)) !=
 		  local_face_integrals.end(),
 		  ExcInternalError());
 	  Assert (local_face_integrals[face->child(subface_no)][0] >= 0,
 		  ExcInternalError());
-      
+
 	  for (unsigned int n=0; n<n_solution_vectors; ++n)
 	    sum[n] += local_face_integrals[face->child(subface_no)][n];
 	}
@@ -818,7 +818,7 @@ namespace internal
 				      * The error estimator in one
 				      * dimension is implemented
 				      * seperatly.
-				      */    
+				      */
     template <int dim, int spacedim, typename InputVector, class DH>
     void
     estimate_one_cell (const typename DH::active_cell_iterator &cell,
@@ -827,14 +827,14 @@ namespace internal
 		       const std::vector<const InputVector*> &solutions)
     {
       const unsigned int n_solution_vectors = solutions.size();
-  
+
       const unsigned int subdomain_id = parallel_data.subdomain_id;
       const unsigned int material_id  = parallel_data.material_id;
 
 				       // empty our own copy of the local face
 				       // integrals
       local_face_integrals.clear();
-      
+
 				       // loop over all faces of this cell
       for (unsigned int face_no=0;
 	   face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
@@ -863,7 +863,7 @@ namespace internal
 		(cell->neighbor(face_no)->index() == cell->index() &&
 		 cell->neighbor(face_no)->level() < cell->level()))))
 	    continue;
-	  
+
 					   // if the neighboring cell is less
 					   // refined than the present one,
 					   // then do nothing since we
@@ -872,7 +872,7 @@ namespace internal
 	  if (cell->at_boundary(face_no) == false)
 	    if (cell->neighbor_is_coarser(face_no))
 	      continue;
-	  
+
 					   // if this face is part of the
 					   // boundary but not of the neumann
 					   // boundary -> nothing to
@@ -952,7 +952,7 @@ namespace internal
 					       // next face
 	      if (care_for_cell == false)
 		continue;
-	    }              
+	    }
 
 					   // so now we know that we care for
 					   // this face, let's do something
@@ -960,8 +960,8 @@ namespace internal
 					   // arrays we may use to the correct
 					   // size:
 	  parallel_data.resize (cell->active_fe_index());
-	  
-	  
+
+
 					   // then do the actual integration
 	  if (face->has_children() == false)
 					     // if the face is a regular one,
@@ -978,7 +978,7 @@ namespace internal
 					 cell, face_no,
 					 parallel_data.fe_face_values_cell,
 					 parallel_data.fe_face_values_neighbor);
-	  
+
 	  else
 					     // otherwise we need to do some
 					     // special computations which do
@@ -991,7 +991,7 @@ namespace internal
 					   parallel_data.fe_face_values_cell,
 					   parallel_data.fe_subface_values);
 	}
-    }    
+    }
   }
 }
 
@@ -1181,11 +1181,11 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 				   // sanity checks
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
-  
+
   for (FunctionMap<1>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
-    Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());  
-  
+    Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
+
   Assert ((component_mask_.size() == 0) ||
           (component_mask_.size() == n_components), ExcInvalidComponentMask());
   Assert ((component_mask_.size() == 0) ||
@@ -1196,8 +1196,8 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   Assert ((coefficient == 0) ||
 	  (coefficient->n_components == n_components) ||
 	  (coefficient->n_components == 1),
-	  ExcInvalidCoefficient());  
-  
+	  ExcInvalidCoefficient());
+
   Assert (solutions.size() > 0,
 	  ExcNoSolutions());
   Assert (solutions.size() == errors.size(),
@@ -1205,7 +1205,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   for (unsigned int n=0; n<solutions.size(); ++n)
     Assert (solutions[n]->size() == dof_handler.n_dofs(),
 	    ExcInvalidSolutionVector());
-  
+
 				   // if no mask given: treat all components
   std::vector<bool> component_mask ((component_mask_.size() == 0)    ?
 				    std::vector<bool>(n_components, true) :
@@ -1213,7 +1213,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
   Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcInvalidComponentMask());
-  
+
   Assert ((coefficient == 0) ||
 	  (coefficient->n_components == n_components) ||
 	  (coefficient->n_components == 1),
@@ -1253,7 +1253,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   if (coefficient == 0)
     for (unsigned int c=0; c<n_components; ++c)
       coefficient_values(c) = 1;
-  
+
   const QTrapez<1> quadrature;
   const hp::QCollection<1> q_collection(quadrature);
 
@@ -1261,10 +1261,10 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 
   hp::MappingCollection<1,spacedim> mapping_collection;
   mapping_collection.push_back (mapping);
-  
+
   hp::FEValues<1,spacedim> fe_values (mapping_collection, fe, q_collection,
 			     update_gradients);
-  
+
 				   // loop over all cells and do something on
 				   // the cells which we're told to work
 				   // on. note that the error indicator is
@@ -1283,7 +1283,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
       {
         for (unsigned int n=0; n<n_solution_vectors; ++n)
           (*errors[n])(cell_index) = 0;
-      
+
                                          // loop over the two points bounding
                                          // this line. n==0 is left point,
                                          // n==1 is right point
@@ -1295,7 +1295,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
             if (neighbor.state() == IteratorState::valid)
               while (neighbor->has_children())
                 neighbor = neighbor->child(n==0 ? 1 : 0);
-      
+
                                              // now get the gradients on the
                                              // both sides of the point
             fe_values.reinit (cell);
@@ -1334,7 +1334,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
                     {
                       const double
                         v = neumann_bc.find(n)->second->value(cell->vertex(0));
-		    
+
                       for (unsigned int s=0; s<n_solution_vectors; ++s)
                         grad_neighbor[s](0) = v;
                     }
@@ -1342,7 +1342,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
                     {
                       Vector<double> v(n_components);
                       neumann_bc.find(n)->second->vector_value(cell->vertex(0), v);
-		    
+
                       for (unsigned int s=0; s<n_solution_vectors; ++s)
                         grad_neighbor[s] = v;
                     }
@@ -1383,13 +1383,13 @@ estimate (const Mapping<1,spacedim>                    &mapping,
                                                      // other component
                                                      // in 1d)
                     const double grad_here = gradients_here[s][n][component][0];
-		  
+
                     const double jump = ((grad_here - grad_neighbor[s](component)) *
                                          coefficient_values(component));
                     (*errors[s])(cell_index) += jump*jump * cell->diameter();
                   }
           }
-      
+
         for (unsigned int s=0; s<n_solution_vectors; ++s)
           (*errors[s])(cell_index) = std::sqrt((*errors[s])(cell_index));
       }
@@ -1524,8 +1524,8 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   for (typename FunctionMap<dim>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components,
-            ExcInvalidBoundaryFunction());  
-  
+            ExcInvalidBoundaryFunction());
+
   Assert ((component_mask_.size() == 0) ||
           (component_mask_.size() == n_components), ExcInvalidComponentMask());
   Assert ((component_mask_.size() == 0) ||
@@ -1536,7 +1536,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   Assert ((coefficients == 0) ||
 	  (coefficients->n_components == n_components) ||
 	  (coefficients->n_components == 1),
-	  ExcInvalidCoefficient());  
+	  ExcInvalidCoefficient());
 
   for (unsigned int n=0; n<solutions.size(); ++n)
     Assert (solutions[n]->size() == dof_handler.n_dofs(),
@@ -1549,7 +1549,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
   Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcInvalidComponentMask());
-	  
+
   const unsigned int n_solution_vectors = solutions.size();
 
   				   // Map of integrals indexed by
@@ -1589,10 +1589,10 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
 				    _1, std_cxx1x::ref(face_integrals)),
 		   parallel_data,
 		   sample_local_face_integrals);
-  
+
 				   // finally add up the contributions of the
 				   // faces for each cell
-  
+
 				   // reserve one slot for each cell and set
 				   // it to zero
   for (unsigned int n=0; n<n_solution_vectors; ++n)
@@ -1626,7 +1626,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
                    != face_integrals.end(),
                    ExcInternalError());
             const double factor = cell->diameter() / 24;
-	  
+
             for (unsigned int n=0; n<n_solution_vectors; ++n)
               {
                                                  // make sure that we have
@@ -1634,7 +1634,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
                                                  // into this slot
                 Assert (face_integrals[cell->face(face_no)][n] >= 0,
                         ExcInternalError());
-                
+
                 (*errors[n])(present_cell)
                   += (face_integrals[cell->face(face_no)][n] * factor);
               }
@@ -1685,7 +1685,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                          const unsigned int       subdomain_id,
                                          const unsigned int       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));  
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
@@ -1706,7 +1706,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                          const unsigned int       subdomain_id,
                                          const unsigned int       material_id)
 {
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));  
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
