@@ -69,12 +69,12 @@
 				   // introduction, an <code>Epetra_Map</code>
 				   // is the Trilinos data structure for the
 				   // definition of which part of a
-				   // distributed vector is stored locally.
+				   // distributed vector is stored locally:
 #include <Epetra_Map.h>
 
 
 				 // Next, we import all deal.II
-				 // names into global namespace
+				 // names into global namespace:
 using namespace dealii;
 
 				 // @sect3{Equation data}
