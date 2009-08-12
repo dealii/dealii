@@ -28,8 +28,16 @@ The difference between @ref step_31 "step-31" and the current program is that
 here we want to do things in %parallel, using both the availability of many
 machines in a cluster (with parallelization based on MPI) as well as many
 processor cores within a single machine (with parallelization based on
-threads). This program's main job is therefore to discuss the changes that are
+threads). This program's main job is therefore to introduce the changes that are
 necessary to utilize the availability of these %parallel compute resources.
+
+In addition to these changes, we also use a slightly different preconditioner,
+which we will discuss first.
+
+
+<h3> Changes to the Stokes preconditioner </h3>
+
+TODO: MARTIN
 
 
 <h3> Parallelization on clusters </h3>
@@ -220,4 +228,4 @@ cores within the same machine if there is only a single MPI process in use.
 
 <h3> The testcase </h3>
 
-To be written.
+TODO: WOLFGANG
