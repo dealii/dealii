@@ -89,7 +89,7 @@ pressure mass matrix as approximation for $S^{-1}$, so it is at least as
 good as GMRES in this example. Keep in mind the discussion in the results
 section of the @ref step_22 "step-22" tutorial program, where we observed
 that BiCGStab does <i>not</i> like inner solves with CG, which made us
-choose GMRES in step-31
+prefer GMRES in step-31.
 
 <h3> Parallelization on clusters </h3>
 
@@ -254,26 +254,27 @@ We will comment on a few more points in the actual code, but in general
 their structure should be clear from the discussion in @ref threads.
 
 The underlying technology for WorkStream identifies "tasks" that need to be
-worked on (e.g. assembling local contributions on a cell) and schedules these
-tasks automatically to available processors. WorkStream creates these tasks
-automatically, by splitting the iterator range into suitable chunks, but as
-outlined in @ref threads, one can also create tasks explicitly. We use this in
-one place in the program, namely where we set up the Stokes system and
-preconditioner matrices as well as the temperature matrix. These are
-independent operations that, if enough processors are available, can be worked
-on in parallel (if not enough processors are available -- because the system
-has only one, or because the others are working on something else for us --
-then these tasks will be worked on sequentially). Consequently, 
-<code>BoussinesqFlowProblem::setup_dofs</code> creates tasks for the three calls
-to <code>BoussinesqFlowProblem::setup_stokes_matrix</code>,
+worked on (e.g. assembling local contributions on a cell) and schedules
+these tasks automatically to available processors. WorkStream creates these
+tasks automatically, by splitting the iterator range into suitable chunks,
+but as outlined in @ref threads, one can also create tasks explicitly. We
+use this in one place in the program, namely where we set up the Stokes
+system and preconditioner matrices as well as the temperature matrix. These
+are independent operations that, if enough processors are available, can be
+worked on in parallel (if not enough processors are available -- because the
+system has only one, or because the others are working on something else for
+us -- then these tasks will be worked on sequentially). Consequently,
+<code>BoussinesqFlowProblem::setup_dofs</code> creates tasks for the three
+calls to <code>BoussinesqFlowProblem::setup_stokes_matrix</code>,
 <code>BoussinesqFlowProblem::setup_stokes_preconditioner</code>, and
 <code>BoussinesqFlowProblem::setup_temperature_matrices</code> that are then
-scheduled to available resources. There is one problem with this, however: if
-we have more than MPI process running in parallel, then all of these processes
-need to communicate in a certain order and that requires that the various
-<code>setup_*</code> functions can't run in parallel. For these setup
-operations, we will therefore only be able to make use of multiple processor
-cores within the same machine if there is only a single MPI process in use.
+scheduled to available resources. There is one problem with this, however:
+if we have more than one MPI process running in parallel, then all of these
+processes need to communicate in a certain order and that requires that the
+various <code>setup_*</code> functions can't run in parallel. For these
+setup operations, we will therefore only be able to make use of multiple
+processor cores within the same machine if there is only a single MPI
+process in use.
 
 
 
