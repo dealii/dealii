@@ -1257,7 +1257,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 }
 
 
-				 // @sect4{BoussinesqFlowProblem::setup_*}
+				 // @sect4{The BoussinesqFlowProblem setup functions}
 
 				 // The following three functions set
 				 // up the Stokes matrix, the matrix
@@ -1411,9 +1411,6 @@ void BoussinesqFlowProblem<dim>::setup_temperature_matrices ()
 
 
 
-
-				 // @sect4{BoussinesqFlowProblem::setup_dofs}
-
 				 // The remainder of the setup function
 				 // (after splitting out the three functions
 				 // above) mostly has to deal with the
@@ -1453,16 +1450,25 @@ void BoussinesqFlowProblem<dim>::setup_temperature_matrices ()
 				 // After this, we have to set up the
 				 // various partitioners (of type
 				 // <code>Epetra_Map</code>, see the
-				 // introduction) that describe which
-				 // parts of each matrix or vector
-				 // will be stored where, then call
-				 // the functions that actually set up
-				 // the matrices (concurrently if on a
-				 // single processor, but sequentially
-				 // if we need MPI communications),
-				 // and at the end also resize the
-				 // various vectors we keep around in
-				 // this program.
+				 // introduction) that describe which parts
+				 // of each matrix or vector will be stored
+				 // where, then call the functions that
+				 // actually set up the matrices
+				 // (concurrently if on a single processor,
+				 // but sequentially if we need MPI
+				 // communications), and at the end also
+				 // resize the various vectors we keep
+				 // around in this program. We given those
+				 // vectors the correct size using the
+				 // aforementioned Epetra_Map. Most of the
+				 // vectors are actually localized, i.e.,
+				 // they store all dofs in the problem on
+				 // each processor. In that case, the only
+				 // information that is used is the global
+				 // size. This is different for the two
+				 // right hand side vectors, which are
+				 // distributed ones, see also the class
+				 // declaration.
 				 //
 				 // Note how this function enters and leaves
 				 // a timed section so that we can get a
@@ -1596,8 +1602,31 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 }
 
 
-				 // @sect4{The BoussinesqFlowProblem assembly functions}
 
+				 // @sect4{The BoussinesqFlowProblem assembly functions}
+				 // 
+				 // According to the discussion in the
+				 // introduction, we split the assembly
+				 // functions into differrent parts. The
+				 // first part is to do the local
+				 // calculations of matrices and right hand
+				 // sides, given a certain cell as
+				 // input. This is done in the same way as
+				 // in step-31. Note that these functions
+				 // store the result from the local
+				 // calculations in variables contained in
+				 // the CopyData namespace, which are then
+				 // given to the second step which writes
+				 // the local data into the global data
+				 // structures. These two subfunctions are
+				 // then used in the respective assembly
+				 // routine, where a WorkStream object is
+				 // set up and runs over all the cells that
+				 // belong to the processor's subdomain.
+				 // 
+				 // We start the implementation with the
+				 // assembly functions for the Stokes
+				 // preconditioner.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::
@@ -1648,6 +1677,48 @@ copy_local_to_global_stokes_preconditioner (const Assembly::CopyData::StokesPrec
 }
 
 
+
+				 // When we create the WorkStream, we modify
+				 // the start and end iterator into a
+				 // so-called <code>SubdomainFilter</code>
+				 // that tells the individual processes on
+				 // which cells to work on. This is exactly
+				 // the case discussed in the
+				 // introduction. Note how we use the
+				 // construct <code>std_cxx1x::bind</code>
+				 // to create a function object that is
+				 // compatible with the WorkStream class. It
+				 // uses placeholders <code>1_, 2_,
+				 // 3_</code> for the local assembly
+				 // function that specify cell, scratch
+				 // data, and copy data, as well as the
+				 // placeholder <code>1_</code> for the copy
+				 // function that expects the data to be
+				 // written into the global matrix. When the
+				 // WorkStream is executed, it will create
+				 // several local assembly routines of the
+				 // first kind for several cells and let
+				 // some available processors work on
+				 // them. The function that needs to be
+				 // synchronized, i.e., the write operation
+				 // into the global matrix, however, is
+				 // executed by only one thread at a time in
+				 // the prescribed order. Of course, this
+				 // only holds for the parallelization on a
+				 // single MPI process. Different MPI
+				 // processes will have their own WorkStream
+				 // objects and do that work completely
+				 // independently. In a distributed
+				 // calculation, some data will accumulate
+				 // at degrees of freedom that are not owned
+				 // by the respective processor. It would be
+				 // inefficient to send data around every
+				 // time we encounter such a dof. What
+				 // happens instead is that the Trilinos
+				 // sparse matrix will keep that data and
+				 // send it to the owner at the end of
+				 // assembly, by calling the
+				 // <code>compress()</code> command.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
