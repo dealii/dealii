@@ -1,10 +1,10 @@
 <br>
 
 <i>This program was contributed by Martin Kronbichler and Wolfgang
-Bangerth. 
+Bangerth.
 <br>
 This material is based upon work partly supported by the National
-Science Foundation under Award No. EAR-0426271 and The California Institute of 
+Science Foundation under Award No. EAR-0426271 and The California Institute of
 Technology. Any opinions, findings, and conclusions or recommendations
 expressed in this publication are those of the author and do not
 necessarily reflect the views of the National Science Foundation or of The
@@ -42,13 +42,13 @@ In this tutorial program, we apply a variant of the preconditioner used in
 system matrix <i>M</i> in block form such that the product matrix
 @f{eqnarray*}
   P^{-1} M
-  = 
+  =
   \left(\begin{array}{cc}
     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
-  \end{array}\right) 
+  \end{array}\right)
   \left(\begin{array}{cc}
     A & B^T \\ B & 0
-  \end{array}\right) 
+  \end{array}\right)
 @f}
 is of a form that Krylov-based iterative solvers like GMRES can solve in a
 few iterations. We then replaced the exact inverse of <i>A</i> by the action
@@ -96,7 +96,7 @@ prefer GMRES in step-31.
 Parallelization of scientific codes across multiple machines in a cluster of
 computers is almost always done using the Message Passing Interface
 (MPI). This program is no exception to that, and it follows the
-@ref step_17 "step-17" and @ref step_18 "step-18" programs in this. 
+@ref step_17 "step-17" and @ref step_18 "step-18" programs in this.
 
 MPI is a rather awkward interface to program with, and so we usually try to
 not use it directly but through an interface layer that abstracts most of the
@@ -111,7 +111,7 @@ easy to use as some other libraries. As a consequence, deal.II also has
 interfaces to Trilinos, a library similar to PETSc in its aims and with a lot
 of the same functionality. It is, however, a project that is several years
 younger, is written in C++ and by people who generally have put a significant
-emphasis on software design. We have already used Trilinos in 
+emphasis on software design. We have already used Trilinos in
 @ref step_31 "step-31", and will do so again here, with the difference that we
 will use its %parallel capabilities.
 
@@ -122,7 +122,7 @@ same as deal.II's own implementations of this functionality. However, as
 opposed to deal.II's classes, they can be used in %parallel if we give them the
 necessary information. As a consequence, there are two Trilinos classes that
 we have to deal with directly (rather than through wrappers), both of which
-are part of Trilinos' Epetra library of basic linear algebra and tool classes: 
+are part of Trilinos' Epetra library of basic linear algebra and tool classes:
 <ul>
 <li> The Epetra_Comm class is an abstraction of an MPI "communicator", i.e.
   it describes how many and which machines can communicate with each other.
@@ -215,7 +215,7 @@ contributions. The third part, copying into the global matrix, must not happen
 in %parallel since we are modifying one object and so several threads can not
 at the same time read an existing matrix element, add their contribution, and
 write the sum back into memory without danger of producing a <a
-href="http://en.wikipedia.org/wiki/Race_condition">race condition</a>. 
+href="http://en.wikipedia.org/wiki/Race_condition">race condition</a>.
 
 deal.II has a class that is made for exactly this workflow: WorkStream. Its
 use is extensively documented in the module on @ref threads (in the section
@@ -276,6 +276,12 @@ setup operations, we will therefore only be able to make use of multiple
 processor cores within the same machine if there is only a single MPI
 process in use.
 
+
+<h3> Implementation details </h3>
+
+TODO: Wolfgang
+Mention that we immediately localize all solution vectors after
+solving.
 
 
 <h3> The testcase </h3>
