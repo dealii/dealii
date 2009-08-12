@@ -928,7 +928,7 @@ class BoussinesqFlowProblem
 				 // The constructor of the problem is very
 				 // similar to the constructor in
 				 // step-31. What is different is the
-				 // %parallel communication: Trilins uses a
+				 // %parallel communication: Trilinos uses a
 				 // message passing interface (MPI) for
 				 // data distribution. When entering the
 				 // BoussinesqFlowProblem class, we have
