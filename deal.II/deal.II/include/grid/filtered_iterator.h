@@ -208,6 +208,9 @@ namespace IteratorFilters
  * called with a pair of iterators denoting a range on which they
  * shall act, by choosing a filtered iterator instead of usual ones.
  *
+ * This class is used in @ref step_18 "step-18" and
+ * @ref step_32 "step-32".
+ *
  *
  * <h3>Predicates</h3>
  *
