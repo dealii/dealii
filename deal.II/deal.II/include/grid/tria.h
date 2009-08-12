@@ -171,10 +171,10 @@ namespace internal
 				 /**
 				  * A namespace for classes internal to the
 				  * triangulation classes and helpers.
-				  */  
+				  */
   namespace Triangulation
   {
-    
+
 /**
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
@@ -210,7 +210,7 @@ namespace internal
  * @author Wolfgang Bangerth, 1999
  */
     template <>
-    struct NumberCache<1> 
+    struct NumberCache<1>
     {
                                          /**
                                           * Number of used lines in the whole
@@ -223,7 +223,7 @@ namespace internal
                                           * lines on each level.
                                           */
         std::vector<unsigned int> n_lines_level;
-    
+
                                          /**
                                           * Number of active lines in the
                                           * whole triangulation.
@@ -281,7 +281,7 @@ namespace internal
                                           * quads on each level.
                                           */
         std::vector<unsigned int> n_quads_level;
-    
+
                                          /**
                                           * Number of active quads in the
                                           * whole triangulation.
@@ -340,7 +340,7 @@ namespace internal
                                           * hexes on each level.
                                           */
         std::vector<unsigned int> n_hexes_level;
-    
+
                                          /**
                                           * Number of active hexes in the
                                           * whole triangulation.
@@ -375,15 +375,15 @@ namespace internal
 
 /**
  *  Triangulations denote a hierarchy of levels of elements which together
- *  form a @p dim -dimensional manifold in @p spacedim spatial dimensions 
+ *  form a @p dim -dimensional manifold in @p spacedim spatial dimensions
  *  (if spacedim is not specified it takes the default value @ spacedim=dim).
- *  
- *  Thus, for example, an object of type @p Triangulation<1,1> (or simply 
- *  @p Triangulation<1> since @p spacedim==dim by default) is used to represent 
- *  and handle the usual one-dimensional triangulation used in the finite 
- *  element method (so, segments on a straight line). On the other hand, 
- *  objects such as @p Triangulation<1,2> or @p Triangulation<2,3> (that 
- *  are associated with curves in 2D or surfaces in 3D) 
+ *
+ *  Thus, for example, an object of type @p Triangulation<1,1> (or simply
+ *  @p Triangulation<1> since @p spacedim==dim by default) is used to represent
+ *  and handle the usual one-dimensional triangulation used in the finite
+ *  element method (so, segments on a straight line). On the other hand,
+ *  objects such as @p Triangulation<1,2> or @p Triangulation<2,3> (that
+ *  are associated with curves in 2D or surfaces in 3D)
  *  are the ones one wants to use in the boundary element method.
  *
  *  This class is written to be as independent of the dimension as possible
@@ -405,7 +405,7 @@ namespace internal
  *  concept of iterators (see the STL documentation and TriaRawIterator).
  *  In order to make things as easy and dimension independent as possible,
  *  use of class local typedefs is made, see below.
- *  
+ *
  *  The Triangulation class provides iterator which enable looping over all
  *  lines, cells, etc without knowing the exact representation used to
  *  describe them. Their names are typedefs imported from the Iterators
@@ -414,7 +414,7 @@ namespace internal
  *  <ul>
  *  <li> @p raw_line_iterator: loop over all lines, used or not (declared for
  *  all dimensions).
- *  
+ *
  *  <li> @p line_iterator: loop over all used lines (declared for all dimensions).
  *
  *  <li> @p active_line_iterator: loop over all active lines (declared for all
@@ -422,7 +422,7 @@ namespace internal
  *
  *  <li> @p raw_quad_iterator: loop over all quads, used or not (declared only
  *  for <tt>dim>=2</tt>).
- *  
+ *
  *  <li> @p quad_iterator: loop over all quads (declared only for @p dim>=2).
  *
  *  <li> @p active_quad_iterator: loop over all active quads (declared only for
@@ -437,13 +437,13 @@ namespace internal
  *  @endverbatim
  *  while for @p dim==2
  *  @verbatim
- *    typedef quad_line_iterator   raw_cell_iterator;    
+ *    typedef quad_line_iterator   raw_cell_iterator;
  *    typedef quad_iterator        cell_iterator;
  *    typedef active_quad_iterator active_cell_iterator;
  *
  *    typedef raw_line_iterator    raw_face_iterator;
  *    typedef line_iterator        face_iterator;
- *    typedef active_line_iterator active_face_iterator;    
+ *    typedef active_line_iterator active_face_iterator;
  *  @endverbatim
  *
  *  By using the cell iterators, you can write code nearly independent of
@@ -459,7 +459,7 @@ namespace internal
  *  Usage of these iterators works mostly like with the STL iterators. Some
  *  examples taken from the Triangulation source code follow (notice that in the last
  *  two examples the template parameter @p spacedim has been omitted, so it takes
- *  the default value @ dim).
+ *  the default value <code>dim</code>).
  *  <ul>
  *  <li> <em>Counting the number of cells on a specific level</em>
  *    @verbatim
@@ -484,9 +484,9 @@ namespace internal
  *                   begin (level+1)),
  *                  n);
  *        return n;
- *      };  
+ *      };
  *    @endverbatim
- *    
+ *
  *  <li> <em>Refining all cells of a triangulation</em>
  *    @verbatim
  *      template <int dim>
@@ -515,7 +515,7 @@ namespace internal
  *                                     // we want to log the
  *                                     // refinement history
  *    ofstream history ("mesh.history");
- *    
+ *
  *                                     // refine first cell
  *    tria.begin_active()->set_refine_flag();
  *    tria.save_refine_flags (history);
@@ -526,9 +526,9 @@ namespace internal
  *    tria.begin_active()->set_refine_flag ();
  *    tria.save_refine_flags (history);
  *    tria.execute_coarsening_and_refinement ();
- *    
+ *
  *    Triangulation<2>::active_cell_iterator cell;
- *    for (int i=0; i<17; ++i) 
+ *    for (int i=0; i<17; ++i)
  *      {
  *                                         // refine the presently
  *                                         // second last cell 17
@@ -542,10 +542,10 @@ namespace internal
  *                                       // output the grid
  *    ofstream out("grid.1");
  *    GridOut::write_gnuplot (tria, out);
- *  };  
+ *  };
  *  @endverbatim
  *
- *  
+ *
  *  <h3>Creating a triangulation</h3>
  *
  *  There are several possibilities to create a triangulation:
@@ -556,7 +556,7 @@ namespace internal
  *       generalizations and others, are provided by the GridGenerator
  *       class which takes a triangulation and fills it by a division
  *       of the required domain.
- *   
+ *
  *     <li> Reading in a triangulation: By using an object of the GridIn
  *        class, you can read in fairly general triangulations. See there for
  *        more information. The mentioned class uses the interface described
@@ -878,7 +878,7 @@ namespace internal
  *     This flag includes all the above ones and therefore combines all
  *     smoothing algorithms implemented.
  *
- *   <li> @p allow_anisotropic_smoothing: 
+ *   <li> @p allow_anisotropic_smoothing:
  *     This flag is not included in @p maximum_smoothing. The flag is
  *     concerned with the following case: consider the case that an
  *     unrefined and a refined cell share a common face and that one
@@ -980,7 +980,7 @@ namespace internal
  *       ...;
  *       tria.save_refine_flags (history);
  *       tria.execute_coarsening_and_refinement ();
- *     };        
+ *     };
  *   @endverbatim
  *
  *   If you want to re-create the grid from the stored information, you write:
@@ -991,7 +991,7 @@ namespace internal
  *     for (int step=0; step<10; ++step) {
  *       tria.load_refine_flags (history);
  *       tria.execute_coarsening_and_refinement ();
- *     };        
+ *     };
  *   @endverbatim
  *
  *   The same scheme is employed for coarsening and the coarsening flags.
@@ -1072,7 +1072,7 @@ namespace internal
  *
  *   Just like the user flags, this field is not available for vertices,
  *   which does no harm since the vertices have a unique and continuous number
- *   unlike the structured objects lines and quads. 
+ *   unlike the structured objects lines and quads.
  *
  *
  *   <h3>Boundary approximation</h3>
@@ -1084,7 +1084,7 @@ namespace internal
  *   determine the proper component. See Boundary for the
  *   details. Usage with the Triangulation object is then like this
  *   (let @p Ball be a class derived from Boundary<tt><2></tt>):
- * 
+ *
  *   @verbatim
  *     void main () {
  *       Triangulation<2> tria;
@@ -1098,7 +1098,7 @@ namespace internal
  *
  *
  *       Triangulation<2>::active_cell_iterator cell, endc;
- *       for (int i=0; i<8; ++i) 
+ *       for (int i=0; i<8; ++i)
  *         {
  *           cell = tria.begin_active();
  *           endc = tria.end();
@@ -1111,7 +1111,7 @@ namespace internal
  *
  *           tria.execute_coarsening_and_refinement();
  *         };
- *     };            
+ *     };
  *   @endverbatim
  *
  *   You should take note of one caveat: if you have concave
@@ -1210,7 +1210,7 @@ namespace internal
  *   apply some smoothing for multigrid algorithms, but this has to be decided
  *   upon later.
  *
- *   
+ *
  *   <h3>Warning</h3>
  *
  *   It seems impossible to preserve @p constness of a triangulation through
@@ -1232,7 +1232,7 @@ class Triangulation : public Subscriptor
 				      * classes simpler.
 				      */
     typedef internal::Triangulation::Iterators<dim, spacedim> IteratorSelector;
-		      
+
   public:
 				     /**
 				      * Default boundary object. This is used
@@ -1242,7 +1242,7 @@ class Triangulation : public Subscriptor
 				      */
     static const StraightBoundary<dim,spacedim> straight_boundary;
 
-				     /** 
+				     /**
 				      * Default boundary object to be
 				      * used in the codimension 1
 				      * case.  This is used for those
@@ -1262,26 +1262,26 @@ class Triangulation : public Subscriptor
     enum MeshSmoothing
     {
 	  none                               = 0x0,
-	  limit_level_difference_at_vertices = 0x1,     
+	  limit_level_difference_at_vertices = 0x1,
 	  eliminate_unrefined_islands        = 0x2,
 	  patch_level_1                      = 0x4,
 	  coarsest_level_1                   = 0x8,
 
 	  allow_anisotropic_smoothing        = 0x10,
-	  
+
 	  eliminate_refined_inner_islands    = 0x100,
 	  eliminate_refined_boundary_islands = 0x200,
 	  do_not_produce_unrefined_islands   = 0x400,
-	  
+
 	  smoothing_on_refinement            = (limit_level_difference_at_vertices |
 						eliminate_unrefined_islands),
 	  smoothing_on_coarsening            = (eliminate_refined_inner_islands |
 						eliminate_refined_boundary_islands |
 						do_not_produce_unrefined_islands),
-	  
+
 	  maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
     };
-    
+
 
     typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
@@ -1302,9 +1302,9 @@ class Triangulation : public Subscriptor
     typedef typename IteratorSelector::raw_face_iterator    raw_face_iterator;
     typedef typename IteratorSelector::face_iterator        face_iterator;
     typedef typename IteratorSelector::active_face_iterator active_face_iterator;
-    
+
 				     /**
-				      *  Base class for refinement listeners. 
+				      *  Base class for refinement listeners.
 				      *  Other classes, which need to be
 				      *  informed about refinements of the
 				      *  Triangulation,
@@ -1332,7 +1332,7 @@ class Triangulation : public Subscriptor
                                           * class also has virtual functions.
                                           */
         virtual ~RefinementListener ();
-        
+
                                          /**
                                           * Before refinement is actually
                                           * performed, the triangulation class
@@ -1343,7 +1343,7 @@ class Triangulation : public Subscriptor
         virtual
         void
         pre_refinement_notification (const Triangulation<dim, spacedim> &tria);
-        
+
                                          /**
                                           * After refinement is actually
                                           * performed, the triangulation class
@@ -1428,8 +1428,8 @@ class Triangulation : public Subscriptor
 	std::list<typename Triangulation<dim,spacedim>::cell_iterator>
 	distorted_cells;
     };
-    
-    
+
+
 				     /**
 				      * Make the dimension available
 				      * in function templates.
@@ -1482,7 +1482,7 @@ class Triangulation : public Subscriptor
 				      *  avoid copies.
 				      */
     Triangulation (const Triangulation<dim, spacedim> &t);
-    
+
 				     /**
 				      *  Delete the object and all levels of
 				      *  the hierarchy.
@@ -1509,8 +1509,8 @@ class Triangulation : public Subscriptor
 				      * triangulation is empty.
 				      */
     void set_mesh_smoothing(const MeshSmoothing mesh_smoothing);
-    
-				     /**					
+
+				     /**
 				      * If @p dim==spacedim, assign a boundary
 				      * object to a certain part of the
 				      * boundary of a the triangulation. If a
@@ -1521,7 +1521,7 @@ class Triangulation : public Subscriptor
 				      * non-linear (i.e.: non-Q1)
 				      * transformations of cells to the unit
 				      * cell in shape function calculations.
-				      * 
+				      *
 				      * If @p dim!=spacedim the boundary object
 				      * is in fact the exact manifold that the
 				      * triangulation is approximating (for
@@ -1575,7 +1575,7 @@ class Triangulation : public Subscriptor
                                       * same name and two arguments.
                                       */
     void set_boundary (const unsigned int number);
-    
+
 				     /**
 				      * Return a constant reference to
 				      * a boundary object used for
@@ -1599,7 +1599,7 @@ class Triangulation : public Subscriptor
 				      * or equal one).
 				      */
     std::vector<unsigned char> get_boundary_indicators() const;
-    
+
 				     /**
 				      *  Copy a triangulation. This
 				      *  operation is not cheap, so
@@ -1846,7 +1846,7 @@ class Triangulation : public Subscriptor
 				      * class).
 				      */
     virtual void execute_coarsening_and_refinement ();
-    
+
 				     /**
 				      * Do both preparation for
 				      * refinement and coarsening as
@@ -1866,7 +1866,7 @@ class Triangulation : public Subscriptor
 				      * returns whether additional
 				      * cells have been flagged for
 				      * refinement.
-				      *  
+				      *
 				      * See the general doc of this
 				      * class for more information on
 				      * smoothing upon refinement.
@@ -1875,7 +1875,7 @@ class Triangulation : public Subscriptor
 				      * flagging and deflagging cells
 				      * in preparation of the actual
 				      * coarsening step are done. This
-				      * includes deleting coarsen 
+				      * includes deleting coarsen
 				      * flags from cells which may not
 				      * be deleted (e.g. because one
 				      * neighbor is more refined
@@ -1900,7 +1900,7 @@ class Triangulation : public Subscriptor
 				      * still need them afterwards.
 				      */
     bool prepare_coarsening_and_refinement ();
-    
+
 				     /**
 				      *  Add a
 				      *  RefinementListener. Adding
@@ -2114,7 +2114,7 @@ class Triangulation : public Subscriptor
 				      * both for next access.
 				      */
     void clear_user_data ();
-    
+
 				     /**
 				      * @deprecated User
 				      * clear_user_data() instead.
@@ -2122,7 +2122,7 @@ class Triangulation : public Subscriptor
 				      *  Clear all user pointers.
 				      */
     void clear_user_pointers ();
-    
+
 				     /**
 				      * Save all user indices. The
 				      * output vector is resized if
@@ -2226,8 +2226,8 @@ class Triangulation : public Subscriptor
 				      */
     void load_user_pointers_hex (const std::vector<void *> &v);
 				     /*@}*/
-    
-    
+
+
 				     /**
 				      *  @name Cell iterator functions
 				      */
@@ -2279,7 +2279,7 @@ class Triangulation : public Subscriptor
 				      * <tt>end()</tt>.
 				      */
     cell_iterator        end (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
@@ -2362,7 +2362,7 @@ class Triangulation : public Subscriptor
 				     /**
 				      *  Iterator to the first face, used
 				      *  or not. As faces have no level,
-				      *  no argument can be given. 
+				      *  no argument can be given.
 				      *
 				      *  This function calls @p begin_raw_line
 				      *  in 2D and @p begin_raw_quad in 3D.
@@ -2455,7 +2455,7 @@ class Triangulation : public Subscriptor
 				      *  If lines are no cells, i.e. for @p dim>1
 				      *  no @p level argument must be given.
 				      *  The same applies for all the other functions
-				      *  above, of course. 
+				      *  above, of course.
 				      */
     raw_line_iterator
     begin_raw_line   (const unsigned int level = 0) const;
@@ -2490,7 +2490,7 @@ class Triangulation : public Subscriptor
 				      * <tt>end()</tt>.
 				      */
     line_iterator        end_line (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
@@ -2548,7 +2548,7 @@ class Triangulation : public Subscriptor
 				      */
     active_line_iterator
     last_active_line (const unsigned int level) const;
-				     /*@}*/	  
+				     /*@}*/
 
 				     /*---------------------------------------*/
 
@@ -2564,7 +2564,7 @@ class Triangulation : public Subscriptor
 				      *  is returned.
 				      *  If quads are no cells, i.e. for $dim>2$
 				      *  no level argument must be given.
-				     
+
 				      */
     raw_quad_iterator
     begin_raw_quad   (const unsigned int level = 0) const;
@@ -2598,7 +2598,7 @@ class Triangulation : public Subscriptor
 				      * <tt>end()</tt>.
 				      */
     quad_iterator        end_quad (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
@@ -2705,7 +2705,7 @@ class Triangulation : public Subscriptor
 				      * <tt>end()</tt>.
 				      */
     hex_iterator        end_hex (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
@@ -2767,7 +2767,7 @@ class Triangulation : public Subscriptor
 				     /*@}*/
 
 				     /*---------------------------------------*/
-    
+
 				     /**
 				      * @name Information about the triangulation
 				      */
@@ -2789,7 +2789,7 @@ class Triangulation : public Subscriptor
 				      * are faces in 2D and therefore
 				      * have no level.
 				      */
-    
+
 				     /**
 				      * Total Number of lines, used or
 				      * unused.
@@ -2807,24 +2807,24 @@ class Triangulation : public Subscriptor
 				      *  active or not.
 				      */
     unsigned int n_lines () const;
-    
+
 				     /**
 				      *  Return total number of used lines,
 				      *  active or not on level @p level.
 				      */
     unsigned int n_lines (const unsigned int level) const;
-    
+
 				     /**
 				      * Return total number of active lines.
 				      */
     unsigned int n_active_lines () const;
-    
+
 				     /**
 				      *  Return total number of active lines,
 				      *  on level @p level.
 				      */
     unsigned int n_active_lines (const unsigned int level) const;
-    
+
 				     /**
 				      * Total number of quads, used or
 				      * unused.
@@ -2848,19 +2848,19 @@ class Triangulation : public Subscriptor
 				      *  active or not on level @p level.
 				      */
     unsigned int n_quads (const unsigned int level) const;
-    
+
 				     /**
 				      *  Return total number of active quads,
 				      *  active or not.
 				      */
     unsigned int n_active_quads () const;
-    
+
 				     /**
 				      *  Return total number of active quads,
 				      *  active or not on level @p level.
 				      */
     unsigned int n_active_quads (const unsigned int level) const;
-    
+
 				     /**
 				      * Total number of hexs, used or
 				      * unused.
@@ -2884,13 +2884,13 @@ class Triangulation : public Subscriptor
 				      *  active or not on level @p level.
 				      */
     unsigned int n_hexs(const unsigned int level) const;
-    
+
 				     /**
 				      *  Return total number of active hexahedra,
 				      *  active or not.
 				      */
     unsigned int n_active_hexs() const;
-    
+
 				     /**
 				      *  Return total number of active hexahedra,
 				      *  active or not on level @p level.
@@ -3023,7 +3023,7 @@ class Triangulation : public Subscriptor
 				      * with this @p index is used.
 				      */
     bool vertex_used (const unsigned int index) const;
-    
+
 				     /**
 				      * Return a constant reference to
 				      * the array of @p bools
@@ -3033,7 +3033,7 @@ class Triangulation : public Subscriptor
 				      */
     const std::vector<bool> &
     get_used_vertices () const;
-    
+
 				     /**
 				      * Return the maximum number of
 				      * cells meeting at a common
@@ -3073,7 +3073,7 @@ class Triangulation : public Subscriptor
 				      * derived class.
 				      */
     virtual unsigned int memory_consumption () const;
-    
+
 
 				     /**
 				      *  @name Exceptions
@@ -3190,7 +3190,7 @@ class Triangulation : public Subscriptor
 				      * function).
 				      */
     void clear_despite_subscriptions ();
-    
+
 				     /**
 				      *  Refine all cells on all levels which
 				      *  were previously flagged for refinement.
@@ -3206,7 +3206,7 @@ class Triangulation : public Subscriptor
 				      *  children that satisfy the
 				      *  criteria of
 				      *  @ref GlossDistorted "distorted cells".
-				      */ 
+				      */
     DistortedCellList execute_refinement ();
 
 				     /**
@@ -3314,7 +3314,7 @@ class Triangulation : public Subscriptor
 				      *  List of RefinementListeners,
 				      *  which want to be informed if the
 				      *  Triangulation is refined.
-				      */    
+				      */
     mutable std::list<RefinementListener *> refinement_listeners;
 
 				     // make a couple of classes
@@ -3323,8 +3323,8 @@ class Triangulation : public Subscriptor
     template <int,int,int> friend class TriaAccessor;
     friend class CellAccessor<dim, spacedim>;
 
-    friend class internal::TriaAccessor::Implementation;    
-    
+    friend class internal::TriaAccessor::Implementation;
+
     friend class hp::DoFHandler<dim,spacedim>;
 
     friend class internal::Triangulation::Implementation;
