@@ -1,6 +1,6 @@
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
-   Wolfgang Bangerth, Texas A&M University 2007, 2008, 2009 */
+           Wolfgang Bangerth, Texas A&M University 2007, 2008, 2009 */
 /*                                                                */
 /*    Copyright (C) 2008, 2009 by the deal.II authors */
 /*                                                                */
@@ -264,30 +264,40 @@ namespace LinearSolvers
 
 
 				 // @sect3{Definition of assembly data structures}
-				 // 
-				 // This is a collection of data
-				 // structures that we use for assembly in
-				 // %parallel. The concept of this
-				 // task-based parallelization is
-				 // described in detail @ref MTWorkStream
-				 // "here". Each assembly routine gets two
-				 // sets of data: a Scratch array that
-				 // collects all the classes and arrays
-				 // that are used for the calculation of
-				 // the cell contribution, and a CopyData
-				 // array that keeps local matrices and
-				 // vectors which will be written into the
+				 //
+				 // As described in the introduction, we will
+				 // use the WorkStream mechanism discussed in
+				 // the @ref threads module to parallelize
+				 // operations among the processors of a
+				 // single machine. The WorkStream class
+				 // requires that data is passed around in two
+				 // kinds of data structures, one for scratch
+				 // data and one to pass data from the
+				 // assembly function to the function that
+				 // copies local contributions into global
+				 // objects.
+				 //
+				 // The following namespace (and the two
+				 // sub-namespaces) contains a collection of
+				 // data structures that serve this purpose,
+				 // one pair for each of the four operations
+				 // discussed in the introduction that we will
+				 // want to parallelize. Each
+				 // assembly routine gets two sets of data: a
+				 // Scratch array that collects all the
+				 // classes and arrays that are used for the
+				 // calculation of the cell contribution, and
+				 // a CopyData array that keeps local matrices
+				 // and vectors which will be written into the
 				 // global matrix. Whereas CopyData is a
 				 // container for the final data that is
 				 // written into the global matrices and
-				 // vector (and, thus, absolutely
-				 // necessary), the Scratch arrays are
-				 // merely there for performance reasons
-				 // &mdash; it would be much more
-				 // expensive to set up a FEValues object
-				 // on each cell, than creating it only
-				 // once and updating some derivative
-				 // data.
+				 // vector (and, thus, absolutely necessary),
+				 // the Scratch arrays are merely there for
+				 // performance reasons &mdash; it would be
+				 // much more expensive to set up a FEValues
+				 // object on each cell, than creating it only
+				 // once and updating some derivative data.
 				 //
 				 // Using the program in step-31, we have
 				 // four assembly routines. One for the
