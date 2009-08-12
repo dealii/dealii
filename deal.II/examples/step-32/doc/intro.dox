@@ -184,19 +184,19 @@ and per-cell data. Suffice it to mention that we need the following:
   above, i.e. functions that assemble the local contributions to Stokes matrix
   and preconditioner, temperature matrix, and temperature right hand
   side. These are the
-  <code>BoussinesqProblem::local_assemble_stokes_system</code>,
-  <code>BoussinesqProblem::local_assemble_stokes_preconditioner</code>,
-  <code>BoussinesqProblem::local_assemble_temperature_matrix</code>, and
-  <code>BoussinesqProblem::local_assemble_temperature_rhs</code> functions in
+  <code>BoussinesqFlowProblem::local_assemble_stokes_system</code>,
+  <code>BoussinesqFlowProblem::local_assemble_stokes_preconditioner</code>,
+  <code>BoussinesqFlowProblem::local_assemble_temperature_matrix</code>, and
+  <code>BoussinesqFlowProblem::local_assemble_temperature_rhs</code> functions in
   the code below. These four functions can all have several instances of each
   running in %parallel.
 
 - %Functions that copy the result of the previous ones into the global object
   and that run sequentially to avoid race conditions. These are the
-  <code>BoussinesqProblem::copy_local_to_global_stokes_system</code>,
-  <code>BoussinesqProblem::copy_local_to_global_stokes_preconditioner</code>,
-  <code>BoussinesqProblem::copy_local_to_global_temperature_matrix</code>, and
-  <code>BoussinesqProblem::copy_local_to_global_temperature_rhs</code>
+  <code>BoussinesqFlowProblem::copy_local_to_global_stokes_system</code>,
+  <code>BoussinesqFlowProblem::copy_local_to_global_stokes_preconditioner</code>,
+  <code>BoussinesqFlowProblem::copy_local_to_global_temperature_matrix</code>, and
+  <code>BoussinesqFlowProblem::copy_local_to_global_temperature_rhs</code>
   functions.
 
 We will comment on a few more points in the actual code, but in general their
@@ -213,10 +213,10 @@ independent operations that, if enough processors are available, can be worked
 on in parallel (if not enough processors are available -- because the system
 has only one, or because the others are working on something else for us --
 then these tasks will be worked on sequentially). Consequently, 
-<code>BoussinesqProblem::setup_dofs</code> creates tasks for the three calls
-to <code>BoussinesqProblem::setup_stokes_matrix</code>,
-<code>BoussinesqProblem::setup_stokes_preconditioner</code>, and
-<code>BoussinesqProblem::setup_temperature_matrices</code> that are then
+<code>BoussinesqFlowProblem::setup_dofs</code> creates tasks for the three calls
+to <code>BoussinesqFlowProblem::setup_stokes_matrix</code>,
+<code>BoussinesqFlowProblem::setup_stokes_preconditioner</code>, and
+<code>BoussinesqFlowProblem::setup_temperature_matrices</code> that are then
 scheduled to available resources. There is one problem with this, however: if
 we have more than MPI process running in parallel, then all of these processes
 need to communicate in a certain order and that requires that the various
