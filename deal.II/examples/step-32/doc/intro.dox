@@ -37,8 +37,59 @@ which we will discuss first.
 
 <h3> Changes to the Stokes preconditioner </h3>
 
-TODO: MARTIN
+In this tutorial program, we apply a variant of the preconditioner used in
+@ref step_31 "step-31". That preconditioner was built to operate on the
+system matrix <i>M</i> in block form such that the product matrix
+@f{eqnarray*}
+  P^{-1} M
+  = 
+  \left(\begin{array}{cc}
+    A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
+  \end{array}\right) 
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right) 
+@f}
+is of a form that Krylov-based iterative solvers like GMRES can solve in a
+few iterations. We then replaced the exact inverse of <i>A</i> by the action
+of an AMG preconditioner $\tilde{A}$ based on a vector Laplace matrix,
+approximated the Schur complement $S = B A^{-1} B^T$ by a mass matrix $M_p$
+on the pressure space and wrote an <tt>InverseMatrix</tt> class for
+implementing the action of $M_p^{-1}\approx S^{-1}$ on vectors. In the
+InverseMatrix class, we used a CG solve with an incomplete Cholesky (IC)
+preconditioner for performing the inner solves.
 
+An observation one can make is that we use just the action of a
+preconditioner for approximating the velocity inverse $A^{-1}$ (and the
+outer GMRES iteration takes care of the approximate character of the
+inverse), whereas we use a more or less <i>exact</i> inverse for $M_p^{-1}$,
+realized by a fully converged CG solve. What we change here is to skip that
+<i>exact</i> inverse matrix and replace it &ndash; as usual &ndash; by the
+action of a preconditioner only. This works, as we will demonstrate
+below. For efficiency reasons, we want to avoid increasing the number of
+iterations for the block solve. Keep in mind that most of the time in the
+solution of the matrix system is the application of the AMG preconditioner
+(about half the time of the total solve), and the application of matrix
+<i>A</i> (about one third of the total solve time). This means that we
+really do not want to do those operations more often when we remove the
+inner solve on the Schur complement approximation. It turns out that the
+Trilinos IC preconditioner would not fulfill this requirement, however, the
+Trilinos ILU preconditioner does. It does even better than so &mdash; it
+decreases the iteration count for large 3D problems. The reason for that
+decrease is that we avoid some errors that CG introduces: Even a converged
+solve has still some residual. That is a problem because that small error
+interferes with the outer iterative solver, probably because a CG solver
+does some nonlinear operations by weighting vectors by some inner products.
+
+Except the simplification in the preconditioner, we replaced the GMRES
+solver by BiCGStab. This is merely to demonstrate that GMRES is not the only
+possible option for a saddle point system like the Stokes
+equations. BiCGStab harmonizes nicely with the ILU preconditioner on a
+pressure mass matrix as approximation for $S^{-1}$, so it is at least as
+good as GMRES in this example. Keep in mind the discussion in the results
+section of the @ref step_22 "step-22" tutorial program, where we observed
+that BiCGStab does <i>not</i> like inner solves with CG, which made us
+choose GMRES in step-31
 
 <h3> Parallelization on clusters </h3>
 
@@ -199,8 +250,8 @@ and per-cell data. Suffice it to mention that we need the following:
   <code>BoussinesqFlowProblem::copy_local_to_global_temperature_rhs</code>
   functions.
 
-We will comment on a few more points in the actual code, but in general their
-general structure should be clear from the discussion in @ref threads.
+We will comment on a few more points in the actual code, but in general
+their structure should be clear from the discussion in @ref threads.
 
 The underlying technology for WorkStream identifies "tasks" that need to be
 worked on (e.g. assembling local contributions on a cell) and schedules these
