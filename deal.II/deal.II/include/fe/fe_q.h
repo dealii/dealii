@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
  * The standard constructor of this class takes the degree @p p of this finite
  * element. Alternatively, it can take a quadrature formula @p points defining
  * the support points of the Lagrange interpolation in one coordinate direction.
- * 
+ *
  * For more information about the <tt>spacedim</tt> template parameter
  * check the documentation of FiniteElement or the one of
  * Triangulation.
@@ -46,31 +46,11 @@ DEAL_II_NAMESPACE_OPEN
  * creates a TensorProductPolynomials object that includes the tensor product
  * of @p Lagrange polynomials with the support points from @p points.
  *
- * Furthermore the constructor filles the @p interface_constraints,
- * the @p prolongation (embedding) and the @p restriction
- * matrices. These are implemented only up to a certain degree, that
- * is listed in the following:
+ * Furthermore the constructor fills the @p interface_constraints, the
+ * @p prolongation (embedding) and the @p restriction matrices. These
+ * are implemented only up to a certain degree and may not be
+ * available for very high polynomial degree.
  *
- * <ul>
- * <li> <tt>dim==1</tt>
- *   <ul>
- *   <li> the @p interface_constraints are not needed
- *   <li> the @p prolongation matrices up to degree 4, and
- *   <li> the @p restriction matrices up to degree 4.
- *   </ul>
- * <li> <tt>dim==2</tt>
- *   <ul>
- *   <li> the @p interface_constraints up to degree 4,
- *   <li> the @p prolongation matrices up to degree 3, and
- *   <li> the @p restriction matrices up to degree 4.
- *   </ul>
- * <li> <tt>dim==3</tt>
- *   <ul>
- *   <li> the @p interface_constraints up to degree 2,
- *   <li> the @p prolongation matrices up to degree 2, and
- *   <li> the @p restriction matrices up to degree 4.
- *   </ul>
- * </ul>
  *
  * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
@@ -163,7 +143,7 @@ DEAL_II_NAMESPACE_OPEN
  *     |  /       /     |   22  |  /
  *     | /  24   /      |       | /
  *     |/       /       |       |/
- *     *-------*        *-------* 
+ *     *-------*        *-------*
  *   @endverbatim
  *   The center vertex has number 26.
  *
@@ -196,7 +176,7 @@ DEAL_II_NAMESPACE_OPEN
  *   <li> Index 23: <tt>[1/2, 1, 1/2]</tt>;
  *   <li> Index 24: <tt>[1/2, 1/2, 0]</tt>;
  *   <li> Index 25: <tt>[1/2, 1/2, 1]</tt>;
- *   <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>; 
+ *   <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>;
  *   </ul>
  * </ul>
  * <h4>Q3 elements</h4>
@@ -249,7 +229,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * polynomials of degree @p p.
 				      */
     FE_Q (const unsigned int p);
-	
+
 				     /**
 				      * Constructor for tensor product
 				      * polynomials with support points @p
@@ -261,7 +241,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * last one 1.
 				      */
 
-    FE_Q (const Quadrature<1> &points);    
+    FE_Q (const Quadrature<1> &points);
 				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
@@ -272,7 +252,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * values.
 				      */
     virtual std::string get_name () const;
-    
+
 				     /**
 				      * Return the matrix
 				      * interpolating from the given
@@ -293,12 +273,12 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
     get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 			      FullMatrix<double>       &matrix) const;
 
-    
+
 				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the face of
-				      * the neighboring element. 
+				      * the neighboring element.
 				      * The size of the matrix is
 				      * then <tt>source.dofs_per_face</tt> times
 				      * <tt>this->dofs_per_face</tt>.
@@ -317,13 +297,13 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      */
     virtual void
     get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-				   FullMatrix<double>       &matrix) const;    
+				   FullMatrix<double>       &matrix) const;
 
 				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the face of
-				      * the neighboring element. 
+				      * the neighboring element.
 				      * The size of the matrix is
 				      * then <tt>source.dofs_per_face</tt> times
 				      * <tt>this->dofs_per_face</tt>.
@@ -344,7 +324,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
     get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
-    
+
 				     /**
 				      * Check for non-zero values on a face.
 				      *
@@ -362,10 +342,10 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      const unsigned int face_index) const;
 
 				     /**
-				      * @name Functions to support hp 
+				      * @name Functions to support hp
 				      * @{
 				      */
-    
+
                                      /**
                                       * Return whether this element
                                       * implements its hanging node
@@ -380,7 +360,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * for hp capability.
                                       */
     virtual bool hp_constraints_are_implemented () const;
-    
+
 				     /**
 				      * If, on a vertex, several
 				      * finite elements are active,
@@ -440,7 +420,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
-    
+
 				     /**
 				      * Return whether this element dominates
 				      * the one given as argument when they
@@ -471,7 +451,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      */
     virtual unsigned int memory_consumption () const;
 
-  protected:    
+  protected:
 				     /**
 				      * @p clone function instead of
 				      * a copy constructor.
@@ -480,9 +460,9 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim,spacedim> * clone() const;
-    
+
   private:
-    
+
 				     /**
 				      * Only for internal use. Its
 				      * full name is
@@ -512,7 +492,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * from the constructor.
 				      */
     void initialize_constraints ();
-	
+
 				     /**
 				      * Initialize the embedding
 				      * matrices. Called from the
@@ -535,7 +515,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * constructor.
 				      */
     void initialize_unit_support_points ();
-	
+
 					     /**
 				      * Initialize the @p unit_support_points
 				      * field of the FiniteElement
@@ -553,7 +533,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * constructor.
 				      */
     void initialize_unit_face_support_points ();
-	
+
 					     /**
 				      * Initialize the @p
 				      * unit_face_support_points field of the
@@ -571,7 +551,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * constructor.
 				      */
     void initialize_quad_dof_index_permutation ();
-             
+
 				     /**
 				      * Mapping from hierarchic to
 				      * lexicographic numbering on
@@ -591,7 +571,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 				      * information.
 				      */
     struct Implementation;
-    
+
 				     /**
 				      * Allow access from other
 				      * dimensions. We need this since
