@@ -146,7 +146,7 @@ namespace Utilities
   std::pair<int, unsigned int>
   get_integer_at_position (const std::string &name,
 			   const unsigned int position);
-    
+
                                    /**
                                     * Generate a random number from a
                                     * normalized Gaussian probability
@@ -194,16 +194,16 @@ namespace Utilities
 				    */
   std::vector<unsigned int>
   invert_permutation (const std::vector<unsigned int> &permutation);
-  
+
                                    /**
                                     * A namespace for utility functions that
                                     * probe system properties.
-                                    * 
+                                    *
                                     * @ingroup utilities
                                     */
   namespace System
   {
-    
+
                                      /**
                                       * Return the CPU load as returned by
                                       * "uptime". Note that the interpretation
@@ -301,7 +301,7 @@ namespace Utilities
 					  */
 	MPI_InitFinalize (int    &argc,
 			  char** &argv);
-	
+
 					 /**
 					  * Destructor. Calls
 					  * <tt>MPI_Finalize()</tt> in
@@ -340,10 +340,10 @@ namespace Utilities
    * classes such as matrices, vectors, and preconditioners. The most
    * important function in this class is <tt>comm()</tt>, which is needed
    * for the initialization of Trilinos Epetra_Maps, which design the
-   * parallel distribution of vectors and matrices. Moreover, this class
-   * provides a unified interface to both serial and parallel
+   * %parallel distribution of vectors and matrices. Moreover, this class
+   * provides a unified interface to both serial and %parallel
    * implementations of Trilinos, sets up the MPI communicator in case the
-   * programs are run in parallel, and correctly terminates all processes
+   * programs are run in %parallel, and correctly terminates all processes
    * when the destructor is called. An example usage of this class is shown
    * in the tutorial program @ref step_32 "step-32".
    */
@@ -381,13 +381,13 @@ namespace Utilities
 				      * processor.
 				      */
     const Epetra_Comm& comm_self();
-    
+
 				     /**
 				      * Given a communicator, duplicate it. If
 				      * the given communicator is serial, that
 				      * means to just return a copy of
 				      * itself. On the other hand, if it is
-				      * parallel, we duplicate the underlying
+				      * %parallel, we duplicate the underlying
 				      * MPI_Comm object: we create a separate
 				      * MPI communicator that contains the
 				      * same processors and in the same order
@@ -415,7 +415,7 @@ namespace Utilities
 				      * because they own no cells. That's
 				      * clearly a bug. However, if these
 				      * processors just continue their work,
-				      * and the next parallel operation
+				      * and the next %parallel operation
 				      * happens to be a sync on a different
 				      * matrix, then the sync could succeed --
 				      * by accident, since different
@@ -505,13 +505,13 @@ namespace Utilities
 	case 4:
 	      return n*n*n*n;
 	default:
-	      T result = n;  
+	      T result = n;
 	      for (unsigned int d=1;d<N;++d)
 		result *= n;
 	      return result;
       }
   }
-  
+
 }
 
 
