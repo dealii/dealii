@@ -1099,8 +1099,8 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 
 
 				 // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
-				 // Again, this is only a slight
-				 // modification of the respective
+				 // Again, this is only a slightly
+				 // modified version of the respective
 				 // function in step-31. What is new is
 				 // that each processor works on its
 				 // partition of cells, and gets a minimum
@@ -1201,6 +1201,8 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
 
 
+				 // @sect4{BoussinesqFlowProblem::compute_viscosity}
+
 				 // The function that calculates the
 				 // viscosity is purely local, so this is
 				 // the same code as in step-31.
@@ -1265,7 +1267,77 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 }
 
 
+				 // @sect4{BoussinesqFlowProblem::setup_*}
 
+				 // The following three functions set
+				 // up the Stokes matrix, the matrix
+				 // used for the Stokes
+				 // preconditioner, and the
+				 // temperature matrix. The code is
+				 // mostly the same as in step-31, but
+				 // it has been broken out into three
+				 // functions of their own for
+				 // simplicity, but also so that they
+				 // can easily be run in parallel on
+				 // multiple threads (unless we are
+				 // running with MPI, in which case
+				 // this is not possible, as explained
+				 // in the introduction).
+				 //
+				 // The main functional difference
+				 // between the code here and that in
+				 // step-31 is that the matrices we
+				 // want to set up are distributed
+				 // across multiple processors. Since
+				 // we still want to build up the
+				 // sparsity pattern first for
+				 // efficiency reasons, we could
+				 // continue to build the
+				 // <i>entire</i> sparsity pattern as
+				 // a
+				 // BlockCompressedSimpleSparsityPattern,
+				 // as we did in step-31. However,
+				 // that would be inefficient: every
+				 // processor would build the same
+				 // sparsity pattern, but only
+				 // initialize a small part of the
+				 // matrix using it.
+				 //
+				 // Rather, we use an object of type
+				 // TrilinosWrappers::BlockSparsityPattern,
+				 // which is (obviously) a wrapper
+				 // around a sparsity pattern object
+				 // provided by Trilinos. The
+				 // advantage is that the Trilinos
+				 // sparsity pattern class can
+				 // communicate across multiple
+				 // processors: if this processor
+				 // fills in all the nonzero entries
+				 // that result from the cells it
+				 // owns, and every other processor
+				 // does so as well, then at the end
+				 // after some MPI communication
+				 // initiated by the
+				 // <code>compress()</code> call, we
+				 // will have the globally assembled
+				 // sparsity pattern available with
+				 // which the global matrix can be
+				 // initialized.
+				 //
+				 // The only other change we need to
+				 // make is to tell the
+				 // DoFTools::make_sparsity_pattern
+				 // function that it is only supposed
+				 // to work on a subset of cells,
+				 // namely the ones whose
+				 // <code>subdomain_id</code> equals
+				 // the number of the current
+				 // processor, and to ignore all other
+				 // cells.
+				 //
+				 // This strategy is replicated across
+				 // all three of the following
+				 // functions.
 template <int dim>
 void BoussinesqFlowProblem<dim>::setup_stokes_matrix ()
 {
@@ -1289,13 +1361,6 @@ void BoussinesqFlowProblem<dim>::setup_stokes_matrix ()
   sp.compress();
 
   stokes_matrix.reinit (sp);
-				   /*std::cout << "Processor " << trilinos_communicator.MyPID()
-				     << " stokes(0,0) rows: "
-				     << stokes_matrix.block(0,0).matrix->NumMyRows()
-				     << ", nnz: "
-				     << stokes_matrix.block(0,0).matrix->NumMyNonzeros()
-				     << std::endl;*/
-
 }
 
 
