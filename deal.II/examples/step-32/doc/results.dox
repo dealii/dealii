@@ -1,3 +1,25 @@
 <h1>Results</h1>
 
+When run, the program simulates convection in 3d in much the same way
+as @ref step_31 "step-31" did -- in fact, the testcase is exactly the
+same, just that we can now solve in parallel and with much higher
+resolution.
 
+Here are two images that show this higher resolution. At these time
+steps, the meshes had around 72,000 and 236,000 cells, for a total of
+2,680,000 and 8,250,000 degrees of freedom, respectively, more than an
+order of magnitude more than we had available in step-31:
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+        @image html "step-32.3d.cube.0.png" "" width=49%
+    </td>
+    <td>
+        @image html "step-32.3d.cube.1.png" "" width=49%
+    </td>
+  </tr>
+</table>
+
+The computation was done on a subset of 50 processors of the Brazos
+cluster at Texas A&amp;M University.
