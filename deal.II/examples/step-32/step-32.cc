@@ -745,7 +745,7 @@ namespace Assembly
 				 // hand side vectors) whereas others are
 				 // not (such as the various matrices). For
 				 // the matrices, we happen to use the same
-				 // class names for parallel and sequential
+				 // class names for %parallel and sequential
 				 // data structures, i.e. all matrices will
 				 // actually be considered parallel
 				 // below. On the other hand, for vectors,
@@ -757,7 +757,7 @@ namespace Assembly
 				 // points; consequently, rather than
 				 // "localizing" a vector whenever we need a
 				 // localized vector, we solve linear
-				 // systems in parallel but then immediately
+				 // systems in %parallel but then immediately
 				 // localize the solution for further
 				 // processing. The various
 				 // <code>*_solution</code> vectors are
@@ -903,7 +903,7 @@ class BoussinesqFlowProblem
 				 // The constructor of the problem is very
 				 // similar to the constructor in
 				 // step-31. What is different is the
-				 // parallel communication: Trilins uses a
+				 // %parallel communication: Trilins uses a
 				 // message passing interface (MPI) for
 				 // data distribution. When entering the
 				 // BoussinesqFlowProblem class, we have
