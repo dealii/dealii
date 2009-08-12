@@ -1417,6 +1417,84 @@ void BoussinesqFlowProblem<dim>::setup_temperature_matrices ()
 
 
 				 // @sect4{BoussinesqFlowProblem::setup_dofs}
+
+				 // The remainder of the setup
+				 // function (after splitting out the
+				 // three functions above) mostly has
+				 // to deal with the things we need to
+				 // do for parallelization across
+				 // processors. In particular, at the
+				 // top it calls
+				 // GridTools::partition_triangulation
+				 // to subdivide all cells into
+				 // subdomains of roughly equal size
+				 // and roughly minimal interface
+				 // length. We then distribute degrees
+				 // of freedom for Stokes and
+				 // temperature DoFHandler objects,
+				 // and re-sort them in such a way
+				 // that all degrees of freedom
+				 // associated with subdomain zero
+				 // come before all those associated
+				 // with subdomain one, etc. For the
+				 // Stokes part, this entails,
+				 // however, that velocities and
+				 // pressures become intermixed, but
+				 // this is trivially solved by
+				 // sorting again by blocks; it is
+				 // worth noting that this latter
+				 // operation leaves the relative
+				 // ordering of all velocities and
+				 // pressures alone, i.e. within the
+				 // velocity block we will still have
+				 // all those associated with
+				 // subdomain zero before all
+				 // velocities associated with
+				 // subdomain one, etc. This is
+				 // important since we store each of
+				 // the blocks of this matrix
+				 // distributed across all processors
+				 // and want this to be done in such a
+				 // way that each processor stores
+				 // that part of the matrix that is
+				 // roughly equal to the degrees of
+				 // freedom located on those cells
+				 // that it will actually work on.
+				 //
+				 // After this, we have to set up the
+				 // various partitioners (of type
+				 // <code>Epetra_Map</code>, see the
+				 // introduction) that describe which
+				 // parts of each matrix or vector
+				 // will be stored where, then call
+				 // the functions that actually set up
+				 // the matrices (concurrently if on a
+				 // single processor, but sequentially
+				 // if we need MPI communications),
+				 // and at the end also resize the
+				 // various vectors we keep around in
+				 // this program.
+				 //
+				 // Note also how this function enters
+				 // and leaves a timed section so that
+				 // we can get a time report at the
+				 // end of the program. Note also the
+				 // use of the <code>pcout</code>
+				 // variable: to every process it
+				 // looks like we can write to screen,
+				 // but only the output of the first
+				 // processor actually ends up
+				 // somewhere. We could of course have
+				 // achieved the same effect by
+				 // writing to <code>std::cout</code>
+				 // but would then have had to guard
+				 // every access to that stream by
+				 // something like <code>if
+				 // (Utilities:: Trilinos::
+				 // get_this_mpi_process
+				 // (trilinos_communicator) ==
+				 // 0)</code>, hardly a pretty
+				 // solution.
 template <int dim>
 void BoussinesqFlowProblem<dim>::setup_dofs ()
 {
@@ -1532,6 +1610,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 }
 
 
+				 // @sect4{The BoussinesqFlowProblem assembly functions}
 
 template <int dim>
 void
