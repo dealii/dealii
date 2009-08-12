@@ -1,6 +1,6 @@
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
-           Wolfgang Bangerth, Texas A&M University 2007, 2008, 2009 */
+   Wolfgang Bangerth, Texas A&M University 2007, 2008, 2009 */
 /*                                                                */
 /*    Copyright (C) 2008, 2009 by the deal.II authors */
 /*                                                                */
@@ -62,14 +62,14 @@
 #include <iostream>
 #include <sstream>
 
-				   // This is the only include file that is
-				   // new: We use Trilinos for defining the
-				   // %parallel partitioning of the matrices
-				   // and vectors, and as explained in the
-				   // introduction, an <code>Epetra_Map</code>
-				   // is the Trilinos data structure for the
-				   // definition of which part of a
-				   // distributed vector is stored locally:
+				 // This is the only include file that is
+				 // new: We use Trilinos for defining the
+				 // %parallel partitioning of the matrices
+				 // and vectors, and as explained in the
+				 // introduction, an <code>Epetra_Map</code>
+				 // is the Trilinos data structure for the
+				 // definition of which part of a
+				 // distributed vector is stored locally:
 #include <Epetra_Map.h>
 
 
@@ -79,9 +79,9 @@ using namespace dealii;
 
 				 // @sect3{Equation data}
 
-				   // This program is mainly an extension of
-				   // step-31 to operate in %parallel, so the
-				   // equation data remains the same.
+				 // This program is mainly an extension of
+				 // step-31 to operate in %parallel, so the
+				 // equation data remains the same.
 namespace EquationData
 {
   const double eta = 1;
@@ -110,10 +110,10 @@ namespace EquationData
   TemperatureInitialValues<dim>::value (const Point<dim>  &,
 					const unsigned int) const
   {
-				   /* Data for shell problem */
-    /*return (p.norm() < 0.55+0.02*std::sin(p[0]*20) ? 1 : 0);*/
+				     /* Data for shell problem */
+				     /*return (p.norm() < 0.55+0.02*std::sin(p[0]*20) ? 1 : 0);*/
 
-				   /* Data for cube problem */
+				     /* Data for cube problem */
     return 0.;
   }
 
@@ -149,10 +149,10 @@ namespace EquationData
   TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
 					const unsigned int component) const
   {
-				   /* Data for shell problem. */
-    /*    return 0; */
+				     /* Data for shell problem. */
+				     /*    return 0; */
 
-				   /* Data for cube problem. */
+				     /* Data for cube problem. */
     Assert (component == 0,
 	    ExcMessage ("Invalid operation for a scalar function."));
     
@@ -189,29 +189,29 @@ namespace EquationData
 
 
 
-				   // @sect3{Linear solvers and preconditioners}
+				 // @sect3{Linear solvers and preconditioners}
 
-				   // In comparison to step-31, we did one
-				   // change in the linear algebra of the
-				   // problem: We exchange the
-				   // <code>InverseMatrix</code> that
-				   // previously held the approximation of the
-				   // Schur complement by a preconditioner
-				   // only (we will choose ILU in the
-				   // application code below). This is the
-				   // same trick we already did for the
-				   // velocity block - the idea of this is
-				   // that the outer iterations will
-				   // eventually also make the inner
-				   // approximation for the Schur complement
-				   // good. If the preconditioner we're using
-				   // is good enough, there will be no
-				   // increase in the (outer) iteration
-				   // count. All we need to do for
-				   // implementing this change here is to give
-				   // the respective variable in the
-				   // BlockSchurPreconditioner class another
-				   // name.
+				 // In comparison to step-31, we did one
+				 // change in the linear algebra of the
+				 // problem: We exchange the
+				 // <code>InverseMatrix</code> that
+				 // previously held the approximation of the
+				 // Schur complement by a preconditioner
+				 // only (we will choose ILU in the
+				 // application code below). This is the
+				 // same trick we already did for the
+				 // velocity block - the idea of this is
+				 // that the outer iterations will
+				 // eventually also make the inner
+				 // approximation for the Schur complement
+				 // good. If the preconditioner we're using
+				 // is good enough, there will be no
+				 // increase in the (outer) iteration
+				 // count. All we need to do for
+				 // implementing this change here is to give
+				 // the respective variable in the
+				 // BlockSchurPreconditioner class another
+				 // name.
 namespace LinearSolvers
 {
   template <class PreconditionerA, class PreconditionerMp>
@@ -263,58 +263,58 @@ namespace LinearSolvers
 
 
 
-				   // @sect3{Definition of assembly data structures}
-				   // 
-				   // This is a collection of data
-				   // structures that we use for assembly in
-				   // %parallel. The concept of this
-				   // task-based parallelization is
-				   // described in detail @ref MTWorkStream
-				   // "here". Each assembly routine gets two
-				   // sets of data: a Scratch array that
-				   // collects all the classes and arrays
-				   // that are used for the calculation of
-				   // the cell contribution, and a CopyData
-				   // array that keeps local matrices and
-				   // vectors which will be written into the
-				   // global matrix. Whereas CopyData is a
-				   // container for the final data that is
-				   // written into the global matrices and
-				   // vector (and, thus, absolutely
-				   // necessary), the Scratch arrays are
-				   // merely there for performance reasons
-				   // &mdash; it would be much more
-				   // expensive to set up a FEValues object
-				   // on each cell, than creating it only
-				   // once and updating some derivative
-				   // data.
-				   //
-				   // Using the program in step-31, we have
-				   // four assembly routines. One for the
-				   // preconditioner matrix of the Stokes
-				   // system, one for the Stokes matrix and
-				   // right hand side, one for the
-				   // temperature matrices and one for the
-				   // right hand side of the temperature
-				   // equation. We organize the scratch
-				   // arrays and a CopyData arrays for each
-				   // of those four assembly components
-				   // using a <code>struct</code>
-				   // environment.
-				   //
-				   // Regarding the Scratch array, each
-				   // struct is equipped with a constructor
-				   // that create an FEValues object for a
-				   // @ref FiniteElement "finite element", a
-				   // @ref Quadrature "quadrature formula"
-				   // and some
-				   // @ref UpdateFlags "update flags".
-				   // Moreover, we manually
-				   // implement a copy constructor (since
-				   // the FEValues class is not copyable by
-				   // itself), and provide some additional
-				   // vector fields that are used to improve
-				   // performance of assembly.
+				 // @sect3{Definition of assembly data structures}
+				 // 
+				 // This is a collection of data
+				 // structures that we use for assembly in
+				 // %parallel. The concept of this
+				 // task-based parallelization is
+				 // described in detail @ref MTWorkStream
+				 // "here". Each assembly routine gets two
+				 // sets of data: a Scratch array that
+				 // collects all the classes and arrays
+				 // that are used for the calculation of
+				 // the cell contribution, and a CopyData
+				 // array that keeps local matrices and
+				 // vectors which will be written into the
+				 // global matrix. Whereas CopyData is a
+				 // container for the final data that is
+				 // written into the global matrices and
+				 // vector (and, thus, absolutely
+				 // necessary), the Scratch arrays are
+				 // merely there for performance reasons
+				 // &mdash; it would be much more
+				 // expensive to set up a FEValues object
+				 // on each cell, than creating it only
+				 // once and updating some derivative
+				 // data.
+				 //
+				 // Using the program in step-31, we have
+				 // four assembly routines. One for the
+				 // preconditioner matrix of the Stokes
+				 // system, one for the Stokes matrix and
+				 // right hand side, one for the
+				 // temperature matrices and one for the
+				 // right hand side of the temperature
+				 // equation. We organize the scratch
+				 // arrays and a CopyData arrays for each
+				 // of those four assembly components
+				 // using a <code>struct</code>
+				 // environment.
+				 //
+				 // Regarding the Scratch array, each
+				 // struct is equipped with a constructor
+				 // that create an FEValues object for a
+				 // @ref FiniteElement "finite element", a
+				 // @ref Quadrature "quadrature formula"
+				 // and some
+				 // @ref UpdateFlags "update flags".
+				 // Moreover, we manually
+				 // implement a copy constructor (since
+				 // the FEValues class is not copyable by
+				 // itself), and provide some additional
+				 // vector fields that are used to improve
+				 // performance of assembly.
 namespace Assembly
 {
   namespace Scratch
@@ -360,21 +360,21 @@ namespace Assembly
 
 
 
-				   // Observe that we derive the
-				   // StokesSystem scratch array from the
-				   // StokesPreconditioner array. We do this
-				   // because all the objects that are
-				   // necessary for the assembly of the
-				   // preconditioner are also needed for the
-				   // actual matrix system and right hand
-				   // side, plus some extra data. This makes
-				   // the program more compact. Note also
-				   // that the assembly of the Stokes system
-				   // and the temperature right hand side
-				   // further down requires data from
-				   // temperature and velocity,
-				   // respectively, so we actually need two
-				   // FEValues objects for those two cases.
+				     // Observe that we derive the
+				     // StokesSystem scratch array from the
+				     // StokesPreconditioner array. We do this
+				     // because all the objects that are
+				     // necessary for the assembly of the
+				     // preconditioner are also needed for the
+				     // actual matrix system and right hand
+				     // side, plus some extra data. This makes
+				     // the program more compact. Note also
+				     // that the assembly of the Stokes system
+				     // and the temperature right hand side
+				     // further down requires data from
+				     // temperature and velocity,
+				     // respectively, so we actually need two
+				     // FEValues objects for those two cases.
     template <int dim>
     struct StokesSystem : public StokesPreconditioner<dim>
     {
@@ -688,72 +688,72 @@ namespace Assembly
 
 
 
-				   // @sect3{The <code>BoussinesqFlowProblem</code> class template}
-				   // 
-				   // This is the declaration of the main
-				   // class. It is very similar to
-				   // step-31. Following the @ref
-				   // MTWorkStream "task-based parallelization"
-				   // paradigm, we split all the
-				   // assembly routines into two parts: a
-				   // first part that can do all the
-				   // calculations on a certain cell without
-				   // taking care of other threads, and a
-				   // second part (which is writing the
-				   // local data into the global matrices
-				   // and vectors) which can be entered by
-				   // only one thread at a time. In order to
-				   // implement that, we provide functions
-				   // for each of those two steps for all
-				   // the four assembly routines that we use
-				   // in this program.
-				   // 
-				   // Moreover, we include an MPI communicator
-				   // and an Epetra_Map (see the introduction)
-				   // that are needed for communication and
-				   // data exchange if the Trilinos matrices
-				   // and vectors are distributed over several
-				   // processors. Finally, the
-				   // <code>pcout</code> (for <i>%parallel
-				   // <code>std::cout</code></i>) object is
-				   // used to simplify writing output: each
-				   // MPI process can use this to generate
-				   // output as usual, but since each of these
-				   // processes will produce the same output
-				   // it will just be replicated many times
-				   // over; with the ConditionalOStream class,
-				   // only the output generated by one task
-				   // will actually be printed to screen,
-				   // whereas the output by all the other
-				   // threads will simply be forgotten.
-				   //
-				   // In a bit of naming confusion, you will
-				   // notice below that some of the variables
-				   // from namespace TrilinosWrappers are
-				   // taken from namespace
-				   // TrilinosWrappers::MPI (such as the right
-				   // hand side vectors) whereas others are
-				   // not (such as the various matrices). For
-				   // the matrices, we happen to use the same
-				   // class names for parallel and sequential
-				   // data structures, i.e. all matrices will
-				   // actually be considered parallel
-				   // below. On the other hand, for vectors,
-				   // only those from namespace
-				   // TrilinosWrappers::MPI are actually
-				   // distributed. In particular, we will
-				   // frequently have to query velocities and
-				   // temperatures at arbitrary quadrature
-				   // points; consequently, rather than
-				   // "localizing" a vector whenever we need a
-				   // localized vector, we solve linear
-				   // systems in parallel but then immediately
-				   // localize the solution for further
-				   // processing. The various
-				   // <code>*_solution</code> vectors are
-				   // therefore filled immediately after
-				   // solving their respective linear system
-				   // in parallel.
+				 // @sect3{The <code>BoussinesqFlowProblem</code> class template}
+				 // 
+				 // This is the declaration of the main
+				 // class. It is very similar to
+				 // step-31. Following the @ref
+				 // MTWorkStream "task-based parallelization"
+				 // paradigm, we split all the
+				 // assembly routines into two parts: a
+				 // first part that can do all the
+				 // calculations on a certain cell without
+				 // taking care of other threads, and a
+				 // second part (which is writing the
+				 // local data into the global matrices
+				 // and vectors) which can be entered by
+				 // only one thread at a time. In order to
+				 // implement that, we provide functions
+				 // for each of those two steps for all
+				 // the four assembly routines that we use
+				 // in this program.
+				 // 
+				 // Moreover, we include an MPI communicator
+				 // and an Epetra_Map (see the introduction)
+				 // that are needed for communication and
+				 // data exchange if the Trilinos matrices
+				 // and vectors are distributed over several
+				 // processors. Finally, the
+				 // <code>pcout</code> (for <i>%parallel
+				 // <code>std::cout</code></i>) object is
+				 // used to simplify writing output: each
+				 // MPI process can use this to generate
+				 // output as usual, but since each of these
+				 // processes will produce the same output
+				 // it will just be replicated many times
+				 // over; with the ConditionalOStream class,
+				 // only the output generated by one task
+				 // will actually be printed to screen,
+				 // whereas the output by all the other
+				 // threads will simply be forgotten.
+				 //
+				 // In a bit of naming confusion, you will
+				 // notice below that some of the variables
+				 // from namespace TrilinosWrappers are
+				 // taken from namespace
+				 // TrilinosWrappers::MPI (such as the right
+				 // hand side vectors) whereas others are
+				 // not (such as the various matrices). For
+				 // the matrices, we happen to use the same
+				 // class names for parallel and sequential
+				 // data structures, i.e. all matrices will
+				 // actually be considered parallel
+				 // below. On the other hand, for vectors,
+				 // only those from namespace
+				 // TrilinosWrappers::MPI are actually
+				 // distributed. In particular, we will
+				 // frequently have to query velocities and
+				 // temperatures at arbitrary quadrature
+				 // points; consequently, rather than
+				 // "localizing" a vector whenever we need a
+				 // localized vector, we solve linear
+				 // systems in parallel but then immediately
+				 // localize the solution for further
+				 // processing. The various
+				 // <code>*_solution</code> vectors are
+				 // therefore filled immediately after
+				 // solving their respective linear system
+				 // in parallel.
 template <int dim>
 class BoussinesqFlowProblem
 {
@@ -886,58 +886,58 @@ class BoussinesqFlowProblem
 };
 
 
-				   // @sect3{BoussinesqFlowProblem class implementation}
+				 // @sect3{BoussinesqFlowProblem class implementation}
 
-				   // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
-				   // 
-				   // The constructor of the problem is very
-				   // similar to the constructor in
-				   // step-31. What is different is the
-				   // parallel communication: Trilins uses a
-				   // message passing interface (MPI) for
-				   // data distribution. When entering the
-				   // BoussinesqFlowProblem class, we have
-				   // to decide how the parallization is to
-				   // be done. We choose a rather simple
-				   // strategy and let all processors
-				   // running the program work together,
-				   // specified by the communicator
-				   // <code>comm_world()</code>. Next, we
-				   // create some modified output stream as
-				   // we already did in step-18. In MPI, all
-				   // the processors run the same program
-				   // individually (they simply operate on
-				   // different chunks of data and exchange
-				   // some data from time to time). Since we
-				   // do not want each processor to write
-				   // the same information to screen (like
-				   // the number of degrees of freedom), we
-				   // only use one processor for writing
-				   // that output to terminal windows. The
-				   // implementation of this idea is to
-				   // check if the process number when
-				   // entering the program. If we are on
-				   // processor 0, then the data field
-				   // <code>pcout</code> gets a true
-				   // argument, and it uses the
-				   // <code>std::cout</code> stream for
-				   // output. If we are one processor five,
-				   // for instance, then we will give a
-				   // <code>false</code> argument to
-				   // <code>pcout</code>, which means that
-				   // the output of that processor will not
-				   // be printed anywhere.
-				   // 
-				   // Finally, we use a TimerOutput object
-				   // for summarizing the time we spend in
-				   // different sections of the program,
-				   // which we need to initialize. First, we
-				   // restrict it to the <code>pcout</code>
-				   // stream, and then we specify that we
-				   // want to get a summary table in the end
-				   // of the program which shows us
-				   // wallclock times (as opposed to CPU
-				   // times).
+				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
+				 // 
+				 // The constructor of the problem is very
+				 // similar to the constructor in
+				 // step-31. What is different is the
+				 // parallel communication: Trilins uses a
+				 // message passing interface (MPI) for
+				 // data distribution. When entering the
+				 // BoussinesqFlowProblem class, we have
+				 // to decide how the parallization is to
+				 // be done. We choose a rather simple
+				 // strategy and let all processors
+				 // running the program work together,
+				 // specified by the communicator
+				 // <code>comm_world()</code>. Next, we
+				 // create some modified output stream as
+				 // we already did in step-18. In MPI, all
+				 // the processors run the same program
+				 // individually (they simply operate on
+				 // different chunks of data and exchange
+				 // some data from time to time). Since we
+				 // do not want each processor to write
+				 // the same information to screen (like
+				 // the number of degrees of freedom), we
+				 // only use one processor for writing
+				 // that output to terminal windows. The
+				 // implementation of this idea is to
+				 // check if the process number when
+				 // entering the program. If we are on
+				 // processor 0, then the data field
+				 // <code>pcout</code> gets a true
+				 // argument, and it uses the
+				 // <code>std::cout</code> stream for
+				 // output. If we are one processor five,
+				 // for instance, then we will give a
+				 // <code>false</code> argument to
+				 // <code>pcout</code>, which means that
+				 // the output of that processor will not
+				 // be printed anywhere.
+				 // 
+				 // Finally, we use a TimerOutput object
+				 // for summarizing the time we spend in
+				 // different sections of the program,
+				 // which we need to initialize. First, we
+				 // restrict it to the <code>pcout</code>
+				 // stream, and then we specify that we
+				 // want to get a summary table in the end
+				 // of the program which shows us
+				 // wallclock times (as opposed to CPU
+				 // times).
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
@@ -973,43 +973,43 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 
 
 
-				   // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
-				   //
-				   // Except two small details, this
-				   // function is the very same as in
-				   // step-31. The first detail is actually
-				   // common to all functions that implement
-				   // loop over all cells in the
-				   // triangulation: When operating in
-				   // parallel, each processor only works on
-				   // a chunk of cells. This chunk of cells
-				   // is identified via a so-called
-				   // subdomain_id, as we also did in
-				   // step-18. All we need to change is
-				   // hence to perform the cell-related
-				   // operations only on the process with
-				   // the correct ID. The second difference
-				   // is the way we calculate the maximum
-				   // value. Before, we could simply have a
-				   // <code>double</code> variable that we
-				   // checked against on each quadrature
-				   // point for each cell. Now, we have to
-				   // be a bit more careful since each
-				   // processor only operates on a subset of
-				   // cells. What we do is to first let each
-				   // processor calculate the maximum among
-				   // its cells, and then do a global
-				   // communication operation called
-				   // <code>MaxAll</code> that searches for
-				   // the maximum value among all the
-				   // maximum values of the individual
-				   // processors. The call to
-				   // <code>MaxAll</code> needs three
-				   // arguments, namely the local maximum
-				   // (input), a field for the global
-				   // maximum (output), and an integer value
-				   // one that says that we only work on one
-				   // double.
+				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
+				 //
+				 // Except two small details, this
+				 // function is the very same as in
+				 // step-31. The first detail is actually
+				 // common to all functions that implement
+				 // loop over all cells in the
+				 // triangulation: When operating in
+				 // parallel, each processor only works on
+				 // a chunk of cells. This chunk of cells
+				 // is identified via a so-called
+				 // subdomain_id, as we also did in
+				 // step-18. All we need to change is
+				 // hence to perform the cell-related
+				 // operations only on the process with
+				 // the correct ID. The second difference
+				 // is the way we calculate the maximum
+				 // value. Before, we could simply have a
+				 // <code>double</code> variable that we
+				 // checked against on each quadrature
+				 // point for each cell. Now, we have to
+				 // be a bit more careful since each
+				 // processor only operates on a subset of
+				 // cells. What we do is to first let each
+				 // processor calculate the maximum among
+				 // its cells, and then do a global
+				 // communication operation called
+				 // <code>MaxAll</code> that searches for
+				 // the maximum value among all the
+				 // maximum values of the individual
+				 // processors. The call to
+				 // <code>MaxAll</code> needs three
+				 // arguments, namely the local maximum
+				 // (input), a field for the global
+				 // maximum (output), and an integer value
+				 // one that says that we only work on one
+				 // double.
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
@@ -1049,16 +1049,16 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 
 
 
-				   // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
-				   // Again, this is only a slight
-				   // modification of the respective
-				   // function in step-31. What is new is
-				   // that each processor works on its
-				   // partition of cells, and gets a minimum
-				   // and maximum temperature on that
-				   // partition. Two global communication
-				   // steps synchronize the data among the
-				   // processors.
+				 // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
+				 // Again, this is only a slight
+				 // modification of the respective
+				 // function in step-31. What is new is
+				 // that each processor works on its
+				 // partition of cells, and gets a minimum
+				 // and maximum temperature on that
+				 // partition. Two global communication
+				 // steps synchronize the data among the
+				 // processors.
 template <int dim>
 std::pair<double,double>
 BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
@@ -1152,9 +1152,9 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
 
 
-				   // The function that calculates the
-				   // viscosity is purely local, so this is
-				   // the same code as in step-31.
+				 // The function that calculates the
+				 // viscosity is purely local, so this is
+				 // the same code as in step-31.
 template <int dim>
 double
 BoussinesqFlowProblem<dim>::
@@ -1483,27 +1483,27 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
   
   WorkStream::
     run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
-			   stokes_dof_handler.begin_active()),
+			  (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			  stokes_dof_handler.begin_active()),
 	 SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
-			   stokes_dof_handler.end()),
-	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			   local_assemble_stokes_preconditioner,
-			   this,
-			   _1,
-			   _2,
-			   _3),
-	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			   copy_local_to_global_stokes_preconditioner,
-			   this,
-			   _1),
-	  Assembly::Scratch::
-	  StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
-				     update_JxW_values |
-				     update_values |
-				     update_gradients),
-	  Assembly::CopyData::
+			  (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			  stokes_dof_handler.end()),
+	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			  local_assemble_stokes_preconditioner,
+			  this,
+			  _1,
+			  _2,
+			  _3),
+	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			  copy_local_to_global_stokes_preconditioner,
+			  this,
+			  _1),
+	 Assembly::Scratch::
+	 StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
+				    update_JxW_values |
+				    update_values |
+				    update_gradients),
+	 Assembly::CopyData::
 	 StokesPreconditioner<dim> (stokes_fe));
   
   stokes_preconditioner_matrix.compress();
@@ -1659,34 +1659,34 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
   WorkStream::
     run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
-			   stokes_dof_handler.begin_active()),
-	  SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
-			   stokes_dof_handler.end()),
-	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			   local_assemble_stokes_system,
-			   this,
-			   _1,
-			   _2,
-			   _3),
-	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			   copy_local_to_global_stokes_system,
-			   this,
-			   _1),
-	  Assembly::Scratch::
-	  StokesSystem<dim> (stokes_fe, quadrature_formula,
-			     (update_values    |
-			      update_quadrature_points  |
-			      update_JxW_values |
-			      (rebuild_stokes_matrix == true
-			       ?
-			       update_gradients
-			       :
-			       UpdateFlags(0))),
-			     temperature_fe,
-			     update_values),
-	  Assembly::CopyData::
+			  (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			  stokes_dof_handler.begin_active()),
+	 SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			  (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			  stokes_dof_handler.end()),
+	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			  local_assemble_stokes_system,
+			  this,
+			  _1,
+			  _2,
+			  _3),
+	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			  copy_local_to_global_stokes_system,
+			  this,
+			  _1),
+	 Assembly::Scratch::
+	 StokesSystem<dim> (stokes_fe, quadrature_formula,
+			    (update_values    |
+			     update_quadrature_points  |
+			     update_JxW_values |
+			     (rebuild_stokes_matrix == true
+			      ?
+			      update_gradients
+			      :
+			      UpdateFlags(0))),
+			    temperature_fe,
+			    update_values),
+	 Assembly::CopyData::
 	 StokesSystem<dim> (stokes_fe));
   
   stokes_matrix.compress();
@@ -1777,24 +1777,24 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 
   WorkStream::
     run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
-			   temperature_dof_handler.begin_active()),
-	  SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
-			   temperature_dof_handler.end()),
-	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			   local_assemble_temperature_matrix,
-			   this,
-			   _1,
-			   _2,
-			   _3),
-	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			   copy_local_to_global_temperature_matrix,
-			   this,
-			   _1),
-	  Assembly::Scratch::
-	  TemperatureMatrix<dim> (temperature_fe, quadrature_formula),
-	  Assembly::CopyData::
+			  (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			  temperature_dof_handler.begin_active()),
+	 SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			  (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			  temperature_dof_handler.end()),
+	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			  local_assemble_temperature_matrix,
+			  this,
+			  _1,
+			  _2,
+			  _3),
+	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			  copy_local_to_global_temperature_matrix,
+			  this,
+			  _1),
+	 Assembly::Scratch::
+	 TemperatureMatrix<dim> (temperature_fe, quadrature_formula),
+	 Assembly::CopyData::
 	 TemperatureMatrix<dim> (temperature_fe));
 
   temperature_mass_matrix.compress();
@@ -1963,7 +1963,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
   if (rebuild_temperature_preconditioner == true)
     {
       T_preconditioner =  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
-                                   (new TrilinosWrappers::PreconditionIC());
+			  (new TrilinosWrappers::PreconditionIC());
       T_preconditioner->initialize (temperature_matrix);
 
       rebuild_temperature_preconditioner = false;
@@ -1981,26 +1981,26 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 
   WorkStream::
     run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
-			   temperature_dof_handler.begin_active()),
-	  SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			   (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
-			   temperature_dof_handler.end()),
-	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			   local_assemble_temperature_rhs,
-			   this,
-			   global_T_range,
-			   maximal_velocity,
-			   _1,
-			   _2,
-			   _3),
-	  std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			   copy_local_to_global_temperature_rhs,
-			   this,
-			   _1),
-	  Assembly::Scratch::
-	  TemperatureRHS<dim> (temperature_fe, stokes_fe, quadrature_formula),
-	  Assembly::CopyData::
+			  (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			  temperature_dof_handler.begin_active()),
+	 SubdomainFilter (IteratorFilters::SubdomainEqualTo
+			  (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
+			  temperature_dof_handler.end()),
+	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			  local_assemble_temperature_rhs,
+			  this,
+			  global_T_range,
+			  maximal_velocity,
+			  _1,
+			  _2,
+			  _3),
+	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+			  copy_local_to_global_temperature_rhs,
+			  this,
+			  _1),
+	 Assembly::Scratch::
+	 TemperatureRHS<dim> (temperature_fe, stokes_fe, quadrature_formula),
+	 Assembly::CopyData::
 	 TemperatureRHS<dim> (temperature_fe));
 
   temperature_rhs.compress();
@@ -2031,7 +2031,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   FEValues<dim> fe_values (temperature_fe, quadrature, update_flags);
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-    n_q_points    = fe_values.n_quadrature_points;
+		     n_q_points    = fe_values.n_quadrature_points;
 
   std::vector<unsigned int> dofs (dofs_per_cell);
   Vector<double> cell_vector (dofs_per_cell);
@@ -2059,8 +2059,8 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	    cell_vector(i) += rhs_values[point] *
-	      fe_values.shape_value(i,point) *
-	      weights[point];
+			      fe_values.shape_value(i,point) *
+			      weights[point];
 
 	cell->get_dof_indices (dofs);
 	 
@@ -2091,7 +2091,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
   {
     const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                                                  TrilinosWrappers::PreconditionILU>
+      TrilinosWrappers::PreconditionILU>
       preconditioner (stokes_matrix, *Mp_preconditioner, *Amg_preconditioner);
 
     SolverControl solver_control (stokes_matrix.m(),
@@ -2104,7 +2104,7 @@ void BoussinesqFlowProblem<dim>::solve ()
       distributed_stokes_solution (stokes_partitioner);
     distributed_stokes_solution = stokes_solution;
 
-				   // now treat the hanging nodes correctly.
+				     // now treat the hanging nodes correctly.
     const unsigned int start = 
       distributed_stokes_solution.block(1).local_range().first + 
       distributed_stokes_solution.block(0).size();
@@ -2350,11 +2350,11 @@ void BoussinesqFlowProblem<dim>::run ()
   const unsigned int initial_refinement = (dim == 2 ? 4 : 2);
   const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
 
-  //GridGenerator::half_hyper_shell (triangulation,
-  //				   Point<dim>(), 0.5, 1.0);
+				   //GridGenerator::half_hyper_shell (triangulation,
+				   //				   Point<dim>(), 0.5, 1.0);
 
-  //static HyperShellBoundary<dim> boundary;
-  //triangulation.set_boundary (0, boundary);
+				   //static HyperShellBoundary<dim> boundary;
+				   //triangulation.set_boundary (0, boundary);
   GridGenerator::hyper_cube (triangulation);
   global_Omega_diameter = GridTools::diameter (triangulation);
 
