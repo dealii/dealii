@@ -5,10 +5,13 @@ as @ref step_31 "step-31" did -- in fact, the testcase is exactly the
 same, just that we can now solve in parallel and with much higher
 resolution.
 
-Here are two images that show this higher resolution. At these time
-steps, the meshes had around 72,000 and 236,000 cells, for a total of
-2,680,000 and 8,250,000 degrees of freedom, respectively, more than an
-order of magnitude more than we had available in step-31:
+Here are two images that show this higher resolution if we choose a 3d
+computation in <code>main()</code> and if we set
+<code>initial_refinement=3</code> and
+<code>n_pre_refinement_steps=4</code>. At the time steps shown, the
+meshes had around 72,000 and 236,000 cells, for a total of 2,680,000
+and 8,250,000 degrees of freedom, respectively, more than an order of
+magnitude more than we had available in step-31:
 
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
