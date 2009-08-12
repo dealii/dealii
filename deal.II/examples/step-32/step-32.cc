@@ -763,7 +763,32 @@ namespace Assembly
 				 // <code>*_solution</code> vectors are
 				 // therefore filled immediately after
 				 // solving their respective linear system
-				 // in parallel.
+				 // in %parallel.
+				 //
+				 // The only other new data member is
+				 // <code>computing_timer</code>. Its class
+				 // type, TimerOutput, can be used to
+				 // conveniently account for compute time
+				 // spent in certain "sections" of the code
+				 // that are repeatedly entered. For example,
+				 // we will enter (and leave) sections for
+				 // Stokes matrix assembly and would like to
+				 // accumulate the run time spent in this
+				 // section over all time steps. At the end of
+				 // the program, the destructor of the
+				 // TimerOutput class will automatically
+				 // produce a nice summary of the times spent
+				 // in all the sections. For this output, one
+				 // can choose whether wall clock or CPU times
+				 // are to be printed, as well as whether we
+				 // want a percentage breakdown of where the
+				 // time was spent (this choice is made in the
+				 // constructor of TimerOutput, which is
+				 // called in the constructor of
+				 // <code>BoussinesqFlowProblem</code>). You
+				 // can take a look at the output generated
+				 // from this variable in the results section
+				 // of this tutorial program.
 template <int dim>
 class BoussinesqFlowProblem
 {
@@ -977,6 +1002,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 		rebuild_stokes_preconditioner (true),
 		rebuild_temperature_matrices (true),
 		rebuild_temperature_preconditioner (true),
+		
 		computing_timer (pcout, TimerOutput::summary,
 				 TimerOutput::wall_times)
 {}
