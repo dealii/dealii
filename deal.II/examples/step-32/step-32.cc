@@ -570,7 +570,7 @@ namespace Assembly
 				   // constructor, a copy operation, and
 				   // some arrays for local matrix, local
 				   // vectors and the relation between local
-				   // and global degrees of freedom (aka
+				   // and global degrees of freedom (a.k.a.
 				   // <code>local_dof_indices</code>).
   namespace CopyData
   {
@@ -770,25 +770,24 @@ namespace Assembly
 				 // type, TimerOutput, can be used to
 				 // conveniently account for compute time
 				 // spent in certain "sections" of the code
-				 // that are repeatedly entered. For example,
-				 // we will enter (and leave) sections for
-				 // Stokes matrix assembly and would like to
-				 // accumulate the run time spent in this
-				 // section over all time steps. At the end of
-				 // the program, the destructor of the
-				 // TimerOutput class will automatically
-				 // produce a nice summary of the times spent
-				 // in all the sections. For this output, one
-				 // can choose whether wall clock or CPU times
-				 // are to be printed, as well as whether we
-				 // want a percentage breakdown of where the
-				 // time was spent (this choice is made in the
-				 // constructor of TimerOutput, which is
-				 // called in the constructor of
-				 // <code>BoussinesqFlowProblem</code>). You
-				 // can take a look at the output generated
-				 // from this variable in the results section
-				 // of this tutorial program.
+ 				 // that are repeatedly entered. For
+ 				 // example, we will enter (and leave)
+ 				 // sections for Stokes matrix assembly and
+ 				 // would like to accumulate the run time
+ 				 // spent in this section over all time
+ 				 // steps. At the end of the program, the
+ 				 // destructor of the TimerOutput class will
+ 				 // automatically produce a nice summary of
+ 				 // the times spent in all the sections. For
+ 				 // this output, one can choose whether wall
+ 				 // clock or CPU times are to be printed, as
+ 				 // well as whether we want to produce
+				 // output every time we leave a section --
+ 				 // which would be quite a lot of additional
+ 				 // output -- or just in the end of the
+ 				 // program (this choice is made in the
+ 				 // from this variable in the results
+ 				 // section of this tutorial program.
 template <int dim>
 class BoussinesqFlowProblem
 {
@@ -929,52 +928,43 @@ class BoussinesqFlowProblem
 				 // similar to the constructor in
 				 // step-31. What is different is the
 				 // %parallel communication: Trilinos uses a
-				 // message passing interface (MPI) for
-				 // data distribution. When entering the
-				 // BoussinesqFlowProblem class, we have
-				 // to decide how the parallization is to
-				 // be done. We choose a rather simple
-				 // strategy and let all processors
-				 // running the program work together,
-				 // specified by the communicator
+				 // message passing interface (MPI) for data
+				 // distribution. When entering the
+				 // BoussinesqFlowProblem class, we have to
+				 // decide how the parallization is to be
+				 // done. We choose a rather simple strategy
+				 // and let all processors that are running
+				 // the program work together, specified by
+				 // the communicator
 				 // <code>comm_world()</code>. Next, we
-				 // create some modified output stream as
-				 // we already did in step-18. In MPI, all
-				 // the processors run the same program
+				 // create some modified output stream as we
+				 // already did in step-18. In MPI, all the
+				 // processors run the same program
 				 // individually (they simply operate on
 				 // different chunks of data and exchange
-				 // some data from time to time). Since we
-				 // do not want each processor to write
-				 // the same information to screen (like
-				 // the number of degrees of freedom), we
-				 // only use one processor for writing
-				 // that output to terminal windows. The
-				 // implementation of this idea is to
-				 // check the process number when
-				 // entering the program. If we are on
-				 // processor 0, then the data field
-				 // <code>pcout</code> gets a true
-				 // argument, and it uses the
-				 // <code>std::cout</code> stream for
-				 // output. If we are on processor five,
-				 // for instance, then we will give a
-				 // <code>false</code> argument to
-				 // <code>pcout</code>, which means that
-				 // the output of that processor will not
-				 // be printed anywhere.
-				 //
-				 // Finally, we use a TimerOutput
-				 // object for summarizing the time we
-				 // spend in different sections of the
-				 // program, which we need to
-				 // initialize. The first constructor
-				 // argument denotes the stream we
-				 // want output to be written to; we
-				 // choose <code>pcout</code> here. We
-				 // then also say that we want to get
-				 // a summary table at the end of the
-				 // program which shows us wallclock
-				 // times (as opposed to CPU times).
+				 // some part of that data from time to
+				 // time). Next, we need to initialize the
+ 				 // <code>pcout</code> object in order to
+ 				 // print the user information only on one
+ 				 // processor. The implementation of this
+ 				 // idea is to check the process number when
+ 				 // <code>pcout</code> gets a true argument,
+ 				 // and it uses the <code>std::cout</code>
+ 				 // stream for output. If we are one
+ 				 // processor five, for instance, then we
+ 				 // will give a <code>false</code> argument
+ 				 // to <code>pcout</code>, which means that
+ 				 // the output of that processor will not be
+ 				 // printed anywhere.
+ 				 // 
+ 				 // Finally, we enter the preffered options
+ 				 // for the TimerOutput object to its
+ 				 // constructor. We restrict the output to
+ 				 // the <code>pcout</code> stream (processor
+ 				 // 0), and then we specify that we want to
+ 				 // get a summary table in the end of the
+ 				 // program which shows us wallclock times
+ 				 // (as opposed to CPU times).
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
@@ -1338,6 +1328,12 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // This strategy is replicated across
 				 // all three of the following
 				 // functions.
+				 //
+				 // Note that Trilinos matrices store the
+ 				 // information contained in the sparsity
+ 				 // patterns, so we can safely release the
+ 				 // <code>sp</code> variable once the matrix
+ 				 // has been given the sparsity structure.
 template <int dim>
 void BoussinesqFlowProblem<dim>::setup_stokes_matrix ()
 {
@@ -1418,48 +1414,41 @@ void BoussinesqFlowProblem<dim>::setup_temperature_matrices ()
 
 				 // @sect4{BoussinesqFlowProblem::setup_dofs}
 
-				 // The remainder of the setup
-				 // function (after splitting out the
-				 // three functions above) mostly has
-				 // to deal with the things we need to
-				 // do for parallelization across
-				 // processors. In particular, at the
+				 // The remainder of the setup function
+				 // (after splitting out the three functions
+				 // above) mostly has to deal with the
+				 // things we need to do for parallelization
+				 // across processors. In particular, at the
 				 // top it calls
-				 // GridTools::partition_triangulation
-				 // to subdivide all cells into
-				 // subdomains of roughly equal size
-				 // and roughly minimal interface
-				 // length. We then distribute degrees
-				 // of freedom for Stokes and
-				 // temperature DoFHandler objects,
-				 // and re-sort them in such a way
-				 // that all degrees of freedom
-				 // associated with subdomain zero
-				 // come before all those associated
-				 // with subdomain one, etc. For the
-				 // Stokes part, this entails,
-				 // however, that velocities and
-				 // pressures become intermixed, but
-				 // this is trivially solved by
-				 // sorting again by blocks; it is
-				 // worth noting that this latter
-				 // operation leaves the relative
-				 // ordering of all velocities and
-				 // pressures alone, i.e. within the
-				 // velocity block we will still have
-				 // all those associated with
-				 // subdomain zero before all
-				 // velocities associated with
-				 // subdomain one, etc. This is
-				 // important since we store each of
-				 // the blocks of this matrix
-				 // distributed across all processors
-				 // and want this to be done in such a
-				 // way that each processor stores
-				 // that part of the matrix that is
-				 // roughly equal to the degrees of
-				 // freedom located on those cells
-				 // that it will actually work on.
+				 // GridTools::partition_triangulation to
+				 // subdivide all cells into subdomains of
+				 // roughly equal size and roughly minimal
+				 // interface length (using METIS). We then
+				 // distribute degrees of freedom for Stokes
+				 // and temperature DoFHandler objects, and
+				 // re-sort them in such a way that all
+				 // degrees of freedom associated with
+				 // subdomain zero come before all those
+				 // associated with subdomain one, etc. For
+				 // the Stokes part, this entails, however,
+				 // that velocities and pressures become
+				 // intermixed, but this is trivially solved
+				 // by sorting again by blocks; it is worth
+				 // noting that this latter operation leaves
+				 // the relative ordering of all velocities
+				 // and pressures alone, i.e. within the
+				 // velocity block we will still have all
+				 // those associated with subdomain zero
+				 // before all velocities associated with
+				 // subdomain one, etc. This is important
+				 // since we store each of the blocks of
+				 // this matrix distributed across all
+				 // processors and want this to be done in
+				 // such a way that each processor stores
+				 // that part of the matrix that is roughly
+				 // equal to the degrees of freedom located
+				 // on those cells that it will actually
+				 // work on.
 				 //
 				 // After this, we have to set up the
 				 // various partitioners (of type
@@ -1475,26 +1464,23 @@ void BoussinesqFlowProblem<dim>::setup_temperature_matrices ()
 				 // various vectors we keep around in
 				 // this program.
 				 //
-				 // Note also how this function enters
-				 // and leaves a timed section so that
-				 // we can get a time report at the
-				 // end of the program. Note also the
-				 // use of the <code>pcout</code>
-				 // variable: to every process it
-				 // looks like we can write to screen,
-				 // but only the output of the first
-				 // processor actually ends up
-				 // somewhere. We could of course have
-				 // achieved the same effect by
-				 // writing to <code>std::cout</code>
-				 // but would then have had to guard
-				 // every access to that stream by
-				 // something like <code>if
+				 // Note how this function enters and leaves
+				 // a timed section so that we can get a
+				 // time report at the end of the
+				 // program. Note also the use of the
+				 // <code>pcout</code> variable: to every
+				 // process it looks like we can write to
+				 // screen, but only the output of the first
+				 // processor actually ends up somewhere. We
+				 // could of course have achieved the same
+				 // effect by writing to
+				 // <code>std::cout</code> but would then
+				 // have had to guard every access to that
+				 // stream by something like <code>if
 				 // (Utilities:: Trilinos::
 				 // get_this_mpi_process
-				 // (trilinos_communicator) ==
-				 // 0)</code>, hardly a pretty
-				 // solution.
+				 // (trilinos_communicator) == 0)</code>,
+				 // hardly a pretty solution.
 template <int dim>
 void BoussinesqFlowProblem<dim>::setup_dofs ()
 {
