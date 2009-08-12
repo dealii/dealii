@@ -216,11 +216,11 @@ namespace IteratorFilters
  *
  * The object that represent the condition an iterator has to satisfy
  * only have to provide an interface that allows to call the
- * evaluation operator, i.e. <tt>bool operator() (const
- * BaseIterator&)</tt>. This includes function pointers as well as
- * classes that implement an <tt>bool operator ()(const
- * BaseIterator&)</tt>. Then, the FilteredIterator will skip all
- * objects where the return value of this function is <tt>false</tt>.
+ * evaluation operator, i.e. <code>bool operator() (const
+ * BaseIterator&)</code>. This includes function pointers as well as
+ * classes that implement an <code>bool operator ()(const
+ * BaseIterator&)</code>. Then, the FilteredIterator will skip all
+ * objects where the return value of this function is <code>false</code>.
  *
  *
  * An example of a simple valid predicate is the following: given the function
@@ -284,7 +284,7 @@ namespace IteratorFilters
  *       const unsigned int subdomain_id;
  *   };
  * @endcode
- * Objects like <tt>SubdomainEqualTo(3)</tt> can then be used as predicates.
+ * Objects like <code>SubdomainEqualTo(3)</code> can then be used as predicates.
  *
  * Since whenever a predicate is evaluated it is checked that the
  * iterator checked is actually valid (i.e. not past the end), no
@@ -313,8 +313,8 @@ namespace IteratorFilters
  * however, a value is given to the constructor, that value has either
  * to be past the end, or has to satisfy the predicate. For example,
  * if the predicate only evaluates to true if the level of an object
- * is equal to three, then <tt>tria.begin_active(3)</tt> would be a valid
- * choice while <tt>tria.begin()</tt> would not since the latter also
+ * is equal to three, then <code>tria.begin_active(3)</code> would be a valid
+ * choice while <code>tria.begin()</code> would not since the latter also
  * returns iterators to non-active cells which always start at level
  * 0.
  *
@@ -326,7 +326,7 @@ namespace IteratorFilters
  * assign the next or last previous iterator that satisfies the
  * predicate, i.e. they follow the list of iterators in either
  * direction until they find a matching one (or the past-the-end
- * iterator). Like the <tt>operator=</tt> they return the resulting value
+ * iterator). Like the <code>operator=</code> they return the resulting value
  * of the filtered iterator.
  *
  *
@@ -378,7 +378,7 @@ namespace IteratorFilters
  * Since comparison between filtered and unfiltered iterators is
  * defined, we could as well have let the @p endc variable in the
  * last example be of type
- * <tt>Triangulation<dim>::active_cell_iterator</tt> since it is unchanged
+ * <code>Triangulation@<dim@>::active_cell_iterator</code> since it is unchanged
  * and its value does not depend on the filter.
  *
  * @ingroup grid
