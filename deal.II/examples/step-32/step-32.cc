@@ -959,7 +959,7 @@ class BoussinesqFlowProblem
  				 // the output of that processor will not be
  				 // printed anywhere.
  				 // 
- 				 // Finally, we enter the preffered options
+ 				 // Finally, we enter the preferred options
  				 // for the TimerOutput object to its
  				 // constructor. We restrict the output to
  				 // the <code>pcout</code> stream (processor
@@ -1264,7 +1264,10 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // we used for generating an initial vector
 				 // for temperature based on some initial
 				 // function. The library function only
-				 // works with shared memory. If run with
+				 // works with shared memory but doesn't
+				 // know how to utilize multiple machines
+				 // coupled through MPI to compute the
+				 // projected solution. If run with
 				 // more than one MPI process, this would
 				 // mean that each processor projects the
 				 // whole field, which is clearly not very
@@ -1289,7 +1292,10 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // down (which include thread-based
 				 // parallelization with the WorkStream
 				 // concept). Here we chose to keep things
-				 // simple, and generating that right hand
+				 // simple (keeping in mind that this function
+				 // is also only called at the beginning of
+				 // the program, not every time step), and
+				 // generating that right hand
 				 // side is cheap anyway so we won't even
 				 // notice that this part is not parallized
 				 // by threads.
@@ -1316,8 +1322,9 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 
   std::vector<double> rhs_values(n_q_points);
 
-  TrilinosWrappers::MPI::Vector rhs (temperature_mass_matrix.row_partitioner()),
-    sol (temperature_mass_matrix.row_partitioner());
+  TrilinosWrappers::MPI::Vector
+    rhs (temperature_mass_matrix.row_partitioner()),
+    solution (temperature_mass_matrix.row_partitioner());
 
   for (; cell!=endc; ++cell)
     if (cell->subdomain_id() ==
@@ -1350,9 +1357,9 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   TrilinosWrappers::PreconditionIC preconditioner_mass;
   preconditioner_mass.initialize(temperature_mass_matrix);
 
-  cg.solve (temperature_mass_matrix, sol, rhs, preconditioner_mass);
+  cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
 
-  old_temperature_solution = sol;
+  old_temperature_solution = solution;
   temperature_constraints.distribute (old_temperature_solution);
 }
 
@@ -1707,28 +1714,55 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 				 // @sect4{The BoussinesqFlowProblem assembly functions}
 				 // 
-				 // According to the discussion in the
-				 // introduction, we split the assembly
-				 // functions into differrent parts. The
-				 // first part is to do the local
-				 // calculations of matrices and right hand
-				 // sides, given a certain cell as
-				 // input. This is done in the same way as
-				 // in step-31. Note that these functions
-				 // store the result from the local
-				 // calculations in variables contained in
-				 // the CopyData namespace, which are then
-				 // given to the second step which writes
-				 // the local data into the global data
-				 // structures. These two subfunctions are
-				 // then used in the respective assembly
-				 // routine, where a WorkStream object is
-				 // set up and runs over all the cells that
-				 // belong to the processor's subdomain.
-				 // 
-				 // We start the implementation with the
-				 // assembly functions for the Stokes
-				 // preconditioner.
+				 // Following the discussion in the
+				 // introduction and in the @ref threads
+				 // module, we split the assembly functions
+				 // into different parts:
+				 //
+				 // <ul>
+				 // <li> The local calculations of matrices
+				 // and right hand sides, given a certain cell
+				 // as input (these functions are named
+				 // <code>local_assemble_*</code> below). The
+				 // resulting function is, in other words,
+				 // essentially the body of the loop over all
+				 // cells in step-31. Note, however, that
+				 // these functions store the result from the
+				 // local calculations in variables of classes
+				 // from the CopyData namespace.
+				 //
+				 // <li>These objects are then given to the
+				 // second step which writes the local data
+				 // into the global data structures (these
+				 // functions are named
+				 // <code>copy_local_to_global_*</code>
+				 // below). These functions are pretty
+				 // trivial.
+				 //
+				 // <li>These two subfunctions are then used
+				 // in the respective assembly routine (called
+				 // <code>assemble_*</code> below), where a
+				 // WorkStream object is set up and runs over
+				 // all the cells that belong to the
+				 // processor's subdomain.
+				 // </ul>
+
+				 // @sect5{Stokes preconditioner assembly}
+				 //
+				 // Let us start with the functions that
+				 // builds the Stokes preconditioner. The
+				 // first two of these are pretty trivial,
+				 // given the discussion above. Note in
+				 // particular that the main point in using
+				 // the scratch data object is that we want to
+				 // avoid allocating any objects on the free
+				 // space each time we visit a new cell. As a
+				 // consequence, the assembly function below
+				 // only has automatic local variables, and
+				 // everything else is accessed through the
+				 // scratch data object, which is allocated
+				 // only once before we start the loop over
+				 // all cells:
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::
@@ -1758,7 +1792,8 @@ local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cel
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  data.local_matrix(i,j) += (EquationData::eta *
-				     scalar_product (scratch.grad_phi_u[i], scratch.grad_phi_u[j])
+				     scalar_product (scratch.grad_phi_u[i],
+						     scratch.grad_phi_u[j])
 				     +
 				     (1./EquationData::eta) *
 				     scratch.phi_p[i] * scratch.phi_p[j])
@@ -1783,20 +1818,31 @@ copy_local_to_global_stokes_preconditioner (const Assembly::CopyData::StokesPrec
 				 // When we create the WorkStream, we modify
 				 // the start and end iterator into a
 				 // so-called <code>SubdomainFilter</code>
-				 // that tells the individual processes on
-				 // which cells to work on. This is exactly
-				 // the case discussed in the
-				 // introduction. Note how we use the
-				 // construct <code>std_cxx1x::bind</code>
-				 // to create a function object that is
-				 // compatible with the WorkStream class. It
-				 // uses placeholders <code>1_, 2_,
-				 // 3_</code> for the local assembly
-				 // function that specify cell, scratch
-				 // data, and copy data, as well as the
-				 // placeholder <code>1_</code> for the copy
-				 // function that expects the data to be
-				 // written into the global matrix. When the
+				 // that tells the individual processes which
+				 // cells to work on. This is exactly the case
+				 // discussed in the introduction. Note how we
+				 // use the construct
+				 // <code>std_cxx1x::bind</code> to create a
+				 // function object that is compatible with
+				 // the WorkStream class. It uses placeholders
+				 // <code>_1, _2, _3</code> for the local
+				 // assembly function that specify cell,
+				 // scratch data, and copy data, as well as
+				 // the placeholder <code>_1</code> for the
+				 // copy function that expects the data to be
+				 // written into the global matrix. On the
+				 // other hand, the implicit zeroth argument
+				 // of member functions (namely the
+				 // <code>this</code> pointer of the object on
+				 // which that member function is to operate
+				 // on) is <i>bound</i> to the
+				 // <code>this</code> pointer of the current
+				 // function. The WorkStream class, as a
+				 // consequence, does not need to know
+				 // anything about the object these functions
+				 // work on.
+				 //
+				 // When the
 				 // WorkStream is executed, it will create
 				 // several local assembly routines of the
 				 // first kind for several cells and let
@@ -1863,13 +1909,15 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 
 
 
-				 // This function builds the Stokes
-				 // preconditioner and is the same as in the
-				 // serial case. The only difference to
+				 // The final function in this block initiates
+				 // assemble of the Stokes preconditioner
+				 // matrix and then builds the Stokes
+				 // preconditioner. It is mostly the same as
+				 // in the serial case. The only difference to
 				 // step-31 is that we use an ILU
 				 // preconditioner for the pressure mass
-				 // matrix instead of IC, as discussed in
-				 // the introduction.
+				 // matrix instead of IC, as discussed in the
+				 // introduction.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
@@ -1910,7 +1958,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   computing_timer.exit_section();
 }
 
-
+				 // @sect5{Stokes system assembly}
 
 				 // The next three functions implement the
 				 // assembly of the Stokes system, again
@@ -2076,15 +2124,21 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 }
 
 
+				 // @sect5{Temperature matrix assembly}
 
-				 // The task to be performed by the next
-				 // three functions is to calculate a mass
-				 // matrix and a Laplace matrix on the
-				 // temperature system. These will be
-				 // combined in order to yield the
-				 // semi-implicit time stepping matrix that
-				 // consists of the mass matrix plus a time
-				 // step weight times the Laplace matrix.
+				 // The task to be performed by the next three
+				 // functions is to calculate a mass matrix
+				 // and a Laplace matrix on the temperature
+				 // system. These will be combined in order to
+				 // yield the semi-implicit time stepping
+				 // matrix that consists of the mass matrix
+				 // plus a time step weight times the Laplace
+				 // matrix. This function is again essentially
+				 // the body of the loop over all cells from
+				 // step-31.
+				 //
+				 // The two following functions perform
+				 // similar services as the ones above.
 template <int dim>
 void BoussinesqFlowProblem<dim>::
 local_assemble_temperature_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -2187,6 +2241,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 }
 
 
+				 // @sect5{Temperature right hand side assembly}
 
 				 // This is the last assembly function. It
 				 // calculates the right hand side of the
@@ -2353,8 +2408,8 @@ copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<d
 				 // more efficient to precompute the
 				 // preconditioner, even though the matrix
 				 // entries may slightly change because the
-				 // time step might change. This is not a
-				 // too big problem because we remesh every
+				 // time step might change. This is not
+				 // too big a problem because we remesh every
 				 // fifth time step (and regenerate the
 				 // preconditioner then).
 template <int dim>
@@ -2427,7 +2482,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 				 // @sect4{BoussinesqFlowProblem::solve}
 
 				 // This function solves the linear systems
-				 // in the Boussinesq problem. First, we
+				 // in each time step of the Boussinesq
+				 // problem. First, we
 				 // work on the Stokes system and then on
 				 // the temperature system. In essence, it
 				 // does the same things as the respective
@@ -2460,7 +2516,11 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 				 // actually are irrelevant during the solve
 				 // stage. As a difference to step-31, here
 				 // we do it only for the locally owned
-				 // pressure dofs.
+				 // pressure dofs. After solving for the
+				 // Stokes solution, each processor copies
+				 // distributed solution back into the solution
+				 // vector for which every element is locally
+				 // owned.
 				 // 
 				 // Apart from these two changes, everything
 				 // is the same as in step-31, so we don't
@@ -2473,19 +2533,18 @@ void BoussinesqFlowProblem<dim>::solve ()
 
   {
     const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-      TrilinosWrappers::PreconditionILU>
+                                                  TrilinosWrappers::PreconditionILU>
       preconditioner (stokes_matrix, *Mp_preconditioner, *Amg_preconditioner);
 
     TrilinosWrappers::MPI::BlockVector
       distributed_stokes_solution (stokes_partitioner);
     distributed_stokes_solution = stokes_solution;
 
-    const unsigned int start =
-      distributed_stokes_solution.block(1).local_range().first +
-      distributed_stokes_solution.block(0).size();
-    const unsigned int end =
-      distributed_stokes_solution.block(1).local_range().second +
-      distributed_stokes_solution.block(0).size();
+    const unsigned int
+      start = (distributed_stokes_solution.block(0).size() +
+	       distributed_stokes_solution.block(1).local_range().first),
+      end   = (distributed_stokes_solution.block(0).size() +
+	       distributed_stokes_solution.block(1).local_range().second);
     for (unsigned int i=start; i<end; ++i)
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
@@ -2571,27 +2630,29 @@ void BoussinesqFlowProblem<dim>::solve ()
 				 // @sect4{BoussinesqFlowProblem::output_results}
 
 				 // This function has remained completely
-				 // unchanged compared to step-31, so
-				 // everything should be clear here.
+				 // unchanged compared to step-31 (with the
+				 // exception that we make sure that only a
+				 // single processor actually does some work
+				 // here), so everything should be clear here:
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
   if (timestep_number % 10 != 0)
     return;
 
-  const FESystem<dim> joint_fe (stokes_fe, 1,
-				temperature_fe, 1);
-  DoFHandler<dim> joint_dof_handler (triangulation);
-  joint_dof_handler.distribute_dofs (joint_fe);
-  Assert (joint_dof_handler.n_dofs() ==
-	  stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
-	  ExcInternalError());
-
-  Vector<double> joint_solution (joint_dof_handler.n_dofs());
-
   if (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) == 0)
     {
 
+      const FESystem<dim> joint_fe (stokes_fe, 1,
+				    temperature_fe, 1);
+      DoFHandler<dim> joint_dof_handler (triangulation);
+      joint_dof_handler.distribute_dofs (joint_fe);
+      Assert (joint_dof_handler.n_dofs() ==
+	      stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
+	      ExcInternalError());
+
+      Vector<double> joint_solution (joint_dof_handler.n_dofs());
+      
       {
 	std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
 	std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
