@@ -1,6 +1,6 @@
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
-           Wolfgang Bangerth, Texas A&M University 2007, 2008, 2009 */
+           Wolfgang Bangerth, Texas A&M University 2008, 2009 */
 /*                                                                */
 /*    Copyright (C) 2008, 2009 by the deal.II authors */
 /*                                                                */
