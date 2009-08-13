@@ -2722,7 +2722,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
       data_out.write_vtk (output);
     }
 
-  computing_timer.leave_section ();
+  computing_timer.exit_section ();
 }
 
 
