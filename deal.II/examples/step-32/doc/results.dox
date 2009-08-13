@@ -28,3 +28,86 @@ magnitude more than we had available in step-31:
 
 The computation was done on a subset of 50 processors of the Brazos
 cluster at Texas A&amp;M University.
+
+For a much more modest run (less mesh refinement, only 35 time steps, but 50
+processors as above), we get this as output:
+
+<code>
+<pre>
+Number of active cells: 512 (on 4 levels)
+Number of degrees of freedom: 20381 (14739+729+4913)
+
+Timestep 0:  t=0
+   Assembling...
+   Rebuilding Stokes preconditioner...[II] fixing the coarse-level matrix dead dofs
+
+   Solving...
+   0 BiCGStab iterations for Stokes subsystem.
+   Time step: 1.30208
+   26 CG iterations for temperature
+   Temperature range: -0.560335 2.39809
+
+Number of active cells: 1296 (on 5 levels)
+Number of degrees of freedom: 51497 (37305+1757+12435)
+
+Timestep 0:  t=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 BiCGStab iterations for Stokes subsystem.
+   Time step: 0.651042
+   28 CG iterations for temperature
+   Temperature range: -0.527408 0.900169
+
+Number of active cells: 5104 (on 6 levels)
+Number of degrees of freedom: 194273 (140913+6389+46971)
+
+[...]
+
+Timestep 35:  t=1.99808
+   Assembling...
+   Solving...
+   16 BiCGStab iterations for Stokes subsystem.
+   Time step: 0.0266227
+   16 CG iterations for temperature
+   Temperature range: -0.0693383 2.04746
+
+Number of active cells: 22912 (on 7 levels)
+Number of degrees of freedom: 838791 (609105+26651+203035)
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |       523s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble Stokes system          |        39 |      39.9s |       7.6% |
+| Assemble temperature matrices   |        10 |      5.43s |         1% |
+| Assemble temperature rhs        |        39 |      16.7s |       3.2% |
+| Build Stokes preconditioner     |        10 |      60.5s |        12% |
+| Solve Stokes system             |        39 |       260s |        50% |
+| Solve temperature system        |        39 |      39.9s |       7.6% |
+| Postprocessing                  |         7 |      9.31s |       1.8% |
+| Refine mesh structure, part 1   |        10 |      20.5s |       3.9% |
+| Refine mesh structure, part 2   |        10 |       2.1s |       0.4% |
+| Setup dof systems               |        11 |      63.3s |        12% |
++---------------------------------+-----------+------------+------------+
+</pre>
+</code>
+
+As can be seen here, we spend most of the compute time in assembling linear
+systems, setting up degrees of freedom and distributed objects, and in
+particular in solving the Stokes system. A closer investigation turns out that
+the 12% spent in the setup part is mostly spent in assembling the sparsity
+pattern; this in turn is due to unsuitable data structures in Trilinos 9.0
+with which these computations have been done, but we have worked closely with
+the Trilinos authors to avoid this bottleneck, and future Trilinos versions
+should perform better in this regard.
+
+The 50% spent on solving the Stokes system, as well as a good part of the 12%
+for building the Stokes preconditioner (which includes, in addition to
+assembling the preconditioner matrix the operations necessary to form the
+distributed algebraic multigrid preconditioner) are affected in large part
+because the Brazos cluster has a relatively slow ethernet interconnect. A
+cluster with a faster interconnect, for example using infiniband, should do
+better in this regard.
