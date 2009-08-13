@@ -48,6 +48,7 @@
 #include <dofs/dof_tools.h>
 
 #include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
@@ -2629,11 +2630,21 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 				 // @sect4{BoussinesqFlowProblem::output_results}
 
-				 // This function has remained completely
-				 // unchanged compared to step-31 (with the
-				 // exception that we make sure that only a
-				 // single processor actually does some work
-				 // here), so everything should be clear here:
+				 // This function has remained mostly
+				 // unchanged compared to step-31, in
+				 // particular merging data from the two
+				 // DoFHandler objects (for the Stokes and the
+				 // temperature parts of the problem) into one
+				 // is the same. There are only two minor
+				 // changes: we make sure that only a single
+				 // processor actually does some work here;
+				 // and in addition to the Stokes and
+				 // temperature parts in the
+				 // <code>joint_fe</code> finite element, we
+				 // also add a piecewise constant field that
+				 // denotes the subdomain id a cell
+				 // corresponds to. This allows us to
+				 // visualize the partitioning of the domain.
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
@@ -2646,7 +2657,8 @@ void BoussinesqFlowProblem<dim>::output_results ()
     {
 
       const FESystem<dim> joint_fe (stokes_fe, 1,
-				    temperature_fe, 1);
+				    temperature_fe, 1,
+				    FE_DGQ<dim>(0), 1);
       DoFHandler<dim> joint_dof_handler (triangulation);
       joint_dof_handler.distribute_dofs (joint_fe);
       Assert (joint_dof_handler.n_dofs() ==
@@ -2681,10 +2693,8 @@ void BoussinesqFlowProblem<dim>::output_results ()
 		  joint_solution(local_joint_dof_indices[i])
 		    = stokes_solution(local_stokes_dof_indices[joint_fe.system_to_base_index(i).second]);
 		}
-	      else
+	      else if (joint_fe.system_to_base_index(i).first.first == 1)
 		{
-		  Assert (joint_fe.system_to_base_index(i).first.first == 1,
-			  ExcInternalError());
 		  Assert (joint_fe.system_to_base_index(i).second
 			  <
 			  local_stokes_dof_indices.size(),
@@ -2692,12 +2702,23 @@ void BoussinesqFlowProblem<dim>::output_results ()
 		  joint_solution(local_joint_dof_indices[i])
 		    = temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
 		}
+	      else
+		{
+		  Assert (joint_fe.system_to_base_index(i).first.first == 2,
+			  ExcInternalError());
+		  Assert (joint_fe.system_to_base_index(i).second
+			  == 0,
+			  ExcInternalError());
+		  joint_solution(local_joint_dof_indices[i])
+		    = joint_cell->subdomain_id();
+		}
 	  }
       }
 
       std::vector<std::string> joint_solution_names (dim, "velocity");
       joint_solution_names.push_back ("p");
       joint_solution_names.push_back ("T");
+      joint_solution_names.push_back ("partition");
 
       DataOut<dim> data_out;
 
