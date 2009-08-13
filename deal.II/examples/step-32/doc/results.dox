@@ -16,10 +16,12 @@ magnitude more than we had available in step-31:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        @image html "step-32.3d.cube.0.png" "" width=49%
+        @image html "step-32.3d.cube.0.png" "" width=80%
     </td>
+  </tr>
+  <tr>
     <td>
-        @image html "step-32.3d.cube.1.png" "" width=49%
+        @image html "step-32.3d.cube.1.png" "" width=80%
     </td>
   </tr>
 </table>
