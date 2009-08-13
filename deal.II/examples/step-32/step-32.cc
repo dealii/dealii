@@ -198,18 +198,20 @@ namespace EquationData
 				 // previously held the approximation of the
 				 // Schur complement by a preconditioner
 				 // only (we will choose ILU in the
-				 // application code below). This is the
-				 // same trick we already did for the
-				 // velocity block - the idea of this is
-				 // that the outer iterations will
-				 // eventually also make the inner
-				 // approximation for the Schur complement
-				 // good. If the preconditioner we're using
-				 // is good enough, there will be no
-				 // increase in the (outer) iteration
-				 // count. All we need to do for
-				 // implementing this change here is to give
-				 // the respective variable in the
+				 // application code below), as discussed in
+				 // the introduction. This trick we already
+				 // did for the velocity block - the idea of
+				 // this is that the solver iterations on
+				 // the block system will eventually also
+				 // make the approximation for the Schur
+				 // complement good. If the preconditioner
+				 // we're using is good enough, there will
+				 // be no increase in the outer iteration
+				 // count compared to using converged solves
+				 // for the inverse matrices of velocity and
+				 // Schur complement. All we need to do for
+				 // implementing that change is to give the
+				 // respective variable in the
 				 // BlockSchurPreconditioner class another
 				 // name.
 namespace LinearSolvers
@@ -1001,7 +1003,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 
 
 
-				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
+				 // @sect4{The BoussinesqFlowProblem helper functions}
 				 //
 				 // Except two small details, this
 				 // function is the very same as in
@@ -1087,8 +1089,6 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 
 
 
-
-				 // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
 				 // Again, this is only a slightly
 				 // modified version of the respective
 				 // function in step-31. What is new is
@@ -1191,8 +1191,6 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
 
 
-				 // @sect4{BoussinesqFlowProblem::compute_viscosity}
-
 				 // The function that calculates the
 				 // viscosity is purely local, so this is
 				 // the same code as in step-31.
@@ -1255,6 +1253,110 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		    std::pow(cell_diameter,alpha) *
 		    max_residual / global_scaling));
 }
+
+
+
+				 // This function is new compared to
+				 // step-31. What is does is to re-implement
+				 // the library function
+				 // <code>VectorTools::project()</code> for
+				 // an MPI-based parallelization, a function
+				 // we used for generating an initial vector
+				 // for temperature based on some initial
+				 // function. The library function only
+				 // works with shared memory. If run with
+				 // more than one MPI process, this would
+				 // mean that each processor projects the
+				 // whole field, which is clearly not very
+				 // efficient. The details of a
+				 // <code>project()</code> function are not
+				 // very difficult. All we do is to use a
+				 // mass matrix and put the evaluation of
+				 // the initial value function on the right
+				 // hand side. The mass matrix for
+				 // temperature we can simply generate using
+				 // the respective assembly function, so all
+				 // we need to do here is to create the
+				 // right hand side and do a CG solve. The
+				 // assembly function does a loop over all
+				 // cells and evaluates the function in the
+				 // <code>EquationData</code> namespace, and
+				 // does this only on cells pertaining to
+				 // the respective processor. The
+				 // implementation of this assembly differs
+				 // from the assembly we do for the
+				 // principal assembly functions further
+				 // down (which include thread-based
+				 // parallelization with the WorkStream
+				 // concept). Here we chose to keep things
+				 // simple, and generating that right hand
+				 // side is cheap anyway so we won't even
+				 // notice that this part is not parallized
+				 // by threads.
+template <int dim>
+void BoussinesqFlowProblem<dim>::project_temperature_field ()
+{
+  assemble_temperature_matrix ();
+
+  QGauss<dim> quadrature(temperature_degree+2);
+  UpdateFlags update_flags = UpdateFlags(update_values   |
+					 update_quadrature_points |
+					 update_JxW_values);
+  FEValues<dim> fe_values (temperature_fe, quadrature, update_flags);
+
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+		     n_q_points    = fe_values.n_quadrature_points;
+
+  std::vector<unsigned int> dofs (dofs_per_cell);
+  Vector<double> cell_vector (dofs_per_cell);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = temperature_dof_handler.begin_active(),
+    endc = temperature_dof_handler.end();
+
+  std::vector<double> rhs_values(n_q_points);
+
+  TrilinosWrappers::MPI::Vector rhs (temperature_mass_matrix.row_partitioner()),
+    sol (temperature_mass_matrix.row_partitioner());
+
+  for (; cell!=endc; ++cell)
+    if (cell->subdomain_id() ==
+	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
+      {
+	fe_values.reinit(cell);
+
+	const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	EquationData::TemperatureInitialValues<dim>().value_list
+	  (fe_values.get_quadrature_points(), rhs_values);
+
+	cell_vector = 0;
+	for (unsigned int point=0; point<n_q_points; ++point)
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    cell_vector(i) += rhs_values[point] *
+			      fe_values.shape_value(i,point) *
+			      weights[point];
+
+	cell->get_dof_indices (dofs);
+
+	temperature_constraints.distribute_local_to_global (cell_vector,
+							    dofs,
+							    rhs);
+      }
+
+  ReductionControl  control(5*rhs.size(), 0., 1e-12, false, false);
+  GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
+  SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
+
+  TrilinosWrappers::PreconditionIC preconditioner_mass;
+  preconditioner_mass.initialize(temperature_mass_matrix);
+
+  cg.solve (temperature_mass_matrix, sol, rhs, preconditioner_mass);
+
+  old_temperature_solution = sol;
+  temperature_constraints.distribute (old_temperature_solution);
+}
+
+
 
 
 				 // @sect4{The BoussinesqFlowProblem setup functions}
@@ -1761,6 +1863,13 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 
 
 
+				 // This function builds the Stokes
+				 // preconditioner and is the same as in the
+				 // serial case. The only difference to
+				 // step-31 is that we use an ILU
+				 // preconditioner for the pressure mass
+				 // matrix instead of IC, as discussed in
+				 // the introduction.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
@@ -1803,6 +1912,25 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
 
 
+				 // The next three functions implement the
+				 // assembly of the Stokes system, again
+				 // split up into a part performing local
+				 // calculations, one for writing the local
+				 // data into the global matrix and vector,
+				 // and one for actually running the loop
+				 // over all cells with the help of the
+				 // WorkStream class. Note that the assembly
+				 // of the Stokes matrix needs only to be
+				 // done in case we have changed the
+				 // mesh. Otherwise, just the
+				 // (temperature-dependent) right hand side
+				 // needs to be calculated here. Since we
+				 // are working with distributed matrices
+				 // and vectors, we have to call the
+				 // respective <code>compress()</code>
+				 // functions in the end of the assembly in
+				 // order to send non-local data to the
+				 // owner process.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::
@@ -1888,7 +2016,6 @@ copy_local_to_global_stokes_system (const Assembly::CopyData::StokesSystem<dim> 
 
 
 
-// @sect4{BoussinesqFlowProblem::assemble_stokes_system}
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 {
@@ -1950,10 +2077,14 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
 
 
-
-
-
-				 // @sect4{BoussinesqFlowProblem::assemble_temperature_system}
+				 // The task to be performed by the next
+				 // three functions is to calculate a mass
+				 // matrix and a Laplace matrix on the
+				 // temperature system. These will be
+				 // combined in order to yield the
+				 // semi-implicit time stepping matrix that
+				 // consists of the mass matrix plus a time
+				 // step weight times the Laplace matrix.
 template <int dim>
 void BoussinesqFlowProblem<dim>::
 local_assemble_temperature_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -1968,7 +2099,6 @@ local_assemble_temperature_matrix (const typename DoFHandler<dim>::active_cell_i
 
   data.local_mass_matrix = 0;
   data.local_stiffness_matrix = 0;
-
 
   for (unsigned int q=0; q<n_q_points; ++q)
     {
@@ -2058,6 +2188,16 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 
 
 
+				 // This is the last assembly function. It
+				 // calculates the right hand side of the
+				 // temperature system, which includes the
+				 // convection and the stabilization
+				 // terms. It includes a lot of evaluations
+				 // of old solutions at the quadrature
+				 // points (which are necessary for
+				 // calculating the artificial viscosity of
+				 // stabilization), but is otherwise similar
+				 // to the other assembly functions.
 template <int dim>
 void BoussinesqFlowProblem<dim>::
 local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
@@ -2191,6 +2331,32 @@ copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<d
 
 
 
+				 // In the function that runs the WorkStream
+				 // for actually calculating the right hand
+				 // side, we also generate the final
+				 // matrix. As mentioned above, it is a sum
+				 // of the mass matrix and the Laplace
+				 // matrix, times some time step
+				 // weight. This weight is specified by the
+				 // BDF-2 time integration scheme, see the
+				 // introduction in step-31. What is new in
+				 // this tutorial program (in addition to
+				 // the use of MPI parallelization and the
+				 // WorkStream class), is that we now
+				 // precompute the temperature
+				 // preconditioner as well. The reason is
+				 // that the setup of the IC preconditioner
+				 // takes a noticable time compared to the
+				 // solver because we usually only need
+				 // between 10 and 20 iterations for solving
+				 // the temperature system. Hence, it is
+				 // more efficient to precompute the
+				 // preconditioner, even though the matrix
+				 // entries may slightly change because the
+				 // time step might change. This is not a
+				 // too big problem because we remesh every
+				 // fifth time step (and regenerate the
+				 // preconditioner then).
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maximal_velocity)
 {
@@ -2215,7 +2381,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
       T_preconditioner =  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
 			  (new TrilinosWrappers::PreconditionIC());
       T_preconditioner->initialize (temperature_matrix);
-
       rebuild_temperature_preconditioner = false;
     }
 
@@ -2258,81 +2423,48 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 
 
 
-				 // @sect4{BoussinesqFlowProblem::project_temperature_field}
-				 // Manually project the initial
-				 // conditions for the temperature in
-				 // %parallel instead of doing that
-				 // completely on each processor. The
-				 // temperature mass matrix is already
-				 // available, and we need just to
-				 // compute a right hand side in
-				 // %parallel, do a CG solve and
-				 // distribute the hanging node
-				 // constraints.
-template <int dim>
-void BoussinesqFlowProblem<dim>::project_temperature_field ()
-{
-  assemble_temperature_matrix ();
-
-  QGauss<dim> quadrature(temperature_degree+2);
-  UpdateFlags update_flags = UpdateFlags(update_values   |
-					 update_quadrature_points |
-					 update_JxW_values);
-  FEValues<dim> fe_values (temperature_fe, quadrature, update_flags);
-
-  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-		     n_q_points    = fe_values.n_quadrature_points;
-
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  Vector<double> cell_vector (dofs_per_cell);
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = temperature_dof_handler.begin_active(),
-    endc = temperature_dof_handler.end();
-
-  std::vector<double> rhs_values(n_q_points);
-
-  TrilinosWrappers::MPI::Vector rhs (temperature_mass_matrix.row_partitioner()),
-    sol (temperature_mass_matrix.row_partitioner());
-
-  for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() ==
-	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
-      {
-	fe_values.reinit(cell);
-
-	const std::vector<double> &weights   = fe_values.get_JxW_values ();
-	EquationData::TemperatureInitialValues<dim>().value_list
-	  (fe_values.get_quadrature_points(), rhs_values);
-
-	cell_vector = 0;
-	for (unsigned int point=0; point<n_q_points; ++point)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    cell_vector(i) += rhs_values[point] *
-			      fe_values.shape_value(i,point) *
-			      weights[point];
-
-	cell->get_dof_indices (dofs);
-
-	temperature_constraints.distribute_local_to_global (cell_vector,
-							    dofs,
-							    rhs);
-      }
-
-  ReductionControl  control(5*rhs.size(), 0., 1e-12, false, false);
-  GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
-  SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
-
-  TrilinosWrappers::PreconditionIC preconditioner_mass;
-  preconditioner_mass.initialize(temperature_mass_matrix);
-
-  cg.solve (temperature_mass_matrix, sol, rhs, preconditioner_mass);
-
-  old_temperature_solution = sol;
-  temperature_constraints.distribute (old_temperature_solution);
-}
 
 				 // @sect4{BoussinesqFlowProblem::solve}
+
+				 // This function solves the linear systems
+				 // in the Boussinesq problem. First, we
+				 // work on the Stokes system and then on
+				 // the temperature system. In essence, it
+				 // does the same things as the respective
+				 // function in step-31. However, there are
+				 // a few things that we need to pay some
+				 // attention to. The first thing is, as
+				 // mentioned in the introduction, the way
+				 // we store our solution: we keep the full
+				 // vector with all degrees of freedom on
+				 // each MPI node. When we enter a solver
+				 // which is supposed to perform
+				 // matrix-vector products with a
+				 // distributed matrix, this is not the
+				 // appropriate form, though. There, we will
+				 // want to have the solution vector to be
+				 // distributed in the same way as the
+				 // matrix. So what we do first (after
+				 // initializing the Schur-complement based
+				 // preconditioner) is to generate a
+				 // distributed vector called
+				 // <code>distributed_stokes_solution</code>
+				 // and put only the locally owned dofs into
+				 // that, which is neatly done by the
+				 // <code>operator=</code> of the Trilinos
+				 // vector. Next, we need to set the
+				 // pressure values at hanging nodes to
+				 // zero. This we also did in step-31 in
+				 // order not to disturb the Schur
+				 // complement by some vector entries that
+				 // actually are irrelevant during the solve
+				 // stage. As a difference to step-31, here
+				 // we do it only for the locally owned
+				 // pressure dofs.
+				 // 
+				 // Apart from these two changes, everything
+				 // is the same as in step-31, so we don't
+				 // need to further comment on it.
 template <int dim>
 void BoussinesqFlowProblem<dim>::solve ()
 {
@@ -2344,17 +2476,10 @@ void BoussinesqFlowProblem<dim>::solve ()
       TrilinosWrappers::PreconditionILU>
       preconditioner (stokes_matrix, *Mp_preconditioner, *Amg_preconditioner);
 
-    SolverControl solver_control (stokes_matrix.m(),
-				  1e-6*stokes_rhs.l2_norm());
-
-    SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
-      bicgstab (solver_control, false);
-
     TrilinosWrappers::MPI::BlockVector
       distributed_stokes_solution (stokes_partitioner);
     distributed_stokes_solution = stokes_solution;
 
-				     // now treat the hanging nodes correctly.
     const unsigned int start =
       distributed_stokes_solution.block(1).local_range().first +
       distributed_stokes_solution.block(0).size();
@@ -2364,6 +2489,11 @@ void BoussinesqFlowProblem<dim>::solve ()
     for (unsigned int i=start; i<end; ++i)
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
+
+
+    SolverControl solver_control (stokes_matrix.m(), 1e-6*stokes_rhs.l2_norm());
+    SolverBicgstab<TrilinosWrappers::MPI::BlockVector> 
+      bicgstab (solver_control, false);
 
     bicgstab.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
 		   preconditioner);
@@ -2439,6 +2569,10 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 
 				 // @sect4{BoussinesqFlowProblem::output_results}
+
+				 // This function has remained completely
+				 // unchanged compared to step-31, so
+				 // everything should be clear here.
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
@@ -2529,6 +2663,8 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
 
 				 // @sect4{BoussinesqFlowProblem::refine_mesh}
+
+				 // Nothing new here, either...
 template <int dim>
 void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
@@ -2594,17 +2730,32 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 
 
 				 // @sect4{BoussinesqFlowProblem::run}
+
+				 // This is the final function in this
+				 // class. It actually runs the program. It
+				 // is, once more, very similar to
+				 // step-31. The only thing that really
+				 // changed is that we use the
+				 // <code>project_temperature_field()</code>
+				 // function instead of the library function
+				 // <code>VectorTools::project</code>, the
+				 // rest is as before.
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
   const unsigned int initial_refinement = (dim == 2 ? 4 : 2);
   const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
 
-				   //GridGenerator::half_hyper_shell (triangulation,
-				   //				   Point<dim>(), 0.5, 1.0);
+				 /* Data for the shell problem. */
+  /*
+  GridGenerator::half_hyper_shell (triangulation,
+				   Point<dim>(), 0.5, 1.0);
 
-				   //static HyperShellBoundary<dim> boundary;
-				   //triangulation.set_boundary (0, boundary);
+  static HyperShellBoundary<dim> boundary;
+  triangulation.set_boundary (0, boundary);
+  */
+
+				 /* Data for the cube problem. */
   GridGenerator::hyper_cube (triangulation);
   global_Omega_diameter = GridTools::diameter (triangulation);
 
@@ -2663,6 +2814,8 @@ void BoussinesqFlowProblem<dim>::run ()
 
 
 				 // @sect3{The <code>main</code> function}
+
+				 // This is copied verbatim from step-31.
 int main (int argc, char *argv[])
 {
   try
