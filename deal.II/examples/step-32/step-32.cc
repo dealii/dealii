@@ -2640,6 +2640,8 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   if (timestep_number % 10 != 0)
     return;
 
+  computing_timer.enter_section ("Postprocessing");
+  
   if (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) == 0)
     {
 
@@ -2719,13 +2721,21 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
       std::ofstream output (filename.str().c_str());
       data_out.write_vtk (output);
     }
+
+  computing_timer.leave_section ();
 }
 
 
 
 				 // @sect4{BoussinesqFlowProblem::refine_mesh}
 
-				 // Nothing new here, either...
+				 // Nothing new here, either. Since the
+				 // <code>setup_dofs</code> function that we
+				 // call in the middle has its own timer
+				 // section, we split timing this function
+				 // into two sections. It will also allow us
+				 // to easily identify which of the two is
+				 // more expensive.
 template <int dim>
 void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
@@ -2876,7 +2886,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
 				 // @sect3{The <code>main</code> function}
 
-				 // This is copied verbatim from step-31.
+				 // This is copied verbatim from step-31:
 int main (int argc, char *argv[])
 {
   try
