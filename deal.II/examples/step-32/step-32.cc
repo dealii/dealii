@@ -959,7 +959,7 @@ class BoussinesqFlowProblem
  				 // to <code>pcout</code>, which means that
  				 // the output of that processor will not be
  				 // printed anywhere.
- 				 // 
+ 				 //
  				 // Finally, we enter the preferred options
  				 // for the TimerOutput object to its
  				 // constructor. We restrict the output to
@@ -1714,7 +1714,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 
 				 // @sect4{The BoussinesqFlowProblem assembly functions}
-				 // 
+				 //
 				 // Following the discussion in the
 				 // introduction and in the @ref threads
 				 // module, we split the assembly functions
@@ -2522,7 +2522,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 				 // distributed solution back into the solution
 				 // vector for which every element is locally
 				 // owned.
-				 // 
+				 //
 				 // Apart from these two changes, everything
 				 // is the same as in step-31, so we don't
 				 // need to further comment on it.
@@ -2552,7 +2552,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 
     SolverControl solver_control (stokes_matrix.m(), 1e-6*stokes_rhs.l2_norm());
-    SolverBicgstab<TrilinosWrappers::MPI::BlockVector> 
+    SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
       bicgstab (solver_control, false);
 
     bicgstab.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
@@ -2632,19 +2632,37 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 				 // This function has remained mostly
 				 // unchanged compared to step-31, in
-				 // particular merging data from the two
-				 // DoFHandler objects (for the Stokes and the
-				 // temperature parts of the problem) into one
-				 // is the same. There are only two minor
-				 // changes: we make sure that only a single
-				 // processor actually does some work here;
-				 // and in addition to the Stokes and
-				 // temperature parts in the
-				 // <code>joint_fe</code> finite element, we
-				 // also add a piecewise constant field that
+				 // particular merging data from the
+				 // two DoFHandler objects (for the
+				 // Stokes and the temperature parts
+				 // of the problem) into one is the
+				 // same. There are only two minor
+				 // changes: we make sure that only a
+				 // single processor actually does
+				 // some work here; and in addition to
+				 // the Stokes and temperature parts
+				 // in the <code>joint_fe</code>
+				 // finite element, we also add a
+				 // piecewise constant field that
 				 // denotes the subdomain id a cell
 				 // corresponds to. This allows us to
-				 // visualize the partitioning of the domain.
+				 // visualize the partitioning of the
+				 // domain. As a consequence, we also
+				 // have to change the assertion about
+				 // the number of degrees of freedom
+				 // in the joint DoFHandler object
+				 // (which is now equal to the number
+				 // of Stokes degrees of freedom plus
+				 // the temperature degrees of freedom
+				 // plus the number of active cells as
+				 // that is the number of partition
+				 // variables we want to add), and
+				 // adjust the number of elements in
+				 // the arrays we use to name the
+				 // components of the joint solution
+				 // vector and to identify which of
+				 // these components are scalars or
+				 // parts of dim-dimensional vectors.
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
@@ -2652,7 +2670,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
     return;
 
   computing_timer.enter_section ("Postprocessing");
-  
+
   if (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) == 0)
     {
 
@@ -2662,11 +2680,13 @@ void BoussinesqFlowProblem<dim>::output_results ()
       DoFHandler<dim> joint_dof_handler (triangulation);
       joint_dof_handler.distribute_dofs (joint_fe);
       Assert (joint_dof_handler.n_dofs() ==
-	      stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
+	      stokes_dof_handler.n_dofs() +
+	      temperature_dof_handler.n_dofs() +
+	      triangulation.n_active_cells(),
 	      ExcInternalError());
 
       Vector<double> joint_solution (joint_dof_handler.n_dofs());
-      
+
       {
 	std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
 	std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
@@ -2726,7 +2746,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
 
       std::vector<DataComponentInterpretation::DataComponentInterpretation>
 	data_component_interpretation
-	(dim+2, DataComponentInterpretation::component_is_scalar);
+	(dim+3, DataComponentInterpretation::component_is_scalar);
       for (unsigned int i=0; i<dim; ++i)
 	data_component_interpretation[i]
 	  = DataComponentInterpretation::component_is_part_of_vector;
