@@ -808,7 +808,7 @@ class BoussinesqFlowProblem
     double get_maximal_velocity () const;
     std::pair<double,double> get_extrapolated_temperature_range () const;
     void solve ();
-    void output_results () const;
+    void output_results ();
     void refine_mesh (const unsigned int max_grid_level);
 
     double
@@ -2635,7 +2635,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				 // single processor actually does some work
 				 // here), so everything should be clear here:
 template <int dim>
-void BoussinesqFlowProblem<dim>::output_results ()  const
+void BoussinesqFlowProblem<dim>::output_results ()
 {
   if (timestep_number % 10 != 0)
     return;
