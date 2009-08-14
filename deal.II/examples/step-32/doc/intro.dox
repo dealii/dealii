@@ -279,9 +279,41 @@ process in use.
 
 <h3> Implementation details </h3>
 
-TODO: Wolfgang
-Mention that we immediately localize all solution vectors after
-solving.
+One detail worth discussing before we show the actual implementation
+is how to deal with distributed vs. localized vectors. When we build
+the linear systems, the various matrices and right hand side vectors
+are always built distributed, i.e. each processor builds contributions
+for a subset of cells and adds them to the global matrix objects;
+Trilinos then makes sure that the right entries end up on the right
+processors so that each processor stores a part of these distributed
+objects.
+
+When we then come around to solving linear systems, the solution
+vectors will also be distributed. On the other hand, in later steps,
+processors will need to be able to access random elements for various
+tasks. For example, processor zero needs to have access to all
+elements in order to produce output; all processors need to have
+access to temperature and Stokes solution data on the cells they own
+to build right hand side vectors for the next time step; and all
+processors need to access data on the cells they own as well as their
+neighbors (whether these neighbors are owned by the same process or
+another one) in order to compute the jump of the gradient across cell
+interfaces in the Kelly error estimator when computing refinement
+information.
+
+In other words, for some operations we will have to exchange
+information between processors. We could try to be smart and really
+only exchange that data that we really need. This would probably be
+important if we were to run this program on thousands of processors,
+as then storing <i>all</i> elements of a solution vector may become
+impractical. On the other hand, deal.II currently has a number of
+other bottlenecks that make sure that thousands of processors is not
+possible anyway. Consequently, here we opt for the simplest choice:
+solve linear systems using distributed vectors, and immediately
+afterwards each processor requests a localized copy of the solution
+vector containing all elements that we will use henceforth for all
+operations. The distributed vector is no longer necessary at this
+point and is, in fact, deallocated again immediately.
 
 
 <h3> The testcase </h3>
