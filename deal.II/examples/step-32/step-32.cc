@@ -1314,7 +1314,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
 
-  std::vector<unsigned int> dofs (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   Vector<double> cell_vector (dofs_per_cell);
 
   typename DoFHandler<dim>::active_cell_iterator
@@ -1344,10 +1344,10 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 			      fe_values.shape_value(i,point) *
 			      weights[point];
 
-	cell->get_dof_indices (dofs);
+	cell->get_dof_indices (local_dof_indices);
 
 	temperature_constraints.distribute_local_to_global (cell_vector,
-							    dofs,
+							    local_dof_indices,
 							    rhs);
       }
 
