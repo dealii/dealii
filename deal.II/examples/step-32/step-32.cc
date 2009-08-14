@@ -750,7 +750,7 @@ namespace Assembly
 				 // the matrices, we happen to use the same
 				 // class names for %parallel and sequential
 				 // data structures, i.e. all matrices will
-				 // actually be considered parallel
+				 // actually be considered %parallel
 				 // below. On the other hand, for vectors,
 				 // only those from namespace
 				 // TrilinosWrappers::MPI are actually
@@ -1378,7 +1378,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 				 // it has been broken out into three
 				 // functions of their own for
 				 // simplicity, but also so that they
-				 // can easily be run in parallel on
+				 // can easily be run in %parallel on
 				 // multiple threads (unless we are
 				 // running with MPI, in which case
 				 // this is not possible, as explained
