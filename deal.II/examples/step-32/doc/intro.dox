@@ -271,10 +271,17 @@ calls to <code>BoussinesqFlowProblem::setup_stokes_matrix</code>,
 scheduled to available resources. There is one problem with this, however:
 if we have more than one MPI process running in parallel, then all of these
 processes need to communicate in a certain order and that requires that the
-various <code>setup_*</code> functions can't run in parallel. For these
-setup operations, we will therefore only be able to make use of multiple
-processor cores within the same machine if there is only a single MPI
-process in use.
+various <code>setup_*</code> functions can't run in parallel. To make
+things worse, even if there is only a single MPI process, we still
+have to make a few calls to the MPI runtime (for example to set up
+communicators for the various matrices and vectors; all of these
+communicators contain only a single processor, but we still have to
+call MPI functions for this). Unfortunately, most MPI implementations
+are not thread-safe, and we can't call MPI functions from multiple
+threads at once. For these setup operations, we will therefore only be
+able to make use of multiple processor cores within the same machine
+if we are not running under the control of MPI -- a condition we can
+check using the Utilities::System::job_supports_mpi() function.
 
 
 <h3> Implementation details </h3>
