@@ -445,6 +445,15 @@ namespace Utilities
 
     
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+
+    bool job_supports_mpi ()
+    {
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+
+      return (MPI_has_been_started > 0);
+    }
+    
                                 // Unfortunately, we have to work
                                 // around an oddity in the way PETSc
                                 // and some gcc versions interact. If
@@ -506,6 +515,13 @@ namespace Utilities
     
 #else
     
+    bool job_supports_mpi ()
+    {
+      return false;
+    }
+
+
+
     unsigned int get_n_mpi_processes (const MPI_Comm &)
     {
       return 1;

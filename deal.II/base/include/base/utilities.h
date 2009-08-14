@@ -23,7 +23,8 @@
 #if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
 #include <mpi.h>
 #else
-typedef int MPI_Comm;
+//typedef int MPI_Comm;
+#include <mpi.h>
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -229,6 +230,23 @@ namespace Utilities
                                       */
     std::string get_time ();
 
+				     /**
+				      * Return whether (i) deal.II has
+				      * been compiled to support MPI
+				      * (for example by compiling with
+				      * <code>CXX=mpiCC</code>) and if
+				      * so whether (ii)
+				      * <code>MPI_Init()</code> has
+				      * been called (for example using
+				      * the
+				      * Utilities::System::MPI_InitFinalize
+				      * class). In other words, the
+				      * result indicates whether the
+				      * current job is running under
+				      * MPI.
+				      */
+    bool job_supports_mpi ();
+    
 				     /**
 				      * Return the number of MPI processes
 				      * there exist in the given communicator

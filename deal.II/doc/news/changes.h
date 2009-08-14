@@ -171,6 +171,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The Utilities::System::job_supports_mpi() can be used to query whether
+  the current job runs under MPI or not.
+  <br>
+  (WB 2009/08/14)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The Utilities::Trilinos::comm_self function return an MPI
   communicator that consists only of the current processor.
   <br>
