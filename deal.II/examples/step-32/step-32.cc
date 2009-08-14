@@ -89,6 +89,11 @@ namespace EquationData
   const double kappa = 1e-6;
   const double Rayleigh_number = 10;
 
+  const double R0 = 6371-2890;
+  const double R1 = 6371-35;
+
+  const double T0 = 4270;
+  const double T1 =  970;
 
 
   template <int dim>
@@ -108,14 +113,18 @@ namespace EquationData
 
   template <int dim>
   double
-  TemperatureInitialValues<dim>::value (const Point<dim>  &,
+  TemperatureInitialValues<dim>::value (const Point<dim>  &p,
 					const unsigned int) const
   {
-				     /* Data for shell problem */
-				     /*return (p.norm() < 0.55+0.02*std::sin(p[0]*20) ? 1 : 0);*/
+    const double r = p.norm();
+    const double h = R1-R0;
 
-				     /* Data for cube problem */
-    return 0.;
+    const double rho = (r-R0)/h;
+
+    Assert (rho >= -.05, ExcInternalError());
+    Assert (rho <= 1, ExcInternalError());
+
+    return T1+(T0-T1)*((1-rho)*(1-rho));
   }
 
 
@@ -150,31 +159,7 @@ namespace EquationData
   TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
 					const unsigned int component) const
   {
-				     /* Data for shell problem. */
-				     /*    return 0; */
-
-				     /* Data for cube problem. */
-    Assert (component == 0,
-	    ExcMessage ("Invalid operation for a scalar function."));
-
-    Assert ((dim==2) || (dim==3), ExcNotImplemented());
-
-    static const Point<dim> source_centers[3]
-      = { (dim == 2 ? Point<dim>(.3,.1) : Point<dim>(.3,.5,.1)),
-	  (dim == 2 ? Point<dim>(.45,.1) : Point<dim>(.45,.5,.1)),
-	  (dim == 2 ? Point<dim>(.75,.1) : Point<dim>(.75,.5,.1)) };
-    static const double source_radius
-      = (dim == 2 ? 1./32 : 1./8);
-
-    return ((source_centers[0].distance (p) < source_radius)
-	    ||
-	    (source_centers[1].distance (p) < source_radius)
-	    ||
-	    (source_centers[2].distance (p) < source_radius)
-	    ?
-	    1
-	    :
-	    0);
+    return 0;
   }
 
 
@@ -1352,7 +1337,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
       }
 
   rhs.compress ();
-
+  
   ReductionControl  control(5*rhs.size(), 0., 1e-12, false, false);
   GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
   SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
@@ -1566,9 +1551,9 @@ void BoussinesqFlowProblem<dim>::setup_temperature_matrices ()
 				 // of each matrix or vector will be stored
 				 // where, then call the functions that
 				 // actually set up the matrices
-				 // (concurrently if on a single processor,
-				 // but sequentially if we need MPI
-				 // communications), and at the end also
+				 // (concurrently if not using MPI
+				 // but sequentially otherwise, as explained
+				 // in the introduction), and at the end also
 				 // resize the various vectors we keep
 				 // around in this program. We given those
 				 // vectors the correct size using the
@@ -1618,8 +1603,17 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     stokes_constraints.clear ();
     DoFTools::make_hanging_node_constraints (stokes_dof_handler,
 					     stokes_constraints);
+
+    std::vector<bool> velocity_mask (dim+1, true);
+    velocity_mask[dim] = false;
+    VectorTools::interpolate_boundary_values (stokes_dof_handler,
+					      0,
+					      ZeroFunction<dim>(dim+1),
+					      stokes_constraints,
+					      velocity_mask);
+
     std::set<unsigned char> no_normal_flux_boundaries;
-    no_normal_flux_boundaries.insert (0);
+    no_normal_flux_boundaries.insert (1);
     VectorTools::compute_no_normal_flux_constraints (stokes_dof_handler, 0,
 						     no_normal_flux_boundaries,
 						     stokes_constraints);
@@ -1683,7 +1677,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 		  0,
 		  trilinos_communicator);
 
-  if (Utilities::Trilinos::get_n_mpi_processes(trilinos_communicator) == 1)
+  if (Utilities::System::job_supports_mpi() == false)
     {
       Threads::TaskGroup<> tasks;
       tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_stokes_matrix,
@@ -2035,8 +2029,9 @@ local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterat
 				       - scratch.phi_p[i] * scratch.div_phi_u[j])
 				      * scratch.stokes_fe_values.JxW(q);
 
-      const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) :
-				   (Point<dim> (0,0,1)) );
+      const Point<dim> gravity = 9.81 *
+				 scratch.stokes_fe_values.quadrature_point(q) /
+				 scratch.stokes_fe_values.quadrature_point(q).norm_square();
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	data.local_rhs(i) += (EquationData::Rayleigh_number *
 			      gravity * scratch.phi_u[i] * old_temperature)*
@@ -2553,7 +2548,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 	distributed_stokes_solution(i) = 0;
 
 
-    SolverControl solver_control (stokes_matrix.m(), 1e-6*stokes_rhs.l2_norm());
+    SolverControl solver_control (stokes_matrix.m(), 1e-12*stokes_rhs.l2_norm());
     SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
       bicgstab (solver_control, false);
 
@@ -2576,7 +2571,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
   old_time_step = time_step;
   const double maximal_velocity = get_maximal_velocity();
-  time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
+  time_step = 1./(1.8*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
               std::max (maximal_velocity, 0.01);
@@ -2857,27 +2852,27 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
-  const unsigned int initial_refinement = (dim == 2 ? 4 : 2);
-  const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
+  const unsigned int initial_refinement = (dim == 2 ? 5 : 2);
+  const unsigned int n_pre_refinement_steps = (dim == 2 ? 2 : 2);
 
-				 /* Data for the shell problem. */
-  /*
-  GridGenerator::half_hyper_shell (triangulation,
-				   Point<dim>(), 0.5, 1.0);
+  GridGenerator::hyper_shell (triangulation,
+			      Point<dim>(),
+			      EquationData::R0,
+			      EquationData::R1,
+			      12,
+			      true);
 
   static HyperShellBoundary<dim> boundary;
   triangulation.set_boundary (0, boundary);
-  */
+  triangulation.set_boundary (1, boundary);
 
-				 /* Data for the cube problem. */
-  GridGenerator::hyper_cube (triangulation);
   global_Omega_diameter = GridTools::diameter (triangulation);
 
   triangulation.refine_global (initial_refinement);
 
   setup_dofs();
 
-  unsigned int       pre_refinement_step    = 0;
+  unsigned int pre_refinement_step = 0;
 
   start_time_iteration:
 
@@ -2922,7 +2917,7 @@ void BoussinesqFlowProblem<dim>::run ()
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;
     }
-  while (time <= 100);
+  while (time <= 1);
 }
 
 
