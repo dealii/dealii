@@ -1351,6 +1351,8 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 							    rhs);
       }
 
+  rhs.compress ();
+
   ReductionControl  control(5*rhs.size(), 0., 1e-12, false, false);
   GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
   SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
