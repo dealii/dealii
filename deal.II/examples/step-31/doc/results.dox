@@ -301,7 +301,7 @@ The program as is has three parameters that we don't have much of a
 theoretical handle on how to choose in an optimal way. These are:
 <ul>
   <li>The time step must satisfy a CFL condition
-      $k\le \min_K \frac{c_kh_K}{\|\mathbf{u}\|_{L^\infty(K)}}$. Here, $c_k$ is 
+      $k\le \min_K \frac{c_kh_K}{\|\mathbf{u}\|_{L^\infty(K)}}$. Here, $c_k$ is
       dimensionless, but what is the right value?
   <li>In the computation of the artificial viscosity,
 @f{eqnarray*}
@@ -315,7 +315,7 @@ theoretical handle on how to choose in an optimal way. These are:
     \frac{\|R_\alpha(T)\|_{L^\infty(K)}}{c(\mathbf{u},T)}
   \right\},
 @f}
-      with $c(\mathbf{u},T) = 
+      with $c(\mathbf{u},T) =
       c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
       \ |\mathrm{diam}(\Omega)|^{\alpha-2}$.
       Here, the choice of the dimensionless numbers $\beta,c_R$ is of
@@ -325,17 +325,17 @@ In all of these cases, we will have to expect that the correct choice of each
 value depends on that of the others, and most likely also on the space
 dimension and polynomial degree of the finite element used for the
 temperature. Below we'll discuss a few numerical experiments to choose
-constants. 
+constants.
 
 
-<h4> Choosing <i>c<sub>k</sub></i> and &beta; </h4>
+<h4> Choosing <i>c<sub>k</sub></i> and beta </h4>
 
 These two constants are definitely linked in some way. The reason is easy to
-see: In the case of a pure advection problem, 
+see: In the case of a pure advection problem,
 $\frac{\partial T}{\partial t} + \mathbf{u}\cdot\nabla T = \gamma$, any
-explicit scheme has to satisfy a CFL condition of the form 
+explicit scheme has to satisfy a CFL condition of the form
 $k\le \min_K \frac{c_k^a h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$. On the other hand,
-for a pure diffusion problem, 
+for a pure diffusion problem,
 $\frac{\partial T}{\partial t} + \nu \Delta T = \gamma$,
 explicit schemes need to satisfy a condition
 $k\le \min_K \frac{c_k^d h_K^2}{\nu}$. So given the form of $\nu$ above, an
@@ -361,7 +361,7 @@ as large as possible to reduce the overall amount of work.
 
 The find the right balance, the only way is to do a few computational
 experiments. Here's what we did: We modified the program slightly to allow
-less mesh refinement (so we don't always have to wait that long) and to choose 
+less mesh refinement (so we don't always have to wait that long) and to choose
 $
   \nu(T)|_K
   =
@@ -373,7 +373,7 @@ in the domain. What we expect to see is this: If we choose the time step too
 big (i.e. choose a $c_k$ bigger than theoretically allowed) then we will get
 exponential growth of the temperature. If we choose $\beta$ too small, then
 the transport stabilization becomes insufficient and the solution will show
-significant oscillations but not exponential growth. 
+significant oscillations but not exponential growth.
 
 
 <h5>Results for Q<sub>1</sub> elements</h5>
@@ -404,17 +404,17 @@ bilinear elements (<code>temperature_degree=1</code>) in 2d:
 
 The way to interpret these graphs goes like this: for $\beta=0.01$ and
 $c_k=\frac 12,\frac 14$, we see exponential growth or at least large
-variations, but if we choose 
-$k=\frac 18\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
-or smaller, then the scheme is 
-stable though a bit wobbly. For more artificial diffusion, we can choose 
-$k=\frac 14\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
+variations, but if we choose
+$k=\frac 18\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$
+or smaller, then the scheme is
+stable though a bit wobbly. For more artificial diffusion, we can choose
+$k=\frac 14\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$
 or smaller for $\beta=0.03$,
-$k=\frac 13\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
+$k=\frac 13\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$
 or smaller for $\beta=0.1$, and again need
-$k=\frac 1{15}\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
+$k=\frac 1{15}\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$
 for $\beta=0.5$ (this time because much diffusion requires a small time
-step). 
+step).
 
 So how to choose? If we were simply interested in a large time step, then we
 would go with $\beta=0.1$ and
@@ -428,7 +428,7 @@ elements to approximate a discontinuous solution. We can therefore see that
 choosing $\beta$ too small is bad: too little artificial diffusion leads to
 over- and undershoots that aren't diffused away. On the other hand, for large
 $\beta$, the minimum temperature drops below zero at the beginning but then
-quickly diffuses back to zero. 
+quickly diffuses back to zero.
 
 On the other hand, let's also look at the maximum temperature. Watching the
 movie of the solution, we see that initially the fluid is at rest. The source
@@ -480,7 +480,7 @@ Again, small values of $\beta$ lead to less diffusion but we have to
 choose the time step very small to keep things under control. Too
 large values of $\beta$ make for more diffusion, but again require
 small time steps. The best value would appear to be $\beta=0.03$, as
-for the $Q_1$ element, and the we have to choose 
+for the $Q_1$ element, and the we have to choose
 $k=\frac 18\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ &mdash; exactly
 half the size for the $Q_1$ element, a fact that may not be surprising
 if we state the CFL condition as the requirement that the time step be
@@ -495,7 +495,7 @@ One can repeat these experiments in 3d and find the optimal time step
 for each value of $\beta$ and find the best value of $\beta$. What one
 finds is that for the same $\beta$ already used in 2d, the time steps
 needs to be a bit small, by around a factor of 1.2 or so. This is
-easily explained: the time step restriction is 
+easily explained: the time step restriction is
 $k=\min_K \frac{ch_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ where $h_K$ is
 the <i>diameter</i> of the cell. However, what is really needed is the
 distance between mesh points, which is $\frac{h_K}{\sqrt{d}}$. So a
