@@ -325,7 +325,134 @@ point and is, in fact, deallocated again immediately.
 
 <h3> The testcase </h3>
 
-TODO: WOLFGANG
+The setup for this program is mildly reminiscent of the problem we wanted to
+solve in the first place (see the introduction of @ref step_31 "step-31"):
+convection in the earth mantle. As a consequence, we choose the following
+data, all of which appears in the program in units of meters and seconds (the
+SI system) even if we list them here in other units:
+<ul>
+  <li>The domain is an annulus (in 2d) or a spherical shell (in 3d) with inner
+  and outer radii that match that of the earth: the total radius of the earth
+  is 6371km, with the mantle starting at a depth of around 35km (just under
+  the solid earth <a target="_top"
+  href="http://en.wikipedia.org/wiki/Crust_(geology)">crust</a> composed of
+  <a target="_top"
+  href="http://en.wikipedia.org/wiki/Continental_crust">continental</a> and <a
+  target="_top" href="http://en.wikipedia.org/wiki/Oceanic_crust">oceanic
+  plates</a>) to a depth of 2890km (where the 
+  <a target="_top" href="http://en.wikipedia.org/wiki/Outer_core">outer earth
+  core</a> starts). The radii are therefore $R_0=(6371-2890)\text{km},
+  R_1=(6371-35)\text{km}$. This domain is conveniently generated using the
+  GridGenerator::hyper_shell() function, and we use a HyperShellBoundary
+  objects for the inner and outer boundary.
+
+  <li>At the interface between crust and mantle, the temperature is between
+  500 and 900 degrees Celsius, whereas at its bottom it is around 4000 degrees
+  Celsius (see, for example, <a target="_top"
+  href="http://en.wikipedia.org/wiki/Mantle_(geology)">this Wikipedia
+  entry</a>). In Kelvin, we therefore choose $T_0=(4000+273)\text{K},
+  T_1=(500+273)\text{K}$. These temperatures we choose as boundary
+  conditions at the inner and outer edge.
+
+  In addition to this, we also have to specifiy some initial conditions for
+  the temperature field. The real temperature field of the earth is quite
+  complicated as a consequence of the convection that has been going on for
+  more than four billion years -- in fact, it is the properties of this
+  temperature distribution that we want to explore with programs like this
+  (or, to be honest, more sophisticated versions of it). As a consequence, we
+  don't really have anything useful to offer here, but we can hope that if we
+  start with something and let things run for a while that the exact initial
+  conditions don't matter that much any more. The initial temperature field we
+  use here is given in terms of the radius by
+  @f{align*}
+    \rho &= \frac{r-R_0}{R_1-R_0}, \\
+    T(r) &= T_0(1-\rho)^2 + T_1[1-(1-\rho)^2].
+  @f}
+  This profile is quadratic and matches the boundary conditions at the inner
+  and outer radii.
+
+  <li>For the velocity we choose as boundary conditions $\mathbf{v}=0$ at the
+  inner radius (i.e. the fluid sticks to the earth core) and
+  $\mathbf{n}\cdot\mathbf{v}=0$ at the outer radius (i.e. the fluid flows
+  tangentially along the bottom of the earth crust). Neither of these is
+  physically overly correct: certainly, on both boundaries, fluids can flow
+  tangentially, but they will incur a shear stress through friction against
+  the medium at the other side of the interface (the metallic core and the
+  crust, respectively). Such a situation could be modeled by a Robin-type
+  boundary condition. To make things worse, the medium on the other side is
+  in motion as well, so the shear stress would, in the simplest case, be
+  proportional to the <i>velocity difference</i>, leading to a boundary
+  condition of the form
+  @f{align*}
+    \mathbf{n}\cdot [2\eta \varepsilon(\mathbf v)] 
+    &= 
+    s \mathbf{n} \times [\mathbf v - \mathbf v_0],
+    \\
+    \mathbf{n} \cdot \mathbf v &= 0,
+  @f}
+  with a proportionality constant $s$. Rather than going down this route,
+  however, we rather stick with the choice of zero (stick) and tangential
+  flow boundary conditions.
+
+  As a side note of interest, we may also have chosen tangential flow
+  conditions on both inner and outer boundary. That has a significant
+  drawback, however: it leaves the velocity not uniquely defined. The reason
+  is that all velocity fields $\hat{\mathbf v}$ that correspond to a solid
+  body rotation around the center of the domain satisfy $\mathrm{div}
+  \varepsilon(\hat{\mathbf v})=0, \mathrm{div} \hat{\mathbf v} = 0$, and
+  $\mathbf{n} \cdot \hat{\mathbf v} = 0$. As a consequence, if $\mathbf v$
+  satisfies equations and boundary conditions, then so does $\mathbf v +
+  \hat{\mathbf v}$. That's certainly not a good situation that we would like
+  to avoid. The traditional way to work around this is to pick an arbitrary
+  point on the boundary and call this your fixed point by choosing the
+  velocity to be zero in all components there. 
+
+  <li>To first order, the gravity vector always point downward. The question for
+  a body as big as the earth is just: where is "up". The answer of course is
+  "radially inward, towards the center of the earth". So at the surface of the
+  earth, we have
+  @f[
+    \mathbf g 
+    = 
+    -9.81 \frac{\text{m}}{\text{s}^2} \frac{\mathbf x}{\|\mathbf x\|},
+  @f]
+  where $9.81 \frac{\text{m}}{\text{s}^2}$ happens to be the average gravity
+  acceleration at the earth surface. But in the earth interior, the question
+  becomes a bit more complicated: at the center of the earth, for example, you
+  have matter pulling equally hard in all directions, and so $\mathbf g=0$. In
+  between, the net force is described as follows: let us define the 
+  <a target="_top"
+  href="http://en.wikipedia.org/wiki/Potential_energy#Gravitational_potential_energy">gravity
+  potential</a> by
+  @f[
+    \varphi(\mathbf x)
+    =
+    \int_{\text{earth}} 
+    -G \frac{\rho(\mathbf x)}{\|\mathbf x-\mathbf y\|} 
+    \ \text{d}y,
+  @f]
+  then $\mathbf g(\mathbf x) = -\nabla \varphi(\mathbf x)$. If we assume that
+  the density $\rho$ is constant throughout the earth, we can produce an
+  analytical expression for the gravity vector:
+
+XXX
+  Of course, within this problem, we are only interested in the branch that
+  pertains to within the earth.
+
+
+  There are two problems with this, however: (i) The Earth is not homogenous,
+  i.e. the density $\rho$ depends on $\mathbf x$; in fact it is not even a
+  function that only depends on the radius $r$. (ii) The density, and by
+  consequence the gravity vector, is not even constant in time: after all, the
+  problem we want to solve is the time dependent upwelling of hot, less dense
+  material and the downwelling of cold dense material. This leads to a gravity
+  vector that varies with space and time, and does not always point straight
+  down.
+
+  In order to not make the situation more complicated than necessary, we'll
+  here just go with the constant density model above.
+</ul>
+
 
 meaningful eta, kappa
 do things in meters, second, not km
