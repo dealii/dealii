@@ -351,8 +351,7 @@ SI system) even if we list them here in other units:
   Celsius (see, for example, <a target="_top"
   href="http://en.wikipedia.org/wiki/Mantle_(geology)">this Wikipedia
   entry</a>). In Kelvin, we therefore choose $T_0=(4000+273)\text{K},
-  T_1=(500+273)\text{K}$. These temperatures we choose as boundary
-  conditions at the inner and outer edge.
+  T_1=(500+273)\text{K}$ as boundary conditions at the inner and outer edge.
 
   In addition to this, we also have to specifiy some initial conditions for
   the temperature field. The real temperature field of the earth is quite
