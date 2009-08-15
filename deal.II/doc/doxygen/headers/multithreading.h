@@ -773,7 +773,8 @@
  *   point where we want to copy the local into the global contributions the
  *   order is still as if we computed things sequentially. In other words, it
  *   may happen that we add the contributions of cell 1 before those of cell
- *   0. That may seem harmless because addition is commutative, but in fact it
+ *   0. That may seem harmless because addition is commutative and
+ *   associative, but in fact it 
  *   is not if done in floating point arithmetic: $a+b+c \neq a+c+b$ -- take
  *   for example $a=1, b=-1, c=10^{-20}$ (because $1+10^{-20}=1$ in floating
  *   point arithmetic, using double precision).
