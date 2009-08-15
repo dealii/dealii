@@ -428,21 +428,52 @@ SI system) even if we list them here in other units:
     \varphi(\mathbf x)
     =
     \int_{\text{earth}} 
-    -G \frac{\rho(\mathbf x)}{\|\mathbf x-\mathbf y\|} 
+    -G \frac{\rho(\mathbf y)}{\|\mathbf x-\mathbf y\|} 
     \ \text{d}y,
   @f]
   then $\mathbf g(\mathbf x) = -\nabla \varphi(\mathbf x)$. If we assume that
   the density $\rho$ is constant throughout the earth, we can produce an
-  analytical expression for the gravity vector:
-
-XXX
-  Of course, within this problem, we are only interested in the branch that
-  pertains to within the earth.
-
+  analytical expression for the gravity vector (don't try to integrate above
+  equation somehow -- it leads to elliptic integrals; the simpler way is to
+  notice that $-\Delta\varphi(\mathbf x) = 4\pi G \rho
+  \chi_{\text{earth}}(\mathbf x)$ and solving this
+  partial differential equation in all of ${\mathbb R}^3$ exploiting the
+  radial symmetry):
+  @f[
+    \mathbf g(\mathbf x) = 
+    \left\{
+      \begin{array}{ll}
+        -\frac{4}{3}\pi G \rho \|\mathbf x\| \frac{\mathbf x}{\|\mathbf x\|}
+	& \text{for} \ \|\mathbf x\|<R_1, \\
+        -\frac{4}{3}\pi G \rho R^3 \frac{1}{\|\mathbf x\|^2} 
+        \frac{\mathbf x}{\|\mathbf x\|}
+	& \text{for} \ \|\mathbf x\|\ge R_1
+      \end{array}
+    \right.
+  @f]
+  The factor $-\frac{\mathbf x}{\|\mathbf x\|}$ is the unit vector pointing
+  radially inward. Of course, within this problem, we are only interested in
+  the branch that pertains to within the earth, i.e. $\|\mathbf x\|<R_1$. In
+  the program, we therefore only consider the expression
+  @f[
+    \mathbf g(\mathbf x) = 
+        -\frac{4}{3}\pi G \rho \|\mathbf x\| \frac{\mathbf x}{\|\mathbf x\|}
+        =
+        -\frac{4}{3}\pi G \rho \mathbf x
+	=
+	- 9.81 \frac{\mathbf x}{R_1} \frac{\text{m}}{\text{s}^2},
+  @f]
+  where we can infer the last expression because we know Earth's gravity at
+  the surface (where $\|x\|=R_1$).
 
   There are two problems with this, however: (i) The Earth is not homogenous,
   i.e. the density $\rho$ depends on $\mathbf x$; in fact it is not even a
-  function that only depends on the radius $r$. (ii) The density, and by
+  function that only depends on the radius $r$. In reality, gravity therefore
+  does not always decrease as we get deeper: because the earth core is so much
+  denser than the mantle, gravity actually peaks at around $10.7
+  \frac{\text{m}}{\text{s}^2}$ at the core mantle boundary (see <a
+  target="_top" href="http://en.wikipedia.org/wiki/Earth's_gravity">this
+  article</a>). (ii) The density, and by
   consequence the gravity vector, is not even constant in time: after all, the
   problem we want to solve is the time dependent upwelling of hot, less dense
   material and the downwelling of cold dense material. This leads to a gravity

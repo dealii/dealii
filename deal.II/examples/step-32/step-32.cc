@@ -99,7 +99,7 @@ namespace EquationData
   template <int dim>
   Tensor<1,dim> gravity_vector (const Point<dim> &p)
   {
-    return -9.81 * p / p.norm_square();
+    return -9.81 * p / R1;
   }
 
   
