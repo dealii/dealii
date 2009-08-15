@@ -89,13 +89,20 @@ namespace EquationData
   const double kappa = 1e-6;
   const double Rayleigh_number = 10;
 
-  const double R0 = 6371-2890;
-  const double R1 = 6371-35;
+  const double R0 = 6371000.-2890000.;
+  const double R1 = 6371000.-  35000.;
 
-  const double T0 = 4270;
-  const double T1 =  970;
+  const double T0 = 4000+273;
+  const double T1 =  700+273;
 
 
+  template <int dim>
+  Tensor<1,dim> gravity_vector (const Point<dim> &p)
+  {
+    return -9.81 * p / p.norm_square();
+  }
+
+  
   template <int dim>
   class TemperatureInitialValues : public Function<dim>
   {
@@ -2029,11 +2036,12 @@ local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterat
 				       - scratch.phi_p[i] * scratch.div_phi_u[j])
 				      * scratch.stokes_fe_values.JxW(q);
 
-      const Point<dim> gravity = 9.81 *
-				 scratch.stokes_fe_values.quadrature_point(q) /
-				 scratch.stokes_fe_values.quadrature_point(q).norm_square();
+      const Tensor<1,dim>
+	gravity = EquationData::gravity_vector (scratch.stokes_fe_values
+						.quadrature_point(q));
+      
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	data.local_rhs(i) += (EquationData::Rayleigh_number *
+	data.local_rhs(i) += (-EquationData::Rayleigh_number *
 			      gravity * scratch.phi_u[i] * old_temperature)*
 			     scratch.stokes_fe_values.JxW(q);
     }
