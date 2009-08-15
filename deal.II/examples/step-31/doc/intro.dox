@@ -29,7 +29,7 @@ can be neglected, the equations that describe such behavior are the
 Boussinesq equations that read as follows:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& 
-  \mathrm{Ra} \; T \mathbf{g},
+  -\mathrm{Ra} \; T \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0,
   \\
@@ -52,14 +52,14 @@ particular with regard to efficient linear Stokes solvers.
 
 The forcing term of the fluid motion is the buoyancy of the
 fluid, expressed as the product of the Rayleigh number $\mathrm{Ra}$,
-the temperature <i>T</i> and the gravity vector <b>g</b>. (A possibly
-more intuitive formulation would use $\mathrm{Ra} \; (T-\bar T)
+the temperature <i>T</i> and the gravity vector <b>g</b> pointing downward. (A
+possibly more intuitive formulation would use $-\mathrm{Ra} \; (T-\bar T)
 \mathbf{g}$ as right hand side where $\bar T$ is the average
 temperature, and the right hand side then describes the forces due to
 local deviations from the average density; this formulation is
 entirely equivalent if the gravity vector results from a gravity
 potential $\phi$, i.e. $\mathbf{g}=-\nabla\phi$, and yields the exact
-same solution except for the pressure which will now be $p+\mathrm{Ra}
+same solution except for the pressure which will now be $p-\mathrm{Ra}
 \;\bar T \phi$.)
 
 While the first two equations describe how the fluid reacts to
@@ -190,7 +190,7 @@ the previous time step. In other words, we first solve the Stokes system for
 time step <i>n-1</i> as
 @f{eqnarray*}
   -\nabla \cdot (2\eta \varepsilon ({\mathbf u}^{n-1})) + \nabla p^{n-1} &=& 
-  \mathrm{Ra} \; T^{n-1} \mathbf{g},
+  -\mathrm{Ra} \; T^{n-1} \mathbf{g},
   \\
   \nabla \cdot {\mathbf u}^{n-1} &=& 0,
 @f}
@@ -310,7 +310,7 @@ by their discrete counterparts:
   -
   (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
   &=& 
-  ({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
+  -({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
   \\
   (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0,
 @f}
@@ -329,7 +329,7 @@ that we implement is
   -
   (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
   &=& 
-  ({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
+  -({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
   \\
   (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0.
 @f}

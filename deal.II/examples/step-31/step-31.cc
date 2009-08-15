@@ -1770,10 +1770,10 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				      - phi_p[i] * div_phi_u[j])
 				     * stokes_fe_values.JxW(q);
 
-	  const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
-				       (Point<dim> (0,0,1)) );
+	  const Point<dim> gravity = -( (dim == 2) ? (Point<dim> (0,1)) : 
+					(Point<dim> (0,0,1)) );
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    local_rhs(i) += (EquationData::Rayleigh_number *
+	    local_rhs(i) += (-EquationData::Rayleigh_number *
 			     gravity * phi_u[i] * old_temperature)*
 			    stokes_fe_values.JxW(q);
 	}
