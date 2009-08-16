@@ -29,7 +29,7 @@ can be neglected, the equations that describe such behavior are the
 Boussinesq equations that read as follows:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& 
-  -\mathrm{Ra} \; T \mathbf{g},
+  -\rho \beta \; T \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0,
   \\
@@ -51,7 +51,8 @@ will draw extensively on the experience we have gained in that program, in
 particular with regard to efficient linear Stokes solvers. 
 
 The forcing term of the fluid motion is the buoyancy of the
-fluid, expressed as the product of the Rayleigh number $\mathrm{Ra}$,
+fluid, expressed as the product of the density $\rho$, the thermal expansion
+coefficient $\beta$,
 the temperature <i>T</i> and the gravity vector <b>g</b> pointing downward. (A
 possibly more intuitive formulation would use $-\mathrm{Ra} \; (T-\bar T)
 \mathbf{g}$ as right hand side where $\bar T$ is the average
@@ -83,14 +84,18 @@ sometimes, as in the case of rock minerals at temperatures close to their
 melting point, $\eta$ may change by orders of magnitude over the typical range
 of temperatures.
 
-$\mathrm{Ra}$, called the <a
-href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
-number</a>, is a dimensionless number that describes the ratio of heat
+We note that the Stokes equation above could be non-dimensionalized by
+introducing the <a target="_top"
+href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh 
+number</a> $\mathrm{Ra}=\frac{\|g\| \beta \rho}{\eta \kappa} \delta T L^3$ using a
+typical length scale $L$, typical temperature difference $\delta T$, density
+$\rho$, thermal diffusivity $\kappa$, and thermal conductivity $\kappa$.
+$\mathrm{Ra}$ is a dimensionless number that describes the ratio of heat
 transport due to convection induced by buoyancy changes from
 temperature differences, and of heat transport due to thermal
 diffusion. A small Rayleigh number implies that buoyancy is not strong
 relative to viscosity and fluid motion <b>u</b> is slow enough so
-that heat diffusion $\kappa\Delta T$ is the dominant heat transport
+that heat diffusion $\kappa\nabla T$ is the dominant heat transport
 term. On the other hand, a fluid with a high Rayleigh number will show
 vigorous convection that dominates heat conduction. 
 

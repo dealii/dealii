@@ -130,13 +130,15 @@ using namespace dealii;
 				 // 
 				 // Finally, or maybe firstly, at the top of
 				 // this namespace, we define the various
-				 // material constants we need ($\eta,\kappa$
-				 // and the Rayleigh number $Ra$):
+				 // material constants we need ($\eta,\kappa$,
+				 // density $\rho$ and the thermal expansion
+				 // coefficient $\beta$):
 namespace EquationData
 {
   const double eta = 1;
   const double kappa = 1e-6;
-  const double Rayleigh_number = 10;
+  const double beta = 10;
+  const double density = 1;
 
 
   template <int dim>
@@ -1773,7 +1775,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	  const Point<dim> gravity = -( (dim == 2) ? (Point<dim> (0,1)) : 
 					(Point<dim> (0,0,1)) );
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    local_rhs(i) += (-EquationData::Rayleigh_number *
+	    local_rhs(i) += (-EquationData::density *
+			     EquationData::beta *
 			     gravity * phi_u[i] * old_temperature)*
 			    stokes_fe_values.JxW(q);
 	}
