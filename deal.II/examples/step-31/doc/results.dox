@@ -318,7 +318,7 @@ theoretical handle on how to choose in an optimal way. These are:
       with $c(\mathbf{u},T) =
       c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
       \ |\mathrm{diam}(\Omega)|^{\alpha-2}$.
-      Here, the choice of the dimensionless numbers $\beta,c_R$ is of
+      Here, the choice of the dimensionless %numbers $\beta,c_R$ is of
       interest.
 </ul>
 In all of these cases, we will have to expect that the correct choice of each
