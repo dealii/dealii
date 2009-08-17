@@ -29,7 +29,7 @@ can be neglected, the equations that describe such behavior are the
 Boussinesq equations that read as follows:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& 
-  -\rho \beta \; T \mathbf{g},
+  -\rho\; \beta \; T\; \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0,
   \\
@@ -54,13 +54,13 @@ The forcing term of the fluid motion is the buoyancy of the
 fluid, expressed as the product of the density $\rho$, the thermal expansion
 coefficient $\beta$,
 the temperature <i>T</i> and the gravity vector <b>g</b> pointing downward. (A
-possibly more intuitive formulation would use $-\mathrm{Ra} \; (T-\bar T)
+possibly more intuitive formulation would use $-\rho\; \beta \; (T-\bar T)
 \mathbf{g}$ as right hand side where $\bar T$ is the average
 temperature, and the right hand side then describes the forces due to
 local deviations from the average density; this formulation is
 entirely equivalent if the gravity vector results from a gravity
 potential $\phi$, i.e. $\mathbf{g}=-\nabla\phi$, and yields the exact
-same solution except for the pressure which will now be $p-\mathrm{Ra}
+same solution except for the pressure which will now be $p-\rho\; \beta
 \;\bar T \phi$.)
 
 While the first two equations describe how the fluid reacts to
@@ -195,7 +195,7 @@ the previous time step. In other words, we first solve the Stokes system for
 time step <i>n-1</i> as
 @f{eqnarray*}
   -\nabla \cdot (2\eta \varepsilon ({\mathbf u}^{n-1})) + \nabla p^{n-1} &=& 
-  -\mathrm{Ra} \; T^{n-1} \mathbf{g},
+  -\rho\; \beta \; T^{n-1} \mathbf{g},
   \\
   \nabla \cdot {\mathbf u}^{n-1} &=& 0,
 @f}
@@ -315,7 +315,7 @@ by their discrete counterparts:
   -
   (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
   &=& 
-  -({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
+  -({\mathbf v}_h, \rho\; \beta \; T^{n-1}_h \mathbf{g}),
   \\
   (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0,
 @f}
@@ -334,7 +334,7 @@ that we implement is
   -
   (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
   &=& 
-  -({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
+  -({\mathbf v}_h, \rho\; \beta \; T^{n-1}_h \mathbf{g}),
   \\
   (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0.
 @f}
@@ -977,7 +977,7 @@ discussed here.
 <h3>The testcase</h3>
 
 The case we want to solve here is as follows: we solve the Boussinesq
-equations described above with $\kappa=10^{-6}, \eta=1, \mathrm{Ra}=10$,
+equations described above with $\kappa=10^{-6}, \eta=1, \rho=1, \beta=10$,
 i.e. a relatively slow moving fluid that has virtually no thermal diffusive
 conductivity and transports heat mainly through convection. On the
 boundary, we will require no-normal flux for the velocity
