@@ -581,6 +581,6 @@ the following quantities:
 All of these pieces of equation data are defined in the program in the
 <code>EquationData</code> namespace. When run, the program produces
 maximal velocities around 10 centimeters per year, approximately the
-physically correct order of magnitude. We will set the end time to 10
+physically correct order of magnitude. We will set the end time to 30
 million years.
 

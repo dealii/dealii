@@ -104,7 +104,7 @@ namespace EquationData
   const double T1      =  700+273;
 
   const double year_in_seconds = 60*60*24*365.2425;
-  const double end_time        = 1e7 * year_in_seconds;
+  const double end_time        = 3e7 * year_in_seconds;
 
   template <int dim>
   Tensor<1,dim> gravity_vector (const Point<dim> &p)
