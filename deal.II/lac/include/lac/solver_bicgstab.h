@@ -87,8 +87,8 @@ class SolverBicgstab : public Solver<VECTOR>
 					  * exact residual computation and
 					  * breakdown parameter 1e-10.
 					  */
-	AdditionalData(bool exact_residual = true,
-		       double breakdown=1.e-10) :
+	AdditionalData(const bool   exact_residual = true,
+		       const double breakdown      = 1.e-10) :
 			exact_residual(exact_residual),
 			breakdown(breakdown)
 	  {}
@@ -105,7 +105,7 @@ class SolverBicgstab : public Solver<VECTOR>
 				     /**
 				      * Constructor.
 				      */
-    SolverBicgstab (SolverControl &cn,
+    SolverBicgstab (SolverControl        &cn,
 		    VectorMemory<VECTOR> &mem,
 		    const AdditionalData &data=AdditionalData());
 
