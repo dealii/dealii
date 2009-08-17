@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * The Bicgstab-method has two additional parameters: the first is a
  * boolean, deciding whether to compute the actual residual in each step (@p
  * true) or to use the length of the computed orthogonal residual (@p
- * false). Remark, that computing the residual causes a third
+ * false). Note that computing the residual causes a third
  * matrix-vector-multiplication, though no additional preconditioning, in
  * each step. The reason for doing this is, that the size of the
  * orthogonalized residual computed during the iteration may be larger by
@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * instabilities related to badly conditioned matrices. Since this
  * instability results in a bad stopping criterion, the default for this
  * parameter is @p true. Whenever the user knows that the estimated residual
- * works reasonably as well, it the flag should be set to @p false in order
+ * works reasonably as well, the flag should be set to @p false in order
  * to increase the performance of the solver.
  *
  * The second parameter is the size of a breakdown criterion. It is
