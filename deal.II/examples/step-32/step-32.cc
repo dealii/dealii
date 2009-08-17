@@ -104,7 +104,7 @@ namespace EquationData
   const double T1      =  700+273;
 
   const double year_in_seconds = 60*60*24*365.2425;
-
+  const double end_time        = 1e7 * year_in_seconds;
 
   template <int dim>
   Tensor<1,dim> gravity_vector (const Point<dim> &p)
@@ -2941,7 +2941,7 @@ void BoussinesqFlowProblem<dim>::run ()
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;
     }
-  while (time <= 1e8 * EquationData::year_in_seconds);
+  while (time <= EquationData::end_time);
 }
 
 

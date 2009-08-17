@@ -333,7 +333,7 @@ SI system) even if we list them here in other units.
 
 As a reminder, the equations we want to solve are these:
 @f{eqnarray*}
-  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& 
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   -\rho \; \beta \; T \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0,
@@ -355,7 +355,7 @@ the following quantities:
   <a target="_top"
   href="http://en.wikipedia.org/wiki/Continental_crust">continental</a> and <a
   target="_top" href="http://en.wikipedia.org/wiki/Oceanic_crust">oceanic
-  plates</a>) to a depth of 2890km (where the 
+  plates</a>) to a depth of 2890km (where the
   <a target="_top" href="http://en.wikipedia.org/wiki/Outer_core">outer earth
   core</a> starts). The radii are therefore $R_0=(6371-2890)\text{km},
   R_1=(6371-35)\text{km}$. This domain is conveniently generated using the
@@ -408,8 +408,8 @@ the following quantities:
   proportional to the <i>velocity difference</i>, leading to a boundary
   condition of the form
   @f{align*}
-    \mathbf{n}\cdot [2\eta \varepsilon(\mathbf v)] 
-    &= 
+    \mathbf{n}\cdot [2\eta \varepsilon(\mathbf v)]
+    &=
     s \mathbf{n} \times [\mathbf v - \mathbf v_0],
     \\
     \mathbf{n} \cdot \mathbf v &= 0,
@@ -429,30 +429,30 @@ the following quantities:
   \hat{\mathbf v}$. That's certainly not a good situation that we would like
   to avoid. The traditional way to work around this is to pick an arbitrary
   point on the boundary and call this your fixed point by choosing the
-  velocity to be zero in all components there. 
+  velocity to be zero in all components there.
 
   <li>To first order, the gravity vector always points downward. The question for
   a body as big as the earth is just: where is "up". The answer of course is
   "radially inward, towards the center of the earth". So at the surface of the
   earth, we have
   @f[
-    \mathbf g 
-    = 
+    \mathbf g
+    =
     -9.81 \frac{\text{m}}{\text{s}^2} \frac{\mathbf x}{\|\mathbf x\|},
   @f]
   where $9.81 \frac{\text{m}}{\text{s}^2}$ happens to be the average gravity
   acceleration at the earth surface. But in the earth interior, the question
   becomes a bit more complicated: at the center of the earth, for example, you
   have matter pulling equally hard in all directions, and so $\mathbf g=0$. In
-  between, the net force is described as follows: let us define the 
+  between, the net force is described as follows: let us define the
   <a target="_top"
   href="http://en.wikipedia.org/wiki/Potential_energy#Gravitational_potential_energy">gravity
   potential</a> by
   @f[
     \varphi(\mathbf x)
     =
-    \int_{\text{earth}} 
-    -G \frac{\rho(\mathbf y)}{\|\mathbf x-\mathbf y\|} 
+    \int_{\text{earth}}
+    -G \frac{\rho(\mathbf y)}{\|\mathbf x-\mathbf y\|}
     \ \text{d}y,
   @f]
   then $\mathbf g(\mathbf x) = -\nabla \varphi(\mathbf x)$. If we assume that
@@ -464,12 +464,12 @@ the following quantities:
   partial differential equation in all of ${\mathbb R}^3$ exploiting the
   radial symmetry):
   @f[
-    \mathbf g(\mathbf x) = 
+    \mathbf g(\mathbf x) =
     \left\{
       \begin{array}{ll}
         -\frac{4}{3}\pi G \rho \|\mathbf x\| \frac{\mathbf x}{\|\mathbf x\|}
 	& \text{for} \ \|\mathbf x\|<R_1, \\
-        -\frac{4}{3}\pi G \rho R^3 \frac{1}{\|\mathbf x\|^2} 
+        -\frac{4}{3}\pi G \rho R^3 \frac{1}{\|\mathbf x\|^2}
         \frac{\mathbf x}{\|\mathbf x\|}
 	& \text{for} \ \|\mathbf x\|\ge R_1
       \end{array}
@@ -480,7 +480,7 @@ the following quantities:
   the branch that pertains to within the earth, i.e. $\|\mathbf x\|<R_1$. In
   the program, we therefore only consider the expression
   @f[
-    \mathbf g(\mathbf x) = 
+    \mathbf g(\mathbf x) =
         -\frac{4}{3}\pi G \rho \|\mathbf x\| \frac{\mathbf x}{\|\mathbf x\|}
         =
         -\frac{4}{3}\pi G \rho \mathbf x
@@ -515,7 +515,7 @@ the following quantities:
   (through its dependence on temperature and pressure). Close to the surface,
   it appears to be on the order of $\beta=45\cdot 10^{-6} \frac 1{\text{K}}$,
   whereas at the core mantle boundary, it may be closer to $\beta=10\cdot
-  10^{-6} \frac 1{\text{K}}$. As a reasonable value, let us choose 
+  10^{-6} \frac 1{\text{K}}$. As a reasonable value, let us choose
   $\beta=2\cdot 10^{-5} \frac 1{\text{K}}$.
 
   <li>The second to last parameter we need to specify is the viscosity
@@ -533,10 +533,10 @@ the following quantities:
   viscosity of the material that flows into the area vacated under the
   rebounding continental plates.
 
-  Using this technique, values around $\eta=10^{21} \text{Pa\; s} 
+  Using this technique, values around $\eta=10^{21} \text{Pa\; s}
   = 10^{21} \frac{\text{N\; s}}{\text{m}^2}
   = 10^{21} \frac{\text{kg}}{\text{m\; s}}$ have been found as the most
-  likely, though the error bar on this is at least one order of magnitude. 
+  likely, though the error bar on this is at least one order of magnitude.
 
   While we will use this value, we again have to caution that there are many
   physical reasons to assume that this is not the correct value. First, it
@@ -563,7 +563,7 @@ the following quantities:
   conductivity, $\rho$ the density, and $c_p$ the specific heat. For
   this, the literature indicates that it increases from around $0.7$ in the
   upper mantle to around $1.7 \frac{\text{mm}^2}{\text{s}}$ in the lower
-  mantle, though the exact value 
+  mantle, though the exact value
   is not really all that important: heat transport through convection is
   several orders of magnitude more important than through thermal
   conduction. It may be of interest to know that perovskite, the most abundant
@@ -573,10 +573,14 @@ the following quantities:
   transport through radiative transfer is more efficient than through thermal
   conduction.
 
-  In view of these considerations, let us choose 
+  In view of these considerations, let us choose
   $\kappa=1 \frac{\text{mm}^2}{\text{s}} =10^{-6} \frac{\text{m}^2}{\text{s}}$
   for the purpose of this program.
 </ul>
 
 All of these pieces of equation data are defined in the program in the
-<code>EquationData</code> namespace.
+<code>EquationData</code> namespace. When run, the program produces
+maximal velocities around 10 centimeters per year, approximately the
+physically correct order of magnitude. We will set the end time to 10
+million years.
+
