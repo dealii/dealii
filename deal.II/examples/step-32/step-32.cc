@@ -1,7 +1,6 @@
 //TODO: - adjust stopping criteria for solvers
 //      - better refinement at the start?
 //      - check solver stability
-//      - set meaningful endtimes
 
 
 /* $Id$ */
@@ -98,11 +97,13 @@ namespace EquationData
   const double density = 3300;
   const double beta    = 2e-5;
 
-  const double R0 = 6371000.-2890000.;
-  const double R1 = 6371000.-  35000.;
+  const double R0      = 6371000.-2890000.;
+  const double R1      = 6371000.-  35000.;
 
-  const double T0 = 4000+273;
-  const double T1 =  700+273;
+  const double T0      = 4000+273;
+  const double T1      =  700+273;
+
+  const double year_in_seconds = 60*60*24*365.2425;
 
 
   template <int dim>
@@ -2594,9 +2595,11 @@ void BoussinesqFlowProblem<dim>::solve ()
   time_step = 1./(1.8*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
-              std::max (maximal_velocity, 0.01);
+              maximal_velocity;
 
-  pcout << "   " << "Time step: " << time_step
+  pcout << "   " << "Time step: "
+	<< time_step/EquationData::year_in_seconds
+	<< " years"
 	<< std::endl;
 
   temperature_solution = old_temperature_solution;
@@ -2906,7 +2909,8 @@ void BoussinesqFlowProblem<dim>::run ()
   do
     {
       pcout << "Timestep " << timestep_number
-	    << ":  t=" << time
+	    << ":  t=" << time/EquationData::year_in_seconds
+	    << " years"
 	    << std::endl;
 
       assemble_stokes_system ();
@@ -2937,7 +2941,7 @@ void BoussinesqFlowProblem<dim>::run ()
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;
     }
-  while (time <= 1e7);
+  while (time <= 1e8 * EquationData::year_in_seconds);
 }
 
 
