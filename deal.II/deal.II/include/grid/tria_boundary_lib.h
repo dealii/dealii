@@ -213,7 +213,7 @@ class ConeBoundary : public StraightBoundary<dim>
 				      * points <tt>x_0</tt> and
 				      * <tt>x_1</tt> describe the
 				      * starting and ending points of
-				      * the axis of the (cutted)
+				      * the axis of the (truncated)
 				      * cone. <tt>radius_0</tt>
 				      * denotes the radius
 				      * corresponding to <tt>x_0</tt>
@@ -227,7 +227,7 @@ class ConeBoundary : public StraightBoundary<dim>
 
 				     /**
 				      * Return the radius of the
-				      * (cutted) cone at given point
+				      * (truncated) cone at given point
 				      * <tt>x</tt> on the axis.
 				      */
     double get_radius (const Point<dim> x) const;
@@ -298,13 +298,13 @@ class ConeBoundary : public StraightBoundary<dim>
 
   protected:
 				     /**
-				      * First radius of the (cutted)
+				      * First radius of the (truncated)
 				      * cone.
 				      */
     const double radius_0;
 
 				     /**
-				      * Second radius of the (cutted)
+				      * Second radius of the (truncated)
 				      * cone.
 				      */
     const double radius_1;
