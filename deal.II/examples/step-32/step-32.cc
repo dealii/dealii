@@ -1,3 +1,9 @@
+//TODO: - adjust stopping criteria for solvers
+//      - better refinement at the start?
+//      - check solver stability
+//      - set meaningful endtimes
+
+
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
            Wolfgang Bangerth, Texas A&M University 2008, 2009 */
@@ -105,7 +111,7 @@ namespace EquationData
     return -9.81 * p / R1;
   }
 
-  
+
   template <int dim>
   class TemperatureInitialValues : public Function<dim>
   {
@@ -1347,7 +1353,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
       }
 
   rhs.compress ();
-  
+
   ReductionControl  control(5*rhs.size(), 0., 1e-12, false, false);
   GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
   SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
@@ -2042,7 +2048,7 @@ local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterat
       const Tensor<1,dim>
 	gravity = EquationData::gravity_vector (scratch.stokes_fe_values
 						.quadrature_point(q));
-      
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	data.local_rhs(i) += (-EquationData::density *
 			      EquationData::beta *
@@ -2562,7 +2568,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 	distributed_stokes_solution(i) = 0;
 
 
-    SolverControl solver_control (stokes_matrix.m(), 1e-12*stokes_rhs.l2_norm());
+    SolverControl solver_control (stokes_matrix.m(), 1e-21*stokes_rhs.l2_norm());
     SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
       bicgstab (solver_control, false);
 
@@ -2931,7 +2937,7 @@ void BoussinesqFlowProblem<dim>::run ()
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;
     }
-  while (time <= 1);
+  while (time <= 1e7);
 }
 
 
