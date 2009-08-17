@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ template <typename number> class SparseMatrix;
  * set, parts of the boundary receive different boundary numbers,
  * allowing them to be distinguished by application programs. See the
  * documentation of the functions for details.
- * 
+ *
  * Additionally this class provides a function
  * (@p laplace_transformation) that smoothly transforms a grid
  * according to given new boundary points. This can be used to
@@ -147,7 +147,7 @@ class GridGenerator
 				      * adds 2<sup>i</sup>. For
 				      * instance, the center point
 				      * (1,-1,1) yields a material id 5.
-				      * 
+				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this
 				      * function.
@@ -166,7 +166,7 @@ class GridGenerator
 				      * dimension @p i,
 				      * <tt>repetitions[i]</tt> cells are
 				      * generated.
-				      * 
+				      *
 				      * To get cells with an aspect
 				      * ratio different from that of
 				      * the domain, use different
@@ -179,7 +179,7 @@ class GridGenerator
 				      * of integers denoting the
 				      * number of subdivisions in each
 				      * coordinate direction.
-				      * 
+				      *
 				      * If the @p colorize flag is
 				      * set, the
 				      * @p boundary_indicators of the
@@ -279,7 +279,7 @@ class GridGenerator
 				const Point<dim>                         &p,
 				const Table<dim,unsigned char>           &material_id,
 				const bool                               colorize=false);
-    
+
 				     /**
 				      * A parallelogram. The first
 				      * corner point is the
@@ -304,8 +304,8 @@ class GridGenerator
     parallelogram(Triangulation<dim>&  tria,
 		  const Tensor<2,dim>& corners,
 		  const bool           colorize=false);
-		  
-			      
+
+
 				     /**
 				      * Hypercube with a layer of
 				      * hypercubes around it. The
@@ -339,7 +339,7 @@ class GridGenerator
 				     const double      right= 1.,
 				     const double      thickness = 1.,
 				     const bool        colorize = false);
-    
+
 				     /**
 				      * Initialize the given
 				      * triangulation with a
@@ -366,7 +366,7 @@ class GridGenerator
 				      * @note The triangulation needs to be
 				      * void upon calling this
 				      * function.
-				      */    
+				      */
     template <int dim>
     static void hyper_ball (Triangulation<dim> &tria,
 			    const Point<dim>   &center = Point<dim>(),
@@ -381,14 +381,14 @@ class GridGenerator
 				      * perpendicular to the
 				      * <i>x</i>-axis.
 				      *
-				      * The boundary indicators for the final 
+				      * The boundary indicators for the final
 				      * triangulation are 0 for the curved boundary and
-				      * 1 for the cut plane. 
+				      * 1 for the cut plane.
 				      *
 				      * The appropriate
-				      * boundary class is 
+				      * boundary class is
 				      * HalfHyperBallBoundary, or HyperBallBoundary.
-				      * 
+				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this
 				      * function.
@@ -429,7 +429,55 @@ class GridGenerator
     static void cylinder (Triangulation<dim> &tria,
 			  const double      radius = 1.,
 			  const double      half_length = 1.);
-    
+
+                                     /**
+                                      * Create a cutted cone around
+                                      * the x-axis.  The cone extends
+                                      * from <tt>x=-half_length</tt>
+                                      * to <tt>x=half_length</tt> and
+                                      * its projection into the @p
+                                      * yz-plane is a circle of radius
+                                      * @p radius_0 at
+                                      * <tt>x=-half_length</tt> and a
+                                      * circle of radius @p radius_1
+                                      * at <tt>x=+half_length</tt>.
+                                      * In between the radius is
+                                      * linearly decreasing.
+                                      *
+                                      * In two dimensions, the cone is
+                                      * a trapezoid from
+                                      * <tt>x=-half_length</tt> to
+                                      * <tt>x=+half_length</tt> and
+                                      * from <tt>y=-radius</tt> to
+                                      * <tt>y=radius_0</tt> at
+                                      * <tt>x=-half_length</tt> and
+                                      * from <tt>y=-radius_1</tt> to
+                                      * <tt>y=radius_1</tt> at
+                                      * <tt>x=+half_length</tt>.  In
+                                      * between the range of
+                                      * <tt>y</tt> is linearly
+                                      * decreasing.
+				      *
+                                      * The boundaries are colored
+                                      * according to the following
+                                      * scheme: 0 for the hull of the
+                                      * cone, 1 for the left hand
+                                      * face and 2 for the right hand
+                                      * face.
+                                      *
+                                      * @note The triangulation needs to be
+                                      * void upon calling this
+                                      * function.
+				      *
+				      * @author Markus B&uuml;rg, 2009
+                                      */
+    template <int dim>
+    static void
+    truncated_cone (Triangulation<dim> &tria,
+		    const double radius_0 = 1.0,
+		    const double radius_1 = 0.5,
+		    const double half_length = 1.0);
+
 				     /**
 				      * Initialize the given
 				      * triangulation with a hyper-L
@@ -460,7 +508,7 @@ class GridGenerator
     static void hyper_L (Triangulation<dim> &tria,
 			 const double      left = -1.,
 			 const double      right= 1.);
-    
+
                                      /**
 				      * Initialize the given
 				      * Triangulation with a hypercube
@@ -481,7 +529,7 @@ class GridGenerator
 				      * <i>z</i>-direction, such that
 				      * a plane cuts the lower half of
 				      * a rectangle in two.
-				      
+
 				      * This function is declared to
 				      * exist for triangulations of
 				      * all space dimensions, but
@@ -497,7 +545,7 @@ class GridGenerator
 				 const double      left = 0.,
 				 const double      right= 1.,
 				 const bool colorize = false);
-    
+
 				     /**
 				      * Produce a hyper-shell,
 				      * the region between two
@@ -550,7 +598,7 @@ class GridGenerator
 			     const double        outer_radius,
 			     const unsigned int  n_cells = 0,
 			     bool colorize = false);
-    
+
 				     /**
 				      * Produce a half hyper-shell,
 				      * i.e. the space between two
@@ -595,7 +643,7 @@ class GridGenerator
 				  const double        inner_radius,
 				  const double        outer_radius,
 				  const unsigned int  n_cells = 0);
-    
+
 				     /**
 				      * Produce a domain that is the space
 				      * between two cylinders in 3d, with
@@ -626,7 +674,7 @@ class GridGenerator
                                 const unsigned int  n_radial_cells = 0,
                                 const unsigned int  n_axial_cells = 0);
 
-				     /** 
+				     /**
 				      * This class produces a square
 				      * on the <i>xy</i>-plane with a
 				      * circular hole in the middle,
@@ -634,29 +682,29 @@ class GridGenerator
 				      * (only in 3d).
 				      *
 				      *	 @image html cubes_hole.png
-				      *	 
+				      *
 				      * It is implemented in 2d and
 				      * 3d, and takes the following
 				      * arguments:
-				      * 
+				      *
 				      * @arg @p inner_radius: size of the
-                                      *    internal hole 
+                                      *    internal hole
 				      * @arg @p  outer_radius: size of the
                                       *    biggest enclosed cylinder
 				      * @arg @p L: extension on the @p z-direction
 				      * @arg @p repetitions: number of subdivisions
 				      *      along the @p z-direction
-				      * @arg @p colorize: wether to assign different 
+				      * @arg @p colorize: wether to assign different
 				      *     boundary indicators to different faces.
-				      *    The colors are given in lexicographic 
-				      *    ordering for the flat faces (0 to 3 in 2d, 
-				      *    0 to 5 in 3d) plus the curved hole 
+				      *    The colors are given in lexicographic
+				      *    ordering for the flat faces (0 to 3 in 2d,
+				      *    0 to 5 in 3d) plus the curved hole
 				      *    (4 in 2d, and 6 in 3d).
-				      *    If @p colorize is set to false, then flat faces 
+				      *    If @p colorize is set to false, then flat faces
 				      *    get the number 0 and the hole gets number 1.
 				      */
     template<int dim>
-    static void hyper_cube_with_cylindrical_hole (Triangulation<dim> &triangulation, 
+    static void hyper_cube_with_cylindrical_hole (Triangulation<dim> &triangulation,
 						const double inner_radius = .25,
 						const double outer_radius = .5,
 						const double L = .5,
@@ -680,7 +728,7 @@ class GridGenerator
 			 const unsigned int   n_rotations,
 			 const double         R,
 			 const double         r);
-    
+
 				     /**
 				      * This function transformes the
 				      * @p Triangulation @p tria
@@ -723,7 +771,7 @@ class GridGenerator
 				      */
     DeclException1 (ExcInvalidRepetitionsDimension,
                     int,
-                    << "The vector of repetitions  must have " 
+                    << "The vector of repetitions  must have "
 		    << arg1 <<" elements.");
 
   private:
@@ -766,7 +814,7 @@ class GridGenerator
 			  const Point<dim>& center,
 			  const double inner_radius,
 			  const double outer_radius);
-    
+
 				     /**
 				      * Solve the Laplace equation for
 				      * @p laplace_transformation

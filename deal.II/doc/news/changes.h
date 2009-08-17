@@ -361,6 +361,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The function GridGenerator::truncated_cone() and the class ConeBoundary
+  can now be used to describe conical objects.
+  <br>
+  (Markus B&uuml;rg 2009/08/17)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: Instead of asking face or edge iterators for their boundary indicator
   using TriaAccessor::boundary_indicator() and then the triangulation for
   the boundary object using Triangulation::get_boundary(), you can now directly

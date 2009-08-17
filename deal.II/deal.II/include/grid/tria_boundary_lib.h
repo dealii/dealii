@@ -142,8 +142,8 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * see below, flag is set true.
 				      */
     DeclException0 (ExcRadiusNotSet);
-    
-    
+
+
   protected:
 				     /**
 				      * Radius of the cylinder.
@@ -188,10 +188,163 @@ class CylinderBoundary : public StraightBoundary<dim>
 
 
 /**
- *   Specialisation of Boundary<dim>, which places the new point on
+ * Boundary object for the hull of a (truncated) cone with two
+ * different radii at the two ends. If one radius is chosen to be 0
+ * the object describes the boundary of a cone. In three dimensions,
+ * points are projected on an arbitrarily oriented (truncated) cone
+ * described by the two endpoints and the corresponding radii. Similar
+ * to HyperBallBoundary, new points are projected by dividing the
+ * straight line between the old two points and adjusting the radius
+ * from the axis.
+ *
+ * This class is derived from StraightBoundary rather than from
+ * Boundary, which would seem natural, since this way we can use the
+ * StraightBoundary::in_between() function.
+ *
+ * @author Markus B&uuml;rg, 2009
+ */
+template <int dim>
+class ConeBoundary : public StraightBoundary<dim>
+{
+  public:
+				     /**
+				      * Constructor. Here the boundary
+				      * object is constructed. The
+				      * points <tt>x_0</tt> and
+				      * <tt>x_1</tt> describe the
+				      * starting and ending points of
+				      * the axis of the (cutted)
+				      * cone. <tt>radius_0</tt>
+				      * denotes the radius
+				      * corresponding to <tt>x_0</tt>
+				      * and <tt>radius_1</tt> the one
+				      * corresponding to <tt>x_1</tt>.
+				      */
+    ConeBoundary (const double radius_0,
+		  const double radius_1,
+		  const Point<dim> x_0,
+		  const Point<dim> x_1);
+
+				     /**
+				      * Return the radius of the
+				      * (cutted) cone at given point
+				      * <tt>x</tt> on the axis.
+				      */
+    double get_radius (const Point<dim> x) const;
+
+				     /**
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual
+    Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+
+				     /**
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual
+    Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+
+				     /**
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      *
+				      * Calls @p
+				      * get_intermediate_points_between_points.
+				      */
+    virtual
+    void
+    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				     std::vector<Point<dim> > &points) const;
+
+				     /**
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      *
+				      * Only implemented for
+				      * <tt>dim=3</tt> and for
+				      * <tt>points.size()==1</tt>.
+				      */
+    virtual
+    void
+    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				     std::vector<Point<dim> > &points) const;
+
+				     /**
+				      * Compute the normals to the
+				      * boundary at the vertices of
+				      * the given face.
+				      *
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual
+    void
+    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+
+  protected:
+				     /**
+				      * First radius of the (cutted)
+				      * cone.
+				      */
+    const double radius_0;
+
+				     /**
+				      * Second radius of the (cutted)
+				      * cone.
+				      */
+    const double radius_1;
+
+				     /**
+				      * Starting point of the axis.
+				      */
+    const Point<dim> x_0;
+
+				     /**
+				      * Ending point of the axis.
+				      */
+    const Point<dim> x_1;
+
+  private:
+				     /**
+				      * Called by @p
+				      * get_intermediate_points_on_line
+				      * and by @p
+				      * get_intermediate_points_on_quad.
+				      *
+				      * Refer to the general
+				      * documentation of @p
+				      * get_intermediate_points_on_line
+				      * in the documentation of the
+				      * base class.
+				      */
+    void
+    get_intermediate_points_between_points (const Point<dim> &p0,
+					    const Point<dim> &p1,
+					    std::vector<Point<dim> > &points) const;
+};
+
+
+
+/**
+ *   Specialization of Boundary<dim>, which places the new point on
  *   the boundary of a ball in arbitrary dimension. It works by projecting
  *   the point in the middle of the old points onto the ball. The middle is
- *   defined as the arithmetic mean of the points. 
+ *   defined as the arithmetic mean of the points.
  *
  *   The center of the ball and its radius may be given upon construction of
  *   an object of this type. They default to the origin and a radius of 1.0.
@@ -287,10 +440,10 @@ class HyperBallBoundary : public StraightBoundary<dim,spacedim>
 				      * see below, flag is set true.
 				      */
     DeclException0 (ExcRadiusNotSet);
-    
-    
+
+
   protected:
-    
+
 				     /**
 				      * Center point of the hyperball.
 				      */
@@ -335,7 +488,7 @@ class HyperBallBoundary : public StraightBoundary<dim,spacedim>
 				      * base class.
 				      */
     void get_intermediate_points_between_points (const Point<spacedim> &p0, const Point<spacedim> &p1,
-						 std::vector<Point<spacedim> > &points) const;    
+						 std::vector<Point<spacedim> > &points) const;
 };
 
 
@@ -464,7 +617,7 @@ class HyperShellBoundary : public HyperBallBoundary<dim>
  * @author Wolfgang Bangerth, 2000, 2009
  */
 template <int dim>
-class HalfHyperShellBoundary : public HyperShellBoundary<dim> 
+class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 {
   public:
 				     /**
@@ -482,13 +635,13 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
     HalfHyperShellBoundary (const Point<dim> &center = Point<dim>(),
 			    const double inner_radius = -1,
 			    const double outer_radius = -1);
-    
+
 				     /**
 				      * Construct a new point on a line.
 				      */
     virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;  
-    
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+
 				     /**
 				      * Construct a new point on a quad.
 				      */
