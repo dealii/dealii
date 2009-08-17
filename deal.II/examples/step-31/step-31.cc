@@ -2293,6 +2293,47 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // time step is discussed in the results
 				   // section of this program.
 				   //
+				   // There is a snatch here. The formula
+				   // contains a division by the maximum value
+				   // of the velocity. However, at the start
+				   // of the computation, we have a constant
+				   // temperature field (we start with a
+				   // constant temperature, and it will be
+				   // non-constant only after the first time
+				   // step during which the source
+				   // acts). Constant temperature means that
+				   // no buoyancy acts, and so the velocity is
+				   // zero. Dividing by it will not likely
+				   // lead to anything good.
+				   //
+				   // To avoid the resulting infinite time
+				   // step, we ask whether the maximal
+				   // velocity is very small (in particular
+				   // smaller than the values we encounter
+				   // during any of the following time steps)
+				   // and if so rather than dividing by zero
+				   // we just divide by a small value,
+				   // resulting in a large but finite time
+				   // step.
+  old_time_step = time_step;
+  const double maximal_velocity = get_maximal_velocity();
+
+  if (maximal_velocity >= 0.01)
+    time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
+		temperature_degree *
+		GridTools::minimal_cell_diameter(triangulation) /
+		maximal_velocity;
+  else
+    time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
+		temperature_degree *
+		GridTools::minimal_cell_diameter(triangulation) /
+		.01;
+
+  std::cout << "   " << "Time step: " << time_step
+	    << std::endl;
+  
+  temperature_solution = old_temperature_solution;
+
 				   // Next we set up the temperature system
 				   // and the right hand side using the
 				   // function
@@ -2326,19 +2367,6 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // Finally, we solve, distribute the
 				   // hanging node constraints and write out
 				   // the number of iterations.
-  old_time_step = time_step;
-  const double maximal_velocity = get_maximal_velocity();
-  time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
-	      temperature_degree *
-	      GridTools::minimal_cell_diameter(triangulation) /
-              std::max (maximal_velocity, .01);
-
-  std::cout << "   " << "Time step: " << time_step
-	    << std::endl;
-  
-  temperature_solution = old_temperature_solution;
-
-
   assemble_temperature_system (maximal_velocity);
   {
 
