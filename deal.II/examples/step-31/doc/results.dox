@@ -563,7 +563,7 @@ There are various ways to extend the current program. Of particular interest
 is, of course, to make it faster and/or increase the resolution of the
 program, in particular in 3d. This is the topic of the @ref step_32 "step-32"
 tutorial program which will implement strategies to solve this problem in
-parallel on a cluster.
+%parallel on a cluster.
 
 Another direction would be to make the fluid flow more realistic. The program
 was initially written to simulate various cases simulating the convection of
