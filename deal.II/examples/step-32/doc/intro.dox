@@ -329,7 +329,23 @@ The setup for this program is mildly reminiscent of the problem we wanted to
 solve in the first place (see the introduction of @ref step_31 "step-31"):
 convection in the earth mantle. As a consequence, we choose the following
 data, all of which appears in the program in units of meters and seconds (the
-SI system) even if we list them here in other units:
+SI system) even if we list them here in other units.
+
+As a reminder, the equations we want to solve are these:
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& 
+  -\rho \; \beta \; T \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u} &=& 0,
+  \\
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot \kappa \nabla T &=& \gamma,
+@f}
+augmented by boundary and initial conditions. We then have to choose data for
+the following quantities:
 <ul>
   <li>The domain is an annulus (in 2d) or a spherical shell (in 3d) with inner
   and outer radii that match that of the earth: the total radius of the earth
@@ -370,6 +386,15 @@ SI system) even if we list them here in other units:
   This profile is quadratic and matches the boundary conditions at the inner
   and outer radii.
 
+  <li>The right hand side of the temperature equation contains the rate of
+  internal heating $\gamma$. The earth does heat naturally through three mechanisms:
+  radioactive decay, chemical separation (heavier elements sink to the bottom,
+  lighter ones rise to the top; the countercurrents dissipate emergy equal to
+  the loss of potential energy by this separation process), and heat release
+  by crystallization of liquid metal as the solid inner core of the earth
+  grows. None of these processes are overly significant the earth mantle, and
+  so we assume that the internal heating can be set to zero.
+
   <li>For the velocity we choose as boundary conditions $\mathbf{v}=0$ at the
   inner radius (i.e. the fluid sticks to the earth core) and
   $\mathbf{n}\cdot\mathbf{v}=0$ at the outer radius (i.e. the fluid flows
@@ -406,7 +431,7 @@ SI system) even if we list them here in other units:
   point on the boundary and call this your fixed point by choosing the
   velocity to be zero in all components there. 
 
-  <li>To first order, the gravity vector always point downward. The question for
+  <li>To first order, the gravity vector always points downward. The question for
   a body as big as the earth is just: where is "up". The answer of course is
   "radially inward, towards the center of the earth". So at the surface of the
   earth, we have
@@ -481,10 +506,77 @@ SI system) even if we list them here in other units:
 
   In order to not make the situation more complicated than necessary, we'll
   here just go with the constant density model above.
+
+  <li>The density of the earth mantle varies spatially, but not by very
+  much. $\rho=3300 \frac{\text{kg}}{\text{m}^3}$ is a relatively good average
+  value.
+
+  <li>The thermal expansion coefficient $\beta$ also varies with depth
+  (through its dependence on temperature and pressure). Close to the surface,
+  it appears to be on the order of $\beta=45\cdot 10^{-6} \frac 1{\text{K}}$,
+  whereas at the core mantle boundary, it may be closer to $\beta=10\cdot
+  10^{-6} \frac 1{\text{K}}$. As a reasonable value, let us choose 
+  $\beta=2\cdot 10^{-5} \frac 1{\text{K}}$.
+
+  <li>The second to last parameter we need to specify is the viscosity
+  $\eta$. This is a tough one, because rocks at the temperatures and pressure
+  typical for the earth mantle flow so slowly that the viscosity can not be
+  determined accurately in the laboratory. So how do we know about the
+  viscosity of the mantle? The most commonly used route is to consider that
+  during and after ice ages, ice shields form and disappear on time scales
+  that are shorter than the time scale of flow in the mantle. As a
+  consequence, continents slowly sink into the earth mantle under the added
+  weight of an ice shield, and they rise up again slowly after the ice shield
+  has disappeared again (this is called <a target="_top"
+  href="http://en.wikipedia.org/wiki/Postglacial_rebound"><i>postglacial
+  rebound</i></a>). By measuring the speed of this rebound, we can infer the
+  viscosity of the material that flows into the area vacated under the
+  rebounding continental plates.
+
+  Using this technique, values around $\eta=10^{21} \text{Pa\; s} 
+  = 10^{21} \frac{\text{N\; s}}{\text{m}^2}
+  = 10^{21} \frac{\text{kg}}{\text{m\; s}}$ have been found as the most
+  likely, though the error bar on this is at least one order of magnitude. 
+
+  While we will use this value, we again have to caution that there are many
+  physical reasons to assume that this is not the correct value. First, it
+  should really be made dependent on temperature: hotter material is most
+  likely to be less viscous than colder material. In reality, however, the
+  situation is even more complex. Most rocks in the mantle undergo phase
+  changes as temperature and pressure change: depending on temperature and
+  pressure, different crystal configurations are thermodynamically favored
+  over others, even if the chemical composition of the mantle were
+  homogenous. For example, the common mantle material MgSiO<sub>3</sub> exists
+  in its <a target="_top"
+  href="http://en.wikipedia.org/wiki/Perovskite_(structure)">perovskite
+  structure</a> throughout most of the mantle, but in the lower mantle the
+  same substance is stable only as <a targe="_top"
+  href="http://en.wikipedia.org/wiki/Postperovskite">post-perovskite</a>. Clearly,
+  to compute realistic viscosities, we would not only need to know the exact
+  chemical composition of the mantle and the viscosities of all materials, but
+  we would also have to compute the thermodynamically most stable
+  configurations for all materials at each quadrature point. This is at the
+  time of writing this program not a feasible suggestion.
+
+  <li>Our last material parameter is the thermal diffusivity $\kappa$, which
+  is defined as $\kappa=\frac{k}{\rho c_p}$ where $k$ is the thermal
+  conductivity, $\rho$ the density, and $c_p$ the specific heat. For
+  this, the literature indicates that it increases from around $0.7$ in the
+  upper mantle to around $1.7 \frac{\text{mm}^2}{\text{s}}$ in the lower
+  mantle, though the exact value 
+  is not really all that important: heat transport through convection is
+  several orders of magnitude more important than through thermal
+  conduction. It may be of interest to know that perovskite, the most abundant
+  material in the earth mantle, appears to become transparent at pressures
+  above around 120 GPa (see, for example, J. Badro et al., Science 305,
+  383-386 (2004)); in the lower mantle, it may therefore be that heat
+  transport through radiative transfer is more efficient than through thermal
+  conduction.
+
+  In view of these considerations, let us choose 
+  $\kappa=1 \frac{\text{mm}^2}{\text{s}} =10^{-6} \frac{\text{m}^2}{\text{s}}$
+  for the purpose of this program.
 </ul>
 
-
-meaningful eta, kappa
-do things in meters, second, not km
-temperature boundary conditions at inner ring
-
+All of these pieces of equation data are defined in the program in the
+<code>EquationData</code> namespace.

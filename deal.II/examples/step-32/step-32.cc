@@ -80,14 +80,17 @@ using namespace dealii;
 
 				 // @sect3{Equation data}
 
-				 // This program is mainly an extension of
-				 // step-31 to operate in %parallel, so the
-				 // equation data remains the same.
+				 // In the following namespace, we define the
+				 // various pieces of equation data. All of
+				 // these are exhaustively discussed in the
+				 // description of the testcase in the
+				 // introduction:
 namespace EquationData
 {
-  const double eta = 1;
-  const double kappa = 1e-6;
-  const double Rayleigh_number = 10;
+  const double eta     = 1e21;
+  const double kappa   = 1e-6;
+  const double density = 3300;
+  const double beta    = 2e-5;
 
   const double R0 = 6371000.-2890000.;
   const double R1 = 6371000.-  35000.;
@@ -2041,8 +2044,11 @@ local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterat
 						.quadrature_point(q));
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	data.local_rhs(i) += (-EquationData::Rayleigh_number *
-			      gravity * scratch.phi_u[i] * old_temperature)*
+	data.local_rhs(i) += (-EquationData::density *
+			      EquationData::beta *
+			      gravity  *
+			      old_temperature *
+			      scratch.phi_u[i]) *
 			     scratch.stokes_fe_values.JxW(q);
     }
 
