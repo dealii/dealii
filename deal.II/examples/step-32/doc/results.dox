@@ -1,9 +1,15 @@
 <h1>Results</h1>
 
 When run, the program simulates convection in 3d in much the same way
-as @ref step_31 "step-31" did -- in fact, the testcase is exactly the
-same, just that we can now solve in parallel and with much higher
-resolution.
+as @ref step_31 "step-31" did, though with an entirely different testcase. 
+
+
+<h3>Comparison of results with step-31</h3>
+
+Before we go to this testcase, however, let us show a few results from a
+slightly earlier version of this program that was solving exactly the
+testcase we used in step-31, just that we now solve it in parallel and with
+much higher resolution. We show these results mainly for comparison.
 
 Here are two images that show this higher resolution if we choose a 3d
 computation in <code>main()</code> and if we set
@@ -28,6 +34,10 @@ magnitude more than we had available in step-31:
 
 The computation was done on a subset of 50 processors of the Brazos
 cluster at Texas A&amp;M University.
+
+
+<h3>Results for a 2d circular shell testcase</h3>
+
 
 For a much more modest run (less mesh refinement, only 35 time steps, but 50
 processors as above), we get this as output:
