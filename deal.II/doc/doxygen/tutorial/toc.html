@@ -17,8 +17,8 @@
 <h2>Overview</h2>
 
 <p>
-The <acronym>deal.II</acronym> tutorial contains a collection of 
-programs, each more 
+The <acronym>deal.II</acronym> tutorial contains a collection of
+programs, each more
 or less built atop of previous ones, which demonstrate various
 aspects of the library. Each such example has the following structure
 follows:</p>
@@ -28,13 +28,13 @@ follows:</p>
        discussion of the mathematical model and its formulation.
   <li> <b>The commented program:</b> A listing of the program, interspersed
        with many comments that explain what is going on, how things are done
-       and why. 
+       and why.
   <li> <b>Results:</b> The output of the program, with some comments and
-       interpretation. 
+       interpretation.
   <li> <b>The plain program:</b> Since the program itself usually is a little
        bit unreadable with all the comments intertwingled, we present the
        program again, with all comments stripped off, to allow getting an
-       overview of it. 
+       overview of it.
 </ol>
 
 <p>
@@ -48,11 +48,12 @@ in <a href="../../development/index.html" target="_top">in this section</a>.
 </p>
 
 <p>
-Below we will list the currently available tutorial programs twice, once 
+Below we will list the currently available tutorial programs twice, once
 <a href="#bynumber">in numerical order explaining what is new in each
 program</a> and once <a href="#bytopic">listed by topic</a> to facilitate
 searching for programs with a certain functionality. Some of these programs
-also jointly form the <a href="../../group__geodynamics.html">geodynamics
+also jointly form
+the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
   demonstration suite</a>.
 </p>
 
@@ -62,12 +63,12 @@ also jointly form the <a href="../../group__geodynamics.html">geodynamics
 
 <table align="center" width="80%">
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_1.html">Step-1</a></td> 
+      <td><a href="../../doxygen/deal.II/step_1.html">Step-1</a></td>
       <td> Creating a grid. A simple way to write it to a file.
       </td></tr>
-    
+
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_2.html">Step-2</a></td> 
+      <td><a href="../../doxygen/deal.II/step_2.html">Step-2</a></td>
       <td> Associate degrees of freedom to
       each vertex and compute the resulting sparsity pattern of
       matrices. Show that renumbering reduces the bandwidth of
@@ -76,14 +77,14 @@ also jointly form the <a href="../../group__geodynamics.html">geodynamics
       </td></tr>
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_3.html">Step-3</a></td> 
+      <td><a href="../../doxygen/deal.II/step_3.html">Step-3</a></td>
       <td> Actually solve Laplace's
       problem. Object-orientation. Assembling matrices and
       vectors. Boundary values.
       </td></tr>
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_4.html">Step-4</a></td> 
+      <td><a href="../../doxygen/deal.II/step_4.html">Step-4</a></td>
       <td> This example is programmed in a
       way that it is independent of the dimension for which we want to
       solve Laplace's equation; we will solve the equation in 2D and
@@ -92,23 +93,23 @@ also jointly form the <a href="../../group__geodynamics.html">geodynamics
       </td></tr>
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_5.html">Step-5</a></td> 
+      <td><a href="../../doxygen/deal.II/step_5.html">Step-5</a></td>
       <td> Computations on successively
-      refined grids. Reading a grid from disk. Some optimizations.  
+      refined grids. Reading a grid from disk. Some optimizations.
       Using assertions. Non-constant coefficient in
       the elliptic operator. Preconditioning the CG solver for the
       linear system of equations.
       </td></tr>
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_6.html">Step-6</a></td> 
+      <td><a href="../../doxygen/deal.II/step_6.html">Step-6</a></td>
       <td> Adaptive local
       refinement. Handling of hanging nodes. Higher order elements.
       Catching exceptions in the &#8220;main&#8221; function.
       </td></tr>
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_7.html">Step-7</a></td> 
+      <td><a href="../../doxygen/deal.II/step_7.html">Step-7</a></td>
       <td> Helmholtz
       equation. Non-homogeneous Neumann boundary conditions and
       boundary integrals. Verification of correctness of computed
@@ -117,7 +118,7 @@ also jointly form the <a href="../../group__geodynamics.html">geodynamics
       </td></tr>
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td> 
+      <td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td>
       <td> The elastic equations will be
       solved instead of Laplace's equation. The solution is
       vector-valued and the equations form a system with as many
@@ -125,21 +126,21 @@ also jointly form the <a href="../../group__geodynamics.html">geodynamics
       </td></tr>
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a></td> 
-      <td> Transport equation, assembling 
-      the system of equations in parallel using multi-threading, 
+      <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a></td>
+      <td> Transport equation, assembling
+      the system of equations in parallel using multi-threading,
       implementing a refinement criterion based on a finite difference
       approximation of the gradient.
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_10.html">Step-10</a></td> 
+      <td><a href="../../doxygen/deal.II/step_10.html">Step-10</a></td>
       <td> Higher order mappings. Do not
       solve equations, but rather compute the value of pi to high
       accuracy.
       </td></tr>
 
   <tr valign="top">
-      <td><a href="../../doxygen/deal.II/step_11.html">Step-11</a></td> 
+      <td><a href="../../doxygen/deal.II/step_11.html">Step-11</a></td>
       <td> Solving a Laplace problem with
       higher order mappings. Using strange constraints and
       intermediate representations of sparsity patterns.
@@ -261,13 +262,13 @@ also jointly form the <a href="../../group__geodynamics.html">geodynamics
   <tr valign="top">
       <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td>
       <td> A nonlinear hyperbolic conservation law: The Euler equations of
-      compressible gas dynamics.  
+      compressible gas dynamics.
       </td></tr>
 
   <tr valign="top">
       <td><a href="../../doxygen/deal.II/step_34.html">Step-34</a></td>
       <td> Boundary element methods (BEM) of low order: Exterior irrotational
-      flow. The ParsedFunction class. 
+      flow. The ParsedFunction class.
       </td></tr>
 
   <tr valign="top">
@@ -287,49 +288,49 @@ by topic:
 <table align="center" width="80%">
   <tr valign="top">
     <td><b>Basic techniques</b></td>
-    <td><a href="../../doxygen/deal.II/step_1.html">Step-1</a></td> 
+    <td><a href="../../doxygen/deal.II/step_1.html">Step-1</a></td>
     <td> Creating a grid. A simple way to write it to a file
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_2.html">Step-2</a></td> 
+    <td><a href="../../doxygen/deal.II/step_2.html">Step-2</a></td>
     <td> Degrees of freedom
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_3.html">Step-3</a></td> 
+    <td><a href="../../doxygen/deal.II/step_3.html">Step-3</a></td>
     <td> Solve the Laplace equation
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_4.html">Step-4</a></td> 
+    <td><a href="../../doxygen/deal.II/step_4.html">Step-4</a></td>
     <td> Dimension independent programming, non-zero data
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_5.html">Step-5</a></td> 
+    <td><a href="../../doxygen/deal.II/step_5.html">Step-5</a></td>
     <td> Computing on uniformly refined meshes
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_6.html">Step-6</a></td> 
+    <td><a href="../../doxygen/deal.II/step_6.html">Step-6</a></td>
     <td> Adaptivity
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_7.html">Step-7</a></td> 
+    <td><a href="../../doxygen/deal.II/step_7.html">Step-7</a></td>
     <td> Evaluating errors
     </td>
   </tr>
@@ -340,34 +341,34 @@ by topic:
   <tr valign="top">
     <td><b>Advanced techniques</b></td>
     <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a>,
-        <a href="../../doxygen/deal.II/step_28.html">Step-28</a></td> 
+        <a href="../../doxygen/deal.II/step_28.html">Step-28</a></td>
     <td> Multithreading
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a>, 
-        <a href="../../doxygen/deal.II/step_21.html">Step-21</a>, 
-        <a href="../../doxygen/deal.II/step_22.html">Step-22</a>, 
-        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td> 
+    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a>,
+        <a href="../../doxygen/deal.II/step_21.html">Step-21</a>,
+        <a href="../../doxygen/deal.II/step_22.html">Step-22</a>,
+        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td>
     <td> Block solvers and preconditioners
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_17.html">Step-17</a>, 
-        <a href="../../doxygen/deal.II/step_18.html">Step-18</a>, 
-        <a href="../../doxygen/deal.II/step_19.html">Step-19</a></td> 
+    <td><a href="../../doxygen/deal.II/step_17.html">Step-17</a>,
+        <a href="../../doxygen/deal.II/step_18.html">Step-18</a>,
+        <a href="../../doxygen/deal.II/step_19.html">Step-19</a></td>
     <td> Parallelization via PETSc and MPI
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_31.html">Step-31</a>, 
-        <a href="../../doxygen/deal.II/step_33.html">Step-33</a></td> 
+    <td><a href="../../doxygen/deal.II/step_31.html">Step-31</a>,
+        <a href="../../doxygen/deal.II/step_33.html">Step-33</a></td>
     <td> Using Trilinos
     </td>
   </tr>
@@ -379,24 +380,24 @@ by topic:
         <a href="../../doxygen/deal.II/step_29.html">Step-29</a>,
         <a href="../../doxygen/deal.II/step_29.html">Step-33</a>,
         <a href="../../doxygen/deal.II/step_34.html">Step-34</a>,
-        <a href="../../doxygen/deal.II/step_36.html">Step-36</a></td> 
+        <a href="../../doxygen/deal.II/step_36.html">Step-36</a></td>
     <td> Input parameter handling
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_10.html">Step-10</a>, 
-        <a href="../../doxygen/deal.II/step_11.html">Step-11</a></td> 
+    <td><a href="../../doxygen/deal.II/step_10.html">Step-10</a>,
+        <a href="../../doxygen/deal.II/step_11.html">Step-11</a></td>
     <td> Higher order mappings
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_6.html">Step-6</a>, 
-        <a href="../../doxygen/deal.II/step_9.html">Step-9</a>, 
-        <a href="../../doxygen/deal.II/step_14.html">Step-14</a></td> 
+    <td><a href="../../doxygen/deal.II/step_6.html">Step-6</a>,
+        <a href="../../doxygen/deal.II/step_9.html">Step-9</a>,
+        <a href="../../doxygen/deal.II/step_14.html">Step-14</a></td>
     <td> Error indicators and estimators
     </td>
   </tr>
@@ -406,21 +407,21 @@ by topic:
     <td><a href="../../doxygen/deal.II/step_15.html">Step-15</a>,
         <a href="../../doxygen/deal.II/step_28.html">Step-28</a>,
         <a href="../../doxygen/deal.II/step_31.html">Step-31</a>,
-        <a href="../../doxygen/deal.II/step_33.html">Step-33</a></td> 
+        <a href="../../doxygen/deal.II/step_33.html">Step-33</a></td>
     <td> Transfering solutions across mesh refinement
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_12.html">Step-12</a></td> 
+    <td><a href="../../doxygen/deal.II/step_12.html">Step-12</a></td>
     <td> Discontinuous Galerkin methods
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_27.html">Step-27</a></td> 
+    <td><a href="../../doxygen/deal.II/step_27.html">Step-27</a></td>
     <td> hp finite elements
     </td>
   </tr>
@@ -434,21 +435,21 @@ by topic:
 
   <tr>
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_16.html">Step-16</a></td> 
+    <td><a href="../../doxygen/deal.II/step_16.html">Step-16</a></td>
     <td> Multilevel preconditioners
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td> 
+    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td>
     <td> Computing Jacobians from residuals, automatic differentiation
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_34.html">Step-34</a></td> 
+    <td><a href="../../doxygen/deal.II/step_34.html">Step-34</a></td>
     <td> Boundary element methods
     </td>
   </tr>
@@ -457,21 +458,21 @@ by topic:
 
   <tr valign="top">
     <td><b>Linear solver issues</b></td>
-    <td><a href="../../doxygen/deal.II/step_3.html">Step-3</a></td> 
+    <td><a href="../../doxygen/deal.II/step_3.html">Step-3</a></td>
     <td> Conjugate Gradient solver
     </td>
   </tr>
 
   <tr valign="top">
     <td><b></b></td>
-    <td><a href="../../doxygen/deal.II/step_5.html">Step-5</a></td> 
+    <td><a href="../../doxygen/deal.II/step_5.html">Step-5</a></td>
     <td> Preconditioned CG solver
     </td>
   </tr>
 
   <tr valign="top">
     <td><b></b></td>
-    <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a></td> 
+    <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a></td>
     <td> BiCGStab
     </td>
   </tr>
@@ -479,7 +480,7 @@ by topic:
   <tr valign="top">
     <td><b></b></td>
     <td><a href="../../doxygen/deal.II/step_16.html">Step-16</a>,
-        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td> 
+        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td>
     <td> Multilevel preconditioners
     </td>
   </tr>
@@ -487,7 +488,7 @@ by topic:
   <tr valign="top">
     <td><b></b></td>
     <td><a href="../../doxygen/deal.II/step_17.html">Step-17</a>,
-        <a href="../../doxygen/deal.II/step_18.html">Step-18</a></td> 
+        <a href="../../doxygen/deal.II/step_18.html">Step-18</a></td>
     <td> Parallel solvers
     </td>
   </tr>
@@ -495,23 +496,23 @@ by topic:
   <tr valign="top">
     <td><b></b></td>
     <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a>,
-        <a href="../../doxygen/deal.II/step_21.html">Step-21</a>, 
-        <a href="../../doxygen/deal.II/step_22.html">Step-22</a>, 
-        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td> 
+        <a href="../../doxygen/deal.II/step_21.html">Step-21</a>,
+        <a href="../../doxygen/deal.II/step_22.html">Step-22</a>,
+        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td>
     <td> Block and Schur complement solvers
     </td>
   </tr>
 
   <tr valign="top">
     <td><b></b></td>
-    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td> 
+    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td>
     <td> Linear Newton systems from nonlinear equations
     </td>
   </tr>
 
   <tr valign="top">
     <td><b></b></td>
-    <td><a href="../../doxygen/deal.II/step_36.html">Step-36</a></td> 
+    <td><a href="../../doxygen/deal.II/step_36.html">Step-36</a></td>
     <td> Eigenvalue solvers
     </td>
   </tr>
@@ -521,21 +522,21 @@ by topic:
   <tr valign="top">
     <td><b>Other equations</b></td>
     <td><a href="../../doxygen/deal.II/step_7.html">Step-7</a>,
-        <a href="../../doxygen/deal.II/step_29.html">Step-29</a></td> 
+        <a href="../../doxygen/deal.II/step_29.html">Step-29</a></td>
     <td> Helmholtz equation
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td> 
+    <td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td>
     <td> Elasticity equations
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_18.html">Step-18</a></td> 
+    <td><a href="../../doxygen/deal.II/step_18.html">Step-18</a></td>
     <td> Quasi-static elasticity equations
     </td>
   </tr>
@@ -544,28 +545,28 @@ by topic:
     <td></td>
     <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a>,
         <a href="../../doxygen/deal.II/step_21.html">Step-21</a>,
-	<a href="../../doxygen/deal.II/step_31.html">Step-31</a></td> 
+	<a href="../../doxygen/deal.II/step_31.html">Step-31</a></td>
     <td> Transport (advection) equations
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td> 
-    <td> The nonlinear hyperbolic Euler system of compressible gas dynamics 
+    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td>
+    <td> The nonlinear hyperbolic Euler system of compressible gas dynamics
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a></td> 
+    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a></td>
     <td> Mixed Laplace
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td> 
+    <td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td>
     <td> Porous media flow
     </td>
   </tr>
@@ -573,58 +574,58 @@ by topic:
   <tr valign="top">
     <td></td>
     <td><a href="../../doxygen/deal.II/step_22.html">Step-22</a>,
-        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td> 
+        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td>
     <td> Incompressible Stokes flow
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_23.html">Step-23</a>, 
-        <a href="../../doxygen/deal.II/step_24.html">Step-24</a>, 
-        <a href="../../doxygen/deal.II/step_25.html">Step-25</a></td> 
+    <td><a href="../../doxygen/deal.II/step_23.html">Step-23</a>,
+        <a href="../../doxygen/deal.II/step_24.html">Step-24</a>,
+        <a href="../../doxygen/deal.II/step_25.html">Step-25</a></td>
     <td> The wave equation, in linear and nonlinear variants
     </td>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_28.html">Step-28</a></td> 
+    <td><a href="../../doxygen/deal.II/step_28.html">Step-28</a></td>
     <td> A multigroup diffusion problem in neutron transport
     </td>
   </tr>
 
-  
+
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_34.html">Step-34</a></td> 
+    <td><a href="../../doxygen/deal.II/step_34.html">Step-34</a></td>
     <td> Irrotational flow
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_36.html">Step-36</a></td> 
+    <td><a href="../../doxygen/deal.II/step_36.html">Step-36</a></td>
     <td> An eigenspectrum problem
 
   <tr><td><br></td></tr>
 
   <tr valign="top">
     <td><b>Vector problems</b></td>
-    <td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td> 
+    <td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td>
     <td> Elasticity equations
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a></td> 
+    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a></td>
     <td> Mixed Laplace
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td> 
+    <td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td>
     <td> Mixed Laplace plus an advection equation
     </td>
   </tr>
@@ -632,60 +633,60 @@ by topic:
   <tr valign="top">
     <td></td>
     <td><a href="../../doxygen/deal.II/step_22.html">Step-22</a>,
-        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td> 
+        <a href="../../doxygen/deal.II/step_31.html">Step-31</a></td>
     <td> Incompressible Stokes flow
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_29.html">Step-29</a></td> 
+    <td><a href="../../doxygen/deal.II/step_29.html">Step-29</a></td>
     <td> A complex-valued Helmholtz problem
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td> 
-    <td> The Euler equations of compressible gas dynamics 
+    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td>
+    <td> The Euler equations of compressible gas dynamics
     </td>
   </tr>
 
 
   <tr valign="top">
     <td><b>Time-dependent problems</b></td>
-    <td><a href="../../doxygen/deal.II/step_18.html">Step-18</a></td> 
+    <td><a href="../../doxygen/deal.II/step_18.html">Step-18</a></td>
     <td> Quasi-static elasticity
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td> 
+    <td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td>
     <td> Porous media flow
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_23.html">Step-23</a>, 
-        <a href="../../doxygen/deal.II/step_24.html">Step-24</a>, 
-        <a href="../../doxygen/deal.II/step_25.html">Step-25</a></td> 
+    <td><a href="../../doxygen/deal.II/step_23.html">Step-23</a>,
+        <a href="../../doxygen/deal.II/step_24.html">Step-24</a>,
+        <a href="../../doxygen/deal.II/step_25.html">Step-25</a></td>
     <td> The wave equation, in linear and nonlinear variants
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_31.html">Step-31</a></td> 
+    <td><a href="../../doxygen/deal.II/step_31.html">Step-31</a></td>
     <td> Time dependent Stokes flow driven by buoyancy
     </td>
   </tr>
 
   <tr valign="top">
     <td></td>
-    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td> 
-    <td> The Euler equations of compressible gas dynamics 
+    <td><a href="../../doxygen/deal.II/step_33.html">Step-33</a></td>
+    <td> The Euler equations of compressible gas dynamics
     </td>
   </tr>
     </td>
