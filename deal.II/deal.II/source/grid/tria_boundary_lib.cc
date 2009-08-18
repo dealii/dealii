@@ -306,19 +306,10 @@ get_intermediate_points_between_points (const Point<dim> &p0,
 				       // the axis of the cone.
       const double c = (x_i - x_0) * axis / axis.square ();
       const Point<dim> x_ip = x_0 + c * axis;
-				       // If the middle point is located
-				       // on the axis hand over the
-				       // current point itself, else
-				       // hand over the projection of it
-				       // on the boundary.
-      if (x_ip.norm () <= 1e-10 * x_i.norm ())
-	points[i] = x_i;
-      else {
-					 // Compute the projection of
-					 // the middle point on the
-					 // boundary of the cone.
-	points[i] = x_ip + get_radius (x_ip) *  (x_i - x_ip) / (x_i - x_ip).norm ();
-      }
+				       // Compute the projection of
+				       // the middle point on the
+				       // boundary of the cone.
+      points[i] = x_ip + get_radius (x_ip) *  (x_i - x_ip) / (x_i - x_ip).norm ();
     }
 }
 
@@ -337,19 +328,10 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 				   // the cone.
   const double c = (middle - x_0) * axis / axis.square ();
   const Point<dim> middle_p = x_0 + c * axis;
-				   // If the middle point is located
-				   // on the axis return the middle
-				   // point itself, else return the
-				   // projection of it on the
-				   // boundary.
-  if (middle_p.norm () <= 1e-10 * middle.norm ())
-    return middle;
-  else {
-				     // Compute the projection of the
-				     // middle point on the boundary
-				     // of the cone.
-    return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
-  }
+				   // Compute the projection of the
+				   // middle point on the boundary
+				   // of the cone.
+  return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
 }
 
 
@@ -370,19 +352,10 @@ ConeBoundary<3>::get_new_point_on_quad (const Triangulation<3>::quad_iterator &q
 				   // the cone.
   const double c = (middle - x_0) * axis / axis.square ();
   const Point<3> middle_p = x_0 + c * axis;
-				   // If the middle point is located
-				   // on the axis return the middle
-				   // point itself, else return the
-				   // projection of it on the
-				   // boundary.
-  if (middle_p.norm () <= 1e-10 * middle.norm ())
-    return middle;
-  else {
-				     // Compute the projection of the
-				     // middle point on the boundary
-				     // of the cone.
-    return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
-  }
+				   // Compute the projection of the
+				   // middle point on the boundary
+				   // of the cone.
+  return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
 }
 
 
