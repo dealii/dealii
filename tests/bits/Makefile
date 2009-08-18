@@ -50,6 +50,7 @@ tests_x = grid_generator_?? \
 	  block_vector_* \
 	  hyper_ball_3d \
 	  cylinder* \
+	  cone* \
 	  coarsening_3d \
 	  mesh_3d_* \
 	  normals_* \
