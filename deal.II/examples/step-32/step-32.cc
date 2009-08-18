@@ -138,9 +138,6 @@ namespace EquationData
 
     const double rho = (r-R0)/h;
 
-    Assert (rho >= -.001, ExcInternalError());
-    Assert (rho <= 1.001, ExcInternalError());
-
     return T1+(T0-T1)*((1-rho)*(1-rho));
   }
 
@@ -1306,7 +1303,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // side is cheap anyway so we won't even
 				 // notice that this part is not parallized
 				 // by threads.
-				 // 
+				 //
 				 // Regarding the implementation of
 				 // inhomogeneous Dirichlet boundary
 				 // conditions: Since we use the temperature
@@ -2462,7 +2459,7 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 				time_step *
 				nu * ext_grad_T * scratch.grad_phi_T[i]
 				+
-				time_step * 
+				time_step *
 				scratch.gamma_values[q] * scratch.phi_T[i])
 	                       *
 	                       scratch.temperature_fe_values.JxW(q);
@@ -2470,15 +2467,15 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 	  if (temperature_constraints.is_inhomogeneously_constrained(data.local_dof_indices[i]))
 	    {
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		data.matrix_for_bc(j,i) += (scratch.phi_T[i] * scratch.phi_T[j] * 
-					    (use_bdf2_scheme ? 
+		data.matrix_for_bc(j,i) += (scratch.phi_T[i] * scratch.phi_T[j] *
+					    (use_bdf2_scheme ?
 					     ((2*time_step + old_time_step) /
 					      (time_step + old_time_step)) : 1.)
 					    +
 					    scratch.grad_phi_T[i] *
 					    scratch.grad_phi_T[j] *
 					    EquationData::kappa *
-					    time_step) 
+					    time_step)
 		                           *
 		                           scratch.temperature_fe_values.JxW(q);
 	    }
