@@ -201,6 +201,23 @@ class CylinderBoundary : public StraightBoundary<dim>
  * Boundary, which would seem natural, since this way we can use the
  * StraightBoundary::in_between() function.
  *
+ * As an example of use, consider the following code snippet:
+ * @code
+ *  Triangulation<dim> triangulation;
+ *  GridGenerator::truncated_cone (triangulation);
+ *  Point<dim> p1, p2;
+ *  p1[0] = -1;
+ *  p2[0] = 1;
+ *  const ConeBoundary<dim> boundary (1, 0.5, p1, p2);
+ *  triangulation.set_boundary (0, boundary);
+ *  triangulation.refine_global (2);
+ * @endcode
+ * This will produce the following meshes after the two
+ * refinements we perform, in 2d and 3d, respectively:
+ *
+ * @image html cone_2d.png
+ * @image html cone_3d.png
+ *
  * @author Markus B&uuml;rg, 2009
  */
 template <int dim>

@@ -465,6 +465,12 @@ class GridGenerator
                                       * face and 2 for the right hand
                                       * face.
                                       *
+				      * An example of use can be found in the
+				      * documentation of the ConeBoundary
+				      * class, with which you probably want to
+				      * associate boundary indicator 0 (the
+				      * hull of the cone).
+				      * 
                                       * @note The triangulation needs to be
                                       * void upon calling this
                                       * function.
