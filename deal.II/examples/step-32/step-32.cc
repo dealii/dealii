@@ -138,8 +138,8 @@ namespace EquationData
 
     const double rho = (r-R0)/h;
 
-    Assert (rho >= -.05, ExcInternalError());
-    Assert (rho <= 1, ExcInternalError());
+    Assert (rho >= -.001, ExcInternalError());
+    Assert (rho <= 1.001, ExcInternalError());
 
     return T1+(T0-T1)*((1-rho)*(1-rho));
   }
@@ -680,6 +680,7 @@ namespace Assembly
 
 	Vector<double>              local_rhs;
 	std::vector<unsigned int>   local_dof_indices;
+        FullMatrix<double>          matrix_for_bc;
     };
 
     template <int dim>
@@ -687,7 +688,9 @@ namespace Assembly
     TemperatureRHS (const FiniteElement<dim> &temperature_fe)
 		    :
 		    local_rhs (temperature_fe.dofs_per_cell),
-		    local_dof_indices (temperature_fe.dofs_per_cell)
+		    local_dof_indices (temperature_fe.dofs_per_cell),
+		    matrix_for_bc (temperature_fe.dofs_per_cell,
+				   temperature_fe.dofs_per_cell)
     {}
 
 
@@ -696,7 +699,8 @@ namespace Assembly
     TemperatureRHS (const TemperatureRHS &data)
 		    :
 		    local_rhs (data.local_rhs),
-		    local_dof_indices (data.local_dof_indices)
+		    local_dof_indices (data.local_dof_indices),
+		    matrix_for_bc (data.matrix_for_bc)
     {}
   }
 }
@@ -1302,6 +1306,47 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // side is cheap anyway so we won't even
 				 // notice that this part is not parallized
 				 // by threads.
+				 // 
+				 // Regarding the implementation of
+				 // inhomogeneous Dirichlet boundary
+				 // conditions: Since we use the temperature
+				 // ConstraintMatrix, we can apply the
+				 // boundary conditions directly when
+				 // building the respective matrix and right
+				 // hand side. In this case, the boundary
+				 // conditions are inhomogeneous, which
+				 // makes this procedure somewhat
+				 // tricky. Remember that we get the matrix
+				 // from some other function. However, the
+				 // correct imposition of boundary
+				 // conditions needs the matrix data we work
+				 // on plus the right hand side
+				 // simultaneously, since the right hand
+				 // side is created by Gaussian elimination
+				 // on the matrix rows. In order to not
+				 // introduce the matrix assembly at this
+				 // place, but still having the matrix data
+				 // available, we choose to create a dummy
+				 // matrix <code>matrix_for_bc</code> that
+				 // we only fill with data when we need it
+				 // for imposing boundary conditions. These
+				 // positions are exactly those where we
+				 // have an inhomogeneous entry in the
+				 // ConstraintMatrix. There are only a few
+				 // such positions (on the boundary dofs),
+				 // so it is still much cheaper to use this
+				 // function than to create the full matrix
+				 // here. To implement this, we ask the
+				 // constraint matrix whether the dof under
+				 // consideration is inhomogeneously
+				 // constraint. In that case, we generate
+				 // the respective matrix column that we
+				 // need for creating the correct right hand
+				 // side. Note that this (manually
+				 // generated) matrix entry needs to be
+				 // exactly the entry that we would fill the
+				 // matrix with &mdash; otherwise, this will
+				 // not work.
 template <int dim>
 void BoussinesqFlowProblem<dim>::project_temperature_field ()
 {
@@ -1318,6 +1363,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   Vector<double> cell_vector (dofs_per_cell);
+  FullMatrix<double> matrix_for_bc (dofs_per_cell, dofs_per_cell);
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
@@ -1333,34 +1379,42 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
     if (cell->subdomain_id() ==
 	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
+	cell->get_dof_indices (local_dof_indices);
 	fe_values.reinit(cell);
 
-	const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	EquationData::TemperatureInitialValues<dim>().value_list
 	  (fe_values.get_quadrature_points(), rhs_values);
 
 	cell_vector = 0;
+	matrix_for_bc = 0;
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    cell_vector(i) += rhs_values[point] *
-			      fe_values.shape_value(i,point) *
-			      weights[point];
-
-	cell->get_dof_indices (local_dof_indices);
+	    {
+	      cell_vector(i) += rhs_values[point] *
+		                fe_values.shape_value(i,point) *
+		                fe_values.JxW(point);
+	      if (temperature_constraints.is_inhomogeneously_constrained(local_dof_indices[i]))
+		{
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    matrix_for_bc(j,i) += fe_values.shape_value(i,point) *
+					  fe_values.shape_value(j,point) *
+		                          fe_values.JxW(point);
+		}
+	    }
 
 	temperature_constraints.distribute_local_to_global (cell_vector,
 							    local_dof_indices,
-							    rhs);
+							    rhs,
+							    matrix_for_bc);
       }
 
   rhs.compress ();
 
-  ReductionControl  control(5*rhs.size(), 0., 1e-12, false, false);
-  GrowingVectorMemory<TrilinosWrappers::MPI::Vector> memory;
-  SolverCG<TrilinosWrappers::MPI::Vector> cg(control,memory);
+  SolverControl solver_control(5*rhs.size(), 1e-12*rhs.l2_norm());
+  SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
-  TrilinosWrappers::PreconditionIC preconditioner_mass;
-  preconditioner_mass.initialize(temperature_mass_matrix);
+  TrilinosWrappers::PreconditionSSOR preconditioner_mass;
+  preconditioner_mass.initialize(temperature_mass_matrix, 1.3);
 
   cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
 
@@ -1559,7 +1613,9 @@ void BoussinesqFlowProblem<dim>::setup_temperature_matrices ()
 				 // that part of the matrix that is roughly
 				 // equal to the degrees of freedom located
 				 // on those cells that it will actually
-				 // work on.
+				 // work on. Note how we set boundary
+				 // conditions on the temperature by using
+				 // the ConstraintMatrix object.
 				 //
 				 // After this, we have to set up the
 				 // various partitioners (of type
@@ -1641,6 +1697,14 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     DoFRenumbering::subdomain_wise (temperature_dof_handler);
 
     temperature_constraints.clear ();
+    VectorTools::interpolate_boundary_values (temperature_dof_handler,
+					      0,
+					      EquationData::TemperatureInitialValues<dim>(),
+					      temperature_constraints);
+    VectorTools::interpolate_boundary_values (temperature_dof_handler,
+					      1,
+					      EquationData::TemperatureInitialValues<dim>(),
+					      temperature_constraints);
     DoFTools::make_hanging_node_constraints (temperature_dof_handler,
 					     temperature_constraints);
     temperature_constraints.close ();
@@ -2271,7 +2335,19 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 				 // points (which are necessary for
 				 // calculating the artificial viscosity of
 				 // stabilization), but is otherwise similar
-				 // to the other assembly functions.
+				 // to the other assembly functions. Notice,
+				 // once again, how we resolve the dilemma
+				 // of having inhomogeneous boundary
+				 // conditions, but just making a right hand
+				 // side at this point (compare the comments
+				 // for the project function): We create
+				 // some matrix columns with exactly the
+				 // values that would be entered for the
+				 // temperature stiffness matrix, in case we
+				 // have inhomogeneously constrained
+				 // dofs. That will account for the correct
+				 // balance of the right hand side vector
+				 // with the matrix system of temperature.
 template <int dim>
 void BoussinesqFlowProblem<dim>::
 local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
@@ -2290,6 +2366,8 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
   const FEValuesExtractors::Vector velocities (0);
 
   data.local_rhs = 0;
+  data.matrix_for_bc = 0;
+  cell->get_dof_indices (data.local_dof_indices);
 
   scratch.temperature_fe_values.reinit (cell);
 
@@ -2375,21 +2453,37 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 	   scratch.old_velocity_values[q]);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	data.local_rhs(i) += (old_Ts * scratch.phi_T[i]
-			      -
-			      time_step *
-			      extrapolated_u * ext_grad_T * scratch.phi_T[i]
-			      -
-			      time_step *
-			      nu * ext_grad_T * scratch.grad_phi_T[i]
-			      +
-			      time_step *
-			      scratch.gamma_values[q] * scratch.phi_T[i])
-			     *
-			     scratch.temperature_fe_values.JxW(q);
-    }
+	{
+	  data.local_rhs(i) += (old_Ts * scratch.phi_T[i]
+				-
+				time_step *
+				extrapolated_u * ext_grad_T * scratch.phi_T[i]
+				-
+				time_step *
+				nu * ext_grad_T * scratch.grad_phi_T[i]
+				+
+				time_step * 
+				scratch.gamma_values[q] * scratch.phi_T[i])
+	                       *
+	                       scratch.temperature_fe_values.JxW(q);
 
-  cell->get_dof_indices (data.local_dof_indices);
+	  if (temperature_constraints.is_inhomogeneously_constrained(data.local_dof_indices[i]))
+	    {
+	      for (unsigned int j=0; j<dofs_per_cell; ++j)
+		data.matrix_for_bc(j,i) += (scratch.phi_T[i] * scratch.phi_T[j] * 
+					    (use_bdf2_scheme ? 
+					     ((2*time_step + old_time_step) /
+					      (time_step + old_time_step)) : 1.)
+					    +
+					    scratch.grad_phi_T[i] *
+					    scratch.grad_phi_T[j] *
+					    EquationData::kappa *
+					    time_step) 
+		                           *
+		                           scratch.temperature_fe_values.JxW(q);
+	    }
+	}
+    }
 }
 
 
@@ -2400,7 +2494,8 @@ copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<d
 {
   temperature_constraints.distribute_local_to_global (data.local_rhs,
 						      data.local_dof_indices,
-						      temperature_rhs);
+						      temperature_rhs,
+						      data.matrix_for_bc);
 }
 
 
@@ -2568,7 +2663,6 @@ void BoussinesqFlowProblem<dim>::solve ()
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
 
-
     SolverControl solver_control (stokes_matrix.m(), 1e-21*stokes_rhs.l2_norm());
     SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
       bicgstab (solver_control, false);
@@ -2592,10 +2686,16 @@ void BoussinesqFlowProblem<dim>::solve ()
 
   old_time_step = time_step;
   const double maximal_velocity = get_maximal_velocity();
-  time_step = 1./(1.8*dim*std::sqrt(1.*dim)) /
-	      temperature_degree *
-	      GridTools::minimal_cell_diameter(triangulation) /
-              maximal_velocity;
+  if (maximal_velocity > 1e-10)
+    time_step = 1./(1.8*dim*std::sqrt(1.*dim)) /
+		temperature_degree *
+		GridTools::minimal_cell_diameter(triangulation) /
+		maximal_velocity;
+  else
+    time_step = 1./(1.8*dim*std::sqrt(1.*dim)) /
+		temperature_degree *
+		GridTools::minimal_cell_diameter(triangulation) /
+		1e-10;
 
   pcout << "   " << "Time step: "
 	<< time_step/EquationData::year_in_seconds
@@ -2612,7 +2712,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
   {
     SolverControl solver_control (temperature_matrix.m(),
-				  1e-8*temperature_rhs.l2_norm());
+				  1e-12*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
 
     TrilinosWrappers::MPI::Vector
@@ -2811,7 +2911,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 
   GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
 						     estimated_error_per_cell,
-						     0.8, 0.1);
+						     0.6, 0.2);
   if (triangulation.n_levels() > max_grid_level)
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell = triangulation.begin_active(max_grid_level);
@@ -2846,6 +2946,8 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 
   temperature_solution = tmp[0];
   old_temperature_solution = tmp[1];
+  temperature_constraints.distribute(temperature_solution);
+  temperature_constraints.distribute(old_temperature_solution);
 
   TrilinosWrappers::BlockVector x_stokes_new = stokes_solution;
   stokes_trans.interpolate (x_stokes, x_stokes_new);
@@ -2919,8 +3021,6 @@ void BoussinesqFlowProblem<dim>::run ()
 
       solve ();
 
-      output_results ();
-
       pcout << std::endl;
 
       if ((timestep_number == 0) &&
@@ -2933,6 +3033,8 @@ void BoussinesqFlowProblem<dim>::run ()
       else
 	if ((timestep_number > 0) && (timestep_number % 5 == 0))
 	  refine_mesh (initial_refinement + n_pre_refinement_steps);
+
+      output_results ();
 
       time += time_step;
       ++timestep_number;
