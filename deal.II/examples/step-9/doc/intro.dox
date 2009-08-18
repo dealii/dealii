@@ -41,7 +41,7 @@ augmented by boundary conditions:
 where $\partial\Omega_-$ describes the inflow portion of the boundary and is
 formally defined by
 @f[
-  \partial\Omega_- 
+  \partial\Omega_-
   =
   \{{\mathbf x}\in \partial\Omega: \beta\cdot{\mathbf n}({\mathbf x}) < 0\},
 @f]
@@ -55,7 +55,7 @@ pose any boundary condition on the outflow part of the boundary.
 As it is stated, the transport equation is not stably solvable using
 the standard finite element method, however. The problem is that
 solutions to this equation possess only insufficient regularity
-orthogonal to the transport direction: while they are smooth parallel
+orthogonal to the transport direction: while they are smooth %parallel
 to $\beta$, they may be discontinuous perpendicular to this
 direction. These discontinuities lead to numerical instabilities that
 make a stable solution by a straight-forward discretization
@@ -98,8 +98,8 @@ to be inverted of the form
 with basis functions $\varphi_i,\varphi_j$.  However, this is a
 pitfall that happens to every numerical analyst at least once
 (including the author): we have here expanded the solution
-$u_h = u_i \varphi_i$, but if we do so, we will have to solve the 
-problem 
+$u_h = u_i \varphi_i$, but if we do so, we will have to solve the
+problem
 @f[
   {\mathbf u}^T A = {\mathbf f}^T,
 @f]
@@ -138,23 +138,23 @@ Regarding the exact form of the problem which we will solve, we use
 the following domain and functions (in $d=2$ space dimensions):
 @f{eqnarray*}
   \Omega &=& [-1,1]^d \\
-  \beta({\mathbf x}) 
+  \beta({\mathbf x})
   &=&
   \left(
-    \begin{array}{c}1 \\ 1+\frac 45 \sin(8\pi x)\end{array} 
+    \begin{array}{c}1 \\ 1+\frac 45 \sin(8\pi x)\end{array}
   \right),
   \\
   f({\mathbf x})
   &=&
   \left\{
     \begin{array}{ll}
-        \frac 1{10 s^d} & 
+        \frac 1{10 s^d} &
         \mathrm{for}\ |{\mathbf x}-{\mathbf x}_0|<s, \\
         0 & \mathrm{else},
     \end{array}
   \right.
   \qquad\qquad
-  {\mathbf x}_0 
+  {\mathbf x}_0
   =
   \left(
     \begin{array}{c} -\frac 34 \\ -\frac 34\end{array}
@@ -175,8 +175,8 @@ structure superimposed.
 boundary conditions a blob in the lower left corner, which is then
 transported along.
 <li> The inflow boundary conditions impose a weighted sinusoidal
-structure that is transported along with the flow field. Since 
-$|{\mathbf x}|\ge 1$ on the boundary, the weighting term never gets very large. 
+structure that is transported along with the flow field. Since
+$|{\mathbf x}|\ge 1$ on the boundary, the weighting term never gets very large.
 </ol>
 
 
@@ -199,7 +199,7 @@ shown that this error indicator uses a discrete analogue of the second
 derivatives, weighted by a power of the cell size that is adjusted to
 the linear elements assumed to be in use here:
 @f[
-  \eta_K \approx 
+  \eta_K \approx
   C h \| \nabla^2 u \|_K,
 @f]
 which itself is related to the error size in the energy norm.
@@ -230,7 +230,7 @@ approximate the directional derivative of a function $u$ as follows:
   \frac{u(K') - u(K)}{|{\mathbf y}_{KK'}|},
 @f]
 where $u(K)$ and $u(K')$ denote $u$ evaluated at the centers of the
-respective cells. We now multiply the above approximation by 
+respective cells. We now multiply the above approximation by
 ${\mathbf y}_{KK'}/|{\mathbf y}_{KK'}|$ and sum over all neighbors $K'$ of $K$:
 @f[
   \underbrace{
@@ -265,7 +265,7 @@ criterion:
 @f]
 which is inspired by the following (not rigorous) argument:
 @f{eqnarray*}
-  \|u-u_h\|^2_{L_2} 
+  \|u-u_h\|^2_{L_2}
   &\le&
   C h^2 \|\nabla u\|^2_{L_2}
 \\
