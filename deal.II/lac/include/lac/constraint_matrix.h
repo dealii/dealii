@@ -610,6 +610,14 @@ class ConstraintMatrix : public Subscriptor
     unsigned int max_constraint_indirections () const;
 
 				     /**
+				      * Returns <tt>true</tt> in case the
+				      * dof is constrained and there is a
+				      * non-trivial inhomogeneous valeus set
+				      * to the dof.
+				      */
+    bool is_inhomogeneously_constrained (const unsigned int index) const;
+
+				     /**
 				      * Returns <tt>false</tt> if all
 				      * constraints in the ConstraintMatrix
 				      * are homogeneous ones, and
@@ -1692,6 +1700,26 @@ ConstraintMatrix::is_constrained (const unsigned int index) const
   return ((index < constraint_line_exists.size())
           &&
           (constraint_line_exists[index] == true));
+}
+
+
+
+inline
+bool
+ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) const 
+{
+  if (is_constrained(index) == false)
+    return false;
+
+  ConstraintLine index_comparison;
+  index_comparison.line = index;
+
+  const std::vector<ConstraintLine>::const_iterator
+    position = std::lower_bound (lines.begin(),
+				 lines.end(),
+				 index_comparison);
+  Assert (position != lines.end(), ExcInternalError());
+  return position->inhomogeneity != 0;
 }
 
 DEAL_II_NAMESPACE_CLOSE

@@ -797,7 +797,7 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 		    {
 		      Assert (is_constrained(position_j->entries[q].first) == false,
 			      ExcMessage ("Tried to distribute to a fixed dof."));
-		      global_vector(position_j->entries[j].first)
+		      global_vector(position_j->entries[q].first)
 			-= val * position_j->entries[q].second * matrix_entry;
 		    }
 		}
