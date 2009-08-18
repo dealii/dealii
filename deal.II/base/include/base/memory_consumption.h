@@ -228,7 +228,7 @@ namespace MemoryConsumption
   template <typename T, int N>
   inline
   unsigned int memory_consumption (const T (&v)[N]);
-  
+
 				   /**
 				    * Specialization of the
 				    * determination of the memory
@@ -242,7 +242,7 @@ namespace MemoryConsumption
 				    */
   inline
   unsigned int memory_consumption (const std::vector<bool> &v);
-    
+
 				   /**
 				    * Specialization of the
 				    * determination of the memory
@@ -251,7 +251,7 @@ namespace MemoryConsumption
 				    */
   inline
   unsigned int memory_consumption (const std::vector<int> &v);
-    
+
 				   /**
 				    * Specialization of the
 				    * determination of the memory
@@ -260,7 +260,7 @@ namespace MemoryConsumption
 				    */
   inline
   unsigned int memory_consumption (const std::vector<double> &v);
-    
+
 				   /**
 				    * Specialization of the
 				    * determination of the memory
@@ -269,7 +269,7 @@ namespace MemoryConsumption
 				    */
   inline
   unsigned int memory_consumption (const std::vector<float> &v);
-    
+
 				   /**
 				    * Specialization of the
 				    * determination of the memory
@@ -278,7 +278,7 @@ namespace MemoryConsumption
 				    */
   inline
   unsigned int memory_consumption (const std::vector<char> &v);
-    
+
 				   /**
 				    * Specialization of the
 				    * determination of the memory
@@ -287,7 +287,7 @@ namespace MemoryConsumption
 				    */
   inline
   unsigned int memory_consumption (const std::vector<unsigned char> &v);
-    
+
 				   /**
 				    * Specialization of the
 				    * determination of the memory
@@ -298,7 +298,7 @@ namespace MemoryConsumption
   inline
   unsigned int memory_consumption (const std::vector<T *> &v);
 
-				   /** 
+				   /**
 				    * Specialization of the
 				    * determination of the memory
 				    * consumption of a vector, here
@@ -309,7 +309,7 @@ namespace MemoryConsumption
 				    * necessary for compatibility with
 				    * IBM's xlC 5.0 compiler, and
 				    * doesn't harm for other compilers
-				    * as well.  
+				    * as well.
 				    */
   unsigned int memory_consumption (const std::vector<std::string> &v);
 
@@ -322,7 +322,7 @@ namespace MemoryConsumption
   template <typename A, typename B>
   inline
   unsigned int memory_consumption (const std::pair<A,B> &p);
-    
+
 				   /**
 				    * Return the amount of memory
 				    * used by a pointer. Make sure
@@ -334,7 +334,7 @@ namespace MemoryConsumption
   template <typename T>
   inline
   unsigned int memory_consumption (const T * const);
-  
+
 				   /**
 				    * Return the amount of memory
 				    * used by a pointer. Make sure
@@ -368,7 +368,7 @@ namespace MemoryConsumption
 				    */
   inline
   unsigned int memory_consumption (void * const);
-    
+
 				   /**
 				    * Return the amount of memory used
 				    * by a shared pointer. Make
@@ -380,7 +380,7 @@ namespace MemoryConsumption
   template <typename T>
   inline
   unsigned int memory_consumption (const std_cxx1x::shared_ptr<T> &);
-    
+
 				   /**
 				    * For all other types which are
 				    * not explicitly listed: try if
@@ -408,27 +408,27 @@ namespace MemoryConsumption
   {
     return sizeof(bool);
   }
-  
-  
-  
+
+
+
   inline
   unsigned int memory_consumption (const char)
   {
     return sizeof(char);
   }
-  
+
 
 
   inline
-  unsigned int memory_consumption (const short int) 
+  unsigned int memory_consumption (const short int)
   {
     return sizeof(short int);
   }
-  
+
 
 
   inline
-  unsigned int memory_consumption (const short unsigned int) 
+  unsigned int memory_consumption (const short unsigned int)
   {
     return sizeof(short unsigned int);
   }
@@ -436,15 +436,15 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const int) 
+  unsigned int memory_consumption (const int)
   {
     return sizeof(int);
   }
-  
+
 
 
   inline
-  unsigned int memory_consumption (const unsigned int) 
+  unsigned int memory_consumption (const unsigned int)
   {
     return sizeof(unsigned int);
   }
@@ -466,7 +466,7 @@ namespace MemoryConsumption
   }
 
 
-  
+
   inline
   unsigned int memory_consumption (const std::string &s)
   {
@@ -506,15 +506,15 @@ namespace MemoryConsumption
   }
 
 
-  
+
   inline
   unsigned int memory_consumption (const std::vector<int> &v)
   {
     return (v.capacity() * sizeof(int) +
 	    sizeof(v));
   }
-    
-    
+
+
 
   inline
   unsigned int memory_consumption (const std::vector<double> &v)
@@ -522,8 +522,8 @@ namespace MemoryConsumption
     return (v.capacity() * sizeof(double) +
 	    sizeof(v));
   }
-    
-    
+
+
 
   inline
   unsigned int memory_consumption (const std::vector<float> &v)
@@ -531,18 +531,18 @@ namespace MemoryConsumption
     return (v.capacity() * sizeof(float) +
 	    sizeof(v));
   }
-    
-    
-	
+
+
+
   inline
   unsigned int memory_consumption (const std::vector<char> &v)
   {
     return (v.capacity() * sizeof(char) +
 	    sizeof(v));
   }
-    
 
-    
+
+
   inline
   unsigned int memory_consumption (const std::vector<unsigned char> &v)
   {
@@ -551,7 +551,7 @@ namespace MemoryConsumption
   }
 
 
-    
+
   template <typename T>
   inline
   unsigned int memory_consumption (const std::vector<T *> &v)
@@ -559,9 +559,9 @@ namespace MemoryConsumption
     return (v.capacity() * sizeof(T *) +
 	    sizeof(v));
   }
-    
 
-				    
+
+
   template <typename A, typename B>
   inline
   unsigned int memory_consumption (const std::pair<A,B> &p)
@@ -570,8 +570,8 @@ namespace MemoryConsumption
 	    memory_consumption(p.second));
   }
 
-  
-		
+
+
   template <typename T>
   inline
   unsigned int
@@ -581,7 +581,7 @@ namespace MemoryConsumption
   }
 
 
-		
+
   template <typename T>
   inline
   unsigned int
@@ -590,8 +590,8 @@ namespace MemoryConsumption
     return sizeof(T*);
   }
 
-  
-	
+
+
   inline
   unsigned int
   memory_consumption (void * const)
@@ -604,13 +604,13 @@ namespace MemoryConsumption
   template <typename T>
   inline
   unsigned int
-  memory_consumption (const std_cxx1x::shared_ptr<T> &ptr)
+  memory_consumption (const std_cxx1x::shared_ptr<T> &)
   {
-    return sizeof(ptr);
+    return sizeof(std_cxx1x::shared_ptr<T>);
   }
-  
-    
-	
+
+
+
   template <typename T>
   inline
   unsigned int
