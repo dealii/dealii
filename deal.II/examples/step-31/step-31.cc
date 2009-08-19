@@ -127,7 +127,7 @@ using namespace dealii;
 				 // circles (or spheres in 3d) somewhere at
 				 // the bottom of the domain, as explained in
 				 // the introduction, and zero outside.
-				 // 
+				 //
 				 // Finally, or maybe firstly, at the top of
 				 // this namespace, we define the various
 				 // material constants we need ($\eta,\kappa$,
@@ -195,16 +195,16 @@ namespace EquationData
   {
     Assert (component == 0,
 	    ExcMessage ("Invalid operation for a scalar function."));
-    
+
     Assert ((dim==2) || (dim==3), ExcNotImplemented());
-    
+
     static const Point<dim> source_centers[3]
       = { (dim == 2 ? Point<dim>(.3,.1) : Point<dim>(.3,.5,.1)),
 	  (dim == 2 ? Point<dim>(.45,.1) : Point<dim>(.45,.5,.1)),
 	  (dim == 2 ? Point<dim>(.75,.1) : Point<dim>(.75,.5,.1)) };
     static const double source_radius
       = (dim == 2 ? 1./32 : 1./8);
-      
+
     return ((source_centers[0].distance (p) < source_radius)
 	    ||
 	    (source_centers[1].distance (p) < source_radius)
@@ -392,7 +392,7 @@ namespace LinearSolvers
 				   // \end{array}\right) =
 				   // \left(\begin{array}{cc} I &
 				   // A^{-1} B^T \\ 0 & I
-				   // \end{array}\right), 
+				   // \end{array}\right),
 				   // @f}
 				   // which indeed is very simple. A GMRES
 				   // solver based on exact matrices would
@@ -408,7 +408,7 @@ namespace LinearSolvers
 				   // Using general block preconditioners",
 				   // SIAM J. Numer. Anal., 31 (1994),
 				   // pp. 1352-1367).
-				   // 
+				   //
 				   // Replacing <i>P</i> by $\tilde{P}$
 				   // keeps that spirit alive: the product
 				   // $P^{-1} A$ will still be close to a
@@ -444,7 +444,7 @@ namespace LinearSolvers
 				   // iterations for <em>each</em> outer
 				   // solver step (using the AMG
 				   // preconditioner).
-				   // 
+				   //
 				   // Having the above explanations in mind,
 				   // we define a preconditioner class with
 				   // a <code>vmult</code> functionality,
@@ -452,7 +452,7 @@ namespace LinearSolvers
 				   // interaction with the usual solver
 				   // functions further below in the program
 				   // code.
-				   // 
+				   //
 				   // First the declarations. These are
 				   // similar to the definition of the Schur
 				   // complement in step-20, with the
@@ -627,7 +627,7 @@ class BoussinesqFlowProblem
     TrilinosWrappers::BlockVector       stokes_rhs;
 
 
-    const unsigned int                  temperature_degree;    
+    const unsigned int                  temperature_degree;
     FE_Q<dim>                           temperature_fe;
     DoFHandler<dim>                     temperature_dof_handler;
     ConstraintMatrix                    temperature_constraints;
@@ -658,7 +658,7 @@ class BoussinesqFlowProblem
 				 // @sect3{BoussinesqFlowProblem class implementation}
 
 				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
-				 // 
+				 //
 				 // The constructor of this class is an
 				 // extension of the constructor in
 				 // step-22. We need to add the various
@@ -785,7 +785,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   double max_velocity = 0;
 
   const FEValuesExtractors::Vector velocities (0);
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
@@ -895,7 +895,7 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
 	  for (unsigned int q=0; q<n_q_points; ++q)
 	    {
-	      const double temperature = 
+	      const double temperature =
 		(1. + time_step/old_time_step) * old_temperature_values[q]-
 		time_step/old_time_step * old_old_temperature_values[q];
 
@@ -928,9 +928,9 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 	      max_temperature = std::max (max_temperature, temperature);
 	    }
 	}
-  
+
       return std::make_pair(min_temperature, max_temperature);
-    }    
+    }
 }
 
 
@@ -991,25 +991,25 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 {
   const double beta = 0.015 * dim;
   const double alpha = 1;
-  
+
   if (global_u_infty == 0)
     return 5e-3 * cell_diameter;
-  
+
   const unsigned int n_q_points = old_temperature.size();
-  
+
   double max_residual = 0;
   double max_velocity = 0;
-  
+
   for (unsigned int q=0; q < n_q_points; ++q)
     {
       const Tensor<1,dim> u = (old_velocity_values[q] +
 			       old_old_velocity_values[q]) / 2;
-      
+
       const double dT_dt = (old_temperature[q] - old_old_temperature[q])
 			   / old_time_step;
       const double u_grad_T = u * (old_temperature_grads[q] +
 				   old_old_temperature_grads[q]) / 2;
-      
+
       const double kappa_Delta_T = EquationData::kappa
 				   * (old_temperature_laplacians[q] +
 				      old_old_temperature_laplacians[q]) / 2;
@@ -1022,8 +1022,9 @@ compute_viscosity (const std::vector<double>          &old_temperature,
       max_residual = std::max (residual,        max_residual);
       max_velocity = std::max (std::sqrt (u*u), max_velocity);
     }
-  
-  const double global_scaling = global_u_infty * global_T_variation *
+
+  const double c_R = std::pow (2., (4.-2*alpha)/dim);
+  const double global_scaling = c_R * global_u_infty * global_T_variation *
 				std::pow(global_Omega_diameter, alpha - 2.);
 
   return (beta *
@@ -1036,7 +1037,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 
 
 				 // @sect4{BoussinesqFlowProblem::setup_dofs}
-				 // 
+				 //
 				 // This is the function that sets up the
 				 // DoFHandler objects we have here (one for
 				 // the Stokes part and one for the
@@ -1045,7 +1046,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // for the linear algebra in this
 				 // program. Its basic operations are similar
 				 // to what we do in step-22.
-				 // 
+				 //
 				 // The body of the function first
 				 // enumerates all degrees of freedom for
 				 // the Stokes and temperature systems. For
@@ -1066,7 +1067,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // renumbering, but its costs are low
 				 // compared to the velocity portion, so the
 				 // additional work does not pay off.
-				 // 
+				 //
 				 // We then proceed with the generation of the
 				 // hanging node constraints that arise from
 				 // adaptive grid refinement for both
@@ -1092,11 +1093,11 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 {
   std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
   stokes_sub_blocks[dim] = 1;
-  
+
   {
     stokes_dof_handler.distribute_dofs (stokes_fe);
     DoFRenumbering::component_wise (stokes_dof_handler, stokes_sub_blocks);
-    
+
     stokes_constraints.clear ();
     DoFTools::make_hanging_node_constraints (stokes_dof_handler,
 					     stokes_constraints);
@@ -1119,7 +1120,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   std::vector<unsigned int> stokes_dofs_per_block (2);
   DoFTools::count_dofs_per_block (stokes_dof_handler, stokes_dofs_per_block,
 				  stokes_sub_blocks);
-  
+
   const unsigned int n_u = stokes_dofs_per_block[0],
                      n_p = stokes_dofs_per_block[1],
 		     n_T = temperature_dof_handler.n_dofs();
@@ -1135,7 +1136,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
             << " (" << n_u << '+' << n_p << '+'<< n_T <<')'
             << std::endl
             << std::endl;
-  
+
 				   // The next step is to create the sparsity
 				   // pattern for the Stokes and temperature
 				   // system matrices as well as the
@@ -1150,7 +1151,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // class would consume too much memory when
 				   // used in three spatial dimensions as we
 				   // intend to do for this program.
-				   // 
+				   //
 				   // So, we first release the memory stored
 				   // in the matrices, then set up an object
 				   // of type
@@ -1215,7 +1216,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     stokes_matrix.clear ();
 
     BlockCompressedSimpleSparsityPattern csp (2,2);
- 
+
     csp.block(0,0).reinit (n_u, n_u);
     csp.block(0,1).reinit (n_u, n_p);
     csp.block(1,0).reinit (n_p, n_u);
@@ -1244,12 +1245,12 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     stokes_preconditioner_matrix.clear ();
 
     BlockCompressedSimpleSparsityPattern csp (2,2);
- 
+
     csp.block(0,0).reinit (n_u, n_u);
     csp.block(0,1).reinit (n_u, n_p);
     csp.block(1,0).reinit (n_p, n_u);
     csp.block(1,1).reinit (n_p, n_p);
-      
+
     csp.collect_sizes ();
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
@@ -1293,7 +1294,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
-    CompressedSimpleSparsityPattern csp (n_T, n_T);      
+    CompressedSimpleSparsityPattern csp (n_T, n_T);
     DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
 				     temperature_constraints, false);
 
@@ -1324,7 +1325,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 
 				 // @sect4{BoussinesqFlowProblem::assemble_stokes_preconditioner}
-				 // 
+				 //
                                  // This function assembles the matrix we use
                                  // for preconditioning the Stokes
                                  // system. What we need are a vector Laplace
@@ -1405,7 +1406,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 	      phi_grad_u[k] = stokes_fe_values[velocities].gradient(k,q);
 	      phi_p[k]      = stokes_fe_values[pressure].value (k, q);
 	    }
-	  
+
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      local_matrix(i,j) += (EquationData::eta *
@@ -1426,7 +1427,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 
 
 				 // @sect4{BoussinesqFlowProblem::build_stokes_preconditioner}
-				 // 
+				 //
 				 // This function generates the inner
 				 // preconditioners that are going to be used
 				 // for the Schur complement block
@@ -1441,7 +1442,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 				 // task is to call
 				 // <code>assemble_stokes_preconditioner</code>
 				 // to generate the preconditioner matrices.
-				 // 
+				 //
 				 // Next, we set up the preconditioner for
 				 // the velocity-velocity matrix
 				 // <i>A</i>. As explained in the
@@ -1475,18 +1476,18 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 {
   if (rebuild_stokes_preconditioner == false)
     return;
-  
+
   std::cout << "   Rebuilding Stokes preconditioner..." << std::flush;
-      
+
   assemble_stokes_preconditioner ();
-      
+
   Amg_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>
 		       (new TrilinosWrappers::PreconditionAMG());
 
   std::vector<std::vector<bool> > constant_modes;
   std::vector<bool>  velocity_components (dim+1,true);
   velocity_components[dim] = false;
-  DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
+  DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components,
 				    constant_modes);
   TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
   amg_data.constant_modes = constant_modes;
@@ -1526,7 +1527,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // this data set, we then initialize the
 				   // preconditioner with the matrix we want
 				   // it to apply to.
-				   // 
+				   //
 				   // Finally, we also initialize the
 				   // preconditioner for the inversion of
 				   // the pressure mass matrix. This matrix
@@ -1564,7 +1565,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
 
 				 // @sect4{BoussinesqFlowProblem::assemble_stokes_system}
-				 // 
+				 //
 				 // The time lag scheme we use for advancing
 				 // the coupled Stokes-temperature system
 				 // forces us to split up the assembly (and
@@ -1575,7 +1576,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				 // and right hand sides for the temperature
 				 // dofs, which depends on the result of the
 				 // linear system for the velocity.
-				 // 
+				 //
 				 // This function is called at the beginning
 				 // of each time step. In the first time step
 				 // or if the mesh has changed, indicated by
@@ -1586,7 +1587,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				 // not necessary and all we need to do is
 				 // assemble the right hand side vector which
 				 // changes in each time step.
-				 // 
+				 //
 				 // Regarding the technical details of
 				 // implementation, not much has changed from
 				 // step-22. We reset matrix and vector,
@@ -1617,7 +1618,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				 // FEValues objects to ensure that we get
 				 // matching information when we loop over the
 				 // quadrature points of the two objects.
-				 // 
+				 //
 				 // The declarations proceed with some
 				 // shortcuts for array sizes, the creation
 				 // of the local matrix and right hand side
@@ -1644,7 +1645,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				       update_gradients
 				       :
 				       UpdateFlags(0)));
-  
+
   FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
 					   update_values);
 
@@ -1663,7 +1664,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				   // term in the right hand side of the
 				   // momentum equation. Let's call this vector
 				   // <code>old_solution_values</code>.
-				   // 
+				   //
 				   // The set of vectors we create next hold
 				   // the evaluations of the basis functions
 				   // as well as their gradients and
@@ -1674,7 +1675,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				   // each time it is needed is an
 				   // optimization to accelerate the assembly
 				   // process, see step-22 for details.
-				   // 
+				   //
 				   // The last two declarations are used to
 				   // extract the individual blocks
 				   // (velocity, pressure, temperature) from
@@ -1713,16 +1714,16 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
     endc = stokes_dof_handler.end();
   typename DoFHandler<dim>::active_cell_iterator
     temperature_cell = temperature_dof_handler.begin_active();
-  
+
   for (; cell!=endc; ++cell, ++temperature_cell)
     {
       stokes_fe_values.reinit (cell);
       temperature_fe_values.reinit (temperature_cell);
-      
+
       local_matrix = 0;
       local_rhs = 0;
 
-      temperature_fe_values.get_function_values (old_temperature_solution, 
+      temperature_fe_values.get_function_values (old_temperature_solution,
 						 old_temperature_values);
 
       for (unsigned int q=0; q<n_q_points; ++q)
@@ -1735,7 +1736,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 					   // inner products. As shown in
 					   // step-22 this helps accelerate
 					   // assembly.
-					   // 
+					   //
 					   // Once this is done, we start the
 					   // loop over the rows and columns
 					   // of the local matrix and feed the
@@ -1772,7 +1773,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				      - phi_p[i] * div_phi_u[j])
 				     * stokes_fe_values.JxW(q);
 
-	  const Point<dim> gravity = -( (dim == 2) ? (Point<dim> (0,1)) : 
+	  const Point<dim> gravity = -( (dim == 2) ? (Point<dim> (0,1)) :
 					(Point<dim> (0,0,1)) );
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    local_rhs(i) += (-EquationData::density *
@@ -1815,7 +1816,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
 
 				 // @sect4{BoussinesqFlowProblem::assemble_temperature_matrix}
-				 // 
+				 //
 				 // This function assembles the matrix in
 				 // the temperature equation. The
 				 // temperature matrix consists of two
@@ -1838,7 +1839,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				 // will then sum up the matrix plus the
 				 // stiffness matrix times the time step
 				 // size once we know the actual time step.
-				 // 
+				 //
 				 // So the details for this first step are
 				 // very simple. In case we need to
 				 // rebuild the matrix (i.e., the mesh has
@@ -1853,10 +1854,10 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 {
   if (rebuild_temperature_matrices == false)
     return;
-  
+
   temperature_mass_matrix = 0;
   temperature_stiffness_matrix = 0;
-  
+
   QGauss<dim>   quadrature_formula (temperature_degree+2);
   FEValues<dim> temperature_fe_values (temperature_fe, quadrature_formula,
 				       update_values    | update_gradients |
@@ -1896,7 +1897,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
       local_stiffness_matrix = 0;
 
       temperature_fe_values.reinit (cell);
-      
+
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -1904,7 +1905,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 	      grad_phi_T[k] = temperature_fe_values.shape_grad (k,q);
 	      phi_T[k]      = temperature_fe_values.shape_value (k, q);
 	    }
-	  
+
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      {
@@ -1918,7 +1919,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 		      temperature_fe_values.JxW(q));
 	      }
 	}
-      
+
       cell->get_dof_indices (local_dof_indices);
 
       temperature_constraints.distribute_local_to_global (local_mass_matrix,
@@ -1928,7 +1929,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 							  local_dof_indices,
 							  temperature_stiffness_matrix);
     }
-  
+
   rebuild_temperature_matrices = false;
 }
 
@@ -1980,9 +1981,9 @@ void BoussinesqFlowProblem<dim>::
       temperature_matrix.copy_from (temperature_mass_matrix);
       temperature_matrix.add (time_step, temperature_stiffness_matrix);
     }
-  
+
   temperature_rhs = 0;
-  
+
   const QGauss<dim> quadrature_formula(temperature_degree+2);
   FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
 					   update_values    |
@@ -2033,12 +2034,12 @@ void BoussinesqFlowProblem<dim>::
 
   std::vector<double>         phi_T      (dofs_per_cell);
   std::vector<Tensor<1,dim> > grad_phi_T (dofs_per_cell);
-  
+
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
 
   const FEValuesExtractors::Vector velocities (0);
-  
+
 				   // Now, let's start the loop over all cells
 				   // in the triangulation. Again, we need two
 				   // cell iterators that walk in parallel
@@ -2084,12 +2085,12 @@ void BoussinesqFlowProblem<dim>::
 						    old_temperature_grads);
       temperature_fe_values.get_function_gradients (old_old_temperature_solution,
 						    old_old_temperature_grads);
-      
+
       temperature_fe_values.get_function_laplacians (old_temperature_solution,
 						     old_temperature_laplacians);
       temperature_fe_values.get_function_laplacians (old_old_temperature_solution,
 						   old_old_temperature_laplacians);
-      
+
       temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 					      gamma_values);
 
@@ -2133,7 +2134,7 @@ void BoussinesqFlowProblem<dim>::
 			     maximal_velocity,
 			     global_T_range.second - global_T_range.first,
 			     cell->diameter());
-      
+
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -2154,18 +2155,18 @@ void BoussinesqFlowProblem<dim>::
 	       old_temperature_values[q]);
 
 	  const Tensor<1,dim> ext_grad_T
-	    = (use_bdf2_scheme ? 
+	    = (use_bdf2_scheme ?
 	       (old_temperature_grads[q] *
-		(1+time_step/old_time_step) 
+		(1+time_step/old_time_step)
 		-
 		old_old_temperature_grads[q] *
-		time_step / old_time_step) 
+		time_step / old_time_step)
 	       :
 	       old_temperature_grads[q]);
-	  
+
 	  const Tensor<1,dim> extrapolated_u
-	    = (use_bdf2_scheme ? 
-	       (old_velocity_values[q] * (1+time_step/old_time_step) - 
+	    = (use_bdf2_scheme ?
+	       (old_velocity_values[q] * (1+time_step/old_time_step) -
 		old_old_velocity_values[q] * time_step/old_time_step)
 	       :
 	       old_velocity_values[q]);
@@ -2184,7 +2185,7 @@ void BoussinesqFlowProblem<dim>::
 	                    *
 	                    temperature_fe_values.JxW(q);
 	}
- 
+
       cell->get_dof_indices (local_dof_indices);
       temperature_constraints.distribute_local_to_global (local_rhs,
 							  local_dof_indices,
@@ -2219,7 +2220,7 @@ void BoussinesqFlowProblem<dim>::
 				 // only pointers, so we use <code>*</code>
 				 // to pass down the actual preconditioner
 				 // objects.
-				 // 
+				 //
 				 // Once the preconditioner is ready, we
 				 // create a GMRES solver for the block
 				 // system. Since we are working with
@@ -2331,7 +2332,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
   std::cout << "   " << "Time step: " << time_step
 	    << std::endl;
-  
+
   temperature_solution = old_temperature_solution;
 
 				   // Next we set up the temperature system
@@ -2404,7 +2405,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 	max_temperature = std::max<double> (max_temperature,
 					    temperature_solution(i));
       }
-    
+
     std::cout << "   Temperature range: "
 	      << min_temperature << ' ' << max_temperature
 	      << std::endl;
@@ -2414,7 +2415,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 
 				 // @sect4{BoussinesqFlowProblem::output_results}
-				 // 
+				 //
 				 // This function writes the solution to a VTK
 				 // output file for visualization, which is
 				 // done every tenth time step. This is
@@ -2441,7 +2442,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				 // that ensures that we got all the dofs from
 				 // both Stokes and temperature even in the
 				 // combined system.
-				 // 
+				 //
 				 // Next, we create a vector that will collect
 				 // the actual solution values. Since this
 				 // vector is only going to be used for
@@ -2462,7 +2463,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   Assert (joint_dof_handler.n_dofs() ==
 	  stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
 	  ExcInternalError());
-  
+
   Vector<double> joint_solution (joint_dof_handler.n_dofs());
 
 				   // Unfortunately, there is no
@@ -2495,7 +2496,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 				   // between global vector and local dofs
 				   // looks like on the present cell, which
 				   // concludes this tedious work.
-				   // 
+				   //
 				   // There's one thing worth remembering
 				   // when looking at the output: In our
 				   // algorithm, we first solve for the
@@ -2515,7 +2516,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
     std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
     std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
     std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
-    
+
     typename DoFHandler<dim>::active_cell_iterator
       joint_cell       = joint_dof_handler.begin_active(),
       joint_endc       = joint_dof_handler.end(),
@@ -2550,7 +2551,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 	    }
       }
   }
-  
+
 				   // Next, we proceed as we've done in
 				   // step-22. We create solution names
 				   // (that are going to appear in the
@@ -2603,7 +2604,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
 
 				 // @sect4{BoussinesqFlowProblem::refine_mesh}
-				 // 
+				 //
 				 // This function takes care of the adaptive
 				 // mesh refinement. The three tasks this
 				 // function performs is to first find out
@@ -2669,7 +2670,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
 						     estimated_error_per_cell,
 						     0.8, 0.1);
-  if (triangulation.n_levels() > max_grid_level) 
+  if (triangulation.n_levels() > max_grid_level)
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell = triangulation.begin_active(max_grid_level);
 	 cell != triangulation.end(); ++cell)
@@ -2766,7 +2767,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 
 
 				 // @sect4{BoussinesqFlowProblem::run}
-				 // 
+				 //
 				 // This function performs all the
 				 // essential steps in the Boussinesq
 				 // program. It starts by setting up a
@@ -2792,7 +2793,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 				 // beginning at the
 				 // <code>start_time_iteration</code>
 				 // label.
-				 // 
+				 //
 				 // Before we start, we project the
 				 // initial values to the grid and
 				 // obtain the first data for the
@@ -2815,7 +2816,7 @@ void BoussinesqFlowProblem<dim>::run ()
   setup_dofs();
 
   unsigned int pre_refinement_step = 0;
-  
+
   start_time_iteration:
 
   VectorTools::project (temperature_dof_handler,
@@ -2823,10 +2824,10 @@ void BoussinesqFlowProblem<dim>::run ()
 			QGauss<dim>(temperature_degree+2),
 			EquationData::TemperatureInitialValues<dim>(),
 			old_temperature_solution);
-  
+
   timestep_number           = 0;
   time_step = old_time_step = 0;
-  
+
   double time = 0;
 
   do
@@ -2864,7 +2865,7 @@ void BoussinesqFlowProblem<dim>::run ()
       output_results ();
 
       std::cout << std::endl;
-      
+
       if ((timestep_number == 0) &&
 	  (pre_refinement_step < n_pre_refinement_steps))
 	{
@@ -2891,7 +2892,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
 
 				 // @sect3{The <code>main</code> function}
-				 // 
+				 //
 				 // The main function looks almost the same
 				 // as in all other programs. The only
 				 // difference is that Trilinos wants to get

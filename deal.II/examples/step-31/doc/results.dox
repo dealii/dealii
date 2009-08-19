@@ -325,7 +325,29 @@ In all of these cases, we will have to expect that the correct choice of each
 value depends on that of the others, and most likely also on the space
 dimension and polynomial degree of the finite element used for the
 temperature. Below we'll discuss a few numerical experiments to choose
-constants.
+constants $c_k$ and $\beta$.
+
+Below, we will not discuss the choice of $c_R$. In the program, we set
+it to $c_R=2^{\frac{4-2\alpha}{d}}$. The reason for this value is a
+bit complicated and has more to do with the history of the program
+than reasoning: while the correct formula for the global scaling
+parameter $c(\mathbf{u},T)$ is shown above, the program (including the
+version shipped with deal.II 6.2) initially had a bug in that we
+computed
+$c(\mathbf{u},T) =
+      \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
+      \ \frac{1}{|\mathrm{diam}(\Omega)|^{\alpha-2}}$ instead, where
+we had set the scaling parameter to one. Since we only computed on the
+unit square/cube where $\mathrm{diam}(\Omega)=2^{1/d}$, this was
+entirely equivalent to using the correct formula with
+$c_R=\left(2^{1/d}\right)^{4-2\alpha}=2^{\frac{4-2\alpha}{d}}$. Since
+this value for $c_R$ appears to work just fine for the current
+program, we corrected the formula in the program and set $c_R$ to a
+value that reproduces exactly the results we had before. We will,
+however, revisit this issue again in @ref step_32 "step-32".
+
+Now, however, back to the discussion of what values of $c_k$ and
+$\beta$ to choose:
 
 
 <h4> Choosing <i>c<sub>k</sub></i> and beta </h4>
@@ -367,7 +389,11 @@ $
   =
   \beta
   \|\mathbf{u}\|_{L^\infty(K)} h_K
-$ to eliminate the effect of of the constant $c_R$. We then run the program
+$ to eliminate the effect of of the constant $c_R$ (we know that
+solutions are stable by using above $\nu(T)$ as an artificial
+viscosity, but that we can improve things -- i.e. make the solution
+sharper -- by using the more complicated formula for this artificial
+viscosity). We then run the program
 for different values $c_k,\beta$ and observe maximal and minimal temperatures
 in the domain. What we expect to see is this: If we choose the time step too
 big (i.e. choose a $c_k$ bigger than theoretically allowed) then we will get
