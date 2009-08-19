@@ -84,6 +84,26 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
+   Fixed: @ref step_31 "step-31" had a bug in the computation of the
+   global scaling parameter in the function that evaluates the artificial
+   viscosity: we computed
+   $c(\mathbf{u},T) = 
+    c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
+    \frac{1}{|\mathrm{diam}(\Omega)|^{\alpha-2}}$
+   when it should have been
+   $c(\mathbf{u},T) = 
+    c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
+    \ |\mathrm{diam}(\Omega)|^{\alpha-2}$. This didn't matter much in this
+   program because $\mathrm{diam}(\Omega)=2^{1/\textrm{dim}}$ and so is close
+   to one. It would matter, however, if the domain had been different, as
+   it is, for example, in @ref step_32 "step-32".
+   <br>
+   (WB 2009/08/19)
+   </p>
+   </li>
+
+   <li>
+   <p>
    Changed: When using Trilinos wrapper objects in parallel through MPI, each
    object now uses a separate and distinct MPI communicator object. This
    ensures that different objects (such as different matrices, or different

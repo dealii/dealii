@@ -1023,7 +1023,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
       max_velocity = std::max (std::sqrt (u*u), max_velocity);
     }
   
-  const double global_scaling = global_u_infty * global_T_variation /
+  const double global_scaling = global_u_infty * global_T_variation *
 				std::pow(global_Omega_diameter, alpha - 2.);
 
   return (beta *
