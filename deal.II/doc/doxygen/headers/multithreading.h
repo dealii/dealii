@@ -339,7 +339,7 @@
  *
  * The TBB library primitives for this are a bit clumsy so deal.II has
  * wrapper routines for the most frequently used operations. The
- * simplest one is akin to the what the std::transform does: it takes
+ * simplest one is akin to what the std::transform does: it takes
  * one or more ranges of input operators, one output iterator, and a
  * function object. A typical implementation of std::transform would
  * look like this:
