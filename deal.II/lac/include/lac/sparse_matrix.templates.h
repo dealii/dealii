@@ -1725,20 +1725,6 @@ SparseMatrix<number>::get_sparsity_pattern () const
 
 
 template <typename number>
-void SparseMatrix<number>::print (std::ostream &out) const
-{
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
-
-  for (unsigned int i=0; i<cols->rows; ++i)
-    for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
-      out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
-
-  AssertThrow (out, ExcIO());
-}
-
-
-template <typename number>
 void SparseMatrix<number>::print_formatted (std::ostream &out,
 					    const unsigned int precision,
 					    const bool scientific,

@@ -1889,7 +1889,8 @@ class SparseMatrix : public virtual Subscriptor
 				      * i.e. one nonzero entry of the
 				      * matrix per line.
 				      */
-    void print (std::ostream &out) const;
+    template <class STREAM>
+    void print (STREAM &out) const;
 
 				     /**
 				      * Print the matrix in the usual
@@ -2933,6 +2934,20 @@ SparseMatrix<number>::end (const unsigned int r)
   return end();
 }
 
+
+
+template <typename number>
+template <class STREAM>
+inline
+void SparseMatrix<number>::print (STREAM &out) const
+{
+  Assert (cols != 0, ExcNotInitialized());
+  Assert (val != 0, ExcNotInitialized());
+
+  for (unsigned int i=0; i<cols->rows; ++i)
+    for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
+      out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
+}
 
 
 template <typename number>
