@@ -2893,6 +2893,14 @@ template <int dim, int spacedim=dim>
 class FEFaceValuesBase : public FEValuesBase<dim,spacedim>
 {
   public:
+                                     /**
+                                      * Dimension of the object over
+                                      * which we integrate. For the
+                                      * present class, this is equal
+                                      * to <code>dim-1</code>.
+                                      */
+    static const unsigned int integral_dimension = dim-1;
+
 				     /**
 				      * Constructor. Call the constructor of
 				      * the base class and set up the arrays
