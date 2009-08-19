@@ -2684,12 +2684,12 @@ void BoussinesqFlowProblem<dim>::solve ()
   old_time_step = time_step;
   const double maximal_velocity = get_maximal_velocity();
   if (maximal_velocity > 1e-10)
-    time_step = 1./(1.8*dim*std::sqrt(1.*dim)) /
+    time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
 		temperature_degree *
 		GridTools::minimal_cell_diameter(triangulation) /
 		maximal_velocity;
   else
-    time_step = 1./(1.8*dim*std::sqrt(1.*dim)) /
+    time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
 		temperature_degree *
 		GridTools::minimal_cell_diameter(triangulation) /
 		1e-10;
