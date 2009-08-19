@@ -339,7 +339,8 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 
 template<int dim>
 Point<dim>
-ConeBoundary<dim>::get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
+ConeBoundary<dim>::
+get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
 {
   const Point<dim> axis = x_1 - x_0;
 				   // Compute the middle point of the
