@@ -335,15 +335,16 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 }
 
 
+#if deal_II_dimension == 3
 
-template<>
-Point<3>
-ConeBoundary<3>::get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
+template<int dim>
+Point<dim>
+ConeBoundary<dim>::get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
-  const Point<3> axis = x_1 - x_0;
+  const Point<dim> axis = x_1 - x_0;
 				   // Compute the middle point of the
 				   // quad.
-  const Point<3> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
+  const Point<dim> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
 				   // Same algorithm as above: To
 				   // project it on the boundary of
 				   // the cone we first compute the
@@ -351,14 +352,14 @@ ConeBoundary<3>::get_new_point_on_quad (const Triangulation<3>::quad_iterator &q
 				   // middle point onto the axis of
 				   // the cone.
   const double c = (middle - x_0) * axis / axis.square ();
-  const Point<3> middle_p = x_0 + c * axis;
+  const Point<dim> middle_p = x_0 + c * axis;
 				   // Compute the projection of the
 				   // middle point on the boundary
 				   // of the cone.
   return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
 }
 
-
+#else
 
 template<int dim>
 Point<dim>
@@ -370,7 +371,7 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
   return Point<dim>();
 }
 
-
+#endif
 
 template<int dim>
 void
