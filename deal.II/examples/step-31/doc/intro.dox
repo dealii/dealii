@@ -1,10 +1,10 @@
 <br>
 
 <i>This program was contributed by Martin Kronbichler and Wolfgang
-Bangerth. 
+Bangerth.
 <br>
 This material is based upon work partly supported by the National
-Science Foundation under Award No. EAR-0426271 and The California Institute of 
+Science Foundation under Award No. EAR-0426271 and The California Institute of
 Technology. Any opinions, findings, and conclusions or recommendations
 expressed in this publication are those of the author and do not
 necessarily reflect the views of the National Science Foundation or of The
@@ -28,7 +28,7 @@ In cases where the fluid moves slowly enough such that inertia effects
 can be neglected, the equations that describe such behavior are the
 Boussinesq equations that read as follows:
 @f{eqnarray*}
-  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& 
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   -\rho\; \beta \; T\; \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0,
@@ -48,7 +48,7 @@ gradient of the velocity. As can be seen, velocity and pressure
 solve a Stokes equation describing the motion of an incompressible
 fluid, an equation we have previously considered in @ref step_22 "step-22"; we
 will draw extensively on the experience we have gained in that program, in
-particular with regard to efficient linear Stokes solvers. 
+particular with regard to efficient linear Stokes solvers.
 
 The forcing term of the fluid motion is the buoyancy of the
 fluid, expressed as the product of the density $\rho$, the thermal expansion
@@ -72,7 +72,7 @@ diffusion (heat conduction) term. In many applications, the diffusion
 coefficient is fairly small, and the temperature equation is in fact
 transport, not diffusion dominated and therefore in character more hyperbolic
 than elliptic; we will have to take this into account when developing a stable
-discretization. 
+discretization.
 
 In the equations above, the term $\gamma$ on the right hand side denotes the
 heat sources and may be a spatially and temporally varying function. $\eta$
@@ -86,7 +86,7 @@ of temperatures.
 
 We note that the Stokes equation above could be non-dimensionalized by
 introducing the <a target="_top"
-href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh 
+href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
 number</a> $\mathrm{Ra}=\frac{\|g\| \beta \rho}{\eta \kappa} \delta T L^3$ using a
 typical length scale $L$, typical temperature difference $\delta T$, density
 $\rho$, thermal diffusivity $\kappa$, and thermal conductivity $\kappa$.
@@ -97,7 +97,7 @@ diffusion. A small Rayleigh number implies that buoyancy is not strong
 relative to viscosity and fluid motion <b>u</b> is slow enough so
 that heat diffusion $\kappa\nabla T$ is the dominant heat transport
 term. On the other hand, a fluid with a high Rayleigh number will show
-vigorous convection that dominates heat conduction. 
+vigorous convection that dominates heat conduction.
 
 For most fluids for which we are interested in computing thermal
 convection, the Rayleigh number is very large, often $10^6$ or
@@ -143,7 +143,7 @@ boundary data all around the boundary for all times. These can either be a
 prescribed boundary temperature $T|_{\partial\Omega}=T_b$ (Dirichlet boundary
 conditions), or a prescribed thermal flux $\mathbf{n}\cdot\kappa\nabla
 T|_{\partial\Omega}=\phi$; in this program, we will use an insulated boundary
-condition, i.e. prescribe no thermal flux: $\phi=0$. 
+condition, i.e. prescribe no thermal flux: $\phi=0$.
 
 Similarly, the velocity field requires us to pose boundary conditions. These
 may be no-slip no-flux conditions <b>u</b>=0 on $\partial\Omega$ if the fluid
@@ -178,7 +178,7 @@ Laplacian $\Delta$ applied to a vector field.
 Given the similarity to what we have done in @ref step_21 "step-21",
 it may not come as a surprise that we choose a similar approach,
 although we will have to make adjustments for the change in operator
-in the top-left corner of the differential operator. 
+in the top-left corner of the differential operator.
 
 
 <h4>Time stepping</h4>
@@ -194,7 +194,7 @@ field from the previous time step, which means that we get the velocity for
 the previous time step. In other words, we first solve the Stokes system for
 time step <i>n-1</i> as
 @f{eqnarray*}
-  -\nabla \cdot (2\eta \varepsilon ({\mathbf u}^{n-1})) + \nabla p^{n-1} &=& 
+  -\nabla \cdot (2\eta \varepsilon ({\mathbf u}^{n-1})) + \nabla p^{n-1} &=&
   -\rho\; \beta \; T^{n-1} \mathbf{g},
   \\
   \nabla \cdot {\mathbf u}^{n-1} &=& 0,
@@ -213,8 +213,8 @@ temperature equation
 @f{eqnarray*}
   \frac 32 T^n
   -
-  k\nabla \cdot \kappa \nabla T^n 
-  &=& 
+  k\nabla \cdot \kappa \nabla T^n
+  &=&
   2 T^{n-1}
   -
   \frac 12 T^{n-2}
@@ -251,15 +251,15 @@ step, then we use the approximations
 $\frac{\partial T}{\partial t} \approx
  \frac 1{k_n}
  \left(
-       \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^{n} 
+       \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^{n}
        -
-       \frac{k_n+k_{n-1}}{k_{n-1}}T^{n-1} 
+       \frac{k_n+k_{n-1}}{k_{n-1}}T^{n-1}
        +
        \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
  \right)$
 and
-$T^n \approx 
-   T^{n-1} + k_n \frac{\partial T}{\partial t} 
+$T^n \approx
+   T^{n-1} + k_n \frac{\partial T}{\partial t}
    \approx
    T^{n-1} + k_n
    \frac{T^{n-1}-T^{n-2}}{k_{n-1}}
@@ -269,8 +269,8 @@ and above equation is generalized as follows:
 @f{eqnarray*}
   \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n
   -
-  k_n\nabla \cdot \kappa \nabla T^n 
-  &=& 
+  k_n\nabla \cdot \kappa \nabla T^n
+  &=&
   \frac{k_n+k_{n-1}}{k_{n-1}} T^{n-1}
   -
   \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
@@ -313,8 +313,8 @@ by their discrete counterparts:
 @f{eqnarray*}
   (\nabla {\mathbf v}_h, 2\eta \varepsilon ({\mathbf u}^{n-1}_h))
   -
-  (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
-  &=& 
+  (\nabla \cdot {\mathbf v}_h, p^{n-1}_h)
+  &=&
   -({\mathbf v}_h, \rho\; \beta \; T^{n-1}_h \mathbf{g}),
   \\
   (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0,
@@ -332,14 +332,14 @@ that we implement is
 @f{eqnarray*}
   (\varepsilon({\mathbf v}_h), 2\eta \varepsilon ({\mathbf u}^{n-1}_h))
   -
-  (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
-  &=& 
+  (\nabla \cdot {\mathbf v}_h, p^{n-1}_h)
+  &=&
   -({\mathbf v}_h, \rho\; \beta \; T^{n-1}_h \mathbf{g}),
   \\
   (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0.
 @f}
 
-This is exactly the same as what we already discussed in 
+This is exactly the same as what we already discussed in
 @ref step_22 "step-22" and there is not much more to say about this here.
 
 
@@ -350,8 +350,8 @@ advection-diffusion equation. By default, not all discretizations of
 this equation are equally stable unless we either do something like
 upwinding, stabilization, or all of this. One way to achieve this is
 to use discontinuous elements (i.e. the FE_DGQ class that we used, for
-example, in the discretization of the transport equation in 
-@ref step_12 "step-12", or in discretizing the pressure in 
+example, in the discretization of the transport equation in
+@ref step_12 "step-12", or in discretizing the pressure in
 @ref step_20 "step-20" and @ref step_21 "step-21") and to define a
 flux at the interface between cells that takes into account
 upwinding. If we had a pure advection problem this would probably be
@@ -367,7 +367,7 @@ necessary to stabilize the scheme.
 
 A better alternative is therefore to add some nonlinear viscosity to
 the model. Essentially, what this does is to transform the temperature
-equation from the form 
+equation from the form
 @f{eqnarray*}
   \frac{\partial T}{\partial t}
   +
@@ -423,7 +423,7 @@ equivalent form:
   +
   \kappa(\alpha-1)
   T^{\alpha-2} |\nabla T|^\alpha
-  - 
+  -
   \gamma
   T^{\alpha-1}
 @f}
@@ -449,7 +449,7 @@ reveals that it is unitless and therefore independent of scaling; we will
 discuss its choice in the <a href="#Results">results section</a>) and
 $c(\mathbf{u},T)$ is a normalization constant that must have units
 $\frac{m^{\alpha-1}K^\alpha}{s}$. We will choose it as
-$c(\mathbf{u},T) = 
+$c(\mathbf{u},T) =
  c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
  \ |\mathrm{diam}(\Omega)|^{\alpha-2}$,
 where $\mathrm{var}(T)=\max_\Omega T - \min_\Omega T$ is the range of present
@@ -488,32 +488,32 @@ reason to despair: we still have to discretize in time and we can
 treat the term explicitly.
 
 In the definition of the stabilization parameter, we approximate the time
-derivative by $\frac{\partial T}{\partial t} \approx 
+derivative by $\frac{\partial T}{\partial t} \approx
 \frac{T^{n-1}-T^{n-2}}{k^{n-1}}$. This approximation makes only use
-of available time data and this is the reason why we need to store data of two 
+of available time data and this is the reason why we need to store data of two
 previous time steps (which enabled us to use the BDF-2 scheme without
 additional storage cost). We could now simply evaluate the rest of the
 terms at $t_{n-1}$, but then the discrete residual would be nothing else than
 a backward Euler approximation, which is only first order accurate. So, in
-case of smooth solutions, the residual would be still of the order <i>h</i>, 
-despite the second order time accuracy in the outer BDF-2 scheme and the 
+case of smooth solutions, the residual would be still of the order <i>h</i>,
+despite the second order time accuracy in the outer BDF-2 scheme and the
 spatial FE discretization. This is certainly not what we want to have
 (in fact, we desired to have small residuals in regions where the solution
 behaves nicely), so a bit more care is needed. The key to this problem
-is to observe that the first derivative as we constructed it is actually 
+is to observe that the first derivative as we constructed it is actually
 centered at $t_{n-\frac{3}{2}}$. We get the desired second order accurate
 residual calculation if we evaluate all spatial terms at $t_{n-\frac{3}{2}}$
 by using the approximation $\frac 12 T^{n-1}+\frac 12 T^{n-2}$, which means
 that we calculate the nonlinear viscosity as a function of this
-intermediate temperature, $\nu_\alpha = 
+intermediate temperature, $\nu_\alpha =
 \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right)$. Note that this
 evaluation of the residual is nothing else than a Crank-Nicholson scheme,
 so we can be sure that now everything is alright. One might wonder whether
-it is a problem that the numerical viscosity now is not evaluated at 
+it is a problem that the numerical viscosity now is not evaluated at
 time <i>n</i> (as opposed to the rest of the equation). However, this offset
 is uncritical: For smooth solutions, $\nu_\alpha$ will vary continuously,
 so the error in time offset is <i>k</i> times smaller than the nonlinear
-viscosity itself, i.e., it is a small higher order contribution that is 
+viscosity itself, i.e., it is a small higher order contribution that is
 left out. That's fine because the term itself is already at the level of
 discretization error in smooth regions.
 
@@ -522,17 +522,17 @@ this yields for the simpler case of uniform time steps of size <i>k</i>:
 @f{eqnarray*}
   \frac 32 T^n
   -
-  k\nabla \cdot \kappa \nabla T^n 
-  &=& 
+  k\nabla \cdot \kappa \nabla T^n
+  &=&
   2 T^{n-1}
   -
   \frac 12 T^{n-2}
   \\
   &&
   +
-  k\nabla \cdot 
+  k\nabla \cdot
   \left[
-    \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right) 
+    \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right)
     \ \nabla (2T^{n-1}-T^{n-2})
   \right]
   \\
@@ -564,17 +564,17 @@ form above first) and reads:
 @f{eqnarray*}
   \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n
   -
-  k_n\nabla \cdot \kappa \nabla T^n 
-  &=& 
+  k_n\nabla \cdot \kappa \nabla T^n
+  &=&
   \frac{k_n+k_{n-1}}{k_{n-1}} T^{n-1}
   -
   \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
   \\
   &&
   +
-  k_n\nabla \cdot 
+  k_n\nabla \cdot
   \left[
-    \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right) 
+    \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right)
     \ \nabla  \left[
     \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
   \right]
@@ -586,8 +586,8 @@ form above first) and reads:
   \left[
     \left(1+\frac{k_n}{k_{n-1}}\right){\mathbf u}^{n-1} -
     \frac{k_n}{k_{n-1}}{\mathbf u}^{n-2}
-  \right] 
-  \cdot \nabla 
+  \right]
+  \cdot \nabla
   \left[
     \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
   \right]
@@ -604,8 +604,8 @@ at the weak form of the discretized equations:
   \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} (\tau_h,T_h^n)
   +
   k_n (\nabla \tau_h, \kappa \nabla T_h^n)
-  &=& 
-  \biggl(\tau_h, 
+  &=&
+  \biggl(\tau_h,
   \frac{k_n+k_{n-1}}{k_{n-1}} T_h^{n-1}
   -
   \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T_h^{n-2}
@@ -614,10 +614,10 @@ at the weak form of the discretized equations:
   -
   k_n
   \left[
-    \left(1+\frac{k_n}{k_{n-1}}\right){\mathbf u}^{n-1} - 
+    \left(1+\frac{k_n}{k_{n-1}}\right){\mathbf u}^{n-1} -
     \frac{k_n}{k_{n-1}}{\mathbf u}^{n-2}
   \right]
-  \cdot \nabla 
+  \cdot \nabla
   \left[
     \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
   \right]
@@ -626,8 +626,8 @@ at the weak form of the discretized equations:
   \\
   &&
   -
-  k_n \left(\nabla \tau_h, 
-    \nu_\alpha\left(\frac 12 T_h^{n-1}+\frac 12 T_h^{n-2}\right) 
+  k_n \left(\nabla \tau_h,
+    \nu_\alpha\left(\frac 12 T_h^{n-1}+\frac 12 T_h^{n-2}\right)
     \ \nabla \left[
     \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
   \right]
@@ -640,7 +640,7 @@ $\mathbf{n}\cdot\kappa\nabla T|_{\partial\Omega}=0$.
 This then results in a
 matrix equation of form
 @f{eqnarray*}
-  \left( \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} M+k_n A_T\right) T_h^n 
+  \left( \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} M+k_n A_T\right) T_h^n
   = F(U_h^{n-1}, U_h^{n-2},T_h^{n-1},T_h^{n-2}),
 @f}
 which given the structure of matrix on the left (the sum of two
@@ -655,7 +655,7 @@ As explained above, our approach to solving the joint system for
 velocities/pressure on the one hand and temperature on the other is to use an
 operator splitting where we first solve the Stokes system for the velocities
 and pressures using the old temperature field, and then solve for the new
-temperature field using the just computed velocity field. 
+temperature field using the just computed velocity field.
 
 
 <h5>Linear solvers for the Stokes problem</h5>
@@ -684,7 +684,7 @@ and as discussed there a good preconditioner is
   \text{or equivalently}
   \qquad
   P^{-1}
-  = 
+  =
   \left(\begin{array}{cc}
     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
   \end{array}\right)
@@ -695,7 +695,7 @@ can't form the various inverses of matrices, but we can use the
 following as a preconditioner:
 @f{eqnarray*}
   \tilde P^{-1}
-  = 
+  =
   \left(\begin{array}{cc}
     \tilde A^{-1} & 0 \\ \tilde S^{-1} B \tilde A^{-1} & -\tilde S^{-1}
   \end{array}\right)
@@ -712,7 +712,7 @@ we should be using.
 
 It was more complicated to come up with a good replacement $\tilde
 A^{-1}$, which corresponds to the discretized symmetric Laplacian of
-the vector-valued velocity field, i.e. 
+the vector-valued velocity field, i.e.
 $A_{ij} = (\varepsilon {\mathbf v}_i, 2\eta \varepsilon ({\mathbf
 v}_j))$.
 In @ref step_22 "step-22" we used a sparse LU decomposition (using the
@@ -723,11 +723,11 @@ consequently, we only use an incomplete LU decomposition (ILU, using
 the SparseILU class) in 3d.
 
 For this program, we would like to go a bit further. To this end, note
-that the symmetrized bilinear form on vector fields, 
+that the symmetrized bilinear form on vector fields,
 $(\varepsilon {\mathbf v}_i, 2 \eta \varepsilon ({\mathbf v}_j))$
 is not too far away from the nonsymmetrized version,
 $(\nabla {\mathbf v}_i, \eta \nabla {\mathbf v}_j)
-= \sum_{k,l=1}^d 
+= \sum_{k,l=1}^d
   (\partial_k ({\mathbf v}_i)_l, \eta \partial_k ({\mathbf v}_j)_l)
 $ (note that the factor 2 has disappeared in this form). The latter,
 however, has the advantage that the <code>dim</code> vector components
@@ -753,12 +753,12 @@ velocity matrix <i>A</i> as follows:
   \tilde A^{-1} =
   \left(\begin{array}{ccc}
     \tilde A_s^{-1} & 0 & 0 \\
-    0 & \tilde A_s^{-1} & 0 \\ 
+    0 & \tilde A_s^{-1} & 0 \\
     0 & 0 & \tilde A_s^{-1}
   \end{array}\right),
 @f}
 where $\tilde A_s^{-1}$ is a preconditioner for the Laplace matrix &mdash;
-something where we know very well how to build good preconditioners! 
+something where we know very well how to build good preconditioners!
 
 In reality, the story is not quite as simple: To make the matrix
 $\tilde A$ definite, we need to make the individual blocks $\tilde
@@ -767,11 +767,11 @@ applying Dirichlet boundary conditions all around the boundary, and
 then the so-defined preconditioner $\tilde A^{-1}$ turns out to be a
 good preconditioner for <i>A</i> if the latter matrix results from a Stokes
 problem where we also have Dirichlet boundary conditions on the
-velocity components all around the domain, i.e. if we enforce <b>u</b>=0. 
+velocity components all around the domain, i.e. if we enforce <b>u</b>=0.
 
 Unfortunately, this "if" is an "if and only if": in the program below
 we will want to use no-flux boundary conditions of the form $\mathbf u
-\cdot \mathbf n = 0$ (i.e. flow parallel to the boundary is allowed,
+\cdot \mathbf n = 0$ (i.e. flow %parallel to the boundary is allowed,
 but no flux through the boundary). In this case, it turns out that the
 block diagonal matrix defined above is not a good preconditioner
 because it neglects the coupling of components at the boundary. A
@@ -923,7 +923,7 @@ DoFHandlers, two sparsity patterns and two matrices for the Stokes and
 temperature parts, etc. And whenever we have to assemble something that
 contains both temperature and Stokes shape functions (in particular the right
 hand sides of Stokes and temperature equations), then we use two FEValues
-objects initialized with two cell iterators that we walk in parallel through
+objects initialized with two cell iterators that we walk in %parallel through
 the two DoFHandler objects associated with the same Triangulation object; for
 these two FEValues objects, we use of course the same quadrature objects so
 that we can iterate over the same set of quadrature points, but each FEValues
@@ -935,7 +935,7 @@ assembling the right hand side of the temperature equation is now a component
 of the program that is hardly measurable.
 
 With these changes, timing the program yields that only the following
-operations are relevant for the overall run time: 
+operations are relevant for the overall run time:
 <ul>
   <li>Solving the Stokes system: 72% of the run time.
   <li>Assembling the Stokes preconditioner and computing the algebraic
@@ -964,12 +964,12 @@ directions in the future as well).
 The main reason for using Trilinos, similar to our exploring PETSc, is that it
 is a very powerful library that provides a lot more tools than deal.II's own
 linear algebra library. That includes, in particular, the ability to work in
-parallel on a cluster, using MPI, and a wider variety of preconditioners. In
+%parallel on a cluster, using MPI, and a wider variety of preconditioners. In
 the latter class, one of the most interesting capabilities is the existence of
 the Trilinos ML package that implements an Algebraic Multigrid (AMG)
 method. We will use this preconditioner to precondition the second order
 operator part of the momentum equation. The ability to solve problems in
-parallel will be explored in @ref step_32 "step-32", using the same problem as
+%parallel will be explored in @ref step_32 "step-32", using the same problem as
 discussed here.
 
 
@@ -984,7 +984,7 @@ boundary, we will require no-normal flux for the velocity
 ($\mathrm{n}\cdot\mathrm{u}=0$) and for the temperature
 ($\mathrm{n}\cdot\nabla T=0$). This is one of the cases discussed in the
 introduction of @ref step_22 "step-22" and fixes one component of the velocity
-while allowing flow to be parallel to the boundary. There remain
+while allowing flow to be %parallel to the boundary. There remain
 <code>dim-1</code> components to be fixed, namely the tangential components of
 the normal stress; for these, we choose homogenous conditions which means that
 we do not have to anything special. Initial conditions are only necessary for
