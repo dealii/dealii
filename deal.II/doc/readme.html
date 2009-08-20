@@ -14,10 +14,10 @@
 <body>
 
 
-    <h1>Installation instructions and further information 
+    <h1>Installation instructions and further information
         on <acronym>deal.II</acronym> </h1>
 
-    <p>	
+    <p>
     This document contains the following sections:
     </p>
     <ul>
@@ -36,7 +36,7 @@
     </ul>
 
 
-    
+
     <a name="prerequisites"></a>
     <h2>System requirements</h2>
 
@@ -51,7 +51,7 @@
       <li>Mac OS X 10.2, 10.3, and 10.4 (on both PowerPC and Intel
           processors) with gcc 3.x, 4.0, and 4.1;
       <li>Sun Solaris 2.5, 2.6, 7, 8, and 9 on Sparc, with
-          gcc 3.2, 3.3, 3.4; 
+          gcc 3.2, 3.3, 3.4;
       <li>Linux on IA-64 (Itanium), using gcc 3.4.2, 4.1.2 and ICC
           9.1, ICC 10.0;
       <li>Linux on x86, with the PathScale EKOPath compiler version
@@ -106,7 +106,7 @@
     libraries you need to have the following programs installed:
     <ul>
       <li> <p>
-           A fairly complete C++ compiler. Various working compilers 
+           A fairly complete C++ compiler. Various working compilers
            are listed above. We do not support gcc versions older than
            3.2 any more at this time.
            Note that we are interested in writing portable C++, so if you find
@@ -118,7 +118,7 @@
            Perl: Any Perl 5.x version should work.
 	   </p>
 
-      <li> <p> 
+      <li> <p>
            Make: We use <a href="http://www.gnu.org"
            target="_top">GNU make</a>, version 3.78 or later which also
            has rather good support for parallel builds, so you may
@@ -169,10 +169,10 @@
 
       <li> <p>
            The library generates output in formats readable by
-           <a href="http://www.ucc.ie/gnuplot/gnuplot-faq.html" target="_top">GNUPLOT</a>, 
+           <a href="http://www.ucc.ie/gnuplot/gnuplot-faq.html" target="_top">GNUPLOT</a>,
 	   <a href="http://www-xdiv.lanl.gov/XCM/gmv/" target="_top">GMV
- 	                              (general mesh viewer)</a>, 
-	   <a href="http://www.amtec.com" target="_top">Tecplot</a> (ASCII and binary), 
+ 	                              (general mesh viewer)</a>,
+	   <a href="http://www.amtec.com" target="_top">Tecplot</a> (ASCII and binary),
            <a href="http://public.kitware.com/VTK/"
                  target="_top">Visualization Toolkit (Vtk)</a>,
 	   <a href="http://www.avs.com" target="_top">AVS Explorer</a>,
@@ -219,14 +219,14 @@
     The whole library usually comes as a .tar.gz file, that is a
     tarred file archive which is compressed with gzip. After unpacking
     it with gunzip and tar (or <tt>tar xzf</tt> if you use GNU tar), you will
-    find several subdirectories. First run the script 
+    find several subdirectories. First run the script
     <pre><code>
          ./configure
     </code></pre>
     in the top-level directory,
     which sets some paths and finds out what compiler you
     use. ./configure supports several flags which are discussed
-    further down <a href="#configuration-options">below</a>. 
+    further down <a href="#configuration-options">below</a>.
     </p>
 
     <p>
@@ -252,7 +252,7 @@
 
     <p>
     After configuring, type `make', to obtain the following help (this
-    output may change slightly over time, just try it): 
+    output may change slightly over time, just try it):
 
     <pre><code>
     ========================================================================
@@ -298,7 +298,7 @@
       code of the classes in the <code>/base</code> directory. These
       are mostly helper classes (such as output of various data in
       different data formats), and classes of general numerical
-      interest (functions, tensors, etc.). 
+      interest (functions, tensors, etc.).
       </p>
 
       <li> <p><code>lib/liblac</code>: <code>lac</code> is the
@@ -323,7 +323,7 @@
     </p>
 
     <p>
-    For each library, there will also be another one with an 
+    For each library, there will also be another one with an
     infix <code>.g</code> between library name and suffix. The
     difference between the two sets of libraries is the following:
     <ul>
@@ -357,7 +357,7 @@
       <li>
       <p>
       The libraries without the <code>.g</code> infix do not contain
-      neither debugging information nor assertions. They are therefore much 
+      neither debugging information nor assertions. They are therefore much
       smaller and your program will run significantly faster (the
       performance penalty of the <code>.g</code> libraries is
       between a factor of two and ten, depending on which parts of
@@ -370,7 +370,7 @@
       they run stable and are used in production mode.
       </p>
     </ul>
-    
+
     </p>
 
     <p>
@@ -378,12 +378,12 @@
     documentation files, by typing `make online-doc'; this takes some
     minutes but you will
     have (almost) all the documentation locally on your computer. You
-    can access all documentation through <a 
+    can access all documentation through <a
     href="documentation.html" target="body">this page</a>.
     </p>
 
     <p>
-    At this point, you have generated everything necessary to write 
+    At this point, you have generated everything necessary to write
     programs based on <acronym>deal.II</acronym>. If you are new to
     <acronym>deal.II</acronym>, you may want to continue with the
     <a href="doxygen/tutorial/index.html" target="_top">tutorial</a>.
@@ -471,13 +471,12 @@
       </p>
 
       <p>
-      Currently supported CPUs are <code>PowerPC64</code>, <code>i386</code>,
-      <code>i486</code>, <code>i586</code>, <code>i686</code>,
-      <code>pentium</code>, <code>pentium-mmx</code>, <code>pentiumpro</code>, 
-      <code>pentium2</code>, <code>pentium3</code>, <code>pentium4</code>, 
-      <code>k6</code>, <code>k6-2</code>, <code>k6-3</code>, <code>athlon</code>,
-      <code>athlon-tbird</code>, <code>athlon-4</code>, <code>athlon-xp</code>, 
-      <code>athlon-mp</code>, <code>opteron</code>, <code>winchip-c6</code>, and <code>winchip2</code>.
+      For a complete list of supported values of this switch, you may
+      take a look at the file <code>aclocal.m4</code> in the top-level
+      directory. However, the most commonly used value
+      is <code>--with-cpu=native</code> indicating that the compiler
+      should determine the CPU we are running on by itself and
+      optimize for it.
       </p>
 
       <p>
@@ -543,11 +542,11 @@
     want a different version of UMFPACK, provide the path to that
     version as an argument. Enabling UMFPACK adds the
     class <tt>SparseDirectUMFPACK</tt> to the library. The default is to not
-    use UMFPACK. 
+    use UMFPACK.
 
     <p>
     If you want to use an external installation of UMFPACK, but UMFPACK was
-    installed as 
+    installed as
     part of <code>/usr</code> or <code>/opt</code>, instead of local
     directories in a home directory for example, you can use configure
     switches <code>--with-umfpack-include, --with-umfpack-libs</code>.
@@ -558,10 +557,10 @@
     you want to use it with deal.II, please read it and make sure that you
     agree with it. You can find the license of UMFPACK <a
     href="http://www.cise.ufl.edu/research/sparse/umfpack/">here</a>. We
-    include UMFPACK in the deal.II distributions courtesy of its author, 
+    include UMFPACK in the deal.II distributions courtesy of its author,
     <a href="http://www.cise.ufl.edu/~davis/">Timothy A. Davis</a>.
     </dd>
-    
+
     <a name="petsc"></a>
     <dt>Petsc</dt>
     <dd>
@@ -571,7 +570,7 @@
       library. The simplest way to do so is to set the <code>PETSC_DIR</code>
       and <code>PETSC_ARCH</code> environment variables. More information and
       configuration options can be found <a href="readme-petsc-trilinos.html"
-      target="body">here</a>. 
+      target="body">here</a>.
       </p>
     </dd>
 
@@ -586,7 +585,7 @@
       pass <code>--with-trilinos=/path/to/trilinos</code>
       to <acronym>deal.II</acronym>'s <code>./configure</code> script. More
       configuration options can be found <a href="readme-petsc-trilinos.html"
-      target="body">here</a>. 
+      target="body">here</a>.
       </p>
     </dd>
 
@@ -618,7 +617,7 @@
       switches <code>--with-metis-include, --with-metis-libs</code>.
       </p>
     </dd>
-    
+
     <a name="blas"></a>
     <dt>BLAS, LAPACK</dt>
 
@@ -646,22 +645,22 @@
     <code>libmyblas.a</code> or <code>libmyblas.so</code> in the
     directory <code>/my/lib</code> and elsewhere in the system library
     paths.</p>
- 
-    <p>Some versions of BLAS and LAPACK need additional libraries 
-    to be linked with. Such an example is the 
+
+    <p>Some versions of BLAS and LAPACK need additional libraries
+    to be linked with. Such an example is the
     <a href="http://math-atlas.sourceforge.net/">automatically tuned
     linear algebra software (ATLAS)</a>. The BLAS version of this
-    package also needs declarations from <code>libatlas.a</code>, 
+    package also needs declarations from <code>libatlas.a</code>,
     so it must be included. Using the standard library names of
     atlas, the include for BLAS reads
     <pre>
     ./configure --with-blas='f77blas -latlas'
     </pre>
     assuming that the library files <code>libf77blas.a</code> and
-    <code>libatlas.a</code> or the respective shared libraries 
-    <code>*.so</code> are in libraries included in 
+    <code>libatlas.a</code> or the respective shared libraries
+    <code>*.so</code> are in libraries included in
     <code>LD_LIBRARY_PATH</code>. LAPACK generated by ATLAS is
-    included in a similar fashion.</p> 
+    included in a similar fashion.</p>
     </dd>
 
     <a name="netcdf"></a>
@@ -692,16 +691,16 @@
     <a name="functionparser"></a>
     <dt>FunctionParser</dt>
     <dd>
-      There is a wrapper for the 
+      There is a wrapper for the
       <a href="http://warp.povusers.org/FunctionParser/">FunctionParser</a>
-      library, which  has its own license; if you want to use it with deal.II, 
-      please read it and make sure that you agree with it. 
-      You can find the license of FunctionParser 
+      library, which  has its own license; if you want to use it with deal.II,
+      please read it and make sure that you agree with it.
+      You can find the license of FunctionParser
       <a href="http://warp.povusers.org/FunctionParser/">here</a>. We
-      include FunctionParser in the deal.II distributions courtesy of its author, 
+      include FunctionParser in the deal.II distributions courtesy of its author,
       <a href="http://www.students.tut.fi/~warp/">Juha Nieminen</a>.
-    </dd>    
-    
+    </dd>
+
 
     </dl>
 
@@ -719,14 +718,14 @@
     feel free to ask if you have any problems with deal.II. If a
     question is of general interest, you may want to use our mailing list,
     which can be reached at
-    <a href="mail.html" target="body"><b>dealii (at) dealii.org</b></a> 
+    <a href="mail.html" target="body"><b>dealii (at) dealii.org</b></a>
     and of which
     <a href="http://www.dealii.org/mail/maillist.html" target="body">
     previous mails</a> are also archived online. Before writing to the
     list, you will have to subscribe to it.
     </p>
 
-    <p>    
+    <p>
     You can <B>subscribe</B> to this list by writing email to <b>list-server
     (at) dealii.org</b></a>
     with the text (not in the subject!)
@@ -736,7 +735,7 @@
     The list server also understands the command <TT>help</TT> given
     on a line by itself.
     </p>
-  
+
     <p>
     For specific problems, send email to either
     <tt>Wolfgang.Bangerth</tt>, <tt>Ralf.Hartmann</tt>,
@@ -797,18 +796,18 @@
     project homepage.
 
     <p>
-    
+
     <acronym>deal.II</acronym> can interface with a number of <a
     href="#external-libs">other packages</a> that you have to install
     yourself. They are, of course, covered by their own licenses. In addition,
     deal.II comes with a copy of <a
-    href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a> and one of 
+    href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a> and one of
     <a href="http://warp.povusers.org/FunctionParser/">FunctionParser</a>,
-    courtesy of their authors. UMFPACK and FunctionParser are covered by their 
+    courtesy of their authors. UMFPACK and FunctionParser are covered by their
     own licenses; please refer to their webpages to read them.
 
     <hr>
-    
+
     <address>
       <a href="mail.html" target="body">The deal.II mailing list</a>
       $Date$
