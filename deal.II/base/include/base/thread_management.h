@@ -39,7 +39,6 @@
 #    include <pthread.h>
 #  endif
 #  include <tbb/task.h>
-#  include <tbb/task_scheduler_init.h>
 #endif
 
 
@@ -58,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup threads
  */
-namespace Threads 
+namespace Threads
 {
 /**
  * This class is used instead of a true lock class when not using
@@ -128,7 +127,7 @@ namespace Threads
                                             */
           ~ScopedLock () {}
       };
-      
+
 				       /**
 					* Simulate acquisition of the
 					* mutex. As this class does
@@ -211,7 +210,7 @@ namespace Threads
   };
 
 
-  
+
 /**
  * This class is used instead of a true barrier class when not using
  * multithreading. It allows to write programs such that they use the
@@ -262,7 +261,7 @@ namespace Threads
 
 				       /** @addtogroup Exceptions
 					* @{ */
-      
+
 				       /**
 					* Exception.
 					*/
@@ -273,8 +272,8 @@ namespace Threads
 
 				       //@}
   };
-  
-  
+
+
 #if DEAL_II_USE_MT == 1
 
 				   /**
@@ -305,7 +304,7 @@ namespace Threads
 				    *
 				    * @author Wolfgang Bangerth, 2002, 2003, 2009
 				    */
-  class Mutex 
+  class Mutex
   {
     public:
                                        /**
@@ -357,7 +356,7 @@ namespace Threads
                                             * of course does nothing.
                                             */
           ~ScopedLock () { mutex.release (); }
-          
+
         private:
                                            /**
                                             * Store the address of the
@@ -383,8 +382,8 @@ namespace Threads
 		      :
 		      mutex()
 	{}
-      
-      
+
+
 				       /**
 					* Acquire a mutex.
 					*/
@@ -498,7 +497,7 @@ namespace Threads
 				    *
 				    * @author Wolfgang Bangerth, 2002
 				    */
-  class PosixThreadBarrier 
+  class PosixThreadBarrier
   {
     public:
 				       /**
@@ -514,7 +513,7 @@ namespace Threads
 					* Destructor. Release all
 					* resources.
 					*/
-      ~PosixThreadBarrier ();      
+      ~PosixThreadBarrier ();
 
 				       /**
 					* Wait for all threads to
@@ -562,7 +561,7 @@ namespace Threads
 				    *
 				    * @deprecated
                                     */
-  typedef ConditionVariable ThreadCondition;  
+  typedef ConditionVariable ThreadCondition;
 
                                    /**
                                     * If using POSIX functions, then
@@ -608,7 +607,7 @@ namespace Threads
 				    */
   typedef DummyBarrier         Barrier;
 #endif
-  
+
 }
 
 
@@ -636,7 +635,7 @@ namespace Threads
                                     * locks and mutexes, or may be
                                     * sleeping until they are
                                     * delivered with data to work on.
-                                    * 
+                                    *
                                     * Upon program start, this number
                                     * is one. It is increased each
                                     * time a thread is created using
@@ -692,7 +691,7 @@ namespace Threads
 				    * @ingroup threads
 				    */
   unsigned int this_thread_id ();
-  
+
 				   /**
 				    * Split the range <tt>[begin,end)</tt>
 				    * into <tt>n_intervals</tt> subintervals
@@ -731,7 +730,7 @@ namespace Threads
 				    * iterators, now values are taken
 				    * that define the whole interval.
 				    *
-				    * @ingroup threads				    
+				    * @ingroup threads
 				    */
   std::vector<std::pair<unsigned int,unsigned int> >
   split_interval (const unsigned int begin,
@@ -741,7 +740,7 @@ namespace Threads
                                    /**
                                     * @cond internal
                                     */
-  
+
                                    /**
                                     * A namespace in which helper
                                     * functions and the like for the
@@ -749,7 +748,7 @@ namespace Threads
                                     * implemented. The members of this
                                     * namespace are not meant for
                                     * public use.
-                                    * 
+                                    *
                                     * @author Wolfgang Bangerth, 2003
                                     */
   namespace internal
@@ -807,7 +806,7 @@ namespace Threads
                                       * functions below.
                                       */
     void register_thread ();
-  
+
                                      /**
 				      * @internal
                                       * The following function is used
@@ -824,13 +823,13 @@ namespace Threads
                                    /**
                                     * @endcond
                                     */
-  
+
 }   // end declarations of namespace Threads
 
 /* ----------- implementation of functions in namespace Threads ---------- */
 #ifndef DOXYGEN
-namespace Threads 
-{  
+namespace Threads
+{
   template <typename ForwardIterator>
   std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
@@ -845,23 +844,23 @@ namespace Threads
 				     // n_intervals==1, so have a
 				     // shortcut here to handle that
 				     // case efficiently
-    
+
     if (n_intervals==1)
       return (std::vector<IteratorPair>
 	      (1, IteratorPair(begin, end)));
-    
+
 				     // if more than one interval
 				     // requested, do the full work
     const unsigned int n_elements              = std::distance (begin, end);
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
-    
+
     std::vector<IteratorPair> return_values (n_intervals);
 
     return_values[0].first = begin;
     for (unsigned int i=0; i<n_intervals; ++i)
       {
-	if (i != n_intervals-1) 
+	if (i != n_intervals-1)
 	  {
 	    return_values[i].second = return_values[i].first;
 					     // note: the cast is
@@ -880,21 +879,21 @@ namespace Threads
 					     // subintervals
 	    if (i < residual)
 	      ++return_values[i].second;
-	    
+
 	    return_values[i+1].first = return_values[i].second;
 	  }
 	else
 	  return_values[i].second = end;
       }
     return return_values;
-  }  
+  }
 }
 
 #endif // DOXYGEN
 
 namespace Threads
 {
-  namespace internal 
+  namespace internal
   {
                                      /**
 				      * @internal
@@ -912,12 +911,12 @@ namespace Threads
         RT value;
       public:
         inline return_value () : value() {}
-      
+
         inline RT get () const { return value; }
         inline void set (RT v) { value = v; }
     };
 
-  
+
                                      /**
 				      * @internal
                                       * Given an arbitrary type RT,
@@ -942,7 +941,7 @@ namespace Threads
         inline void set (RT & v) { value = &v; }
     };
 
-  
+
                                      /**
 				      * @internal
                                       * Given an arbitrary type RT,
@@ -961,7 +960,7 @@ namespace Threads
     };
   }
 
-  
+
 
   namespace internal
   {
@@ -970,14 +969,14 @@ namespace Threads
 		      internal::return_value<RT> &ret_val)
     {
       ret_val.set (function());
-    }  
+    }
 
 
     inline void call (const std_cxx1x::function<void ()> &function,
 		      internal::return_value<void> &)
     {
       function();
-    }  
+    }
   }
 
 
@@ -1000,7 +999,7 @@ namespace Threads
     template <typename RT, typename ArgList,
               int length = std_cxx1x::tuple_size<ArgList>::value>
     struct fun_ptr_helper;
-  
+
 
                                      /**
 				      * @internal
@@ -1201,7 +1200,7 @@ namespace Threads
 			   typename std_cxx1x::tuple_element<9,ArgList>::type);
     };
 
-  
+
 
                                      /**
 				      * @internal
@@ -1229,7 +1228,7 @@ namespace Threads
 
 
 
-  namespace internal 
+  namespace internal
   {
 #if (DEAL_II_USE_MT == 1)
 
@@ -1343,7 +1342,7 @@ namespace Threads
 	  {
 	    thread.join ();
 	  }
-	
+
       private:
 
 					 /**
@@ -1354,35 +1353,7 @@ namespace Threads
 	void thread_entry_point (const std_cxx1x::function<RT ()> function,
 				 ThreadDescriptor<RT> *descriptor)
 	  {
-					     // create a new scheduler object
-					     // so that we can start tasks on
-					     // the new thread. the scheduler
-					     // will go out of scope at the
-					     // end of the function, which
-					     // also coincides with the end of
-					     // the thread
-					     //
-					     // one may think that the
-					     // creation of a scheduler is
-					     // expensive, but just creating
-					     // one and then destroying it
-					     // again costs about 92
-					     // nanoseconds on my laptop
-					     // (early 2009), whereas thread
-					     // creation takes about 12000
-					     // nanoseconds, more than 100
-					     // times longer. there is
-					     // therefore no need to only
-					     // create the scheduler when this
-					     // is actually necessary because
-					     // we are spawning tasks on this
-					     // particular thread; rather, we
-					     // make our life simpler by
-					     // always having a scheduler
-					     // around
-	    tbb::task_scheduler_init scheduler;
-
-					     // now call the function
+					     // call the function
 					     // in question. since an
                                              // exception that is
                                              // thrown from one of the
@@ -1395,7 +1366,7 @@ namespace Threads
                                              // the operating system's
                                              // thread library
             internal::register_thread ();
-            try 
+            try
               {
                 call (function, descriptor->ret_val);
               }
@@ -1443,7 +1414,7 @@ namespace Threads
 				      * this descriptor.
 				      */
     template <typename RT>
-    struct ThreadDescriptor 
+    struct ThreadDescriptor
     {
 					 /**
 					  * An object that will hold the value
@@ -1468,10 +1439,10 @@ namespace Threads
 	void join ()
 	  {}
     };
-  
+
 #endif
   }
-  
+
 
                                    /**
                                     * An object that represents a
@@ -1505,7 +1476,7 @@ namespace Threads
                                     * calling on a new thread has no
                                     * return value, you can omit the
                                     * template argument.
-                                    * 
+                                    *
                                     * @author Wolfgang Bangerth, 2003, 2009
 				    * @ingroup threads
 				    * @ingroup threads
@@ -1593,7 +1564,7 @@ namespace Threads
 
 				       /** @addtogroup Exceptions
 					* @{ */
-      
+
                                        /**
                                         * Exception
                                         */
@@ -1637,7 +1608,7 @@ namespace Threads
       std_cxx1x::shared_ptr<internal::ThreadDescriptor<RT> > thread_descriptor;
   };
 
-  
+
   namespace internal
   {
 				     /**
@@ -1657,7 +1628,7 @@ namespace Threads
 	    return t;
 	  }
     };
-    
+
 
 
 				     /**
@@ -1678,8 +1649,8 @@ namespace Threads
 	  }
     };
   }
-  
-    
+
+
 
   namespace internal
   {
@@ -1736,11 +1707,11 @@ namespace Threads
 	  {
 	    return Thread<RT> (function);
 	  }
-    
+
       private:
         std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
-  
+
                                      /**
 				      * @internal
                                       * Encapsulator class for
@@ -1767,7 +1738,7 @@ namespace Threads
 	      (std_cxx1x::bind (function,
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
@@ -1800,11 +1771,11 @@ namespace Threads
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<0,ArgList>::type>::act(arg1),
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
-  
+
 				     /**
 				      * @internal
 				      * Encapsulator class for
@@ -1835,11 +1806,11 @@ namespace Threads
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<1,ArgList>::type>::act(arg2),
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
-  
+
 				     /**
 				      * @internal
 				      * Encapsulator class for
@@ -1872,11 +1843,11 @@ namespace Threads
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<2,ArgList>::type>::act(arg3),
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<3,ArgList>::type>::act(arg4)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
-  
+
 				     /**
 				      * @internal
 				      * Encapsulator class for
@@ -1911,11 +1882,11 @@ namespace Threads
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<3,ArgList>::type>::act(arg4),
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<4,ArgList>::type>::act(arg5)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
-  
+
 				     /**
 				      * @internal
 				      * Encapsulator class for
@@ -1952,11 +1923,11 @@ namespace Threads
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<4,ArgList>::type>::act(arg5),
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<5,ArgList>::type>::act(arg6)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
-  
+
 				     /**
 				      * @internal
 				      * Encapsulator class for
@@ -1995,7 +1966,7 @@ namespace Threads
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<5,ArgList>::type>::act(arg6),
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<6,ArgList>::type>::act(arg7)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
@@ -2040,11 +2011,11 @@ namespace Threads
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<6,ArgList>::type>::act(arg7),
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<7,ArgList>::type>::act(arg8)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
-  
+
 				     /**
 				      * @internal
 				      * Encapsulator class for
@@ -2087,7 +2058,7 @@ namespace Threads
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<7,ArgList>::type>::act(arg8),
 			    internal::maybe_make_ref<typename std_cxx1x::tuple_element<8,ArgList>::type>::act(arg9)));
 	  }
-    
+
       private:
 	std_cxx1x::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
@@ -2113,7 +2084,7 @@ namespace Threads
     return fun_ptr;
   }
 
- 
+
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions with
@@ -2147,7 +2118,7 @@ namespace Threads
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<> >::type>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c)));
   }
-  
+
 
 
 
@@ -2256,7 +2227,7 @@ namespace Threads
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2> >::type>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2));
-  }  
+  }
 
 
 // ----------- encapsulators for ternary functions
@@ -2313,7 +2284,7 @@ namespace Threads
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2,Arg3> >::type>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3));
-  }  
+  }
 
 
 
@@ -2432,7 +2403,7 @@ namespace Threads
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5));
   }
-  
+
 
 // ----------- encapsulators for functions with 6 arguments
 
@@ -2493,7 +2464,7 @@ namespace Threads
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6));
   }
-  
+
 
 // ----------- encapsulators for functions with 7 arguments
 
@@ -2560,7 +2531,7 @@ namespace Threads
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7));
   }
-  
+
 
 // ----------- encapsulators for functions with 8 arguments
 
@@ -2633,7 +2604,7 @@ namespace Threads
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7, _8));
   }
-  
+
 
 // ----------- encapsulators for functions with 9 arguments
 
@@ -2743,7 +2714,7 @@ namespace Threads
   {
     return Thread<RT>(fun_ptr);
   }
-  
+
 
                                    /**
                                     * Overload of the non-const new_thread
@@ -2782,7 +2753,7 @@ namespace Threads
       Thread<RT>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c)));
   }
-#endif  
+#endif
 
 
 
@@ -2919,7 +2890,7 @@ namespace Threads
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
 		   internal::maybe_make_ref<Arg1>::act(arg1),
 		   internal::maybe_make_ref<Arg2>::act(arg2)));
-  }  
+  }
 #endif
 
 // ----------- thread starters for ternary functions
@@ -2999,7 +2970,7 @@ namespace Threads
 		   internal::maybe_make_ref<Arg1>::act(arg1),
 		   internal::maybe_make_ref<Arg2>::act(arg2),
 		   internal::maybe_make_ref<Arg3>::act(arg3)));
-  }  
+  }
 #endif
 
 
@@ -3182,7 +3153,7 @@ namespace Threads
 		   internal::maybe_make_ref<Arg4>::act(arg4),
 		   internal::maybe_make_ref<Arg5>::act(arg5)));
   }
-#endif  
+#endif
 
 // ----------- thread starters for functions with 6 arguments
 
@@ -3283,7 +3254,7 @@ namespace Threads
 		   internal::maybe_make_ref<Arg5>::act(arg5),
 		   internal::maybe_make_ref<Arg6>::act(arg6)));
   }
-#endif  
+#endif
 
 // ----------- thread starters for functions with 7 arguments
 
@@ -3393,7 +3364,7 @@ namespace Threads
 		   internal::maybe_make_ref<Arg6>::act(arg6),
 		   internal::maybe_make_ref<Arg7>::act(arg7)));
   }
-#endif  
+#endif
 
 // ----------- thread starters for functions with 8 arguments
 
@@ -3512,7 +3483,7 @@ namespace Threads
 		   internal::maybe_make_ref<Arg7>::act(arg7),
 		   internal::maybe_make_ref<Arg8>::act(arg8)));
   }
-#endif  
+#endif
 
 // ----------- thread starters for functions with 9 arguments
 
@@ -3636,10 +3607,10 @@ namespace Threads
 		   internal::maybe_make_ref<Arg7>::act(arg7),
 		   internal::maybe_make_ref<Arg8>::act(arg8),
 		   internal::maybe_make_ref<Arg9>::act(arg9)));
-  }  
+  }
 #endif
-  
-// ------------------------ ThreadGroup -------------------------------------  
+
+// ------------------------ ThreadGroup -------------------------------------
 
                                    /**
                                     * A container for thread
@@ -3653,7 +3624,7 @@ namespace Threads
 				    * @ingroup threads
                                     */
   template <typename RT = void>
-  class ThreadGroup 
+  class ThreadGroup
   {
     public:
                                        /**
@@ -3683,25 +3654,25 @@ namespace Threads
                t=threads.begin(); t!=threads.end(); ++t)
           t->join ();
       }
-    
+
     private:
                                        /**
                                         * List of thread objects.
                                         */
       std::list<Thread<RT> > threads;
   };
-  
+
 
   template <typename> class Task;
 
-  
-  namespace internal 
+
+  namespace internal
   {
 #if (DEAL_II_USE_MT == 1)
 
     template <typename> class TaskDescriptor;
 
-    
+
 				     /**
 				      * The task class for TBB that is
 				      * used by the TaskDescriptor
@@ -3739,7 +3710,7 @@ namespace Threads
 					     // TaskDescriptor::join().
 	    task_descriptor.task_is_done = true;
 	    task_descriptor.completion_mutex.release ();
-		
+
 	    return 0;
 	  }
 
@@ -3748,8 +3719,8 @@ namespace Threads
 					  * object of this task.
 					  */
 	TaskDescriptor<RT> &task_descriptor;
-    };  
-    
+    };
+
                                      /**
 				      * @internal
                                       * Base class describing a
@@ -3799,7 +3770,7 @@ namespace Threads
 					  * that are to be run on the task.
 					  */
 	std_cxx1x::function<RT ()> function;
-	
+
                                          /**
                                           * Variable holding the data the TBB
                                           * needs to work with a task. Set by
@@ -3820,7 +3791,7 @@ namespace Threads
 					  * deposit its return value.
 					  */
         return_value<RT> ret_val;
-	
+
 					 /**
 					  * A flag indicating whether the task
 					  * has terminated.
@@ -3860,7 +3831,7 @@ namespace Threads
 					  * task.
 					  */
 	TaskDescriptor ();
-	
+
 					 /**
 					  * Copy constructor. Throws
 					  * an exception since we want
@@ -3870,7 +3841,7 @@ namespace Threads
 					  * task.
 					  */
 	TaskDescriptor (const TaskDescriptor &);
-	
+
                                          /**
                                           * Destructor.
                                           */
@@ -3890,7 +3861,7 @@ namespace Threads
 					  * already.
 					  */
 	void queue_task ();
-	
+
                                          /**
                                           * Join a task, i.e. wait
                                           * for it to finish. This
@@ -3914,7 +3885,7 @@ namespace Threads
     TaskDescriptor<RT>::TaskDescriptor (const std_cxx1x::function<RT ()> &function)
 		    :
 		    function (function),
-		    task_is_done (false)		    
+		    task_is_done (false)
     {}
 
 
@@ -3927,7 +3898,7 @@ namespace Threads
 				       // become unlocked when the
 				       // task is done
       completion_mutex.acquire ();
-      
+
 				       // use the pattern described in
 				       // the TBB book on pages
 				       // 230/231 ("Start a large task
@@ -3955,7 +3926,7 @@ namespace Threads
     {
       Assert (false, ExcInternalError());
     }
-    
+
 
 
     template <typename RT>
@@ -3991,7 +3962,7 @@ namespace Threads
       task->destroy (*task);
     }
 
-    
+
     template <typename RT>
     inline
     void
@@ -4063,12 +4034,12 @@ namespace Threads
 					  */
 	static void queue_task () {}
     };
-    
+
 #endif
-    
+
   }
 
-  
+
   template <typename RT = void>
   class Task
   {
@@ -4148,7 +4119,7 @@ namespace Threads
 
 				       /** @addtogroup Exceptions
 					* @{ */
-      
+
                                        /**
                                         * Exception
                                         */
@@ -4200,8 +4171,8 @@ namespace Threads
   {
     return new_task<RT>(std_cxx1x::function<RT ()>(fun_ptr));
   }
-  
- 
+
+
                                    /**
                                     * Overload of the non-const new_task
                                     * function for member functions with
@@ -4238,7 +4209,7 @@ namespace Threads
       new_task<RT>
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c)));
   }
-#endif  
+#endif
 
 
 
@@ -4375,7 +4346,7 @@ namespace Threads
       (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c),
 		       internal::maybe_make_ref<Arg1>::act(arg1),
 		       internal::maybe_make_ref<Arg2>::act(arg2)));
-  }  
+  }
 #endif
 
 // ----------- thread starters for ternary functions
@@ -4455,7 +4426,7 @@ namespace Threads
 		       internal::maybe_make_ref<Arg1>::act(arg1),
 		       internal::maybe_make_ref<Arg2>::act(arg2),
 		       internal::maybe_make_ref<Arg3>::act(arg3)));
-  }  
+  }
 #endif
 
 
@@ -4638,7 +4609,7 @@ namespace Threads
 		       internal::maybe_make_ref<Arg4>::act(arg4),
 		       internal::maybe_make_ref<Arg5>::act(arg5)));
   }
-#endif  
+#endif
 
 // ----------- thread starters for functions with 6 arguments
 
@@ -4739,7 +4710,7 @@ namespace Threads
 		       internal::maybe_make_ref<Arg5>::act(arg5),
 		       internal::maybe_make_ref<Arg6>::act(arg6)));
   }
-#endif  
+#endif
 
 // ----------- thread starters for functions with 7 arguments
 
@@ -4849,7 +4820,7 @@ namespace Threads
 		       internal::maybe_make_ref<Arg6>::act(arg6),
 		       internal::maybe_make_ref<Arg7>::act(arg7)));
   }
-#endif  
+#endif
 
 // ----------- thread starters for functions with 8 arguments
 
@@ -4968,7 +4939,7 @@ namespace Threads
 		       internal::maybe_make_ref<Arg7>::act(arg7),
 		       internal::maybe_make_ref<Arg8>::act(arg8)));
   }
-#endif  
+#endif
 
 // ----------- thread starters for functions with 9 arguments
 
@@ -5092,11 +5063,11 @@ namespace Threads
 		       internal::maybe_make_ref<Arg7>::act(arg7),
 		       internal::maybe_make_ref<Arg8>::act(arg8),
 		       internal::maybe_make_ref<Arg9>::act(arg9)));
-  }  
+  }
 #endif
 
 
-// ------------------------ TaskGroup -------------------------------------  
+// ------------------------ TaskGroup -------------------------------------
 
                                    /**
                                     * A container for task
@@ -5110,7 +5081,7 @@ namespace Threads
 				    * @ingroup tasks
                                     */
   template <typename RT = void>
-  class TaskGroup 
+  class TaskGroup
   {
     public:
                                        /**
@@ -5140,14 +5111,14 @@ namespace Threads
                t=tasks.begin(); t!=tasks.end(); ++t)
           t->join ();
       }
-    
+
     private:
                                        /**
                                         * List of task objects.
                                         */
       std::list<Task<RT> > tasks;
   };
-  
+
 }   // end of implementation of namespace Threads
 
 /**

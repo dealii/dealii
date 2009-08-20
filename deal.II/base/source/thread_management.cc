@@ -38,7 +38,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace Threads 
+namespace Threads
 {
   namespace internal
   {
@@ -47,7 +47,7 @@ namespace Threads
     volatile unsigned int n_existing_threads_counter = 1;
     ThreadMutex  n_existing_threads_mutex;
 
-  
+
     void register_thread ()
     {
       ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
@@ -55,8 +55,8 @@ namespace Threads
     }
 
 
-  
-    void deregister_thread () 
+
+    void deregister_thread ()
     {
       ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
       --n_existing_threads_counter;
@@ -66,7 +66,7 @@ namespace Threads
 
 
 
-    void handle_std_exception (const std::exception &exc) 
+    void handle_std_exception (const std::exception &exc)
     {
       std::cerr << std::endl << std::endl
                 << "---------------------------------------------------------"
@@ -107,15 +107,15 @@ namespace Threads
       std::abort ();
     }
   }
-  
 
-  
-  unsigned int n_existing_threads () 
+
+
+  unsigned int n_existing_threads ()
   {
     ThreadMutex::ScopedLock lock (internal::n_existing_threads_mutex);
     return internal::n_existing_threads_counter;
   }
-  
+
 
   unsigned int this_thread_id ()
   {
@@ -130,7 +130,7 @@ namespace Threads
   }
 
 
-  
+
 #if DEAL_II_USE_MT != 1
   DummyBarrier::DummyBarrier (const unsigned int  count,
 			      const char         *,
@@ -144,7 +144,7 @@ namespace Threads
 #  ifdef DEAL_II_USE_MT_POSIX
 
 
-#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
+#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
 					  const char         *,
 					  void               *)
@@ -193,7 +193,7 @@ namespace Threads
   int
   PosixThreadBarrier::wait ()
   {
-#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
+#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     return pthread_barrier_wait (&barrier);
 #else
                                      // in the special case, this
@@ -209,13 +209,13 @@ namespace Threads
       };
 #endif
   }
-  
 
 
-  
+
+
 #  endif
-#endif  
-  
+#endif
+
 
 
   std::vector<std::pair<unsigned int,unsigned int> >
@@ -224,17 +224,17 @@ namespace Threads
 		  const unsigned int n_intervals)
   {
     Assert (end >= begin, ExcInternalError());
-    
+
     const unsigned int n_elements              = end-begin;
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
-    
+
     std::vector<std::pair<unsigned int,unsigned int> > return_values (n_intervals);
 
     return_values[0].first = begin;
     for (unsigned int i=0; i<n_intervals; ++i)
       {
-	if (i != n_intervals-1) 
+	if (i != n_intervals-1)
 	  {
 	    return_values[i].second = (return_values[i].first
 				       + n_elements_per_interval);
@@ -250,17 +250,8 @@ namespace Threads
 	  return_values[i].second = end;
       };
     return return_values;
-  }  
+  }
 }   // end namespace Thread
-
-
-
-#if DEAL_II_USE_MT == 1
-/**
- * A scheduler for tasks. 
- */
-tbb::task_scheduler_init scheduler;
-#endif
 
 
 DEAL_II_NAMESPACE_CLOSE
