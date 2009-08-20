@@ -2010,6 +2010,22 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
           ;;
         esac
         ;;
+
+    native)
+        AC_MSG_RESULT(native processor variant)
+	case "$GXX_VERSION" in
+	  gcc*)
+	      dnl Tune for this processor, but only in optimized mode
+              dnl (to prevent the effects of possible compiler bugs to affect
+              dnl both debug as well as optimized versions)
+	      CXXFLAGSO="$CXXFLAGSO -march=native"
+
+	      dnl Also set the mode for f77 compiler
+	      F77FLAGSO="$F77FLAGSO -march=native
+          ;;
+        esac
+        ;;
+
     *)
         AC_MSG_RESULT(none given or not recognized)
 	;;
