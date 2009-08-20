@@ -38,6 +38,7 @@ $hierarchy{"i686-pc-linux-gnu+gcc4.1"}        = "i686-pc-linux-gnu+gcc4.0";
 $hierarchy{"i686-pc-linux-gnu+gcc4.2"}        = "i686-pc-linux-gnu+gcc4.1";
 $hierarchy{"i686-pc-linux-gnu+gcc4.3"}        = "i686-pc-linux-gnu+gcc4.2";
 $hierarchy{"i686-pc-linux-gnu+gcc4.4"}        = "i686-pc-linux-gnu+gcc4.3";
+$hierarchy{"i686-pc-linux-gnu+gcc4.5"}        = "i686-pc-linux-gnu+gcc4.4";
 
 $hierarchy{"i686-pc-linux-gnu+icc7"}          = "generic";
 $hierarchy{"i686-pc-linux-gnu+icc7.1"}        = "i686-pc-linux-gnu+icc7";
