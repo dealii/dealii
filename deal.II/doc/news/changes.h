@@ -84,14 +84,25 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
+   New: The configure switch <code>--with-cpu=...</code> now allows the value
+   <code>native</code>, indicating that we would like the compiler to figure
+   out which CPU we are running on and optimize for it. The resulting
+   libraries may not work on other (previous generation) processors, however.
+   <br>
+   (WB 2009/08/20)
+   </p>
+   </li>
+
+   <li>
+   <p>
    Fixed: @ref step_31 "step-31" had a bug in the computation of the
    global scaling parameter in the function that evaluates the artificial
    viscosity: we computed
-   $c(\mathbf{u},T) = 
+   $c(\mathbf{u},T) =
     c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
     \frac{1}{|\mathrm{diam}(\Omega)|^{\alpha-2}}$
    when it should have been
-   $c(\mathbf{u},T) = 
+   $c(\mathbf{u},T) =
     c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
     \ |\mathrm{diam}(\Omega)|^{\alpha-2}$. This didn't matter much in this
    program because $\mathrm{diam}(\Omega)=2^{1/\textrm{dim}}$ and so is close
