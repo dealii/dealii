@@ -2021,7 +2021,7 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
 	      CXXFLAGSO="$CXXFLAGSO -march=native"
 
 	      dnl Also set the mode for f77 compiler
-	      F77FLAGSO="$F77FLAGSO -march=native
+	      F77FLAGSO="$F77FLAGSO -march=native"
           ;;
         esac
         ;;
