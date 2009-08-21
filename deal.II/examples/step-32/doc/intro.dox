@@ -91,6 +91,93 @@ section of the @ref step_22 "step-22" tutorial program, where we observed
 that BiCGStab does <i>not</i> like inner solves with CG, which made us
 prefer GMRES in step-31.
 
+
+<h3> Changes to the artificial viscosity stabilization </h3>
+
+As in @ref step_31 "step-31", we will use an artificial viscosity of
+the form
+@f{eqnarray*}
+  \nu_\alpha(T)|_K
+  =
+  \beta
+  \|\mathbf{u}\|_{L^\infty(K)}
+  \min\left\{
+    h_K,
+    h_K^\alpha
+    \frac{\|R_\alpha(T)\|_{L^\infty(K)}}{c(\mathbf{u},T)}
+  \right\}
+@f}
+in this problem, where
+$c(\mathbf{u},T) =
+ c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
+ \ |\mathrm{diam}(\Omega)|^{\alpha-2}$ (for the meaning of the various
+terms in these formulas, see @ref step_31 "step-31". In the results
+section of that program, we have discussed our choice for $c_R$ and
+how we arrived at the value used there mostly by accident, and in more
+detail how $\beta$ was chosen. For the
+current program, we want to go about this issue a bit more
+systematically for both parameters,
+using the same line of reasoning with which we chose two other
+parameters in our discretization, $c_k$ and $\beta$, in the results
+section of step-31. In particular, remember that we would like to make
+the artificial viscosity as small as possible while keeping it as large as
+necessary. To see what is happening, note that below we will impose
+boundary conditions for the temperature between 973 and 4273 Kelvin,
+and initial conditions are also chosen in this range; because there
+are no internal heat sources or sinks, the temperature should
+consequently always be in this range, barring any internal
+oscillations. If the minimal temperature drops below 973 Kelvin, then
+we need to add stabilization by either increasing $\beta$ or
+decreasing $c_R$.
+
+As we did in step-31, we first determine an optimal value of $\beta$
+by using the "traditional" formula
+@f{eqnarray*}
+  \nu_\alpha(T)|_K
+  =
+  \beta
+  \|\mathbf{u}\|_{L^\infty(K)}
+    h_K,
+@f}
+which we know to be stable if only $\beta$ is large enough. Doing a
+couple hundred time steps (on a coarser mesh than the one shown in the
+program, and with a different viscosity that affects transport
+velocities and therefore time step sizes) in 2d will produce the
+following graph:
+
+@image html step-32.beta.2d.png
+
+As can be seen, values $\beta \le 0.05$ are too small whereas
+$\beta=0.052$ appears to work, at least to the time horizon shown
+here. As a remark on the side, there are at least two questions one
+may wonder here: First, what happens at the time when the solution
+becomes unstable? Looking at the graphical output, we can see that
+with the unreasonably coarse mesh chosen for these experiments, around
+time $t=10^{15}$ seconds the plumes of hot material that have been
+rising towards the cold outer boundary and have then spread sideways
+are starting to get close to each other, squezzing out the cold
+material inbetween. This creates a layer of cells into which fluids
+flows from two opposite sides and flows out toward a third, apparently
+a scenario that then produce these instabilities without sufficient
+stabilization. Second: In step-31, we used
+$\beta=0.015\cdot\text{dim}$; why does this not work here? The answer
+to this is not entirely clear -- stabilization parameters are
+certainly known to depend on things like the shape of cells, for which
+we had square in step-31 but have trapezoids in the current
+program. Whatever the exact cause, we at least have a value of
+$\beta$, namely 0.052 for 2d, that works for the current program.
+
+With this value fixed, we can go back to the original formula for the
+viscosity $\nu$ and play with the constant $c_R$, making it as large
+as possible in order to make $\nu$ as small as possible. This gives us
+a picture like this:
+
+@image html doc/step-32.beta_cr.2d.png
+
+Consequently, $c_R=0.1$ would appear to be the right value.
+
+
+
 <h3> Parallelization on clusters </h3>
 
 Parallelization of scientific codes across multiple machines in a cluster of
