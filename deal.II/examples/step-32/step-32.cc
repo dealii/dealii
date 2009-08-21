@@ -1214,7 +1214,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const double                        global_T_variation,
 		   const double                        cell_diameter) const
 {
-  const double beta = 0.015 * dim;
+  const double beta = 0.026 * dim;
   const double alpha = 1;
 
   if (global_u_infty == 0)
@@ -1248,14 +1248,22 @@ compute_viscosity (const std::vector<double>          &old_temperature,
       max_velocity = std::max (std::sqrt (u*u), max_velocity);
     }
 
-  const double global_scaling = global_u_infty * global_T_variation /
-				std::pow(global_Omega_diameter, alpha - 2.);
+  if (timestep_number == 0)
+    return beta * max_velocity * cell_diameter;
+  else
+    {
+      Assert (old_time_step > 0, ExcInternalError());
 
-  return (beta *
-	  max_velocity *
-	  std::min (cell_diameter,
-		    std::pow(cell_diameter,alpha) *
-		    max_residual / global_scaling));
+      const double c_R = 0.11;
+      const double global_scaling = c_R * global_u_infty * global_T_variation *
+				    std::pow(global_Omega_diameter, alpha - 2.);
+
+      return (beta *
+	      max_velocity *
+	      std::min (cell_diameter,
+			std::pow(cell_diameter,alpha) * max_residual /
+			global_scaling));
+    }
 }
 
 
