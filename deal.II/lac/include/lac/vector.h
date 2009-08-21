@@ -16,7 +16,9 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/parallel.h>
 #include <base/subscriptor.h>
+#include <boost/lambda/lambda.hpp>
 
 #include <cstdio>
 
@@ -776,9 +778,25 @@ class Vector : public Subscriptor
 				      * immediate re-assignment) by a
 				      * diagonal scaling matrix.
 				      */
+    void scale (const Vector<Number> &scaling_factors);
+    
+				     /**
+				      * Scale each element of this
+				      * vector by the corresponding
+				      * element in the argument. This
+				      * function is mostly meant to
+				      * simulate multiplication (and
+				      * immediate re-assignment) by a
+				      * diagonal scaling matrix.
+				      */
     template <typename Number2>
     void scale (const Vector<Number2> &scaling_factors);
-    
+
+				     /**
+				      * Assignment <tt>*this = a*u</tt>.
+				      */
+    void equ (const Number a, const Vector<Number>& u);
+
 				     /**
 				      * Assignment <tt>*this = a*u</tt>.
 				      */
@@ -1033,7 +1051,10 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size!=0)
-    std::fill (begin(), end(), s);
+    parallel::apply_to_subranges (begin(), end(), 
+				  std_cxx1x::bind(&std::fill<Number*,Number>,
+						  _1, _2, s),
+				  internal::Vector::minimum_parallel_grain_size);
   return *this;
 }
 
@@ -1147,10 +1168,11 @@ Vector<Number>::scale (const Number factor)
 
   Assert (vec_size!=0, ExcEmptyObject());
 
-  iterator             ptr  = begin();
-  const const_iterator eptr = end();
-  while (ptr!=eptr)
-    *ptr++ *= factor;
+  parallel::transform (val,
+		       val+vec_size,
+		       val,
+		       (factor*boost::lambda::_1),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -1167,11 +1189,12 @@ Vector<Number>::add (const Number a,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ += a * *v_ptr++;
+  parallel::transform (val,
+		       val+vec_size,
+		       v.val,
+		       val,
+		       (boost::lambda::_1 + a*boost::lambda::_2),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -1190,11 +1213,13 @@ Vector<Number>::sadd (const Number x,
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin();
-  for (; i_ptr!=i_end; ++i_ptr)
-    *i_ptr = x * *i_ptr  +  a * *v_ptr++;
+
+  parallel::transform (val,
+		       val+vec_size,
+		       v.val,
+		       val,
+		       (x*boost::lambda::_1 + a*boost::lambda::_2),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 

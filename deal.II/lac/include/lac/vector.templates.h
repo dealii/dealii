@@ -16,7 +16,6 @@
 
 #include <base/template_constraints.h>
 #include <base/numbers.h>
-#include <base/parallel.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 
@@ -28,8 +27,6 @@
 #ifdef DEAL_II_USE_TRILINOS
 #  include <lac/trilinos_vector.h>
 #endif
-
-#include <boost/lambda/lambda.hpp>
 
 #include <cmath>
 #include <cstring>
@@ -528,22 +525,24 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& w, const Number c,
                            const Vector<Number>& y)
 {
-  Assert (numbers::is_finite(x), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(c), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  sadd (x, a, v, b, w);
+  add (c, y);
+}
 
+
+
+template <typename Number>
+void Vector<Number>::scale (const Vector<Number> &s)
+{
   Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
-  Assert (vec_size == y.vec_size, ExcDimensionMismatch(vec_size, y.vec_size));
+  Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] = x*val[i] + a*v.val[i] + b*w.val[i] +c*y.val[i];
+  parallel::transform (val,
+		       val+vec_size,
+		       s.val,
+		       val,
+		       (boost::lambda::_1*boost::lambda::_2),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -554,10 +553,30 @@ void Vector<Number>::scale (const Vector<Number2> &s)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
-  
+
   for (unsigned int i=0; i<vec_size; ++i)
     val[i] *= s.val[i];
 }
+
+
+
+template <typename Number>
+void Vector<Number>::equ (const Number a,
+			  const Vector<Number>& u)
+{
+  Assert (numbers::is_finite(a), 
+	  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
+
+  parallel::transform (u.val,
+		       u.val+u.vec_size,
+		       val,
+		       (a*boost::lambda::_1),
+		       internal::Vector::minimum_parallel_grain_size);
+}
+
 
 
 template <typename Number>
@@ -582,6 +601,7 @@ void Vector<Number>::equ (const Number a,
 }
 
 
+
 template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 			  const Number b, const Vector<Number>& v)
@@ -595,9 +615,13 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] = a * u.val[i] + b * v.val[i];
-}
+  parallel::transform (u.val,
+		       u.val+u.vec_size,
+		       v.val,
+		       val,
+		       (a*boost::lambda::_1 + b*boost::lambda::_2),
+		       internal::Vector::minimum_parallel_grain_size);
+  }
 
 
 template <typename Number>
@@ -610,8 +634,13 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] = a * u.val[i] + b * v.val[i] + c * w.val[i];
+  parallel::transform (u.val,
+		       u.val+u.vec_size,
+		       v.val,
+		       w.val,
+		       val,
+		       (a*boost::lambda::_1 + b*boost::lambda::_2 + c*boost::lambda::_3),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -627,8 +656,12 @@ void Vector<Number>::ratio (const Vector<Number> &a,
 				   // we overwrite them anyway
   reinit (a.size(), true);
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    val[i] = a.val[i] / b.val[i];
+  parallel::transform (a.val,
+		       a.val+a.vec_size,
+		       b.val,
+		       val,
+		       (boost::lambda::_1 / boost::lambda::_2),
+		       internal::Vector::minimum_parallel_grain_size);
 }
 
 
@@ -640,7 +673,11 @@ Vector<Number>::operator = (const Vector<Number>& v)
   if (v.vec_size != vec_size)
     reinit (v.vec_size, true);
   if (vec_size!=0)
-    std::copy (v.begin(), v.end(), begin());
+    parallel::transform (v.val,
+			 v.val+v.vec_size,
+			 val,
+			 (boost::lambda::_1),
+			 internal::Vector::minimum_parallel_grain_size);
   
   return *this;
 }

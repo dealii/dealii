@@ -29,10 +29,6 @@ for (S1, S2 : REAL_SCALARS)
       operator*<S2>(const Vector<S2>&) const;
     template
       void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
-    template
-      void Vector<S1>::equ<S2>(const S1, const Vector<S2>&);
-    template
-      void Vector<S1>::scale<S2>(const Vector<S2>&);
   }
 
 
@@ -54,8 +50,4 @@ for (S1, S2 : COMPLEX_SCALARS)
       operator*<S2>(const Vector<S2>&) const;
     template
       void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
-    template
-      void Vector<S1>::equ<S2>(const S1, const Vector<S2>&);
-    template
-      void Vector<S1>::scale<S2>(const Vector<S2>&);
   }
