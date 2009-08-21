@@ -1870,7 +1870,10 @@ void GridGenerator::truncated_cone (Triangulation<dim> &triangulation,
 {
   Assert (dim <= 3, ExcNotImplemented());
 				   // Determine number of cells and vertices
-  const unsigned int n_cells = std::floor (half_length / std::max (radius_0, radius_1) + 0.5);
+  const unsigned int n_cells = static_cast<unsigned int>(std::floor (half_length /
+								     std::max (radius_0,
+									       radius_1) +
+								     0.5));
   const unsigned int n_vertices = 4 * (n_cells + 1);
   std::vector<Point<dim> > vertices_tmp(n_vertices);
 
