@@ -2702,6 +2702,10 @@ void BoussinesqFlowProblem<dim>::solve ()
 		GridTools::minimal_cell_diameter(triangulation) /
 		1e-10;
 
+  pcout << "   Maximal velocity: "
+	<< maximal_velocity * EquationData::year_in_seconds * 100
+	<< " cm/year"
+	<< std::endl;
   pcout << "   " << "Time step: "
 	<< time_step/EquationData::year_in_seconds
 	<< " years"
