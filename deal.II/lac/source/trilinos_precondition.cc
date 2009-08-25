@@ -558,6 +558,7 @@ namespace TrilinosWrappers
   
     parameter_list.set("smoother: sweeps", 
 		       static_cast<int>(additional_data.smoother_sweeps));
+    parameter_list.set("smoother: Chebyshev alpha",10.);
     parameter_list.set("smoother: ifpack overlap", 
 		       static_cast<int>(additional_data.smoother_overlap));
     parameter_list.set("aggregation: threshold", 
