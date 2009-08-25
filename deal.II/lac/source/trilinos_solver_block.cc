@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,7 +34,6 @@
 #include <Thyra_MultiVectorDefaultBase.hpp>
 #include <Thyra_LinearOperatorDecl.hpp>
 #include <Thyra_LinearOperatorImpl.hpp>
-#include <Thyra_DefaultBlockedLinearOpDecl.hpp>
 #include <Thyra_DefaultBlockedLinearOp.hpp>
 #include <Thyra_EpetraLinearOp.hpp>
 #include <Thyra_EpetraThyraWrappers.hpp>
