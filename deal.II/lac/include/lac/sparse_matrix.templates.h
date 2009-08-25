@@ -1580,18 +1580,16 @@ SparseMatrix<number>::Jacobi_step (Vector<somenumber> &v,
   GrowingVectorMemory<Vector<somenumber> > mem;
   typename VectorMemory<Vector<somenumber> >::Pointer w(mem);
   w->reinit(v);
-  
-  for (unsigned int row=0; row<m(); ++row)
+
+  if (!v.all_zero())
     {
-      somenumber s = b(row);
-      for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
-	{
-	  s -= val[j] * v(cols->colnums[j]);
-	}
-      (*w)(row) = v(row) + s * om / val[cols->rowstart[row]];
+      vmult (*w, v);
+      *w -= b;
     }
-  for (unsigned int row=0; row<m(); ++row)
-    v(row) = (*w)(row);
+  else
+    w->equ (-1.,b);
+  precondition_Jacobi (*w, *w, om);
+  v -= *w;
 }
 
 
