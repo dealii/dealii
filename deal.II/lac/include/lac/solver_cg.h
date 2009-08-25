@@ -342,10 +342,10 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
     if (!x.all_zero())
       {
 	A.vmult(g,x);
-	g.sadd(-1.,1.,b);
+	g.add(-1.,b);
       }
     else
-      g = b;
+      g.equ(-1.,b);
     res = g.l2_norm();
     
     conv = this->control().check(0,res);
@@ -354,8 +354,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	cleanup();
 	return;
       }
-    
-    g *= -1.;
+
     precondition.vmult(h,g);
     
     d.equ(-1.,h);
