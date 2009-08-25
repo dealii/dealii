@@ -16,9 +16,10 @@
 // This file contains simple preconditioners.
 
 #include <base/config.h>
-#include <lac/vector_memory.h>
 #include <base/smartpointer.h>
 #include <base/template_constraints.h>
+#include <lac/tridiagonal_matrix.h>
+#include <lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -96,7 +97,7 @@ class PreconditionIdentity : public Subscriptor
  *
  * In Krylov-space methods, this preconditioner should not have any
  * effect. Using SolverRichardson, the two relaxation parameters will
- * be just multiplied. Still, this class is usefull in multigrid
+ * be just multiplied. Still, this class is useful in multigrid
  * smoother objects (MGSmootherRelaxation).
  *
  * @author Guido Kanschat, 2005
@@ -814,7 +815,216 @@ class PreconditionedMatrix : public Subscriptor
 };
 
 
-    
+
+/**
+ * Preconditioning with a Chebyshev polynomial for symmetric positive
+ * definite matrices. This preconditioner is similar to a Jacobi
+ * preconditioner if the degree variable is set to one, otherwise some
+ * higher order polynomial corrections are used. This preconditioner needs
+ * access to the diagonal of the matrix its acts on and needs a respective
+ * <tt>vmult</tt> implemention. However, it does not need to explicitly know
+ * the matrix entries.
+ *
+ * This class is useful e.g. in multigrid smoother objects, since it is
+ * trivially %parallel (assuming that matrix-vector products are %parallel).
+ *
+ * @author Martin Kronbichler, 2009
+ */
+template <class MATRIX=SparseMatrix<double>, class VECTOR=Vector<double> >
+class PreconditionChebyshev : public Subscriptor
+{
+public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional parameters
+                                        * to the preconditioner.
+                                        */      
+  struct AdditionalData
+  {
+                                       /**
+					* Constructor.
+					*/
+    AdditionalData (const unsigned int degree              = 1,
+		    const double       smoothing_range     = 0.,
+		    const bool         nonzero_starting    = false,
+		    const unsigned int eig_cg_n_iterations = 8,
+		    const double       eig_cg_residual     = 1e-2);
+	
+                                       /**
+					* This determines the degree of the
+					* Chebyshev polynomial. The degree
+					* of the polynomial gives the number
+					* of matrix-vector products to be
+					* performed for one application of
+					* the vmult() operation.
+					*/
+    unsigned int degree;
+
+                                       /**
+					* This sets the range between the
+					* largest eigenvalue in the matrix
+					* and the smallest eigenvalue to be
+					* treated. If the parameter is zero,
+					* an estimate for the largest and
+					* for the smallest eigenvalue will
+					* be calculated
+					* internally. Otherwise, the
+					* Chebyshev polynomial will act in
+					* the interval
+					* $[\lambda_\mathrm{max}/
+					* \tt{smoothing\_range},
+					* \lambda_\mathrm{max}]$, where
+					* $\lambda_\mathrm{max}$ is an
+					* estimate of the maximum eigenvalue
+					* of the matrix. A choice of
+					* <tt>smoothing_range</tt> between 5
+					* and 20 is useful in case the
+					* preconditioner is used as a
+					* smoother in multigrid.
+					*/
+    double smoothing_range;
+
+                                       /**
+					* When this flag is set to
+					* <tt>true</tt>, it enables the
+					* method <tt>vmult(dst, src)</tt> to
+					* use non-zero data in the vector
+					* <tt>dst</tt>, appending to it the
+					* Chebyshev corrections. This can be
+					* useful in some situations
+					* (e.g. when used for high-frequency
+					* error smoothing in a multigrid
+					* algorithm), but not the way the
+					* solver classes expect a
+					* preconditioner to work (where one
+					* ignores the content in
+					* <tt>dst</tt> for the
+					* preconditioner application).
+					*/
+    bool nonzero_starting;
+
+				       /**
+					* Maximum number of CG iterations
+					* performed for finding the maximum
+					* eigenvalue.
+					*/
+    unsigned int eig_cg_n_iterations;
+
+				       /**
+					* Tolerance for CG iterations
+					* performed for finding the maximum
+					* eigenvalue.
+					*/
+    double eig_cg_residual;
+  };
+
+  PreconditionChebyshev ();
+
+                                       /**
+                                        * Initialize function. Takes the
+                                        * matrix which is used to form the
+                                        * preconditioner, and additional
+                                        * flags if there are any. This
+                                        * function works only if the input
+                                        * matrix has an operator
+                                        * <tt>el(i,i)</tt> for accessing all
+                                        * the elements in the
+                                        * diagonal. Otherwise, use the other
+                                        * <tt>initialize</tt> function to
+                                        * manually provide the diagonal.
+					*
+					* This function calculates an
+					* estimate of the eigenvalue range
+					* of the matrix weighted by its
+					* diagonal using a modified CG
+					* iteration.
+                                        */
+  void initialize (const MATRIX         &matrix,
+		   const AdditionalData &additional_data = AdditionalData());
+
+                                       /**
+                                        * Second initialize function. Takes
+                                        * the matrix which is used to form
+                                        * the preconditioner, a vector
+                                        * containing the <i>inverse</i> of
+                                        * the diagonal of the input matrix,
+                                        * and additional flags if there are
+                                        * any.
+                                        */
+  void initialize (const MATRIX         &matrix,
+		   const VECTOR         &diagonal_inverse,
+		   const AdditionalData &additional_data = AdditionalData());
+
+				       /** 
+					* Computes the action of the
+					* preconditioner on <tt>src</tt>,
+					* storing the result in
+					* <tt>dst</tt>.
+					*/
+  void vmult (VECTOR       &dst,
+	      const VECTOR &src) const;
+
+				       /**
+					* Resets the preconditioner.
+					*/
+  void clear ();
+
+private:
+
+				       /**
+					* A pointer to the underlying
+					* matrix.
+					*/
+  SmartPointer<const MATRIX> matrix_ptr;
+
+				       /**
+					* Stores the inverse of the diagonal
+					* of the underlying matrix.
+					*/
+  VECTOR diagonal_inverse;
+
+				       /**
+					* Internal vector used for
+					* <tt>vmult</tt> operation.
+					*/
+  mutable VECTOR update1;
+
+				       /**
+					* Internal vector used for
+					* <tt>vmult</tt> operation.
+					*/
+  mutable VECTOR update2;
+
+				       /**
+					* Stores the additional data
+					* provided to the initialize
+					* function.
+					*/
+  AdditionalData data;
+
+				       /**
+					* Average of the largest and
+					* smallest eigenvalue under
+					* consideration.
+					*/
+  double theta;
+
+				       /**
+					* Half the interval length between
+					* the largest and smallest
+					* eigenvalue under consideration.
+					*/
+  double delta;
+
+				       /**
+					* Stores whether the preconditioner
+					* has been set up.
+					*/
+  bool is_initialized;
+};
+
+
+
 /*@}*/
 /* ---------------------------------- Inline functions ------------------- */
 
@@ -1288,6 +1498,190 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
   dst.sadd(-1.,1.,rhs);
   return dst.l2_norm ();
 }
+
+
+
+//---------------------------------------------------------------------------
+
+template <class MATRIX, class VECTOR>
+inline
+PreconditionChebyshev<MATRIX,VECTOR>::AdditionalData::
+AdditionalData (const unsigned int degree,
+		const double       smoothing_range,
+		const bool         nonzero_starting,
+		const unsigned int eig_cg_n_iterations,
+		const double       eig_cg_residual)
+                :
+                degree  (degree),
+		smoothing_range (smoothing_range),
+		nonzero_starting (nonzero_starting),
+		eig_cg_n_iterations (eig_cg_n_iterations),
+		eig_cg_residual (eig_cg_residual)
+{}
+
+
+
+template <class MATRIX, class VECTOR>
+inline
+PreconditionChebyshev<MATRIX,VECTOR>::PreconditionChebyshev ()
+  :
+    is_initialized (false)
+{}
+
+
+
+template <class MATRIX, class VECTOR>
+inline
+void 
+PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
+						  const AdditionalData &additional_data)
+{
+  VECTOR diagonal_inv (matrix.m());
+  for (unsigned int i=0; i<matrix.m(); ++i)
+    diagonal_inv(i) = 1./matrix.el(i,i);
+
+  initialize (matrix, diagonal_inv, additional_data);
+}
+
+
+template <class MATRIX, class VECTOR>
+inline
+void 
+PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
+						  const VECTOR &diagonal_inv,
+						  const AdditionalData &additional_data)
+{
+  Assert (matrix.m() == matrix.n(), ExcMessage("Matrix not quadratic."));
+  matrix_ptr = &matrix;
+  update1.reinit (diagonal_inv, true);
+  update2.reinit (diagonal_inv, true);
+  diagonal_inverse = diagonal_inv;
+  data = additional_data;
+
+				 // calculate largest eigenvalue using a
+				 // hand-tuned CG iteration on the matrix
+				 // weighted by its diagonal.
+				 // 
+				 // TODO: can we obtain this with the
+				 // standard CG method? we would need to
+				 // read the logfile in that case, which
+				 // does not seem feasible.
+  double max_eigenvalue, min_eigenvalue;
+  {
+    double eigen_beta_alpha = 0;
+  
+    std::vector<double> diagonal;
+    std::vector<double> offdiagonal;
+  
+    VECTOR rhs, g;
+    rhs.reinit(diagonal_inv, true);
+    rhs = 1./sqrt(matrix.m());
+    g.reinit(diagonal_inv, true);
+
+    int  it=0;
+    double res,gh,alpha,beta;
+
+    g.equ(-1.,rhs);
+    res = g.l2_norm();
+    update2.equ (-1., g);
+    gh = res*res;
+
+    while (true)
+      {
+	it++;
+	matrix.vmult (update1, update2);
+	update1.scale (diagonal_inverse);
+	alpha = update2 * update1;
+	alpha = gh/alpha;
+	g.add (alpha, update1);
+	res = g.l2_norm();
+
+	if (it > data.eig_cg_n_iterations || res < data.eig_cg_residual)
+	  break;
+
+	beta = gh;
+	gh = res*res;
+	beta = gh/beta;
+	update2.sadd (beta, -1., g);
+
+	diagonal.push_back (1./alpha + eigen_beta_alpha);
+	eigen_beta_alpha = beta/alpha;
+	offdiagonal.push_back(std::sqrt(beta)/alpha);
+      }
+
+    TridiagonalMatrix<double> T(diagonal.size(), true);
+    for (unsigned int i=0;i<diagonal.size();++i)
+      {
+	T(i,i) = diagonal[i];
+	if (i< diagonal.size()-1)
+	  T(i,i+1) = offdiagonal[i];
+      }
+    T.compute_eigenvalues();
+    min_eigenvalue = T.eigenvalue(0);
+    max_eigenvalue = T.eigenvalue(T.n()-1);
+  }
+
+  const double beta = 1.1 * max_eigenvalue;
+  const double alpha = (data.smoothing_range > 0 ? 
+			max_eigenvalue / data.smoothing_range :
+			max_eigenvalue / min_eigenvalue);
+  delta = (beta-alpha)*0.5;
+  theta = (beta+alpha)*0.5;
+  is_initialized = true;
+}
+
+
+
+template <class MATRIX, class VECTOR>
+inline
+void 
+PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
+					     const VECTOR &src) const
+{
+  Assert (is_initialized, ExcMessage("Preconditioner not initialized"));
+  double rhok  = delta / theta,  sigma = theta / delta;
+  if (data.nonzero_starting && !dst.all_zero())
+    {
+      matrix_ptr->vmult (update1, dst);
+      update1 -= src;
+      update1 /= theta;
+      update1.scale (diagonal_inverse);
+      dst -= update1;
+    }
+  else
+    {
+      dst.equ (1./theta, src);
+      dst.scale (diagonal_inverse);
+      update1.equ(-1.,dst);
+    }
+
+  for (unsigned int k=0; k<data.degree-1; ++k)
+    {
+      matrix_ptr->vmult (update2, dst);
+      update2 -= src;
+      update2.scale (diagonal_inverse);
+      const double rhokp = 1./(2.*sigma-rhok);
+      const double factor1 = rhokp * rhok, factor2 = 2.*rhokp/delta;
+      rhok = rhokp;
+      update1.sadd (factor1, factor2, update2);
+      dst -= update1;
+    }
+}
+
+
+
+template <class MATRIX, class VECTOR>
+inline
+void PreconditionChebyshev<MATRIX,VECTOR>::clear ()
+{
+  is_initialized = false;
+  matrix_ptr = 0;
+  diagonal_inverse.reinit(0);
+  update1.reinit(0);
+  update2.reinit(0);
+}
+
+
 
 #endif // DOXYGEN
 
