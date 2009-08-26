@@ -8,7 +8,7 @@ vector-valued. The deal.II library supports such problems (see the
 extensive documentation in the @ref vector_valued module), and we will show
 that that is mostly rather simple. The only more complicated problems
 are in assembling matrix and right hand side, but these are easily
-understood as well. 
+understood as well.
 
 In the example, we will want to solve the elastic equations. They are
 an extension to Laplace's equation with a vector-valued solution that
@@ -30,9 +30,9 @@ many cases, one knows that the material under consideration is
 isotropic, in which case by introduction of the two coefficients
 $\lambda$ and $\mu$ the coefficient tensor reduces to
 @f[
-  c_{ijkl} 
+  c_{ijkl}
   =
-  \lambda \delta_{ij} \delta_{kl} + 
+  \lambda \delta_{ij} \delta_{kl} +
   \mu (\delta_{ik} \delta_{jl} + \delta_{il} \delta_{jk}).
 @f]
 
@@ -115,28 +115,28 @@ zero). $\varphi_{base(i)}(x)$ describes the space dependence of the shape
 function, which is taken to be the $base(i)$-th shape function of the scalar
 element. Of course, while $i$ is in the range $0,\ldots,N-1$, the functions
 $comp(i)$ and $base(i)$ have the ranges $0,1$ (in 2D) and $0,\ldots,n-1$,
-respectively. 
+respectively.
 
 For example (though this sequence of shape functions is not
 guaranteed, and you should not rely on it),
 the following layout could be used by the library:
 @f{eqnarray*}
-  \Phi_0({\mathbf x}) &=& 
+  \Phi_0({\mathbf x}) &=&
   \left(\begin{array}{c}
     \varphi_0({\mathbf x}) \\ 0
   \end{array}\right),
   \\
-  \Phi_1({\mathbf x}) &=& 
+  \Phi_1({\mathbf x}) &=&
   \left(\begin{array}{c}
     0 \\ \varphi_0({\mathbf x})
   \end{array}\right),
   \\
-  \Phi_2({\mathbf x}) &=& 
+  \Phi_2({\mathbf x}) &=&
   \left(\begin{array}{c}
     \varphi_1({\mathbf x}) \\ 0
   \end{array}\right),
   \\
-  \Phi_3({\mathbf x}) &=& 
+  \Phi_3({\mathbf x}) &=&
   \left(\begin{array}{c}
     0 \\ \varphi_1({\mathbf x})
   \end{array}\right),
@@ -166,12 +166,12 @@ of this example program.
 Now using this vector shape functions, we can write the discrete finite
 element solution as
 @f[
-  {\mathbf u}_h({\mathbf x}) = 
-  \sum_i \Phi_i({\mathbf x})\ u_i
+  {\mathbf u}_h({\mathbf x}) =
+  \sum_i \Phi_i({\mathbf x})\ U_i
 @f]
-with scalar coefficients $u_i$. If we define an analog function ${\mathbf v}_h$ as
+with scalar coefficients $U_i$. If we define an analog function ${\mathbf v}_h$ as
 test function, we can write the discrete problem as follows: Find coefficients
-$u_i$ such that
+$U_i$ such that
 @f[
   a({\mathbf u}_h, {\mathbf v}_h) = ({\mathbf f}, {\mathbf v}_h)
   \qquad
@@ -182,7 +182,7 @@ If we insert the definition of the bilinear form and the representation of
 ${\mathbf u}_h$ and ${\mathbf v}_h$ into this formula:
 @f{eqnarray*}
   \sum_{i,j}
-    u_i v_j
+    U_i V_j
   \sum_{k,l}
   \left\{
   \left(
@@ -191,15 +191,15 @@ ${\mathbf u}_h$ and ${\mathbf v}_h$ into this formula:
   +
   \left(
     \mu \partial_l (\Phi_i)_k, \partial_l (\Phi_j)_k
-  \right)_\Omega  
+  \right)_\Omega
   +
   \left(
     \mu \partial_l (\Phi_i)_k, \partial_k (\Phi_j)_l
-  \right)_\Omega  
+  \right)_\Omega
   \right\}
 \\
 =
-  \sum_j v_j
+  \sum_j V_j
   \sum_l
   \left(
     f_l,
@@ -229,7 +229,7 @@ The local stiffness matrix on cell $K$ therefore has the following entries:
   \right)_K
   \right\},
 @f]
-where $i,j$ now are local degrees of freedom and therefore $0\le i,j < N$. 
+where $i,j$ now are local degrees of freedom and therefore $0\le i,j < N$.
 In these formulas, we always take some component of the vector shape functions
 $\Phi_i$, which are of course given as follows (see their definition):
 @f[
@@ -243,7 +243,7 @@ the sums over $k$ and $l$:
   \sum_{k,l}
   \Bigl\{
   \left(
-    \lambda \partial_l \phi_i\ \delta_{l,comp(i)}, 
+    \lambda \partial_l \phi_i\ \delta_{l,comp(i)},
             \partial_k \phi_j\ \delta_{k,comp(j)}
   \right)_K
 \\
