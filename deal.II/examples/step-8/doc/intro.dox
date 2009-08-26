@@ -106,15 +106,15 @@ number of shape functions for the vector element; in two space dimensions, we
 need $n$ shape functions for each component of the vector, so $N=2n$. Then,
 the $i$th shape function of the vector element has the form
 @f[
-  \Phi_i({\mathbf x}) = \varphi_{base(i)}({\mathbf x})\ {\mathbf e}_{comp(i)},
+  \Phi_i({\mathbf x}) = \varphi_{\text{base}(i)}({\mathbf x})\ {\mathbf e}_{\text{comp}(i)},
 @f]
-where $e_l$ is the $l$th unit vector, $comp(i)$ is the function that tells
+where $e_l$ is the $l$th unit vector, $\text{comp}(i)$ is the function that tells
 us which component of $\Phi_i$ is the one that is nonzero (for
 each vector shape function, only one component is nonzero, and all others are
-zero). $\varphi_{base(i)}(x)$ describes the space dependence of the shape
-function, which is taken to be the $base(i)$-th shape function of the scalar
+zero). $\varphi_{\text{base}(i)}(x)$ describes the space dependence of the shape
+function, which is taken to be the $\text{base}(i)$-th shape function of the scalar
 element. Of course, while $i$ is in the range $0,\ldots,N-1$, the functions
-$comp(i)$ and $base(i)$ have the ranges $0,1$ (in 2D) and $0,\ldots,n-1$,
+$\text{comp}(i)$ and $\text{base}(i)$ have the ranges $0,1$ (in 2D) and $0,\ldots,n-1$,
 respectively.
 
 For example (though this sequence of shape functions is not
@@ -144,23 +144,23 @@ the following layout could be used by the library:
 @f}
 where here
 @f[
-  comp(0)=0, \quad  comp(1)=1, \quad  comp(2)=0, \quad  comp(3)=1, \quad  \ldots
+  \text{comp}(0)=0, \quad  \text{comp}(1)=1, \quad  \text{comp}(2)=0, \quad  \text{comp}(3)=1, \quad  \ldots
 @f]
 @f[
-  base(0)=0, \quad  base(1)=0, \quad  base(2)=1, \quad  base(3)=1, \quad  \ldots
+  \text{base}(0)=0, \quad  \text{base}(1)=0, \quad  \text{base}(2)=1, \quad  \text{base}(3)=1, \quad  \ldots
 @f]
 
 In all but very rare cases, you will not need to know which shape function
-$\varphi_{base(i)}$ of the scalar element belongs to a shape function $\Phi_i$
+$\varphi_{\text{base}(i)}$ of the scalar element belongs to a shape function $\Phi_i$
 of the vector element. Let us therefore define
 @f[
-  \phi_i = \varphi_{base(i)}
+  \phi_i = \varphi_{\text{base}(i)}
 @f]
 by which we can write the vector shape function as
 @f[
-  \Phi_i({\mathbf x}) = \phi_{i}({\mathbf x})\ {\mathbf e}_{comp(i)}.
+  \Phi_i({\mathbf x}) = \phi_{i}({\mathbf x})\ {\mathbf e}_{\text{comp}(i)}.
 @f]
-You can now safely forget about the function $base(i)$, at least for the rest
+You can now safely forget about the function $\text{base}(i)$, at least for the rest
 of this example program.
 
 Now using this vector shape functions, we can write the discrete finite
@@ -233,7 +233,7 @@ where $i,j$ now are local degrees of freedom and therefore $0\le i,j < N$.
 In these formulas, we always take some component of the vector shape functions
 $\Phi_i$, which are of course given as follows (see their definition):
 @f[
-  (\Phi_i)_l = \phi_i \delta_{l,comp(i)},
+  (\Phi_i)_l = \phi_i \delta_{l,\text{comp}(i)},
 @f]
 with the Kronecker symbol $\delta_{nm}$. Due to this, we can delete some of
 the sums over $k$ and $l$:
@@ -243,26 +243,26 @@ the sums over $k$ and $l$:
   \sum_{k,l}
   \Bigl\{
   \left(
-    \lambda \partial_l \phi_i\ \delta_{l,comp(i)},
-            \partial_k \phi_j\ \delta_{k,comp(j)}
+    \lambda \partial_l \phi_i\ \delta_{l,\text{comp}(i)},
+            \partial_k \phi_j\ \delta_{k,\text{comp}(j)}
   \right)_K
 \\
   &\qquad\qquad& +
   \left(
-    \mu \partial_l \phi_i\ \delta_{k,comp(i)},
-        \partial_l \phi_j\ \delta_{k,comp(j)}
+    \mu \partial_l \phi_i\ \delta_{k,\text{comp}(i)},
+        \partial_l \phi_j\ \delta_{k,\text{comp}(j)}
   \right)_K
   +
   \left(
-    \mu \partial_l \phi_i\ \delta_{k,comp(i)},
-        \partial_k \phi_j\ \delta_{l,comp(j)}
+    \mu \partial_l \phi_i\ \delta_{k,\text{comp}(i)},
+        \partial_k \phi_j\ \delta_{l,\text{comp}(j)}
   \right)_K
   \Bigr\}
 \\
   &=&
   \left(
-    \lambda \partial_{comp(i)} \phi_i,
-            \partial_{comp(j)} \phi_j
+    \lambda \partial_{\text{comp}(i)} \phi_i,
+            \partial_{\text{comp}(j)} \phi_j
   \right)_K
   +
   \sum_l
@@ -270,28 +270,28 @@ the sums over $k$ and $l$:
     \mu \partial_l \phi_i,
         \partial_l \phi_j
   \right)_K
-  \ \delta_{comp(i),comp(j)}
+  \ \delta_{\text{comp}(i),\text{comp}(j)}
   +
   \left(
-    \mu \partial_{comp(j)} \phi_i,
-        \partial_{comp(i)} \phi_j
+    \mu \partial_{\text{comp}(j)} \phi_i,
+        \partial_{\text{comp}(i)} \phi_j
   \right)_K
 \\
   &=&
   \left(
-    \lambda \partial_{comp(i)} \phi_i,
-            \partial_{comp(j)} \phi_j
+    \lambda \partial_{\text{comp}(i)} \phi_i,
+            \partial_{\text{comp}(j)} \phi_j
   \right)_K
   +
   \left(
     \mu \nabla \phi_i,
         \nabla \phi_j
   \right)_K
-  \ \delta_{comp(i),comp(j)}
+  \ \delta_{\text{comp}(i),\text{comp}(j)}
   +
   \left(
-    \mu \partial_{comp(j)} \phi_i,
-        \partial_{comp(i)} \phi_j
+    \mu \partial_{\text{comp}(j)} \phi_i,
+        \partial_{\text{comp}(i)} \phi_j
   \right)_K.
 @f}
 
@@ -309,12 +309,12 @@ Likewise, the contribution of cell $K$ to the right hand side vector is
   \sum_l
   \left(
     f_l,
-    \phi_j \delta_{l,comp(j)}
+    \phi_j \delta_{l,\text{comp}(j)}
   \right)_K
 \\
   &=&
   \left(
-    f_{comp(j)},
+    f_{\text{comp}(j)},
     \phi_j
   \right)_K.
 @f}
