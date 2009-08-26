@@ -296,6 +296,16 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+ 
+  <li><p> Improved: BlockVector and several of the block sparsity
+  patterns can now be initialized with BlockIndices
+  objects. Therefore, if an application needs such an object, it does
+  not have to store a vector of block sizes separately.
+  <br>
+  (GK 2009/08/26)
+  </p>
+  </li>
+  
   <li>
   <p>
   Fixed: Crash or strange behaviour (wrong matrix entries written) in
@@ -390,6 +400,14 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li><p> FETools::compute_block_renumbering() can nor return block sizes instead of
+  start indices.
+  <br>
+  (GK 2009/08/26)
+  </p>
+  </li>
+  
   <li>
   <p>
   New: The function GridGenerator::truncated_cone() and the class ConeBoundary

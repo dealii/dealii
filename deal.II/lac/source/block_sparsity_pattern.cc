@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -441,8 +441,9 @@ BlockCompressedSparsityPattern::BlockCompressedSparsityPattern ()
 
 
 BlockCompressedSparsityPattern::
-BlockCompressedSparsityPattern (const unsigned int n_rows,
-				const unsigned int n_columns)
+BlockCompressedSparsityPattern (
+  const unsigned int n_rows,
+  const unsigned int n_columns)
 		:
 		BlockSparsityPatternBase<CompressedSparsityPattern>(n_rows,
 								    n_columns)
@@ -450,16 +451,20 @@ BlockCompressedSparsityPattern (const unsigned int n_rows,
 
 
 BlockCompressedSparsityPattern::
-BlockCompressedSparsityPattern (const std::vector<unsigned int>& row_indices,
-				const std::vector<unsigned int>& col_indices)
-		:
-		BlockSparsityPatternBase<CompressedSparsityPattern>(row_indices.size(),
-								    col_indices.size())
+BlockCompressedSparsityPattern (
+  const std::vector<unsigned int>& row_indices,
+  const std::vector<unsigned int>& col_indices)
 {
-  for (unsigned int i=0;i<row_indices.size();++i)
-    for (unsigned int j=0;j<col_indices.size();++j)
-      this->block(i,j).reinit(row_indices[i],col_indices[j]);
-  this->collect_sizes();
+  reinit(row_indices, col_indices);
+}
+
+
+BlockCompressedSparsityPattern::
+BlockCompressedSparsityPattern (
+  const BlockIndices& row_indices,
+  const BlockIndices& col_indices)
+{
+  reinit(row_indices, col_indices);
 }
 
 
@@ -477,31 +482,52 @@ BlockCompressedSparsityPattern::reinit (
 
 
 
+void
+BlockCompressedSparsityPattern::reinit (
+  const BlockIndices& row_indices,
+  const BlockIndices& col_indices)
+{
+  BlockSparsityPatternBase<CompressedSparsityPattern>::reinit(row_indices.size(),
+							      col_indices.size());
+  for (unsigned int i=0;i<row_indices.size();++i)
+    for (unsigned int j=0;j<col_indices.size();++j)
+      this->block(i,j).reinit(row_indices.block_size(i),
+			      col_indices.block_size(j));
+  this->collect_sizes();  
+}
+
+
+
 BlockCompressedSetSparsityPattern::BlockCompressedSetSparsityPattern ()
 {}
 
 
 
 BlockCompressedSetSparsityPattern::
-BlockCompressedSetSparsityPattern (const unsigned int n_rows,
-				const unsigned int n_columns)
+BlockCompressedSetSparsityPattern (
+  const unsigned int n_rows,
+  const unsigned int n_columns)
 		:
 		BlockSparsityPatternBase<CompressedSetSparsityPattern>(n_rows,
-								    n_columns)
+								       n_columns)
 {}
 
 
 BlockCompressedSetSparsityPattern::
-BlockCompressedSetSparsityPattern (const std::vector<unsigned int>& row_indices,
-				const std::vector<unsigned int>& col_indices)
-		:
-		BlockSparsityPatternBase<CompressedSetSparsityPattern>(row_indices.size(),
-								    col_indices.size())
+BlockCompressedSetSparsityPattern (
+  const std::vector<unsigned int>& row_indices,
+  const std::vector<unsigned int>& col_indices)
 {
-  for (unsigned int i=0;i<row_indices.size();++i)
-    for (unsigned int j=0;j<col_indices.size();++j)
-      this->block(i,j).reinit(row_indices[i],col_indices[j]);
-  this->collect_sizes();
+  reinit(row_indices, col_indices);
+}
+
+
+BlockCompressedSetSparsityPattern::
+BlockCompressedSetSparsityPattern (
+  const BlockIndices& row_indices,
+  const BlockIndices& col_indices)
+{
+  reinit(row_indices, col_indices);
 }
 
 
@@ -514,6 +540,22 @@ BlockCompressedSetSparsityPattern::reinit (
   for (unsigned int i=0;i<row_block_sizes.size();++i)
     for (unsigned int j=0;j<col_block_sizes.size();++j)
       this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
+  this->collect_sizes();  
+}
+
+
+
+void
+BlockCompressedSetSparsityPattern::reinit (
+  const BlockIndices& row_indices,
+  const BlockIndices& col_indices)
+{
+  BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit(row_indices.size(),
+								 col_indices.size());
+  for (unsigned int i=0;i<row_indices.size();++i)
+    for (unsigned int j=0;j<col_indices.size();++j)
+      this->block(i,j).reinit(row_indices.block_size(i),
+			      col_indices.block_size(j));
   this->collect_sizes();  
 }
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -679,6 +679,15 @@ class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<Compresse
     BlockCompressedSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
 				    const std::vector<unsigned int>& col_block_sizes);
     
+    				     /**
+				      * Initialize the pattern with
+				      * two BlockIndices for the block
+				      * structures of matrix rows and
+				      * columns.
+				      */
+    BlockCompressedSparsityPattern (const BlockIndices& row_indices,
+				    const BlockIndices& col_indices);
+    
 				     /**
 				      * Resize the matrix to a tensor
 				      * product of matrices with
@@ -697,6 +706,18 @@ class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<Compresse
     void reinit (const std::vector< unsigned int > &row_block_sizes,
 		 const std::vector< unsigned int > &col_block_sizes);
 
+				     /**
+				      * Resize the matrix to a tensor
+				      * product of matrices with
+				      * dimensions defined by the
+				      * arguments. The two
+				      * BlockIndices objects must be
+				      * initialized and the sparsity
+				      * pattern will have the
+				      * same block structure afterwards.
+				      */
+    void reinit (const BlockIndices& row_indices, const BlockIndices& col_indices);
+    
 				     /**
 				      * Allow the use of the reinit
 				      * functions of the base class as
@@ -759,7 +780,7 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
 				      * you assign them sizes.
 				      */
     BlockCompressedSetSparsityPattern (const unsigned int n_rows,
-				    const unsigned int n_columns);
+				       const unsigned int n_columns);
 
     				     /**
 				      * Initialize the pattern with
@@ -773,7 +794,16 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
 				      * values.
 				      */
     BlockCompressedSetSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
-				    const std::vector<unsigned int>& col_block_sizes);
+				       const std::vector<unsigned int>& col_block_sizes);
+    
+    				     /**
+				      * Initialize the pattern with
+				      * two BlockIndices for the block
+				      * structures of matrix rows and
+				      * columns.
+				      */
+    BlockCompressedSetSparsityPattern (const BlockIndices& row_indices,
+				       const BlockIndices& col_indices);
     
 				     /**
 				      * Resize the matrix to a tensor
@@ -793,6 +823,18 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
     void reinit (const std::vector< unsigned int > &row_block_sizes,
 		 const std::vector< unsigned int > &col_block_sizes);
 
+				     /**
+				      * Resize the matrix to a tensor
+				      * product of matrices with
+				      * dimensions defined by the
+				      * arguments. The two
+				      * BlockIndices objects must be
+				      * initialized and the sparsity
+				      * pattern will have the
+				      * same block structure afterwards.
+				      */
+    void reinit (const BlockIndices& row_indices, const BlockIndices& col_indices);
+    
 				     /**
 				      * Allow the use of the reinit
 				      * functions of the base class as

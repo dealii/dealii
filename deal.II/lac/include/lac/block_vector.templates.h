@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,6 +33,13 @@ BlockVector<Number>::BlockVector (const unsigned int n_blocks,
 
 template <typename Number>
 BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n)
+{
+  reinit (n, false);
+}
+
+
+template <typename Number>
+BlockVector<Number>::BlockVector (const BlockIndices& n)
 {
   reinit (n, false);
 }
@@ -101,6 +108,20 @@ void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
   
   for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->components[i].reinit(n[i], fast);
+}
+
+
+template <typename Number>
+void BlockVector<Number>::reinit (
+  const BlockIndices& n,
+  const bool fast)
+{
+  this->block_indices = n;
+  if (this->components.size() != this->n_blocks())
+    this->components.resize(this->n_blocks());
+  
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
+    this->components[i].reinit(n.block_size(i), fast);
 }
 
 

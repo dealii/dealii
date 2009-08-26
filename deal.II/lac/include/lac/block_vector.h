@@ -160,6 +160,13 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
                                       */
     BlockVector (const std::vector<unsigned int> &block_sizes);
 
+                                     /**
+                                      * Constructor. Initialize vector
+                                      * to the structure found in the
+                                      * BlockIndices argument.
+                                      */
+    BlockVector (const BlockIndices& block_indices);
+
 				     /**
 				      * Constructor. Set the number of
 				      * blocks to
@@ -285,6 +292,23 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
 				      */ 
     void reinit (const std::vector<unsigned int> &N,
 		 const bool                       fast=false);
+
+				     /**
+				      * Reinitialize the BlockVector
+				      * to reflect the structure found
+				      * in BlockIndices.
+				      *
+				      * If the number of blocks is the
+				      * same as before this function
+				      * was called, all vectors remain
+				      * the same and reinit() is
+				      * called for each vector.
+				      *
+				      * If <tt>fast==false</tt>, the vector
+				      * is filled with zeros.
+				      */
+    void reinit (const BlockIndices& block_indices,
+		 const bool fast=false);
     
 				     /**
 				      * Change the dimension to that
