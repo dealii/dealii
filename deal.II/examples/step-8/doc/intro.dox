@@ -67,19 +67,19 @@ and the respective bilinear form is then
 or also writing the first term a sum over components:
 @f[
   a({\mathbf u}, {\mathbf v}) =
-  \sum_{i,j}
+  \sum_{k,l}
   \left(
     \lambda \partial_l u_l, \partial_k v_k
   \right)_\Omega
   +
   \sum_{k,l}
   \left(
-    \mu \partial_i u_j, \partial_i v_j
+    \mu \partial_k u_l, \partial_k v_l
   \right)_\Omega
   +
-  \sum_{i,j}
+  \sum_{k,l}
   \left(
-    \mu \partial_i u_j, \partial_j v_i
+    \mu \partial_k u_l, \partial_l v_k
   \right)_\Omega.
 @f]
 
