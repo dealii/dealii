@@ -289,13 +289,14 @@ template<int dim, int spacedim>
 void FETools::compute_block_renumbering (
   const FiniteElement<dim,spacedim>& element,
   std::vector<unsigned int>& renumbering,
-  std::vector<unsigned int>& start_indices)
+  std::vector<unsigned int>& block_data,
+  bool return_start_indices)
 {
   Assert(renumbering.size() == element.dofs_per_cell,
 	 ExcDimensionMismatch(renumbering.size(),
 			      element.dofs_per_cell));
-  Assert(start_indices.size() == element.n_blocks(),
-	 ExcDimensionMismatch(start_indices.size(),
+  Assert(block_data.size() == element.n_blocks(),
+	 ExcDimensionMismatch(block_data.size(),
 			      element.n_blocks()));
   
   unsigned int k=0;
@@ -303,10 +304,24 @@ void FETools::compute_block_renumbering (
   for (unsigned int b=0;b<element.n_base_elements();++b)
     for (unsigned int m=0;m<element.element_multiplicity(b);++m)
       {
-	start_indices[i++] = k;
+	block_data[i++] = (return_start_indices)
+			     ? k
+			     : (element.base_element(b).n_dofs_per_cell());
 	k += element.base_element(b).n_dofs_per_cell();
       }
   Assert (i == element.n_blocks(), ExcInternalError());
+  
+  std::vector<unsigned int> start_indices(block_data.size());
+  k = 0;
+  for (unsigned int i=0;i<block_data.size();++i)
+    if (return_start_indices)
+      start_indices[i] = block_data[i];
+    else
+      {
+	start_indices[i] = k;
+	k += block_data[i];
+      }
+  
 //TODO:[GK] This does not work for a single RT  
   for (unsigned int i=0;i<element.dofs_per_cell;++i)
     {
@@ -2037,7 +2052,7 @@ void FETools::compute_component_wise(
 template
 void FETools::compute_block_renumbering (
   const FiniteElement<deal_II_dimension>& element,
-  std::vector<unsigned int>&, std::vector<unsigned int>&_indices);
+  std::vector<unsigned int>&, std::vector<unsigned int>&_indices, bool);
 template
 void FETools::get_interpolation_matrix<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &,

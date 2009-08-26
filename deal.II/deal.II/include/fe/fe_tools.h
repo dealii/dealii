@@ -163,10 +163,17 @@ class FETools
 				     /**
 				      * Compute the vector required to
 				      * renumber the dofs of a cell by
-				      * block. Furthermore,
-				      * compute the vector storing the
-				      * start indices of each local block
-				      * vector.
+				      * block. Furthermore, compute
+				      * the vector storing either the
+				      * start indices or the size of
+				      * each local block vector.
+				      *
+				      * If the @p bool parameter is
+				      * true, @p block_data is filled
+				      * with the start indices of each
+				      * local block. If it is false,
+				      * then the block sizes are
+				      * returned.
 				      *
 				      * @todo Which way does this
 				      * vector map the numbers?
@@ -175,7 +182,8 @@ class FETools
     static void compute_block_renumbering (
       const FiniteElement<dim,spacedim>&  fe,
       std::vector<unsigned int>& renumbering,
-      std::vector<unsigned int>& start_indices);
+      std::vector<unsigned int>& block_data,
+      bool return_start_indices = true);
     
 				     /**
 				      * @name Generation of local matrices
