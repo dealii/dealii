@@ -324,7 +324,7 @@ right hand side vectors.
 
 As a final note: in the @ref step_17 "step-17" example program, we will
 revisit the elastic problem laid out here, and will show how to solve it in
-parallel on a cluster of computers. The resulting program will thus be able to
+%parallel on a cluster of computers. The resulting program will thus be able to
 solve this problem to significantly higher accuracy, and more efficiently if
 this is required. In addition, in @ref step_20 "step-20", @ref step_21
 "step-21", as well as a few other of the later tutorial programs, we will
