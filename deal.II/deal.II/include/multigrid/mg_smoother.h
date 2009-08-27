@@ -130,6 +130,7 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				      * nonzero.
 				      */
     unsigned int debug;
+
 				     /**
 				      * Memory for auxiliary vectors.
 				      */
@@ -417,6 +418,8 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
     MGLevelObject<PointerMatrix<MATRIX, VECTOR> > matrices;
 
 };
+
+
 
 /**
  * Smoother using preconditioner classes.

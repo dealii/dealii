@@ -964,6 +964,15 @@ public:
   void vmult (VECTOR       &dst,
 	      const VECTOR &src) const;
 
+				       /** 
+					* Computes the action of the
+					* transposed preconditioner on
+					* <tt>src</tt>, storing the result
+					* in <tt>dst</tt>.
+					*/
+  void Tvmult (VECTOR       &dst,
+	       const VECTOR &src) const;
+
 				       /**
 					* Resets the preconditioner.
 					*/
@@ -1658,6 +1667,44 @@ PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
   for (unsigned int k=0; k<data.degree-1; ++k)
     {
       matrix_ptr->vmult (update2, dst);
+      update2 -= src;
+      update2.scale (diagonal_inverse);
+      const double rhokp = 1./(2.*sigma-rhok);
+      const double factor1 = rhokp * rhok, factor2 = 2.*rhokp/delta;
+      rhok = rhokp;
+      update1.sadd (factor1, factor2, update2);
+      dst -= update1;
+    }
+}
+
+
+
+template <class MATRIX, class VECTOR>
+inline
+void 
+PreconditionChebyshev<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
+					      const VECTOR &src) const
+{
+  Assert (is_initialized, ExcMessage("Preconditioner not initialized"));
+  double rhok  = delta / theta,  sigma = theta / delta;
+  if (data.nonzero_starting && !dst.all_zero())
+    {
+      matrix_ptr->Tvmult (update1, dst);
+      update1 -= src;
+      update1 /= theta;
+      update1.scale (diagonal_inverse);
+      dst -= update1;
+    }
+  else
+    {
+      dst.equ (1./theta, src);
+      dst.scale (diagonal_inverse);
+      update1.equ(-1.,dst);
+    }
+
+  for (unsigned int k=0; k<data.degree-1; ++k)
+    {
+      matrix_ptr->Tvmult (update2, dst);
       update2 -= src;
       update2.scale (diagonal_inverse);
       const double rhokp = 1./(2.*sigma-rhok);

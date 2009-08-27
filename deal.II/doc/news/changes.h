@@ -305,6 +305,14 @@ inconvenience this causes.
   (GK 2009/08/26)
   </p>
   </li>
+ 
+  <li><p> New: The class PreconditionChebyshev implements a 
+  preconditioner based on Chebyshev polynomials. It is based on matrix-vector 
+  products together with some vector updates.
+  <br>
+  (Martin Kronbichler 2009/08/25)
+  </p>
+  </li>
   
   <li>
   <p>
