@@ -187,14 +187,9 @@ void LaplaceProblem<dim>::setup_system ()
     }
 }
 
-				 // This is the standard assemble
-				 // function you have seen a lot of
-				 // times before.
-				 //
-				 // A small difference, though: we
-				 // assemble the matrix for Poisson
-				 // equation so we can solve the
-				 // Dirichlet boundary value problem.
+				 // This is the standard assemble function
+				 // for the Poisson equation you have seen a
+				 // lot of times before.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
@@ -219,34 +214,20 @@ void LaplaceProblem<dim>::assemble_system ()
       cell_matrix = 0;
       cell_rhs = 0;
 
-				       // As before, we want the
-				       // FEValues object to compute
-				       // the quantities which we told
-				       // him to compute in the
-				       // constructor using the update
-				       // flags.
+				       // As before, we want the FEValues
+				       // object to compute the quantities
+				       // which we told him to compute in
+				       // the constructor using the update
+				       // flags. Then, we loop over all
+				       // quadrature points and the local
+				       // matrix rows and columns for
+				       // computing the element
+				       // contribution. This is the same as
+				       // in step-4. For the right hand
+				       // side, we use a constant value of
+				       // 1.
       fe_values.reinit (cell);
-				       // It should be noted that the
-				       // creation of the
-				       // coefficient_values object is
-				       // done outside the loop over
-				       // all cells to avoid memory
-				       // allocation each time we
-				       // visit a new cell.
-      
-				       // With all this, the loops
-				       // then look like this (the
-				       // parentheses around the
-				       // product of the two gradients
-				       // are needed to indicate the
-				       // dot product; we have to
-				       // overrule associativity of
-				       // the operator* here, since
-				       // the compiler would otherwise
-				       // complain about an undefined
-				       // product of double*gradient
-				       // since it parses
-				       // left-to-right):
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -255,13 +236,9 @@ void LaplaceProblem<dim>::assemble_system ()
 				   * fe_values.shape_grad(j,q_point))
 				  * fe_values.JxW(q_point);
 
-					     // For the right hand
-					     // side, a constant value
-					     // is used again:
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point)
 			    * 1.0 * fe_values.JxW(q_point));
 	  };
-
 
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -279,19 +256,16 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // conditions on the finest level
 				   // are handled as usual.
   std::map<unsigned int,double> boundary_values;  
-  
+
   VectorTools::interpolate_boundary_values (mg_dof_handler,
 					    0,
 					    ZeroFunction<dim>(),
 					    boundary_values);
- 
-  
+
   MatrixTools::apply_boundary_values (boundary_values,
 				      system_matrix,
 				      solution,
 				      system_rhs);
-  
-
 }
 
 
