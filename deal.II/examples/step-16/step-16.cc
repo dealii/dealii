@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -94,22 +94,23 @@ class LaplaceProblem
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
-    MGDoFHandler<dim>      mg_dof_handler;
+    MGDoFHandler<dim>    mg_dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
 				     // Here are the new objects for
-				     // handling level matrices.
-    MGLevelObject<SparsityPattern> mg_sparsity;
-				     // We use number type float to
-				     // save memory. It's only a
-				     // preconditioner!
+				     // handling level matrices: sparsity
+				     // patterns and matrices. We use number
+				     // type float to save memory. It's only
+				     // a preconditioner!
+    MGLevelObject<SparsityPattern>      mg_sparsity;
     MGLevelObject<SparseMatrix<float> > mg_matrices;
     
     Vector<double>       solution;
     Vector<double>       system_rhs;
 };
+
 
 
 				 // This function is as before.
@@ -159,13 +160,13 @@ void LaplaceProblem<dim>::setup_system ()
 				   // now but may change in a future
 				   // revision). Remark, that the
 				   // finest level is nlevels-1.
-  const unsigned int nlevels = triangulation.n_levels();
 				   // We first have to resize the
 				   // container holding the
 				   // SparseMatrix classes, since they
 				   // have to release their
 				   // SparsityPattern before it can be
 				   // destroyed.
+  const unsigned int nlevels = triangulation.n_levels();
   mg_matrices.resize(0, nlevels-1);
   mg_sparsity.resize(0, nlevels-1);
 
