@@ -1,0 +1,14 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This example shows how a matrix-free method can be implemented for a
+second-order Poisson equation.
+
+<h3>Implementation of a matrix-vector product</h3>
+TODO: Describe how one gets to the piece of code we use below.
+
+<h3>Combination with multigrid</h3>
+TODO: Explain which kind of smoother we can use when we do not have 
+access to the matrix entries.
+
+<h3>Parallization issues</h3>
