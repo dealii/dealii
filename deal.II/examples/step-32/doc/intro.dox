@@ -31,8 +31,88 @@ processor cores within a single machine (with parallelization based on
 threads). This program's main job is therefore to introduce the changes that are
 necessary to utilize the availability of these %parallel compute resources.
 
-In addition to these changes, we also use a slightly different preconditioner,
-which we will discuss first.
+In addition to these changes, we also use a slightly different
+preconditioner, and we will have to make a number of changes that have
+to do with the fact that we want to solve a <i>realistic</i> problem
+here, not a model problem. The latter, in particular, will require
+that we think about scaling issues as well as what all those
+parameters and coefficients in the equations under consideration
+actually mean. We will discuss first the issues that affect changes in
+the mathematical formulation and solver structure, then how to
+parallelize things, and finally the actual testcase we will consider.
+
+
+<h3> The scaling of discretized equations </h3>
+
+Remember that we want to solve the following set of equations:
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
+  -\rho \; \beta \; T \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u} &=& 0,
+  \\
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot \kappa \nabla T &=& \gamma,
+@f}
+augmented by appropriate boundary and initial conditions. As discussed
+in @ref step_31 "step-31", we will solve this set of equations by
+solving for a Stokes problem first in each time step, and then moving
+the temperature equation forward by one time interval.
+
+The problem under consideration in this current section is with the
+Stokes problem: if we discretize it as usual, we get a linear system
+@f{eqnarray*}
+  M \; X
+  =
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+  \left(\begin{array}{c}
+    U \\ P
+  \end{array}\right)
+  =
+  \left(\begin{array}{c}
+    F_U \\ 0
+  \end{array}\right)
+  =
+  F
+@f}
+which in this program we will solve with a BiCGStab solver. BiCGStab
+iterates until the residual of these linear equations is below a
+certain tolerance, i.e. until
+@f[
+  \left\|
+  \left(\begin{array}{c}
+    F_U - A U^{(k)} - B P^{(k)}
+    \\
+    B^T U^{(k)}
+  \end{array}\right)
+  \right\|
+  < \text{Tol}.
+@f]
+This does not make any sense from the viewpoint of physical units: the
+quantities involved here have physical units so that the first part of
+the residual has units $\frac{\text{Pa}}{\text{m}}
+\text{m}^{\text{dim}}$ (most easily established by considering the
+term $(\nabla \cdot \mathbf v, p)_{\Omega}$ and considering that the
+pressure has units $\text{Pa}=\frac{\text{kg}}{\text{m\; s}^2}$ and
+the integration yields a factor of $\text{m}^{\text{dim}}$), whereas
+the second part of the residual has units
+$\frac{\text{m}^{\text{dim}}}{\text{s}}$. Taking the norm
+of this residual vector would yield a quantity with units
+$\sqrt{\left(\text{Pa}\text{m}^{\text{dim}-1}\right)^2 +
+       \left(\frac{\text{m}^{\text{dim}}}{\text{s}}\right)^2}$. This,
+quite obviously, does not make sense, and we should not be surprised
+that doing so is eventually going to come back hurting us.
+
+So why is this an issue here, but not in @ref step_31 "step-31"? The
+reason back there is that everything was nicely balanced: velocities
+were on the order of one, the pressure likewise, the viscosity was
+one, and the domain had a diameter of $\sqrt{2}$. As a result, while
+non-sensical, nothing bad happened.
 
 
 <h3> Changes to the Stokes preconditioner </h3>
@@ -418,7 +498,7 @@ convection in the earth mantle. As a consequence, we choose the following
 data, all of which appears in the program in units of meters and seconds (the
 SI system) even if we list them here in other units.
 
-As a reminder, the equations we want to solve are these:
+As a reminder, let us again state the equations we want to solve are these:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   -\rho \; \beta \; T \mathbf{g},
