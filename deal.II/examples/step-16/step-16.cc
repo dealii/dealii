@@ -432,9 +432,9 @@ void LaplaceProblem<dim>::solve ()
     mg_smoother(vector_memory);
 
 				   // Initialize the smoother with our
-				   // level matrices and the required,
+				   // level matrices and the (required)
 				   // additional data for the
-				   // relaxaton method with default
+				   // relaxation method with default
 				   // values.
   RELAXATION::AdditionalData smoother_data;
   mg_smoother.initialize(mg_matrices, smoother_data);
@@ -518,7 +518,7 @@ void LaplaceProblem<dim>::run ()
 
       if (cycle == 0)
 	{
-					   // Generate a simple hypercube grid.
+					   // Generate a simple hyperball grid.
 	  GridGenerator::hyper_ball(triangulation);
 	  static const HyperBallBoundary<dim> boundary;
 	  triangulation.set_boundary (0, boundary);
