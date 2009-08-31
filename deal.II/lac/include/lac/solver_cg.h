@@ -347,7 +347,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
     else
       g.equ(-1.,b);
     res = g.l2_norm();
-    
+
     conv = this->control().check(0,res);
     if (conv) 
       {
@@ -378,7 +378,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	conv = this->control().check(it,res);
 	if (conv)
 	  break;
-	
+
 	precondition.vmult(h,g);
 	
 	beta = gh;

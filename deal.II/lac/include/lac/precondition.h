@@ -916,6 +916,12 @@ public:
 					* eigenvalue.
 					*/
     double eig_cg_residual;
+
+				       /**
+					* Stores the inverse of the diagonal
+					* of the underlying matrix.
+					*/
+    VECTOR matrix_diagonal_inverse;
   };
 
   PreconditionChebyshev ();
@@ -929,9 +935,9 @@ public:
                                         * matrix has an operator
                                         * <tt>el(i,i)</tt> for accessing all
                                         * the elements in the
-                                        * diagonal. Otherwise, use the other
-                                        * <tt>initialize</tt> function to
-                                        * manually provide the diagonal.
+                                        * diagonal. Alternatively, the
+                                        * diagonal can be supplied with the
+                                        * help of the AdditionalData field.
 					*
 					* This function calculates an
 					* estimate of the eigenvalue range
@@ -940,19 +946,6 @@ public:
 					* iteration.
                                         */
   void initialize (const MATRIX         &matrix,
-		   const AdditionalData &additional_data = AdditionalData());
-
-                                       /**
-                                        * Second initialize function. Takes
-                                        * the matrix which is used to form
-                                        * the preconditioner, a vector
-                                        * containing the <i>inverse</i> of
-                                        * the diagonal of the input matrix,
-                                        * and additional flags if there are
-                                        * any.
-                                        */
-  void initialize (const MATRIX         &matrix,
-		   const VECTOR         &diagonal_inverse,
 		   const AdditionalData &additional_data = AdditionalData());
 
 				       /** 
@@ -985,12 +978,6 @@ private:
 					* matrix.
 					*/
   SmartPointer<const MATRIX> matrix_ptr;
-
-				       /**
-					* Stores the inverse of the diagonal
-					* of the underlying matrix.
-					*/
-  VECTOR diagonal_inverse;
 
 				       /**
 					* Internal vector used for
@@ -1545,27 +1532,18 @@ void
 PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 						  const AdditionalData &additional_data)
 {
-  VECTOR diagonal_inv (matrix.m());
-  for (unsigned int i=0; i<matrix.m(); ++i)
-    diagonal_inv(i) = 1./matrix.el(i,i);
-
-  initialize (matrix, diagonal_inv, additional_data);
-}
-
-
-template <class MATRIX, class VECTOR>
-inline
-void 
-PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
-						  const VECTOR &diagonal_inv,
-						  const AdditionalData &additional_data)
-{
   Assert (matrix.m() == matrix.n(), ExcMessage("Matrix not quadratic."));
   matrix_ptr = &matrix;
-  update1.reinit (diagonal_inv, true);
-  update2.reinit (diagonal_inv, true);
-  diagonal_inverse = diagonal_inv;
   data = additional_data;
+  if (data.matrix_diagonal_inverse.size() != matrix.m())
+    {
+      data.matrix_diagonal_inverse.reinit(matrix.m());
+      for (unsigned int i=0; i<matrix.m(); ++i)
+	data.matrix_diagonal_inverse(i) = 1./matrix.el(i,i);
+    }
+  update1.reinit (data.matrix_diagonal_inverse, true);
+  update2.reinit (data.matrix_diagonal_inverse, true);
+
 
 				 // calculate largest eigenvalue using a
 				 // hand-tuned CG iteration on the matrix
@@ -1578,16 +1556,16 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
   double max_eigenvalue, min_eigenvalue;
   {
     double eigen_beta_alpha = 0;
-  
+
     std::vector<double> diagonal;
     std::vector<double> offdiagonal;
-  
-    VECTOR rhs, g;
-    rhs.reinit(diagonal_inv, true);
-    rhs = 1./sqrt(matrix.m());
-    g.reinit(diagonal_inv, true);
 
-    int  it=0;
+    VECTOR rhs, g;
+    rhs.reinit(data.matrix_diagonal_inverse, true);
+    rhs = 1./sqrt(matrix.m());
+    g.reinit(data.matrix_diagonal_inverse, true);
+
+    unsigned int it=0;
     double res,gh,alpha,beta;
 
     g.equ(-1.,rhs);
@@ -1599,7 +1577,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
       {
 	it++;
 	matrix.vmult (update1, update2);
-	update1.scale (diagonal_inverse);
+	update1.scale (data.matrix_diagonal_inverse);
 	alpha = update2 * update1;
 	alpha = gh/alpha;
 	g.add (alpha, update1);
@@ -1654,13 +1632,13 @@ PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
       matrix_ptr->vmult (update1, dst);
       update1 -= src;
       update1 /= theta;
-      update1.scale (diagonal_inverse);
+      update1.scale (data.matrix_diagonal_inverse);
       dst -= update1;
     }
   else
     {
       dst.equ (1./theta, src);
-      dst.scale (diagonal_inverse);
+      dst.scale (data.matrix_diagonal_inverse);
       update1.equ(-1.,dst);
     }
 
@@ -1668,7 +1646,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
     {
       matrix_ptr->vmult (update2, dst);
       update2 -= src;
-      update2.scale (diagonal_inverse);
+      update2.scale (data.matrix_diagonal_inverse);
       const double rhokp = 1./(2.*sigma-rhok);
       const double factor1 = rhokp * rhok, factor2 = 2.*rhokp/delta;
       rhok = rhokp;
@@ -1692,13 +1670,13 @@ PreconditionChebyshev<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
       matrix_ptr->Tvmult (update1, dst);
       update1 -= src;
       update1 /= theta;
-      update1.scale (diagonal_inverse);
+      update1.scale (data.matrix_diagonal_inverse);
       dst -= update1;
     }
   else
     {
       dst.equ (1./theta, src);
-      dst.scale (diagonal_inverse);
+      dst.scale (data.matrix_diagonal_inverse);
       update1.equ(-1.,dst);
     }
 
@@ -1706,7 +1684,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
     {
       matrix_ptr->Tvmult (update2, dst);
       update2 -= src;
-      update2.scale (diagonal_inverse);
+      update2.scale (data.matrix_diagonal_inverse);
       const double rhokp = 1./(2.*sigma-rhok);
       const double factor1 = rhokp * rhok, factor2 = 2.*rhokp/delta;
       rhok = rhokp;
@@ -1723,7 +1701,7 @@ void PreconditionChebyshev<MATRIX,VECTOR>::clear ()
 {
   is_initialized = false;
   matrix_ptr = 0;
-  diagonal_inverse.reinit(0);
+  data.matrix_diagonal_inverse.reinit(0);
   update1.reinit(0);
   update2.reinit(0);
 }
