@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -542,14 +542,16 @@ class TableBase : public Subscriptor
     void reset_values ();
     
                                      /**
-                                      * Set the dimensions of this
-                                      * object to the sizes given in
-                                      * the argument, and newly
-                                      * allocate the required
-                                      * memory. Forget the previous
-                                      * content of the array.
+                                      * Set the dimensions of this object to
+                                      * the sizes given in the argument, and
+                                      * newly allocate the required
+                                      * memory. If <tt>fast</tt> is set to
+                                      * <tt>false</tt>, previous content is
+                                      * deleted, otherwise the memory is not
+                                      * touched.
                                       */
-    void reinit (const TableIndices<N> &new_size);
+    void reinit (const TableIndices<N> &new_size,
+		 const bool             fast = false);
 
 				     /**
 				      * Size of the table in direction
@@ -879,7 +881,8 @@ class Table<2,T> : public TableBase<2,T>
                                       * base class.
                                       */
     void reinit (const unsigned int size1,
-                 const unsigned int size2);
+                 const unsigned int size2,
+		 const bool         fast = false);
 
                                      /**
                                       * Access operator. Generate an
@@ -1607,7 +1610,8 @@ class TransposeTable : public TableBase<2,T>
                                       * base class.
                                       */
     void reinit (const unsigned int size1,
-                 const unsigned int size2);
+                 const unsigned int size2,
+		 const bool         fast = false);
 
                                      /**
                                       * Direct access to one element
@@ -1964,7 +1968,8 @@ TableBase<N,T>::fill (const T& value)
 template <int N, typename T>
 inline
 void
-TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
+TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
+			const bool             fast)
 {
   table_size = new_sizes;
   
@@ -2015,7 +2020,8 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
                                    // their values after calling 'new
                                    // double[val_size]' is
                                    // indetermined.
-  reset_values ();
+  if (fast == false)
+    reset_values ();
 }
 
 
@@ -2282,9 +2288,10 @@ template <typename T>
 inline
 void
 Table<2,T>::reinit (const unsigned int size1,
-                    const unsigned int size2)
+                    const unsigned int size2,
+		    const bool         fast)
 {
-  this->TableBase<2,T>::reinit (TableIndices<2> (size1, size2));
+  this->TableBase<2,T>::reinit (TableIndices<2> (size1, size2),fast);
 }
 
 
@@ -2430,9 +2437,10 @@ template <typename T>
 inline
 void
 TransposeTable<T>::reinit (const unsigned int size1,
-			   const unsigned int size2)
+			   const unsigned int size2,
+			   const bool         fast)
 {
-  this->TableBase<2,T>::reinit (TableIndices<2> (size2, size1));
+  this->TableBase<2,T>::reinit (TableIndices<2> (size2, size1),fast);
 }
 
 
