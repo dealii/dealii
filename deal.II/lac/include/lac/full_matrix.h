@@ -1030,7 +1030,7 @@ class FullMatrix : public Table<2,number>
 //@}
 ///@name Multiplications
 //@{
-    
+
 				     /**
 				      * Matrix-matrix-multiplication.
 				      *
@@ -1093,6 +1093,71 @@ class FullMatrix : public Table<2,number>
     void Tmmult (FullMatrix<number2>       &C,
 		 const FullMatrix<number2> &B,
 		 const bool                 adding=false) const;
+
+				     /**
+				      * Matrix-matrix-multiplication using
+				      * transpose of <tt>B</tt>.
+				      *
+				      * The optional parameter
+				      * <tt>adding</tt> determines, whether the
+				      * result is stored in <tt>C</tt> or added
+				      * to <tt>C</tt>.
+				      *
+				      * if (adding)
+				      *  <i>C += A*B<sup>T</sup></i>
+				      *
+				      * if (!adding)
+				      *  <i>C = A*B<sup>T</sup></i>
+				      *
+				      * Assumes that <tt>A</tt> and
+				      * <tt>B</tt> have compatible sizes and
+				      * that <tt>C</tt> already has the
+				      * right size.
+				      *
+				      * This function uses the BLAS function
+				      * Xgemm if the calling matrix has more
+				      * than 15 rows and BLAS was detected
+				      * during configuration. Using BLAS
+				      * usually results in considerable
+				      * performance gains.
+				      */
+    template<typename number2>
+    void mTmult (FullMatrix<number2>       &C,
+		 const FullMatrix<number2> &B,
+		 const bool                 adding=false) const;
+    
+				     /**
+				      * Matrix-matrix-multiplication using
+				      * transpose of <tt>this</tt> and
+				      * <tt>B</tt>.
+				      *
+				      * The optional parameter
+				      * <tt>adding</tt> determines, whether the
+				      * result is stored in <tt>C</tt> or added
+				      * to <tt>C</tt>.
+				      *
+				      * if (adding)
+				      *  <i>C += A<sup>T</sup>*B<sup>T</sup></i>
+				      *
+				      * if (!adding)
+				      *  <i>C = A<sup>T</sup>*B<sup>T</sup></i>
+				      *
+				      * Assumes that <tt>A</tt> and
+				      * <tt>B</tt> have compatible
+				      * sizes and that <tt>C</tt>
+				      * already has the right size.
+				      *
+				      * This function uses the BLAS function
+				      * Xgemm if the calling matrix has more
+				      * than 15 columns and BLAS was
+				      * detected during configuration. Using
+				      * BLAS usually results in considerable
+				      * performance gains.
+				      */
+    template<typename number2>
+    void TmTmult (FullMatrix<number2>       &C,
+		  const FullMatrix<number2> &B,
+		  const bool                 adding=false) const;
     
 				     /**
 				      * Matrix-vector-multiplication.

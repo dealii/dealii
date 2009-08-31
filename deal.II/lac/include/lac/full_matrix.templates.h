@@ -582,7 +582,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
        types_are_equal<number,float>::value)
       &&
       types_are_equal<number,number2>::value)
-    if (this->m() > 15)
+    if (this->n()*this->m()*src.n() > 300)
     {
 				       // In case we have the BLAS
 				       // function gemm detected at
@@ -628,24 +628,20 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 
   const unsigned int m = this->m(), n = src.n(), l = this->n();
 
-					// arrange the loops in a way 
-					// that we can access contiguous 
-					// fields at the innermost loop 
-					// (even though this introduces 
-					// a lot of writing into the 
-					// destination matrix)
-  if (!adding)
-    dst = (number2)0;
+					// arrange the loops in a way that
+					// we keep write operations low,
+					// (writing is usually more costly
+					// than reading), even though we
+					// need to access the data in src
+					// not in a contiguous way.
   for (unsigned int i=0; i<m; i++)
-    {
-      number2 * dst_ptr = &dst(i,0);
-      for (unsigned int k=0; k<l; k++)
-        {
-	  const number2 mult = (number2)(*this)(i,k);
-	  for (unsigned int j=0; j<n; j++)
-	    dst_ptr[j] += mult * (number2)(src(k,j));
-	}
-    }
+    for (unsigned int j=0; j<n; j++)
+      {
+        number2 add_value = adding ? dst(i,j) : 0.;
+	for (unsigned int k=0; k<l; k++)
+	  add_value += (number2)(*this)(i,k) * (number2)(src(k,j));
+	dst(i,j) = add_value;
+      }
 }
 
 
@@ -673,7 +669,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
        types_are_equal<number,float>::value)
       &&
       types_are_equal<number,number2>::value)
-    if (this->n() > 15)
+    if (this->n()*this->m()*src.n() > 300)
     {
 				       // In case we have the BLAS
 				       // function gemm detected at
@@ -720,24 +716,201 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 
   const unsigned int m = n(), n = src.n(), l = this->m();
 
-					// arrange the loops in a way 
-					// that we can access contiguous 
-					// fields at the innermost loop 
-					// (even though this introduces 
-					// a lot of writing into the 
-					// destination matrix)
-  if (!adding)
-    dst = (number2)0;
+					// arrange the loops in a way that
+					// we keep write operations low,
+					// (writing is usually more costly
+					// than reading), even though we
+					// need to access the data in src
+					// not in a contiguous way. However,
+					// we should usually end up in the
+					// optimized gemm operation in case
+					// the matrix is big, so this
+					// shouldn't be too bad.
   for (unsigned int i=0; i<m; i++)
+    for (unsigned int j=0; j<n; j++)
+      {
+        number2 add_value = adding ? dst(i,j) : 0.;
+	for (unsigned int k=0; k<l; k++)
+	  add_value += (number2)(*this)(k,i) * (number2)(src(k,j));
+	dst(i,j) = add_value;
+      }
+}
+
+
+
+template <typename number>
+template <typename number2>
+void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
+				 const FullMatrix<number2> &src,
+				 const bool                 adding) const
+{
+  Assert (!this->empty(), ExcEmptyMatrix());
+  Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
+  Assert (dst.n() == src.m(), ExcDimensionMismatch(dst.n(), src.m()));
+  Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
+
+				   // see if we can use BLAS algorithms
+				   // for this and if the type for 'number'
+				   // works for us (it is usually not
+				   // efficient to use BLAS for very small
+				   // matrices):
+#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+  if ((types_are_equal<number,double>::value
+       ||
+       types_are_equal<number,float>::value)
+      &&
+      types_are_equal<number,number2>::value)
+    if (this->n()*this->m()*src.m() > 300)
     {
-      number2 * dst_ptr = &dst(i,0);
-      for (unsigned int k=0; k<l; k++)
-        {
-	  const number2 mult = (number2)(*this)(k,i);
-	  for (unsigned int j=0; j<n; j++)
-	    dst_ptr[j] += mult * (number2)(src(k,j));
-	}
+				       // In case we have the BLAS
+				       // function gemm detected at
+				       // configure, we use that algorithm
+				       // for matrix-matrix multiplication
+				       // since it provides better
+				       // performance than the deal.II
+				       // native function (it uses cache
+				       // and register blocking in order to
+				       // access local data).
+				       //
+				       // Note that BLAS/LAPACK stores
+				       // matrix elements column-wise (i.e.,
+				       // all values in one column, then all
+				       // in the next, etc.), whereas the
+				       // FullMatrix stores them row-wise.
+				       // We ignore that difference, and
+				       // give our row-wise data to BLAS,
+				       // let BLAS build the product of
+				       // transpose matrices, and read the
+				       // result as if it were row-wise
+				       // again. In other words, we calculate 
+				       // (B A^T)^T, which is AB^T.
+
+      const int m = src.m();
+      const int n = this->m();
+      const int k = this->n();
+      const char *notrans = "n";
+      const char *trans = "t";
+
+      const number alpha = 1.;
+      const number beta = (adding == true) ? 1. : 0.;
+
+				       // Use the BLAS function gemm for
+				       // calculating the matrix-matrix
+				       // product.
+      internal::gemm_switch::gemm(trans, notrans, &m, &n, &k, &alpha, &src(0,0), &k,
+				  this->val, &k, &beta, &dst(0,0), &m);
+
+      return;
     }
+
+#endif
+
+  const unsigned int m = this->m(), n = src.m(), l = this->n();
+
+					// arrange the loops in a way that
+					// we keep write operations low,
+					// (writing is usually more costly
+					// than reading).
+  for (unsigned int i=0; i<m; i++)
+    for (unsigned int j=0; j<n; j++)
+      {
+        number2 add_value = adding ? dst(i,j) : 0.;
+	for (unsigned int k=0; k<l; k++)
+	  add_value += (number2)(*this)(i,k) * (number2)(src(j,k));
+	dst(i,j) = add_value;
+      }
+}
+
+
+
+template <typename number>
+template <typename number2>
+void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
+				  const FullMatrix<number2> &src,
+				  const bool                 adding) const
+{
+  Assert (!this->empty(), ExcEmptyMatrix());  
+  Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
+  Assert (n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
+  Assert (src.m() == dst.n(), ExcDimensionMismatch(src.m(), dst.n()));
+
+
+				   // see if we can use BLAS algorithms
+				   // for this and if the type for 'number'
+				   // works for us (it is usually not
+				   // efficient to use BLAS for very small
+				   // matrices):
+#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+  if ((types_are_equal<number,double>::value
+       ||
+       types_are_equal<number,float>::value)
+      &&
+      types_are_equal<number,number2>::value)
+    if (this->n()*this->m()*src.m() > 300)
+    {
+				       // In case we have the BLAS
+				       // function gemm detected at
+				       // configure, we use that algorithm
+				       // for matrix-matrix multiplication
+				       // since it provides better
+				       // performance than the deal.II
+				       // native function (it uses cache
+				       // and register blocking in order to
+				       // access local data).
+				       //
+				       // Note that BLAS/LAPACK stores
+				       // matrix elements column-wise (i.e.,
+				       // all values in one column, then all
+				       // in the next, etc.), whereas the
+				       // FullMatrix stores them row-wise.
+				       // We ignore that difference, and
+				       // give our row-wise data to BLAS,
+				       // let BLAS build the product of
+				       // transpose matrices, and read the
+				       // result as if it were row-wise
+				       // again. In other words, we calculate 
+				       // (B A)^T, which is A^T B^T.
+
+      const int m = src.n();
+      const int n = this->n();
+      const int k = this->m();
+      const char *trans = "t";
+
+      const number alpha = 1.;
+      const number beta = (adding == true) ? 1. : 0.;
+
+				       // Use the BLAS function gemm for
+				       // calculating the matrix-matrix
+				       // product.
+      internal::gemm_switch::gemm(trans, trans, &m, &n, &k, &alpha, &src(0,0), &k,
+				  this->val, &n, &beta, &dst(0,0), &m);
+
+      return;
+    }
+
+#endif
+
+  const unsigned int m = n(), n = src.m(), l = this->m();
+
+					// arrange the loops in a way that
+					// we keep write operations low,
+					// (writing is usually more costly
+					// than reading), even though we
+					// need to access the data in the
+					// calling matrix not in a
+					// contiguous way. However, we
+					// should usually end up in the
+					// optimized gemm operation in case
+					// the matrix is big, so this
+					// shouldn't be too bad.
+  for (unsigned int i=0; i<m; i++)
+    for (unsigned int j=0; j<n; j++)
+      {
+        number2 add_value = adding ? dst(i,j) : 0.;
+	for (unsigned int k=0; k<l; k++)
+	  add_value += (number2)(*this)(k,i) * (number2)(src(j,k));
+	dst(i,j) = add_value;
+      }
 }
 
 

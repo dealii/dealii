@@ -32,7 +32,7 @@ template<typename number> class FullMatrix;
 
 
 /**
- * A variant of FullMatrix using LAPACK functions whereever
+ * A variant of FullMatrix using LAPACK functions wherever
  * possible. In order to do this, the matrix is stored in transposed
  * order. The element access functions hide this fact by reverting the
  * transposition.

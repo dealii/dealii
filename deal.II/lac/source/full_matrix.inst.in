@@ -82,6 +82,10 @@ for (S1, S2 : REAL_SCALARS)
     template
       void FullMatrix<S1>::Tmmult<S2> (FullMatrix<S2>&, const FullMatrix<S2>&, const bool) const;
     template
+      void FullMatrix<S1>::mTmult<S2> (FullMatrix<S2>&, const FullMatrix<S2>&, const bool) const;
+    template
+      void FullMatrix<S1>::TmTmult<S2> (FullMatrix<S2>&, const FullMatrix<S2>&, const bool) const;
+    template
       void FullMatrix<S1>::invert<S2> (const FullMatrix<S2>&);
  
     template 
