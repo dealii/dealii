@@ -469,7 +469,7 @@ public:
   LaplaceOperator<dim,number>&
   operator = (const Tensor<2,dim> &tensor);
 
-  number transformation[dim][dim];
+  number transformation[dim*(dim+1)/2];
 };
 
 template<int dim,typename number>
@@ -490,20 +490,49 @@ void LaplaceOperator<dim,number>::transform (number* result) const
     temp_result[d] = result[d];
   for (unsigned int d=0; d<dim; ++d)
     {
-      number output = 0;
-      for (unsigned int e=0; e<dim; ++e)
-	output += transformation[d][e] * temp_result[e];
+      number output = transformation[d]*temp_result[d];
+      if (dim == 2)
+	output += transformation[2]*temp_result[1-d];
+      else if (dim == 3)
+	{
+	  if (d==0)
+	    output += transformation[3]*temp_result[1] + transformation[4]*temp_result[2];
+	  else if (d==1)
+	    output += transformation[3]*temp_result[0] + transformation[5]*temp_result[2];
+	  else
+	    output += transformation[4]*temp_result[0] + transformation[5]*temp_result[1];
+	}
       result[d] = output;
     }
 }
 
 template <int dim, typename number>
 LaplaceOperator<dim,number>&
-LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor)
+LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor) 
 {
-  for (unsigned int d=0;d<dim;++d)
-    for (unsigned int e=0;e<dim;++e)
-      transformation[d][e] = tensor[d][e];
+  if (dim == 2)
+    {
+      transformation[0] = tensor[0][0];
+      transformation[1] = tensor[1][1];
+      transformation[2] = tensor[0][1];
+      Assert (std::fabs(tensor[1][0]-tensor[0][1])<1e-15,
+	      ExcInternalError());
+    }
+  else if (dim == 3)
+    {
+      transformation[0] = tensor[0][0];
+      transformation[1] = tensor[1][1];
+      transformation[2] = tensor[2][2];
+      transformation[3] = tensor[0][1];
+      transformation[4] = tensor[0][2];
+      transformation[5] = tensor[1][2];
+      Assert (std::fabs(tensor[1][0]-tensor[0][1])<1e-15,
+	      ExcInternalError());
+      Assert (std::fabs(tensor[2][0]-tensor[0][2])<1e-15,
+	      ExcInternalError());
+      Assert (std::fabs(tensor[2][1]-tensor[1][2])<1e-15,
+	      ExcInternalError());
+    }
   return *this;
 }
 
@@ -851,7 +880,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<6; ++cycle)
+  for (unsigned int cycle=0; cycle<8-dim; ++cycle)
     {
       std::cout << "Cycle " << cycle << std::endl;
 
@@ -861,7 +890,7 @@ void LaplaceProblem<dim>::run ()
 	  GridGenerator::hyper_ball(triangulation);
 	  static const HyperBallBoundary<dim> boundary;
 	  triangulation.set_boundary (0, boundary);
-	  triangulation.refine_global (0);
+	  triangulation.refine_global (3-dim);
 	}
       triangulation.refine_global (1);
       setup_system ();

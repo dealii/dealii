@@ -59,6 +59,7 @@ include $D/common/Make.global_options
 # You may need to augment the lists of libraries when compiling your
 # program for other dimensions, or when using third party libraries
 libs.g   = $(lib-deal2-2d.g) \
+	   $(lib-deal2-3d.g) \
 	   $(lib-lac.g)      \
            $(lib-base.g)
 libs.o   = $(lib-deal2-2d.o) \
