@@ -103,8 +103,8 @@ the integration yields a factor of $\text{m}^{\text{dim}}$), whereas
 the second part of the residual has units
 $\frac{\text{m}^{\text{dim}}}{\text{s}}$. Taking the norm
 of this residual vector would yield a quantity with units
-$\sqrt{\left(\text{Pa}\text{m}^{\text{dim}-1}\right)^2 +
-       \left(\frac{\text{m}^{\text{dim}}}{\text{s}}\right)^2}$. This,
+$\text{m}^{\text{dim}-1} \sqrt{\left(\text{Pa}\right)^2 +
+       \left(\frac{\text{m}}{\text{s}}\right)^2}$. This,
 quite obviously, does not make sense, and we should not be surprised
 that doing so is eventually going to come back hurting us.
 
@@ -112,7 +112,60 @@ So why is this an issue here, but not in @ref step_31 "step-31"? The
 reason back there is that everything was nicely balanced: velocities
 were on the order of one, the pressure likewise, the viscosity was
 one, and the domain had a diameter of $\sqrt{2}$. As a result, while
-non-sensical, nothing bad happened.
+non-sensical, nothing bad happened. On the other hand, as we will explain
+below, things here will not be that simply scaled: $\eta$ will be around
+$10^{21}$, velocities on the order of $10^{-8}$, pressure around $10^8$, and
+the diameter of the domain is $10^7$. In other words, the order of magnitude
+for the first equation is going to be 
+$\eta\text{div}\varepsilon(\mathbf u) \approx 10^{21} \frac{10^{-8}}{(10^7)^2}
+\approx 10^{-1}$, whereas the second equation will be around
+$\text{div}{\mathbf u}\approx \frac{10^{-8}}{10^7} \approx 10^{-15}$. Well, so
+what this will lead to is this: if BiCGStab wants to make the residual small,
+it will almost entirely focus on the first set of equations because they are
+so much bigger, and ignore the divergence equation that describes mass
+conservation. That's exactly what happens: unless we set the tolerance to
+extremely small values, the resulting flow field is definitely not divergence
+free. As an auxiliary problem, it turns out that it is difficult to find a
+tolerance that always works; in practice, one often ends up with a tolerance
+that requires 30 or 40 iterations for most time steps, and 10,000 for some
+others. 
+
+So what's a numerical analyst to do in a case like this? The answer is to
+start at the root and first make sure that everything is mathematically
+consistent first. In our case, this means that if we want to solve the system
+of Stokes equations jointly, we have to scale them so that they all have the
+same physical dimensions. In our case, this means multiplying the second
+equation by something that has units $\frac{\text{Pa\; s}}{\text{m}}$; one
+choice is to multiply with $\frac{\eta}{L}$ where $L$ is a typical lengthscale
+in our domain. Using the %numbers above, this factor is around $10^{14}$, which
+just so happens to be the order of magnitude that would make the two equations
+numerically about the same. So, we now get this for the Stokes system:
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
+  -\rho \; \beta \; T \mathbf{g},
+  \\
+  \frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0.
+@f}
+The trouble with this is that the result is not symmetric any more (we have
+$\frac{\eta}{L} \nabla \cdot$ at the bottom left, but not its transpose
+operator at the top right). This, however, can be cured by introducing a
+scaled pressure $\hat p = \frac{L}{\eta}p$, and we get the scaled equations
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + 
+  \nabla \left(\frac{\eta}{L} \hat p\right) &=&
+  -\rho \; \beta \; T \mathbf{g},
+  \\
+  \frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0.
+@f}
+This is now symmetric. Obviously, we can easily recover the original pressure
+$p$ from the scaled pressure $\hat p$ that we compute as a result of this
+procedure.
+
+In the program below, we will introduce a factor
+<code>EquationData::pressure_scaling</code> that corresponds to
+$\frac{\eta}{L}$, and we will use this factor in the assembly of the system
+matrix and preconditioner. We will recover the unscaled pressure in the
+<code>output_results</code> function.
 
 
 <h3> Changes to the Stokes preconditioner </h3>
@@ -170,6 +223,16 @@ good as GMRES in this example. Keep in mind the discussion in the results
 section of the @ref step_22 "step-22" tutorial program, where we observed
 that BiCGStab does <i>not</i> like inner solves with CG, which made us
 prefer GMRES in step-31.
+
+As a final note, let us remark that in @ref step_31 "step-31" we computed the
+Schur complement $S=B A^{-1} B^T$ by approximating
+$-\text{div}(-\eta\Delta)^{-1}\nabla \approx \frac 1{\eta} \mathbf{1}$. Now,
+however, we have re-scaled the $B$ and $B^T$ operators. So $S$ should now
+approximate 
+$-\frac{\eta}{L}\text{div}(-\eta\Delta)^{-1}\nabla \frac{\eta}{L} \approx
+\left(\frac{\eta}{L}\right)^2 \frac 1{\eta} \mathbf{1}$.
+This is exactly the operator we use to approximate $S$.
+
 
 
 <h3> Changes to the artificial viscosity stabilization </h3>
@@ -500,10 +563,11 @@ SI system) even if we list them here in other units.
 
 As a reminder, let us again state the equations we want to solve are these:
 @f{eqnarray*}
-  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + 
+  \nabla \left( \frac{\eta}{L} \hat p\right) &=&
   -\rho \; \beta \; T \mathbf{g},
   \\
-  \nabla \cdot {\mathbf u} &=& 0,
+  \frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0,
   \\
   \frac{\partial T}{\partial t}
   +
@@ -528,6 +592,9 @@ the following quantities:
   R_1=(6371-35)\text{km}$. This domain is conveniently generated using the
   GridGenerator::hyper_shell() function, and we use a HyperShellBoundary
   objects for the inner and outer boundary.
+
+  These two numbers also provide us with the lengthscale $L$ we need for the
+  pressure scaling. We choose $L=R_1-R_0$.
 
   <li>At the interface between crust and mantle, the temperature is between
   500 and 900 degrees Celsius, whereas at its bottom it is around 4000 degrees
