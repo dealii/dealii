@@ -102,7 +102,7 @@ namespace parallel
 		    :
 		    iterators (i)
     {}
-        
+
 
     template <typename Iterators>
     inline
@@ -195,7 +195,7 @@ namespace parallel
       std::advance (std_cxx1x::get<2>(t), n);
       std::advance (std_cxx1x::get<3>(t), n);
     }
-    
+
 
 
 				     /**
@@ -220,7 +220,7 @@ namespace parallel
       ++std_cxx1x::get<1>(t);
       ++std_cxx1x::get<2>(t);
     }
-    
+
 				     /**
 				      * Advance a tuple of iterators by 1.
 				      */
@@ -234,7 +234,7 @@ namespace parallel
       ++std_cxx1x::get<2>(t);
       ++std_cxx1x::get<3>(t);
     }
-    
+
 
 
 				     /**
@@ -281,7 +281,7 @@ namespace parallel
       return (std_cxx1x::get<0>(a.iterators) !=
 	      std_cxx1x::get<0>(b.iterators));
     }
-    
+
 
 				     /**
 				      * Convert a function object of type F
@@ -309,7 +309,7 @@ namespace parallel
 		 p != range.end(); ++p)
 	      apply (f, p.iterators);
 	  }
-	
+
       private:
 					 /**
 					  * The stored function object.
@@ -376,7 +376,7 @@ namespace parallel
       return Body<F>(f);
     }
   }
-  
+
 				   /**
 				    * An algorithm that performs the action
 				    * <code>*out++ = predicate(*in++)</code>
@@ -695,9 +695,9 @@ namespace parallel
   }
 
 
-  
+
   namespace internal
-  {  
+  {
 #if DEAL_II_USE_MT == 1
 				     /**
 				      * A class that conforms to the Body
@@ -757,7 +757,7 @@ namespace parallel
 			neutral_element (r.neutral_element),
 			reductor (r.reductor)
 	  {}
-	
+
 					 /**
 					  * Join operation: merge the results
 					  * from computations on different
@@ -767,7 +767,7 @@ namespace parallel
 	  {
 	    result = reductor(result, r.result);
 	  }
-	
+
 					 /**
 					  * Execute the given function on the
 					  * specified range.
@@ -785,7 +785,7 @@ namespace parallel
 					  * every sub-range.
 					  */
 	const Function f;
-	
+
 					 /**
 					  * The neutral element with respect
 					  * to the reduction operation. This
@@ -803,9 +803,9 @@ namespace parallel
 					  */
 	const std_cxx1x::function<ResultType (ResultType, ResultType)> reductor;
     };
-#endif  
+#endif
   }
-  
+
 
 				   /**
 				    * This function works a lot like the
@@ -908,9 +908,55 @@ namespace parallel
     return reductor.result;
 #endif
   }
-  
+
 }
 
+
+namespace internal
+{
+  namespace Vector
+  {
+				     /**
+				      * If we do computations on vectors in
+				      * parallel (say, we add two vectors to
+				      * get a third, and we do the loop over
+				      * all elements in parallel), then this
+				      * variable determines the minimum number
+				      * of elements for which it is profitable
+				      * to split a range of elements any
+				      * further to distribute to different
+				      * threads.
+				      *
+				      * This variable is available as
+				      * a global writable variable in
+				      * order to allow the testsuite
+				      * to also test the parallel
+				      * case. By default, it is set to
+				      * several thousand elements,
+				      * which is a case that the
+				      * testsuite would not normally
+				      * encounter. As a consequence,
+				      * in the testsuite we set it to
+				      * one -- a value that's hugely
+				      * unprofitable but definitely
+				      * tests parallel operations.
+				      */
+    extern unsigned int minimum_parallel_grain_size;
+  }
+
+
+  namespace SparseMatrix
+  {
+				     /**
+				      * Like
+				      * internal::Vector::minimum_parallel_grain_size,
+				      * but now denoting the number of rows of
+				      * a matrix that should be worked on as a
+				      * minimum.
+				      */
+    extern unsigned int minimum_parallel_grain_size;
+  }
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

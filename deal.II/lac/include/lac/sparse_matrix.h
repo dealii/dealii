@@ -32,27 +32,13 @@ template <typename Matrix> class BlockMatrixBase;
  *@{
  */
 
-namespace internal
-{
-  namespace SparseMatrix
-  {
-				     /**
-				      * Like
-				      * internal::Vector::minimum_parallel_grain_size,
-				      * but now denoting the number of rows of
-				      * a matrix that should be worked on as a
-				      * minimum.
-				      */
-    extern unsigned int minimum_parallel_grain_size;
-  }
-}
 
 namespace SparseMatrixIterators
 {
 				   // forward declaration
   template <typename number, bool Constness>
   class Iterator;
-  
+
 				   /**
 				    * General template for sparse matrix
 				    * accessors. The first template argument
@@ -78,12 +64,12 @@ namespace SparseMatrixIterators
 					* Value of this matrix entry.
 					*/
       number value() const;
-   
+
     				       /**
 					* Value of this matrix entry.
 					*/
       number& value();
-   
+
 				       /**
 					* Return a reference to the matrix
 					* into which this accessor
@@ -93,9 +79,9 @@ namespace SparseMatrixIterators
 					*/
       const SparseMatrix<number>& get_matrix () const;
   };
-  
-  
-  
+
+
+
 				   /**
 				    * Accessor class for constant matrices,
 				    * used in the const_iterators. This
@@ -116,32 +102,32 @@ namespace SparseMatrixIterators
 					* used here.
 					*/
       typedef const SparseMatrix<number> MatrixType;
-      
+
 				       /**
 					* Constructor.
 					*/
       Accessor (MatrixType         *matrix,
 		const unsigned int  row,
 		const unsigned int  index);
-      
+
 				       /**
 					* Constructor. Construct the end
 					* accessor for the given matrix.
 					*/
       Accessor (MatrixType         *matrix);
-      
+
 				       /**
 					* Copy constructor to get from a
 					* non-const accessor to a const
 					* accessor.
 					*/
       Accessor (const SparseMatrixIterators::Accessor<number,false> &a);
-      
+
 				       /**
 					* Value of this matrix entry.
 					*/
       number value() const;
-      
+
 				       /**
 					* Return a reference to the matrix
 					* into which this accessor
@@ -150,27 +136,27 @@ namespace SparseMatrixIterators
 					* reference.
 					*/
       MatrixType & get_matrix () const;
-      
+
     private:
 				       /**
 					* Pointer to the matrix we use.
 					*/
       MatrixType *matrix;
-      
+
 				       /**
 					* Make the advance function of the
 					* base class available.
 					*/
       using SparsityPatternIterators::Accessor::advance;
-      
+
 				       /**
 					* Make iterator class a friend.
 					*/
       template <typename, bool>
       friend class Iterator;
   };
-  
-  
+
+
 				   /**
 				    * Accessor class for non-constant
 				    * matrices, used in the iterators. This
@@ -228,7 +214,7 @@ namespace SparseMatrixIterators
 					* The testcase oliver_01 checks that
 					* this actually works as intended.
 					*/
-      class Reference 
+      class Reference
       {
 	public:
 					   /**
@@ -256,28 +242,28 @@ namespace SparseMatrixIterators
 					    * matrix we presently point to.
 					    */
 	  const Reference & operator += (const number n) const;
-            
+
 					   /**
 					    * Subtract @p n from the element
 					    * of the matrix we presently
 					    * point to.
 					    */
 	  const Reference & operator -= (const number n) const;
-            
+
 					   /**
 					    * Multiply the element of the
 					    * matrix we presently point to
 					    * by @p n.
 					    */
 	  const Reference & operator *= (const number n) const;
-            
+
 					   /**
 					    * Divide the element of the
 					    * matrix we presently point to
 					    * by @p n.
 					    */
 	  const Reference & operator /= (const number n) const;
-            
+
 	private:
 					   /**
 					    * Pointer to the accessor that
@@ -301,7 +287,7 @@ namespace SparseMatrixIterators
       Accessor (MatrixType         *matrix,
 		const unsigned int  row,
 		const unsigned int  index);
-        
+
 				       /**
 					* Constructor. Construct the end
 					* accessor for the given matrix.
@@ -314,7 +300,7 @@ namespace SparseMatrixIterators
 					* reference.
 					*/
       Reference value() const;
-        
+
 				       /**
 					* Return a reference to the matrix
 					* into which this accessor
@@ -341,7 +327,7 @@ namespace SparseMatrixIterators
 					*/
       template <typename, bool>
       friend class Iterator;
-	
+
 				       /**
 					* Make the inner reference class a
 					* friend if the compiler has a bug
@@ -351,7 +337,7 @@ namespace SparseMatrixIterators
       friend class Reference;
 #endif
   };
-    
+
 
 
 				   /**
@@ -385,7 +371,7 @@ namespace SparseMatrixIterators
 					* Constructor. Create an iterator
 					* into the matrix @p matrix for the
 					* given row and the index within it.
-					*/ 
+					*/
       Iterator (MatrixType        *matrix,
 		const unsigned int row,
 		const unsigned int index);
@@ -395,14 +381,14 @@ namespace SparseMatrixIterators
 					* iterator for the given matrix.
 					*/
       Iterator (MatrixType *matrix);
-        
+
 				       /**
 					* Conversion constructor to get from
 					* a non-const iterator to a const
 					* iterator.
 					*/
       Iterator (const SparseMatrixIterators::Iterator<number,false> &i);
-        
+
 				       /**
 					* Prefix increment.
 					*/
@@ -455,7 +441,7 @@ namespace SparseMatrixIterators
 					* the other way round.
 					*/
       bool operator > (const Iterator &) const;
-        
+
     private:
 				       /**
 					* Store an object of the
@@ -463,7 +449,7 @@ namespace SparseMatrixIterators
 					*/
       Accessor<number,Constness> accessor;
   };
-    
+
 }
 
 
@@ -514,7 +500,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * norms.
 				      */
     typedef typename numbers::NumberTraits<number>::real_type real_type;
-    
+
                                      /**
                                       * Typedef of an STL conforming iterator
                                       * class walking over all the nonzero
@@ -558,7 +544,7 @@ class SparseMatrix : public virtual Subscriptor
                                           */
         static const bool zero_addition_can_be_elided = true;
     };
-    
+
 /**
  * @name Constructors and initalization.
  */
@@ -636,7 +622,7 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     SparseMatrix (const SparsityPattern &sparsity,
 		  const IdentityMatrix  &id);
-    
+
 				     /**
 				      * Destructor. Free all memory, but do not
 				      * release the memory of the sparsity
@@ -644,7 +630,7 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     virtual ~SparseMatrix ();
 
-				     /** 
+				     /**
 				      * Copy operator. Since copying
 				      * entire sparse matrices is a
 				      * very expensive operation, we
@@ -679,7 +665,7 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     SparseMatrix<number> &
     operator= (const IdentityMatrix  &id);
-    
+
                                      /**
                                       * This operator assigns a scalar to
                                       * a matrix. Since this does usually
@@ -733,7 +719,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * previously tied to.
 				      */
     virtual void clear ();
-//@}    
+//@}
 /**
  * @name Information on the matrix
  */
@@ -754,7 +740,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * $m \times n$.
 				      */
     unsigned int m () const;
-    
+
 				     /**
 				      * Return the dimension of the
 				      * range space.  To remember: the
@@ -790,7 +776,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * value is greater than threshold).
 				      */
     unsigned int n_actually_nonzero_elements (const double threshold = 0.) const;
-    
+
 				     /**
 				      * Return a (constant) reference
 				      * to the underlying sparsity
@@ -812,7 +798,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * MemoryConsumption.
 				      */
     unsigned int memory_consumption () const;
-    
+
 //@}
 /**
  * @name Modifying entries
@@ -1034,13 +1020,13 @@ class SparseMatrix : public virtual Subscriptor
 				      * fixed factor.
 				      */
     SparseMatrix & operator *= (const number factor);
-    
+
 				     /**
 				      * Divide the entire matrix by a
 				      * fixed factor.
 				      */
     SparseMatrix & operator /= (const number factor);
-    
+
 				     /**
 				      * Symmetrize the matrix by
 				      * forming the mean value between
@@ -1067,7 +1053,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * SparsityPattern::symmetrize().
 				      */
     void symmetrize ();
-    
+
 				     /**
 				      * Copy the given matrix to this
 				      * one.  The operation throws an
@@ -1134,7 +1120,7 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     template <typename ForwardIterator>
     void copy_from (const ForwardIterator begin,
-		    const ForwardIterator end);    
+		    const ForwardIterator end);
 
 				     /**
 				      * Copy the nonzero entries of a
@@ -1148,7 +1134,7 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     template <typename somenumber>
     void copy_from (const FullMatrix<somenumber> &matrix);
-    
+
 				     /**
 				      * Add <tt>matrix</tt> scaled by
 				      * <tt>factor</tt> to this matrix,
@@ -1168,14 +1154,14 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     template <typename somenumber>
     void add (const number factor,
-	      const SparseMatrix<somenumber> &matrix);    
-    
+	      const SparseMatrix<somenumber> &matrix);
+
 //@}
 /**
  * @name Entry Access
  */
 //@{
-    
+
 				     /**
 				      * Return the value of the entry
 				      * (<i>i,j</i>).  This may be an
@@ -1272,7 +1258,7 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     number raw_entry (const unsigned int row,
 		      const unsigned int index) const;
-    
+
     				     /**
 				      * @internal @deprecated Use iterator or
 				      * const_iterator instead!
@@ -1330,14 +1316,14 @@ class SparseMatrix : public virtual Subscriptor
 				      * with BlockVector objects, you should
 				      * consider using a BlockSparseMatrix as
 				      * well.
-				      * 
+				      *
                                       * Source and destination must
                                       * not be the same vector.
 				      */
     template <class OutVector, class InVector>
     void vmult (OutVector& dst,
 		const InVector& src) const;
-    
+
 				     /**
 				      * Matrix-vector multiplication:
 				      * let <i>dst = M<sup>T</sup>*src</i> with
@@ -1358,14 +1344,14 @@ class SparseMatrix : public virtual Subscriptor
 				      * with BlockVector objects, you should
 				      * consider using a BlockSparseMatrix as
 				      * well.
-				      * 
+				      *
                                       * Source and destination must
                                       * not be the same vector.
 				      */
     template <class OutVector, class InVector>
     void Tvmult (OutVector& dst,
 		 const InVector& src) const;
-  
+
 				     /**
 				      * Adding Matrix-vector
 				      * multiplication. Add
@@ -1385,14 +1371,14 @@ class SparseMatrix : public virtual Subscriptor
 				      * with BlockVector objects, you should
 				      * consider using a BlockSparseMatrix as
 				      * well.
-				      * 
+				      *
                                       * Source and destination must
                                       * not be the same vector.
 				      */
     template <class OutVector, class InVector>
     void vmult_add (OutVector& dst,
 		    const InVector& src) const;
-    
+
 				     /**
 				      * Adding Matrix-vector
 				      * multiplication. Add
@@ -1415,14 +1401,14 @@ class SparseMatrix : public virtual Subscriptor
 				      * with BlockVector objects, you should
 				      * consider using a BlockSparseMatrix as
 				      * well.
-				      * 
+				      *
                                       * Source and destination must
                                       * not be the same vector.
 				      */
     template <class OutVector, class InVector>
     void Tvmult_add (OutVector& dst,
 		     const InVector& src) const;
-  
+
 				     /**
 				      * Return the square of the norm
 				      * of the vector $v$ with respect
@@ -1460,7 +1446,7 @@ class SparseMatrix : public virtual Subscriptor
     template <typename somenumber>
     somenumber matrix_scalar_product (const Vector<somenumber> &u,
 				      const Vector<somenumber> &v) const;
-    
+
 				     /**
 				      * Compute the residual of an
 				      * equation <i>Mx=b</i>, where
@@ -1519,7 +1505,7 @@ class SparseMatrix : public virtual Subscriptor
 		const SparseMatrix<numberB> &B,
 		const Vector<numberV>       &V = Vector<numberV>(),
 		const bool                   rebuild_sparsity_pattern = true) const;
-    
+
 				     /**
 				      * Perform the matrix-matrix
 				      * multiplication with the transpose of
@@ -1560,13 +1546,13 @@ class SparseMatrix : public virtual Subscriptor
 		 const SparseMatrix<numberB> &B,
 		 const Vector<numberV>       &V = Vector<numberV>(),
 		 const bool                   rebuild_sparsity_pattern = true) const;
-    
+
 //@}
 /**
  * @name Matrix norms
  */
 //@{
-    
+
     				     /**
 				      * Return the $l_1$-norm of the matrix,
 				      * that is $|M|_1=\max_{\mathrm{all\
@@ -1608,7 +1594,7 @@ class SparseMatrix : public virtual Subscriptor
  * @name Preconditioning methods
  */
 //@{
-    
+
 				     /**
 				      * Apply the Jacobi
 				      * preconditioner, which
@@ -1649,7 +1635,7 @@ class SparseMatrix : public virtual Subscriptor
     void precondition_SOR (Vector<somenumber>       &dst,
 			   const Vector<somenumber> &src,
  			   const number              om = 1.) const;
-    
+
 				     /**
 				      * Apply transpose SOR
 				      * preconditioning matrix to
@@ -1659,7 +1645,7 @@ class SparseMatrix : public virtual Subscriptor
     void precondition_TSOR (Vector<somenumber>       &dst,
 			    const Vector<somenumber> &src,
 			    const number              om = 1.) const;
-    
+
 				     /**
 				      * Perform SSOR preconditioning
 				      * in-place.  Apply the
@@ -1818,7 +1804,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * non-constant matrices.
 				      */
     iterator end ();
-    
+
 				     /**
 				      * STL-like iterator with the first entry
 				      * of row <tt>r</tt>. This is the version
@@ -1847,7 +1833,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * iterator for the last row of a matrix.
 				      */
     const_iterator end (const unsigned int r) const;
-    
+
 				     /**
 				      * STL-like iterator with the first entry
 				      * of row <tt>r</tt>. This is the version
@@ -1951,7 +1937,7 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     void print_pattern(std::ostream& out,
 		       const double threshold = 0.) const;
-    
+
 				     /**
 				      * Write the data of this object
 				      * en bloc to a file. This is
@@ -2073,7 +2059,7 @@ class SparseMatrix : public virtual Subscriptor
                                       * requires such an operation.
                                       */
     void prepare_set();
-    
+
   private:
 				     /**
 				      * Pointer to the sparsity
@@ -2118,12 +2104,12 @@ class SparseMatrix : public virtual Subscriptor
     template <typename somenumber> friend class SparseMatrix;
     template <typename somenumber> friend class SparseLUDecomposition;
     template <typename> friend class SparseILU;
-    
+
     				       /**
 				        * To allow it calling private
                                         * prepare_add() and
                                         * prepare_set().
-				        */  
+				        */
     template <typename> friend class BlockMatrixBase;
 };
 
@@ -2153,9 +2139,9 @@ unsigned int SparseMatrix<number>::n () const
 
 
 				        // Inline the set() and add()
-				        // functions, since they will be 
+				        // functions, since they will be
                                         // called frequently.
-template <typename number>  
+template <typename number>
 inline
 void
 SparseMatrix<number>::set (const unsigned int i,
@@ -2185,8 +2171,8 @@ SparseMatrix<number>::set (const unsigned int i,
 
 
 
-template <typename number>  
-template <typename number2>  
+template <typename number>
+template <typename number2>
 inline
 void
 SparseMatrix<number>::set (const std::vector<unsigned int> &indices,
@@ -2204,8 +2190,8 @@ SparseMatrix<number>::set (const std::vector<unsigned int> &indices,
 
 
 
-template <typename number>  
-template <typename number2>  
+template <typename number>
+template <typename number2>
 inline
 void
 SparseMatrix<number>::set (const std::vector<unsigned int> &row_indices,
@@ -2225,8 +2211,8 @@ SparseMatrix<number>::set (const std::vector<unsigned int> &row_indices,
 
 
 
-template <typename number>  
-template <typename number2>  
+template <typename number>
+template <typename number2>
 inline
 void
 SparseMatrix<number>::set (const unsigned int               row,
@@ -2243,7 +2229,7 @@ SparseMatrix<number>::set (const unsigned int               row,
 
 
 
-template <typename number>  
+template <typename number>
 inline
 void
 SparseMatrix<number>::add (const unsigned int i,
@@ -2276,8 +2262,8 @@ SparseMatrix<number>::add (const unsigned int i,
 
 
 
-template <typename number>  
-template <typename number2>  
+template <typename number>
+template <typename number2>
 inline
 void
 SparseMatrix<number>::add (const std::vector<unsigned int> &indices,
@@ -2295,8 +2281,8 @@ SparseMatrix<number>::add (const std::vector<unsigned int> &indices,
 
 
 
-template <typename number>  
-template <typename number2>  
+template <typename number>
+template <typename number2>
 inline
 void
 SparseMatrix<number>::add (const std::vector<unsigned int> &row_indices,
@@ -2316,8 +2302,8 @@ SparseMatrix<number>::add (const std::vector<unsigned int> &row_indices,
 
 
 
-template <typename number>  
-template <typename number2>  
+template <typename number>
+template <typename number2>
 inline
 void
 SparseMatrix<number>::add (const unsigned int               row,
@@ -2411,7 +2397,7 @@ number SparseMatrix<number>::diag_element (const unsigned int i) const
   Assert (cols != 0, ExcNotInitialized());
   Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
   Assert (i<m(), ExcInvalidIndex1(i));
-  
+
 				   // Use that the first element in each
 				   // row of a quadratic matrix is the main
 				   // diagonal
@@ -2427,7 +2413,7 @@ number & SparseMatrix<number>::diag_element (const unsigned int i)
   Assert (cols != 0, ExcNotInitialized());
   Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
   Assert (i<m(), ExcInvalidIndex1(i));
-  
+
 				   // Use that the first element in each
 				   // row of a quadratic matrix is the main
 				   // diagonal
@@ -2458,7 +2444,7 @@ number SparseMatrix<number>::global_entry (const unsigned int j) const
   Assert (cols != 0, ExcNotInitialized());
   Assert (j < cols->n_nonzero_elements(),
 	  ExcIndexRange (j, 0, cols->n_nonzero_elements()));
-  
+
   return val[j];
 }
 
@@ -2528,7 +2514,7 @@ namespace SparseMatrixIterators
 		  SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern()),
 		  matrix (matrix)
   {}
-    
+
 
 
   template <typename number>
@@ -2539,7 +2525,7 @@ namespace SparseMatrixIterators
 		  SparsityPatternIterators::Accessor (a),
 		  matrix (&a.get_matrix())
   {}
-    
+
 
 
   template <typename number>
@@ -2551,7 +2537,7 @@ namespace SparseMatrixIterators
   }
 
 
-    
+
   template <typename number>
   inline
   typename Accessor<number, true>::MatrixType &
@@ -2561,7 +2547,7 @@ namespace SparseMatrixIterators
   }
 
 
-    
+
   template <typename number>
   inline
   Accessor<number, false>::Reference::
@@ -2570,9 +2556,9 @@ namespace SparseMatrixIterators
 		  :
 		  accessor (accessor)
   {}
-    
 
-    
+
+
   template <typename number>
   inline
   Accessor<number, false>::Reference::operator number() const
@@ -2580,9 +2566,9 @@ namespace SparseMatrixIterators
     return accessor->matrix->raw_entry(accessor->a_row,
 				       accessor->a_index);
   }
-    
 
-    
+
+
   template <typename number>
   inline
   const typename Accessor<number, false>::Reference &
@@ -2592,9 +2578,9 @@ namespace SparseMatrixIterators
     accessor->matrix->set (accessor->row(), accessor->column(), n);
     return *this;
   }
-    
 
-    
+
+
   template <typename number>
   inline
   const typename Accessor<number, false>::Reference &
@@ -2605,9 +2591,9 @@ namespace SparseMatrixIterators
 			   static_cast<number>(*this) + n);
     return *this;
   }
-    
 
-    
+
+
   template <typename number>
   inline
   const typename Accessor<number, false>::Reference &
@@ -2631,9 +2617,9 @@ namespace SparseMatrixIterators
 			   static_cast<number>(*this)*n);
     return *this;
   }
-    
 
-    
+
+
   template <typename number>
   inline
   const typename Accessor<number, false>::Reference &
@@ -2644,9 +2630,9 @@ namespace SparseMatrixIterators
 			   static_cast<number>(*this)/n);
     return *this;
   }
-    
 
-    
+
+
   template <typename number>
   inline
   Accessor<number,false>::
@@ -2669,7 +2655,7 @@ namespace SparseMatrixIterators
 		  SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern()),
 		  matrix (matrix)
   {}
-    
+
 
 
   template <typename number>
@@ -2682,7 +2668,7 @@ namespace SparseMatrixIterators
 
 
 
-          
+
   template <typename number>
   inline
   typename Accessor<number, false>::MatrixType &
@@ -2692,7 +2678,7 @@ namespace SparseMatrixIterators
   }
 
 
-    
+
   template <typename number, bool Constness>
   inline
   Iterator<number, Constness>::
@@ -2722,8 +2708,8 @@ namespace SparseMatrixIterators
 		  :
 		  accessor(*i)
   {}
-    
-    
+
+
 
   template <typename number, bool Constness>
   inline
@@ -2792,7 +2778,7 @@ namespace SparseMatrixIterators
   {
     Assert (&accessor.get_matrix() == &other.accessor.get_matrix(),
 	    ExcInternalError());
-      
+
     return (accessor < other.accessor);
   }
 
@@ -2805,7 +2791,7 @@ namespace SparseMatrixIterators
   {
     return (other < *this);
   }
-    
+
 }
 
 

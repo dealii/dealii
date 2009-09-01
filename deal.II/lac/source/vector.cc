@@ -16,27 +16,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-namespace internal
-{
-  namespace Vector
-  {
-				     // set minimum grain size. this value is
-				     // roughly in accordance with the curve
-				     // in the TBB book (fig 3.2) that shows
-				     // run time as a function of grain size
-				     // -- there, values from 200 upward are
-				     // so that the scheduling overhead
-				     // amortizes well (for very large values
-				     // in that example, the grain size is too
-				     // large to split the work load into
-				     // enough chunks and the problem becomes
-				     // badly balanced)
-    unsigned int minimum_parallel_grain_size = 1000;
-  }
-}
-
-
 #include "vector.inst"
 
 // do a few functions that currently don't fit the scheme because they have
@@ -47,7 +26,7 @@ namespace internal
 #define TEMPL_COPY_CONSTRUCTOR(S1,S2)			\
   template Vector<S1>::Vector (const Vector<S2> &)
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG    
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 TEMPL_COPY_CONSTRUCTOR(double,float);
 TEMPL_COPY_CONSTRUCTOR(float,double);
 
@@ -78,7 +57,7 @@ TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<long double>);
   Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST \
   operator=<S2>(const Vector<S2>&);		      \
   template void Vector<S1>::scale (const Vector<S2>&);	\
-  template void Vector<S1>::equ (const S1, const Vector<S2>&)    
+  template void Vector<S1>::equ (const S1, const Vector<S2>&)
 
 TEMPL_OP_EQ(double,float);
 TEMPL_OP_EQ(float,double);

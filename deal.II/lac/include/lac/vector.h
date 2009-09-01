@@ -53,32 +53,6 @@ template <typename> class BlockVector;
 
 template <typename> class VectorView;
 
-namespace internal
-{
-  namespace Vector
-  {
-				     /**
-				      * If we do computations on vectors in
-				      * parallel (say, we add two vectors to
-				      * get a third, and we do the loop over
-				      * all elements in parallel), then this
-				      * variable determines the minimum number
-				      * of elements for which it is profitable
-				      * to split a range of elements any
-				      * further to distribute to different
-				      * threads.
-				      *
-				      * This variable is available as a global
-				      * writable variable in order to allow
-				      * the testsuite to also test the
-				      * parallel case. By default, it is set
-				      * to several thousand elements, which is
-				      * a case that the testsuite would not
-				      * normally encounter.
-				      */
-    extern unsigned int minimum_parallel_grain_size;
-  }
-}
 
 
 
@@ -103,7 +77,7 @@ namespace internal
  * @<std::complex@<long double@>@></tt>; others can be generated in
  * application programs (see the section on @ref Instantiations in the
  * manual).
- * 
+ *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
@@ -147,9 +121,9 @@ class Vector : public Subscriptor
     typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
   public:
-    
+
 				     /**
-				      * @name 1: Basic Object-handling 
+				      * @name 1: Basic Object-handling
 				      */
 				     //@{
 				     /**
@@ -157,7 +131,7 @@ class Vector : public Subscriptor
 				      *  dimension zero.
 				      */
     Vector ();
-    
+
 				     /**
 				      * Copy-constructor. Sets the dimension
                                       * to that of the given vector, and
@@ -170,7 +144,7 @@ class Vector : public Subscriptor
     Vector (const Vector<Number> &v);
 
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG    
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 				     /**
 				      * Copy constructor taking a vector of
 				      * another data type. This will fail if
@@ -195,7 +169,7 @@ class Vector : public Subscriptor
     explicit
     Vector (const Vector<OtherNumber> &v);
 #endif
-    
+
 #ifdef DEAL_II_USE_PETSC
                                      /**
                                       * Another copy constructor: copy the
@@ -260,7 +234,7 @@ class Vector : public Subscriptor
                                       */
     Vector (const TrilinosWrappers::Vector &v);
 #endif
-    
+
 				     /**
 				      * Constructor. Set dimension to
 				      * @p n and initialize all
@@ -290,7 +264,7 @@ class Vector : public Subscriptor
     template <typename InputIterator>
     Vector (const InputIterator first,
             const InputIterator last);
-    
+
 				     /**
 				      * Destructor, deallocates
 				      * memory. Made virtual to allow
@@ -303,7 +277,7 @@ class Vector : public Subscriptor
                                       * This function does nothing but is
                                       * there for compatibility with the
                                       * @p PETScWrappers::Vector class.
-                                      * 
+                                      *
                                       * For the PETSc vector wrapper class,
                                       * thios function compresses the
                                       * underlying representation of the PETSc
@@ -344,10 +318,10 @@ class Vector : public Subscriptor
 				      * order to allow for derived
 				      * classes to handle memory
 				      * separately.
-				      */ 
+				      */
     virtual void reinit (const unsigned int N,
 			 const bool         fast=false);
-    
+
 				     /**
 				      * Change the dimension to that of the
 				      * vector @p V. The same applies as for
@@ -388,9 +362,9 @@ class Vector : public Subscriptor
 				      * order to allow for derived
 				      * classes to handle memory
 				      * separately.
-				      */ 
+				      */
     virtual void swap (Vector<Number> &v);
-    
+
 				     /**
                                       * Set all components of the vector to
                                       * the given number @p s. Simply pass
@@ -411,13 +385,13 @@ class Vector : public Subscriptor
                                       * be disallowed in the future.
 				      */
     Vector<Number> & operator = (const Number s);
-    
+
 				     /**
 				      * Copy the given vector. Resize the
 				      * present vector if necessary.
 				      */
     Vector<Number> & operator= (const Vector<Number> &c);
-    
+
 				     /**
 				      * Copy the given vector. Resize the
 				      * present vector if necessary.
@@ -431,7 +405,7 @@ class Vector : public Subscriptor
                                       * vector.
                                       */
     Vector<Number> & operator= (const BlockVector<Number> &v);
-    
+
 #ifdef DEAL_II_USE_PETSC
                                      /**
                                       * Another copy operator: copy the
@@ -515,7 +489,7 @@ class Vector : public Subscriptor
                                       */
     template <typename Number2>
     bool operator == (const Vector<Number2> &v) const;
-    
+
                                      /**
                                       * Test for inequality. This function
                                       * assumes that the present vector and
@@ -526,7 +500,7 @@ class Vector : public Subscriptor
                                       */
     template <typename Number2>
     bool operator != (const Vector<Number2> &v) const;
-    
+
 				     /**
 				      * Return the scalar product of
 				      * two vectors.  The return type
@@ -614,7 +588,7 @@ class Vector : public Subscriptor
 				      * thrown.
                                       */
     bool is_non_negative () const;
-    
+
 				     /**
 				      * Make the @p Vector class a bit like
 				      * the <tt>vector<></tt> class of the C++
@@ -640,7 +614,7 @@ class Vector : public Subscriptor
 				      * Return a constant iterator pointing to
 				      * the element past the end of the array.
 				      */
-    const_iterator end () const;  
+    const_iterator end () const;
 				     //@}
 
 
@@ -653,7 +627,7 @@ class Vector : public Subscriptor
 				      * component.
 				      */
     Number operator() (const unsigned int i) const;
-    
+
 				     /**
 				      * Access the @p ith component
 				      * as a writeable reference.
@@ -666,7 +640,7 @@ class Vector : public Subscriptor
 				      * @name 3: Modification of vectors
 				      */
 				     //@{
-    
+
 				     /**
 				      * Add the given vector to the present
 				      * one.
@@ -685,26 +659,26 @@ class Vector : public Subscriptor
 				      * scalar and not a vector.
 				      */
     void add (const Number s);
-    
+
 				     /**
 				      * Simple vector addition, equal to the
 				      * <tt>operator +=</tt>.
 				      */
     void add (const Vector<Number> &V);
-    
+
 				     /**
 				      * Simple addition of a multiple of a
 				      * vector, i.e. <tt>*this += a*V</tt>.
 				      */
     void add (const Number a, const Vector<Number> &V);
-    
+
 				     /**
 				      * Multiple addition of scaled vectors,
 				      * i.e. <tt>*this += a*V+b*W</tt>.
 				      */
     void add (const Number a, const Vector<Number> &V,
 	      const Number b, const Vector<Number> &W);
-    
+
 				     /**
 				      * Scaling and simple vector addition,
 				      * i.e.
@@ -712,7 +686,7 @@ class Vector : public Subscriptor
 				      */
     void sadd (const Number          s,
                const Vector<Number> &V);
-    
+
 				     /**
 				      * Scaling and simple addition, i.e.
 				      * <tt>*this = s*(*this)+a*V</tt>.
@@ -720,7 +694,7 @@ class Vector : public Subscriptor
     void sadd (const Number          s,
                const Number          a,
                const Vector<Number> &V);
-    
+
 				     /**
 				      * Scaling and multiple addition.
 				      */
@@ -729,7 +703,7 @@ class Vector : public Subscriptor
 	       const Vector<Number> &V,
                const Number          b,
                const Vector<Number> &W);
-    
+
 				     /**
 				      * Scaling and multiple addition.
 				      * <tt>*this = s*(*this)+a*V + b*W + c*X</tt>.
@@ -738,10 +712,10 @@ class Vector : public Subscriptor
                const Number          a,
 	       const Vector<Number> &V,
                const Number          b,
-               const Vector<Number> &W, 
+               const Vector<Number> &W,
 	       const Number          c,
                const Vector<Number> &X);
-    
+
 				     /**
 				      * Scale each element of the
 				      * vector by the given factor.
@@ -754,7 +728,7 @@ class Vector : public Subscriptor
 				      */
     void scale (const Number factor);
 
-    
+
 				     /**
 				      * Scale each element of the
 				      * vector by a constant
@@ -768,7 +742,7 @@ class Vector : public Subscriptor
 				      * given value.
 				      */
     Vector<Number> & operator /= (const Number factor);
-    
+
 				     /**
 				      * Scale each element of this
 				      * vector by the corresponding
@@ -779,7 +753,7 @@ class Vector : public Subscriptor
 				      * diagonal scaling matrix.
 				      */
     void scale (const Vector<Number> &scaling_factors);
-    
+
 				     /**
 				      * Scale each element of this
 				      * vector by the corresponding
@@ -802,13 +776,13 @@ class Vector : public Subscriptor
 				      */
     template <typename Number2>
     void equ (const Number a, const Vector<Number2>& u);
-    
+
 				     /**
 				      * Assignment <tt>*this = a*u + b*v</tt>.
 				      */
     void equ (const Number a, const Vector<Number>& u,
 	      const Number b, const Vector<Number>& v);
-    
+
 				     /**
 				      * Assignment <tt>*this = a*u + b*v + b*w</tt>.
 				      */
@@ -1019,14 +993,14 @@ template <typename Number>
 inline
 void Vector<Number>::reinit (const unsigned int n, const bool fast)
 {
-  if (n==0) 
+  if (n==0)
     {
       if (val) delete[] val;
       val = 0;
       max_vec_size = vec_size = 0;
       return;
     };
-  
+
   if (n>max_vec_size)
     {
       if (val) delete[] val;
@@ -1045,13 +1019,13 @@ template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
 {
-  Assert (numbers::is_finite(s), 
+  Assert (numbers::is_finite(s),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  
+
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size!=0)
-    parallel::apply_to_subranges (begin(), end(), 
+    parallel::apply_to_subranges (begin(), end(),
 				  std_cxx1x::bind(&std::fill<Number*,Number>,
 						  _1, _2, s),
 				  internal::Vector::minimum_parallel_grain_size);
@@ -1071,8 +1045,8 @@ unsigned int Vector<Number>::size () const
 
 template <typename Number>
 inline
-typename Vector<Number>::iterator 
-Vector<Number>::begin () 
+typename Vector<Number>::iterator
+Vector<Number>::begin ()
 {
   return &val[0];
 }
@@ -1081,8 +1055,8 @@ Vector<Number>::begin ()
 
 template <typename Number>
 inline
-typename Vector<Number>::const_iterator 
-Vector<Number>::begin () const 
+typename Vector<Number>::const_iterator
+Vector<Number>::begin () const
 {
   return &val[0];
 }
@@ -1092,7 +1066,7 @@ Vector<Number>::begin () const
 template <typename Number>
 inline
 typename Vector<Number>::iterator
-Vector<Number>::end () 
+Vector<Number>::end ()
 {
   return &val[vec_size];
 }
@@ -1134,7 +1108,7 @@ inline
 Vector<Number> & Vector<Number>::operator *= (const Number factor)
 {
 
-  Assert (numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   scale (factor);
@@ -1148,7 +1122,7 @@ inline
 Vector<Number> &
 Vector<Number>::operator /= (const Number factor)
 {
-  Assert (numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
   Assert (factor != Number(0.), ExcZero() );
 
@@ -1163,7 +1137,7 @@ inline
 void
 Vector<Number>::scale (const Number factor)
 {
-  Assert (numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -1183,7 +1157,7 @@ void
 Vector<Number>::add (const Number a,
 		     const Vector<Number>& v)
 {
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -1206,9 +1180,9 @@ Vector<Number>::sadd (const Number x,
 		      const Number a,
 		      const Vector<Number>& v)
 {
-  Assert (numbers::is_finite(x), 
+  Assert (numbers::is_finite(x),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
