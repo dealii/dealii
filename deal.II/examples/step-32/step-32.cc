@@ -103,9 +103,12 @@ namespace EquationData
   const double T0      = 4000+273;
   const double T1      =  700+273;
 
-  const double year_in_seconds = 60*60*24*365.2425;
-  const double end_time        = 3e7 * year_in_seconds;
+  const double year_in_seconds  = 60*60*24*365.2425;
+  const double end_time         = 3e7 * year_in_seconds;
 
+  const double pressure_scaling = eta / (R1-R0);
+
+  
   template <int dim>
   Tensor<1,dim> gravity_vector (const Point<dim> &p)
   {
@@ -1879,6 +1882,8 @@ local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cel
 						     scratch.grad_phi_u[j])
 				     +
 				     (1./EquationData::eta) *
+				     EquationData::pressure_scaling *
+				     EquationData::pressure_scaling *
 				     scratch.phi_p[i] * scratch.phi_p[j])
 				    * scratch.stokes_fe_values.JxW(q);
     }
@@ -2111,8 +2116,10 @@ local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterat
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    data.local_matrix(i,j) += (EquationData::eta * 2 *
 				       (scratch.grads_phi_u[i] * scratch.grads_phi_u[j])
-				       - scratch.div_phi_u[i] * scratch.phi_p[j]
-				       - scratch.phi_p[i] * scratch.div_phi_u[j])
+				       - (EquationData::pressure_scaling *
+					  scratch.div_phi_u[i] * scratch.phi_p[j])
+				       - (EquationData::pressure_scaling *
+					  scratch.phi_p[i] * scratch.div_phi_u[j]))
 				      * scratch.stokes_fe_values.JxW(q);
 
       const Tensor<1,dim>
@@ -2668,7 +2675,7 @@ void BoussinesqFlowProblem<dim>::solve ()
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
 
-    SolverControl solver_control (stokes_matrix.m(), 1e-21*stokes_rhs.l2_norm());
+    SolverControl solver_control (stokes_matrix.m(), 1e-18*stokes_rhs.l2_norm());
     SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
       bicgstab (solver_control, false);
 
@@ -2759,30 +2766,32 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 				 // @sect4{BoussinesqFlowProblem::output_results}
 
-				 // This function has remained mostly
-				 // unchanged compared to step-31, in
-				 // particular merging data from the
-				 // two DoFHandler objects (for the
-				 // Stokes and the temperature parts
-				 // of the problem) into one is the
-				 // same. There are only two minor
-				 // changes: we make sure that only a
-				 // single processor actually does
-				 // some work here; and in addition to
-				 // the Stokes and temperature parts
-				 // in the <code>joint_fe</code>
-				 // finite element, we also add a
-				 // piecewise constant field that
-				 // denotes the subdomain id a cell
-				 // corresponds to. This allows us to
-				 // visualize the partitioning of the
-				 // domain. As a consequence, we also
-				 // have to change the assertion about
-				 // the number of degrees of freedom
-				 // in the joint DoFHandler object
-				 // (which is now equal to the number
-				 // of Stokes degrees of freedom plus
-				 // the temperature degrees of freedom
+				 // This function does mostly what the
+				 // corresponding one did in to
+				 // step-31, in particular merging
+				 // data from the two DoFHandler
+				 // objects (for the Stokes and the
+				 // temperature parts of the problem)
+				 // into one is the same. There are
+				 // three minor changes: we make sure
+				 // that only a single processor
+				 // actually does some work here; take
+				 // care of scaling variables in a
+				 // useful way; and in addition to the
+				 // Stokes and temperature parts in
+				 // the <code>joint_fe</code> finite
+				 // element, we also add a piecewise
+				 // constant field that denotes the
+				 // subdomain id a cell corresponds
+				 // to. This allows us to visualize
+				 // the partitioning of the domain. As
+				 // a consequence, we also have to
+				 // change the assertion about the
+				 // number of degrees of freedom in
+				 // the joint DoFHandler object (which
+				 // is now equal to the number of
+				 // Stokes degrees of freedom plus the
+				 // temperature degrees of freedom
 				 // plus the number of active cells as
 				 // that is the number of partition
 				 // variables we want to add), and
@@ -2792,6 +2801,27 @@ void BoussinesqFlowProblem<dim>::solve ()
 				 // vector and to identify which of
 				 // these components are scalars or
 				 // parts of dim-dimensional vectors.
+				 //
+				 // As for scaling: as mentioned in
+				 // the introduction, to keep the
+				 // Stokes equations properly scaled
+				 // and symmetric, we introduced a new
+				 // pressure $\hat p =
+				 // \frac{L}{\eta}p$. What we really
+				 // wanted, however, was the original
+				 // pressure $p$, so while copying
+				 // data from the Stokes DoFHandler
+				 // into the joint one, we undo this
+				 // scaling. While we're at it, let's
+				 // also take care of the awkward
+				 // units we use for the velocity: it
+				 // is computed in SI units of meters
+				 // per second, which of course is a
+				 // very small number in the earth
+				 // mantle. We therefore rescale
+				 // things into centimeters per year,
+				 // the unit commonly used in
+				 // geophysics.
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
@@ -2839,8 +2869,34 @@ void BoussinesqFlowProblem<dim>::output_results ()
 			  <
 			  local_stokes_dof_indices.size(),
 			  ExcInternalError());
-		  joint_solution(local_joint_dof_indices[i])
-		    = stokes_solution(local_stokes_dof_indices[joint_fe.system_to_base_index(i).second]);
+
+		  const unsigned int index_in_stokes_fe
+		    = joint_fe.system_to_base_index(i).second;
+
+		  if (stokes_fe.system_to_component_index(index_in_stokes_fe).first
+		      < dim)
+		    {
+		      joint_solution(local_joint_dof_indices[i])
+			= (stokes_solution(local_stokes_dof_indices
+					   [joint_fe.system_to_base_index(i).second])
+			   *
+			   EquationData::year_in_seconds
+			   *
+			   100);
+		    }
+		  else 
+		    {
+		      Assert (stokes_fe.system_to_component_index(index_in_stokes_fe).first
+			      ==
+			      dim,
+			      ExcInternalError());
+		      
+		      joint_solution(local_joint_dof_indices[i])
+			= (stokes_solution(local_stokes_dof_indices
+					   [joint_fe.system_to_base_index(i).second])
+			   *
+			   EquationData::pressure_scaling);
+		    }
 		}
 	      else if (joint_fe.system_to_base_index(i).first.first == 1)
 		{
