@@ -267,8 +267,8 @@ the artificial viscosity as small as possible while keeping it as large as
 necessary. To see what is happening, note that below we will impose
 boundary conditions for the temperature between 973 and 4273 Kelvin,
 and initial conditions are also chosen in this range; because there
-are no internal heat sources or sinks, the temperature should
-consequently always be in this range, barring any internal
+are no %internal heat sources or sinks, the temperature should
+consequently always be in this range, barring any %internal
 oscillations. If the minimal temperature drops below 973 Kelvin, then
 we need to add stabilization by either increasing $\beta$ or
 decreasing $c_R$.
@@ -621,13 +621,13 @@ the following quantities:
   and outer radii.
 
   <li>The right hand side of the temperature equation contains the rate of
-  internal heating $\gamma$. The earth does heat naturally through three mechanisms:
+  %internal heating $\gamma$. The earth does heat naturally through three mechanisms:
   radioactive decay, chemical separation (heavier elements sink to the bottom,
   lighter ones rise to the top; the countercurrents dissipate emergy equal to
   the loss of potential energy by this separation process), and heat release
   by crystallization of liquid metal as the solid inner core of the earth
   grows. None of these processes are overly significant the earth mantle, and
-  so we assume that the internal heating can be set to zero.
+  so we assume that the %internal heating can be set to zero.
 
   <li>For the velocity we choose as boundary conditions $\mathbf{v}=0$ at the
   inner radius (i.e. the fluid sticks to the earth core) and
