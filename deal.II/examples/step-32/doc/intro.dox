@@ -593,7 +593,7 @@ the following quantities:
   GridGenerator::hyper_shell() function, and we use a HyperShellBoundary
   objects for the inner and outer boundary.
 
-  These two numbers also provide us with the lengthscale $L$ we need for the
+  These two %numbers also provide us with the lengthscale $L$ we need for the
   pressure scaling. We choose $L=R_1-R_0$.
 
   <li>At the interface between crust and mantle, the temperature is between
