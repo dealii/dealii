@@ -133,7 +133,7 @@ namespace TrilinosWrappers
 					// generate the vector.
       if (allow_different_maps == false)
         {
-	  if (local_range() != v.local_range())
+	  if (vector->Map().SameAs(v.vector->Map()) == false)
 	    {
 	      vector.reset();
 	      communicator.reset (Utilities::Trilinos::
@@ -147,11 +147,12 @@ namespace TrilinosWrappers
 	    }
 	  else if (fast == false)
 	    {
+					       // old and new vectors
+					       // have exactly the
+					       // same map, i.e. size
+					       // and parallel
+					       // distribution
 	      int ierr;
-	      Assert (vector->Map().SameAs(v.vector->Map()) == true,
-		      ExcMessage ("The Epetra maps in the assignment operator ="
-				  " do not match, even though the local_range "
-				  " seems to be the same. Check vector setup!"));
 	      ierr = vector->GlobalAssemble (last_action);	
 	      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
