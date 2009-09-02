@@ -11,25 +11,25 @@ Cycle 0
 Number of degrees of freedom: 337
 System matrix memory consumption: 0.02232 MBytes.
 Multigrid objects memory consumption: 0.04438 MBytes.
-Convergence in 8 CG iterations.
+Convergence in 9 CG iterations.
 
 Cycle 1
 Number of degrees of freedom: 1313
 System matrix memory consumption: 0.08101 MBytes.
 Multigrid objects memory consumption: 0.1564 MBytes.
-Convergence in 9 CG iterations.
+Convergence in 10 CG iterations.
 
 Cycle 2
 Number of degrees of freedom: 5185
 System matrix memory consumption: 0.3141 MBytes.
 Multigrid objects memory consumption: 0.5939 MBytes.
-Convergence in 9 CG iterations.
+Convergence in 10 CG iterations.
 
 Cycle 3
 Number of degrees of freedom: 20609
 System matrix memory consumption: 1.243 MBytes.
 Multigrid objects memory consumption: 2.328 MBytes.
-Convergence in 9 CG iterations.
+Convergence in 10 CG iterations.
 
 Cycle 4
 Number of degrees of freedom: 82177
@@ -41,7 +41,7 @@ Cycle 5
 Number of degrees of freedom: 328193
 System matrix memory consumption: 19.77 MBytes.
 Multigrid objects memory consumption: 36.83 MBytes.
-Convergence in 9 CG iterations.
+Convergence in 10 CG iterations.
 @endcode
 
 As in step-16, we see that the number of CG iterations stays constant with 
@@ -53,13 +53,13 @@ Cycle 0
 Number of degrees of freedom: 517
 System matrix memory consumption: 0.09649 MBytes.
 Multigrid objects memory consumption: 0.1389 MBytes.
-Convergence in 7 CG iterations.
+Convergence in 9 CG iterations.
 
 Cycle 1
 Number of degrees of freedom: 3817
 System matrix memory consumption: 0.6333 MBytes.
 Multigrid objects memory consumption: 0.8396 MBytes.
-Convergence in 8 CG iterations.
+Convergence in 9 CG iterations.
 
 Cycle 2
 Number of degrees of freedom: 29521
@@ -71,15 +71,18 @@ Cycle 3
 Number of degrees of freedom: 232609
 System matrix memory consumption: 38.68 MBytes.
 Multigrid objects memory consumption: 49.26 MBytes.
-Convergence in 10 CG iterations.
+Convergence in 9 CG iterations.
 
 Cycle 4
 Number of degrees of freedom: 1847617
 System matrix memory consumption: 308.4 MBytes.
 Multigrid objects memory consumption: 391.5 MBytes.
-Convergence in 11 CG iterations.
+Convergence in 9 CG iterations.
 @endcode
 
-We observe a slight increase in the number of CG iterations, but also for the
-largest size with almost two million unknowns, the iteration count is still
-very modest.
+A comparison of the memory consumption of the MatrixFree class with a 
+standard SparseMatrix object shows that, for the largest problem considered
+in 3D, the memory consumption for SparseMatrix and its sparsity pattern 
+would be about 1.3 GBytes, which is a factor of 4 more memory. If combined
+with cubic elements in 3D, the MatrixFree class would decrease memory 
+consumption by a factor of 12.

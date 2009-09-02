@@ -182,21 +182,21 @@ public:
   std::size_t memory_consumption () const;
 
 				 // The private member variables of the
-				 // <code>MatrixFree</code> class are a small matrix that
-				 // does the transformation from solution
-				 // values to quadrature points, a list with
-				 // the mapping between local degrees of
-				 // freedom and global degrees of freedom
-				 // for each cell (stored as a
-				 // two-dimensional array, where the each
-				 // row corresponds to one cell, and the
-				 // columns within individual cells are the
-				 // local degrees of freedom), the
-				 // transformation variable for implementing
-				 // derivatives, a constraint matrix for
-				 // handling boundary conditions as well as
-				 // a few other variables that store matrix
-				 // properties.
+				 // <code>MatrixFree</code> class are a
+				 // small matrix that does the
+				 // transformation from solution values to
+				 // quadrature points, a list with the
+				 // mapping between local degrees of freedom
+				 // and global degrees of freedom for each
+				 // cell (stored as a two-dimensional array,
+				 // where the each row corresponds to one
+				 // cell, and the columns within individual
+				 // cells are the local degrees of freedom),
+				 // the transformation variable for
+				 // implementing derivatives, a constraint
+				 // matrix for handling boundary conditions
+				 // as well as a few other variables that
+				 // store matrix properties.
 private:
   template <typename number2>
   void vmult_on_subrange (const unsigned int first_cell,
@@ -288,9 +288,9 @@ reinit (const unsigned int        n_dofs_in,
 
 				 // This function we need if we want to
 				 // delete the content of the matrix,
-				 // e.g. when are finished with one grid
+				 // e.g. when we are finished with one grid
 				 // level and continue to the next one. Just
-				 // let all fields have size 0.
+				 // put all fields sizes to 0.
 template <typename number, class Transformation>
 void
 MatrixFree<number,Transformation>::clear ()
@@ -1268,10 +1268,11 @@ void LaplaceProblem<dim>::solve ()
 				   // order elements, since smoothing gets
 				   // more difficult then. Smooth out a
 				   // range of
-				   // $[\lambda_{\max}/8,\lambda_{\max}]$.
+				   // $[\lambda_{\max}/10,\lambda_{\max}]$.
   typename SMOOTHER::AdditionalData smoother_data;
-  smoother_data.smoothing_range = 8.;
-  smoother_data.degree = 3;
+  smoother_data.smoothing_range = 10.;
+  smoother_data.degree = fe.degree+1;
+  smoother_data.eig_cg_n_iterations = 4+2*fe.degree;
   mg_smoother.initialize(mg_matrices, smoother_data);
 
   MGMatrix<MatrixFreeType, Vector<double> >
@@ -1371,7 +1372,7 @@ void LaplaceProblem<dim>::run ()
     };
 }
 
-    
+
 
 int main () 
 {

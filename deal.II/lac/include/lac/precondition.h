@@ -1608,7 +1608,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
     max_eigenvalue = T.eigenvalue(T.n()-1);
   }
 
-  const double beta = 1.1 * max_eigenvalue;
+  const double beta = 1.2 * max_eigenvalue;
   const double alpha = (data.smoothing_range > 0 ? 
 			max_eigenvalue / data.smoothing_range :
 			max_eigenvalue / min_eigenvalue);
