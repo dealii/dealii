@@ -1376,7 +1376,7 @@ void LaplaceProblem<dim>::run ()
 int main () 
 {
   deallog.depth_console (0);
-  LaplaceProblem<3> laplace_problem (2);
+  LaplaceProblem<2> laplace_problem (2);
   laplace_problem.run ();
   
   return 0;
