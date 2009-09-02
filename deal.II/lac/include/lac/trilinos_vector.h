@@ -242,9 +242,7 @@ namespace TrilinosWrappers
 				        * be left unchanged and the user has
 				        * to set all elements.
 					*
-				        * Reinit functionality. This class
-					* also has a third possible
-					* argument,
+				        * This function has a third  argument,
 					* <tt>allow_different_maps</tt>,
 					* that allows for an exchange of
 					* data between two equal-sized
@@ -254,7 +252,7 @@ namespace TrilinosWrappers
 					* of this function is to generate a
 					* replication of a whole vector on
 					* each machine, when the calling
-					* vector is build according to the
+					* vector is built according to the
 					* localized vector class
 					* TrilinosWrappers::Vector, and
 					* <tt>v</tt> is a distributed
