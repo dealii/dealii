@@ -9,44 +9,45 @@ output:
 @code
 Cycle 0
 Number of degrees of freedom: 337
-System matrix memory consumption: 0.02781 MBytes.
-Multigrid objects memory consumption: 0.04799 MBytes.
+System matrix memory consumption: 0.02232 MBytes.
+Multigrid objects memory consumption: 0.04438 MBytes.
 Convergence in 8 CG iterations.
 
 Cycle 1
 Number of degrees of freedom: 1313
-System matrix memory consumption: 0.103 MBytes.
-Multigrid objects memory consumption: 0.171 MBytes.
+System matrix memory consumption: 0.08101 MBytes.
+Multigrid objects memory consumption: 0.1564 MBytes.
 Convergence in 9 CG iterations.
 
 Cycle 2
 Number of degrees of freedom: 5185
-System matrix memory consumption: 0.4019 MBytes.
-Multigrid objects memory consumption: 0.6524 MBytes.
+System matrix memory consumption: 0.3141 MBytes.
+Multigrid objects memory consumption: 0.5939 MBytes.
 Convergence in 9 CG iterations.
 
 Cycle 3
 Number of degrees of freedom: 20609
-System matrix memory consumption: 1.594 MBytes.
-Multigrid objects memory consumption: 2.562 MBytes.
+System matrix memory consumption: 1.243 MBytes.
+Multigrid objects memory consumption: 2.328 MBytes.
 Convergence in 9 CG iterations.
 
 Cycle 4
 Number of degrees of freedom: 82177
-System matrix memory consumption: 6.357 MBytes.
-Multigrid objects memory consumption: 10.18 MBytes.
+System matrix memory consumption: 4.951 MBytes.
+Multigrid objects memory consumption: 9.238 MBytes.
 Convergence in 9 CG iterations.
 
 Cycle 5
 Number of degrees of freedom: 328193
-System matrix memory consumption: 25.39 MBytes.
-Multigrid objects memory consumption: 40.58 MBytes.
+System matrix memory consumption: 19.77 MBytes.
+Multigrid objects memory consumption: 36.83 MBytes.
 Convergence in 9 CG iterations.
 @endcode
 
 As in step-16, we see that the number of CG iterations stays constant with 
 increasing number of degrees of freedom. Not much changes if we run the 
 program in three dimensions:
+
 @code
 Cycle 0
 Number of degrees of freedom: 517
@@ -79,6 +80,6 @@ Multigrid objects memory consumption: 391.5 MBytes.
 Convergence in 11 CG iterations.
 @endcode
 
-There is a slight increase in the number of CG iterations, but also for the
+We observe a slight increase in the number of CG iterations, but also for the
 largest size with almost two million unknowns, the iteration count is still
 very modest.
