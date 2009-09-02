@@ -296,7 +296,18 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
- 
+
+  <li>
+    <p>
+    Fixed: When using the TrilinosWrappers::MPI::Vector::reinit() function with a parallel
+    vector, and if the vector initialized and the vector given had a local range on one of
+    the processors that exactly matched, the program would freeze if the local ranges on
+    the other processors did not also match exactly. This is now fixed.
+    </p>
+  <br>
+  (WB 2009/09/02)
+  </li>
+
   <li><p> Improved: BlockVector and several of the block sparsity
   patterns can now be initialized with BlockIndices
   objects. Therefore, if an application needs such an object, it does
@@ -305,15 +316,15 @@ inconvenience this causes.
   (GK 2009/08/26)
   </p>
   </li>
- 
-  <li><p> New: The class PreconditionChebyshev implements a 
-  preconditioner based on Chebyshev polynomials. It is based on matrix-vector 
+
+  <li><p> New: The class PreconditionChebyshev implements a
+  preconditioner based on Chebyshev polynomials. It is based on matrix-vector
   products together with some vector updates.
   <br>
   (Martin Kronbichler 2009/08/25)
   </p>
   </li>
-  
+
   <li>
   <p>
   Fixed: Crash or strange behaviour (wrong matrix entries written) in
@@ -415,7 +426,7 @@ inconvenience this causes.
   (GK 2009/08/26)
   </p>
   </li>
-  
+
   <li>
   <p>
   New: The function GridGenerator::truncated_cone() and the class ConeBoundary
