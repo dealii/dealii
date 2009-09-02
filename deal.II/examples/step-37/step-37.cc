@@ -67,14 +67,14 @@ using namespace dealii;
 				 // implemenation, rather than being
 				 // physically reasonable.
 template <int dim>
-class Coefficient : public Function<dim> 
+class Coefficient : public Function<dim>
 {
   public:
     Coefficient ()  : Function<dim>() {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
@@ -84,7 +84,7 @@ class Coefficient : public Function<dim>
 
 template <int dim>
 double Coefficient<dim>::value (const Point<dim> &p,
-				const unsigned int /*component*/) const 
+				const unsigned int /*component*/) const
 {
   return 1./(0.1+p.square());
 }
@@ -94,11 +94,11 @@ double Coefficient<dim>::value (const Point<dim> &p,
 template <int dim>
 void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
-				   const unsigned int              component) const 
+				   const unsigned int              component) const
 {
-  Assert (values.size() == points.size(), 
+  Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
-  Assert (component == 0, 
+  Assert (component == 0,
 	  ExcIndexRange (component, 0, 1));
 
   const unsigned int n_points = points.size();
@@ -119,7 +119,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // matrix-vector multiplications in several
 				 // forms, and it provides functions for
 				 // filling the matrix with data.
-				 // 
+				 //
 				 // We choose to make this class generic,
 				 // i.e., we do not implement the actual
 				 // differential operator (here: Laplace
@@ -413,7 +413,7 @@ set_derivative_data (const unsigned int cell_no,
 				 // chunk we are sitting, we can parallelize
 				 // it and get very regular operation
 				 // patterns.
-				 // 
+				 //
 				 // Following the discussion in the
 				 // introduction, we try to work on multiple
 				 // cells at a time. This is possible
@@ -448,7 +448,7 @@ set_derivative_data (const unsigned int cell_no,
 				 // cell for the first and the number of
 				 // quadrature points times the number of
 				 // components per point for the latter.
-				 // 
+				 //
 				 // One more thing to make this work
 				 // efficiently is to decide how many cells
 				 // should be included in the matrix that
@@ -486,7 +486,7 @@ set_derivative_data (const unsigned int cell_no,
 				 // chunks.
 template <typename number, class Transformation>
 template <typename number2>
-void 
+void
 MatrixFree<number,Transformation>::
 vmult_on_subrange (const unsigned int    first_cell,
 		   const unsigned int    last_cell,
@@ -497,12 +497,12 @@ vmult_on_subrange (const unsigned int    first_cell,
 
   const unsigned int divisor = 400000/(matrix_sizes.n*sizeof(number));
   const unsigned int n_chunks = (last_cell-first_cell)/divisor + 1;
-  const unsigned int chunk_size = 
+  const unsigned int chunk_size =
     (last_cell-first_cell)/n_chunks + ((last_cell-first_cell)%n_chunks>0);
 
   for (unsigned int k=first_cell; k<last_cell; k+=chunk_size)
     {
-      const unsigned int current_chunk_size = 
+      const unsigned int current_chunk_size =
 	k+chunk_size>last_cell ? last_cell-k : chunk_size;
 
 				 // OK, now we are sitting in the loop that
@@ -537,7 +537,7 @@ vmult_on_subrange (const unsigned int    first_cell,
 				 // as there are rows in the second, which
 				 // means that the product is done
 				 // non-transposed for both matrices.
-				 // 
+				 //
 				 // Once the first product is calculated, we
 				 // apply the derivative information on all
 				 // the cells and all the quadrature points
@@ -590,7 +590,7 @@ vmult_on_subrange (const unsigned int    first_cell,
 				 // function.
 template <typename number, class Transformation>
 template <typename number2>
-void 
+void
 MatrixFree<number,Transformation>::vmult (Vector<number2>       &dst,
 					  const Vector<number2> &src) const
 {
@@ -606,7 +606,7 @@ MatrixFree<number,Transformation>::vmult (Vector<number2>       &dst,
 				 // operation.
 template <typename number, class Transformation>
 template <typename number2>
-void 
+void
 MatrixFree<number,Transformation>::Tvmult (Vector<number2>       &dst,
 					   const Vector<number2> &src) const
 {
@@ -635,14 +635,14 @@ MatrixFree<number,Transformation>::Tvmult (Vector<number2>       &dst,
 				 // (cf. the @ref threads module), and we
 				 // eventually condense the constraints on
 				 // the resulting vector.
-				 // 
+				 //
 				 // TODO: Use WorkStream for parallelization
 				 // instead of apply_to_subranges, once we
 				 // have realized the best way for doing
 				 // that.
 template <typename number, class Transformation>
 template <typename number2>
-void 
+void
 MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 					      const Vector<number2> &src) const
 {
@@ -651,7 +651,7 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 
   parallel::apply_to_subranges (0, matrix_sizes.n_cells,
 				std_cxx1x::bind(&MatrixFree<number,Transformation>::
-						vmult_on_subrange<number2>,
+						template vmult_on_subrange<number2>,
 						this,
 						_1,_2,
 						boost::ref(dst),
@@ -680,7 +680,7 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 
 template <typename number, class Transformation>
 template <typename number2>
-void 
+void
 MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
 					       const Vector<number2> &src) const
 {
@@ -772,8 +772,8 @@ MatrixFree<number,Transformation>::calculate_diagonal() const
 template <typename number, class Transformation>
 std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 {
-  std::size_t glob_size = derivatives.memory_consumption() + 
-    indices_local_to_global.memory_consumption() + 
+  std::size_t glob_size = derivatives.memory_consumption() +
+    indices_local_to_global.memory_consumption() +
     constraints.memory_consumption() +
     small_matrix.memory_consumption() + sizeof(*this);
   return glob_size;
@@ -895,7 +895,7 @@ void LaplaceOperator<dim,number>::transform (number* result) const
 				 // dimensions two and three.
 template <int dim, typename number>
 LaplaceOperator<dim,number>&
-LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor) 
+LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor)
 {
   if (dim == 2)
     {
@@ -935,12 +935,12 @@ LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor)
 				 // matrix-free implementation, which means
 				 // that we can skip the sparsity patterns.
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     LaplaceProblem (const unsigned int degree);
     void run ();
-    
+
   private:
     void setup_system ();
     void assemble_system ();
@@ -1010,12 +1010,12 @@ void LaplaceProblem<dim>::setup_system ()
   mg_matrices.resize(0, nlevels-1);
 
   QGauss<dim>  quadrature_formula(fe.degree+1);
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_gradients);
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria, 0, 1);
   fe_values.reinit (tria.begin());
-  FullMatrix<double> data_matrix (fe.dofs_per_cell, 
+  FullMatrix<double> data_matrix (fe.dofs_per_cell,
 				  quadrature_formula.size()*dim);
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     {
@@ -1033,8 +1033,8 @@ void LaplaceProblem<dim>::setup_system ()
 					    system_matrix.get_constraints());
   system_matrix.get_constraints().close();
   std::cout.precision(4);
-  std::cout << "System matrix memory consumption: " 
-	    << (double)system_matrix.memory_consumption()*std::pow(2.,-20.) << " MBytes." 
+  std::cout << "System matrix memory consumption: "
+	    << (double)system_matrix.memory_consumption()*std::pow(2.,-20.) << " MBytes."
 	    << std::endl;
 
   solution.reinit (mg_dof_handler.n_dofs());
@@ -1103,11 +1103,11 @@ void LaplaceProblem<dim>::setup_system ()
 				 // Dirichlet boundary conditions away from
 				 // the right hand side.
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
+void LaplaceProblem<dim>::assemble_system ()
 {
   QGauss<dim>  quadrature_formula(fe.degree+1);
   MappingQ<dim> mapping (fe.degree);
-  FEValues<dim> fe_values (mapping, fe, quadrature_formula, 
+  FEValues<dim> fe_values (mapping, fe, quadrature_formula,
 			   update_values   | update_inverse_jacobians |
                            update_quadrature_points | update_JxW_values);
 
@@ -1142,9 +1142,9 @@ void LaplaceProblem<dim>::assemble_system ()
       for (unsigned int q=0; q<n_q_points; ++q)
 	system_matrix.set_derivative_data (cell_no, q,
 					   (transpose
-					    (fe_values.inverse_jacobian(q)) * 
-					    fe_values.inverse_jacobian(q)) * 
-					   fe_values.JxW(q) * 
+					    (fe_values.inverse_jacobian(q)) *
+					    fe_values.inverse_jacobian(q)) *
+					   fe_values.JxW(q) *
 					   coefficient_values[q]);
     }
   system_matrix.get_constraints().condense(system_rhs);
@@ -1171,12 +1171,12 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // simple anyway, so calculate it here
 				 // instead.
 template <int dim>
-void LaplaceProblem<dim>::assemble_multigrid () 
+void LaplaceProblem<dim>::assemble_multigrid ()
 {
   coarse_matrix = 0;
   QGauss<dim>  quadrature_formula(fe.degree+1);
   MappingQ<dim> mapping (fe.degree);
-  FEValues<dim> fe_values (mapping, fe, quadrature_formula, 
+  FEValues<dim> fe_values (mapping, fe, quadrature_formula,
 			   update_gradients  | update_inverse_jacobians |
                            update_quadrature_points | update_JxW_values);
 
@@ -1198,13 +1198,13 @@ void LaplaceProblem<dim>::assemble_multigrid ()
       coefficient.value_list (fe_values.get_quadrature_points(),
 			      coefficient_values);
 
-      mg_matrices[level].set_local_dof_indices (cell_no[level], 
+      mg_matrices[level].set_local_dof_indices (cell_no[level],
 						local_dof_indices);
       for (unsigned int q=0; q<n_q_points; ++q)
-	mg_matrices[level].set_derivative_data 
+	mg_matrices[level].set_derivative_data
 	  (cell_no[level], q,
-	   (transpose(fe_values.inverse_jacobian(q)) * 
-	    fe_values.inverse_jacobian(q)) * 
+	   (transpose(fe_values.inverse_jacobian(q)) *
+	    fe_values.inverse_jacobian(q)) *
 	   fe_values.JxW(q) * coefficient_values[q]);
 
       ++cell_no[level];
@@ -1247,7 +1247,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 				 // using the Chebyshev smoother:
 				 // MGSmootherPrecondition.
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void LaplaceProblem<dim>::solve ()
 {
   GrowingVectorMemory<>   vector_memory;
 
@@ -1297,13 +1297,13 @@ void LaplaceProblem<dim>::solve ()
 				   // step-16. The magic is all hidden
 				   // behind the implementation of the
 				   // MatrixFree::vmult operation.
-  double multigrid_memory = 
+  double multigrid_memory =
     (double)mg_matrices.memory_consumption() +
     (double)mg_transfer.memory_consumption() +
     (double)coarse_matrix.memory_consumption();
-  std::cout << "Multigrid objects memory consumption: " 
-	    << multigrid_memory*std::pow(2.,-20.) 
-	    << " MBytes." 
+  std::cout << "Multigrid objects memory consumption: "
+	    << multigrid_memory*std::pow(2.,-20.)
+	    << " MBytes."
 	    << std::endl;
 
   SolverControl           solver_control (1000, 1e-12);
@@ -1311,8 +1311,8 @@ void LaplaceProblem<dim>::solve ()
 
   cg.solve (system_matrix, solution, system_rhs,
   	    preconditioner);
-  
-  std::cout << "Convergence in " << solver_control.last_step() 
+
+  std::cout << "Convergence in " << solver_control.last_step()
 	    << " CG iterations." << std::endl;
 }
 
@@ -1349,7 +1349,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 					   // calls a bit different for 2D
 					   // and 3D, but that's it.
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<8-dim; ++cycle)
     {
@@ -1374,11 +1374,11 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main () 
+int main ()
 {
   deallog.depth_console (0);
   LaplaceProblem<2> laplace_problem (2);
   laplace_problem.run ();
-  
+
   return 0;
 }
