@@ -111,7 +111,7 @@ namespace PETScWrappers
                             << " of a distributed matrix, but only rows "
                             << arg2 << " through " << arg3
                             << " are stored locally and can be accessed.");
-            
+
           private:
                                              /**
                                               * The matrix accessed.
@@ -159,7 +159,7 @@ namespace PETScWrappers
                                               * of this row.
                                               */
             std_cxx1x::shared_ptr<const std::vector<PetscScalar> > value_cache;
-            
+
                                              /**
                                               * Discard the old row caches
                                               * (they may still be used by
@@ -175,18 +175,18 @@ namespace PETScWrappers
                                               */
             friend class const_iterator;
         };
-        
+
       public:
-          
+
                                          /**
                                           * Constructor. Create an iterator
                                           * into the matrix @p matrix for the
                                           * given row and the index within it.
-                                          */ 
+                                          */
         const_iterator (const MatrixBase   *matrix,
                         const unsigned int  row,
                         const unsigned int  index);
-          
+
                                          /**
                                           * Prefix increment.
                                           */
@@ -238,7 +238,7 @@ namespace PETScWrappers
                         << "Attempt to access element " << arg2
                         << " of row " << arg1
                         << " which doesn't have that many elements.");
-        
+
       private:
                                          /**
                                           * Store an object of the
@@ -246,10 +246,10 @@ namespace PETScWrappers
                                           */
         Accessor accessor;
     };
-    
+
   }
-  
-  
+
+
 /**
  * Base class for all matrix classes that are implemented on top of the PETSc
  * matrix types. Since in PETSc all matrix types (i.e. sequential and
@@ -277,7 +277,7 @@ namespace PETScWrappers
  * no more free entries available after that any more, it is better to only
  * call SparseMatrix::compress() once at the end of the assembly stage and
  * before the matrix is actively used.
- * 
+ *
  * @ingroup PETScWrappers
  * @ingroup Matrix1
  * @author Wolfgang Bangerth, 2004
@@ -296,7 +296,7 @@ namespace PETScWrappers
                                         * the other container classes.
                                         */
       typedef PetscScalar value_type;
-      
+
                                        /**
                                         * Default constructor.
                                         */
@@ -323,7 +323,7 @@ namespace PETScWrappers
                                         * previously used.
                                         */
       MatrixBase &
-      operator = (const double d);      
+      operator = (const double d);
                                        /**
                                         * Release all memory and return
                                         * to a state just like after
@@ -651,7 +651,7 @@ namespace PETScWrappers
                                         */
       void clear_rows (const std::vector<unsigned int> &rows,
                        const PetscScalar                new_diag_value = 0);
-      
+
                                        /**
                                         * PETSc matrices store their own
                                         * sparsity patterns. So, in analogy to
@@ -666,7 +666,7 @@ namespace PETScWrappers
                                         * assembled the matrix.
                                         */
       void compress ();
-      
+
                                        /**
                                         * Return the value of the entry
                                         * (<i>i,j</i>).  This may be an
@@ -716,7 +716,7 @@ namespace PETScWrappers
                                         * SparseMatrix class.
                                         */
       PetscScalar diag_element (const unsigned int i) const;
-      
+
                                        /**
                                         * Return the number of rows in this
                                         * matrix.
@@ -793,10 +793,10 @@ namespace PETScWrappers
                                         * Number of entries in a specific row.
                                         */
       unsigned int row_length (const unsigned int row) const;
-      
+
                                        /**
                                         * Return the l1-norm of the matrix, that is
-                                        * $|M|_1=max_{all columns j}\sum_{all 
+                                        * $|M|_1=max_{all columns j}\sum_{all
                                         * rows i} |M_ij|$,
                                         * (max. sum of columns).
                                         * This is the
@@ -811,7 +811,7 @@ namespace PETScWrappers
                                        /**
                                         * Return the linfty-norm of the
                                         * matrix, that is
-                                        * $|M|_infty=max_{all rows i}\sum_{all 
+                                        * $|M|_infty=max_{all rows i}\sum_{all
                                         * columns j} |M_ij|$,
                                         * (max. sum of rows).
                                         * This is the
@@ -830,13 +830,13 @@ namespace PETScWrappers
                                         * matrix.
                                         */
       PetscReal frobenius_norm () const;
-      
+
                                        /**
                                         * Multiply the entire matrix by a
                                         * fixed factor.
                                         */
       MatrixBase & operator *= (const PetscScalar factor);
-    
+
                                        /**
                                         * Divide the entire matrix by a
                                         * fixed factor.
@@ -860,7 +860,7 @@ namespace PETScWrappers
 					* well. Conversely, if the matrix is
 					* not distributed, then neither of the
 					* vectors may be.
-                                        */      
+                                        */
       void vmult (VectorBase       &dst,
                   const VectorBase &src) const;
 
@@ -1065,7 +1065,7 @@ namespace PETScWrappers
                                         * iterator for the last row of a matrix.
                                         */
       const_iterator end (const unsigned int r) const;
-      
+
                                        /**
                                         * Conversion operator to gain access
                                         * to the underlying PETSc type. If you
@@ -1079,31 +1079,31 @@ namespace PETScWrappers
                                         */
       operator const Mat () const;
 
-                                        /**  
-					 * Make an in-place transpose of a 
+                                        /**
+					 * Make an in-place transpose of a
 					 * matrix.
 					 */
       void transpose ();
 
-                                        /**  
+                                        /**
 					 * Test whether a matrix is symmetric.
-					 * Default tolerance is zero. 
+					 * Default tolerance is zero.
 					 */
       PetscTruth is_symmetric (const double tol = 0.0);
 
-                                        /** 
-					 * Test whether a matrix is Hermitian, 
-					 * i.e. it is the complex conjugate 
-					 * of its transpose. Default tolerance 
-					 * is zero. 
+                                        /**
+					 * Test whether a matrix is Hermitian,
+					 * i.e. it is the complex conjugate
+					 * of its transpose. Default tolerance
+					 * is zero.
 					 */
       PetscTruth is_hermitian (const double tol = 0.0);
 
-                                        /* 
-					 * Abstract PETSc object that helps view 
+                                        /*
+					 * Abstract PETSc object that helps view
 					 * in ASCII other PETSc objects. Currently
-					 * this function simply writes non-zero 
-					 * elements of a matrix to the terminal. 
+					 * this function simply writes non-zero
+					 * elements of a matrix to the terminal.
 					 */
       void write_ascii ();
 
@@ -1199,9 +1199,9 @@ namespace PETScWrappers
                                         * requires such an operation.
                                         */
       void prepare_set();
-      
 
-      
+
+
     private:
 				       /**
 					* An internal array of integer
@@ -1226,8 +1226,8 @@ namespace PETScWrappers
 				        *  To allow calling protected
 				        *  prepare_add() and
 				        *  prepare_set().
-				        */ 
-      template <class> friend class BlockMatrixBase;
+				        */
+      template <class> friend class dealii::BlockMatrixBase;
   };
 
 
@@ -1315,7 +1315,7 @@ namespace PETScWrappers
         {
           accessor.a_index = 0;
           ++accessor.a_row;
-      
+
           while ((accessor.a_row < accessor.matrix->m())
                  &&
                  (accessor.matrix->row_length(accessor.a_row) == 0))
@@ -1381,17 +1381,17 @@ namespace PETScWrappers
               (accessor.row() == other.accessor.row() &&
                accessor.index() < other.accessor.index()));
     }
-    
+
   }
 
 
 
 				        // Inline the set() and add()
-				        // functions, since they will be 
-                                        // called frequently, and the 
-				        // compiler can optimize away 
+				        // functions, since they will be
+                                        // called frequently, and the
+				        // compiler can optimize away
 				        // some unnecessary loops when
-					// the sizes are given at 
+					// the sizes are given at
 				        // compile time.
   inline
   void
@@ -1470,7 +1470,7 @@ namespace PETScWrappers
 		   const bool          elide_zero_values)
   {
     prepare_action(LastAction::insert);
-    
+
     const signed int petsc_i = row;
     int * col_index_ptr;
     PetscScalar const* col_value_ptr;
@@ -1513,7 +1513,7 @@ namespace PETScWrappers
 	col_index_ptr = (int*)&column_indices[0];
 	col_value_ptr = &column_values[0];
       }
-          
+
     const int ierr
       = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
 		      col_value_ptr, INSERT_VALUES);
@@ -1529,7 +1529,7 @@ namespace PETScWrappers
 		   const PetscScalar  value)
   {
 
-    Assert (numbers::is_finite(value), 
+    Assert (numbers::is_finite(value),
 	    ExcMessage("The given value is not finite but either "
 		       "infinite or Not A Number (NaN)"));
 
@@ -1617,7 +1617,7 @@ namespace PETScWrappers
 		   const bool          /*col_indices_are_sorted*/)
   {
     prepare_action(LastAction::add);
-    
+
     const signed int petsc_i = row;
     int * col_index_ptr;
     PetscScalar const* col_value_ptr;
@@ -1660,7 +1660,7 @@ namespace PETScWrappers
 	col_index_ptr = (int*)&column_indices[0];
 	col_value_ptr = &column_values[0];
       }
-          
+
     const int ierr
       = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
 		      col_value_ptr, ADD_VALUES);
@@ -1680,7 +1680,7 @@ namespace PETScWrappers
     return el(i,j);
   }
 
-  
+
 
   inline
   MatrixBase::const_iterator
@@ -1722,14 +1722,14 @@ namespace PETScWrappers
     for (unsigned int i=r+1; i<m(); ++i)
       if (row_length(i) > 0)
         return const_iterator(this, i, 0);
-    
+
                                      // if there is no such line, then take the
                                      // end iterator of the matrix
     return end();
   }
 
 
-  
+
   inline
   bool
   MatrixBase::in_local_range (const unsigned int index) const
@@ -1738,12 +1738,12 @@ namespace PETScWrappers
     const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
 					   &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
     return ((index >= static_cast<unsigned int>(begin)) &&
             (index < static_cast<unsigned int>(end)));
   }
 
-  
+
 
   inline
   void
@@ -1764,7 +1764,7 @@ namespace PETScWrappers
   }
 
 
-  
+
   inline
   void
   MatrixBase::prepare_add()
@@ -1773,15 +1773,15 @@ namespace PETScWrappers
   }
 
 
-  
+
   inline
   void
   MatrixBase::prepare_set()
   {
     prepare_action(LastAction::insert);
   }
-  
-#endif // DOXYGEN      
+
+#endif // DOXYGEN
 }
 
 
