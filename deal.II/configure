@@ -13575,7 +13575,6 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
 
-
 for ac_header in Amesos.h \
                     AztecOO.h \
                     AztecOO_Operator.h \
@@ -13595,7 +13594,6 @@ for ac_header in Amesos.h \
                     Teuchos_RCP.hpp \
                     Teuchos_RefCountPtr.hpp \
                     Thyra_AztecOOLinearOpWithSolveFactory.hpp \
-                    Thyra_DefaultBlockedLinearOpDecl.hpp \
                     Thyra_DefaultBlockedLinearOp.hpp \
                     Thyra_DefaultInverseLinearOp.hpp \
                     Thyra_EpetraLinearOp.hpp \
