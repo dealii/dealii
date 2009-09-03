@@ -261,7 +261,7 @@ considerably. In fact, all the remainder is just to make a slightly more
 clever use of data in order to gain some extra speed. It does not change the
 code structure, though.
 
-If one would implement the above code, one would soon realize that the
+If one would implement the code above, one would soon realize that the
 operations done by the call <code>fe_values.reinit(cell)</code> takes about
 as much time as the other steps together (at least if the mesh is
 unstructured; deal.II can recognize that the gradients are often unchanged
@@ -274,7 +274,7 @@ point, i.e., as many times as there are elements in one of the loops
 above. The Jacobian does not depend on the basis function, but it is
 different on different quadrature points in general. The trick is now to
 first apply the operation that leads us to <code>temp_vector</code> only
-with the gradient of the reference cell. That transforms the vector of
+with the gradient on the reference cell. That transforms the vector of
 values on the local dofs to a vector of gradients on the quadrature
 points. There, we apply first the Jacobian that we factored out from the
 gradient, then we apply the weights of the quadrature, and we apply with the
@@ -383,27 +383,31 @@ there that make the implementation even more efficient, namely:
       be implemented more efficiently. Obviously, we need some adapted data
       structures for that, but it isn't too hard to realize that. What is nice
       is that matrix-matrix products are close to the processor's peak
-      performance (and these are the most expensive part in the code). This
-      makes that the matrix-free matrix-vector product is slower for linear
+      performance if the matrices are not too large (and these are the
+      most expensive part in the code). This
+      implies that the matrix-free matrix-vector product is slower for linear
       and quadratic elements, but on par with third order elements and faster
       for even higher order elements.
 </ul>
 
-And one more gain with this implementation is that we do not have to build
+An additional gain with this implementation is that we do not have to build
 the sparse matrix itself, which can be quite expensive depending on the
 underlying differential equation.
 
+
 <h4>Parallelization issues</h4>
 
-We mentioned in the philosophical section above that parallelization is an
-issue where sparse matrix-vector products are not that suited. There is a
+We mentioned in the philosophical section above that parallelization
+with multiple cores in a shared memory machines is an
+issue where sparse matrix-vector products are not particularly well
+suited because processors are memory bandwidth limited. There is a
 lot of data traffic involved, and the access patterns in the vector are not
-very regular. Different rows might have different numbers of nonzero
+very regular. Different rows might have different %numbers of nonzero
 elements. The matrix-free implementation, however, is better in this
 respect. It does not need to save all the elements (only the product of
 transposed Jacobian, weights, and Jacobian, for all quadrature points on all
 cells, which is about 4 times the size of the solution vector in 2D and 9
-times the size of the solution vector in 3D), whereas number of nonzeros
+times the size of the solution vector in 3D), whereas the number of nonzeros
 grow with the element order. Moreover, most of the work is done on a very
 regular pattern: Perform matrix-vector products with the same matrix,
 perform (equally many) transformations on the vector related quadrature
@@ -419,23 +423,27 @@ matrix-vector product run efficiently on a GPU.
 
 For our program, we choose to follow a simple strategy: We let several
 processors work together by splitting the cells into several chunks. The
-threading building blocks implemenation of a parallel <code>for</code> loop
-implements this concept by the command <code>apply_to_subranges</code>.
+threading building blocks implemenation of a %parallel <code>for</code> loop
+implements this concept using the parallel::apply_to_subranges() function.
+
 
 <h3>Combination with multigrid</h3>
 
-Now we made big efforts to implement a matrix-vector product that does not
-need to have access to the matrix elements. In many user codes, however,
+Above, we have gone to significant efforts to implement a
+matrix-vector product that does actually store the matrix elements. In many user codes, however,
 there is more than just performing un uncertain number of matrix-vector
 products &mdash; one wants to do as little of these operations as possible
 when solving linear equation systems. In theory, we could use the CG method
-without preconditioning, however, that would not by very efficient. Often
-one uses preconditioners for improving speed. One such option is SSOR, which
-is not possible here because there one needs to do substitutions based on
-the matrix entries.
+without preconditioning, however, that would not by very efficient. Rather,
+one uses preconditioners for improving speed. On the other hand, most
+of the more frequently used preconditioners such as Jacobi, SSOR, ILU
+or algebraic multigrid (AMG) can now no longer be used here because
+their implementation requires knowledge of the elements of the system
+matrix.
 
-Multigrid methods as shown in @ref step_16 "step-16" are very fast, and
-actually even suitable for our purpose since they can be designed based
+One solution is to use multigrid methods as shown in @ref step_16
+"step-16". They are known to be very fast, and
+they are suitable for our purpose here since they can be designed based
 purely on matrix-vector products. All one needs to do is to find a smoother
 that works with matrix-vector products only. One such candidate would be a
 damped Jacobi iteration, but that one is often not sufficiently good in
