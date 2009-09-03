@@ -1,14 +1,460 @@
+<br>
+
+<i>This program was contributed by Martin Kronbichler.</i>
+
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-This example shows how a matrix-free method can be implemented for a
-second-order Poisson equation.
+This example shows how to implement a matrix-free method, that is, a method 
+that does not explicitly store the matrix elements, for a
+second-order Poisson equation with variable coefficients on an unstructured
+mesh.
 
-<h3>Implementation of a matrix-vector product</h3>
-TODO: Describe how one gets to the piece of code we use below.
+<h3>Matrix-vector product implementation</h3>
+
+<h4>Philosophic view on usual matrix-vector products</h4>
+
+In most of tutorial programs the code is built around assembling some sparse
+matrix and solving a linear equation system based on that matrix. The time
+spent in such programs is due to the construction of the sparse matrix
+(assembling) and performing some matrix-vector products (possibly together
+with some substitutions like in SSOR preconditioners) in an iterative Krylov
+method. This is a general concept in finite element program. Depending on
+the quality of the linear solver and the complexity of the equation to be
+solved, between 40 and 95 precent of the computational time is spent in
+performing sparse matrix-vector products. 
+
+Let us shortly look at a simplified version of code for the matrix-vector 
+product (the actual implementation in deal.II uses a different counter for
+the innermost loop, which avoids having one additional counter variable):
+@code
+// y = A * x
+std::size_t value_indices = 0;
+for (unsigned int row=0; row<n_rows; ++row)
+  {
+    const std::size_t row_ends = row_indices[row+1];
+    double sum = 0;
+    while (value_indices != row_ends)
+      {
+        sum += matrix_values[value_indices] *
+               x[matrix_indices[value_indices]];
+        value_indices++;
+      }
+    y[row] = sum;
+  }
+@endcode
+
+Looking into what actually happens in the computer when forming a
+matrix-vector product, one observes that the matrix data
+<code>matrix_values</code> is continuously traveling from main memory into
+the CPU in order to be multiplied with some vector element determined by the
+other array <code>matrix_indices</code> and add this product to a sum that
+eventually is written into the output vector. Let us assume for simplicity
+that all the vector elements are sitting in the CPU (or some fast memory
+like caches) and that we use a compressed storage scheme for the sparse
+matrix, i.e., the format deal.II matrices (as well as PETSc and Trilinos
+matrices) use. Then each matrix element corresponds to 12 bytes of data, 8
+bytes for the the respective element in <code>matrix_values</code>, and 4
+bytes for the unsigned integer position <code>matrix_indices</code> that
+tells which vector element we actually use for multiplication. Here we
+neglect the additional array that tells us the ranges of individual rows in
+the matrix. With that 12 bytes of data, we perform two floating point
+operations, a multiplication and an addition. If our matrix has one billion
+entries, a matrix-vector product consists of two billion floating point
+operations, 2 GFLOP. One core of a processor of 2009's standard (Intel
+'Nehalem' processor, 3 GHz) has a peak performance of about 12 billion
+operations per second, 12 GFLOPS. Now we might be tempted to hope for
+getting a matrix-vector product done in about one sixth of a second on such
+a machine. Remember, though, that we have to get 12 GB of data through the
+processor in order to make the matrix-vector product. Looking again at which
+hardware is available in 2009, we will hardly get more than 10 GB/s of data
+read. This means that the matrix-vector product will take more than one
+second to complete, giving a rate of 1.7 GFLOPS at the best. This is quite
+far away from the theoretical peak performance of 12 GLOPS.
+
+What makes things worse is that today's processors have multiple cores, and
+multiple cores have to compete for memory bandwidth. Imagine we have 8 cores
+available with a theoretical peak performance of 96 GFLOPs. However, they
+can only get about 35 GB/s of data. For our matrix-vector product, we would
+get a performance of about 6 GFLOPS, which is at nightmarish 6 precent of
+the processor's peak performance. Things won't get better in the future,
+rather worse. Memory bandwidth will most likely continue to grow more slowly
+than the number of cores (i.e., the computing power). Then we will probably
+not see that much of an improvement in the speed of our programs when
+computers become faster in the future.
+
+And remember: We are talking about a more or less ideal situation when the
+vectors do not need to read &mdash; in reality, a substantial amount of
+vector entries needs to be read, too, which makes things worse.
+
+Another point might be simply that matrices consume very much memory &mdash;
+sometimes too much. A billion matrix entries might seem like an enormous
+problem, but in fact, already a Laplace problem in 3D with cubic elements
+and 6 million unknowns results in a matrix of that size, or even at 2
+million unknowns for sixth order polynomial interpolation.
+
+This tutorial shows some alternative implementation that is less memory
+demanding. This comes at the cost of more operations to be performed in an
+actual matrix-vector product.
+
+<h4>Avoiding matrices</h4>
+
+In order to find out how we can write a code that performs a matrix-vector
+product, but does not need to store the matrix elements, let us start with
+the construction of some matrix $A$:
+@f{eqnarray*}
+A = \sum_{j=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T A_\mathrm{cell}
+P_\mathrm{cell,{loc-glob}}.
+@f}
+In this formula, the matrix $P_\mathrm{cell,{loc-glob}}$ is a permutation
+matrix that defines the mapping from local degrees of freedom in the cells
+to the global degrees of freedom, which is usually implemented using a
+variable <code>local_dof_indices</code>.
+
+If we are to perform a matrix-vector product, we can hence use that
+@f{eqnarray*}
+y &=& A\cdot x = \left(\sum_{j=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T 
+A_\mathrm{cell} P_\mathrm{cell,{loc-glob}}\right) \cdot x\\
+&=& \sum_{j=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T 
+A_\mathrm{cell} x_\mathrm{cell},
+@f}
+where $x_\mathrm{cell}$ is the values of <i>x</i> at the degrees of freedom
+of the respective cell.
+
+A naive attempt to implement the local action of the Laplacian would hence be
+to use the following code:
+@code
+MatrixFree::vmult (Vector<double>       &dst,
+		   const Vector<double> &src) const
+{
+  dst = 0;
+
+  QGauss<dim>  quadrature_formula(fe.degree+1);
+  FEValues<dim> fe_values (fe, quadrature_formula, 
+                           update_gradients | update_JxW_values);
+ 
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.size();
+ 
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_src (dofs_per_cell),
+   		       cell_dst (dofs_per_cell);
+ 
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+ 
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      cell_matrix = 0;
+      fe_values.reinit (cell);
+ 
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
+                                   fe_values.shape_grad(j,q_point) *
+                                   fe_values.JxW(q_point));
+          }
+
+      cell->get_dof_indices (local_dof_indices);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        cell_src(i) = src(local_dof_indices(i));
+
+      cell_matrix.vmult (cell_dst, cell_src);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        dst(local_dof_indices(i)) += cell_dst;
+    }
+}
+@endcode
+
+Here we neglected boundary conditions. Note how we first generate the local
+matrix in the usual way. To form the actual product as expressed in the
+above formula, we read in the values of <code>src</code> of the cell-related
+degrees of freedom, multiply by the local matrix, and finally add the result
+to the destination vector <code>dst</code>. It is not more difficult than
+that, in principle.
+
+While this code is completely correct, it is very slow. For every cell, we
+generate a local matrix, which takes three nested loops with as many
+elements as there are degrees of freedom on the actual cell to compute. The
+multiplication itself is then done by two nested loops, which means that it
+is much cheaper.
+
+A naive way to improve this is to realize that we actually build the local
+matrix by a product of three matrices,
+@f{eqnarray*}
+A_\mathrm{cell} = B D B^T.
+@f}
+Here, the $(i,q*\mathrm{dim}+d)$-th element of <i>B</i> is given by
+<code>fe_values.shape_grad(i,q)[d]</code> (i.e., it consists of
+<code>dofs_per_cell</code> rows and <code>dim*n_q_points</code>
+columns). The matrix <i>D</i> is diagonal and contains the values
+<code>JxW(q)</code> (or, rather, <code>dim</code> copies of it).
+
+Every numerical analyst learns in one of her first classes that for
+forming a product of the shape
+@f{eqnarray*}
+A_\mathrm{cell}\cdot x_\mathrm{cell} = B D B^T \cdot x_\mathrm{cell},
+@f}
+one should never be done by forming the matrix-matrix products, but rather by
+multiplying with the vector from right to left. To put this into code, we can
+write:
+@code
+...
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+ 
+      cell->get_dof_indices (local_dof_indices);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        cell_src(i) = src(local_dof_indices(i));
+
+      temp_vector = 0;
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    temp_vector(q_point*dim+d) += fe_values.shape_grad(i,q_point)[d] *
+	    			          src(i);
+
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        for (unsigned int d=0; d<dim; ++d)
+	  temp_vector(q_point*dim+d) *= fe_values.JxW(q_point);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+          for (unsigned int d=0; d<dim; ++d)
+	    dst(i) += fe_values.shape_grad(i,q_point)[d] *
+	              temp_vector(q_point*dim+d);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        dst(local_dof_indices(i)) += cell_dst;
+    }
+}
+@endcode
+
+This removed the three nested loops in the calculation of the local matrix
+(note that the loop over <i>d</i> is a not really a loop, rather two or
+three operations). What happens is as follows: We first transform the vector
+of values on the local dofs to a vector of gradients on the quadrature
+points. In the second loop, we multiply these gradients by the integration
+weight. The third loop applies the second gradient (in transposed form), so
+that we get back to a vector of (Laplacian) values on the cell dofs.
+
+This improves the situation a lot and reduced the complexity of the product
+considerably. In fact, all the remainder is just to make a slightly more
+clever use of data in order to gain some extra speed. It does not change the
+code structure, though.
+
+If one would implement the above code, one would soon realize that the
+operations done by the call <code>fe_values.reinit(cell)</code> takes about
+as much time as the other steps together (at least if the mesh is
+unstructured; deal.II can recognize that the gradients are often unchanged
+on structured meshes and does nothing in such a case). That is certainly not
+what one would wish to have. What the reinit function actually does is to
+calculate the gradient in real space by transforming the gradient on the
+reference cell using the Jacobian of the transformation from real to unit
+cell. This is done for each local basis function and for each quadrature
+point, i.e., as many times as there are elements in one of the loops
+above. The Jacobian does not depend on the basis function, but it is
+different on different quadrature points in general. The trick is now to
+first apply the operation that leads us to <code>temp_vector</code> only
+with the gradient of the reference cell. That transforms the vector of
+values on the local dofs to a vector of gradients on the quadrature
+points. There, we apply first the Jacobian that we factored out from the
+gradient, then we apply the weights of the quadrature, and we apply with the
+transposed Jacobian for preparing the third loop which agains uses the
+gradients on the unit cell.
+
+Let's look how this is implemented:
+@code
+...
+  FEValues<dim> fe_values_reference (fe, quadrature_formula, 
+                           	     update_gradients);
+  Triangulation<dim> reference_cell;
+  GridGenerator::hyper_cube(reference_cell, 0., 1.);
+  fe_values_reference.reinit (reference_cell.begin());
+
+  FEValues<dim> fe_values (fe, quadrature_formula, 
+                           update_inverse_jacobians | update_JxW_values);
+
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+ 
+      cell->get_dof_indices (local_dof_indices);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        cell_src(i) = src(local_dof_indices(i));
+
+      temp_vector = 0;
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    temp_vector(q_point*dim+d) += 
+	      fe_values_reference.shape_grad(i,q_point)[d] * src(i);
+
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        {
+          // apply the Jacobian of the mapping from unit to real cell
+	  Tensor<1,dim> temp;
+	  for (unsigned int d=0; d<dim; ++d)
+            {
+	      temp[d] = temp_vector(q_point*dim+d);
+	      temp_vector(q_point*dim+d);
+	    }
+	  for (unsigned int d=0; d<dim; ++d)
+	    for (unsigned int e=0; e<dim; ++e)
+	      temp_vector(q_point*dim+d) += fe_values.inverse_jacobian(q_point)[d][e] *
+	       				    temp[e];
+
+          // multiply with integration weight
+	  for (unsigned int d=0; d<dim; ++d)
+	    temp_vector(q_point*dim+d) *= fe_values.JxW(q_point);
+
+          // apply the transpose of the Jacobian of the mapping from unit 
+	  // to real cell
+	  for (unsigned int d=0; d<dim; ++d)
+            {
+	      temp[d] = temp_vector(q_point*dim+d);
+	      temp_vector(q_point*dim+d);
+	    }
+	  for (unsigned int d=0; d<dim; ++d)
+	    for (unsigned int e=0; e<dim; ++e)
+	      temp_vector(q_point*dim+d) += fe_values.inverse_jacobian(q_point)[e][d] *
+	       				    temp[e];
+        }
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+          for (unsigned int d=0; d<dim; ++d)
+	    dst(i) += fe_values_reference.shape_grad(i,q_point)[d] *
+	              temp_vector(q_point*dim+d);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        dst(local_dof_indices(i)) += cell_dst;
+    }
+}
+@endcode
+
+Note how we create an additional FEValues object for the reference cell
+gradients and how we initialize it to the reference cell. The actual
+derivative data is then applied by the Jacobians (deal.II calls the Jacobian
+matrix from unit to real cell inverse_jacobian, because the Jacobian is
+defined from the transformation from real to unit cell).
+
+Note the additional costs introduced by this written-out
+matrix-matrix-vector product. To first approximation, we have increased the
+number of operations for the local matrix-vector product by a factor of 4 in
+2D and 6 in 3D (two matrix-vector products with matrices that have
+<code>dim</code> as many columns than before. Then, we also need to think
+that we touch some degrees of freedom several times because they belong to
+several cells. This also increases computational costs. A realistic value
+compared to a sparse matrix is that we now have to perform about 10 times as
+many operations (a bit less in 2D, a bit more in 3D).
+
+The above is, in essence, what happens in the code below and if you have
+difficulties in understanding the implementation, you should try to
+understand what happens in the code above. There are a few more points done
+there that make the implementation even more efficient, namely:
+<ul>
+  <li>We pre-compute the inverse of the Jacobian of the transformation and
+      store it in an extra array. This allows us to fuse the three operations
+      (apply Jacobian, multiply with weights, apply transposed Jacobian) into
+      one second-rank tensor that is also symmetric (so we can save only half
+      the tensor).
+  <li>We work on several cells at once when we apply the gradients of the unit
+      cell. This allows us to replace the matrix-vector product by a matrix-
+      matrix product (several vectors of cell-data form a matrix), which can
+      be implemented more efficiently. Obviously, we need some adapted data
+      structures for that, but it isn't too hard to realize that. What is nice
+      is that matrix-matrix products are close to the processor's peak 
+      performance (and these are the most expensive part in the code). This
+      makes that the matrix-free matrix-vector product is slower for linear
+      and quadratic elements, but on par with third order elements and faster
+      for even higher order elements.
+</ul>
+
+And one more gain with this implementation is that we do not have to build
+the sparse matrix itself, which can be quite expensive depending on the
+underlying differential equation.
+
+<h4>Parallelization issues</h4>
+
+We mentioned in the philosophical section above that parallelization is an
+issue where sparse matrix-vector products are not that suited. There is a
+lot of data traffic involved, and the access patterns in the vector are not
+very regular. Different rows might have different numbers of nonzero
+elements. The matrix-free implementation, however, is better in this
+respect. It does not need to save all the elements (only the product of
+transposed Jacobian, weights, and Jacobian, for all quadrature points on all
+cells, which is about 4 times the size of the solution vector in 2D and 9
+times the size of the solution vector in 3D), whereas number of nonzeros
+grow with the element order. Moreover, most of the work is done on a very
+regular pattern: Perform matrix-vector products with the same matrix,
+perform (equally many) transformations on the vector related quadrature
+points, and do one more matrix-vector product. Only the read operation from
+the global vector <code>src</code> and the write operation to
+<code>dst</code> in the end need to have random access to a vector.
+
+For example, it should not be too difficult to implement a matrix-free
+matrix-vector product on a <a
+href="http://en.wikipedia.org/wiki/GPGPU">graphics processing unit
+(GP-GPU)</a>. However, it would be quite complex to make a sparse
+matrix-vector product run efficiently on a GPU.
+
+For our program, we choose to follow a simple strategy: We let several
+processors work together by splitting the cells into several chunks. The
+threading building blocks implemenation of a parallel <code>for</code> loop
+implements this concept by the command <code>apply_to_subranges</code>.
 
 <h3>Combination with multigrid</h3>
-TODO: Explain which kind of smoother we can use when we do not have 
-access to the matrix entries.
 
-<h3>Parallization issues</h3>
+Now we made big efforts to implement a matrix-vector product that does not
+need to have access to the matrix elements. In many user codes, however,
+there is more than just performing un uncertain number of matrix-vector
+products &mdash; one wants to do as little of these operations as possible
+when solving linear equation systems. In theory, we could use the CG method
+without preconditioning, however, that would not by very efficient. Often
+one uses preconditioners for improving speed. One such option is SSOR, which
+is not possible here because there one needs to do substitutions based on
+the matrix entries.
+
+Multigrid methods as shown in @ref step_16 "step-16" are very fast, and
+actually even suitable for our purpose since they can be designed based
+purely on matrix-vector products. All one needs to do is to find a smoother
+that works with matrix-vector products only. One such candidate would be a
+damped Jacobi iteration, but that one is often not sufficiently good in
+damping high-frequency errors than one would like. A Chebyshev
+preconditioner, eventually, is what we use here. It can be seen as an
+extension of the Jacobi method by using Chebyshev polynomials. With degree
+zero, the Jacobi method is retrieved, whereas higher order corrections
+improve the smoothing properties if some parameters are chosen
+correctly. The effectiveness of Chebyshev smoothing in multigrid has been
+demonstrated, e.g., by <i>M. Adams, M. Brezina, J. Hu, R. Tuminaro: Parallel
+multigrid smoothers: polynomial versus Gauss&ndash;Seidel,
+J. Comput. Phys. 188:593&ndash;610, 2003</i>. This publication also names one
+more advantage of Chebyshev smoothers, namely that they are easy to
+parallelize, whereas SOR/Gauss&ndash;Seidel rely on substitutions, which can
+often only be tackled by working on diagonal subblocks of the matrix, which
+decreases efficiency.
+
+The implementation into the multigrid framework is then very
+straight-forward. We will only need some few modifications compared to @ref
+step_16 "step-16".
+
+<h3>The test case</h3>
+
+In order to demonstrate the capabilities of the method, we work on a rather
+difficult problem, i.e., a more or less unstructured mesh (where the
+Jacobians are different from cell to cell) and with non-constant
+coefficients in a Poisson equation. If we worked on a constant-coefficient
+case with structured mesh, we could decrease the operation count by a factor
+of 4 in 2D and 6 in 3D by building a local matrix (which is then the same
+for all cells), and doing the products as in the first step of the above
+code pieces.

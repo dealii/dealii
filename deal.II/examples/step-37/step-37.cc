@@ -1101,7 +1101,7 @@ void LaplaceProblem<dim>::setup_system ()
 				 // hard given the discussion in the
 				 // introduction: We need to take the
 				 // inverse of the Jacobian of the
-				 // transformation from real to unit cell,
+				 // transformation from unit to real cell,
 				 // multiply it with its transpose and
 				 // multiply the resulting rank-2 tensor
 				 // with the quadrature weights and the
