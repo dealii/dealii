@@ -784,16 +784,18 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 				 // @sect3{Laplace operator.}
 
 				 // This class implements the local action
-				 // of a Laplace preconditioner on a
-				 // quadrature point. It is very basic, can
-				 // be initialized with a Tensor of rank 2
-				 // and implements the
-				 // <code>transform</code> operation need by
-				 // the <code>MatrixFree</code> class. There
-				 // is one point worth noting: The operation
-				 // of the Laplace operator is a tensor of
-				 // rank two. It is even symmetric since it
-				 // is the product of the inverse Jacobian
+				 // of a Laplace operator on a quadrature
+				 // point. This is a very basic class
+				 // implementation, providing functions for
+				 // initialization with a Tensor of rank 2
+				 // and implementing the
+				 // <code>transform</code> operation needed
+				 // by the <code>MatrixFree</code>
+				 // class. There is one point worth noting:
+				 // The quadrature-point related action of
+				 // the Laplace operator is a tensor of rank
+				 // two. It is even symmetric since it is
+				 // the product of the inverse Jacobian
 				 // transformation between unit and real
 				 // cell with its transpose (times
 				 // quadrature weights and a coefficient,
@@ -804,28 +806,29 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 				 // <code>double</code> numbers. Since we
 				 // also want to use <code>float</code>
 				 // numbers for the multigrid preconditioner
-				 // (that saves memory and computing time),
-				 // we manually keep a respective
-				 // field. Note that <code>dim</code> is a
-				 // template argument and hence known at
+				 // (in order to save memory and computing
+				 // time), we manually implement this
+				 // operator. Note that <code>dim</code> is
+				 // a template argument and hence known at
 				 // compile-time, so the compiler knows that
-				 // the field has 3 entries if used in 2D
-				 // and 6 entries if used in 3D.
+				 // this symmetric rank-2 tensor has 3
+				 // entries if used in 2D and 6 entries if
+				 // used in 3D.
 template <int dim,typename number>
 class LaplaceOperator
 {
-public:
-  LaplaceOperator ();
+  public:
+    LaplaceOperator ();
 
-  LaplaceOperator (const Tensor<2,dim> &tensor);
+    LaplaceOperator (const Tensor<2,dim> &tensor);
 
-  void transform (number * result) const;
+    void transform (number * result) const;
 
-  LaplaceOperator<dim,number>&
-  operator = (const Tensor<2,dim> &tensor);
+    LaplaceOperator<dim,number>&
+    operator = (const Tensor<2,dim> &tensor);
 
-private:
-  number transformation[dim*(dim+1)/2];
+  private:
+    number transformation[dim*(dim+1)/2];
 };
 
 template<int dim,typename number>
@@ -846,21 +849,29 @@ LaplaceOperator<dim,number>::LaplaceOperator(const Tensor<2,dim> &tensor)
 				 // rank. Unfortunately, we need to
 				 // implement this by hand, since we don't
 				 // have tensors (note that the result
-				 // values are entries of a full matrix). It
-				 // feels a bit unsafe to operate with
-				 // points, but it works. We need to be
-				 // careful since we only saved half of the
-				 // rank-two tensor. It might seem
-				 // inefficient that we have an
-				 // <code>if</code> clause at this place
+				 // values are entries in a full matrix that
+				 // consists of doubles or floats). It might
+				 // feel a bit unsafe to operate on a
+				 // pointer to the data, but that is the
+				 // only possibility if we do not want to
+				 // copy data back and forth, which is
+				 // expensive since this is the innermost
+				 // position of the loop in the
+				 // <code>vmult</code> operation of the
+				 // MatrixFree class. We need to remember
+				 // that we only saved half the (symmetric)
+				 // rank-two tensor.
+				 //
+				 // It might seem inefficient that we have
+				 // an <code>if</code> clause at this place
 				 // (which is the innermost loop, so it
 				 // could be expensive), but note once again
 				 // that <code>dim</code> is known when this
-				 // code is compiled, so the compiler can
-				 // optize away the <code>if</code>
-				 // statement (and actually even inline
-				 // these few lines of code in the
-				 // <code>MatrixFree</code> class).
+				 // piece of code is compiled, so the
+				 // compiler can optize away the
+				 // <code>if</code> statement (and actually
+				 // even inline these few lines of code into
+				 // the <code>MatrixFree</code> class).
 template <int dim, typename number>
 void LaplaceOperator<dim,number>::transform (number* result) const
 {
@@ -889,9 +900,9 @@ void LaplaceOperator<dim,number>::transform (number* result) const
 				 // rank-2 tensor and writes it to the field
 				 // <code>transformation</code> of this
 				 // class. We save the upper part of the
-				 // tensor row-wise, so we first take the
-				 // (0,0)-entry, then the (0,1)-entry, and
-				 // so on. We only implement this for
+				 // symmetric tensor row-wise: we first take
+				 // the (0,0)-entry, then the (0,1)-entry,
+				 // and so on. We only implement this for
 				 // dimensions two and three.
 template <int dim, typename number>
 LaplaceOperator<dim,number>&
@@ -970,6 +981,8 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree) :
 {}
 
 
+
+				 // @sect4{LaplaceProblem::setup_system}
 
 				 // This is the function of step-16 with
 				 // relevant changes due to the MatrixFree
@@ -1077,6 +1090,8 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 
+				 // @sect4{LaplaceProblem::assemble_system}
+
 				 // The assemble function is significantly
 				 // reduced compared to step-16. All we need
 				 // to do is to assemble the right hand side
@@ -1150,6 +1165,8 @@ void LaplaceProblem<dim>::assemble_system ()
   system_matrix.get_constraints().condense(system_rhs);
 }
 
+
+				 // @sect4{LaplaceProblem::assemble_multigrid}
 
 				 // Here is another assemble
 				 // function. The integration core is
@@ -1236,6 +1253,8 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
 
 
+				 // @sect4{LaplaceProblem::solve}
+
 				 // The solution process again looks like
 				 // step-16. We now use a Chebyshev smoother
 				 // instead of SSOR (which is very difficult
@@ -1318,6 +1337,8 @@ void LaplaceProblem<dim>::solve ()
 
 
 
+				 // @sect4{LaplaceProblem::output_results}
+
 				 // Here is the data output, which is
 				 // a simplified version of step-5. We
 				 // do a standard vtk output for
@@ -1343,11 +1364,13 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 
 
-					   // The function that runs the
-					   // program is very similar to the
-					   // one in step-16. We make the
-					   // calls a bit different for 2D
-					   // and 3D, but that's it.
+				 // @sect4{LaplaceProblem::output_results}
+
+				 // The function that runs the
+				 // program is very similar to the
+				 // one in step-16. We make the
+				 // calls a bit different for 2D
+				 // and 3D, but that's it.
 template <int dim>
 void LaplaceProblem<dim>::run ()
 {
@@ -1374,6 +1397,7 @@ void LaplaceProblem<dim>::run ()
 
 
 
+				 // @sect3{The <code>main</code> function}
 int main ()
 {
   deallog.depth_console (0);
