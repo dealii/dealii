@@ -2825,7 +2825,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
-  if (timestep_number % 10 != 0)
+  if (timestep_number % 20 != 0)
     return;
 
   computing_timer.enter_section ("Postprocessing");
@@ -2942,7 +2942,8 @@ void BoussinesqFlowProblem<dim>::output_results ()
       data_out.build_patches (std::min(stokes_degree, temperature_degree));
 
       std::ostringstream filename;
-      filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
+      filename << "solution-" << Utilities::int_to_string(timestep_number, 5)
+	       << ".vtk";
 
       std::ofstream output (filename.str().c_str());
       data_out.write_vtk (output);
