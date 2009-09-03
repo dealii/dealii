@@ -6,7 +6,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-This example shows how to implement a matrix-free method, that is, a method 
+This example shows how to implement a matrix-free method, that is, a method
 that does not explicitly store the matrix elements, for a
 second-order Poisson equation with variable coefficients on an unstructured
 mesh.
@@ -15,17 +15,17 @@ mesh.
 
 <h4>Philosophic view on usual matrix-vector products</h4>
 
-In most of tutorial programs the code is built around assembling some sparse
-matrix and solving a linear equation system based on that matrix. The time
-spent in such programs is due to the construction of the sparse matrix
-(assembling) and performing some matrix-vector products (possibly together
+In most of the deal.II tutorial programs the code is built around assembling some sparse
+matrix and solving a linear equation system based on that matrix. The run
+time of such programs is mostly spent in the construction of the sparse matrix
+(assembling) and in performing matrix-vector products (possibly together
 with some substitutions like in SSOR preconditioners) in an iterative Krylov
-method. This is a general concept in finite element program. Depending on
+method. This is a general concept in finite element programs. Depending on
 the quality of the linear solver and the complexity of the equation to be
 solved, between 40 and 95 precent of the computational time is spent in
-performing sparse matrix-vector products. 
+performing sparse matrix-vector products.
 
-Let us shortly look at a simplified version of code for the matrix-vector 
+Let us briefly look at a simplified version of code for the matrix-vector
 product (the actual implementation in deal.II uses a different counter for
 the innermost loop, which avoids having one additional counter variable):
 @code
@@ -35,10 +35,10 @@ for (unsigned int row=0; row<n_rows; ++row)
   {
     const std::size_t row_ends = row_indices[row+1];
     double sum = 0;
-    while (value_indices != row_ends)
+    while (element_index != row_ends)
       {
-        sum += matrix_values[value_indices] *
-               x[matrix_indices[value_indices]];
+        sum += matrix_values[element_indices] *
+               x[column_indices[element_index]];
         value_indices++;
       }
     y[row] = sum;
@@ -49,14 +49,14 @@ Looking into what actually happens in the computer when forming a
 matrix-vector product, one observes that the matrix data
 <code>matrix_values</code> is continuously traveling from main memory into
 the CPU in order to be multiplied with some vector element determined by the
-other array <code>matrix_indices</code> and add this product to a sum that
+other array <code>column_indices</code> and add this product to a sum that
 eventually is written into the output vector. Let us assume for simplicity
 that all the vector elements are sitting in the CPU (or some fast memory
 like caches) and that we use a compressed storage scheme for the sparse
 matrix, i.e., the format deal.II matrices (as well as PETSc and Trilinos
 matrices) use. Then each matrix element corresponds to 12 bytes of data, 8
-bytes for the the respective element in <code>matrix_values</code>, and 4
-bytes for the unsigned integer position <code>matrix_indices</code> that
+bytes for the respective element in <code>matrix_values</code>, and 4
+bytes for the unsigned integer position <code>column_indices</code> that
 tells which vector element we actually use for multiplication. Here we
 neglect the additional array that tells us the ranges of individual rows in
 the matrix. With that 12 bytes of data, we perform two floating point
@@ -77,26 +77,32 @@ What makes things worse is that today's processors have multiple cores, and
 multiple cores have to compete for memory bandwidth. Imagine we have 8 cores
 available with a theoretical peak performance of 96 GFLOPs. However, they
 can only get about 35 GB/s of data. For our matrix-vector product, we would
-get a performance of about 6 GFLOPS, which is at nightmarish 6 precent of
-the processor's peak performance. Things won't get better in the future,
-rather worse. Memory bandwidth will most likely continue to grow more slowly
-than the number of cores (i.e., the computing power). Then we will probably
-not see that much of an improvement in the speed of our programs when
-computers become faster in the future.
+get a performance of about 6 GFLOPS, which is at nightmarish 6 per cent of
+the processor's peak performance. In practice, things are likely even
+worse since, for example, a substantial amount of
+vector entries needs to be read, too.
 
-And remember: We are talking about a more or less ideal situation when the
-vectors do not need to read &mdash; in reality, a substantial amount of
-vector entries needs to be read, too, which makes things worse.
+Things won't get better in the future, rather worse: Memory bandwidth
+will most likely continue to grow more slowly than the number of cores
+(i.e., the computing power). Consequently, we will probably not see
+that much of an improvement in the speed of our programs even though
+computers do become faster in the future if we accumulate their speed
+over all of their cores.
 
-Another point might be simply that matrices consume very much memory &mdash;
-sometimes too much. A billion matrix entries might seem like an enormous
+In essence, one may ask how this can be avoided. The basic fact that
+precipitates this is that matrices just consume a lot of memory &mdash;
+sometimes too much, if it limits the number of computations that can
+be done with them. A billion matrix entries might seem like an enormous
 problem, but in fact, already a Laplace problem in 3D with cubic elements
 and 6 million unknowns results in a matrix of that size, or even at 2
 million unknowns for sixth order polynomial interpolation.
 
-This tutorial shows some alternative implementation that is less memory
+This tutorial shows an alternative that is less memory
 demanding. This comes at the cost of more operations to be performed in an
-actual matrix-vector product.
+actual matrix-vector product. However, one can hope that because the
+speed with which computations can be done increases faster than the
+speed with which memory can be streamed into a processor, this
+trade-off will be worthwhile.
 
 <h4>Avoiding matrices</h4>
 
@@ -109,14 +115,16 @@ P_\mathrm{cell,{loc-glob}}.
 @f}
 In this formula, the matrix $P_\mathrm{cell,{loc-glob}}$ is a permutation
 matrix that defines the mapping from local degrees of freedom in the cells
-to the global degrees of freedom, which is usually implemented using a
-variable <code>local_dof_indices</code>.
+to the global degrees of freedom. The information from which this
+operator can be build is usually encoded in the
+<code>local_dof_indices</code> variable we have always used in the
+assembly of matrices.
 
 If we are to perform a matrix-vector product, we can hence use that
 @f{eqnarray*}
-y &=& A\cdot x = \left(\sum_{j=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T 
+y &=& A\cdot x = \left(\sum_{\text{cell}=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T
 A_\mathrm{cell} P_\mathrm{cell,{loc-glob}}\right) \cdot x\\
-&=& \sum_{j=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T 
+&=& \sum_{j=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T
 A_\mathrm{cell} x_\mathrm{cell},
 @f}
 where $x_\mathrm{cell}$ is the values of <i>x</i> at the degrees of freedom
@@ -131,18 +139,18 @@ MatrixFree::vmult (Vector<double>       &dst,
   dst = 0;
 
   QGauss<dim>  quadrature_formula(fe.degree+1);
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
                            update_gradients | update_JxW_values);
- 
+
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.size();
- 
+
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_src (dofs_per_cell),
    		       cell_dst (dofs_per_cell);
- 
+
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
- 
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -150,7 +158,7 @@ MatrixFree::vmult (Vector<double>       &dst,
     {
       cell_matrix = 0;
       fe_values.reinit (cell);
- 
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
@@ -173,7 +181,8 @@ MatrixFree::vmult (Vector<double>       &dst,
 }
 @endcode
 
-Here we neglected boundary conditions. Note how we first generate the local
+Here we neglected boundary conditions as well as any hanging nodes we
+may have. Note how we first generate the local
 matrix in the usual way. To form the actual product as expressed in the
 above formula, we read in the values of <code>src</code> of the cell-related
 degrees of freedom, multiply by the local matrix, and finally add the result
@@ -198,11 +207,11 @@ columns). The matrix <i>D</i> is diagonal and contains the values
 <code>JxW(q)</code> (or, rather, <code>dim</code> copies of it).
 
 Every numerical analyst learns in one of her first classes that for
-forming a product of the shape
+forming a product of the form
 @f{eqnarray*}
 A_\mathrm{cell}\cdot x_\mathrm{cell} = B D B^T \cdot x_\mathrm{cell},
 @f}
-one should never be done by forming the matrix-matrix products, but rather by
+one should never form the matrix-matrix products, but rather by
 multiplying with the vector from right to left. To put this into code, we can
 write:
 @code
@@ -210,7 +219,7 @@ write:
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
- 
+
       cell->get_dof_indices (local_dof_indices);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -275,19 +284,19 @@ gradients on the unit cell.
 Let's look how this is implemented:
 @code
 ...
-  FEValues<dim> fe_values_reference (fe, quadrature_formula, 
+  FEValues<dim> fe_values_reference (fe, quadrature_formula,
                            	     update_gradients);
   Triangulation<dim> reference_cell;
   GridGenerator::hyper_cube(reference_cell, 0., 1.);
   fe_values_reference.reinit (reference_cell.begin());
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
                            update_inverse_jacobians | update_JxW_values);
 
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
- 
+
       cell->get_dof_indices (local_dof_indices);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -297,7 +306,7 @@ Let's look how this is implemented:
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         for (unsigned int d=0; d<dim; ++d)
           for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    temp_vector(q_point*dim+d) += 
+	    temp_vector(q_point*dim+d) +=
 	      fe_values_reference.shape_grad(i,q_point)[d] * src(i);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
@@ -318,7 +327,7 @@ Let's look how this is implemented:
 	  for (unsigned int d=0; d<dim; ++d)
 	    temp_vector(q_point*dim+d) *= fe_values.JxW(q_point);
 
-          // apply the transpose of the Jacobian of the mapping from unit 
+          // apply the transpose of the Jacobian of the mapping from unit
 	  // to real cell
 	  for (unsigned int d=0; d<dim; ++d)
             {
@@ -373,7 +382,7 @@ there that make the implementation even more efficient, namely:
       matrix product (several vectors of cell-data form a matrix), which can
       be implemented more efficiently. Obviously, we need some adapted data
       structures for that, but it isn't too hard to realize that. What is nice
-      is that matrix-matrix products are close to the processor's peak 
+      is that matrix-matrix products are close to the processor's peak
       performance (and these are the most expensive part in the code). This
       makes that the matrix-free matrix-vector product is slower for linear
       and quadratic elements, but on par with third order elements and faster
