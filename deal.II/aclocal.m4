@@ -6267,7 +6267,6 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
                     Teuchos_RCP.hpp \
                     Teuchos_RefCountPtr.hpp \
                     Thyra_AztecOOLinearOpWithSolveFactory.hpp \
-                    Thyra_DefaultBlockedLinearOpDecl.hpp \
                     Thyra_DefaultBlockedLinearOp.hpp \
                     Thyra_DefaultInverseLinearOp.hpp \
                     Thyra_EpetraLinearOp.hpp \
