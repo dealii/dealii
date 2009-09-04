@@ -109,7 +109,7 @@ In order to find out how we can write a code that performs a matrix-vector
 product, but does not need to store the matrix elements, let us start at
 looking how some finite-element related matrix $A$ is assembled:
 @f{eqnarray*}
-A = \sum_{j=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T A_\mathrm{cell}
+A = \sum_{\mathrm{cell}=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T A_\mathrm{cell}
 P_\mathrm{cell,{loc-glob}}.
 @f}
 In this formula, the matrix $P_\mathrm{cell,{loc-glob}}$ is a permutation
@@ -123,7 +123,7 @@ If we are to perform a matrix-vector product, we can hence use that
 @f{eqnarray*}
 y &=& A\cdot x = \left(\sum_{\text{cell}=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T
 A_\mathrm{cell} P_\mathrm{cell,{loc-glob}}\right) \cdot x\\
-&=& \sum_{j=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T
+&=& \sum_{\mathrm{cell}=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T
 A_\mathrm{cell} x_\mathrm{cell},
 @f}
 where $x_\mathrm{cell}$ is the values of <i>x</i> at the degrees of freedom
