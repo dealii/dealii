@@ -1378,7 +1378,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 
 
-				 // @sect4{LaplaceProblem::output_results}
+				 // @sect4{LaplaceProblem::run}
 
 				 // The function that runs the program is
 				 // very similar to the one in step-16. We
