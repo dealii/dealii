@@ -458,6 +458,45 @@ namespace Utilities
     duplicate_communicator (const Epetra_Comm &communicator);
 
 				     /**
+				      * Given an Epetra communicator that was
+				      * created by the
+				      * duplicate_communicator() function,
+				      * destroy the underlying MPI
+				      * communicator object and reset the
+				      * Epetra_Comm object to a the result of
+				      * comm_self().
+				      *
+				      * It is necessary to call this function
+				      * at the time when the result of
+				      * duplicate_communicator() is no longer
+				      * needed. The reason is that in that
+				      * function, we first create a new
+				      * MPI_Comm object and then create an
+				      * Epetra_Comm around it. While we can
+				      * take care of destroying the latter, it
+				      * doesn't destroy the communicator since
+				      * it can only assume that it may also be
+				      * still used by other objects in the
+				      * program. Consequently, we have to take
+				      * care of destroying it ourselves,
+				      * explicitly.
+				      *
+				      * This function does exactly
+				      * that. Because this has to happen while
+				      * the Epetra_Comm object is still
+				      * around, it first resets the latter and
+				      * then destroys the communicator object.
+				      *
+				      * @note If you call this function on an
+				      * Epetra_Comm object that is not created
+				      * by duplicate_communicator(), you are
+				      * likely doing something quite
+				      * wrong. Don't do this.
+				      */
+    void
+    destroy_communicator (Epetra_Comm &communicator);
+    
+				     /**
 				      * Return the number of MPI processes
 				      * there exist in the given communicator
 				      * object. If this is a sequential job,
