@@ -602,7 +602,7 @@ MatrixFree<number,Transformation>::vmult (Vector<number2>       &dst,
 
 				 // Transposed matrix-vector products: do
 				 // the same. Since we implement a symmetric
-				 // operation, we can refer to the vmult
+				 // operation, we can refer to the vmult_add
 				 // operation.
 template <typename number, class Transformation>
 template <typename number2>
@@ -612,6 +612,17 @@ MatrixFree<number,Transformation>::Tvmult (Vector<number2>       &dst,
 {
   dst = 0;
   Tvmult_add (dst,src);
+}
+
+
+
+template <typename number, class Transformation>
+template <typename number2>
+void
+MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
+					       const Vector<number2> &src) const
+{
+  vmult_add (dst,src);
 }
 
 
@@ -678,17 +689,6 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 
 
 
-template <typename number, class Transformation>
-template <typename number2>
-void
-MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
-					       const Vector<number2> &src) const
-{
-  vmult_add (dst,src);
-}
-
-
-
 				 // This function returns the entries of the
 				 // matrix. Since this class is intended not
 				 // to store the matrix entries, it would
@@ -699,7 +699,7 @@ MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
 				 // constrained degrees of freedom or for
 				 // the implementation of the Chebyshev
 				 // smoother that we intend to use in the
-				 // multigrid implemenation. This matrix is
+				 // multigrid preconditioner. This matrix is
 				 // equipped with a vector that stores the
 				 // diagonal, and we compute it when this
 				 // function is called for the first time.
@@ -727,14 +727,14 @@ MatrixFree<number,Transformation>::el (const unsigned int row,
 				 // go through all the cells (now in serial,
 				 // since this function should not be called
 				 // very often anyway), then all the degrees
-				 // of freedom. On that level, we first copy
+				 // of freedom. At this place, we first copy
 				 // the first basis functions in all the
-				 // quadrature points, then apply the
-				 // derivatives from the Jacobian matrix,
-				 // and finally multiply with the second
-				 // basis function. This is the value that
-				 // would be written into the diagonal of a
-				 // sparse matrix.
+				 // quadrature points to a temporary array,
+				 // apply the derivatives from the Jacobian
+				 // matrix, and finally multiply with the
+				 // second basis function. This is exactly
+				 // the value that would be written into the
+				 // diagonal of a sparse matrix.
 template <typename number, class Transformation>
 void
 MatrixFree<number,Transformation>::calculate_diagonal() const
@@ -794,26 +794,27 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 				 // class. There is one point worth noting:
 				 // The quadrature-point related action of
 				 // the Laplace operator is a tensor of rank
-				 // two. It is even symmetric since it is
-				 // the product of the inverse Jacobian
+				 // two. It is symmetric since it is the
+				 // product of the inverse Jacobian
 				 // transformation between unit and real
 				 // cell with its transpose (times
 				 // quadrature weights and a coefficient,
 				 // which are scalar), so we can just save
-				 // the symmetric part. We could use the
-				 // SymmetricTensor<2,dim> class for doing
-				 // this, however, that is only based on
-				 // <code>double</code> numbers. Since we
+				 // the diagonal and upper diagonal part. We
+				 // could use the SymmetricTensor<2,dim>
+				 // class for doing this, however, that
+				 // class is only based on
+				 // <code>double</code> %numbers. Since we
 				 // also want to use <code>float</code>
-				 // numbers for the multigrid preconditioner
-				 // (in order to save memory and computing
-				 // time), we manually implement this
-				 // operator. Note that <code>dim</code> is
-				 // a template argument and hence known at
-				 // compile-time, so the compiler knows that
-				 // this symmetric rank-2 tensor has 3
-				 // entries if used in 2D and 6 entries if
-				 // used in 3D.
+				 // %numbers for the multigrid
+				 // preconditioner (in order to save memory
+				 // and computing time), we manually
+				 // implement this operator. Note that
+				 // <code>dim</code> is a template argument
+				 // and hence known at compile-time, so the
+				 // compiler knows that this symmetric
+				 // rank-2 tensor has 3 entries if used in
+				 // 2D and 6 entries if used in 3D.
 template <int dim,typename number>
 class LaplaceOperator
 {
@@ -864,14 +865,14 @@ LaplaceOperator<dim,number>::LaplaceOperator(const Tensor<2,dim> &tensor)
 				 //
 				 // It might seem inefficient that we have
 				 // an <code>if</code> clause at this place
-				 // (which is the innermost loop, so it
-				 // could be expensive), but note once again
-				 // that <code>dim</code> is known when this
-				 // piece of code is compiled, so the
-				 // compiler can optize away the
-				 // <code>if</code> statement (and actually
-				 // even inline these few lines of code into
-				 // the <code>MatrixFree</code> class).
+				 // (which is the innermost loop), but note
+				 // once again that <code>dim</code> is
+				 // known when this piece of code is
+				 // compiled, so the compiler can optize
+				 // away the <code>if</code> statement (and
+				 // actually even inline these few lines of
+				 // code into the <code>MatrixFree</code>
+				 // class).
 template <int dim, typename number>
 void LaplaceOperator<dim,number>::transform (number* result) const
 {
