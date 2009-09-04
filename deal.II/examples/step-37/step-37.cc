@@ -458,7 +458,8 @@ set_derivative_data (const unsigned int cell_no,
 				 // utilized (dgemm tends to provide more
 				 // efficiency the larger the matrix
 				 // dimensions get). If we choose too many,
-				 // we will firstly degrade parallelization,
+				 // we will firstly degrade parallelization
+				 // (which is based on some these chunks),
 				 // and secondly introduce an inefficiency
 				 // that comes from the computer
 				 // architecture: Right after the first
@@ -467,22 +468,24 @@ set_derivative_data (const unsigned int cell_no,
 				 // points by using derivatives. Obviously,
 				 // we want to have fast access to that
 				 // data, so it should still be present in
-				 // L2 cache and not be loaded from main
+				 // L2 cache and not to be fetched from main
 				 // memory. The total memory usage of the
 				 // data on quadrature points should be not
-				 // more than about two thirds the cache
-				 // size of the processor in order to be on
-				 // the safe side. Since most today's
-				 // processors provide 512 kBytes or more
-				 // cache memory per core, we choose about
-				 // 400 kBytes as a size. Clearly, this is
-				 // an architecture-dependent value. Once we
-				 // have chosen the size of cells we
-				 // summarize to one chunk, we determine how
-				 // many chunks we have on the given cell
-				 // range and recalculate the actual chunk
-				 // size in order to evenly distribute the
-				 // chunks.
+				 // more than about half the cache size of
+				 // the processor in order to be on the safe
+				 // side. Since most today's processors
+				 // provide 512 kBytes or more cache memory
+				 // per core, we choose about 250 kB as a
+				 // size. Clearly, this is an
+				 // architecture-dependent value and the
+				 // interested user can squeeze out some
+				 // extra performance by hand-tuning this
+				 // parameter. Once we have chosen the
+				 // number of cells we collect in one chunk,
+				 // we determine how many chunks we have on
+				 // the given cell range and recalculate the
+				 // actual chunk size in order to evenly
+				 // distribute the chunks.
 template <typename number, class Transformation>
 template <typename number2>
 void
@@ -494,7 +497,7 @@ vmult_on_subrange (const unsigned int    first_cell,
 {
   FullMatrix<number> solution_cells, solution_points;
 
-  const unsigned int divisor = 400000/(matrix_sizes.n*sizeof(number));
+  const unsigned int divisor = 250000/(matrix_sizes.n*sizeof(number));
   const unsigned int n_chunks = (last_cell-first_cell)/divisor + 1;
   const unsigned int chunk_size =
     (last_cell-first_cell)/n_chunks + ((last_cell-first_cell)%n_chunks>0);
