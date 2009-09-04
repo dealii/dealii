@@ -432,11 +432,11 @@ implements this concept using the parallel::apply_to_subranges() function.
 <h3>Combination with multigrid</h3>
 
 Above, we have gone to significant efforts to implement a matrix-vector
-product that does actually store the matrix elements. In many user codes,
-however, there is more than just performing un uncertain number of
+product that does not actually store the matrix elements. In many user
+codes, however, one wants more than just performing some uncertain number of
 matrix-vector products &mdash; one wants to do as little of these operations
 as possible when solving linear equation systems. In theory, we could use
-the CG method without preconditioning, however, that would not by very
+the CG method without preconditioning, however, that would not be very
 efficient. Rather, one uses preconditioners for improving speed. On the
 other hand, most of the more frequently used preconditioners such as Jacobi,
 SSOR, ILU or algebraic multigrid (AMG) can now no longer be used here
@@ -444,23 +444,24 @@ because their implementation requires knowledge of the elements of the
 system matrix.
 
 One solution is to use multigrid methods as shown in @ref step_16
-"step-16". They are known to be very fast, and
-they are suitable for our purpose here since they can be designed based
-purely on matrix-vector products. All one needs to do is to find a smoother
-that works with matrix-vector products only. One such candidate would be a
-damped Jacobi iteration, but that one is often not sufficiently good in
-damping high-frequency errors than one would like. A Chebyshev
-preconditioner, eventually, is what we use here. It can be seen as an
-extension of the Jacobi method by using Chebyshev polynomials. With degree
-zero, the Jacobi method is retrieved, whereas higher order corrections
-improve the smoothing properties if some parameters are chosen
-correctly. The effectiveness of Chebyshev smoothing in multigrid has been
-demonstrated, e.g., by <i>M. Adams, M. Brezina, J. Hu, R. Tuminaro: Parallel
-multigrid smoothers: polynomial versus Gauss&ndash;Seidel,
-J. Comput. Phys. 188:593&ndash;610, 2003</i>. This publication also names one
-more advantage of Chebyshev smoothers, namely that they are easy to
-parallelize, whereas SOR/Gauss&ndash;Seidel rely on substitutions, which can
-often only be tackled by working on diagonal subblocks of the matrix, which
+"step-16". They are known to be very fast, and they are suitable for our
+purpose since they can be designed based purely on matrix-vector products
+(and knowledge of the diagonal entries of the matrix, though). All one needs
+to do is to find a smoother that works with matrix-vector products only. One
+such candidate would be a damped Jacobi iteration, but that one is often not
+sufficiently good in damping high-frequency errors than one would like. A
+Chebyshev preconditioner, eventually, is what we use here. It can be seen as
+an extension of the Jacobi method by using Chebyshev polynomials. With
+degree zero, the Jacobi method is retrieved, whereas higher order
+corrections improve the smoothing properties if some parameters are suitably
+chosen. The effectiveness of Chebyshev smoothing in multigrid has been
+demonstrated, e.g., in the article <i>M. Adams, M. Brezina, J. Hu,
+R. Tuminaro. Parallel multigrid smoothers: polynomial versus
+Gauss&ndash;Seidel, J. Comput. Phys. 188:593&ndash;610, 2003</i>. This
+publication also identifies one more advantage of Chebyshev smoothers that
+we exploit here, namely that they are easy to parallelize, whereas
+SOR/Gauss&ndash;Seidel smoothing relies on substitutions, which can often
+only be parallelized by working on diagonal subblocks of the matrix, which
 decreases efficiency.
 
 The implementation into the multigrid framework is then very
@@ -470,10 +471,10 @@ step_16 "step-16".
 <h3>The test case</h3>
 
 In order to demonstrate the capabilities of the method, we work on a rather
-difficult problem, i.e., a more or less unstructured mesh (where the
-Jacobians are different from cell to cell) and with non-constant
-coefficients in a Poisson equation. If we worked on a constant-coefficient
-case with structured mesh, we could decrease the operation count by a factor
-of 4 in 2D and 6 in 3D by building a local matrix (which is then the same
-for all cells), and doing the products as in the first step of the above
-code pieces.
+general Poisson problem, based on a more or less unstructured mesh (where
+the Jacobians are different from cell to cell), higher order mappings to a
+curved boundary, and a non-constant coefficient in the equation. If we
+worked on a constant-coefficient case with structured mesh, we could
+decrease the operation count by a factor of 4 in 2D and 6 in 3D by building
+a local matrix (which is then the same for all cells), and doing the
+products as in the first developing step of the above code pieces.

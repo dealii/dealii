@@ -24,7 +24,6 @@
 
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
 
 #include <fe/fe_q.h>
 #include <fe/fe_values.h>
@@ -44,9 +43,8 @@
 #include <multigrid/mg_smoother.h>
 #include <multigrid/mg_matrix.h>
 
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
 #include <numerics/data_out.h>
+#include <numerics/vectors.h>
 
 #include <fstream>
 #include <sstream>
@@ -1302,7 +1300,7 @@ void LaplaceProblem<dim>::solve ()
 				   // $[\lambda_{\max}/10,\lambda_{\max}]$.
   typename SMOOTHER::AdditionalData smoother_data;
   smoother_data.smoothing_range = 10.;
-  smoother_data.degree = fe.degree+1;
+  smoother_data.degree = fe.degree;
   smoother_data.eig_cg_n_iterations = 4+2*fe.degree;
   mg_smoother.initialize(mg_matrices, smoother_data);
 

@@ -844,19 +844,21 @@ public:
                                        /**
 					* Constructor.
 					*/
-    AdditionalData (const unsigned int degree              = 1,
+    AdditionalData (const unsigned int degree              = 0,
 		    const double       smoothing_range     = 0.,
 		    const bool         nonzero_starting    = false,
 		    const unsigned int eig_cg_n_iterations = 8,
 		    const double       eig_cg_residual     = 1e-2);
-	
+
                                        /**
 					* This determines the degree of the
 					* Chebyshev polynomial. The degree
 					* of the polynomial gives the number
 					* of matrix-vector products to be
 					* performed for one application of
-					* the vmult() operation.
+					* the vmult() operation. Degree zero
+					* corresponds to a damped Jacobi
+					* method.
 					*/
     unsigned int degree;
 
@@ -980,13 +982,13 @@ private:
   SmartPointer<const MATRIX> matrix_ptr;
 
 				       /**
-					* Internal vector used for
+					* Internal vector used for the
 					* <tt>vmult</tt> operation.
 					*/
   mutable VECTOR update1;
 
 				       /**
-					* Internal vector used for
+					* Internal vector used for the
 					* <tt>vmult</tt> operation.
 					*/
   mutable VECTOR update2;
@@ -1550,8 +1552,8 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 				 // weighted by its diagonal.
 				 // 
 				 // TODO: can we obtain this with the
-				 // standard CG method? we would need to
-				 // read the logfile in that case, which
+				 // regular CG implementation? we would need
+				 // to read the logfile in that case, which
 				 // does not seem feasible.
   double max_eigenvalue, min_eigenvalue;
   {
@@ -1608,6 +1610,8 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
     max_eigenvalue = T.eigenvalue(T.n()-1);
   }
 
+				 // include a safety factor since the CG
+				 // method will in general not be converged
   const double beta = 1.2 * max_eigenvalue;
   const double alpha = (data.smoothing_range > 0 ? 
 			max_eigenvalue / data.smoothing_range :
@@ -1642,7 +1646,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
       update1.equ(-1.,dst);
     }
 
-  for (unsigned int k=0; k<data.degree-1; ++k)
+  for (unsigned int k=0; k<data.degree; ++k)
     {
       matrix_ptr->vmult (update2, dst);
       update2 -= src;
