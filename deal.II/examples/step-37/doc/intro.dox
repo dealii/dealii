@@ -230,20 +230,21 @@ write:
         for (unsigned int d=0; d<dim; ++d)
           for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    temp_vector(q_point*dim+d) += fe_values.shape_grad(i,q_point)[d] *
-	    			          src(i);
+	    			          cell_src(i);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         for (unsigned int d=0; d<dim; ++d)
 	  temp_vector(q_point*dim+d) *= fe_values.JxW(q_point);
 
+      cell_dst = 0;
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
           for (unsigned int d=0; d<dim; ++d)
-	    dst(i) += fe_values.shape_grad(i,q_point)[d] *
-	              temp_vector(q_point*dim+d);
+	    cell_dst(i) += fe_values.shape_grad(i,q_point)[d] *
+	         	   temp_vector(q_point*dim+d);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dst(local_dof_indices(i)) += cell_dst;
+        dst(local_dof_indices(i)) += cell_dst(i);
     }
 }
 @endcode
@@ -306,21 +307,22 @@ Let's see how we can implement this:
         for (unsigned int d=0; d<dim; ++d)
           for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    temp_vector(q_point*dim+d) +=
-	      fe_values_reference.shape_grad(i,q_point)[d] * src(i);
+	      fe_values_reference.shape_grad(i,q_point)[d] * cell_src(i);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         {
           // apply the Jacobian of the mapping from unit to real cell
 	  Tensor<1,dim> temp;
 	  for (unsigned int d=0; d<dim; ++d)
-            {
-	      temp[d] = temp_vector(q_point*dim+d);
-	      temp_vector(q_point*dim+d);
-	    }
+	    temp[d] = temp_vector(q_point*dim+d);
 	  for (unsigned int d=0; d<dim; ++d)
-	    for (unsigned int e=0; e<dim; ++e)
-	      temp_vector(q_point*dim+d) += fe_values.inverse_jacobian(q_point)[d][e] *
-	       				    temp[e];
+	    {
+	      double sum = 0;
+	      for (unsigned int e=0; e<dim; ++e)
+	      	sum += fe_values.inverse_jacobian(q_point)[d][e] *
+	       	       temp[e];
+	      temp_vector(q_point*dim+d) = sum;
+	    }
 
           // multiply with integration weight
 	  for (unsigned int d=0; d<dim; ++d)
@@ -329,23 +331,26 @@ Let's see how we can implement this:
           // apply the transpose of the Jacobian of the mapping from unit
 	  // to real cell
 	  for (unsigned int d=0; d<dim; ++d)
-            {
-	      temp[d] = temp_vector(q_point*dim+d);
-	      temp_vector(q_point*dim+d);
-	    }
+	    temp[d] = temp_vector(q_point*dim+d);
 	  for (unsigned int d=0; d<dim; ++d)
-	    for (unsigned int e=0; e<dim; ++e)
-	      temp_vector(q_point*dim+d) += fe_values.inverse_jacobian(q_point)[e][d] *
-	       				    temp[e];
+	    {
+	      double sum = 0;
+	      for (unsigned int e=0; e<dim; ++e)
+	      	sum += fe_values.inverse_jacobian(q_point)[e][d] *
+	    	       temp[e];
+	      temp_vector(q_point*dim+d) = sum;
+	    }
         }
+
+      cell_dst = 0;
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
           for (unsigned int d=0; d<dim; ++d)
-	    dst(i) += fe_values_reference.shape_grad(i,q_point)[d] *
-	              temp_vector(q_point*dim+d);
+	    cell_dst(i) += fe_values_reference.shape_grad(i,q_point)[d] *
+	               	   temp_vector(q_point*dim+d);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dst(local_dof_indices(i)) += cell_dst;
+        dst(local_dof_indices(i)) += cell_dst(i);
     }
 }
 @endcode
