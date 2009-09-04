@@ -765,10 +765,10 @@ MatrixFree<number,Transformation>::calculate_diagonal() const
 				 // constraints, the small matrix and of the
 				 // local variables. Just as a remark: In 2D
 				 // and with data type <code>double</code>,
-				 // about 80 precent of the memory
+				 // about 80 per cent of the memory
 				 // consumption is due to the
 				 // <code>derivatives</code> array, in 3D
-				 // even 85 precent.
+				 // even 85 per cent.
 template <typename number, class Transformation>
 std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 {
@@ -1267,7 +1267,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
 				 // The solution process again looks like
 				 // step-16. We now use a Chebyshev smoother
-				 // instead of SSOR (SSOR would very
+				 // instead of SOR (SOR would very
 				 // difficult to implement because we do not
 				 // have the matrix elements explicitly
 				 // available, and it is difficult to make

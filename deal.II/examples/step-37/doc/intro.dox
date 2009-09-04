@@ -22,7 +22,7 @@ the sparse matrix (assembling) and in performing some matrix-vector products
 (possibly together with some substitutions like in SSOR preconditioners) in
 an iterative Krylov method. This is a general concept in finite element
 programs. Depending on the quality of the linear solver and the complexity
-of the equation to be solved, between 40 and 95 precent of the computational
+of the equation to be solved, between 40 and 95 per cent of the computational
 time is spent in performing sparse matrix-vector products.
 
 Let us briefly look at a simplified version of code for the matrix-vector
