@@ -2825,7 +2825,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
-  if (timestep_number % 20 != 0)
+  if (timestep_number % 25 != 0)
     return;
 
   computing_timer.enter_section ("Postprocessing");
@@ -3097,7 +3097,7 @@ void BoussinesqFlowProblem<dim>::run ()
 	  goto start_time_iteration;
 	}
       else
-	if ((timestep_number > 0) && (timestep_number % 5 == 0))
+	if ((timestep_number > 0) && (timestep_number % 10 == 0))
 	  refine_mesh (initial_refinement + n_pre_refinement_steps);
 
       output_results ();
