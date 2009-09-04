@@ -279,7 +279,6 @@ reinit (const unsigned int        n_dofs_in,
   matrix_sizes.n = small_matrix.n();
   matrix_sizes.n_points = n_points_per_cell;
   matrix_sizes.n_comp   = small_matrix.n()/matrix_sizes.n_points;
-
   Assert(matrix_sizes.n_comp * n_points_per_cell == small_matrix.n(),
 	 ExcInternalError());
 }
@@ -290,7 +289,7 @@ reinit (const unsigned int        n_dofs_in,
 				 // delete the content of the matrix,
 				 // e.g. when we are finished with one grid
 				 // level and continue to the next one. Just
-				 // put all fields sizes to 0.
+				 // put all the field sizes to 0.
 template <typename number, class Transformation>
 void
 MatrixFree<number,Transformation>::clear ()
@@ -987,10 +986,11 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree) :
 				 // This is the function of step-16 with
 				 // relevant changes due to the MatrixFree
 				 // class. What we need to do is to somehow
-				 // create a small matrix that does not
-				 // contain any cell-related data. The way
-				 // to get to this matrix is to create an
-				 // FEValues object with gradient
+				 // create a local gradient matrix that does
+				 // not contain any cell-related data
+				 // (gradient on the reference cell). The
+				 // way to get to this matrix is to create
+				 // an FEValues object with gradient
 				 // information on a cell that corresponds
 				 // to the reference cell, which is a cube
 				 // with side length 1. So we create a
@@ -1005,8 +1005,8 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree) :
 				 // on the individual levels. We need to
 				 // implement Dirichlet boundary conditions
 				 // here, which is done with the
-				 // ConstraintMatrix function as shown
-				 // e.g. in step-22.
+				 // ConstraintMatrix function as shown,
+				 // e.g., in step-22.
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
@@ -1023,11 +1023,11 @@ void LaplaceProblem<dim>::setup_system ()
   mg_matrices.resize(0, nlevels-1);
 
   QGauss<dim>  quadrature_formula(fe.degree+1);
-  FEValues<dim> fe_values (fe, quadrature_formula,
-			   update_gradients);
-  Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria, 0, 1);
-  fe_values.reinit (tria.begin());
+  FEValues<dim> fe_values_reference (fe, quadrature_formula,
+				     update_gradients);
+  Triangulation<dim> reference_cell;
+  GridGenerator::hyper_cube (reference_cell, 0, 1);
+  fe_values_reference.reinit (reference_cell.begin());
   FullMatrix<double> data_matrix (fe.dofs_per_cell,
 				  quadrature_formula.size()*dim);
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -1035,7 +1035,7 @@ void LaplaceProblem<dim>::setup_system ()
       for (unsigned int j=0; j<quadrature_formula.size(); ++j)
 	{
 	  for (unsigned int d=0; d<dim; ++d)
-	    data_matrix(i,j*dim+d) = fe_values.shape_grad(i,j)[d];
+	    data_matrix(i,j*dim+d) = fe_values_reference.shape_grad(i,j)[d];
 	}
     }
   system_matrix.reinit (mg_dof_handler.n_dofs(), triangulation.n_active_cells(),
@@ -1047,7 +1047,8 @@ void LaplaceProblem<dim>::setup_system ()
   system_matrix.get_constraints().close();
   std::cout.precision(4);
   std::cout << "System matrix memory consumption: "
-	    << (double)system_matrix.memory_consumption()*std::pow(2.,-20.) << " MBytes."
+	    << (double)system_matrix.memory_consumption()*std::pow(2.,-20.) 
+	    << " MBytes."
 	    << std::endl;
 
   solution.reinit (mg_dof_handler.n_dofs());
@@ -1218,11 +1219,12 @@ void LaplaceProblem<dim>::assemble_multigrid ()
       mg_matrices[level].set_local_dof_indices (cell_no[level],
 						local_dof_indices);
       for (unsigned int q=0; q<n_q_points; ++q)
-	mg_matrices[level].set_derivative_data
-	  (cell_no[level], q,
-	   (transpose(fe_values.inverse_jacobian(q)) *
-	    fe_values.inverse_jacobian(q)) *
-	   fe_values.JxW(q) * coefficient_values[q]);
+	mg_matrices[level].set_derivative_data (cell_no[level], q,
+						(transpose
+						 (fe_values.inverse_jacobian(q)) *
+						 fe_values.inverse_jacobian(q)) *
+						fe_values.JxW(q) * 
+						coefficient_values[q]);
 
       ++cell_no[level];
       if (level == 0)
@@ -1241,6 +1243,13 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 	      }
 	}
     }
+
+				 // Here, we need to condense the boundary
+				 // conditions on the coarse matrix. There
+				 // is no built-in function for doing this
+				 // on a full matrix, so manually delete the
+				 // rows and columns of the matrix that are
+				 // constrained.
   for (unsigned int i=0; i<coarse_matrix.m(); ++i)
     if (mg_matrices[0].get_constraints().is_constrained(i))
       for (unsigned int j=0; j<coarse_matrix.n(); ++j)
@@ -1257,14 +1266,14 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
 				 // The solution process again looks like
 				 // step-16. We now use a Chebyshev smoother
-				 // instead of SSOR (which is very difficult
-				 // to implement if we do not have the
-				 // matrix elements explicitly available,
-				 // and it is difficult to make it work
-				 // efficiently in %parallel). The multigrid
-				 // classes provide a simple interface for
-				 // using the Chebyshev smoother:
-				 // MGSmootherPrecondition.
+				 // instead of SSOR (SSOR would very
+				 // difficult to implement because we do not
+				 // have the matrix elements explicitly
+				 // available, and it is difficult to make
+				 // it work efficiently in %parallel). The
+				 // multigrid classes provide a simple
+				 // interface for using the Chebyshev
+				 // smoother: MGSmootherPrecondition.
 template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
@@ -1308,14 +1317,17 @@ void LaplaceProblem<dim>::solve ()
     preconditioner(mg_dof_handler, mg, mg_transfer);
 
 				   // Finally, write out the memory
-				   // consumption of the Multigrid object,
-				   // then create the solver object and
-				   // solve the system. This is very easy,
-				   // and we didn't even see any difference
-				   // in the solve process compared to
-				   // step-16. The magic is all hidden
-				   // behind the implementation of the
-				   // MatrixFree::vmult operation.
+				   // consumption of the Multigrid object
+				   // (or rather, of its most significant
+				   // components, since there is no built-in
+				   // function for the total multigrid
+				   // object), then create the solver object
+				   // and solve the system. This is very
+				   // easy, and we didn't even see any
+				   // difference in the solve process
+				   // compared to step-16. The magic is all
+				   // hidden behind the implementation of
+				   // the MatrixFree::vmult operation.
   double multigrid_memory =
     (double)mg_matrices.memory_consumption() +
     (double)mg_transfer.memory_consumption() +
@@ -1339,11 +1351,10 @@ void LaplaceProblem<dim>::solve ()
 
 				 // @sect4{LaplaceProblem::output_results}
 
-				 // Here is the data output, which is
-				 // a simplified version of step-5. We
-				 // do a standard vtk output for
-				 // each grid produced in the
-				 // refinement process.
+				 // Here is the data output, which is a
+				 // simplified version of step-5. We use a
+				 // standard VTK output for each grid
+				 // produced in the refinement process.
 template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
@@ -1366,11 +1377,10 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 				 // @sect4{LaplaceProblem::output_results}
 
-				 // The function that runs the
-				 // program is very similar to the
-				 // one in step-16. We make the
-				 // calls a bit different for 2D
-				 // and 3D, but that's it.
+				 // The function that runs the program is
+				 // very similar to the one in step-16. We
+				 // make less refinement steps in 3D
+				 // compared to 2D, but that's it.
 template <int dim>
 void LaplaceProblem<dim>::run ()
 {
