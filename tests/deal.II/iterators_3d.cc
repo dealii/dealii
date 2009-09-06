@@ -1,5 +1,5 @@
 //----------------------------  iterators_3d.cc  ---------------------------
-//    $Id: iterators_3d.cc 17599 2008-11-15 04:06:30Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2008 by the deal.II authors
