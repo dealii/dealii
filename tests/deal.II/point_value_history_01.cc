@@ -1,6 +1,6 @@
 //----------------------------  point_value_history_01.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2009 by the deal.II authors and Michael Rapson
 //
@@ -99,7 +99,7 @@ void TestPointValueHistory<dim>::run()
     post_processed.reinit(dof_handler.n_dofs());
     poles.reinit(dof_handler.n_dofs());
 
-    // set up a simple linear discrete time system so that time plots vary 
+    // set up a simple linear discrete time system so that time plots vary
     // over the mesh but can be easily checked. The basic idea is to have each
     // component of the fe_system to depend on a specific dimension (i.e component 0
     // depends on dim 0, etc. % dim handles the case where there are more components
@@ -146,7 +146,7 @@ void TestPointValueHistory<dim>::run()
     unsigned int n_inputs = 1;
     PointValueHistory<dim> node_monitor (dof_handler, n_inputs);
     PointValueHistory<dim> no_dof_handler (n_inputs);
-  
+
     // check that the assignment operator is valid
     test_copy = node_monitor;
     test_copy.add_point(Point<2>::Point(1, 0.2));
@@ -159,7 +159,7 @@ void TestPointValueHistory<dim>::run()
     test_copy.evaluate_field("Solution", solution);
     std::vector <double> input_value(n_inputs, 1);
     test_copy.push_back_independent(input_value);
-    test_copy.write_gnuplot("Test_Copy");
+    test_copy.write_gnuplot("point_value_history_01/Test_Copy");
     test_copy.status(deallog.get_file_stream());
     test_copy.clear ();
     // end of assignment operator check
@@ -167,7 +167,7 @@ void TestPointValueHistory<dim>::run()
     {
         node_monitor.add_field_name("Solution");
         node_monitor.add_field_name("Post Processed Vector"); // not sensitive to spaces
-        
+
         // two alternatives here, adding a point at a time or a vector of points
         // 2d points
         std::vector <Point < 2 > > point_vector(5, Point < 2 > ::Point());
@@ -211,9 +211,9 @@ void TestPointValueHistory<dim>::run()
         post_processed = solution;
         post_processed.add(2.0); // simple post processing, giving it a dc offset
     }
-    node_monitor.write_gnuplot("node");
-    no_dof_handler.write_gnuplot("no_dof");
-    
+    node_monitor.write_gnuplot("point_value_history_01/node");
+    no_dof_handler.write_gnuplot("point_value_history_01/no_dof");
+
     node_monitor.status (deallog.get_file_stream());
     no_dof_handler.status (deallog.get_file_stream());
 
@@ -222,24 +222,35 @@ void TestPointValueHistory<dim>::run()
 				     // copy all the data into deallog and
 				     // delete those files
     const std::string filenames[]
-      = { "node_00.gpl", "node_01.gpl", "node_02.gpl",
-	  "node_03.gpl", "node_04.gpl",
-	  "node_indep.gpl",
-	  "Test_Copy_00.gpl", "Test_Copy_indep.gpl", "no_dof_indep.gpl" };
-    
+      = { "point_value_history_01/node_00.gpl",
+	  "point_value_history_01/node_01.gpl",
+	  "point_value_history_01/node_02.gpl",
+	  "point_value_history_01/node_03.gpl",
+	  "point_value_history_01/node_04.gpl",
+	  "point_value_history_01/node_05.gpl",
+	  "point_value_history_01/node_indep.gpl",
+	  "point_value_history_01/Test_Copy_00.gpl",
+	  "point_value_history_01/Test_Copy_indep.gpl",
+	  "point_value_history_01/no_dof_indep.gpl" };
+
     for (unsigned int i=0; i<sizeof(filenames)/sizeof(filenames[0]); ++i)
       {
+	deallog << "Copying output file " << filenames[i]
+		<< std::endl;
+
 	std::ifstream in(filenames[i].c_str());
 	AssertThrow (in, ExcIO());
 
 	std::string s;
 	while (in)
 	  {
-	    in >> s;
-	    deallog << s;
+	    std::getline (in, s);
+	    deallog << s << std::endl;
 	  }
 
 	std::remove (filenames[i].c_str());
+
+	deallog << std::endl;
       }
 }
 
