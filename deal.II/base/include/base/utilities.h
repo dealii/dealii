@@ -278,6 +278,11 @@ namespace Utilities
 				      * communicators over which they can
 				      * interact without interfering with each
 				      * other.
+				      *
+				      * When no longer needed, the
+				      * communicator created here needs to
+				      * be destroyed using
+				      * <code>MPI_Comm_free</code>.
 				      */
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
 
