@@ -1,5 +1,5 @@
 //----------------------------  solver.cc  ---------------------------
-//    $Id: vector-vector.cc 15661 2008-01-24 04:59:09Z kanschat $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008 by the deal.II authors
