@@ -140,7 +140,7 @@ void PointValueHistory<dim>
 				   // Implementation assumes that support
 				   // points locations are dofs locations
   AssertThrow (dof_handler->get_fe ().has_support_points (), ExcNotImplemented ());
-  
+
 				   // FEValues object to extract quadrature
 				   // points from
   std::vector <Point <dim> >
@@ -280,7 +280,7 @@ void PointValueHistory<dim>
 				   // Implementation assumes that support
 				   // points locations are dofs locations
   AssertThrow (dof_handler->get_fe ().has_support_points (), ExcNotImplemented ());
-  
+
 				   // FEValues object to extract quadrature
 				   // points from
   std::vector <Point <dim> > unit_support_points = dof_handler->get_fe ().get_unit_support_points ();
@@ -700,9 +700,6 @@ void PointValueHistory<dim>
 	}
     }
   out << "\n";
-
-  std::cout << dataset_key.size () << " data keys are stored \n";
-
 
   if (independent_values.size () != 0)
     {
