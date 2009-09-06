@@ -414,7 +414,9 @@ namespace Utilities
 				      * object of a class derived from
 				      * Epetra_Comm. The caller of this
 				      * function needs to assume ownership of
-				      * this function.
+				      * this function. The returned object
+				      * should be destroyed using the
+				      * destroy_communicator() function.
 				      *
 				      * This facility is used to separate
 				      * streams of communication. For example,
