@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@ namespace Polynomials
  * happens through the Horner scheme which provides both numerical
  * stability and a minimal number of numerical operations.
  *
- * @author Ralf Hartmann, Guido Kanschat, 2000, 2006
+ * @author Ralf Hartmann, Guido Kanschat, 2000, 2006, 2009
  */
   template <typename number>
   class Polynomial : public Subscriptor
@@ -68,6 +68,12 @@ namespace Polynomials
                                         */
       Polynomial (const std::vector<number> &coefficients);
 
+				       /**
+					* Constructor creating a zero
+					* polynomial of degree @p n.
+					*/
+      Polynomial (const unsigned int n);
+      
 				       /**
 					* Default constructor creating
 					* an illegal object.
