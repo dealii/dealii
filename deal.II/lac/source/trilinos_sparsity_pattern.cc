@@ -127,7 +127,8 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern (const Epetra_Map                &InputMap,
 				    const std::vector<unsigned int> &n_entries_per_row)
 		  :
-		  communicator (Utilities::Trilinos::duplicate_communicator (InputMap.Comm())),
+		  communicator (Utilities::Trilinos::
+				duplicate_communicator (InputMap.Comm())),
                   row_map (Utilities::Trilinos::duplicate_map (InputMap, *communicator)),
 		  col_map (row_map),
 		  compressed (false),
@@ -150,9 +151,12 @@ namespace TrilinosWrappers
 				    const Epetra_Map  &InputColMap,
 				    const unsigned int n_entries_per_row)
 		  :
-		  communicator (Utilities::Trilinos::duplicate_communicator (InputRowMap.Comm())),
-                  row_map (Utilities::Trilinos::duplicate_map (InputRowMap, *communicator)),
-                  col_map (Utilities::Trilinos::duplicate_map (InputColMap, *communicator)),
+		  communicator (Utilities::Trilinos::
+				duplicate_communicator (InputRowMap.Comm())),
+                  row_map (Utilities::Trilinos::
+			   duplicate_map (InputRowMap, *communicator)),
+                  col_map (Utilities::Trilinos::
+			   duplicate_map (InputColMap, *communicator)),
 		  compressed (false),
 		  graph (row_map.Comm().NumProc() > 1 ?
 			 (std::auto_ptr<Epetra_FECrsGraph>
@@ -171,9 +175,12 @@ namespace TrilinosWrappers
 				    const Epetra_Map                &InputColMap,
 				    const std::vector<unsigned int> &n_entries_per_row)
 		  :
-		  communicator (Utilities::Trilinos::duplicate_communicator (InputRowMap.Comm())),
-                  row_map (Utilities::Trilinos::duplicate_map (InputRowMap, *communicator)),
-                  col_map (Utilities::Trilinos::duplicate_map (InputColMap, *communicator)),
+		  communicator (Utilities::Trilinos::
+				duplicate_communicator (InputRowMap.Comm())),
+                  row_map (Utilities::Trilinos::
+			   duplicate_map (InputRowMap, *communicator)),
+                  col_map (Utilities::Trilinos::
+			   duplicate_map (InputColMap, *communicator)),
 		  compressed (false),
 		  graph (row_map.Comm().NumProc() > 1 ?
 			 (std::auto_ptr<Epetra_FECrsGraph>
@@ -239,7 +246,16 @@ namespace TrilinosWrappers
 
 
   SparsityPattern::~SparsityPattern ()
-  {}
+  {
+// this is sorta tricky. we can't destroy the communicator here
+// if we have initialized a matrix with it because the matrix
+// keeps a reference count to the sparsity pattern and so
+// the communicator has to stay alive even though the sparsity
+// pattern goes out of scope :-(
+//
+// TODO: find a way to fix this    
+//    Utilities::Trilinos::destroy_communicator (*communicator);
+  }
 
 
 
@@ -268,6 +284,7 @@ namespace TrilinosWrappers
 			   const Epetra_Map   &input_col_map,
 			   const unsigned int  n_entries_per_row)
   {
+    Utilities::Trilinos::destroy_communicator (*communicator);
     communicator.reset (Utilities::Trilinos::
 			duplicate_communicator (input_row_map.Comm()));
 
@@ -330,6 +347,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (n_entries_per_row.size(),
 				  input_row_map.NumGlobalElements()));
 
+    Utilities::Trilinos::destroy_communicator (*communicator);
     communicator.reset (Utilities::Trilinos::
 			duplicate_communicator (input_row_map.Comm()));
 
@@ -379,6 +397,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (sp.n_cols(),
 				  input_col_map.NumGlobalElements()));
 
+    Utilities::Trilinos::destroy_communicator (*communicator);
     communicator.reset (Utilities::Trilinos::
 			duplicate_communicator (input_row_map.Comm()));
 
@@ -447,6 +466,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (sp.n_cols(),
 				  input_col_map.NumGlobalElements()));
 
+    Utilities::Trilinos::destroy_communicator (*communicator);
     communicator.reset (Utilities::Trilinos::
 			duplicate_communicator (input_row_map.Comm()));
 

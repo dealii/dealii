@@ -159,7 +159,7 @@ namespace TrilinosWrappers
  * @ingroup TrilinosWrappers
  * @ingroup Vectors
  * @see @ref SoftwareTrilinos
- * @author Martin Kronbichler, Wolfgang Bangerth, 2008
+ * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
  */
     class Vector : public VectorBase
     {
@@ -219,6 +219,11 @@ namespace TrilinosWrappers
         explicit Vector (const Epetra_Map             &InputMap,
                          const dealii::Vector<Number> &v);
 
+					 /**
+					  * Destructor.
+					  */
+	~Vector ();
+	
 				       /**
 				        * Reinit functionality. This
 				        * function destroys the old

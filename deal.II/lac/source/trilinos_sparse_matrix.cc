@@ -258,7 +258,9 @@ namespace TrilinosWrappers
 
 
   SparseMatrix::~SparseMatrix ()
-  {}
+  {
+    Utilities::Trilinos::destroy_communicator (*communicator);
+  }
 
 
 
@@ -517,6 +519,7 @@ namespace TrilinosWrappers
 				     // model the communicator on the
 				     // one used for the sparsity
 				     // pattern
+    Utilities::Trilinos::destroy_communicator (*communicator);
     communicator.reset (Utilities::Trilinos::
 			duplicate_communicator (sparsity_pattern.trilinos_communicator()));
     

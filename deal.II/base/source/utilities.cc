@@ -665,6 +665,28 @@ namespace Utilities
 	      ExcInternalError());
       return new Epetra_SerialComm(dynamic_cast<const Epetra_SerialComm&>(communicator));
     }
+
+
+
+    void destroy_communicator (Epetra_Comm &communicator)
+    {
+      Assert (&communicator != 0, ExcInternalError());
+      
+				       // save the communicator, reset
+				       // the map, and delete the
+				       // communicator if this whole
+				       // thing was created as an MPI
+				       // communicator
+      Epetra_MpiComm
+	*mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);
+      if (mpi_comm != 0)
+	{
+	  MPI_Comm comm = mpi_comm->GetMpiComm();
+	  *mpi_comm = Epetra_MpiComm(MPI_COMM_SELF);
+	  MPI_Comm_free (&comm);
+	}
+    }
+
     
 
     unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator)

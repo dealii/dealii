@@ -95,12 +95,20 @@ namespace TrilinosWrappers
 
 
 
+    Vector::~Vector ()
+    {
+      Utilities::Trilinos::destroy_communicator (*communicator);
+    }
+    
+
+
     void
     Vector::reinit (const Epetra_Map &input_map,
 		    const bool        fast)
     {
       vector.reset();
 
+      Utilities::Trilinos::destroy_communicator (*communicator);
       communicator.reset (Utilities::Trilinos::
 			  duplicate_communicator(input_map.Comm()));
       map = Utilities::Trilinos::duplicate_map (input_map, *communicator);
@@ -136,6 +144,7 @@ namespace TrilinosWrappers
 	  if (vector->Map().SameAs(v.vector->Map()) == false)
 	    {
 	      vector.reset();
+	      Utilities::Trilinos::destroy_communicator (*communicator);
 	      communicator.reset (Utilities::Trilinos::
 				  duplicate_communicator(v.trilinos_vector()
 							 .Map().Comm()));
@@ -212,6 +221,7 @@ namespace TrilinosWrappers
 	{
 	  vector.reset();
 
+	  Utilities::Trilinos::destroy_communicator (*communicator);
 	  communicator.reset (Utilities::Trilinos::
 			      duplicate_communicator(v.trilinos_vector().
 						     Map().Comm()));
