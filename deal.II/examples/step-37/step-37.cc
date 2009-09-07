@@ -142,42 +142,42 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 template <typename number, class Transformation>
 class MatrixFree : public Subscriptor
 {
-public:
-  MatrixFree ();
+  public:
+    MatrixFree ();
 
-  void reinit (const unsigned int        n_dofs,
-	       const unsigned int        n_cells,
-	       const FullMatrix<double> &cell_matrix,
-	       const unsigned int        n_points_per_cell);
-  void clear();
+    void reinit (const unsigned int        n_dofs,
+		 const unsigned int        n_cells,
+		 const FullMatrix<double> &cell_matrix,
+		 const unsigned int        n_points_per_cell);
+    void clear();
 
-  unsigned int m () const;
-  unsigned int n () const;
-  ConstraintMatrix & get_constraints ();
+    unsigned int m () const;
+    unsigned int n () const;
+    ConstraintMatrix & get_constraints ();
 
-  void set_local_dof_indices (const unsigned int               cell_no,
-			      const std::vector<unsigned int> &local_dof_indices);
-  void set_derivative_data (const unsigned int    cell_no,
-			    const unsigned int    quad_point,
-			    const Transformation &trans_in);
+    void set_local_dof_indices (const unsigned int               cell_no,
+				const std::vector<unsigned int> &local_dof_indices);
+    void set_derivative_data (const unsigned int    cell_no,
+			      const unsigned int    quad_point,
+			      const Transformation &trans_in);
 
-  template <typename number2>
-  void vmult (Vector<number2> &dst,
-	      const Vector<number2> &src) const;
-  template <typename number2>
-  void Tvmult (Vector<number2> &dst,
-	       const Vector<number2> &src) const;
-  template <typename number2>
-  void vmult_add (Vector<number2> &dst,
-		  const Vector<number2> &src) const;
-  template <typename number2>
-  void Tvmult_add (Vector<number2> &dst,
-		   const Vector<number2> &src) const;
+    template <typename number2>
+    void vmult (Vector<number2> &dst,
+		const Vector<number2> &src) const;
+    template <typename number2>
+    void Tvmult (Vector<number2> &dst,
+		 const Vector<number2> &src) const;
+    template <typename number2>
+    void vmult_add (Vector<number2> &dst,
+		    const Vector<number2> &src) const;
+    template <typename number2>
+    void Tvmult_add (Vector<number2> &dst,
+		     const Vector<number2> &src) const;
 
-  number el (const unsigned int row, const unsigned int col) const;
-  void calculate_diagonal () const;
+    number el (const unsigned int row, const unsigned int col) const;
+    void calculate_diagonal () const;
 
-  std::size_t memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				 // The private member variables of the
 				 // <code>MatrixFree</code> class are a
@@ -195,28 +195,28 @@ public:
 				 // matrix for handling boundary conditions
 				 // as well as a few other variables that
 				 // store matrix properties.
-private:
-  template <typename number2>
-  void vmult_on_subrange (const unsigned int first_cell,
-			  const unsigned int last_cell,
-			  Vector<number2> &dst,
-			  const Vector<number2> &src) const;
+  private:
+    template <typename number2>
+    void vmult_on_subrange (const unsigned int first_cell,
+			    const unsigned int last_cell,
+			    Vector<number2> &dst,
+			    const Vector<number2> &src) const;
 
-  FullMatrix<number>      small_matrix;
-  Table<2,unsigned int>   indices_local_to_global;
-  Table<2,Transformation> derivatives;
+    FullMatrix<number>      small_matrix;
+    Table<2,unsigned int>   indices_local_to_global;
+    Table<2,Transformation> derivatives;
 
-  ConstraintMatrix        constraints;
+    ConstraintMatrix        constraints;
 
-  mutable Vector<number>  diagonal_values;
-  mutable bool            diagonal_is_calculated;
+    mutable Vector<number>  diagonal_values;
+    mutable bool            diagonal_is_calculated;
 
-  struct MatrixSizes
-  {
-    unsigned int n_dofs, n_cells;
-    unsigned int m, n;
-    unsigned int n_points, n_comp;
-  }  matrix_sizes;
+    struct MatrixSizes
+    {
+      unsigned int n_dofs, n_cells;
+      unsigned int m, n;
+      unsigned int n_points, n_comp;
+    }  matrix_sizes;
 };
 
 
@@ -226,8 +226,8 @@ private:
 				 // nothing.
 template <typename number, class Transformation>
 MatrixFree<number,Transformation>::MatrixFree ()
-:
-  Subscriptor()
+    :
+    Subscriptor()
 {}
 
 
@@ -671,20 +671,22 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
   constraints.condense (dst);
 
 				 // One thing to be cautious about: The
-				 // deal.II classes expect that the matrix
-				 // still contains a diagonal entry for
-				 // constrained dofs (otherwise, the matrix
-				 // would be singular, which is not what we
-				 // want). Since the <code>condense</code>
-				 // command of the constraint matrix sets
-				 // those constrained elements to zero, we
-				 // have to circumvent that problem by using
-				 // the diagonal element which we have
-				 // access to together with the solution
-				 // function.
+				 // deal.II classes expect that the
+				 // matrix still contains a diagonal
+				 // entry for constrained dofs
+				 // (otherwise, the matrix would be
+				 // singular, which is not what we
+				 // want). Since the
+				 // <code>condense</code> command of the
+				 // constraint matrix sets those
+				 // constrained elements to zero, we
+				 // have to circumvent that problem by
+				 // setting the diagonal to some
+				 // non-zero value. We simply set it to
+				 // one.
   for (unsigned int i=0; i<matrix_sizes.n_dofs; ++i)
     if (constraints.is_constrained(i) == true)
-      dst(i) += el(i,i) * src(i);
+      dst(i) += 1.0 * src(i);
 }
 
 
@@ -753,6 +755,11 @@ MatrixFree<number,Transformation>::calculate_diagonal() const
 	  diag_value += calculation[q] * small_matrix(dof,q);
 	diagonal_values(indices_local_to_global(cell,dof)) += diag_value;
       }
+  constraints.condense (diagonal_values);
+  for (unsigned int i=0; i<matrix_sizes.n_dofs; ++i)
+    if (constraints.is_constrained(i) == true)
+      diagonal_values(i) = 1.0;
+
   diagonal_is_calculated = true;
 }
 
@@ -879,18 +886,18 @@ void LaplaceOperator<dim,number>::transform (number* result) const
   if (dim == 2)
     {
       const number temp = result[0];
-      result[0] = transformation[0] * temp + transformation[1]*result[1];
-      result[1] = transformation[1] * temp + transformation[2]*result[1];
+      result[0] = transformation[0] * temp + transformation[1] * result[1];
+      result[1] = transformation[1] * temp + transformation[2] * result[1];
     }
   else if (dim == 3)
     {
       const number temp1 = result[0];
       const number temp2 = result[1];
-      result[0] = transformation[0] * temp1 + transformation[1]*temp2 +
+      result[0] = transformation[0] * temp1 + transformation[1] * temp2 +
 	transformation[2] * result[2];
-      result[1] = transformation[1] * temp1 + transformation[3]*temp2 +
+      result[1] = transformation[1] * temp1 + transformation[3] * temp2 +
 	transformation[4] * result[2];
-      result[2] = transformation[2] * temp1 + transformation[4]*temp2 +
+      result[2] = transformation[2] * temp1 + transformation[4] * temp2 +
 	transformation[5] * result[2];
     }
   else
@@ -1413,7 +1420,7 @@ void LaplaceProblem<dim>::run ()
 int main ()
 {
   deallog.depth_console (0);
-  LaplaceProblem<2> laplace_problem (2);
+  LaplaceProblem<3> laplace_problem (2);
   laplace_problem.run ();
 
   return 0;
