@@ -39,85 +39,100 @@ cluster at Texas A&amp;M University.
 <h3>Results for a 2d circular shell testcase</h3>
 
 
-For a much more modest run (less mesh refinement, only 35 time steps, but 50
-processors as above), we get this as output:
+If we run the program as shown above, the output will look roughly like this,
+producing the final part of the output after some 2 days when run on 10
+processors: 
 
 <code>
 <pre>
-Number of active cells: 512 (on 4 levels)
-Number of degrees of freedom: 20381 (14739+729+4913)
+Number of active cells: 12288 (on 6 levels)
+Number of degrees of freedom: 162432 (99840+12672+49920)
 
-Timestep 0:  t=0
-   Assembling...
-   Rebuilding Stokes preconditioner...[II] fixing the coarse-level matrix dead dofs
-
-   Solving...
-   0 BiCGStab iterations for Stokes subsystem.
-   Time step: 1.30208
-   26 CG iterations for temperature
-   Temperature range: -0.560335 2.39809
-
-Number of active cells: 1296 (on 5 levels)
-Number of degrees of freedom: 51497 (37305+1757+12435)
-
-Timestep 0:  t=0
+Timestep 0:  t=0 years
    Assembling...
    Rebuilding Stokes preconditioner...
    Solving...
-   0 BiCGStab iterations for Stokes subsystem.
-   Time step: 0.651042
-   28 CG iterations for temperature
-   Temperature range: -0.527408 0.900169
+   14 BiCGStab iterations for Stokes subsystem.
+   Maximal velocity: 1.80187 cm/year
+   Time step: 607937 years
+   15 CG iterations for temperature
+   Temperature range: 973 4273.27
 
-Number of active cells: 5104 (on 6 levels)
-Number of degrees of freedom: 194273 (140913+6389+46971)
+Number of active cells: 17988 (on 7 levels)
+Number of degrees of freedom: 240504 (147888+18672+73944)
+
+Timestep 0:  t=0 years
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   3 BiCGStab iterations for Stokes subsystem.
+   Maximal velocity: 1.52763 cm/year
+   Time step: 357565 years
+   17 CG iterations for temperature
+   Temperature range: 973 4274.08
+
+Number of active cells: 34716 (on 8 levels)
+Number of degrees of freedom: 474550 (291896+36706+145948)
+
+Timestep 0:  t=0 years
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   3 BiCGStab iterations for Stokes subsystem.
+   Maximal velocity: 2.97931 cm/year
+   Time step: 91574.3 years
+   17 CG iterations for temperature
+   Temperature range: 973 4277.31
+
+Timestep 1:  t=91574.3 years
+   Assembling...
+   Solving...
+   2 BiCGStab iterations for Stokes subsystem.
+   Maximal velocity: 2.86431 cm/year
+   Time step: 95251.1 years
+   18 CG iterations for temperature
+   Temperature range: 973 4277.31
 
 [...]
 
-Timestep 35:  t=1.99808
+Timestep 53906:  t=9.99985e+08 years
    Assembling...
    Solving...
-   16 BiCGStab iterations for Stokes subsystem.
-   Time step: 0.0266227
-   16 CG iterations for temperature
-   Temperature range: -0.0693383 2.04746
-
-Number of active cells: 22912 (on 7 levels)
-Number of degrees of freedom: 838791 (609105+26651+203035)
+   4 BiCGStab iterations for Stokes subsystem.
+   Maximal velocity: 12.2898 cm/year
+   Time step: 22199.6 years
+   18 CG iterations for temperature
+   Temperature range: 973 4273.07
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |       523s |            |
+| Total wallclock time elapsed since start    |  1.87e+05s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble Stokes system          |        39 |      39.9s |       7.6% |
-| Assemble temperature matrices   |        10 |      5.43s |         1% |
-| Assemble temperature rhs        |        39 |      16.7s |       3.2% |
-| Build Stokes preconditioner     |        10 |      60.5s |        12% |
-| Solve Stokes system             |        39 |       260s |        50% |
-| Solve temperature system        |        39 |      39.9s |       7.6% |
-| Postprocessing                  |         7 |      9.31s |       1.8% |
-| Refine mesh structure, part 1   |        10 |      20.5s |       3.9% |
-| Refine mesh structure, part 2   |        10 |       2.1s |       0.4% |
-| Setup dof systems               |        11 |      63.3s |        12% |
+| Assemble Stokes system          |     53909 |  1.06e+04s |       5.7% |
+| Assemble temperature matrices   |      5393 |       913s |      0.49% |
+| Assemble temperature rhs        |     53909 |  1.24e+04s |       6.6% |
+| Build Stokes preconditioner     |      5393 |  4.52e+03s |       2.4% |
+| Solve Stokes system             |     53909 |  6.94e+04s |        37% |
+| Solve temperature system        |     53909 |  2.34e+04s |        13% |
+| Postprocessing                  |      2157 |  5.51e+03s |       2.9% |
+| Refine mesh structure, part 1   |      5392 |  4.71e+04s |        25% |
+| Refine mesh structure, part 2   |      5392 |  1.02e+03s |      0.55% |
+| Setup dof systems               |      5393 |  1.11e+04s |       5.9% |
 +---------------------------------+-----------+------------+------------+
 </pre>
 </code>
 
 As can be seen here, we spend most of the compute time in assembling linear
-systems, setting up degrees of freedom and distributed objects, and in
-particular in solving the Stokes system. A closer investigation turns out that
-the 12% spent in the setup part is mostly spent in assembling the sparsity
-pattern; this in turn is due to unsuitable data structures in Trilinos 9.0
-with which these computations have been done, but we have worked closely with
-the Trilinos authors to avoid this bottleneck, and future Trilinos versions
-should perform better in this regard.
+systems, refining the mesh, and in particular in solving the Stokes and 
+temperature linear systems. 
 
-The 50% spent on solving the Stokes system, as well as a good part of the 12%
-for building the Stokes preconditioner (which includes, in addition to
-assembling the preconditioner matrix the operations necessary to form the
-distributed algebraic multigrid preconditioner) are affected in large part
+The 50% spent on solving the linear systems are affected in large part
 because the Brazos cluster has a relatively slow ethernet interconnect. A
 cluster with a faster interconnect, for example using infiniband, should do
-better in this regard.
+better in this regard. On the other hand, there is little hope to do better
+with assembling the linear systems, though one could do significantly better
+with estimating the error by making sure that each processor only estimates
+the error on those cells it owns.
+
