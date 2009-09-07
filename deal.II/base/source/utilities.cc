@@ -677,6 +677,7 @@ namespace Utilities
 				       // communicator if this whole
 				       // thing was created as an MPI
 				       // communicator
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       Epetra_MpiComm
 	*mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);
       if (mpi_comm != 0)
@@ -685,6 +686,7 @@ namespace Utilities
 	  *mpi_comm = Epetra_MpiComm(MPI_COMM_SELF);
 	  MPI_Comm_free (&comm);
 	}
+#endif
     }
 
     
