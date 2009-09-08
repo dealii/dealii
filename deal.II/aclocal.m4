@@ -4425,7 +4425,7 @@ AC_DEFUN(DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Older gcc version appear to frown upon the way we write the
+dnl Older gcc versions appear to frown upon the way we write the
 dnl IsBlockMatrix<MatrixType> template. If that's the case,
 dnl remove the -Wctor-dtor-privacy flag.
 dnl
@@ -4473,6 +4473,56 @@ AC_DEFUN(DEAL_II_CHECK_CTOR_DTOR_PRIVACY, dnl
       ])
   fi
 ])
+
+
+
+dnl -------------------------------------------------------------
+dnl On Mac OS X, gcc appears to have a bug that prevents us from
+dnl compiling a bit of code that involves boost::bind. Check for
+dnl that.
+dnl
+dnl Usage: DEAL_II_CHECK_BOOST_BIND_COMPILER_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_BOOST_BIND_COMPILER_BUG, dnl
+[
+  if test "x$GXX" = "xyes" ; then
+    AC_MSG_CHECKING(for boost::bind compiler internal error)
+    AC_LANG(C++)
+    CXXFLAGS="$CXXFLAGSG -I./contrib/boost/include"
+    AC_TRY_COMPILE(
+      [
+#include <complex>
+#include <iostream>
+#include <boost/bind.hpp>
+
+template<typename number>
+void bug_function (number test)
+{
+  std::cout << test << std::endl;
+}
+      ],
+      [
+  std::complex<double> double_val (1., 2.);
+  boost::bind(&bug_function<std::complex<double> >,
+	      double_val)();
+
+  std::complex<float> float_val (1., 2.);
+  boost::bind(&bug_function<std::complex<float> >,
+	      float_val)();
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ],
+      [
+        AC_MSG_RESULT(yes)
+	AC_DEFINE(DEAL_II_BOOST_BIND_COMPILER_BUG, 1,
+	          [Defined if the compiler gets an internal error compiling
+		   some code that involves boost::bind])
+      ])
+  fi
+])
+
 
 
 dnl -------------------------------------------------------------

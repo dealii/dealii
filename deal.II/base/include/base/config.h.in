@@ -470,10 +470,6 @@
    header file. */
 #undef HAVE_THYRA_AZTECOOLINEAROPWITHSOLVEFACTORY_HPP
 
-/* Define to 1 if you have the <Thyra_DefaultBlockedLinearOpDecl.hpp> header
-   file. */
-#undef HAVE_THYRA_DEFAULTBLOCKEDLINEAROPDECL_HPP
-
 /* Define to 1 if you have the <Thyra_DefaultBlockedLinearOp.hpp> header file.
    */
 #undef HAVE_THYRA_DEFAULTBLOCKEDLINEAROP_HPP
