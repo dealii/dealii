@@ -2956,13 +2956,94 @@ void BoussinesqFlowProblem<dim>::output_results ()
 
 				 // @sect4{BoussinesqFlowProblem::refine_mesh}
 
-				 // Nothing new here, either. Since the
-				 // <code>setup_dofs</code> function that we
-				 // call in the middle has its own timer
-				 // section, we split timing this function
-				 // into two sections. It will also allow us
-				 // to easily identify which of the two is
-				 // more expensive.
+				 // This function isn't really new
+				 // either. Since the
+				 // <code>setup_dofs</code> function
+				 // that we call in the middle has its
+				 // own timer section, we split timing
+				 // this function into two
+				 // sections. It will also allow us to
+				 // easily identify which of the two
+				 // is more expensive.
+				 //
+				 // One thing of note, however, is
+				 // that we don't want to compute all
+				 // error indicators on all cells, of
+				 // course. Rather, it would be nice
+				 // if each processor could only
+				 // compute the error indicators for
+				 // those cells it actually
+				 // owns. However, in order for mesh
+				 // refinement to proceed in the same
+				 // way on all processors, all
+				 // processors would have to exchange
+				 // their refinement indicators. We do
+				 // so in two steps: first, we call
+				 // the KellyErrorEstimator::estimate
+				 // function with an argument (usually
+				 // defaulted, but explicitly given
+				 // here) thatindicates the subdomain
+				 // id of all those cells that we want
+				 // to work on; note that this means
+				 // that we also have to specify
+				 // values for all those default
+				 // arguments that lie before the one
+				 // we want to give.
+				 //
+				 // Secondly, we need to exchange the
+				 // data. To do this, we could add up
+				 // the refinement indicators from all
+				 // processors, since they all only
+				 // worked on a disjoint subset of the
+				 // elements of the vector that holds
+				 // these indicators. We could set up
+				 // a distributed Trilinos vector for
+				 // this, but that appears
+				 // unnecessarily complicated because
+				 // we would have to specify a
+				 // partition of this vector, and none
+				 // appears immediately
+				 // obvious. Rather, we want to use
+				 // the Trilinos communicator class to
+				 // this for us, taking the local
+				 // indicators as a collection of
+				 // floating point values rather than
+				 // a linear algebra
+				 // vector. Unfortunately, the
+				 // Trilinos communicator class
+				 // doesn't appear to have function
+				 // that wraps around the MPI add
+				 // function; it has one that computes
+				 // the maximum of a bunch of values,
+				 // though, which in our case is
+				 // equally good -- maybe even better,
+				 // in case two processors should
+				 // compute values for the same cell
+				 // (which they shouldn't of course,
+				 // unless we have made a mistake in
+				 // specifying the arguments to the
+				 // estimate function below). There is
+				 // little snag again, however, that
+				 // makes this a bit awkward: the
+				 // Trilinos communicator class can
+				 // take the maximum over all
+				 // processors for each element of a
+				 // vector, but only if the vector
+				 // contains doubles. The vector
+				 // returned by the
+				 // KellyErrorEstimator::estimate
+				 // function, on the other hand, has
+				 // floats as its data type. An ugly,
+				 // if workable way, is therefore to
+				 // compute the indicators as floats,
+				 // convert the vector to doubles, and
+				 // form the maximum of that.
+				 //
+				 // At the end of this chain of
+				 // events, every processors has the
+				 // complete set of refinement
+				 // indicators, and the rest of the
+				 // function proceeds as before.
 template <int dim>
 void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
