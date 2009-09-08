@@ -5,18 +5,15 @@ set Method_Form = rotational
 subsection Physical data
   # In this subsection we declare the physical data
   # The initial and final time, and the Reynolds number
-  set initial_time = 0.0
-  set final_time   = 1.0
-  set Reynolds     = 1.
+  set initial_time = 0.
+  set final_time   = 8.
+  set Reynolds     = 100
 end
 
 subsection Time step data
-  # In this subsection we declare the data that is to be used for the convergence tests
-  # To test convergence in time we run the algorithm with the time step set from
-  # 'initial_dt' to 'final_dt', each time dividing the current time step by 'dt_decrement'
-  set initial_dt   = .1
-  set final_dt     = 5e-3
-  set dt_decrement = 2.
+  # In this subsection we declare the data that is to be used for time discretization,
+  # i.e. the time step dt
+  set dt = 5e-3
 end
 
 subsection Space discretization
@@ -31,31 +28,15 @@ subsection Data solve velocity
   # In this section we declare the parameters that are going to control the solution process
   # for the velocity.
   set max_iterations = 1000  # maximal number of iterations that GMRES must make
-  set eps            = 1e-12 # stopping criterion
-  set Krylov_size    = 10    # size of the Krylov subspace to be used in GMRES
+  set eps            = 1e-6  # stopping criterion
+  set Krylov_size    = 30    # size of the Krylov subspace to be used in GMRES
   set off_diagonals  = 60    # number of off diagonals that ILU must compute
-  set diag_strength  = 0     # diagonal strengthening value
-  set update_prec    = 20    # this number indicates how often the preconditioner must be updated
+  set diag_strength  = 0.01  # diagonal strengthening value
+  set update_prec    = 10    # this number indicates how often the preconditioner must be updated
 end
 
-subsection Data solve projection
-  # In this section we declare the parameters that are going to control the solution process
-  # for the projection step.
-  set max_iterations = 1000  # maximal number of iterations that CG must make
-  set eps            = 1e-12 # stopping criterion
-  set off_diagonals  = 100    # number of off diagonals that ILU must compute. This one can be big as it is computed only once
-  set diag_strength  = 1.5     # diagonal strengthening value
-end
-
-subsection Data solve pressure update
-  # In this section we declare the parameters that are going to control the solution process
-  # for the pressure update step in the case of a rotational form of the method
-  set max_iterations = 1000  # maximal number of iterations that CG must make
-  set eps            = 1e-12 # stopping criterion
-  set off_diagonals  = 100    # number of off diagonals that ILU must compute. This one can be big as it is computed only once
-  set diag_strength  = 1e-5     # diagonal strengthening value
-end
-
+#The output frequency
+set output = 1
 
 #Finally we set the verbosity level
-set verbose = false
+set verbose = true

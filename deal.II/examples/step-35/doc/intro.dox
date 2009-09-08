@@ -1,3 +1,8 @@
-<a name="Intro"></a>
+<i> This program grew out of a student project by Abner Salgado at Texas A&M University. Most of the work for this program is by him.
+</i>
 
-<h1>Introduction</h1>
+<a name="Intro"></a>
+<h1> Introduction </h1>
+
+The purpose of this program is to show how to effectively solve the incompressible time-dependent Navier-Stokes equations.
+In previous tutorial programs (see for instance ****) we have seen how to solve the time-independent Stokes equations using a Schur-complement approach. However
