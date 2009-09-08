@@ -2967,13 +2967,24 @@ template <int dim>
 void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
   computing_timer.enter_section ("Refine mesh structure, part 1");
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  Vector<float> local_estimated_error_per_cell (triangulation.n_active_cells());
 
   KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
 				      QGauss<dim-1>(temperature_degree+1),
 				      typename FunctionMap<dim>::type(),
 				      temperature_solution,
-				      estimated_error_per_cell);
+				      local_estimated_error_per_cell,
+				      std::vector<bool>(),
+				      0,
+				      0,
+				      Utilities::Trilinos::get_this_mpi_process(trilinos_communicator));
+
+  Vector<double> x_local_estimated_error_per_cell (triangulation.n_active_cells());
+  x_local_estimated_error_per_cell = local_estimated_error_per_cell;
+  Vector<double> estimated_error_per_cell (triangulation.n_active_cells());
+  trilinos_communicator.MaxAll (&x_local_estimated_error_per_cell(0),
+				&estimated_error_per_cell(0),
+				triangulation.n_active_cells());
 
   GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
 						     estimated_error_per_cell,
