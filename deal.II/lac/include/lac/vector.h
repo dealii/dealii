@@ -1079,9 +1079,11 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
 
 
 
+#ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
 template <>
 inline
-Vector<std::complex<float> > & Vector<std::complex<float> >::operator = (const std::complex<float> s)
+Vector<std::complex<float> > & 
+Vector<std::complex<float> >::operator = (const std::complex<float> s)
 {
   Assert (numbers::is_finite(s),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
@@ -1093,6 +1095,7 @@ Vector<std::complex<float> > & Vector<std::complex<float> >::operator = (const s
 
   return *this;
 }
+#endif
 
 
 
