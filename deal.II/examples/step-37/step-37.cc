@@ -736,7 +736,10 @@ MatrixFree<number,Transformation>::el (const unsigned int row,
 				 // matrix, and finally multiply with the
 				 // second basis function. This is exactly
 				 // the value that would be written into the
-				 // diagonal of a sparse matrix.
+				 // diagonal of a sparse matrix. Note that
+				 // we need to condense hanging node
+				 // constraints and set the diagonals to
+				 // one.
 template <typename number, class Transformation>
 void
 MatrixFree<number,Transformation>::calculate_diagonal() const
@@ -782,7 +785,8 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
   std::size_t glob_size = derivatives.memory_consumption() +
     indices_local_to_global.memory_consumption() +
     constraints.memory_consumption() +
-    small_matrix.memory_consumption() + sizeof(*this);
+    small_matrix.memory_consumption() + 
+    diagonal_values.memory_consumption() + sizeof(*this);
   return glob_size;
 }
 
@@ -1420,7 +1424,7 @@ void LaplaceProblem<dim>::run ()
 int main ()
 {
   deallog.depth_console (0);
-  LaplaceProblem<3> laplace_problem (2);
+  LaplaceProblem<2> laplace_problem (2);
   laplace_problem.run ();
 
   return 0;
