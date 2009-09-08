@@ -1,7 +1,7 @@
 <h1>Results</h1>
 
 When run, the program simulates convection in 3d in much the same way
-as @ref step_31 "step-31" did, though with an entirely different testcase. 
+as @ref step_31 "step-31" did, though with an entirely different testcase.
 
 
 <h3>Comparison of results with step-31</h3>
@@ -41,7 +41,7 @@ cluster at Texas A&amp;M University.
 
 If we run the program as shown above, the output will look roughly like this,
 producing the final part of the output after some 2 days when run on 10
-processors: 
+processors:
 
 <code>
 <pre>
@@ -125,8 +125,8 @@ Timestep 53906:  t=9.99985e+08 years
 </code>
 
 As can be seen here, we spend most of the compute time in assembling linear
-systems, refining the mesh, and in particular in solving the Stokes and 
-temperature linear systems. 
+systems, refining the mesh, and in particular in solving the Stokes and
+temperature linear systems.
 
 The 50% spent on solving the linear systems are affected in large part
 because the Brazos cluster has a relatively slow ethernet interconnect. A
@@ -136,3 +136,155 @@ with assembling the linear systems, though one could do significantly better
 with estimating the error by making sure that each processor only estimates
 the error on those cells it owns.
 
+
+The program writes output every 25th time step, but we won't show all
+2100 or so images this produces. Rather, let us only show the output
+from every 2500th time step here, even though this does, of course,
+not do full justice to the dynamics that are going on:
+<table>
+  <tr>
+    <td>
+      @image html step-32.2d.temperature.0000.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.0100.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.0200.png
+    <td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-32.2d.temperature.0300.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.0400.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.0500.png
+    <td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-32.2d.temperature.0600.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.0700.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.0800.png
+    <td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-32.2d.temperature.0900.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.1000.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.1100.png
+    <td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-32.2d.temperature.1200.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.1300.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.1400.png
+    <td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-32.2d.temperature.1500.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.1600.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.1700.png
+    <td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-32.2d.temperature.1800.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.1900.png
+    <td>
+
+    <td>
+      @image html step-32.2d.temperature.2000.png
+    <td>
+  </tr>
+
+
+  <tr>
+    <td>
+      @image html step-32.2d.temperature.2100.png
+    <td>
+
+    <td>
+      @image html step-32.2d.grid.2100.png
+    <td>
+
+    <td>
+      @image html step-32.2d.partition.2100.png
+    <td>
+  </tr>
+</table>
+
+The last two images show the grid as well as the partitioning of the
+mesh for the last timestep shown into the 10 subdomains used for this
+computation. The full dynamics are really only visible by looking at
+an animation. <a
+href="http:/www.math.tamu.edu/~bangerth/images/pictures/convection-outward/step-32.2d.convection.gif">At
+this site</a> is such an animation. Beware that this animation is
+about 20MB large, though it is well worth watching due to its almost
+artistic quality.
+
+If you watch the movie, you'll see that the convection pattern goes
+through several stages: First, it gets rid of the instable temperature
+layering with the hot material overlaid by the dense cold
+material. After this great driver is removed and we have a sort of
+stable situation, a few blobs start to separate from the hot boundary
+layer at the inner ring and rise up, with a few cold fingers also
+dropping down from the outer ring. During this phase, the solution
+remains mostly symmetric, reflecting the 12-fold symmetry of the
+original mesh. In a final phase, the fluid enters vigorous chaotic
+stirring in which all symmetries are lost. This is a pattern that then
+continues to dominate flow.
+
+These different phases can also be identified if we look at the
+maximal velocity as a function of time in the simulation:
+
+@image html step-32.2d.t_vs_vmax.png
+
+Here, the velocity (shown in centimeters per year) becomes very large,
+to the order of several meters per year) at the beginning when the
+temperature layering is instable. It then calms down to relatively
+small values before picking up again in the chaotic stirring
+regime. There, it remains in the range of 10-40 centimeters per year,
+quite within the physically expected region.
