@@ -4489,7 +4489,7 @@ AC_DEFUN(DEAL_II_CHECK_BOOST_BIND_COMPILER_BUG, dnl
   if test "x$GXX" = "xyes" ; then
     AC_MSG_CHECKING(for boost::bind compiler internal error)
     AC_LANG(C++)
-    CXXFLAGS="$CXXFLAGSG -I./contrib/boost/include"
+    CXXFLAGS="$CXXFLAGSO -I./contrib/boost/include"
     AC_TRY_COMPILE(
       [
 #include <complex>
@@ -4503,10 +4503,6 @@ void bug_function (number test)
 }
       ],
       [
-  std::complex<double> double_val (1., 2.);
-  boost::bind(&bug_function<std::complex<double> >,
-	      double_val)();
-
   std::complex<float> float_val (1., 2.);
   boost::bind(&bug_function<std::complex<float> >,
 	      float_val)();
