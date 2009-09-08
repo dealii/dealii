@@ -1015,6 +1015,49 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast)
 
 
 
+namespace internal
+{
+  namespace Vector
+  {
+    template<typename T>
+    void set_subrange (const T            s,
+		       const unsigned int begin,
+		       const unsigned int end,
+		       dealii::Vector<T> &dst)
+    {
+      if (s == T())
+	memset ((dst.begin()+begin),0,(end-begin)*sizeof(T));
+      else
+	std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
+    }
+
+    template<typename T>
+    void copy_subrange (const dealii::Vector<T>&src,
+			const unsigned int      begin,
+			const unsigned int      end,
+			dealii::Vector<T>      &dst)
+    {
+      memcpy(&*(dst.begin()+begin), &*(src.begin()+begin),
+	     (end-begin)*sizeof(T));
+    }
+
+    template<typename T, typename U>
+    void copy_subrange_ext (const dealii::Vector<T>&src,
+			    const unsigned int      begin,
+			    const unsigned int      end,
+			    dealii::Vector<U>      &dst)
+    {
+      const T* q = src.begin()+begin;
+      const T* const end_q = src.begin()+end;
+      U* p = dst.begin()+begin;
+      for (; q!=end_q; ++q, ++p)
+	*p = *q;
+    }
+  }
+}
+
+
+
 template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
@@ -1025,10 +1068,70 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size!=0)
-    parallel::apply_to_subranges (begin(), end(),
-				  std_cxx1x::bind(&std::fill<Number*,Number>,
-						  _1, _2, s),
+    parallel::apply_to_subranges (0U, size(),
+				  std_cxx1x::bind(&internal::Vector::template
+						  set_subrange<Number>,
+						  s, _1, _2, std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
+
+  return *this;
+}
+
+
+
+template <>
+inline
+Vector<std::complex<float> > & Vector<std::complex<float> >::operator = (const std::complex<float> s)
+{
+  Assert (numbers::is_finite(s),
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
+  if (s != std::complex<float>())
+    Assert (vec_size!=0, ExcEmptyObject());
+  if (vec_size!=0)
+    std::fill (begin(), end(), s);
+
+  return *this;
+}
+
+
+
+template <typename Number>
+inline
+Vector<Number> &
+Vector<Number>::operator = (const Vector<Number>& v)
+{
+  if (v.vec_size != vec_size)
+    reinit (v.vec_size, true);
+  if (vec_size!=0)
+    parallel::apply_to_subranges (0U, size(),
+				  std_cxx1x::bind(&internal::Vector::template
+						  copy_subrange<Number>,
+						  std_cxx1x::cref(v), _1, _2, 
+						  std_cxx1x::ref(*this)),
+				  internal::Vector::minimum_parallel_grain_size);
+
+  return *this;
+}
+
+
+
+template <typename Number>
+template <typename Number2>
+inline
+Vector<Number> &
+Vector<Number>::operator = (const Vector<Number2>& v)
+{
+  if (v.size() != vec_size)
+    reinit (v.size(), true);
+  if (vec_size!=0)
+    parallel::apply_to_subranges (0U, size(),
+				  std_cxx1x::bind(&internal::Vector::template
+						  copy_subrange_ext<Number2,Number>,
+						  std_cxx1x::cref(v), _1, _2, 
+						  std_cxx1x::ref(*this)),
+				  internal::Vector::minimum_parallel_grain_size);
+  
   return *this;
 }
 

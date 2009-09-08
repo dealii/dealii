@@ -668,39 +668,6 @@ void Vector<Number>::ratio (const Vector<Number> &a,
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const Vector<Number>& v)
-{
-  if (v.vec_size != vec_size)
-    reinit (v.vec_size, true);
-  if (vec_size!=0)
-    parallel::transform (v.val,
-			 v.val+v.vec_size,
-			 val,
-			 (boost::lambda::_1),
-			 internal::Vector::minimum_parallel_grain_size);
-  
-  return *this;
-}
-
-
-
-template <typename Number>
-template <typename Number2>
-Vector<Number> &
-Vector<Number>::operator = (const Vector<Number2>& v)
-{
-  if (v.size() != vec_size)
-    reinit (v.size(), true);
-  if (vec_size!=0)
-    std::copy (v.begin(), v.end(), begin());
-  
-  return *this;
-}
-
-
-
-template <typename Number>
-Vector<Number> &
 Vector<Number>::operator = (const BlockVector<Number>& v)
 {
   if (v.size() != vec_size)

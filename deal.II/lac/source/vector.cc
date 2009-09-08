@@ -52,10 +52,6 @@ TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<long double>);
 
 
 #define TEMPL_OP_EQ(S1,S2) \
-  template \
-  Vector<S1>& \
-  Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST \
-  operator=<S2>(const Vector<S2>&);		      \
   template void Vector<S1>::scale (const Vector<S2>&);	\
   template void Vector<S1>::equ (const S1, const Vector<S2>&)
 
