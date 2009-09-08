@@ -65,6 +65,10 @@
    */
 #undef DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG
 
+/* Defined if the compiler gets an internal error compiling some code that
+   involves boost::bind */
+#undef DEAL_II_BOOST_BIND_COMPILER_BUG
+
 /* Define if the use of socket functionality leads to strange results with
    floating point computations on cygwin systems. */
 #undef DEAL_II_BROKEN_SOCKETS
