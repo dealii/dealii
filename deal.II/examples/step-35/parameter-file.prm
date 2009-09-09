@@ -6,9 +6,8 @@ subsection Physical data
   # In this subsection we declare the physical data
   # The initial and final time, and the Reynolds number
   set initial_time = 0.
-  set final_time   = 8.
-  set Reynolds     = 100
-  set filename     = zigzag.inp
+  set final_time   = 10.
+  set Reynolds     = 1e3
 end
 
 subsection Time step data
