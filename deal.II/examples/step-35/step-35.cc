@@ -79,12 +79,18 @@ namespace RunTimeParameters{
     METHOD_ROTATIONAL
   };
 
+  enum Mesh_Used{
+    MESH_NSBENCH,
+    MESH_WANNIER
+  };
+
   class Data_Storage{
     public:
       Data_Storage();
       ~Data_Storage();
       void read_data( const char *filename );
       Method_Formulation form;
+      Mesh_Used meshfile;
       double initial_time,
              final_time,
              Reynolds;
@@ -113,6 +119,8 @@ namespace RunTimeParameters{
       prm.declare_entry( "initial_time", "0.", Patterns::Double( 0. ), " The initial time of the simulation. " );
       prm.declare_entry( "final_time", "1.", Patterns::Double( 0. ), " The final time of the simulation. " );
       prm.declare_entry( "Reynolds", "1.", Patterns::Double( 0. ), " The Reynolds number. " );
+      prm.declare_entry( "filename", "nsbench2.inp", Patterns::Selection( "nsbench2.inp|wannier.inp" ),
+                        " The mesh that we want to use." );
     prm.leave_subsection();
 
     prm.enter_subsection( "Time step data" );
@@ -164,6 +172,11 @@ namespace RunTimeParameters{
       initial_time = prm.get_double( "initial_time" );
       final_time   = prm.get_double( "final_time" );
       Reynolds     = prm.get_double( "Reynolds" );
+      token        = prm.get( "filename" );
+      if( token == std::string( "nsbench2.inp" ) )
+        meshfile = MESH_NSBENCH;
+      else
+        meshfile = MESH_WANNIER;
     prm.leave_subsection();
 
     prm.enter_subsection( "Time step data" );
@@ -195,7 +208,7 @@ namespace RunTimeParameters{
 
 
 // @sect3{The Equation Data}
-// Here we declare the initial and boundary conditions, as well as the right hand side.
+// Here we declare the initial and boundary conditions.
 namespace EquationData{
   // Because of our implementation, we do not take advantage of the capabilities of the library
   // to handle vector valued problems. Whether this is a good or bad idea is another issue. The
@@ -239,10 +252,10 @@ namespace EquationData{
   }
 
   template<int dim> inline double Velocity<dim>::value( const Point<dim> &p, const unsigned int ) const{
-    double return_value = 0., dist = std::sqrt( p.square() );
-    static const double Um = 1.5, H = 4.1;
+    double return_value = 0.;
+    static const double Um = 5., H = 4.1; //Um = 1.5
     if( MultiComponentFunction<dim>::comp == 0 )
-      return_value = 4.*Um*p(1)*( H - p(1) )/**sin( M_PI*FunctionTime::get_time()/8. )*//(H*H);
+      return_value = 4.*Um*p(1)*( H - p(1) )/(H*H);
     return return_value;
   }
 
@@ -268,30 +281,6 @@ namespace EquationData{
     for (unsigned int i=0; i<n_points; ++i)
       values[i] = Pressure<dim>::value( points[i] );
   }
-
-/*  template<int dim> class Force: public MultiComponentFunction<dim>{
-    public:
-      Force( const double initial_time =0.0 );
-      virtual double value( const Point<dim> &p, const unsigned int component = 0 ) const;
-      virtual void value_list( const std::vector< Point<dim> > &points, std::vector<double> &values,
-                                const unsigned int component = 0 ) const;
-  };
-
-  template<int dim> Force<dim>::Force( const double initial_time ):
-                                  MultiComponentFunction<dim>( initial_time ){}
-
-  template<int dim> void  Force<dim>::value_list( const std::vector<Point<dim> > &points, std::vector<double> &values,
-                                                    const unsigned int ) const{
-    const unsigned int n_points = points.size();
-    Assert( values.size() == n_points, ExcDimensionMismatch( values.size(), n_points ) );
-    for (unsigned int i=0; i<n_points; ++i)
-      values[i] = Force<dim>::value( points[i] );
-  }
-
-  template<int dim> inline double Force<dim>::value( const Point<dim> &p, const unsigned int ) const{
-    double return_value = 0.;
-    return return_value;
-  }*/
 }
 
 
@@ -307,12 +296,12 @@ template<int dim> class Navier_Stokes_Projection{
     void run( const bool verbose = false, const unsigned int n_of_plots = 10 );
   protected:
     RunTimeParameters::Method_Formulation type;
+    RunTimeParameters::Mesh_Used meshfile;
 
     unsigned int deg;
     double dt;
 
     double t_0, T, Re;
-//     EquationData::Force<dim> rhs;
 
     EquationData::Velocity<dim> vel_exact;
     std::map<unsigned int, double> boundary_values;
@@ -331,10 +320,11 @@ template<int dim> class Navier_Stokes_Projection{
     Vector<double> pres_n, pres_n_minus_1, phi_n, phi_n_minus_1, u_n[dim], u_n_minus_1[dim],
                   u_star[dim],
                   force[dim],
-                  v_tmp, pres_tmp;
+                  v_tmp, pres_tmp,
+                  rot_u;
 
     SparseILU<double> prec_velocity[dim];
-    SparseDirectUMFPACK prec_mass, prec_pressure;
+    SparseDirectUMFPACK prec_mass, prec_pressure, prec_vel_mass;
 
     DeclException2( ExcInvalidTimeStep, double, double, <<" The time step "<<arg1<<" is out of range."<<std::endl
                                                                 <<" The permitted range is (0,"<<arg2<<"]");
@@ -412,6 +402,7 @@ template<int dim> class Navier_Stokes_Projection{
     inline void diffusion_component_solve( const unsigned int d );
 
     inline void plot_solution( const unsigned int step );
+    inline void assemble_vorticity( const bool reinit_prec );
 };
 
 
@@ -428,9 +419,10 @@ template<int dim> Navier_Stokes_Projection<dim>::~Navier_Stokes_Projection(){
 // and, finally, create the triangulation and load the initial data.
 template<int dim> Navier_Stokes_Projection<dim>::Navier_Stokes_Projection(
                                         const RunTimeParameters::Data_Storage &data ):
-                    type( data.form ), deg( data.pressure_degree ), dt( data.dt ), t_0( data.initial_time ),
-                    T( data.final_time ), Re( data.Reynolds ), /*rhs( data.initial_time ),*/
-                    vel_exact( data.initial_time ), dof_handler_velocity( triangulation ),
+                    type( data.form ), meshfile( data.meshfile ),
+                    deg( data.pressure_degree ), dt( data.dt ), t_0( data.initial_time ),
+                    T( data.final_time ), Re( data.Reynolds ), vel_exact( data.initial_time ),
+                    dof_handler_velocity( triangulation ),
                     dof_handler_pressure( triangulation ), fe_velocity( deg+1 ), fe_pressure( deg ),
                     quadrature_pressure( deg+1 ), quadrature_velocity( deg+2 ),
                     vel_max_its( data.vel_max_iterations ), vel_Krylov_size( data.vel_Krylov_size ),
@@ -458,9 +450,20 @@ template<int dim> void Navier_Stokes_Projection<dim>::Create_Triangulation( cons
   GridIn<dim> grid_in;
   grid_in.attach_triangulation( triangulation );
 
-  std::ifstream file( "nsbench2.inp" );
-  Assert( file, ExcFileNotOpen( "nsbench2.inp" ) );
-  grid_in.read_ucd(file);
+  std::string filename;
+  switch( meshfile ){
+    case RunTimeParameters::MESH_NSBENCH:
+      filename = "nsbench2.inp";
+      break;
+    case RunTimeParameters::MESH_WANNIER:
+      filename = "wannier.inp";
+      break;
+    default:
+      Assert( false, ExcNotImplemented() );
+  }
+  std::ifstream file( filename.c_str() );
+  Assert( file, ExcFileNotOpen( filename.c_str() ) );
+  grid_in.read_ucd( file );
   file.close();
 
   std::cout<<" Number of refines = "<<n_of_refines<<std::endl;
@@ -490,9 +493,11 @@ template<int dim> void Navier_Stokes_Projection<dim>::Create_Triangulation( cons
     force[d].reinit( dof_handler_velocity.n_dofs() );
   }
   v_tmp.reinit( dof_handler_velocity.n_dofs() );
+  rot_u.reinit( dof_handler_velocity.n_dofs() );
 
   std::cout<<" dim( X_h ) = "<<( dof_handler_velocity.n_dofs()*dim )<<std::endl
-           <<" dim( M_h ) = "<<dof_handler_pressure.n_dofs()<<std::endl;
+           <<" dim( M_h ) = "<<dof_handler_pressure.n_dofs()<<std::endl
+           <<" Re         = "<<Re<<std::endl;
 }
 
 
@@ -639,11 +644,8 @@ template<int dim> void Navier_Stokes_Projection<dim>::copy_gradient_local_to_glo
 // and so it is by default set to false
 template<int dim> void Navier_Stokes_Projection<dim>::run( const bool verbose, const unsigned int n_of_plots ){
   unsigned int n_steps = ( T - t_0 )/dt;
-//   rhs.set_time( 2.*dt );
   vel_exact.set_time( 2.*dt );
-
   plot_solution(1);
-
   for( unsigned int n = 2; n<=n_steps; ++n ){
     if( n%n_of_plots == 0 ){
       if( verbose )
@@ -666,7 +668,6 @@ template<int dim> void Navier_Stokes_Projection<dim>::run( const bool verbose, c
     if( verbose )
       std::cout<<"  Updating the Pressure"<<std::endl;
     update_pressure( ( n == 2 ) );
-//     rhs.advance_time(dt);
     vel_exact.advance_time(dt);
   }
   plot_solution( n_steps );
@@ -690,9 +691,7 @@ template<int dim> void Navier_Stokes_Projection<dim>::diffusion_step( const bool
   assemble_advection_term();
 
   for( unsigned int d=0; d<dim; ++d ){
-//     rhs.set_component(d);
     force[d] = 0.;
-
     v_tmp = 0.;
     v_tmp.add( 2./dt,u_n[d],-.5/dt,u_n_minus_1[d] );
     vel_Mass.vmult_add( force[d], v_tmp );
@@ -853,11 +852,16 @@ template<int dim> void Navier_Stokes_Projection<dim>::update_pressure( const boo
 // @sect4{ <code>Navier_Stokes_Projection::plot_solution</code> }
 // This method plots the current solution. It is an adaptation of
 // step-31 **** and so I will not elaborate on it.
+// There is one small detail here. It is often interested to see
+// the vorticity of the flow. But, since we are using it here only for plotting
+// purposes, we are not going to compute it at every time step, but only when
+// we are going to plot it.
 template<int dim> void Navier_Stokes_Projection<dim>::plot_solution( const unsigned int step ){
-  const FESystem<dim> joint_fe( fe_velocity, dim, fe_pressure, 1 );
+  assemble_vorticity( ( step == 1 ) );
+  const FESystem<dim> joint_fe( fe_velocity, dim, fe_pressure, 1, fe_velocity, 1 );
   DoFHandler<dim> joint_dof_handler( triangulation );
   joint_dof_handler.distribute_dofs( joint_fe );
-  Assert( joint_dof_handler.n_dofs() == dim*dof_handler_velocity.n_dofs() + dof_handler_pressure.n_dofs(),
+  Assert( joint_dof_handler.n_dofs() == (dim + 1)*dof_handler_velocity.n_dofs() + dof_handler_pressure.n_dofs(),
           ExcInternalError() );
   static Vector<double> joint_solution( joint_dof_handler.n_dofs() );
   std::vector<unsigned int> loc_joint_dof_indices( joint_fe.dofs_per_cell ),
@@ -885,17 +889,24 @@ template<int dim> void Navier_Stokes_Projection<dim>::plot_solution( const unsig
           joint_solution( loc_joint_dof_indices[i] ) =
                                           pres_n( loc_pres_dof_indices[ joint_fe.system_to_base_index(i).second ] );
           break;
+        case 2:
+          Assert( joint_fe.system_to_base_index(i).first.second == 0, ExcInternalError() );
+          joint_solution( loc_joint_dof_indices[i] ) =
+                          rot_u( loc_vel_dof_indices[ joint_fe.system_to_base_index(i).second ] );
+          break;
         default:
           Assert( false, ExcInternalError() );
       }
   }
   std::vector<std::string> joint_solution_names( dim, "v" );
   joint_solution_names.push_back( "p" );
+  joint_solution_names.push_back( "rot_u" );
   DataOut<dim> data_out;
   data_out.attach_dof_handler (joint_dof_handler);
   std::vector< DataComponentInterpretation::DataComponentInterpretation >
-            component_interpretation( dim+1, DataComponentInterpretation::component_is_part_of_vector );
-  component_interpretation[dim] = DataComponentInterpretation::component_is_scalar;
+            component_interpretation( dim+2, DataComponentInterpretation::component_is_part_of_vector );
+  component_interpretation[dim]   = DataComponentInterpretation::component_is_scalar;
+  component_interpretation[dim+1] = DataComponentInterpretation::component_is_scalar;
   data_out.add_data_vector( joint_solution, joint_solution_names, DataOut<dim>::type_dof_data,
                             component_interpretation );
   data_out.build_patches( deg + 1 );
@@ -905,6 +916,43 @@ template<int dim> void Navier_Stokes_Projection<dim>::plot_solution( const unsig
   data_out.write_vtk( output );
 }
 
+
+
+// Since this function is supposed to be called only when the plot is going to be made,
+// which should not be every time step, we do not parallelize it. Of course, if needed,
+// this can be done as in the other cases. Moreover, the implementation that we have
+// here only works for 2d, so we bail if that is not the case.
+template<int dim> void Navier_Stokes_Projection<dim>::assemble_vorticity( const bool reinit_prec ){
+  Assert( dim == 2, ExcNotImplemented() );
+  if( reinit_prec )
+    prec_vel_mass.initialize( vel_Mass );
+
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler_velocity.begin_active(),
+                                                   end = dof_handler_velocity.end();
+  FEValues<dim> fe_val_vel( fe_velocity, quadrature_velocity, update_gradients | update_JxW_values | update_values );
+  const unsigned int dpc = fe_velocity.dofs_per_cell,
+                     nqp = quadrature_velocity.size();
+  std::vector<unsigned int> ldi( dpc );
+  Vector<double> loc_rot( dpc );
+
+  std::vector< Tensor<1,dim> > grad_u1( nqp ), grad_u2( nqp );
+  rot_u = 0.;
+  for( ; cell not_eq end; ++cell ){
+    fe_val_vel.reinit( cell );
+    cell->get_dof_indices( ldi );
+    fe_val_vel.get_function_gradients( u_n[0], grad_u1 );
+    fe_val_vel.get_function_gradients( u_n[1], grad_u2 );
+    loc_rot = 0.;
+    for( unsigned int q=0; q<nqp; ++q )
+      for( unsigned int i=0; i<dpc; ++i )
+        loc_rot(i) += fe_val_vel.JxW(q)*( grad_u2[q][0] - grad_u1[q][1] )*fe_val_vel.shape_value( i, q );
+
+    for( unsigned int i=0; i<dpc; ++i )
+      rot_u( ldi[i] ) += loc_rot(i);
+  }
+
+  prec_vel_mass.solve( rot_u );
+}
 
 
 // @sect3{ The main function }
