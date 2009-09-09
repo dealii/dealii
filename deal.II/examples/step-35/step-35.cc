@@ -79,18 +79,12 @@ namespace RunTimeParameters{
     METHOD_ROTATIONAL
   };
 
-  enum Mesh_Used{
-    MESH_NSBENCH,
-    MESH_WANNIER
-  };
-
   class Data_Storage{
     public:
       Data_Storage();
       ~Data_Storage();
       void read_data( const char *filename );
       Method_Formulation form;
-      Mesh_Used meshfile;
       double initial_time,
              final_time,
              Reynolds;
@@ -119,8 +113,6 @@ namespace RunTimeParameters{
       prm.declare_entry( "initial_time", "0.", Patterns::Double( 0. ), " The initial time of the simulation. " );
       prm.declare_entry( "final_time", "1.", Patterns::Double( 0. ), " The final time of the simulation. " );
       prm.declare_entry( "Reynolds", "1.", Patterns::Double( 0. ), " The Reynolds number. " );
-      prm.declare_entry( "filename", "nsbench2.inp", Patterns::Selection( "nsbench2.inp|wannier.inp" ),
-                        " The mesh that we want to use." );
     prm.leave_subsection();
 
     prm.enter_subsection( "Time step data" );
@@ -173,10 +165,6 @@ namespace RunTimeParameters{
       final_time   = prm.get_double( "final_time" );
       Reynolds     = prm.get_double( "Reynolds" );
       token        = prm.get( "filename" );
-      if( token == std::string( "nsbench2.inp" ) )
-        meshfile = MESH_NSBENCH;
-      else
-        meshfile = MESH_WANNIER;
     prm.leave_subsection();
 
     prm.enter_subsection( "Time step data" );
@@ -253,7 +241,7 @@ namespace EquationData{
 
   template<int dim> inline double Velocity<dim>::value( const Point<dim> &p, const unsigned int ) const{
     double return_value = 0.;
-    static const double Um = 5., H = 4.1; //Um = 1.5
+    static const double Um = 1.5, H = 4.1;
     if( MultiComponentFunction<dim>::comp == 0 )
       return_value = 4.*Um*p(1)*( H - p(1) )/(H*H);
     return return_value;
@@ -296,7 +284,6 @@ template<int dim> class Navier_Stokes_Projection{
     void run( const bool verbose = false, const unsigned int n_of_plots = 10 );
   protected:
     RunTimeParameters::Method_Formulation type;
-    RunTimeParameters::Mesh_Used meshfile;
 
     unsigned int deg;
     double dt;
@@ -419,11 +406,10 @@ template<int dim> Navier_Stokes_Projection<dim>::~Navier_Stokes_Projection(){
 // and, finally, create the triangulation and load the initial data.
 template<int dim> Navier_Stokes_Projection<dim>::Navier_Stokes_Projection(
                                         const RunTimeParameters::Data_Storage &data ):
-                    type( data.form ), meshfile( data.meshfile ),
-                    deg( data.pressure_degree ), dt( data.dt ), t_0( data.initial_time ),
+                    type( data.form ), deg( data.pressure_degree ), dt( data.dt ), t_0( data.initial_time ),
                     T( data.final_time ), Re( data.Reynolds ), vel_exact( data.initial_time ),
-                    dof_handler_velocity( triangulation ),
-                    dof_handler_pressure( triangulation ), fe_velocity( deg+1 ), fe_pressure( deg ),
+                    dof_handler_velocity( triangulation ), dof_handler_pressure( triangulation ),
+                    fe_velocity( deg+1 ), fe_pressure( deg ),
                     quadrature_pressure( deg+1 ), quadrature_velocity( deg+2 ),
                     vel_max_its( data.vel_max_iterations ), vel_Krylov_size( data.vel_Krylov_size ),
                     vel_off_diagonals( data.vel_off_diagonals ),
@@ -450,17 +436,7 @@ template<int dim> void Navier_Stokes_Projection<dim>::Create_Triangulation( cons
   GridIn<dim> grid_in;
   grid_in.attach_triangulation( triangulation );
 
-  std::string filename;
-  switch( meshfile ){
-    case RunTimeParameters::MESH_NSBENCH:
-      filename = "nsbench2.inp";
-      break;
-    case RunTimeParameters::MESH_WANNIER:
-      filename = "wannier.inp";
-      break;
-    default:
-      Assert( false, ExcNotImplemented() );
-  }
+  std::string filename = "nsbench2.inp";
   std::ifstream file( filename.c_str() );
   Assert( file, ExcFileNotOpen( filename.c_str() ) );
   grid_in.read_ucd( file );
@@ -674,26 +650,21 @@ template<int dim> void Navier_Stokes_Projection<dim>::run( const bool verbose, c
 }
 
 template<int dim> void Navier_Stokes_Projection<dim>::interpolate_velocity(){
-  for( unsigned int d=0; d<dim; ++d ){
-    u_star[d] = 0.;
-    u_star[d].add( 2., u_n[d], -1., u_n_minus_1[d] );
-  }
+  for( unsigned int d=0; d<dim; ++d )
+    u_star[d].equ( 2., u_n[d], -1, u_n_minus_1[d] );
 }
 
 
 // @sect4{<code>Navier_Stokes_Projection::diffusion_step</code>}
 // The implementation of a diffusion step.
 template<int dim> void Navier_Stokes_Projection<dim>::diffusion_step( const bool reinit_prec ){
-  pres_tmp = pres_n;
-  pres_tmp.add(4./3., phi_n, -1./3., phi_n_minus_1);
-  pres_tmp *= -1.;
+  pres_tmp.equ( -1., pres_n, -4./3., phi_n, 1./3., phi_n_minus_1 );
 
   assemble_advection_term();
 
   for( unsigned int d=0; d<dim; ++d ){
     force[d] = 0.;
-    v_tmp = 0.;
-    v_tmp.add( 2./dt,u_n[d],-.5/dt,u_n_minus_1[d] );
+    v_tmp.equ( 2./dt,u_n[d],-.5/dt,u_n_minus_1[d] );
     vel_Mass.vmult_add( force[d], v_tmp );
 
     pres_Diff[d].vmult_add( force[d], pres_tmp );
@@ -705,6 +676,7 @@ template<int dim> void Navier_Stokes_Projection<dim>::diffusion_step( const bool
     vel_exact.set_component(d);
     std::vector<unsigned char>::const_iterator boundaries = boundary_indicators.begin(),
                                                b_end = boundary_indicators.end();
+    boundary_values.clear();
     for( ; boundaries not_eq b_end; ++boundaries ){
       switch( *boundaries ){
         case 1:
@@ -715,7 +687,6 @@ template<int dim> void Navier_Stokes_Projection<dim>::diffusion_step( const bool
           VectorTools::interpolate_boundary_values( dof_handler_velocity, *boundaries,
                                                     vel_exact, boundary_values );
           break;
-          ///
         case 3:
           if( d not_eq 0 )
             VectorTools::interpolate_boundary_values( dof_handler_velocity, *boundaries,
@@ -738,7 +709,7 @@ template<int dim> void Navier_Stokes_Projection<dim>::diffusion_step( const bool
     if( reinit_prec )
       prec_velocity[d].initialize( vel_it_matrix[d],
                                   SparseILU<double>::AdditionalData( vel_diag_strength, vel_off_diagonals ) );
-      tasks += Threads::new_task( &Navier_Stokes_Projection<dim>::diffusion_component_solve, *this, d );
+    tasks += Threads::new_task( &Navier_Stokes_Projection<dim>::diffusion_component_solve, *this, d );
   }
   tasks.join_all();
 }
@@ -929,7 +900,8 @@ template<int dim> void Navier_Stokes_Projection<dim>::assemble_vorticity( const 
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof_handler_velocity.begin_active(),
                                                    end = dof_handler_velocity.end();
-  FEValues<dim> fe_val_vel( fe_velocity, quadrature_velocity, update_gradients | update_JxW_values | update_values );
+  FEValues<dim> fe_val_vel( fe_velocity, quadrature_velocity,
+                            update_gradients | update_JxW_values | update_values );
   const unsigned int dpc = fe_velocity.dofs_per_cell,
                      nqp = quadrature_velocity.size();
   std::vector<unsigned int> ldi( dpc );
