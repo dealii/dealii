@@ -4641,6 +4641,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
           CXXFLAGS="$CXXFLAGS -m64"
           CXXFLAGSG="$CXXFLAGSG -m64"
           CXXFLAGSO="$CXXFLAGSO -m64"
+	  F77FLAGS="$F77FLAGS -m64"
+	  F77FLAGSG="$F77FLAGSG -m64"
+          F77FLAGSO="$F77FLAGSO -m64"
           LDFLAGS="$LDFLAGS -m64"
         fi
 
