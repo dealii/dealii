@@ -1,1 +1,80 @@
+<a name="results"></a>
 <h1>Results</h1>
+
+We run the code with the following <code>parameter-file.prm</code>, which can be found in the
+same directory as the source:
+@verbatim
+  # First a global definition
+  # the type of method we want to use
+  set Method_Form = rotational
+
+  subsection Physical data
+    # In this subsection we declare the physical data
+    # The initial and final time, and the Reynolds number
+    set initial_time = 0.
+    set final_time   = 10.
+    set Reynolds     = 100
+  end
+
+  subsection Time step data
+    # In this subsection we declare the data that is to be used for time discretization,
+    # i.e. the time step dt
+    set dt = 5e-3
+  end
+
+  subsection Space discretization
+    # In this subsection we declare the data that is relevant to the space discretization
+    # we set the number of global refines the triangulation must have
+    # and the degree k of the pair Q_(k+1)--Q_k of velocity--pressure finite element spaces
+    set n_of_refines = 3
+    set pressure_fe_degree = 1
+  end
+
+  subsection Data solve velocity
+    # In this section we declare the parameters that are going to control the solution process
+    # for the velocity.
+    set max_iterations = 1000  # maximal number of iterations that GMRES must make
+    set eps            = 1e-6  # stopping criterion
+    set Krylov_size    = 30    # size of the Krylov subspace to be used in GMRES
+    set off_diagonals  = 60    # number of off diagonals that ILU must compute
+    set diag_strength  = 0.01  # diagonal strengthening value
+    set update_prec    = 10    # this number indicates how often the preconditioner must be updated
+  end
+
+  #The output frequency
+  set output = 5
+
+  #Finally we set the verbosity level
+  set verbose = false
+@endverbatim
+
+Since the <code>verbose</code> parameter is set to <code>false</code>, we do not get any kind of output.
+If we we were to set it to <code>true</code> we would get information on what the program is doing and
+how many steps each iterative process had to make to converge, etc.
+
+A plot of the obtained results for $t=0,1,5,10$ is the following
+
+@image html visit0001.jpeg
+
+@image html visit0002.jpeg
+
+@image html visit0003.jpeg
+
+@image html visit0004.jpeg
+
+The contour lines correspond to the pressure, the color to the voriticity and the arrows to the velocity.
+Here we only show a zoom into a region near the obstacle which is, after all, where the interesting things happen.
+
+<a name="extensions"></a>
+<h2> Possible Extensions </h2>
+
+This program can be extended in the following directions:
+<ul>
+  <li> Adaptive mesh refinement. As we have seen, we computed everything on a single fixed mesh.
+  Using adaptive mesh refinement can lead to increased accuracy while not significantly increasing the
+  computational time.
+  <li> Adaptive time-stepping. Although there is no theory about projection methods with variable time-step,
+  practice shows that they perform very well. This could be implemented too.
+  <li> Variable density incompressible flows. There are projection-like methods for the case of incompressible
+  flows with variable density.
+</ul>
