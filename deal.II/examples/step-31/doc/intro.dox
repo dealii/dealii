@@ -53,16 +53,9 @@ particular with regard to efficient linear Stokes solvers.
 The forcing term of the fluid motion is the buoyancy of the
 fluid, expressed as the product of the density $\rho$, the thermal expansion
 coefficient $\beta$,
-the temperature <i>T</i> and the gravity vector <b>g</b> pointing downward. (A
-possibly more intuitive formulation would use $-\rho\; \beta \; (T-\bar T)
-\mathbf{g}$ as right hand side where $\bar T$ is the average
-temperature, and the right hand side then describes the forces due to
-local deviations from the average density; this formulation is
-entirely equivalent if the gravity vector results from a gravity
-potential $\phi$, i.e. $\mathbf{g}=-\nabla\phi$, and yields the exact
-same solution except for the pressure which will now be $p-\rho\; \beta
-\;\bar T \phi$.)
-
+the temperature <i>T</i> and the gravity vector <b>g</b> pointing
+downward. (A derivation of why the right hand side looks like it looks
+is given in the introduction of @ref step_32 "step-32".)
 While the first two equations describe how the fluid reacts to
 temperature differences by moving around, the third equation states
 how the fluid motion affects the temperature field: it is an advection

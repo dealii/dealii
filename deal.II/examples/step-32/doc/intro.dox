@@ -42,12 +42,92 @@ the mathematical formulation and solver structure, then how to
 parallelize things, and finally the actual testcase we will consider.
 
 
+<h3> Using the "right" pressure </h3>
+
+In @ref step_31 "step-31", we used the following Stokes model for the
+velocity and pressure field:
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
+  -\rho \; \beta \; T \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u} &=& 0.
+@f}
+The right hand side of the first equation appears a wee bit
+unmotivated. Here's how things should really be. On the right side, we
+need the external forces that act on the fluid, which we assume are
+given by gravity only. In the current case, we assume that the fluid
+does expand slightly for the purposes of this gravity force, but not
+enough that we need to modify the incompressibility condition (the
+second equation). What this means is that for the purpose of the right
+hand side, we can assume that $\rho=\rho(T)$. An assumption that may
+not be entirely justified is that we can assume that the changes of
+density as a function of temperature are small, leading to an
+expression of the form $\rho(T) = \rho_{\text{ref}}
+[1-\beta(T-T_{\text{ref}})]$, i.e. the density equals
+$\rho_{\text{ref}}$ at reference temperature and decreases linearly as
+the temperature increases (as the material expands). The force balance
+equation then looks properly written like this:
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
+  \rho_{\text{ref}} [1-\beta(T-T_{\text{ref}})] \mathbf{g}.
+@f}
+Now note that the gravity force results from a gravity potential as
+$\mathbf g=\nabla \varphi$, so that we can re-write this as follows:
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
+  -\beta\; T\; \mathbf{g} +
+  \rho_{\text{ref}} [1+\beta T_{\text{ref}}] \nabla\varphi.
+@f}
+The second term on the right is time independent, and so we could
+introduce a new "dynamic" pressure $p_{\text{dyn}}=p-\rho_{\text{ref}}
+[1+\beta T_{\text{ref}}] \varphi=p_{\text{total}}-p_{\text{static}}$
+with which the Stokes equations would read:
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p_{\text{dyn}} &=&
+  -\rho \; \beta \; T \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u} &=& 0.
+@f}
+This is exactly the form we used in @ref step_31 "step-31", and it was
+appropriate to do so because all changes in the fluid flow are only
+driven by the dynamic pressure that results from temperature
+differences.
+
+On the other hand, we will here use the form of the Stokes equations
+that considers the total pressure instead:
+@f{eqnarray*}
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
+  \rho_{\text{ref}} [1-\beta(T-T_{\text{ref}})] \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u} &=& 0.
+@f}
+This way we can plot the pressure in our program in such a way that it
+actually shows the total pressure that includes the effects of
+temperature differences as well as the static pressure of the
+overlying rocks. Since the pressure does not appear any further in any
+of the other equations, whether to use one or the other is more a
+matter of taste than of correctness. The flow field is exactly the
+same, but we get a pressure that we can now compare with values that
+are given in geophysical books as those that hold at the bottom of the
+earth mantle, for example.
+
+A second reason to do this is discussed in the results section and
+concerns possible extensions to the model we use here. It has to do
+with the fact that while the temperature equation we use here does not
+include a term that contains the pressure. It should, however:
+pressure, like gas, heats up as you compress it. Consequently,
+material that rises up cools adiabatically, and cold material that
+sinks down heats adiabatically. We discuss this further below.
+
+
+
+
 <h3> The scaling of discretized equations </h3>
 
 Remember that we want to solve the following set of equations:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
-  -\rho \; \beta \; T \mathbf{g},
+  \rho(T) \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0,
   \\
@@ -565,7 +645,7 @@ As a reminder, let us again state the equations we want to solve are these:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) +
   \nabla \left( \frac{\eta}{L} \hat p\right) &=&
-  -\rho \; \beta \; T \mathbf{g},
+  \rho(T) \mathbf{g},
   \\
   \frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0,
   \\
@@ -614,11 +694,15 @@ the following quantities:
   conditions don't matter that much any more. The initial temperature field we
   use here is given in terms of the radius by
   @f{align*}
-    \rho &= \frac{r-R_0}{R_1-R_0}, \\
-    T(r) &= T_0(1-\rho)^2 + T_1[1-(1-\rho)^2].
+    s &= \frac{r-R_0}{R_1-R_0}, \\
+    T(r) &= T_0(1-s)^2 + T_1[1-(1-s)^2].
   @f}
   This profile is quadratic and matches the boundary conditions at the inner
-  and outer radii.
+  and outer radii. We will see in the results section that this is an
+  entirely unphysical temperature field (though it will make for
+  interesting images) as the equilibrium state for the temperature
+  will be an almost constant temperature with boundary layers at the
+  inner and outer boundary.
 
   <li>The right hand side of the temperature equation contains the rate of
   %internal heating $\gamma$. The earth does heat naturally through three mechanisms:
@@ -692,7 +776,7 @@ the following quantities:
   then $\mathbf g(\mathbf x) = -\nabla \varphi(\mathbf x)$. If we assume that
   the density $\rho$ is constant throughout the earth, we can produce an
   analytical expression for the gravity vector (don't try to integrate above
-  equation somehow -- it leads to elliptic integrals; the simpler way is to
+  equation somehow -- it leads to elliptic integrals; a simpler way is to
   notice that $-\Delta\varphi(\mathbf x) = 4\pi G \rho
   \chi_{\text{earth}}(\mathbf x)$ and solving this
   partial differential equation in all of ${\mathbb R}^3$ exploiting the
@@ -742,15 +826,17 @@ the following quantities:
   here just go with the constant density model above.
 
   <li>The density of the earth mantle varies spatially, but not by very
-  much. $\rho=3300 \frac{\text{kg}}{\text{m}^3}$ is a relatively good average
-  value.
+  much. $\rho_{\text{ref}}=3300 \frac{\text{kg}}{\text{m}^3}$ is a relatively good average
+  value for the density at reference temperature $T_{\text{ref}}=293$ Kelvin.
 
   <li>The thermal expansion coefficient $\beta$ also varies with depth
   (through its dependence on temperature and pressure). Close to the surface,
   it appears to be on the order of $\beta=45\cdot 10^{-6} \frac 1{\text{K}}$,
   whereas at the core mantle boundary, it may be closer to $\beta=10\cdot
   10^{-6} \frac 1{\text{K}}$. As a reasonable value, let us choose
-  $\beta=2\cdot 10^{-5} \frac 1{\text{K}}$.
+  $\beta=2\cdot 10^{-5} \frac 1{\text{K}}$. The density as a function
+  of temperature is then
+  $\rho(T)=[1-\beta(T-T_{\text{ref}})]\rho_{\text{ref}}$.
 
   <li>The second to last parameter we need to specify is the viscosity
   $\eta$. This is a tough one, because rocks at the temperatures and pressure
