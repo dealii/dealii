@@ -106,7 +106,7 @@ namespace RunTimeParameters{
 
 // In the constructor of this class we declare all the parameters. The
 // details of how this works have been discussed elsewhere, for example in
-// step step-19 and step-29.
+// step-19 and step-29.
   Data_Storage::Data_Storage(){
     prm.declare_entry( "Method_Form", "rotational", Patterns::Selection( "rotational|standard" ),
                       " Used to select the type of method that we are going to use. " );
@@ -156,11 +156,11 @@ namespace RunTimeParameters{
   }
 
 
-  
+
   Data_Storage::~Data_Storage(){}
 
 
-  
+
   void Data_Storage::read_data( const char *filename ){
     std::ifstream file( filename );
     AssertThrow (file, ExcFileNotOpen( filename ));
@@ -177,7 +177,6 @@ namespace RunTimeParameters{
       initial_time = prm.get_double( "initial_time" );
       final_time   = prm.get_double( "final_time" );
       Reynolds     = prm.get_double( "Reynolds" );
-      token        = prm.get( "filename" );
     }
     prm.leave_subsection();
 
@@ -238,7 +237,7 @@ namespace EquationData{
 		  Function<dim>( 1, initial_time ), comp(0)
   {}
 
-  
+
   template<int dim>
   void MultiComponentFunction<dim>::set_component(const unsigned int d )
   {
@@ -264,14 +263,14 @@ namespace EquationData{
 			       const unsigned int component = 0 ) const;
   };
 
-  
+
   template<int dim>
   Velocity<dim>::Velocity( const double initial_time )
 		  :
 		  MultiComponentFunction<dim>( initial_time )
   {}
 
-  
+
   template<int dim>
   void  Velocity<dim>::value_list( const std::vector<Point<dim> > &points,
 				   std::vector<double> &values,
@@ -284,7 +283,7 @@ namespace EquationData{
       values[i] = Velocity<dim>::value( points[i] );
   }
 
-  
+
   template<int dim>
   inline double Velocity<dim>::value( const Point<dim> &p,
 				      const unsigned int ) const
@@ -301,10 +300,10 @@ namespace EquationData{
   {
     public:
       Pressure( const double initial_time = 0.0 );
-      
+
       virtual double value( const Point<dim> &p,
 			    const unsigned int component = 0 ) const;
-      
+
       virtual void value_list( const std::vector< Point<dim> > &points,
 			       std::vector<double> &values,
 			       const unsigned int component = 0 ) const;
@@ -316,7 +315,7 @@ namespace EquationData{
 		  Function<dim>( 1, initial_time )
   {}
 
-  
+
   template<int dim>
   inline double Pressure<dim>::value( const Point<dim> &p,
 				      const unsigned int ) const
