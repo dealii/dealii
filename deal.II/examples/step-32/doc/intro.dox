@@ -115,7 +115,7 @@ A second reason to do this is discussed in the results section and
 concerns possible extensions to the model we use here. It has to do
 with the fact that while the temperature equation we use here does not
 include a term that contains the pressure. It should, however:
-pressure, like gas, heats up as you compress it. Consequently,
+rock, like gas, heats up as you compress it. Consequently,
 material that rises up cools adiabatically, and cold material that
 sinks down heats adiabatically. We discuss this further below.
 

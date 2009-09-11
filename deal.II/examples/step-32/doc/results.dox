@@ -288,3 +288,44 @@ temperature layering is instable. It then calms down to relatively
 small values before picking up again in the chaotic stirring
 regime. There, it remains in the range of 10-40 centimeters per year,
 quite within the physically expected region.
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+Apart from the various possibilities for extensions already outlined
+in the @ref step_31 "step-31", here are a few more ideas:
+
+<ul>
+  <li> The temperature field we get in our simulations after a while
+  is mostly constant with boundary layers at the inner and outer
+  boundary, and streamers of cold and hot material mixing
+  everything. Yet, this doesn't match our expectation that things
+  closer to the earth core should be hotter than closer to the
+  surface. The reason is that the energy equation we have used does
+  not include a term that describes adiabatic cooling and heating:
+  rock, like gas, heats up as you compress it. Consequently, material
+  that rises up cools adiabatically, and cold material that sinks down
+  heats adiabatically. The correct temperature equation would
+  therefore look somewhat like this:
+  @f{eqnarray*}
+    \frac{D T}{Dt}
+    -
+    \nabla \cdot \kappa \nabla T &=& \gamma + \tau\frac{Dp}{Dt},
+  @f}
+  or, expanding the advected derivative $\frac{D}{Dt} =
+  \frac{\partial}{\partial t} + \mathbf u \cdot \nabla$:
+  @f{eqnarray*}
+    \frac{\partial T}{\partial t}
+    +
+    {\mathbf u} \cdot \nabla T
+    -
+    \nabla \cdot \kappa \nabla T &=& \gamma + \tau\frac{\partial
+  p}{\partial t} + \mathbf u \cdot \nabla p.
+  @f}
+  In other words, as pressure increases in a rock volume
+  ($\frac{Dp}{Dt}>0$) we get an additional heat source, and vice
+  versa.
+
+</ul>
