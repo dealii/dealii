@@ -1,45 +1,52 @@
+<br>
+
 <i>
-This program grew out of a student project by Abner Salgado at Texas A&M University. Most of the work for
-this program is by him.
+This program grew out of a student project by Abner Salgado at Texas A&M
+University. Most of the work for this program is by him.
 </i>
 
 <a name="Intro"></a>
 <h1> Introduction </h1>
 
 <a name="Motivation"></a>
-<h2> Motivation </h2>
+<h3> Motivation </h3>
 The purpose of this program is to show how to effectively solve the incompressible time-dependent
-Navier-Stokes equations. These equations describe the flow of a viscous incompressible fluid and they read
+Navier-Stokes equations. These equations describe the flow of a viscous incompressible fluid and read
 @f{align*}
   u_t + u \cdot \nabla u - \nu \Delta u + \nabla p = f, \\
   \nabla \cdot u = 0,
 @f}
 supplemented by the boundary condition $u=0$ Here $u$ represents the velocity of the flow and $p$ the pressure.
 
-In previous tutorial programs (see for instance step-20 and step-22) we have seen
-how to solve the time-independent Stokes equations using a Schur-complement approach. For the
+In previous tutorial programs (see for instance @ref step_20 "step-20" and
+@ref step_22 "step-22") we have seen
+how to solve the time-independent Stokes equations using a Schur complement approach. For the
 time-dependent case, after time discretization, we would arrive at a system like
 @f{align*}
   \frac1\tau u^k - \nu \Delta u^k + \nabla p^k = F^k, \\
   \nabla \cdot u^k = 0,
 @f}
 where $\tau$ is the time-step. Although the structure of this system is similar to the Stokes system and thus
-it could be solved using a Schur-complement approach, it turns out that the condition number of the
-Schur-complement is proportional to $\tau^{-2}$, which makes the system very difficult to solve.
+it could be solved using a Schur complement approach, it turns out that the condition number of the
+Schur complement is proportional to $\tau^{-2}$. This makes the system very
+difficult to solve, and means that for the Navier-Stokes equations, this is
+not a useful avenue to the solution.
 
 <a name="Projection"></a>
-<h2> Projection Methods </h2>
+<h3> Projection methods </h3>
 
-As we explained above, we need to come up with a different approach to solve the time-dependent Navier-Stokes
+Rather, we need to come up with a different approach to solve the time-dependent Navier-Stokes
 equations. The difficulty in their solution comes from the fact that the velocity and the pressure are coupled
 through the constraint
 @f[
-  \nabla \cdot u = 0.
+  \nabla \cdot u = 0,
 @f]
+for which the pressure is the Lagrange multiplier.
 Projection methods aim at decoupling this constraint from the diffusion (Laplace) operator.
 
 Let us shortly describe how the projection methods look like in a semi-discrete setting. The objective is to
-obtain a sequence of velocities $\{u^k\}$ and pressures $\{p^k\}$. We will also obtain a sequence $\{\phi^k\}.$
+obtain a sequence of velocities $\{u^k\}$ and pressures $\{p^k\}$. We will
+also obtain a sequence $\{\phi^k\}$ of auxiliary variables.
 Suppose that from the initial conditions, and an application of a first order method we have found
 $(u^0,p^0,\phi^0=0)$ and $(u^1,p^1,\phi^1=p^1-p^0)$. Then the projection method consists of three steps:
 
@@ -48,14 +55,15 @@ $(u^0,p^0,\phi^0=0)$ and $(u^1,p^1,\phi^1=p^1-p^0)$. Then the projection method 
   @f[
     u^\star = 2u^k - u^{k-1}, \quad p^\sharp = p^k + \frac43 \phi^k - \frac13 \phi^{k-1}.
   @f]
-  <li> <b>Step 1</b>: Diffusion step. We find $u^{k+1}$ that solves
+  <li> <b>Step 1</b>: Diffusion step. We find $u^{k+1}$ that solves the single
+  linear equation
   @f[
     \frac1{2\tau}\left( 3u^{k+1} - 4u^k + u^{k-1} \right)
     + u^\star \cdot\nabla u^{k+1} + \frac12 \left( \nabla \cdot u^\star \right) u^{k+1}
     -\nu \Delta u^{k+1} + \nabla p^\sharp
     = f^{k+1},
     \quad
-    u|_{\partial\Omega} = 0.
+    u^{k+1}|_{\partial\Omega} = 0.
   @f]
   <li> <b>Step 2</b>: Projection. Find $\phi^{k+1}$ that solves
   @f[
@@ -83,7 +91,8 @@ projection methods that we have just described:
   @f[
     u \cdot \nabla u + \frac12 \left( \nabla\cdot u \right) u.
   @f]
-  This is consistent with the equation and it is needed to guarantee unconditional stability of the
+  This is consistent with the continuous equation (because $\nabla\cdot u$,
+  though this is not true pointwise for the discrete solution) and it is needed to guarantee unconditional stability of the
   time-stepping scheme. Moreover, to linearize the term we use the second order extrapolation $u^\star$ of
   $u^{k+1}$.
   <li> The projection step is a realization of the Helmholtz decomposition
@@ -98,17 +107,18 @@ projection methods that we have just described:
   @f[
     u^{k+1} = v^{k+1} + \nabla \left( \frac{2\tau}{3}  \phi^{k+1} \right),
   @f]
-  with $v^{k+1}\in H$. Taking the divergence of this equation we arrive the projection equation.
-  <li> The most accurate form of the methods is the rotational one. We included the standard because it was
-  so easy to implement that it is worth having. Moreover, it is the one (in my experience) that should be
+  with $v^{k+1}\in H$. Taking the divergence of this equation we arrive at the projection equation.
+  <li> The more accurate of the two variants outlined above is the rotational
+  one. That said, in the program below we use the standard form because it is
+  much easier to implement. Moreover, in the author's experience, it is the one that should be
   used if, for instance, the viscosity $\nu$ is variable.
 </ul>
 
 <a name ="testcase"></a>
-<h2> The Test Case </h2>
+<h3> The testcase </h3>
 
-The test case that we are going to carry out consist of the flow around a square obstacle. The geometry is
-the following
+The testcase that we use for this program consists of the flow around a square obstacle. The geometry is
+as follows:
 
 @image html geometry.gif
 
@@ -117,10 +127,11 @@ with $H=4.1$.
 We impose no-slip boundary conditions on both the top and bottom walls and the obstacle. On the left side we
 have the inflow boundary condition
 @f[
-  U = 4 U_m y (H-y)/H^2, \quad V = 0,
+  u =
+  \begin{array}{c} 4 U_m y (H-y)/H^2 \\ 0 \end{array},
 @f]
-with $U_m = 1.5$, which corresponds to the Poiseuille flow for this configuration. Finally, on the right
+with $U_m = 1.5$, i.e. the inflow boundary conditions correspond to Poiseuille flow for this configuration. Finally, on the right
 vertical wall we impose the condition that the vertical component of the velocity should be zero.
-The Reynolds number is $Re=100$ and the final time $T=10$.
+The Reynolds number is $Re=\frac{1}{\nu}=100$ and the final time $T=10$.
 
 
