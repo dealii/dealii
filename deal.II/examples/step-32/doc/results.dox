@@ -321,11 +321,27 @@ in the @ref step_31 "step-31", here are a few more ideas:
     +
     {\mathbf u} \cdot \nabla T
     -
-    \nabla \cdot \kappa \nabla T &=& \gamma + \tau\frac{\partial
-  p}{\partial t} + \mathbf u \cdot \nabla p.
+    \nabla \cdot \kappa \nabla T &=& \gamma +
+    \tau\left\{\frac{\partial
+    p}{\partial t} + \mathbf u \cdot \nabla p \right\}.
   @f}
   In other words, as pressure increases in a rock volume
   ($\frac{Dp}{Dt}>0$) we get an additional heat source, and vice
   versa.
 
+  The time derivative of the pressure is a bit awkward to
+  implement. If necessary, one could approximate using the fact
+  outlined in the introduction that the pressure can be decomposed
+  into a dynamic component due to temperature differences and the
+  resulting flow, and a static component that results solely from the
+  static pressure of the overlying rock. Since the latter is much
+  bigger, one may approximate $p\approx p_{\text{static}}=-\rho_{\text{ref}}
+  [1+\beta T_{\text{ref}}] \varphi$, and consequently
+  $\frac{Dp}{Dt} \approx \left\{- \mathbf u \cdot \nabla \rho_{\text{ref}}
+  [1+\beta T_{\text{ref}}]\varphi\right\} = \rho_{\text{ref}}
+  [1+\beta T_{\text{ref}}] \mathbf u \cdot \mathbf g$.
+  In other words, if the fluid is moving in the direction of gravity
+  (downward) it will be compressed and because in that case $\mathbf u
+  \cdot \mathbf g > 0$ we get a positive heat source. Conversely, the
+  fluid will cool down if it moves against the direction of gravity.
 </ul>

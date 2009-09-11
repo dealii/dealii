@@ -72,14 +72,14 @@ equation then looks properly written like this:
   \rho_{\text{ref}} [1-\beta(T-T_{\text{ref}})] \mathbf{g}.
 @f}
 Now note that the gravity force results from a gravity potential as
-$\mathbf g=\nabla \varphi$, so that we can re-write this as follows:
+$\mathbf g=-\nabla \varphi$, so that we can re-write this as follows:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
-  -\rho_{\text{ref}} \; beta\; T\; \mathbf{g} +
-  \rho_{\text{ref}} [1+\beta T_{\text{ref}}] \nabla\varphi.
+  -\rho_{\text{ref}} \; \beta\; T\; \mathbf{g}
+  -\rho_{\text{ref}} [1+\beta T_{\text{ref}}] \nabla\varphi.
 @f}
 The second term on the right is time independent, and so we could
-introduce a new "dynamic" pressure $p_{\text{dyn}}=p-\rho_{\text{ref}}
+introduce a new "dynamic" pressure $p_{\text{dyn}}=p+\rho_{\text{ref}}
 [1+\beta T_{\text{ref}}] \varphi=p_{\text{total}}-p_{\text{static}}$
 with which the Stokes equations would read:
 @f{eqnarray*}
