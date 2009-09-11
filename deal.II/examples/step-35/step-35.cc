@@ -13,7 +13,7 @@
 				 // @sect3{Include Files}
 
 				 // We start by including all the necessary
-				 // dealii header files and some C++ related
+				 // deal.II header files and some C++ related
 				 // ones. Each one of them has been discussed
 				 // in previous tutorial programs, so we will
 				 // not get into details here.
@@ -25,6 +25,14 @@
 #include <base/thread_management.h>
 #include <base/work_stream.h>
 #include <base/parallel.h>
+
+#include <lac/vector.h>
+#include <lac/sparse_matrix.h>
+#include <lac/solver_cg.h>
+#include <lac/precondition.h>
+#include <lac/solver_gmres.h>
+#include <lac/sparse_ilu.h>
+#include <lac/sparse_direct.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -45,32 +53,25 @@
 #include <fe/fe_tools.h>
 #include <fe/fe_system.h>
 
-#include <lac/vector.h>
-#include <lac/sparse_matrix.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/solver_gmres.h>
-#include <lac/sparse_ilu.h>
-#include <lac/sparse_direct.h>
-
 #include <numerics/matrices.h>
 #include <numerics/vectors.h>
 #include <numerics/data_out.h>
 
 #include <fstream>
-#include <iostream>
 #include <cmath>
 #include <iostream>
 
-// Finally we import all the dealii names to the global namespace
+// Finally we import all the deal.II names to the global namespace
 using namespace dealii;
 
 
 
-// @sect3{Run Time parameters}
-// Since our method has several options that can be fine-tuned we decided to group all these into
-// an external file, so that these can be determined at run-time.<br>
-// First, the formulation of the method, which we set as a <code>enum</code>.
+// @sect3{Run time parameters}
+//
+// Since our method has several parameters that can be fine-tuned we put them
+// into an external file, so that they can be determined at run-time.
+//
+// This includes, in particular, the formulation of the equation for the auxiliary variable $\phi$, for which we declare an <code>enum</code>.
 // Next, we declare a class that is going to read and store all the parameters that our program
 // needs to run.
 namespace RunTimeParameters{
@@ -103,30 +104,37 @@ namespace RunTimeParameters{
       ParameterHandler prm;
   };
 
-// In the constructor of this class we declare all the parameters.
-// The details of how this works have been discussed somewhere else ***
-// so let's not elaborate on that
+// In the constructor of this class we declare all the parameters. The
+// details of how this works have been discussed elsewhere, for example in
+// step step-19 and step-29.
   Data_Storage::Data_Storage(){
     prm.declare_entry( "Method_Form", "rotational", Patterns::Selection( "rotational|standard" ),
                       " Used to select the type of method that we are going to use. " );
     prm.enter_subsection( "Physical data" );
+    {
       prm.declare_entry( "initial_time", "0.", Patterns::Double( 0. ), " The initial time of the simulation. " );
       prm.declare_entry( "final_time", "1.", Patterns::Double( 0. ), " The final time of the simulation. " );
       prm.declare_entry( "Reynolds", "1.", Patterns::Double( 0. ), " The Reynolds number. " );
+    }
     prm.leave_subsection();
 
     prm.enter_subsection( "Time step data" );
+    {
       prm.declare_entry( "dt", "5e-4",  Patterns::Double( 0. ), " The time step size. " );
+    }
     prm.leave_subsection();
 
     prm.enter_subsection( "Space discretization" );
+    {
       prm.declare_entry( "n_of_refines", "0", Patterns::Integer( 0, 15),
                          " The number of global refines we do on the mesh. " );
       prm.declare_entry( "pressure_fe_degree", "1", Patterns::Integer( 1, 5 ),
                          " The polynomial degree for the pressure space. " );
+    }
     prm.leave_subsection();
 
     prm.enter_subsection( "Data solve velocity" );
+    {
       prm.declare_entry( "max_iterations", "1000", Patterns::Integer( 1, 1000 ),
                          " The maximal number of iterations GMRES must make. " );
       prm.declare_entry( "eps", "1e-12", Patterns::Double( 0. ), " The stopping criterion. " );
@@ -137,6 +145,7 @@ namespace RunTimeParameters{
                           " Diagonal strengthening coefficient. " );
       prm.declare_entry( "update_prec", "15", Patterns::Integer(1),
                          " This number indicates how often we need to update the preconditioner" );
+    }
     prm.leave_subsection();
 
     prm.declare_entry( "verbose", "true", Patterns::Bool(),
@@ -146,65 +155,75 @@ namespace RunTimeParameters{
                        " This indicates between how many time steps we print the solution. " );
   }
 
+
+  
   Data_Storage::~Data_Storage(){}
 
+
+  
   void Data_Storage::read_data( const char *filename ){
     std::ifstream file( filename );
-    if( not file )
-      throw ExcFileNotOpen( filename );
+    AssertThrow (file, ExcFileNotOpen( filename ));
+
     prm.read_input( file );
 
-    std::string token = prm.get( "Method_Form" );
-    if( token == std::string( "rotational" ) )
+    if( prm.get( "Method_Form" ) == std::string( "rotational" ) )
       form = METHOD_ROTATIONAL;
     else
       form = METHOD_STANDARD;
 
     prm.enter_subsection( "Physical data" );
+    {
       initial_time = prm.get_double( "initial_time" );
       final_time   = prm.get_double( "final_time" );
       Reynolds     = prm.get_double( "Reynolds" );
       token        = prm.get( "filename" );
+    }
     prm.leave_subsection();
 
     prm.enter_subsection( "Time step data" );
+    {
       dt = prm.get_double( "dt" );
+    }
     prm.leave_subsection();
 
     prm.enter_subsection( "Space discretization" );
+    {
       n_of_global_refines = prm.get_integer( "n_of_refines" );
       pressure_degree     = prm.get_integer( "pressure_fe_degree" );
+    }
     prm.leave_subsection();
 
     prm.enter_subsection( "Data solve velocity" );
+    {
       vel_max_iterations = prm.get_double( "max_iterations" );
       vel_eps            = prm.get_double( "eps" );
       vel_Krylov_size    = prm.get_integer( "Krylov_size" );
       vel_off_diagonals  = prm.get_integer( "off_diagonals" );
       vel_diag_strength  = prm.get_double( "diag_strength" );
       vel_update_prec    = prm.get_integer( "update_prec" );
+    }
     prm.leave_subsection();
 
     verbose = prm.get_bool( "verbose" );
 
     output = prm.get_integer( "output" );
-
-    file.close();
   }
 }
 
 
 
 // @sect3{The Equation Data}
-// Here we declare the initial and boundary conditions.
+// In the next namespace, we declare the initial and boundary conditions:
 namespace EquationData{
-  // Because of our implementation, we do not take advantage of the capabilities of the library
-  // to handle vector valued problems. Whether this is a good or bad idea is another issue. The
-  // point here is that we want to be able to write an interface for the equation data that is
+  // As we have chosen a completely decoupled formulation, we will not take advantage of deal.II's capabilities
+  // to handle vector valued problems. We do, however,
+  // want to use an interface for the equation data that is
   // somehow dimension indenpendent. To be able to do that, our functions should be able to know
   // on which space component we are currently working, and we should be able to have a
   // common interface to do that. The following class is an attempt in that direction.
-  template<int dim> class MultiComponentFunction: public Function<dim>{
+  template<int dim>
+  class MultiComponentFunction: public Function<dim>{
     public:
       MultiComponentFunction( const double initial_time = 0. );
       void set_component( const unsigned int d );
@@ -212,58 +231,104 @@ namespace EquationData{
       unsigned int comp;
   };
 
-  template<int dim> MultiComponentFunction<dim>::MultiComponentFunction( const double initial_time ):
-                                                  Function<dim>( 1, initial_time ), comp(0){}
+  template<int dim>
+  MultiComponentFunction<dim>::
+  MultiComponentFunction( const double initial_time )
+		  :
+		  Function<dim>( 1, initial_time ), comp(0)
+  {}
 
-  template<int dim> void MultiComponentFunction<dim>::set_component(const unsigned int d ){
+  
+  template<int dim>
+  void MultiComponentFunction<dim>::set_component(const unsigned int d )
+  {
     Assert( d<dim, ExcIndexRange( d, 0, dim ) );
     comp = d;
   }
 
-  template<int dim> class Velocity: public MultiComponentFunction<dim>{
+
+				   // With this class defined, we declare
+				   // classes that describe the boundary
+				   // conditions for velocity and pressure:
+  template<int dim>
+  class Velocity : public MultiComponentFunction<dim>
+  {
     public:
       Velocity( const double initial_time = 0.0 );
-      virtual double value( const Point<dim> &p, const unsigned int component = 0 ) const;
-      virtual void value_list( const std::vector< Point<dim> > &points, std::vector<double> &values,
-                                const unsigned int component = 0 ) const;
+
+      virtual double value( const Point<dim> &p,
+			    const unsigned int component = 0 ) const;
+
+      virtual void value_list( const std::vector< Point<dim> > &points,
+			       std::vector<double> &values,
+			       const unsigned int component = 0 ) const;
   };
 
-  template<int dim> Velocity<dim>::Velocity( const double initial_time ):
-                                    MultiComponentFunction<dim>( initial_time ){}
+  
+  template<int dim>
+  Velocity<dim>::Velocity( const double initial_time )
+		  :
+		  MultiComponentFunction<dim>( initial_time )
+  {}
 
-  template<int dim> void  Velocity<dim>::value_list( const std::vector<Point<dim> > &points,
-                                                      std::vector<double> &values, const unsigned int ) const{
+  
+  template<int dim>
+  void  Velocity<dim>::value_list( const std::vector<Point<dim> > &points,
+				   std::vector<double> &values,
+				   const unsigned int ) const
+  {
     const unsigned int n_points = points.size();
-    Assert( values.size() == n_points, ExcDimensionMismatch( values.size(), n_points ) );
+    Assert( values.size() == n_points,
+	    ExcDimensionMismatch( values.size(), n_points ) );
     for (unsigned int i=0; i<n_points; ++i)
       values[i] = Velocity<dim>::value( points[i] );
   }
 
-  template<int dim> inline double Velocity<dim>::value( const Point<dim> &p, const unsigned int ) const{
+  
+  template<int dim>
+  inline double Velocity<dim>::value( const Point<dim> &p,
+				      const unsigned int ) const
+  {
     double return_value = 0.;
     static const double Um = 1.5, H = 4.1;
-    if( MultiComponentFunction<dim>::comp == 0 )
+    if( this->comp == 0 )
       return_value = 4.*Um*p(1)*( H - p(1) )/(H*H);
     return return_value;
   }
 
-  template<int dim> class Pressure: public Function<dim>{
+  template<int dim>
+  class Pressure: public Function<dim>
+  {
     public:
       Pressure( const double initial_time = 0.0 );
-      virtual double value( const Point<dim> &p, const unsigned int component = 0 ) const;
-      virtual void value_list( const std::vector< Point<dim> > &points, std::vector<double> &values,
-                                const unsigned int component = 0 ) const;
+      
+      virtual double value( const Point<dim> &p,
+			    const unsigned int component = 0 ) const;
+      
+      virtual void value_list( const std::vector< Point<dim> > &points,
+			       std::vector<double> &values,
+			       const unsigned int component = 0 ) const;
   };
 
-  template<int dim> Pressure<dim>::Pressure( const double initial_time ): Function<dim>( 1, initial_time ){}
+  template<int dim>
+  Pressure<dim>::Pressure( const double initial_time )
+		  :
+		  Function<dim>( 1, initial_time )
+  {}
 
-  template<int dim> inline double Pressure<dim>::value( const Point<dim> &p, const unsigned int ) const{
+  
+  template<int dim>
+  inline double Pressure<dim>::value( const Point<dim> &p,
+				      const unsigned int ) const
+  {
     return 0.;
   }
 
-  template<int dim> void Pressure<dim>::value_list( const std::vector<Point<dim> > &points,
-                                                      std::vector<double> &values,
-                                                      const unsigned int ) const{
+  template<int dim>
+  void Pressure<dim>::value_list( const std::vector<Point<dim> > &points,
+				  std::vector<double> &values,
+				  const unsigned int ) const
+  {
     const unsigned int n_points = points.size();
     Assert( values.size() == n_points, ExcDimensionMismatch( values.size(), n_points ) );
     for (unsigned int i=0; i<n_points; ++i)
@@ -274,9 +339,9 @@ namespace EquationData{
 
 
 // @sect3{The <code>Navier_Stokes_Projection</code> class}
-// This is the main class of the program. It implements the various avatars of the projection
-// methods for Navier-Stokes equations.
-// The names for all the methods and attributes are self-explanatory.
+// Now for the main class of the program. It implements the various versions of the projection
+// method for Navier-Stokes equations.
+// The names for all the methods and attributes should be self-explanatory.
 template<int dim> class Navier_Stokes_Projection{
   public:
     Navier_Stokes_Projection( const RunTimeParameters::Data_Storage &data );
