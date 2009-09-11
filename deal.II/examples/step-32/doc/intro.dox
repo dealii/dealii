@@ -75,7 +75,7 @@ Now note that the gravity force results from a gravity potential as
 $\mathbf g=\nabla \varphi$, so that we can re-write this as follows:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
-  -\beta\; T\; \mathbf{g} +
+  -\rho_{\text{ref}} \; beta\; T\; \mathbf{g} +
   \rho_{\text{ref}} [1+\beta T_{\text{ref}}] \nabla\varphi.
 @f}
 The second term on the right is time independent, and so we could
@@ -84,7 +84,7 @@ introduce a new "dynamic" pressure $p_{\text{dyn}}=p-\rho_{\text{ref}}
 with which the Stokes equations would read:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p_{\text{dyn}} &=&
-  -\rho \; \beta \; T \mathbf{g},
+  -\rho_{\text{ref}} \; \beta \; T \; \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0.
 @f}
@@ -97,7 +97,7 @@ On the other hand, we will here use the form of the Stokes equations
 that considers the total pressure instead:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
-  \rho_{\text{ref}} [1-\beta(T-T_{\text{ref}})] \mathbf{g},
+  \rho(T)\; \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0.
 @f}
@@ -222,7 +222,7 @@ just so happens to be the order of magnitude that would make the two equations
 numerically about the same. So, we now get this for the Stokes system:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
-  -\rho \; \beta \; T \mathbf{g},
+  \rho(T) \; \mathbf{g},
   \\
   \frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0.
 @f}
@@ -233,7 +233,7 @@ scaled pressure $\hat p = \frac{L}{\eta}p$, and we get the scaled equations
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) +
   \nabla \left(\frac{\eta}{L} \hat p\right) &=&
-  -\rho \; \beta \; T \mathbf{g},
+  \rho(T) \; \mathbf{g},
   \\
   \frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0.
 @f}
