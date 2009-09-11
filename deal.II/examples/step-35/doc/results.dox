@@ -70,11 +70,30 @@ Here we only show a zoom into a region near the obstacle which is, after all, wh
 
 This program can be extended in the following directions:
 <ul>
-  <li> Adaptive mesh refinement. As we have seen, we computed everything on a single fixed mesh.
+  <li> Adaptive mesh refinement: As we have seen, we computed everything on a single fixed mesh.
   Using adaptive mesh refinement can lead to increased accuracy while not significantly increasing the
   computational time.
-  <li> Adaptive time-stepping. Although there is no theory about projection methods with variable time-step,
-  practice shows that they perform very well. This could be implemented too.
-  <li> Variable density incompressible flows. There are projection-like methods for the case of incompressible
-  flows with variable density.
+
+  <li> Adaptive time-stepping: Although there apparently is currently no theory about
+  projection methods with variable time step,
+  practice shows that they perform very well.
+
+  <li> Variable density incompressible flows: There are projection-like methods for the case of incompressible
+  flows with variable density. Such flows play a role if fluids of different
+  density mix, for example fresh water and salt water, or alcohol and water.
+
+  <li> Compressible Navier-Stokes equations: These equations are relevant for
+  cases where 
+  velocities are high enough so that the fluid becomes compressible, but not
+  fast enough that we get into a regime where viscosity becomes incompressible
+  and the Navier-Stokes equations need to be replaced by the hyperbolic Euler
+  equations of gas dynamics. Compressibility starts to become a factor if the
+  velocity becomes greater than about one third of the speed of sound, so it
+  is not a factor for almost all terrestrial vehicles. On the other hand,
+  commercial jetliners fly at about 85 per cent of the speed of sound, and
+  flow over the wings becomes significantly supersonic, a regime in which the
+  compressible Navier-Stokes equations are not applicable any more
+  either. There are significant applications for the range in between,
+  however, such as for small aircraft or the fast trains in many European and
+  East Asian countries.
 </ul>
