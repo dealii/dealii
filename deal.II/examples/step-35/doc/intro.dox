@@ -65,6 +65,11 @@ $(u^0,p^0,\phi^0=0)$ and $(u^1,p^1,\phi^1=p^1-p^0)$. Then the projection method 
     \quad
     u^{k+1}|_{\partial\Omega} = 0.
   @f]
+  Note in particular that this formulation completely decouples the velocity
+  components from each other. As a consequence, rather than having to solve a
+  coupled system for all $d$ velocities together, we can solve $d$ independent
+  equations which, conveniently also all share the same system matrix.
+
   <li> <b>Step 2</b>: Projection. Find $\phi^{k+1}$ that solves
   @f[
     \Delta \phi^{k+1} = \frac3{2\tau} \nabla \cdot u^{k+1},
