@@ -887,7 +887,7 @@ template<int dim> void Navier_Stokes_Projection<dim>::update_pressure( const boo
 
 // @sect4{ <code>Navier_Stokes_Projection::plot_solution</code> }
 // This method plots the current solution. It is an adaptation of
-// step-31 **** and so I will not elaborate on it.
+// step-31 and so I will not elaborate on it.
 // There is one small detail here. It is often interested to see
 // the vorticity of the flow. But, since we are using it here only for plotting
 // purposes, we are not going to compute it at every time step, but only when
