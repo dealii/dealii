@@ -92,10 +92,11 @@ using namespace dealii;
 				 // introduction:
 namespace EquationData
 {
-  const double eta     = 1e21;
-  const double kappa   = 1e-6;
-  const double density = 3300;
-  const double beta    = 2e-5;
+  const double eta                   = 1e21;
+  const double kappa                 = 1e-6;
+  const double reference_density     = 3300;
+  const double reference_temperature = 293;
+  const double expansion_coefficient = 2e-5;
 
   const double R0      = 6371000.-2890000.;
   const double R1      = 6371000.-  35000.;
@@ -104,10 +105,18 @@ namespace EquationData
   const double T1      =  700+273;
 
   const double year_in_seconds  = 60*60*24*365.2425;
-  const double end_time         = 1e9 * year_in_seconds;
+  const double end_time         = 2.7e6 * year_in_seconds;
 
   const double pressure_scaling = eta / (R1-R0);
 
+
+  double density (const double temperature)
+  {
+    return (reference_density *
+	    (1 - expansion_coefficient * (temperature -
+					  reference_temperature)));
+  }
+  
   
   template <int dim>
   Tensor<1,dim> gravity_vector (const Point<dim> &p)
@@ -139,9 +148,9 @@ namespace EquationData
     const double r = p.norm();
     const double h = R1-R0;
 
-    const double rho = (r-R0)/h;
+    const double s = (r-R0)/h;
 
-    return T1+(T0-T1)*((1-rho)*(1-rho));
+    return T1+(T0-T1)*((1-s)*(1-s));
   }
 
 
@@ -2127,10 +2136,8 @@ local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterat
 						.quadrature_point(q));
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	data.local_rhs(i) += (-EquationData::density *
-			      EquationData::beta *
+	data.local_rhs(i) += (EquationData::density(old_temperature) *
 			      gravity  *
-			      old_temperature *
 			      scratch.phi_u[i]) *
 			     scratch.stokes_fe_values.JxW(q);
     }
@@ -2812,16 +2819,26 @@ void BoussinesqFlowProblem<dim>::solve ()
 				 // pressure $p$, so while copying
 				 // data from the Stokes DoFHandler
 				 // into the joint one, we undo this
-				 // scaling. While we're at it, let's
-				 // also take care of the awkward
-				 // units we use for the velocity: it
-				 // is computed in SI units of meters
-				 // per second, which of course is a
-				 // very small number in the earth
-				 // mantle. We therefore rescale
-				 // things into centimeters per year,
-				 // the unit commonly used in
-				 // geophysics.
+				 // scaling. While we're at it messing
+				 // with the results of the
+				 // simulation, we do two more things:
+				 // First, the pressure is only
+				 // defined up to a constant. To make
+				 // it more easily comparable, we
+				 // compute the minimal value of the
+				 // pressure computed and shift all
+				 // values up by that amount -- in
+				 // essence making all pressure
+				 // variables positive or
+				 // zero. Secondly, let's also take
+				 // care of the awkward units we use
+				 // for the velocity: it is computed
+				 // in SI units of meters per second,
+				 // which of course is a very small
+				 // number in the earth mantle. We
+				 // therefore rescale things into
+				 // centimeters per year, the unit
+				 // commonly used in geophysics.
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
@@ -2847,6 +2864,11 @@ void BoussinesqFlowProblem<dim>::output_results ()
       Vector<double> joint_solution (joint_dof_handler.n_dofs());
 
       {
+	double minimal_pressure = stokes_solution.block(1)(0);
+	for (unsigned int i=0; i<stokes_solution.block(1).size(); ++i)
+	  minimal_pressure = std::min<double> (stokes_solution.block(1)(i),
+					       minimal_pressure);
+	
 	std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
 	std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
 	std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
@@ -2892,8 +2914,10 @@ void BoussinesqFlowProblem<dim>::output_results ()
 			      ExcInternalError());
 		      
 		      joint_solution(local_joint_dof_indices[i])
-			= (stokes_solution(local_stokes_dof_indices
-					   [joint_fe.system_to_base_index(i).second])
+			= ((stokes_solution(local_stokes_dof_indices
+					    [joint_fe.system_to_base_index(i).second])
+			    -
+			    minimal_pressure)
 			   *
 			   EquationData::pressure_scaling);
 		    }
@@ -2905,7 +2929,8 @@ void BoussinesqFlowProblem<dim>::output_results ()
 			  local_stokes_dof_indices.size(),
 			  ExcInternalError());
 		  joint_solution(local_joint_dof_indices[i])
-		    = temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
+		    = temperature_solution(local_temperature_dof_indices
+					   [joint_fe.system_to_base_index(i).second]);
 		}
 	      else
 		{
@@ -3054,7 +3079,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 				      QGauss<dim-1>(temperature_degree+1),
 				      typename FunctionMap<dim>::type(),
 				      temperature_solution,
-				      local_estimated_error_per_cell,
+ 				      local_estimated_error_per_cell,
 				      std::vector<bool>(),
 				      0,
 				      0,
