@@ -710,8 +710,11 @@ the following quantities:
   lighter ones rise to the top; the countercurrents dissipate emergy equal to
   the loss of potential energy by this separation process), and heat release
   by crystallization of liquid metal as the solid inner core of the earth
-  grows. None of these processes are overly significant the earth mantle, and
-  so we assume that the %internal heating can be set to zero.
+  grows. None of these processes are overly significant in the earth mantle, and
+  so we assume that the %internal heating can be set to zero. We
+  neglect one internal heat source, namely adiabatic heating here,
+  which will lead to a surprising temperature field. This point is
+  commented on in detail in the results section below.
 
   <li>For the velocity we choose as boundary conditions $\mathbf{v}=0$ at the
   inner radius (i.e. the fluid sticks to the earth core) and
