@@ -174,7 +174,9 @@ class NamedSelection
 
 				     /**
 				      * The number of names in this
-				      * object.
+				      * object. This function may be
+				      * used whether initialize() was
+				      * called before or not.
 				      */
     unsigned int size() const;
     
@@ -182,7 +184,9 @@ class NamedSelection
 				      * Return the corresponding index
 				      * in the NamedData object
 				      * supplied to the last
-				      * initialize().
+				      * initialize(). It is an error
+				      * if initialize() has not been
+				      * called before.
 				      *
 				      * Indices are in the same order
 				      * as the calls to add().
@@ -364,7 +368,6 @@ inline
 unsigned int
 NamedSelection::size() const
 {
-  Assert (indices.size() == names.size(), ExcNotInitialized());
   return names.size();
 }
 
@@ -373,6 +376,7 @@ inline
 unsigned int
 NamedSelection::operator() (unsigned int i) const
 {
+  Assert (indices.size() == names.size(), ExcNotInitialized());
   AssertIndexRange(i, size());  
   return indices[i];
 }
