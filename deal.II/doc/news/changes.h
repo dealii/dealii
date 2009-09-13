@@ -200,6 +200,13 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+
+  <li><p>New: classes NamedData and NamedSelection provide an interface to store and
+  retrieve data objects with name identifiers.
+  <br>
+  (GK 2009/09/13)
+  </p></li>
+  
   <li>
   <p>
   New: The Utilities::System::job_supports_mpi() can be used to query whether
