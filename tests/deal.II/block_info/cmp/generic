@@ -1,0 +1,40 @@
+
+DEAL::Global dofs    81
+DEAL::Global blocks  81
+DEAL::Level dofs     4
+DEAL::Level block[0] 4
+DEAL::Level dofs     9
+DEAL::Level block[1] 9
+DEAL::Level dofs     25
+DEAL::Level block[2] 25
+DEAL::Level dofs     81
+DEAL::Level block[3] 81
+DEAL::Local blocks   4
+DEAL::Renumbering    0 1 2 3
+DEAL::Inverse        0 1 2 3
+DEAL::Global dofs    289
+DEAL::Global blocks  289
+DEAL::Level dofs     9
+DEAL::Level block[0] 9
+DEAL::Level dofs     25
+DEAL::Level block[1] 25
+DEAL::Level dofs     81
+DEAL::Level block[2] 81
+DEAL::Level dofs     289
+DEAL::Level block[3] 289
+DEAL::Local blocks   9
+DEAL::Renumbering    0 1 2 3 4 5 6 7 8
+DEAL::Inverse        0 1 2 3 4 5 6 7 8
+DEAL::Global dofs    821
+DEAL::Global blocks  81 81 81 289 289
+DEAL::Level dofs     30
+DEAL::Level block[0] 4 4 4 9 9
+DEAL::Level dofs     77
+DEAL::Level block[1] 9 9 9 25 25
+DEAL::Level dofs     237
+DEAL::Level block[2] 25 25 25 81 81
+DEAL::Level dofs     821
+DEAL::Level block[3] 81 81 81 289 289
+DEAL::Local blocks   4 4 4 9 9
+DEAL::Renumbering    0 4 8 12 21 1 5 9 13 22 2 6 10 14 23 3 7 11 15 24 16 25 17 26 18 27 19 28 20 29
+DEAL::Inverse        0 5 10 15 1 6 11 16 2 7 12 17 3 8 13 18 20 22 24 26 28 4 9 14 19 21 23 25 27 29
