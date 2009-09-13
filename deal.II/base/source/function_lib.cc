@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -412,7 +412,15 @@ namespace Functions
   }
   
 //////////////////////////////////////////////////////////////////////
-  
+
+  template <int dim>
+  CosineFunction<dim>::CosineFunction (const unsigned int n_components)
+		  :
+		Function<dim> (n_components)
+{}
+
+
+
   template<int dim>
   double
   CosineFunction<dim>::value (const Point<dim>   &p,
@@ -442,24 +450,27 @@ namespace Functions
 	    ExcDimensionMismatch(values.size(), points.size()));
     
     for (unsigned int i=0;i<points.size();++i)
+      values[i] = value(points[i]);
+  }
+  
+  
+  template<int dim>
+  void
+  CosineFunction<dim>::vector_value_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<Vector<double> >   &values) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
       {
-	const Point<dim>& p = points[i];
-	switch(dim)
-	  {
-	    case 1:
-		  values[i] = std::cos(M_PI_2*p(0));
-		  break;
-	    case 2:
-		  values[i] = std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-		  break;
-	    case 3:
-		  values[i] = std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-		  break;
-	    default:
-		  Assert(false, ExcNotImplemented());
-	  }
+	const double v = value(points[i]);
+	for (unsigned int k=0;k<values[i].size();++k)
+	  values[i](k) = v;
       }
   }
+  
   
   template<int dim>
   double
@@ -490,23 +501,7 @@ namespace Functions
 	    ExcDimensionMismatch(values.size(), points.size()));
     
     for (unsigned int i=0;i<points.size();++i)
-      {
-	const Point<dim>& p = points[i];
-	switch(dim)
-	  {
-	    case 1:
-		  values[i] = -M_PI_2*M_PI_2* std::cos(M_PI_2*p(0));
-		  break;
-	    case 2:
-		  values[i] = -2*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
-		  break;
-	    case 3:
-		  values[i] = -3*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
-		  break;
-	    default:
-		  Assert(false, ExcNotImplemented());
-	  }
-      }
+      values[i] = laplacian(points[i]);
   }
   
   template<int dim>

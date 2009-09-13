@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -219,40 +219,34 @@ namespace Functions
   {
     public:
 				       /**
-					* The value at a single point.
+					* Constructor which allows to
+					* optionally generate a vector
+					* valued cosine function with
+					* the same value in each
+					* component.
 					*/
+      CosineFunction (const unsigned int n_components = 1);
+      
       virtual double value (const Point<dim>   &p,
 			    const unsigned int  component = 0) const;
       
-				       /**
-					* Values at multiple points.
-					*/
       virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
       
-				       /**
-					* Gradient at a single point.
-					*/
+      virtual void vector_value_list (const std::vector<Point<dim> >& points,
+				      std::vector<Vector<double> >& values) const;
+      
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				      const unsigned int  component = 0) const;
       
-				       /**
-					* Gradients at multiple points.
-					*/
       virtual void gradient_list (const std::vector<Point<dim> > &points,
 				  std::vector<Tensor<1,dim> >    &gradients,
 				  const unsigned int              component = 0) const;
       
-				       /**
-					* Laplacian at a single point.
-					*/
       virtual double laplacian (const Point<dim>   &p,
 				const unsigned int  component = 0) const;
       
-				       /**
-					* Laplacian at multiple points.
-					*/
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component = 0) const;
