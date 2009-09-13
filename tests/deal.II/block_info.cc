@@ -83,7 +83,7 @@ int main ()
 {
   std::ofstream logfile("block_info/output");
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
 
   FE_Q<2> q21(1);
   FE_Q<2> q22(2);

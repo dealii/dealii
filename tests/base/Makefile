@@ -66,6 +66,7 @@ tests_x =  geometry_info_* \
 	   reference \
 	   quadrature_* qprojector \
 	   path_search \
+	   named_data \
 	   slice_vector \
 	   table \
 	   tensor \
