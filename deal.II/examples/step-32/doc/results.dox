@@ -351,7 +351,7 @@ in the @ref step_31 "step-31", here are a few more ideas:
   density. That isn't the case, however: the earth core is much denser than
   the mantle, and gravity actually tops out at the core
   mantle boundary. A consequence of this is that our computations predict
-  pressures around 80 GPa at the core mantle boundary, whereas in reality the
+  pressures around 70 GPa at the core mantle boundary, whereas in reality the
   value is closer to 140 GPa. With a pressure wrong by so much, we can't
   expect compression heating to be accurate.
 
