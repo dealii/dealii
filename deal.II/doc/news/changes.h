@@ -420,6 +420,19 @@ inconvenience this causes.
 
 <ol>
 
+  <li><p>New: The class BlockInfo stores and computes all BlockIndices objects related to
+  DoFHandler and MGDoFHandler based on FESystem.
+  <br>
+  (GK 2009/09/13)
+  </p>
+  </li>  
+
+  <li><p>Improved: MGDoFHandler now also has a typedef for MGDoFHandler::Container
+  <br>
+  (GK 2009/09/13)
+  </p>
+  </li>  
+
   <li><p> FETools::compute_block_renumbering() can nor return block sizes instead of
   start indices.
   <br>
