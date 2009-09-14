@@ -54,13 +54,13 @@ how many steps each iterative process had to make to converge, etc.
 
 A plot of the obtained results for $t=0,1,5,10$ is the following
 
-@image html visit0001.jpeg
+@image html visit0001.png
 
-@image html visit0002.jpeg
+@image html visit0002.png
 
-@image html visit0003.jpeg
+@image html visit0003.png
 
-@image html visit0004.jpeg
+@image html visit0004.png
 
 The contour lines correspond to the pressure, the color to the voriticity and the arrows to the velocity.
 Here we only show a zoom into a region near the obstacle which is, after all, where the interesting things happen.
@@ -83,7 +83,7 @@ This program can be extended in the following directions:
   density mix, for example fresh water and salt water, or alcohol and water.
 
   <li> Compressible Navier-Stokes equations: These equations are relevant for
-  cases where 
+  cases where
   velocities are high enough so that the fluid becomes compressible, but not
   fast enough that we get into a regime where viscosity becomes incompressible
   and the Navier-Stokes equations need to be replaced by the hyperbolic Euler

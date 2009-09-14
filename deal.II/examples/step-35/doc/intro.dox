@@ -125,7 +125,7 @@ projection methods that we have just described:
 The testcase that we use for this program consists of the flow around a square obstacle. The geometry is
 as follows:
 
-@image html geometry.gif
+@image html geometry.png
 
 with $H=4.1$.
 
@@ -133,7 +133,7 @@ We impose no-slip boundary conditions on both the top and bottom walls and the o
 have the inflow boundary condition
 @f[
   u =
-  \begin{array}{c} 4 U_m y (H-y)/H^2 \\ 0 \end{array},
+  \left( \begin{array}{c} 4 U_m y (H-y)/H^2 \\ 0 \end{array} \right),
 @f]
 with $U_m = 1.5$, i.e. the inflow boundary conditions correspond to Poiseuille flow for this configuration. Finally, on the right
 vertical wall we impose the condition that the vertical component of the velocity should be zero.
