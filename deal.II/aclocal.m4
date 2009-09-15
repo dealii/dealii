@@ -668,9 +668,6 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGS="$CXXFLAGS -m64"
           CXXFLAGSG="$CXXFLAGSG -m64"
           CXXFLAGSO="$CXXFLAGSO -m64"
-	  F77FLAGS="$F77FLAGS -m64"
-	  F77FLAGSG="$F77FLAGSG -m64"
-          F77FLAGSO="$F77FLAGSO -m64"
           LDFLAGS="$LDFLAGS -m64"
         fi
 
@@ -1805,6 +1802,16 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
            *cygwin* )
                 F77FLAGSPIC=
                 ;;
+
+           *apple-darwin*)
+		dnl Add -m64 to flags for the same TBB-related reason as
+		dnl above when setting CXXFLAGS
+                if test "`/usr/sbin/sysctl -n hw.optional.x86_64`" = "1" ; then
+         	  F77FLAGSG="$F77FLAGSG -m64"
+                  F77FLAGSO="$F77FLAGSO -m64"
+                fi
+		;;
+
            * )
 	        F77FLAGSPIC="-fPIC"
                 ;;
