@@ -85,7 +85,7 @@ This program can be extended in the following directions:
   <li> Compressible Navier-Stokes equations: These equations are relevant for
   cases where
   velocities are high enough so that the fluid becomes compressible, but not
-  fast enough that we get into a regime where viscosity becomes incompressible
+  fast enough that we get into a regime where viscosity becomes negligible
   and the Navier-Stokes equations need to be replaced by the hyperbolic Euler
   equations of gas dynamics. Compressibility starts to become a factor if the
   velocity becomes greater than about one third of the speed of sound, so it
