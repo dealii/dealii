@@ -2,23 +2,23 @@
 
 ###############################################################################
 ## Please note:
-##   The ./configure script generates Make.global_options from 
+##   The ./configure script generates Make.global_options from
 ##   Make.global_options.in, so if you want to change something,
 ##   then do it in the latter file and re-run ./configure in the
 ##   top level directory
 ##
 ##
-##   This file exports several variables. They are documented in 
+##   This file exports several variables. They are documented in
 ##   the file  doc/development/makefiles.html. If you add a new
-##   variable, make sure it is documented in 
-##   doc/development/makefiles.1.html and listed in 
+##   variable, make sure it is documented in
+##   doc/development/makefiles.1.html and listed in
 ##   doc/development/Makefile.
 ###############################################################################
 
 
 
 ######################################################
-# the following lines will be replaced by the output 
+# the following lines will be replaced by the output
 # of ./configure
 
 D                    = @prefix@
@@ -76,7 +76,7 @@ TARGET               = @target@
 ######################################################
 # now configuration for compiler flags, paths, etc
 
-# path for libraries 
+# path for libraries
 
 LIBPATH    += $(addprefix -L,$(LIBDIR))
 
@@ -108,7 +108,7 @@ else
   ifeq (@DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME@,yes)
     DEAL_II_ADD_SONAME = -Wl,-dynamic,-install_name -Wl,$(call DEAL_II_SHLIB_NAME,$(1))
   else
-    DEAL_II_ADD_SONAME = 
+    DEAL_II_ADD_SONAME =
   endif
 endif
 
@@ -121,7 +121,7 @@ endif
 # for all PETSc libraries in our own lib directory, and have this one
 # twiddle with whatever is necessary to link in PETSc.
 #
-# to make things more fun, the whole scheme was changed in petsc 2.3.0 
+# to make things more fun, the whole scheme was changed in petsc 2.3.0
 # and then again in petsc 3.0.0
 #
 # also sort of annoying is the fact that on Mac OS X, the trick with the
@@ -147,7 +147,7 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
         lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
         lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
       endif
-    endif  
+    endif
   else
     lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
     lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib
@@ -213,9 +213,11 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
   endif
 endif
 
-# deal with HSL
+# deal with HSL; this should have been $(lib-contrib-hsl) but for a long time we
+# accidentally had $(lib-hsl) -- so we simply make both symbols available
 ifeq ($(USE_CONTRIB_HSL),yes)
-  lib-hsl = $(LIBDIR)/libhsl$(lib-suffix) 
+  lib-hsl = $(LIBDIR)/libhsl$(lib-suffix)
+  lib-contrib-hsl = $(lib-hsl)
 endif
 
 # need to link with libtbb if we're using threads
@@ -265,7 +267,7 @@ include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 
 # include paths as command line flags. while compilers allow a space between
-# the '-I' and the actual path, we also send these flags to the 
+# the '-I' and the actual path, we also send these flags to the
 # make_dependencies program that doesn't support the extra space.
 INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
 	  @CPPFLAGS@ @TECPLOT_INCLUDE_DIR@ \
