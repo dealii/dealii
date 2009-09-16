@@ -138,14 +138,14 @@ projection methods that we have just described:
 
 Our implementation of the projection methods follows <i>verbatim</i> the description given above. We must note,
 however, that as opposed to most other problems that have several solution components, we do not use
-vector-valued finite elements. Instead, we use separate finite elements for each component of the velocity
+vector-valued finite elements. Instead, we use separate finite elements the components of the velocity
 and the pressure, respectively, and use different <code>DoFHandler</code>'s for those as well. The main
 reason for doing this is that, as we see from the description of the scheme, the <code>dim</code> components
 of the velocity and the pressure are decoupled. As a consequence, the equations for all the velocity components
-look all the same, have the same system matrix, and can be solved in parallel. Obviously, this approach
+look all the same, have the same system matrix, and can be solved in %parallel. Obviously, this approach
 has also its disadvantages. For instance, we need to keep several <code>DoFHandler</code>s and iterators
 synchronized when assembling matrices and right hand sides; obtaining quantities that are inherent to
-vector-valued functions (i.e. divergences) becomes a little awkward, and others.
+vector-valued functions (e.g. divergences) becomes a little awkward, and others.
 
 <a name ="testcase"></a>
 <h3> The Testcase </h3>
