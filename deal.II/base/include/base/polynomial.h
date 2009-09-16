@@ -352,9 +352,10 @@ namespace Polynomials
                                         * constructor.
                                         */
       static 
-      std::vector<double> 
+      void
       compute_coefficients (const unsigned int n,
-                            const unsigned int support_point);
+                            const unsigned int support_point,
+			    std::vector<double>& a);
   };
 
 /**

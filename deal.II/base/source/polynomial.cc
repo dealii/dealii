@@ -366,17 +366,47 @@ namespace Polynomials
 
   LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
                                             const unsigned int support_point)
-		  :
-                  Polynomial<double>(compute_coefficients(n,support_point))
-  {}
-
-
-
-  std::vector<double> 
-  LagrangeEquidistant::compute_coefficients (const unsigned int n,
-                                             const unsigned int support_point)
   {
-    std::vector<double> a (n+1);
+    if (n <= 10)
+      {
+	this->coefficients.resize(n+1);
+	compute_coefficients(n, support_point, this->coefficients);
+      }
+    else
+      {
+					 // We have precomputed tables
+					 // up to degree 10. For
+					 // higher order, we have to
+					 // compute by hand.
+	
+					 // Start with the constant one
+	this->coefficients.resize(1);
+	this->coefficients[0] = 1.;
+
+					 // Then compute the Lagrange
+					 // polynomial as the product
+					 // of linear factors
+	std::vector<double> two (2, 1.);
+	
+	for (unsigned int k=0;k<=n;++k)
+	  {
+	    if (k != support_point)
+	      {
+		two[0] = -1.*k/n;
+		Polynomial<double> factor(two);
+		factor.scale(1.*n/(support_point - k));
+		(*this) *= factor;
+	      }
+	  }  
+      }
+  }
+  
+
+  void
+  LagrangeEquidistant::compute_coefficients (const unsigned int n,
+                                             const unsigned int support_point,
+					     std::vector<double>& a)
+  {
     Assert(support_point<n+1, ExcIndexRange(support_point, 0, n+1));
 
     unsigned int n_functions=n+1;
@@ -583,14 +613,12 @@ namespace Polynomials
           break;
         }
         default:
-              Assert(false, ExcNotImplemented());
+	      Assert(false, ExcInternalError())
       }
 
     Assert(x!=0, ExcInternalError());
     for (unsigned int i=0; i<n_functions; ++i)
       a[i]=x[support_point*n_functions+i];
-  
-    return a;
   }
 
 
