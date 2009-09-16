@@ -218,8 +218,8 @@ namespace EquationData{
   // As we have chosen a completely decoupled formulation, we will not take advantage of deal.II's capabilities
   // to handle vector valued problems. We do, however,
   // want to use an interface for the equation data that is
-  // somehow dimension indenpendent. To be able to do that, our functions should be able to know
-  // on which space component we are currently working, and we should be able to have a
+  // somehow dimension independent. To be able to do that, our functions should be able to know
+  // on which spatial component we are currently working, and we should be able to have a
   // common interface to do that. The following class is an attempt in that direction.
   template<int dim>
   class MultiComponentFunction: public Function<dim>{
@@ -285,8 +285,8 @@ namespace EquationData{
 
 
   template<int dim>
-  inline double Velocity<dim>::value( const Point<dim> &p,
-				      const unsigned int ) const
+  double Velocity<dim>::value( const Point<dim> &p,
+			       const unsigned int ) const
   {
     double return_value = 0.;
     static const double Um = 1.5, H = 4.1;
@@ -317,8 +317,8 @@ namespace EquationData{
 
 
   template<int dim>
-  inline double Pressure<dim>::value( const Point<dim> &p,
-				      const unsigned int ) const
+  double Pressure<dim>::value( const Point<dim> &p,
+			       const unsigned int ) const
   {
     return 0.;
   }
@@ -383,17 +383,17 @@ template<int dim> class Navier_Stokes_Projection{
     void Create_Triangulation( const unsigned int n_of_refines );
     void Initialize();
 
-    inline void interpolate_velocity();
-    inline void diffusion_step( const bool reinit_prec );
-    inline void projection_step( const bool reinit_prec );
-    inline void update_pressure( const bool reinit_prec );
+    void interpolate_velocity();
+    void diffusion_step( const bool reinit_prec );
+    void projection_step( const bool reinit_prec );
+    void update_pressure( const bool reinit_prec );
   private:
     unsigned int vel_max_its, vel_Krylov_size, vel_off_diagonals, vel_update_prec;
     double vel_eps, vel_diag_strength;
 
-    inline void init_velocity_matrices();
-    inline void init_pressure_matrices();
-    inline void init_gradient_operator();
+    void init_velocity_matrices();
+    void init_pressure_matrices();
+    void init_gradient_operator();
 
     typedef std_cxx1x::tuple< typename DoFHandler<dim>::active_cell_iterator,
                                 typename DoFHandler<dim>::active_cell_iterator
@@ -425,7 +425,7 @@ template<int dim> class Navier_Stokes_Projection{
                                         InitGradPerTaskData &data );
     void copy_gradient_local_to_global( const InitGradPerTaskData &data );
 
-    inline void assemble_advection_term();
+    void assemble_advection_term();
     struct AdvectionPerTaskData{
       FullMatrix<double> local_advection;
       std::vector<unsigned int> local_dof_indices;
