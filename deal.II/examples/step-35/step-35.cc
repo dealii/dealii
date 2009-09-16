@@ -288,11 +288,14 @@ namespace EquationData{
   double Velocity<dim>::value( const Point<dim> &p,
 			       const unsigned int ) const
   {
-    double return_value = 0.;
-    static const double Um = 1.5, H = 4.1;
     if( this->comp == 0 )
-      return_value = 4.*Um*p(1)*( H - p(1) )/(H*H);
-    return return_value;
+      {
+	const double Um = 1.5;
+	const double H  = 4.1;
+	return 4.*Um*p(1)*( H - p(1) )/(H*H);
+      }
+    else
+      return 0;
   }
 
   template<int dim>
