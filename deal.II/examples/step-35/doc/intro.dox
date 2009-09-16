@@ -155,7 +155,7 @@ as follows:
 
 @image html geometry.png
 
-with $H=4.1$.
+with $H=4.1$, making the geometry slightly non-symmetric.
 
 We impose no-slip boundary conditions on both the top and bottom walls and the obstacle. On the left side we
 have the inflow boundary condition
