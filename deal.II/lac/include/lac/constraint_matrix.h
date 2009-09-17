@@ -1539,6 +1539,26 @@ class ConstraintMatrix : public Subscriptor
 				 const Table<2,bool>             &dof_mask,
 				 internal::bool2type<true>) const;
 
+				    /**
+				     * This function returns a pointer to
+				     * the respective ConstraintLine object
+				     * if a dof is constrained, and a zero
+				     * pointer otherwise.
+				     */
+    std::vector<ConstraintLine>::const_iterator
+    find_constraint (const unsigned int line) const;
+
+				    /**
+				     * This function returns a pointer to
+				     * the respective ConstraintLine object
+				     * if a dof is constrained, and a zero
+				     * pointer otherwise. This function is
+				     * used if the constraint matrix has not
+				     * been closed yet.
+				     */
+    std::vector<ConstraintLine>::iterator
+    find_constraint (const unsigned int line);
+    
 #ifdef DEAL_II_USE_TRILINOS
 //TODO: Make use of the following member thread safe    
 				      /**
@@ -1615,28 +1635,7 @@ ConstraintMatrix::add_entry (const unsigned int line,
   Assert (line != column,
 	  ExcMessage ("Can't constrain a degree of freedom to itself"));
 
-  std::vector<ConstraintLine>::iterator line_ptr;
-  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
-
-  				   // the usual case is that the line where
-				   // a value is entered is the one we
-				   // added last, so we search backward
-  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
-    if (line_ptr->line == line)
-      break;
-
-				   // if the loop didn't break, then
-				   // line_ptr must be begin().
-				   // we have an error if that doesn't
-				   // point to 'line' then
-  Assert (line_ptr->line==line, ExcLineInexistant(line));
-				   // second check: the respective
-				   // flag in the
-				   // constraint_line_exists field
-				   // must exist
-  Assert (line < constraint_line_exists.size(), ExcInternalError());
-  Assert (constraint_line_exists[line] == true, ExcInternalError());
-  
+  std::vector<ConstraintLine>::iterator line_ptr = find_constraint(line);
 
 				   // if in debug mode, check whether an
 				   // entry for this column already
@@ -1666,29 +1665,7 @@ void
 ConstraintMatrix::set_inhomogeneity (const unsigned int line,
 				     const double       value)
 {
-  std::vector<ConstraintLine>::iterator line_ptr;
-  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
-
-  				   // the usual case is that the line where
-				   // the inhomogeneity is set to the one we
-				   // added last, so we search backward
-  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
-    if (line_ptr->line == line)
-      break;
-
-				   // if the loop didn't break, then
-				   // line_ptr must be begin().
-				   // we have an error if that doesn't
-				   // point to 'line' then
-  Assert (line_ptr->line==line, ExcLineInexistant(line));
-				   // second check: the respective
-				   // flag in the
-				   // constraint_line_exists field
-				   // must exist
-  Assert (line < constraint_line_exists.size(), ExcInternalError());
-  Assert (constraint_line_exists[line] == true, ExcInternalError());
-
-  line_ptr->inhomogeneity = value;
+  find_constraint(line)->inhomogeneity = value;
 }
 
 
@@ -1708,18 +1685,68 @@ inline
 bool
 ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) const 
 {
-  if (is_constrained(index) == false)
-    return false;
+  const std::vector<ConstraintLine>::const_iterator position 
+    = find_constraint(index);
+  return position!=lines.end() ? position->inhomogeneity != 0 : false;
+}
 
+
+
+inline
+std::vector<ConstraintMatrix::ConstraintLine>::const_iterator 
+ConstraintMatrix::find_constraint (const unsigned int line) const
+{
+  if (is_constrained(line) == false)
+    return lines.end();
+
+  Assert (sorted==true, ExcMatrixNotClosed());
   ConstraintLine index_comparison;
-  index_comparison.line = index;
+  index_comparison.line = line;
 
   const std::vector<ConstraintLine>::const_iterator
     position = std::lower_bound (lines.begin(),
 				 lines.end(),
 				 index_comparison);
   Assert (position != lines.end(), ExcInternalError());
-  return position->inhomogeneity != 0;
+
+				   // check whether we've really found the
+				   // right constraint.
+  Assert (position->line == line,
+	  ExcInternalError());
+
+  return position;
+}
+
+
+
+inline
+std::vector<ConstraintMatrix::ConstraintLine>::iterator 
+ConstraintMatrix::find_constraint (const unsigned int line)
+{
+  Assert (sorted==false, ExcMatrixIsClosed());
+  std::vector<ConstraintLine>::iterator line_ptr;
+  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
+
+  				   // the usual case is that the line where
+				   // a value is entered is the one we
+				   // added last, so we search backward
+  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
+    if (line_ptr->line == line)
+      break;
+
+				   // if the loop didn't break, then
+				   // line_ptr must be begin().
+				   // we have an error if that doesn't
+				   // point to 'line' then
+  Assert (line_ptr->line==line, ExcLineInexistant(line));
+				   // second check: the respective
+				   // flag in the
+				   // constraint_line_exists field
+				   // must exist
+  Assert (line < constraint_line_exists.size(), ExcInternalError());
+  Assert (constraint_line_exists[line] == true, ExcInternalError());
+
+  return line_ptr;
 }
 
 DEAL_II_NAMESPACE_CLOSE
