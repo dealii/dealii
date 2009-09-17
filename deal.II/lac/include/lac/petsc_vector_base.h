@@ -835,7 +835,7 @@ namespace PETScWrappers
                                        // PETScWrappers::MPI::Vector), but we
                                        // can save some work if the addend is
                                        // zero
-      if (value == 0)
+      if (value == PetscScalar())
         return *this;
       
                                        // use the PETSc function to add something
@@ -873,7 +873,7 @@ namespace PETScWrappers
                                        // PETScWrappers::MPI::Vector), but we
                                        // can save some work if the addend is
                                        // zero
-      if (value == 0)
+      if (value == PetscScalar())
         return *this;
 
                                        // use the PETSc function to add something

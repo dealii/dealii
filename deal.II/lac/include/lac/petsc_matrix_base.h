@@ -1497,11 +1497,11 @@ namespace PETScWrappers
 	n_columns = 0;
 	for (unsigned int j=0; j<n_cols; ++j)
 	  {
-	    const double value = values[j];
+	    const PetscScalar value = values[j];
 	    Assert (numbers::is_finite(value),
 		    ExcMessage("The given value is not finite but either "
 			       "infinite or Not A Number (NaN)"));
-	    if (value != 0)
+	    if (value != PetscScalar())
 	      {
 		column_indices[n_columns] = col_indices[j];
 		column_values[n_columns] = value;
@@ -1533,7 +1533,7 @@ namespace PETScWrappers
 	    ExcMessage("The given value is not finite but either "
 		       "infinite or Not A Number (NaN)"));
 
-    if (value == 0)
+    if (value == PetscScalar())
       {
 				  // we have to do checkings on Insert/Add
 				  // in any case
@@ -1644,11 +1644,11 @@ namespace PETScWrappers
 	n_columns = 0;
 	for (unsigned int j=0; j<n_cols; ++j)
 	  {
-	    const double value = values[j];
+	    const PetscScalar value = values[j];
 	    Assert (numbers::is_finite(value),
 		    ExcMessage("The given value is not finite but either "
 			       "infinite or Not A Number (NaN)"));
-	    if (value != 0)
+	    if (value != PetscScalar())
 	      {
 		column_indices[n_columns] = col_indices[j];
 		column_values[n_columns] = value;
