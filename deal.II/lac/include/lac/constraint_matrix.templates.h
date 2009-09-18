@@ -1313,8 +1313,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // hanging nodes in 3d). however, in the
 				   // line below, we do actually do
 				   // something with this dof
-      const double new_diagonal = std::fabs(local_matrix(local_row,local_row)) != 0 ?
-	std::fabs(local_matrix(local_row,local_row)) : average_diagonal;
+      const typename MatrixType::value_type new_diagonal 
+	= (std::fabs(local_matrix(local_row,local_row)) != 0 ?
+	   std::fabs(local_matrix(local_row,local_row)) : average_diagonal);
       global_matrix.add(global_row, global_row, new_diagonal);
     }
 
@@ -1323,8 +1324,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // create arrays for the column data
 				   // (indices and values) that will then be
 				   // written into the matrix.
-  std::vector<unsigned int> cols (n_actual_dofs);
-  std::vector<double>       vals (n_actual_dofs);
+  std::vector<unsigned int>                    cols (n_actual_dofs);
+  std::vector<typename MatrixType::value_type> vals (n_actual_dofs);
 
   typedef std::vector<std::pair<unsigned int,double> > constraint_format;
 
@@ -1334,7 +1335,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
       const unsigned int row = my_indices[i].global_row;
       const unsigned int loc_row = my_indices[i].local_row;
       unsigned int * col_ptr = &cols[0];
-      double * val_ptr = &vals[0];
+      typename MatrixType::value_type * val_ptr = &vals[0];
       double val = 0;
 
 				   // fast function if there are no indirect
@@ -1356,7 +1357,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	      const double col_val = matrix_ptr[loc_col];
 	      if (col_val != 0)
 		{
-		  *val_ptr++ = col_val;
+		  *val_ptr++ = static_cast<typename MatrixType::value_type>
+		    (col_val);
 		  *col_ptr++ = my_indices[j].global_row;
 		}
 	    }
@@ -1456,9 +1458,10 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 				   // if we got some nontrivial value,
 				   // append it to the array of values.
-	      if (col_val != 0)
+	      if (col_val != typename MatrixType::value_type())
 		{
-		  *val_ptr++ = col_val;
+		  *val_ptr++ = static_cast<typename MatrixType::value_type>
+		    (col_val);
 		  *col_ptr++ = my_indices[j].global_row;
 		}
 	    }
@@ -1511,7 +1514,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
       if (n_values > 0)
 	global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
       if (val != 0)
-	global_vector(row) += val;
+	global_vector(row) += static_cast<typename VectorType::value_type>(val);
     }
 }
 
@@ -1601,8 +1604,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				  (local_row, position->entries[q].second));
 	}
 
-      const double new_diagonal = std::fabs(local_matrix(local_row,local_row)) != 0 ?
-	std::fabs(local_matrix(local_row,local_row)) : average_diagonal;
+      const typename MatrixType::value_type new_diagonal 
+	= (std::fabs(local_matrix(local_row,local_row)) != 0 ?
+	   std::fabs(local_matrix(local_row,local_row)) : average_diagonal);
       global_matrix.add(global_row, global_row, new_diagonal);
     }
 
@@ -1617,8 +1621,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   std::vector<unsigned int> block_starts(num_blocks+1, n_actual_dofs);
   internals::make_block_starts (global_matrix, localized_indices, block_starts);
 
-  std::vector<unsigned int> cols (n_actual_dofs);
-  std::vector<double>       vals (n_actual_dofs);
+  std::vector<unsigned int>                    cols (n_actual_dofs);
+  std::vector<typename MatrixType::value_type> vals (n_actual_dofs);
   typedef std::vector<std::pair<unsigned int,double> > constraint_format;
 
 				   // the basic difference to the
@@ -1637,7 +1641,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	    {
 	      const unsigned int next_block_col = block_starts[block_col+1];
 	      unsigned int * col_ptr = &cols[0];
-	      double * val_ptr = &vals[0];
+	      typename MatrixType::value_type * val_ptr = &vals[0];
 	      if (have_indirect_rows == false)
 		{
 		  Assert(loc_row < n_local_dofs, ExcInternalError());
@@ -1651,7 +1655,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		      const double col_val = matrix_ptr[loc_col];
 		      if (col_val != 0)
 			{
-			  *val_ptr++ = col_val;
+			  *val_ptr++ =
+			    static_cast<typename MatrixType::value_type> (col_val);
 			  *col_ptr++ = localized_indices[j];
 			}
 		    }
@@ -1721,7 +1726,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		      if (col_val != 0)
 			{
 			  *col_ptr++ = localized_indices[j];
-			  *val_ptr++ = col_val;
+			  *val_ptr++ = 
+			    static_cast<typename MatrixType::value_type>(col_val);
 			}
 		    }
 		}
@@ -1770,7 +1776,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		    }
 		}
 	      if (val != 0)
-		global_vector(my_indices[i].global_row) += val;
+		global_vector(my_indices[i].global_row) += 
+		  static_cast<typename VectorType::value_type>(val);
 	    }
 	}
     }
