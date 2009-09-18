@@ -347,10 +347,10 @@ namespace EquationData
       {
 	const double Um = 1.5;
 	const double H  = 4.1;
-	return 4.*Um*p(1)* (H - p(1))/(H*H);
+	return 4.*Um*p(1)*(H - p(1))/(H*H);
       }
     else
-      return 0;
+      return 0.;
   }
 
 
@@ -380,7 +380,7 @@ namespace EquationData
   double Pressure<dim>::value (const Point<dim> &p,
 			       const unsigned int) const
   {
-    return 0.;
+    return 25.-p(0);
   }
 
   template <int dim>
@@ -434,16 +434,15 @@ class NavierStokesProjection
     SparsityPattern sparsity_pattern_velocity, sparsity_pattern_pressure, sparsity_pattern_pres_vel;
     SparseMatrix<double> vel_Laplace_plus_Mass, vel_it_matrix[dim], vel_Mass, vel_Laplace,
     vel_Advection,
-    pres_Laplace, pres_Mass, pres_Diff[dim];
-    ConstraintMatrix pres_regularization;
+    pres_Laplace, pres_Mass, pres_Diff[dim], pres_iterative;
     Vector<double> pres_n, pres_n_minus_1, phi_n, phi_n_minus_1, u_n[dim], u_n_minus_1[dim],
     u_star[dim],
     force[dim],
     v_tmp, pres_tmp,
     rot_u;
 
-    SparseILU<double> prec_velocity[dim];
-    SparseDirectUMFPACK prec_mass, prec_pressure, prec_vel_mass;
+    SparseILU<double> prec_velocity[dim], prec_pres_Laplace;
+    SparseDirectUMFPACK prec_mass, prec_vel_mass;
 
     DeclException2 (ExcInvalidTimeStep, double, double, << " The time step " << arg1 << " is out of range." << std::endl
 		    << " The permitted range is (0," << arg2 << "]");
@@ -661,9 +660,9 @@ void NavierStokesProjection<dim>::Initialize()
     {
       vel_exact.set_time (t_0);
       vel_exact.set_component(d);
-      VectorTools::interpolate (dof_handler_velocity, vel_exact, u_n_minus_1[d]);
+      VectorTools::interpolate (dof_handler_velocity, ZeroFunction<dim>(), u_n_minus_1[d]);
       vel_exact.advance_time (dt);
-      VectorTools::interpolate (dof_handler_velocity, vel_exact, u_n[d]);
+      VectorTools::interpolate (dof_handler_velocity, ZeroFunction<dim>(), u_n[d]);
     }
 }
 
@@ -674,7 +673,7 @@ void NavierStokesProjection<dim>::Initialize()
 				 // initialize the sparsity patterns,
 				 // the constraints (if any) and
 				 // assemble the matrices that do not
-				 // depend on the timestep $\Delta t$.
+				 // depend on the timestep <code>dt</code>.
 template <int dim>
 void NavierStokesProjection<dim>::init_velocity_matrices()
 {
@@ -716,20 +715,14 @@ void NavierStokesProjection<dim>::init_pressure_matrices()
 				    dof_handler_pressure.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler_pressure, sparsity_pattern_pressure);
 
-  pres_regularization.clear();
-  pres_regularization.add_line(0);
-  pres_regularization.close();
-  pres_regularization.condense (sparsity_pattern_pressure);
-
   sparsity_pattern_pressure.compress();
 
   pres_Laplace.reinit (sparsity_pattern_pressure);
+  pres_iterative.reinit (sparsity_pattern_pressure);
   pres_Mass.reinit (sparsity_pattern_pressure);
 
   MatrixCreator::create_laplace_matrix (dof_handler_pressure, quadrature_pressure, pres_Laplace);
   MatrixCreator::create_mass_matrix ( dof_handler_pressure, quadrature_pressure, pres_Mass);
-
-  pres_regularization.condense (pres_Laplace);
 }
 
 
@@ -757,7 +750,7 @@ void NavierStokesProjection<dim>::init_gradient_operator()
 
   InitGradPerTaskData per_task_data (0, fe_velocity.dofs_per_cell, fe_pressure.dofs_per_cell);
   InitGradScratchData scratch_data (fe_velocity, fe_pressure, quadrature_velocity,
-                                    update_values | update_JxW_values, update_gradients);
+                                    update_gradients | update_JxW_values, update_values);
 
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -796,8 +789,8 @@ void NavierStokesProjection<dim>::assemble_one_cell_of_gradient (const SIterator
     {
       for (unsigned int i=0; i<data.vel_dpc; ++i)
 	for (unsigned int j=0; j<data.pres_dpc; ++j)
-	  data.local_grad (i, j) += scratch.fe_val_vel.JxW(q)*scratch.fe_val_vel.shape_value (i, q)
-				    *scratch.fe_val_pres.shape_grad (j, q)[data.d];
+	  data.local_grad (i, j) += scratch.fe_val_vel.JxW(q)*scratch.fe_val_vel.shape_grad (i, q)[data.d]
+				    *scratch.fe_val_pres.shape_value (j, q);
     }
 }
 
@@ -1015,20 +1008,30 @@ void NavierStokesProjection<dim>::copy_advection_local_to_global(
 template <int dim>
 void NavierStokesProjection<dim>::projection_step (const bool reinit_prec)
 {
-  if (reinit_prec)
-    prec_pressure.initialize (pres_Laplace);
-
+  pres_iterative.copy_from (pres_Laplace);
+  
   pres_tmp = 0.;
   for (unsigned d=0; d<dim; ++d)
     pres_Diff[d].Tvmult_add (pres_tmp, u_n[d]);
 
   phi_n_minus_1 = phi_n;
-  phi_n = pres_tmp;
-  phi_n *= 1.5/dt;
 
-  pres_regularization.condense (phi_n);
-  prec_pressure.solve (phi_n);
-  pres_regularization.distribute (phi_n);
+  static std::map<unsigned int, double> bval;
+  if (reinit_prec)
+    VectorTools::interpolate_boundary_values (dof_handler_pressure, 3,
+                                                ZeroFunction<dim>(), bval);
+
+  MatrixTools::apply_boundary_values (bval, pres_iterative, phi_n, pres_tmp);
+
+  if (reinit_prec)
+    prec_pres_Laplace.initialize(pres_iterative,
+        SparseILU<double>::AdditionalData (vel_diag_strength, vel_off_diagonals) );
+
+  SolverControl solvercontrol (vel_max_its, vel_eps*pres_tmp.l2_norm());
+  SolverCG<> cg (solvercontrol);
+  cg.solve (pres_iterative, phi_n, pres_tmp, prec_pres_Laplace);
+
+  phi_n *= 1.5/dt;
 }
 
 
@@ -1074,7 +1077,7 @@ void NavierStokesProjection<dim>::update_pressure (const bool reinit_prec)
 				 // step-31 and so I will not
 				 // elaborate on it.  There is one
 				 // small detail here. It is often
-				 // interested to see the vorticity of
+				 // interesting to see the vorticity of
 				 // the flow. But, since we are using
 				 // it here only for plotting
 				 // purposes, we are not going to
