@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,8 @@
 #include <iomanip>
 
 //TODO[WB]: This class is not thread-safe: it uses mutable member variables that contain temporary state. this is not what one would want when one uses a finite element object in a number of different contexts on different threads: finite element objects should be stateless
+//TODO:[GK] This can be achieved by writing a function in Polynomial space which does the rotated fill performed below and writes the data into the right data structures. The same function would be used
+//by Nedelec polynomials.
 
 DEAL_II_NAMESPACE_OPEN
 
