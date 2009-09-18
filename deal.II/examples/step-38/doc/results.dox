@@ -1,0 +1,91 @@
+<h1>Results</h1>
+
+
+The output of this program consist of the console output, the eps
+files including the grids, and the solutions given in gnuplot format.
+@code
+Cycle 0:
+   Number of active cells:       64
+   Number of degrees of freedom: 256
+Time of assemble_system1: 0.05
+Time of assemble_system2: 0.04
+solution1 and solution2 coincide.
+Writing grid to <grid-0.eps>...
+Writing solution to <sol-0.gnuplot>...
+
+Cycle 1:
+   Number of active cells:       112
+   Number of degrees of freedom: 448
+Time of assemble_system1: 0.09
+Time of assemble_system2: 0.07
+solution1 and solution2 coincide.
+Writing grid to <grid-1.eps>...
+Writing solution to <sol-1.gnuplot>...
+
+Cycle 2:
+   Number of active cells:       214
+   Number of degrees of freedom: 856
+Time of assemble_system1: 0.17
+Time of assemble_system2: 0.14
+solution1 and solution2 coincide.
+Writing grid to <grid-2.eps>...
+Writing solution to <sol-2.gnuplot>...
+
+Cycle 3:
+   Number of active cells:       415
+   Number of degrees of freedom: 1660
+Time of assemble_system1: 0.32
+Time of assemble_system2: 0.28
+solution1 and solution2 coincide.
+Writing grid to <grid-3.eps>...
+Writing solution to <sol-3.gnuplot>...
+
+Cycle 4:
+   Number of active cells:       796
+   Number of degrees of freedom: 3184
+Time of assemble_system1: 0.62
+Time of assemble_system2: 0.52
+solution1 and solution2 coincide.
+Writing grid to <grid-4.eps>...
+Writing solution to <sol-4.gnuplot>...
+
+Cycle 5:
+   Number of active cells:       1561
+   Number of degrees of freedom: 6244
+Time of assemble_system1: 1.23
+Time of assemble_system2: 1.03
+solution1 and solution2 coincide.
+Writing grid to <grid-5.eps>...
+Writing solution to <sol-5.gnuplot>...
+@endcode
+
+We see that, as expected, on each refinement step the two solutions
+coincide. The difference measured in time of treating each face only
+once (second version of the DG method) in comparison with treating
+each face twice within a nested loop over all cells and all faces of
+each cell (first version), is much less than one might have
+expected. The gain is less than 20% on the last few refinement steps.
+
+
+ First we show the solutions on the initial mesh, the mesh after two
+and after five adaptive refinement steps.
+
+@image html step-12.sol-0.png
+@image html step-12.sol-2.png
+@image html step-12.sol-5.png
+
+
+Then we show the final grid (after 5 refinement steps) and the solution again,
+this time with a nicer 3d rendering (obtained using the DataOutBase::write_vtk
+function and the VTK-based VisIt visualization program) that better shows the
+sharpness of the jump on the refined mesh and the over- and undershoots of the
+solution along the interface:
+
+@image html step-12.grid-5.png
+@image html step-12.3d-solution.png
+
+
+And finally we show a plot of a 3d computation.
+
+@image html step-12.sol-5-3d.png
+

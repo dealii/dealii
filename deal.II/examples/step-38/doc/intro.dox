@@ -1,0 +1,13 @@
+<a name="Intro"></a>
+<h1>This will be an example of the new MeshWorker framework and will be available soon</h1>
+
+<h3>Overview</h3>
+
+This example is devoted to the <em>discontinuous Galerkin method</em>,
+or in short: DG method. It solves the same problem as step-12 (see
+there for a description of the problem and discretization), but here
+we use the MeshWorker framework in order to save reprogramming the
+cell/face loops.
+
+<h3>Implementation</h3>
+
