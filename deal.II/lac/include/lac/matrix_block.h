@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
  * MatrixBlock comes handy when using BlockMatrixArray. Once the
  * MatrixBlock has been properly initalized and filled, it can be used
  * as:
- * @begin{code}
+ * @code
  * std::vector<MatrixBlock<SparseMatrix<double> > > blocks;
  *
  * ...
@@ -42,7 +42,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * for (unsigned int i=0;i<blocks.size;++i)
  *   matrix.enter(blocks[i].row, blocks[i].column, blocks[i].matrix);
- * @end{code}
+ * @endcode
  *
  *
  * @author Guido Kanschat, 2006
