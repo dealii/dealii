@@ -221,7 +221,11 @@ namespace PETScWrappers
 
   int
   SolverBase::convergence_test (KSP                 /*ksp*/,
-                                const int           iteration,
+#ifdef PETSC_USE_64BIT_INDICES
+				const PetscInt      iteration,
+#else
+				const int           iteration,
+#endif
                                 const PetscReal     residual_norm,
                                 KSPConvergedReason *reason,
                                 void               *solver_control_x)

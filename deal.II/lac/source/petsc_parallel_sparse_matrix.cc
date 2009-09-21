@@ -237,10 +237,19 @@ namespace PETScWrappers
                                        // signed integers. so we have to
                                        // convert, unless we want to play dirty
                                        // tricks with conversions of pointers
+#ifdef PETSC_USE_64BIT_INDICES
+      const std::vector<PetscInt> int_row_lengths (row_lengths.begin(),
+						   row_lengths.end());
+      PetscInt
+#else
       const std::vector<signed int> int_row_lengths (row_lengths.begin(),
                                                      row_lengths.end());
+      int
+#endif
+	petsc_m = m, petsc_n = n;
 
 //TODO: There must be a significantly better way to provide information about the off-diagonal blocks of the matrix. this way, petsc keeps allocating tiny chunks of memory, and gets completely hung up over this
+
       const int ierr
         = MatCreateMPIAIJ(communicator,
 			  local_rows, local_columns,
@@ -301,8 +310,13 @@ namespace PETScWrappers
 
                                        // then count the elements in- and
                                        // out-of-window for the rows we own
-      std::vector<int> row_lengths_in_window (local_row_end - local_row_start);
-      std::vector<int> row_lengths_out_of_window (local_row_end - local_row_start);
+#ifdef PETSC_USE_64BIT_INDICES
+      std::vector<PetscInt> 
+#else
+      std::vector<int> 
+#endif
+	row_lengths_in_window (local_row_end - local_row_start),
+	row_lengths_out_of_window (local_row_end - local_row_start);
       for (unsigned int row = local_row_start; row<local_row_end; ++row)
         for (unsigned int c=0; c<sparsity_pattern.row_length(row); ++c)
           {
@@ -361,7 +375,12 @@ namespace PETScWrappers
     ((PETSC_VERSION_MINOR < 2) ||  \
      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
 
-          std::vector<int> row_entries;
+#ifdef PETSC_USE_64BIT_INDICES
+          std::vector<PetscInt> 
+#else
+          std::vector<int> 
+#endif
+            row_entries;
           std::vector<PetscScalar> row_values;
           for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
             {
@@ -386,10 +405,13 @@ namespace PETScWrappers
                                            // dummy entry at the end to make
                                            // sure petsc doesn't read past the
                                            // end
-          std::vector<int> rowstart_in_window (local_row_end -
-                                               local_row_start + 1,
-                                               0);
-          std::vector<int> colnums_in_window;
+#ifdef PETSC_USE_64BIT_INDICES
+          std::vector<PetscInt> 
+#else
+          std::vector<int> 
+#endif
+	    rowstart_in_window (local_row_end - local_row_start + 1, 0),
+	    colnums_in_window;
           {
             unsigned int n_cols = 0;
             for (unsigned int i=local_row_start; i<local_row_end; ++i)
@@ -444,7 +466,12 @@ namespace PETScWrappers
 
             for (unsigned int i=local_row_start; i<local_row_end; ++i)
               {
-                const int petsc_i = i;
+#ifdef PETSC_USE_64BIT_INDICES
+		PetscInt 
+#else
+		int 
+#endif
+		  petsc_i = i;
                 MatSetValues (matrix, 1, &petsc_i,
                               sparsity_pattern.row_length(i),
                               &colnums_in_window[rowstart_in_window[i-local_row_start]],

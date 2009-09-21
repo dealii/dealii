@@ -1210,7 +1210,11 @@ namespace PETScWrappers
 					* adding/inserting local data into
 					* the (large) sparse matrix.
 					*/
-      std::vector<unsigned int> column_indices;
+#ifdef PETSC_USE_64BIT_INDICES
+      std::vector<PetscInt> column_indices;
+#else
+      std::vector<int> column_indices;
+#endif
 
 				       /**
 					* An internal array of double values
@@ -1471,13 +1475,19 @@ namespace PETScWrappers
   {
     prepare_action(LastAction::insert);
 
-    const signed int petsc_i = row;
+#ifdef PETSC_USE_64BIT_INDICES
+    const PetscInt petsc_i = row;
+    PetscInt * col_index_ptr;
+#else
+    const int petsc_i = row;
     int * col_index_ptr;
+#endif
     PetscScalar const* col_value_ptr;
     int n_columns;
 
 				   // If we don't elide zeros, the pointers
 				   // are already available...
+#ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
 	col_index_ptr = (int*)col_indices;
@@ -1485,6 +1495,7 @@ namespace PETScWrappers
 	n_columns = n_cols;
       }
     else
+#endif
       {
 				   // Otherwise, extract nonzero values in
 				   // each row and get the respective index.
@@ -1510,7 +1521,7 @@ namespace PETScWrappers
 	  }
 	Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-	col_index_ptr = (int*)&column_indices[0];
+	col_index_ptr = &column_indices[0];
 	col_value_ptr = &column_values[0];
       }
 
@@ -1618,13 +1629,19 @@ namespace PETScWrappers
   {
     prepare_action(LastAction::add);
 
-    const signed int petsc_i = row;
+#ifdef PETSC_USE_64BIT_INDICES
+    const PetscInt petsc_i = row;
+    PetscInt * col_index_ptr;
+#else
+    const int petsc_i = row;
     int * col_index_ptr;
+#endif
     PetscScalar const* col_value_ptr;
     int n_columns;
 
 				   // If we don't elide zeros, the pointers
 				   // are already available...
+#ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
 	col_index_ptr = (int*)col_indices;
@@ -1632,6 +1649,7 @@ namespace PETScWrappers
 	n_columns = n_cols;
       }
     else
+#endif
       {
 				   // Otherwise, extract nonzero values in
 				   // each row and get the respective index.
@@ -1657,7 +1675,7 @@ namespace PETScWrappers
 	  }
 	Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-	col_index_ptr = (int*)&column_indices[0];
+	col_index_ptr = &column_indices[0];
 	col_value_ptr = &column_values[0];
       }
 
@@ -1734,7 +1752,11 @@ namespace PETScWrappers
   bool
   MatrixBase::in_local_range (const unsigned int index) const
   {
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt begin, end;
+#else
     int begin, end;
+#endif
     const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
 					   &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

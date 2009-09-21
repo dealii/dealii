@@ -63,7 +63,12 @@ namespace PETScWrappers
                                            // element is actually locally
                                            // available
           int ierr;
-          int begin, end;
+#ifdef PETSC_USE_64BIT_INDICES
+	  PetscInt
+#else
+	  int
+#endif
+	    begin, end;
           ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
                                        &begin, &end);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -180,7 +185,12 @@ namespace PETScWrappers
   unsigned int
   VectorBase::size () const
   {
-    int sz;
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt
+#else
+    int
+#endif
+      sz;
     const int ierr = VecGetSize (vector, &sz);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -192,7 +202,12 @@ namespace PETScWrappers
   unsigned int
   VectorBase::local_size () const
   {
-    int sz;
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt
+#else
+    int
+#endif
+      sz;
     const int ierr = VecGetLocalSize (vector, &sz);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -204,7 +219,12 @@ namespace PETScWrappers
   std::pair<unsigned int, unsigned int>
   VectorBase::local_range () const
   {
-    int begin, end;
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt
+#else
+    int
+#endif
+      begin, end;
     const int ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
 					   &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -990,15 +1010,13 @@ namespace PETScWrappers
 				     // (unlike the above calls)
     if (n_elements != 0)
       {
-#if (PETSC_VERSION_MAJOR <= 2) &&					\
-     ((PETSC_VERSION_MINOR < 2) ||						\
-      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
-	const int * petsc_indices = indices;
-#else
+#ifdef PETSC_USE_64BIT_INDICES
 	std::vector<PetscInt> petsc_ind (n_elements);
 	for (unsigned int i=0; i<n_elements; ++i)
 	  petsc_ind[i] = indices[i];
-        const PetscInt * petsc_indices = &petsc_ind[0];
+	const PetscInt *petsc_indices = &petsc_ind[0];
+#else
+	const int * petsc_indices = (const int*)indices;
 #endif
 
 	InsertMode mode = ADD_VALUES;

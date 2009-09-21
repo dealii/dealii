@@ -47,15 +47,15 @@ namespace PETScWrappers
 
                                        // get a representation of the present
                                        // row
-      int ncols;
-
 #if (PETSC_VERSION_MAJOR <= 2) && \
     ((PETSC_VERSION_MINOR < 2) ||  \
      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+      int          ncols;
       int         *colnums;
       PetscScalar *values;
 #else
-      const int         *colnums;
+      PetscInt           ncols;
+      const PetscInt    *colnums;
       const PetscScalar *values;
 #endif
 
@@ -212,8 +212,12 @@ namespace PETScWrappers
   MatrixBase::el (const unsigned int i,
                   const unsigned int j) const
   {
-    const signed int petsc_i = i;
-    const signed int petsc_j = j;
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt 
+#else
+    int 
+#endif
+      petsc_i = i, petsc_j = j;
     PetscScalar value;
 
     const int ierr
@@ -259,7 +263,12 @@ namespace PETScWrappers
   unsigned int
   MatrixBase::m () const
   {
-    int n_rows, n_cols;
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt
+#else
+    int
+#endif
+      n_rows, n_cols;
     int ierr = MatGetSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -271,7 +280,12 @@ namespace PETScWrappers
   unsigned int
   MatrixBase::n () const
   {
-    int n_rows, n_cols;
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt
+#else
+    int
+#endif
+      n_rows, n_cols;
     int ierr = MatGetSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -283,7 +297,12 @@ namespace PETScWrappers
   unsigned int
   MatrixBase::local_size () const
   {
-    int n_rows, n_cols;
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt
+#else
+    int
+#endif
+      n_rows, n_cols;
     int ierr = MatGetLocalSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -295,7 +314,12 @@ namespace PETScWrappers
   std::pair<unsigned int, unsigned int>
   MatrixBase::local_range () const
   {
-    int begin, end;
+#ifdef PETSC_USE_64BIT_INDICES
+    PetscInt
+#else
+    int
+#endif
+      begin, end;
     const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
 					   &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -332,15 +356,15 @@ namespace PETScWrappers
 
                                      // get a representation of the present
                                      // row
-    int ncols;
-
-#if (PETSC_VERSION_MAJOR <= 2) && \
+ #if (PETSC_VERSION_MAJOR <= 2) && \
     ((PETSC_VERSION_MINOR < 2) ||  \
      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+    int ncols;
     int         *colnums;
     PetscScalar *values;
 #else
-    const int         *colnums;
+    PetscInt ncols;
+    const PetscInt    *colnums;
     const PetscScalar *values;
 #endif
 
