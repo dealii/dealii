@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,8 +35,8 @@ namespace PETScWrappers
   {
                                      // destroy the solver object
     int ierr = KSPDestroy (ksp);
-    AssertThrow (ierr == 0, ExcPETScError(ierr)); 
-  
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
                                      // and destroy the solver object if we
                                      // are in old PETSc mode
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
@@ -45,8 +45,8 @@ namespace PETScWrappers
 #endif
   }
 
-  
-  
+
+
   SolverBase::SolverBase (SolverControl  &cn,
                           const MPI_Comm &mpi_communicator)
                   :
@@ -54,12 +54,12 @@ namespace PETScWrappers
                   mpi_communicator (mpi_communicator)
   {}
 
-  
+
 
   SolverBase::~SolverBase ()
   {}
 
-  
+
 
   void
   SolverBase::solve (const MatrixBase         &A,
@@ -80,7 +80,7 @@ namespace PETScWrappers
     SLES sles;
     ierr = SLESCreate (mpi_communicator, &sles);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
                                      // set the matrices involved. the
                                      // last argument is irrelevant here,
                                      // since we use the solver only once
@@ -88,29 +88,29 @@ namespace PETScWrappers
     ierr = SLESSetOperators (sles, A, preconditioner,
                              SAME_PRECONDITIONER);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
                                      // let derived classes set the solver
                                      // type, and the preconditioning object
                                      // set the type of preconditioner
     KSP ksp;
     ierr = SLESGetKSP (sles, &ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
     set_solver_type (ksp);
-    
+
     PC pc;
     ierr = SLESGetPC (sles, &pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
     preconditioner.set_preconditioner_type (pc);
-  
+
                                      // then a convergence monitor
                                      // function. that function simply checks
                                      // with the solver_control object we have
                                      // in this object for convergence
     KSPSetConvergenceTest (ksp, &convergence_test,
                            reinterpret_cast<void *>(&solver_control));
-      
+
                                      // then do the real work: set up solver
                                      // internal data and solve the
                                      // system. this could be joined in one
@@ -120,7 +120,7 @@ namespace PETScWrappers
     int iterations = 0;
     ierr = SLESSetUp (sles, b, x);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
     ierr = SLESSolve (sles, b, x, &iterations);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -135,7 +135,7 @@ namespace PETScWrappers
     if (solver_data == 0)
       {
         solver_data.reset (new SolverData());
-        
+
         ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -152,7 +152,7 @@ namespace PETScWrappers
                                          // object set the type of
                                          // preconditioner
         set_solver_type (solver_data->ksp);
-    
+
         ierr = KSPGetPC (solver_data->ksp, &solver_data->pc);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -163,7 +163,7 @@ namespace PETScWrappers
                                          // checks with the solver_control
                                          // object we have in this object for
                                          // convergence
-#if (PETSC_VERSION_MAJOR <= 2) 
+#if (PETSC_VERSION_MAJOR <= 2)
         KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                reinterpret_cast<void *>(&solver_control));
 #else
@@ -173,7 +173,7 @@ namespace PETScWrappers
 #endif
 
       }
-    
+
                                      // then do the real work: set up solver
                                      // internal data and solve the
                                      // system. unfortunately, the call
@@ -186,7 +186,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     ierr = KSPSetUp (solver_data->ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
     ierr = KSPSolve (solver_data->ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 #  else
@@ -195,7 +195,7 @@ namespace PETScWrappers
 
     ierr = KSPSolve (solver_data->ksp, b, x);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-#  endif 
+#  endif
 
 #endif
                                      // destroy solver object
@@ -216,38 +216,38 @@ namespace PETScWrappers
   {
     return solver_control;
   }
-  
+
 
 
   int
   SolverBase::convergence_test (KSP                 /*ksp*/,
                                 const int           iteration,
-                                const PetscScalar   residual_norm,
+                                const PetscReal     residual_norm,
                                 KSPConvergedReason *reason,
                                 void               *solver_control_x)
   {
     SolverControl &solver_control = *reinterpret_cast<SolverControl*>(solver_control_x);
-    
+
     const SolverControl::State state
         = solver_control.check (iteration, residual_norm);
-    
+
     switch (state)
       {
         case ::dealii::SolverControl::iterate:
               *reason = KSP_CONVERGED_ITERATING;
               break;
-              
+
         case ::dealii::SolverControl::success:
               *reason = static_cast<KSPConvergedReason>(1);
               break;
-              
+
         case ::dealii::SolverControl::failure:
               if (solver_control.last_step() > solver_control.max_steps())
                 *reason = KSP_DIVERGED_ITS;
               else
                 *reason = KSP_DIVERGED_DTOL;
               break;
-              
+
         default:
               Assert (false, ExcNotImplemented());
       }
@@ -255,8 +255,8 @@ namespace PETScWrappers
                                      // return without failure
     return 0;
   }
-  
-    
+
+
 
 /* ---------------------- SolverRichardson ------------------------ */
 
@@ -266,8 +266,8 @@ namespace PETScWrappers
                   omega (omega)
   {}
 
-  
-  
+
+
   SolverRichardson::SolverRichardson (SolverControl        &cn,
                                       const MPI_Comm       &mpi_communicator,
                                       const AdditionalData &data)
@@ -313,7 +313,7 @@ namespace PETScWrappers
     KSPSetTolerances(ksp, PETSC_DEFAULT, this->solver_control.tolerance(),
 		     PETSC_DEFAULT, this->solver_control.max_steps()+1);
   }
-  
+
 
 /* ---------------------- SolverChebychev ------------------------ */
 
@@ -343,7 +343,7 @@ namespace PETScWrappers
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
-  
+
 /* ---------------------- SolverCG ------------------------ */
 
   SolverCG::SolverCG (SolverControl        &cn,
@@ -371,7 +371,7 @@ namespace PETScWrappers
                                      // solution vector. do so here as well:
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
-  
+
 
 /* ---------------------- SolverBiCG ------------------------ */
 
@@ -401,7 +401,7 @@ namespace PETScWrappers
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
-  
+
 /* ---------------------- SolverGMRES ------------------------ */
 
   SolverGMRES::AdditionalData::
@@ -412,8 +412,8 @@ namespace PETScWrappers
 		  right_preconditioning (right_preconditioning)
   {}
 
-  
-  
+
+
   SolverGMRES::SolverGMRES (SolverControl        &cn,
                             const MPI_Comm       &mpi_communicator,
                             const AdditionalData &data)
@@ -454,7 +454,7 @@ namespace PETScWrappers
                                      // so rather expand their macros by hand,
                                      // and do some equally nasty stuff that at
                                      // least doesn't yield warnings...
-    int (*fun_ptr)(KSP,int); 
+    int (*fun_ptr)(KSP,int);
     ierr = PetscObjectQueryFunction((PetscObject)(ksp),
                                     "KSPGMRESSetRestart_C",
                                     (void (**)())&fun_ptr);
@@ -476,7 +476,7 @@ namespace PETScWrappers
                                      // solution vector. do so here as well:
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
-  
+
 
 /* ---------------------- SolverBicgstab ------------------------ */
 
@@ -506,7 +506,7 @@ namespace PETScWrappers
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
-  
+
 /* ---------------------- SolverCGS ------------------------ */
 
   SolverCGS::SolverCGS (SolverControl        &cn,
@@ -534,7 +534,7 @@ namespace PETScWrappers
                                      // solution vector. do so here as well:
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
-  
+
 
 /* ---------------------- SolverTFQMR ------------------------ */
 
@@ -564,7 +564,7 @@ namespace PETScWrappers
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
-  
+
 /* ---------------------- SolverTCQMR ------------------------ */
 
   SolverTCQMR::SolverTCQMR (SolverControl        &cn,
@@ -593,7 +593,7 @@ namespace PETScWrappers
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
-  
+
 /* ---------------------- SolverCR ------------------------ */
 
   SolverCR::SolverCR (SolverControl        &cn,
@@ -622,7 +622,7 @@ namespace PETScWrappers
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
 
-  
+
 /* ---------------------- SolverLSQR ------------------------ */
 
   SolverLSQR::SolverLSQR (SolverControl        &cn,
@@ -650,7 +650,7 @@ namespace PETScWrappers
                                      // solution vector. do so here as well:
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
   }
- 
+
 
 /* ---------------------- SolverPreOnly ------------------------ */
 
@@ -676,11 +676,11 @@ namespace PETScWrappers
 
                                      // The KSPPREONLY solver of
                                      // PETSc never calls the convergence
-                                     // monitor, which leads to failure 
+                                     // monitor, which leads to failure
                                      // even when everything was ok.
-                                     // Therefore the SolverControl status 
+                                     // Therefore the SolverControl status
                                      // is set to some nice values, which
-                                     // guarantee a nice result at the end 
+                                     // guarantee a nice result at the end
                                      // of the solution process.
     solver_control.check (1, 0.0);
 

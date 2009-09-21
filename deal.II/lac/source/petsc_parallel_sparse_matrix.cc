@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,7 +27,7 @@ namespace PETScWrappers
 {
   namespace MPI
   {
-    
+
     SparseMatrix::SparseMatrix ()
     {
                                        // just like for vectors: since we
@@ -89,17 +89,17 @@ namespace PETScWrappers
                  local_columns_per_process, this_process,
                  preset_nonzero_locations);
     }
-    
+
 
 
     SparseMatrix &
-    SparseMatrix::operator = (const double d)
+    SparseMatrix::operator = (const value_type d)
     {
       MatrixBase::operator = (d);
       return *this;
     }
 
-    
+
 
     void
     SparseMatrix::reinit (const MPI_Comm    &communicator,
@@ -115,8 +115,8 @@ namespace PETScWrappers
                                        // get rid of old matrix and generate a
                                        // new one
       const int ierr = MatDestroy (matrix);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));    
-    
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
       do_reinit (m, n, local_rows, local_columns,
                  n_nonzero_per_row, is_symmetric);
     }
@@ -133,14 +133,14 @@ namespace PETScWrappers
                           const bool         is_symmetric)
     {
       this->communicator = communicator;
-      
+
                                        // get rid of old matrix and generate a
                                        // new one
       const int ierr = MatDestroy (matrix);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));    
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       do_reinit (m, n, local_rows, local_columns, row_lengths, is_symmetric);
-    }  
+    }
 
 
 
@@ -155,18 +155,18 @@ namespace PETScWrappers
             const bool                       preset_nonzero_locations)
     {
       this->communicator = communicator;
-      
+
                                        // get rid of old matrix and generate a
                                        // new one
       const int ierr = MatDestroy (matrix);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));    
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       do_reinit (sparsity_pattern, local_rows_per_process,
                  local_columns_per_process, this_process,
                  preset_nonzero_locations);
     }
 
-    
+
 
     void
     SparseMatrix::do_reinit (const unsigned int m,
@@ -177,7 +177,7 @@ namespace PETScWrappers
                              const bool         is_symmetric)
     {
       Assert (local_rows <= m, ExcLocalRowsTooLarge (local_rows, m));
-      
+
                                        // use the call sequence indicating only
                                        // a maximal number of elements per row
                                        // for all rows globally
@@ -192,7 +192,7 @@ namespace PETScWrappers
                                        // set symmetric flag, if so requested
       if (is_symmetric == true)
         {
-#if (PETSC_VERSION_MAJOR <= 2) 
+#if (PETSC_VERSION_MAJOR <= 2)
           const int ierr
             = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
@@ -228,7 +228,7 @@ namespace PETScWrappers
       for (unsigned int i=0; i<row_lengths.size(); ++i)
 	Assert(row_lengths[i]<=local_columns,
 	       ExcIndexRange(row_lengths[i], 1, local_columns+1));
-    
+
                                        // use the call sequence indicating a
                                        // maximal number of elements for each
                                        // row individually. annoyingly, we
@@ -252,7 +252,7 @@ namespace PETScWrappers
                                        // set symmetric flag, if so requested
       if (is_symmetric == true)
         {
-#if (PETSC_VERSION_MAJOR <= 2) 
+#if (PETSC_VERSION_MAJOR <= 2)
           const int ierr
             = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
@@ -261,7 +261,7 @@ namespace PETScWrappers
 #endif
 
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }    
+        }
     }
 
 
@@ -307,7 +307,7 @@ namespace PETScWrappers
         for (unsigned int c=0; c<sparsity_pattern.row_length(row); ++c)
           {
             const unsigned int column = sparsity_pattern.column_number(row,c);
-            
+
             if ((column >= local_col_start) &&
                 (column < local_col_end))
               ++row_lengths_in_window[row-local_row_start];
@@ -359,7 +359,7 @@ namespace PETScWrappers
                                        // the whole thing:
 #if (PETSC_VERSION_MAJOR <= 2) && \
     ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))      
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
 
           std::vector<int> row_entries;
           std::vector<PetscScalar> row_values;
@@ -369,7 +369,7 @@ namespace PETScWrappers
               row_values.resize (sparsity_pattern.row_length(i), 0.0);
               for (unsigned int j=0; j<sparsity_pattern.row_length(i); ++j)
                 row_entries[j] = sparsity_pattern.column_number (i,j);
-              
+
               const int int_row = i;
               MatSetValues (matrix, 1, &int_row,
                             sparsity_pattern.row_length(i), &row_entries[0],
@@ -377,7 +377,7 @@ namespace PETScWrappers
             }
 
           compress ();
-          
+
 #else
 
                                            // first set up the column number
@@ -401,7 +401,7 @@ namespace PETScWrappers
               }
             colnums_in_window.resize (n_cols+1, -1);
           }
-          
+
                                            // now copy over the information
                                            // from the sparsity pattern.
           {
@@ -412,7 +412,7 @@ namespace PETScWrappers
               colnums_in_window[index] = sparsity_pattern.column_number(i,j);
             Assert (index == colnums_in_window.size()-1, ExcInternalError());
           }
-          
+
                                            // then call the petsc function
                                            // that summarily allocates these
                                            // entries:
@@ -441,7 +441,7 @@ namespace PETScWrappers
             const std::vector<PetscScalar>
               values (sparsity_pattern.max_entries_per_row(),
                       1.);
-            
+
             for (unsigned int i=local_row_start; i<local_row_end; ++i)
               {
                 const int petsc_i = i;
@@ -451,28 +451,28 @@ namespace PETScWrappers
                               &values[0], INSERT_VALUES);
               }
           }
-          
+
           compress ();
 
                                            // set the dummy entries set above
                                            // back to zero
           *this = 0;
           compress ();
-          
+
 #endif
 
 				           // Now we won't insert any
 				           // further entries, so PETSc can
 				           // internally optimize some data
 				           // structures.
-#if (PETSC_VERSION_MAJOR <= 2) 
+#if (PETSC_VERSION_MAJOR <= 2)
           const int ierr =
 	    MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
 #else
           const int ierr =
 	    MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
 #endif
-	  
+
 	  AssertThrow (ierr == 0, ExcPETScError(ierr));
         }
     }

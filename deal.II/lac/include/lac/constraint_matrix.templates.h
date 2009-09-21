@@ -72,7 +72,7 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
   Assert (condensed.size()+n_constraints() == uncondensed.size(),
 	  ExcDimensionMismatch(condensed.size()+n_constraints(),
 			       uncondensed.size()));
-  
+
 				   // store for each line of the
 				   // vector its new line number after
 				   // compression. If the shift is -1,
@@ -85,7 +85,7 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
   unsigned int                                shift           = 0;
   unsigned int n_rows = uncondensed.size();
 
-  if (next_constraint == lines.end()) 
+  if (next_constraint == lines.end())
 				     // if no constraint is to be handled
     for (unsigned int row=0; row!=n_rows; ++row)
       new_line.push_back (row);
@@ -127,7 +127,7 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
     else
 				       // line must be distributed
       {
-	for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
+	for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
 	  condensed(new_line[next_constraint->entries[q].first])
 	    +=
 	    uncondensed(row) * next_constraint->entries[q].second;
@@ -148,9 +148,10 @@ ConstraintMatrix::condense (VectorType &vec) const
   std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
   for (; constraint_line!=lines.end(); ++constraint_line)
     {
-      for (unsigned int q=0; q!=constraint_line->entries.size(); ++q) 
+      for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
         vec(constraint_line->entries[q].first)
-          += (vec(constraint_line->line) *
+          += (static_cast<typename VectorType::value_type>
+	      (vec(constraint_line->line)) *
               constraint_line->entries[q].second);
       vec(constraint_line->line) = 0.;
 
@@ -175,11 +176,11 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 				   // check whether we work on real vectors
 				   // or we just used a dummy when calling
 				   // the other function above.
-  const bool use_vectors = (uncondensed_vector.size() == 0 && 
+  const bool use_vectors = (uncondensed_vector.size() == 0 &&
 			    condensed_vector.size() == 0) ? false : true;
 
   const SparsityPattern &uncondensed_struct = uncondensed.get_sparsity_pattern ();
-  
+
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (uncondensed_struct.is_compressed() == true, ExcMatrixNotClosed());
   Assert (condensed.get_sparsity_pattern().is_compressed() == true, ExcMatrixNotClosed());
@@ -210,7 +211,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
   unsigned int                                shift           = 0;
   const unsigned int n_rows = uncondensed_struct.n_rows();
 
-  if (next_constraint == lines.end()) 
+  if (next_constraint == lines.end())
 				     // if no constraint is to be handled
     for (unsigned int row=0; row!=n_rows; ++row)
       new_line.push_back (row);
@@ -256,7 +257,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	  if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
 	    condensed.add (new_line[row], new_line[uncondensed_struct.get_column_numbers()[j]],
 			   uncondensed.global_entry(j));
-	  else 
+	  else
 	    {
 					     // let c point to the
 					     // constraint of this column
@@ -277,12 +278,12 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 				   // row of the inhomogeneous constraint in
 				   // the matrix with Gauss elimination
 	      if (use_vectors == true)
-		condensed_vector(new_line[row]) -= uncondensed.global_entry(j) * 
+		condensed_vector(new_line[row]) -= uncondensed.global_entry(j) *
 		                                   c->inhomogeneity;
 	    }
 
 	if (use_vectors == true)
-	  condensed_vector(new_line[row]) += uncondensed_vector(row);	  
+	  condensed_vector(new_line[row]) += uncondensed_vector(row);
       }
     else
 				       // line must be distributed
@@ -292,12 +293,12 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 					   // for each column: distribute
 	  if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
 					     // column is not constrained
-	    for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
+	    for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
 	      condensed.add (new_line[next_constraint->entries[q].first],
 			     new_line[uncondensed_struct.get_column_numbers()[j]],
 			     uncondensed.global_entry(j) *
 			     next_constraint->entries[q].second);
-	
+
 	  else
 					     // not only this line but
 					     // also this col is constrained
@@ -307,7 +308,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	      std::vector<ConstraintLine>::const_iterator c = lines.begin();
 	      while (c->line != uncondensed_struct.get_column_numbers()[j])
 		++c;
-	      
+
 	      for (unsigned int p=0; p!=c->entries.size(); ++p)
 		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
 		  condensed.add (new_line[next_constraint->entries[q].first],
@@ -319,14 +320,14 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	      if (use_vectors == true)
 		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
 		  condensed_vector (new_line[next_constraint->entries[q].first])
-		    -= uncondensed.global_entry(j) * 
+		    -= uncondensed.global_entry(j) *
 		       next_constraint->entries[q].second *
 		       c->inhomogeneity;
 	    };
 
 				   // condense the vector
 	if (use_vectors == true)
-	  for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
+	  for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
 	    condensed_vector(new_line[next_constraint->entries[q].first])
 	      +=
 	      uncondensed_vector(row) * next_constraint->entries[q].second;
@@ -355,7 +356,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
 	  ExcNotQuadratic());
   if (use_vectors == true)
     {
-      Assert (vec.size() == sparsity.n_rows(), 
+      Assert (vec.size() == sparsity.n_rows(),
 	      ExcDimensionMismatch(vec.size(), sparsity.n_rows()));
     }
 
@@ -363,7 +364,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
   for (unsigned int i=0; i<uncondensed.m(); ++i)
     average_diagonal += std::fabs (uncondensed.diag_element(i));
   average_diagonal /= uncondensed.m();
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // invalid_unsigned_int, no distribution is
@@ -372,7 +373,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
 				   // handles this index
   std::vector<unsigned int> distribute (sparsity.n_rows(),
                                         numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
 
@@ -387,7 +388,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                entry != uncondensed.end(row); ++entry)
             {
               const unsigned int column = entry->column();
-              
+
                                                // end of row reached?
                                                // this should not
                                                // happen, since we only
@@ -395,7 +396,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                                                // matrices!
               Assert (column != SparsityPattern::invalid_entry,
                       ExcMatrixNotClosed());
-	    
+
               if (distribute[column] != numbers::invalid_unsigned_int)
                                                  // distribute entry at
                                                  // regular row @p row
@@ -417,7 +418,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
 				   // row of the inhomogeneous constraint in
 				   // the matrix with Gauss elimination
 		  if (use_vectors == true)
-		    vec(row) -= 
+		    vec(row) -=
 		      entry->value() * lines[distribute[column]].inhomogeneity;
 
                                                    // set old value to zero
@@ -451,7 +452,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                                                  // old entry to zero
                 {
                   for (unsigned int q=0;
-                       q!=lines[distribute[row]].entries.size(); ++q) 
+                       q!=lines[distribute[row]].entries.size(); ++q)
                     uncondensed.add (lines[distribute[row]].entries[q].first,
                                      column,
                                      entry->value() *
@@ -479,7 +480,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
 					 lines[distribute[column]].entries[q].second);
 
 		      if (use_vectors == true)
-			vec(lines[distribute[row]].entries[p].first) -= 
+			vec(lines[distribute[row]].entries[p].first) -=
 			  entry->value() * lines[distribute[row]].entries[p].second *
 			  lines[distribute[column]].inhomogeneity;
 		    }
@@ -493,7 +494,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
 				   // take care of vector
 	  if (use_vectors == true)
 	    {
-	      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
+	      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q)
 		vec(lines[distribute[row]].entries[q].first)
 		  += (vec(row) * lines[distribute[row]].entries[q].second);
 
@@ -516,7 +517,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
   const bool use_vectors = vec.n_blocks() == 0 ? false : true;
 
   const unsigned int blocks = uncondensed.n_block_rows();
-  
+
   const BlockSparsityPattern &
     sparsity = uncondensed.get_sparsity_pattern ();
 
@@ -533,7 +534,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 
   if (use_vectors == true)
     {
-      Assert (vec.size() == sparsity.n_rows(), 
+      Assert (vec.size() == sparsity.n_rows(),
 	      ExcDimensionMismatch(vec.size(), sparsity.n_rows()));
       Assert (vec.n_blocks() == sparsity.n_block_rows(),
 	      ExcDimensionMismatch(vec.n_blocks(), sparsity.n_block_rows()));
@@ -547,7 +548,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 
   const BlockIndices &
     index_mapping = sparsity.get_column_indices();
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -557,7 +558,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 				   // index
   std::vector<unsigned int> distribute (sparsity.n_rows(),
                                         numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
 
@@ -569,7 +570,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
       const std::pair<unsigned int,unsigned int>
 	block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
-      
+
       if (distribute[row] == numbers::invalid_unsigned_int)
 					 // regular line. loop over
 					 // all columns and see
@@ -592,7 +593,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                 {
                   const unsigned int global_col
                     = index_mapping.local_to_global(block_col,entry->column());
-		    
+
                   if (distribute[global_col] != numbers::invalid_unsigned_int)
                                                      // distribute entry at
                                                      // regular row @p row
@@ -601,7 +602,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                                                      // entry to zero
                     {
                       const double old_value = entry->value ();
-			
+
                       for (unsigned int q=0;
                            q!=lines[distribute[global_col]].entries.size(); ++q)
                         uncondensed.add (row,
@@ -615,7 +616,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 				   // row of the inhomogeneous constraint in
 				   // the matrix with Gauss elimination
 		      if (use_vectors == true)
-			vec(row) -= entry->value() * 
+			vec(row) -= entry->value() *
 			            lines[distribute[global_col]].inhomogeneity;
 
                       entry->value() = 0.;
@@ -639,7 +640,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                 {
                   const unsigned int global_col
                     = index_mapping.local_to_global (block_col, entry->column());
-		    
+
                   if (distribute[global_col] ==
                       numbers::invalid_unsigned_int)
                                                      // distribute
@@ -653,9 +654,9 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                                                      // zero
                     {
                       const double old_value = entry->value();
-			  
+
                       for (unsigned int q=0;
-                           q!=lines[distribute[row]].entries.size(); ++q) 
+                           q!=lines[distribute[row]].entries.size(); ++q)
                         uncondensed.add (lines[distribute[row]].entries[q].first,
                                          global_col,
                                          old_value *
@@ -673,7 +674,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                                                      // otherwise
                     {
                       const double old_value = entry->value ();
-			  
+
                       for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
 			{
 			  for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
@@ -684,7 +685,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 					     lines[distribute[global_col]].entries[q].second);
 
 			  if (use_vectors == true)
-			    vec(lines[distribute[row]].entries[p].first) -= 
+			    vec(lines[distribute[row]].entries[p].first) -=
 			      old_value * lines[distribute[row]].entries[p].second *
 			      lines[distribute[global_col]].inhomogeneity;
 			}
@@ -697,7 +698,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 	  				   // take care of vector
 	  if (use_vectors == true)
 	    {
-	      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
+	      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q)
 		vec(lines[distribute[row]].entries[q].first)
 		  += (vec(row) * lines[distribute[row]].entries[q].second);
 
@@ -749,7 +750,7 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 				   // vector that tells about whether a
 				   // certain constraint exists. then, we
 				   // simply copy over the data.
-      const std::vector<ConstraintLine>::const_iterator position = 
+      const std::vector<ConstraintLine>::const_iterator position =
 	find_constraint(local_dof_indices[i]);
 
       if (position==lines.end())
@@ -764,7 +765,7 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 	  if (val != 0)
 	    for (unsigned int j=0; j<n_local_dofs; ++j)
 	      {
-		const std::vector<ConstraintLine>::const_iterator 
+		const std::vector<ConstraintLine>::const_iterator
 		  position_j = find_constraint(local_dof_indices[j]);
 
 		if (position_j == lines.end())
@@ -821,7 +822,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // feature further down.
   Vector<double> dummy(0);
   distribute_local_to_global (local_matrix, dummy, local_dof_indices,
-			      global_matrix, dummy, 
+			      global_matrix, dummy,
 			      internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
 
@@ -841,7 +842,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // actual implementation follows further
 				   // down.
   distribute_local_to_global (local_matrix, local_vector, local_dof_indices,
-			      global_matrix, global_vector, 
+			      global_matrix, global_vector,
 			      internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
 
@@ -888,7 +889,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
   unsigned int                                shift           = 0;
   unsigned int n_rows = uncondensed.size();
 
-  if (next_constraint == lines.end()) 
+  if (next_constraint == lines.end())
 				     // if no constraint is to be handled
     for (unsigned int row=0; row!=n_rows; ++row)
       old_line.push_back (row);
@@ -921,7 +922,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
-  for (unsigned int line=0; line<uncondensed.size(); ++line) 
+  for (unsigned int line=0; line<uncondensed.size(); ++line)
     if (old_line[line] != -1)
 				       // line was not condensed away
       uncondensed(line) = condensed(old_line[line]);
@@ -949,14 +950,16 @@ ConstraintMatrix::distribute (VectorType &vec) const
   Assert (sorted == true, ExcMatrixNotClosed());
 
   std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  for (; next_constraint != lines.end(); ++next_constraint) 
+  for (; next_constraint != lines.end(); ++next_constraint)
     {
 				       // fill entry in line
 				       // next_constraint.line by adding the
 				       // different contributions
-      double new_value = next_constraint->inhomogeneity;
+      typename VectorType::value_type
+	new_value = next_constraint->inhomogeneity;
       for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
-	new_value += (vec(next_constraint->entries[i].first) *
+	new_value += (static_cast<typename VectorType::value_type>
+		      (vec(next_constraint->entries[i].first)) *
                       next_constraint->entries[i].second);
       vec(next_constraint->line) = new_value;
     }
@@ -972,7 +975,7 @@ namespace internals
 				   // which global entries (global_row) are
 				   // given rise by local entries
 				   // (local_row) or some constraints.
-  struct distributing 
+  struct distributing
   {
     distributing (const unsigned int global_row = deal_II_numbers::invalid_unsigned_int,
 		  const unsigned int local_row = deal_II_numbers::invalid_unsigned_int);
@@ -1070,7 +1073,7 @@ namespace internals
       }
 
     if (&*pos1->constraints == 0)
-      pos1->constraints = 
+      pos1->constraints =
 	new std::vector<std::pair<unsigned int,double> > (1,constraint);
     else
       pos1->constraints->push_back (constraint);
@@ -1113,7 +1116,7 @@ namespace internals
 	    j2 = j-istep;
 	    temp = my_indices[i].global_row;
 	    templ = my_indices[i].local_row;
-	    if (my_indices[j2].global_row > temp) 
+	    if (my_indices[j2].global_row > temp)
 	      {
 		while ((j >= istep) && (my_indices[j2].global_row > temp))
 		  {
@@ -1154,7 +1157,7 @@ namespace internals
     block_starts[0] = 0;
     for (unsigned int i=1;i<num_blocks;++i)
       {
-	row_iterator first_block = 
+	row_iterator first_block =
 	  std::lower_bound (col_indices,
 			    row_indices.end(),
 			    block_object.get_row_indices().block_start(i));
@@ -1188,7 +1191,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // check whether we work on real vectors
 				   // or we just used a dummy when calling
 				   // the other function above.
-  const bool use_vectors = (local_vector.size() == 0 && 
+  const bool use_vectors = (local_vector.size() == 0 &&
 			    global_vector.size() == 0) ? false : true;
 
   Assert (local_matrix.n() == local_dof_indices.size(),
@@ -1284,7 +1287,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	{
 	  have_indirect_rows = true;
 	  internals::insert_index(my_indices, position->entries[q].first,
-				  std::make_pair<unsigned int,double> 
+				  std::make_pair<unsigned int,double>
 				  (local_row, position->entries[q].second));
 	}
 
@@ -1313,7 +1316,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // hanging nodes in 3d). however, in the
 				   // line below, we do actually do
 				   // something with this dof
-      const typename MatrixType::value_type new_diagonal 
+      const typename MatrixType::value_type new_diagonal
 	= (std::fabs(local_matrix(local_row,local_row)) != 0 ?
 	   std::fabs(local_matrix(local_row,local_row)) : average_diagonal);
       global_matrix.add(global_row, global_row, new_diagonal);
@@ -1329,7 +1332,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
   typedef std::vector<std::pair<unsigned int,double> > constraint_format;
 
-				   // now do the actual job. 
+				   // now do the actual job.
   for (unsigned int i=0; i<n_actual_dofs; ++i)
     {
       const unsigned int row = my_indices[i].global_row;
@@ -1343,7 +1346,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // all on this set of dofs (saves a lot
 				   // of checks). the only check we actually
 				   // need to perform is whether the matrix
-				   // element is zero. 
+				   // element is zero.
       if (have_indirect_rows == false)
 	{
 	  Assert(loc_row < n_local_dofs, ExcInternalError());
@@ -1416,7 +1419,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		    {
 		      constraint_format &constraint_j = *my_indices[j].constraints;
 		      for (unsigned int p=0; p<constraint_j.size(); ++p)
-			col_val += matrix_ptr[constraint_j[p].first] 
+			col_val += matrix_ptr[constraint_j[p].first]
 		                   *
 		                   constraint_j[p].second;
 		    }
@@ -1440,13 +1443,13 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		    {
 		      double add_this = loc_col != deal_II_numbers::invalid_unsigned_int ?
 			local_matrix(constraint_i[q].first, loc_col) : 0;
-  
+
 		      if (my_indices[j].constraints != 0)
 			{
 			  constraint_format &constraint_j = *my_indices[j].constraints;
 			  for (unsigned int p=0; p<constraint_j.size(); ++p)
 			    add_this += local_matrix(constraint_i[q].first,
-						     constraint_j[p].first) 
+						     constraint_j[p].first)
 			                *
 			                constraint_j[p].second;
 			}
@@ -1454,7 +1457,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		    }
 		}
 
-		   
+
 
 				   // if we got some nontrivial value,
 				   // append it to the array of values.
@@ -1488,7 +1491,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 	      if (my_indices[i].constraints != 0)
 		{
-		  std::vector<std::pair<unsigned int,double> > &constraint_i = 
+		  std::vector<std::pair<unsigned int,double> > &constraint_i =
 		    *my_indices[i].constraints;
 
 		  for (unsigned int q=0; q<constraint_i.size(); ++q)
@@ -1536,7 +1539,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // the other function for additional
 				   // comments.
 
-  const bool use_vectors = (local_vector.size() == 0 && 
+  const bool use_vectors = (local_vector.size() == 0 &&
 			    global_vector.size() == 0) ? false : true;
 
   Assert (local_matrix.n() == local_dof_indices.size(),
@@ -1600,11 +1603,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	{
 	  have_indirect_rows = true;
 	  internals::insert_index(my_indices, position->entries[q].first,
-				  std::make_pair<unsigned int,double> 
+				  std::make_pair<unsigned int,double>
 				  (local_row, position->entries[q].second));
 	}
 
-      const typename MatrixType::value_type new_diagonal 
+      const typename MatrixType::value_type new_diagonal
 	= (std::fabs(local_matrix(local_row,local_row)) != 0 ?
 	   std::fabs(local_matrix(local_row,local_row)) : average_diagonal);
       global_matrix.add(global_row, global_row, new_diagonal);
@@ -1684,12 +1687,12 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // constraints
 			  if (my_indices[j].constraints != 0)
 			    {
-			      constraint_format &constraint_j = 
+			      constraint_format &constraint_j =
 				*my_indices[j].constraints;
 
 			      for (unsigned int p=0; p<constraint_j.size(); ++p)
 				col_val += local_matrix(loc_row,
-						        constraint_j[p].first) 
+						        constraint_j[p].first)
 				           *
 				           constraint_j[p].second;
 			    }
@@ -1704,18 +1707,18 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 			  for (unsigned int q=0; q<constraint_i.size(); ++q)
 			    {
-			      double add_this = 
+			      double add_this =
 				loc_col != deal_II_numbers::invalid_unsigned_int ?
 				local_matrix(constraint_i[q].first, loc_col) : 0;
-  
+
 			      if (my_indices[j].constraints != 0)
 				{
-				  constraint_format &constraint_j = 
+				  constraint_format &constraint_j =
 				    *my_indices[j].constraints;
 
 				  for (unsigned int p=0; p<constraint_j.size(); ++p)
 				    add_this += local_matrix(constraint_i[q].first,
-							     constraint_j[p].first) 
+							     constraint_j[p].first)
 				                *
 				                constraint_j[p].second;
 				}
@@ -1726,7 +1729,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		      if (col_val != 0)
 			{
 			  *col_ptr++ = localized_indices[j];
-			  *val_ptr++ = 
+			  *val_ptr++ =
 			    static_cast<typename MatrixType::value_type>(col_val);
 			}
 		    }
@@ -1762,7 +1765,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 	      if (my_indices[i].constraints != 0)
 		{
-		  std::vector<std::pair<unsigned int,double> > &constraint_i = 
+		  std::vector<std::pair<unsigned int,double> > &constraint_i =
 		    *my_indices[i].constraints;
 
 		  for (unsigned int q=0; q<constraint_i.size(); ++q)
@@ -1776,7 +1779,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		    }
 		}
 	      if (val != 0)
-		global_vector(my_indices[i].global_row) += 
+		global_vector(my_indices[i].global_row) +=
 		  static_cast<typename VectorType::value_type>(val);
 	    }
 	}
@@ -1854,7 +1857,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		}
 	      else
 		{
-		  std::vector<unsigned int>::iterator it = 
+		  std::vector<unsigned int>::iterator it =
 		    std::lower_bound(actual_dof_indices.begin(),
 				     actual_dof_indices.end(),
 				     new_index);
@@ -1943,7 +1946,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	{
 	  have_indirect_rows = true;
 	  internals::insert_index(my_indices, position->entries[q].first,
-				  std::make_pair<unsigned int,double> 
+				  std::make_pair<unsigned int,double>
 				  (local_row, position->entries[q].second));
 	}
 
@@ -2032,7 +2035,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // constraints
 		  if (my_indices[j].constraints != 0)
 		    {
-		      std::vector<std::pair<unsigned int,double> > &constraint_j = 
+		      std::vector<std::pair<unsigned int,double> > &constraint_j =
 			*my_indices[j].constraints;
 
 		      for (unsigned int p=0; p<constraint_j.size(); ++p)
@@ -2047,7 +2050,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // given column.
 	      if (my_indices[i].constraints != 0)
 		{
-		  std::vector<std::pair<unsigned int,double> > &constraint_i = 
+		  std::vector<std::pair<unsigned int,double> > &constraint_i =
 		    *my_indices[i].constraints;
 		  for (unsigned int q=0; q<constraint_i.size(); ++q)
 		    {
@@ -2057,10 +2060,10 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 			  if (dof_mask[constraint_i[q].first][loc_col] == true)
 			    goto add_this_index;
 			}
-  
+
 		      if (my_indices[j].constraints != 0)
 			{
-			  std::vector<std::pair<unsigned int,double> > &constraint_j = 
+			  std::vector<std::pair<unsigned int,double> > &constraint_j =
 			    *my_indices[j].constraints;
 
 			  for (unsigned int p=0; p<constraint_j.size(); ++p)
@@ -2171,7 +2174,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		}
 	      else
 		{
-		  std::vector<unsigned int>::iterator it = 
+		  std::vector<unsigned int>::iterator it =
 		    std::lower_bound(actual_dof_indices.begin(),
 				     actual_dof_indices.end(),
 				     new_index);
@@ -2220,8 +2223,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 		  const unsigned int next_block_col = block_starts[block_col+1];
 		  sparsity_pattern.block(block,block_col).
 		    add_entries(row,
-				index_it, 
-				actual_dof_indices.begin() + next_block_col, 
+				index_it,
+				actual_dof_indices.begin() + next_block_col,
 				true);
 		  index_it = actual_dof_indices.begin() + next_block_col;
 		}
@@ -2288,7 +2291,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	{
 	  have_indirect_rows = true;
 	  internals::insert_index(my_indices, position->entries[q].first,
-				  std::make_pair<unsigned int,double> 
+				  std::make_pair<unsigned int,double>
 				  (local_row, position->entries[q].second));
 	}
 
@@ -2384,7 +2387,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // constraints
 			  if (my_indices[j].constraints != 0)
 			    {
-			      std::vector<std::pair<unsigned int,double> > 
+			      std::vector<std::pair<unsigned int,double> >
 				&constraint_j = *my_indices[j].constraints;
 
 			      for (unsigned int p=0; p<constraint_j.size(); ++p)
@@ -2399,7 +2402,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // given column.
 		      if (my_indices[i].constraints != 0)
 			{
-			  std::vector<std::pair<unsigned int,double> > 
+			  std::vector<std::pair<unsigned int,double> >
 			    &constraint_i = *my_indices[i].constraints;
 			  for (unsigned int q=0; q<constraint_i.size(); ++q)
 			    {
@@ -2410,10 +2413,10 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				  if (dof_mask[constraint_i[q].first][loc_col] == true)
 				    goto add_this_index;
 				}
-  
+
 			      if (my_indices[j].constraints != 0)
 				{
-				  std::vector<std::pair<unsigned int,double> > 
+				  std::vector<std::pair<unsigned int,double> >
 				    &constraint_j = *my_indices[j].constraints;
 
 				  for (unsigned int p=0; p<constraint_j.size(); ++p)
@@ -2435,8 +2438,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // that accumulated under the given
 				   // process into the global matrix row and
 				   // into the vector
-	      sparsity_pattern.block(block, block_col).add_entries(row, 
-								   cols.begin(), 
+	      sparsity_pattern.block(block, block_col).add_entries(row,
+								   cols.begin(),
 								   col_ptr,
 								   true);
 	    }

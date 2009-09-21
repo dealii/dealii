@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,7 @@ namespace PETScWrappers
     {
       Assert (index < vector.size(),
               ExcIndexRange (index, 0, vector.size()));
-              
+
                                        // this is clumsy: there is no simple
                                        // way in PETSc to read an element from
                                        // a vector, i.e. there is no function
@@ -49,12 +49,12 @@ namespace PETScWrappers
           int ierr
             = VecGetArray (static_cast<const Vec &>(vector), &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-          
+
           const PetscScalar value = *(ptr+index);
-          
+
           ierr = VecRestoreArray (static_cast<const Vec &>(vector), &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-          
+
           return value;
         }
       else if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&vector) != 0)
@@ -76,12 +76,12 @@ namespace PETScWrappers
           PetscScalar *ptr;
           ierr = VecGetArray (static_cast<const Vec &>(vector), &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-          
+
           const PetscScalar value = *(ptr+index-begin);
-          
+
           ierr = VecRestoreArray (static_cast<const Vec &>(vector), &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-          
+
           return value;
         }
       else
@@ -89,16 +89,16 @@ namespace PETScWrappers
                                          // exists there?
         Assert (false, ExcInternalError());
       return -1e20;
-    }  
+    }
   }
-  
+
   VectorBase::VectorBase ()
                   :
                   last_action (LastAction::none)
   {}
-  
 
-  
+
+
   VectorBase::VectorBase (const VectorBase &v)
                   :
                   last_action (LastAction::none)
@@ -110,7 +110,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
-  
+
   VectorBase::~VectorBase ()
   {
     const int ierr = VecDestroy (vector);
@@ -123,7 +123,7 @@ namespace PETScWrappers
   VectorBase::operator = (const PetscScalar s)
   {
 
-    Assert (numbers::is_finite(s), 
+    Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                      // flush previously cached elements. this
@@ -131,13 +131,13 @@ namespace PETScWrappers
                                      // 2.2.1, at least for parallel vectors
                                      // (see test bits/petsc_65)
     compress ();
-    
+
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
     const int ierr = VecSet (&s, vector);
 #else
     const int ierr = VecSet (vector, s);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -150,9 +150,9 @@ namespace PETScWrappers
   {
     Assert (size() == v.size(),
             ExcDimensionMismatch(size(), v.size()));
-    
+
     PetscTruth flag;
-    
+
     const int ierr = VecEqual (vector, v.vector, &flag);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -160,7 +160,7 @@ namespace PETScWrappers
   }
 
 
-  
+
   bool
   VectorBase::operator != (const VectorBase &v) const
   {
@@ -168,7 +168,7 @@ namespace PETScWrappers
             ExcDimensionMismatch(size(), v.size()));
 
     PetscTruth flag;
-    
+
     const int ierr = VecEqual (vector, v.vector, &flag);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -176,7 +176,7 @@ namespace PETScWrappers
   }
 
 
-  
+
   unsigned int
   VectorBase::size () const
   {
@@ -229,7 +229,7 @@ namespace PETScWrappers
   {
     do_set_add_operation(indices, values, true);
   }
-  
+
 
 
   PetscScalar
@@ -245,7 +245,7 @@ namespace PETScWrappers
 
     return result;
   }
-  
+
 
 
   void
@@ -263,7 +263,7 @@ namespace PETScWrappers
   VectorBase::real_type
   VectorBase::norm_sqr () const
   {
-    const PetscScalar d = l2_norm();
+    const real_type d = l2_norm();
     return d*d;
   }
 
@@ -300,48 +300,48 @@ namespace PETScWrappers
                                        // add up remaining elements
       while (ptr != start_ptr+size())
         sum0 += *ptr++;
-  
-      mean = (sum0+sum1+sum2+sum3)/size();
+
+      mean = (sum0+sum1+sum2+sum3)/static_cast<PetscScalar>(size());
     }
-    
+
                                      // restore the representation of the
                                      // vector
     ierr = VecRestoreArray (vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
     return mean;
   }
-  
+
 
 
   VectorBase::real_type
   VectorBase::l1_norm () const
   {
-    PetscScalar d;
+    real_type d;
 
     const int ierr = VecNorm (vector, NORM_1, &d);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return d;
   }
-  
+
 
 
   VectorBase::real_type
   VectorBase::l2_norm () const
   {
-    PetscScalar d;
+    real_type d;
 
     const int ierr = VecNorm (vector, NORM_2, &d);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return d;
   }
-  
+
 
 
   VectorBase::real_type
-  VectorBase::lp_norm (const PetscScalar p) const
+  VectorBase::lp_norm (const real_type p) const
   {
                                      // get a representation of the vector and
                                      // loop over all the elements
@@ -349,12 +349,12 @@ namespace PETScWrappers
     int ierr = VecGetArray (vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-    PetscScalar norm = 0;
+    real_type norm = 0;
     {
-      PetscScalar sum0 = 0,
-                  sum1 = 0,
-                  sum2 = 0,
-                  sum3 = 0;
+      real_type sum0 = 0,
+		sum1 = 0,
+		sum2 = 0,
+		sum3 = 0;
 
                                        // use modern processors better by
                                        // allowing pipelined commands to be
@@ -363,24 +363,24 @@ namespace PETScWrappers
       const PetscScalar * eptr = ptr + (size()/4)*4;
       while (ptr!=eptr)
         {
-          sum0 += std::pow(std::fabs(*ptr++), p);
-          sum1 += std::pow(std::fabs(*ptr++), p);
-          sum2 += std::pow(std::fabs(*ptr++), p);
-          sum3 += std::pow(std::fabs(*ptr++), p);
-        };
+          sum0 += std::pow(numbers::NumberTraits<value_type>::abs(*ptr++), p);
+          sum1 += std::pow(numbers::NumberTraits<value_type>::abs(*ptr++), p);
+          sum2 += std::pow(numbers::NumberTraits<value_type>::abs(*ptr++), p);
+          sum3 += std::pow(numbers::NumberTraits<value_type>::abs(*ptr++), p);
+        }
                                        // add up remaining elements
       while (ptr != start_ptr+size())
-        sum0 += std::pow(std::fabs(*ptr++), p);
-  
+        sum0 += std::pow(numbers::NumberTraits<value_type>::abs(*ptr++), p);
+
       norm = std::pow(sum0+sum1+sum2+sum3,
-                      static_cast<PetscScalar>(1./p));
+                      1./p);
     }
-    
+
                                      // restore the representation of the
                                      // vector
     ierr = VecRestoreArray (vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
     return norm;
   }
 
@@ -389,7 +389,7 @@ namespace PETScWrappers
   VectorBase::real_type
   VectorBase::linfty_norm () const
   {
-    PetscScalar d;
+    real_type d;
 
     const int ierr = VecNorm (vector, NORM_INFINITY, &d);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -402,7 +402,7 @@ namespace PETScWrappers
   VectorBase::real_type
   VectorBase::normalize () const
   {
-    PetscScalar d;
+    real_type d;
 
     const int ierr = VecNormalize (vector, &d);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -415,8 +415,8 @@ namespace PETScWrappers
   VectorBase::real_type
   VectorBase::max ()  const
   {
-    PetscInt    p;
-    PetscScalar d;
+    PetscInt  p;
+    real_type d;
 
     const int ierr = VecMax (vector, &p, &d);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -427,7 +427,7 @@ namespace PETScWrappers
 
 
   VectorBase &
-  VectorBase::abs () 
+  VectorBase::abs ()
   {
     const int ierr = VecAbs (vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -438,7 +438,7 @@ namespace PETScWrappers
 
 
   VectorBase &
-  VectorBase::conjugate () 
+  VectorBase::conjugate ()
   {
     const int ierr = VecConjugate (vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -449,7 +449,7 @@ namespace PETScWrappers
 
 
   VectorBase &
-  VectorBase::mult () 
+  VectorBase::mult ()
   {
     const int ierr = VecPointwiseMult (vector,vector,vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -473,20 +473,41 @@ namespace PETScWrappers
     bool flag = true;
     while (ptr != eptr)
       {
-        if (*ptr != 0)
+        if (*ptr != value_type())
           {
             flag = false;
             break;
           }
         ++ptr;
       }
-    
+
                                      // restore the representation of the
                                      // vector
     ierr = VecRestoreArray (vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
     return flag;
+  }
+
+
+  namespace internal
+  {
+    template <typename T>
+    bool is_non_negative (const T &t)
+    {
+      return t >= 0;
+    }
+
+
+
+    template <typename T>
+    bool is_non_negative (const std::complex<T> &)
+    {
+      Assert (false,
+	      ExcMessage ("You can't ask a complex value "
+			  "whether it is non-negative."))
+      return true;
+    }
   }
 
 
@@ -505,29 +526,29 @@ namespace PETScWrappers
     bool flag = true;
     while (ptr != eptr)
       {
-        if (*ptr < 0.0)
+        if (! internal::is_non_negative(*ptr))
           {
             flag = false;
             break;
           }
         ++ptr;
       }
-    
+
                                      // restore the representation of the
                                      // vector
     ierr = VecRestoreArray (vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-      
+
     return flag;
   }
-  
+
 
 
   VectorBase &
   VectorBase::operator *= (const PetscScalar a)
   {
 
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -535,7 +556,7 @@ namespace PETScWrappers
 #else
     const int ierr = VecScale (vector, a);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -547,12 +568,12 @@ namespace PETScWrappers
   VectorBase::operator /= (const PetscScalar a)
   {
 
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     const PetscScalar factor = 1./a;
-    
-    Assert (numbers::is_finite(factor), 
+
+    Assert (numbers::is_finite(factor),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -572,12 +593,12 @@ namespace PETScWrappers
   VectorBase::operator += (const VectorBase &v)
   {
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
-    const PetscScalar one = 1.0;    
+    const PetscScalar one = 1.0;
     const int ierr = VecAXPY (&one, v, vector);
 #else
     const int ierr = VecAXPY (vector, 1, v);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -589,12 +610,12 @@ namespace PETScWrappers
   VectorBase::operator -= (const VectorBase &v)
   {
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
-    const PetscScalar minus_one = -1.0;    
+    const PetscScalar minus_one = -1.0;
     const int ierr = VecAXPY (&minus_one, v, vector);
 #else
     const int ierr = VecAXPY (vector, -1, v);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -606,7 +627,7 @@ namespace PETScWrappers
   VectorBase::add (const PetscScalar s)
   {
 
-    Assert (numbers::is_finite(s), 
+    Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -614,10 +635,10 @@ namespace PETScWrappers
 #else
     const int ierr = VecShift (vector, s);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
-  
+
 
 
   void
@@ -625,7 +646,7 @@ namespace PETScWrappers
   {
     *this += v;
   }
-  
+
 
 
   void
@@ -633,7 +654,7 @@ namespace PETScWrappers
                    const VectorBase     &v)
   {
 
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -641,10 +662,10 @@ namespace PETScWrappers
 #else
     const int ierr = VecAXPY (vector, a, v);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
-  
+
 
 
   void
@@ -654,14 +675,14 @@ namespace PETScWrappers
                    const VectorBase &w)
   {
 
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b), 
+    Assert (numbers::is_finite(b),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector, w.vector};
-    
+
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
     const int ierr = VecMAXPY (2, weights, vector, addends);
 #else
@@ -670,7 +691,7 @@ namespace PETScWrappers
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
-  
+
 
 
   void
@@ -678,7 +699,7 @@ namespace PETScWrappers
                     const VectorBase &v)
   {
 
-    Assert (numbers::is_finite(s), 
+    Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -686,10 +707,10 @@ namespace PETScWrappers
 #else
     const int ierr = VecAYPX (vector, s, v);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
-  
+
 
 
   void
@@ -698,9 +719,9 @@ namespace PETScWrappers
                     const VectorBase     &v)
   {
 
-    Assert (numbers::is_finite(s), 
+    Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                      // there is nothing like a AXPAY
@@ -709,7 +730,7 @@ namespace PETScWrappers
     *this *= s;
     add (a,v);
   }
-  
+
 
 
   void
@@ -719,27 +740,27 @@ namespace PETScWrappers
                     const PetscScalar b,
                     const VectorBase     &w)
   {
- 
-    Assert (numbers::is_finite(s), 
+
+    Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b), 
+    Assert (numbers::is_finite(b),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                      // there is no operation like MAXPAY, so
                                      // do it in two steps
     *this *= s;
-    
+
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector,w.vector};
-    
+
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
     const int ierr = VecMAXPY (2, weights, vector, addends);
 #else
     const int ierr = VecMAXPY (vector, 2, weights, addends);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -754,14 +775,14 @@ namespace PETScWrappers
                     const PetscScalar c,
                     const VectorBase     &x)
   {
- 
-    Assert (numbers::is_finite(s), 
+
+    Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b), 
+    Assert (numbers::is_finite(b),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(c), 
+    Assert (numbers::is_finite(c),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                      // there is no operation like MAXPAY, so
@@ -770,13 +791,13 @@ namespace PETScWrappers
 
     const PetscScalar weights[3] = {a,b,c};
     Vec               addends[3] = {v.vector, w.vector, x.vector};
-    
+
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
     const int ierr = VecMAXPY (3, weights, vector, addends);
 #else
     const int ierr = VecMAXPY (vector, 3, weights, addends);
 #endif
-    
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -797,7 +818,7 @@ namespace PETScWrappers
                    const VectorBase &v)
   {
 
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     Assert (size() == v.size(),
@@ -811,7 +832,7 @@ namespace PETScWrappers
 
     *this *= a;
   }
-  
+
 
 
   void
@@ -821,9 +842,9 @@ namespace PETScWrappers
                    const VectorBase &w)
   {
 
-    Assert (numbers::is_finite(a), 
+    Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b), 
+    Assert (numbers::is_finite(b),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     Assert (size() == v.size(),
@@ -877,29 +898,29 @@ namespace PETScWrappers
 
     if (across)
       for (unsigned int i=0; i<size(); ++i)
-        out << static_cast<double>(val[i]) << ' ';
+        out << val[i] << ' ';
     else
       for (unsigned int i=0; i<size(); ++i)
-        out << static_cast<double>(val[i]) << std::endl;
+        out << val[i] << std::endl;
     out << std::endl;
 
                                      // restore the representation of the
                                      // vector
     ierr = VecRestoreArray (vector, &val);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+
     AssertThrow (out, ExcIO());
   }
 
 
-  
+
   void
   VectorBase::swap (VectorBase &v)
   {
     const int ierr = VecSwap (vector, v.vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
-  
+
 
 
   VectorBase::operator const Vec & () const
@@ -915,7 +936,7 @@ namespace PETScWrappers
     AssertThrow(false, ExcNotImplemented() );
     return 0;
   }
-  
+
 
 
   void
@@ -966,7 +987,7 @@ namespace PETScWrappers
 
     last_action = LastAction::insert;
   }
-  
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

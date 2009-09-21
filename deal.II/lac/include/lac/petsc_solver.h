@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,8 +32,8 @@ namespace PETScWrappers
   class MatrixBase;
   class VectorBase;
   class PreconditionerBase;
-  
-  
+
+
 /**
  * Base class for solver classes using the PETSc solvers. Since solvers in
  * PETSc are selected based on flags passed to a generic solver object,
@@ -62,7 +62,7 @@ namespace PETScWrappers
  * fact that the default argument to the solver classes, @p PETSC_COMM_SELF,
  * is the appropriate argument for the sequential case (which is why it is the
  * default argument), so this error only shows up in parallel mode.
- * 
+ *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
@@ -87,7 +87,7 @@ namespace PETScWrappers
                                         */
       SolverBase (SolverControl  &cn,
                   const MPI_Comm &mpi_communicator);
-      
+
                                        /**
                                         * Destructor.
                                         */
@@ -165,7 +165,7 @@ namespace PETScWrappers
       int
       convergence_test (KSP                 ksp,
                         const int           iteration,
-                        const PetscScalar   residual_norm,
+                        const PetscReal     residual_norm,
                         KSPConvergedReason *reason,
                         void               *solver_control);
 
@@ -204,7 +204,7 @@ namespace PETScWrappers
                                             * Destructor
                                             */
           ~SolverData ();
-          
+
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
                                            /**
                                             * A PETSc solver object.
@@ -245,7 +245,7 @@ namespace PETScWrappers
                                         * pipe additional data to the
                                         * solver.
                                         */
-      struct AdditionalData 
+      struct AdditionalData
       {
                                            /**
                                             * Constructor. By default,
@@ -253,13 +253,13 @@ namespace PETScWrappers
                                             * to one.
                                             */
           AdditionalData (const double omega = 1);
-	
+
                                            /**
                                             * Relaxation parameter.
                                             */
           double omega;
       };
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -327,7 +327,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -395,7 +395,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -463,7 +463,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -538,7 +538,7 @@ namespace PETScWrappers
                                             */
           AdditionalData (const unsigned int restart_parameter = 30,
 			  const bool right_preconditioning = false);
-	
+
                                            /**
                                             * Maximum number of
                                             * tmp vectors.
@@ -551,7 +551,7 @@ namespace PETScWrappers
 					    */
 	  bool right_preconditioning;
       };
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -619,7 +619,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -685,7 +685,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -753,7 +753,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -826,7 +826,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -894,7 +894,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -962,7 +962,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -1010,14 +1010,14 @@ namespace PETScWrappers
                                         */
       virtual void set_solver_type (KSP &ksp) const;
   };
-  
+
 
 /**
  * An implementation of the solver interface using the PETSc PREONLY
  * solver. Actually this is NOT a real solution algorithm. Its only
  * purpose is to provide a solver object, when the preconditioner
  * should be used as real solver. It is very useful in conjunction with
- * the complete LU decomposition preconditioner <tt> PreconditionLU </tt>, 
+ * the complete LU decomposition preconditioner <tt> PreconditionLU </tt>,
  * which in conjunction with this solver class becomes a direct solver.
  *
  * @ingroup PETScWrappers
@@ -1033,7 +1033,7 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
-	
+
                                        /**
                                         * Constructor. In contrast to
                                         * deal.II's own solvers, there is no
@@ -1065,7 +1065,7 @@ namespace PETScWrappers
       SolverPreOnly (SolverControl        &cn,
 		     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
 		     const AdditionalData &data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this

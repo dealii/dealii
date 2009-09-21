@@ -323,7 +323,7 @@ namespace PETScWrappers
                                         * previously used.
                                         */
       MatrixBase &
-      operator = (const double d);
+      operator = (const value_type d);
                                        /**
                                         * Release all memory and return
                                         * to a state just like after

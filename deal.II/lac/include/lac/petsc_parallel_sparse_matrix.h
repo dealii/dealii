@@ -34,7 +34,7 @@ namespace PETScWrappers
 {
   namespace MPI
   {
-    
+
 /**
  * Implementation of a parallel sparse matrix class based on PETSC, with rows
  * of the matrix distributed across an MPI network. All the functionality is
@@ -104,7 +104,7 @@ namespace PETScWrappers
  * which. Thus, it is not sufficient to just count the number of degrees of
  * freedom that belong to a particular process, but you have to have the
  * numbers for all processes available at all processes.
- * 
+ *
  * @ingroup PETScWrappers
  * @ingroup Matrix1
  * @author Wolfgang Bangerth, 2004
@@ -147,7 +147,7 @@ namespace PETScWrappers
                                           * empty matrix.
                                           */
         SparseMatrix ();
-      
+
                                          /**
                                           * Create a sparse matrix of
                                           * dimensions @p m times @p n, with
@@ -164,7 +164,7 @@ namespace PETScWrappers
                                           * local_row and @p local_columns
                                           * parameters, see the class
                                           * documentation.
-                                          * 
+                                          *
                                           * The @p is_symmetric flag determines
                                           * whether we should tell PETSc that
                                           * the matrix is going to be symmetric
@@ -197,7 +197,7 @@ namespace PETScWrappers
                                           * local_row and @p local_columns
                                           * parameters, see the class
                                           * documentation.
-                                          * 
+                                          *
                                           * Just as for the other
                                           * constructors: PETSc is able to
                                           * cope with the situation that more
@@ -226,7 +226,7 @@ namespace PETScWrappers
                       const unsigned int               local_columns,
                       const std::vector<unsigned int> &row_lengths,
                       const bool                       is_symmetric = false);
-        
+
                                          /**
                                           * Initialize using the given
                                           * sparsity pattern with
@@ -238,7 +238,7 @@ namespace PETScWrappers
                                           * local_columns_per_process
                                           * parameters, see the class
                                           * documentation.
-                                          * 
+                                          *
                                           * Note that PETSc can be very slow
                                           * if you do not provide it with a
                                           * good estimate of the lengths of
@@ -291,7 +291,7 @@ namespace PETScWrappers
                                           * but keep the sparsity pattern
                                           * previously used.
                                           */
-        SparseMatrix & operator = (const double d);
+        SparseMatrix & operator = (const value_type d);
 
                                          /**
                                           * Throw away the present matrix and
@@ -366,14 +366,14 @@ namespace PETScWrappers
                      const std::vector<unsigned int> &local_columns_per_process,
                      const unsigned int               this_process,
                      const bool                       preset_nonzero_locations = true);
-        
+
                                          /**
                                           * Return a reference to the MPI
                                           * communicator object in use with
                                           * this matrix.
                                           */
         virtual const MPI_Comm & get_mpi_communicator () const;
-        
+
 				     /** @addtogroup Exceptions
 				      * @{ */
 					 /**
@@ -383,7 +383,7 @@ namespace PETScWrappers
 			int, int,
 			<< "The number of local rows " << arg1
 			<< " must be larger than the total number of rows " << arg2);
-					 //@}        
+					 //@}
       private:
 
                                          /**
@@ -431,7 +431,7 @@ namespace PETScWrappers
 				        *  To allow calling protected
 				        *  prepare_add() and
 				        *  prepare_set().
-				        */  
+				        */
 	friend class BlockMatrixBase<SparseMatrix>;
     };
 
@@ -440,7 +440,7 @@ namespace PETScWrappers
 // -------- template and inline functions ----------
 
     inline
-    const MPI_Comm &    
+    const MPI_Comm &
     SparseMatrix::get_mpi_communicator () const
     {
       return communicator;
