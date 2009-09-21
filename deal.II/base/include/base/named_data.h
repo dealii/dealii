@@ -18,6 +18,7 @@
 #include <base/subscriptor.h>
 
 #include <vector>
+#include <algorithm>
 
 DEAL_II_NAMESPACE_OPEN
 
