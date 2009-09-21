@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,7 +58,7 @@ namespace TrilinosWrappers
 /**
  * A namespace for internal implementation details of the
  * TrilinosWrapper members.
- *  
+ *
  * @ingroup TrilinosWrappers
  */
   namespace internal
@@ -116,14 +116,14 @@ namespace TrilinosWrappers
 					* this allows us to make the
 					* assignment operator const.
 					*/
-	const VectorReference & 
+	const VectorReference &
 	  operator = (const VectorReference &r) const;
 
                                        /**
 					* Set the referenced element of the
 					* vector to <tt>s</tt>.
 					*/
-	const VectorReference & 
+	const VectorReference &
 	  operator = (const TrilinosScalar &s) const;
 
                                        /**
@@ -131,7 +131,7 @@ namespace TrilinosWrappers
 					* referenced element of the
 					* vector->
 					*/
-	const VectorReference & 
+	const VectorReference &
 	  operator += (const TrilinosScalar &s) const;
 
                                        /**
@@ -139,7 +139,7 @@ namespace TrilinosWrappers
 					* referenced element of the
 					* vector->
 					*/
-	const VectorReference & 
+	const VectorReference &
 	  operator -= (const TrilinosScalar &s) const;
 
 	                               /**
@@ -147,7 +147,7 @@ namespace TrilinosWrappers
 					* element of the vector by
 					* <tt>s</tt>.
 					*/
-	const VectorReference & 
+	const VectorReference &
 	  operator *= (const TrilinosScalar &s) const;
 
                                        /**
@@ -155,7 +155,7 @@ namespace TrilinosWrappers
 					* element of the vector by
 					* <tt>s</tt>.
 					*/
-	const VectorReference & 
+	const VectorReference &
 	  operator /= (const TrilinosScalar &s) const;
 
                                        /**
@@ -262,7 +262,7 @@ namespace TrilinosWrappers
       typedef const internal::VectorReference const_reference;
 
 				       /**
-					* @name 1: Basic Object-handling 
+					* @name 1: Basic Object-handling
 					*/
 				       //@{
 
@@ -365,7 +365,7 @@ namespace TrilinosWrappers
 					* distribution as the calling
 					* vector.
 					*/
-      VectorBase & 
+      VectorBase &
 	operator = (const VectorBase &v);
 
                                        /**
@@ -386,7 +386,7 @@ namespace TrilinosWrappers
 					* &input_map) function.
 					*/
       template <typename Number>
-      VectorBase & 
+      VectorBase &
 	operator = (const ::dealii::Vector<Number> &v);
 
                                        /**
@@ -677,7 +677,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Simple vector addition, equal
                                         * to the <tt>operator
-                                        * +=</tt>. 
+                                        * +=</tt>.
 					*
 					* Though, if the second argument
                                         * <tt>allow_different_maps</tt>
@@ -692,7 +692,7 @@ namespace TrilinosWrappers
                                         * of a vector, i.e. <tt>*this =
                                         * a*V</tt>.
                                         */
-      void add (const TrilinosScalar  a, 
+      void add (const TrilinosScalar  a,
 		const VectorBase     &V);
 
                                        /**
@@ -700,9 +700,9 @@ namespace TrilinosWrappers
                                         * vectors, i.e. <tt>*this = a*V
                                         * + b*W</tt>.
                                         */
-      void add (const TrilinosScalar  a, 
+      void add (const TrilinosScalar  a,
 		const VectorBase     &V,
-		const TrilinosScalar  b, 
+		const TrilinosScalar  b,
 		const VectorBase     &W);
 
                                        /**
@@ -759,16 +759,16 @@ namespace TrilinosWrappers
                                         * Assignment <tt>*this =
                                         * a*V</tt>.
                                         */
-      void equ (const TrilinosScalar  a, 
+      void equ (const TrilinosScalar  a,
 		const VectorBase     &V);
 
                                        /**
                                         * Assignment <tt>*this = a*V +
                                         * b*W</tt>.
                                         */
-      void equ (const TrilinosScalar  a, 
+      void equ (const TrilinosScalar  a,
 		const VectorBase     &V,
-		const TrilinosScalar  b, 
+		const TrilinosScalar  b,
 		const VectorBase     &W);
 
                                        /**
@@ -1028,8 +1028,8 @@ namespace TrilinosWrappers
 	      vector.last_action = Add;
 	    }
 
-	  const int ierr = vector.vector->SumIntoGlobalValues (1, 
-							       (const int*)(&index), 
+	  const int ierr = vector.vector->SumIntoGlobalValues (1,
+							       (const int*)(&index),
 							       &value);
 	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	  vector.compressed = false;
@@ -1128,7 +1128,7 @@ namespace TrilinosWrappers
     const int ierr = vector->GlobalAssemble(last_action);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     last_action = Zero;
-  
+
     compressed = true;
   }
 
@@ -1196,8 +1196,8 @@ namespace TrilinosWrappers
 	const int local_row = vector->Map().LID(indices[i]);
 	if (local_row == -1)
 	  {
-	    const int ierr = vector->ReplaceGlobalValues (1, 
-							  (const int*)(&row), 
+	    const int ierr = vector->ReplaceGlobalValues (1,
+							  (const int*)(&row),
 							  &values[i]);
 	    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	    compressed = false;
@@ -1254,8 +1254,8 @@ namespace TrilinosWrappers
 	const int local_row = vector->Map().LID(row);
 	if (local_row == -1)
 	  {
-	    const int ierr = vector->SumIntoGlobalValues (1, 
-							  (const int*)(&row), 
+	    const int ierr = vector->SumIntoGlobalValues (1,
+							  (const int*)(&row),
 							  &values[i]);
 	    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	    compressed = false;
@@ -1383,7 +1383,7 @@ namespace TrilinosWrappers
 
     const TrilinosScalar * ptr  = start_ptr;
 
-                                       // add up elements 
+                                       // add up elements
 				       // TODO: This
 				       // won't work in parallel like
 				       // this. Find out a better way to
@@ -1771,7 +1771,7 @@ namespace TrilinosWrappers
     Assert (size() == w.size(),
 	    ExcDimensionMismatch (size(), w.size()));
 
-    const int ierr = vector->ReciprocalMultiply(1.0, *(w.vector), 
+    const int ierr = vector->ReciprocalMultiply(1.0, *(w.vector),
 						*(v.vector), 0.0);
 
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));

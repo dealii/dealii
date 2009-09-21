@@ -556,6 +556,9 @@ void LaplaceProblem<dim>::assemble_system ()
 	  }
 
 
+      cell->distribute_local_to_global (cell_rhs, system_rhs);
+      cell->distribute_local_to_global (cell_matrix, system_matrix);
+      /*
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -566,6 +569,7 @@ void LaplaceProblem<dim>::assemble_system ()
 	  
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	}
+      */
     }
 
 				   // With the matrix so built, we use

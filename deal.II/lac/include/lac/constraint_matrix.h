@@ -164,7 +164,7 @@ class BlockIndices;
  * sparsity pattern and the constraints; third, the global matrix is
  * assembled; and fourth, the matrix is finally condensed. To do these steps,
  * you have (at least) two possibilities:
- * 
+ *
  * <ul>
  * <li> Use two different sparsity patterns and two different matrices: you
  * may eliminate the lines and rows connected with a constraint and create a
@@ -228,10 +228,10 @@ class BlockIndices;
  * PETSc/Trilinos matrices, you can either copy an already condensed deal.II
  * matrix, or build the PETSc/Trilinos matrix in the already condensed form,
  * see the discussion below.
- * 
- * 
+ *
+ *
  * <h5>Condensing vectors</h5>
- * 
+ *
  * Condensing vectors works exactly as described above for matrices. Note that
  * condensation is an idempotent operation, i.e. doing it more than once on a
  * vector or matrix yields the same result as doing it only once: once an
@@ -260,14 +260,14 @@ class BlockIndices;
  * The use of ConstraintMatrix for implementing Dirichlet boundary conditions
  * is discussed in the @ref step_22 "step-22" tutorial program.
  *
- * 
+ *
  * <h3>Avoiding explicit condensation</h3>
  *
  * Sometimes, one wants to avoid explicit condensation of a linear system
  * after it has been built at all. There are two main reasons for wanting to
  * do so:
  *
- * <ul> 
+ * <ul>
  * <li>
  * Condensation is an expensive operation, in particular if there
  * are many constraints and/or if the matrix has many nonzero entries. Both
@@ -305,10 +305,10 @@ class BlockIndices;
  * matrices and right hand side vectors, whereas the distribute() function
  * discussed below is applied to the solution vector after solving the linear
  * system.
- * 
- * 
+ *
+ *
  * <h3>Distributing constraints</h3>
- * 
+ *
  * After solving the condensed system of equations, the solution vector has
  * to be redistributed. This is done by the two distribute() functions, one
  * working with two vectors, one working in-place. The operation of
@@ -524,7 +524,7 @@ class ConstraintMatrix : public Subscriptor
 				      * again.
 				      */
     void shift (const unsigned int offset);
-    
+
 				     /**
 				      * Clear all entries of this
 				      * matrix. Reset the flag determining
@@ -546,7 +546,7 @@ class ConstraintMatrix : public Subscriptor
 				      * @name Querying constraints
 				      * @{
 				      */
-    
+
 				     /**
 				      * Return number of constraints stored in
 				      * this matrix.
@@ -589,7 +589,7 @@ class ConstraintMatrix : public Subscriptor
 				      * from one.
 				      */
     bool is_identity_constrained (const unsigned int index) const;
-    
+
 				     /**
 				      * Return the maximum number of other
 				      * dofs that one dof is constrained
@@ -671,7 +671,7 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      * @name Eliminating constraints from linear systems after their creation
 				      * @{
@@ -810,7 +810,7 @@ class ConstraintMatrix : public Subscriptor
 				      * patterns.
 				      */
     void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
-    
+
 
 				     /**
 				      * Condense a given matrix. The
@@ -844,7 +844,7 @@ class ConstraintMatrix : public Subscriptor
 				      */
     template <typename number>
     void condense (BlockSparseMatrix<number> &matrix) const;
-    
+
 				     /**
 				      * Condense the given vector @p
 				      * uncondensed into @p condensed. It is
@@ -936,7 +936,7 @@ class ConstraintMatrix : public Subscriptor
 				      * @name Eliminating constraints from linear systems during their creation
 				      * @{
 				      */
-    
+
                                      /**
                                       * This function takes a vector of
                                       * local contributions (@p
@@ -1217,7 +1217,7 @@ class ConstraintMatrix : public Subscriptor
     template <class VectorType>
     void set_zero (VectorType &vec) const;
 
-    
+
 				     /**
 				      * @}
 				      */
@@ -1226,7 +1226,7 @@ class ConstraintMatrix : public Subscriptor
 				      * @name Dealing with constraints after solving a linear system
 				      * @{
 				      */
-    
+
 				     /**
 				      * Re-distribute the elements of the
 				      * vector @p condensed to @p
@@ -1329,7 +1329,7 @@ class ConstraintMatrix : public Subscriptor
 		    << "to another DoF with number " << arg1
 		    << ", which however is constrained by this object. This is not"
 		    << " allowed.");
-    
+
   private:
 
 				     /**
@@ -1457,12 +1457,12 @@ class ConstraintMatrix : public Subscriptor
 				      * misses. This should also be fixed by
 				      * using the O(1) algorithm to access
 				      * the fields of this array.
-				      * 
+				      *
 				      * The field is useful in a number of
 				      * other contexts as well, though.
 				      */
     std::vector<bool> constraint_line_exists;
-	
+
 				     /**
 				      * Store whether the arrays are sorted.
 				      * If so, no new entries can be added.
@@ -1558,9 +1558,9 @@ class ConstraintMatrix : public Subscriptor
 				     */
     std::vector<ConstraintLine>::iterator
     find_constraint (const unsigned int line);
-    
+
 #ifdef DEAL_II_USE_TRILINOS
-//TODO: Make use of the following member thread safe    
+//TODO: Make use of the following member thread safe
 				      /**
 				       * This vector is used to import data
 				       * within the distribute function.
@@ -1601,8 +1601,8 @@ ConstraintMatrix::add_line (const unsigned int line)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
 
-  
-  
+
+
 				   // check whether line already exists; it
 				   // may, in which case we can just quit
   if ((line < constraint_line_exists.size())
@@ -1615,7 +1615,7 @@ ConstraintMatrix::add_line (const unsigned int line)
   if (line >= constraint_line_exists.size())
     constraint_line_exists.resize (line+1, false);
   constraint_line_exists[line] = true;
-  
+
 				   // push a new line to the end of the
 				   // list
   lines.push_back (ConstraintLine());
@@ -1654,7 +1654,7 @@ ConstraintMatrix::add_entry (const unsigned int line,
 		ExcEntryAlreadyExists(line, column, p->second, value));
 	return;
       }
-  
+
   line_ptr->entries.push_back (std::make_pair(column,value));
 }
 
@@ -1672,7 +1672,7 @@ ConstraintMatrix::set_inhomogeneity (const unsigned int line,
 
 inline
 bool
-ConstraintMatrix::is_constrained (const unsigned int index) const 
+ConstraintMatrix::is_constrained (const unsigned int index) const
 {
   return ((index < constraint_line_exists.size())
           &&
@@ -1683,9 +1683,9 @@ ConstraintMatrix::is_constrained (const unsigned int index) const
 
 inline
 bool
-ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) const 
+ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) const
 {
-  const std::vector<ConstraintLine>::const_iterator position 
+  const std::vector<ConstraintLine>::const_iterator position
     = find_constraint(index);
   return position!=lines.end() ? position->inhomogeneity != 0 : false;
 }
@@ -1693,7 +1693,7 @@ ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) cons
 
 
 inline
-std::vector<ConstraintMatrix::ConstraintLine>::const_iterator 
+std::vector<ConstraintMatrix::ConstraintLine>::const_iterator
 ConstraintMatrix::find_constraint (const unsigned int line) const
 {
   if (is_constrained(line) == false)
@@ -1720,7 +1720,7 @@ ConstraintMatrix::find_constraint (const unsigned int line) const
 
 
 inline
-std::vector<ConstraintMatrix::ConstraintLine>::iterator 
+std::vector<ConstraintMatrix::ConstraintLine>::iterator
 ConstraintMatrix::find_constraint (const unsigned int line)
 {
   Assert (sorted==false, ExcMatrixIsClosed());

@@ -213,9 +213,9 @@ namespace PETScWrappers
                   const unsigned int j) const
   {
 #ifdef PETSC_USE_64BIT_INDICES
-    PetscInt 
+    PetscInt
 #else
-    int 
+    int
 #endif
       petsc_i = i, petsc_j = j;
     PetscScalar value;

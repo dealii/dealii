@@ -129,7 +129,7 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
     {
       Assert (line != col_val_pair->first,
 	      ExcMessage ("Can't constrain a degree of freedom to itself"));
-      
+
       for (std::vector<std::pair<unsigned int,double> >::const_iterator
              p=line_ptr->entries.begin();
 	   p != line_ptr->entries.end(); ++p)
@@ -142,7 +142,7 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
 					  p->second, col_val_pair->second));
 	    break;
 	  }
-      
+
       line_ptr->entries.push_back (*col_val_pair);
     }
 }
@@ -172,7 +172,7 @@ void ConstraintMatrix::close ()
 					 line->entries.end(),
 					 &check_zero_weight),
 			 line->entries.end());
-  
+
 				   // replace references to dofs that
 				   // are themselves constrained. note
 				   // that because we may replace
@@ -219,7 +219,7 @@ void ConstraintMatrix::close ()
 						 // further
 						 // constrained:
 		chained_constraint_replaced = true;
-		
+
 						 // look up the chain
 						 // of constraints for
 						 // this entry
@@ -228,7 +228,7 @@ void ConstraintMatrix::close ()
 
 		Assert (dof_index != line->line,
 			ExcMessage ("Cycle in constraints detected!"));
-		
+
 						 // find the line
 						 // corresponding to
 						 // this entry. note
@@ -280,7 +280,7 @@ void ConstraintMatrix::close ()
 		      std::make_pair (constrained_line->entries[0].first,
 				      constrained_line->entries[0].second *
 				      weight);
-		
+
 		    for (unsigned int i=1; i<constrained_line->entries.size(); ++i)
 		      line->entries
 			.push_back (std::make_pair (constrained_line->entries[i].first,
@@ -307,7 +307,7 @@ void ConstraintMatrix::close ()
 
 		line->inhomogeneity += constrained_line->inhomogeneity *
 		                       weight;
-		
+
 						 // now that we're here, do
 						 // not increase index by
 						 // one but rather make
@@ -394,7 +394,7 @@ void ConstraintMatrix::close ()
                 }
               else
                 new_entries.push_back (line->entries[j]);
-            
+
             Assert (new_entries.size() == line->entries.size() - duplicates,
                     ExcInternalError());
 
@@ -410,7 +410,7 @@ void ConstraintMatrix::close ()
                         ExcInternalError());
               }
 
-            
+
                                              // replace old list of
                                              // constraints for this
                                              // dof by the new one and
@@ -418,7 +418,7 @@ void ConstraintMatrix::close ()
             line->entries.swap (new_entries);
             break;
           }
-      
+
 				       // finally do the following
 				       // check: if the sum of
 				       // weights for the
@@ -455,7 +455,7 @@ void ConstraintMatrix::close ()
 	  line->inhomogeneity /= sum;
 	}
     }
-  
+
 #ifdef DEBUG
 				   // if in debug mode: check that no
 				   // dof is constraint to another dof
@@ -480,7 +480,7 @@ void ConstraintMatrix::close ()
 		ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
       };
 #endif
-  
+
   sorted = true;
 }
 
@@ -492,7 +492,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 				   // constraints in the two objects
 				   // are for different degrees of
 				   // freedom
-#ifdef DEBUG  
+#ifdef DEBUG
   if (true)
     {
 				       // first insert all dofs in
@@ -566,7 +566,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
   std::vector<std::pair<unsigned int,double> > tmp;
   std::vector<std::vector<ConstraintLine>::const_iterator> tmp_other_lines;
   for (std::vector<ConstraintLine>::iterator line=lines.begin();
-       line!=lines.end(); ++line) 
+       line!=lines.end(); ++line)
     {
 				       // copy the line of old object
 				       // modulo dofs constrained in
@@ -586,9 +586,9 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
       tmp_other_lines.clear ();
       tmp_other_lines.reserve (line->entries.size());
 
-      
+
       bool entries_to_resolve = false;
-      
+
       for (unsigned int i=0; i<line->entries.size(); ++i)
 	{
 	  if (other_constraints.sorted == true)
@@ -624,7 +624,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 	    {
 	      std::vector<ConstraintLine>::const_iterator
 		it = other_constraints.lines.end ();
-	      
+
 	      for (std::vector<ConstraintLine>::const_iterator
 		     p=other_constraints.lines.begin();
 		   p!=other_constraints.lines.end(); ++p)
@@ -636,7 +636,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 
 	      tmp_other_lines.push_back (it);
 	    };
-	  
+
 	  if (tmp_other_lines.back() != other_constraints.lines.end ())
 	    entries_to_resolve = true;
 	};
@@ -683,7 +683,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 		   j!=tmp_other_lines[i]->entries.end(); ++j)
 		tmp.push_back (std::make_pair(j->first, j->second*weight));
 
-	      line->inhomogeneity += tmp_other_lines[i]->inhomogeneity *  
+	      line->inhomogeneity += tmp_other_lines[i]->inhomogeneity *
 		line->entries[i].second;
 	    };
 	};
@@ -691,9 +691,9 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 				       // newly resolved line
       line->entries.swap (tmp);
     };
-  
-      
-  
+
+
+
 				   // next action: append new lines at
 				   // the end
   lines.insert (lines.end(),
@@ -715,12 +715,12 @@ void ConstraintMatrix::shift (const unsigned int offset)
 {
   constraint_line_exists.insert (constraint_line_exists.begin(), offset,
 				 false);
-  
+
   for (std::vector<ConstraintLine>::iterator i = lines.begin();
        i != lines.end(); i++)
     {
       i->line += offset;
-      for (std::vector<std::pair<unsigned int,double> >::iterator 
+      for (std::vector<std::pair<unsigned int,double> >::iterator
 	     j = i->entries.begin();
 	   j != i->entries.end(); j++)
 	j->first += offset;
@@ -735,7 +735,7 @@ void ConstraintMatrix::clear ()
     std::vector<ConstraintLine> tmp;
     lines.swap (tmp);
   }
-  
+
   {
     std::vector<bool> tmp;
     constraint_line_exists.swap (tmp);
@@ -747,7 +747,7 @@ void ConstraintMatrix::clear ()
     vec_distribute.reset();
   }
 #endif
-  
+
   sorted = false;
 }
 
@@ -774,17 +774,17 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
   unsigned int                                shift           = 0;
   unsigned int n_rows = uncondensed.n_rows();
 
-  if (next_constraint == lines.end()) 
+  if (next_constraint == lines.end())
 				     // if no constraint is to be handled
     for (unsigned int row=0; row!=n_rows; ++row)
       new_line.push_back (row);
   else
-    for (unsigned int row=0; row!=n_rows; ++row) 
+    for (unsigned int row=0; row!=n_rows; ++row)
       if (row == next_constraint->line)
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
-					   // note that @p{lines} is ordered	  
+					   // note that @p{lines} is ordered
 	  ++shift;
 	  ++next_constraint;
 	  if (next_constraint == lines.end())
@@ -817,7 +817,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 	   j<uncondensed.get_rowstart_indices()[row+1]; ++j)
 	if (new_line[uncondensed.get_column_numbers()[j]] != -1)
 	  condensed.add (new_line[row], new_line[uncondensed.get_column_numbers()[j]]);
-	else 
+	else
 	  {
 					     // let c point to the constraint
 					     // of this column
@@ -825,7 +825,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 	    while (c->line != uncondensed.get_column_numbers()[j])
 	      ++c;
 
-	    for (unsigned int q=0; q!=c->entries.size(); ++q) 
+	    for (unsigned int q=0; q!=c->entries.size(); ++q)
 	      condensed.add (new_line[row], new_line[c->entries[q].first]);
 	  }
     else
@@ -836,10 +836,10 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 					   // for each entry: distribute
 	  if (new_line[uncondensed.get_column_numbers()[j]] != -1)
 					     // column is not constrained
-	    for (unsigned int q=0; q!=next_constraint->entries.size(); ++q) 
+	    for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
 	      condensed.add (new_line[next_constraint->entries[q].first],
 			     new_line[uncondensed.get_column_numbers()[j]]);
-	
+
 	  else
 					     // not only this line but
 					     // also this col is constrained
@@ -848,13 +848,13 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 					       // of this column
 	      std::vector<ConstraintLine>::const_iterator c = lines.begin();
 	      while (c->line != uncondensed.get_column_numbers()[j]) ++c;
-	      
+
 	      for (unsigned int p=0; p!=c->entries.size(); ++p)
 		for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
 		  condensed.add (new_line[next_constraint->entries[q].first],
 				 new_line[c->entries[p].first]);
 	    };
-	
+
 	++next_constraint;
       };
 
@@ -869,7 +869,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcNotQuadratic());
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -879,7 +879,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 				   // index
   std::vector<unsigned int> distribute(sparsity.n_rows(),
                                        numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
 
@@ -926,7 +926,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
                                                    // sparsity.colnums[j]
                   for (unsigned int q=0;
                        q!=lines[distribute[column]].entries.size();
-                       ++q) 
+                       ++q)
                     sparsity.add (row,
                                   lines[distribute[column]].entries[q].first);
                 }
@@ -947,7 +947,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
                                                  // row @p{row} and regular column
                                                  // sparsity.colnums[j]
                 for (unsigned int q=0;
-                     q!=lines[distribute[row]].entries.size(); ++q) 
+                     q!=lines[distribute[row]].entries.size(); ++q)
                   sparsity.add (lines[distribute[row]].entries[q].first,
                                 column);
               else
@@ -962,7 +962,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
             }
 	}
     }
-  
+
   sparsity.compress();
 }
 
@@ -973,7 +973,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcNotQuadratic());
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -983,7 +983,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 				   // index
   std::vector<unsigned int> distribute(sparsity.n_rows(),
                                        numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
 
@@ -1058,11 +1058,11 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 		unsigned int old_rowlength = sparsity.row_length(row);
 		for (unsigned int q=0;
 		     q!=lines[distribute[column]].entries.size();
-		     ++q) 
+		     ++q)
 		  {
 		    const unsigned int
 		      new_col = lines[distribute[column]].entries[q].first;
-		    
+
 		    sparsity.add (row, new_col);
 
 		    const unsigned int new_rowlength = sparsity.row_length(row);
@@ -1083,7 +1083,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 					       // row @p{row} and regular column
 					       // sparsity.colnums[j]
 	      for (unsigned int q=0;
-		   q!=lines[distribute[row]].entries.size(); ++q) 
+		   q!=lines[distribute[row]].entries.size(); ++q)
 		sparsity.add (lines[distribute[row]].entries[q].first,
 			      column);
 	    else
@@ -1108,7 +1108,7 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcNotQuadratic());
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -1118,7 +1118,7 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
 				   // index
   std::vector<unsigned int> distribute(sparsity.n_rows(),
                                        numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
 
@@ -1132,24 +1132,24 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
 					   // distribute cols, the loop may
 					   // get longer
 	  CompressedSetSparsityPattern::row_iterator col_num = sparsity.row_begin (row);
-	  
+
 	  for (; col_num != sparsity.row_end (row); ++col_num)
 	    {
 	      const unsigned int column = *col_num;
-	      
+
 	      if (distribute[column] != numbers::invalid_unsigned_int)
 		{
 		  // row
 		  unsigned int old_rowlength = sparsity.row_length(row);
 		  for (unsigned int q=0;
 		       q!=lines[distribute[column]].entries.size();
-		       ++q) 
+		       ++q)
 		    {
 		      const unsigned int
 			new_col = lines[distribute[column]].entries[q].first;
-		      
+
 		      sparsity.add (row, new_col);
-		      
+
 		      const unsigned int new_rowlength = sparsity.row_length(row);
 		      //		      if ((new_col < column) && (old_rowlength != new_rowlength))
 		      //		++col_num;
@@ -1162,17 +1162,17 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
 	// row must be distributed
 	{
 	  CompressedSetSparsityPattern::row_iterator col_num = sparsity.row_begin (row);
-	  
+
 	  for (; col_num != sparsity.row_end (row); ++col_num)
 	    {
 	      const unsigned int column = *col_num;
-	      
+
 	      if (distribute[column] == numbers::invalid_unsigned_int)
 		// distribute entry at irregular
 		// row @p{row} and regular column
 		// sparsity.colnums[j]
 		for (unsigned int q=0;
-		     q!=lines[distribute[row]].entries.size(); ++q) 
+		     q!=lines[distribute[row]].entries.size(); ++q)
 		  sparsity.add (lines[distribute[row]].entries[q].first,
 				column);
 	      else
@@ -1198,7 +1198,7 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcNotQuadratic());
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -1208,7 +1208,7 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
 				   // index
   std::vector<unsigned int> distribute(sparsity.n_rows(),
                                        numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
 
@@ -1283,11 +1283,11 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
 		unsigned int old_rowlength = sparsity.row_length(row);
 		for (unsigned int q=0;
 		     q!=lines[distribute[column]].entries.size();
-		     ++q) 
+		     ++q)
 		  {
 		    const unsigned int
 		      new_col = lines[distribute[column]].entries[q].first;
-		    
+
 		    sparsity.add (row, new_col);
 
 		    const unsigned int new_rowlength = sparsity.row_length(row);
@@ -1308,7 +1308,7 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
 					       // row @p{row} and regular column
 					       // sparsity.colnums[j]
 	      for (unsigned int q=0;
-		   q!=lines[distribute[row]].entries.size(); ++q) 
+		   q!=lines[distribute[row]].entries.size(); ++q)
 		sparsity.add (lines[distribute[row]].entries[q].first,
 			      column);
 	    else
@@ -1338,12 +1338,12 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 	  ExcNotQuadratic());
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
 	  ExcNotQuadratic());
-  
+
   const BlockIndices &
     index_mapping = sparsity.get_column_indices();
 
   const unsigned int n_blocks = sparsity.n_block_rows();
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -1353,7 +1353,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 				   // index
   std::vector<unsigned int> distribute (sparsity.n_rows(),
                                         numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
 
@@ -1365,7 +1365,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
       const std::pair<unsigned int,unsigned int>
 	block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
-      
+
       if (distribute[row] == numbers::invalid_unsigned_int)
 					 // regular line. loop over
 					 // all columns and see
@@ -1392,7 +1392,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
                 {
                   const unsigned int global_col
                     = index_mapping.local_to_global(block_col, entry->column());
-                  
+
                   if (distribute[global_col] != numbers::invalid_unsigned_int)
                                                      // distribute entry at regular
                                                      // row @p{row} and irregular column
@@ -1417,7 +1417,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 	    {
 	      const SparsityPattern &
 		block_sparsity = sparsity.block(block_row,block_col);
-	      
+
               for (SparsityPattern::const_iterator
                      entry = block_sparsity.begin(block_index.second);
                    (entry != block_sparsity.end(block_index.second)) &&
@@ -1426,13 +1426,13 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
                 {
                   const unsigned int global_col
                     = index_mapping.local_to_global (block_col, entry->column());
-                  
+
                   if (distribute[global_col] == numbers::invalid_unsigned_int)
                                                      // distribute entry at irregular
                                                      // row @p{row} and regular column
                                                      // global_col.
                     {
-                      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
+                      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q)
                         sparsity.add (lines[distribute[row]].entries[q].first, global_col);
                     }
                   else
@@ -1449,7 +1449,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 	    }
 	}
     }
-  
+
   sparsity.compress();
 }
 
@@ -1464,12 +1464,12 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
 	  ExcNotQuadratic());
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
 	  ExcNotQuadratic());
-  
+
   const BlockIndices &
     index_mapping = sparsity.get_column_indices();
 
   const unsigned int n_blocks = sparsity.n_block_rows();
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -1479,7 +1479,7 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
 				   // index
   std::vector<unsigned int> distribute (sparsity.n_rows(),
                                         numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
 
@@ -1492,7 +1492,7 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
 	block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
       const unsigned int local_row = block_index.second;
-      
+
       if (distribute[row] == numbers::invalid_unsigned_int)
 					 // regular line. loop over
 					 // all columns and see
@@ -1529,7 +1529,7 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
 		  const unsigned int global_col
 		    = index_mapping.local_to_global(block_col,
 						    block_sparsity.column_number(local_row,j));
-		    
+
 		  if (distribute[global_col] != numbers::invalid_unsigned_int)
 						     // distribute entry at regular
 						     // row @p{row} and irregular column
@@ -1555,19 +1555,19 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
 	    {
 	      const CompressedSparsityPattern &
 		block_sparsity = sparsity.block(block_row,block_col);
-      
+
 	      for (unsigned int j=0; j<block_sparsity.row_length(local_row); ++j)
 		{
 		  const unsigned int global_col
 		    = index_mapping.local_to_global (block_col,
 						     block_sparsity.column_number(local_row,j));
-		    
+
 		  if (distribute[global_col] == numbers::invalid_unsigned_int)
 						     // distribute entry at irregular
 						     // row @p{row} and regular column
 						     // global_col.
 		    {
-		      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
+		      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q)
 			sparsity.add (lines[distribute[row]].entries[q].first,
 				      global_col);
 		    }
@@ -1598,12 +1598,12 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
 	  ExcNotQuadratic());
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
 	  ExcNotQuadratic());
-  
+
   const BlockIndices &
     index_mapping = sparsity.get_column_indices();
 
   const unsigned int n_blocks = sparsity.n_block_rows();
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -1613,7 +1613,7 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
 				   // index
   std::vector<unsigned int> distribute (sparsity.n_rows(),
                                         numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
 
@@ -1626,7 +1626,7 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
 	block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
       const unsigned int local_row = block_index.second;
-      
+
       if (distribute[row] == numbers::invalid_unsigned_int)
 					 // regular line. loop over
 					 // all columns and see
@@ -1664,7 +1664,7 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
 		{
 		  const unsigned int global_col
 		    = index_mapping.local_to_global(block_col, *j);
-		    
+
 		  if (distribute[global_col] != numbers::invalid_unsigned_int)
 						     // distribute entry at regular
 						     // row @p{row} and irregular column
@@ -1690,20 +1690,20 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
 	    {
 	      const CompressedSetSparsityPattern &
 		block_sparsity = sparsity.block(block_row,block_col);
-      
+
 	      for (CompressedSetSparsityPattern::row_iterator
 		     j = block_sparsity.row_begin(local_row);
 		   j != block_sparsity.row_end(local_row); ++j)
 		{
 		  const unsigned int global_col
 		    = index_mapping.local_to_global (block_col, *j);
-		    
+
 		  if (distribute[global_col] == numbers::invalid_unsigned_int)
 						     // distribute entry at irregular
 						     // row @p{row} and regular column
 						     // global_col.
 		    {
-		      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
+		      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q)
 			sparsity.add (lines[distribute[row]].entries[q].first,
 				      global_col);
 		    }
@@ -1734,12 +1734,12 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 	  ExcNotQuadratic());
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
 	  ExcNotQuadratic());
-  
+
   const BlockIndices &
     index_mapping = sparsity.get_column_indices();
 
   const unsigned int n_blocks = sparsity.n_block_rows();
-  
+
 				   // store for each index whether it must be
 				   // distributed or not. If entry is
 				   // numbers::invalid_unsigned_int,
@@ -1749,7 +1749,7 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 				   // index
   std::vector<unsigned int> distribute (sparsity.n_rows(),
                                         numbers::invalid_unsigned_int);
-  
+
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
 
@@ -1762,7 +1762,7 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 	block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
       const unsigned int local_row = block_index.second;
-      
+
       if (distribute[row] == numbers::invalid_unsigned_int)
 					 // regular line. loop over
 					 // all columns and see
@@ -1799,7 +1799,7 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 		  const unsigned int global_col
 		    = index_mapping.local_to_global(block_col,
 						    block_sparsity.column_number(local_row,j));
-		    
+
 		  if (distribute[global_col] != numbers::invalid_unsigned_int)
 						     // distribute entry at regular
 						     // row @p{row} and irregular column
@@ -1825,19 +1825,19 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 	    {
 	      const CompressedSimpleSparsityPattern &
 		block_sparsity = sparsity.block(block_row,block_col);
-      
+
 	      for (unsigned int j=0; j<block_sparsity.row_length(local_row); ++j)
 		{
 		  const unsigned int global_col
 		    = index_mapping.local_to_global (block_col,
 						     block_sparsity.column_number(local_row,j));
-		    
+
 		  if (distribute[global_col] == numbers::invalid_unsigned_int)
 						     // distribute entry at irregular
 						     // row @p{row} and regular column
 						     // global_col.
 		    {
-		      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
+		      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q)
 			sparsity.add (lines[distribute[row]].entries[q].first,
 				      global_col);
 		    }
@@ -1875,11 +1875,11 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
   ConstraintLine index_comparison;
   index_comparison.line = vec.local_range().first;
 
-  std::vector<ConstraintLine>::const_iterator next_constraint = 
+  std::vector<ConstraintLine>::const_iterator next_constraint =
     std::lower_bound (lines.begin(),lines.end(),index_comparison);
 
   index_comparison.line = vec.local_range().second;
-  
+
   std::vector<ConstraintLine>::const_iterator end_constraint
     = std::lower_bound(lines.begin(),lines.end(),index_comparison);
 
@@ -1897,7 +1897,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
         {
           my_indices[index2]=i;
         }
-      for (; next_constraint != end_constraint; ++next_constraint) 
+      for (; next_constraint != end_constraint; ++next_constraint)
         {
           for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
             my_indices.push_back (next_constraint->entries[i].first);
@@ -1924,10 +1924,10 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 				   // here we import the data
   vec_distribute->reinit(vec,false,true);
 
-  next_constraint = 
+  next_constraint =
     std::lower_bound (lines.begin(),lines.end(),index_comparison);
 
-  for (; next_constraint != end_constraint; ++next_constraint) 
+  for (; next_constraint != end_constraint; ++next_constraint)
     {
 				       // fill entry in line
 				       // next_constraint.line by adding the
@@ -1950,11 +1950,11 @@ unsigned int ConstraintMatrix::n_constraints () const
 
 
 
-bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const 
+bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const
 {
   if (is_constrained(index) == false)
     return false;
-  
+
   if (sorted == true)
     {
       ConstraintLine index_comparison;
@@ -1992,7 +1992,7 @@ bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const
 
 
 
-unsigned int ConstraintMatrix::max_constraint_indirections () const 
+unsigned int ConstraintMatrix::max_constraint_indirections () const
 {
   unsigned int return_value = 0;
   for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
@@ -2017,7 +2017,7 @@ bool ConstraintMatrix::has_inhomogeneities () const
 
   return false;
 }
-    
+
 
 void ConstraintMatrix::print (std::ostream &out) const
 {
@@ -2033,7 +2033,7 @@ void ConstraintMatrix::print (std::ostream &out) const
 		<< " " << lines[i].entries[j].first
 		<< ":  " << lines[i].entries[j].second << "\n";
 
-				       // print out inhomogeneity. 
+				       // print out inhomogeneity.
 	  if (lines[i].inhomogeneity != 0)
 	    out << "    " << lines[i].line
 		<< ": " << lines[i].inhomogeneity << "\n";
@@ -2054,7 +2054,7 @@ void ConstraintMatrix::print (std::ostream &out) const
 	    out << "    " << lines[i].line << " = 0\n";
 	}
     }
-  
+
   AssertThrow (out, ExcIO());
 }
 
@@ -2218,7 +2218,7 @@ distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>    
 
 MATRIX_FUNCTIONS(SparseMatrix<double>, Vector<double>);
 MATRIX_FUNCTIONS(SparseMatrix<float>,  Vector<float>);
-template void ConstraintMatrix::distribute_local_to_global<SparseMatrix<float>,Vector<double> > 
+template void ConstraintMatrix::distribute_local_to_global<SparseMatrix<float>,Vector<double> >
 (const FullMatrix<double>        &,
  const Vector<double>            &,
  const std::vector<unsigned int> &,
@@ -2227,7 +2227,7 @@ template void ConstraintMatrix::distribute_local_to_global<SparseMatrix<float>,V
 
 MATRIX_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
 MATRIX_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
-template void ConstraintMatrix::distribute_local_to_global<BlockSparseMatrix<float>,BlockVector<double> > 
+template void ConstraintMatrix::distribute_local_to_global<BlockSparseMatrix<float>,BlockVector<double> >
 (const FullMatrix<double>        &,
  const Vector<double>            &,
  const std::vector<unsigned int> &,
@@ -2253,18 +2253,18 @@ MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappers::MPI::Bloc
 MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::Vector);
 MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::BlockVector);
 template void ConstraintMatrix::distribute_local_to_global
-<TrilinosWrappers::SparseMatrix,TrilinosWrappers::MPI::Vector> 
-  (const FullMatrix<double>        &, 
-   const Vector<double>            &, 
-   const std::vector<unsigned int> &, 
-   TrilinosWrappers::SparseMatrix &, 
+<TrilinosWrappers::SparseMatrix,TrilinosWrappers::MPI::Vector>
+  (const FullMatrix<double>        &,
+   const Vector<double>            &,
+   const std::vector<unsigned int> &,
+   TrilinosWrappers::SparseMatrix &,
    TrilinosWrappers::MPI::Vector  &) const;
 template void ConstraintMatrix::distribute_local_to_global
-<TrilinosWrappers::BlockSparseMatrix,TrilinosWrappers::MPI::BlockVector> 
-  (const FullMatrix<double>        &, 
-   const Vector<double>            &, 
-   const std::vector<unsigned int> &, 
-   TrilinosWrappers::BlockSparseMatrix &, 
+<TrilinosWrappers::BlockSparseMatrix,TrilinosWrappers::MPI::BlockVector>
+  (const FullMatrix<double>        &,
+   const Vector<double>            &,
+   const std::vector<unsigned int> &,
+   TrilinosWrappers::BlockSparseMatrix &,
    TrilinosWrappers::MPI::BlockVector  &) const;
 #endif
 

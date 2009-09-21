@@ -785,7 +785,7 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
   std::size_t glob_size = derivatives.memory_consumption() +
     indices_local_to_global.memory_consumption() +
     constraints.memory_consumption() +
-    small_matrix.memory_consumption() + 
+    small_matrix.memory_consumption() +
     diagonal_values.memory_consumption() + sizeof(*this);
   return glob_size;
 }
@@ -1060,7 +1060,7 @@ void LaplaceProblem<dim>::setup_system ()
   system_matrix.get_constraints().close();
   std::cout.precision(4);
   std::cout << "System matrix memory consumption: "
-	    << (double)system_matrix.memory_consumption()*std::pow(2.,-20.) 
+	    << (double)system_matrix.memory_consumption()*std::pow(2.,-20.)
 	    << " MBytes."
 	    << std::endl;
 
@@ -1236,7 +1236,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 						(transpose
 						 (fe_values.inverse_jacobian(q)) *
 						 fe_values.inverse_jacobian(q)) *
-						fe_values.JxW(q) * 
+						fe_values.JxW(q) *
 						coefficient_values[q]);
 
       ++cell_no[level];

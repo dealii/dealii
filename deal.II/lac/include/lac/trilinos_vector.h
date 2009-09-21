@@ -50,7 +50,7 @@ namespace TrilinosWrappers
   namespace MPI
   {
 
-/** 
+/**
  * This class implements a wrapper to use the Trilinos distributed
  * vector class Epetra_FEVector. This class is derived from the
  * TrilinosWrappers::VectorBase class and provides all functionality
@@ -120,11 +120,11 @@ namespace TrilinosWrappers
  * writes. If it encounters an operation of the opposite kind, it calls
  * compress() and flips the state. This can sometimes lead to very
  * confusing behavior, in code that may for example look like this:
- * 
- * @verbatim 
+ *
+ * @verbatim
  * TrilinosWrappers::Vector vector;
- * // do some write operations on the vector 
- * for (unsigned int i=0; i<vector->size(); ++i) 
+ * // do some write operations on the vector
+ * for (unsigned int i=0; i<vector->size(); ++i)
  *   vector(i) = i;
  *
  *                   // do some additions to vector elements, but
@@ -223,7 +223,7 @@ namespace TrilinosWrappers
 					  * Destructor.
 					  */
 	~Vector ();
-	
+
 				       /**
 				        * Reinit functionality. This
 				        * function destroys the old
@@ -330,7 +330,7 @@ namespace TrilinosWrappers
 					* &input_map) function.
 					*/
 	template <typename Number>
-	Vector & 
+	Vector &
 	operator = (const ::dealii::Vector<Number> &v);
 
 				       /**
@@ -373,7 +373,7 @@ namespace TrilinosWrappers
 					* for example done during the
 					* solution of linear systems.
 					*/
-	void import_nonlocal_data_for_fe 
+	void import_nonlocal_data_for_fe
 	  (const dealii::TrilinosWrappers::SparseMatrix &matrix,
 	   const Vector                                 &vector);
 
@@ -422,7 +422,7 @@ namespace TrilinosWrappers
     {
       u.swap (v);
     }
-  
+
 
 #ifndef DOXYGEN
 
@@ -433,7 +433,7 @@ namespace TrilinosWrappers
                     map (InputMap)
     {
       vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-      
+
       const int min_my_id = map.MinMyGID();
       const int size = map.NumMyElements();
 
@@ -441,7 +441,7 @@ namespace TrilinosWrappers
 	      ExcDimensionMismatch(map.MaxLID(), size-1));
 
 				   // Need to copy out values, since the
-				   // deal.II might not use doubles, so 
+				   // deal.II might not use doubles, so
 				   // that a direct access is not possible.
       std::vector<int> indices (size);
       std::vector<double> values (size);
@@ -451,14 +451,14 @@ namespace TrilinosWrappers
 	  values[i] = v(i);
 	}
 
-      const int ierr = vector->ReplaceGlobalValues (size, &indices[0], 
+      const int ierr = vector->ReplaceGlobalValues (size, &indices[0],
 						    &values[0]);
 
       AssertThrow (ierr == 0, VectorBase::ExcTrilinosError(ierr));
     }
 
-  
-  
+
+
     inline
     Vector &
     Vector::operator = (const TrilinosScalar s)
@@ -470,7 +470,7 @@ namespace TrilinosWrappers
 
 
     template <typename Number>
-    Vector & 
+    Vector &
     Vector::operator = (const ::dealii::Vector<Number> &v)
     {
       if (size() != v.size())
@@ -481,13 +481,13 @@ namespace TrilinosWrappers
 	  map = Epetra_Map (v.size(), 0, Epetra_SerialComm());
 #endif
 	}
-      
+
       *this = Vector(map, v);
 
       return *this;
     }
-    
-    
+
+
 #endif
 
   } /* end of namespace MPI */
@@ -626,7 +626,7 @@ namespace TrilinosWrappers
 					* the right hand argument.
 					*/
       Vector &
-	operator = (const Vector &V); 
+	operator = (const Vector &V);
 
     private:
 				       /**
@@ -672,8 +672,8 @@ namespace TrilinosWrappers
     *this = v;
   }
 
-  
-  
+
+
   inline
   Vector &
   Vector::operator = (const TrilinosScalar s)
@@ -684,7 +684,7 @@ namespace TrilinosWrappers
   }
 
   template <typename Number>
-  Vector & 
+  Vector &
   Vector::operator = (const ::dealii::Vector<Number> &v)
   {
     if (size() != v.size())
@@ -706,7 +706,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(map.MaxLID(), size-1));
 
 				   // Need to copy out values, since the
-				   // deal.II might not use doubles, so 
+				   // deal.II might not use doubles, so
 				   // that a direct access is not possible.
     std::vector<int> indices (size);
     std::vector<double> values (size);
@@ -716,13 +716,13 @@ namespace TrilinosWrappers
 	values[i] = v(i);
       }
 
-    const int ierr = vector->ReplaceGlobalValues (size, &indices[0], 
+    const int ierr = vector->ReplaceGlobalValues (size, &indices[0],
 						  &values[0]);
     AssertThrow (ierr == 0, VectorBase::ExcTrilinosError(ierr));
 
     return *this;
   }
-  
+
 #endif
 
 

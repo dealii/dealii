@@ -64,7 +64,7 @@ namespace PETScWrappers
     do_reinit (sparsity_pattern, preset_nonzero_locations);
   }
 
-  
+
 
   SparseMatrix &
   SparseMatrix::operator = (const double d)
@@ -84,8 +84,8 @@ namespace PETScWrappers
                                      // get rid of old matrix and generate a
                                      // new one
     const int ierr = MatDestroy (matrix);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));    
-    
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
     do_reinit (m, n, n_nonzero_per_row, is_symmetric);
   }
 
@@ -100,10 +100,10 @@ namespace PETScWrappers
                                      // get rid of old matrix and generate a
                                      // new one
     const int ierr = MatDestroy (matrix);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));    
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     do_reinit (m, n, row_lengths, is_symmetric);
-  }  
+  }
 
 
 
@@ -116,13 +116,13 @@ namespace PETScWrappers
                                      // get rid of old matrix and generate a
                                      // new one
     const int ierr = MatDestroy (matrix);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));    
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     do_reinit (sparsity_pattern, preset_nonzero_locations);
   }
 
 
-  
+
   const MPI_Comm &
   SparseMatrix::get_mpi_communicator () const
   {
@@ -149,7 +149,7 @@ namespace PETScWrappers
                                      // set symmetric flag, if so requested
     if (is_symmetric == true)
       {
-#if (PETSC_VERSION_MAJOR <= 2) 
+#if (PETSC_VERSION_MAJOR <= 2)
         const int ierr
           = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
@@ -171,7 +171,7 @@ namespace PETScWrappers
   {
     Assert (row_lengths.size() == m,
             ExcDimensionMismatch (row_lengths.size(), m));
-    
+
                                      // use the call sequence indicating a
                                      // maximal number of elements for each
                                      // row individually. annoyingly, we
@@ -194,7 +194,7 @@ namespace PETScWrappers
                                      // set symmetric flag, if so requested
     if (is_symmetric == true)
       {
-#if (PETSC_VERSION_MAJOR <= 2) 
+#if (PETSC_VERSION_MAJOR <= 2)
         const int ierr
           = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
@@ -203,10 +203,10 @@ namespace PETScWrappers
 #endif
 
         AssertThrow (ierr == 0, ExcPETScError(ierr));
-      }    
+      }
   }
 
-  
+
 
   template <typename SparsityType>
   void
@@ -249,7 +249,7 @@ namespace PETScWrappers
             row_values.resize (row_lengths[i], 0.0);
             for (unsigned int j=0; j<row_lengths[i]; ++j)
               row_entries[j] = sparsity_pattern.column_number (i,j);
-              
+
 #ifdef PETSC_USE_64BIT_INDICES
 	    const PetscInt
 #else
@@ -266,7 +266,7 @@ namespace PETScWrappers
 				        // In the end, tell the matrix that
 				        // it should not expect any new
 				        // entries.
-#if (PETSC_VERSION_MAJOR <= 2) 
+#if (PETSC_VERSION_MAJOR <= 2)
     const int ierr =
       MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
 #else

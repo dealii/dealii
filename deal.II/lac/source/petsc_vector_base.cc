@@ -262,8 +262,8 @@ namespace PETScWrappers
   {
     Assert (indices.size() == values.size(),
             ExcMessage ("Function called with arguments of different sizes"));
-    do_set_add_operation(indices.size(), &indices[0], 
-			 &(*const_cast<dealii::Vector<PetscScalar>*>(&values))(0), 
+    do_set_add_operation(indices.size(), &indices[0],
+			 &(*const_cast<dealii::Vector<PetscScalar>*>(&values))(0),
 			 true);
   }
 

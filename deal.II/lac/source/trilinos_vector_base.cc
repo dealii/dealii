@@ -42,7 +42,7 @@ namespace TrilinosWrappers
 
       const int local_index = vector.vector->Map().LID(index);
       Assert (local_index >= 0,
-	      ExcAccessToNonLocalElement (index, 
+	      ExcAccessToNonLocalElement (index,
 					  vector.vector->Map().MinMyGID(),
 					  vector.vector->Map().MaxMyGID()));
 
@@ -58,27 +58,27 @@ namespace TrilinosWrappers
                         last_action (Zero),
 			compressed  (true),
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-			vector(std::auto_ptr<Epetra_FEVector> 
+			vector(std::auto_ptr<Epetra_FEVector>
 			  (new Epetra_FEVector(
 				 Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF)))))
 #else
-			vector(std::auto_ptr<Epetra_FEVector> 
+			vector(std::auto_ptr<Epetra_FEVector>
                           (new Epetra_FEVector(
 				 Epetra_Map(0,0,Epetra_SerialComm()))))
 #endif
   {}
-  
 
-  
+
+
   VectorBase::VectorBase (const VectorBase &v)
                         :
 			Subscriptor(),
 			last_action (Zero),
 			compressed (true),
-			vector(std::auto_ptr<Epetra_FEVector> 
+			vector(std::auto_ptr<Epetra_FEVector>
 			       (new Epetra_FEVector(*v.vector)))
   {}
-  
+
 
 
   VectorBase::~VectorBase ()
@@ -145,7 +145,7 @@ namespace TrilinosWrappers
   {
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
-    
+
 				     // this is probably not very efficient
 				     // but works. in particular, we could do
 				     // better if we know that
@@ -249,7 +249,7 @@ namespace TrilinosWrappers
       return false;
 
     unsigned int i;
-    for (i=0; i<local_size(); i++) 
+    for (i=0; i<local_size(); i++)
       if ((*(v.vector))[0][i]!=(*vector)[0][i]) return false;
 
     return true;

@@ -153,12 +153,12 @@ DoFAccessor<structdim,DH>::child (const unsigned int i) const
     next_level = this->level()+1;
   else
     next_level = 0;
-  
+
   TriaIterator<DoFAccessor<structdim,DH> > q (this->tria,
 					      next_level,
 					      this->child_index (i),
 					      this->dof_handler);
-  
+
 				   // make sure that we either created
 				   // a past-the-end iterator or one
 				   // pointing to a used cell
@@ -223,7 +223,7 @@ namespace internal
 			     local_index,
 			     global_index);
 	  }
-    
+
 
 	template <int spacedim>
 	static
@@ -265,8 +265,8 @@ namespace internal
 			     local_index,
 			     global_index);
 	  }
-    
-    
+
+
 	template <int spacedim>
 	static
 	unsigned int
@@ -405,7 +405,7 @@ namespace internal
 	      get_dof_index (dof_handler,
 			     obj_index,
 			     fe_index,
-			     local_index);	
+			     local_index);
 	  }
 
 
@@ -505,7 +505,7 @@ namespace internal
 			     fe_index,
 			     local_index,
 			     global_index,
-			     obj_level);  
+			     obj_level);
 	  }
 
 
@@ -585,7 +585,7 @@ namespace internal
 			     fe_index,
 			     local_index,
 			     global_index,
-			     obj_level);  
+			     obj_level);
 	  }
 
 
@@ -665,7 +665,7 @@ namespace internal
 			     fe_index,
 			     local_index,
 			     global_index,
-			     obj_level);  
+			     obj_level);
 	  }
 
 
@@ -778,10 +778,10 @@ namespace internal
 		    ExcMessage ("This cell is not active and therefore can't be "
 				"queried for its active FE indices"));
 	    Assert (n == 0, ExcIndexRange (n, 0, 1));
-  
+
 	    return dealii::DoFHandler<dim,spacedim>::default_fe_index;
 	  }
-	
+
 
 	template <int spacedim>
 	static
@@ -873,7 +873,7 @@ namespace internal
 								 n);
 	  }
 
-  
+
 
 	template <int spacedim>
 	static
@@ -1133,7 +1133,7 @@ namespace internal
 		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
 		const unsigned int this_fe_index = *pointer;
-	
+
 		Assert (this_fe_index != numbers::invalid_unsigned_int,
 			ExcInternalError());
 		Assert (this_fe_index < dof_handler.finite_elements->size(),
@@ -1148,8 +1148,8 @@ namespace internal
 		  pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
 	      }
 	  }
-	
-	
+
+
 					 /**
 					  * Get the @p local_index-th
 					  * degree of freedom
@@ -1182,7 +1182,7 @@ namespace internal
 	      dof_handler.vertex_dofs[vertex_index *
 				      dof_handler.selected_fe->dofs_per_vertex
 				      + local_index];
-	  }  
+	  }
 
 
 	template<int dim, int spacedim>
@@ -1223,7 +1223,7 @@ namespace internal
 		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
 		const unsigned int this_fe_index = *pointer;
-	
+
 		Assert (this_fe_index != numbers::invalid_unsigned_int,
 			ExcInternalError());
 		Assert (this_fe_index < dof_handler.finite_elements->size(),
@@ -1265,14 +1265,14 @@ namespace internal
 
 	    Assert (*pointer != numbers::invalid_unsigned_int,
 		    ExcInternalError());
-    
+
 	    unsigned int counter = 0;
 	    while (true)
 	      {
 		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
 		const unsigned int this_fe_index = *pointer;
-	
+
 		if (this_fe_index == numbers::invalid_unsigned_int)
 		  return counter;
 		else
@@ -1317,14 +1317,14 @@ namespace internal
 
 	    Assert (*pointer != numbers::invalid_unsigned_int,
 		    ExcInternalError());
-    
+
 	    unsigned int counter = 0;
 	    while (true)
 	      {
 		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
 		const unsigned int this_fe_index = *pointer;
-	
+
 		Assert (this_fe_index < dof_handler.finite_elements->size(),
 			ExcInternalError());
 
@@ -1333,12 +1333,12 @@ namespace internal
 
 		Assert (this_fe_index != numbers::invalid_unsigned_int,
 			ExcInternalError());
-	
+
 		pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
-		++counter;	
+		++counter;
 	      }
 	  }
-  
+
 
 
 					 /**
@@ -1377,13 +1377,13 @@ namespace internal
 
 	    Assert (*pointer != numbers::invalid_unsigned_int,
 		    ExcInternalError());
-    
+
 	    while (true)
 	      {
 		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
 		const unsigned int this_fe_index = *pointer;
-	
+
 		Assert (this_fe_index < dof_handler.finite_elements->size(),
 			ExcInternalError());
 
@@ -1396,7 +1396,7 @@ namespace internal
 		    pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
 	      }
 	  }
-  
+
     };
   }
 }
@@ -1409,7 +1409,7 @@ unsigned int
 DoFAccessor<dim,DH>::dof_index (const unsigned int i,
 				const unsigned int fe_index) const
 {
-				   // access the respective DoF 
+				   // access the respective DoF
   return internal::DoFAccessor::Implementation::get_dof_index (*this->dof_handler,
 							       this->level(),
 							       this->present_index,
@@ -1541,7 +1541,7 @@ namespace internal
     }
 
 
-  
+
     template <int dim, int spacedim>
     inline
     const FiniteElement<dim,spacedim> &
@@ -1561,7 +1561,7 @@ DoFAccessor<dim,DH>::get_fe (const unsigned int fe_index) const
 {
   Assert (fe_index_is_active (fe_index) == true,
 	  ExcMessage ("This function can only be called for active fe indices"));
-  
+
   return internal::DoFAccessor::get_fe (this->dof_handler->get_fe(), fe_index);
 }
 
@@ -1587,7 +1587,7 @@ namespace internal
     }
 
 
-    
+
     template <class DH>
     void get_dof_indices (const dealii::DoFAccessor<2,DH>   &accessor,
 			  std::vector<unsigned int> &dof_indices,
@@ -1621,7 +1621,7 @@ namespace internal
 	*next++ = accessor.dof_index(d,fe_index);
     }
 
-    
+
 
     template <class DH>
     void get_dof_indices (const dealii::DoFAccessor<3,DH>   &accessor,
@@ -1720,7 +1720,7 @@ DoFAccessor<structdim,DH>::get_dof_indices (std::vector<unsigned int> &dof_indic
       default:
 	    Assert (false, ExcNotImplemented());
     }
-  
+
 
 				   // this function really only makes
 				   // sense if either a) there are
@@ -1756,7 +1756,7 @@ DoFAccessor<structdim,DH>::line (const unsigned int i) const
   Assert (structdim > 1, ExcImpossibleInDim(structdim));
 				   // checking of 'i' happens in
 				   // line_index(i)
-  
+
   return typename internal::DoFHandler::Iterators<DH>::line_iterator
     (
       this->tria,
@@ -1802,7 +1802,7 @@ namespace internal
 				     // internal::DoFCellAccessor
     using dealii::DoFCellAccessor;
     using dealii::DoFHandler;
-    
+
 /**
  * A class with the same purpose as the similarly named class of the
  * Triangulation class. See there for more information.
@@ -1832,11 +1832,11 @@ namespace internal
 		(accessor.get_fe().dofs_per_cell !=
 		 accessor.get_fe().dofs_per_vertex * GeometryInfo<1>::vertices_per_cell))
 	      return;
-	
+
 	    const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
 			       dofs_per_line   = accessor.get_fe().dofs_per_line,
 			       dofs_per_cell   = accessor.get_fe().dofs_per_cell;
-	
+
 					     // make sure the cache is at least
 					     // as big as we need it when
 					     // writing to the last element of
@@ -1846,11 +1846,11 @@ namespace internal
 		    accessor.dof_handler->levels[accessor.present_level]
 		    ->cell_dof_indices_cache.size(),
 		    ExcInternalError());
-	
+
 	    std::vector<unsigned int>::iterator next
 	      = (accessor.dof_handler->levels[accessor.present_level]
 		 ->cell_dof_indices_cache.begin() + accessor.present_index * dofs_per_cell);
-	
+
 	    for (unsigned int vertex=0; vertex<2; ++vertex)
 	      for (unsigned int d=0; d<dofs_per_vertex; ++d)
 		*next++ = accessor.vertex_dof_index(vertex,d);
@@ -1877,7 +1877,7 @@ namespace internal
 		(accessor.get_fe().dofs_per_cell !=
 		 accessor.get_fe().dofs_per_vertex * GeometryInfo<2>::vertices_per_cell))
 	      return;
-  
+
 	    const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
 			       dofs_per_line   = accessor.get_fe().dofs_per_line,
 			       dofs_per_quad   = accessor.get_fe().dofs_per_quad,
@@ -1926,7 +1926,7 @@ namespace internal
 		(accessor.get_fe().dofs_per_cell !=
 		 accessor.get_fe().dofs_per_vertex * GeometryInfo<3>::vertices_per_cell))
 	      return;
-  
+
 	    const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
 			       dofs_per_line   = accessor.get_fe().dofs_per_line,
 			       dofs_per_quad   = accessor.get_fe().dofs_per_quad,
@@ -2001,7 +2001,7 @@ namespace internal
 	update_cell_dof_indices_cache (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &)
 	  {
 //TODO[WB]: should implement a dof indices cache for hp as well
-  
+
 					     // not implemented, but should also
 					     // not be called
 	    Assert (false, ExcNotImplemented());
@@ -2037,12 +2037,12 @@ namespace internal
 		    (accessor.get_fe().dofs_per_cell ==
 		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
 		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
-  
+
 	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
-				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell]; 
+				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
 	    for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
 	      dof_indices[i] = *cache;
-	  }      
+	  }
 
 					 /**
 					  * Same function as above except
@@ -2057,7 +2057,7 @@ namespace internal
 	get_dof_indices (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
 			 std::vector<unsigned int>                            &dof_indices)
 	  {
-					     // no caching for hp::DoFHandler implemented 
+					     // no caching for hp::DoFHandler implemented
 	    accessor.dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim> >::get_dof_indices (dof_indices,
 										      accessor.active_fe_index());
 	  }
@@ -2095,12 +2095,12 @@ namespace internal
 		    (accessor.get_fe().dofs_per_cell ==
 		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
 		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
-  
+
 	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
-				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell]; 
+				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
 	    for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
 	      local_values(i) = values(*cache);
-	  }      
+	  }
 
 					 /**
 					  * Same function as above except
@@ -2119,7 +2119,7 @@ namespace internal
 					     // no caching for hp::DoFHandler
 					     // implemented
 	    const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
-  
+
 	    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 	    get_dof_indices (accessor, local_dof_indices);
 
@@ -2156,12 +2156,12 @@ namespace internal
 		    (accessor.get_fe().dofs_per_cell ==
 		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
 		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
-  
+
 	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
-				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell]; 
+				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
 	    for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
 	      values(*cache) = local_values(i);
-	  }      
+	  }
 
 
 
@@ -2175,14 +2175,14 @@ namespace internal
 					     // no caching for hp::DoFHandler
 					     // implemented
 	    const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
-  
+
 	    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 	    get_dof_indices (accessor, local_dof_indices);
 
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      values(local_dof_indices[i]) = local_values(i);
 	  }
-	
+
 
 					 /**
 					  * Do what the active_fe_index
@@ -2301,7 +2301,7 @@ namespace internal
 	                          ->cell_dof_indices_cache[accessor.present_index * n_dofs];
 
 				   // distribute cell vector
-	    global_destination.add(n_dofs, dofs, 
+	    global_destination.add(n_dofs, dofs,
 				   &(*const_cast<dealii::Vector<number>*>(&local_source))(0));
   	  }
 
@@ -2330,11 +2330,11 @@ namespace internal
 	    const unsigned int n_dofs = local_source.size();
 
 //TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array. This should be fixed eventually
-  
+
 				   // get indices of dofs
 	    std::vector<unsigned int> dofs (n_dofs);
 	    accessor.get_dof_indices (dofs);
-  
+
 				   // distribute cell vector
 	    global_destination.add (dofs, local_source);
 	  }
@@ -2381,7 +2381,7 @@ namespace internal
 
 				   // distribute cell matrices
 	    for (unsigned int i=0; i<n_dofs; ++i)
-	      global_destination.add(dofs[i], n_dofs, dofs, 
+	      global_destination.add(dofs[i], n_dofs, dofs,
 				     &local_source(i,0));
   	  }
 
@@ -2414,11 +2414,11 @@ namespace internal
 	    const unsigned int n_dofs = local_source.size();
 
 //TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array.
-  
+
 				   // get indices of dofs
 	    std::vector<unsigned int> dofs (n_dofs);
 	    accessor.get_dof_indices (dofs);
-  
+
 				   // distribute cell vector
 	    global_destination.add(dofs,local_source);
 	  }
@@ -2473,7 +2473,7 @@ DoFCellAccessor<DH>::neighbor (const unsigned int i) const
        this->neighbor_level (i),
        this->neighbor_index (i),
        this->dof_handler);
-  
+
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsNeighbor());
@@ -2492,7 +2492,7 @@ DoFCellAccessor<DH>::child (const unsigned int i) const
        this->level()+1,
        this->child_index (i),
        this->dof_handler);
-  
+
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsChild());
@@ -2510,7 +2510,7 @@ DoFCellAccessor<DH>::face (const unsigned int i) const
   Assert (static_cast<unsigned int>(this->level()) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
-  const unsigned int dim = DH::dimension;  
+  const unsigned int dim = DH::dimension;
   Assert (dim > 1, ExcImpossibleInDim(1));
 
   switch (dim)
@@ -2521,14 +2521,14 @@ DoFCellAccessor<DH>::face (const unsigned int i) const
 	       0,
 	       this->line_index (i),
 	       this->dof_handler);
-	    
+
       case 3:
 	    return typename internal::DoFHandler::Iterators<DH>::face_iterator
 	      (this->tria,
 	       0,
 	       this->quad_index (i),
 	       this->dof_handler);
-	    
+
       default:
 	    Assert (false, ExcNotImplemented());
 	    return typename internal::DoFHandler::Iterators<DH>::face_iterator();

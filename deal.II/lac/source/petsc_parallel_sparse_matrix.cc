@@ -311,9 +311,9 @@ namespace PETScWrappers
                                        // then count the elements in- and
                                        // out-of-window for the rows we own
 #ifdef PETSC_USE_64BIT_INDICES
-      std::vector<PetscInt> 
+      std::vector<PetscInt>
 #else
-      std::vector<int> 
+      std::vector<int>
 #endif
 	row_lengths_in_window (local_row_end - local_row_start),
 	row_lengths_out_of_window (local_row_end - local_row_start);
@@ -376,9 +376,9 @@ namespace PETScWrappers
      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
 
 #ifdef PETSC_USE_64BIT_INDICES
-          std::vector<PetscInt> 
+          std::vector<PetscInt>
 #else
-          std::vector<int> 
+          std::vector<int>
 #endif
             row_entries;
           std::vector<PetscScalar> row_values;
@@ -406,9 +406,9 @@ namespace PETScWrappers
                                            // sure petsc doesn't read past the
                                            // end
 #ifdef PETSC_USE_64BIT_INDICES
-          std::vector<PetscInt> 
+          std::vector<PetscInt>
 #else
-          std::vector<int> 
+          std::vector<int>
 #endif
 	    rowstart_in_window (local_row_end - local_row_start + 1, 0),
 	    colnums_in_window;
@@ -467,9 +467,9 @@ namespace PETScWrappers
             for (unsigned int i=local_row_start; i<local_row_end; ++i)
               {
 #ifdef PETSC_USE_64BIT_INDICES
-		PetscInt 
+		PetscInt
 #else
-		int 
+		int
 #endif
 		  petsc_i = i;
                 MatSetValues (matrix, 1, &petsc_i,

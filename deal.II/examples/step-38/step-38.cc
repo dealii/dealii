@@ -1541,7 +1541,7 @@ void DGMethod<dim>::run ()
 	{
 	  GridGenerator::hyper_cube (triangulation);
 
-	  triangulation.refine_global (3);
+	  triangulation.refine_global (5);
 	}
       else
 	refine_grid ();
@@ -1599,7 +1599,7 @@ void DGMethod<dim>::run ()
 				       // two solutions for equality.
       solution1-=solution2;
       const double difference=solution1.linfty_norm();
-      if (difference>1e-13)
+      if (difference>1e-12)
 	std::cout << "solution1 and solution2 differ!!" << std::endl;
       else
 	std::cout << "solution1 and solution2 coincide." << std::endl;

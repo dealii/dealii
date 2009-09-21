@@ -163,9 +163,9 @@ namespace PETScWrappers
                                         */
       static
 #ifdef PETSC_USE_64BIT_INDICES
-      PetscErrorCode 
+      PetscErrorCode
 #else
-      int 
+      int
 #endif
       convergence_test (KSP                 ksp,
 #ifdef PETSC_USE_64BIT_INDICES
