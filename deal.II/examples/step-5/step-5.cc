@@ -73,12 +73,12 @@ using namespace dealii;
 				 // <code>setup_system</code>. Apart from this,
 				 // everything is as before.
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     LaplaceProblem ();
     void run ();
-    
+
   private:
     void setup_system ();
     void assemble_system ();
@@ -125,14 +125,14 @@ class LaplaceProblem
 				 // here just as in the previous
 				 // example.
 template <int dim>
-class Coefficient : public Function<dim> 
+class Coefficient : public Function<dim>
 {
   public:
     Coefficient ()  : Function<dim>() {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
@@ -154,7 +154,7 @@ class Coefficient : public Function<dim>
 				 // after all):
 template <int dim>
 double Coefficient<dim>::value (const Point<dim> &p,
-				const unsigned int /*component*/) const 
+				const unsigned int /*component*/) const
 {
   if (p.square() < 0.5*0.5)
     return 20;
@@ -271,9 +271,9 @@ double Coefficient<dim>::value (const Point<dim> &p,
 template <int dim>
 void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
-				   const unsigned int              component) const 
+				   const unsigned int              component) const
 {
-  Assert (values.size() == points.size(), 
+  Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
 				   // Since examples are not very good
 				   // if they do not demonstrate their
@@ -295,7 +295,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   // call stack to immediately find
 				   // the place where the the array
 				   // with the wrong size was set up.
-  
+
 				   // While we're at it, we can do
 				   // another check: the coefficient
 				   // is a scalar, but the
@@ -331,7 +331,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   // of writing <code>v.size()-1</code> in
 				   // many places, the range is
 				   // defined as half-open.)
-  Assert (component == 0, 
+  Assert (component == 0,
 	  ExcIndexRange (component, 0, 1));
 
 				   // The rest of the function is
@@ -430,11 +430,11 @@ void LaplaceProblem<dim>::setup_system ()
 				 // are completely unchanged from
 				 // before:
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
-{  
+void LaplaceProblem<dim>::assemble_system ()
+{
   QGauss<dim>  quadrature_formula(2);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values    |  update_gradients |
 			   update_quadrature_points  |  update_JxW_values);
 
@@ -540,7 +540,7 @@ void LaplaceProblem<dim>::assemble_system ()
 
       coefficient.value_list (fe_values.get_quadrature_points(),
 			      coefficient_values);
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -556,9 +556,6 @@ void LaplaceProblem<dim>::assemble_system ()
 	  }
 
 
-      cell->distribute_local_to_global (cell_rhs, system_rhs);
-      cell->distribute_local_to_global (cell_matrix, system_matrix);
-      /*
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -566,10 +563,9 @@ void LaplaceProblem<dim>::assemble_system ()
 	    system_matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
-	  
+
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	}
-      */
     }
 
 				   // With the matrix so built, we use
@@ -638,7 +634,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // declared, and the CG solver will
 				 // do the rest for us:
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -820,7 +816,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				 // this is the first cycle, however,
 				 // we first have to generate a mesh:
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
@@ -910,7 +906,7 @@ void LaplaceProblem<dim>::run ()
 					   // might be worth to show
 					   // what not to do, after
 					   // all.
-	  
+
 					   // So if we got past the
 					   // assertion, we know that
 					   // dim==2, and we can now
@@ -987,7 +983,7 @@ void LaplaceProblem<dim>::run ()
 				 // like the one in the previous
 				 // example, so we won't comment on it
 				 // further:
-int main () 
+int main ()
 {
   deallog.depth_console (0);
 
@@ -1016,12 +1012,12 @@ int main ()
 				   // Results section of the program
 				   // to see what happens when the
 				   // code is actually run:
-/*  
+/*
   Coefficient<2>    coefficient;
   std::vector<Point<2> > points (2);
   std::vector<double>    coefficient_values (1);
   coefficient.value_list (points, coefficient_values);
 */
-  
+
   return 0;
 }
