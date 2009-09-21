@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1084,6 +1084,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 
 
 template <> void FESystem<1>::initialize_unit_face_support_points ();
+template <> void FESystem<1,2>::initialize_unit_face_support_points ();
 
 
 DEAL_II_NAMESPACE_CLOSE
