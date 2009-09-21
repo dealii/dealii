@@ -908,6 +908,44 @@ class BlockVectorBase : public Subscriptor
     BlockVectorBase &
     operator -= (const BlockVectorBase &V);
 
+
+				       /**
+                                        * A collective add operation:
+                                        * This funnction adds a whole
+                                        * set of values stored in @p
+                                        * values to the vector
+                                        * components specified by @p
+                                        * indices.
+                                        */
+    template <typename Number>
+    void add (const std::vector<unsigned int> &indices,
+	      const std::vector<Number>       &values);
+
+				       /**
+				        * This is a second collective
+				        * add operation. As a
+				        * difference, this function
+				        * takes a deal.II vector of
+				        * values.
+				        */
+    template <typename Number>
+    void add (const std::vector<unsigned int> &indices,
+	      const Vector<Number>            &values);
+
+				      /**
+				       * Take an address where
+				       * <tt>n_elements</tt> are stored
+				       * contiguously and add them into
+				       * the vector. Handles all cases
+				       * which are not covered by the
+				       * other two <tt>add()</tt>
+				       * functions above.
+				       */
+    template <typename Number>
+    void add (const unsigned int  n_elements,
+	      const unsigned int *indices,
+	      const Number       *values);
+
 				     /**
 				      * $U(0-DIM)+=s$.  Addition of <tt>s</tt>
 				      * to all components. Note that
@@ -1865,13 +1903,56 @@ BlockVectorBase<VectorType>::operator -= (const BlockVectorBase<VectorType>& v)
     }
   return *this;
 }
+ 
+
+
+template <class VectorType>
+template <typename Number>
+inline
+void
+BlockVectorBase<VectorType> ::add (const std::vector<unsigned int> &indices,
+				   const std::vector<Number>       &values)
+{
+  Assert (indices.size() == values.size(),
+	  ExcDimensionMismatch(indices.size(), values.size()));
+  add (indices.size(), &indices[0], &values[0]);
+}
+
+
+
+template <class VectorType>
+template <typename Number>
+inline
+void
+BlockVectorBase<VectorType> ::add (const std::vector<unsigned int> &indices,
+				   const Vector<Number>            &values)
+{
+  Assert (indices.size() == values.size(),
+	  ExcDimensionMismatch(indices.size(), values.size()));
+  const unsigned int n_indices = indices.size();
+  for (unsigned int i=0; i<n_indices; ++i)
+    (*this)(indices[i]) += values(i);
+}
+
+
+
+template <class VectorType>
+template <typename Number>
+inline
+void
+BlockVectorBase<VectorType> ::add (const unsigned int  n_indices,
+				   const unsigned int *indices,
+				   const Number       *values)
+{
+  for (unsigned int i=0; i<n_indices; ++i)
+    (*this)(indices[i]) += values[i];
+}
 
 
 
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a)
 {
-
   Assert (numbers::is_finite(a), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 

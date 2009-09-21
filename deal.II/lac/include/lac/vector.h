@@ -21,6 +21,7 @@
 #include <boost/lambda/lambda.hpp>
 
 #include <cstdio>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -653,6 +654,43 @@ class Vector : public Subscriptor
 				      */
     Vector<Number> & operator -= (const Vector<Number> &V);
 
+				       /**
+                                        * A collective add operation:
+                                        * This funnction adds a whole
+                                        * set of values stored in @p
+                                        * values to the vector
+                                        * components specified by @p
+                                        * indices.
+                                        */
+    template <typename OtherNumber>
+    void add (const std::vector<unsigned int> &indices,
+	      const std::vector<OtherNumber>  &values);
+
+				       /**
+				        * This is a second collective
+				        * add operation. As a
+				        * difference, this function
+				        * takes a deal.II vector of
+				        * values.
+				        */
+    template <typename OtherNumber>
+    void add (const std::vector<unsigned int> &indices,
+	      const Vector<OtherNumber>       &values);
+
+				      /**
+				       * Take an address where
+				       * <tt>n_elements</tt> are stored
+				       * contiguously and add them into
+				       * the vector. Handles all cases
+				       * which are not covered by the
+				       * other two <tt>add()</tt>
+				       * functions above.
+				       */
+    template <typename OtherNumber>
+    void add (const unsigned int  n_elements,
+	      const unsigned int *indices,
+	      const OtherNumber  *values);
+
 				     /**
 				      * Addition of @p s to all
 				      * components. Note that @p s is a
@@ -1254,7 +1292,55 @@ Vector<Number>::scale (const Number factor)
 		       (factor*boost::lambda::_1),
 		       internal::Vector::minimum_parallel_grain_size);
 }
+ 
 
+
+template <typename Number>
+template <typename Number2>
+inline
+void
+Vector<Number>::add (const std::vector<unsigned int> &indices,
+		     const std::vector<Number2>      &values)
+{
+  Assert (indices.size() == values.size(),
+	  ExcDimensionMismatch(indices.size(), values.size()));
+  add (indices.size(), &indices[0], &values[0]);
+}
+
+
+
+template <typename Number>
+template <typename Number2>
+inline
+void
+Vector<Number>::add (const std::vector<unsigned int> &indices,
+		     const Vector<Number2>           &values)
+{
+  Assert (indices.size() == values.size(),
+	  ExcDimensionMismatch(indices.size(), values.size()));
+  add (indices.size(), &indices[0], values.val);
+}
+
+
+
+template <typename Number>
+template <typename Number2>
+inline
+void
+Vector<Number>::add (const unsigned int  n_indices,
+		     const unsigned int *indices,
+		     const Number2      *values)
+{
+  for (unsigned int i=0; i<n_indices; ++i)
+    {
+      Assert (indices[i] < vec_size, ExcIndexRange(indices[i],0,vec_size));
+      Assert (numbers::is_finite(values[i]),
+	      ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
+      val[indices[i]] += values[i];
+    }
+}
+ 
 
 
 template <typename Number>

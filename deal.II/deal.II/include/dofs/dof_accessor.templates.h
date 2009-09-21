@@ -2163,6 +2163,8 @@ namespace internal
 	      values(*cache) = local_values(i);
 	  }      
 
+
+
 	template <int dim, int spacedim, class OutputVector, typename number>
 	static
 	void
@@ -2244,7 +2246,7 @@ namespace internal
 	static
 	void
 	set_active_fe_index (DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
-			     const unsigned int                              i)
+			     const unsigned int                                      i)
 	  {
 	    typedef
 	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
@@ -2260,6 +2262,165 @@ namespace internal
 				   accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size ()));
 	    accessor.dof_handler->levels[accessor.level()]
 	      ->active_fe_indices[accessor.present_index] = i;
+	  }
+
+
+
+        template <int dim, int spacedim, typename number, class OutputVector>
+	static
+	void
+	distribute_local_to_global (const DoFCellAccessor<dealii::DoFHandler<dim,spacedim> > &accessor,
+				    const dealii::Vector<number> &local_source,
+				    OutputVector                 &global_destination)
+          {
+	    typedef
+	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
+	      BaseClass;
+
+	    Assert (accessor.dof_handler != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (&accessor.get_fe() != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (local_source.size() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+					     // check as in documentation that
+					     // cell is either active, or dofs
+					     // are only in vertices
+	    Assert (!accessor.has_children()
+		    ||
+		    (accessor.get_fe().dofs_per_cell ==
+		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
+		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+
+	    const unsigned int n_dofs = local_source.size();
+
+	    unsigned int * dofs = &accessor.dof_handler->levels[accessor.level()]
+	                          ->cell_dof_indices_cache[accessor.present_index * n_dofs];
+
+				   // distribute cell vector
+	    global_destination.add(n_dofs, dofs, 
+				   &(*const_cast<dealii::Vector<number>*>(&local_source))(0));
+  	  }
+
+
+
+        template <int dim, int spacedim, typename number, class OutputVector>
+	static
+	void
+	distribute_local_to_global (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
+				    const dealii::Vector<number> &local_source,
+				    OutputVector                 &global_destination)
+          {
+	    typedef
+	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
+	      BaseClass;
+
+	    Assert (accessor->dof_handler != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (&accessor.get_fe() != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (local_source.size() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+	    const unsigned int n_dofs = local_source.size();
+
+//TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array. This should be fixed eventually
+  
+				   // get indices of dofs
+	    std::vector<unsigned int> dofs (n_dofs);
+	    accessor.get_dof_indices (dofs);
+  
+				   // distribute cell vector
+	    global_destination.add (dofs, local_source);
+	  }
+
+
+
+        template <int dim, int spacedim, typename number, class OutputMatrix>
+	static
+	void
+	distribute_local_to_global (const DoFCellAccessor<dealii::DoFHandler<dim,spacedim> > &accessor,
+				    const dealii::FullMatrix<number> &local_source,
+				    OutputMatrix                     &global_destination)
+          {
+	    typedef
+	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
+	      BaseClass;
+
+	    Assert (accessor.dof_handler != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (&accessor.get_fe() != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (local_source.n() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_destination.m(),
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_destination.n(),
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+
+					     // check as in documentation that
+					     // cell is either active, or dofs
+					     // are only in vertices
+	    Assert (!accessor.has_children()
+		    ||
+		    (accessor.get_fe().dofs_per_cell ==
+		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
+		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+
+	    const unsigned int n_dofs = local_source.m();
+
+	    unsigned int * dofs = &accessor.dof_handler->levels[accessor.level()]
+	                          ->cell_dof_indices_cache[accessor.present_index * n_dofs];
+
+				   // distribute cell matrices
+	    for (unsigned int i=0; i<n_dofs; ++i)
+	      global_destination.add(dofs[i], n_dofs, dofs, 
+				     &local_source(i,0));
+  	  }
+
+
+
+        template <int dim, int spacedim, typename number, class OutputMatrix>
+	static
+	void
+	distribute_local_to_global (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
+				    const dealii::FullMatrix<number> &local_source,
+				    OutputMatrix                     &global_destination)
+          {
+	    typedef
+	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
+	      BaseClass;
+
+	    Assert (accessor->dof_handler != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (&accessor.get_fe() != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (local_source.n() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_destination.m(),
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_destination.n(),
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+
+	    const unsigned int n_dofs = local_source.size();
+
+//TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array.
+  
+				   // get indices of dofs
+	    std::vector<unsigned int> dofs (n_dofs);
+	    accessor.get_dof_indices (dofs);
+  
+				   // distribute cell vector
+	    global_destination.add(dofs,local_source);
 	  }
     };
   }
@@ -2450,26 +2611,8 @@ DoFCellAccessor<DH>::
 distribute_local_to_global (const Vector<number> &local_source,
 			    OutputVector         &global_destination) const
 {
-  Assert (this->dof_handler != 0,
-	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-	  typename BaseClass::ExcInvalidObject());
-  Assert (local_source.size() == this->get_fe().dofs_per_cell,
-	  typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (this->dof_handler->n_dofs() == global_destination.size(),
-	  typename BaseClass::ExcVectorDoesNotMatch());
-
-  const unsigned int n_dofs = local_source.size();
-
-//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array (or by using the dof_indices cache for non-hp DoFHandlers, see the functions in the Implementation class above). second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
-  
-				   // get indices of dofs
-  std::vector<unsigned int> dofs (n_dofs);
-  this->get_dof_indices (dofs);
-  
-				   // distribute cell vector
-  for (unsigned int j=0; j<n_dofs; ++j)
-    global_destination(dofs[j]) += local_source(j);
+  internal::DoFCellAccessor::Implementation::
+    distribute_local_to_global (*this,local_source,global_destination);
 }
 
 
@@ -2482,31 +2625,8 @@ DoFCellAccessor<DH>::
 distribute_local_to_global (const FullMatrix<number> &local_source,
 			    OutputMatrix             &global_destination) const
 {
-  Assert (this->dof_handler != 0,
-	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-	  typename BaseClass::ExcInvalidObject());
-  Assert (local_source.m() == this->get_fe().dofs_per_cell,
-	  typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (local_source.m() == local_source.n(),
-	  typename BaseClass::ExcMatrixDoesNotMatch());
-  Assert (this->dof_handler->n_dofs() == global_destination.m(),
-	  typename BaseClass::ExcMatrixDoesNotMatch());
-  Assert (global_destination.m() == global_destination.n(),
-	  typename BaseClass::ExcMatrixDoesNotMatch());
-
-  const unsigned int n_dofs = local_source.m();
-
-//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array (or by using the dof_indices cache for non-hp DoFHandlers, see the functions in the Implementation class above). second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
-
-				   // get indices of dofs
-  std::vector<unsigned int> dofs (n_dofs);
-  this->get_dof_indices (dofs);
-  
-				   // distribute cell matrix
-  for (unsigned int i=0; i<n_dofs; ++i)
-    for (unsigned int j=0; j<n_dofs; ++j)
-      global_destination.add(dofs[i], dofs[j], local_source(i,j));
+  internal::DoFCellAccessor::Implementation::
+    distribute_local_to_global (*this,local_source,global_destination);
 }
 
 

@@ -468,7 +468,7 @@ namespace SparseMatrixIterators
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
  *
- * @author Essentially everyone who has ever worked on deal.II, 1994-2007
+ * @author Essentially everyone who has ever worked on deal.II, 1994-2009
  */
 template <typename number>
 class SparseMatrix : public virtual Subscriptor

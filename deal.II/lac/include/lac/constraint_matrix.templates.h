@@ -744,68 +744,71 @@ distribute_local_to_global (const Vector<double>            &local_vector,
     }
 
   const unsigned int n_local_dofs = local_vector.size();
-  for (unsigned int i=0; i<n_local_dofs; ++i)
-    {
+  if (lines.size() == 0)
+    global_vector.add(local_dof_indices, local_vector);
+  else
+    for (unsigned int i=0; i<n_local_dofs; ++i)
+      {
 				   // let's see if we can use the bool
 				   // vector that tells about whether a
 				   // certain constraint exists. then, we
 				   // simply copy over the data.
-      const std::vector<ConstraintLine>::const_iterator position =
-	find_constraint(local_dof_indices[i]);
+	const std::vector<ConstraintLine>::const_iterator position =
+	  find_constraint(local_dof_indices[i]);
 
-      if (position==lines.end())
-	{
-	  global_vector(local_dof_indices[i]) += local_vector(i);
-	  continue;
-	}
+	if (position==lines.end())
+	  {
+	    global_vector(local_dof_indices[i]) += local_vector(i);
+	    continue;
+	  }
 
-      if (use_matrix)
-	{
-	  const double val = position->inhomogeneity;
-	  if (val != 0)
-	    for (unsigned int j=0; j<n_local_dofs; ++j)
-	      {
-		const std::vector<ConstraintLine>::const_iterator
-		  position_j = find_constraint(local_dof_indices[j]);
+	if (use_matrix)
+	  {
+	    const double val = position->inhomogeneity;
+	    if (val != 0)
+	      for (unsigned int j=0; j<n_local_dofs; ++j)
+		{
+		  const std::vector<ConstraintLine>::const_iterator
+		    position_j = find_constraint(local_dof_indices[j]);
 
-		if (position_j == lines.end())
-		  global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
-		else
-		  {
-		    const double matrix_entry = local_matrix(j,i);
-		    if (matrix_entry == 0)
-		      continue;
+		  if (position_j == lines.end())
+		    global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
+		  else
+		    {
+		      const double matrix_entry = local_matrix(j,i);
+		      if (matrix_entry == 0)
+			continue;
 
-		    for (unsigned int q=0; q<position_j->entries.size(); ++q)
-		      {
-			Assert (is_constrained(position_j->entries[q].first) == false,
-				ExcMessage ("Tried to distribute to a fixed dof."));
-			global_vector(position_j->entries[q].first)
-			  -= val * position_j->entries[q].second * matrix_entry;
-		      }
-		  }
-	      }
-	}
-      else
+		      for (unsigned int q=0; q<position_j->entries.size(); ++q)
+			{
+			  Assert (is_constrained(position_j->entries[q].first) == false,
+				  ExcMessage ("Tried to distribute to a fixed dof."));
+			  global_vector(position_j->entries[q].first)
+			    -= val * position_j->entries[q].second * matrix_entry;
+			}
+		    }
+		}
+	  }
+	else
 				   // in case the constraint is
 				   // inhomogeneous and we have no matrix
 				   // available, this function is not
 				   // appropriate. Throw an exception.
-	Assert (position->inhomogeneity == 0.,
-		ExcMessage ("Inhomogeneous constraint cannot be condensed "
-			    "without any matrix specified."));
+	  Assert (position->inhomogeneity == 0.,
+		  ExcMessage ("Inhomogeneous constraint cannot be condensed "
+			      "without any matrix specified."));
 
 				   // now distribute the constraint,
 				   // but make sure we don't touch
 				   // the entries of fixed dofs
-      for (unsigned int j=0; j<position->entries.size(); ++j)
-	{
-	  Assert (is_constrained(position->entries[j].first) == false,
-		  ExcMessage ("Tried to distribute to a fixed dof."));
-	  global_vector(position->entries[j].first)
-	    += local_vector(i) * position->entries[j].second;
-	}
-    }
+	for (unsigned int j=0; j<position->entries.size(); ++j)
+	  {
+	    Assert (is_constrained(position->entries[j].first) == false,
+		    ExcMessage ("Tried to distribute to a fixed dof."));
+	    global_vector(position->entries[j].first)
+	      += local_vector(i) * position->entries[j].second;
+	  }
+      }
 }
 
 
