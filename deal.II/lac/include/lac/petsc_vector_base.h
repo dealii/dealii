@@ -384,6 +384,29 @@ namespace PETScWrappers
       void add (const std::vector<unsigned int> &indices,
                 const std::vector<PetscScalar>  &values);
 
+				       /**
+				        * This is a second collective
+				        * add operation. As a
+				        * difference, this function
+				        * takes a deal.II vector of
+				        * values.
+				        */
+      void add (const std::vector<unsigned int>     &indices,
+		const ::dealii::Vector<PetscScalar> &values);
+
+				      /**
+				       * Take an address where
+				       * <tt>n_elements</tt> are stored
+				       * contiguously and add them into
+				       * the vector. Handles all cases
+				       * which are not covered by the
+				       * other two <tt>add()</tt>
+				       * functions above.
+				       */
+      void add (const unsigned int  n_elements,
+		const unsigned int *indices,
+		const PetscScalar  *values);
+
                                        /**
                                         * Return the scalar product of two
                                         * vectors. The vectors must have the
@@ -734,8 +757,9 @@ namespace PETScWrappers
                                         * @p add_values flag set to the
                                         * corresponding value.
                                         */
-      void do_set_add_operation (const std::vector<unsigned int> &indices,
-				 const std::vector<PetscScalar>  &values,
+      void do_set_add_operation (const unsigned int  n_elements,
+				 const unsigned int *indices,
+				 const PetscScalar  *values,
 				 const bool add_values);
   };
 

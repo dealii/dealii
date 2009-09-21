@@ -218,7 +218,9 @@ namespace PETScWrappers
   VectorBase::set (const std::vector<unsigned int> &indices,
                    const std::vector<PetscScalar>  &values)
   {
-    do_set_add_operation(indices, values, false);
+    Assert (indices.size() == values.size(),
+            ExcMessage ("Function called with arguments of different sizes"));
+    do_set_add_operation(indices.size(), &indices[0], &values[0], false);
   }
 
 
@@ -227,7 +229,32 @@ namespace PETScWrappers
   VectorBase::add (const std::vector<unsigned int> &indices,
                    const std::vector<PetscScalar>  &values)
   {
-    do_set_add_operation(indices, values, true);
+    Assert (indices.size() == values.size(),
+            ExcMessage ("Function called with arguments of different sizes"));
+    do_set_add_operation(indices.size(), &indices[0], &values[0], true);
+  }
+
+
+
+  void
+  VectorBase::add (const std::vector<unsigned int>    &indices,
+                   const ::dealii::Vector<PetscScalar>&values)
+  {
+    Assert (indices.size() == values.size(),
+            ExcMessage ("Function called with arguments of different sizes"));
+    do_set_add_operation(indices.size(), &indices[0], 
+			 &(*const_cast<dealii::Vector<PetscScalar>*>(&values))(0), 
+			 true);
+  }
+
+
+
+  void
+  VectorBase::add (const unsigned int  n_elements,
+		   const unsigned int *indices,
+		   const PetscScalar  *values)
+  {
+    do_set_add_operation(n_elements, indices, values, true);
   }
 
 
@@ -940,13 +967,11 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::do_set_add_operation (const std::vector<unsigned int> &indices,
-				    const std::vector<PetscScalar>  &values,
-				    const bool add_values)
+  VectorBase::do_set_add_operation (const unsigned int  n_elements,
+				    const unsigned int *indices,
+				    const PetscScalar  *values,
+				    const bool          add_values)
   {
-    Assert (indices.size() == values.size(),
-            ExcMessage ("Function called with arguments of different sizes"));
-
     if (last_action != VectorBase::LastAction::insert)
       {
         int ierr;
@@ -963,24 +988,24 @@ namespace PETScWrappers
 				     // collective operation, so we
 				     // can skip the call if necessary
 				     // (unlike the above calls)
-    if (indices.size() != 0)
+    if (n_elements != 0)
       {
-#if (PETSC_VERSION_MAJOR <= 2) && \
-    ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
-	const std::vector<int> petsc_indices (indices.begin(),
-					      indices.end());
+#if (PETSC_VERSION_MAJOR <= 2) &&					\
+     ((PETSC_VERSION_MINOR < 2) ||						\
+      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+	const int * petsc_indices = indices;
 #else
-	const std::vector<PetscInt> petsc_indices (indices.begin(),
-						   indices.end());
+	std::vector<PetscInt> petsc_ind (n_elements);
+	for (unsigned int i=0; i<n_elements; ++i)
+	  petsc_ind[i] = indices[i];
+        const PetscInt * petsc_indices = &petsc_ind[0];
 #endif
 
-	InsertMode mode = INSERT_VALUES;
-	if (add_values)
-	  mode = ADD_VALUES;
+	InsertMode mode = ADD_VALUES;
+	if (!add_values)
+	  mode = INSERT_VALUES;
 	const int ierr
-	  = VecSetValues (vector, indices.size(),
-			  &petsc_indices[0], &values[0],
+	  = VecSetValues (vector, n_elements, petsc_indices, values,
 			  mode);
 	AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
