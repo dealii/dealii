@@ -1,3 +1,16 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//    Author: Toby D. Young, Polish Academy of Sciences, 2009
+//
+//    Copyright (C) 2009 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
 
 #ifndef __deal2__slepc_spectral_transformation_h
 #define __deal2__slepc_spectral_transformation_h
@@ -262,16 +275,17 @@ namespace SLEPcWrappers
     public:
       
                                    /**
-                                    * Standardized data struct to
-                                   * pipe additional data to the
-                                    * solver.
+                                    * Standardized data struct to pipe
+                                    * additional data to the solver.
                                     */
       struct AdditionalData
       {
                                    /**
-                                    * Constructor. Requires two shift parameters
+                                    * Constructor. Requires two shift
+                                    * parameters
                                     */
-	AdditionalData (const double shift_parameter = 0, const double antishift_parameter = 0);
+	AdditionalData (const double shift_parameter     = 0, 
+			const double antishift_parameter = 0);
 
                                    /**
                                     * Shift and antishift parameter.
@@ -284,7 +298,8 @@ namespace SLEPcWrappers
                                    /**
                                     * Constructor.
                                     */
-      TransformationCayley (const double shift, const double antishift);
+      TransformationCayley (const double shift, 
+			    const double antishift);
 
     protected:
 

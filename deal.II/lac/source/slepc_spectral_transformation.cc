@@ -1,3 +1,16 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//    Author: Toby D. Young, Polish Academy of Sciences, 2009
+//
+//    Copyright (C) 2009 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
 
 #include <lac/petsc_matrix_base.h>
 #include <lac/petsc_vector_base.h>
@@ -10,9 +23,6 @@
 
 #ifdef DEAL_II_USE_SLEPC
 
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
-#  include <petscsles.h>
-#endif
 #include <petscversion.h>
 
 DEAL_II_NAMESPACE_OPEN
