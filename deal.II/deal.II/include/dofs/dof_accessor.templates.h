@@ -2301,8 +2301,7 @@ namespace internal
 	                          ->cell_dof_indices_cache[accessor.present_index * n_dofs];
 
 				   // distribute cell vector
-	    global_destination.add(n_dofs, dofs,
-				   &(*const_cast<dealii::Vector<number>*>(&local_source))(0));
+	    global_destination.add(n_dofs, dofs,local_source.begin());
   	  }
 
 

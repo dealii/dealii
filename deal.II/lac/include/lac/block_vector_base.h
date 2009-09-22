@@ -1910,8 +1910,8 @@ template <class VectorType>
 template <typename Number>
 inline
 void
-BlockVectorBase<VectorType> ::add (const std::vector<unsigned int> &indices,
-				   const std::vector<Number>       &values)
+BlockVectorBase<VectorType>::add (const std::vector<unsigned int> &indices,
+				  const std::vector<Number>       &values)
 {
   Assert (indices.size() == values.size(),
 	  ExcDimensionMismatch(indices.size(), values.size()));
@@ -1924,8 +1924,8 @@ template <class VectorType>
 template <typename Number>
 inline
 void
-BlockVectorBase<VectorType> ::add (const std::vector<unsigned int> &indices,
-				   const Vector<Number>            &values)
+BlockVectorBase<VectorType>::add (const std::vector<unsigned int> &indices,
+				  const Vector<Number>            &values)
 {
   Assert (indices.size() == values.size(),
 	  ExcDimensionMismatch(indices.size(), values.size()));
@@ -1940,9 +1940,9 @@ template <class VectorType>
 template <typename Number>
 inline
 void
-BlockVectorBase<VectorType> ::add (const unsigned int  n_indices,
-				   const unsigned int *indices,
-				   const Number       *values)
+BlockVectorBase<VectorType>::add (const unsigned int  n_indices,
+				  const unsigned int *indices,
+				  const Number       *values)
 {
   for (unsigned int i=0; i<n_indices; ++i)
     (*this)(indices[i]) += values[i];
