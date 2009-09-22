@@ -2,7 +2,7 @@
 <h1>Results</h1>
 
 <a name="Re100"></a>
-<h2> $Re = 100$ </h2>
+<h2> Re = 100 </h2>
 
 We run the code with the following <code>parameter-file.prm</code>, which can be found in the
 same directory as the source:
@@ -68,7 +68,7 @@ The contour lines correspond to the pressure, the color to the voriticity and th
 Here we only show a zoom into a region near the obstacle which is, after all, where the interesting things happen.
 
 <a name="Re500"></a>
-<h2> $Re = 500$ </h2>
+<h2> Re = 500 </h2>
 
 Changing the Reynolds number, $Re$, to in the parameter file to a value of $500$ we obtain the following results.
 @image html Re500t0.png
