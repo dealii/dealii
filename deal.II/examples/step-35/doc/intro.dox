@@ -29,9 +29,14 @@ condition, is
 It is possible to prescribe other boundary conditions as well. In the test case that we solve here the boundary
 is partitioned into two disjoint subsets $\partial\Omega = \Gamma_1 \cup \Gamma_2$ and we have
 @f[
-  u|_{\Gamma_1} = u_b, \qquad u\times n|_{\Gamma_2} = 0.
+  u|_{\Gamma_1} = u_b,
 @f]
-where $n$ is the outer unit normal. The boundary condition on $\Gamma_2$ is used to model outflow conditions.
+and
+@f[
+ u\times n|_{\Gamma_2} = 0, \quad p|_{\Gamma_2} = 0
+@f]
+where $n$ is the outer unit normal. The boundary conditions on $\Gamma_2$ are often
+used to model outflow conditions.
 
 In previous tutorial programs (see for instance @ref step_20 "step-20" and
 @ref step_22 "step-22") we have seen
@@ -63,8 +68,7 @@ Let us shortly describe how the projection methods look like in a semi-discrete 
 obtain a sequence of velocities $\{u^k\}$ and pressures $\{p^k\}$. We will
 also obtain a sequence $\{\phi^k\}$ of auxiliary variables.
 Suppose that from the initial conditions, and an application of a first order method we have found
-$(u^0,p^0,\phi^0=0)$ and $(u^1,p^1,\phi^1=p^1-p^0)$. Then the projection method consists of three steps:
-
+$(u^0,p^0,\phi^0=0)$ and $(u^1,p^1,\phi^1=p^1-p^0)$. Then the projection method consists of the following steps:
 <ul>
   <li> <b>Step 0</b>: Extrapolation. Define:
   @f[
@@ -78,18 +82,18 @@ $(u^0,p^0,\phi^0=0)$ and $(u^1,p^1,\phi^1=p^1-p^0)$. Then the projection method 
     -\nu \Delta u^{k+1} + \nabla p^\sharp
     = f^{k+1},
     \quad
-    u^{k+1}|_{\partial\Omega} = 0.
+    u^{k+1}|_{\Gamma_1} = u_b,
+    \quad
+    u^{k+1} \times n|_{\Gamma_2} = 0.
   @f]
-  Note in particular that this formulation completely decouples the velocity
-  components from each other. As a consequence, rather than having to solve a
-  coupled system for all $d$ velocities together, we can solve $d$ independent
-  equations which, conveniently also all share the same system matrix.
 
   <li> <b>Step 2</b>: Projection. Find $\phi^{k+1}$ that solves
   @f[
     \Delta \phi^{k+1} = \frac3{2\tau} \nabla \cdot u^{k+1},
     \quad
-    \partial_n \phi^{k+1} = 0.
+    \partial_n \phi^{k+1}|_{\Gamma_1} = 0,
+    \quad
+    \phi^{k+1}|_{\Gamma_2} = 0
   @f]
   <li> <b>Step 3</b>: Pressure correction. Here we have two options:
     <ul>
@@ -111,17 +115,22 @@ projection methods that we have just described:
   @f[
     u \cdot \nabla u + \frac12 \left( \nabla\cdot u \right) u.
   @f]
-  This is consistent with the continuous equation (because $\nabla\cdot u$,
-  though this is not true pointwise for the discrete solution) and it is needed to guarantee unconditional stability of the
+  This is consistent with the continuous equation (because $\nabla\cdot u = 0$,
+  though this is not true pointwise for the discrete solution) and it is needed to
+  guarantee unconditional stability of the
   time-stepping scheme. Moreover, to linearize the term we use the second order extrapolation $u^\star$ of
   $u^{k+1}$.
   <li> The projection step is a realization of the Helmholtz decomposition
   @f[
-    L^2(\Omega)^d = H \oplus \nabla H^1(\Omega),
+    L^2(\Omega)^d = H \oplus \nabla H^1_{\Gamma_2}(\Omega),
   @f]
   where
   @f[
-    H = \left\{ v \in L^2(\Omega)^d:\  \nabla\cdot v =0, \  v\cdot n|_{\partial\Omega} = 0 \right\}.
+    H = \left\{ v \in L^2(\Omega)^d:\  \nabla\cdot v =0, \  v\cdot n|_{\Gamma_1} = 0 \right\},
+  @f]
+  and
+  @f[
+    H^1_{\Gamma_2}(\Omega) = \left\{ q \in H^1(\Omega):\ q|_{\Gamma_2} = 0 \right\}.
   @f]
   Indeed, if we use this decomposition on $u^{k+1}$ we obtain
   @f[
@@ -132,6 +141,62 @@ projection methods that we have just described:
   one. However, the program below implements both variants. Moreover, in the author's experience,
   the standard form is the one that should be used if, for instance, the viscosity $\nu$ is variable.
 </ul>
+
+
+<a name ="fullydiscrete"></a>
+<h3> The Fully Discrete Setting </h3>
+To obtain a fully discrete setting of the method we, as always, need a variational formulation. There is one
+subtle issue here given the nature of the boundary conditions. When we multiply the equation by a suitable test
+function one of the term that arises is
+@f[
+  -\nu \int_\Omega \Delta u \cdot v.
+@f]
+If we, say, had Dirichlet boundary conditions on the whole boundary then after integration by parts we would
+obtain
+@f[
+  -\nu \int_\Omega \Delta u \cdot v = \nu \int_\Omega \nabla u : \nabla v
+                                    - \int_{\partial\Omega} \partial_n u \cdot v
+                                    = \nu \int_\Omega \nabla u : \nabla v.
+@f]
+One of the advantages of this formulation is that it fully decouples the components of the velocity. Moreover,
+they all share the same system matrix. This can be exploited in the program.
+
+However, given the nonstandard boundary conditions, to be able to take them into account we need to use
+the following identity
+@f[
+  \Delta u = \nabla\nabla\cdot u - \nabla\times\nabla\times u,
+@f]
+so that when we integrate by parts and take into account the boundary conditions we obtain
+@f[
+  -\nu \int_\Omega \Delta u \cdot v = \nu \int_\Omega \left[ \nabla \cdot u \nabla \cdot v
+                                    + \nabla \times u \nabla \times v \right],
+@f]
+which is the form that we would have to use. Notice that this couples the components of the velocity.
+Moreover, to enforce the boundary condition on the pressure, we need to rewrite
+@f[
+  \int_\Omega \nabla p \cdot v = -\int_\Omega p \nabla \cdot v + \int_{\Gamma_1} p v\cdot n
+                                + \int_{\Gamma_2} p v\cdot n
+                               = -\int_\Omega p \nabla \cdot v,
+@f]
+where the boundary integral in $\Gamma_1$ equals zero given the boundary conditions for the velocity,
+and the one in $\Gamma_2$ given the boundary conditions for the pressure.
+
+In the simplified case where the boundary $\Gamma_2$ is parallel to a coordinate axis, which holds for
+the testcase that we carry out below, it can actually be shown that
+@f[
+  \nu \int_\Omega \nabla u : \nabla v = \nu \int_\Omega \left[ \nabla \cdot u \nabla \cdot v
+                                    + \nabla \times u \nabla \times v \right].
+@f]
+This issue is not very often addressed in the literature. For more information the reader can consult, for
+instance,
+<ul>
+  <li> J.-L. GUERMOND, L. QUARTAPELLE, On the approximation of the unsteady Navier-Stokes equations by
+  finite element projection methods, Numer. Math., 80  (1998) 207-238
+  <li> J.-L. GUERMOND, P. MINEV, J. SHEN, Error analysis of pressure-correction schemes for the
+  Navier-Stokes equations with open boundary conditions, SIAM J. Numer. Anal., 43  1 (2005) 239--258.
+</ul>
+
+
 
 <a name = "implementation"></a>
 <h3> Implementation </h3>
@@ -163,8 +228,9 @@ have the inflow boundary condition
   u =
   \left( \begin{array}{c} 4 U_m y (H-y)/H^2 \\ 0 \end{array} \right),
 @f]
-with $U_m = 1.5$, i.e. the inflow boundary conditions correspond to Poiseuille flow for this configuration. Finally, on the right
-vertical wall we impose the condition that the vertical component of the velocity should be zero.
-The Reynolds number is $Re=\frac{1}{\nu}=100$ and the final time $T=10$.
+with $U_m = 1.5$, i.e. the inflow boundary conditions correspond to Poiseuille flow for this configuration.
+Finally, on the right vertical wall we impose the condition that the vertical component of the velocity
+and the pressure should both be zero.
+The final time $T=10$.
 
 
