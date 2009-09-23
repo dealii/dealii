@@ -142,7 +142,7 @@ satisfy in a distributional sense the equation:
 where the derivative is done in the variable $\mathbf{y}$. By using
 the usual Green identities, our problem can be written on the boundary
 $\partial\Omega = \Gamma$ only. We recall the general definition of
-the second Green identity:
+the second Green %identity:
 
 \f[\label{green}
   \int_{\omega}
@@ -168,7 +168,7 @@ $\Omega$, that is, they are in fact <i>inner</i> to the integration
 domain, and some care is required in defining the various integrals
 with the correct signs for the normals.
 
-If we substitute $u$ and $v$ in the Green identity with the solution
+If we substitute $u$ and $v$ in the Green %identity with the solution
 $\phi$ and with the fundamental solution of the Laplace equation
 respectively, as long as $\mathbf{x}$ is chosen in the region
 $\mathbb{R}^n\backslash\Omega$, we obtain:
