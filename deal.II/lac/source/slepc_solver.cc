@@ -149,7 +149,11 @@ namespace SLEPcWrappers
 
   void
   SolverBase::get_eigenpair (const unsigned int         index,
+#ifndef DEAL_II_USE_PETSC_COMPLEX
 			     double                    &kr,
+#else
+			     std::complex<double>      &kr,
+#endif
 			     PETScWrappers::VectorBase &vr)
   {
     AssertThrow (solver_data != 0, ExcSLEPcWrappersUsageError());
