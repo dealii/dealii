@@ -987,15 +987,6 @@ namespace FEValuesViews
       const unsigned int first_tensor_component;
 
 				       /**
-					* The index of the first-order
-					* tensor representation of a
-					* symmetric second-order
-					* tensor, stored as the
-					* components of a tensor
-					*/
-      std::vector < std::vector<unsigned int> > vector_to_symmetric_tensor_data;
-
-				       /**
 					* A structure where for each shape
 					* function we pre-compute a bunch of
 					* data that will make later accesses

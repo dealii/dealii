@@ -304,38 +304,9 @@ namespace FEValuesViews
 	  }
       }
     }
-
-    vector_to_symmetric_tensor_data.resize (dim);
-    for (unsigned int i=0; i<dim; ++i)
-      vector_to_symmetric_tensor_data[i].resize(dim);
-    switch(dim) {
-      case(1):
-	    vector_to_symmetric_tensor_data[0][0] = 0;
-	    break;
-      case(2):
-	    vector_to_symmetric_tensor_data[0][0] = 0;
-	    vector_to_symmetric_tensor_data[1][1] = 1;
-	    vector_to_symmetric_tensor_data[0][1] = 2;
-	    vector_to_symmetric_tensor_data[1][0] = 2;
-	    break;
-      case(3):
-	    vector_to_symmetric_tensor_data[0][0] = 0;
-	    vector_to_symmetric_tensor_data[1][1] = 1;
-	    vector_to_symmetric_tensor_data[2][2] = 2;
-	    vector_to_symmetric_tensor_data[0][1] = 3;
-	    vector_to_symmetric_tensor_data[1][0] = 3;
-	    vector_to_symmetric_tensor_data[0][2] = 4;
-	    vector_to_symmetric_tensor_data[2][0] = 4;
-	    vector_to_symmetric_tensor_data[1][2] = 5;
-	    vector_to_symmetric_tensor_data[2][1] = 5;
-	    break;
-      default:
-	    ;
-    }
-
-
-
   }
+
+
 
   template <int dim, int spacedim>
   SymmetricTensor<2, dim, spacedim>::SymmetricTensor()
@@ -343,6 +314,7 @@ namespace FEValuesViews
 		  fe_values(*static_cast<dealii::FEValuesBase<dim, spacedim>*> (0)),
 		  first_tensor_component(numbers::invalid_unsigned_int)
   {}
+
 
 
   template <int dim, int spacedim>
@@ -1026,7 +998,7 @@ namespace FEValuesViews
 	for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
 	     ++q_point, ++shape_gradient_ptr) {
 	  for (unsigned int j = 0; j < dim; ++j) {
-	    const unsigned int vector_component = vector_to_symmetric_tensor_data[comp][j];
+	    const unsigned int vector_component = value_type::unrolled_index (TableIndices<2>(comp,j));
 	    divergences[q_point][vector_component] += value * (*shape_gradient_ptr)[j];
 	  }
 	}
@@ -1042,7 +1014,7 @@ namespace FEValuesViews
 	    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
 		 ++q_point, ++shape_gradient_ptr) {
 	      for (unsigned int j = 0; j < dim; ++j) {
-		const unsigned int vector_component = vector_to_symmetric_tensor_data[comp][j];
+		const unsigned int vector_component = value_type::unrolled_index (TableIndices<2>(comp,j));
 		divergences[q_point][vector_component] += value * (*shape_gradient_ptr++)[j];
 	      }
 	    }
