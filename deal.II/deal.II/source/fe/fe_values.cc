@@ -233,18 +233,18 @@ namespace FEValuesViews
 		  first_tensor_component(first_tensor_component),
 		  shape_function_data(fe_values.fe->dofs_per_cell)
   {
-    Assert(first_tensor_component + value_type::n_independent_components - 1
+    Assert(first_tensor_component + (dim*dim+dim)/2 - 1
 	   <
 	   fe_values.fe->n_components(),
 	   ExcIndexRange(first_tensor_component +
-			 value_type::n_independent_components - 1,
+			 dealii::SymmetricTensor<2,dim>::n_independent_components - 1,
 			 0,
 			 fe_values.fe->n_components()));
 
     const std::vector<unsigned int> shape_function_to_row_table
       = make_shape_function_to_row_table(*fe_values.fe);
 
-    for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+    for (unsigned int d = 0; d < dealii::SymmetricTensor<2,dim>::n_independent_components; ++d)
       {
 	const unsigned int component = first_tensor_component + d;
 
@@ -286,7 +286,7 @@ namespace FEValuesViews
     for (unsigned int i = 0; i < fe_values.fe->dofs_per_cell; ++i)
       {
 	unsigned int n_nonzero_components = 0;
-	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+	for (unsigned int d = 0; d < dealii::SymmetricTensor<2,dim>::n_independent_components; ++d)
 	  if (shape_function_data[i].is_nonzero_shape_function_component[d]
 	      == true)
 	    ++n_nonzero_components;
@@ -297,7 +297,7 @@ namespace FEValuesViews
 	  shape_function_data[i].single_nonzero_component = -1;
 	else
 	  {
-	    for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+	    for (unsigned int d = 0; d < dealii::SymmetricTensor<2,dim>::n_independent_components; ++d)
 	      if (shape_function_data[i].is_nonzero_shape_function_component[d]
 		  == true)
 		{
@@ -1071,6 +1071,13 @@ namespace internal
 							component);
 	}
 
+				       // compute number of vectors
+				       // that we can fit into
+				       // this finite element. note
+				       // that this is based on the
+				       // dimensionality 'dim' of the
+				       // manifold, not 'spacedim' of
+				       // the output vector
       const unsigned int n_vectors = (fe.n_components() >= dim ?
 				      fe.n_components()-dim+1 :
 				      0);
@@ -1084,9 +1091,11 @@ namespace internal
 							component);
 	}
 
+				       // compute number of symmetric
+				       // tensors in the same way as above
       const unsigned int n_symmetric_second_order_tensors
-	= (fe.n_components() >= (spacedim*spacedim + spacedim)/2 ?
-	   fe.n_components() - (spacedim*spacedim + spacedim)/2 + 1 :
+	= (fe.n_components() >= (dim*dim + dim)/2 ?
+	   fe.n_components() - (dim*dim + dim)/2 + 1 :
 	   0);
       symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
       for (unsigned int component = 0; component < n_symmetric_second_order_tensors; ++component)
