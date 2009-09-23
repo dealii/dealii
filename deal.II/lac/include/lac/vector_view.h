@@ -234,6 +234,21 @@ class VectorView : public Vector<Number>
     virtual void reinit (const unsigned int N,
 			 const bool         fast=false);
     
+				     /** This reinit function is
+					 equivalent to constructing a
+					 new object with the given
+					 size, starting from the
+					 pointer ptr. */
+    void reinit(const unsigned int N, Number * ptr);
+    
+				     /** This reinit function is
+					 equivalent to constructing a
+					 new object with the given
+					 size, starting from the
+					 pointer ptr. The same
+					 considerations made for the
+					 constructor apply here. */
+    void reinit(const unsigned int N, const Number * ptr);
     
 				     /**
 				      * This function is here to prevent
@@ -300,6 +315,26 @@ void VectorView<Number>::reinit(const unsigned int N, const bool fast)
     this->max_vec_size = N;
     if(fast == false)
 	Vector<Number>::operator=(static_cast<Number>(0));
+}
+
+
+template<typename Number>
+inline
+void VectorView<Number>::reinit(const unsigned int new_size, Number * ptr)
+{
+    this->vec_size	= new_size;
+    this->max_vec_size	= new_size;
+    this->val		= ptr;
+}
+
+
+template<typename Number>
+inline
+void VectorView<Number>::reinit(const unsigned int new_size, const Number * ptr) 
+{
+    this->vec_size	= new_size;
+    this->max_vec_size	= new_size;
+    this->val		= const_cast<Number*>(ptr);
 }
 
 

@@ -73,6 +73,9 @@ int main()
   VectorView<double> v4(N, v3.begin());
   deallog << "const Vector View" << std::endl;
   print(v4); 
+
+  v4.reinit(N, v1.begin());
+  v4.reinit(N, v3.begin());
 }
 
   
