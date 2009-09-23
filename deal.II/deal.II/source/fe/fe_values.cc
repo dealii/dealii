@@ -247,63 +247,69 @@ namespace FEValuesViews
 
     for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
       {
-      const unsigned int component = first_tensor_component + d;
+	const unsigned int component = first_tensor_component + d;
 
-      for (unsigned int i = 0; i < fe_values.fe->dofs_per_cell; ++i) {
-	const bool is_primitive = (fe_values.fe->is_primitive() ||
-				   fe_values.fe->is_primitive(i));
+	for (unsigned int i = 0; i < fe_values.fe->dofs_per_cell; ++i)
+	  {
+	    const bool is_primitive = (fe_values.fe->is_primitive() ||
+				       fe_values.fe->is_primitive(i));
 
-	if (is_primitive == true)
-	  shape_function_data[i].is_nonzero_shape_function_component[d]
-	    = (component ==
-	       fe_values.fe->system_to_component_index(i).first);
-	else
-	  shape_function_data[i].is_nonzero_shape_function_component[d]
-	    = (fe_values.fe->get_nonzero_components(i)[component]
-	       == true);
+	    if (is_primitive == true)
+	      shape_function_data[i].is_nonzero_shape_function_component[d]
+		= (component ==
+		   fe_values.fe->system_to_component_index(i).first);
+	    else
+	      shape_function_data[i].is_nonzero_shape_function_component[d]
+		= (fe_values.fe->get_nonzero_components(i)[component]
+		   == true);
 
-	if (shape_function_data[i].is_nonzero_shape_function_component[d]
-	    == true) {
-	  if (is_primitive == true)
-	    shape_function_data[i].row_index[d]
-	      = shape_function_to_row_table[i];
-	  else
-	    shape_function_data[i].row_index[d]
-	      = (shape_function_to_row_table[i]
-		 +
-		 std::count(fe_values.fe->get_nonzero_components(i).begin(),
-                            fe_values.fe->get_nonzero_components(i).begin() +
-                            component,
-                            true));
-	} else
-	  shape_function_data[i].row_index[d]
-	    = numbers::invalid_unsigned_int;
-      }
-    }
-
-    for (unsigned int i = 0; i < fe_values.fe->dofs_per_cell; ++i) {
-      unsigned int n_nonzero_components = 0;
-      for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
-	if (shape_function_data[i].is_nonzero_shape_function_component[d]
-	    == true)
-	  ++n_nonzero_components;
-
-      if (n_nonzero_components == 0)
-	shape_function_data[i].single_nonzero_component = -2;
-      else if (n_nonzero_components > 1)
-	shape_function_data[i].single_nonzero_component = -1;
-      else {
-	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
-	  if (shape_function_data[i].is_nonzero_shape_function_component[d]
-	      == true) {
-	    shape_function_data[i].single_nonzero_component
-	      = shape_function_data[i].row_index[d];
-	    shape_function_data[i].single_nonzero_component_index
-	      = d;
-	    break;
+	    if (shape_function_data[i].is_nonzero_shape_function_component[d]
+		== true)
+	      {
+		if (is_primitive == true)
+		  shape_function_data[i].row_index[d]
+		    = shape_function_to_row_table[i];
+		else
+		  shape_function_data[i].row_index[d]
+		    = (shape_function_to_row_table[i]
+		       +
+		       std::count(fe_values.fe->get_nonzero_components(i).begin(),
+				  fe_values.fe->get_nonzero_components(i).begin() +
+				  component,
+				  true));
+	      }
+	    else
+	      shape_function_data[i].row_index[d]
+		= numbers::invalid_unsigned_int;
 	  }
       }
-    }
+
+    for (unsigned int i = 0; i < fe_values.fe->dofs_per_cell; ++i)
+      {
+	unsigned int n_nonzero_components = 0;
+	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+	  if (shape_function_data[i].is_nonzero_shape_function_component[d]
+	      == true)
+	    ++n_nonzero_components;
+
+	if (n_nonzero_components == 0)
+	  shape_function_data[i].single_nonzero_component = -2;
+	else if (n_nonzero_components > 1)
+	  shape_function_data[i].single_nonzero_component = -1;
+	else
+	  {
+	    for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+	      if (shape_function_data[i].is_nonzero_shape_function_component[d]
+		  == true)
+		{
+		  shape_function_data[i].single_nonzero_component
+		    = shape_function_data[i].row_index[d];
+		  shape_function_data[i].single_nonzero_component_index
+		    = d;
+		  break;
+		}
+	  }
+      }
   }
 
 
@@ -911,42 +917,49 @@ namespace FEValuesViews
     std::vector< base_tensor_type > values_in_vector_form(values.size(), base_tensor_type());
 
     for (unsigned int shape_function = 0;
-	 shape_function < fe_values.fe->dofs_per_cell; ++shape_function) {
-      const int snc = shape_function_data[shape_function].single_nonzero_component;
+	 shape_function < fe_values.fe->dofs_per_cell; ++shape_function)
+      {
+	const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-      if (snc == -2)
-					 // shape function is zero for the
-					 // selected components
-	continue;
+	if (snc == -2)
+					   // shape function is zero for the
+					   // selected components
+	  continue;
 
-      const double value = dof_values(shape_function);
-      if (value == 0.)
-	continue;
+	const double value = dof_values(shape_function);
+	if (value == 0.)
+	  continue;
 
-      if (snc != -1) {
-	const unsigned int comp =
-	  shape_function_data[shape_function].single_nonzero_component_index;
-	const double * shape_value_ptr = &fe_values.shape_values(snc, 0);
-	for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
-	  values_in_vector_form[q_point][comp] += value * *shape_value_ptr++;
-      } else
-	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
-	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d]) {
-	    const double * shape_value_ptr =
-	      &fe_values.shape_values(shape_function_data[shape_function].row_index[d], 0);
+	if (snc != -1)
+	  {
+	    const unsigned int comp =
+	      shape_function_data[shape_function].single_nonzero_component_index;
+	    const double * shape_value_ptr = &fe_values.shape_values(snc, 0);
 	    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
-	      values_in_vector_form[q_point][d] += value * *shape_value_ptr++;
+	      values_in_vector_form[q_point][comp] += value * *shape_value_ptr++;
 	  }
-    }
+	else
+	  {
+	    for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+	      if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+		{
+		  const double * shape_value_ptr =
+		    &fe_values.shape_values(shape_function_data[shape_function].row_index[d], 0);
+		  for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+		    values_in_vector_form[q_point][d] += value * *shape_value_ptr++;
+		}
+	  }
+      }
 				     // copy entries in std::vector to an array as there is no constructor
 				     // for a second order tensor that take a std::vector
     double values_array[value_type::n_independent_components];
-    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point) {
-      for (unsigned int d = 0; d < value_type::n_independent_components; d++)
-	values_array[d] = values_in_vector_form[q_point][d];
+    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+      {
+	for (unsigned int d = 0; d < value_type::n_independent_components; d++)
+	  values_array[d] = values_in_vector_form[q_point][d];
 
-      values[q_point] = dealii::SymmetricTensor<2, dim>(values_array);
-    }
+	values[q_point] = dealii::SymmetricTensor<2, dim>(values_array);
+      }
   }
 
 
@@ -977,49 +990,56 @@ namespace FEValuesViews
     std::fill(divergences.begin(), divergences.end(), divergence_type());
 
     for (unsigned int shape_function = 0;
-	 shape_function < fe_values.fe->dofs_per_cell; ++shape_function) {
-      const int snc = shape_function_data[shape_function].single_nonzero_component;
+	 shape_function < fe_values.fe->dofs_per_cell; ++shape_function)
+      {
+	const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-      if (snc == -2)
-					 // shape function is zero for the
-					 // selected components
-	continue;
+	if (snc == -2)
+					   // shape function is zero for the
+					   // selected components
+	  continue;
 
-      const double value = dof_values(shape_function);
-      if (value == 0.)
-	continue;
+	const double value = dof_values(shape_function);
+	if (value == 0.)
+	  continue;
 
-      if (snc != -1) {
-	const unsigned int comp =
-	  shape_function_data[shape_function].single_nonzero_component_index;
-
-	const Tensor < 1, spacedim> * shape_gradient_ptr =
-	  &fe_values.shape_gradients[snc][0];
-	for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-	     ++q_point, ++shape_gradient_ptr) {
-	  for (unsigned int j = 0; j < dim; ++j) {
-	    const unsigned int vector_component = value_type::unrolled_index (TableIndices<2>(comp,j));
-	    divergences[q_point][vector_component] += value * (*shape_gradient_ptr)[j];
-	  }
-	}
-      } else
-	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
-	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d]) {
+	if (snc != -1)
+	  {
 	    const unsigned int comp =
 	      shape_function_data[shape_function].single_nonzero_component_index;
 
 	    const Tensor < 1, spacedim> * shape_gradient_ptr =
-	      &fe_values.shape_gradients[shape_function_data[shape_function].
-					 row_index[d]][0];
+	      &fe_values.shape_gradients[snc][0];
 	    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
 		 ++q_point, ++shape_gradient_ptr) {
 	      for (unsigned int j = 0; j < dim; ++j) {
 		const unsigned int vector_component = value_type::unrolled_index (TableIndices<2>(comp,j));
-		divergences[q_point][vector_component] += value * (*shape_gradient_ptr++)[j];
+		divergences[q_point][vector_component] += value * (*shape_gradient_ptr)[j];
 	      }
 	    }
 	  }
-    }
+	else
+	  {
+	    for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+	      if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+		{
+		  const unsigned int comp =
+		    shape_function_data[shape_function].single_nonzero_component_index;
+
+		  const Tensor < 1, spacedim> * shape_gradient_ptr =
+		    &fe_values.shape_gradients[shape_function_data[shape_function].
+					       row_index[d]][0];
+		  for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
+		       ++q_point, ++shape_gradient_ptr) {
+		    for (unsigned int j = 0; j < dim; ++j)
+		      {
+			const unsigned int vector_component = value_type::unrolled_index (TableIndices<2>(comp,j));
+			divergences[q_point][vector_component] += value * (*shape_gradient_ptr++)[j];
+		      }
+		  }
+		}
+	  }
+      }
   }
 }
 
@@ -1063,20 +1083,20 @@ namespace internal
 	  new (&vectors[component])
 	    dealii::FEValuesViews::Vector<dim,spacedim>(fe_values,
 							component);
-            }
+	}
 
-            const unsigned int n_symmetric_second_order_tensors = (fe.n_components() >= 0.5*(dim*dim + dim) ?
-                    fe.n_components() - 0.5*(dim*dim + dim) + 1 :
-                    0);
-            symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
-            for (unsigned int component = 0; component < n_symmetric_second_order_tensors; ++component)
-	      {
-		typedef dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim> SymmetricTensorView;
-                symmetric_second_order_tensors[component].SymmetricTensorView::~SymmetricTensorView();
-                new (&symmetric_second_order_tensors[component])
-		  dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim > (fe_values,
-									     component);
-            }
+      const unsigned int n_symmetric_second_order_tensors = (fe.n_components() >= 0.5*(dim*dim + dim) ?
+							     fe.n_components() - 0.5*(dim*dim + dim) + 1 :
+							     0);
+      symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
+      for (unsigned int component = 0; component < n_symmetric_second_order_tensors; ++component)
+	{
+	  typedef dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim> SymmetricTensorView;
+	  symmetric_second_order_tensors[component].SymmetricTensorView::~SymmetricTensorView();
+	  new (&symmetric_second_order_tensors[component])
+	    dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim > (fe_values,
+								       component);
+	}
     }
   }
 }
@@ -1536,8 +1556,8 @@ class FEValuesBase<dim,spacedim>::TriaCellIterator : public FEValuesBase<dim,spa
 template <int dim, int spacedim>
 template <typename CI>
 FEValuesBase<dim,spacedim>::CellIterator<CI>::CellIterator (const CI &cell)
-                :
-                cell(cell)
+		:
+		cell(cell)
 {}
 
 
@@ -1567,7 +1587,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const Vector<double> &in,
-                             Vector<double>       &out) const
+			     Vector<double>       &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1578,7 +1598,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const Vector<float> &in,
-                             Vector<float>       &out) const
+			     Vector<float>       &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1589,7 +1609,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const Vector<long double> &in,
-                             Vector<long double>       &out) const
+			     Vector<long double>       &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1600,7 +1620,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const BlockVector<double> &in,
-                             Vector<double>            &out) const
+			     Vector<double>            &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1611,7 +1631,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const BlockVector<float> &in,
-                             Vector<float>            &out) const
+			     Vector<float>            &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1622,7 +1642,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const BlockVector<long double> &in,
-                             Vector<long double>            &out) const
+			     Vector<long double>            &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1636,7 +1656,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const PETScWrappers::Vector &in,
-                             Vector<PetscScalar>         &out) const
+			     Vector<PetscScalar>         &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1648,7 +1668,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
-                             Vector<PetscScalar>              &out) const
+			     Vector<PetscScalar>              &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1663,7 +1683,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
-                             Vector<TrilinosScalar>         &out) const
+			     Vector<TrilinosScalar>         &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1675,7 +1695,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
-                             Vector<TrilinosScalar>              &out) const
+			     Vector<TrilinosScalar>              &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1687,7 +1707,7 @@ template <typename CI>
 void
 FEValuesBase<dim, spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &in,
-                             Vector<TrilinosScalar>              &out) const
+			     Vector<TrilinosScalar>              &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1699,7 +1719,7 @@ template <typename CI>
 void
 FEValuesBase<dim, spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &in,
-                             Vector<TrilinosScalar>                   &out) const
+			     Vector<TrilinosScalar>                   &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -1724,8 +1744,8 @@ FEValuesBase<dim,spacedim>::TriaCellIterator::message_string
 template <int dim, int spacedim>
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 TriaCellIterator (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
-                :
-                cell(cell)
+		:
+		cell(cell)
 {}
 
 
@@ -1752,7 +1772,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const Vector<double> &,
-                             Vector<double>       &) const
+			     Vector<double>       &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1762,7 +1782,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const Vector<float> &,
-                             Vector<float>       &) const
+			     Vector<float>       &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1772,7 +1792,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const Vector<long double> &,
-                             Vector<long double>       &) const
+			     Vector<long double>       &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1782,7 +1802,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const BlockVector<double> &,
-                             Vector<double>            &) const
+			     Vector<double>            &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1793,7 +1813,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const BlockVector<float> &,
-                             Vector<float>            &) const
+			     Vector<float>            &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1803,7 +1823,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const BlockVector<long double> &,
-                             Vector<long double>            &) const
+			     Vector<long double>            &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1816,7 +1836,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const PETScWrappers::Vector &,
-                             Vector<PetscScalar>         &) const
+			     Vector<PetscScalar>         &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1827,7 +1847,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const PETScWrappers::BlockVector &,
-                             Vector<PetscScalar>              &) const
+			     Vector<PetscScalar>              &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1840,7 +1860,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const TrilinosWrappers::Vector &,
-                             Vector<TrilinosScalar>         &) const
+			     Vector<TrilinosScalar>         &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1851,7 +1871,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const TrilinosWrappers::BlockVector &,
-                             Vector<TrilinosScalar>              &) const
+			     Vector<TrilinosScalar>              &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1862,7 +1882,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim, spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &,
-                             Vector<TrilinosScalar>              &) const
+			     Vector<TrilinosScalar>              &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1873,7 +1893,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &,
-                             Vector<TrilinosScalar>                   &) const
+			     Vector<TrilinosScalar>                   &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -1921,7 +1941,7 @@ FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_p
 
   if (flags & update_gradients)
     this->shape_gradients.resize (n_nonzero_shape_components,
-                                  std::vector<Tensor<1,spacedim> > (n_quadrature_points));
+				  std::vector<Tensor<1,spacedim> > (n_quadrature_points));
 
   if (flags & update_hessians)
     this->shape_hessians.resize (n_nonzero_shape_components,
@@ -3634,25 +3654,25 @@ FEValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_it
 
   typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
- 	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
+	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
 	  typename FEVB::ExcFEDontMatch());
 
   check_cell_similarity(cell);
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename DoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit ();
 }
 
@@ -3673,20 +3693,20 @@ FEValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cel
 
   check_cell_similarity(cell);
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename hp::DoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit ();
 }
 
@@ -3730,20 +3750,20 @@ FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_
 
   check_cell_similarity(cell);
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename MGDoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit ();
 }
 
@@ -3752,22 +3772,22 @@ FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_
 template <int dim, int spacedim>
 void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
 {
-                                   // no FE in this cell, so no assertion
-                                   // necessary here
+				   // no FE in this cell, so no assertion
+				   // necessary here
   check_cell_similarity(cell);
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit ();
 }
 
@@ -3826,7 +3846,7 @@ FEFaceValuesBase<dim,spacedim>::FEFaceValuesBase (const unsigned int n_q_points,
 					    update_default,
 					    mapping,
 					    fe),
-                quadrature(quadrature)
+		quadrature(quadrature)
 {}
 
 
@@ -3941,20 +3961,20 @@ void FEFaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename DoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit (face_no);
 }
 
@@ -3977,20 +3997,20 @@ void FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,space
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename hp::DoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit (face_no);
 }
 
@@ -4033,20 +4053,20 @@ void FEFaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedi
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename MGDoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit (face_no);
 }
 
@@ -4058,19 +4078,19 @@ void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spaced
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit (face_no);
 }
 
@@ -4201,24 +4221,24 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spaced
 	  ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
 
   Assert (cell->has_children() == false,
-          ExcMessage ("You can't use subface data for cells that are "
-                      "already refined. Iterate over their children "
-                      "instead in these cases."));
+	  ExcMessage ("You can't use subface data for cells that are "
+		      "already refined. Iterate over their children "
+		      "instead in these cases."));
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename DoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit (face_no, subface_no);
 }
 
@@ -4243,24 +4263,24 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,sp
   Assert (subface_no < cell->face(face_no)->number_of_children(),
 	  ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
   Assert (cell->has_children() == false,
-          ExcMessage ("You can't use subface data for cells that are "
-                      "already refined. Iterate over their children "
-                      "instead in these cases."));
+	  ExcMessage ("You can't use subface data for cells that are "
+		      "already refined. Iterate over their children "
+		      "instead in these cases."));
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename hp::DoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit (face_no, subface_no);
 }
 
@@ -4279,24 +4299,24 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spac
   Assert (subface_no < cell->face(face_no)->number_of_children(),
 	  ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
   Assert (cell->has_children() == false,
-          ExcMessage ("You can't use subface data for cells that are "
-                      "already refined. Iterate over their children "
-                      "instead in these cases."));
+	  ExcMessage ("You can't use subface data for cells that are "
+		      "already refined. Iterate over their children "
+		      "instead in these cases."));
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename MGDoFHandler<dim,spacedim>::cell_iterator> (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit (face_no, subface_no);
 }
 
@@ -4312,19 +4332,19 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spa
   Assert (subface_no < cell->face(face_no)->n_children(),
 	  ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
 
-                                   // set new cell. auto_ptr will take
-                                   // care that old object gets
-                                   // destroyed and also that this
-                                   // object gets destroyed in the
-                                   // destruction of this class
+				   // set new cell. auto_ptr will take
+				   // care that old object gets
+				   // destroyed and also that this
+				   // object gets destroyed in the
+				   // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
 
-                                   // this was the part of the work
-                                   // that is dependent on the actual
-                                   // data type of the iterator. now
-                                   // pass on to the function doing
-                                   // the real work.
+				   // this was the part of the work
+				   // that is dependent on the actual
+				   // data type of the iterator. now
+				   // pass on to the function doing
+				   // the real work.
   do_reinit (face_no, subface_no);
 }
 
@@ -4332,7 +4352,7 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spa
 
 template <int dim, int spacedim>
 void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
-                                               const unsigned int subface_no)
+					       const unsigned int subface_no)
 {
 				   // first of all, set the present_face_index
 				   // (if available)
@@ -4406,7 +4426,7 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
 				   // now ask the mapping and the finite element
 				   // to do the actual work
   this->get_mapping().fill_fe_subface_values(*this->present_cell,
-                                             face_no, subface_no,
+					     face_no, subface_no,
 					     this->quadrature,
 					     *this->mapping_data,
 					     this->quadrature_points,
@@ -4416,7 +4436,7 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
 
   this->get_fe().fill_fe_subface_values(this->get_mapping(),
 					*this->present_cell,
-                                        face_no, subface_no,
+					face_no, subface_no,
 					this->quadrature,
 					*this->mapping_data,
 					*this->fe_data,
