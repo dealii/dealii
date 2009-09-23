@@ -181,7 +181,7 @@ Moreover, to enforce the boundary condition on the pressure, we need to rewrite
 where the boundary integral in $\Gamma_1$ equals zero given the boundary conditions for the velocity,
 and the one in $\Gamma_2$ given the boundary conditions for the pressure.
 
-In the simplified case where the boundary $\Gamma_2$ is parallel to a coordinate axis, which holds for
+In the simplified case where the boundary $\Gamma_2$ is %parallel to a coordinate axis, which holds for
 the testcase that we carry out below, it can actually be shown that
 @f[
   \nu \int_\Omega \nabla u : \nabla v = \nu \int_\Omega \left[ \nabla \cdot u \nabla \cdot v
