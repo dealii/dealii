@@ -987,13 +987,6 @@ namespace FEValuesViews
       const unsigned int first_tensor_component;
 
 				       /**
-					* The number of unique
-					* components of a symmetric
-					* second-order tensor
-					*/
-      static const unsigned int n_independent_components = (dim*dim + dim)/2;
-
-				       /**
 					* The index of the first-order
 					* tensor representation of a
 					* symmetric second-order
@@ -1025,7 +1018,7 @@ namespace FEValuesViews
 					    * (e.g. for RT elements it depends
 					    * on the shape of a cell).
 					    */
-	  bool is_nonzero_shape_function_component[n_independent_components];
+	  bool is_nonzero_shape_function_component[value_type::n_independent_components];
 
 					   /**
 					    * For each pair (shape function,
@@ -1043,7 +1036,7 @@ namespace FEValuesViews
 					    * harder to compute this
 					    * information.
 					    */
-	  unsigned int row_index[n_independent_components];
+	  unsigned int row_index[value_type::n_independent_components];
 
 					   /**
 					    * For each shape function say the

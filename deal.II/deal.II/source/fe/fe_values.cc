@@ -234,14 +234,19 @@ namespace FEValuesViews
 		  shape_function_data(fe_values.fe->dofs_per_cell)
   {
 
-    Assert(first_tensor_component + n_independent_components - 1 < fe_values.fe->n_components(),
-	   ExcIndexRange(first_tensor_component + n_independent_components - 1, 0,
+    Assert(first_tensor_component + value_type::n_independent_components - 1
+	   <
+	   fe_values.fe->n_components(),
+	   ExcIndexRange(first_tensor_component +
+			 value_type::n_independent_components - 1,
+			 0,
 			 fe_values.fe->n_components()));
 
     const std::vector<unsigned int> shape_function_to_row_table
       = make_shape_function_to_row_table(*fe_values.fe);
 
-    for (unsigned int d = 0; d < n_independent_components; ++d) {
+    for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+      {
       const unsigned int component = first_tensor_component + d;
 
       for (unsigned int i = 0; i < fe_values.fe->dofs_per_cell; ++i) {
@@ -278,7 +283,7 @@ namespace FEValuesViews
 
     for (unsigned int i = 0; i < fe_values.fe->dofs_per_cell; ++i) {
       unsigned int n_nonzero_components = 0;
-      for (unsigned int d = 0; d < n_independent_components; ++d)
+      for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
 	if (shape_function_data[i].is_nonzero_shape_function_component[d]
 	    == true)
 	  ++n_nonzero_components;
@@ -288,7 +293,7 @@ namespace FEValuesViews
       else if (n_nonzero_components > 1)
 	shape_function_data[i].single_nonzero_component = -1;
       else {
-	for (unsigned int d = 0; d < n_independent_components; ++d)
+	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
 	  if (shape_function_data[i].is_nonzero_shape_function_component[d]
 	      == true) {
 	    shape_function_data[i].single_nonzero_component
@@ -929,7 +934,7 @@ namespace FEValuesViews
 				     // second order tensor stored as
 				     // a vector (i.e. a first-order
 				     // tensor)
-    typedef Tensor<1, n_independent_components> base_tensor_type;
+    typedef Tensor<1, value_type::n_independent_components> base_tensor_type;
 
     std::vector< base_tensor_type > values_in_vector_form(values.size(), base_tensor_type());
 
@@ -953,7 +958,7 @@ namespace FEValuesViews
 	for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
 	  values_in_vector_form[q_point][comp] += value * *shape_value_ptr++;
       } else
-	for (unsigned int d = 0; d < n_independent_components; ++d)
+	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
 	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d]) {
 	    const double * shape_value_ptr =
 	      &fe_values.shape_values(shape_function_data[shape_function].row_index[d], 0);
@@ -963,9 +968,9 @@ namespace FEValuesViews
     }
 				     // copy entries in std::vector to an array as there is no constructor
 				     // for a second order tensor that take a std::vector
-    double values_array[n_independent_components];
+    double values_array[value_type::n_independent_components];
     for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point) {
-      for (unsigned int d = 0; d < n_independent_components; d++)
+      for (unsigned int d = 0; d < value_type::n_independent_components; d++)
 	values_array[d] = values_in_vector_form[q_point][d];
 
       values[q_point] = dealii::SymmetricTensor<2, dim>(values_array);
@@ -1026,7 +1031,7 @@ namespace FEValuesViews
 	  }
 	}
       } else
-	for (unsigned int d = 0; d < n_independent_components; ++d)
+	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
 	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d]) {
 	    const unsigned int comp =
 	      shape_function_data[shape_function].single_nonzero_component_index;
