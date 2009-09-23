@@ -233,7 +233,6 @@ namespace FEValuesViews
 		  first_tensor_component(first_tensor_component),
 		  shape_function_data(fe_values.fe->dofs_per_cell)
   {
-
     Assert(first_tensor_component + value_type::n_independent_components - 1
 	   <
 	   fe_values.fe->n_components(),
@@ -1085,9 +1084,10 @@ namespace internal
 							component);
 	}
 
-      const unsigned int n_symmetric_second_order_tensors = (fe.n_components() >= 0.5*(dim*dim + dim) ?
-							     fe.n_components() - 0.5*(dim*dim + dim) + 1 :
-							     0);
+      const unsigned int n_symmetric_second_order_tensors
+	= (fe.n_components() >= (spacedim*spacedim + spacedim)/2 ?
+	   fe.n_components() - (spacedim*spacedim + spacedim)/2 + 1 :
+	   0);
       symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
       for (unsigned int component = 0; component < n_symmetric_second_order_tensors; ++component)
 	{
