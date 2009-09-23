@@ -58,7 +58,7 @@ template <int dim, int spacedim=dim> class FEValuesBase;
  * element. There are extractors for single scalar components,
  * vector components consisting of <code>dim</code> elements,
  * and second order symmetric tensors consisting
- * of <code>(dim*dim + dim)/2<code> components
+ * of <code>(dim*dim + dim)/2</code> components
  *
  * See the description of the @ref vector_valued module for examples how to
  * use the features of this namespace.
