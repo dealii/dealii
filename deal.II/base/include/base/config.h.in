@@ -235,6 +235,10 @@
 /* Defined if a PETSc installation was found and is going to be used */
 #undef DEAL_II_USE_PETSC
 
+/* Defined if a PETSc installation with complex scalar type was found 
+   and is going to be used */
+#undef DEAL_II_USE_PETSC_COMPLEX
+
 /* Defined if a SLEPc installation was found and is going to be used */
 #undef DEAL_II_USE_SLEPC
 

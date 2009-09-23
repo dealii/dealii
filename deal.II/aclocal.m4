@@ -5701,6 +5701,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     DEAL_II_CONFIGURE_PETSC_VERSION
     DEAL_II_CONFIGURE_PETSC_ARCH
     DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
+    DEAL_II_CONFIGURE_PETSC_COMPLEX
 
     DEAL_II_EXPAND_PETSC_VECTOR="PETScWrappers::Vector"
     DEAL_II_EXPAND_PETSC_BLOCKVECTOR="PETScWrappers::BlockVector"
@@ -5760,16 +5761,18 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
       2.2*)
         if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
              ; then
+
           dnl Check whether PETSc is installed but someone has simply
           dnl forgotten to also compile for C++
           if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
+               -o -d $DEAL_II_PETSC_DIR/lib/libg_complex/$DEAL_II_PETSC_ARCH \
              ; then
-            AC_MSG_ERROR([PETSc has not been compiled for C++, but
-                          deal.II needs this])
+            AC_MSG_ERROR([PETSc has not been compiled for C++ with scalar type real, 
+                  but deal.II needs this for this PETSc version] $PETSC_VERSION)
           else
             AC_MSG_ERROR([PETSc has not been compiled for the architecture
                           specified with --with-petsc-arch])
-          fi
+          fi 
         fi
         ;;
 
@@ -5841,14 +5844,72 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
     DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.a" ;
   else if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a ; then
     DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a" ;
+  else if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a ; then
+    DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a" ;
   else if test -f $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.so ; then
     DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.so" ;
   else if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.so ; then
     DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.so" ;
-  fi fi fi fi
+  else if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.so ; then
+    DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.so" ;
+  fi fi fi fi fi fi
 
-  AC_MSG_RESULT($DEAL_II_PETSC_MPIUNI_LIB)
+  if test "$DEAL_II_PETSC_MPIUNI_LIB" = "" ; then
+     AC_MSG_RESULT(not found)
+  else
+     AC_MSG_RESULT($DEAL_II_PETSC_MPIUNI_LIB)
+  fi 
 ])
+
+
+dnl ------------------------------------------------------------
+dnl Figure out PETSc was compiled with scalar-type = complex.
+dnl To do this we need to scan the PETSc configuration file.
+dnl
+dnl Usage: DEAL_II_CONFIGURE_PETSC_COMPLEX
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_PETSC_COMPLEX, dnl
+[
+  AC_MSG_CHECKING(for PETSc scalar complex)
+
+  case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
+    2.*)
+      dnl This should never happen, so we ignore the test
+      DEAL_II_PETSC_COMPLEX="-1"
+    ;;
+    3.*)
+      DEAL_II_PETSC_COMPLEX=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h \
+                               | grep "#define PETSC_USE_COMPLEX" \
+                               | perl -pi -e 's/.*COMPLEX\s+//g;'`      
+    ;;
+    *)
+      AC_MSG_ERROR([Unknown PETSc version])
+    ;;
+  esac
+
+  if test "$DEAL_II_PETSC_COMPLEX" = "1" ; then
+     AC_MSG_RESULT(yes)
+
+  dnl If the check for complex scalar is ignored, say so and why
+  else if test "$DEAL_II_PETSC_COMPLEX" = "-1" ; then
+     AC_MSG_RESULT(ignored test. complex not supported)
+
+  dnl Here "not found" means not found!
+  else
+     AC_MSG_RESULT(not found)
+  fi fi
+
+  dnl If we have previously found PETSc and here with a complex 
+  dnl scalar type then set the DEAL_II_USE_COMPLEX macro
+  if test "$USE_CONTRIB_PETSC" = "yes" ; then
+    if test "$DEAL_II_PETSC_COMPLEX" = "1" ; then
+      AC_DEFINE(DEAL_II_USE_PETSC_COMPLEX, 1,
+                [Defined if a PETSc installation was found with complex
+                 scalar type and is going to be used])
+  fi fi
+])
+
 
 
 dnl ------------------------------------------------------------
