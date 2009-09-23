@@ -257,7 +257,7 @@ void TestPointValueHistory<dim>::run()
 
 
 
-int main(int argc, char **argv)
+int main()
 {
     std::ofstream logfile("point_value_history_01/output");
     logfile << std::setprecision(2);
