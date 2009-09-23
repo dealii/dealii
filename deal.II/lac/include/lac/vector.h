@@ -972,6 +972,8 @@ class Vector : public Subscriptor
 /*----------------------- Inline functions ----------------------------------*/
 
 
+#ifndef DOXYGEN
+
 
 template <typename Number>
 inline
@@ -1296,11 +1298,11 @@ Vector<Number>::scale (const Number factor)
 
 
 template <typename Number>
-template <typename Number2>
+template <typename OtherNumber>
 inline
 void
 Vector<Number>::add (const std::vector<unsigned int> &indices,
-		     const std::vector<Number2>      &values)
+		     const std::vector<OtherNumber>  &values)
 {
   Assert (indices.size() == values.size(),
 	  ExcDimensionMismatch(indices.size(), values.size()));
@@ -1310,11 +1312,11 @@ Vector<Number>::add (const std::vector<unsigned int> &indices,
 
 
 template <typename Number>
-template <typename Number2>
+template <typename OtherNumber>
 inline
 void
 Vector<Number>::add (const std::vector<unsigned int> &indices,
-		     const Vector<Number2>           &values)
+		     const Vector<OtherNumber>       &values)
 {
   Assert (indices.size() == values.size(),
 	  ExcDimensionMismatch(indices.size(), values.size()));
@@ -1324,12 +1326,12 @@ Vector<Number>::add (const std::vector<unsigned int> &indices,
 
 
 template <typename Number>
-template <typename Number2>
+template <typename OtherNumber>
 inline
 void
 Vector<Number>::add (const unsigned int  n_indices,
 		     const unsigned int *indices,
-		     const Number2      *values)
+		     const OtherNumber  *values)
 {
   for (unsigned int i=0; i<n_indices; ++i)
     {
@@ -1423,6 +1425,8 @@ Vector<Number>::swap (Vector<Number> &v)
 }
 
 
+
+#endif
 
 
 /*! @addtogroup Vectors

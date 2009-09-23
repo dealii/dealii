@@ -8,8 +8,8 @@
 
 This example shows how to implement a matrix-free method, that is, a method
 that does not explicitly store the matrix elements, for a
-second-order Poisson equation with variable coefficients on an unstructured
-mesh.
+second-order Poisson equation with variable coefficients on a rather 
+unstructured mesh representing a circle.
 
 <h3>Matrix-vector product implementation</h3>
 
@@ -195,7 +195,7 @@ elements as there are degrees of freedom on the actual cell to compute. The
 multiplication itself is then done by two nested loops, which means that it
 is much cheaper.
 
-A naive way to improve this is to realize that we actually build the local
+One way to improve this is to realize that we actually build the local
 matrix by a product of three matrices,
 @f{eqnarray*}
 A_\mathrm{cell} = B D B^T.
@@ -258,9 +258,9 @@ weight. The third loop applies the second gradient (in transposed form), so
 that we get back to a vector of (Laplacian) values on the cell dofs.
 
 This improves the situation a lot and reduced the complexity of the product
-from something like $\mathcal {O}(\mathrm{dofs_per_cell}^3)$ to $\mathcal
-{O}(\mathrm{dofs_per_cell}^2)$. In fact, all the remainder is just to make a
-slightly more clever use of data in order to gain some extra speed. It does
+from something like $\mathcal {O}(\mathrm{dofs\_per\_cell}^3)$ to $\mathcal
+{O}(\mathrm{dofs\_per\_cell}^2)$. In fact, all the remainder is just to make
+a slightly more clever use of data in order to gain some extra speed. It does
 not change the code structure, though.
 
 If one would implement the code above, one would soon realize that the
