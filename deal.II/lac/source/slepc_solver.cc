@@ -187,10 +187,14 @@ namespace SLEPcWrappers
 
   int
   SolverBase::convergence_test (EPS                 /*eps*/,
-                                const int           iteration,
-                                const PetscScalar   residual_norm,
-                                EPSConvergedReason *reason,
-                                void               *solver_control_x)
+#ifdef PETSC_USE_64BIT_INDICES
+				const PetscInt      iteration,
+#else
+				const int           iteration,
+#endif
+				const PetscReal     residual_norm,
+				EPSConvergedReason *reason,
+				void               *solver_control_x)
   {
     SolverControl &solver_control
       = *reinterpret_cast<SolverControl*>(solver_control_x);

@@ -318,8 +318,12 @@ namespace SLEPcWrappers
       static
 	int
 	convergence_test (EPS                 eps,
+#ifdef PETSC_USE_64BIT_INDICES
+			  const PetscInt      iteration,
+#else
 			  const int           iteration,
-			  const PetscScalar   residual_norm,
+#endif
+			  const PetscReal     residual_norm,
 			  EPSConvergedReason *reason,
 			  void               *solver_control);
 
@@ -523,6 +527,7 @@ namespace SLEPcWrappers
       
       if (n_converged > n_eigenvectors)
 	n_converged = n_eigenvectors;
+      AssertThrow (n_converged == n_eigenvectors, ExcSLEPcWrappersUsageError());
       
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
       vr.resize (n_converged, vr.front());
@@ -548,10 +553,7 @@ namespace SLEPcWrappers
       
       if (n_converged > n_eigenvectors)
 	n_converged = n_eigenvectors;
-
-      // TODO: Fix this properly
-      if (n_converged < n_eigenvectors)
-	{}
+      AssertThrow (n_converged == n_eigenvectors, ExcSLEPcWrappersUsageError());
       
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
       vr.resize (n_converged, vr.front());

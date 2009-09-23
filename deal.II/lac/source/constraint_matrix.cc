@@ -2147,10 +2147,12 @@ VECTOR_FUNCTIONS(BlockVector<float>);
 // use them. The key is to use local ranges etc., which still needs to be
 // implemented.
 #ifdef DEAL_II_USE_PETSC
+#ifndef DEAL_II_USE_PETSC_COMPLEX
 VECTOR_FUNCTIONS(PETScWrappers::Vector);
 VECTOR_FUNCTIONS(PETScWrappers::BlockVector);
 VECTOR_FUNCTIONS(PETScWrappers::MPI::Vector);
 VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockVector);
+#endif
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS

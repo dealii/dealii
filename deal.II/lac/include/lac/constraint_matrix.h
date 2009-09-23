@@ -13,6 +13,7 @@
 #ifndef __deal2__constraint_matrix_h
 #define __deal2__constraint_matrix_h
 
+#include <complex>
 
 #include <base/config.h>
 #include <base/exceptions.h>
