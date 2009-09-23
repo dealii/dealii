@@ -647,6 +647,13 @@ will be <code>Triangulation@<2,3@></code>, and correspondingly we will use
 <code>DoFHandler@<2,3@></code> as the DoF handler class and
 <code>FE_Q@<2,3@></code> for finite elements.
 
+Some further details on what one can do with things that live on
+curved manifolds can be found in the report
+<a target="_top"
+href="../../reports/codimension-one/desimone-heltai-manigrasso.pdf"><i>Tools
+for the Solution of PDEs Defined on Curved Manifolds with the deal.II
+Library</i> by A. DeSimone, L. Heltai, C. Manigrasso</a>.
+
 
 <h3>Testcase</h3>
 
