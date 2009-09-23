@@ -300,6 +300,9 @@ namespace FEValuesViews
       }
     }
 
+    vector_to_symmetric_tensor_data.resize (dim);
+    for (unsigned int i=0; i<dim; ++i)
+      vector_to_symmetric_tensor_data[i].resize(dim);
     switch(dim) {
       case(1):
 	    vector_to_symmetric_tensor_data[0][0] = 0;
@@ -307,8 +310,8 @@ namespace FEValuesViews
       case(2):
 	    vector_to_symmetric_tensor_data[0][0] = 0;
 	    vector_to_symmetric_tensor_data[1][1] = 1;
-	    vector_to_symmetric_tensor_data[1][2] = 2;
-	    vector_to_symmetric_tensor_data[2][1] = 2;
+	    vector_to_symmetric_tensor_data[0][1] = 2;
+	    vector_to_symmetric_tensor_data[1][0] = 2;
 	    break;
       case(3):
 	    vector_to_symmetric_tensor_data[0][0] = 0;
