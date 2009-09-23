@@ -1009,7 +1009,7 @@ template <int dim>
 void NavierStokesProjection<dim>::projection_step (const bool reinit_prec)
 {
   pres_iterative.copy_from (pres_Laplace);
-  
+
   pres_tmp = 0.;
   for (unsigned d=0; d<dim; ++d)
     pres_Diff[d].Tvmult_add (pres_tmp, u_n[d]);
@@ -1046,7 +1046,7 @@ void NavierStokesProjection<dim>::projection_step (const bool reinit_prec)
 				 // @f]
 				 // or the rotational form, which is
 				 // @f[
-				 //      p^{n+1} = p^n + \phi^{n+1} - \fraC{1}{Re} \nabla\cdot u^{n+1}.
+				 //      p^{n+1} = p^n + \phi^{n+1} - \frac{1}{Re} \nabla\cdot u^{n+1}.
 				 // @f]
 template <int dim>
 void NavierStokesProjection<dim>::update_pressure (const bool reinit_prec)
