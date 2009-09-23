@@ -84,6 +84,21 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
+   New: A report has been added on the
+   <a href="../../reports/codimension-one/desimone-heltai-manigrasso.pdf"
+   target="body">codimension one</a> capabilities
+   of the library (by Antonio DeSimone, Luca Heltai
+   and Cataldo Manigrasso, SISSA, Trieste, Italy). It
+   explains in detail how to use the
+   library for the solution of problems defined on codimension
+   one manifolds, such as, for example, Boundary Element Methods.
+   <br>
+   (Luca Heltai, 2009/09/23)
+   </p>
+   </li>
+
+   <li>
+   <p>
    New: The configure switch <code>--with-cpu=...</code> now allows the value
    <code>native</code>, indicating that we would like the compiler to figure
    out which CPU we are running on and optimize for it. The resulting
@@ -200,13 +215,19 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li><p>New: SymmetricTensor::unrolled_index() returns the index of an element of
+  a symmetric tensor within an unrolled vector.
+  <br>
+  (WB 2009/09/23)
+  </p></li>
+
 
   <li><p>New: classes NamedData and NamedSelection provide an interface to store and
   retrieve data objects with name identifiers.
   <br>
   (GK 2009/09/13)
   </p></li>
-  
+
   <li>
   <p>
   New: The Utilities::System::job_supports_mpi() can be used to query whether
@@ -432,13 +453,13 @@ inconvenience this causes.
   <br>
   (GK 2009/09/13)
   </p>
-  </li>  
+  </li>
 
   <li><p>Improved: MGDoFHandler now also has a typedef for MGDoFHandler::Container
   <br>
   (GK 2009/09/13)
   </p>
-  </li>  
+  </li>
 
   <li><p> FETools::compute_block_renumbering() can nor return block sizes instead of
   start indices.
