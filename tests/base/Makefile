@@ -14,7 +14,7 @@ debug-mode = on
 libraries += $(lib-lac.g)  \
              $(lib-base.g)
 
-default: run-tests 
+default: run-tests
 
 ############################################################
 
@@ -62,6 +62,7 @@ task_%/output : task_%/exe
 ############################################################
 tests_x =  geometry_info_* \
 	   logtest \
+	   logstream_end \
 	   log_* \
 	   reference \
 	   quadrature_* qprojector \

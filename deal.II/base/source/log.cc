@@ -32,7 +32,7 @@
 // on SunOS 4.x, getrusage is stated in the man pages and exists, but
 // is not declared in resource.h. declare it ourselves
 #ifdef NO_HAVE_GETRUSAGE
-extern "C" { 
+extern "C" {
   int getrusage(int who, struct rusage* ru);
 }
 #endif
@@ -41,7 +41,7 @@ extern "C" {
 // another thread tries to do the same.
 DEAL_II_NAMESPACE_OPEN
 
-namespace 
+namespace
 {
   Threads::ThreadMutex log_lock;
   Threads::ThreadMutex write_lock;
@@ -65,6 +65,20 @@ LogStream::LogStream()
 
 LogStream::~LogStream()
 {
+				   // if there was anything left in
+				   // the stream that is current to
+				   // this thread, make sure we flush
+				   // it before it gets lost
+  {
+    const unsigned int id = Threads::this_thread_id();
+    if ((outstreams.find(id) != outstreams.end())
+	&&
+	(*outstreams[id] != 0)
+	&&
+	(outstreams[id]->str().length() > 0))
+      *this << std::endl;
+  }
+
   if (old_cerr)
     std::cerr.rdbuf(old_cerr);
 
@@ -80,7 +94,7 @@ LogStream::~LogStream()
 				   // deliberate memory leak and
 				   // instead destroying an empty
 				   // object
-#ifdef DEAL_II_USE_TRILINOS  
+#ifdef DEAL_II_USE_TRILINOS
   if (this == &deallog)
     (new stream_map_type())->swap (outstreams);
 #endif
@@ -105,10 +119,10 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream&))
       std::ostringstream& stream = get_stream();
       if (prefixes.size() <= std_depth)
 	*std_out << stream.str();
-      
+
       if (file && (prefixes.size() <= file_depth))
 	*file << stream.str() << std::flush;
-      
+
 				       // Start a new string
       stream.str("");
     }
@@ -120,14 +134,14 @@ std::ostringstream&
 LogStream::get_stream()
 {
   Threads::ThreadMutex::ScopedLock lock(log_lock);
-  unsigned int id = Threads::this_thread_id();
+  const unsigned int id = Threads::this_thread_id();
 
   std_cxx1x::shared_ptr<std::ostringstream>& sptr = outstreams[id];
   if (sptr == 0)
     {
       sptr = std_cxx1x::shared_ptr<std::ostringstream> (new std::ostringstream());
       sptr->setf(std::ios::showpoint | std::ios::left);
-    } 
+    }
   return *sptr;
 }
 
@@ -300,10 +314,10 @@ LogStream::print_line_head()
  * When we have more information about the kernel, this should be
  * incorporated properly. Suggestions are welcome!
  */
-  
+
 #ifdef DEALII_MEMORY_DEBUG
   static const pid_t id = getpid();
-  
+
   std::ostringstream statname;
   statname << "/proc/" << id << "/stat";
 
@@ -316,10 +330,10 @@ LogStream::print_line_head()
     dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
     dummy >> dummy >> dummy >> dummy >> dummy >> size;
 #endif
-  
+
   const std::string& head = get_prefix();
   const unsigned int thread = Threads::this_thread_id();
-  
+
   if (prefixes.size() <= std_depth)
     {
       if (print_utime)
@@ -333,10 +347,10 @@ LogStream::print_line_head()
 	}
       if (print_thread_id)
 	*std_out << '[' << thread << ']';
-      
+
       *std_out <<  head << ':';
     }
-  
+
   if (file && (prefixes.size() <= file_depth))
     {
       if (print_utime)
@@ -347,10 +361,10 @@ LogStream::print_line_head()
 	  *file << size << ':';
 #endif
 	  file->width(p);
-	}  
+	}
       if (print_thread_id)
 	*file << '[' << thread << ']';
-      
+
       *file << head << ':';
     }
 }
@@ -370,7 +384,7 @@ LogStream::memory_consumption () const
       mem += MemoryConsumption::memory_consumption (tmp.top());
       tmp.pop ();
     };
-  
+
   return mem;
 }
 
