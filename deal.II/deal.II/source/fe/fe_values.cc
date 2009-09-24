@@ -4486,10 +4486,22 @@ CellIterator<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
 // template class FEFaceValues<deal_II_dimension,deal_II_dimension+1>;
 // template class FESubfaceValues<deal_II_dimension,deal_II_dimension+1>;
 // #endif
-
-
-
 #endif
+
+
+namespace FEValuesViews
+{
+  template class Scalar<deal_II_dimension, deal_II_dimension>;
+  template class Vector<deal_II_dimension, deal_II_dimension>;
+  template class SymmetricTensor<2, deal_II_dimension, deal_II_dimension>;
+
+#if deal_II_dimension != 3
+  template class Scalar<deal_II_dimension, deal_II_dimension+1>;
+  template class Vector<deal_II_dimension, deal_II_dimension+1>;
+  template class SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>;
+#endif
+}
+
 
 //---------------------------------------------------------------------------
 // Instantiations are in a different file using the macro IN for the vector type.
