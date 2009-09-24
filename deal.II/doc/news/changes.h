@@ -231,8 +231,9 @@ inconvenience this causes.
   </p>
   </li>
 
-  <li><p>New: SymmetricTensor::unrolled_index() returns the index of an element of
-  a symmetric tensor within an unrolled vector.
+  <li><p>New: SymmetricTensor::component_to_unrolled_index() and
+  SymmetricTensor::unrolled_to_component_indices() allow to convert between the
+  indices of an element of a symmetric tensor and the index within an unrolled vector.
   <br>
   (WB 2009/09/23)
   </p></li>
