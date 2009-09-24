@@ -215,12 +215,21 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li>
+  <p>
+  Fixed: If anything had been put into a LogStream object without flushing
+  it with std::endl before the destruction of the log stream, it was lost.
+  This is now fixed.
+  <br>
+  (WB 2009/09/23)
+  </p>
+  </li>
+
   <li><p>New: SymmetricTensor::unrolled_index() returns the index of an element of
   a symmetric tensor within an unrolled vector.
   <br>
   (WB 2009/09/23)
   </p></li>
-
 
   <li><p>New: classes NamedData and NamedSelection provide an interface to store and
   retrieve data objects with name identifiers.
