@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,16 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+
+// we only need output streams, but older compilers did not provide
+// them in a separate include file
+#ifdef HAVE_STD_OSTREAM_HEADER
+#  include <ostream>
+#else
+#  include <iostream>
+#endif
+
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -58,7 +68,7 @@ class TableIndicesBase
                                       * used for the SymmetricTensor class.
                                       */
     void sort ();
-      
+
   protected:
                                      /**
                                       * Store the indices in an array.
@@ -407,7 +417,7 @@ class TableIndices<7> : public TableIndicesBase<7>
 template <int N>
 inline
 unsigned int
-TableIndicesBase<N>::operator [] (const unsigned int i) const 
+TableIndicesBase<N>::operator [] (const unsigned int i) const
 {
   Assert (i < N, ExcIndexRange (i, 0, N));
   return indices[i];
@@ -418,7 +428,7 @@ TableIndicesBase<N>::operator [] (const unsigned int i) const
 template <int N>
 inline
 bool
-TableIndicesBase<N>::operator == (const TableIndicesBase<N> &other) const 
+TableIndicesBase<N>::operator == (const TableIndicesBase<N> &other) const
 {
   for (unsigned int i=0; i<N; ++i)
     if (indices[i] != other.indices[i])
@@ -431,7 +441,7 @@ TableIndicesBase<N>::operator == (const TableIndicesBase<N> &other) const
 template <int N>
 inline
 bool
-TableIndicesBase<N>::operator != (const TableIndicesBase<N> &other) const 
+TableIndicesBase<N>::operator != (const TableIndicesBase<N> &other) const
 {
   return !(*this == other);
 }
@@ -475,7 +485,7 @@ TableIndicesBase<3>::sort ()
 
 
 inline
-TableIndices<1>::TableIndices () 
+TableIndices<1>::TableIndices ()
 {
   this->indices[0] = 0;
 }
@@ -491,7 +501,7 @@ TableIndices<1>::TableIndices (const unsigned int index1)
 
 
 inline
-TableIndices<2>::TableIndices () 
+TableIndices<2>::TableIndices ()
 {
   this->indices[0] = this->indices[1] = 0;
 }
@@ -509,7 +519,7 @@ TableIndices<2>::TableIndices (const unsigned int index1,
 
 
 inline
-TableIndices<3>::TableIndices () 
+TableIndices<3>::TableIndices ()
 {
   this->indices[0] = this->indices[1] = this->indices[2] = 0;
 }
@@ -631,6 +641,29 @@ TableIndices<7>::TableIndices (const unsigned int index1,
   this->indices[5] = index6;
   this->indices[6] = index7;
 }
+
+
+/**
+ * Output operator for indices; reports them in a list like this:
+ * <code>[i1,i2,...]</code>.
+ */
+template <int N>
+std::ostream &
+operator << (std::ostream &o,
+	     const TableIndices<N> &indices)
+{
+  o << '[';
+  for (unsigned int i=0; i<N; ++i)
+    {
+      o << indices[i];
+      if (i+1 != N)
+	o << ',';
+    }
+  o << ']';
+
+  return o;
+}
+
 
 
 

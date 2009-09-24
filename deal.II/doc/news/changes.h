@@ -215,6 +215,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li><p>New: There is now an <code>operator @<@<</code> for the
+  TableIndices class.
+  <br>
+  (WB 2009/09/24)
+  </p></li>
+
   <li>
   <p>
   Fixed: If anything had been put into a LogStream object without flushing
