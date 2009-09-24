@@ -96,7 +96,11 @@ LogStream::~LogStream()
 				   // object
 #ifdef DEAL_II_USE_TRILINOS
   if (this == &deallog)
-    (new stream_map_type())->swap (outstreams);
+    {
+      stream_map_type * dummy = new stream_map_type();
+      dummy->swap (outstreams);
+      delete dummy;
+    }
 #endif
 }
 
