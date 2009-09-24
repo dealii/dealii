@@ -43,5 +43,5 @@ int main()
 
     log << "This should be printed!";
   }
-//  deallog << "OK" << std::endl;
+  deallog << "OK" << std::endl;
 }
