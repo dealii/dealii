@@ -1,0 +1,9 @@
+
+DEAL::Number of stress components: 6	Number of gamma components: 1
+DEAL::Number of active cells: 1
+DEAL::Total number of cells: 1
+DEAL::Number of degrees of freedom: 56 = (48 + 8)
+DEAL::dofs_per_cell: 56
+DEAL::fe.dofs_per_cell: 56	quadrature_formula.size(): 1
+DEAL::3.50 27.5 35.5 27.5 11.5 43.5 35.5 43.5 19.5
+DEAL::10.5 7.00 3.50
