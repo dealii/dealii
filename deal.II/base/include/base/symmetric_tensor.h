@@ -877,6 +877,22 @@ class SymmetricTensor
     internal::SymmetricTensorAccessors::Accessor<rank,dim,false,rank-1>
     operator [] (const unsigned int row);
 
+				     /**
+				      * Access to an element where you
+				      * specify the entire set of
+				      * indices.
+				      */
+    double
+    operator [] (const TableIndices<rank> &indices) const;
+
+				     /**
+				      * Access to an element where you
+				      * specify the entire set of
+				      * indices.
+				      */
+    double &
+    operator [] (const TableIndices<rank> &indices);
+
                                      /**
                                       * Return the Frobenius-norm of a tensor,
                                       * i.e. the square root of the sum of
@@ -1902,6 +1918,26 @@ SymmetricTensor<rank,dim>::operator [] (const unsigned int row)
   return
     internal::SymmetricTensorAccessors::
     Accessor<rank,dim,false,rank-1> (*this, TableIndices<rank> (row));
+}
+
+
+
+template <int rank, int dim>
+inline
+double
+SymmetricTensor<rank,dim>::operator [] (const TableIndices<rank> &indices) const
+{
+  return data[component_to_unrolled_index(indices)];
+}
+
+
+
+template <int rank, int dim>
+inline
+double &
+SymmetricTensor<rank,dim>::operator [] (const TableIndices<rank> &indices)
+{
+  return data[component_to_unrolled_index(indices)];
 }
 
 
