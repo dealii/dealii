@@ -39,7 +39,7 @@ tests_x = grid_generator_?? \
 	  fe_face_to_cell_index \
 	  fe_field_function \
           anna_? \
-	  gerold_1 \
+	  gerold_? \
 	  roy_1 \
           denis_1 \
 	  unit_support_points \
