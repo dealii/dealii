@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -166,12 +166,30 @@ namespace SparsityTools
 				    * equal coordination numbers. The
 				    * renumbering algorithms will therefore
 				    * not give optimal results.
+				    *
+				    * If the graph has two or more
+				    * unconnected components and if no
+				    * starting indices are given, the
+				    * algorithm will number each
+				    * component
+				    * consecutively. However, this
+				    * requires the determination of a
+				    * starting index for each
+				    * component; as a consequence, the
+				    * algorithm will produce an
+				    * exception if starting indices
+				    * are given, taking the latter as
+				    * an indication that the caller of
+				    * the function would like to
+				    * override the part of the
+				    * algorithm that chooses starting
+				    * indices.
 				    */
   void
   reorder_Cuthill_McKee (const SparsityPattern     &sparsity,
 			 std::vector<unsigned int> &new_indices,
 			 const std::vector<unsigned int> &starting_indices = std::vector<unsigned int>());
-  
+
 				   /**
 				    * Exception
 				    */

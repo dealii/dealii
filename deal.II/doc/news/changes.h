@@ -343,6 +343,15 @@ inconvenience this causes.
 
   <li>
     <p>
+    Fixed: SparsityTools::reorder_Cuthill_McKee would produce an error if the
+    input graph had disconnected components. This is now fixed.
+    </p>
+  <br>
+  (WB 2009/09/25)
+  </li>
+
+  <li>
+    <p>
     Fixed: When using the TrilinosWrappers::MPI::Vector::reinit() function with a parallel
     vector, and if the vector initialized and the vector given had a local range on one of
     the processors that exactly matched, the program would freeze if the local ranges on
