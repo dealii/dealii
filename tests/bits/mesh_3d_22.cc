@@ -1,5 +1,5 @@
 //----------------------------  mesh_3d_22.cc  ---------------------------
-//    $Id: mesh_3d_22.cc 15662 2008-01-24 05:31:14Z kanschat $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006, 2008 by Timo Heister and the deal.II authors

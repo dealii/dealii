@@ -1,5 +1,5 @@
 //----------------------------  integrate_one_over_r.cc  ---------------------------
-//    $Id: testsuite.html 13373 2006-07-13 13:12:08Z heltai $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005 by the deal.II authors 

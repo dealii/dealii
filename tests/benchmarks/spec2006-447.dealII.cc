@@ -1,7 +1,7 @@
-/* $Id: step-14.cc 2008 2006-01-23 23:53:16Z wolf $ */
+/* $Id$ */
 /* Author: Wolfgang Bangerth, ETH Zurich, 2002 */
 
-/*    $Id: step-14.cc 2008 2006-01-23 23:53:16Z wolf $       */
+/*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 2002, 2003, 2004, 2008 by the deal.II authors */

@@ -1,5 +1,5 @@
 //----------------------------  make_boundary_constraints_01.cc  ------------------
-//    $Id: make_boundary_constraints_01.cc $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2009 by the deal.II authors

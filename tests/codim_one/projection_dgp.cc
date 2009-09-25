@@ -1,5 +1,5 @@
 //----------------------------  template.cc  ---------------------------
-//    $Id: testsuite.html 13373 2006-07-13 13:12:08Z manigrasso $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2008 by the deal.II authors 

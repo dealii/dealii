@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//    $Id: full_matrix_28.cc 15513 2007-11-18 05:44:22Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2007 by the deal.II authors

@@ -1,5 +1,5 @@
 //----------------------------  trilinos_solver_07.cc  ---------------------------
-//    $Id: solver_07.cc 17307 2008-10-23 01:52:20Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2004, 2005 by the deal.II authors

@@ -1,5 +1,5 @@
 //-----------------  trilinos_sparse_matrix_set_02.cc  -------------------------
-//    $Id: 01.cc 17484 2008-11-06 10:21:30Z kronbichler $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2004, 2005, 2008 by the deal.II authors
