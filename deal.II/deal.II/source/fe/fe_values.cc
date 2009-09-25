@@ -907,14 +907,6 @@ namespace FEValuesViews
 
     std::fill(values.begin(), values.end(), value_type());
 
-				     // the unique components of the
-				     // second order tensor stored as
-				     // a vector (i.e. a first-order
-				     // tensor)
-    typedef Tensor<1, value_type::n_independent_components> base_tensor_type;
-
-    std::vector< base_tensor_type > values_in_vector_form(values.size(), base_tensor_type());
-
     for (unsigned int shape_function = 0;
 	 shape_function < fe_values.fe->dofs_per_cell; ++shape_function)
       {
@@ -935,7 +927,8 @@ namespace FEValuesViews
 	      shape_function_data[shape_function].single_nonzero_component_index;
 	    const double * shape_value_ptr = &fe_values.shape_values(snc, 0);
 	    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
-	      values_in_vector_form[q_point][comp] += value * *shape_value_ptr++;
+	      values[q_point][value_type::unrolled_to_component_indices(comp)]
+		+= value * *shape_value_ptr++;
 	  }
 	else
 	  {
@@ -945,19 +938,10 @@ namespace FEValuesViews
 		  const double * shape_value_ptr =
 		    &fe_values.shape_values(shape_function_data[shape_function].row_index[d], 0);
 		  for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
-		    values_in_vector_form[q_point][d] += value * *shape_value_ptr++;
+		    values[q_point][value_type::unrolled_to_component_indices(d)]
+		      += value * *shape_value_ptr++;
 		}
 	  }
-      }
-				     // copy entries in std::vector to an array as there is no constructor
-				     // for a second order tensor that take a std::vector
-    double values_array[value_type::n_independent_components];
-    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
-      {
-	for (unsigned int d = 0; d < value_type::n_independent_components; d++)
-	  values_array[d] = values_in_vector_form[q_point][d];
-
-	values[q_point] = dealii::SymmetricTensor<2, dim>(values_array);
       }
   }
 
@@ -1011,10 +995,9 @@ namespace FEValuesViews
 	      &fe_values.shape_gradients[snc][0];
 	    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
 		 ++q_point, ++shape_gradient_ptr) {
-	      for (unsigned int j = 0; j < dim; ++j) {
-		const unsigned int vector_component = value_type::unrolled_index (TableIndices<2>(comp,j));
-		divergences[q_point][vector_component] += value * (*shape_gradient_ptr)[j];
-	      }
+	      for (unsigned int j = 0; j < dim; ++j)
+		divergences[q_point][value_type::unrolled_to_component_indices(comp)[0]]
+		  += value * (*shape_gradient_ptr)[j];
 	    }
 	  }
 	else
@@ -1022,6 +1005,11 @@ namespace FEValuesViews
 	    for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
 	      if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
 		{
+		  Assert (false, ExcNotImplemented());
+
+// the following implementation needs to be looked over -- I think it
+// can't be right, because we are in a case where there is no single
+// nonzero component
 		  const unsigned int comp =
 		    shape_function_data[shape_function].single_nonzero_component_index;
 
@@ -1032,7 +1020,7 @@ namespace FEValuesViews
 		       ++q_point, ++shape_gradient_ptr) {
 		    for (unsigned int j = 0; j < dim; ++j)
 		      {
-			const unsigned int vector_component = value_type::unrolled_index (TableIndices<2>(comp,j));
+			const unsigned int vector_component = value_type::component_to_unrolled_index (TableIndices<2>(comp,j));
 			divergences[q_point][vector_component] += value * (*shape_gradient_ptr++)[j];
 		      }
 		  }
