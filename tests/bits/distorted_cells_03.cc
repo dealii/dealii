@@ -101,6 +101,10 @@ void check ()
 	      << std::endl;
       Assert (dcv.distorted_cells.front() == coarse_grid.begin(0),
 	      ExcInternalError());
+
+				       // ignore the exception, i.e. do not
+				       // even attempt to fix up the problem
+				       // (but see the _04 testcase for this)
     }
 
   Assert (flag == true, ExcInternalError());
