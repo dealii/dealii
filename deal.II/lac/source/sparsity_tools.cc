@@ -343,7 +343,7 @@ namespace SparsityTools
 					     // an error if we got
 					     // here and starting
 					     // indices were given
-	    Assert (starting_indices.size() > 0,
+	    Assert (starting_indices.size() == 0,
 		    ExcMessage ("The input graph appears to have more than one "
 				"component, but as stated in the documentation "
 				"we only want to reorder such graphs if no "
