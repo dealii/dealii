@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -17,7 +17,7 @@ libraries = $(lib-deal2-1d.g) \
             $(lib-lac.g)  \
             $(lib-base.g)
 
-default: run-tests 
+default: run-tests
 
 ############################################################
 
@@ -26,6 +26,7 @@ tests_x = hp_dof_handler \
 	  q_collection_* \
 	  mapping_collection_* \
 	  fe_collection_* \
+	  fe_nothing_* \
 	  continuous_* \
 	  n_dofs \
 	  random \
