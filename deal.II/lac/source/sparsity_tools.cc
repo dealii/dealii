@@ -398,17 +398,7 @@ namespace SparsityTools
 				     // whether the
 				     // front-marching-algorithm (which
 				     // Cuthill-McKee actually is) has
-				     // reached all points. it should
-				     // usually do so, but might not for
-				     // two reasons:
-				     //
-				     // - The algorithm above has a bug, or
-				     // - The domain is not connected and
-				     // consists of separate parts.
-				     //
-				     // In any case, if not all DoFs
-				     // have been reached, renumbering
-				     // will not be possible
+				     // reached all points.
     Assert ((std::find (new_indices.begin(), new_indices.end(), numbers::invalid_unsigned_int)
 	     ==
 	     new_indices.end())
