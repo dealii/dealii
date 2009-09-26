@@ -120,8 +120,8 @@ FE_Nothing<dim>::get_data (const UpdateFlags  /*flags*/,
 			   const Mapping<dim> & /*mapping*/,
 			   const Quadrature<dim> & /*quadrature*/) const
 {
-  Assert(false,ExcMessage(zero_dof_message));
-  return NULL;
+  typename Mapping<dim>::InternalDataBase* data = new typename Mapping<dim>::InternalDataBase();
+  return data;
 }
 
 
@@ -129,7 +129,7 @@ FE_Nothing<dim>::get_data (const UpdateFlags  /*flags*/,
 template <int dim>
 void
 FE_Nothing<dim>::
-fill_fe_values (const Mapping<dim>                      & /*mapping*/,
+fill_fe_values (const Mapping<dim> & /*mapping*/,
 		const typename Triangulation<dim>::cell_iterator & /*cell*/,
 		const Quadrature<dim> & /*quadrature*/,
 		typename Mapping<dim>::InternalDataBase & /*mapping_data*/,
@@ -174,6 +174,17 @@ fill_fe_subface_values (const Mapping<dim> & /*mapping*/,
 }
 
 
+template <int dim>
+FiniteElementDomination::Domination
+FE_Nothing<dim> ::
+compare_for_face_domination (const FiniteElement<dim> & fe_other) const
+{
+  if(dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+    return FiniteElementDomination::either_element_can_dominate;
+  else
+    return FiniteElementDomination::other_element_dominates;
+}
+    
 
 template class FE_Nothing<deal_II_dimension>;
 
