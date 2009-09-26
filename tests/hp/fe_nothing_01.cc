@@ -12,7 +12,8 @@
 //----------------------------  fe_nothing_01.cc  ---------------------------
 
 
-// test that FE_Nothing works as intended
+// test that FE_Nothing works as intended: we used to abort in the
+// computation of face domination relationships
 
 
 #include "../tests.h"
@@ -40,8 +41,8 @@ template <int dim>
 void test ()
 {
   Triangulation<dim>       triangulation;
-  GridGenerator :: hyper_cube (triangulation, -0.5, 0.5);
-  triangulation.refine_global(4);
+  GridGenerator :: hyper_cube (triangulation, 0, 1);
+  triangulation.refine_global(1);
 
   hp::FECollection<dim>    fe_collection;
   fe_collection.push_back (FE_Q<dim>(1));
@@ -60,7 +61,7 @@ void test ()
   for(; cell != endc; cell++)
     {
       Point<dim> center = cell->center();
-      if( std::sqrt(center.square()) < 0.25 )
+      if( std::sqrt(center.square()) < 0.5 )
 	cell->set_active_fe_index(1);
       else
 	cell->set_active_fe_index(0);
@@ -68,12 +69,9 @@ void test ()
 
 				   // Attempt to distribute dofs.
 				   // Fails here with assertion from
-				   // hp_vertex_dof_identities().
-				   // Seems this function expects all
-				   // elements to be of type FE_Q, and
-				   // therefore have dofs at the cell
-				   // vertices.
-
+				   // hp_vertex_dof_identities() and
+				   // after that is fixed in face
+				   // domination computation.
   dof_handler.distribute_dofs (fe_collection);
 
   deallog << "   Number of active cells:       "
