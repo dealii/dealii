@@ -112,6 +112,18 @@ class BlockInfo : public Subscriptor
 				      * numbering of DoFAccessor.
 				      */
     unsigned int renumber (unsigned int i) const;
+
+				     /**
+				      * The number of base elements.
+				      */
+    unsigned int n_base_elements() const;
+    
+				     /**
+				      * Return the base element of
+				      * this index.
+				      */
+    unsigned int base_element(unsigned int i) const;
+    
   private:
 				     /**
 				      * @brief The block structure
@@ -133,7 +145,7 @@ class BlockInfo : public Subscriptor
 				      * The base element associated
 				      * with each block.
 				      */
-    std::vector<unsigned int> base_element;
+    std::vector<unsigned int> base_elements;
     
 				     /**
 				      * A vector containing the
@@ -182,6 +194,25 @@ unsigned int BlockInfo::renumber(unsigned int i) const
   AssertIndexRange(i, local_renumbering.size());
   return local_renumbering[i];
 }
+
+
+inline
+unsigned int
+BlockInfo::base_element(unsigned int i) const
+{
+  AssertIndexRange(i, base_elements.size());
+
+  return base_elements[i];
+}
+
+
+inline
+unsigned int
+BlockInfo::n_base_elements() const
+{
+  return base_elements.size();
+}
+
 
 
 DEAL_II_NAMESPACE_CLOSE

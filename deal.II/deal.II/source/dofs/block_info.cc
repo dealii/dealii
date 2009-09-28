@@ -41,10 +41,10 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim>& dof)
   const FiniteElement<dim, spacedim>& fe = dof.get_fe();
   std::vector<unsigned int> sizes(fe.n_blocks());
 
-  base_element.resize(fe.n_blocks());
+  base_elements.resize(fe.n_blocks());
   
-  for (unsigned int i=0;i<base_element.size();++i)
-    base_element[i] = fe.block_to_base_index(i).first;
+  for (unsigned int i=0;i<base_elements.size();++i)
+    base_elements[i] = fe.block_to_base_index(i).first;
   
   local_renumbering.resize(fe.n_dofs_per_cell());
   FETools::compute_block_renumbering(fe,
