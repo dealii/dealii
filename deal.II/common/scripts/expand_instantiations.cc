@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -361,14 +361,14 @@ void process_instantiations ()
       skip_space (whole_file);
       if (whole_file.find ("for") != 0)
 	{
-	  std::cerr << "Invalid instantiation list" << std::endl;
+	  std::cerr << "Invalid instantiation list: missing 'for'" << std::endl;
 	  std::exit (1);
 	}
       whole_file.erase (0, 3);
       skip_space (whole_file);
       if (whole_file.find ("(") != 0)
 	{
-	  std::cerr << "Invalid instantiation list" << std::endl;
+	  std::cerr << "Invalid instantiation list: missing '('" << std::endl;
 	  std::exit (1);
 	}
       whole_file.erase (0, 1);
@@ -381,7 +381,7 @@ void process_instantiations ()
 					   ';');
       if (whole_file.find (")") != 0)
 	{
-	  std::cerr << "Invalid instantiation list" << std::endl;
+	  std::cerr << "Invalid instantiation list: missing ')'" << std::endl;
 	  std::exit (1);
 	}
       whole_file.erase (0, 1);

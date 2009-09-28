@@ -3,6 +3,10 @@ COMPLEX_SCALARS := { std::complex<double>;
                      std::complex<float>;
                      std::complex<long double> }
 
+DERIVATIVE_TENSORS := { double;
+			Tensor<1,deal_II_dimension>;
+			Tensor<2,deal_II_dimension> }
+
 DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
 
 SERIAL_VECTORS := { Vector<double>;
@@ -30,6 +34,9 @@ TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension>;
                                    DoFHandler<deal_II_dimension>;
                                    hp::DoFHandler<deal_II_dimension>;
 		                   MGDoFHandler<deal_II_dimension> }
+
+FEVALUES_BASES := { FEValuesBase<deal_II_dimension>;
+	            FEFaceValuesBase<deal_II_dimension> }
 
 SPARSITY_PATTERNS := { SparsityPattern;
                        CompressedSparsityPattern;
