@@ -1995,7 +1995,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     template <class InputVector, typename number>
     void get_function_values (const InputVector& fe_function,
 			      const VectorSlice<const std::vector<unsigned int> >& indices,
-			      std::vector<std::vector<number> >& values,
+			      VectorSlice<std::vector<std::vector<number> > >& values,
 			      const bool quadrature_points_fastest) const;
 
 				     /**
@@ -2130,7 +2130,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     template <class InputVector>
     void get_function_gradients (const InputVector& fe_function,
 				 const VectorSlice<const std::vector<unsigned int> >& indices,
-				 std::vector<std::vector<Tensor<1,spacedim> > >& gradients,
+				 VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > >& gradients,
 				 bool quadrature_points_fastest = false) const;
 
 				     /**
@@ -2254,7 +2254,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     void get_function_hessians (
       const InputVector& fe_function,
       const VectorSlice<const std::vector<unsigned int> >& indices,
-      std::vector<std::vector<Tensor<2,spacedim> > >& hessians,
+      VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > >& hessians,
       bool quadrature_points_fastest = false) const;
 
 				     /**
