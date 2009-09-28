@@ -20,6 +20,7 @@
 #include <base/memory_consumption.h>
 #include <lac/exceptions.h>
 #include <lac/block_indices.h>
+#include <lac/vector.h>
 #include <vector>
 #include <iterator>
 #include <cmath>
