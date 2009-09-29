@@ -596,7 +596,7 @@ void NavierStokesProjection<dim>::Create_Triangulation (const unsigned int n_of_
   GridIn<dim> grid_in;
   grid_in.attach_triangulation (triangulation);
 
-  std::string filename = "nsbench2.inp";
+  std::string filename = "../nsbench2.inp";
   std::ifstream file (filename.c_str());
   Assert (file, ExcFileNotOpen (filename.c_str()));
   grid_in.read_ucd (file);
@@ -1206,7 +1206,7 @@ int main()
   try
     {
       RunTimeParameters::Data_Storage data;
-      data.read_data ("parameter-file.prm");
+      data.read_data ("../parameter-file.prm");
       deallog.depth_console (data.verbose ? 2 : 0);
       NavierStokesProjection<2> test (data);
       test.run (data.verbose, data.output);

@@ -162,7 +162,7 @@ One of the advantages of this formulation is that it fully decouples the compone
 they all share the same system matrix. This can be exploited in the program.
 
 However, given the nonstandard boundary conditions, to be able to take them into account we need to use
-the following identity
+the following %identity
 @f[
   \Delta u = \nabla\nabla\cdot u - \nabla\times\nabla\times u,
 @f]

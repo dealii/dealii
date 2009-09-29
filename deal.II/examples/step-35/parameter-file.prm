@@ -7,7 +7,7 @@ subsection Physical data
   # The initial and final time, and the Reynolds number
   set initial_time = 0.
   set final_time   = 10.
-  set Reynolds     = 1e3
+  set Reynolds     = 100
 end
 
 subsection Time step data
@@ -28,15 +28,15 @@ subsection Data solve velocity
   # In this section we declare the parameters that are going to control the solution process
   # for the velocity.
   set max_iterations = 1000  # maximal number of iterations that GMRES must make
-  set eps            = 1e-6  # stopping criterion
+  set eps            = 1e-8  # stopping criterion
   set Krylov_size    = 30    # size of the Krylov subspace to be used in GMRES
-  set off_diagonals  = 60    # number of off diagonals that ILU must compute
-  set diag_strength  = 0.01  # diagonal strengthening value
+  set off_diagonals  = 70    # number of off diagonals that ILU must compute
+  set diag_strength  = 0.1  # diagonal strengthening value
   set update_prec    = 10    # this number indicates how often the preconditioner must be updated
 end
 
 #The output frequency
-set output = 5
+set output = 50
 
 #Finally we set the verbosity level
-set verbose = true
+set verbose = false
