@@ -92,7 +92,7 @@ This program can be extended in the following directions:
   projection methods with variable time step,
   practice shows that they perform very well.
 
-  <li> High Reynolds numbers: As we can see from the results, increasing the Reynolds number changes significantly
+  <li> High Reynolds %numbers: As we can see from the results, increasing the Reynolds number changes significantly
   the behavior of the flow. Using well-known stabilization techniques we could be able to
   compute the flow in this, or many other problems, when the Reynolds number is very large.
 
