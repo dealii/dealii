@@ -789,7 +789,7 @@ void NavierStokesProjection<dim>::assemble_one_cell_of_gradient (const SIterator
     {
       for (unsigned int i=0; i<data.vel_dpc; ++i)
 	for (unsigned int j=0; j<data.pres_dpc; ++j)
-	  data.local_grad (i, j) += scratch.fe_val_vel.JxW(q)*scratch.fe_val_vel.shape_grad (i, q)[data.d]
+	  data.local_grad (i, j) += -scratch.fe_val_vel.JxW(q)*scratch.fe_val_vel.shape_grad (i, q)[data.d]
 				    *scratch.fe_val_pres.shape_value (j, q);
     }
 }
