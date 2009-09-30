@@ -1308,7 +1308,7 @@ class ConstraintMatrix : public Subscriptor
     add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				 SparsityType                    &sparsity_pattern,
 				 const bool                       keep_constrained_entries = true,
-				 const Table<2,bool>             &dof_mask = Table<2,bool>()) const;
+				 const Table<2,bool>             &dof_mask = default_empty_table) const;
 
                                      /**
                                       * This function imports values from a
@@ -1622,6 +1622,13 @@ class ConstraintMatrix : public Subscriptor
 				      */
     static bool check_zero_weight (const std::pair<unsigned int, double> &p);
 
+ 				     /**
+				      * Dummy table that serves as default
+				      * argument for function
+				      * <tt>add_entries_local_to_global()</tt>.
+				      */
+    static const Table<2,bool> default_empty_table;
+
 				     /**
 				      * This function actually implements
 				      * the local_to_global function for
@@ -1734,9 +1741,9 @@ ConstraintMatrix::add_line (const unsigned int line)
 				   // existing entries for cache
   if (line >= lines_cache.size())
     lines_cache.resize (line+1,0);
-				   // enlarge lines vector if necessary. 
-				   // need to reset the pointers to the 
-				   // ConstraintLine entries in that case, 
+				   // enlarge lines vector if necessary.
+				   // need to reset the pointers to the
+				   // ConstraintLine entries in that case,
 				   // since new memory will be allocated
   if (lines.size() == lines.capacity())
     {

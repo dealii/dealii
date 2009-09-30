@@ -55,6 +55,11 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
+				        // Static member variable
+const Table<2,bool> ConstraintMatrix::default_empty_table = Table<2,bool>();
+
+
+
 bool
 ConstraintMatrix::check_zero_weight (const std::pair<unsigned int, double> &p)
 {
@@ -237,7 +242,7 @@ void ConstraintMatrix::close ()
 			ExcMessage ("Cycle in constraints detected!"));
 
 		const ConstraintLine * constrained_line = lines_cache[dof_index];
-		Assert (constrained_line->line == dof_index, 
+		Assert (constrained_line->line == dof_index,
 			ExcInternalError());
 
 						 // now we have to
@@ -465,7 +470,7 @@ void ConstraintMatrix::close ()
 					 // make sure that
 					 // entry->first is not the
 					 // index of a line itself
-	const ConstraintLine * it = entry->first < lines_cache.size() ? 
+	const ConstraintLine * it = entry->first < lines_cache.size() ?
 	  lines_cache[entry->first] : 0;
 	Assert (it == 0,
 		ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
