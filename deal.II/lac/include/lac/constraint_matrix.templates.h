@@ -734,14 +734,10 @@ distribute_local_to_global (const Vector<double>            &local_vector,
   Assert (local_vector.size() == local_dof_indices.size(),
           ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
   Assert (sorted == true, ExcMatrixNotClosed());
-  const bool use_matrix = local_matrix.m() != 0 ? true : false;
-  if (local_matrix.m() != 0)
-    {
-      Assert (local_matrix.m() == local_dof_indices.size(),
-	      ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
-      Assert (local_matrix.n() == local_dof_indices.size(),
-	      ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
-    }
+  Assert (local_matrix.m() == local_dof_indices.size(),
+	  ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
+  Assert (local_matrix.n() == local_dof_indices.size(),
+	  ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
 
   const unsigned int n_local_dofs = local_vector.size();
   if (lines.size() == 0)
@@ -753,50 +749,41 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 				   // vector that tells about whether a
 				   // certain constraint exists. then, we
 				   // simply copy over the data.
-	const std::vector<ConstraintLine>::const_iterator position =
-	  find_constraint(local_dof_indices[i]);
-
-	if (position==lines.end())
+	if (is_constrained(local_dof_indices[i]) == false)
 	  {
 	    global_vector(local_dof_indices[i]) += local_vector(i);
 	    continue;
 	  }
 
-	if (use_matrix)
-	  {
-	    const double val = position->inhomogeneity;
-	    if (val != 0)
-	      for (unsigned int j=0; j<n_local_dofs; ++j)
+	const ConstraintLine * position = 
+	  lines_cache.size() <= local_dof_indices[i] ? 0 : 
+	  lines_cache[local_dof_indices[i]];
+
+	const double val = position->inhomogeneity;
+	if (val != 0)
+	  for (unsigned int j=0; j<n_local_dofs; ++j)
+	    {
+	      const ConstraintLine * position_j = 
+		lines_cache.size() <= local_dof_indices[j] ? 0 : 
+		lines_cache[local_dof_indices[j]];
+
+	      if (position_j == 0)
+		global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
+	      else
 		{
-		  const std::vector<ConstraintLine>::const_iterator
-		    position_j = find_constraint(local_dof_indices[j]);
+		  const double matrix_entry = local_matrix(j,i);
+		  if (matrix_entry == 0)
+		    continue;
 
-		  if (position_j == lines.end())
-		    global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
-		  else
+		  for (unsigned int q=0; q<position_j->entries.size(); ++q)
 		    {
-		      const double matrix_entry = local_matrix(j,i);
-		      if (matrix_entry == 0)
-			continue;
-
-		      for (unsigned int q=0; q<position_j->entries.size(); ++q)
-			{
-			  Assert (is_constrained(position_j->entries[q].first) == false,
-				  ExcMessage ("Tried to distribute to a fixed dof."));
-			  global_vector(position_j->entries[q].first)
-			    -= val * position_j->entries[q].second * matrix_entry;
-			}
+		      Assert (is_constrained(position_j->entries[q].first) == false,
+			      ExcMessage ("Tried to distribute to a fixed dof."));
+		      global_vector(position_j->entries[q].first)
+			-= val * position_j->entries[q].second * matrix_entry;
 		    }
 		}
-	  }
-	else
-				   // in case the constraint is
-				   // inhomogeneous and we have no matrix
-				   // available, this function is not
-				   // appropriate. Throw an exception.
-	  Assert (position->inhomogeneity == 0.,
-		  ExcMessage ("Inhomogeneous constraint cannot be condensed "
-			      "without any matrix specified."));
+	    }
 
 				   // now distribute the constraint,
 				   // but make sure we don't touch
@@ -1259,9 +1246,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // resolved in a second step.
     for (unsigned int i = 0; i<n_local_dofs; ++i)
       {
-	const std::vector<ConstraintLine>::const_iterator position =
-	  find_constraint(local_dof_indices[i]);
-	if (position == lines.end())
+	if (is_constrained(local_dof_indices[i]) == false)
 	  {
 	    my_indices[added_rows].global_row = local_dof_indices[i];
 	    my_indices[added_rows].local_row = i;
@@ -1270,7 +1255,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	  }
 
 	constraint_lines.push_back (std::make_pair<unsigned int,
-				    const ConstraintLine *>(i,&*position));
+				    const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
+	Assert (lines_cache[local_dof_indices[i]]->line == local_dof_indices[i],
+		ExcInternalError());
       }
     Assert (constraint_lines.size() + added_rows == n_local_dofs,
 	    ExcInternalError());
@@ -1577,9 +1564,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
     unsigned int added_rows = 0;
     for (unsigned int i = 0; i<n_local_dofs; ++i)
       {
-	const std::vector<ConstraintLine>::const_iterator position
-	  = find_constraint (local_dof_indices[i]);
-	if (position == lines.end())
+	if (is_constrained(local_dof_indices[i]) == false)
 	  {
 	    my_indices[added_rows].global_row = local_dof_indices[i];
 	    my_indices[added_rows].local_row = i;
@@ -1588,7 +1573,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	  }
 
 	constraint_lines.push_back (std::make_pair<unsigned int,
-				    const ConstraintLine *>(i,&*position));
+				    const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
       }
     Assert (constraint_lines.size() + added_rows == n_local_dofs,
 	    ExcInternalError());
@@ -1827,9 +1812,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
       for (unsigned int i = 0; i<n_local_dofs; ++i)
 	{
-	  const std::vector<ConstraintLine>::const_iterator position
-	    = find_constraint(local_dof_indices[i]);
-	  if (position == lines.end())
+	  if (is_constrained(local_dof_indices[i]) == false)
 	    {
 	      actual_dof_indices[added_rows] = local_dof_indices[i];
 	      ++added_rows;
@@ -1837,7 +1820,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	    }
 
 	  constraint_lines.push_back (std::make_pair<unsigned int,
-				      const ConstraintLine *>(i,&*position));
+				      const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
       }
       Assert (constraint_lines.size() + added_rows == n_local_dofs,
 	      ExcInternalError());
@@ -1918,9 +1901,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // resolved in a second step.
     for (unsigned int i = 0; i<n_local_dofs; ++i)
       {
-	const std::vector<ConstraintLine>::const_iterator position
-	  = find_constraint(local_dof_indices[i]);
-	if (position == lines.end())
+	if (is_constrained(local_dof_indices[i]) == false)
 	  {
 	    my_indices[added_rows].global_row = local_dof_indices[i];
 	    my_indices[added_rows].local_row = i;
@@ -1929,7 +1910,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	  }
 
 	constraint_lines.push_back (std::make_pair<unsigned int,
-				    const ConstraintLine *>(i,&*position));
+				    const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
       }
     Assert (constraint_lines.size() + added_rows == n_local_dofs,
 	    ExcInternalError());
@@ -2144,9 +2125,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
       for (unsigned int i = 0; i<n_local_dofs; ++i)
 	{
-	  const std::vector<ConstraintLine>::const_iterator position
-	    = find_constraint(local_dof_indices[i]);
-	  if (position == lines.end())
+	  if (is_constrained(local_dof_indices[i]) == false)
 	    {
 	      actual_dof_indices[added_rows] = local_dof_indices[i];
 	      ++added_rows;
@@ -2154,7 +2133,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	    }
 
 	  constraint_lines.push_back (std::make_pair<unsigned int,
-				      const ConstraintLine *>(i,&*position));
+				      const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
       }
       Assert (constraint_lines.size() + added_rows == n_local_dofs,
 	      ExcInternalError());
@@ -2254,8 +2233,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // resolved in a second step.
     for (unsigned int i = 0; i<n_local_dofs; ++i)
       {
-	if (constraint_line_exists.size() <= local_dof_indices[i] ||
-	    constraint_line_exists[local_dof_indices[i]] == false)
+	if (is_constrained(local_dof_indices[i]) == false)
 	  {
 	    my_indices[added_rows].global_row = local_dof_indices[i];
 	    my_indices[added_rows].local_row = i;
@@ -2263,18 +2241,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	    continue;
 	  }
 
-	ConstraintLine index_comparison;
-	index_comparison.line = local_dof_indices[i];
-
-	const std::vector<ConstraintLine>::const_iterator
-	  position = std::lower_bound (lines.begin(),
-				       lines.end(),
-				       index_comparison);
-	Assert (position->line == local_dof_indices[i],
-		ExcInternalError());
-
 	constraint_lines.push_back (std::make_pair<unsigned int,
-				    const ConstraintLine *>(i,&*position));
+				    const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
       }
     Assert (constraint_lines.size() + added_rows == n_local_dofs,
 	    ExcInternalError());

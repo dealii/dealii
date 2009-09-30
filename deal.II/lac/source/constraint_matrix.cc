@@ -55,11 +55,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-				        // Static member variable
-const Table<2,bool> ConstraintMatrix::default_empty_table = Table<2,bool>();
-
-
-
 bool
 ConstraintMatrix::check_zero_weight (const std::pair<unsigned int, double> &p)
 {
@@ -98,21 +93,15 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
                                const std::vector<std::pair<unsigned int,double> > &col_val_pairs)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
+  Assert (is_constrained(line), ExcLineInexistant(line));
 
-  std::vector<ConstraintLine>::iterator line_ptr;
-  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
-				   // the usual case is that the line where
-				   // a value is entered is the one we
-				   // added last, so we search backward
-  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
-    if (line_ptr->line == line)
-      break;
+  ConstraintLine * line_ptr = const_cast<ConstraintLine*>(lines_cache[line]);
+  Assert (line_ptr->line == line, ExcInternalError());
 
 				   // if the loop didn't break, then
 				   // line_ptr must be begin().
 				   // we have an error if that doesn't
 				   // point to 'line' then
-  Assert (line_ptr->line==line, ExcLineInexistant(line));
 
 				   // if in debug mode, check whether an
 				   // entry for this column already
@@ -156,6 +145,24 @@ void ConstraintMatrix::close ()
 
 				   // sort the lines
   std::sort (lines.begin(), lines.end());
+
+				   // update list of pointers and give the
+				   // vector a sharp size since we won't
+				   // modify the size any more after this
+				   // point.
+  {
+    std::vector<const ConstraintLine*> new_lines (lines_cache.size());
+    for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
+	 line!=lines.end(); ++line)
+      new_lines[line->line] = &*line;
+    std::swap (lines_cache, new_lines);
+  }
+
+				   // in debug mode: check whether we really
+				   // set the pointers correctly.
+  for (unsigned int i=0; i<lines_cache.size(); ++i)
+    if (lines_cache[i] != 0)
+      Assert (i == lines_cache[i]->line, ExcInternalError());
 
 				   // first, strip zero entries, as we
 				   // have to do that only once
@@ -229,19 +236,9 @@ void ConstraintMatrix::close ()
 		Assert (dof_index != line->line,
 			ExcMessage ("Cycle in constraints detected!"));
 
-						 // find the line
-						 // corresponding to
-						 // this entry. note
-						 // that we have
-						 // already sorted
-						 // them to make this
-						 // process faster
-		ConstraintLine test_line;
-		test_line.line = dof_index;
-		const std::vector<ConstraintLine>::const_iterator
-		  constrained_line = std::lower_bound (lines.begin(),
-						       lines.end(),
-						       test_line);
+		const ConstraintLine * constrained_line = lines_cache[dof_index];
+		Assert (constrained_line->line == dof_index, 
+			ExcInternalError());
 
 						 // now we have to
 						 // replace an entry
@@ -468,15 +465,9 @@ void ConstraintMatrix::close ()
 					 // make sure that
 					 // entry->first is not the
 					 // index of a line itself
-	ConstraintLine test_line;
-	test_line.line = entry->first;
-	const std::vector<ConstraintLine>::const_iterator
-	  test_line_position = std::lower_bound (lines.begin(),
-						 lines.end(),
-						 test_line);
-	Assert ((test_line_position == lines.end())
-		||
-		(test_line_position->line != entry->first),
+	const ConstraintLine * it = entry->first < lines_cache.size() ? 
+	  lines_cache[entry->first] : 0;
+	Assert (it == 0,
 		ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
       };
 #endif
@@ -543,15 +534,8 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
   const bool object_was_sorted = sorted;
   sorted = false;
 
-				   // before we even start: merge the
-				   // two flag arrays
-  if (other_constraints.constraint_line_exists.size() >
-      constraint_line_exists.size())
-    constraint_line_exists.resize (other_constraints.constraint_line_exists.size(),
-				   false);
-  for (unsigned int i=0; i<other_constraints.constraint_line_exists.size(); ++i)
-    if (other_constraints.constraint_line_exists[i] == true)
-      constraint_line_exists[i] = true;
+  if (other_constraints.lines_cache.size() > lines_cache.size())
+    lines_cache.resize(other_constraints.lines_cache.size());
 
 				   // first action is to fold into the
 				   // present object possible
@@ -705,6 +689,9 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 				   // afterwards as well. otherwise
 				   // leave everything in the unsorted
 				   // state
+  for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
+       line!=lines.end(); ++line)
+    lines_cache[line->line] = &*line;
   if (object_was_sorted == true)
     close ();
 }
@@ -713,8 +700,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 
 void ConstraintMatrix::shift (const unsigned int offset)
 {
-  constraint_line_exists.insert (constraint_line_exists.begin(), offset,
-				 false);
+  lines_cache.insert (lines_cache.begin(), offset, 0);
 
   for (std::vector<ConstraintLine>::iterator i = lines.begin();
        i != lines.end(); i++)
@@ -737,8 +723,8 @@ void ConstraintMatrix::clear ()
   }
 
   {
-    std::vector<bool> tmp;
-    constraint_line_exists.swap (tmp);
+    std::vector<const ConstraintLine*> tmp;
+    lines_cache.swap (tmp);
   }
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -1871,7 +1857,6 @@ template<>
 void
 ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 {
-  Assert (sorted == true, ExcMatrixNotClosed());
   ConstraintLine index_comparison;
   index_comparison.line = vec.local_range().first;
 
@@ -1955,39 +1940,14 @@ bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const
   if (is_constrained(index) == false)
     return false;
 
-  if (sorted == true)
-    {
-      ConstraintLine index_comparison;
-      index_comparison.line = index;
+  const ConstraintLine * p = lines_cache[index];
+  Assert (p->line == index, ExcInternalError());
 
-      const std::vector<ConstraintLine>::const_iterator
-	p = std::lower_bound (lines.begin (),
-			      lines.end (),
-			      index_comparison);
 				       // return if an entry for this
 				       // line was found and if it has
 				       // only one entry equal to 1.0
-				       //
-				       // note that lower_bound only
-				       // returns a valid iterator if
-				       // 'index' is less than the
-				       // largest line index in out
-				       // constraints list
-      return ((p != lines.end()) &&
-	      (p->line == index) &&
-	      (p->entries.size() == 1) &&
-	      (p->entries[0].second == 1.0));
-    }
-  else
-    {
-      for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
-	   i!=lines.end(); ++i)
-	if (i->line == index)
-	  return ((i->entries.size() == 1) &&
-		  (i->entries[0].second == 1.0));
-
-      return false;
-    }
+  return ((p->entries.size() == 1) &&
+	  (p->entries[0].second == 1.0));
 }
 
 
@@ -2087,7 +2047,7 @@ unsigned int
 ConstraintMatrix::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (lines) +
-	  MemoryConsumption::memory_consumption (constraint_line_exists) +
+	  MemoryConsumption::memory_consumption (lines_cache) +
 	  MemoryConsumption::memory_consumption (sorted));
 }
 

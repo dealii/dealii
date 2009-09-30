@@ -26,6 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 template <typename number> class Vector;
+class ConstraintMatrix;
 
 template <typename Accessor> class TriaRawIterator;
 
@@ -923,6 +924,76 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
     void get_dof_values (const InputVector &values,
 			 Vector<number>    &local_values) const;
 
+    				     /**
+				      * Return the values of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function. This
+				      * function is only callable for
+				      * active cells.
+				      *
+				      * The input vector may be either
+				      * a <tt>Vector<float></tt>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
+				      * PETSc or Trilinos vector if
+				      * deal.II is compiled to support
+				      * these libraries. It is in the
+				      * responsibility of the caller
+				      * to assure that the types of
+				      * the numbers stored in input
+				      * and output vectors are
+				      * compatible and with similar
+				      * accuracy.
+				      */
+    template <class InputVector, typename ForwardIterator>
+    void get_dof_values (const InputVector &values,
+			 ForwardIterator    local_values_begin,
+			 ForwardIterator    local_values_end) const;
+
+    				     /**
+				      * Return the values of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function. This
+				      * function is only callable for
+				      * active cells.
+				      *
+				      * The input vector may be either a
+				      * <tt>Vector<float></tt>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a PETSc or
+				      * Trilinos vector if deal.II is
+				      * compiled to support these
+				      * libraries. It is in the
+				      * responsibility of the caller to
+				      * assure that the types of the numbers
+				      * stored in input and output vectors
+				      * are compatible and with similar
+				      * accuracy. The ConstraintMatrix
+				      * passed as an argument to this
+				      * function makes sure that constraints
+				      * are correctly distributed when the
+				      * dof values are calculated.
+				      */
+    template <class InputVector, typename ForwardIterator>
+    void get_dof_values (const ConstraintMatrix &constraints,
+			 const InputVector      &values,
+			 ForwardIterator         local_values_begin,
+			 ForwardIterator         local_values_end) const;
+
 				     /**
 				      * This function is the counterpart to
 				      * get_dof_values(): it takes a vector
@@ -1112,6 +1183,50 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
                                 OutputVector         &global_destination) const;
 
 				     /**
+				      * Distribute a local (cell based)
+				      * vector in iterator format to a
+				      * global one by mapping the local
+				      * numbering of the degrees of freedom
+				      * to the global one and entering the
+				      * local values into the global vector.
+				      *
+				      * The elements are <em>added</em> up
+				      * to the elements in the global
+				      * vector, rather than just set, since
+				      * this is usually what one wants.
+				      */
+    template <typename ForwardIterator, typename OutputVector>
+    void
+    distribute_local_to_global (ForwardIterator   local_source_begin,
+				ForwardIterator   local_source_end,
+				OutputVector     &global_destination) const;
+
+				     /**
+				      * Distribute a local (cell based)
+				      * vector in iterator format to a
+				      * global one by mapping the local
+				      * numbering of the degrees of freedom
+				      * to the global one and entering the
+				      * local values into the global vector.
+				      *
+				      * The elements are <em>added</em> up
+				      * to the elements in the global
+				      * vector, rather than just set, since
+				      * this is usually what one
+				      * wants. Moreover, the
+				      * ConstraintMatrix passed to this
+				      * function makes sure that also
+				      * constraints are eliminated in this
+				      * process.
+				      */
+    template <typename ForwardIterator, typename OutputVector>
+    void
+    distribute_local_to_global (const ConstraintMatrix &constraints,
+                                ForwardIterator         local_source_begin,
+				ForwardIterator         local_source_end,
+				OutputVector           &global_destination) const;
+
+				     /**
 				      * This function does much the
 				      * same as the
 				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
@@ -1126,6 +1241,19 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
     void
     distribute_local_to_global (const FullMatrix<number> &local_source,
                                 OutputMatrix             &global_destination) const;
+    
+				     /**
+				      * This function does what the two
+				      * <tt>distribute_local_to_global</tt>
+				      * functions with vector and matrix
+				      * argument do, but all at once.
+				      */
+    template <typename number, typename OutputMatrix, typename OutputVector>
+    void
+    distribute_local_to_global (const FullMatrix<number> &local_matrix,
+				const Vector<number>     &local_vector,
+                                OutputMatrix             &global_matrix,
+				OutputVector             &global_vector) const;
     
 				     /**
 				      * @}

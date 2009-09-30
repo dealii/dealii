@@ -343,6 +343,18 @@ inconvenience this causes.
 
   <li>
     <p>
+    Improved: The ConstraintMatrix class now uses a cache for random access to
+    the constraint lines. This considerably increases performance of the 
+    *_local_to_global functions, where such an access pattern is usual. Moreover,
+    the ConstraintMatrix class has now a function get_dof_values that can import 
+    data from a global vector to a cell vector with respecting the constraints.
+    </p>
+  <br>
+  (Martin Kronbichler 2009/09/30)
+  </li>
+
+  <li>
+    <p>
     Fixed: SparsityTools::reorder_Cuthill_McKee would produce an error if the
     input graph had disconnected components. This is now fixed.
     </p>

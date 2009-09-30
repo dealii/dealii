@@ -930,6 +930,21 @@ class ConstraintMatrix : public Subscriptor
 		   BlockVectorType           &vector) const;
 
 				     /**
+				      * Delete hanging nodes in a
+				      * vector. Sets all hanging node
+				      * values to zero. The @p
+				      * VectorType may be a
+				      * Vector<float>, Vector<double>,
+				      * BlockVector<tt><...></tt>, a
+				      * PETSc or Trilinos vector
+				      * wrapper class, or any other
+				      * type having the same
+				      * interface.
+				      */
+    template <class VectorType>
+    void set_zero (VectorType &vec) const;
+
+				     /**
 				      * @}
 				      */
 
@@ -976,52 +991,144 @@ class ConstraintMatrix : public Subscriptor
                                       * vectors and matrices are fully
                                       * assembled.
 				      *
-				      * Note that, unless an optional
-                                      * FullMatrix object is provided, this
-                                      * function will apply all constraints
-                                      * as if they were homogeneous and
-                                      * throw an exception in case it
-                                      * encounters inhomogeneous
-                                      * constraints. For correctly setting
-                                      * inhomogeneous constraints, you
-                                      * should provide an additional matrix
-                                      * argument or use one of the functions
-                                      * with both matrix and vector
-                                      * arguments.
+				      * Note that this function will apply all
+                                      * constraints as if they were
+                                      * homogeneous. For correctly setting
+                                      * inhomogeneous constraints, use the
+                                      * similar function with a matrix
+                                      * argument or the function with both
+                                      * matrix and vector arguments.
 				      *
-				      * The optional argument
+				      * Note: This function is not
+				      * thread-safe, so you will need to make
+				      * sure that only on process at a time
+				      * calls this function.
+                                      */
+    template <typename VectorType>
+    void
+    distribute_local_to_global (const Vector<double>            &local_vector,
+                                const std::vector<unsigned int> &local_dof_indices,
+                                VectorType                      &global_vector) const;
+
+                                     /**
+                                      * This function takes a vector of
+                                      * local contributions (@p
+                                      * local_vector) corresponding to the
+                                      * degrees of freedom indices given in
+                                      * @p local_dof_indices and distributes
+                                      * them to the global vector. In most
+                                      * cases, these local contributions
+                                      * will be the result of an integration
+                                      * over a cell or face of a
+                                      * cell. However, as long as @p
+                                      * local_vector and @p
+                                      * local_dof_indices have the same
+                                      * number of elements, this function is
+                                      * happy with whatever it is
+                                      * given.
+                                      *
+                                      * In contrast to the similar function in
+                                      * the DoFAccessor class, this function
+                                      * also takes care of constraints,
+                                      * i.e. if one of the elements of @p
+                                      * local_dof_indices belongs to a
+                                      * constrained node, then rather than
+                                      * writing the corresponding element of
+                                      * @p local_vector into @p global_vector,
+                                      * the element is distributed to the
+                                      * entries in the global vector to which
+                                      * this particular degree of freedom is
+                                      * constrained.
+                                      *
+                                      * Thus, by using this function to
+                                      * distribute local contributions to the
+                                      * global object, one saves the call to
+                                      * the condense function after the
+                                      * vectors and matrices are fully
+                                      * assembled.
+				      *
+				      * The fourth argument
 				      * <tt>local_matrix</tt> is intended to
 				      * be used in case one wants to apply
 				      * inhomogeneous constraints on the
-				      * vector only. Such a situation could
-				      * be where one wants to assemble of a
-				      * right hand side vector on a problem
-				      * with inhomogeneous constraints, but
-				      * the global matrix has been assembled
-				      * previously. A typical example of
-				      * this is a time stepping algorithm
-				      * where the stiffness matrix is
-				      * assembled once, and the right hand
-				      * side updated every time step. Note
-				      * that, however, the entries in the
-				      * columns of the local matrix have to
-				      * be exactly the same as those that
-				      * have been written into the global
-				      * matrix. Otherwise, this function
-				      * will not be able to correctly handle
-				      * inhomogeneities.
+				      * vector only. Such a situation could be
+				      * where one wants to assemble of a right
+				      * hand side vector on a problem with
+				      * inhomogeneous constraints, but the
+				      * global matrix has been assembled
+				      * previously. A typical example of this
+				      * is a time stepping algorithm where the
+				      * stiffness matrix is assembled once,
+				      * and the right hand side updated every
+				      * time step. Note that, however, the
+				      * entries in the columns of the local
+				      * matrix have to be exactly the same as
+				      * those that have been written into the
+				      * global matrix. Otherwise, this
+				      * function will not be able to correctly
+				      * handle inhomogeneities.
 				      *
 				      * Note: This function is not
-				      * thread-safe, so you will need to
-				      * make sure that only on process at a
-				      * time calls this function.
+				      * thread-safe, so you will need to make
+				      * sure that only on process at a time
+				      * calls this function.
                                       */
     template <typename VectorType>
     void
     distribute_local_to_global (const Vector<double>            &local_vector,
                                 const std::vector<unsigned int> &local_dof_indices,
                                 VectorType                      &global_vector,
-				const FullMatrix<double>        &local_matrix = FullMatrix<double>()) const;
+				const FullMatrix<double>        &local_matrix) const;
+
+
+                                     /**
+                                      * This function takes a pointer to a
+                                      * vector of local contributions (@p
+                                      * local_vector) corresponding to the
+                                      * degrees of freedom indices given in
+                                      * @p local_dof_indices and distributes
+                                      * them to the global vector. In most
+                                      * cases, these local contributions
+                                      * will be the result of an integration
+                                      * over a cell or face of a
+                                      * cell. However, as long as the
+                                      * entries in @p local_dof_indices
+                                      * indicate reasonable global vector
+                                      * entries, this function is happy with
+                                      * whatever it is given.
+                                      *
+                                      * If one of the elements of @p
+                                      * local_dof_indices belongs to a
+                                      * constrained node, then rather than
+                                      * writing the corresponding element of
+                                      * @p local_vector into @p
+                                      * global_vector, the element is
+                                      * distributed to the entries in the
+                                      * global vector to which this
+                                      * particular degree of freedom is
+                                      * constrained.
+                                      *
+                                      * Thus, by using this function to
+                                      * distribute local contributions to
+                                      * the global object, one saves the
+                                      * call to the condense function after
+                                      * the vectors and matrices are fully
+                                      * assembled. Note that this function
+                                      * completely ignores inhomogeneous
+                                      * constraints.
+				      *
+				      * Note: This function is not
+				      * thread-safe, so you will need to
+				      * make sure that only on process at a
+				      * time calls this function.
+                                      */
+    template <typename ForwardIteratorVec, typename ForwardIteratorInd,
+              class VectorType>
+    void
+    distribute_local_to_global (ForwardIteratorVec local_vector_begin,
+                                ForwardIteratorVec local_vector_end,
+				ForwardIteratorInd local_indices_begin,
+                                VectorType        &global_vector) const;
 
                                      /**
                                       * This function takes a matrix of
@@ -1201,23 +1308,49 @@ class ConstraintMatrix : public Subscriptor
     add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				 SparsityType                    &sparsity_pattern,
 				 const bool                       keep_constrained_entries = true,
-				 const Table<2,bool>             &dof_mask = default_empty_table) const;
+				 const Table<2,bool>             &dof_mask = Table<2,bool>()) const;
 
-				     /**
-				      * Delete hanging nodes in a
-				      * vector. Sets all hanging node
-				      * values to zero. The @p
-				      * VectorType may be a
-				      * Vector<float>, Vector<double>,
-				      * BlockVector<tt><...></tt>, a
-				      * PETSc or Trilinos vector
-				      * wrapper class, or any other
-				      * type having the same
-				      * interface.
-				      */
-    template <class VectorType>
-    void set_zero (VectorType &vec) const;
-
+                                     /**
+                                      * This function imports values from a
+                                      * global vector (@p global_vector) by
+                                      * applying the constraints to a vector
+                                      * of local values, expressed in
+                                      * iterator format.  In most cases, the
+                                      * local values will be identified by
+                                      * the local dof values on a
+                                      * cell. However, as long as the
+                                      * entries in @p local_dof_indices
+                                      * indicate reasonable global vector
+                                      * entries, this function is happy with
+                                      * whatever it is given.
+                                      *
+                                      * If one of the elements of @p
+                                      * local_dof_indices belongs to a
+                                      * constrained node, then rather than
+                                      * writing the corresponding element of
+                                      * @p global_vector into @p
+                                      * local_vector, the constraints are
+                                      * resolved as the respective
+                                      * distribute function does, i.e., the
+                                      * local entry is constructed from the
+                                      * global entries to which this
+                                      * particular degree of freedom is
+                                      * constrained.
+				      *
+                                      * In contrast to the similar function
+                                      * get_dof_values in the DoFAccessor
+                                      * class, this function does not need
+                                      * the constrained values to be
+                                      * correctly set (i.e., distribute to
+                                      * be called).
+                                      */
+    template <typename ForwardIteratorVec, typename ForwardIteratorInd,
+              class VectorType>
+    void
+    get_dof_values (const VectorType  &global_vector,
+		    ForwardIteratorInd local_indices_begin,
+		    ForwardIteratorVec local_vector_begin,
+		    ForwardIteratorVec local_vector_end) const;
 
 				     /**
 				      * @}
@@ -1363,9 +1496,9 @@ class ConstraintMatrix : public Subscriptor
 				         /**
 					  * Value of the inhomogeneity.
 					  */
-        double inhomogeneity;
+	double inhomogeneity;
 
-					 /**
+                                         /**
 					  * This operator is a bit weird and
 					  * unintuitive: it compares the
 					  * line numbers of two lines. We
@@ -1379,7 +1512,7 @@ class ConstraintMatrix : public Subscriptor
 					  */
 	bool operator < (const ConstraintLine &) const;
 
-					 /**
+                                         /**
 					  * This operator is likewise weird:
 					  * it checks whether the line
 					  * indices of the two operands are
@@ -1412,17 +1545,21 @@ class ConstraintMatrix : public Subscriptor
 				      * to store the lines. This, however,
 				      * would mean a much more fractioned
 				      * heap since it allocates many small
-				      * objects, ans would additionally make
+				      * objects, and would additionally make
 				      * usage of this matrix much slower.
 				      */
     std::vector<ConstraintLine> lines;
 
 				     /**
-				      * A list of flags that indicate
-				      * whether there is a constraint line
-				      * for a given degree of freedom
-				      * index. Note that this class has no
-				      * notion of how many degrees of
+				      * A list of pointers that contains the
+				      * address of the ConstraintLine of a
+				      * constrained degree of freedom, or NULL
+				      * if the degree of freedom is not
+				      * constrained. The NULL return value
+				      * returns thus whether there is a
+				      * constraint line for a given degree of
+				      * freedom index. Note that this class
+				      * has no notion of how many degrees of
 				      * freedom there really are, so if we
 				      * check whether there is a constraint
 				      * line for a given degree of freedom,
@@ -1430,39 +1567,45 @@ class ConstraintMatrix : public Subscriptor
 				      * shorter than the index of the DoF we
 				      * check for.
 				      *
-				      * This field exists since when adding
-				      * a new constraint line we have to
-				      * figure out whether it already
+				      * This field exists since when adding a
+				      * new constraint line we have to figure
+				      * out whether it already
 				      * exists. Previously, we would simply
 				      * walk the unsorted list of constraint
 				      * lines until we either hit the end or
-				      * found it. This algorithm is O(N) if
-				      * N is the number of constraints,
-				      * which makes it O(N^2) when inserting
-				      * all constraints. For large problems
-				      * with many constraints, this could
-				      * easily take 5-10 per cent of the
-				      * total run time. With this field, we
-				      * can at least save this time when
-				      * checking whether a new constraint
-				      * line already exists.
+				      * found it. This algorithm is O(N) if N
+				      * is the number of constraints, which
+				      * makes it O(N^2) when inserting all
+				      * constraints. For large problems with
+				      * many constraints, this could easily
+				      * take 5-10 per cent of the total run
+				      * time. With this field, we can save
+				      * this time since we find any constraint
+				      * in O(1) time or get to know that it a
+				      * certain degree of freedom is not
+				      * constrained.
 				      *
 				      * To make things worse, traversing the
-				      * list of existing constraints
-				      * requires reads from many different
-				      * places in memory. Thus, in large 3d
-				      * applications, the add_line()
-				      * function showed up very prominently
-				      * in the overall compute time, mainly
-				      * because it generated a lot of cache
+				      * list of existing constraints requires
+				      * reads from many different places in
+				      * memory. Thus, in large 3d
+				      * applications, the add_line() function
+				      * showed up very prominently in the
+				      * overall compute time, mainly because
+				      * it generated a lot of cache
 				      * misses. This should also be fixed by
-				      * using the O(1) algorithm to access
-				      * the fields of this array.
+				      * using the O(1) algorithm to access the
+				      * fields of this array.
 				      *
 				      * The field is useful in a number of
-				      * other contexts as well, though.
+				      * other contexts as well, e.g. when one
+				      * needs random access to the constraints
+				      * as in all the functions that apply
+				      * constraints on the fly while add cell
+				      * contributions into vectors and
+				      * matrices.
 				      */
-    std::vector<bool> constraint_line_exists;
+    std::vector<const ConstraintLine*> lines_cache;
 
 				     /**
 				      * Store whether the arrays are sorted.
@@ -1478,13 +1621,6 @@ class ConstraintMatrix : public Subscriptor
 				      * weight.
 				      */
     static bool check_zero_weight (const std::pair<unsigned int, double> &p);
-
-				     /**
-				      * Dummy table that serves as default
-				      * argument for function
-				      * <tt>add_entries_local_to_global()</tt>.
-				      */
-    static const Table<2,bool> default_empty_table;
 
 				     /**
 				      * This function actually implements
@@ -1540,26 +1676,6 @@ class ConstraintMatrix : public Subscriptor
 				 const Table<2,bool>             &dof_mask,
 				 internal::bool2type<true>) const;
 
-				    /**
-				     * This function returns a pointer to
-				     * the respective ConstraintLine object
-				     * if a dof is constrained, and a zero
-				     * pointer otherwise.
-				     */
-    std::vector<ConstraintLine>::const_iterator
-    find_constraint (const unsigned int line) const;
-
-				    /**
-				     * This function returns a pointer to
-				     * the respective ConstraintLine object
-				     * if a dof is constrained, and a zero
-				     * pointer otherwise. This function is
-				     * used if the constraint matrix has not
-				     * been closed yet.
-				     */
-    std::vector<ConstraintLine>::iterator
-    find_constraint (const unsigned int line);
-
 #ifdef DEAL_II_USE_TRILINOS
 //TODO: Make use of the following member thread safe
 				      /**
@@ -1588,7 +1704,7 @@ ConstraintMatrix::ConstraintMatrix (const ConstraintMatrix &constraint_matrix)
 		:
 		Subscriptor (),
 		lines (constraint_matrix.lines),
-		constraint_line_exists (constraint_matrix.constraint_line_exists),
+		lines_cache (constraint_matrix.lines_cache),
 		sorted (constraint_matrix.sorted)
 #ifdef DEAL_II_USE_TRILINOS
 		,vec_distribute ()
@@ -1606,22 +1722,36 @@ ConstraintMatrix::add_line (const unsigned int line)
 
 				   // check whether line already exists; it
 				   // may, in which case we can just quit
-  if ((line < constraint_line_exists.size())
+  if ((line < lines_cache.size())
       &&
-      (constraint_line_exists[line] == true))
-    return;
+      (lines_cache[line] != 0))
+    {
+      Assert (lines_cache[line]->line == line, ExcInternalError());
+      return;
+    }
 
 				   // if necessary enlarge vector of
-				   // existing entries
-  if (line >= constraint_line_exists.size())
-    constraint_line_exists.resize (line+1, false);
-  constraint_line_exists[line] = true;
+				   // existing entries for cache
+  if (line >= lines_cache.size())
+    lines_cache.resize (line+1,0);
+				   // enlarge lines vector if necessary. 
+				   // need to reset the pointers to the 
+				   // ConstraintLine entries in that case, 
+				   // since new memory will be allocated
+  if (lines.size() == lines.capacity())
+    {
+      lines.reserve (2*lines.size()+8);
+      std::vector<ConstraintLine>::const_iterator it = lines.begin();
+      for ( ; it != lines.end(); ++it)
+	lines_cache[it->line] = &*it;
+    }
 
 				   // push a new line to the end of the
 				   // list
   lines.push_back (ConstraintLine());
   lines.back().line = line;
   lines.back().inhomogeneity = 0.;
+  lines_cache[line] = &lines.back();
 }
 
 
@@ -1636,8 +1766,6 @@ ConstraintMatrix::add_entry (const unsigned int line,
   Assert (line != column,
 	  ExcMessage ("Can't constrain a degree of freedom to itself"));
 
-  std::vector<ConstraintLine>::iterator line_ptr = find_constraint(line);
-
 				   // if in debug mode, check whether an
 				   // entry for this column already
 				   // exists and if its the same as
@@ -1646,6 +1774,9 @@ ConstraintMatrix::add_entry (const unsigned int line,
 				   // in any case: exit the function if an
 				   // entry for this column already exists,
 				   // since we don't want to enter it twice
+  ConstraintLine* line_ptr = const_cast<ConstraintLine*>(lines_cache[line]);
+  Assert (line_ptr != 0, ExcInternalError());
+  Assert (line_ptr->line == line, ExcInternalError());
   for (std::vector<std::pair<unsigned int,double> >::const_iterator
          p=line_ptr->entries.begin();
        p != line_ptr->entries.end(); ++p)
@@ -1666,7 +1797,8 @@ void
 ConstraintMatrix::set_inhomogeneity (const unsigned int line,
 				     const double       value)
 {
-  find_constraint(line)->inhomogeneity = value;
+  ConstraintLine* line_ptr = const_cast<ConstraintLine*>(lines_cache[line]);
+  line_ptr->inhomogeneity = value;
 }
 
 
@@ -1675,9 +1807,9 @@ inline
 bool
 ConstraintMatrix::is_constrained (const unsigned int index) const
 {
-  return ((index < constraint_line_exists.size())
+  return ((index < lines_cache.size())
           &&
-          (constraint_line_exists[index] == true));
+          (lines_cache[index] != 0));
 }
 
 
@@ -1686,68 +1818,89 @@ inline
 bool
 ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) const
 {
-  const std::vector<ConstraintLine>::const_iterator position
-    = find_constraint(index);
-  return position!=lines.end() ? position->inhomogeneity != 0 : false;
+  return (is_constrained(index) &&
+	  lines_cache[index]->inhomogeneity != 0);
 }
 
 
 
+template <class VectorType>
 inline
-std::vector<ConstraintMatrix::ConstraintLine>::const_iterator
-ConstraintMatrix::find_constraint (const unsigned int line) const
+void
+ConstraintMatrix::
+distribute_local_to_global (const Vector<double>            &local_vector,
+                            const std::vector<unsigned int> &local_dof_indices,
+                            VectorType                      &global_vector) const
 {
-  if (is_constrained(line) == false)
-    return lines.end();
-
-  Assert (sorted==true, ExcMatrixNotClosed());
-  ConstraintLine index_comparison;
-  index_comparison.line = line;
-
-  const std::vector<ConstraintLine>::const_iterator
-    position = std::lower_bound (lines.begin(),
-				 lines.end(),
-				 index_comparison);
-  Assert (position != lines.end(), ExcInternalError());
-
-				   // check whether we've really found the
-				   // right constraint.
-  Assert (position->line == line,
-	  ExcInternalError());
-
-  return position;
+  Assert (local_vector.size() == local_dof_indices.size(),
+          ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
+  distribute_local_to_global (local_vector.begin(), local_vector.end(),
+			      local_dof_indices.begin(), global_vector);
 }
 
 
 
+template <typename ForwardIteratorVec, typename ForwardIteratorInd,
+          class VectorType>
 inline
-std::vector<ConstraintMatrix::ConstraintLine>::iterator
-ConstraintMatrix::find_constraint (const unsigned int line)
+void ConstraintMatrix::
+  distribute_local_to_global (ForwardIteratorVec local_vector_begin,
+			      ForwardIteratorVec local_vector_end,
+			      ForwardIteratorInd local_indices_begin,
+			      VectorType        &global_vector) const
 {
-  Assert (sorted==false, ExcMatrixIsClosed());
-  std::vector<ConstraintLine>::iterator line_ptr;
-  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
+  Assert (sorted == true, ExcMatrixNotClosed());
+  for ( ; local_vector_begin != local_vector_end;
+	++local_vector_begin, ++local_indices_begin)
+    {
+      if (is_constrained(*local_indices_begin) == false)
+	global_vector(*local_indices_begin) += *local_vector_begin;
+      else
+	{
+	  const ConstraintLine* position =
+	    lines_cache[*local_indices_begin];
+	  for (unsigned int j=0; j<position->entries.size(); ++j)
+	    {
+	      Assert (is_constrained(position->entries[j].first) == false,
+		      ExcMessage ("Tried to distribute to a fixed dof."));
+	      global_vector(position->entries[j].first)
+		+= *local_vector_begin * position->entries[j].second;
+	    }
+	}
+    }
+}
 
-  				   // the usual case is that the line where
-				   // a value is entered is the one we
-				   // added last, so we search backward
-  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
-    if (line_ptr->line == line)
-      break;
 
-				   // if the loop didn't break, then
-				   // line_ptr must be begin().
-				   // we have an error if that doesn't
-				   // point to 'line' then
-  Assert (line_ptr->line==line, ExcLineInexistant(line));
-				   // second check: the respective
-				   // flag in the
-				   // constraint_line_exists field
-				   // must exist
-  Assert (line < constraint_line_exists.size(), ExcInternalError());
-  Assert (constraint_line_exists[line] == true, ExcInternalError());
 
-  return line_ptr;
+template <typename ForwardIteratorVec, typename ForwardIteratorInd,
+          class VectorType>
+inline
+void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
+				       ForwardIteratorInd local_indices_begin,
+				       ForwardIteratorVec local_vector_begin,
+				       ForwardIteratorVec local_vector_end) const
+{
+  Assert (sorted == true, ExcMatrixNotClosed());
+  for ( ; local_vector_begin != local_vector_end;
+	++local_vector_begin, ++local_indices_begin)
+    {
+      if (is_constrained(*local_indices_begin) == false)
+	*local_vector_begin = global_vector(*local_indices_begin);
+      else
+	{
+	  const ConstraintLine* position =
+	    lines_cache[*local_indices_begin];
+	  typename VectorType::value_type value = position->inhomogeneity;
+	  for (unsigned int j=0; j<position->entries.size(); ++j)
+	    {
+	      Assert (is_constrained(position->entries[j].first) == false,
+		      ExcMessage ("Tried to distribute to a fixed dof."));
+	      value += (global_vector(position->entries[j].first) *
+			position->entries[j].second);
+	    }
+	  *local_vector_begin = value;
+	}
+    }
 }
 
 DEAL_II_NAMESPACE_CLOSE

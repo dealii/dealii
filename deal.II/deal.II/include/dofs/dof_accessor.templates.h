@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <lac/constraint_matrix.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_levels.h>
 #include <dofs/dof_faces.h>
@@ -48,9 +49,10 @@ DoFAccessor (const Triangulation<DH::dimension,DH::space_dimension> *tria,
 	     const int                 index,
 	     const DH                 *dof_handler)
 		:
-		internal::DoFAccessor::Inheritance<structdim,DH::dimension,DH::space_dimension>::BaseClass (tria,
-													    level,
-													    index),
+		internal::DoFAccessor::Inheritance<structdim,DH::dimension,
+                                                   DH::space_dimension>::BaseClass (tria,
+										    level,
+										    index),
                 dof_handler(const_cast<DH*>(dof_handler))
 {}
 
@@ -191,10 +193,10 @@ namespace internal
 	static
 	unsigned int
 	get_dof_index (const dealii::DoFHandler<1,spacedim>   &dof_handler,
-		       const unsigned int              obj_level,
-		       const unsigned int              obj_index,
-		       const unsigned int              fe_index,
-		       const unsigned int              local_index,
+		       const unsigned int                      obj_level,
+		       const unsigned int                      obj_index,
+		       const unsigned int                      fe_index,
+		       const unsigned int                      local_index,
 		       internal::int2type<1>)
 	  {
 	    return dof_handler.levels[obj_level]->lines.
@@ -2072,17 +2074,16 @@ namespace internal
 					  * indices that we hold for each
 					  * cell.
 					  */
-	template <int dim, int spacedim, class InputVector, typename number>
+	template <int dim, int spacedim, class InputVector, typename ForwardIterator>
 	static
 	void
 	get_dof_values (const DoFCellAccessor<DoFHandler<dim,spacedim> > &accessor,
 			const InputVector &values,
-			dealii::Vector<number> &local_values)
+			ForwardIterator    local_values_begin,
+			ForwardIterator    local_values_end)
 	  {
-	    typedef
-	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
-	      BaseClass;
-	    Assert (local_values.size() == accessor.get_fe().dofs_per_cell,
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (local_values_end-local_values_begin == accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    Assert (values.size() == accessor.get_dof_handler().n_dofs(),
 		    typename BaseClass::ExcVectorDoesNotMatch());
@@ -2097,9 +2098,10 @@ namespace internal
 		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
 
 	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
-				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
-	    for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
-	      local_values(i) = values(*cache);
+				  ->cell_dof_indices_cache[accessor.present_index * 
+							   accessor.get_fe().dofs_per_cell];
+	    for ( ; local_values_begin != local_values_end; ++local_values_begin, ++cache)
+	      *local_values_begin = values(*cache);
 	  }
 
 					 /**
@@ -2109,22 +2111,98 @@ namespace internal
 					  * not have a cache for the local
 					  * DoF indices.
 					  */
-	template <int dim, int spacedim, class InputVector, typename number>
+	template <int dim, int spacedim, class InputVector, typename ForwardIterator>
 	static
 	void
 	get_dof_values (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
 			const InputVector &values,
-			dealii::Vector<number>    &local_values)
+			ForwardIterator    local_values_begin,
+			ForwardIterator    local_values_end)
 	  {
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+
 					     // no caching for hp::DoFHandler
 					     // implemented
+	    Assert (local_values_end-local_values_begin == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
 	    const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
 
 	    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 	    get_dof_indices (accessor, local_dof_indices);
 
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      local_values(i) = values(local_dof_indices[i]);
+	    for (unsigned int i=0; i<dofs_per_cell; ++i, ++local_values_begin)
+	      *local_values_begin = values(local_dof_indices[i]);
+	  }
+
+
+					 /**
+					  * A function that collects the
+					  * values of degrees of freedom. This
+					  * function works for ::DoFHandler
+					  * and all template arguments and
+					  * uses the data from the cache of
+					  * indices that we hold for each
+					  * cell.
+					  */
+	template <int dim, int spacedim, class InputVector, typename ForwardIterator>
+	static
+	void
+	get_dof_values (const DoFCellAccessor<DoFHandler<dim,spacedim> > &accessor,
+			const ConstraintMatrix &constraints,
+			const InputVector      &values,
+			ForwardIterator         local_values_begin,
+			ForwardIterator         local_values_end)
+	  {
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (local_values_end-local_values_begin == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (values.size() == accessor.get_dof_handler().n_dofs(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+					     // check as in documentation that
+					     // cell is either active, or dofs
+					     // are only in vertices
+	    Assert (!accessor.has_children()
+		    ||
+		    (accessor.get_fe().dofs_per_cell ==
+		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
+		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+
+	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
+				  ->cell_dof_indices_cache[accessor.present_index * 
+							   accessor.get_fe().dofs_per_cell];
+	    constraints.get_dof_values(values, *cache, local_values_begin,
+				       local_values_end);
+	  }
+
+					 /**
+					  * Same function as above except
+					  * that it works for
+					  * hp::DoFHandler objects that do
+					  * not have a cache for the local
+					  * DoF indices.
+					  */
+	template <int dim, int spacedim, class InputVector, typename ForwardIterator>
+	static
+	void
+	get_dof_values (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
+			const ConstraintMatrix &constraints,
+			const InputVector      &values,
+			ForwardIterator         local_values_begin,
+			ForwardIterator         local_values_end)
+	  {
+					     // no caching for hp::DoFHandler
+					     // implemented
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (local_values_end-local_values_begin == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
+
+	    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+	    get_dof_indices (accessor, local_dof_indices);
+
+	    constraints.get_dof_values (values, local_dof_indices.begin(),
+					local_values_begin, local_values_end);
 	  }
 
 
@@ -2140,9 +2218,7 @@ namespace internal
 			const dealii::Vector<number> &local_values,
 			OutputVector &values)
 	  {
-	    typedef
-	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
-	      BaseClass;
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
 	    Assert (local_values.size() == accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    Assert (values.size() == accessor.get_dof_handler().n_dofs(),
@@ -2234,9 +2310,7 @@ namespace internal
 					     // ::DoFHandler only supports a
 					     // single active fe with index
 					     // zero
-	    typedef
-	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
-	      BaseClass;
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
 	    Assert (i == 0, typename BaseClass::ExcInvalidObject());
 	  }
 
@@ -2248,9 +2322,7 @@ namespace internal
 	set_active_fe_index (DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
 			     const unsigned int                                      i)
 	  {
-	    typedef
-	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
-	      BaseClass;
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
 	    Assert (accessor.dof_handler != 0,
 		    typename BaseClass::ExcInvalidObject());
 	    Assert (static_cast<unsigned int>(accessor.level()) <
@@ -2266,22 +2338,20 @@ namespace internal
 
 
 
-        template <int dim, int spacedim, typename number, class OutputVector>
+        template <int dim, int spacedim, typename ForwardIterator, class OutputVector>
 	static
 	void
 	distribute_local_to_global (const DoFCellAccessor<dealii::DoFHandler<dim,spacedim> > &accessor,
-				    const dealii::Vector<number> &local_source,
-				    OutputVector                 &global_destination)
+				    ForwardIterator local_source_begin,
+				    ForwardIterator local_source_end,
+				    OutputVector   &global_destination)
           {
-	    typedef
-	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
-	      BaseClass;
-
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
 	    Assert (accessor.dof_handler != 0,
 		    typename BaseClass::ExcInvalidObject());
 	    Assert (&accessor.get_fe() != 0,
 		    typename BaseClass::ExcInvalidObject());
-	    Assert (local_source.size() == accessor.get_fe().dofs_per_cell,
+	    Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
 		    typename BaseClass::ExcVectorDoesNotMatch());
@@ -2295,38 +2365,36 @@ namespace internal
 		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
 		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
 
-	    const unsigned int n_dofs = local_source.size();
+	    const unsigned int n_dofs = local_source_end - local_source_begin;
 
 	    unsigned int * dofs = &accessor.dof_handler->levels[accessor.level()]
 	                          ->cell_dof_indices_cache[accessor.present_index * n_dofs];
 
 				   // distribute cell vector
-	    global_destination.add(n_dofs, dofs,local_source.begin());
+	    global_destination.add(n_dofs, dofs, local_source_begin);
   	  }
 
 
 
-        template <int dim, int spacedim, typename number, class OutputVector>
+        template <int dim, int spacedim, typename ForwardIterator, class OutputVector>
 	static
 	void
 	distribute_local_to_global (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
-				    const dealii::Vector<number> &local_source,
-				    OutputVector                 &global_destination)
+				    ForwardIterator local_source_begin,
+				    ForwardIterator local_source_end,
+				    OutputVector   &global_destination)
           {
-	    typedef
-	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
-	      BaseClass;
-
-	    Assert (accessor->dof_handler != 0,
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (accessor.dof_handler != 0,
 		    typename BaseClass::ExcInvalidObject());
 	    Assert (&accessor.get_fe() != 0,
 		    typename BaseClass::ExcInvalidObject());
-	    Assert (local_source.size() == accessor.get_fe().dofs_per_cell,
+	    Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
 		    typename BaseClass::ExcVectorDoesNotMatch());
 
-	    const unsigned int n_dofs = local_source.size();
+	    const unsigned int n_dofs = local_source_end - local_source_begin;
 
 //TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array. This should be fixed eventually
 
@@ -2335,7 +2403,81 @@ namespace internal
 	    accessor.get_dof_indices (dofs);
 
 				   // distribute cell vector
-	    global_destination.add (dofs, local_source);
+	    global_destination.add (n_dofs, dofs.begin(), local_source_begin);
+	  }
+
+
+
+        template <int dim, int spacedim, typename ForwardIterator, class OutputVector>
+	static
+	void
+	distribute_local_to_global (const DoFCellAccessor<dealii::DoFHandler<dim,spacedim> > &accessor,
+				    const ConstraintMatrix &constraints,
+				    ForwardIterator         local_source_begin,
+				    ForwardIterator         local_source_end,
+				    OutputVector           &global_destination)
+          {
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (accessor.dof_handler != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (&accessor.get_fe() != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+					     // check as in documentation that
+					     // cell is either active, or dofs
+					     // are only in vertices
+	    Assert (!accessor.has_children()
+		    ||
+		    (accessor.get_fe().dofs_per_cell ==
+		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
+		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+
+	    const unsigned int n_dofs = local_source_end - local_source_begin;
+
+	    unsigned int * dofs = &accessor.dof_handler->levels[accessor.level()]
+	                          ->cell_dof_indices_cache[accessor.present_index * n_dofs];
+
+				   // distribute cell vector
+	    constraints.distribute_local_to_global (local_source_begin, local_source_end,
+						    dofs, global_destination);
+  	  }
+
+
+
+        template <int dim, int spacedim, typename ForwardIterator, class OutputVector>
+	static
+	void
+	distribute_local_to_global (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
+				    const ConstraintMatrix &constraints,
+				    ForwardIterator         local_source_begin,
+				    ForwardIterator         local_source_end,
+				    OutputVector           &global_destination)
+          {
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (accessor.dof_handler != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (&accessor.get_fe() != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+	    const unsigned int n_dofs = local_source_end - local_source_begin;
+
+//TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array. This should be fixed eventually
+
+				   // get indices of dofs
+	    std::vector<unsigned int> dofs (n_dofs);
+	    accessor.get_dof_indices (dofs);
+
+				   // distribute cell vector
+	    constraints.distribute_local_to_global (local_source_begin, local_source_end,
+						    dofs.begin(), global_destination);
 	  }
 
 
@@ -2347,10 +2489,7 @@ namespace internal
 				    const dealii::FullMatrix<number> &local_source,
 				    OutputMatrix                     &global_destination)
           {
-	    typedef
-	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
-	      BaseClass;
-
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
 	    Assert (accessor.dof_handler != 0,
 		    typename BaseClass::ExcInvalidObject());
 	    Assert (&accessor.get_fe() != 0,
@@ -2378,7 +2517,7 @@ namespace internal
 	    unsigned int * dofs = &accessor.dof_handler->levels[accessor.level()]
 	                          ->cell_dof_indices_cache[accessor.present_index * n_dofs];
 
-				   // distribute cell matrices
+				   // distribute cell matrix
 	    for (unsigned int i=0; i<n_dofs; ++i)
 	      global_destination.add(dofs[i], n_dofs, dofs,
 				     &local_source(i,0));
@@ -2393,11 +2532,8 @@ namespace internal
 				    const dealii::FullMatrix<number> &local_source,
 				    OutputMatrix                     &global_destination)
           {
-	    typedef
-	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
-	      BaseClass;
-
-	    Assert (accessor->dof_handler != 0,
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (accessor.dof_handler != 0,
 		    typename BaseClass::ExcInvalidObject());
 	    Assert (&accessor.get_fe() != 0,
 		    typename BaseClass::ExcInvalidObject());
@@ -2418,8 +2554,102 @@ namespace internal
 	    std::vector<unsigned int> dofs (n_dofs);
 	    accessor.get_dof_indices (dofs);
 
-				   // distribute cell vector
+				   // distribute cell matrix
 	    global_destination.add(dofs,local_source);
+	  }
+
+
+
+        template <int dim, int spacedim, typename number, 
+	          class OutputMatrix, typename OutputVector>
+        static
+	void
+	distribute_local_to_global (const DoFCellAccessor<dealii::DoFHandler<dim,spacedim> > &accessor,
+				    const dealii::FullMatrix<number> &local_matrix,
+				    const dealii::Vector<number>     &local_vector,
+				    OutputMatrix                     &global_matrix,
+				    OutputVector                     &global_vector)
+          {
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (accessor.dof_handler != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (&accessor.get_fe() != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (local_matrix.n() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_matrix.m(),
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_matrix.n(),
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (local_vector.size() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_vector.size(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+					     // check as in documentation that
+					     // cell is either active, or dofs
+					     // are only in vertices
+	    Assert (!accessor.has_children()
+		    ||
+		    (accessor.get_fe().dofs_per_cell ==
+		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
+		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+
+	    const unsigned int n_dofs = accessor.get_fe().dofs_per_cell;
+	    unsigned int * dofs = &accessor.dof_handler->levels[accessor.level()]
+	                          ->cell_dof_indices_cache[accessor.present_index * n_dofs];
+
+				   // distribute cell matrices
+	    for (unsigned int i=0; i<n_dofs; ++i)
+	      {
+		global_matrix.add(dofs[i], n_dofs, dofs, &local_matrix(i,0));
+		global_vector(dofs[i]) += local_vector(i);
+	      }
+  	  }
+
+
+
+        template <int dim, int spacedim, typename number, 
+	          class OutputMatrix, typename OutputVector>
+	static
+	void
+	distribute_local_to_global (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
+				    const dealii::FullMatrix<number> &local_matrix,
+				    const dealii::Vector<number>     &local_vector,
+				    OutputMatrix                     &global_matrix,
+				    OutputVector                     &global_vector)
+          {
+	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
+	    Assert (accessor.dof_handler != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (&accessor.get_fe() != 0,
+		    typename BaseClass::ExcInvalidObject());
+	    Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (local_matrix.n() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_matrix.m(),
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_matrix.n(),
+		    typename BaseClass::ExcMatrixDoesNotMatch());
+	    Assert (local_vector.size() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (accessor.dof_handler->n_dofs() == global_vector.size(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+	    const unsigned int n_dofs = local_matrix.size();
+
+//TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array.
+
+				   // get indices of dofs
+	    std::vector<unsigned int> dofs (n_dofs);
+	    accessor.get_dof_indices (dofs);
+
+				   // distribute cell matrix and vector
+	    global_matrix.add(dofs,local_matrix);
+	    global_vector.add(dofs,local_vector);
 	  }
     };
   }
@@ -2554,7 +2784,35 @@ DoFCellAccessor<DH>::get_dof_values (const InputVector &values,
 				     Vector<number>    &local_values) const
 {
   internal::DoFCellAccessor::Implementation
-    ::get_dof_values (*this, values, local_values);
+    ::get_dof_values (*this, values, local_values.begin(), local_values.end());
+}
+
+
+
+template <class DH>
+template <class InputVector, typename ForwardIterator>
+void
+DoFCellAccessor<DH>::get_dof_values (const InputVector &values,
+				     ForwardIterator    local_values_begin,
+				     ForwardIterator    local_values_end) const
+{
+  internal::DoFCellAccessor::Implementation
+    ::get_dof_values (*this, values, local_values_begin, local_values_end);
+}
+
+
+
+template <class DH>
+template <class InputVector, typename ForwardIterator>
+void
+DoFCellAccessor<DH>::get_dof_values (const ConstraintMatrix &constraints,
+				     const InputVector      &values,
+				     ForwardIterator         local_values_begin,
+				     ForwardIterator         local_values_end) const
+{
+  internal::DoFCellAccessor::Implementation
+    ::get_dof_values (*this, constraints, values, 
+		      local_values_begin, local_values_end);
 }
 
 
@@ -2611,7 +2869,41 @@ distribute_local_to_global (const Vector<number> &local_source,
 			    OutputVector         &global_destination) const
 {
   internal::DoFCellAccessor::Implementation::
-    distribute_local_to_global (*this,local_source,global_destination);
+    distribute_local_to_global (*this, local_source.begin(),
+				local_source.end(), global_destination);
+}
+
+
+
+template <class DH>
+template <typename ForwardIterator, typename OutputVector>
+inline
+void
+DoFCellAccessor<DH>::
+distribute_local_to_global (ForwardIterator  local_source_begin,
+			    ForwardIterator  local_source_end,
+			    OutputVector    &global_destination) const
+{
+  internal::DoFCellAccessor::Implementation::
+    distribute_local_to_global (*this, local_source_begin,
+				local_source_end, global_destination);
+}
+
+
+
+template <class DH>
+template <typename ForwardIterator, typename OutputVector>
+inline
+void
+DoFCellAccessor<DH>::
+distribute_local_to_global (const ConstraintMatrix &constraints,
+			    ForwardIterator         local_source_begin,
+			    ForwardIterator         local_source_end,
+			    OutputVector           &global_destination) const
+{
+  internal::DoFCellAccessor::Implementation::
+    distribute_local_to_global (*this, constraints, local_source_begin,
+				local_source_end, global_destination);
 }
 
 
@@ -2626,6 +2918,23 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 {
   internal::DoFCellAccessor::Implementation::
     distribute_local_to_global (*this,local_source,global_destination);
+}
+
+
+
+template <class DH>
+template <typename number, typename OutputMatrix, typename OutputVector>
+inline
+void
+DoFCellAccessor<DH>::
+distribute_local_to_global (const FullMatrix<number> &local_matrix,
+			    const Vector<number>     &local_vector,
+			    OutputMatrix             &global_matrix,
+			    OutputVector             &global_vector) const
+{
+  internal::DoFCellAccessor::Implementation::
+    distribute_local_to_global (*this,local_matrix,local_vector,
+				global_matrix,global_vector);
 }
 
 
