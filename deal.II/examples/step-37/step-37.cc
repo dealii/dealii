@@ -507,62 +507,69 @@ vmult_on_subrange (const unsigned int    first_cell,
 
 				 // OK, now we are sitting in the loop that
 				 // goes over our chunks of cells. What we
-				 // need to do is five things: First, we
-				 // have to give the full matrices
-				 // containing the solution at cell dofs and
-				 // quadrature points the correct sizes. We
-				 // use the <code>true</code> argument in
-				 // order to specify that this should be
-				 // done fast, i.e., the field will not be
-				 // initialized since we fill them manually
-				 // in a second anyway. Then, we copy the
+				 // need to do is five things: First, we have
+				 // to give the full matrices containing the
+				 // solution at cell dofs and quadrature
+				 // points the correct sizes. We use the
+				 // <code>true</code> argument in order to
+				 // specify that this should be done fast,
+				 // i.e., the field will not be initialized
+				 // since we fill them manually in the very
+				 // next step second anyway. Then, we copy the
 				 // source values from the global vector to
 				 // the local cell range, and we perform a
 				 // matrix-matrix product to tranform the
 				 // values to the quadrature points. It is a
 				 // bit tricky to find out how the matrices
-				 // should be multiplied with each
-				 // other. One way to resolve this is to
+				 // should be multiplied with each other,
+				 // i.e., which matrix needs to be
+				 // transposed. One way to resolve this is to
 				 // look at the matrix dimensions:
 				 // <code>solution_cells</code> has
 				 // <code>current_chunk_size</code> rows and
 				 // <code>matrix_sizes.m</code> columns,
 				 // whereas <code>small_matrix</code> has
 				 // <code>matrix_sizes.m</code> rows and
-				 // <code>matrix_sizes.n</code> columns,
-				 // which is also the size of columns in the
-				 // output matrix
+				 // <code>matrix_sizes.n</code> columns, which
+				 // is also the size of columns in the output
+				 // matrix
 				 // <code>solution_points</code>. Hence, the
-				 // columns of the first matrix are as many
-				 // as there are rows in the second, which
-				 // means that the product is done
-				 // non-transposed for both matrices.
+				 // columns of the first matrix are as many as
+				 // there are rows in the second, which means
+				 // that the product is done non-transposed
+				 // for both matrices.
 				 //
 				 // Once the first product is calculated, we
 				 // apply the derivative information on all
-				 // the cells and all the quadrature points
-				 // by calling the <code>transform</code>
+				 // the cells and all the quadrature points by
+				 // calling the <code>transform</code>
 				 // operation of the
 				 // <code>Transformation</code> class, and
-				 // then use a second matrix-matrix product
-				 // to get back to the solution values at
-				 // the support points. This time, we need
-				 // to transpose the small matrix, indicated
-				 // by a <code>mTmult</code> in the
-				 // operations. The fifth and last step is
-				 // to add the local data into the global
-				 // vector, which is what we did in many
-				 // tutorial programs when assembling right
-				 // hand sides. Just use the
-				 // <code>indices_local_to_global</code>
-				 // field to find out how local dofs and
-				 // global dofs are related to each other.
+				 // then use a second matrix-matrix product to
+				 // get back to the solution values at the
+				 // support points. This time, we need to
+				 // transpose the small matrix, indicated by a
+				 // <code>mTmult</code> in the operations. The
+				 // fifth and last step is to add the local
+				 // data into the global vector, which is what
+				 // we did in many tutorial programs when
+				 // assembling right hand sides. We use the
+				 // <code>indices_local_to_global</code> field
+				 // to find out how local dofs and global dofs
+				 // are related to each other. Since we
+				 // simultaneously apply the constraints, we
+				 // hand this task off to the ConstraintMatrix
+				 // object. Most often, itis used to work on
+				 // one cell at a time, but since we work on a
+				 // whole chunk of dofs, we can do that just
+				 // as easily for all the cells at once.
       solution_cells.reinit (current_chunk_size,matrix_sizes.m, true);
       solution_points.reinit (current_chunk_size,matrix_sizes.n, true);
 
-      for (unsigned int i=0; i<current_chunk_size; ++i)
-	for (unsigned int j=0; j<matrix_sizes.m; ++j)
-	  solution_cells(i,j) = (number)src(indices_local_to_global(i+k,j));
+      const unsigned int n_cell_entries = current_chunk_size*matrix_sizes.m;
+      constraints.get_dof_values(src, &indices_local_to_global(k,0),
+				 &solution_cells(0,0),
+				 &solution_cells(0,0)+n_cell_entries);
 
       solution_cells.mmult (solution_points, small_matrix);
 
@@ -574,9 +581,10 @@ vmult_on_subrange (const unsigned int    first_cell,
 
       static Threads::Mutex mutex;
       Threads::Mutex::ScopedLock lock (mutex);
-      for (unsigned int i=0; i<current_chunk_size; ++i)
-	for (unsigned int j=0; j<matrix_sizes.m; ++j)
-	  dst(indices_local_to_global(i+k,j)) += (number2)solution_cells(i,j);
+      constraints.distribute_local_to_global (&solution_cells(0,0),
+					      &solution_cells(0,0)+n_cell_entries,
+					      &indices_local_to_global(k,0),
+					      dst);
     }
 }
 
@@ -627,25 +635,13 @@ MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
 
 
 
-				 // The <code>vmult_add</code> function that
-				 // multiplies the matrix with vector
-				 // <code>src</code> and adds the result to
-				 // vector <code>dst</code> first creates a
-				 // copy of the source vector in order to
-				 // apply the constraints. The reason for
-				 // doing this is that constrained dofs are
-				 // zero when used in a solver like CG
-				 // (since they are not real degrees of
-				 // freedom), but the solution at the
-				 // respective nodes might still have
-				 // non-zero values which is necessary to
-				 // represent the field correctly in terms
-				 // of the FE basis functions. Then, we call
+				 // This is the <code>vmult_add</code>
+				 // function that multiplies the matrix with
+				 // vector <code>src</code> and adds the
+				 // result to vector <code>dst</code>. We call
 				 // a %parallel function that applies the
 				 // multiplication on a subrange of cells
-				 // (cf. the @ref threads module), and we
-				 // eventually condense the constraints on
-				 // the resulting vector.
+				 // (cf. the @ref threads module).
 				 //
 				 // TODO: Use WorkStream for parallelization
 				 // instead of apply_to_subranges, once we
@@ -657,33 +653,29 @@ void
 MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 					      const Vector<number2> &src) const
 {
-  Vector<number2> src_copy (src);
-  constraints.distribute(src_copy);
-
   parallel::apply_to_subranges (0, matrix_sizes.n_cells,
 				std_cxx1x::bind(&MatrixFree<number,Transformation>::
 						template vmult_on_subrange<number2>,
 						this,
 						_1,_2,
 						boost::ref(dst),
-						boost::cref(src_copy)),
+						boost::cref(src)),
 				200);
-  constraints.condense (dst);
 
 				 // One thing to be cautious about: The
-				 // deal.II classes expect that the
-				 // matrix still contains a diagonal
-				 // entry for constrained dofs
-				 // (otherwise, the matrix would be
-				 // singular, which is not what we
+				 // deal.II classes expect that the matrix
+				 // still contains a diagonal entry for
+				 // constrained dofs (otherwise, the matrix
+				 // would be singular, which is not what we
 				 // want). Since the
-				 // <code>condense</code> command of the
-				 // constraint matrix sets those
-				 // constrained elements to zero, we
-				 // have to circumvent that problem by
-				 // setting the diagonal to some
-				 // non-zero value. We simply set it to
-				 // one.
+				 // <code>distribute_local_to_global</code>
+				 // command of the constraint matrix which we
+				 // used for add the local elements into the
+				 // global matrix does not do write anything
+				 // with constrained elements, we have to
+				 // circumvent that problem by setting the
+				 // diagonal to some non-zero value. We simply
+				 // set it to one.
   for (unsigned int i=0; i<matrix_sizes.n_dofs; ++i)
     if (constraints.is_constrained(i) == true)
       dst(i) += 1.0 * src(i);
