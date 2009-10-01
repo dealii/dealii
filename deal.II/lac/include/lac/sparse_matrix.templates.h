@@ -499,8 +499,13 @@ SparseMatrix<number>::add (const unsigned int  row,
 	      ExcMessage("The given value is not finite but either "
 			 "infinite or Not A Number (NaN)"));
 
-      if (value == 0 && elide_zero_values == true)
+#ifdef DEBUG
+      if (elide_zero_values==true && value == 0)
 	continue;
+#else
+      if (value == 0)
+	continue;
+#endif
 
 				   // check whether the next index to add is
 				   // the next present index in the sparsity
@@ -517,9 +522,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // value we add is zero
       if (index == SparsityPattern::invalid_entry)
 	{
-	  Assert ((index != SparsityPattern::invalid_entry) ||
-		  (value == 0.),
-		  ExcInvalidIndex(row,col_indices[j]));
+	  Assert (value == 0., ExcInvalidIndex(row,col_indices[j]));
 	  continue;
 	}
 
@@ -550,39 +553,69 @@ SparseMatrix<number>::set (const unsigned int  row,
   std::size_t index = cols->get_rowstart_indices()[row], next_index = index;
   const std::size_t next_row_index = cols->get_rowstart_indices()[row+1];
 
-  for (unsigned int j=0; j<n_cols; ++j)
+  if (elide_zero_values == true)
     {
-      const number value = values[j];
-      Assert (numbers::is_finite(value),
-	      ExcMessage("The given value is not finite but either "
-			 "infinite or Not A Number (NaN)"));
+      for (unsigned int j=0; j<n_cols; ++j)
+	{
+	  const number value = values[j];
+	  Assert (numbers::is_finite(value),
+		  ExcMessage("The given value is not finite but either "
+			     "infinite or Not A Number (NaN)"));
 
-      if (value == 0 && elide_zero_values == true)
-	continue;
+	  if (value == 0)
+	    continue;
 
 				   // check whether the next index to set is
 				   // the next present index in the sparsity
 				   // pattern (otherwise, do a binary
 				   // search)
-      if (index != next_row_index && my_cols[index] == col_indices[j])
-	goto set_value;
+	  if (index != next_row_index && my_cols[index] == col_indices[j])
+	    goto set_value;
 
-      next_index = cols->operator()(row, col_indices[j]);
+	  next_index = cols->operator()(row, col_indices[j]);
 
 				   // it is allowed to set elements in
 				   // the matrix that are not part of
 				   // the sparsity pattern, if the
 				   // value to which we set it is zero
-      if (next_index == SparsityPattern::invalid_entry)
-	{
-	  Assert (value == 0., ExcInvalidIndex(row,col_indices[j]));
-	  continue;
-	}
-      index = next_index;
+	  if (next_index == SparsityPattern::invalid_entry)
+	    {
+	      Assert (false, ExcInvalidIndex(row,col_indices[j]));
+	      continue;
+	    }
+	  index = next_index;
 
-    set_value:
-      val[index] = value;
-      ++index;
+	set_value:
+	  val[index] = value;
+	  ++index;
+	}
+    }
+  else
+    {
+				// same code as above, but now check for zeros
+      for (unsigned int j=0; j<n_cols; ++j)
+	{
+	  const number value = values[j];
+	  Assert (numbers::is_finite(value),
+		  ExcMessage("The given value is not finite but either "
+			     "infinite or Not A Number (NaN)"));
+
+	  if (index != next_row_index && my_cols[index] == col_indices[j])
+	    goto set_value_checked;
+
+	  next_index = cols->operator()(row, col_indices[j]);
+
+	  if (next_index == SparsityPattern::invalid_entry)
+	    {
+	      Assert (value == 0., ExcInvalidIndex(row,col_indices[j]));
+	      continue;
+	    }
+	  index = next_index;
+
+	set_value_checked:
+	  val[index] = value;
+	  ++index;
+	}
     }
 }
 
