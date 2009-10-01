@@ -2083,7 +2083,8 @@ namespace internal
 			ForwardIterator    local_values_end)
 	  {
 	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
-	    Assert (local_values_end-local_values_begin == accessor.get_fe().dofs_per_cell,
+	    Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
+		    == accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    Assert (values.size() == accessor.get_dof_handler().n_dofs(),
 		    typename BaseClass::ExcVectorDoesNotMatch());
@@ -2098,7 +2099,7 @@ namespace internal
 		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
 
 	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
-				  ->cell_dof_indices_cache[accessor.present_index * 
+				  ->cell_dof_indices_cache[accessor.present_index *
 							   accessor.get_fe().dofs_per_cell];
 	    for ( ; local_values_begin != local_values_end; ++local_values_begin, ++cache)
 	      *local_values_begin = values(*cache);
@@ -2123,7 +2124,8 @@ namespace internal
 
 					     // no caching for hp::DoFHandler
 					     // implemented
-	    Assert (local_values_end-local_values_begin == accessor.get_fe().dofs_per_cell,
+	    Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
+		    == accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
 
@@ -2154,7 +2156,8 @@ namespace internal
 			ForwardIterator         local_values_end)
 	  {
 	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
-	    Assert (local_values_end-local_values_begin == accessor.get_fe().dofs_per_cell,
+	    Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
+		    == accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    Assert (values.size() == accessor.get_dof_handler().n_dofs(),
 		    typename BaseClass::ExcVectorDoesNotMatch());
@@ -2169,7 +2172,7 @@ namespace internal
 		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
 
 	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
-				  ->cell_dof_indices_cache[accessor.present_index * 
+				  ->cell_dof_indices_cache[accessor.present_index *
 							   accessor.get_fe().dofs_per_cell];
 	    constraints.get_dof_values(values, *cache, local_values_begin,
 				       local_values_end);
@@ -2194,7 +2197,8 @@ namespace internal
 					     // no caching for hp::DoFHandler
 					     // implemented
 	    typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> > BaseClass;
-	    Assert (local_values_end-local_values_begin == accessor.get_fe().dofs_per_cell,
+	    Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
+		    == accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
 
@@ -2560,7 +2564,7 @@ namespace internal
 
 
 
-        template <int dim, int spacedim, typename number, 
+        template <int dim, int spacedim, typename number,
 	          class OutputMatrix, typename OutputVector>
         static
 	void
@@ -2611,7 +2615,7 @@ namespace internal
 
 
 
-        template <int dim, int spacedim, typename number, 
+        template <int dim, int spacedim, typename number,
 	          class OutputMatrix, typename OutputVector>
 	static
 	void
@@ -2811,7 +2815,7 @@ DoFCellAccessor<DH>::get_dof_values (const ConstraintMatrix &constraints,
 				     ForwardIterator         local_values_end) const
 {
   internal::DoFCellAccessor::Implementation
-    ::get_dof_values (*this, constraints, values, 
+    ::get_dof_values (*this, constraints, values,
 		      local_values_begin, local_values_end);
 }
 
