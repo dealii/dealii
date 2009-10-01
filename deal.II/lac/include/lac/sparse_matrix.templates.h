@@ -490,6 +490,8 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // actually need to add.
   const unsigned int * const my_cols = cols->get_column_numbers();
   unsigned int index = cols->get_rowstart_indices()[row];
+  const unsigned int next_row_index = cols->get_rowstart_indices()[row+1];
+
   for (unsigned int j=0; j<n_cols; ++j)
     {
       const number value = values[j];
@@ -504,8 +506,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // the next present index in the sparsity
 				   // pattern (otherwise, do a binary
 				   // search)
-      if (index != cols->get_rowstart_indices()[row+1] &&
-	  my_cols[index] == col_indices[j])
+      if (index != next_row_index && my_cols[index] == col_indices[j])
 	goto add_value;
 
       index = cols->operator()(row, col_indices[j]);
@@ -540,12 +541,15 @@ SparseMatrix<number>::set (const unsigned int  row,
 			   const bool          elide_zero_values)
 {
   Assert (cols != 0, ExcNotInitialized());
+  Assert (row < m(), ExcInvalidIndex1(row));
 
 				   // First, search all the indices to find
 				   // out which values we actually need to
 				   // set.
   const unsigned int * my_cols = cols->get_column_numbers();
-  unsigned int index = cols->get_rowstart_indices()[row];
+  std::size_t index = cols->get_rowstart_indices()[row], next_index = index;
+  const std::size_t next_row_index = cols->get_rowstart_indices()[row+1];
+
   for (unsigned int j=0; j<n_cols; ++j)
     {
       const number value = values[j];
@@ -560,23 +564,21 @@ SparseMatrix<number>::set (const unsigned int  row,
 				   // the next present index in the sparsity
 				   // pattern (otherwise, do a binary
 				   // search)
-      if (index != cols->get_rowstart_indices()[row+1] &&
-	  my_cols[index] == col_indices[j])
+      if (index != next_row_index && my_cols[index] == col_indices[j])
 	goto set_value;
 
-      index = cols->operator()(row, col_indices[j]);
+      next_index = cols->operator()(row, col_indices[j]);
 
 				   // it is allowed to set elements in
 				   // the matrix that are not part of
 				   // the sparsity pattern, if the
 				   // value to which we set it is zero
-      if (index == SparsityPattern::invalid_entry)
+      if (next_index == SparsityPattern::invalid_entry)
 	{
-	  Assert ((index != SparsityPattern::invalid_entry) ||
-		  (value == 0.),
-		  ExcInvalidIndex(row,col_indices[j]));
+	  Assert (value == 0., ExcInvalidIndex(row,col_indices[j]));
 	  continue;
 	}
+      index = next_index;
 
     set_value:
       val[index] = value;
