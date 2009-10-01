@@ -58,7 +58,7 @@
                                  // iterators looping over all cells. We will
                                  // use this when selecting only those cells
                                  // for output that are owned by the present
-                                 // process in a parallel program:
+                                 // process in a %parallel program:
 #include <grid/filtered_iterator.h>
 
                                  // This is then simply C++ again:
@@ -657,13 +657,13 @@ namespace QuasiStaticElasticity
                                        // and the solution vector. Since we
                                        // anticipate solving big problems, we
                                        // use the same types as in step-17,
-                                       // i.e. distributed parallel matrices
+                                       // i.e. distributed %parallel matrices
                                        // and vectors built on top of the
                                        // PETSc library. Conveniently, they
                                        // can also be used when running on
                                        // only a single machine, in which case
                                        // this machine happens to be the only
-                                       // one in our parallel universe.
+                                       // one in our %parallel universe.
                                        //
                                        // However, as a difference to step-17,
                                        // we do not store the solution vector
@@ -717,7 +717,7 @@ namespace QuasiStaticElasticity
       unsigned int timestep_no;
 
                                        // Then a few variables that have to do
-                                       // with parallel processing: first, a
+                                       // with %parallel processing: first, a
                                        // variable denoting the MPI
                                        // communicator we use, and then two
                                        // numbers telling us how many
@@ -1395,7 +1395,7 @@ namespace QuasiStaticElasticity
                                      // freedom whether they will be owned by
                                      // the processor we are on or another one
                                      // (in case this program is run in
-                                     // parallel via MPI). This of course is
+                                     // %parallel via MPI). This of course is
                                      // not optimal -- it limits the size of
                                      // the problems we can solve, since
                                      // storing the entire sparsity pattern
@@ -1438,7 +1438,7 @@ namespace QuasiStaticElasticity
                                      // the solution vector is a local
                                      // one, unlike the right hand
                                      // side that is a distributed
-                                     // parallel one and therefore
+                                     // %parallel one and therefore
                                      // needs to know the MPI
                                      // communicator over which it is
                                      // supposed to transmit messages:
@@ -1617,7 +1617,7 @@ namespace QuasiStaticElasticity
 				     // solution vector compatible
 				     // with the matrix and right hand
 				     // side (i.e. here a distributed
-				     // parallel vector, rather than
+				     // %parallel vector, rather than
 				     // the sequential vector we use
 				     // in this program) in order to
 				     // preset the entries of the
@@ -2266,7 +2266,7 @@ namespace QuasiStaticElasticity
 
                                      // Then set up a global vector into which
                                      // we merge the local indicators from
-                                     // each of the parallel processes:
+                                     // each of the %parallel processes:
     const unsigned int n_local_cells
       = GridTools::count_cells_with_subdomain_association (triangulation,
 							   this_mpi_process);

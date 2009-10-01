@@ -1682,7 +1682,7 @@ namespace PETScWrappers
     const int ierr
       = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
 		      col_value_ptr, ADD_VALUES);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    Assert (ierr == 0, ExcPETScError(ierr));
   }
 
 

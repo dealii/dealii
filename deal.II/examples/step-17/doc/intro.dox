@@ -10,13 +10,13 @@ provides that wrap around the linear algebra implementation of the <a
 href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library. And
 since PETSc allows to distribute matrices and vectors across several computers
 within an MPI network, the resulting code will even be able to solve the
-problem in parallel. If you don't know what PETSc is, then this would be a
+problem in %parallel. If you don't know what PETSc is, then this would be a
 good time to take a quick glimpse at their homepage.
 
 
 
 As a prerequisite of this program, you need to have PETSc installed, and if
-you want to run in parallel on a cluster, you also need <a
+you want to run in %parallel on a cluster, you also need <a
 href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
 target="_top">METIS</a> to partition meshes. The installation of deal.II
 together with these two additional libraries is described in the <a
@@ -45,7 +45,7 @@ interchangable as possible.
 
 While the sequential PETSc wrappers classes do not have any advantage over
 their deal.II counterparts, the main point of using PETSc is that it can run
-in parallel. We will make use of this by partitioning the domain into as many
+in %parallel. We will make use of this by partitioning the domain into as many
 blocks (``subdomains'') as there are processes in the MPI network. At the same
 time, PETSc provides dummy MPI stubs that allow to run the same program on a
 single machine if so desired, without any changes.

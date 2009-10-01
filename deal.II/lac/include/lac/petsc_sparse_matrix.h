@@ -185,7 +185,7 @@ namespace PETScWrappers
                                         */
       template <typename SparsityType>
       SparseMatrix (const SparsityType &sparsity_pattern,
-                    const bool          preset_nonzero_locations = false);
+                    const bool          preset_nonzero_locations = true);
 
                                        /**
                                         * This operator assigns a scalar to
@@ -281,7 +281,7 @@ namespace PETScWrappers
                                         */
       template <typename SparsityType>
       void reinit (const SparsityType &sparsity_pattern,
-                   const bool          preset_nonzero_locations = false);
+                   const bool          preset_nonzero_locations = true);
 
                                        /**
                                         * Return a reference to the MPI

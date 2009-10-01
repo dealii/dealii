@@ -7,7 +7,7 @@ that we have already started with @ref step_8 "step-8" and @ref step_17 "step-17
 different directions: first, it solves the quasistatic but time dependent
 elasticity problem for large deformations with a Lagrangian mesh movement
 approach. Secondly, it shows some more techniques for solving such problems
-using parallel processing with PETSc's linear algebra. In addition to this, we
+using %parallel processing with PETSc's linear algebra. In addition to this, we
 show how to work around the main bottleneck of @ref step_17 "step-17", namely that we
 generated graphical output from only one process, and that this scaled very
 badly with larger numbers of processes and on large problems. Finally, a good
@@ -230,7 +230,7 @@ if we compute the incremental updates $\Delta\mathbf{u}^n$ using lowest-order
 finite elements, then its symmetric gradient $\varepsilon(\Delta\mathbf{u}^n)$ is
 in general still a function that is not easy to describe. In particular, it is
 not a piecewise constant function, and on general meshes (with cells that are
-not rectangles parallel to the coordinate axes) or with non-constant
+not rectangles %parallel to the coordinate axes) or with non-constant
 stress-strain tensors $C$ it is not even a bi- or trilinear function. Thus, it
 is a priori not clear how to store $\sigma^n$ in a computer program.
 
@@ -306,7 +306,7 @@ Both stress update and rotation are implemented in the function
 
 <h3>Parallel graphical output</h3>
 
-In the @ref step_17 "step-17" example program, the main bottleneck for parallel computations
+In the @ref step_17 "step-17" example program, the main bottleneck for %parallel computations
 was that only the first processor generated output for the entire domain.
 Since generating graphical output is expensive, this did not scale well when
 large numbers of processors were involved. However, no viable ways around this
@@ -509,7 +509,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
   Unlike the previous one, this function is not really interesting, since it
   does what similar functions have done in all previous tutorial programs --
   solving the linear system using the CG method, using an incomplete LU
-  decomposition as a preconditioner (in the parallel case, it uses an ILU of
+  decomposition as a preconditioner (in the %parallel case, it uses an ILU of
   each processor's block separately). It is virtually unchanged
   from @ref step_17 "step-17".
 

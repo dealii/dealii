@@ -43,7 +43,7 @@
                                  // step-8. First, we replace the
                                  // standard output <code>std::cout</code> by a
                                  // new stream <code>pcout</code> which is used
-                                 // in parallel computations for
+                                 // in %parallel computations for
                                  // generating output only on one of
                                  // the MPI processes.
 #include <base/conditional_ostream.h>
@@ -130,7 +130,7 @@ class ElasticProblem
     void output_results (const unsigned int cycle) const;
 
                                      // The first variable is basically only
-                                     // for convenience: in parallel program,
+                                     // for convenience: in %parallel program,
                                      // if each process outputs status
                                      // information, then there quickly is a
                                      // lot of clutter. Rather, we would want
@@ -168,9 +168,9 @@ class ElasticProblem
                                      // member variables for the sparsity
                                      // pattern, the system matrix, right
                                      // hand, and solution vector. We change
-                                     // these declarations to use parallel
+                                     // these declarations to use %parallel
                                      // PETSc objects instead (note that the
-                                     // fact that we use the parallel versions
+                                     // fact that we use the %parallel versions
                                      // is denoted the fact that we use the
                                      // classes from the
                                      // <code>PETScWrappers::MPI</code> namespace;
@@ -195,11 +195,11 @@ class ElasticProblem
                                      // then PETSc provides some dummy type
                                      // for <code>MPI_Comm</code>, so we do not have to
                                      // care here whether the job is really a
-                                     // parallel one:
+                                     // %parallel one:
     MPI_Comm mpi_communicator;
     
                                      // Then we have two variables that tell
-                                     // us where in the parallel world we
+                                     // us where in the %parallel world we
                                      // are. The first of the following
                                      // variables, <code>n_mpi_processes</code> tells
                                      // us how many MPI processes there exist
@@ -335,7 +335,7 @@ void ElasticProblem<dim>::setup_system ()
 {
                                    // Before we even start out setting up the
                                    // system, there is one thing to do for a
-                                   // parallel program: we need to assign
+                                   // %parallel program: we need to assign
                                    // cells to each of the processes. We do
                                    // this by splitting (<code>partitioning</code>) the
                                    // mesh cells into as many chunks
@@ -389,7 +389,7 @@ void ElasticProblem<dim>::setup_system ()
                                    // Then we initialize the system matrix,
                                    // solution, and right hand side
                                    // vectors. Since they all need to work in
-                                   // parallel, we have to pass them an MPI
+                                   // %parallel, we have to pass them an MPI
                                    // communication object, as well as their
                                    // global sizes (both dimensions are equal
                                    // to the number of degrees of freedom),
@@ -440,7 +440,7 @@ void ElasticProblem<dim>::setup_system ()
                                  // problem. There are some things worth
                                  // mentioning before we go into
                                  // detail. First, we will be assembling the
-                                 // system in parallel, i.e. each process will
+                                 // system in %parallel, i.e. each process will
                                  // be responsible for assembling on cells
                                  // that belong to this particular
                                  // processor. Note that the degrees of
@@ -730,7 +730,7 @@ void ElasticProblem<dim>::assemble_system ()
                                  // The fourth step is to solve the linear
                                  // system, with its distributed matrix and
                                  // vector objects. Fortunately, PETSc offers
-                                 // a variety of sequential and parallel
+                                 // a variety of sequential and %parallel
                                  // solvers, for which we have written
                                  // wrappers that have almost the same
                                  // interface as is used for the deal.II
@@ -744,7 +744,7 @@ unsigned int ElasticProblem<dim>::solve ()
                                    // which we would like to solve the linear
                                    // system. Next, an actual solver object
                                    // using PETSc's CG solver which also works
-                                   // with parallel (distributed) vectors and
+                                   // with %parallel (distributed) vectors and
                                    // matrices. And finally a preconditioner;
                                    // we choose to use a block Jacobi
                                    // preconditioner which works by computing
@@ -1088,7 +1088,7 @@ void ElasticProblem<dim>::refine_grid ()
                                    // vector.
                                    //
                                    // So in the first step, we need to set up
-                                   // a parallel vector. For simplicity, every
+                                   // a %parallel vector. For simplicity, every
                                    // process will own a chunk with as many
                                    // elements as this process owns cells, so
                                    // that the first chunk of elements is
