@@ -9,20 +9,20 @@ output:
 @code
 Cycle 0
 Number of degrees of freedom: 337
-System matrix memory consumption: 0.0257 MBytes.
-Multigrid objects memory consumption: 0.05071 MBytes.
+System matrix memory consumption: 0.02573 MBytes.
+Multigrid objects memory consumption: 0.05083 MBytes.
 Convergence in 10 CG iterations.
 
 Cycle 1
 Number of degrees of freedom: 1313
-System matrix memory consumption: 0.0925 MBytes.
-Multigrid objects memory consumption: 0.1792 MBytes.
+System matrix memory consumption: 0.09254 MBytes.
+Multigrid objects memory consumption: 0.1794 MBytes.
 Convergence in 10 CG iterations.
 
 Cycle 2
 Number of degrees of freedom: 5185
-System matrix memory consumption: 0.3551 MBytes.
-Multigrid objects memory consumption: 0.6775 MBytes.
+System matrix memory consumption: 0.3552 MBytes.
+Multigrid objects memory consumption: 0.6777 MBytes.
 Convergence in 10 CG iterations.
 
 Cycle 3
@@ -40,7 +40,7 @@ Convergence in 10 CG iterations.
 Cycle 5
 Number of degrees of freedom: 328193
 System matrix memory consumption: 22.1 MBytes.
-Multigrid objects memory consumption: 41.63 MBytes.
+Multigrid objects memory consumption: 41.64 MBytes.
 Convergence in 10 CG iterations.
 @endcode
 
@@ -51,14 +51,14 @@ program in three dimensions:
 @code
 Cycle 0
 Number of degrees of freedom: 517
-System matrix memory consumption: 0.1 MBytes.
-Multigrid objects memory consumption: 0.1462 MBytes.
+System matrix memory consumption: 0.1001 MBytes.
+Multigrid objects memory consumption: 0.1463 MBytes.
 Convergence in 9 CG iterations.
 
 Cycle 1
 Number of degrees of freedom: 3817
-System matrix memory consumption: 0.6612 MBytes.
-Multigrid objects memory consumption: 0.8894 MBytes.
+System matrix memory consumption: 0.6613 MBytes.
+Multigrid objects memory consumption: 0.8896 MBytes.
 Convergence in 10 CG iterations.
 
 Cycle 2
@@ -75,9 +75,8 @@ Convergence in 11 CG iterations.
 
 Cycle 4
 Number of degrees of freedom: 1847617
-System matrix memory consumption: 321.9 MBytes.
+System matrix memory consumption: 322 MBytes.
 Multigrid objects memory consumption: 415.1 MBytes.
-Convergence in 11 CG iterations.
 @endcode
 
 A comparison of the memory consumption of the MatrixFree class with a 

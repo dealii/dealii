@@ -431,8 +431,12 @@ matrix-vector product implementation efficient on a GPU.
 
 For our program, we choose to follow a simple strategy: We let several
 processors work together by splitting the cells into several chunks. The
-threading building blocks implemenation of a %parallel <code>for</code> loop
-implements this concept using the parallel::apply_to_subranges() function.
+threading building blocks implemenation of a %parallel pipeline implements
+this concept using the WorkStream::run() function. What the pipeline does is
+pretty much the same as a for loop. However, it can be instructed to do some
+part of the loop body by just one process at a time and in natural order. We
+need to use this for writing the local contributions into the global vector,
+in order to avoid a race condition.
 
 
 <h3>Combination with multigrid</h3>

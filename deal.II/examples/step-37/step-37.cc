@@ -16,6 +16,7 @@
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
+#include <base/work_stream.h>
 
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -109,6 +110,57 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
 				 // @sect3{Matrix-free implementation.}
 
+				// First com a few variables that we use for
+				// defining the %parallel layout of the vector
+				// multiplication function with the WorkStream
+				// concept in the Matrix-free class.
+namespace WorkStreamData
+{
+  template <typename number>
+  struct ScratchData
+  {
+    ScratchData ();
+    ScratchData (const ScratchData &scratch);
+    FullMatrix<number> solutions;
+  };
+
+  template<typename number>
+  ScratchData<number>::ScratchData ()
+    :
+    solutions ()
+  {}
+
+  template<typename number>
+  ScratchData<number>::ScratchData (const ScratchData &scratch)
+    :
+    solutions ()
+  {}
+
+  template <typename number>
+  struct CopyData : public ScratchData<number>
+  {
+    CopyData ();
+    CopyData (const CopyData &scratch);
+    unsigned int first_dof;
+    unsigned int n_dofs;
+  };
+
+  template <typename number>
+  CopyData<number>::CopyData ()
+    :
+    ScratchData<number> ()
+  {}
+
+  template <typename number>
+  CopyData<number>::CopyData (const CopyData &scratch)
+    :
+    ScratchData<number> ()
+  {}
+
+}
+
+
+
 				 // Next comes the implemenation of the
 				 // matrix-free class. It provides some
 				 // standard information we expect for
@@ -196,11 +248,18 @@ class MatrixFree : public Subscriptor
 				 // as well as a few other variables that
 				 // store matrix properties.
   private:
+    typedef std::vector<std::pair<unsigned int,unsigned int> >::const_iterator
+      CellChunkIterator;
     template <typename number2>
-    void vmult_on_subrange (const unsigned int first_cell,
-			    const unsigned int last_cell,
-			    Vector<number2> &dst,
-			    const Vector<number2> &src) const;
+    void local_vmult (CellChunkIterator                    cell_range,
+		      WorkStreamData::ScratchData<number> &scratch,
+		      WorkStreamData::CopyData<number>    &copy,
+		      const Vector<number2>               &src) const;
+
+    template <typename number2>
+    void
+    copy_local_to_global (const WorkStreamData::CopyData<number> &copy,
+			  Vector<number2>                        &dst) const;
 
     FullMatrix<number>      small_matrix;
     Table<2,unsigned int>   indices_local_to_global;
@@ -216,6 +275,7 @@ class MatrixFree : public Subscriptor
       unsigned int n_dofs, n_cells;
       unsigned int m, n;
       unsigned int n_points, n_comp;
+      std::vector<std::pair<unsigned int,unsigned int> > chunks;
     }  matrix_sizes;
 };
 
@@ -229,81 +289,6 @@ MatrixFree<number,Transformation>::MatrixFree ()
     :
     Subscriptor()
 {}
-
-
-
-				 // This function initializes the structures
-				 // of the matrix. It writes the number of
-				 // total degrees of freedom in the problem
-				 // as well as the number of cells to the
-				 // MatrixSizes struct and copies the small
-				 // matrix that transforms the solution from
-				 // support points to quadrature points. It
-				 // uses the small matrix for determining
-				 // the number of degrees of freedom per
-				 // cell (number of rows in
-				 // <code>small_matrix</code>). The number
-				 // of quadrature points needs to be passed
-				 // through the last variable
-				 // <code>n_points_per_cell</code>, since
-				 // the number of columns in the small
-				 // matrix is
-				 // <code>dim*n_points_per_cell</code> for
-				 // the Laplace problem (the Laplacian is a
-				 // tensor and has <code>dim</code>
-				 // components). In this function, we also
-				 // give the fields containing the
-				 // derivative information and the local dof
-				 // indices the correct sizes. They will be
-				 // filled by calling the respective set
-				 // function.
-template <typename number, class Transformation>
-void MatrixFree<number,Transformation>::
-reinit (const unsigned int        n_dofs_in,
-	const unsigned int        n_cells_in,
-	const FullMatrix<double> &small_matrix_in,
-	const unsigned int        n_points_per_cell)
-{
-  small_matrix = small_matrix_in;
-
-  derivatives.reinit (n_cells_in, n_points_per_cell);
-  indices_local_to_global.reinit (n_cells_in, small_matrix.m());
-
-  diagonal_is_calculated = false;
-
-  matrix_sizes.n_dofs = n_dofs_in;
-  matrix_sizes.n_cells = n_cells_in;
-  matrix_sizes.m = small_matrix.m();
-  matrix_sizes.n = small_matrix.n();
-  matrix_sizes.n_points = n_points_per_cell;
-  matrix_sizes.n_comp   = small_matrix.n()/matrix_sizes.n_points;
-  Assert(matrix_sizes.n_comp * n_points_per_cell == small_matrix.n(),
-	 ExcInternalError());
-}
-
-
-
-				 // This function we need if we want to
-				 // delete the content of the matrix,
-				 // e.g. when we are finished with one grid
-				 // level and continue to the next one. Just
-				 // put all the field sizes to 0.
-template <typename number, class Transformation>
-void
-MatrixFree<number,Transformation>::clear ()
-{
-  small_matrix.reinit(0,0);
-  derivatives.reinit (0,0);
-  indices_local_to_global.reinit(0,0);
-
-  constraints.clear();
-
-  diagonal_values.reinit (0);
-  diagonal_is_calculated = false;
-
-  matrix_sizes.n_dofs = 0;
-  matrix_sizes.n_cells = 0;
-}
 
 
 
@@ -403,13 +388,14 @@ set_derivative_data (const unsigned int cell_no,
 				 // This is the central function of the
 				 // matrix-free class, implementing the
 				 // multiplication of the matrix with a
-				 // vector. This function actually not work
-				 // on all the cells, but only a subset of
-				 // cells. Since this function operates
-				 // similarly irrespective on which cell
-				 // chunk we are sitting, we can parallelize
-				 // it and get very regular operation
-				 // patterns.
+				 // vector. This function does actually not
+				 // work on all the cells, but only a subset
+				 // of cells, specified by the first argument
+				 // <code>cell_range</code>. Since this
+				 // function operates similarly irrespective
+				 // on which cell chunk we are sitting, we can
+				 // parallelize it and get very regular
+				 // operation patterns.
 				 //
 				 // Following the discussion in the
 				 // introduction, we try to work on multiple
@@ -445,65 +431,17 @@ set_derivative_data (const unsigned int cell_no,
 				 // cell for the first and the number of
 				 // quadrature points times the number of
 				 // components per point for the latter.
-				 //
-				 // One more thing to make this work
-				 // efficiently is to decide how many cells
-				 // should be included in the matrix that
-				 // contains the solution values at local
-				 // dofs for several cells. If we choose too
-				 // few cells, then the gains from using the
-				 // matrix-matrix product will not be fully
-				 // utilized (dgemm tends to provide more
-				 // efficiency the larger the matrix
-				 // dimensions get). If we choose too many,
-				 // we will firstly degrade parallelization
-				 // (which is based on some these chunks),
-				 // and secondly introduce an inefficiency
-				 // that comes from the computer
-				 // architecture: Right after the first
-				 // matrix-matrix multiplication, we
-				 // transform the solution on quadrature
-				 // points by using derivatives. Obviously,
-				 // we want to have fast access to that
-				 // data, so it should still be present in
-				 // L2 cache and not to be fetched from main
-				 // memory. The total memory usage of the
-				 // data on quadrature points should be not
-				 // more than about half the cache size of
-				 // the processor in order to be on the safe
-				 // side. Since most today's processors
-				 // provide 512 kBytes or more cache memory
-				 // per core, we choose about 250 kB as a
-				 // size. Clearly, this is an
-				 // architecture-dependent value and the
-				 // interested user can squeeze out some
-				 // extra performance by hand-tuning this
-				 // parameter. Once we have chosen the
-				 // number of cells we collect in one chunk,
-				 // we determine how many chunks we have on
-				 // the given cell range and recalculate the
-				 // actual chunk size in order to evenly
-				 // distribute the chunks.
 template <typename number, class Transformation>
 template <typename number2>
 void
 MatrixFree<number,Transformation>::
-vmult_on_subrange (const unsigned int    first_cell,
-		   const unsigned int    last_cell,
-		   Vector<number2>       &dst,
-		   const Vector<number2> &src) const
+  local_vmult (CellChunkIterator                    cell_range,
+	       WorkStreamData::ScratchData<number> &scratch,
+	       WorkStreamData::CopyData<number>    &copy,
+	       const Vector<number2>               &src) const
 {
-  FullMatrix<number> solution_cells, solution_points;
-
-  const unsigned int divisor = 250000/(matrix_sizes.n*sizeof(number));
-  const unsigned int n_chunks = (last_cell-first_cell)/divisor + 1;
-  const unsigned int chunk_size =
-    (last_cell-first_cell)/n_chunks + ((last_cell-first_cell)%n_chunks>0);
-
-  for (unsigned int k=first_cell; k<last_cell; k+=chunk_size)
-    {
-      const unsigned int current_chunk_size =
-	k+chunk_size>last_cell ? last_cell-k : chunk_size;
+  const unsigned int first_cell = cell_range->first,
+    chunk_size = cell_range->second - cell_range->first;
 
 				 // OK, now we are sitting in the loop that
 				 // goes over our chunks of cells. What we
@@ -559,33 +497,49 @@ vmult_on_subrange (const unsigned int    first_cell,
 				 // are related to each other. Since we
 				 // simultaneously apply the constraints, we
 				 // hand this task off to the ConstraintMatrix
-				 // object. Most often, itis used to work on
-				 // one cell at a time, but since we work on a
-				 // whole chunk of dofs, we can do that just
-				 // as easily for all the cells at once.
-      solution_cells.reinit (current_chunk_size,matrix_sizes.m, true);
-      solution_points.reinit (current_chunk_size,matrix_sizes.n, true);
+				 // object. We do this in an extra function
+				 // since we split between %parallel code that
+				 // can be run independently (this function)
+				 // and code that needs to be synchronized
+				 // between threads
+				 // (<code>copy_local_to_global</code>
+				 // function). Most often, the
+				 // ConstraintMatrix function is used to be
+				 // applied to data from one cell at a time,
+				 // but since we work on a whole chunk of
+				 // dofs, we can do that just as easily for
+				 // all the cells at once.
+  copy.solutions.reinit    (chunk_size,matrix_sizes.m, true);
+  copy.first_dof          = first_cell;
+  copy.n_dofs             = chunk_size*matrix_sizes.m;
+  scratch.solutions.reinit (chunk_size,matrix_sizes.n, true);
 
-      const unsigned int n_cell_entries = current_chunk_size*matrix_sizes.m;
-      constraints.get_dof_values(src, &indices_local_to_global(k,0),
-				 &solution_cells(0,0),
-				 &solution_cells(0,0)+n_cell_entries);
+  constraints.get_dof_values(src, &indices_local_to_global(copy.first_dof,0),
+			     &copy.solutions(0,0),
+			     &copy.solutions(0,0)+copy.n_dofs);
 
-      solution_cells.mmult (solution_points, small_matrix);
+  copy.solutions.mmult (scratch.solutions, small_matrix);
 
-      for (unsigned int i=0; i<current_chunk_size; ++i)
-	for (unsigned int j=0; j<matrix_sizes.n_points; ++j)
-	  derivatives(i+k,j).transform(&solution_points(i, j*matrix_sizes.n_comp));
+  for (unsigned int i=0, k = first_cell; i<chunk_size; ++i, ++k)
+    for (unsigned int j=0; j<matrix_sizes.n_points; ++j)
+      derivatives(k,j).transform(&scratch.solutions(i, j*matrix_sizes.n_comp));
 
-      solution_points.mTmult (solution_cells, small_matrix);
+  scratch.solutions.mTmult (copy.solutions, small_matrix);
+}
 
-      static Threads::Mutex mutex;
-      Threads::Mutex::ScopedLock lock (mutex);
-      constraints.distribute_local_to_global (&solution_cells(0,0),
-					      &solution_cells(0,0)+n_cell_entries,
-					      &indices_local_to_global(k,0),
-					      dst);
-    }
+
+
+template <typename number, class Transformation>
+template <typename number2>
+void
+MatrixFree<number,Transformation>::
+  copy_local_to_global (const WorkStreamData::CopyData<number> &copy,
+			Vector<number2>                        &dst) const
+{
+  constraints.distribute_local_to_global (&copy.solutions(0,0),
+					  &copy.solutions(0,0)+copy.n_dofs,
+					  &indices_local_to_global(copy.first_dof,0),
+					  dst);
 }
 
 
@@ -640,27 +594,29 @@ MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
 				 // vector <code>src</code> and adds the
 				 // result to vector <code>dst</code>. We call
 				 // a %parallel function that applies the
-				 // multiplication on a subrange of cells
-				 // (cf. the @ref threads module).
-				 //
-				 // TODO: Use WorkStream for parallelization
-				 // instead of apply_to_subranges, once we
-				 // have realized the best way for doing
-				 // that.
+				 // multiplication on a chunk of cells at once
+				 // using the WorkStream module (cf. also the
+				 // @ref threads module). The subdivision into
+				 // chunks will be performed in the reinit
+				 // function and is stored in the field
+				 // <code>matrix_sizes.chunks</code>.
 template <typename number, class Transformation>
 template <typename number2>
 void
 MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 					      const Vector<number2> &src) const
 {
-  parallel::apply_to_subranges (0, matrix_sizes.n_cells,
-				std_cxx1x::bind(&MatrixFree<number,Transformation>::
-						template vmult_on_subrange<number2>,
-						this,
-						_1,_2,
-						boost::ref(dst),
-						boost::cref(src)),
-				200);
+
+  WorkStream::run (matrix_sizes.chunks.begin(), matrix_sizes.chunks.end(),
+		   std_cxx1x::bind(&MatrixFree<number,Transformation>::
+				   template local_vmult<number2>,
+				   this, _1, _2, _3, boost::cref(src)),
+		   std_cxx1x::bind(&MatrixFree<number,Transformation>::
+				   template copy_local_to_global<number2>,
+				   this, _1, boost::ref(dst)),
+		   WorkStreamData::ScratchData<number>(),
+		   WorkStreamData::CopyData<number>(),
+		   4,1);
 
 				 // One thing to be cautious about: The
 				 // deal.II classes expect that the matrix
@@ -679,6 +635,142 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
   for (unsigned int i=0; i<matrix_sizes.n_dofs; ++i)
     if (constraints.is_constrained(i) == true)
       dst(i) += 1.0 * src(i);
+}
+
+
+
+				 // This function initializes the structures
+				 // of the matrix. It writes the number of
+				 // total degrees of freedom in the problem
+				 // as well as the number of cells to the
+				 // MatrixSizes struct and copies the small
+				 // matrix that transforms the solution from
+				 // support points to quadrature points. It
+				 // uses the small matrix for determining
+				 // the number of degrees of freedom per
+				 // cell (number of rows in
+				 // <code>small_matrix</code>). The number
+				 // of quadrature points needs to be passed
+				 // through the last variable
+				 // <code>n_points_per_cell</code>, since
+				 // the number of columns in the small
+				 // matrix is
+				 // <code>dim*n_points_per_cell</code> for
+				 // the Laplace problem (the Laplacian is a
+				 // tensor and has <code>dim</code>
+				 // components). In this function, we also
+				 // give the fields containing the
+				 // derivative information and the local dof
+				 // indices the correct sizes. They will be
+				 // filled by calling the respective set
+				 // function.
+template <typename number, class Transformation>
+void MatrixFree<number,Transformation>::
+reinit (const unsigned int        n_dofs_in,
+	const unsigned int        n_cells_in,
+	const FullMatrix<double> &small_matrix_in,
+	const unsigned int        n_points_per_cell)
+{
+  small_matrix = small_matrix_in;
+
+  derivatives.reinit (n_cells_in, n_points_per_cell);
+  indices_local_to_global.reinit (n_cells_in, small_matrix.m());
+
+  diagonal_is_calculated = false;
+
+  matrix_sizes.n_dofs = n_dofs_in;
+  matrix_sizes.n_cells = n_cells_in;
+  matrix_sizes.m = small_matrix.m();
+  matrix_sizes.n = small_matrix.n();
+  matrix_sizes.n_points = n_points_per_cell;
+  matrix_sizes.n_comp   = small_matrix.n()/matrix_sizes.n_points;
+  Assert(matrix_sizes.n_comp * n_points_per_cell == small_matrix.n(),
+	 ExcInternalError());
+
+				 // One thing to make the matrix-vector
+				 // product with this class efficient is to
+				 // decide how many cells should be summarized
+				 // to one chunk, which will determine the
+				 // size of the full matrix that we work
+				 // on. If we choose too few cells, then the
+				 // gains from using the matrix-matrix product
+				 // will not be fully utilized (dgemm tends to
+				 // provide more efficiency the larger the
+				 // matrix dimensions get). If we choose too
+				 // many, we will firstly degrade
+				 // parallelization (which is based on some
+				 // these chunks), and secondly introduce an
+				 // inefficiency that comes from the computer
+				 // architecture: In the actual working
+				 // function above, right after the first
+				 // matrix-matrix multiplication, we transform
+				 // the solution on quadrature points by using
+				 // derivatives. Obviously, we want to have
+				 // fast access to that data, so it should
+				 // still be present in L2 cache and not
+				 // needed to be fetched from main memory. The
+				 // total memory usage of the data on
+				 // quadrature points should be not more than
+				 // about half the cache size of the processor
+				 // in order to be on the safe side. Since
+				 // most today's processors provide 512 kBytes
+				 // or more cache memory per core, we choose
+				 // about 50 kB as a size to be on the safe
+				 // side (other things need to be stored in
+				 // the CPU as well). Clearly, this is an
+				 // architecture-dependent value and the
+				 // interested user can squeeze out some extra
+				 // performance by hand-tuning this
+				 // parameter. Once we have chosen the number
+				 // of cells we collect in one chunk, we
+				 // determine how many chunks we have on the
+				 // given cell range and recalculate the
+				 // actual chunk size in order to evenly
+				 // distribute the chunks.
+  const unsigned int divisor = 50000/(matrix_sizes.m*sizeof(double));
+  unsigned int n_chunks = matrix_sizes.n_cells/divisor + 1;
+  if (n_chunks<2*multithread_info.n_default_threads)
+    n_chunks = 2*multithread_info.n_default_threads;
+
+  const unsigned int chunk_size = (matrix_sizes.n_cells/n_chunks +
+				   (matrix_sizes.n_cells%n_chunks>0));
+  matrix_sizes.chunks.resize (n_chunks);
+  for (unsigned int i=0; i<n_chunks; ++i)
+    {
+      matrix_sizes.chunks[i].first = i*chunk_size;
+      if ((i+1)*chunk_size > matrix_sizes.n_cells)
+	{
+	  matrix_sizes.chunks[i].second = matrix_sizes.n_cells;
+	  break;
+	}
+      else
+	matrix_sizes.chunks[i].second = (i+1)*chunk_size;
+    }
+}
+
+
+
+				 // This function we need if we want to
+				 // delete the content of the matrix,
+				 // e.g. when we are finished with one grid
+				 // level and continue to the next one. Just
+				 // put all the field sizes to 0.
+template <typename number, class Transformation>
+void
+MatrixFree<number,Transformation>::clear ()
+{
+  small_matrix.reinit(0,0);
+  derivatives.reinit (0,0);
+  indices_local_to_global.reinit(0,0);
+
+  constraints.clear();
+
+  diagonal_values.reinit (0);
+  diagonal_is_calculated = false;
+
+  matrix_sizes.n_dofs = 0;
+  matrix_sizes.n_cells = 0;
+  matrix_sizes.chunks.clear();
 }
 
 
@@ -778,7 +870,9 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
     indices_local_to_global.memory_consumption() +
     constraints.memory_consumption() +
     small_matrix.memory_consumption() +
-    diagonal_values.memory_consumption() + sizeof(*this);
+    diagonal_values.memory_consumption() +
+    matrix_sizes.chunks.size()*2*sizeof(unsigned int) +
+    sizeof(*this);
   return glob_size;
 }
 
