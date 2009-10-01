@@ -25,11 +25,11 @@ namespace
 
 
 template <int dim>
-FE_Nothing<dim>::FE_Nothing ()
+FE_Nothing<dim>::FE_Nothing (const unsigned n_components)
                 :
                 FiniteElement<dim>
 		(FiniteElementData<dim>(std::vector<unsigned>(dim+1,0),
-					1, 0,
+					n_components, 0,
 					FiniteElementData<dim>::unknown),
 		 std::vector<bool>(),
 		 std::vector<std::vector<bool> >() )
@@ -120,6 +120,9 @@ FE_Nothing<dim>::get_data (const UpdateFlags  /*flags*/,
 			   const Mapping<dim> & /*mapping*/,
 			   const Quadrature<dim> & /*quadrature*/) const
 {
+                // Create a default data object.  Normally we would then
+                // need to resize things to hold the appropriate numbers
+                // of dofs, but in this case all data fields are empty.
   typename Mapping<dim>::InternalDataBase* data = new typename Mapping<dim>::InternalDataBase();
   return data;
 }
@@ -137,7 +140,7 @@ fill_fe_values (const Mapping<dim> & /*mapping*/,
 		FEValuesData<dim,dim> & /*data*/,
 		CellSimilarity::Similarity & /*cell_similarity*/) const
 {
-  Assert(false,ExcMessage(zero_dof_message));
+                // leave data fields empty
 }
 
 
@@ -153,10 +156,8 @@ fill_fe_face_values (const Mapping<dim> & /*mapping*/,
 		     typename Mapping<dim>::InternalDataBase & /*fedata*/,
 		     FEValuesData<dim,dim> & /*data*/) const
 {
-  Assert(false,ExcMessage(zero_dof_message));
+                // leave data fields empty
 }
-
-
 
 template <int dim>
 void
@@ -170,7 +171,7 @@ fill_fe_subface_values (const Mapping<dim> & /*mapping*/,
 			typename Mapping<dim>::InternalDataBase & /*fedata*/,
 			FEValuesData<dim,dim> & /*data*/) const
 {
-  Assert(false,ExcMessage(zero_dof_message));
+                // leave data fields empty
 }
 
 
@@ -181,10 +182,103 @@ compare_for_face_domination (const FiniteElement<dim> & fe_other) const
 {
   if(dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
     return FiniteElementDomination::either_element_can_dominate;
+    
+              // Question: Best to assume this element always dominates,
+              // since we will always no how to do deal with other elements
+              // regardless of type, or do we leave it up to the other 
+              // element to handle the FENothing appropriately?  Set
+              // to the second choice for now.
   else
     return FiniteElementDomination::other_element_dominates;
+    //return FiniteElementDomination::this_element_dominates;
 }
+   
+   
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Nothing<dim> ::
+hp_vertex_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
+{
+               // the FE_Nothing has no
+				       // degrees of freedom, so there
+				       // are no equivalencies to be
+				       // recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Nothing<dim> ::
+hp_line_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
+{
+               // the FE_Nothing has no
+				       // degrees of freedom, so there
+				       // are no equivalencies to be
+				       // recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+   
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Nothing<dim> ::
+hp_quad_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
+{
+               // the FE_Nothing has no
+				       // degrees of freedom, so there
+				       // are no equivalencies to be
+				       // recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
     
+template <int dim>
+bool
+FE_Nothing<dim> ::
+hp_constraints_are_implemented () const
+{
+  return true;
+}
+  
+        
+template <int dim>
+void
+FE_Nothing<dim>::
+get_face_interpolation_matrix (const FiniteElement<dim> &/*source_fe*/,
+                               FullMatrix<double>       &interpolation_matrix) const
+{
+                                   // since this element has no face dofs, the
+                                   // interpolation matrix is necessarily empty
+                                   
+  Assert (interpolation_matrix.m() == 0,
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                0));
+  Assert (interpolation_matrix.n() == 0,
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                0));
+}
+
+
+template <int dim>
+void
+FE_Nothing<dim>::
+get_subface_interpolation_matrix (const FiniteElement<dim> & /*source_fe*/,
+                                  const unsigned int /*index*/,
+                                  FullMatrix<double>  &interpolation_matrix) const
+{
+                                   // since this element has no face dofs, the
+                                   // interpolation matrix is necessarily empty
+
+  Assert (interpolation_matrix.m() == 0,
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                0));
+  Assert (interpolation_matrix.n() == 0,
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                0));
+}
+
+       
 
 template class FE_Nothing<deal_II_dimension>;
 

@@ -40,9 +40,11 @@ class FE_Nothing : public FiniteElement<dim>
   public:
 
                                     /**
-                                      * Constructor.  
+                                      * Constructor. Argument denotes the
+                                      * number of components to give this
+                                      * finite element (default = 1).  
                                       */
-    FE_Nothing ();
+    FE_Nothing (unsigned int n_components = 1);
     
                                      /**
                                       * A sort of virtual copy
@@ -276,6 +278,65 @@ class FE_Nothing : public FiniteElement<dim>
     virtual
     FiniteElementDomination::Domination
     compare_for_face_domination (const FiniteElement<dim> & fe_other) const;
+    
+    
+    
+    virtual
+    std::vector<std::pair<unsigned int, unsigned int> >
+    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+    
+    virtual
+    std::vector<std::pair<unsigned int, unsigned int> >
+    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+    
+    virtual
+    std::vector<std::pair<unsigned int, unsigned int> >
+    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+    
+    virtual
+    bool
+    hp_constraints_are_implemented () const;
+
+                                      /**
+                                      * Return the matrix
+                                      * interpolating from a face of
+                                      * of one element to the face of
+                                      * the neighboring element. 
+                                      * The size of the matrix is
+                                      * then <tt>source.#dofs_per_face</tt> times
+                                      * <tt>this->#dofs_per_face</tt>.
+                                      *
+                                      * Since the current finite element has no
+                                      * degrees of freedom, the interpolation
+                                      * matrix is necessarily empty.
+                                      */
+
+    virtual
+    void
+    get_face_interpolation_matrix (const FiniteElement<dim> &source_fe,
+                                   FullMatrix<double>       &interpolation_matrix) const;
+                                   
+                                   
+                                     /**
+                                      * Return the matrix
+                                      * interpolating from a face of
+                                      * of one element to the subface of
+                                      * the neighboring element. 
+                                      * The size of the matrix is
+                                      * then <tt>source.#dofs_per_face</tt> times
+                                      * <tt>this->#dofs_per_face</tt>.
+                                      *
+                                      * Since the current finite element has no
+                                      * degrees of freedom, the interpolation
+                                      * matrix is necessarily empty.
+                                      */
+                                      
+    virtual
+    void
+    get_subface_interpolation_matrix (const FiniteElement<dim> & source_fe,
+                                      const unsigned int index,
+                                      FullMatrix<double>  &interpolation_matrix) const;
+
     
 };
 
