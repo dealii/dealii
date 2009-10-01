@@ -616,7 +616,7 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 				   this, _1, boost::ref(dst)),
 		   WorkStreamData::ScratchData<number>(),
 		   WorkStreamData::CopyData<number>(),
-		   4,1);
+		   2*multithread_info.n_default_threads,1);
 
 				 // One thing to be cautious about: The
 				 // deal.II classes expect that the matrix
