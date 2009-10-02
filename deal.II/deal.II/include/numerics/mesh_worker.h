@@ -45,7 +45,7 @@ template<int,int> class MGDoFHandler;
  * global result, whether a functional, a form or a bilinear
  * form. While the first job is particular to the problem being
  * solved, the second is generic and only depends on the data
- * structures. Therefore, base classes for workers assimbling into
+ * structures. Therefore, base classes for workers assembling into
  * global data are provided in the namespace Assembler.
  *
  * <h3>Simplified interfaces</h3>
