@@ -484,6 +484,14 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  New: The function DoFRenumbering::component_wise is now also implemented
+  for arguments of type hp::DoFHandler.
+  <br>
+  (Markus B&uuml;rg 2009/10/01)
+  </p>
+  </li>
 
   <li><p>New: The class BlockInfo stores and computes all BlockIndices objects related to
   DoFHandler and MGDoFHandler based on FESystem.
