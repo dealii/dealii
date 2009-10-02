@@ -18,6 +18,7 @@
 #include <base/exceptions.h>
 #include <base/point.h>
 #include <dofs/dof_handler.h>
+#include <hp/dof_handler.h>
 #include <multigrid/mg_dof_handler.h>
 
 #include <vector>
@@ -693,6 +694,18 @@ namespace DoFRenumbering
 		  const std::vector<unsigned int> &target_component
 		  = std::vector<unsigned int>());
 
+
+				   /**
+				    * Sort the degrees of freedom by
+				    * component. It does the same
+				    * thing as the above function.
+				    */
+  template <int dim>
+  void
+  component_wise (hp::DoFHandler<dim>             &dof_handler,
+		  const std::vector<unsigned int> &target_component = std::vector<unsigned int> ());
+
+
 				   /**
 				    * Sort the degrees of freedom by
 				    * component. It does the same
@@ -724,7 +737,6 @@ namespace DoFRenumbering
   void
   component_wise (MGDoFHandler<dim>&               dof_handler,
 		  const std::vector<unsigned int>& target_component = std::vector<unsigned int>());
-
     
 				   /**
 				    * Computes the renumbering
