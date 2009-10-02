@@ -194,7 +194,7 @@ void BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
 				 // used. Finally, through its base
 				 // class from the
 				 // MeshWorker::Assembler namespace,
-				 // this object determins, how locally
+				 // this object determines, how locally
 				 // produced data is assembled into
 				 // the global system.
 				 //
@@ -202,7 +202,7 @@ void BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
 				 // MeshWorker::IntegrationWorker. It
 				 // has all the control structures the
 				 // generic loop needs. Fortunately,
-				 // most of them havereasonable
+				 // most of them have reasonable
 				 // default values. The others will be
 				 // set below.
 				 //
@@ -228,19 +228,10 @@ class DGIntegrator : public Subscriptor
 
 				     // The following three functions
 				     // are the ones that get called
-				     // by the generic loop over all
-				     // ccells and faces. They are the
+				     // inside the generic loop over all
+				     // cells and faces. They are the
 				     // ones doing the actual
 				     // integration.
-				     //
-				     // Note that the arguments are
-				     // not constant, because the data
-				     // spae for local matrices and
-				     // vectors is part of the
-				     // MeshWorker::IntegrationInfo
-				     // object (namely, in its base
-				     // class
-				     // MeshWorker::LocalResults).
     void cell(CellInfo& info) const;
     void bdry(FaceInfo& info) const;
     void face(FaceInfo& info1, FaceInfo& info2) const;
@@ -266,7 +257,7 @@ class DGIntegrator : public Subscriptor
 				 // local integration loop inside the
 				 // following functions. The program
 				 // would be even shorter, if we used
-				 // premade operators from the
+				 // pre-made operators from the
 				 // Operators namespace (which will be
 				 // added soon).
 
@@ -363,7 +354,7 @@ void DGIntegrator<dim>::face(FaceInfo& info1, FaceInfo& info2) const
 
 				   // For additional shape functions,
 				   // we have to ask the neighbors
-				   // FEFaceValuseBase.
+				   // FEFaceValuesBase.
   const FEFaceValuesBase<dim>& fe_v_neighbor = info2.fe();
   
 				   // Then we get references to the
@@ -601,7 +592,7 @@ void DGMethod<dim>::assemble_system ()
 				   // quadrature formulae and the
 				   // update flags in the worker base
 				   // class. For quadrature, we play
-				   // safe and use a QGauss forumla
+				   // safe and use a QGauss formula
 				   // with number of points one higher
 				   // than the polynomial degree
 				   // used. Since the quadratures for
@@ -708,7 +699,7 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				 // want to base them also on jumps of
 				 // the discontinuous solution
 				 // function over faces between
-				 // neighboring cells. The simpliest
+				 // neighboring cells. The simplest
 				 // way of doing that is to compute
 				 // approximative gradients by
 				 // difference quotients including the
@@ -726,7 +717,7 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				 // step-9. Relating to the
 				 // discussion in step-9, here we
 				 // consider $h^{1+d/2}|\nabla_h
-				 // u_h|$. Futhermore we note that we
+				 // u_h|$. Furthermore we note that we
 				 // do not consider approximate second
 				 // derivatives because solutions to
 				 // the linear advection equation are
