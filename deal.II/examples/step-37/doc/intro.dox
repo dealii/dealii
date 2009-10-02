@@ -26,8 +26,8 @@ of the equation to be solved, between 40 and 95 per cent of the computational
 time is spent in performing sparse matrix-vector products.
 
 Let us briefly look at a simplified version of code for the matrix-vector
-product (the actual implementation in deal.II uses a different counter for
-the innermost loop, which avoids having one additional counter variable):
+product (the actual implementation in deal.II uses a different layout for
+the innermost loop, which avoids having the counter variable):
 @code
 // y = A * x
 std::size_t element_index = 0;
@@ -47,47 +47,47 @@ for (unsigned int row=0; row<n_rows; ++row)
 
 Looking into what actually happens in the computer when forming a
 matrix-vector product, one observes that the matrix data
-<code>matrix_values</code> is continuously traveling from main memory into
-the CPU in order to be multiplied with some vector element determined by the
-other array <code>column_indices</code> and add this product to a sum that
+<code>matrix_values</code> is continuously traveling from main memory into the
+CPU in order to be multiplied with some vector element determined by the other
+array <code>column_indices</code> and add this product to a sum that
 eventually is written into the output vector. Let us assume for simplicity
-that all the vector elements are sitting in the CPU (or some fast memory
-like caches) and that we use a compressed storage scheme for the sparse
-matrix, i.e., the format deal.II matrices (as well as PETSc and Trilinos
-matrices) use. Then each matrix element corresponds to 12 bytes of data, 8
-bytes for the respective element in <code>matrix_values</code>, and 4
-bytes for the unsigned integer position <code>column_indices</code> that
-tells which vector element we actually use for multiplication. Here we
-neglect the additional array that tells us the ranges of individual rows in
-the matrix. With that 12 bytes of data, we perform two floating point
-operations, a multiplication and an addition. If our matrix has one billion
-entries, a matrix-vector product consists of two billion floating point
-operations, 2 GFLOP. One core of a processor of 2009's standard (Intel's
-'Nehalem' processor, 3 GHz) has a peak performance of about 12 billion
-operations per second, 12 GFLOP/s. Now we might be tempted to hope for
-getting a matrix-vector product done in about one sixth of a second on such
-a machine. Remember, though, that we have to get 12 GB of data through the
-processor in order to form the matrix-vector product. Looking again at which
-hardware is available in 2009, we will hardly get more than 10 GB/s of data
-read. This means that the matrix-vector product will take more than one
-second to complete, giving a rate of 1.7 GFLOP/s at the best. This is quite
-far away from the theoretical peak performance of 12 GFLOP/s.
+that all the vector elements are sitting in the CPU (or some fast memory like
+caches) and that we use a compressed storage scheme for the sparse matrix,
+i.e., the format deal.II matrices (as well as PETSc and Trilinos matrices)
+use. Then each matrix element corresponds to 12 bytes of data, 8 bytes for the
+respective element in <code>matrix_values</code>, and 4 bytes for the unsigned
+integer position <code>column_indices</code> that tells which vector element
+we actually use for multiplication. Here we neglect the additional array that
+tells us the ranges of individual rows in the matrix. With that 12 bytes of
+data, we perform two floating point operations, a multiplication and an
+addition. If our matrix has one billion entries, a matrix-vector product
+consists of two billion floating point operations, 2 GFLOP. One core of a
+processor of 2009's standard (Intel's 'Nehalem' processor, 3 GHz) has a peak
+performance of about 12 billion operations per second, 12 GFLOP/s. Now we
+might be tempted to hope for getting a matrix-vector product done in about one
+sixth of a second on such a machine. Remember, though, that we have to get 12
+GB of data through the processor in order to form the matrix-vector
+product. Looking again at which hardware is available in 2009, we will hardly
+get more than 10 GB/s of data read. This means that the matrix-vector product
+will take more than one second to complete, giving a rate of 1.7 GFLOP/s at
+the best. This is quite far away from the theoretical peak performance of 12
+GFLOP/s. In practice, the rate is often considerably lower because, for
+example, the vectors do not fit into cache. A usual value on a 2009's machine
+is 0.5 to 1.1 GFLOP/s.
 
 What makes things worse is that today's processors have multiple cores, and
 multiple cores have to compete for memory bandwidth. Imagine we have 8 cores
-available with a theoretical peak performance of 96 GFLOP/s. However, they
-can only get about 35 GB/s of data. For our matrix-vector product, we would
-get a performance of about 6 GFLOP/s, which is at nightmarish 6 per cent of
-the system's peak performance. In practice, things are likely even worse
-since, for example, a substantial amount of vector entries needs to be
-fetched from main memory, too.
+available with a theoretical peak performance of 96 GFLOP/s. However, these
+cores sit on a machine with about 35 GB/s of memory bandwidth. For our
+matrix-vector product, we would get a performance of about 6 GFLOP/s, which is
+at nightmarish 6 per cent of the system's peak performance. And this is the
+theoretical maximum we can get!
 
-Things won't get better in the future, rather worse: Memory bandwidth
-will most likely continue to grow more slowly than the number of cores
-(i.e., the computing power). Consequently, we will probably not see
-that much of an improvement in the speed of our programs even though
-computers do become faster in the future if we accumulate their speed
-over all of their cores.
+Things won't get better in the future, rather worse: Memory bandwidth will
+most likely continue to grow more slowly than the number of cores (i.e., the
+computing power). Consequently, we will probably not see that much of an
+improvement in the speed of our programs even though computers do become
+faster if we accumulate their speed over all of their cores.
 
 In essence, one may ask how this can be avoided. The basic fact that
 precipitates this is that matrices just consume a lot of memory &mdash;
@@ -109,7 +109,7 @@ In order to find out how we can write a code that performs a matrix-vector
 product, but does not need to store the matrix elements, let us start at
 looking how some finite-element related matrix $A$ is assembled:
 @f{eqnarray*}
-A = \sum_{\mathrm{cell}=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T A_\mathrm{cell}
+A = \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T A_\mathrm{cell}
 P_\mathrm{cell,{loc-glob}}.
 @f}
 In this formula, the matrix $P_\mathrm{cell,{loc-glob}}$ is a permutation
@@ -121,13 +121,15 @@ assembly of matrices.
 
 If we are to perform a matrix-vector product, we can hence use that
 @f{eqnarray*}
-y &=& A\cdot x = \left(\sum_{\text{cell}=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T
+y &=& A\cdot x = \left(\sum_{\text{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
 A_\mathrm{cell} P_\mathrm{cell,{loc-glob}}\right) \cdot x\\
-&=& \sum_{\mathrm{cell}=1}^{\mathrm{n,cells}} P_\mathrm{cell,{loc-glob}}^T
+&=& \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
 A_\mathrm{cell} x_\mathrm{cell},
+&=& \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
+y_\mathrm{cell},
 @f}
 where $x_\mathrm{cell}$ is the values of <i>x</i> at the degrees of freedom
-of the respective cell.
+of the respective cell, and $y_\mathrm{cell}$ does so for the result.
 
 A naive attempt to implement the local action of the Laplacian would hence be
 to use the following code:
@@ -160,12 +162,10 @@ MatrixFree::vmult (Vector<double>       &dst,
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                                   fe_values.shape_grad(j,q_point) *
-                                   fe_values.JxW(q_point));
-          }
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+            cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
+                                 fe_values.shape_grad(j,q_point) *
+                                 fe_values.JxW(q_point));
 
       cell->get_dof_indices (local_dof_indices);
 
@@ -363,15 +363,17 @@ matrix from unit to real cell inverse_jacobian, because the transformation
 direction in deal.II is from real to unit cell).
 
 To sum up, we want to look at the additional costs introduced by this
-written-out matrix-matrix-vector product compared to a sparse matrix. To
-first approximation, we have increased the number of operations for the
-local matrix-vector product by a factor of 4 in 2D and 6 in 3D, i.e., two
+written-out matrix-matrix-vector product compared to a sparse matrix. To first
+approximation, we have increased the number of operations for the local
+matrix-vector product by a factor of 4 in 2D and 6 in 3D, i.e., two
 matrix-vector products with matrices that have <code>dim</code> as many
-columns than before. Then, we also need to think that we touch some degrees
-of freedom several times because they belong to several cells. This also
-increases computational costs. A realistic value compared to a sparse matrix
-is that we now have to perform about 10 times as many operations (a bit less
-in 2D, a bit more in 3D).
+columns than before (here we assume that the number of quadrature points is
+the same as the number of degrees of freedom per cell, which is usual for
+scalar problems). Then, we also need to keep in mind that we touch some
+degrees of freedom several times because they belong to several cells. This
+also increases computational costs. A realistic value compared to a sparse
+matrix is that we now have to perform about 10 times as many operations (a bit
+less in 2D, a bit more in 3D).
 
 The above is, in essence, what happens in the code below and if you have
 difficulties in understanding the implementation, you should try to first
@@ -392,36 +394,36 @@ there are a few more points done to be even more efficient, namely:
       is nice is that matrix-matrix products are close to the processor's
       peak performance if the matrices are neither too small nor too large
       &mdash; and these operations are the most expensive part in the
-      implementation shown here. This implies that the matrix-free
-      matrix-vector product is slower than a matrix-vector product using a
-      sparse matrix for linear and quadratic elements, but on par with third
-      order elements and faster for even higher order elements.
+      implementation shown here. 
 </ul>
 
-An additional gain with this implementation is that we do not have to build
-the sparse matrix itself, which can be quite expensive depending on the
-underlying differential equation.
+The implementation of the matrix-free matrix-vector product shown in this
+tutorial is slower than a matrix-vector product using a sparse matrix for
+linear and quadratic elements, but on par with third order elements and faster
+for even higher order elements. An additional gain with this implementation is
+that we do not have to build the sparse matrix itself, which can also be quite
+expensive depending on the underlying differential equation.
 
 
 <h4>Parallelization issues</h4>
 
 We mentioned in the philosophical section above that parallelization with
 multiple cores in a shared memory machine is an issue where sparse
-matrix-vector products are not particularly well suited because processors
-are memory bandwidth limited. There is a lot of data traffic involved, and
-the access patterns in the vector are not very regular. Also, different rows
-might have different %numbers of nonzero elements. The matrix-free
-implementation, however, is more favorable in this respect. It does not need
-to save all the elements (only the product of transposed Jacobian, weights,
-and Jacobian, for all quadrature points on all cells, which is about 4 times
-the size of the solution vector in 2D and 9 times the size of the solution
-vector in 3D), whereas the number of nonzeros grows with the element
-order. Moreover, most of the work is done on a very regular pattern with
-stride-one access to data: Perform matrix-vector products with the same
-matrix, perform (equally many) transformations on the vector related
-quadrature points, and do one more matrix-vector product. Only the read
-operation from the global vector <code>src</code> and the write operation to
-<code>dst</code> in the end need to have random access to a vector.
+matrix-vector products are not particularly well suited because processors are
+memory bandwidth limited. There is a lot of data traffic involved, and the
+access patterns in the vector are not very regular. Also, different rows might
+have different %numbers of nonzero elements. The matrix-free implementation,
+however, is more favorable in this respect. It does not need to save all the
+elements (only the product of transposed Jacobian, weights, and Jacobian, for
+all quadrature points on all cells, which is about 4 times the size of the
+solution vector in 2D and 9 times the size of the solution vector in 3D),
+whereas the number of nonzeros grows with the element order. Moreover, most of
+the work is done on a very regular pattern with stride-one access to data:
+Performing matrix-vector products with the same matrix, performing (equally
+many) transformations on the vector related quadrature points, and doing one
+more matrix-vector product. Only the read operation from the global vector
+<code>src</code> and the write operation to <code>dst</code> in the end
+request for random access to a vector.
 
 For example, it should not be too difficult to implement a matrix-free
 matrix-vector product on a <a
@@ -429,14 +431,14 @@ href="http://en.wikipedia.org/wiki/GPGPU">graphics processing unit
 (GP-GPU)</a>. However, it would be quite complex to make a sparse
 matrix-vector product implementation efficient on a GPU.
 
-For our program, we choose to follow a simple strategy: We let several
-processors work together by splitting the cells into several chunks. The
-threading building blocks implemenation of a %parallel pipeline implements
-this concept using the WorkStream::run() function. What the pipeline does is
-pretty much the same as a for loop. However, it can be instructed to do some
-part of the loop body by just one process at a time and in natural order. We
-need to use this for writing the local contributions into the global vector,
-in order to avoid a race condition.
+For our program, we choose to follow a simple strategy to make the code
+%parallel: We let several processors work together by splitting the cells into
+several chunks. The threading building blocks implemenation of a %parallel
+pipeline implements this concept using the WorkStream::run() function. What
+the pipeline does closely resembles the work done by a for loop. However, it
+can be instructed to do some part of the loop body by just one process at a
+time and in natural order. We need to use this for writing the local
+contributions into the global vector, in order to avoid a race condition.
 
 
 <h3>Combination with multigrid</h3>
@@ -455,27 +457,27 @@ system matrix.
 
 One solution is to use multigrid methods as shown in @ref step_16
 "step-16". They are known to be very fast, and they are suitable for our
-purpose since they can be designed based purely on matrix-vector products
-(and knowledge of the diagonal entries of the matrix, though). All one needs
-to do is to find a smoother that works with matrix-vector products only. One
-such candidate would be a damped Jacobi iteration, but that one is often not
-sufficiently good in damping high-frequency errors than one would like. A
-Chebyshev preconditioner, eventually, is what we use here. It can be seen as
-an extension of the Jacobi method by using Chebyshev polynomials. With
-degree zero, the Jacobi method is retrieved, whereas higher order
-corrections improve the smoothing properties if some parameters are suitably
-chosen. The effectiveness of Chebyshev smoothing in multigrid has been
-demonstrated, e.g., in the article <i>M. Adams, M. Brezina, J. Hu,
-R. Tuminaro. Parallel multigrid smoothers: polynomial versus
+purpose since they can be designed based purely on matrix-vector products. All
+one needs to do is to find a smoother that works with matrix-vector products
+only (our choice requires knowledge of the diagonal entries of the matrix,
+though). One such candidate would be a damped Jacobi iteration, but that is
+often not sufficiently good in damping high-frequency errors than one would
+like. A Chebyshev preconditioner, eventually, is what we use here. It can be
+seen as an extension of the Jacobi method by using Chebyshev polynomials. With
+degree zero, the Jacobi method with optimal damping parameter is retrieved,
+whereas higher order corrections improve the smoothing properties if some
+parameters are suitably chosen. The effectiveness of Chebyshev smoothing in
+multigrid has been demonstrated, e.g., in the article <i>M. Adams, M. Brezina,
+J. Hu, R. Tuminaro. Parallel multigrid smoothers: polynomial versus
 Gauss&ndash;Seidel, J. Comput. Phys. 188:593&ndash;610, 2003</i>. This
-publication also identifies one more advantage of Chebyshev smoothers that
-we exploit here, namely that they are easy to parallelize, whereas
-SOR/Gauss&ndash;Seidel smoothing relies on substitutions, which can often
-only be parallelized by working on diagonal subblocks of the matrix, which
+publication also identifies one more advantage of Chebyshev smoothers that we
+exploit here, namely that they are easy to parallelize, whereas
+SOR/Gauss&ndash;Seidel smoothing relies on substitutions, which can often only
+be parallelized by working on diagonal subblocks of the matrix, which
 decreases efficiency.
 
 The implementation into the multigrid framework is then very
-straight-forward. We will only need some few modifications compared to @ref
+straight-forward. We will only need some minor modifications compared to @ref
 step_16 "step-16".
 
 <h3>The test case</h3>

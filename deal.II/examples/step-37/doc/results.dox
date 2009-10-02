@@ -44,9 +44,9 @@ Multigrid objects memory consumption: 41.64 MBytes.
 Convergence in 10 CG iterations.
 @endcode
 
-As in step-16, we see that the number of CG iterations stays constant with 
-increasing number of degrees of freedom. Not much changes if we run the 
-program in three dimensions:
+As in step-16, we see that the number of CG iterations remains constant with
+increasing number of degrees of freedom. Not much changes if we run the
+program in three spatial dimensions:
 
 @code
 Cycle 0
@@ -84,4 +84,4 @@ standard SparseMatrix object shows that, for the largest problem considered
 in 3D, the memory consumption for SparseMatrix and its sparsity pattern 
 would be about 1.3 GBytes, which is a factor of 4 more memory. If combined
 with cubic elements in 3D, the MatrixFree class would decrease memory 
-consumption by a factor of 12.
+consumption even by a factor of 12.
