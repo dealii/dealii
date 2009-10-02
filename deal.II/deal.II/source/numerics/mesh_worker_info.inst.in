@@ -1,0 +1,34 @@
+//---------------------------------------------------------------------------
+//    $Id: fe_field_function.inst.in 19046 2009-07-08 19:30:23Z bangerth $
+//
+//    Copyright (C) 2009 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (FEV : FEVALUES_BASES)
+{
+  template class IntegrationInfo<deal_II_dimension, FEV>;
+}
+
+for (FEV : FEVALUES_BASES)
+{
+//   for (TYPE : DERIVATIVE_TENSORS)
+//   {
+//     template void IntegrationInfo<deal_II_dimension, FEV>::fill_local_data(
+//       std::vector<std::vector<std::vector<TYPE > > >&, bool) const;
+//     template void IntegrationInfo<deal_II_dimension, FEV>::fill_local_data(
+//       std::vector<std::vector<std::vector<TYPE > > >&, VectorSelector&, bool) const;
+//   }
+//     for (VECTOR : SERIAL_VECTORS)
+//       {
+//       }
+ }
+
+
+

@@ -1,7 +1,8 @@
 //---------------------------------------------------------------------------
 //    $Id$
+//    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -10,14 +11,18 @@
 //
 //---------------------------------------------------------------------------
 
+#include <lac/vector.h>
+#include <lac/block_vector.h>
 
-for (VECTOR : SERIAL_VECTORS)
+#include <numerics/mesh_worker_vector_selector.templates.h>
+
+DEAL_II_NAMESPACE_OPEN
+
+namespace MeshWorker
 {
-  template class FEFieldFunction<deal_II_dimension, 
-				 DoFHandler<deal_II_dimension>, 
-				 VECTOR>;
+  template class VectorDataBase<deal_II_dimension>;
 
-  template class FEFieldFunction<deal_II_dimension, 
-				 MGDoFHandler<deal_II_dimension>, 
-				 VECTOR>;
+#include "mesh_worker_vector_selector.inst"
 }
+
+DEAL_II_NAMESPACE_CLOSE
