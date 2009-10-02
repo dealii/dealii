@@ -1206,7 +1206,7 @@ int main()
   try
     {
       RunTimeParameters::Data_Storage data;
-      data.read_data ("../parameter-file.prm");
+      data.read_data ("parameter-file.prm");
       deallog.depth_console (data.verbose ? 2 : 0);
       NavierStokesProjection<2> test (data);
       test.run (data.verbose, data.output);
