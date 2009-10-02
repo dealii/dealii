@@ -8,7 +8,7 @@
 
 This example shows how to implement a matrix-free method, that is, a method
 that does not explicitly store the matrix elements, for a
-second-order Poisson equation with variable coefficients on a rather 
+second-order Poisson equation with variable coefficients on a fairly 
 unstructured mesh representing a circle.
 
 <h3>Matrix-vector product implementation</h3>
