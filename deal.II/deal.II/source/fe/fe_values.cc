@@ -2346,11 +2346,11 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector& fe_function,
   const VectorSlice<const std::vector<unsigned int> >& indices,
-  VectorSlice<std::vector<std::vector<number> > >& values,
+  VectorSlice<std::vector<std::vector<double> > > values,
   bool quadrature_points_fastest) const
 {
   const unsigned int n_components = fe->n_components();
@@ -2666,7 +2666,7 @@ template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector& fe_function,
   const VectorSlice<const std::vector<unsigned int> >& indices,
-  VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > >& gradients,
+  VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > gradients,
   bool quadrature_points_fastest) const
 {
   const unsigned int n_components = fe->n_components();
@@ -2957,7 +2957,7 @@ template <class InputVector>
 void FEValuesBase<dim, spacedim>::get_function_hessians (
   const InputVector& fe_function,
   const VectorSlice<const std::vector<unsigned int> >& indices,
-  VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > >& hessians,
+  VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
   bool quadrature_points_fastest) const
 {
   Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());

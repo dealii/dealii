@@ -1992,24 +1992,12 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * the checks on the arguments
 				      * may not detect errors.
 				      */
-    template <class InputVector, typename number>
+    template <class InputVector>
     void get_function_values (const InputVector& fe_function,
 			      const VectorSlice<const std::vector<unsigned int> >& indices,
-			      std::vector<std::vector<number> >& values,
+			      VectorSlice<std::vector<std::vector<double> > > values,
 			      const bool quadrature_points_fastest) const;
-
-				     /**
-				      * Like the previous function,
-				      * but allows to only fill a
-				      * slice of a vector instead of
-				      * the whole one.
-				      */
-    template <class InputVector, typename number>
-    void get_function_values (const InputVector& fe_function,
-			      const VectorSlice<const std::vector<unsigned int> >& indices,
-			      VectorSlice<std::vector<std::vector<number> > >& values,
-			      const bool quadrature_points_fastest) const;
-
+    
 				     /**
 				      * Compute the gradients of the finite
 				      * element function characterized
@@ -2142,18 +2130,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     template <class InputVector>
     void get_function_gradients (const InputVector& fe_function,
 				 const VectorSlice<const std::vector<unsigned int> >& indices,
-				 std::vector<std::vector<Tensor<1,spacedim> > >& gradients,
-				 bool quadrature_points_fastest = false) const;
-
-				     /**
-				      * Same as the previous function,
-				      * but filling only a slice of
-				      * the result vector.
-				      */
-    template <class InputVector>
-    void get_function_gradients (const InputVector& fe_function,
-				 const VectorSlice<const std::vector<unsigned int> >& indices,
-				 VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > >& gradients,
+				 VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > gradients,
 				 bool quadrature_points_fastest = false) const;
 
 				     /**
@@ -2277,18 +2254,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     void get_function_hessians (
       const InputVector& fe_function,
       const VectorSlice<const std::vector<unsigned int> >& indices,
-      std::vector<std::vector<Tensor<2,spacedim> > >& hessians,
-      bool quadrature_points_fastest = false) const;
-				     /**
-				      * Same as the previous function,
-				      * but filling only a slice of
-				      * the result vector.
-				      */
-    template <class InputVector>
-    void get_function_hessians (
-      const InputVector& fe_function,
-      const VectorSlice<const std::vector<unsigned int> >& indices,
-      VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > >& hessians,
+      VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
       bool quadrature_points_fastest = false) const;
 
 				     /**
@@ -4615,51 +4581,6 @@ FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 
   return this->inverse_jacobians[i];
 }
-
-
-template <int dim, int spacedim>
-template <class InputVector, typename number>
-inline void
-FEValuesBase<dim,spacedim>::get_function_values (
-  const InputVector& fe_function,
-  const VectorSlice<const std::vector<unsigned int> >& indices,
-  std::vector<std::vector<number> >& values,
-  const bool quadrature_points_fastest) const
-{
-  VectorSlice<std::vector<std::vector<number> > > slice(values);
-  get_function_values(fe_function, indices, slice, quadrature_points_fastest);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline void
-FEValuesBase<dim,spacedim>::get_function_gradients (
-  const InputVector& fe_function,
-  const VectorSlice<const std::vector<unsigned int> >& indices,
-  std::vector<std::vector<Tensor<1,spacedim> > >& values,
-  const bool quadrature_points_fastest) const
-{
-  VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > slice(values);
-  get_function_gradients(fe_function, indices, slice, quadrature_points_fastest);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline void
-FEValuesBase<dim,spacedim>::get_function_hessians (
-  const InputVector& fe_function,
-  const VectorSlice<const std::vector<unsigned int> >& indices,
-  std::vector<std::vector<Tensor<2,spacedim> > >& values,
-  const bool quadrature_points_fastest) const
-{
-  VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > slice(values);
-  get_function_hessians(fe_function, indices, slice, quadrature_points_fastest);
-}
-
 
 
 template <int dim, int spacedim>

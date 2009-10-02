@@ -150,11 +150,11 @@ for (VEC : SERIAL_VECTORS)
     template
       void FEValuesBase<deal_II_dimension>::get_function_values<VEC>
       (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
-       VectorSlice<std::vector<std::vector<double> > >&, bool) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_values<VEC>
-      (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
-       VectorSlice<std::vector<std::vector<float> > > &, bool) const;
+       VectorSlice<std::vector<std::vector<double> > >, bool) const;
+//     template
+//       void FEValuesBase<deal_II_dimension>::get_function_values<VEC>
+//       (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
+//        VectorSlice<std::vector<std::vector<float> > >, bool) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_gradients<VEC>
@@ -170,7 +170,7 @@ for (VEC : SERIAL_VECTORS)
     template
       void FEValuesBase<deal_II_dimension>::get_function_gradients<VEC>
       (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
-       VectorSlice<std::vector<std::vector<Tensor<1,deal_II_dimension> > > >&, bool) const;
+       VectorSlice<std::vector<std::vector<Tensor<1,deal_II_dimension> > > >, bool) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_hessians<VEC>
@@ -186,7 +186,7 @@ for (VEC : SERIAL_VECTORS)
     template
       void FEValuesBase<deal_II_dimension>::get_function_hessians<VEC>
       (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
-       VectorSlice<std::vector<std::vector<Tensor<2,deal_II_dimension> > > >&, bool) const;
+       VectorSlice<std::vector<std::vector<Tensor<2,deal_II_dimension> > > >, bool) const;
 
     template
 	void FEValuesBase<deal_II_dimension>::get_function_laplacians<VEC>
@@ -261,11 +261,11 @@ for (VEC : SERIAL_VECTORS)
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<VEC>
       (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
-       VectorSlice<std::vector<std::vector<double> > >&, bool) const;
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<VEC>
-      (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
-       VectorSlice<std::vector<std::vector<float> > >&, bool) const;
+       VectorSlice<std::vector<std::vector<double> > >, bool) const;
+//     template
+//       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<VEC>
+//       (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
+//        VectorSlice<std::vector<std::vector<float> > >, bool) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_gradients<VEC>
@@ -281,7 +281,7 @@ for (VEC : SERIAL_VECTORS)
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_gradients<VEC>
       (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
-       VectorSlice<std::vector<std::vector<Tensor<1,deal_II_dimension+1> > > >&, bool) const;
+       VectorSlice<std::vector<std::vector<Tensor<1,deal_II_dimension+1> > > >, bool) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_hessians<VEC>
@@ -297,7 +297,7 @@ for (VEC : SERIAL_VECTORS)
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_hessians<VEC>
       (const VEC&, const VectorSlice<const std::vector<unsigned int> >&,
-       VectorSlice<std::vector<std::vector<Tensor<2,deal_II_dimension+1> > > >&, bool) const;
+       VectorSlice<std::vector<std::vector<Tensor<2,deal_II_dimension+1> > > >, bool) const;
 
     template
 	void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_laplacians<VEC>

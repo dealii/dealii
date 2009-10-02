@@ -16,6 +16,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#if deal_II_dimension > 1
+
 namespace MeshWorker
 {
   template class LocalResults<double>;
@@ -37,6 +39,7 @@ namespace MeshWorker
     const Quadrature<FESubfaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags);
 }
 
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

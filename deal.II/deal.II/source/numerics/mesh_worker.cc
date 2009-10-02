@@ -111,6 +111,7 @@ IntegrationWorker<dim>::initialize_gauss_quadrature(
 
 }
 
-  
+#if deal_II_dimension > 1
 template class IntegrationWorker<deal_II_dimension>;
+#endif
 

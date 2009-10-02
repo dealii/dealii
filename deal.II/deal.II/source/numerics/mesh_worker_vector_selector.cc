@@ -18,11 +18,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#if deal_II_dimension > 1
+
 namespace MeshWorker
 {
   template class VectorDataBase<deal_II_dimension>;
 
 #include "mesh_worker_vector_selector.inst"
 }
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
