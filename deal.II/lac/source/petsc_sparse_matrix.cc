@@ -261,19 +261,18 @@ namespace PETScWrappers
                           &row_values[0], INSERT_VALUES);
           }
         compress ();
-      }
-
 				        // In the end, tell the matrix that
 				        // it should not expect any new
 				        // entries.
 #if (PETSC_VERSION_MAJOR <= 2)
-    const int ierr =
-      MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
+	const int ierr =
+	  MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
 #else
-    const int ierr =
-      MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+	const int ierr =
+	  MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
 #endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
   }
 
 
