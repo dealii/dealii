@@ -10,7 +10,7 @@
 /*    further information on this license.                        */
 
 
-				 // @sect3{Include Files}
+				 // @sect3{Include files}
 
 				 // We start by including all the necessary
 				 // deal.II header files and some C++ related
@@ -251,7 +251,7 @@ namespace RunTimeParameters
 
 
 
-				 // @sect3{The Equation Data}
+				 // @sect3{Equation data}
 
 				 // In the next namespace, we declare
 				 // the initial and boundary
@@ -399,149 +399,279 @@ namespace EquationData
 
 				 // @sect3{The <code>NavierStokesProjection</code> class}
 
-				 // Now for the main class of the
-				 // program. It implements the various
-				 // versions of the projection method
-				 // for Navier-Stokes equations.  The
-				 // names for all the methods and
-				 // attributes should be
-				 // self-explanatory.
+				 // Now for the main class of the program. It
+				 // implements the various versions of the
+				 // projection method for Navier-Stokes
+				 // equations.  The names for all the methods
+				 // and member variables should be
+				 // self-explanatory, taking into account the
+				 // implementation details given in the
+				 // introduction.
 template <int dim>
 class NavierStokesProjection
 {
   public:
     NavierStokesProjection (const RunTimeParameters::Data_Storage &data);
-    ~NavierStokesProjection();
-    void run (const bool verbose = false,
+
+    void run (const bool         verbose    = false,
 	      const unsigned int n_of_plots = 10);
   protected:
     RunTimeParameters::MethodFormulation type;
 
-    unsigned int deg;
-    double dt;
+    const unsigned int deg;
+    const double       dt;
+    const double       t_0, T, Re;
 
-    double t_0, T, Re;
-
-    EquationData::Velocity<dim> vel_exact;
+    EquationData::Velocity<dim>    vel_exact;
     std::map<unsigned int, double> boundary_values;
-    std::vector<unsigned char> boundary_indicators;
+    std::vector<unsigned char>     boundary_indicators;
 
     Triangulation<dim> triangulation;
-    DoFHandler<dim> dof_handler_velocity, dof_handler_pressure;
-    FE_Q<dim> fe_velocity, fe_pressure;
-    QGauss<dim> quadrature_pressure, quadrature_velocity;
+    
+    FE_Q<dim>          fe_velocity;
+    FE_Q<dim>          fe_pressure;
+    
+    DoFHandler<dim>    dof_handler_velocity;
+    DoFHandler<dim>    dof_handler_pressure;
 
-    SparsityPattern sparsity_pattern_velocity, sparsity_pattern_pressure, sparsity_pattern_pres_vel;
-    SparseMatrix<double> vel_Laplace_plus_Mass, vel_it_matrix[dim], vel_Mass, vel_Laplace,
-    vel_Advection,
-    pres_Laplace, pres_Mass, pres_Diff[dim], pres_iterative;
-    Vector<double> pres_n, pres_n_minus_1, phi_n, phi_n_minus_1, u_n[dim], u_n_minus_1[dim],
-    u_star[dim],
-    force[dim],
-    v_tmp, pres_tmp,
-    rot_u;
+    QGauss<dim>        quadrature_pressure;
+    QGauss<dim>        quadrature_velocity;
 
-    SparseILU<double> prec_velocity[dim], prec_pres_Laplace;
-    SparseDirectUMFPACK prec_mass, prec_vel_mass;
+    SparsityPattern    sparsity_pattern_velocity;
+    SparsityPattern    sparsity_pattern_pressure;
+    SparsityPattern    sparsity_pattern_pres_vel;
+    
+    SparseMatrix<double> vel_Laplace_plus_Mass;
+    SparseMatrix<double> vel_it_matrix[dim];
+    SparseMatrix<double> vel_Mass;
+    SparseMatrix<double> vel_Laplace;
+    SparseMatrix<double> vel_Advection;
+    SparseMatrix<double> pres_Laplace;
+    SparseMatrix<double> pres_Mass;
+    SparseMatrix<double> pres_Diff[dim];
+    SparseMatrix<double> pres_iterative;
+    
+    Vector<double> pres_n;
+    Vector<double> pres_n_minus_1;
+    Vector<double> phi_n;
+    Vector<double> phi_n_minus_1;
+    Vector<double> u_n[dim];
+    Vector<double> u_n_minus_1[dim];
+    Vector<double> u_star[dim];
+    Vector<double> force[dim];
+    Vector<double> v_tmp;
+    Vector<double> pres_tmp;
+    Vector<double> rot_u;
 
-    DeclException2 (ExcInvalidTimeStep, double, double, << " The time step " << arg1 << " is out of range." << std::endl
+    SparseILU<double> prec_velocity[dim];
+    SparseILU<double> prec_pres_Laplace;
+    SparseDirectUMFPACK prec_mass;
+    SparseDirectUMFPACK prec_vel_mass;
+
+    DeclException2 (ExcInvalidTimeStep,
+		    double, double,
+		    << " The time step " << arg1 << " is out of range."
+		    << std::endl
 		    << " The permitted range is (0," << arg2 << "]");
 
-    void Create_Triangulation (const unsigned int n_of_refines);
-    void Initialize();
+    void create_triangulation (const unsigned int n_of_refines);
 
-    void interpolate_velocity();
+    void initialize();
+
+    void interpolate_velocity ();
+
     void diffusion_step (const bool reinit_prec);
+
     void projection_step (const bool reinit_prec);
+
     void update_pressure (const bool reinit_prec);
+
   private:
-    unsigned int vel_max_its, vel_Krylov_size, vel_off_diagonals, vel_update_prec;
-    double vel_eps, vel_diag_strength;
+    unsigned int vel_max_its;
+    unsigned int vel_Krylov_size;
+    unsigned int vel_off_diagonals;
+    unsigned int vel_update_prec;
+    double       vel_eps;
+    double       vel_diag_strength;
 
     void init_velocity_matrices();
-    void init_pressure_matrices();
-    void init_gradient_operator();
 
+    void init_pressure_matrices();
+
+				     // The next few structures and functions
+				     // are for doing various things in
+				     // parallel. They follow the scheme laid
+				     // out in @ref threads, using the
+				     // WorkStream class. As explained there,
+				     // this requires us to declare two
+				     // structures for each of the assemblers,
+				     // a per-task data and a scratch data
+				     // structure. These are then handed over
+				     // to functions that assemble local
+				     // contributions and that copy these
+				     // local contributions to the global
+				     // objects.
+				     //
+				     // One of the things that are specific to
+				     // this program is that we don't just
+				     // have a single DoFHandler object that
+				     // represents both the velocities and the
+				     // pressure, but we use individual
+				     // DoFHandler objects for these two kinds
+				     // of variables. We pay for this
+				     // optimization when we want to assemble
+				     // terms that involve both variables,
+				     // such as the divergence of the velocity
+				     // and the gradient of the pressure,
+				     // times the respective test
+				     // functions. When doing so, we can't
+				     // just anymore use a single FEValues
+				     // object, but rather we need two, and
+				     // they need to be initialized with cell
+				     // iterators that point to the same cell
+				     // in the triangulation but different
+				     // DoFHandlers.
+				     //
+				     // To do this in practice, we declare a
+				     // "synchronous" iterator -- an object
+				     // that internally consists of several
+				     // (in our case two) iterators, and each
+				     // time the synchronous iteration is
+				     // moved up one step, each of the
+				     // iterators stored internally is moved
+				     // up one step as well, thereby always
+				     // staying in sync. As it so happens,
+				     // there is a deal.II class that
+				     // facilitates this sort of thing.
     typedef std_cxx1x::tuple< typename DoFHandler<dim>::active_cell_iterator,
 			      typename DoFHandler<dim>::active_cell_iterator
 			      > IteratorTuple;
-typedef parallel::internal::SynchronousIterators<IteratorTuple> SIterators;
-struct InitGradPerTaskData
-{
-    unsigned int d, vel_dpc, pres_dpc;
-    FullMatrix<double> local_grad;
-    std::vector<unsigned int> vel_local_dof_indices, pres_local_dof_indices;
-    InitGradPerTaskData (const unsigned int dd, const unsigned int vdpc, const unsigned int pdpc):
-		    d(dd), vel_dpc (vdpc), pres_dpc (pdpc),
-		    local_grad (vdpc, pdpc), vel_local_dof_indices (vdpc),
-		    pres_local_dof_indices (pdpc)
-      {}
-};
-struct InitGradScratchData
-{
-    unsigned int nqp;
-    FEValues<dim> fe_val_vel, fe_val_pres;
-    InitGradScratchData (const FE_Q<dim> &fe_v, const FE_Q<dim> &fe_p, const QGauss<dim> &quad,
-			 const UpdateFlags flags_v, const UpdateFlags flags_p) :
-		    nqp (quad.size()), fe_val_vel (fe_v, quad, flags_v),
-		    fe_val_pres (fe_p, quad, flags_p)
-      {}
-    InitGradScratchData (const InitGradScratchData &data): nqp (data.nqp),
-							   fe_val_vel (data.fe_val_vel.get_fe(), data.fe_val_vel.get_quadrature(),
-								       data.fe_val_vel.get_update_flags()),
-							   fe_val_pres (data.fe_val_pres.get_fe(), data.fe_val_pres.get_quadrature(),
-									data.fe_val_pres.get_update_flags())
-      {}
-};
-void assemble_one_cell_of_gradient (const SIterators &SI, InitGradScratchData &scratch,
-				    InitGradPerTaskData &data);
-void copy_gradient_local_to_global (const InitGradPerTaskData &data);
 
-void assemble_advection_term();
-struct AdvectionPerTaskData
-{
-    FullMatrix<double> local_advection;
-    std::vector<unsigned int> local_dof_indices;
-    AdvectionPerTaskData (const unsigned int dpc): local_advection (dpc, dpc), local_dof_indices (dpc)
-      {}
+    typedef parallel::internal::SynchronousIterators<IteratorTuple> IteratorPair;
+
+    void init_gradient_operator();
+
+    struct InitGradPerTaskData
+    {
+	unsigned int              d;
+	unsigned int              vel_dpc;
+	unsigned int              pres_dpc;
+	FullMatrix<double>        local_grad;
+	std::vector<unsigned int> vel_local_dof_indices;
+	std::vector<unsigned int> pres_local_dof_indices;
+	
+	InitGradPerTaskData (const unsigned int dd,
+			     const unsigned int vdpc,
+			     const unsigned int pdpc)
+			:
+			d(dd),
+			vel_dpc (vdpc),
+			pres_dpc (pdpc),
+			local_grad (vdpc, pdpc),
+			vel_local_dof_indices (vdpc),
+			pres_local_dof_indices (pdpc)
+	  {}
+    };
+    
+    struct InitGradScratchData
+    {
+	unsigned int  nqp;
+	FEValues<dim> fe_val_vel;
+	FEValues<dim> fe_val_pres;
+	InitGradScratchData (const FE_Q<dim> &fe_v,
+			     const FE_Q<dim> &fe_p,
+			     const QGauss<dim> &quad,
+			     const UpdateFlags flags_v,
+			     const UpdateFlags flags_p)
+			:
+			nqp (quad.size()),
+			fe_val_vel (fe_v, quad, flags_v),
+			fe_val_pres (fe_p, quad, flags_p)
+	  {}
+	InitGradScratchData (const InitGradScratchData &data)
+			:
+			nqp (data.nqp),
+			fe_val_vel (data.fe_val_vel.get_fe(),
+				    data.fe_val_vel.get_quadrature(),
+				    data.fe_val_vel.get_update_flags()),
+			fe_val_pres (data.fe_val_pres.get_fe(),
+				     data.fe_val_pres.get_quadrature(),
+				     data.fe_val_pres.get_update_flags())
+	  {}
+    };
+    
+    void assemble_one_cell_of_gradient (const IteratorPair  &SI,
+					InitGradScratchData &scratch,
+					InitGradPerTaskData &data);
+    
+    void copy_gradient_local_to_global (const InitGradPerTaskData &data);
+
+				     // The same general layout also applies
+				     // to the following classes and functions
+				     // implementing the assembly of the
+				     // advection term:
+    void assemble_advection_term();
+    
+    struct AdvectionPerTaskData
+    {
+	FullMatrix<double>        local_advection;
+	std::vector<unsigned int> local_dof_indices;
+	AdvectionPerTaskData (const unsigned int dpc)
+			:
+			local_advection (dpc, dpc),
+			local_dof_indices (dpc)
+	  {}
+    };
+    
+    struct AdvectionScratchData
+    {
+	unsigned int                 nqp;
+	unsigned int                 dpc;
+	std::vector< Point<dim> >    u_star_local;
+	std::vector< Tensor<1,dim> > grad_u_star;
+	std::vector<double>          u_star_tmp;
+	FEValues<dim>                fe_val;
+	AdvectionScratchData (const FE_Q<dim> &fe,
+			      const QGauss<dim> &quad,
+			      const UpdateFlags flags)
+			:
+			nqp (quad.size()),
+			dpc (fe.dofs_per_cell),
+			u_star_local (nqp),
+			grad_u_star (nqp),
+			u_star_tmp (nqp),
+			fe_val (fe, quad, flags)
+	  {}
+	
+	AdvectionScratchData (const AdvectionScratchData &data)
+			:
+			nqp (data.nqp),
+			dpc (data.dpc),
+			u_star_local (nqp),
+			grad_u_star (nqp),
+			u_star_tmp (nqp),
+			fe_val (data.fe_val.get_fe(),
+				data.fe_val.get_quadrature(),
+				data.fe_val.get_update_flags())
+	  {}
+    };
+
+    void assemble_one_cell_of_advection (const typename DoFHandler<dim>::active_cell_iterator &cell,
+					 AdvectionScratchData &scratch,
+					 AdvectionPerTaskData &data);
+    
+    void copy_advection_local_to_global (const AdvectionPerTaskData &data);
+
+				     // The final few functions implement the
+				     // diffusion solve as well as
+				     // postprocessing the output, including
+				     // computing the curl of the velocity:
+    void diffusion_component_solve (const unsigned int d);
+
+    void plot_solution (const unsigned int step);
+    
+    void assemble_vorticity (const bool reinit_prec);
 };
-struct AdvectionScratchData
-{
-    unsigned int nqp, dpc;
-    std::vector< Point<dim> > u_star_local;
-    std::vector< Tensor<1,dim> > grad_u_star;
-    std::vector<double> u_star_tmp;
-    FEValues<dim> fe_val;
-    AdvectionScratchData (const FE_Q<dim> &fe, const QGauss<dim> &quad, const UpdateFlags flags):
-		    nqp (quad.size()), dpc (fe.dofs_per_cell),
-		    u_star_local (nqp), grad_u_star (nqp), u_star_tmp (nqp),
-		    fe_val (fe, quad, flags)
-      {}
-    AdvectionScratchData (const AdvectionScratchData &data)
-		    :
-		    nqp (data.nqp), dpc (data.dpc),
-		    u_star_local (nqp), grad_u_star (nqp), u_star_tmp (nqp),
-		    fe_val (data.fe_val.get_fe(), data.fe_val.get_quadrature(),
-			    data.fe_val.get_update_flags())
-      {}
-};
-
-void assemble_one_cell_of_advection (const typename DoFHandler<dim>::active_cell_iterator &cell,
-				     AdvectionScratchData &scratch, AdvectionPerTaskData &data);
-void copy_advection_local_to_global (const AdvectionPerTaskData &data);
-inline void diffusion_component_solve (const unsigned int d);
-
-inline void plot_solution (const unsigned int step);
-inline void assemble_vorticity (const bool reinit_prec);
-};
-
-
-template <int dim>
-NavierStokesProjection<dim>::~NavierStokesProjection()
-{
-  dof_handler_velocity.clear();
-  dof_handler_pressure.clear();
-}
 
 
 
@@ -558,28 +688,40 @@ NavierStokesProjection<dim>::~NavierStokesProjection()
 template <int dim>
 NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Data_Storage &data)
 		:
-		type (data.form), deg (data.pressure_degree), dt (data.dt), t_0 (data.initial_time),
-		T (data.final_time), Re (data.Reynolds), vel_exact (data.initial_time),
-		dof_handler_velocity (triangulation), dof_handler_pressure (triangulation),
-		fe_velocity (deg+1), fe_pressure (deg),
-		quadrature_pressure (deg+1), quadrature_velocity (deg+2),
-		vel_max_its (data.vel_max_iterations), vel_Krylov_size (data.vel_Krylov_size),
+		type (data.form),
+		deg (data.pressure_degree),
+		dt (data.dt),
+		t_0 (data.initial_time),
+		T (data.final_time),
+		Re (data.Reynolds),
+		vel_exact (data.initial_time),
+		fe_velocity (deg+1),
+		fe_pressure (deg),
+		dof_handler_velocity (triangulation),
+		dof_handler_pressure (triangulation),
+		quadrature_pressure (deg+1),
+		quadrature_velocity (deg+2),
+		vel_max_its (data.vel_max_iterations),
+		vel_Krylov_size (data.vel_Krylov_size),
 		vel_off_diagonals (data.vel_off_diagonals),
-		vel_update_prec (data.vel_update_prec), vel_eps (data.vel_eps),
+		vel_update_prec (data.vel_update_prec),
+		vel_eps (data.vel_eps),
 		vel_diag_strength (data.vel_diag_strength)
 {
   if(deg < 1)
-    std::cout << " WARNING: The chosen pair of finite element spaces is not stable." << std::endl
-	      << " The obtained results will be nonsense" << std::endl;
+    std::cout << " WARNING: The chosen pair of finite element spaces is not stable."
+	      << std::endl
+	      << " The obtained results will be nonsense"
+	      << std::endl;
 
   AssertThrow (not  ( (dt <= 0.) or  (dt > .5*T)), ExcInvalidTimeStep (dt, .5*T));
 
-  Create_Triangulation (data.n_of_global_refines);
-  Initialize();
+  create_triangulation (data.n_of_global_refines);
+  initialize();
 }
 
 
-				 // @sect4{ <code>NavierStokesProjection::Create_Triangulation</code> }
+				 // @sect4{ <code>NavierStokesProjection::create_triangulation</code> }
 
 				 // The method that creates the
 				 // triangulation and refines it the
@@ -591,7 +733,7 @@ NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Dat
 				 // initializes the matrices and
 				 // vectors that we will use.
 template <int dim>
-void NavierStokesProjection<dim>::Create_Triangulation (const unsigned int n_of_refines)
+void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_refines)
 {
   GridIn<dim> grid_in;
   grid_in.attach_triangulation (triangulation);
@@ -638,13 +780,13 @@ void NavierStokesProjection<dim>::Create_Triangulation (const unsigned int n_of_
 }
 
 
-				 // @sect4{ <code>NavierStokesProjection::Initialize</code> }
+				 // @sect4{ <code>NavierStokesProjection::initialize</code> }
 
 				 // This method creates the constant
 				 // matrices and loads the initial
 				 // data
 template <int dim>
-void NavierStokesProjection<dim>::Initialize()
+void NavierStokesProjection<dim>::initialize()
 {
   vel_Laplace_plus_Mass = 0.;
   vel_Laplace_plus_Mass.add (1./Re, vel_Laplace);
@@ -739,7 +881,7 @@ void NavierStokesProjection<dim>::init_pressure_matrices()
 				 // <code>typedef</code>'s that we
 				 // have defined before, namely
 				 // <code>PairedIterators</code> and
-				 // <code>SIterators</code>.
+				 // <code>IteratorPair</code>.
 template <int dim>
 void NavierStokesProjection<dim>::init_gradient_operator()
 {
@@ -756,13 +898,13 @@ void NavierStokesProjection<dim>::init_gradient_operator()
     {
       pres_Diff[d].reinit (sparsity_pattern_pres_vel);
       per_task_data.d = d;
-      WorkStream::run (SIterators (IteratorTuple (dof_handler_velocity.begin_active(),
-						  dof_handler_pressure.begin_active()
-				   )
+      WorkStream::run (IteratorPair (IteratorTuple (dof_handler_velocity.begin_active(),
+						    dof_handler_pressure.begin_active()
+				     )
 		       ),
-		       SIterators (IteratorTuple (dof_handler_velocity.end(),
-						  dof_handler_pressure.end()
-				   )
+		       IteratorPair (IteratorTuple (dof_handler_velocity.end(),
+						    dof_handler_pressure.end()
+				     )
 		       ),
 		       *this,
 		       &NavierStokesProjection<dim>::assemble_one_cell_of_gradient,
@@ -774,7 +916,7 @@ void NavierStokesProjection<dim>::init_gradient_operator()
 }
 
 template <int dim>
-void NavierStokesProjection<dim>::assemble_one_cell_of_gradient (const SIterators &SI,
+void NavierStokesProjection<dim>::assemble_one_cell_of_gradient (const IteratorPair  &SI,
 								 InitGradScratchData &scratch,
 								 InitGradPerTaskData &data)
 {
