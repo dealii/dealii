@@ -146,7 +146,7 @@ namespace MeshWorker
  * Based on VectorSelector, this is the class used by IntegrationInfo
  * to compute values of source vectors in quadrature points.
  *
- * @guido Kanschat, 2009
+ * @author Guido Kanschat, 2009
  */
   template <int dim, int spacedim = dim>
   class VectorDataBase :
