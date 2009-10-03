@@ -65,7 +65,7 @@ class FE_Nothing : public FiniteElement<dim>
                                       * Return a string that uniquely
                                       * identifies a finite
                                       * element. In this case it is
-                                      * "FE_Nothing<dim>()
+                                      * <code>FE_Nothing@<dim@></code>.
                                       */
     virtual
     std::string
