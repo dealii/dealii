@@ -59,8 +59,8 @@ template<int,int> class MGDoFHandler;
  * assembling. In order to use it, follow this recipe: fist, create a
  * class responsible for the local integration:
  *
- * @begin{code}
- * @end{code}
+ * @code
+ * @endcode
  *
  * @author Guido Kanschat, 2009
  */
@@ -155,7 +155,7 @@ namespace MeshWorker
 					* eeffort. If no selectors
 					* are used, then values for
 					* all named vectors in
-					* #global_data will be
+					* DoFInfo::global_data will be
 					* computed in all quadrature
 					* points.
 					*
@@ -288,7 +288,7 @@ namespace MeshWorker
  * In order to use this class, it will be necessary to create an
  * INTEGRATOR class following this template:
  *
- * @begin{code}
+ * @code
  * template <int dim>
  * class MyLocalOperator : public Subscriptor
  * {
@@ -298,19 +298,19 @@ namespace MeshWorker
  *     void face(typename IntegrationWorker<dim>::FaceInfo& info1,
  *               typename IntegrationWorker<dim>::FaceInfo& info2) const;
  * };
- * @end{code}
+ * @endcode
  *
  * This class will do whatever your problem requires locally on each
  * cell and/or face. Once this class is defined, you choose a suitable
  * assembler for your problem from the Assembler namespace and set up
  * objects:
  *
- * @begin{code}
+ * @code
  * MyLocalOperator<dim> myop;
  *
  * AssemblingIntegrator<dim, Assembler::MyAssembler, MyLocalOperator<dim> >
  *   integrator(myop);
- * @end{code}
+ * @endcode
  *
  * You do the necessary initializations of this @p integrator and then
  * you have a worker object suitable for integration_loop().
