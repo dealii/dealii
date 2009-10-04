@@ -434,10 +434,10 @@ class NavierStokesProjection
     std::vector<unsigned char>     boundary_indicators;
 
     Triangulation<dim> triangulation;
-    
+
     FE_Q<dim>          fe_velocity;
     FE_Q<dim>          fe_pressure;
-    
+
     DoFHandler<dim>    dof_handler_velocity;
     DoFHandler<dim>    dof_handler_pressure;
 
@@ -447,7 +447,7 @@ class NavierStokesProjection
     SparsityPattern    sparsity_pattern_velocity;
     SparsityPattern    sparsity_pattern_pressure;
     SparsityPattern    sparsity_pattern_pres_vel;
-    
+
     SparseMatrix<double> vel_Laplace_plus_Mass;
     SparseMatrix<double> vel_it_matrix[dim];
     SparseMatrix<double> vel_Mass;
@@ -457,7 +457,7 @@ class NavierStokesProjection
     SparseMatrix<double> pres_Mass;
     SparseMatrix<double> pres_Diff[dim];
     SparseMatrix<double> pres_iterative;
-    
+
     Vector<double> pres_n;
     Vector<double> pres_n_minus_1;
     Vector<double> phi_n;
@@ -554,7 +554,7 @@ class NavierStokesProjection
 			      typename DoFHandler<dim>::active_cell_iterator
 			      > IteratorTuple;
 
-    typedef parallel::internal::SynchronousIterators<IteratorTuple> IteratorPair;
+    typedef SynchronousIterators<IteratorTuple> IteratorPair;
 
     void init_gradient_operator();
 
@@ -566,7 +566,7 @@ class NavierStokesProjection
 	FullMatrix<double>        local_grad;
 	std::vector<unsigned int> vel_local_dof_indices;
 	std::vector<unsigned int> pres_local_dof_indices;
-	
+
 	InitGradPerTaskData (const unsigned int dd,
 			     const unsigned int vdpc,
 			     const unsigned int pdpc)
@@ -579,7 +579,7 @@ class NavierStokesProjection
 			pres_local_dof_indices (pdpc)
 	  {}
     };
-    
+
     struct InitGradScratchData
     {
 	unsigned int  nqp;
@@ -606,11 +606,11 @@ class NavierStokesProjection
 				     data.fe_val_pres.get_update_flags())
 	  {}
     };
-    
+
     void assemble_one_cell_of_gradient (const IteratorPair  &SI,
 					InitGradScratchData &scratch,
 					InitGradPerTaskData &data);
-    
+
     void copy_gradient_local_to_global (const InitGradPerTaskData &data);
 
 				     // The same general layout also applies
@@ -618,7 +618,7 @@ class NavierStokesProjection
 				     // implementing the assembly of the
 				     // advection term:
     void assemble_advection_term();
-    
+
     struct AdvectionPerTaskData
     {
 	FullMatrix<double>        local_advection;
@@ -629,7 +629,7 @@ class NavierStokesProjection
 			local_dof_indices (dpc)
 	  {}
     };
-    
+
     struct AdvectionScratchData
     {
 	unsigned int                 nqp;
@@ -649,7 +649,7 @@ class NavierStokesProjection
 			u_star_tmp (nqp),
 			fe_val (fe, quad, flags)
 	  {}
-	
+
 	AdvectionScratchData (const AdvectionScratchData &data)
 			:
 			nqp (data.nqp),
@@ -666,7 +666,7 @@ class NavierStokesProjection
     void assemble_one_cell_of_advection (const typename DoFHandler<dim>::active_cell_iterator &cell,
 					 AdvectionScratchData &scratch,
 					 AdvectionPerTaskData &data);
-    
+
     void copy_advection_local_to_global (const AdvectionPerTaskData &data);
 
 				     // The final few functions implement the
@@ -676,7 +676,7 @@ class NavierStokesProjection
     void diffusion_component_solve (const unsigned int d);
 
     void plot_solution (const unsigned int step);
-    
+
     void assemble_vorticity (const bool reinit_prec);
 };
 
@@ -978,7 +978,7 @@ void NavierStokesProjection<dim>::run (const bool verbose,
 				       const unsigned int n_of_plots)
 {
   ConditionalOStream verbose_cout (std::cout, verbose);
-  
+
   unsigned int n_steps =  (T - t_0)/dt;
   vel_exact.set_time (2.*dt);
   plot_solution(1);

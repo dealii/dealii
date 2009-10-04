@@ -17,12 +17,12 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/template_constraints.h>
+#include <base/synchronous_iterator.h>
 
 #include <base/std_cxx1x/tuple.h>
 #include <base/std_cxx1x/bind.h>
 #include <base/std_cxx1x/function.h>
 
-#include <iterator>
 #include <cstddef>
 
 #if DEAL_II_USE_MT == 1
@@ -48,241 +48,6 @@ namespace parallel
 {
   namespace internal
   {
-				     /**
-				      * A class that represents a set of
-				      * iterators each of which are
-				      * incremented by one at the same
-				      * time. This is typically used in calls
-				      * like <code>std::transform(a.begin(),
-				      * a.end(), b.begin(), functor);</code>
-				      * where we have synchronous iterators
-				      * marching through the containers
-				      * <code>a,b</code>. If an object of this
-				      * type represents the end of a range,
-				      * only the first element is considered
-				      * (we only have <code>a.end()</code>,
-				      * not <code>b.end()</code>)
-				      *
-				      * The template argument of the current
-				      * class shall be of type
-				      * <code>std_cxx1x::tuple</code> with
-				      * arguments equal to the iterator types.
-				      *
-				      * This type, and the helper functions
-				      * associated with it, are used as the
-				      * Value concept for the blocked_range
-				      * type of the Threading Building Blocks.
-				      */
-    template <typename Iterators>
-    struct SynchronousIterators
-    {
-					 /**
-					  * Constructor.
-					  */
-	SynchronousIterators (const Iterators &i);
-
-					 /**
-					  * Copy constructor.
-					  */
-	SynchronousIterators (const SynchronousIterators &i);
-
-					 /**
-					  * Storage for the iterators
-					  * represented by the current class.
-					  */
-	Iterators iterators;
-    };
-
-
-
-    template <typename Iterators>
-    inline
-    SynchronousIterators<Iterators>::
-    SynchronousIterators (const Iterators &i)
-		    :
-		    iterators (i)
-    {}
-
-
-    template <typename Iterators>
-    inline
-    SynchronousIterators<Iterators>::
-    SynchronousIterators (const SynchronousIterators &i)
-		    :
-		    iterators (i.iterators)
-    {}
-
-
-
-				     /**
-				      * Return whether the first element of
-				      * the first argument is less than the
-				      * first element of the second
-				      * argument. Since the objects compared
-				      * march forward all elements at the same
-				      * time, comparing the first element is
-				      * sufficient.
-				      */
-    template <typename Iterators>
-    inline
-    bool
-    operator< (const SynchronousIterators<Iterators> &a,
-	       const SynchronousIterators<Iterators> &b)
-    {
-      return std_cxx1x::get<0>(a.iterators) < std_cxx1x::get<0>(b.iterators);
-    }
-
-
-
-				     /**
-				      * Return the distance between the first
-				      * and the second argument. Since the
-				      * objects compared march forward all
-				      * elements at the same time,
-				      * differencing the first element is
-				      * sufficient.
-				      */
-    template <typename Iterators>
-    inline
-    std::size_t
-    operator- (const SynchronousIterators<Iterators> &a,
-	       const SynchronousIterators<Iterators> &b)
-    {
-      Assert (std::distance (std_cxx1x::get<0>(b.iterators),
-			     std_cxx1x::get<0>(a.iterators)) >= 0,
-	      ExcInternalError());
-      return std::distance (std_cxx1x::get<0>(b.iterators),
-			    std_cxx1x::get<0>(a.iterators));
-    }
-
-
-				     /**
-				      * Advance a tuple of iterators by $n$.
-				      */
-    template <typename I1, typename I2>
-    inline
-    void advance (std_cxx1x::tuple<I1,I2> &t,
-		  const unsigned int       n)
-    {
-      std::advance (std_cxx1x::get<0>(t), n);
-      std::advance (std_cxx1x::get<1>(t), n);
-    }
-
-				     /**
-				      * Advance a tuple of iterators by $n$.
-				      */
-    template <typename I1, typename I2, typename I3>
-    inline
-    void advance (std_cxx1x::tuple<I1,I2,I3> &t,
-		  const unsigned int          n)
-    {
-      std::advance (std_cxx1x::get<0>(t), n);
-      std::advance (std_cxx1x::get<1>(t), n);
-      std::advance (std_cxx1x::get<2>(t), n);
-    }
-
-				     /**
-				      * Advance a tuple of iterators by $n$.
-				      */
-    template <typename I1, typename I2,
-	      typename I3, typename I4>
-    inline
-    void advance (std_cxx1x::tuple<I1,I2,I3, I4> &t,
-		  const unsigned int              n)
-    {
-      std::advance (std_cxx1x::get<0>(t), n);
-      std::advance (std_cxx1x::get<1>(t), n);
-      std::advance (std_cxx1x::get<2>(t), n);
-      std::advance (std_cxx1x::get<3>(t), n);
-    }
-
-
-
-				     /**
-				      * Advance a tuple of iterators by 1.
-				      */
-    template <typename I1, typename I2>
-    inline
-    void advance_by_one (std_cxx1x::tuple<I1,I2> &t)
-    {
-      ++std_cxx1x::get<0>(t);
-      ++std_cxx1x::get<1>(t);
-    }
-
-				     /**
-				      * Advance a tuple of iterators by 1.
-				      */
-    template <typename I1, typename I2, typename I3>
-    inline
-    void advance_by_one (std_cxx1x::tuple<I1,I2,I3> &t)
-    {
-      ++std_cxx1x::get<0>(t);
-      ++std_cxx1x::get<1>(t);
-      ++std_cxx1x::get<2>(t);
-    }
-
-				     /**
-				      * Advance a tuple of iterators by 1.
-				      */
-    template <typename I1, typename I2,
-	      typename I3, typename I4>
-    inline
-    void advance_by_one (std_cxx1x::tuple<I1,I2,I3,I4> &t)
-    {
-      ++std_cxx1x::get<0>(t);
-      ++std_cxx1x::get<1>(t);
-      ++std_cxx1x::get<2>(t);
-      ++std_cxx1x::get<3>(t);
-    }
-
-
-
-				     /**
-				      * Advance the elements of this iterator
-				      * by $n$.
-				      */
-    template <typename Iterators>
-    inline
-    SynchronousIterators<Iterators>
-    operator + (const SynchronousIterators<Iterators> &a,
-		const std::size_t                      n)
-    {
-      SynchronousIterators<Iterators> x (a);
-      parallel::internal::advance (x.iterators, n);
-      return x;
-    }
-
-				     /**
-				      * Advance the elements of this iterator
-				      * by 1.
-				      */
-    template <typename Iterators>
-    inline
-    SynchronousIterators<Iterators>
-    operator ++ (SynchronousIterators<Iterators> &a)
-    {
-      parallel::internal::advance_by_one (a.iterators);
-      return a;
-    }
-
-
-				     /**
-				      * Compare synch iterators for
-				      * inequality. Since they march in synch,
-				      * comparing only the first element is
-				      * sufficient.
-				      */
-    template <typename Iterators>
-    inline
-    bool
-    operator != (const SynchronousIterators<Iterators> &a,
-		 const SynchronousIterators<Iterators> &b)
-    {
-      return (std_cxx1x::get<0>(a.iterators) !=
-	      std_cxx1x::get<0>(b.iterators));
-    }
-
-
 				     /**
 				      * Convert a function object of type F
 				      * into an object that can be applied to
@@ -420,7 +185,7 @@ namespace parallel
       *out++ = predicate (*in++);
 #else
     typedef std_cxx1x::tuple<InputIterator,OutputIterator> Iterators;
-    typedef internal::SynchronousIterators<Iterators> SyncIterators;
+    typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in, out);
     Iterators x_end (end_in, OutputIterator());
     tbb::parallel_for (tbb::blocked_range<SyncIterators>(x_begin,
@@ -480,7 +245,7 @@ namespace parallel
     typedef
       std_cxx1x::tuple<InputIterator1,InputIterator2,OutputIterator>
       Iterators;
-    typedef internal::SynchronousIterators<Iterators> SyncIterators;
+    typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in1, in2, out);
     Iterators x_end (end_in1, InputIterator2(), OutputIterator());
     tbb::parallel_for (tbb::blocked_range<SyncIterators>(x_begin,
@@ -542,7 +307,7 @@ namespace parallel
     typedef
       std_cxx1x::tuple<InputIterator1,InputIterator2,InputIterator3,OutputIterator>
       Iterators;
-    typedef internal::SynchronousIterators<Iterators> SyncIterators;
+    typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in1, in2, in3, out);
     Iterators x_end (end_in1, InputIterator2(),
 		     InputIterator3(), OutputIterator());
