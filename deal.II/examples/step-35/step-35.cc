@@ -25,6 +25,7 @@
 #include <base/thread_management.h>
 #include <base/work_stream.h>
 #include <base/parallel.h>
+#include <base/utilities.h>
 
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
@@ -714,7 +715,7 @@ NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Dat
 	      << " The obtained results will be nonsense"
 	      << std::endl;
 
-  AssertThrow (not  ( (dt <= 0.) or  (dt > .5*T)), ExcInvalidTimeStep (dt, .5*T));
+  AssertThrow (!  ( (dt <= 0.) or  (dt > .5*T)), ExcInvalidTimeStep (dt, .5*T));
 
   create_triangulation (data.n_of_global_refines);
   initialize();
@@ -974,7 +975,7 @@ void NavierStokesProjection<dim>::run (const bool verbose, const unsigned int n_
   plot_solution(1);
   for (unsigned int n = 2; n<=n_steps; ++n)
     {
-      if (n%n_of_plots == 0)
+      if (n % n_of_plots == 0)
 	{
 	  if (verbose)
 	    std::cout << " Plotting Solution" << std::endl;
@@ -987,9 +988,9 @@ void NavierStokesProjection<dim>::run (const bool verbose, const unsigned int n_
       interpolate_velocity();
       if (verbose)
 	std::cout << "  Diffusion Step" << std::endl;
-      if ( (n%vel_update_prec == 0) and  (verbose))
+      if ( (n%vel_update_prec == 0) && (verbose))
 	std::cout << "   With reinitialization of the preconditioner" << std::endl;
-      diffusion_step ((n%vel_update_prec == 0) or  (n == 2));
+      diffusion_step ((n%vel_update_prec == 0) || (n == 2));
       if (verbose)
 	std::cout << "  Projection Step" << std::endl;
       projection_step ( (n == 2));
@@ -1036,7 +1037,7 @@ void NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
       std::vector<unsigned char>::const_iterator boundaries = boundary_indicators.begin(),
 						      b_end = boundary_indicators.end();
       boundary_values.clear();
-      for (; boundaries not_eq b_end; ++boundaries)
+      for (; boundaries != b_end; ++boundaries)
 	{
 	  switch (*boundaries)
 	    {
@@ -1049,7 +1050,7 @@ void NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
 							      vel_exact, boundary_values);
 		    break;
 	      case 3:
-		    if (d not_eq 0)
+		    if (d != 0)
 		      VectorTools::interpolate_boundary_values (dof_handler_velocity, *boundaries,
 								ZeroFunction<dim>(), boundary_values);
 		    break;
@@ -1243,7 +1244,7 @@ void NavierStokesProjection<dim>::plot_solution (const unsigned int step)
     joint_endc = joint_dof_handler.end(),
     vel_cell   = dof_handler_velocity.begin_active(),
     pres_cell  = dof_handler_pressure.begin_active();
-  for (; joint_cell not_eq joint_endc; ++joint_cell, ++vel_cell, ++pres_cell)
+  for (; joint_cell != joint_endc; ++joint_cell, ++vel_cell, ++pres_cell)
     {
       joint_cell->get_dof_indices (loc_joint_dof_indices);
       vel_cell->get_dof_indices (loc_vel_dof_indices),
@@ -1277,15 +1278,20 @@ void NavierStokesProjection<dim>::plot_solution (const unsigned int step)
   DataOut<dim> data_out;
   data_out.attach_dof_handler (joint_dof_handler);
   std::vector< DataComponentInterpretation::DataComponentInterpretation >
-    component_interpretation (dim+2, DataComponentInterpretation::component_is_part_of_vector);
-  component_interpretation[dim]   = DataComponentInterpretation::component_is_scalar;
-  component_interpretation[dim+1] = DataComponentInterpretation::component_is_scalar;
-  data_out.add_data_vector (joint_solution, joint_solution_names, DataOut<dim>::type_dof_data,
+    component_interpretation (dim+2,
+			      DataComponentInterpretation::component_is_part_of_vector);
+  component_interpretation[dim]
+    = DataComponentInterpretation::component_is_scalar;
+  component_interpretation[dim+1]
+    = DataComponentInterpretation::component_is_scalar;
+  data_out.add_data_vector (joint_solution,
+			    joint_solution_names,
+			    DataOut<dim>::type_dof_data,
                             component_interpretation);
   data_out.build_patches (deg + 1);
-  std::ostringstream filename;
-  filename << "solution-" << step << ".vtk";
-  std::ofstream output (filename.str().c_str());
+  std::ofstream output (("solution" +
+			 Utilities::int_to_string (step, 4) +
+			 ".vtk").c_str());
   data_out.write_vtk (output);
 }
 
@@ -1308,10 +1314,13 @@ void NavierStokesProjection<dim>::assemble_vorticity (const bool reinit_prec)
   if (reinit_prec)
     prec_vel_mass.initialize (vel_Mass);
 
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler_velocity.begin_active(),
-						  end = dof_handler_velocity.end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler_velocity.begin_active(),
+    end  = dof_handler_velocity.end();
   FEValues<dim> fe_val_vel (fe_velocity, quadrature_velocity,
-                            update_gradients | update_JxW_values | update_values);
+                            update_gradients |
+			    update_JxW_values |
+			    update_values);
   const unsigned int dpc = fe_velocity.dofs_per_cell,
                      nqp = quadrature_velocity.size();
   std::vector<unsigned int> ldi (dpc);
@@ -1319,7 +1328,7 @@ void NavierStokesProjection<dim>::assemble_vorticity (const bool reinit_prec)
 
   std::vector< Tensor<1,dim> > grad_u1 (nqp), grad_u2 (nqp);
   rot_u = 0.;
-  for (; cell not_eq end; ++cell)
+  for (; cell != end; ++cell)
     {
       fe_val_vel.reinit (cell);
       cell->get_dof_indices (ldi);
@@ -1328,7 +1337,9 @@ void NavierStokesProjection<dim>::assemble_vorticity (const bool reinit_prec)
       loc_rot = 0.;
       for (unsigned int q=0; q<nqp; ++q)
 	for (unsigned int i=0; i<dpc; ++i)
-	  loc_rot(i) += fe_val_vel.JxW(q)* (grad_u2[q][0] - grad_u1[q][1])*fe_val_vel.shape_value (i, q);
+	  loc_rot(i) += (grad_u2[q][0] - grad_u1[q][1]) *
+			fe_val_vel.shape_value (i, q) *
+			fe_val_vel.JxW(q);
 
       for (unsigned int i=0; i<dpc; ++i)
 	rot_u (ldi[i]) += loc_rot(i);
