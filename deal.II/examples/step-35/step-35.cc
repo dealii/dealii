@@ -974,8 +974,11 @@ void NavierStokesProjection<dim>::copy_gradient_local_to_global(
 				 // purposes and so it is by default
 				 // set to false
 template <int dim>
-void NavierStokesProjection<dim>::run (const bool verbose, const unsigned int n_of_plots)
+void NavierStokesProjection<dim>::run (const bool verbose,
+				       const unsigned int n_of_plots)
 {
+  ConditionalOStream verbose_cout (std::cout, verbose);
+  
   unsigned int n_steps =  (T - t_0)/dt;
   vel_exact.set_time (2.*dt);
   plot_solution(1);
@@ -983,30 +986,28 @@ void NavierStokesProjection<dim>::run (const bool verbose, const unsigned int n_
     {
       if (n % n_of_plots == 0)
 	{
-	  if (verbose)
-	    std::cout << " Plotting Solution" << std::endl;
+	  verbose_cout << " Plotting Solution" << std::endl;
 	  plot_solution(n);
 	}
-      if (verbose)
-	std::cout << " Step = " << n << " Time = " << (n*dt) << std::endl;
-      if (verbose)
-	std::cout << "  Interpolating the velocity " << std::endl;
+      verbose_cout << " Step = " << n << " Time = " << (n*dt) << std::endl;
+      verbose_cout << "  Interpolating the velocity " << std::endl;
+
       interpolate_velocity();
-      if (verbose)
-	std::cout << "  Diffusion Step" << std::endl;
-      if ( (n%vel_update_prec == 0) && (verbose))
-	std::cout << "   With reinitialization of the preconditioner" << std::endl;
+      verbose_cout << "  Diffusion Step" << std::endl;
+      if (n%vel_update_prec == 0)
+	verbose_cout << "   With reinitialization of the preconditioner"
+		     << std::endl;
       diffusion_step ((n%vel_update_prec == 0) || (n == 2));
-      if (verbose)
-	std::cout << "  Projection Step" << std::endl;
+      verbose_cout << "  Projection Step" << std::endl;
       projection_step ( (n == 2));
-      if (verbose)
-	std::cout << "  Updating the Pressure" << std::endl;
+      verbose_cout << "  Updating the Pressure" << std::endl;
       update_pressure ( (n == 2));
       vel_exact.advance_time(dt);
     }
   plot_solution (n_steps);
 }
+
+
 
 template <int dim>
 void NavierStokesProjection<dim>::interpolate_velocity()
