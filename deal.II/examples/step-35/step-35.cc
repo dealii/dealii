@@ -751,9 +751,9 @@ void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_
   grid_in.read_ucd (file);
   file.close();
 
-  std::cout << " Number of refines = " << n_of_refines << std::endl;
+  std::cout << "Number of refines = " << n_of_refines << std::endl;
   triangulation.refine_global (n_of_refines);
-  std::cout << " Number of active cells: " << triangulation.n_active_cells() << std::endl;
+  std::cout << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
 
   boundary_indicators = triangulation.get_boundary_indicators();
 
@@ -781,9 +781,13 @@ void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_
   v_tmp.reinit (dof_handler_velocity.n_dofs());
   rot_u.reinit (dof_handler_velocity.n_dofs());
 
-  std::cout << " dim (X_h) = " << (dof_handler_velocity.n_dofs()*dim) << std::endl
-	    << " dim (M_h) = " << dof_handler_pressure.n_dofs() << std::endl
-	    << " Re         = " << Re << std::endl;
+  std::cout << "dim (X_h) = " << (dof_handler_velocity.n_dofs()*dim)
+	    << std::endl
+	    << "dim (M_h) = " << dof_handler_pressure.n_dofs()
+	    << std::endl
+	    << "Re        = " << Re
+	    << std::endl
+  	    << std::endl;
 }
 
 
@@ -986,16 +990,16 @@ void NavierStokesProjection<dim>::run (const bool verbose,
     {
       if (n % n_of_plots == 0)
 	{
-	  verbose_cout << " Plotting Solution" << std::endl;
+	  verbose_cout << "Plotting Solution" << std::endl;
 	  plot_solution(n);
 	}
-      verbose_cout << " Step = " << n << " Time = " << (n*dt) << std::endl;
+      std::cout << "Step = " << n << " Time = " << (n*dt) << std::endl;
       verbose_cout << "  Interpolating the velocity " << std::endl;
 
       interpolate_velocity();
       verbose_cout << "  Diffusion Step" << std::endl;
       if (n%vel_update_prec == 0)
-	verbose_cout << "   With reinitialization of the preconditioner"
+	verbose_cout << "    With reinitialization of the preconditioner"
 		     << std::endl;
       diffusion_step ((n%vel_update_prec == 0) || (n == 2));
       verbose_cout << "  Projection Step" << std::endl;
@@ -1296,7 +1300,7 @@ void NavierStokesProjection<dim>::plot_solution (const unsigned int step)
 			    DataOut<dim>::type_dof_data,
                             component_interpretation);
   data_out.build_patches (deg + 1);
-  std::ofstream output (("solution" +
+  std::ofstream output (("solution-" +
 			 Utilities::int_to_string (step, 4) +
 			 ".vtk").c_str());
   data_out.write_vtk (output);
