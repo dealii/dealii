@@ -26,6 +26,7 @@
 #include <base/work_stream.h>
 #include <base/parallel.h>
 #include <base/utilities.h>
+#include <base/conditional_ostream.h>
 
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
@@ -127,7 +128,8 @@ namespace RunTimeParameters
   {
     prm.declare_entry ("Method_Form", "rotational",
 		       Patterns::Selection ("rotational|standard"),
-		       " Used to select the type of method that we are going to use. ");
+		       " Used to select the type of method that we are going "
+		       "to use. ");
     prm.enter_subsection ("Physical data");
     {
       prm.declare_entry ("initial_time", "0.",
@@ -174,23 +176,27 @@ namespace RunTimeParameters
 			 " The size of the Krylov subspace to be used. ");
       prm.declare_entry ("off_diagonals", "60",
 			 Patterns::Integer(0),
-                         " The number of off-diagonal elements ILU must compute. ");
+                         " The number of off-diagonal elements ILU must "
+			 "compute. ");
       prm.declare_entry ("diag_strength", "0.01",
 			 Patterns::Double (0.),
 			 " Diagonal strengthening coefficient. ");
       prm.declare_entry ("update_prec", "15",
 			 Patterns::Integer(1),
-                         " This number indicates how often we need to update the preconditioner");
+                         " This number indicates how often we need to "
+			 "update the preconditioner");
     }
     prm.leave_subsection();
 
     prm.declare_entry ("verbose", "true",
 		       Patterns::Bool(),
-                       " This indicates whether the output of the solution process should be verbose. ");
+                       " This indicates whether the output of the solution "
+		       "process should be verbose. ");
 
     prm.declare_entry ("output", "1",
 		       Patterns::Integer(1),
-                       " This indicates between how many time steps we print the solution. ");
+                       " This indicates between how many time steps we print "
+		       "the solution. ");
   }
 
 
