@@ -721,7 +721,7 @@ NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Dat
 	      << " The obtained results will be nonsense"
 	      << std::endl;
 
-  AssertThrow (!  ( (dt <= 0.) or  (dt > .5*T)), ExcInvalidTimeStep (dt, .5*T));
+  AssertThrow (!  ( (dt <= 0.) || (dt > .5*T)), ExcInvalidTimeStep (dt, .5*T));
 
   create_triangulation (data.n_of_global_refines);
   initialize();
@@ -745,15 +745,18 @@ void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_
   GridIn<dim> grid_in;
   grid_in.attach_triangulation (triangulation);
 
-  std::string filename = "nsbench2.inp";
-  std::ifstream file (filename.c_str());
-  Assert (file, ExcFileNotOpen (filename.c_str()));
-  grid_in.read_ucd (file);
-  file.close();
+  {
+    std::string filename = "nsbench2.inp";
+    std::ifstream file (filename.c_str());
+    Assert (file, ExcFileNotOpen (filename.c_str()));
+    grid_in.read_ucd (file);
+  }
 
-  std::cout << "Number of refines = " << n_of_refines << std::endl;
+  std::cout << "Number of refines = " << n_of_refines
+	    << std::endl;
   triangulation.refine_global (n_of_refines);
-  std::cout << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
+  std::cout << "Number of active cells: " << triangulation.n_active_cells()
+	    << std::endl;
 
   boundary_indicators = triangulation.get_boundary_indicators();
 
@@ -1045,35 +1048,51 @@ void NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
       vel_it_matrix[d].add (1., vel_Advection);
 
       vel_exact.set_component(d);
-      std::vector<unsigned char>::const_iterator boundaries = boundary_indicators.begin(),
-						      b_end = boundary_indicators.end();
       boundary_values.clear();
-      for (; boundaries != b_end; ++boundaries)
+      for (std::vector<unsigned char>::const_iterator
+	     boundaries = boundary_indicators.begin();
+	   boundaries != boundary_indicators.end();
+	   ++boundaries)
 	{
 	  switch (*boundaries)
 	    {
 	      case 1:
-		    VectorTools::interpolate_boundary_values (dof_handler_velocity, *boundaries,
-							      ZeroFunction<dim>(), boundary_values);
+		    VectorTools::
+		      interpolate_boundary_values (dof_handler_velocity,
+						   *boundaries,
+						   ZeroFunction<dim>(),
+						   boundary_values);
 		    break;
 	      case 2:
-		    VectorTools::interpolate_boundary_values (dof_handler_velocity, *boundaries,
-							      vel_exact, boundary_values);
+		    VectorTools::
+		      interpolate_boundary_values (dof_handler_velocity,
+						   *boundaries,
+						   vel_exact,
+						   boundary_values);
 		    break;
 	      case 3:
 		    if (d != 0)
-		      VectorTools::interpolate_boundary_values (dof_handler_velocity, *boundaries,
-								ZeroFunction<dim>(), boundary_values);
+		      VectorTools::
+			interpolate_boundary_values (dof_handler_velocity,
+						     *boundaries,
+						     ZeroFunction<dim>(),
+						     boundary_values);
 		    break;
 	      case 4:
-		    VectorTools::interpolate_boundary_values (dof_handler_velocity, *boundaries,
-							      ZeroFunction<dim>(), boundary_values);
+		    VectorTools::
+		      interpolate_boundary_values (dof_handler_velocity,
+						   *boundaries,
+						   ZeroFunction<dim>(),
+						   boundary_values);
 		    break;
 	      default:
 		    Assert (false, ExcNotImplemented());
 	    }
 	}
-      MatrixTools::apply_boundary_values (boundary_values, vel_it_matrix[d], u_n[d], force[d]);
+      MatrixTools::apply_boundary_values (boundary_values,
+					  vel_it_matrix[d],
+					  u_n[d],
+					  force[d]);
     }
 
 
@@ -1082,8 +1101,12 @@ void NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
     {
       if (reinit_prec)
 	prec_velocity[d].initialize (vel_it_matrix[d],
-				     SparseILU<double>::AdditionalData (vel_diag_strength, vel_off_diagonals));
-      tasks += Threads::new_task (&NavierStokesProjection<dim>::diffusion_component_solve, *this, d);
+				     SparseILU<double>::
+				     AdditionalData (vel_diag_strength,
+						     vel_off_diagonals));
+      tasks += Threads::new_task (&NavierStokesProjection<dim>::
+				  diffusion_component_solve,
+				  *this, d);
     }
   tasks.join_all();
 }
@@ -1092,12 +1115,13 @@ template <int dim>
 void NavierStokesProjection<dim>::diffusion_component_solve (const unsigned int d)
 {
   SolverControl solver_control (vel_max_its, vel_eps*force[d].l2_norm());
-  SolverGMRES<> gmres (solver_control, SolverGMRES<>::AdditionalData (vel_Krylov_size));
+  SolverGMRES<> gmres (solver_control,
+		       SolverGMRES<>::AdditionalData (vel_Krylov_size));
   gmres.solve (vel_it_matrix[d], u_n[d], force[d], prec_velocity[d]);
 }
 
 
-				 // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code>  method and related}
+				 // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code> method and related}
 template <int dim>
 void NavierStokesProjection<dim>::assemble_advection_term()
 {
