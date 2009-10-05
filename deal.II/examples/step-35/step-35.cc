@@ -104,7 +104,7 @@ namespace RunTimeParameters
       final_time,
       Reynolds;
       double dt;
-      unsigned int n_of_global_refines,
+      unsigned int n_global_refines,
       pressure_degree;
       unsigned int vel_max_iterations,
       vel_Krylov_size,
@@ -113,7 +113,7 @@ namespace RunTimeParameters
       double vel_eps,
       vel_diag_strength;
       bool verbose;
-      unsigned int output;
+      unsigned int output_interval;
     protected:
       ParameterHandler prm;
   };
@@ -193,7 +193,7 @@ namespace RunTimeParameters
                        " This indicates whether the output of the solution "
 		       "process should be verbose. ");
 
-    prm.declare_entry ("output", "1",
+    prm.declare_entry ("output_interval", "1",
 		       Patterns::Integer(1),
                        " This indicates between how many time steps we print "
 		       "the solution. ");
@@ -234,7 +234,7 @@ namespace RunTimeParameters
 
     prm.enter_subsection ("Space discretization");
     {
-      n_of_global_refines = prm.get_integer ("n_of_refines");
+      n_global_refines = prm.get_integer ("n_of_refines");
       pressure_degree     = prm.get_integer ("pressure_fe_degree");
     }
     prm.leave_subsection();
@@ -252,7 +252,7 @@ namespace RunTimeParameters
 
     verbose = prm.get_bool ("verbose");
 
-    output = prm.get_integer ("output");
+    output_interval = prm.get_integer ("output_interval");
   }
 }
 
@@ -421,7 +421,7 @@ class NavierStokesProjection
     NavierStokesProjection (const RunTimeParameters::Data_Storage &data);
 
     void run (const bool         verbose    = false,
-	      const unsigned int n_of_plots = 10);
+	      const unsigned int n_plots = 10);
   protected:
     RunTimeParameters::MethodFormulation type;
 
@@ -481,7 +481,7 @@ class NavierStokesProjection
 		    << std::endl
 		    << " The permitted range is (0," << arg2 << "]");
 
-    void create_triangulation (const unsigned int n_of_refines);
+    void create_triangulation_and_dofs (const unsigned int n_refines);
 
     void initialize();
 
@@ -501,9 +501,9 @@ class NavierStokesProjection
     double       vel_eps;
     double       vel_diag_strength;
 
-    void init_velocity_matrices();
+    void initialize_velocity_matrices();
 
-    void init_pressure_matrices();
+    void initialize_pressure_matrices();
 
 				     // The next few structures and functions
 				     // are for doing various things in
@@ -556,7 +556,7 @@ class NavierStokesProjection
 
     typedef SynchronousIterators<IteratorTuple> IteratorPair;
 
-    void init_gradient_operator();
+    void initialize_gradient_operator();
 
     struct InitGradPerTaskData
     {
@@ -723,12 +723,12 @@ NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Dat
 
   AssertThrow (!  ( (dt <= 0.) || (dt > .5*T)), ExcInvalidTimeStep (dt, .5*T));
 
-  create_triangulation (data.n_of_global_refines);
+  create_triangulation_and_dofs (data.n_global_refines);
   initialize();
 }
 
 
-				 // @sect4{ <code>NavierStokesProjection::create_triangulation</code> }
+				 // @sect4{ <code>NavierStokesProjection::create_triangulation_and_dofs</code> }
 
 				 // The method that creates the
 				 // triangulation and refines it the
@@ -740,7 +740,9 @@ NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Dat
 				 // initializes the matrices and
 				 // vectors that we will use.
 template <int dim>
-void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_refines)
+void
+NavierStokesProjection<dim>::
+create_triangulation_and_dofs (const unsigned int n_refines)
 {
   GridIn<dim> grid_in;
   grid_in.attach_triangulation (triangulation);
@@ -752,9 +754,9 @@ void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_
     grid_in.read_ucd (file);
   }
 
-  std::cout << "Number of refines = " << n_of_refines
+  std::cout << "Number of refines = " << n_refines
 	    << std::endl;
-  triangulation.refine_global (n_of_refines);
+  triangulation.refine_global (n_refines);
   std::cout << "Number of active cells: " << triangulation.n_active_cells()
 	    << std::endl;
 
@@ -765,9 +767,9 @@ void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_
   dof_handler_pressure.distribute_dofs (fe_pressure);
   DoFRenumbering::boost::Cuthill_McKee (dof_handler_pressure);
 
-  init_velocity_matrices();
-  init_pressure_matrices();
-  init_gradient_operator();
+  initialize_velocity_matrices();
+  initialize_pressure_matrices();
+  initialize_gradient_operator();
 
   pres_n.reinit (dof_handler_pressure.n_dofs());
   pres_n_minus_1.reinit (dof_handler_pressure.n_dofs());
@@ -790,7 +792,7 @@ void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_
 	    << std::endl
 	    << "Re        = " << Re
 	    << std::endl
-  	    << std::endl;
+	    << std::endl;
 }
 
 
@@ -800,7 +802,8 @@ void NavierStokesProjection<dim>::create_triangulation (const unsigned int n_of_
 				 // matrices and loads the initial
 				 // data
 template <int dim>
-void NavierStokesProjection<dim>::initialize()
+void
+NavierStokesProjection<dim>::initialize()
 {
   vel_Laplace_plus_Mass = 0.;
   vel_Laplace_plus_Mass.add (1./Re, vel_Laplace);
@@ -823,19 +826,37 @@ void NavierStokesProjection<dim>::initialize()
 }
 
 
-				 // @sect4{ The <code>NavierStokesProjection::init_*_matrices</code> methods }
+				 // @sect4{ The <code>NavierStokesProjection::initialize_*_matrices</code> methods }
 
-				 // In this set of methods we
-				 // initialize the sparsity patterns,
-				 // the constraints (if any) and
-				 // assemble the matrices that do not
-				 // depend on the timestep <code>dt</code>.
+				 // In this set of methods we initialize the
+				 // sparsity patterns, the constraints (if
+				 // any) and assemble the matrices that do not
+				 // depend on the timestep
+				 // <code>dt</code>. Note that for the Laplace
+				 // and mass matrices, we can use functions in
+				 // the library that do this. Because the
+				 // expensive operations of this function --
+				 // creating the two matrices -- are entirely
+				 // independent, we could in principle mark
+				 // them as tasks that can be worked on in
+				 // %parallel using the Threads::new_task
+				 // functions. We won't do that here since
+				 // these functions internally already are
+				 // parallelized, and in particular because
+				 // the current function is only called once
+				 // per program run and so does not incur a
+				 // cost in each time step. The necessary
+				 // modifications would be quite
+				 // straightforward, however.
 template <int dim>
-void NavierStokesProjection<dim>::init_velocity_matrices()
+void
+NavierStokesProjection<dim>::initialize_velocity_matrices()
 {
-  sparsity_pattern_velocity.reinit (dof_handler_velocity.n_dofs(), dof_handler_velocity.n_dofs(),
+  sparsity_pattern_velocity.reinit (dof_handler_velocity.n_dofs(),
+				    dof_handler_velocity.n_dofs(),
 				    dof_handler_velocity.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler_velocity, sparsity_pattern_velocity);
+  DoFTools::make_sparsity_pattern (dof_handler_velocity,
+				   sparsity_pattern_velocity);
   sparsity_pattern_velocity.compress();
 
   vel_Laplace_plus_Mass.reinit (sparsity_pattern_velocity);
@@ -845,27 +866,34 @@ void NavierStokesProjection<dim>::init_velocity_matrices()
   vel_Laplace.reinit (sparsity_pattern_velocity);
   vel_Advection.reinit (sparsity_pattern_velocity);
 
-  MatrixCreator::create_mass_matrix (dof_handler_velocity, quadrature_velocity, vel_Mass);
-  MatrixCreator::create_laplace_matrix (dof_handler_velocity, quadrature_velocity, vel_Laplace);
+  MatrixCreator::create_mass_matrix (dof_handler_velocity,
+				     quadrature_velocity,
+				     vel_Mass);
+  MatrixCreator::create_laplace_matrix (dof_handler_velocity,
+					quadrature_velocity,
+					vel_Laplace);
 }
 
-				 // For the initialization of the
-				 // matrices that act on the pressure
-				 // space it is worth noticing one
-				 // small detail. Since the projection
-				 // step involves the solution of a
-				 // Poisson equation with homogeneous
-				 // Neumann boundary conditions, we
-				 // need somehow to regularize this
-				 // problem, that is to pick a
-				 // solution.  The way we do it is by
-				 // setting the value of the solution
-				 // at the first node (wherever it is)
-				 // to zero. This regularizes the
-				 // problem and does not increase the
-				 // sparsity pattern we use.
+				 // For the initialization of the matrices
+				 // that act on the pressure space it is worth
+				 // noticing one small detail. Since the
+				 // projection step involves the solution of a
+				 // Poisson equation with homogeneous Neumann
+				 // boundary conditions, we need somehow to
+				 // regularize this problem, that is to pick a
+				 // solution.  The way we do it is by setting
+				 // the value of the pressure solution at the
+				 // first node (wherever it is) to zero. This
+				 // regularizes the problem and does not
+				 // increase the number of entries in the
+				 // sparsity pattern we use as the solution
+				 // shown in step-11 would do. In the end it
+				 // achieves the solution: it makes sure that
+				 // the pressure is not left undetermined up
+				 // to a constant.
 template <int dim>
-void NavierStokesProjection<dim>::init_pressure_matrices()
+void
+NavierStokesProjection<dim>::initialize_pressure_matrices()
 {
   sparsity_pattern_pressure.reinit (dof_handler_pressure.n_dofs(), dof_handler_pressure.n_dofs(),
 				    dof_handler_pressure.max_couplings_between_dofs());
@@ -877,8 +905,12 @@ void NavierStokesProjection<dim>::init_pressure_matrices()
   pres_iterative.reinit (sparsity_pattern_pressure);
   pres_Mass.reinit (sparsity_pattern_pressure);
 
-  MatrixCreator::create_laplace_matrix (dof_handler_pressure, quadrature_pressure, pres_Laplace);
-  MatrixCreator::create_mass_matrix ( dof_handler_pressure, quadrature_pressure, pres_Mass);
+  MatrixCreator::create_laplace_matrix (dof_handler_pressure,
+					quadrature_pressure,
+					pres_Laplace);
+  MatrixCreator::create_mass_matrix (dof_handler_pressure,
+				     quadrature_pressure,
+				     pres_Mass);
 }
 
 
@@ -897,16 +929,24 @@ void NavierStokesProjection<dim>::init_pressure_matrices()
 				 // <code>PairedIterators</code> and
 				 // <code>IteratorPair</code>.
 template <int dim>
-void NavierStokesProjection<dim>::init_gradient_operator()
+void
+NavierStokesProjection<dim>::initialize_gradient_operator()
 {
-  sparsity_pattern_pres_vel.reinit (dof_handler_velocity.n_dofs(), dof_handler_pressure.n_dofs(),
+  sparsity_pattern_pres_vel.reinit (dof_handler_velocity.n_dofs(),
+				    dof_handler_pressure.n_dofs(),
 				    dof_handler_velocity.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler_velocity, dof_handler_pressure, sparsity_pattern_pres_vel);
+  DoFTools::make_sparsity_pattern (dof_handler_velocity,
+				   dof_handler_pressure,
+				   sparsity_pattern_pres_vel);
   sparsity_pattern_pres_vel.compress();
 
-  InitGradPerTaskData per_task_data (0, fe_velocity.dofs_per_cell, fe_pressure.dofs_per_cell);
-  InitGradScratchData scratch_data (fe_velocity, fe_pressure, quadrature_velocity,
-                                    update_gradients | update_JxW_values, update_values);
+  InitGradPerTaskData per_task_data (0, fe_velocity.dofs_per_cell,
+				     fe_pressure.dofs_per_cell);
+  InitGradScratchData scratch_data (fe_velocity,
+				    fe_pressure,
+				    quadrature_velocity,
+                                    update_gradients | update_JxW_values,
+				    update_values);
 
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -930,9 +970,11 @@ void NavierStokesProjection<dim>::init_gradient_operator()
 }
 
 template <int dim>
-void NavierStokesProjection<dim>::assemble_one_cell_of_gradient (const IteratorPair  &SI,
-								 InitGradScratchData &scratch,
-								 InitGradPerTaskData &data)
+void
+NavierStokesProjection<dim>::
+assemble_one_cell_of_gradient (const IteratorPair  &SI,
+			       InitGradScratchData &scratch,
+			       InitGradPerTaskData &data)
 {
   scratch.fe_val_vel.reinit (std_cxx1x::get<0> (SI.iterators));
   scratch.fe_val_pres.reinit (std_cxx1x::get<1> (SI.iterators));
@@ -945,14 +987,17 @@ void NavierStokesProjection<dim>::assemble_one_cell_of_gradient (const IteratorP
     {
       for (unsigned int i=0; i<data.vel_dpc; ++i)
 	for (unsigned int j=0; j<data.pres_dpc; ++j)
-	  data.local_grad (i, j) += -scratch.fe_val_vel.JxW(q)*scratch.fe_val_vel.shape_grad (i, q)[data.d]
-				    *scratch.fe_val_pres.shape_value (j, q);
+	  data.local_grad (i, j) += -scratch.fe_val_vel.JxW(q) *
+				    scratch.fe_val_vel.shape_grad (i, q)[data.d] *
+				    scratch.fe_val_pres.shape_value (j, q);
     }
 }
 
+
 template <int dim>
-void NavierStokesProjection<dim>::copy_gradient_local_to_global(
-  const InitGradPerTaskData &data)
+void
+NavierStokesProjection<dim>::
+copy_gradient_local_to_global(const InitGradPerTaskData &data)
 {
   for (unsigned int i=0; i<data.vel_dpc; ++i)
     for (unsigned int j=0; j<data.pres_dpc; ++j)
@@ -981,8 +1026,9 @@ void NavierStokesProjection<dim>::copy_gradient_local_to_global(
 				 // purposes and so it is by default
 				 // set to false
 template <int dim>
-void NavierStokesProjection<dim>::run (const bool verbose,
-				       const unsigned int n_of_plots)
+void
+NavierStokesProjection<dim>::run (const bool verbose,
+				  const unsigned int output_interval)
 {
   ConditionalOStream verbose_cout (std::cout, verbose);
 
@@ -991,7 +1037,7 @@ void NavierStokesProjection<dim>::run (const bool verbose,
   plot_solution(1);
   for (unsigned int n = 2; n<=n_steps; ++n)
     {
-      if (n % n_of_plots == 0)
+      if (n % output_interval == 0)
 	{
 	  verbose_cout << "Plotting Solution" << std::endl;
 	  plot_solution(n);
@@ -1017,7 +1063,8 @@ void NavierStokesProjection<dim>::run (const bool verbose,
 
 
 template <int dim>
-void NavierStokesProjection<dim>::interpolate_velocity()
+void
+NavierStokesProjection<dim>::interpolate_velocity()
 {
   for (unsigned int d=0; d<dim; ++d)
     u_star[d].equ (2., u_n[d], -1, u_n_minus_1[d]);
@@ -1029,7 +1076,8 @@ void NavierStokesProjection<dim>::interpolate_velocity()
 				 // The implementation of a diffusion
 				 // step.
 template <int dim>
-void NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
+void
+NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
 {
   pres_tmp.equ (-1., pres_n, -4./3., phi_n, 1./3., phi_n_minus_1);
 
@@ -1111,8 +1159,11 @@ void NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
   tasks.join_all();
 }
 
+
+
 template <int dim>
-void NavierStokesProjection<dim>::diffusion_component_solve (const unsigned int d)
+void
+NavierStokesProjection<dim>::diffusion_component_solve (const unsigned int d)
 {
   SolverControl solver_control (vel_max_its, vel_eps*force[d].l2_norm());
   SolverGMRES<> gmres (solver_control,
@@ -1123,21 +1174,31 @@ void NavierStokesProjection<dim>::diffusion_component_solve (const unsigned int 
 
 				 // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code> method and related}
 template <int dim>
-void NavierStokesProjection<dim>::assemble_advection_term()
+void
+NavierStokesProjection<dim>::assemble_advection_term()
 {
   vel_Advection = 0.;
   AdvectionPerTaskData data (fe_velocity.dofs_per_cell);
   AdvectionScratchData scratch (fe_velocity, quadrature_velocity,
-                                update_values | update_JxW_values | update_gradients);
-  WorkStream::run (dof_handler_velocity.begin_active(), dof_handler_velocity.end(), *this,
+                                update_values |
+				update_JxW_values |
+				update_gradients);
+  WorkStream::run (dof_handler_velocity.begin_active(),
+		   dof_handler_velocity.end(), *this,
                    &NavierStokesProjection<dim>::assemble_one_cell_of_advection,
-                   &NavierStokesProjection<dim>::copy_advection_local_to_global, scratch, data);
+                   &NavierStokesProjection<dim>::copy_advection_local_to_global,
+		   scratch,
+		   data);
 }
 
+
+
 template <int dim>
-void NavierStokesProjection<dim>::assemble_one_cell_of_advection(
-  const typename DoFHandler<dim>::active_cell_iterator &cell,
-  AdvectionScratchData &scratch, AdvectionPerTaskData &data)
+void
+NavierStokesProjection<dim>::
+assemble_one_cell_of_advection(const typename DoFHandler<dim>::active_cell_iterator &cell,
+			       AdvectionScratchData &scratch,
+			       AdvectionPerTaskData &data)
 {
   scratch.fe_val.reinit(cell);
   cell->get_dof_indices (data.local_dof_indices);
@@ -1163,19 +1224,30 @@ void NavierStokesProjection<dim>::assemble_one_cell_of_advection(
   for (unsigned int q=0; q<scratch.nqp; ++q)
     for (unsigned int i=0; i<scratch.dpc; ++i)
       for (unsigned int j=0; j<scratch.dpc; ++j)
-        data.local_advection(i,j) += (
-	  scratch.u_star_local[q]*scratch.fe_val.shape_grad (j, q)*scratch.fe_val.shape_value (i, q)
-	  + 0.5*scratch.u_star_tmp[q]*scratch.fe_val.shape_value (i, q)*scratch.fe_val.shape_value (j, q)
-	)*scratch.fe_val.JxW(q) ;
+        data.local_advection(i,j) += (scratch.u_star_local[q] *
+				      scratch.fe_val.shape_grad (j, q) *
+				      scratch.fe_val.shape_value (i, q)
+				      +
+				      0.5 *
+				      scratch.u_star_tmp[q] *
+				      scratch.fe_val.shape_value (i, q) *
+				      scratch.fe_val.shape_value (j, q))
+				     *
+				     scratch.fe_val.JxW(q) ;
 }
 
+
+
 template <int dim>
-void NavierStokesProjection<dim>::copy_advection_local_to_global(
-  const AdvectionPerTaskData &data)
+void
+NavierStokesProjection<dim>::
+copy_advection_local_to_global(const AdvectionPerTaskData &data)
 {
   for (unsigned int i=0; i<fe_velocity.dofs_per_cell; ++i)
     for (unsigned int j=0; j<fe_velocity.dofs_per_cell; ++j)
-      vel_Advection.add (data.local_dof_indices[i] , data.local_dof_indices[j], data.local_advection(i,j));
+      vel_Advection.add (data.local_dof_indices[i],
+			 data.local_dof_indices[j],
+			 data.local_advection(i,j));
 }
 
 
@@ -1184,7 +1256,8 @@ void NavierStokesProjection<dim>::copy_advection_local_to_global(
 
 				 // This implements the projection step:
 template <int dim>
-void NavierStokesProjection<dim>::projection_step (const bool reinit_prec)
+void
+NavierStokesProjection<dim>::projection_step (const bool reinit_prec)
 {
   pres_iterative.copy_from (pres_Laplace);
 
@@ -1197,13 +1270,14 @@ void NavierStokesProjection<dim>::projection_step (const bool reinit_prec)
   static std::map<unsigned int, double> bval;
   if (reinit_prec)
     VectorTools::interpolate_boundary_values (dof_handler_pressure, 3,
-                                                ZeroFunction<dim>(), bval);
+					      ZeroFunction<dim>(), bval);
 
   MatrixTools::apply_boundary_values (bval, pres_iterative, phi_n, pres_tmp);
 
   if (reinit_prec)
     prec_pres_Laplace.initialize(pres_iterative,
-        SparseILU<double>::AdditionalData (vel_diag_strength, vel_off_diagonals) );
+        SparseILU<double>::AdditionalData (vel_diag_strength,
+					   vel_off_diagonals) );
 
   SolverControl solvercontrol (vel_max_its, vel_eps*pres_tmp.l2_norm());
   SolverCG<> cg (solvercontrol);
@@ -1227,7 +1301,8 @@ void NavierStokesProjection<dim>::projection_step (const bool reinit_prec)
 				 //      p^{n+1} = p^n + \phi^{n+1} - \frac{1}{Re} \nabla\cdot u^{n+1}.
 				 // @f]
 template <int dim>
-void NavierStokesProjection<dim>::update_pressure (const bool reinit_prec)
+void
+NavierStokesProjection<dim>::update_pressure (const bool reinit_prec)
 {
   pres_n_minus_1 = pres_n;
   switch (type)
@@ -1265,10 +1340,14 @@ template <int dim>
 void NavierStokesProjection<dim>::plot_solution (const unsigned int step)
 {
   assemble_vorticity ( (step == 1));
-  const FESystem<dim> joint_fe (fe_velocity, dim, fe_pressure, 1, fe_velocity, 1);
+  const FESystem<dim> joint_fe (fe_velocity, dim,
+				fe_pressure, 1,
+				fe_velocity, 1);
   DoFHandler<dim> joint_dof_handler (triangulation);
   joint_dof_handler.distribute_dofs (joint_fe);
-  Assert (joint_dof_handler.n_dofs() == (dim + 1)*dof_handler_velocity.n_dofs() + dof_handler_pressure.n_dofs(),
+  Assert (joint_dof_handler.n_dofs() ==
+	  ((dim + 1)*dof_handler_velocity.n_dofs() +
+	   dof_handler_pressure.n_dofs()),
           ExcInternalError());
   static Vector<double> joint_solution (joint_dof_handler.n_dofs());
   std::vector<unsigned int> loc_joint_dof_indices (joint_fe.dofs_per_cell),
@@ -1288,18 +1367,21 @@ void NavierStokesProjection<dim>::plot_solution (const unsigned int step)
 	switch (joint_fe.system_to_base_index(i).first.first)
 	  {
 	    case 0:
-		  Assert (joint_fe.system_to_base_index(i).first.second < dim, ExcInternalError());
+		  Assert (joint_fe.system_to_base_index(i).first.second < dim,
+			  ExcInternalError());
 		  joint_solution (loc_joint_dof_indices[i]) =
 		    u_n[ joint_fe.system_to_base_index(i).first.second ]
 		    (loc_vel_dof_indices[ joint_fe.system_to_base_index(i).second ]);
 		  break;
 	    case 1:
-		  Assert (joint_fe.system_to_base_index(i).first.second == 0, ExcInternalError());
+		  Assert (joint_fe.system_to_base_index(i).first.second == 0,
+			  ExcInternalError());
 		  joint_solution (loc_joint_dof_indices[i]) =
 		    pres_n (loc_pres_dof_indices[ joint_fe.system_to_base_index(i).second ]);
 		  break;
 	    case 2:
-		  Assert (joint_fe.system_to_base_index(i).first.second == 0, ExcInternalError());
+		  Assert (joint_fe.system_to_base_index(i).first.second == 0,
+			  ExcInternalError());
 		  joint_solution (loc_joint_dof_indices[i]) =
 		    rot_u (loc_vel_dof_indices[ joint_fe.system_to_base_index(i).second ]);
 		  break;
@@ -1397,7 +1479,7 @@ int main()
       data.read_data ("parameter-file.prm");
       deallog.depth_console (data.verbose ? 2 : 0);
       NavierStokesProjection<2> test (data);
-      test.run (data.verbose, data.output);
+      test.run (data.verbose, data.output_interval);
     }
   catch (std::exception &exc)
     {
