@@ -282,7 +282,7 @@ transforms the vector of values on the local dofs to a vector of gradients
 on the quadrature points. There, we first apply the Jacobian that we
 factored out from the gradient, then we apply the weights of the quadrature,
 and we apply with the transposed Jacobian for preparing the third loop which
-agains uses the gradients on the unit cell.
+again uses the gradients on the unit cell.
 
 Let's see how we can implement this:
 @code
@@ -435,7 +435,7 @@ matrix-vector product implementation efficient on a GPU.
 
 For our program, we choose to follow a simple strategy to make the code
 %parallel: We let several processors work together by splitting the cells into
-several chunks. The threading building blocks implemenation of a %parallel
+several chunks. The threading building blocks implementation of a %parallel
 pipeline implements this concept using the WorkStream::run() function. What
 the pipeline does closely resembles the work done by a for loop. However, it
 can be instructed to do some part of the loop body by just one process at a
@@ -475,7 +475,7 @@ Gauss&ndash;Seidel, J. Comput. Phys. 188:593&ndash;610, 2003</i>. This
 publication also identifies one more advantage of Chebyshev smoothers that we
 exploit here, namely that they are easy to parallelize, whereas
 SOR/Gauss&ndash;Seidel smoothing relies on substitutions, which can often only
-be parallelized by working on diagonal subblocks of the matrix, which
+be parallelized by working on diagonal sub-blocks of the matrix, which
 decreases efficiency.
 
 The implementation into the multigrid framework is then very
