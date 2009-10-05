@@ -122,9 +122,10 @@ assembly of matrices.
 If we are to perform a matrix-vector product, we can hence use that
 @f{eqnarray*}
 y &=& A\cdot x = \left(\sum_{\text{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
-A_\mathrm{cell} P_\mathrm{cell,{loc-glob}}\right) \cdot x\\
+A_\mathrm{cell} P_\mathrm{cell,{loc-glob}}\right) \cdot x
+\\
 &=& \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
-A_\mathrm{cell} x_\mathrm{cell},
+A_\mathrm{cell} x_\mathrm{cell}
 \\
 &=& \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
 y_\mathrm{cell},
