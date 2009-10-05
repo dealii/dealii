@@ -675,7 +675,7 @@ class NavierStokesProjection
 				     // computing the curl of the velocity:
     void diffusion_component_solve (const unsigned int d);
 
-    void plot_solution (const unsigned int step);
+    void output_results (const unsigned int step);
 
     void assemble_vorticity (const bool reinit_prec);
 };
@@ -1015,16 +1015,31 @@ copy_gradient_local_to_global(const InitGradPerTaskData &data)
 				 // time step <code>dt</code> until
 				 // <code>T</code>.
 				 //
-				 // The boolean parameter,
-				 // <code>verbose</code>, that it
-				 // takes is to enable information
-				 // about what the method is doing at
-				 // the given moment, i.e. diffusion,
+				 // Its second parameter, <code>verbose</code>
+				 // indicates whether the function should
+				 // output information what it is doing at any
+				 // given moment: for example, it will say
+				 // whether we are working on the diffusion,
 				 // projection substep; updating
-				 // preconditioners etc. This is
-				 // useful mostly for debugging
-				 // purposes and so it is by default
-				 // set to false
+				 // preconditioners etc. Rather than
+				 // implementing this output using code like
+				 // @code
+				 //   if (verbose)
+				 //     std::cout << "something";
+				 // @endcode
+				 // we use the ConditionalOStream class to
+				 // do that for us. That class takes an
+				 // output stream and a condition that
+				 // indicates whether the things you pass
+				 // to it should be passed through to the
+				 // given output stream, or should just
+				 // be ignored. This way, above code
+				 // simply becomes
+				 // @code
+				 //   verbose_cout << "something";
+				 // @endcode
+				 // and does the right thing in either
+				 // case.
 template <int dim>
 void
 NavierStokesProjection<dim>::run (const bool verbose,
@@ -1034,20 +1049,20 @@ NavierStokesProjection<dim>::run (const bool verbose,
 
   unsigned int n_steps =  (T - t_0)/dt;
   vel_exact.set_time (2.*dt);
-  plot_solution(1);
+  output_results(1);
   for (unsigned int n = 2; n<=n_steps; ++n)
     {
       if (n % output_interval == 0)
 	{
 	  verbose_cout << "Plotting Solution" << std::endl;
-	  plot_solution(n);
+	  output_results(n);
 	}
       std::cout << "Step = " << n << " Time = " << (n*dt) << std::endl;
       verbose_cout << "  Interpolating the velocity " << std::endl;
 
       interpolate_velocity();
       verbose_cout << "  Diffusion Step" << std::endl;
-      if (n%vel_update_prec == 0)
+      if (n % vel_update_prec == 0)
 	verbose_cout << "    With reinitialization of the preconditioner"
 		     << std::endl;
       diffusion_step ((n%vel_update_prec == 0) || (n == 2));
@@ -1057,7 +1072,7 @@ NavierStokesProjection<dim>::run (const bool verbose,
       update_pressure ( (n == 2));
       vel_exact.advance_time(dt);
     }
-  plot_solution (n_steps);
+  output_results (n_steps);
 }
 
 
@@ -1074,7 +1089,25 @@ NavierStokesProjection<dim>::interpolate_velocity()
 				 // @sect4{<code>NavierStokesProjection::diffusion_step</code>}
 
 				 // The implementation of a diffusion
-				 // step.
+				 // step. Note that the expensive operation is
+				 // the diffusion solve at the end of the
+				 // function, which we have to do once for
+				 // each velocity component. To accellerate
+				 // things a bit, we allow to do this in
+				 // %parallel, using the Threads::new_task
+				 // function which makes sure that the
+				 // <code>dim</code> solves are all taken care
+				 // of and are scheduled to available
+				 // processors: if your machine has more than
+				 // one processor core and no other parts of
+				 // this program are using resources
+				 // currently, then the diffusion solves will
+				 // run in %parallel. On the other hand, if
+				 // your system has only one processor core
+				 // then running things in %parallel would be
+				 // inefficient (since it leads, for example,
+				 // to cache congestion) and things will be
+				 // executed sequentially.
 template <int dim>
 void
 NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
@@ -1173,6 +1206,15 @@ NavierStokesProjection<dim>::diffusion_component_solve (const unsigned int d)
 
 
 				 // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code> method and related}
+
+				 // The following few functions deal with
+				 // assembling the advection terms that enter
+				 // the right hand side of the pressure
+				 // Laplace equations. As mentioned above, we
+				 // will run the assembly loop over all cells
+				 // in %parallel, using the WorkStream class
+				 // and other facilities as described in the
+				 // documentation module on @ref threads.
 template <int dim>
 void
 NavierStokesProjection<dim>::assemble_advection_term()
@@ -1323,21 +1365,42 @@ NavierStokesProjection<dim>::update_pressure (const bool reinit_prec)
 }
 
 
-				 // @sect4{ <code>NavierStokesProjection::plot_solution</code> }
+				 // @sect4{ <code>NavierStokesProjection::output_results</code> }
 
 				 // This method plots the current
-				 // solution. It is an adaptation of
-				 // step-31 and so I will not
-				 // elaborate on it.  There is one
-				 // small detail here. It is often
-				 // interesting to see the vorticity of
-				 // the flow. But, since we are using
-				 // it here only for plotting
-				 // purposes, we are not going to
-				 // compute it at every time step, but
-				 // only when we are going to plot it.
+				 // solution. The main difficulty is that we
+				 // want to create a single output file that
+				 // contains the data for all velocity
+				 // components, the pressure, and also the
+				 // vorticity of the flow. On the other hand,
+				 // velocities and the pressure live on
+				 // separate DoFHandler objects, and so can't
+				 // be written to the same file using a single
+				 // DataOut object. As a consequence, we have
+				 // to work a bit harder to get the various
+				 // pieces of data into a single DoFHandler
+				 // object, and then use that to drive
+				 // graphical output.
+				 //
+				 // We will not elaborate on this process
+				 // here, but rather refer to step-31 and
+				 // step-32, where a similar procedure is used
+				 // (and is documented) to create a joint
+				 // DoFHandler object for all variables.
+				 //
+				 // Let us also note that we here compute the
+				 // vorticity as a scalar quantity in a
+				 // separate function, using the $L^2$
+				 // projection of the quantity $\text{curl} u$
+				 // onto the finite element space used for the
+				 // components of the velocity. In principle,
+				 // however, we could also have computed as a
+				 // pointwise quantity from the velocity, and
+				 // do so through the DataPostprocessor
+				 // mechanism discussed in step-29 and
+				 // step-33.
 template <int dim>
-void NavierStokesProjection<dim>::plot_solution (const unsigned int step)
+void NavierStokesProjection<dim>::output_results (const unsigned int step)
 {
   assemble_vorticity ( (step == 1));
   const FESystem<dim> joint_fe (fe_velocity, dim,
@@ -1414,16 +1477,20 @@ void NavierStokesProjection<dim>::plot_solution (const unsigned int step)
 
 
 
-				 // Since this function is supposed to
-				 // be called only when the plot is
-				 // going to be made, which should not
-				 // be every time step, we do not
-				 // parallelize it. Of course, if
-				 // needed, this can be done as in the
-				 // other cases. Moreover, the
-				 // implementation that we have here
-				 // only works for 2d, so we bail if
-				 // that is not the case.
+				 // Following is the helper function that
+				 // computes the vorticity by projecting the
+				 // term $\text{curl} u$ onto the finite
+				 // element space used for the components of
+				 // the velocity. The function is only called
+				 // whenever we generate graphical output, so
+				 // not very often, and as a consequence we
+				 // didn't bother parallelizing it using the
+				 // WorkStream concept as we do for the other
+				 // assembly functions. That should not be
+				 // overly complicated, however, if
+				 // needed. Moreover, the implementation that
+				 // we have here only works for 2d, so we bail
+				 // if that is not the case.
 template <int dim>
 void NavierStokesProjection<dim>::assemble_vorticity (const bool reinit_prec)
 {
@@ -1468,9 +1535,9 @@ void NavierStokesProjection<dim>::assemble_vorticity (const bool reinit_prec)
 
 				 // @sect3{ The main function }
 
-				 // The main function looks very much
-				 // like in all the other tutorial
-				 // programs.
+				 // The main function looks very much like in
+				 // all the other tutorial programs, so there
+				 // is little to comment on here:
 int main()
 {
   try
