@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,7 +29,8 @@ DEAL_II_NAMESPACE_OPEN
  * depending on the ConditionalOStream object being active (default)
  * or not. The condition of this object can be changed by
  * set_condition() and in the constructor. This class is used in the
- * @ref step_17 "step-17", @ref step_18 "step-18", and @ref step_33 "step-33"
+ * @ref step_17 "step-17", @ref step_18 "step-18", @ref step_32 "step-32",
+ * @ref step_33 "step-33", and @ref step_35 "step-35"
  * tutorial programs.
  *
  * This class is mostly useful in parallel computations. Ordinarily, you would
