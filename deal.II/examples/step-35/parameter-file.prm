@@ -36,7 +36,7 @@ subsection Data solve velocity
 end
 
 #The output frequency
-set output = 50
+set output_interval = 50
 
 #Finally we set the verbosity level
 set verbose = false
