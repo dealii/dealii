@@ -1470,7 +1470,7 @@ void NavierStokesProjection<dim>::output_results (const unsigned int step)
                             component_interpretation);
   data_out.build_patches (deg + 1);
   std::ofstream output (("solution-" +
-			 Utilities::int_to_string (step, 4) +
+			 Utilities::int_to_string (step, 5) +
 			 ".vtk").c_str());
   data_out.write_vtk (output);
 }
