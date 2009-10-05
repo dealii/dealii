@@ -204,7 +204,6 @@ namespace PETScWrappers
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
- * @ingroup PETScWrappers
  * @relates PETScWrappers::Vector
  * @author Wolfgang Bangerth, 2004
  */

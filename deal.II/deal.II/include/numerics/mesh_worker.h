@@ -60,6 +60,50 @@ template<int,int> class MGDoFHandler;
  * class responsible for the local integration:
  *
  * @code
+ * template <int dim>
+ * class LocalIntegrator : public Subscriptor
+ * {
+ *   void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const;
+ *   void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const;
+ *   void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+ *             typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const;
+ * };
+ * @endcode
+ * The three functions in there must have exactly this signature and
+ * should do the integration on cells, boundary and interior faces,
+ * respectively.
+ *
+ * Then, create the AssemblingIntegrator object, where the second
+ * template argument decides on what kind of global data is
+ * assembled. In the following, we decide to assemble a simple
+ * SparseMatrix with no block structure:
+ *
+ * @code
+ * LocalIntegrator<dim> loc;
+ * MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> >, LocalIntegrator<dim> >
+ *   integrator(loc);
+ * @endcode
+ *
+ * Before we can run the integration loop, we have to initialize
+ * several data structures in our AssemblingIntegrator. For instance,
+ * we have to decide on the quadrature rule or we may need more than
+ * the default update flags.
+ *
+ * @code
+ * integrator.initialize_gauss_quadrature(2,2,2);
+ * integrator.add_update_flags(update_values | update_gradients, true, true, true, true);
+ * integrator.initialize(system_matrix);
+ * @endcode
+ *
+ * Finally, we set up the structures needed by the integration_loop()
+ * and run it.
+ *
+ * @code
+ * MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
+ * info_box.initialize(integrator, fe, mapping);
+ *
+ * MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(),
+ *                              info_box, integrator);
  * @endcode
  *
  * @author Guido Kanschat, 2009

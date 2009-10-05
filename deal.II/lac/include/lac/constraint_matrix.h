@@ -1234,8 +1234,9 @@ class ConstraintMatrix : public Subscriptor
 				      * write into a matrix but only allocate
 				      * sparsity pattern entries.
 				      *
-				      * As explained in the @ref hp_paper "hp
-				      * paper" and in @ref step_27 "step-27",
+				      * As explained in the
+				      * @ref hp_paper "hp paper"
+				      * and in @ref step_27 "step-27",
 				      * first allocating a sparsity pattern
 				      * and later coming back and allocating
 				      * additional entries for those matrix

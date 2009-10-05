@@ -181,39 +181,20 @@ void BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
 
 				 // @sect3{Integrating cell and face matrices}
 				 //
-				 // In order to use the MeshWorker
-				 // framework, we need to define a
-				 // worker object, which serves three
-				 // purposes. First, it performs the
-				 // local integration on each mesh
-				 // cell. Second, it controls the loop
-				 // over cells and faces and the data
-				 // being generated. This part is
-				 // easily implemented here, since the
-				 // default structure can be
-				 // used. Finally, through its base
-				 // class from the
-				 // MeshWorker::Assembler namespace,
-				 // this object determines, how locally
-				 // produced data is assembled into
-				 // the global system.
-				 //
-				 // The fist base class is
-				 // MeshWorker::IntegrationWorker. It
-				 // has all the control structures the
-				 // generic loop needs. Fortunately,
-				 // most of them have reasonable
-				 // default values. The others will be
-				 // set below.
-				 //
-				 // The second base class is
-				 // MeshWorker::Assembler::SystemSimple,
-				 // which will assemble the matrices
-				 // and residuals on cells and faces,
-				 // respectively, into the global
-				 // system. The "simple" indicates
-				 // that we do not want to use
-				 // sophisticated block structures.
+				 // We define a class that fits into
+				 // the MeshWorker framework. Since it
+				 // will be used by
+				 // MeshWorker::AssemblingIntegrator,
+				 // it needs the functions for cell,
+				 // boundary and interior face
+				 // integration specified exactly as
+				 // below.
+
+				 // The base class Subscriptor is
+				 // needed so that
+				 // MeshWorker::AssemblingIntegrator
+				 // can store a SmartPointer to an
+				 // object of this class.
 template <int dim>
 class DGIntegrator : public Subscriptor
 {
@@ -236,7 +217,8 @@ class DGIntegrator : public Subscriptor
     void bdry(FaceInfo& info) const;
     void face(FaceInfo& info1, FaceInfo& info2) const;
 
-				     // Additionally, like in step 12,
+				     // Additionally, like in @ref
+				     // step_12 "step-12",
 				     // we have objects of the
 				     // functions used in this class.
   private:
@@ -246,6 +228,7 @@ class DGIntegrator : public Subscriptor
 };
 
 				 // @sect4{The local integrators}
+
 				 // These functions are analogous to
 				 // step 12 and differ only in the
 				 // data structures. Instead of
@@ -573,18 +556,32 @@ void DGMethod<dim>::assemble_system ()
 
 				   // This is the magic object, which
 				   // knows everything about the data
-				   // structures and local
-				   // integration (the latter through
-				   // our object @p dg). This is the
-				   // object doing the work in the
-				   // function MeshWorker::loop, which
-				   // is implicitly called
-				   // below. After @p dg did the local
+				   // structures and local integration
+				   // (the latter through our object
+				   // @p dg). This is the object doing
+				   // the work in the function
+				   // MeshWorker::loop(), which is
+				   // implicitly called by
+				   // MeshWorker::integration_loop()
+				   // below.
+				   // After @p dg did the local
 				   // integration, the
 				   // MeshWorker::Assembler::SystemSimple
 				   // object distributes these into
 				   // the global sparse matrix and the
 				   // right hand side vector.
+				   //
+				   // It turns out,
+				   // MeshWorker::AssemblingIntegrator
+				   // itself is not that clever at
+				   // all, but all its capabilities
+				   // are provided by the two later
+				   // template arguments. By
+				   // exchanging
+				   // MeshWorker::Assembler::SystemSimple,
+				   // we could for instance assemble a
+				   // BlockMatrix or just a Vector
+				   // instead.
   MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >, DGIntegrator<dim> >
     integrator(dg);
   

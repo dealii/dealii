@@ -1,13 +1,20 @@
 <a name="Intro"></a>
-<h1>This will be an example of the new MeshWorker framework and will be available soon</h1>
+<h1>Example of the MeshWorker framework with an advection problem</h1>
 
 <h3>Overview</h3>
 
-This example is devoted to the <em>discontinuous Galerkin method</em>,
-or in short: DG method. It solves the same problem as step-12 (see
-there for a description of the problem and discretization), but here
-we use the MeshWorker framework in order to save reprogramming the
-cell/face loops.
+This example is devoted to the MeshWorker framework and the
+<em>discontinuous Galerkin method</em>, or in short: DG method. It
+solves the same problem as @ref step_12 "step-12" (see there for a description of the
+problem and discretization), but here we use the MeshWorker framework
+in order to save reprogramming the cell/face loops.
+
+In particular the loops of DG methods turn out to be complex, because
+for the face terms, we have to distinguish the cases of boundary,
+regular interior faces and interior faces with hanging nodes,
+respectively. The MeshWorker framework implements the standard loop
+over all cells and faces in MeshWorker::loop() and takes care of
+distinguishing between all the different faces.
 
 <h3>Implementation</h3>
 

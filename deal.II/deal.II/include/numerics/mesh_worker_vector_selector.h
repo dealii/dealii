@@ -209,9 +209,13 @@ namespace MeshWorker
 					* the subset of @p indices
 					* used.
 					*
-					* @param block is the block
-					* number processed, or zero if
-					* no base elements are used.
+					* @param component is the first
+					* index in @p values, @p
+					* gradients and @p hessians
+					* entered in this function.
+					*
+					* @param n_comp is the number
+					* of components to be filled.
 					*
 					* @param start is the first
 					* index of this block in @p

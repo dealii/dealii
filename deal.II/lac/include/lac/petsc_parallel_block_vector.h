@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -459,7 +459,6 @@ namespace PETScWrappers
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
- * @ingroup PETScWrappers
  * @relates PETScWrappers::MPI::BlockVector
  * @author Wolfgang Bangerth, 2000
  */

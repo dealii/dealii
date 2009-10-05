@@ -346,13 +346,6 @@ namespace MeshWorker
 					* and allocate space for
 					* data vectors.
 					*
-					* @param fe is only used
-					* to determine the type of
-					* the element and can be a
-					* null pointer to FEValues,
-					* FEVaceValues or
-					* FESubfaceValues.
-					*
 					* @param el is the finite
 					* element of the DoFHandler.
 					*

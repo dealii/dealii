@@ -438,7 +438,6 @@ namespace TrilinosWrappers
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors. 
  *
- * @ingroup TrilinosWrappers
  * @relates TrilinosWrappers::MPI::BlockVector
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
@@ -898,7 +897,6 @@ namespace TrilinosWrappers
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors. 
  *
- * @ingroup TrilinosWrappers
  * @relates TrilinosWrappers::BlockVector
  * @author Martin Kronbichler, 2008
  */
