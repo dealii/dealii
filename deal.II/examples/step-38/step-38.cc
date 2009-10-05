@@ -217,8 +217,7 @@ class DGIntegrator : public Subscriptor
     void bdry(FaceInfo& info) const;
     void face(FaceInfo& info1, FaceInfo& info2) const;
 
-				     // Additionally, like in @ref
-				     // step_12 "step-12",
+				     // Additionally, like in step-12,
 				     // we have objects of the
 				     // functions used in this class.
   private:
@@ -230,7 +229,7 @@ class DGIntegrator : public Subscriptor
 				 // @sect4{The local integrators}
 
 				 // These functions are analogous to
-				 // step 12 and differ only in the
+				 // step-12 and differ only in the
 				 // data structures. Instead of
 				 // providing the local matrices
 				 // explicitly in the argument list,
@@ -259,7 +258,7 @@ void DGIntegrator<dim>::cell(CellInfo& info) const
   Vector<double>& local_vector = info.R[0].block(0);
 
 				   // With these objects, we continue
-				   // local integration like in step 12.
+				   // local integration like in step-12.
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   
   std::vector<Point<dim> > beta (fe_v.n_quadrature_points);

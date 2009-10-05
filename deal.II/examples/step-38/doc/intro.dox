@@ -16,5 +16,3 @@ respectively. The MeshWorker framework implements the standard loop
 over all cells and faces in MeshWorker::loop() and takes care of
 distinguishing between all the different faces.
 
-<h3>Implementation</h3>
-
