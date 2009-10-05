@@ -59,7 +59,7 @@ using namespace dealii;
 				 // we use the formulation $\frac{1}{0.1 +
 				 // \|\bf x\|^2}$ instead of a discontinuous
 				 // one. It is merely to demonstrate the
-				 // possibilities of this implemenation,
+				 // possibilities of this implementation,
 				 // rather than making much sense physically.
 template <int dim>
 class Coefficient : public Function<dim>
@@ -168,7 +168,7 @@ namespace WorkStreamData
 
 
 
-				 // Next comes the implemenation of the
+				 // Next comes the implementation of the
 				 // matrix-free class. It provides some
 				 // standard information we expect for
 				 // matrices (like returning the dimensions
@@ -350,9 +350,9 @@ MatrixFree<number,Transformation>::get_constraints ()
 				 // enter this function, we probably make some
 				 // modification to the matrix. This means
 				 // that the diagonal of the matrix, which we
-				 // might have computed to have access to the
-				 // matrix diagonal, is invalidated. We set
-				 // the respective flag to <code>false</code>.
+				 // might have computed to have fast access to
+				 // those elements, is invalidated. We set the
+				 // respective flag to <code>false</code>.
 template <typename number, class Transformation>
 void MatrixFree<number,Transformation>::
 set_local_dof_indices (const unsigned int               cell_no,
@@ -464,7 +464,7 @@ MatrixFree<number,Transformation>::
 				 // next step second anyway. Then, we copy the
 				 // source values from the global vector to
 				 // the local cell range, and we perform a
-				 // matrix-matrix product to tranform the
+				 // matrix-matrix product to transform the
 				 // values to the quadrature points. It is a
 				 // bit tricky to find out how the matrices
 				 // should be multiplied with each other,
@@ -750,9 +750,9 @@ reinit (const unsigned int        n_dofs_in,
 				 // than about a third of the cache size of
 				 // the processor in order to be on the safe
 				 // side. Since most today's processors
-				 // provide 512 kBytes or more cache memory
-				 // per core, we choose about 150 kB as a size
-				 // to leave some room for other things to be
+				 // provide 512 kB or more cache memory per
+				 // core, we choose about 150 kB as a size to
+				 // leave some room for other things to be
 				 // stored in the CPU. Clearly, this is an
 				 // architecture-dependent value and the
 				 // interested user can squeeze out some extra
@@ -999,7 +999,7 @@ LaplaceOperator<dim,number>::LaplaceOperator(const Tensor<2,dim> &tensor)
 				 // loop, but note once again that
 				 // <code>dim</code> is known when this piece
 				 // of code is compiled, so the compiler can
-				 // optize away the <code>if</code> statement
+				 // optimize away the <code>if</code> statement
 				 // (and actually even inline these few lines
 				 // of code into the <code>MatrixFree</code>
 				 // class).
@@ -1243,7 +1243,7 @@ void LaplaceProblem<dim>::setup_system ()
 				 // update flag
 				 // <code>update_inverse_jacobians</code> to
 				 // the FEValues constructor, and query the
-				 // inverse of the jacobian in a loop over
+				 // inverse of the Jacobian in a loop over
 				 // the quadrature points (note that the
 				 // Jacobian is not related to any kind of
 				 // degrees of freedom directly). In the
@@ -1308,18 +1308,17 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // and the results must be entered
 				 // into the correct matrix.
 
-				 // Since we only do multi-level
+				 // Since we only do multilevel
 				 // preconditioning, no right-hand side is
-				 // assembled here. Compared to step-16,
-				 // there is one new thing here: we manually
+				 // assembled here. Compared to step-16, there
+				 // is one new thing here: we manually
 				 // calculate the matrix on the coarsest
 				 // level. In step-16, we could simply copy
 				 // the entries from the respective sparse
 				 // matrix, what is obviously not possible
-				 // here. We could have integrated this to
-				 // the MatrixFree class as well, but it is
-				 // simple anyway, so calculate it here
-				 // instead.
+				 // here. We could have integrated this to the
+				 // MatrixFree class as well, but it is simple
+				 // anyway, so calculate it here instead.
 template <int dim>
 void LaplaceProblem<dim>::assemble_multigrid ()
 {
