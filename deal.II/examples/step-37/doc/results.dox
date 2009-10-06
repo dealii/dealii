@@ -77,6 +77,7 @@ Cycle 4
 Number of degrees of freedom: 1847617
 System matrix memory consumption: 322 MBytes.
 Multigrid objects memory consumption: 415.1 MBytes.
+Convergence in 11 CG iterations.
 @endcode
 
 A comparison of the memory consumption of the MatrixFree class with a 
