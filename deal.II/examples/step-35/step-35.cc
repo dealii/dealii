@@ -1194,9 +1194,9 @@ NavierStokesProjection<dim>::diffusion_component_solve (const unsigned int d)
 				 // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code> method and related}
 
 				 // The following few functions deal with
-				 // assembling the advection terms that enter
-				 // the right hand side of the pressure
-				 // Laplace equations. As mentioned above, we
+				 // assembling the advection terms, which is the part of the
+         // system matrix for the diffusion step that changes
+         // at every time step. As mentioned above, we
 				 // will run the assembly loop over all cells
 				 // in %parallel, using the WorkStream class
 				 // and other facilities as described in the
