@@ -874,23 +874,9 @@ NavierStokesProjection<dim>::initialize_velocity_matrices()
 					vel_Laplace);
 }
 
-				 // For the initialization of the matrices
-				 // that act on the pressure space it is worth
-				 // noticing one small detail. Since the
-				 // projection step involves the solution of a
-				 // Poisson equation with homogeneous Neumann
-				 // boundary conditions, we need somehow to
-				 // regularize this problem, that is to pick a
-				 // solution.  The way we do it is by setting
-				 // the value of the pressure solution at the
-				 // first node (wherever it is) to zero. This
-				 // regularizes the problem and does not
-				 // increase the number of entries in the
-				 // sparsity pattern we use as the solution
-				 // shown in step-11 would do. In the end it
-				 // achieves the solution: it makes sure that
-				 // the pressure is not left undetermined up
-				 // to a constant.
+				 // The initialization of the matrices
+				 // that act on the pressure space is similar
+         // to the ones that act on the velocity space.
 template <int dim>
 void
 NavierStokesProjection<dim>::initialize_pressure_matrices()
