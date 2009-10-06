@@ -15,7 +15,7 @@ same directory as the source:
     # In this subsection we declare the physical data
     # The initial and final time, and the Reynolds number
     set initial_time = 0.
-    set final_time   = 10.
+    set final_time   = 25.
     set Reynolds     = 100
   end
 
@@ -45,27 +45,49 @@ same directory as the source:
   end
 
   #The output frequency
-  set output = 5
+  set output = 50
 
   #Finally we set the verbosity level
   set verbose = false
 @endverbatim
 
-Since the <code>verbose</code> parameter is set to <code>false</code>, we do not get any kind of output.
+Since the <code>verbose</code> parameter is set to <code>false</code>,
+we do not get any kind of output besides the number of the time step
+the program is currently working on.
 If we we were to set it to <code>true</code> we would get information on what the program is doing and
 how many steps each iterative process had to make to converge, etc.
 
-A plot of the obtained results for $t=0,1,3,5,8,10$ is the following
+Let us plot the obtained results for $t=1,5,12,20,25$ (i.e. time steps
+200, 1000, 2400, 4000, and 5000), where in the left column we show the
+vorticity and in the right the velocity field:
 
-@image html Re100t0.png
-@image html Re100t1.png
-@image html Re100t3.png
-@image html Re100t5.png
-@image html Re100t8.png
-@image html Re100t10.png
+<table>
+  <tr>
+    <td> @image html step-35.Re_100.vorticity.0.png </td>
+    <td> @image html step-35.Re_100.velocity.0.png </td>
+  </tr>
+  <tr>
+    <td> @image html step-35.Re_100.vorticity.1.png </td>
+    <td> @image html step-35.Re_100.velocity.1.png </td>
+  </tr>
+  <tr>
+    <td> @image html step-35.Re_100.vorticity.2.png </td>
+    <td> @image html step-35.Re_100.velocity.2.png </td>
+  </tr>
+  <tr>
+    <td> @image html step-35.Re_100.vorticity.3.png </td>
+    <td> @image html step-35.Re_100.velocity.3.png </td>
+  </tr>
+  <tr>
+    <td> @image html step-35.Re_100.vorticity.4.png </td>
+    <td> @image html step-35.Re_100.velocity.4.png </td>
+  </tr>
+</table>
 
-The contour lines correspond to the pressure, the color to the voriticity and the arrows to the velocity.
-Here we only show a zoom into a region near the obstacle which is, after all, where the interesting things happen.
+The images show nicely the development and extension of a vortex chain
+behind the obstacles, with the sign of the vorticity indicating
+whether this is a left or right turning vortex.
+
 
 <a name="Re500"></a>
 <h2> Re = 500 </h2>
