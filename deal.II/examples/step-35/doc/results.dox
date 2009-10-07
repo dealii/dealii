@@ -92,13 +92,39 @@ whether this is a left or right turning vortex.
 <a name="Re500"></a>
 <h2> Re = 500 </h2>
 
-Changing the Reynolds number, $Re$, to in the parameter file to a value of $500$ we obtain the following results.
-@image html Re500t0.png
-@image html Re500t1.png
-@image html Re500t3.png
-@image html Re500t5.png
-@image html Re500t8.png
-@image html Re500t10.png
+We can change the Reynolds number, $Re$, in the parameter file to a
+value of $500$. Doing so, and reducing the time step somewhat as well,
+yields the following images at times $t=20,40:
+
+<table>
+  <tr>
+    <td> @image html step-35.Re_500.vorticity.0.png </td>
+    <td> @image html step-35.Re_500.velocity.0.png </td>
+  </tr>
+  <tr>
+    <td> @image html step-35.Re_500.vorticity.1.png </td>
+    <td> @image html step-35.Re_500.velocity.1.png </td>
+  </tr>
+</table>
+
+What does look right is that with the higher Reynolds number, the flow
+is much more unorganized, swaying between the bottom and top boundary
+of the domain. On the other hand, the vorticity can't be right: it
+oscillates rapidly, not something we would expect for a Reynolds
+number that is still only moderate and that would not produce
+turbulence at very small length scales. The riddle is easily solved,
+however, by looking at a zoom at the region behind the obstacle, and
+the mesh size we have there:
+
+@image html step-35.Re_500.zoom.png
+
+It is clear here that the flow is still reasonably well resolved in
+the immediate wake of the obstacle, where the mesh is relatively fine,
+but that the problem appears where the mesh becomes too coarse. That
+shouldn't surprise us: if we increase the Reynolds number, the scales
+on which we expect flow variation decreases and we will have to have a
+finer mesh. A rerun with one more mesh refinement dialed in in the
+parameter file confirms that results look much more sensible now.
 
 
 <a name="extensions"></a>
