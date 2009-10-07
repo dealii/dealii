@@ -2,7 +2,7 @@
 <h1>Results</h1>
 
 <a name="Re100"></a>
-<h2> Re = 100 </h2>
+<h3> Re = 100 </h3>
 
 We run the code with the following <code>parameter-file.prm</code>, which can be found in the
 same directory as the source:
@@ -90,11 +90,11 @@ whether this is a left or right turning vortex.
 
 
 <a name="Re500"></a>
-<h2> Re = 500 </h2>
+<h3> Re = 500 </h3>
 
 We can change the Reynolds number, $Re$, in the parameter file to a
 value of $500$. Doing so, and reducing the time step somewhat as well,
-yields the following images at times $t=20,40:
+yields the following images at times $t=20,40$:
 
 <table>
   <tr>
@@ -128,7 +128,7 @@ parameter file confirms that results look much more sensible now.
 
 
 <a name="extensions"></a>
-<h2> Possible Extensions </h2>
+<h3> Possible Extensions </h3>
 
 This program can be extended in the following directions:
 <ul>
