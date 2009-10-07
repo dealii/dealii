@@ -555,10 +555,10 @@ namespace SLEPcWrappers
       set_matrices (A,B);
       solve (n_eigenvectors, &n_converged);
 
-      if (n_converged > n_eigenvectors)
+      if (n_converged >= n_eigenvectors)
 	n_converged = n_eigenvectors;
-      AssertThrow (n_converged == n_eigenvectors, ExcSLEPcWrappersUsageError());
 
+      AssertThrow (n_converged == n_eigenvectors, ExcSLEPcWrappersUsageError());
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
       vr.resize (n_converged, vr.front());
       kr.resize (n_converged);
