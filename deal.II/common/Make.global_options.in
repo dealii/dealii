@@ -189,9 +189,9 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
 		stratimikos \
 		ml \
 		amesos \
-                aztecoo \
 		belos \
 		ifpack \
+                aztecoo \
 		rtop \
 		sacado \
 		thyra \
