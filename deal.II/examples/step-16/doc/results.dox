@@ -49,5 +49,5 @@ DEAL:cg::Convergence step 10 value 9.41828e-14
 <h3> Possible extensions </h3>
 
 A close inspection of this program's performance shows that it is mostly
-dominated by matrix-vector operations. @ref step-37 "Step-37" shows one way
+dominated by matrix-vector operations. @ref step_37 "Step-37" shows one way
 how this can be avoided by working with matrix-free methods.
