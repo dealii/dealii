@@ -106,21 +106,35 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
 				 // @sect3{Matrix-free implementation}
 
-				 // Next come a few declarations that we use
-				 // for defining the %parallel layout of the
-				 // vector multiplication function with the
-				 // WorkStream concept in the Matrix-free
-				 // class. These comprise so-called scratch
-				 // data that we use for calculating
-				 // cell-related information, and copy data
-				 // that is eventually used in a separate
-				 // function for writing local data into the
-				 // global vector. The reason for this split-up
-				 // definition is that many threads at a time
-				 // can execute the local multiplications (and
-				 // filling up the copy data), but than that
-				 // copy data needs to be worked on by one
-				 // process at a time.
+				 // In this program, we want to make
+				 // use of the ability of deal.II to
+				 // runs things in parallel if compute
+				 // resources are available. We will
+				 // follow the general framework laid
+				 // out in the @ref threads module and
+				 // use the WorkStream class to do
+				 // operations on the range of all
+				 // cells.
+				 //
+				 // To this end, we first have to have
+				 // a few declarations that we use for
+				 // defining the %parallel layout of
+				 // the vector multiplication function
+				 // with the WorkStream concept in the
+				 // Matrix-free class. These comprise
+				 // so-called scratch data that we use
+				 // for calculating cell-related
+				 // information, and copy data that is
+				 // eventually used in a separate
+				 // function for writing local data
+				 // into the global vector. The reason
+				 // for this split-up definition is
+				 // that many threads at a time can
+				 // execute the local multiplications
+				 // (and filling up the copy data),
+				 // but than that copy data needs to
+				 // be worked on by one process at a
+				 // time.
 namespace WorkStreamData
 {
   template <typename number>
@@ -232,7 +246,8 @@ class MatrixFree : public Subscriptor
     void Tvmult_add (Vector<number2> &dst,
 		     const Vector<number2> &src) const;
 
-    number el (const unsigned int row, const unsigned int col) const;
+    number el (const unsigned int row,
+	       const unsigned int col) const;
     void calculate_diagonal () const;
 
     std::size_t memory_consumption () const;
@@ -245,7 +260,7 @@ class MatrixFree : public Subscriptor
 				     // mapping between local degrees of freedom
 				     // and global degrees of freedom for each
 				     // cell (stored as a two-dimensional array,
-				     // where the each row corresponds to one
+				     // where each row corresponds to one
 				     // cell, and the columns within individual
 				     // cells are the local degrees of freedom),
 				     // the transformation variable for
@@ -302,11 +317,17 @@ MatrixFree<number,Transformation>::MatrixFree ()
 
 
 
-				 // This function returns the number of rows
-				 // of the global matrix, and the next one
-				 // the number of columns (which is the
-				 // same, since we consider only quadratic
-				 // matrices).
+				 // The next functions return the
+				 // number of rows and columns of the
+				 // global matrix (i.e. the dimensions
+				 // of the operator this class
+				 // represents, the point of this
+				 // tutorial program was, after all,
+				 // that we don't actually store the
+				 // elements of the rows and columns
+				 // of this operator). Since the
+				 // matrix is square, the returned
+				 // numbers are the same.
 template <typename number, class Transformation>
 unsigned int
 MatrixFree<number,Transformation>::m () const
@@ -339,20 +360,24 @@ MatrixFree<number,Transformation>::get_constraints ()
 
 
 
-				 // This function takes a vector of local dof
-				 // indices on cell level and writes the data
+				 // The following function takes a
+				 // vector of local dof indices on
+				 // cell level and writes the data
 				 // into the
-				 // <code>indices_local_to_global</code> field
-				 // in order to have fast access to it. It
-				 // performs a few sanity checks like whether
-				 // the sizes in the matrix are set
-				 // correctly. One tiny thing: Whenever we
-				 // enter this function, we probably make some
-				 // modification to the matrix. This means
-				 // that the diagonal of the matrix, which we
-				 // might have computed to have fast access to
-				 // those elements, is invalidated. We set the
-				 // respective flag to <code>false</code>.
+				 // <code>indices_local_to_global</code>
+				 // field in order to have fast access
+				 // to it. It performs a few sanity
+				 // checks like whether the sizes in
+				 // the matrix are set correctly. One
+				 // tiny thing: Whenever we enter this
+				 // function, we probably make some
+				 // modification to the matrix. This
+				 // means that the diagonal of the
+				 // matrix, which we might have
+				 // computed to have fast access to
+				 // those elements, is invalidated. We
+				 // set the respective flag to
+				 // <code>false</code>.
 template <typename number, class Transformation>
 void MatrixFree<number,Transformation>::
 set_local_dof_indices (const unsigned int               cell_no,
@@ -371,16 +396,18 @@ set_local_dof_indices (const unsigned int               cell_no,
 
 
 
-				 // This writes the derivative data on a
-				 // certain cell and a certain quadrature
-				 // point to the array that keeps the data
+				 // Next a function that writes the
+				 // derivative data on a certain cell
+				 // and a certain quadrature point to
+				 // the array that keeps the data
 				 // around. Even though the array
-				 // <code>derivatives</code> stands for the
-				 // majority of the matrix memory consumption,
-				 // it still pays off to have that data around
-				 // since it would be quite expensive to
-				 // manually compute it every time we make a
-				 // matrix-vector product.
+				 // <code>derivatives</code> stands
+				 // for the majority of the matrix
+				 // memory consumption, it still pays
+				 // off to have that data around since
+				 // it would be quite expensive to
+				 // manually compute it every time we
+				 // make a matrix-vector product.
 template <typename number, class Transformation>
 void MatrixFree<number,Transformation>::
 set_derivative_data (const unsigned int cell_no,
@@ -394,12 +421,12 @@ set_derivative_data (const unsigned int cell_no,
 
 
 
-				 // This is the central function of the
+				 // Now finally to the central function of the
 				 // matrix-free class, implementing the
 				 // multiplication of the matrix with a
-				 // vector. This function does actually not
-				 // work on all the cells, but only a subset
-				 // of cells, specified by the first argument
+				 // vector. This function does not actually
+				 // work on all cells of a mesh, but only the subset
+				 // of cells specified by the first argument
 				 // <code>cell_range</code>. Since this
 				 // function operates similarly irrespective
 				 // on which cell chunk we are sitting, we can
