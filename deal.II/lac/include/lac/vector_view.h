@@ -84,17 +84,17 @@ DEAL_II_NAMESPACE_OPEN
  VectorView<double> view(5, array);
 
  view(1) = 4;
- 
+
  // The following line should output 4.
  cout << array[1] << endl;
 
  // If debug mode is on, then the following triggers an execption:
  view(6) = 4;
- 
+
  // But notice that no checks are performed, so this is legal but WILL
  // NOT work
  VectorView<double> wrong_view(10, array);
- 
+
  // Now no assert will be thrown if you type wrong_view(6), but most
  // likely a seg fault will occur.
  view(6) = 4;
@@ -102,11 +102,11 @@ DEAL_II_NAMESPACE_OPEN
  // Notice that this construction is legal. It will create a copy of
  // the array.
  const Vector<double> const_copy(view);
- 
+
  // Now this is the correct way to instantiate a constant view of the
  // above vector:
  const VectorView<double> correct_const_copy_view(5, const_copy.begin());
- 
+
  // While this will compile, BUT WILL NOT COMPLAIN if you try to write
  // on it!
  VectorView<double> wrong_const_copy_view(5, const_copy.begin());
@@ -114,9 +114,9 @@ DEAL_II_NAMESPACE_OPEN
  // Now writing to elements of wrong_const_copy_view is allowed, and
  // will change the same memory as the const_copy object.
  wrong_const_copy_view(1) = 5;
- 
+
  if(copy_view(1) == wrong_const_copy_view(1)) cout << "Tautology";
- 
+
  @endcode
  *
  *
@@ -126,13 +126,13 @@ DEAL_II_NAMESPACE_OPEN
  * @<std::complex@<long double@>@></tt>; others can be generated in
  * application programs (see the section on @ref Instantiations in the
  * manual).
- * 
+ *
  * @author Luca Heltai, 2009
  */
 template<typename Number>
 class VectorView : public Vector<Number>
 {
-  public:    
+  public:
 				     /**
 				      * Read write constructor. Takes the size
 				      * of the vector, just like the standard
@@ -141,7 +141,7 @@ class VectorView : public Vector<Number>
 				      * ptr.
 				      */
     VectorView(const unsigned int new_size, Number *ptr);
-    
+
 				     /**
 				      * The constant constructor is the same
 				      * as above, however you will not be able
@@ -156,7 +156,7 @@ class VectorView : public Vector<Number>
 				      * attempt to write on it.
 				      */
     VectorView(const unsigned int new_size, const Number *ptr);
-    
+
 				     /**
 				      * This desctructor will only reset the
 				      * internal sizes and the internal
@@ -172,7 +172,7 @@ class VectorView : public Vector<Number>
 				      * Vector<double> is required.
 				      */
     operator const Vector<Number> &() const;
-    
+
 				     /**
 				      * The reinit function of this object has
 				      * a behavior which is different from the
@@ -202,7 +202,7 @@ class VectorView : public Vector<Number>
 				      *
 				      * // Make a view of it
 				      * VectorView<double> view_of_long_vector(1, long_vector.begin());
-				      * 
+				      *
 				      * // Resize the original vector to a bigger size
 				      * long_vector.reinit(100);
 				      *
@@ -230,17 +230,17 @@ class VectorView : public Vector<Number>
 				      * this behavior, and you should only
 				      * call this reinit function if you
 				      * really know what you are doing.
-				      */ 
+				      */
     virtual void reinit (const unsigned int N,
 			 const bool         fast=false);
-    
+
 				     /** This reinit function is
 					 equivalent to constructing a
 					 new object with the given
 					 size, starting from the
 					 pointer ptr. */
     void reinit(const unsigned int N, Number * ptr);
-    
+
 				     /** This reinit function is
 					 equivalent to constructing a
 					 new object with the given
@@ -249,12 +249,12 @@ class VectorView : public Vector<Number>
 					 considerations made for the
 					 constructor apply here. */
     void reinit(const unsigned int N, const Number * ptr);
-    
+
 				     /**
 				      * This function is here to prevent
 				      * memory corruption. It should never be
 				      * called, and will throw an exception if
-				      * you try to do so. */ 
+				      * you try to do so. */
     virtual void swap (Vector<Number> &v);
 };
 
@@ -263,7 +263,7 @@ class VectorView : public Vector<Number>
 /*@}*/
 /*----------------------- Inline functions ----------------------------------*/
 
-
+#ifndef DOXYGEN
 
 template<typename Number>
 inline
@@ -278,7 +278,7 @@ VectorView<Number>::VectorView(const unsigned int new_size, Number * ptr)
 
 template<typename Number>
 inline
-VectorView<Number>::VectorView(const unsigned int new_size, const Number * ptr) 
+VectorView<Number>::VectorView(const unsigned int new_size, const Number * ptr)
 {
     this->vec_size	= new_size;
     this->max_vec_size	= new_size;
@@ -330,7 +330,7 @@ void VectorView<Number>::reinit(const unsigned int new_size, Number * ptr)
 
 template<typename Number>
 inline
-void VectorView<Number>::reinit(const unsigned int new_size, const Number * ptr) 
+void VectorView<Number>::reinit(const unsigned int new_size, const Number * ptr)
 {
     this->vec_size	= new_size;
     this->max_vec_size	= new_size;
@@ -344,6 +344,8 @@ void VectorView<Number>::swap(Vector<Number> &)
 {
     AssertThrow(false, ExcMessage("Cant' swap a VectorView with a Vector!"));
 }
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
