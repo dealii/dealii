@@ -125,7 +125,7 @@ shouldn't surprise us: if we increase the Reynolds number, the scales
 on which we expect flow variation decrease and we will have to have a
 finer mesh.
 
-A rerun with one more mesh refinement dialed in in the parameter file
+A rerun with one more mesh refinement set in the parameter file
 confirms that results look much more sensible now:
 
 @image html step-35.Re_500.zoom_2.png
