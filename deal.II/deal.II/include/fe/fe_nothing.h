@@ -32,6 +32,39 @@ DEAL_II_NAMESPACE_OPEN
  * therefore assign no degrees of freedom to the FE_Nothing cells, and
  * this subregion is therefore implicitly deleted from the computation.
  *
+ * Note that some care must be taken that the resulting mesh topology
+ * continues to make sense when FE_Nothing elements are introduced.
+ * This is particularly true when dealing with hanging node constraints,
+ * because the library makes some basic assumptions about the nature
+ * of those constraints.  The following geometries are acceptable:
+ *
+ * +---------+----+----+
+ * |         | 0  |    |
+ * |    1    +----+----+
+ * |         | 0  |    |
+ * +---------+----+----+
+ *
+ * +---------+----+----+
+ * |         | 1  |    |
+ * |    0    +----+----+
+ * |         | 1  |    |
+ * +---------+----+----+
+ *
+ * Here, 0 denotes an FE_Nothing cell, and 1 denotes some other
+ * element type.  The library has no difficulty computing the necessary
+ * hanging node constraints in these cases (i.e. no constraint).  
+ * However, the following geometry is NOT acceptable (at least 
+ * in the current implementation):
+ *
+ * +---------+----+----+
+ * |         | 0  |    |
+ * |    1    +----+----+
+ * |         | 1  |    |
+ * +---------+----+----+
+ * 
+ * The distinction lies in the mixed nature of the child faces,
+ * a case we have not implemented as of yet.
+ *
  * @author Joshua White
  */
 template <int dim>
@@ -269,7 +302,7 @@ class FE_Nothing : public FiniteElement<dim>
                                       * FiniteElementBase::Domination and in
                                       * particular the @ref hp_paper "hp paper".
                                       *
-                                      * In the current case, the other element
+                                      * In the current case, this element
                                       * is always assumed to dominate, unless 
                                       * it is also of type FE_Nothing().  In
                                       * that situation, either element can

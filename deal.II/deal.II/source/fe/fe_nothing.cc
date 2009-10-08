@@ -182,15 +182,8 @@ compare_for_face_domination (const FiniteElement<dim> & fe_other) const
 {
   if(dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
     return FiniteElementDomination::either_element_can_dominate;
-    
-              // Question: Best to assume this element always dominates,
-              // since we will always no how to do deal with other elements
-              // regardless of type, or do we leave it up to the other 
-              // element to handle the FENothing appropriately?  Set
-              // to the second choice for now.
   else
-    return FiniteElementDomination::other_element_dominates;
-    //return FiniteElementDomination::this_element_dominates;
+    return FiniteElementDomination::this_element_dominates;
 }
    
    
@@ -199,7 +192,7 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_Nothing<dim> ::
 hp_vertex_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 {
-               // the FE_Nothing has no
+                                       // the FE_Nothing has no
 				       // degrees of freedom, so there
 				       // are no equivalencies to be
 				       // recorded
@@ -212,7 +205,7 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_Nothing<dim> ::
 hp_line_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 {
-               // the FE_Nothing has no
+                                       // the FE_Nothing has no
 				       // degrees of freedom, so there
 				       // are no equivalencies to be
 				       // recorded
@@ -225,7 +218,7 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_Nothing<dim> ::
 hp_quad_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 {
-               // the FE_Nothing has no
+                                       // the FE_Nothing has no
 				       // degrees of freedom, so there
 				       // are no equivalencies to be
 				       // recorded

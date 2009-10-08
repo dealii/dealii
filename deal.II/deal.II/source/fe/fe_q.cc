@@ -1257,7 +1257,7 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 				       // and rather allow the
 				       // function to be discontinuous
 				       // along the interface
-      return FiniteElementDomination::this_element_dominates;
+      return FiniteElementDomination::other_element_dominates;
     }
 
   Assert (false, ExcNotImplemented());

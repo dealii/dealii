@@ -2240,11 +2240,34 @@ namespace internal
 					       // on the face at all or no
 					       // anisotropic refinement
 	      if (cell->get_fe().dofs_per_face == 0)
-		continue;
+	      	continue;
 	      
 	      Assert(cell->face(face)->refinement_case()==RefinementCase<dim-1>::isotropic_refinement,
 		     ExcNotImplemented());
-	      
+
+					       // check to see if the child elements
+                                               // have no dofs on the
+                                               // shared face.  if none of them do, we
+                                               // we can simply continue to the next face.
+                                               // if only some of them have dofs, while
+                                               // others do not, then we don't know
+                                               // what to do and throw an exception.
+              bool any_are_zero = false;
+              bool all_are_zero = true;
+
+	      for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
+              {
+                if(cell->neighbor_child_on_subface (face, c)->get_fe().dofs_per_face == 0)
+                  any_are_zero = true;
+                else
+                  all_are_zero = false;
+              }
+
+              if(all_are_zero) 
+                continue;
+
+              Assert( all_are_zero || !any_are_zero, ExcNotImplemented() );
+
 					       // so now we've found a
 					       // face of an active
 					       // cell that has
@@ -2696,7 +2719,12 @@ namespace internal
 			cell->face(face)->get_dof_indices (slave_dofs,
 							   neighbor->active_fe_index ());
 			  
-						  
+							 // break if the n_master_dofs == 0,
+                                                         // because we are attempting to 
+                                                         // constrain to an element that has
+                                                         // has no face dofs
+                        if(master_dofs.size() == 0) break;
+ 
 							 // make sure
 							 // the element
 							 // constraints
