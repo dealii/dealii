@@ -123,8 +123,19 @@ the immediate wake of the obstacle, where the mesh is relatively fine,
 but that the problem appears where the mesh becomes too coarse. That
 shouldn't surprise us: if we increase the Reynolds number, the scales
 on which we expect flow variation decreases and we will have to have a
-finer mesh. A rerun with one more mesh refinement dialed in in the
-parameter file confirms that results look much more sensible now.
+finer mesh.
+
+A rerun with one more mesh refinement dialed in in the parameter file
+confirms that results look much more sensible now:
+
+@image html step-35.Re_500.zoom_2.png
+
+Here, the zone where the mesh becomes coarser is immediately
+downstream of the big red blob at the bottom of the wake behind the
+obstacle. While there are still quite visible oscillations beyond that
+point, it is clear that mesh refinement has already significantly
+helped, and we can expect that further refining the mesh will suppress
+the remaining oscillations as well.
 
 
 <a name="extensions"></a>
