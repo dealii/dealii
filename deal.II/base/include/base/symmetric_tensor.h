@@ -2086,6 +2086,25 @@ SymmetricTensor<2,3>::component_to_unrolled_index (const TableIndices<2> &indice
 
 template <>
 inline
+unsigned int
+SymmetricTensor<2,4>::component_to_unrolled_index (const TableIndices<2> &indices)
+{
+  const unsigned int dim = 4;
+  Assert (indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
+  Assert (indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
+
+  static const unsigned int table[dim][dim] = {{0, 4, 5, 6},
+					       {4, 1, 7, 8},
+					       {5, 7, 2, 9},
+					       {6, 8, 9, 3}};
+
+  return table[indices[0]][indices[1]];
+}
+
+
+
+template <>
+inline
 TableIndices<2>
 SymmetricTensor<2,1>::unrolled_to_component_indices (const unsigned int i)
 {
