@@ -122,7 +122,7 @@ It is clear here that the flow is still reasonably well resolved in
 the immediate wake of the obstacle, where the mesh is relatively fine,
 but that the problem appears where the mesh becomes too coarse. That
 shouldn't surprise us: if we increase the Reynolds number, the scales
-on which we expect flow variation decreases and we will have to have a
+on which we expect flow variation decrease and we will have to have a
 finer mesh.
 
 A rerun with one more mesh refinement dialed in in the parameter file
