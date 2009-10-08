@@ -28,12 +28,17 @@
  * this frequently leads to significant savings in compute time on
  * multiprocessor machines.
  *
- * deal.II supports operations running in %parallel on shared-memory (SMP)
- * machines through the functions and classes in the Threads namespace. The
- * MultithreadInfo class allows to query certain properties of the system,
- * such as the number of CPUs. These facilities for %parallel computing are
- * described in the following. The step-9, step-13 and step-14 tutorial
- * programs also show their use in practice.
+ * deal.II supports operations running in %parallel on shared-memory
+ * (SMP) machines through the functions and classes in the Threads
+ * namespace. The MultithreadInfo class allows to query certain
+ * properties of the system, such as the number of CPUs. These
+ * facilities for %parallel computing are described in the
+ * following. The step-9, step-13, step-14, step-32, step-35 and
+ * step-37 tutorial programs also show their use in practice, with the
+ * ones starting with step-32 using a more modern style of doing
+ * things in which essentially we describe <i>what</i> can be done in
+ * %parallel, while the older tutorial programs describe <i>how</i>
+ * things have to be done in %parallel.
  *
  * On the other hand, programs running on distributed memory machines
  * (i.e. clusters) need a different programming model built on top of MPI and
@@ -74,7 +79,7 @@
  * first. By way of example, consider the typical layout of a part of the
  * <code>setup_dofs</code> function that most of the tutorial programs have:
  * @code
-1  dof_handler.distribute_dofs (fe);  
+1  dof_handler.distribute_dofs (fe);
 2  DoFTools::make_hanging_node_constraints (dof_handler, hanging_node_constraints);
 3  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 4  hanging_node_constraints.condense (sparsity_pattern);
@@ -144,7 +149,7 @@
  * many different systems.
  *
  *
- * 
+ *
  * @anchor MTUsing
  * <h3>Using tasks from within deal.II</h3>
  *
@@ -239,7 +244,7 @@
      Threads::Task<double> t2 = Threads::new_task (&C::f2, *this, i);
      return t1.return_value() + t2.return_value();
    }
-   
+
    int main () {
      C c;
 
@@ -462,7 +467,7 @@
 			      Vector::iterator &dst_row) const
     {
       const unsigned int  row = (dst_row - dst.begin());
-      
+
       const double       *val_ptr    = &values[rowstart[row]];
       const unsigned int *colnum_ptr = &colnums[rowstart[row]];
 
@@ -539,7 +544,7 @@
 						  boost::cref(src),
 						  boost::ref(dst)),
 				     200);
-    } 
+    }
  * @endcode
  * Here, we call the <code>vmult_on_subrange</code> function on sub-ranges
  * of at least 200 elements each, so that the initial setup cost can amortize.
@@ -557,7 +562,7 @@
       const unsigned int *colnum_ptr = &colnums[0];
 
       double norm_sqr = 0;
-      
+
       for (unsigned int row=0; row<n_rows; ++row, ++dst_ptr)
 	{
 	  double s = 0.;
@@ -590,7 +595,7 @@
       Vector::iterator dst_ptr = dst.begin() + begin_row;
 
       double norm_sqr = 0;
-      
+
       for (unsigned int row=begin_row; row<end_row; ++row, ++dst_ptr)
 	{
 	  double s = 0.;
@@ -613,7 +618,7 @@
 						           _1, _2,
 						           boost::cref(x)),
 				              200));
-    } 
+    }
  * @endcode
  *
  *
@@ -637,7 +642,7 @@
    template <int dim>
    void MyClass<dim>::assemble_on_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell)
    { ... }
-   
+
    template <int dim>
    void MyClass<dim>::assemble_system ()
    {
@@ -674,7 +679,7 @@
    template <int dim>
    void MyClass<dim>::assemble_on_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell)
    { ... }
-   
+
    template <int dim>
    void MyClass<dim>::assemble_system ()
    {
@@ -716,7 +721,7 @@
      ...same for rhs...
    }
  * @endcode
- 
+
  *   The problem here is that several tasks, each running
  *   <code>MyClass::assemble_on_one_cell</code>, could potentially try
  *   to write into the object <code>MyClass::system_matrix</code> <i>at
@@ -737,7 +742,7 @@
      mutex.release ();
    }
  * @endcode
- 
+
  *   By making the mutex a static variable, it exists only once globally
  *   (i.e. once for all tasks that may be running in %parallel) and only one of
  *   the tasks can enter the region protected by the acquire/release calls on
@@ -774,7 +779,7 @@
  *   order is still as if we computed things sequentially. In other words, it
  *   may happen that we add the contributions of cell 1 before those of cell
  *   0. That may seem harmless because addition is commutative and
- *   associative, but in fact it 
+ *   associative, but in fact it
  *   is not if done in floating point arithmetic: $a+b+c \neq a+c+b$ -- take
  *   for example $a=1, b=-1, c=10^{-20}$ (because $1+10^{-20}=1$ in floating
  *   point arithmetic, using double precision).
@@ -808,7 +813,7 @@
      Vector<double>            cell_rhs;
      std::vector<unsigned int> dof_indices;
    }
- 
+
    template <int dim>
    void MyClass<dim>::assemble_on_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                             PerTaskData &data)
@@ -817,7 +822,7 @@
 
      data.cell_matrix = 0;
      data.cell_rhs    = 0;
-     
+
      // assemble local contributions
      fe_values.reinit (cell);
      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -838,13 +843,13 @@
 	                    data.cell_matrix(i,j));
      ...same for rhs...
    }
-   
+
    template <int dim>
    void MyClass<dim>::assemble_system ()
    {
      PerTaskData per_task_data;
      ...initialize members of per_task_data to the correct sizes...
-     
+
      WorkStream work_stream;
      work_stream.run (dof_handler.begin_active(),
 	              dof_handler.end(),
@@ -853,7 +858,7 @@
 		      &MyClass<dim>::copy_local_to_global,
 		      per_task_data);
    }
- * @endcode 
+ * @endcode
  *
  *   The way this works is that we create a sample <code>per_task_data</code>
  *   object that the work stream object will replicate once per task that runs
@@ -885,7 +890,7 @@
  *
  *   The way to avoid this is to put the FEValues object into a second
  *   structure that will hold scratch data, and initialize it in the
- *   constructor: 
+ *   constructor:
  * @code
    struct PerTaskData {
      FullMatrix<double>        cell_matrix;
@@ -983,7 +988,7 @@
 		      &MyClass<dim>::assemble_on_one_cell,
 		      &MyClass<dim>::copy_local_to_global,
 		      per_task_data);
-     // ...is the same as:		      
+     // ...is the same as:
      work_stream.run (dof_handler.begin_active(),
 	              dof_handler.end(),
 		      boost::bind(&MyClass<dim>::assemble_on_one_cell, *this, _1, _2, _3),
@@ -1037,6 +1042,10 @@
  * function with the cell and scratch and per task objects which will be filled
  * in at the positions indicated by <code>_1, _2</code> and <code>_3</code>.
  *
+ * To see the WorkStream class used in practice on tasks like the ones
+ * outlined above, take a look at the step-32, step-35 or step-37
+ * tutorial programs.
+ *
  *
  * @anchor MTThreads
  * <h3>Thread-based parallelism</h3>
@@ -1044,8 +1053,8 @@
  * Even though tasks are a higher-level way to describe things, there are
  * cases where they are poorly suited to a task. The main reason for not
  * using tasks even for computations that are independent are listed in the
- * section on 
- * @ref MTHow "How scheduling tasks works and when task-based programming is not efficient" 
+ * section on
+ * @ref MTHow "How scheduling tasks works and when task-based programming is not efficient"
  * above. Primarily, jobs that are not able to fully utilize the CPU are bad
  * fits for tasks.
  *
@@ -1064,7 +1073,7 @@
      data_out.build_patches ();
 
      std::ofstream output ("solution.vtk");
-     
+
      Threads::Thread<void>
        thread = Threads::new_thread (&DataOut<dim>::write_vtk, data_out, output);
 
@@ -1074,7 +1083,7 @@
 				        typename FunctionMap<dim>::type(),
 				        solution,
 				        estimated_error_per_cell);
-     thread.join ();					
+     thread.join ();
  * @endcode
  *
  * Here, Threads::new_thread starts the given function that writes to the
