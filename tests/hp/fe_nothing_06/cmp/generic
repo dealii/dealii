@@ -1,0 +1,14 @@
+
+DEAL::Try dim == 1
+DEAL::   Number of active cells:       4
+DEAL::   Number of degrees of freedom: 8
+DEAL::   Number of constraints:        0
+DEAL::Try dim == 2
+DEAL::   Number of active cells:       10
+DEAL::   Number of degrees of freedom: 75
+DEAL::   Number of constraints:        7
+DEAL::Try dim == 3
+DEAL::   Number of active cells:       22
+DEAL::   Number of degrees of freedom: 583
+DEAL::   Number of constraints:        126
+DEAL::OK
