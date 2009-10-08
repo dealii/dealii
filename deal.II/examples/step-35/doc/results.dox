@@ -112,7 +112,7 @@ is much more unorganized, swaying between the bottom and top boundary
 of the domain. On the other hand, the vorticity can't be right: it
 oscillates rapidly, not something we would expect for a Reynolds
 number that is still only moderate and that would not produce
-turbulence at very small length scales. The riddle is easily solved,
+small scale dynamics. The riddle is easily solved,
 however, by looking at a zoom at the region behind the obstacle, and
 the mesh size we have there:
 
