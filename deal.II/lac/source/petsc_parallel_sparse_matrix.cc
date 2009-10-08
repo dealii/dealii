@@ -240,13 +240,10 @@ namespace PETScWrappers
 #ifdef PETSC_USE_64BIT_INDICES
       const std::vector<PetscInt> int_row_lengths (row_lengths.begin(),
 						   row_lengths.end());
-      PetscInt
 #else
       const std::vector<signed int> int_row_lengths (row_lengths.begin(),
                                                      row_lengths.end());
-      int
 #endif
-	petsc_m = m, petsc_n = n;
 
 //TODO: There must be a significantly better way to provide information about the off-diagonal blocks of the matrix. this way, petsc keeps allocating tiny chunks of memory, and gets completely hung up over this
 
