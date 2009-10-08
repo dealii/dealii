@@ -911,7 +911,7 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 
 
 
-				 // @sect3{Laplace operator}
+				 // @sect3{Laplace operator implementation}
 
 				 // This class implements the local action
 				 // of a Laplace operator on a quadrature
