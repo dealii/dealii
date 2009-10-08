@@ -44,3 +44,10 @@ DEAL::Number of degrees of freedom: 20609   L0: 8   L1: 25   L2: 89   L3: 337   
 DEAL:cg::Starting value 0.0253688
 DEAL:cg::Convergence step 10 value 9.41828e-14
 </pre>
+
+
+<h3> Possible extensions </h3>
+
+A close inspection of this program's performance shows that it is mostly
+dominated by matrix-vector operations. @ref step-37 "Step-37" shows one way
+how this can be avoided by working with matrix-free methods.
