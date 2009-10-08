@@ -11,8 +11,8 @@
 /*    further information on this license.                        */
 
 
-				 // The include files are more or less the
-				 // same as in step-16.
+				 // To start with the include files are more
+				 // or less the same as in step-16:
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
@@ -51,16 +51,16 @@ using namespace dealii;
 
 
 
-				 // @sect3{Equation data.}
+				 // @sect3{Equation data}
 
 				 // We define a variable coefficient function
 				 // for the Poisson problem. It is similar to
-				 // the function in step-5. As a difference,
-				 // we use the formulation $\frac{1}{0.1 +
-				 // \|\bf x\|^2}$ instead of a discontinuous
-				 // one. It is merely to demonstrate the
-				 // possibilities of this implementation,
-				 // rather than making much sense physically.
+				 // the function in step-5 but we use the form
+				 // $a(\mathbf x)=\frac{1}{0.1 + \|\bf x\|^2}$
+				 // instead of a discontinuous one. It is
+				 // merely to demonstrate the possibilities of
+				 // this implementation, rather than making
+				 // much sense physically.
 template <int dim>
 class Coefficient : public Function<dim>
 {
@@ -104,64 +104,64 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
 
 
-				 // @sect3{Matrix-free implementation.}
+				 // @sect3{Matrix-free implementation}
 
-				// First com a few declarations that we use
-				// for defining the %parallel layout of the
-				// vector multiplication function with the
-				// WorkStream concept in the Matrix-free
-				// class. These comprise so-called scratch
-				// data that we use for calculating
-				// cell-related information, and copy data
-				// that is eventually used in a separate
-				// function for writing local data into the
-				// global vector. The reason for this split-up
-				// definition is that many threads at a time
-				// can execute the local multiplications (and
-				// filling up the copy data), but than that
-				// copy data needs to be worked on by one
-				// process at a time.
+				 // Next come a few declarations that we use
+				 // for defining the %parallel layout of the
+				 // vector multiplication function with the
+				 // WorkStream concept in the Matrix-free
+				 // class. These comprise so-called scratch
+				 // data that we use for calculating
+				 // cell-related information, and copy data
+				 // that is eventually used in a separate
+				 // function for writing local data into the
+				 // global vector. The reason for this split-up
+				 // definition is that many threads at a time
+				 // can execute the local multiplications (and
+				 // filling up the copy data), but than that
+				 // copy data needs to be worked on by one
+				 // process at a time.
 namespace WorkStreamData
 {
   template <typename number>
   struct ScratchData
   {
-    ScratchData ();
-    ScratchData (const ScratchData &scratch);
-    FullMatrix<number> solutions;
+      ScratchData ();
+      ScratchData (const ScratchData &scratch);
+      FullMatrix<number> solutions;
   };
 
   template<typename number>
   ScratchData<number>::ScratchData ()
-    :
-    solutions ()
+		  :
+		  solutions ()
   {}
 
   template<typename number>
   ScratchData<number>::ScratchData (const ScratchData &scratch)
-    :
-    solutions ()
+		  :
+		  solutions ()
   {}
 
   template <typename number>
   struct CopyData : public ScratchData<number>
   {
-    CopyData ();
-    CopyData (const CopyData &scratch);
-    unsigned int first_cell;
-    unsigned int n_dofs;
+      CopyData ();
+      CopyData (const CopyData &scratch);
+      unsigned int first_cell;
+      unsigned int n_dofs;
   };
 
   template <typename number>
   CopyData<number>::CopyData ()
-    :
-    ScratchData<number> ()
+		  :
+		  ScratchData<number> ()
   {}
 
   template <typename number>
   CopyData<number>::CopyData (const CopyData &scratch)
-    :
-    ScratchData<number> ()
+		  :
+		  ScratchData<number> ()
   {}
 
 }
@@ -237,25 +237,25 @@ class MatrixFree : public Subscriptor
 
     std::size_t memory_consumption () const;
 
-				 // The private member variables of the
-				 // <code>MatrixFree</code> class are a
-				 // small matrix that does the
-				 // transformation from solution values to
-				 // quadrature points, a list with the
-				 // mapping between local degrees of freedom
-				 // and global degrees of freedom for each
-				 // cell (stored as a two-dimensional array,
-				 // where the each row corresponds to one
-				 // cell, and the columns within individual
-				 // cells are the local degrees of freedom),
-				 // the transformation variable for
-				 // implementing derivatives, a constraint
-				 // matrix for handling boundary conditions
-				 // as well as a few other variables that
-				 // store matrix properties.
+				     // The private member variables of the
+				     // <code>MatrixFree</code> class are a
+				     // small matrix that does the
+				     // transformation from solution values to
+				     // quadrature points, a list with the
+				     // mapping between local degrees of freedom
+				     // and global degrees of freedom for each
+				     // cell (stored as a two-dimensional array,
+				     // where the each row corresponds to one
+				     // cell, and the columns within individual
+				     // cells are the local degrees of freedom),
+				     // the transformation variable for
+				     // implementing derivatives, a constraint
+				     // matrix for handling boundary conditions
+				     // as well as a few other variables that
+				     // store matrix properties.
   private:
     typedef std::vector<std::pair<unsigned int,unsigned int> >::const_iterator
-      CellChunkIterator;
+    CellChunkIterator;
     template <typename number2>
     void local_vmult (CellChunkIterator                    cell_range,
 		      WorkStreamData::ScratchData<number> &scratch,
@@ -278,10 +278,10 @@ class MatrixFree : public Subscriptor
 
     struct MatrixSizes
     {
-      unsigned int n_dofs, n_cells;
-      unsigned int m, n;
-      unsigned int n_points, n_comp;
-      std::vector<std::pair<unsigned int,unsigned int> > chunks;
+	unsigned int n_dofs, n_cells;
+	unsigned int m, n;
+	unsigned int n_points, n_comp;
+	std::vector<std::pair<unsigned int,unsigned int> > chunks;
     }  matrix_sizes;
 };
 
@@ -296,8 +296,8 @@ class MatrixFree : public Subscriptor
 				 // else, e.g. in a preconditioner.
 template <typename number, class Transformation>
 MatrixFree<number,Transformation>::MatrixFree ()
-    :
-    Subscriptor()
+		:
+		Subscriptor()
 {}
 
 
@@ -444,79 +444,79 @@ template <typename number, class Transformation>
 template <typename number2>
 void
 MatrixFree<number,Transformation>::
-  local_vmult (CellChunkIterator                    cell_range,
-	       WorkStreamData::ScratchData<number> &scratch,
-	       WorkStreamData::CopyData<number>    &copy,
-	       const Vector<number2>               &src) const
+local_vmult (CellChunkIterator                    cell_range,
+	     WorkStreamData::ScratchData<number> &scratch,
+	     WorkStreamData::CopyData<number>    &copy,
+	     const Vector<number2>               &src) const
 {
   const unsigned int chunk_size = cell_range->second - cell_range->first;
 
-				 // OK, now we are sitting in the loop that
-				 // goes over our chunks of cells. What we
-				 // need to do is five things: First, we have
-				 // to give the full matrices containing the
-				 // solution at cell dofs and quadrature
-				 // points the correct sizes. We use the
-				 // <code>true</code> argument in order to
-				 // specify that this should be done fast,
-				 // i.e., the field will not be initialized
-				 // since we fill them manually in the very
-				 // next step second anyway. Then, we copy the
-				 // source values from the global vector to
-				 // the local cell range, and we perform a
-				 // matrix-matrix product to transform the
-				 // values to the quadrature points. It is a
-				 // bit tricky to find out how the matrices
-				 // should be multiplied with each other,
-				 // i.e., which matrix needs to be
-				 // transposed. One way to resolve this is to
-				 // look at the matrix dimensions:
-				 // <code>solution_cells</code> has
-				 // <code>current_chunk_size</code> rows and
-				 // <code>matrix_sizes.m</code> columns,
-				 // whereas <code>small_matrix</code> has
-				 // <code>matrix_sizes.m</code> rows and
-				 // <code>matrix_sizes.n</code> columns, which
-				 // is also the size of columns in the output
-				 // matrix
-				 // <code>solution_points</code>. Hence, the
-				 // columns of the first matrix are as many as
-				 // there are rows in the second, which means
-				 // that the product is done non-transposed
-				 // for both matrices.
-				 //
-				 // Once the first product is calculated, we
-				 // apply the derivative information on all
-				 // the cells and all the quadrature points by
-				 // calling the <code>transform</code>
-				 // operation of the
-				 // <code>Transformation</code> class, and
-				 // then use a second matrix-matrix product to
-				 // get back to the solution values at the
-				 // support points. This time, we need to
-				 // transpose the small matrix, indicated by a
-				 // <code>mTmult</code> in the operations. The
-				 // fifth and last step is to add the local
-				 // data into the global vector, which is what
-				 // we did in many tutorial programs when
-				 // assembling right hand sides. We use the
-				 // <code>indices_local_to_global</code> field
-				 // to find out how local dofs and global dofs
-				 // are related to each other. Since we
-				 // simultaneously apply the constraints, we
-				 // hand this task off to the ConstraintMatrix
-				 // object. Most often, the ConstraintMatrix
-				 // function is used to be applied to data
-				 // from one cell at a time, but since we work
-				 // on a whole chunk of dofs, we can feed the
-				 // function with data from all the cells at
-				 // once. We do this in an extra function
-				 // since we split between %parallel code that
-				 // can be run independently (this function)
-				 // and code that needs to be synchronized
-				 // between threads
-				 // (<code>copy_local_to_global</code>
-				 // function).
+				   // OK, now we are sitting in the loop that
+				   // goes over our chunks of cells. What we
+				   // need to do is five things: First, we have
+				   // to give the full matrices containing the
+				   // solution at cell dofs and quadrature
+				   // points the correct sizes. We use the
+				   // <code>true</code> argument in order to
+				   // specify that this should be done fast,
+				   // i.e., the field will not be initialized
+				   // since we fill them manually in the very
+				   // next step second anyway. Then, we copy the
+				   // source values from the global vector to
+				   // the local cell range, and we perform a
+				   // matrix-matrix product to transform the
+				   // values to the quadrature points. It is a
+				   // bit tricky to find out how the matrices
+				   // should be multiplied with each other,
+				   // i.e., which matrix needs to be
+				   // transposed. One way to resolve this is to
+				   // look at the matrix dimensions:
+				   // <code>solution_cells</code> has
+				   // <code>current_chunk_size</code> rows and
+				   // <code>matrix_sizes.m</code> columns,
+				   // whereas <code>small_matrix</code> has
+				   // <code>matrix_sizes.m</code> rows and
+				   // <code>matrix_sizes.n</code> columns, which
+				   // is also the size of columns in the output
+				   // matrix
+				   // <code>solution_points</code>. Hence, the
+				   // columns of the first matrix are as many as
+				   // there are rows in the second, which means
+				   // that the product is done non-transposed
+				   // for both matrices.
+				   //
+				   // Once the first product is calculated, we
+				   // apply the derivative information on all
+				   // the cells and all the quadrature points by
+				   // calling the <code>transform</code>
+				   // operation of the
+				   // <code>Transformation</code> class, and
+				   // then use a second matrix-matrix product to
+				   // get back to the solution values at the
+				   // support points. This time, we need to
+				   // transpose the small matrix, indicated by a
+				   // <code>mTmult</code> in the operations. The
+				   // fifth and last step is to add the local
+				   // data into the global vector, which is what
+				   // we did in many tutorial programs when
+				   // assembling right hand sides. We use the
+				   // <code>indices_local_to_global</code> field
+				   // to find out how local dofs and global dofs
+				   // are related to each other. Since we
+				   // simultaneously apply the constraints, we
+				   // hand this task off to the ConstraintMatrix
+				   // object. Most often, the ConstraintMatrix
+				   // function is used to be applied to data
+				   // from one cell at a time, but since we work
+				   // on a whole chunk of dofs, we can feed the
+				   // function with data from all the cells at
+				   // once. We do this in an extra function
+				   // since we split between %parallel code that
+				   // can be run independently (this function)
+				   // and code that needs to be synchronized
+				   // between threads
+				   // (<code>copy_local_to_global</code>
+				   // function).
   copy.solutions.reinit    (chunk_size,matrix_sizes.m, true);
   copy.first_cell         = cell_range->first;
   copy.n_dofs             = chunk_size*matrix_sizes.m;
@@ -541,8 +541,8 @@ template <typename number, class Transformation>
 template <typename number2>
 void
 MatrixFree<number,Transformation>::
-  copy_local_to_global (const WorkStreamData::CopyData<number> &copy,
-			Vector<number2>                        &dst) const
+copy_local_to_global (const WorkStreamData::CopyData<number> &copy,
+		      Vector<number2>                        &dst) const
 {
   constraints.distribute_local_to_global (&copy.solutions(0,0),
 					  &copy.solutions(0,0)+copy.n_dofs,
@@ -652,21 +652,21 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 		   WorkStreamData::CopyData<number>(),
 		   2*multithread_info.n_default_threads,1);
 
-				 // One thing to be cautious about: The
-				 // deal.II classes expect that the matrix
-				 // still contains a diagonal entry for
-				 // constrained dofs (otherwise, the matrix
-				 // would be singular, which is not what we
-				 // want). Since the
-				 // <code>distribute_local_to_global</code>
-				 // command of the constraint matrix which we
-				 // used for adding the local elements into
-				 // the global vector does not do anything
-				 // with constrained elements, we have to
-				 // circumvent that problem by artificially
-				 // setting the diagonal to some non-zero
-				 // value and adding the source values. We
-				 // simply set it to one.
+				   // One thing to be cautious about: The
+				   // deal.II classes expect that the matrix
+				   // still contains a diagonal entry for
+				   // constrained dofs (otherwise, the matrix
+				   // would be singular, which is not what we
+				   // want). Since the
+				   // <code>distribute_local_to_global</code>
+				   // command of the constraint matrix which we
+				   // used for adding the local elements into
+				   // the global vector does not do anything
+				   // with constrained elements, we have to
+				   // circumvent that problem by artificially
+				   // setting the diagonal to some non-zero
+				   // value and adding the source values. We
+				   // simply set it to one.
   for (unsigned int i=0; i<matrix_sizes.n_dofs; ++i)
     if (constraints.is_constrained(i) == true)
       dst(i) += 1.0 * src(i);
@@ -722,47 +722,47 @@ reinit (const unsigned int        n_dofs_in,
   Assert(matrix_sizes.n_comp * n_points_per_cell == small_matrix.n(),
 	 ExcInternalError());
 
-				 // One thing to make the matrix-vector
-				 // product with this class efficient is to
-				 // decide how many cells should be combined
-				 // to one chunk, which will determine the
-				 // size of the full matrix that we work
-				 // on. If we choose too few cells, then the
-				 // gains from using the matrix-matrix product
-				 // will not be fully utilized (dgemm tends to
-				 // provide more efficiency the larger the
-				 // matrix dimensions get). If we choose too
-				 // many, we will firstly degrade
-				 // parallelization (we need to have
-				 // sufficiently independent tasks), and
-				 // secondly introduce an inefficiency that
-				 // comes from the computer architecture: In
-				 // the actual working function above, right
-				 // after the first matrix-matrix
-				 // multiplication, we transform the solution
-				 // on quadrature points by using
-				 // derivatives. Obviously, we want to have
-				 // fast access to that data, so it should
-				 // still be present in processor cache and
-				 // not needed to be fetched from main
-				 // memory. The total memory usage of the data
-				 // on quadrature points should not be more
-				 // than about a third of the cache size of
-				 // the processor in order to be on the safe
-				 // side. Since most today's processors
-				 // provide 512 kB or more cache memory per
-				 // core, we choose about 150 kB as a size to
-				 // leave some room for other things to be
-				 // stored in the CPU. Clearly, this is an
-				 // architecture-dependent value and the
-				 // interested user can squeeze out some extra
-				 // performance by hand-tuning this
-				 // parameter. Once we have chosen the number
-				 // of cells we collect in one chunk, we
-				 // determine how many chunks we have on the
-				 // given cell range and recalculate the
-				 // actual chunk size in order to evenly
-				 // distribute the chunks.
+				   // One thing to make the matrix-vector
+				   // product with this class efficient is to
+				   // decide how many cells should be combined
+				   // to one chunk, which will determine the
+				   // size of the full matrix that we work
+				   // on. If we choose too few cells, then the
+				   // gains from using the matrix-matrix product
+				   // will not be fully utilized (dgemm tends to
+				   // provide more efficiency the larger the
+				   // matrix dimensions get). If we choose too
+				   // many, we will firstly degrade
+				   // parallelization (we need to have
+				   // sufficiently independent tasks), and
+				   // secondly introduce an inefficiency that
+				   // comes from the computer architecture: In
+				   // the actual working function above, right
+				   // after the first matrix-matrix
+				   // multiplication, we transform the solution
+				   // on quadrature points by using
+				   // derivatives. Obviously, we want to have
+				   // fast access to that data, so it should
+				   // still be present in processor cache and
+				   // not needed to be fetched from main
+				   // memory. The total memory usage of the data
+				   // on quadrature points should not be more
+				   // than about a third of the cache size of
+				   // the processor in order to be on the safe
+				   // side. Since most today's processors
+				   // provide 512 kB or more cache memory per
+				   // core, we choose about 150 kB as a size to
+				   // leave some room for other things to be
+				   // stored in the CPU. Clearly, this is an
+				   // architecture-dependent value and the
+				   // interested user can squeeze out some extra
+				   // performance by hand-tuning this
+				   // parameter. Once we have chosen the number
+				   // of cells we collect in one chunk, we
+				   // determine how many chunks we have on the
+				   // given cell range and recalculate the
+				   // actual chunk size in order to evenly
+				   // distribute the chunks.
   const unsigned int divisor = 150000/(matrix_sizes.n*sizeof(double));
   unsigned int n_chunks = matrix_sizes.n_cells/divisor + 1;
   if (n_chunks<2*multithread_info.n_default_threads)
@@ -900,18 +900,18 @@ template <typename number, class Transformation>
 std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 {
   std::size_t glob_size = derivatives.memory_consumption() +
-    indices_local_to_global.memory_consumption() +
-    constraints.memory_consumption() +
-    small_matrix.memory_consumption() +
-    diagonal_values.memory_consumption() +
-    matrix_sizes.chunks.size()*2*sizeof(unsigned int) +
-    sizeof(*this);
+			  indices_local_to_global.memory_consumption() +
+			  constraints.memory_consumption() +
+			  small_matrix.memory_consumption() +
+			  diagonal_values.memory_consumption() +
+			  matrix_sizes.chunks.size()*2*sizeof(unsigned int) +
+			  sizeof(*this);
   return glob_size;
 }
 
 
 
-				 // @sect3{Laplace operator.}
+				 // @sect3{Laplace operator}
 
 				 // This class implements the local action
 				 // of a Laplace operator on a quadrature
@@ -1017,11 +1017,11 @@ void LaplaceOperator<dim,number>::transform (number* result) const
       const number temp1 = result[0];
       const number temp2 = result[1];
       result[0] = transformation[0] * temp1 + transformation[1] * temp2 +
-	transformation[2] * result[2];
+		  transformation[2] * result[2];
       result[1] = transformation[1] * temp1 + transformation[3] * temp2 +
-	transformation[4] * result[2];
+		  transformation[4] * result[2];
       result[2] = transformation[2] * temp1 + transformation[4] * temp2 +
-	transformation[5] * result[2];
+		  transformation[5] * result[2];
     }
   else
     ExcNotImplemented();
@@ -1069,7 +1069,7 @@ LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor)
 
 
 
-				 // @sect3{LaplaceProblem class.}
+				 // @sect3{LaplaceProblem class}
 
 				 // This class is based on the same class in
 				 // step-16. We replaced the
@@ -1186,19 +1186,19 @@ void LaplaceProblem<dim>::setup_system ()
   solution.reinit (mg_dof_handler.n_dofs());
   system_rhs.reinit (mg_dof_handler.n_dofs());
 
-				 // Initialize the matrices for the
-				 // multigrid method on all the
-				 // levels. Unfortunately, the function
-				 // MGTools::make_boundary_list cannot write
-				 // Dirichlet boundary conditions into a
-				 // ConstraintMatrix object directly, so we
-				 // first have to make the boundary list and
-				 // then manually fill the boundary
-				 // conditions using the command
-				 // ConstraintMatrix::add_line. Once this is
-				 // done, we close the ConstraintMatrix so
-				 // it can be used for matrix-vector
-				 // products.
+				   // Initialize the matrices for the
+				   // multigrid method on all the
+				   // levels. Unfortunately, the function
+				   // MGTools::make_boundary_list cannot write
+				   // Dirichlet boundary conditions into a
+				   // ConstraintMatrix object directly, so we
+				   // first have to make the boundary list and
+				   // then manually fill the boundary
+				   // conditions using the command
+				   // ConstraintMatrix::add_line. Once this is
+				   // done, we close the ConstraintMatrix so
+				   // it can be used for matrix-vector
+				   // products.
   typename FunctionMap<dim>::type dirichlet_boundary;
   ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
@@ -1375,12 +1375,12 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 	}
     }
 
-				 // Here, we need to condense the boundary
-				 // conditions on the coarse matrix. There
-				 // is no built-in function for doing this
-				 // on a full matrix, so manually delete the
-				 // rows and columns of the matrix that are
-				 // constrained.
+				   // Here, we need to condense the boundary
+				   // conditions on the coarse matrix. There
+				   // is no built-in function for doing this
+				   // on a full matrix, so manually delete the
+				   // rows and columns of the matrix that are
+				   // constrained.
   for (unsigned int i=0; i<coarse_matrix.m(); ++i)
     if (mg_matrices[0].get_constraints().is_constrained(i))
       for (unsigned int j=0; j<coarse_matrix.n(); ++j)
@@ -1452,37 +1452,37 @@ void LaplaceProblem<dim>::solve ()
 				mg_smoother);
   PreconditionMG<dim, Vector<double>,
     MGTransferPrebuilt<Vector<double> > >
-    preconditioner(mg_dof_handler, mg, mg_transfer);
+  preconditioner(mg_dof_handler, mg, mg_transfer);
 
-				   // Finally, write out the memory
-				   // consumption of the Multigrid object
-				   // (or rather, of its most significant
-				   // components, since there is no built-in
-				   // function for the total multigrid
-				   // object), then create the solver object
-				   // and solve the system. This is very
-				   // easy, and we didn't even see any
-				   // difference in the solve process
-				   // compared to step-16. The magic is all
-				   // hidden behind the implementation of
-				   // the MatrixFree::vmult operation.
-  double multigrid_memory =
-    (double)mg_matrices.memory_consumption() +
-    (double)mg_transfer.memory_consumption() +
-    (double)coarse_matrix.memory_consumption();
-  std::cout << "Multigrid objects memory consumption: "
-	    << multigrid_memory*std::pow(2.,-20.)
-	    << " MBytes."
-	    << std::endl;
+				 // Finally, write out the memory
+				 // consumption of the Multigrid object
+				 // (or rather, of its most significant
+				 // components, since there is no built-in
+				 // function for the total multigrid
+				 // object), then create the solver object
+				 // and solve the system. This is very
+				 // easy, and we didn't even see any
+				 // difference in the solve process
+				 // compared to step-16. The magic is all
+				 // hidden behind the implementation of
+				 // the MatrixFree::vmult operation.
+double multigrid_memory =
+  (double)mg_matrices.memory_consumption() +
+  (double)mg_transfer.memory_consumption() +
+  (double)coarse_matrix.memory_consumption();
+std::cout << "Multigrid objects memory consumption: "
+<< multigrid_memory*std::pow(2.,-20.)
+<< " MBytes."
+<< std::endl;
 
-  SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              cg (solver_control);
+SolverControl           solver_control (1000, 1e-12);
+SolverCG<>              cg (solver_control);
 
-  cg.solve (system_matrix, solution, system_rhs,
-  	    preconditioner);
+cg.solve (system_matrix, solution, system_rhs,
+	  preconditioner);
 
-  std::cout << "Convergence in " << solver_control.last_step()
-	    << " CG iterations." << std::endl;
+std::cout << "Convergence in " << solver_control.last_step()
+<< " CG iterations." << std::endl;
 }
 
 
@@ -1546,11 +1546,39 @@ void LaplaceProblem<dim>::run ()
 
 
 				 // @sect3{The <code>main</code> function}
+
+				 // This is as in all other programs:
 int main ()
 {
-  deallog.depth_console (0);
-  LaplaceProblem<2> laplace_problem (2);
-  laplace_problem.run ();
+  try
+    {
+      deallog.depth_console (0);
+      LaplaceProblem<2> laplace_problem (2);
+      laplace_problem.run ();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
 
   return 0;
 }
