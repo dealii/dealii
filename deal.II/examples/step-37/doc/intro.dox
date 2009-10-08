@@ -15,8 +15,8 @@ unstructured mesh representing a circle.
 
 <h4>Philosophical view on usual matrix-vector products</h4>
 
-In most of deal.II tutorial programs the code is built around assembling
-some sparse matrix and solving a linear equation system based on that
+In most deal.II tutorial programs the code is built around assembling
+some sparse matrix and solving a linear system of equations based on that
 matrix. The run time of such programs is mostly spent in the construction of
 the sparse matrix (assembling) and in performing some matrix-vector products
 (possibly together with some substitutions like in SSOR preconditioners) in
@@ -26,8 +26,11 @@ of the equation to be solved, between 40 and 95 per cent of the computational
 time is spent in performing sparse matrix-vector products.
 
 Let us briefly look at a simplified version of code for the matrix-vector
-product (the actual implementation in deal.II uses a different layout for
-the innermost loop, which avoids having the counter variable):
+product when the matrix is stored in the usual sparse compressed row storage
+&mdash; in short CRS &mdash; format implemented by the SparsityPattern and
+SparseMatrix classes (the actual implementation in deal.II uses a slightly
+different structure for the innermost loop, thereby avoiding the counter
+variable):
 @code
 // y = A * x
 std::size_t element_index = 0;
@@ -56,9 +59,9 @@ caches) and that we use a compressed storage scheme for the sparse matrix,
 i.e., the format deal.II matrices (as well as PETSc and Trilinos matrices)
 use. Then each matrix element corresponds to 12 bytes of data, 8 bytes for the
 respective element in <code>matrix_values</code>, and 4 bytes for the unsigned
-integer position <code>column_indices</code> that tells which vector element
+integer position <code>column_indices</code> that indicates which vector element
 we actually use for multiplication. Here we neglect the additional array that
-tells us the ranges of individual rows in the matrix. With that 12 bytes of
+tells us the ranges of individual rows in the matrix. With those 12 bytes of
 data, we perform two floating point operations, a multiplication and an
 addition. If our matrix has one billion entries, a matrix-vector product
 consists of two billion floating point operations, 2 GFLOP. One core of a
@@ -80,7 +83,7 @@ multiple cores have to compete for memory bandwidth. Imagine we have 8 cores
 available with a theoretical peak performance of 96 GFLOP/s. However, these
 cores sit on a machine with about 35 GB/s of memory bandwidth. For our
 matrix-vector product, we would get a performance of about 6 GFLOP/s, which is
-at nightmarish 6 per cent of the system's peak performance. And this is the
+a nightmarish 6 per cent of the system's peak performance. And this is the
 theoretical maximum we can get!
 
 Things won't get better in the future, rather worse: Memory bandwidth will
@@ -112,10 +115,11 @@ looking how some finite-element related matrix $A$ is assembled:
 A = \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T A_\mathrm{cell}
 P_\mathrm{cell,{loc-glob}}.
 @f}
-In this formula, the matrix $P_\mathrm{cell,{loc-glob}}$ is a permutation
-matrix that defines the mapping from local degrees of freedom in the cells
+In this formula, the matrix $P_\mathrm{cell,{loc-glob}}$ is a rectangular
+matrix that defines the index mapping from local degrees of freedom in the
+current cell
 to the global degrees of freedom. The information from which this
-operator can be build is usually encoded in the
+operator can be built is usually encoded in the
 <code>local_dof_indices</code> variable we have always used in the
 assembly of matrices.
 
@@ -130,9 +134,8 @@ A_\mathrm{cell} x_\mathrm{cell}
 &=& \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
 y_\mathrm{cell},
 @f}
-where $x_\mathrm{cell}$ is the values of <i>x</i> at the degrees of freedom
-of the respective cell, and $y_\mathrm{cell}$ does so for the result.
-
+where $x_\mathrm{cell}$ are the values of <i>x</i> at the degrees of freedom
+of the respective cell, and $y_\mathrm{cell}$ correspondingly for the result.
 A naive attempt to implement the local action of the Laplacian would hence be
 to use the following code:
 @code
@@ -183,8 +186,8 @@ MatrixFree::vmult (Vector<double>       &dst,
 @endcode
 
 Here we neglected boundary conditions as well as any hanging nodes we
-may have. It is not very difficult to
-include them using the ConstraintMatrix class. Note how we first generate the local
+may have, though neither would be very difficult to
+include using the ConstraintMatrix class. Note how we first generate the local
 matrix in the usual way. To form the actual product as expressed in the
 above formula, we read in the values of <code>src</code> of the cell-related
 degrees of freedom, multiply by the local matrix, and finally add the result
@@ -197,16 +200,17 @@ elements as there are degrees of freedom on the actual cell to compute. The
 multiplication itself is then done by two nested loops, which means that it
 is much cheaper.
 
-One way to improve this is to realize that we actually build the local
-matrix by a product of three matrices,
+One way to improve this is to realize that conceptually the local
+matrix can be thought of as the product of three matrices,
 @f{eqnarray*}
-A_\mathrm{cell} = B D B^T.
+A_\mathrm{cell} = B D B^T,
 @f}
-Here, the $(i,q*\mathrm{dim}+d)$-th element of <i>B</i> is given by
+where for the example of the Laplace operator 
+the $(i,q*\mathrm{dim}+d)$-th element of <i>B</i> is given by
 <code>fe_values.shape_grad(i,q)[d]</code> (i.e., it consists of
 <code>dofs_per_cell</code> rows and <code>dim*n_q_points</code>
 columns). The matrix <i>D</i> is diagonal and contains the values
-<code>JxW(q)</code> (or, rather, <code>dim</code> copies of it).
+<code>fe_values.JxW(q)</code> (or, rather, <code>dim</code> copies of it).
 
 Every numerical analyst learns in one of her first classes that for
 forming a product of the form
@@ -270,9 +274,9 @@ operations done by the call <code>fe_values.reinit(cell)</code> take about
 as much time as the other steps together (at least if the mesh is
 unstructured; deal.II can recognize that the gradients are often unchanged
 on structured meshes). That is certainly not ideal and we would like to do
-smarter than this. What the reinit function does is to calculate the
+better than this. What the reinit function does is to calculate the
 gradient in real space by transforming the gradient on the reference cell
-using the Jacobian of the transformation from real to unit cell. This is
+using the Jacobian of the transformation from real to reference cell. This is
 done for each basis function on the cell on each quadrature point. The
 Jacobian does not depend on the basis function, but it is different on
 different quadrature points in general. The trick is now to factor out the
@@ -393,10 +397,10 @@ there are a few more points done to be even more efficient, namely:
       matrix-matrix product (several vectors of cell-data form a matrix),
       which enables a faster implementation. Obviously, we need some adapted
       data structures for that, but it isn't too hard to provide that. What
-      is nice is that matrix-matrix products are close to the processor's
-      peak performance if the matrices are neither too small nor too large
-      &mdash; and these operations are the most expensive part in the
-      implementation shown here. 
+      is nice is that dense matrix-matrix products are close to today's
+      processors' peak performance if the matrices are neither too small nor
+      too large &mdash; and these operations are the most expensive part in
+      the implementation shown here. 
 </ul>
 
 The implementation of the matrix-free matrix-vector product shown in this
@@ -413,7 +417,8 @@ We mentioned in the philosophical section above that parallelization with
 multiple cores in a shared memory machine is an issue where sparse
 matrix-vector products are not particularly well suited because processors are
 memory bandwidth limited. There is a lot of data traffic involved, and the
-access patterns in the vector are not very regular. Also, different rows might
+access patterns in the source vector are not very regular. Also, different
+rows might
 have different %numbers of nonzero elements. The matrix-free implementation,
 however, is more favorable in this respect. It does not need to save all the
 elements (only the product of transposed Jacobian, weights, and Jacobian, for
@@ -425,16 +430,16 @@ Performing matrix-vector products with the same matrix, performing (equally
 many) transformations on the vector related quadrature points, and doing one
 more matrix-vector product. Only the read operation from the global vector
 <code>src</code> and the write operation to <code>dst</code> in the end
-request for random access to a vector.
-
-For example, it should not be too difficult to implement a matrix-free
+require random access to a vector. This kind of rather uniform data access
+should make it not too difficult to implement a matrix-free
 matrix-vector product on a <a
 href="http://en.wikipedia.org/wiki/GPGPU">graphics processing unit
-(GP-GPU)</a>. However, it would be quite complex to make a sparse
-matrix-vector product implementation efficient on a GPU.
+(GP-GPU)</a>, for example. On the contrary, it would be quite complex to make
+a sparse matrix-vector product implementation efficient on a GPU.
 
 For our program, we choose to follow a simple strategy to make the code
-%parallel: We let several processors work together by splitting the cells into
+%parallel: We let several processors work together by splitting the complete
+set of all active cells on which we have to assemble into
 several chunks. The threading building blocks implementation of a %parallel
 pipeline implements this concept using the WorkStream::run() function. What
 the pipeline does closely resembles the work done by a for loop. However, it
@@ -445,12 +450,12 @@ contributions into the global vector, in order to avoid a race condition.
 
 <h3>Combination with multigrid</h3>
 
-Above, we have gone to significant efforts to implement a matrix-vector
+Above, we have gone to significant lengths to implement a matrix-vector
 product that does not actually store the matrix elements. In many user
 codes, however, one wants more than just performing some uncertain number of
 matrix-vector products &mdash; one wants to do as little of these operations
 as possible when solving linear equation systems. In theory, we could use
-the CG method without preconditioning, however, that would not be very
+the CG method without preconditioning; however, that would not be very
 efficient. Rather, one uses preconditioners for improving speed. On the
 other hand, most of the more frequently used preconditioners such as Jacobi,
 SSOR, ILU or algebraic multigrid (AMG) can now no longer be used here
@@ -463,8 +468,8 @@ purpose since they can be designed based purely on matrix-vector products. All
 one needs to do is to find a smoother that works with matrix-vector products
 only (our choice requires knowledge of the diagonal entries of the matrix,
 though). One such candidate would be a damped Jacobi iteration, but that is
-often not sufficiently good in damping high-frequency errors than one would
-like. A Chebyshev preconditioner, eventually, is what we use here. It can be
+often not sufficiently good in damping high-frequency errors.
+A Chebyshev preconditioner, eventually, is what we use here. It can be
 seen as an extension of the Jacobi method by using Chebyshev polynomials. With
 degree zero, the Jacobi method with optimal damping parameter is retrieved,
 whereas higher order corrections improve the smoothing properties if some
@@ -478,9 +483,8 @@ SOR/Gauss&ndash;Seidel smoothing relies on substitutions, which can often only
 be parallelized by working on diagonal sub-blocks of the matrix, which
 decreases efficiency.
 
-The implementation into the multigrid framework is then very
-straight-forward. We will only need some minor modifications compared to @ref
-step_16 "step-16".
+The implementation into the multigrid framework is then straightforward. We
+will only need some minor modifications compared to @ref step_16 "step-16".
 
 <h3>The test case</h3>
 
