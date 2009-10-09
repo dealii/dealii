@@ -4,8 +4,8 @@ Since this example solves the same problem as @ref step_5 "step-5", we
 refer to the graphical output there. The only difference between the two is 
 the solver and the implementation of the matrix-vector products. 
 
-When we run this program in 2D for quadratic elements, we get the following 
-output:
+When we run this program in 2D for quadratic ($Q_2$) elements, we get the
+following output:
 @code
 Cycle 0
 Number of degrees of freedom: 337
@@ -45,8 +45,16 @@ Convergence in 10 CG iterations.
 @endcode
 
 As in step-16, we see that the number of CG iterations remains constant with
-increasing number of degrees of freedom. Not much changes if we run the
-program in three spatial dimensions:
+increasing number of degrees of freedom. We can also see that the various
+objects we have to store for the multigrid method on the individual levels of
+our mesh together make up about twice as much as the matrix on the finest
+level.
+
+Not much changes if we run the
+program in three spatial dimensions, with the exception that the multilevel
+objects now take up comparatively less space (because in 3d, each level has
+only one eighth the number of cells of the next finer one, whereas in 2d this
+factor if one quarter):
 
 @code
 Cycle 0
