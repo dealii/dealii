@@ -488,7 +488,7 @@ local_vmult (CellChunkIterator                    cell_range,
 				   // specify that this should be done fast,
 				   // i.e., the field will not be initialized
 				   // since we fill them manually in the very
-				   // next step second anyway. Then, we copy the
+				   // next step anyway. Then, we copy the
 				   // source values from the global vector to
 				   // the local cell range, and we perform a
 				   // matrix-matrix product to transform the
@@ -533,7 +533,7 @@ local_vmult (CellChunkIterator                    cell_range,
 				   // simultaneously apply the constraints, we
 				   // hand this task off to the ConstraintMatrix
 				   // object. Most often, the ConstraintMatrix
-				   // function is used to be applied to data
+				   // function is applied to data
 				   // from one cell at a time, but since we work
 				   // on a whole chunk of dofs, we can feed the
 				   // function with data from all the cells at
@@ -625,40 +625,59 @@ MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
 
 
 				 // This is the <code>vmult_add</code>
-				 // function that multiplies the matrix with
-				 // vector <code>src</code> and adds the
-				 // result to vector <code>dst</code>.  We
-				 // include a few sanity checks to make sure
-				 // that the size of the vectors is the same
-				 // as the dimension of the matrix. We call a
-				 // %parallel function that applies the
-				 // multiplication on a chunk of cells at once
-				 // using the WorkStream module (cf. also the
-				 // @ref threads module). The subdivision into
-				 // chunks will be performed in the reinit
-				 // function and is stored in the field
-				 // <code>matrix_sizes.chunks</code>. What the
-				 // rather cryptic command to
-				 // <code>std_cxx1x::bind</code> does is to
-				 // transform a function that has several
-				 // arguments (source vector, chunk
-				 // information) into a function which has no
-				 // arguments, which is what the
-				 // WorkStream::run function expects. The
-				 // placeholders <code>_1, _2, _3</code> in
-				 // the local vmult specify variable input
-				 // values, given by the chunk information,
-				 // scratch data and copy data. Similarly, the
+				 // function that multiplies the
+				 // matrix with vector
+				 // <code>src</code> and adds the
+				 // result to vector <code>dst</code>.
+				 // We include a few sanity checks to
+				 // make sure that the size of the
+				 // vectors is the same as the
+				 // dimension of the matrix. We call a
+				 // %parallel function that applies
+				 // the multiplication on a chunk of
+				 // cells at once using the WorkStream
+				 // module (cf. also the @ref threads
+				 // module). The subdivision into
+				 // chunks will be performed in the
+				 // reinit function and is stored in
+				 // the field
+				 // <code>matrix_sizes.chunks</code>. What
+				 // the rather cryptic command to
+				 // <code>std_cxx1x::bind</code> does
+				 // is to transform a function that
+				 // has several arguments (source
+				 // vector, chunk information) into a
+				 // function which has three arguments
+				 // (in the first case) or one
+				 // argument (in the second), which is
+				 // what the WorkStream::run function
+				 // expects. The placeholders
+				 // <code>_1, _2, _3</code> in the
+				 // local vmult specify variable input
+				 // values, given by the chunk
+				 // information, scratch data and copy
+				 // data that the WorkStream::run
+				 // function will provide, whereas the
+				 // other arguments to the
+				 // <code>local_vmult</code> function
+				 // are bound: to <code>this</code>
+				 // and a constant reference to the
+				 // <code>src</code> in the first
+				 // case, and <code>this</code> and a
+				 // reference to the output vector in
+				 // the second. Similarly, the
 				 // placeholder <code>_1</code> in the
-				 // <code>copy_local_to_global</code> function
-				 // sets the first argument of that function,
-				 // which is of class
+				 // <code>copy_local_to_global</code>
+				 // function sets the first explicit
+				 // argument of that function, which
+				 // is of class
 				 // <code>CopyData</code>. We need to
-				 // abstractly specify these arguments because
-				 // the tasks defined by different cell chunks
-				 // will be scheduled by the WorkStream class,
-				 // and we will reuse available scratch and
-				 // copy data.
+				 // abstractly specify these arguments
+				 // because the tasks defined by
+				 // different cell chunks will be
+				 // scheduled by the WorkStream class,
+				 // and we will reuse available
+				 // scratch and copy data.
 template <typename number, class Transformation>
 template <typename number2>
 void
@@ -679,21 +698,28 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 		   WorkStreamData::CopyData<number>(),
 		   2*multithread_info.n_default_threads,1);
 
-				   // One thing to be cautious about: The
-				   // deal.II classes expect that the matrix
-				   // still contains a diagonal entry for
-				   // constrained dofs (otherwise, the matrix
-				   // would be singular, which is not what we
-				   // want). Since the
+				   // One thing to be cautious about:
+				   // The deal.II classes expect that
+				   // the matrix still contains a
+				   // diagonal entry for constrained
+				   // dofs (otherwise, the matrix
+				   // would be singular, which is not
+				   // what we want). Since the
 				   // <code>distribute_local_to_global</code>
-				   // command of the constraint matrix which we
-				   // used for adding the local elements into
-				   // the global vector does not do anything
-				   // with constrained elements, we have to
-				   // circumvent that problem by artificially
-				   // setting the diagonal to some non-zero
-				   // value and adding the source values. We
-				   // simply set it to one.
+				   // command of the constraint matrix
+				   // which we used for adding the
+				   // local elements into the global
+				   // vector does not do anything with
+				   // constrained elements, we have to
+				   // circumvent that problem by
+				   // artificially setting the
+				   // diagonal to some non-zero value
+				   // and adding the source values. We
+				   // simply set it to one, which
+				   // corresponds to copying the
+				   // respective elements of the
+				   // source vector into the matching
+				   // entry of the destination vector.
   for (unsigned int i=0; i<matrix_sizes.n_dofs; ++i)
     if (constraints.is_constrained(i) == true)
       dst(i) += 1.0 * src(i);
@@ -701,7 +727,7 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 
 
 
-				 // This function initializes the structures
+				 // The next function initializes the structures
 				 // of the matrix. It writes the number of
 				 // total degrees of freedom in the problem
 				 // as well as the number of cells to the
@@ -776,7 +802,7 @@ reinit (const unsigned int        n_dofs_in,
 				   // on quadrature points should not be more
 				   // than about a third of the cache size of
 				   // the processor in order to be on the safe
-				   // side. Since most today's processors
+				   // side. Since most of today's processors
 				   // provide 512 kB or more cache memory per
 				   // core, we choose about 150 kB as a size to
 				   // leave some room for other things to be
@@ -791,9 +817,8 @@ reinit (const unsigned int        n_dofs_in,
 				   // actual chunk size in order to evenly
 				   // distribute the chunks.
   const unsigned int divisor = 150000/(matrix_sizes.n*sizeof(double));
-  unsigned int n_chunks = matrix_sizes.n_cells/divisor + 1;
-  if (n_chunks<2*multithread_info.n_default_threads)
-    n_chunks = 2*multithread_info.n_default_threads;
+  const unsigned int n_chunks = std::max (matrix_sizes.n_cells/divisor + 1,
+					  2*multithread_info.n_default_threads);
 
   const unsigned int chunk_size = (matrix_sizes.n_cells/n_chunks +
 				   (matrix_sizes.n_cells%n_chunks>0));
@@ -813,11 +838,11 @@ reinit (const unsigned int        n_dofs_in,
 
 
 
-				 // This function we need if we want to
+				 // Then we need a function if we want to
 				 // delete the content of the matrix,
 				 // e.g. when we are finished with one grid
 				 // level and continue to the next one. Just
-				 // put all the field sizes to 0.
+				 // set all the field sizes to 0.
 template <typename number, class Transformation>
 void
 MatrixFree<number,Transformation>::clear ()
@@ -838,7 +863,7 @@ MatrixFree<number,Transformation>::clear ()
 
 
 
-				 // This function returns the entries of the
+				 // The next function returns the entries of the
 				 // matrix. Since this class is intended not
 				 // to store the matrix entries, it would make
 				 // no sense to provide all those
@@ -868,7 +893,7 @@ MatrixFree<number,Transformation>::el (const unsigned int row,
 				 // remember that this is as simple (or
 				 // complicated) as assembling a right hand
 				 // side in deal.II. Well, it is a bit easier
-				 // to do this within this class since have
+				 // to do this within this class since we have
 				 // all the derivative information
 				 // available. What we do is to go through all
 				 // the cells (now in serial, since this
@@ -921,8 +946,8 @@ MatrixFree<number,Transformation>::calculate_diagonal() const
 				 // and with data type <code>double</code>,
 				 // about 80 per cent of the memory
 				 // consumption is due to the
-				 // <code>derivatives</code> array, in 3D
-				 // even 85 per cent.
+				 // <code>derivatives</code> array, while in 3D
+				 // this number is even 85 per cent.
 template <typename number, class Transformation>
 std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 {
@@ -1001,9 +1026,9 @@ LaplaceOperator<dim,number>::LaplaceOperator(const Tensor<2,dim> &tensor)
 }
 
 				 // Now implement the transformation, which is
-				 // nothing else than a so-called contract
-				 // operation of a tensor of second rank on a
-				 // tensor of first rank. Unfortunately, we
+				 // just a so-called contraction
+				 // operation between a tensor of rank two and a
+				 // tensor of rank one. Unfortunately, we
 				 // need to implement this by hand, since we
 				 // chose not to use the
 				 // SymmetricTensor<2,dim> class (note that
@@ -1017,7 +1042,7 @@ LaplaceOperator<dim,number>::LaplaceOperator(const Tensor<2,dim> &tensor)
 				 // the loop in the <code>vmult</code>
 				 // operation of the MatrixFree class. We need
 				 // to pay attention to the fact that we only
-				 // saved half the (symmetric) rank-two
+				 // saved half of the (symmetric) rank-two
 				 // tensor.
 				 //
 				 // At first sight, it seems inefficient that
@@ -1054,14 +1079,18 @@ void LaplaceOperator<dim,number>::transform (number* result) const
     ExcNotImplemented();
 }
 
-				 // This function takes the content of a
-				 // rank-2 tensor and writes it to the field
-				 // <code>transformation</code> of this
-				 // class. We save the upper part of the
-				 // symmetric tensor row-wise: we first take
-				 // the (0,0)-entry, then the (0,1)-entry,
-				 // and so on. We only implement this for
-				 // dimensions two and three.
+				 // The final function in this group
+				 // takes the content of a rank-2
+				 // tensor and writes it to the field
+				 // <code>transformation</code> of
+				 // this class. We save the upper part
+				 // of the symmetric tensor row-wise:
+				 // we first take the (0,0)-entry,
+				 // then the (0,1)-entry, and so
+				 // on. We only implement this for
+				 // dimensions two and three, which
+				 // for the moment should do just
+				 // fine:
 template <int dim, typename number>
 LaplaceOperator<dim,number>&
 LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor)
@@ -1098,11 +1127,13 @@ LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor)
 
 				 // @sect3{LaplaceProblem class}
 
-				 // This class is based on the same class in
-				 // step-16. We replaced the
-				 // SparseMatrix<double> class by our
-				 // matrix-free implementation, which means
-				 // that we can skip the sparsity patterns.
+				 // This class is based on the same
+				 // class in step-16. However, we
+				 // replaced the SparseMatrix<double>
+				 // class by our matrix-free
+				 // implementation, which means that
+				 // we can also skip the sparsity
+				 // patterns.
 template <int dim>
 class LaplaceProblem
 {
@@ -1133,7 +1164,8 @@ class LaplaceProblem
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree) :
+LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
+		:
                 fe (degree),
 		mg_dof_handler (triangulation)
 {}
@@ -1206,14 +1238,14 @@ void LaplaceProblem<dim>::setup_system ()
   system_matrix.get_constraints().close();
   std::cout.precision(4);
   std::cout << "System matrix memory consumption: "
-	    << (double)system_matrix.memory_consumption()*std::pow(2.,-20.)
+	    << system_matrix.memory_consumption()/std::pow(2.,20.)
 	    << " MBytes."
 	    << std::endl;
 
   solution.reinit (mg_dof_handler.n_dofs());
   system_rhs.reinit (mg_dof_handler.n_dofs());
 
-				   // Initialize the matrices for the
+				   // Next, initialize the matrices for the
 				   // multigrid method on all the
 				   // levels. Unfortunately, the function
 				   // MGTools::make_boundary_list cannot write
@@ -1342,10 +1374,10 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // calculate the matrix on the coarsest
 				 // level. In step-16, we could simply copy
 				 // the entries from the respective sparse
-				 // matrix, what is obviously not possible
-				 // here. We could have integrated this to the
+				 // matrix, but this is obviously not possible
+				 // here. We could have integrated this into the
 				 // MatrixFree class as well, but it is simple
-				 // anyway, so calculate it here instead.
+				 // enough, so calculate it here instead.
 template <int dim>
 void LaplaceProblem<dim>::assemble_multigrid ()
 {
@@ -1402,11 +1434,13 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 	}
     }
 
-				   // Here, we need to condense the boundary
-				   // conditions on the coarse matrix. There
-				   // is no built-in function for doing this
-				   // on a full matrix, so manually delete the
-				   // rows and columns of the matrix that are
+				   // In a final step, we need to
+				   // condense the boundary conditions
+				   // on the coarse matrix. There is
+				   // no built-in function for doing
+				   // this on a full matrix, so
+				   // manually delete the rows and
+				   // columns of the matrix that are
 				   // constrained.
   for (unsigned int i=0; i<coarse_matrix.m(); ++i)
     if (mg_matrices[0].get_constraints().is_constrained(i))
@@ -1426,8 +1460,8 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 				 // step-16. We now use a Chebyshev smoother
 				 // instead of SOR (SOR would be very
 				 // difficult to implement because we do not
-				 // have the matrix elements explicitly
-				 // available, and it is difficult to make it
+				 // have the matrix elements available
+				 // explicitly, and it is difficult to make it
 				 // work efficiently in %parallel). The
 				 // multigrid classes provide a simple
 				 // interface for using the Chebyshev smoother
@@ -1448,20 +1482,27 @@ void LaplaceProblem<dim>::solve ()
   MGSmootherPrecondition<MatrixFreeType, SMOOTHER, Vector<double> >
     mg_smoother(vector_memory);
 
-				   // Initialize the smoother with our level
-				   // matrices and the required, additional
-				   // data for the Chebyshev smoother. Use a
-				   // higher polynomial degree for higher
-				   // order elements, since smoothing gets
-				   // more difficult then. Smooth out a range
-				   // of
+				   // Then, we initialize the smoother
+				   // with our level matrices and the
+				   // required, additional data for
+				   // the Chebyshev smoother. In
+				   // particular, we use a higher
+				   // polynomial degree for higher
+				   // order elements, since smoothing
+				   // gets more difficult for
+				   // these. Smooth out a range of
 				   // $[\lambda_{\max}/10,\lambda_{\max}]$. In
-				   // order to compute the maximum eigenvalue
-				   // of the corresponding matrix, the
-				   // Chebyshev initializations performs a few
-				   // steps of a CG algorithm. Since all we
-				   // need is a rough estimate, we choose some
-				   // eight iterations.
+				   // order to compute the maximum
+				   // eigenvalue of the corresponding
+				   // matrix, the Chebyshev
+				   // initializations performs a few
+				   // steps of a CG algorithm. Since
+				   // all we need is a rough estimate,
+				   // we choose some eight iterations
+				   // (more if the finite element
+				   // polynomial degree is larger,
+				   // less if it is smaller than
+				   // quadratic).
   typename SMOOTHER::AdditionalData smoother_data;
   smoother_data.smoothing_range = 10.;
   smoother_data.degree = fe.degree;
@@ -1493,23 +1534,23 @@ void LaplaceProblem<dim>::solve ()
 				 // compared to step-16. The magic is all
 				 // hidden behind the implementation of
 				 // the MatrixFree::vmult operation.
-double multigrid_memory =
-  (double)mg_matrices.memory_consumption() +
-  (double)mg_transfer.memory_consumption() +
-  (double)coarse_matrix.memory_consumption();
-std::cout << "Multigrid objects memory consumption: "
-<< multigrid_memory*std::pow(2.,-20.)
-<< " MBytes."
-<< std::endl;
+  const unsigned int multigrid_memory
+    = (mg_matrices.memory_consumption() +
+       mg_transfer.memory_consumption() +
+       coarse_matrix.memory_consumption());
+  std::cout << "Multigrid objects memory consumption: "
+	    << multigrid_memory/std::pow(2.,20.)
+	    << " MBytes."
+	    << std::endl;
 
-SolverControl           solver_control (1000, 1e-12);
-SolverCG<>              cg (solver_control);
+  SolverControl           solver_control (1000, 1e-12);
+  SolverCG<>              cg (solver_control);
 
-cg.solve (system_matrix, solution, system_rhs,
-	  preconditioner);
+  cg.solve (system_matrix, solution, system_rhs,
+	    preconditioner);
 
-std::cout << "Convergence in " << solver_control.last_step()
-<< " CG iterations." << std::endl;
+  std::cout << "Convergence in " << solver_control.last_step()
+	    << " CG iterations." << std::endl;
 }
 
 
@@ -1517,7 +1558,7 @@ std::cout << "Convergence in " << solver_control.last_step()
 				 // @sect4{LaplaceProblem::output_results}
 
 				 // Here is the data output, which is a
-				 // simplified version of step-5. We use a
+				 // simplified version of step-5. We use the
 				 // standard VTK output for each grid
 				 // produced in the refinement process.
 template <int dim>
