@@ -72,6 +72,7 @@ tests_x =  geometry_info_* \
 	   table \
 	   tensor \
 	   tensor_* \
+	   index_set_* \
 	   symmetric_tensor_* \
 	   full_tensor_* \
            timer \
