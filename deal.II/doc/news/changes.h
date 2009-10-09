@@ -84,6 +84,17 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
+   New: There is now a new tutorial program, @ref step_35 "step-35",
+   contributed by Abner Salgado-Gonzales, that implements a solver
+   for the Navier-Stokes equations using a decoupled projection
+   scheme.
+   <br>
+   (Abner Salgado-Gonzales 2009/10/07)
+   </p>
+   </li>
+
+   <li>
+   <p>
    New: A report has been added on the
    <a href="../../reports/codimension-one/desimone-heltai-manigrasso.pdf"
    target="body">codimension one</a> capabilities
@@ -344,9 +355,9 @@ inconvenience this causes.
   <li>
     <p>
     Improved: The ConstraintMatrix class now uses a cache for random access to
-    the constraint lines. This considerably increases performance of the 
+    the constraint lines. This considerably increases performance of the
     *_local_to_global functions, where such an access pattern is usual. Moreover,
-    the ConstraintMatrix class has now a function get_dof_values that can import 
+    the ConstraintMatrix class has now a function get_dof_values that can import
     data from a global vector to a cell vector with respecting the constraints.
     </p>
   <br>
