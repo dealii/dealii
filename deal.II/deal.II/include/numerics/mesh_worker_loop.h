@@ -13,6 +13,11 @@
 #ifndef __deal2__mesh_worker_loop_h
 #define __deal2__mesh_worker_loop_h
 
+#include <base/config.h>
+#include <grid/tria.h>
+#include <numerics/mesh_worker_info.h>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 template <typename> class TriaActiveIterator;
@@ -36,7 +41,7 @@ namespace MeshWorker
       return true;
     }
   }
-  
+
 
 /**
  * The main work function of this namespace. Its action consists of two
@@ -65,7 +70,7 @@ namespace MeshWorker
   {
     const_cast<Triangulation<ITERATOR::AccessorType::Container::dimension>&>(
       begin->get_triangulation()).clear_user_flags();
-    
+
 				     // Loop over all cells
     for (ITERATOR cell = begin; cell != end; ++cell)
       {
@@ -77,14 +82,14 @@ namespace MeshWorker
 	    cellinfo.reinit(cell);
 	    localworker.cell(cellinfo);
 	  }
-	
+
 	if (localworker.interior_fluxes || localworker.boundary_fluxes)
 	  for (unsigned int face_no=0; face_no < GeometryInfo<ITERATOR::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
 	    {
 	      typename ITERATOR::AccessorType::Container::face_iterator face = cell->face(face_no);
 					       // Treat every face only once
 	      if (face->user_flag_set ()) continue;
-	      
+
 	      if (cell->at_boundary(face_no))
 		{
 		  if (localworker.boundary_fluxes)
@@ -100,7 +105,7 @@ namespace MeshWorker
 						   // Interior face
 		  typename ITERATOR::AccessorType::Container::cell_iterator
 		    neighbor = cell->neighbor(face_no);
-		  
+
 						   // Deal with
 						   // refinement edges
 						   // from the refined
@@ -115,7 +120,7 @@ namespace MeshWorker
 		    {
 		      Assert(!cell->has_children(), ExcInternalError());
 		      Assert(!neighbor->has_children(), ExcInternalError());
-		      
+
 		      std::pair<unsigned int, unsigned int> neighbor_face_no
 			= cell->neighbor_of_coarser_neighbor(face_no);
 		      typename ITERATOR::AccessorType::Container::face_iterator nface
@@ -142,18 +147,18 @@ namespace MeshWorker
 						       // internal face.
 		      if (internal::is_active_iterator(cell) && neighbor->has_children())
 			continue;
-		      
+
 		      unsigned int neighbor_face_no = cell->neighbor_of_neighbor(face_no);
 		      Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
 						       // Regular interior face
 		      faceinfo.reinit(cell, face, face_no);
 		      ngbrinfo.reinit(neighbor, neighbor->face(neighbor_face_no),
 				      neighbor_face_no);
-		      
+
 		      localworker.face(faceinfo, ngbrinfo);
 		      neighbor->face(neighbor_face_no)->set_user_flag ();
 		    }
-		  
+
 		}
 	    } // faces
 					 // Execute this, if faces
