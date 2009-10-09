@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <base/exceptions.h>
 
 #include <base/std_cxx1x/tuple.h>
 
