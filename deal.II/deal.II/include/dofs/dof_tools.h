@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/table.h>
+#include <base/index_set.h>
 #include <lac/constraint_matrix.h>
 #include <dofs/function_map.h>
 
@@ -199,7 +200,7 @@ class DoFTools
                                             */
 	  nonzero
     };
-    
+
 				     /**
 				      * @name Auxiliary functions
 				      * @{
@@ -211,12 +212,12 @@ class DoFTools
     template <int dim, int spacedim>
     static unsigned int
     max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh);
-    
+
     template <int dim, int spacedim>
     static unsigned int
     max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh);
-    
-    
+
+
 				     /**
 				      * Maximal number of degrees of
 				      * freedom on a face.
@@ -242,7 +243,7 @@ class DoFTools
     template <int dim, int spacedim>
     static unsigned int
     max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh);
-    
+
 				     /**
 				      * Maximal number of degrees of
 				      * freedom on a vertex.
@@ -255,7 +256,7 @@ class DoFTools
     template <int dim, int spacedim>
     static unsigned int
     max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh);
-    
+
 				     /**
 				      * Maximal number of degrees of
 				      * freedom on a vertex.
@@ -268,7 +269,7 @@ class DoFTools
     template <int dim, int spacedim>
     static unsigned int
     max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh);
-    
+
 				     /**
 				      * Number of vector components in the
 				      * finite element object used by this
@@ -282,7 +283,7 @@ class DoFTools
     template <int dim, int spacedim>
     static unsigned int
     n_components (const DoFHandler<dim,spacedim> &dh);
-    
+
 				     /**
 				      * Number of vector components in the
 				      * finite element object used by this
@@ -296,7 +297,7 @@ class DoFTools
     template <int dim, int spacedim>
     static unsigned int
     n_components (const hp::DoFHandler<dim,spacedim> &dh);
-    
+
 				     /**
 				      * Find out whether the FiniteElement
 				      * used by this DoFHandler is primitive
@@ -310,7 +311,7 @@ class DoFTools
     template <int dim, int spacedim>
     static unsigned int
     fe_is_primitive (const DoFHandler<dim,spacedim> &dh);
-    
+
 				     /**
 				      * Find out whether the FiniteElement
 				      * used by this DoFHandler is primitive
@@ -324,16 +325,16 @@ class DoFTools
     template <int dim, int spacedim>
     static unsigned int
     fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh);
-    
+
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      * @name Sparsity Pattern Generation
 				      * @{
 				      */
-    
+
 				     /**
 				      * Locate non-zero entries of the
 				      * system matrix.
@@ -612,7 +613,7 @@ class DoFTools
 			   const ConstraintMatrix   &constraints = ConstraintMatrix(),
 			   const bool                keep_constrained_dofs = true,
 			   const unsigned int        subdomain_id = numbers::invalid_unsigned_int);
-    
+
 				     /**
 				      * @deprecated This is the old
 				      * form of the previous
@@ -671,7 +672,7 @@ class DoFTools
     make_sparsity_pattern (const DH        &dof_row,
 			   const DH        &dof_col,
 			   SparsityPattern &sparsity);
-    
+
     				     /**
 				      * Create the sparsity pattern for
 				      * boundary matrices. See the general
@@ -694,7 +695,7 @@ class DoFTools
     make_boundary_sparsity_pattern (const DH                        &dof,
 				    const std::vector<unsigned int> &dof_to_boundary_mapping,
 				    SparsityPattern                 &sparsity_pattern);
-    
+
 				     /**
 				      * Write the sparsity structure of the
 				      * matrix composed of the basis functions
@@ -752,7 +753,7 @@ class DoFTools
     static void
     make_flux_sparsity_pattern (const DH        &dof_handler,
 				SparsityPattern &sparsity_pattern);
-    
+
 				     /**
 				      * This function does the same as
 				      * the other with the same name,
@@ -785,7 +786,7 @@ class DoFTools
 				      * @name Hanging Nodes
 				      * @{
 				      */
-    
+
 				     /**
 				      * Compute the constraints resulting from
 				      * the presence of hanging nodes. Hanging
@@ -861,7 +862,7 @@ class DoFTools
     make_hanging_node_constraints (const DH         &dof_handler,
 				   ConstraintMatrix &constraints);
 				     //@}
-    
+
 				     /**
 				      * Take a vector of values which live on
 				      * cells (e.g. an error per cell) and
@@ -991,7 +992,7 @@ class DoFTools
 		  const std::vector<bool> &select,
 		  std::vector<bool>       &selected_dofs,
 		  const bool               blocks = false);
-    
+
 				     /**
 				      * Do the same thing as
 				      * extract_dofs() for one level
@@ -1061,7 +1062,7 @@ class DoFTools
 				      * @name Hanging Nodes
 				      * @{
 				      */
-    
+
 				     /**
 				      * Select all dofs that will be
 				      * constrained by interface
@@ -1079,7 +1080,7 @@ class DoFTools
     extract_hanging_node_dofs (const DoFHandler<dim,spacedim> &dof_handler,
 			       std::vector<bool>              &selected_dofs);
 				     //@}
-    
+
 				     /**
 				      * Flag all those degrees of
 				      * freedom which are on cells
@@ -1105,27 +1106,27 @@ class DoFTools
 			    std::vector<bool>  &selected_dofs);
 
 				     /**
-				      * Extract a vector that 
+				      * Extract a vector that
 				      * represents the constant
 				      * modes of the DoFHandler
-				      * for the components 
+				      * for the components
 				      * chosen by <tt>component_select</tt>.
 				      * The constant modes on a
-				      * discretization are the 
+				      * discretization are the
 				      * null space of a Laplace
 				      * operator on the selected
 				      * components with Neumann
-				      * boundary conditions 
+				      * boundary conditions
 				      * applied. The null space is
 				      * a necessary ingredient for
 				      * obtaining a good AMG
 				      * preconditioner when using
-				      * the class 
+				      * the class
 				      * TrilinosWrappers::PreconditionAMG.
 				      * Since the ML AMG package
 				      * only works on algebraic
 				      * properties of the respective
-				      * matrix, it has no chance 
+				      * matrix, it has no chance
 				      * to detect whether the matrix
 				      * comes from a scalar or a
 				      * vector valued problem. However,
@@ -1134,27 +1135,27 @@ class DoFTools
 				      * about these components.
 				      * The null space will consist
 				      * of as many vectors as there
-				      * are true arguments in 
-				      * <tt>component_select</tt>, 
+				      * are true arguments in
+				      * <tt>component_select</tt>,
 				      * each of which will be one
-				      * in one component and 
-				      * zero in all others. We store 
-				      * this object in a vector of 
-				      * vectors, where the outer 
-				      * vector is of the size of 
-				      * the number of selected 
+				      * in one component and
+				      * zero in all others. We store
+				      * this object in a vector of
+				      * vectors, where the outer
+				      * vector is of the size of
+				      * the number of selected
 				      * components, and each inner
 				      * vector has as many components
-				      * as there are degrees of 
-				      * freedom in the selected 
+				      * as there are degrees of
+				      * freedom in the selected
 				      * components. Note that any
 				      * matrix associated with this
 				      * null space must have been
-				      * constructed using the 
+				      * constructed using the
 				      * same
 				      * <tt>component_select</tt>
 				      * argument.
-				      * 
+				      *
 				      * The main reason for this
 				      * program is the use of the
 				      * null space with the
@@ -1185,7 +1186,7 @@ class DoFTools
     static void
     get_active_fe_indices (const DH                  &dof_handler,
 			   std::vector<unsigned int> &active_fe_indices);
-    
+
                                      /**
                                       * For each DoF, return in the output
                                       * array to which subdomain (as given by
@@ -1256,6 +1257,20 @@ class DoFTools
     count_dofs_with_subdomain_association (const DH           &dof_handler,
                                            const unsigned int  subdomain);
 
+				     /**
+				      * Similar to the previous
+				      * function, but do not just
+				      * return the number of degrees
+				      * of freedom that are owned by a
+				      * given subdomain, but return a
+				      * set of their indices.
+				      */
+    template <class DH>
+    static
+    IndexSet
+    dof_indices_with_subdomain_association (const DH           &dof_handler,
+					    const unsigned int  subdomain);
+
                                      /**
                                       * Count how many degrees of freedom are
                                       * uniquely associated with the given
@@ -1277,7 +1292,7 @@ class DoFTools
     count_dofs_with_subdomain_association (const DH           &dof_handler,
                                            const unsigned int  subdomain,
 					   std::vector<unsigned int> &n_dofs_on_subdomain);
-    
+
                                      /**
 				      * Count how many degrees of
 				      * freedom out of the total
@@ -1390,7 +1405,7 @@ class DoFTools
 			  std::vector<unsigned int>& dofs_per_block,
 			  std::vector<unsigned int>  target_block
 			  = std::vector<unsigned int>());
-    
+
 				     /**
 				      * @deprecated See the previous
 				      * function with the same name
@@ -1404,7 +1419,7 @@ class DoFTools
     count_dofs_per_component (const DoFHandler<dim,spacedim>&     dof_handler,
 			      std::vector<unsigned int>& dofs_per_component,
 			      std::vector<unsigned int>  target_component);
-    
+
 				     /**
 				      * This function can be used when
 				      * different variables shall be
@@ -1660,7 +1675,7 @@ class DoFTools
 					       const unsigned int                  fine_component,
 					       const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
 					       std::vector<std::map<unsigned int, float> > &transfer_representation);
-    
+
 				     /**
 				      * Create a mapping from degree
 				      * of freedom indices to the
@@ -1692,7 +1707,7 @@ class DoFTools
     static void
     map_dof_to_boundary_indices (const DH                   &dof_handler,
 				 std::vector<unsigned int>  &mapping);
-    
+
 				     /**
 				      * Same as the previous function,
 				      * except that only those parts
@@ -1709,7 +1724,7 @@ class DoFTools
     map_dof_to_boundary_indices (const DH                      &dof_handler,
 				 const std::set<unsigned char> &boundary_indicators,
 				 std::vector<unsigned int>     &mapping);
-    
+
 				     /**
 				      * Return a list of support
 				      * points for all the degrees of
@@ -1787,17 +1802,17 @@ class DoFTools
 				 const Table<2, Coupling>& table_by_component,
 				 std::vector<Table<2,Coupling> >& tables_by_block);
 
-                                     /** 
+                                     /**
 				      * Make a constraint matrix for the
 				      * constraints that result from zero
 				      * boundary values. This function is used
 				      * in @ref step_36 "step-36", for
 				      * example.
 				      */
-    template <int dim, int spacedim, template <int, int> class DH> 
-    static void 
-    make_zero_boundary_constraints (const DH<dim,spacedim> &dof,  
-				    ConstraintMatrix        &zero_boundary_constraints,    
+    template <int dim, int spacedim, template <int, int> class DH>
+    static void
+    make_zero_boundary_constraints (const DH<dim,spacedim> &dof,
+				    ConstraintMatrix        &zero_boundary_constraints,
 				    const std::vector<bool> &component_mask_=std::vector<bool>());
 
 				     /**
@@ -1834,7 +1849,7 @@ class DoFTools
     Table<2,Coupling>
     dof_couplings_from_component_couplings (const FiniteElement<dim,spacedim> &fe,
 					    const Table<2,Coupling> &component_couplings);
-    
+
 				     /**
 				      * Exception
 				      */
@@ -1941,7 +1956,7 @@ DoFTools::max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_face (const DoFHandler<dim,spacedim> &dh) 
+DoFTools::max_dofs_per_face (const DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().dofs_per_face;
 }
@@ -1949,7 +1964,7 @@ DoFTools::max_dofs_per_face (const DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh) 
+DoFTools::max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().dofs_per_vertex;
 }
@@ -1957,7 +1972,7 @@ DoFTools::max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::n_components (const DoFHandler<dim,spacedim> &dh) 
+DoFTools::n_components (const DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().n_components();
 }
@@ -1966,7 +1981,7 @@ DoFTools::n_components (const DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::fe_is_primitive (const DoFHandler<dim,spacedim> &dh) 
+DoFTools::fe_is_primitive (const DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().is_primitive();
 }
@@ -1974,7 +1989,7 @@ DoFTools::fe_is_primitive (const DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh) 
+DoFTools::max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().max_dofs_per_cell ();
 }
@@ -1982,7 +1997,7 @@ DoFTools::max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh) 
+DoFTools::max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().max_dofs_per_face ();
 }
@@ -1990,7 +2005,7 @@ DoFTools::max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh) 
+DoFTools::max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().max_dofs_per_vertex ();
 }
@@ -1998,7 +2013,7 @@ DoFTools::max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::n_components (const hp::DoFHandler<dim,spacedim> &dh) 
+DoFTools::n_components (const hp::DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe()[0].n_components();
 }
@@ -2006,7 +2021,7 @@ DoFTools::n_components (const hp::DoFHandler<dim,spacedim> &dh)
 
 template <int dim, int spacedim>
 inline unsigned int
-DoFTools::fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh) 
+DoFTools::fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe()[0].is_primitive();
 }
@@ -2020,21 +2035,21 @@ DoFTools::make_sparsity_pattern (const DH                              &dof,
 				 SparsityPattern                       &sparsity_pattern)
 {
   const unsigned int ncomp = dof.get_fe().n_components();
-  
+
   Assert (mask.size() == ncomp,
 	  ExcDimensionMismatch(mask.size(), ncomp));
   for (unsigned int i=0; i<mask.size(); ++i)
     Assert (mask[i].size() == ncomp,
 	    ExcDimensionMismatch(mask[i].size(), ncomp));
 				   // Create a coupling table out of the mask
-  Table<2,DoFTools::Coupling> couplings(ncomp, ncomp);  
+  Table<2,DoFTools::Coupling> couplings(ncomp, ncomp);
   for (unsigned int i=0;i<ncomp;++i)
     for (unsigned int j=0;j<ncomp;++j)
       if (mask[i][j])
 	couplings(i,j) = always;
       else
 	couplings(i,j) = none;
-  
+
 				   // Call the new function
   make_sparsity_pattern(dof, couplings, sparsity_pattern);
 }

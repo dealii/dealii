@@ -3904,6 +3904,45 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
 
 
 template <class DH>
+IndexSet
+DoFTools::dof_indices_with_subdomain_association (const DH           &dof_handler,
+						  const unsigned int  subdomain)
+{
+  std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
+  get_subdomain_association (dof_handler, subdomain_association);
+
+  IndexSet index_set (dof_handler.n_dofs());
+
+  unsigned int index = 0;
+  while (index < dof_handler.n_dofs())
+    {
+				       // find first_of
+      while ((subdomain_association[index] != subdomain)
+	     &&
+	     (index < dof_handler.n_dofs()))
+	++index;
+      const unsigned int begin = index;
+
+				       // find first_not_of
+      while ((subdomain_association[index] == subdomain)
+	     &&
+	     (index < dof_handler.n_dofs()))
+	++index;
+      const unsigned int end = index;
+
+      if ((begin < end) && (begin < dof_handler.n_dofs()))
+	index_set.add_range (begin, end);
+    }
+
+  return index_set;
+}
+
+
+
+
+
+
+template <class DH>
 void
 DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler,
 						 const unsigned int  subdomain,
@@ -5753,14 +5792,25 @@ DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
  const unsigned int);
 template
+IndexSet
+DoFTools::dof_indices_with_subdomain_association<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const unsigned int);
+template
 void
 DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
  const unsigned int,
  std::vector<unsigned int> &);
+
 template
 unsigned int
 DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const unsigned int);
+template
+IndexSet
+DoFTools::dof_indices_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
  const unsigned int);
 template
@@ -5769,9 +5819,15 @@ DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension
 (const hp::DoFHandler<deal_II_dimension> &,
  const unsigned int,
  std::vector<unsigned int> &);
+
 template
 unsigned int
 DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
+(const MGDoFHandler<deal_II_dimension> &,
+ const unsigned int);
+template
+IndexSet
+DoFTools::dof_indices_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
 (const MGDoFHandler<deal_II_dimension> &,
  const unsigned int);
 template
