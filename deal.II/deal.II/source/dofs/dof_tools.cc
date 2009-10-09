@@ -172,7 +172,7 @@ DoFTools::make_sparsity_pattern (const DH                &dof,
 		Assert (first_nonzero_comp_i < fe_collection[f].n_components(),
 			ExcInternalError());
 		Assert (first_nonzero_comp_j < fe_collection[f].n_components(),
-			ExcInternalError());          
+			ExcInternalError());
 
 		dof_mask[f][i][j]
 		  = (couplings(first_nonzero_comp_i,first_nonzero_comp_j) != none);
@@ -350,7 +350,7 @@ DoFTools::make_boundary_sparsity_pattern (
 
       const unsigned int dofs_per_vertex = cell->get_fe().dofs_per_vertex;
       std::vector<unsigned int> boundary_dof_boundary_indices (dofs_per_vertex);
-  
+
 				       // next get boundary mapped dof
 				       // indices of boundary dofs
       for (unsigned int i=0; i<dofs_per_vertex; ++i)
@@ -437,10 +437,10 @@ DoFTools::make_boundary_sparsity_pattern (
           dofs_on_this_face.resize (dofs_per_face);
           cell->face(f)->get_dof_indices (dofs_on_this_face,
 					  cell->active_fe_index());
-          
+
                                            // make sparsity pattern for this cell
           for (unsigned int i=0; i<dofs_per_face; ++i)
-            for (unsigned int j=0; j<dofs_per_face; ++j) 
+            for (unsigned int j=0; j<dofs_per_face; ++j)
               sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
                             dof_to_boundary_mapping[dofs_on_this_face[j]]);
 	}
@@ -511,7 +511,7 @@ DoFTools::make_flux_sparsity_pattern (
   SparsityPattern &sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
-  
+
   Assert (sparsity.n_rows() == n_dofs,
 	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
   Assert (sparsity.n_cols() == n_dofs,
@@ -535,7 +535,7 @@ DoFTools::make_flux_sparsity_pattern (
   std::vector<bool> user_flags;
   dof.get_tria().save_user_flags(user_flags);
   const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).clear_user_flags ();
-  
+
   for (; cell!=endc; ++cell)
     {
       const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
@@ -597,7 +597,7 @@ DoFTools::make_flux_sparsity_pattern (
 						   // coarser cells
 		  if (cell->neighbor_is_coarser(face))
 		    continue;
-		  
+
 		  const unsigned int n_dofs_on_neighbor
                     = neighbor->get_fe().dofs_per_cell;
                   dofs_on_other_cell.resize (n_dofs_on_neighbor);
@@ -612,9 +612,9 @@ DoFTools::make_flux_sparsity_pattern (
 		    sparsity.add_entries (dofs_on_other_cell[j],
 					  dofs_on_this_cell.begin(),
 					  dofs_on_this_cell.end());
-		  neighbor->face(neighbor_face)->set_user_flag (); 
+		  neighbor->face(neighbor_face)->set_user_flag ();
 		}
-	    } 
+	    }
 	}
     }
 
@@ -638,7 +638,7 @@ DoFTools::make_flux_sparsity_pattern (
   std::vector<unsigned int> neighbor_dof_indices;
   local_dof_indices.reserve (max_dofs_per_cell(dof));
   neighbor_dof_indices.reserve (max_dofs_per_cell(dof));
-  
+
   active_cell_iterator cell = dof.begin_active(),
 		       endc = dof.end();
   for (; cell!=endc; ++cell)
@@ -693,7 +693,7 @@ DoFTools::dof_couplings_from_component_couplings
   Assert(component_couplings.n_cols() == fe.n_components(),
 	 ExcDimensionMismatch(component_couplings.n_cols(),
 			      fe.n_components()));
-  
+
   const unsigned int n_dofs = fe.dofs_per_cell;
 
   Table<2,DoFTools::Coupling> dof_couplings (n_dofs, n_dofs);
@@ -724,7 +724,7 @@ DoFTools::dof_couplings_from_component_couplings
 		-
 		fe.get_nonzero_components(j).begin())
 	    );
-	  Assert (jj < fe.n_components(), ExcInternalError());          
+	  Assert (jj < fe.n_components(), ExcInternalError());
 
 	  dof_couplings(i,j) = component_couplings(ii,jj);
 	}
@@ -747,7 +747,7 @@ DoFTools::make_flux_sparsity_pattern (
   const unsigned int n_dofs = dof.n_dofs();
   const FiniteElement<DH::dimension> &fe = dof.get_fe();
   const unsigned int n_comp = fe.n_components();
-  
+
   Assert (sparsity.n_rows() == n_dofs,
 	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
   Assert (sparsity.n_cols() == n_dofs,
@@ -760,24 +760,24 @@ DoFTools::make_flux_sparsity_pattern (
 	  ExcDimensionMismatch (flux_mask.n_rows(), n_comp));
   Assert (flux_mask.n_cols() == n_comp,
 	  ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
-  
+
   const unsigned int total_dofs = fe.dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(total_dofs);
   std::vector<unsigned int> dofs_on_other_cell(total_dofs);
   Table<2,bool> support_on_face(
     total_dofs, GeometryInfo<DH::dimension>::faces_per_cell);
-  
+
   typename DH::active_cell_iterator cell = dof.begin_active(),
 				    endc = dof.end();
-  
+
   const Table<2,Coupling>
     int_dof_mask  = dof_couplings_from_component_couplings(fe, int_mask),
     flux_dof_mask = dof_couplings_from_component_couplings(fe, flux_mask);
-  
+
   for (unsigned int i=0; i<total_dofs; ++i)
     for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell;++f)
       support_on_face(i,f) = fe.has_support_on_face(i,f);
-  
+
 				   // Clear user flags because we will
 				   // need them. But first we save
 				   // them and make sure that we
@@ -789,7 +789,7 @@ DoFTools::make_flux_sparsity_pattern (
   std::vector<bool> user_flags;
   dof.get_tria().save_user_flags(user_flags);
   const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).clear_user_flags ();
-  
+
   for (; cell!=endc; ++cell)
     {
       cell->get_dof_indices (dofs_on_this_cell);
@@ -818,7 +818,7 @@ DoFTools::make_flux_sparsity_pattern (
 		  for (unsigned int j=0; j<total_dofs; ++j)
 		    {
 		      const bool j_non_zero_i = support_on_face (j, face);
-		      
+
 		      if (flux_dof_mask(i,j) == always)
                         sparsity.add (dofs_on_this_cell[i],
                                       dofs_on_this_cell[j]);
@@ -837,11 +837,11 @@ DoFTools::make_flux_sparsity_pattern (
 					       // by coarser cells
 	      if (cell->neighbor_is_coarser(face))
 		continue;
-	      
+
 	      typename DH::face_iterator cell_face = cell->face(face);
 	      const unsigned int
                 neighbor_face = cell->neighbor_of_neighbor(face);
-	      
+
 	      if (cell_face->has_children())
 		{
 		  for (unsigned int sub_nr = 0;
@@ -887,7 +887,7 @@ DoFTools::make_flux_sparsity_pattern (
 				    sparsity.add (dofs_on_other_cell[i],
 						  dofs_on_other_cell[j]);
 				}
-			      
+
 			      if (flux_dof_mask(j,i) == always)
 				{
 				  sparsity.add (dofs_on_this_cell[j],
@@ -912,7 +912,7 @@ DoFTools::make_flux_sparsity_pattern (
 						  dofs_on_this_cell[i]);
 				  if (j_non_zero_e && i_non_zero_e)
 				    sparsity.add (dofs_on_other_cell[j],
-						  dofs_on_other_cell[i]); 
+						  dofs_on_other_cell[i]);
 				}
 			    }
 			}
@@ -954,7 +954,7 @@ DoFTools::make_flux_sparsity_pattern (
 					      dofs_on_this_cell[j]);
 			      if (i_non_zero_e && j_non_zero_e)
 				sparsity.add (dofs_on_other_cell[i],
-					      dofs_on_other_cell[j]); 
+					      dofs_on_other_cell[j]);
 			    }
 
 			  if (flux_dof_mask(j,i) == always)
@@ -981,13 +981,13 @@ DoFTools::make_flux_sparsity_pattern (
 					      dofs_on_this_cell[i]);
 			      if (j_non_zero_e && i_non_zero_e)
 				sparsity.add (dofs_on_other_cell[j],
-					      dofs_on_other_cell[i]); 
+					      dofs_on_other_cell[i]);
 			    }
 			}
 		    }
-		  neighbor->face(neighbor_face)->set_user_flag (); 
+		  neighbor->face(neighbor_face)->set_user_flag ();
 		}
-	    } 
+	    }
 	}
     }
 
@@ -1001,7 +1001,7 @@ namespace internal
 {
   namespace DoFTools
   {
-    namespace 
+    namespace
     {
       inline
       bool
@@ -1030,7 +1030,7 @@ namespace internal
 					 // care about is whether the
 					 // matrix is regular or
 					 // singular
-	
+
 					 // first get an estimate of the
 					 // size of the elements of this
 					 // matrix, for later checks whether
@@ -1075,7 +1075,7 @@ namespace internal
 					     // dofs
 	    if (max < 1.e-12*typical_diagonal_element)
 	      return false;
-      
+
 					     // row interchange
 	    if (r>j)
 	      {
@@ -1112,8 +1112,8 @@ namespace internal
 					 // been collected)
 	return true;
       }
-      
-      
+
+
 				       /**
 					* When restricting, on a face, the
 					* degrees of freedom of fe1 to the
@@ -1153,7 +1153,7 @@ namespace internal
 					* this isn't the case, go back
 					* and select dofs differently
 					*/
-      template <int dim, int spacedim>  
+      template <int dim, int spacedim>
       void
       select_master_dofs_for_face_restriction (const FiniteElement<dim,spacedim> &fe1,
 					       const FiniteElement<dim,spacedim> &fe2,
@@ -1253,7 +1253,7 @@ namespace internal
 						 // one
 		++i;
 	      }
-	    index += fe1.dofs_per_vertex;	    
+	    index += fe1.dofs_per_vertex;
 	  }
 
 	for (int l=0;
@@ -1267,7 +1267,7 @@ namespace internal
 	      {
 		Assert (i < fe1.dofs_per_line,
 			ExcInternalError());
-		
+
 		master_dof_list.push_back (index+i);
 		if (check_master_dof_list (face_interpolation_matrix,
 					   master_dof_list)
@@ -1280,7 +1280,7 @@ namespace internal
 	      }
 	    index += fe1.dofs_per_line;
 	  }
-	
+
 	for (int q=0;
 	     q<static_cast<signed int>(GeometryInfo<dim>::quads_per_face);
 	     ++q)
@@ -1292,7 +1292,7 @@ namespace internal
 	      {
 		Assert (i < fe1.dofs_per_quad,
 			ExcInternalError());
-		
+
 		master_dof_list.push_back (index+i);
 		if (check_master_dof_list (face_interpolation_matrix,
 					   master_dof_list)
@@ -1308,7 +1308,7 @@ namespace internal
 
 	AssertDimension (index, fe1.dofs_per_face);
 	AssertDimension (master_dof_list.size(), fe2.dofs_per_face);
-	
+
 					 // finally copy the list into the
 					 // mask
 	std::fill (master_dof_mask.begin(), master_dof_mask.end(), false);
@@ -1325,7 +1325,7 @@ namespace internal
 					* masters on refined faces where an
 					* fe1 and a fe2 meet.
 					*/
-      template <int dim, int spacedim>  
+      template <int dim, int spacedim>
       void
       ensure_existence_of_master_dof_mask (const FiniteElement<dim,spacedim> &fe1,
 					   const FiniteElement<dim,spacedim> &fe2,
@@ -1342,8 +1342,8 @@ namespace internal
 						     *master_dof_mask);
 	  }
       }
-      
-      
+
+
                                        /**
                                         * Make sure that the given @p
                                         * face_interpolation_matrix
@@ -1353,7 +1353,7 @@ namespace internal
                                         * with the correct data. If it
                                         * is nonzero, don't touch it.
                                         */
-      template <int dim, int spacedim>  
+      template <int dim, int spacedim>
       void
       ensure_existence_of_face_matrix (const FiniteElement<dim,spacedim> &fe1,
                                        const FiniteElement<dim,spacedim> &fe2,
@@ -1375,7 +1375,7 @@ namespace internal
 					* Same, but for subface
 					* interpolation matrices.
 					*/
-      template <int dim, int spacedim>  
+      template <int dim, int spacedim>
       void
       ensure_existence_of_subface_matrix (const FiniteElement<dim,spacedim> &fe1,
                                           const FiniteElement<dim,spacedim> &fe2,
@@ -1404,7 +1404,7 @@ namespace internal
 					*/
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
       static
-#endif      
+#endif
       void
       ensure_existence_of_split_face_matrix (const FullMatrix<double> &face_interpolation_matrix,
 					     const std::vector<bool> &master_dof_mask,
@@ -1414,7 +1414,7 @@ namespace internal
 	Assert (std::count (master_dof_mask.begin(), master_dof_mask.end(), true) ==
 		static_cast<signed int>(face_interpolation_matrix.n()),
 		ExcInternalError());
-	
+
         if (split_matrix == 0)
           {
             split_matrix
@@ -1434,7 +1434,7 @@ namespace internal
 
 	    unsigned int nth_master_dof = 0,
 			 nth_slave_dof  = 0;
-	    
+
 	    for (unsigned int i=0; i<n_dofs; ++i)
 	      if (master_dof_mask[i] == true)
 		{
@@ -1452,13 +1452,13 @@ namespace internal
 		}
 
 	    AssertDimension (nth_master_dof, n_master_dofs);
-	    AssertDimension (nth_slave_dof, n_dofs-n_master_dofs);	    
+	    AssertDimension (nth_slave_dof, n_dofs-n_master_dofs);
 
 //TODO[WB]: We should make sure very small entries are removed after inversion
 	    split_matrix->first.gauss_jordan ();
 	  }
       }
-      
+
 
                                        // a template that can
                                        // determine statically whether
@@ -1526,7 +1526,7 @@ namespace internal
       {
 
 	const unsigned int spacedim=dim;
- 
+
         unsigned int dominating_subface_no = 0;
         for (; dominating_subface_no<face->n_children();
              ++dominating_subface_no)
@@ -1541,12 +1541,12 @@ namespace internal
                     ->n_active_fe_indices()
                     == 1,
                     ExcInternalError());
-			
+
             const FiniteElement<dim,spacedim> &
               this_subface_fe = (face->child(dominating_subface_no)
                                  ->get_fe (face->child(dominating_subface_no)
                                            ->nth_active_fe_index(0)));
-			
+
             FiniteElementDomination::Domination
               domination = FiniteElementDomination::either_element_can_dominate;
             for (unsigned int sf=0; sf<face->n_children(); ++sf)
@@ -1556,11 +1556,11 @@ namespace internal
                     that_subface_fe = (face->child(sf)
                                        ->get_fe (face->child(sf)
                                                  ->nth_active_fe_index(0)));
-			      
+
                   domination = domination &
                                this_subface_fe.compare_for_face_domination(that_subface_fe);
                 }
-			
+
                                              // see if the element
                                              // on this subface is
                                              // able to dominate
@@ -1584,9 +1584,9 @@ namespace internal
                                          // be active on such subfaces
         return face->child (dominating_subface_no)->nth_active_fe_index(0);
       }
-      
 
-      
+
+
                                        /**
 					* Copy constraints into a constraint
 					* matrix object.
@@ -1605,7 +1605,7 @@ namespace internal
                                         */
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
       static
-#endif      
+#endif
       void
       filter_constraints (const std::vector<unsigned int> &master_dofs,
 			  const std::vector<unsigned int> &slave_dofs,
@@ -1620,7 +1620,7 @@ namespace internal
 				     face_constraints.m()));
 
 	const unsigned int n_master_dofs = master_dofs.size ();
-	const unsigned int n_slave_dofs = slave_dofs.size ();      
+	const unsigned int n_slave_dofs = slave_dofs.size ();
 
 	for (unsigned int row=0; row!=n_slave_dofs; ++row)
           if (constraints.is_constrained (slave_dofs[row]) == false)
@@ -1650,7 +1650,7 @@ namespace internal
 		  double abs_sum = 0;
 		  for (unsigned int i=0; i<n_master_dofs; ++i)
 		    abs_sum += std::abs (face_constraints(row,i));
-                 
+
 						   // then enter those
 						   // constraints that are
 						   // larger than
@@ -1684,12 +1684,12 @@ namespace internal
                       }
 		  constraints.set_inhomogeneity (slave_dofs[row], 0.);
                 }
-            }      
+            }
       }
 
     }
-    
-    
+
+
 #if deal_II_dimension == 1
     static
     void
@@ -1711,7 +1711,7 @@ namespace internal
 				       // nothing to do for regular
 				       // dof handlers in 1d
     }
-    
+
 
     static
     void
@@ -1733,7 +1733,7 @@ namespace internal
 				       // nothing to do for regular
 				       // dof handlers in 1d
     }
-    
+
 
     static
     void
@@ -1744,7 +1744,7 @@ namespace internal
 				       // constraints for
 				       // vertices. gotta think about
 				       // that a bit more
-//TODO[WB]: think about what to do here...      
+//TODO[WB]: think about what to do here...
     }
 
 
@@ -1759,7 +1759,7 @@ namespace internal
 				       // constraints for
 				       // vertices. gotta think about
 				       // that a bit more
-//TODO[WB]: think about what to do here...      
+//TODO[WB]: think about what to do here...
     }
 #endif
 
@@ -1776,7 +1776,7 @@ namespace internal
       const unsigned int dim = 2;
 
       const unsigned int spacedim = DH::space_dimension;
-  
+
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
 
@@ -1800,7 +1800,7 @@ namespace internal
 					endc = dof_handler.end();
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  if (cell->face(face)->has_children()) 
+	  if (cell->face(face)->has_children())
 	    {
 					       // so now we've found a
 					       // face of an active
@@ -1843,23 +1843,23 @@ namespace internal
 					       // ok, start up the work
 	      const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
 	      const unsigned int        fe_index = cell->active_fe_index();
-		
+
 	      const unsigned int
 		n_dofs_on_mother   = 2*fe.dofs_per_vertex + fe.dofs_per_line,
 		n_dofs_on_children = fe.dofs_per_vertex + 2*fe.dofs_per_line;
 
 	      dofs_on_mother.resize (n_dofs_on_mother);
 	      dofs_on_children.resize (n_dofs_on_children);
-	      
+
 	      Assert(n_dofs_on_mother == fe.constraints().n(),
 		     ExcDimensionMismatch(n_dofs_on_mother,
 					  fe.constraints().n()));
 	      Assert(n_dofs_on_children == fe.constraints().m(),
 		     ExcDimensionMismatch(n_dofs_on_children,
-					  fe.constraints().m()));	      
+					  fe.constraints().m()));
 
 	      const typename DH::line_iterator this_face = cell->face(face);
-	      
+
 					       // fill the dofs indices. Use same
 					       // enumeration scheme as in
 					       // @p{FiniteElement::constraints()}
@@ -1871,7 +1871,7 @@ namespace internal
 	      for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
 		dofs_on_mother[next_index++] = this_face->dof_index(dof, fe_index);
 	      AssertDimension (next_index, dofs_on_mother.size());
-	  
+
 	      next_index = 0;
 	      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 		dofs_on_children[next_index++]
@@ -1881,10 +1881,10 @@ namespace internal
 		  dofs_on_children[next_index++]
 		    = this_face->child(child)->dof_index(dof, fe_index);
 	      AssertDimension (next_index, dofs_on_children.size());
-	  
+
 					       // for each row in the constraint
 					       // matrix for this line:
-	      for (unsigned int row=0; row!=dofs_on_children.size(); ++row) 
+	      for (unsigned int row=0; row!=dofs_on_children.size(); ++row)
 		{
 		  constraints.add_line (dofs_on_children[row]);
 		  for (unsigned int i=0; i!=dofs_on_mother.size(); ++i)
@@ -1908,9 +1908,9 @@ namespace internal
 	      Assert (cell->face(face)
 		      ->fe_index_is_active(cell->active_fe_index()) == true,
 		      ExcInternalError());
-	    } 
+	    }
     }
-#endif      
+#endif
 
 
 #if deal_II_dimension == 3
@@ -1922,7 +1922,7 @@ namespace internal
 					    dealii::internal::int2type<3>)
     {
       const unsigned int dim = 3;
-  
+
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
 
@@ -1946,7 +1946,7 @@ namespace internal
 					endc = dof_handler.end();
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  if (cell->face(face)->has_children()) 
+	  if (cell->face(face)->has_children())
 	    {
 					       // first of all, make sure that
 					       // we treat a case which is
@@ -1955,7 +1955,7 @@ namespace internal
 					       // anisotropic refinement
 	      if (cell->get_fe().dofs_per_face == 0)
 		continue;
-	      
+
 	      Assert(cell->face(face)->refinement_case()==RefinementCase<dim-1>::isotropic_refinement,
 		     ExcNotImplemented());
 
@@ -2019,7 +2019,7 @@ namespace internal
 			  ->fe_index_is_active(cell->active_fe_index()) == true,
 			  ExcNotImplemented());
 		}
-	      
+
 					       // ok, start up the work
 	      const FiniteElement<dim> &fe       = cell->get_fe();
 	      const unsigned int        fe_index = cell->active_fe_index();
@@ -2032,19 +2032,19 @@ namespace internal
 				      12*fe.dofs_per_line+
 				      4*fe.dofs_per_quad);
 					       //TODO[TL]: think about this and the following in case of anisotropic refinement
-	      
+
 	      dofs_on_mother.resize (n_dofs_on_mother);
 	      dofs_on_children.resize (n_dofs_on_children);
-	      
+
 	      Assert(n_dofs_on_mother == fe.constraints().n(),
 		     ExcDimensionMismatch(n_dofs_on_mother,
 					  fe.constraints().n()));
 	      Assert(n_dofs_on_children == fe.constraints().m(),
 		     ExcDimensionMismatch(n_dofs_on_children,
-					  fe.constraints().m()));	      
+					  fe.constraints().m()));
 
 	      const typename DH::face_iterator this_face = cell->face(face);
-	  
+
 					       // fill the dofs indices. Use same
 					       // enumeration scheme as in
 					       // @p{FiniteElement::constraints()}
@@ -2060,7 +2060,7 @@ namespace internal
 	      for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
 		dofs_on_mother[next_index++] = this_face->dof_index(dof, fe_index);
 	      AssertDimension (next_index, dofs_on_mother.size());
-	  
+
 	      next_index = 0;
 
 					       // assert some consistency
@@ -2077,14 +2077,14 @@ namespace internal
 	      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 		dofs_on_children[next_index++]
 		  = this_face->child(0)->vertex_dof_index(3,dof);
-	  
+
 					       // dof numbers on the centers of
 					       // the lines bounding this face
 	      for (unsigned int line=0; line<4; ++line)
 		for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 		  dofs_on_children[next_index++]
 		    = this_face->line(line)->child(0)->vertex_dof_index(1,dof, fe_index);
-	  
+
 					       // next the dofs on the lines interior
 					       // to the face; the order of these
 					       // lines is laid down in the
@@ -2101,14 +2101,14 @@ namespace internal
 	      for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
 		dofs_on_children[next_index++]
 		  = this_face->child(1)->line(3)->dof_index(dof, fe_index);
-	  
+
 					       // dofs on the bordering lines
 	      for (unsigned int line=0; line<4; ++line)
 		for (unsigned int child=0; child<2; ++child)
 		  for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
 		    dofs_on_children[next_index++]
 		      = this_face->line(line)->child(child)->dof_index(dof, fe_index);
-	  
+
 					       // finally, for the dofs interior
 					       // to the four child faces
 	      for (unsigned int child=0; child<4; ++child)
@@ -2116,10 +2116,10 @@ namespace internal
 		  dofs_on_children[next_index++]
 		    = this_face->child(child)->dof_index(dof, fe_index);
 	      AssertDimension (next_index, dofs_on_children.size());
-	  
+
 					       // for each row in the constraint
 					       // matrix for this line:
-	      for (unsigned int row=0; row!=dofs_on_children.size(); ++row) 
+	      for (unsigned int row=0; row!=dofs_on_children.size(); ++row)
 		{
 		  constraints.add_line (dofs_on_children[row]);
 		  for (unsigned int i=0; i!=dofs_on_mother.size(); ++i)
@@ -2143,11 +2143,11 @@ namespace internal
 	      Assert (cell->face(face)
 		      ->fe_index_is_active(cell->active_fe_index()) == true,
 		      ExcInternalError());
-	    } 
+	    }
     }
 #endif
 
-    
+
     template <class DH>
     static
     void
@@ -2166,7 +2166,7 @@ namespace internal
 
       const unsigned int spacedim = DH::space_dimension;
 
-      
+
                                        // a matrix to be used for
                                        // constraints below. declared
                                        // here and simply resized down
@@ -2182,7 +2182,7 @@ namespace internal
       std::vector<unsigned int> master_dofs;
       std::vector<unsigned int> slave_dofs;
       std::vector<unsigned int> scratch_dofs;
-      
+
                                        // caches for the face and
                                        // subface interpolation
                                        // matrices between different
@@ -2220,7 +2220,7 @@ namespace internal
       Table<2,std_cxx1x::shared_ptr<std::vector<bool> > >
 	master_dof_masks (n_finite_elements (dof_handler),
 			  n_finite_elements (dof_handler));
-      
+
 				       // loop over all faces
 				       //
 				       // note that even though we may
@@ -2232,7 +2232,7 @@ namespace internal
 					endc = dof_handler.end();
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  if (cell->face(face)->has_children()) 
+	  if (cell->face(face)->has_children())
 	    {
 					       // first of all, make sure that
 					       // we treat a case which is
@@ -2241,7 +2241,7 @@ namespace internal
 					       // anisotropic refinement
 	      if (cell->get_fe().dofs_per_face == 0)
 	      	continue;
-	      
+
 	      Assert(cell->face(face)->refinement_case()==RefinementCase<dim-1>::isotropic_refinement,
 		     ExcNotImplemented());
 
@@ -2263,7 +2263,7 @@ namespace internal
                   all_are_zero = false;
               }
 
-              if(all_are_zero) 
+              if(all_are_zero)
                 continue;
 
               Assert( all_are_zero || !any_are_zero, ExcNotImplemented() );
@@ -2341,7 +2341,7 @@ namespace internal
 
 		    cell->face(face)->get_dof_indices (master_dofs,
                                                        cell->active_fe_index ());
-		  
+
 						     // Now create constraint matrix for
 						     // the subfaces and assemble it.
 		    for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
@@ -2361,7 +2361,7 @@ namespace internal
 			slave_dofs.resize (subface->get_fe(subface_fe_index)
 					   .dofs_per_face);
 			subface->get_dof_indices (slave_dofs, subface_fe_index);
-					      
+
 							 // Now create the
 							 // element constraint
 							 // for this subface.
@@ -2431,14 +2431,14 @@ namespace internal
 				  << ", subface=" << c
 				  << std::endl;
 #endif
-			
+
 			filter_constraints (master_dofs,
 					    slave_dofs,
 					    *(subface_interpolation_matrices
                                               [cell->active_fe_index()][subface_fe_index][c]),
 					    constraints);
 		      }
-		    
+
 		    break;
 		  }
 
@@ -2477,10 +2477,10 @@ namespace internal
 						     // constrained to
                     const unsigned int dominating_fe_index
                       = get_most_dominating_subface_fe_index<dim> (cell->face(face));
-                    
+
 		    const FiniteElement<dim,spacedim> &dominating_fe
 		      = dof_handler.get_fe()[dominating_fe_index];
-		    
+
 						     // check also
 						     // that it is
 						     // able to
@@ -2502,7 +2502,7 @@ namespace internal
 			     == FiniteElementDomination::either_element_can_dominate),
 			    ExcInternalError());
 
-		    
+
 						     // first get the
 						     // interpolation matrix
 						     // from the mother to the
@@ -2516,7 +2516,7 @@ namespace internal
                        cell->get_fe(),
                        face_interpolation_matrices
                        [dominating_fe_index][cell->active_fe_index()]);
-                    
+
 						     // split this matrix into
 						     // master and slave
 						     // components. invert the
@@ -2530,7 +2530,7 @@ namespace internal
 		       master_dof_masks
 		       [dominating_fe_index]
 		       [cell->active_fe_index()]);
-		    
+
 		    ensure_existence_of_split_face_matrix
 		      (*face_interpolation_matrices
                        [dominating_fe_index][cell->active_fe_index()],
@@ -2538,7 +2538,7 @@ namespace internal
 			[dominating_fe_index][cell->active_fe_index()]),
 		       split_face_interpolation_matrices
                        [dominating_fe_index][cell->active_fe_index()]);
-		    
+
 		    const FullMatrix<double> &restrict_mother_to_virtual_master_inv
 		      = (split_face_interpolation_matrices
 			 [dominating_fe_index][cell->active_fe_index()]->first);
@@ -2583,11 +2583,11 @@ namespace internal
 			master_dofs.push_back (scratch_dofs[i]);
 		      else
 			slave_dofs.push_back (scratch_dofs[i]);
-		    
+
 		    AssertDimension (master_dofs.size(), dominating_fe.dofs_per_face);
 		    AssertDimension (slave_dofs.size(),
 			    cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face);
-		    
+
 #ifdef WOLFGANG
 		    std::cout << "Constraints for cell=" << cell
 			      << ", face=" << face
@@ -2617,7 +2617,7 @@ namespace internal
 			  = cell->face(face)->child(sf)->nth_active_fe_index(0);
 			const FiniteElement<dim,spacedim> &subface_fe
 			  = dof_handler.get_fe()[subface_fe_index];
-			    
+
 							 // first get the
 							 // interpolation
 							 // matrix from the
@@ -2632,18 +2632,18 @@ namespace internal
                            sf,
                            subface_interpolation_matrices
                            [dominating_fe_index][subface_fe_index][sf]);
-                    
+
                         const FullMatrix<double> &restrict_subface_to_virtual
                           = *(subface_interpolation_matrices
                               [dominating_fe_index][subface_fe_index][sf]);
 
                         constraint_matrix.reinit (subface_fe.dofs_per_face,
                                                   dominating_fe.dofs_per_face);
-			
+
 			restrict_subface_to_virtual
 			  .mmult (constraint_matrix,
 				  restrict_mother_to_virtual_master_inv);
-			
+
 			slave_dofs.resize (subface_fe.dofs_per_face);
 			cell->face(face)->child(sf)->get_dof_indices (slave_dofs,
 								      subface_fe_index);
@@ -2660,7 +2660,7 @@ namespace internal
 					    constraint_matrix,
 					    constraints);
 		      }
-			
+
 		    break;
 		  }
 
@@ -2697,7 +2697,7 @@ namespace internal
 		  &&
 		  (!cell->face(face)->has_children() &&
 		   !cell->neighbor_is_coarser(face) ))
-		{		  
+		{
 		  const typename DH::cell_iterator neighbor = cell->neighbor (face);
 
 						   // see which side of the
@@ -2714,17 +2714,17 @@ namespace internal
 			master_dofs.resize (cell->get_fe().dofs_per_face);
 			cell->face(face)->get_dof_indices (master_dofs,
 							   cell->active_fe_index ());
-                          
+
 			slave_dofs.resize (neighbor->get_fe().dofs_per_face);
 			cell->face(face)->get_dof_indices (slave_dofs,
 							   neighbor->active_fe_index ());
-			  
+
 							 // break if the n_master_dofs == 0,
-                                                         // because we are attempting to 
+                                                         // because we are attempting to
                                                          // constrain to an element that has
                                                          // has no face dofs
                         if(master_dofs.size() == 0) break;
- 
+
 							 // make sure
 							 // the element
 							 // constraints
@@ -2739,7 +2739,7 @@ namespace internal
 
 							 // Add constraints to global constraint
 							 // matrix.
-#ifdef WOLFGANG		      
+#ifdef WOLFGANG
 			std::cout << "p-constraints for cell=" << cell
 				  << ", face=" << face << std::endl;
 #endif
@@ -2836,10 +2836,10 @@ namespace internal
 			    for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
 			      AssertDimension (master_dofs[i], slave_dofs[i]);
 			  }
-		      
+
 			break;
 		      }
-		    
+
 		      case FiniteElementDomination::neither_element_dominates:
 		      {
 							 // we don't presently
@@ -2904,7 +2904,7 @@ void DoFTools::distribute_cell_to_dof_vector (
   const unsigned int    component)
 {
   const Triangulation<DH::dimension> &tria = dof_handler.get_tria();
-  
+
   Assert (cell_data.size()==tria.n_active_cells(),
 	  ExcWrongSize (cell_data.size(), tria.n_active_cells()));
   Assert (dof_data.size()==dof_handler.n_dofs(),
@@ -2913,7 +2913,7 @@ void DoFTools::distribute_cell_to_dof_vector (
 	  ExcInvalidComponent(component, n_components(dof_handler)));
   Assert (fe_is_primitive(dof_handler) == true,
           ExcFENotPrimitive());
-  
+
 				   // store a flag whether we should care
 				   // about different components. this is
 				   // just a simplification, we could ask
@@ -2936,7 +2936,7 @@ void DoFTools::distribute_cell_to_dof_vector (
       for (unsigned int i=0; i<dof_data.size(); ++i)
 	dof_data(i) = 0;
     }
-  
+
 				   // count how often we have added a value
 				   // in the sum for each dof
   std::vector<unsigned char> touch_count (dof_handler.n_dofs(), 0);
@@ -2946,12 +2946,12 @@ void DoFTools::distribute_cell_to_dof_vector (
   std::vector<unsigned int> dof_indices;
   dof_indices.reserve (max_dofs_per_cell(dof_handler));
 
-  for (unsigned int present_cell = 0; cell!=endc; ++cell, ++present_cell) 
+  for (unsigned int present_cell = 0; cell!=endc; ++cell, ++present_cell)
     {
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
       dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (dof_indices);
-      
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 					 // consider this dof only if it
 					 // is the right component. if there
@@ -2968,7 +2968,7 @@ void DoFTools::distribute_cell_to_dof_vector (
 	    ++touch_count[dof_indices[i]];
 	  }
     }
-  
+
 				   // compute the mean value on all the
 				   // dofs by dividing with the number
 				   // of summands.
@@ -2996,7 +2996,7 @@ DoFTools::extract_dofs (
   const bool               count_by_blocks)
 {
   const FiniteElement<dim,spacedim> &fe = dof.get_fe();
-  
+
   if (count_by_blocks == true)
     {
       Assert(component_select.size() == fe.n_blocks(),
@@ -3007,7 +3007,7 @@ DoFTools::extract_dofs (
       Assert(component_select.size() == n_components(dof),
 	     ExcDimensionMismatch(component_select.size(), n_components(dof)));
     }
-  
+
   Assert(selected_dofs.size() == dof.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs()));
 
@@ -3027,7 +3027,7 @@ DoFTools::extract_dofs (
       std::fill_n (selected_dofs.begin(), dof.n_dofs(), true);
       return;
     };
-  
+
 
 				   // preset all values by false
   std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
@@ -3064,7 +3064,7 @@ DoFTools::extract_dofs (
 	  const unsigned int this_base = fe.system_to_base_index(i).first.first;
 	  const unsigned int this_multiplicity
 	    = fe.system_to_base_index(i).first.second;
-	  
+
 	  for (unsigned int b=0; b<this_base; ++b)
 	    first_comp += fe.base_element(b).n_components() *
 			  fe.element_multiplicity(b);
@@ -3072,10 +3072,10 @@ DoFTools::extract_dofs (
 	    first_comp += fe.base_element(this_base).n_components();
 	  const unsigned int end_comp = first_comp +
 					fe.base_element(this_base).n_components();
-	  
+
 	  Assert (first_comp < fe.n_components(), ExcInternalError());
 	  Assert (end_comp <= fe.n_components(),  ExcInternalError());
-	  
+
 					   // now check whether any of
 					   // the components in between
 					   // is set
@@ -3086,7 +3086,7 @@ DoFTools::extract_dofs (
 		break;
 	      }
 	}
-  
+
                                    // then loop over all cells and do
                                    // the work
   std::vector<unsigned int> indices(fe.dofs_per_cell);
@@ -3109,11 +3109,11 @@ DoFTools::extract_dofs (
   std::vector<bool>       &/*selected_dofs*/,
   const bool               /*count_by_blocks*/)
 {
-//TODO[WB]: implement this function  
+//TODO[WB]: implement this function
   Assert (false, ExcNotImplemented());
-/*  
+/*
   const FiniteElement<dim,spacedim> &fe = dof.get_fe();
-  
+
   if (count_by_blocks == true)
     {
       Assert(component_select.size() == fe.n_blocks(),
@@ -3124,7 +3124,7 @@ DoFTools::extract_dofs (
       Assert(component_select.size() == n_components(dof),
 	     ExcDimensionMismatch(component_select.size(), n_components(dof)));
     }
-  
+
   Assert(selected_dofs.size() == dof.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs()));
 
@@ -3144,7 +3144,7 @@ DoFTools::extract_dofs (
       std::fill_n (selected_dofs.begin(), dof.n_dofs(), true);
       return;
     };
-  
+
 
 				   // preset all values by false
   std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
@@ -3181,7 +3181,7 @@ DoFTools::extract_dofs (
 	  const unsigned int this_base = fe.system_to_base_index(i).first.first;
 	  const unsigned int this_multiplicity
 	    = fe.system_to_base_index(i).first.second;
-	  
+
 	  for (unsigned int b=0; b<this_base; ++b)
 	    first_comp += fe.base_element(b).n_components() *
 			  fe.element_multiplicity(b);
@@ -3189,10 +3189,10 @@ DoFTools::extract_dofs (
 	    first_comp += fe.base_element(this_base).n_components();
 	  const unsigned int end_comp = first_comp +
 					fe.base_element(this_base).n_components();
-	  
+
 	  Assert (first_comp < fe.n_components(), ExcInternalError());
 	  Assert (end_comp <= fe.n_components(),  ExcInternalError());
-	  
+
 					   // now check whether any of
 					   // the components in between
 					   // is set
@@ -3203,7 +3203,7 @@ DoFTools::extract_dofs (
 		break;
 	      }
 	}
-  
+
                                    // then loop over all cells and do
                                    // the work
   std::vector<unsigned int> indices(fe.dofs_per_cell);
@@ -3229,7 +3229,7 @@ DoFTools::extract_level_dofs(
   const bool               count_by_blocks)
 {
   const FiniteElement<dim,spacedim>& fe = dof.get_fe();
-  
+
   if (count_by_blocks == true)
     {
       Assert(component_select.size() == fe.n_blocks(),
@@ -3240,7 +3240,7 @@ DoFTools::extract_level_dofs(
       Assert(component_select.size() == fe.n_components(),
 	     ExcDimensionMismatch(component_select.size(), fe.n_components()));
     }
-  
+
   Assert(selected_dofs.size() == dof.n_dofs(level),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs(level)));
 
@@ -3296,7 +3296,7 @@ DoFTools::extract_level_dofs(
 	  const unsigned int this_base = fe.system_to_base_index(i).first.first;
 	  const unsigned int this_multiplicity
 	    = fe.system_to_base_index(i).first.second;
-	  
+
 	  for (unsigned int b=0; b<this_base; ++b)
 	    first_comp += fe.base_element(b).n_components() *
 			  fe.element_multiplicity(b);
@@ -3304,10 +3304,10 @@ DoFTools::extract_level_dofs(
 	    first_comp += fe.base_element(this_base).n_components();
 	  const unsigned int end_comp = first_comp +
 					fe.base_element(this_base).n_components();
-	  
+
 	  Assert (first_comp < fe.n_components(), ExcInternalError());
 	  Assert (end_comp <= fe.n_components(),  ExcInternalError());
-	  
+
 					   // now check whether any of
 					   // the components in between
 					   // is set
@@ -3318,10 +3318,10 @@ DoFTools::extract_level_dofs(
 		break;
 	      }
 	}
-  
+
                                    // then loop over all cells and do
                                    // work
-  std::vector<unsigned int> indices(fe.dofs_per_cell);  
+  std::vector<unsigned int> indices(fe.dofs_per_cell);
   typename MGDoFHandler<dim,spacedim>::cell_iterator c;
   for (c = dof.begin(level) ; c != dof.end(level) ; ++ c)
     {
@@ -3360,7 +3360,7 @@ DoFTools::extract_boundary_dofs (const DH                      &dof_handler,
   const bool check_vector_component
     = (component_select != std::vector<bool>(component_select.size(),
                                              true));
-  
+
 				   // clear and reset array by default
 				   // values
   selected_dofs.clear ();
@@ -3391,7 +3391,7 @@ DoFTools::extract_boundary_dofs (const DH                      &dof_handler,
 	     != boundary_indicators.end()))
 	  {
             const FiniteElement<DH::dimension> &fe = cell->get_fe();
-            
+
             const unsigned int dofs_per_face = fe.dofs_per_face;
             face_dof_indices.resize (dofs_per_face);
 	    cell->face(face)->get_dof_indices (face_dof_indices,
@@ -3449,7 +3449,7 @@ DoFTools::extract_boundary_dofs (const DH                      &dof_handler,
                            fe.get_nonzero_components(cell_index).begin());
                       Assert (first_nonzero_comp < fe.n_components(),
                               ExcInternalError());
-                       
+
                       selected_dofs[face_dof_indices[i]]
                         = (component_select[first_nonzero_comp]
                            == true);
@@ -3472,7 +3472,7 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
   Assert (component_select.size() == n_components(dof_handler),
 	  ExcWrongSize (component_select.size(),
 			n_components(dof_handler)));
-	  
+
 				   // clear and reset array by default
 				   // values
   selected_dofs.clear ();
@@ -3495,13 +3495,13 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
   const bool check_vector_component
     = (component_select != std::vector<bool>(component_select.size(),
                                              true));
-  
+
 				   // loop over coarse grid cells
   for (typename DH::cell_iterator cell=dof_handler.begin(0);
        cell!=dof_handler.end(0); ++cell)
     {
       const FiniteElement<1> &fe = cell->get_fe();
-            
+
 				       // check left-most vertex
       if (check_left_vertex)
 	if (cell->neighbor(0) == dof_handler.end())
@@ -3511,7 +3511,7 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
 					     // equal to the number of DoFs
 					     // on the vertices.
             AssertDimension (fe.dofs_per_face, fe.dofs_per_vertex);
-            
+
             for (unsigned int i=0; i<fe.dofs_per_face; ++i)
               if (!check_vector_component)
                 selected_dofs[cell->vertex_dof_index(0,i)] = true;
@@ -3539,12 +3539,12 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
                       fe.get_nonzero_components(i).begin()));
                   Assert (component < fe.n_components(),
                           ExcInternalError());
-                 
+
                   if (component_select[component] == true)
                     selected_dofs[cell->vertex_dof_index(0,i)] = true;
                 }
           }
-      
+
 				       // check right-most
 				       // vertex. same procedure here
 				       // as above
@@ -3552,7 +3552,7 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
 	if (cell->neighbor(1) == dof_handler.end())
           {
             AssertDimension (fe.dofs_per_face, fe.dofs_per_vertex);
-            
+
             for (unsigned int i=0; i<fe.dofs_per_face; ++i)
               if (!check_vector_component)
                 selected_dofs[cell->vertex_dof_index(1,i)] = true;
@@ -3568,7 +3568,7 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
                       fe.get_nonzero_components(i).begin()));
                   Assert (component < fe.n_components(),
                           ExcInternalError());
-                 
+
                   if (component_select[component] == true)
                     selected_dofs[cell->vertex_dof_index(1,i)] = true;
                 }
@@ -3592,7 +3592,7 @@ namespace internal
 	     ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
 				       // preset all values by false
       std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
-      
+
 				       // there are no hanging nodes in 1d
     }
 
@@ -3602,7 +3602,7 @@ namespace internal
 				     std::vector<bool>           &selected_dofs)
     {
       const unsigned int dim = 2;
-  
+
       Assert(selected_dofs.size() == dof_handler.n_dofs(),
 	     ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
 				       // preset all values by false
@@ -3618,14 +3618,14 @@ namespace internal
 	endc = dof_handler.end();
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  if (cell->face(face)->has_children()) 
+	  if (cell->face(face)->has_children())
 	    {
 	      const typename dealii::DoFHandler<dim,spacedim>::line_iterator
 		line = cell->face(face);
 
 	      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 		selected_dofs[line->child(0)->vertex_dof_index(1,dof)] = true;
-	  
+
 	      for (unsigned int child=0; child<2; ++child)
 		for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
 		  selected_dofs[line->child(child)->dof_index(dof)] = true;
@@ -3645,7 +3645,7 @@ namespace internal
       std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
       const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
-  
+
 				       // this function is similar to the
 				       // make_sparsity_pattern function,
 				       // see there for more information
@@ -3655,20 +3655,20 @@ namespace internal
 	endc = dof_handler.end();
       for (; cell!=endc; ++cell)
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	  if (cell->face(f)->has_children()) 
+	  if (cell->face(f)->has_children())
 	    {
 	      const typename dealii::DoFHandler<dim,spacedim>::face_iterator
 		face = cell->face(f);
-	  
+
 	      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 		selected_dofs[face->child(0)->vertex_dof_index(2,dof)] = true;
-	  
+
 					       // dof numbers on the centers of
 					       // the lines bounding this face
 	      for (unsigned int line=0; line<4; ++line)
 		for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 		  selected_dofs[face->line(line)->child(0)->vertex_dof_index(1,dof)] = true;
-	  
+
 					       // next the dofs on the lines interior
 					       // to the face; the order of these
 					       // lines is laid down in the
@@ -3681,13 +3681,13 @@ namespace internal
 		selected_dofs[face->child(2)->line(3)->dof_index(dof)] = true;
 	      for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
 		selected_dofs[face->child(3)->line(0)->dof_index(dof)] = true;
-	  
+
 					       // dofs on the bordering lines
 	      for (unsigned int line=0; line<4; ++line)
 		for (unsigned int child=0; child<2; ++child)
 		  for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
 		    selected_dofs[face->line(line)->child(child)->dof_index(dof)] = true;
-	
+
 					       // finally, for the dofs interior
 					       // to the four child faces
 	      for (unsigned int child=0; child<4; ++child)
@@ -3698,7 +3698,7 @@ namespace internal
   }
 }
 
-    
+
 
 template <int dim, int spacedim>
 void
@@ -3726,11 +3726,11 @@ DoFTools::extract_subdomain_dofs (const DH           &dof_handler,
 
   std::vector<unsigned int> local_dof_indices;
   local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
-  
+
 				   // this function is similar to the
 				   // make_sparsity_pattern function,
 				   // see there for more information
-  typename DH::active_cell_iterator 
+  typename DH::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -3776,15 +3776,15 @@ DoFTools::extract_constant_modes (const DH                        &dof_handler,
   extract_dofs (dof_handler, component_select, selection_dof_list);
 
   constant_modes.resize (n_components_selected, std::vector<bool>(n_u, false));
-  
-  for (unsigned int component=0, component_used=0; 
+
+  for (unsigned int component=0, component_used=0;
        component < n_components; ++component, ++component_used)
     if (component_select[component])
       {
 	std::vector<bool> selection_mask (n_components, false);
 	selection_mask[component] = true;
 	extract_dofs (dof_handler, selection_mask, temporary_dof_list);
-  
+
 	unsigned int counter = 0;
 	for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
 	{
@@ -3811,7 +3811,7 @@ DoFTools::get_active_fe_indices (const DH                  &dof_handler,
   Assert (active_fe_indices.size() == dof_handler.get_tria().n_active_cells(),
 	  ExcWrongSize (active_fe_indices.size(),
 			dof_handler.get_tria().n_active_cells()));
-  
+
   typename DH::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -3842,7 +3842,7 @@ DoFTools::get_subdomain_association (const DH                  &dof_handler,
 				   // between subdomains to each of
 				   // the two or more
   bool coin_flip = true;
-  
+
 				   // loop over all cells and record
 				   // which subdomain a DoF belongs
 				   // to. toss a coin in case it is on
@@ -3893,25 +3893,6 @@ unsigned int
 DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler,
 						 const unsigned int  subdomain)
 {
-                                   // in debug mode, make sure that there are
-                                   // some cells at least with this subdomain
-                                   // id
-#ifdef DEBUG
-  {
-    bool found = false;
-    for (typename Triangulation<DH::dimension, DH::space_dimension>::active_cell_iterator
-           cell=dof_handler.get_tria().begin_active();
-         cell!=dof_handler.get_tria().end(); ++cell)
-      if (cell->subdomain_id() == subdomain)
-        {
-          found = true;
-          break;
-        }
-    Assert (found == true,
-            ExcMessage ("There are no cells for the given subdomain!"));
-  } 
-#endif
-
   std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
   get_subdomain_association (dof_handler, subdomain_association);
 
@@ -3932,7 +3913,7 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
 	  ExcDimensionMismatch (n_dofs_on_subdomain.size(),
 				dof_handler.get_fe().n_components()));
   std::fill (n_dofs_on_subdomain.begin(), n_dofs_on_subdomain.end(), 0);
-  
+
                                    // in debug mode, make sure that there are
                                    // some cells at least with this subdomain
                                    // id
@@ -3949,7 +3930,7 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
         }
     Assert (found == true,
             ExcMessage ("There are no cells for the given subdomain!"));
-  } 
+  }
 #endif
 
   std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
@@ -3980,7 +3961,7 @@ DoFTools::count_dofs_per_component (
   std::vector<unsigned int>  target_component)
 {
   const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
-  
+
   std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
 
 				   // If the empty vector was given as
@@ -3997,16 +3978,16 @@ DoFTools::count_dofs_per_component (
 	    ExcDimensionMismatch(target_component.size(),
 				 fe.n_components()));
 
-    
+
 
   const unsigned int max_component
     = *std::max_element (target_component.begin(),
 			 target_component.end());
   const unsigned int n_target_components = max_component + 1;
   const unsigned int n_components = fe.n_components();
-  
+
   AssertDimension (dofs_per_component.size(), n_target_components);
-  
+
 				   // special case for only one
 				   // component. treat this first
 				   // since it does not require any
@@ -4017,7 +3998,7 @@ DoFTools::count_dofs_per_component (
       return;
     }
 
-      
+
 				   // otherwise determine the number
 				   // of dofs in each component
 				   // separately. do so in parallel
@@ -4049,7 +4030,7 @@ DoFTools::count_dofs_per_component (
       const FiniteElement<dim,spacedim>& base = fe.base_element(b);
 				       // Dimension of base element
       unsigned int d = base.n_components();
-      
+
       for (unsigned int m=0;m<fe.element_multiplicity(b);++m)
 	{
 	  for (unsigned int dd=0;dd<d;++dd)
@@ -4063,7 +4044,7 @@ DoFTools::count_dofs_per_component (
 	    }
 	}
     }
-  
+
 				   // finally sanity check. this is
 				   // only valid if the finite element
 				   // is actually primitive, so
@@ -4085,9 +4066,9 @@ DoFTools::count_dofs_per_block (
   std::vector<unsigned int>  target_block)
 {
   const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
-  
+
   std::fill (dofs_per_block.begin(), dofs_per_block.end(), 0U);
-  
+
 				   // If the empty vector was given as
 				   // default argument, set up this
 				   // vector as identity.
@@ -4102,14 +4083,14 @@ DoFTools::count_dofs_per_block (
 	    ExcDimensionMismatch(target_block.size(),
 				 fe.n_blocks()));
 
-    
+
 
   const unsigned int max_block
     = *std::max_element (target_block.begin(),
 			 target_block.end());
   const unsigned int n_target_blocks = max_block + 1;
   const unsigned int n_blocks = fe.n_blocks();
-  
+
   AssertDimension (dofs_per_block.size(), n_target_blocks);
 
 				   // special case for only one
@@ -4120,7 +4101,7 @@ DoFTools::count_dofs_per_block (
     {
       dofs_per_block[0] = dof_handler.n_dofs();
       return;
-    } 
+    }
 				   // otherwise determine the number
 				   // of dofs in each block
 				   // separately. do so in parallel
@@ -4206,7 +4187,7 @@ namespace internal
 				       // grid:
       const unsigned int coarse_dofs_per_cell_component
 	= coarse_fe.base_element(coarse_fe.component_to_base_index(coarse_component).first).dofs_per_cell;
-  
+
 
 				       // Try to find out whether the
 				       // grids stem from the same coarse
@@ -4221,8 +4202,8 @@ namespace internal
 	      dealii::DoFTools::ExcGridsDontMatch ());
       Assert (&coarse_to_fine_grid_map.get_destination_grid() == &fine_grid,
 	      dealii::DoFTools::ExcGridsDontMatch ());
-  
-  
+
+
 				       // check whether component numbers
 				       // are valid
       Assert (coarse_component < coarse_fe.n_components(),
@@ -4248,7 +4229,7 @@ namespace internal
 		dealii::DoFTools::ExcGridNotCoarser());
 #endif
 
-  
+
 
 /*
  * From here on: the term `parameter' refers to the selected component
@@ -4268,7 +4249,7 @@ namespace internal
  */
 
 
-  
+
 				       // set up vectors of cell-local
 				       // data; each vector represents one
 				       // degree of freedom of the
@@ -4308,7 +4289,7 @@ namespace internal
 					   // how many true's there
 	  std::vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
 	  std::vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
-      
+
 	  for (typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
 		 cell=fine_grid.begin_active();
 	       cell!=fine_grid.end(); ++cell)
@@ -4322,8 +4303,8 @@ namespace internal
 	  n_parameters_on_fine_grid = std::count (dof_is_interesting.begin(),
 						  dof_is_interesting.end(),
 						  true);
-	};  
-  
+	};
+
 
 				       // set up the weights mapping
       weights.clear ();
@@ -4331,7 +4312,7 @@ namespace internal
 
       weight_mapping.clear ();
       weight_mapping.resize (n_fine_dofs, -1);
-  
+
       if (true)
 	{
 	  std::vector<unsigned int> local_dof_indices(fine_fe.dofs_per_cell);
@@ -4358,7 +4339,7 @@ namespace internal
 		  ExcInternalError());
 	};
 
-  
+
 				       // for each cell on the parameter grid:
 				       // find out which degrees of freedom on the
 				       // fine grid correspond in which way to
@@ -4409,7 +4390,7 @@ namespace internal
 	};
 #endif
 
-  
+
       return n_parameters_on_fine_grid;
     }
 
@@ -4438,7 +4419,7 @@ namespace internal
     {
 				       // aliases to the finite elements
 				       // used by the dof handlers:
-      const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe();    
+      const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe();
 
 				       // for each cell on the parameter grid:
 				       // find out which degrees of freedom on the
@@ -4511,10 +4492,10 @@ namespace internal
 				       // on the fine grid
       const unsigned int n_fine_dofs = weight_mapping.size();
       dealii::Vector<double> global_parameter_representation (n_fine_dofs);
-  
+
       typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator cell;
       std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
-  
+
       for (cell=begin; cell!=end; ++cell)
 	{
 					   // get the global indices of the
@@ -4537,9 +4518,9 @@ namespace internal
 						 // this cell?
 		const unsigned int local_parameter_dof
 		  = coarse_fe.system_to_component_index(local_dof).second;
-	    
+
 		global_parameter_representation = 0;
-	    
+
 						 // distribute the representation of
 						 // @p{local_parameter_dof} on the
 						 // parameter grid cell @p{cell} to
@@ -4633,7 +4614,7 @@ namespace internal
 								     coarse_grid.end(),
 								     multithread_info.n_default_threads);
 
-//TODO: use WorkStream here      
+//TODO: use WorkStream here
       Threads::TaskGroup<> tasks;
       void (*fun_ptr) (const dealii::DoFHandler<dim,spacedim>              &,
 		       const unsigned int                  ,
@@ -4722,7 +4703,7 @@ DoFTools::compute_intergrid_constraints (
 					     fine_grid, fine_component,
 					     coarse_to_fine_grid_map,
 					     weights, weight_mapping);
-  
+
 				   // global numbers of dofs
   const unsigned int n_coarse_dofs = coarse_grid.n_dofs(),
 		     n_fine_dofs   = fine_grid.n_dofs();
@@ -4739,7 +4720,7 @@ DoFTools::compute_intergrid_constraints (
       mask[coarse_component] = true;
       extract_dofs (coarse_grid, mask, coarse_dof_is_parameter);
     };
-  
+
 				   // now we know that the weights in
 				   // each row constitute a
 				   // constraint. enter this into the
@@ -4780,7 +4761,7 @@ DoFTools::compute_intergrid_constraints (
 	    break;
 	Assert (i!=weights[parameter_dof].end(), ExcInternalError());
 	const unsigned int column = i->first;
-	
+
 					 // now we know in which column of
 					 // weights the representant is, but
 					 // we don't know its global index. get
@@ -4791,7 +4772,7 @@ DoFTools::compute_intergrid_constraints (
 	  if (weight_mapping[global_dof] == static_cast<int>(column))
 	    break;
 	Assert (global_dof < weight_mapping.size(), ExcInternalError());
-	
+
 					 // now enter the representants global
 					 // index into our list
 	representants[parameter_dof] = global_dof;
@@ -4805,7 +4786,7 @@ DoFTools::compute_intergrid_constraints (
 					 // empty!
 	Assert (weights[parameter_dof].size() == 0, ExcInternalError());
       };
-  
+
 
 
 				   // note for people that want to
@@ -4837,7 +4818,7 @@ DoFTools::compute_intergrid_constraints (
       {
 	const unsigned int col = weight_mapping[global_dof];
 	Assert (col < n_parameters_on_fine_grid, ExcInternalError());
-	
+
 	unsigned int first_used_row=0;
 
 	{
@@ -4852,7 +4833,7 @@ DoFTools::compute_intergrid_constraints (
 	    }
 
 	  Assert (col_entry != weights[first_used_row].end(), ExcInternalError());
-	    
+
 	  if ((col_entry->second == 1) &&
 	      (representants[first_used_row] == static_cast<int>(global_dof)))
 					     // dof unconstrained or
@@ -4877,7 +4858,7 @@ DoFTools::compute_intergrid_constraints (
 	      constraint_line.push_back (std::make_pair(representants[row],
 							j->second));
 	  };
-	
+
 	constraints.add_entries (global_dof, constraint_line);
       };
 }
@@ -4947,13 +4928,13 @@ compute_intergrid_transfer_representation (
 					 fine_grid, fine_component,
 					 coarse_to_fine_grid_map,
 					 weights, weight_mapping);
-  
+
 				   // now compute the requested
 				   // representation
   const unsigned int n_global_parm_dofs
     = std::count_if (weight_mapping.begin(), weight_mapping.end(),
 		     std::bind2nd (std::not_equal_to<int> (), -1));
-  
+
 				   // first construct the inverse
 				   // mapping of weight_mapping
   std::vector<unsigned int> inverse_weight_mapping (n_global_parm_dofs,
@@ -4968,28 +4949,28 @@ compute_intergrid_transfer_representation (
 	  Assert (parameter_dof < n_global_parm_dofs, ExcInternalError());
 	  Assert ((inverse_weight_mapping[parameter_dof] == DoFHandler<dim,spacedim>::invalid_dof_index),
 		  ExcInternalError());
-	  
+
 	  inverse_weight_mapping[parameter_dof] = i;
 	};
     };
-  
+
 				   // next copy over weights array
 				   // and replace respective
 				   // numbers
   const unsigned int n_rows = weight_mapping.size();
-  
+
   transfer_representation.clear ();
   transfer_representation.resize (n_rows);
-  
+
   const unsigned int n_coarse_dofs = coarse_grid.n_dofs();
   for (unsigned int i=0; i<n_coarse_dofs; ++i)
-    {      
+    {
       std::map<unsigned int, float>::const_iterator j = weights[i].begin();
       for (; j!=weights[i].end(); ++j)
 	{
 	  const unsigned int p = inverse_weight_mapping[j->first];
 	  Assert (p<n_rows, ExcInternalError());
-	  
+
 	  transfer_representation[p][i] = j->second;
 	};
     };
@@ -5013,7 +4994,7 @@ void DoFTools::map_dof_to_boundary_indices (
 		  DH::invalid_dof_index);
 
   unsigned int next_free_index = 0;
-  
+
 				   // first check left, the right
 				   // boundary point
   for (unsigned int direction=0; direction<2; ++direction)
@@ -5073,11 +5054,11 @@ DoFTools::map_dof_to_boundary_indices (const DH                  &dof_handler,
   mapping.clear ();
   mapping.insert (mapping.end(), dof_handler.n_dofs(),
 		  DH::invalid_dof_index);
-  
+
   std::vector<unsigned int> dofs_on_face;
   dofs_on_face.reserve (max_dofs_per_face(dof_handler));
   unsigned int next_boundary_index = 0;
-  
+
 				   // now loop over all cells and
 				   // check whether their faces are at
 				   // the boundary. note that we need
@@ -5095,7 +5076,7 @@ DoFTools::map_dof_to_boundary_indices (const DH                  &dof_handler,
 				    endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
-      if (cell->at_boundary(f)) 
+      if (cell->at_boundary(f))
         {
           const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
           dofs_on_face.resize (dofs_per_face);
@@ -5128,11 +5109,11 @@ void DoFTools::map_dof_to_boundary_indices (
 				   // return if there is nothing to do
   if (boundary_indicators.size() == 0)
     return;
-  
+
   std::vector<unsigned int> dofs_on_face;
   dofs_on_face.reserve (max_dofs_per_face(dof_handler));
   unsigned int next_boundary_index = 0;
-  
+
   typename DH::active_cell_iterator cell = dof_handler.begin_active(),
 				    endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -5162,7 +5143,7 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping
 				      std::vector<Point<spacedim> > &support_points)
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
-  
+
 				   // check whether fe has support
 				   // points
   Assert (dof_handler.get_fe().has_support_points(),
@@ -5211,11 +5192,11 @@ DoFTools::convert_couplings_to_blocks (
 {
   const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
   const unsigned int nb = fe.n_blocks();
-  
+
   tables_by_block.resize(1);
   tables_by_block[0].reinit(nb, nb);
   tables_by_block[0].fill(none);
-  
+
   for (unsigned int i=0;i<fe.n_components();++i)
     {
       const unsigned int ib = fe.component_to_block_index(i);
@@ -5241,7 +5222,7 @@ DoFTools::convert_couplings_to_blocks (
   for (unsigned int f=0;f<fe_collection.size();++f)
     {
       const FiniteElement<dim,spacedim>& fe = fe_collection[f];
-      
+
       const unsigned int nb = fe.n_blocks();
       tables_by_block[f].reinit(nb, nb);
       tables_by_block[f].fill(none);
@@ -5259,17 +5240,17 @@ DoFTools::convert_couplings_to_blocks (
 
 #if deal_II_dimension == 1
 
-template <int dim, int spacedim, template <int,int> class DH> 
-void 
-DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,  
+template <int dim, int spacedim, template <int,int> class DH>
+void
+DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
  					  ConstraintMatrix        &zero_boundary_constraints,
- 					  const std::vector<bool> &component_mask_) 
+ 					  const std::vector<bool> &component_mask_)
 {
-  Assert ((component_mask_.size() == 0) || 
- 	  (component_mask_.size() == dof.get_fe().n_components()), 
- 	  ExcMessage ("The number of components in the mask has to be either " 
- 		      "zero or equal to the number of components in the finite " 
- 		      "element.")); 
+  Assert ((component_mask_.size() == 0) ||
+ 	  (component_mask_.size() == dof.get_fe().n_components()),
+ 	  ExcMessage ("The number of components in the mask has to be either "
+ 		      "zero or equal to the number of components in the finite "
+ 		      "element."));
 
                                    // check for boundary cells in both
                                    // directions to secure indicators
@@ -5286,7 +5267,7 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
       typename DH<dim,spacedim>::cell_iterator outermost_cell = dof.begin(0);
       while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
 	outermost_cell = outermost_cell->neighbor(direction);
-      
+
       while (outermost_cell->has_children())
 	outermost_cell = outermost_cell->child(direction);
 
@@ -5315,17 +5296,17 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
 
 #else
 
-template <int dim, int spacedim, template <int,int> class DH> 
-void 
-DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,  
+template <int dim, int spacedim, template <int,int> class DH>
+void
+DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
  					  ConstraintMatrix        &zero_boundary_constraints,
- 					  const std::vector<bool> &component_mask_) 
+ 					  const std::vector<bool> &component_mask_)
 {
-  Assert ((component_mask_.size() == 0) || 
- 	  (component_mask_.size() == dof.get_fe().n_components()), 
- 	  ExcMessage ("The number of components in the mask has to be either " 
- 		      "zero or equal to the number of components in the finite " 
- 		      "element.")); 
+  Assert ((component_mask_.size() == 0) ||
+ 	  (component_mask_.size() == dof.get_fe().n_components()),
+ 	  ExcMessage ("The number of components in the mask has to be either "
+ 		      "zero or equal to the number of components in the finite "
+ 		      "element."));
 
   const unsigned int        n_components = DoFTools::n_components(dof);
   const bool                fe_is_system = (n_components != 1);
@@ -5450,9 +5431,9 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
 		      if (component_mask[fe.face_system_to_component_index(i).first])
 			zero_boundary_constraints.add_line (face_dofs[i]);
 
-                  } 
+                  }
 	      }
-	    else 
+	    else
 	      {
 				    // get the one component that this
 				    // function has and cast zero
@@ -5465,9 +5446,9 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
 	      }
 
 	  }
-      } 
+      }
 }
-    
+
 #endif
 
 // explicit instantiations
@@ -5913,17 +5894,17 @@ DoFTools::convert_couplings_to_blocks (
   const hp::DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
   std::vector<Table<2,Coupling> >&);
 
-template 
-void 
+template
+void
 DoFTools::make_zero_boundary_constraints
-(const DoFHandler<deal_II_dimension> &, 
+(const DoFHandler<deal_II_dimension> &,
  ConstraintMatrix                    &,
  const std::vector<bool>             &);
 
-template 
-void 
+template
+void
 DoFTools::make_zero_boundary_constraints
-(const hp::DoFHandler<deal_II_dimension> &, 
+(const hp::DoFHandler<deal_II_dimension> &,
  ConstraintMatrix                        &,
  const std::vector<bool>                 &);
 
