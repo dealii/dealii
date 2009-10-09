@@ -197,8 +197,11 @@ IndexSet::add_range (const unsigned int begin,
 	  ExcIndexRange (begin, 0, index_space_size));
   Assert (end <= index_space_size,
 	  ExcIndexRange (end, 0, index_space_size+1));
+  Assert (begin <= end,
+	  ExcIndexRange (begin, 0, end));
 
-  contiguous_ranges.insert (ContiguousRange(begin,end));
+  if (begin != end)
+    contiguous_ranges.insert (ContiguousRange(begin,end));
 }
 
 
