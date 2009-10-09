@@ -13,6 +13,7 @@
 #ifndef __deal2__mesh_worker_h
 #define __deal2__mesh_worker_h
 
+#include <base/config.h>
 #include <base/geometry_info.h>
 #include <base/named_data.h>
 #include <lac/block_indices.h>
@@ -136,17 +137,17 @@ namespace MeshWorker
 					* true.
 					*/
       LocalWorker ();
-	
+
 				       /**
 					* Do the work on a cell.
 					*/
       void cell(DoFInfo<dim>& cell);
-      
+
 				       /**
 					* Do the work on a boundary face.
 					*/
       void bdry(DoFInfo<dim>& face);
-      
+
 				       /**
 					* Do the work on an interior face.
 					*/
@@ -157,12 +158,12 @@ namespace MeshWorker
 					* faces are necessary.
 					*/
       bool interior_fluxes;
-      
+
 				       /**
 					* Computations on interior
 					* faces are necessary.
 					*/
-      bool boundary_fluxes;      
+      bool boundary_fluxes;
   };
 
 /**
@@ -178,13 +179,13 @@ namespace MeshWorker
 					* cell integrator.
 					*/
       typedef IntegrationInfo<dim, FEValuesBase<dim, dim>, dim> CellInfo;
-      
+
 				       /**
 					* The info type expected by a
 					* face integrator.
 					*/
       typedef IntegrationInfo<dim, FEFaceValuesBase<dim, dim>, dim> FaceInfo;
-      
+
 				       /**
 					* Initialize default values.
 					*/
@@ -224,7 +225,7 @@ namespace MeshWorker
       void add_update_flags(const UpdateFlags flags, bool cell = true,
 			    bool bdry = true, bool face = true,
 			    bool ngbr = true);
-	
+
 				       /** Assign n-point Gauss
 					* quadratures to each of the
 					* quadrature rules. Here, a
@@ -244,7 +245,7 @@ namespace MeshWorker
 					* the quadrature points on cells.
 					*/
       MeshWorker::VectorSelector cell_selector;
-	
+
 				       /**
 					* Select the vectors from
 					* DoFInfo::global_data
@@ -253,7 +254,7 @@ namespace MeshWorker
 					* boundary faces.
 					*/
       MeshWorker::VectorSelector bdry_selector;
-	
+
 				       /**
 					* Select the vectors from
 					* DoFInfo::global_data
@@ -280,7 +281,7 @@ namespace MeshWorker
 					* #update_normal_vectors.
 					*/
       UpdateFlags bdry_flags;
-	
+
 				       /**
 					* The set of update flags
 					* for interior face integration.
@@ -301,27 +302,27 @@ namespace MeshWorker
 					* taken from the other cell.
 					*/
       UpdateFlags ngbr_flags;
-	
+
 				       /**
 					* The quadrature rule used
 					* on cells.
 					*/
       Quadrature<dim> cell_quadrature;
-      
+
 				       /**
 					* The quadrature rule used
 					* on boundary faces.
 					*/
       Quadrature<dim-1> bdry_quadrature;
-      
+
 				       /**
 					* The quadrature rule used
 					* on interior faces.
 					*/
       Quadrature<dim-1> face_quadrature;
   };
-      
-  
+
+
 /**
  * A worker class for integration_loop(), separating assembling and
  * local integration. Objects of this class rely on the base class
@@ -377,14 +378,14 @@ namespace MeshWorker
 					* integration_loop().
 					*/
       void cell(typename IntegrationWorker<dim>::CellInfo& info);
-      
+
 				       /**
 					* The local boundary operator
 					* called by
 					* integration_loop().
 					*/
       void bdry(typename IntegrationWorker<dim>::FaceInfo& info);
-      
+
 				       /**
 					* The interior face operator
 					* called by
@@ -392,7 +393,7 @@ namespace MeshWorker
 					*/
       void face(typename IntegrationWorker<dim>::FaceInfo& info1,
 		typename IntegrationWorker<dim>::FaceInfo& info2);
-      
+
     private:
 				       /**
 					* Pointer to the object doing
@@ -400,7 +401,7 @@ namespace MeshWorker
 					*/
       SmartPointer<const INTEGRATOR> local;
   };
-  
+
 //----------------------------------------------------------------------//
   template <int dim>
   inline
@@ -418,7 +419,7 @@ namespace MeshWorker
 		  local(&local, typeid(*this).name())
   {}
 
-  
+
   template <int dim, class ASSEMBLER, class INTEGRATOR>
   inline void
   AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR>::cell(
@@ -428,7 +429,7 @@ namespace MeshWorker
     ASSEMBLER::assemble(info);
   }
 
-  
+
   template <int dim, class ASSEMBLER, class INTEGRATOR>
   inline void
   AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR>::bdry(
@@ -438,7 +439,7 @@ namespace MeshWorker
     ASSEMBLER::assemble(info);
   }
 
-  
+
   template <int dim, class ASSEMBLER, class INTEGRATOR>
   inline void
   AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR>::face(
@@ -447,7 +448,7 @@ namespace MeshWorker
   {
     local->face(info1, info2);
     ASSEMBLER::assemble(info1, info2);
-  }  
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE
