@@ -85,11 +85,11 @@ inconvenience this causes.
    <li>
    <p>
    New: There is now a new tutorial program, @ref step_35 "step-35",
-   contributed by Abner Salgado-Gonzales, that implements a solver
+   contributed by Abner Salgado-Gonzalez, that implements a solver
    for the Navier-Stokes equations using a decoupled projection
    scheme.
    <br>
-   (Abner Salgado-Gonzales 2009/10/07)
+   (Abner Salgado-Gonzalez 2009/10/07)
    </p>
    </li>
 
