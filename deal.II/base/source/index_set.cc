@@ -57,9 +57,45 @@ IndexSet::compress () const
   }
 
 
-				   // we can roll any of
+				   // next see if we can roll any of
 				   // the individual entries into the
 				   // contiguous ranges
+
+
+				   // finally see if any of the
+				   // contiguous ranges can be
+				   // merged. since they are sorted by
+				   // their first index, determining
+				   // overlap isn't all that hard
+  for (std::set<ContiguousRange, RangeComparison>::iterator
+	 i = contiguous_ranges.begin();
+       i != contiguous_ranges.end();
+       ++i)
+    {
+      std::set<ContiguousRange, RangeComparison>::const_iterator
+	next = i;
+      ++next;
+
+      if (next != contiguous_ranges.end())
+	if (next->first <= i->second)
+	  {
+	    const unsigned int first_index = i->first;
+	    const unsigned int last_index  = next->second;
+
+					     // delete the two old
+					     // ranges and insert the
+					     // new range
+	    contiguous_ranges.erase (i, ++next);
+	    contiguous_ranges.insert (ContiguousRange(first_index,
+						      last_index));
+
+					     // then set iterator to
+					     // the same position as
+					     // before
+	    i = contiguous_ranges.lower_bound (ContiguousRange(first_index,
+							       last_index));
+	  }
+    }
 }
 
 
