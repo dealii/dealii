@@ -92,6 +92,25 @@ class IndexSet
 				      */
     bool is_element (const unsigned int index) const;
 
+				     /**
+				      * Return whether the index set
+				      * stored by this object defines
+				      * a contiguous range. This is
+				      * true also if no indices are
+				      * stored at all.
+				      */
+    bool is_contiguous () const;
+
+				     /**
+				      * Compress the internal
+				      * representation by merging
+				      * individual elements with
+				      * contiguous ranges, etc. This
+				      * function does not have any
+				      * external effect.
+				      */
+    void compress () const;
+
   private:
 				     /**
 				      * A type that denotes an index
@@ -113,16 +132,32 @@ class IndexSet
 				      * A set of contiguous ranges of
 				      * indices that make up (part of)
 				      * this index set.
+				      *
+				      * The variable is marked
+				      * "mutable" so that it can be
+				      * changed by compress(), though
+				      * this of course doesn't change
+				      * anything about the external
+				      * representation of this index
+				      * set.
 				      */
-    std::set<ContiguousRange, RangeComparison> contiguous_ranges;
+    mutable std::set<ContiguousRange, RangeComparison> contiguous_ranges;
 
 				     /**
 				      * A set of individual indices
 				      * that make up (part of) this
 				      * index set, together with the
 				      * contiguous ranges.
+				      *
+				      * The variable is marked
+				      * "mutable" so that it can be
+				      * changed by compress(), though
+				      * this of course doesn't change
+				      * anything about the external
+				      * representation of this index
+				      * set.
 				      */
-    std::set<unsigned int>                     individual_indices;
+    mutable std::set<unsigned int>                     individual_indices;
 
 				     /**
 				      * The overall size of the index
@@ -201,7 +236,15 @@ IndexSet::add_range (const unsigned int begin,
 	  ExcIndexRange (begin, 0, end));
 
   if (begin != end)
-    contiguous_ranges.insert (ContiguousRange(begin,end));
+    {
+				       // if it turns out to be a
+				       // single element then add that
+				       // separately
+      if (end == begin+1)
+	add_index (begin);
+      else
+	contiguous_ranges.insert (ContiguousRange(begin,end));
+    }
 }
 
 
@@ -240,6 +283,19 @@ IndexSet::is_element (const unsigned int index) const
 				   // not in the set
   return false;
 }
+
+
+
+inline
+bool
+IndexSet::is_contiguous () const
+{
+  compress ();
+  return ((individual_indices.size() == 0)
+	  &&
+	  (contiguous_ranges.size() <= 1));
+}
+
 
 
 
