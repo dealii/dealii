@@ -122,7 +122,19 @@ IndexSet::compress () const
 					 // current range, so we'll
 					 // delete all of them
 	const unsigned int old_index = *next_individual_index;
-	individual_indices.erase (next_individual_index);
+
+	{
+	  std::set<unsigned int>::iterator
+	    last_index = next_individual_index;
+	  ++last_index;
+	  while ((last_index != individual_indices.end())
+		 &&
+		 (*last_index < new_range.second))
+	    ++last_index;
+
+	  individual_indices.erase (next_individual_index,
+				    last_index);
+	}
 	next_individual_index = individual_indices.lower_bound (old_index);
 
 	contiguous_ranges.erase (next_range);
