@@ -822,17 +822,20 @@ reinit (const unsigned int        n_dofs_in,
 
   const unsigned int chunk_size = (matrix_sizes.n_cells/n_chunks +
 				   (matrix_sizes.n_cells%n_chunks>0));
-  matrix_sizes.chunks.resize (n_chunks);
+
+  std::pair<unsigned int, unsigned int> chunk;
   for (unsigned int i=0; i<n_chunks; ++i)
     {
-      matrix_sizes.chunks[i].first = i*chunk_size;
+      chunk.first = i*chunk_size;
       if ((i+1)*chunk_size > matrix_sizes.n_cells)
-	{
-	  matrix_sizes.chunks[i].second = matrix_sizes.n_cells;
-	  break;
-	}
+	chunk.second = matrix_sizes.n_cells;
       else
-	matrix_sizes.chunks[i].second = (i+1)*chunk_size;
+	chunk.second = (i+1)*chunk_size;
+
+      if (chunk.second > chunk.first)
+	matrix_sizes.chunks.push_back(chunk);
+      else
+	break;
     }
 }
 
