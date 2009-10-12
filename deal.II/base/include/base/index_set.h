@@ -267,17 +267,19 @@ IndexSet::is_element (const unsigned int index) const
 {
 				   // see if it's in the list of
 				   // individual indices
-  if (individual_indices.find (index) != individual_indices.end())
+  if ((individual_indices.size() > 0) &&
+      (individual_indices.find (index) != individual_indices.end()))
     return true;
 
 				   // if not, we need to walk the list
 				   // of contiguous ranges:
-  for (std::set<ContiguousRange, RangeComparison>::const_iterator
-	 i = contiguous_ranges.begin();
-       i != contiguous_ranges.end();
-       ++i)
-    if ((index >= i->first) && (index < i->second))
-      return true;
+  if (contiguous_ranges.size() > 0)
+    for (std::set<ContiguousRange, RangeComparison>::const_iterator
+	   i = contiguous_ranges.begin();
+	 i != contiguous_ranges.end();
+	 ++i)
+      if ((index >= i->first) && (index < i->second))
+	return true;
 
 				   // didn't find this index, so it's
 				   // not in the set
