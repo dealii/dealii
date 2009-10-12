@@ -338,6 +338,30 @@ Article{BK07,
  * the finite element basis functions to a single grid cell.</dd>
  *
  *
+ * <dt class="glossary">@anchor SubdomainId Subdomain id</dt>
+ * <dd>Each cell of a triangulation has associated with it a property called
+ * the "subdomain id" that can be queried using a call like
+ * <code>cell-@>subdomain_id()</code> and that can be set for example by using
+ * <code>cell-@>set_subdomain_id(13)</code>. While in principle this property
+ * can be used in any way application programs deem useful (it is simply an
+ * integer associated with each cell that can indicate whatever you want), at
+ * least for programs that run in parallel it usually denotes the processor a
+ * cell is associated with.
+ *
+ * For programs that are parallelized based on MPI but where each processor
+ * stores the entire triangulation (as in, for example, @ref step_18 "step-18"
+ * or @ref step_32 "step-32", subdomain ids are assigned to cells by
+ * partitioning a mesh, and each MPI process then only works on those cells it
+ * "owns", i.e. that belong to a subdomain that it is associated with
+ * (traditionally, this is the case for the subdomain id whose numerical value
+ * coincides with the rank of the MPI process within the MPI
+ * communicator). Partitioning is typically done using the
+ * GridTools::partition() function, but any other method can also be used to
+ * do this though most other ideas will likely lead to less well balanced
+ * numbers of degrees of freedom on the various subdomains.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossSupport Support points</dt> <dd>Support points are
  * by definition those points $p_i$, such that for the shape functions
  * $v_j$ holds $v_j(p_i) = \delta_{ij}$. Therefore, a finite element
