@@ -75,6 +75,7 @@ tests_x = block_info block_matrices \
 	iterators* \
 	mesh_smoothing_* \
 	create_* \
+	mesh_worker_* \
 	line_coarsening_3d \
 	no_flux_* \
 	fe_values_view_* \
