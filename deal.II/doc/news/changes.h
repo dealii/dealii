@@ -226,6 +226,11 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li><p>New: The new class IndexSet can represent sets and ranges of indices.
+  <br>
+  (WB 2009/10/09)
+  </p></li>
+
   <li><p>New: There is now an <code>operator @<@<</code> for the
   TableIndices class.
   <br>
