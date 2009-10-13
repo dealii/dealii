@@ -102,6 +102,33 @@ class IndexSet
     bool is_contiguous () const;
 
 				     /**
+				      * Return the number of elements
+				      * stored in this index set.
+				      */
+    unsigned int n_elements () const;
+
+				     /**
+				      * Return the nth index stored in
+				      * this index set. @p n obviously
+				      * needs to be less than
+				      * n_elements().
+				      */
+    unsigned int nth_index_in_set (const unsigned int n) const;
+
+				     /**
+				      * Return the how-manyth element
+				      * of this set (counted in
+				      * ascending order) @p n is. @p n
+				      * needs to be less than the
+				      * size(). This function throws
+				      * an exception if the index @p n
+				      * is not actually a member of
+				      * this index set, i.e. if
+				      * is_element(n) is false.
+				      */
+    unsigned int index_within_set (const unsigned int n) const;
+
+				     /**
 				      * Compress the internal
 				      * representation by merging
 				      * individual elements with
@@ -296,6 +323,53 @@ IndexSet::is_contiguous () const
   return ((individual_indices.size() == 0)
 	  &&
 	  (contiguous_ranges.size() <= 1));
+}
+
+
+
+inline
+unsigned int
+IndexSet::n_elements () const
+{
+				   // make sure we have
+				   // non-overlapping ranges and
+				   // individual indices
+  compress ();
+
+  unsigned int s = individual_indices.size();
+  for (std::set<ContiguousRange, RangeComparison>::iterator
+	 range = contiguous_ranges.begin();
+       range != contiguous_ranges.end();
+       ++range)
+    s += (range->second - range->first);
+
+  return s;
+}
+
+
+
+inline
+unsigned int
+IndexSet::nth_index_in_set (const unsigned int n) const
+{
+  Assert (n < n_elements(), ExcIndexRange (n, 0, n_elements()));
+
+  Assert (is_contiguous(), ExcNotImplemented());
+  return (n+contiguous_ranges.begin()->first);
+}
+
+
+
+inline
+unsigned int
+IndexSet::index_within_set (const unsigned int n) const
+{
+  Assert (is_element(n) == true,
+	  ExcMessage ("Given number is not an element of this set."));
+  Assert (n < size(), ExcIndexRange (n, 0, size()));
+
+  Assert (is_contiguous(), ExcNotImplemented());
+  return (n-contiguous_ranges.begin()->first);
 }
 
 
