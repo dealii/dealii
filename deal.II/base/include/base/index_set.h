@@ -438,8 +438,17 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 {
   Assert (n < n_elements(), ExcIndexRange (n, 0, n_elements()));
 
-  Assert (is_contiguous(), ExcNotImplemented());
-  return (n+ranges.begin()->begin);
+//TODO: this could be done more efficiently by using a binary search
+  for (std::vector<Range>::const_iterator p = ranges.begin();
+       p != ranges.end(); ++p)
+    {
+      Assert (n >= p->nth_index_in_set, ExcInternalError());
+      if (n < p->nth_index_in_set + (p->end-p->begin))
+	return p->begin + (n-p->nth_index_in_set);
+    }
+
+  Assert (false, ExcInternalError());
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -452,8 +461,17 @@ IndexSet::index_within_set (const unsigned int n) const
 	  ExcMessage ("Given number is not an element of this set."));
   Assert (n < size(), ExcIndexRange (n, 0, size()));
 
-  Assert (is_contiguous(), ExcNotImplemented());
-  return (n-ranges.begin()->begin);
+//TODO: this could be done more efficiently by using a binary search
+  for (std::vector<Range>::const_iterator p = ranges.begin();
+       p != ranges.end(); ++p)
+    {
+      Assert (n >= p->begin, ExcInternalError());
+      if (n < p->end)
+	return (n-p->begin) + p->nth_index_in_set;
+    }
+
+  Assert (false, ExcInternalError());
+  return numbers::invalid_unsigned_int;
 }
 
 
