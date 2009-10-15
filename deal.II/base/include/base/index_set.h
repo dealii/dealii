@@ -143,7 +143,7 @@ class IndexSet
 				      * A type that denotes an index
 				      * range.
 				      */
-    typedef std::pair<unsigned int, unsigned int> ContiguousRange;
+    typedef std::pair<unsigned int, unsigned int> Range;
 
 				     /**
 				      * A structure that provides an
@@ -151,8 +151,8 @@ class IndexSet
 				      */
     struct RangeComparison
     {
-	bool operator() (const ContiguousRange &range_1,
-			 const ContiguousRange &range_2) const;
+	bool operator() (const Range &range_1,
+			 const Range &range_2) const;
     };
 
 				     /**
@@ -168,7 +168,7 @@ class IndexSet
 				      * representation of this index
 				      * set.
 				      */
-    mutable std::set<ContiguousRange, RangeComparison> contiguous_ranges;
+    mutable std::set<Range, RangeComparison> ranges;
 
 				     /**
 				      * The overall size of the index
@@ -184,8 +184,8 @@ class IndexSet
 
 inline
 bool
-IndexSet::RangeComparison::operator() (const ContiguousRange &range_1,
-				       const ContiguousRange &range_2) const
+IndexSet::RangeComparison::operator() (const Range &range_1,
+				       const Range &range_2) const
 {
   return ((range_1.first < range_2.first)
 	  ||
@@ -216,7 +216,7 @@ inline
 void
 IndexSet::set_size (const unsigned int sz)
 {
-  Assert (contiguous_ranges.size() == 0,
+  Assert (ranges.size() == 0,
 	  ExcMessage ("This function can only be called if the current "
 		      "object does not yet contain any elements."));
   index_space_size = sz;
@@ -252,7 +252,7 @@ IndexSet::add_range (const unsigned int begin,
       if (end == begin+1)
 	add_index (begin);
       else
-	contiguous_ranges.insert (ContiguousRange(begin,end));
+	ranges.insert (Range(begin,end));
     }
 }
 
@@ -265,7 +265,7 @@ IndexSet::add_index (const unsigned int index)
   Assert (index < index_space_size,
 	  ExcIndexRange (index, 0, index_space_size));
 
-  contiguous_ranges.insert (ContiguousRange(index, index+1));
+  ranges.insert (Range(index, index+1));
 }
 
 
@@ -277,10 +277,10 @@ IndexSet::is_element (const unsigned int index) const
 //TODO: since the list of ranges is sorted, we be faster here by doing a binary search
 				   // if not, we need to walk the list
 				   // of contiguous ranges:
-  if (contiguous_ranges.size() > 0)
-    for (std::set<ContiguousRange, RangeComparison>::const_iterator
-	   i = contiguous_ranges.begin();
-	 i != contiguous_ranges.end();
+  if (ranges.size() > 0)
+    for (std::set<Range, RangeComparison>::const_iterator
+	   i = ranges.begin();
+	 i != ranges.end();
 	 ++i)
       if ((index >= i->first) && (index < i->second))
 	return true;
@@ -297,7 +297,7 @@ bool
 IndexSet::is_contiguous () const
 {
   compress ();
-  return (contiguous_ranges.size() <= 1);
+  return (ranges.size() <= 1);
 }
 
 
@@ -312,9 +312,9 @@ IndexSet::n_elements () const
   compress ();
 
   unsigned int s = 0;
-  for (std::set<ContiguousRange, RangeComparison>::iterator
-	 range = contiguous_ranges.begin();
-       range != contiguous_ranges.end();
+  for (std::set<Range, RangeComparison>::iterator
+	 range = ranges.begin();
+       range != ranges.end();
        ++range)
     s += (range->second - range->first);
 
@@ -330,7 +330,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
   Assert (n < n_elements(), ExcIndexRange (n, 0, n_elements()));
 
   Assert (is_contiguous(), ExcNotImplemented());
-  return (n+contiguous_ranges.begin()->first);
+  return (n+ranges.begin()->first);
 }
 
 
@@ -344,7 +344,7 @@ IndexSet::index_within_set (const unsigned int n) const
   Assert (n < size(), ExcIndexRange (n, 0, size()));
 
   Assert (is_contiguous(), ExcNotImplemented());
-  return (n-contiguous_ranges.begin()->first);
+  return (n-ranges.begin()->first);
 }
 
 
