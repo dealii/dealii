@@ -11,7 +11,7 @@
 //
 //-----------------------------------------------------------------------------
 
-// test indexing in IndexSet variables for a contiguous range
+// test indexing in IndexSet variables for a non-contiguous range
 
 #include "../tests.h"
 #include <iomanip>
@@ -35,7 +35,7 @@ void test ()
 
   index_set.compress ();
 
-  index_set.add_index (5);
+  index_set.add_index (9);
 
   for (unsigned int i=0; i<index_set.n_elements(); ++i)
     {
@@ -57,7 +57,7 @@ void test ()
 
 int main()
 {
-  std::ofstream logfile("index_set_10/output");
+  std::ofstream logfile("index_set_12/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
