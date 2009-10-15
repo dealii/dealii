@@ -182,6 +182,21 @@ class IndexSet
     mutable std::set<Range, RangeComparison> ranges;
 
 				     /**
+				      * True if compress() has been
+				      * called after the last change
+				      * in the set of indices.
+				      *
+				      * The variable is marked
+				      * "mutable" so that it can be
+				      * changed by compress(), though
+				      * this of course doesn't change
+				      * anything about the external
+				      * representation of this index
+				      * set.
+				      */
+    mutable bool is_compressed;
+
+				     /**
 				      * The overall size of the index
 				      * range. Elements of this index
 				      * set have to have a smaller
@@ -210,6 +225,7 @@ IndexSet::RangeComparison::operator() (const Range &range_1,
 inline
 IndexSet::IndexSet ()
 		:
+		is_compressed (true),
 		index_space_size (0)
 {}
 
@@ -218,6 +234,7 @@ IndexSet::IndexSet ()
 inline
 IndexSet::IndexSet (const unsigned int size)
 		:
+		is_compressed (true),
 		index_space_size (size)
 {}
 
@@ -231,6 +248,7 @@ IndexSet::set_size (const unsigned int sz)
 	  ExcMessage ("This function can only be called if the current "
 		      "object does not yet contain any elements."));
   index_space_size = sz;
+  is_compressed = true;
 }
 
 
@@ -256,7 +274,10 @@ IndexSet::add_range (const unsigned int begin,
 	  ExcIndexRange (begin, 0, end));
 
   if (begin != end)
-    ranges.insert (Range(begin,end));
+    {
+      ranges.insert (Range(begin,end));
+      is_compressed = false;
+    }
 }
 
 
@@ -269,6 +290,7 @@ IndexSet::add_index (const unsigned int index)
 	  ExcIndexRange (index, 0, index_space_size));
 
   ranges.insert (Range(index, index+1));
+  is_compressed = false;
 }
 
 

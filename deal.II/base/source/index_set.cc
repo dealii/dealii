@@ -18,6 +18,8 @@ DEAL_II_NAMESPACE_OPEN
 void
 IndexSet::compress () const
 {
+  if (is_compressed == true)
+    return;
 				   // see if any of the
 				   // contiguous ranges can be
 				   // merged. since they are sorted by
@@ -73,6 +75,8 @@ IndexSet::compress () const
 					last_index));
 	}
     }
+
+  is_compressed = true;
 }
 
 
