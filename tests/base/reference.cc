@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,11 +55,11 @@ int main()
       Test a("A");
       const Test& b("B");
       
-      SmartPointer<Test>       r(&a, "Test R");
-      SmartPointer<const Test> s(&a, "const Test S");
-//  SmartPointer<Test>       t=&b;    // this one should not work
-      SmartPointer<Test>       t(const_cast<Test*>(&b), "Test T");
-      SmartPointer<const Test> u(&b, "const Test");
+      SmartPointer<Test,Test>       r(&a, "Test R");
+      SmartPointer<const Test,Test> s(&a, "const Test S");
+//  SmartPointer<Test,Test>       t=&b;    // this one should not work
+      SmartPointer<Test,Test>       t(const_cast<Test*>(&b), "Test T");
+      SmartPointer<const Test,Test> u(&b, "const Test");
       
       
       deallog << "a ";
