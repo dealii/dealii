@@ -25,25 +25,25 @@ IndexSet::compress () const
 				   // merged. since they are sorted by
 				   // their first index, determining
 				   // overlap isn't all that hard
-  for (std::set<Range, RangeComparison>::iterator
+  for (std::set<Range>::iterator
 	 i = ranges.begin();
        i != ranges.end();
        ++i)
     {
-      std::set<Range, RangeComparison>::const_iterator
+      std::set<Range>::const_iterator
 	next = i;
       ++next;
 
-      unsigned int first_index = i->first;
-      unsigned int last_index  = i->second;
+      unsigned int first_index = i->begin;
+      unsigned int last_index  = i->end;
 
 				       // see if we can merge any of
 				       // the following ranges
       bool can_merge = false;
       while (next != ranges.end() &&
-	     (next->first <= last_index))
+	     (next->begin <= last_index))
 	{
-	  last_index = next->second;
+	  last_index = next->end;
 	  ++next;
 	  can_merge = true;
 	}

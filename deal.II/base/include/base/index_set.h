@@ -151,19 +151,28 @@ class IndexSet
 
   private:
 				     /**
-				      * A type that denotes an index
-				      * range.
+				      * A type that denotes the half
+				      * open index range
+				      * <code>[begin,end)</code>.
 				      */
-    typedef std::pair<unsigned int, unsigned int> Range;
-
-				     /**
-				      * A structure that provides an
-				      * ordering to ranges.
-				      */
-    struct RangeComparison
+    struct Range
     {
-	bool operator() (const Range &range_1,
-			 const Range &range_2) const;
+	unsigned int begin;
+	unsigned int end;
+
+	Range (const unsigned int i1,
+	       const unsigned int i2);
+
+	friend
+	inline bool operator< (const Range &range_1,
+			       const Range &range_2)
+	  {
+	    return ((range_1.begin < range_2.begin)
+		    ||
+		    ((range_1.begin == range_2.begin)
+		     &&
+		     (range_1.end < range_2.end)));
+	  }
     };
 
 				     /**
@@ -179,7 +188,7 @@ class IndexSet
 				      * representation of this index
 				      * set.
 				      */
-    mutable std::set<Range, RangeComparison> ranges;
+    mutable std::set<Range> ranges;
 
 				     /**
 				      * True if compress() has been
@@ -209,16 +218,12 @@ class IndexSet
 /* ------------------ inline functions ------------------ */
 
 inline
-bool
-IndexSet::RangeComparison::operator() (const Range &range_1,
-				       const Range &range_2) const
-{
-  return ((range_1.first < range_2.first)
-	  ||
-	  ((range_1.first == range_2.first)
-	   &&
-	   (range_1.second < range_2.second)));
-}
+IndexSet::Range::Range (const unsigned int i1,
+			const unsigned int i2)
+		:
+		begin(i1),
+		end(i2)
+{}
 
 
 
@@ -332,11 +337,11 @@ IndexSet::is_element (const unsigned int index) const
 				   // if not, we need to walk the list
 				   // of contiguous ranges:
   if (ranges.size() > 0)
-    for (std::set<Range, RangeComparison>::const_iterator
+    for (std::set<Range>::const_iterator
 	   i = ranges.begin();
 	 i != ranges.end();
 	 ++i)
-      if ((index >= i->first) && (index < i->second))
+      if ((index >= i->begin) && (index < i->end))
 	return true;
 
 				   // didn't find this index, so it's
@@ -366,11 +371,10 @@ IndexSet::n_elements () const
   compress ();
 
   unsigned int s = 0;
-  for (std::set<Range, RangeComparison>::iterator
-	 range = ranges.begin();
+  for (std::set<Range>::iterator range = ranges.begin();
        range != ranges.end();
        ++range)
-    s += (range->second - range->first);
+    s += (range->end - range->begin);
 
   return s;
 }
@@ -384,7 +388,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
   Assert (n < n_elements(), ExcIndexRange (n, 0, n_elements()));
 
   Assert (is_contiguous(), ExcNotImplemented());
-  return (n+ranges.begin()->first);
+  return (n+ranges.begin()->begin);
 }
 
 
@@ -398,7 +402,7 @@ IndexSet::index_within_set (const unsigned int n) const
   Assert (n < size(), ExcIndexRange (n, 0, size()));
 
   Assert (is_contiguous(), ExcNotImplemented());
-  return (n-ranges.begin()->first);
+  return (n-ranges.begin()->begin);
 }
 
 
