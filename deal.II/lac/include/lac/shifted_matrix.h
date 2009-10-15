@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -68,7 +68,7 @@ class ShiftedMatrix
 				     /**
 				      * Storage for base matrix.
 				      */
-    SmartPointer<const MATRIX> A;
+    SmartPointer<const MATRIX,ShiftedMatrix<MATRIX> > A;
 
 				     /**
 				      * Auxiliary vector.
@@ -127,11 +127,11 @@ class ShiftedMatrixGeneralized
 				     /**
 				      * Storage for base matrix.
 				      */
-    SmartPointer<const MATRIX> A;
+    SmartPointer<const MATRIX,ShiftedMatrixGeneralized<MATRIX,MASSMATRIX,VECTOR> > A;
 				     /**
 				      * Storage for mass matrix.
 				      */
-    SmartPointer<const MASSMATRIX> M;
+    SmartPointer<const MASSMATRIX,ShiftedMatrixGeneralized<MATRIX,MASSMATRIX,VECTOR> > M;
 
 				     /**
 				      * Auxiliary vector.

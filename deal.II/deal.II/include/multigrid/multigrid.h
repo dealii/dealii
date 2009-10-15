@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -374,37 +374,37 @@ class Multigrid : public Subscriptor
 				     /**
 				      * The matrix for each level.
 				      */
-    SmartPointer<const MGMatrixBase<VECTOR> > matrix;
+    SmartPointer<const MGMatrixBase<VECTOR>,Multigrid<VECTOR> > matrix;
     
 				     /**
 				      * The matrix for each level.
 				      */
-    SmartPointer<const MGCoarseGridBase<VECTOR> > coarse;
+    SmartPointer<const MGCoarseGridBase<VECTOR>,Multigrid<VECTOR> > coarse;
     
 				     /**
 				      * Object for grid tranfer.
 				      */
-    SmartPointer<const MGTransferBase<VECTOR> > transfer;
+    SmartPointer<const MGTransferBase<VECTOR>,Multigrid<VECTOR> > transfer;
 
 				     /**
 				      * The pre-smoothing object.
 				      */
-    SmartPointer<const MGSmootherBase<VECTOR> > pre_smooth;
+    SmartPointer<const MGSmootherBase<VECTOR>,Multigrid<VECTOR> > pre_smooth;
 
 				     /**
 				      * The post-smoothing object.
 				      */
-    SmartPointer<const MGSmootherBase<VECTOR> > post_smooth;
+    SmartPointer<const MGSmootherBase<VECTOR>,Multigrid<VECTOR> > post_smooth;
     
 				     /**
 				      * Edge matrix from fine to coarse.
 				      */
-    SmartPointer<const MGMatrixBase<VECTOR> > edge_down;
+    SmartPointer<const MGMatrixBase<VECTOR>,Multigrid<VECTOR> > edge_down;
 
 				     /**
 				      * Transpose edge matrix from coarse to fine.
 				      */
-    SmartPointer<const MGMatrixBase<VECTOR> > edge_up;
+    SmartPointer<const MGMatrixBase<VECTOR>,Multigrid<VECTOR> > edge_up;
 
 				     /**
 				      * Level for debug
@@ -494,17 +494,17 @@ class PreconditionMG : public Subscriptor
 				     /**
 				      * Associated @p MGDoFHandler.
 				      */
-    SmartPointer<const MGDoFHandler<dim> > mg_dof_handler;
+    SmartPointer<const MGDoFHandler<dim>,PreconditionMG<dim,VECTOR,TRANSFER> > mg_dof_handler;
 
 				     /**
 				      * The multigrid object.
 				      */
-    SmartPointer<Multigrid<VECTOR> > multigrid;
+    SmartPointer<Multigrid<VECTOR>,PreconditionMG<dim,VECTOR,TRANSFER> > multigrid;
     
 				     /**
 				      * Object for grid tranfer.
 				      */
-    SmartPointer<const TRANSFER> transfer;  
+    SmartPointer<const TRANSFER,PreconditionMG<dim,VECTOR,TRANSFER> > transfer;  
 };
 
 /*@}*/

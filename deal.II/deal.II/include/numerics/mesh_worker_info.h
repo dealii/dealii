@@ -249,7 +249,7 @@ namespace MeshWorker
       
 	
 				       /// The block structure of the system
-      SmartPointer<const BlockInfo> block_info;
+      SmartPointer<const BlockInfo,DoFInfo<dim,spacedim> > block_info;
     private:
 				       /// Fill index vector
       void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator c);
@@ -544,11 +544,11 @@ namespace MeshWorker
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping);
 	
-      template <class WORKER, class VECTOR>
+      template <class WORKER, class VECTOR,class P>
       void initialize(const WORKER&,
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
-		      const NamedData<SmartPointer<VECTOR> >& data);
+		      const NamedData<SmartPointer<VECTOR,P> >& data);
 //      private:
 	
       CellInfo cell_info;
@@ -843,13 +843,13 @@ namespace MeshWorker
 
     
   template <int dim, int sdim>
-  template <class WORKER, class VECTOR>
+  template <class WORKER, class VECTOR, class P>
   void
   IntegrationInfoBox<dim,sdim>::initialize(
     const WORKER& integrator,
     const FiniteElement<dim,sdim>& el,
     const Mapping<dim,sdim>& mapping,
-    const NamedData<SmartPointer<VECTOR> >& data)
+    const NamedData<SmartPointer<VECTOR,P> >& data)
   {
     cell_info.initialize_data(data);
     bdry_info.initialize_data(data);

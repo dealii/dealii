@@ -156,7 +156,7 @@ class VectorMemory : public Subscriptor
 					 /**
 					  * The memory pool used.
 					  */
-	SmartPointer<VectorMemory<VECTOR> > pool;
+	SmartPointer<VectorMemory<VECTOR>,Pointer> pool;
 					 /**
 					  * The pointer to the vector.
 					  */
@@ -403,7 +403,7 @@ template <typename VECTOR>
 inline
 VectorMemory<VECTOR>::Pointer::Pointer(VectorMemory<VECTOR>& mem)
 		:
-		pool(&mem), v(0)
+		pool(&mem, typeid(*this).name()), v(0)
 {
   v = pool->alloc();
 }

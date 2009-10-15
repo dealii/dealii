@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -293,7 +293,7 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * additional multiplication
 				      * using #factors is desired.
 				      */
-    SmartPointer<VectorMemory<Vector<number> > > memory;
+    SmartPointer<VectorMemory<Vector<number> >,MGTransferBlock<number> > memory;
 };
 
 

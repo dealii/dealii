@@ -1026,7 +1026,7 @@ class BlockMatrixBase : public Subscriptor
 				     /**
 				      * Array of sub-matrices.
 				      */
-    Table<2,SmartPointer<BlockType> > sub_objects;
+    Table<2,SmartPointer<BlockType, BlockMatrixBase<MatrixType> > > sub_objects;
 
                                      /**
                                       * This function collects the

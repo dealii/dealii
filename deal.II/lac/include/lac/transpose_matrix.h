@@ -123,7 +123,7 @@ TransposeMatrix : public PointerMatrixBase<VECTOR>
 				     /**
 				      * The pointer to the actual matrix.
 				      */
-    SmartPointer<const MATRIX> m;
+    SmartPointer<const MATRIX,TransposeMatrix<MATRIX,VECTOR> > m;
 };
 
 
@@ -132,7 +132,7 @@ TransposeMatrix : public PointerMatrixBase<VECTOR>
 
 template<class MATRIX, class VECTOR>
 TransposeMatrix<MATRIX, VECTOR>::TransposeMatrix (const MATRIX* M)
-  : m(M, typeid(*this).name())
+  : m(M)
 {}
 
 

@@ -25,20 +25,24 @@ DEAL_II_NAMESPACE_OPEN
  * but make sure that the object pointed to is not deleted in the course of
  * use of the pointer by signalling the pointee its use.
  *
- * Objects pointed to should inherit <tt>Subscriptor</tt> or must implement
- * the same functionality. Null pointers are an exception from this
- * rule and are allowed, too.
+ * Objects pointed to, that is ,the class T, should inherit
+ * Subscriptor or must implement the same functionality. Null pointers
+ * are an exception from this rule and are allowed, too.
+ *
+ * The second template argument P only serves a single purpose: if a
+ * constructor without a debug string is used, then the name of P is
+ * used as the debug string.
  *
  * SmartPointer does NOT implement any memory handling! Especially,
  * deleting a SmartPointer does not delete the object. Writing
  * @code
- * SmartPointer<T> dont_do_this = new T;
+ * SmartPointer<T,P> dont_do_this = new T;
  * @endcode
  * is a sure way to program a memory leak! The secure version is
  * @code
  * T* p = new T;
  * {
- *   SmartPointer<T> t(p, "mypointer");
+ *   SmartPointer<T,P> t(p);
  *   ...
  * }
  * delete p;
@@ -52,17 +56,15 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup memory
  * @author Guido Kanschat, Wolfgang Bangerth, 1998 - 2009
  */
-template<typename T>
+template<typename T, typename P = void>
 class SmartPointer
 {
   public:
 				     /**
 				      * Standard constructor for null
-				      * pointer.  @deprecated Since
-				      * this constructor will leave
-				      * SmartPointer::id empty, it should be
-				      * avoided wherever possible and
-				      * replaced by SmartPointer(0,id).
+				      * pointer. The id of this
+				      * pointer is set to the name of
+				      * the class P.
 				      */
     SmartPointer ();
 
@@ -72,13 +74,18 @@ class SmartPointer
 				      * copy the object subscribed to
 				      * from <tt>tt</tt>, but subscribe
 				      * ourselves to it again.
-				      *
-				      * The <tt>id</tt> is used in the
-				      * call to
-				      * Subscriptor::subscribe(typeid(*this).name()). The #id of
-				      * the object copied is used here.
 				      */
-    SmartPointer (const SmartPointer<T> &tt);
+    template <class Q>
+    SmartPointer (const SmartPointer<T,Q> &tt);
+
+				     /*
+				      * Copy constructor for
+				      * SmartPointer. We do now
+				      * copy the object subscribed to
+				      * from <tt>tt</tt>, but subscribe
+				      * ourselves to it again.
+				      */
+    SmartPointer (const SmartPointer<T,P> &tt);
 
 				     /**
 				      * Constructor taking a normal
@@ -92,11 +99,25 @@ class SmartPointer
 				      *
 				      * The <tt>id</tt> is used in the
 				      * call to
-				      * Subscriptor::subscribe(typeid(*this).name()) and
+				      * Subscriptor::subscribe(id) and
 				      * by ~SmartPointer() in the call
 				      * to Subscriptor::unsubscribe().
 				      */
-    SmartPointer (T *t, const char* id=0);
+    SmartPointer (T *t, const char* id);
+
+				     /**
+				      * Constructor taking a normal
+				      * pointer.  If possible, i.e. if
+				      * the pointer is not a null
+				      * pointer, the constructor
+				      * subscribes to the given object
+				      * to lock it, i.e. to prevent
+				      * its destruction before the end
+				      * of its use. The id of this
+				      * pointer is set to the name of
+				      * the class P.
+				      */
+    SmartPointer (T *t);
 
 
 				     /**
@@ -115,7 +136,7 @@ class SmartPointer
 				      * null-pointer, but stilll
 				      * delete the old subscription.
 				      */
-    SmartPointer<T> & operator= (T *tt);
+    SmartPointer<T,P> & operator= (T *tt);
 
 				     /**
 				      * Assignment operator for
@@ -124,7 +145,17 @@ class SmartPointer
 				      * automatically and unsubscribes
 				      * to an old one if it exists.
 				      */
-    SmartPointer<T> & operator= (const SmartPointer<T> &tt);
+    template <class Q>
+    SmartPointer<T,P> & operator= (const SmartPointer<T,Q> &tt);
+
+				     /**
+				      * Assignment operator for
+				      * SmartPointer.  The pointer
+				      * subscribes to the new object
+				      * automatically and unsubscribes
+				      * to an old one if it exists.
+				      */
+    SmartPointer<T,P> & operator= (const SmartPointer<T,P> &tt);
 
 				     /**
 				      * Conversion to normal pointer.
@@ -132,12 +163,18 @@ class SmartPointer
     operator T* () const;
     
 				     /**
-				      * Dereferencing operator.
+				      * Dereferencing operator. This
+				      * operator throws an
+				      * ExcNotInitialized if the
+				      * pointer is a null pointer.
 				      */
     T& operator * () const;
     
 				     /**
-				      * Dereferencing operator.
+				      * Dereferencing operator. This
+				      * operator throws an
+				      * ExcNotInitialized if the
+				      * pointer is a null pointer.
 				      */
     T * operator -> () const;
 
@@ -158,7 +195,8 @@ class SmartPointer
 				      * pointer are implemented in
 				      * global namespace.
 				      */
-    void swap (SmartPointer<T> &tt);
+    template <class Q>
+    void swap (SmartPointer<T,Q> &tt);
 
 				     /**
 				      * Swap pointers between this
@@ -209,16 +247,30 @@ class SmartPointer
 /* --------------------------- inline Template functions ------------------------------*/
 
 
-template <typename T>
-SmartPointer<T>::SmartPointer ()
+template <typename T, typename P>
+inline
+SmartPointer<T,P>::SmartPointer ()
                 :
-		t (0), id(0)
+		t (0), id(typeid(P).name())
 {}
 
 
 
-template <typename T>
-SmartPointer<T>::SmartPointer (T *t, const char* id)
+template <typename T, typename P>
+inline
+SmartPointer<T,P>::SmartPointer (T *t)
+                :
+		t (t), id(typeid(P).name())
+{
+  if (t != 0)
+    t->subscribe(id);
+}
+
+
+
+template <typename T, typename P>
+inline
+SmartPointer<T,P>::SmartPointer (T *t, const char* id)
                 :
 		t (t), id(id)
 {
@@ -228,8 +280,10 @@ SmartPointer<T>::SmartPointer (T *t, const char* id)
 
 
 
-template <typename T>
-SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt)
+template <typename T, typename P>
+template <class Q>
+inline
+SmartPointer<T,P>::SmartPointer (const SmartPointer<T,Q> &tt)
                 :
 		t (tt.t), id(tt.id)
 {
@@ -239,8 +293,21 @@ SmartPointer<T>::SmartPointer (const SmartPointer<T> &tt)
 
 
 
-template <typename T>
-SmartPointer<T>::~SmartPointer ()
+template <typename T, typename P>
+inline
+SmartPointer<T,P>::SmartPointer (const SmartPointer<T,P> &tt)
+                :
+		t (tt.t), id(tt.id)
+{
+  if (t != 0)
+    t->subscribe(id);
+}
+
+
+
+template <typename T, typename P>
+inline
+SmartPointer<T,P>::~SmartPointer ()
 {
   if (t != 0)
     t->unsubscribe(id);
@@ -248,8 +315,9 @@ SmartPointer<T>::~SmartPointer ()
 
 
 
-template <typename T>
-SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
+template <typename T, typename P>
+inline
+SmartPointer<T,P> & SmartPointer<T,P>::operator = (T *tt)
 {
 				   // optimize if no real action is
 				   // requested
@@ -266,9 +334,11 @@ SmartPointer<T> & SmartPointer<T>::operator = (T *tt)
 
 
 
-template <typename T>
-SmartPointer<T> &
-SmartPointer<T>::operator = (const SmartPointer<T>& tt)
+template <typename T, typename P>
+template <class Q>
+inline
+SmartPointer<T,P> &
+SmartPointer<T,P>::operator = (const SmartPointer<T,Q>& tt)
 {
 				   // if objects on the left and right
 				   // hand side of the operator= are
@@ -286,18 +356,39 @@ SmartPointer<T>::operator = (const SmartPointer<T>& tt)
 
 
 
-template <typename T>
+template <typename T, typename P>
 inline
-SmartPointer<T>::operator T* () const
+SmartPointer<T,P> &
+SmartPointer<T,P>::operator = (const SmartPointer<T,P>& tt)
+{
+				   // if objects on the left and right
+				   // hand side of the operator= are
+				   // the same, then this is a no-op
+  if (&tt == this)
+    return *this;
+  
+  if (t != 0)
+    t->unsubscribe(id);
+  t = static_cast<T*>(tt);
+  if (tt != 0)
+    tt->subscribe(id);
+  return *this;
+}
+
+
+
+template <typename T, typename P>
+inline
+SmartPointer<T,P>::operator T* () const
 {
   return t;
 }
 
 
 
-template <typename T>
+template <typename T, typename P>
 inline
-T & SmartPointer<T>::operator * () const
+T & SmartPointer<T,P>::operator * () const
 {
   Assert(t != 0, ExcNotInitialized());
   return *t;
@@ -305,9 +396,9 @@ T & SmartPointer<T>::operator * () const
 
 
 
-template <typename T>
+template <typename T, typename P>
 inline
-T * SmartPointer<T>::operator -> () const
+T * SmartPointer<T,P>::operator -> () const
 {
   Assert(t != 0, ExcNotInitialized());
   return t;
@@ -315,12 +406,13 @@ T * SmartPointer<T>::operator -> () const
 
 
 
-template <typename T>
+template <typename T, typename P>
+template <class Q>
 inline
-void SmartPointer<T>::swap (SmartPointer<T> &tt)
+void SmartPointer<T,P>::swap (SmartPointer<T,Q> &tt)
 {
 #ifdef DEBUG
-  SmartPointer<T> aux(t,id);
+  SmartPointer<T,P> aux(t,id);
   *this = tt;
   tt = aux;
 #else
@@ -330,9 +422,9 @@ void SmartPointer<T>::swap (SmartPointer<T> &tt)
 
 
 
-template <typename T>
+template <typename T, typename P>
 inline
-void SmartPointer<T>::swap (T *&tt)
+void SmartPointer<T,P>::swap (T *&tt)
 {
   if (t != 0)
     t->unsubscribe (id);
@@ -345,11 +437,11 @@ void SmartPointer<T>::swap (T *&tt)
 
 
 
-template <typename T>
+template <typename T, typename P>
 inline
-unsigned int SmartPointer<T>::memory_consumption () const
+unsigned int SmartPointer<T,P>::memory_consumption () const
 {
-  return sizeof(SmartPointer<T>);
+  return sizeof(SmartPointer<T,P>);
 }
 
 
@@ -360,9 +452,9 @@ unsigned int SmartPointer<T>::memory_consumption () const
  * objects to which the pointers point retain to be subscribed to, we
  * do not have to change their subscription count.
  */
-template <typename T>
+template <typename T, typename P, class Q>
 inline
-void swap (SmartPointer<T> &t1, SmartPointer<T> &t2)
+void swap (SmartPointer<T,P> &t1, SmartPointer<T,Q> &t2)
 {
   t1.swap (t2);
 }
@@ -376,9 +468,9 @@ void swap (SmartPointer<T> &t1, SmartPointer<T> &t2)
  * Note that we indeed need a reference of a pointer, as we want to
  * change the pointer variable which we are given.
  */
-template <typename T>
+template <typename T, typename P>
 inline
-void swap (SmartPointer<T> &t1, T *&t2)
+void swap (SmartPointer<T,P> &t1, T *&t2)
 {
   t1.swap (t2);
 }
@@ -392,9 +484,9 @@ void swap (SmartPointer<T> &t1, T *&t2)
  * Note that we indeed need a reference of a pointer, as we want to
  * change the pointer variable which we are given.
  */
-template <typename T>
+template <typename T, typename P>
 inline
-void swap (T *&t1, SmartPointer<T> &t2)
+void swap (T *&t1, SmartPointer<T,P> &t2)
 {
   t2.swap (t1);
 }

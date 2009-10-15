@@ -399,7 +399,7 @@ namespace MeshWorker
 					* Pointer to the object doing
 					* local integration.
 					*/
-      SmartPointer<const INTEGRATOR> local;
+      SmartPointer<const INTEGRATOR, AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR> > local;
   };
 
 //----------------------------------------------------------------------//

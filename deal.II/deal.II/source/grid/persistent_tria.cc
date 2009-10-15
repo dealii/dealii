@@ -29,7 +29,7 @@ template <int dim>
 PersistentTriangulation<dim>::
 PersistentTriangulation (const Triangulation<dim> &coarse_grid)
                 :
-		coarse_grid (&coarse_grid) 
+		coarse_grid (&coarse_grid, typeid(*this).name()) 
 {}
 
 

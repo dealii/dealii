@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 GridIn<dim, spacedim>::GridIn () :
-		tria(0), default_format(ucd)
+		tria(0, typeid(*this).name()), default_format(ucd)
 {}
 
 

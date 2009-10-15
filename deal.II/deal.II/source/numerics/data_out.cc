@@ -95,7 +95,7 @@ DataEntryBase::DataEntryBase (const std::vector<std::string> &names_in,
 		:
 		names(names_in),
 		data_component_interpretation (data_component_interpretation),
-		postprocessor(0),
+		postprocessor(0, typeid(*this).name()),
 		n_output_variables(names.size())
 {
   Assert (names.size() == data_component_interpretation.size(),
@@ -123,7 +123,7 @@ DataEntryBase::DataEntryBase (const DataPostprocessor<DH::space_dimension> *data
 		:
 		names(data_postprocessor->get_names()),
 		data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
-		postprocessor(data_postprocessor),
+		postprocessor(data_postprocessor, typeid(*this).name()),
 		n_output_variables(data_postprocessor->n_output_variables())
 {
 				   // if there is a post processor, then we

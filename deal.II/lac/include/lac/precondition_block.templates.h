@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 template <class MATRIX, typename inverse_type>
 PreconditionBlock<MATRIX,inverse_type>::PreconditionBlock ():
 		blocksize(0),
-		A(0),
+		A(0, typeid(*this).name()),
 		store_diagonals(false),
 		var_same_diagonal(false)
 {}

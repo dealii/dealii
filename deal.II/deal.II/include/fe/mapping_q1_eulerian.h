@@ -84,7 +84,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Michael Stadler, 2001
  */
-template <int dim, class EulerVectorType = Vector<double>, int spacedim=dim >
+template <int dim, class VECTOR = Vector<double>, int spacedim=dim >
 class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 {
   public:
@@ -110,7 +110,7 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 				      * can be initialized by
 				      * <tt>DoFAccessor::set_dof_values()</tt>.
 				      */
-    MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
+    MappingQ1Eulerian (const VECTOR  &euler_transform_vectors,
                        const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
     
                                      /**
@@ -165,14 +165,14 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 				      * Reference to the vector of
 				      * shifts.
 				      */
-    const EulerVectorType &euler_transform_vectors;
+    const VECTOR &euler_transform_vectors;
     
                                      /**
 				      * Pointer to the DoFHandler to
 				      * which the mapping vector is
 				      * associated.
 				      */
-    const SmartPointer<const DoFHandler<dim,spacedim> > shiftmap_dof_handler;
+    const SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VECTOR,spacedim> > shiftmap_dof_handler;
     
 
   private:    

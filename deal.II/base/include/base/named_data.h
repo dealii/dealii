@@ -48,6 +48,15 @@ class NamedData : public Subscriptor
 				      * an empty object.
 				      */
     NamedData();
+
+				     /**
+				      * Assignment operator, copying
+				      * conversible data from another
+				      * object.
+				      */
+    template <typename DATA2>
+    NamedData<DATA>& operator = (const NamedData<DATA2>& other);
+    
 				     /**
 				      * \name Adding members
 				      */
@@ -75,7 +84,8 @@ class NamedData : public Subscriptor
 				      * #is_constant set, so will have
 				      * this object after merge.
 				      */
-    void merge(NamedData&);
+    template <typename DATA2>
+    void merge(NamedData<DATA2>&);
 				     /**
 				      * Merge the data of another
 				      * NamedData to the end of this
@@ -85,7 +95,8 @@ class NamedData : public Subscriptor
 				      * data in this object will be
 				      * treated as const.
 				      */
-    void merge(const NamedData&);
+    template <typename DATA2>
+    void merge(const NamedData<DATA2>&);
 //@}
 				     /**
 				      * \name Accessing and querying
@@ -243,35 +254,52 @@ NamedData<DATA>::add(const DATA& v, const std::string& n)
   
   
 template<typename DATA>
+template<typename DATA2>
 inline
 void
-NamedData<DATA>::merge(NamedData<DATA>& other)
+NamedData<DATA>::merge(NamedData<DATA2>& other)
 {
   Assert(!is_constant, ExcConstantObject());
   for (unsigned int i=0;i<other.size();++i)
     {
-      names.push_back(other.names[i]);
-      data.push_back(other.data[i]);
+      names.push_back(other.name(i));
+      data.push_back(other(i));
     }
-  is_constant = other.is_constant;
+  is_constant = other.is_const();
 }
   
   
 template<typename DATA>
+template<typename DATA2>
 inline
 void
-NamedData<DATA>::merge(const NamedData<DATA>& other)
+NamedData<DATA>::merge(const NamedData<DATA2>& other)
 {
   Assert(!is_constant, ExcConstantObject());
   for (unsigned int i=0;i<other.size();++i)
     {
-      names.push_back(other.names[i]);
-      data.push_back(other.data[i]);
+      names.push_back(other.name(i));
+      data.push_back(other(i));
     }
   is_constant = true;
 }
   
+
+
+template<typename DATA>
+template<typename DATA2>
+inline
+NamedData<DATA>&
+NamedData<DATA>::operator= (const NamedData<DATA2>& other)
+{
+  is_constant = false;
+  merge(other);
+  is_constant = other.is_const();
+  return *this;
+}
   
+
+
 template<typename DATA>
 inline
 unsigned int

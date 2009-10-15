@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -699,7 +699,7 @@ class TimeDependent
 				      * objects pointed to by the pointers
 				      * in this collection.
 				      */
-    std::vector<SmartPointer<TimeStepBase> > timesteps;
+    std::vector<SmartPointer<TimeStepBase,TimeDependent> > timesteps;
 
 				     /**
 				      * Number of the present sweep. This is
@@ -1795,7 +1795,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * such a behaviour is specified
 				      * in the @p flags structure.
 				      */
-    SmartPointer<Triangulation<dim, dim> > tria;
+    SmartPointer<Triangulation<dim, dim>,TimeStepBase_Tria<dim> > tria;
 
 				     /**
 				      * Pointer to a grid which is to
@@ -1806,7 +1806,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * with the owner of this
 				      * management object.
 				      */
-    SmartPointer<const Triangulation<dim, dim> > coarse_grid;
+    SmartPointer<const Triangulation<dim, dim>,TimeStepBase_Tria<dim> > coarse_grid;
     
 				     /**
 				      * Some flags about how this time level

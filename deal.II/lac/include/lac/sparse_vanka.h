@@ -264,7 +264,7 @@ class SparseVanka
 				     /**
 				      * Pointer to the matrix.
 				      */
-    SmartPointer<const SparseMatrix<number> > matrix;
+    SmartPointer<const SparseMatrix<number>,SparseVanka<number> > matrix;
     
 				     /**
 				      * Conserve memory flag.
@@ -291,7 +291,7 @@ class SparseVanka
 				      * Only those elements will be used
 				      * that are tagged in @p selected.
 				      */
-    mutable std::vector<SmartPointer<FullMatrix<float> > > inverses;
+    mutable std::vector<SmartPointer<FullMatrix<float>,SparseVanka<number> > > inverses;
 
 				     /**
 				      * Compute the inverses of all

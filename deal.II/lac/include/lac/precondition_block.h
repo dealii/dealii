@@ -412,7 +412,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * @p vmult function of the
 				      * derived classes.
 				      */
-    SmartPointer<const MATRIX> A;
+    SmartPointer<const MATRIX,PreconditionBlock<MATRIX,inverse_type> > A;
 				     /**
 				      * Relaxation parameter to be
 				      * used by derived classes.

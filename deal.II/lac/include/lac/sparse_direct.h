@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -444,7 +444,7 @@ class SparseDirectMA27 : public Subscriptor
 				      * that we use the same thing for
 				      * all calls.
 				      */
-    SmartPointer<const SparsityPattern> sparsity_pattern;
+    SmartPointer<const SparsityPattern,SparseDirectMA27> sparsity_pattern;
     
 				     /**
 				      * Number of nonzero elements in
@@ -879,7 +879,7 @@ class SparseDirectMA47 : public Subscriptor
 				      * to make sure that we use the
 				      * same thing for all calls.
 				      */
-    SmartPointer<const SparseMatrix<double> > matrix;
+    SmartPointer<const SparseMatrix<double>,SparseDirectMA47> matrix;
     
 				     /**
 				      * Number of nonzero elements in

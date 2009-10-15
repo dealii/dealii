@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -129,14 +129,16 @@ namespace internal
                                           * collection of finite
                                           * elements to be used.
                                           */
-        const SmartPointer<const dealii::hp::FECollection<dim,FEValues::space_dimension> > fe_collection;
+        const SmartPointer<const dealii::hp::FECollection<dim,FEValues::space_dimension>,
+			   FEValuesBase<dim,q_dim,FEValues> > fe_collection;
         
                                          /**
                                           * A pointer to the
                                           * collection of mappings to
                                           * be used.
                                           */
-        const SmartPointer<const dealii::hp::MappingCollection<dim, FEValues::space_dimension> > mapping_collection;
+        const SmartPointer<const dealii::hp::MappingCollection<dim, FEValues::space_dimension>,
+			   FEValuesBase<dim,q_dim,FEValues> > mapping_collection;
     
                                          /**
                                           * Copy of the quadrature

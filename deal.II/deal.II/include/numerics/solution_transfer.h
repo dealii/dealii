@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -198,7 +198,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup numerics
  * @author Ralf Hartmann, 1999
  */
-template<int dim, typename VectorType=Vector<double>, class DH=DoFHandler<dim> >
+template<int dim, typename VECTOR=Vector<double>, class DH=DoFHandler<dim> >
 class SolutionTransfer
 {
   public:
@@ -242,14 +242,14 @@ class SolutionTransfer
 				      * onto the new (refined and/or
 				      * coarsenend) grid.
 				      */
-    void prepare_for_coarsening_and_refinement (const std::vector<VectorType> &all_in);
+    void prepare_for_coarsening_and_refinement (const std::vector<VECTOR> &all_in);
     
 				     /**
 				      * Same as previous function
 				      * but for only one discrete function
 				      * to be interpolated.
 				      */
-    void prepare_for_coarsening_and_refinement (const VectorType &in);
+    void prepare_for_coarsening_and_refinement (const VECTOR &in);
 		      
 				     /**
 				      * This function
@@ -269,8 +269,8 @@ class SolutionTransfer
 				      * allowed. e.g. for interpolating several
 				      * functions.
 				      */
-    void refine_interpolate (const VectorType &in,
-			     VectorType &out) const;
+    void refine_interpolate (const VECTOR &in,
+			     VECTOR &out) const;
       
 				     /**
 				      * This function
@@ -306,8 +306,8 @@ class SolutionTransfer
 				      * (@p n_dofs_refined). Otherwise
 				      * an assertion will be thrown.
 				      */
-    void interpolate (const std::vector<VectorType>&all_in,
-		      std::vector<VectorType>      &all_out) const;
+    void interpolate (const std::vector<VECTOR>&all_in,
+		      std::vector<VECTOR>      &all_out) const;
       
 				     /**
 				      * Same as the previous function.
@@ -322,8 +322,8 @@ class SolutionTransfer
 				      * in one step by using
 				      * <tt>interpolate (all_in, all_out)</tt>
 				      */
-    void interpolate (const VectorType &in,
-		      VectorType       &out) const;
+    void interpolate (const VECTOR &in,
+		      VECTOR       &out) const;
 
     				     /**
 				      * Determine an estimate for the
@@ -367,21 +367,13 @@ class SolutionTransfer
 				      */
     DeclException0(ExcNumberOfDoFsPerCellHasChanged);
 
-				     /**
-				      * Exception
-				      */
-    DeclException2(ExcWrongVectorSize,
-		   int, int,
-		   << "The size of the vector is " << arg1
-		   << " although it should be " << arg2 << ".");
-				  
   private:
 
 				     /**
 				      * Pointer to the degree of freedom handler
 				      * to work with.
 				      */
-    SmartPointer<const DH> dof_handler;
+    SmartPointer<const DH,SolutionTransfer<dim,VECTOR,DH> > dof_handler;
     
 				     /**
 				      * Stores the number of DoFs before the
@@ -443,7 +435,7 @@ class SolutionTransfer
 	unsigned int memory_consumption () const;
 	
 	std::vector<unsigned int>    *indices_ptr;
-	std::vector<Vector<typename VectorType::value_type> > *dof_values_ptr;
+	std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr;
     };
 
 				     /**
@@ -464,7 +456,7 @@ class SolutionTransfer
 				      * of all cells that'll be coarsened
 				      * will be stored in this vector.
 				      */
-    std::vector<std::vector<Vector<typename VectorType::value_type> > > dof_values_on_cell;
+    std::vector<std::vector<Vector<typename VECTOR::value_type> > > dof_values_on_cell;
 };
 
 

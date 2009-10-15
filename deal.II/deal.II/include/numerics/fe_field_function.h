@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -333,7 +333,7 @@ namespace Functions
 				       /**
 					* Pointer to the dof handler.
 					*/
-      SmartPointer<const DH> dh;
+      SmartPointer<const DH,FEFieldFunction<dim, DH, VECTOR> > dh;
     
 				       /**
 					* A reference to the actual

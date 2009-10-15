@@ -1983,10 +1983,10 @@ FEValuesBase<dim,spacedim>::FEValuesBase (const unsigned int n_q_points,
 		:
 		n_quadrature_points (n_q_points),
 		dofs_per_cell (dofs_per_cell),
-		mapping(&mapping),
-		fe(&fe),
-		mapping_data(0),
-		fe_data(0),
+		mapping(&mapping, typeid(*this).name()),
+		fe(&fe, typeid(*this).name()),
+		mapping_data(0, typeid(*this).name()),
+		fe_data(0, typeid(*this).name()),
 		fe_values_views_cache (*this)
 {
   this->update_flags = flags;

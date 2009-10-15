@@ -3264,7 +3264,7 @@ class Triangulation : public Subscriptor
 				      *  and can thus never be
 				      *  associated with a boundary.
 				      */
-    SmartPointer<const Boundary<dim,spacedim> > boundary[255];
+    SmartPointer<const Boundary<dim,spacedim>,Triangulation<dim,spacedim> > boundary[255];
 
 				     /**
 				      *  Collection of ly
@@ -3275,7 +3275,7 @@ class Triangulation : public Subscriptor
 				      *  and can thus never be
 				      *  associated with a boundary.
 				      */
-    SmartPointer<const Boundary<spacedim,spacedim> > manifold_description[255];
+    SmartPointer<const Boundary<spacedim,spacedim>,Triangulation<dim,spacedim> > manifold_description[255];
 
 				     /**
 				      * Flag indicating whether

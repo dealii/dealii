@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -436,8 +436,8 @@ class PreconditionLU
     void Tvmult(BlockVector<number>&,
 		const BlockVector<number>&) const;
   private:
-    SmartPointer<const LAPACKFullMatrix<number> > matrix;
-    SmartPointer<VectorMemory<Vector<number> > > mem;
+    SmartPointer<const LAPACKFullMatrix<number>,PreconditionLU<number> > matrix;
+    SmartPointer<VectorMemory<Vector<number> >,PreconditionLU<number> > mem;
 };
 
 

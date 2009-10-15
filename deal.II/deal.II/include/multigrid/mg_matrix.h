@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -97,7 +97,7 @@ class MGMatrix : public MGMatrixBase<VECTOR>
 				     /**
 				      * Pointer to the matrix objects on each level.
 				      */
-    SmartPointer<MGLevelObject<MATRIX> > matrix;
+    SmartPointer<MGLevelObject<MATRIX>,MGMAtrix<MATRIX,VECTOR> > matrix;
 };
 
 
@@ -181,7 +181,7 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 				     /**
 				      * Pointer to the matrix objects on each level.
 				      */
-    SmartPointer<MGLevelObject<MATRIX> > matrix;
+    SmartPointer<MGLevelObject<MATRIX>,MGMAtrixSelect<MATRIX,number> > matrix;
 				     /**
 				      * Row coordinate of selected block.
 				      */

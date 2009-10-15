@@ -157,7 +157,7 @@ namespace MeshWorker
 					  * communicating the cell and
 					  * face vectors.
 					  */
-	typedef NamedData<SmartPointer<BlockVector<number> > > DataVectors;
+	typedef NamedData<SmartPointer<BlockVector<number>,CellsAndFaces<number> > > DataVectors;
 	
 					 /**
 					  * The initialization
@@ -258,7 +258,7 @@ namespace MeshWorker
     class ResidualSimple
     {
       public:
-	void initialize(NamedData<SmartPointer<VECTOR> >& results);
+	void initialize(NamedData<VECTOR*>& results);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -299,7 +299,7 @@ namespace MeshWorker
 					  * The global residal vectors
 					  * filled by assemble().
 					  */
-	NamedData<SmartPointer<VECTOR> > residuals;
+	NamedData<SmartPointer<VECTOR,ResidualSimple<VECTOR> > > residuals;
     };
     
 /**
@@ -331,7 +331,7 @@ namespace MeshWorker
 					  * matrix pointers into local
 					  * variables.
 					  */
-	void initialize(NamedData<SmartPointer<VECTOR> >& residuals);
+	void initialize(NamedData<VECTOR*>& residuals);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -383,13 +383,21 @@ namespace MeshWorker
 					  * stored as a vector of
 					  * pointers.
 					  */
-	NamedData<SmartPointer<VECTOR> > residuals;
+	NamedData<SmartPointer<VECTOR,ResidualLocalBlocksToGlobalBlocks<VECTOR> > > residuals;
     };
 
 
 /**
  * Assemble local matrices into a single global matrix without using
  * block structure.
+ *
+ * After being initialized with a SparseMatrix object (or another
+ * matrix offering the same functionality as SparseMatrix::add()),
+ * this class can be used in a MeshWorker::loop() to assemble the cell
+ * and face matrices into the global matrix.
+ *
+ * @todo On locally refined meshes, a ConstraintMatrix should be used
+ * to automatically eliminate hanging nodes.
  *
  * @author Guido Kanschat, 2009
  */
@@ -462,7 +470,130 @@ namespace MeshWorker
 					  * The global matrix being
 					  * assembled.
 					  */
-	SmartPointer<MATRIX> matrix;
+	SmartPointer<MATRIX,MatrixSimple<MATRIX> > matrix;
+	
+					 /**
+					  * The smallest positive
+					  * number that will be
+					  * entered into the global
+					  * matrix. All smaller
+					  * absolute values will be
+					  * treated as zero and will
+					  * not be assembled.
+					  */
+	const double threshold;
+	
+    };
+    
+    
+/**
+ * Assemble local matrices into level matrices without using
+ * block structure.
+ *
+ * @todo The matrix structures needed for assembling level matrices
+ * with local refinement and continuous elements are missing.
+ *
+ * @author Guido Kanschat, 2009
+ */
+    template <class MATRIX>
+    class MGMatrixSimple
+    {
+      public:
+					 /**
+					  * Constructor, initializing
+					  * the #threshold, which
+					  * limits how small numbers
+					  * may be to be entered into
+					  * the matrix.
+					  */
+	MGMatrixSimple(double threshold = 1.e-12);
+	
+					 /**
+					  * Store the result matrix
+					  * for later assembling.
+					  */
+	void initialize(MGLevelObject<MATRIX>& m);
+
+					 /**
+					  * Initialize the matrices
+					  * #flux_up and #flux_down
+					  * used for local refinement
+					  * with discontinuous
+					  * Galerkin methods.
+					  */
+	void initialize_fluxes(MGLevelObject<MATRIX>& flux_up,
+			       MGLevelObject<MATRIX>& flux_down);
+	
+					 /**
+					  * Initialize the local data
+					  * in the
+					  * DoFInfo
+					  * object used later for
+					  * assembling.
+					  *
+					  * The second parameter is
+					  * used to distinguish
+					  * between the data used on
+					  * cells and boundary faces
+					  * on the one hand and
+					  * interior faces on the
+					  * other. Interior faces may
+					  * require additional data
+					  * being initialized.
+					  */
+	template <int dim>
+	void initialize_info(DoFInfo<dim>& info,
+			     bool interior_face) const;
+	
+					 /**
+					  * Assemble the matrix
+					  * DoFInfo::M1[0]
+					  * into the global matrix.
+					  */
+	template<int dim>
+	void assemble(const DoFInfo<dim>& info);
+	
+					 /**
+					  * Assemble both local
+					  * matrices in the info
+					  * objects into the global
+					  * matrices.
+					  */
+	template<int dim>
+	void assemble(const DoFInfo<dim>& info1,
+		      const DoFInfo<dim>& info2);
+      private:
+					 /**
+					  * Assemble a single matrix
+					  * into a global matrix.
+					  */
+    void assemble(MATRIX& G,
+		  const FullMatrix<double>& M,
+		  const std::vector<unsigned int>& i1,
+		  const std::vector<unsigned int>& i2,
+		  const bool transpose = false);
+	
+					 /**
+					  * The global matrix being
+					  * assembled.
+					  */
+	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > matrix;
+	
+					 /**
+					  * The matrix used for face
+					  * flux terms across the
+					  * refinement edge, coupling
+					  * coarse to fine.
+					  */
+	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > flux_up;
+	
+					 /**
+					  * The matrix used for face
+					  * flux terms across the
+					  * refinement edge, coupling
+					  * fine to coarse.
+					  */
+	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > flux_down;
 	
 					 /**
 					  * The smallest positive
@@ -815,7 +946,7 @@ namespace MeshWorker
 
     template <class VECTOR>
     inline void
-    ResidualSimple<VECTOR>::initialize(NamedData<SmartPointer<VECTOR> >& results)
+    ResidualSimple<VECTOR>::initialize(NamedData<VECTOR*>& results)
     {
       residuals = results;
     }
@@ -861,7 +992,7 @@ namespace MeshWorker
 
     template <class VECTOR>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(NamedData<SmartPointer<VECTOR> >& m)
+    ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(NamedData<VECTOR*>& m)
     {
       residuals = m;      
     }
@@ -991,6 +1122,106 @@ namespace MeshWorker
       assemble(info1.M2[0].matrix, info1.indices, info2.indices);
       assemble(info2.M1[0].matrix, info2.indices, info2.indices);
       assemble(info2.M2[0].matrix, info2.indices, info1.indices);
+    }
+    
+    
+//----------------------------------------------------------------------//
+
+    template <class MATRIX>
+    inline
+    MGMatrixSimple<MATRIX>::MGMatrixSimple(double threshold)
+		    :
+		    threshold(threshold)
+    {}
+    
+    
+    template <class MATRIX>
+    inline void
+    MGMatrixSimple<MATRIX>::initialize(MGLevelObject<MATRIX>& m)
+    {
+      matrix = &m;
+    }
+    
+
+    template <class MATRIX>
+    inline void
+    MGMatrixSimple<MATRIX>::initialize_fluxes(
+      MGLevelObject<MATRIX>& up, MGLevelObject<MATRIX>& down)
+    {
+      flux_up = &up;
+      flux_down = &down;
+    }
+    
+
+    template <class MATRIX >
+    template <int dim>
+    inline void
+    MGMatrixSimple<MATRIX>::initialize_info(DoFInfo<dim>& info,
+					    bool interior_face) const
+    {
+      info.initialize_matrices(1, interior_face);
+    }
+
+
+
+    template <class MATRIX>
+    inline void
+    MGMatrixSimple<MATRIX>::assemble(MATRIX& G,
+				     const FullMatrix<double>& M,
+				     const std::vector<unsigned int>& i1,
+				     const std::vector<unsigned int>& i2,
+				     bool transpose)
+    {
+      AssertDimension(M.m(), i1.size());
+      AssertDimension(M.n(), i2.size());
+      
+      for (unsigned int j=0; j<i1.size(); ++j)
+	for (unsigned int k=0; k<i2.size(); ++k)
+	  if (std::fabs(M(j,k)) >= threshold)
+	    {
+	      if (transpose)
+		G.add(i1[j], i2[k], M(j,k));
+	      else
+		G.add(i1[j], i2[k], M(j,k));
+	    }
+    }
+    
+    
+    template <class MATRIX>
+    template <int dim>
+    inline void
+    MGMatrixSimple<MATRIX>::assemble(const DoFInfo<dim>& info)
+    {
+      assemble(info.M1[0].matrix, info.indices, info.indices);
+    }
+    
+
+    template <class MATRIX>
+    template <int dim>
+    inline void
+    MGMatrixSimple<MATRIX>::assemble(const DoFInfo<dim>& info1,
+				     const DoFInfo<dim>& info2)
+    {
+      const unsigned int level1 = info1.cell->level();
+      const unsigned int level2 = info2.cell->level();
+      
+      if (level1 == level2)
+	{
+	  assemble(matrix[level1], info1.M1[0].matrix, info1.indices, info1.indices);
+	  assemble(matrix[level1], info1.M2[0].matrix, info1.indices, info2.indices);
+	  assemble(matrix[level1], info2.M1[0].matrix, info2.indices, info2.indices);
+	  assemble(matrix[level1], info2.M2[0].matrix, info2.indices, info1.indices);
+	}
+      else
+	{
+	  Assert(level1 > level2, ExcInternalError());
+					   // Do not add info2.M1,
+					   // which is done by
+					   // the coarser cell
+	  assemble(matrix[level1], info1.M1[0].matrix, info1.indices, info1.indices);
+	  assemble(flux_up[level1],info1.M2[0].matrix, info1.indices, info2.indices, true);
+	  assemble(flux_down[level1], info2.M2[0].matrix, info2.indices, info1.indices);
+	}
     }
     
     
@@ -1261,8 +1492,8 @@ namespace MeshWorker
     inline void
     SystemSimple<MATRIX,VECTOR>::initialize(MATRIX& m, VECTOR& rhs)
     {
-      NamedData<SmartPointer<VECTOR> > data;
-      SmartPointer<VECTOR> p = &rhs;
+      NamedData<VECTOR*> data;
+      VECTOR* p = &rhs;
       data.add(p, "right hand side");
       
       MatrixSimple<MATRIX>::initialize(m);

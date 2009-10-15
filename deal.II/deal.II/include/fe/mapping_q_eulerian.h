@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -86,7 +86,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Joshua White, 2008
  */
-template <int dim, class EulerVectorType = Vector<double>, int spacedim=dim >
+template <int dim, class VECTOR = Vector<double>, int spacedim=dim >
 class MappingQEulerian : public MappingQ<dim, spacedim>
 {
   public:
@@ -114,7 +114,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       */
 
     MappingQEulerian (const unsigned int     degree,
-                      const EulerVectorType  &euler_vector,
+                      const VECTOR  &euler_vector,
                       const DoFHandler<dim>  &euler_dof_handler);
 
                                      /**
@@ -169,7 +169,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       * shifts.
                                       */
 
-    const EulerVectorType &euler_vector;
+    const VECTOR &euler_vector;
     
                                      /**
                                       * Pointer to the DoFHandler to
@@ -177,7 +177,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       * associated.
                                       */
 
-    const SmartPointer<const DoFHandler<dim> > euler_dof_handler;
+    const SmartPointer<const DoFHandler<dim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
 
 
   private:   

@@ -424,7 +424,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				     /**
 				      * Array of sparsity patterns.
 				      */
-    Table<2,SmartPointer<SparsityPatternBase> > sub_objects;
+    Table<2,SmartPointer<SparsityPatternBase, BlockSparsityPatternBase<SparsityPatternBase> > > sub_objects;
 
 				     /**
 				      * Object storing and managing

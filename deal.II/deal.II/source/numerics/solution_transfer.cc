@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,31 +31,31 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-template<int dim, typename VectorType, class DH>
-SolutionTransfer<dim, VectorType, DH>::SolutionTransfer(const DH &dof):
-		dof_handler(&dof),
+template<int dim, typename VECTOR, class DH>
+SolutionTransfer<dim, VECTOR, DH>::SolutionTransfer(const DH &dof):
+		dof_handler(&dof, typeid(*this).name()),
 		n_dofs_old(0),
 		prepared_for(none)
 {}
 
 
-template<int dim, typename VectorType, class DH>
-SolutionTransfer<dim, VectorType, DH>::~SolutionTransfer()
+template<int dim, typename VECTOR, class DH>
+SolutionTransfer<dim, VECTOR, DH>::~SolutionTransfer()
 {
   clear ();
 }
 
 
-template<int dim, typename VectorType, class DH>
-SolutionTransfer<dim, VectorType, DH>::Pointerstruct::Pointerstruct():
+template<int dim, typename VECTOR, class DH>
+SolutionTransfer<dim, VECTOR, DH>::Pointerstruct::Pointerstruct():
 		indices_ptr(0),
 		dof_values_ptr(0)
 {}
 
 
 
-template<int dim, typename VectorType, class DH>
-void SolutionTransfer<dim, VectorType, DH>::clear ()
+template<int dim, typename VECTOR, class DH>
+void SolutionTransfer<dim, VECTOR, DH>::clear ()
 {
   indices_on_cell.clear();
   dof_values_on_cell.clear();
@@ -65,8 +65,8 @@ void SolutionTransfer<dim, VectorType, DH>::clear ()
 }
 
 
-template<int dim, typename VectorType, class DH>
-void SolutionTransfer<dim, VectorType, DH>::prepare_for_pure_refinement()
+template<int dim, typename VECTOR, class DH>
+void SolutionTransfer<dim, VECTOR, DH>::prepare_for_pure_refinement()
 { 
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(prepared_for!=coarsening_and_refinement, 
@@ -100,20 +100,20 @@ void SolutionTransfer<dim, VectorType, DH>::prepare_for_pure_refinement()
 }
 
 
-template<int dim, typename VectorType, class DH>  
+template<int dim, typename VECTOR, class DH>  
 void
-SolutionTransfer<dim, VectorType, DH>::refine_interpolate(const VectorType &in,
-						  VectorType       &out) const
+SolutionTransfer<dim, VECTOR, DH>::refine_interpolate(const VECTOR &in,
+						  VECTOR       &out) const
 {
   Assert(prepared_for==pure_refinement, ExcNotPrepared());
-  Assert(in.size()==n_dofs_old, ExcWrongVectorSize(in.size(),n_dofs_old));
+  Assert(in.size()==n_dofs_old, ExcDimensionMismatch(in.size(),n_dofs_old));
   Assert(out.size()==dof_handler->n_dofs(),
-	 ExcWrongVectorSize(out.size(),dof_handler->n_dofs()));
+	 ExcDimensionMismatch(out.size(),dof_handler->n_dofs()));
   Assert(&in != &out,
          ExcMessage ("Vectors cannot be used as input and output"
                      " at the same time!"));
 
-  Vector<typename VectorType::value_type> local_values(0);
+  Vector<typename VECTOR::value_type> local_values(0);
 
   typename DH::cell_iterator cell = dof_handler->begin(),
 			     endc = dof_handler->end();
@@ -154,10 +154,10 @@ SolutionTransfer<dim, VectorType, DH>::refine_interpolate(const VectorType &in,
 }
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VECTOR, class DH>
 void
-SolutionTransfer<dim, VectorType, DH>::
-prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
+SolutionTransfer<dim, VECTOR, DH>::
+prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(!prepared_for!=coarsening_and_refinement, 
@@ -174,7 +174,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
   for (unsigned int i=0; i<in_size; ++i)
     {
       Assert(all_in[i].size()==n_dofs_old,
-	     ExcWrongVectorSize(all_in[i].size(),n_dofs_old));
+	     ExcDimensionMismatch(all_in[i].size(),n_dofs_old));
     }
 
 				   // first count the number
@@ -212,9 +212,9 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
     (n_cells_to_stay_or_refine)
     .swap(indices_on_cell);
   
-  std::vector<std::vector<Vector<typename VectorType::value_type> > >
+  std::vector<std::vector<Vector<typename VECTOR::value_type> > >
     (n_coarsen_fathers,
-     std::vector<Vector<typename VectorType::value_type> > (in_size))
+     std::vector<Vector<typename VECTOR::value_type> > (in_size))
     .swap(dof_values_on_cell);
   
 				   // we need counters for
@@ -247,8 +247,8 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 		   ExcTriaPrepCoarseningNotCalledBefore());
 	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
 
-	  std::vector<Vector<typename VectorType::value_type> >(in_size,
-								Vector<typename VectorType::value_type>(dofs_per_cell))
+	  std::vector<Vector<typename VECTOR::value_type> >(in_size,
+								Vector<typename VECTOR::value_type>(dofs_per_cell))
 	    .swap(dof_values_on_cell[n_cf]);
       
 	  for (unsigned int j=0; j<in_size; ++j)
@@ -269,36 +269,36 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 }
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VECTOR, class DH>
 void
-SolutionTransfer<dim, VectorType, DH>::prepare_for_coarsening_and_refinement(const VectorType &in)
+SolutionTransfer<dim, VECTOR, DH>::prepare_for_coarsening_and_refinement(const VECTOR &in)
 {
-  std::vector<VectorType> all_in=std::vector<VectorType>(1, in);
+  std::vector<VECTOR> all_in=std::vector<VECTOR>(1, in);
   prepare_for_coarsening_and_refinement(all_in);
 }
 
 
-template<int dim, typename VectorType, class DH>
-void SolutionTransfer<dim, VectorType, DH>::
-interpolate (const std::vector<VectorType> &all_in,
-	     std::vector<VectorType>       &all_out) const
+template<int dim, typename VECTOR, class DH>
+void SolutionTransfer<dim, VECTOR, DH>::
+interpolate (const std::vector<VECTOR> &all_in,
+	     std::vector<VECTOR>       &all_out) const
 {
   Assert(prepared_for==coarsening_and_refinement, ExcNotPrepared());
   const unsigned int size=all_in.size();
   Assert(all_out.size()==size, ExcDimensionMismatch(all_out.size(), size));
   for (unsigned int i=0; i<size; ++i)
     Assert (all_in[i].size() == n_dofs_old,
-	    ExcWrongVectorSize(all_in[i].size(), n_dofs_old));
+	    ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
   for (unsigned int i=0; i<all_out.size(); ++i)
     Assert (all_out[i].size() == dof_handler->n_dofs(),
-	    ExcWrongVectorSize(all_out[i].size(), dof_handler->n_dofs()));
+	    ExcDimensionMismatch(all_out[i].size(), dof_handler->n_dofs()));
   for (unsigned int i=0; i<size; ++i)
     for (unsigned int j=0; j<size; ++j)
       Assert(&all_in[i] != &all_out[j],
              ExcMessage ("Vectors cannot be used as input and output"
                          " at the same time!"));
 
-  Vector<typename VectorType::value_type> local_values;
+  Vector<typename VECTOR::value_type> local_values;
   std::vector<unsigned int> dofs;
 
   typename std::map<std::pair<unsigned int, unsigned int>, Pointerstruct>::const_iterator
@@ -316,7 +316,7 @@ interpolate (const std::vector<VectorType> &all_in,
 	  const std::vector<unsigned int> * const indexptr
 	    =pointerstruct->second.indices_ptr;
 
-	  const std::vector<Vector<typename VectorType::value_type> > * const valuesptr
+	  const std::vector<Vector<typename VECTOR::value_type> > * const valuesptr
 	    =pointerstruct->second.dof_values_ptr;
 
 	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
@@ -394,18 +394,18 @@ interpolate (const std::vector<VectorType> &all_in,
 
 
 
-template<int dim, typename VectorType, class DH>
-void SolutionTransfer<dim, VectorType, DH>::interpolate(const VectorType &in,
-						VectorType       &out) const
+template<int dim, typename VECTOR, class DH>
+void SolutionTransfer<dim, VECTOR, DH>::interpolate(const VECTOR &in,
+						VECTOR       &out) const
 {
   Assert (in.size()==n_dofs_old,
-	  ExcWrongVectorSize(in.size(), n_dofs_old));
+	  ExcDimensionMismatch(in.size(), n_dofs_old));
   Assert (out.size()==dof_handler->n_dofs(),
-	  ExcWrongVectorSize(out.size(), dof_handler->n_dofs()));
+	  ExcDimensionMismatch(out.size(), dof_handler->n_dofs()));
 
-  std::vector<VectorType> all_in(1);
+  std::vector<VECTOR> all_in(1);
   all_in[0] = in;
-  std::vector<VectorType> all_out(1);
+  std::vector<VECTOR> all_out(1);
   all_out[0] = out;
   interpolate(all_in,
 	      all_out);
@@ -414,9 +414,9 @@ void SolutionTransfer<dim, VectorType, DH>::interpolate(const VectorType &in,
 
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VECTOR, class DH>
 unsigned int
-SolutionTransfer<dim, VectorType, DH>::memory_consumption () const
+SolutionTransfer<dim, VECTOR, DH>::memory_consumption () const
 {
 				   // at the moment we do not include the memory
 				   // consumption of the cell_map as we have no
@@ -431,9 +431,9 @@ SolutionTransfer<dim, VectorType, DH>::memory_consumption () const
 
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VECTOR, class DH>
 unsigned int
-SolutionTransfer<dim, VectorType, DH>::Pointerstruct::memory_consumption () const
+SolutionTransfer<dim, VECTOR, DH>::Pointerstruct::memory_consumption () const
 {
   return sizeof(*this);
 }

@@ -441,7 +441,7 @@ class GridIn
 				      * Store address of the triangulation to
 				      * be fed with the data read in.
 				      */
-    SmartPointer<Triangulation<dim,spacedim> > tria;
+    SmartPointer<Triangulation<dim,spacedim>,GridIn<dim,spacedim> > tria;
     
 				     /**
 				      * This function can write the

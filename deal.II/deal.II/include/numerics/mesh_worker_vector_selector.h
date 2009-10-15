@@ -249,7 +249,7 @@ namespace MeshWorker
       public VectorDataBase<dim, spacedim>
   {
     public:
-      void initialize(const NamedData<SmartPointer<VECTOR> >&);
+      void initialize(const NamedData<VECTOR*>&);
       
       virtual void fill(
 	std::vector<std::vector<std::vector<double> > >& values,
@@ -262,7 +262,7 @@ namespace MeshWorker
 	unsigned int start,
 	unsigned int size) const;
     private:
-      SmartPointer<const NamedData<SmartPointer<VECTOR> > > data;
+      NamedData<SmartPointer<VECTOR,VectorData<VECTOR,dim,spacedim> > > data;
   };
   
 //----------------------------------------------------------------------//

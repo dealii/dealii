@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,7 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 				 const bool                  conserve_mem,
 				 const unsigned int          n_threads)
 		:
-		matrix (&M),
+		matrix (&M, typeid(*this).name()),
 		conserve_mem (conserve_mem),
 		selected (selected),
 		n_threads (n_threads),
@@ -49,7 +49,7 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 template<typename number>
 SparseVanka<number>::~SparseVanka()
 {
-  std::vector<SmartPointer<FullMatrix<float> > >::iterator i;
+  typename std::vector<SmartPointer<FullMatrix<float>,SparseVanka<number> > >::iterator i;
   for(i=inverses.begin(); i!=inverses.end(); ++i)
     {
       FullMatrix<float> *p = *i;

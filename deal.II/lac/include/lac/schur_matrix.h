@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -183,19 +183,19 @@ class SchurMatrix : public Subscriptor
                                      /**
                                       * Pointer to inverse of upper left block.
                                       */
-    const SmartPointer<const MA_inverse> Ainv;
+    const SmartPointer<const MA_inverse,SchurMatrix<MA_inverse,MB,MDt,MC> > Ainv;
                                      /**
                                       * Pointer to lower left block.
                                       */
-    const SmartPointer<const MB> B;
+    const SmartPointer<const MB,SchurMatrix<MA_inverse,MB,MDt,MC> > B;
                                      /**
                                       * Pointer to transpose of upper right block.
                                       */
-    const SmartPointer<const MDt> Dt;
+    const SmartPointer<const MDt,SchurMatrix<MA_inverse,MB,MDt,MC> > Dt;
                                      /**
                                       * Pointer to lower right block.
                                       */
-    const SmartPointer<const MC> C;
+    const SmartPointer<const MC,SchurMatrix<MA_inverse,MB,MDt,MC> > C;
                                      /**
                                       * Auxiliary memory for vectors.
                                       */

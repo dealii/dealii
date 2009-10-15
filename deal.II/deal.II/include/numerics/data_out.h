@@ -873,7 +873,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * object which shall be applied to
 					  * this data vector.
 					  */
-	SmartPointer<const DataPostprocessor<DH::space_dimension> > postprocessor;
+	SmartPointer<const DataPostprocessor<DH::space_dimension>,DataOut_DoFData<DH,patch_dim,patch_space_dim>  > postprocessor;
 
 					 /**
 					  * Number of output variables this
@@ -1039,7 +1039,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				     /**
 				      * Pointer to the dof handler object.
 				      */
-    SmartPointer<const DH> dofs;
+    SmartPointer<const DH, DataOut_DoFData<DH,patch_dim,patch_space_dim> > dofs;
 
 				     /**
 				      * List of data elements with vectors of

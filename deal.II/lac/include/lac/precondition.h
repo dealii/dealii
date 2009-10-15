@@ -329,7 +329,7 @@ class PreconditionRelaxation : public Subscriptor
 				     /**
 				      * Pointer to the matrix object.
 				      */
-    SmartPointer<const MATRIX> A;
+    SmartPointer<const MATRIX, PreconditionRelaxation<MATRIX> > A;
 
 				     /**
 				      * Relaxation parameter.
@@ -740,17 +740,17 @@ class PreconditionLACSolver : public Subscriptor
 				     /**
 				      * The solver object to use.
 				      */
-    SmartPointer<SOLVER> solver;
+    SmartPointer<SOLVER,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > solver;
 
 				     /**
 				      * The matrix in use.
 				      */
-    SmartPointer<const MATRIX> matrix;
+    SmartPointer<const MATRIX,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > matrix;
     
 				     /**
 				      * The preconditioner to use.
 				      */
-    SmartPointer<const PRECONDITION> precondition;
+    SmartPointer<const PRECONDITION,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > precondition;
 };
 
 
@@ -979,7 +979,7 @@ private:
 					* A pointer to the underlying
 					* matrix.
 					*/
-  SmartPointer<const MATRIX> matrix_ptr;
+    SmartPointer<const MATRIX,PreconditionChebyshev<MATRIX,VECTOR> > matrix_ptr;
 
 				       /**
 					* Internal vector used for the

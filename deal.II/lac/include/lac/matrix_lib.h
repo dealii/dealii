@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -137,7 +137,7 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 				     /**
 				      * Memory for auxiliary vector.
 				      */
-    SmartPointer<VectorMemory<VECTOR> > mem;
+    SmartPointer<VectorMemory<VECTOR>,ProductMatrix<VECTOR> > mem;
 				     /**
 				      * Return some kind of
 				      * identifier.
@@ -297,17 +297,17 @@ class ProductSparseMatrix : public PointerMatrixBase<Vector<vector_number> >
 				     /**
 				      * The left matrix of the product.
 				      */
-    SmartPointer<const MatrixType> m1;
+    SmartPointer<const MatrixType,ProductSparseMatrix<number,vector_number> > m1;
     
 				     /**
 				      * The right matrix of the product.
 				      */
-    SmartPointer<const MatrixType> m2;
+    SmartPointer<const MatrixType,ProductSparseMatrix<number,vector_number> > m2;
     
 				     /**
 				      * Memory for auxiliary vector.
 				      */
-    SmartPointer<VectorMemory<VectorType> > mem;
+    SmartPointer<VectorMemory<VectorType>,ProductSparseMatrix<number,vector_number>  > mem;
 				     /**
 				      * Return some kind of
 				      * identifier.
@@ -578,13 +578,13 @@ ScaledMatrix<VECTOR>::Tvmult (VECTOR& w, const VECTOR& v) const
 
 template<class VECTOR>
 ProductMatrix<VECTOR>::ProductMatrix ()
-  : m1(0), m2(0), mem(0, typeid(*this).name())
+  : m1(0), m2(0), mem(0)
 {}
 
 
 template<class VECTOR>
 ProductMatrix<VECTOR>::ProductMatrix (VectorMemory<VECTOR>& m)
-  : m1(0), m2(0), mem(&m, typeid(*this).name())
+  : m1(0), m2(0), mem(&m)
 {}
 
 
@@ -594,7 +594,7 @@ ProductMatrix<VECTOR>::ProductMatrix (
   const MATRIX1& mat1,
   const MATRIX2& mat2,
   VectorMemory<VECTOR>& m)
-  : mem(&m, typeid(*this).name())
+  : mem(&m)
 {
   m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1, typeid(*this).name());
   m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2, typeid(*this).name());

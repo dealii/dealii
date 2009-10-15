@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -606,11 +606,7 @@ class FilteredMatrix : public Subscriptor
 				     /**
 				      * Pointer to the sparsity
 				      * pattern used for this
-				      * matrix. In order to guarantee
-				      * that it is not deleted while
-				      * still in use, we subscribe to
-				      * it using the SmartPointer
-				      * class.
+				      * matrix.
 				      */
     std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
 

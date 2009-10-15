@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,7 +90,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
     else
       {
 					 // inner time step
-	std::vector<SmartPointer<TimeStepBase> >::iterator insert_position
+	std::vector<SmartPointer<TimeStepBase,TimeDependent> >::iterator insert_position
 	  = std::find(timesteps.begin(), timesteps.end(), position);
 	
 	(*(insert_position-1))->set_next_timestep (new_timestep);
@@ -138,14 +138,14 @@ void TimeDependent::delete_timestep (const unsigned int position)
   if (position != 0)
     timesteps[position-1]->set_next_timestep ((position<timesteps.size()) ?
 					      timesteps[position] :
-					      /*null*/SmartPointer<TimeStepBase>());
+					      /*null*/SmartPointer<TimeStepBase,TimeDependent>());
 
 				   // same for "previous" pointer of next
 				   // time step
   if (position<timesteps.size())
     timesteps[position]->set_previous_timestep ((position!=0) ?
 						timesteps[position-1] :
-						/*null*/SmartPointer<TimeStepBase>());
+						/*null*/SmartPointer<TimeStepBase,TimeDependent>());
 }
 
 
@@ -411,8 +411,8 @@ TimeStepBase::memory_consumption () const
 template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
 		TimeStepBase (0),
-		tria (0),
-		coarse_grid (0),
+		tria (0, typeid(*this).name()),
+		coarse_grid (0, typeid(*this).name()),
                 flags (),
 		refinement_flags(0)
 {
@@ -428,7 +428,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria (const double              time,
 					   const RefinementFlags    &refinement_flags) :
 		TimeStepBase (time),
 		tria(0, typeid(*this).name()),
-		coarse_grid (&coarse_grid),
+		coarse_grid (&coarse_grid, typeid(*this).name()),
 		flags (flags),
 		refinement_flags (refinement_flags)
 {}

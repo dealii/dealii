@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -89,8 +89,8 @@ template <class number> class SparseMatrix;
  *
  * @author Ralf Hartmann, 1999
  */
-template <class Matrix = SparseMatrix<double>,
-          class Vector = dealii::Vector<double> >
+template <class MATRIX = SparseMatrix<double>,
+          class VECTOR = dealii::Vector<double> >
 class PreconditionSelector : public Subscriptor
 {
   public:
@@ -101,7 +101,7 @@ class PreconditionSelector : public Subscriptor
 				      * the preconditioning.
 				      */
     PreconditionSelector(const std::string                 &preconditioning,
-			 const typename Vector::value_type &omega=1.);
+			 const typename VECTOR::value_type &omega=1.);
     
 				     /**
 				      * Destructor.
@@ -114,14 +114,14 @@ class PreconditionSelector : public Subscriptor
 				      * matrix. e.g. for @p precondition_jacobi,
 				      * <tt>~_sor</tt>, <tt>~_ssor</tt>.
 				      */
-    void use_matrix(const Matrix &M);
+    void use_matrix(const MATRIX &M);
 
 				     /**
 				      * Precondition procedure. Calls the
 				      * preconditioning that was specified in
 				      * the constructor.
 				      */    
-    virtual void vmult (Vector &dst, const Vector&src) const;
+    virtual void vmult (VECTOR &dst, const VECTOR&src) const;
 
 				     /**
 				      * Get the names of all implemented
@@ -153,44 +153,44 @@ class PreconditionSelector : public Subscriptor
 				      * matrix-builtin preconditioning function.
 				      * cf. also @p PreconditionUseMatrix.
 				      */
-    SmartPointer<const Matrix> A;
+    SmartPointer<const MATRIX,PreconditionSelector<MATRIX,VECTOR> > A;
     
 				     /**
 				      * Stores the damping parameter
 				      * of the preconditioner.
 				      */
-    const typename Vector::value_type omega;
+    const typename VECTOR::value_type omega;
 };
 
 /*@}*/
 /* --------------------- Inline and template functions ------------------- */
 
 
-template <class Matrix, class Vector>
-PreconditionSelector<Matrix,Vector>
+template <class MATRIX, class VECTOR>
+PreconditionSelector<MATRIX,VECTOR>
 ::PreconditionSelector(const std::string                 &preconditioning,
-		       const typename Vector::value_type &omega) :
+		       const typename VECTOR::value_type &omega) :
 		preconditioning(preconditioning),
 		omega(omega)  {}
 
 
-template <class Matrix, class Vector>
-PreconditionSelector<Matrix,Vector>::~PreconditionSelector()
+template <class MATRIX, class VECTOR>
+PreconditionSelector<MATRIX,VECTOR>::~PreconditionSelector()
 {
 				   // release the matrix A
   A=0;
 }
 
 
-template <class Matrix, class Vector>
-void PreconditionSelector<Matrix,Vector>::use_matrix(const Matrix &M)
+template <class MATRIX, class VECTOR>
+void PreconditionSelector<MATRIX,VECTOR>::use_matrix(const MATRIX &M)
 {
   A=&M;
 }
 
-template <class Matrix, class Vector>
-void PreconditionSelector<Matrix,Vector>::vmult (Vector &dst,
-						 const Vector &src) const
+template <class MATRIX, class VECTOR>
+void PreconditionSelector<MATRIX,VECTOR>::vmult (VECTOR &dst,
+						 const VECTOR &src) const
 {
   if (preconditioning=="none")
     {
@@ -218,8 +218,8 @@ void PreconditionSelector<Matrix,Vector>::vmult (Vector &dst,
 }
 
 
-template <class Matrix, class Vector>
-std::string PreconditionSelector<Matrix,Vector>::get_precondition_names()
+template <class MATRIX, class VECTOR>
+std::string PreconditionSelector<MATRIX,VECTOR>::get_precondition_names()
 {
   return "none|jacobi|sor|ssor";
 }

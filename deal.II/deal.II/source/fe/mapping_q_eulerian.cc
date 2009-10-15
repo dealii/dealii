@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ MappingQEulerian (const unsigned int degree,
 		:
 		MappingQ<dim,spacedim>(degree, true),
 		euler_vector(euler_vector),
-		euler_dof_handler(&euler_dof_handler),
+		euler_dof_handler(&euler_dof_handler, typeid(*this).name()),
 		support_quadrature(degree),
 		fe_values(euler_dof_handler.get_fe(),
 			  support_quadrature,

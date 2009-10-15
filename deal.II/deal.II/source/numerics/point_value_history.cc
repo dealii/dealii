@@ -40,7 +40,6 @@ namespace internal
 template <int dim>
 PointValueHistory<dim>
 ::PointValueHistory (const unsigned int n_independent_variables) :
-		dof_handler (0, "No DoFHandler"),
 		n_dofs (0),
 		n_indep (n_independent_variables)
 {
@@ -57,10 +56,9 @@ PointValueHistory<dim>
 
 
 template <int dim>
-PointValueHistory<dim>
-::PointValueHistory (const DoFHandler<dim> & dof_handler,
+PointValueHistory<dim>::PointValueHistory (const DoFHandler<dim> & dof_handler,
 		     const unsigned int n_independent_variables) :
-		dof_handler (&dof_handler, typeid (*this).name ()),
+		dof_handler (&dof_handler),
 		n_dofs (dof_handler.n_dofs ()),
 		n_indep (n_independent_variables)
 {
@@ -77,8 +75,7 @@ PointValueHistory<dim>
 
 
 template <int dim>
-PointValueHistory<dim>
-::PointValueHistory (const PointValueHistory & point_value_history)
+PointValueHistory<dim>::PointValueHistory (const PointValueHistory & point_value_history)
 {
   dataset_key = point_value_history.dataset_key;
   independent_values = point_value_history.independent_values;
@@ -418,7 +415,7 @@ void PointValueHistory<dim>
 ::clear ()
 {
   cleared = true;
-  dof_handler = SmartPointer<const DoFHandler<dim> > (0, "Cleared");
+  dof_handler = 0;
 }
 
 // Need to test that the internal data has a full and complete dataset for

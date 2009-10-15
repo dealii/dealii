@@ -40,9 +40,9 @@ namespace MeshWorker
 
   template <class VECTOR, int dim, int spacedim>
   void
-  VectorData<VECTOR, dim, spacedim>::initialize(const NamedData<SmartPointer<VECTOR> >& d)
+  VectorData<VECTOR, dim, spacedim>::initialize(const NamedData<VECTOR*>& d)
   {
-    data = &d;
+    data = d;
     VectorSelector::initialize(d);
   }
   
@@ -62,21 +62,21 @@ namespace MeshWorker
   {
     for (unsigned int i=0;i<this->n_values();++i)
       {
-	const VECTOR& src = *(*data)(this->value_index(i));
+	const VECTOR& src = *data(this->value_index(i));
 	VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
 	fe.get_function_values(src, make_slice(index, start, size), dst, true);
       }
     
     for (unsigned int i=0;i<this->n_gradients();++i)
       {
-	const VECTOR& src = *(*data)(this->value_index(i));
+	const VECTOR& src = *data(this->value_index(i));
 	VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
 	fe.get_function_gradients(src, make_slice(index, start, size), dst, true);
       }
     
     for (unsigned int i=0;i<this->n_hessians();++i)
       {
-	const VECTOR& src = *(*data)(this->value_index(i));
+	const VECTOR& src = *data(this->value_index(i));
 	VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
 	fe.get_function_hessians(src, make_slice(index, start, size), dst, true);
       }

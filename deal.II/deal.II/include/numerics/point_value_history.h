@@ -527,7 +527,7 @@ class PointValueHistory
                                      * supplied to the constructor. This can be 
                                      * released by calling @p clear().
                                      */
-    SmartPointer<const DoFHandler<dim> > dof_handler;
+    SmartPointer<const DoFHandler<dim>,PointValueHistory<dim> > dof_handler;
     
 				     /**
 				      * Variable to check that number of dofs

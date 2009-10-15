@@ -2875,23 +2875,23 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				     /**
 				      * Storage for the mapping object.
 				      */
-    const SmartPointer<const Mapping<dim,spacedim> > mapping;
+    const SmartPointer<const Mapping<dim,spacedim>,FEValuesBase<dim,spacedim> > mapping;
 
 				     /**
 				      * Store the finite element for later use.
 				      */
-    const SmartPointer<const FiniteElement<dim,spacedim> > fe;
+    const SmartPointer<const FiniteElement<dim,spacedim>,FEValuesBase<dim,spacedim> > fe;
 
 
 				     /**
 				      * Internal data of mapping.
 				      */
-    SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase> mapping_data;
+    SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase,FEValuesBase<dim,spacedim> > mapping_data;
 
 				     /**
 				      * Internal data of finite element.
 				      */
-    SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase> fe_data;
+    SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase,FEValuesBase<dim,spacedim> > fe_data;
 
 				     /**
 				      * Initialize some update

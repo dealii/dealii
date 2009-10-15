@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -183,14 +183,14 @@ class SolverSelector : public Subscriptor
 				      * is needed in the constructor of
 				      * each @p Solver class.
 				      */
-    SmartPointer<SolverControl> control;
+    SmartPointer<SolverControl,SolverSelector<VECTOR> > control;
 
 				     /**
 				      * Stores the @p VectorMemory that
 				      * is needed in the constructor of
 				      * each @p Solver class.
 				      */
-    SmartPointer<VectorMemory<VECTOR> > vector_memory;
+    SmartPointer<VectorMemory<VECTOR>,SolverSelector<VECTOR> > vector_memory;
 
   private:
 				     /**

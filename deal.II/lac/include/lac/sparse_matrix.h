@@ -1871,12 +1871,15 @@ class SparseMatrix : public virtual Subscriptor
 				     /**
 				      * Print the matrix to the given
 				      * stream, using the format
-				      * <tt>(line,col) value</tt>,
+				      * <tt>(row,column) value</tt>,
 				      * i.e. one nonzero entry of the
-				      * matrix per line.
+				      * matrix per line. If @p across
+				      * is true, print all entries on
+				      * a single line, using the
+				      * format row,column:value
 				      */
     template <class STREAM>
-    void print (STREAM &out) const;
+    void print (STREAM &out, bool across=false) const;
 
 				     /**
 				      * Print the matrix in the usual
@@ -2070,7 +2073,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * it using the SmartPointer
 				      * class.
 				      */
-    SmartPointer<const SparsityPattern> cols;
+    SmartPointer<const SparsityPattern,SparseMatrix<number> > cols;
 
 				     /**
 				      * Array of values for all the
@@ -2925,14 +2928,22 @@ SparseMatrix<number>::end (const unsigned int r)
 template <typename number>
 template <class STREAM>
 inline
-void SparseMatrix<number>::print (STREAM &out) const
+void SparseMatrix<number>::print (STREAM &out, bool across) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
 
-  for (unsigned int i=0; i<cols->rows; ++i)
-    for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
-      out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
+  if (across)
+    {
+      for (unsigned int i=0; i<cols->rows; ++i)
+	for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
+	  out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
+      out << std::endl;
+    }
+  else
+    for (unsigned int i=0; i<cols->rows; ++i)
+      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
+	out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
 }
 
 

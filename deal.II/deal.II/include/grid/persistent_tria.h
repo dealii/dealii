@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -282,7 +282,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * This grid shall be used as coarse
 				      * grid.
 				      */
-    SmartPointer<const Triangulation<dim> > coarse_grid;
+    SmartPointer<const Triangulation<dim>,PersistentTriangulation<dim> > coarse_grid;
     
     				     /**
 				      * Vectors holding the refinement and

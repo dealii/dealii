@@ -1586,7 +1586,7 @@ namespace hp
   template<int dim, int spacedim>
   DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
                   :
-                  tria(&tria),
+                  tria(&tria, typeid(*this).name()),
 		  faces (NULL),
                   used_dofs (0)
   {

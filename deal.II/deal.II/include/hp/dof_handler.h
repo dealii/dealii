@@ -936,7 +936,7 @@ namespace hp
                                         * Address of the triangulation to
                                         * work on.
                                         */
-      SmartPointer<const Triangulation<dim,spacedim> > tria;
+      SmartPointer<const Triangulation<dim,spacedim>,DoFHandler<dim,spacedim> > tria;
 
                                        /**
                                         * Store a pointer to the finite
@@ -953,7 +953,7 @@ namespace hp
                                         * (this clears all data of this
                                         * object as well, though).
                                         */
-      SmartPointer<const hp::FECollection<dim,spacedim> > finite_elements;
+      SmartPointer<const hp::FECollection<dim,spacedim>,hp::DoFHandler<dim,spacedim> > finite_elements;
 
     private:
 

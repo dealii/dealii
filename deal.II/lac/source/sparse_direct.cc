@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -392,7 +392,7 @@ SparseDirectMA27::SparseDirectMA27 (const double LIW_factor_1,
 		LA_increase_factor (LA_increase_factor),
 		initialize_called (false),
 		factorize_called (false),
-		sparsity_pattern (0)
+		sparsity_pattern (0, typeid(*this).name())
 {}
 
 
@@ -1073,7 +1073,7 @@ SparseDirectMA47::SparseDirectMA47 (const double LIW_factor_1,
 		LA_increase_factor (LA_increase_factor),
 		initialize_called (false),
 		factorize_called (false),
-		matrix (0)
+		matrix (0, typeid(*this).name())
 {}
 
 

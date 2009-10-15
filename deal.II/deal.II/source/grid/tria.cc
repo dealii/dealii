@@ -9814,7 +9814,6 @@ Triangulation<dim, spacedim>::dimension;
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::Triangulation (const MeshSmoothing smooth_grid)
 		:
-		Subscriptor (),
 		faces(NULL),
 		anisotropic_refinement(false),
 		smooth_grid(smooth_grid)
@@ -9827,12 +9826,12 @@ Triangulation<dim, spacedim>::Triangulation (const MeshSmoothing smooth_grid)
 
 
 template <int dim, int spacedim>
-Triangulation<dim, spacedim>::Triangulation (const Triangulation<dim, spacedim> &) 
-		:
-		Subscriptor ()
+Triangulation<dim, spacedim>::Triangulation (const Triangulation<dim, spacedim> &)
 				   // do not set any subscriptors;
 				   // anyway, calling this constructor
 				   // is an error!
+		:
+		Subscriptor()
 {
   Assert (false, ExcInternalError());
 }
