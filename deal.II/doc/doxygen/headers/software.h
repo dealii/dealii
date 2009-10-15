@@ -95,13 +95,14 @@
  * example algebraic multigrid) and most importantly it works in parallel on
  * distributed memory clusters, using MPI.
  *
- * In order to support parallel computations in deal.II, we have written
- * interfaces to many PETSc functions and data structures in the PETScWrapper
- * namespace, that allow the use of PETSc in much the same way as deal.II's
- * own linear algebra classes are used. The use of these wrappers is explained
- * in the step-17 and step-18 example programs, as well as in the @ref
- * PETScWrappers module. The <a href="../../readme-petsc-trilinos.html">ReadMe</a> file
- * explains how to configure deal.II to use PETSc.
+ * In order to support parallel computations in deal.II, we have
+ * written interfaces to many PETSc functions and data structures in
+ * the PETScWrapper namespace, that allow the use of PETSc in much the
+ * same way as deal.II's own linear algebra classes are used. The use
+ * of these wrappers is explained in the step-17 and step-18 example
+ * programs, as well as in the @ref PETScWrappers module. The <a
+ * href="../../readme-petsc-trilinos.html">PETSc and Trilinos
+ * ReadMe</a> file explains how to configure deal.II to use PETSc.
  *
  * PETSc can be obtained from http://www.mcs.anl.gov/petsc/.
  *
@@ -115,8 +116,12 @@
  *
  * Interfaces to Trilinos exist in the TrilinosWrappers namespace,
  * making matrices, vectors, and solvers look like the corresponding
- * deal.II classes. The <a href="../../readme-petsc-trilinos.html">ReadMe</a> file
- * explains how to configure deal.II to use this feature.
+ * deal.II classes. Their use is explained in the @ref step_31
+ * "step-31", @ref step_32 "step-32", and @ref step_33 "step-33"
+ * tutorial programs.  The <a
+ * href="../../readme-petsc-trilinos.html">PETSc and Trilinos
+ * ReadMe</a> file explains how to configure deal.II to use this
+ * feature.
  *
  * Trilinos can be obtained from http://trilinos.sandia.gov.
  *
