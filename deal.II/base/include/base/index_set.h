@@ -171,22 +171,6 @@ class IndexSet
     mutable std::set<ContiguousRange, RangeComparison> contiguous_ranges;
 
 				     /**
-				      * A set of individual indices
-				      * that make up (part of) this
-				      * index set, together with the
-				      * contiguous ranges.
-				      *
-				      * The variable is marked
-				      * "mutable" so that it can be
-				      * changed by compress(), though
-				      * this of course doesn't change
-				      * anything about the external
-				      * representation of this index
-				      * set.
-				      */
-    mutable std::set<unsigned int>                     individual_indices;
-
-				     /**
 				      * The overall size of the index
 				      * range. Elements of this index
 				      * set have to have a smaller
@@ -232,9 +216,7 @@ inline
 void
 IndexSet::set_size (const unsigned int sz)
 {
-  Assert (contiguous_ranges.size() == 0
-	  &&
-	  individual_indices.size() == 0,
+  Assert (contiguous_ranges.size() == 0,
 	  ExcMessage ("This function can only be called if the current "
 		      "object does not yet contain any elements."));
   index_space_size = sz;
@@ -283,7 +265,7 @@ IndexSet::add_index (const unsigned int index)
   Assert (index < index_space_size,
 	  ExcIndexRange (index, 0, index_space_size));
 
-  individual_indices.insert (index);
+  contiguous_ranges.insert (ContiguousRange(index, index+1));
 }
 
 
@@ -292,12 +274,7 @@ inline
 bool
 IndexSet::is_element (const unsigned int index) const
 {
-				   // see if it's in the list of
-				   // individual indices
-  if ((individual_indices.size() > 0) &&
-      (individual_indices.find (index) != individual_indices.end()))
-    return true;
-
+//TODO: since the list of ranges is sorted, we be faster here by doing a binary search
 				   // if not, we need to walk the list
 				   // of contiguous ranges:
   if (contiguous_ranges.size() > 0)
@@ -320,9 +297,7 @@ bool
 IndexSet::is_contiguous () const
 {
   compress ();
-  return ((individual_indices.size() == 0)
-	  &&
-	  (contiguous_ranges.size() <= 1));
+  return (contiguous_ranges.size() <= 1);
 }
 
 
@@ -336,7 +311,7 @@ IndexSet::n_elements () const
 				   // individual indices
   compress ();
 
-  unsigned int s = individual_indices.size();
+  unsigned int s = 0;
   for (std::set<ContiguousRange, RangeComparison>::iterator
 	 range = contiguous_ranges.begin();
        range != contiguous_ranges.end();
