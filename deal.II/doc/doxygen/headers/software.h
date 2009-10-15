@@ -20,8 +20,8 @@
  * way, either by supporting a data format of another program, or by actively
  * calling functions of other packages. Configuration of interfaces, if
  * necessary at all, is described in the deal.II ReadMe file.
- * 
- * 
+ *
+ *
  * @section SodtwarePrePost Pre- and Postprocessing
  *
  * @subsection SoftwareVis Visualization tools
@@ -29,7 +29,7 @@
  * This is a list of visualization formats and software that deal.II
  * supports. Data in these formats is written by the DataOutBase and in parts
  * by the GridOut classes (see @ref output).
- * 
+ *
  *
  * @subsubsection SoftwareAVS AVS Express
  *
@@ -48,26 +48,26 @@
  * gnuplot, even on locally refined and unstructured meshes, See
  * http://www.gnuplot.info/
  *
- * 
+ *
  * @subsubsection SoftwareOpenDX OpenDX
  *
  * The former IBM Visual Data Explorer, now an OpenSource project at
  * http://www.opendx.org/.
  *
- * 
+ *
  * @subsubsection SoftwarePovray Povray
  *
  * While it is not actually taylored to scientific visualization, you
  * may be able to produce impressive pictures of three-dimensional
  * deformed bodies with http://www.povray.org/
  *
- * 
+ *
  * @subsubsection SoftwareTecplot Tecplot
  *
  * deal.II writes textual and binary files for Tecplot. See
  * http://www.tecplot.com for more details on this software.
  *
- * 
+ *
  * @subsubsection SoftwareXFig XFig
  *
  * Though not a visualization tool at all, you can nevertheless write grids in
@@ -83,7 +83,7 @@
  * at http://vtk.org/pdf/file-formats.pdf .
  *
  *
- * 
+ *
  * @section SoftwareLibs Libraries used inside deal.II
  *
  * @subsection SoftwarePETSc PETSc
@@ -100,7 +100,7 @@
  * namespace, that allow the use of PETSc in much the same way as deal.II's
  * own linear algebra classes are used. The use of these wrappers is explained
  * in the step-17 and step-18 example programs, as well as in the @ref
- * PETScWrappers module. The <a href="../../readme.html">ReadMe</a> file
+ * PETScWrappers module. The <a href="../../readme-petsc-trilinos.html">ReadMe</a> file
  * explains how to configure deal.II to use PETSc.
  *
  * PETSc can be obtained from http://www.mcs.anl.gov/petsc/.
@@ -113,12 +113,10 @@
  * algebra data structures and algorithms. It, too, can work on parallel
  * clusters.
  *
- * Currently, we do not have wrapper classes that make Trilinos objects look
- * like deal.II objects. However, our Makefiles are setup so that programs
- * using Trilinos classes are automatically linked against the Trilinos
- * libraries, and header files are found automatically. The <a
- * href="../../readme.html">ReadMe</a> file explains how to configure deal.II
- * to use this feature.
+ * Interfaces to Trilinos exist in the TrilinosWrappers namespace,
+ * making matrices, vectors, and solvers look like the corresponding
+ * deal.II classes. The <a href="../../readme-petsc-trilinos.html">ReadMe</a> file
+ * explains how to configure deal.II to use this feature.
  *
  * Trilinos can be obtained from http://trilinos.sandia.gov.
  *
@@ -130,7 +128,7 @@
  * same number of cells, when distributing work for parallel programs. METIS
  * can be obtained from http://www-users.cs.umn.edu/~karypis/metis/index.html
  *
- * 
+ *
  * @subsection SoftwareUMFPACK UMFPACK
  *
  * UMFPACK is a sparse direct solver and is included by permission with
