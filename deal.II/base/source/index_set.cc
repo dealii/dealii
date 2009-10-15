@@ -25,12 +25,11 @@ IndexSet::compress () const
 				   // merged. since they are sorted by
 				   // their first index, determining
 				   // overlap isn't all that hard
-  for (std::set<Range>::iterator
+  for (std::vector<Range>::iterator
 	 i = ranges.begin();
-       i != ranges.end();
-       ++i)
+       i != ranges.end(); )
     {
-      std::set<Range>::const_iterator
+      std::vector<Range>::iterator
 	next = i;
       ++next;
 
@@ -50,33 +49,36 @@ IndexSet::compress () const
 
       if (can_merge == true)
 	{
-					   // delete the old
-					   // ranges and insert the
-					   // new range
-	  ranges.erase (i, next);
-	  ranges.insert (Range(first_index,
-			       last_index));
-
-					   // then set iterator to
-					   // the same position as
-					   // before. in the next
-					   // step, the loop is then
-					   // going to increase 'i'
-					   // by one. note that we
-					   // don't need to
-					   // reconsider the same
-					   // iterator for merging
-					   // with the next range
-					   // because we have made
-					   // sure we gobble up as
-					   // many of the following
-					   // ranges as possible
-	  i = ranges.lower_bound (Range(first_index,
-					last_index));
+					   // delete the old ranges
+					   // and insert the new range
+					   // in place of the previous
+					   // one
+	  *i = Range(first_index, last_index);
+	  i = ranges.erase (i+1, next);
 	}
+      else
+	++i;
     }
 
+
+				   // now compute indices within set
+  unsigned int next_index = 0;
+  for (std::vector<Range>::iterator
+	 i = ranges.begin();
+       i != ranges.end();
+       ++i)
+    {
+      i->nth_index_in_set = next_index;
+      next_index += (i->end - i->begin);
+    }
   is_compressed = true;
+
+				   // check that next_index is
+				   // correct. needs to be after the
+				   // previous statement because we
+				   // otherwise will get into an
+				   // endless loop
+  Assert (next_index == n_elements(), ExcInternalError());
 }
 
 

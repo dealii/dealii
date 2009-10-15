@@ -16,7 +16,8 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
-#include <set>
+#include <vector>
+#include <algorithm>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -154,11 +155,23 @@ class IndexSet
 				      * A type that denotes the half
 				      * open index range
 				      * <code>[begin,end)</code>.
+				      *
+				      * The nth_index_in_set denotes
+				      * the how many-th index within
+				      * this IndexSet the first
+				      * element of the current range
+				      * is. This information is only
+				      * accurate if
+				      * IndexSet::compress() has been
+				      * called after the last
+				      * insertion.
 				      */
     struct Range
     {
 	unsigned int begin;
 	unsigned int end;
+
+	unsigned int nth_index_in_set;
 
 	Range (const unsigned int i1,
 	       const unsigned int i2);
@@ -178,7 +191,8 @@ class IndexSet
 				     /**
 				      * A set of contiguous ranges of
 				      * indices that make up (part of)
-				      * this index set.
+				      * this index set. This variable
+				      * is always kept sorted.
 				      *
 				      * The variable is marked
 				      * "mutable" so that it can be
@@ -188,7 +202,7 @@ class IndexSet
 				      * representation of this index
 				      * set.
 				      */
-    mutable std::set<Range> ranges;
+    mutable std::vector<Range> ranges;
 
 				     /**
 				      * True if compress() has been
@@ -280,7 +294,11 @@ IndexSet::add_range (const unsigned int begin,
 
   if (begin != end)
     {
-      ranges.insert (Range(begin,end));
+      const Range new_range(begin,end);
+      ranges.insert (std::lower_bound (ranges.begin(),
+				       ranges.end(),
+				       new_range),
+		     new_range);
       is_compressed = false;
     }
 }
@@ -294,7 +312,11 @@ IndexSet::add_index (const unsigned int index)
   Assert (index < index_space_size,
 	  ExcIndexRange (index, 0, index_space_size));
 
-  ranges.insert (Range(index, index+1));
+  const Range new_range(index, index+1);
+  ranges.insert (std::lower_bound (ranges.begin(),
+				   ranges.end(),
+				   new_range),
+		 new_range);
   is_compressed = false;
 }
 
@@ -355,7 +377,7 @@ IndexSet::is_element (const unsigned int index) const
 				       // of the following ranges
 				       // because otherwise p would be
 				       // a different iterator
-      std::set<Range>::const_iterator
+      std::vector<Range>::const_iterator
 	p = std::upper_bound (ranges.begin(),
 			      ranges.end(),
 			      Range (index, size()+1));
@@ -396,12 +418,11 @@ unsigned int
 IndexSet::n_elements () const
 {
 				   // make sure we have
-				   // non-overlapping ranges and
-				   // individual indices
+				   // non-overlapping ranges
   compress ();
 
   unsigned int s = 0;
-  for (std::set<Range>::iterator range = ranges.begin();
+  for (std::vector<Range>::iterator range = ranges.begin();
        range != ranges.end();
        ++range)
     s += (range->end - range->begin);
