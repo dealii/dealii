@@ -43,7 +43,7 @@ IndexSet::compress () const
       while (next != ranges.end() &&
 	     (next->begin <= last_index))
 	{
-	  last_index = next->end;
+	  last_index = std::max (last_index, next->end);
 	  ++next;
 	  can_merge = true;
 	}
