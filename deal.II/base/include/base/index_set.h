@@ -86,6 +86,17 @@ class IndexSet
     void add_index (const unsigned int index);
 
 				     /**
+				      * Add a whole set of indices
+				      * described by dereferencing
+				      * every element of the the
+				      * iterator range
+				      * <code>[begin,end)</code>.
+				      */
+    template <typename ForwardIterator>
+    void add_indices (const ForwardIterator &begin,
+		      const ForwardIterator &end);
+
+				     /**
 				      * Return whether the specified
 				      * index is an element of the
 				      * index set.
@@ -245,15 +256,7 @@ IndexSet::add_range (const unsigned int begin,
 	  ExcIndexRange (begin, 0, end));
 
   if (begin != end)
-    {
-				       // if it turns out to be a
-				       // single element then add that
-				       // separately
-      if (end == begin+1)
-	add_index (begin);
-      else
-	ranges.insert (Range(begin,end));
-    }
+    ranges.insert (Range(begin,end));
 }
 
 
@@ -266,6 +269,35 @@ IndexSet::add_index (const unsigned int index)
 	  ExcIndexRange (index, 0, index_space_size));
 
   ranges.insert (Range(index, index+1));
+}
+
+
+
+template <typename ForwardIterator>
+inline
+void
+IndexSet::add_indices (const ForwardIterator &begin,
+		       const ForwardIterator &end)
+{
+				   // insert each element of the
+				   // range. if some of them happen to
+				   // be consecutive, merge them to a
+				   // range
+  for (ForwardIterator p=begin; p<end;)
+    {
+      const unsigned int begin_index = *p;
+      unsigned int       end_index   = begin_index + 1;
+      ForwardIterator q = p;
+      ++q;
+      while ((q != end) && (*q == end_index))
+	{
+	  ++end_index;
+	  ++q;
+	}
+
+      add_range (begin_index, end_index);
+      p = q;
+    }
 }
 
 
