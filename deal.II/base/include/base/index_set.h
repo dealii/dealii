@@ -333,16 +333,46 @@ inline
 bool
 IndexSet::is_element (const unsigned int index) const
 {
-//TODO: since the list of ranges is sorted, we be faster here by doing a binary search
-				   // if not, we need to walk the list
-				   // of contiguous ranges:
   if (ranges.size() > 0)
-    for (std::set<Range>::const_iterator
-	   i = ranges.begin();
-	 i != ranges.end();
-	 ++i)
-      if ((index >= i->begin) && (index < i->end))
-	return true;
+    {
+      compress ();
+
+				       // get the element after which
+				       // we would have to insert a
+				       // range that consists of all
+				       // elements from this element
+				       // to the end of the index
+				       // range plus one. after this
+				       // call we know that if
+				       // p!=end() then
+				       // p->begin<=index unless there
+				       // is no such range at all
+				       //
+				       // if the searched for element
+				       // is an element of this range,
+				       // then we're done. otherwise,
+				       // the element can't be in one
+				       // of the following ranges
+				       // because otherwise p would be
+				       // a different iterator
+      std::set<Range>::const_iterator
+	p = std::upper_bound (ranges.begin(),
+			      ranges.end(),
+			      Range (index, size()+1));
+
+      if (p == ranges.begin())
+	return ((index >= p->begin) && (index < p->end));
+
+      Assert ((p == ranges.end()) || (p->begin > index),
+		ExcInternalError());
+
+				       // now move to that previous
+				       // range
+      --p;
+      Assert (p->begin <= index, ExcInternalError());
+
+      return (p->end > index);
+    }
 
 				   // didn't find this index, so it's
 				   // not in the set
