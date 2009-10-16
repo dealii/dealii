@@ -59,7 +59,7 @@ namespace internal
 						    n_postprocessor_outputs,
 						    finite_elements),
 		    q_collection (quadrature),
-		    mapping_collection (mapping),	    
+		    mapping_collection (mapping),
 		    x_fe_values (this->mapping_collection,
 				 this->fe_collection,
 				 q_collection,
@@ -112,7 +112,7 @@ DataEntryBase::DataEntryBase (const std::vector<std::string> &names_in,
 	    ExcInvalidCharacter (names[i],
 				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-							    "0123456789_<>()")));  
+							    "0123456789_<>()")));
 }
 
 
@@ -149,7 +149,7 @@ DataEntryBase::DataEntryBase (const DataPostprocessor<DH::space_dimension> *data
 	    ExcInvalidCharacter (names[i],
 				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-							    "0123456789_<>()")));  
+							    "0123456789_<>()")));
 }
 
 
@@ -330,7 +330,7 @@ attach_dof_handler (const DH &d)
 {
   Assert (dof_data.size() == 0, ExcOldDataStillPresent());
   Assert (cell_data.size() == 0, ExcOldDataStillPresent());
-  
+
   dofs = &d;
 }
 
@@ -371,7 +371,7 @@ add_data_vector (const VECTOR                             &vec,
   	  names[i] = name + namebuf.str();
   	}
     }
-  
+
   add_data_vector (vec, names, type, data_component_interpretation);
 }
 
@@ -397,7 +397,7 @@ add_data_vector (const VECTOR                             &vec,
        :
        std::vector<DataComponentInterpretation::DataComponentInterpretation>
        (names.size(), DataComponentInterpretation::component_is_scalar));
-  
+
 				   // either cell data and one name,
 				   // or dof data and n_components names
   DataVectorType actual_type = type;
@@ -408,7 +408,7 @@ add_data_vector (const VECTOR                             &vec,
       else
 	actual_type = type_dof_data;
     }
-  
+
   switch (actual_type)
     {
       case type_cell_data:
@@ -419,7 +419,7 @@ add_data_vector (const VECTOR                             &vec,
 	    Assert (names.size() == 1,
 		    ExcInvalidNumberOfNames (names.size(), 1));
 	    break;
-      
+
       case type_dof_data:
 	    Assert (vec.size() == dofs->n_dofs(),
 		    ExcInvalidVectorSize (vec.size(),
@@ -460,7 +460,7 @@ add_data_vector (const VECTOR                           &vec,
 				   // bit simpler, we also don't need to deal
 				   // with some of the other stuff and use a
 				   // different constructor of DataEntry
-  
+
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
 
   Assert (vec.size() == dofs->n_dofs(),
@@ -496,7 +496,7 @@ clear_input_data_references ()
 {
   for (unsigned int i=0; i<dof_data.size(); ++i)
     dof_data[i]->clear ();
-  
+
   for (unsigned int i=0; i<cell_data.size(); ++i)
     cell_data[i]->clear ();
 
@@ -528,7 +528,7 @@ template <class DH,
 	  int patch_dim, int patch_space_dim>
 std::vector<std::string>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-get_dataset_names () const 
+get_dataset_names () const
 {
   std::vector<std::string> names;
 				   // collect the names of dof
@@ -536,7 +536,7 @@ get_dataset_names () const
   typedef
     typename std::vector<std_cxx1x::shared_ptr<DataEntryBase> >::const_iterator
     data_iterator;
-  
+
   for (data_iterator  d=dof_data.begin();
        d!=dof_data.end(); ++d)
     for (unsigned int i=0; i<(*d)->names.size(); ++i)
@@ -559,7 +559,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 {
   std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     ranges;
-  
+
 				   // collect the ranges of dof
 				   // and cell data
   typedef
@@ -613,7 +613,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 	    range (output_component,
 		   output_component+patch_space_dim-1,
 		   name);
-	  
+
 	  ranges.push_back (range);
 
 					   // increase the 'component' counter
@@ -640,7 +640,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
   Assert (output_component == n_output_components,
 	  ExcInternalError());
 #endif
-  
+
   return ranges;
 }
 
@@ -678,7 +678,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 		 internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
 		 DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
 		 const CurvedCellRegion curved_cell_region)
-{  
+{
 				   // use ucd_to_deal map as patch
 				   // vertices are in the old,
 				   // unnatural ordering
@@ -686,7 +686,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
     patch.vertices[vertex] = data.mapping_collection[0].transform_unit_to_real_cell
 			     (cell_and_index->first,
 			      GeometryInfo<DH::dimension>::unit_cell_vertex (vertex));
-      
+
   if (data.n_datasets > 0)
     {
       data.x_fe_values.reinit (cell_and_index->first);
@@ -694,7 +694,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 	= data.x_fe_values.get_present_fe_values ();
 
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
-      
+
 				       // depending on the requested output
 				       // of curved cells, if necessary
 				       // append the quadrature points to
@@ -729,16 +729,16 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 	  patch.data.reinit(data.n_datasets, n_q_points);
 	  patch.points_are_available = false;
 	}
-      
+
 
 				       // counter for data records
       unsigned int offset=0;
-	  
+
 				       // first fill dof_data
       for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 	{
 	  const DataPostprocessor<DH::space_dimension> *postprocessor=this->dof_data[dataset]->postprocessor;
-	      
+
 	  if (postprocessor != 0)
 	    {
 					       // we have to postprocess the
@@ -790,7 +790,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 						      dummy_normals,
 						      data.postprocessed_values[dataset]);
 		}
-		  
+
 	      for (unsigned int q=0; q<n_q_points; ++q)
 		for (unsigned int component=0;
 		     component<this->dof_data[dataset]->n_output_variables;
@@ -836,7 +836,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
       if (this->cell_data.size() != 0)
 	{
 	  Assert (!cell_and_index->first->has_children(), ExcNotImplemented());
-              
+
 	  for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
 	    {
 	      const double value
@@ -896,7 +896,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 	   ==
 	   dealii::DataOutBase::Patch<DH::dimension>::no_neighbor))
 	{
-	  patch.neighbors[f] = numbers::invalid_unsigned_int;	  
+	  patch.neighbors[f] = numbers::invalid_unsigned_int;
 	  continue;
 	}
 
@@ -912,7 +912,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 
 
 template <int dim, class DH>
-void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions) 
+void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions)
 {
   build_patches (StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
 		 n_subdivisions, no_curved_cells);
@@ -922,15 +922,15 @@ void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions)
 template <int dim, class DH>
 void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
 				     const unsigned int nnnn_subdivisions,
-				     const CurvedCellRegion curved_region) 
+				     const CurvedCellRegion curved_region)
 {
 				   // Check consistency of redundant
 				   // template parameter
   Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
-  
+
   typedef DataOut_DoFData<DH, DH::dimension, DH::space_dimension> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
-  
+
   const unsigned int n_subdivisions = (nnnn_subdivisions != 0)
 				      ? nnnn_subdivisions
 				      : this->default_subdivisions;
@@ -946,7 +946,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 				   // information
   std::vector<std::vector<unsigned int> > cell_to_patch_index_map;
   cell_to_patch_index_map.resize (this->dofs->get_tria().n_levels());
-  for (unsigned int l=0; l<this->dofs->get_tria().n_levels(); ++l) 
+  for (unsigned int l=0; l<this->dofs->get_tria().n_levels(); ++l)
     {
       unsigned int max_index = 0;
       for (cell_iterator cell=first_cell(); cell != this->dofs->end();
@@ -954,11 +954,11 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
         if (static_cast<unsigned int>(cell->level()) == l)
           max_index = std::max (max_index,
                                 static_cast<unsigned int>(cell->index()));
-      
+
       cell_to_patch_index_map[l].resize (max_index+1,
                                          dealii::DataOutBase::Patch<DH::dimension,DH::space_dimension>::no_neighbor);
     }
-                                  
+
   std::vector<std::pair<cell_iterator, unsigned int> > all_cells;
   {
     unsigned int index = 0;
@@ -971,28 +971,28 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 	Assert (static_cast<unsigned int>(cell->index()) <
 		cell_to_patch_index_map[cell->level()].size(),
 		ExcInternalError());
-	
+
 	cell_to_patch_index_map[cell->level()][cell->index()] = all_cells.size();
-	
+
 	all_cells.push_back (std::make_pair(cell, index));
       }
   }
-  
+
   this->patches.clear ();
   this->patches.reserve (all_cells.size());
-  Assert (this->patches.size() == 0, ExcInternalError());  
+  Assert (this->patches.size() == 0, ExcInternalError());
 
 				   // now create a default patch and a
 				   // default object for the
 				   // WorkStream object to work with
   const QTrapez<1>     q_trapez;
   const QIterated<DH::dimension> patch_points (q_trapez, n_subdivisions);
-  
+
   const unsigned int n_components   = this->dofs->get_fe().n_components();
   unsigned int n_datasets=this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     n_datasets += this->dof_data[i]->n_output_variables;
-  
+
   std::vector<unsigned int> n_postprocessor_outputs (this->dof_data.size());
   for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
     if (this->dof_data[dataset]->postprocessor)
@@ -1002,11 +1002,11 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 
   const CurvedCellRegion curved_cell_region
     = (n_subdivisions<2 ? no_curved_cells : curved_region);
-  
+
   UpdateFlags update_flags = update_values;
   if (curved_cell_region != no_curved_cells)
     update_flags |= update_quadrature_points;
-  
+
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     if (this->dof_data[i]->postprocessor)
       update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();
@@ -1016,7 +1016,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   Assert (!(update_flags & update_normal_vectors),
 	  ExcMessage("The update of normal vectors may not be requested for evaluation of "
 		     "data on cells via DataPostprocessor."));
-  
+
   internal::DataOut::ParallelData<DH::dimension, DH::space_dimension>
     thread_data (patch_points,
 		 n_components, n_datasets, n_subdivisions,
@@ -1048,7 +1048,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 
 template <int dim, class DH>
 typename DataOut<dim,DH>::cell_iterator
-DataOut<dim,DH>::first_cell () 
+DataOut<dim,DH>::first_cell ()
 {
   return this->dofs->begin_active ();
 }
@@ -1057,7 +1057,7 @@ DataOut<dim,DH>::first_cell ()
 
 template <int dim, class DH>
 typename DataOut<dim,DH>::cell_iterator
-DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell) 
+DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell)
 {
 				   // convert the iterator to an
 				   // active_iterator and advance
@@ -1068,7 +1068,7 @@ DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell)
 }
 
 
-// explicit instantiations 
+// explicit instantiations
 
 #define INSTANTIATE(DH,D0,D1,D2,D3,V)		\
 template void \
