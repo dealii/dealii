@@ -213,7 +213,7 @@ namespace PETScWrappers
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
-  class VectorBase
+  class VectorBase : public Subscriptor
   {
     public:
                                        /**
