@@ -106,6 +106,7 @@ namespace PETScWrappers
 
   VectorBase::VectorBase (const VectorBase &v)
                   :
+		  Subscriptor (),
                   last_action (LastAction::none)
   {
     int ierr = VecDuplicate (v.vector, &vector);
