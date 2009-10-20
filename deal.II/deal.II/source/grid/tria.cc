@@ -374,361 +374,6 @@ namespace
   }
 
 
-
-				   /**
-				    * In 3d, set the neighbor information of
-				    * all outer neighbor of all children of
-				    * the given cell <tt>cell</tt>, if
-				    * <tt>refining=true</tt>. In this
-				    * constellation the function is called
-				    * after the creation of children in @p
-				    * execute_refinement. If
-				    * <tt>refining=false</tt>, it is assumed,
-				    * that the given cell is just coarsened,
-				    * i.e. that its children are about to be
-				    * deleted, thus they do not need new
-				    * neighbor information.
-				    *
-				    * In both cases, the neighbor information
-				    * of the cell's neighbors are updated, if
-				    * necessary.
-				    */
-  template <int spacedim>
-  void
-  update_neighbors (const typename Triangulation<3, spacedim>::cell_iterator &cell,
-		    const bool                                                refining)
-  {
-    const unsigned int dim = 3;
-    
-    Assert(cell->has_children(),
-	   ExcMessage("Only cells with children can ask for an update of neighbor information."));
-
-    typedef
-      typename Triangulation<dim, spacedim>::cell_iterator cell_iterator;
-    typedef
-      typename Triangulation<dim, spacedim>::face_iterator face_iterator;
-    
-    
-    const RefinementCase<dim> ref_case=cell->refinement_case();
-  
-				     // visit each face in turn
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      {
-	cell_iterator neighbor=cell->neighbor(f);
-					 // as default: set all children neighbors
-					 // to the cell's neighbor first, if we
-					 // are to set neighbors after refining.
-	if (refining)
-	  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_face; ++c)
-	    cell->child(GeometryInfo<dim>::child_cell_on_face(ref_case,f,c))
-	      ->set_neighbor(f, neighbor);
-	else
-					   // in this case, if we are refined
-					   // anisotropically in a way that does
-					   // not refine the current face, then
-					   // set our child's neighbor as our
-					   // neighbor (the child's neighbor might
-					   // be more current...).
-	  if (GeometryInfo<dim>::face_refinement_case(cell->refinement_case(), f) == RefinementCase<dim-1>::no_refinement)
-	    {
-	      const typename Triangulation<dim, spacedim>::active_cell_iterator
-		child_on_this_face=cell->child(GeometryInfo<dim>::child_cell_on_face(cell->refinement_case(),
-										     f,
-										     cell->face_orientation(f),
-										     cell->face_flip(f),
-										     cell->face_rotation(f),
-										     RefinementCase<dim>::no_refinement));
-	      neighbor=child_on_this_face->neighbor(f);
-	      cell->set_neighbor(f, child_on_this_face->neighbor(f));
-	    }
-		
-	if (neighbor.state()!=IteratorState::valid)
-					   // the neighbor is at the
-					   // boundary, so simply copy
-					   // this to all children at
-					   // this face. As this has
-					   // been done already, there
-					   // is nothing more to do here
-	  {}
-	else if (neighbor->active())
-	  {
-		    
-					     // the neighbor is active,
-					     // so it cannot be refined
-					     // along the given face. We
-					     // have to set the neighbor
-					     // of our children to this
-					     // neighbor. This has been
-					     // done already. If our
-					     // face is not refined AND
-					     // if the neighbor is not
-					     // coarser we also have to
-					     // adjust the neighbor's
-					     // neighborship info.
-	    if ((GeometryInfo<dim>::face_refinement_case(ref_case,f) ==
-		 RefinementCase<dim-1>::no_refinement)
-		&&
-		!cell->neighbor_is_coarser(f))
-	      {
-		if (refining)
-		  neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
-					 cell->child(GeometryInfo<dim>::child_cell_on_face(ref_case,f,0)));
-		else
-		  neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
-					 cell);
-	      }				    
-	  }// else if (neighbor->active())
-	else
-	  {
-	    const bool f_or=cell->face_orientation(f);
-	    const bool f_fl=cell->face_flip(f);
-	    const bool f_ro=cell->face_rotation(f);
-	  
-					     // now the neighbor has children, so
-					     // it is kind of complicated.
-	    const RefinementCase<dim-1> our_face_ref_case
-	      = GeometryInfo<dim>::face_refinement_case(ref_case,f,f_or,f_fl,f_ro);
-	    const RefinementCase<dim-1> face_ref_case
-	      = cell->face(f)->refinement_case();
-		    
-	    switch (face_ref_case)
-	      {
-		case RefinementCase<dim>::no_refinement:
-						       // in this case neither our
-						       // cell nor the neighbor is
-						       // refined along face
-						       // f. however, the above
-						       // case should have caught
-						       // this situation, as the
-						       // neighbor has to be
-						       // active then.
-		      Assert (false, ExcInternalError());
-		      break;
-		case RefinementCase<dim>::cut_x:
-		case RefinementCase<dim>::cut_y:
-		case RefinementCase<dim>::cut_xy:
-		{
-			  
-						   // this is really tricky and
-						   // originally there were some
-						   // 800 lines of code which were
-						   // still buggy. thus we use a
-						   // different kind of approach
-						   // here: we create a map of our
-						   // child cells at the given
-						   // face with the (sub)face as
-						   // key. Then create a
-						   // corresponding (multi-)map of
-						   // the neighbor and its
-						   // children. As a third
-						   // ingredient, we need a map
-						   // pointing us from a face to
-						   // its parent.
-		  const unsigned int nb_nb=cell->neighbor_face_no(f);
-			  
-		  std::map<face_iterator, cell_iterator> our_children;
-						   // we only need to fill this
-						   // map, if the cell was just
-						   // refined. after coarsening,
-						   // we should use our own cell
-						   // instead
-		  if (refining)
-		    for (unsigned int c=0; c<std::max(GeometryInfo<dim-1>::n_children(our_face_ref_case),1U); ++c)
-		      {
-			cell_iterator child
-			  =
-			  cell->child(GeometryInfo<dim>::child_cell_on_face(ref_case,
-									    f,c,
-									    f_or,
-									    f_fl,
-									    f_ro,
-									    our_face_ref_case));
-			our_children.insert(std::make_pair(child->face(f),child));
-		      }
-		  else
-		    our_children.insert(std::make_pair(cell->face(f),cell));
-			  
-		  std::map<face_iterator,face_iterator> parents;
-		  for (unsigned int face_child=0; face_child<neighbor->face(nb_nb)->n_children(); ++face_child)
-		    parents.insert(std::make_pair(neighbor->face(nb_nb)->child(face_child),neighbor->face(nb_nb)));
-		  bool inserted=true;
-		  while (inserted)
-		    {
-		      inserted=false;
-		      typename std::map<face_iterator,face_iterator>::iterator
-			cur_face = parents.begin();
-		      for (;cur_face!=parents.end(); ++cur_face)
-			if (cur_face->first->has_children())
-			  for (unsigned int fc=0; fc<cur_face->first->n_children(); ++fc)
-			    if (parents.find(cur_face->first->child(fc))==parents.end())
-			      {
-				parents.insert(std::make_pair(cur_face->first->child(fc),cur_face->first));
-				inserted=true;
-			      }
-		    }
-			  
-		  const bool nb_f_or=neighbor->face_orientation(nb_nb);
-		  const bool nb_f_fl=neighbor->face_flip(nb_nb);
-		  const bool nb_f_ro=neighbor->face_rotation(nb_nb);
-			  
-		  std::multimap<face_iterator,cell_iterator> nb_children;
-		  nb_children.insert(std::make_pair(neighbor->face(nb_nb),neighbor));
-			  
-		  int current_level=neighbor->level();
-		  inserted=true;
-		  while (inserted)
-		    {
-		      inserted=false;
-		      typename std::multimap<face_iterator,cell_iterator>::iterator
-			it = nb_children.begin();
-		      for (;it!=nb_children.end(); ++it)
-							 // only treat
-							 // untreated
-							 // cells,
-							 // i.e. those
-							 // with
-							 // level()==current_level
-			if (it->second->level()==current_level &&
-			    it->second->has_children())
-			  {
-			    RefinementCase<dim-1> nb_face_ref_case
-			      =GeometryInfo<dim>::face_refinement_case(it->second->refinement_case(),
-								       nb_nb,
-								       nb_f_or,
-								       nb_f_fl,
-								       nb_f_ro);
-			    for (unsigned int c=0; c<std::max(GeometryInfo<dim-1>::n_children(nb_face_ref_case),1U); ++c)
-			      {
-				cell_iterator child=
-				  it->second->child(GeometryInfo<dim>::child_cell_on_face(it->second->refinement_case(),
-											  nb_nb,c,
-											  nb_f_or,
-											  nb_f_fl,
-											  nb_f_ro,
-											  nb_face_ref_case));
-				nb_children.insert(std::make_pair(child->face(nb_nb),child));
-				inserted=true;
-			      }
-			  }
-		      ++current_level;
-		    }
-
-						   // now loop over all of our
-						   // children and set their
-						   // neighbor, if available. only
-						   // necessary, if we are
-						   // refining.
-
-						   // declare some iterator which
-						   // are needed in any case
-		  typename std::map<face_iterator,cell_iterator>::iterator
-		    our_it = our_children.begin(),
-		    end_our_it = our_children.end();
-		  typename std::multimap<face_iterator,cell_iterator>::iterator
-		    nb_it, end_nb_it;
-		
-		  if (refining)
-		    {
-		      for (; our_it!=end_our_it; ++our_it)
-			{
-			  face_iterator parent_face=our_it->first;
-			  bool further_parents=true;
-			
-			  while(further_parents &&
-				nb_children.find(parent_face)==nb_children.end())
-			    {
-			      if (parents.find(parent_face)==parents.end())
-				further_parents=false;
-			      parent_face=parents.find(parent_face)->second;
-			    }
-			      
-			  if (further_parents)
-							     // we found a
-							     // corresponding
-							     // neighbor_child. if
-							     // not, do nothing,
-							     // as the default
-							     // neighbor set above
-							     // is correct.
-			    {
-			      nb_it=nb_children.lower_bound(parent_face);
-			      end_nb_it=nb_children.upper_bound(parent_face);
-			    
-							       // advance to
-							       // the last
-							       // child at
-							       // the given
-							       // face, as
-							       // this is on
-							       // the
-							       // highest
-							       // level and
-							       // thus the
-							       // finest one
-							       // possible
-			      for (; nb_it!=end_nb_it; ++nb_it)
-				our_it->second->set_neighbor(f, nb_it->second);
-			    }
-			}
-		    }
-		
-						   // now do the same for the
-						   // neighbor and its
-						   // children. this is also
-						   // necessary if we are
-						   // coarsening
-		  nb_it=nb_children.begin();
-		  end_nb_it=nb_children.end();
-			  
-		  for (; nb_it!=end_nb_it; ++nb_it)
-		    {
-		      face_iterator parent_face=nb_it->first;
-		      bool further_parents=true;
-		    
-		      while(further_parents &&
-			    our_children.find(parent_face)==our_children.end())
-			{
-			  if (parents.find(parent_face)==parents.end())
-			    further_parents=false;
-			  parent_face=parents.find(parent_face)->second;
-			}
-		    
-		      if (further_parents)
-							 // we found a
-							 // corresponding
-							 // child. if
-							 // not, do
-							 // nothing, as
-							 // the old
-							 // neighbor is
-							 // still
-							 // correct.
-			{
-							   // here, we
-							   // only have
-							   // one child
-							   // at any
-							   // given
-							   // face, so
-							   // we do not
-							   // need a
-							   // loop.
-			  our_it=our_children.find(parent_face);
-			  nb_it->second->set_neighbor(nb_nb, our_it->second);
-			}
-		    }
-		  break;
-		}
-		default:
-		      Assert(false, ExcInternalError());
-		      break;
-	      }// switch (our_face_ref_case)
-		    
-	  }// else -> neighbor has children
-      }// for all faces
-  }
-
-
 				   /**
 				    * For a given Triangulation, update the
 				    * number cache for lines. For 1d, we have
@@ -1243,6 +888,152 @@ namespace
   }
   
   
+
+				   /**
+				    * For a given triangulation: set up the
+				    * neighbor information on all cells.
+				    */
+  template <int dim, int spacedim>
+  void
+  update_neighbors (Triangulation<dim,spacedim> &triangulation)
+  {
+				     // each face can be neighbored on two sides
+				     // by cells. according to the face's
+				     // intrinsic normal we define the left
+				     // neighbor as the one for which the face
+				     // normal points outward, and store that
+				     // one first, with an offset of one we
+				     // store the right neighbor for which the
+				     // face normal points inward. This
+				     // information depends on the type of cell
+				     // and local number of face for the
+				     // 'standard ordering and orientation' of
+				     // faces and then on the face_orientation
+				     // information for the real mesh. Set up a
+				     // table to have fast access to those
+				     // offsets (0 for left and 1 for
+				     // right). Some of the values are invalid
+				     // as they reference too large face
+				     // numbers, but we just leave them at a
+				     // zero value.
+				     //
+				     // Note, that in 2d for lines as faces the
+				     // normal direction given in the
+				     // GeometryInfo class is not consistent. We
+				     // thus define here that the normal for a
+				     // line points to the right if the line
+				     // points upwards.
+				     //
+				     // first index:  dimension (minus 2)
+				     // second index: local face index
+				     // third index:  face_orientation (false and true)
+    static const unsigned int left_right_offset[2][6][2] =
+      {
+					     // quadrilateral
+	    {{0,1}, // face 0, face_orientation = false and true
+	     {1,0}, // face 1, face_orientation = false and true 
+	     {1,0}, // face 2, face_orientation = false and true 
+	     {0,1}, // face 3, face_orientation = false and true                      
+	     {0,0}, // face 4, invalid face                      
+	     {0,0}},// face 5, invalid face                      
+					     // hexahedron
+	    {{0,1},
+	     {1,0},
+	     {0,1},
+	     {1,0},
+	     {0,1},
+	     {1,0}}};
+
+				     // now create a vector of the two active
+				     // neighbors (left and right) for each face
+				     // and fill it by looping over all cells. For
+				     // cases with anisotropic refinement and more
+				     // then one cell neighboring at a given side
+				     // of the face we will automatically get the
+				     // active one on the highest level as we loop
+				     // over cells from lower levels first.
+    const typename Triangulation<dim,spacedim>::cell_iterator dummy;
+    std::vector<typename Triangulation<dim,spacedim>::cell_iterator>
+      adjacent_cells(2*triangulation.n_raw_faces(), dummy);
+
+    typename Triangulation<dim,spacedim>::cell_iterator
+      cell = triangulation.begin(),
+      endc = triangulation.end();
+    for (; cell != endc; ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	{
+	  const typename Triangulation<dim,spacedim>::face_iterator face=cell->face(f);
+	  const unsigned int offset=left_right_offset[dim-2][f][cell->face_orientation(f)];
+	  adjacent_cells[2*face->index() + offset] = cell;
+					   // if this cell is not refined, but the
+					   // face is, then we'll have to set our
+					   // cell as neighbor for the cild faces
+					   // as well. Fortunately the normal
+					   // orientation of children will be just
+					   // the same.
+	  if (dim==2)
+	    {
+	      if (cell->active() && face->has_children())
+		{
+		  adjacent_cells[2*face->child(0)->index() + offset] = cell;
+		  adjacent_cells[2*face->child(1)->index() + offset] = cell;
+		}
+	    }
+	  else // -> dim == 3
+	    {
+					       // We need the same as in 2d
+					       // here. Furthermore, if the face is
+					       // refined with cut_x or cut_y then
+					       // those children again in the other
+					       // direction, and if this cell is
+					       // refined isotropically (along the
+					       // face) then the neighbor will
+					       // (probably) be refined as cut_x or
+					       // cut_y along the face. For those
+					       // neighboring children cells, their
+					       // neighbor will be the current,
+					       // inactive cell, as our children are
+					       // too fine to be neighbors. Catch that
+					       // case by also acting on inactive
+					       // cells with isotropic refinement
+					       // along the face. If the situation
+					       // described is not present, the data
+					       // will be overwritten later on when we
+					       // visit cells on finer levels, so no
+					       // harm will be done.
+	      if (face->has_children() &&
+		  (cell->active() ||
+		   GeometryInfo<dim>::face_refinement_case(cell->refinement_case(),f) == RefinementCase<dim-1>::isotropic_refinement))
+		{
+		  
+		  for (unsigned int c=0; c<face->n_children(); ++c)
+		    adjacent_cells[2*face->child(c)->index() + offset] = cell;
+		  if (face->child(0)->has_children())
+		    {
+		      adjacent_cells[2*face->child(0)->child(0)->index() + offset] = cell;
+		      adjacent_cells[2*face->child(0)->child(1)->index() + offset] = cell;
+		    }
+		  if (face->child(1)->has_children())
+		    {
+		      adjacent_cells[2*face->child(1)->child(0)->index() + offset] = cell;
+		      adjacent_cells[2*face->child(1)->child(1)->index() + offset] = cell;
+		    }
+		} // if cell active and face refined
+	    } // else -> dim==3	    
+	} // for all faces of all cells
+
+				     // now loop again over all cells and set the
+				     // corresponding neighbor cell. Note, that we
+				     // have to use the opposite of the
+				     // left_right_offset in this case as we want
+				     // the offset of the neighbor, not our own.
+    for (cell=triangulation.begin(); cell != endc; ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	cell->set_neighbor(f,
+			   adjacent_cells[2*cell->face(f)->index() + 1
+					  - left_right_offset[dim-2][f][cell->face_orientation(f)]]);
+  }
+
 }// end of anonymous namespace
 
 
@@ -3095,114 +2886,33 @@ namespace internal
 	void
 	delete_children (Triangulation<2,spacedim> &triangulation,
 			 typename Triangulation<2,spacedim>::cell_iterator &cell,
-			 std::vector<unsigned int> &,
+			 std::vector<unsigned int> &line_cell_count,
 			 std::vector<unsigned int> &)
 	  {
 	    const unsigned int dim=2;
 	    const RefinementCase<dim> ref_case=cell->refinement_case();
 
-	    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-	      if (!cell->at_boundary(face_no))
-		{
-		  if (GeometryInfo<dim>::face_refinement_case(ref_case, face_no)
-		      ==RefinementCase<1>::no_refinement)
-		    cell->set_neighbor(face_no,cell->child(face_no%2)->neighbor(face_no));
-	
-		  typename Triangulation<dim,spacedim>::cell_iterator
-		    neighbor=cell->neighbor(face_no);
-	
-						   // it is possible that the neighbor is
-						   // coarser if it has already been
-						   // coarsened earlier in this cycle. for
-						   // anisotropic refinement that can
-						   // happen, even if the neighbor is on a
-						   // higher level.
-	
-						   // it is also possible, that the
-						   // neighbor information of cell was not
-						   // the best information currently
-						   // available. however, the neighbor
-						   // information now set should be
-						   // accurate, as we have taken the
-						   // pointer from one of our children, if
-						   // that could be mor accurate and these
-						   // children can't be further refined.
-	
-						   // if the neighbor is coarser, do
-						   // nothing: we won't have to reset our
-						   // pointer of course and the coarser
-						   // neighbor does not point to this cell
-		  if (cell->neighbor_is_coarser(face_no))
-		    {
-		      Assert(neighbor->active(),
-			     ExcInternalError());
-		      continue;
-		    }
-	
-		  const unsigned int nb_nb=cell->neighbor_of_neighbor(face_no);
-		  neighbor->set_neighbor(nb_nb, cell);
-						   // go down the list of children which
-						   // are not refined along the face (if
-						   // any)
-		  while (neighbor->has_children() &&
-			 (GeometryInfo<dim>::face_refinement_case(neighbor->refinement_case(), nb_nb)
-			  ==RefinementCase<dim-1>::no_refinement))
-		    {
-		      neighbor=neighbor->child(GeometryInfo<dim>
-					       ::child_cell_on_face(neighbor->refinement_case(),
-								    nb_nb,
-								    0));
-		      neighbor->set_neighbor(nb_nb, cell);
-		    }
-		
-						   // now we can safely set the cells
-						   // neighbor
-		  cell->set_neighbor(face_no,neighbor);
-			   
-						   // if there are still children, they
-						   // have to be refined along the face
-						   // currently under consideration
-		  if (neighbor->has_children())
-		    {
-		      unsigned int n_subfaces=GeometryInfo<dim-1>::n_children(
-			GeometryInfo<dim>::face_refinement_case(neighbor->refinement_case(), nb_nb));
-		      Assert (n_subfaces>0, ExcInternalError());
-		
-		      for (unsigned int i=0; i<n_subfaces; ++i)
-			{
-			  typename Triangulation<dim,spacedim>::cell_iterator
-			    neighbor_child=neighbor->child(
-			    GeometryInfo<dim>::child_cell_on_face(neighbor->refinement_case(),
-								  nb_nb, i));
-			  neighbor_child->set_neighbor(nb_nb, cell);
-							   // once again, this
-							   // neighbor_child can be
-							   // refined several times,
-							   // as long as this
-							   // refinement is not along
-							   // the current subface. if
-							   // there are children
-							   // refined along the
-							   // subface they will be
-							   // coarsened away later in
-							   // this process, so we
-							   // don't care about them
-							   // here
-			  while (neighbor_child->has_children() &&
-				 (GeometryInfo<dim>::face_refinement_case(neighbor_child->refinement_case(),
-									  nb_nb)
-				  == RefinementCase<dim-1>::no_refinement))
-			    {
-			      neighbor_child=neighbor_child
-					     ->child(GeometryInfo<dim>
-						     ::child_cell_on_face(neighbor_child->refinement_case(),
-									  nb_nb,
-									  0));
-			      neighbor_child->set_neighbor(nb_nb, cell);
-			    }
-			}
-		    }
-		}
+	    Assert(line_cell_count.size()==triangulation.n_raw_lines(), ExcInternalError());
+
+					     // vectors to hold all lines which
+					     // may be deleted
+	    std::vector<typename Triangulation<dim,spacedim>::line_iterator>
+	      lines_to_delete(0);
+	    
+	    lines_to_delete.reserve(4*2+4);
+  
+					     // now we decrease the counters for
+					     // lines contained in the child
+					     // cells
+	    for (unsigned int c=0; c<cell->n_children(); ++c)
+	      {
+		typename Triangulation<dim,spacedim>::cell_iterator
+		  child=cell->child(c);
+		for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+		  --line_cell_count[child->line_index(l)];
+	      }
+
+
 					     // delete the vertex which will not
 					     // be needed anymore. This vertex
 					     // is the second of the second line
@@ -3214,28 +2924,11 @@ namespace internal
 	    if (ref_case==RefinementCase<dim>::cut_xy)
 	      {
 		triangulation.vertices_used[cell->child(0)->line(1)->vertex_index(1)] = false;
-      
-						 // clear user pointers, to
-						 // avoid that they may appear
-						 // at unwanted places later
-						 // on...
-		cell->child(0)->line(1)->clear_user_data();
-		cell->child(0)->line(3)->clear_user_data();
-		cell->child(3)->line(0)->clear_user_data();
-		cell->child(3)->line(2)->clear_user_data();
-      
-						 // same for user flags
-		cell->child(0)->line(1)->clear_user_flag();
-		cell->child(0)->line(3)->clear_user_flag();
-		cell->child(3)->line(0)->clear_user_flag();
-		cell->child(3)->line(2)->clear_user_flag();
-      
-						 // delete the four interior
-						 // lines
-		cell->child(0)->line(1)->clear_used_flag();
-		cell->child(0)->line(3)->clear_used_flag();
-		cell->child(3)->line(0)->clear_used_flag();
-		cell->child(3)->line(2)->clear_used_flag();
+
+		lines_to_delete.push_back(cell->child(0)->line(1));
+		lines_to_delete.push_back(cell->child(0)->line(3));
+		lines_to_delete.push_back(cell->child(3)->line(0));
+		lines_to_delete.push_back(cell->child(3)->line(2));
 	      }
 	    else
 	      {
@@ -3243,38 +2936,9 @@ namespace internal
 				 
 						 // the inner line will not be
 						 // used any more
-		cell->child(0)->line(inner_face_no)->clear_user_data();
-		cell->child(0)->line(inner_face_no)->clear_user_flag();
-		cell->child(0)->line(inner_face_no)->clear_used_flag();
+		lines_to_delete.push_back(cell->child(0)->line(inner_face_no));
 	      }
 				   
-					     // if the neighbor does not need
-					     // the subfaces, delete them.  in case of
-					     // anisotropic refinement we can't just
-					     // ask the neighbor's level here to
-					     // assure, that he is not refined along
-					     // the face
-	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
-	      if (((cell->neighbor(face).state() != IteratorState::valid) ||
-		   (!cell->neighbor(face)->has_children())) &&
-		  (GeometryInfo<dim>::face_refinement_case(ref_case,face)
-		   !=RefinementCase<dim-1>::no_refinement))
-		{
-		  typename Triangulation<dim,spacedim>::line_iterator
-		    line=cell->face(face);
-						   // delete middle vertex
-		  triangulation.vertices_used[line->child(0)->vertex_index(1)] = false;
-						   // delete the two subfaces
-		  for (unsigned int subface=0;
-		       subface<line->n_children(); ++subface)
-		    {
-		      line->child(subface)->clear_user_data ();
-		      line->child(subface)->clear_user_flag ();
-		      line->child(subface)->clear_used_flag ();
-		    }
-	
-		  line->clear_children();
-		}
 					     // invalidate children
 	    for (unsigned int child=0; child<cell->n_children(); ++child)
 	      {
@@ -3288,6 +2952,63 @@ namespace internal
 	    cell->clear_children ();
 	    cell->clear_refinement_case();
 	    cell->clear_user_flag();
+
+					     // look at the refinement of outer
+					     // lines. if nobody needs those
+					     // anymore we can add them to the
+					     // list of lines to be deleted.
+	    for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
+	      {
+		typename Triangulation<dim,spacedim>::line_iterator
+		  line=cell->line(line_no);
+
+		if (line->has_children())
+		  {
+						     // if one of the cell counters is
+						     // zero, the other has to be as well
+
+		    Assert((line_cell_count[line->child_index(0)] == 0 &&
+			    line_cell_count[line->child_index(1)] == 0) ||
+			   (line_cell_count[line->child_index(0)] > 0 &&
+			    line_cell_count[line->child_index(1)] > 0),
+			   ExcInternalError());
+      
+		    if (line_cell_count[line->child_index(0)]==0)
+		      {
+			for (unsigned int c=0; c<2; ++c)
+			  Assert (!line->child(c)->has_children(),
+				  ExcInternalError());
+	      
+							 // we may delete the line's
+							 // children and the middle vertex
+							 // as no cell references them
+							 // anymore
+			triangulation.vertices_used[line->child(0)->vertex_index(1)] = false;
+	      
+			lines_to_delete.push_back(line->child(0));
+			lines_to_delete.push_back(line->child(1));
+	      
+			line->clear_children();
+		      }
+		  }
+	      }
+
+					     // finally, delete unneeded lines
+  
+					     // clear user pointers, to avoid that
+					     // they may appear at unwanted places
+					     // later on...
+					     // same for user flags, then finally
+					     // delete the lines
+	    typename std::vector<typename Triangulation<dim,spacedim>::line_iterator>::iterator
+	      line=lines_to_delete.begin(),
+	      endline=lines_to_delete.end();
+	    for (; line!=endline; ++line)
+	      {
+		(*line)->clear_user_data();
+		(*line)->clear_user_flag();
+		(*line)->clear_used_flag();
+	      }
 	  }
 
 
@@ -3329,12 +3050,6 @@ namespace internal
 		for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 		  --quad_cell_count[child->quad_index(f)];
 	      }
-  
-					     // first we need to reset the neighbor
-					     // pointers of the neighbors from this cell's
-					     // children to this cell. This is done by a
-					     // seperate function.
-	    update_neighbors<spacedim> (cell, false);
 
 					     ///////////////////////////////////////
 					     // delete interior quads and lines and the
@@ -4268,332 +3983,6 @@ namespace internal
 		subcells[i]->set_material_id (cell->material_id());
 		subcells[i]->set_subdomain_id (cell->subdomain_id());
 	      }
-	    
-					     // now the only thing
-					     // still to be done is
-					     // setting neighborship
-					     // information.
-					     //
-					     // we have to do that for
-					     // all children of our
-					     // current cell. if the
-					     // neighbor is a refined
-					     // one or if we use anisotropic
-					     // refinement and there is only
-					     // one child of the current cell
-					     // adjacent to a certain face,
-					     // we also have to reset the
-					     // neighbors neighbor pointers.
-					     // In earlier versions of the
-					     // library these tasks were done one
-					     // after the other. here we combine
-					     // these steps, as otherwise we
-					     // would have to gather the same
-					     // information on the refinement
-					     // situation along a certain face
-					     // twice. As this is a more
-					     // complicated task for anisotropic
-					     // refinement, we prefer to do it
-					     // only once.
-					     //
-					     // note that in case the
-					     // neighboring cell is
-					     // not refined along the
-					     // common face, the
-					     // neighbor iterators
-					     // point to the common
-					     // mother cell. the same
-					     // applies if there is no
-					     // neighbor: the
-					     // iterators are past the
-					     // end
-	    typename Triangulation<dim,spacedim>::cell_iterator
-	      nb_children[GeometryInfo<dim>::max_children_per_face],
-	      nb_child,
-	      children[GeometryInfo<dim>::faces_per_cell][GeometryInfo<dim>::max_children_per_face];
-
-					     // first, set up an array of our current
-					     // children / subcells. for all faces and
-					     // subfaces store the info, which subcell is
-					     // adjacent to that subface
-	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	      for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_face; ++c)
-		children[face][c]=subcells[GeometryInfo<dim>::child_cell_on_face(ref_case,
-										 face,c)];
-
-
-	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
-		 ++face)
-	      {
-		const typename Triangulation<dim,spacedim>::cell_iterator
-		  neighbor=cell->neighbor(face);
-		const RefinementCase<dim-1>
-		  face_ref_case=GeometryInfo<dim>::face_refinement_case(ref_case,face);
-		const unsigned int
-		  n_subfaces=std::max(GeometryInfo<dim-1>::n_children(face_ref_case),
-				      static_cast<unsigned int>(1));
-		
-						      
-						      
-						 // if no neighbor set invalid pointer for
-						 // all children adjacent to that face
-		if (neighbor.state() != IteratorState::valid)
-		  for (unsigned int c=0; c<n_subfaces; ++c)
-		    children[face][c]
-		      ->set_neighbor(face,neighbor);
-      
-		else
-						   // neighbor exists
-		  {
-						     // now there are two possibilities:
-						     // either the neighbor is not refined
-						     // along the common face or it is
-						     // refined along the common face once,
-						     // this must be terminal then
-						     // (otherwise something went wrong in
-						     // prepare_refinement_and_coarsening()).
-						     // however, if at any time the neighbor
-						     // has children, which are not refined
-						     // along the face currently under
-						     // consideration, one of these children
-						     // would have been set as the neighbor
-						     // of our current cell. therefore the
-						     // question wether the neighbor is
-						     // refined along the common face is
-						     // equivalent to the question, wether
-						     // the neighbor has children.  if our
-						     // current cell is not refined along
-						     // the face face_no, then we have to
-						     // set the current neighbor as the new
-						     // neighbor, even if the neighbor is
-						     // further refined
-		    if (!neighbor->has_children())
-		      {
-							 // if the neighbor has no children,
-							 // set the neighbor-pointer of all
-							 // children to this neighbor cell
-			for (unsigned int c=0; c<n_subfaces; ++c)
-			  children[face][c]
-			    ->set_neighbor(face,neighbor);
-							 // if the current cell is not
-							 // refined along the face we have
-							 // to update the neighbors neighbor
-							 // pointer. we have to do this only,
-							 // if the neighbor is not coarser
-			if (n_subfaces==1 && !cell->neighbor_is_coarser(face))
-			  {
-			    const unsigned int nb_nb = cell->neighbor_of_neighbor(face);
-			    neighbor->set_neighbor(nb_nb, children[face][0]);
-			  }
-		      }
-		    else
-		      {
-							 // neighbor has children
-			const unsigned int nb_nb = cell->neighbor_of_neighbor(face);
-			const RefinementCase<dim> nb_ref_case = neighbor->refinement_case();
-			const RefinementCase<dim-1> nb_face_ref_case = GeometryInfo<dim>::face_refinement_case(nb_ref_case,
-													       nb_nb);
-			const unsigned int nb_n_subfaces = std::max(GeometryInfo<dim-1>::
-								    n_children(nb_face_ref_case),
-								    static_cast<unsigned int>(1));
-			
-			for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_face; ++c)
-			  {
-			    nb_child=neighbor->child(GeometryInfo<dim>::
-						     child_cell_on_face(nb_ref_case,
-									nb_nb,
-									c));
-							     // there could be an unknown
-							     // number of refinements for
-							     // nb_child that do
-							     // not refine the common
-							     // face.
-
-							     // consider for example the
-							     // following case, where the
-							     // lower cell has been refined
-							     // in this step into c1 and c2.
-
-							     //  ---------------
-							     // |       |       |
-							     // |       |  n2.1 |
-							     // |       |       |
-							     // |  n1    -------
-							     // |       |       |
-							     // |       |  n2.2 |   
-							     // |       |       |
-							     //  ---------------
-							     // |       |       |
-							     // |       |       |
-							     // |       |       |
-							     // |  c1   |  c2   |
-							     // |       |       |
-							     // |       |       |
-							     //  ---------------
-		
-							     // the neighbor of cell c was
-							     // the whole of cell n. what we
-							     // have done so far is setting
-							     // the right neighbor
-							     // information for cells c1 and
-							     // n1 as well as c2 and n2,
-							     // where n2 is the mother cell
-							     // of n2.1 and n2.2. however,
-							     // n2 is further refined and we
-							     // would have to set n2.2 as
-							     // neighbor of child c2 and
-							     // vice versa. this is specific
-							     // to anisotropic refinement.
-	    
-							     // note that n2.2 could be
-							     // further refined with cut_y
-							     // (if n1 was also refined with
-							     // cut_y). 
-			    			    
-							     // go down that list to
-							     // the end. note, that nb_nb
-							     // stays constant, for all
-							     // children of a cell have
-							     // their faces in the same
-							     // direction and orientation as
-							     // the mother cell
-			    while(nb_child->has_children()
-				  && (GeometryInfo<dim>::face_refinement_case(nb_child->refinement_case(),
-									      nb_nb)
-				      == RefinementCase<dim-1>::no_refinement))
-							       // nb_child has children
-							       // which are not refined at
-							       // the current (sub)face,
-							       // therefore one of these
-							       // children is the true
-							       // neighbor of our cell
-			      nb_child = nb_child
-					 ->child(GeometryInfo<dim>::
-						 child_cell_on_face(nb_child->refinement_case(),
-								    nb_nb,
-								    0));
-							     // there's one more possibility
-							     // here, if the current cell is
-							     // refined along the face: the
-							     // last child found above could
-							     // still be refined once along
-							     // the common face, e.g. n1 or
-							     // n2.2 in the above picture
-							     // could be refined with
-							     // cut_x. this refinement leeds
-							     // to an inreased number of
-							     // hanging nodes. therefore it
-							     // was introduced in this
-							     // refinement cycle and the
-							     // additional hanging nodes
-							     // will be removed now, as the
-							     // current cell is also
-							     // refined. this temporaray
-							     // effect can occur during
-							     // anisotropic refinement, as
-							     // it is possible there, that a
-							     // coarser cell (along the face
-							     // between the cells) is on a
-							     // higher level and therefore
-							     // refined after the already
-							     // refined neighbor.
-			    if (nb_child->has_children())
-			      {
-								 // This is only valid, if
-								 // the current cell is
-								 // refined along the face
-								 // considered here
-				Assert(n_subfaces > 1, ExcInternalError());
-				for (unsigned int sub=0;
-				     sub<GeometryInfo<dim>::max_children_per_face; ++sub)
-				  {
-								     // collect all the
-								     // children of nb_child
-								     // and set their
-								     // neighbor
-								     // pointers. we will
-								     // care for our own
-								     // children later on
-				    nb_children[sub]=nb_child->
-						     child(GeometryInfo<dim>::
-							   child_cell_on_face(nb_child->refinement_case(),
-									      nb_nb, sub));
-				    nb_children[sub]->set_neighbor(nb_nb, children[face][c]);
-				  }
-			      }
-			    
-			    
-							     // now set the neighbor
-							     // pointers of the neighbor's
-							     // children.
-			    nb_child->set_neighbor(nb_nb, children[face][c]);
-							     // if this cell is as refined
-							     // as the neighbor, set the
-							     // neighbor pointers of the
-							     // subcells to the
-							     // corresponting
-							     // neighbor_child. else, set
-							     // the neighbor pointers to the
-							     // common neighbor mother cell
-			    if (nb_n_subfaces==n_subfaces)
-			      children[face][c]->set_neighbor(face,nb_child);
-			    else
-			      children[face][c]->set_neighbor(face,neighbor);
-			  }
-		      }
-		  }	    
-	      }
-					     // by now, all the outer neighbors have been
-					     // set, the inner neighbors have to be
-					     // considered in the following
-
-	    if (ref_case==RefinementCase<dim>::cut_xy)
-	      {
-						 // children:
-						 //   .--.--.
-						 //   |2 . 3|
-						 //   .--.--.
-						 //   |0 | 1|
-						 //   .--.--.
-		subcells[0]->set_neighbor (1, subcells[1]);
-		subcells[0]->set_neighbor (3, subcells[2]);
-		
-		subcells[1]->set_neighbor (0, subcells[0]);
-		subcells[1]->set_neighbor (3, subcells[3]);
-		
-		subcells[2]->set_neighbor (1, subcells[3]);
-		subcells[2]->set_neighbor (2, subcells[0]);
-		
-		subcells[3]->set_neighbor (0, subcells[2]);
-		subcells[3]->set_neighbor (2, subcells[1]);
-	      }
-	    else if (ref_case==RefinementCase<dim>::cut_x)
-	      {
-						 // children:
-						 //   .--.--.
-						 //   |  .  |
-						 //   .0 . 1.
-						 //   |  |  |
-						 //   .--.--.
-		subcells[0]->set_neighbor (1, subcells[1]);
-		
-		subcells[1]->set_neighbor (0, subcells[0]);
-	      }
-	    else
-	      {
-		Assert(ref_case==RefinementCase<dim>::cut_y, ExcInternalError());
-						 // children:
-						 //   .-----.
-						 //   |  1  |
-						 //   .-----.
-						 //   |  0  |
-						 //   .-----.
-		subcells[0]->set_neighbor (3, subcells[1]);
-		
-		subcells[1]->set_neighbor (2, subcells[0]);
-	      }
-	    
-	    
 
 					     // set child index for
 					     // even children children
@@ -9226,115 +8615,6 @@ namespace internal
 			    new_hexes[current_child]->set_face_rotation    (f, f_ro[f]);
 			  }
 
-						       /////////////////////////////////
-						       // now the only thing still
-						       // to be done is setting
-						       // neighborship
-						       // information.
-						       //
-						       // the easiest part is setting the
-						       // inner neighbors, i.e. children
-						       // neighboring other children of
-						       // the same mother cube.
-		      switch (ref_case)
-			{
-			  case RefinementCase<dim>::cut_x:
-				new_hexes[0]->set_neighbor(1, new_hexes[1]);
-		      
-				new_hexes[1]->set_neighbor(0, new_hexes[0]);
-				break;
-			  case RefinementCase<dim>::cut_y:
-				new_hexes[0]->set_neighbor(3, new_hexes[1]);
-
-				new_hexes[1]->set_neighbor(2, new_hexes[0]);
-				break;
-			  case RefinementCase<dim>::cut_z:
-				new_hexes[0]->set_neighbor(5, new_hexes[1]);
-
-				new_hexes[1]->set_neighbor(4, new_hexes[0]);
-				break;
-			  case RefinementCase<dim>::cut_xy:
-				new_hexes[0]->set_neighbor(1, new_hexes[1]);
-				new_hexes[0]->set_neighbor(3, new_hexes[2]);
-
-				new_hexes[1]->set_neighbor(0, new_hexes[0]);
-				new_hexes[1]->set_neighbor(3, new_hexes[3]);
-
-				new_hexes[2]->set_neighbor(1, new_hexes[3]);
-				new_hexes[2]->set_neighbor(2, new_hexes[0]);
-
-				new_hexes[3]->set_neighbor(0, new_hexes[2]);
-				new_hexes[3]->set_neighbor(2, new_hexes[1]);
-				break;
-			  case RefinementCase<dim>::cut_xz:
-				new_hexes[0]->set_neighbor(1, new_hexes[2]);
-				new_hexes[0]->set_neighbor(5, new_hexes[1]);
-
-				new_hexes[1]->set_neighbor(1, new_hexes[3]);
-				new_hexes[1]->set_neighbor(4, new_hexes[0]);
-
-				new_hexes[2]->set_neighbor(0, new_hexes[0]);
-				new_hexes[2]->set_neighbor(5, new_hexes[3]);
-
-				new_hexes[3]->set_neighbor(0, new_hexes[1]);
-				new_hexes[3]->set_neighbor(4, new_hexes[2]);
-				break;
-			  case RefinementCase<dim>::cut_yz:
-				new_hexes[0]->set_neighbor(3, new_hexes[1]);
-				new_hexes[0]->set_neighbor(5, new_hexes[2]);
-
-				new_hexes[1]->set_neighbor(2, new_hexes[0]);
-				new_hexes[1]->set_neighbor(5, new_hexes[3]);
-
-				new_hexes[2]->set_neighbor(3, new_hexes[3]);
-				new_hexes[2]->set_neighbor(4, new_hexes[0]);
-
-				new_hexes[3]->set_neighbor(2, new_hexes[2]);
-				new_hexes[3]->set_neighbor(4, new_hexes[1]);
-				break;
-			  case RefinementCase<dim>::cut_xyz:
-				new_hexes[0]->set_neighbor(1, new_hexes[1]);
-				new_hexes[0]->set_neighbor(3, new_hexes[2]);
-				new_hexes[0]->set_neighbor(5, new_hexes[4]);
-
-				new_hexes[1]->set_neighbor(0, new_hexes[0]);
-				new_hexes[1]->set_neighbor(3, new_hexes[3]);
-				new_hexes[1]->set_neighbor(5, new_hexes[5]);
-
-				new_hexes[2]->set_neighbor(1, new_hexes[3]);
-				new_hexes[2]->set_neighbor(2, new_hexes[0]);
-				new_hexes[2]->set_neighbor(5, new_hexes[6]);
-
-				new_hexes[3]->set_neighbor(0, new_hexes[2]);
-				new_hexes[3]->set_neighbor(2, new_hexes[1]);
-				new_hexes[3]->set_neighbor(5, new_hexes[7]);
-
-				new_hexes[4]->set_neighbor(1, new_hexes[5]);
-				new_hexes[4]->set_neighbor(3, new_hexes[6]);
-				new_hexes[4]->set_neighbor(4, new_hexes[0]);
-
-				new_hexes[5]->set_neighbor(0, new_hexes[4]);
-				new_hexes[5]->set_neighbor(3, new_hexes[7]);
-				new_hexes[5]->set_neighbor(4, new_hexes[1]);
-
-				new_hexes[6]->set_neighbor(1, new_hexes[7]);
-				new_hexes[6]->set_neighbor(2, new_hexes[4]);
-				new_hexes[6]->set_neighbor(4, new_hexes[2]);
-
-				new_hexes[7]->set_neighbor(0, new_hexes[6]);
-				new_hexes[7]->set_neighbor(2, new_hexes[5]);
-				new_hexes[7]->set_neighbor(4, new_hexes[3]);
-				break;
-			  default:
-				Assert (false, ExcInternalError());
-				break;
-			}
-	    
-						       // it's a bit more complicated for
-						       // outer neighbors. Leave this to a
-						       // separate function
-		      update_neighbors<spacedim> (hex, true);
-
 						       // now see if
 						       // we have
 						       // created
@@ -12730,6 +12010,12 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
   if (smooth_grid & limit_level_difference_at_vertices)
     Assert (satisfies_level1_at_vertex_rule (*this) == true,
 	    ExcInternalError());
+
+#if deal_II_dimension > 1
+				   // finally build up neighbor connectivity
+				   // information
+  update_neighbors(*this);
+#endif
   
 				   // Inform RefinementListeners
                                    // about end of refinement.
