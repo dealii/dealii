@@ -4,7 +4,6 @@
 # include paths and global variables
 include ../../../common/Make.global_options
 
-
 # plain names of those files that we shall treat
 example-names = $(notdir $(shell echo $D/examples/step-? \
                                       $D/examples/step-??))
@@ -29,7 +28,14 @@ example-dox-plain  = $(addsuffix _plain.dox,$(gen-example-names))
 example-doxygen     = $(addprefix doxygen/,$(addsuffix .h,$(example-names)))
 
 
+# generate dot file
 
+steps.dot: steps.pl
+	perl $< > $@
+steps.png: steps.dot
+	neato -Tpng -Timap -O $<
+	@mv steps.dot.png steps.png
+	@mv steps.dot.imap steps.imap
 
 
 # a makefile command that extracts the base name of a program
