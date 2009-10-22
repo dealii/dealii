@@ -12,7 +12,9 @@ my $laststep = 38;
 
 my $essential = ',fillcolor="red"';
 my $technique = ',fillcolor="orange"';
-my $application = ',fillcolor="yellow"';
+my $fluidapplication = ',fillcolor="yellow"';
+my $solidsapplication = ',fillcolor="lightblue"';
+my $timeapplication = ',fillcolor="blue"';
 my $unfinished = ',style="dashed"';
 
 # List of additional node attributes to highlight purpose and state of the example
@@ -24,13 +26,40 @@ my %attribute = (
     4 => $essential,
     5 => $essential,
     6 => $essential,
+
     7 => $technique,
     8 => $technique,
     9 => $technique,
     10 => $technique,
     11 => $technique,
-    17 => $technique,
-    35 => $application,
+    12 => $technique,
+    13 => $technique,
+    14 => $technique,
+    15 => $technique,
+    16 => $technique,
+    19 => $technique,
+    27 => $technique,
+    29 => $technique,
+    30 => $technique,
+    36 => $technique,
+    37 => $technique,
+
+    17 => $solidsapplication,
+    18 => $solidsapplication,
+
+    20 => $fluidapplication,
+    21 => $fluidapplication,
+    22 => $fluidapplication,
+    31 => $fluidapplication,
+    32 => $fluidapplication,
+    33 => $fluidapplication,
+    34 => $fluidapplication,
+    35 => $fluidapplication,
+
+    23 => $timeapplication,
+    24 => $timeapplication,
+    25 => $timeapplication,
+
     38 => $unfinished
     );
 
@@ -39,9 +68,20 @@ my %attribute = (
 print << 'EOT'
 digraph G
 {
-  edge [fontname="FreeSans",fontsize="10",labelfontname="FreeSans",labelfontsize="10",color="black",style="solid"];
-  node [fontname="FreeSans",fontsize="10",shape=record,height=0.2,width=0.4,color="black",fillcolor="white",style="filled"];
-
+  edge [fontname="FreeSans",
+        fontsize="10",
+        labelfontname="FreeSans",
+        labelfontsize="10",
+        color="black",
+        style="solid"];
+  node [fontname="FreeSans",
+        fontsize="10",
+        shape=record,
+        height=0.2,
+        width=0.4,
+        color="black",
+        fillcolor="white",
+        style="filled"];
 EOT
     ;
 
