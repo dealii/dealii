@@ -41,7 +41,7 @@ digraph G
 {
   edge [fontname="FreeSans",fontsize="10",labelfontname="FreeSans",labelfontsize="10",color="black",style="solid"];
   node [fontname="FreeSans",fontsize="10",shape=record,height=0.2,width=0.4,color="black",fillcolor="white",style="filled"];
-  
+
 EOT
     ;
 
@@ -64,22 +64,55 @@ Step02 -> Step03;
 Step03 -> Step04;
 Step04 -> Step05;
 Step05 -> Step06;
+
 Step06 -> Step07;
 Step06 -> Step08;
 Step06 -> Step09;
-Step06 -> Step10;
+
+Step04 -> Step10;
 Step10 -> Step11;
-Step06 -> Step12;
+
+Step07 -> Step12;
+
 Step05 -> Step16;
+Step16 -> Step37;
+
 Step12 -> Step38;
 Step38 -> Step12;
+Step12 -> Step33;
+
 Step06 -> Step13;
-Step06 -> Step14;
-Step06 -> Step15;
-Step06 -> Step16;
-Step06 -> Step17;
-Step08 -> Step18;
-Step06 -> Step19;
+Step13 -> Step14;
+
+Step04 -> Step15;
+
+Step08 -> Step17;
+Step17 -> Step18;
+
+Step04 -> Step20;
+Step20 -> Step21;
+
+Step06 -> Step22;
+Step22 -> Step31;
+Step31 -> Step32;
+
+Step04 -> Step23;
+Step23 -> Step24;
+Step24 -> Step25;
+
+Step06 -> Step27;
+
+Step06 -> Step28;
+
+Step04 -> Step29;
+
+Step12 -> Step30;
+
+Step04 -> Step34;
+
+Step22 -> Step35;
+
+Step04 -> Step36;
 }
 
 EOT
