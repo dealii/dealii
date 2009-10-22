@@ -1879,7 +1879,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 				   // constraints indicate. Do this only at
 				   // the first call and provide the class
 				   // with a vector for further use.
-  if (&*vec_distribute!=0 || vec_distribute->size()!=vec.size())
+  if (!vec_distribute || vec_distribute->size()!=vec.size())
     {
       std::vector<int> my_indices(vec.local_size());
       unsigned int index2 = 0;
