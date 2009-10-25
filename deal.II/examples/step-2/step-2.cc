@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006, 2008 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -85,9 +85,9 @@ using namespace dealii;
                                  // function, which is too early. We avoid the
                                  // problem by declaring it 'static' which
                                  // makes sure that the object is initialized
-                                 // the first time control flow passes its
-                                 // point of declaration, but at the same time
-                                 // assures that it lives until the end of the
+                                 // the first time control the program passes
+                                 // this point, but at the same time assures
+                                 // that it lives until the end of the
                                  // program.
 void make_grid (Triangulation<2> &triangulation)
 {
@@ -108,12 +108,12 @@ void make_grid (Triangulation<2> &triangulation)
 	endc = triangulation.end();
 
       for (; cell!=endc; ++cell)
-	for (unsigned int vertex=0;
-	     vertex < GeometryInfo<2>::vertices_per_cell;
-	     ++vertex)
+	for (unsigned int v=0;
+	     v < GeometryInfo<2>::vertices_per_cell;
+	     ++v)
 	  {
             const double distance_from_center
-              = center.distance (cell->vertex(vertex));
+              = center.distance (cell->vertex(v));
 	    
 	    if (std::fabs(distance_from_center - inner_radius) < 1e-10)
 	      {
