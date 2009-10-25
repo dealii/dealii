@@ -241,9 +241,9 @@ void second_grid ()
                                          // numbers like a 4 that
                                          // needs to be replaced by an
                                          // 8:
-        for (unsigned int vertex=0;
-             vertex < GeometryInfo<2>::vertices_per_cell;
-             ++vertex)
+        for (unsigned int v=0;
+             v < GeometryInfo<2>::vertices_per_cell;
+             ++v)
           {
                                              // If this cell is at the
                                              // inner boundary, then
@@ -266,7 +266,7 @@ void second_grid ()
                                              // vertices and move on
                                              // to the next cell.
             const double distance_from_center
-              = center.distance (cell->vertex(vertex));
+              = center.distance (cell->vertex(v));
             
             if (std::fabs(distance_from_center - inner_radius) < 1e-10)
               {
