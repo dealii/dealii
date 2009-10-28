@@ -74,8 +74,13 @@ namespace PETScWrappers
       communicator = comm;
       
                                        // only do something if the sizes
-                                       // mismatch
-      if ((size() != n) || (local_size() != local_sz))
+                                       // mismatch (may not be true for every proc)
+      
+      int k_global, k = ((size() != n) || (local_size() != local_sz));
+      MPI_Allreduce (&k, &k_global, 1,
+	MPI_INT, MPI_LOR, communicator);
+
+      if (k_global)
         {
                                            // FIXME: I'd like to use this here,
                                            // but somehow it leads to odd errors
