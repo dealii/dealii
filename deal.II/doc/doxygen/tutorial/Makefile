@@ -28,22 +28,20 @@ example-dox-plain  = $(addsuffix _plain.dox,$(gen-example-names))
 example-doxygen     = $(addprefix doxygen/,$(addsuffix .h,$(example-names)))
 
 
-# generate dot file
+# a makefile command that extracts the base name of a program
+get_basename = $(shell echo $(1) | $(PERL) -pi -e 's/(generated|doxygen).//g; s/\..*//g; s/_(prog|plain|toc.*)//g;')
 
+
+
+all: $(example-doxygen) steps.png
+
+# generate dot file
 steps.dot: steps.pl
 	perl $< > $@
 steps.png: steps.dot
 	neato -Tpng -Timap -O $<
 	@mv steps.dot.png steps.png
 	@mv steps.dot.imap steps.imap
-
-
-# a makefile command that extracts the base name of a program
-get_basename = $(shell echo $(1) | $(PERL) -pi -e 's/(generated|doxygen).//g; s/\..*//g; s/_(prog|plain|toc.*)//g;')
-
-
-
-all: $(example-doxygen)
 
 
 $(example-toc-prog):
