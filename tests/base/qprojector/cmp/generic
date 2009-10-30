@@ -3,6 +3,15 @@ DEAL::
 DEAL:line::length: 0
 DEAL:line::length: 0
 DEAL:line::length: 0
+DEAL:face::Checking dim 1 1d-points 0
+DEAL:face::Face 0
+DEAL:face::0.0
+DEAL:face::Face 1
+DEAL:face::1.0
+DEAL:face::Face 0 subface 0
+DEAL:face::0.0
+DEAL:face::Face 1 subface 0
+DEAL:face::1.0
 DEAL:face::Checking dim 2 1d-points 0
 DEAL:face::Face 0
 DEAL:face::Face 1
@@ -76,6 +85,15 @@ DEAL:line::0	4.0 -1.0
 DEAL:line::length: 10.
 DEAL:line::0	4.0 -1.0 5.0
 DEAL:line::length: 14.
+DEAL:face::Checking dim 1 1d-points 1
+DEAL:face::Face 0
+DEAL:face::0.0
+DEAL:face::Face 1
+DEAL:face::1.0
+DEAL:face::Face 0 subface 0
+DEAL:face::0.0
+DEAL:face::Face 1 subface 0
+DEAL:face::1.0
 DEAL:face::Checking dim 2 1d-points 1
 DEAL:face::Face 0
 DEAL:face::0.0 0.50
@@ -214,6 +232,15 @@ DEAL:line::length: 10.
 DEAL:line::0	1.0 3.0 0.0
 DEAL:line::1	7.0 -5.0 10.
 DEAL:line::length: 14.
+DEAL:face::Checking dim 1 1d-points 2
+DEAL:face::Face 0
+DEAL:face::0.0
+DEAL:face::Face 1
+DEAL:face::1.0
+DEAL:face::Face 0 subface 0
+DEAL:face::0.0
+DEAL:face::Face 1 subface 0
+DEAL:face::1.0
 DEAL:face::Checking dim 2 1d-points 2
 DEAL:face::Face 0
 DEAL:face::0.0 0.0
@@ -501,6 +528,15 @@ DEAL:line::0	1.0 3.0 0.0
 DEAL:line::1	4.0 -1.0 5.0
 DEAL:line::2	7.0 -5.0 10.
 DEAL:line::length: 14.
+DEAL:face::Checking dim 1 1d-points 3
+DEAL:face::Face 0
+DEAL:face::0.0
+DEAL:face::Face 1
+DEAL:face::1.0
+DEAL:face::Face 0 subface 0
+DEAL:face::0.0
+DEAL:face::Face 1 subface 0
+DEAL:face::1.0
 DEAL:face::Checking dim 2 1d-points 3
 DEAL:face::Face 0
 DEAL:face::0.0 0.0
@@ -1024,6 +1060,15 @@ DEAL:line::2	4.0 -1.0 5.0
 DEAL:line::3	5.5 -3.0 7.5
 DEAL:line::4	7.0 -5.0 10.
 DEAL:line::length: 14.
+DEAL:face::Checking dim 1 1d-points 5
+DEAL:face::Face 0
+DEAL:face::0.0
+DEAL:face::Face 1
+DEAL:face::1.0
+DEAL:face::Face 0 subface 0
+DEAL:face::0.0
+DEAL:face::Face 1 subface 0
+DEAL:face::1.0
 DEAL:face::Checking dim 2 1d-points 5
 DEAL:face::Face 0
 DEAL:face::0.0 0.0
