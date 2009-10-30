@@ -17,9 +17,8 @@
 #ifndef __LAPACK_TEMPLATES_H
 #define __LAPACK_TEMPLATES_H
 
+#include <base/config.h>
 #include <lac/lapack_support.h>
-
-using namespace dealii;
 
 extern "C"
 {
@@ -171,6 +170,7 @@ void sstev_ (const char* jobz, const int* n,
 }
 
 
+DEAL_II_NAMESPACE_OPEN
 
 #ifdef HAVE_DAXPY_
 inline void
@@ -621,5 +621,6 @@ stev (const char*, const int*, float*, float*, float*, const int*, float*, int*)
 }
 #endif
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
