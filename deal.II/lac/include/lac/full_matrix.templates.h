@@ -544,7 +544,7 @@ namespace internal
 				   // LAPACK.
   namespace gemm_switch
   {
-    using ::gemm;
+    using ::dealii::gemm;
 
     template <typename T, typename T2>
     void
@@ -1731,7 +1731,7 @@ namespace internal
 				   // LAPACK.
   namespace getrf_switch
   {
-    using ::getrf;
+    using ::dealii::getrf;
 
     template <typename T>
     void
@@ -1741,7 +1741,7 @@ namespace internal
     }
     
 
-    using ::getri;
+    using ::dealii::getri;
 
     template <typename T>
     void
