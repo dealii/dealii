@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,15 +43,8 @@ namespace
 
 template <>
 Quadrature<0>::Quadrature (const unsigned int)
-              : n_quadrature_points(0)
-{}
-
-
-
-template <>
-Quadrature<0>::Quadrature (const Quadrature<0> &)
-		: Subscriptor(),
-		  n_quadrature_points(0)
+		: n_quadrature_points(1),
+		  weights (1, 1.)
 {}
 
 
@@ -111,21 +104,9 @@ template <>
 Quadrature<0>::Quadrature (const Quadrature<-1> &,
 			   const Quadrature<1> &)
 		:
-                n_quadrature_points (0)
-{
-  Assert (false, ExcInternalError());
-}
-
-
-
-template <>
-Quadrature<1>::Quadrature (const Quadrature<0> &,
-			   const Quadrature<1> &)
-                :
-                n_quadrature_points (0)
-{
-  Assert (false, ExcInternalError());
-}
+                n_quadrature_points (1),
+		weights(1, 1.)
+{}
 
 
 
@@ -173,9 +154,54 @@ Quadrature<dim>::Quadrature (const SubQuadrature &q1,
 
 
 template <>
+Quadrature<1>::Quadrature (const SubQuadrature&,
+			   const Quadrature<1>& q2)
+		:
+		n_quadrature_points (q2.size()),
+		quadrature_points (n_quadrature_points),
+		weights (n_quadrature_points, 0)
+{
+  unsigned int present_index = 0;
+  for (unsigned int i2=0; i2<q2.size(); ++i2)
+    {
+					 // compose coordinates of
+					 // new quadrature point by tensor
+					 // product in the last component
+      quadrature_points[present_index](0)
+	= q2.point(i2)(0);
+      
+      weights[present_index] = q2.weight(i2);
+      
+      ++present_index;
+    }
+
+#ifdef DEBUG
+  if (size() > 0)
+    {
+      double sum = 0;
+      for (unsigned int i=0; i<size(); ++i)
+	sum += weights[i];
+				       // we cant guarantee the sum of weights
+				       // to be exactly one, but it should be
+				       // near that. 
+      Assert ((sum>0.999999) && (sum<1.000001), ExcInternalError());
+    }
+#endif
+}
+
+
+
+template <>
+Quadrature<0>::Quadrature (const Quadrature<1> &)
+		:
+		n_quadrature_points (1),
+		weights (1, 1.)
+{}
+
+
+template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &)
 		:
-		Subscriptor(),
 		n_quadrature_points (numbers::invalid_unsigned_int),
 		quadrature_points (),
 		weights ()
@@ -274,16 +300,6 @@ template <int dim>
 const std::vector<double> &
 Quadrature<dim>::get_weights () const
 {
-  return weights;
-}
-
-
-
-template <>
-const std::vector<double> &
-Quadrature<0>::get_weights () const
-{
-  Assert (false, ExcInternalError());
   return weights;
 }
 
@@ -424,10 +440,14 @@ QProjector<dim>::rotate (const Quadrature<2> &q,
 template <>
 void
 QProjector<1>::project_to_face (const Quadrature<0> &,
-                                const unsigned int,
-                                std::vector<Point<1> > &)
+                                const unsigned int face_no,
+                                std::vector<Point<1> > &q_points)
 {
-  Assert (false, ExcNotImplemented());
+  const unsigned int dim=1;
+  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  AssertDimension (q_points.size(), 1);
+  
+  q_points[0] = Point<dim>((double) face_no);
 }
 
 
@@ -520,12 +540,16 @@ QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
 template <>
 void
 QProjector<1>::project_to_subface (const Quadrature<0> &,
+                                   const unsigned int face_no,
                                    const unsigned int,
-                                   const unsigned int,
-                                   std::vector<Point<1> > &,
+                                   std::vector<Point<1> >& q_points,
 				   const RefinementCase<0> &)
 {
-  Assert(false, ExcNotImplemented());
+  const unsigned int dim=1;
+  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  AssertDimension (q_points.size(), 1);
+  
+  q_points[0] = Point<dim>((double) face_no);
 }
 
 
@@ -697,10 +721,42 @@ QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
 
 template <>
 Quadrature<1>
-QProjector<1>::project_to_all_faces (const Quadrature<0> &)
+QProjector<1>::project_to_all_faces (const Quadrature<0>& quadrature)
 {
-  Assert (false, ExcImpossibleInDim(1));
-  return Quadrature<1>(0);
+  const unsigned int dim = 1;
+  
+  const unsigned int n_points = 1,
+		     n_faces  = GeometryInfo<dim>::faces_per_cell;
+
+				   // first fix quadrature points
+  std::vector<Point<dim> > q_points;
+  q_points.reserve(n_points * n_faces);
+  std::vector <Point<dim> > help(n_points);
+  
+  
+				   // project to each face and append
+				   // results
+  for (unsigned int face=0; face<n_faces; ++face)
+    {
+      project_to_face(quadrature, face, help);
+      std::copy (help.begin(), help.end(),
+                 std::back_inserter (q_points));
+    }
+
+				   // next copy over weights
+  std::vector<double> weights;
+  weights.reserve (n_points * n_faces);
+  for (unsigned int face=0; face<n_faces; ++face)
+    std::copy (quadrature.get_weights().begin(),
+               quadrature.get_weights().end(),
+               std::back_inserter (weights));
+
+  Assert (q_points.size() == n_points * n_faces,
+          ExcInternalError());
+  Assert (weights.size() == n_points * n_faces,
+          ExcInternalError());  
+  
+  return Quadrature<dim>(q_points, weights);
 }
 
 
@@ -811,10 +867,44 @@ QProjector<3>::project_to_all_faces (const SubQuadrature &quadrature)
 
 template <>
 Quadrature<1>
-QProjector<1>::project_to_all_subfaces (const Quadrature<0> &)
+QProjector<1>::project_to_all_subfaces (const Quadrature<0>& quadrature)
 {
-  Assert (false, ExcImpossibleInDim(1));
-  return Quadrature<1>(0);
+  const unsigned int dim = 1;
+  
+  const unsigned int n_points          = 1,
+		     n_faces           = GeometryInfo<dim>::faces_per_cell,
+		     subfaces_per_face = GeometryInfo<dim>::max_children_per_face;
+  
+				   // first fix quadrature points
+  std::vector<Point<dim> > q_points;
+  q_points.reserve (n_points * n_faces * subfaces_per_face);
+  std::vector <Point<dim> > help(n_points);
+  
+				   // project to each face and copy
+				   // results
+  for (unsigned int face=0; face<n_faces; ++face)
+    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+      {
+	project_to_subface(quadrature, face, subface, help);
+	std::copy (help.begin(), help.end(),
+                   std::back_inserter (q_points));
+      };
+
+				   // next copy over weights
+  std::vector<double> weights;
+  weights.reserve (n_points * n_faces * subfaces_per_face);
+  for (unsigned int face=0; face<n_faces; ++face)
+    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+      std::copy (quadrature.get_weights().begin(),
+                 quadrature.get_weights().end(),
+                 std::back_inserter (weights));
+
+  Assert (q_points.size() == n_points * n_faces * subfaces_per_face,
+          ExcInternalError());
+  Assert (weights.size() == n_points * n_faces * subfaces_per_face,
+          ExcInternalError());
+  
+  return Quadrature<dim>(q_points, weights);
 }
 
 

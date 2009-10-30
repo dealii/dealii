@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,10 +33,20 @@ DEAL_II_NAMESPACE_OPEN
  * integration formulæ. Their names names prefixed by
  * <tt>Q</tt>. Refer to the list of derived classes for more details.
  *
- * The schemes for higher dimensions are tensor products of the
- * one-dimansional formulæ. Therefore, a three-dimensional 5-point
- * Gauss formula has 125 quadrature points.
+ * The schemes for higher dimensions are typically tensor products of the
+ * one-dimensional formulæ, but refer to the section on implementation
+ * detail below.
  *
+ * In order to allow for dimension independent programming, a
+ * quadrature formula of dimension zero exists. Since an integral over
+ * zero dimensions is the evaluation at a single point, any
+ * constructor of such a formula initializes to a single quadrature
+ * point with weight one. Access to the weight is possible, while
+ * access to the quadrature point is not permitted, since a Point of
+ * dimension zero contains no information. The main purpose of these
+ * formulæ is their use in QProjector, which will create a useful
+ * formula of dimension one out of them.
+ * 
  * <h3>Mathematical background</h3>
  *
  * For each quadrature formula we denote by <tt>m</tt>, the maximal
@@ -62,22 +72,10 @@ DEAL_II_NAMESPACE_OPEN
  * points in <tt>dim</tt> dimensions, where N is the constructor
  * parameter of QGauss.
  *
- * For some programs it is necessary to have a quadrature object for
- * faces.  These programs fail to link if compiled for only one space
- * dimension, since there quadrature rules for faces just don't make
- * no sense. In order to allow these programs to be linked anyway, for
- * class Quadrature@<0@> all functions are provided in the
- * <tt>quadrature.cc</tt> file, but they will throw exceptions if actually
- * called. The only function which is allowed to be called is the
- * constructor taking one integer, which in this case ignores its
- * parameter, and of course the destructor. Besides this, it is
- * necessary to provide a class Point@<0@> to make the compiler
- * happy. This class also does nothing.
+ * @note Instantiations for this template are provided for dimensions
+ * 0, 1, 2, and 3 (see the section on @ref Instantiations).
  *
- * @note Instantiations for this template are provided for dimensions 1, 2,
- * and 3 (see the section on @ref Instantiations in the manual).
- *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005, 2009
  */
 template <int dim>
 class Quadrature : public Subscriptor
@@ -413,10 +411,10 @@ Quadrature<dim>::weight (const unsigned int i) const
 template <>
 Quadrature<0>::Quadrature (const unsigned int);
 template <>
-Quadrature<0>::Quadrature (const Quadrature<0> &);
-template <>
 Quadrature<0>::Quadrature (const Quadrature<-1> &,
 			   const Quadrature<1> &);
+template <>
+Quadrature<0>::Quadrature (const Quadrature<1> &);
 template <>
 Quadrature<0>::~Quadrature ();
 
@@ -429,8 +427,6 @@ Quadrature<1>::Quadrature (const Quadrature<0> &);
 
 template <>
 const std::vector<Point<0> > & Quadrature<0>::get_points () const;
-template <>
-const std::vector<double> & Quadrature<0>::get_weights () const;
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE
