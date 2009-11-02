@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//      $Id$   
+//      $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2005, 2006, 2008, 2009 by the deal.II authors
@@ -60,7 +60,7 @@ namespace Utilities
 		  << "Can't convert the string " << arg1
                   << " to the desired type");
 
-	  
+
   std::string
   int_to_string (const unsigned int i,
 		 const unsigned int digits)
@@ -69,8 +69,8 @@ namespace Utilities
 				     // not pad the resulting string at all
     if (digits == numbers::invalid_unsigned_int)
       return int_to_string (i, needed_digits(i));
-    
-    
+
+
     AssertThrow ( ! ((digits==1 && i>=10)   ||
 		     (digits==2 && i>=100)  ||
 		     (digits==3 && i>=1000) ||
@@ -78,9 +78,9 @@ namespace Utilities
 		     (digits==5 && i>=100000)||
 		     (i>=1000000)),
 		  ExcInvalidNumber2StringConversersion(i, digits));
-  
+
     std::string s;
-    switch (digits) 
+    switch (digits)
       {
 	case 6:
 	      s += '0' + i/100000;
@@ -123,7 +123,7 @@ namespace Utilities
   }
 
 
-  
+
   int
   string_to_int (const std::string &s)
   {
@@ -134,16 +134,16 @@ namespace Utilities
 #else
     static const int max_int = INT_MAX;
 #endif
-    
+
     int i = max_int;
     ss >> i;
 
                                      // check for errors
     AssertThrow (i != max_int, ExcCantConvertString (s));
-    
+
     return i;
   }
-  
+
 
 
   std::vector<int>
@@ -178,7 +178,7 @@ namespace Utilities
 	  }
 	else
 	  tmp = "";
-      
+
 	while ((name.length() != 0) &&
 	       (name[0] == ' '))
 	  name.erase (0,1);
@@ -205,7 +205,7 @@ namespace Utilities
                                      // remove trailing spaces
     while ((text.length() != 0) && (text[text.length()-1] == delimiter))
       text.erase(text.length()-1,1);
-  
+
                                      // then split the text into lines
     while (text.length() != 0)
       {
@@ -231,7 +231,7 @@ namespace Utilities
             for (; location>0; --location)
               if (text[location] == delimiter)
                 break;
-          
+
                                              // if there are no spaces, then try if
                                              // there are spaces coming up
             if (location == 0)
@@ -240,7 +240,7 @@ namespace Utilities
                    ++location)
                 if (text[location] == delimiter)
                   break;
-          
+
                                              // now take the text up to the found
                                              // location and put it into a single
                                              // line, and remove it from 'text'
@@ -248,10 +248,10 @@ namespace Utilities
             text.erase (0, location);
           }
       }
-  
+
     return lines;
   }
-  
+
 
 
   bool
@@ -268,17 +268,17 @@ namespace Utilities
     return true;
   }
 
-  
+
 
   std::pair<int, unsigned int>
   get_integer_at_position (const std::string &name,
 			   const unsigned int position)
   {
     Assert (position < name.size(), ExcInternalError());
-    
+
     const std::string test_string (name.begin()+position,
 				   name.end());
-    
+
     std::istringstream str(test_string);
 
     int i;
@@ -312,7 +312,7 @@ namespace Utilities
       return std::make_pair (-1, numbers::invalid_unsigned_int);
   }
 
-  
+
 
   double
   generate_normal_random_number (const double a,
@@ -322,7 +322,7 @@ namespace Utilities
     if (sigma == 0)
       return a;
 
-#ifdef HAVE_RAND_R  
+#ifdef HAVE_RAND_R
     static unsigned int seed = 0xabcd1234;
     const double y = 1.0*rand_r(&seed)/RAND_MAX;
 #else
@@ -358,7 +358,7 @@ namespace Utilities
   reverse_permutation (const std::vector<unsigned int> &permutation)
   {
     const unsigned int n = permutation.size();
-    
+
     std::vector<unsigned int> out (n);
     for (unsigned int i=0; i<n; ++i)
       out[i] = n - 1 - permutation[i];
@@ -372,9 +372,9 @@ namespace Utilities
   invert_permutation (const std::vector<unsigned int> &permutation)
   {
     const unsigned int n = permutation.size();
-    
+
     std::vector<unsigned int> out (n, numbers::invalid_unsigned_int);
-    
+
     for (unsigned int i=0; i<n; ++i)
       {
 	Assert (permutation[i] < n, ExcIndexRange (permutation[i], 0, n));
@@ -386,10 +386,10 @@ namespace Utilities
     for (unsigned int i=0; i<n; ++i)
       Assert (out[i] != numbers::invalid_unsigned_int,
 	      ExcMessage ("The given input permutation had duplicate entries!"));
-    
+
     return out;
   }
-  
+
 
 
 
@@ -401,7 +401,7 @@ namespace Utilities
     {
       std::ifstream cpuinfo;
       cpuinfo.open("/proc/loadavg");
-    
+
       AssertThrow(cpuinfo, ExcIO());
 
       double load;
@@ -411,12 +411,12 @@ namespace Utilities
     }
 
 #else
-  
+
     double get_cpu_load ()
     {
       return 0.;
     }
-  
+
 #endif
 
 
@@ -433,7 +433,7 @@ namespace Utilities
     std::string get_time ()
     {
       std::time_t  time1= std::time (0);
-      std::tm     *time = std::localtime(&time1); 
+      std::tm     *time = std::localtime(&time1);
 
       std::ostringstream o;
       o << time->tm_hour << ":"
@@ -443,7 +443,7 @@ namespace Utilities
       return o.str();
     }
 
-    
+
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
     bool job_supports_mpi ()
@@ -453,7 +453,7 @@ namespace Utilities
 
       return (MPI_has_been_started > 0);
     }
-    
+
                                 // Unfortunately, we have to work
                                 // around an oddity in the way PETSc
                                 // and some gcc versions interact. If
@@ -491,16 +491,16 @@ namespace Utilities
     {
       int n_jobs=1;
       (void) MPI_Comm_size (mpi_communicator, &n_jobs);
-      
+
       return n_jobs;
     }
 
-    
+
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator)
     {
       int rank=0;
       (void) MPI_Comm_rank (mpi_communicator, &rank);
-      
+
       return rank;
     }
 
@@ -511,10 +511,10 @@ namespace Utilities
       MPI_Comm_dup (mpi_communicator, &new_communicator);
       return new_communicator;
     }
-    
-    
+
+
 #else
-    
+
     bool job_supports_mpi ()
     {
       return false;
@@ -528,14 +528,14 @@ namespace Utilities
     }
 
 
-    
+
     unsigned int get_this_mpi_process (const MPI_Comm &)
     {
       return 0;
     }
 
 
-    
+
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
     {
       return mpi_communicator;
@@ -552,8 +552,8 @@ namespace Utilities
       static bool constructor_has_already_run = false;
       Assert (constructor_has_already_run == false,
 	      ExcMessage ("You can only create a single object of this class "
-			  "in a program sinc it initialize the MPI system."));
-      
+			  "in a program since it initializes the MPI system."));
+
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
@@ -601,12 +601,12 @@ namespace Utilities
 #else
       return false;
 #endif
-    }    
+    }
   }
-  
+
 
 #ifdef DEAL_II_USE_TRILINOS
-  
+
   namespace Trilinos
   {
     const Epetra_Comm&
@@ -619,7 +619,7 @@ namespace Utilities
       static Teuchos::RCP<Epetra_SerialComm>
 	communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
 #endif
-    
+
       return *communicator;
     }
 
@@ -635,7 +635,7 @@ namespace Utilities
       static Teuchos::RCP<Epetra_SerialComm>
 	communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
 #endif
-    
+
       return *communicator;
     }
 
@@ -671,7 +671,7 @@ namespace Utilities
     void destroy_communicator (Epetra_Comm &communicator)
     {
       Assert (&communicator != 0, ExcInternalError());
-      
+
 				       // save the communicator, reset
 				       // the map, and delete the
 				       // communicator if this whole
@@ -689,13 +689,13 @@ namespace Utilities
 #endif
     }
 
-    
+
 
     unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator)
     {
       return mpi_communicator.NumProc();
     }
-    
+
 
     unsigned int get_this_mpi_process (const Epetra_Comm &mpi_communicator)
     {
@@ -703,7 +703,7 @@ namespace Utilities
     }
 
 
-    
+
     Epetra_Map
     duplicate_map (const Epetra_BlockMap &map,
 		   const Epetra_Comm     &comm)
@@ -720,7 +720,7 @@ namespace Utilities
 		    comm);
     }
   }
-  
+
 #endif
 
 }
