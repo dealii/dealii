@@ -33,15 +33,15 @@ different structure for the innermost loop, thereby avoiding the counter
 variable):
 @code
 // y = A * x
-std::size_t element_index = 0;
+std::size_t element_index = A_row_indices[0];
 for (unsigned int row=0; row<n_rows; ++row)
   {
-    const std::size_t row_ends = row_indices[row+1];
+    const std::size_t row_ends = A_row_indices[row+1];
     double sum = 0;
     while (element_index != row_ends)
       {
-        sum += matrix_values[element_index] *
-               x[column_indices[element_index]];
+        sum += A_values[element_index] *
+               x[A_column_indices[element_index]];
         element_index++;
       }
     y[row] = sum;
@@ -50,16 +50,16 @@ for (unsigned int row=0; row<n_rows; ++row)
 
 Looking into what actually happens in the computer when forming a
 matrix-vector product, one observes that the matrix data
-<code>matrix_values</code> is continuously traveling from main memory into the
+<code>A_values</code> is continuously traveling from main memory into the
 CPU in order to be multiplied with some vector element determined by the other
-array <code>column_indices</code> and add this product to a sum that
+array <code>A_column_indices</code> and add this product to a sum that
 eventually is written into the output vector. Let us assume for simplicity
 that all the vector elements are sitting in the CPU (or some fast memory like
 caches) and that we use a compressed storage scheme for the sparse matrix,
 i.e., the format deal.II matrices (as well as PETSc and Trilinos matrices)
 use. Then each matrix element corresponds to 12 bytes of data, 8 bytes for the
-respective element in <code>matrix_values</code>, and 4 bytes for the unsigned
-integer position <code>column_indices</code> that indicates which vector element
+respective element in <code>A_values</code>, and 4 bytes for the unsigned
+integer position <code>A_column_indices</code> that indicates which vector element
 we actually use for multiplication. Here we neglect the additional array that
 tells us the ranges of individual rows in the matrix. With those 12 bytes of
 data, we perform two floating point operations, a multiplication and an
@@ -203,19 +203,20 @@ is much cheaper.
 One way to improve this is to realize that conceptually the local
 matrix can be thought of as the product of three matrices,
 @f{eqnarray*}
-A_\mathrm{cell} = B D B^T,
+A_\mathrm{cell} = B_\mathrm{cell}^T D_\mathrm{cell} B_\mathrm{cell},
 @f}
 where for the example of the Laplace operator 
-the $(i,q*\mathrm{dim}+d)$-th element of <i>B</i> is given by
-<code>fe_values.shape_grad(i,q)[d]</code> (i.e., it consists of
-<code>dofs_per_cell</code> rows and <code>dim*n_q_points</code>
-columns). The matrix <i>D</i> is diagonal and contains the values
+the $(q*\mathrm{dim}+d,i)$-th element of <i>B</i><sub>cell</sub> is given by
+<code>fe_values.shape_grad(i,q)[d]</code>. The matrix consists of
+<code>dim*n_q_pointsdofs_per_cell</code> rows and <code>dofs_per_cell</code>
+columns). The matrix <i>D</i><sub>cell</sub> is diagonal and contains the values
 <code>fe_values.JxW(q)</code> (or, rather, <code>dim</code> copies of it).
 
 Every numerical analyst learns in one of her first classes that for
 forming a product of the form
 @f{eqnarray*}
-A_\mathrm{cell}\cdot x_\mathrm{cell} = B D B^T \cdot x_\mathrm{cell},
+A_\mathrm{cell}\cdot x_\mathrm{cell} = B_\mathrm{cell} D_\mathrm{cell} 
+		     B_\mathrm{cell}^T \cdot x_\mathrm{cell},
 @f}
 one should never form the matrix-matrix products, but rather multiply
 with the vector from right to left so that only matrix-vector products are
@@ -288,7 +289,32 @@ factored out from the gradient, then we apply the weights of the quadrature,
 and we apply with the transposed Jacobian for preparing the third loop which
 again uses the gradients on the unit cell.
 
-Let's see how we can implement this:
+Let us again write this in terms of matrices. Let the matrix
+<i>B</i><sub>cell</sub> denote the cell-related gradient matrix, with each row
+containing the values of the quadrature points. It is constructed by a
+matrix-matrix product as
+@f{eqnarray*}
+B_\mathrm{cell} = J_\mathrm{cell} B_\mathrm{ref\_cell},
+@f}
+where <i>B</i><sub>ref_cell</sub> denotes the gradient on the reference cell
+and <i>J</i><sub>cell</sub><sup>T</sup> denotes the
+Jacobian. <i>J</i><sub>cell</sub><sup>T</sup> is block-diagonal, and the
+blocks size is equal to the dimension of the problem. Each diagonal block is
+the Jacobian transformation that goes from the reference cell to the real 
+cell.
+
+Putting things together, we find that
+@f{eqnarray*}
+A_\mathrm{cell} = B_\mathrm{cell}^T D B_\mathrm{cell} 
+		= B_\mathrm{ref\_cell}^T J_\mathrm{cell}^T 
+		  D_\mathrm{cell} 
+		  J_\mathrm{cell} B_\mathrm{ref\_cell},
+@f}
+so we calculate the product (starting from the right)
+@f{eqnarray*}
+B_\mathrm{ref\_cell}^T J_\mathrm{cell}^T D J_\mathrm{cell} 
+B_\mathrm{ref\_cell}\cdot x_\mathrm{cell}.
+@f}
 @code
 ...
   FEValues<dim> fe_values_reference (fe, quadrature_formula,
@@ -388,7 +414,9 @@ there are a few more points done to be even more efficient, namely:
 <ul>
   <li>We pre-compute the inverse of the Jacobian of the transformation and
       store it in an extra array. This allows us to fuse the three
-      operations (apply Jacobian, multiply with weights, apply transposed
+      operations <i>J</i><sub>cell</sub><sup>T</sup><i> D </i>
+      <i>J</i><sub>cell</sub> (apply Jacobian, multiply by 
+      weights, apply transposed
       Jacobian) into one second-rank tensor that is also symmetric (so we
       can save only half the tensor).
   <li>We work on several cells at once when we apply the gradients of the

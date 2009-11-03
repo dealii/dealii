@@ -282,7 +282,7 @@ class MatrixFree : public Subscriptor
     copy_local_to_global (const WorkStreamData::CopyData<number> &copy,
 			  Vector<number2>                        &dst) const;
 
-    FullMatrix<number>      small_matrix;
+    FullMatrix<number>      B_ref_cell;
     Table<2,unsigned int>   indices_local_to_global;
     Table<2,Transformation> derivatives;
 
@@ -433,40 +433,111 @@ set_derivative_data (const unsigned int cell_no,
 				 // call it simultaneously on many processors,
 				 // but with different cell range data.
 				 //
-				 // Following the discussion in the
-				 // introduction, we try to work on multiple
-				 // cells at a time. This is possible
-				 // because the small matrix remains the same
-				 // on all the cells, and only the
-				 // derivative information from the Jacobian
-				 // is different. That way, the operation
-				 // that is actually the multiplication of
-				 // the small matrix with a vector (on the
-				 // local dofs) becomes a multiplication of
-				 // two full but small matrices with each
-				 // other. This is an operation that can be
+				 // The goal of this function is to provide
+				 // the multiplication of a vector with the
+				 // local contributions of a set of cells. As
+				 // mentioned in the introduction, if we were
+				 // to deal with a single cell, this would
+				 // amount to performing the product 
+				 // @f{eqnarray*}
+				 // P^T_\mathrm{cell,local-global} A_\mathrm{cell} 
+				 // P_\mathrm{cell,local-global} x
+				 // @f}
+				 // where 
+				 // @f{eqnarray*}
+				 // A_\mathrm{cell} = 
+				 // B_\mathrm{ref\_cell}^T J_\mathrm{cell}^T 
+				 // D_\mathrm{cell} 
+				 // J_\mathrm{cell} B_\mathrm{ref\_cell}
+				 // @f}
+				 // and $P_\mathrm{cell,local-global}$ is the
+				 // transformation from local to global
+				 // indices.
+				 //
+				 // To do this, we would have to do the
+				 // following steps:
+				 // <ol>
+				 //   <li> Form $x_\mathrm{cell} =
+				 //   P_\mathrm{cell,local-global} x$. This is
+				 //   done using the command
+				 //   ConstraintMatrix::get_dof_values.
+				 //   <li> Form $x_1 = B_\mathrm{ref\_cell}
+				 //   x_\mathrm{cell}$. The vector $x_1$
+				 //   contains the reference cell gradient to
+				 //   the local cell vector.
+				 //   <li> Form $x_2 = J_\mathrm{cell}^T
+				 //   D_\mathrm{cell} J_\mathrm{cell}
+				 //   x_1$. This is a block-diagonal
+				 //   operation, with the block size equal to
+				 //   <code>dim</code>. The blocks just
+				 //   correspond to the individual quadrature
+				 //   points. The operation on each quadrature
+				 //   point is implemented by the
+				 //   Transformation class object that this
+				 //   class is equipped with. Compared to the
+				 //   introduction, the matrix
+				 //   $D_\mathrm{cell}$ now contains the
+				 //   <code>JxW</code> values and the
+				 //   inhomogeneous coefficient.
+				 //   <li> Form $y_\mathrm{cell} =
+				 //   B_\mathrm{ref\_cell}^T x_2$. This gives
+				 //   the local result of the matrix-vector
+				 //   product.
+				 //   <li> Form $y +=
+				 //   P_\mathrm{cell,local-global}^T
+				 //   y_\mathrm{cell}$. This adds the local
+				 //   result to the global vector, which is
+				 //   realized using the method
+				 //   ConstraintMatrix::distribute_local_to_global.
+				 //   Note that we do this in an extra
+				 //   function called
+				 //   <code>copy_local_to_global</code>
+				 //   because that operation must not be done
+				 //   in %parallel, in order to avoid two or
+				 //   more processes trying to add to the same
+				 //   positions in the result vector $y$.
+				 //   </ol>
+				 // The steps 1 to 4 can be done in %parallel
+				 // by multiple processes.
+
+				 // Now, it turns out that the most expensive
+				 // part of the above is the multiplication
+				 // $B_\mathrm{ref\_cell} x_\mathrm{cell}$ in
+				 // the second step and the transpose
+				 // operation in step 4. Note that the matrix
+				 // $J^T D J$ is block-diagonal, and hence,
+				 // its application is cheaper. Since the
+				 // matrix $B_\mathrm{ref\_cell}$ is the same
+				 // for all cells, all that changes is the
+				 // vector $x_\mathrm{cell}$. Hence, nothing
+				 // prevents us from collecting several cell
+				 // vectors to a (rectangular) matrix, and
+				 // then perform a matrix-matrix
+				 // product. These matrices are both full, but
+				 // not very large, having of the order
+				 // <code>dofs_per_cell</code> rows and
+				 // columns. This is an operation that can be
 				 // much better optimized than matrix-vector
 				 // products. The functions
-				 // <code>FullMatrix<number>::mmult</code>
-				 // and
+				 // <code>FullMatrix<number>::mmult</code> and
 				 // <code>FullMatrix<number>::mTmult</code>
 				 // use the BLAS dgemm function (as long as
 				 // BLAS has been detected in deal.II
 				 // configuration), which provides optimized
 				 // kernels for doing this product. In our
 				 // case, a matrix-matrix product is between
-				 // three and five times faster than doing
-				 // the matrix-vector product on one cell
-				 // after the other. The variables that hold
-				 // the solution on the respective cell's
-				 // support points and the quadrature points
-				 // are thus full matrices. The number of
-				 // rows is given by the number of cells
-				 // they work on, and the number of columns
-				 // is the number of degrees of freedom per
-				 // cell for the first and the number of
-				 // quadrature points times the number of
-				 // components per point for the latter.
+				 // three and five times faster than doing the
+				 // matrix-vector product on one cell after
+				 // the other. The variables that hold the
+				 // solution on the respective cell's support
+				 // points and the quadrature points are thus
+				 // full matrices. The number of rows is given
+				 // by the number of cells they work on, and
+				 // the number of columns is the number of
+				 // degrees of freedom per cell for the first
+				 // and the number of quadrature points times
+				 // the number of components per point for the
+				 // latter.
 template <typename number, class Transformation>
 template <typename number2>
 void
@@ -478,72 +549,6 @@ local_vmult (CellChunkIterator                    cell_range,
 {
   const unsigned int chunk_size = cell_range->second - cell_range->first;
 
-				   // OK, now we are sitting in the loop that
-				   // goes over our chunks of cells. What we
-				   // need to do is five things: First, we have
-				   // to give the full matrices containing the
-				   // solution at cell dofs and quadrature
-				   // points the correct sizes. We use the
-				   // <code>true</code> argument in order to
-				   // specify that this should be done fast,
-				   // i.e., the field will not be initialized
-				   // since we fill them manually in the very
-				   // next step anyway. Then, we copy the
-				   // source values from the global vector to
-				   // the local cell range, and we perform a
-				   // matrix-matrix product to transform the
-				   // values to the quadrature points. It is a
-				   // bit tricky to find out how the matrices
-				   // should be multiplied with each other,
-				   // i.e., which matrix needs to be
-				   // transposed. One way to resolve this is to
-				   // look at the matrix dimensions:
-				   // <code>solution_cells</code> has
-				   // <code>current_chunk_size</code> rows and
-				   // <code>matrix_sizes.m</code> columns,
-				   // whereas <code>small_matrix</code> has
-				   // <code>matrix_sizes.m</code> rows and
-				   // <code>matrix_sizes.n</code> columns, which
-				   // is also the size of columns in the output
-				   // matrix
-				   // <code>solution_points</code>. Hence, the
-				   // columns of the first matrix are as many as
-				   // there are rows in the second, which means
-				   // that the product is done non-transposed
-				   // for both matrices.
-				   //
-				   // Once the first product is calculated, we
-				   // apply the derivative information on all
-				   // the cells and all the quadrature points by
-				   // calling the <code>transform</code>
-				   // operation of the
-				   // <code>Transformation</code> class, and
-				   // then use a second matrix-matrix product to
-				   // get back to the solution values at the
-				   // support points. This time, we need to
-				   // transpose the small matrix, indicated by a
-				   // <code>mTmult</code> in the operations. The
-				   // fifth and last step is to add the local
-				   // data into the global vector, which is what
-				   // we did in many tutorial programs when
-				   // assembling right hand sides. We use the
-				   // <code>indices_local_to_global</code> field
-				   // to find out how local dofs and global dofs
-				   // are related to each other. Since we
-				   // simultaneously apply the constraints, we
-				   // hand this task off to the ConstraintMatrix
-				   // object. Most often, the ConstraintMatrix
-				   // function is applied to data
-				   // from one cell at a time, but since we work
-				   // on a whole chunk of dofs, we can feed the
-				   // function with data from all the cells at
-				   // once. We do this in an extra function
-				   // since we split between %parallel code that
-				   // can be run independently (this function)
-				   // and code that needs to be synchronized
-				   // between threads
-				   // (<code>copy_local_to_global</code>
-				   // function).
   copy.solutions.reinit    (chunk_size,matrix_sizes.m, true);
   copy.first_cell         = cell_range->first;
   copy.n_dofs             = chunk_size*matrix_sizes.m;
@@ -553,13 +558,13 @@ local_vmult (CellChunkIterator                    cell_range,
 			     &copy.solutions(0,0),
 			     &copy.solutions(0,0)+copy.n_dofs);
 
-  copy.solutions.mmult (scratch.solutions, small_matrix);
+  copy.solutions.mmult (scratch.solutions, B_ref_cell);
 
   for (unsigned int i=0, k = copy.first_cell; i<chunk_size; ++i, ++k)
     for (unsigned int j=0; j<matrix_sizes.n_points; ++j)
       derivatives(k,j).transform(&scratch.solutions(i, j*matrix_sizes.n_comp));
 
-  scratch.solutions.mTmult (copy.solutions, small_matrix);
+  scratch.solutions.mTmult (copy.solutions, B_ref_cell);
 }
 
 
@@ -737,7 +742,7 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 				 // uses the small matrix for determining
 				 // the number of degrees of freedom per
 				 // cell (number of rows in
-				 // <code>small_matrix</code>). The number
+				 // <code>B_ref_cell</code>). The number
 				 // of quadrature points needs to be passed
 				 // through the last variable
 				 // <code>n_points_per_cell</code>, since
@@ -756,23 +761,23 @@ template <typename number, class Transformation>
 void MatrixFree<number,Transformation>::
 reinit (const unsigned int        n_dofs_in,
 	const unsigned int        n_cells_in,
-	const FullMatrix<double> &small_matrix_in,
+	const FullMatrix<double> &B_ref_cell_in,
 	const unsigned int        n_points_per_cell)
 {
-  small_matrix = small_matrix_in;
+  B_ref_cell = B_ref_cell_in;
 
   derivatives.reinit (n_cells_in, n_points_per_cell);
-  indices_local_to_global.reinit (n_cells_in, small_matrix.m());
+  indices_local_to_global.reinit (n_cells_in, B_ref_cell.m());
 
   diagonal_is_calculated = false;
 
   matrix_sizes.n_dofs = n_dofs_in;
   matrix_sizes.n_cells = n_cells_in;
-  matrix_sizes.m = small_matrix.m();
-  matrix_sizes.n = small_matrix.n();
+  matrix_sizes.m = B_ref_cell.m();
+  matrix_sizes.n = B_ref_cell.n();
   matrix_sizes.n_points = n_points_per_cell;
-  matrix_sizes.n_comp   = small_matrix.n()/matrix_sizes.n_points;
-  Assert(matrix_sizes.n_comp * n_points_per_cell == small_matrix.n(),
+  matrix_sizes.n_comp   = B_ref_cell.n()/matrix_sizes.n_points;
+  Assert(matrix_sizes.n_comp * n_points_per_cell == B_ref_cell.n(),
 	 ExcInternalError());
 
 				   // One thing to make the matrix-vector
@@ -850,7 +855,7 @@ template <typename number, class Transformation>
 void
 MatrixFree<number,Transformation>::clear ()
 {
-  small_matrix.reinit(0,0);
+  B_ref_cell.reinit(0,0);
   derivatives.reinit (0,0);
   indices_local_to_global.reinit(0,0);
 
@@ -921,13 +926,13 @@ MatrixFree<number,Transformation>::calculate_diagonal() const
   for (unsigned int cell=0; cell<matrix_sizes.n_cells; ++cell)
     for (unsigned int dof=0; dof<matrix_sizes.m; ++dof)
       {
-	memcpy (&calculation[0],&small_matrix(dof,0),
+	memcpy (&calculation[0],&B_ref_cell(dof,0),
 		matrix_sizes.n*sizeof(number));
 	for (unsigned int q=0; q<matrix_sizes.n_points; ++q)
 	  derivatives(cell,q).transform(&calculation[q*matrix_sizes.n_comp]);
 	double diag_value = 0;
 	for (unsigned int q=0; q<matrix_sizes.n; ++q)
-	  diag_value += calculation[q] * small_matrix(dof,q);
+	  diag_value += calculation[q] * B_ref_cell(dof,q);
 	diagonal_values(indices_local_to_global(cell,dof)) += diag_value;
       }
   constraints.condense (diagonal_values);
@@ -957,7 +962,7 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
   std::size_t glob_size = derivatives.memory_consumption() +
 			  indices_local_to_global.memory_consumption() +
 			  constraints.memory_consumption() +
-			  small_matrix.memory_consumption() +
+			  B_ref_cell.memory_consumption() +
 			  diagonal_values.memory_consumption() +
 			  matrix_sizes.chunks.size()*2*sizeof(unsigned int) +
 			  sizeof(*this);
