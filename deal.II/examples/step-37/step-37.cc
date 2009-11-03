@@ -1227,18 +1227,18 @@ void LaplaceProblem<dim>::setup_system ()
   Triangulation<dim> reference_cell;
   GridGenerator::hyper_cube (reference_cell, 0, 1);
   fe_values_reference.reinit (reference_cell.begin());
-  FullMatrix<double> data_matrix (fe.dofs_per_cell,
-				  quadrature_formula.size()*dim);
+  FullMatrix<double> ref_cell_gradients (fe.dofs_per_cell,
+					 quadrature_formula.size()*dim);
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     {
       for (unsigned int j=0; j<quadrature_formula.size(); ++j)
 	{
 	  for (unsigned int d=0; d<dim; ++d)
-	    data_matrix(i,j*dim+d) = fe_values_reference.shape_grad(i,j)[d];
+	    ref_cell_gradients(i,j*dim+d) = fe_values_reference.shape_grad(i,j)[d];
 	}
     }
   system_matrix.reinit (mg_dof_handler.n_dofs(), triangulation.n_active_cells(),
-			data_matrix, quadrature_formula.size());
+			ref_cell_gradients, quadrature_formula.size());
   VectorTools::interpolate_boundary_values (mg_dof_handler,
 					    0,
 					    ZeroFunction<dim>(),
@@ -1277,7 +1277,7 @@ void LaplaceProblem<dim>::setup_system ()
     {
       mg_matrices[level].reinit(mg_dof_handler.n_dofs(level),
 				triangulation.n_cells(level),
-				data_matrix,
+				ref_cell_gradients,
 				quadrature_formula.size());
       std::set<unsigned int>::iterator bc_it = boundary_indices[level].begin();
       for ( ; bc_it != boundary_indices[level].end(); ++bc_it)
