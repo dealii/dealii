@@ -182,7 +182,7 @@ namespace TrilinosWrappers
       {
 	return 0.;
         //Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
-	//				  local_range().second));
+	//				  local_range().second-1));
       }
     else
       value = (*vector)[0][trilinos_i];
@@ -208,7 +208,7 @@ namespace TrilinosWrappers
     if (trilinos_i == -1 )
       {
 	Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
-						  local_range().second));
+						  local_range().second-1));
       }
     else
       value = (*vector)[0][trilinos_i];
