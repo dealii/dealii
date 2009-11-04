@@ -41,8 +41,8 @@ template <typename number> class SparseMatrix;
  * times can only be achieved at the expense of either increased
  * memory or run time consumption upon use. The main purpose of this
  * class is to avoid some memory bottlenecks, so we chose to implement
- * it memory conservative, but the chosen data format is too unsuited
- * to be used for actual matrices. It is therefore necessary to first
+ * it memory conservative. The chosen data format is too unsuited
+ * to be used for actual matrices, though. It is therefore necessary to first
  * copy the data of this object over to an object of type
  * SparsityPattern before using it in actual matrices.
  *
@@ -106,7 +106,7 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 				      * involuntary copies of objects for
 				      * temporaries, which can use large
 				      * amounts of computing time.  However,
-				      * copy constructors are needed if yo
+				      * copy constructors are needed if you
 				      * want to use the STL data types on
 				      * classes like this, e.g. to write such
 				      * statements like <tt>v.push_back
@@ -194,7 +194,7 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 				      * happens.
 				      */
     template <typename ForwardIterator>
-    void add_entries (const unsigned int row, 
+    void add_entries (const unsigned int row,
 		      ForwardIterator    begin,
 		      ForwardIterator    end,
 		      const bool         indices_are_unique_and_sorted = false);
