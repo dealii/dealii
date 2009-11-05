@@ -54,9 +54,9 @@ namespace internal
     {
         typedef DH<1,spacedim> DoFHandler_type;
     
-        typedef TriaRawIterator<DoFCellAccessor<DoFHandler_type> >    raw_line_iterator;
-        typedef TriaIterator<DoFCellAccessor<DoFHandler_type> >       line_iterator;
-        typedef TriaActiveIterator<DoFCellAccessor<DoFHandler_type> > active_line_iterator;
+        typedef TriaRawIterator<dealii::DoFCellAccessor<DoFHandler_type> >    raw_line_iterator;
+        typedef TriaIterator<dealii::DoFCellAccessor<DoFHandler_type> >       line_iterator;
+        typedef TriaActiveIterator<dealii::DoFCellAccessor<DoFHandler_type> > active_line_iterator;
     
         typedef TriaRawIterator   <InvalidAccessor<2,1,spacedim> > raw_quad_iterator;
         typedef TriaIterator      <InvalidAccessor<2,1,spacedim> > quad_iterator;
@@ -93,13 +93,13 @@ namespace internal
     {
         typedef DH<2,spacedim> DoFHandler_type;
     
-        typedef TriaRawIterator<DoFAccessor<1, DoFHandler_type> >    raw_line_iterator;
-        typedef TriaIterator<DoFAccessor<1, DoFHandler_type> >       line_iterator;
-        typedef TriaActiveIterator<DoFAccessor<1, DoFHandler_type> > active_line_iterator;
+        typedef TriaRawIterator<dealii::DoFAccessor<1, DoFHandler_type> >    raw_line_iterator;
+        typedef TriaIterator<dealii::DoFAccessor<1, DoFHandler_type> >       line_iterator;
+        typedef TriaActiveIterator<dealii::DoFAccessor<1, DoFHandler_type> > active_line_iterator;
     
-        typedef TriaRawIterator<DoFCellAccessor<DoFHandler_type> >         raw_quad_iterator;
-        typedef TriaIterator<DoFCellAccessor<DoFHandler_type> >            quad_iterator;
-        typedef TriaActiveIterator<DoFCellAccessor<DoFHandler_type> >      active_quad_iterator;
+        typedef TriaRawIterator<dealii::DoFCellAccessor<DoFHandler_type> >         raw_quad_iterator;
+        typedef TriaIterator<dealii::DoFCellAccessor<DoFHandler_type> >            quad_iterator;
+        typedef TriaActiveIterator<dealii::DoFCellAccessor<DoFHandler_type> >      active_quad_iterator;
     
         typedef TriaRawIterator   <InvalidAccessor<3,2,spacedim> > raw_hex_iterator;
         typedef TriaIterator      <InvalidAccessor<3,2,spacedim> > hex_iterator;
@@ -132,17 +132,17 @@ namespace internal
     {
         typedef DH<3, spacedim> DoFHandler_type;
       
-        typedef TriaRawIterator<DoFAccessor<1, DoFHandler_type> >    raw_line_iterator;
-        typedef TriaIterator<DoFAccessor<1, DoFHandler_type> >       line_iterator;
-        typedef TriaActiveIterator<DoFAccessor<1, DoFHandler_type> > active_line_iterator;
+        typedef TriaRawIterator<dealii::DoFAccessor<1, DoFHandler_type> >    raw_line_iterator;
+        typedef TriaIterator<dealii::DoFAccessor<1, DoFHandler_type> >       line_iterator;
+        typedef TriaActiveIterator<dealii::DoFAccessor<1, DoFHandler_type> > active_line_iterator;
       
-        typedef TriaRawIterator<DoFAccessor<2, DoFHandler_type> >    raw_quad_iterator;
-        typedef TriaIterator<DoFAccessor<2, DoFHandler_type> >       quad_iterator;
-        typedef TriaActiveIterator<DoFAccessor<2, DoFHandler_type> > active_quad_iterator;
+        typedef TriaRawIterator<dealii::DoFAccessor<2, DoFHandler_type> >    raw_quad_iterator;
+        typedef TriaIterator<dealii::DoFAccessor<2, DoFHandler_type> >       quad_iterator;
+        typedef TriaActiveIterator<dealii::DoFAccessor<2, DoFHandler_type> > active_quad_iterator;
       
-        typedef TriaRawIterator<DoFCellAccessor<DoFHandler_type> >         raw_hex_iterator;
-        typedef TriaIterator<DoFCellAccessor<DoFHandler_type> >            hex_iterator;
-        typedef TriaActiveIterator<DoFCellAccessor<DoFHandler_type> >      active_hex_iterator;
+        typedef TriaRawIterator<dealii::DoFCellAccessor<DoFHandler_type> >         raw_hex_iterator;
+        typedef TriaIterator<dealii::DoFCellAccessor<DoFHandler_type> >            hex_iterator;
+        typedef TriaActiveIterator<dealii::DoFCellAccessor<DoFHandler_type> >      active_hex_iterator;
       
         typedef raw_hex_iterator    raw_cell_iterator;
         typedef hex_iterator        cell_iterator;

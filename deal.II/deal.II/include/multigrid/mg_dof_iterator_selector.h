@@ -47,9 +47,9 @@ namespace internal
     class Iterators<1,spacedim>
     {
       public:
-        typedef TriaRawIterator<MGDoFCellAccessor<1,spacedim> >    raw_line_iterator;
-        typedef TriaIterator<MGDoFCellAccessor<1,spacedim> >       line_iterator;
-        typedef TriaActiveIterator<MGDoFCellAccessor<1,spacedim> > active_line_iterator;
+        typedef TriaRawIterator<dealii::MGDoFCellAccessor<1,spacedim> >    raw_line_iterator;
+        typedef TriaIterator<dealii::MGDoFCellAccessor<1,spacedim> >       line_iterator;
+        typedef TriaActiveIterator<dealii::MGDoFCellAccessor<1,spacedim> > active_line_iterator;
 
         typedef TriaRawIterator   <InvalidAccessor<2,1,spacedim> > raw_quad_iterator;
         typedef TriaIterator      <InvalidAccessor<2,1,spacedim> > quad_iterator;
@@ -78,13 +78,13 @@ namespace internal
     class Iterators<2,spacedim>
     {
       public:
-        typedef TriaRawIterator<MGDoFAccessor<1,2,spacedim> >    raw_line_iterator;
-        typedef TriaIterator<MGDoFAccessor<1,2,spacedim> >       line_iterator;
-        typedef TriaActiveIterator<MGDoFAccessor<1,2,spacedim> > active_line_iterator;
+        typedef TriaRawIterator<dealii::MGDoFAccessor<1,2,spacedim> >    raw_line_iterator;
+        typedef TriaIterator<dealii::MGDoFAccessor<1,2,spacedim> >       line_iterator;
+        typedef TriaActiveIterator<dealii::MGDoFAccessor<1,2,spacedim> > active_line_iterator;
     
-        typedef TriaRawIterator<MGDoFCellAccessor<2,spacedim> >         raw_quad_iterator;
-        typedef TriaIterator<MGDoFCellAccessor<2,spacedim> >            quad_iterator;
-        typedef TriaActiveIterator<MGDoFCellAccessor<2,spacedim> >      active_quad_iterator;
+        typedef TriaRawIterator<dealii::MGDoFCellAccessor<2,spacedim> >         raw_quad_iterator;
+        typedef TriaIterator<dealii::MGDoFCellAccessor<2,spacedim> >            quad_iterator;
+        typedef TriaActiveIterator<dealii::MGDoFCellAccessor<2,spacedim> >      active_quad_iterator;
 
         typedef TriaRawIterator   <InvalidAccessor<3,2,spacedim> > raw_hex_iterator;
         typedef TriaIterator      <InvalidAccessor<3,2,spacedim> > hex_iterator;
@@ -109,17 +109,17 @@ namespace internal
     class Iterators<3,spacedim>
     {
       public:
-        typedef TriaRawIterator<MGDoFAccessor<1,3,spacedim> >    raw_line_iterator;
-        typedef TriaIterator<MGDoFAccessor<1,3,spacedim> >       line_iterator;
-        typedef TriaActiveIterator<MGDoFAccessor<1,3,spacedim> > active_line_iterator;
+        typedef TriaRawIterator<dealii::MGDoFAccessor<1,3,spacedim> >    raw_line_iterator;
+        typedef TriaIterator<dealii::MGDoFAccessor<1,3,spacedim> >       line_iterator;
+        typedef TriaActiveIterator<dealii::MGDoFAccessor<1,3,spacedim> > active_line_iterator;
 
-        typedef TriaRawIterator<MGDoFAccessor<2,3,spacedim> >    raw_quad_iterator;
-        typedef TriaIterator<MGDoFAccessor<2,3,spacedim> >       quad_iterator;
-        typedef TriaActiveIterator<MGDoFAccessor<2,3,spacedim> > active_quad_iterator;
+        typedef TriaRawIterator<dealii::MGDoFAccessor<2,3,spacedim> >    raw_quad_iterator;
+        typedef TriaIterator<dealii::MGDoFAccessor<2,3,spacedim> >       quad_iterator;
+        typedef TriaActiveIterator<dealii::MGDoFAccessor<2,3,spacedim> > active_quad_iterator;
 
-        typedef TriaRawIterator<MGDoFCellAccessor<3,spacedim> >        raw_hex_iterator;
-        typedef TriaIterator<MGDoFCellAccessor<3,spacedim> >           hex_iterator;
-        typedef TriaActiveIterator<MGDoFCellAccessor<3,spacedim> >     active_hex_iterator;
+        typedef TriaRawIterator<dealii::MGDoFCellAccessor<3,spacedim> >        raw_hex_iterator;
+        typedef TriaIterator<dealii::MGDoFCellAccessor<3,spacedim> >           hex_iterator;
+        typedef TriaActiveIterator<dealii::MGDoFCellAccessor<3,spacedim> >     active_hex_iterator;
 
         typedef raw_hex_iterator    raw_cell_iterator;
         typedef hex_iterator        cell_iterator;
