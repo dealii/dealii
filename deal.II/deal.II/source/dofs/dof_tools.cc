@@ -5401,89 +5401,12 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
  	    face_dofs.resize (fe.dofs_per_face);
  	    face->get_dof_indices (face_dofs, cell->active_fe_index());
 
-	    if (fe_is_system)
-	      {
-				    // enter those dofs into the list
-				    // that match the component
-				    // signature.
-		for (unsigned int i=0; i<face_dofs.size(); ++i)
-                  {
-                    unsigned int component;
-                    if (fe.is_primitive())
-                      component = fe.face_system_to_component_index(i).first;
-                    else
-                      {
-                                    // non-primitive case. make sure
-                                    // that this particular shape
-                                    // function _is_ primitive, and
-                                    // get at it's component. use
-                                    // usual trick to transfer face
-                                    // dof index to cell dof index
-                        const unsigned int cell_i
-                          = (dim == 1 ?
-                             i
-                             :
-                             (dim == 2 ?
-                              (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
-                              :
-                              (dim == 3 ?
-                               (i<4*fe.dofs_per_vertex ?
-                                i
-                                :
-                                (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                 i+4*fe.dofs_per_vertex
-                                 :
-                                 i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
-                               :
-                               numbers::invalid_unsigned_int)));
-                        Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
-
-                                    // make sure that if this is not a
-                                    // primitive shape function, then
-                                    // all the corresponding
-                                    // components in the mask are not
-                                    // set
-                        if (!fe.is_primitive(cell_i))
-                          for (unsigned int c=0; c<n_components; ++c)
-                            if (fe.get_nonzero_components(cell_i)[c])
-                              Assert (component_mask[c] == false,
-                                      FETools::ExcFENotPrimitive());
-
-                                    // pick the first possibly of more
-                                    // than one non-zero component. if
-                                    // the shape function is
-                                    // non-primitive, then we will
-                                    // ignore the result in the
-                                    // following anyway, otherwise
-                                    // there's only one non-zero
-                                    // component which we will use
-                        component = (std::find (fe.get_nonzero_components(cell_i).begin(),
-                                                fe.get_nonzero_components(cell_i).end(),
-                                                true)
-                                     -
-                                     fe.get_nonzero_components(cell_i).begin());
-                      }
-
-				    // cast zero boundary constraints onto
-				    // a matrix
-		    for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-		      if (component_mask[fe.face_system_to_component_index(i).first])
-			zero_boundary_constraints.add_line (face_dofs[i]);
-
-                  }
-	      }
-	    else
-	      {
-				    // get the one component that this
-				    // function has and cast zero
-				    // boundary constraints onto a
-				    // matrix
-		for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-		  if (component_mask[fe.face_system_to_component_index(i).first])
-		    zero_boundary_constraints.add_line (face_dofs[i]);
-
-	      }
-
+					     // enter those dofs into the list
+					     // that match the component
+					     // signature.
+	    for (unsigned int i=0; i<face_dofs.size(); ++i)
+	      if (component_mask[fe.face_system_to_component_index(i).first])
+		zero_boundary_constraints.add_line (face_dofs[i]);
 	  }
       }
 }
