@@ -1862,15 +1862,15 @@ template<>
 void
 ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 {
+  typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
   ConstraintLine index_comparison;
-  index_comparison.line = vec.local_range().first;
-
-  std::vector<ConstraintLine>::const_iterator next_constraint =
+  std::pair<unsigned int, unsigned int> local_range = vec.local_range();
+  index_comparison.line = local_range.first;
+  const constraint_iterator begin_my_constraints =
     std::lower_bound (lines.begin(),lines.end(),index_comparison);
 
-  index_comparison.line = vec.local_range().second;
-
-  std::vector<ConstraintLine>::const_iterator end_constraint
+  index_comparison.line = local_range.second;
+  const constraint_iterator end_my_constraints
     = std::lower_bound(lines.begin(),lines.end(),index_comparison);
 
 				   // Here we search all the indices that we
@@ -1883,15 +1883,18 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
     {
       std::vector<int> my_indices(vec.local_size());
       unsigned int index2 = 0;
-      for(unsigned int i=vec.local_range().first;i<vec.local_range().second;i++,index2++)
+      
+      for(unsigned int i=local_range.first;i<local_range.second;i++,index2++)
         {
           my_indices[index2]=i;
         }
-      for (; next_constraint != end_constraint; ++next_constraint)
-        {
-          for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
-            my_indices.push_back (next_constraint->entries[i].first);
-        }
+      for (constraint_iterator it = begin_my_constraints; 
+	   it != end_my_constraints; ++it)
+	for (unsigned int i=0; i<it->entries.size(); ++i)
+	  if ((it->entries[i].first < local_range.first)
+	      ||
+	      (it->entries[i].first >= local_range.second))
+	    my_indices.push_back (it->entries[i].first);
 
 				   // sort and compress out duplicates
       std::sort(my_indices.begin(),my_indices.end());
@@ -1904,8 +1907,6 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
             }
         }
 
-      my_indices.resize(index2);
-
       Epetra_Map map_exchange
 	= Epetra_Map(-1,index2,(int*)&my_indices[0],0,
 		     vec.trilinos_vector().Comm());
@@ -1914,19 +1915,17 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 				   // here we import the data
   vec_distribute->reinit(vec,false,true);
 
-  next_constraint =
-    std::lower_bound (lines.begin(),lines.end(),index_comparison);
-
-  for (; next_constraint != end_constraint; ++next_constraint)
+  for (constraint_iterator it = begin_my_constraints; 
+       it != end_my_constraints; ++it)
     {
 				       // fill entry in line
 				       // next_constraint.line by adding the
 				       // different contributions
-      double new_value = next_constraint->inhomogeneity;
-      for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
-	new_value += ((*vec_distribute)(next_constraint->entries[i].first) *
-                      next_constraint->entries[i].second);
-      vec(next_constraint->line) = new_value;
+      double new_value = it->inhomogeneity;
+      for (unsigned int i=0; i<it->entries.size(); ++i)
+	new_value += ((*vec_distribute)(it->entries[i].first) *
+                      it->entries[i].second);
+      vec(it->line) = new_value;
     }
 }
 
