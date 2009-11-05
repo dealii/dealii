@@ -35,6 +35,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#define BLOCK_LEVEL 6
+
 namespace internal
 {
   template <typename T>
@@ -326,16 +328,70 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
   Assert (vec_size == v.size(),
 	  ExcDimensionMismatch(vec_size, v.size()));
 
-  Number sum = 0;
+  const unsigned int blocking = 1<<BLOCK_LEVEL;
+  register Number sum1, sum2, sum3, sum = Number();
+  const Number * X = val, *X_end = X + vec_size, 
+    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
+    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
+    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
+  const Number2  * Y = v.val;
 
 				   // multiply the two vectors. we have to
 				   // convert the elements of u to the type of
 				   // the result vector. this is necessary
 				   // because
 				   // operator*(complex<float>,complex<double>)
-				   // is not defined by default
-  for (unsigned int i=0; i<vec_size; ++i)
-    sum += val[i] * Number(numbers::NumberTraits<Number2>::conjugate(v.val[i]));
+				   // is not defined by default. do the 
+				   // operations block-wise with post-update.
+				   // use three nested loops, which should make 
+				   // the roundoff error very small up to 
+				   // about 20m entries. in the
+				   // end do extra loops with the remainders. 
+				   // this blocked algorithm has been proposed
+				   // by Castaldo, Whaley and Chronopoulos
+				   // (SIAM J. Sci. Comput. 31, 1156-1174, 
+				   // 2008)
+  while (X != X_end1)
+    {
+      sum1 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum2 = 0;
+	  for (unsigned int k=0; k<blocking; ++k)
+	    {
+	      sum3 = 0;
+	      for (unsigned int i=0; i<blocking; ++i)
+		sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
+	      sum2 += sum3;
+	    }
+	  sum1 += sum2;
+	}
+      sum += sum1;
+    }
+  while (X != X_end2)
+    {
+      sum2 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum3 = 0;
+	  for (unsigned int i=0; i<blocking; ++i)
+	    sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
+	  sum2 += sum3;
+	}
+      sum += sum2;
+    }
+  while (X != X_end3)
+    {
+      sum3 = 0;
+      for (unsigned int i=0; i<blocking; ++i)
+	sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
+      sum += sum3;
+    }
+
+  sum3 = 0;
+  while (X != X_end) 
+    sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
+  sum += sum3;
 
   return sum;
 }
@@ -347,10 +403,54 @@ Vector<Number>::norm_sqr () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  real_type sum = 0;
+  const unsigned int blocking = 1<<BLOCK_LEVEL;
+  register real_type sum1, sum2, sum3, sum = 0.;
+  const Number * X = val, *X_end = X + vec_size, 
+    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
+    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
+    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    sum += numbers::NumberTraits<Number>::abs_square(val[i]);
+  while (X != X_end1)
+    {
+      sum1 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum2 = 0;
+	  for (unsigned int k=0; k<blocking; ++k)
+	    {
+	      sum3 = 0;
+	      for (unsigned int i=0; i<blocking; ++i)
+		sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
+	      sum2 += sum3;
+	    }
+	  sum1 += sum2;
+	}
+      sum += sum1;
+    }
+  while (X != X_end2)
+    {
+      sum2 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum3 = 0;
+	  for (unsigned int i=0; i<blocking; ++i)
+	    sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
+	  sum2 += sum3;
+	}
+      sum += sum2;
+    }
+  while (X != X_end3)
+    {
+      sum3 = 0;
+      for (unsigned int i=0; i<blocking; ++i)
+	sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
+      sum += sum3;
+    }
+
+  sum3 = 0;
+  while (X != X_end) 
+    sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
+  sum += sum3;
 
   return sum;
 }
@@ -361,10 +461,54 @@ Number Vector<Number>::mean_value () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  Number sum = 0;
+  const unsigned int blocking = 1<<BLOCK_LEVEL;
+  register Number sum1, sum2, sum3, sum = 0.;
+  const Number * X = val, *X_end = X + vec_size, 
+    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
+    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
+    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    sum += val[i];
+  while (X != X_end1)
+    {
+      sum1 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum2 = 0;
+	  for (unsigned int k=0; k<blocking; ++k)
+	    {
+	      sum3 = 0;
+	      for (unsigned int i=0; i<blocking; ++i)
+		sum3 += *X++;
+	      sum2 += sum3;
+	    }
+	  sum1 += sum2;
+	}
+      sum += sum1;
+    }
+  while (X != X_end2)
+    {
+      sum2 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum3 = 0;
+	  for (unsigned int i=0; i<blocking; ++i)
+	    sum3 += *X++;
+	  sum2 += sum3;
+	}
+      sum += sum2;
+    }
+  while (X != X_end3)
+    {
+      sum3 = 0;
+      for (unsigned int i=0; i<blocking; ++i)
+	sum3 += *X++;
+      sum += sum3;
+    }
+
+  sum3 = 0;
+  while (X != X_end) 
+    sum3 += *X++;
+  sum += sum3;
 
   return sum / real_type(size());
 }
@@ -376,11 +520,55 @@ typename Vector<Number>::real_type
 Vector<Number>::l1_norm () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
+ 
+  const unsigned int blocking = 1<<BLOCK_LEVEL;
+  register real_type sum1, sum2, sum3, sum = 0.;
+  const Number * X = val, *X_end = X + vec_size, 
+    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
+    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
+    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
 
-  real_type sum = 0;
+  while (X != X_end1)
+    {
+      sum1 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum2 = 0;
+	  for (unsigned int k=0; k<blocking; ++k)
+	    {
+	      sum3 = 0;
+	      for (unsigned int i=0; i<blocking; ++i)
+		sum3 += numbers::NumberTraits<Number>::abs(*X++);
+	      sum2 += sum3;
+	    }
+	  sum1 += sum2;
+	}
+      sum += sum1;
+    }
+  while (X != X_end2)
+    {
+      sum2 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum3 = 0;
+	  for (unsigned int i=0; i<blocking; ++i)
+	    sum3 += numbers::NumberTraits<Number>::abs(*X++);
+	  sum2 += sum3;
+	}
+      sum += sum2;
+    }
+  while (X != X_end3)
+    {
+      sum3 = 0;
+      for (unsigned int i=0; i<blocking; ++i)
+	sum3 += numbers::NumberTraits<Number>::abs(*X++);
+      sum += sum3;
+    }
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    sum += numbers::NumberTraits<Number>::abs(val[i]);
+  sum3 = 0;
+  while (X != X_end) 
+    sum3 += numbers::NumberTraits<Number>::abs(*X++);
+  sum += sum3;
 
   return sum;
 }
@@ -402,10 +590,59 @@ Vector<Number>::lp_norm (const real_type p) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  real_type sum = 0;
+  if (p == 1.)
+    return l1_norm();
+  else if (p == 2.)
+    return std::sqrt(norm_sqr());
 
-  for (unsigned int i=0; i<vec_size; ++i)
-    sum += std::pow (numbers::NumberTraits<Number>::abs(val[i]), p);
+  const unsigned int blocking = 1<<BLOCK_LEVEL;
+  register real_type sum1, sum2, sum3, sum = 0.;
+  const Number * X = val, *X_end = X + vec_size, 
+    *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
+    *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
+    *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
+
+  while (X != X_end1)
+    {
+      sum1 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum2 = 0;
+	  for (unsigned int k=0; k<blocking; ++k)
+	    {
+	      sum3 = 0;
+	      for (unsigned int i=0; i<blocking; ++i)
+		sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
+	      sum2 += sum3;
+	    }
+	  sum1 += sum2;
+	}
+      sum += sum1;
+    }
+  while (X != X_end2)
+    {
+      sum2 = 0.;
+      for (unsigned int j=0; j<blocking; ++j)
+	{
+	  sum3 = 0;
+	  for (unsigned int i=0; i<blocking; ++i)
+	    sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
+	  sum2 += sum3;
+	}
+      sum += sum2;
+    }
+  while (X != X_end3)
+    {
+      sum3 = 0;
+      for (unsigned int i=0; i<blocking; ++i)
+	sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
+      sum += sum3;
+    }
+
+  sum3 = 0;
+  while (X != X_end) 
+    sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
+  sum += sum3;
 
   return std::pow(sum, static_cast<real_type>(1./p));
 }
@@ -443,12 +680,16 @@ Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  parallel::transform (val,
-		       val+vec_size,
-		       v.val,
-		       val,
-		       (boost::lambda::_1 - boost::lambda::_2),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (val,
+			 val+vec_size,
+			 v.val,
+			 val,
+			 (boost::lambda::_1 - boost::lambda::_2),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] -= v.val[i];
 
   return *this;
 }
@@ -459,11 +700,15 @@ void Vector<Number>::add (const Number v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  parallel::transform (val,
-		       val+vec_size,
-		       val,
-		       (boost::lambda::_1 + v),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (val,
+			 val+vec_size,
+			 val,
+			 (boost::lambda::_1 + v),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] += v;
 }
 
 
@@ -473,12 +718,16 @@ void Vector<Number>::add (const Vector<Number>& v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  parallel::transform (val,
-		       val+vec_size,
-		       v.val,
-		       val,
-		       (boost::lambda::_1 + boost::lambda::_2),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (val,
+			 val+vec_size,
+			 v.val,
+			 val,
+			 (boost::lambda::_1 + boost::lambda::_2),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] += v.val[i];
 }
 
 
@@ -495,13 +744,17 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
 
-  parallel::transform (val,
-		       val+vec_size,
-		       v.val,
-		       w.val,
-		       val,
-		       (boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (val,
+			 val+vec_size,
+			 v.val,
+			 w.val,
+			 val,
+			 (boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] += a * v.val[i] + b * w.val[i];
 }
 
 
@@ -515,12 +768,16 @@ void Vector<Number>::sadd (const Number x,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  parallel::transform (val,
-		       val+vec_size,
-		       v.val,
-		       val,
-		       (x*boost::lambda::_1 + boost::lambda::_2),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (val,
+			 val+vec_size,
+			 v.val,
+			 val,
+			 (x*boost::lambda::_1 + boost::lambda::_2),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] = x * val[i] + v.val[i];
 }
 
 
@@ -541,6 +798,7 @@ void Vector<Number>::sadd (const Number x, const Number a,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
 
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
   parallel::transform (val,
 		       val+vec_size,
 		       v.val,
@@ -548,6 +806,9 @@ void Vector<Number>::sadd (const Number x, const Number a,
 		       val,
 		       (x*boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
 		       internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] = x*val[i] + a * v.val[i] + b * w.val[i];
 }
 
 
@@ -569,12 +830,16 @@ void Vector<Number>::scale (const Vector<Number> &s)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
 
-  parallel::transform (val,
-		       val+vec_size,
-		       s.val,
-		       val,
-		       (boost::lambda::_1*boost::lambda::_2),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (val,
+			 val+vec_size,
+			 s.val,
+			 val,
+			 (boost::lambda::_1*boost::lambda::_2),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] *= s.val[i];
 }
 
 
@@ -602,11 +867,15 @@ void Vector<Number>::equ (const Number a,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
 
-  parallel::transform (u.val,
-		       u.val+u.vec_size,
-		       val,
-		       (a*boost::lambda::_1),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (u.val,
+			 u.val+u.vec_size,
+			 val,
+			 (a*boost::lambda::_1),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] = a * u.val[i];
 }
 
 
@@ -647,13 +916,17 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  parallel::transform (u.val,
-		       u.val+u.vec_size,
-		       v.val,
-		       val,
-		       (a*boost::lambda::_1 + b*boost::lambda::_2),
-		       internal::Vector::minimum_parallel_grain_size);
-  }
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (u.val,
+			 u.val+u.vec_size,
+			 v.val,
+			 val,
+			 (a*boost::lambda::_1 + b*boost::lambda::_2),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] = a * u.val[i] + b * v.val[i];
+}
 
 
 template <typename Number>
@@ -666,13 +939,17 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
 
-  parallel::transform (u.val,
-		       u.val+u.vec_size,
-		       v.val,
-		       w.val,
-		       val,
-		       (a*boost::lambda::_1 + b*boost::lambda::_2 + c*boost::lambda::_3),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (u.val,
+			 u.val+u.vec_size,
+			 v.val,
+			 w.val,
+			 val,
+			 (a*boost::lambda::_1 + b*boost::lambda::_2 + c*boost::lambda::_3),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] = a * u.val[i] + b * v.val[i] + c * w.val[i];
 }
 
 
@@ -688,12 +965,16 @@ void Vector<Number>::ratio (const Vector<Number> &a,
 				   // we overwrite them anyway
   reinit (a.size(), true);
 
-  parallel::transform (a.val,
-		       a.val+a.vec_size,
-		       b.val,
-		       val,
-		       (boost::lambda::_1 / boost::lambda::_2),
-		       internal::Vector::minimum_parallel_grain_size);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::transform (a.val,
+			 a.val+a.vec_size,
+			 b.val,
+			 val,
+			 (boost::lambda::_1 / boost::lambda::_2),
+			 internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    for (unsigned int i=0; i<vec_size; ++i)
+      val[i] = a.val[i]/b.val[i];
 }
 
 

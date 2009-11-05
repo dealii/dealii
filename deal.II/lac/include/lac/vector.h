@@ -1103,16 +1103,19 @@ inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
 {
   Assert (numbers::is_finite(s),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+          ExcMessage("The given value is not finite but either infinite or "
+		     "Not A Number (NaN)"));
 
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
-  if (vec_size!=0)
-    parallel::apply_to_subranges (0U, size(),
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::apply_to_subranges (0U, vec_size,
 				  std_cxx1x::bind(&internal::Vector::template
 						  set_subrange<Number>,
 						  s, _1, _2, std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
 
   return *this;
 }
@@ -1126,7 +1129,8 @@ Vector<std::complex<float> > &
 Vector<std::complex<float> >::operator = (const std::complex<float> s)
 {
   Assert (numbers::is_finite(s),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+          ExcMessage("The given value is not finite but either infinite or "
+		     "Not A Number (NaN)"));
 
   if (s != std::complex<float>())
     Assert (vec_size!=0, ExcEmptyObject());
@@ -1146,13 +1150,15 @@ Vector<Number>::operator = (const Vector<Number>& v)
 {
   if (v.vec_size != vec_size)
     reinit (v.vec_size, true);
-  if (vec_size!=0)
-    parallel::apply_to_subranges (0U, size(),
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::apply_to_subranges (0U, vec_size,
 				  std_cxx1x::bind(&internal::Vector::template
 						  copy_subrange<Number>,
 						  std_cxx1x::cref(v), _1, _2, 
 						  std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
+  else if (vec_size > 0)
+    internal::Vector::copy_subrange<Number>(v, 0U, vec_size, *this);
 
   return *this;
 }
@@ -1165,16 +1171,18 @@ inline
 Vector<Number> &
 Vector<Number>::operator = (const Vector<Number2>& v)
 {
-  if (v.size() != vec_size)
-    reinit (v.size(), true);
-  if (vec_size!=0)
-    parallel::apply_to_subranges (0U, size(),
+  if (v.vec_size != vec_size)
+    reinit (v.vec_size, true);
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    parallel::apply_to_subranges (0U, vec_size,
 				  std_cxx1x::bind(&internal::Vector::template
 						  copy_subrange_ext<Number2,Number>,
 						  std_cxx1x::cref(v), _1, _2, 
 						  std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
-  
+  else if (vec_size > 0)
+    internal::Vector::copy_subrange_ext<Number2,Number>(v, 0U, vec_size, *this);
+
   return *this;
 }
 
