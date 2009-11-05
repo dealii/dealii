@@ -19,13 +19,14 @@ debug: 2dg 3dg 1dg
 
 1dg: $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
 1d : $(LIBDIR)/libdeal_II_1d$(lib-suffix)
-2dg: $(LIBDIR)/libdeal_II_2d.g$(lib-suffix) 
+2dg: $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
 2d : $(LIBDIR)/libdeal_II_2d$(lib-suffix)
-3dg: $(LIBDIR)/libdeal_II_3d.g$(lib-suffix) 
+3dg: $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 3d : $(LIBDIR)/libdeal_II_3d$(lib-suffix)
 
-# create lists of file names
-cc-files     = $(shell echo source/*/*.cc)
+# create lists of file names. compile vectors.cc first because it is
+# one of the files that takes the longest
+cc-files     = source/numerics/vectors.cc $(shell echo source/*/*.cc)
 h-files      = $(sort $(shell echo include/*/*.h))
 
 inst-in-files= $(shell echo source/*/*.inst.in)
@@ -34,7 +35,7 @@ inst-files   = $(inst-in-files:%.in=%)
 
 # replace subdirectories in cc file names by a prefix, preprend a "lib/[g]o"
 # and change the suffix
-tmp1        = $(shell cd source ; echo */*cc | $(PERL) -pi -e 's,/,_,g;')
+tmp1        = $(shell echo $(cc-files) | $(PERL) -pi -e 's,source/,,g; s,/,_,g;')
 o-files-1d  = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.$(OBJEXT)) )
 go-files-1d = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.g.$(OBJEXT)))
 o-files-2d  = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.$(OBJEXT)) )
@@ -215,7 +216,7 @@ include Makefile.dep
 
 ################### some clean-up rules
 
-clean: 
+clean:
 	-rm -f *~ */*~ */*/*~ Makefile.dep
 
 
