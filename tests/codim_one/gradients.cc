@@ -1,15 +1,15 @@
-//----------------------------  template.cc  ---------------------------                                                                      
-//    $Id$                                                                             
-//    Version: $Name$                                                                                                                         
-//                                                                                                                                            
-//    Copyright (C) 2005, 2008 by the deal.II authors                                                                                               
-//                                                                                                                                            
-//    This file is subject to QPL and may not be  distributed                                                                                 
-//    without copyright and license information. Please refer                                                                                 
-//    to the file deal.II/doc/license.html for the  text  and                                                                                 
-//    further information on this license.                                                                                                    
-//                                                                                                                                            
-//----------------------------  template.cc  ---------------------------                                                                      
+//----------------------------  template.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2005, 2008, 2009 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  template.cc  ---------------------------
 
 
 // Controls that the covariant matrix is calculated properly. It uses
@@ -23,7 +23,7 @@
 #include <base/logstream.h>
 #include <string>
 
-// all include files needed for the program                                                                                                   
+// all include files needed for the program
 
 #include <base/function.h>
 #include <base/function_lib.h>
@@ -49,7 +49,7 @@
 std::ofstream logfile("gradients/output");
 
 template <int dim, int spacedim>
-void test(std::string filename) 
+void test(std::string filename)
 
 {
   Triangulation<dim, spacedim> triangulation;
@@ -61,7 +61,7 @@ void test(std::string filename)
 
   const QMidpoint<dim> q_midpoint;
 
-	
+
 				// finite elements used for the
 				// projection
   const FE_Q<dim,spacedim> fe (1);
@@ -92,7 +92,7 @@ void test(std::string filename)
       << "no. of help dofs "<< dof_handler_help.n_dofs()<< std::endl;
   deallog
       << "no. of help dofs per cell "<< fe_help.dofs_per_cell<< std::endl;
-     
+
 
 
 				//  definition of the exact function
@@ -100,8 +100,8 @@ void test(std::string filename)
 				//  one
   Vector<double> projected_one(dof_handler.n_dofs());
 
-//  Functions::CosineFunction<spacedim> cosine; 
-  
+//  Functions::CosineFunction<spacedim> cosine;
+
   Tensor<1,spacedim> exp;
   exp[0]=1;
   exp[1]=0;
@@ -116,11 +116,11 @@ void test(std::string filename)
 
 
 				// calculate its gradient
-  
+
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
   FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-   
+
   std::vector< Point<spacedim> > cell_normals(q_midpoint.n_quadrature_points);
   std::vector< Point<spacedim> > cell_tangentials(q_midpoint.n_quadrature_points);
   std::vector<double> shape_directional_derivative(dofs_per_cell);
@@ -131,10 +131,10 @@ void test(std::string filename)
   typename DoFHandler<dim, spacedim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
-  
+
   for (; cell!=endc; ++cell)
   {
- 
+
       fe_values.reinit(cell);
       cell-> get_dof_indices (local_dof_indices);
       cell_normals = fe_values.get_cell_normal_vectors();
@@ -145,25 +145,25 @@ void test(std::string filename)
 				// z component = 0 is chosen out of
 				// the plane tangential to the
 				// element surface.
-      cell_tangentials[0][0] = cell_normals[0][1] 
+      cell_tangentials[0][0] = cell_normals[0][1]
 	  / sqrt( pow(cell_normals[0][0],2) + pow(cell_normals[0][1],2) );
       cell_tangentials[0][1] = -cell_normals[0][0]
 	  / sqrt( pow(cell_normals[0][0],2) + pow(cell_normals[0][1],2) );
-      if (spacedim == 3) 
+      if (spacedim == 3)
 	  cell_tangentials[0][2]=0.;
-   
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
       {
 	  shape_directional_derivative[i]=
 	      contract(
-	      fe_values.shape_grad(i,0), 
+	      fe_values.shape_grad(i,0),
 	      cell_tangentials[0]);
 
 				// notice that the dof_index for
 				// fe_dgq(0) is the same as that of
 				// the cell
-	  projected_directional_derivative(cell->index()) 
-	      += 
+	  projected_directional_derivative(cell->index())
+	      +=
 	      projected_one(local_dof_indices[i])
 	      *
 	      shape_directional_derivative[i];
@@ -179,7 +179,7 @@ void test(std::string filename)
 	      << "exact solution "
 	      << cos( 2*numbers::PI*
 		      (cell->index()+.5) / triangulation.n_cells() )
-	      << std::endl;       
+	      << std::endl;
 
 
   }
@@ -196,8 +196,10 @@ void test(std::string filename)
 
 int main ()
 {
-    deallog.attach(logfile);
-    deallog.depth_console(0);
+  logfile.precision (4);
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-12);
 
     deallog<<"Test <1,2>"<<std::endl;
     test<1,2>("grids/circle_4.inp");

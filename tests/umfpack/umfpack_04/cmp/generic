@@ -26,9 +26,9 @@ DEAL::relative norm distance = 0
 DEAL::3d
 DEAL::Number of dofs = 669
 DEAL:cg::Starting value 3.12141
-DEAL:cg::Convergence step 25 value 0
+DEAL:cg::Convergence step 24 value 0
 DEAL:cg::Starting value 3.12141
-DEAL:cg::Convergence step 25 value 0
+DEAL:cg::Convergence step 24 value 0
 DEAL::Sparse Factorization
 DEAL::absolute norms = 13.7931 13.7931
 DEAL::relative norm distance = 0

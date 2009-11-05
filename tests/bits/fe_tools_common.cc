@@ -176,7 +176,7 @@ main()
       deallog << std::setprecision (2);
       deallog.attach(logfile);
       deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+      deallog.threshold_double(1.e-10);
 
       CHECK_ALL(Q,1,Q,1);
       CHECK_ALL(Q,1,Q,2);
