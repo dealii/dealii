@@ -513,6 +513,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The function DataOut class got confused when its DataOut::first_cell() and
+  DataOut::next_cell() were overloaded and cell data was given. This is now fixed.
+  <br>
+  (Wolfgang Bangerth 2009/11/05)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The function DoFRenumbering::component_wise is now also implemented
   for arguments of type hp::DoFHandler.
   <br>

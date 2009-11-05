@@ -961,9 +961,20 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 
   std::vector<std::pair<cell_iterator, unsigned int> > all_cells;
   {
-    unsigned int index = 0;
+				     // set the index of the first
+				     // cell. if first_cell/next_cell
+				     // returns non-active cells, then
+				     // the index is not usable
+				     // anyway, but otherwise we
+				     // should keep track where we are
+    unsigned int index;
+    if (first_cell()->has_children())
+      index = 0;
+    else
+      index = std::distance (this->dofs->begin_active(),
+			     active_cell_iterator(first_cell()));
     for (cell_iterator cell=first_cell(); cell != this->dofs->end();
-	 cell = next_cell(cell), ++index)
+	 cell = next_cell(cell))
       {
 	Assert (static_cast<unsigned int>(cell->level()) <
 		cell_to_patch_index_map.size(),
@@ -975,6 +986,23 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 	cell_to_patch_index_map[cell->level()][cell->index()] = all_cells.size();
 
 	all_cells.push_back (std::make_pair(cell, index));
+
+					 // if both this and the next
+					 // cell are active, then
+					 // increment the index that
+					 // keeps track on which
+					 // active cell we are sitting
+					 // correctly. if one of the
+					 // cells is not active, then
+					 // this index doesn't mean
+					 // anything anyway, so just
+					 // ignore it. same if we are
+					 // at the end of the range
+	if (!cell->has_children() &&
+	    next_cell(cell) != this->dofs->end() &&
+	    !next_cell(cell)->has_children())
+	  index += std::distance (active_cell_iterator(cell),
+				  active_cell_iterator(next_cell(cell)));
       }
   }
 
