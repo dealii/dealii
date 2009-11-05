@@ -2018,6 +2018,7 @@ void MatrixCreator::create_mass_matrix<deal_II_dimension>
  const Function<deal_II_dimension> * const coefficient);
 
 
+#if deal_II_dimension != 1
 
 template
 void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
@@ -2055,7 +2056,6 @@ MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
  const Function<deal_II_dimension> * const,
  std::vector<unsigned int>);
 
-
 template
 void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
 (const hp::DoFHandler<deal_II_dimension>&,
@@ -2067,6 +2067,7 @@ void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
  const Function<deal_II_dimension> * const,
  std::vector<unsigned int>);
 
+#endif
 
 
 // non-hp versions of create_laplace_matrix
@@ -2201,6 +2202,8 @@ void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_dimension
  Vector<double>           &rhs_vector,
  const Function<deal_II_dimension+1> * const coefficient);
 
+#if deal_II_dimension == 2
+
 template
 void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension,deal_II_dimension+1>
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1>     &dof,
@@ -2224,7 +2227,7 @@ void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension,deal_II_dimens
  const Function<deal_II_dimension+1> * const a,
  std::vector<unsigned int>);
 
- 
+#endif 
 
 // #if deal_II_dimension != 1
 // template
