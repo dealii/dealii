@@ -205,7 +205,17 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator = (const Vector &v)
     {
-      if (local_range() == v.local_range())
+				// distinguish three cases. First case: both
+				// vectors have the same layout (just need to
+				// copy the local data). Second case: vectors
+				// have the same size, but different
+				// layout. The calling vector has a wider
+				// local range than the input vector, and the
+				// input vector has a 1-to-1 map (need to
+				// import data). The third case means that we
+				// have to rebuild the calling vector.
+      if (size() == v.size() && 
+	  local_range() == v.local_range())
 	{
 	  Assert (vector->Map().SameAs(v.vector->Map()) == true,
 		  ExcMessage ("The Epetra maps in the assignment operator ="
@@ -216,6 +226,14 @@ namespace TrilinosWrappers
 	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 	  last_action = Zero;
+	}
+      else if (size() == v.size() && local_range().first<=v.local_range().first &&
+	       local_range().second>=v.local_range().second &&
+	       v.vector->Map().UniqueGIDs())
+	{
+	  Epetra_Import data_exchange (vector->Map(), v.vector->Map());
+	  const int ierr = vector->Import(*v.vector, data_exchange, Insert);
+	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	}
       else
 	{
