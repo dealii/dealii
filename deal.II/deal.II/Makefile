@@ -26,7 +26,8 @@ debug: 2dg 3dg 1dg
 
 # create lists of file names. compile vectors.cc first because it is
 # one of the files that takes the longest
-cc-files     = source/numerics/vectors.cc $(shell echo source/*/*.cc)
+cc-files     = source/numerics/vectors.cc \
+               $(filter-out source/numerics/vectors.cc, $(shell echo source/*/*.cc))
 h-files      = $(sort $(shell echo include/*/*.h))
 
 inst-in-files= $(shell echo source/*/*.inst.in)
