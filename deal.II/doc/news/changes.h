@@ -359,6 +359,17 @@ inconvenience this causes.
 
   <li>
     <p>
+    Improved: The Vector class has been equipped with an improved way to 
+    calculate sums in inner products and norms. This reduces the accumulation
+    of round-off errors. Especially the solution with float vectors should 
+    profit from the new implementation.
+    </p>
+  <br>
+  (Martin Kronbichler 2009/11/05)
+  </li>
+
+  <li>
+    <p>
     Improved: The ConstraintMatrix class now uses a cache for random access to
     the constraint lines. This considerably increases performance of the
     *_local_to_global functions, where such an access pattern is usual. Moreover,
