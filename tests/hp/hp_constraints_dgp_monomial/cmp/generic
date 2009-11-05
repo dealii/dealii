@@ -1,0 +1,96 @@
+
+DEAL::Test for dim = 1
+DEAL::
+DEAL::No hanging nodes test
+DEAL::n_dofs=23
+DEAL::
+DEAL::
+DEAL::Hanging nodes test
+DEAL::n_dofs=18
+DEAL::
+DEAL::
+DEAL::Wrong face orientation test
+DEAL::
+DEAL::
+DEAL::2d deformed mesh test
+DEAL::
+DEAL::
+DEAL::2d deformed refined mesh test
+DEAL::
+DEAL::
+DEAL::Interpolation test
+DEAL::
+DEAL::
+DEAL::Random hanging nodes
+DEAL::n_dofs=18
+DEAL::
+DEAL::
+DEAL::
+DEAL::
+DEAL::Test for dim = 2
+DEAL::
+DEAL::No hanging nodes test
+DEAL::n_dofs=313
+DEAL::
+DEAL::
+DEAL::Hanging nodes test
+DEAL::n_dofs=121
+DEAL::
+DEAL::
+DEAL::Wrong face orientation test
+DEAL::
+DEAL::
+DEAL::2d deformed mesh test
+DEAL::n_dofs=21
+DEAL::
+DEAL::
+DEAL::2d deformed refined mesh test
+DEAL::n_dofs=35
+DEAL::n_dofs=22
+DEAL::n_dofs=36
+DEAL::
+DEAL::
+DEAL::Interpolation test
+DEAL::
+DEAL::
+DEAL::Random hanging nodes
+DEAL::n_dofs=951
+DEAL::
+DEAL::
+DEAL::
+DEAL::
+DEAL::Test for dim = 3
+DEAL::
+DEAL::No hanging nodes test
+DEAL::n_dofs=4645
+DEAL::
+DEAL::
+DEAL::Hanging nodes test
+DEAL::n_dofs=1049
+DEAL::
+DEAL::
+DEAL::Wrong face orientation test
+DEAL::n_dofs=74
+DEAL::n_dofs=100
+DEAL::n_dofs=116
+DEAL::n_dofs=167
+DEAL::n_dofs=119
+DEAL::n_dofs=163
+DEAL::n_dofs=170
+DEAL::
+DEAL::
+DEAL::2d deformed mesh test
+DEAL::
+DEAL::
+DEAL::2d deformed refined mesh test
+DEAL::
+DEAL::
+DEAL::Interpolation test
+DEAL::
+DEAL::
+DEAL::Random hanging nodes
+DEAL::n_dofs=6196
+DEAL::
+DEAL::
+DEAL::
+DEAL::
