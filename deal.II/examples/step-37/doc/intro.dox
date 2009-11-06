@@ -30,9 +30,11 @@ product when the matrix is stored in the usual sparse compressed row storage
 &mdash; in short CRS &mdash; format implemented by the SparsityPattern and
 SparseMatrix classes (the actual implementation in deal.II uses a slightly
 different structure for the innermost loop, thereby avoiding the counter
-variable):
+variable), also used by Trilinos and PETSc matrices:
 @code
 // y = A * x
+// variables: double * A_values;  unsigned int * A_column_indices;
+//            std::size_t * A_row_indices, unsigned int n_rows;
 std::size_t element_index = A_row_indices[0];
 for (unsigned int row=0; row<n_rows; ++row)
   {
@@ -48,43 +50,42 @@ for (unsigned int row=0; row<n_rows; ++row)
   }
 @endcode
 
-Looking into what actually happens in the computer when forming a
-matrix-vector product, one observes that the matrix data
-<code>A_values</code> is continuously traveling from main memory into the
-CPU in order to be multiplied with some vector element determined by the other
-array <code>A_column_indices</code> and add this product to a sum that
-eventually is written into the output vector. Let us assume for simplicity
-that all the vector elements are sitting in the CPU (or some fast memory like
-caches) and that we use a compressed storage scheme for the sparse matrix,
-i.e., the format deal.II matrices (as well as PETSc and Trilinos matrices)
-use. Then each matrix element corresponds to 12 bytes of data, 8 bytes for the
-respective element in <code>A_values</code>, and 4 bytes for the unsigned
-integer position <code>A_column_indices</code> that indicates which vector element
-we actually use for multiplication. Here we neglect the additional array that
-tells us the ranges of individual rows in the matrix. With those 12 bytes of
-data, we perform two floating point operations, a multiplication and an
-addition. If our matrix has one billion entries, a matrix-vector product
-consists of two billion floating point operations, 2 GFLOP. One core of a
-processor of 2009's standard (Intel's 'Nehalem' processor, 3 GHz) has a peak
-performance of about 12 billion operations per second, 12 GFLOP/s. Now we
-might be tempted to hope for getting a matrix-vector product done in about one
-sixth of a second on such a machine. Remember, though, that we have to get 12
-GB of data through the processor in order to form the matrix-vector
-product. Looking again at which hardware is available in 2009, we will hardly
-get more than 10 GB/s of data read. This means that the matrix-vector product
-will take more than one second to complete, giving a rate of 1.7 GFLOP/s at
-the best. This is quite far away from the theoretical peak performance of 12
-GFLOP/s. In practice, the rate is often considerably lower because, for
-example, the vectors do not fit into cache. A usual value on a 2009's machine
-is 0.5 to 1.1 GFLOP/s.
+The matrix-vector product basically goes through the @p A_values array,
+multiplies the current element <code>A_values[element_index]</code> with the
+entry in the vector that corresponds to that element, and then accumulates
+this product to the sum along the current row. Each matrix element thus
+involves two floating-point operations, a multiplication and an
+addition. Assume now we have a matrix with a billion (10<sup>9</sup>)
+entries. Then, a matrix-vector product requires two billion floating point
+operations, 2 GFLOP. One core of a processor of 2009's standard (Intel's
+'Nehalem' processor, 3 GHz) has a peak performance of about 12 billion
+floating point operations per second, 12 GFLOP/s. Now we might be tempted to
+hope for getting a matrix-vector product done in about one sixth of a second
+on such a machine.
+
+However, that is usually not the case &mdash; because of memory. Each matrix
+element corresponds to 12 bytes of data, 8 bytes for the actual data in @p
+A_values and 4 bytes for the unsigned integer column position of that element,
+which we need to find the correct vector element. For our one-billion-sized
+matrix, these two arrays make up 12 GB of data, which we need to stream into
+the processor. Looking again at which hardware is available in 2009, we will
+hardly get more than 10 GB/s of data read. This means that the matrix-vector
+product will take more than one second to complete, giving a rate of 1.7
+GFLOP/s at the best. This is quite far away from the theoretical peak
+performance of 12 GFLOP/s. Here, we neglect the additional storage required by
+the additional array @p A_row_indices that tells us the range of the
+individual rows for simplicity, and assumed that the vector data is stored in
+some fast (cache) memory. In practice, the rate is often considerably lower
+because, for example, the vectors do not fit into cache. A usual value on a
+2009's machine is 0.5 to 1.1 GFLOP/s.
 
 What makes things worse is that today's processors have multiple cores, and
 multiple cores have to compete for memory bandwidth. Imagine we have 8 cores
 available with a theoretical peak performance of 96 GFLOP/s. However, these
-cores sit on a machine with about 35 GB/s of memory bandwidth. For our
-matrix-vector product, we would get a performance of about 6 GFLOP/s, which is
-a nightmarish 6 per cent of the system's peak performance. And this is the
-theoretical maximum we can get!
+cores will at best sit on a machine with about 35 GB/s of memory
+bandwidth. For our matrix-vector product, we would get a performance of about
+6 GFLOP/s, which is a nightmarish 6 per cent of the system's peak
+performance. And this is the theoretical maximum!
 
 Things won't get better in the future, rather worse: Memory bandwidth will
 most likely continue to grow more slowly than the number of cores (i.e., the
@@ -110,18 +111,16 @@ can be streamed into a processor, this trade-off will be worthwhile.
 
 In order to find out how we can write a code that performs a matrix-vector
 product, but does not need to store the matrix elements, let us start at
-looking how some finite-element related matrix $A$ is assembled:
+looking how some finite-element related matrix <i>A</i> is assembled:
 @f{eqnarray*}
 A = \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T A_\mathrm{cell}
 P_\mathrm{cell,{loc-glob}}.
 @f}
-In this formula, the matrix $P_\mathrm{cell,{loc-glob}}$ is a rectangular
+In this formula, the matrix <i>P</i><sub>cell,loc-glob</sub> is a rectangular
 matrix that defines the index mapping from local degrees of freedom in the
-current cell
-to the global degrees of freedom. The information from which this
-operator can be built is usually encoded in the
-<code>local_dof_indices</code> variable we have always used in the
-assembly of matrices.
+current cell to the global degrees of freedom. The information from which this
+operator can be built is usually encoded in the <code>local_dof_indices</code>
+variable we have always used in the assembly of matrices.
 
 If we are to perform a matrix-vector product, we can hence use that
 @f{eqnarray*}
@@ -134,8 +133,8 @@ A_\mathrm{cell} x_\mathrm{cell}
 &=& \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
 y_\mathrm{cell},
 @f}
-where $x_\mathrm{cell}$ are the values of <i>x</i> at the degrees of freedom
-of the respective cell, and $y_\mathrm{cell}$ correspondingly for the result.
+where <i>x</i><sub>cell</sub> are the values of <i>x</i> at the degrees of freedom
+of the respective cell, and  <i>x</i><sub>cell</sub> correspondingly for the result.
 A naive attempt to implement the local action of the Laplacian would hence be
 to use the following code:
 @code
@@ -185,14 +184,16 @@ MatrixFree::vmult (Vector<double>       &dst,
 }
 @endcode
 
-Here we neglected boundary conditions as well as any hanging nodes we
-may have, though neither would be very difficult to
-include using the ConstraintMatrix class. Note how we first generate the local
-matrix in the usual way. To form the actual product as expressed in the
-above formula, we read in the values of <code>src</code> of the cell-related
-degrees of freedom, multiply by the local matrix, and finally add the result
-to the destination vector <code>dst</code>. It is not more difficult than
-that, in principle.
+Here we neglected boundary conditions as well as any hanging nodes we may
+have, though neither would be very difficult to include using the
+ConstraintMatrix class. Note how we first generate the local matrix in the
+usual way. To form the actual product as expressed in the above formula, we
+read in the values of <code>src</code> of the cell-related degrees of freedom
+(the action of <i>P</i><sub>cell,loc-glob</sub>), multiply by the local matrix
+(the action of <i>A</i><sub>cell</sub>), and finally add the result to the
+destination vector <code>dst</code> (the action of
+<i>P</i><sub>cell,loc-glob</sub><sup>T</sup>, added over all the elements). It
+is not more difficult than that, in principle.
 
 While this code is completely correct, it is very slow. For every cell, we
 generate a local matrix, which takes three nested loops with as many
@@ -205,12 +206,12 @@ matrix can be thought of as the product of three matrices,
 @f{eqnarray*}
 A_\mathrm{cell} = B_\mathrm{cell}^T D_\mathrm{cell} B_\mathrm{cell},
 @f}
-where for the example of the Laplace operator 
-the $(q*\mathrm{dim}+d,i)$-th element of <i>B</i><sub>cell</sub> is given by
+where for the example of the Laplace operator the (<i>q</i>*dim+<i>d,i</i>)-th
+element of <i>B</i><sub>cell</sub> is given by
 <code>fe_values.shape_grad(i,q)[d]</code>. The matrix consists of
-<code>dim*n_q_pointsdofs_per_cell</code> rows and <code>dofs_per_cell</code>
-columns). The matrix <i>D</i><sub>cell</sub> is diagonal and contains the values
-<code>fe_values.JxW(q)</code> (or, rather, <code>dim</code> copies of it).
+<code>dim*n_q_points</code> rows and @p dofs_per_cell columns). The matrix
+<i>D</i><sub>cell</sub> is diagonal and contains the values
+<code>fe_values.JxW(q)</code> (or, rather, @p dim copies of it).
 
 Every numerical analyst learns in one of her first classes that for
 forming a product of the form
@@ -218,9 +219,9 @@ forming a product of the form
 A_\mathrm{cell}\cdot x_\mathrm{cell} = B_\mathrm{cell} D_\mathrm{cell} 
 		     B_\mathrm{cell}^T \cdot x_\mathrm{cell},
 @f}
-one should never form the matrix-matrix products, but rather multiply
-with the vector from right to left so that only matrix-vector products are
-formed. To put this into code, we can write:
+one should never form the matrix-matrix products, but rather multiply with the
+vector from right to left so that only three successive matrix-vector products
+are formed. To put this into code, we can write:
 @code
 ...
   for (; cell!=endc; ++cell)
@@ -270,24 +271,23 @@ from something like $\mathcal {O}(\mathrm{dofs\_per\_cell}^3)$ to $\mathcal
 a slightly more clever use of data in order to gain some extra speed. It does
 not change the code structure, though.
 
-If one would implement the code above, one would soon realize that the
-operations done by the call <code>fe_values.reinit(cell)</code> take about
-as much time as the other steps together (at least if the mesh is
-unstructured; deal.II can recognize that the gradients are often unchanged
-on structured meshes). That is certainly not ideal and we would like to do
-better than this. What the reinit function does is to calculate the
-gradient in real space by transforming the gradient on the reference cell
-using the Jacobian of the transformation from real to reference cell. This is
-done for each basis function on the cell on each quadrature point. The
-Jacobian does not depend on the basis function, but it is different on
-different quadrature points in general. The trick is now to factor out the
-Jacobian transformation and first apply the operation that leads us to
-<code>temp_vector</code> only with the gradient on the reference cell. That
-transforms the vector of values on the local dofs to a vector of gradients
-on the quadrature points. There, we first apply the Jacobian that we
-factored out from the gradient, then we apply the weights of the quadrature,
-and we apply with the transposed Jacobian for preparing the third loop which
-again uses the gradients on the unit cell.
+The bottleneck in the above code is the operations done by the call
+<code>fe_values.reinit(cell)</code>, which take about as much time as the
+other steps together (at least if the mesh is unstructured; deal.II can
+recognize that the gradients are often unchanged on structured meshes). That
+is certainly not ideal and we would like to do better than this. What the
+reinit function does is to calculate the gradient in real space by
+transforming the gradient on the reference cell using the Jacobian of the
+transformation from real to reference cell. This is done for each basis
+function on the cell, for each quadrature point. The Jacobian does not depend on
+the basis function, but it is different on different quadrature points in
+general. The trick is now to factor out the Jacobian transformation and first
+apply the operation that leads us to <code>temp_vector</code> only with the
+gradient on the reference cell. That transforms the vector of values on the
+local dofs to a vector of gradients on the quadrature points. There, we first
+apply the Jacobian that we factored out from the gradient, then we apply the
+weights of the quadrature, and we apply with the transposed Jacobian for
+preparing the third loop which again uses the gradients on the unit cell.
 
 Let us again write this in terms of matrices. Let the matrix
 <i>B</i><sub>cell</sub> denote the cell-related gradient matrix, with each row
@@ -297,11 +297,10 @@ matrix-matrix product as
 B_\mathrm{cell} = J_\mathrm{cell} B_\mathrm{ref\_cell},
 @f}
 where <i>B</i><sub>ref_cell</sub> denotes the gradient on the reference cell
-and <i>J</i><sub>cell</sub><sup>T</sup> denotes the
-Jacobian. <i>J</i><sub>cell</sub><sup>T</sup> is block-diagonal, and the
-blocks size is equal to the dimension of the problem. Each diagonal block is
-the Jacobian transformation that goes from the reference cell to the real 
-cell.
+and <i>J</i><sub>cell</sub> denotes the Jacobian
+transformation. <i>J</i><sub>cell</sub> is block-diagonal, and the blocks size
+is equal to the dimension of the problem. Each diagonal block is the Jacobian
+transformation that goes from the reference cell to the real cell.
 
 Putting things together, we find that
 @f{eqnarray*}
@@ -310,10 +309,12 @@ A_\mathrm{cell} = B_\mathrm{cell}^T D B_\mathrm{cell}
 		  D_\mathrm{cell} 
 		  J_\mathrm{cell} B_\mathrm{ref\_cell},
 @f}
-so we calculate the product (starting from the right)
+so we calculate the product (starting the local product from the right)
 @f{eqnarray*}
-B_\mathrm{ref\_cell}^T J_\mathrm{cell}^T D J_\mathrm{cell} 
-B_\mathrm{ref\_cell}\cdot x_\mathrm{cell}.
+y_\mathrm{cell} = B_\mathrm{ref\_cell}^T J_\mathrm{cell}^T D J_\mathrm{cell} 
+B_\mathrm{ref\_cell} x_\mathrm{cell}, \quad
+y = \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
+y_\mathrm{cell}.
 @f}
 @code
 ...
@@ -414,11 +415,11 @@ there are a few more points done to be even more efficient, namely:
 <ul>
   <li>We pre-compute the inverse of the Jacobian of the transformation and
       store it in an extra array. This allows us to fuse the three
-      operations <i>J</i><sub>cell</sub><sup>T</sup><i> D </i>
+      operations <i>J</i><sub>cell</sub><sup>T</sup><i> D</i><sub>cell</sub>
       <i>J</i><sub>cell</sub> (apply Jacobian, multiply by 
       weights, apply transposed
       Jacobian) into one second-rank tensor that is also symmetric (so we
-      can save only half the tensor).
+      only need to store half the tensor).
   <li>We work on several cells at once when we apply the gradients of the
       unit cell (it is always the same matrix with the reference cell
       data). This allows us to replace the matrix-vector product by a
@@ -446,20 +447,19 @@ multiple cores in a shared memory machine is an issue where sparse
 matrix-vector products are not particularly well suited because processors are
 memory bandwidth limited. There is a lot of data traffic involved, and the
 access patterns in the source vector are not very regular. Also, different
-rows might
-have different %numbers of nonzero elements. The matrix-free implementation,
-however, is more favorable in this respect. It does not need to save all the
-elements (only the product of transposed Jacobian, weights, and Jacobian, for
-all quadrature points on all cells, which is about 4 times the size of the
-solution vector in 2D and 9 times the size of the solution vector in 3D),
-whereas the number of nonzeros grows with the element order. Moreover, most of
-the work is done on a very regular pattern with stride-one access to data:
-Performing matrix-vector products with the same matrix, performing (equally
-many) transformations on the vector related quadrature points, and doing one
-more matrix-vector product. Only the read operation from the global vector
-<code>src</code> and the write operation to <code>dst</code> in the end
-require random access to a vector. This kind of rather uniform data access
-should make it not too difficult to implement a matrix-free
+rows might have different %numbers of nonzero elements. The matrix-free
+implementation, however, is more favorable in this respect. It does not need
+to save all the elements (only the product of transposed Jacobian, weights,
+and Jacobian, for all quadrature points on all cells, which is about 4 times
+the size of the solution vector in 2D and 9 times the size of the solution
+vector in 3D), whereas the number of nonzeros grows with the element
+order. Moreover, most of the work is done on a very regular pattern with
+stride-one access to data: Performing matrix-vector products with the same
+matrix, performing (equally many) transformations on the vector related
+quadrature points, and doing one more matrix-vector product. Only the read
+operation from the global vector @p src and the write operation to @p dst in
+the end perform more random access to a vector. This kind of rather uniform
+data access should make it not too difficult to implement a matrix-free
 matrix-vector product on a <a
 href="http://en.wikipedia.org/wiki/GPGPU">graphics processing unit
 (GP-GPU)</a>, for example. On the contrary, it would be quite complex to make
@@ -479,16 +479,15 @@ contributions into the global vector, in order to avoid a race condition.
 <h3>Combination with multigrid</h3>
 
 Above, we have gone to significant lengths to implement a matrix-vector
-product that does not actually store the matrix elements. In many user
-codes, however, one wants more than just performing some uncertain number of
+product that does not actually store the matrix elements. In many user codes,
+however, one wants more than just performing some uncertain number of
 matrix-vector products &mdash; one wants to do as little of these operations
-as possible when solving linear equation systems. In theory, we could use
-the CG method without preconditioning; however, that would not be very
-efficient. Rather, one uses preconditioners for improving speed. On the
-other hand, most of the more frequently used preconditioners such as Jacobi,
-SSOR, ILU or algebraic multigrid (AMG) can now no longer be used here
-because their implementation requires knowledge of the elements of the
-system matrix.
+as possible when solving linear equation systems. In theory, we could use the
+CG method without preconditioning; however, that would not be very
+efficient. Rather, one uses preconditioners for improving speed. On the other
+hand, most of the more frequently used preconditioners such as SSOR, ILU or
+algebraic multigrid (AMG) can now no longer be used here because their
+implementation requires knowledge of the elements of the system matrix.
 
 One solution is to use multigrid methods as shown in @ref step_16
 "step-16". They are known to be very fast, and they are suitable for our

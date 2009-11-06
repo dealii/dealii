@@ -108,7 +108,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
 				 // In this program, we want to make
 				 // use of the ability of deal.II to
-				 // runs things in parallel if compute
+				 // runs things in %parallel if compute
 				 // resources are available. We will
 				 // follow the general framework laid
 				 // out in the @ref threads module and
@@ -205,11 +205,11 @@ namespace WorkStreamData
 				 // a big list &ndash; we choose a
 				 // <code>Table<2,Transformation></code> data
 				 // format) &ndash; and call a transform
-				 // command of the <code>Transformation</code>
+				 // command of the @p Transformation
 				 // class. This template magic makes it easy
 				 // to reuse this MatrixFree class for other
 				 // problems that are based on a symmetric
-				 // operation without the need for further
+				 // operation without the need for substantial
 				 // changes.
 template <typename number, class Transformation>
 class MatrixFree : public Subscriptor
@@ -253,7 +253,7 @@ class MatrixFree : public Subscriptor
     std::size_t memory_consumption () const;
 
 				     // The private member variables of the
-				     // <code>MatrixFree</code> class are a
+				     // @p MatrixFree class are a
 				     // small matrix that does the
 				     // transformation from solution values to
 				     // quadrature points, a list with the
@@ -302,13 +302,13 @@ class MatrixFree : public Subscriptor
 
 
 
-				 // This is the constructor of the
-				 // <code>MatrixFree</code> class. All it does
-				 // is to subscribe to the general deal.II
-				 // <code>Subscriptor</code> scheme that makes
-				 // sure that we do not delete an object of
-				 // this class as long as it used somewhere
-				 // else, e.g. in a preconditioner.
+				 // This is the constructor of the @p
+				 // MatrixFree class. All it does is to
+				 // subscribe to the general deal.II @p
+				 // Subscriptor scheme that makes sure that we
+				 // do not delete an object of this class as
+				 // long as it used somewhere else, e.g. in a
+				 // preconditioner.
 template <typename number, class Transformation>
 MatrixFree<number,Transformation>::MatrixFree ()
 		:
@@ -360,24 +360,20 @@ MatrixFree<number,Transformation>::get_constraints ()
 
 
 
-				 // The following function takes a
-				 // vector of local dof indices on
-				 // cell level and writes the data
-				 // into the
-				 // <code>indices_local_to_global</code>
-				 // field in order to have fast access
-				 // to it. It performs a few sanity
-				 // checks like whether the sizes in
-				 // the matrix are set correctly. One
-				 // tiny thing: Whenever we enter this
-				 // function, we probably make some
-				 // modification to the matrix. This
-				 // means that the diagonal of the
-				 // matrix, which we might have
-				 // computed to have fast access to
-				 // those elements, is invalidated. We
-				 // set the respective flag to
-				 // <code>false</code>.
+				 // The following function takes a vector of
+				 // local dof indices on cell level and writes
+				 // the data into the
+				 // @p indices_local_to_global field
+				 // in order to have fast access to it. It
+				 // performs a few sanity checks like whether
+				 // the sizes in the matrix are set
+				 // correctly. One tiny thing: Whenever we
+				 // enter this function, we probably make some
+				 // modification to the matrix. This means
+				 // that the diagonal of the matrix, which we
+				 // might have computed to have fast access to
+				 // those elements, is invalidated. We set the
+				 // respective flag to @p false.
 template <typename number, class Transformation>
 void MatrixFree<number,Transformation>::
 set_local_dof_indices (const unsigned int               cell_no,
@@ -396,18 +392,16 @@ set_local_dof_indices (const unsigned int               cell_no,
 
 
 
-				 // Next a function that writes the
-				 // derivative data on a certain cell
-				 // and a certain quadrature point to
-				 // the array that keeps the data
-				 // around. Even though the array
-				 // <code>derivatives</code> stands
-				 // for the majority of the matrix
-				 // memory consumption, it still pays
-				 // off to have that data around since
-				 // it would be quite expensive to
-				 // manually compute it every time we
-				 // make a matrix-vector product.
+				 // Next a function that writes the derivative
+				 // data on a certain cell and a certain
+				 // quadrature point to the array that keeps
+				 // the data around. Even though the array @p
+				 // derivatives stands for the majority of the
+				 // matrix memory consumption, it still pays
+				 // off to have that data around since it
+				 // would be quite expensive to manually
+				 // compute it every time we make a
+				 // matrix-vector product.
 template <typename number, class Transformation>
 void MatrixFree<number,Transformation>::
 set_derivative_data (const unsigned int cell_no,
@@ -425,9 +419,9 @@ set_derivative_data (const unsigned int cell_no,
 				 // matrix-free class, implementing the
 				 // multiplication of the matrix with a
 				 // vector. This function does not actually
-				 // work on all cells of a mesh, but only the subset
-				 // of cells specified by the first argument
-				 // <code>cell_range</code>. Since this
+				 // work on all cells of a mesh, but only the
+				 // subset of cells specified by the first
+				 // argument @p cell_range. Since this
 				 // function operates similarly irrespective
 				 // on which cell chunk we are sitting, we can
 				 // call it simultaneously on many processors,
@@ -450,8 +444,8 @@ set_derivative_data (const unsigned int cell_no,
 				 // D_\mathrm{cell} 
 				 // J_\mathrm{cell} B_\mathrm{ref\_cell}
 				 // @f}
-				 // and $P_\mathrm{cell,local-global}$ is the
-				 // transformation from local to global
+				 // and <i>P</i><sub>cell,local-global</sub>
+				 // is the transformation from local to global
 				 // indices.
 				 //
 				 // To do this, we would have to do the
@@ -459,31 +453,32 @@ set_derivative_data (const unsigned int cell_no,
 				 // <ol>
 				 //   <li> Form $x_\mathrm{cell} =
 				 //   P_\mathrm{cell,local-global} x$. This is
-				 //   done using the command
+				 //   done by using the command
 				 //   ConstraintMatrix::get_dof_values.
 				 //   <li> Form $x_1 = B_\mathrm{ref\_cell}
-				 //   x_\mathrm{cell}$. The vector $x_1$
-				 //   contains the reference cell gradient to
-				 //   the local cell vector.
+				 //   x_\mathrm{cell}$. The vector
+				 //   <i>x</i><sub>1</sub> contains the
+				 //   reference cell gradient to the local
+				 //   cell vector.
 				 //   <li> Form $x_2 = J_\mathrm{cell}^T
 				 //   D_\mathrm{cell} J_\mathrm{cell}
 				 //   x_1$. This is a block-diagonal
 				 //   operation, with the block size equal to
-				 //   <code>dim</code>. The blocks just
+				 //   @p dim. The blocks just
 				 //   correspond to the individual quadrature
 				 //   points. The operation on each quadrature
 				 //   point is implemented by the
 				 //   Transformation class object that this
 				 //   class is equipped with. Compared to the
 				 //   introduction, the matrix
-				 //   $D_\mathrm{cell}$ now contains the
-				 //   <code>JxW</code> values and the
+				 //   <i>D</i><sub>cell</sub> now contains the
+				 //   @p JxW values and the
 				 //   inhomogeneous coefficient.
 				 //   <li> Form $y_\mathrm{cell} =
 				 //   B_\mathrm{ref\_cell}^T x_2$. This gives
 				 //   the local result of the matrix-vector
 				 //   product.
-				 //   <li> Form $y +=
+				 //   <li> Form $y \leftarrow y +
 				 //   P_\mathrm{cell,local-global}^T
 				 //   y_\mathrm{cell}$. This adds the local
 				 //   result to the global vector, which is
@@ -491,49 +486,53 @@ set_derivative_data (const unsigned int cell_no,
 				 //   ConstraintMatrix::distribute_local_to_global.
 				 //   Note that we do this in an extra
 				 //   function called
-				 //   <code>copy_local_to_global</code>
+				 //   @p copy_local_to_global
 				 //   because that operation must not be done
 				 //   in %parallel, in order to avoid two or
 				 //   more processes trying to add to the same
-				 //   positions in the result vector $y$.
+				 //   positions in the result vector <i>y</i>.
 				 //   </ol>
 				 // The steps 1 to 4 can be done in %parallel
 				 // by multiple processes.
 
 				 // Now, it turns out that the most expensive
 				 // part of the above is the multiplication
-				 // $B_\mathrm{ref\_cell} x_\mathrm{cell}$ in
-				 // the second step and the transpose
-				 // operation in step 4. Note that the matrix
-				 // $J^T D J$ is block-diagonal, and hence,
-				 // its application is cheaper. Since the
-				 // matrix $B_\mathrm{ref\_cell}$ is the same
+				 // <i>B</i><sub>ref_cell</sub>
+				 // <i>x</i><sub>cell</sub> in the second step
+				 // and the transpose operation in step
+				 // 4. Note that the matrix
+				 // <i>J</i><sup>T</sup><i> D J</i> is
+				 // block-diagonal, and hence, its application
+				 // is cheaper. Since the matrix
+				 // <i>B</i><sub>ref_cell</sub> is the same
 				 // for all cells, all that changes is the
-				 // vector $x_\mathrm{cell}$. Hence, nothing
-				 // prevents us from collecting several cell
-				 // vectors to a (rectangular) matrix, and
-				 // then perform a matrix-matrix
+				 // vector <i>x</i><sub>cell</sub>. Hence,
+				 // nothing prevents us from collecting
+				 // several cell vectors to a (rectangular)
+				 // matrix, and then perform a matrix-matrix
 				 // product. These matrices are both full, but
-				 // not very large, having of the order
-				 // <code>dofs_per_cell</code> rows and
-				 // columns. This is an operation that can be
-				 // much better optimized than matrix-vector
-				 // products. The functions
-				 // <code>FullMatrix<number>::mmult</code> and
-				 // <code>FullMatrix<number>::mTmult</code>
-				 // use the BLAS dgemm function (as long as
-				 // BLAS has been detected in deal.II
-				 // configuration), which provides optimized
-				 // kernels for doing this product. In our
-				 // case, a matrix-matrix product is between
-				 // three and five times faster than doing the
-				 // matrix-vector product on one cell after
-				 // the other. The variables that hold the
-				 // solution on the respective cell's support
-				 // points and the quadrature points are thus
-				 // full matrices. The number of rows is given
-				 // by the number of cells they work on, and
-				 // the number of columns is the number of
+				 // not very large, having of the order @p
+				 // dofs_per_cell rows and columns. This is an
+				 // operation that can be much better
+				 // optimized than matrix-vector products. The
+				 // functions @p FullMatrix<number>::mmult and
+				 // @p FullMatrix<number>::mTmult use the BLAS
+				 // dgemm function (as long as BLAS has been
+				 // detected in deal.II configuration), which
+				 // provides optimized kernels for doing this
+				 // product. In our case, a matrix-matrix
+				 // product is between three and five times
+				 // faster than doing the matrix-vector
+				 // product on one cell after the other. The
+				 // variables that hold the solution on the
+				 // respective cell's support points and the
+				 // quadrature points are thus full matrices,
+				 // which we set to the correct size as a
+				 // first action in this function. The number
+				 // of rows in the two matrices @p
+				 // scratch.solutions and @p copy.solutions is
+				 // given by the number of cells they work on,
+				 // and the number of columns is the number of
 				 // degrees of freedom per cell for the first
 				 // and the number of quadrature points times
 				 // the number of components per point for the
@@ -549,10 +548,10 @@ local_vmult (CellChunkIterator                    cell_range,
 {
   const unsigned int chunk_size = cell_range->second - cell_range->first;
 
-  copy.solutions.reinit    (chunk_size,matrix_sizes.m, true);
+  scratch.solutions.reinit (chunk_size, matrix_sizes.n, true);
+  copy.solutions.reinit    (chunk_size, matrix_sizes.m, true);
   copy.first_cell         = cell_range->first;
   copy.n_dofs             = chunk_size*matrix_sizes.m;
-  scratch.solutions.reinit (chunk_size,matrix_sizes.n, true);
 
   constraints.get_dof_values(src, &indices_local_to_global(copy.first_cell,0),
 			     &copy.solutions(0,0),
@@ -584,12 +583,10 @@ copy_local_to_global (const WorkStreamData::CopyData<number> &copy,
 
 
 
-				 // Now to the <code>vmult</code> function
-				 // that is called externally: It is very
-				 // similar to the <code>vmult_add</code>
-				 // function, so just set the destination to
-				 // zero first, and then go to the other
-				 // function.
+				 // Now to the @p vmult function that is
+				 // called externally: In addition to what we
+				 // do in a @p vmult_add function, we set the
+				 // destination to zero first.
 template <typename number, class Transformation>
 template <typename number2>
 void
@@ -602,10 +599,11 @@ MatrixFree<number,Transformation>::vmult (Vector<number2>       &dst,
 
 
 
-				 // Transposed matrix-vector products: do
-				 // the same. Since we implement a symmetric
-				 // operation, we can refer to the vmult_add
-				 // operation.
+				 // Transposed matrix-vector products (needed
+				 // for the multigrid operations to be
+				 // well-defined): do the same. Since we
+				 // implement a symmetric operation, we can
+				 // refer to the @ vmult_add operation.
 template <typename number, class Transformation>
 template <typename number2>
 void
@@ -629,60 +627,47 @@ MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
 
 
 
-				 // This is the <code>vmult_add</code>
-				 // function that multiplies the
-				 // matrix with vector
-				 // <code>src</code> and adds the
-				 // result to vector <code>dst</code>.
-				 // We include a few sanity checks to
-				 // make sure that the size of the
-				 // vectors is the same as the
-				 // dimension of the matrix. We call a
-				 // %parallel function that applies
-				 // the multiplication on a chunk of
-				 // cells at once using the WorkStream
-				 // module (cf. also the @ref threads
-				 // module). The subdivision into
-				 // chunks will be performed in the
-				 // reinit function and is stored in
-				 // the field
-				 // <code>matrix_sizes.chunks</code>. What
-				 // the rather cryptic command to
-				 // <code>std_cxx1x::bind</code> does
-				 // is to transform a function that
-				 // has several arguments (source
-				 // vector, chunk information) into a
-				 // function which has three arguments
-				 // (in the first case) or one
-				 // argument (in the second), which is
-				 // what the WorkStream::run function
-				 // expects. The placeholders
-				 // <code>_1, _2, _3</code> in the
-				 // local vmult specify variable input
-				 // values, given by the chunk
-				 // information, scratch data and copy
-				 // data that the WorkStream::run
-				 // function will provide, whereas the
-				 // other arguments to the
-				 // <code>local_vmult</code> function
-				 // are bound: to <code>this</code>
-				 // and a constant reference to the
-				 // <code>src</code> in the first
-				 // case, and <code>this</code> and a
-				 // reference to the output vector in
-				 // the second. Similarly, the
-				 // placeholder <code>_1</code> in the
-				 // <code>copy_local_to_global</code>
-				 // function sets the first explicit
-				 // argument of that function, which
-				 // is of class
-				 // <code>CopyData</code>. We need to
-				 // abstractly specify these arguments
-				 // because the tasks defined by
-				 // different cell chunks will be
-				 // scheduled by the WorkStream class,
-				 // and we will reuse available
-				 // scratch and copy data.
+				 // This is the @p vmult_add function that
+				 // multiplies the matrix with vector @p src
+				 // and adds the result to vector @p dst.  We
+				 // include a few sanity checks to make sure
+				 // that the size of the vectors is the same
+				 // as the dimension of the matrix. We call a
+				 // %parallel function that applies the
+				 // multiplication on a chunk of cells at once
+				 // using the WorkStream module (cf. also the
+				 // @ref threads module). The subdivision into
+				 // chunks will be performed in the reinit
+				 // function and is stored in the field @p
+				 // matrix_sizes.chunks. What the rather
+				 // cryptic command to @p std_cxx1x::bind does
+				 // is to transform a function that has
+				 // several arguments (source vector, chunk
+				 // information) into a function which has
+				 // three arguments (in the first case) or one
+				 // argument (in the second), which is what
+				 // the WorkStream::run function expects. The
+				 // placeholders <code>_1, _2, _3</code> in
+				 // the local vmult specify variable input
+				 // values, given by the chunk information,
+				 // scratch data and copy data that the
+				 // WorkStream::run function will provide,
+				 // whereas the other arguments to the @p
+				 // local_vmult function are bound: to @p this
+				 // and a constant reference to the @p src in
+				 // the first case, and @p this and a
+				 // reference to the output vector in the
+				 // second. Similarly, the placeholder
+				 // @p _1 argument in the
+				 // @p copy_local_to_global function
+				 // sets the first explicit argument of that
+				 // function, which is of class
+				 // @p CopyData. We need to
+				 // abstractly specify these arguments because
+				 // the tasks defined by different cell chunks
+				 // will be scheduled by the WorkStream class,
+				 // and we will reuse available scratch and
+				 // copy data.
 template <typename number, class Transformation>
 template <typename number2>
 void
@@ -732,27 +717,24 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
 
 
 
-				 // The next function initializes the structures
-				 // of the matrix. It writes the number of
-				 // total degrees of freedom in the problem
-				 // as well as the number of cells to the
-				 // MatrixSizes struct and copies the small
-				 // matrix that transforms the solution from
-				 // support points to quadrature points. It
-				 // uses the small matrix for determining
-				 // the number of degrees of freedom per
-				 // cell (number of rows in
-				 // <code>B_ref_cell</code>). The number
-				 // of quadrature points needs to be passed
-				 // through the last variable
-				 // <code>n_points_per_cell</code>, since
-				 // the number of columns in the small
-				 // matrix is
-				 // <code>dim*n_points_per_cell</code> for
-				 // the Laplace problem (the Laplacian is a
-				 // tensor and has <code>dim</code>
-				 // components). In this function, we also
-				 // give the fields containing the
+				 // The next function initializes the
+				 // structures of the matrix. It writes the
+				 // number of total degrees of freedom in the
+				 // problem as well as the number of cells to
+				 // the MatrixSizes struct and copies the
+				 // small matrix that transforms the solution
+				 // from support points to quadrature
+				 // points. It uses the small matrix for
+				 // determining the number of degrees of
+				 // freedom per cell (number of rows in @p
+				 // B_ref_cell). The number of quadrature
+				 // points needs to be passed through the last
+				 // variable @p n_points_per_cell, since the
+				 // number of columns in the small matrix is
+				 // @p dim*n_points_per_cell for the Laplace
+				 // problem (the Laplacian is a tensor and has
+				 // @p dim components). In this function, we
+				 // also give the fields containing the
 				 // derivative information and the local dof
 				 // indices the correct sizes. They will be
 				 // filled by calling the respective set
@@ -951,10 +933,10 @@ MatrixFree<number,Transformation>::calculate_diagonal() const
 				 // consumption of the arrays, the
 				 // constraints, the small matrix and of the
 				 // local variables. Just as a remark: In 2D
-				 // and with data type <code>double</code>,
+				 // and with data type @p double,
 				 // about 80 per cent of the memory
 				 // consumption is due to the
-				 // <code>derivatives</code> array, while in 3D
+				 // @p derivatives array, while in 3D
 				 // this number is even 85 per cent.
 template <typename number, class Transformation>
 std::size_t MatrixFree<number,Transformation>::memory_consumption () const
@@ -973,38 +955,34 @@ std::size_t MatrixFree<number,Transformation>::memory_consumption () const
 
 				 // @sect3{Laplace operator implementation}
 
-				 // This class implements the local action
-				 // of a Laplace operator on a quadrature
+				 // This class implements the local action of
+				 // a Laplace operator on a quadrature
 				 // point. This is a very basic class
 				 // implementation, providing functions for
-				 // initialization with a Tensor of rank 2
-				 // and implementing the
-				 // <code>transform</code> operation needed
-				 // by the <code>MatrixFree</code>
-				 // class. There is one point worth noting:
-				 // The quadrature-point related action of
-				 // the Laplace operator is a tensor of rank
+				 // initialization with a Tensor of rank 2 and
+				 // implementing the @p transform operation
+				 // needed by the @p MatrixFree class. There
+				 // is one point worth noting: The
+				 // quadrature-point related action of the
+				 // Laplace operator is a tensor of rank
 				 // two. It is symmetric since it is the
 				 // product of the inverse Jacobian
-				 // transformation between unit and real
-				 // cell with its transpose (times
-				 // quadrature weights and a coefficient,
-				 // which are scalar), so we can just save
-				 // the diagonal and upper diagonal part. We
-				 // could use the SymmetricTensor<2,dim>
-				 // class for doing this, however, that
-				 // class is only based on
-				 // <code>double</code> %numbers. Since we
-				 // also want to use <code>float</code>
-				 // %numbers for the multigrid
+				 // transformation between unit and real cell
+				 // with its transpose (times quadrature
+				 // weights and a coefficient, which are
+				 // scalar), so we can just save the diagonal
+				 // and upper diagonal part. We could use the
+				 // SymmetricTensor<2,dim> class for doing
+				 // this, however, that class is only based on
+				 // @p double %numbers. Since we also want to
+				 // use @p float %numbers for the multigrid
 				 // preconditioner (in order to save memory
-				 // and computing time), we manually
-				 // implement this operator. Note that
-				 // <code>dim</code> is a template argument
-				 // and hence known at compile-time, so the
-				 // compiler knows that this symmetric
-				 // rank-2 tensor has 3 entries if used in
-				 // 2D and 6 entries if used in 3D.
+				 // and computing time), we manually implement
+				 // this operator. Note that @p dim is a
+				 // template argument and hence known at
+				 // compile-time, so the compiler knows that
+				 // this symmetric rank-2 tensor has 3 entries
+				 // if used in 2D and 6 entries if used in 3D.
 template <int dim,typename number>
 class LaplaceOperator
 {
@@ -1047,21 +1025,20 @@ LaplaceOperator<dim,number>::LaplaceOperator(const Tensor<2,dim> &tensor)
 				 // only possibility if we do not want to copy
 				 // data back and forth, which is expensive
 				 // since this is the innermost position of
-				 // the loop in the <code>vmult</code>
+				 // the loop in the @p vmult
 				 // operation of the MatrixFree class. We need
 				 // to pay attention to the fact that we only
 				 // saved half of the (symmetric) rank-two
 				 // tensor.
 				 //
 				 // At first sight, it seems inefficient that
-				 // we have an <code>if</code> clause at this
-				 // position in the code at the innermost
-				 // loop, but note once again that
-				 // <code>dim</code> is known when this piece
-				 // of code is compiled, so the compiler can
-				 // optimize away the <code>if</code> statement
-				 // (and actually even inline these few lines
-				 // of code into the <code>MatrixFree</code>
+				 // we have an @p if clause at this position
+				 // in the code at the innermost loop, but
+				 // note once again that @p dim is known when
+				 // this piece of code is compiled, so the
+				 // compiler can optimize away the @p if
+				 // statement (and actually even inline these
+				 // few lines of code into the @p MatrixFree
 				 // class).
 template <int dim, typename number>
 void LaplaceOperator<dim,number>::transform (number* result) const
@@ -1090,7 +1067,7 @@ void LaplaceOperator<dim,number>::transform (number* result) const
 				 // The final function in this group
 				 // takes the content of a rank-2
 				 // tensor and writes it to the field
-				 // <code>transformation</code> of
+				 // @p transformation of
 				 // this class. We save the upper part
 				 // of the symmetric tensor row-wise:
 				 // we first take the (0,0)-entry,
@@ -1296,27 +1273,25 @@ void LaplaceProblem<dim>::setup_system ()
 				 // reduced compared to step-16. All we need
 				 // to do is to assemble the right hand side
 				 // and to calculate the cell-dependent part
-				 // of the Laplace operator. The first task
-				 // is standard. The second is also not too
-				 // hard given the discussion in the
-				 // introduction: We need to take the
-				 // inverse of the Jacobian of the
-				 // transformation from unit to real cell,
-				 // multiply it with its transpose and
-				 // multiply the resulting rank-2 tensor
-				 // with the quadrature weights and the
-				 // coefficient values at the quadrature
-				 // points. To make this work, we add the
-				 // update flag
-				 // <code>update_inverse_jacobians</code> to
-				 // the FEValues constructor, and query the
-				 // inverse of the Jacobian in a loop over
-				 // the quadrature points (note that the
-				 // Jacobian is not related to any kind of
-				 // degrees of freedom directly). In the
-				 // end, we condense the constraints from
-				 // Dirichlet boundary conditions away from
-				 // the right hand side.
+				 // of the Laplace operator. The first task is
+				 // standard. The second is also not too hard
+				 // given the discussion in the introduction:
+				 // We need to take the inverse of the
+				 // Jacobian of the transformation from unit
+				 // to real cell, multiply it with its
+				 // transpose and multiply the resulting
+				 // rank-2 tensor with the quadrature weights
+				 // and the coefficient values at the
+				 // quadrature points. To make this work, we
+				 // add the update flag @p
+				 // update_inverse_jacobians to the FEValues
+				 // constructor, and query the inverse of the
+				 // Jacobian in a loop over the quadrature
+				 // points (note that the Jacobian is not
+				 // related to any kind of degrees of freedom
+				 // directly). In the end, we condense the
+				 // constraints from Dirichlet boundary
+				 // conditions away from the right hand side.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system ()
 {
@@ -1621,7 +1596,7 @@ void LaplaceProblem<dim>::run ()
 
 
 
-				 // @sect3{The <code>main</code> function}
+				 // @sect3{The @p main function}
 
 				 // This is as in all other programs:
 int main ()
