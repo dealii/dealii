@@ -5348,7 +5348,6 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
  		      "element."));
 
   const unsigned int        n_components = DoFTools::n_components(dof);
-  const bool                fe_is_system = (n_components != 1);
 
 				   // set the component mask to either
 				   // the original value or a vector
