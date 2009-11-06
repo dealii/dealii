@@ -2355,7 +2355,9 @@ namespace internal
 		    typename BaseClass::ExcInvalidObject());
 	    Assert (&accessor.get_fe() != 0,
 		    typename BaseClass::ExcInvalidObject());
-	    Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
+	    Assert (static_cast<unsigned int>(local_source_end-local_source_begin)
+		    ==
+		    accessor.get_fe().dofs_per_cell,
 		    typename BaseClass::ExcVectorDoesNotMatch());
 	    Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
 		    typename BaseClass::ExcVectorDoesNotMatch());
