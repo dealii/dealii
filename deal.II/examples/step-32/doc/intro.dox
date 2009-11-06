@@ -798,7 +798,8 @@ the following quantities:
   @f]
   The factor $-\frac{\mathbf x}{\|\mathbf x\|}$ is the unit vector pointing
   radially inward. Of course, within this problem, we are only interested in
-  the branch that pertains to within the earth, i.e. $\|\mathbf x\|<R_1$. In
+  the branch that pertains to within the earth, i.e. $\|\mathbf
+  x\|<R_1$. In
   the program, we therefore only consider the expression
   @f[
     \mathbf g(\mathbf x) =
@@ -810,6 +811,16 @@ the following quantities:
   @f]
   where we can infer the last expression because we know Earth's gravity at
   the surface (where $\|x\|=R_1$).
+
+  One can derive a more general expression by integrating the
+  differential equation for $\varphi(r)$ in the case that the density
+  distribution is radially symmetric, i.e. $\rho(\mathbf
+  x)=\rho(\|\mathbf x\|)=\rho(r)$. In that case, one would get
+  @f[
+    \varphi(r)
+    = 4\pi G \int_0^r \frac 1{s^2} \int_0^t t^2 \rho(t) \; ds \; dt.
+  @f]
+
 
   There are two problems with this, however: (i) The Earth is not homogenous,
   i.e. the density $\rho$ depends on $\mathbf x$; in fact it is not even a
