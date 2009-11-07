@@ -35,6 +35,9 @@
 #ifdef DEAL_II_USE_TRILINOS
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #    include <Epetra_MpiComm.h>
+#    include <lac/vector_memory.h>
+#    include <lac/trilinos_vector.h>
+#    include <lac/trilinos_block_vector.h>
 #  endif
 #  include "Epetra_SerialComm.h"
 #endif
@@ -578,9 +581,29 @@ namespace Utilities
     MPI_InitFinalize::~MPI_InitFinalize()
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+
+#  ifdef DEAL_II_USE_TRILINOS
+				       // make memory pool release all
+				       // vectors that are no longer
+				       // used at this point. this is
+				       // relevant because the static
+				       // object destructors run for
+				       // these vectors at the end of
+				       // the program would run after
+				       // MPI_Finalize is called,
+				       // leading to errors
+      GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
+	::release_unused_memory ();
+      GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
+	::release_unused_memory ();
+#  endif
+
       int mpi_err = 0;
 
-      if (program_uses_mpi() == true && owns_mpi == true)
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+      if (program_uses_mpi() == true && owns_mpi == true &&
+	  MPI_has_been_started != 0)
 	mpi_err = MPI_Finalize();
 
       AssertThrow (mpi_err == 0,

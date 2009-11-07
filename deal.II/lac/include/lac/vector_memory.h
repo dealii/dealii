@@ -317,6 +317,12 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
     virtual void free (const VECTOR * const);
 
 				     /**
+				      * Release all vectors that are
+				      * not currently in use.
+				      */
+    static void release_unused_memory ();
+    
+				     /**
 				      * Memory consumed by this class
 				      * and all currently allocated
 				      * vectors.
@@ -573,6 +579,31 @@ GrowingVectorMemory<VECTOR>::free(const VECTOR* const v)
 	}
     }
   Assert(false, typename VectorMemory<VECTOR>::ExcNotAllocatedHere());
+}
+
+
+
+template<typename VECTOR>
+void
+GrowingVectorMemory<VECTOR>::release_unused_memory ()
+{
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+
+  std::vector<entry_type> new_data;
+
+  if (pool.data != 0)
+    {
+      const typename std::vector<entry_type>::const_iterator
+	end = pool.data->end();
+      for (typename std::vector<entry_type>::const_iterator
+	     i = pool.data->begin(); i != end ; ++i)
+	if (i->first == false)
+	  delete i->second;
+	else
+	  new_data.push_back (*i);
+  
+      *pool.data = new_data;
+    }
 }
 
 
