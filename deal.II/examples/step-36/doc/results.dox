@@ -184,4 +184,16 @@ freedom? For example, if the particle were a spin-$1/2$ particle? In
 that case, we may want to start solving a vector-valued problem
 instead.
 
+<li> Our implementation of the deal.II library here uses the
+PETScWrappers and SLEPcWrappers and is suitable for running on serial
+machine architecture. However, for larger grids and with a larger
+number of degrees-of-freedom, we may want to run our application on
+parallel architectures. A parallel implementation of the above code
+can be particuarily useful here since the generalized eigenspectrum
+problem is somewhat more expensive to solve than the standard problems
+considered in the tutorial up-to-now. Fortunately, modifying the above
+program to be MPI complient is a relatively straightforward
+procedure. A sketch of how this can be done can be found in @ref
+step_17 "step-17".
+
 </ul>

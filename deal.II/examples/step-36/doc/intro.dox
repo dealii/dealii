@@ -64,7 +64,7 @@ function $\Psi(\mathbf x)$ that satisfies a relation of the
 As a consequence, this particle can only exist in a certain number of
 eigenstates that correspond to the energy eigenvalues
 $\varepsilon_\ell$ admitted as solutions of this equation. The
-Copenhagen interpretation of quantum mechanics posits that, if a
+orthodox interpretation of quantum mechanics posits that, if a
 particle has energy $\varepsilon_\ell$ then the probability of finding
 it at location $\mathbf x$ is proportional to $|\Psi_\ell(\mathbf
 x)|^2$ where $\Psi_\ell$ is the eigenfunction that corresponds to this
