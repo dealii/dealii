@@ -329,7 +329,7 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
 	  ExcDimensionMismatch(vec_size, v.size()));
 
   const unsigned int blocking = 1<<BLOCK_LEVEL;
-  register Number sum1, sum2, sum3, sum = Number();
+  Number sum1, sum2, sum3, sum = Number();
   const Number * X = val, *X_end = X + vec_size, 
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
@@ -462,7 +462,7 @@ Number Vector<Number>::mean_value () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   const unsigned int blocking = 1<<BLOCK_LEVEL;
-  register Number sum1, sum2, sum3, sum = 0.;
+  Number sum1, sum2, sum3, sum = 0.;
   const Number * X = val, *X_end = X + vec_size, 
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
