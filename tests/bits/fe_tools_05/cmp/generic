@@ -30,7 +30,7 @@ DEAL::0 3.0 6.0 28. 45. 48. 69. 85. 1.0e+02 1.1e+02 1.1e+02 1.3e+02 0.50 3.0 25.
 DEAL::Checking Q1 against Q3 in 1d:
 DEAL::Checking Q3 against Q1 in 1d:
 DEAL::Checking Q1 against Q3 in 2d:
-DEAL::8.9e+02 97. 16.
+DEAL::9.0e+02 97. 16.
 DEAL::0 1.3 2.3 2.0 2.0 3.4 8.0 8.3 7.0 11. 9.7 9.9 11. 5.4 0.83 13. 12. 12. 16. 14. 15. 13. 3.0 11. 
 DEAL::Checking Q3 against Q1 in 2d:
 DEAL::5.8e+02 1.9e+02 88.
