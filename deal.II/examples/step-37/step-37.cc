@@ -1596,7 +1596,7 @@ void LaplaceProblem<dim>::run ()
 
 
 
-				 // @sect3{The @p main function}
+				 // @sect3{The <code>main</code> function}
 
 				 // This is as in all other programs:
 int main ()
