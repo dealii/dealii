@@ -404,7 +404,7 @@ Vector<Number>::norm_sqr () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   const unsigned int blocking = 1<<BLOCK_LEVEL;
-  register real_type sum1, sum2, sum3, sum = 0.;
+  real_type sum1, sum2, sum3, sum = 0.;
   const Number * X = val, *X_end = X + vec_size, 
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
@@ -522,7 +522,7 @@ Vector<Number>::l1_norm () const
   Assert (vec_size!=0, ExcEmptyObject());
  
   const unsigned int blocking = 1<<BLOCK_LEVEL;
-  register real_type sum1, sum2, sum3, sum = 0.;
+  real_type sum1, sum2, sum3, sum = 0.;
   const Number * X = val, *X_end = X + vec_size, 
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
@@ -596,7 +596,7 @@ Vector<Number>::lp_norm (const real_type p) const
     return std::sqrt(norm_sqr());
 
   const unsigned int blocking = 1<<BLOCK_LEVEL;
-  register real_type sum1, sum2, sum3, sum = 0.;
+  real_type sum1, sum2, sum3, sum = 0.;
   const Number * X = val, *X_end = X + vec_size, 
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
