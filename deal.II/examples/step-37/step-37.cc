@@ -152,7 +152,7 @@ namespace WorkStreamData
   {}
 
   template<typename number>
-  ScratchData<number>::ScratchData (const ScratchData &scratch)
+  ScratchData<number>::ScratchData (const ScratchData &)
 		  :
 		  solutions ()
   {}
@@ -173,7 +173,7 @@ namespace WorkStreamData
   {}
 
   template <typename number>
-  CopyData<number>::CopyData (const CopyData &scratch)
+  CopyData<number>::CopyData (const CopyData &)
 		  :
 		  ScratchData<number> ()
   {}
@@ -603,7 +603,7 @@ MatrixFree<number,Transformation>::vmult (Vector<number2>       &dst,
 				 // for the multigrid operations to be
 				 // well-defined): do the same. Since we
 				 // implement a symmetric operation, we can
-				 // refer to the @ vmult_add operation.
+				 // refer to the @p vmult_add operation.
 template <typename number, class Transformation>
 template <typename number2>
 void
@@ -768,42 +768,36 @@ reinit (const unsigned int        n_dofs_in,
 				   // to one chunk, which will determine the
 				   // size of the full matrix that we work
 				   // on. If we choose too few cells, then the
-				   // gains from using the matrix-matrix product
-				   // will not be fully utilized (dgemm tends to
-				   // provide more efficiency the larger the
-				   // matrix dimensions get). If we choose too
-				   // many, we will firstly degrade
-				   // parallelization (we need to have
-				   // sufficiently independent tasks), and
-				   // secondly introduce an inefficiency that
-				   // comes from the computer architecture: In
-				   // the actual working function above, right
-				   // after the first matrix-matrix
-				   // multiplication, we transform the solution
-				   // on quadrature points by using
-				   // derivatives. Obviously, we want to have
-				   // fast access to that data, so it should
-				   // still be present in processor cache and
-				   // not needed to be fetched from main
-				   // memory. The total memory usage of the data
-				   // on quadrature points should not be more
-				   // than about a third of the cache size of
-				   // the processor in order to be on the safe
-				   // side. Since most of today's processors
-				   // provide 512 kB or more cache memory per
-				   // core, we choose about 150 kB as a size to
-				   // leave some room for other things to be
-				   // stored in the CPU. Clearly, this is an
+				   // gains from using the matrix-matrix
+				   // product will not be fully utilized
+				   // (dgemm tends to provide more efficiency
+				   // the larger the matrix dimensions get),
+				   // so we choose at least 60 cells for one
+				   // chunk (except when there are very few
+				   // cells, like on the coarse levels of the
+				   // multigrid scheme). If we choose too
+				   // many, we will degrade parallelization
+				   // (we need to have sufficiently
+				   // independent tasks). We need to also
+				   // think about the fact that most high
+				   // performance BLAS implementations
+				   // internally work with square
+				   // sub-matrices. Choosing as many cells in
+				   // a chunk as there are degrees of freedom
+				   // on each cell (coded in @p
+				   // matrix_sizes.m) respects the BLAS GEMM
+				   // design, whenever we exceed 60. Clearly,
+				   // the chunk size is an
 				   // architecture-dependent value and the
-				   // interested user can squeeze out some extra
-				   // performance by hand-tuning this
-				   // parameter. Once we have chosen the number
-				   // of cells we collect in one chunk, we
-				   // determine how many chunks we have on the
-				   // given cell range and recalculate the
+				   // interested user can squeeze out some
+				   // extra performance by hand-tuning this
+				   // parameter. Once we have chosen the
+				   // number of cells we collect in one chunk,
+				   // we determine how many chunks we have on
+				   // the given cell range and recalculate the
 				   // actual chunk size in order to evenly
 				   // distribute the chunks.
-  const unsigned int divisor = 150000/(matrix_sizes.n*sizeof(double));
+  const unsigned int divisor = std::max(60U, matrix_sizes.m);
   const unsigned int n_chunks = std::max (matrix_sizes.n_cells/divisor + 1,
 					  2*multithread_info.n_default_threads);
 
@@ -1223,8 +1217,8 @@ void LaplaceProblem<dim>::setup_system ()
   system_matrix.get_constraints().close();
   std::cout.precision(4);
   std::cout << "System matrix memory consumption: "
-	    << system_matrix.memory_consumption()/std::pow(2.,20.)
-	    << " MBytes."
+	    << system_matrix.memory_consumption()/double(1<<20)
+	    << " MiB."
 	    << std::endl;
 
   solution.reinit (mg_dof_handler.n_dofs());
@@ -1522,8 +1516,8 @@ void LaplaceProblem<dim>::solve ()
        mg_transfer.memory_consumption() +
        coarse_matrix.memory_consumption());
   std::cout << "Multigrid objects memory consumption: "
-	    << multigrid_memory/std::pow(2.,20.)
-	    << " MBytes."
+	    << multigrid_memory/double(1<<20)
+	    << " MiB."
 	    << std::endl;
 
   SolverControl           solver_control (1000, 1e-12);

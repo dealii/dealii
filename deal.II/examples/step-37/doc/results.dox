@@ -1,46 +1,48 @@
 <h1>Results</h1>
 
-Since this example solves the same problem as @ref step_5 "step-5", we
-refer to the graphical output there. The only difference between the two is 
-the solver and the implementation of the matrix-vector products. 
+<h3>Program output</h3>
+
+Since this example solves the same problem as @ref step_5 "step-5" (except for
+a different coefficient), we refer to the graphical output there. Here, we
+evaluate some aspects of the multigrid solver.
 
 When we run this program in 2D for quadratic ($Q_2$) elements, we get the
 following output:
 @code
 Cycle 0
 Number of degrees of freedom: 337
-System matrix memory consumption: 0.02573 MBytes.
-Multigrid objects memory consumption: 0.05083 MBytes.
+System matrix memory consumption: 0.02573 MiB.
+Multigrid objects memory consumption: 0.05083 MiB.
 Convergence in 10 CG iterations.
 
 Cycle 1
 Number of degrees of freedom: 1313
-System matrix memory consumption: 0.09254 MBytes.
-Multigrid objects memory consumption: 0.1794 MBytes.
+System matrix memory consumption: 0.09257 MiB.
+Multigrid objects memory consumption: 0.1794 MiB.
 Convergence in 10 CG iterations.
 
 Cycle 2
 Number of degrees of freedom: 5185
-System matrix memory consumption: 0.3552 MBytes.
-Multigrid objects memory consumption: 0.6777 MBytes.
+System matrix memory consumption: 0.3553 MiB.
+Multigrid objects memory consumption: 0.6779 MiB.
 Convergence in 10 CG iterations.
 
 Cycle 3
 Number of degrees of freedom: 20609
-System matrix memory consumption: 1.397 MBytes.
-Multigrid objects memory consumption: 2.644 MBytes.
+System matrix memory consumption: 1.397 MiB.
+Multigrid objects memory consumption: 2.645 MiB.
 Convergence in 10 CG iterations.
 
 Cycle 4
 Number of degrees of freedom: 82177
-System matrix memory consumption: 5.544 MBytes.
-Multigrid objects memory consumption: 10.46 MBytes.
+System matrix memory consumption: 5.546 MiB.
+Multigrid objects memory consumption: 10.46 MiB.
 Convergence in 10 CG iterations.
 
 Cycle 5
 Number of degrees of freedom: 328193
-System matrix memory consumption: 22.1 MBytes.
-Multigrid objects memory consumption: 41.64 MBytes.
+System matrix memory consumption: 22.11 MiB.
+Multigrid objects memory consumption: 41.65 MiB.
 Convergence in 10 CG iterations.
 @endcode
 
@@ -59,38 +61,246 @@ factor if one quarter):
 @code
 Cycle 0
 Number of degrees of freedom: 517
-System matrix memory consumption: 0.1001 MBytes.
-Multigrid objects memory consumption: 0.1463 MBytes.
+System matrix memory consumption: 0.1001 MiB.
+Multigrid objects memory consumption: 0.1463 MiB.
 Convergence in 9 CG iterations.
 
 Cycle 1
 Number of degrees of freedom: 3817
-System matrix memory consumption: 0.6613 MBytes.
-Multigrid objects memory consumption: 0.8896 MBytes.
+System matrix memory consumption: 0.6613 MiB.
+Multigrid objects memory consumption: 0.8896 MiB.
 Convergence in 10 CG iterations.
 
 Cycle 2
 Number of degrees of freedom: 29521
-System matrix memory consumption: 5.099 MBytes.
-Multigrid objects memory consumption: 6.653 MBytes.
+System matrix memory consumption: 5.1 MiB.
+Multigrid objects memory consumption: 6.653 MiB.
 Convergence in 10 CG iterations.
 
 Cycle 3
 Number of degrees of freedom: 232609
-System matrix memory consumption: 40.4 MBytes.
-Multigrid objects memory consumption: 52.24 MBytes.
+System matrix memory consumption: 40.4 MiB.
+Multigrid objects memory consumption: 52.24 MiB.
 Convergence in 11 CG iterations.
 
 Cycle 4
 Number of degrees of freedom: 1847617
-System matrix memory consumption: 322 MBytes.
-Multigrid objects memory consumption: 415.1 MBytes.
+System matrix memory consumption: 322 MiB.
+Multigrid objects memory consumption: 415.1 MiB.
 Convergence in 11 CG iterations.
 @endcode
 
-A comparison of the memory consumption of the MatrixFree class with a 
-standard SparseMatrix object shows that, for the largest problem considered
-in 3D, the memory consumption for SparseMatrix and its sparsity pattern 
-would be about 1.3 GBytes, which is a factor of 4 more memory. If combined
-with cubic elements in 3D, the MatrixFree class would decrease memory 
-consumption even by a factor of 12.
+
+<h3>Comparison with a sparse matrix</h3>
+
+In order to understand the capabilities of this class, we compare the memory
+consumption and execution (wallclock) time for assembly and 50 matrix-vector
+products (MV) on a <b>3D problem with one million unknowns</b> the classical
+sparse matrix implementation (SpM) and the MatrixFree implementation shown
+here (M-F). Both matrices are based on @p double %numbers. The program is run
+on a 2.8 GHz Opteron processor with the ACML BLAS, once utilizing only one
+core, and once utilizing four cores. The sparse matrix is initialized using a
+CompressedSimpleSparsityPattern for calling the
+DoFTools::make_sparsity_pattern function, and then copied to a SparsityPattern
+object. The boundary nodes are eliminated using the ConstraintMatrix class, so
+that only actual nonzeros are stored in the matrix.
+
+<table align="center" border="1">
+  <tr>
+    <th>&nbsp;</th>
+    <th colspan="2">Memory consumption</th>
+    <th colspan="2">Time assembly</th>
+    <th colspan="2">Time 50 MV, 1 CPU</th>
+    <th colspan="2">Time 50 MV, 4 CPUs</th>
+  </tr>
+  <tr>
+    <th align="center">element order</th>
+    <th align="center">SpM</th>
+    <th align="center">M-F</th>
+    <th align="center">SpM</th>
+    <th align="center">M-F</th>
+    <th align="center">SpM</th>
+    <th align="center">M-F</th>
+    <th align="center">SpM</th>
+    <th align="center">M-F</th>
+  </tr>
+  <tr>
+    <td align="center">1</td>
+    <td align="center">299 MiB</td>
+    <td align="center">394 MiB</td>
+    <td align="center">8.09 s</td>
+    <td align="center">3.43 s</td>
+    <td align="center">5.50 s</td>
+    <td align="center">22.4 s</td>
+    <td align="center">4.30 s</td>
+    <td align="center">11.0 s</td>
+  </tr>
+  <tr>
+    <td align="center">2</td>
+    <td align="center">698 MiB</td>
+    <td align="center">177 MiB</td>
+    <td align="center">12.43 s</td>
+    <td align="center">1.32 s</td>
+    <td align="center">12.0 s</td>
+    <td align="center">18.6 s</td>
+    <td align="center">9.10 s</td>
+    <td align="center">6.31 s</td>
+  </tr>
+  <tr>
+    <td align="center">3</td>
+    <td align="center">1295 MiB</td>
+    <td align="center">124 MiB</td>
+    <td align="center">41.1 s</td>
+    <td align="center">1.31 s</td>
+    <td align="center">21.2 s</td>
+    <td align="center">23.7 s</td>
+    <td align="center">16.0 s</td>
+    <td align="center">7.43 s</td>
+  </tr>
+  <tr>
+    <td align="center">4</td>
+    <td align="center">2282 MiB</td>
+    <td align="center">107 MiB</td>
+    <td align="center">117 s</td>
+    <td align="center">1.97 s</td>
+    <td align="center">40.8 s</td>
+    <td align="center">36.3 s</td>
+    <td align="center">19.7 s</td>
+    <td align="center">10.9 s</td>
+  </tr>
+  <tr>
+    <td align="center">5</td>
+    <td align="center">3597 MiB</td>
+    <td align="center">96.4 MiB</td>
+    <td align="center">510 s</td>
+    <td align="center">5.52 s</td>
+    <td align="center">75.7 s</td>
+    <td align="center">53.9 s</td>
+    <td align="center">29.3 s</td>
+    <td align="center">15.7 s</td>
+  </tr>
+  <tr>
+    <td align="center">6</td>
+    <td align="center">5679 MiB</td>
+    <td align="center">96.3 MiB</td>
+    <td align="center">2389 s</td>
+    <td align="center">26.1 s</td>
+    <td align="center">135 s</td>
+    <td align="center">79.1 s</td>
+    <td align="center">45.8 s</td>
+    <td align="center">24.3 s</td>
+  </tr>
+</table>
+
+There are a few interesting things with the %numbers in this table. 
+
+Firstly, we see the disappointing fact that for <b>linear elements</b> the
+MatrixFree class does actually consume more memory than a SparseMatrix with
+its SparsityPattern, despite the efforts made in this program. As mentioned
+earlier, this is mostly because the Transformation data is stored for every
+quadrature point. These are six doubles, and there are about eight times as
+many quadrature points as there are degrees of freedom. In first
+approximation, the matrix consumes 384 (= 8*6*sizeof(double)) bytes for each
+degree of freedom. On the other hand, the sparse matrix has a bandwidth of 27,
+so each dof gives rise to about 324 (= 27*12) bytes. A more clever
+implementation would try to compress the Jacobian transformation data, by
+exploiting similarities between the mappings within the cells, as well as from
+one cell to the next. This could dramatically reduce the memory requirements,
+and hence, increase the speed for lower-order implementations.
+
+Secondly, we observe that the memory requirements for a SparseMatrix grow
+quickly as the order of the elements increases. This is because there are
+increasingly many entries in each row because more degrees of freedom couple
+to each other. The matrix-free implementation does not suffer from this
+drawback. Here, the memory consumption decreases instead, since the number of
+DoFs that are shared among elements decreases, which decreases the relative
+amount of quadrature points. Regarding the execution speed, we see that the
+matrix-free variant gets more competitive with higher order, and it does scale
+better (3.5 speedup with four processors compared to the serial case, compared
+to 2-2.5 speedup for the SparseMatrix). The advantage in %parallel scaling was
+expected, because the matrix-free variant is less memory-bound for higher
+order implementations.
+
+A third thing, which is unrelated to this tutorial program, is the fact that
+standard matrix assembly gets really slow for high order elements. The %numbers
+shown here are based on the usual routines that many other tutorial programs
+make use of. A closer analysis of this shows that the cell data does not fit
+into cache anymore. One could circumvent this problem by writing the assembly
+as a matrix-matrix product, and using (cache-aware) BLAS implementations.
+
+For completeness, here comes a similar table for a <b>2D problem with 5.7
+million unknowns</b>. Since the excess in work for the matrix-free
+implementation is less compared to 3D, the implementation is more competitive
+here.
+
+<table align="center" border="1">
+  <tr>
+    <th>&nbsp;</th>
+    <th colspan="2">Memory consumption</th>
+    <th colspan="2">Time assembly</th>
+    <th colspan="2">Time 50 MV, 4 CPUs</th>
+  </tr>
+  <tr>
+    <th align="center">element order</th>
+    <th align="center">SpM</th>
+    <th align="center">M-F</th>
+    <th align="center">SpM</th>
+    <th align="center">M-F</th>
+    <th align="center">SpM</th>
+    <th align="center">M-F</th>
+  </tr>
+  <tr>
+    <td align="center">1</td>
+    <td align="center">659 MiB</td>
+    <td align="center">661 MiB</td>
+    <td align="center">18.8 s</td>
+    <td align="center">6.45 s</td>
+    <td align="center">11.0 s</td>
+    <td align="center">28.8 s</td>
+  </tr>
+  <tr>
+    <td align="center">2</td>
+    <td align="center">1119 MiB</td>
+    <td align="center">391 MiB</td>
+    <td align="center">15.6 s</td>
+    <td align="center">2.46 s</td>
+    <td align="center">17.1 s</td>
+    <td align="center">16.2 s</td>
+  </tr>
+  <tr>
+    <td align="center">3</td>
+    <td align="center">1711 MiB</td>
+    <td align="center">318 MiB</td>
+    <td align="center">17.4 s</td>
+    <td align="center">1.82 s</td>
+    <td align="center">23.1 s</td>
+    <td align="center">13.7 s</td>
+  </tr>
+  <tr>
+    <td align="center">4</td>
+    <td align="center">2434 MiB</td>
+    <td align="center">285 MiB</td>
+    <td align="center">24.2 s</td>
+    <td align="center">1.34 s</td>
+    <td align="center">31.1 s</td>
+    <td align="center">14.6 s</td>
+  </tr>
+  <tr>
+    <td align="center">5</td>
+    <td align="center">3289 MiB</td>
+    <td align="center">266 MiB</td>
+    <td align="center">35.9 s</td>
+    <td align="center">1.26 s</td>
+    <td align="center">29.6 s</td>
+    <td align="center">16.7 s</td>
+  </tr>
+  <tr>
+    <td align="center">6</td>
+    <td align="center">4274 MiB</td>
+    <td align="center">254 MiB</td>
+    <td align="center">58.0 s</td>
+    <td align="center">1.12 s</td>
+    <td align="center">35.9 s</td>
+    <td align="center">19.4 s</td>
+  </tr>
+</table>
