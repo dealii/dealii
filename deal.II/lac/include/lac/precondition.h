@@ -1549,7 +1549,9 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 
 				 // calculate largest eigenvalue using a
 				 // hand-tuned CG iteration on the matrix
-				 // weighted by its diagonal.
+				 // weighted by its diagonal. we start 
+				 // with a vector that consists of ones 
+				 // only, weighted by the length.
 				 // 
 				 // TODO: can we obtain this with the
 				 // regular CG implementation? we would need
@@ -1564,7 +1566,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 
     VECTOR rhs, g;
     rhs.reinit(data.matrix_diagonal_inverse, true);
-    rhs = 1./sqrt(matrix.m());
+    rhs = 1./std::sqrt(static_cast<double>(matrix.m()));
     g.reinit(data.matrix_diagonal_inverse, true);
 
     unsigned int it=0;
