@@ -15,6 +15,7 @@
 #include <base/timer.h>
 #include <base/exceptions.h>
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 
 // these includes should probably be properly
@@ -263,7 +264,7 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
 TimerOutput::~TimerOutput()
 {
   while (active_sections.size() > 0)
-    exit_section();
+    leave_subsection();
 
   if (output_frequency != every_call && output_is_enabled == true)
     print_summary();
@@ -272,7 +273,7 @@ TimerOutput::~TimerOutput()
 
 
 void 
-TimerOutput::enter_section (const std::string &section_name)
+TimerOutput::enter_subsection (const std::string &section_name)
 {
   Threads::ThreadMutex::ScopedLock lock (mutex);
 
@@ -300,7 +301,7 @@ TimerOutput::enter_section (const std::string &section_name)
 
 
 void 
-TimerOutput::exit_section (const std::string &section_name)
+TimerOutput::leave_subsection (const std::string &section_name)
 {
   Assert (active_sections.size() > 0,
 	  ExcMessage("Cannot exit any section because none has been entered!"));
@@ -424,14 +425,14 @@ TimerOutput::print_summary () const
 		 << "+---------------------------------------------+------------"
 		 << "+------------+\n"
 		 << "| Total CPU time elapsed since start          |";
-      std::cout.width(10);
-      std::cout.precision(3);
+      out_stream << std::setw(10);
+      out_stream << std::setprecision(3);
       out_stream << total_cpu_time << "s |            |\n";
       out_stream << "|                                             |            "
 		 << "|            |\n";
       out_stream << "| Section                         | no. calls |";
-      std::cout.width(10);
-      std::cout.precision(3);
+      out_stream << std::setw(10);
+      out_stream << std::setprecision(3);
       out_stream << "  CPU time "  << " | % of total |\n";
       out_stream << "+---------------------------------+-----------+------------"
 		 << "+------------+";
@@ -448,13 +449,13 @@ TimerOutput::print_summary () const
 	  out_stream << std::endl;
 	  out_stream << "| " << name_out;
 	  out_stream << "| ";
-	  std::cout.width(9);
+	  out_stream << std::setw(9);
 	  out_stream << i->second.n_calls << " |";
-	  std::cout.width(10);
-	  std::cout.precision(3);
+	  out_stream << std::setw(10);
+	  out_stream << std::setprecision(3);
 	  out_stream << i->second.total_cpu_time << "s |";
-	  std::cout.width(10);
-	  std::cout.precision(2);
+	  out_stream << std::setw(10);
+	  out_stream << std::setprecision(2);
 	  out_stream << i->second.total_cpu_time/total_cpu_time * 100 << "% |";
 	}
       out_stream << std::endl
@@ -492,14 +493,14 @@ TimerOutput::print_summary () const
 		 << "+---------------------------------------------+------------"
 		 << "+------------+\n"
 		 << "| Total wallclock time elapsed since start    |";
-      std::cout.width(10);
-      std::cout.precision(3);
+      out_stream << std::setw(10);
+      out_stream << std::setprecision(3);
       out_stream << total_wall_time << "s |            |\n";
       out_stream << "|                                             |            "
 		 << "|            |\n";
       out_stream << "| Section                         | no. calls |";
-      std::cout.width(10);
-      std::cout.precision(3);
+      out_stream << std::setw(10);
+      out_stream << std::setprecision(3);
       out_stream << "  wall time | % of total |\n";
       out_stream << "+---------------------------------+-----------+------------"
 		 << "+------------+";
@@ -516,13 +517,13 @@ TimerOutput::print_summary () const
 	  out_stream << std::endl;
 	  out_stream << "| " << name_out;
 	  out_stream << "| ";
-	  std::cout.width(9);
+	  out_stream << std::setw(9);
 	  out_stream << i->second.n_calls << " |";
-	  std::cout.width(10);
-	  std::cout.precision(3);
+	  out_stream << std::setw(10);
+	  out_stream << std::setprecision(3);
 	  out_stream << i->second.total_wall_time << "s |";
-	  std::cout.width(10);
-	  std::cout.precision(2);
+	  out_stream << std::setw(10);
+	  out_stream << std::setprecision(2);
 	  out_stream << i->second.total_wall_time/total_wall_time * 100 << "% |";
 	}
       out_stream << std::endl

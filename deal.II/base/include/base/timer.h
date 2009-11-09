@@ -86,7 +86,7 @@ class Timer
 				      * CPU times over all processors in the
 				      * MPI network when requested by the
 				      * operator ().
-				      * 
+				      *
 				      * Starts the timer at 0 sec.
 				      *
 				      * This constructor is only available
@@ -219,30 +219,30 @@ class Timer
  *
  * Use of this class could be as follows:
  * @code
- *   TimerOuput timer (std::cout, TimerOutput::summary, 
+ *   TimerOuput timer (std::cout, TimerOutput::summary,
  *                     TimerOutput::wall_times);
  *
- *   timer.enter_section ("Setup dof system");
+ *   timer.enter_subsection ("Setup dof system");
  *   setup_dofs();
- *   timer.exit_section();
+ *   timer.leave_subsection();
  *
- *   timer.enter_section ("Assemble");
+ *   timer.enter_subsection ("Assemble");
  *   assemble_system_1();
- *   timer.exit_section();
+ *   timer.leave_subsection();
  *
- *   timer.enter_section ("Solve");
+ *   timer.enter_subsection ("Solve");
  *   solve_system_1();
- *   timer.exit_section();
+ *   timer.leave_subsection();
  *
- *   timer.enter_section ("Assemble");
+ *   timer.enter_subsection ("Assemble");
  *   assemble_system_2();
- *   timer.exit_section();
+ *   timer.leave_subsection();
  *
- *   timer.enter_section ("Solve");
+ *   timer.enter_subsection ("Solve");
  *   solve_system_2();
- *   timer.exit_section();
+ *   timer.leave_subsection();
  *
- *   // do something else...   
+ *   // do something else...
  * @endcode
  * When run, this program will return an output like this:
  * @code
@@ -257,12 +257,12 @@ class Timer
  * +---------------------------------+-----------+------------+------------+
  * @endcode
  * The output will see that we entered the assembly and solve section
- * twice, and reports how much time we spent there. Moreover, the class 
+ * twice, and reports how much time we spent there. Moreover, the class
  * measures the total time spent from start to termination of the TimerOutput
  * object. In this case, we did a lot of other stuff, so that the time
  * proportions of the functions we measured are far away from 100 precent.
  *
- * See the @ref step_32 "step-32" tutorial program for usage of this class. 
+ * See the @ref step_32 "step-32" tutorial program for usage of this class.
  *
  * @ingroup utilities
  * @author M. Kronbichler, 2009.
@@ -282,14 +282,14 @@ class TimerOutput
 				      * Sets whether to show CPU times, wall
 				      * times, or both CPU and wall times.
 				      */
-    enum OutputType      {cpu_times, wall_times, cpu_and_wall_times} 
+    enum OutputType      {cpu_times, wall_times, cpu_and_wall_times}
     output_type;
-    
+
 				     /**
 				      * Constructor that takes std::cout as
 				      * output stream.
 				      */
-    TimerOutput (std::ostream              &stream, 
+    TimerOutput (std::ostream              &stream,
 		 const enum OutputFrequency output_frequency,
 		 const enum OutputType      output_type);
 
@@ -297,10 +297,10 @@ class TimerOutput
 				      * Constructor that takes a
 				      * ConditionalOStream to write output to.
 				      */
-    TimerOutput (ConditionalOStream        &stream, 
+    TimerOutput (ConditionalOStream        &stream,
 		 const enum OutputFrequency output_frequency,
 		 const enum OutputType      output_type);
-    
+
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 				     /**
 				      * Constructor that takes an MPI
@@ -314,7 +314,7 @@ class TimerOutput
 				      * stream.
 				      */
     TimerOutput (MPI_Comm                   mpi_comm,
-		 std::ostream              &stream, 
+		 std::ostream              &stream,
 		 const enum OutputFrequency output_frequency,
 		 const enum OutputType      output_type);
 
@@ -330,7 +330,7 @@ class TimerOutput
 				      * ConditionalOStream to write output to.
 				      */
     TimerOutput (MPI_Comm                   mpi_comm,
-		 ConditionalOStream        &stream, 
+		 ConditionalOStream        &stream,
 		 const enum OutputFrequency output_frequency,
 		 const enum OutputType      output_type);
 #endif
@@ -348,12 +348,22 @@ class TimerOutput
 				      * exists, that section is done once
 				      * again.
 				      */
+    void enter_subsection (const std::string &section_name);
+
+				     /**
+				      * Same as @p enter_subsection.
+				      */
     void enter_section (const std::string &section_name);
 
-				     /**				       
+				     /**
 				      * Leave a section. If no name is given,
 				      * the last section that was entered is
 				      * left.
+				      */
+    void leave_subsection (const std::string &section_name = std::string());
+
+				     /**
+				      * Same as @p leave_subsection.
 				      */
     void exit_section (const std::string &section_name = std::string());
 
@@ -457,6 +467,27 @@ class TimerOutput
 				      */
     Threads::ThreadMutex mutex;
 };
+
+
+
+/* ---------------- inline functions ----------------- */
+
+inline
+void
+TimerOutput::enter_section (const std::string &section_name)
+{
+  enter_subsection(section_name);
+}
+
+
+
+inline
+void
+TimerOutput::exit_section (const std::string &section_name)
+{
+  leave_subsection(section_name);
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 
