@@ -1162,11 +1162,13 @@ template void SparsityPattern::add_entries<const unsigned int*> (const unsigned 
 								 const unsigned int*,
 								 const unsigned int*,
 								 const bool);
+#ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void SparsityPattern::add_entries<std::vector<unsigned int>::const_iterator> 
 (const unsigned int,
  std::vector<unsigned int>::const_iterator,
  std::vector<unsigned int>::const_iterator,
  const bool);
+#endif
 template void SparsityPattern::add_entries<std::vector<unsigned int>::iterator> 
 (const unsigned int,
  std::vector<unsigned int>::iterator,

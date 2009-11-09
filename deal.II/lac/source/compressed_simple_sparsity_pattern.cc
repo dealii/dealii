@@ -422,10 +422,11 @@ CompressedSimpleSparsityPattern::n_nonzero_elements () const
 template void CompressedSimpleSparsityPattern::Line::add_entries(unsigned int *,
 								 unsigned int *,
 								 const bool);
+#ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void CompressedSimpleSparsityPattern::Line::
 add_entries(std::vector<unsigned int>::iterator,
 	    std::vector<unsigned int>::iterator,
 	    const bool);
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
