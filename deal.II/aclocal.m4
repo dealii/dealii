@@ -4989,7 +4989,7 @@ void f (const std::ostream &out);
 
 
 dnl -------------------------------------------------------------
-dnl Check whether the numeric_limits classes are available
+dnl Check whether the <iosfwd> header is available
 dnl
 dnl Usage: DEAL_II_HAVE_STD_OSTREAM_HEADER
 dnl
@@ -5771,12 +5771,12 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
           if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
                -o -d $DEAL_II_PETSC_DIR/lib/libg_complex/$DEAL_II_PETSC_ARCH \
              ; then
-            AC_MSG_ERROR([PETSc has not been compiled for C++ with scalar type real, 
+            AC_MSG_ERROR([PETSc has not been compiled for C++ with scalar type real,
                   but deal.II needs this for this PETSc version] $PETSC_VERSION)
           else
             AC_MSG_ERROR([PETSc has not been compiled for the architecture
                           specified with --with-petsc-arch])
-          fi 
+          fi
         fi
         ;;
 
@@ -5862,7 +5862,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
      AC_MSG_RESULT(not found)
   else
      AC_MSG_RESULT($DEAL_II_PETSC_MPIUNI_LIB)
-  fi 
+  fi
 ])
 
 
@@ -5885,7 +5885,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_COMPLEX, dnl
     3.*)
       DEAL_II_PETSC_COMPLEX=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h \
                                | grep "#define PETSC_USE_COMPLEX" \
-                               | perl -pi -e 's/.*COMPLEX\s+//g;'`      
+                               | perl -pi -e 's/.*COMPLEX\s+//g;'`
     ;;
     *)
       AC_MSG_ERROR([Unknown PETSc version])
@@ -5904,7 +5904,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_COMPLEX, dnl
      AC_MSG_RESULT(not found)
   fi fi
 
-  dnl If we have previously found PETSc and here with a complex 
+  dnl If we have previously found PETSc and here with a complex
   dnl scalar type then set the DEAL_II_USE_COMPLEX macro
   if test "$USE_CONTRIB_PETSC" = "yes" ; then
     if test "$DEAL_II_PETSC_COMPLEX" = "1" ; then
