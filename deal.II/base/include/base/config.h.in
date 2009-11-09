@@ -235,8 +235,8 @@
 /* Defined if a PETSc installation was found and is going to be used */
 #undef DEAL_II_USE_PETSC
 
-/* Defined if a PETSc installation with complex scalar type was found 
-   and is going to be used */
+/* Defined if a PETSc installation was found with complex scalar type and is
+   going to be used */
 #undef DEAL_II_USE_PETSC_COMPLEX
 
 /* Defined if a SLEPc installation was found and is going to be used */
@@ -244,6 +244,9 @@
 
 /* Defined if a Trilinos installation was found and is going to be used */
 #undef DEAL_II_USE_TRILINOS
+
+/* Define if vector iterators are just plain pointers */
+#undef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 
 /* This error appears in the Apple edition of the gcc 3.3, which ships with
    Darwin7.9.0 and probably previous version. It leads to problems during

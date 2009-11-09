@@ -5017,6 +5017,40 @@ void f (const std::ostream &out);
 ])
 
 
+
+dnl -------------------------------------------------------------
+dnl Check whether the std::vector::iterator is just a plain pointer
+dnl
+dnl Usage: DEAL_II_CHECK_VECTOR_ITERATOR_IS_POINTER
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_VECTOR_ITERATOR_IS_POINTER, dnl
+[
+  AC_MSG_CHECKING(whether vector iterators are plain pointers)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <vector>
+template <typename T> void f(T) {}
+
+template void f(int *);
+template void f(std::vector<int>::iterator);
+    ],
+    [
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(DEAL_II_VECTOR_ITERATOR_IS_POINTER, 1,
+                [Define if vector iterators are just plain pointers])
+    ])
+])
+
+
+
 dnl -------------------------------------------------------------
 dnl Check whether glibc-like stacktrace information is available
 dnl for the Exception class. If it is, then try to also determine
