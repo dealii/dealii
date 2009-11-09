@@ -187,7 +187,6 @@ MGDoFAccessor<structdim, dim, spacedim>::copy_from (const MGDoFAccessor &a)
 
 
 template <int structdim, int dim, int spacedim>
-inline
 typename internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator
 MGDoFAccessor<structdim,dim,spacedim>::line (const unsigned int i) const
 {
@@ -206,7 +205,6 @@ MGDoFAccessor<structdim,dim,spacedim>::line (const unsigned int i) const
 
 
 template <int structdim, int dim, int spacedim>
-inline
 typename internal::MGDoFHandler::Iterators<dim,spacedim>::quad_iterator
 MGDoFAccessor<structdim,dim,spacedim>::quad (const unsigned int i) const
 {
