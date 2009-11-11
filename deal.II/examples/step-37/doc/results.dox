@@ -98,12 +98,15 @@ consumption and execution (wallclock) time for assembly and 50 matrix-vector
 products (MV) on a <b>3D problem with one million unknowns</b> the classical
 sparse matrix implementation (SpM) and the MatrixFree implementation shown
 here (M-F). Both matrices are based on @p double %numbers. The program is run
-on a 2.8 GHz Opteron processor with the ACML BLAS, once utilizing only one
-core, and once utilizing four cores. The sparse matrix is initialized using a
+on a 2.8 GHz Opteron processor with the <a href="http://www.amd.com/acml">ACML
+BLAS</a>. We present results running on one core core and four cores,
+respectively. Moreover, we measure the time it takes to construct the
+individual matrices and filling them with data (@p setup and @p assemble
+functions). The sparse matrix is initialized using a
 CompressedSimpleSparsityPattern for calling the
 DoFTools::make_sparsity_pattern function, and then copied to a SparsityPattern
 object. The boundary nodes are eliminated using the ConstraintMatrix class, so
-that only actual nonzeros are stored in the matrix.
+that only elements that are actually nonzero are stored in the matrix.
 
 <table align="center" border="1">
   <tr>
@@ -198,11 +201,12 @@ Firstly, we see the disappointing fact that for <b>linear elements</b> the
 MatrixFree class does actually consume more memory than a SparseMatrix with
 its SparsityPattern, despite the efforts made in this program. As mentioned
 earlier, this is mostly because the Transformation data is stored for every
-quadrature point. These are six doubles, and there are about eight times as
-many quadrature points as there are degrees of freedom. In first
-approximation, the matrix consumes 384 (= 8*6*sizeof(double)) bytes for each
-degree of freedom. On the other hand, the sparse matrix has a bandwidth of 27,
-so each dof gives rise to about 324 (= 27*12) bytes. A more clever
+quadrature point. For each quadrature point, the transformation consists of
+six doubles, and there are about eight times as many quadrature points as
+there are degrees of freedom. In first approximation, this means that the
+matrix consumes 384 (= @p sizeof(double) * 6 * 8) bytes for each degree of
+freedom. On the other hand, the sparse matrix has a bandwidth of 27 or less,
+so each dof gives rise to at most 324 (= 27 * 12) bytes. A more clever
 implementation would try to compress the Jacobian transformation data, by
 exploiting similarities between the mappings within the cells, as well as from
 one cell to the next. This could dramatically reduce the memory requirements,
@@ -210,16 +214,17 @@ and hence, increase the speed for lower-order implementations.
 
 Secondly, we observe that the memory requirements for a SparseMatrix grow
 quickly as the order of the elements increases. This is because there are
-increasingly many entries in each row because more degrees of freedom couple
-to each other. The matrix-free implementation does not suffer from this
-drawback. Here, the memory consumption decreases instead, since the number of
-DoFs that are shared among elements decreases, which decreases the relative
-amount of quadrature points. Regarding the execution speed, we see that the
-matrix-free variant gets more competitive with higher order, and it does scale
-better (3.5 speedup with four processors compared to the serial case, compared
-to 2-2.5 speedup for the SparseMatrix). The advantage in %parallel scaling was
-expected, because the matrix-free variant is less memory-bound for higher
-order implementations.
+increasingly many entries in each row, which exist due to more degrees of
+freedom that couple to each other. The matrix-free implementation does not
+suffer from this drawback. Here, the memory consumption decreases instead,
+since there are less DoFs that are shared among elements, which decreases the
+relative amount of quadrature points. Regarding the execution speed, we see
+that the matrix-free variant gets more competitive with higher order, and it
+does scale better when run on multiple processors (3.5 speedup with four
+processors compared to the serial case, compared to 2-2.5 speedup for the
+SparseMatrix). The advantage in %parallel scaling was expected, because the
+matrix-free variant is less memory-bound for higher order implementations, so
+that the additional computing power from many cores can better be exploited.
 
 A third thing, which is unrelated to this tutorial program, is the fact that
 standard matrix assembly gets really slow for high order elements. The %numbers
@@ -231,7 +236,7 @@ as a matrix-matrix product, and using (cache-aware) BLAS implementations.
 For completeness, here comes a similar table for a <b>2D problem with 5.7
 million unknowns</b>. Since the excess in work for the matrix-free
 implementation is less compared to 3D, the implementation is more competitive
-here.
+for lower-order elements.
 
 <table align="center" border="1">
   <tr>
