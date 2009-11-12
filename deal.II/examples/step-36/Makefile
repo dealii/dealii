@@ -52,9 +52,9 @@ ifneq ($(USE_CONTRIB_PETSC)$(USE_CONTRIB_SLEPC),yesyes)
 default run clean:
 	@echo
 	@echo "===========================================================" 
-	@echo "=   This program cannot be compiled without PETSc. Make   ="
-	@echo "=   sure you have PETSc installed and detected during     ="
-	@echo "=   configuration of deal.II                              ="
+	@echo "=   This program cannot be compiled without PETSc and     ="
+	@echo "=   SLEPc. Make sure you have PETSc and SLEPc installed   ="
+	@echo "=   and detected during configuration of deal.II          ="
 	@echo "==========================================================="
 	@echo
 
