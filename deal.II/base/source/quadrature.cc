@@ -277,34 +277,6 @@ Quadrature<dim>::~Quadrature ()
 
 
 
-template <>
-const std::vector<Point<0> > &
-Quadrature<0>::get_points () const
-{
-  Assert (false, ExcInternalError());
-  return quadrature_points;
-}
-
-
-
-template <int dim>
-const std::vector<Point<dim> > &
-Quadrature<dim>::get_points () const
-{
-  return quadrature_points;
-}
-
-
-
-template <int dim>
-const std::vector<double> &
-Quadrature<dim>::get_weights () const
-{
-  return weights;
-}
-
-
-
 template <int dim>
 unsigned int
 Quadrature<dim>::memory_consumption () const

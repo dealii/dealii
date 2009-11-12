@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * dimension zero contains no information. The main purpose of these
  * formulæ is their use in QProjector, which will create a useful
  * formula of dimension one out of them.
- * 
+ *
  * <h3>Mathematical background</h3>
  *
  * For each quadrature formula we denote by <tt>m</tt>, the maximal
@@ -89,7 +89,7 @@ class Quadrature : public Subscriptor
 				      * then be a face quadrature.
 				      */
     typedef Quadrature<dim-1> SubQuadrature;
-    
+
 				     /**
 				      * @deprecated Use size()
 				      * instead.
@@ -137,7 +137,7 @@ class Quadrature : public Subscriptor
 				      */
     Quadrature (const SubQuadrature &,
 		const Quadrature<1> &);
-    
+
 				     /**
 				      * Build this quadrature formula
 				      * as the <tt>dim</tt>-fold
@@ -165,7 +165,7 @@ class Quadrature : public Subscriptor
                                       * Copy constructor.
                                       */
     Quadrature (const Quadrature<dim> &q);
-    
+
 				     /**
 				      * Construct a quadrature formula
 				      * from given vectors of
@@ -210,7 +210,7 @@ class Quadrature : public Subscriptor
 				      * size.
 				      */
     Quadrature& operator = (const Quadrature<dim>&);
-    
+
 				     /**
 				      * Virtual destructor.
 				      */
@@ -220,7 +220,7 @@ class Quadrature : public Subscriptor
 				      * Number of quadrature points.
 				      */
     unsigned int size () const;
-    
+
 				     /**
 				      * Return the <tt>i</tt>th quadrature
 				      * point.
@@ -233,7 +233,7 @@ class Quadrature : public Subscriptor
 				      * points.
 				      */
     const std::vector<Point<dim> > & get_points () const;
-    
+
 				     /**
 				      * Return the weight of the <tt>i</tt>th
 				      * quadrature point.
@@ -294,14 +294,14 @@ class QAnisotropic : public Quadrature<dim>
 				      * quadrature rule.
 				      */
     QAnisotropic(const Quadrature<1>& qx);
-    
+
 				     /**
 				      * Constructor for a
 				      * two-dimensional formula.
 				      */
     QAnisotropic(const Quadrature<1>& qx,
 		 const Quadrature<1>& qy);
-    
+
 				     /**
 				      * Constructor for a
 				      * three-dimensional formula.
@@ -405,6 +405,28 @@ Quadrature<dim>::weight (const unsigned int i) const
 
 
 
+template <int dim>
+inline
+const std::vector<Point<dim> > &
+Quadrature<dim>::get_points () const
+{
+  Assert (dim > 0, ExcInternalError());
+  return quadrature_points;
+}
+
+
+
+template <int dim>
+inline
+const std::vector<double> &
+Quadrature<dim>::get_weights () const
+{
+  return weights;
+}
+
+
+
+
 
 /* -------------- declaration of explicit specializations ------------- */
 
@@ -424,9 +446,6 @@ Quadrature<1>::Quadrature (const Quadrature<0> &,
 
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &);
-
-template <>
-const std::vector<Point<0> > & Quadrature<0>::get_points () const;
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE
