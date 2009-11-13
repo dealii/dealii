@@ -12,14 +12,13 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/utilities.h>
 #include <lac/trilinos_vector.h>
-
-#include <cmath>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Epetra_Import.h>
+#  include <lac/trilinos_sparse_matrix.h>
+#  include <cmath>
+#  include <Epetra_Import.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -31,37 +30,32 @@ namespace TrilinosWrappers
 
 
     Vector::Vector ()
-		    :
-		    communicator (Utilities::Trilinos::
-				  duplicate_communicator(Utilities::Trilinos::comm_self())),
-		    map (0, 0, *communicator)
     {
       last_action = Zero;
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+      vector = std::auto_ptr<Epetra_FEVector> 
+	(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())));
     }
 
 
   
-    Vector::Vector (const Epetra_Map &InputMap)
-                    :
-		    communicator (Utilities::Trilinos::
-				  duplicate_communicator (InputMap.Comm())),
-		    map (Utilities::Trilinos::
-			 duplicate_map (InputMap, *communicator))
+    Vector::Vector (const Epetra_Map &input_map)
     {
-      last_action = Zero;
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+      reinit (input_map);
+    }
+
+
+  
+    Vector::Vector (const IndexSet &parallel_partitioner,
+		    const MPI_Comm &communicator)
+    {
+      reinit (parallel_partitioner, communicator);
     }
   
 
   
     Vector::Vector (const Vector &v)
                     :
-                    VectorBase(),
-		    communicator (Utilities::Trilinos::
-				  duplicate_communicator (*v.communicator)),
-		    map (Utilities::Trilinos::duplicate_map (v.map,
-							     *communicator))
+                    VectorBase()
     {
       last_action = Zero;
       vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
@@ -69,36 +63,50 @@ namespace TrilinosWrappers
 
 
 
-    Vector::Vector (const Epetra_Map &InputMap,
+    Vector::Vector (const Epetra_Map &input_map,
 		    const VectorBase &v)
                     :
-                    VectorBase(),
-		    communicator (Utilities::Trilinos::
-				  duplicate_communicator (InputMap.Comm())),
-		    map (Utilities::Trilinos::
-			 duplicate_map (InputMap, *communicator))
+                    VectorBase()
     {
-      AssertThrow (map.NumGlobalElements() == v.vector->Map().NumGlobalElements(),
-		   ExcDimensionMismatch (map.NumGlobalElements(),
+      AssertThrow (input_map.NumGlobalElements() == v.vector->Map().NumGlobalElements(),
+		   ExcDimensionMismatch (input_map.NumGlobalElements(),
 					 v.vector->Map().NumGlobalElements()));
 
       last_action = Zero;
       
-      if (map.SameAs(v.vector->Map()) == true)
+      if (input_map.SameAs(v.vector->Map()) == true)
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
       else
 	{
-	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(input_map));
 	  reinit (v, false, true);
 	}
     }
 
 
 
-    Vector::~Vector ()
+    Vector::Vector (const IndexSet   &parallel_partitioner,
+		    const VectorBase &v,
+		    const MPI_Comm   &communicator)
+                    :
+                    VectorBase()
     {
-      Utilities::Trilinos::destroy_communicator (*communicator);
+      AssertThrow ((int)parallel_partitioner.size() == v.vector->Map().NumGlobalElements(),
+		   ExcDimensionMismatch (parallel_partitioner.size(),
+					 v.vector->Map().NumGlobalElements()));
+
+      last_action = Zero;
+      
+      vector = std::auto_ptr<Epetra_FEVector>
+	(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,
+								    true)));
+      reinit (v, false, true);
     }
+
+
+
+    Vector::~Vector ()
+    {}
     
 
 
@@ -106,23 +114,27 @@ namespace TrilinosWrappers
     Vector::reinit (const Epetra_Map &input_map,
 		    const bool        fast)
     {
-      vector.reset();
-
-      Utilities::Trilinos::destroy_communicator (*communicator);
-      communicator.reset (Utilities::Trilinos::
-			  duplicate_communicator(input_map.Comm()));
-      map = Utilities::Trilinos::duplicate_map (input_map, *communicator);
-      
-      
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-
-      if (fast == false)
+      if (!vector->Map().SameAs(input_map))
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(input_map));
+      else if (fast == false)
 	{
 	  const int ierr = vector->PutScalar(0.);
-	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	  Assert (ierr == 0, ExcTrilinosError(ierr));
 	}
   
       last_action = Zero;
+    }
+    
+
+
+    void
+    Vector::reinit (const IndexSet &parallel_partitioner,
+		    const MPI_Comm &communicator,
+		    const bool      fast)
+    {
+      Epetra_Map map = parallel_partitioner.make_trilinos_map (communicator,
+							       true);
+      reinit (map, fast);
     }
 
 
@@ -144,14 +156,9 @@ namespace TrilinosWrappers
 	  if (vector->Map().SameAs(v.vector->Map()) == false)
 	    {
 	      vector.reset();
-	      Utilities::Trilinos::destroy_communicator (*communicator);
-	      communicator.reset (Utilities::Trilinos::
-				  duplicate_communicator(v.trilinos_vector()
-							 .Map().Comm()));
-	      map = Utilities::Trilinos::
-		    duplicate_map (v.trilinos_vector().Map(), *communicator);
 
-	      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	      vector = std::auto_ptr<Epetra_FEVector> 
+		(new Epetra_FEVector(v.vector->Map()));
 	      last_action = Zero;
 	    }
 	  else if (fast == false)
@@ -238,15 +245,6 @@ namespace TrilinosWrappers
       else
 	{
 	  vector.reset();
-
-	  Utilities::Trilinos::destroy_communicator (*communicator);
-	  communicator.reset (Utilities::Trilinos::
-			      duplicate_communicator(v.trilinos_vector().
-						     Map().Comm()));
-	  map = Utilities::Trilinos::
-		duplicate_map (v.trilinos_vector().Map(),
-			       *communicator);
-
 	  vector = std::auto_ptr<Epetra_FEVector> 
 	                    (new Epetra_FEVector(*v.vector));
 	  last_action = Zero;
@@ -287,7 +285,7 @@ namespace TrilinosWrappers
 
       if (vector->Map().SameAs(m.col_partitioner()) == false)
 	{
-	  map = m.col_partitioner();
+	  Epetra_Map map = m.col_partitioner();
 	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	}
 
@@ -305,43 +303,40 @@ namespace TrilinosWrappers
 
 
   Vector::Vector ()
-		  :
-		  map (0, 0,
-		       Utilities::Trilinos::comm_self())
   {
     last_action = Zero;
+    Epetra_LocalMap map (0, 0, Utilities::Trilinos::comm_self());
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
   }
 
 
 
   Vector::Vector (const unsigned int n)
-                 :
-		  map ((int)n, 0,
-		       Utilities::Trilinos::comm_self())
   {
     last_action = Zero;
+    Epetra_LocalMap map ((int)n, 0, Utilities::Trilinos::comm_self());
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
   }
 
 
 
-  Vector::Vector (const Epetra_Map &InputMap)
-                 :
-                 map (InputMap.NumGlobalElements(), InputMap.IndexBase(), 
-		      InputMap.Comm())
+  Vector::Vector (const Epetra_Map &input_map)
   {
     last_action = Zero;
+    Epetra_LocalMap map (input_map.NumGlobalElements(), 
+			 input_map.IndexBase(), 
+			 input_map.Comm());
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
   }
 
 
 
   Vector::Vector (const VectorBase &v)
-                 :
-                 map (v.vector->Map().NumGlobalElements(), 0, v.vector->Comm())
   {
     last_action = Zero;
+    Epetra_LocalMap map (v.vector->Map().NumGlobalElements(), 
+			 v.vector->Map().IndexBase(), 
+			 v.vector->Map().Comm());
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 
     if (vector->Map().SameAs(v.vector->Map()) == true)
@@ -364,9 +359,8 @@ namespace TrilinosWrappers
       {
 	vector.reset();
 
-	map = Epetra_LocalMap ((int)n, 0,
-			       Utilities::Trilinos::comm_self());
-
+	Epetra_LocalMap map ((int)n, 0,
+			     Utilities::Trilinos::comm_self());
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
       }
     else if (fast == false)
@@ -388,12 +382,12 @@ namespace TrilinosWrappers
   Vector::reinit (const Epetra_Map &input_map,
                   const bool        fast)
   {
-    if (map.NumGlobalElements() != input_map.NumGlobalElements())
+    if (vector->Map().NumGlobalElements() != input_map.NumGlobalElements())
       {
 	vector.reset();
-	map = Epetra_LocalMap (input_map.NumGlobalElements(),
-			       input_map.IndexBase(),
-			       input_map.Comm());
+	Epetra_LocalMap map (input_map.NumGlobalElements(),
+			     input_map.IndexBase(),
+			     input_map.Comm());
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
       }
     else if (fast == false)
@@ -427,10 +421,9 @@ namespace TrilinosWrappers
 	if (local_range() != v.local_range())
 	  {
 	    vector.reset();
-	    map = Epetra_LocalMap (v.vector->GlobalLength(),
-				   v.vector->Map().IndexBase(),
-				   v.vector->Comm());
-
+	    Epetra_LocalMap map (v.vector->GlobalLength(),
+				 v.vector->Map().IndexBase(),
+				 v.vector->Comm());
 	    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	  }
 	else
@@ -484,9 +477,9 @@ namespace TrilinosWrappers
     if (size() != v.size())
       {
 	vector.reset();
-	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 
-			       v.vector->Map().IndexBase(),
-			       v.vector->Comm());
+	Epetra_LocalMap map (v.vector->Map().NumGlobalElements(), 
+			     v.vector->Map().IndexBase(),
+			     v.vector->Comm());
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 
@@ -501,9 +494,9 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 
-			       v.vector->Map().IndexBase(),
-			       v.vector->Comm());
+	Epetra_LocalMap map (v.vector->Map().NumGlobalElements(), 
+			     v.vector->Map().IndexBase(),
+			     v.vector->Comm());
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 

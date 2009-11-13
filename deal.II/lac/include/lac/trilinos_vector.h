@@ -13,16 +13,17 @@
 #ifndef __deal2__trilinos_vector_h
 #define __deal2__trilinos_vector_h
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <lac/exceptions.h>
-#include <lac/vector.h>
-#include <lac/trilinos_vector_base.h>
-#include <lac/trilinos_sparse_matrix.h>
 
-#include <boost/scoped_ptr.hpp>
+#include <base/config.h>
 
 #ifdef DEAL_II_USE_TRILINOS
+
+#  include <base/subscriptor.h>
+#  include <base/index_set.h>
+#  include <base/utilities.h>
+#  include <lac/exceptions.h>
+#  include <lac/vector.h>
+#  include <lac/trilinos_vector_base.h>
 
 #  include "Epetra_Map.h"
 #  include "Epetra_LocalMap.h"
@@ -39,6 +40,7 @@ template <typename> class Vector;
  */
 namespace TrilinosWrappers
 {
+  class SparseMatrix;
 /**
  * Namespace for Trilinos vector classes that work in parallel over
  * MPI. This namespace is restricted to vectors only, whereas matrices
@@ -164,6 +166,10 @@ namespace TrilinosWrappers
     class Vector : public VectorBase
     {
       public:
+/**
+ * @name Basic constructors and initalization.
+ */
+//@{
                                        /**
                                         * Default constructor that
                                         * generates an empty (zero size)
@@ -176,63 +182,16 @@ namespace TrilinosWrappers
                                         */
 	Vector ();
 
-                                       /**
-				        * This constructor takes an
-				        * Epetra_Map that already knows
-				        * how to distribute the
-				        * individual components among
-				        * the MPI processors. Since it
-				        * also includes information
-				        * about the size of the vector,
-				        * this is all we need to
-				        * generate a parallel vector.
-                                        */
-	Vector (const Epetra_Map &InputMap);
-
 	                               /**
 					* Copy constructor using the
 					* given vector.
 					*/
 	Vector (const Vector &V);
 
-				       /**
-					* Copy constructor from the
-					* TrilinosWrappers vector
-					* class. Since a vector of this
-					* class does not necessarily
-					* need to be distributed among
-					* processes, the user needs to
-					* supply us with an Epetra_Map
-					* that sets the partitioning
-					* details.
-					*/
-	explicit Vector (const Epetra_Map &InputMap,
-			 const VectorBase &v);
-
-                                         /**
-                                          * Copy-constructor from deal.II
-                                          * vectors. Sets the dimension to that
-                                          * of the given vector, and copies all
-                                          * elements.
-                                          */
-        template <typename Number>
-        explicit Vector (const Epetra_Map             &InputMap,
-                         const dealii::Vector<Number> &v);
-
 					 /**
 					  * Destructor.
 					  */
 	~Vector ();
-
-				       /**
-				        * Reinit functionality. This
-				        * function destroys the old
-				        * vector content and generates a
-				        * new one based on the input
-				        * map.
-				        */
-	void reinit (const Epetra_Map &input_map,
-		     const bool        fast = false);
 
 				       /**
 				        * Reinit functionality. This
@@ -376,30 +335,111 @@ namespace TrilinosWrappers
 	void import_nonlocal_data_for_fe
 	  (const dealii::TrilinosWrappers::SparseMatrix &matrix,
 	   const Vector                                 &vector);
+//@}
+/**
+ * @name Initialization with an Epetra_Map
+ */
+//@{
+                                       /**
+				        * This constructor takes an
+				        * Epetra_Map that already knows
+				        * how to distribute the
+				        * individual components among
+				        * the MPI processors. Since it
+				        * also includes information
+				        * about the size of the vector,
+				        * this is all we need to
+				        * generate a parallel vector.
+                                        */
+	Vector (const Epetra_Map &parallel_partitioning);
 
-      private:
-					 /**
-					  * A pointer to the communicator used
-					  * for all operations in this object.
-					  *
-					  * Note that we create a new
-					  * communicator (with a unique MPI ID)
-					  * for each object if we are running in
-					  * parallel.
-					  */
-      boost::scoped_ptr<Epetra_Comm> communicator;
+				       /**
+					* Copy constructor from the
+					* TrilinosWrappers vector
+					* class. Since a vector of this
+					* class does not necessarily
+					* need to be distributed among
+					* processes, the user needs to
+					* supply us with an Epetra_Map
+					* that sets the partitioning
+					* details.
+					*/
+	explicit Vector (const Epetra_Map &parallel_partitioning,
+			 const VectorBase &v);
 
-					 /**
-					  * The Epetra map is used to map
-					  * (or rather, partition) vector
-					  * data accross multiple
-					  * processes. This is the
-					  * communicator and data
-					  * distribution object common to
-					  * all Trilinos objects used by
-					  * deal.II.
-					  */
-	Epetra_Map map;
+				       /**
+				        * Reinit functionality. This
+				        * function destroys the old
+				        * vector content and generates a
+				        * new one based on the input
+				        * map.
+				        */
+	void reinit (const Epetra_Map &parallel_partitioning,
+		     const bool        fast = false);
+
+                                         /**
+                                          * Copy-constructor from deal.II
+                                          * vectors. Sets the dimension to that
+                                          * of the given vector, and copies all
+                                          * elements.
+                                          */
+        template <typename Number>
+        explicit Vector (const Epetra_Map             &parallel_partitioning,
+                         const dealii::Vector<Number> &v);
+//@}
+/**
+ * @name Initialization with an IndexSet
+ */
+//@{
+                                       /**
+				        * This constructor takes an IndexSet
+				        * that defines how to distribute the
+				        * individual components among the
+				        * MPI processors. Since it also
+				        * includes information about the
+				        * size of the vector, this is all we
+				        * need to generate a %parallel
+				        * vector.
+                                        */
+	Vector (const IndexSet &parallel_partitioning,
+		const MPI_Comm &communicator = MPI_COMM_WORLD);
+
+				       /**
+					* Copy constructor from the
+					* TrilinosWrappers vector
+					* class. Since a vector of this
+					* class does not necessarily need to
+					* be distributed among processes,
+					* the user needs to supply us with
+					* an IndexSet and an MPI
+					* communicator that set the
+					* partitioning details.
+					*/
+	explicit Vector (const IndexSet   &parallel_partitioning,
+			 const VectorBase &v,
+			 const MPI_Comm   &communicator = MPI_COMM_WORLD);
+
+                                         /**
+                                          * Copy-constructor from deal.II
+                                          * vectors. Sets the dimension to
+                                          * that of the given vector, and
+                                          * copies all the elements.
+                                          */
+        template <typename Number>
+        explicit Vector (const IndexSet               &parallel_partitioning,
+			 const dealii::Vector<Number> &v,
+                         const MPI_Comm               &communicator = MPI_COMM_WORLD);
+
+				       /**
+				        * Reinit functionality. This
+				        * function destroys the old vector
+				        * content and generates a new one
+				        * based on the input partitioning.
+				        */
+	void reinit (const IndexSet &parallel_partitioning,
+		     const MPI_Comm &communicator = MPI_COMM_WORLD,
+		     const bool      fast = false);
+//@}
     };
 
 
@@ -426,34 +466,33 @@ namespace TrilinosWrappers
 #ifndef DOXYGEN
 
     template <typename number>
-    Vector::Vector (const Epetra_Map             &InputMap,
+    Vector::Vector (const Epetra_Map             &input_map,
                     const dealii::Vector<number> &v)
-                    :
-                    map (InputMap)
     {
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(input_map));
 
-      const int min_my_id = map.MinMyGID();
-      const int size = map.NumMyElements();
+      const int min_my_id = input_map.MinMyGID();
+      const int size = input_map.NumMyElements();
 
-      Assert (map.MaxLID() == size-1,
-	      ExcDimensionMismatch(map.MaxLID(), size-1));
+      Assert (input_map.MaxLID() == size-1,
+	      ExcDimensionMismatch(input_map.MaxLID(), size-1));
 
 				   // Need to copy out values, since the
 				   // deal.II might not use doubles, so
 				   // that a direct access is not possible.
-      std::vector<int> indices (size);
-      std::vector<double> values (size);
       for (int i=0; i<size; ++i)
-	{
-	  indices[i] = map.GID(i);
-	  values[i] = v(i);
-	}
+	(*vector)[0][i] = v(i);
+    }
 
-      const int ierr = vector->ReplaceGlobalValues (size, &indices[0],
-						    &values[0]);
 
-      AssertThrow (ierr == 0, VectorBase::ExcTrilinosError(ierr));
+
+    template <typename number>
+    Vector::Vector (const IndexSet               &parallel_partitioner,
+                    const dealii::Vector<number> &v,
+		    const MPI_Comm               &communicator)
+    {
+      *this = Vector(parallel_partitioner.make_trilinos_map (communicator, true),
+		     v);
     }
 
 
@@ -474,15 +513,17 @@ namespace TrilinosWrappers
     {
       if (size() != v.size())
 	{
+	  *vector = std::auto_ptr<Epetra_FEVector> 
+	  (new Epetra_FEVector(Epetra_Map (v.size(), 0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-	  map = Epetra_Map (v.size(), 0, Epetra_MpiComm(MPI_COMM_SELF));
+					   Epetra_MpiComm(MPI_COMM_SELF)
 #else
-	  map = Epetra_Map (v.size(), 0, Epetra_SerialComm());
+					   Epetra_SerialComm()
 #endif
+					   )));
 	}
 
-      *this = Vector(map, v);
-
+      reinit (vector_partitioner(), v);
       return *this;
     }
 
@@ -490,6 +531,7 @@ namespace TrilinosWrappers
 #endif
 
   } /* end of namespace MPI */
+
 
 
 /**
@@ -626,13 +668,6 @@ namespace TrilinosWrappers
 					*/
       Vector &
 	operator = (const Vector &V);
-
-    private:
-				       /**
-					* A map indicating the size of the
-					* vector.
-					*/
-      Epetra_LocalMap map;
   };
 
 
@@ -659,13 +694,8 @@ namespace TrilinosWrappers
 
   template <typename number>
   Vector::Vector (const dealii::Vector<number> &v)
-                 :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                 map (v.size(), 0, Epetra_MpiComm(MPI_COMM_SELF))
-#else
-		 map (v.size(), 0, Epetra_SerialComm())
-#endif
   {
+    Epetra_LocalMap map ((int)v.size(), 0, Utilities::Trilinos::comm_self());
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     *this = v;
   }
@@ -681,6 +711,8 @@ namespace TrilinosWrappers
     return *this;
   }
 
+
+
   template <typename Number>
   Vector &
   Vector::operator = (const ::dealii::Vector<Number> &v)
@@ -688,15 +720,13 @@ namespace TrilinosWrappers
     if (size() != v.size())
       {
 	vector.release();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-	map = Epetra_LocalMap (v.size(), 0, Epetra_MpiComm(MPI_COMM_SELF));
-#else
-	map = Epetra_LocalMap (v.size(), 0, Epetra_SerialComm());
-#endif
 
+	Epetra_LocalMap map ((int)v.size(), 0, 
+			     Utilities::Trilinos::comm_self());
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 
+    Epetra_Map & map = vector_partitioner();
     const int min_my_id = map.MinMyGID();
     const int size = map.NumMyElements();
 
@@ -706,17 +736,8 @@ namespace TrilinosWrappers
 				   // Need to copy out values, since the
 				   // deal.II might not use doubles, so
 				   // that a direct access is not possible.
-    std::vector<int> indices (size);
-    std::vector<double> values (size);
     for (int i=0; i<size; ++i)
-      {
-	indices[i] = map.GID(i);
-	values[i] = v(i);
-      }
-
-    const int ierr = vector->ReplaceGlobalValues (size, &indices[0],
-						  &values[0]);
-    AssertThrow (ierr == 0, VectorBase::ExcTrilinosError(ierr));
+      (*vector)[0][i] = v(i);
 
     return *this;
   }

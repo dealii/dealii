@@ -13,9 +13,10 @@
 
 
 #include <lac/petsc_full_matrix.h>
-#include <lac/petsc_vector.h>
 
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/petsc_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

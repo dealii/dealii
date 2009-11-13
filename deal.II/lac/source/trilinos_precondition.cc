@@ -12,19 +12,20 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/vector.h>
-#include <lac/sparse_matrix.h>
 #include <lac/trilinos_precondition.h>
-#include <lac/trilinos_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Ifpack.h>
-#include <Ifpack_Chebyshev.h>
-#include <Teuchos_ParameterList.hpp>
-#include <Epetra_MultiVector.h>
-#include <ml_include.h>
-#include <ml_MultiLevelPreconditioner.h>
+#  include <lac/vector.h>
+#  include <lac/sparse_matrix.h>
+#  include <lac/trilinos_sparse_matrix.h>
+
+#  include <Ifpack.h>
+#  include <Ifpack_Chebyshev.h>
+#  include <Teuchos_ParameterList.hpp>
+#  include <Epetra_MultiVector.h>
+#  include <ml_include.h>
+#  include <ml_MultiLevelPreconditioner.h>
 
 
 DEAL_II_NAMESPACE_OPEN

@@ -13,10 +13,10 @@
 
 
 #include <lac/petsc_parallel_block_vector.h>
-#include <lac/petsc_block_vector.h>
-
   
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/petsc_block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 #include <lac/exceptions.h>
+#include <base/index_set.h>
 
 #include <vector>
 #include <algorithm>
@@ -119,10 +120,17 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 				     /**
 				      * Initialize a rectangular
 				      * matrix with @p m rows and
-				      * @p n columns.
+				      * @p n columns. The @p rowset
+				      * restricts the storage to
+				      * elements in rows of this set.
+				      * Adding elements outside of
+				      * this set has no effect. The
+				      * default argument keeps all
+				      * entries.
 				      */
     CompressedSimpleSparsityPattern (const unsigned int m,
-			       const unsigned int n);
+				     const unsigned int n,
+				     const IndexSet & rowset = IndexSet());
 
 				     /**
 				      * Initialize a square matrix of
@@ -146,10 +154,17 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 				      * matrix with @p m rows and
 				      * @p n columns, with at most
 				      * max_entries_per_row() nonzero
-				      * entries per row.
+				      * entries per row. The @p rowset
+				      * restricts the storage to
+				      * elements in rows of this set.
+				      * Adding elements outside of
+				      * this set has no effect. The
+				      * default argument keeps all
+				      * entries.
 				      */
     void reinit (const unsigned int m,
-		 const unsigned int n);
+		 const unsigned int n,
+		 const IndexSet & rowset = IndexSet());
 
 				     /**
 				      * Since this object is kept
@@ -270,7 +285,12 @@ class CompressedSimpleSparsityPattern : public Subscriptor
     unsigned int n_cols () const;
 
 				     /**
-				      * Number of entries in a specific row.
+				      * Number of entries in a
+				      * specific row. This function
+				      * can only be called if the
+				      * given row is a member of the
+				      * index set of rows that we want
+				      * to store.
 				      */
     unsigned int row_length (const unsigned int row) const;
 
@@ -298,8 +318,17 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 				      */
     unsigned int n_nonzero_elements () const;
 
+				     /**
+				      * Return the IndexSet that sets which
+				      * rows are active on the current
+				      * processor. It corresponds to the
+				      * IndexSet given to this class in the
+				      * constructor or in the reinit function.
+				      */
+    const IndexSet & row_index_set () const;
+
                                      /**
-                                      * Return whether this object stores only
+                                      * return whether this object stores only
                                       * those entries that have been added
                                       * explicitly, or if the sparsity pattern
                                       * contains elements that have been added
@@ -316,7 +345,12 @@ class CompressedSimpleSparsityPattern : public Subscriptor
     static
     bool stores_only_added_elements ();
 
-
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
 
   private:
 				     /**
@@ -330,6 +364,13 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 				      * structure shall represent.
 				      */
     unsigned int cols;
+
+				     /**
+				      * A set that contains the valid rows.
+				      */
+
+    IndexSet rowset;
+
 
                                      /**
                                       * Store some data for each row
@@ -369,6 +410,11 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 	void add_entries (ForwardIterator begin,
 			  ForwardIterator end,
 			  const bool indices_are_sorted);
+
+					 /**
+					  * estimates memory consumption.
+					  */
+	unsigned int memory_consumption () const;
     };
 
 
@@ -441,7 +487,10 @@ CompressedSimpleSparsityPattern::add (const unsigned int i,
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
 
-  lines[i].add (j);
+  if (!rowset.is_element(i))
+    return;
+
+  lines[rowset.index_within_set(i)].add (j);
 }
 
 
@@ -456,7 +505,10 @@ CompressedSimpleSparsityPattern::add_entries (const unsigned int row,
 {
   Assert (row < rows, ExcIndexRange (row, 0, rows));
 
-  lines[row].add_entries (begin, end, indices_are_sorted);
+  if (!rowset.is_element(row))
+    return;
+
+  lines[rowset.index_within_set(row)].add_entries (begin, end, indices_are_sorted);
 }
 
 
@@ -472,8 +524,9 @@ unsigned int
 CompressedSimpleSparsityPattern::row_length (const unsigned int row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert( rowset.is_element(row), ExcInternalError());
 
-  return lines[row].entries.size();
+  return lines[rowset.index_within_set(row)].entries.size();
 }
 
 
@@ -484,11 +537,21 @@ CompressedSimpleSparsityPattern::column_number (const unsigned int row,
 						const unsigned int index) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
-  Assert (index < lines[row].entries.size(),
-	  ExcIndexRange (index, 0, lines[row].entries.size()));
+  Assert (index < lines[rowset.index_within_set(row)].entries.size(),
+	  ExcIndexRange (index, 0, lines[rowset.index_within_set(row)].entries.size()));
+  Assert( rowset.is_element(row), ExcInternalError());
 
-  return lines[row].entries[index];
+  return lines[rowset.index_within_set(row)].entries[index];
 }
+
+
+inline
+const IndexSet &
+CompressedSimpleSparsityPattern::row_index_set () const
+{
+  return rowset;
+}
+
 
 
 inline

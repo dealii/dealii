@@ -13,12 +13,13 @@
 
 
 #include <lac/petsc_matrix_base.h>
-#include <lac/petsc_full_matrix.h>
-#include <lac/petsc_sparse_matrix.h>
-#include <lac/petsc_parallel_sparse_matrix.h>
-#include <lac/petsc_vector.h>
 
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/petsc_full_matrix.h>
+#  include <lac/petsc_sparse_matrix.h>
+#  include <lac/petsc_parallel_sparse_matrix.h>
+#  include <lac/petsc_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -607,6 +608,23 @@ namespace PETScWrappers
 #endif
                                        // Write to screen
     MatView (matrix,PETSC_VIEWER_STDOUT_WORLD);
+  }
+
+
+
+  unsigned int
+  MatrixBase::memory_consumption() const
+  {
+      MatInfo info;
+      MatGetInfo(matrix, MAT_LOCAL, &info);
+
+				       // report if sparsity pattern was not
+				       // sufficient
+      if (info.mallocs)
+	std::cout << "*** PETSC-Matrix: num-allocs = "
+		  << info.mallocs << " ***" << std::endl;
+
+      return sizeof(*this) + info.memory;
   }
 
 }

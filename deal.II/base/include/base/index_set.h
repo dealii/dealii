@@ -19,6 +19,16 @@
 #include <vector>
 #include <algorithm>
 
+#ifdef DEAL_II_USE_TRILINOS
+#  include <Epetra_Map.h>
+#endif
+
+#if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
+#include <mpi.h>
+#else
+typedef int MPI_Comm;
+#define MPI_COMM_WORLD 0
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -149,6 +159,68 @@ class IndexSet
 				      * external effect.
 				      */
     void compress () const;
+
+#ifdef DEAL_II_USE_TRILINOS
+				     /**
+				      * Given an MPI communicator,
+				      * create a Trilinos map object
+				      * that represents a distribution
+				      * of vector elements or matrix
+				      * rows in which we will locally
+				      * store those elements or rows
+				      * for which we store the index
+				      * in the current index set, and
+				      * all the other elements/rows
+				      * elsewhere on one of the other
+				      * MPI processes.
+				      *
+				      * The last argument only plays a
+				      * role if the communicator is a
+				      * parallel one, distributing
+				      * computations across multiple
+				      * processors. In that case, if
+				      * the last argument is false,
+				      * then it is assumed that the
+				      * index sets this function is
+				      * called on on all processors
+				      * are mutually exclusive but
+				      * together enumerate each index
+				      * exactly once. In other words,
+				      * if you call this function on
+				      * two processors, then the index
+				      * sets this function is called
+				      * with must together have all
+				      * possible indices from zero to
+				      * size()-1, and no index must
+				      * appear in both index
+				      * sets. This corresponds, for
+				      * example, to the case where we
+				      * want to split the elements of
+				      * vectors into unique subsets to
+				      * be stored on different
+				      * processors -- no element
+				      * should be owned by more than
+				      * one processor, but each
+				      * element must be owned by one.
+				      *
+				      * On the other hand, if the
+				      * second argument is true, then
+				      * the index sets can be
+				      * overlapping, though they still
+				      * need to contain each index
+				      * exactly once on all processors
+				      * taken together. This is a
+				      * useful operation if we want to
+				      * create vectors that not only
+				      * contain the locally owned
+				      * indices, but for example also
+				      * the elements that correspond
+				      * to degrees of freedom located
+				      * on ghost cells.
+				      */
+    Epetra_Map make_trilinos_map (const MPI_Comm &communicator = MPI_COMM_WORLD,
+				  const bool      overlapping  = false) const;
+#endif
 
   private:
 				     /**
@@ -332,7 +404,7 @@ IndexSet::add_indices (const ForwardIterator &begin,
 				   // range. if some of them happen to
 				   // be consecutive, merge them to a
 				   // range
-  for (ForwardIterator p=begin; p<end;)
+  for (ForwardIterator p=begin; p!=end;)
     {
       const unsigned int begin_index = *p;
       unsigned int       end_index   = begin_index + 1;

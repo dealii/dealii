@@ -11,7 +11,15 @@
 //
 //---------------------------------------------------------------------------
 
+
 #include <base/index_set.h>
+
+#ifdef DEAL_II_USE_TRILINOS
+#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#    include <Epetra_MpiComm.h>
+#  endif
+#  include <Epetra_SerialComm.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -80,6 +88,52 @@ IndexSet::compress () const
 				   // endless loop
   Assert (next_index == n_elements(), ExcInternalError());
 }
+
+
+
+#ifdef DEAL_II_USE_TRILINOS
+
+Epetra_Map
+IndexSet::make_trilinos_map (const MPI_Comm &communicator,
+			     const bool overlapping) const
+{
+  compress ();
+
+  if ((is_contiguous() == true) && (!overlapping))
+    return Epetra_Map (size(),
+		       n_elements(),
+		       0,
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+		       Epetra_MpiComm(communicator));
+#else
+		       Epetra_SerialComm());
+#endif
+  else
+    {
+      std::vector<int> indices;
+      indices.reserve(n_elements());
+      for (std::vector<Range>::iterator
+	     i = ranges.begin();
+	   i != ranges.end();
+	   ++i)
+	for (unsigned int j=i->begin; j<i->end; ++j)
+	  indices.push_back (j);
+      Assert (indices.size() == n_elements(), ExcInternalError());
+  
+      return Epetra_Map (-1,
+			 n_elements(),
+			 &indices[0],
+			 0,
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+			 Epetra_MpiComm(communicator));
+#else
+			 Epetra_SerialComm());
+#endif
+    }
+}
+
+  
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE

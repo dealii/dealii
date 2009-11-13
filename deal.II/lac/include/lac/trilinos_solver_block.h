@@ -13,12 +13,13 @@
 #ifndef __deal2__trilinos_block_solver_h
 #define __deal2__trilinos_block_solver_h
 
+
 #include <base/config.h>
-#include <lac/exceptions.h>
-#include <lac/solver_control.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
+#  include <lac/exceptions.h>
+#  include <lac/solver_control.h>
 
 DEAL_II_NAMESPACE_OPEN
 

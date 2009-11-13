@@ -13,15 +13,16 @@
 #ifndef __deal2__petsc_solver_h
 #define __deal2__petsc_solver_h
 
-#include <base/config.h>
-#include <lac/exceptions.h>
-#include <lac/solver_control.h>
-#include <base/std_cxx1x/shared_ptr.h>
 
+#include <base/config.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#include <petscksp.h>
+#  include <lac/exceptions.h>
+#  include <lac/solver_control.h>
+#  include <base/std_cxx1x/shared_ptr.h>
+
+#  include <petscksp.h>
 
 DEAL_II_NAMESPACE_OPEN
 

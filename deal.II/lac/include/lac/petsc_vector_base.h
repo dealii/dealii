@@ -15,15 +15,16 @@
 
 
 #include <base/config.h>
-#include <base/subscriptor.h>
-#include <lac/exceptions.h>
-
-#include <vector>
-#include <utility>
 
 #ifdef DEAL_II_USE_PETSC
 
-#include <petscvec.h>
+#  include <base/subscriptor.h>
+#  include <lac/exceptions.h>
+
+#  include <vector>
+#  include <utility>
+
+#  include <petscvec.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -256,6 +257,10 @@ namespace PETScWrappers
                                         * is necessary after writing into a
                                         * vector element-by-element and before
                                         * anything else can be done on it.
+					*
+					* See @ref GlossCompress "Compressing distributed objects"
+					* for more information.
+					* more information.
                                         */
       void compress ();
 

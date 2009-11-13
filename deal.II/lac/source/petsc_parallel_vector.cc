@@ -13,12 +13,12 @@
 
 
 #include <lac/petsc_parallel_vector.h>
-#include <lac/petsc_vector.h>
-
-#include <cmath>
-#include <algorithm>
 
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/petsc_vector.h>
+#  include <cmath>
+#  include <algorithm>
 
 DEAL_II_NAMESPACE_OPEN
 

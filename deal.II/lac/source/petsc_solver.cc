@@ -13,13 +13,13 @@
 
 
 #include <lac/petsc_solver.h>
-#include <lac/petsc_matrix_base.h>
-#include <lac/petsc_vector_base.h>
-#include <lac/petsc_precondition.h>
-
-#include <cmath>
 
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/petsc_matrix_base.h>
+#  include <lac/petsc_vector_base.h>
+#  include <lac/petsc_precondition.h>
+#  include <cmath>
 
 #if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
 #  include <petscsles.h>

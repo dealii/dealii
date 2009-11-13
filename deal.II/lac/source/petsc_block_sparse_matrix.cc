@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/petsc_block_sparse_matrix.h>
 
+#include <lac/petsc_block_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_PETSC
 

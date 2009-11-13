@@ -15,16 +15,16 @@
 
 
 #include <base/config.h>
-#include <lac/exceptions.h>
-#include <lac/trilinos_precondition.h>
-#include <lac/trilinos_sparse_matrix.h>
-
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Teuchos_RCP.hpp>
-#include <Thyra_LinearOperatorDecl.hpp>
-#include <Epetra_Operator.h>
+#  include <lac/exceptions.h>
+#  include <lac/trilinos_precondition.h>
+#  include <lac/trilinos_sparse_matrix.h>
+
+#  include <Teuchos_RCP.hpp>
+#  include <Thyra_LinearOperatorDecl.hpp>
+#  include <Epetra_Operator.h>
 
 // some forward declarations
 class Ifpack_Preconditioner;

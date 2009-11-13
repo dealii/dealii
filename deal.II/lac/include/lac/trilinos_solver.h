@@ -13,17 +13,19 @@
 #ifndef __deal2__trilinos_solver_h
 #define __deal2__trilinos_solver_h
 
+
 #include <base/config.h>
-#include <lac/exceptions.h>
-#include <lac/solver_control.h>
-#include <lac/vector.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Epetra_LinearProblem.h>
-#include <AztecOO.h>
-#include <Epetra_Operator.h>
-#include <Amesos.h>
+#  include <lac/exceptions.h>
+#  include <lac/solver_control.h>
+#  include <lac/vector.h>
+
+#  include <Epetra_LinearProblem.h>
+#  include <AztecOO.h>
+#  include <Epetra_Operator.h>
+#  include <Amesos.h>
 
 DEAL_II_NAMESPACE_OPEN
 

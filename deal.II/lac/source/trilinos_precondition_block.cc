@@ -11,23 +11,24 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/trilinos_precondition_block.h>
 
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_block_sparse_matrix.h>
+#include <lac/trilinos_precondition_block.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Thyra_EpetraLinearOp.hpp>
-#include <Thyra_EpetraThyraWrappers.hpp>
+#  include <lac/trilinos_sparse_matrix.h>
+#  include <lac/trilinos_block_sparse_matrix.h>
 
-#include <Thyra_VectorSpaceImpl.hpp>
-#include <Thyra_LinearOperatorDecl.hpp>
-#include <Thyra_DefaultBlockedLinearOp.hpp>
-#include <Thyra_LinearOpWithSolveFactoryHelpers.hpp>
-#include <Thyra_InverseLinearOperator.hpp>
-#include <Thyra_DefaultInverseLinearOp.hpp>
-#include <Thyra_AztecOOLinearOpWithSolveFactory.hpp>
+#  include <Thyra_EpetraLinearOp.hpp>
+#  include <Thyra_EpetraThyraWrappers.hpp>
+
+#  include <Thyra_VectorSpaceImpl.hpp>
+#  include <Thyra_LinearOperatorDecl.hpp>
+#  include <Thyra_DefaultBlockedLinearOp.hpp>
+#  include <Thyra_LinearOpWithSolveFactoryHelpers.hpp>
+#  include <Thyra_InverseLinearOperator.hpp>
+#  include <Thyra_DefaultInverseLinearOp.hpp>
+#  include <Thyra_AztecOOLinearOpWithSolveFactory.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 

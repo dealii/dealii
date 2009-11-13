@@ -14,9 +14,9 @@
 
 #include <lac/petsc_vector.h>
 
-#include <cmath>
-
 #ifdef DEAL_II_USE_PETSC
+
+#  include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 

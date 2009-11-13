@@ -1045,13 +1045,6 @@ QProjector<dim>::project_to_line(
 }
 
 
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::cell ()
-{
-  return 0;
-}
-
 
 template <int dim>
 typename QProjector<dim>::DataSetDescriptor
@@ -1412,30 +1405,6 @@ subface (const unsigned int face_no,
 	  )
 	  * n_quadrature_points);
 }
-
-
-template <int dim>
-QProjector<dim>::DataSetDescriptor::operator unsigned int () const
-{
-  return dataset_offset;
-}
-
-
-
-template <int dim>
-QProjector<dim>::DataSetDescriptor::
-DataSetDescriptor (const unsigned int dataset_offset)
-                :
-                dataset_offset (dataset_offset)
-{}
-
-
-template <int dim>
-QProjector<dim>::DataSetDescriptor::
-DataSetDescriptor ()
-                :
-                dataset_offset (numbers::invalid_unsigned_int)
-{}
 
 
 

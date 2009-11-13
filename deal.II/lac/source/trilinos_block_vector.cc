@@ -11,11 +11,13 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/trilinos_block_vector.h>
-#include <lac/trilinos_block_sparse_matrix.h>
 
+#include <lac/trilinos_block_vector.h>
 
 #ifdef DEAL_II_USE_TRILINOS
+
+#  include <lac/trilinos_block_sparse_matrix.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 

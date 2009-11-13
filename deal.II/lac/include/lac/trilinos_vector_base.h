@@ -15,15 +15,16 @@
 
 
 #include <base/config.h>
-#include <base/subscriptor.h>
-#include <lac/exceptions.h>
-#include <lac/vector.h>
-
-#include <vector>
-#include <utility>
-#include <memory>
 
 #ifdef DEAL_II_USE_TRILINOS
+
+#  include <base/subscriptor.h>
+#  include <lac/exceptions.h>
+#  include <lac/vector.h>
+
+#  include <vector>
+#  include <utility>
+#  include <memory>
 
 #  define TrilinosScalar double
 #  include "Epetra_ConfigDefs.h"
@@ -319,8 +320,26 @@ namespace TrilinosWrappers
                                         * vector element-by-element and
                                         * before anything else can be
                                         * done on it.
+					*
+					* The (defaulted) argument can
+					* be used to specify the
+					* compress mode
+					* (<code>Add</code> or
+					* <code>Insert</code>) in case
+					* the vector has not been
+					* written to since the last
+					* time this function was
+					* called. The argument is
+					* ignored if the vector has
+					* been added or written to
+					* since the last time
+					* compress() was called.
+					*
+					* See @ref GlossCompress "Compressing distributed objects"
+					* for more information.
+					* more information.
                                         */
-      void compress ();
+      void compress (const Epetra_CombineMode last_action = Zero);
 
 				       /**
 					* Returns the state of the
@@ -827,7 +846,7 @@ namespace TrilinosWrappers
 					*  class.
 					*/
       void print (const char* format = 0) const;
-
+      
                                        /**
                                         * Print to a stream. @p
                                         * precision denotes the desired
@@ -1015,27 +1034,7 @@ namespace TrilinosWrappers
     const VectorReference &
     VectorReference::operator += (const TrilinosScalar &value) const
     {
-      const int local_row = vector.vector->Map().LID(index);
-      if (local_row == -1)
-	{
-				   // write the code explicitly here to make
-				   // it faster.
-	  if (vector.last_action != Add)
-	    {
-	      if (vector.last_action == Insert)
-		vector.vector->GlobalAssemble(Insert);
-	      vector.last_action = Add;
-	    }
-
-	  const int ierr = vector.vector->SumIntoGlobalValues (1,
-							       (const int*)(&index),
-							       &value);
-	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-	  vector.compressed = false;
-	}
-      else
-	(*vector.vector)[0][local_row] += value;
-
+      vector.add (1, &index, &value);
       return *this;
     }
 
@@ -1120,11 +1119,13 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::compress ()
+  VectorBase::compress (const Epetra_CombineMode given_last_action)
   {
 				 // Now pass over the information about
 				 // what we did last to the vector.
-    const int ierr = vector->GlobalAssemble(last_action);
+    const int ierr = vector->GlobalAssemble(last_action != Zero ?
+					    last_action :
+					    given_last_action);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     last_action = Zero;
 
@@ -1802,7 +1803,8 @@ namespace TrilinosWrappers
   {
     return static_cast<const Epetra_Map&>(vector->Map());
   }
-
+  
+  
 #endif // DOXYGEN
 
 }

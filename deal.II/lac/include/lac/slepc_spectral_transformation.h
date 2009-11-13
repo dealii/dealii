@@ -15,16 +15,18 @@
 #ifndef __deal2__slepc_spectral_transformation_h
 #define __deal2__slepc_spectral_transformation_h
 
+
 #include <base/config.h>
-#include <lac/exceptions.h>
-#include <lac/solver_control.h>
-#include <lac/slepc_solver.h>
-#include <boost/shared_ptr.hpp>
 
 #ifdef DEAL_II_USE_SLEPC
 
-#include <petscksp.h>
-#include <slepceps.h>
+#  include <lac/exceptions.h>
+#  include <lac/solver_control.h>
+#  include <lac/slepc_solver.h>
+#  include <boost/shared_ptr.hpp>
+
+#  include <petscksp.h>
+#  include <slepceps.h>
 
 DEAL_II_NAMESPACE_OPEN 
 

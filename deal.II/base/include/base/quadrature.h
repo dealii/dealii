@@ -370,7 +370,7 @@ class QIterated : public Quadrature<dim>
 
 #ifndef DOXYGEN
 
-// ----------------------------------------------------------------------
+// -------------------  inline and template functions ----------------
 
 
 template<int dim>
@@ -423,7 +423,6 @@ Quadrature<dim>::get_weights () const
 {
   return weights;
 }
-
 
 
 

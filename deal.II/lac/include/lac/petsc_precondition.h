@@ -13,13 +13,13 @@
 #ifndef __deal2__petsc_precondition_h
 #define __deal2__petsc_precondition_h
 
-#include <base/config.h>
-#include <lac/exceptions.h>
 
+#include <base/config.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#include <petscpc.h>
+#  include <lac/exceptions.h>
+#  include <petscpc.h>
 
 DEAL_II_NAMESPACE_OPEN
 

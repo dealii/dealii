@@ -12,18 +12,20 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/petsc_matrix_base.h>
-#include <lac/petsc_vector_base.h>
-#include <lac/petsc_vector.h>
-#include <lac/slepc_solver.h>
-#include <lac/slepc_spectral_transformation.h>
 
-#include <cmath>
-#include <vector>
+#include <lac/slepc_solver.h>
 
 #ifdef DEAL_II_USE_SLEPC
 
-#include <petscversion.h>
+#  include <lac/petsc_matrix_base.h>
+#  include <lac/petsc_vector_base.h>
+#  include <lac/petsc_vector.h>
+#  include <lac/slepc_spectral_transformation.h>
+
+#  include <cmath>
+#  include <vector>
+
+#  include <petscversion.h>
 
 DEAL_II_NAMESPACE_OPEN
 

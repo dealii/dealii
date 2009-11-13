@@ -15,12 +15,12 @@
 
 
 #include <base/config.h>
-#include <lac/exceptions.h>
-#include <lac/petsc_matrix_base.h>
-
-#include <vector>
 
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/exceptions.h>
+#  include <lac/petsc_matrix_base.h>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
                                  // forward declaration

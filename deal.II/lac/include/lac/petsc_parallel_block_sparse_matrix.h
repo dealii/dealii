@@ -15,14 +15,15 @@
 
 
 #include <base/config.h>
-#include <base/table.h>
-#include <lac/block_matrix_base.h>
-#include <lac/petsc_parallel_sparse_matrix.h>
-#include <lac/petsc_parallel_block_vector.h>
-#include <lac/exceptions.h>
-#include <cmath>
 
 #ifdef DEAL_II_USE_PETSC
+
+#  include <base/table.h>
+#  include <lac/block_matrix_base.h>
+#  include <lac/petsc_parallel_sparse_matrix.h>
+#  include <lac/petsc_parallel_block_vector.h>
+#  include <lac/exceptions.h>
+#  include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 

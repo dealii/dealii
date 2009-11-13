@@ -14,11 +14,10 @@
 
 #include <lac/trilinos_vector_base.h>
 
-#include <cmath>
-
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Epetra_Import.h>
+#  include <cmath>
+#  include <Epetra_Import.h>
 
 
 DEAL_II_NAMESPACE_OPEN

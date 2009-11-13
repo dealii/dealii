@@ -15,23 +15,24 @@
 
 
 #include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/std_cxx1x/shared_ptr.h>
-
-#include <lac/trilinos_vector_base.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-#  include <Epetra_MpiComm.h>
-#else
-#  include <Epetra_SerialComm.h>
-#endif
-#include <Epetra_Map.h>
+#  include <base/subscriptor.h>
+#  include <base/std_cxx1x/shared_ptr.h>
 
-#include <Teuchos_RCP.hpp>
-#include <Epetra_Operator.h>
-#include <Epetra_Vector.h>
+#  include <lac/trilinos_vector_base.h>
+
+#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#    include <Epetra_MpiComm.h>
+#  else
+#    include <Epetra_SerialComm.h>
+#  endif
+#  include <Epetra_Map.h>
+
+#  include <Teuchos_RCP.hpp>
+#  include <Epetra_Operator.h>
+#  include <Epetra_Vector.h>
 
 // forward declarations
 class Ifpack_Preconditioner;

@@ -421,9 +421,50 @@ class QProjector
 /*@}*/
 
 
+// -------------------  inline and template functions ----------------
+
+
+
+template <int dim>
+inline
+QProjector<dim>::DataSetDescriptor::
+DataSetDescriptor (const unsigned int dataset_offset)
+                :
+                dataset_offset (dataset_offset)
+{}
+
+
+template <int dim>
+inline
+QProjector<dim>::DataSetDescriptor::
+DataSetDescriptor ()
+                :
+                dataset_offset (numbers::invalid_unsigned_int)
+{}
+
+
+
+template <int dim>
+typename QProjector<dim>::DataSetDescriptor
+QProjector<dim>::DataSetDescriptor::cell ()
+{
+  return 0;
+}
+
+
+
+template <int dim>
+inline
+QProjector<dim>::DataSetDescriptor::operator unsigned int () const
+{
+  return dataset_offset;
+}
+
+
 /* -------------- declaration of explicit specializations ------------- */
 
 #ifndef DOXYGEN
+
 
 template <>
 void

@@ -11,34 +11,34 @@
 //
 //---------------------------------------------------------------------------
 
+
 #include <lac/trilinos_solver_block.h>
-#include <lac/trilinos_block_sparse_matrix.h>
-#include <lac/trilinos_block_vector.h>
-#include <lac/trilinos_precondition_block.h>
-
-#include <base/utilities.h>
-
-#include <cmath>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Teuchos_RCP.hpp>
-#include <Teuchos_ParameterList.hpp>
+#  include <lac/trilinos_block_sparse_matrix.h>
+#  include <lac/trilinos_block_vector.h>
+#  include <lac/trilinos_precondition_block.h>
 
-#include <Epetra_Vector.h>
+#  include <base/utilities.h>
 
-#include <Thyra_VectorDecl.hpp>
-#include <Thyra_VectorImpl.hpp>
-#include <Thyra_VectorSpaceImpl.hpp>
-#include <Thyra_MultiVectorBase.hpp>
-#include <Thyra_MultiVectorDefaultBase.hpp>
-#include <Thyra_LinearOperatorDecl.hpp>
-#include <Thyra_LinearOperatorImpl.hpp>
-#include <Thyra_DefaultBlockedLinearOp.hpp>
-#include <Thyra_EpetraLinearOp.hpp>
-#include <Thyra_EpetraThyraWrappers.hpp>
-#include <Thyra_LinearOpWithSolveFactoryHelpers.hpp>
-#include <Thyra_AztecOOLinearOpWithSolveFactory.hpp>
+#  include <Teuchos_RCP.hpp>
+#  include <Teuchos_ParameterList.hpp>
+
+#  include <Epetra_Vector.h>
+
+#  include <Thyra_VectorDecl.hpp>
+#  include <Thyra_VectorImpl.hpp>
+#  include <Thyra_VectorSpaceImpl.hpp>
+#  include <Thyra_MultiVectorBase.hpp>
+#  include <Thyra_MultiVectorDefaultBase.hpp>
+#  include <Thyra_LinearOperatorDecl.hpp>
+#  include <Thyra_LinearOperatorImpl.hpp>
+#  include <Thyra_DefaultBlockedLinearOp.hpp>
+#  include <Thyra_EpetraLinearOp.hpp>
+#  include <Thyra_EpetraThyraWrappers.hpp>
+#  include <Thyra_LinearOpWithSolveFactoryHelpers.hpp>
+#  include <Thyra_AztecOOLinearOpWithSolveFactory.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 

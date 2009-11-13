@@ -21,6 +21,7 @@
 #include <base/table.h>
 #include <base/template_constraints.h>
 
+#include <lac/vector.h>
 #include <lac/trilinos_vector.h>
 
 #include <vector>
@@ -33,7 +34,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 template<int dim, class T> class Table;
-template <typename> class Vector;
 template <typename> class FullMatrix;
 class SparsityPattern;
 class CompressedSparsityPattern;

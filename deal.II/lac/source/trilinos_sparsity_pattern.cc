@@ -11,14 +11,16 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/utilities.h>
+
 #include <lac/trilinos_sparsity_pattern.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/compressed_set_sparsity_pattern.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
 
 #ifdef DEAL_II_USE_TRILINOS
+
+#  include <base/utilities.h>
+#  include <lac/sparsity_pattern.h>
+#  include <lac/compressed_sparsity_pattern.h>
+#  include <lac/compressed_set_sparsity_pattern.h>
+#  include <lac/compressed_simple_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -40,7 +42,7 @@ namespace TrilinosWrappers
 
 	  return;
 	}
-      
+
 				  // otherwise first flush Trilinos caches
       sparsity_pattern->compress ();
 
@@ -48,11 +50,11 @@ namespace TrilinosWrappers
 				  // row
       int ncols;
       int colnums = sparsity_pattern->n_cols();
-      
+
       int ierr;
-      ierr = sparsity_pattern->graph->ExtractGlobalRowCopy((int)this->a_row, 
+      ierr = sparsity_pattern->graph->ExtractGlobalRowCopy((int)this->a_row,
 							   colnums,
-							   ncols, 
+							   ncols,
 							   (int*)&(*colnum_cache)[0]);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -82,184 +84,91 @@ namespace TrilinosWrappers
 				  // interface.
   SparsityPattern::SparsityPattern ()
 		  :
-		  communicator (Utilities::Trilinos::duplicate_communicator
-				(Utilities::Trilinos::comm_self())),
-                  row_map (0, 0, *communicator),
-		  col_map (0, 0, *communicator),
-		  compressed (true),
-		  graph (std::auto_ptr<Epetra_FECrsGraph>
-			 (new Epetra_FECrsGraph(View, row_map, col_map, 0)))
+		  compressed (true)
   {
+    column_space_map = std::auto_ptr<Epetra_Map>
+      (new Epetra_Map (0, 0, Utilities::Trilinos::comm_self()));
+    graph = std::auto_ptr<Epetra_FECrsGraph>
+      (new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0));
     graph->FillComplete();
   }
 
-  
-  SparsityPattern::SparsityPattern (const Epetra_Map  &InputMap,
-				    const unsigned int n_entries_per_row)
-		  :
-		  communicator (Utilities::Trilinos::duplicate_communicator (InputMap.Comm())),
-                  row_map (Utilities::Trilinos::duplicate_map (InputMap, *communicator)),
-		  col_map (row_map),
-		  compressed (false),
-				   // for more than one processor, need to
-				   // specify only row map first and let the
-				   // matrix entries decide about the column
-				   // map (which says which columns are
-				   // present in the matrix, not to be
-				   // confused with the col_map that tells
-				   // how the domain dofs of the matrix will
-				   // be distributed). for only one
-				   // processor, we can directly assign the
-				   // columns as well.
-		  graph (row_map.Comm().NumProc() > 1 ?
-			 (std::auto_ptr<Epetra_FECrsGraph>
-				   (new Epetra_FECrsGraph(Copy, row_map, 
-							  (int)n_entries_per_row, 
-							  false)))
-			 :
-			 (std::auto_ptr<Epetra_FECrsGraph>
-			           (new Epetra_FECrsGraph(Copy, row_map, col_map, 
-							  (int)n_entries_per_row, 
-							  false)))
-			 )
-  {}
- 
-  SparsityPattern::SparsityPattern (const Epetra_Map                &InputMap,
-				    const std::vector<unsigned int> &n_entries_per_row)
-		  :
-		  communicator (Utilities::Trilinos::
-				duplicate_communicator (InputMap.Comm())),
-                  row_map (Utilities::Trilinos::duplicate_map (InputMap, *communicator)),
-		  col_map (row_map),
-		  compressed (false),
-		  graph (row_map.Comm().NumProc() > 1 ?
-			 (std::auto_ptr<Epetra_FECrsGraph>
-			  (new Epetra_FECrsGraph(Copy, row_map, 
-						 (int*)const_cast<unsigned int*>
-						 (&(n_entries_per_row[row_map.MinMyGID()])),
-						 false)))
-			 :
-			 (std::auto_ptr<Epetra_FECrsGraph>
-			  (new Epetra_FECrsGraph(Copy, row_map, col_map, 
-						 (int*)const_cast<unsigned int*>
-						 (&(n_entries_per_row[row_map.MinMyGID()])),
-						 false)))
-			 )
-  {}
 
-  SparsityPattern::SparsityPattern (const Epetra_Map  &InputRowMap,
-				    const Epetra_Map  &InputColMap,
+  SparsityPattern::SparsityPattern (const Epetra_Map  &input_map,
 				    const unsigned int n_entries_per_row)
-		  :
-		  communicator (Utilities::Trilinos::
-				duplicate_communicator (InputRowMap.Comm())),
-                  row_map (Utilities::Trilinos::
-			   duplicate_map (InputRowMap, *communicator)),
-                  col_map (Utilities::Trilinos::
-			   duplicate_map (InputColMap, *communicator)),
-		  compressed (false),
-		  graph (row_map.Comm().NumProc() > 1 ?
-			 (std::auto_ptr<Epetra_FECrsGraph>
-				   (new Epetra_FECrsGraph(Copy, row_map, 
-							  (int)n_entries_per_row, 
-							  false)))
-			 :
-			 (std::auto_ptr<Epetra_FECrsGraph>
-			           (new Epetra_FECrsGraph(Copy, row_map, col_map, 
-							  (int)n_entries_per_row, 
-							  false)))
-			 )
-  {}
+  {
+    reinit (input_map, input_map, n_entries_per_row);
+  }
 
-  SparsityPattern::SparsityPattern (const Epetra_Map                &InputRowMap,
-				    const Epetra_Map                &InputColMap,
+
+
+  SparsityPattern::SparsityPattern (const Epetra_Map                &input_map,
 				    const std::vector<unsigned int> &n_entries_per_row)
-		  :
-		  communicator (Utilities::Trilinos::
-				duplicate_communicator (InputRowMap.Comm())),
-                  row_map (Utilities::Trilinos::
-			   duplicate_map (InputRowMap, *communicator)),
-                  col_map (Utilities::Trilinos::
-			   duplicate_map (InputColMap, *communicator)),
-		  compressed (false),
-		  graph (row_map.Comm().NumProc() > 1 ?
-			 (std::auto_ptr<Epetra_FECrsGraph>
-			  (new Epetra_FECrsGraph(Copy, row_map, 
-						 (int*)const_cast<unsigned int*>
-						 (&(n_entries_per_row[row_map.MinMyGID()])),
-						 false)))
-			 :
-			 (std::auto_ptr<Epetra_FECrsGraph>
-			  (new Epetra_FECrsGraph(Copy, row_map, col_map, 
-						 (int*)const_cast<unsigned int*>
-						 (&(n_entries_per_row[row_map.MinMyGID()])),
-						 false)))
-			 )
-  {}
+  {
+    reinit (input_map, input_map, n_entries_per_row);
+  }
+
+
+
+  SparsityPattern::SparsityPattern (const Epetra_Map  &input_row_map,
+				    const Epetra_Map  &input_col_map,
+				    const unsigned int n_entries_per_row)
+  {
+    reinit (input_row_map, input_col_map, n_entries_per_row);
+  }
+
+
+
+  SparsityPattern::SparsityPattern (const Epetra_Map                &input_row_map,
+				    const Epetra_Map                &input_col_map,
+				    const std::vector<unsigned int> &n_entries_per_row)
+  {
+    reinit (input_row_map, input_col_map, n_entries_per_row);
+  }
+
+
 
   SparsityPattern::SparsityPattern (const unsigned int m,
 				    const unsigned int n,
 				    const unsigned int n_entries_per_row)
-		  :
-		  communicator (Utilities::Trilinos::duplicate_communicator
-				(Utilities::Trilinos::comm_self())),
-                  row_map (m, 0, *communicator),
-                  col_map (n, 0, *communicator),
-		  compressed (false),
-		  graph (std::auto_ptr<Epetra_FECrsGraph>
-			 (new Epetra_FECrsGraph(Copy, row_map, col_map,
-						int(n_entries_per_row), false)))
-  {}
-
-  
-  SparsityPattern::SparsityPattern (const unsigned int               m,
-				    const unsigned int               n,
-				    const std::vector<unsigned int> &n_entries_per_row)
-		  :
-		  communicator (Utilities::Trilinos::duplicate_communicator
-				(Utilities::Trilinos::comm_self())),
-                  row_map (m, 0, *communicator),
-                  col_map (n, 0, *communicator),
-		  compressed (false),
-		  graph (std::auto_ptr<Epetra_FECrsGraph>
-			 (new Epetra_FECrsGraph(Copy, row_map, col_map, 
-			  (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])), 
-						false)))
-  {}
-
-				   // Copy function is currently not working
-				   // because the Trilinos Epetra_FECrsGraph
-				   // does not implement a constructor from
-				   // another graph.
-  /*
-  SparsityPattern::SparsityPattern (const SparsityPattern &InputSP)
-  		  :
-                  Subscriptor(),
-		  row_map (InputSP.row_map),
- 		  col_map (InputSP.col_map),
-  		  compressed (false),
-  		  graph (std::auto_ptr<Epetra_FECrsGraph>
-  			  (new Epetra_FECrsGraph(*InputSP.graph)))
-  {}
-  */
-
-
-
-  SparsityPattern::~SparsityPattern ()
   {
-// this is sorta tricky. we can't destroy the communicator here
-// if we have initialized a matrix with it because the matrix
-// keeps a reference count to the sparsity pattern and so
-// the communicator has to stay alive even though the sparsity
-// pattern goes out of scope :-(
-//
-// TODO: find a way to fix this    
-//    Utilities::Trilinos::destroy_communicator (*communicator);
+    reinit (m, n, n_entries_per_row);
   }
 
 
 
-  void 
+  SparsityPattern::SparsityPattern (const unsigned int               m,
+				    const unsigned int               n,
+				    const std::vector<unsigned int> &n_entries_per_row)
+  {
+    reinit (m, n, n_entries_per_row);
+  }
+
+
+				   // Copy function only works if the
+				   // sparsity pattern is empty.
+  SparsityPattern::SparsityPattern (const SparsityPattern &input_sparsity)
+  		  :
+                  Subscriptor(),
+                  column_space_map (std::auto_ptr<Epetra_Map>
+				    (new Epetra_Map(0, 0, Utilities::Trilinos::comm_self()))),
+                  compressed (false),
+                  graph (std::auto_ptr<Epetra_FECrsGraph>
+			 (new Epetra_FECrsGraph(View, *column_space_map,
+						*column_space_map, 0)))
+  {
+    Assert (input_sparsity.n_rows() == 0,
+	    ExcMessage ("Copy constructor only works for empty sparsity patterns."));
+  }
+
+
+
+  SparsityPattern::~SparsityPattern ()
+  {}
+
+
+
+  void
   SparsityPattern::reinit (const Epetra_Map   &input_map,
 			   const unsigned int  n_entries_per_row)
   {
@@ -267,7 +176,7 @@ namespace TrilinosWrappers
   }
 
 
-  void 
+  void
   SparsityPattern::reinit (const unsigned int  m,
 			   const unsigned int  n,
 			   const unsigned int  n_entries_per_row)
@@ -279,22 +188,15 @@ namespace TrilinosWrappers
   }
 
 
-  void 
+  void
   SparsityPattern::reinit (const Epetra_Map   &input_row_map,
 			   const Epetra_Map   &input_col_map,
 			   const unsigned int  n_entries_per_row)
   {
-    Utilities::Trilinos::destroy_communicator (*communicator);
-    communicator.reset (Utilities::Trilinos::
-			duplicate_communicator (input_row_map.Comm()));
-
-    row_map = Utilities::Trilinos::duplicate_map (input_row_map,
-						  *communicator);
-    col_map = Utilities::Trilinos::duplicate_map (input_col_map,
-						  *communicator);
-
+    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
     graph.reset();
-    
+    compressed = false;
+
 				   // for more than one processor, need to
 				   // specify only row map first and let the
 				   // matrix entries decide about the column
@@ -305,17 +207,18 @@ namespace TrilinosWrappers
 				   // be distributed). for only one
 				   // processor, we can directly assign the
 				   // columns as well.
-    if (row_map.Comm().NumProc() > 1)
+    if (input_row_map.Comm().NumProc() > 1)
       graph = std::auto_ptr<Epetra_FECrsGraph>
-	(new Epetra_FECrsGraph(Copy, row_map, n_entries_per_row, false));
+	(new Epetra_FECrsGraph(Copy, input_row_map, n_entries_per_row, false));
     else
       graph = std::auto_ptr<Epetra_FECrsGraph>
-	(new Epetra_FECrsGraph(Copy, row_map, col_map, n_entries_per_row, false));
+	(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
+			       n_entries_per_row, false));
   }
 
 
 
-  void 
+  void
   SparsityPattern::reinit (const Epetra_Map   &input_map,
 			   const std::vector<unsigned int> &n_entries_per_row)
   {
@@ -324,7 +227,7 @@ namespace TrilinosWrappers
 
 
 
-  void 
+  void
   SparsityPattern::reinit (const unsigned int  m,
 			   const unsigned int  n,
 			   const std::vector<unsigned int> &n_entries_per_row)
@@ -337,104 +240,98 @@ namespace TrilinosWrappers
 
 
 
-  void 
+  void
   SparsityPattern::reinit (const Epetra_Map   &input_row_map,
 			   const Epetra_Map   &input_col_map,
 			   const std::vector<unsigned int> &n_entries_per_row)
   {
-    Assert (n_entries_per_row.size() == 
+    Assert (n_entries_per_row.size() ==
 	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
 	    ExcDimensionMismatch (n_entries_per_row.size(),
 				  input_row_map.NumGlobalElements()));
 
-    Utilities::Trilinos::destroy_communicator (*communicator);
-    communicator.reset (Utilities::Trilinos::
-			duplicate_communicator (input_row_map.Comm()));
-
-    row_map = Utilities::Trilinos::duplicate_map (input_row_map,
-						  *communicator);
-    col_map = Utilities::Trilinos::duplicate_map (input_col_map,
-						  *communicator);
-
+    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
     graph.reset();
+    compressed = false;
 
-    if (row_map.Comm().NumProc() > 1)
+    if (input_row_map.Comm().NumProc() > 1)
       graph = std::auto_ptr<Epetra_FECrsGraph>
-	(new Epetra_FECrsGraph(Copy, row_map, 
-			       n_entries_per_row[input_row_map.MinMyGID()], 
+	(new Epetra_FECrsGraph(Copy, input_row_map,
+			       n_entries_per_row[input_row_map.MinMyGID()],
 			       false));
     else
       graph = std::auto_ptr<Epetra_FECrsGraph>
-	(new Epetra_FECrsGraph(Copy, row_map, col_map,
-			       n_entries_per_row[input_row_map.MinMyGID()], 
-			       false));      
+	(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
+			       n_entries_per_row[input_row_map.MinMyGID()],
+			       false));
   }
 
 
 
   template <typename SparsityType>
-  void 
+  void
   SparsityPattern::reinit (const Epetra_Map   &input_map,
-			   const SparsityType &sp)
+			   const SparsityType &sp,
+			   const bool          exchange_data)
   {
-    reinit (input_map, input_map, sp);
+    reinit (input_map, input_map, sp, exchange_data);
   }
 
 
 
   template <typename SparsityType>
-  void 
+  void
   SparsityPattern::reinit (const Epetra_Map   &input_row_map,
 			   const Epetra_Map   &input_col_map,
-			   const SparsityType &sp)
+			   const SparsityType &sp,
+			   const bool          exchange_data)
   {
-    Assert (sp.n_rows() == 
+    Assert (sp.n_rows() ==
 	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
 	    ExcDimensionMismatch (sp.n_rows(),
 				  input_row_map.NumGlobalElements()));
-    Assert (sp.n_cols() == 
+    Assert (sp.n_cols() ==
 	      static_cast<unsigned int>(input_col_map.NumGlobalElements()),
 	    ExcDimensionMismatch (sp.n_cols(),
 				  input_col_map.NumGlobalElements()));
+    Assert (exchange_data == false, ExcNotImplemented());
 
-    Utilities::Trilinos::destroy_communicator (*communicator);
-    communicator.reset (Utilities::Trilinos::
-			duplicate_communicator (input_row_map.Comm()));
-
-    row_map = Utilities::Trilinos::duplicate_map (input_row_map,
-						  *communicator);
-    col_map = Utilities::Trilinos::duplicate_map (input_col_map,
-						  *communicator);
-
+    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
     graph.reset();
+    compressed = false;
 
     const unsigned int n_rows = sp.n_rows();
 
-    std::vector<int> n_entries_per_row(n_rows);
+    Assert (input_row_map.LinearMap() == true,
+	    ExcMessage ("This function is not efficient if the map is not contiguous."));
 
-    for (unsigned int row=0; row<n_rows; ++row)
-      n_entries_per_row[row] = sp.row_length(row);
+    std::vector<int> n_entries_per_row(input_row_map.MaxMyGID()-
+				       input_row_map.MinMyGID() + 1);
 
-    if (row_map.Comm().NumProc() > 1)
+    for (unsigned int row=input_row_map.MinMyGID();
+	 row<static_cast<unsigned int>(input_row_map.MaxMyGID()+1);
+	 ++row)
+      n_entries_per_row[row-input_row_map.MinMyGID()] = sp.row_length(row);
+
+    if (input_row_map.Comm().NumProc() > 1)
       graph = std::auto_ptr<Epetra_FECrsGraph>
-	(new Epetra_FECrsGraph(Copy, row_map, 
-			       n_entries_per_row[input_row_map.MinMyGID()], 
+	(new Epetra_FECrsGraph(Copy, input_row_map,
+			       n_entries_per_row[0],
 			       false));
     else
       graph = std::auto_ptr<Epetra_FECrsGraph>
-	(new Epetra_FECrsGraph(Copy, row_map, col_map,
-			       n_entries_per_row[input_row_map.MinMyGID()], 
-			       false));      
+	(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
+			       n_entries_per_row[0],
+			       false));
 
     Assert (graph->NumGlobalRows() == (int)sp.n_rows(),
     	    ExcDimensionMismatch (graph->NumGlobalRows(),
     				  sp.n_rows()));
 
-
     std::vector<int>   row_indices;
-    
+
     for (unsigned int row=0; row<n_rows; ++row)
-      if (row_map.MyGID(row))
+      if ( input_row_map.MyGID(row) )
 	{
 	  const int row_length = sp.row_length(row);
 	  row_indices.resize (row_length, -1);
@@ -442,7 +339,7 @@ namespace TrilinosWrappers
 	  for (int col=0; col < row_length; ++col)
 	    row_indices[col] = sp.column_number (row, col);
 
-	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length, 
+	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
 						       &row_indices[0]);
 	}
 
@@ -451,13 +348,14 @@ namespace TrilinosWrappers
 
 
 
-  template<>
-  void 
+  template <>
+  void
   SparsityPattern::reinit (const Epetra_Map   &input_row_map,
 			   const Epetra_Map   &input_col_map,
-			   const CompressedSetSparsityPattern &sp)
+			   const CompressedSimpleSparsityPattern &sp,
+			   const bool          exchange_data)
   {
-    Assert (sp.n_rows() == 
+    Assert (sp.n_rows() ==
 	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
 	    ExcDimensionMismatch (sp.n_rows(),
 				  input_row_map.NumGlobalElements()));
@@ -466,34 +364,113 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (sp.n_cols(),
 				  input_col_map.NumGlobalElements()));
 
-    Utilities::Trilinos::destroy_communicator (*communicator);
-    communicator.reset (Utilities::Trilinos::
-			duplicate_communicator (input_row_map.Comm()));
-
-    row_map = Utilities::Trilinos::duplicate_map (input_row_map,
-						  *communicator);
-    col_map = Utilities::Trilinos::duplicate_map (input_col_map,
-						  *communicator);
-
+    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
     graph.reset();
+    compressed = false;
 
-    const unsigned int n_rows = sp.n_rows();
+    Assert (input_row_map.LinearMap() == true,
+	    ExcMessage ("This function is not efficient if the map is not contiguous."));
 
-    std::vector<int> n_entries_per_row(n_rows);
+    std::vector<int> n_entries_per_row(input_row_map.MaxMyGID()-
+				       input_row_map.MinMyGID() + 1);
 
-    for (unsigned int row=0; row<n_rows; ++row)
-      n_entries_per_row[row] = sp.row_length(row);
+    for (unsigned int row=input_row_map.MinMyGID();
+	 row<static_cast<unsigned int>(input_row_map.MaxMyGID()+1);
+	 ++row)
+      n_entries_per_row[row-input_row_map.MinMyGID()] = sp.row_length(row);
 
-    if (row_map.Comm().NumProc() > 1)
+    if (input_row_map.Comm().NumProc() > 1)
       graph = std::auto_ptr<Epetra_FECrsGraph>
-	(new Epetra_FECrsGraph(Copy, row_map, 
-			       n_entries_per_row[input_row_map.MinMyGID()], 
+	(new Epetra_FECrsGraph(Copy, input_row_map,
+			       n_entries_per_row[0],
 			       false));
     else
       graph = std::auto_ptr<Epetra_FECrsGraph>
-	(new Epetra_FECrsGraph(Copy, row_map, col_map,
-			       n_entries_per_row[input_row_map.MinMyGID()], 
-			       false));      
+	(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
+			       n_entries_per_row[0],
+			       false));
+
+    Assert (graph->NumGlobalRows() == (int)sp.n_rows(),
+    	    ExcDimensionMismatch (graph->NumGlobalRows(),
+    				  sp.n_rows()));
+
+    const unsigned int n_rows = sp.n_rows();
+    std::vector<int>   row_indices;
+
+				// Include possibility to exchange data
+				// since CompressedSimpleSparsityPattern is
+				// able to do so
+    for (unsigned int row=0; row<n_rows; ++row)
+      if (input_row_map.MyGID(row) )
+	{
+	  const int row_length = sp.row_length(row);
+	  row_indices.resize (row_length, -1);
+
+	  for (int col=0; col < row_length; ++col)
+	    row_indices[col] = sp.column_number (row, col);
+
+	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
+						       &row_indices[0]);
+	}
+      else if ( exchange_data && sp.row_index_set().is_element(row) )
+	{
+	  const int row_length = sp.row_length(row);
+	  row_indices.resize (row_length, -1);
+
+	  for (int col=0; col < row_length; ++col)
+	    row_indices[col] = sp.column_number (row, col);
+
+	  graph->InsertGlobalIndices (1, (int*)&row, row_length, &row_indices[0]);
+	}
+
+    compress();
+  }
+
+
+
+  template<>
+  void
+  SparsityPattern::reinit (const Epetra_Map   &input_row_map,
+			   const Epetra_Map   &input_col_map,
+			   const CompressedSetSparsityPattern &sp,
+			   const bool          exchange_data)
+  {
+    Assert (exchange_data == false, ExcNotImplemented());
+    Assert (sp.n_rows() ==
+	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
+	    ExcDimensionMismatch (sp.n_rows(),
+				  input_row_map.NumGlobalElements()));
+    Assert (sp.n_cols() ==
+	      static_cast<unsigned int>(input_col_map.NumGlobalElements()),
+	    ExcDimensionMismatch (sp.n_cols(),
+				  input_col_map.NumGlobalElements()));
+
+    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
+    graph.reset();
+    compressed = false;
+
+    const unsigned int n_rows = sp.n_rows();
+
+    std::vector<int> n_entries_per_row(input_row_map.MaxMyGID()-
+				       input_row_map.MinMyGID() + 1);
+    for (unsigned int row=input_row_map.MinMyGID();
+	 row<static_cast<unsigned int>(input_row_map.MaxMyGID()+1);
+	 ++row)
+      {
+	n_entries_per_row[row-input_row_map.MinMyGID()] = sp.row_length(row);
+      }
+
+
+    if (input_row_map.Comm().NumProc() > 1)
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, input_row_map,
+			       n_entries_per_row[0],
+			       false));
+    else
+      graph = std::auto_ptr<Epetra_FECrsGraph>
+	(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
+			       n_entries_per_row[0],
+			       false));
 
     Assert (graph->NumGlobalRows() == (int)sp.n_rows(),
     	    ExcDimensionMismatch (graph->NumGlobalRows(),
@@ -501,22 +478,27 @@ namespace TrilinosWrappers
 
 
     std::vector<int>   row_indices;
-    
-    for (unsigned int row=0; row<n_rows; ++row)
-      if (row_map.MyGID(row))
+
+    for (unsigned int row=input_row_map.MinMyGID();
+	 row<static_cast<unsigned int>(input_row_map.MaxMyGID()+1);
+	 ++row)
+     if (exchange_data || input_row_map.MyGID(row))
 	{
 	  const int row_length = sp.row_length(row);
+	  if (row_length == 0)
+	    continue;
+
 	  row_indices.resize (row_length, -1);
 
-	  CompressedSetSparsityPattern::row_iterator col_num = 
+	  CompressedSetSparsityPattern::row_iterator col_num =
 	    sp.row_begin (row);
 
-	  for (unsigned int col = 0; 
-	       col_num != sp.row_end (row); 
+	  for (unsigned int col = 0;
+	       col_num != sp.row_end (row);
 	       ++col_num, ++col)
 	    row_indices[col] = *col_num;
 
-	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length, 
+	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
 						       &row_indices[0]);
 	}
 
@@ -531,10 +513,10 @@ namespace TrilinosWrappers
     Assert (false, ExcNotImplemented());
   }
 
-  
+
 
   template <typename SparsityType>
-  void 
+  void
   SparsityPattern::copy_from (const SparsityType &sp)
   {
     const Epetra_Map rows (sp.n_rows(), 0, Utilities::Trilinos::comm_self());
@@ -550,15 +532,14 @@ namespace TrilinosWrappers
   {
 				  // When we clear the matrix, reset
 				  // the pointer and generate an
-				  // empty matrix.
+				  // empty sparsity pattern.
+    column_space_map.reset();
     graph.reset();
- 
-    row_map = Epetra_Map (0, 0, Utilities::Trilinos::comm_self());
-    col_map = row_map;
 
-    graph = std::auto_ptr<Epetra_FECrsGraph> 
-	      (new Epetra_FECrsGraph(View, row_map, 0));
-
+     column_space_map = std::auto_ptr<Epetra_Map>
+       (new Epetra_Map (0, 0, Utilities::Trilinos::comm_self()));
+    graph = std::auto_ptr<Epetra_FECrsGraph>
+      (new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0));
     graph->FillComplete();
 
     compressed = true;
@@ -570,8 +551,11 @@ namespace TrilinosWrappers
   SparsityPattern::compress ()
   {
     int ierr;
-    ierr = graph->GlobalAssemble (col_map, row_map, true);
-    
+    Assert (&* column_space_map != 0, ExcInternalError());
+    ierr = graph->GlobalAssemble (*column_space_map,
+				  static_cast<const Epetra_Map&>(graph->RangeMap()),
+				  true);
+
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
     ierr = graph->OptimizeStorage ();
@@ -602,7 +586,7 @@ namespace TrilinosWrappers
       }
     else
       {
-				      // Check whether the matrix 
+				      // Check whether the matrix
 				      // already is transformed to
 				      // local indices.
 	if (graph->Filled() == false)
@@ -701,7 +685,7 @@ namespace TrilinosWrappers
     if (graph->Filled() == true)
       n_cols = graph -> NumGlobalCols();
     else
-      n_cols = col_map.NumGlobalElements();
+      n_cols = column_space_map->NumGlobalElements();
 
     return n_cols;
   }
@@ -724,7 +708,7 @@ namespace TrilinosWrappers
     unsigned int begin, end;
     begin = graph -> RowMap().MinMyGID();
     end = graph -> RowMap().MaxMyGID()+1;
-    
+
     return std::make_pair (begin, end);
   }
 
@@ -783,19 +767,25 @@ namespace TrilinosWrappers
 				  // ouput is generated in case of
 				  // multiple processors.
   void
-  SparsityPattern::print (std::ostream &out) const
+  SparsityPattern::print (std::ostream &out,
+			  const bool    write_extended_trilinos_info) const
   {
-    int * indices;
-    int num_entries;
-  
-    for (int i=0; i<graph->NumMyRows(); ++i)
+    if (write_extended_trilinos_info)
+      out << *graph;
+    else
       {
-	graph->ExtractMyRowView (i, num_entries, indices);
-	for (int j=0; j<num_entries; ++j)
-	  out << "(" << i << "," << indices[graph->GRID(j)] << ") " 
-	      << std::endl;
+	int * indices;
+	int num_entries;
+
+	for (int i=0; i<graph->NumMyRows(); ++i)
+	  {
+	    graph->ExtractMyRowView (i, num_entries, indices);
+	    for (int j=0; j<num_entries; ++j)
+	      out << "(" << i << "," << indices[graph->GRID(j)] << ") "
+		  << std::endl;
+	  }
       }
-  
+
     AssertThrow (out, ExcIO());
   }
 
@@ -803,7 +793,7 @@ namespace TrilinosWrappers
 
   void
   SparsityPattern::print_gnuplot (std::ostream &out) const
-  { 
+  {
     Assert (graph->Filled() == true, ExcInternalError());
     for (unsigned int row=0; row<local_size(); ++row)
       {
@@ -817,9 +807,9 @@ namespace TrilinosWrappers
                                          // j horizontal, gnuplot output is
                                          // x-y, that is we have to exchange
                                          // the order of output
-	  out << indices[graph->GRID(j)] << " " << -static_cast<signed int>(row) 
+	  out << indices[graph->GRID(j)] << " " << -static_cast<signed int>(row)
 	      << std::endl;
-      }      
+      }
 
     AssertThrow (out, ExcIO());
   }
@@ -841,30 +831,32 @@ namespace TrilinosWrappers
 
   template void
   SparsityPattern::reinit (const Epetra_Map &,
-			   const dealii::SparsityPattern &);
+			   const dealii::SparsityPattern &,
+			   bool);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
-			   const dealii::CompressedSparsityPattern &);
+			   const dealii::CompressedSparsityPattern &,
+			   bool);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
-			   const dealii::CompressedSetSparsityPattern &);
+			   const dealii::CompressedSetSparsityPattern &,
+			   bool);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
-			   const dealii::CompressedSimpleSparsityPattern &);
+			   const dealii::CompressedSimpleSparsityPattern &,
+			   bool);
 
 
   template void
   SparsityPattern::reinit (const Epetra_Map &,
 			   const Epetra_Map &,
-			   const dealii::SparsityPattern &);
+			   const dealii::SparsityPattern &,
+			   bool);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
 			   const Epetra_Map &,
-			   const dealii::CompressedSparsityPattern &);
-  template void
-  SparsityPattern::reinit (const Epetra_Map &,
-			   const Epetra_Map &,
-			   const dealii::CompressedSimpleSparsityPattern &);
+			   const dealii::CompressedSparsityPattern &,
+			   bool);
 
 }
 

@@ -15,12 +15,13 @@
 
 
 #include <base/config.h>
-#include <lac/petsc_parallel_vector.h>
-#include <lac/block_indices.h>
-#include <lac/block_vector_base.h>
-#include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/petsc_parallel_vector.h>
+#  include <lac/block_indices.h>
+#  include <lac/block_vector_base.h>
+#  include <lac/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

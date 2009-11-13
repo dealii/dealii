@@ -12,13 +12,13 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/petsc_matrix_base.h>
-#include <lac/petsc_vector_base.h>
 #include <lac/petsc_precondition.h>
 
-#include <cmath>
-
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/petsc_matrix_base.h>
+#  include <lac/petsc_vector_base.h>
+#  include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 

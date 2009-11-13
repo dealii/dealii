@@ -13,13 +13,13 @@
 
 
 #include <lac/petsc_parallel_sparse_matrix.h>
-#include <lac/petsc_vector.h>
-
-#include <lac/sparsity_pattern.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
 
 #ifdef DEAL_II_USE_PETSC
+
+#  include <lac/petsc_vector.h>
+#  include <lac/sparsity_pattern.h>
+#  include <lac/compressed_sparsity_pattern.h>
+#  include <lac/compressed_simple_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
 

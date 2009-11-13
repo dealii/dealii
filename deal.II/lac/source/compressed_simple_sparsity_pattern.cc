@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,9 +13,8 @@
 
 
 #include <lac/compressed_simple_sparsity_pattern.h>
+#include <base/memory_consumption.h>
 
-#include <iostream>
-#include <iomanip>
 #include <algorithm>
 #include <cmath>
 #include <numeric>
@@ -202,11 +201,18 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 }
 
 
+unsigned int
+CompressedSimpleSparsityPattern::Line::memory_consumption () const
+{
+  return entries.capacity()*sizeof(unsigned int)+sizeof(Line);
+}
 
+  
 CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern ()
                 :
 		rows(0),
-		cols(0)
+		cols(0),
+		rowset(0)
 {}
 
 
@@ -216,7 +222,8 @@ CompressedSimpleSparsityPattern (const CompressedSimpleSparsityPattern &s)
                 :
 		Subscriptor(),
 		rows(0),
-		cols(0)
+		cols(0),
+		rowset(0)
 {
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
@@ -225,12 +232,15 @@ CompressedSimpleSparsityPattern (const CompressedSimpleSparsityPattern &s)
 
 
 CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const unsigned int m,
-						      const unsigned int n) 
+								  const unsigned int n,
+								  const IndexSet & rowset_
+) 
 		:
                 rows(0),
-                cols(0)
+                cols(0),
+		rowset(0)
 {
-  reinit (m,n);
+  reinit (m,n, rowset_);
 }
 
 
@@ -238,7 +248,8 @@ CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const unsigned
 CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const unsigned int n)
 		:
                 rows(0),
-                cols(0)
+                cols(0),
+		rowset(0)
 {
   reinit (n,n);
 }
@@ -261,12 +272,21 @@ CompressedSimpleSparsityPattern::operator = (const CompressedSimpleSparsityPatte
 
 void
 CompressedSimpleSparsityPattern::reinit (const unsigned int m,
-				   const unsigned int n)
+					 const unsigned int n,
+					 const IndexSet & rowset_)
 {
   rows = m;
   cols = n;
+  rowset=rowset_;
+  if (rowset.size()==0)
+    {
+      rowset.set_size(m);
+      rowset.add_range(0,m);
+    }
+  
+  Assert( rowset.size()==m, ExcInternalError());
 
-  std::vector<Line> new_lines (rows);
+  std::vector<Line> new_lines (rowset.n_elements());
   lines.swap (new_lines);
 }
 
@@ -290,7 +310,7 @@ unsigned int
 CompressedSimpleSparsityPattern::max_entries_per_row () const
 {
   unsigned int m = 0;
-  for (unsigned int i=0; i<rows; ++i)
+  for (unsigned int i=0; i<rowset.n_elements(); ++i)
     {
       m = std::max (m, static_cast<unsigned int>(lines[i].entries.size()));
     }
@@ -302,13 +322,16 @@ CompressedSimpleSparsityPattern::max_entries_per_row () const
 
 bool 
 CompressedSimpleSparsityPattern::exists (const unsigned int i,
-				   const unsigned int j) const
+					 const unsigned int j) const
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
+  Assert( rowset.is_element(i), ExcInternalError());
 
-  return std::binary_search (lines[i].entries.begin(),
-                             lines[i].entries.end(),
+  unsigned int rowindex = rowset.index_within_set(i);
+  
+  return std::binary_search (lines[rowindex].entries.begin(),
+                             lines[rowindex].entries.end(),
                              j);
 }
 
@@ -332,14 +355,16 @@ CompressedSimpleSparsityPattern::symmetrize ()
 				   // already exist without any harm
   for (unsigned int row=0; row<rows; ++row)
     {
+      unsigned int rowindex = rowset.nth_index_in_set(row);
+
       for (std::vector<unsigned int>::const_iterator
              j=lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
 				       // add the transpose entry if
 				       // this is not the diagonal
-        if (row != *j)
-          add (*j, row);
+        if (rowindex != *j)
+          add (*j, rowindex);
     }
 }
 
@@ -350,7 +375,7 @@ CompressedSimpleSparsityPattern::print (std::ostream &out) const
 {
   for (unsigned int row=0; row<rows; ++row)
     {
-      out << '[' << row;
+      out << '[' << rowset.nth_index_in_set(row);
 
       for (std::vector<unsigned int>::const_iterator
              j=lines[row].entries.begin();
@@ -370,6 +395,8 @@ CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
 { 
   for (unsigned int row=0; row<rows; ++row)
     {
+      unsigned int rowindex = rowset.nth_index_in_set(row);
+
       for (std::vector<unsigned int>::const_iterator
              j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
@@ -378,7 +405,9 @@ CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
                                          // j horizontal, gnuplot output is
                                          // x-y, that is we have to exchange
                                          // the order of output
-        out << *j << " " << -static_cast<signed int>(row) << std::endl;
+        out << *j << " "
+	    << -static_cast<signed int>(rowindex)
+	    << std::endl;
     }
       
 
@@ -393,11 +422,13 @@ CompressedSimpleSparsityPattern::bandwidth () const
   unsigned int b=0;
   for (unsigned int row=0; row<rows; ++row)
     {
+      unsigned int rowindex = rowset.nth_index_in_set(row);
+
       for (std::vector<unsigned int>::const_iterator
              j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
-        if (static_cast<unsigned int>(std::abs(static_cast<int>(row-*j))) > b)
-          b = std::abs(static_cast<signed int>(row-*j));
+	if (static_cast<unsigned int>(std::abs(static_cast<int>(rowindex-*j))) > b)
+	  b = std::abs(static_cast<signed int>(rowindex-*j));
     }
   
   return b;
@@ -415,6 +446,18 @@ CompressedSimpleSparsityPattern::n_nonzero_elements () const
     }
   
   return n;
+}
+
+
+unsigned int
+CompressedSimpleSparsityPattern::memory_consumption () const
+{
+				   //TODO: IndexSet...
+  unsigned int mem = sizeof(CompressedSimpleSparsityPattern);
+  for (unsigned int i=0; i<lines.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (lines[i]);  
+
+  return mem;
 }
 
 

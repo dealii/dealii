@@ -15,16 +15,17 @@
 
 
 #include <base/config.h>
-#include <base/subscriptor.h>
-#include <lac/full_matrix.h>
-#include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#include <petscmat.h>
-#include <base/std_cxx1x/shared_ptr.h>
-#include <vector>
-#include <cmath>
+#  include <base/subscriptor.h>
+#  include <lac/full_matrix.h>
+#  include <lac/exceptions.h>
+
+#  include <petscmat.h>
+#  include <base/std_cxx1x/shared_ptr.h>
+#  include <vector>
+#  include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -664,6 +665,10 @@ namespace PETScWrappers
                                         * allowed. This function must
                                         * therefore be called once you have
                                         * assembled the matrix.
+					*
+					* See @ref GlossCompress "Compressing distributed objects"
+					* for more information.
+					* more information.
                                         */
       void compress ();
 
@@ -1107,6 +1112,12 @@ namespace PETScWrappers
 					 */
       void write_ascii ();
 
+				       /**
+					*  Returns the number bytes consumed
+					*  by this matrix on this CPU.
+					*/
+      unsigned int memory_consumption() const;
+      
                                        /**
                                         * Exception
                                         */

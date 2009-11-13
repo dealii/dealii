@@ -15,17 +15,17 @@
 
 
 #include <base/config.h>
-#include <base/table.h>
-#include <lac/block_matrix_base.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_block_vector.h>
-#include <lac/full_matrix.h>
-#include <lac/exceptions.h>
-
-#include <cmath>
-
 
 #ifdef DEAL_II_USE_TRILINOS
+
+#  include <base/table.h>
+#  include <lac/block_matrix_base.h>
+#  include <lac/trilinos_sparse_matrix.h>
+#  include <lac/trilinos_block_vector.h>
+#  include <lac/full_matrix.h>
+#  include <lac/exceptions.h>
+
+#  include <cmath>
 
 #  define TrilinosScalar double
 
