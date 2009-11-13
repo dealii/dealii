@@ -21,14 +21,12 @@
 #ifdef DEAL_II_USE_SLEPC
 
 #  include <lac/exceptions.h>
-#  include <lac/solver_control.h>
-#  include <lac/slepc_solver.h>
 #  include <boost/shared_ptr.hpp>
 
 #  include <petscksp.h>
 #  include <slepceps.h>
 
-DEAL_II_NAMESPACE_OPEN 
+DEAL_II_NAMESPACE_OPEN
 
 
 namespace SLEPcWrappers
@@ -56,7 +54,7 @@ namespace SLEPcWrappers
                                    /**
                                     * Destructor.
                                     */
-      virtual ~TransformationBase ();      
+      virtual ~TransformationBase ();
 
                                    /**
 				    * Record the EPS object that is associated
@@ -85,7 +83,7 @@ namespace SLEPcWrappers
                                     */
       struct TransformationData
       {
-	
+
                                    /**
                            	    * Destructor.
                               	    */
@@ -95,14 +93,14 @@ namespace SLEPcWrappers
                                     * Objects for Eigenvalue Problem
                                     * Solver.
                                     */
-	ST st;  
+	ST st;
       };
 
       boost::shared_ptr<TransformationData> transformation_data;
     };
 
 /**
- * An implementation of the transformation interface using the SLEPc 
+ * An implementation of the transformation interface using the SLEPc
  * Shift.
  *
  * @ingroup SLEPcWrappers
@@ -111,7 +109,7 @@ namespace SLEPcWrappers
   class TransformationShift : public TransformationBase
     {
     public:
-      
+
                                    /**
                                     * Standardized data struct to
                                     * pipe additional data to the
@@ -132,7 +130,7 @@ namespace SLEPcWrappers
 	const double shift_parameter;
       };
 
-        
+
                                    /**
                                     * Constructor.
                                     */
@@ -154,11 +152,11 @@ namespace SLEPcWrappers
                                     * transformationthat is
                                     * appropriate for this class.
                                     */
-      virtual void set_transformation_type (ST &st) const; 
+      virtual void set_transformation_type (ST &st) const;
     };
 
 /**
- * An implementation of the transformation interface using the SLEPc 
+ * An implementation of the transformation interface using the SLEPc
  * Shift and Invert.
  *
  * @ingroup SLEPcWrappers
@@ -167,7 +165,7 @@ namespace SLEPcWrappers
   class TransformationShiftInvert : public TransformationBase
     {
     public:
-     
+
                                    /**
                                     * Standardized data struct to
                                     * pipe additional data to the
@@ -187,7 +185,7 @@ namespace SLEPcWrappers
 	const double shift_parameter;
       };
 
-        
+
                                    /**
                                     * Constructor.
                                     */
@@ -208,11 +206,11 @@ namespace SLEPcWrappers
                                     * transformationthat is
                                     * appropriate for this class.
                                     */
-      virtual void set_transformation_type (ST &st) const; 
+      virtual void set_transformation_type (ST &st) const;
     };
 
 /**
- * An implementation of the transformation interface using the SLEPc 
+ * An implementation of the transformation interface using the SLEPc
  * Spectrum Folding.
  *
  * @ingroup SLEPcWrappers
@@ -221,7 +219,7 @@ namespace SLEPcWrappers
   class TransformationSpectrumFolding : public TransformationBase
     {
     public:
-      
+
                                    /**
                                     * Standardized data struct to
                                     * pipe additional data to the
@@ -241,7 +239,7 @@ namespace SLEPcWrappers
 	const double shift_parameter;
       };
 
-        
+
                                    /**
                                     * Constructor.
                                     */
@@ -262,11 +260,11 @@ namespace SLEPcWrappers
                                     * transformationthat is
                                     * appropriate for this class.
                                     */
-      virtual void set_transformation_type (ST &st) const; 
+      virtual void set_transformation_type (ST &st) const;
     };
 
 /**
- * An implementation of the transformation interface using the SLEPc 
+ * An implementation of the transformation interface using the SLEPc
  * Cayley.
  *
  * @ingroup SLEPcWrappers
@@ -275,7 +273,7 @@ namespace SLEPcWrappers
   class TransformationCayley : public TransformationBase
     {
     public:
-      
+
                                    /**
                                     * Standardized data struct to pipe
                                     * additional data to the solver.
@@ -286,7 +284,7 @@ namespace SLEPcWrappers
                                     * Constructor. Requires two shift
                                     * parameters
                                     */
-	AdditionalData (const double shift_parameter     = 0, 
+	AdditionalData (const double shift_parameter     = 0,
 			const double antishift_parameter = 0);
 
                                    /**
@@ -296,11 +294,11 @@ namespace SLEPcWrappers
 	const double antishift_parameter;
       };
 
-        
+
                                    /**
                                     * Constructor.
                                     */
-      TransformationCayley (const double shift, 
+      TransformationCayley (const double shift,
 			    const double antishift);
 
     protected:
@@ -318,7 +316,7 @@ namespace SLEPcWrappers
                                     * transformationthat is
                                     * appropriate for this class.
                                     */
-      virtual void set_transformation_type (ST &st) const; 
+      virtual void set_transformation_type (ST &st) const;
     };
 
 }
@@ -329,6 +327,6 @@ DEAL_II_NAMESPACE_CLOSE
 
 /*--------------------   slepc_spectral_transformation.h   ------------------*/
 
-#endif 
+#endif
 
 /*--------------------   slepc_spectral_transformation.h   ------------------*/

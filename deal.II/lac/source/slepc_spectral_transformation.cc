@@ -17,10 +17,10 @@
 
 #ifdef DEAL_II_USE_SLEPC
 
+#  include <lac/slepc_solver.h>
 #  include <lac/petsc_matrix_base.h>
 #  include <lac/petsc_vector_base.h>
 #  include <lac/petsc_vector.h>
-#  include <lac/slepc_solver.h>
 
 #  include <cmath>
 #  include <vector>
@@ -45,23 +45,23 @@ namespace SLEPcWrappers
 
   void TransformationBase::set_context (EPS &eps)
   {
-    AssertThrow (transformation_data == 0, 
+    AssertThrow (transformation_data == 0,
 		 SolverBase::ExcSLEPcWrappersUsageError());
     transformation_data.reset (new TransformationData());
-    
+
     int ierr = EPSGetST(eps, &transformation_data->st);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
-    
+
     set_transformation_type(transformation_data->st);
   }
-  
+
   /* ------------------- TransformationShift --------------------- */
   TransformationShift::AdditionalData::
   AdditionalData (const double shift_parameter)
                   :
                   shift_parameter (shift_parameter)
   {}
-  
+
   TransformationShift::TransformationShift (const AdditionalData &data)
     :
     additional_data (data)
@@ -84,7 +84,7 @@ namespace SLEPcWrappers
                   :
                   shift_parameter (shift_parameter)
   {}
-  
+
   TransformationShiftInvert::TransformationShiftInvert (const AdditionalData &data)
     :
     additional_data (data)
@@ -107,7 +107,7 @@ namespace SLEPcWrappers
                   :
                   shift_parameter (shift_parameter)
   {}
-  
+
   TransformationSpectrumFolding::TransformationSpectrumFolding (const AdditionalData &data)
     :
     additional_data (data)
@@ -124,18 +124,18 @@ namespace SLEPcWrappers
     ierr = STSetShift (st, additional_data.shift_parameter);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
   }
-  
+
   /* ------------------- TransformationCayley --------------------- */
   TransformationCayley::AdditionalData::
-  AdditionalData (const double shift_parameter, 
+  AdditionalData (const double shift_parameter,
 		  const double antishift_parameter)
                   :
                   shift_parameter (shift_parameter),
 		  antishift_parameter (antishift_parameter)
   {
   }
-  
-  TransformationCayley::TransformationCayley (const double shift, 
+
+  TransformationCayley::TransformationCayley (const double shift,
 					      const double antishift)
     :
     additional_data (shift, antishift)

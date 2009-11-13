@@ -300,8 +300,6 @@ namespace TrilinosWrappers
     graph.reset();
     compressed = false;
 
-    const unsigned int n_rows = sp.n_rows();
-
     Assert (input_row_map.LinearMap() == true,
 	    ExcMessage ("This function is not efficient if the map is not contiguous."));
 
@@ -329,6 +327,7 @@ namespace TrilinosWrappers
     				  sp.n_rows()));
 
     std::vector<int>   row_indices;
+    const unsigned int n_rows = sp.n_rows();
 
     for (unsigned int row=0; row<n_rows; ++row)
       if ( input_row_map.MyGID(row) )
@@ -449,7 +448,8 @@ namespace TrilinosWrappers
     graph.reset();
     compressed = false;
 
-    const unsigned int n_rows = sp.n_rows();
+    Assert (input_row_map.LinearMap() == true,
+	    ExcMessage ("This function is not efficient if the map is not contiguous."));
 
     std::vector<int> n_entries_per_row(input_row_map.MaxMyGID()-
 				       input_row_map.MinMyGID() + 1);
@@ -477,11 +477,10 @@ namespace TrilinosWrappers
     				  sp.n_rows()));
 
 
+    const unsigned int n_rows = sp.n_rows();
     std::vector<int>   row_indices;
 
-    for (unsigned int row=input_row_map.MinMyGID();
-	 row<static_cast<unsigned int>(input_row_map.MaxMyGID()+1);
-	 ++row)
+    for (unsigned int row=0; row<n_rows; ++row)
      if (exchange_data || input_row_map.MyGID(row))
 	{
 	  const int row_length = sp.row_length(row);

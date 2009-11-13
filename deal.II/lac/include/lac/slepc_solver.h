@@ -22,6 +22,7 @@
 
 #  include <lac/exceptions.h>
 #  include <lac/solver_control.h>
+#  include <lac/petsc_matrix_base.h>
 #  include <lac/slepc_spectral_transformation.h>
 #  include <boost/shared_ptr.hpp>
 
