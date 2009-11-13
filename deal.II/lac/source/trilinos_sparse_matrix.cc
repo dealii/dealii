@@ -327,11 +327,9 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix &
+  void
   SparseMatrix::copy_from (const SparseMatrix &m)
   {
-    column_space_map = std::auto_ptr<Epetra_Map>
-      (new Epetra_Map (m.domain_partitioner()));
 
 				   // check whether we need to update the
 				   // partitioner or can just copy the data:
@@ -340,10 +338,14 @@ namespace TrilinosWrappers
     if (local_range() == m.local_range())
       *matrix = *m.matrix;
     else
-      matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	(new Epetra_FECrsMatrix(*m.matrix));
+      {
+	column_space_map = std::auto_ptr<Epetra_Map>
+	  (new Epetra_Map (m.domain_partitioner()));
+	matrix = std::auto_ptr<Epetra_FECrsMatrix>
+	  (new Epetra_FECrsMatrix(*m.matrix));
+      }
+
     compress();
-    return *this;
   }
 
 
@@ -1368,27 +1370,6 @@ namespace TrilinosWrappers
 
 
 
-  bool
-  SparseMatrix::is_symmetric (const double tolerance) const
-  {
-    (void)tolerance;
-
-    Assert (false, ExcNotImplemented());
-
-    return false;
-  }
-
-
-
-  bool
-  SparseMatrix::is_hermitian () const
-  {
-    Assert (false, ExcNotImplemented());
-    return false;
-  }
-
-
-
   void
   SparseMatrix::write_ascii ()
   {
@@ -1422,6 +1403,18 @@ namespace TrilinosWrappers
       }
 
     AssertThrow (out, ExcIO());
+  }
+
+
+
+  unsigned int
+  SparseMatrix::memory_consumption () const
+  {
+    unsigned int static_memory = sizeof(this) + sizeof (*matrix)
+      + sizeof(*matrix->Graph().DataPtr());
+    return ((sizeof(TrilinosScalar)+sizeof(int))*matrix->NumMyNonzeros() +
+	    sizeof(int)*local_size() +
+	    static_memory);
   }
 
 

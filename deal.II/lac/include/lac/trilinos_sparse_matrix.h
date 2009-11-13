@@ -406,11 +406,11 @@ namespace TrilinosWrappers
 				        * the matrix is going to be
 				        * distributed among different
 				        * processors. This function works in
-				        * parallel, too, but it is
+				        * %parallel, too, but it is
 				        * recommended to manually specify
 				        * the %parallel partioning of the
 				        * matrix using an Epetra_Map. When
-				        * run in parallel, it is currently
+				        * run in %parallel, it is currently
 				        * necessary that each processor
 				        * holds the sparsity_pattern
 				        * structure because each processor
@@ -555,7 +555,7 @@ namespace TrilinosWrappers
                                         * matrix-vector products. This is a
                                         * collective operation, i.e., it
                                         * needs to be run on all processors
-                                        * when used in parallel.
+                                        * when used in %parallel.
 					*
 					* See @ref GlossCompress "Compressing distributed objects"
 					* for more information.
@@ -627,7 +627,7 @@ namespace TrilinosWrappers
                                         * columns. This interface is meant
                                         * to be used for generating
                                         * rectangular matrices, where one
-                                        * map describes the parallel
+                                        * map describes the %parallel
                                         * partitioning of the dofs
                                         * associated with the matrix rows
                                         * and the other one the partitioning
@@ -660,7 +660,7 @@ namespace TrilinosWrappers
 				        * columns. This interface is meant
 				        * to be used for generating
 				        * rectangular matrices, where one
-				        * map specifies the parallel
+				        * map specifies the %parallel
 				        * distribution of degrees of freedom
 				        * associated with matrix rows and
 				        * the second one specifies the
@@ -699,7 +699,7 @@ namespace TrilinosWrappers
 				        * rectangular matrix) are the natural
 				        * way to initialize the matrix size,
 				        * its distribution among the MPI
-				        * processes (if run in parallel) as
+				        * processes (if run in %parallel) as
 				        * well as the locatoin of non-zero
 				        * elements. Trilinos stores the
 				        * sparsity pattern internally, so it
@@ -769,7 +769,7 @@ namespace TrilinosWrappers
 				        * matrix argument, this function
 				        * takes a %parallel partitioning
 				        * specified by the user instead of
-				        * internally generating one.
+				        * internally generating it.
 					*
 					* The optional parameter
 					* <tt>copy_values</tt> decides
@@ -906,7 +906,7 @@ namespace TrilinosWrappers
 				        * columns. This interface is meant
 				        * to be used for generating
 				        * rectangular matrices, where one
-				        * map specifies the parallel
+				        * map specifies the %parallel
 				        * distribution of degrees of freedom
 				        * associated with matrix rows and
 				        * the second one specifies the
@@ -948,7 +948,7 @@ namespace TrilinosWrappers
 				        * natural way to initialize the
 				        * matrix size, its distribution
 				        * among the MPI processes (if run in
-				        * parallel) as well as the locatoin
+				        * %parallel) as well as the locatoin
 				        * of non-zero elements. Trilinos
 				        * stores the sparsity pattern
 				        * internally, so it won't be needed
@@ -1020,7 +1020,7 @@ namespace TrilinosWrappers
 				        * matrix argument, this function
 				        * takes a %parallel partitioning
 				        * specified by the user instead of
-				        * internally generating one.
+				        * internally generating it.
 					*
 					* The optional parameter
 					* <tt>copy_values</tt> decides
@@ -1141,28 +1141,13 @@ namespace TrilinosWrappers
                                         */
       unsigned int row_length (const unsigned int row) const;
 
-                                       /**
-					* Test whether a matrix is
-					* symmetric.  Default
-					* tolerance is zero.  TODO:
-					* Not implemented.
-					*/
-      bool is_symmetric (const double tol = 0.0) const;
-
-                                       /**
-					* Test whether a matrix is
-					* Hermitian, i.e. it is the
-					* complex conjugate of its
-					* transpose.  TODO: Not
-					* implemented.
-					*/
-      bool is_hermitian () const;
-
 				       /**
-					* Determine an estimate for the
-					* memory consumption (in bytes)
-					* of this object. Currently not
-					* implemented for this class.
+					* Determine an estimate for the memory
+					* consumption (in bytes) of this
+					* object. Note that only the memory
+					* reserved on the current processor is
+					* returned in case this is called in
+					* an MPI-based program.
 					*/
       unsigned int memory_consumption () const;
 
@@ -1456,14 +1441,10 @@ namespace TrilinosWrappers
       SparseMatrix & operator /= (const TrilinosScalar factor);
 
 				       /**
-					* Copy the given matrix to this
-					* one.
-					*
-					* The function returns a
-					* reference to <tt>*this</tt>.
+					* Copy the given (Trilinos) matrix
+					* (sparsity pattern and entries).
 					*/
-      SparseMatrix &
-	copy_from (const SparseMatrix &source);
+      void copy_from (const SparseMatrix &source);
 
 				       /**
 					* Add <tt>matrix</tt> scaled by
