@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -85,7 +85,7 @@ namespace Functions {
 	  Utilities::split_string_list(const_list[i], '=');
 	AssertThrow(this_c.size() == 2, ExcMessage("Invalid format"));
 	double tmp;
-	AssertThrow( sscanf(this_c[1].c_str(), "%lf", &tmp),
+	AssertThrow( std::sscanf(this_c[1].c_str(), "%lf", &tmp),
 		     ExcMessage("Double number?"));
 	constants[this_c[0]] = tmp;
       }
