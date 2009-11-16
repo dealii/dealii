@@ -700,7 +700,7 @@ FE_ABF<dim>::interpolate(
 
   // TODO: Check if this "correction" can be removed.
   for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
-    if (fabs (local_dofs[start_abf_dofs+i]) < 1.0e-16)
+    if (std::fabs (local_dofs[start_abf_dofs+i]) < 1.0e-16)
       local_dofs[start_abf_dofs+i] = 0.0;
 }
 
@@ -760,7 +760,7 @@ FE_ABF<dim>::interpolate(
 
   // TODO: Check if this "correction" can be removed.
   for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
-    if (fabs (local_dofs[start_abf_dofs+i]) < 1.0e-16)
+    if (std::fabs (local_dofs[start_abf_dofs+i]) < 1.0e-16)
       local_dofs[start_abf_dofs+i] = 0.0;
 }
 
