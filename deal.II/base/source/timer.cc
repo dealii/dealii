@@ -14,6 +14,7 @@
 
 #include <base/timer.h>
 #include <base/exceptions.h>
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
