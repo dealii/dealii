@@ -8735,7 +8735,7 @@ namespace internal
 							     // the face (0 for faces 0,
 							     // 2, and 4; 1 for faces 1, 3
 							     // and 5)
-			    const double dist = fabs(new_unit[face_no/2] - face_no%2);
+			    const double dist = std::fabs(new_unit[face_no/2] - face_no%2);
 							     // compare this with
 							     // the empirical value
 							     // allowed. if it is
