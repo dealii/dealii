@@ -941,9 +941,9 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 			       	   // 1 or 0. Unfortunately, this
 			       	   // is required to avoid problems
 			       	   // with higher order elements.
-	  if (fabs (matrix_entry - 1.0) < eps)
+	  if (std::fabs (matrix_entry - 1.0) < eps)
 	    matrix_entry = 1.0;
-	  if (fabs (matrix_entry) < eps)
+	  if (std::fabs (matrix_entry) < eps)
 	    matrix_entry = 0.0;
 
 	  interpolation_matrix(i,j) = matrix_entry;
@@ -1049,9 +1049,9 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
 					   // 1 or 0. Unfortunately, this
 					   // is required to avoid problems
 					   // with higher order elements.
-	  if (fabs (matrix_entry - 1.0) < eps)
+	  if (std::fabs (matrix_entry - 1.0) < eps)
 	    matrix_entry = 1.0;
-	  if (fabs (matrix_entry) < eps)
+	  if (std::fabs (matrix_entry) < eps)
 	    matrix_entry = 0.0;
 
 	  interpolation_matrix(i,j) = matrix_entry;
