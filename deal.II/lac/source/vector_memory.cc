@@ -41,13 +41,13 @@ Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
 #ifdef DEAL_II_USE_PETSC
     template class VectorMemory<PETScWrappers::Vector>;
     template class GrowingVectorMemory<PETScWrappers::Vector>;
-    
+
     template class VectorMemory<PETScWrappers::BlockVector>;
     template class GrowingVectorMemory<PETScWrappers::BlockVector>;
 
     template class VectorMemory<PETScWrappers::MPI::Vector>;
     template class GrowingVectorMemory<PETScWrappers::MPI::Vector>;
-    
+
     template class VectorMemory<PETScWrappers::MPI::BlockVector>;
     template class GrowingVectorMemory<PETScWrappers::MPI::BlockVector>;
 #endif

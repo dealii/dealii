@@ -584,6 +584,7 @@ GrowingVectorMemory<VECTOR>::free(const VECTOR* const v)
 
 
 template<typename VECTOR>
+inline
 void
 GrowingVectorMemory<VECTOR>::release_unused_memory ()
 {
