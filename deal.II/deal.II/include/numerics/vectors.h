@@ -107,7 +107,8 @@ class ConstraintMatrix;
  * \phi_i(x) \phi_j(x) dx$ and $f_i = \int_\Omega f(x) \phi_i(x)
  * dx$. The solution vector $v$ then is the nodal representation of
  * the projection <i>f<sub>h</sub></i>. The project() functions are
- * used in the @ref step_23 "step-23" tutorial program.
+ * used in the @ref step_21 "step-21" and @ref step_23 "step-23"
+ * tutorial programs.
  *
  *   In order to get proper results, it be may necessary to treat
  *   boundary conditions right. Below are listed some cases where this
@@ -175,7 +176,7 @@ class ConstraintMatrix;
  *
  * <li> Creation of right hand side vectors for point sources:
  *   The create_point_source_vector() function computes the vector
- *   $f_i = \int_\Omega \delta_0(x-x_0) \phi_i(x) dx$. 
+ *   $f_i = \int_\Omega \delta_0(x-x_0) \phi_i(x) dx$.
  *
  * <li> Creation of boundary right hand side vectors: The
  *   create_boundary_right_hand_side() function computes the vector
@@ -449,7 +450,7 @@ class VectorTools
   static void interpolate (const DH              &dof,
 			   const Function<DH::space_dimension>   &function,
 			   VECTOR                &vec);
-    
+
 				     /**
 				      * Interpolate different finite
 				      * element spaces. The
@@ -515,7 +516,7 @@ class VectorTools
 				      *
 				      * See the general documentation of this
 				      * class for further information.
-				      * 
+				      *
 				      * In 1d, the default value of
 				      * the boundary quadrature
 				      * formula is an invalid object
@@ -629,7 +630,7 @@ class VectorTools
 			       const typename FunctionMap<DH::space_dimension>::type &function_map,
 			       std::map<unsigned int,double> &boundary_values,
 			       const std::vector<bool>       &component_mask = std::vector<bool>());
-  
+
 				     /**
 				      * @deprecated This function is there mainly
 				      * for backward compatibility.
@@ -668,7 +669,7 @@ class VectorTools
 			       std::map<unsigned int,double> &boundary_values,
 			       const std::vector<bool>       &component_mask = std::vector<bool>());
 
-    
+
 				     /**
 				      * Calls the other
 				      * interpolate_boundary_values()
@@ -760,7 +761,7 @@ class VectorTools
 			       const typename FunctionMap<DH::space_dimension>::type &function_map,
 			       ConstraintMatrix              &constraints,
 			       const std::vector<bool>       &component_mask = std::vector<bool>());
-  
+
 				     /**
 				      * @deprecated This function is there
 				      * mainly for backward compatibility.
@@ -797,7 +798,7 @@ class VectorTools
 			       ConstraintMatrix                    &constraints,
 			       const std::vector<bool>             &component_mask = std::vector<bool>());
 
-    
+
 				     /**
 				      * Calls the other
 				      * interpolate_boundary_values()
@@ -1247,14 +1248,14 @@ class VectorTools
 				      const std::set<unsigned char> &boundary_ids,
 				      ConstraintMatrix      &constraints,
 				      const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
-    
-    
+
+
 				     //@}
 				     /**
 				      * @name Assembling of right hand sides
 				      */
 				     //@{
-    
+
 				     /**
 				      * Create a right hand side
 				      * vector. Prior content of the
@@ -1302,7 +1303,7 @@ class VectorTools
 					const hp::QCollection<dim> &q,
 					const Function<spacedim>   &rhs,
 					Vector<double>        &rhs_vector);
-    
+
 				     /**
 				      * Create a right hand side
 				      * vector for a point source at point @p p.
@@ -1353,7 +1354,7 @@ class VectorTools
     static void create_point_source_vector(const hp::DoFHandler<dim,spacedim> &dof,
                                            const Point<spacedim>      &p,
                                            Vector<double>        &rhs_vector);
-    
+
                                      /**
 				      * Create a right hand side
 				      * vector from boundary
@@ -1420,7 +1421,7 @@ class VectorTools
 				      * and errors
 				      */
 				     //@{
-    
+
     				     /**
 				      * Compute the error of the
 				      * finite element solution.
@@ -1538,7 +1539,7 @@ class VectorTools
 				      const NormType        &norm,
 				      const Function<spacedim>   *weight=0,
 				      const double exponent = 2.);
-    
+
 				     /**
 				      * Point error evaluation. Find
 				      * the first cell containing the
@@ -1634,7 +1635,7 @@ class VectorTools
     point_value (const DoFHandler<dim,spacedim> &dof,
 		 const InVector        &fe_function,
 		 const Point<spacedim>      &point);
-    
+
 				     /**
 				      * Evaluate a possibly
 				      * vector-valued finite element
@@ -1679,13 +1680,13 @@ class VectorTools
                  const DoFHandler<dim,spacedim> &dof,
 		 const InVector        &fe_function,
 		 const Point<spacedim>      &point);
-    
+
 				     //@}
 				     /**
 				      * Mean value operations
 				      */
 				     //@{
-    
+
                                      /**
 				      * Subtract the (algebraic) mean value
 				      * from a vector. This function is most
