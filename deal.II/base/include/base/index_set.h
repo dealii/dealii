@@ -160,6 +160,41 @@ class IndexSet
 				      */
     void compress () const;
 
+				     /**
+				      * Comparison for equality of
+				      * index sets. This operation is
+				      * only allowed if the size of
+				      * the two sets is the same
+				      * (though of course they do not
+				      * have to have the same number
+				      * of indices).
+				      */
+    bool operator == (const IndexSet &is) const;
+
+				     /**
+				      * Comparison for inequality of
+				      * index sets. This operation is
+				      * only allowed if the size of
+				      * the two sets is the same
+				      * (though of course they do not
+				      * have to have the same number
+				      * of indices).
+				      */
+    bool operator != (const IndexSet &is) const;
+
+				     /**
+				      * Return the intersection of the
+				      * current index set and the
+				      * argument given, i.e. a set of
+				      * indices that are elements of
+				      * both index sets. The two index
+				      * sets must have the same size
+				      * (though of course they do not
+				      * have to have the same number
+				      * of indices).
+				      */
+    IndexSet operator & (const IndexSet &is) const;
+
 #ifdef DEAL_II_USE_TRILINOS
 				     /**
 				      * Given an MPI communicator,
@@ -257,6 +292,15 @@ class IndexSet
 		    ((range_1.begin == range_2.begin)
 		     &&
 		     (range_1.end < range_2.end)));
+	  }
+
+	friend
+	inline bool operator== (const Range &range_1,
+				const Range &range_2)
+	  {
+	    return ((range_1.begin == range_2.begin)
+		    ||
+		    (range_1.begin == range_2.begin));
 	  }
     };
 
@@ -544,6 +588,101 @@ IndexSet::index_within_set (const unsigned int n) const
 
   Assert (false, ExcInternalError());
   return numbers::invalid_unsigned_int;
+}
+
+
+
+inline
+bool
+IndexSet::operator == (const IndexSet &is) const
+{
+  Assert (size() == is.size(),
+	  ExcDimensionMismatch (size(), is.size()));
+
+  compress ();
+  is.compress ();
+
+  return ranges == is.ranges;
+}
+
+
+
+inline
+bool
+IndexSet::operator != (const IndexSet &is) const
+{
+  Assert (size() == is.size(),
+	  ExcDimensionMismatch (size(), is.size()));
+
+  compress ();
+  is.compress ();
+
+  return ranges != is.ranges;
+}
+
+
+
+inline
+IndexSet
+IndexSet::operator & (const IndexSet &is) const
+{
+  Assert (size() == is.size(),
+	  ExcDimensionMismatch (size(), is.size()));
+
+  compress ();
+  is.compress ();
+
+  std::vector<Range>::const_iterator r1 = ranges.begin(),
+				     r2 = is.ranges.begin();
+  IndexSet result (size());
+
+  while ((r1 != ranges.end())
+	 &&
+	 (r2 != is.ranges.end()))
+    {
+				       // if r1 and r2 do not overlap
+				       // at all, then move the
+				       // pointer that sits to the
+				       // left of the other up by one
+      if (r1->end <= r2->begin)
+	++r1;
+      else if (r2->end <= r1->begin)
+	++r2;
+      else
+	{
+					   // the ranges must overlap
+					   // somehow
+	  Assert (((r1->begin <= r2->begin) &&
+		   (r1->end > r2->begin))
+		  ||
+		  ((r2->begin <= r1->begin) &&
+		   (r2->end > r1->begin)),
+		  ExcInternalError());
+
+					   // add the overlapping
+					   // range to the result
+	  result.add_range (std::max (r1->begin,
+				      r2->begin),
+			    std::min (r1->end,
+				      r2->end));
+
+					   // now move that iterator
+					   // that ends earlier one
+					   // up. note that it has to
+					   // be this one because a
+					   // subsequent range may
+					   // still have a chance of
+					   // overlapping with the
+					   // range that ends later
+	  if (r1->end <= r2->end)
+	    ++r1;
+	  else
+	    ++r2;
+	}
+    }
+
+  result.compress ();
+  return result;
 }
 
 
