@@ -19,6 +19,7 @@
 #    include <Epetra_MpiComm.h>
 #  endif
 #  include <Epetra_SerialComm.h>
+#  include <Epetra_Map.h>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
