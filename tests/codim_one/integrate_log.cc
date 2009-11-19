@@ -160,7 +160,7 @@ int main()
 	    *(
 	      pow(b-a,static_cast<int>(k)+1) / (k+1) * log(b-a)
 		-
-	      pow(b-a,static_cast<int>(k)+1) / pow(k+1, 2)
+	      pow(b-a,static_cast<int>(k)+1) / pow(static_cast<double>(k+1), 2)
 	     ); 
     deallog << "f(x) = x^" << j << std::endl;
     for (unsigned int i=1; i<13; ++i)
