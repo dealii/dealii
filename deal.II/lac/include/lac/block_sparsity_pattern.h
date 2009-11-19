@@ -92,7 +92,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * SparsityPattern class.
 				      */
     static const unsigned int invalid_entry = SparsityPattern::invalid_entry;
-    
+
 				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
@@ -115,7 +115,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      */
     BlockSparsityPatternBase (const unsigned int n_block_rows,
 			      const unsigned int n_block_columns);
-    
+
 				     /**
 				      * Copy constructor. This
 				      * constructor is only allowed to
@@ -133,7 +133,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * Destructor.
 				      */
     ~BlockSparsityPatternBase ();
-    
+
 				     /**
 				      * Resize the matrix, by setting
 				      * the number of block rows and
@@ -186,7 +186,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * the sub-objects.
 				      */
     void collect_sizes ();
-    
+
 				     /**
 				      * Access the block with the
 				      * given coordinates.
@@ -194,8 +194,8 @@ class BlockSparsityPatternBase : public Subscriptor
     SparsityPatternBase &
     block (const unsigned int row,
 	   const unsigned int column);
-    
-    
+
+
 				     /**
 				      * Access the block with the
 				      * given coordinates. Version for
@@ -203,7 +203,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      */
     const SparsityPatternBase &
     block (const unsigned int row,
-	   const unsigned int column) const;    
+	   const unsigned int column) const;
 
 				     /**
 				      * Grant access to the object
@@ -222,7 +222,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      */
     const BlockIndices &
     get_column_indices () const;
-    
+
 				     /**
 				      * This function compresses the
 				      * sparsity structures that this
@@ -237,13 +237,13 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * column.
 				      */
     unsigned int n_block_rows () const;
-    
+
 				     /**
 				      * Return the number of blocks in a
 				      * row.
 				      */
     unsigned int n_block_cols () const;
-  
+
 				     /**
 				      * Return whether the object is
 				      * empty. It is empty if no
@@ -297,7 +297,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * blocks.
 				      */
     template <typename ForwardIterator>
-    void add_entries (const unsigned int row, 
+    void add_entries (const unsigned int row,
 		      ForwardIterator    begin,
 		      ForwardIterator    end,
 		      const bool         indices_are_sorted = false);
@@ -335,7 +335,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * row.
 				      */
     unsigned int row_length (const unsigned int row) const;
-    
+
 				     /**
 				      * Return the number of nonzero
 				      * elements of this
@@ -408,7 +408,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      */
     DeclException0 (ExcInvalidConstructorCall);
 				     //@}
-    
+
   protected:
 
 				     /**
@@ -420,7 +420,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * Number of block columns.
 				      */
     unsigned int columns;
-    
+
 				     /**
 				      * Array of sparsity patterns.
 				      */
@@ -449,7 +449,7 @@ class BlockSparsityPatternBase : public Subscriptor
 					* individual blocks when doing a
 					* collective add or set.
 					*/
-    std::vector<unsigned int> counter_within_block; 
+    std::vector<unsigned int> counter_within_block;
 
                                        /**
 					* Temporary vector for column
@@ -457,7 +457,7 @@ class BlockSparsityPatternBase : public Subscriptor
 					* local to global data on each
 					* sparse matrix.
 					*/
-    std::vector<std::vector<unsigned int> > block_column_indices; 
+    std::vector<std::vector<unsigned int> > block_column_indices;
 
 				     /**
 				      * Make the block sparse matrix a
@@ -484,7 +484,7 @@ class BlockSparsityPatternBase : public Subscriptor
 class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 {
   public:
-    
+
 				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
@@ -514,7 +514,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      */
     void reinit (const unsigned int n_block_rows,
 		 const unsigned int n_block_columns);
-    
+
     				     /**
 				      * Initialize the pattern with
 				      * two BlockIndices for the block
@@ -526,7 +526,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
     void reinit (const BlockIndices& row_indices,
 		 const BlockIndices& col_indices,
 		 const std::vector<std::vector<unsigned int> >& row_lengths);
-    
+
 
 				     /**
 				      * Return whether the structure
@@ -534,7 +534,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      * i.e. whether all sub-matrices
 				      * are compressed.
 				      */
-    bool is_compressed () const;    
+    bool is_compressed () const;
 
 				     /**
 				      * Determine an estimate for the
@@ -641,7 +641,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<CompressedSparsityPattern>
 {
   public:
-    
+
 				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
@@ -678,7 +678,7 @@ class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      */
     BlockCompressedSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
 				    const std::vector<unsigned int>& col_block_sizes);
-    
+
     				     /**
 				      * Initialize the pattern with
 				      * two BlockIndices for the block
@@ -687,7 +687,7 @@ class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      */
     BlockCompressedSparsityPattern (const BlockIndices& row_indices,
 				    const BlockIndices& col_indices);
-    
+
 				     /**
 				      * Resize the matrix to a tensor
 				      * product of matrices with
@@ -717,7 +717,7 @@ class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * same block structure afterwards.
 				      */
     void reinit (const BlockIndices& row_indices, const BlockIndices& col_indices);
-    
+
 				     /**
 				      * Allow the use of the reinit
 				      * functions of the base class as
@@ -758,7 +758,7 @@ typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern;
 class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<CompressedSetSparsityPattern>
 {
   public:
-    
+
 				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
@@ -795,7 +795,7 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
 				      */
     BlockCompressedSetSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
 				       const std::vector<unsigned int>& col_block_sizes);
-    
+
     				     /**
 				      * Initialize the pattern with
 				      * two BlockIndices for the block
@@ -804,7 +804,7 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
 				      */
     BlockCompressedSetSparsityPattern (const BlockIndices& row_indices,
 				       const BlockIndices& col_indices);
-    
+
 				     /**
 				      * Resize the matrix to a tensor
 				      * product of matrices with
@@ -834,7 +834,7 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
 				      * same block structure afterwards.
 				      */
     void reinit (const BlockIndices& row_indices, const BlockIndices& col_indices);
-    
+
 				     /**
 				      * Allow the use of the reinit
 				      * functions of the base class as
@@ -955,11 +955,11 @@ class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<Com
  *
  * This class is used in @ref step_32 "step-32".
  *
- * @author Martin Kronbichler, 2008
+ * @author Martin Kronbichler, 2008, 2009
  */
 namespace TrilinosWrappers
 {
-  class BlockSparsityPattern : 
+  class BlockSparsityPattern :
     public dealii::BlockSparsityPatternBase<SparsityPattern>
   {
     public:
@@ -1015,7 +1015,24 @@ namespace TrilinosWrappers
 				      * mapping vector and then entering the
 				      * index values.
 				      */
-      BlockSparsityPattern (const std::vector<Epetra_Map>& input_maps);
+      BlockSparsityPattern (const std::vector<Epetra_Map>& parallel_partitioning);
+
+    				     /**
+				      * Initialize the pattern with an array
+				      * of index sets that specifies both
+				      * rows and columns of the matrix (so
+				      * the final matrix will be a square
+				      * matrix), where the IndexSet
+				      * specifies the parallel distribution
+				      * of the degrees of freedom on the
+				      * individual block.  This function is
+				      * equivalent to calling the second
+				      * constructor with the length of the
+				      * mapping vector and then entering the
+				      * index values.
+				      */
+      BlockSparsityPattern (const std::vector<IndexSet>& parallel_partitioning,
+			    const MPI_Comm &communicator = MPI_COMM_WORLD);
 
 				     /**
 				      * Resize the matrix to a tensor
@@ -1042,7 +1059,17 @@ namespace TrilinosWrappers
 				      * specifications in the array of
 				      * Epetra_Maps.
 				      */
-      void reinit (const std::vector<Epetra_Map>& input_maps);
+      void reinit (const std::vector<Epetra_Map>& parallel_partitioning);
+
+				     /**
+				      * Resize the matrix to a square tensor
+				      * product of matrices with parallel
+				      * distribution according to the
+				      * specifications in the array of
+				      * Epetra_Maps.
+				      */
+      void reinit (const std::vector<IndexSet>& parallel_partitioning,
+		   const MPI_Comm             & communicator = MPI_COMM_WORLD);
 
 
 				     /**
@@ -1197,7 +1224,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int r
 				   // where we should start reading out
 				   // data. Now let's write the data into
 				   // the individual blocks!
-  const std::pair<unsigned int,unsigned int> 
+  const std::pair<unsigned int,unsigned int>
     row_index = this->row_indices.global_to_local (row);
   for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
     {
@@ -1241,7 +1268,7 @@ row_length (const unsigned int row) const
     row_index = row_indices.global_to_local (row);
 
   unsigned int c = 0;
-  
+
   for (unsigned int b=0; b<rows; ++b)
     c += sub_objects[row_index.first][b]->row_length (row_index.second);
 

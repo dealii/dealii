@@ -112,8 +112,8 @@ namespace EquationData
 	    (1 - expansion_coefficient * (temperature -
 					  reference_temperature)));
   }
-  
-  
+
+
   template <int dim>
   Tensor<1,dim> gravity_vector (const Point<dim> &p)
   {
@@ -731,7 +731,7 @@ namespace Assembly
 				 // for each of those two steps for all
 				 // the four assembly routines that we use
 				 // in this program.
-				 // 
+				 //
 				 // The <code>pcout</code> (for <i>%parallel
 				 // <code>std::cout</code></i>) object is used
 				 // to simplify writing output: each MPI
@@ -880,10 +880,8 @@ class BoussinesqFlowProblem
 
     TimerOutput computing_timer;
 
-    void setup_stokes_matrix (const IndexSet &velocity_partitioning,
-			      const IndexSet &pressure_partitioning);
-    void setup_stokes_preconditioner (const IndexSet &velocity_partitioning,
-				      const IndexSet &pressure_partitioning);
+    void setup_stokes_matrix (const std::vector<IndexSet> &stokes_partitioning);
+    void setup_stokes_preconditioner (const std::vector<IndexSet> &stokes_partitioning);
     void setup_temperature_matrices (const IndexSet &temperature_partitioning);
 
     void
@@ -1523,21 +1521,12 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
  				 // has been given the sparsity structure.
 template <int dim>
 void BoussinesqFlowProblem<dim>::
-  setup_stokes_matrix (const IndexSet &velocity_partitioning,
-		       const IndexSet &pressure_partitioning)
+  setup_stokes_matrix (const std::vector<IndexSet> &stokes_partitioning)
 {
   stokes_matrix.clear ();
 
-  TrilinosWrappers::BlockSparsityPattern sp (2,2);
-  sp.block(0,0).reinit (velocity_partitioning, velocity_partitioning, 
-			MPI_COMM_WORLD);
-  sp.block(0,1).reinit (velocity_partitioning, pressure_partitioning, 
-			MPI_COMM_WORLD);
-  sp.block(1,0).reinit (pressure_partitioning, velocity_partitioning, 
-			MPI_COMM_WORLD);
-  sp.block(1,1).reinit (pressure_partitioning, pressure_partitioning, 
-			MPI_COMM_WORLD);
-  sp.collect_sizes();
+  TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioning,
+					     MPI_COMM_WORLD);
 
   Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
@@ -1561,24 +1550,15 @@ void BoussinesqFlowProblem<dim>::
 
 template <int dim>
 void BoussinesqFlowProblem<dim>::
-  setup_stokes_preconditioner (const IndexSet &velocity_partitioning,
-			       const IndexSet &pressure_partitioning)
+  setup_stokes_preconditioner (const std::vector<IndexSet> &stokes_partitioning)
 {
   Amg_preconditioner.reset ();
   Mp_preconditioner.reset ();
 
   stokes_preconditioner_matrix.clear ();
 
-  TrilinosWrappers::BlockSparsityPattern sp (2,2);
-  sp.block(0,0).reinit (velocity_partitioning, velocity_partitioning, 
-			MPI_COMM_WORLD);
-  sp.block(0,1).reinit (velocity_partitioning, pressure_partitioning, 
-			MPI_COMM_WORLD);
-  sp.block(1,0).reinit (pressure_partitioning, velocity_partitioning, 
-			MPI_COMM_WORLD);
-  sp.block(1,1).reinit (pressure_partitioning, pressure_partitioning, 
-			MPI_COMM_WORLD);
-  sp.collect_sizes();
+  TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioning,
+					     MPI_COMM_WORLD);
 
   Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
   for (unsigned int c=0; c<dim+1; ++c)
@@ -1607,7 +1587,8 @@ void BoussinesqFlowProblem<dim>::
   temperature_stiffness_matrix.clear ();
   temperature_matrix.clear ();
 
-  TrilinosWrappers::SparsityPattern sp (temperature_partitioner, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp (temperature_partitioner,
+					MPI_COMM_WORLD);
   DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
 				   temperature_constraints, false,
 				   Utilities::System::
@@ -1772,78 +1753,20 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	<< std::endl
 	<< std::endl;
 
-  IndexSet velocity_partitioning (n_u);
-  IndexSet pressure_partitioning (n_p);
+  std::vector<IndexSet> stokes_partitioning;
   IndexSet temperature_partitioning (n_T);
   {
-    const unsigned int my_id = Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
-    std::pair<unsigned int, unsigned int> 
-      range_u (deal_II_numbers::invalid_unsigned_int,
-	       deal_II_numbers::invalid_unsigned_int),
-      range_p = range_u,
-      range_T = range_u;
-    std::vector<unsigned int> subdomain_association (stokes_dof_handler.n_dofs());
-    DoFTools::get_subdomain_association (stokes_dof_handler, subdomain_association);
-    unsigned int i;
-    for (i=0; i<n_u; ++i)
-      if (subdomain_association[i] == my_id)
-	{
-	  range_u.first = i;
-	  break;
-	}
-    Assert (range_u.first != deal_II_numbers::invalid_unsigned_int,
-	    ExcMessage ("Could not find an appropriate parallel partition"));
-    for (i=range_u.first; i<n_u; ++i)
-      if (subdomain_association[i] != my_id)
-	{
-	  range_u.second = i;
-	  break;
-	}
-    if (i == n_u)
-      range_u.second = i;
-    for (i=n_u; i<n_u+n_p; ++i)
-      if (subdomain_association[i] == my_id)
-	{
-	  range_p.first = i-n_u;
-	  break;
-	}
-    Assert (range_p.first != deal_II_numbers::invalid_unsigned_int,
-	    ExcMessage ("Could not find an appropriate parallel partition"));
-    for (i=range_p.first+n_u; i<n_u+n_p; ++i)
-      if (subdomain_association[i] != my_id)
-	{
-	  range_p.second = i-n_u;
-	  break;
-	}
-    if (i == n_u+n_p)
-      range_p.second = i-n_u;
+    const unsigned int my_id =
+      Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
+    IndexSet stokes_index_set =
+      DoFTools::dof_indices_with_subdomain_association(stokes_dof_handler,
+						       my_id);
+    stokes_partitioning.push_back(stokes_index_set.get_view(0,n_u));
+    stokes_partitioning.push_back(stokes_index_set.get_view(n_u,n_u+n_p));
 
-    subdomain_association.resize(temperature_dof_handler.n_dofs());
-    DoFTools::get_subdomain_association (temperature_dof_handler, 
-					 subdomain_association);
-    for (i=0; i<n_T; ++i)
-      if (subdomain_association[i] == my_id)
-	{
-	  range_T.first = i;
-	  break;
-	}
-    Assert (range_T.first != deal_II_numbers::invalid_unsigned_int,
-	    ExcMessage ("Could not find an appropriate parallel partition"));
-    for (i=range_T.first; i<n_T; ++i)
-      if (subdomain_association[i] != my_id)
-	{
-	  range_T.second = i;
-	  break;
-	}
-    if (i == n_T)
-      range_T.second = i;
-
-    velocity_partitioning.add_range (range_u.first, range_u.second);
-    velocity_partitioning.compress();
-    pressure_partitioning.add_range (range_p.first, range_p.second);
-    pressure_partitioning.compress();
-    temperature_partitioning.add_range (range_T.first, range_T.second);
-    temperature_partitioning.compress();
+    temperature_partitioning =
+      DoFTools::dof_indices_with_subdomain_association(temperature_dof_handler,
+						       my_id);
   }
 
   if (Utilities::System::job_supports_mpi() == false)
@@ -1851,10 +1774,10 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
       Threads::TaskGroup<> tasks;
       tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_stokes_matrix,
 				  *this,
-				  velocity_partitioning, pressure_partitioning);
+				  stokes_partitioning);
       tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_stokes_preconditioner,
 				  *this,
-				  velocity_partitioning, pressure_partitioning);
+				  stokes_partitioning);
       tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_temperature_matrices,
 				  *this,
 				  temperature_partitioning);
@@ -1862,15 +1785,12 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     }
   else
     {
-      setup_stokes_matrix (velocity_partitioning, pressure_partitioning);
-      setup_stokes_preconditioner (velocity_partitioning, pressure_partitioning);
+      setup_stokes_matrix (stokes_partitioning);
+      setup_stokes_preconditioner (stokes_partitioning);
       setup_temperature_matrices (temperature_partitioning);
     }
 
-  stokes_rhs.reinit (2);
-  stokes_rhs.block(0).reinit (velocity_partitioning, MPI_COMM_WORLD);
-  stokes_rhs.block(1).reinit (pressure_partitioning, MPI_COMM_WORLD);
-  stokes_rhs.collect_sizes();
+  stokes_rhs.reinit (stokes_partitioning, MPI_COMM_WORLD);
   stokes_solution.reinit (stokes_rhs);
   old_stokes_solution.reinit (stokes_solution);
 
@@ -2759,7 +2679,7 @@ void BoussinesqFlowProblem<dim>::solve ()
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
 
-    SolverControl solver_control (stokes_matrix.m(), 1e-18*stokes_rhs.l2_norm());
+    SolverControl solver_control (stokes_matrix.m(), 1e-22*stokes_rhs.l2_norm());
     SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
       bicgstab (solver_control, false);
 
@@ -2945,7 +2865,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
 	for (unsigned int i=0; i<stokes_solution.block(1).size(); ++i)
 	  minimal_pressure = std::min<double> (stokes_solution.block(1)(i),
 					       minimal_pressure);
-	
+
 	std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
 	std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
 	std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
@@ -2983,13 +2903,13 @@ void BoussinesqFlowProblem<dim>::output_results ()
 			   *
 			   100);
 		    }
-		  else 
+		  else
 		    {
 		      Assert (stokes_fe.system_to_component_index(index_in_stokes_fe).first
 			      ==
 			      dim,
 			      ExcInternalError());
-		      
+
 		      joint_solution(local_joint_dof_indices[i])
 			= ((stokes_solution(local_stokes_dof_indices
 					    [joint_fe.system_to_base_index(i).second])

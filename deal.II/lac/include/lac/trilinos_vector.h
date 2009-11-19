@@ -513,7 +513,7 @@ namespace TrilinosWrappers
     {
       if (size() != v.size())
 	{
-	  *vector = std::auto_ptr<Epetra_FEVector> 
+	  *vector = std::auto_ptr<Epetra_FEVector>
 	  (new Epetra_FEVector(Epetra_Map (v.size(), 0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 					   Epetra_MpiComm(MPI_COMM_SELF)
@@ -578,7 +578,21 @@ namespace TrilinosWrappers
 				        * map will be generated
 				        * internally.
                                         */
-      Vector (const Epetra_Map &InputMap);
+      Vector (const Epetra_Map &partitioning);
+
+                                       /**
+				        * This constructor takes as input
+				        * the number of elements in the
+				        * vector. If the index set is not
+				        * localized, i.e., if there are some
+				        * elements that are not present on
+				        * all processes, only the global
+				        * size of the index set will be
+				        * taken and a localized version will
+				        * be generated internally.
+                                        */
+      Vector (const IndexSet &partitioning,
+	      const MPI_Comm &communicator = MPI_COMM_WORLD);
 
                                        /**
 				        * This constructor takes a
@@ -608,18 +622,41 @@ namespace TrilinosWrappers
 
                                        /**
 					* Initialization with an
-					* Epetra_Map. Similar to the
-					* call in the other class
-					* MPI::Vector, with the only
-					* difference that now a copy on
-					* all processes is
-					* generated. The variable
-					* <tt>fast</tt> determines
-					* whether the vector should be
-					* filled with zero or left
-					* untouched.
+					* Epetra_Map. Similar to the call in
+					* the other class MPI::Vector, with
+					* the difference that now a copy on
+					* all processes is generated. This
+					* initialization function is
+					* appropriate when the data in the
+					* localized vector should be
+					* imported from a distributed vector
+					* that has been initialized with the
+					* same communicator. The variable
+					* <tt>fast</tt> determines whether
+					* the vector should be filled with
+					* zero or left untouched.
 					*/
       void reinit (const Epetra_Map &input_map,
+		   const bool        fast = false);
+
+                                       /**
+					* Initialization with an
+					* IndexSet. Similar to the call in
+					* the other class MPI::Vector, with
+					* the difference that now a copy on
+					* all processes is generated. This
+					* initialization function is
+					* appropriate in case the data in
+					* the localized vector should be
+					* imported from a distributed vector
+					* that has been initialized with the
+					* same communicator. The variable
+					* <tt>fast</tt> determines whether
+					* the vector should be filled with
+					* zero or left untouched.
+					*/
+      void reinit (const IndexSet   &input_map,
+		   const MPI_Comm   &communicator = MPI_COMM_WORLD,
 		   const bool        fast = false);
 
                                        /**
@@ -721,7 +758,7 @@ namespace TrilinosWrappers
       {
 	vector.release();
 
-	Epetra_LocalMap map ((int)v.size(), 0, 
+	Epetra_LocalMap map ((int)v.size(), 0,
 			     Utilities::Trilinos::comm_self());
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }

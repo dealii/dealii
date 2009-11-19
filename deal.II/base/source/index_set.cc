@@ -92,6 +92,99 @@ IndexSet::compress () const
 
 
 
+IndexSet
+IndexSet::operator & (const IndexSet &is) const
+{
+  Assert (size() == is.size(),
+	  ExcDimensionMismatch (size(), is.size()));
+
+  compress ();
+  is.compress ();
+
+  std::vector<Range>::const_iterator r1 = ranges.begin(),
+				     r2 = is.ranges.begin();
+  IndexSet result (size());
+
+  while ((r1 != ranges.end())
+	 &&
+	 (r2 != is.ranges.end()))
+    {
+				       // if r1 and r2 do not overlap
+				       // at all, then move the
+				       // pointer that sits to the
+				       // left of the other up by one
+      if (r1->end <= r2->begin)
+	++r1;
+      else if (r2->end <= r1->begin)
+	++r2;
+      else
+	{
+					   // the ranges must overlap
+					   // somehow
+	  Assert (((r1->begin <= r2->begin) &&
+		   (r1->end > r2->begin))
+		  ||
+		  ((r2->begin <= r1->begin) &&
+		   (r2->end > r1->begin)),
+		  ExcInternalError());
+
+					   // add the overlapping
+					   // range to the result
+	  result.add_range (std::max (r1->begin,
+				      r2->begin),
+			    std::min (r1->end,
+				      r2->end));
+
+					   // now move that iterator
+					   // that ends earlier one
+					   // up. note that it has to
+					   // be this one because a
+					   // subsequent range may
+					   // still have a chance of
+					   // overlapping with the
+					   // range that ends later
+	  if (r1->end <= r2->end)
+	    ++r1;
+	  else
+	    ++r2;
+	}
+    }
+
+  result.compress ();
+  return result;
+}
+
+
+
+IndexSet
+IndexSet::get_view (const unsigned int begin,
+		    const unsigned int end) const
+{
+  Assert (begin <= end,
+	  ExcMessage ("End index needs to be larger or equal to begin index!"));
+  Assert (end <= size(),
+	  ExcMessage ("Given range exceeds index set dimension"));
+
+  IndexSet result (end-begin);
+  std::vector<Range>::const_iterator r1 = ranges.begin();
+
+  while (r1 != ranges.end())
+    {
+      if (r1->end > begin || r1->begin < end)
+	{
+	  result.add_range (std::max(r1->begin, begin)-begin,
+			    std::min(r1->end, end)-begin);
+
+	}
+      ++r1;
+    }
+
+  result.compress();
+  return result;
+}
+
+
+
 #ifdef DEAL_II_USE_TRILINOS
 
 Epetra_Map
@@ -120,7 +213,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 	for (unsigned int j=i->begin; j<i->end; ++j)
 	  indices.push_back (j);
       Assert (indices.size() == n_elements(), ExcInternalError());
-  
+
       return Epetra_Map (-1,
 			 n_elements(),
 			 &indices[0],
@@ -133,7 +226,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
     }
 }
 
-  
+
 #endif
 
 

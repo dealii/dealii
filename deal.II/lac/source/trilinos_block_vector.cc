@@ -44,7 +44,7 @@ namespace TrilinosWrappers
 	this->components[i] = v.block(i);
 
       collect_sizes();
-	
+
       return *this;
     }
 
@@ -94,16 +94,41 @@ namespace TrilinosWrappers
 
 
     void
+    BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
+			 const MPI_Comm              &communicator,
+			 const bool                   fast)
+    {
+      const unsigned int no_blocks = parallel_partitioning.size();
+      std::vector<unsigned int> block_sizes (no_blocks);
+
+      for (unsigned int i=0; i<no_blocks; ++i)
+	{
+	  block_sizes[i] = parallel_partitioning[i].size();
+	}
+
+      this->block_indices.reinit (block_sizes);
+      if (components.size() != n_blocks())
+        components.resize(n_blocks());
+
+      for (unsigned int i=0; i<n_blocks(); ++i)
+        components[i].reinit(parallel_partitioning[i], communicator, fast);
+
+      collect_sizes();
+    }
+
+
+
+    void
     BlockVector::reinit (const BlockVector& v,
 			 const bool fast)
     {
       block_indices = v.get_block_indices();
       if (components.size() != n_blocks())
         components.resize(n_blocks());
-  
+
       for (unsigned int i=0;i<n_blocks();++i)
         components[i].reinit(v.block(i), fast, false);
-      
+
       collect_sizes();
     }
 
@@ -116,7 +141,7 @@ namespace TrilinosWrappers
       this->block_indices.reinit (block_sizes);
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
-  
+
       for (unsigned int i=0;i<this->n_blocks();++i)
         components[i].clear();
 
@@ -126,7 +151,7 @@ namespace TrilinosWrappers
 
 
     void
-    BlockVector::import_nonlocal_data_for_fe 
+    BlockVector::import_nonlocal_data_for_fe
       (const TrilinosWrappers::BlockSparseMatrix &m,
        const BlockVector                         &v)
     {
@@ -196,6 +221,30 @@ namespace TrilinosWrappers
 
 
   void
+  BlockVector::reinit (const std::vector<IndexSet> &partitioning,
+		       const MPI_Comm              &communicator,
+		       const bool                   fast)
+  {
+    unsigned int no_blocks = partitioning.size();
+    std::vector<unsigned int> block_sizes (no_blocks);
+
+    for (unsigned int i=0; i<no_blocks; ++i)
+      block_sizes[i] = partitioning[i].size();
+
+
+    this->block_indices.reinit (block_sizes);
+    if (components.size() != n_blocks())
+      components.resize(n_blocks());
+
+    for (unsigned int i=0; i<n_blocks(); ++i)
+      components[i].reinit(partitioning[i], communicator, fast);
+
+    collect_sizes();
+  }
+
+
+
+  void
   BlockVector::reinit (const std::vector<unsigned int> &block_sizes,
 		       const bool                       fast)
   {
@@ -206,9 +255,9 @@ namespace TrilinosWrappers
     for (unsigned int i=0; i<n_blocks(); ++i)
       components[i].reinit(block_sizes[i], fast);
 
-    collect_sizes();      
+    collect_sizes();
   }
-    
+
 
 
   void
@@ -217,7 +266,7 @@ namespace TrilinosWrappers
     block_indices = v.get_block_indices();
     if (components.size() != n_blocks())
       components.resize(n_blocks());
-  
+
     for (unsigned int i=0;i<n_blocks();++i)
       components[i] = v.block(i);
   }
@@ -231,7 +280,7 @@ namespace TrilinosWrappers
     block_indices.reinit (block_sizes);
     if (components.size() != n_blocks())
       components.resize(n_blocks());
-  
+
     for (unsigned int i=0;i<n_blocks();++i)
       block(i).clear();
 
@@ -247,10 +296,10 @@ namespace TrilinosWrappers
     block_indices = v.get_block_indices();
     if (components.size() != n_blocks())
       components.resize(n_blocks());
-  
+
     for (unsigned int i=0;i<n_blocks();++i)
       components[i].reinit(v.block(i), fast);
-      
+
     collect_sizes();
   }
 
@@ -284,7 +333,7 @@ namespace TrilinosWrappers
 
     return *this;
   }
- 
+
 }
 
 

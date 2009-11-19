@@ -41,7 +41,7 @@ template <typename number> class BlockSparseMatrix;
 
 namespace TrilinosWrappers
 {
-  
+
 /*! @addtogroup TrilinosWrappers
  *@{
  */
@@ -75,7 +75,7 @@ namespace TrilinosWrappers
                                         * access to its own typedefs.
                                         */
       typedef BlockMatrixBase<SparseMatrix> BaseClass;
-    
+
                                        /**
                                         * Typedef the type of the underlying
                                         * matrix.
@@ -181,7 +181,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Resize the matrix, by using an
 				        * array of Epetra maps to determine
-				        * the distribution of the 
+				        * the %parallel distribution of the
 				        * individual matrices. This function
 				        * assumes that a quadratic block
 				        * matrix is generated.
@@ -189,6 +189,19 @@ namespace TrilinosWrappers
       template <typename BlockSparsityType>
       void reinit (const std::vector<Epetra_Map> &input_maps,
 		   const BlockSparsityType       &block_sparsity_pattern);
+
+                                       /**
+                                        * Resize the matrix, by using an
+				        * array of index sets to determine
+				        * the %parallel distribution of the
+				        * individual matrices. This function
+				        * assumes that a quadratic block
+				        * matrix is generated.
+                                        */
+      template <typename BlockSparsityType>
+      void reinit (const std::vector<IndexSet> &input_maps,
+		   const BlockSparsityType     &block_sparsity_pattern,
+		   const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
                                        /**
                                         * Resize the matrix and initialize it
@@ -204,10 +217,10 @@ namespace TrilinosWrappers
                                         * This function initializes the
 				        * Trilinos matrix using the deal.II
 				        * sparse matrix and the entries stored
-				        * therein. It uses a threshold 
-				        * to copy only elements whose 
-				        * modulus is larger than the 
-				        * threshold (so zeros in the 
+				        * therein. It uses a threshold
+				        * to copy only elements whose
+				        * modulus is larger than the
+				        * threshold (so zeros in the
 				        * deal.II matrix can be filtered
 				        * away).
                                         */
@@ -235,14 +248,14 @@ namespace TrilinosWrappers
 
 				       /**
 					* This function calls the compress()
-				        * command of all matrices after 
-				        * the assembly is 
+				        * command of all matrices after
+				        * the assembly is
 				        * completed. Note that all MPI
-				        * processes need to call this 
-				        * command (whereas the individual 
+				        * processes need to call this
+				        * command (whereas the individual
 				        * assembly routines will most probably
 				        * only be called on each processor
-				        * individually) before any 
+				        * individually) before any
 				        * can complete it.
 				        */
       void compress ();
@@ -288,7 +301,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Return the number of nonzero
                                         * elements of this
-                                        * matrix. 
+                                        * matrix.
                                         */
       unsigned int n_nonzero_elements () const;
 
@@ -603,11 +616,11 @@ namespace TrilinosWrappers
                                         * protected.
                                         */
       using BlockMatrixBase<SparseMatrix>::clear;
-      
+
 				       /** @addtogroup Exceptions
 					* @{
 					*/
-      
+
                                        /**
                                         * Exception
                                         */
@@ -657,7 +670,7 @@ namespace TrilinosWrappers
   {
     BaseClass::vmult_block_block (dst, src);
   }
-  
+
 
 
   inline
@@ -677,7 +690,7 @@ namespace TrilinosWrappers
   {
     BaseClass::vmult_block_nonblock (dst, src);
   }
-  
+
 
 
   inline
@@ -697,7 +710,7 @@ namespace TrilinosWrappers
   {
     BaseClass::vmult_nonblock_block (dst, src);
   }
-  
+
 
 
   inline

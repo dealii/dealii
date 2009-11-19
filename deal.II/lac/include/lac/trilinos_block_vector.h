@@ -62,7 +62,7 @@ namespace TrilinosWrappers
  *
  * @ingroup Vectors
  * @ingroup TrilinosWrappers
- * @author Martin Kronbichler, Wolfgang Bangerth, 2008
+ * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
  */
     class BlockVector : public BlockVectorBase<Vector>
     {
@@ -72,7 +72,7 @@ namespace TrilinosWrappers
 					* access to its own typedefs.
 					*/
         typedef BlockVectorBase<Vector> BaseClass;
-    
+
                                        /**
 					* Typedef the type of the underlying
 					* vector.
@@ -97,17 +97,31 @@ namespace TrilinosWrappers
 					* empty vector without any blocks.
 					*/
         BlockVector ();
-        
+
                                        /**
 					* Constructor. Generate a block
 					* vector with as many blocks as
-					* there are entries in Input_Maps.
-					* Each Epetra_Map already knows
-					* the distribution of data among
-					* the MPI processes.
+					* there are entries in @p
+					* partitioning. Each Epetra_Map
+					* contains the layout of the
+					* distribution of data among the MPI
+					* processes.
 					*/
-        BlockVector (const std::vector<Epetra_Map> &InputMaps);
-    
+        BlockVector (const std::vector<Epetra_Map> &parallel_partitioning);
+
+                                       /**
+					* Constructor. Generate a block
+					* vector with as many blocks as
+					* there are entries in
+					* @p partitioning.  Each IndexSet
+					* together with the MPI communicator
+					* contains the layout of the
+					* distribution of data among the MPI
+					* processes.
+					*/
+        BlockVector (const std::vector<IndexSet> &parallel_partitioning,
+		     const MPI_Comm              &communicator = MPI_COMM_WORLD);
+
                                        /**
 					* Copy-Constructor. Set all the
 					* properties of the parallel vector
@@ -115,7 +129,7 @@ namespace TrilinosWrappers
 					* copy the elements.
 					*/
         BlockVector (const BlockVector  &V);
-    
+
                                        /**
 					* Creates a block vector
 					* consisting of
@@ -127,7 +141,7 @@ namespace TrilinosWrappers
 					* reinit of the blocks.
 					*/
         BlockVector (const unsigned int num_blocks);
-    
+
                                        /**
 					* Destructor. Clears memory
 					*/
@@ -178,23 +192,39 @@ namespace TrilinosWrappers
 					* deal.II vector.
 					*/
         template <typename Number>
-	BlockVector & 
+	BlockVector &
 	  operator = (const ::dealii::BlockVector<Number> &V);
 
                                          /**
                                           * Reinitialize the BlockVector to
-                                          * contain as many blocks as there 
+                                          * contain as many blocks as there
 					  * are Epetra_Maps given in the input
 					  * argument, according to the
-					  * parallel distribution of the 
+					  * parallel distribution of the
 					  * individual components described
 					  * in the maps.
                                           *
                                           * If <tt>fast==false</tt>, the vector
                                           * is filled with zeros.
                                           */
-        void reinit (const std::vector<Epetra_Map> &input_maps,
+        void reinit (const std::vector<Epetra_Map> &parallel_partitioning,
 		     const bool                     fast = false);
+
+                                         /**
+                                          * Reinitialize the BlockVector to
+                                          * contain as many blocks as there
+					  * are index sets given in the input
+					  * argument, according to the
+					  * parallel distribution of the
+					  * individual components described
+					  * in the maps.
+                                          *
+                                          * If <tt>fast==false</tt>, the vector
+                                          * is filled with zeros.
+                                          */
+        void reinit (const std::vector<IndexSet> &parallel_partitioning,
+		     const MPI_Comm              &communicator = MPI_COMM_WORLD,
+		     const bool                   fast = false);
 
                                          /**
                                           * Change the dimension to that
@@ -231,9 +261,9 @@ namespace TrilinosWrappers
 					  * blocks will get initialized with
 					  * zero size, so it is assumed that
 					  * the user resizes the
-					  * individual blocks by herself 
+					  * individual blocks by herself
 					  * in an appropriate way, and
-					  * calls <tt>collect_sizes</tt> 
+					  * calls <tt>collect_sizes</tt>
 					  * afterwards.
                                           */
         void reinit (const unsigned int num_blocks);
@@ -354,9 +384,18 @@ namespace TrilinosWrappers
 
 
     inline
-    BlockVector::BlockVector (const std::vector<Epetra_Map> &InputMaps)
+    BlockVector::BlockVector (const std::vector<Epetra_Map> &parallel_partitioning)
     {
-      reinit (InputMaps);
+      reinit (parallel_partitioning, false);
+    }
+
+
+
+    inline
+    BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
+			      const MPI_Comm              &communicator)
+    {
+      reinit (parallel_partitioning, communicator, false);
     }
 
 
@@ -376,7 +415,7 @@ namespace TrilinosWrappers
     {
       this->components.resize (v.n_blocks());
       this->block_indices = v.block_indices;
-    
+
       for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->components[i] = v.components[i];
     }
@@ -427,17 +466,17 @@ namespace TrilinosWrappers
     {
       Assert (n_blocks() == v.n_blocks(),
 	      ExcDimensionMismatch(n_blocks(),v.n_blocks()));
-      
+
       for (unsigned int row=0; row<n_blocks(); ++row)
 	block(row).swap (v.block(row));
     }
-    
+
 
 
 /**
  * Global function which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
- * function simply exchanges the data of the two vectors. 
+ * function simply exchanges the data of the two vectors.
  *
  * @relates TrilinosWrappers::MPI::BlockVector
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008
@@ -480,7 +519,7 @@ namespace TrilinosWrappers
 					* access to its own typedefs.
 					*/
       typedef BlockVectorBase<Vector> BaseClass;
-    
+
                                        /**
 					* Typedef the type of the underlying
 					* vector.
@@ -505,32 +544,44 @@ namespace TrilinosWrappers
 					* empty vector without any blocks.
 					*/
       BlockVector ();
-        
+
                                        /**
 					* Constructor. Generate a block
 					* vector with as many blocks as
 					* there are entries in Input_Maps.
-					* Each Epetra_Map already knows
-					* the distribution of data among
-					* the MPI processes.
+					* For this non-distributed vector,
+					* the %parallel partitioning is not
+					* used, just the global size of the
+					* partitioner.
 					*/
-      BlockVector (const std::vector<Epetra_Map> &InputMaps);
+      BlockVector (const std::vector<Epetra_Map> &partitioner);
+
+                                       /**
+					* Constructor. Generate a block
+					* vector with as many blocks as
+					* there are entries in Input_Maps.
+					* For this non-distributed vector,
+					* the %parallel partitioning is not
+					* used, just the global size of the
+					* partitioner.
+					*/
+      BlockVector (const std::vector<IndexSet> &partitioner,
+		   const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
                                        /**
 					* Copy-Constructor. Set all the
-					* properties of the parallel
+					* properties of the non-%parallel
 					* vector to those of the given
-					* argument and copy the
+					* %parallel vector and import the
 					* elements.
 					*/
       BlockVector (const MPI::BlockVector &V);
-    
+
                                        /**
 					* Copy-Constructor. Set all the
-					* properties of the parallel
-					* vector to those of the given
-					* argument and copy the
-					* elements.
+					* properties of the vector to those
+					* of the given input vector and copy
+					* the elements.
 					*/
       BlockVector (const BlockVector  &V);
 
@@ -629,23 +680,54 @@ namespace TrilinosWrappers
 					* deal.II vector.
 					*/
       template <typename Number>
-      BlockVector & 
+      BlockVector &
 	operator = (const ::dealii::BlockVector<Number> &V);
 
                                          /**
                                           * Reinitialize the BlockVector to
-                                          * contain as many blocks as there 
-					  * are Epetra_Maps given in the input
-					  * argument, according to the
-					  * parallel distribution of the 
-					  * individual components described
-					  * in the maps.
+                                          * contain as many blocks as there
+                                          * are Epetra_Maps given in the
+                                          * input argument, according to the
+                                          * global size of the individual
+                                          * components described in the
+                                          * maps. Note that the resulting
+                                          * vector will be stored completely
+                                          * on each process. The Epetra_Map
+                                          * is useful when data exchange
+                                          * with a distributed vector based
+                                          * on the same Epetra_map is
+                                          * intended. In that case, the same
+                                          * communicator is used for data
+                                          * exchange.
                                           *
                                           * If <tt>fast==false</tt>, the vector
                                           * is filled with zeros.
                                           */
-      void reinit (const std::vector<Epetra_Map> &input_maps,
+      void reinit (const std::vector<Epetra_Map> &partitioning,
 		   const bool                     fast = false);
+
+                                         /**
+                                          * Reinitialize the BlockVector to
+                                          * contain as many blocks as there
+                                          * are index sets given in the
+                                          * input argument, according to the
+                                          * global size of the individual
+                                          * components described in the
+                                          * index set, and using a given MPI
+                                          * communicator. The MPI
+                                          * communicator is useful when data
+                                          * exchange with a distributed
+                                          * vector based on the same
+                                          * initialization is intended. In
+                                          * that case, the same communicator
+                                          * is used for data exchange.
+                                          *
+                                          * If <tt>fast==false</tt>, the vector
+                                          * is filled with zeros.
+                                          */
+      void reinit (const std::vector<IndexSet> &partitioning,
+		   const MPI_Comm              &communicator = MPI_COMM_WORLD,
+		   const bool                   fast = false);
 
                                          /**
                                           * Reinitialize the BlockVector to
@@ -661,7 +743,7 @@ namespace TrilinosWrappers
                                           */
       void reinit (const std::vector<unsigned int> &N,
 		   const bool                       fast=false);
-      
+
                                          /**
                                           * Reinit the function
                                           * according to a distributed
@@ -706,9 +788,9 @@ namespace TrilinosWrappers
 					  * blocks will get initialized with
 					  * zero size, so it is assumed that
 					  * the user resizes the
-					  * individual blocks by herself 
+					  * individual blocks by herself
 					  * in an appropriate way, and
-					  * calls <tt>collect_sizes</tt> 
+					  * calls <tt>collect_sizes</tt>
 					  * afterwards.
                                           */
       void reinit (const unsigned int num_blocks);
@@ -759,7 +841,7 @@ namespace TrilinosWrappers
 					* Exception
 					*/
       DeclException2 (ExcNonLocalizedMap,
-      		      int, int, 
+      		      int, int,
       		      << "For the generation of a localized vector the map has "
 		      << "to assign all elements to all vectors! "
 		      << "local_size = global_size is a necessary condition, but"
@@ -780,16 +862,18 @@ namespace TrilinosWrappers
 
 
   inline
-  BlockVector::BlockVector (const std::vector<Epetra_Map> &InputMaps)
+  BlockVector::BlockVector (const std::vector<Epetra_Map> &partitioning)
   {
-    for (unsigned int i=0; i<InputMaps.size(); ++i)
-      {
-	Assert (InputMaps[i].NumGlobalElements() == InputMaps[i].NumMyElements(),
-		ExcNonLocalizedMap(InputMaps[i].NumGlobalElements(),
-				   InputMaps[i].NumMyElements()));
-      }
+    reinit (partitioning);
+  }
 
-    reinit (InputMaps);
+
+
+  inline
+  BlockVector::BlockVector (const std::vector<IndexSet> &partitioning,
+			    const MPI_Comm              &communicator)
+  {
+    reinit (partitioning, communicator);
   }
 
 
@@ -854,7 +938,7 @@ namespace TrilinosWrappers
   {
     this->components.resize (v.n_blocks());
     this->block_indices = v.block_indices;
-    
+
     for (unsigned int i=0; i<this->n_blocks(); ++i)
       this->components[i] = v.components[i];
   }
@@ -866,7 +950,7 @@ namespace TrilinosWrappers
   {
     Assert (n_blocks() == v.n_blocks(),
 	    ExcDimensionMismatch(n_blocks(),v.n_blocks()));
-      
+
     for (unsigned int row=0; row<n_blocks(); ++row)
       block(row).swap (v.block(row));
   }
@@ -891,12 +975,12 @@ namespace TrilinosWrappers
 
     return *this;
   }
-  
+
 
 /**
  * Global function which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
- * function simply exchanges the data of the two vectors. 
+ * function simply exchanges the data of the two vectors.
  *
  * @relates TrilinosWrappers::BlockVector
  * @author Martin Kronbichler, 2008
