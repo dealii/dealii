@@ -184,7 +184,7 @@ namespace TrilinosWrappers
 				   // available when entries have been added
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 			  (new Epetra_FECrsMatrix(Copy,
-						  Epetra_Map (n, 0,
+						  Epetra_Map (m, 0,
 							      Utilities::Trilinos::comm_self()),
 						  *column_space_map,
 						  n_max_entries_per_row,
@@ -204,7 +204,7 @@ namespace TrilinosWrappers
 						     Utilities::Trilinos::comm_self()))),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 			  (new Epetra_FECrsMatrix(Copy,
-						  Epetra_Map (n, 0,
+						  Epetra_Map (m, 0,
 							      Utilities::Trilinos::comm_self()),
 						  *column_space_map,
 			   (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),

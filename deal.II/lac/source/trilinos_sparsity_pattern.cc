@@ -507,7 +507,7 @@ namespace TrilinosWrappers
 
 
   void
-  SparsityPattern::operator = (const SparsityPattern &sp)
+  SparsityPattern::operator = (const SparsityPattern &)
   {
     Assert (false, ExcNotImplemented());
   }

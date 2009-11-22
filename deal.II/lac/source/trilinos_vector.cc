@@ -341,6 +341,7 @@ namespace TrilinosWrappers
 			 Epetra_MpiComm(communicator));
 #else
                          Epetra_SerialComm());
+    (void)communicator;
 #endif
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
   }
@@ -436,6 +437,7 @@ namespace TrilinosWrappers
 			     Epetra_MpiComm(communicator));
 #else
                              Epetra_SerialComm());
+        (void)communicator;
 #endif
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
