@@ -244,7 +244,7 @@ If we don't do anything special to renumber degrees of freedom (i.e.,
 without using DoFRenumbering::Cuthill_McKee, but with using
 DoFRenumbering::component_wise to ensure that degrees of freedom are
 appropriately sorted into their corresponding blocks of the matrix and
-vector, then we get the following image after the first adaptive
+vector), then we get the following image after the first adaptive
 refinement in two dimensions:
 
 @image html step-22.2d.sparsity-nor.png
@@ -275,7 +275,7 @@ now concentrated around the diagonal in the (0,0) block in the matrix. Similar
 effects are also visible for the other blocks. In this case, the ILU
 decomposition will be much closer to the full LU decomposition, which improves
 the quality of the preconditioner. (It may be interesting to note that the
-sparse direct solver UMFPACK does some internal renumbering of the equations
+sparse direct solver UMFPACK does some %internal renumbering of the equations
 before actually generating a sparse LU decomposition; that procedure leads to
 a very similar pattern to the one we got from the Cuthill-McKee algorithm.)
 

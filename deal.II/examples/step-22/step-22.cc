@@ -700,14 +700,14 @@ void StokesProblem<dim>::setup_dofs ()
 				   // (and its block variant
 				   // BlockCompressedSimpleSparsityPattern)
 				   // has exactly the same interface, uses a
-				   // different internal data structure and
+				   // different %internal data structure and
 				   // is linear in the number of degrees of
 				   // freedom and therefore much more
 				   // efficient for large problems. As
 				   // another alternative, we could also
 				   // have chosen the class
 				   // BlockCompressedSetSparsityPattern that
-				   // uses yet another strategy for internal
+				   // uses yet another strategy for %internal
 				   // memory management. Though, that class
 				   // turns out to be more memory-demanding
 				   // than
@@ -762,7 +762,7 @@ void StokesProblem<dim>::setup_dofs ()
 				 // abbreviations for the data structures
 				 // that hold the local matrix, right
 				 // hand side, and global
-				 // numbers of the degrees of freedom
+				 // numbering of the degrees of freedom
 				 // for the present cell.
 template <int dim>
 void StokesProblem<dim>::assemble_system () 
