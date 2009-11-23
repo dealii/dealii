@@ -29,7 +29,7 @@ void test (TrilinosWrappers::Vector &v,
   TrilinosWrappers::SparseMatrix m(v.size(),v.size(),v.size());
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
-        m.set (i,j, i+2*j);
+      m.set (i,j, i+2*j);
 
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -40,7 +40,6 @@ void test (TrilinosWrappers::Vector &v,
   m.compress ();
   v.compress ();
   w.compress ();
-
                                    // w:=Mv
   m.Tvmult_add (w,v);
 

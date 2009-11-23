@@ -33,7 +33,7 @@ void test ()
   const unsigned int N = 200;
 
                                    // build the sparse matrix 
-  TrilinosWrappers::SparseMatrix matrix (N*N, N*N, 5);
+  TrilinosWrappers::SparseMatrix matrix (N*N, N*N, 5U);
   for(unsigned int i=0; i<N; i++)
     for(unsigned int j=0; j<N; j++)
       {

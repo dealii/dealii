@@ -31,7 +31,7 @@ void test ()
                                    // first set a few entries one-by-one in
                                    // a small matrix
   const unsigned int block_size = 16;
-  TrilinosWrappers::SparseMatrix m_small (block_size,block_size,3);
+  TrilinosWrappers::SparseMatrix m_small (block_size,block_size,3U);
   for (unsigned int i=0; i<block_size; ++i)
     for (unsigned int j=0; j<block_size; ++j)
       if (std::fabs((double)i-j) < 2)

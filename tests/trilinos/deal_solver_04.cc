@@ -80,7 +80,7 @@ int main(int argc, char **argv)
       
                                      // Make matrix
     FDMatrix testproblem(size, size);
-    TrilinosWrappers::SparseMatrix  A(dim, dim, 5);
+    TrilinosWrappers::SparseMatrix  A(dim, dim, 5U);
     testproblem.five_point(A);
 
     TrilinosWrappers::Vector  f(dim);

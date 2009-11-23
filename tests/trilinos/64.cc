@@ -59,7 +59,7 @@ int main (int argc,char **argv)
 					 // check
 					 // TrilinosWrappers::SparseMatrix
         TrilinosWrappers::SparseMatrix
-	  v1 (n_dofs, n_dofs, 5);
+	  v1 (n_dofs, n_dofs, 5U);
         test (v1);
 
 					 // check

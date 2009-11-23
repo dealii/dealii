@@ -60,7 +60,7 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::SparseMatrix m (5,5,3);
+        TrilinosWrappers::SparseMatrix m (5U,5U,3U);
         test (m);
       }
     }

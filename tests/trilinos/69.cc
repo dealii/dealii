@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -116,7 +116,7 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::SparseMatrix v (14,14,3);
+        TrilinosWrappers::SparseMatrix v (14U,14U,3U);
         test (v);
       }
     }

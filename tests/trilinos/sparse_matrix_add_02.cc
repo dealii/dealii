@@ -27,7 +27,7 @@
 
 void test (TrilinosWrappers::SparseMatrix &m)
 {
-  TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), 3);
+  TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), 3U);
 
                                    // first set a few entries one-by-one and
                                    // initialize the sparsity pattern for m2
@@ -96,7 +96,7 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::SparseMatrix m (16,16,3);
+        TrilinosWrappers::SparseMatrix m (16U,16U,3U);
         test (m);
       }
     }

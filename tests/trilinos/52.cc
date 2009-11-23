@@ -66,7 +66,7 @@ int main (int argc,char **argv)
       {
         std::vector<unsigned int> row_lengths (5, 3U);
         row_lengths.back() = 2;
-        TrilinosWrappers::SparseMatrix m (5,5,row_lengths);
+        TrilinosWrappers::SparseMatrix m (5U,5U,row_lengths);
         test (m);
       }
     }

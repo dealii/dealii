@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -63,7 +63,7 @@ check_solve( SOLVER& solver, const MATRIX& A,
 int main(int argc, char **argv)
 {
   std::ofstream logfile("deal_solver_03/output");
-  logfile.precision(4);
+  logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10); 
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
       
                                      // Make matrix
     FDMatrix testproblem(size, size);
-    TrilinosWrappers::SparseMatrix  A(dim, dim, 5);
+    TrilinosWrappers::SparseMatrix  A(dim, dim, 5U);
     testproblem.five_point(A);
 
     TrilinosWrappers::Vector  f(dim);
