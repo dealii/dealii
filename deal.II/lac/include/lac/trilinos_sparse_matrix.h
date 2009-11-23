@@ -167,13 +167,13 @@ namespace TrilinosWrappers
 					* than one accessor can access
 					* this data if necessary.
 					*/
-            std_cxx1x::shared_ptr<const std::vector<unsigned int> > colnum_cache;
+            std_cxx1x::shared_ptr<std::vector<unsigned int> > colnum_cache;
 
                                        /**
 					* Similar cache for the values
 					* of this row.
 					*/
-            std_cxx1x::shared_ptr<const std::vector<TrilinosScalar> > value_cache;
+            std_cxx1x::shared_ptr<std::vector<TrilinosScalar> > value_cache;
 
 	                               /**
 					* Discard the old row caches
@@ -3235,7 +3235,7 @@ namespace TrilinosWrappers
 
     temp_vector.reinit(dst, true);
 
-    vmult (temp_vector, src);
+    Tvmult (temp_vector, src);
     dst += temp_vector;
   }
 

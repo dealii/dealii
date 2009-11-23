@@ -57,12 +57,24 @@ namespace TrilinosWrappers
 				  // row
       int ncols;
       int colnums = matrix->n();
-      TrilinosScalar *values = new TrilinosScalar(colnums);
+      if (value_cache.get() == 0)
+	{
+	  value_cache.reset (new std::vector<TrilinosScalar> (matrix->n()));
+	  colnum_cache.reset (new std::vector<unsigned int> (matrix->n()));
+	}
+      else
+	{
+	  value_cache->resize (matrix->n());
+	  colnum_cache->resize (matrix->n());
+	}
 
-      int ierr;
-      ierr = matrix->trilinos_matrix().ExtractGlobalRowCopy((int)this->a_row,
-							    colnums,
-							    ncols, &(values[0]));
+      int ierr = matrix->trilinos_matrix().
+	ExtractGlobalRowCopy((int)this->a_row,
+			     colnums,
+			     ncols, &((*value_cache)[0]),
+			     reinterpret_cast<int*>(&((*colnum_cache)[0])));
+      value_cache->resize (ncols);
+      colnum_cache->resize (ncols);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 				  // copy it into our caches if the
@@ -71,10 +83,6 @@ namespace TrilinosWrappers
 				  // we shouldn't have initialized an
 				  // iterator for an empty line (what
 				  // would it point to?)
-      Assert (ncols != 0, ExcInternalError());
-      colnum_cache.reset (new std::vector<unsigned int> (colnums,
-							 colnums+ncols));
-      value_cache.reset (new std::vector<TrilinosScalar> (values, values+ncols));
     }
   }
 
@@ -1397,7 +1405,7 @@ namespace TrilinosWrappers
 	  {
 	    matrix->ExtractMyRowView (i, num_entries, values, indices);
 	    for (int j=0; j<num_entries; ++j)
-	      out << "(" << i << "," << indices[matrix->GRID(j)] << ") "
+	      out << "(" << matrix->GRID(i) << "," << indices[matrix->GCID(j)] << ") "
 		  << values[j] << std::endl;
 	  }
       }

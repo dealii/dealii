@@ -368,6 +368,15 @@ namespace TrilinosWrappers
 			 const VectorBase &v);
 
 				       /**
+					* Reinitialize from a deal.II
+					* vector. The Epetra_Map specifies the
+					* %parallel partitioning.
+					*/
+	template <typename number>
+	void reinit (const Epetra_Map             &parallel_partitioner,
+		     const dealii::Vector<number> &v);
+
+				       /**
 				        * Reinit functionality. This
 				        * function destroys the old
 				        * vector content and generates a
@@ -469,19 +478,7 @@ namespace TrilinosWrappers
     Vector::Vector (const Epetra_Map             &input_map,
                     const dealii::Vector<number> &v)
     {
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(input_map));
-
-      const int min_my_id = input_map.MinMyGID();
-      const int size = input_map.NumMyElements();
-
-      Assert (input_map.MaxLID() == size-1,
-	      ExcDimensionMismatch(input_map.MaxLID(), size-1));
-
-				   // Need to copy out values, since the
-				   // deal.II might not use doubles, so
-				   // that a direct access is not possible.
-      for (int i=0; i<size; ++i)
-	(*vector)[0][i] = v(i);
+      reinit (input_map, v);
     }
 
 
@@ -495,6 +492,25 @@ namespace TrilinosWrappers
 		     v);
     }
 
+
+
+
+    template <typename number>
+    void Vector::reinit (const Epetra_Map             &parallel_partitioner,
+			 const dealii::Vector<number> &v)
+    {
+      if (&*vector != 0 && vector->Map().SameAs(parallel_partitioner))
+	vector = std::auto_ptr<Epetra_FEVector>
+	  (new Epetra_FEVector(parallel_partitioner));
+
+      const int size = parallel_partitioner.NumMyElements();
+
+				   // Need to copy out values, since the
+				   // deal.II might not use doubles, so
+				   // that a direct access is not possible.
+      for (int i=0; i<size; ++i)
+	(*vector)[0][i] = v(parallel_partitioner.GID(i));
+    }
 
 
     inline
@@ -513,7 +529,7 @@ namespace TrilinosWrappers
     {
       if (size() != v.size())
 	{
-	  *vector = std::auto_ptr<Epetra_FEVector>
+	  vector = std::auto_ptr<Epetra_FEVector>
 	  (new Epetra_FEVector(Epetra_Map (v.size(), 0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 					   Epetra_MpiComm(MPI_COMM_SELF)
@@ -763,8 +779,7 @@ namespace TrilinosWrappers
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 
-    Epetra_Map & map = vector_partitioner();
-    const int min_my_id = map.MinMyGID();
+    const Epetra_Map & map = vector_partitioner();
     const int size = map.NumMyElements();
 
     Assert (map.MaxLID() == size-1,
