@@ -212,6 +212,13 @@ namespace internal
     template <>
     struct NumberCache<1>
     {
+					 /**
+					  * The number of levels on
+					  * which we have used
+					  * objects.
+					  */
+	unsigned int n_levels;
+
                                          /**
                                           * Number of used lines in the whole
                                           * triangulation.
@@ -3342,6 +3349,36 @@ Triangulation<dim,spacedim>::vertex_used(const unsigned int index) const
 	  ExcIndexRange(index, 0, vertices_used.size()));
   return vertices_used[index];
 }
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int Triangulation<dim, spacedim>::n_levels () const
+{
+  return number_cache.n_levels;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int
+Triangulation<dim, spacedim>::n_vertices () const
+{
+  return vertices.size();
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const std::vector<Point<spacedim> > &
+Triangulation<dim, spacedim>::get_vertices () const
+{
+  return vertices;
+}
+
 
 
 /* -------------- declaration of explicit specializations ------------- */

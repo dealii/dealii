@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
 bool
 SubCellData::check_consistency (const unsigned int dim) const
 {
-  switch (dim) 
+  switch (dim)
     {
       case 1:
 	    return ((boundary_lines.size() == 0) &&
@@ -54,9 +54,11 @@ namespace internal
   namespace Triangulation
   {
 
-    NumberCache<1>::NumberCache () :
+    NumberCache<1>::NumberCache ()
+		    :
+		    n_levels (0),
                     n_lines (0),
-                    n_active_lines (0) 
+                    n_active_lines (0)
                                        // all other fields are
                                        // default constructed
     {}
@@ -66,7 +68,8 @@ namespace internal
     unsigned int
     NumberCache<1>::memory_consumption () const
     {
-      return (MemoryConsumption::memory_consumption (n_lines) +
+      return (MemoryConsumption::memory_consumption (n_levels) +
+              MemoryConsumption::memory_consumption (n_lines) +
               MemoryConsumption::memory_consumption (n_lines_level) +
               MemoryConsumption::memory_consumption (n_active_lines) +
               MemoryConsumption::memory_consumption (n_active_lines_level));
@@ -75,7 +78,7 @@ namespace internal
 
     NumberCache<2>::NumberCache () :
                     n_quads (0),
-                    n_active_quads (0) 
+                    n_active_quads (0)
                                        // all other fields are
                                        // default constructed
     {}
@@ -96,7 +99,7 @@ namespace internal
 
     NumberCache<3>::NumberCache () :
                     n_hexes (0),
-                    n_active_hexes (0) 
+                    n_active_hexes (0)
                                        // all other fields are
                                        // default constructed
     {}

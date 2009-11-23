@@ -359,9 +359,9 @@ inconvenience this causes.
 
   <li>
     <p>
-    Improved: The Vector class has been equipped with an improved way to 
+    Improved: The Vector class has been equipped with an improved way to
     calculate sums in inner products and norms. This reduces the accumulation
-    of round-off errors. Especially the solution with float vectors should 
+    of round-off errors. Especially the solution with float vectors should
     profit from the new implementation.
     </p>
   <br>
@@ -511,6 +511,19 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  Fixed: The function Triangulation::n_levels() accidentally turned out to be
+  quite expensive, in particular if the mesh has been coarsened significantly
+  in the past. Since Triangulation::n_active_cells() calls Triangulation::n_levels()
+  repeatedly, by consequence it also is surprisingly expensive, which is
+  particularly annoying since this is a frequently called function. This has
+  now been fixed by caching the result of this function.
+  <br>
+  (Wolfgang Bangerth 2009/11/22)
+  </p>
+  </li>
+
   <li>
   <p>
   Fixed: The function DataOut class got confused when its DataOut::first_cell() and
