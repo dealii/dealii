@@ -518,7 +518,7 @@ inconvenience this causes.
   in the past. Since Triangulation::n_active_cells() calls Triangulation::n_levels()
   repeatedly, by consequence it also is surprisingly expensive, which is
   particularly annoying since this is a frequently called function. This has
-  now been fixed by caching the result of this function.
+  now been fixed by caching the result of both functions.
   <br>
   (Wolfgang Bangerth 2009/11/22)
   </p>

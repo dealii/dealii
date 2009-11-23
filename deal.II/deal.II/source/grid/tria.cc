@@ -11452,23 +11452,67 @@ Triangulation<dim, spacedim>::last_active_hex () const
 
 // -------------------------------- number of cells etc ---------------
 
+
+namespace internal
+{
+  namespace Triangulation
+  {
+    unsigned int
+    n_cells (const internal::Triangulation::NumberCache<1> &c)
+    {
+      return c.n_lines;
+    }
+
+
+    unsigned int
+    n_active_cells (const internal::Triangulation::NumberCache<1> &c)
+    {
+      return c.n_active_lines;
+    }
+
+
+    unsigned int
+    n_cells (const internal::Triangulation::NumberCache<2> &c)
+    {
+      return c.n_quads;
+    }
+
+
+    unsigned int
+    n_active_cells (const internal::Triangulation::NumberCache<2> &c)
+    {
+      return c.n_active_quads;
+    }
+
+
+    unsigned int
+    n_cells (const internal::Triangulation::NumberCache<3> &c)
+    {
+      return c.n_hexes;
+    }
+
+
+    unsigned int
+    n_active_cells (const internal::Triangulation::NumberCache<3> &c)
+    {
+      return c.n_active_hexes;
+    }
+  }
+}
+
+
+
 template <int dim, int spacedim>
 unsigned int Triangulation<dim, spacedim>::n_cells () const
 {
-  unsigned int n=0;
-  for (unsigned int l=0; l<n_levels(); ++l)
-    n += n_cells (l);
-  return n;
+  return internal::Triangulation::n_cells (number_cache);
 }
 
 
 template <int dim, int spacedim>
 unsigned int Triangulation<dim, spacedim>::n_active_cells () const
 {
-  unsigned int n=0;
-  for (unsigned int l=0; l<n_levels(); ++l)
-    n += n_active_cells (l);
-  return n;
+  return internal::Triangulation::n_active_cells (number_cache);
 }
 
 
