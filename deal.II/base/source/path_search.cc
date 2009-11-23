@@ -16,6 +16,7 @@
 #include <base/utilities.h>
 
 #include <iostream>
+#include <cstdio>
 #include <algorithm>
 
 DEAL_II_NAMESPACE_OPEN
@@ -39,7 +40,7 @@ PathSearch::initialize_classes()
   v.push_back(empty);
   v.push_back(std::string(".prm"));
   suffix_lists.insert(map_type(std::string("PARAMETER"), v));
-
+  
 				   // We cannot use the GridIn class
 				   // to query the formats, since this
 				   // would require linking with the
@@ -61,29 +62,29 @@ PathSearch::get_path_list(const std::string& cls)
 {
   if (path_lists.empty())
     initialize_classes();
-
+  
   // Modified by Luca Heltai. If a class is not there, add it
   if(path_lists.count(cls) == 0) add_class(cls);
-
+  
   // Assert(path_lists.count(cls) != 0, ExcNoClass(cls));
   Assert(path_lists.count(cls) != 0, ExcInternalError());
-
+  
   return path_lists.find(cls)->second;
 }
 
 
 std::vector<std::string>&
 PathSearch::get_suffix_list(const std::string& cls)
-{
+{  
   // This is redundant. The constructor should have already called the
   // add_path function with the path_list bit...
 
   // Modified by Luca Heltai. If a class is not there, add it
   if(suffix_lists.count(cls) == 0) add_class(cls);
-
+  
   // Assert(suffix_lists.count(cls) != 0, ExcNoClass(cls));
   Assert(suffix_lists.count(cls) != 0, ExcInternalError());
-
+  
   return suffix_lists.find(cls)->second;
 }
 
@@ -107,12 +108,12 @@ PathSearch::find (const std::string& filename,
   const std::vector<std::string>::const_iterator endp = my_path_list.end();
 
   std::string real_name;
-
+  
   if (debug > 2)
     deallog << "PathSearch[" << cls << "] "
 	    << my_path_list.size() << " directories "
 	    << std::endl;
-
+  
 				   // Try to open file
   for (path = my_path_list.begin(); path != endp; ++path)
     {
@@ -120,12 +121,13 @@ PathSearch::find (const std::string& filename,
       if (debug > 1)
 	deallog << "PathSearch[" << cls << "] trying "
 		<< real_name << std::endl;
-      std::ifstream in (real_name.c_str());
-      if (in)
+      FILE* fp = fopen(real_name.c_str(), open_mode);
+      if (fp != 0)
 	{
 	  if (debug > 0)
 	    deallog << "PathSearch[" << cls << "] opened "
 		    << real_name << std::endl;
+	  fclose(fp);
 	  return real_name;
 	}
     }
@@ -145,7 +147,7 @@ PathSearch::find (const std::string& filename,
 	    << my_path_list.size() << " directories "
 	    << my_suffix_list.size() << " suffixes"
 	    << std::endl;
-
+  
   for (suffix = my_suffix_list.begin(); suffix != ends; ++suffix)
     {
       try
@@ -156,7 +158,7 @@ PathSearch::find (const std::string& filename,
 	{
 	  continue;
 	}
-
+      
     }
   AssertThrow(false, ExcFileNotFound(filename, cls));
   return std::string("");
