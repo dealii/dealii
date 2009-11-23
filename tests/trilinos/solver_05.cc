@@ -74,7 +74,10 @@ int main(int argc, char **argv)
       
                                      // Make matrix
     FDMatrix testproblem(size, size);
-    TrilinosWrappers::SparseMatrix  A(dim, dim, 5U);
+    CompressedSimpleSparsityPattern csp (dim, dim);
+    testproblem.five_point_structure(csp);
+    TrilinosWrappers::SparseMatrix  A;
+    A.reinit(csp);
     testproblem.five_point(A);
 
     TrilinosWrappers::Vector  f(dim);

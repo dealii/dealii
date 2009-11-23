@@ -2,5 +2,5 @@
 DEAL::Size 32 Unknowns 961
 DEAL::Solver type: N6dealii11SolverGMRESINS_16TrilinosWrappers6VectorEEE
 DEAL:GMRES::Starting value 31.0000
-DEAL:GMRES::Convergence step 1216 value 0.000999125
-DEAL::Solver stopped after 1216 iterations
+DEAL:GMRES::Convergence step 75 value 0.000809583
+DEAL::Solver stopped after 75 iterations

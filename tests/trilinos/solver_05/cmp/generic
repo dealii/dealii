@@ -1,6 +1,5 @@
 
 DEAL::Size 32 Unknowns 961
-DEAL::Solver type: N6dealii13TrilinosWrappers11SolverGMRESE
-DEAL::Starting value 7.750
-DEAL::Convergence step 48 value 0.0009841
-DEAL::Solver stopped after 48 iterations
+DEAL::Solver type: N6dealii16TrilinosWrappers11SolverGMRESE
+DEAL::Convergence step 71 value 0.000916839
+DEAL::Solver stopped after 71 iterations
