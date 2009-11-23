@@ -1160,18 +1160,27 @@ namespace TrilinosWrappers
                                         * Set the element (<i>i,j</i>)
                                         * to @p value.
 					*
-					* This function is able to insert
-					* new elements into the matrix as
-					* long as compress() has not been
-					* called, so the sparsity pattern
-					* will be extended. When compress()
-					* is called for the first time, then
-					* this is no longer possible and an
-					* insertion of elements at positions
-					* which have not been initialized
-					* will throw an exception. Moreover,
-					* if <tt>value</tt> is not a finite
-					* number an exception is thrown.
+					* This function is able to insert new
+					* elements into the matrix as long as
+					* compress() has not been called, so
+					* the sparsity pattern will be
+					* extended. When compress() is called
+					* for the first time, then this is no
+					* longer possible and an insertion of
+					* elements at positions which have not
+					* been initialized will throw an
+					* exception. Note that in case
+					* elements need to be inserted, it is
+					* mandatory that elements are inserted
+					* only once. Otherwise, the elements
+					* will actually be added in the end
+					* (since it is not possible to
+					* efficiently find values to the same
+					* entry before compress() has been
+					* called). In the case that an element
+					* is set more than once, initialize
+					* the matrix with a sparsity pattern
+					* first.
 					*/
       void set (const unsigned int i,
                 const unsigned int j,

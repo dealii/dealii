@@ -102,7 +102,7 @@ class SolverCG : public Solver<VECTOR>
 					  * @note Requires LAPACK support.
 					  */
 	bool compute_all_condition_numbers;
-	
+
 					 /**
 					  * Compute all eigenvalues of
 					  * the projected matrix.
@@ -110,7 +110,7 @@ class SolverCG : public Solver<VECTOR>
 					  * @note Requires LAPACK support.
 					  */
 	bool compute_eigenvalues;
-	
+
                                          /**
                                           * Constructor. Initialize data
                                           * fields.  Confer the description of
@@ -186,7 +186,7 @@ class SolverCG : public Solver<VECTOR>
     VECTOR *Vp;
     VECTOR *Vz;
     VECTOR *VAp;
-    
+
 				     /**
 				      * Within the iteration loop, the
 				      * square of the residual vector is
@@ -227,7 +227,7 @@ AdditionalData (const bool log_coefficients,
 		compute_all_condition_numbers(compute_all_condition_numbers),
 		compute_eigenvalues(compute_eigenvalues)
 {}
-    
+
 
 
 template <class VECTOR>
@@ -300,7 +300,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   SolverControl::State conv=SolverControl::iterate;
 
   deallog.push("cg");
-  
+
 				   // Memory allocation
   Vr  = this->memory.alloc();
   Vp  = this->memory.alloc();
@@ -312,17 +312,17 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 			| additional_data.compute_all_condition_numbers
 			| additional_data.compute_eigenvalues;
   double eigen_beta_alpha = 0;
-  
+
 				   // vectors used for eigenvalue
 				   // computations
   std::vector<double> diagonal;
   std::vector<double> offdiagonal;
-  
+
   try {
 				     // define some aliases for simpler access
-    VECTOR& g  = *Vr; 
-    VECTOR& h  = *Vp; 
-    VECTOR& d  = *Vz; 
+    VECTOR& g  = *Vr;
+    VECTOR& h  = *Vp;
+    VECTOR& d  = *Vz;
     VECTOR& Ad = *VAp;
 				     // resize the vectors, but do not set
 				     // the values since they'd be overwritten
@@ -335,7 +335,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 				     // library
     int  it=0;
     double res,gh,alpha,beta;
-    
+
 				     // compute residual. if vector is
 				     // zero, then short-circuit the
 				     // full computation
@@ -349,42 +349,42 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
     res = g.l2_norm();
 
     conv = this->control().check(0,res);
-    if (conv) 
+    if (conv)
       {
 	cleanup();
 	return;
       }
 
     precondition.vmult(h,g);
-    
+
     d.equ(-1.,h);
-    
+
     gh = g*h;
-    
+
     while (conv == SolverControl::iterate)
       {
 	it++;
 	A.vmult(Ad,d);
-	
+
 	alpha = d*Ad;
 	alpha = gh/alpha;
-	
+
 	g.add(alpha,Ad);
 	x.add(alpha,d );
 	res = g.l2_norm();
-	
+
 	print_vectors(it, x, g, d);
-	
+
 	conv = this->control().check(it,res);
 	if (conv)
 	  break;
 
 	precondition.vmult(h,g);
-	
+
 	beta = gh;
 	gh   = g*h;
 	beta = gh/beta;
-	
+
 	if (additional_data.log_coefficients)
 	  deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
 					 // set up the vectors
@@ -411,7 +411,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	    deallog << "Condition number estimate: " <<
 	      T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
 	  }
-	
+
 	d.sadd(beta,-1.,h);
       }
   }
