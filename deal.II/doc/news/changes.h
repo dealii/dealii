@@ -32,6 +32,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Removed: The class TrilinosWrappers::PreconditionStokes has been deleted
+  because it did not work properly, and it is too specific to be part of
+  the general library. A preconditioner that has the same properties is 
+  explained in the @ref step_31 step-31 tutorial program.
+  <br>
+  (Martin Kronbichler 2009/11/23)
+  </p>
+
+  <li>
+  <p>
   Changed: The class MGSmootherRelaxation now instead of a
   preconditioner takes a relaxation method with the functions
   <code>step</code> and <code>Tstep</code>. These perform a complete
