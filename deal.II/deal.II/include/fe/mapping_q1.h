@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  * Shape function for this mapping are the same as for the finite
  * element FE_Q of order 1. Therefore, coupling these two yields
  * an isoparametric element.
- * 
+ *
  * For more information about the <tt>spacedim</tt> template parameter
  * check the documentation of FiniteElement or the one of
  * Triangulation.
@@ -56,12 +56,12 @@ class MappingQ1 : public Mapping<dim,spacedim>
 				      * Default constructor.
 				      */
     MappingQ1 ();
-    
+
     virtual Point<spacedim>
     transform_unit_to_real_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<dim>                                 &p) const;
-    
+
 				     /**
 				      * Transforms the point @p p on
 				      * the real cell to the point
@@ -76,7 +76,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
     transform_real_to_unit_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<spacedim>                            &p) const;
-    
+
     virtual void
     transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                VectorSlice<std::vector<Tensor<1,spacedim> > > output,
@@ -88,7 +88,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
                VectorSlice<std::vector<Tensor<2,spacedim> > > output,
                const typename Mapping<dim,spacedim>::InternalDataBase &internal,
 	       const MappingType type) const;
-    
+
                                      /**
                                       * Return a pointer to a copy of the
                                       * present object. The caller of this
@@ -97,7 +97,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
     virtual
     Mapping<dim,spacedim> * clone () const;
 
-				     /** 
+				     /**
 				      * Storage for internal data of
 				      * d-linear transformation.
 				      */
@@ -119,14 +119,14 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  */
 	double shape (const unsigned int qpoint,
 		      const unsigned int shape_nr) const;
-	
+
 					 /**
 					  * Shape function at quadrature
 					  * point. See above.
 					  */
 	double &shape (const unsigned int qpoint,
 		       const unsigned int shape_nr);
-	
+
 					 /**
 					  * Gradient of shape function
 					  * in quadrature point. See
@@ -166,7 +166,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * object.
 					  */
 	virtual unsigned int memory_consumption () const;
-	
+
 					 /**
 					  * Values of shape
 					  * functions. Access by
@@ -175,7 +175,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * Computed once.
 					  */
 	std::vector<double> shape_values;
-	
+
 					 /**
 					  * Values of shape function
 					  * derivatives. Access by
@@ -184,7 +184,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * Computed once.
 					  */
 	std::vector<Tensor<1,dim> > shape_derivatives;
-	
+
 					 /**
 					  * Values of shape function
 					  * second derivatives. Access
@@ -194,7 +194,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * Computed once.
 					  */
 	std::vector<Tensor<2,dim> > shape_second_derivatives;
-	
+
 					 /**
 					  * Tensors of covariant
 					  * transformation at each of
@@ -209,7 +209,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * Computed on each cell.
 					  */
 	std::vector<Tensor<2,spacedim> > covariant;
-	
+
 					 /**
 					  * Tensors of contravariant
 					  * transformation at each of
@@ -222,7 +222,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * Computed on each cell.
 					  */
 	std::vector<Tensor<2,spacedim> > contravariant;
-	
+
 					 /**
 					  * Unit tangential vectors. Used
 					  * for the computation of
@@ -232,7 +232,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * Filled once.
 					  */
         std::vector<std::vector<Tensor<1,spacedim> > > unit_tangentials;
-	
+
 					 /**
 					  * Auxiliary vectors for internal use.
 					  */
@@ -244,14 +244,14 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * the @p cell_of_current_support_points.
 					  */
 	std::vector<Point<spacedim> > mapping_support_points;
-	
+
 					 /**
 					  * Stores the cell of which the
 					  * @p mapping_support_points are
 					  * stored.
 					  */
 	typename Triangulation<dim,spacedim>::cell_iterator cell_of_current_support_points;
-	
+
 					 /**
 					  * Default value of this flag
 					  * is @p true. If <tt>*this</tt>
@@ -287,7 +287,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
     typedef
     typename QProjector<dim>::DataSetDescriptor
     DataSetDescriptor;
-    
+
 				     /**
 				      * Implementation of the interface in
 				      * Mapping.
@@ -332,7 +332,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			    std::vector<double>             &JxW_values,
 			    typename std::vector<Tensor<1,dim> >        &boundary_form,
 			    typename std::vector<Point<spacedim> >        &normal_vectors) const ;
-    
+
 				     /**
 				      * Compute shape values and/or
 				      * derivatives.
@@ -377,7 +377,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			    const Quadrature<dim> &quadrature,
 			    const unsigned int n_orig_q_points,
 			    InternalData &data) const;
-    
+
 				     /**
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
@@ -388,7 +388,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 		       const CellSimilarity::Similarity cell_similarity,
 		       InternalData           &data,
 		       std::vector<Point<spacedim> > &quadrature_points) const;
-    
+
 				     /**
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
@@ -404,7 +404,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			    std::vector<double>         &JxW_values,
 			    std::vector<Tensor<1,dim> > &boundary_form,
 			    std::vector<Point<spacedim> > &normal_vectors) const;
-    
+
 				     /**
 				      * Compute shape values and/or
 				      * derivatives.
@@ -439,7 +439,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 				      * support points.
 				      */
     Point<spacedim> transform_unit_to_real_cell_internal (const InternalData &mdata) const;
-    
+
 				     /**
 				      * Transforms the point @p p on
 				      * the real cell to the point
@@ -479,6 +479,13 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					       InternalData &mdata,
 					       Point<dim> &p_unit) const;
 
+				     /**
+				      * Always returns @p true because
+				      * MappingQ1 preserves vertex locations.
+				      */
+    virtual
+    bool preserves_vertex_locations () const;
+
   private:
 				     /**
 				      * Implementation of the interface in
@@ -509,7 +516,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 				      * </ul>
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const;
-    
+
 				     /**
 				      * Implementation of the interface in
 				      * Mapping.
@@ -699,6 +706,15 @@ MappingQ1<dim,spacedim>::InternalData::second_derivative (const unsigned int qpo
   return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
 }
 
+
+
+template <int dim, int spacedim>
+inline
+bool
+MappingQ1<dim,spacedim>::preserves_vertex_locations () const
+{
+  return true;
+}
 
 #endif // DOXYGEN
 

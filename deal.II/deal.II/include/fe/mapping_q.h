@@ -35,7 +35,7 @@ template <int dim> class TensorProductPolynomials;
  * For more details about Qp-mappings, see the `mapping' report at
  * <tt>deal.II/doc/reports/mapping_q/index.html</tt> in the `Reports'
  * section of `Documentation'.
- * 
+ *
  * For more information about the <tt>spacedim</tt> template parameter
  * check the documentation of FiniteElement or the one of
  * Triangulation.
@@ -89,7 +89,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * Destructor.
 				      */
     virtual ~MappingQ ();
-    
+
 				     /**
 				      * Transforms the point @p p on
 				      * the unit cell to the point
@@ -100,7 +100,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
     transform_unit_to_real_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<dim>                                 &p) const;
-    
+
 				     /**
 				      * Transforms the point @p p on
 				      * the real cell to the point
@@ -127,7 +127,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
                VectorSlice<std::vector<Tensor<2,spacedim> > > output,
                const typename Mapping<dim,spacedim>::InternalDataBase &internal,
 	       const MappingType type) const;
-    
+
 				     /**
 				      * Return the degree of the
 				      * mapping, i.e. the value which
@@ -142,8 +142,8 @@ class MappingQ : public MappingQ1<dim,spacedim>
                                       */
     virtual
     Mapping<dim,spacedim> * clone () const;
-    
-				     /** 
+
+				     /**
 				      * Storage for internal data of
 				      * Q_degree transformation.
 				      */
@@ -154,7 +154,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 					  * Constructor.
 					  */
 	InternalData (const unsigned int n_shape_functions);
-	
+
 
 					 /**
 					  * Return an estimate (in
@@ -189,7 +189,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 					  * used.
 					  */
 	bool use_mapping_q1_on_current_cell;
-	
+
 					 /**
 					  * On interior cells
 					  * @p MappingQ1 is used.
@@ -297,9 +297,9 @@ class MappingQ : public MappingQ1<dim,spacedim>
     virtual void
     add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    std::vector<Point<dim> > &a) const;
-    
+
   private:
-    
+
     virtual
     typename Mapping<dim,spacedim>::InternalDataBase *
     get_data (const UpdateFlags,
@@ -314,7 +314,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
     typename Mapping<dim,spacedim>::InternalDataBase *
     get_subface_data (const UpdateFlags flags,
 		      const Quadrature<dim-1>& quadrature) const;
-    
+
 				     /**
 				      * Compute shape values and/or
 				      * derivatives.
@@ -342,7 +342,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      */
     void
     set_laplace_on_quad_vector(Table<2,double> &loqvs) const;
-    
+
 				     /**
 				      * This function is needed by the
 				      * constructor of <tt>MappingQ<3></tt>.
@@ -360,7 +360,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * of the `mapping' report.
 				      */
     void set_laplace_on_hex_vector(Table<2,double> &lohvs) const;
-    
+
 				     /**
 				      * Computes the
 				      * <tt>laplace_on_quad(hex)_vector</tt>.
@@ -397,7 +397,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      */
     void apply_laplace_vector(const Table<2,double>   &lvs,
 			      std::vector<Point<dim> > &a) const;
-    
+
 				     /**
 				      * Computes the support points of
 				      * the mapping.
@@ -423,7 +423,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
     void compute_support_points_laplace(
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       std::vector<Point<dim> > &a) const;
-    
+
 				     /**
 				      * Needed by the
 				      * @p laplace_on_quad function
@@ -445,7 +445,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * `mapping' report.
 				      */
     Table<2,double> laplace_on_quad_vector;
-    
+
 				     /**
 				      * Needed by the
 				      * @p laplace_on_hex function
@@ -464,13 +464,13 @@ class MappingQ : public MappingQ1<dim,spacedim>
     DeclException1 (ExcLaplaceVectorNotSet,
 		    int,
 		    << "laplace_vector not set for degree=" << arg1 << ".");
-     
+
 				     /**
 				      * Degree @p p of the
 				      * polynomials used as shape
 				      * functions for the Qp mapping
 				      * of cells at the boundary.
-				      */  
+				      */
     const unsigned int degree;
 
 				     /**
@@ -484,7 +484,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * functions on the boundary.
 				      */
     const unsigned int n_outer;
-    
+
 				     /**
 				      * Pointer to the
 				      * @p dim-dimensional tensor
@@ -494,7 +494,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * boundary.
 				      */
     const TensorProductPolynomials<dim> *tensor_pols;
-    
+
     				     /**
 				      * Number of the Qp tensor
 				      * product shape functions.

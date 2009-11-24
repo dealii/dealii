@@ -887,7 +887,7 @@ namespace DoFRenumbering
 				     // Actually, we compute the
 				     // inverse of the reordering
 				     // vector, called reverse here.
-				     // Later, irs inverse is computed
+				     // Later, its inverse is computed
 				     // into new_indices, which is the
 				     // return argument.
 

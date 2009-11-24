@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
  * along the coordinate directions. It is specifically developed for
  * cartesian meshes. Apply this mapping to a general mesh to get
  * strange results.
- * 
+ *
  * For more information about the <tt>spacedim</tt> template parameter
  * check the documentation of FiniteElement or the one of
  * Triangulation.
@@ -101,8 +101,8 @@ class MappingCartesian : public Mapping<dim,spacedim>
     transform (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                VectorSlice<std::vector<Tensor<2,spacedim> > > output,
                const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-	       const MappingType type) const;    
-    
+	       const MappingType type) const;
+
     virtual Point<spacedim>
     transform_unit_to_real_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -122,7 +122,7 @@ class MappingCartesian : public Mapping<dim,spacedim>
     transform_real_to_unit_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<spacedim>                            &p) const;
-    
+
 
                                      /**
                                       * Return a pointer to a copy of the
@@ -131,9 +131,16 @@ class MappingCartesian : public Mapping<dim,spacedim>
                                       */
     virtual
     Mapping<dim, spacedim> * clone () const;
-    
+
+				     /**
+				      * Always returns @p true because
+				      * MappingCartesian preserves vertex
+				      * locations.
+				      */
+    bool preserves_vertex_locations () const;
+
   protected:
-				     /** 
+				     /**
 				      * Storage for internal data of
 				      * the scaling.
 				      */
@@ -165,7 +172,7 @@ class MappingCartesian : public Mapping<dim,spacedim>
 					  * The volume element
 					  */
 	double volume_element;
-	
+
 					 /**
 					  * Vector of all quadrature
 					  * points. Especially, all
@@ -173,7 +180,7 @@ class MappingCartesian : public Mapping<dim,spacedim>
 					  */
 	std::vector<Point<dim> > quadrature_points;
     };
-    
+
 				     /**
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
@@ -187,20 +194,32 @@ class MappingCartesian : public Mapping<dim,spacedim>
 		       std::vector<Point<dim> >& normal_vectors) const;
 
   private:
-    virtual UpdateFlags update_once (const UpdateFlags) const;    
+    virtual UpdateFlags update_once (const UpdateFlags) const;
     virtual UpdateFlags update_each (const UpdateFlags) const;
-    
+
 				     /**
 				      * Value to indicate that a given
 				      * face or subface number is
 				      * invalid.
 				      */
-    static const unsigned int invalid_face_number = numbers::invalid_unsigned_int;    
+    static const unsigned int invalid_face_number = numbers::invalid_unsigned_int;
 };
 
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
+
+#ifndef DOXYGEN
+
+template <int dim, int spacedim>
+inline
+bool
+MappingCartesian<dim,spacedim>::preserves_vertex_locations () const
+{
+  return true;
+}
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

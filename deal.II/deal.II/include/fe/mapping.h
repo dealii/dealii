@@ -444,6 +444,16 @@ class Mapping : public Subscriptor
     Mapping<dim,spacedim> * clone () const = 0;
     
 				     /**
+				      * Returns whether the mapping preserves
+				      * vertex locations. Returns @p true for
+				      * MappingQ, MappingQ1, MappingCartesian,
+				      * but @p false for MappingQEulerian,
+				      * MappingQ1Eulerian.
+				      */
+    virtual
+    bool preserves_vertex_locations () const = 0;
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidData);

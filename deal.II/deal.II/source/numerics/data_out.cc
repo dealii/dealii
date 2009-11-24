@@ -679,13 +679,20 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 		 DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
 		 const CurvedCellRegion curved_cell_region)
 {
-				   // use ucd_to_deal map as patch
-				   // vertices are in the old,
-				   // unnatural ordering
+				   // use ucd_to_deal map as patch vertices
+				   // are in the old, unnatural ordering. if
+				   // the mapping does not preserve locations
+				   // (e.g. MappingQEulerian), we need to
+				   // compute the offset of the vertex for the
+				   // graphical output. Otherwise, we can just
+				   // use the vertex info.
   for (unsigned int vertex=0; vertex<GeometryInfo<DH::dimension>::vertices_per_cell; ++vertex)
-    patch.vertices[vertex] = data.mapping_collection[0].transform_unit_to_real_cell
-			     (cell_and_index->first,
-			      GeometryInfo<DH::dimension>::unit_cell_vertex (vertex));
+    if (data.mapping_collection[0].preserves_vertex_locations())
+      patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
+    else
+      patch.vertices[vertex] = data.mapping_collection[0].transform_unit_to_real_cell
+			       (cell_and_index->first,
+				GeometryInfo<DH::dimension>::unit_cell_vertex (vertex));
 
   if (data.n_datasets > 0)
     {
