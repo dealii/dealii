@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,13 +55,9 @@ DEAL_II_NAMESPACE_OPEN
  * functions depend on the cells in real space, the update_once() and
  * update_each() functions must be overloaded.
  *
- * Todos:
- * - checke dim of POLY
- * - templatisiere nur auf POLY, dim ergibt sich durch POLY::dim
- *
  * @author Ralf Hartmann 2004
  **/
-template <class POLY, int dim/*=POLY::dim*/, int spacedim=dim>
+template <class POLY, int dim=POLY::dimension, int spacedim=dim>
 class FE_Poly : public FiniteElement<dim,spacedim>
 {
   public:

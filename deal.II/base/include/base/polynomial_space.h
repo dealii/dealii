@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -85,6 +85,14 @@ template <int dim>
 class PolynomialSpace
 {
   public:
+				     /**
+				      * Access to the dimension of
+				      * this object, for checking and
+				      * automatic setting of dimension
+				      * in other classes.
+				      */
+    static const unsigned int dimension = dim;
+    
 				     /**
 				      * Constructor. <tt>pols</tt> is a
 				      * vector of pointers to

@@ -28,7 +28,9 @@ FE_Poly<POLY,dim,spacedim>::FE_Poly (const POLY& poly_space,
 				    restriction_is_additive_flags,
 				    nonzero_components),
                 poly_space(poly_space)
-{}
+{
+  AssertDimension(dim, POLY::dimension);
+}
 
 
 template <class POLY, int dim, int spacedim>
