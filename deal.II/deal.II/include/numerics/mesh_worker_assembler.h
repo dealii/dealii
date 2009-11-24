@@ -1192,7 +1192,8 @@ namespace MeshWorker
     inline void
     MGMatrixSimple<MATRIX>::assemble(const DoFInfo<dim>& info)
     {
-      assemble(info.M1[0].matrix, info.indices, info.indices);
+      const unsigned int level = info.cell->level();
+      assemble((*matrix)[level], info.M1[0].matrix, info.indices, info.indices);
     }
     
 
@@ -1207,10 +1208,10 @@ namespace MeshWorker
       
       if (level1 == level2)
 	{
-	  assemble(matrix[level1], info1.M1[0].matrix, info1.indices, info1.indices);
-	  assemble(matrix[level1], info1.M2[0].matrix, info1.indices, info2.indices);
-	  assemble(matrix[level1], info2.M1[0].matrix, info2.indices, info2.indices);
-	  assemble(matrix[level1], info2.M2[0].matrix, info2.indices, info1.indices);
+	  assemble((*matrix)[level1], info1.M1[0].matrix, info1.indices, info1.indices);
+	  assemble((*matrix)[level1], info1.M2[0].matrix, info1.indices, info2.indices);
+	  assemble((*matrix)[level1], info2.M1[0].matrix, info2.indices, info2.indices);
+	  assemble((*matrix)[level1], info2.M2[0].matrix, info2.indices, info1.indices);
 	}
       else
 	{
@@ -1218,9 +1219,9 @@ namespace MeshWorker
 					   // Do not add info2.M1,
 					   // which is done by
 					   // the coarser cell
-	  assemble(matrix[level1], info1.M1[0].matrix, info1.indices, info1.indices);
-	  assemble(flux_up[level1],info1.M2[0].matrix, info1.indices, info2.indices, true);
-	  assemble(flux_down[level1], info2.M2[0].matrix, info2.indices, info1.indices);
+	  assemble((*matrix)[level1], info1.M1[0].matrix, info1.indices, info1.indices);
+	  assemble((*flux_up)[level1],info1.M2[0].matrix, info1.indices, info2.indices, true);
+	  assemble((*flux_down)[level1], info2.M2[0].matrix, info2.indices, info1.indices);
 	}
     }
     
