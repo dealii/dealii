@@ -445,7 +445,15 @@ class Mapping : public Subscriptor
     
 				     /**
 				      * Returns whether the mapping preserves
-				      * vertex locations. Returns @p true for
+				      * vertex locations, i.e. whether the
+				      * mapped location of the reference cell
+				      * vertices (given by
+				      * GeometryInfo::unit_cell_vertex())
+				      * equals the result of
+				      * <code>cell-@>vertex()</code>.
+				      *
+				      * For example, implementations in
+				      * derived classes return @p true for
 				      * MappingQ, MappingQ1, MappingCartesian,
 				      * but @p false for MappingQEulerian,
 				      * MappingQ1Eulerian.

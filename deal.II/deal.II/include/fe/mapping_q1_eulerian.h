@@ -123,8 +123,11 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 
 				     /**
 				      * Always returns @p false because
-				      * MappingQ1Eulerian does not preserve
-				      * vertex locations.
+				      * MappingQ1Eulerian does not in general
+				      * preserve vertex locations (unless the
+				      * translation vector happens to provide
+				      * for zero displacements at vertex
+				      * locations).
 				      */
     bool preserves_vertex_locations () const;
 
