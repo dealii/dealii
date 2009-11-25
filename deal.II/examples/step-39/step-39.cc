@@ -66,8 +66,7 @@ using namespace dealii;
 				 // This is the function we use to set
 				 // the boundary values and also the
 				 // exact solution we compare to.
-//Functions::LSingularityFunction exact_solution;
-Functions::Q1WedgeFunction<2> exact_solution;
+Functions::LSingularityFunction exact_solution;
 
 				 // @sect3{The local integrators}
 
@@ -261,7 +260,7 @@ Step39<dim>::Step39(const FiniteElement<dim>& fe)
 		fe(fe),
 		dof_handler(triangulation)
 {
-  GridGenerator::hyper_cube(triangulation, -1, 1);
+  GridGenerator::hyper_L(triangulation, -1, 1);
 }
 
 
