@@ -72,6 +72,7 @@ namespace MeshWorker
  * each base element, it is not quite clear a priori, which data model
  * is more efficient.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   namespace Assembler
@@ -82,6 +83,7 @@ namespace MeshWorker
  *
  * 
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
     template <typename number = double>
@@ -146,6 +148,7 @@ namespace MeshWorker
  * Compute cell and face contributions of one or several functionals,
  * typically for error estimates.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
     template <typename number = double>
@@ -253,6 +256,9 @@ namespace MeshWorker
  * entries numbered from zero to DoFHandler::n_dofs(). No BlockInfo is
  * required and the global vector may be any type of vector having
  * element access through <tt>operator() (unsigned int)</tt>
+ *
+ * @ingroup MeshWorker
+ * @author Guido Kanschat, 2009
  */
     template <class VECTOR>
     class ResidualSimple
@@ -320,6 +326,7 @@ namespace MeshWorker
  *
  * @todo Comprehensive model currently not implemented.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
     template <class VECTOR>
@@ -399,6 +406,7 @@ namespace MeshWorker
  * @todo On locally refined meshes, a ConstraintMatrix should be used
  * to automatically eliminate hanging nodes.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
     template <class MATRIX>
@@ -493,6 +501,7 @@ namespace MeshWorker
  * @todo The matrix structures needed for assembling level matrices
  * with local refinement and continuous elements are missing.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
     template <class MATRIX>
@@ -633,6 +642,7 @@ namespace MeshWorker
  * FESystem::base_element(). These blocks can be generated separately
  * and will be assembled into the correct matrix block by this object.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
     template <class MATRIX, typename number = double>
@@ -749,6 +759,7 @@ namespace MeshWorker
  * participating matrices will be assembled from the cell and face
  * matrices automatically.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
     template <class MATRIX, typename number = double>
@@ -881,6 +892,7 @@ namespace MeshWorker
  * objects in LocalResults and this class will assemble
  * them into matrix and vector objects.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
     template <class MATRIX, class VECTOR>

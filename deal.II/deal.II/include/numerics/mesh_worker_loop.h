@@ -60,6 +60,9 @@ namespace MeshWorker
  * The extend of the second loop will be determined by the two control
  * variables LocalWorker::boundary_fluxes and
  * LocalWorker::interior_fluxes.
+ *
+ * @ingroup MeshWorker
+ * @author Guido Kanschat, 2009
  */
   template<class ITERATOR, class ENDITERATOR, class CELLINFO, class FACEINFO, class LOCALWORKER>
   void loop(ITERATOR begin, ENDITERATOR end,
@@ -174,6 +177,7 @@ namespace MeshWorker
 /**
  * Simplified interface for loop() if specialized for integration.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   template<int dim, class ITERATOR, class ENDITERATOR, class LOCALWORKER>

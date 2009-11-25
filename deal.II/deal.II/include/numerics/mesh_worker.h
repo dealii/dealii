@@ -107,6 +107,7 @@ template<int,int> class MGDoFHandler;
  *                              info_box, integrator);
  * @endcode
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
 namespace MeshWorker
@@ -169,6 +170,8 @@ namespace MeshWorker
 /**
  * Worker object for integration of functionals, residuals or matrices.
  *
+ * @ingroup MeshWorker
+ * @author Guido Kanschat, 2009
  */
   template <int dim>
   class IntegrationWorker : public LocalWorker<dim>
@@ -360,6 +363,7 @@ namespace MeshWorker
  * You do the necessary initializations of this @p integrator and then
  * you have a worker object suitable for integration_loop().
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   template <int dim, class ASSEMBLER, class INTEGRATOR>

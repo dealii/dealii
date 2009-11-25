@@ -32,6 +32,7 @@ namespace MeshWorker
  * The local matrices initialized by reinit() of the info object and
  * then assembled into the global system by Assembler classes.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   template <typename number>
@@ -165,6 +166,7 @@ namespace MeshWorker
  * block structure changes, for instance because of mesh refinement,
  * the DoFInfo class will automatically use the new structures.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   template<int dim, int spacedim = dim>
@@ -318,6 +320,7 @@ namespace MeshWorker
  * triggered by calling BlockInfo::initialize_local() before
  * using initialize() in this class.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   template<int dim, class FEVALUESBASE, int spacedim = dim>
@@ -523,6 +526,7 @@ namespace MeshWorker
  * A simple container collecting the five info objects required by the
  * integration loops.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   template <int dim, int spacedim=dim>
