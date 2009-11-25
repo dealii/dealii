@@ -511,7 +511,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // the next present index in the sparsity
 				   // pattern (otherwise, do a binary
 				   // search)
-      if (index != next_row_index && my_cols[index] == col_indices[j])
+      if (index < next_row_index && my_cols[index] == col_indices[j])
 	goto add_value;
 
       index = cols->operator()(row, col_indices[j]);
