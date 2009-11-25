@@ -416,7 +416,7 @@ QProjector<1>::project_to_face (const Quadrature<0> &,
                                 std::vector<Point<1> > &q_points)
 {
   const unsigned int dim=1;
-  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  AssertIndexRange (face_no, GeometryInfo<dim>::faces_per_cell);
   AssertDimension (q_points.size(), 1);
   
   q_points[0] = Point<dim>((double) face_no);
@@ -431,7 +431,7 @@ QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
                                 std::vector<Point<2> >   &q_points)
 {
   const unsigned int dim=2;
-  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  AssertIndexRange (face_no, GeometryInfo<dim>::faces_per_cell);
   Assert (q_points.size() == quadrature.size(),
 	  ExcDimensionMismatch (q_points.size(), quadrature.size()));
   
@@ -464,7 +464,7 @@ QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
                                 std::vector<Point<3> > &q_points)
 {
   const unsigned int dim=3;
-  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  AssertIndexRange (face_no, GeometryInfo<dim>::faces_per_cell);
   Assert (q_points.size() == quadrature.size(),
 	  ExcDimensionMismatch (q_points.size(), quadrature.size()));
   
@@ -518,7 +518,7 @@ QProjector<1>::project_to_subface (const Quadrature<0> &,
 				   const RefinementCase<0> &)
 {
   const unsigned int dim=1;
-  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
+  AssertIndexRange (face_no, GeometryInfo<dim>::faces_per_cell);
   AssertDimension (q_points.size(), 1);
   
   q_points[0] = Point<dim>((double) face_no);
@@ -535,8 +535,9 @@ QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
 				   const RefinementCase<1> &)
 {
   const unsigned int dim=2;
-  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
-  Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
+  AssertIndexRange (face_no, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange (subface_no, GeometryInfo<dim>::max_children_per_face);
+  
   Assert (q_points.size() == quadrature.size(),
 	  ExcDimensionMismatch (q_points.size(), quadrature.size()));
   
@@ -614,8 +615,8 @@ QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
 				   const RefinementCase<2> &ref_case)
 {
   const unsigned int dim=3;
-  Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
-  Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
+  AssertIndexRange (face_no, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange (subface_no, GeometryInfo<dim>::max_children_per_face);
   Assert (q_points.size() == quadrature.size(),
 	  ExcDimensionMismatch (q_points.size(), quadrature.size()));
 
@@ -1019,6 +1020,32 @@ QProjector<dim>::project_to_child (const Quadrature<dim>    &quadrature,
 
   return Quadrature<dim> (q_points, weights);
 }
+
+
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_all_children (const Quadrature<dim> &quadrature)
+{
+  const unsigned int n_points = quadrature.size(),
+		     n_children  = GeometryInfo<dim>::max_children_per_cell;
+  
+  std::vector<Point<dim> > q_points(n_points * n_children);
+  std::vector<double> weights(n_points * n_children);
+  
+				   // project to each child and copy
+				   // results
+  for (unsigned int child=0; child<n_children; ++child)
+    {
+      Quadrature<dim> help = project_to_child(quadrature, child);
+      for (unsigned int i=0;i<n_points;++i)
+	{
+	  q_points[child*n_points+i] = help.point(i);
+	  weights[child*n_points+i] = help.weight(i);
+	}
+    }
+  return Quadrature<dim>(q_points, weights);
+}
+
 
 
 
