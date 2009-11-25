@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,9 +12,6 @@
 //---------------------------------------------------------------------------
 #ifndef __deal2__fe_dgq_h
 #define __deal2__fe_dgq_h
-
-
-//TODO: we should probably turn the derivation around, i.e. make FE_DGQ a special case of FE_DGQ_Generic/Arbitrary, and then have other classes that only have the constructor and clone() that use other sets of quadrature nodes.
 
 #include <base/config.h>
 #include <base/tensor_product_polynomials.h>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -10,8 +10,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__fe_poly_h
-#define __deal2__fe_poly_h
+#ifndef __deal2__fe_poly_face_h
+#define __deal2__fe_poly_face_h
 
 
 #include <fe/fe.h>
@@ -22,24 +22,19 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * This class gives a unified framework for the implementation of
- * FiniteElement classes based on a polynomial spaces like the
- * TensorProductPolynomials or a PolynomialSpace classes.
+ * @warning This class is not sufficiently tested yet!
  *
- * Every class conforming to the following interface can be used as
+ * This class gives a unified framework for the implementation of
+ * FiniteElement classes only located on faces of the mesh. Theu are
+ * based on polynomial spaces like the TensorProductPolynomials or a
+ * PolynomialSpace classes.
+ *
+ * Every class that implements following functions can be used as
  * template parameter POLY.
  *
  * @code
- * static const unsigned int dimension;
- *
  * double compute_value (const unsigned int i,
  *                       const Point<dim> &p) const;
- *
- * Tensor<1,dim> compute_grad (const unsigned int i,
- *                             const Point<dim> &p) const;
- *
- * Tensor<2,dim> compute_grad_grad (const unsigned int i,
- *                                  const Point<dim> &p) const;
  * @endcode
  * Example classes are TensorProductPolynomials, PolynomialSpace or
  * PolynomialsP.
@@ -57,22 +52,18 @@ DEAL_II_NAMESPACE_OPEN
  * functions depend on the cells in real space, the update_once() and
  * update_each() functions must be overloaded.
  *
- * @todo Since nearly all functions for spacedim != dim are
- * specialized, this class needs cleaning up.
- *
- * @author Ralf Hartmann 2004, Guido Kanschat, 2009
+ * @author Guido Kanschat, 2009
  **/
-template <class POLY, int dim=POLY::dimension, int spacedim=dim>
-class FE_Poly : public FiniteElement<dim,spacedim>
+template <class POLY, int dim=POLY::dimension+1, int spacedim=dim>
+class FE_PolyFace : public FiniteElement<dim,spacedim>
 {
   public:
 				     /**
 				      * Constructor.
 				      */
-    FE_Poly (const POLY& poly_space,
-	     const FiniteElementData<dim> &fe_data,
-	     const std::vector<bool> &restriction_is_additive_flags,
-	     const std::vector<std::vector<bool> > &nonzero_components);
+    FE_PolyFace (const POLY& poly_space,
+		 const FiniteElementData<dim> &fe_data,
+		 const std::vector<bool> &restriction_is_additive_flags);
 
 				     /**
 				      * Return the polynomial degree
@@ -90,8 +81,8 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 				      * for more information about the
 				      * semantics of this function.
 				      */
-    virtual double shape_value (const unsigned int i,
-			        const Point<dim> &p) const;
+//    virtual double shape_value (const unsigned int i,
+//			        const Point<dim> &p) const;
     
 				     /**
 				      * Return the value of the
@@ -110,9 +101,9 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 				      * were called, provided that the
 				      * specified component is zero.
 				      */
-    virtual double shape_value_component (const unsigned int i,
-					  const Point<dim> &p,
-					  const unsigned int component) const;
+//    virtual double shape_value_component (const unsigned int i,
+//					  const Point<dim> &p,
+//					  const unsigned int component) const;
 
 				     /**
 				      * Return the gradient of the
@@ -122,8 +113,8 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 				      * for more information about the
 				      * semantics of this function.
 				      */
-    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-				      const Point<dim>   &p) const;
+//    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
+//				      const Point<dim>   &p) const;
 
 				     /**
 				      * Return the gradient of the
@@ -142,9 +133,9 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 				      * were called, provided that the
 				      * specified component is zero.
 				      */
-    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-						const Point<dim> &p,
-						const unsigned int component) const;
+//    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
+//						const Point<dim> &p,
+//						const unsigned int component) const;
 
 				     /**
 				      * Return the tensor of second
@@ -156,8 +147,8 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 				      * for more information about the
 				      * semantics of this function.
 				      */
-    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim> &p) const;
+//    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
+//					   const Point<dim> &p) const;
 
 				     /**
 				      * Return the second derivative
@@ -176,9 +167,9 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 				      * were called, provided that the
 				      * specified component is zero.
 				      */
-    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-						     const Point<dim> &p,
-						     const unsigned int component) const;
+//    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
+//						     const Point<dim> &p,
+//						     const unsigned int component) const;
 
                                      /**
 				      * Number of base elements in a
@@ -218,6 +209,16 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 	      const Mapping<dim,spacedim>& mapping,
 	      const Quadrature<dim>& quadrature) const ;
 
+    typename Mapping<dim,spacedim>::InternalDataBase *
+    get_face_data (const UpdateFlags,
+		   const Mapping<dim,spacedim>& mapping,
+		   const Quadrature<dim-1>& quadrature) const ;
+    
+    typename Mapping<dim,spacedim>::InternalDataBase *
+    get_subface_data (const UpdateFlags,
+		      const Mapping<dim,spacedim>& mapping,
+		      const Quadrature<dim-1>& quadrature) const ;
+    
     virtual void
     fill_fe_values (const Mapping<dim,spacedim>                           &mapping,
 		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -346,7 +347,7 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 					 /**
 					  * Array with shape function
 					  * values in quadrature
-					  * points. There is one
+					  * points on one face. There is one
 					  * row for each shape
 					  * function, containing
 					  * values for each quadrature
@@ -355,35 +356,20 @@ class FE_Poly : public FiniteElement<dim,spacedim>
 					  * In this array, we store
 					  * the values of the shape
 					  * function in the quadrature
-					  * points on the unit
+					  * points on one face of the unit
 					  * cell. Since these values
 					  * do not change under
 					  * transformation to the real
 					  * cell, we only need to copy
 					  * them over when visiting a
 					  * concrete cell.
+					  *
+					  * In particular, we can
+					  * simply copy the same set
+					  * of values to each of the
+					  * faces.
 					  */
 	std::vector<std::vector<double> > shape_values;
-
-					 /**
-					  * Array with shape function
-					  * gradients in quadrature
-					  * points. There is one
-					  * row for each shape
-					  * function, containing
-					  * values for each quadrature
-					  * point.
-					  *
-					  * We store the gradients in
-					  * the quadrature points on
-					  * the unit cell. We then
-					  * only have to apply the
-					  * transformation (which is a
-					  * matrix-vector
-					  * multiplication) when
-					  * visiting an actual cell.
-					  */      
-	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
     };
     
                                      /**
