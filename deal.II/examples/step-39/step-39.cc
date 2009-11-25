@@ -111,7 +111,7 @@ void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::Ce
   for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-	local_matrix(i,j) += fe.shape_grad(i,k) * fe.shape_grad(j,k)
+	local_matrix(i,j) += (fe.shape_grad(i,k) * fe.shape_grad(j,k))
 			     * fe.JxW(k);
 }
 
@@ -121,7 +121,7 @@ void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::Fa
 {
   const FEFaceValuesBase<dim>& fe = info.fe();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
-
+  
   const unsigned int deg = fe.get_fe().tensor_degree();
   const double penalty = 2. * deg * (deg+1) * info.face->measure() / info.cell->measure();
   
@@ -139,37 +139,38 @@ template <int dim>
 void MatrixIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const
 {
-  const FEFaceValuesBase<dim>& fe = info1.fe();
+  const FEFaceValuesBase<dim>& fe1 = info1.fe();
+  const FEFaceValuesBase<dim>& fe2 = info2.fe();
   FullMatrix<double>& matrix_v1u1 = info1.M1[0].matrix;
   FullMatrix<double>& matrix_v1u2 = info1.M2[0].matrix;
   FullMatrix<double>& matrix_v2u1 = info2.M2[0].matrix;
   FullMatrix<double>& matrix_v2u2 = info2.M1[0].matrix;
   
-  const unsigned int deg = fe.get_fe().tensor_degree();
+  const unsigned int deg = fe1.get_fe().tensor_degree();
   const double penalty1 = deg * (deg+1) * info1.face->measure() / info1.cell->measure();
   const double penalty2 = deg * (deg+1) * info2.face->measure() / info2.cell->measure();
   const double penalty = penalty1 + penalty2;
   
-  for (unsigned k=0;k<fe.n_quadrature_points;++k)
-    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+  for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+    for (unsigned int i=0; i<fe1.dofs_per_cell; ++i)
+      for (unsigned int j=0; j<fe1.dofs_per_cell; ++j)
 	{
-	  matrix_v1u1(i,j) += (fe.shape_value(i,k) * penalty * fe.shape_value(j,k)
-			       - (fe.normal_vector(k) * fe.shape_grad(i,k)) * fe.shape_value(j,k)
-			       - (fe.normal_vector(k) * fe.shape_grad(j,k)) * fe.shape_value(i,k))
-			      * .5 * fe.JxW(k);
-	  matrix_v1u2(i,j) += (-fe.shape_value(i,k) * penalty * fe.shape_value(j,k)
-			       + (fe.normal_vector(k) * fe.shape_grad(i,k)) * fe.shape_value(j,k)
-			       - (fe.normal_vector(k) * fe.shape_grad(j,k)) * fe.shape_value(i,k))
-			      * .5 * fe.JxW(k);
-	  matrix_v2u1(i,j) += (-fe.shape_value(i,k) * penalty * fe.shape_value(j,k)
-			       - (fe.normal_vector(k) * fe.shape_grad(i,k)) * fe.shape_value(j,k)
-			       + (fe.normal_vector(k) * fe.shape_grad(j,k)) * fe.shape_value(i,k))
-			      * .5 * fe.JxW(k);
-	  matrix_v2u2(i,j) += (fe.shape_value(i,k) * penalty * fe.shape_value(j,k)
-			       + (fe.normal_vector(k) * fe.shape_grad(i,k)) * fe.shape_value(j,k)
-			       + (fe.normal_vector(k) * fe.shape_grad(j,k)) * fe.shape_value(i,k))
-			      * .5 * fe.JxW(k);
+	  matrix_v1u1(i,j) += (fe1.shape_value(i,k) * penalty * fe1.shape_value(j,k)
+			       - (fe1.normal_vector(k) * fe1.shape_grad(i,k)) * fe1.shape_value(j,k)
+			       - (fe1.normal_vector(k) * fe1.shape_grad(j,k)) * fe1.shape_value(i,k)
+	  ) * .5 * fe1.JxW(k);
+	  matrix_v1u2(i,j) += (-fe1.shape_value(i,k) * penalty * fe2.shape_value(j,k)
+			       + (fe1.normal_vector(k) * fe1.shape_grad(i,k)) * fe2.shape_value(j,k)
+			       - (fe1.normal_vector(k) * fe2.shape_grad(j,k)) * fe1.shape_value(i,k)
+	  ) * .5 * fe1.JxW(k);
+	  matrix_v2u1(i,j) += (-fe2.shape_value(i,k) * penalty * fe1.shape_value(j,k)
+			       - (fe1.normal_vector(k) * fe2.shape_grad(i,k)) * fe1.shape_value(j,k)
+			       + (fe1.normal_vector(k) * fe1.shape_grad(j,k)) * fe2.shape_value(i,k)
+	  ) * .5 * fe1.JxW(k);
+	  matrix_v2u2(i,j) += (fe2.shape_value(i,k) * penalty * fe2.shape_value(j,k)
+			       + (fe1.normal_vector(k) * fe2.shape_grad(i,k)) * fe2.shape_value(j,k)
+			       + (fe1.normal_vector(k) * fe2.shape_grad(j,k)) * fe2.shape_value(i,k)
+	  ) * .5 * fe1.JxW(k);
 	}
 }
 
@@ -496,8 +497,11 @@ Step39<dim>::run(unsigned int n_steps)
 	deallog << ' ' << dof_handler.n_dofs(l);
       deallog << std::endl;
 
+      deallog << "Assemble matrix" << std::endl;
       assemble_matrix();
+      deallog << "Assemble multilevel matrix" << std::endl;
       assemble_mg_matrix();
+      deallog << "Assemble right hand side" << std::endl;
       assemble_right_hand_side();
       
       solve();
@@ -509,7 +513,7 @@ Step39<dim>::run(unsigned int n_steps)
 
 int main()
 {
-  FE_Q<2> dgq1(1);
+  FE_DGQ<2> dgq1(1);
   Step39<2> test1(dgq1);
   test1.run(7);
 }
