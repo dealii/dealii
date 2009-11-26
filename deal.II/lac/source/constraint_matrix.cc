@@ -16,13 +16,10 @@
 #include <lac/constraint_matrix.templates.h>
 
 #include <base/memory_consumption.h>
-#include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
-#include <lac/vector.h>
 #include <lac/block_vector.h>
-#include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 #include <lac/sparse_matrix_ez.h>
 #include <lac/block_sparse_matrix_ez.h>
@@ -100,7 +97,7 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
   Assert (sorted==false, ExcMatrixIsClosed());
   Assert (is_constrained(line), ExcLineInexistant(line));
 
-  ConstraintLine * line_ptr = const_cast<ConstraintLine*>(lines_cache[line]);
+  ConstraintLine * line_ptr = &lines[lines_cache[calculate_line_index(line)]];
   Assert (line_ptr->line == line, ExcInternalError());
 
 				   // if the loop didn't break, then
@@ -156,18 +153,21 @@ void ConstraintMatrix::close ()
 				   // modify the size any more after this
 				   // point.
   {
-    std::vector<const ConstraintLine*> new_lines (lines_cache.size());
+    std::vector<unsigned int> new_lines (lines_cache.size(),
+					 numbers::invalid_unsigned_int);
+    unsigned int counter = 0;
     for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
-	 line!=lines.end(); ++line)
-      new_lines[line->line] = &*line;
+	 line!=lines.end(); ++line, ++counter)
+      new_lines[calculate_line_index(line->line)] = counter;
     std::swap (lines_cache, new_lines);
   }
 
 				   // in debug mode: check whether we really
 				   // set the pointers correctly.
   for (unsigned int i=0; i<lines_cache.size(); ++i)
-    if (lines_cache[i] != 0)
-      Assert (i == lines_cache[i]->line, ExcInternalError());
+    if (lines_cache[i] != numbers::invalid_unsigned_int)
+      Assert (i == calculate_line_index(lines[lines_cache[i]].line),
+	      ExcInternalError());
 
 				   // first, strip zero entries, as we
 				   // have to do that only once
@@ -241,7 +241,8 @@ void ConstraintMatrix::close ()
 		Assert (dof_index != line->line,
 			ExcMessage ("Cycle in constraints detected!"));
 
-		const ConstraintLine * constrained_line = lines_cache[dof_index];
+		const ConstraintLine * constrained_line =
+		  &lines[lines_cache[calculate_line_index(dof_index)]];
 		Assert (constrained_line->line == dof_index,
 			ExcInternalError());
 
@@ -464,15 +465,15 @@ void ConstraintMatrix::close ()
 				   // that is also constrained
   for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
        line!=lines.end(); ++line)
-    for (std::vector<std::pair<unsigned int,double> >::const_iterator entry=line->entries.begin();
+    for (std::vector<std::pair<unsigned int,double> >::const_iterator
+	   entry=line->entries.begin();
 	 entry!=line->entries.end(); ++entry)
       {
 					 // make sure that
 					 // entry->first is not the
 					 // index of a line itself
-	const ConstraintLine * it = entry->first < lines_cache.size() ?
-	  lines_cache[entry->first] : 0;
-	Assert (it == 0,
+	const bool is_circle = is_constrained(entry->first);
+	Assert (is_circle == false,
 		ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
       };
 #endif
@@ -484,6 +485,10 @@ void ConstraintMatrix::close ()
 
 void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 {
+				   //TODO: this doesn't work with IndexSets yet. [TH]
+  AssertThrow(local_lines.size()==0, ExcNotImplemented());
+  AssertThrow(other_constraints.local_lines.size()==0, ExcNotImplemented());
+
 				   // first check whether the
 				   // constraints in the two objects
 				   // are for different degrees of
@@ -540,7 +545,8 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
   sorted = false;
 
   if (other_constraints.lines_cache.size() > lines_cache.size())
-    lines_cache.resize(other_constraints.lines_cache.size());
+    lines_cache.resize(other_constraints.lines_cache.size(),
+		       numbers::invalid_unsigned_int);
 
 				   // first action is to fold into the
 				   // present object possible
@@ -694,9 +700,10 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 				   // afterwards as well. otherwise
 				   // leave everything in the unsorted
 				   // state
+  unsigned int counter = 0;
   for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
-       line!=lines.end(); ++line)
-    lines_cache[line->line] = &*line;
+       line!=lines.end(); ++line, ++counter)
+    lines_cache[line->line] = counter;
   if (object_was_sorted == true)
     close ();
 }
@@ -705,7 +712,11 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 
 void ConstraintMatrix::shift (const unsigned int offset)
 {
-  lines_cache.insert (lines_cache.begin(), offset, 0);
+				   //TODO: this doesn't work with IndexSets yet. [TH]
+  AssertThrow(local_lines.size()==0, ExcNotImplemented());
+
+  lines_cache.insert (lines_cache.begin(), offset,
+		      numbers::invalid_unsigned_int);
 
   for (std::vector<ConstraintLine>::iterator i = lines.begin();
        i != lines.end(); i++)
@@ -728,7 +739,7 @@ void ConstraintMatrix::clear ()
   }
 
   {
-    std::vector<const ConstraintLine*> tmp;
+    std::vector<unsigned int> tmp;
     lines_cache.swap (tmp);
   }
 
@@ -740,6 +751,14 @@ void ConstraintMatrix::clear ()
 #endif
 
   sorted = false;
+}
+
+
+
+void ConstraintMatrix::reinit (const IndexSet & local_constraints)
+{
+  local_lines = local_constraints;
+  clear();
 }
 
 
@@ -1864,12 +1883,11 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 {
   typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
   ConstraintLine index_comparison;
-  std::pair<unsigned int, unsigned int> local_range = vec.local_range();
-  index_comparison.line = local_range.first;
+  index_comparison.line = vec.local_range().first;
   const constraint_iterator begin_my_constraints =
     std::lower_bound (lines.begin(),lines.end(),index_comparison);
 
-  index_comparison.line = local_range.second;
+  index_comparison.line = vec.local_range().second;
   const constraint_iterator end_my_constraints
     = std::lower_bound(lines.begin(),lines.end(),index_comparison);
 
@@ -1881,41 +1899,44 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 				   // with a vector for further use.
   if (!vec_distribute || vec_distribute->size()!=vec.size())
     {
-      std::vector<int> my_indices(vec.local_size());
-      unsigned int index2 = 0;
-      
-      for(unsigned int i=local_range.first;i<local_range.second;i++,index2++)
-        {
-          my_indices[index2]=i;
-        }
-      for (constraint_iterator it = begin_my_constraints; 
+      IndexSet my_indices (vec.size());
+
+      const std::pair<unsigned int, unsigned int>
+	local_range = vec.local_range();
+
+      my_indices.add_range (local_range.first, local_range.second);
+
+      std::set<unsigned int> individual_indices;
+      for (constraint_iterator it = begin_my_constraints;
 	   it != end_my_constraints; ++it)
 	for (unsigned int i=0; i<it->entries.size(); ++i)
 	  if ((it->entries[i].first < local_range.first)
 	      ||
 	      (it->entries[i].first >= local_range.second))
-	    my_indices.push_back (it->entries[i].first);
+	    individual_indices.insert (it->entries[i].first);
 
-				   // sort and compress out duplicates
-      std::sort(my_indices.begin(),my_indices.end());
-      index2 = 1;
-      for(unsigned int index1=1;index1<my_indices.size();index1++)
-        {
-          if(my_indices[index1]!=my_indices[index1-1])
-            {
-              my_indices[index2++] = my_indices[index1];
-            }
-        }
+      my_indices.add_indices (individual_indices.begin(),
+			      individual_indices.end());
 
-      Epetra_Map map_exchange
-	= Epetra_Map(-1,index2,(int*)&my_indices[0],0,
-		     vec.trilinos_vector().Comm());
-      vec_distribute.reset (new TrilinosWrappers::MPI::Vector(map_exchange));
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      const Epetra_MpiComm *mpi_comm
+	= dynamic_cast<const Epetra_MpiComm*>(&vec.trilinos_vector().Comm());
+
+      Assert (mpi_comm != 0, ExcInternalError());
+
+      vec_distribute.reset (new TrilinosWrappers::MPI::Vector
+			    (my_indices.make_trilinos_map (mpi_comm->Comm(),
+							   true)));
+#else
+      vec_distribute.reset (new TrilinosWrappers::MPI::Vector
+			    (my_indices.make_trilinos_map (MPI_COMM_WORLD,
+							   true)));
+#endif
     }
 				   // here we import the data
   vec_distribute->reinit(vec,false,true);
 
-  for (constraint_iterator it = begin_my_constraints; 
+  for (constraint_iterator it = begin_my_constraints;
        it != end_my_constraints; ++it)
     {
 				       // fill entry in line
@@ -1944,14 +1965,14 @@ bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const
   if (is_constrained(index) == false)
     return false;
 
-  const ConstraintLine * p = lines_cache[index];
-  Assert (p->line == index, ExcInternalError());
+  const ConstraintLine & p = lines[lines_cache[calculate_line_index(index)]];
+  Assert (p.line == index, ExcInternalError());
 
 				       // return if an entry for this
 				       // line was found and if it has
 				       // only one entry equal to 1.0
-  return ((p->entries.size() == 1) &&
-	  (p->entries[0].second == 1.0));
+  return ((p.entries.size() == 1) &&
+	  (p.entries[0].second == 1.0));
 }
 
 

@@ -10,20 +10,17 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__dof_constraints_templates_h
-#define __deal2__dof_constraints_templates_h
+
+#ifndef __deal2__constraint_matrix_templates_h
+#define __deal2__constraint_matrix_templates_h
 
 
-#include <base/config.h>
 #include <lac/constraint_matrix.h>
-#include <lac/vector.h>
+
+#include <base/table.h>
 #include <lac/full_matrix.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/sparse_matrix.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_block_sparse_matrix.h>
-#include <lac/petsc_block_sparse_matrix.h>
-#include <lac/petsc_parallel_block_sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/block_sparse_matrix.h>
 
@@ -755,35 +752,31 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 	    continue;
 	  }
 
-	const ConstraintLine * position = 
-	  lines_cache.size() <= local_dof_indices[i] ? 0 : 
-	  lines_cache[local_dof_indices[i]];
+	const unsigned int line_index = calculate_line_index (local_dof_indices[i]);
+	const ConstraintLine * position =
+	  lines_cache.size() <= line_index ? 0 : &lines[lines_cache[line_index]];
 
 	const double val = position->inhomogeneity;
 	if (val != 0)
 	  for (unsigned int j=0; j<n_local_dofs; ++j)
-	    {
-	      const ConstraintLine * position_j = 
-		lines_cache.size() <= local_dof_indices[j] ? 0 : 
-		lines_cache[local_dof_indices[j]];
+	    if (is_constrained(local_dof_indices[j]) == false)
+	      global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
+	    else
+	      {
+		const double matrix_entry = local_matrix(j,i);
+		if (matrix_entry == 0)
+		  continue;
 
-	      if (position_j == 0)
-		global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
-	      else
-		{
-		  const double matrix_entry = local_matrix(j,i);
-		  if (matrix_entry == 0)
-		    continue;
-
-		  for (unsigned int q=0; q<position_j->entries.size(); ++q)
-		    {
-		      Assert (is_constrained(position_j->entries[q].first) == false,
-			      ExcMessage ("Tried to distribute to a fixed dof."));
-		      global_vector(position_j->entries[q].first)
-			-= val * position_j->entries[q].second * matrix_entry;
-		    }
-		}
-	    }
+		const ConstraintLine & position_j =
+		  lines[lines_cache[calculate_line_index(local_dof_indices[j])]];
+		for (unsigned int q=0; q<position_j.entries.size(); ++q)
+		  {
+		    Assert (is_constrained(position_j.entries[q].first) == false,
+			    ExcMessage ("Tried to distribute to a fixed dof."));
+		    global_vector(position_j.entries[q].first)
+		      -= val * position_j.entries[q].second * matrix_entry;
+		  }
+	      }
 
 				   // now distribute the constraint,
 				   // but make sure we don't touch
@@ -956,146 +949,247 @@ ConstraintMatrix::distribute (VectorType &vec) const
 }
 
 
+
 				   // Some helper definitions for the
 				   // local_to_global functions.
 namespace internals
 {
 				   // this struct contains all the
 				   // information we need to store about
-				   // which global entries (global_row) are
-				   // given rise by local entries
+				   // each of the global entries (global_row), how
+				   // they are obtained directly by some
+				   // local entry
 				   // (local_row) or some constraints.
-  struct distributing
+  struct Distributing
   {
-    distributing (const unsigned int global_row = deal_II_numbers::invalid_unsigned_int,
-		  const unsigned int local_row = deal_II_numbers::invalid_unsigned_int);
-    distributing (const distributing &in);
-    ~distributing ();
-    distributing & operator = (const distributing &in);
-    bool operator < (const distributing &in) const;
+    Distributing (const unsigned int global_row = numbers::invalid_unsigned_int,
+		  const unsigned int local_row = numbers::invalid_unsigned_int);
+    Distributing (const Distributing &in);
+    Distributing & operator = (const Distributing &in);
+    bool operator < (const Distributing &in) const {return global_row<in.global_row;};
+
     unsigned int global_row;
     unsigned int local_row;
-    mutable std::vector<std::pair<unsigned int,double> > *constraints;
+    mutable unsigned int constraint_position;
   };
 
   inline
-  distributing::distributing (const unsigned int global_row,
+  Distributing::Distributing (const unsigned int global_row,
 			      const unsigned int local_row) :
     global_row (global_row),
     local_row (local_row),
-    constraints (0) {}
+    constraint_position (numbers::invalid_unsigned_int) {}
 
   inline
-  distributing::distributing (const distributing &in) :
-    constraints (0)
+  Distributing::Distributing (const Distributing &in) :
+    constraint_position (numbers::invalid_unsigned_int)
   {*this = (in);}
 
   inline
-  distributing::~distributing ()
-  {
-    if (constraints != 0)
-      {
-	delete constraints;
-	constraints = 0;
-      }
-  }
-
-  inline
-  distributing & distributing::operator = (const distributing &in)
+  Distributing & Distributing::operator = (const Distributing &in)
   {
     global_row = in.global_row;
     local_row = in.local_row;
 				   // the constraints pointer should not
 				   // contain any data here.
-    Assert (constraints == 0, ExcInternalError());
+    Assert (constraint_position == numbers::invalid_unsigned_int, ExcInternalError());
 
-    if (in.constraints != 0)
+    if (in.constraint_position != numbers::invalid_unsigned_int)
       {
-	constraints = in.constraints;
-	in.constraints = 0;
+	constraint_position = in.constraint_position;
+	in.constraint_position = numbers::invalid_unsigned_int;
       }
     return *this;
   }
 
-  inline
-  bool distributing::operator < (const distributing &in) const
+
+
+				    // this is a cache for constraints.
+				    // could use std::vector, but that
+				    // needs a lot of memory allocations,
+				    // is much more expensive
+  struct DataCache
   {
-    return global_row < in.global_row;
-  }
+    DataCache () : element_size (0), data (0) {};
+    ~DataCache() { if (data != 0) {delete [] data;} };
+    void reinit () { Assert (element_size == 0, ExcInternalError());
+      element_size = 6; data = new std::pair<unsigned int,double> [20*6];
+      individual_size.resize(20), n_used_elements = 0;};
+    unsigned int element_size;
+    std::pair<unsigned int,double> * data;
+    std::vector<unsigned int> individual_size;
+    unsigned int n_used_elements;
+
+    unsigned int insert_new_index (const std::pair<unsigned int,double> &pair)
+    {
+      if (element_size == 0)
+	reinit();
+      if (n_used_elements == individual_size.size())
+	{
+	  std::pair<unsigned int,double> * new_data =
+	    new std::pair<unsigned int,double> [2*individual_size.size()*element_size];
+	  memcpy (new_data, data, individual_size.size()*element_size*
+		  sizeof(std::pair<unsigned int,double>));
+	  delete [] data;
+	  data = new_data;
+	  individual_size.resize (2*individual_size.size(), 0);
+	}
+      unsigned int index = n_used_elements;
+      data[index*element_size] = pair;
+      individual_size[index] = 1;
+      ++n_used_elements;
+      return index;
+    }
+
+    void append_index (const unsigned int index,
+		       const std::pair<unsigned int,double> &pair)
+    {
+      Assert (index < n_used_elements, ExcIndexRange (index, 0, n_used_elements));
+      const unsigned int my_size = individual_size[index];
+      if (my_size == element_size)
+	{
+	  std::pair<unsigned int,double> * new_data =
+	    new std::pair<unsigned int,double> [2*individual_size.size()*element_size];
+	  for (unsigned int i=0; i<n_used_elements; ++i)
+	    memcpy (&new_data[i*element_size*2], &data[i*element_size],
+		    element_size*sizeof(std::pair<unsigned int,double>));
+	  delete [] data;
+	  data = new_data;
+	  element_size *= 2;
+	}
+      data[index*element_size+my_size] = pair;
+      individual_size[index]++;
+    };
+
+    unsigned int
+    get_size (const unsigned int index) const { return individual_size[index]; };
+
+    const std::pair<unsigned int,double> *
+    get_entry (const unsigned int index) const { return &data[index*element_size]; };
+  };
+
+
+
+				    // collects all the global rows and
+				    // their origin (direct/constraint)
+				    // basically a vector of distributing
+				    // and the data cache. with some
+				    // specialized sort and insert functions.
+  struct GlobalRowsFromLocal
+  {
+    GlobalRowsFromLocal (const unsigned int local_dof_size) :
+    total_dof_indices (local_dof_size) {};
+    void insert_index (const unsigned int global_row,
+		       const unsigned int local_row,
+		       const double       constraint_value);
+    void sort (const unsigned int added_rows);
+    const unsigned int & n_additional_dofs (const unsigned int local_dofs);
+    unsigned int size () const { return total_dof_indices.size(); };
+    unsigned int & global_row (const unsigned int loc_index)
+      { return total_dof_indices[loc_index].global_row; };
+    unsigned int size (const unsigned int loc_index) const
+      { return (total_dof_indices[loc_index].constraint_position ==
+		numbers::invalid_unsigned_int ?
+		0 :
+		data_cache.get_size(total_dof_indices[loc_index].constraint_position)); };
+    const unsigned int & global_row (const unsigned int loc_index) const
+      { return total_dof_indices[loc_index].global_row; };
+    const unsigned int & local_row (const unsigned int loc_index) const
+      { return total_dof_indices[loc_index].local_row; };
+    unsigned int & local_row (const unsigned int loc_index)
+      { return total_dof_indices[loc_index].local_row; };
+    unsigned int local_row (const unsigned int loc_index,
+			    const unsigned int index_in_constraint) const
+      { return (data_cache.get_entry(total_dof_indices[loc_index].constraint_position)
+		[index_in_constraint]).first; };
+    double constraint_value (const unsigned int loc_index,
+			     const unsigned int index_in_constraint) const
+      { return (data_cache.get_entry(total_dof_indices[loc_index].constraint_position)
+		[index_in_constraint]).second; };
+    bool have_indirect_rows () const { return data_cache.element_size; }
+
+    std::vector<Distributing> total_dof_indices;
+    DataCache                 data_cache;
+  };
 
 				   // a function that appends an additional
 				   // row to the list of values, or appends
 				   // a value to an already existing
 				   // row. Similar functionality as for
-				   // std::map<unsigned int,distributing>,
+				   // std::map<unsigned int,Distributing>,
 				   // but here done for a std::vector of
-				   // data type distributing, and much
+				   // data type Distributing, and much
 				   // faster.
   inline
   void
-  insert_index (std::vector<distributing> &my_indices,
-		const unsigned int row,
-		const std::pair<unsigned int,double> constraint)
+  GlobalRowsFromLocal::insert_index (const unsigned int global_row,
+				     const unsigned int local_row,
+				     const double       constraint_value)
   {
-    typedef std::vector<distributing>::iterator index_iterator;
+    typedef std::vector<Distributing>::iterator index_iterator;
     index_iterator pos, pos1;
-    distributing row_value (row);
+    Distributing row_value (global_row);
+    std::pair<unsigned int,double> constraint (local_row, constraint_value);
 
 				   // check whether the list was really
 				   // sorted before entering here
 #ifdef DEBUG
-    for (unsigned int i=1; i<my_indices.size(); ++i)
-      Assert (my_indices[i-1] < my_indices[i], ExcInternalError());
+    for (unsigned int i=1; i<total_dof_indices.size(); ++i)
+      Assert (total_dof_indices[i-1] < total_dof_indices[i], ExcInternalError());
 #endif
 
-    if (my_indices.size() == 0 || my_indices.back().global_row < row)
+    if (total_dof_indices.size() == 0 ||
+	total_dof_indices.back().global_row < global_row)
       {
-	my_indices.push_back(row_value);
-	pos1 = my_indices.end()-1;
+	total_dof_indices.push_back(row_value);
+	pos1 = total_dof_indices.end()-1;
       }
     else
       {
-	pos = std::lower_bound (my_indices.begin(),my_indices.end(), row_value);
-	if (pos->global_row == row)
+	pos = std::lower_bound (total_dof_indices.begin(),
+				total_dof_indices.end(),
+				row_value);
+	if (pos->global_row == global_row)
 	  pos1 = pos;
 	else
-	  pos1 = my_indices.insert(pos, row_value);
+	  pos1 = total_dof_indices.insert(pos, row_value);
       }
 
-    if (&*pos1->constraints == 0)
-      pos1->constraints =
-	new std::vector<std::pair<unsigned int,double> > (1,constraint);
+    if (pos1->constraint_position == numbers::invalid_unsigned_int)
+      pos1->constraint_position = data_cache.insert_new_index (constraint);
     else
-      pos1->constraints->push_back (constraint);
+      data_cache.append_index (pos1->constraint_position, constraint);
   }
 
-
+  inline
+  void
+  GlobalRowsFromLocal::sort (const unsigned int added_rows)
+  {
 				   // this sort algorithm sorts a vector of
-				   // distributing elements, but does not
+				   // Distributing elements, but does not
 				   // take the constraints into
 				   // account. this means that in case that
 				   // constraints are already inserted, this
-				   // function does not work as
-				   // expected. shellsort is very fast in
+				   // function does not work as expected.
+				   // we use shellsort, which is very fast in
 				   // case the indices are already sorted
 				   // (which is the usual case with DG
 				   // elements), and not too slow in other
 				   // cases
-  inline
-  void
-  list_shellsort (std::vector<distributing> &my_indices)
-  {
     unsigned int i, j, j2, temp, templ, istep;
-    unsigned step;
+    unsigned int step;
 
-				   // in debug mode, check whether the
+				   // check whether the
 				   // constraints are really empty.
+    total_dof_indices.resize(added_rows);
 #ifdef DEBUG
-    for (unsigned int i=0; i<my_indices.size(); ++i)
-      Assert (&*my_indices[i].constraints == 0, ExcInternalError());
+    for (unsigned int i=0; i<total_dof_indices.size(); ++i)
+      Assert (total_dof_indices[i].constraint_position ==
+	      numbers::invalid_unsigned_int,
+	      ExcInternalError());
 #endif
 
-    const unsigned int length = my_indices.size();
+    const unsigned int length = added_rows;
     step = length/2;
     while (step > 0)
       {
@@ -1104,19 +1198,19 @@ namespace internals
 	    istep = step;
 	    j = i;
 	    j2 = j-istep;
-	    temp = my_indices[i].global_row;
-	    templ = my_indices[i].local_row;
-	    if (my_indices[j2].global_row > temp)
+	    temp = total_dof_indices[i].global_row;
+	    templ = total_dof_indices[i].local_row;
+	    if (total_dof_indices[j2].global_row > temp)
 	      {
-		while ((j >= istep) && (my_indices[j2].global_row > temp))
+		while ((j >= istep) && (total_dof_indices[j2].global_row > temp))
 		  {
-		    my_indices[j].global_row = my_indices[j2].global_row;
-		    my_indices[j].local_row = my_indices[j2].local_row;
+		    total_dof_indices[j].global_row = total_dof_indices[j2].global_row;
+		    total_dof_indices[j].local_row = total_dof_indices[j2].local_row;
 		    j = j2;
 		    j2 -= istep;
 		  }
-		my_indices[j].global_row = temp;
-		my_indices[j].local_row = templ;
+		total_dof_indices[j].global_row = temp;
+		total_dof_indices[j].local_row = templ;
 	      }
 	  }
 	step = step>>1;
@@ -1127,6 +1221,45 @@ namespace internals
 				   // creates some block indices for the
 				   // list of local dofs and transforms the
 				   // indices to local block indices.
+  template <class BlockType>
+  inline
+  void
+  make_block_starts (const BlockType           &block_object,
+		     GlobalRowsFromLocal       &global_rows,
+		     std::vector<unsigned int> &block_starts)
+  {
+    Assert (block_starts.size() == block_object.n_block_rows() + 1,
+	    ExcDimensionMismatch(block_starts.size(),
+				 block_object.n_block_rows()+1));
+
+    typedef std::vector<Distributing>::iterator row_iterator;
+    row_iterator block_indices = global_rows.total_dof_indices.begin();
+
+    const unsigned int num_blocks = block_object.n_block_rows();
+
+				   // find end of rows.
+    block_starts[0] = 0;
+    for (unsigned int i=1;i<num_blocks;++i)
+      {
+	row_iterator first_block =
+	  std::lower_bound (block_indices,
+			    global_rows.total_dof_indices.end(),
+			    Distributing(block_object.get_row_indices().block_start(i)));
+	block_starts[i] = first_block - global_rows.total_dof_indices.begin();
+	block_indices = first_block;
+      }
+
+				   // transform row indices to local index
+				   // space
+    for (unsigned int i=block_starts[1]; i<global_rows.size(); ++i)
+      global_rows.global_row(i) = block_object.get_row_indices().
+	global_to_local(global_rows.global_row(i)).second;
+  }
+
+
+
+				   // same as before, but for std::vector
+				   // of ints
   template <class BlockType>
   inline
   void
@@ -1158,52 +1291,406 @@ namespace internals
 				   // transform row indices to local index
 				   // space
     for (unsigned int i=block_starts[1]; i<row_indices.size(); ++i)
-      row_indices[i] = block_object.get_row_indices().global_to_local(row_indices[i]).second;
+      row_indices[i] = block_object.get_row_indices().
+	global_to_local(row_indices[i]).second;
   }
 
-}
 
 
-				   // internal implementation for
-				   // distribute_local_to_global for
-				   // standard (non-block) matrices
-template <typename MatrixType, typename VectorType>
+				   // resolves constraints of one column
+				   // at the innermost loop. goes through
+				   // the origin of each global entry and
+				   // finds out which data we need to collect
+  inline
+  double resolve_matrix_entry (const GlobalRowsFromLocal&global_rows,
+			       const unsigned int        i,
+			       const unsigned int        j,
+			       const unsigned int        loc_row,
+			       const FullMatrix<double> &local_matrix,
+			       const double*             matrix_ptr)
+  {
+    const unsigned int loc_col = global_rows.local_row(j);
+    double col_val;
+
+				   // case 1: row has direct contribution in
+				   // local matrix. decide whether col has a
+				   // direct contribution. if not,
+				   // set the value to zero.
+    if (loc_row != numbers::invalid_unsigned_int)
+      {
+	col_val = loc_col != numbers::invalid_unsigned_int ? matrix_ptr[loc_col] : 0;
+
+				   // account for indirect contributions by
+				   // constraints in column
+	for (unsigned int p=0; p<global_rows.size(j); ++p)
+	  col_val += (matrix_ptr[global_rows.local_row(j,p)] *
+		      global_rows.constraint_value(j,p));
+      }
+
+				   // case 2: row has no direct contribution in
+				   // local matrix
+    else
+      col_val = 0;
+
+				   // account for indirect contributions by
+				   // constraints in row, going trough the
+				   // direct and indirect references in the
+				   // given column.
+    for (unsigned int q=0; q<global_rows.size(i); ++q)
+      {
+	double add_this = loc_col != numbers::invalid_unsigned_int ?
+	  local_matrix(global_rows.local_row(i,q), loc_col) : 0;
+
+	for (unsigned int p=0; p<global_rows.size(j); ++p)
+	  add_this += (local_matrix(global_rows.local_row(i,q),
+				    global_rows.local_row(j,p))
+		       *
+		       global_rows.constraint_value(j,p));
+	col_val += add_this * global_rows.constraint_value(i,q);
+      }
+    return col_val;
+  }
+
+
+
+  template <typename number>
+  inline
+  void
+  resolve_matrix_row (const GlobalRowsFromLocal&global_rows,
+		      const unsigned int        i,
+		      const unsigned int        column_start,
+		      const unsigned int        column_end,
+		      const FullMatrix<double> &local_matrix,
+		      unsigned int *           &col_ptr,
+		      number *                 &val_ptr)
+  {
+    Assert (global_rows.size() >= column_end,
+	    ExcIndexRange (column_end, 0, global_rows.size()));
+    const unsigned int loc_row = global_rows.local_row(i);
+
+				   // fast function if there are no indirect
+				   // references to any of the local rows at
+				   // all on this set of dofs (saves a lot
+				   // of checks). the only check we actually
+				   // need to perform is whether the matrix
+				   // element is zero.
+    if (global_rows.have_indirect_rows() == false)
+      {
+	Assert(loc_row < local_matrix.m(), ExcInternalError());
+	const double * matrix_ptr = &local_matrix(loc_row, 0);
+
+	for (unsigned int j=column_start; j<column_end; ++j)
+	  {
+	    const unsigned int loc_col = global_rows.local_row(j);
+	    const double col_val = matrix_ptr[loc_col];
+	    if (col_val != 0.)
+	      {
+		*val_ptr++ = static_cast<number> (col_val);
+		*col_ptr++ = global_rows.global_row(j);
+	      }
+	  }
+      }
+
+				   // more difficult part when there are
+				   // indirect references and when we need
+				   // to do some more checks.
+    else
+      {
+	const double * matrix_ptr = 0;
+	if (loc_row != numbers::invalid_unsigned_int)
+	  {
+	    Assert (loc_row < local_matrix.m(), ExcInternalError());
+	    matrix_ptr = &local_matrix(loc_row, 0);
+	  }
+	for (unsigned int j=column_start; j<column_end; ++j)
+	  {
+	    double col_val = resolve_matrix_entry (global_rows, i, j,
+						   loc_row, local_matrix, matrix_ptr);
+
+				   // if we got some nontrivial value,
+				   // append it to the array of values.
+	    if (col_val != 0.)
+	      {
+		*val_ptr++ = static_cast<number> (col_val);
+		*col_ptr++ = global_rows.global_row(j);
+	      }
+	  }
+      }
+  }
+
+
+
+				   // specialized function that can write
+				   // into the row of a SparseMatrix
+  template <typename number>
+  inline
+  void add_value (const double value,
+		  const unsigned int row,
+		  const unsigned int column,
+		  const unsigned int * col_ptr,
+		  const bool   are_on_diagonal,
+		  unsigned int &counter,
+		  number       *val_ptr)
+  {
+    if (value != 0.)
+      {
+	if (are_on_diagonal)
+	  {
+	    val_ptr[0] += value;
+	    return;
+	  }
+	while (col_ptr[counter] < column)
+	  ++counter;
+	Assert (col_ptr[counter] == column,
+		typename SparseMatrix<number>::ExcInvalidIndex(row, column));
+	val_ptr[counter] += static_cast<number>(value);
+      }
+  }
+
+
+				// similar as before, now with shortcut
+				// for deal.II sparse matrices. this lets
+				// use avoid using extra arrays, and does
+				// all the operations just in place
+  template <typename number>
+  inline
+  void
+  resolve_matrix_row (const GlobalRowsFromLocal&global_rows,
+		      const unsigned int        i,
+		      const unsigned int        column_start,
+		      const unsigned int        column_end,
+		      const FullMatrix<double> &local_matrix,
+		      SparseMatrix<number>     *sparse_matrix)
+  {
+    Assert (global_rows.size() >= column_end,
+	    ExcIndexRange (column_end, 0, global_rows.size()));
+    const unsigned int row = global_rows.global_row(i);
+    const unsigned int loc_row = global_rows.local_row(i);
+    const SparsityPattern & sparsity = sparse_matrix->get_sparsity_pattern();
+    const std::size_t * row_start = sparsity.get_rowstart_indices();
+    const unsigned int * sparsity_struct = sparsity.get_column_numbers();
+    const unsigned int * col_ptr = &sparsity_struct[row_start[row]];
+    number * val_ptr = &sparse_matrix->global_entry (row_start[row]);
+    const bool optimize_diagonal = sparsity.optimize_diagonal();
+    unsigned int counter = optimize_diagonal;
+
+				// distinguish three cases about what
+				// can happen (in order to avoid if()
+				// at the innermost loop position)
+				// for checking whether the diagonal is
+				// the first element of the row
+    if (!optimize_diagonal) // case 1: no diagonal optimization
+      {
+	if (global_rows.have_indirect_rows() == false)
+	  {
+	    Assert(loc_row < local_matrix.m(),
+		   ExcIndexRange(loc_row, 0, local_matrix.m()));
+	    const double * matrix_ptr = &local_matrix(loc_row, 0);
+
+	    for (unsigned int j=column_start; j<column_end; ++j)
+	      {
+		const unsigned int loc_col = global_rows.local_row(j);
+		const double col_val = matrix_ptr[loc_col];
+		add_value(col_val, row, global_rows.global_row(j), col_ptr,
+			  false, counter, val_ptr);
+	      }
+	  }
+	else
+	  {
+	    const double * matrix_ptr = loc_row != numbers::invalid_unsigned_int ?
+	      &local_matrix(loc_row, 0) : 0;
+	    for (unsigned int j=column_start; j<column_end; ++j)
+	      {
+		double col_val = resolve_matrix_entry (global_rows, i, j,
+						       loc_row, local_matrix, matrix_ptr);
+		add_value (col_val, row, global_rows.global_row(j), col_ptr,
+			   false, counter, val_ptr);
+	      }
+	  }
+      }
+    else if (i>=column_start && i<column_end) // case 2: can rewrite loop
+      {
+	if (global_rows.have_indirect_rows() == false)
+	  {
+	    Assert(loc_row < local_matrix.m(),
+		   ExcIndexRange(loc_row, 0, local_matrix.m()));
+	    const double * matrix_ptr = &local_matrix(loc_row, 0);
+
+	    for (unsigned int j=column_start; j<i; ++j)
+	      {
+		const unsigned int loc_col = global_rows.local_row(j);
+		const double col_val = matrix_ptr[loc_col];
+		add_value(col_val, row, global_rows.global_row(j), col_ptr,
+			  false, counter, val_ptr);
+	      }
+	    val_ptr[0] += matrix_ptr[loc_row];
+	    for (unsigned int j=i+1; j<column_end; ++j)
+	      {
+		const unsigned int loc_col = global_rows.local_row(j);
+		const double col_val = matrix_ptr[loc_col];
+		add_value(col_val, row, global_rows.global_row(j), col_ptr,
+			  false, counter, val_ptr);
+	      }
+	  }
+	else
+	  {
+	    const double * matrix_ptr = loc_row != numbers::invalid_unsigned_int ?
+	      &local_matrix(loc_row, 0) : 0;
+	    for (unsigned int j=column_start; j<i; ++j)
+	      {
+		double col_val = resolve_matrix_entry (global_rows, i, j,
+						       loc_row, local_matrix, matrix_ptr);
+		add_value (col_val, row, global_rows.global_row(j), col_ptr,
+			   false, counter, val_ptr);
+	      }
+	    val_ptr[0] += resolve_matrix_entry (global_rows, i, i, loc_row,
+						local_matrix, matrix_ptr);
+	    for (unsigned int j=i+1; j<column_end; ++j)
+	      {
+		double col_val = resolve_matrix_entry (global_rows, i, j,
+						       loc_row, local_matrix, matrix_ptr);
+		add_value (col_val, row, global_rows.global_row(j), col_ptr,
+			   false, counter, val_ptr);
+	      }
+	  }
+      }
+				// case 3: can't say - need to check inside
+				// the loop
+    else if (global_rows.have_indirect_rows() == false)
+      {
+	Assert(loc_row < local_matrix.m(),
+	       ExcIndexRange(loc_row, 0, local_matrix.m()));
+	const double * matrix_ptr = &local_matrix(loc_row, 0);
+
+	for (unsigned int j=column_start; j<column_end; ++j)
+	  {
+	    const unsigned int loc_col = global_rows.local_row(j);
+	    const double col_val = matrix_ptr[loc_col];
+	    add_value(col_val, row, global_rows.global_row(j), col_ptr,
+		      row==global_rows.global_row(j), counter, val_ptr);
+	  }
+      }
+    else
+      {
+	const double * matrix_ptr = loc_row != numbers::invalid_unsigned_int ?
+	  &local_matrix(loc_row, 0) : 0;
+	for (unsigned int j=column_start; j<column_end; ++j)
+	  {
+	    double col_val = resolve_matrix_entry (global_rows, i, j,
+						   loc_row, local_matrix, matrix_ptr);
+	    add_value (col_val, row, global_rows.global_row(j), col_ptr,
+		       row==global_rows.global_row(j), counter, val_ptr);
+	  }
+      }
+  }
+
+
+
+				// Same function as before, now for
+				// sparsity pattern
+  inline
+  void
+  resolve_matrix_row (const GlobalRowsFromLocal     &global_rows,
+		      const unsigned int             i,
+		      const unsigned int             column_start,
+		      const unsigned int             column_end,
+		      const Table<2,bool>           &dof_mask,
+		      std::vector<unsigned int>::iterator &col_ptr)
+  {
+    const unsigned int loc_row = global_rows.local_row(i);
+
+				   // fast function if there are no indirect
+				   // references to any of the local rows at
+				   // all on this set of dofs
+    if (global_rows.have_indirect_rows() == false)
+      {
+	Assert(loc_row < dof_mask.n_rows(),
+	       ExcInternalError());
+
+	for (unsigned int j=column_start; j<column_end; ++j)
+	  {
+	    const unsigned int loc_col = global_rows.local_row(j);
+	    Assert(loc_col < dof_mask.n_cols(), ExcInternalError());
+
+	    if (dof_mask[loc_row][loc_col] == true)
+	      *col_ptr++ = global_rows.global_row(j);
+	  }
+      }
+
+				   // slower functions when there are
+				   // indirect references and when we need
+				   // to do some more checks.
+    else
+      {
+	for (unsigned int j=column_start; j<column_end; ++j)
+	  {
+	    const unsigned int loc_col = global_rows.local_row(j);
+	    if (loc_row != numbers::invalid_unsigned_int)
+	      {
+		Assert (loc_row < dof_mask.n_rows(), ExcInternalError());
+		if (loc_col != numbers::invalid_unsigned_int)
+		  {
+		    Assert (loc_col < dof_mask.n_cols(), ExcInternalError());
+		    if (dof_mask[loc_row][loc_col] == true)
+		      goto add_this_index;
+		  }
+
+		for (unsigned int p=0; p<global_rows.size(j); ++p)
+		  if (dof_mask[loc_row][global_rows.local_row(j,p)] == true)
+		    goto add_this_index;
+	      }
+
+	    for (unsigned int q=0; q<global_rows.size(i); ++q)
+	      {
+		if (loc_col != numbers::invalid_unsigned_int)
+		  {
+		    Assert (loc_col < dof_mask.n_cols(), ExcInternalError());
+		    if (dof_mask[global_rows.local_row(i,q)][loc_col] == true)
+		      goto add_this_index;
+		  }
+
+		for (unsigned int p=0; p<global_rows.size(j); ++p)
+		  if (dof_mask[global_rows.local_row(i,q)]
+		              [global_rows.local_row(j,p)] == true)
+		    goto add_this_index;
+	      }
+
+	    continue;
+				   // if we got some nontrivial value,
+				   // append it to the array of values.
+	  add_this_index:
+	    *col_ptr++ = global_rows.global_row(j);
+	  }
+      }
+  }
+
+
+} // end of namespace internals
+
+
+
+				// Basic idea of setting up a list of
+				// all global dofs: first find all rows and columns
+				// that we are going to write touch,
+				// and then go through the
+				// lines and collect all the local rows that
+				// are related to it.
+template <typename MatrixType>
 inline
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-			    const Vector<double>            &local_vector,
-                            const std::vector<unsigned int> &local_dof_indices,
-                            MatrixType                      &global_matrix,
-			    VectorType                      &global_vector,
-			    internal::bool2type<false>) const
+make_sorted_dof_list (const FullMatrix<double>        &local_matrix,
+		      const std::vector<unsigned int> &local_dof_indices,
+		      MatrixType                      &global_matrix,
+		      internals::GlobalRowsFromLocal  &global_rows,
+		      std::vector<unsigned int>       &constrained_lines) const
 {
-				   // check whether we work on real vectors
-				   // or we just used a dummy when calling
-				   // the other function above.
-  const bool use_vectors = (local_vector.size() == 0 &&
-			    global_vector.size() == 0) ? false : true;
-
-  Assert (local_matrix.n() == local_dof_indices.size(),
-          ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
-  Assert (local_matrix.m() == local_dof_indices.size(),
-          ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
-  Assert (global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
-  if (use_vectors == true)
-    {
-      Assert (local_matrix.m() == local_vector.size(),
-	      ExcDimensionMismatch(local_matrix.m(), local_vector.size()));
-      Assert (global_matrix.m() == global_vector.size(),
-	      ExcDimensionMismatch(global_matrix.m(), global_vector.size()));
-    }
-  Assert (sorted == true, ExcMatrixNotClosed());
-
   const unsigned int n_local_dofs = local_dof_indices.size();
 
   double average_diagonal = 0;
   for (unsigned int i=0; i<n_local_dofs; ++i)
     average_diagonal += std::fabs (local_matrix(i,i));
-  average_diagonal /= n_local_dofs;
+  average_diagonal /= static_cast<double>(n_local_dofs);
 
 				   // when distributing the local data to
 				   // the global matrix, we can quite
@@ -1231,55 +1718,50 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // constraints). Choosing an STL map or
 				   // anything else M.K. knows of would be
 				   // much more expensive here!
-  std::vector<internals::distributing> my_indices (n_local_dofs);
-  std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
 
 				   // cache whether we have to resolve any
 				   // indirect rows generated from resolving
 				   // constrained dofs.
-  bool have_indirect_rows = false;
-  {
-    unsigned int added_rows = 0;
+  unsigned int added_rows = 0;
+  bool have_inhomogeneities = false;
+
 				   // first add the indices in an unsorted
 				   // way and only keep track of the
 				   // constraints that appear. They are
 				   // resolved in a second step.
-    for (unsigned int i = 0; i<n_local_dofs; ++i)
-      {
-	if (is_constrained(local_dof_indices[i]) == false)
-	  {
-	    my_indices[added_rows].global_row = local_dof_indices[i];
-	    my_indices[added_rows].local_row = i;
-	    ++added_rows;
-	    continue;
-	  }
+  for (unsigned int i = 0; i<n_local_dofs; ++i)
+    {
+      if (is_constrained(local_dof_indices[i]) == false)
+	{
+	  global_rows.global_row(added_rows)  = local_dof_indices[i];
+	  global_rows.local_row(added_rows++) = i;
+	  continue;
+	}
 
-	constraint_lines.push_back (std::make_pair<unsigned int,
-				    const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
-	Assert (lines_cache[local_dof_indices[i]]->line == local_dof_indices[i],
-		ExcInternalError());
-      }
-    Assert (constraint_lines.size() + added_rows == n_local_dofs,
-	    ExcInternalError());
-    my_indices.resize (added_rows);
-  }
-  internals::list_shellsort (my_indices);
+      constrained_lines.reserve (n_local_dofs);
+      constrained_lines.push_back (i);
+      if (have_inhomogeneities == false)
+	have_inhomogeneities =
+	  lines[lines_cache[calculate_line_index(local_dof_indices[i])]].
+	  inhomogeneity != 0;
+    }
+  Assert (constrained_lines.size() + added_rows == n_local_dofs,
+	  ExcDimensionMismatch (constrained_lines.size() + added_rows,
+				n_local_dofs));
+  global_rows.sort(added_rows);
 
 				   // now in the second step actually
 				   // resolve the constraints
-  const unsigned int n_constrained_dofs = constraint_lines.size();
-  for (unsigned int i=0; i<n_constrained_dofs; ++i)
+  for (unsigned int i=0; i<constrained_lines.size(); ++i)
     {
-      const unsigned int local_row = constraint_lines[i].first;
-      const unsigned int global_row = local_dof_indices[local_row];
-      const ConstraintLine * position = constraint_lines[i].second;
-      for (unsigned int q=0; q<position->entries.size(); ++q)
-	{
-	  have_indirect_rows = true;
-	  internals::insert_index(my_indices, position->entries[q].first,
-				  std::make_pair<unsigned int,double>
-				  (local_row, position->entries[q].second));
-	}
+      const unsigned int local_row = constrained_lines[i],
+	global_row = local_dof_indices[local_row];
+      const ConstraintLine position =
+	lines[lines_cache[calculate_line_index(global_row)]];
+      for (unsigned int q=0; q<position.entries.size(); ++q)
+	global_rows.insert_index (position.entries[q].first,
+					local_row,
+					position.entries[q].second);
 
 				   // to make sure that the global matrix
 				   // remains invertible, we need to do
@@ -1311,153 +1793,269 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 	   std::fabs(local_matrix(local_row,local_row)) : average_diagonal);
       global_matrix.add(global_row, global_row, new_diagonal);
     }
+  constrained_lines.resize (constrained_lines.size() * have_inhomogeneities);
+}
 
-  const unsigned int n_actual_dofs = my_indices.size();
+
+
+template <typename SparsityType>
+inline
+void
+ConstraintMatrix::
+  make_sorted_dof_list (const std::vector<unsigned int> &local_dof_indices,
+			const bool                       keep_constrained_entries,
+			SparsityType                    &sparsity_pattern,
+			std::vector<unsigned int>       &actual_dof_indices) const
+{
+  const unsigned int n_local_dofs = local_dof_indices.size();
+  unsigned int added_rows = 0;
+  for (unsigned int i = 0; i<n_local_dofs; ++i)
+    {
+      if (is_constrained(local_dof_indices[i]) == false)
+	{
+	  actual_dof_indices[added_rows] = local_dof_indices[i];
+	  ++added_rows;
+	  continue;
+	}
+
+      actual_dof_indices[n_local_dofs-i+added_rows-1] = i;
+    }
+  std::sort (actual_dof_indices.begin(), actual_dof_indices.begin()+added_rows);
+
+  const unsigned int n_constrained_dofs = n_local_dofs-added_rows;
+  for (unsigned int i=n_constrained_dofs; i>0; --i)
+    {
+      const unsigned int local_row = actual_dof_indices.back();
+      actual_dof_indices.pop_back();
+      const unsigned int global_row = local_dof_indices[local_row];
+      const ConstraintLine & position =
+	lines[lines_cache[calculate_line_index(global_row)]];
+      for (unsigned int q=0; q<position.entries.size(); ++q)
+	{
+	  const unsigned int new_index = position.entries[q].first;
+	  if (actual_dof_indices[actual_dof_indices.size()-i] < new_index)
+	    actual_dof_indices.insert(actual_dof_indices.end()-i+1,new_index);
+	  else
+	    {
+	      std::vector<unsigned int>::iterator it =
+		std::lower_bound(actual_dof_indices.begin(),
+				 actual_dof_indices.end()-i+1,
+				 new_index);
+	      if (*it != new_index)
+		actual_dof_indices.insert(it, new_index);
+	    }
+	}
+
+      if (keep_constrained_entries == true)
+	{
+	  for (unsigned int j=0; j<n_local_dofs; ++j)
+	    {
+	      sparsity_pattern.add(global_row,
+				   local_dof_indices[j]);
+	      sparsity_pattern.add(local_dof_indices[j],
+				   global_row);
+	    }
+	}
+      else
+	sparsity_pattern.add(global_row,global_row);
+    }
+}
+
+
+
+template <typename SparsityType>
+inline
+void
+ConstraintMatrix::
+  make_sorted_dof_list (const Table<2,bool>                &dof_mask,
+			const std::vector<unsigned int>    &local_dof_indices,
+			const bool                          keep_constrained_entries,
+			SparsityType                       &sparsity_pattern,
+			internals::GlobalRowsFromLocal     &global_rows) const
+{
+				   // cache whether we have to resolve any
+				   // indirect rows generated from resolving
+				   // constrained dofs.
+  std::vector<unsigned int> constrained_lines;
+  unsigned int added_rows = 0;
+  const unsigned int n_local_dofs = local_dof_indices.size();
+
+  for (unsigned int i = 0; i<n_local_dofs; ++i)
+    {
+      if (is_constrained(local_dof_indices[i]) == false)
+	{
+	  global_rows.global_row(added_rows)  = local_dof_indices[i];
+	  global_rows.local_row(added_rows++) = i;
+	  continue;
+	}
+
+      constrained_lines.reserve (n_local_dofs);
+      constrained_lines.push_back (i);
+    }
+  Assert (constrained_lines.size() + added_rows == n_local_dofs,
+	  ExcDimensionMismatch (constrained_lines.size() + added_rows,
+				n_local_dofs));
+  global_rows.sort(added_rows);
+
+  for (unsigned int i=0; i<constrained_lines.size(); ++i)
+    {
+      const unsigned int local_row = constrained_lines[i],
+	global_row = local_dof_indices[local_row];
+      const ConstraintLine * position =
+	&lines[lines_cache[calculate_line_index(global_row)]];
+      for (unsigned int q=0; q<position->entries.size(); ++q)
+	global_rows.insert_index (position->entries[q].first,
+					local_row,
+					position->entries[q].second);
+
+                                   // need to add the whole row and column
+                                   // structure in case we keep constrained
+                                   // entries. Unfortunately, we can't use
+                                   // the nice matrix structure we use
+                                   // elsewhere, so manually add those
+                                   // indices one by one.
+      if (keep_constrained_entries == true)
+	{
+	  for (unsigned int j=0; j<n_local_dofs; ++j)
+	    {
+	      if (dof_mask[local_row][j] == true)
+		sparsity_pattern.add(global_row,
+				     local_dof_indices[j]);
+	      if (dof_mask[j][local_row] == true)
+		sparsity_pattern.add(local_dof_indices[j],
+				     global_row);
+	    }
+	}
+      else
+				   // don't keep constrained entries - just
+				   // add the diagonal.
+	sparsity_pattern.add(global_row,global_row);
+    }
+}
+
+
+
+inline
+double
+ConstraintMatrix::
+  resolve_vector_entry (const unsigned int                    i,
+			const internals::GlobalRowsFromLocal &global_rows,
+			const Vector<double>                 &local_vector,
+			const std::vector<unsigned int>      &local_dof_indices,
+			const FullMatrix<double>             &local_matrix,
+			const std::vector<unsigned int>      &constrained_lines) const
+{
+				// Resolve the constraints from the vector and
+				// apply inhomogeneities.
+  const unsigned int loc_row = global_rows.local_row(i);
+  const unsigned int n_inhomogeneous_dofs = constrained_lines.size();
+  double val = 0;
+  if (loc_row != numbers::invalid_unsigned_int)
+    {
+      val = local_vector(loc_row);
+      for (unsigned int i=0; i<n_inhomogeneous_dofs; ++i)
+	val -= (lines[lines_cache[calculate_line_index(local_dof_indices
+						       [constrained_lines[i]])]].
+		inhomogeneity *
+		local_matrix(loc_row, constrained_lines[i]));
+    }
+
+  for (unsigned int q=0; q<global_rows.size(i); ++q)
+    {
+      const unsigned int loc_row_q = global_rows.local_row(i,q);
+      double add_this = local_vector (loc_row_q);
+      for (unsigned int k=0; k<n_inhomogeneous_dofs; ++k)
+	add_this -= (lines[lines_cache[calculate_line_index(local_dof_indices
+							    [constrained_lines[k]])]].
+		     inhomogeneity *
+		     local_matrix(loc_row_q,constrained_lines[k]));
+      val += add_this * global_rows.constraint_value(i,q);
+    }
+  return val;
+}
+
+
+				   // internal implementation for
+				   // distribute_local_to_global for
+				   // standard (non-block) matrices
+template <typename MatrixType, typename VectorType>
+void
+ConstraintMatrix::
+distribute_local_to_global (const FullMatrix<double>        &local_matrix,
+			    const Vector<double>            &local_vector,
+                            const std::vector<unsigned int> &local_dof_indices,
+                            MatrixType                      &global_matrix,
+			    VectorType                      &global_vector,
+			    internal::bool2type<false>) const
+{
+				   // check whether we work on real vectors
+				   // or we just used a dummy when calling
+				   // the other function above.
+  const bool use_vectors = (local_vector.size() == 0 &&
+			    global_vector.size() == 0) ? false : true;
+  typedef typename MatrixType::value_type number;
+  const bool use_dealii_matrix =
+    types_are_equal<MatrixType,SparseMatrix<number> >::value;
+
+  Assert (local_matrix.n() == local_dof_indices.size(),
+          ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
+  Assert (local_matrix.m() == local_dof_indices.size(),
+          ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
+  Assert (global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
+  if (use_vectors == true)
+    {
+      Assert (local_matrix.m() == local_vector.size(),
+	      ExcDimensionMismatch(local_matrix.m(), local_vector.size()));
+      Assert (global_matrix.m() == global_vector.size(),
+	      ExcDimensionMismatch(global_matrix.m(), global_vector.size()));
+    }
+  Assert (sorted == true, ExcMatrixNotClosed());
+
+  const unsigned int n_local_dofs = local_dof_indices.size();
+  internals::GlobalRowsFromLocal global_rows (n_local_dofs);
+  std::vector<unsigned int> constrained_lines;
+
+  make_sorted_dof_list (local_matrix, local_dof_indices, global_matrix,
+			global_rows, constrained_lines);
+
+  const unsigned int n_actual_dofs = global_rows.size();
 
 				   // create arrays for the column data
 				   // (indices and values) that will then be
-				   // written into the matrix.
-  std::vector<unsigned int>                    cols (n_actual_dofs);
-  std::vector<typename MatrixType::value_type> vals (n_actual_dofs);
-
-  typedef std::vector<std::pair<unsigned int,double> > constraint_format;
+				   // written into the matrix. Shortcut for
+				   // deal.II sparse matrix
+  std::vector<unsigned int> cols;
+  std::vector<number>       vals;
+  SparseMatrix<number> * sparse_matrix
+    = dynamic_cast<SparseMatrix<number> *>(&global_matrix);
+  if (use_dealii_matrix == false)
+    {
+      cols.resize (n_actual_dofs);
+      vals.resize (n_actual_dofs);
+    }
 
 				   // now do the actual job.
   for (unsigned int i=0; i<n_actual_dofs; ++i)
     {
-      const unsigned int row = my_indices[i].global_row;
-      const unsigned int loc_row = my_indices[i].local_row;
-      unsigned int * col_ptr = &cols[0];
-      typename MatrixType::value_type * val_ptr = &vals[0];
-      double val = 0;
+      const unsigned int row = global_rows.global_row(i);
 
-				   // fast function if there are no indirect
-				   // references to any of the local rows at
-				   // all on this set of dofs (saves a lot
-				   // of checks). the only check we actually
-				   // need to perform is whether the matrix
-				   // element is zero.
-      if (have_indirect_rows == false)
+				   // calculate all the data that will be
+				   // written into the matrix row.
+      if (use_dealii_matrix == false)
 	{
-	  Assert(loc_row < n_local_dofs, ExcInternalError());
-	  const double * matrix_ptr = &local_matrix(loc_row, 0);
-
-	  for (unsigned int j=0; j < n_actual_dofs; ++j)
-	    {
-	      const unsigned int loc_col = my_indices[j].local_row;
-	      Assert(loc_col < n_local_dofs, ExcInternalError());
-
-	      const double col_val = matrix_ptr[loc_col];
-	      if (col_val != 0)
-		{
-		  *val_ptr++ = static_cast<typename MatrixType::value_type>
-		    (col_val);
-		  *col_ptr++ = my_indices[j].global_row;
-		}
-	    }
-
-	  if (use_vectors == true)
-	    {
-	      val = local_vector(loc_row);
-
-				   // need to account for inhomogeneities
-				   // here: thie corresponds to eliminating
-				   // the respective column in the local
-				   // matrix with value on the right hand
-				   // side.
-	      for (unsigned int i=0; i<constraint_lines.size(); ++i)
-		val -= constraint_lines[i].second->inhomogeneity *
-		       matrix_ptr[constraint_lines[i].first];
-	    }
+	  unsigned int * col_ptr = &cols[0];
+	  number * val_ptr = &vals[0];
+	  resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
+			      local_matrix, col_ptr, val_ptr);
+	  const unsigned int n_values = col_ptr - &cols[0];
+	  Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
+		  ExcInternalError());
+	  if (n_values > 0)
+	    global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
 	}
-
-				   // more difficult part when there are
-				   // indirect references and when we need
-				   // to do some more checks.
       else
-	{
-	  const double * matrix_ptr = 0;
-	  if (loc_row != deal_II_numbers::invalid_unsigned_int)
-	    {
-	      Assert (loc_row < n_local_dofs, ExcInternalError());
-	      matrix_ptr = &local_matrix(loc_row, 0);
-	    }
-	  for (unsigned int j=0; j < n_actual_dofs; ++j)
-	    {
-	      double col_val;
-	      const unsigned int loc_col = my_indices[j].local_row;
-
-				   // case 1: row has direct contribution in
-				   // local matrix
-	      if (loc_row != deal_II_numbers::invalid_unsigned_int)
-		{
-				   // case 1a: col has direct contribution
-				   // in local matrix
-		  if (loc_col != deal_II_numbers::invalid_unsigned_int)
-		    {
-		      Assert (loc_col < n_local_dofs, ExcInternalError());
-		      col_val = matrix_ptr[loc_col];
-		    }
-				   // case 1b: col has no direct
-				   // contribution in local matrix
-		  else
-		    col_val = 0;
-
-				   // account for indirect contributions by
-				   // constraints in column
-		  if (my_indices[j].constraints != 0)
-		    {
-		      constraint_format &constraint_j = *my_indices[j].constraints;
-		      for (unsigned int p=0; p<constraint_j.size(); ++p)
-			col_val += matrix_ptr[constraint_j[p].first]
-		                   *
-		                   constraint_j[p].second;
-		    }
-		}
-
-				   // case 2: row has no direct contribution in
-				   // local matrix
-	      else
-		col_val = 0;
-
-				   // account for indirect contributions by
-				   // constraints in row, going trough the
-				   // direct and indirect references in the
-				   // given column.
-	      if (my_indices[i].constraints != 0)
-		{
-		  constraint_format &constraint_i = *my_indices[i].constraints;
-		  Assert (constraint_i.size() > 0, ExcInternalError());
-
-		  for (unsigned int q=0; q<constraint_i.size(); ++q)
-		    {
-		      double add_this = loc_col != deal_II_numbers::invalid_unsigned_int ?
-			local_matrix(constraint_i[q].first, loc_col) : 0;
-
-		      if (my_indices[j].constraints != 0)
-			{
-			  constraint_format &constraint_j = *my_indices[j].constraints;
-			  for (unsigned int p=0; p<constraint_j.size(); ++p)
-			    add_this += local_matrix(constraint_i[q].first,
-						     constraint_j[p].first)
-			                *
-			                constraint_j[p].second;
-			}
-		      col_val += add_this * constraint_i[q].second;
-		    }
-		}
-
-
-
-				   // if we got some nontrivial value,
-				   // append it to the array of values.
-	      if (col_val != typename MatrixType::value_type())
-		{
-		  *val_ptr++ = static_cast<typename MatrixType::value_type>
-		    (col_val);
-		  *col_ptr++ = my_indices[j].global_row;
-		}
-	    }
+	resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
+			    local_matrix, sparse_matrix);
 
 				   // now to the vectors. besides doing the
 				   // same job as we did above (i.e.,
@@ -1467,54 +2065,23 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				   // corresponds to eliminating the
 				   // respective column in the local matrix
 				   // with value on the right hand side.
-	  if (use_vectors == true)
-	    {
-	      if (loc_row != deal_II_numbers::invalid_unsigned_int)
-		{
-		  Assert (loc_row < n_local_dofs,
-			  ExcInternalError());
-		  val = local_vector(loc_row);
-		  for (unsigned int i=0; i<constraint_lines.size(); ++i)
-		    val -= constraint_lines[i].second->inhomogeneity *
-		           matrix_ptr[constraint_lines[i].first];
-		}
+      if (use_vectors == true)
+	{
+	  const double val = resolve_vector_entry (i, global_rows,
+						   local_vector,
+						   local_dof_indices,
+						   local_matrix,
+						   constrained_lines);
 
-	      if (my_indices[i].constraints != 0)
-		{
-		  std::vector<std::pair<unsigned int,double> > &constraint_i =
-		    *my_indices[i].constraints;
-
-		  for (unsigned int q=0; q<constraint_i.size(); ++q)
-		    {
-		      const unsigned int loc_row_q = constraint_i[q].first;
-		      double add_this = local_vector (loc_row_q);
-		      for (unsigned int k=0; k<constraint_lines.size(); ++k)
-			add_this -= constraint_lines[k].second->inhomogeneity *
-		                    local_matrix(loc_row_q,constraint_lines[k].first);
-		      val += add_this * constraint_i[q].second;
-		    }
-		}
-	    }
+	  if (val != 0)
+	    global_vector(row) += static_cast<typename VectorType::value_type>(val);
 	}
-
-				   // finally, write all the information
-				   // that accumulated under the given
-				   // process into the global matrix row and
-				   // into the vector
-      const unsigned int n_values = col_ptr - &cols[0];
-      Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
-	      ExcInternalError());
-      if (n_values > 0)
-	global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
-      if (val != 0)
-	global_vector(row) += static_cast<typename VectorType::value_type>(val);
     }
 }
 
 
 
 template <typename MatrixType, typename VectorType>
-inline
 void
 ConstraintMatrix::
 distribute_local_to_global (const FullMatrix<double>        &local_matrix,
@@ -1531,6 +2098,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
   const bool use_vectors = (local_vector.size() == 0 &&
 			    global_vector.size() == 0) ? false : true;
+  typedef typename MatrixType::value_type number;
+  const bool use_dealii_matrix =
+    types_are_equal<MatrixType,BlockSparseMatrix<number> >::value;
 
   Assert (local_matrix.n() == local_dof_indices.size(),
           ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
@@ -1549,72 +2119,34 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   Assert (sorted == true, ExcMatrixNotClosed());
 
   const unsigned int n_local_dofs = local_dof_indices.size();
-  const unsigned int num_blocks   = global_matrix.n_block_rows();
+  internals::GlobalRowsFromLocal global_rows (n_local_dofs);
+  std::vector<unsigned int> constrained_lines;
 
-  double average_diagonal = 0;
-  for (unsigned int i=0; i<n_local_dofs; ++i)
-    average_diagonal += std::fabs (local_matrix(i,i));
-  average_diagonal /= n_local_dofs;
+  make_sorted_dof_list (local_matrix, local_dof_indices, global_matrix,
+			global_rows, constrained_lines);
+  const unsigned int n_actual_dofs = global_rows.size();
 
-  std::vector<internals::distributing> my_indices (n_local_dofs);
-  std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
-
-  bool have_indirect_rows = false;
-  {
-    unsigned int added_rows = 0;
-    for (unsigned int i = 0; i<n_local_dofs; ++i)
-      {
-	if (is_constrained(local_dof_indices[i]) == false)
-	  {
-	    my_indices[added_rows].global_row = local_dof_indices[i];
-	    my_indices[added_rows].local_row = i;
-	    ++added_rows;
-	    continue;
-	  }
-
-	constraint_lines.push_back (std::make_pair<unsigned int,
-				    const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
-      }
-    Assert (constraint_lines.size() + added_rows == n_local_dofs,
-	    ExcInternalError());
-    my_indices.resize (added_rows);
-  }
-  internals::list_shellsort (my_indices);
-
-  const unsigned int n_constrained_dofs = constraint_lines.size();
-  for (unsigned int i=0; i<n_constrained_dofs; ++i)
+  std::vector<unsigned int> global_indices;
+  if (use_vectors == true)
     {
-      const unsigned int local_row = constraint_lines[i].first;
-      const unsigned int global_row = local_dof_indices[local_row];
-      const ConstraintLine * position = constraint_lines[i].second;
-      for (unsigned int q=0; q<position->entries.size(); ++q)
-	{
-	  have_indirect_rows = true;
-	  internals::insert_index(my_indices, position->entries[q].first,
-				  std::make_pair<unsigned int,double>
-				  (local_row, position->entries[q].second));
-	}
-
-      const typename MatrixType::value_type new_diagonal
-	= (std::fabs(local_matrix(local_row,local_row)) != 0 ?
-	   std::fabs(local_matrix(local_row,local_row)) : average_diagonal);
-      global_matrix.add(global_row, global_row, new_diagonal);
+      global_indices.resize(n_actual_dofs);
+      for (unsigned int i=0; i<n_actual_dofs; ++i)
+	global_indices[i] = global_rows.global_row(i);
     }
-
-  const unsigned int n_actual_dofs = my_indices.size();
-
-  std::vector<unsigned int> localized_indices (n_actual_dofs);
-  for (unsigned int i=0; i<n_actual_dofs; ++i)
-    localized_indices[i] = my_indices[i].global_row;
 
 				   // additional construct that also takes
 				   // care of block indices.
+  const unsigned int num_blocks   = global_matrix.n_block_rows();
   std::vector<unsigned int> block_starts(num_blocks+1, n_actual_dofs);
-  internals::make_block_starts (global_matrix, localized_indices, block_starts);
+  internals::make_block_starts (global_matrix, global_rows, block_starts);
 
-  std::vector<unsigned int>                    cols (n_actual_dofs);
-  std::vector<typename MatrixType::value_type> vals (n_actual_dofs);
-  typedef std::vector<std::pair<unsigned int,double> > constraint_format;
+  std::vector<unsigned int> cols;
+  std::vector<number>       vals;
+  if (use_dealii_matrix == false)
+    {
+      cols.resize (n_actual_dofs);
+      vals.resize (n_actual_dofs);
+    }
 
 				   // the basic difference to the
 				   // non-block variant from now onwards
@@ -1625,149 +2157,47 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
       const unsigned int next_block = block_starts[block+1];
       for (unsigned int i=block_starts[block]; i<next_block; ++i)
 	{
-	  const unsigned int row = localized_indices[i];
-	  const unsigned int loc_row = my_indices[i].local_row;
+	  const unsigned int row = global_rows.global_row(i);
 
 	  for (unsigned int block_col=0; block_col<num_blocks; ++block_col)
 	    {
-	      const unsigned int next_block_col = block_starts[block_col+1];
-	      unsigned int * col_ptr = &cols[0];
-	      typename MatrixType::value_type * val_ptr = &vals[0];
-	      if (have_indirect_rows == false)
+	      const unsigned int start_block = block_starts[block_col],
+		end_block = block_starts[block_col+1];
+	      if (use_dealii_matrix == false)
 		{
-		  Assert(loc_row < n_local_dofs, ExcInternalError());
-		  const double * matrix_ptr = &local_matrix(loc_row, 0);
-
-		  for (unsigned int j=block_starts[block_col]; j < next_block_col; ++j)
-		    {
-		      const unsigned int loc_col = my_indices[j].local_row;
-		      Assert(loc_col < n_local_dofs, ExcInternalError());
-
-		      const double col_val = matrix_ptr[loc_col];
-		      if (col_val != 0)
-			{
-			  *val_ptr++ =
-			    static_cast<typename MatrixType::value_type> (col_val);
-			  *col_ptr++ = localized_indices[j];
-			}
-		    }
+		  unsigned int * col_ptr = &cols[0];
+		  number * val_ptr = &vals[0];
+		  resolve_matrix_row (global_rows, i, start_block,
+				      end_block, local_matrix, col_ptr, val_ptr);
+		  const unsigned int n_values = col_ptr - &cols[0];
+		  Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
+			  ExcInternalError());
+		  if (n_values > 0)
+		    global_matrix.block(block, block_col).add(row, n_values,
+							      &cols[0], &vals[0],
+							      false, true);
 		}
-
 	      else
 		{
-		  const double * matrix_ptr = 0;
-		  if (loc_row != deal_II_numbers::invalid_unsigned_int)
-		    {
-		      Assert (loc_row < n_local_dofs, ExcInternalError());
-		      matrix_ptr = &local_matrix(loc_row, 0);
-		    }
-		  for (unsigned int j=block_starts[block_col]; j < next_block_col; ++j)
-		    {
-		      double col_val;
-		      const unsigned int loc_col = my_indices[j].local_row;
-
-		      if (loc_row != deal_II_numbers::invalid_unsigned_int)
-			{
-			  col_val = loc_col != deal_II_numbers::invalid_unsigned_int ?
-			    matrix_ptr[loc_col] : 0;
-
-				   // account for indirect contributions by
-				   // constraints
-			  if (my_indices[j].constraints != 0)
-			    {
-			      constraint_format &constraint_j =
-				*my_indices[j].constraints;
-
-			      for (unsigned int p=0; p<constraint_j.size(); ++p)
-				col_val += local_matrix(loc_row,
-						        constraint_j[p].first)
-				           *
-				           constraint_j[p].second;
-			    }
-			}
-
-		      else
-			col_val = 0;
-
-		      if (my_indices[i].constraints != 0)
-			{
-			  constraint_format &constraint_i = *my_indices[i].constraints;
-
-			  for (unsigned int q=0; q<constraint_i.size(); ++q)
-			    {
-			      double add_this =
-				loc_col != deal_II_numbers::invalid_unsigned_int ?
-				local_matrix(constraint_i[q].first, loc_col) : 0;
-
-			      if (my_indices[j].constraints != 0)
-				{
-				  constraint_format &constraint_j =
-				    *my_indices[j].constraints;
-
-				  for (unsigned int p=0; p<constraint_j.size(); ++p)
-				    add_this += local_matrix(constraint_i[q].first,
-							     constraint_j[p].first)
-				                *
-				                constraint_j[p].second;
-				}
-			      col_val += add_this * constraint_i[q].second;
-			    }
-			}
-
-		      if (col_val != 0)
-			{
-			  *col_ptr++ = localized_indices[j];
-			  *val_ptr++ =
-			    static_cast<typename MatrixType::value_type>(col_val);
-			}
-		    }
+		  SparseMatrix<number> * sparse_matrix
+		    = dynamic_cast<SparseMatrix<number> *>(&global_matrix.block(block,
+										block_col));
+		  Assert (sparse_matrix != 0, ExcInternalError());
+		  resolve_matrix_row (global_rows, i, start_block,
+				      end_block, local_matrix, sparse_matrix);
 		}
-
-				   // finally, write all the information
-				   // that accumulated under the given
-				   // process into the global matrix row and
-				   // into the vector. For the block matrix,
-				   // go trough the individual blocks and
-				   // look which entries we need to set.
-	      const unsigned int n_values = col_ptr - &cols[0];
-	      Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
-		      ExcInternalError());
-	      if (n_values > 0)
-		global_matrix.block(block, block_col).add(row, n_values,
-							  &cols[0], &vals[0],
-							  false, true);
 	    }
 
 	  if (use_vectors == true)
 	    {
-	      double val = 0;
-	      if (loc_row != deal_II_numbers::invalid_unsigned_int)
-		{
-		  Assert (loc_row < n_local_dofs,
-			  ExcInternalError());
-		  val = local_vector(loc_row);
-		  for (unsigned int i=0; i<constraint_lines.size(); ++i)
-		    val -= constraint_lines[i].second->inhomogeneity *
-		      local_matrix(loc_row,constraint_lines[i].first);
-		}
+	      const double val = resolve_vector_entry (i, global_rows,
+						       local_vector,
+						       local_dof_indices,
+						       local_matrix,
+						       constrained_lines);
 
-	      if (my_indices[i].constraints != 0)
-		{
-		  std::vector<std::pair<unsigned int,double> > &constraint_i =
-		    *my_indices[i].constraints;
-
-		  for (unsigned int q=0; q<constraint_i.size(); ++q)
-		    {
-		      const unsigned int loc_row_q = constraint_i[q].first;
-		      double add_this = local_vector (loc_row_q);
-		      for (unsigned int k=0; k<constraint_lines.size(); ++k)
-			add_this -= constraint_lines[k].second->inhomogeneity *
-			            local_matrix(loc_row_q,constraint_lines[k].first);
-		      val += add_this * constraint_i[q].second;
-		    }
-		}
 	      if (val != 0)
-		global_vector(my_indices[i].global_row) +=
+		global_vector(global_indices[i]) +=
 		  static_cast<typename VectorType::value_type>(val);
 	    }
 	}
@@ -1777,7 +2207,6 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 
 
 template <typename SparsityType>
-inline
 void
 ConstraintMatrix::
 add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
@@ -1807,71 +2236,14 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
   if (dof_mask_is_active == false)
     {
       std::vector<unsigned int> actual_dof_indices (n_local_dofs);
-      unsigned int added_rows = 0;
-      bool have_indirect_rows = false;
-      std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
-      for (unsigned int i = 0; i<n_local_dofs; ++i)
-	{
-	  if (is_constrained(local_dof_indices[i]) == false)
-	    {
-	      actual_dof_indices[added_rows] = local_dof_indices[i];
-	      ++added_rows;
-	      continue;
-	    }
-
-	  constraint_lines.push_back (std::make_pair<unsigned int,
-				      const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
-      }
-      Assert (constraint_lines.size() + added_rows == n_local_dofs,
-	      ExcInternalError());
-      actual_dof_indices.resize (added_rows);
-      std::sort (actual_dof_indices.begin(), actual_dof_indices.end());
-
-      const unsigned int n_constrained_dofs = constraint_lines.size();
-      for (unsigned int i=0; i<n_constrained_dofs; ++i)
-	{
-	  const unsigned int local_row = constraint_lines[i].first;
-	  const unsigned int global_row = local_dof_indices[local_row];
-	  const ConstraintLine * position = constraint_lines[i].second;
-	  for (unsigned int q=0; q<position->entries.size(); ++q)
-	    {
-	      have_indirect_rows = true;
-	      const unsigned int new_index = position->entries[q].first;
-	      if (actual_dof_indices.back() < new_index)
-		{
-		  actual_dof_indices.push_back(new_index);
-		}
-	      else
-		{
-		  std::vector<unsigned int>::iterator it =
-		    std::lower_bound(actual_dof_indices.begin(),
-				     actual_dof_indices.end(),
-				     new_index);
-		  if (*it != new_index)
-		    actual_dof_indices.insert(it, new_index);
-		}
-	    }
-
-	  if (keep_constrained_entries == true)
-	    {
-	      for (unsigned int j=0; j<n_local_dofs; ++j)
-		{
-		  sparsity_pattern.add(global_row,
-				       local_dof_indices[j]);
-		  sparsity_pattern.add(local_dof_indices[j],
-				       global_row);
-		}
-	    }
-	  else
-	    sparsity_pattern.add(global_row,global_row);
-	}
-
+      make_sorted_dof_list (local_dof_indices, keep_constrained_entries,
+			    sparsity_pattern, actual_dof_indices);
       const unsigned int n_actual_dofs = actual_dof_indices.size();
 
 				   // now add the indices we collected above
 				   // to the sparsity pattern. Very easy
 				   // here - just add the same array to all
-				   // the columns...
+				   // the rows...
       for (unsigned int i=0; i<n_actual_dofs; ++i)
 	sparsity_pattern.add_entries(actual_dof_indices[i],
 				     actual_dof_indices.begin(),
@@ -1886,79 +2258,10 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // gets similar to the function for
 				   // distributing matrix entries, see there
 				   // for additional comments.
-  std::vector<internals::distributing> my_indices (n_local_dofs);
-  std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
-
-				   // cache whether we have to resolve any
-				   // indirect rows generated from resolving
-				   // constrained dofs.
-  bool have_indirect_rows = false;
-  {
-    unsigned int added_rows = 0;
-				   // first add the indices in an unsorted
-				   // way and only keep track of the
-				   // constraints that appear. They are
-				   // resolved in a second step.
-    for (unsigned int i = 0; i<n_local_dofs; ++i)
-      {
-	if (is_constrained(local_dof_indices[i]) == false)
-	  {
-	    my_indices[added_rows].global_row = local_dof_indices[i];
-	    my_indices[added_rows].local_row = i;
-	    ++added_rows;
-	    continue;
-	  }
-
-	constraint_lines.push_back (std::make_pair<unsigned int,
-				    const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
-      }
-    Assert (constraint_lines.size() + added_rows == n_local_dofs,
-	    ExcInternalError());
-    my_indices.resize (added_rows);
-  }
-  internals::list_shellsort (my_indices);
-
-				   // now in the second step actually
-				   // resolve the constraints
-  const unsigned int n_constrained_dofs = constraint_lines.size();
-  for (unsigned int i=0; i<n_constrained_dofs; ++i)
-    {
-      const unsigned int local_row = constraint_lines[i].first;
-      const unsigned int global_row = local_dof_indices[local_row];
-      const ConstraintLine * position = constraint_lines[i].second;
-      for (unsigned int q=0; q<position->entries.size(); ++q)
-	{
-	  have_indirect_rows = true;
-	  internals::insert_index(my_indices, position->entries[q].first,
-				  std::make_pair<unsigned int,double>
-				  (local_row, position->entries[q].second));
-	}
-
-                                   // need to add the whole row and column
-                                   // structure in case we keep constrained
-                                   // entries. Unfortunately, we can't use
-                                   // the nice matrix structure we use
-                                   // elsewhere, so manually add those
-                                   // indices one by one.
-      if (keep_constrained_entries == true)
-	{
-	  for (unsigned int j=0; j<n_local_dofs; ++j)
-	    {
-	      if (dof_mask[local_row][j] == true)
-		sparsity_pattern.add(global_row,
-				     local_dof_indices[j]);
-	      if (dof_mask[j][local_row] == true)
-		sparsity_pattern.add(local_dof_indices[j],
-				     global_row);
-	    }
-	}
-      else
-				   // don't keep constrained entries - just
-				   // add the diagonal.
-	sparsity_pattern.add(global_row,global_row);
-    }
-
-  const unsigned int n_actual_dofs = my_indices.size();
+  internals::GlobalRowsFromLocal global_rows (n_local_dofs);
+  make_sorted_dof_list (dof_mask, local_dof_indices, keep_constrained_entries,
+			sparsity_pattern, global_rows);
+  const unsigned int n_actual_dofs = global_rows.size();
 
 				   // create arrays for the column indices
 				   // that will then be written into the
@@ -1968,105 +2271,9 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
   for (unsigned int i=0; i<n_actual_dofs; ++i)
     {
       std::vector<unsigned int>::iterator col_ptr = cols.begin();
-      const unsigned int row = my_indices[i].global_row;
-      const unsigned int loc_row = my_indices[i].local_row;
-
-				   // fast function if there are no indirect
-				   // references to any of the local rows at
-				   // all on this set of dofs
-      if (have_indirect_rows == false)
-	{
-	  Assert(loc_row < n_local_dofs,
-		 ExcInternalError());
-
-	  for (unsigned int j=0; j < n_actual_dofs; ++j)
-	    {
-	      const unsigned int loc_col = my_indices[j].local_row;
-	      Assert(loc_col < n_local_dofs, ExcInternalError());
-
-	      if (dof_mask[loc_row][loc_col] == true)
-		*col_ptr++ = my_indices[j].global_row;
-	    }
-	}
-
-				   // slower functions when there are
-				   // indirect references and when we need
-				   // to do some more checks.
-      else
-	{
-	  for (unsigned int j=0; j < n_actual_dofs; ++j)
-	    {
-	      const unsigned int loc_col = my_indices[j].local_row;
-
-	      bool add_this = false;
-
-				   // case 1: row has direct contribution in
-				   // local matrix
-	      if (loc_row != deal_II_numbers::invalid_unsigned_int)
-		{
-		  Assert (loc_row < n_local_dofs, ExcInternalError());
-
-				   // case 1a: col has direct contribution
-				   // in local matrix
-		  if (loc_col != deal_II_numbers::invalid_unsigned_int)
-		    {
-		      Assert (loc_col < n_local_dofs, ExcInternalError());
-		      if (dof_mask[loc_row][loc_col] == true)
-			goto add_this_index;
-		    }
-
-				   // account for indirect contributions by
-				   // constraints
-		  if (my_indices[j].constraints != 0)
-		    {
-		      std::vector<std::pair<unsigned int,double> > &constraint_j =
-			*my_indices[j].constraints;
-
-		      for (unsigned int p=0; p<constraint_j.size(); ++p)
-			if (dof_mask[loc_row][constraint_j[p].first] == true)
-			  goto add_this_index;
-		    }
-		}
-
-				   // account for indirect contributions by
-				   // constraints in row, going trough the
-				   // direct and indirect references in the
-				   // given column.
-	      if (my_indices[i].constraints != 0)
-		{
-		  std::vector<std::pair<unsigned int,double> > &constraint_i =
-		    *my_indices[i].constraints;
-		  for (unsigned int q=0; q<constraint_i.size(); ++q)
-		    {
-		      if (loc_col != deal_II_numbers::invalid_unsigned_int)
-			{
-			  Assert (loc_col < n_local_dofs, ExcInternalError());
-			  if (dof_mask[constraint_i[q].first][loc_col] == true)
-			    goto add_this_index;
-			}
-
-		      if (my_indices[j].constraints != 0)
-			{
-			  std::vector<std::pair<unsigned int,double> > &constraint_j =
-			    *my_indices[j].constraints;
-
-			  for (unsigned int p=0; p<constraint_j.size(); ++p)
-			    if (dof_mask[constraint_i[q].first]
-			                [constraint_j[p].first] == true)
-			      goto add_this_index;
-			}
-		    }
-		}
-
-				   // if we got some nontrivial value,
-				   // append it to the array of values.
-	      if (add_this == true)
-		{
-		add_this_index:
-		  *col_ptr++ = my_indices[j].global_row;
-		}
-	    }
-	}
+      const unsigned int row = global_rows.global_row(i);
+      resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
+			  dof_mask, col_ptr);
 
 				   // finally, write all the information
 				   // that accumulated under the given
@@ -2082,7 +2289,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 
 
 template <typename SparsityType>
-inline
 void
 ConstraintMatrix::
 add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
@@ -2110,75 +2316,11 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	      ExcDimensionMismatch(dof_mask.n_cols(), n_local_dofs));
     }
 
-				   // if the dof mask is not active, all we
-				   // have to do is to add some indices in a
-				   // matrix format. To do this, we first
-				   // create an array of all the indices
-				   // that are to be added. these indices
-				   // are the local dof indices plus some
-				   // indices that come from constraints.
   if (dof_mask_is_active == false)
     {
       std::vector<unsigned int> actual_dof_indices (n_local_dofs);
-      unsigned int added_rows = 0;
-      bool have_indirect_rows = false;
-      std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
-      for (unsigned int i = 0; i<n_local_dofs; ++i)
-	{
-	  if (is_constrained(local_dof_indices[i]) == false)
-	    {
-	      actual_dof_indices[added_rows] = local_dof_indices[i];
-	      ++added_rows;
-	      continue;
-	    }
-
-	  constraint_lines.push_back (std::make_pair<unsigned int,
-				      const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
-      }
-      Assert (constraint_lines.size() + added_rows == n_local_dofs,
-	      ExcInternalError());
-      actual_dof_indices.resize (added_rows);
-      std::sort (actual_dof_indices.begin(), actual_dof_indices.end());
-
-      const unsigned int n_constrained_dofs = constraint_lines.size();
-      for (unsigned int i=0; i<n_constrained_dofs; ++i)
-	{
-	  const unsigned int local_row = constraint_lines[i].first;
-	  const unsigned int global_row = local_dof_indices[local_row];
-	  const ConstraintLine * position = constraint_lines[i].second;
-	  for (unsigned int q=0; q<position->entries.size(); ++q)
-	    {
-	      have_indirect_rows = true;
-	      const unsigned int new_index = position->entries[q].first;
-	      if (actual_dof_indices.back() < new_index)
-		{
-		  actual_dof_indices.push_back(new_index);
-		}
-	      else
-		{
-		  std::vector<unsigned int>::iterator it =
-		    std::lower_bound(actual_dof_indices.begin(),
-				     actual_dof_indices.end(),
-				     new_index);
-		  if (*it != new_index)
-		    actual_dof_indices.insert(it, new_index);
-		}
-	    }
-
-	  if (keep_constrained_entries == true)
-	    {
-	      for (unsigned int j=0; j<n_local_dofs; ++j)
-		{
-		  sparsity_pattern.add(global_row,
-				       local_dof_indices[j]);
-		  sparsity_pattern.add(local_dof_indices[j],
-				       global_row);
-		}
-	    }
-	  else
-	    sparsity_pattern.add(global_row,global_row);
-	}
-
+      make_sorted_dof_list (local_dof_indices, keep_constrained_entries,
+			    sparsity_pattern, actual_dof_indices);
       const unsigned int n_actual_dofs = actual_dof_indices.size();
 
 				   // additional construct that also takes
@@ -2187,9 +2329,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       internals::make_block_starts (sparsity_pattern, actual_dof_indices,
 				    block_starts);
 
-				   // easy operation - just go trough the
-				   // individual blocks and add the same
-				   // array for each row
       for (unsigned int block=0; block<num_blocks; ++block)
 	{
 	  const unsigned int next_block = block_starts[block+1];
@@ -2218,83 +2357,15 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				   // difficult case with dof_mask, similar
 				   // to the distribute_local_to_global
 				   // function for block matrices
-  std::vector<internals::distributing> my_indices (n_local_dofs);
-  std::vector<std::pair<unsigned int, const ConstraintLine *> > constraint_lines;
-
-				   // cache whether we have to resolve any
-				   // indirect rows generated from resolving
-				   // constrained dofs.
-  bool have_indirect_rows = false;
-  {
-    unsigned int added_rows = 0;
-				   // first add the indices in an unsorted
-				   // way and only keep track of the
-				   // constraints that appear. They are
-				   // resolved in a second step.
-    for (unsigned int i = 0; i<n_local_dofs; ++i)
-      {
-	if (is_constrained(local_dof_indices[i]) == false)
-	  {
-	    my_indices[added_rows].global_row = local_dof_indices[i];
-	    my_indices[added_rows].local_row = i;
-	    ++added_rows;
-	    continue;
-	  }
-
-	constraint_lines.push_back (std::make_pair<unsigned int,
-				    const ConstraintLine *>(i,lines_cache[local_dof_indices[i]]));
-      }
-    Assert (constraint_lines.size() + added_rows == n_local_dofs,
-	    ExcInternalError());
-    my_indices.resize (added_rows);
-  }
-  internals::list_shellsort (my_indices);
-
-				   // now in the second step actually
-				   // resolve the constraints
-  const unsigned int n_constrained_dofs = constraint_lines.size();
-  for (unsigned int i=0; i<n_constrained_dofs; ++i)
-    {
-      const unsigned int local_row = constraint_lines[i].first;
-      const unsigned int global_row = local_dof_indices[local_row];
-      const ConstraintLine * position = constraint_lines[i].second;
-      for (unsigned int q=0; q<position->entries.size(); ++q)
-	{
-	  have_indirect_rows = true;
-	  internals::insert_index(my_indices, position->entries[q].first,
-				  std::make_pair<unsigned int,double>
-				  (local_row, position->entries[q].second));
-	}
-
-      if (keep_constrained_entries == true)
-	{
-	  for (unsigned int j=0; j<n_local_dofs; ++j)
-	    {
-	      if (dof_mask[local_row][j] == true)
-		sparsity_pattern.add(global_row,
-				     local_dof_indices[j]);
-	      if (dof_mask[j][local_row] == true)
-		sparsity_pattern.add(local_dof_indices[j],
-				     global_row);
-	    }
-	}
-      else
-				   // don't keep constrained entries - just
-				   // add the diagonal.
-	sparsity_pattern.add(global_row,global_row);
-    }
-
-
-  const unsigned int n_actual_dofs = my_indices.size();
-
-  std::vector<unsigned int> localized_indices (n_actual_dofs);
-  for (unsigned int i=0; i<n_actual_dofs; ++i)
-    localized_indices[i] = my_indices[i].global_row;
+  internals::GlobalRowsFromLocal global_rows (n_local_dofs);
+  make_sorted_dof_list (dof_mask, local_dof_indices, keep_constrained_entries,
+			sparsity_pattern, global_rows);
+  const unsigned int n_actual_dofs = global_rows.size();
 
 				   // additional construct that also takes
 				   // care of block indices.
   std::vector<unsigned int> block_starts(num_blocks+1, n_actual_dofs);
-  internals::make_block_starts(sparsity_pattern, localized_indices,
+  internals::make_block_starts(sparsity_pattern, global_rows,
 			       block_starts);
 
   std::vector<unsigned int> cols (n_actual_dofs);
@@ -2308,107 +2379,15 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
       const unsigned int next_block = block_starts[block+1];
       for (unsigned int i=block_starts[block]; i<next_block; ++i)
 	{
-	  const unsigned int row = localized_indices[i];
-	  const unsigned int loc_row = my_indices[i].local_row;
-
+	  const unsigned int row = global_rows.global_row(i);
 	  for (unsigned int block_col=0; block_col<num_blocks; ++block_col)
 	    {
-	      const unsigned int next_block_col = block_starts[block_col+1];
+	      const unsigned int begin_block = block_starts[block_col],
+		end_block = block_starts[block_col+1];
 	      std::vector<unsigned int>::iterator col_ptr = cols.begin();
-	      if (have_indirect_rows == false)
-		{
-		  Assert(loc_row < n_local_dofs,
-			 ExcInternalError());
+	      resolve_matrix_row (global_rows, i, begin_block, end_block,
+				  dof_mask, col_ptr);
 
-		  for (unsigned int j=block_starts[block_col]; j < next_block_col; ++j)
-		    {
-		      const unsigned int loc_col = my_indices[j].local_row;
-		      Assert(loc_col < n_local_dofs,
-			     ExcInternalError());
-
-		      if (dof_mask[loc_row][loc_col] == true)
-			*col_ptr++ = localized_indices[j];
-		    }
-		}
-
-				   // have indirect references by
-				   // constraints, resolve them
-	      else
-		{
-		  for (unsigned int j=block_starts[block_col]; j < next_block_col; ++j)
-		    {
-		      const unsigned int loc_col = my_indices[j].local_row;
-
-		      bool add_this = false;
-
-		      if (loc_row != deal_II_numbers::invalid_unsigned_int)
-			{
-			  Assert (loc_row < n_local_dofs,
-				  ExcInternalError());
-
-			  if (loc_col != deal_II_numbers::invalid_unsigned_int)
-			    {
-			      Assert (loc_col < n_local_dofs,
-				      ExcInternalError());
-			      if (dof_mask[loc_row][loc_col] == true)
-				goto add_this_index;
-			    }
-
-				   // account for indirect contributions by
-				   // constraints
-			  if (my_indices[j].constraints != 0)
-			    {
-			      std::vector<std::pair<unsigned int,double> >
-				&constraint_j = *my_indices[j].constraints;
-
-			      for (unsigned int p=0; p<constraint_j.size(); ++p)
-				if (dof_mask[loc_row][constraint_j[p].first] == true)
-				  goto add_this_index;
-			    }
-			}
-
-				   // account for indirect contributions by
-				   // constraints in row, going trough the
-				   // direct and indirect references in the
-				   // given column.
-		      if (my_indices[i].constraints != 0)
-			{
-			  std::vector<std::pair<unsigned int,double> >
-			    &constraint_i = *my_indices[i].constraints;
-			  for (unsigned int q=0; q<constraint_i.size(); ++q)
-			    {
-			      if (loc_col != deal_II_numbers::invalid_unsigned_int)
-				{
-				  Assert (loc_col < n_local_dofs,
-					  ExcInternalError());
-				  if (dof_mask[constraint_i[q].first][loc_col] == true)
-				    goto add_this_index;
-				}
-
-			      if (my_indices[j].constraints != 0)
-				{
-				  std::vector<std::pair<unsigned int,double> >
-				    &constraint_j = *my_indices[j].constraints;
-
-				  for (unsigned int p=0; p<constraint_j.size(); ++p)
-				    if (dof_mask[constraint_i[q].first]
-			                        [constraint_j[p].first] == true)
-				      goto add_this_index;
-				}
-			    }
-			}
-		      if (add_this == true)
-			{
-			add_this_index:
-			  *col_ptr++ = localized_indices[j];
-			}
-		    }
-		}
-
-				   // finally, write all the information
-				   // that accumulated under the given
-				   // process into the global matrix row and
-				   // into the vector
 	      sparsity_pattern.block(block, block_col).add_entries(row,
 								   cols.begin(),
 								   col_ptr,

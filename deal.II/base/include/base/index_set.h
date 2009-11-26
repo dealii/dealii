@@ -304,7 +304,12 @@ class IndexSet
 		     &&
 		     (range_1.end < range_2.end)));
 	  }
-
+	
+	static bool end_compare(const IndexSet::Range & x, const IndexSet::Range & y)
+	  {
+	    return x.end < y.end;
+	  }
+	
 	friend
 	inline bool operator== (const Range &range_1,
 				const Range &range_2)
@@ -353,6 +358,12 @@ class IndexSet
 				      * number than this value.
 				      */
     unsigned int index_space_size;
+
+				     /**
+				      * Actually perform the compress()
+				      * operation.
+				      */
+    void do_compress() const;
 };
 
 
@@ -405,6 +416,19 @@ IndexSet::size () const
 {
   return index_space_size;
 }
+
+
+
+inline
+void
+IndexSet::compress () const
+{
+  if (is_compressed == true)
+    return;
+
+  do_compress();
+}
+
 
 
 inline
@@ -588,17 +612,17 @@ IndexSet::index_within_set (const unsigned int n) const
 	  ExcMessage ("Given number is not an element of this set."));
   Assert (n < size(), ExcIndexRange (n, 0, size()));
 
-//TODO: this could be done more efficiently by using a binary search
-  for (std::vector<Range>::const_iterator p = ranges.begin();
-       p != ranges.end(); ++p)
-    {
-      Assert (n >= p->begin, ExcInternalError());
-      if (n < p->end)
-	return (n-p->begin) + p->nth_index_in_set;
-    }
+  Range r(n, n);
 
-  Assert (false, ExcInternalError());
-  return numbers::invalid_unsigned_int;
+  std::vector<Range>::const_iterator p = std::lower_bound(ranges.begin(),
+							  ranges.end(),
+							  r,
+							  Range::end_compare);
+
+  Assert(p!=ranges.end(), ExcInternalError());
+  Assert(p->begin<=n, ExcInternalError());
+  Assert(n<p->end, ExcInternalError());
+  return (n-p->begin) + p->nth_index_in_set;
 }
 
 

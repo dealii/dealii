@@ -10,6 +10,7 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
+
 #ifndef __deal2__constraint_matrix_h
 #define __deal2__constraint_matrix_h
 
@@ -17,8 +18,8 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/index_set.h>
 #include <base/subscriptor.h>
-#include <base/table.h>
 #include <base/template_constraints.h>
 
 #include <lac/vector.h>
@@ -46,6 +47,11 @@ class BlockCompressedSimpleSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 class BlockIndices;
+
+namespace internals
+{
+  struct GlobalRowsFromLocal;
+}
 
 
 /**
@@ -330,12 +336,22 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Constructor
 				      */
-    ConstraintMatrix ();
+    ConstraintMatrix (const IndexSet & local_constraints = IndexSet());
 
 				     /**
 				      * Copy constructor
 				      */
     ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
+
+				     /**
+				      * Reinit the ConstraintMatrix
+				      * object. This function is only relevant
+				      * in the distributed case, to supply a
+				      * different IndexSet. Otherwise this
+				      * routine is equivalent to calling
+				      * clear().
+				      */
+    void reinit (const IndexSet & local_constraints = IndexSet());
 
 				     /**
 				      * @name Adding constraints
@@ -1473,6 +1489,13 @@ class ConstraintMatrix : public Subscriptor
 				      */
     struct ConstraintLine
     {
+				         /**
+					  * A data type in which we store the list
+					  * of entries that make up the homogenous
+					  * part of a constraint.
+					  */
+	typedef std::vector<std::pair<unsigned int,double> > Entries;
+
 					 /**
 					  * Number of this line. Since only
 					  * very few lines are stored, we
@@ -1492,7 +1515,7 @@ class ConstraintMatrix : public Subscriptor
 					  * applies as what is said for
 					  * ConstraintMatrix@p ::lines.
 					  */
-	std::vector<std::pair<unsigned int,double> > entries;
+	Entries entries;
 
 				         /**
 					  * Value of the inhomogeneity.
@@ -1552,21 +1575,23 @@ class ConstraintMatrix : public Subscriptor
     std::vector<ConstraintLine> lines;
 
 				     /**
-				      * A list of pointers that contains the
-				      * address of the ConstraintLine of a
-				      * constrained degree of freedom, or NULL
-				      * if the degree of freedom is not
-				      * constrained. The NULL return value
-				      * returns thus whether there is a
+				      * A list of unsigned integers that
+				      * contains the position of the
+				      * ConstraintLine of a constrained degree
+				      * of freedom, or @p
+				      * numbers::invalid_unsigned_int if the
+				      * degree of freedom is not
+				      * constrained. The @p invalid_unsigned
+				      * int return value returns thus whether
+				      * there is a constraint line for a given
+				      * degree of freedom index. Note that
+				      * this class has no notion of how many
+				      * degrees of freedom there really are,
+				      * so if we check whether there is a
 				      * constraint line for a given degree of
-				      * freedom index. Note that this class
-				      * has no notion of how many degrees of
-				      * freedom there really are, so if we
-				      * check whether there is a constraint
-				      * line for a given degree of freedom,
-				      * then this vector may actually be
-				      * shorter than the index of the DoF we
-				      * check for.
+				      * freedom, then this vector may actually
+				      * be shorter than the index of the DoF
+				      * we check for.
 				      *
 				      * This field exists since when adding a
 				      * new constraint line we have to figure
@@ -1606,13 +1631,30 @@ class ConstraintMatrix : public Subscriptor
 				      * contributions into vectors and
 				      * matrices.
 				      */
-    std::vector<const ConstraintLine*> lines_cache;
+    std::vector<unsigned int> lines_cache;
+
+				     /**
+				      * This IndexSet is used to limit the
+				      * lines to save in the ContraintMatrix
+				      * to a subset. This is necessary,
+				      * because the lines_cache vector would
+				      * become too big in a distributed
+				      * calculation.
+				      */
+    IndexSet local_lines;
 
 				     /**
 				      * Store whether the arrays are sorted.
 				      * If so, no new entries can be added.
 				      */
     bool sorted;
+
+				     /**
+				      * Internal function to calculate the
+				      * index of line @p line in the vector
+				      * lines_cache using local_lines.
+				      */
+    unsigned int calculate_line_index(unsigned int line) const;
 
 				     /**
 				      * Return @p true if the weight of an
@@ -1684,6 +1726,53 @@ class ConstraintMatrix : public Subscriptor
 				 const Table<2,bool>             &dof_mask,
 				 internal::bool2type<true>) const;
 
+				     /**
+				      * Internal helper function for
+				      * distribute_local_to_global function.
+				      */
+    template <typename MatrixType>
+    void
+    make_sorted_dof_list (const FullMatrix<double>        &local_matrix,
+			  const std::vector<unsigned int> &local_dof_indices,
+			  MatrixType                      &global_matrix,
+			  internals::GlobalRowsFromLocal  &global_rows,
+			  std::vector<unsigned int>       &constrained_lines) const;
+
+				     /**
+				      * Internal helper function for
+				      * add_entries_local_to_global function.
+				      */
+    template <typename SparsityType>
+    void
+    make_sorted_dof_list (const std::vector<unsigned int> &local_dof_indices,
+			  const bool                       keep_constrained_entries,
+			  SparsityType                    &sparsity_pattern,
+			  std::vector<unsigned int>       &active_dofs) const;
+
+				     /**
+				      * Internal helper function for
+				      * add_entries_local_to_global function.
+				      */
+    template <typename SparsityType>
+    void
+    make_sorted_dof_list (const Table<2,bool>             &dof_mask,
+			  const std::vector<unsigned int> &local_dof_indices,
+			  const bool                       keep_constrained_entries,
+			  SparsityType                    &sparsity_pattern,
+			  internals::GlobalRowsFromLocal  &global_rows) const;
+
+				     /**
+				      * Internal helper function for
+				      * distribute_local_to_global function.
+				      */
+    double
+    resolve_vector_entry (const unsigned int                    i,
+			  const internals::GlobalRowsFromLocal &global_rows,
+			  const Vector<double>                 &local_vector,
+			  const std::vector<unsigned int>      &local_dof_indices,
+			  const FullMatrix<double>             &local_matrix,
+			  const std::vector<unsigned int>      &constrained_lines) const;
+
 #ifdef DEAL_II_USE_TRILINOS
 //TODO: Make use of the following member thread safe
 				      /**
@@ -1699,21 +1788,23 @@ class ConstraintMatrix : public Subscriptor
 /* ---------------- template and inline functions ----------------- */
 
 inline
-ConstraintMatrix::ConstraintMatrix ()
-		:
-		lines (),
-		sorted (false)
+ConstraintMatrix::ConstraintMatrix (const IndexSet &local_constraints)
+		 :
+		 lines (),
+		 local_lines (local_constraints),
+		 sorted (false)
 {}
 
 
 
 inline
 ConstraintMatrix::ConstraintMatrix (const ConstraintMatrix &constraint_matrix)
-		:
-		Subscriptor (),
-		lines (constraint_matrix.lines),
-		lines_cache (constraint_matrix.lines_cache),
-		sorted (constraint_matrix.sorted)
+		 :
+		 Subscriptor (),
+		 lines (constraint_matrix.lines),
+		 lines_cache (constraint_matrix.lines_cache),
+		 local_lines (constraint_matrix.local_lines),
+		 sorted (constraint_matrix.sorted)
 #ifdef DEAL_II_USE_TRILINOS
 		,vec_distribute ()
 #endif
@@ -1726,40 +1817,38 @@ ConstraintMatrix::add_line (const unsigned int line)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
 
-
+				   // the following can happen when we
+				   // compute with distributed meshes
+				   // and dof handlers and we
+				   // constrain a degree of freedom
+				   // whose number we don't have
+				   // locally. if we don't abort here
+				   // the program will try to allocate
+				   // several terabytes of memory to
+				   // resize the various arrays below
+				   // :-)
+  Assert (line != numbers::invalid_unsigned_int,
+	  ExcInternalError());
+  const unsigned int line_index = calculate_line_index (line);
 
 				   // check whether line already exists; it
 				   // may, in which case we can just quit
-  if ((line < lines_cache.size())
-      &&
-      (lines_cache[line] != 0))
-    {
-      Assert (lines_cache[line]->line == line, ExcInternalError());
-      return;
-    }
+  if (is_constrained(line))
+    return;
 
 				   // if necessary enlarge vector of
 				   // existing entries for cache
-  if (line >= lines_cache.size())
-    lines_cache.resize (line+1,0);
-				   // enlarge lines vector if necessary.
-				   // need to reset the pointers to the
-				   // ConstraintLine entries in that case,
-				   // since new memory will be allocated
-  if (lines.size() == lines.capacity())
-    {
-      lines.reserve (2*lines.size()+8);
-      std::vector<ConstraintLine>::const_iterator it = lines.begin();
-      for ( ; it != lines.end(); ++it)
-	lines_cache[it->line] = &*it;
-    }
+  if (line_index >= lines_cache.size())
+    lines_cache.resize (std::max(2*static_cast<unsigned int>(lines_cache.size()),
+				 line_index+1),
+			numbers::invalid_unsigned_int);
 
 				   // push a new line to the end of the
 				   // list
   lines.push_back (ConstraintLine());
   lines.back().line = line;
   lines.back().inhomogeneity = 0.;
-  lines_cache[line] = &lines.back();
+  lines_cache[line_index] = lines.size()-1;
 }
 
 
@@ -1782,10 +1871,11 @@ ConstraintMatrix::add_entry (const unsigned int line,
 				   // in any case: exit the function if an
 				   // entry for this column already exists,
 				   // since we don't want to enter it twice
-  ConstraintLine* line_ptr = const_cast<ConstraintLine*>(lines_cache[line]);
-  Assert (line_ptr != 0, ExcInternalError());
+  Assert (lines_cache[calculate_line_index(line)] != numbers::invalid_unsigned_int,
+	  ExcInternalError());
+  ConstraintLine* line_ptr = &lines[lines_cache[calculate_line_index(line)]];
   Assert (line_ptr->line == line, ExcInternalError());
-  for (std::vector<std::pair<unsigned int,double> >::const_iterator
+  for (ConstraintLine::Entries::const_iterator
          p=line_ptr->entries.begin();
        p != line_ptr->entries.end(); ++p)
     if (p->first == column)
@@ -1805,7 +1895,7 @@ void
 ConstraintMatrix::set_inhomogeneity (const unsigned int line,
 				     const double       value)
 {
-  ConstraintLine* line_ptr = const_cast<ConstraintLine*>(lines_cache[line]);
+  ConstraintLine* line_ptr = &lines[lines_cache[calculate_line_index(line)]];
   line_ptr->inhomogeneity = value;
 }
 
@@ -1815,9 +1905,10 @@ inline
 bool
 ConstraintMatrix::is_constrained (const unsigned int index) const
 {
-  return ((index < lines_cache.size())
+  const unsigned int line_index = calculate_line_index(index);
+  return ((line_index < lines_cache.size())
           &&
-          (lines_cache[index] != 0));
+          (lines_cache[line_index] != numbers::invalid_unsigned_int));
 }
 
 
@@ -1827,7 +1918,7 @@ bool
 ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) const
 {
   return (is_constrained(index) &&
-	  lines_cache[index]->inhomogeneity != 0);
+	  lines[lines_cache[calculate_line_index(index)]].inhomogeneity != 0);
 }
 
 
@@ -1865,14 +1956,14 @@ void ConstraintMatrix::
 	global_vector(*local_indices_begin) += *local_vector_begin;
       else
 	{
-	  const ConstraintLine* position =
-	    lines_cache[*local_indices_begin];
-	  for (unsigned int j=0; j<position->entries.size(); ++j)
+	  const ConstraintLine& position =
+	    lines[lines_cache[calculate_line_index(*local_indices_begin)]];
+	  for (unsigned int j=0; j<position.entries.size(); ++j)
 	    {
-	      Assert (is_constrained(position->entries[j].first) == false,
+	      Assert (is_constrained(position.entries[j].first) == false,
 		      ExcMessage ("Tried to distribute to a fixed dof."));
-	      global_vector(position->entries[j].first)
-		+= *local_vector_begin * position->entries[j].second;
+	      global_vector(position.entries[j].first)
+		+= *local_vector_begin * position.entries[j].second;
 	    }
 	}
     }
@@ -1896,20 +1987,35 @@ void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
 	*local_vector_begin = global_vector(*local_indices_begin);
       else
 	{
-	  const ConstraintLine* position =
-	    lines_cache[*local_indices_begin];
-	  typename VectorType::value_type value = position->inhomogeneity;
-	  for (unsigned int j=0; j<position->entries.size(); ++j)
+	  const ConstraintLine & position =
+	    lines[lines_cache[calculate_line_index(*local_indices_begin)]];
+	  typename VectorType::value_type value = position.inhomogeneity;
+	  for (unsigned int j=0; j<position.entries.size(); ++j)
 	    {
-	      Assert (is_constrained(position->entries[j].first) == false,
+	      Assert (is_constrained(position.entries[j].first) == false,
 		      ExcMessage ("Tried to distribute to a fixed dof."));
-	      value += (global_vector(position->entries[j].first) *
-			position->entries[j].second);
+	      value += (global_vector(position.entries[j].first) *
+			position.entries[j].second);
 	    }
 	  *local_vector_begin = value;
 	}
     }
 }
+
+
+
+inline unsigned int
+ConstraintMatrix::calculate_line_index(unsigned int line) const
+{
+				   //IndexSet is unused (serial case)
+  if (!local_lines.size())
+    return line;
+
+  Assert(local_lines.is_element(line), ExcInternalError());
+
+  return local_lines.index_within_set(line);
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -10,6 +10,7 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
+
 #ifndef __deal2__sparse_matrix_templates_h
 #define __deal2__sparse_matrix_templates_h
 

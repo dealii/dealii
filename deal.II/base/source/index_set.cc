@@ -25,10 +25,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 void
-IndexSet::compress () const
+IndexSet::do_compress () const
 {
-  if (is_compressed == true)
-    return;
 				   // see if any of the
 				   // contiguous ranges can be
 				   // merged. since they are sorted by
