@@ -229,7 +229,7 @@ dnl                        Fortran 77 compilers
 dnl -------------------------------------------------------------
 
 AC_MSG_RESULT()
-AC_MSG_RESULT(----------------- configuring F77 compilers -----------------)
+AC_MSG_RESULT(---------------- configuring F77 compilers ------------------)
 
 dnl Find path to a Fortran 77 compiler. By default try to find a
 dnl vendor compiler which is usually named `f77', and only if that could
@@ -267,7 +267,7 @@ dnl                         Shared libraries
 dnl --------------------------------------------------------------
 
 AC_MSG_RESULT()
-AC_MSG_RESULT(-------------- configuring shared/static libs ---------------)
+AC_MSG_RESULT(---------------- configuring shared/static libs -------------)
 
 AC_ARG_ENABLE(shared,
 [  --enable-shared         Set compiler flags to generate shared libraries],
@@ -348,7 +348,7 @@ dnl                       Optional features
 dnl --------------------------------------------------------------
 
 AC_MSG_RESULT()
-AC_MSG_RESULT(-------------- configuring optional features ---------------)
+AC_MSG_RESULT(---------------- configuring optional features --------------)
 
 AC_ARG_ENABLE(parser,
               AS_HELP_STRING([--enable-parser],[While switched on by default, this option allows to switch off support for the function parser in the contrib directory.]),
@@ -579,7 +579,7 @@ dnl       Optimizations and consistency of compiler flags
 dnl -------------------------------------------------------------
 
 AC_MSG_RESULT()
-AC_MSG_RESULT(------------------ checking compiler flags ------------------)
+AC_MSG_RESULT(---------------- checking compiler flags --------------------)
 
 dnl Possibly add some flags is optimizations are requested
 DEAL_II_CHECK_CPU_OPTIMIZATIONS
@@ -625,7 +625,7 @@ dnl                          Output results
 dnl -------------------------------------------------------------
 
 AC_MSG_RESULT()
-AC_MSG_RESULT(--------------------- generating output ---------------------)
+AC_MSG_RESULT(---------------- generating output --------------------------)
 
 dnl First set the templates for config.h
 AH_TOP(
