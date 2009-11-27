@@ -1732,11 +1732,10 @@ class ConstraintMatrix : public Subscriptor
 				      */
     template <typename MatrixType>
     void
-    make_sorted_dof_list (const FullMatrix<double>        &local_matrix,
+    make_sorted_row_list (const FullMatrix<double>        &local_matrix,
 			  const std::vector<unsigned int> &local_dof_indices,
 			  MatrixType                      &global_matrix,
-			  internals::GlobalRowsFromLocal  &global_rows,
-			  std::vector<unsigned int>       &constrained_lines) const;
+			  internals::GlobalRowsFromLocal  &global_rows) const;
 
 				     /**
 				      * Internal helper function for
@@ -1744,7 +1743,7 @@ class ConstraintMatrix : public Subscriptor
 				      */
     template <typename SparsityType>
     void
-    make_sorted_dof_list (const std::vector<unsigned int> &local_dof_indices,
+    make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
 			  const bool                       keep_constrained_entries,
 			  SparsityType                    &sparsity_pattern,
 			  std::vector<unsigned int>       &active_dofs) const;
@@ -1755,7 +1754,7 @@ class ConstraintMatrix : public Subscriptor
 				      */
     template <typename SparsityType>
     void
-    make_sorted_dof_list (const Table<2,bool>             &dof_mask,
+    make_sorted_row_list (const Table<2,bool>             &dof_mask,
 			  const std::vector<unsigned int> &local_dof_indices,
 			  const bool                       keep_constrained_entries,
 			  SparsityType                    &sparsity_pattern,
@@ -1770,8 +1769,7 @@ class ConstraintMatrix : public Subscriptor
 			  const internals::GlobalRowsFromLocal &global_rows,
 			  const Vector<double>                 &local_vector,
 			  const std::vector<unsigned int>      &local_dof_indices,
-			  const FullMatrix<double>             &local_matrix,
-			  const std::vector<unsigned int>      &constrained_lines) const;
+			  const FullMatrix<double>             &local_matrix) const;
 
 #ifdef DEAL_II_USE_TRILINOS
 //TODO: Make use of the following member thread safe
