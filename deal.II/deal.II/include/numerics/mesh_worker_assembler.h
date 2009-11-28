@@ -579,8 +579,16 @@ namespace MeshWorker
     void assemble(MATRIX& G,
 		  const FullMatrix<double>& M,
 		  const std::vector<unsigned int>& i1,
-		  const std::vector<unsigned int>& i2,
-		  const bool transpose = false);
+		  const std::vector<unsigned int>& i2);
+	
+					 /**
+					  * Assemble a single matrix
+					  * into a global matrix.
+					  */
+    void assemble_transpose(MATRIX& G,
+			    const FullMatrix<double>& M,
+			    const std::vector<unsigned int>& i1,
+			    const std::vector<unsigned int>& i2);
 	
 					 /**
 					  * The global matrix being
@@ -1178,11 +1186,11 @@ namespace MeshWorker
 
     template <class MATRIX>
     inline void
-    MGMatrixSimple<MATRIX>::assemble(MATRIX& G,
-				     const FullMatrix<double>& M,
-				     const std::vector<unsigned int>& i1,
-				     const std::vector<unsigned int>& i2,
-				     bool transpose)
+    MGMatrixSimple<MATRIX>::assemble(
+      MATRIX& G,
+      const FullMatrix<double>& M,
+      const std::vector<unsigned int>& i1,
+      const std::vector<unsigned int>& i2)
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
@@ -1190,12 +1198,25 @@ namespace MeshWorker
       for (unsigned int j=0; j<i1.size(); ++j)
 	for (unsigned int k=0; k<i2.size(); ++k)
 	  if (std::fabs(M(j,k)) >= threshold)
-	    {
-	      if (transpose)
-		G.add(i1[j], i2[k], M(j,k));
-	      else
-		G.add(i1[j], i2[k], M(j,k));
-	    }
+	    G.add(i1[j], i2[k], M(j,k));
+    }
+    
+    
+    template <class MATRIX>
+    inline void
+    MGMatrixSimple<MATRIX>::assemble_transpose(
+      MATRIX& G,
+      const FullMatrix<double>& M,
+      const std::vector<unsigned int>& i1,
+      const std::vector<unsigned int>& i2)
+    {
+      AssertDimension(M.n(), i1.size());
+      AssertDimension(M.m(), i2.size());
+      
+      for (unsigned int j=0; j<i1.size(); ++j)
+	for (unsigned int k=0; k<i2.size(); ++k)
+	  if (std::fabs(M(k,j)) >= threshold)
+	    G.add(i1[j], i2[k], M(k,j));
     }
     
     
@@ -1232,7 +1253,7 @@ namespace MeshWorker
 					   // which is done by
 					   // the coarser cell
 	  assemble((*matrix)[level1], info1.M1[0].matrix, info1.indices, info1.indices);
-	  assemble((*flux_up)[level1],info1.M2[0].matrix, info1.indices, info2.indices, true);
+	  assemble_transpose((*flux_up)[level1],info1.M2[0].matrix, info2.indices, info1.indices);
 	  assemble((*flux_down)[level1], info2.M2[0].matrix, info2.indices, info1.indices);
 	}
     }

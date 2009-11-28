@@ -28,6 +28,7 @@
 				 // Include files for FiniteElement
 				 // classes and DoFHandler.
 #include <fe/fe_q.h>
+#include <fe/fe_dgp.h>
 #include <fe/fe_dgq.h>
 #include <dofs/dof_tools.h>
 #include <multigrid/mg_dof_handler.h>
@@ -146,9 +147,16 @@ void MatrixIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::Fa
   FullMatrix<double>& matrix_v2u2 = info2.M1[0].matrix;
   
   const unsigned int deg = fe1.get_fe().tensor_degree();
-  const double penalty1 = deg * (deg+1) * info1.face->measure() / info1.cell->measure();
-  const double penalty2 = deg * (deg+1) * info2.face->measure() / info2.cell->measure();
-  const double penalty = penalty1 + penalty2;
+  double penalty1 = deg * (deg+1) * info1.face->measure() / info1.cell->measure();
+  double penalty2 = deg * (deg+1) * info2.face->measure() / info2.cell->measure();
+  if (info1.cell->has_children() ^ info2.cell->has_children())
+    {
+      Assert (info1.face == info2.face, ExcInternalError());
+      Assert (info1.face->has_children(), ExcInternalError());
+      Assert (info1.cell->has_children(), ExcInternalError());
+      penalty1 *= 2;
+    }
+const double penalty = penalty1 + penalty2;
   
   for (unsigned k=0;k<fe1.n_quadrature_points;++k)
     for (unsigned int i=0; i<fe1.dofs_per_cell; ++i)
@@ -236,10 +244,11 @@ class Step39
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
     
-    Triangulation<dim> triangulation;
-    const MappingQ1<dim> mapping;
+    Triangulation<dim>        triangulation;
+    const MappingQ1<dim>      mapping;
     const FiniteElement<dim>& fe;
-    MGDoFHandler<dim>      dof_handler;
+    MGDoFHandler<dim>         mg_dof_handler;
+    DoFHandler<dim>&          dof_handler;
 
     SparsityPattern      sparsity;
     SparseMatrix<double> matrix;
@@ -258,9 +267,12 @@ template <int dim>
 Step39<dim>::Step39(const FiniteElement<dim>& fe)
 		:
 		fe(fe),
-		dof_handler(triangulation)
+		mg_dof_handler(triangulation),
+		dof_handler(mg_dof_handler)
 {
   GridGenerator::hyper_L(triangulation, -1, 1);
+  triangulation.begin()->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
 }
 
 
@@ -272,10 +284,8 @@ Step39<dim>::setup_system()
   unsigned int n_dofs = dof_handler.n_dofs();
   
   CompressedSparsityPattern c_sparsity(n_dofs);
-  const DoFHandler<dim>& dof = dof_handler;
-  DoFTools::make_flux_sparsity_pattern(dof, c_sparsity);
+  DoFTools::make_flux_sparsity_pattern(dof_handler, c_sparsity);
   sparsity.copy_from(c_sparsity);
-  
   matrix.reinit(sparsity);
   
   solution.reinit(n_dofs);
@@ -296,14 +306,14 @@ Step39<dim>::setup_system()
   for (unsigned int level=mg_sparsity.get_minlevel();
        level<=mg_sparsity.get_maxlevel();++level)
     {
-      CompressedSparsityPattern c_sparsity(dof_handler.n_dofs(level));
+      CompressedSparsityPattern c_sparsity(mg_dof_handler.n_dofs(level));
       CompressedSparsityPattern ci_sparsity;
       if (level>0)
-	ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
+	ci_sparsity.reinit(mg_dof_handler.n_dofs(level-1), mg_dof_handler.n_dofs(level));
       
-      MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
+      MGTools::make_flux_sparsity_pattern(mg_dof_handler, c_sparsity, level);
       if (level>0)
-	MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
+	MGTools::make_flux_sparsity_pattern_edge(mg_dof_handler, ci_sparsity, level);
       
       mg_sparsity[level].copy_from(c_sparsity);
       mg_matrix[level].reinit(mg_sparsity[level]);
@@ -333,6 +343,8 @@ Step39<dim>::assemble_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
   info_box.initialize(integrator, fe, mapping);
   MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
+  
+//  matrix.print_formatted(std::cout, 2, false, 5, "*");
 }
 
 
@@ -343,15 +355,29 @@ Step39<dim>::assemble_mg_matrix()
   const MatrixIntegrator<dim> local;
   MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> >, MatrixIntegrator<dim> >
     integrator(local);
-  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
+  const unsigned int n_gauss_points = mg_dof_handler.get_fe().tensor_degree()+1;
   integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
   UpdateFlags update_flags = update_values | update_gradients;
   integrator.add_update_flags(update_flags, true, true, true, true);
 
   integrator.initialize(mg_matrix);
-  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
+  integrator.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
+  MeshWorker::IntegrationInfoBox<dim> info_box(mg_dof_handler);
   info_box.initialize(integrator, fe, mapping);
-  MeshWorker::integration_loop(dof_handler.begin(), dof_handler.end(), info_box, integrator);
+  MeshWorker::integration_loop(mg_dof_handler.begin(), mg_dof_handler.end(), info_box, integrator);
+
+//   for (unsigned int l=0;l<triangulation.n_levels();++l)
+//     {
+//       std::cout << "level matrix " << l << std::endl;
+//       mg_matrix[l].print_formatted(std::cout, 2, false, 5, "*");
+//     }
+//   for (unsigned int l=1;l<triangulation.n_levels();++l)
+//     {
+//       std::cout << "up matrix " << l << std::endl;
+//       mg_matrix_dg_up[l].print_formatted(std::cout, 2, false, 5, "*");
+//       std::cout << "down matrix " << l << std::endl;
+//       mg_matrix_dg_down[l].print_formatted(std::cout, 2, false, 5, "*");
+//     }
 }
 
 
@@ -388,7 +414,7 @@ Step39<dim>::solve()
 
   GrowingVectorMemory<Vector<double> > mem;
   MGTransferPrebuilt<Vector<double> > mg_transfer;
-  mg_transfer.build_matrices(dof_handler);
+  mg_transfer.build_matrices(mg_dof_handler);
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from (mg_matrix[0]);
   MGCoarseGridHouseholder<double, Vector<double> > mg_coarse;
@@ -423,7 +449,7 @@ Step39<dim>::solve()
 				   // Now, we are ready to set up the
 				   // V-cycle operator and the
 				   // multilevel preconditioner.
-  Multigrid<Vector<double> > mg(dof_handler, mgmatrix,
+  Multigrid<Vector<double> > mg(mg_dof_handler, mgmatrix,
 				mg_coarse, mg_transfer,
 				mg_smoother, mg_smoother);
   mg.set_edge_matrices(mgdown, mgup);
@@ -432,7 +458,7 @@ Step39<dim>::solve()
   
   PreconditionMG<dim, Vector<double>,
     MGTransferPrebuilt<Vector<double> > >
-    preconditioner(dof_handler, mg, mg_transfer);
+    preconditioner(mg_dof_handler, mg, mg_transfer);
   
   cg.solve(matrix, solution, right_hand_side, preconditioner);
 }
@@ -480,6 +506,7 @@ template <int dim>
 void
 Step39<dim>::run(unsigned int n_steps)
 {
+  deallog << "Element: " << fe.get_name() << std::endl;
   for (unsigned int s=0;s<n_steps;++s)
     {
       deallog << "Step " << s << std::endl;
@@ -491,9 +518,9 @@ Step39<dim>::run(unsigned int n_steps)
 	      << triangulation.n_levels() << " levels" << std::endl;
       
       setup_system();
-      deallog << "DoFHandler " << dof_handler.n_dofs() << " dofs, levels";
+      deallog << "DoFHandler " << dof_handler.n_dofs() << " dofs, level dofs";
       for (unsigned int l=0;l<triangulation.n_levels();++l)
-	deallog << ' ' << dof_handler.n_dofs(l);
+	deallog << ' ' << mg_dof_handler.n_dofs(l);
       deallog << std::endl;
 
       deallog << "Assemble matrix" << std::endl;
@@ -502,8 +529,9 @@ Step39<dim>::run(unsigned int n_steps)
       assemble_mg_matrix();
       deallog << "Assemble right hand side" << std::endl;
       assemble_right_hand_side();
-      
+      deallog << "Solve" << std::endl;
       solve();
+      deallog << "Error" << std::endl;
       error();
       output_results(s);
     }
@@ -512,7 +540,7 @@ Step39<dim>::run(unsigned int n_steps)
 
 int main()
 {
-  FE_DGQ<2> dgq1(1);
-  Step39<2> test1(dgq1);
+  FE_DGQ<2> fe1(1);
+  Step39<2> test1(fe1);
   test1.run(7);
 }
