@@ -1654,7 +1654,7 @@ class ConstraintMatrix : public Subscriptor
 				      * index of line @p line in the vector
 				      * lines_cache using local_lines.
 				      */
-    unsigned int calculate_line_index(unsigned int line) const;
+    unsigned int calculate_line_index (const unsigned int line) const;
 
 				     /**
 				      * Return @p true if the weight of an
@@ -2003,7 +2003,7 @@ void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
 
 
 inline unsigned int
-ConstraintMatrix::calculate_line_index(unsigned int line) const
+ConstraintMatrix::calculate_line_index (const unsigned int line) const
 {
 				   //IndexSet is unused (serial case)
   if (!local_lines.size())
