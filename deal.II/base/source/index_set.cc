@@ -168,7 +168,9 @@ IndexSet::get_view (const unsigned int begin,
 
   while (r1 != ranges.end())
     {
-      if (r1->end > begin || r1->begin < end)
+      if ((r1->end > begin)
+	  &&
+	  (r1->begin < end))
 	{
 	  result.add_range (std::max(r1->begin, begin)-begin,
 			    std::min(r1->end, end)-begin);
