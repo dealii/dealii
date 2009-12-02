@@ -122,6 +122,12 @@ namespace MeshWorker
       template <class STREAM, typename DATA>
       void print (STREAM& s, const NamedData<DATA>& v) const;
       
+				       /**
+					* Print the number of selections to the stream.
+					*/
+      template <class STREAM>
+      void print (STREAM& s) const;
+      
     protected:
 				       /**
 					* Selection of the vectors
@@ -238,9 +244,11 @@ namespace MeshWorker
 	unsigned int size) const;
   };
 
+  
 /**
  * Based on VectorSelector, this is the class that implements the
- * function VectorDataBase::fill() for a certain type of vector.
+ * function VectorDataBase::fill() for a certain type of vector, using
+ * NamedData to identify vectors by name.
  *
  * @author Guido Kanschat, 2009
  */
@@ -250,6 +258,7 @@ namespace MeshWorker
   {
     public:
       void initialize(const NamedData<VECTOR*>&);
+      void initialize(const VECTOR*, const std::string& name);
       
       virtual void fill(
 	std::vector<std::vector<std::vector<double> > >& values,
@@ -262,8 +271,9 @@ namespace MeshWorker
 	unsigned int start,
 	unsigned int size) const;
     private:
-      NamedData<SmartPointer<VECTOR,VectorData<VECTOR,dim,spacedim> > > data;
+      NamedData<SmartPointer<const VECTOR,VectorData<VECTOR,dim,spacedim> > > data;
   };
+
   
 //----------------------------------------------------------------------//
 
@@ -356,6 +366,17 @@ namespace MeshWorker
     return hessian_selection(i);
   }
   
+
+  template <class STREAM>
+  inline void
+  VectorSelector::print(STREAM& s) const
+  {
+    s << "values: " << n_values()
+      << " gradients: " << n_gradients()
+      << " hessians: " << n_hessians()
+      << std::endl;
+  }
+
 
   template <class STREAM, typename DATA>
   inline void

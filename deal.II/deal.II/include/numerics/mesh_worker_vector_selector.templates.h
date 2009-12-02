@@ -49,6 +49,16 @@ namespace MeshWorker
   
   template <class VECTOR, int dim, int spacedim>
   void
+  VectorData<VECTOR, dim, spacedim>::initialize(const VECTOR* v, const std::string& name)
+  {
+    SmartPointer<const VECTOR,VectorData<VECTOR, dim, spacedim> > p = v;
+    data.add(p, name);
+    VectorSelector::initialize(data);
+  }
+  
+  
+  template <class VECTOR, int dim, int spacedim>
+  void
   VectorData<VECTOR, dim, spacedim>::fill(
 	std::vector<std::vector<std::vector<double> > >& values,
 	std::vector<std::vector<std::vector<Tensor<1,dim> > > >& gradients,

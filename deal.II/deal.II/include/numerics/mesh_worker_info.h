@@ -47,7 +47,8 @@ namespace MeshWorker
 	MatrixBlock<FullMatrix<number> >& M,
 	unsigned int row, unsigned int col);
     public:
-      void initialize_vectors(const unsigned int n_vectors);
+      void initialize_numbers(const unsigned int n);
+      void initialize_vectors(const unsigned int n);
 				       /**
 					* Allocate @p n local
 					* matrices. Additionally,
@@ -542,19 +543,20 @@ namespace MeshWorker
 					*/
       template <typename T>
       IntegrationInfoBox(const T&);
-	
+
+      template <class VECTOR>
+      void initialize_data(const VECTOR*, const std::string& name,
+			   bool values, bool gradients, bool hessians);
+      
       template <class WORKER>
       void initialize(const WORKER&,
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping);
 	
-      template <class WORKER, class VECTOR,class P>
-      void initialize(const WORKER&,
-		      const FiniteElement<dim, spacedim>& el,
-		      const Mapping<dim, spacedim>& mapping,
-		      const NamedData<SmartPointer<VECTOR,P> >& data);
 //      private:
-	
+
+      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > data;
+      
       CellInfo cell_info;
       FaceInfo bdry_info;
       FaceInfo face_info;
@@ -565,6 +567,14 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
+  template <typename number>
+  inline void
+  LocalResults<number>::initialize_numbers(unsigned int n)
+  {
+    J.resize(n);
+  }
+
+    
   template <typename number>
   inline void
   LocalResults<number>::initialize_vectors(unsigned int n)
@@ -623,6 +633,8 @@ namespace MeshWorker
   inline void
   LocalResults<number>::reinit(const BlockIndices& bi)
   {
+    for (unsigned int i=0;i<J.size();++i)
+      J[i] = 0.;
     for (unsigned int i=0;i<R.size();++i)
       R[i].reinit(bi);
     for (unsigned int i=0;i<M1.size();++i)
@@ -818,7 +830,29 @@ namespace MeshWorker
 		  subface_info(t),
 		  neighbor_info(t)
   {}
+  
+  
+  template <int dim, int sdim>
+  template <typename VECTOR>
+  void
+  IntegrationInfoBox<dim,sdim>::initialize_data(
+    const VECTOR* v, const std::string& name,
+    bool values, bool gradients, bool hessians)
+  {
+    boost::shared_ptr<VectorData<VECTOR, dim, sdim> >
+      p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> ());
+    p->add(name, values, gradients, hessians);
+    p->initialize(v, name);
+    data = p;
     
+    cell_info.initialize_data(data);
+    bdry_info.initialize_data(data);
+    face_info.initialize_data(data);
+    subface_info.initialize_data(data);
+    neighbor_info.initialize_data(data);
+  }
+
+  
   template <int dim, int sdim>
   template <class WORKER>
   void
@@ -836,33 +870,14 @@ namespace MeshWorker
     cell_info.initialize<FEValues<dim,sdim> >(el, mapping, integrator.cell_quadrature,
 			 integrator.cell_flags);
     bdry_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.bdry_quadrature,
-			 integrator.face_flags);
+			 integrator.bdry_flags);
     face_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 			 integrator.face_flags);
     subface_info.initialize<FESubfaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 			    integrator.face_flags);
     neighbor_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 			     integrator.ngbr_flags);
-  }
-
-    
-  template <int dim, int sdim>
-  template <class WORKER, class VECTOR, class P>
-  void
-  IntegrationInfoBox<dim,sdim>::initialize(
-    const WORKER& integrator,
-    const FiniteElement<dim,sdim>& el,
-    const Mapping<dim,sdim>& mapping,
-    const NamedData<SmartPointer<VECTOR,P> >& data)
-  {
-    cell_info.initialize_data(data);
-    bdry_info.initialize_data(data);
-    face_info.initialize_data(data);
-    subface_info.initialize_data(data);
-    neighbor_info.initialize_data(data);
-
-    initialize(integrator, el, mapping);
-  }
+  }    
 }
 
 

@@ -106,7 +106,7 @@ namespace MeshWorker
 					 // For all components
 	for (unsigned int j=0;j<values[i].size();++j)
 	  {
-	    values[i][j].resize(el.n_components());
+	    values[i][j].resize(quadrature.size());
 	  }
       }
     
@@ -119,7 +119,7 @@ namespace MeshWorker
 					 // For all components
 	for (unsigned int j=0;j<gradients[i].size();++j)
 	  {
-	    gradients[i][j].resize(el.n_components());
+	    gradients[i][j].resize(quadrature.size());
 	  }
       }
     
@@ -132,7 +132,7 @@ namespace MeshWorker
 					 // For all components
 	for (unsigned int j=0;j<hessians[i].size();++j)
 	  {
-	    hessians[i][j].resize(el.n_components());
+	    hessians[i][j].resize(quadrature.size());
 	  }
       }
   }

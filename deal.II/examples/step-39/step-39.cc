@@ -20,10 +20,12 @@
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <lac/precondition_block.h>
+#include <lac/block_vector.h>
 
 				 // Include files for setting up the
 				 // mesh
 #include <grid/grid_generator.h>
+#include <grid/grid_refinement.h>
 
 				 // Include files for FiniteElement
 				 // classes and DoFHandler.
@@ -102,6 +104,13 @@ class MatrixIntegrator : public Subscriptor
 };
 
 
+				 // On each cell, we integrate the
+				 // Dirichlet form. All local
+				 // integrations consist of nested
+				 // loops, first over all quadrature
+				 // points and the iner loops over the
+				 // degrees of freedom associated
+				 // with the shape functions.
 template <int dim>
 void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const
 {
@@ -115,7 +124,8 @@ void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::Ce
 			     * fe.JxW(k);
 }
 
-
+				 // On boundary faces, we use the
+				 // Nitsche boundary condition
 template <int dim>
 void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const
 {
@@ -153,7 +163,7 @@ void MatrixIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::Fa
     {
       Assert (info1.face == info2.face, ExcInternalError());
       Assert (info1.face->has_children(), ExcInternalError());
-      Assert (info1.cell->has_children(), ExcInternalError());
+//      Assert (info1.cell->has_children(), ExcInternalError());
       penalty1 *= 2;
     }
 const double penalty = penalty1 + penalty2;
@@ -224,6 +234,77 @@ void RHSIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceI
 {}
 
 
+template <int dim>
+class Estimator : public Subscriptor
+{
+  public:
+    void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const;
+    void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const;
+    void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+	      typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const;
+};
+
+
+template <int dim>
+void Estimator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const
+{
+  const FEValuesBase<dim>& fe = info.fe();
+  
+  const std::vector<Tensor<2,dim> >& DDuh = info.hessians[0][0];
+  for (unsigned k=0;k<fe.n_quadrature_points;++k)
+    {
+      const double t = info.cell->diameter() * trace(DDuh[k]);
+      info.J[0] +=  t*t * fe.JxW(k);
+    }
+}
+
+
+template <int dim>
+void Estimator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const
+{
+  const FEFaceValuesBase<dim>& fe = info.fe();
+  
+  std::vector<double> boundary_values(fe.n_quadrature_points);
+  exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
+  
+  const std::vector<double>& uh = info.values[0][0];
+  
+  const unsigned int deg = fe.get_fe().tensor_degree();
+  const double penalty = 2. * deg * (deg+1) * info.face->measure() / info.cell->measure();
+  
+  for (unsigned k=0;k<fe.n_quadrature_points;++k)
+    info.J[0] += penalty * (boundary_values[k] - uh[k]) * (boundary_values[k] - uh[k])
+		 * fe.JxW(k);
+}
+
+
+template <int dim>
+void Estimator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const
+{
+  const FEFaceValuesBase<dim>& fe = info1.fe();
+  const std::vector<double>& uh1 = info1.values[0][0];
+  const std::vector<double>& uh2 = info2.values[0][0];
+  const std::vector<Tensor<1,dim> >& Duh1 = info1.gradients[0][0];
+  const std::vector<Tensor<1,dim> >& Duh2 = info2.gradients[0][0];
+  
+  const unsigned int deg = fe.get_fe().tensor_degree();
+  const double penalty1 = deg * (deg+1) * info1.face->measure() / info1.cell->measure();
+  const double penalty2 = deg * (deg+1) * info2.face->measure() / info2.cell->measure();
+  const double penalty = penalty1 + penalty2;
+  const double h = info1.face->measure();
+  
+  for (unsigned k=0;k<fe.n_quadrature_points;++k)
+    {
+      double diff1 = uh1[k] - uh2[k];
+      double diff2 = fe.normal_vector(k) * Duh1[k] - fe.normal_vector(k) * Duh2[k];
+      info1.J[0] += (penalty * diff1*diff1 + h * diff2*diff2)
+		    * fe.JxW(k);
+    }
+  info2.J[0] = info1.J[0];
+}
+
+
 				 // @sect3{The main class}
 template <int dim>
 class Step39
@@ -239,7 +320,7 @@ class Step39
     void assemble_mg_matrix ();
     void assemble_right_hand_side ();
     void error ();
-    void estimate ();
+    double estimate ();
     void solve ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
@@ -254,7 +335,8 @@ class Step39
     SparseMatrix<double> matrix;
     Vector<double>       solution;
     Vector<double>       right_hand_side;
-
+    BlockVector<double>  estimates;
+    
     MGLevelObject<SparsityPattern> mg_sparsity;
     MGLevelObject<SparsityPattern> mg_sparsity_dg_interface;
     MGLevelObject<SparseMatrix<double> > mg_matrix;
@@ -268,11 +350,10 @@ Step39<dim>::Step39(const FiniteElement<dim>& fe)
 		:
 		fe(fe),
 		mg_dof_handler(triangulation),
-		dof_handler(mg_dof_handler)
+		dof_handler(mg_dof_handler),
+		estimates(1)
 {
   GridGenerator::hyper_L(triangulation, -1, 1);
-  triangulation.begin()->set_refine_flag();
-  triangulation.execute_coarsening_and_refinement();
 }
 
 
@@ -474,7 +555,39 @@ Step39<dim>::error()
   QGauss<dim> quadrature(n_gauss_points);
   VectorTools::integrate_difference(mapping, dof_handler, solution, exact_solution,
 				    cell_errors, quadrature, VectorTools::L2_norm);
-  deallog << "Error " << cell_errors.l2_norm() << std::endl;
+  deallog << "Error    " << cell_errors.l2_norm() << std::endl;
+}
+
+
+template <int dim>
+double
+Step39<dim>::estimate()
+{
+  estimates.block(0).reinit(triangulation.n_active_cells());
+  unsigned int i=0;
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
+       cell != triangulation.end();++cell,++i)
+    cell->set_user_index(i);
+  
+  const Estimator<dim> local;
+  MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::CellsAndFaces<double>, Estimator<dim> >
+  integrator(local);
+  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
+  integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
+  UpdateFlags update_flags = update_values | update_gradients;
+  integrator.add_update_flags(update_flags | update_hessians, true, true, true, true);
+//  integrator.add_update_flags(update_hessians, true, false, false, false);
+  integrator.add_update_flags(update_quadrature_points, false, true, false, false);
+
+  NamedData<BlockVector<double>* > out_data;
+  BlockVector<double>* est = &estimates;
+  out_data.add(est, "cells");
+  integrator.initialize(out_data, false);
+  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
+  info_box.initialize_data(&solution, std::string("solution"), true, true, true);
+  info_box.initialize(integrator, fe, mapping);
+  MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
+  return estimates.block(0).l2_norm();
 }
 
 
@@ -483,10 +596,10 @@ void Step39<dim>::output_results (const unsigned int cycle) const
 {
 				   // Output of the solution in
 				   // gnuplot format.
-  std::string filename = "sol-";
-  filename += ('0' + cycle);
-  Assert (cycle < 10, ExcInternalError());
-  
+  char * fn = new char[100];
+  sprintf(fn, "sol-%02d", cycle);
+
+  std::string filename(fn);
   filename += ".gnuplot";
   std::cout << "Writing solution to <" << filename << ">..."
 	    << std::endl << std::endl;
@@ -495,6 +608,7 @@ void Step39<dim>::output_results (const unsigned int cycle) const
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "u");
+  data_out.add_data_vector (estimates.block(0), "est");
 
   data_out.build_patches ();
   
@@ -511,7 +625,17 @@ Step39<dim>::run(unsigned int n_steps)
     {
       deallog << "Step " << s << std::endl;
       if (s != 0)
-	triangulation.refine_global(1);
+	{
+	  if (estimates.block(0).size() == 0)
+	    triangulation.refine_global(1);
+	  else
+	    {
+	      GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
+								 estimates.block(0),
+								 0.5, 0.0);
+	      triangulation.execute_coarsening_and_refinement ();
+	    }
+	}
       
       deallog << "Triangulation "
 	      << triangulation.n_active_cells() << " cells, "
@@ -531,8 +655,8 @@ Step39<dim>::run(unsigned int n_steps)
       assemble_right_hand_side();
       deallog << "Solve" << std::endl;
       solve();
-      deallog << "Error" << std::endl;
       error();
+      deallog << "Estimate " << estimate() << std::endl;
       output_results(s);
     }
 }
@@ -540,7 +664,7 @@ Step39<dim>::run(unsigned int n_steps)
 
 int main()
 {
-  FE_DGQ<2> fe1(1);
+  FE_DGQ<2> fe1(3);
   Step39<2> test1(fe1);
-  test1.run(7);
+  test1.run(13);
 }
