@@ -176,6 +176,10 @@ IndexSet::get_view (const unsigned int begin,
 			    std::min(r1->end, end)-begin);
 
 	}
+      else
+	if (r1->begin >= end)
+	  break
+
       ++r1;
     }
 
