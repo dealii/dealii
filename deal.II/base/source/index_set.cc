@@ -178,7 +178,7 @@ IndexSet::get_view (const unsigned int begin,
 	}
       else
 	if (r1->begin >= end)
-	  break
+	  break;
 
       ++r1;
     }
