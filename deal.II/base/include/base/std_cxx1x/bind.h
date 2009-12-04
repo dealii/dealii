@@ -10,7 +10,7 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__std_cxx1x_bin_h
+#ifndef __deal2__std_cxx1x_bind_h
 #define __deal2__std_cxx1x_bind_h
 
 
