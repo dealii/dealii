@@ -226,6 +226,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 			 Epetra_MpiComm(communicator));
 #else
 			 Epetra_SerialComm());
+      (void)communicator;
 #endif
     }
 }
