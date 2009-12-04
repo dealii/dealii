@@ -63,7 +63,7 @@ refs-%:
 
 # clean up output files
 clean:     $(addprefix clean-,$(nofail-dirs) fail)
-distclean: $(addprefix clean-,$(nofail-dirs) fail)
+distclean: $(addprefix distclean-,$(nofail-dirs) fail)
 clean-%:
 	cd $(@:clean-%=%) && $(MAKE) clean
 distclean-%:
