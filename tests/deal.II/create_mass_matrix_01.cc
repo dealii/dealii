@@ -1,6 +1,6 @@
 //----------------------------  create_mass_matrix_01.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008 by the deal.II authors
 //
@@ -52,7 +52,7 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -86,14 +86,14 @@ check ()
   constraints.close ();
   constraints.condense (sparsity);
   sparsity.compress ();
-  
+
   SparseMatrix<double> matrix;
   matrix.reinit (sparsity);
 
   Functions::ExpFunction<dim> rhs_function;
-  
+
   Vector<double> rhs (dof.n_dofs());
-  
+
   MatrixTools::
     create_mass_matrix (mapping, dof,
 			quadrature, matrix,
@@ -122,7 +122,7 @@ int main ()
 {
   std::ofstream logfile ("create_mass_matrix_01/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

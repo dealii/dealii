@@ -1,5 +1,5 @@
 //----------------------------  fe_nothing_01.cc  ---------------------------
-//    $Id: fe_nothing_03.cc 19539 2009-09-25 02:48:15Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009 by the deal.II authors

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009 by the deal.II authors
 //
@@ -35,14 +35,14 @@ using namespace dealii;
 
 
 // Define a class that fills all available entries in the info objects
-// with recognizable numbers. 
+// with recognizable numbers.
 template <int dim>
 class Local : public Subscriptor
 {
   public:
     typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
     typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
-    
+
     void cell(CellInfo& info) const;
     void bdry(FaceInfo& info) const;
     void face(FaceInfo& info1, FaceInfo& info2) const;
@@ -73,7 +73,7 @@ Local<dim>::cell(CellInfo& info) const
   for (unsigned int i=0;i<info.indices.size();++i)
     deallog << ' ' << info.indices[i];
   deallog << std::endl;
-  
+
 				   // Fill local residuals
   for (unsigned int k=0;k<info.R.size();++k)
     for (unsigned int b=0;b<info.R[k].n_blocks();++b)
@@ -82,7 +82,7 @@ Local<dim>::cell(CellInfo& info) const
 	  const double x = cell + 0.1 * b + 0.001 * i;
 	  info.R[k].block(b)(i) = x;
 	}
-  
+
   for (unsigned int k=0;k<info.M1.size();++k)
     {
       const unsigned int block_row = info.M1[k].row;
@@ -126,10 +126,10 @@ assemble(const DoFHandler<dim>& dof_handler, WORKER& worker)
 {
   const FiniteElement<dim>& fe = dof_handler.get_fe();
   MappingQ1<dim> mapping;
-  
+
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
   info_box.initialize(worker, fe, mapping);
-  
+
   MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, worker);
 }
 
@@ -151,17 +151,17 @@ test_simple(MGDoFHandler<dim>& mgdofs)
   pattern.compress();
   matrix.reinit (pattern);
   v.reinit (dofs.n_dofs());
-  
+
   Local<dim> local;
   local.cells = true;
   local.faces = false;
-  
+
   MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >, Local<dim> >
     integrator(local);
   integrator.initialize_gauss_quadrature(1, 1, 1);
   integrator.initialize(matrix, v);
   integrator.boundary_fluxes = local.faces;
-  integrator.interior_fluxes = local.faces;  
+  integrator.interior_fluxes = local.faces;
 
   assemble(dofs, integrator);
   for (unsigned int i=0;i<v.size();++i)
@@ -189,7 +189,7 @@ test(const FiniteElement<dim>& fe)
   for (unsigned int l=0;l<tr.n_levels();++l)
     deallog << ' ' << l << ':' << tr.n_cells(l);
   deallog << std::endl;
-  
+
   unsigned int cn = 0;
   for (typename Triangulation<dim>::cell_iterator cell = tr.begin();
        cell != tr.end(); ++cell, ++cn)
@@ -201,7 +201,7 @@ test(const FiniteElement<dim>& fe)
   for (unsigned int l=0;l<tr.n_levels();++l)
     deallog << ' ' << l << ':' << dofs.n_dofs(l);
   deallog << std::endl;
-  
+
   test_simple(dofs);
 }
 
@@ -210,16 +210,16 @@ int main ()
 {
   std::ofstream logfile ("mesh_worker_01/output");
   logfile << std::setprecision (2);
-  logfile << std::fixed;  
+  logfile << std::fixed;
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
-//  deallog.depth_console (0);
+  deallog.depth_console (0);
 
   std::vector<boost::shared_ptr<FiniteElement<2> > > fe2;
   fe2.push_back(boost::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
   fe2.push_back(boost::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
-  
+
   for (unsigned int i=0;i<fe2.size();++i)
     test(*fe2[i]);
 }
