@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,6 +28,14 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
 
 
 template <int dim, int spacedim>
+FiniteElement<dim,spacedim>*
+FE_FaceQ<dim,spacedim>::clone() const
+{
+  return new FE_FaceQ<dim,spacedim>(this->degree);
+}
+
+
+template <int dim, int spacedim>
 std::string
 FE_FaceQ<dim,spacedim>::get_name () const
 {
@@ -43,6 +51,8 @@ FE_FaceQ<dim,spacedim>::get_name () const
 
   return namebuf.str();
 }
+
+
 
 template <int dim, int spacedim>
 bool

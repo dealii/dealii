@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
  * A finite element, which is a tensor product polynomial on each face
  * and undefined in the interior of the cells.
  *
- * This finite element is the trace space of FE_RavirtThomas on the
+ * This finite element is the trace space of FE_RaviartThomas on the
  * faces and serves in hybridized methods.
  *
  * @author Guido Kanschat, 2009
@@ -46,6 +46,8 @@ class FE_FaceQ : FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim>
 				      */
     FE_FaceQ(unsigned int p);
     
+    virtual FiniteElement<dim,spacedim>* clone() const;
+
 				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
