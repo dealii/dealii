@@ -88,6 +88,14 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 {
   public:
 				     /**
+				      * An iterator that can be used to
+				      * iterate over the elements of a single
+				      * row. The result of dereferencing such
+				      * an iterator is a column index.
+				      */
+    typedef std::vector<unsigned int>::const_iterator row_iterator;
+
+				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
 				      * allocated. This is useful if
@@ -302,6 +310,18 @@ class CompressedSimpleSparsityPattern : public Subscriptor
     unsigned int column_number (const unsigned int row,
 				const unsigned int index) const;
 
+ 				     /**
+				      * Return an iterator that can loop over
+				      * all entries in the given
+				      * row. Dereferencing the iterator yields
+				      * a column index.
+				      */
+    row_iterator row_begin (const unsigned int row) const;
+
+				     /**
+				      * Returns the end of the current row.
+				      */
+    row_iterator row_end (const unsigned int row) const; 
 				     /**
 				      * Compute the bandwidth of the matrix
 				      * represented by this structure. The
@@ -487,10 +507,12 @@ CompressedSimpleSparsityPattern::add (const unsigned int i,
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
 
-  if (!rowset.is_element(i))
+  if (rowset.size() > 0 && !rowset.is_element(i))
     return;
 
-  lines[rowset.index_within_set(i)].add (j);
+  const unsigned int rowindex = 
+    rowset.size()==0 ? i : rowset.nth_index_in_set(i);
+  lines[rowindex].add (j);
 }
 
 
@@ -505,10 +527,12 @@ CompressedSimpleSparsityPattern::add_entries (const unsigned int row,
 {
   Assert (row < rows, ExcIndexRange (row, 0, rows));
 
-  if (!rowset.is_element(row))
+  if (rowset.size() > 0 && !rowset.is_element(row))
     return;
 
-  lines[rowset.index_within_set(row)].add_entries (begin, end, indices_are_sorted);
+  const unsigned int rowindex = 
+    rowset.size()==0 ? row : rowset.nth_index_in_set(row);
+  lines[rowindex].add_entries (begin, end, indices_are_sorted);
 }
 
 
@@ -524,9 +548,12 @@ unsigned int
 CompressedSimpleSparsityPattern::row_length (const unsigned int row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
-  Assert( rowset.is_element(row), ExcInternalError());
+  if (rowset.size() > 0 && !rowset.is_element(row))
+    return 0;
 
-  return lines[rowset.index_within_set(row)].entries.size();
+  const unsigned int rowindex = 
+    rowset.size()==0 ? row : rowset.nth_index_in_set(row);
+  return lines[rowindex].entries.size();
 }
 
 
@@ -537,12 +564,36 @@ CompressedSimpleSparsityPattern::column_number (const unsigned int row,
 						const unsigned int index) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
-  Assert (index < lines[rowset.index_within_set(row)].entries.size(),
-	  ExcIndexRange (index, 0, lines[rowset.index_within_set(row)].entries.size()));
-  Assert( rowset.is_element(row), ExcInternalError());
+  Assert( rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
-  return lines[rowset.index_within_set(row)].entries[index];
+  const unsigned int local_row = rowset.size() ? rowset.index_within_set(row) : row;
+  Assert (index < lines[local_row].entries.size(),
+	  ExcIndexRange (index, 0, lines[local_row].entries.size()));
+  return lines[local_row].entries[index];
 }
+
+
+
+inline
+CompressedSimpleSparsityPattern::row_iterator
+CompressedSimpleSparsityPattern::row_begin (const unsigned int row) const
+{
+  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  const unsigned int local_row = rowset.size() ? rowset.index_within_set(row) : row;
+  return lines[local_row].entries.begin();
+}
+
+
+
+inline
+CompressedSimpleSparsityPattern::row_iterator
+CompressedSimpleSparsityPattern::row_end (const unsigned int row) const
+{
+  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  const unsigned int local_row = rowset.size() ? rowset.index_within_set(row) : row;
+  return lines[local_row].entries.end();
+}
+
 
 
 inline

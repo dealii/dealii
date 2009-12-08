@@ -77,7 +77,7 @@ namespace internals
 
       if (len==0)
 	return first;
-  
+
       while (true)
 	{
 					   // if length equals 8 or less,
@@ -130,12 +130,12 @@ namespace internals
 			Assert (false, ExcInternalError());
 		}
 	    }
-      
-      
-      
+
+
+
 	  const unsigned int         half   = len >> 1;
 	  const unsigned int * const middle = first + half;
-      
+
 					   // if the value is larger than
 					   // that pointed to by the
 					   // middle pointer, then the
@@ -162,7 +162,7 @@ namespace internals
 				      */
     unsigned int
     get_column_index_from_iterator (const unsigned int i);
-    
+
 				     /**
 				      * Helper function to get the
 				      * column index from a
@@ -186,17 +186,17 @@ namespace internals
     template <typename value>
     unsigned int
     get_column_index_from_iterator (const std::pair<const unsigned int, value> &i);
-    
+
   }
 }
 
 
-    
+
 namespace SparsityPatternIterators
 {
 				   // forward declaration
   class Iterator;
-    
+
 				   /**
 				    * Accessor class for iterators into
 				    * sparsity patterns. This class is also
@@ -300,8 +300,8 @@ namespace SparsityPatternIterators
 
 				       /** @addtogroup Exceptions
 					* @{ */
-	
-				       //@}        
+
+				       //@}
     protected:
 				       /**
 					* The sparsity pattern we operate on
@@ -324,7 +324,7 @@ namespace SparsityPatternIterators
 					* nonzero entry in the matrix.
 					*/
       void advance ();
-	
+
 				       /**
 					* Grant access to iterator class.
 					*/
@@ -344,11 +344,11 @@ namespace SparsityPatternIterators
 					* Constructor. Create an iterator
 					* into the sparsity pattern @p sp for the
 					* given row and the index within it.
-					*/ 
+					*/
       Iterator (const SparsityPattern *sp,
 		const unsigned int     row,
 		const unsigned int     index);
-        
+
 				       /**
 					* Prefix increment.
 					*/
@@ -403,7 +403,7 @@ namespace SparsityPatternIterators
 					* accessor class.
 					*/
       Accessor accessor;
-  };    
+  };
 }
 
 
@@ -428,7 +428,15 @@ class SparsityPattern : public Subscriptor
     typedef
     SparsityPatternIterators::Iterator
     const_iterator;
-    
+
+                                     /**
+                                      * Typedef an iterator class that allows
+                                      * to walk over the nonzero elements of a
+                                      * row of a sparsity pattern.
+                                      */
+    typedef
+    const unsigned int * row_iterator;
+
                                      /**
                                       * Typedef an iterator class that allows
                                       * to walk over all nonzero elements of a
@@ -442,8 +450,8 @@ class SparsityPattern : public Subscriptor
     typedef
     SparsityPatternIterators::Iterator
     iterator;
-    
-    
+
+
 				     /**
 				      * Define a value which is used
 				      * to indicate that a certain
@@ -469,7 +477,7 @@ class SparsityPattern : public Subscriptor
 				      * variable may change over time.
 				      */
     static const unsigned int invalid_entry = numbers::invalid_unsigned_int;
-    
+
 				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
@@ -481,7 +489,7 @@ class SparsityPattern : public Subscriptor
 				      * the reinit() function.
 				      */
     SparsityPattern ();
-    
+
 				     /**
 				      * Copy constructor. This
 				      * constructor is only allowed to
@@ -557,7 +565,7 @@ class SparsityPattern : public Subscriptor
 		     const unsigned int               n,
 		     const std::vector<unsigned int>& row_lengths,
 		     const bool optimize_diagonal = true);
-    
+
 				     /**
 				      * Initialize a quadratic matrix
 				      * of dimension <tt>n</tt> with
@@ -637,7 +645,7 @@ class SparsityPattern : public Subscriptor
     SparsityPattern (const SparsityPattern  &original,
 		     const unsigned int      max_per_row,
 		     const unsigned int      extra_off_diagonals);
-    
+
 				     /**
 				      * Destructor.
 				      */
@@ -652,7 +660,7 @@ class SparsityPattern : public Subscriptor
 				      * objects.
 				      */
     SparsityPattern & operator = (const SparsityPattern &);
-    
+
 				     /**
 				      * Reallocate memory and set up data
 				      * structures for a new matrix with
@@ -707,7 +715,7 @@ class SparsityPattern : public Subscriptor
 		 const unsigned int               n,
 		 const VectorSlice<const std::vector<unsigned int> > &row_lengths,
 		 const bool optimize_diagonal = true);
-    
+
 				     /**
 				      * This function compresses the sparsity
 				      * structure that this object represents.
@@ -769,7 +777,34 @@ class SparsityPattern : public Subscriptor
 				      * iterator for the last row of a matrix.
 				      */
     inline iterator end (const unsigned int r) const;
-    
+
+				     /**
+				      * STL-like iterator with the first entry
+				      * of row <tt>r</tt>.
+				      *
+				      * Note that if the given row is empty,
+				      * i.e. does not contain any nonzero
+				      * entries, then the iterator returned by
+				      * this function equals
+				      * <tt>end(r)</tt>. Note also that the
+				      * iterator may not be dereferencable in
+				      * that case.
+				      */
+    inline row_iterator row_begin (const unsigned int r) const;
+
+				     /**
+				      * Final iterator of row <tt>r</tt>. It
+				      * points to the first element past the
+				      * end of line @p r, or past the end of
+				      * the entire sparsity pattern.
+				      *
+				      * Note that the end iterator is not
+				      * necessarily dereferencable. This is in
+				      * particular the case if it is the end
+				      * iterator for the last row of a matrix.
+				      */
+    inline row_iterator row_end (const unsigned int r) const;
+
     				     /**
 				      * This function can be used as a
 				      * replacement for reinit(),
@@ -916,42 +951,17 @@ class SparsityPattern : public Subscriptor
 		    const bool optimize_diagonal = true);
 
 				     /**
-				      * Copy data from an object of
-				      * type
-				      * CompressedSparsityPattern.
-				      * Previous content of this
-				      * object is lost, and the
-				      * sparsity pattern is in
-				      * compressed mode afterwards.
-				      */
-    void copy_from (const CompressedSparsityPattern &csp,
-		    const bool optimize_diagonal = true);
-
-
-                                     /**
-                                      * Copy data from an object of
-                                      * type
-                                      * CompressedSetSparsityPattern.
-                                      * Previous content of this
-                                      * object is lost, and the
-                                      * sparsity pattern is in
-                                      * compressed mode afterwards.
-                                      */
-    void copy_from (const CompressedSetSparsityPattern &csp,
-                    const bool optimize_diagonal = true);
-
-				     /**
-				      * Copy data from an object of
-				      * type
+				      * Copy data from an object of type
+				      * CompressedSparsityPattern,
+				      * CompressedSetSparsityPattern or
 				      * CompressedSimpleSparsityPattern.
-				      * Previous content of this
-				      * object is lost, and the
-				      * sparsity pattern is in
+				      * Previous content of this object is
+				      * lost, and the sparsity pattern is in
 				      * compressed mode afterwards.
 				      */
-    void copy_from (const CompressedSimpleSparsityPattern &csp,
+    template <typename CompressedSparsityType>
+    void copy_from (const CompressedSparsityType &csp,
 		    const bool optimize_diagonal = true);
-
 
 				     /**
 				      * Take a full matrix and use its
@@ -967,7 +977,7 @@ class SparsityPattern : public Subscriptor
     template <typename number>
     void copy_from (const FullMatrix<number> &matrix,
 		    const bool optimize_diagonal = true);
-    
+
 				     /**
 				      * Return whether the object is empty. It
 				      * is empty if no memory is allocated,
@@ -1014,7 +1024,7 @@ class SparsityPattern : public Subscriptor
 				      * @deprecated Use
 				      * SparseMatrix::const_iterator
 				      */
-    unsigned int operator() (const unsigned int i, 
+    unsigned int operator() (const unsigned int i,
 			     const unsigned int j) const;
 
 				     /**
@@ -1039,7 +1049,7 @@ class SparsityPattern : public Subscriptor
 				      */
     std::pair<unsigned int, unsigned int>
     matrix_position (const unsigned int global_index) const;
-    
+
 				     /**
 				      * Add a nonzero entry to the matrix.
 				      * This function may only be called
@@ -1048,7 +1058,7 @@ class SparsityPattern : public Subscriptor
 				      * If the entry already exists, nothing
 				      * bad happens.
 				      */
-    void add (const unsigned int i, 
+    void add (const unsigned int i,
 	      const unsigned int j);
 
 				     /**
@@ -1061,11 +1071,11 @@ class SparsityPattern : public Subscriptor
 				      * exist, nothing bad happens.
 				      */
     template <typename ForwardIterator>
-    void add_entries (const unsigned int row, 
+    void add_entries (const unsigned int row,
 		      ForwardIterator    begin,
 		      ForwardIterator    end,
 		      const bool         indices_are_sorted = false);
-    
+
 				     /**
 				      * Make the sparsity pattern
 				      * symmetric by adding the
@@ -1078,7 +1088,7 @@ class SparsityPattern : public Subscriptor
 				      * quadratic matrix.
 				      */
     void symmetrize ();
-    
+
 				     /**
 				      * Return number of rows of this
 				      * matrix, which equals the dimension
@@ -1154,7 +1164,7 @@ class SparsityPattern : public Subscriptor
     unsigned int n_nonzero_elements () const;
 
 				     /**
-				      * Return whether the structure is 
+				      * Return whether the structure is
 				      * compressed or not.
 				      */
     bool is_compressed () const;
@@ -1214,7 +1224,7 @@ class SparsityPattern : public Subscriptor
 				      * template arguments.
 				      */
     bool stores_only_added_elements () const;
-    
+
                                      /**
 				      * @deprecated
 				      *
@@ -1278,7 +1288,7 @@ class SparsityPattern : public Subscriptor
                                       */
     void partition (const unsigned int         n_partitions,
                     std::vector<unsigned int> &partition_indices) const;
-    
+
 				     /**
 				      * Write the data of this object
 				      * en bloc to a file. This is
@@ -1325,7 +1335,7 @@ class SparsityPattern : public Subscriptor
 				      * more.
 				      */
     void block_read (std::istream &in);
-    
+
 				     /**
 				      * Print the sparsity of the
 				      * matrix. The output consists of
@@ -1372,7 +1382,7 @@ class SparsityPattern : public Subscriptor
     unsigned int memory_consumption () const;
 
 				     /**
-				      * This is kind of an expert mode. Get 
+				      * This is kind of an expert mode. Get
 				      * access to the rowstart array, but
 				      * read-only.
 				      *
@@ -1624,8 +1634,8 @@ class SparsityPattern : public Subscriptor
 				      * Is special treatment of
 				      * diagonals enabled?
 				      */
-    bool diagonal_optimized;    
-    
+    bool diagonal_optimized;
+
 				     /**
 				      * Make all sparse matrices
 				      * friends of this class.
@@ -1644,7 +1654,7 @@ class SparsityPattern : public Subscriptor
 
 
 namespace SparsityPatternIterators
-{    
+{
   inline
   Accessor::
   Accessor (const SparsityPattern *sparsity_pattern,
@@ -1693,7 +1703,7 @@ namespace SparsityPatternIterators
   Accessor::column() const
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
-      
+
     return (sparsity_pattern
 	    ->get_column_numbers()[sparsity_pattern
 				   ->get_rowstart_indices()[a_row]+a_index]);
@@ -1715,7 +1725,7 @@ namespace SparsityPatternIterators
   inline
   bool
   Accessor::operator == (const Accessor& other) const
-  {      
+  {
     return (sparsity_pattern  == other.sparsity_pattern &&
 	    a_row   == other.a_row &&
 	    a_index == other.a_index);
@@ -1726,22 +1736,22 @@ namespace SparsityPatternIterators
   inline
   bool
   Accessor::operator < (const Accessor& other) const
-  {      
+  {
     Assert (sparsity_pattern == other.sparsity_pattern,
 	    ExcInternalError());
-      
+
     return (a_row < other.a_row ||
 	    (a_row == other.a_row &&
 	     a_index < other.a_index));
   }
-    
+
 
   inline
   void
   Accessor::advance ()
-  {      
+  {
     Assert (a_row < sparsity_pattern->n_rows(), ExcIteratorPastEnd());
-  
+
     ++a_index;
 
 				     // if at end of line: cycle until we
@@ -1758,7 +1768,7 @@ namespace SparsityPatternIterators
 	  break;
       }
   }
-    
+
 
 
   inline
@@ -1832,7 +1842,7 @@ namespace SparsityPatternIterators
   {
     return accessor < other.accessor;
   }
-    
+
 }
 
 
@@ -1893,6 +1903,26 @@ SparsityPattern::end (const unsigned int r) const
                                    // if there is no such line, then take the
                                    // end iterator of the matrix
   return end();
+}
+
+
+
+inline
+SparsityPattern::row_iterator
+SparsityPattern::row_begin (const unsigned int r) const
+{
+  Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
+  return &colnums[rowstart[r]];
+}
+
+
+
+inline
+SparsityPattern::row_iterator
+SparsityPattern::row_end (const unsigned int r) const
+{
+  Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
+  return &colnums[rowstart[r+1]];
 }
 
 
@@ -1983,7 +2013,7 @@ inline
 unsigned int
 SparsityPattern::n_nonzero_elements () const
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
   Assert (compressed, ExcNotCompressed());
   return rowstart[rows]-rowstart[0];
 }
@@ -2035,7 +2065,7 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 {
   Assert (static_cast<unsigned int>(std::distance (begin, end)) == n_rows,
 	  ExcIteratorRange (std::distance (begin, end), n_rows));
-  
+
 				   // first determine row lengths for
 				   // each row. if the matrix is
 				   // quadratic, then we might have to
@@ -2075,7 +2105,7 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 	  const unsigned int col
 	    = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
 	  Assert (col < n_cols, ExcIndexRange(col,0,n_cols));
-	  
+
 	  if ((col!=row) || !is_square)
 	    *cols++ = col;
 	};

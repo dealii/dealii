@@ -492,12 +492,14 @@ CompressedSetSparsityPattern::row_length (const unsigned int row) const
 }
 
 
+
 inline
 CompressedSetSparsityPattern::row_iterator
 CompressedSetSparsityPattern::row_begin (const unsigned int row) const
 {
   return (lines[row].entries.begin ());
 }
+
 
 
 inline

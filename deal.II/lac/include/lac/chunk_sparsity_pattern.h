@@ -442,32 +442,18 @@ class ChunkSparsityPattern : public Subscriptor
 		    const bool optimize_diagonal = true);
 
 				     /**
-				      * Copy data from an object of
-				      * type
-				      * CompressedSparsityPattern.
-				      * Previous content of this
-				      * object is lost, and the
-				      * sparsity pattern is in
+				      * Copy data from an object of type
+				      * CompressedSparsityPattern,
+				      * CompressedSetSparsityPattern or
+				      * CompressedSimpleSparsityPattern.
+				      * Previous content of this object is
+				      * lost, and the sparsity pattern is in
 				      * compressed mode afterwards.
 				      */
-    void copy_from (const CompressedSparsityPattern &csp,
-		    const unsigned int chunk_size,
-		    const bool optimize_diagonal = true);
-
-
-				     /**
-				      * Copy data from an object of
-				      * type
-				      * CompressedSetSparsityPattern.
-				      * Previous content of this
-				      * object is lost, and the
-				      * sparsity pattern is in
-				      * compressed mode afterwards.
-				      */
-    void copy_from (const CompressedSetSparsityPattern &csp,
-		    const unsigned int chunk_size,
-		    const bool optimize_diagonal = true);
-
+    template <typename SparsityType>
+    void copy_from (const SparsityType &csp,
+		    const unsigned int  chunk_size,
+		    const bool          optimize_diagonal = true);
 
 				     /**
 				      * Take a full matrix and use its

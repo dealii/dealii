@@ -90,6 +90,14 @@ class CompressedSparsityPattern : public Subscriptor
 {
   public:
 				     /**
+				      * An iterator that can be used to
+				      * iterate over the elements of a single
+				      * row. The result of dereferencing such
+				      * an iterator is a column index.
+				      */
+    typedef std::vector<unsigned int>::const_iterator row_iterator;
+
+				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
 				      * allocated. This is useful if
@@ -100,7 +108,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * the reinit() function.
 				      */
     CompressedSparsityPattern ();
-    
+
 				     /**
 				      * Copy constructor. This constructor is
 				      * only allowed to be called if the
@@ -126,7 +134,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      */
     CompressedSparsityPattern (const unsigned int m,
 			       const unsigned int n);
-    
+
 				     /**
 				      * Initialize a square matrix of
 				      * dimension @p n.
@@ -142,7 +150,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * objects.
 				      */
     CompressedSparsityPattern & operator = (const CompressedSparsityPattern &);
-    
+
 				     /**
 				      * Reallocate memory and set up
 				      * data structures for a new
@@ -153,7 +161,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      */
     void reinit (const unsigned int m,
 		 const unsigned int n);
-    
+
 				     /**
 				      * Since this object is kept
 				      * compressed at all times anway,
@@ -164,7 +172,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * SparsityPattern class.
 				      */
     void compress ();
-    
+
 				     /**
 				      * Return whether the object is
 				      * empty. It is empty if no
@@ -187,7 +195,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * matrix. If the entry already
 				      * exists, nothing bad happens.
 				      */
-    void add (const unsigned int i, 
+    void add (const unsigned int i,
 	      const unsigned int j);
 
 				     /**
@@ -197,7 +205,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * happens.
 				      */
     template <typename ForwardIterator>
-    void add_entries (const unsigned int row, 
+    void add_entries (const unsigned int row,
 		      ForwardIterator    begin,
 		      ForwardIterator    end,
 		      const bool         indices_are_unique_and_sorted = false);
@@ -208,7 +216,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      */
     bool exists (const unsigned int i,
                  const unsigned int j) const;
-    
+
                                      /**
 				      * Make the sparsity pattern
 				      * symmetric by adding the
@@ -221,7 +229,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * square matrix.
 				      */
     void symmetrize ();
-    
+
 				     /**
 				      * Print the sparsity of the
 				      * matrix. The output consists of
@@ -285,6 +293,19 @@ class CompressedSparsityPattern : public Subscriptor
     unsigned int column_number (const unsigned int row,
 				const unsigned int index) const;
 
+ 				     /**
+				      * Return an iterator that can loop over
+				      * all entries in the given
+				      * row. Dereferencing the iterator yields
+				      * a column index.
+				      */
+    row_iterator row_begin (const unsigned int row) const;
+
+				     /**
+				      * Returns the end of the current row.
+				      */
+    row_iterator row_end (const unsigned int row) const;
+
 				     /**
 				      * Compute the bandwidth of the matrix
 				      * represented by this structure. The
@@ -319,7 +340,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      */
     static
     bool stores_only_added_elements ();
-    
+
   private:
 				     /**
 				      * Number of rows that this sparsity
@@ -396,7 +417,7 @@ class CompressedSparsityPattern : public Subscriptor
                                          /**
                                           * Size of the cache.
                                           */
-        static const unsigned int cache_size = 8;        
+        static const unsigned int cache_size = 8;
 
       public:
                                          /**
@@ -444,8 +465,8 @@ class CompressedSparsityPattern : public Subscriptor
                                           */
         void flush_cache () const;
     };
-    
-        
+
+
 				     /**
 				      * Actual data: store for each
 				      * row the set of nonzero
@@ -474,7 +495,7 @@ CompressedSparsityPattern::Line::add (const unsigned int j)
                                    // the cache first
   if (cache_entries == cache_size && cache_entries != 0)
     flush_cache ();
-  
+
   cache[cache_entries] = j;
   ++cache_entries;
 }
@@ -560,6 +581,29 @@ CompressedSparsityPattern::column_number (const unsigned int row,
   if (lines[row].cache_entries != 0)
     lines[row].flush_cache ();
   return lines[row].entries[index];
+}
+
+
+
+inline
+CompressedSparsityPattern::row_iterator
+CompressedSparsityPattern::row_begin (const unsigned int row) const
+{
+  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+
+  if (lines[row].cache_entries != 0)
+    lines[row].flush_cache ();
+  return lines[row].entries.begin();
+}
+
+
+
+inline
+CompressedSparsityPattern::row_iterator
+CompressedSparsityPattern::row_end (const unsigned int row) const
+{
+  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  return lines[row].entries.end();
 }
 
 

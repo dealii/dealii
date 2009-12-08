@@ -549,8 +549,9 @@ SparsityPattern::compress ()
 
 
 
+template <typename CSP>
 void
-SparsityPattern::copy_from (const CompressedSparsityPattern &csp,
+SparsityPattern::copy_from (const CSP &csp,
 			    const bool optimize_diag) 
 {
 				   // first determine row lengths for
@@ -563,19 +564,18 @@ SparsityPattern::copy_from (const CompressedSparsityPattern &csp,
 				   // bother to check whether that
 				   // diagonal entry is in a certain
 				   // row or not
-  const bool is_square = optimize_diag && (csp.n_rows() == csp.n_cols());
+  const bool do_diag_optimize = optimize_diag && (csp.n_rows() == csp.n_cols());
   std::vector<unsigned int> row_lengths (csp.n_rows());
   for (unsigned int i=0; i<csp.n_rows(); ++i)
     {
       unsigned int additional_diagonal = 0;
-      if (is_square)
+      if (do_diag_optimize)
 	if (csp.exists(i,i) == false)
 	  additional_diagonal = 1;
 
       row_lengths[i] = csp.row_length(i) + additional_diagonal;
     }
-
-  reinit (csp.n_rows(), csp.n_cols(), row_lengths, is_square);
+  reinit (csp.n_rows(), csp.n_cols(), row_lengths, do_diag_optimize);
 
 				   // now enter all the elements into
 				   // the matrix. note that if the
@@ -584,123 +584,16 @@ SparsityPattern::copy_from (const CompressedSparsityPattern &csp,
 				   // element preallocated
   for (unsigned int row = 0; row<csp.n_rows(); ++row)
     {
-      unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
-      const unsigned int row_length = csp.row_length(row);
-      for (unsigned int j=0; j<row_length; ++j)
-        {
-          const unsigned int col = csp.column_number(row,j);
-	  Assert (col < csp.n_cols(), ExcIndexRange(col,0,csp.n_cols()));
-	  
-	  if ((col!=row) || !is_square)
-	    *cols++ = col;
-	}
-    }
+      unsigned int *cols = &colnums[rowstart[row]] + (do_diag_optimize ? 1 : 0);
+      typename CSP::row_iterator col_num = csp.row_begin (row), 
+	end_row = csp.row_end (row);
 
-				   // do not need to compress the sparsity
-				   // pattern since we already have
-				   // allocated the right amount of data,
-				   // and the CSP data is sorted, too.
-  compressed = true;
-}
-
-
-
-void
-SparsityPattern::copy_from (const CompressedSetSparsityPattern &csp,
-			    const bool optimize_diag) 
-{
-				   // first determine row lengths for
-				   // each row. if the matrix is
-				   // quadratic, then we might have to
-				   // add an additional entry for the
-				   // diagonal, if that is not yet
-				   // present. as we have to call
-				   // compress anyway later on, don't
-				   // bother to check whether that
-				   // diagonal entry is in a certain
-				   // row or not
-  const bool is_square = optimize_diag && (csp.n_rows() == csp.n_cols());
-  std::vector<unsigned int> row_lengths (csp.n_rows());
-  for (unsigned int i=0; i<csp.n_rows(); ++i)
-    {
-      unsigned int additional_diagonal = 0;
-      if (is_square)
-	if (csp.exists(i,i) == false)
-	  additional_diagonal = 1;
-
-      row_lengths[i] = csp.row_length(i) + additional_diagonal;
-    }
-  reinit (csp.n_rows(), csp.n_cols(), row_lengths, is_square);
-
-				   // now enter all the elements into
-				   // the matrix. note that if the
-				   // matrix is quadratic, then we
-				   // already have the diagonal
-				   // element preallocated
-  for (unsigned int row = 0; row<csp.n_rows(); ++row)
-    {
-      unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
-      CompressedSetSparsityPattern::row_iterator col_num = csp.row_begin (row);
-
-      for (; col_num != csp.row_end (row); ++col_num)
+      for (; col_num != end_row; ++col_num)
 	{
 	  const unsigned int col = *col_num;
-	  if ((col!=row) || !is_square)
+	  if ((col!=row) || !do_diag_optimize)
 	    *cols++ = col;
 	}
-    }
-
-				   // do not need to compress the sparsity
-				   // pattern since we already have
-				   // allocated the right amount of data,
-				   // and the CSP data is sorted, too.
-  compressed = true;
-}
-
-void
-SparsityPattern::copy_from (const CompressedSimpleSparsityPattern &csp,
-                            const bool optimize_diag)
-{
-                                   // first determine row lengths for
-                                   // each row. if the matrix is
-                                   // quadratic, then we might have to
-                                   // add an additional entry for the
-                                   // diagonal, if that is not yet
-                                   // present. as we have to call
-                                   // compress anyway later on, don't
-                                   // bother to check whether that
-                                   // diagonal entry is in a certain
-                                   // row or not
-  const bool is_square = optimize_diag && (csp.n_rows() == csp.n_cols());
-  std::vector<unsigned int> row_lengths (csp.n_rows());
-  for (unsigned int i=0; i<csp.n_rows(); ++i)
-    {
-      unsigned int additional_diagonal = 0;
-      if (is_square)
-	if (csp.exists(i,i) == false)
-	  additional_diagonal = 1;
-
-      row_lengths[i] = csp.row_length(i) + additional_diagonal;
-    }
-  reinit (csp.n_rows(), csp.n_cols(), row_lengths, is_square);
-
-                                   // now enter all the elements into
-                                   // the matrix. note that if the
-                                   // matrix is quadratic, then we
-                                   // already have the diagonal
-                                   // element preallocated
-  for (unsigned int row = 0; row<csp.n_rows(); ++row)
-    {
-      unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
-      const unsigned int row_length = csp.row_length(row);
-      for (unsigned int j=0; j<row_length; ++j)
-	{
-	  const unsigned int col = csp.column_number(row,j);
-          Assert (col < csp.n_cols(), ExcIndexRange(col,0,csp.n_cols()));
-
-          if ((col!=row) || !is_square)
-            *cols++ = col;
-        }
     }
 
 				   // do not need to compress the sparsity
@@ -1155,6 +1048,9 @@ partition (const unsigned int         n_partitions,
 
 
 // explicit instantiations
+template void SparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &, bool);
+template void SparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &, bool);
+template void SparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const CompressedSimpleSparsityPattern &, bool);
 template void SparsityPattern::copy_from<float> (const FullMatrix<float> &, bool);
 template void SparsityPattern::copy_from<double> (const FullMatrix<double> &, bool);
 

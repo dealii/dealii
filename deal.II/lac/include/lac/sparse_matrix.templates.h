@@ -136,7 +136,7 @@ SparseMatrix<number>::operator = (const double d)
   Assert (cols->compressed || cols->empty(), SparsityPattern::ExcNotCompressed());
 
   if (val)
-    std::fill_n (&val[0], cols->n_nonzero_elements(), 0.);
+    memset (&val[0], cols->n_nonzero_elements()*sizeof(number), 0);
 
   return *this;
 }
