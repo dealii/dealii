@@ -511,7 +511,7 @@ CompressedSimpleSparsityPattern::add (const unsigned int i,
     return;
 
   const unsigned int rowindex = 
-    rowset.size()==0 ? i : rowset.nth_index_in_set(i);
+    rowset.size()==0 ? i : rowset.index_within_set(i);
   lines[rowindex].add (j);
 }
 
@@ -531,7 +531,7 @@ CompressedSimpleSparsityPattern::add_entries (const unsigned int row,
     return;
 
   const unsigned int rowindex = 
-    rowset.size()==0 ? row : rowset.nth_index_in_set(row);
+    rowset.size()==0 ? row : rowset.index_within_set(row);
   lines[rowindex].add_entries (begin, end, indices_are_sorted);
 }
 
@@ -552,7 +552,7 @@ CompressedSimpleSparsityPattern::row_length (const unsigned int row) const
     return 0;
 
   const unsigned int rowindex = 
-    rowset.size()==0 ? row : rowset.nth_index_in_set(row);
+    rowset.size()==0 ? row : rowset.index_within_set(row);
   return lines[rowindex].entries.size();
 }
 

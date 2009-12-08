@@ -388,7 +388,7 @@ CompressedSimpleSparsityPattern::print (std::ostream &out) const
 void
 CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
 {
-  for (unsigned int row=0; row<rows; ++row)
+  for (unsigned int row=0; row<lines.size(); ++row)
     {
       const unsigned int rowindex =
 	rowset.size()==0 ? row : rowset.nth_index_in_set(row);
@@ -416,7 +416,7 @@ unsigned int
 CompressedSimpleSparsityPattern::bandwidth () const
 {
   unsigned int b=0;
-  for (unsigned int row=0; row<rows; ++row)
+  for (unsigned int row=0; row<lines.size(); ++row)
     {
       const unsigned int rowindex =
 	rowset.size()==0 ? row : rowset.nth_index_in_set(row);
@@ -437,7 +437,7 @@ unsigned int
 CompressedSimpleSparsityPattern::n_nonzero_elements () const
 {
   unsigned int n=0;
-  for (unsigned int i=0; i<rows; ++i)
+  for (unsigned int i=0; i<lines.size(); ++i)
     {
       n += lines[i].entries.size();
     }
