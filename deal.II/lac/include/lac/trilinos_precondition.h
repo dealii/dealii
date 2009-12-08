@@ -31,6 +31,7 @@
 #  include <Epetra_Map.h>
 
 #  include <Teuchos_RCP.hpp>
+#  include <Teuchos_ParameterList.hpp>
 #  include <Epetra_Operator.h>
 #  include <Epetra_Vector.h>
 
@@ -1411,6 +1412,29 @@ namespace TrilinosWrappers
 					*/
       void initialize (const SparseMatrix                    &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
+
+				       /**
+					* Let Trilinos compute a multilevel
+					* hierarchy for the solution of a
+					* linear system with the given
+					* matrix. The function uses the
+					* matrix format specified in
+					* TrilinosWrappers::SparseMatrix.
+					*
+					* This function is similar to the one
+					* above, but allows the user to set
+					* all the options of the Trilinos ML
+					* preconditioner. In order to find out
+					* about all the options for ML, we
+					* refer to the <a
+					* href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML
+					* user's guide</a>. In particular,
+					* users need to follow the ML
+					* instructions in case a vector-valued
+					* problem ought to be solved.
+					*/
+      void initialize (const SparseMatrix           &matrix,
+		       const Teuchos::ParameterList &ml_parameters);
 
 				       /**
 					* Let Trilinos compute a multilevel

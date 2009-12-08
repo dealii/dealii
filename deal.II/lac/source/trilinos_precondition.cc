@@ -80,9 +80,9 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create 
-			   ("point relaxation", 
-			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+    ifpack = Teuchos::rcp (Ifpack().Create
+			   ("point relaxation",
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
 			    0));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
@@ -94,9 +94,9 @@ namespace TrilinosWrappers
     parameter_list.set ("relaxation: sweeps", 1);
     parameter_list.set ("relaxation: type", "Jacobi");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
-    parameter_list.set ("relaxation: min diagonal value", 
+    parameter_list.set ("relaxation: min diagonal value",
 			additional_data.min_diagonal);
-    
+
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -132,9 +132,9 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create 
+    ifpack = Teuchos::rcp (Ifpack().Create
 			   ("point relaxation",
-			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
 			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
@@ -146,10 +146,10 @@ namespace TrilinosWrappers
     parameter_list.set ("relaxation: sweeps", 1);
     parameter_list.set ("relaxation: type", "symmetric Gauss-Seidel");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
-    parameter_list.set ("relaxation: min diagonal value", 
+    parameter_list.set ("relaxation: min diagonal value",
 			additional_data.min_diagonal);
     parameter_list.set ("schwarz: combine mode", "Add");
-    
+
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -185,9 +185,9 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create 
+    ifpack = Teuchos::rcp (Ifpack().Create
 			   ("point relaxation",
-			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
 			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
@@ -199,10 +199,10 @@ namespace TrilinosWrappers
     parameter_list.set ("relaxation: sweeps", 1);
     parameter_list.set ("relaxation: type", "Gauss-Seidel");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
-    parameter_list.set ("relaxation: min diagonal value", 
+    parameter_list.set ("relaxation: min diagonal value",
 			additional_data.min_diagonal);
     parameter_list.set ("schwarz: combine mode", "Add");
-    
+
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -240,9 +240,9 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create 
-			   ("IC", 
-			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+    ifpack = Teuchos::rcp (Ifpack().Create
+			   ("IC",
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
 			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
@@ -251,11 +251,11 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("fact: level-of-fill",(int)additional_data.ic_fill); 
-    parameter_list.set ("fact: absolute threshold",additional_data.ic_atol); 
-    parameter_list.set ("fact: relative threshold",additional_data.ic_rtol); 
+    parameter_list.set ("fact: level-of-fill",(int)additional_data.ic_fill);
+    parameter_list.set ("fact: absolute threshold",additional_data.ic_atol);
+    parameter_list.set ("fact: relative threshold",additional_data.ic_rtol);
     parameter_list.set ("schwarz: combine mode", "Add");
-    
+
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -293,9 +293,9 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create 
-			   ("ILU", 
-			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+    ifpack = Teuchos::rcp (Ifpack().Create
+			   ("ILU",
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
 			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
@@ -304,11 +304,11 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("fact: level-of-fill",(int)additional_data.ilu_fill); 
-    parameter_list.set ("fact: absolute threshold",additional_data.ilu_atol); 
-    parameter_list.set ("fact: relative threshold",additional_data.ilu_rtol); 
+    parameter_list.set ("fact: level-of-fill",(int)additional_data.ilu_fill);
+    parameter_list.set ("fact: absolute threshold",additional_data.ilu_atol);
+    parameter_list.set ("fact: relative threshold",additional_data.ilu_rtol);
     parameter_list.set ("schwarz: combine mode", "Add");
-    
+
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -348,9 +348,9 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create 
-			   ("ILUT", 
-			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+    ifpack = Teuchos::rcp (Ifpack().Create
+			   ("ILUT",
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
 			    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
@@ -359,12 +359,12 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("fact: drop value",additional_data.ilut_drop);  
-    parameter_list.set ("fact: level-of-fill",(int)additional_data.ilut_fill);  
-    parameter_list.set ("fact: absolute threshold",additional_data.ilut_atol); 
-    parameter_list.set ("fact: relative threshold",additional_data.ilut_rtol); 
+    parameter_list.set ("fact: drop value",additional_data.ilut_drop);
+    parameter_list.set ("fact: level-of-fill",(int)additional_data.ilut_fill);
+    parameter_list.set ("fact: absolute threshold",additional_data.ilut_atol);
+    parameter_list.set ("fact: relative threshold",additional_data.ilut_rtol);
     parameter_list.set ("schwarz: combine mode", "Add");
-    
+
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -396,9 +396,9 @@ namespace TrilinosWrappers
     preconditioner.release();
     ifpack.release();
 
-    ifpack = Teuchos::rcp (Ifpack().Create 
-			   ("Amesos", 
-			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()), 
+    ifpack = Teuchos::rcp (Ifpack().Create
+			   ("Amesos",
+			    const_cast<Epetra_CrsMatrix*>(&matrix.trilinos_matrix()),
 			    additional_data.overlap));
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
@@ -407,7 +407,7 @@ namespace TrilinosWrappers
 
     Teuchos::ParameterList parameter_list;
     parameter_list.set ("schwarz: combine mode", "Add");
-    
+
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -513,12 +513,12 @@ namespace TrilinosWrappers
     multilevel_operator.release();
 
     const unsigned int n_rows = matrix.m();
-    const unsigned int constant_modes_dimension = 
+    const unsigned int constant_modes_dimension =
       additional_data.constant_modes.size();
 
 				        // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
-  
+
     if (additional_data.elliptic == true)
       {
 	ML_Epetra::SetDefaults("SA",parameter_list);
@@ -539,7 +539,7 @@ namespace TrilinosWrappers
 				   // now we also just use Uncoupled,
 				   // but we should be aware that maybe
 				   // MIS might be needed
-				   // 
+				   //
 				   // TODO: Maybe there are any
 				   // other/better options?
 	if (additional_data.higher_order_elements)
@@ -556,31 +556,31 @@ namespace TrilinosWrappers
 	parameter_list.set("aggregation: type", "Uncoupled");
 	parameter_list.set("aggregation: block scaling", true);
       }
-  
-    parameter_list.set("smoother: sweeps", 
+
+    parameter_list.set("smoother: sweeps",
 		       static_cast<int>(additional_data.smoother_sweeps));
     parameter_list.set("smoother: Chebyshev alpha",10.);
-    parameter_list.set("smoother: ifpack overlap", 
+    parameter_list.set("smoother: ifpack overlap",
 		       static_cast<int>(additional_data.smoother_overlap));
-    parameter_list.set("aggregation: threshold", 
+    parameter_list.set("aggregation: threshold",
 		       additional_data.aggregation_threshold);
-    
+
     if (additional_data.output_details)
       parameter_list.set("ML output", 10);
     else
-      parameter_list.set("ML output", 0);  
+      parameter_list.set("ML output", 0);
 
     const Epetra_Map & domain_map = matrix.domain_partitioner();
-    
-    Epetra_MultiVector distributed_constant_modes (domain_map, 
+
+    Epetra_MultiVector distributed_constant_modes (domain_map,
 						   constant_modes_dimension);
-  
+
     if (constant_modes_dimension > 1)
       {
 	Assert (n_rows == additional_data.constant_modes[0].size(),
 		ExcDimensionMismatch(n_rows,
 				     additional_data.constant_modes[0].size()));
-	Assert (n_rows == 
+	Assert (n_rows ==
 		static_cast<unsigned int>(distributed_constant_modes.GlobalLength()),
 		ExcDimensionMismatch(n_rows,
 				     distributed_constant_modes.GlobalLength()));
@@ -588,7 +588,7 @@ namespace TrilinosWrappers
 	const unsigned int my_size = domain_map.NumMyElements();
 	Assert (my_size == static_cast<unsigned int>(domain_map.MaxLID()+1),
 		ExcDimensionMismatch (my_size, domain_map.MaxLID()+1));
-	
+
 				        // Reshape null space as a
 				        // contiguous vector of
 				        // doubles so that Trilinos
@@ -597,24 +597,32 @@ namespace TrilinosWrappers
 	  for (unsigned int row=0; row<my_size; ++row)
 	    {
 	      int global_row_id = domain_map.GID(row);
-	      distributed_constant_modes.ReplaceMyValue(row, d, 
+	      distributed_constant_modes.ReplaceMyValue(row, d,
 		static_cast<double>(additional_data.constant_modes[d][global_row_id]));
 	    }
-  
+
 	parameter_list.set("null space: type", "pre-computed");
-	parameter_list.set("null space: dimension", 
+	parameter_list.set("null space: dimension",
 			   distributed_constant_modes.NumVectors());
-	parameter_list.set("null space: vectors", 
+	parameter_list.set("null space: vectors",
 			   distributed_constant_modes.Values());
       }
 
-    multilevel_operator = Teuchos::rcp (new ML_Epetra::MultiLevelPreconditioner(
-					matrix.trilinos_matrix(), parameter_list,
-					true));
+    initialize (matrix, parameter_list);
 
     if (additional_data.output_details)
       multilevel_operator->PrintUnused(0);
+  }
 
+
+
+  void
+  PreconditionAMG::initialize (const SparseMatrix           &matrix,
+			       const Teuchos::ParameterList &ml_parameters)
+  {
+    multilevel_operator = Teuchos::rcp (new ML_Epetra::MultiLevelPreconditioner(
+					matrix.trilinos_matrix(), ml_parameters,
+					true));
     preconditioner = Teuchos::rcp (&*multilevel_operator, false);
   }
 
@@ -627,7 +635,7 @@ namespace TrilinosWrappers
 	      const double                          drop_tolerance)
   {
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
-  
+
 				        // Init Epetra Matrix using an
 				        // equidistributed map; avoid
 				        // storing the nonzero
@@ -642,8 +650,8 @@ namespace TrilinosWrappers
 
     initialize (*Matrix, additional_data);
   }
-  
-  
+
+
   void PreconditionAMG::reinit ()
   {
     multilevel_operator->ReComputePreconditioner();
