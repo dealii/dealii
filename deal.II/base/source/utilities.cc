@@ -582,7 +582,7 @@ namespace Utilities
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
-#  ifdef DEAL_II_USE_TRILINOS
+#  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
 				       // make memory pool release all
 				       // vectors that are no longer
 				       // used at this point. this is
@@ -592,6 +592,17 @@ namespace Utilities
 				       // the program would run after
 				       // MPI_Finalize is called,
 				       // leading to errors
+				       //
+				       // TODO: On Mac OS X, shared libs can
+ 				       // only depend on other libs listed
+ 				       // later on the command line. This
+ 				       // means that libbase can't depend on
+ 				       // liblac, and we can't destroy the
+ 				       // memory pool here as long as we have
+ 				       // separate libraries. Consequently,
+ 				       // the #ifdef above. Deal will then
+ 				       // just continue to seg fault upon
+ 				       // completion of main()
       GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
 	::release_unused_memory ();
       GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
