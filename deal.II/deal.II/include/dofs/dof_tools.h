@@ -1106,55 +1106,44 @@ class DoFTools
 			    std::vector<bool>  &selected_dofs);
 
 				     /**
-				      * Extract a vector that
-				      * represents the constant
-				      * modes of the DoFHandler
-				      * for the components
-				      * chosen by <tt>component_select</tt>.
-				      * The constant modes on a
-				      * discretization are the
-				      * null space of a Laplace
-				      * operator on the selected
-				      * components with Neumann
-				      * boundary conditions
-				      * applied. The null space is
-				      * a necessary ingredient for
-				      * obtaining a good AMG
-				      * preconditioner when using
-				      * the class
+				      * Extract a vector that represents the
+				      * constant modes of the DoFHandler for
+				      * the components chosen by
+				      * <tt>component_select</tt>.  The
+				      * constant modes on a discretization are
+				      * the null space of a Laplace operator
+				      * on the selected components with
+				      * Neumann boundary conditions
+				      * applied. The null space is a necessary
+				      * ingredient for obtaining a good AMG
+				      * preconditioner when using the class
 				      * TrilinosWrappers::PreconditionAMG.
-				      * Since the ML AMG package
-				      * only works on algebraic
-				      * properties of the respective
-				      * matrix, it has no chance
-				      * to detect whether the matrix
-				      * comes from a scalar or a
-				      * vector valued problem. However,
-				      * a near null space supplies
-				      * exactly the needed information
-				      * about these components.
-				      * The null space will consist
-				      * of as many vectors as there
+				      * Since the ML AMG package only works on
+				      * algebraic properties of the respective
+				      * matrix, it has no chance to detect
+				      * whether the matrix comes from a scalar
+				      * or a vector valued problem. However, a
+				      * near null space supplies exactly the
+				      * needed information about these
+				      * components.  The null space will
+				      * consist of as many vectors as there
 				      * are true arguments in
-				      * <tt>component_select</tt>,
-				      * each of which will be one
-				      * in one component and
-				      * zero in all others. We store
-				      * this object in a vector of
-				      * vectors, where the outer
-				      * vector is of the size of
-				      * the number of selected
-				      * components, and each inner
-				      * vector has as many components
-				      * as there are degrees of
+				      * <tt>component_select</tt>, each of
+				      * which will be one in one component and
+				      * zero in all others. We store this
+				      * object in a vector of vectors, where
+				      * the outer vector is of the size of the
+				      * number of selected components, and
+				      * each inner vector has as many
+				      * components as there are degrees of
 				      * freedom in the selected
-				      * components. Note that any
-				      * matrix associated with this
-				      * null space must have been
-				      * constructed using the
-				      * same
-				      * <tt>component_select</tt>
-				      * argument.
+				      * components. Note that any matrix
+				      * associated with this null space must
+				      * have been constructed using the same
+				      * <tt>component_select</tt> argument,
+				      * since the numbering of DoFs is done
+				      * relative to the selected dofs, not to
+				      * all dofs.
 				      *
 				      * The main reason for this
 				      * program is the use of the
