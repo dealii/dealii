@@ -135,8 +135,8 @@ SparseMatrix<number>::operator = (const double d)
   Assert (cols != 0, ExcNotInitialized());
   Assert (cols->compressed || cols->empty(), SparsityPattern::ExcNotCompressed());
 
-  if (val)
-    memset (&val[0], cols->n_nonzero_elements()*sizeof(number), 0);
+  if (val != 0)
+    memset (&val[0], 0, cols->n_nonzero_elements()*sizeof(number));
 
   return *this;
 }
@@ -185,8 +185,7 @@ SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
       max_len = N;
     }
 
-  if (val != 0)
-    std::fill_n (&val[0], N, 0);
+  *this = 0.;
 }
 
 
