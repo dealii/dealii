@@ -69,6 +69,7 @@ check ()
   FESystem<dim> fe (FE_RaviartThomas<dim>(0), 1, FE_DGQ<dim>(0), 1);
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
+  deallog << "Number of DoFs: " << dof_handler.n_dofs() << std::endl;
 
 				   // no grouping
   {

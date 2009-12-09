@@ -126,4 +126,4 @@ DEAL::160 10 10 10 57 10 57 10
 DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(1)2 in 2d:
 DEAL::160 29 29 29 29 
 DEAL::Checking FE_Nedelec<2>(1)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(1),2)2 in 2d:
-DEAL::29 29 40 40 115 58 58 58 58 115 58 58 58 58 
+DEAL::29 29 40 40 57 29 29 29 29 57 29 29 29 29 
