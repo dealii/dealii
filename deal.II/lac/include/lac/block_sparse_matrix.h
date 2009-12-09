@@ -50,7 +50,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
                                       * access to its own typedefs.
                                       */
     typedef BlockMatrixBase<SparseMatrix<number> > BaseClass;
-    
+
                                      /**
                                       * Typedef the type of the underlying
                                       * matrix.
@@ -120,10 +120,10 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      * Destructor.
 				      */
     virtual ~BlockSparseMatrix ();
-    
-    
 
-				     /** 
+
+
+				     /**
 				      * Pseudo copy operator only copying
 				      * empty objects. The sizes of the block
 				      * matrices need to be the same.
@@ -131,22 +131,22 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     BlockSparseMatrix &
     operator = (const BlockSparseMatrix &);
 
-				     /**
+                                     /**
 				      * This operator assigns a scalar to a
 				      * matrix. Since this does usually not
 				      * make much sense (should we set all
-				      * matrix entries to this value? Only the
-				      * nonzero entries of the sparsity
+				      * matrix entries to this value? Only
+				      * the nonzero entries of the sparsity
 				      * pattern?), this operation is only
 				      * allowed if the actual value to be
 				      * assigned is zero. This operator only
 				      * exists to allow for the obvious
-				      * notation <tt>matrix=0</tt>, which sets
-				      * all elements of the matrix to zero,
-				      * but keep the sparsity pattern
+				      * notation <tt>matrix=0</tt>, which
+				      * sets all elements of the matrix to
+				      * zero, but keep the sparsity pattern
 				      * previously used.
 				      */
-    BlockSparseMatrix<number> &
+    BlockSparseMatrix &
     operator = (const double d);
 
     				     /**
@@ -162,7 +162,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      * object to have no blocks at all.
 				      */
     void clear ();
-    
+
 				     /**
 				      * Reinitialize the sparse matrix
 				      * with the given sparsity
@@ -209,7 +209,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      * (with absolute value larger than
 				      * threshold) of all the blocks.
 				      */
-    unsigned int n_actually_nonzero_elements (const double threshold = 0.0) const;    
+    unsigned int n_actually_nonzero_elements (const double threshold = 0.0) const;
 
 				     /**
 				      * Matrix-vector multiplication:
@@ -254,7 +254,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     template <typename nonblock_number>
     void vmult (Vector<nonblock_number>       &dst,
                 const Vector<nonblock_number> &src) const;
-    
+
 				     /**
 				      * Matrix-vector multiplication:
 				      * let $dst = M^T*src$ with $M$
@@ -266,7 +266,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     template <typename block_number>
     void Tvmult (BlockVector<block_number>       &dst,
                  const BlockVector<block_number> &src) const;
-  
+
 				     /**
 				      * Matrix-vector
 				      * multiplication. Just like the
@@ -301,7 +301,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     template <typename nonblock_number>
     void Tvmult (Vector<nonblock_number>       &dst,
                  const Vector<nonblock_number> &src) const;
-    
+
 				     /**
 				      * Apply the Jacobi
 				      * preconditioner, which
@@ -396,7 +396,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      */
     const BlockSparsityPattern &
     get_sparsity_pattern () const;
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -406,12 +406,12 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 
       				     /** @addtogroup Exceptions
 				      * @{ */
-    
+
                                      /**
                                       * Exception
                                       */
     DeclException0 (ExcBlockDimensionMismatch);
-				     //@}    
+				     //@}
   private:
     				     /**
 				      * Pointer to the block sparsity
@@ -433,6 +433,22 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 
 
 template <typename number>
+inline
+BlockSparseMatrix<number> &
+BlockSparseMatrix<number>::operator = (const double d)
+{
+  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
+      this->block(r,c) = d;
+
+  return *this;
+}
+
+
+
+template <typename number>
 template <typename block_number>
 inline
 void
@@ -441,7 +457,7 @@ BlockSparseMatrix<number>::vmult (BlockVector<block_number>       &dst,
 {
   BaseClass::vmult_block_block (dst, src);
 }
-  
+
 
 
 template <typename number>
@@ -454,7 +470,7 @@ BlockSparseMatrix<number>::vmult (BlockVector<block_number>     &dst,
 {
   BaseClass::vmult_block_nonblock (dst, src);
 }
-  
+
 
 
 template <typename number>
@@ -467,7 +483,7 @@ BlockSparseMatrix<number>::vmult (Vector<nonblock_number>         &dst,
 {
   BaseClass::vmult_nonblock_block (dst, src);
 }
-  
+
 
 
 template <typename number>
@@ -481,6 +497,7 @@ BlockSparseMatrix<number>::vmult (Vector<nonblock_number>       &dst,
 }
 
 
+
 template <typename number>
 template <typename block_number>
 inline
@@ -490,7 +507,7 @@ BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>       &dst,
 {
   BaseClass::Tvmult_block_block (dst, src);
 }
-  
+
 
 
 template <typename number>
@@ -503,7 +520,7 @@ BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>     &dst,
 {
   BaseClass::Tvmult_block_nonblock (dst, src);
 }
-  
+
 
 
 template <typename number>
@@ -516,7 +533,7 @@ BlockSparseMatrix<number>::Tvmult (Vector<nonblock_number>         &dst,
 {
   BaseClass::Tvmult_nonblock_block (dst, src);
 }
-  
+
 
 
 template <typename number>
@@ -530,8 +547,10 @@ BlockSparseMatrix<number>::Tvmult (Vector<nonblock_number>       &dst,
 }
 
 
+
 template <typename number>
 template <class BlockVectorType>
+inline
 void
 BlockSparseMatrix<number>::
 precondition_Jacobi (BlockVectorType       &dst,
@@ -553,8 +572,10 @@ precondition_Jacobi (BlockVectorType       &dst,
 }
 
 
+
 template <typename number>
 template <typename number2>
+inline
 void
 BlockSparseMatrix<number>::
 precondition_Jacobi (Vector<number2>       &dst,

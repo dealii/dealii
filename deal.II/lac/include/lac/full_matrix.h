@@ -1365,7 +1365,7 @@ FullMatrix<number>::operator = (const number d)
   Assert (d==number(0), ExcScalarAssignmentOnlyForZeroValue());
 
   if (this->n_elements() != 0)
-    std::fill_n (this->val, this->n_elements(), number());
+    memset (this->val, 0, this->n_elements()*sizeof(number));
 
   return *this;
 }

@@ -645,6 +645,23 @@ namespace TrilinosWrappers
 
 // ------------- inline and template functions -----------------
 
+
+
+  inline
+  BlockSparseMatrix &
+  BlockSparseMatrix::operator = (const double d)
+  {
+    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+
+    for (unsigned int r=0; r<this->n_block_rows(); ++r)
+      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+	this->block(r,c) = d;
+
+    return *this;
+  }
+
+
+
   inline
   bool
   BlockSparseMatrix::is_compressed () const

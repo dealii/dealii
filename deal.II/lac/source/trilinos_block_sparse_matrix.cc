@@ -47,18 +47,6 @@ namespace TrilinosWrappers
 
 
 
-  BlockSparseMatrix &
-  BlockSparseMatrix::operator = (const double d)
-  {
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
-        this->block(r,c) = d;
-
-    return *this;
-  }
-
-
-
   void
   BlockSparseMatrix::
   reinit (const unsigned int n_block_rows,

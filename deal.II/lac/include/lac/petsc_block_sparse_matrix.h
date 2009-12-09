@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  
+
 /*! @addtogroup PETScWrappers
  *@{
  */
@@ -66,7 +66,7 @@ namespace PETScWrappers
                                         * access to its own typedefs.
                                         */
       typedef BlockMatrixBase<SparseMatrix> BaseClass;
-    
+
                                        /**
                                         * Typedef the type of the underlying
                                         * matrix.
@@ -114,7 +114,7 @@ namespace PETScWrappers
                                         */
       ~BlockSparseMatrix ();
 
-                                       /** 
+                                       /**
                                         * Pseudo copy operator only copying
                                         * empty objects. The sizes of the block
                                         * matrices need to be the same.
@@ -168,7 +168,7 @@ namespace PETScWrappers
                                         */
       void reinit (const unsigned int n_block_rows,
                    const unsigned int n_block_columns);
-      
+
                                        /**
                                         * This function collects the
                                         * sizes of the sub-objects and
@@ -220,7 +220,7 @@ namespace PETScWrappers
                                         */
       void vmult (Vector       &dst,
                   const Vector &src) const;
-    
+
                                        /**
                                         * Matrix-vector multiplication:
                                         * let $dst = M^T*src$ with $M$
@@ -231,7 +231,7 @@ namespace PETScWrappers
                                         */
       void Tvmult (BlockVector       &dst,
                    const BlockVector &src) const;
-  
+
                                        /**
                                         * Matrix-vector
                                         * multiplication. Just like the
@@ -260,7 +260,7 @@ namespace PETScWrappers
                                         * only one block.
                                         */
       void Tvmult (Vector       &dst,
-                   const Vector &src) const;    
+                   const Vector &src) const;
 
                                        /**
                                         * Make the clear() function in the
@@ -268,11 +268,11 @@ namespace PETScWrappers
                                         * protected.
                                         */
       using BlockMatrixBase<SparseMatrix>::clear;
-      
+
 				       /** @addtogroup Exceptions
 					* @{
 					*/
-      
+
                                        /**
                                         * Exception
                                         */
@@ -297,13 +297,28 @@ namespace PETScWrappers
 // ------------- inline and template functions -----------------
 
   inline
+  BlockSparseMatrix &
+  BlockSparseMatrix::operator = (const double d)
+  {
+    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+
+    for (unsigned int r=0; r<this->n_block_rows(); ++r)
+      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+	this->block(r,c) = d;
+
+    return *this;
+  }
+
+
+
+  inline
   void
   BlockSparseMatrix::vmult (BlockVector       &dst,
                             const BlockVector &src) const
   {
     BaseClass::vmult_block_block (dst, src);
   }
-  
+
 
 
   inline
@@ -313,7 +328,7 @@ namespace PETScWrappers
   {
     BaseClass::vmult_block_nonblock (dst, src);
   }
-  
+
 
 
   inline
@@ -323,7 +338,7 @@ namespace PETScWrappers
   {
     BaseClass::vmult_nonblock_block (dst, src);
   }
-  
+
 
 
   inline
@@ -342,7 +357,7 @@ namespace PETScWrappers
   {
     BaseClass::Tvmult_block_block (dst, src);
   }
-  
+
 
 
   inline
@@ -352,7 +367,7 @@ namespace PETScWrappers
   {
     BaseClass::Tvmult_block_nonblock (dst, src);
   }
-  
+
 
 
   inline
@@ -362,7 +377,7 @@ namespace PETScWrappers
   {
     BaseClass::Tvmult_nonblock_block (dst, src);
   }
-  
+
 
 
   inline
@@ -372,7 +387,7 @@ namespace PETScWrappers
   {
     BaseClass::Tvmult_nonblock_nonblock (dst, src);
   }
-  
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

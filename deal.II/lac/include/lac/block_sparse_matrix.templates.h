@@ -68,21 +68,6 @@ operator = (const BlockSparseMatrix<number> &m)
   return *this;
 }
 
- 
-
-template <typename number>
-BlockSparseMatrix<number> &
-BlockSparseMatrix<number>::operator = (const double d)
-{
-  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
-  
-  for (unsigned int r=0; r<this->n_block_rows(); ++r)
-    for (unsigned int c=0; c<this->n_block_cols(); ++c)
-      this->block(r,c) = d;
-
-  return *this;
-}
-
 
 
 template <typename number>
