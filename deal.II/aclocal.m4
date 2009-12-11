@@ -1963,6 +1963,35 @@ AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
 
 
 dnl -------------------------------------------------------------
+dnl
+dnl Check for a problem with dynamic cast on dynamic libs on
+dnl Mac OS X Snow Leopard. The test is only called on Mac OS X.
+dnl The test is due to Scott Miller <scott.miller@psu.edu>
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_DYNAMIC_CAST_BUG,
+[
+  AC_MSG_CHECKING(for dynamic_cast problem with shared libs)
+
+  if (cd contrib/config/tests/darwin-dynamic-cast ; \
+      $CXX -dynamiclib BaseClass.cpp -o libDynamicCastTestLib.dylib ; \
+      $CXX -L. -lDynamicCastTestLib main.cc -o main ; \
+      ./main) ; then
+    AC_MSG_RESULT(no) ;
+  else
+    AC_MSG_RESULT(yes) ;
+    AC_DEFINE(DEAL_II_HAVE_DARWIN_DYNACAST_BUG, 1,
+              [Defined if the compiler has a bug with dynamic casting
+               and dynamic libraries])
+  fi
+  rm -f contrib/config/tests/darwin-dynamic-cast/libDynamicCastTestLib.dylib
+  rm -f contrib/config/tests/darwin-dynamic-cast/main.o
+  rm -f contrib/config/tests/darwin-dynamic-cast/main
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Check whether user wants optimization for a certain type of
 dnl CPU. If so, then set some flags, dependent on what he
 dnl wants and the compiler. Not very many CPUS are listed here,

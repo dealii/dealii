@@ -100,6 +100,10 @@
    aclocal.m4 in the top-level directory. */
 #undef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
 
+/* Defined if the compiler has a bug with dynamic casting and dynamic
+   libraries */
+#undef DEAL_II_HAVE_DARWIN_DYNACAST_BUG
+
 /* Defined if std::isfinite is available */
 #undef DEAL_II_HAVE_ISFINITE
 

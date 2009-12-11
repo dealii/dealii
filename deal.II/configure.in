@@ -309,13 +309,14 @@ if test "x$enableshared" = "xyes" ; then
 
   case "$target" in
     *-apple-darwin* )
-       SHLIBFLAGS="-dynamiclib"
+           SHLIBFLAGS="-dynamiclib"
+           DEAL_II_CHECK_DYNAMIC_CAST_BUG
 	   ;;
   esac
 
   case "${GXX_VERSION}" in
     ibm_xlc* )
-       SHLIBFLAGS="-qmkshrobj"
+           SHLIBFLAGS="-qmkshrobj"
 	   ;;
   esac
 
