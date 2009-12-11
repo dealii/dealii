@@ -34,7 +34,7 @@ inconvenience this causes.
   <p>
   Removed: The class TrilinosWrappers::PreconditionStokes has been deleted
   because it did not work properly, and it is too specific to be part of
-  the general library. A preconditioner that has the same properties is 
+  the general library. A preconditioner that has the same properties is
   explained in the @ref step_31 step-31 tutorial program.
   <br>
   (Martin Kronbichler 2009/11/23)
@@ -92,6 +92,16 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+   <li>
+   <p>
+   New: The version of <a href="http://www.boost.org/">boost</a>
+   included in the <code>contrib/</code> directory has been updated
+   to 1.41.0.
+   <br>
+   (WB 2009/12/10)
+   </p>
+   </li>
+
    <li>
    <p>
    New: There is now a new tutorial program, @ref step_35 "step-35",
