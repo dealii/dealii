@@ -2896,97 +2896,6 @@ DoFTools::make_hanging_node_constraints (const DH &dof_handler,
 
 
 
-template <class DH, typename Number>
-void DoFTools::distribute_cell_to_dof_vector (
-  const DH             &dof_handler,
-  const Vector<Number> &cell_data,
-  Vector<double>       &dof_data,
-  const unsigned int    component)
-{
-  const Triangulation<DH::dimension> &tria = dof_handler.get_tria();
-
-  Assert (cell_data.size()==tria.n_active_cells(),
-	  ExcWrongSize (cell_data.size(), tria.n_active_cells()));
-  Assert (dof_data.size()==dof_handler.n_dofs(),
-	  ExcWrongSize (dof_data.size(), dof_handler.n_dofs()));
-  Assert (component < n_components(dof_handler),
-	  ExcInvalidComponent(component, n_components(dof_handler)));
-  Assert (fe_is_primitive(dof_handler) == true,
-          ExcFENotPrimitive());
-
-				   // store a flag whether we should care
-				   // about different components. this is
-				   // just a simplification, we could ask
-				   // for this at every single place
-				   // equally well
-  const bool consider_components = (n_components(dof_handler) != 1);
-
-				   // zero out the components that we
-				   // will touch
-  if (consider_components == false)
-    dof_data = 0;
-  else
-    {
-      std::vector<bool> component_dofs (dof_handler.n_dofs());
-      std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
-					false);
-      component_mask[component] = true;
-      DoFTools::extract_dofs (dof_handler, component_mask, component_dofs);
-
-      for (unsigned int i=0; i<dof_data.size(); ++i)
-	dof_data(i) = 0;
-    }
-
-				   // count how often we have added a value
-				   // in the sum for each dof
-  std::vector<unsigned char> touch_count (dof_handler.n_dofs(), 0);
-
-  typename DH::active_cell_iterator cell = dof_handler.begin_active(),
-				    endc = dof_handler.end();
-  std::vector<unsigned int> dof_indices;
-  dof_indices.reserve (max_dofs_per_cell(dof_handler));
-
-  for (unsigned int present_cell = 0; cell!=endc; ++cell, ++present_cell)
-    {
-      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-      dof_indices.resize (dofs_per_cell);
-      cell->get_dof_indices (dof_indices);
-
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-					 // consider this dof only if it
-					 // is the right component. if there
-					 // is only one component, short cut
-					 // the test
-	if (!consider_components ||
-	    (cell->get_fe().system_to_component_index(i).first == component))
-	  {
-					     // sum up contribution of the
-					     // present_cell to this dof
-	    dof_data(dof_indices[i]) += cell_data(present_cell);
-					     // note that we added another
-					     // summand
-	    ++touch_count[dof_indices[i]];
-	  }
-    }
-
-				   // compute the mean value on all the
-				   // dofs by dividing with the number
-				   // of summands.
-  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-    {
-				       // assert that each dof was used
-				       // at least once. this needs not be
-				       // the case if the vector has more than
-				       // one component
-      Assert (consider_components || (touch_count[i]!=0),
-	      ExcInternalError());
-      if (touch_count[i] != 0)
-	dof_data(i) /=  touch_count[i];
-    }
-}
-
-
-
 namespace internal
 {
 				// this internal function assigns to each dof
@@ -3093,6 +3002,99 @@ namespace internal
   {
     Assert (false, ExcNotImplemented());
   }
+}
+
+
+
+template <class DH, typename Number>
+void DoFTools::distribute_cell_to_dof_vector (
+  const DH             &dof_handler,
+  const Vector<Number> &cell_data,
+  Vector<double>       &dof_data,
+  const unsigned int    component)
+{
+  const Triangulation<DH::dimension> &tria = dof_handler.get_tria();
+
+  Assert (cell_data.size()==tria.n_active_cells(),
+	  ExcWrongSize (cell_data.size(), tria.n_active_cells()));
+  Assert (dof_data.size()==dof_handler.n_dofs(),
+	  ExcWrongSize (dof_data.size(), dof_handler.n_dofs()));
+  Assert (component < n_components(dof_handler),
+	  ExcInvalidComponent(component, n_components(dof_handler)));
+  Assert (fe_is_primitive(dof_handler) == true,
+          ExcFENotPrimitive());
+
+				   // store a flag whether we should care
+				   // about different components. this is
+				   // just a simplification, we could ask
+				   // for this at every single place
+				   // equally well
+  const bool consider_components = (n_components(dof_handler) != 1);
+
+				   // zero out the components that we
+				   // will touch
+  if (consider_components == false)
+    dof_data = 0;
+  else
+    {
+      std::vector<unsigned char> component_dofs (dof_handler.n_dofs());
+      std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
+					false);
+      component_mask[component] = true;
+      internal::extract_dofs_by_component (dof_handler, component_mask, 
+					   false, component_dofs);
+
+      for (unsigned int i=0; i<dof_data.size(); ++i)
+	if (component_dofs[i] == static_cast<unsigned char>(component))
+	  dof_data(i) = 0;
+    }
+
+				   // count how often we have added a value
+				   // in the sum for each dof
+  std::vector<unsigned char> touch_count (dof_handler.n_dofs(), 0);
+
+  typename DH::active_cell_iterator cell = dof_handler.begin_active(),
+				    endc = dof_handler.end();
+  std::vector<unsigned int> dof_indices;
+  dof_indices.reserve (max_dofs_per_cell(dof_handler));
+
+  for (unsigned int present_cell = 0; cell!=endc; ++cell, ++present_cell)
+    {
+      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+      dof_indices.resize (dofs_per_cell);
+      cell->get_dof_indices (dof_indices);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+					 // consider this dof only if it
+					 // is the right component. if there
+					 // is only one component, short cut
+					 // the test
+	if (!consider_components ||
+	    (cell->get_fe().system_to_component_index(i).first == component))
+	  {
+					     // sum up contribution of the
+					     // present_cell to this dof
+	    dof_data(dof_indices[i]) += cell_data(present_cell);
+					     // note that we added another
+					     // summand
+	    ++touch_count[dof_indices[i]];
+	  }
+    }
+
+				   // compute the mean value on all the
+				   // dofs by dividing with the number
+				   // of summands.
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    {
+				       // assert that each dof was used
+				       // at least once. this needs not be
+				       // the case if the vector has more than
+				       // one component
+      Assert (consider_components || (touch_count[i]!=0),
+	      ExcInternalError());
+      if (touch_count[i] != 0)
+	dof_data(i) /=  touch_count[i];
+    }
 }
 
 
