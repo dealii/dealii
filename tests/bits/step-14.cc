@@ -1,6 +1,6 @@
 //----------------------------  step-14.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
@@ -60,13 +60,13 @@ std::ofstream logfile("step-14/output");
 namespace Evaluation
 {
   template <int dim>
-  class EvaluationBase 
+  class EvaluationBase
   {
     public:
       virtual ~EvaluationBase ();
 
       void set_refinement_cycle (const unsigned int refinement_cycle);
-      
+
       virtual void operator () (const DoFHandler<dim> &dof_handler,
 				const Vector<double>  &solution) const = 0;
     protected:
@@ -77,9 +77,9 @@ namespace Evaluation
   template <int dim>
   EvaluationBase<dim>::~EvaluationBase ()
   {}
-  
 
-  
+
+
   template <int dim>
   void
   EvaluationBase<dim>::set_refinement_cycle (const unsigned int step)
@@ -93,10 +93,10 @@ namespace Evaluation
   {
     public:
       PointValueEvaluation (const Point<dim>   &evaluation_point);
-      
+
       virtual void operator () (const DoFHandler<dim> &dof_handler,
 				const Vector<double>  &solution) const;
-      
+
       DeclException1 (ExcEvaluationPointNotFound,
 		      Point<dim>,
 		      << "The evaluation point " << arg1
@@ -112,14 +112,14 @@ namespace Evaluation
 		  :
 		  evaluation_point (evaluation_point)
   {}
-  
+
 
 
   template <int dim>
   void
   PointValueEvaluation<dim>::
   operator () (const DoFHandler<dim> &dof_handler,
-	       const Vector<double>  &solution) const 
+	       const Vector<double>  &solution) const
   {
     double point_value = 1e20;
 
@@ -155,10 +155,10 @@ namespace Evaluation
   {
     public:
       PointXDerivativeEvaluation (const Point<dim>   &evaluation_point);
-      
+
       virtual void operator () (const DoFHandler<dim> &dof_handler,
 				const Vector<double>  &solution) const;
-      
+
       DeclException1 (ExcEvaluationPointNotFound,
 		      Point<dim>,
 		      << "The evaluation point " << arg1
@@ -174,13 +174,13 @@ namespace Evaluation
 		  :
 		  evaluation_point (evaluation_point)
   {}
-  
+
 
   template <int dim>
   void
   PointXDerivativeEvaluation<dim>::
   operator () (const DoFHandler<dim> &dof_handler,
-	       const Vector<double>  &solution) const 
+	       const Vector<double>  &solution) const
   {
     double point_derivative = 0;
 
@@ -190,7 +190,7 @@ namespace Evaluation
 			     update_gradients | update_q_points);
     std::vector<Tensor<1,dim> >
       solution_gradients (vertex_quadrature.n_quadrature_points);
-    
+
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
@@ -228,14 +228,14 @@ namespace Evaluation
   }
 
 
-  
+
 
   template <int dim>
   class GridOutput : public EvaluationBase<dim>
   {
     public:
       GridOutput (const std::string &output_name_base);
-      
+
       virtual void operator () (const DoFHandler<dim> &dof_handler,
 				const Vector<double>  &solution) const;
     private:
@@ -249,7 +249,7 @@ namespace Evaluation
 		  :
 		  output_name_base (output_name_base)
   {}
-  
+
 
   template <int dim>
   void
@@ -261,19 +261,19 @@ namespace Evaluation
 	     << this->refinement_cycle
 	     << ".eps"
 	     << std::ends;
-    
+
     GridOut().write_eps (dof_handler.get_tria(),
 			 deallog.get_file_stream());
   }
 }
 
-  
+
 
 namespace LaplaceSolver
 {
   template <int dim> class WeightedResidual;
-  
-  
+
+
 
   template <int dim>
   class Base
@@ -290,7 +290,7 @@ namespace LaplaceSolver
       virtual void set_refinement_cycle (const unsigned int cycle);
 
       virtual void output_solution () const = 0;
-      
+
     protected:
       const SmartPointer<Triangulation<dim> > triangulation;
 
@@ -306,7 +306,7 @@ namespace LaplaceSolver
 
 
   template <int dim>
-  Base<dim>::~Base () 
+  Base<dim>::~Base ()
   {}
 
 
@@ -317,7 +317,7 @@ namespace LaplaceSolver
   {
     refinement_cycle = cycle;
   }
-  
+
 
 
   template <int dim>
@@ -327,7 +327,7 @@ namespace LaplaceSolver
       Solver (Triangulation<dim>       &triangulation,
 	      const FiniteElement<dim> &fe,
 	      const Quadrature<dim>    &quadrature,
-	      const Quadrature<dim-1>  &face_quadrature,	      
+	      const Quadrature<dim-1>  &face_quadrature,
 	      const Function<dim>      &boundary_values);
       virtual
       ~Solver ();
@@ -343,24 +343,24 @@ namespace LaplaceSolver
       virtual
       unsigned int
       n_dofs () const;
-      
+
     protected:
       const SmartPointer<const FiniteElement<dim> >  fe;
       const SmartPointer<const Quadrature<dim> >     quadrature;
-      const SmartPointer<const Quadrature<dim-1> >   face_quadrature;      
+      const SmartPointer<const Quadrature<dim-1> >   face_quadrature;
       DoFHandler<dim>                                dof_handler;
       Vector<double>                                 solution;
       const SmartPointer<const Function<dim> >       boundary_values;
 
       virtual void assemble_rhs (Vector<double> &rhs) const = 0;
-    
+
     private:
       struct LinearSystem
       {
 	  LinearSystem (const DoFHandler<dim> &dof_handler);
 
 	  void solve (Vector<double> &solution) const;
-	
+
 	  ConstraintMatrix     hanging_node_constraints;
 	  SparsityPattern      sparsity_pattern;
 	  SparseMatrix<double> matrix;
@@ -389,14 +389,14 @@ namespace LaplaceSolver
 		  Base<dim> (triangulation),
 		  fe (&fe),
                   quadrature (&quadrature),
-                  face_quadrature (&face_quadrature),    
+                  face_quadrature (&face_quadrature),
 		  dof_handler (triangulation),
 		  boundary_values (&boundary_values)
   {}
 
 
   template <int dim>
-  Solver<dim>::~Solver () 
+  Solver<dim>::~Solver ()
   {
     dof_handler.clear ();
   }
@@ -430,7 +430,7 @@ namespace LaplaceSolver
   {
     return dof_handler.n_dofs();
   }
-  
+
 
   template <int dim>
   void
@@ -442,7 +442,7 @@ namespace LaplaceSolver
 
     const unsigned int n_threads = multithread_info.n_default_threads;
     std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-      thread_ranges 
+      thread_ranges
       = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
 						    dof_handler.end (),
 						    n_threads);
@@ -467,7 +467,7 @@ namespace LaplaceSolver
 					      0,
 					      *boundary_values,
 					      boundary_value_map);
-    
+
     threads.join_all ();
     linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
@@ -485,7 +485,7 @@ namespace LaplaceSolver
 				const typename DoFHandler<dim>::active_cell_iterator &end_cell,
 				Threads::ThreadMutex                                 &mutex) const
   {
-    FEValues<dim> fe_values (*fe, *quadrature, 
+    FEValues<dim> fe_values (*fe, *quadrature,
 			     update_gradients | update_JxW_values);
 
     const unsigned int   dofs_per_cell = fe->dofs_per_cell;
@@ -530,7 +530,7 @@ namespace LaplaceSolver
     void (*mhnc_p) (const DoFHandler<dim> &,
 		    ConstraintMatrix      &)
       = &DoFTools::make_hanging_node_constraints;
-    
+
     Threads::Thread<>
       mhnc_thread = Threads::spawn (mhnc_p)(dof_handler, hanging_node_constraints);
 
@@ -582,16 +582,16 @@ namespace LaplaceSolver
 
       virtual
       void solve_problem ();
-      
+
       virtual
       unsigned int n_dofs () const;
-      
+
       virtual
       void postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
 
       virtual
       void output_solution () const;
-      
+
     protected:
       const SmartPointer<const Function<dim> > rhs_function;
       virtual void assemble_rhs (Vector<double> &rhs) const;
@@ -659,15 +659,15 @@ namespace LaplaceSolver
 	     << std::ends;
     data_out.write (deallog.get_file_stream(), DataOut<dim>::gnuplot);
   }
-  
+
 
 
   template <int dim>
   void
   PrimalSolver<dim>::
-  assemble_rhs (Vector<double> &rhs) const 
+  assemble_rhs (Vector<double> &rhs) const
   {
-    FEValues<dim> fe_values (*this->fe, *this->quadrature, 
+    FEValues<dim> fe_values (*this->fe, *this->quadrature,
 			     update_values  | update_q_points  |
                              update_JxW_values);
 
@@ -689,7 +689,7 @@ namespace LaplaceSolver
 
 	rhs_function->value_list (fe_values.get_quadrature_points(),
 				  rhs_values);
-      
+
 	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
@@ -854,7 +854,7 @@ namespace LaplaceSolver
     for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
       estimated_error(cell_index)
 	*= weighting_function->value (cell->center());
-    
+
     GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
 						     estimated_error,
 						     0.3, 0.03);
@@ -866,7 +866,7 @@ namespace LaplaceSolver
 
 namespace Data
 {
-  
+
   template <int dim>
   struct SetUpBase : public Subscriptor
   {
@@ -891,7 +891,7 @@ namespace Data
 
       virtual
       const Function<dim> &  get_right_hand_side () const;
-      
+
 
       virtual
       void create_coarse_grid (Triangulation<dim> &coarse_grid) const;
@@ -908,7 +908,7 @@ namespace Data
 
   template <class Traits, int dim>
   const Function<dim> &
-  SetUp<Traits,dim>::get_boundary_values () const 
+  SetUp<Traits,dim>::get_boundary_values () const
   {
     return boundary_values;
   }
@@ -916,7 +916,7 @@ namespace Data
 
   template <class Traits, int dim>
   const Function<dim> &
-  SetUp<Traits,dim>::get_right_hand_side () const 
+  SetUp<Traits,dim>::get_right_hand_side () const
   {
     return right_hand_side;
   }
@@ -925,11 +925,11 @@ namespace Data
   template <class Traits, int dim>
   void
   SetUp<Traits,dim>::
-  create_coarse_grid (Triangulation<dim> &coarse_grid) const 
+  create_coarse_grid (Triangulation<dim> &coarse_grid) const
   {
     Traits::create_coarse_grid (coarse_grid);
   }
-  
+
 
 
   template <int dim>
@@ -939,7 +939,7 @@ namespace Data
       {
 	public:
 	  BoundaryValues () : Function<dim> () {}
-	  
+
 	  virtual double value (const Point<dim>   &p,
 				const unsigned int  component) const;
       };
@@ -949,7 +949,7 @@ namespace Data
       {
 	public:
 	  RightHandSide () : Function<dim> () {}
-	  
+
 	  virtual double value (const Point<dim>   &p,
 				const unsigned int  component) const;
       };
@@ -958,8 +958,8 @@ namespace Data
       void
       create_coarse_grid (Triangulation<dim> &coarse_grid);
   };
-  
-    
+
+
   template <int dim>
   double
   CurvedRidges<dim>::BoundaryValues::
@@ -996,7 +996,7 @@ namespace Data
 	      100*std::sin(10*p(i)+5*p(0)*p(0));
       };
     t1 = t1*t1;
-    
+
     return -u*(t1+t2+t3);
   }
 
@@ -1009,9 +1009,9 @@ namespace Data
     GridGenerator::hyper_cube (coarse_grid, -1, 1);
     coarse_grid.refine_global (2);
   }
-  
 
-  
+
+
   template <int dim>
   struct Exercise_2_3
   {
@@ -1022,7 +1022,7 @@ namespace Data
 	public:
 	  RightHandSide () : ConstantFunction<dim> (1.) {}
       };
-      
+
       static
       void
       create_coarse_grid (Triangulation<dim> &coarse_grid);
@@ -1042,27 +1042,27 @@ namespace Data
 	     Point<2> (0.,    -1.),
 	     Point<2> (+1./2, -1.),
 	     Point<2> (+1,    -1.),
-	     
+
 	     Point<2> (-1.,   -1./2.),
 	     Point<2> (-1./2, -1./2.),
 	     Point<2> (0.,    -1./2.),
 	     Point<2> (+1./2, -1./2.),
 	     Point<2> (+1,    -1./2.),
-	     
+
 	     Point<2> (-1.,   0.),
 	     Point<2> (-1./2, 0.),
 	     Point<2> (+1./2, 0.),
 	     Point<2> (+1,    0.),
-	     
+
 	     Point<2> (-1.,   1./2.),
 	     Point<2> (-1./2, 1./2.),
 	     Point<2> (0.,    1./2.),
 	     Point<2> (+1./2, 1./2.),
 	     Point<2> (+1,    1./2.),
-	     
+
 	     Point<2> (-1.,   1.),
 	     Point<2> (-1./2, 1.),
-	     Point<2> (0.,    1.),			  
+	     Point<2> (0.,    1.),
 	     Point<2> (+1./2, 1.),
 	     Point<2> (+1,    1.)    };
     const unsigned int
@@ -1088,7 +1088,7 @@ namespace Data
       n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
 
     std::vector<CellData<dim> > cells (n_cells, CellData<dim>());
-    for (unsigned int i=0; i<n_cells; ++i) 
+    for (unsigned int i=0; i<n_cells; ++i)
       {
 	for (unsigned int j=0;
 	     j<GeometryInfo<dim>::vertices_per_cell;
@@ -1100,7 +1100,7 @@ namespace Data
     coarse_grid.create_triangulation (vertices,
 						    cells,
 						    SubCellData());
-    
+
     coarse_grid.refine_global (1);
   }
 }
@@ -1110,7 +1110,7 @@ namespace Data
 
 namespace DualFunctional
 {
-  
+
   template <int dim>
   class DualFunctionalBase : public Subscriptor
   {
@@ -1122,7 +1122,7 @@ namespace DualFunctional
   };
 
 
-  
+
   template <int dim>
   class PointValueEvaluation : public DualFunctionalBase<dim>
   {
@@ -1133,7 +1133,7 @@ namespace DualFunctional
       void
       assemble_rhs (const DoFHandler<dim> &dof_handler,
 		    Vector<double>        &rhs) const;
-      
+
       DeclException1 (ExcEvaluationPointNotFound,
 		      Point<dim>,
 		      << "The evaluation point " << arg1
@@ -1150,7 +1150,7 @@ namespace DualFunctional
 		  :
 		  evaluation_point (evaluation_point)
   {}
-  
+
 
   template <int dim>
   void
@@ -1178,7 +1178,7 @@ namespace DualFunctional
   }
 
 
-  
+
   template <int dim>
   class PointXDerivativeEvaluation : public DualFunctionalBase<dim>
   {
@@ -1189,7 +1189,7 @@ namespace DualFunctional
       void
       assemble_rhs (const DoFHandler<dim> &dof_handler,
 		    Vector<double>        &rhs) const;
-      
+
       DeclException1 (ExcEvaluationPointNotFound,
 		      Point<dim>,
 		      << "The evaluation point " << arg1
@@ -1206,7 +1206,7 @@ namespace DualFunctional
 		  :
 		  evaluation_point (evaluation_point)
   {}
-  
+
 
   template <int dim>
   void
@@ -1228,7 +1228,7 @@ namespace DualFunctional
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
     double total_volume = 0;
-    
+
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
@@ -1238,7 +1238,7 @@ namespace DualFunctional
 	{
 	  fe_values.reinit (cell);
 	  cell_rhs = 0;
-	  
+
 	  for (unsigned int q=0; q<n_q_points; ++q)
 	    {
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1257,7 +1257,7 @@ namespace DualFunctional
 
     rhs.scale (1./total_volume);
   }
-  
+
 
 }
 
@@ -1279,7 +1279,7 @@ namespace LaplaceSolver
       virtual
       void
       solve_problem ();
-      
+
       virtual
       unsigned int
       n_dofs () const;
@@ -1340,13 +1340,13 @@ namespace LaplaceSolver
   {
     Solver<dim>::postprocess(postprocessor);
   }
-  
+
 
 
   template <int dim>
   void
   DualSolver<dim>::
-  assemble_rhs (Vector<double> &rhs) const 
+  assemble_rhs (Vector<double> &rhs) const
   {
     dual_functional->assemble_rhs (this->dof_handler, rhs);
   }
@@ -1374,7 +1374,7 @@ namespace LaplaceSolver
       virtual
       void
       postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
-      
+
       virtual
       unsigned int
       n_dofs () const;
@@ -1388,7 +1388,7 @@ namespace LaplaceSolver
     private:
       void solve_primal_problem ();
       void solve_dual_problem ();
-					
+
       typedef
       typename DoFHandler<dim>::active_cell_iterator
       active_cell_iterator;
@@ -1403,8 +1403,8 @@ namespace LaplaceSolver
 	  const SmartPointer<const Function<dim> > right_hand_side;
 
 	  std::vector<double> cell_residual;
-	  std::vector<double> rhs_values;	  
-	  std::vector<double> dual_weights;	  
+	  std::vector<double> rhs_values;
+	  std::vector<double> dual_weights;
 	  typename std::vector<Tensor<2,dim> > cell_grad_grads;
 	  CellData (const FiniteElement<dim> &fe,
 		    const Quadrature<dim>    &quadrature,
@@ -1418,14 +1418,14 @@ namespace LaplaceSolver
 	  FESubfaceValues<dim> fe_subface_values_cell;
 
 	  std::vector<double> jump_residual;
-	  std::vector<double> dual_weights;	  
+	  std::vector<double> dual_weights;
 	  typename std::vector<Tensor<1,dim> > cell_grads;
 	  typename std::vector<Tensor<1,dim> > neighbor_grads;
 	  FaceData (const FiniteElement<dim> &fe,
 		    const Quadrature<dim-1>  &face_quadrature);
       };
 
-      
+
 
       void estimate_error (Vector<float> &error_indicators) const;
 
@@ -1474,17 +1474,17 @@ namespace LaplaceSolver
 			     update_q_points           |
 			     update_JxW_values),
 		  right_hand_side (&right_hand_side)
-  {  
+  {
     const unsigned int n_q_points
       = quadrature.n_quadrature_points;
-  
+
     cell_residual.resize(n_q_points);
-    rhs_values.resize(n_q_points);    
-    dual_weights.resize(n_q_points);    
+    rhs_values.resize(n_q_points);
+    dual_weights.resize(n_q_points);
     cell_grad_grads.resize(n_q_points);
   }
-  
-  
+
+
 
   template <int dim>
   WeightedResidual<dim>::FaceData::
@@ -1503,16 +1503,16 @@ namespace LaplaceSolver
 					   update_normal_vectors),
 		  fe_subface_values_cell (fe, face_quadrature,
 					  update_gradients)
-  {  
+  {
     const unsigned int n_face_q_points
       = face_quadrature.n_quadrature_points;
-  
+
     jump_residual.resize(n_face_q_points);
-    dual_weights.resize(n_face_q_points);    
+    dual_weights.resize(n_face_q_points);
     cell_grads.resize(n_face_q_points);
     neighbor_grads.resize(n_face_q_points);
   }
-  
+
 
 
 
@@ -1548,7 +1548,7 @@ namespace LaplaceSolver
     threads.join_all ();
   }
 
-  
+
   template <int dim>
   void
   WeightedResidual<dim>::solve_primal_problem ()
@@ -1562,7 +1562,7 @@ namespace LaplaceSolver
   {
     DualSolver<dim>::solve_problem ();
   }
-  
+
 
   template <int dim>
   void
@@ -1571,8 +1571,8 @@ namespace LaplaceSolver
   {
     PrimalSolver<dim>::postprocess (postprocessor);
   }
-  
-  
+
+
   template <int dim>
   unsigned int
   WeightedResidual<dim>::n_dofs () const
@@ -1598,7 +1598,7 @@ namespace LaplaceSolver
 						       0.8, 0.02);
     this->triangulation->execute_coarsening_and_refinement ();
   }
-  
+
 
   template <int dim>
   void
@@ -1606,7 +1606,7 @@ namespace LaplaceSolver
   {
     const PrimalSolver<dim> &primal_solver = *this;
     const DualSolver<dim>   &dual_solver   = *this;
-    
+
     ConstraintMatrix primal_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints (primal_solver.dof_handler,
 					     primal_hanging_node_constraints);
@@ -1616,7 +1616,7 @@ namespace LaplaceSolver
 			  dual_solver.solution,
 			  primal_solver.dof_handler,
 			  primal_hanging_node_constraints,
-			  dual_solution);    
+			  dual_solution);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (primal_solver.dof_handler);
@@ -1625,9 +1625,9 @@ namespace LaplaceSolver
 			      "primal_solution");
     data_out.add_data_vector (dual_solution,
 			      "dual_solution");
-    
+
     data_out.build_patches ();
-  
+
     std::ostringstream filename;
     filename << "solution-"
 	     << this->refinement_cycle
@@ -1638,7 +1638,7 @@ namespace LaplaceSolver
 
 
 
-  
+
   template <int dim>
   void
   WeightedResidual<dim>::
@@ -1657,7 +1657,7 @@ namespace LaplaceSolver
 			  dual_solver.dof_handler,
 			  dual_hanging_node_constraints,
 			  primal_solution);
-    
+
     ConstraintMatrix primal_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints (primal_solver.dof_handler,
 					     primal_hanging_node_constraints);
@@ -1669,8 +1669,8 @@ namespace LaplaceSolver
 				       primal_solver.dof_handler,
 				       primal_hanging_node_constraints,
 				       dual_weights);
-    
-    
+
+
     FaceIntegrals face_integrals;
     for (active_cell_iterator cell=dual_solver.dof_handler.begin_active();
 	 cell!=dual_solver.dof_handler.end();
@@ -1696,7 +1696,7 @@ namespace LaplaceSolver
 	threads.join_all();
       }
 
-    unsigned int present_cell=0;  
+    unsigned int present_cell=0;
     for (active_cell_iterator cell=dual_solver.dof_handler.begin_active();
 	 cell!=dual_solver.dof_handler.end();
 	 ++cell, ++present_cell)
@@ -1734,16 +1734,19 @@ namespace LaplaceSolver
 			*dual_solver.quadrature,
 			*primal_solver.rhs_function);
     FaceData face_data (*dual_solver.fe,
-			*dual_solver.face_quadrature);    
+			*dual_solver.face_quadrature);
 
     active_cell_iterator cell=dual_solver.dof_handler.begin_active();
     for (unsigned int t=0;
 	 (t<this_thread) && (cell!=dual_solver.dof_handler.end());
-	 ++t, ++cell);
+	 ++t, ++cell)
+      {
+      }
+
 
     if (cell == dual_solver.dof_handler.end())
       return;
-    
+
     for (unsigned int cell_index=this_thread; true; )
       {
 	integrate_over_cell (cell, cell_index,
@@ -1751,17 +1754,17 @@ namespace LaplaceSolver
 			     dual_weights,
 			     cell_data,
 			     error_indicators);
-	
+
 	for (unsigned int face_no=0;
 	     face_no<GeometryInfo<dim>::faces_per_cell;
 	     ++face_no)
 	  {
-	    if (cell->face(face_no)->at_boundary()) 
+	    if (cell->face(face_no)->at_boundary())
 	      {
 		face_integrals[cell->face(face_no)] = 0;
 		continue;
 	      };
-	    
+
 	    if ((cell->neighbor(face_no)->has_children() == false) &&
 		(cell->neighbor(face_no)->level() == cell->level()) &&
 		(cell->neighbor(face_no)->index() < cell->index()))
@@ -1769,7 +1772,7 @@ namespace LaplaceSolver
 
 	    if (cell->at_boundary(face_no) == false)
 	      if (cell->neighbor(face_no)->level() < cell->level())
-		continue;	  
+		continue;
 
 
 	    if (cell->face(face_no)->has_children() == false)
@@ -1777,7 +1780,7 @@ namespace LaplaceSolver
 					   primal_solution,
 					   dual_weights,
 					   face_data,
-					   face_integrals);	  
+					   face_integrals);
 	    else
 	      integrate_over_irregular_face (cell, face_no,
 					     primal_solution,
@@ -1788,7 +1791,10 @@ namespace LaplaceSolver
 
 	for (unsigned int t=0;
 	     ((t<n_threads) && (cell!=dual_solver.dof_handler.end()));
-	     ++t, ++cell, ++cell_index);
+	     ++t, ++cell, ++cell_index)
+	  {
+	  }
+
 	if (cell == dual_solver.dof_handler.end())
 	  break;
       };
@@ -1824,7 +1830,7 @@ namespace LaplaceSolver
   }
 
 
-  
+
   template <int dim>
   void WeightedResidual<dim>::
   integrate_over_regular_face (const active_cell_iterator &cell,
@@ -1846,7 +1852,7 @@ namespace LaplaceSolver
     const unsigned int
       neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
     const active_cell_iterator neighbor = cell->neighbor(face_no);
-    face_data.fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);      
+    face_data.fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
     face_data.fe_face_values_neighbor.get_function_grads (primal_solution,
 							  face_data.neighbor_grads);
 
@@ -1857,7 +1863,7 @@ namespace LaplaceSolver
 
     face_data.fe_face_values_cell.get_function_values (dual_weights,
 						       face_data.dual_weights);
-    
+
     double face_integral = 0;
     for (unsigned int p=0; p<n_q_points; ++p)
       face_integral += (face_data.jump_residual[p] *
@@ -1873,7 +1879,7 @@ namespace LaplaceSolver
   }
 
 
-  
+
   template <int dim>
   void WeightedResidual<dim>::
   integrate_over_irregular_face (const active_cell_iterator &cell,
@@ -1887,9 +1893,9 @@ namespace LaplaceSolver
       n_q_points = face_data.fe_face_values_cell.n_quadrature_points;
 
     const typename DoFHandler<dim>::face_iterator
-      face = cell->face(face_no);    
+      face = cell->face(face_no);
     const typename DoFHandler<dim>::cell_iterator
-      neighbor = cell->neighbor(face_no);    
+      neighbor = cell->neighbor(face_no);
     Assert (neighbor.state() == IteratorState::valid,
 	    ExcInternalError());
     Assert (neighbor->has_children(),
@@ -1897,7 +1903,7 @@ namespace LaplaceSolver
 
     const unsigned int
       neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
-  
+
     for (unsigned int subface_no=0;
 	 subface_no<face->n_children(); ++subface_no)
       {
@@ -1914,7 +1920,7 @@ namespace LaplaceSolver
 					     neighbor_neighbor);
 	face_data.fe_face_values_neighbor.get_function_grads (primal_solution,
 							      face_data.neighbor_grads);
-      
+
 	for (unsigned int p=0; p<n_q_points; ++p)
 	  face_data.jump_residual[p]
 	     = ((face_data.neighbor_grads[p] - face_data.cell_grads[p]) *
@@ -1922,7 +1928,7 @@ namespace LaplaceSolver
 
 	face_data.fe_face_values_neighbor.get_function_values (dual_weights,
 							       face_data.dual_weights);
-	
+
 	double face_integral = 0;
 	for (unsigned int p=0; p<n_q_points; ++p)
 	  face_integral += (face_data.jump_residual[p] *
@@ -1934,19 +1940,19 @@ namespace LaplaceSolver
 
     double sum = 0;
     for (unsigned int subface_no=0;
-	 subface_no<face->n_children(); ++subface_no) 
+	 subface_no<face->n_children(); ++subface_no)
       {
 	Assert (face_integrals.find(face->child(subface_no)) !=
 		face_integrals.end(),
 		ExcInternalError());
 	Assert (face_integrals[face->child(subface_no)] != -1e20,
 		ExcInternalError());
-      
+
 	sum += face_integrals[face->child(subface_no)];
       };
     face_integrals[face] = sum;
   }
-  
+
 }
 
 
@@ -1959,7 +1965,7 @@ struct Framework
     typedef std::list<Evaluator*>           EvaluatorList;
 
 
-    struct ProblemDescription 
+    struct ProblemDescription
     {
 	unsigned int primal_fe_degree;
 	unsigned int dual_fe_degree;
@@ -2029,7 +2035,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 						      *descriptor.dual_functional);
 	break;
       };
-       
+
       case ProblemDescription::global_refinement:
       {
 	solver
@@ -2041,7 +2047,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 						      descriptor.data->get_boundary_values());
 	break;
       };
-       
+
       case ProblemDescription::kelly_indicator:
       {
 	solver
@@ -2066,23 +2072,23 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 							     *descriptor.kelly_weight);
 	break;
       };
-	    
+
       default:
 	    AssertThrow (false, ExcInternalError());
     };
-  
+
   for (unsigned int step=0; true; ++step)
     {
       deallog << "Refinement cycle: "	<< step
 		<< std::endl;
-	    
+
       solver->set_refinement_cycle (step);
       solver->solve_problem ();
       solver->output_solution ();
 
       deallog << "   Number of degrees of freedom="
 		<< solver->n_dofs() << std::endl;
-      
+
       for (typename EvaluatorList::const_iterator
 	     e = descriptor.evaluator_list.begin();
 	   e != descriptor.evaluator_list.end(); ++e)
@@ -2091,7 +2097,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 	  solver->postprocess (**e);
 	};
 
-	    
+
       if (solver->n_dofs() < descriptor.max_degrees_of_freedom)
 	solver->refine_grid ();
       else
@@ -2107,17 +2113,17 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 
 
 
-int main () 
+int main ()
 {
   deallog.depth_console (0);
   try
     {
       deallog << std::setprecision(2);
       logfile << std::setprecision(2);
-      
+
       deallog.attach(logfile);
       deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);  
+      deallog.threshold_double(1.e-10);
 
       const unsigned int dim = 2;
       Framework<dim>::ProblemDescription descriptor;
@@ -2129,21 +2135,21 @@ int main ()
       descriptor.dual_fe_degree   = 2;
 
       descriptor.data = new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
-      
+
       const Point<dim> evaluation_point (0.75, 0.75);
       descriptor.dual_functional
 	= new DualFunctional::PointValueEvaluation<dim> (evaluation_point);
-      
+
       Evaluation::PointValueEvaluation<dim>
 	postprocessor1 (evaluation_point);
       Evaluation::GridOutput<dim>
 	postprocessor2 ("grid");
-      
+
       descriptor.evaluator_list.push_back (&postprocessor1);
       descriptor.evaluator_list.push_back (&postprocessor2);
 
       descriptor.max_degrees_of_freedom = 1000;
-      
+
       Framework<dim>::run (descriptor);
     }
 
@@ -2159,7 +2165,7 @@ int main ()
 		<< std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
