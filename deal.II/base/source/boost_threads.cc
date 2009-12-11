@@ -32,11 +32,9 @@
 #    endif
 
 #    include <../libs/thread/src/pthread/once.cpp>
-#    include <../libs/thread/src/pthread/exceptions.cpp>
 #    include <../libs/thread/src/pthread/thread.cpp>
 #  else
 #    include <../libs/thread/src/win32/once.cpp>
-#    include <../libs/thread/src/win32/exceptions.cpp>
 #    include <../libs/thread/src/win32/thread.cpp>
 #  endif
 
