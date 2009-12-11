@@ -396,15 +396,15 @@ loop over the set of common most refined cells, calling the function
 these cells.
 
 By construction, there are now three cases to be considered:
-<ul>
-<li>[(i)] The cell $K$ is active on both meshes, i.e. both the basis
+<ol>
+<li> The cell $K$ is active on both meshes, i.e. both the basis
   functions $\varphi_g^i$ as well as $\varphi_{g'}^j$ are defined on $K$.
-<li>[(ii)] The cell $K$ is active on mesh $g$, but not $g'$, i.e. the
+<li> The cell $K$ is active on mesh $g$, but not $g'$, i.e. the
   $\varphi_g^i$  are defined on $K$, whereas the $\varphi_{g'}^j$ are defined
   on children of $K$.
-<li>[(iii)] The cell $K$ is active on mesh $g'$, but not $g$, with opposite
+<li> The cell $K$ is active on mesh $g'$, but not $g$, with opposite
   conclusions than in (ii).
-</ul>
+</ol>
 
 To compute the right hand side above, we then need to have different code for
 these three cases, as follows:
@@ -458,7 +458,7 @@ these three cases, as follows:
     \qquad
     \qquad
     F_i|_{K_c} = B_c^{il} M_{K_c}^{lj}  \phi_{g'}^j
-    = (B_c M_{K_c})^{il} \phi_{g'}^j,
+    = (B_c M_{K_c})^{ij} \phi_{g'}^j,
   @f}
   where $M_{K_c}^{lj}=\int_{K_c} f(x) \varphi_{g'}^l(x) \varphi_{g'}^j(x)$ is
   the weighted mass matrix on child $c$ of cell $K$.
@@ -500,7 +500,7 @@ these three cases, as follows:
     &=&
     \left\{
     \sum_{0\le c<2^{\texttt{dim}}}
-    \int_{K_c} f(x) \varphi_{g'}^i(x) B_c^{jl} \varphi_{g'}^l(x) 
+    \int_{K_c} f(x) \varphi_g^i(x) B_c^{jl} \varphi_{g}^l(x) 
     \ dx \right\} \phi_{g'}^j.
   @f}
   In matrix notation, this expression now reads as
