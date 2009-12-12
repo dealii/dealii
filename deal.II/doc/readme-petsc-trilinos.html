@@ -5,7 +5,7 @@
   <title>The deal.II Readme on interfacing to PETSc and Trilinos</title>
   <link href="screen.css" rel="StyleSheet">
   <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2008 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2008, 2009 by the deal.II authors">
   <meta name="date" content="$Date: 2008-10-14 05:36:48 -0500 (Tue, 14 Oct 2008) $">
   <meta name="svn_id" content="$Id: readme.html 17202 2008-10-14 10:36:48Z heister $">
   <meta name="keywords" content="deal.II">
@@ -56,7 +56,7 @@
       </p>
 
 
-      <h6>PETSc</h6>
+      <h5>PETSc</h5>
       
       <p>
       PETSc usually requires you to set the
@@ -100,7 +100,7 @@
       </p>
 
 
-      <h6>Trilinos</h6>
+      <h5>Trilinos</h5>
 
       <p>
       As above, set the <code>TRILINOS_DIR</code>
@@ -116,18 +116,84 @@
 
       <p>
       <acronym>deal.II</acronym> and its tutorial programs use several of the
-      Trilinos sub-packages. Configuring Trilinos with a command
-      like the following should do the trick:
+      Trilinos sub-packages.
+      </p>
+      
+      <h6>Trilinos up to and including version 9.0.x</h6>
+
+      <p>
+      Up to version 9.0, Trilinos was configured and built using autoconf and
+      related tools. Configuring and building Trilinos with a sequence of
+      commands like the following should do the trick:
       <code>
       <pre>
+cd trilinos-9.0.2
+mkdir build
+cd build
 ../configure --enable-shared \
       --with-cflags=-fPIC --with-cxxflags=-fPIC --with-fflags=-fPIC \
       --enable-thyra --enable-stratimikos --enable-rtop --enable-teuchos \
       --enable-sacado --enable-ml --enable-ifpack --enable-epetra \
       --enable-belos --enable-aztecoo --enable-amesos \
-      --prefix=/home/bangerth/bin/trilinos-9.0.1
+      --prefix=/home/bangerth/bin/trilinos-9.0.2
+make
+make install
       </pre>
       </code>
+      Obviously the path names in the first line and at the end of the
+      configure line need to be adjusted.
+      </p>
+      
+
+      <h6>Trilinos starting with version 10.0</h6>
+
+      <p>
+      Starting with version 10.0, Trilinos uses cmake to configure and
+      build. This is a bit cumbersome because you first have to install a
+      version of cmake that is at least a cmake 2.8 prerelease, and then enter
+      the following slightly longish set of commands:
+      <code>
+      <pre>
+cd trilinos-9.0.2
+mkdir build
+cd build
+cmake \
+          -D CMAKE_BUILD_TYPE:STRING=RELEASE \
+          -D CMAKE_CXX_FLAGS:STRING="-ggdb -O2 -march=native" \
+          -D CMAKE_C_FLAGS:STRING="-ggdb -O3 -march=native" \
+          -D CMAKE_FORTRAN_FLAGS:STRING="-ggdb -O5 -march=native" \
+          -D Trilinos_ENABLE_DEFAULT_PACKAGES:BOOL=OFF \
+          -D Trilinos_ENABLE_Epetra:BOOL=ON \
+          -D Trilinos_ENABLE_Tpetra:BOOL=ON \
+          -D Trilinos_ENABLE_ML:BOOL=ON \
+          -D Trilinos_ENABLE_Ifpack:BOOL=ON \
+          -D Trilinos_ENABLE_AztecOO:BOOL=ON \
+          -D Trilinos_ENABLE_Amesos:BOOL=ON \
+          -D Trilinos_ENABLE_Teuchos:BOOL=ON \
+          -D Trilinos_ENABLE_Sacado:BOOL=ON \
+          -D Trilinos_ENABLE_Thyra:BOOL=ON \
+          -D Trilinos_ENABLE_Didasko:BOOL=ON \
+          -D Trilinos_ENABLE_Stratimikos:BOOL=ON \
+          -D Trilinos_ENABLE_Belos:BOOL=ON \
+          -D Trilinos_ENABLE_EpetraExt:BOOL=ON \
+          -D Trilinos_ENABLE_Kokkos:BOOL=ON \
+          -D Trilinos_ENABLE_CTrilinos:BOOL=ON \
+          -D Trilinos_ENABLE_ForTrilinos:BOOL=ON \
+          -D Trilinos_ENABLE_TESTS:BOOL=OFF \
+          -D Trilinos_ENABLE_EXAMPLES:BOOL=OFF \
+          -D TPL_ENABLE_MPI:BOOL=ON \
+          -D Trilinos_EXTRA_LINK_FLAGS:STRING="-lgfortran" \
+          -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE       \
+          -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE   \
+          -D BUILD_SHARED_LIBS:BOOL=ON \
+          -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/x86_64/trilinos-10.0.2-mpi \
+          `pwd`/../
+make
+make install
+      </pre>
+      </code>
+      Again, the path into which you want to install Trilinos in the second to
+      last line of the cmake command needs to be adjusted.
       </p>
 
 
