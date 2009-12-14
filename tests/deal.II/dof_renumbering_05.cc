@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,7 +11,7 @@
 //
 //----------------------------------------------------------------------
 
-// Check DoFRenumbering::king_ordering
+// Check DoFRenumbering::boost::king_ordering
 
 
 #include "../tests.h"
@@ -43,20 +43,20 @@ print_dofs (const DoFHandler<dim> &dof)
   const FiniteElement<dim>& fe = dof.get_fe();
   std::vector<unsigned int> v (fe.dofs_per_cell);
   boost::shared_ptr<FEValues<dim> > fevalues;
-  
+
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
       fevalues = boost::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_q_points));
     }
-  
+
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
     {
       Point<dim> p = cell->center();
       if (fevalues != 0)
 	fevalues->reinit(cell);
-      
+
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
 	if (fevalues != 0)
@@ -75,7 +75,7 @@ check_renumbering(DoFHandler<dim>& dof)
 {
   const FiniteElement<dim>& element = dof.get_fe();
   deallog << element.get_name() << std::endl;
-  
+
   DoFRenumbering::boost::king_ordering(dof);
   print_dofs (dof);
 }
@@ -85,13 +85,13 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, -1., 1.);
   tr.refine_global (1);
   tr.begin_active()->set_refine_flag ();
   tr.execute_coarsening_and_refinement ();
   tr.refine_global(3-dim);
-  
+
   {
     FE_Q<dim> fe(2);
     DoFHandler<dim> dof(tr);
@@ -115,7 +115,7 @@ int main ()
 {
   std::ofstream logfile ("dof_renumbering_05/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 
