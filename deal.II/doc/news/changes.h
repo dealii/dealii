@@ -533,11 +533,20 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Fixed: The functions DoFTools::count_dofs_per_component and DoFTools::extract_dofs 
-  produced wrong results for elements that consist of two or more nested FESystems. 
-  Moreoever, a bug in DoFTools::extract_constant_modes has been corrected and 
-  DoFTools::distribute_cell_to_dof_vector now works according to the documentation, 
-  namely leaving unselected components in the result vector unchanged, instead of 
+  New: The functions in namespace DoFRenumbering::boost are now also compiled for
+  hp::DoFHandler arguments.
+  <br>
+  (WB 2009/12/14)
+  </p>
+  </li>
+
+  <li>
+  <p>
+  Fixed: The functions DoFTools::count_dofs_per_component and DoFTools::extract_dofs
+  produced wrong results for elements that consist of two or more nested FESystems.
+  Moreoever, a bug in DoFTools::extract_constant_modes has been corrected and
+  DoFTools::distribute_cell_to_dof_vector now works according to the documentation,
+  namely leaving unselected components in the result vector unchanged, instead of
   setting these to zero as was done before.
   <br>
   (Martin Kronbichler 2009/12/14)

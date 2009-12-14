@@ -1536,6 +1536,34 @@ namespace DoFRenumbering
     void
     compute_minimum_degree (std::vector<unsigned int> &,
 			    const DoFHandler<deal_II_dimension> &, bool, bool);
+
+
+    template
+    void
+    Cuthill_McKee (hp::DoFHandler<deal_II_dimension> &, bool, bool);
+
+    template
+    void
+    compute_Cuthill_McKee (std::vector<unsigned int> &,
+			   const hp::DoFHandler<deal_II_dimension> &, bool, bool);
+
+    template
+    void
+    king_ordering (hp::DoFHandler<deal_II_dimension> &, bool, bool);
+
+    template
+    void
+    compute_king_ordering (std::vector<unsigned int> &,
+			   const hp::DoFHandler<deal_II_dimension> &, bool, bool);
+
+    template
+    void
+    minimum_degree (hp::DoFHandler<deal_II_dimension> &, bool, bool);
+
+    template
+    void
+    compute_minimum_degree (std::vector<unsigned int> &,
+			    const hp::DoFHandler<deal_II_dimension> &, bool, bool);
   }
 
 
