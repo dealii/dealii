@@ -41,7 +41,8 @@ tests_x = hp_dof_handler \
 	  vectors* \
 	  get_active_fe_indices \
 	  create_* \
-	  renumber_*
+	  renumber_* \
+	  dof_renumbering_*
 
 # from above list of regular expressions, generate the real set of
 # tests
