@@ -4,7 +4,7 @@
 #
 # Rerun configure with the same options as last time.
 
-if test -e config.log
+if test -f config.log
 then
   perl -e 'while(<>) { if(s/^ *\$ *(.*)configure/$1configure/) { exec $_; } }' config.log
 else
