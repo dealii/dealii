@@ -235,6 +235,15 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	  *)                GXX_VERSION_DETAILED=gcc4.5.x ;;
         esac
   	;;
+      *version\ 4.6*)
+  	GXX_VERSION=gcc4.6
+        case "$GXX_VERSION_STRING" in
+	  *version\ 4.6.0*) GXX_VERSION_DETAILED=gcc4.6.0 ;;
+	  *version\ 4.6.1*) GXX_VERSION_DETAILED=gcc4.6.1 ;;
+	  *version\ 4.6.2*) GXX_VERSION_DETAILED=gcc4.6.2 ;;
+	  *)                GXX_VERSION_DETAILED=gcc4.6.x ;;
+        esac
+  	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	dnl These compilers are too old to support a useful subset
   	dnl of modern C++, so we don't support them
@@ -1313,6 +1322,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
   	AC_MSG_RESULT(C compiler is gcc-4.5)
   	CC_VERSION=gcc4.5
   	;;
+      *version\ 4.6*)
+  	AC_MSG_RESULT(C compiler is gcc-4.6)
+  	CC_VERSION=gcc4.6
+  	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	AC_MSG_RESULT(C compiler is $CC_VERSION_STRING)
   	AC_MSG_ERROR(C compiler is not supported)
@@ -1713,6 +1726,10 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
         *version\ 4.5*)
   	  AC_MSG_RESULT(F77 compiler is gcc-4.5)
   	  F77_VERSION=gcc4.5
+  	  ;;
+        *version\ 4.6*)
+  	  AC_MSG_RESULT(F77 compiler is gcc-4.6)
+  	  F77_VERSION=gcc4.6
   	  ;;
         *)
   	  AC_MSG_RESULT(F77 compiler is unknown but accepted gcc version)
