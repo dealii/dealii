@@ -134,9 +134,6 @@ AC_SUBST(CC_VERSION)
 AC_SUBST(CFLAGS)
 AC_SUBST(CFLAGSPIC)
 
-dnl Check if the linker supports -rpath
-DEAL_II_CHECK_RPATH
-
 dnl -------------------------------------------------------------
 dnl                          Multithreading
 dnl -------------------------------------------------------------
@@ -319,6 +316,9 @@ if test "x$enableshared" = "xyes" ; then
            SHLIBFLAGS="-qmkshrobj"
 	   ;;
   esac
+
+  dnl Check if the linker supports -rpath
+  DEAL_II_CHECK_RPATH
 
   dnl See if we can use -Wl,-soname,... for linking
   DEAL_II_CHECK_LINK_SONAME

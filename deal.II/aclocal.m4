@@ -2000,6 +2000,8 @@ AC_DEFUN(DEAL_II_CHECK_DYNAMIC_CAST_BUG,
     AC_DEFINE(DEAL_II_HAVE_DARWIN_DYNACAST_BUG, 1,
               [Defined if the compiler has a bug with dynamic casting
                and dynamic libraries])
+    CXXFLAGSG="$CXXFLAGSG -mmacosx-version-min=10.4"
+    CXXFLAGSO="$CXXFLAGSO -mmacosx-version-min=10.4"
   fi
   rm -f contrib/config/tests/darwin-dynamic-cast/libDynamicCastTestLib.dylib
   rm -f contrib/config/tests/darwin-dynamic-cast/main.o
