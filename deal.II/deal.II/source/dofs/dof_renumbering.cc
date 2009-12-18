@@ -538,7 +538,7 @@ namespace DoFRenumbering
 
   template <int dim>
   void
-  component_wise (hp::DoFHandler<dim>                 &dof_handler,
+  component_wise (hp::DoFHandler<dim>             &dof_handler,
 		  const std::vector<unsigned int> &component_order_arg)
   {
     std::vector<unsigned int> renumbering (dof_handler.n_dofs(),
@@ -635,7 +635,7 @@ namespace DoFRenumbering
 			  const ENDITERATOR& end,
 			  const std::vector<unsigned int> &component_order_arg)
   {
-    const hp::FECollection<dim> fe_collection (start->get_fe ());
+    const hp::FECollection<dim> fe_collection (start->get_dof_handler().get_fe ());
 
 				     // do nothing if the FE has only
 				     // one component
@@ -644,9 +644,6 @@ namespace DoFRenumbering
 	new_indices.resize(0);
 	return 0;
       }
-
-    const FiniteElement<dim>& fe = fe_collection[0];
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
 //    Assert (new_indices.size() ==  start->dof_handler().n_dofs(),
 //  	  ExcDimensionMismatch(new_indices.size(),
@@ -660,19 +657,19 @@ namespace DoFRenumbering
 				     // store components in the order
 				     // found in the system.
     if (component_order.size() == 0)
-      for (unsigned int i=0; i<fe.n_components(); ++i)
+      for (unsigned int i=0; i<fe_collection.n_components(); ++i)
 	component_order.push_back (i);
 
-    Assert (component_order.size() == fe.n_components(),
-	    ExcDimensionMismatch(component_order.size(), fe.n_components()));
+    Assert (component_order.size() == fe_collection.n_components(),
+	    ExcDimensionMismatch(component_order.size(), fe_collection.n_components()));
 
     for (unsigned int i=0; i< component_order.size(); ++i)
-      Assert(component_order[i] < fe.n_components(),
-	     ExcIndexRange(component_order[i], 0, fe.n_components()));
+      Assert(component_order[i] < fe_collection.n_components(),
+	     ExcIndexRange(component_order[i], 0, fe_collection.n_components()));
 
 				     // vector to hold the dof indices on
 				     // the cell we visit at a time
-    std::vector<unsigned int> local_dof_indices(dofs_per_cell);
+    std::vector<unsigned int> local_dof_indices;
 
 				     // prebuilt list to which component
 				     // a given dof on a cell
@@ -684,31 +681,29 @@ namespace DoFRenumbering
 				     // belongs. in this case, assign it
 				     // to the first vector component to
 				     // which it belongs
-    std::vector<unsigned int> component_list (dofs_per_cell);
-    for (unsigned int i=0; i<component_list.size(); ++i)
-      if (fe.is_primitive(i))
-	component_list[i]
-	  = component_order[fe.system_to_component_index(i).first];
-      else
-	{
-	  const unsigned int base_element =
-	    fe.system_to_base_index(i).first.first;
-	  const unsigned int base_multiplicity =
-	    fe.system_to_base_index(i).first.second;
-					   // sum up the number of
-					   // components all the
-					   // elements before that have
-	  unsigned int c=0;
-	  for (unsigned int b=0; b<base_element; ++b)
-	    c += fe.base_element(b).n_components() *
-		 fe.element_multiplicity(b);
-	  for (unsigned int m=0; m<base_multiplicity; ++m)
-	    c += fe.base_element(base_element).n_components();
+    std::vector<std::vector<unsigned int> > component_list (fe_collection.size());
+    for (unsigned int f=0; f<fe_collection.size(); ++f)
+      {
+	const FiniteElement<dim> & fe = fe_collection[f];
+	const unsigned int dofs_per_cell = fe.dofs_per_cell;
+	component_list[f].resize(dofs_per_cell);
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  if (fe.is_primitive(i))
+	    component_list[f][i]
+	      = component_order[fe.system_to_component_index(i).first];
+	  else
+	    {
+	      const unsigned int comp = (std::find(fe.get_nonzero_components(i).begin(),
+						   fe.get_nonzero_components(i).end(),
+						   true) -
+					 fe.get_nonzero_components(i).begin());
+
 					   // then associate this degree
 					   // of freedom with this
 					   // component
-	  component_list[i] = component_order[c];
-	};
+	      component_list[f][i] = component_order[comp];
+	    };
+      }
 
 				     // set up a map where for each
 				     // component the respective degrees
@@ -722,15 +717,19 @@ namespace DoFRenumbering
 				     // multiply, so we will have to
 				     // take care of that
     std::vector<std::vector<unsigned int> >
-      component_to_dof_map (fe.n_components());
+      component_to_dof_map (fe_collection.n_components());
     for (;start!=end;++start)
       {
 					 // on each cell: get dof indices
 					 // and insert them into the global
 					 // list using their component
+	const unsigned int fe_index = start->active_fe_index();
+	const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
+	local_dof_indices.resize (dofs_per_cell);
 	start.get_dof_indices (local_dof_indices);
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  component_to_dof_map[component_list[i]].push_back (local_dof_indices[i]);
+	  component_to_dof_map[component_list[fe_index][i]].
+	    push_back (local_dof_indices[i]);
       };
 
 				     // now we've got all indices sorted
@@ -756,7 +755,8 @@ namespace DoFRenumbering
 				     // into the first one. The same
 				     // holds if several components were
 				     // joined into a single target.
-    for (unsigned int component=0; component<fe.n_components(); ++component)
+    for (unsigned int component=0; component<fe_collection.n_components();
+	 ++component)
       {
 	std::sort (component_to_dof_map[component].begin(),
 		   component_to_dof_map[component].end());
@@ -770,7 +770,7 @@ namespace DoFRenumbering
 				     // components in the order the user
 				     // desired to see
     unsigned int next_free_index = 0;
-    for (unsigned int c=0; c<fe.n_components(); ++c)
+    for (unsigned int c=0; c<fe_collection.n_components(); ++c)
       {
 	const unsigned int component = c;
 

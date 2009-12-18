@@ -194,11 +194,8 @@ DoFTools::make_sparsity_pattern (const DH                &dof,
 	||
 	(subdomain_id == cell->subdomain_id()))
       {
-	const unsigned int fe_index
-	  = cell->active_fe_index();
-
-	const unsigned int dofs_per_cell
-	  = fe_collection[fe_index].dofs_per_cell;
+	const unsigned int fe_index = cell->active_fe_index();
+	const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
 
 	dofs_on_this_cell.resize (dofs_per_cell);
 	cell->get_dof_indices (dofs_on_this_cell);
@@ -2910,36 +2907,42 @@ namespace internal
 				// component can be assigned. Then, we sort
 				// them to the first selected component of the
 				// vector system.
-  template <int dim, int spacedim>
+  template <class DH>
   inline
   void
-  extract_dofs_by_component (const dealii::DoFHandler<dim,spacedim> &dof,
+  extract_dofs_by_component (const DH                   &dof,
 			     const std::vector<bool>    &component_select,
 			     const bool                  sort_by_blocks,
 			     std::vector<unsigned char> &dofs_by_component)
   {
-    const FiniteElement<dim,spacedim> &fe = dof.get_fe();
-    Assert (fe.n_components() < 256, ExcNotImplemented());
+    const dealii::hp::FECollection<DH::dimension,DH::space_dimension> 
+      fe_collection (dof.get_fe());
+    Assert (fe_collection.n_components() < 256, ExcNotImplemented());
     Assert(dofs_by_component.size() == dof.n_dofs(),
 	   ExcDimensionMismatch(dofs_by_component.size(), dof.n_dofs()));
-
 
                                    // next set up a table for the
                                    // degrees of freedom on each of
                                    // the cells whether it is
                                    // something interesting or not
-    std::vector<unsigned char> local_component_association (fe.dofs_per_cell);
-    if (sort_by_blocks == true)
+    std::vector<std::vector<unsigned char> > local_component_association
+      (fe_collection.size());
+    for (unsigned int f=0; f<fe_collection.size(); ++f)
       {
-	for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	  local_component_association[i]
-	    = fe.system_to_block_index(i).first;
-      }
-    else
-      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	if (fe.is_primitive(i))
-	  local_component_association[i] = fe.system_to_component_index(i).first;
+	const FiniteElement<DH::dimension,DH::space_dimension> &fe = 
+	  fe_collection[f];
+	local_component_association[f].resize(fe.dofs_per_cell);
+	if (sort_by_blocks == true)
+	  {
+	    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	      local_component_association[f][i]
+		= fe.system_to_block_index(i).first;
+	  }
 	else
+	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	    if (fe.is_primitive(i))
+	      local_component_association[f][i] = fe.system_to_component_index(i).first;
+	    else
 					 // if this shape function is
 					 // not primitive, then we have
 					 // to work harder. we have to
@@ -2951,56 +2954,49 @@ namespace internal
 					 // to do so, get the a list of
 					 // nonzero elements and see which are
 					 // actually active
-	  {
-	    const unsigned int first_comp = (std::find(fe.get_nonzero_components(i).begin(),
-						       fe.get_nonzero_components(i).end(),
-						       true) -
-					     fe.get_nonzero_components(i).begin());
-	    const unsigned int end_comp = (std::find(fe.get_nonzero_components(i).begin()+first_comp,
-						     fe.get_nonzero_components(i).end(),
-						     false)-
-					   fe.get_nonzero_components(i).begin());
+	      {
+		const unsigned int first_comp =
+		  (std::find(fe.get_nonzero_components(i).begin(),
+			     fe.get_nonzero_components(i).end(),
+			     true) -
+		   fe.get_nonzero_components(i).begin());
+		const unsigned int end_comp =
+		  (std::find(fe.get_nonzero_components(i).begin()+first_comp,
+			     fe.get_nonzero_components(i).end(),
+			     false)-
+		   fe.get_nonzero_components(i).begin());
 
 					   // now check whether any of
 					   // the components in between
 					   // is set
-	    if (component_select.size() == 0 ||
-		(component_select[first_comp] == true ||
-		 std::count(component_select.begin()+first_comp,
-			    component_select.begin()+end_comp, true) == 0))
-	      local_component_association[i] = first_comp;
-	    else
-	      for (unsigned int c=first_comp; c<end_comp; ++c)
-		if (component_select[c] == true)
-		  {
-		    local_component_association[i] = c;
-		    break;
-		  }
-	  }
+		if (component_select.size() == 0 ||
+		    (component_select[first_comp] == true ||
+		     std::count(component_select.begin()+first_comp,
+				component_select.begin()+end_comp, true) == 0))
+		  local_component_association[f][i] = first_comp;
+		else
+		  for (unsigned int c=first_comp; c<end_comp; ++c)
+		    if (component_select[c] == true)
+		      {
+			local_component_association[f][i] = c;
+			break;
+		      }
+	      }
+      }
 
                                    // then loop over all cells and do
                                    // the work
-    std::vector<unsigned int> indices(fe.dofs_per_cell);
-    typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator c;
-    for (c=dof.begin_active(); c!=dof.end(); ++ c)
+    std::vector<unsigned int> indices;
+    for (typename DH::active_cell_iterator c=dof.begin_active(); 
+	 c!=dof.end(); ++ c)
       {
+	const unsigned int fe_index = c->active_fe_index();
+	const unsigned int dofs_per_cell = c->get_fe().dofs_per_cell;
+	indices.resize(dofs_per_cell);
 	c->get_dof_indices(indices);
-	for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	  dofs_by_component[indices[i]] = local_component_association[i];
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  dofs_by_component[indices[i]] = local_component_association[fe_index][i];
       }
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline
-  void
-  extract_dofs_by_component (const dealii::hp::DoFHandler<dim,spacedim> &,
-			     const std::vector<bool>  &,
-			     const bool                ,
-			     std::vector<unsigned char>&)
-  {
-    Assert (false, ExcNotImplemented());
   }
 }
 
@@ -3041,7 +3037,7 @@ void DoFTools::distribute_cell_to_dof_vector (
       std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
 					false);
       component_mask[component] = true;
-      internal::extract_dofs_by_component (dof_handler, component_mask, 
+      internal::extract_dofs_by_component (dof_handler, component_mask,
 					   false, component_dofs);
 
       for (unsigned int i=0; i<dof_data.size(); ++i)
@@ -3165,15 +3161,12 @@ DoFTools::extract_dofs (
 template <int dim, int spacedim>
 void
 DoFTools::extract_dofs (
-  const hp::DoFHandler<dim,spacedim>   &/*dof*/,
-  const std::vector<bool> &/*component_select*/,
-  std::vector<bool>       &/*selected_dofs*/,
-  const bool               /*count_by_blocks*/)
+  const hp::DoFHandler<dim,spacedim>   &dof,
+  const std::vector<bool> &component_select,
+  std::vector<bool>       &selected_dofs,
+  const bool               count_by_blocks)
 {
-//TODO[WB]: implement this function
-  Assert (false, ExcNotImplemented());
-/*
-  const FiniteElement<dim,spacedim> &fe = dof.get_fe();
+  const FiniteElement<dim,spacedim> &fe = dof.begin_active()->get_fe();
 
   if (count_by_blocks == true)
     {
@@ -3210,72 +3203,20 @@ DoFTools::extract_dofs (
 				   // preset all values by false
   std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
 
-                                   // next set up a table for the
-                                   // degrees of freedom on each of
-                                   // the cells whether it is
-                                   // something interesting or not
-  std::vector<bool> local_selected_dofs (fe.dofs_per_cell, false);
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    if (count_by_blocks == true)
-      local_selected_dofs[i]
-        = component_select[fe.system_to_block_index(i).first];
-    else
-      if (fe.is_primitive(i))
-	local_selected_dofs[i]
-	  = component_select[fe.system_to_component_index(i).first];
-      else
-					 // if this shape function is
-					 // not primitive, then we have
-					 // to work harder. we have to
-					 // find out whether _any_ of
-					 // the vector components of
-					 // this element is selected or
-					 // not
-					 //
-					 // to do so, get the first and
-					 // last vector components of
-					 // the base element to which
-					 // the local dof with index i
-					 // belongs
-	{
-	  unsigned int first_comp = 0;
-	  const unsigned int this_base = fe.system_to_base_index(i).first.first;
-	  const unsigned int this_multiplicity
-	    = fe.system_to_base_index(i).first.second;
+				// if we count by blocks, we need to extract
+				// the association of blocks with local dofs,
+				// and then go through all the cells and set
+				// the properties according to this
+				// info. Otherwise, we let the function
+				// extract_dofs_by_component function do the
+				// job.
+  std::vector<unsigned char> dofs_by_component (dof.n_dofs());
+  internal::extract_dofs_by_component (dof, component_select, count_by_blocks,
+				       dofs_by_component);
 
-	  for (unsigned int b=0; b<this_base; ++b)
-	    first_comp += fe.base_element(b).n_components() *
-			  fe.element_multiplicity(b);
-	  for (unsigned int m=0; m<this_multiplicity; ++m)
-	    first_comp += fe.base_element(this_base).n_components();
-	  const unsigned int end_comp = first_comp +
-					fe.base_element(this_base).n_components();
-
-	  Assert (first_comp < fe.n_components(), ExcInternalError());
-	  Assert (end_comp <= fe.n_components(),  ExcInternalError());
-
-					   // now check whether any of
-					   // the components in between
-					   // is set
-	  for (unsigned int c=first_comp; c<end_comp; ++c)
-	    if (component_select[c] == true)
-	      {
-		local_selected_dofs[i] = true;
-		break;
-	      }
-	}
-
-                                   // then loop over all cells and do
-                                   // the work
-  std::vector<unsigned int> indices(fe.dofs_per_cell);
-  typename DoFHandler<dim,spacedim>::active_cell_iterator c;
-  for (c=dof.begin_active(); c!=dof.end(); ++ c)
-    {
-      c->get_dof_indices(indices);
-      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-        selected_dofs[indices[i]] = local_selected_dofs[i];
-    }
-*/
+  for (unsigned int i=0; i<dof.n_dofs(); ++i)
+    if (component_select[dofs_by_component[i]] == true)
+      selected_dofs[i] = true;
 }
 
 
