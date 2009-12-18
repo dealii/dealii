@@ -779,7 +779,8 @@ $[-2,2]\times[-2,2]\times[-1,0]$
 @code
     std::vector<unsigned int> subdivisions (dim, 1);
     subdivisions[0] = 4;
-    subdivisions[1] = 4;
+    if (dim>2)
+      subdivisions[1] = 4;
 
     const Point<dim> bottom_left = (dim == 2 ?
                                     Point<dim>(-2,-1) :
