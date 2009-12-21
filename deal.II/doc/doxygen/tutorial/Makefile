@@ -6,7 +6,8 @@ include ../../../common/Make.global_options
 
 # plain names of those files that we shall treat
 example-names = $(notdir $(shell echo $D/examples/step-? \
-                                      $D/examples/step-??))
+                                      $D/examples/step-?? \
+				      $D/examples/MADDs-*))
 
 # prefix names for generated intermediate files
 gen-example-names = $(addprefix generated/, $(example-names))
