@@ -574,6 +574,22 @@
       </p>
     </dd>
 
+    <a name="slepc"></a>
+    <dt>Slepc</dt>
+    <dd>
+      <p>
+      <acronym>deal.II</acronym> can also interface to
+      the <a href="http://www.grycap.upv.es/slepc/"
+      target="_top">SLEPc</a> library. The way to do it is to set
+      the <code>SLEPC_DIR</code> environment variable by
+      passing <code>--with-slepc=/path/to/slepc</code>
+      to <acronym>deal.II</acronym>'s <code>./configure</code> script.
+      The use of SLEPc is optional, however, for the interface with
+      SLEPc to work at all, <acronym>deal.II</acronym>'s interface to
+      PETSc must also be configured correctly (see the notes above on
+      how to do this).
+      </p>
+    </dd>
 
     <a name="trilinos"></a>
     <dt>Trilinos</dt>
@@ -594,20 +610,23 @@
     <dt>Metis</dt>
     <dd>
       <p>
-      In order to generate partitionings of triangulations, we have functions
-      that call <a href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
-      target="_top">METIS</a> library. METIS is a library that provides
-      various methods to partition graphs, which we use to define which cell
-      belongs to which part of a triangulation. The main point in using METIS
-      is to generate partitions so that the interfaces between cell blocks are
-      as small as possible. This data can, in turn, be used to distribute
-      degrees of freedom onto different processors when using PETSc in
-      parallel mode.
+      In order to generate partitionings of triangulations, we have
+      functions that
+      call <a href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
+      target="_top">METIS</a> library. METIS is a library that
+      provides various methods to partition graphs, which we use to
+      define which cell belongs to which part of a triangulation. The
+      main point in using METIS is to generate partitions so that the
+      interfaces between cell blocks are as small as possible. This
+      data can, in turn, be used to distribute degrees of freedom onto
+      different processors when using PETSc and/or SLEPc in parallel
+      mode.
       </p>
 
       <p>
-      As with PETSc, the use of METIS is optional. If you wish to use it, you
-      can do so by having a METIS installation around at the time of calling
+      As with PETSc and SLEPc, the use of METIS is optional. If you
+      wish to use it, you can do so by having a METIS installation
+      around at the time of calling
       <code>./configure</code> by either
       setting the <code>METIS_DIR</code> environment
       variable denoting the path to the METIS library, or using the
