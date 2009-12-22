@@ -569,7 +569,7 @@ $k=100$ temporary vectors:
       gmres.solve(system_matrix, solution, system_rhs,
                   preconditioner);
       
-      hanging_node_constraints.distribute (solution);
+      constraints.distribute (solution);
       
       std::cout << " "
                 << solver_control.last_step()
