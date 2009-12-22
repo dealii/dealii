@@ -3112,7 +3112,7 @@ int main (int argc, char *argv[])
   deallog.depth_console(0);
   if (argc != 2)
     {
-      std::cout << "Usage:" << argv[0] << " infile" << std::endl;
+      std::cout << "Usage:" << argv[0] << " input_file" << std::endl;
       std::exit(1);
     }
 
