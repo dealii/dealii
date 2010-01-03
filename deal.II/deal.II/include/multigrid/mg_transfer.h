@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 #include <base/config.h>
 
 #include <lac/block_vector.h>
+#include <lac/constraint_matrix.h>
 #ifdef DEAL_PREFER_MATRIX_EZ
 #  include <lac/sparse_matrix_ez.h>
 #  include <lac/block_sparse_matrix_ez.h>
@@ -64,10 +65,22 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 {
   public:
 				     /**
+				      * Constructor without constraint
+				      * matrices. Use this constructor
+				      * only with discontinuous finite
+				      * elements or with no local
+				      * refinement.
+				      */
+    MGTransferPrebuilt ();
+
+				     /**
+				      * Constructor with constraint matrices.
+				      */
+    MGTransferPrebuilt (const ConstraintMatrix& constraints);
+				     /**
 				      * Destructor.
 				      */
     virtual ~MGTransferPrebuilt ();
-    
 				     /**
 				      * Actually build the prolongation
 				      * matrices for each level.
@@ -176,6 +189,42 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				     */
     std::vector<std::map<unsigned int, unsigned int> >
     copy_indices;
+
+				     /**
+				      * Fill the two boolean vectors
+				      * #dofs_on_refinement_edge and
+				      * #dofs_on_refinement_boundary.
+				      */
+    template <int dim, int spacedim>
+    void find_dofs_on_refinement_edges (
+        const MGDoFHandler<dim,spacedim>& mg_dof);
+
+				     /**
+				      * Degrees of freedom on the
+				      * refinement edge excluding
+				      * those on the boundary.
+				      *
+				      * @todo Clean up names
+				      */
+    std::vector<std::vector<bool> > dofs_on_refinement_edge;
+				     /**
+				      * The degrees of freedom on the
+				      * the refinement edges. For each
+				      * level (outer vector) and each
+				      * dof index (inner vector), this
+				      * bool is true if the level
+				      * degree of freedom is on the
+				      * refinement edge towards the
+				      * lower level.
+				      *
+				      * @todo Clean up names
+				      */
+    std::vector<std::vector<bool> > dofs_on_refinement_boundary; 
+				     /**
+				      * The constraints of the global
+				      * system.
+				      */
+    SmartPointer<const ConstraintMatrix> constraints;
 };
 
 

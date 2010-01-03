@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -103,6 +103,7 @@ class Multigrid : public Subscriptor
 	      const MGSmootherBase<VECTOR>& pre_smooth,
 	      const MGSmootherBase<VECTOR>& post_smooth,
 	      Cycle cycle = v_cycle);
+    
 				     /**
 				      * Experimental constructor for
 				      * cases in which no MGDoFHandler
@@ -217,6 +218,37 @@ class Multigrid : public Subscriptor
 				     /**
 				      * Set additional matrices to
 				      * correct residual computation
+				      * at refinement edges. Since we
+				      * only smoothen in the interior
+				      * of the refined part of the
+				      * mesh, the coupling across the
+				      * refinement edge is
+				      * missing. This coupling is
+				      * provided by these two
+				      * matrices.
+				      *
+				      * @note While
+				      * <tt>edge_out.vmult</tt> is
+				      * used, for the second argument,
+				      * we use
+				      * <tt>edge_in.Tvmult</tt>. Thus,
+				      * <tt>edge_in</tt> should be
+				      * assembled in transposed
+				      * form. This saves a second
+				      * sparsity pattern for
+				      * <tt>edge_in</tt>. In
+				      * particular, for symmetric
+				      * operators, both arguments can
+				      * refer to the same matrix,
+				      * saving assembling of one of
+				      * them.
+				      */
+    void set_edge_matrices (const MGMatrixBase<VECTOR>& edge_out,
+			    const MGMatrixBase<VECTOR>& edge_in);
+
+				     /**
+				      * Set additional matrices to
+				      * correct residual computation
 				      * at refinement edges. These
 				      * matrices originate from
 				      * discontinuous Galerkin methods
@@ -224,9 +256,25 @@ class Multigrid : public Subscriptor
 				      * correspond tu the edge fluxes
 				      * at the refinement edge between
 				      * two levels.
+				      *
+				      * @note While
+				      * <tt>edge_down.vmult</tt> is
+				      * used, for the second argument,
+				      * we use
+				      * <tt>edge_up.Tvmult</tt>. Thus,
+				      * <tt>edge_up</tt> should be
+				      * assembled in transposed
+				      * form. This saves a second
+				      * sparsity pattern for
+				      * <tt>edge_up</tt>. In
+				      * particular, for symmetric
+				      * operators, both arguments can
+				      * refer to the same matrix,
+				      * saving assembling of one of
+				      * them.
 				      */
-    void set_edge_matrices (const MGMatrixBase<VECTOR>& edge_down,
-			    const MGMatrixBase<VECTOR>& edge_up);
+    void set_edge_flux_matrices (const MGMatrixBase<VECTOR>& edge_down,
+				 const MGMatrixBase<VECTOR>& edge_up);
 
 				     /**
 				      * Return the finest level for
@@ -397,12 +445,38 @@ class Multigrid : public Subscriptor
     SmartPointer<const MGSmootherBase<VECTOR>,Multigrid<VECTOR> > post_smooth;
     
 				     /**
+				      * Edge matrix from the interior
+				      * of the refined part to the
+				      * refinement edge.
+				      *
+				      * @note Only <tt>vmult</tt> is
+				      * used for these matrices.
+				      */
+    SmartPointer<const MGMatrixBase<VECTOR> > edge_out;
+
+				     /**
+				      * Transpose edge matrix from the
+				      * refinement edge to the
+				      * interior of the refined part.
+				      *
+				      * @note Only <tt>Tvmult</tt> is
+				      * used for these matrices.
+				      */
+    SmartPointer<const MGMatrixBase<VECTOR> > edge_in;
+
+				     /**
 				      * Edge matrix from fine to coarse.
+				      *
+				      * @note Only <tt>vmult</tt> is
+				      * used for these matrices.
 				      */
     SmartPointer<const MGMatrixBase<VECTOR>,Multigrid<VECTOR> > edge_down;
 
 				     /**
 				      * Transpose edge matrix from coarse to fine.
+				      *
+				      * @note Only <tt>Tvmult</tt> is
+				      * used for these matrices.
 				      */
     SmartPointer<const MGMatrixBase<VECTOR>,Multigrid<VECTOR> > edge_up;
 

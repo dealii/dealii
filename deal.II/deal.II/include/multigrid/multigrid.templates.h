@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,6 +42,8 @@ Multigrid<VECTOR>::Multigrid (const unsigned int minlevel,
 		transfer(&transfer, typeid(*this).name()),
 		pre_smooth(&pre_smooth, typeid(*this).name()),
 		post_smooth(&post_smooth, typeid(*this).name()),
+		edge_out(0, typeid(*this).name()),
+		edge_in(0, typeid(*this).name()),
 		edge_down(0, typeid(*this).name()),
 		edge_up(0, typeid(*this).name()),
 		debug(0)
@@ -103,11 +105,19 @@ void
 Multigrid<VECTOR>::set_edge_matrices (const MGMatrixBase<VECTOR>& down,
 				      const MGMatrixBase<VECTOR>& up)
 {
-  edge_down = &down;
-  edge_up = &up;
+  edge_out = &down;
+  edge_in = &up;
 }
 
 
+template <class VECTOR>
+void
+Multigrid<VECTOR>::set_edge_flux_matrices (const MGMatrixBase<VECTOR>& down,
+					   const MGMatrixBase<VECTOR>& up)
+{
+  edge_down = &down;
+  edge_up = &up;
+}
 
 
 template <class VECTOR>
@@ -150,10 +160,12 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
   for (unsigned int l = level;l>minlevel;--l)
     {
       t[l-1] = 0.;
+      if (l==level && edge_out != 0)
+	edge_out->vmult_add(level, t[level], solution[level]);
+      
       if (l==level && edge_down != 0)
-	{
-	  edge_down->vmult(level, t[level-1], solution[level]);
-	}
+ 	edge_down->vmult(level, t[level-1], solution[level]);
+      
       transfer->restrict_and_add (l, t[l-1], t[l]);
       defect[l-1] -= t[l-1];
     }
@@ -173,11 +185,17 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
   
   solution[level] += t[level];
   
-  if (edge_up != 0)
+  if (edge_in != 0)
     {
-      edge_up->Tvmult(level, t[level], solution[level-1]);
+      edge_in->Tvmult(level, t[level], solution[level]);
       defect[level] -= t[level];
     }
+  
+  if (edge_up != 0)
+    {
+     edge_up->Tvmult(level, t[level], solution[level-1]);
+     defect[level] -= t[level];
+   }
   
   if (debug>2)
     deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
@@ -261,8 +279,12 @@ Multigrid<VECTOR>::level_step(const unsigned int level,
 				   // coarse-level defect already
 				   // contain the global defect, the
 				   // refined parts its restriction.
+  if (edge_out != 0)
+    edge_out->vmult_add(level, t[level], solution[level]);
+  
   if (edge_down != 0)
     edge_down->vmult_add(level, defect2[level-1], solution[level]);
+  
   transfer->restrict_and_add (level, defect2[level-1], t[level]);
 				   // do recursion
   solution[level-1] = 0.;
@@ -296,11 +318,12 @@ Multigrid<VECTOR>::level_step(const unsigned int level,
   solution[level] += t[level];
 
   
-  if (edge_up != 0)
-    {
-      edge_up->Tvmult(level, t[level], solution[level-1]);
-    }
+  if (edge_in != 0)
+    edge_in->Tvmult(level, t[level], solution[level]);
 
+  if (edge_up != 0)
+    edge_up->Tvmult(level, t[level], solution[level-1]);
+  
   t[level].sadd(-1.,-1.,defect2[level],1.,defect[level]);
 
   if (debug>2)

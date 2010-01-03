@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <base/logstream.h>
+#include <base/function.h>
 
 #include <lac/vector.h>
 #include <lac/block_vector.h>
@@ -23,6 +24,7 @@
 #include <fe/fe.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
+#include <multigrid/mg_tools.h>
 #include <multigrid/mg_transfer.h>
 #include <multigrid/mg_transfer.templates.h>
 
@@ -35,6 +37,7 @@ template <int dim, int spacedim>
 void MGTransferPrebuilt<number>::build_matrices (
   const MGDoFHandler<dim,spacedim> &mg_dof)
 {
+  //start building the matrices here
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
   
@@ -156,9 +159,42 @@ void MGTransferPrebuilt<number>::build_matrices (
 	      }
 	  }
     }
-				   // For non-DG elements, add a
-				   // condense operator here.
+  // impose boundary conditions 
+  // but only in the column of 
+  // the prolongation matrix 
+  //TODO: this way is not very efficient
+  std::vector<std::set<unsigned int> > boundary_indices (mg_dof.get_tria().n_levels());
+  typename FunctionMap<dim>::type boundary;
+  ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
+  boundary[0] = &homogeneous_dirichlet_bc;
+  MGTools::make_boundary_list(mg_dof, boundary, boundary_indices);
+
+  for (unsigned int level=0; level<n_levels-1; ++level)
+  {
+    if (boundary_indices[level].size() == 0)
+      continue;
+
+    const unsigned int n_dofs = prolongation_matrices[level]->m();
+    for (unsigned int i=0; i<n_dofs; ++i)
+    {
+      SparseMatrix<double>::iterator anfang = prolongation_matrices[level]->begin(i),
+        ende = prolongation_matrices[level]->end(i); 
+      for(; anfang != ende; ++anfang)
+      {
+        std::set<unsigned int>::const_iterator dof = boundary_indices[level].begin(),
+          endd = boundary_indices[level].end();
+        for (; dof != endd; ++dof)
+        {
+          const unsigned int column_number = anfang->column();
+          const unsigned int dof_number = *dof;
+          if(dof_number == column_number)
+            prolongation_matrices[level]->set(i,dof_number,0);
+        }
+      }
+    }
+  }
   
+  find_dofs_on_refinement_edges (mg_dof);
 				   // Prepare indices to copy from a
 				   // global vector to the parts of an
 				   // MGVector corresponding to active
@@ -188,6 +224,7 @@ void MGTransferPrebuilt<number>::build_matrices (
 	  
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
+              if(!dofs_on_refinement_edge[level][level_dof_indices[i]])
 	      copy_indices[level].insert(
 		std::make_pair(global_dof_indices[i], level_dof_indices[i]));
 	    }

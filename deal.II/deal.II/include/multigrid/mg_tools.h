@@ -126,7 +126,6 @@ class MGTools
     make_flux_sparsity_pattern_edge (const MGDoFHandler<dim,spacedim> &dof_handler,
 				     SparsityPattern         &sparsity,
 				     const unsigned int       level);
-
 				     /**
 				      * This function does the same as
 				      * the other with the same name,
@@ -243,12 +242,15 @@ class MGTools
       const typename FunctionMap<dim>::type& function_map,
       std::vector<std::set<unsigned int> >& boundary_indices,
       const std::vector<bool>& component_mask = std::vector<bool>());
+                                      /**
+                                       */
 
     template <typename number>
     static void apply_boundary_values (
       const std::set<unsigned int> &boundary_dofs,
       SparseMatrix<number>& matrix,
-      const bool preserve_symmetry);
+      const bool preserve_symmetry,
+      const bool ignore_zeros = false);
     
     template <typename number>
     static void apply_boundary_values (

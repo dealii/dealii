@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -101,6 +101,16 @@ Multigrid<VECTOR>::print_vector (const unsigned int level,
 #endif
 
 
+template<class VECTOR>
+MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt ()
+{} 
+
+
+template<class VECTOR>
+MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c)
+ :
+   constraints(&c)
+{} 
 
 
 template <class VECTOR>
@@ -132,10 +142,6 @@ void MGTransferPrebuilt<VECTOR>::restrict_and_add (
 
   prolongation_matrices[from_level-1]->Tvmult_add (dst, src);
 }
-
-
-
-
 
 template <typename number>
 MGTransferBlock<number>::MGTransferBlock ()
@@ -312,21 +318,6 @@ void MGTransferSelect<number>::restrict_and_add (
 }
 
 
-template <class VECTOR>
-void
-MGSmootherContinuous<VECTOR>::set_zero_interior_boundary (
-  const unsigned int level,
-  VECTOR&            u) const
-{
-  if (level==0)
-    return;
-  else
-    for (std::vector<unsigned int>::const_iterator p=interior_boundary_dofs[level-1].begin();
-	 p!=interior_boundary_dofs[level-1].end(); ++p)
-      u(*p) = 0;
-}
-
-
 //----------------------------------------------------------------------//
 
 template <typename number>
@@ -383,17 +374,5 @@ template class MGTransferSelect<double>;
 template class MGTransferBlockSelect<float>;
 template class MGTransferBlockSelect<double>;
 
-template
-void MGSmootherContinuous<Vector<double> >::set_zero_interior_boundary (
-  const unsigned int, Vector<double>&) const;
-template
-void MGSmootherContinuous<Vector<float> >::set_zero_interior_boundary (
-  const unsigned int, Vector<float>&) const;
-template
-void MGSmootherContinuous<BlockVector<double> >::set_zero_interior_boundary (
-  const unsigned int, BlockVector<double>&) const;
-template
-void MGSmootherContinuous<BlockVector<float> >::set_zero_interior_boundary (
-  const unsigned int, BlockVector<float>&) const;
 
 DEAL_II_NAMESPACE_CLOSE

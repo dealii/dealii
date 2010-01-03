@@ -907,7 +907,6 @@ MGTools::make_flux_sparsity_pattern_edge (
 }
 
 
-
 template <int dim, int spacedim>
 void
 MGTools::count_dofs_per_component (

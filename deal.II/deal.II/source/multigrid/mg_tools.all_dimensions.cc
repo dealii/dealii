@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,8 @@ void
 MGTools::apply_boundary_values (
   const std::set<unsigned int> &boundary_dofs,
   SparseMatrix<number>& matrix,
-  const bool preserve_symmetry)
+  const bool preserve_symmetry,
+  const bool ignore_zeros)
 {
 				   // if no boundary values are to be applied
 				   // simply return
@@ -95,10 +96,9 @@ MGTools::apply_boundary_values (
 				       //
 				       // store the new rhs entry to make
 				       // the gauss step more efficient
-      matrix.set (dof_number, dof_number,
-		  first_nonzero_diagonal_entry);
-
-
+      if(!ignore_zeros)
+	matrix.set (dof_number, dof_number,
+		    first_nonzero_diagonal_entry);
 				       // if the user wants to have
 				       // the symmetry of the matrix
 				       // preserved, and if the
@@ -431,10 +431,10 @@ MGTools::apply_boundary_values (
 
 template void MGTools::apply_boundary_values (
   const std::set<unsigned int>&,
-  SparseMatrix<float>&, const bool);
+  SparseMatrix<float>&, const bool, const bool);
 template void MGTools::apply_boundary_values (
   const std::set<unsigned int>&,
-  SparseMatrix<double>&, const bool);
+  SparseMatrix<double>&, const bool, const bool);
 template void MGTools::apply_boundary_values (
   const std::set<unsigned int>&,
   BlockSparseMatrix<float>&, const bool);

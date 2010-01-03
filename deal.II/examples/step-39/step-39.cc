@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -533,7 +533,7 @@ Step39<dim>::solve()
   Multigrid<Vector<double> > mg(mg_dof_handler, mgmatrix,
 				mg_coarse, mg_transfer,
 				mg_smoother, mg_smoother);
-  mg.set_edge_matrices(mgdown, mgup);
+  mg.set_edge_flux_matrices(mgdown, mgup);
   mg.set_debug(0);
   mg_smoother.set_debug(0);
   
