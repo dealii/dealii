@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -11,7 +11,7 @@
 /*    further information on this license.                        */
 
 				 // The first few files have already
-				 // been covered in example 12
+				 // been covered in step-12
 				 // and will thus not be further
 				 // commented on.
 #include <base/quadrature_lib.h>
@@ -50,27 +50,6 @@ using namespace dealii;
 
 				 // @sect3{Equation data}
 				 //
-				 // First we define the classes
-				 // representing the equation-specific
-				 // functions. Both classes, <code>RHS</code>
-				 // and <code>BoundaryValues</code>, are
-				 // derived from the <code>Function</code>
-				 // class. Only the <code>value_list</code>
-				 // function are implemented because
-				 // only lists of function values are
-				 // computed rather than single
-				 // values.
-template <int dim>
-class RHS:  public Function<dim>
-{
-  public:
-    RHS () {};
-    virtual void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<double> &values,
-			     const unsigned int component=0) const;
-};
-
-
 template <int dim>
 class BoundaryValues:  public Function<dim>
 {
@@ -81,80 +60,7 @@ class BoundaryValues:  public Function<dim>
 			     const unsigned int component=0) const;
 };
 
-
-				 // The class <code>Beta</code> represents the
-				 // vector valued flow field of the
-				 // linear transport equation and is
-				 // not derived from the <code>Function</code>
-				 // class as we prefer to get function
-				 // values of type <code>Point</code> rather
-				 // than of type
-				 // <code>Vector@<double@></code>. This, because
-				 // there exist scalar products
-				 // between <code>Point</code> and <code>Point</code> as
-				 // well as between <code>Point</code> and
-				 // <code>Tensor</code>, simplifying terms like
-				 // $\beta\cdot n$ and
-				 // $\beta\cdot\nabla v$.
-                                 //
-                                 // An unnecessary empty constructor
-                                 // is added to the class to work
-                                 // around a bug in Compaq's cxx
-                                 // compiler which otherwise reports
-                                 // an error about an omitted
-                                 // initializer for an object of
-                                 // this class further down.
-template <int dim>
-class Beta
-{
-  public:
-    Beta () {}
-    void value_list (const std::vector<Point<dim> > &points,
-		     std::vector<Point<dim> > &values) const;
-};
-
-
-				 // The implementation of the
-				 // <code>value_list</code> functions of these
-				 // classes are rather simple.  For
-				 // simplicity the right hand side is
-				 // set to be zero but will be
-				 // assembled anyway.
-template <int dim>
-void RHS<dim>::value_list(const std::vector<Point<dim> > &points,
-			  std::vector<double> &values,
-			  const unsigned int) const
-{
-				   // Usually we check whether input
-				   // parameter have the right sizes.
-  Assert(values.size()==points.size(),
-	 ExcDimensionMismatch(values.size(),points.size()));
-
-  for (unsigned int i=0; i<values.size(); ++i)
-    values[i]=0;
-}
-
-
-				 // The flow field is chosen to be
-				 // circular, counterclockwise, and with
-				 // the origin as midpoint.
-template <int dim>
-void Beta<dim>::value_list(const std::vector<Point<dim> > &points,
-			   std::vector<Point<dim> > &values) const
-{
-  Assert(values.size()==points.size(),
-	 ExcDimensionMismatch(values.size(),points.size()));
-
-  for (unsigned int i=0; i<points.size(); ++i)
-    {
-      values[i](0) = -points[i](1);
-      values[i](1) = points[i](0);
-      values[i] /= std::sqrt(values[i].square());
-    }
-}
-
-
-				 // Hence the inflow boundary of the
+				 // The inflow boundary of the
 				 // unit square [0,1]^2 are the right
 				 // and the lower boundaries. We
 				 // prescribe discontinuous boundary
@@ -219,13 +125,8 @@ class DGIntegrator : public Subscriptor
     void bdry(FaceInfo& info) const;
     void face(FaceInfo& info1, FaceInfo& info2) const;
 
-				     // Additionally, like in step-12,
-				     // we have objects of the
-				     // functions used in this class.
   private:
-    const Beta<dim> beta_function;
-    const RHS<dim> rhs_function;
-    const BoundaryValues<dim> boundary_function;
+    BoundaryValues<dim> boundary_function;
 };
 
 				 // @sect4{The local integrators}
@@ -258,27 +159,35 @@ void DGIntegrator<dim>::cell(CellInfo& info) const
   const FEValuesBase<dim>& fe_v = info.fe();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
   Vector<double>& local_vector = info.R[0].block(0);
-
-				   // With these objects, we continue
-				   // local integration like in step-12.
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   
-  std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
-  std::vector<double> rhs (fe_v.n_quadrature_points);
-  
-  beta_function.value_list (fe_v.get_quadrature_points(), beta);
-  rhs_function.value_list (fe_v.get_quadrature_points(), rhs);
-  
+				   // With these objects, we continue
+				   // local integration like
+				   // always. First, we loop over the
+				   // quadrature points and compute
+				   // the advection vector in the
+				   // current point.
   for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
-      {
-	for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	  local_matrix(i,j) -= beta[point]*fe_v.shape_grad(i,point)*
-			      fe_v.shape_value(j,point) *
-			      JxW[point];
-	
-	local_vector(i) += rhs[point] * fe_v.shape_value(i,point) * JxW[point];
-      }
+    {
+      Point<dim> beta;
+      beta(0) = -fe_v.quadrature_point(point)(1);
+      beta(1) = fe_v.quadrature_point(point)(0);
+      beta /= beta.norm();
+      
+      for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
+	{
+					   // We solve a homogeneous
+					   // equation, thus no right
+					   // hand side shows up in
+					   // the cell term.
+					   // What's left is
+					   // integrating the matrix entries.
+	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
+	    local_matrix(i,j) -= beta*fe_v.shape_grad(i,point)*
+				 fe_v.shape_value(j,point) *
+				 JxW[point];
+	}
+    }
 }
 
 				 // Now the same for the boundary
@@ -295,15 +204,18 @@ void DGIntegrator<dim>::bdry(FaceInfo& info) const
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
   
-  std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
   std::vector<double> g(fe_v.n_quadrature_points);
   
-  beta_function.value_list (fe_v.get_quadrature_points(), beta);
   boundary_function.value_list (fe_v.get_quadrature_points(), g);
 
   for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
     {
-      const double beta_n=beta[point] * normals[point];      
+      Point<dim> beta;
+      beta(0) = -fe_v.quadrature_point(point)(1);
+      beta(1) = fe_v.quadrature_point(point)(0);
+      beta /= beta.norm();
+      
+      const double beta_n=beta * normals[point];      
       if (beta_n>0)
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
@@ -369,14 +281,15 @@ void DGIntegrator<dim>::face(FaceInfo& info1, FaceInfo& info2) const
   
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
-
-  std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
   
-  beta_function.value_list (fe_v.get_quadrature_points(), beta);
-
   for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
     {
-      const double beta_n=beta[point] * normals[point];
+      Point<dim> beta;
+      beta(0) = -fe_v.quadrature_point(point)(1);
+      beta(1) = fe_v.quadrature_point(point)(0);
+      beta /= beta.norm();
+      
+      const double beta_n=beta * normals[point];
       if (beta_n>0)
 	{
 					   // This term we've already

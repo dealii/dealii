@@ -5,9 +5,11 @@
 
 This example is devoted to the MeshWorker framework and the
 <em>discontinuous Galerkin method</em>, or in short: DG method. It
-solves the same problem as @ref step_12 "step-12" (see there for a description of the
-problem and discretization), but here we use the MeshWorker framework
-in order to save reprogramming the cell/face loops.
+solves the same problem as @ref step_12 "step-12" (see there for a
+description of the problem and discretization), but here we use the
+MeshWorker framework in order to save reprogramming the cell/face
+loops. We have tried to strip this example of peripheral information
+such that the structure becomes more clear.
 
 In particular the loops of DG methods turn out to be complex, because
 for the face terms, we have to distinguish the cases of boundary,
@@ -15,4 +17,9 @@ regular interior faces and interior faces with hanging nodes,
 respectively. The MeshWorker framework implements the standard loop
 over all cells and faces in MeshWorker::loop() and takes care of
 distinguishing between all the different faces.
+
+There are two things left to do if you use MeshWorker: first, you need
+to write the local integrators for your problem. Second, you select
+classes from the MeshWorker namespace and combine them to achieve your
+goal.
 
