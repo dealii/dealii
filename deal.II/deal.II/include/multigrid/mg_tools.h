@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -389,6 +389,14 @@ class MGTools
 	const std::vector<bool> &selected,
 	const std::vector<unsigned int> &target_component,
 	std::vector<std::vector<unsigned int> >& cached_sizes);
+
+
+    template <int dim, int spacedim>
+    static
+    void
+    extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+				  std::vector<std::vector<bool> >  &interface_dofs,
+				  std::vector<std::vector<bool> >  &boundary_interface_dofs);
 };
 
 /*@}*/

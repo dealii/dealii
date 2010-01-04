@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1518,6 +1518,80 @@ MGTools::reinit_vector_by_blocks (
 }
 
 
+
+template <int dim, int spacedim>
+void
+MGTools::
+extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+			      std::vector<std::vector<bool> >  &interface_dofs,
+			      std::vector<std::vector<bool> >  &boundary_interface_dofs)
+{
+  const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
+  
+  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+  const unsigned int   dofs_per_face   = fe.dofs_per_face;
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> face_dof_indices (dofs_per_face);
+
+  std::vector<bool> cell_dofs(dofs_per_cell, false);
+  std::vector<bool> boundary_cell_dofs(dofs_per_cell, false);
+  
+  typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+					    endc = mg_dof_handler.end();
+
+  for (; cell!=endc; ++cell)
+    {
+      bool has_coarser_neighbor = false;
+      
+      std::fill (cell_dofs.begin(), cell_dofs.end(), false);
+      std::fill (boundary_cell_dofs.begin(), boundary_cell_dofs.end(), false);
+  
+      for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
+	{
+	  const typename DoFHandler<dim>::face_iterator face = cell->face(face_nr);
+	  if (!face->at_boundary())
+	    {
+					       //interior face
+	      const typename MGDoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face_nr);
+
+					       // Do refinement face
+					       // from the coarse side
+	      if (neighbor->level() < cell->level())
+		{
+		  for (unsigned int j=0; j<dofs_per_face; ++j)
+		    cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+
+		  has_coarser_neighbor = true;
+		}
+	    }
+	}
+
+      if (has_coarser_neighbor == true)
+	for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
+	  if(cell->at_boundary(face_nr))
+	    for(unsigned int j=0; j<dofs_per_face; ++j)
+	      if (cell_dofs[fe.face_to_cell_index(j,face_nr)] == true)
+		boundary_cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+
+      
+      const unsigned int level = cell->level();
+      cell->get_mg_dof_indices (local_dof_indices);
+
+      for(unsigned int i=0; i<dofs_per_cell; ++i)
+	{
+	  if (cell_dofs[i])
+	    interface_dofs[level][local_dof_indices[i]] = true;
+
+	  if (boundary_cell_dofs[i])
+	    boundary_interface_dofs[level][local_dof_indices[i]] = true;
+	}
+    }
+}
+
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 
@@ -1636,5 +1710,14 @@ template void MGTools::make_boundary_list(
   const FunctionMap<deal_II_dimension>::type&,
   std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&);
+
+#if deal_II_dimension > 1
+template
+void
+MGTools::
+extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
+			      std::vector<std::vector<bool> >  &interface_dofs,
+			      std::vector<std::vector<bool> >  &boundary_interface_dofs);
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
