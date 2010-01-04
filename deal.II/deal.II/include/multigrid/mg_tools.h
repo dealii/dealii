@@ -63,7 +63,7 @@ class MGTools
       const unsigned int level,
       std::vector<unsigned int>& row_lengths,
       const DoFTools::Coupling flux_couplings = DoFTools::none);
-    
+
 				     /**
 				      * Compute row length vector for
 				      * multilevel methods with
@@ -83,7 +83,7 @@ class MGTools
 				      * Write the sparsity structure
 				      * of the matrix belonging to the
 				      * specified @p level. The sparsity pattern
-				      * is not compressed, so before 
+				      * is not compressed, so before
 				      * creating the actual matrix
 				      * you have to compress the
 				      * matrix yourself, using
@@ -202,7 +202,7 @@ class MGTools
 	std::vector<std::vector<unsigned int> > &result,
 	const bool only_once = false,
 	std::vector<unsigned int> target_component = std::vector<unsigned int>());
-    
+
 				     /**
 				      * @deprecated Wrapper for the
 				      * other function with same name,
@@ -251,7 +251,7 @@ class MGTools
       SparseMatrix<number>& matrix,
       const bool preserve_symmetry,
       const bool ignore_zeros = false);
-    
+
     template <typename number>
     static void apply_boundary_values (
       const std::set<unsigned int>& boundary_dofs,
@@ -299,7 +299,7 @@ class MGTools
       MGLevelObject<Vector<number> > &v,
       const unsigned int selected,
       std::vector<std::vector<unsigned int> >& cached_sizes);
-    
+
 				     /**
 				      * Adjust block vectors on all
 				      * levels to correct size. The
@@ -313,7 +313,7 @@ class MGTools
       MGLevelObject<BlockVector<number> > &v,
       const std::vector<bool> &selected,
       std::vector<std::vector<unsigned int> >& cached_sizes);
-    
+
 				     /**
 				      * Adjust block-vectors on all
 				      * levels to correct size.  Count
@@ -346,7 +346,7 @@ class MGTools
 				      * as in
 				      * DoFRenumbering::component_wise.
 				      *
-				      * 
+				      *
 				      */
     template <int dim, typename number, int spacedim>
       static void
@@ -391,6 +391,23 @@ class MGTools
 	std::vector<std::vector<unsigned int> >& cached_sizes);
 
 
+				     /**
+				      * For each level in a multigrid
+				      * hierarchy, produce a boolean
+				      * mask that indicates which of
+				      * the degrees of freedom are
+				      * along interfaces of this level
+				      * to cells that only exist on
+				      * coarser levels. The function
+				      * returns the subset of these
+				      * indices in the last argument
+				      * that are not only on interior
+				      * interfaces (i.e. between cells
+				      * of a given level and adjacent
+				      * coarser levels) but also on
+				      * the external boundary of the
+				      * domain.
+				      */
     template <int dim, int spacedim>
     static
     void
