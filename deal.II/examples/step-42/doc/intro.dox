@@ -1,0 +1,783 @@
+<br>
+
+<i>This program was contributed by Martin Kronbichler and Wolfgang
+Bangerth. 
+<br>
+This material is based upon work partly supported by the National
+Science Foundation under Award No. EAR-0426271 and The California Institute of 
+Technology. Any opinions, findings, and conclusions or recommendations
+expressed in this publication are those of the author and do not
+necessarily reflect the views of the National Science Foundation or of The
+California Institute of Technology.
+</i> 
+
+
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This program deals with the Stokes system of equations which reads as
+follows in non-dimensionalized form:
+@f{eqnarray*}
+  -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& \textbf{f},
+  \\
+  -\textrm{div}\; \textbf{u} &=& 0,
+@f}
+where $\textbf u$ denotes the velocity of a fluid, $p$ is its
+pressure, $\textbf f$ are external forces, and
+$\varepsilon(\textbf{u})= \nabla^s{\textbf{u}}= \frac 12 \left[
+(\nabla \textbf{u}) + (\nabla \textbf{u})^T\right]$  is the
+rank-2 tensor of symmetrized gradients; a component-wise definition
+of it is $\varepsilon(\textbf{u})_{ij}=\frac
+12\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right)$.
+
+The Stokes equations describe the steady-state motion of a
+slow-moving, viscous fluid such as honey, rocks in the earth mantle,
+or other cases where inertia does not play a significant role. If a
+fluid is moving fast enough that inertia forces are significant
+compared to viscous friction, the Stokes equations are no longer
+valid; taking into account inertia effects then leads to the
+nonlinear Navier-Stokes equations. However, in this tutorial program,
+we will focus on the simpler Stokes system.
+
+To be well-posed, we will have to add boundary conditions to the
+equations. What boundary conditions are readily possible here will
+become clear once we discuss the weak form of the equations.
+
+The equations covered here fall into the class of vector-valued problems. A
+toplevel overview of this topic can be found in the @ref vector_valued module.
+
+
+<h3>Weak form</h3>
+
+The weak form of the equations is obtained by writing it in vector
+form as
+@f{eqnarray*}
+  \left(
+  {-\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p}
+  \atop
+  {-\textrm{div}\; \textbf{u}}
+  \right)
+  =
+  \left(
+  {\textbf{f}}
+  \atop
+  0
+  \right),
+@f}
+forming the dot product from the left with a vector-valued test
+function $\phi = \left({\textbf v \atop q}\right)$ and integrating
+over the domain $\Omega$, yielding the following set of equations:
+@f{eqnarray*}
+  (\mathrm v,
+   -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p)_{\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega,
+@f}
+which has to hold for all test functions $\phi = \left({\textbf v
+\atop q}\right)$.
+
+In practice, one wants to impose as little regularity on the pressure
+variable as possible; consequently, we integrate by parts the second term:
+@f{eqnarray*}
+  (\mathrm v, -\textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega.
+@f}
+Likewise, we integrate by parts the first term to obtain
+@f{eqnarray*}
+  (\nabla \mathrm v,\varepsilon(\textbf{u}))_{\Omega}
+  -
+  (\textbf{n} \otimes \mathrm v,\varepsilon(\textbf{u}))_{\partial\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega,
+@f}
+where the scalar product between two tensor-valued quantities is here
+defined as
+@f{eqnarray*}
+  (\nabla \mathrm v,\varepsilon(\textbf{u}))_{\Omega}
+  =
+  \int_\Omega \sum_{i,j=1}^d \frac{\partial v_j}{\partial x_i}
+  \varepsilon(\textbf{u})_{ij} \ dx.
+@f}
+Because the scalar product between a general tensor like
+$\nabla\mathrm v$ and a symmetric tensor like
+$\varepsilon(\textbf{u})$ equals the scalar product between the
+symmetrized forms of the two, we can also write the bilinear form
+above as follows:
+@f{eqnarray*}
+  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  -
+  (\textbf{n} \otimes \mathrm v,\varepsilon(\textbf{u}))_{\partial\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega,
+@f}
+We will deal with the boundary terms in the next section, but it is already
+clear from the domain terms
+@f{eqnarray*}
+  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+@f}
+of the bilinear form that the Stokes equations yield a symmetric bilinear
+form, and consequently a symmetric (if indefinite) system matrix.
+
+
+<h3>%Boundary conditions</h3>
+
+The weak form just derived immediately presents us with different
+possibilities for imposing boundary conditions:
+<ol>
+<li>Dirichlet velocity boundary conditions: On a part
+    $\Gamma_D\subset\partial\Omega$ we may impose Dirichlet conditions
+    on the velocity $\textbf u$:
+
+    @f{eqnarray*}
+        \textbf u = \textbf g_D \qquad\qquad \textrm{on}\ \Gamma_D.
+    @f}
+    Because test functions $\textbf v$ come from the tangent space of
+    the solution variable, we have that $\textbf v=0$ on $\Gamma_D$
+    and consequently that
+    @f{eqnarray*}
+      -(\textbf{n} \otimes \mathrm
+        v,\varepsilon(\textbf{u}))_{\Gamma_D}
+      +
+      (\textbf{n}\cdot\textbf{v}, p)_{\Gamma_D}
+      = 0.
+    @f}
+    In other words, as usual, strongly imposed boundary values do not
+    appear in the weak form.
+ 
+    It is noteworthy that if we impose Dirichlet boundary values on the entire
+    boundary, then the pressure is only determined up to a constant. An
+    algorithmic realization of that would use similar tools as have been seen in
+    step-11.
+
+<li>Neumann-type or natural boundary conditions: On the rest of the boundary
+    $\Gamma_N=\partial\Omega\backslash\Gamma_D$, let us re-write the
+    boundary terms as follows:
+    @f{eqnarray*}
+      -(\textbf{n} \otimes \mathrm
+        v,\varepsilon(\textbf{u}))_{\Gamma_N}
+      +
+      (\textbf{n}\cdot\textbf{v}, p)_{\Gamma_N}
+      &=&
+      \sum_{i,j=1}^d
+      -(n_i v_j,\varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      +
+      \sum_{i=1}^d 
+      (n_i v_i, p)_{\Gamma_N}	
+      \\
+      &=&
+      \sum_{i,j=1}^d
+      -(n_i v_j,\varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      +
+      \sum_{i,j=1}^d 
+      (n_i v_j, p \delta_{ij})_{\Gamma_N}	
+      \\
+      &=&
+      \sum_{i,j=1}^d
+      (n_i v_j,p \delta_{ij} - \varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      \\
+      &=&
+      (\textbf{n} \otimes \mathrm v,
+      p \textbf{1} - \varepsilon(\textbf{u}))_{\Gamma_N}.
+      \\
+      &=&
+      (\mathrm v,
+       \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})])_{\Gamma_N}.
+    @f}
+    In other words, on the Neumann part of the boundary we can
+    prescribe values for the total stress:
+    @f{eqnarray*}
+      \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})]
+      = 
+      \textbf g_N \qquad\qquad \textrm{on}\ \Gamma_N.
+    @f}
+    If the boundary is subdivided into Dirichlet and Neumann parts
+    $\Gamma_D,\Gamma_N$, this then leads to the following weak form:
+    @f{eqnarray*}
+      (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+      - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+      -
+      (q,\textrm{div}\; \textbf{u})_{\Omega}
+      =
+      (\textbf{v}, \textbf{f})_\Omega
+      -
+      (\textbf{v}, \textbf g_N)_{\Gamma_N}.
+    @f}
+    
+    
+<li>Robin-type boundary conditions: Robin boundary conditions are a mixture of
+    Dirichlet and Neumann boundary conditions. They would read 
+    @f{eqnarray*}
+      \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})]
+      = 
+      \textbf S \textbf u \qquad\qquad \textrm{on}\ \Gamma_R,
+    @f}
+    with a rank-2 tensor (matrix) $\textbf S$. The associated weak form is
+    @f{eqnarray*}
+      (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+      - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+      -
+      (q,\textrm{div}\; \textbf{u})_{\Omega}
+      +
+      (\textbf S \textbf u, \textbf{v})_{\Gamma_R}
+      =
+      (\textbf{v}, \textbf{f})_\Omega.
+    @f}
+
+<li>Partial boundary conditions: It is possible to combine Dirichlet and
+    Neumann boundary conditions by only enforcing each of them for certain
+    components of the velocity. For example, one way to impose artificial
+    boundary conditions is to require that the flow is perpendicular to the
+    boundary, i.e. the tangential component $\textbf u_{\textbf t}=(\textbf
+    1-\textbf n\otimes\textbf n)\textbf u$ be zero, thereby constraining
+    <code>dim</code>-1 components of the velocity. The remaining component can
+    be constrained by requiring that the normal component of the normal 
+    stress be zero, yielding the following set of boundary conditions:
+    @f{eqnarray*}
+      \textbf u_{\textbf t} &=& 0,
+      \\
+      \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{1} -
+      \varepsilon(\textbf{u})] \right)
+      &=& 
+      0.
+    @f}
+
+    An alternative to this is when one wants the flow to be <i>parallel</i>
+    rather than perpendicular to the boundary (in deal.II, the
+    VectorTools::compute_no_normal_flux_constraints function can do this for
+    you). This is frequently the case for problems with a free boundary
+    (e.g. at the surface of a river or lake if vertical forces of the flow are
+    not large enough to actually deform the surface), or if no significant
+    friction is exerted by the boundary on the fluid (e.g. at the interface
+    between earth mantle and earth core where two fluids meet that are
+    stratified by different densities but that both have small enough
+    viscosities to not introduce much tangential stress on each other). 
+    In formulas, this means that 
+    @f{eqnarray*}
+      \textbf{n}\cdot\textbf u &=& 0,
+      \\
+      (\textbf 1-\textbf n\otimes\textbf n)
+      \left(\textbf{n}\cdot [p \textbf{1} -
+      \varepsilon(\textbf{u})] \right)
+      &=& 
+      0,
+    @f}
+    the first condition (which needs to be imposed strongly) fixing a single
+    component of the velocity, with the second (which would be enforced in the
+    weak form) fixing the remaining two components.
+</ol>
+
+Despite this wealth of possibilities, we will only use Dirichlet and
+(homogenous) Neumann boundary conditions in this tutorial program.
+
+
+<h3>Discretization</h3>
+
+As developed above, the weak form of the equations with Dirichlet and Neumann
+boundary conditions on $\Gamma_D$ and $\Gamma_N$ reads like this: find
+$\textbf u\in \textbf V_g = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=\textbf
+g_D\}, p\in Q=L^2(\Omega)$ so that
+@f{eqnarray*}
+  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega
+  -
+  (\textbf{v}, \textbf g_N)_{\Gamma_N}
+@f}
+for all test functions 
+$\textbf v\in \textbf V_0 = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=0\},q\in
+Q$.
+
+These equations represent a symmetric saddle point problem. It is well known
+that then a solution only exists if the function spaces in which we search for
+a solution have to satisfy certain conditions, typically referred to as the
+Babuska-Brezzi or Ladyzhenskaya-Babuska-Brezzi (LBB) conditions. The continuous
+function spaces above satisfy them. However, when we discretize the equations by
+replacing the continuous variables and test functions by finite element
+functions in finite dimensional spaces $\textbf V_{g,h}\subset \textbf V_g,
+Q_h\subset Q$, we have to make sure that $\textbf V_h,Q_h$ also satisfy the LBB
+conditions. This is similar to what we had to do in @ref step_20 "step-20".
+
+For the Stokes equations, there are a number of possible choices to ensure
+that the finite element spaces are compatible with the LBB condition. A simple
+and accurate choice that we will use here is $\textbf u_h\in Q_{p+1}^d,
+p_h\in Q_p$, i.e. use elements one order higher for the velocities than for the
+pressures. 
+
+This then leads to the following discrete problem: find $\textbf u_h,p_h$ so
+that
+@f{eqnarray*}
+  (\varepsilon(\mathrm v_h),\varepsilon(\textbf u_h))_{\Omega}
+  - (\textrm{div}\; \textbf{v}_h, p_h)_{\Omega}
+  -
+  (q_h,\textrm{div}\; \textbf{u}_h)_{\Omega}
+  =
+  (\textbf{v}_h, \textbf{f})_\Omega
+  -
+  (\textbf{v}_h, \textbf g_N)_{\Gamma_N}
+@f}
+for all test functions $\textbf v_h, q_h$. Assembling the linear system
+associated with this problem follows the same lines used in @ref step_20
+"step-20", @ref step_21 "step-21", and explained in detail in the @ref
+vector_valued module.
+
+
+
+<h3>Linear solver and preconditioning issues</h3>
+
+The weak form of the discrete equations naturally leads to the following
+linear system for the nodal values of the velocity and pressure fields:
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+  \left(\begin{array}{c}
+    U \\ P
+  \end{array}\right)
+  =
+  \left(\begin{array}{c}
+    F \\ G
+  \end{array}\right),
+@f}
+Like in @ref step_20 "step-20" and @ref step_21 "step-21", we will solve this
+system of equations by forming the Schur complement, i.e. we will first find
+the solution $P$ of 
+@f{eqnarray*}
+  BA^{-1}B^T P &=& BA^{-1} F - G, \\
+@f}
+and then
+@f{eqnarray*}
+  AU &=& F - B^TP.
+@f}
+The way we do this is pretty much exactly like we did in these previous
+tutorial programs, i.e. we use the same classes <code>SchurComplement</code>
+and <code>InverseMatrix</code> again. There are two significant differences,
+however:
+
+<ol>
+<li>
+First, in the mixed Laplace equation we had to deal with the question of how
+to precondition the Schur complement $B^TM^{-1}B$, which was spectrally
+equivalent to the Laplace operator on the pressure space (because $B$
+represents the gradient operator, $B^T$ its adjoint $-\textrm{div}$, and $M$
+the identity (up to the material parameter $K^{-1}$), so $B^TM^{-1}B$ is
+something like $-\textrm{div} \mathbf 1 \nabla = -\Delta$). Consequently, the
+matrix is badly conditioned for small mesh sizes and we had to come up with an
+elaborate preconditioning scheme for the Schur complement.
+
+<li>
+Second, every time we multiplied with $B^TM^{-1}B$ we had to solve with the
+mass matrix $M$. This wasn't particularly difficult, however, since the mass
+matrix is always well conditioned and so simple to invert using CG and a
+little bit of preconditioning.
+</ol>
+In other words, preconditioning the inner solver for $M$ was simple whereas
+preconditioning the outer solver for $B^TM^{-1}B$ was complicated.
+
+Here, the situation is pretty much exactly the opposite. The difference stems
+from the fact that the matrix at the heart of the Schur complement does not
+stem from the identity operator but from a variant of the Laplace operator,
+$-\textrm{div} \nabla^s$ (where $\nabla^s$ is the symmetric gradient)
+acting on a vector field. In the investigation of this issue
+we largely follow the paper D. Silvester and A. Wathen:
+"Fast iterative solution of stabilised Stokes systems part II. Using
+general block preconditioners." (SIAM J. Numer. Anal., 31 (1994),
+pp. 1352-1367), which is available online <a
+href="http://siamdl.aip.org/getabs/servlet/GetabsServlet?prog=normal&id=SJNAAM000031000005001352000001&idtype=cvips&gifs=Yes" target="_top">here</a>.
+Principally, the difference in the matrix at the heart of the Schur
+complement has two consequences:
+
+<ol>
+<li>
+First, it makes the outer preconditioner simple: the Schur complement
+corresponds to the operator $-\textrm{div} (-\textrm{div} \nabla^s)^{-1}
+\nabla$ on the pressure space; forgetting about the fact that we deal with
+symmetric gradients instead of the regular one, the Schur complement is
+something like $-\textrm{div} (-\textrm{div} \nabla)^{-1} \nabla =
+-\textrm{div} (-\Delta)^{-1} \nabla$, which, even if not mathematically
+entirely concise, is spectrally equivalent to the identity operator (a
+heuristic argument would be to commute the operators into
+$-\textrm{div}(-\Delta)^{-1} \nabla = -\textrm{div}\nabla(-\Delta)^{-1} =
+-\Delta(-\Delta)^{-1} = \mathbf 1$). It turns out that it isn't easy to solve
+this Schur complement in a straightforward way with the CG method:
+using no preconditioner, the condition number of the Schur complement matrix
+depends on the size ratios of the largest to the smallest cells, and one still
+needs on the order of 50-100 CG iterations. However, there is a simple cure:
+precondition with the mass matrix on the pressure space and we get down to a
+number between 5-15 CG iterations, pretty much independently of the structure
+of the mesh (take a look at the <a href="#Results">results section</a> of this
+program to see that indeed the number of CG iterations does not change as we
+refine the mesh).
+
+So all we need in addition to what we already have is the mass matrix on the
+pressure variables. We could do that by building this matrix on the
+side in a separate data structure. However, it is worth remembering
+that although we build the system matrix
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+@f}
+as one object (of type BlockSparseMatrix), we never actually do
+matrix-vector products with this matrix, or any other operations that
+consider the entire matrix. Rather, we only build it in this form for
+convenience (because it reflects the structure of the FESystem finite
+element and associated DoFHandler object) but later only operate on
+the $(0,0),(0,1)$, and $(1,0)$ blocks of this matrix. In other words,
+our algorithm so far entirely ignores the $(1,1)$ (pressure-pressure)
+block as it is empty anyway. 
+
+Now, as mentioned, we need a pressure mass matrix to precondition the
+Schur complement and that conveniently the pressure-pressure block of
+the matrix we build anyway is currently empty and ignored. So what we
+will do is to assemble the needed mass matrix in this space; this does
+change the global system matrix but since our algorithm never operates
+on the global matrix and instead only considers individual blocks,
+this fact does not affect what we actually compute. Later, when
+solving, we then precondition the Schur complement with $M_p^{-1}$ by
+doing a few CG iterations on the well-conditioned pressure mass matrix
+$M_p$ stored in the $(1,1)$ block.
+
+
+
+<li>
+While the outer preconditioner has become simpler compared to the
+mixed Laplace case discussed in @ref step_20 "step-20", the issue of
+the inner solver has become more complicated. In the mixed Laplace
+discretization, the Schur complement has the form $B^TM^{-1}B$. Thus,
+every time we multiplied with the Schur complement, we had to solve a
+linear system $M_uz=y$; this isn't too complicated there, however,
+since the mass matrix $M_u$ on the pressure space is well-conditioned.
+
+
+On the other hand, for the Stokes equation we consider here, the Schur
+complement is $BA^{-1}B^T$ where the matrix $A$ is related to the
+Laplace operator (it is, in fact, the matrix corresponding to the
+bilinear form $(\nabla^s \varphi_i, \nabla^s\varphi_j)$). Thus,
+solving with $A$ is a lot more complicated: the matrix is badly
+conditioned and we know that we need many iterations unless we have a
+very good preconditioner. What is worse, we have to solve with $A$
+every time we multiply with the Schur complement, which is 5-15 times
+using the preconditioner described above.
+
+Because we have to solve with $A$ several times, it pays off to spend
+a bit more time once to create a good preconditioner for this
+matrix. So here's what we're going to do: if in 2d, we use the
+ultimate preconditioner, namely a direct sparse LU decomposition of
+the matrix. This is implemented using the SparseDirectUMFPACK class
+that uses the UMFPACK direct solver to compute the decomposition. To
+use it, you will have to specify the <code>--enable-umfpack</code>
+switch when configuring the deal.II library, see the <a
+href="../../readme.html#optional-software">ReadMe file</a> for
+instructions. With this, the inner solver converges in one iteration.
+
+In 2d, we can do this sort of thing because even reasonably large problems
+rarely have more than a few 100,000 unknowns with relatively few nonzero
+entries per row. Furthermore, the bandwidth of matrices in 2d is ${\cal
+O}(\sqrt{N})$ and therefore moderate. For such matrices, sparse factors can be
+computed in a matter of a few seconds. (As a point of reference, computing the
+sparse factors of a matrix of size $N$ and bandwidth $B$ takes ${\cal
+O}(NB^2)$ operations. In 2d, this is ${\cal O}(N^2)$; though this is a higher
+complexity than, for example, assembling the linear system which takes ${\cal
+O}(N)$, the constant for computing the decomposition is so small that it
+doesn't become the dominating factor in the entire program until we get to
+very large %numbers of unknowns in the high 100,000s or more.)
+
+The situation changes in 3d, because there we quickly have many more
+unknowns and the bandwidth of matrices (which determines the number of
+nonzero entries in sparse LU factors) is ${\cal O}(N^{2/3})$, and there
+are many more entries per row as well. This makes using a sparse
+direct solver such as UMFPACK inefficient: only for problem sizes of a
+few 10,000 to maybe 100,000 unknowns can a sparse decomposition be
+computed using reasonable time and memory resources.
+
+What we do in that case is to use an incomplete LU decomposition (ILU) as a
+preconditioner, rather than actually computing complete LU factors. As it so
+happens, deal.II has a class that does this: SparseILU. Computing the ILU
+takes a time that only depends on the number of nonzero entries in the sparse
+matrix (or that we are willing to fill in the LU factors, if these should be
+more than the ones in the matrix), but is independent of the bandwidth of the
+matrix. It is therefore an operation that can efficiently also be computed in
+3d. On the other hand, an incomplete LU decomposition, by definition, does not
+represent an exact inverse of the matrix $A$. Consequently, preconditioning
+with the ILU will still require more than one iteration, unlike
+preconditioning with the sparse direct solver. The inner solver will therefore
+take more time when multiplying with the Schur complement, a tradeoff
+unavoidable.
+</ol>
+
+In the program below, we will make use of the fact that the SparseILU and
+SparseDirectUMFPACK classes have a very similar interface and can be used
+interchangeably. All that we need is a switch class that, depending on the
+dimension, provides a type that is either of the two classes mentioned
+above. This is how we do that:
+@code
+template <int dim>
+struct InnerPreconditioner;
+
+template <>
+struct InnerPreconditioner<2> 
+{
+    typedef SparseDirectUMFPACK type;
+};
+
+template <>
+struct InnerPreconditioner<3> 
+{
+    typedef SparseILU<double> type;
+};
+@endcode
+
+From hereon, we can refer to the type <code>typename
+InnerPreconditioner@<dim@>::type</code> and automatically get the correct
+preconditioner class. Because of the similarity of the interfaces of the two
+classes, we will be able to use them interchangeably using the same syntax in
+all places.
+
+
+<h3>The testcase</h3>
+
+The domain, right hand side and boundary conditions we implement below relate
+to a problem in geophysics: there, one wants to compute the flow field of
+magma in the earth's interior under a mid-ocean rift. Rifts are places where
+two continental plates are very slowly drifting apart (a few centimeters per
+year at most), leaving a crack in the earth crust that is filled with magma
+from below. Without trying to be entirely realistic, we model this situation
+by solving the following set of equations and boundary conditions on the
+domain $\Omega=[-2,2]\times[0,1]\times[-1,0]$:
+@f{eqnarray*}
+  -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& 0,
+  \\
+  -\textrm{div}\; \textbf{u} &=& 0,
+  \\
+  \mathbf u &=&   \left(\begin{array}{c}
+    -1 \\ 0 \\0
+  \end{array}\right)
+  \qquad\qquad \textrm{at}\ z=0, x<0,
+  \\
+  \mathbf u &=&   \left(\begin{array}{c}
+    +1 \\ 0 \\0
+  \end{array}\right)
+  \qquad\qquad \textrm{at}\ z=0, x>0,
+  \\
+  \mathbf u &=&   \left(\begin{array}{c}
+    0 \\ 0 \\0
+  \end{array}\right)
+  \qquad\qquad \textrm{at}\ z=0, x=0,
+@f}
+and using natural boundary conditions $\textbf{n}\cdot [p \textbf{1} -
+\varepsilon(\textbf{u})] = 0$ everywhere else. In other words, at the
+left part of the top surface we prescribe that the fluid moves with the
+continental plate to the left at speed $-1$, that it moves to the right on the
+right part of the top surface, and impose natural flow conditions everywhere
+else. If we are in 2d, the description is essentially the same, with the
+exception that we omit the second component of all vectors stated above.
+
+As will become apparent in the <a href="#Results">results section</a>, the
+flow field will pull material from below and move it to the left and right
+ends of the domain, as expected. The discontinuity of velocity boundary
+conditions will produce a singularity in the pressure at the center of the top
+surface that sucks material all the way to the top surface to fill the gap
+left by the outward motion of material at this location.
+
+
+<h3>Implementation</h3>
+
+<h4>Using imhomogeneous constraints for implementing Dirichlet boundary conditions</h4>
+
+In all the previous tutorial programs, we used the ConstraintMatrix merely
+for handling hanging node constraints (with exception of step-11). However,
+the class can also be used to implement Dirichlet boundary conditions, as we
+will show in this program, by fixing some node values $x_i = b_i$. Note that
+these are inhomogeneous constraints, and we have to pay some special
+attention to that. The way we are going to implement this is to first read
+in the boundary values into the ConstraintMatrix object by using the call
+
+@code
+  VectorTools::interpolate_boundary_values (dof_handler,
+                                            1,
+                                            BoundaryValues<dim>(),
+                                            constraints);
+@endcode 
+
+very similar to how we were making the list of boundary nodes
+before (note that we set Dirichlet conditions only on boundaries with
+boundary flag 1). The actual application of the boundary values is then
+handled by the ConstraintMatrix object directly, without any additional
+interference.
+
+We could then proceed as before, namely by filling the matrix, and then
+calling a condense function on the constraints object of the form
+@code
+  constraints.condense (system_matrix, system_rhs);
+@endcode
+
+Note that we call this on the system matrix and system right hand side
+simultaneously, since resolving inhomogeneous constraints requires knowledge
+about both the matrix entries and the right hand side. For efficiency
+reasons, though, we choose another strategy: all the constraints collected
+in the ConstraintMatrix can be resolved on the fly while writing local data
+into the global matrix, by using the call
+@code
+  constraints.distribute_local_to_global (local_matrix, local_rhs,
+                                          local_dof_indices,
+                                          system_matrix, system_rhs);
+@endcode
+
+This technique is further discussed in the @ref step_27 "step-27" tutorial
+program. All we need to know here is that this functions does three things
+at once: it writes the local data into the global matrix and right hand
+side, it distributes the hanging node constraints and additionally
+implements (inhomogeneous) Dirichlet boundary conditions. That's nice, isn't
+it?
+
+We can conclude that the ConstraintMatrix provides an alternative to using
+MatrixTools::apply_boundary_values for implementing Dirichlet boundary
+conditions.
+
+
+<a name="constraint-matrix">
+<h4>Using ConstraintMatrix for increasing performance</h4>
+</a>
+
+Frequently, a sparse matrix contains a substantial amount of elements that
+acutally are zero when we are about to start a linear solve. Such elements are
+introduced when we eliminate constraints or implement Dirichlet conditions,
+where we usually delete all entries in constrained rows and columns, i.e., we
+set them to zero. The fraction of elements that are present in the sparsity
+pattern, but do not really contain any information, can be up to one fourth
+of the total number of elements in the matrix for the 3D application
+considered in this tutorial program. Remember that matrix-vector products or
+preconditioners operate on all the elements of a sparse matrix (even those 
+that are zero), which is an inefficiency we will avoid here.
+
+An advantage of directly resolving constrained degrees of freedom is that we
+can avoid having most of the entries that are going to be zero in our sparse
+matrix &mdash; we do not need constrained entries during matrix construction 
+(as opposed to the traditional algorithms, which first fill the matrix, and 
+only resolve constraints afterwards). This will save both memory and time 
+when forming matrix-vector products. The way we are going to do that is to 
+pass the information about constraints to the function that generates the 
+sparsity pattern, and then set a <tt>false</tt> argument specifying that we 
+do not intend to use constrained entries:
+@code
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
+                                   constraints, false);
+@endcode
+This functions obviates, by the way, also the call to the
+<tt>condense()</tt> function on the sparsity pattern.
+
+
+<h4>Performance optimizations</h4>
+
+The program developed below has seen a lot of TLC. We have run it over and
+over under profiling tools (mainly <a
+href="http://www.valgrind.org/">valgrind</a>'s cachegrind and callgrind
+tools, as well as the KDE <a
+href="http://kcachegrind.sourceforge.net/">KCachegrind</a> program for
+visualization) to see where the bottlenecks are. This has paid off: through
+this effort, the program has become about four times as fast when
+considering the runtime of the refinement cycles zero through three,
+reducing the overall number of CPU instructions executed from
+869,574,060,348 to 199,853,005,625. For higher refinement levels, the gain
+is probably even larger since some algorithms that are not ${\cal O}(N)$
+have been eliminated.
+
+Essentially, there are currently two algorithms in the program that do not
+scale linearly with the number of degrees of freedom: renumbering of degrees
+of freedom (which is ${\cal O}(N \log N)$, and the linear solver (which is
+${\cal O}(N^{4/3})$). As for the first, while reordering degrees of freedom
+may not scale linearly, it is an indispensible part of the overall algorithm
+as it greatly improves the quality of the sparse ILU, easily making up for
+the time spent on computing the renumbering; graphs and timings to
+demonstrate this are shown in the documentation of the DoFRenumbering
+namespace, also underlining the choice of the Cuthill-McKee reordering
+algorithm chosen below.
+
+As for the linear solver: as mentioned above, our implementation here uses a
+Schur complement formulation. This is not necessarily the very best choice
+but demonstrates various important techniques available in deal.II. The
+question of which solver is best is again discussed in the <a
+href="#improved-solver">section on improved solvers in the results part</a>
+of this program, along with code showing alternative solvers and a
+comparison of their results.
+
+Apart from this, many other algorithms have been tested and improved during
+the creation of this program. For example, in building the sparsity pattern,
+we originally used a BlockCompressedSparsityPattern object that added one
+element at a time; however, its data structures are poorly adapted for the
+large numbers of nonzero entries per row created by our discretization in
+3d, leading to a quadratic behavior. Replacing the internal algorithms in
+deal.II to set many elements at a time, and using a
+BlockCompressedSimpleSparsityPattern as a better adapted data structure,
+removed this bottleneck at the price of a slightly higher memory
+consumption. Likewise, the implementation of the decomposition step in the
+SparseILU class was very inefficient and has been replaced by one that is
+about 10 times faster. Even the vmult function of the SparseILU has been
+improved to save about twenty precent of time. Small improvements were
+applied here and there. Moreover, the ConstraintMatrix object has been used
+to eliminate a lot of entries in the sparse matrix that are eventually going
+to be zero, see <a href="#constraint-matrix">the section on using advanced
+features of the ConstraintMatrix class</a>.
+
+A profile of how many CPU instructions are spent at the various
+different places in the program during refinement cycles
+zero through three in 3d is shown here:
+
+@image html step-22.profile-3.png
+
+As can be seen, at this refinement level approximately three quarters of the
+instruction count is spent on the actual solver (the SparseILU::vmult calls
+on the left, the SparseMatrix::vmult call in the middle for the Schur
+complement solve, and another box representing the multiplications with
+SparseILU and SparseMatrix in the solve for <i>U</i>). About one fifth of
+the instruction count is spent on matrix assembly and sparse ILU computation
+(box in the lower right corner) and the rest on other things. Since floating
+point operations such as in the SparseILU::vmult calls typically take much
+longer than many of the logical operations and table lookups in matrix
+assembly, the fraction of the run time taken up by matrix assembly is
+actually significantly less than the fraction of instructions, as will
+become apparent in the comparison we make in the results section.
+
+For higher refinement levels, the boxes representing the solver as well as
+the blue box at the top right stemming from reordering algorithm are going
+to grow at the expense of the other parts of the program, since they don't
+scale linearly. The fact that at this moderate refinement level (3168 cells
+and 93176 degrees of freedom) the linear solver already makes up about three
+quarters of the instructions is a good sign that most of the algorithms used
+in this program are well-tuned and that major improvements in speeding up
+the program are most likely not to come from hand-optimizing individual
+aspects but by changing solver algorithms. We will address this point in the
+discussion of results below as well.
+
+As a final point, and as a point of reference, the following picture also
+shows how the profile looked at an early stage of optimizing this program:
+
+@image html step-22.profile-3.original.png
+
+As mentioned above, the runtime of this version was about four times as long
+as for the first profile, with the SparseILU decomposition taking up about
+30% of the instruction count, and operations on the ill-suited
+CompressedSparsityPattern about 10%. Both these bottlenecks have since been
+completely removed.
