@@ -1526,6 +1526,30 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 			      std::vector<std::vector<bool> >  &interface_dofs,
 			      std::vector<std::vector<bool> >  &boundary_interface_dofs)
 {
+  Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
+	  ExcDimensionMismatch (interface_dofs.size(),
+				mg_dof_handler.get_tria().n_levels()));
+  Assert (boundary_interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
+	  ExcDimensionMismatch (boundary_interface_dofs.size(),
+				mg_dof_handler.get_tria().n_levels()));
+
+  for (unsigned int l=0; l<mg_dof_handler.get_tria().n_levels(); ++l)
+    {
+      Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
+	      ExcDimensionMismatch (interface_dofs[l].size(),
+				    mg_dof_handler.n_dofs(l)));
+      Assert (boundary_interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
+	      ExcDimensionMismatch (boundary_interface_dofs[l].size(),
+				    mg_dof_handler.n_dofs(l)));      
+
+      std::fill (interface_dofs[l].begin(),
+		 interface_dofs[l].end(),
+		 false);
+      std::fill (boundary_interface_dofs[l].begin(),
+		 boundary_interface_dofs[l].end(),
+		 false);
+    }
+  
   const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
   
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
