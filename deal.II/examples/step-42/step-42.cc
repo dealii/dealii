@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 2008, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -229,7 +229,7 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
 
   cg.solve (*matrix, dst, src, *preconditioner);
 
-  std::cout << "CG steps: " << solver_control.last_step() << std::endl;
+  std::cout << "  Preconditioner CG steps: " << solver_control.last_step() << std::endl;
 }
 
 template <class PreconditionerA, class PreconditionerMp>
@@ -555,10 +555,6 @@ void StokesProblem<dim>::solve_block ()
       std::cout << " "
                 << solver_control.last_step()
                 << " block GMRES iterations";
-
-
-
-
 }
 
 template <int dim>
