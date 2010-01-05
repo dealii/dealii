@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -4098,10 +4098,10 @@ DoFTools::count_dofs_per_component (
 
 template <int dim, int spacedim>
 void
-DoFTools::count_dofs_per_block (
-  const DoFHandler<dim,spacedim>& dof_handler,
-  std::vector<unsigned int>& dofs_per_block,
-  std::vector<unsigned int>  target_block)
+DoFTools::
+count_dofs_per_block (const DoFHandler<dim,spacedim>& dof_handler,
+		      std::vector<unsigned int> &dofs_per_block,
+		      std::vector<unsigned int>  target_block)
 {
   const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
 
@@ -4144,8 +4144,8 @@ DoFTools::count_dofs_per_block (
 				   // of dofs in each block
 				   // separately. do so in parallel
   std::vector<unsigned char> dofs_by_block (dof_handler.n_dofs());
-  internal::extract_dofs_by_component (dof_handler, std::vector<bool>(), true,
-				       dofs_by_block);
+  internal::extract_dofs_by_component (dof_handler, std::vector<bool>(),
+				       true, dofs_by_block);
 
 				   // next count what we got
   for (unsigned int block=0;block<fe.n_blocks();++block)
@@ -4157,12 +4157,13 @@ DoFTools::count_dofs_per_block (
 
 template <int dim, int spacedim>
 void
-DoFTools::count_dofs_per_component (
-  const DoFHandler<dim,spacedim>&     dof_handler,
-  std::vector<unsigned int>& dofs_per_component,
-  std::vector<unsigned int>  target_component)
+DoFTools::
+count_dofs_per_component (const DoFHandler<dim,spacedim> &dof_handler,
+			  std::vector<unsigned int>      &dofs_per_component,
+			  std::vector<unsigned int>       target_component)
 {
-  count_dofs_per_component (dof_handler, dofs_per_component, false, target_component);
+  count_dofs_per_component (dof_handler, dofs_per_component,
+			    false, target_component);
 }
 
 
