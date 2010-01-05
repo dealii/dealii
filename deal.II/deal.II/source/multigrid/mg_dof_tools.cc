@@ -909,11 +909,11 @@ MGTools::make_flux_sparsity_pattern_edge (
 
 template <int dim, int spacedim>
 void
-MGTools::count_dofs_per_component (
-  const MGDoFHandler<dim,spacedim> &dof_handler,
-  std::vector<std::vector<unsigned int> > &result,
-  bool only_once,
-  std::vector<unsigned int> target_component)
+MGTools::
+count_dofs_per_component (const MGDoFHandler<dim,spacedim> &dof_handler,
+			  std::vector<std::vector<unsigned int> > &result,
+			  bool                              only_once,
+			  std::vector<unsigned int>         target_component)
 {
   const FiniteElement<dim>& fe = dof_handler.get_fe();
   const unsigned int n_components = fe.n_components();
@@ -1009,12 +1009,13 @@ MGTools::count_dofs_per_component (
 
 template <int dim, int spacedim>
 void
-MGTools::count_dofs_per_component (
-  const MGDoFHandler<dim,spacedim> &dof_handler,
-  std::vector<std::vector<unsigned int> > &result,
-  std::vector<unsigned int> target_component)
+MGTools::
+count_dofs_per_component (const MGDoFHandler<dim,spacedim>        &dof_handler,
+			  std::vector<std::vector<unsigned int> > &result,
+			  std::vector<unsigned int>            target_component)
 {
-  count_dofs_per_component(dof_handler, result, false, target_component);
+  count_dofs_per_component (dof_handler, result,
+			    false, target_component);
 }
 
 
