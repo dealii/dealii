@@ -862,6 +862,9 @@ void StokesProblem<dim>::solve_mg ()
   GrowingVectorMemory<BlockVector<double> >  mg_vector_memory;
 
   MGTransferPrebuilt<BlockVector<double> > mg_transfer(constraints);
+  std::vector<unsigned int> block_component (dim+1,0);
+  block_component[dim] = 1;
+  mg_transfer.set_component_to_block_map (block_component);
   mg_transfer.build_matrices(dof_handler);
 
   FullMatrix<float> mg_coarse_matrix;
