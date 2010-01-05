@@ -881,11 +881,11 @@ void StokesProblem<dim>::solve_mg ()
     BlockVector<double> >
   mg_smoother(mg_vector_memory);
 
-MGLevelObject<typename Smoother::AdditionalData>
-smoother_data (0, triangulation.n_levels());
+  MGLevelObject<typename Smoother::AdditionalData>
+    smoother_data (0, triangulation.n_levels());
 
-for (unsigned int level=0; level<triangulation.n_levels(); ++level)
-  smoother_data[level].A_preconditioner = mg_A_preconditioner[level].get();
+  for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+    smoother_data[level].A_preconditioner = mg_A_preconditioner[level].get();
 
   mg_smoother.initialize(mg_matrices, smoother_data);
   mg_smoother.set_steps(2);
