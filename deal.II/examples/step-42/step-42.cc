@@ -132,6 +132,7 @@ class StokesProblem
     std::vector<std::vector<unsigned int> >   mg_dofs_per_component;
 				  
     std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
+    std::vector<std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> > mg_A_preconditioner;
 };
 
 			
@@ -365,6 +366,7 @@ template <int dim>
 void StokesProblem<dim>::setup_dofs ()
 {
   A_preconditioner.reset ();
+  mg_A_preconditioner.resize (0);
   system_matrix.clear ();
   
   dof_handler.distribute_dofs (fe);  
@@ -668,6 +670,16 @@ void StokesProblem<dim>::assemble_multigrid ()
 				   local_dof_indices,
 				   mg_interface_matrices[level]);
     }
+
+  mg_A_preconditioner.resize (triangulation.n_levels());
+  for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+    {
+      mg_A_preconditioner[level]
+	= std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+      mg_A_preconditioner[level]
+	->initialize (mg_matrices[level].block(0,0),
+		      typename InnerPreconditioner<dim>::type::AdditionalData());
+    }
 }
 
 				
@@ -709,7 +721,127 @@ void StokesProblem<dim>::solve_block ()
     << " block GMRES iterations";
 }
 
-  template <int dim>
+
+template <typename InnerPreconditioner>
+class SchurComplementSmoother
+{
+  public:
+    struct AdditionalData 
+    {
+	const InnerPreconditioner *A_preconditioner;
+    };
+
+    void initialize (const BlockSparseMatrix<double> &system_matrix,
+		     const AdditionalData            &data);
+    
+    void vmult (BlockVector<double> &dst,
+		const BlockVector<double> &src) const;
+
+    void Tvmult (BlockVector<double> &dst,
+		 const BlockVector<double> &src) const;
+
+    void clear ();
+    
+  private:
+    SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+    SmartPointer<const InnerPreconditioner>        A_preconditioner;
+};
+
+
+template <typename InnerPreconditioner>
+void
+SchurComplementSmoother<InnerPreconditioner>::
+initialize (const BlockSparseMatrix<double> &system_matrix,
+	    const AdditionalData            &data)
+{
+  this->system_matrix    = &system_matrix;
+  this->A_preconditioner = data.A_preconditioner;
+}
+
+
+
+
+template <typename InnerPreconditioner>
+void
+SchurComplementSmoother<InnerPreconditioner>::
+vmult (BlockVector<double> &dst,
+       const BlockVector<double> &src) const
+{
+  const InverseMatrix<SparseMatrix<double>,InnerPreconditioner>
+    A_inverse (system_matrix->block(0,0), *A_preconditioner);
+  Vector<double> tmp (dst.block(0).size());
+  
+				  
+  {
+    Vector<double> schur_rhs (dst.block(1).size());
+    A_inverse.vmult (tmp, src.block(0));
+    system_matrix->block(1,0).vmult (schur_rhs, tmp);
+    schur_rhs -= src.block(1);
+  
+    SchurComplement<InnerPreconditioner>
+      schur_complement (*system_matrix, A_inverse);
+    
+				     // The usual control structures for
+				     // the solver call are created...
+    SolverControl solver_control (dst.block(1).size(),
+				  1e-6*schur_rhs.l2_norm());
+    SolverCG<>    cg (solver_control);
+    
+				    
+				   
+    SparseILU<double> preconditioner;
+    preconditioner.initialize (system_matrix->block(1,1), 
+			       SparseILU<double>::AdditionalData());
+  
+    InverseMatrix<SparseMatrix<double>,SparseILU<double> >
+      m_inverse (system_matrix->block(1,1), preconditioner);
+    
+				    
+    cg.solve (schur_complement, dst.block(1), schur_rhs,
+	      m_inverse);
+  
+// no constraints to be taken care of here
+    
+    std::cout << "  "
+	      << solver_control.last_step()
+	      << " CG Schur complement iterations in smoother"
+	      << std::flush
+	      << std::endl;    
+  }
+    
+				 
+  {
+    system_matrix->block(0,1).vmult (tmp, dst.block(1));
+    tmp *= -1;
+    tmp += src.block(0);
+  
+    A_inverse.vmult (dst.block(0), tmp);
+
+// no constraints here either
+  }
+}
+
+
+
+template <typename InnerPreconditioner>
+void
+SchurComplementSmoother<InnerPreconditioner>::clear ()
+{}
+
+
+
+template <typename InnerPreconditioner>
+void
+SchurComplementSmoother<InnerPreconditioner>::
+Tvmult (BlockVector<double> &,
+	const BlockVector<double> &) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <int dim>
 void StokesProblem<dim>::solve_mg () 
 {
   assemble_multigrid ();
@@ -729,12 +861,21 @@ void StokesProblem<dim>::solve_mg ()
   MGMatrix<BlockSparseMatrix<double>, BlockVector<double> >
     mg_matrix(&mg_matrices);
 
+  typedef
+    SchurComplementSmoother<typename InnerPreconditioner<dim>::type>
+    Smoother;
+    
+  MGSmootherPrecondition<BlockSparseMatrix<double>,
+    Smoother,
+    BlockVector<double> >
+  mg_smoother(mg_vector_memory);
 
-  typedef PreconditionSSOR<BlockSparseMatrix<double> > REL;
-  MGSmootherRelaxation<BlockSparseMatrix<double>, REL, BlockVector<double> >
-    mg_smoother(mg_vector_memory);
+MGLevelObject<typename Smoother::AdditionalData>
+smoother_data (0, triangulation.n_levels());
 
-  REL::AdditionalData smoother_data;
+for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+  smoother_data[level].A_preconditioner = mg_A_preconditioner[level].get();
+
   mg_smoother.initialize(mg_matrices, smoother_data);
   mg_smoother.set_steps(2);
 
