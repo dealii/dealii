@@ -61,7 +61,7 @@ template <int dim, int spacedim> class MGDoFHandler;
  * @author Wolfgang Bangerth, Guido Kanschat, 1999-2004
  */
 template <class VECTOR>
-class MGTransferPrebuilt : public MGTransferBase<VECTOR> 
+class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 {
   public:
 				     /**
@@ -141,11 +141,44 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 		      const MGLevelObject<VECTOR>& src) const;
 
 				     /**
+				      * If this object operates on
+				      * BlockVector objects, we need
+				      * to describe how the individual
+				      * vector components are mapped
+				      * to the blocks of a vector. For
+				      * example, for a Stokes system,
+				      * we have dim+1 vector
+				      * components for velocity and
+				      * pressure, but we may want to
+				      * use block vectors with only
+				      * two blocks for all velocities
+				      * in one block, and the pressure
+				      * variables in the other.
+				      *
+				      * By default, if this function
+				      * is not called, block vectors
+				      * have as many blocks as the
+				      * finite element has vector
+				      * components. However, this can
+				      * be changed by calling this
+				      * function with an array that
+				      * describes how vector
+				      * components are to be grouped
+				      * into blocks. The meaning of
+				      * the argument is the same as
+				      * the one given to the
+				      * DoFTools::count_dofs_per_component
+				      * function.
+				      */
+    void
+    set_component_to_block_map (const std::vector<unsigned int> &map);
+
+				     /**
 				      * Finite element does not
 				      * provide prolongation matrices.
 				      */
     DeclException0(ExcNoProlongation);
-    
+
 				     /**
 				      * Call @p build_matrices
 				      * function first.
@@ -156,7 +189,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * Memory used by this object.
 				      */
     unsigned int memory_consumption () const;
-    
+
 
   private:
 
@@ -179,8 +212,8 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * while row indices belong to the
 				      * child cell, i.e. the fine level.
 				      */
-    std::vector<std_cxx1x::shared_ptr<SparseMatrix<double> > > prolongation_matrices;    
-    
+    std::vector<std_cxx1x::shared_ptr<SparseMatrix<double> > > prolongation_matrices;
+
 				     /**
 				      * Mapping for the
 				      * <tt>copy_to/from_mg</tt>-functions.
@@ -189,6 +222,14 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				     */
     std::vector<std::map<unsigned int, unsigned int> >
     copy_indices;
+
+				     /**
+				      * The vector that stores what
+				      * has been given to the
+				      * set_component_to_block_map()
+				      * function.
+				      */
+    std::vector<unsigned int> component_to_block_map;
 
 				     /**
 				      * Fill the two boolean vectors
@@ -219,7 +260,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      *
 				      * @todo Clean up names
 				      */
-    std::vector<std::vector<bool> > dofs_on_refinement_boundary; 
+    std::vector<std::vector<bool> > dofs_on_refinement_boundary;
 				     /**
 				      * The constraints of the global
 				      * system.

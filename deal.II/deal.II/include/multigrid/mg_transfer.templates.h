@@ -40,7 +40,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   MGLevelObject<VECTOR>& dst,
   const InVector& src) const
 {
-  internal::mg::reinit_vector(mg_dof_handler, dst);
+  internal::mg::reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;
   for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
     {
@@ -111,6 +111,18 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
 	 i != copy_indices[level].end();++i)
       dst(i->first) += src[level](i->second);
 }
+
+
+
+template <class VECTOR>
+void
+MGTransferPrebuilt<VECTOR>::
+set_component_to_block_map (const std::vector<unsigned int> &map)
+{
+  component_to_block_map = map;
+}
+
+
 
 template <class VECTOR>
 template <int dim, int spacedim>
