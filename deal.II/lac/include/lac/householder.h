@@ -93,6 +93,10 @@ class Householder : private FullMatrix<number>
     double least_squares (Vector<number2> &dst,
 			  const Vector<number2> &src) const;
 
+    template<typename number2>
+    double least_squares (BlockVector<number2> &dst,
+			  const BlockVector<number2> &src) const;
+
   private:
 				     /**
 				      * Storage for the diagonal
@@ -222,6 +226,54 @@ Householder<number>::least_squares (Vector<number2>& dst,
   return std::sqrt(sum);
 }
 
+template <typename number>
+template <typename number2>
+double
+Householder<number>::least_squares (BlockVector<number2>& dst,
+				    const BlockVector<number2>& src) const
+{
+  Assert (!this->empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
+  AssertDimension(dst.size(), this->n());
+  AssertDimension(src.size(), this->m());
+
+  const unsigned int m = this->m(), n = this->n();
+  
+  GrowingVectorMemory<BlockVector<number2> > mem;
+  BlockVector<number2>* aux = mem.alloc();
+  aux->reinit(src, true);
+  *aux = src;
+				   // m > n, m = src.n, n = dst.n
+
+				   // Multiply Q_n ... Q_2 Q_1 src
+				   // Where Q_i = I-v_i v_i^T
+  for (unsigned int j=0;j<n;++j)
+    {
+				       // sum = v_i^T dst
+      number2 sum = diagonal[j]* (*aux)(j);
+      for (unsigned int i=j+1 ; i<m ; ++i)
+	sum += this->el(i,j)*(*aux)(i);
+				       // dst -= v * sum
+      (*aux)(j) -= sum*diagonal[j];
+      for (unsigned int i=j+1 ; i<m ; ++i)
+	(*aux)(i) -= sum*this->el(i,j);
+    }
+				   // Compute norm of residual
+  number2 sum = 0.;
+  for (unsigned int i=n ; i<m ; ++i)
+    sum += (*aux)(i) * (*aux)(i);
+				   // Compute solution
+                                   //backward works for 
+                                   //Vectors only, so copy 
+                                   //them before
+  Vector<number2> v_dst, v_aux;
+  v_dst = dst;
+  v_aux = *aux;
+  this->backward(v_dst, v_aux);
+
+  mem.free(aux);
+  
+  return std::sqrt(sum);
+}
 
 
 #endif // DOXYGEN
