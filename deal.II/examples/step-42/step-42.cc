@@ -56,6 +56,14 @@
 
 #include <lac/sparse_ilu.h>
 
+#include <multigrid/multigrid.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
+#include <multigrid/mg_transfer.h>
+#include <multigrid/mg_tools.h>
+#include <multigrid/mg_coarse.h>
+#include <multigrid/mg_smoother.h>
+#include <multigrid/mg_matrix.h>
 				
 #include <fstream>
 #include <sstream>
@@ -92,9 +100,13 @@ class StokesProblem
   private:
     void setup_dofs ();
     void assemble_system ();
+    void assemble_multigrid ();
     void solve_schur ();
     void solve_block ();
+    void solve_mg ();
 
+    void find_dofs_on_lower_level (std::vector<std::vector<bool> > &lower_dofs, 
+        std::vector<std::vector<bool> > &boundary_dofs);
     void output_results (const unsigned int refinement_cycle) const;
     void refine_mesh ();
     
@@ -102,7 +114,7 @@ class StokesProblem
     
     Triangulation<dim>   triangulation;
     FESystem<dim>        fe;
-    DoFHandler<dim>      dof_handler;
+    MGDoFHandler<dim>    dof_handler;
 
     ConstraintMatrix     constraints;
     
@@ -112,6 +124,12 @@ class StokesProblem
     BlockVector<double> solution;
     BlockVector<double> system_rhs;
 
+    MGLevelObject<ConstraintMatrix>           mg_constraints;
+    MGLevelObject<BlockSparsityPattern>       mg_sparsity;
+    MGLevelObject<BlockSparseMatrix<double> > mg_matrices;
+
+    MGLevelObject<BlockSparseMatrix<double> > mg_interface_matrices;
+    std::vector<std::vector<unsigned int> >   mg_dofs_per_component;
 				  
     std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
 };
@@ -350,7 +368,7 @@ void StokesProblem<dim>::setup_dofs ()
   system_matrix.clear ();
   
   dof_handler.distribute_dofs (fe);  
-  DoFRenumbering::Cuthill_McKee (dof_handler);
+//  DoFRenumbering::Cuthill_McKee (dof_handler);
 
   std::vector<unsigned int> block_component (dim+1,0);
   block_component[dim] = 1;
@@ -399,7 +417,9 @@ void StokesProblem<dim>::setup_dofs ()
   
     csp.collect_sizes();    
   
-    DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
+    DoFTools::make_sparsity_pattern (
+        static_cast<const DoFHandler<dim>&>(dof_handler), 
+        csp, constraints, false);
     sparsity_pattern.copy_from (csp);
   }
   
@@ -415,6 +435,28 @@ void StokesProblem<dim>::setup_dofs ()
   system_rhs.block(0).reinit (n_u);
   system_rhs.block(1).reinit (n_p);
   system_rhs.collect_sizes ();
+
+  //now setup stuff for mg
+  const unsigned int nlevels = triangulation.n_levels();
+
+  mg_matrices.resize(0, nlevels-1);
+  mg_matrices.clear ();
+  mg_interface_matrices.resize(0, nlevels-1);
+  mg_interface_matrices.clear ();
+  mg_sparsity.resize(0, nlevels-1);
+
+  MGTools::count_dofs_per_block (dof_handler, mg_dofs_per_component);
+
+  for (unsigned int level=0;level<nlevels;++level)
+  {
+    BlockCompressedSparsityPattern bscp (mg_dofs_per_component[level], 
+        mg_dofs_per_component[level]);
+    MGTools::make_sparsity_pattern(dof_handler, bscp, level);
+    mg_sparsity[level].copy_from (bscp);
+    mg_matrices[level].reinit (mg_sparsity[level]);
+    if(level>0)
+      mg_interface_matrices[level].reinit (mg_sparsity[level]);
+  }
 }
 
 
@@ -456,7 +498,7 @@ void StokesProblem<dim>::assemble_system ()
   std::vector<double>                  div_phi_u   (dofs_per_cell);
   std::vector<double>                  phi_p       (dofs_per_cell);
 				   
-  typename DoFHandler<dim>::active_cell_iterator
+  typename MGDoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -517,52 +559,221 @@ void StokesProblem<dim>::assemble_system ()
 }
 
 
+template <int dim>
+void StokesProblem<dim>::assemble_multigrid () 
+{
+  QGauss<dim>   quadrature_formula(degree+2);
+  FEValues<dim> fe_values (fe, quadrature_formula,
+                           update_values    |
+                           update_quadrature_points  |
+                           update_JxW_values |
+                           update_gradients);
+  
+  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+  const unsigned int   n_q_points      = quadrature_formula.size();
+
+  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+				 
+  const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
+				 
+				  
+  std::vector<Tensor<2,dim> >          phi_grads_u (dofs_per_cell);
+  std::vector<double>                  div_phi_u   (dofs_per_cell);
+  std::vector<double>                  phi_p       (dofs_per_cell);
+				   
+  std::vector<std::vector<bool> > interface_dofs;
+  std::vector<std::vector<bool> > boundary_interface_dofs;
+  for (unsigned int level = 0; level<triangulation.n_levels(); ++level)
+    {
+      std::vector<bool> tmp (dof_handler.n_dofs(level));
+      interface_dofs.push_back (tmp);
+      boundary_interface_dofs.push_back (tmp);
+    }
+  MGTools::extract_inner_interface_dofs (dof_handler,
+					 interface_dofs, boundary_interface_dofs);
+
+  typename FunctionMap<dim>::type      dirichlet_boundary;
+  BoundaryValues<dim>                  dirichlet_bc;
+  dirichlet_boundary[0] =             &dirichlet_bc;
+
+  std::vector<std::set<unsigned int> > boundary_indices(triangulation.n_levels());
+  std::vector<bool> component_mask (dim+1, true);
+  component_mask[dim] = false;
+  MGTools::make_boundary_list (dof_handler, dirichlet_boundary,
+			       boundary_indices, component_mask);
+
+  std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
+  std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
+  for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+    {
+      boundary_constraints[level].add_lines (interface_dofs[level]);
+      boundary_constraints[level].add_lines (boundary_indices[level]);
+      boundary_constraints[level].close ();
+
+      boundary_interface_constraints[level]
+	.add_lines (boundary_interface_dofs[level]);
+      boundary_interface_constraints[level].close ();
+    }
+
+  typename MGDoFHandler<dim>::cell_iterator
+    cell = dof_handler.begin(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    { 
+				       // Remember the level of the
+				       // current cell.
+      const unsigned int level = cell->level();
+				       // Compute the values specified
+				       // by update flags above.
+      fe_values.reinit (cell);
+      local_matrix = 0;
+      
+      for (unsigned int q=0; q<n_q_points; ++q)
+      {
+	  for (unsigned int k=0; k<dofs_per_cell; ++k)
+	    {
+	      phi_grads_u[k] = fe_values[velocities].gradient (k, q);
+	      div_phi_u[k]   = fe_values[velocities].divergence (k, q);
+	      phi_p[k]       = fe_values[pressure].value (k, q);
+	    }
+
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  local_matrix(i,j) += (
+                      scalar_product(phi_grads_u[i], phi_grads_u[j])
+					- div_phi_u[i] * phi_p[j]
+					- phi_p[i] * div_phi_u[j]
+					+ phi_p[i] * phi_p[j])
+				       * fe_values.JxW(q);     
+
+      }
+				      
+          cell->get_mg_dof_indices (local_dof_indices);
+          boundary_constraints[level]
+            .distribute_local_to_global (local_matrix,
+                local_dof_indices,
+                mg_matrices[level]);
+
+    for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int j=0; j<dofs_per_cell; ++j)
+	if( !(interface_dofs[level][local_dof_indices[i]]==true && 
+	      interface_dofs[level][local_dof_indices[j]]==false))
+	  local_matrix(i,j) = 0;
+
+    boundary_interface_constraints[level]
+      .distribute_local_to_global (local_matrix,
+				   local_dof_indices,
+				   mg_interface_matrices[level]);
+    }
+}
 
 				
 template <int dim>
 void StokesProblem<dim>::solve_block () 
 {
- SparseMatrix<double> pressure_mass_matrix;
-      pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
-      pressure_mass_matrix.copy_from(system_matrix.block(1,1));
-      system_matrix.block(1,1) = 0;
+  SparseMatrix<double> pressure_mass_matrix;
+  pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
+  pressure_mass_matrix.copy_from(system_matrix.block(1,1));
+  system_matrix.block(1,1) = 0;
 
-      SparseILU<double> pmass_preconditioner;
-      pmass_preconditioner.initialize (pressure_mass_matrix, 
-        SparseILU<double>::AdditionalData());
-      
-      InverseMatrix<SparseMatrix<double>,SparseILU<double> >
-        m_inverse (pressure_mass_matrix, pmass_preconditioner);
+  SparseILU<double> pmass_preconditioner;
+  pmass_preconditioner.initialize (pressure_mass_matrix, 
+      SparseILU<double>::AdditionalData());
 
-      BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
-                               SparseILU<double> > 
-        preconditioner (system_matrix, m_inverse, *A_preconditioner);
-      
-      SolverControl solver_control (system_matrix.m(),
-                                    1e-6*system_rhs.l2_norm());
-      GrowingVectorMemory<BlockVector<double> > vector_memory;
-      SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
-      gmres_data.max_n_tmp_vectors = 100;
-      
-      SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
-                                              gmres_data);
-      
-      gmres.solve(system_matrix, solution, system_rhs,
-                  preconditioner);
-      
-      constraints.distribute (solution);
-      
-      std::cout << " "
-                << solver_control.last_step()
-                << " block GMRES iterations";
+  InverseMatrix<SparseMatrix<double>,SparseILU<double> >
+    m_inverse (pressure_mass_matrix, pmass_preconditioner);
+
+  BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
+    SparseILU<double> > 
+      preconditioner (system_matrix, m_inverse, *A_preconditioner);
+
+  SolverControl solver_control (system_matrix.m(),
+      1e-6*system_rhs.l2_norm());
+  GrowingVectorMemory<BlockVector<double> > vector_memory;
+  SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
+  gmres_data.max_n_tmp_vectors = 100;
+
+  SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
+      gmres_data);
+
+  gmres.solve(system_matrix, solution, system_rhs,
+      preconditioner);
+
+  constraints.distribute (solution);
+
+  std::cout << " "
+    << solver_control.last_step()
+    << " block GMRES iterations";
 }
+
+  template <int dim>
+void StokesProblem<dim>::solve_mg () 
+{
+  assemble_multigrid ();
+  typedef PreconditionMG<dim, BlockVector<double>, MGTransferPrebuilt<BlockVector<double> > >
+    MGPREC;
+
+  GrowingVectorMemory<BlockVector<double> >  mg_vector_memory;
+
+  MGTransferPrebuilt<BlockVector<double> > mg_transfer(constraints);
+  mg_transfer.build_matrices(dof_handler);
+
+  FullMatrix<float> mg_coarse_matrix;
+  mg_coarse_matrix.copy_from (mg_matrices[0]);
+  MGCoarseGridHouseholder<float, BlockVector<double> > mg_coarse;
+  mg_coarse.initialize(mg_coarse_matrix);
+
+  MGMatrix<BlockSparseMatrix<double>, BlockVector<double> >
+    mg_matrix(&mg_matrices);
+
+
+  typedef PreconditionSSOR<BlockSparseMatrix<double> > REL;
+  MGSmootherRelaxation<BlockSparseMatrix<double>, REL, BlockVector<double> >
+    mg_smoother(mg_vector_memory);
+
+  REL::AdditionalData smoother_data;
+  mg_smoother.initialize(mg_matrices, smoother_data);
+  mg_smoother.set_steps(2);
+
+  Multigrid<BlockVector<double> > mg(dof_handler,
+      mg_matrix,
+      mg_coarse,
+      mg_transfer,
+      mg_smoother,
+      mg_smoother);
+  mg.set_debug(3);
+
+  MGPREC  preconditioner(dof_handler, mg, mg_transfer);
+
+  SolverControl solver_control (system_matrix.m(),
+      1e-6*system_rhs.l2_norm());
+  GrowingVectorMemory<BlockVector<double> > vector_memory;
+  SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
+  gmres_data.max_n_tmp_vectors = 100;
+
+  SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
+      gmres_data);
+
+//  PreconditionIdentity precondition_identity;
+  gmres.solve(system_matrix, solution, system_rhs,
+      preconditioner);
+  //gmres.solve(system_matrix, solution, system_rhs,
+  //    precondition_identity);
+
+  constraints.distribute (solution);
+
+  std::cout << std::endl << " "
+    << solver_control.last_step()
+    << " block GMRES iterations";
+}
+
 
 template <int dim>
 void StokesProblem<dim>::solve_schur () 
 {
-
-
-
   const InverseMatrix<SparseMatrix<double>,
                       typename InnerPreconditioner<dim>::type>
     A_inverse (system_matrix.block(0,0), *A_preconditioner);
@@ -622,6 +833,78 @@ void StokesProblem<dim>::solve_schur ()
 }
 
 
+template <int dim>
+void StokesProblem<dim>::find_dofs_on_lower_level (std::vector<std::vector<bool> > &dof_lower_level,
+    std::vector<std::vector<bool> > &boundary_dof_lower_level)
+{
+  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+  const unsigned int   dofs_per_face   = fe.dofs_per_face;
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> face_dof_indices (dofs_per_face);
+
+  typename MGDoFHandler<dim>::cell_iterator cell = dof_handler.begin(),
+           endc = dof_handler.end();
+
+  for (; cell!=endc; ++cell)
+  {
+    std::vector<bool> cell_dofs(dofs_per_cell);
+    std::vector<bool> boundary_cell_dofs(dofs_per_cell);
+    const unsigned int level = cell->level();
+    cell->get_mg_dof_indices (local_dof_indices);
+    for (unsigned int face_nr=0; 
+        face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
+    {
+      typename DoFHandler<dim>::face_iterator face = cell->face(face_nr);
+      if(!cell->at_boundary(face_nr))
+      {
+        //interior face
+        typename MGDoFHandler<dim>::cell_iterator neighbor 
+          = cell->neighbor(face_nr);
+        // Do refinement face
+        // from the coarse side
+        if (neighbor->level() < cell->level())
+        {
+          for(unsigned int j=0; j<dofs_per_face; ++j)
+          {
+            cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+          }
+        }
+      }
+      else
+      {
+        //boundary face
+        for(unsigned int inner_face_nr = 1; inner_face_nr<GeometryInfo<dim>::faces_per_cell; ++inner_face_nr)
+        {
+          const unsigned int neighbor_face_nr = (face_nr+inner_face_nr)%GeometryInfo<dim>::faces_per_cell;
+          if(!cell->at_boundary(neighbor_face_nr))
+          {
+            //other face is interior
+            typename MGDoFHandler<dim>::cell_iterator neighbor 
+              = cell->neighbor(neighbor_face_nr);
+            // Do refinement face
+            // from the coarse side
+            if (neighbor->level() < cell->level())
+            {
+              for(unsigned int j=0; j<dofs_per_face; ++j)
+              {
+                boundary_cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+              }
+            }
+          }
+        }
+      }
+    }//faces
+    for(unsigned int i=0; i<dofs_per_cell; ++i)
+    {
+      if(cell_dofs[i])
+        dof_lower_level[level][local_dof_indices[i]] = true;
+
+      if(boundary_cell_dofs[i])
+        boundary_dof_lower_level[level][local_dof_indices[i]] = true;
+    }
+  }
+}
 			
 template <int dim>
 void
@@ -662,7 +945,7 @@ StokesProblem<dim>::refine_mesh ()
 
   std::vector<bool> component_mask (dim+1, false);
   component_mask[dim] = true;
-  KellyErrorEstimator<dim>::estimate (dof_handler,
+  KellyErrorEstimator<dim>::estimate (static_cast<const DoFHandler<dim>&>(dof_handler),
                                       QGauss<dim-1>(degree+1),
                                       typename FunctionMap<dim>::type(),
                                       solution,
@@ -724,7 +1007,7 @@ void StokesProblem<dim>::run ()
       assemble_system ();      
 
       std::cout << "   Solving..." << std::flush;
-      solve_block ();
+      solve_mg ();
       
       output_results (refinement_cycle);
 
