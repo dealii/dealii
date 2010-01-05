@@ -93,6 +93,10 @@ class Householder : private FullMatrix<number>
     double least_squares (Vector<number2> &dst,
 			  const Vector<number2> &src) const;
 
+				     /**
+                                      * This function does the same as 
+                                      * the one for BlockVectors.
+				      */
     template<typename number2>
     double least_squares (BlockVector<number2> &dst,
 			  const BlockVector<number2> &src) const;
@@ -261,13 +265,13 @@ Householder<number>::least_squares (BlockVector<number2>& dst,
   number2 sum = 0.;
   for (unsigned int i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
-				   // Compute solution
                                    //backward works for 
                                    //Vectors only, so copy 
                                    //them before
   Vector<number2> v_dst, v_aux;
   v_dst = dst;
   v_aux = *aux;
+				   // Compute solution
   this->backward(v_dst, v_aux);
 
   mem.free(aux);
