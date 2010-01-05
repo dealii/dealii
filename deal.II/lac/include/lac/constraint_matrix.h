@@ -14,8 +14,6 @@
 #ifndef __deal2__constraint_matrix_h
 #define __deal2__constraint_matrix_h
 
-#include <complex>
-
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/index_set.h>
@@ -27,7 +25,9 @@
 
 #include <vector>
 #include <map>
+#include <set>
 #include <utility>
+#include <complex>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -388,7 +388,7 @@ class ConstraintMatrix : public Subscriptor
 				      * set_inhomogeneity().
 				      */
     void add_lines (const std::vector<bool> &lines);
-    
+
 				     /**
 				      * Call the first add_line() function for
 				      * every index <code>i</code> that
@@ -410,7 +410,7 @@ class ConstraintMatrix : public Subscriptor
 				      * set_inhomogeneity().
 				      */
     void add_lines (const std::set<unsigned int> &lines);
-    
+
 				     /**
 				      * Add an entry to a given
 				      * line. The list of lines is
