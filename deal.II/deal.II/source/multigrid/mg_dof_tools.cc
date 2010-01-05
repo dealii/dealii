@@ -1033,10 +1033,7 @@ MGTools::count_dofs_per_block (
   dofs_per_block.resize (n_levels);
   
   for (unsigned int l=0;l<n_levels;++l)
-    {
-      dofs_per_block[l].resize(n_blocks);
-      std::fill (dofs_per_block[l].begin(), dofs_per_block[l].end(), 0U);
-    }
+    std::fill (dofs_per_block[l].begin(), dofs_per_block[l].end(), 0U);
 				   // If the empty vector was given as
 				   // default argument, set up this
 				   // vector as identity.
@@ -1046,9 +1043,17 @@ MGTools::count_dofs_per_block (
       for (unsigned int i=0;i<n_blocks;++i)
 	target_block[i] = i;
     }
-  
+  else
   Assert(target_block.size()==n_blocks,
 	 ExcDimensionMismatch(target_block.size(),n_blocks));
+
+  const unsigned int max_block
+    = *std::max_element (target_block.begin(),
+			 target_block.end());
+  const unsigned int n_target_blocks = max_block + 1;
+
+  for (unsigned int l=0;l<n_levels;++l)
+    AssertDimension (dofs_per_block[l].size(), n_target_blocks);
 
 				   // special case for only one
 				   // block. treat this first
