@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -367,6 +367,50 @@ class ConstraintMatrix : public Subscriptor
 				      */
     void add_line (const unsigned int line);
 
+				     /**
+				      * Call the first add_line() function for
+				      * every index <code>i</code> for which
+				      * <code>lines[i]</code> is true.
+				      *
+				      * This function essentially exists to
+				      * allow adding several constraints of
+				      * the form $x_i=0$ all at once, where
+				      * the set of indices $i$ for which these
+				      * constraints should be added are given
+				      * by the argument of this function. On
+				      * the other hand, just as if the
+				      * single-argument add_line() function
+				      * were called repeatedly, the
+				      * constraints can later be modified to
+				      * include linear dependencies using the
+				      * add_entry() function as well as
+				      * inhomogeneities using
+				      * set_inhomogeneity().
+				      */
+    void add_lines (const std::vector<bool> &lines);
+    
+				     /**
+				      * Call the first add_line() function for
+				      * every index <code>i</code> that
+				      * appears in the argument.
+				      *
+				      * This function essentially exists to
+				      * allow adding several constraints of
+				      * the form $x_i=0$ all at once, where
+				      * the set of indices $i$ for which these
+				      * constraints should be added are given
+				      * by the argument of this function. On
+				      * the other hand, just as if the
+				      * single-argument add_line() function
+				      * were called repeatedly, the
+				      * constraints can later be modified to
+				      * include linear dependencies using the
+				      * add_entry() function as well as
+				      * inhomogeneities using
+				      * set_inhomogeneity().
+				      */
+    void add_lines (const std::set<unsigned int> &lines);
+    
 				     /**
 				      * Add an entry to a given
 				      * line. The list of lines is

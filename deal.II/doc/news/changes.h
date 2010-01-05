@@ -379,6 +379,15 @@ inconvenience this causes.
 
   <li>
     <p>
+    New: There are now two ConstraintMatrix::add_lines functions that can
+    add several constraints at once.
+    </p>
+  <br>
+  (WB 2010/01/05)
+  </li>
+
+  <li>
+    <p>
     Improved: The Vector class has been equipped with an improved way to
     calculate sums in inner products and norms. This reduces the accumulation
     of round-off errors. Especially the solution with float vectors should

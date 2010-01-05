@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -86,6 +86,26 @@ ConstraintMatrix::ConstraintLine::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (line) +
 	  MemoryConsumption::memory_consumption (entries));
+}
+
+
+
+void
+ConstraintMatrix::add_lines (const std::set<unsigned int> &lines)
+{
+  for (std::set<unsigned int>::const_iterator
+	 i = lines.begin(); i != lines.end(); ++i)
+    add_line (*i);
+}
+
+
+
+void
+ConstraintMatrix::add_lines (const std::vector<bool> &lines)
+{
+  for (unsigned int i=0; i<lines.size(); ++i)
+    if (lines[i] == true)
+      add_line (i);
 }
 
 
