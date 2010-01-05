@@ -394,7 +394,8 @@ void StokesProblem<dim>::setup_dofs ()
 
 				
   std::vector<unsigned int> dofs_per_block (2);
-  DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);  
+  DoFTools::count_dofs_per_block (dof_handler, dofs_per_block,
+				  block_component);  
   const unsigned int n_u = dofs_per_block[0],
                      n_p = dofs_per_block[1];
 
@@ -447,17 +448,21 @@ void StokesProblem<dim>::setup_dofs ()
   mg_interface_matrices.clear ();
   mg_sparsity.resize(0, nlevels-1);
 
-  MGTools::count_dofs_per_block (dof_handler, mg_dofs_per_component);
+  mg_dofs_per_component.resize (nlevels);
+  for (unsigned int level=0; level<nlevels; ++level)
+    mg_dofs_per_component[level].resize (2);
+  
+  MGTools::count_dofs_per_component (dof_handler, mg_dofs_per_component,
+				 block_component);
 
-  for (unsigned int level=0;level<nlevels;++level)
+  for (unsigned int level=0; level<nlevels; ++level)
   {
-    BlockCompressedSparsityPattern bscp (mg_dofs_per_component[level], 
+    BlockCompressedSparsityPattern bcsp (mg_dofs_per_component[level], 
         mg_dofs_per_component[level]);
-    MGTools::make_sparsity_pattern(dof_handler, bscp, level);
-    mg_sparsity[level].copy_from (bscp);
+    MGTools::make_sparsity_pattern(dof_handler, bcsp, level);
+    mg_sparsity[level].copy_from (bcsp);
     mg_matrices[level].reinit (mg_sparsity[level]);
-    if(level>0)
-      mg_interface_matrices[level].reinit (mg_sparsity[level]);
+    mg_interface_matrices[level].reinit (mg_sparsity[level]);
   }
 }
 
@@ -654,7 +659,13 @@ void StokesProblem<dim>::assemble_multigrid ()
       }
 				      
           cell->get_mg_dof_indices (local_dof_indices);
-          boundary_constraints[level]
+// 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+// 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
+// 	      mg_matrices[level].add (local_dof_indices[i],
+// 				      local_dof_indices[j],
+// 				      local_matrix(i,j));
+	  
+	  boundary_constraints[level]
             .distribute_local_to_global (local_matrix,
                 local_dof_indices,
                 mg_matrices[level]);
@@ -1106,7 +1117,7 @@ void StokesProblem<dim>::run ()
 {
   {
     std::vector<unsigned int> subdivisions (dim, 1);
-    subdivisions[0] = 4;
+    subdivisions[0] = 1;
 
     const Point<dim> bottom_left = (dim == 2 ?
 				    Point<dim>(0,0) :
