@@ -379,6 +379,16 @@ inconvenience this causes.
 
   <li>
     <p>
+    New: In householder.h the function least_squares can handle BlockVectors as
+    well now. Note that in one place we still have to copy to a Vector to use 
+    the function backward from FullMatrix.
+    </p>
+  <br>
+  (Bärbel Janssen 2010/01/05)
+  </li>
+
+  <li>
+    <p>
     New: There are now two ConstraintMatrix::add_lines functions that can
     add several constraints at once.
     </p>
