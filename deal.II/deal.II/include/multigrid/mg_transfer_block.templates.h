@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
 //    mg_transfer.templates.h,v 1.22 2006/01/29 15:03:55 guido Exp
-//    Version: 
+//    Version:
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 
 // Simplify some things below
 typedef std::map<unsigned int, unsigned int>::const_iterator IT;
-  
+
 
 
 template <typename number>
@@ -42,7 +42,8 @@ MGTransferBlockSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const BlockVector<number2>     &src) const
 {
-  MGTools::reinit_vector_by_blocks(mg_dof_handler, dst, selected_block, sizes);
+  internal::mg::reinit_vector_by_blocks(mg_dof_handler, dst,
+					selected_block, sizes);
 				   // For MGTransferBlockSelect, the
 				   // multilevel block is always the
 				   // first, since only one block is
@@ -70,7 +71,8 @@ MGTransferBlockSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const Vector<number2>          &src) const
 {
-  MGTools::reinit_vector_by_blocks(mg_dof_handler, dst, selected_block, sizes);
+  internal::mg::reinit_vector_by_blocks(mg_dof_handler, dst,
+					selected_block, sizes);
 				   // For MGTransferBlockSelect, the
 				   // multilevel block is always the
 				   // first, since only one block is selected.
@@ -84,7 +86,7 @@ MGTransferBlockSelect<number>::copy_to_mg (
       if (!first)
 	restrict_and_add (level+1, dst[level], dst[level+1]);
       first = false;
-    }      
+    }
 }
 
 
@@ -173,7 +175,8 @@ MGTransferBlock<number>::copy_to_mg (
   MGLevelObject<BlockVector<number> >& dst,
   const BlockVector<number2>& src) const
 {
-  MGTools::reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
+  internal::mg::reinit_vector_by_blocks(mg_dof_handler, dst,
+					selected, sizes);
   bool first = true;
   for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
     {

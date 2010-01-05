@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
 //    mg_transfer.templates.h,v 1.22 2006/01/29 15:03:55 guido Exp
-//    Version: 
+//    Version:
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,25 +67,25 @@ MGTransferSelect<number>::do_copy_to_mg (
   const unsigned int              offset) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  
+
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  
+
 				   // set the elements of the vectors
 				   // on all levels to zero
   unsigned int minlevel = dst.get_minlevel();
   unsigned int maxlevel = dst.get_maxlevel();
-  
+
   dst=0;
-  
+
   Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
 	 ExcMatricesNotBuilt());
 
-  MGTools::reinit_vector_by_components(
+  internal::mg::reinit_vector_by_components(
     mg_dof_handler, dst, mg_selected, mg_target_component, sizes);
-  
+
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
-  
+
 				   // Build a vector of the selected
 				   // indices, since traversing all
 				   // indices on each cell is too
@@ -133,7 +133,7 @@ MGTransferSelect<number>::do_copy_to_mg (
 	    = mg_component_start[level][selected_component];
 	  const typename std::vector<unsigned int>::const_iterator
 	    end = selected_indices.end();
-	  
+
 	  for (typename std::vector<unsigned int>::const_iterator
 		 i=selected_indices.begin();
 	       i != end; ++i)
@@ -221,7 +221,7 @@ MGTransferSelect<number>::do_copy_from_mg (
   const unsigned int offset) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  
+
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);

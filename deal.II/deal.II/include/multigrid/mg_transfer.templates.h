@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,7 +40,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   MGLevelObject<VECTOR>& dst,
   const InVector& src) const
 {
-  MGTools::reinit_vector(mg_dof_handler, dst);
+  internal::mg::reinit_vector(mg_dof_handler, dst);
   bool first = true;
   for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
     {
@@ -115,7 +115,7 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
 template <class VECTOR>
 template <int dim, int spacedim>
 void MGTransferPrebuilt<VECTOR>::find_dofs_on_refinement_edges (
-    const MGDoFHandler<dim,spacedim>& mg_dof) 
+    const MGDoFHandler<dim,spacedim>& mg_dof)
 {
   for (unsigned int level = 0; level<mg_dof.get_tria().n_levels(); ++level)
   {
@@ -139,14 +139,14 @@ void MGTransferPrebuilt<VECTOR>::find_dofs_on_refinement_edges (
     std::vector<bool> boundary_cell_dofs(dofs_per_cell);
     const unsigned int level = cell->level();
     cell->get_mg_dof_indices (local_dof_indices);
-    for (unsigned int face_nr=0; 
+    for (unsigned int face_nr=0;
         face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
     {
       typename DoFHandler<dim>::face_iterator face = cell->face(face_nr);
       if(!cell->at_boundary(face_nr))
       {
         //interior face
-        typename MGDoFHandler<dim>::cell_iterator neighbor 
+        typename MGDoFHandler<dim>::cell_iterator neighbor
           = cell->neighbor(face_nr);
         // Do refinement face
         // from the coarse side

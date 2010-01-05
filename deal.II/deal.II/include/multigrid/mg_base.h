@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,154 @@
 #include <base/smartpointer.h>
 #include <lac/vector.h>
 
+
 DEAL_II_NAMESPACE_OPEN
+
+
+template <int, int> class MGDoFHandler;
+template <typename> class MGLevelObject;
+
+
+namespace internal
+{
+  namespace mg
+  {
+				     /**
+				      * Ajust vectors on all levels to
+				      * correct size.  Here, we just
+				      * count the numbers of degrees
+				      * of freedom on each level and
+				      * @p reinit each level vector
+				      * to this length.
+				      */
+    template <int dim, typename number, int spacedim>
+    static void
+    reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+		   MGLevelObject<dealii::Vector<number> > &vector);
+
+				     /**
+				      * Ajust vectors on all levels to
+				      * correct size.  Here, we just
+				      * count the numbers of degrees
+				      * of freedom on each level and
+				      * @p reinit each level vector
+				      * to this length.
+				      */
+    template <int dim, typename number, int spacedim>
+    static void
+    reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+		   MGLevelObject<BlockVector<number> > &vector);
+
+
+				     /**
+				      * Adjust vectors on all levels
+				      * to correct size. The degrees
+				      * of freedom on each level are
+				      * counted by block and only the
+				      * block selected is used.
+				      */
+    template <int dim, typename number, int spacedim>
+    static void
+    reinit_vector_by_blocks (
+      const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+      MGLevelObject<dealii::Vector<number> > &v,
+      const unsigned int selected,
+      std::vector<std::vector<unsigned int> >& cached_sizes);
+
+				     /**
+				      * Adjust block vectors on all
+				      * levels to correct size. The
+				      * degrees of freedom on each
+				      * level are counted by block.
+				      */
+    template <int dim, typename number, int spacedim>
+    static void
+    reinit_vector_by_blocks (
+      const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+      MGLevelObject<BlockVector<number> > &v,
+      const std::vector<bool> &selected,
+      std::vector<std::vector<unsigned int> >& cached_sizes);
+
+				     /**
+				      * Adjust block-vectors on all
+				      * levels to correct size.  Count
+				      * the numbers of degrees of
+				      * freedom on each level
+				      * component-wise. Then, assign
+				      * each block of @p vector the
+				      * corresponding size.
+				      *
+				      * The boolean field @p selected
+				      * allows restricting this
+				      * operation to certain
+				      * components. In this case, @p
+				      * vector will only have as many
+				      * blocks as there are true
+				      * values in @p selected (no
+				      * blocks of length zero are
+				      * padded in). If this argument
+				      * is omitted, all blocks will be
+				      * considered.
+				      *
+				      * Degrees of freedom must be
+				      * sorted by component in order
+				      * to obtain reasonable results
+				      * from this function.
+				      *
+				      * The argument
+				      * @p target_component allows to
+				      * re-sort and group components
+				      * as in
+				      * DoFRenumbering::component_wise.
+				      *
+				      *
+				      */
+    template <int dim, typename number, int spacedim>
+    static void
+    reinit_vector_by_components (const dealii::MGDoFHandler<dim,spacedim>& mg_dof,
+				 MGLevelObject<BlockVector<number> >& v,
+				 const std::vector<bool>& selected,
+				 const std::vector<unsigned int>& target_component,
+				 std::vector<std::vector<unsigned int> >& cached_sizes);
+				     /**
+				      * Adjust vectors on all levels
+				      * to correct size.  Count the
+				      * numbers of degrees of freedom
+				      * on each level component-wise
+				      * in a single component. Then,
+				      * assign @p vector the
+				      * corresponding size.
+				      *
+				      * The boolean field @p selected
+				      * may be nonzero in a single
+				      * component, indicating the
+				      * block of a block vector the
+				      * argument @p v corresponds to.
+				      *
+				      * Degrees of freedom must be
+				      * sorted by component in order
+				      * to obtain reasonable results
+				      * from this function.
+				      *
+				      * The argument
+				      * @p target_component allows to
+				      * re-sort and group components
+				      * as in
+				      * DoFRenumbering::component_wise.
+				      */
+    template <int dim, typename number, int spacedim>
+    static void
+    reinit_vector_by_components (
+      const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+      MGLevelObject<dealii::Vector<number> > &v,
+      const std::vector<bool> &selected,
+      const std::vector<unsigned int> &target_component,
+      std::vector<std::vector<unsigned int> >& cached_sizes);
+
+  }
+}
+
+
 
 /*!@addtogroup mg */
 /*@{*/
@@ -239,7 +386,7 @@ class MGSmootherBase : public Subscriptor
 				      * Release matrices.
 				      */
     virtual void clear() = 0;
-    
+
 				   /**
 				    * Smoothing function. This is the
 				    * function used in multigrid
@@ -247,7 +394,7 @@ class MGSmootherBase : public Subscriptor
 				    */
   virtual void smooth (const unsigned int level,
 		       VECTOR&            u,
-		       const VECTOR&      rhs) const = 0;  
+		       const VECTOR&      rhs) const = 0;
 };
 
 /*@}*/
