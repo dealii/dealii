@@ -222,17 +222,12 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 			 const bool transpose = false);
 
 				     /**
-				      * Initialize for matrices. The
-				      * parameter @p matrices can be
-				      * any object having functions
-				      * <tt>get_minlevel()</tt> and
-				      * <tt>get_maxlevel()</tt> as well as
-				      * an <tt>operator[]</tt> returning a
-				      * reference to @p MATRIX. This
+				      * Initialize for matrices. This
 				      * function stores pointers to
 				      * the level matrices and
 				      * initializes the smoothing
-				      * operator for each level.
+				      * operator with the same smoother
+                                      * for each level.
 				      *
 				      * @p additional_data is an
 				      * object of type
@@ -241,28 +236,40 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 				      * initialization function of the
 				      * relaxation method.
 				      */
-    template <class MGMATRIXOBJECT, class DATA>
-    void initialize (const MGMATRIXOBJECT& matrices,
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
 		     const DATA& additional_data);
 
 				     /**
+				      * Initialize for matrices. This
+				      * function stores pointers to
+				      * the level matrices and
+				      * initializes the smoothing
+				      * operator with the according
+                                      * smoother for each level.
+				      *
+				      * @p additional_data is an
+				      * object of type
+				      * @p RELAX::AdditionalData and
+				      * is handed to the
+				      * initialization function of the
+				      * relaxation method.
+				      */
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
+		     const MGLevelObject<DATA>& additional_data);
+
+				     /**
 				      * Initialize for single blocks
-				      * of matrices. The parameter
-				      * @p matrices can be any object
-				      * having functions
-				      * <tt>get_minlevel()</tt> and
-				      * <tt>get_maxlevel()</tt> as well as
-				      * an <tt>operator[]</tt> returning a
-				      * reference to a block matrix
-				      * where each block is of type
-				      * @p MATRIX. Of this block
+				      * of matrices. Of this block
 				      * matrix, the block indicated by
 				      * @p block_row and
 				      * @p block_col is selected on
 				      * each level.  This function
 				      * stores pointers to the level
 				      * matrices and initializes the
-				      * smoothing operator for each
+				      * smoothing operator with the 
+                                      * same smoother for each
 				      * level.
 				      *
 				      * @p additional_data is an
@@ -272,9 +279,35 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 				      * initialization function of the
 				      * relaxation method.
 				      */
-    template <class MGMATRIXOBJECT, class DATA>
-    void initialize (const MGMATRIXOBJECT& matrices,
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
 		     const DATA& additional_data,
+		     const unsigned int block_row,
+		     const unsigned int block_col);
+
+				     /**
+				      * Initialize for single blocks
+				      * of matrices. Of this block
+				      * matrix, the block indicated by
+				      * @p block_row and
+				      * @p block_col is selected on
+				      * each level.  This function
+				      * stores pointers to the level
+				      * matrices and initializes the
+				      * smoothing operator with the 
+                                      * according smoother for each
+				      * level.
+				      *
+				      * @p additional_data is an
+				      * object of type
+				      * @p RELAX::AdditionalData and
+				      * is handed to the
+				      * initialization function of the
+				      * relaxation method.
+				      */
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
+		     const MGLevelObject<DATA>& additional_data,
 		     const unsigned int block_row,
 		     const unsigned int block_col);
 
@@ -358,17 +391,12 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 			   const bool transpose = false);
 
 				     /**
-				      * Initialize for matrices. The
-				      * parameter @p matrices can be
-				      * any object having functions
-				      * <tt>get_minlevel()</tt> and
-				      * <tt>get_maxlevel()</tt> as well as
-				      * an <tt>operator[]</tt> returning a
-				      * reference to @p MATRIX. This
+				      * Initialize for matrices. This
 				      * function stores pointers to
 				      * the level matrices and
 				      * initializes the smoothing
-				      * operator for each level.
+				      * operator with the same smoother
+                                      * for each level.
 				      *
 				      * @p additional_data is an
 				      * object of type
@@ -377,28 +405,40 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      * initialization function of the
 				      * relaxation method.
 				      */
-    template <class MGMATRIXOBJECT, class DATA>
-    void initialize (const MGMATRIXOBJECT& matrices,
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
 		     const DATA& additional_data);
 
 				     /**
+				      * Initialize for matrices. This
+				      * function stores pointers to
+				      * the level matrices and
+				      * initializes the smoothing
+				      * operator with the according
+                                      * smoother for each level.
+				      *
+				      * @p additional_data is an
+				      * object of type
+				      * @p RELAX::AdditionalData and
+				      * is handed to the
+				      * initialization function of the
+				      * relaxation method.
+				      */
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
+		     const MGLevelObject<DATA>& additional_data);
+
+				     /**
 				      * Initialize for single blocks
-				      * of matrices. The parameter
-				      * @p matrices can be any object
-				      * having functions
-				      * <tt>get_minlevel()</tt> and
-				      * <tt>get_maxlevel()</tt> as well as
-				      * an <tt>operator[]</tt> returning a
-				      * reference to a block matrix
-				      * where each block is of type
-				      * @p MATRIX. Of this block
+				      * of matrices. Of this block
 				      * matrix, the block indicated by
 				      * @p block_row and
 				      * @p block_col is selected on
 				      * each level.  This function
 				      * stores pointers to the level
 				      * matrices and initializes the
-				      * smoothing operator for each
+				      * smoothing operator with the 
+                                      * same smoother for each
 				      * level.
 				      *
 				      * @p additional_data is an
@@ -408,9 +448,35 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      * initialization function of the
 				      * relaxation method.
 				      */
-    template <class MGMATRIXOBJECT, class DATA>
-    void initialize (const MGMATRIXOBJECT& matrices,
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
 		     const DATA& additional_data,
+		     const unsigned int block_row,
+		     const unsigned int block_col);
+
+				     /**
+				      * Initialize for single blocks
+				      * of matrices. Of this block
+				      * matrix, the block indicated by
+				      * @p block_row and
+				      * @p block_col is selected on
+				      * each level.  This function
+				      * stores pointers to the level
+				      * matrices and initializes the
+				      * smoothing operator with the 
+                                      * according smoother for each
+				      * level.
+				      *
+				      * @p additional_data is an
+				      * object of type
+				      * @p RELAX::AdditionalData and
+				      * is handed to the
+				      * initialization function of the
+				      * relaxation method.
+				      */
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
+		     const MGLevelObject<DATA>& additional_data,
 		     const unsigned int block_row,
 		     const unsigned int block_col);
 
@@ -547,10 +613,10 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::clear ()
 
 
 template <class MATRIX, class RELAX, class VECTOR>
-template <class MGMATRIXOBJECT, class DATA>
+template <class MATRIX2, class DATA>
 inline void
 MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
-  const MGMATRIXOBJECT& m,
+  const MGLevelObject<MATRIX2>& m,
   const DATA& data)
 {
   const unsigned int min = m.get_minlevel();
@@ -566,12 +632,31 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
-
 template <class MATRIX, class RELAX, class VECTOR>
-template <class MGMATRIXOBJECT, class DATA>
+template <class MATRIX2, class DATA>
 inline void
 MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
-  const MGMATRIXOBJECT& m,
+  const MGLevelObject<MATRIX2>& m,
+  const MGLevelObject<DATA>& data)
+{
+  const unsigned int min = m.get_minlevel();
+  const unsigned int max = m.get_maxlevel();
+  
+  matrices.resize(min, max);
+  smoothers.resize(min, max);
+
+  for (unsigned int i=min;i<=max;++i)
+    {
+      matrices[i] = &m[i];
+      smoothers[i].initialize(m[i], data[i]);
+    }
+}
+
+template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX2, class DATA>
+inline void
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
+  const MGLevelObject<MATRIX2>& m,
   const DATA& data,
   const unsigned int row,
   const unsigned int col)
@@ -589,6 +674,27 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
+template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX2, class DATA>
+inline void
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
+  const MGLevelObject<MATRIX2>& m,
+  const MGLevelObject<DATA>& data,
+  const unsigned int row,
+  const unsigned int col)
+{
+  const unsigned int min = m.get_minlevel();
+  const unsigned int max = m.get_maxlevel();
+  
+  matrices.resize(min, max);
+  smoothers.resize(min, max);
+
+  for (unsigned int i=min;i<=max;++i)
+    {
+      matrices[i] = &(m[i].block(row, col));
+      smoothers[i].initialize(m[i].block(row, col), data[i]);
+    }
+}
 
 #ifdef DEAL_II_MULTIGRID_COMPATIBILITY
 
@@ -727,10 +833,10 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::clear ()
 
 
 template <class MATRIX, class RELAX, class VECTOR>
-template <class MGMATRIXOBJECT, class DATA>
+template <class MATRIX2, class DATA>
 inline void
 MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
-  const MGMATRIXOBJECT& m,
+  const MGLevelObject<MATRIX2>& m,
   const DATA& data)
 {
   const unsigned int min = m.get_minlevel();
@@ -746,12 +852,31 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
-
 template <class MATRIX, class RELAX, class VECTOR>
-template <class MGMATRIXOBJECT, class DATA>
+template <class MATRIX2, class DATA>
 inline void
 MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
-  const MGMATRIXOBJECT& m,
+  const MGLevelObject<MATRIX2>& m,
+  const MGLevelObject<DATA>& data)
+{
+  const unsigned int min = m.get_minlevel();
+  const unsigned int max = m.get_maxlevel();
+  
+  matrices.resize(min, max);
+  smoothers.resize(min, max);
+
+  for (unsigned int i=min;i<=max;++i)
+    {
+      matrices[i] = &m[i];
+      smoothers[i].initialize(m[i], data[i]);
+    }
+}
+
+template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX2, class DATA>
+inline void
+MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
+  const MGLevelObject<MATRIX2>& m,
   const DATA& data,
   const unsigned int row,
   const unsigned int col)
@@ -769,6 +894,27 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
+template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX2, class DATA>
+inline void
+MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
+  const MGLevelObject<MATRIX2>& m,
+  const MGLevelObject<DATA>& data,
+  const unsigned int row,
+  const unsigned int col)
+{
+  const unsigned int min = m.get_minlevel();
+  const unsigned int max = m.get_maxlevel();
+  
+  matrices.resize(min, max);
+  smoothers.resize(min, max);
+
+  for (unsigned int i=min;i<=max;++i)
+    {
+      matrices[i] = &(m[i].block(row, col));
+      smoothers[i].initialize(m[i].block(row, col), data[i]);
+    }
+}
 
 template <class MATRIX, class RELAX, class VECTOR>
 inline void
