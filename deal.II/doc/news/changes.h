@@ -378,6 +378,16 @@ inconvenience this causes.
 <ol>
   <li>
     <p>
+    Fixed: BlockSparsityPattern::copy_from accidentally only copied
+    n_block_rows times n_block_rows blocks, instead of n_block_rows
+    times n_block_cols. This is now fixed.
+    </p>
+  <br>
+  (WB 2010/01/06)
+  </li>
+
+  <li>
+    <p>
     Fixed: SparsityPattern::copy_from crashed whenever a compressed sparsity
     pattern was copied that had either zero rows or zero columns. This is now
     fixed.

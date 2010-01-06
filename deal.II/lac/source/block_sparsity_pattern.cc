@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -390,8 +390,8 @@ BlockSparsityPattern::copy_from  (const BlockCompressedSparsityPattern &csp)
   reinit (csp.n_block_rows(), csp.n_block_cols());
 
 				   // copy over blocks
-  for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<rows; ++j)
+  for (unsigned int i=0; i<n_block_rows(); ++i)
+    for (unsigned int j=0; j<n_block_cols(); ++j)
       block(i,j).copy_from (csp.block(i,j));
 
 				   // and finally enquire their new
