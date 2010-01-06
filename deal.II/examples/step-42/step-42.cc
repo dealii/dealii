@@ -462,8 +462,8 @@ void StokesProblem<dim>::setup_dofs ()
   MGTools::count_dofs_per_block (dof_handler, mg_dofs_per_component,
 				 block_component);
 
-  for (unsigned int level=0; level<nlevels; ++level)
-    std::cout << mg_dofs_per_component[level].size () << std::endl;
+//  for (unsigned int level=0; level<nlevels; ++level)
+//    std::cout << mg_dofs_per_component[level].size () << std::endl;
 
   for (unsigned int level=0; level<nlevels; ++level)
   {
@@ -844,6 +844,10 @@ void StokesProblem<dim>::solve ()
 
   MGMatrix<BlockSparseMatrix<double>, BlockVector<double> >
     mg_matrix(&mg_matrices);
+  MGMatrix<BlockSparseMatrix<double>, BlockVector<double> >
+    mg_interface_up(&mg_interface_matrices);
+  MGMatrix<BlockSparseMatrix<double>, BlockVector<double> >
+    mg_interface_down(&mg_interface_matrices);
 
   typedef
     SchurComplementSmoother<typename InnerPreconditioner<dim>::type>
@@ -870,6 +874,7 @@ void StokesProblem<dim>::solve ()
       mg_smoother,
       mg_smoother);
   mg.set_debug(3);
+  mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
   MGPREC  preconditioner(dof_handler, mg, mg_transfer);
 
@@ -1018,7 +1023,7 @@ int main ()
 {
   try
     {
-      deallog.depth_console (0);
+//      deallog.depth_console (0);
 
       StokesProblem<2> flow_problem(1);
       flow_problem.run ();
