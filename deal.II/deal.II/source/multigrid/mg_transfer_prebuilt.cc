@@ -30,6 +30,115 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace
+{
+				     /**
+				      * Adjust vectors on all levels to
+				      * correct size.  Here, we just
+				      * count the numbers of degrees
+				      * of freedom on each level and
+				      * @p reinit each level vector
+				      * to this length.
+                                      * For compatibility reasons with
+                                      * the next function
+                                      * the target_component is added
+                                      * here but is not used.
+				      */
+  template <int dim, typename number, int spacedim>
+  void
+  reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+		 std::vector<unsigned int> ,
+		 MGLevelObject<dealii::Vector<number> > &v)
+  {
+    for (unsigned int level=v.get_minlevel();
+	 level<=v.get_maxlevel();++level)
+      {
+	unsigned int n = mg_dof.n_dofs (level);
+	v[level].reinit(n);
+      }
+
+  }
+
+
+				     /**
+				      * Adjust vectors on all levels to
+				      * correct size.  Here, we just
+				      * count the numbers of degrees
+				      * of freedom on each level and
+				      * @p reinit each level vector
+				      * to this length. The target_component
+                                      * is handed to MGTools::count_dofs_per_block.
+                                      * See for documentation there.
+				      */
+  template <int dim, typename number, int spacedim>
+  void
+  reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+		 std::vector<unsigned int> target_component,
+		 MGLevelObject<BlockVector<number> > &v)
+  {
+    const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+    if (target_component.size()==0)
+      {
+        target_component.resize(n_blocks);
+        for (unsigned int i=0;i<n_blocks;++i)
+          target_component[i] = i;
+      }
+    Assert(target_component.size()==n_blocks,
+	   ExcDimensionMismatch(target_component.size(),n_blocks));
+    const unsigned int max_block
+      = *std::max_element (target_component.begin(),
+			   target_component.end());
+    const unsigned int n_target_blocks = max_block + 1;
+
+    std::vector<std::vector<unsigned int> >
+      ndofs(mg_dof.get_tria().n_levels(),
+	    std::vector<unsigned int>(n_blocks));
+    MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
+
+    for (unsigned int level=v.get_minlevel();
+	 level<=v.get_maxlevel();++level)
+      {
+	v[level].reinit(n_target_blocks);
+	for (unsigned int b=0; b<n_target_blocks; ++b)
+	  v[level].block(b).reinit(ndofs[level][b]);
+	v[level].collect_sizes();
+      }
+  }
+}
+
+
+
+template <class VECTOR>
+template <int dim, class InVector, int spacedim>
+void
+MGTransferPrebuilt<VECTOR>::copy_to_mg (
+  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
+  MGLevelObject<VECTOR>& dst,
+  const InVector& src) const
+{
+  reinit_vector(mg_dof_handler, component_to_block_map, dst);
+  bool first = true;
+  for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
+    {
+      --level;
+
+      typedef std::map<unsigned int, unsigned int>::const_iterator IT;
+      for (IT i= copy_indices[level].begin();
+	   i != copy_indices[level].end();++i)
+	dst[level](i->second) = src(i->first);
+				       // For non-DG: degrees of
+				       // freedom in the refinement
+				       // face may need special
+				       // attention, since they belong
+				       // to the coarse level, but
+				       // have fine level basis
+				       // functions
+      if (!first)
+	restrict_and_add (level+1, dst[level], dst[level+1]);
+      first = false;
+    }
+}
+
 
 
 template <typename VECTOR>
@@ -233,6 +342,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 }
 
 
+//TODO: Use template expander script
 
 template
 void MGTransferPrebuilt<Vector<float> >::build_matrices<deal_II_dimension>

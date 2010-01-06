@@ -29,37 +29,6 @@ DEAL_II_NAMESPACE_OPEN
 /* --------------------- MGTransferPrebuilt -------------- */
 
 
-template <class VECTOR>
-template <int dim, class InVector, int spacedim>
-void
-MGTransferPrebuilt<VECTOR>::copy_to_mg (
-  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
-  MGLevelObject<VECTOR>& dst,
-  const InVector& src) const
-{
-  internal::mg::reinit_vector(mg_dof_handler, component_to_block_map, dst);
-  bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
-    {
-      --level;
-
-      typedef std::map<unsigned int, unsigned int>::const_iterator IT;
-      for (IT i= copy_indices[level].begin();
-	   i != copy_indices[level].end();++i)
-	dst[level](i->second) = src(i->first);
-				       // For non-DG: degrees of
-				       // freedom in the refinement
-				       // face may need special
-				       // attention, since they belong
-				       // to the coarse level, but
-				       // have fine level basis
-				       // functions
-      if (!first)
-	restrict_and_add (level+1, dst[level], dst[level+1]);
-      first = false;
-    }
-}
-
 
 
 template <class VECTOR>

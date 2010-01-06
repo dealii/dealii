@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,9 +28,177 @@
 #include <multigrid/mg_tools.h>
 
 #include <algorithm>
+#include <numeric>
 #include <iostream>
 
 DEAL_II_NAMESPACE_OPEN
+
+namespace
+{
+				     /**
+				      * Adjust vectors on all levels
+				      * to correct size. The degrees
+				      * of freedom on each level are
+				      * counted by block and only the
+				      * block selected is used.
+				      */
+  template <int dim, typename number, int spacedim>
+  void
+  reinit_vector_by_blocks (
+    const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+    MGLevelObject<BlockVector<number> > &v,
+    const std::vector<bool> &sel,
+    std::vector<std::vector<unsigned int> >& ndofs)
+  {
+    std::vector<bool> selected=sel;
+				     // Compute the number of blocks needed
+    const unsigned int n_selected
+      = std::accumulate(selected.begin(),
+			selected.end(),
+			0U);
+
+    if (ndofs.size() == 0)
+      {
+	std::vector<std::vector<unsigned int> >
+	  new_dofs(mg_dof.get_tria().n_levels(),
+		   std::vector<unsigned int>(selected.size()));
+	std::swap(ndofs, new_dofs);
+	MGTools::count_dofs_per_block (mg_dof, ndofs);
+      }
+
+    for (unsigned int level=v.get_minlevel();
+	 level<=v.get_maxlevel();++level)
+      {
+	v[level].reinit(n_selected, 0);
+	unsigned int k=0;
+	for (unsigned int i=0;i<selected.size() && (k<v[level].n_blocks());++i)
+	  {
+	    if (selected[i])
+	      {
+		v[level].block(k++).reinit(ndofs[level][i]);
+	      }
+	    v[level].collect_sizes();
+	  }
+      }
+  }
+
+
+				     /**
+				      * Adjust block vectors on all
+				      * levels to correct size. The
+				      * degrees of freedom on each
+				      * level are counted by block.
+				      */
+  template <int dim, typename number, int spacedim>
+  void
+  reinit_vector_by_blocks (
+    const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+    MGLevelObject<dealii::Vector<number> > &v,
+    const unsigned int selected_block,
+    std::vector<std::vector<unsigned int> >& ndofs)
+  {
+    const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+    Assert(selected_block < n_blocks, ExcIndexRange(selected_block, 0, n_blocks));
+
+    std::vector<bool> selected(n_blocks, false);
+    selected[selected_block] = true;
+
+    if (ndofs.size() == 0)
+      {
+	std::vector<std::vector<unsigned int> >
+	  new_dofs(mg_dof.get_tria().n_levels(),
+		   std::vector<unsigned int>(selected.size()));
+	std::swap(ndofs, new_dofs);
+	MGTools::count_dofs_per_block (mg_dof, ndofs);
+      }
+
+    for (unsigned int level=v.get_minlevel();
+	 level<=v.get_maxlevel();++level)
+      {
+	v[level].reinit(ndofs[level][selected_block]);
+      }
+  }
+}
+
+
+template <typename number>
+template <int dim, typename number2, int spacedim>
+void
+MGTransferBlockSelect<number>::copy_to_mg (
+  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
+  MGLevelObject<Vector<number> > &dst,
+  const BlockVector<number2>     &src) const
+{
+  reinit_vector_by_blocks(mg_dof_handler, dst, selected_block, sizes);
+				   // For MGTransferBlockSelect, the
+				   // multilevel block is always the
+				   // first, since only one block is
+				   // selected.
+  bool first = true;
+  for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
+    {
+      --level;
+      for (IT i= copy_indices[selected_block][level].begin();
+	   i != copy_indices[selected_block][level].end();++i)
+	dst[level](i->second) = src.block(selected_block)(i->first);
+      if (!first)
+	restrict_and_add (level+1, dst[level], dst[level+1]);
+      first = false;
+    }
+}
+
+
+
+template <typename number>
+template <int dim, typename number2, int spacedim>
+void
+MGTransferBlockSelect<number>::copy_to_mg (
+  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
+  MGLevelObject<Vector<number> > &dst,
+  const Vector<number2>          &src) const
+{
+  reinit_vector_by_blocks(mg_dof_handler, dst, selected_block, sizes);
+				   // For MGTransferBlockSelect, the
+				   // multilevel block is always the
+				   // first, since only one block is selected.
+  bool first = true;
+  for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
+    {
+      --level;
+      for (IT i= copy_indices[selected_block][level].begin();
+	   i != copy_indices[selected_block][level].end();++i)
+	dst[level](i->second) = src(i->first);
+      if (!first)
+	restrict_and_add (level+1, dst[level], dst[level+1]);
+      first = false;
+    }
+}
+
+
+
+template <typename number>
+template <int dim, typename number2, int spacedim>
+void
+MGTransferBlock<number>::copy_to_mg (
+  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
+  MGLevelObject<BlockVector<number> >& dst,
+  const BlockVector<number2>& src) const
+{
+  reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
+  bool first = true;
+  for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
+    {
+      --level;
+      for (unsigned int block=0;block<selected.size();++block)
+	if (selected[block])
+	  for (IT i= copy_indices[block][level].begin();
+	       i != copy_indices[block][level].end();++i)
+	    dst[level].block(mg_block[block])(i->second) = src.block(block)(i->first);
+      if (!first)
+	restrict_and_add (level+1, dst[level], dst[level+1]);
+      first = false;
+    }
+}
 
 
 
@@ -43,10 +211,10 @@ void MGTransferBlockBase::build_matrices (
   const unsigned int n_blocks  = fe.n_blocks();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
-  
+
   Assert (selected.size() == n_blocks,
 	  ExcDimensionMismatch(selected.size(), n_blocks));
-  
+
 				   // Compute the mapping between real
 				   // blocks and blocks used for
 				   // multigrid computations.
@@ -57,11 +225,11 @@ void MGTransferBlockBase::build_matrices (
       mg_block[i] = n_mg_blocks++;
     else
       mg_block[i] = numbers::invalid_unsigned_int;
-  
+
 				   // Compute the lengths of all blocks
   sizes.resize(n_levels);
   MGTools::count_dofs_per_block(mg_dof, sizes);
-  
+
 				   // Fill some index vectors
 				   // for later use.
   mg_block_start = sizes;
@@ -76,7 +244,7 @@ void MGTransferBlockBase::build_matrices (
 	  k += t;
 	}
     }
-  
+
   block_start.resize(n_blocks);
   DoFTools::count_dofs_per_block (static_cast<const DoFHandler<dim,spacedim>&>(mg_dof), block_start);
 
@@ -97,9 +265,9 @@ void MGTransferBlockBase::build_matrices (
   for (unsigned int block=0;block<n_blocks;++block)
     if (selected[block])
       copy_indices[block].resize(n_levels);
-  
+
 // Building the prolongation matrices starts here!
-  
+
 				   // reset the size of the array of
 				   // matrices. call resize(0) first,
 				   // in order to delete all elements
@@ -126,7 +294,7 @@ void MGTransferBlockBase::build_matrices (
 				   // for a cell and one of its children
   std::vector<unsigned int> dof_indices_parent (dofs_per_cell);
   std::vector<unsigned int> dof_indices_child (dofs_per_cell);
-  
+
 				   // for each level: first build the
 				   // sparsity pattern of the matrices
 				   // and then build the matrices
@@ -159,7 +327,7 @@ void MGTransferBlockBase::build_matrices (
 		      0, false);
 
       prolongation_sparsities[level]->collect_sizes();
-      
+
       for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	if (cell->has_children())
@@ -175,7 +343,7 @@ void MGTransferBlockBase::build_matrices (
 						 // this child
 		const FullMatrix<double> &prolongation
 		  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
-	    
+
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
 						 // now tag the entries in the
@@ -214,7 +382,7 @@ void MGTransferBlockBase::build_matrices (
 						 // this child
 		const FullMatrix<double> &prolongation
 		  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
-	    
+
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
 						 // now set the entries in the
@@ -246,13 +414,13 @@ void MGTransferBlockSelect<number>::build_matrices (
 {
   const FiniteElement<dim>& fe = mg_dof.get_fe();
   unsigned int n_blocks = mg_dof.get_fe().n_blocks();
-  
+
   selected_block = select;
   selected.resize(n_blocks, false);
   selected[select] = true;
-  
+
   MGTransferBlockBase::build_matrices (dof, mg_dof);
-  
+
   std::vector<unsigned int> global_dof_indices (fe.dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (fe.dofs_per_cell);
   for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
@@ -261,7 +429,7 @@ void MGTransferBlockSelect<number>::build_matrices (
 	level_cell = mg_dof.begin_active(level);
       const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_end  = mg_dof.end_active(level);
-      
+
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
@@ -273,7 +441,7 @@ void MGTransferBlockSelect<number>::build_matrices (
 					   // numbering
 	  global_cell.get_dof_indices(global_dof_indices);
 	  level_cell->get_mg_dof_indices (level_dof_indices);
-	  
+
 	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	    {
 	      const unsigned int block = fe.system_to_block_index(i).first;
@@ -298,18 +466,18 @@ void MGTransferBlock<number>::build_matrices (
 {
   const FiniteElement<dim>& fe = mg_dof.get_fe();
   unsigned int n_blocks = mg_dof.get_fe().n_blocks();
-  
+
   if (sel.size() != 0)
     {
       Assert(sel.size() == n_blocks,
 	     ExcDimensionMismatch(sel.size(), n_blocks));
       selected = sel;
-    }  
+    }
   if (selected.size() == 0)
     selected = std::vector<bool> (n_blocks, true);
 
   MGTransferBlockBase::build_matrices (dof, mg_dof);
-  
+
   std::vector<unsigned int> global_dof_indices (fe.dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (fe.dofs_per_cell);
   for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
@@ -318,7 +486,7 @@ void MGTransferBlock<number>::build_matrices (
 	level_cell = mg_dof.begin_active(level);
       const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_end  = mg_dof.end_active(level);
-      
+
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
@@ -330,7 +498,7 @@ void MGTransferBlock<number>::build_matrices (
 					   // numbering
 	  global_cell.get_dof_indices(global_dof_indices);
 	  level_cell->get_mg_dof_indices (level_dof_indices);
-	  
+
 	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	    {
 	      const unsigned int block = fe.system_to_block_index(i).first;
