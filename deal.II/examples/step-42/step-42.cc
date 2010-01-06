@@ -337,12 +337,12 @@ template <class Preconditioner>
 void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
 					     const Vector<double> &src) const
 {
-//  std::cout << " SRC " << src.l2_norm() << std::endl;
   system_matrix->block(0,1).vmult (tmp1, src);
   A_inverse->name = "in schur";
   A_inverse->vmult (tmp2, tmp1);
   system_matrix->block(1,0).vmult (dst, tmp2);
-//  std::cout << " DST " << dst.l2_norm() << std::endl;
+
+  system_matrix->block(1,1).vmult_add (dst, src);
 }
 
 
@@ -669,6 +669,7 @@ void StokesProblem<dim>::assemble_multigrid ()
   mg_A_preconditioner.resize (triangulation.n_levels());
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     {
+      Assert (
       mg_A_preconditioner[level]
 	= std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
       mg_A_preconditioner[level]
