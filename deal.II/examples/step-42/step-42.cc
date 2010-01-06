@@ -34,6 +34,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
 #include <grid/grid_tools.h>
+#include <grid/grid_out.h>
 #include <grid/grid_refinement.h>
 
 #include <dofs/dof_handler.h>
@@ -1002,6 +1003,15 @@ void StokesProblem<dim>::run ()
 
       if (refinement_cycle > 0)
         refine_mesh ();
+
+      std::ostringstream out_filename;
+      out_filename << "gitter"
+        << refinement_cycle
+        << ".eps";
+
+      std::ofstream grid_output (out_filename.str().c_str());
+      GridOut grid_out;
+      grid_out.write_eps (triangulation, grid_output);
 
       setup_dofs ();
 
