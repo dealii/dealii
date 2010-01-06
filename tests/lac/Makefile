@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -16,7 +16,7 @@ libraries = $(lib-lac.g)  \
 libraries_o = $(lib-lac.o)  \
             $(lib-base.o)
 
-default: run-tests 
+default: run-tests
 
 ############################################################
 
@@ -35,7 +35,7 @@ tests_x = vector-vector vector_memory \
 	constraints_inhomogeneous \
 	constraint_graph_zero \
 	sparse_matrices matrices \
-	block_sparsity_pattern_01 \
+	block_sparsity_pattern_* \
 	block_indices \
 	block_vector \
 	block_vector_* \
