@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,7 +55,7 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 	       const bool variable = false,
 	       const bool symmetric = false,
 	       const bool transpose = false);
-    
+
 				     /**
 				      * Modify the number of smoothing
 				      * steps on finest level.
@@ -79,7 +79,7 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				      * smoothing. The effect is
 				      * overriden by set_symmetric().
 				      */
-    void set_transpose (const bool);    
+    void set_transpose (const bool);
 
 				     /**
 				      * Set #debug to a nonzero value
@@ -88,7 +88,7 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				      * to get more information
 				      */
     void set_debug (const unsigned int level);
-    
+
   protected:
 				     /**
 				      * Number of smoothing steps on
@@ -123,7 +123,7 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				      * is chosen.
 				      */
     bool transpose;
-    
+
 				     /**
 				      * Output debugging information
 				      * to #deallog if this is
@@ -134,7 +134,7 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				     /**
 				      * Memory for auxiliary vectors.
 				      */
-    VectorMemory<VECTOR>& mem;    
+    VectorMemory<VECTOR>& mem;
 };
 
 
@@ -268,7 +268,7 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 				      * each level.  This function
 				      * stores pointers to the level
 				      * matrices and initializes the
-				      * smoothing operator with the 
+				      * smoothing operator with the
                                       * same smoother for each
 				      * level.
 				      *
@@ -294,7 +294,7 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 				      * each level.  This function
 				      * stores pointers to the level
 				      * matrices and initializes the
-				      * smoothing operator with the 
+				      * smoothing operator with the
                                       * according smoother for each
 				      * level.
 				      *
@@ -315,7 +315,7 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 				      * Empty all vectors.
 				      */
     void clear ();
-    
+
 				     /**
 				      * The actual smoothing method.
 				      */
@@ -333,7 +333,7 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 				      * Memory used by this object.
 				      */
     unsigned int memory_consumption () const;
-    
+
 
  private:
 				     /**
@@ -373,7 +373,7 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
  * <tt>Vector<.></tt>, where the template arguments are all combinations of
  * @p float and @p double. Additional instantiations may be created
  * by including the file mg_smoother.templates.h.
- * 
+ *
  * @author Guido Kanschat, 2009
  */
 template<class MATRIX, class RELAX, class VECTOR>
@@ -437,7 +437,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      * each level.  This function
 				      * stores pointers to the level
 				      * matrices and initializes the
-				      * smoothing operator with the 
+				      * smoothing operator with the
                                       * same smoother for each
 				      * level.
 				      *
@@ -463,7 +463,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      * each level.  This function
 				      * stores pointers to the level
 				      * matrices and initializes the
-				      * smoothing operator with the 
+				      * smoothing operator with the
                                       * according smoother for each
 				      * level.
 				      *
@@ -484,7 +484,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      * Empty all vectors.
 				      */
     void clear ();
-    
+
 				     /**
 				      * The actual smoothing method.
 				      */
@@ -502,7 +502,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      * Memory used by this object.
 				      */
     unsigned int memory_consumption () const;
-    
+
 
  private:
 				     /**
@@ -604,7 +604,7 @@ inline void
 MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::clear ()
 {
   smoothers.clear();
-  
+
   unsigned int i=matrices.get_minlevel(),
        max_level=matrices.get_maxlevel();
   for (; i<=max_level; ++i)
@@ -621,7 +621,7 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
-  
+
   matrices.resize(min, max);
   smoothers.resize(min, max);
 
@@ -642,11 +642,11 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
 
-  Assert (data.get_minlevel() == min, 
+  Assert (data.get_minlevel() == min,
       ExcDimensionMismatch(data.get_minlevel(), min));
-  Assert (data.get_maxlevel() == max, 
+  Assert (data.get_maxlevel() == max,
       ExcDimensionMismatch(data.get_maxlevel(), max));
-  
+
   matrices.resize(min, max);
   smoothers.resize(min, max);
 
@@ -668,7 +668,7 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
-  
+
   matrices.resize(min, max);
   smoothers.resize(min, max);
 
@@ -690,10 +690,10 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
-  
-  Assert (data.get_minlevel() == min, 
+
+  Assert (data.get_minlevel() == min,
       ExcDimensionMismatch(data.get_minlevel(), min));
-  Assert (data.get_maxlevel() == max, 
+  Assert (data.get_maxlevel() == max,
       ExcDimensionMismatch(data.get_maxlevel(), max));
 
   matrices.resize(min, max);
@@ -731,7 +731,7 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
     T = false;
   if (this->debug > 0)
     deallog << 'S' << level << ' ';
-  
+
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
@@ -762,7 +762,7 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
     }
   if (this->debug > 0)
     deallog << std::endl;
-  
+
   this->mem.free(r);
   this->mem.free(d);
 }
@@ -781,13 +781,13 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
 
   if (this->variable)
     steps2 *= (1<<(maxlevel-level));
-  
+
   bool T = this->transpose;
   if (this->symmetric && (steps2 % 2 == 0))
     T = false;
   if (this->debug > 0)
     deallog << 'S' << level << ' ';
-  
+
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
@@ -834,7 +834,7 @@ inline void
 MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::clear ()
 {
   smoothers.clear();
-  
+
   unsigned int i=matrices.get_minlevel(),
        max_level=matrices.get_maxlevel();
   for (; i<=max_level; ++i)
@@ -851,7 +851,7 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
-  
+
   matrices.resize(min, max);
   smoothers.resize(min, max);
 
@@ -871,10 +871,10 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
-  
-  Assert (data.get_minlevel() == min, 
+
+  Assert (data.get_minlevel() == min,
       ExcDimensionMismatch(data.get_minlevel(), min));
-  Assert (data.get_maxlevel() == max, 
+  Assert (data.get_maxlevel() == max,
       ExcDimensionMismatch(data.get_maxlevel(), max));
 
   matrices.resize(min, max);
@@ -898,7 +898,7 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
-  
+
   matrices.resize(min, max);
   smoothers.resize(min, max);
 
@@ -920,10 +920,10 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
-  
-  Assert (data.get_minlevel() == min, 
+
+  Assert (data.get_minlevel() == min,
       ExcDimensionMismatch(data.get_minlevel(), min));
-  Assert (data.get_maxlevel() == max, 
+  Assert (data.get_maxlevel() == max,
       ExcDimensionMismatch(data.get_maxlevel(), max));
 
   matrices.resize(min, max);
@@ -951,48 +951,61 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::smooth(
 
   VECTOR* r = this->mem.alloc();
   VECTOR* d = this->mem.alloc();
-  r->reinit(u);
-  d->reinit(u);
 
-  bool T = this->transpose;
-  if (this->symmetric && (steps2 % 2 == 0))
-    T = false;
-  if (this->debug > 0)
-    deallog << 'S' << level << ' ';
-  
-  for (unsigned int i=0; i<steps2; ++i)
+  try
     {
-      if (T)
+      r->reinit(u);
+      d->reinit(u);
+
+      bool T = this->transpose;
+      if (this->symmetric && (steps2 % 2 == 0))
+	T = false;
+      if (this->debug > 0)
+	deallog << 'S' << level << ' ';
+
+      for (unsigned int i=0; i<steps2; ++i)
 	{
-	  if (this->debug > 0)
-	    deallog << 'T';
-	  matrices[level].Tvmult(*r,u);
-	  r->sadd(-1.,1.,rhs);
-	  if (this->debug > 2)
-	    deallog << ' ' << r->l2_norm() << ' ';
-	  smoothers[level].Tvmult(*d, *r);
-	  if (this->debug > 1)
-	    deallog << ' ' << d->l2_norm() << ' ';
-	} else {
-	  if (this->debug > 0)
-	    deallog << 'N';
-	  matrices[level].vmult(*r,u);
-	  r->sadd(-1.,1.,rhs);
-	  if (this->debug > 2)
-	    deallog << ' ' << r->l2_norm() << ' ';
-	  smoothers[level].vmult(*d, *r);
-	  if (this->debug > 1)
-	    deallog << ' ' << d->l2_norm() << ' ';
+	  if (T)
+	    {
+	      if (this->debug > 0)
+		deallog << 'T';
+	      matrices[level].Tvmult(*r,u);
+	      r->sadd(-1.,1.,rhs);
+	      if (this->debug > 2)
+		deallog << ' ' << r->l2_norm() << ' ';
+	      smoothers[level].Tvmult(*d, *r);
+	      if (this->debug > 1)
+		deallog << ' ' << d->l2_norm() << ' ';
+	    } else {
+	    if (this->debug > 0)
+	      deallog << 'N';
+	    matrices[level].vmult(*r,u);
+	    r->sadd(-1.,1.,rhs);
+	    if (this->debug > 2)
+	      deallog << ' ' << r->l2_norm() << ' ';
+	    smoothers[level].vmult(*d, *r);
+	    if (this->debug > 1)
+	      deallog << ' ' << d->l2_norm() << ' ';
+	  }
+	  u += *d;
+	  if (this->symmetric)
+	    T = !T;
 	}
-      u += *d;
-      if (this->symmetric)
-	T = !T;
+      if (this->debug > 0)
+	deallog << std::endl;
+
+      this->mem.free(r);
+      this->mem.free(d);
     }
-  if (this->debug > 0)
-    deallog << std::endl;
-  
-  this->mem.free(r);
-  this->mem.free(d);
+  catch (...)
+    {
+				       // make sure we don't produce a
+				       // memory leak
+      this->mem.free(r);
+      this->mem.free(d);
+
+      throw;
+    }
 }
 
 
