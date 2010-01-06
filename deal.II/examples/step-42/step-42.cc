@@ -377,9 +377,6 @@ void StokesProblem<dim>::setup_dofs ()
             << " (" << n_u << '+' << n_p << ')'
             << std::endl;
 
-
-
-
   {
     BlockCompressedSimpleSparsityPattern csp (2,2);
 
@@ -424,9 +421,12 @@ void StokesProblem<dim>::setup_dofs ()
 
   MGTools::count_dofs_per_block (dof_handler, mg_dofs_per_component,
 				 block_component);
-
-//  for (unsigned int level=0; level<nlevels; ++level)
-//    std::cout << mg_dofs_per_component[level].size () << std::endl;
+  for (unsigned int level=0; level<nlevels; ++level)
+    std::cout << "                        Level " << level << ": "
+	      << dof_handler.n_dofs (level) << " ("
+	      << mg_dofs_per_component[level][0] << '+'
+      	      << mg_dofs_per_component[level][1] << ')'
+	      << std::endl;
 
   for (unsigned int level=0; level<nlevels; ++level)
   {
