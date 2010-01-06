@@ -92,7 +92,7 @@ namespace
 
     std::vector<std::vector<unsigned int> >
       ndofs(mg_dof.get_tria().n_levels(),
-	    std::vector<unsigned int>(n_blocks));
+	    std::vector<unsigned int>(n_target_blocks));
     MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
 
     for (unsigned int level=v.get_minlevel();
