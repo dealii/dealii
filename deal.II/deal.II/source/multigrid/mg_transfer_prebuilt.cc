@@ -32,19 +32,19 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-template <typename number>
+template <typename VECTOR>
 template <int dim, int spacedim>
-void MGTransferPrebuilt<number>::build_matrices (
+void MGTransferPrebuilt<VECTOR>::build_matrices (
   const MGDoFHandler<dim,spacedim> &mg_dof)
 {
   //start building the matrices here
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
-  
+
   sizes.resize(n_levels);
   for (unsigned int l=0;l<n_levels;++l)
     sizes[l] = mg_dof.n_dofs(l);
-  
+
 				   // reset the size of the array of
 				   // matrices. call resize(0) first,
 				   // in order to delete all elements
@@ -57,7 +57,7 @@ void MGTransferPrebuilt<number>::build_matrices (
 				   // by itself
   prolongation_matrices.resize (0);
   prolongation_sparsities.resize (0);
-  
+
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities
@@ -65,13 +65,13 @@ void MGTransferPrebuilt<number>::build_matrices (
       prolongation_matrices
 	.push_back (std_cxx1x::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
     }
-  
+
 				   // two fields which will store the
 				   // indices of the multigrid dofs
 				   // for a cell and one of its children
   std::vector<unsigned int> dof_indices_parent (dofs_per_cell);
   std::vector<unsigned int> dof_indices_child (dofs_per_cell);
-  
+
 				   // for each level: first build the sparsity
 				   // pattern of the matrices and then build the
 				   // matrices themselves. note that we only
@@ -92,7 +92,7 @@ void MGTransferPrebuilt<number>::build_matrices (
       prolongation_sparsities[level]->reinit (sizes[level+1],
 					      sizes[level],
 					      dofs_per_cell+1);
-      
+
       for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	if (cell->has_children())
@@ -110,7 +110,7 @@ void MGTransferPrebuilt<number>::build_matrices (
 		  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
 
 		Assert (prolongation.n() != 0, ExcNoProlongation());
-		
+
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
 						 // now tag the entries in the
@@ -145,7 +145,7 @@ void MGTransferPrebuilt<number>::build_matrices (
 						 // this child
 		const FullMatrix<double> &prolongation
 		  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
-	    
+
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
 						 // now set the entries in the
@@ -159,9 +159,9 @@ void MGTransferPrebuilt<number>::build_matrices (
 	      }
 	  }
     }
-  // impose boundary conditions 
-  // but only in the column of 
-  // the prolongation matrix 
+  // impose boundary conditions
+  // but only in the column of
+  // the prolongation matrix
   //TODO: this way is not very efficient
   std::vector<std::set<unsigned int> > boundary_indices (mg_dof.get_tria().n_levels());
   typename FunctionMap<dim>::type boundary;
@@ -178,7 +178,7 @@ void MGTransferPrebuilt<number>::build_matrices (
     for (unsigned int i=0; i<n_dofs; ++i)
     {
       SparseMatrix<double>::iterator anfang = prolongation_matrices[level]->begin(i),
-        ende = prolongation_matrices[level]->end(i); 
+        ende = prolongation_matrices[level]->end(i);
       for(; anfang != ende; ++anfang)
       {
         std::set<unsigned int>::const_iterator dof = boundary_indices[level].begin(),
@@ -193,7 +193,7 @@ void MGTransferPrebuilt<number>::build_matrices (
       }
     }
   }
-  
+
   find_dofs_on_refinement_edges (mg_dof);
 				   // Prepare indices to copy from a
 				   // global vector to the parts of an
@@ -209,7 +209,7 @@ void MGTransferPrebuilt<number>::build_matrices (
 	level_cell = mg_dof.begin_active(level);
       const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_end  = mg_dof.end_active(level);
-      
+
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
@@ -221,7 +221,7 @@ void MGTransferPrebuilt<number>::build_matrices (
 					   // numbering
 	  global_cell.get_dof_indices(global_dof_indices);
 	  level_cell->get_mg_dof_indices (level_dof_indices);
-	  
+
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
               if(!dofs_on_refinement_edge[level][level_dof_indices[i]])
