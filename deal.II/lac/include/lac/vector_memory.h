@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,7 +90,7 @@ class VectorMemory : public Subscriptor
 				      * vectors: they are unspecified.
 				      */
     virtual VECTOR* alloc () = 0;
-    
+
 				     /**
 				      * Return a vector and indicate
 				      * that it is not going to be
@@ -102,7 +102,7 @@ class VectorMemory : public Subscriptor
 
 				     /** @addtogroup Exceptions
 				      * @{ */
-    
+
 				     /**
 				      * No more available vectors.
 				      */
@@ -142,12 +142,12 @@ class VectorMemory : public Subscriptor
 					  * Conversion to regular pointer.
 					  */
 	operator VECTOR* () const;
-	
+
 					 /**
 					  * Dereferencing operator.
 					  */
 	VECTOR& operator * () const;
-	
+
 					 /**
 					  * Dereferencing operator.
 					  */
@@ -161,7 +161,7 @@ class VectorMemory : public Subscriptor
 					  * The pointer to the vector.
 					  */
 	VECTOR* v;
-    };    
+    };
 };
 
 
@@ -203,7 +203,7 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
       {
 	return new VECTOR();
       }
-    
+
 				     /**
 				      * Return a vector and indicate
 				      * that it is not going to be
@@ -260,7 +260,7 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
  * template GrowingVectorMemory<MyVector>::Pool
  *   GrowingVectorMemory<MyVector>::pool;
  * @endcode
- * 
+ *
  * @author Guido Kanschat, 1999, 2007
  */
 template<class VECTOR = dealii::Vector<double> >
@@ -288,7 +288,7 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * are allocated vectors left.
 				      */
     ~GrowingVectorMemory();
-    
+
 				     /**
 				      * Return a pointer to a new
 				      * vector. The number of elements
@@ -301,7 +301,7 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * vectors: they are unspecified.
 				      */
     virtual VECTOR* alloc ();
-    
+
 				     /**
 				      * Return a vector and indicate
 				      * that it is not going to be
@@ -321,13 +321,13 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * not currently in use.
 				      */
     static void release_unused_memory ();
-    
+
 				     /**
 				      * Memory consumed by this class
 				      * and all currently allocated
 				      * vectors.
 				      */
-    unsigned int memory_consumption() const;
+    virtual unsigned int memory_consumption() const;
 
   private:
 				     /**
@@ -363,12 +363,12 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 /// Pointer to the storage object
 	std::vector<entry_type>* data;
     };
-    
+
 				     /**
 				      * Array of allocated vectors.
 				      */
     static Pool pool;
-    
+
 				     /**
 				      * Overall number of
 				      * allocations. Only used for
@@ -383,14 +383,14 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * for detecting memory leaks.
 				      */
     unsigned int current_alloc;
-    
+
 				     /**
 				      * A flag controlling the logging
 				      * of statistics by the
 				      * destructor.
 				      */
     bool log_statistics;
-    
+
 				     /**
 				      * Mutex to synchronise access to
 				      * internal data of this object
@@ -488,7 +488,7 @@ GrowingVectorMemory<VECTOR>::Pool::initialize(const unsigned int size)
   if (data == 0)
     {
       data = new std::vector<entry_type>(size);
-      
+
       for (typename std::vector<entry_type>::iterator i= data->begin();
 	   i != data->end();
 	   ++i)
@@ -504,7 +504,7 @@ template <typename VECTOR>
 inline
 GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size,
 						  const bool log_statistics)
-		
+
 		:
 		total_alloc(0),
 		current_alloc(0),
@@ -556,7 +556,7 @@ GrowingVectorMemory<VECTOR>::alloc ()
 				   // just allocate a new one
   const entry_type t (true, new VECTOR);
   pool.data->push_back(t);
-  
+
   return t.second;
 }
 
@@ -602,7 +602,7 @@ GrowingVectorMemory<VECTOR>::release_unused_memory ()
 	  delete i->second;
 	else
 	  new_data.push_back (*i);
-  
+
       *pool.data = new_data;
     }
 }
