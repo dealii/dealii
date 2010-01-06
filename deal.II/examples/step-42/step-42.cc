@@ -90,6 +90,27 @@ struct InnerPreconditioner<3>
     typedef SparseILU<double> type;
 };
 
+template <typename MATRIX>
+void copy(const MATRIX &matrix,
+    FullMatrix<double> &full_matrix)
+{
+  const unsigned int m = matrix.m();
+  const unsigned int n = matrix.n();
+  full_matrix.reinit(n,m);
+
+  Vector<double> unit (n);
+  Vector<double> result (m);
+  for(unsigned int i=0; i<n; ++i)
+  {
+    unit(i) = 1;
+    for(unsigned int j=0; j<m; ++j)
+    {
+      matrix.vmult(result,unit);
+      full_matrix(i,j) = result(j);
+    }
+    unit(i) = 0;
+  }
+}
 
 template <int dim>
 class StokesProblem
@@ -286,6 +307,11 @@ class SchurComplement : public Subscriptor
 	return system_matrix->block(1,1).m();
       }
 
+    unsigned int n() const
+      {
+	return system_matrix->block(1,1).n();
+      }
+
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
     const SmartPointer<const InverseMatrix<SparseMatrix<double>, Preconditioner> > A_inverse;
@@ -311,10 +337,12 @@ template <class Preconditioner>
 void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
 					     const Vector<double> &src) const
 {
+//  std::cout << " SRC " << src.l2_norm() << std::endl;
   system_matrix->block(0,1).vmult (tmp1, src);
   A_inverse->name = "in schur";
   A_inverse->vmult (tmp2, tmp1);
   system_matrix->block(1,0).vmult (dst, tmp2);
+//  std::cout << " DST " << dst.l2_norm() << std::endl;
 }
 
 
@@ -430,6 +458,8 @@ void StokesProblem<dim>::setup_dofs ()
 
   for (unsigned int level=0; level<nlevels; ++level)
   {
+    DoFRenumbering::component_wise (dof_handler, level, block_component);
+
     BlockCompressedSparsityPattern bcsp (mg_dofs_per_component[level],
         mg_dofs_per_component[level]);
     MGTools::make_sparsity_pattern(dof_handler, bcsp, level);
@@ -704,8 +734,11 @@ vmult (BlockVector<double> &dst,
     Vector<double> schur_rhs (dst.block(1).size());
     A_inverse.name = "rhs";
     A_inverse.vmult (tmp, src.block(0));
+//    std::cout << " TMP " << tmp.l2_norm() << std::endl;
     system_matrix->block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= src.block(1);
+//    std::cout << " BLOCK 1 " << src.block(1).l2_norm() << std::endl;
+//    std::cout << " SCHUR RHS " << schur_rhs.l2_norm() << std::endl;
 
     SchurComplement<InnerPreconditioner>
       schur_complement (*system_matrix, A_inverse);
@@ -714,11 +747,22 @@ vmult (BlockVector<double> &dst,
 				     // the solver call are created...
     SolverControl solver_control (dst.block(1).size(),
 				  1e-1*schur_rhs.l2_norm());
-    SolverCG<>    cg (solver_control);
+    SolverGMRES<>    cg (solver_control);
 
     std::cout << "    Starting Schur complement solver -- "
 	      << schur_complement.m() << " unknowns"
 	      << std::endl;
+    /*
+    FullMatrix<double> full_schur(schur_complement.n(),schur_complement.m());
+    copy(schur_complement, full_schur);
+    std::ostringstream filename;
+    filename << "schur_matrix";
+    std::ofstream output (filename.str().c_str());
+    full_schur.print_formatted(output, 1, true,0,"0",1,0);
+    std::cout << full_schur.relative_symmetry_norm2 () << std::endl;
+    std::cout << full_schur.frobenius_norm () << std::endl;
+    abort();
+    */
     try
       {
 	cg.solve (schur_complement, dst.block(1), schur_rhs,
@@ -918,6 +962,21 @@ StokesProblem<dim>::refine_mesh ()
 template <int dim>
 void StokesProblem<dim>::run ()
 {
+/*
+  FullMatrix<double> test_matrix (3,2);
+  test_matrix(0,0) = 0;
+  test_matrix(0,1) = 1;
+  test_matrix(1,0) = 2;
+  test_matrix(1,1) = 3;
+  test_matrix(2,0) = 4;
+  test_matrix(2,1) = 5;
+  FullMatrix<double> copy_matrix (3,2);
+
+  copy(test_matrix, copy_matrix);
+  copy_matrix.print(std::cout);
+
+  abort();
+  */
   {
     std::vector<unsigned int> subdivisions (dim, 1);
     subdivisions[0] = 1;
