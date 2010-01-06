@@ -32,6 +32,7 @@ namespace internal
     template <int dim, typename number, int spacedim>
     void
     reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+                   std::vector<unsigned int> ,
 		   MGLevelObject<dealii::Vector<number> > &v)
     {
       for (unsigned int level=v.get_minlevel();
@@ -47,18 +48,35 @@ namespace internal
     template <int dim, typename number, int spacedim>
     void
     reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+                   std::vector<unsigned int> target_component,
 		   MGLevelObject<BlockVector<number> > &v)
     {
       const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+      if (target_component.size()==0)
+      {
+        target_component.resize(n_blocks);
+        for (unsigned int i=0;i<n_blocks;++i)
+          target_component[i] = i;
+      }
+      Assert(target_component.size()==n_blocks,
+          ExcDimensionMismatch(target_component.size(),n_blocks));
+      const unsigned int max_block
+        = *std::max_element (target_component.begin(),
+            target_component.end());
+      const unsigned int n_target_blocks = max_block + 1;
+
       std::vector<std::vector<unsigned int> >
 	ndofs(mg_dof.get_tria().n_levels(),
 	      std::vector<unsigned int>(n_blocks));
-      MGTools::count_dofs_per_block (mg_dof, ndofs);
+      MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
 
       for (unsigned int level=v.get_minlevel();
 	   level<=v.get_maxlevel();++level)
 	{
-	  v[level].reinit(ndofs[level]);
+	  v[level].reinit(n_target_blocks);
+          for (unsigned int b=0; b<n_target_blocks; ++b)
+            v[level].block(b).reinit(ndofs[level][b]);
+          v[level].collect_sizes();
 	}
     }
 
@@ -285,16 +303,20 @@ namespace internal
   {
     template void reinit_vector<deal_II_dimension> (
       const dealii::MGDoFHandler<deal_II_dimension>&,
+      std::vector<unsigned int>,
       MGLevelObject<dealii::Vector<double> >&);
     template void reinit_vector<deal_II_dimension> (
       const dealii::MGDoFHandler<deal_II_dimension>&,
+      std::vector<unsigned int>,
       MGLevelObject<dealii::Vector<float> >&);
 
     template void reinit_vector<deal_II_dimension> (
       const dealii::MGDoFHandler<deal_II_dimension>&,
+      std::vector<unsigned int>,
       MGLevelObject<BlockVector<double> >&);
     template void reinit_vector<deal_II_dimension> (
       const dealii::MGDoFHandler<deal_II_dimension>&,
+      std::vector<unsigned int>,
       MGLevelObject<BlockVector<float> >&);
 
     template void reinit_vector_by_components<deal_II_dimension> (
