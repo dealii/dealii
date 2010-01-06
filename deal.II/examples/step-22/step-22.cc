@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 2008, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -12,8 +12,8 @@
 
 
 				 // @sect3{Include files}
-                        
-				 // As usual, we start by including 
+
+				 // As usual, we start by including
 				 // some well-known files:
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
@@ -54,8 +54,8 @@
 				 // for the sparse direct solver UMFPACK:
 #include <lac/sparse_direct.h>
 
-				 // This includes the libary for the 
-				 // incomplete LU factorization that will 
+				 // This includes the libary for the
+				 // incomplete LU factorization that will
 				 // be used as a preconditioner in 3D:
 #include <lac/sparse_ilu.h>
 
@@ -68,7 +68,7 @@
 using namespace dealii;
 
 				 // @sect3{Defining the inner preconditioner type}
-                        
+
 				 // As explained in the introduction, we are
 				 // going to use different preconditioners for
 				 // two and three space dimensions,
@@ -87,7 +87,7 @@ struct InnerPreconditioner;
 				 // In 2D, we are going to use a sparse direct
 				 // solver as preconditioner:
 template <>
-struct InnerPreconditioner<2> 
+struct InnerPreconditioner<2>
 {
     typedef SparseDirectUMFPACK type;
 };
@@ -95,14 +95,14 @@ struct InnerPreconditioner<2>
 				 // And the ILU preconditioning in 3D, called
 				 // by SparseILU:
 template <>
-struct InnerPreconditioner<3> 
+struct InnerPreconditioner<3>
 {
     typedef SparseILU<double> type;
 };
 
 
 				 // @sect3{The <code>StokesProblem</code> class template}
-                    
+
 				 // This is an adaptation of step-20, so the
 				 // main class and the data types are the
 				 // same as used there. In this example we
@@ -116,27 +116,27 @@ struct InnerPreconditioner<3>
 				 // <code>hanging_node_constraints</code>
 				 // into <code>constraints</code>.
 template <int dim>
-class StokesProblem 
+class StokesProblem
 {
   public:
     StokesProblem (const unsigned int degree);
     void run ();
-    
+
   private:
     void setup_dofs ();
     void assemble_system ();
     void solve ();
     void output_results (const unsigned int refinement_cycle) const;
     void refine_mesh ();
-    
+
     const unsigned int   degree;
-    
+
     Triangulation<dim>   triangulation;
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
     ConstraintMatrix     constraints;
-    
+
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
 
@@ -200,21 +200,21 @@ class StokesProblem
 				 // filter out the pressure component
 				 // when interpolating the boundary
 				 // values.
-                    
+
 				 // The following function object is a
 				 // representation of the boundary
 				 // values described in the
 				 // introduction:
 template <int dim>
-class BoundaryValues : public Function<dim> 
+class BoundaryValues : public Function<dim>
 {
   public:
     BoundaryValues () : Function<dim>(dim+1) {}
-    
+
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
 
-    virtual void vector_value (const Point<dim> &p, 
+    virtual void vector_value (const Point<dim> &p,
                                Vector<double>   &value) const;
 };
 
@@ -222,11 +222,11 @@ class BoundaryValues : public Function<dim>
 template <int dim>
 double
 BoundaryValues<dim>::value (const Point<dim>  &p,
-			    const unsigned int component) const 
+			    const unsigned int component) const
 {
   Assert (component < this->n_components,
 	  ExcIndexRange (component, 0, this->n_components));
-  
+
   if (component == 0)
     return (p[0] < 0 ? -1 : (p[0] > 0 ? 1 : 0));
   return 0;
@@ -236,7 +236,7 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
 template <int dim>
 void
 BoundaryValues<dim>::vector_value (const Point<dim> &p,
-				   Vector<double>   &values) const 
+				   Vector<double>   &values) const
 {
   for (unsigned int c=0; c<this->n_components; ++c)
     values(c) = BoundaryValues<dim>::value (p, c);
@@ -248,24 +248,24 @@ BoundaryValues<dim>::vector_value (const Point<dim> &p,
 				 // the right hand side which for the
 				 // current example is simply zero:
 template <int dim>
-class RightHandSide : public Function<dim> 
+class RightHandSide : public Function<dim>
 {
   public:
     RightHandSide () : Function<dim>(dim+1) {}
-    
+
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
 
-    virtual void vector_value (const Point<dim> &p, 
+    virtual void vector_value (const Point<dim> &p,
                                Vector<double>   &value) const;
-    
+
 };
 
 
 template <int dim>
 double
 RightHandSide<dim>::value (const Point<dim>  &/*p*/,
-                           const unsigned int /*component*/) const 
+                           const unsigned int /*component*/) const
 {
   return 0;
 }
@@ -274,7 +274,7 @@ RightHandSide<dim>::value (const Point<dim>  &/*p*/,
 template <int dim>
 void
 RightHandSide<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &values) const 
+                                  Vector<double>   &values) const
 {
   for (unsigned int c=0; c<this->n_components; ++c)
     values(c) = RightHandSide<dim>::value (p, c);
@@ -282,14 +282,14 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 				 // @sect3{Linear solvers and preconditioners}
-                        
+
 				 // The linear solvers and preconditioners are
 				 // discussed extensively in the
 				 // introduction. Here, we create the
 				 // respective objects that will be used.
-                        
+
 				 // @sect4{The <code>InverseMatrix</code> class template}
-                        
+
 				 // The <code>InverseMatrix</code>
 				 // class represents the data
 				 // structure for an inverse
@@ -340,9 +340,9 @@ InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
 {}
 
 
-				 // This is the implementation of the 
+				 // This is the implementation of the
 				 // <code>vmult</code> function.
-                    
+
 				 // In this class we use a rather large
 				 // tolerance for the solver control. The
 				 // reason for this is that the function is
@@ -398,7 +398,7 @@ class SchurComplement : public Subscriptor
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
     const SmartPointer<const InverseMatrix<SparseMatrix<double>, Preconditioner> > A_inverse;
-    
+
     mutable Vector<double> tmp1, tmp2;
 };
 
@@ -427,7 +427,7 @@ void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
 
 
 				 // @sect3{StokesProblem class implementation}
-                        
+
 				 // @sect4{StokesProblem::StokesProblem}
 
 				 // The constructor of this class
@@ -446,7 +446,7 @@ void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
 				 // $Q_{degree+1}^d\times Q_{degree}$,
 				 // often referred to as the
 				 // Taylor-Hood element.
-				 //                    
+				 //
 				 // Note that we initialize the triangulation
 				 // with a MeshSmoothing argument, which
 				 // ensures that the refinement of cells is
@@ -468,7 +468,7 @@ StokesProblem<dim>::StokesProblem (const unsigned int degree)
 
 
 				 // @sect4{StokesProblem::setup_dofs}
-                        
+
 				 // Given a mesh, this function
 				 // associates the degrees of freedom
 				 // with it and creates the
@@ -525,11 +525,11 @@ StokesProblem<dim>::StokesProblem (const unsigned int degree)
 				 // use the traditional Cuthill-McKee
 				 // algorithm already used in some of
 				 // the previous tutorial programs.
-				 // In the 
+				 // In the
 				 // <a href="#improved-ilu">section on improved ILU</a>
 				 // we're going to discuss this issue
 				 // in more detail.
-				 
+
 				 // There is one more change compared
 				 // to previous tutorial programs:
 				 // There is no reason in sorting the
@@ -562,8 +562,8 @@ void StokesProblem<dim>::setup_dofs ()
 {
   A_preconditioner.reset ();
   system_matrix.clear ();
-  
-  dof_handler.distribute_dofs (fe);  
+
+  dof_handler.distribute_dofs (fe);
   DoFRenumbering::Cuthill_McKee (dof_handler);
 
   std::vector<unsigned int> block_component (dim+1,0);
@@ -632,7 +632,7 @@ void StokesProblem<dim>::setup_dofs ()
 				   // but now grouped as velocity and pressure
 				   // block via <code>block_component</code>.
   std::vector<unsigned int> dofs_per_block (2);
-  DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);  
+  DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);
   const unsigned int n_u = dofs_per_block[0],
                      n_p = dofs_per_block[1];
 
@@ -643,7 +643,7 @@ void StokesProblem<dim>::setup_dofs ()
             << dof_handler.n_dofs()
             << " (" << n_u << '+' << n_p << ')'
             << std::endl;
-      
+
 				   // The next task is to allocate a
 				   // sparsity pattern for the system matrix
 				   // we will create. We could do this in
@@ -729,24 +729,24 @@ void StokesProblem<dim>::setup_dofs ()
     csp.block(1,0).reinit (n_p, n_u);
     csp.block(0,1).reinit (n_u, n_p);
     csp.block(1,1).reinit (n_p, n_p);
-  
-    csp.collect_sizes();    
-  
+
+    csp.collect_sizes();
+
     DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
     sparsity_pattern.copy_from (csp);
   }
-  
+
 				   // Finally, the system matrix,
-				   // solution and right hand side are 
+				   // solution and right hand side are
 				   // created from the block
 				   // structure as in step-20:
   system_matrix.reinit (sparsity_pattern);
-                                   
+
   solution.reinit (2);
   solution.block(0).reinit (n_u);
   solution.block(1).reinit (n_p);
   solution.collect_sizes ();
-  
+
   system_rhs.reinit (2);
   system_rhs.block(0).reinit (n_u);
   system_rhs.block(1).reinit (n_p);
@@ -755,7 +755,7 @@ void StokesProblem<dim>::setup_dofs ()
 
 
 				 // @sect4{StokesProblem::assemble_system}
-                        
+
 				 // The assembly process follows the
 				 // discussion in step-20 and in the
 				 // introduction. We use the well-known
@@ -765,11 +765,11 @@ void StokesProblem<dim>::setup_dofs ()
 				 // numbering of the degrees of freedom
 				 // for the present cell.
 template <int dim>
-void StokesProblem<dim>::assemble_system () 
+void StokesProblem<dim>::assemble_system ()
 {
   system_matrix=0;
   system_rhs=0;
-  
+
   QGauss<dim>   quadrature_formula(degree+2);
 
   FEValues<dim> fe_values (fe, quadrature_formula,
@@ -777,16 +777,16 @@ void StokesProblem<dim>::assemble_system ()
                            update_quadrature_points  |
                            update_JxW_values |
                            update_gradients);
-  
+
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-  
+
   const unsigned int   n_q_points      = quadrature_formula.size();
 
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       local_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  
+
   const RightHandSide<dim>          right_hand_side;
   std::vector<Vector<double> >      rhs_values (n_q_points,
                                                 Vector<double>(dim+1));
@@ -820,23 +820,23 @@ void StokesProblem<dim>::assemble_system ()
 				   // times, a not insignificant
 				   // difference.
 				   //
-				   // So what we're 
-				   // going to do here is to avoid 
-				   // such repeated calculations by 
-				   // getting a vector of rank-2 
+				   // So what we're
+				   // going to do here is to avoid
+				   // such repeated calculations by
+				   // getting a vector of rank-2
 				   // tensors (and similarly for
 				   // the divergence and the basis
 				   // function value on pressure)
 				   // at the quadrature point prior
 				   // to starting the loop over the
-				   // dofs on the cell. First, we 
+				   // dofs on the cell. First, we
 				   // create the respective objects
 				   // that will hold these
 				   // values. Then, we start the
 				   // loop over all cells and the loop
-				   // over the quadrature points, 
-				   // where we first extract these 
-				   // values. There is one more 
+				   // over the quadrature points,
+				   // where we first extract these
+				   // values. There is one more
 				   // optimization we implement here:
 				   // the local matrix (as well as
 				   // the global one) is going to
@@ -851,19 +851,19 @@ void StokesProblem<dim>::assemble_system ()
   std::vector<SymmetricTensor<2,dim> > phi_grads_u (dofs_per_cell);
   std::vector<double>                  div_phi_u   (dofs_per_cell);
   std::vector<double>                  phi_p       (dofs_per_cell);
-				   
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
-    { 
+    {
       fe_values.reinit (cell);
       local_matrix = 0;
       local_rhs = 0;
-      
+
       right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                         rhs_values);
-      
+
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -881,13 +881,13 @@ void StokesProblem<dim>::assemble_system ()
 					- div_phi_u[i] * phi_p[j]
 					- phi_p[i] * div_phi_u[j]
 					+ phi_p[i] * phi_p[j])
-				       * fe_values.JxW(q);     
+				       * fe_values.JxW(q);
 
 		}
 
 	      const unsigned int component_i =
 		fe.system_to_component_index(i).first;
-	      local_rhs(i) += fe_values.shape_value(i,q) * 
+	      local_rhs(i) += fe_values.shape_value(i,q) *
 			      rhs_values[q](component_i) *
 			      fe_values.JxW(q);
 	    }
@@ -940,10 +940,10 @@ void StokesProblem<dim>::assemble_system ()
 
       cell->get_dof_indices (local_dof_indices);
       constraints.distribute_local_to_global (local_matrix, local_rhs,
-					      local_dof_indices, 
+					      local_dof_indices,
 					      system_matrix, system_rhs);
     }
-  
+
 				   // Before we're going to solve this
 				   // linear system, we generate a
 				   // preconditioner for the
@@ -959,7 +959,7 @@ void StokesProblem<dim>::assemble_system ()
 				   // anything different whether we want to
 				   // use a sparse direct solver or an ILU:
   std::cout << "   Computing preconditioner..." << std::endl << std::flush;
-      
+
   A_preconditioner
     = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
   A_preconditioner->initialize (system_matrix.block(0,0),
@@ -970,7 +970,7 @@ void StokesProblem<dim>::assemble_system ()
 
 
 				 // @sect4{StokesProblem::solve}
-                        
+
 				 // After the discussion in the introduction
 				 // and the definition of the respective
 				 // classes above, the implementation of the
@@ -985,13 +985,13 @@ void StokesProblem<dim>::assemble_system ()
 				 // of type
 				 // <code>InnerPreconditioner@<dim@>::type</code>.
 template <int dim>
-void StokesProblem<dim>::solve () 
+void StokesProblem<dim>::solve ()
 {
   const InverseMatrix<SparseMatrix<double>,
                       typename InnerPreconditioner<dim>::type>
     A_inverse (system_matrix.block(0,0), *A_preconditioner);
   Vector<double> tmp (solution.block(0).size());
-  
+
 				   // This is as in step-20. We generate the
 				   // right hand side $B A^{-1} F - G$ for the
 				   // Schur complement and an object that
@@ -1005,16 +1005,16 @@ void StokesProblem<dim>::solve ()
     A_inverse.vmult (tmp, system_rhs.block(0));
     system_matrix.block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= system_rhs.block(1);
-  
+
     SchurComplement<typename InnerPreconditioner<dim>::type>
       schur_complement (system_matrix, A_inverse);
-    
+
 				     // The usual control structures for
 				     // the solver call are created...
     SolverControl solver_control (solution.block(1).size(),
 				  1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
-    
+
 				     // Now to the preconditioner to the
 				     // Schur complement. As explained in
 				     // the introduction, the
@@ -1060,12 +1060,12 @@ void StokesProblem<dim>::solve ()
 				     // of iterations, but the costs for its
 				     // generation are almost neglible.
     SparseILU<double> preconditioner;
-    preconditioner.initialize (system_matrix.block(1,1), 
+    preconditioner.initialize (system_matrix.block(1,1),
       SparseILU<double>::AdditionalData());
-  
+
     InverseMatrix<SparseMatrix<double>,SparseILU<double> >
       m_inverse (system_matrix.block(1,1), preconditioner);
-    
+
 				     // With the Schur complement and an
 				     // efficient preconditioner at hand, we
 				     // can solve the respective equation
@@ -1074,21 +1074,20 @@ void StokesProblem<dim>::solve ()
 				     // way:
     cg.solve (schur_complement, solution.block(1), schur_rhs,
 	      m_inverse);
-  
+
 				     // After this first solution step, the
 				     // hanging node constraints have to be
 				     // distributed to the solution in order
 				     // to achieve a consistent pressure
 				     // field.
     constraints.distribute (solution);
-  
+
     std::cout << "  "
 	      << solver_control.last_step()
 	      << " outer CG Schur complement iterations for pressure"
-	      << std::flush
-	      << std::endl;    
+	      << std::endl;
   }
-    
+
 				   // As in step-20, we finally need to
 				   // solve for the velocity equation where
 				   // we plug in the solution to the
@@ -1104,7 +1103,7 @@ void StokesProblem<dim>::solve ()
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     tmp *= -1;
     tmp += system_rhs.block(0);
-  
+
     A_inverse.vmult (solution.block(0), tmp);
 
     constraints.distribute (solution);
@@ -1113,7 +1112,7 @@ void StokesProblem<dim>::solve ()
 
 
 				 // @sect4{StokesProblem::output_results}
-                        
+
 				 // The next function generates graphical
 				 // output. In this example, we are going to
 				 // use the VTK file format.  We attach
@@ -1160,20 +1159,20 @@ StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
 {
   std::vector<std::string> solution_names (dim, "velocity");
   solution_names.push_back ("pressure");
-  
+
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation
     (dim, DataComponentInterpretation::component_is_part_of_vector);
   data_component_interpretation
     .push_back (DataComponentInterpretation::component_is_scalar);
-      
+
   DataOut<dim> data_out;
-  data_out.attach_dof_handler (dof_handler);  
+  data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
   data_out.build_patches ();
-  
+
   std::ostringstream filename;
   filename << "solution-"
            << Utilities::int_to_string (refinement_cycle, 2)
@@ -1185,7 +1184,7 @@ StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
 
 
 				 // @sect4{StokesProblem::refine_mesh}
-                        
+
 				 // This is the last interesting function of
 				 // the <code>StokesProblem</code> class.
 				 // As indicated by its name, it takes the
@@ -1200,7 +1199,7 @@ StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
 				 // the grid again:
 template <int dim>
 void
-StokesProblem<dim>::refine_mesh () 
+StokesProblem<dim>::refine_mesh ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -1221,7 +1220,7 @@ StokesProblem<dim>::refine_mesh ()
 
 
 				 // @sect4{StokesProblem::run}
-                        
+
 				 // The last step in the Stokes class is, as
 				 // usual, the function that generates the
 				 // initial grid and calls the other
@@ -1242,7 +1241,7 @@ StokesProblem<dim>::refine_mesh ()
 				 // need them, we put the entire block
 				 // between a pair of braces:
 template <int dim>
-void StokesProblem<dim>::run () 
+void StokesProblem<dim>::run ()
 {
   {
     std::vector<unsigned int> subdivisions (dim, 1);
@@ -1254,13 +1253,13 @@ void StokesProblem<dim>::run ()
     const Point<dim> top_right   = (dim == 2 ?
 				    Point<dim>(2,0) :
 				    Point<dim>(2,1,0));
-    
+
     GridGenerator::subdivided_hyper_rectangle (triangulation,
 					       subdivisions,
 					       bottom_left,
 					       top_right);
   }
-  
+
 				   // A boundary indicator of 1 is set to all
 				   // boundaries that are subject to Dirichlet
 				   // boundary conditions, i.e.  to faces that
@@ -1273,8 +1272,8 @@ void StokesProblem<dim>::run ()
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->center()[dim-1] == 0)
 	cell->face(f)->set_all_boundary_indicators(1);
-  
-  
+
+
 				   // We then apply an initial refinement
 				   // before solving for the first time. In
 				   // 3D, there are going to be more degrees
@@ -1291,18 +1290,18 @@ void StokesProblem<dim>::run ()
        ++refinement_cycle)
     {
       std::cout << "Refinement cycle " << refinement_cycle << std::endl;
-      
+
       if (refinement_cycle > 0)
         refine_mesh ();
-      
+
       setup_dofs ();
 
       std::cout << "   Assembling..." << std::endl << std::flush;
-      assemble_system ();      
+      assemble_system ();
 
       std::cout << "   Solving..." << std::flush;
       solve ();
-      
+
       output_results (refinement_cycle);
 
       std::cout << std::endl;
@@ -1316,7 +1315,7 @@ void StokesProblem<dim>::run ()
 				 // step-20. We pass the element degree as a
 				 // parameter and choose the space dimension
 				 // at the well-known template slot.
-int main () 
+int main ()
 {
   try
     {
@@ -1335,10 +1334,10 @@ int main ()
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
                 << "----------------------------------------------------"
