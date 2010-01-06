@@ -28,9 +28,6 @@ DEAL_II_NAMESPACE_OPEN
 
 /* --------------------- MGTransferPrebuilt -------------- */
 
-// Simplify some things below
-typedef std::map<unsigned int, unsigned int>::const_iterator IT;
-
 
 template <class VECTOR>
 template <int dim, class InVector, int spacedim>
@@ -45,6 +42,8 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
     {
       --level;
+
+      typedef std::map<unsigned int, unsigned int>::const_iterator IT;
       for (IT i= copy_indices[level].begin();
 	   i != copy_indices[level].end();++i)
 	dst[level](i->second) = src(i->first);
@@ -81,6 +80,7 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   dst = 0;
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
   {
+    typedef std::map<unsigned int, unsigned int>::const_iterator IT;
     for (IT i= copy_indices[level].begin();
 	 i != copy_indices[level].end();++i)
       dst(i->first) = src[level](i->second);
@@ -106,6 +106,7 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
 				       // to the coarse level, but
 				       // have fine level basis
 				       // functions
+  typedef std::map<unsigned int, unsigned int>::const_iterator IT;
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
     for (IT i= copy_indices[level].begin();
 	 i != copy_indices[level].end();++i)
