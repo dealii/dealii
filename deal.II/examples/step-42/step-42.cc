@@ -276,6 +276,7 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
       abort ();
     }
 
+#ifdef STEP_42_TEST
   if (name == "in schur")
     std::cout << "      " << solver_control.last_step()
 	      << " inner CG steps inside the Schur complement ";
@@ -290,6 +291,7 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
 
   std::cout << solver_control.initial_value() << "->" << solver_control.last_value()
 	    << std::endl;
+#endif
 }
 
 template <class Preconditioner>
@@ -669,7 +671,6 @@ void StokesProblem<dim>::assemble_multigrid ()
   mg_A_preconditioner.resize (triangulation.n_levels());
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     {
-      Assert (
       mg_A_preconditioner[level]
 	= std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
       mg_A_preconditioner[level]
@@ -724,7 +725,9 @@ SchurComplementSmoother<InnerPreconditioner>::
 vmult (BlockVector<double> &dst,
        const BlockVector<double> &src) const
 {
+#ifdef STEP_42_TEST
   std::cout << "Entering smoother with " << dst.size() << " unknowns" << std::endl;
+#endif
 
   const InverseMatrix<SparseMatrix<double>,InnerPreconditioner>
     A_inverse (system_matrix->block(0,0), *A_preconditioner);
@@ -750,9 +753,11 @@ vmult (BlockVector<double> &dst,
 				  1e-1*schur_rhs.l2_norm());
     SolverGMRES<>    cg (solver_control);
 
+#ifdef STEP_42_TEST
     std::cout << "    Starting Schur complement solver -- "
 	      << schur_complement.m() << " unknowns"
 	      << std::endl;
+#endif
     /*
     FullMatrix<double> full_schur(schur_complement.n(),schur_complement.m());
     copy(schur_complement, full_schur);
@@ -777,12 +782,13 @@ vmult (BlockVector<double> &dst,
       }
 
 // no constraints to be taken care of here
-
+#ifdef STEP_42_TEST
     std::cout << "    "
 	      << solver_control.last_step()
 	      << " CG Schur complement iterations in smoother "
 	      << solver_control.initial_value() << "->" << solver_control.last_value()
 	      << std::endl;
+#endif
   }
 
 
@@ -795,8 +801,9 @@ vmult (BlockVector<double> &dst,
     A_inverse.vmult (dst.block(0), tmp);
 // no constraints here either
   }
-
+#ifdef STEP_42_TEST
   std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
+#endif
 }
 
 
@@ -885,7 +892,9 @@ void StokesProblem<dim>::solve ()
       gmres_data);
 
 //  PreconditionIdentity precondition_identity;
+#ifdef STEP_42_TEST
   std::cout << "Starting outer GMRES complement solver" << std::endl;
+#endif
   try
     {
       gmres.solve(system_matrix, solution, system_rhs,
@@ -899,9 +908,8 @@ void StokesProblem<dim>::solve ()
 
   constraints.distribute (solution);
 
-  std::cout << std::endl << " "
-    << solver_control.last_step()
-    << " outer GMRES iterations";
+  std::cout << solver_control.last_step()
+	    << " outer GMRES iterations";
 }
 
 
