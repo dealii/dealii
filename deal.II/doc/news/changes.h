@@ -376,15 +376,24 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li>
+    <p>
+    Fixed: SparsityPattern::copy_from crashed whenever a compressed sparsity
+    pattern was copied that had either zero rows or zero columns. This is now
+    fixed.
+    </p>
+  <br>
+  (WB 2010/01/06)
+  </li>
 
   <li>
     <p>
-    New: In householder.h the function least_squares can handle BlockVectors as
-    well now. Note that in one place we still have to copy to a Vector to use 
+    New: The function Householder::least_squares can handle BlockVectors as
+    well now. Note that in one place we still have to copy to a Vector to use
     the function backward from FullMatrix.
     </p>
   <br>
-  (Bärbel Janssen 2010/01/05)
+  (B&auml;rbel Janssen 2010/01/05)
   </li>
 
   <li>
