@@ -220,6 +220,7 @@ class InverseMatrix : public Subscriptor
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
+    mutable std::string name;
   private:
     const SmartPointer<const Matrix> matrix;
     const SmartPointer<const Preconditioner> preconditioner;
@@ -239,7 +240,7 @@ template <class Matrix, class Preconditioner>
 void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
 						  const Vector<double> &src) const
 {
-  SolverControl solver_control (src.size(), 1.0e-12);
+  SolverControl solver_control (src.size(), 1.0e-12*src.l2_norm());
   SolverCG<>    cg (solver_control);
 
   dst = 0;
@@ -254,66 +255,21 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
       abort ();
     }
 
-  std::cout << "  Preconditioner CG steps: " << solver_control.last_step()
-	    << "   "
-	    << matrix->m()
+  if (name == "in schur")
+    std::cout << "      " << solver_control.last_step()
+	      << " inner CG steps inside the Schur complement ";
+  else if (name == "top left")
+    std::cout << "    " << solver_control.last_step()
+	      << " CG steps on the top left block ";
+  else if (name == "rhs")
+    std::cout << "    " << solver_control.last_step()
+	      << " CG steps for computing the r.h.s. ";
+  else
+    abort ();
+
+  std::cout << solver_control.initial_value() << "->" << solver_control.last_value()
 	    << std::endl;
 }
-
-template <class PreconditionerA, class PreconditionerMp>
-class BlockSchurPreconditioner : public Subscriptor
-{
-  public:
-    BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,
-          const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
-          const PreconditionerA &Apreconditioner);
-
-  void vmult (BlockVector<double>       &dst,
-              const BlockVector<double> &src) const;
-
-  private:
-    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double>,
-                       PreconditionerMp > > m_inverse;
-    const PreconditionerA &a_preconditioner;
-
-    mutable Vector<double> tmp;
-
-};
-
-template <class PreconditionerA, class PreconditionerMp>
-BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPreconditioner(
-          const BlockSparseMatrix<double>                            &S,
-          const InverseMatrix<SparseMatrix<double>,PreconditionerMp> &Mpinv,
-          const PreconditionerA &Apreconditioner
-          )
-                :
-                system_matrix           (&S),
-                m_inverse               (&Mpinv),
-                a_preconditioner        (Apreconditioner),
-                tmp                     (S.block(1,1).m())
-{}
-
-        // Now the interesting function, the multiplication of
-        // the preconditioner with a BlockVector.
-template <class PreconditionerA, class PreconditionerMp>
-void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
-                                     BlockVector<double>       &dst,
-                                     const BlockVector<double> &src) const
-{
-        // Form u_new = A^{-1} u
-  a_preconditioner.vmult (dst.block(0), src.block(0));
-        // Form tmp = - B u_new + p
-        // (<code>SparseMatrix::residual</code>
-        // does precisely this)
-  system_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
-        // Change sign in tmp
-  tmp *= -1;
-        // Multiply by approximate Schur complement
-        // (i.e. a pressure mass matrix)
-  m_inverse->vmult (dst.block(1), tmp);
-}
-
 
 template <class Preconditioner>
 class SchurComplement : public Subscriptor
@@ -324,6 +280,11 @@ class SchurComplement : public Subscriptor
 
     void vmult (Vector<double>       &dst,
 		const Vector<double> &src) const;
+
+    unsigned int m() const
+      {
+	return system_matrix->block(1,1).m();
+      }
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
@@ -351,6 +312,7 @@ void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
 					     const Vector<double> &src) const
 {
   system_matrix->block(0,1).vmult (tmp1, src);
+  A_inverse->name = "in schur";
   A_inverse->vmult (tmp2, tmp1);
   system_matrix->block(1,0).vmult (dst, tmp2);
 }
@@ -543,8 +505,7 @@ void StokesProblem<dim>::assemble_system ()
 		{
 		  local_matrix(i,j) += (scalar_product(phi_grads_u[i], phi_grads_u[j])
 					- div_phi_u[i] * phi_p[j]
-					- phi_p[i] * div_phi_u[j]
-					+ phi_p[i] * phi_p[j])
+					- phi_p[i] * div_phi_u[j])
 				       * fe_values.JxW(q);
 		}
 
@@ -653,34 +614,26 @@ void StokesProblem<dim>::assemble_multigrid ()
 		  local_matrix(i,j) += (
                       scalar_product(phi_grads_u[i], phi_grads_u[j])
 					- div_phi_u[i] * phi_p[j]
-					- phi_p[i] * div_phi_u[j]
-					+ phi_p[i] * phi_p[j])
+					- phi_p[i] * div_phi_u[j])
 				       * fe_values.JxW(q);
-
       }
 
-          cell->get_mg_dof_indices (local_dof_indices);
-// 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-// 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-// 	      mg_matrices[level].add (local_dof_indices[i],
-// 				      local_dof_indices[j],
-// 				      local_matrix(i,j));
+      cell->get_mg_dof_indices (local_dof_indices);
+      boundary_constraints[level]
+	.distribute_local_to_global (local_matrix,
+				     local_dof_indices,
+				     mg_matrices[level]);
 
-	  boundary_constraints[level]
-            .distribute_local_to_global (local_matrix,
-                local_dof_indices,
-                mg_matrices[level]);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  if( !(interface_dofs[level][local_dof_indices[i]]==true &&
+		interface_dofs[level][local_dof_indices[j]]==false))
+	    local_matrix(i,j) = 0;
 
-    for (unsigned int i=0; i<dofs_per_cell; ++i)
-      for (unsigned int j=0; j<dofs_per_cell; ++j)
-	if( !(interface_dofs[level][local_dof_indices[i]]==true &&
-	      interface_dofs[level][local_dof_indices[j]]==false))
-	  local_matrix(i,j) = 0;
-
-    boundary_interface_constraints[level]
-      .distribute_local_to_global (local_matrix,
-				   local_dof_indices,
-				   mg_interface_matrices[level]);
+      boundary_interface_constraints[level]
+	.distribute_local_to_global (local_matrix,
+				     local_dof_indices,
+				     mg_interface_matrices[level]);
     }
 
   mg_A_preconditioner.resize (triangulation.n_levels());
@@ -740,6 +693,8 @@ SchurComplementSmoother<InnerPreconditioner>::
 vmult (BlockVector<double> &dst,
        const BlockVector<double> &src) const
 {
+  std::cout << "Entering smoother with " << dst.size() << " unknowns" << std::endl;
+
   const InverseMatrix<SparseMatrix<double>,InnerPreconditioner>
     A_inverse (system_matrix->block(0,0), *A_preconditioner);
   Vector<double> tmp (dst.block(0).size());
@@ -747,6 +702,7 @@ vmult (BlockVector<double> &dst,
 
   {
     Vector<double> schur_rhs (dst.block(1).size());
+    A_inverse.name = "rhs";
     A_inverse.vmult (tmp, src.block(0));
     system_matrix->block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= src.block(1);
@@ -757,37 +713,30 @@ vmult (BlockVector<double> &dst,
 				     // The usual control structures for
 				     // the solver call are created...
     SolverControl solver_control (dst.block(1).size(),
-				  1e-6*schur_rhs.l2_norm());
+				  1e-1*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
-
-
-    SparseILU<double> preconditioner;
-    preconditioner.initialize (system_matrix->block(1,1),
-			       SparseILU<double>::AdditionalData());
-
-    InverseMatrix<SparseMatrix<double>,SparseILU<double> >
-      m_inverse (system_matrix->block(1,1), preconditioner);
-
-
+    std::cout << "    Starting Schur complement solver -- "
+	      << schur_complement.m() << " unknowns"
+	      << std::endl;
     try
       {
 	cg.solve (schur_complement, dst.block(1), schur_rhs,
-		  m_inverse);
+		  PreconditionIdentity());
       }
     catch (...)
       {
 	std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
 	std::cout << schur_rhs.l2_norm () << std::endl;
-      abort ();
+	abort ();
       }
 
 // no constraints to be taken care of here
 
-    std::cout << "  "
+    std::cout << "    "
 	      << solver_control.last_step()
-	      << " CG Schur complement iterations in smoother"
-	      << std::flush
+	      << " CG Schur complement iterations in smoother "
+	      << solver_control.initial_value() << "->" << solver_control.last_value()
 	      << std::endl;
   }
 
@@ -797,10 +746,12 @@ vmult (BlockVector<double> &dst,
     tmp *= -1;
     tmp += src.block(0);
 
+    A_inverse.name = "top left";
     A_inverse.vmult (dst.block(0), tmp);
-
 // no constraints here either
   }
+
+  std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
 }
 
 
@@ -889,6 +840,7 @@ void StokesProblem<dim>::solve ()
       gmres_data);
 
 //  PreconditionIdentity precondition_identity;
+  std::cout << "Starting outer GMRES complement solver" << std::endl;
   try
     {
       gmres.solve(system_matrix, solution, system_rhs,
@@ -904,7 +856,7 @@ void StokesProblem<dim>::solve ()
 
   std::cout << std::endl << " "
     << solver_control.last_step()
-    << " block GMRES iterations";
+    << " outer GMRES iterations";
 }
 
 
@@ -1033,7 +985,7 @@ int main ()
 {
   try
     {
-//      deallog.depth_console (0);
+      deallog.depth_console (0);
 
       StokesProblem<2> flow_problem(1);
       flow_problem.run ();
