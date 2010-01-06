@@ -65,6 +65,64 @@
  * FiniteElement</dd>
  *
  *
+ * <dt class="glossary">@anchor GlossCompress Compressing distributed
+ *                                            vectors and matrices</dt>
+ *
+ * For parallel computations, deal.II uses the vector and matrix
+ * classes defined in the PETScWrappers and TrilinosWrappers
+ * namespaces. When running programs in parallel using MPI, these
+ * classes only store a certain number of rows or elements on the
+ * current processor, whereas the rest of the vector or matrix is
+ * stored on the other processors that belong to our MPI
+ * universe. This presents a certain problem when you assemble linear
+ * systems: we add elements to the matrix and right hand side vectors
+ * that may or may not be stored locally. Sometimes, we may also want
+ * to just <i>set</i> an element, not add to it.
+ *
+ * Both PETSc and Trilinos allow adding to or setting elements that
+ * are not locally stored. In that case, they write the value that we
+ * want to store or add into a cache, and we need to call one of the
+ * functions TrilinosWrappers::VectorBase::compress(),
+ * TrilinosWrappers::SparseMatrix::compress(),
+ * PETScWrappers::VectorBase::compress() or
+ * PETScWrappers::MatrixBase::compress() which will then ship the
+ * values in the cache to the MPI process that owns the element to
+ * which it is supposed to be added or written to. Due to the MPI
+ * model that only allows to initiate communication from the sender
+ * side (i.e. in particular, it is not a remote procedure call), these
+ * functions are collective, i.e. they need to be called by all
+ * processors.
+ *
+ * There is one snag, however: both PETSc and Trilinos need to know
+ * whether the operation that these <code>compress()</code> functions
+ * invoke applies to adding elements or setting them. Usually, you
+ * will have written or added elements to the vector or matrix before
+ * (and after <code>compress()</code> was last called), and in this
+ * case the wrapper object knows that the global communication
+ * operation is either an add or a set operation since it keeps track
+ * of this sort of thing. However, there are cases where this isn't
+ * so: for example, if you are working on a coarse grid and there are
+ * more processors than coarse grid cells; in that case, some
+ * processors will not assemble anything, and when they come to the
+ * point where they call <code>compress()</code> on the system matrix
+ * and right hand side, these objects are still in their pristine
+ * state. In a case like this the wrapper object doesn't know whether
+ * it is supposed to do a global exchange for add or set operations,
+ * and in the worst case you end up with a deadlock (because those
+ * processors that did assembly operations want to communicate, while
+ * those that didn't assemble anything do not want to communicate).
+ *
+ * The way out of a situation like this is to use one of the two following ways:
+ * - You tell the object that you want to compress what operation is
+ *   intended. The TrilinosWrappers::VectorBase::compress() can take
+ *   such an additional argument
+ * - You do a fake addition or set operation on the object in question.
+ *
+ * Some of the objects are also indifferent and can figure out what to
+ * do without being told. The TrilinosWrappers::SparseMatrix can do that,
+ * for example.
+ *
+ *
  * <dt class="glossary">@anchor GlossDistorted Distorted cells</dt>
  *
  * <dd>A <i>distorted cell</i> is a cell for which the mapping from
