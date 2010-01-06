@@ -451,9 +451,12 @@ void StokesProblem<dim>::setup_dofs ()
   mg_dofs_per_component.resize (nlevels);
   for (unsigned int level=0; level<nlevels; ++level)
     mg_dofs_per_component[level].resize (2);
-  
-  MGTools::count_dofs_per_component (dof_handler, mg_dofs_per_component,
+
+  MGTools::count_dofs_per_block (dof_handler, mg_dofs_per_component,
 				 block_component);
+
+  for (unsigned int level=0; level<nlevels; ++level)
+    std::cout << mg_dofs_per_component[level].size () << std::endl;
 
   for (unsigned int level=0; level<nlevels; ++level)
   {
@@ -885,7 +888,7 @@ void StokesProblem<dim>::solve_mg ()
   mg_smoother(mg_vector_memory);
 
   MGLevelObject<typename Smoother::AdditionalData>
-    smoother_data (0, triangulation.n_levels());
+    smoother_data (0, triangulation.n_levels()-1);
 
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     smoother_data[level].A_preconditioner = mg_A_preconditioner[level].get();
@@ -1176,7 +1179,7 @@ int main ()
 {
   try
     {
-      deallog.depth_console (0);
+//      deallog.depth_console (0);
 
       StokesProblem<2> flow_problem(1);
       flow_problem.run ();

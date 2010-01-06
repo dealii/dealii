@@ -23,8 +23,9 @@ debug-mode = on
 # designated by a single-character variable, since that can be
 # reference using $D only, i.e. without the parentheses that are
 # required for most other parameters, as e.g. in $(target).
-D = ../../
+# D = ../../
 
+D = ~/deal.II_mg/deal.II
 
 # The last field specifies the names of data and other files that
 # shall be deleted when calling `make clean'. Object and backup files,
