@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MGDoFHandler;
+template <int,int> class MGDoFHandler;
 
 
 /*
@@ -89,7 +89,7 @@ class MGSmootherBlock
 				      * Empty all vectors.
 				      */
     void clear ();
-    
+
 				     /**
 				      * Modify the number of smoothing
 				      * steps on finest level.
@@ -114,7 +114,7 @@ class MGSmootherBlock
 				      * reverse().
 				      */
     void set_transpose (const bool);
-    
+
 				     /**
 				      * Switch on/off reversed. This
 				      * is mutually exclusive with
@@ -206,7 +206,7 @@ MGSmootherBlock<MATRIX, RELAX, number>::MGSmootherBlock(
 template <class MATRIX, class RELAX, typename number>
 inline void
 MGSmootherBlock<MATRIX, RELAX, number>::clear ()
-{  
+{
   unsigned int i=matrices.get_minlevel(),
        max_level=matrices.get_maxlevel();
   for (; i<=max_level; ++i)
@@ -226,7 +226,7 @@ MGSmootherBlock<MATRIX, RELAX, number>::initialize (
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
-  
+
   matrices.resize(min, max);
   smoothers.resize(min, max);
 
@@ -290,7 +290,7 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
   const BlockVector<number>& rhs) const
 {
   deallog.push("Smooth");
-  
+
   unsigned int maxlevel = matrices.get_maxlevel();
   unsigned int steps2 = steps;
 
@@ -307,7 +307,7 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
     T = false;
 //  cerr << 'S' << level;
 //  cerr << '(' << matrices[level]->m() << ',' << matrices[level]->n() << ')';
-  
+
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
