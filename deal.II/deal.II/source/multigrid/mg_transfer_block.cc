@@ -227,7 +227,8 @@ void MGTransferBlockBase::build_matrices (
       mg_block[i] = numbers::invalid_unsigned_int;
 
 				   // Compute the lengths of all blocks
-  sizes.resize(n_levels);
+  sizes.clear ();
+  sizes.resize(n_levels, std::vector<unsigned int>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mg_dof, sizes);
 
 				   // Fill some index vectors
