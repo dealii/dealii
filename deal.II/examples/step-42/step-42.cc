@@ -124,9 +124,11 @@ class StokesProblem
     void assemble_system ();
     void assemble_multigrid ();
     void solve ();
+    void solve_block ();
 
     void find_dofs_on_lower_level (std::vector<std::vector<bool> > &lower_dofs,
         std::vector<std::vector<bool> > &boundary_dofs);
+
     void output_results (const unsigned int refinement_cycle) const;
     void refine_mesh ();
 
@@ -152,6 +154,7 @@ class StokesProblem
     std::vector<std::vector<unsigned int> >   mg_dofs_per_component;
 
     std::vector<std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> > mg_A_preconditioner;
+    std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
 };
 
 
@@ -215,7 +218,7 @@ double
 RightHandSide<dim>::value (const Point<dim>  &/*p*/,
                            const unsigned int component) const
 {
-  return (component == 0 ? 1 : 0);
+  return (component == 1 ? 1 : 0);
 }
 
 
@@ -294,6 +297,61 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
 #endif
 }
 
+
+template <class PreconditionerA, class PreconditionerMp>
+class BlockSchurPreconditioner : public Subscriptor
+{
+  public:
+    BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,
+          const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
+          const PreconditionerA &Apreconditioner);
+
+  void vmult (BlockVector<double>       &dst,
+              const BlockVector<double> &src) const;
+
+  private:
+    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double>, 
+                       PreconditionerMp > > m_inverse;
+    const PreconditionerA &a_preconditioner;
+    
+    mutable Vector<double> tmp;
+
+};
+
+template <class PreconditionerA, class PreconditionerMp>
+BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPreconditioner(
+          const BlockSparseMatrix<double>                            &S,
+          const InverseMatrix<SparseMatrix<double>,PreconditionerMp> &Mpinv,
+          const PreconditionerA &Apreconditioner
+          )
+                :
+                system_matrix           (&S),
+                m_inverse               (&Mpinv),
+                a_preconditioner        (Apreconditioner),
+                tmp                     (S.block(1,1).m())
+{}
+
+        // Now the interesting function, the multiplication of
+        // the preconditioner with a BlockVector. 
+template <class PreconditionerA, class PreconditionerMp>
+void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
+                                     BlockVector<double>       &dst,
+                                     const BlockVector<double> &src) const
+{
+        // Form u_new = A^{-1} u
+  a_preconditioner.vmult (dst.block(0), src.block(0));
+        // Form tmp = - B u_new + p 
+        // (<code>SparseMatrix::residual</code>
+        // does precisely this)
+  system_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
+        // Change sign in tmp
+  tmp *= -1;
+        // Multiply by approximate Schur complement 
+        // (i.e. a pressure mass matrix)
+  m_inverse->vmult (dst.block(1), tmp);
+}
+
 template <class Preconditioner>
 class SchurComplement : public Subscriptor
 {
@@ -343,7 +401,6 @@ void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
   A_inverse->name = "in schur";
   A_inverse->vmult (tmp2, tmp1);
   system_matrix->block(1,0).vmult (dst, tmp2);
-
   system_matrix->block(1,1).vmult_add (dst, src);
 }
 
@@ -353,7 +410,7 @@ template <int dim>
 StokesProblem<dim>::StokesProblem (const unsigned int degree)
                 :
                 degree (degree),
-                triangulation (Triangulation<dim>::maximum_smoothing),
+                triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
                 fe (FE_Q<dim>(degree+1), dim,
                     FE_Q<dim>(degree), 1),
                 dof_handler (triangulation)
@@ -366,6 +423,7 @@ StokesProblem<dim>::StokesProblem (const unsigned int degree)
 template <int dim>
 void StokesProblem<dim>::setup_dofs ()
 {
+  A_preconditioner.reset ();
   mg_A_preconditioner.resize (0);
   system_matrix.clear ();
 
@@ -537,7 +595,9 @@ void StokesProblem<dim>::assemble_system ()
 		{
 		  local_matrix(i,j) += (scalar_product(phi_grads_u[i], phi_grads_u[j])
 					- div_phi_u[i] * phi_p[j]
-					- phi_p[i] * div_phi_u[j])
+					- phi_p[i] * div_phi_u[j]
+                                        - phi_p[i] * phi_p[j]
+                                        )
 				       * fe_values.JxW(q);
 		}
 
@@ -646,7 +706,9 @@ void StokesProblem<dim>::assemble_multigrid ()
 		  local_matrix(i,j) += (
                       scalar_product(phi_grads_u[i], phi_grads_u[j])
 					- div_phi_u[i] * phi_p[j]
-					- phi_p[i] * div_phi_u[j])
+					- phi_p[i] * div_phi_u[j]
+//                                        - phi_p[i] * phi_p[j]
+                                        )
 				       * fe_values.JxW(q);
       }
 
@@ -729,6 +791,15 @@ vmult (BlockVector<double> &dst,
   std::cout << "Entering smoother with " << dst.size() << " unknowns" << std::endl;
 #endif
 
+  SparseDirectUMFPACK direct_solver;
+  direct_solver.initialize(*system_matrix);
+  Vector<double> solution, rhs;
+  solution = dst;
+  rhs = src;
+  direct_solver.vmult(solution, rhs);
+  dst = solution;
+
+  /*
   const InverseMatrix<SparseMatrix<double>,InnerPreconditioner>
     A_inverse (system_matrix->block(0,0), *A_preconditioner);
   Vector<double> tmp (dst.block(0).size());
@@ -758,17 +829,15 @@ vmult (BlockVector<double> &dst,
 	      << schur_complement.m() << " unknowns"
 	      << std::endl;
 #endif
-    /*
-    FullMatrix<double> full_schur(schur_complement.n(),schur_complement.m());
-    copy(schur_complement, full_schur);
-    std::ostringstream filename;
-    filename << "schur_matrix";
-    std::ofstream output (filename.str().c_str());
-    full_schur.print_formatted(output, 1, true,0,"0",1,0);
-    std::cout << full_schur.relative_symmetry_norm2 () << std::endl;
-    std::cout << full_schur.frobenius_norm () << std::endl;
-    abort();
-    */
+//    FullMatrix<double> full_schur(schur_complement.n(),schur_complement.m());
+//    copy(schur_complement, full_schur);
+//    std::ostringstream filename;
+//    filename << "schur_matrix";
+//    std::ofstream output (filename.str().c_str());
+//    full_schur.print_formatted(output, 1, true,0,"0",1,0);
+//    std::cout << full_schur.relative_symmetry_norm2 () << std::endl;
+//    std::cout << full_schur.frobenius_norm () << std::endl;
+//    abort();
     try
       {
 	cg.solve (schur_complement, dst.block(1), schur_rhs,
@@ -804,6 +873,7 @@ vmult (BlockVector<double> &dst,
 #ifdef STEP_42_TEST
   std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
 #endif
+  */
 }
 
 
@@ -829,6 +899,7 @@ Tvmult (BlockVector<double> &,
 template <int dim>
 void StokesProblem<dim>::solve ()
 {
+  system_matrix.block(1,1) = 0;
   assemble_multigrid ();
   typedef PreconditionMG<dim, BlockVector<double>, MGTransferPrebuilt<BlockVector<double> > >
     MGPREC;
@@ -909,9 +980,54 @@ void StokesProblem<dim>::solve ()
   constraints.distribute (solution);
 
   std::cout << solver_control.last_step()
-	    << " outer GMRES iterations";
+	    << " outer GMRES iterations ";
 }
 
+
+  template <int dim>
+void StokesProblem<dim>::solve_block () 
+{
+  std::cout << "   Computing preconditioner..." << std::endl << std::flush;
+      
+  A_preconditioner
+    = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+  A_preconditioner->initialize (system_matrix.block(0,0),
+				typename InnerPreconditioner<dim>::type::AdditionalData());
+
+  SparseMatrix<double> pressure_mass_matrix;
+  pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
+  pressure_mass_matrix.copy_from(system_matrix.block(1,1));
+  system_matrix.block(1,1) = 0;
+
+  SparseILU<double> pmass_preconditioner;
+  pmass_preconditioner.initialize (pressure_mass_matrix, 
+      SparseILU<double>::AdditionalData());
+
+  InverseMatrix<SparseMatrix<double>,SparseILU<double> >
+    m_inverse (pressure_mass_matrix, pmass_preconditioner);
+
+  BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
+    SparseILU<double> > 
+      preconditioner (system_matrix, m_inverse, *A_preconditioner);
+
+  SolverControl solver_control (system_matrix.m(),
+      1e-6*system_rhs.l2_norm());
+  GrowingVectorMemory<BlockVector<double> > vector_memory;
+  SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
+  gmres_data.max_n_tmp_vectors = 100;
+
+  SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
+      gmres_data);
+
+  gmres.solve(system_matrix, solution, system_rhs,
+      preconditioner);
+
+  constraints.distribute (solution);
+
+  std::cout << " "
+    << solver_control.last_step()
+    << " block GMRES iterations ";
+}
 
 
 template <int dim>
@@ -971,21 +1087,6 @@ StokesProblem<dim>::refine_mesh ()
 template <int dim>
 void StokesProblem<dim>::run ()
 {
-/*
-  FullMatrix<double> test_matrix (3,2);
-  test_matrix(0,0) = 0;
-  test_matrix(0,1) = 1;
-  test_matrix(1,0) = 2;
-  test_matrix(1,1) = 3;
-  test_matrix(2,0) = 4;
-  test_matrix(2,1) = 5;
-  FullMatrix<double> copy_matrix (3,2);
-
-  copy(test_matrix, copy_matrix);
-  copy_matrix.print(std::cout);
-
-  abort();
-  */
   {
     std::vector<unsigned int> subdivisions (dim, 1);
     subdivisions[0] = 1;
@@ -1013,10 +1114,10 @@ void StokesProblem<dim>::run ()
 
 
 
-  triangulation.refine_global (4-dim);
+  triangulation.refine_global (1);
 
 
-  for (unsigned int refinement_cycle = 0; refinement_cycle<6;
+  for (unsigned int refinement_cycle = 0; refinement_cycle<10;
        ++refinement_cycle)
     {
       std::cout << "Refinement cycle " << refinement_cycle << std::endl;
@@ -1039,9 +1140,16 @@ void StokesProblem<dim>::run ()
       assemble_system ();
 
       std::cout << "   Solving..." << std::flush;
-      solve ();
 
+      solve_block ();
       output_results (refinement_cycle);
+      system ("mv solution-* block");
+
+      solution = 0;
+
+      solve ();
+      output_results (refinement_cycle);
+      system ("mv solution-* mg");
 
       std::cout << std::endl;
     }
