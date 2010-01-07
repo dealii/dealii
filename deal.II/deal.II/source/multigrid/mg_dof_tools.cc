@@ -1030,7 +1030,7 @@ MGTools::count_dofs_per_block (
   const unsigned int n_blocks = fe.n_blocks();
   const unsigned int n_levels = dof_handler.get_tria().n_levels();
 
-  dofs_per_block.resize (n_levels);
+  AssertDimension (dofs_per_block.size(), n_levels);
 
   for (unsigned int l=0;l<n_levels;++l)
     std::fill (dofs_per_block[l].begin(), dofs_per_block[l].end(), 0U);
