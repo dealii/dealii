@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,10 +42,10 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim>& dof)
   std::vector<unsigned int> sizes(fe.n_blocks());
 
   base_elements.resize(fe.n_blocks());
-  
+
   for (unsigned int i=0;i<base_elements.size();++i)
     base_elements[i] = fe.block_to_base_index(i).first;
-  
+
   local_renumbering.resize(fe.n_dofs_per_cell());
   FETools::compute_block_renumbering(fe,
 				     local_renumbering,
@@ -59,10 +59,12 @@ void
 BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof)
 {
   initialize((DoFHandler<dim, spacedim>&) dof);
-  
-  std::vector<std::vector<unsigned int> > sizes;
+
+  std::vector<std::vector<unsigned int> > sizes (dof.get_tria().n_levels());
+  for (unsigned int i=0; i<sizes.size(); ++i)
+    sizes[i].resize (dof.get_fe().n_blocks());
   MGTools::count_dofs_per_block(dof, sizes);
-  
+
   levels.resize(sizes.size());
   for (unsigned int i=0;i<sizes.size();++i)
     levels[i].reinit(sizes[i]);
