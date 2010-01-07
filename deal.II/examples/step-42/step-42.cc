@@ -401,7 +401,9 @@ void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
   A_inverse->name = "in schur";
   A_inverse->vmult (tmp2, tmp1);
   system_matrix->block(1,0).vmult (dst, tmp2);
+  dst *= -1;
   system_matrix->block(1,1).vmult_add (dst, src);
+  dst *= -1;
 }
 
 
@@ -798,8 +800,7 @@ vmult (BlockVector<double> &dst,
   rhs = src;
   direct_solver.vmult(solution, rhs);
   dst = solution;
-
-  /*
+/*
   const InverseMatrix<SparseMatrix<double>,InnerPreconditioner>
     A_inverse (system_matrix->block(0,0), *A_preconditioner);
   Vector<double> tmp (dst.block(0).size());
@@ -829,15 +830,6 @@ vmult (BlockVector<double> &dst,
 	      << schur_complement.m() << " unknowns"
 	      << std::endl;
 #endif
-//    FullMatrix<double> full_schur(schur_complement.n(),schur_complement.m());
-//    copy(schur_complement, full_schur);
-//    std::ostringstream filename;
-//    filename << "schur_matrix";
-//    std::ofstream output (filename.str().c_str());
-//    full_schur.print_formatted(output, 1, true,0,"0",1,0);
-//    std::cout << full_schur.relative_symmetry_norm2 () << std::endl;
-//    std::cout << full_schur.frobenius_norm () << std::endl;
-//    abort();
     try
       {
 	cg.solve (schur_complement, dst.block(1), schur_rhs,
@@ -873,7 +865,7 @@ vmult (BlockVector<double> &dst,
 #ifdef STEP_42_TEST
   std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
 #endif
-  */
+*/
 }
 
 
