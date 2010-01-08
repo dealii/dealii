@@ -571,6 +571,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: Constructor of FESystem now also exists for four base elements.
+  <br>
+  (Thomas Wick 2010/01/08)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The functions in namespace DoFRenumbering::boost are now also compiled for
   hp::DoFHandler arguments.
   <br>

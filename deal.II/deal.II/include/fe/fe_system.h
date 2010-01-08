@@ -129,6 +129,18 @@ class FESystem : public FiniteElement<dim,spacedim>
 	      const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
 	      const FiniteElement<dim,spacedim> &fe3, const unsigned int n3);
 
+				     /** 
+				      * Constructor for mixed
+				      * discretizations with four
+				      * base elements.
+				      *
+				      * See the other constructor.
+				      */
+    FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
+	      const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
+	      const FiniteElement<dim,spacedim> &fe3, const unsigned int n3,
+	      const FiniteElement<dim,spacedim> &fe4, const unsigned int n4);
+
 				     /**
 				      * Destructor.
 				      */
@@ -783,6 +795,19 @@ class FESystem : public FiniteElement<dim,spacedim>
 			  const FiniteElementData<dim> &fe3,
 			  const unsigned int            N3);
 
+				   /**
+				    * with 4 different sub-elements
+				    */
+  static FiniteElementData<dim>
+  multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+			const unsigned int            N1,
+			const FiniteElementData<dim> &fe2,
+			const unsigned int            N2,
+			const FiniteElementData<dim> &fe3,
+			const unsigned int            N3,
+			const FiniteElementData<dim> &fe4,
+			const unsigned int            N4);
+
 
 				     /**
 				      * Helper function used in the
@@ -821,6 +846,19 @@ class FESystem : public FiniteElement<dim,spacedim>
 					   const FiniteElement<dim,spacedim> &fe3,
 					   const unsigned int        N3);
 
+				   /**
+				    *  with four different sub-elements
+				    */
+    static std::vector<bool>
+    compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> &fe1,
+					   const unsigned int        N1,
+					   const FiniteElement<dim,spacedim> &fe2,
+					   const unsigned int        N2,
+					   const FiniteElement<dim,spacedim> &fe3,
+					   const unsigned int        N3,
+					   const FiniteElement<dim,spacedim> &fe4,
+					   const unsigned int        N4);
+
 				     /**
 				      * Compute the named flags for a
 				      * list of finite elements with
@@ -828,7 +866,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * second argument. This function
 				      * is called from all the above
 				      * functions.
-				     */
+				      */
     static std::vector<bool>
     compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                                            const std::vector<unsigned int>              &multiplicities);
@@ -866,6 +904,21 @@ class FESystem : public FiniteElement<dim,spacedim>
 				const unsigned int        N2,
 				const FiniteElement<dim,spacedim> &fe3,
 				const unsigned int        N3);
+
+				   /**
+				    * Compute the non-zero vector
+				    * components of a composed
+				    * finite element.
+				    */
+   static std::vector<std::vector<bool> >
+    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
+				const unsigned int        N1,
+				const FiniteElement<dim,spacedim> &fe2,
+				const unsigned int        N2,
+				const FiniteElement<dim,spacedim> &fe3,
+				const unsigned int        N3,
+				const FiniteElement<dim,spacedim> &fe4,
+				const unsigned int        N4);
 
 				     /**
 				      * Compute the nonzero components
