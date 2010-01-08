@@ -571,6 +571,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The function Cuthill_McKee in namespace DoFRenumbering is now also compiled for
+  MGDoFHandler as well as the make_sparsity_pattern functions in DoFTools.
+  <br>
+  (Bärbel Janssen 2010/01/08)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: Constructor of FESystem now also exists for four base elements.
   <br>
   (Thomas Wick 2010/01/08)
