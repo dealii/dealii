@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,14 +38,16 @@ namespace MeshWorker
   template <typename number>
   class LocalResults
   {
+    private:
 				       /**
 					* Initialize a single local
 					* matrix block. A helper
 					* function for initialize()
 					*/
-      void initialize_local(
-	MatrixBlock<FullMatrix<number> >& M,
-	unsigned int row, unsigned int col);
+      void initialize_local(MatrixBlock<FullMatrix<number> >& M,
+			    const unsigned int row,
+			    const unsigned int col);
+      
     public:
       void initialize_numbers(const unsigned int n);
       void initialize_vectors(const unsigned int n);
@@ -105,7 +107,7 @@ namespace MeshWorker
 					* The local vectors. This
 					* field is public, so that
 					* local integrators can
-					* write it.
+					* write to it.
 					*/
       std::vector<BlockVector<number> > R;
 	
@@ -236,7 +238,7 @@ namespace MeshWorker
       template <class DHCellIterator, class DHFaceIterator>
       void reinit(const DHCellIterator& c,
 		  const DHFaceIterator& f,
-		  unsigned int n);
+		  const unsigned int n);
 	
 				       /**
 					* Set the current subface
@@ -246,13 +248,15 @@ namespace MeshWorker
       template <class DHCellIterator, class DHFaceIterator>
       void reinit(const DHCellIterator& c,
 		  const DHFaceIterator& f,
-		  const unsigned int n, const unsigned int s);
+		  const unsigned int n,
+		  const unsigned int s);
 
       const BlockIndices& local_indices() const;
       
 	
 				       /// The block structure of the system
       SmartPointer<const BlockInfo,DoFInfo<dim,spacedim> > block_info;
+      
     private:
 				       /// Fill index vector
       void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator c);
@@ -327,6 +331,7 @@ namespace MeshWorker
   template<int dim, class FEVALUESBASE, int spacedim = dim>
   class IntegrationInfo : public DoFInfo<dim, spacedim>
   {
+    private:
 				       /// vector of FEValues objects
       std::vector<boost::shared_ptr<FEVALUESBASE> > fevalv;
     public:
@@ -408,7 +413,7 @@ namespace MeshWorker
 					*
 					* @see DGBlockSplitApplication
 					*/
-      const FEVALUESBASE& fe(unsigned int i) const;
+      const FEVALUESBASE& fe(const unsigned int i) const;
 	
 				       /**
 					* The vector containing the
@@ -496,7 +501,7 @@ namespace MeshWorker
 					* #values, #gradients and
 					* #hessians.
 					*/
-      void fill_local_data(bool split_fevalues);
+      void fill_local_data(const bool split_fevalues);
 
 				       /**
 					* The global data vector
@@ -505,6 +510,7 @@ namespace MeshWorker
 					* points.
 					*/
       boost::shared_ptr<VectorDataBase<dim, spacedim> > global_data;
+
     private:
 				       /**
 					* Use the finite element
@@ -577,7 +583,7 @@ namespace MeshWorker
     
   template <typename number>
   inline void
-  LocalResults<number>::initialize_vectors(unsigned int n)
+  LocalResults<number>::initialize_vectors(const unsigned int n)
   {
     R.resize(n);
   }
@@ -611,7 +617,8 @@ namespace MeshWorker
     
   template <typename number>
   inline void
-  LocalResults<number>::initialize_matrices(unsigned int n, bool both)
+  LocalResults<number>::initialize_matrices(const unsigned int n,
+					    const bool both)
   {
     M1.resize(n);
     if (both)

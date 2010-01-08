@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -377,6 +377,7 @@ namespace MeshWorker
 					* the local data.
 					*/
       AssemblingIntegrator(const INTEGRATOR& local);
+
 				       /**
 					* The cell operator called by
 					* integration_loop().

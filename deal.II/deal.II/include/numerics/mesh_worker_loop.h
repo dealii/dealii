@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,7 @@
 #define __deal2__mesh_worker_loop_h
 
 #include <base/config.h>
+#include <base/template_constraints.h>
 #include <grid/tria.h>
 #include <numerics/mesh_worker_info.h>
 
@@ -180,8 +181,9 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<int dim, class ITERATOR, class ENDITERATOR, class LOCALWORKER>
-  void integration_loop(ITERATOR begin, ENDITERATOR end,
+  template<int dim, class ITERATOR, class LOCALWORKER>
+  void integration_loop(ITERATOR begin,
+			typename identity<ITERATOR>::type end,
 			IntegrationInfoBox<dim, dim>& box,
 			LOCALWORKER& localworker,
 			bool cells_first = true)
