@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,6 +35,208 @@ DEAL_II_NAMESPACE_OPEN
 //make the general case happen it should undergo a similar transformation as
 //the ::DoFHandler class, i.e. much of the functions here that are dimension
 //dependent should be moved into a local Implementation class.
+// Some of the following already goes in the right direction
+namespace internal
+{
+  namespace MGDoFHandler
+  {
+				     // access class
+				     // dealii::MGDoFHandler instead
+				     // of namespace
+				     // internal::MGDoFHandler. same
+				     // for dealii::DoFHandler
+    using dealii::MGDoFHandler;
+    using dealii::DoFHandler;
+
+/**
+ * A class with the same purpose as the similarly named class of the
+ * Triangulation class. See there for more information.
+ */
+    struct Implementation
+    {
+
+					 /**
+					  * Distribute dofs on the given
+					  * cell, with new dofs starting
+					  * with index
+					  * @p next_free_dof. Return the
+					  * next unused index number.
+					  *
+					  * This function is excluded from
+					  * the @p distribute_dofs
+					  * function since it can not be
+					  * implemented dimension
+					  * independent.
+					  *
+					  * Note that unlike for the usual
+					  * dofs, here all cells and not
+					  * only active ones are allowed.
+					  */
+	template <int spacedim>
+	static
+	unsigned int
+	distribute_dofs_on_cell (typename MGDoFHandler<1,spacedim>::cell_iterator &cell,
+				 unsigned int   next_free_dof)
+	  {
+	    const unsigned int dim = 1;
+
+					     // distribute dofs of vertices
+	    if (cell->get_fe().dofs_per_vertex > 0)
+	      for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
+		{
+		  typename MGDoFHandler<dim,spacedim>::cell_iterator neighbor = cell->neighbor(v);
+
+		  if (neighbor.state() == IteratorState::valid)
+		    {
+						       // has neighbor already been processed?
+		      if (neighbor->user_flag_set() &&
+			  (neighbor->level() == cell->level()))
+							 // copy dofs if the neighbor is on
+							 // the same level (only then are
+							 // mg dofs the same)
+			{
+			  if (v==0)
+			    for (unsigned int d=0; d<cell->get_fe().dofs_per_vertex; ++d)
+			      cell->set_mg_vertex_dof_index (cell->level(), 0, d,
+							     neighbor->mg_vertex_dof_index (cell->level(), 1, d));
+			  else
+			    for (unsigned int d=0; d<cell->get_fe().dofs_per_vertex; ++d)
+			      cell->set_mg_vertex_dof_index (cell->level(), 1, d,
+							     neighbor->mg_vertex_dof_index (cell->level(), 0, d));
+
+							   // next neighbor
+			  continue;
+			};
+		    };
+
+						   // otherwise: create dofs newly
+		  for (unsigned int d=0; d<cell->get_fe().dofs_per_vertex; ++d)
+		    cell->set_mg_vertex_dof_index (cell->level(), v, d, next_free_dof++);
+		};
+
+					     // dofs of line
+	    if (cell->get_fe().dofs_per_line > 0)
+	      for (unsigned int d=0; d<cell->get_fe().dofs_per_line; ++d)
+		cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
+
+					     // note that this cell has been processed
+	    cell->set_user_flag ();
+
+	    return next_free_dof;
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	distribute_dofs_on_cell (typename MGDoFHandler<2,spacedim>::cell_iterator &cell,
+				 unsigned int   next_free_dof)
+	  {
+	    const unsigned int dim = 2;
+	  if (cell->get_fe().dofs_per_vertex > 0)
+					     // number dofs on vertices
+	    for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
+					       // check whether dofs for this
+					       // vertex have been distributed
+					       // (only check the first dof)
+	      if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == DoFHandler<2>::invalid_dof_index)
+		for (unsigned int d=0; d<cell->get_fe().dofs_per_vertex; ++d)
+		  cell->set_mg_vertex_dof_index (cell->level(), vertex, d, next_free_dof++);
+
+					   // for the four sides
+	  if (cell->get_fe().dofs_per_line > 0)
+	    for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
+	      {
+		typename MGDoFHandler<dim,spacedim>::line_iterator line = cell->line(side);
+
+						 // distribute dofs if necessary:
+						 // check whether line dof is already
+						 // numbered (check only first dof)
+		if (line->mg_dof_index(cell->level(), 0) == DoFHandler<2>::invalid_dof_index)
+						   // if not: distribute dofs
+		  for (unsigned int d=0; d<cell->get_fe().dofs_per_line; ++d)
+		    line->set_mg_dof_index (cell->level(), d, next_free_dof++);
+	      };
+
+
+					   // dofs of quad
+	  if (cell->get_fe().dofs_per_quad > 0)
+	    for (unsigned int d=0; d<cell->get_fe().dofs_per_quad; ++d)
+	      cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
+
+
+					   // note that this cell has been processed
+	  cell->set_user_flag ();
+
+	  return next_free_dof;
+	}
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	distribute_dofs_on_cell (typename MGDoFHandler<3,spacedim>::cell_iterator &cell,
+				 unsigned int   next_free_dof)
+	  {
+	    const unsigned int dim = 3;
+	  if (cell->get_fe().dofs_per_vertex > 0)
+					     // number dofs on vertices
+	    for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
+					       // check whether dofs for this
+					       // vertex have been distributed
+					       // (only check the first dof)
+	      if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == DoFHandler<3>::invalid_dof_index)
+		for (unsigned int d=0; d<cell->get_fe().dofs_per_vertex; ++d)
+		  cell->set_mg_vertex_dof_index (cell->level(), vertex, d, next_free_dof++);
+
+					   // for the lines
+	  if (cell->get_fe().dofs_per_line > 0)
+	    for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
+	      {
+		typename MGDoFHandler<dim,spacedim>::line_iterator line = cell->line(l);
+
+						 // distribute dofs if necessary:
+						 // check whether line dof is already
+						 // numbered (check only first dof)
+		if (line->mg_dof_index(cell->level(), 0) == DoFHandler<3>::invalid_dof_index)
+						   // if not: distribute dofs
+		  for (unsigned int d=0; d<cell->get_fe().dofs_per_line; ++d)
+		    line->set_mg_dof_index (cell->level(), d, next_free_dof++);
+	      };
+
+					   // for the quads
+	  if (cell->get_fe().dofs_per_quad > 0)
+	    for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
+	      {
+		typename MGDoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
+
+						 // distribute dofs if necessary:
+						 // check whether line dof is already
+						 // numbered (check only first dof)
+		if (quad->mg_dof_index(cell->level(), 0) == DoFHandler<3>::invalid_dof_index)
+						   // if not: distribute dofs
+		  for (unsigned int d=0; d<cell->get_fe().dofs_per_quad; ++d)
+		    quad->set_mg_dof_index (cell->level(), d, next_free_dof++);
+	      };
+
+
+					   // dofs of cell
+	  if (cell->get_fe().dofs_per_hex > 0)
+	    for (unsigned int d=0; d<cell->get_fe().dofs_per_hex; ++d)
+	      cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
+
+
+					   // note that this cell has
+					   // been processed
+	  cell->set_user_flag ();
+
+	  return next_free_dof;
+	}
+    };
+  }
+}
+
+
 
 
 /* ------------------------ MGVertexDoFs ----------------------------------- */
@@ -68,9 +270,9 @@ void MGDoFHandler<dim,spacedim>::MGVertexDoFs::init (const unsigned int cl,
 				   // everything else alone
   if (cl > fl)
     return;
-  
+
   const unsigned int n_levels = finest_level-coarsest_level + 1;
-  
+
   indices = new unsigned int[n_levels * dofs_per_vertex];
   Assert (indices != 0, ExcNoMemory ());
 
@@ -137,9 +339,9 @@ MGDoFHandler<dim,spacedim>::memory_consumption() const
   unsigned int mem = DoFHandler<dim,spacedim>::memory_consumption();
   for (unsigned int l=0;l<mg_levels.size();++l)
     mem += mg_levels[l]->memory_consumption();
-  
+
   mem += MemoryConsumption::memory_consumption(*mg_faces);
-  
+
   for (unsigned int l=0;l<mg_vertex_dofs.size();++l)
     mem += sizeof(MGVertexDoFs)
 	   + (1+mg_vertex_dofs[l].get_finest_level()-mg_vertex_dofs[l].get_coarsest_level())
@@ -776,7 +978,7 @@ MGDoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
 
 	if (this->tria->n_raw_quads(level) == 0)
 	  return end_quad();
-  
+
 	return raw_quad_iterator (this->tria,
 				  level,
 				  0,
@@ -792,11 +994,11 @@ MGDoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
 				  0,
 				  this);
       }
-      
-      
+
+
       default:
 	    Assert (false, ExcNotImplemented());
-	    return raw_hex_iterator();	    
+	    return raw_hex_iterator();
     }
 }
 
@@ -859,7 +1061,7 @@ MGDoFHandler<dim, spacedim>::end_quad (const unsigned int level) const
 	    quad_iterator(end_quad()) :
 	    begin_quad (level+1));
   else
-    return quad_iterator(end_quad());  
+    return quad_iterator(end_quad());
 }
 
 
@@ -917,7 +1119,7 @@ MGDoFHandler<dim,spacedim>::last_raw_quad (const unsigned int level) const
       default:
 	    Assert (false, ExcNotImplemented());
 	    return raw_quad_iterator();
-    }      
+    }
 }
 
 
@@ -1008,16 +1210,16 @@ MGDoFHandler<dim,spacedim>::begin_raw_hex (const unsigned int level) const
 
 	if (this->tria->n_raw_hexs(level) == 0)
 	  return end_hex();
-  
+
 	return raw_hex_iterator (this->tria,
 				 level,
 				 0,
 				 this);
       }
-      
+
       default:
 	    Assert (false, ExcNotImplemented());
-	    return raw_hex_iterator();	    
+	    return raw_hex_iterator();
     }
 }
 
@@ -1160,7 +1362,7 @@ MGDoFHandler<dim, spacedim>::last_hex () const
 }
 
 
- 
+
 template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::active_hex_iterator
 MGDoFHandler<dim, spacedim>::last_active_hex (const unsigned int level) const
@@ -1190,7 +1392,7 @@ MGDoFHandler<dim, spacedim>::last_active_hex () const
 //---------------------------------------------------------------------------
 
 
-#if deal_II_dimension == 1 
+#if deal_II_dimension == 1
 template <>
 template <>
 unsigned int
@@ -1222,7 +1424,7 @@ MGDoFHandler<1>::set_dof_index<1> (const unsigned int       obj_level,
 		   fe_index,
 		   local_index,
 		   global_index);
-  
+
 }
 #endif
 
@@ -1258,7 +1460,7 @@ MGDoFHandler<2>::set_dof_index<1> (const unsigned int       ,
 		   fe_index,
 		   local_index,
 		   global_index);
-  
+
 }
 
 
@@ -1293,7 +1495,7 @@ MGDoFHandler<2>::set_dof_index<2> (const unsigned int       obj_level,
 		   fe_index,
 		   local_index,
 		   global_index);
-  
+
 }
 #endif
 
@@ -1329,7 +1531,7 @@ MGDoFHandler<3>::set_dof_index<1> (const unsigned int       ,
 		   fe_index,
 		   local_index,
 		   global_index);
-  
+
 }
 
 
@@ -1380,7 +1582,7 @@ MGDoFHandler<3>::set_dof_index<2> (const unsigned int       ,
 		   fe_index,
 		   local_index,
 		   global_index);
-  
+
 }
 
 
@@ -1399,7 +1601,7 @@ MGDoFHandler<3>::set_dof_index<3> (const unsigned int       obj_level,
 		   fe_index,
 		   local_index,
 		   global_index);
-  
+
 }
 #endif
 
@@ -1436,181 +1638,16 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
       cell_iterator cell = begin(level),
 		    endc = end(level);
 
-      for (; cell != endc; ++cell) 
-	next_free_dof = distribute_dofs_on_cell (cell, next_free_dof);
-  
+      for (; cell != endc; ++cell)
+	next_free_dof = internal::MGDoFHandler::Implementation::distribute_dofs_on_cell<spacedim> (cell, next_free_dof);
+
       mg_used_dofs[level] = next_free_dof;
-    };
-  
+    }
+
 				   // finally restore the user flags
-  const_cast<Triangulation<dim,spacedim> &>(*(this->tria)).load_user_flags(user_flags);
+  const_cast<Triangulation<dim,spacedim> &>(*(this->tria))
+    .load_user_flags(user_flags);
 }
-
-
-#if deal_II_dimension == 1
-
-template <>
-unsigned int
-MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
-					  unsigned int   next_free_dof)
-{
-
-				   // distribute dofs of vertices
-  if (this->selected_fe->dofs_per_vertex > 0)
-    for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
-      {
-	cell_iterator neighbor = cell->neighbor(v);
-	
-	if (neighbor.state() == IteratorState::valid)
-	  {
-					     // has neighbor already been processed?
-	    if (neighbor->user_flag_set() &&
-		(neighbor->level() == cell->level()))
-					       // copy dofs if the neighbor is on
-					       // the same level (only then are
-					       // mg dofs the same)
-	      {
-		if (v==0) 
-		  for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-		    cell->set_mg_vertex_dof_index (cell->level(), 0, d,
-						   neighbor->mg_vertex_dof_index (cell->level(), 1, d));
-		else
-		  for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-		    cell->set_mg_vertex_dof_index (cell->level(), 1, d,
-						   neighbor->mg_vertex_dof_index (cell->level(), 0, d));
-		
-						 // next neighbor
-		continue;
-	      };
-	  };
-	
-					 // otherwise: create dofs newly
-	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	  cell->set_mg_vertex_dof_index (cell->level(), v, d, next_free_dof++);
-      };
-  
-				   // dofs of line
-  if (this->selected_fe->dofs_per_line > 0)
-    for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
-      cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
-
-				   // note that this cell has been processed
-  cell->set_user_flag ();
-  
-  return next_free_dof;
-}
-
-#endif
-
-
-#if deal_II_dimension == 2
-
-template <>
-unsigned int
-MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
-					  unsigned int   next_free_dof) {
-  if (this->selected_fe->dofs_per_vertex > 0)
-				     // number dofs on vertices
-    for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
-				       // check whether dofs for this
-				       // vertex have been distributed
-				       // (only check the first dof)
-      if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == DoFHandler<2>::invalid_dof_index)
-	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	  cell->set_mg_vertex_dof_index (cell->level(), vertex, d, next_free_dof++);
-    
-  				   // for the four sides
-  if (this->selected_fe->dofs_per_line > 0)
-    for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
-      {
-	line_iterator line = cell->line(side);
-	
-					 // distribute dofs if necessary:
-					 // check whether line dof is already
-					 // numbered (check only first dof)
-	if (line->mg_dof_index(cell->level(), 0) == DoFHandler<2>::invalid_dof_index)
-					   // if not: distribute dofs
-	  for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
-	    line->set_mg_dof_index (cell->level(), d, next_free_dof++);	    
-      };
-
-
-				   // dofs of quad
-  if (this->selected_fe->dofs_per_quad > 0)
-    for (unsigned int d=0; d<this->selected_fe->dofs_per_quad; ++d)
-      cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
-
-
-				   // note that this cell has been processed
-  cell->set_user_flag ();
-  
-  return next_free_dof;
-}
-
-#endif
-
-
-#if deal_II_dimension == 3
-
-template <>
-unsigned int
-MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
-					  unsigned int   next_free_dof) {
-  if (this->selected_fe->dofs_per_vertex > 0)
-				     // number dofs on vertices
-    for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
-				       // check whether dofs for this
-				       // vertex have been distributed
-				       // (only check the first dof)
-      if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == DoFHandler<3>::invalid_dof_index)
-	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	  cell->set_mg_vertex_dof_index (cell->level(), vertex, d, next_free_dof++);
-    
-  				   // for the lines
-  if (this->selected_fe->dofs_per_line > 0)
-    for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
-      {
-	line_iterator line = cell->line(l);
-	
-					 // distribute dofs if necessary:
-					 // check whether line dof is already
-					 // numbered (check only first dof)
-	if (line->mg_dof_index(cell->level(), 0) == DoFHandler<3>::invalid_dof_index)
-					   // if not: distribute dofs
-	  for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
-	    line->set_mg_dof_index (cell->level(), d, next_free_dof++);	    
-      };
-
-  				   // for the quads
-  if (this->selected_fe->dofs_per_quad > 0)
-    for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
-      {
-	quad_iterator quad = cell->quad(q);
-	
-					 // distribute dofs if necessary:
-					 // check whether line dof is already
-					 // numbered (check only first dof)
-	if (quad->mg_dof_index(cell->level(), 0) == DoFHandler<3>::invalid_dof_index)
-					   // if not: distribute dofs
-	  for (unsigned int d=0; d<this->selected_fe->dofs_per_quad; ++d)
-	    quad->set_mg_dof_index (cell->level(), d, next_free_dof++);	    
-      };
-
-
-				   // dofs of cell
-  if (this->selected_fe->dofs_per_hex > 0)
-    for (unsigned int d=0; d<this->selected_fe->dofs_per_hex; ++d)
-      cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
-
-
-				   // note that this cell has been processed
-  cell->set_user_flag ();
-  
-  return next_free_dof;
-}
-
-#endif
-
 
 template <int dim, int spacedim>
 void
@@ -1621,14 +1658,14 @@ MGDoFHandler<dim,spacedim>::clear ()
 
 				   // let base class release its mem
 				   // as well
-  DoFHandler<dim,spacedim>::clear ();  
+  DoFHandler<dim,spacedim>::clear ();
 }
 
 
 template <int dim, int spacedim>
 unsigned int MGDoFHandler<dim,spacedim>::n_dofs (const unsigned int level) const {
   Assert (level < mg_used_dofs.size(), ExcInvalidLevel(level));
-  
+
   return mg_used_dofs[level];
 }
 
@@ -1639,7 +1676,7 @@ template <>
 void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 				     const std::vector<unsigned int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(level), DoFHandler<1>::ExcRenumberingIncomplete());
-  
+
 				   // note that we can not use cell iterators
 				   // in this function since then we would
 				   // renumber the dofs on the interface of
@@ -1658,7 +1695,7 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 						this->selected_fe->dofs_per_vertex)]);
 
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->lines.dofs.begin();
-       i!=mg_levels[level]->lines.dofs.end(); ++i) 
+       i!=mg_levels[level]->lines.dofs.end(); ++i)
     {
       if (*i != DoFHandler<1>::invalid_dof_index)
 	{
@@ -1676,9 +1713,9 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 template <>
 void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 				     const std::vector<unsigned int>  &new_numbers) {
-  Assert (new_numbers.size() == n_dofs(level), 
+  Assert (new_numbers.size() == n_dofs(level),
 	  DoFHandler<2>::ExcRenumberingIncomplete());
-  
+
   for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
        i!=mg_vertex_dofs.end(); ++i)
 				     // if the present vertex lives on
@@ -1696,7 +1733,7 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
       std::vector<bool> user_flags;
       this->tria->save_user_flags(user_flags);
       const_cast<Triangulation<2> &>(*(this->tria)).clear_user_flags ();
-      
+
 				       // flag all lines adjacent to cells of the current
 				       // level, as those lines logically belong to the same
 				       // level as the cell, at least for for isotropic
@@ -1706,10 +1743,10 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
       for ( ; cell != endcell; ++cell)
 	for (unsigned int line=0; line < GeometryInfo<2>::faces_per_cell; ++line)
 	  cell->face(line)->set_user_flag();
-      
+
       line_iterator line = begin_line(),
 		 endline = end_line();
-      
+
       for( ; line != endline; ++line)
 	if (line->user_flag_set())
 	  {
@@ -1742,7 +1779,7 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 				     const std::vector<unsigned int>  &new_numbers) {
   Assert (new_numbers.size() == n_dofs(level),
 	  DoFHandler<3>::ExcRenumberingIncomplete());
-  
+
   for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
        i!=mg_vertex_dofs.end(); ++i)
 				     // if the present vertex lives on
@@ -1761,22 +1798,22 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
       std::vector<bool> user_flags;
       this->tria->save_user_flags(user_flags);
       const_cast<Triangulation<3> &>(*(this->tria)).clear_user_flags ();
-      
+
 				       // flag all lines adjacent to cells of the current
 				       // level, as those lines logically belong to the same
 				       // level as the cell, at least for for isotropic
 				       // refinement
-      
+
       cell_iterator cell = begin(level),
 		endcell  = end(level);
       for ( ; cell != endcell ; ++cell)
 	for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
 	  cell->line(line)->set_user_flag();
-      
+
 
       line_iterator line = begin_line(),
 		 endline = end_line();
-      
+
       for( ; line != endline; ++line)
 	if (line->user_flag_set())
 	  {
@@ -1795,7 +1832,7 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
       std::vector<bool> user_flags;
       this->tria->save_user_flags(user_flags);
       const_cast<Triangulation<3> &>(*(this->tria)).clear_user_flags ();
-      
+
 				       // flag all quads adjacent to cells of the current
 				       // level, as those lines logically belong to the same
 				       // level as the cell, at least for for isotropic
@@ -1805,10 +1842,10 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
       for ( ; cell != endcell ; ++cell)
 	for (unsigned int quad=0; quad < GeometryInfo<3>::faces_per_cell; ++quad)
 	  cell->face(quad)->set_user_flag();
-      
+
       quad_iterator quad = begin_quad(),
 		 endline = end_quad();
-      
+
       for( ; quad != endline; ++quad)
 	if (quad->user_flag_set())
 	  {
@@ -1841,7 +1878,7 @@ template <>
 void MGDoFHandler<1>::reserve_space () {
   const unsigned int dim = 1;
   const unsigned int spacedim = 1;
-  
+
   Assert (this->selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
   Assert (this->tria->n_levels() > 0, DoFHandler<dim>::ExcInvalidTriangulation());
 
@@ -1851,10 +1888,10 @@ void MGDoFHandler<1>::reserve_space () {
 
 				   ////////////////////////////
 				   // CONSTRUCTION
-  
+
 				   // first allocate space for the
 				   // lines on each level
-  for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
+  for (unsigned int i=0; i<this->tria->n_levels(); ++i)
     {
       mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
 
@@ -1899,7 +1936,7 @@ void MGDoFHandler<1>::reserve_space () {
       {
 	Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
 	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
-	
+
 	mg_vertex_dofs[vertex].init (min_level[vertex],
 				     max_level[vertex],
 				     this->get_fe().dofs_per_vertex);
@@ -1908,7 +1945,7 @@ void MGDoFHandler<1>::reserve_space () {
       {
 	Assert (min_level[vertex] == this->tria->n_levels(),   ExcInternalError());
 	Assert (max_level[vertex] == 0, ExcInternalError());
-	
+
 					 // reset to original state
 	mg_vertex_dofs[vertex].init (1, 0, 0);
       }
@@ -1923,20 +1960,20 @@ template <>
 void MGDoFHandler<2>::reserve_space () {
   const unsigned int dim = 2;
   const unsigned int spacedim = 2;
-  
+
   Assert (this->selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
   Assert (this->tria->n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
-  
+
 				   ////////////////////////////
 				   // DESTRUCTION
   clear_space ();
 
 				   ////////////////////////////
 				   // CONSTRUCTION
-  
+
 				   // first allocate space for the
 				   // lines and quads on each level
-  for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
+  for (unsigned int i=0; i<this->tria->n_levels(); ++i)
     {
       mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
@@ -1944,7 +1981,7 @@ void MGDoFHandler<2>::reserve_space () {
 							  this->selected_fe->dofs_per_quad,
 							  DoFHandler<2>::invalid_dof_index);
     };
-  
+
   mg_faces = new internal::DoFHandler::DoFFaces<2>;
   mg_faces->lines.dofs = std::vector<unsigned int> (this->tria->n_raw_lines() *
 						    this->selected_fe->dofs_per_line,
@@ -2016,20 +2053,20 @@ void MGDoFHandler<3>::reserve_space () {
 
   const unsigned int dim = 3;
   const unsigned int spacedim = 3;
-  
+
   Assert (this->selected_fe != 0, DoFHandler<3>::ExcNoFESelected());
   Assert (this->tria->n_levels() > 0, DoFHandler<3>::ExcInvalidTriangulation());
-  
+
 				   ////////////////////////////
 				   // DESTRUCTION
   clear_space ();
 
 				   ////////////////////////////
 				   // CONSTRUCTION
-  
+
 				   // first allocate space for the
 				   // lines and quads on each level
-  for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
+  for (unsigned int i=0; i<this->tria->n_levels(); ++i)
     {
       mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
@@ -2084,7 +2121,7 @@ void MGDoFHandler<3>::reserve_space () {
       {
 	Assert (min_level[vertex] < this->tria->n_levels(), ExcInternalError());
 	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
-	
+
 	mg_vertex_dofs[vertex].init (min_level[vertex],
 				     max_level[vertex],
 				     this->get_fe().dofs_per_vertex);
@@ -2093,7 +2130,7 @@ void MGDoFHandler<3>::reserve_space () {
       {
 	Assert (min_level[vertex] == this->tria->n_levels(), ExcInternalError());
 	Assert (max_level[vertex] == 0, ExcInternalError());
-	
+
 					 // reset to original state
 	mg_vertex_dofs[vertex].init (1, 0, 0);
       }

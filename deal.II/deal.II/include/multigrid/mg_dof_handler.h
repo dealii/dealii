@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
  * This class has not yet been implemented for the use in the codimension
  * one case (<tt>spacedim != dim </tt>).
  *
-//TODO:[WB] Extend MGDoFHandler doc 
+//TODO:[WB] Extend MGDoFHandler doc
  *
  * @author Wolfgang Bangerth, 1998, 1999
  */
@@ -83,7 +83,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * Destructor
 				      */
     virtual ~MGDoFHandler ();
-    
+
 				     /**
 				      * Go through the triangulation
 				      * and distribute the degrees of
@@ -132,9 +132,9 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * name, see above.
 				      */
     void renumber_dofs (const std::vector<unsigned int> &new_numbers);
-    
+
 				     /*--------------------------------------*/
-    
+
 				     /**
 				      *  @name Cell iterator functions
 				      */
@@ -194,7 +194,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * <tt>end()</tt>.
 				      */
     cell_iterator        end (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is
 				      * the first iterator not on
@@ -334,7 +334,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * past-the-end or
 				      * before-the-beginning states.
 				      *
-				      * This is the same as 
+				      * This is the same as
 				      * <tt>end_face()</tt>.
 				      */
     raw_face_iterator    end_raw_face () const;
@@ -346,7 +346,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * past-the-end or
 				      * before-the-beginning states.
 				      *
-				      * This is the same as 
+				      * This is the same as
 				      * <tt>end_face()</tt>.
 				      */
     active_face_iterator end_active_face () const;
@@ -427,7 +427,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * <tt>end()</tt>.
 				      */
     line_iterator        end_line (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is
 				      * the first iterator not on
@@ -485,7 +485,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * @p level.
 				      */
     active_line_iterator last_active_line (const unsigned int level) const;
-				     /*@}*/	  
+				     /*@}*/
 
 				     /*---------------------------------------*/
 
@@ -531,7 +531,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * <tt>end()</tt>.
 				      */
     quad_iterator        end_quad (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is
 				      * the first iterator not on
@@ -635,7 +635,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * <tt>end()</tt>.
 				      */
     hex_iterator        end_hex (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is
 				      * the first iterator not on
@@ -697,7 +697,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 
 				     /*---------------------------------------*/
 
-    
+
     				     /**
 				      * Return the number of degrees
 				      * of freedom on the specified
@@ -716,7 +716,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * name, see above.
 				      */
     unsigned int n_dofs () const;
-    
+
     				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -751,7 +751,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 		    int,
 		    << "You tried to do something on level " << arg1
 		    << ", but this level is empty.");
-    
+
   private:
 
 				     /**
@@ -782,7 +782,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
     class MGVertexDoFs
     {
       public:
-	
+
 					 /**
 					  * Constructor. This one is
 					  * empty because it is
@@ -824,7 +824,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 					  * @p init is supposed to do.
 					  */
 	MGVertexDoFs & operator = (const MGVertexDoFs &vertex);
-	
+
 					 /**
 					  * Set the index with number
 					  * @p dof_number of this
@@ -846,7 +846,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 			const unsigned int dof_number,
 			const unsigned int dofs_per_vertex,
 			const unsigned int index);
-	
+
 					 /**
 					  * Return the index with
 					  * number @p dof_number of
@@ -881,7 +881,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 					  * lives on.
 					  */
 	unsigned int get_finest_level () const;
-	
+
 					 /**
 					  * Exception.
 					  */
@@ -893,7 +893,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 			int,
 			<< "The given level number " << arg1 << " is outside "
 			<< "the range of levels this vertex lives on.");
-	
+
       private:
 					 /**
 					  * Store the coarsest level
@@ -922,29 +922,6 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 
 
 				     /**
-				      * Distribute dofs on the given
-				      * cell, with new dofs starting
-				      * with index
-				      * @p next_free_dof. Return the
-				      * next unused index number. The
-				      * finite element used is the one
-				      * given to @p distribute_dofs,
-				      * which is copied to
-				      * @p selected_fe.
-				      *
-				      * This function is excluded from
-				      * the @p distribute_dofs
-				      * function since it can not be
-				      * implemented dimension
-				      * independent.
-				      *
-				      * Note that unlike for the usual
-				      * dofs, here all cells and not
-				      * only active ones are allowed.
-				      */
-    unsigned int distribute_dofs_on_cell (cell_iterator &cell,
-					  unsigned int   next_free_dof);
-				     /**
 				      *  Return the @p i-th dof-index. This function calls
 				      *  the respective function of DoFObjects.
 				      */
@@ -963,8 +940,8 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 			const unsigned int       fe_index,
 			const unsigned int       local_index,
 			const unsigned int       global_index) const;
-    
-    
+
+
 				     /**
 				      * Reserve enough space for the
 				      * MG dof indices for a given
@@ -976,7 +953,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * Free all used memory.
 				      */
     void clear_space ();
-    
+
     				     /**
 				      * Space to store the DoF numbers
 				      * for the different
@@ -988,7 +965,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * zero on each level.
 				      */
     std::vector<internal::DoFHandler::DoFLevel<dim>*>    mg_levels;
-    
+
 				     /**
 				      * Space to store the DoF numbers
 				      * for the faces.
@@ -1003,7 +980,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * and which are these levels.
 				      */
     std::vector<MGVertexDoFs>      mg_vertex_dofs;
-    
+
 				     /**
 				      * Vectors storing the number of
 				      * degrees of freedom on each
@@ -1049,7 +1026,7 @@ void MGDoFHandler<dim,spacedim>::MGVertexDoFs::set_index  (const unsigned int le
 	  ExcInvalidLevel(level));
   Assert (dof_number < dofs_per_vertex,
 	  ExcIndexRange(dof_number, 0, dofs_per_vertex));
-  
+
   indices[(level-coarsest_level)*dofs_per_vertex + dof_number] = index;
 }
 
@@ -1064,7 +1041,7 @@ MGDoFHandler<dim,spacedim>::MGVertexDoFs::get_index  (const unsigned int level,
 	  ExcInvalidLevel(level));
   Assert (dof_number < dofs_per_vertex,
 	  ExcIndexRange (dof_number, 0, dofs_per_vertex));
-  
+
   return indices[(level-coarsest_level)*dofs_per_vertex + dof_number];
 }
 

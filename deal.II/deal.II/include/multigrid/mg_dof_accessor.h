@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,15 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim> class MGDoFHandler;
 
 template <int celldim, int dim, int spacedim=dim> class MGDoFAccessor;
+
+namespace internal
+{
+  namespace MGDoFHandler
+  {
+    class Implementation;
+  }
+}
+
 
 /*!@addtogroup mg */
 /*@{*/
@@ -46,7 +55,7 @@ namespace internal
  * @author Wolfgang Bangerth, 1999
  */
     template <int celldim, int dim, int spacedim>
-    struct Inheritance 
+    struct Inheritance
     {
 					 /**
 					  * Declaration of the @p typedef.
@@ -123,7 +132,7 @@ namespace internal
  * since they are more secure to changes in the class naming and
  * template interface as well as providing easier typing (much less
  * complicated names!).
- * 
+ *
  *
  * <h3>Inheritance</h3>
  *
@@ -151,7 +160,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
 				      * class to make accessing some
 				      * of the exception classes
 				      * simpler.
-				      */    
+				      */
     typedef
     typename internal::MGDoFAccessor::Inheritance<structdim,dim,spacedim>::BaseClass
     BaseClass;
@@ -167,7 +176,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
 				      * this accessor.
 				      */
     typedef MGDoFHandler<dim, spacedim> Container;
-    
+
 				     /**
 				      * @name Constructors
 				      */
@@ -221,7 +230,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
 				      * previous one.
 				      */
     template <int structdim2, int dim2, int spacedim2>
-    MGDoFAccessor (const MGDoFAccessor<structdim2,dim2,spacedim2> &);    
+    MGDoFAccessor (const MGDoFAccessor<structdim2,dim2,spacedim2> &);
 
 				     /**
 				      * @}
@@ -325,7 +334,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.
@@ -342,7 +351,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
 				      * Store the address of the @p MGDoFHandler object
 				      * to be accessed.
 				      */
-    MGDoFHandler<dim,spacedim> *mg_dof_handler;  
+    MGDoFHandler<dim,spacedim> *mg_dof_handler;
 
 				     /**
 				      * Reset the DoF handler pointer.
@@ -374,6 +383,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
     MGDoFAccessor & operator = (const MGDoFAccessor &da);
 
     template <int, int> friend class MGDoFHandler;
+    friend class internal::MGDoFHandler::Implementation;
 };
 
 
@@ -401,7 +411,7 @@ class MGDoFCellAccessor :  public MGDoFAccessor<dim,dim,spacedim>
 {
   public:
     typedef MGDoFAccessor<dim,dim,spacedim> BaseClass;
-    
+
 				     /**
 				      * Type of faces.
 				      */
@@ -414,7 +424,7 @@ class MGDoFCellAccessor :  public MGDoFAccessor<dim,dim,spacedim>
 				      * iterator classes.
 				      */
     typedef typename MGDoFAccessor<dim,dim,spacedim>::AccessorData  AccessorData;
-    
+
 				     /**
 				      * @name Constructors
 				      */
