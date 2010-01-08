@@ -1,21 +1,23 @@
 <a name="Intro"></a>
-<h1>Example of the MeshWorker framework with an advection problem</h1>
+<h1>An example of the MeshWorker framework with an advection problem</h1>
 
 <h3>Overview</h3>
 
-This example is devoted to the MeshWorker framework and the
-<em>discontinuous Galerkin method</em>, or in short: DG method. It
-solves the same problem as @ref step_12 "step-12" (see there for a
-description of the problem and discretization), but here we use the
-MeshWorker framework in order to save reprogramming the cell/face
-loops. We have tried to strip this example of peripheral information
-such that the structure becomes more clear.
+This example is devoted to the MeshWorker framework and the <em>discontinuous
+Galerkin method</em>, or in short: DG method. It solves the same problem as
+@ref step_12 "step-12" (see there for a description of the problem and
+discretization), but here we use the MeshWorker framework in order to save
+programming the cell/face loops that are often rather. The aim of the
+MeshWorker framework is to simplify this process, by putting the majority of
+the boring setup into a framework class and leaving to user code only things
+that are specific to the application.  We have tried to strip this example of
+peripheral information such that the structure becomes more clear.
 
-In particular the loops of DG methods turn out to be complex, because
-for the face terms, we have to distinguish the cases of boundary,
-regular interior faces and interior faces with hanging nodes,
-respectively. The MeshWorker framework implements the standard loop
-over all cells and faces in MeshWorker::loop() and takes care of
+The particular concern of this program are the loops of DG methods. These turn
+out to be especially complex, primarily because for the face terms, we have to
+distinguish the cases of boundary, regular interior faces and interior faces
+with hanging nodes, respectively. The MeshWorker framework implements the
+standard loop over all cells and faces in MeshWorker::loop() and takes care of
 distinguishing between all the different faces.
 
 There are two things left to do if you use MeshWorker: first, you need
