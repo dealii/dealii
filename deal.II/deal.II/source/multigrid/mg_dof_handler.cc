@@ -232,6 +232,253 @@ namespace internal
 
 	  return next_free_dof;
 	}
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const MGDoFHandler<1,spacedim> &mg_dof_handler,
+		       const internal::DoFHandler::DoFLevel<1> &mg_level,
+		       const internal::DoFHandler::DoFFaces<1> &,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const int2type<1>)
+	  {
+	    return mg_level.lines.
+	      get_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const MGDoFHandler<1,spacedim> &mg_dof_handler,
+		       internal::DoFHandler::DoFLevel<1> &mg_level,
+		       internal::DoFHandler::DoFFaces<1> &,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const unsigned int       global_index,
+		       const int2type<1>)
+	  {
+	    mg_level.lines.
+	      set_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index(const MGDoFHandler<2,spacedim> &mg_dof_handler,
+		      const internal::DoFHandler::DoFLevel<2> &,
+		      const internal::DoFHandler::DoFFaces<2> &mg_faces,
+		      const unsigned int       obj_index,
+		      const unsigned int       fe_index,
+		      const unsigned int       local_index,
+		      const int2type<1>)
+	  {
+	    return mg_faces.lines.
+	      get_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const MGDoFHandler<2,spacedim> &mg_dof_handler,
+		       internal::DoFHandler::DoFLevel<2> &,
+		       internal::DoFHandler::DoFFaces<2> &mg_faces,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const unsigned int       global_index,
+		       const int2type<1>)
+	  {
+	    mg_faces.lines.
+	      set_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const MGDoFHandler<2,spacedim> &mg_dof_handler,
+		       const internal::DoFHandler::DoFLevel<2> &mg_level,
+		       const internal::DoFHandler::DoFFaces<2> &,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const int2type<2>)
+	  {
+	    return mg_level.quads.
+	      get_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const MGDoFHandler<2,spacedim> &mg_dof_handler,
+		       internal::DoFHandler::DoFLevel<2> &mg_level,
+		       internal::DoFHandler::DoFFaces<2> &,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const unsigned int       global_index,
+		       const int2type<2>)
+	  {
+	    mg_level.quads.
+	      set_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const MGDoFHandler<3,spacedim> &mg_dof_handler,
+		       const internal::DoFHandler::DoFLevel<3> &,
+		       const internal::DoFHandler::DoFFaces<3> &mg_faces,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const int2type<1>)
+	  {
+	    return mg_faces.lines.
+	      get_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const MGDoFHandler<3,spacedim> &mg_dof_handler,
+		       internal::DoFHandler::DoFLevel<3> &,
+		       internal::DoFHandler::DoFFaces<3> &mg_faces,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const unsigned int       global_index,
+		       const int2type<1>)
+	  {
+	    mg_faces.lines.
+	      set_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const MGDoFHandler<3,spacedim> &mg_dof_handler,
+		       const internal::DoFHandler::DoFLevel<3> &,
+		       const internal::DoFHandler::DoFFaces<3> &mg_faces,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const int2type<2>)
+	  {
+	    return mg_faces.quads.
+	      get_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const MGDoFHandler<3,spacedim> &mg_dof_handler,
+		       const internal::DoFHandler::DoFLevel<3> &mg_level,
+		       const internal::DoFHandler::DoFFaces<3> &,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const int2type<3>)
+	  {
+	    return mg_level.hexes.
+	      get_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const MGDoFHandler<3,spacedim> &mg_dof_handler,
+		       internal::DoFHandler::DoFLevel<3> &,
+		       internal::DoFHandler::DoFFaces<3> &mg_faces,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const unsigned int       global_index,
+		       const int2type<2>)
+	  {
+	    mg_faces.quads.
+	      set_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const MGDoFHandler<3,spacedim> &mg_dof_handler,
+		       internal::DoFHandler::DoFLevel<3> &mg_level,
+		       internal::DoFHandler::DoFFaces<3> &,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const unsigned int       global_index,
+		       const int2type<3>)
+	  {
+	    mg_level.hexes.
+	      set_dof_index (mg_dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+
+	  }
     };
   }
 }
@@ -301,13 +548,15 @@ MGDoFHandler<dim,spacedim>::MGVertexDoFs::operator = (const MGVertexDoFs &)
 
 
 template <int dim, int spacedim>
-unsigned int MGDoFHandler<dim,spacedim>::MGVertexDoFs::get_coarsest_level () const {
+unsigned int MGDoFHandler<dim,spacedim>::MGVertexDoFs::get_coarsest_level () const
+{
   return coarsest_level;
 }
 
 
 template <int dim, int spacedim>
-unsigned int MGDoFHandler<dim,spacedim>::MGVertexDoFs::get_finest_level () const {
+unsigned int MGDoFHandler<dim,spacedim>::MGVertexDoFs::get_finest_level () const
+{
   return finest_level;
 }
 
@@ -319,7 +568,8 @@ const unsigned int MGDoFHandler<dim,spacedim>::dimension;
 
 
 template <int dim, int spacedim>
-MGDoFHandler<dim,spacedim>::MGDoFHandler (const Triangulation<dim,spacedim> &tria) :
+MGDoFHandler<dim,spacedim>::MGDoFHandler (const Triangulation<dim,spacedim> &tria)
+		:
 		DoFHandler<dim,spacedim> (tria),
 		mg_faces (NULL)
 {}
@@ -1392,218 +1642,47 @@ MGDoFHandler<dim, spacedim>::last_active_hex () const
 //---------------------------------------------------------------------------
 
 
-#if deal_II_dimension == 1
-template <>
-template <>
+template <int dim, int spacedim>
+template <int structdim>
 unsigned int
-MGDoFHandler<1>::get_dof_index<1> (const unsigned int       obj_level,
-				 const unsigned int       obj_index,
-				 const unsigned int       fe_index,
-				 const unsigned int       local_index) const
+MGDoFHandler<dim,spacedim>::
+get_dof_index (const unsigned int       obj_level,
+	       const unsigned int       obj_index,
+	       const unsigned int       fe_index,
+	       const unsigned int       local_index) const
 {
-  return this->mg_levels[obj_level]->lines.
+  return internal::MGDoFHandler::Implementation::
     get_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index);
-}
-
-
-template <>
-template <>
-void
-MGDoFHandler<1>::set_dof_index<1> (const unsigned int       obj_level,
-				 const unsigned int       obj_index,
-				 const unsigned int       fe_index,
-				 const unsigned int       local_index,
-				 const unsigned int       global_index) const
-{
-  this->mg_levels[obj_level]->lines.
-    set_dof_index (*this,
+		   *this->mg_levels[obj_level],
+		   *this->mg_faces,
 		   obj_index,
 		   fe_index,
 		   local_index,
-		   global_index);
-
-}
-#endif
-
-#if deal_II_dimension == 2
-template <>
-template <>
-unsigned int
-MGDoFHandler<2>::get_dof_index<1> (const unsigned int       ,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-{
-  return this->mg_faces->lines.
-    get_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index);
+		   internal::int2type<structdim>());
 }
 
 
-template <>
-template <>
+
+template <int dim, int spacedim>
+template <int structdim>
 void
-MGDoFHandler<2>::set_dof_index<1> (const unsigned int       ,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
+MGDoFHandler<dim,spacedim>::
+set_dof_index (const unsigned int obj_level,
+	       const unsigned int obj_index,
+	       const unsigned int fe_index,
+	       const unsigned int local_index,
+	       const unsigned int global_index) const
 {
-  this->mg_faces->lines.
+  internal::MGDoFHandler::Implementation::
     set_dof_index (*this,
+		   *this->mg_levels[obj_level],
+		   *this->mg_faces,
 		   obj_index,
 		   fe_index,
 		   local_index,
-		   global_index);
-
+		   global_index,
+		   internal::int2type<structdim>());
 }
-
-
-template <>
-template <>
-unsigned int
-MGDoFHandler<2>::get_dof_index<2> (const unsigned int       obj_level,
-				 const unsigned int       obj_index,
-				 const unsigned int       fe_index,
-				 const unsigned int       local_index) const
-{
-  return this->mg_levels[obj_level]->quads.
-    get_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index);
-}
-
-
-template <>
-template <>
-void
-MGDoFHandler<2>::set_dof_index<2> (const unsigned int       obj_level,
-				 const unsigned int       obj_index,
-				 const unsigned int       fe_index,
-				 const unsigned int       local_index,
-				 const unsigned int       global_index) const
-{
-  this->mg_levels[obj_level]->quads.
-    set_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index,
-		   global_index);
-
-}
-#endif
-
-#if deal_II_dimension == 3
-template <>
-template <>
-unsigned int
-MGDoFHandler<3>::get_dof_index<1> (const unsigned int       ,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-{
-  return this->mg_faces->lines.
-    get_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index);
-}
-
-
-template <>
-template <>
-void
-MGDoFHandler<3>::set_dof_index<1> (const unsigned int       ,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-{
-  this->mg_faces->lines.
-    set_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index,
-		   global_index);
-
-}
-
-
-template <>
-template <>
-unsigned int
-MGDoFHandler<3>::get_dof_index<2> (const unsigned int       ,
-				 const unsigned int       obj_index,
-				 const unsigned int       fe_index,
-				 const unsigned int       local_index) const
-{
-  return this->mg_faces->quads.
-    get_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index);
-}
-
-
-template <>
-template <>
-unsigned int
-MGDoFHandler<3>::get_dof_index<3> (const unsigned int       obj_level,
-				 const unsigned int       obj_index,
-				 const unsigned int       fe_index,
-				 const unsigned int       local_index) const
-{
-  return this->mg_levels[obj_level]->hexes.
-    get_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index);
-}
-
-
-template <>
-template <>
-void
-MGDoFHandler<3>::set_dof_index<2> (const unsigned int       ,
-				 const unsigned int       obj_index,
-				 const unsigned int       fe_index,
-				 const unsigned int       local_index,
-				 const unsigned int       global_index) const
-{
-  this->mg_faces->quads.
-    set_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index,
-		   global_index);
-
-}
-
-
-template <>
-template <>
-void
-MGDoFHandler<3>::set_dof_index<3> (const unsigned int       obj_level,
-				 const unsigned int       obj_index,
-				 const unsigned int       fe_index,
-				 const unsigned int       local_index,
-				 const unsigned int       global_index) const
-{
-  this->mg_levels[obj_level]->hexes.
-    set_dof_index (*this,
-		   obj_index,
-		   fe_index,
-		   local_index,
-		   global_index);
-
-}
-#endif
 
 
 template <int dim, int spacedim>
@@ -2165,6 +2244,100 @@ template class MGDoFHandler<deal_II_dimension>;
 
 #if deal_II_dimension==1 || deal_II_dimension==2
 template class MGDoFHandler<deal_II_dimension,deal_II_dimension+1>;
+#endif
+
+
+template
+unsigned int
+MGDoFHandler<deal_II_dimension,deal_II_dimension>::
+get_dof_index<1> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index) const;
+
+template
+unsigned int
+MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
+get_dof_index<1> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index) const;
+
+#if deal_II_dimension >= 2
+template
+unsigned int
+MGDoFHandler<deal_II_dimension,deal_II_dimension>::
+get_dof_index<2> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index) const;
+
+template
+unsigned int
+MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
+get_dof_index<2> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index) const;
+
+#if deal_II_dimension >= 3
+template
+unsigned int
+MGDoFHandler<deal_II_dimension,deal_II_dimension>::
+get_dof_index<3> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index) const;
+#endif
+#endif
+
+template
+void
+MGDoFHandler<deal_II_dimension,deal_II_dimension>::
+set_dof_index<1> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index,
+		  const unsigned int       global_index) const;
+
+template
+void
+MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
+set_dof_index<1> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index,
+		  const unsigned int       global_index) const;
+
+#if deal_II_dimension >= 2
+template
+void
+MGDoFHandler<deal_II_dimension,deal_II_dimension>::
+set_dof_index<2> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index,
+		  const unsigned int       global_index) const;
+
+template
+void
+MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
+set_dof_index<2> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index,
+		  const unsigned int       global_index) const;
+
+#if deal_II_dimension >= 3
+template
+void
+MGDoFHandler<deal_II_dimension,deal_II_dimension>::
+set_dof_index<3> (const unsigned int       obj_level,
+		  const unsigned int       obj_index,
+		  const unsigned int       fe_index,
+		  const unsigned int       local_index,
+		  const unsigned int       global_index) const;
+#endif
 #endif
 
 DEAL_II_NAMESPACE_CLOSE
