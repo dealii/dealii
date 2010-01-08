@@ -1025,7 +1025,7 @@ template <int dim, int spacedim>
 inline
 unsigned int MGDoFHandler<dim,spacedim>::n_dofs() const
 {
-  return DoFHandler<dim>::n_dofs();
+  return DoFHandler<dim,spacedim>::n_dofs();
 }
 
 
@@ -1033,7 +1033,7 @@ template <int dim, int spacedim>
 inline
 void MGDoFHandler<dim,spacedim>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 {
-  return DoFHandler<dim>::renumber_dofs (new_numbers);
+  return DoFHandler<dim,spacedim>::renumber_dofs (new_numbers);
 }
 
 
