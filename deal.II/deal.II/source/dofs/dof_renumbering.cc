@@ -1602,6 +1602,21 @@ namespace DoFRenumbering
    const bool,
    const std::vector<unsigned int>&);
 
+  template
+  void Cuthill_McKee<MGDoFHandler<deal_II_dimension> >
+  (MGDoFHandler<deal_II_dimension>&,
+   const bool,
+   const bool,
+   const std::vector<unsigned int>&);
+
+  template
+  void
+  compute_Cuthill_McKee<MGDoFHandler<deal_II_dimension> >
+  (std::vector<unsigned int>&,
+   const MGDoFHandler<deal_II_dimension>&,
+   const bool,
+   const bool,
+   const std::vector<unsigned int>&);
 
   template
   void component_wise<deal_II_dimension>

@@ -75,7 +75,7 @@ void MGDoFHandler<dim,spacedim>::MGVertexDoFs::init (const unsigned int cl,
   Assert (indices != 0, ExcNoMemory ());
 
   for (unsigned int i=0; i<n_levels*dofs_per_vertex; ++i)
-    indices[i] = DoFHandler<dim>::invalid_dof_index;
+    indices[i] = DoFHandler<dim, spacedim>::invalid_dof_index;
 }
 
 
@@ -118,7 +118,7 @@ const unsigned int MGDoFHandler<dim,spacedim>::dimension;
 
 template <int dim, int spacedim>
 MGDoFHandler<dim,spacedim>::MGDoFHandler (const Triangulation<dim,spacedim> &tria) :
-		DoFHandler<dim> (tria),
+		DoFHandler<dim,spacedim> (tria),
 		mg_faces (NULL)
 {}
 
@@ -134,7 +134,7 @@ template <int dim, int spacedim>
 unsigned int
 MGDoFHandler<dim,spacedim>::memory_consumption() const
 {
-  unsigned int mem = DoFHandler<dim>::memory_consumption();
+  unsigned int mem = DoFHandler<dim,spacedim>::memory_consumption();
   for (unsigned int l=0;l<mg_levels.size();++l)
     mem += mg_levels[l]->memory_consumption();
   
@@ -1409,7 +1409,7 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
 					 const unsigned int        offset)
 {
 				   // first distribute global dofs
-  DoFHandler<dim>::distribute_dofs (fe);
+  DoFHandler<dim,spacedim>::distribute_dofs (fe);
 
 
 				   // reserve space for the MG dof numbers
@@ -1621,7 +1621,7 @@ MGDoFHandler<dim,spacedim>::clear ()
 
 				   // let base class release its mem
 				   // as well
-  DoFHandler<dim>::clear ();  
+  DoFHandler<dim,spacedim>::clear ();  
 }
 
 
@@ -2125,5 +2125,9 @@ void MGDoFHandler<dim,spacedim>::clear_space ()
 
 // explicit instantiations
 template class MGDoFHandler<deal_II_dimension>;
+
+#if deal_II_dimension==1 || deal_II_dimension==2
+template class MGDoFHandler<deal_II_dimension,deal_II_dimension+1>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

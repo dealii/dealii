@@ -1958,6 +1958,12 @@ template
     get_finest_common_cells (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
 			     const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
 
+template
+    std::list<std::pair<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator, MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
+    GridTools::
+    get_finest_common_cells (const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
+			     const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
+
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

@@ -58,7 +58,7 @@ template <int structdim, int dim, int spacedim>
 void
 MGDoFAccessor<structdim, dim, spacedim>::set_mg_dof_handler (MGDoFHandler<dim,spacedim> *dh)
 {
-  typedef DoFAccessor<dim,DoFHandler<dim> > BaseClass;
+  typedef DoFAccessor<dim,DoFHandler<dim, spacedim> > BaseClass;
   Assert (dh != 0, typename BaseClass::ExcInvalidObject());
   mg_dof_handler = dh;
 }
@@ -180,7 +180,7 @@ template <int structdim, int dim, int spacedim>
 void
 MGDoFAccessor<structdim, dim, spacedim>::copy_from (const MGDoFAccessor &a)
 {
-  DoFAccessor<structdim, DoFHandler<dim> >::copy_from (a);
+  DoFAccessor<structdim, DoFHandler<dim, spacedim> >::copy_from (a);
   this->set_mg_dof_handler (a.mg_dof_handler);
 }
 
@@ -625,8 +625,10 @@ get_mg_dof_values (const Vector<float> &values,
 
 
 
+
 #if deal_II_dimension == 1
-template class MGDoFAccessor<1, 1>;
+template class MGDoFAccessor<1, 1, 1>;
+template class MGDoFAccessor<1, 1, 2>;
 
 template class MGDoFCellAccessor<1>;
 
@@ -636,14 +638,21 @@ template class TriaActiveIterator<MGDoFCellAccessor<1> >;
 #endif
 
 #if deal_II_dimension == 2
-template class MGDoFAccessor<1, 2>;
-template class MGDoFAccessor<2, 2>;
+template class MGDoFAccessor<1, 2, 2>;
+template class MGDoFAccessor<2, 2, 2>;
+
+template class MGDoFAccessor<1, 2, 3>;
+template class MGDoFAccessor<2, 2, 3>;
 
 template class MGDoFCellAccessor<2>;
 
-template class TriaRawIterator   <MGDoFAccessor<1, 2> >;
-template class TriaIterator      <MGDoFAccessor<1, 2> >;
-template class TriaActiveIterator<MGDoFAccessor<1, 2> >;
+template class TriaRawIterator   <MGDoFAccessor<1, 2, 2> >;
+template class TriaIterator      <MGDoFAccessor<1, 2, 2> >;
+template class TriaActiveIterator<MGDoFAccessor<1, 2, 2> >;
+
+template class TriaRawIterator   <MGDoFAccessor<1, 2, 3> >;
+template class TriaIterator      <MGDoFAccessor<1, 2, 3> >;
+template class TriaActiveIterator<MGDoFAccessor<1, 2, 3> >;
 
 template class TriaRawIterator   <MGDoFCellAccessor<2> >;
 template class TriaIterator      <MGDoFCellAccessor<2> >;
@@ -652,19 +661,19 @@ template class TriaActiveIterator<MGDoFCellAccessor<2> >;
 
 
 #if deal_II_dimension == 3
-template class MGDoFAccessor<1, 3>;
-template class MGDoFAccessor<2, 3>;
-template class MGDoFAccessor<3, 3>;
+template class MGDoFAccessor<1, 3, 3>;
+template class MGDoFAccessor<2, 3, 3>;
+template class MGDoFAccessor<3, 3, 3>;
 
 template class MGDoFCellAccessor<3>;
 
-template class TriaRawIterator   <MGDoFAccessor<1, 3> >;
-template class TriaIterator      <MGDoFAccessor<1, 3> >;
-template class TriaActiveIterator<MGDoFAccessor<1, 3> >;
+template class TriaRawIterator   <MGDoFAccessor<1, 3, 3> >;
+template class TriaIterator      <MGDoFAccessor<1, 3, 3> >;
+template class TriaActiveIterator<MGDoFAccessor<1, 3, 3> >;
 
-template class TriaRawIterator   <MGDoFAccessor<2, 3> >;
-template class TriaIterator      <MGDoFAccessor<2, 3> >;
-template class TriaActiveIterator<MGDoFAccessor<2, 3> >;
+template class TriaRawIterator   <MGDoFAccessor<2, 3, 3> >;
+template class TriaIterator      <MGDoFAccessor<2, 3, 3> >;
+template class TriaActiveIterator<MGDoFAccessor<2, 3, 3> >;
 
 template class TriaRawIterator   <MGDoFCellAccessor<3> >;
 template class TriaIterator      <MGDoFCellAccessor<3> >;

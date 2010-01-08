@@ -1152,7 +1152,7 @@ MGTools::make_boundary_list(
                                    // field to store the indices
   std::vector<unsigned int> face_dofs;
   face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
-  std::fill (face_dofs.begin (), face_dofs.end (), DoFHandler<dim>::invalid_dof_index);
+  std::fill (face_dofs.begin (), face_dofs.end (), DoFHandler<dim,spacedim>::invalid_dof_index);
 
   typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(),
 					    endc = dof.end();
@@ -1357,7 +1357,7 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 
       for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
 	{
-	  const typename DoFHandler<dim>::face_iterator face = cell->face(face_nr);
+	  const typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_nr);
 	  if (!face->at_boundary())
 	    {
 					       //interior face
