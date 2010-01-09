@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,15 @@ for (SP : SPARSITY_PATTERNS)
      const bool,
      const unsigned int);
 
-    template void 
+    template void
+    DoFTools::make_sparsity_pattern<MGDoFHandler<deal_II_dimension,deal_II_dimension>, SP>
+    (const MGDoFHandler<deal_II_dimension,deal_II_dimension> &dof,
+     SP    &sparsity,
+     const ConstraintMatrix &,
+     const bool,
+     const unsigned int);
+
+    template void
     DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
     (const DoFHandler<deal_II_dimension,deal_II_dimension>&,
      const Table<2,Coupling>&,
@@ -39,9 +47,18 @@ for (SP : SPARSITY_PATTERNS)
      const bool,
      const unsigned int);
 
-    template void 
+    template void
     DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
     (const hp::DoFHandler<deal_II_dimension,deal_II_dimension>&,
+     const Table<2,Coupling>&,
+     SP &,
+     const ConstraintMatrix &,
+     const bool,
+     const unsigned int);
+
+    template void
+    DoFTools::make_sparsity_pattern<MGDoFHandler<deal_II_dimension,deal_II_dimension>, SP>
+    (const MGDoFHandler<deal_II_dimension,deal_II_dimension>&,
      const Table<2,Coupling>&,
      SP &,
      const ConstraintMatrix &,
@@ -100,7 +117,7 @@ for (SP : SPARSITY_PATTERNS)
      const bool,
      const unsigned int);
 
-    template void 
+    template void
     DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
     (const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
      const Table<2,Coupling>&,
@@ -109,7 +126,7 @@ for (SP : SPARSITY_PATTERNS)
      const bool,
      const unsigned int);
 
-    template void 
+    template void
     DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
     (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
      const Table<2,Coupling>&,
