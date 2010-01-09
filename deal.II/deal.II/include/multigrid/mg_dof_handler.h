@@ -20,6 +20,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+namespace internal
+{
+  namespace MGDoFHandler
+  {
+    class Implementation;
+  }
+}
+
+
 /*!@addtogroup mg */
 /*@{*/
 
@@ -992,6 +1002,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * Make accessor objects friends.
 				      */
     template <int dim1, int dim2, int dim3> friend class MGDoFAccessor;
+    friend class internal::MGDoFHandler::Implementation;
 };
 
 /*@}*/

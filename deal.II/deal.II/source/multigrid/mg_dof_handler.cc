@@ -479,6 +479,269 @@ namespace internal
 			     global_index);
 
 	  }
+
+
+
+
+	template <int spacedim>
+	static
+	void reserve_space (MGDoFHandler<1,spacedim> &mg_dof_handler)
+	  {
+	    const unsigned int dim = 1;
+
+	    Assert (mg_dof_handler.selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
+	    Assert (mg_dof_handler.tria->n_levels() > 0, DoFHandler<dim>::ExcInvalidTriangulation());
+
+					     //////////////////////////
+					     // DESTRUCTION
+	    mg_dof_handler.clear_space ();
+
+					     ////////////////////////////
+					     // CONSTRUCTION
+
+					     // first allocate space for the
+					     // lines on each level
+	    for (unsigned int i=0; i<mg_dof_handler.tria->n_levels(); ++i)
+	      {
+		mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
+
+		mg_dof_handler.mg_levels.back()->lines.dofs = std::vector<unsigned int>(mg_dof_handler.tria->n_raw_lines(i) *
+											mg_dof_handler.selected_fe->dofs_per_line,
+											DoFHandler<1>::invalid_dof_index);
+	      }
+
+					     // now allocate space for the
+					     // vertices. To this end, we need
+					     // to construct as many objects as
+					     // there are vertices and let them
+					     // allocate enough space for their
+					     // vertex indices on the levels they
+					     // live on. We need therefore to
+					     // count to how many levels a cell
+					     // belongs to, which we do by looping
+					     // over all cells and storing the
+					     // maximum and minimum level each
+					     // vertex we pass by  belongs to
+	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.tria->n_vertices());
+
+	    std::vector<unsigned int> min_level (mg_dof_handler.tria->n_vertices(), mg_dof_handler.tria->n_levels());
+	    std::vector<unsigned int> max_level (mg_dof_handler.tria->n_vertices(), 0);
+
+	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.tria->begin(),
+						       endc = mg_dof_handler.tria->end();
+	    for (; cell!=endc; ++cell)
+	      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		   ++vertex)
+		{
+		  const unsigned int vertex_index = cell->vertex_index(vertex);
+		  if (min_level[vertex_index] > static_cast<unsigned int>(cell->level()))
+		    min_level[vertex_index] = cell->level();
+		  if (max_level[vertex_index] < static_cast<unsigned int>(cell->level()))
+		    max_level[vertex_index] = cell->level();
+		}
+
+					     // now allocate the needed space
+	    for (unsigned int vertex=0; vertex<mg_dof_handler.tria->n_vertices(); ++vertex)
+	      if (mg_dof_handler.tria->vertex_used(vertex))
+		{
+		  Assert (min_level[vertex] < mg_dof_handler.tria->n_levels(),   ExcInternalError());
+		  Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
+
+		  mg_dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex],
+					       max_level[vertex],
+					       mg_dof_handler.get_fe().dofs_per_vertex);
+		}
+	      else
+		{
+		  Assert (min_level[vertex] == mg_dof_handler.tria->n_levels(),   ExcInternalError());
+		  Assert (max_level[vertex] == 0, ExcInternalError());
+
+						   // reset to original state
+		  mg_dof_handler.mg_vertex_dofs[vertex].init (1, 0, 0);
+		}
+	  }
+
+
+
+	template <int spacedim>
+	static
+	void reserve_space (MGDoFHandler<2,spacedim> &mg_dof_handler)
+	  {
+	    const unsigned int dim = 2;
+
+	    Assert (mg_dof_handler.selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
+	    Assert (mg_dof_handler.tria->n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
+
+					     ////////////////////////////
+					     // DESTRUCTION
+	    mg_dof_handler.clear_space ();
+
+					     ////////////////////////////
+					     // CONSTRUCTION
+
+					     // first allocate space for the
+					     // lines and quads on each level
+	    for (unsigned int i=0; i<mg_dof_handler.tria->n_levels(); ++i)
+	      {
+		mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
+
+		mg_dof_handler.mg_levels.back()->quads.dofs = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_quads(i) *
+											 mg_dof_handler.selected_fe->dofs_per_quad,
+											 DoFHandler<2>::invalid_dof_index);
+	      }
+
+	    mg_dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<2>;
+	    mg_dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_lines() *
+									     mg_dof_handler.selected_fe->dofs_per_line,
+									     DoFHandler<2>::invalid_dof_index);
+
+
+					     // now allocate space for the
+					     // vertices. To this end, we need
+					     // to construct as many objects as
+					     // there are vertices and let them
+					     // allocate enough space for their
+					     // vertex indices on the levels they
+					     // live on. We need therefore to
+					     // count to how many levels a cell
+					     // belongs to, which we do by looping
+					     // over all cells and storing the
+					     // maximum and minimum level each
+					     // vertex we pass by  belongs to
+	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.tria->n_vertices());
+
+					     // initialize these arrays with
+					     // invalid values (min>max)
+	    std::vector<unsigned int> min_level (mg_dof_handler.tria->n_vertices(),
+						 mg_dof_handler.tria->n_levels());
+	    std::vector<unsigned int> max_level (mg_dof_handler.tria->n_vertices(), 0);
+
+	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.tria->begin(),
+						       endc = mg_dof_handler.tria->end();
+	    for (; cell!=endc; ++cell)
+	      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		   ++vertex)
+		{
+		  const unsigned int vertex_index = cell->vertex_index(vertex);
+		  if (min_level[vertex_index] > static_cast<unsigned int>(cell->level()))
+		    min_level[vertex_index] = cell->level();
+		  if (max_level[vertex_index] < static_cast<unsigned int>(cell->level()))
+		    max_level[vertex_index] = cell->level();
+		}
+
+
+					     // now allocate the needed space
+	    for (unsigned int vertex=0; vertex<mg_dof_handler.tria->n_vertices(); ++vertex)
+	      if (mg_dof_handler.tria->vertex_used(vertex))
+		{
+		  Assert (min_level[vertex] < mg_dof_handler.tria->n_levels(), ExcInternalError());
+		  Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
+
+		  mg_dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex],
+					       max_level[vertex],
+					       mg_dof_handler.get_fe().dofs_per_vertex);
+		}
+	      else
+		{
+		  Assert (min_level[vertex] == mg_dof_handler.tria->n_levels(),   ExcInternalError());
+		  Assert (max_level[vertex] == 0, ExcInternalError());
+
+						   // reset to original state
+		  mg_dof_handler.mg_vertex_dofs[vertex].init (1, 0, 0);
+		}
+	  }
+
+
+
+	template <int spacedim>
+	static
+	void reserve_space (MGDoFHandler<3,spacedim> &mg_dof_handler)
+	  {
+	    const unsigned int dim = 3;
+
+	    Assert (mg_dof_handler.selected_fe != 0, DoFHandler<3>::ExcNoFESelected());
+	    Assert (mg_dof_handler.tria->n_levels() > 0, DoFHandler<3>::ExcInvalidTriangulation());
+
+					     ////////////////////////////
+					     // DESTRUCTION
+	    mg_dof_handler.clear_space ();
+
+					     ////////////////////////////
+					     // CONSTRUCTION
+
+					     // first allocate space for the
+					     // lines and quads on each level
+	    for (unsigned int i=0; i<mg_dof_handler.tria->n_levels(); ++i)
+	      {
+		mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
+
+		mg_dof_handler.mg_levels.back()->hexes.dofs
+		  = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_hexs(i) *
+					       mg_dof_handler.selected_fe->dofs_per_hex,
+					       DoFHandler<3>::invalid_dof_index);
+	      }
+	    mg_dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<3>;
+	    mg_dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_lines() *
+									     mg_dof_handler.selected_fe->dofs_per_line,
+									     DoFHandler<3>::invalid_dof_index);
+	    mg_dof_handler.mg_faces->quads.dofs = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_quads() *
+									     mg_dof_handler.selected_fe->dofs_per_quad,
+									     DoFHandler<3>::invalid_dof_index);
+
+
+					     // now allocate space for the
+					     // vertices. To this end, we need
+					     // to construct as many objects as
+					     // there are vertices and let them
+					     // allocate enough space for their
+					     // vertex indices on the levels they
+					     // live on. We need therefore to
+					     // count to how many levels a cell
+					     // belongs to, which we do by looping
+					     // over all cells and storing the
+					     // maximum and minimum level each
+					     // vertex we pass by  belongs to
+	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.tria->n_vertices());
+
+	    std::vector<unsigned int> min_level (mg_dof_handler.tria->n_vertices(), mg_dof_handler.tria->n_levels());
+	    std::vector<unsigned int> max_level (mg_dof_handler.tria->n_vertices(), 0);
+
+	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.tria->begin(),
+						       endc = mg_dof_handler.tria->end();
+	    for (; cell!=endc; ++cell)
+	      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		   ++vertex)
+		{
+		  const unsigned int vertex_index = cell->vertex_index(vertex);
+		  if (min_level[vertex_index] > static_cast<unsigned int>(cell->level()))
+		    min_level[vertex_index] = cell->level();
+		  if (max_level[vertex_index] < static_cast<unsigned int>(cell->level()))
+		    max_level[vertex_index] = cell->level();
+		}
+
+
+					     // now allocate the needed space
+	    for (unsigned int vertex=0; vertex<mg_dof_handler.tria->n_vertices(); ++vertex)
+	      if (mg_dof_handler.tria->vertex_used(vertex))
+		{
+		  Assert (min_level[vertex] < mg_dof_handler.tria->n_levels(), ExcInternalError());
+		  Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
+
+		  mg_dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex],
+					       max_level[vertex],
+					       mg_dof_handler.get_fe().dofs_per_vertex);
+		}
+	      else
+		{
+		  Assert (min_level[vertex] == mg_dof_handler.tria->n_levels(), ExcInternalError());
+		  Assert (max_level[vertex] == 0, ExcInternalError());
+
+						   // reset to original state
+		  mg_dof_handler.mg_vertex_dofs[vertex].init (1, 0, 0);
+		}
+	  }
+
+
     };
   }
 }
@@ -1951,272 +2214,11 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 #endif
 
 
-#if deal_II_dimension == 1
-
-template <>
-void MGDoFHandler<1>::reserve_space () {
-  const unsigned int dim = 1;
-  const unsigned int spacedim = 1;
-
-  Assert (this->selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
-  Assert (this->tria->n_levels() > 0, DoFHandler<dim>::ExcInvalidTriangulation());
-
-				   //////////////////////////
-				   // DESTRUCTION
-  clear_space ();
-
-				   ////////////////////////////
-				   // CONSTRUCTION
-
-				   // first allocate space for the
-				   // lines on each level
-  for (unsigned int i=0; i<this->tria->n_levels(); ++i)
-    {
-      mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
-
-      mg_levels.back()->lines.dofs = std::vector<unsigned int>(this->tria->n_raw_lines(i) *
-							 this->selected_fe->dofs_per_line,
-							 DoFHandler<1>::invalid_dof_index);
-    };
-
-				   // now allocate space for the
-				   // vertices. To this end, we need
-				   // to construct as many objects as
-				   // there are vertices and let them
-				   // allocate enough space for their
-				   // vertex indices on the levels they
-				   // live on. We need therefore to
-				   // count to how many levels a cell
-				   // belongs to, which we do by looping
-				   // over all cells and storing the
-				   // maximum and minimum level each
-				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (this->tria->n_vertices());
-
-  std::vector<unsigned int> min_level (this->tria->n_vertices(), this->tria->n_levels());
-  std::vector<unsigned int> max_level (this->tria->n_vertices(), 0);
-
-  Triangulation<dim,spacedim>::cell_iterator cell = this->tria->begin(),
-				    endc = this->tria->end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-	 ++vertex)
-      {
-	const unsigned int vertex_index = cell->vertex_index(vertex);
-	if (min_level[vertex_index] > static_cast<unsigned int>(cell->level()))
-	  min_level[vertex_index] = cell->level();
-	if (max_level[vertex_index] < static_cast<unsigned int>(cell->level()))
-	  max_level[vertex_index] = cell->level();
-      };
-
-				   // now allocate the needed space
-  for (unsigned int vertex=0; vertex<this->tria->n_vertices(); ++vertex)
-    if (this->tria->vertex_used(vertex))
-      {
-	Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
-	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
-
-	mg_vertex_dofs[vertex].init (min_level[vertex],
-				     max_level[vertex],
-				     this->get_fe().dofs_per_vertex);
-      }
-    else
-      {
-	Assert (min_level[vertex] == this->tria->n_levels(),   ExcInternalError());
-	Assert (max_level[vertex] == 0, ExcInternalError());
-
-					 // reset to original state
-	mg_vertex_dofs[vertex].init (1, 0, 0);
-      }
+template <int dim, int spacedim>
+void MGDoFHandler<dim,spacedim>::reserve_space ()
+{
+  internal::MGDoFHandler::Implementation::reserve_space (*this);
 }
-
-#endif
-
-
-#if deal_II_dimension == 2
-
-template <>
-void MGDoFHandler<2>::reserve_space () {
-  const unsigned int dim = 2;
-  const unsigned int spacedim = 2;
-
-  Assert (this->selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
-  Assert (this->tria->n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
-
-				   ////////////////////////////
-				   // DESTRUCTION
-  clear_space ();
-
-				   ////////////////////////////
-				   // CONSTRUCTION
-
-				   // first allocate space for the
-				   // lines and quads on each level
-  for (unsigned int i=0; i<this->tria->n_levels(); ++i)
-    {
-      mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
-
-      mg_levels.back()->quads.dofs = std::vector<unsigned int> (this->tria->n_raw_quads(i) *
-							  this->selected_fe->dofs_per_quad,
-							  DoFHandler<2>::invalid_dof_index);
-    };
-
-  mg_faces = new internal::DoFHandler::DoFFaces<2>;
-  mg_faces->lines.dofs = std::vector<unsigned int> (this->tria->n_raw_lines() *
-						    this->selected_fe->dofs_per_line,
-						    DoFHandler<2>::invalid_dof_index);
-
-
-				   // now allocate space for the
-				   // vertices. To this end, we need
-				   // to construct as many objects as
-				   // there are vertices and let them
-				   // allocate enough space for their
-				   // vertex indices on the levels they
-				   // live on. We need therefore to
-				   // count to how many levels a cell
-				   // belongs to, which we do by looping
-				   // over all cells and storing the
-				   // maximum and minimum level each
-				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (this->tria->n_vertices());
-
-				   // initialize these arrays with
-				   // invalid values (min>max)
-  std::vector<unsigned int> min_level (this->tria->n_vertices(),
-				       this->tria->n_levels());
-  std::vector<unsigned int> max_level (this->tria->n_vertices(), 0);
-
-  Triangulation<dim,spacedim>::cell_iterator cell = this->tria->begin(),
-				    endc = this->tria->end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-	 ++vertex)
-      {
-	const unsigned int vertex_index = cell->vertex_index(vertex);
-	if (min_level[vertex_index] > static_cast<unsigned int>(cell->level()))
-	  min_level[vertex_index] = cell->level();
-	if (max_level[vertex_index] < static_cast<unsigned int>(cell->level()))
-	  max_level[vertex_index] = cell->level();
-      }
-
-
-                                   // now allocate the needed space
-  for (unsigned int vertex=0; vertex<this->tria->n_vertices(); ++vertex)
-    if (this->tria->vertex_used(vertex))
-      {
-	Assert (min_level[vertex] < this->tria->n_levels(), ExcInternalError());
-	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
-
-	mg_vertex_dofs[vertex].init (min_level[vertex],
-				     max_level[vertex],
-				     this->get_fe().dofs_per_vertex);
-      }
-    else
-      {
-	Assert (min_level[vertex] == this->tria->n_levels(),   ExcInternalError());
-	Assert (max_level[vertex] == 0, ExcInternalError());
-
-					 // reset to original state
-	mg_vertex_dofs[vertex].init (1, 0, 0);
-      }
-}
-
-#endif
-
-
-#if deal_II_dimension == 3
-
-template <>
-void MGDoFHandler<3>::reserve_space () {
-
-  const unsigned int dim = 3;
-  const unsigned int spacedim = 3;
-
-  Assert (this->selected_fe != 0, DoFHandler<3>::ExcNoFESelected());
-  Assert (this->tria->n_levels() > 0, DoFHandler<3>::ExcInvalidTriangulation());
-
-				   ////////////////////////////
-				   // DESTRUCTION
-  clear_space ();
-
-				   ////////////////////////////
-				   // CONSTRUCTION
-
-				   // first allocate space for the
-				   // lines and quads on each level
-  for (unsigned int i=0; i<this->tria->n_levels(); ++i)
-    {
-      mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
-
-      mg_levels.back()->hexes.dofs
-	= std::vector<unsigned int> (this->tria->n_raw_hexs(i) *
-				     this->selected_fe->dofs_per_hex,
-				     DoFHandler<3>::invalid_dof_index);
-    };
-  mg_faces = new internal::DoFHandler::DoFFaces<3>;
-  mg_faces->lines.dofs = std::vector<unsigned int> (this->tria->n_raw_lines() *
-						    this->selected_fe->dofs_per_line,
-						    DoFHandler<3>::invalid_dof_index);
-  mg_faces->quads.dofs = std::vector<unsigned int> (this->tria->n_raw_quads() *
-						    this->selected_fe->dofs_per_quad,
-						    DoFHandler<3>::invalid_dof_index);
-
-
-				   // now allocate space for the
-				   // vertices. To this end, we need
-				   // to construct as many objects as
-				   // there are vertices and let them
-				   // allocate enough space for their
-				   // vertex indices on the levels they
-				   // live on. We need therefore to
-				   // count to how many levels a cell
-				   // belongs to, which we do by looping
-				   // over all cells and storing the
-				   // maximum and minimum level each
-				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (this->tria->n_vertices());
-
-  std::vector<unsigned int> min_level (this->tria->n_vertices(), this->tria->n_levels());
-  std::vector<unsigned int> max_level (this->tria->n_vertices(), 0);
-
-  Triangulation<dim,spacedim>::cell_iterator cell = this->tria->begin(),
-				    endc = this->tria->end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-	 ++vertex)
-      {
-	const unsigned int vertex_index = cell->vertex_index(vertex);
-	if (min_level[vertex_index] > static_cast<unsigned int>(cell->level()))
-	  min_level[vertex_index] = cell->level();
-	if (max_level[vertex_index] < static_cast<unsigned int>(cell->level()))
-	  max_level[vertex_index] = cell->level();
-      };
-
-
-				   // now allocate the needed space
-  for (unsigned int vertex=0; vertex<this->tria->n_vertices(); ++vertex)
-    if (this->tria->vertex_used(vertex))
-      {
-	Assert (min_level[vertex] < this->tria->n_levels(), ExcInternalError());
-	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
-
-	mg_vertex_dofs[vertex].init (min_level[vertex],
-				     max_level[vertex],
-				     this->get_fe().dofs_per_vertex);
-      }
-    else
-      {
-	Assert (min_level[vertex] == this->tria->n_levels(), ExcInternalError());
-	Assert (max_level[vertex] == 0, ExcInternalError());
-
-					 // reset to original state
-	mg_vertex_dofs[vertex].init (1, 0, 0);
-      }
-}
-
-#endif
-
 
 template <int dim, int spacedim>
 void MGDoFHandler<dim,spacedim>::clear_space ()
