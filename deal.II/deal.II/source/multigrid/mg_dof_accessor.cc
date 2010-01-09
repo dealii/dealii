@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -70,7 +70,7 @@ MGDoFAccessor<structdim, dim, spacedim> &
 MGDoFAccessor<structdim, dim, spacedim>::operator = (const MGDoFAccessor &da)
 {
   BaseClass::operator= (*this);
-  
+
   set_dof_handler (da.mg_dof_handler);
   return *this;
 }
@@ -162,7 +162,7 @@ MGDoFAccessor<structdim, dim, spacedim>::child (const unsigned int i) const
 	0),
        this->child_index (i),
        this->mg_dof_handler);
-  
+
 				   // make sure that we either created
 				   // a past-the-end iterator or one
 				   // pointing to a used cell
@@ -193,7 +193,7 @@ MGDoFAccessor<structdim,dim,spacedim>::line (const unsigned int i) const
   Assert (structdim > 1, ExcImpossibleInDim(structdim));
 				   // checking of 'i' happens in
 				   // line_index(i)
-  
+
   return typename internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator
     (
       this->tria,
@@ -241,7 +241,7 @@ namespace internal
 	  *next++ = accessor.mg_vertex_dof_index(level,vertex,d);
       for (unsigned int d=0; d<dofs_per_line; ++d)
 	*next++ = accessor.mg_dof_index(level,d);
-  
+
       Assert (next == dof_indices.end(),
 	      ExcInternalError());
     }
@@ -262,7 +262,7 @@ namespace internal
 	  *next_dof_value++ = values(accessor.mg_vertex_dof_index(level,vertex,d));
       for (unsigned int d=0; d<dofs_per_line; ++d)
 	*next_dof_value++ = values(accessor.mg_dof_index(level,d));
-  
+
       Assert (next_dof_value == dof_values.end(),
 	      ExcInternalError());
     }
@@ -288,7 +288,7 @@ namespace internal
 	  *next++ = accessor.line(line)->mg_dof_index(level,d);
       for (unsigned int d=0; d<dofs_per_quad; ++d)
 	*next++ = accessor.mg_dof_index(level,d);
-  
+
       Assert (next == dof_indices.end(),
 	      ExcInternalError());
     }
@@ -313,7 +313,7 @@ namespace internal
 	  *next_dof_value++ = values(accessor.line(line)->mg_dof_index(level,d));
       for (unsigned int d=0; d<dofs_per_quad; ++d)
 	*next_dof_value++ = values(accessor.mg_dof_index(level,d));
-  
+
       Assert (next_dof_value == dof_values.end(),
 	      ExcInternalError());
     }
@@ -341,7 +341,7 @@ namespace internal
 	  *next++ = accessor.quad(quad)->mg_dof_index(level,d);
       for (unsigned int d=0; d<dofs_per_hex; ++d)
 	*next++ = accessor.mg_dof_index(level,d);
-  
+
       Assert (next == dof_indices.end(),
 	      ExcInternalError());
     }
@@ -370,7 +370,7 @@ namespace internal
 	  *next_dof_value++ = values(accessor.quad(quad)->mg_dof_index(level,d));
       for (unsigned int d=0; d<dofs_per_hex; ++d)
 	*next_dof_value++ = values(accessor.dof_index(d));
-  
+
       Assert (next_dof_value == dof_values.end(),
 	      ExcInternalError());
     }
@@ -492,7 +492,7 @@ MGDoFCellAccessor<dim,spacedim>::neighbor (const unsigned int i) const
 					       this->neighbor_level (i),
 					       this->neighbor_index (i),
 					       this->mg_dof_handler);
-  
+
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsNeighbor());
@@ -509,7 +509,7 @@ MGDoFCellAccessor<dim,spacedim>::child (const unsigned int i) const
 					       this->present_level+1,
 					       this->child_index (i),
 					       this->mg_dof_handler);
-  
+
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsChild());
@@ -534,7 +534,7 @@ MGDoFCellAccessor<dim,spacedim>::face (const unsigned int i) const
 	    return this->quad(i);
       default:
 	    Assert (false, ExcNotImplemented());
-	    return 
+	    return
 	      typename internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator();
     }
 }
@@ -631,6 +631,7 @@ template class MGDoFAccessor<1, 1, 1>;
 template class MGDoFAccessor<1, 1, 2>;
 
 template class MGDoFCellAccessor<1>;
+template class MGDoFCellAccessor<1,2>;
 
 template class TriaRawIterator<MGDoFCellAccessor<1> >;
 template class TriaIterator<MGDoFCellAccessor<1> >;
@@ -645,6 +646,7 @@ template class MGDoFAccessor<1, 2, 3>;
 template class MGDoFAccessor<2, 2, 3>;
 
 template class MGDoFCellAccessor<2>;
+template class MGDoFCellAccessor<2,3>;
 
 template class TriaRawIterator   <MGDoFAccessor<1, 2, 2> >;
 template class TriaIterator      <MGDoFAccessor<1, 2, 2> >;
