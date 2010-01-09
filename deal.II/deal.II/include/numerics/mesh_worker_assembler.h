@@ -675,7 +675,8 @@ namespace MeshWorker
 					  * variables and initialize
 					  * cell matrix vectors.
 					  */
-	void initialize(std::vector<MatrixPtr>& matrices);
+      void initialize(const BlockInfo* block_info,
+		      std::vector<MatrixPtr>& matrices);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -732,7 +733,12 @@ namespace MeshWorker
 					  * pointers.
 					  */
 	std::vector<MatrixPtr> matrices;
-
+      
+      /**
+       * A pointer to the object containing the block structure.
+       */
+      SmartPointer<const BlockInfo> block_info;
+      
 					 /**
 					  * The smallest positive
 					  * number that will be
@@ -792,7 +798,8 @@ namespace MeshWorker
 					  * variables and initialize
 					  * cell matrix vectors.
 					  */
-	void initialize(std::vector<MatrixPtr>& matrices);
+	void initialize(const BlockInfo* block_info,
+		        std::vector<MatrixPtr>& matrices);
 
 					 /**
 					  * Multigrid methods on
@@ -878,8 +885,13 @@ namespace MeshWorker
 					  * the coarse and the fine
 					  * level at refinement edges.
 					  */
-	std::vector<MatrixPtr> flux_up;
-	
+	std::vector<MatrixPtr> flux_up;	
+      
+      /**
+       * A pointer to the object containing the block structure.
+       */
+      SmartPointer<const BlockInfo> block_info;
+      
 					 /**
 					  * The smallest positive
 					  * number that will be
@@ -1382,8 +1394,9 @@ namespace MeshWorker
     
     template <class MATRIX, typename number>
     inline void
-    MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(std::vector<MatrixPtr>& m)
+    MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(const BlockInfo* b, std::vector<MatrixPtr>& m)
     {
+      block_info = b;
       matrices = m;
     }
     
@@ -1411,8 +1424,8 @@ namespace MeshWorker
 					       // block-wise local
 					       // numbering we use in
 					       // our local matrices
-	      const unsigned int jcell = this->block_info.local.local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info.local.local_to_global(block_col, k);
+	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
 
 					       // The global dof
 					       // indices to assemble
@@ -1422,8 +1435,8 @@ namespace MeshWorker
 					       // different cells, we
 					       // provide two sets of
 					       // dof indices.
-	      const unsigned int jglobal = this->block_info.global.global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info.global.global_to_local(dof2[kcell]).second;
+	      const unsigned int jglobal = this->block_info->global().global_to_local(dof1[jcell]).second;
+	      const unsigned int kglobal = this->block_info->global().global_to_local(dof2[kcell]).second;
 	      
 	      global.add(jglobal, kglobal, local(j,k));
 	    }
@@ -1443,7 +1456,7 @@ namespace MeshWorker
 	  const unsigned int row = matrices[i]->row;
 	  const unsigned int col = matrices[i]->column;
 
-	  assemble(matrices[i]->matrix, info->M1[i].matrix, row, col, info.indices, info.indices);
+	  assemble(matrices[i]->matrix, info.M1[i].matrix, row, col, info.indices, info.indices);
 	}
     }
 
@@ -1462,15 +1475,10 @@ namespace MeshWorker
 	  const unsigned int row = matrices[i]->row;
 	  const unsigned int col = matrices[i]->column;
 
-	  assemble(matrices[i]->matrix, this->M11[i].matrix, row, col, info1.indices, info1.indices);
-	  assemble(matrices[i]->matrix, this->M12[i].matrix, row, col, info1.indices, info2.indices);
-	  assemble(matrices[i]->matrix, this->M21[i].matrix, row, col, info2.indices, info1.indices);
-	  assemble(matrices[i]->matrix, this->M22[i].matrix, row, col, info2.indices, info2.indices);
-
-	  this->M11[i].matrix = 0.;
-	  this->M12[i].matrix = 0.;
-	  this->M21[i].matrix = 0.;
-	  this->M22[i].matrix = 0.;
+	  assemble(matrices[i]->matrix, info1.M1[i].matrix, row, col, info1.indices, info1.indices);
+	  assemble(matrices[i]->matrix, info1.M2[i].matrix, row, col, info1.indices, info2.indices);
+	  assemble(matrices[i]->matrix, info2.M1[i].matrix, row, col, info2.indices, info2.indices);
+	  assemble(matrices[i]->matrix, info2.M2[i].matrix, row, col, info2.indices, info1.indices);
 	}
     }
 
@@ -1488,8 +1496,10 @@ namespace MeshWorker
     
     template <class MATRIX, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(std::vector<MatrixPtr>& m)
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(const BlockInfo* b,
+								  std::vector<MatrixPtr>& m)
     {
+      block_info = b;
       matrices = m;
     }
     
@@ -1530,8 +1540,8 @@ namespace MeshWorker
 					       // block-wise local
 					       // numbering we use in
 					       // our local matrices
-	      const unsigned int jcell = this->block_info.local.local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info.local.local_to_global(block_col, k);
+	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
 
 					       // The global dof
 					       // indices to assemble
@@ -1541,8 +1551,8 @@ namespace MeshWorker
 					       // different cells, we
 					       // provide two sets of
 					       // dof indices.
-	      const unsigned int jglobal = this->block_info.levels[level1].global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info.levels[level2].global_to_local(dof2[kcell]).second;
+	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
 
 	      if (transpose)
 		global.add(kglobal, jglobal, local(j,k));
@@ -1567,10 +1577,8 @@ namespace MeshWorker
 	  const unsigned int row = matrices[i]->row;
 	  const unsigned int col = matrices[i]->column;
 
-	  assemble(matrices[i]->matrix[level], this->M11[i].matrix, row, col,
+	  assemble(matrices[i]->matrix[level], info.M1[i].matrix, row, col,
 		   info.indices, info.indices, level, level);
-	  
-	  this->M11[i].matrix = 0.;
 	}
     }
 
@@ -1594,10 +1602,10 @@ namespace MeshWorker
 
 	  if (level1 == level2)
 	    {
-	      assemble(matrices[i]->matrix[level1], this->M11[i].matrix, row, col, info1.indices, info1.indices, level1, level1);
-	      assemble(matrices[i]->matrix[level1], this->M12[i].matrix, row, col, info1.indices, info2.indices, level1, level2);
-	      assemble(matrices[i]->matrix[level1], this->M21[i].matrix, row, col, info2.indices, info1.indices, level2, level1);
-	      assemble(matrices[i]->matrix[level1], this->M22[i].matrix, row, col, info2.indices, info2.indices, level2, level2);
+	      assemble(matrices[i]->matrix[level1], info1.M1[i].matrix, row, col, info1.indices, info1.indices, level1, level1);
+	      assemble(matrices[i]->matrix[level1], info1.M2[i].matrix, row, col, info1.indices, info2.indices, level1, level2);
+	      assemble(matrices[i]->matrix[level1], info2.M1[i].matrix, row, col, info2.indices, info2.indices, level2, level2);
+	      assemble(matrices[i]->matrix[level1], info2.M2[i].matrix, row, col, info2.indices, info1.indices, level2, level1);
 	    }
 	  else
 	    {
@@ -1607,19 +1615,14 @@ namespace MeshWorker
 						   // Do not add M22,
 						   // which is done by
 						   // the coarser cell
-		  assemble(matrices[i]->matrix[level1], this->M11[i].matrix, row, col,
+		  assemble(matrices[i]->matrix[level1], info1.M1[i].matrix, row, col,
 			   info1.indices, info1.indices, level1, level1);	      
-		  assemble(flux_up[i]->matrix[level1], this->M12[i].matrix, row, col,
+		  assemble(flux_up[i]->matrix[level1], info1.M2[i].matrix, row, col,
 			   info1.indices, info2.indices, level1, level2, true);
-		  assemble(flux_down[i]->matrix[level1], this->M21[i].matrix, row, col,
+		  assemble(flux_down[i]->matrix[level1], info2.M2[i].matrix, row, col,
 			   info2.indices, info1.indices, level2, level1);
 		}
 	    }
-	  
-	  this->M11[i].matrix = 0.;
-	  this->M12[i].matrix = 0.;
-	  this->M21[i].matrix = 0.;
-	  this->M22[i].matrix = 0.;
 	}
     }
 
