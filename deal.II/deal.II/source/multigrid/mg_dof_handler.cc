@@ -2257,6 +2257,7 @@ get_dof_index<1> (const unsigned int       obj_level,
 		  const unsigned int       fe_index,
 		  const unsigned int       local_index) const;
 
+#if deal_II_dimension < 3
 template
 unsigned int
 MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
@@ -2264,6 +2265,7 @@ get_dof_index<1> (const unsigned int       obj_level,
 		  const unsigned int       obj_index,
 		  const unsigned int       fe_index,
 		  const unsigned int       local_index) const;
+#endif
 
 #if deal_II_dimension >= 2
 template
@@ -2274,6 +2276,7 @@ get_dof_index<2> (const unsigned int       obj_level,
 		  const unsigned int       fe_index,
 		  const unsigned int       local_index) const;
 
+#if deal_II_dimension < 3
 template
 unsigned int
 MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
@@ -2281,6 +2284,7 @@ get_dof_index<2> (const unsigned int       obj_level,
 		  const unsigned int       obj_index,
 		  const unsigned int       fe_index,
 		  const unsigned int       local_index) const;
+#endif
 
 #if deal_II_dimension >= 3
 template
@@ -2302,6 +2306,7 @@ set_dof_index<1> (const unsigned int       obj_level,
 		  const unsigned int       local_index,
 		  const unsigned int       global_index) const;
 
+#if deal_II_dimension < 3
 template
 void
 MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
@@ -2310,6 +2315,7 @@ set_dof_index<1> (const unsigned int       obj_level,
 		  const unsigned int       fe_index,
 		  const unsigned int       local_index,
 		  const unsigned int       global_index) const;
+#endif
 
 #if deal_II_dimension >= 2
 template
@@ -2321,6 +2327,7 @@ set_dof_index<2> (const unsigned int       obj_level,
 		  const unsigned int       local_index,
 		  const unsigned int       global_index) const;
 
+#if deal_II_dimension < 3
 template
 void
 MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
@@ -2329,6 +2336,7 @@ set_dof_index<2> (const unsigned int       obj_level,
 		  const unsigned int       fe_index,
 		  const unsigned int       local_index,
 		  const unsigned int       global_index) const;
+#endif
 
 #if deal_II_dimension >= 3
 template
