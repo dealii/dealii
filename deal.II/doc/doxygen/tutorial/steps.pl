@@ -89,7 +89,7 @@ EOT
 
 for (my $i=1; $i<=$laststep;++$i)
 {
-    printf 'Step%02d [label="Step %d", URL="step_%d.html"', $i, $i, $i;
+    printf 'Step%02d [label="%d", URL="step_%d.html"', $i, $i, $i;
     print $attribute{$i};
     print "];\n";
 }
