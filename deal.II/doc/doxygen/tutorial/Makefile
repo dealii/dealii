@@ -6,8 +6,7 @@ include ../../../common/Make.global_options
 
 # plain names of those files that we shall treat
 example-names = $(notdir $(shell echo $D/examples/step-? \
-                                      $D/examples/step-?? \
-				      $D/examples/MADDs-*))
+                                      $D/examples/step-??))
 
 # prefix names for generated intermediate files
 gen-example-names = $(addprefix generated/, $(example-names))
@@ -34,7 +33,7 @@ get_basename = $(shell echo $(1) | $(PERL) -pi -e 's/(generated|doxygen).//g; s/
 
 
 
-all: $(example-doxygen) steps.png
+all: $(example-doxygen)
 
 # generate dot file
 steps.dot: steps.pl
