@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -66,11 +66,12 @@
  *
  *
  * <dt class="glossary">@anchor GlossCompress Compressing distributed
- *                                            vectors and matrices</dt>
+ *                                              vectors and matrices</dt>
  *
- * For parallel computations, deal.II uses the vector and matrix
+ * <dd>
+ * For %parallel computations, deal.II uses the vector and matrix
  * classes defined in the PETScWrappers and TrilinosWrappers
- * namespaces. When running programs in parallel using MPI, these
+ * namespaces. When running programs in %parallel using MPI, these
  * classes only store a certain number of rows or elements on the
  * current processor, whereas the rest of the vector or matrix is
  * stored on the other processors that belong to our MPI
@@ -112,15 +113,17 @@
  * processors that did assembly operations want to communicate, while
  * those that didn't assemble anything do not want to communicate).
  *
- * The way out of a situation like this is to use one of the two following ways:
+ * The way out of a situation like this is to use one of the two following
+ * ways:
  * - You tell the object that you want to compress what operation is
- *   intended. The TrilinosWrappers::VectorBase::compress() can take
- *   such an additional argument
+ *   intended. The TrilinosWrappers::VectorBase::compress() can take such an
+ *   additional argument. Or,
  * - You do a fake addition or set operation on the object in question.
  *
  * Some of the objects are also indifferent and can figure out what to
  * do without being told. The TrilinosWrappers::SparseMatrix can do that,
  * for example.
+ * </dd>
  *
  *
  * <dt class="glossary">@anchor GlossDistorted Distorted cells</dt>
@@ -187,7 +190,7 @@
  * the problem that holds in 3d or if more than one side of the cell is at the
  * boundary):
  *
- * @image html distorted_2d_refinement_01.png "One cell with a edge approximating a curved boundary"
+ * @image html distorted_2d_refinement_01.png "One cell with an edge approximating a curved boundary"
  *
  * Now, if this cell is refined, we first split all edges and place
  * new mid-points on them. For the left, top and right edge, this is
@@ -380,11 +383,12 @@ Article{BK07,
  * element is primitive. This includes, in particular, all scalar
  * elements as well as vector-valued elements assembled via the
  * FESystem class from other primitive (for example scalar) elements
- * as shown in @ref step_8 "step-8", @ref step_29 "step_29" or @ref
- * step_22 "step-22". On the other hand, the FE_RaviartThomas class used
+ * as shown in @ref step_8 "step-8", @ref step_29 "step_29", @ref
+ * step_22 "step-22" and several others. On the other hand,
+ * the FE_RaviartThomas class used 
  * in @ref step_20 "step-20" and @ref step_21 "step-21", or the
  * FE_Nedelec class provide non-primitive finite elements because
- * there each vector-value shape function may have several non-zero
+ * there, each vector-value shape function may have several non-zero
  * components.</dd>
  *
  * <dt class="glossary">@anchor GlossReferenceCell Reference cell</dt>
@@ -403,7 +407,7 @@ Article{BK07,
  * <code>cell-@>set_subdomain_id(13)</code>. While in principle this property
  * can be used in any way application programs deem useful (it is simply an
  * integer associated with each cell that can indicate whatever you want), at
- * least for programs that run in parallel it usually denotes the processor a
+ * least for programs that run in %parallel it usually denotes the processor a
  * cell is associated with.
  *
  * For programs that are parallelized based on MPI but where each processor
@@ -453,7 +457,7 @@ Article{BK07,
  *
  *
  * <dt class="glossary">@anchor GlossUnitSupport Unit support points</dt>
- * <dd>@ref GlossSupport "Support points" on the reference cell, defined in
+ * <dd>These are the @ref GlossSupport "support points" on the reference cell, defined in
  * FiniteElementBase. For example, the usual Q1 element in 1d has support
  * points  at <tt>x=0</tt> and <tt>x=1</tt> (and similarly, in higher
  * dimensions at the vertices of the unit square or cube). On the other
