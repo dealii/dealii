@@ -36,6 +36,11 @@ deal.II deal.tag: tutorial \
 tutorial:
 	@cd tutorial ; $(MAKE)
 
+deal.dox: Makefile
+	@echo "=== Making $@"
+	@echo "INPUT=`echo headers ../../{base,lac,deal.II}/include/* tutorial/doxygen ../news/*.h`" > $@
+	@echo "IMAGE_PATH=`echo images ../../examples/*/doc`" >> $@
+
 
 
 # validate cross references. there are so many html files in these
@@ -44,7 +49,7 @@ tutorial:
 # as this leads to error messages of the kind "/usr/bin/perl: Argument 
 # list too long". Instead, use a loop over all html files
 validate-xrefs:
-	@echo --- Validating xrefs in doxygen/deal.II/ ---
+	@echo "--- Validating xrefs in doxygen/deal.II/ ---"
 	@cd deal.II ; \
 		for i in *.html ; do \
 			$(PERL) $D/common/scripts/validate-xrefs.pl $$i ; \
