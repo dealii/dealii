@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -338,7 +338,8 @@ namespace MeshWorker
 					  * matrix pointers into local
 					  * variables.
 					  */
-	void initialize(NamedData<VECTOR*>& residuals);
+	void initialize(const BlockInfo* block_info,
+			NamedData<VECTOR*>& residuals);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -380,9 +381,8 @@ namespace MeshWorker
 					  * Assemble a single local
 					  * residual into the global.
 					  */
-	void assemble(VECTOR global,
+	void assemble(VECTOR& global,
 		      const BlockVector<double>& local,
-		      const BlockIndices& bi,
 		      const std::vector<unsigned int>& dof);
 	
 					 /**
@@ -391,7 +391,12 @@ namespace MeshWorker
 					  * pointers.
 					  */
 	NamedData<SmartPointer<VECTOR,ResidualLocalBlocksToGlobalBlocks<VECTOR> > > residuals;
-    };
+       
+      /**
+       * A pointer to the object containing the block structure.
+       */
+      SmartPointer<const BlockInfo> block_info;
+   };
 
 
 /**
@@ -1134,8 +1139,10 @@ namespace MeshWorker
 
     template <class VECTOR>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(NamedData<VECTOR*>& m)
+    ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(const BlockInfo* b,
+							  NamedData<VECTOR*>& m)
     {
+      block_info = b;
       residuals = m;      
     }
 
@@ -1152,9 +1159,8 @@ namespace MeshWorker
     template <class VECTOR>
     inline void
     ResidualLocalBlocksToGlobalBlocks<VECTOR>::assemble(
-      VECTOR global,
+      VECTOR& global,
       const BlockVector<double>& local,
-      const BlockIndices& bi,
       const std::vector<unsigned int>& dof)
     {
       for (unsigned int b=0;b<local.n_blocks();++b)
@@ -1168,8 +1174,8 @@ namespace MeshWorker
 					     // block-wise local
 					     // numbering we use in
 					     // our local vectors
-	    const unsigned int jcell = this->bi.local_to_global(b, j);
-	    (*global)(dof[jcell]) += local.block(b)(j);
+	    const unsigned int jcell = this->block_info->local().local_to_global(b, j);
+	    global(dof[jcell]) += local.block(b)(j);
 	  }
     }
 
@@ -1180,8 +1186,8 @@ namespace MeshWorker
     ResidualLocalBlocksToGlobalBlocks<VECTOR>::assemble(
       const DoFInfo<dim>& info)
     {
-      for (unsigned int i=0;i<residuals.n_vectors();++i)
-	assemble(residuals.vector(i), info.R[i], info.block_info.local(), info.indices);
+      for (unsigned int i=0;i<residuals.size();++i)
+	assemble(*residuals(i), info.R[i], info.indices);
     }
 
     
@@ -1192,10 +1198,10 @@ namespace MeshWorker
       const DoFInfo<dim>& info1,
       const DoFInfo<dim>& info2)
     {
-      for (unsigned int i=0;i<residuals.n_vectors();++i)
+      for (unsigned int i=0;i<residuals.size();++i)
 	{
-	  assemble(residuals.vector(i), info1.R[i], info1.block_info.local(), info1.indices);
-	  assemble(residuals.vector(i), info2.R[i], info2.block_info.local(), info2.indices);
+	  assemble(*residuals(i), info1.R[i], info1.indices);
+	  assemble(*residuals(i), info2.R[i], info2.indices);
 	}
     }
 
@@ -1402,6 +1408,18 @@ namespace MeshWorker
     
 
     
+    template <class MATRIX ,typename number>
+    template <int dim>
+    inline void
+    MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize_info(
+      DoFInfo<dim>& info,
+      bool interior_face) const
+    {
+      info.initialize_matrices(matrices, interior_face);
+    }
+
+
+
     template <class MATRIX, typename number>
     inline void
     MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble(
@@ -1503,6 +1521,18 @@ namespace MeshWorker
       matrices = m;
     }
     
+
+    template <class MATRIX ,typename number>
+    template <int dim>
+    inline void
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize_info(
+      DoFInfo<dim>& info,
+      bool interior_face) const
+    {
+      info.initialize_matrices(matrices, interior_face);
+    }
+
+
 
     template <class MATRIX, typename number>
     inline void

@@ -85,7 +85,7 @@ namespace MeshWorker
 					* provide row and column info.
 					*/
       template <class MatrixPtr>
-      void initialize_matrices(std::vector<MatrixPtr>& matrices,
+      void initialize_matrices(const std::vector<MatrixPtr>& matrices,
 			       bool both);
 	
 				       /**
@@ -526,7 +526,11 @@ namespace MeshWorker
 	std::vector<std::vector<std::vector<TYPE> > >& data,
 	VectorSelector& selector,
 	bool split_fevalues) const;
-	
+				       /**
+					* Cache the number of
+					* components of the system element.
+					*/
+      unsigned int n_components;
   };
 
 /**
@@ -549,19 +553,23 @@ namespace MeshWorker
 					*/
       template <typename T>
       IntegrationInfoBox(const T&);
-
-      template <class VECTOR>
-      void initialize_data(const VECTOR*, const std::string& name,
-			   bool values, bool gradients, bool hessians);
       
       template <class WORKER>
       void initialize(const WORKER&,
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping);
+
+      template <class WORKER, typename VECTOR>
+      void initialize(const WORKER&,
+		      const FiniteElement<dim, spacedim>& el,
+		      const Mapping<dim, spacedim>& mapping,
+		      const NamedData<VECTOR*>& data);
 	
 //      private:
 
-      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > data;
+      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
+      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > bdry_data;
+      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
       
       CellInfo cell_info;
       FaceInfo bdry_info;
@@ -593,7 +601,7 @@ namespace MeshWorker
   template <class MatrixPtr>
   inline void
   LocalResults<number>::initialize_matrices(
-    std::vector<MatrixPtr>& matrices,
+    const std::vector<MatrixPtr>& matrices,
     bool both)
   {
     M1.resize(matrices.size());
@@ -840,27 +848,6 @@ namespace MeshWorker
   
   
   template <int dim, int sdim>
-  template <typename VECTOR>
-  void
-  IntegrationInfoBox<dim,sdim>::initialize_data(
-    const VECTOR* v, const std::string& name,
-    bool values, bool gradients, bool hessians)
-  {
-    boost::shared_ptr<VectorData<VECTOR, dim, sdim> >
-      p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> ());
-    p->add(name, values, gradients, hessians);
-    p->initialize(v, name);
-    data = p;
-    
-    cell_info.initialize_data(data);
-    bdry_info.initialize_data(data);
-    face_info.initialize_data(data);
-    subface_info.initialize_data(data);
-    neighbor_info.initialize_data(data);
-  }
-
-  
-  template <int dim, int sdim>
   template <class WORKER>
   void
   IntegrationInfoBox<dim,sdim>::initialize(
@@ -883,10 +870,40 @@ namespace MeshWorker
     subface_info.initialize<FESubfaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 			    integrator.face_flags);
     neighbor_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
-			     integrator.ngbr_flags);
-  }    
-}
+						      integrator.ngbr_flags);
+  }
 
+
+  template <int dim, int sdim>
+  template <class WORKER, typename VECTOR>
+  void
+  IntegrationInfoBox<dim,sdim>::initialize(
+    const WORKER& integrator,
+    const FiniteElement<dim,sdim>& el,
+    const Mapping<dim,sdim>& mapping,
+    const NamedData<VECTOR*>& data)
+  {
+    initialize(integrator, el, mapping);
+    boost::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
+    
+    p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.cell_selector));
+    p->initialize(data);
+    cell_data = p;
+    cell_info.initialize_data(p);
+    
+    p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.bdry_selector));
+    p->initialize(data);
+    bdry_data = p;
+    bdry_info.initialize_data(p);
+        
+    p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.face_selector));
+    p->initialize(data);
+    face_data = p;
+    face_info.initialize_data(p);
+    subface_info.initialize_data(p);
+    neighbor_info.initialize_data(p);
+  }
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

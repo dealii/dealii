@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009 by Guido Kanschat
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by Guido Kanschat
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,47 +31,12 @@ IntegrationWorker<dim>::IntegrationWorker ()
 
 template<int dim>
 void
-IntegrationWorker<dim>::initialize_selectors(
-  const VectorSelector& cs,
-  const VectorSelector& bs,
-  const VectorSelector& fs)
+IntegrationWorker<dim>::initialize_update_flags ()
 {
-  cell_selector = cs;
-  bdry_selector = bs;
-  face_selector = fs;
-  
   if (cell_selector.has_values() != 0) cell_flags |= update_values;
   if (cell_selector.has_gradients() != 0) cell_flags |= update_gradients;
   if (cell_selector.has_hessians() != 0) cell_flags |= update_hessians;
   
-  if (bdry_selector.has_values() != 0) bdry_flags |= update_values;
-  if (bdry_selector.has_gradients() != 0) bdry_flags |= update_gradients;
-  if (bdry_selector.has_hessians() != 0) bdry_flags |= update_hessians;
-  
-  if (face_selector.has_values() != 0) face_flags |= update_values;
-  if (face_selector.has_gradients() != 0) face_flags |= update_gradients;
-  if (face_selector.has_hessians() != 0) face_flags |= update_hessians;
-  
-  if (face_selector.has_values() != 0) ngbr_flags |= update_values;
-  if (face_selector.has_gradients() != 0) ngbr_flags |= update_gradients;
-  if (face_selector.has_hessians() != 0) ngbr_flags |= update_hessians;  
-}
-
-
-template<int dim>
-void
-IntegrationWorker<dim>::add_selector(
-  const std::string& name, bool values, bool gradients, bool hessians,
-  bool cell, bool bdry, bool face)
-{
-  if (cell) cell_selector.add(name, values, gradients, hessians);
-  if (bdry) bdry_selector.add(name, values, gradients, hessians);
-  if (face) face_selector.add(name, values, gradients, hessians);  
-  
-  if (cell_selector.has_values() != 0) cell_flags |= update_values;
-  if (cell_selector.has_gradients() != 0) cell_flags |= update_gradients;
-  if (cell_selector.has_hessians() != 0) cell_flags |= update_hessians;
-
   if (bdry_selector.has_values() != 0) bdry_flags |= update_values;
   if (bdry_selector.has_gradients() != 0) bdry_flags |= update_gradients;
   if (bdry_selector.has_hessians() != 0) bdry_flags |= update_hessians;

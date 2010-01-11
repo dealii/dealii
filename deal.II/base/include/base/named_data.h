@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,12 +106,26 @@ class NamedData : public Subscriptor
 /// Number of stored data objects.
     unsigned int size() const;
 
-/// Access to stored data object by index.
+				     /**
+				      * @brief Access to stored data
+				      * object by index.
+				      *
+				      * @note This function throws an
+				      * exception, if is_const()
+				      * returns <tt>true</tt>. In such
+				      * a case, either cast the
+				      * NamedData object to a const
+				      * reference, or use the function
+				      * read() instead of this operator.
+				      */
     DATA& operator() (unsigned int i);
       
 /// Read-only access to stored data object by index.
     const DATA& operator() (unsigned int i) const;
-      
+
+/// Read only access for a non-const object.
+    const DATA& read (unsigned int i) const;
+    
 /// Name of object at index.
     const std::string& name(unsigned int i) const;
       
@@ -260,10 +274,11 @@ void
 NamedData<DATA>::merge(NamedData<DATA2>& other)
 {
   Assert(!is_constant, ExcConstantObject());
+  
   for (unsigned int i=0;i<other.size();++i)
     {
       names.push_back(other.name(i));
-      data.push_back(other(i));
+      data.push_back(other.read(i));
     }
   is_constant = other.is_const();
 }
@@ -333,6 +348,16 @@ template<typename DATA>
 inline
 const DATA&
 NamedData<DATA>::operator() (unsigned int i) const
+{
+  AssertIndexRange(i, size());
+  return data[i];
+}
+  
+  
+template<typename DATA>
+inline
+const DATA&
+NamedData<DATA>::read (unsigned int i) const
 {
   AssertIndexRange(i, size());
   return data[i];

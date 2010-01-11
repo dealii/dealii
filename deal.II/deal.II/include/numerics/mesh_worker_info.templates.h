@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -96,45 +96,7 @@ namespace MeshWorker
 	      new FEVALUES (mapping, el.base_element(i), quadrature, flags));
 	  }
       }
-
-    values.resize(global_data->n_values());
-				     // For all selected finite
-				     // element functions
-    for (unsigned int i=0;i<values.size();++i)
-      {
-	values[i].resize(this->local_indices().size());
-					 // For all components
-	for (unsigned int j=0;j<values[i].size();++j)
-	  {
-	    values[i][j].resize(quadrature.size());
-	  }
-      }
-    
-    gradients.resize(global_data->n_gradients());
-				     // For all selected finite
-				     // element functions
-    for (unsigned int i=0;i<gradients.size();++i)
-      {
-	gradients[i].resize(this->local_indices().size());
-					 // For all components
-	for (unsigned int j=0;j<gradients[i].size();++j)
-	  {
-	    gradients[i][j].resize(quadrature.size());
-	  }
-      }
-    
-    hessians.resize(global_data->n_hessians());
-				     // For all selected finite
-				     // element functions
-    for (unsigned int i=0;i<hessians.size();++i)
-      {
-	hessians[i].resize(this->local_indices().size());
-					 // For all components
-	for (unsigned int j=0;j<hessians[i].size();++j)
-	  {
-	    hessians[i][j].resize(quadrature.size());
-	  }
-      }
+    n_components = el.n_components();
   }
   
 
@@ -144,6 +106,51 @@ namespace MeshWorker
     const boost::shared_ptr<VectorDataBase<dim,sdim> > data)
   {
     global_data = data;
+    const unsigned int nqp = fevalv[0]->n_quadrature_points;
+    
+    values.resize(global_data->n_values());
+//    deallog << "values: " << values.size() << " [";
+				     // For all selected finite
+				     // element functions
+    for (unsigned int i=0;i<values.size();++i)
+      {
+	values[i].resize(n_components);
+//	deallog << ' ' << values[i].size() << " {";
+					 // For all components
+	for (unsigned int j=0;j<values[i].size();++j)
+	  {
+	    values[i][j].resize(nqp);
+//	    deallog << ' ' << values[i][j].size();
+	  }
+//	deallog << " }";
+      }
+//    deallog << " ]" << std::endl;
+    
+    gradients.resize(global_data->n_gradients());
+				     // For all selected finite
+				     // element functions
+    for (unsigned int i=0;i<gradients.size();++i)
+      {
+	gradients[i].resize(n_components);
+					 // For all components
+	for (unsigned int j=0;j<gradients[i].size();++j)
+	  {
+	    gradients[i][j].resize(nqp);
+	  }
+      }
+    
+    hessians.resize(global_data->n_hessians());
+				     // For all selected finite
+				     // element functions
+    for (unsigned int i=0;i<hessians.size();++i)
+      {
+	hessians[i].resize(n_components);
+					 // For all components
+	for (unsigned int j=0;j<hessians[i].size();++j)
+	  {
+	    hessians[i][j].resize(nqp);
+	  }
+      }
   }
 
 

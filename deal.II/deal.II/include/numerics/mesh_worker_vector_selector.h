@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,7 +27,7 @@ namespace MeshWorker
 /**
  * A class that selects vectors from a list of named vectors.
  *
- * Since the number of vectors in FEVectors may grow with every
+ * Since the number of vectors in a NamedData object may grow with every
  * nesting of applications or loops, it is important to be able to
  * select those, which are actually used in computing residuals etc.
  * This class organizes the selection.
@@ -44,11 +44,22 @@ namespace MeshWorker
     public:
 				       /**
 					* Add a vector to the
-					* selection. The arguments are
+					* selection of finite element
+					* functions. The arguments are
 					* the name of the vector and
 					* indicators, which
 					* information is to be
-					* extracted from the vector.
+					* extracted from the
+					* vector. The name refers to
+					* an entry in a NamedData
+					* object, which will be
+					* identified by initialize().
+					* The three bool parameters
+					* indicate, whether values,
+					* greadients and Hessians of
+					* the finite element function
+					* are to be computed on each
+					* cell or face.
 					*/
       void add(const std::string& name,
 	       bool values = true,
@@ -57,7 +68,20 @@ namespace MeshWorker
 
 				       /**
 					* Initialize the selection
-					* field with a data vector.
+					* field with a data
+					* vector. While add() only
+					* enters the names of vectors,
+					* which will be used in the integration
+					* loop over cells and faces,
+					* this function links the
+					* names to actual vectos in a
+					* NamedData object.
+					*
+					* @note This function caches
+					* the index associated with a
+					* name. Therefore, it must be
+					* called everytime after the
+					* NamedData object has changed.
 					*/
       template <class DATA>
       void initialize(const NamedData<DATA>&);
@@ -160,11 +184,21 @@ namespace MeshWorker
   {
     public:
 				       /**
+					* Constructor
+					*/
+      VectorDataBase();
+      
+				       /**
+					* Constructor from a base
+					* class object
+					*/
+      VectorDataBase(const VectorSelector&);
+      
+				       /**
 					* Virtual, but empty
 					* destructor.
 					*/
       virtual ~VectorDataBase();
-      
 				       /**
 					* The only function added to
 					* VectorSelector is an
@@ -257,7 +291,42 @@ namespace MeshWorker
       public VectorDataBase<dim, spacedim>
   {
     public:
+				       /**
+					* Constructor.
+					*/
+      VectorData();
+				       /**
+					* Constructor using a
+					* prefilled VectorSelector
+					*/
+      VectorData(const VectorSelector&);
+
+				       /**
+					* Initialize with a NamedData
+					* object and cache the indices
+					* in the VectorSelector base
+					* class.
+					*
+					* @note Make sure the
+					* VectorSelector base class
+					* was filled with reasonable
+					* data before calling this
+					* function.
+					*/
       void initialize(const NamedData<VECTOR*>&);
+
+				       /**
+					* Initialize with a single
+					* vector and cache the indices
+					* in the VectorSelector base
+					* class.
+					*
+					* @note Make sure the
+					* VectorSelector base class
+					* was filled with reasonable
+					* data before calling this
+					* function.
+					*/
       void initialize(const VECTOR*, const std::string& name);
       
       virtual void fill(

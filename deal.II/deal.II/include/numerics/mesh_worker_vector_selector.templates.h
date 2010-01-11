@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,19 @@ namespace MeshWorker
   VectorDataBase<dim, spacedim>::~VectorDataBase()
   {}
   
+
+  template <int dim, int spacedim>
+  VectorDataBase<dim, spacedim>::VectorDataBase(const VectorSelector& v)
+		  :
+		  VectorSelector(v)
+  {}  
+
+
+  template <int dim, int spacedim>
+  VectorDataBase<dim, spacedim>::VectorDataBase()
+  {}  
+
+
   template <int dim, int spacedim>
   void
   VectorDataBase<dim, spacedim>::fill(
@@ -38,6 +51,18 @@ namespace MeshWorker
   {}
 //----------------------------------------------------------------------//
 
+  template <class VECTOR, int dim, int spacedim>
+  VectorData<VECTOR, dim, spacedim>::VectorData()
+  {}
+  
+  
+  template <class VECTOR, int dim, int spacedim>
+  VectorData<VECTOR, dim, spacedim>::VectorData(const VectorSelector& s)
+		  :
+		  VectorDataBase<dim, spacedim>(s)
+  {}
+  
+  
   template <class VECTOR, int dim, int spacedim>
   void
   VectorData<VECTOR, dim, spacedim>::initialize(const NamedData<VECTOR*>& d)
@@ -70,6 +95,10 @@ namespace MeshWorker
 	unsigned int start,
 	unsigned int size) const
   {
+    AssertDimension(values.size(), this->n_values());
+    AssertDimension(gradients.size(), this->n_gradients());
+    AssertDimension(hessians.size(), this->n_hessians());
+    
     for (unsigned int i=0;i<this->n_values();++i)
       {
 	const VECTOR& src = *data(this->value_index(i));

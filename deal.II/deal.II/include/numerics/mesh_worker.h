@@ -170,6 +170,32 @@ namespace MeshWorker
 /**
  * Worker object for integration of functionals, residuals or matrices.
  *
+ * In order to allow for sufficient generality, a few steps have to be
+ * undertaken to use this class. The constructor will only fill some
+ * default values.
+ *
+ * First, you should consider if you need values from any vectors in a
+ * NamedData object. If so, fill the VectorSelector objects
+ * #cell_selector, #bdry_selector and #face_selector with their names
+ * and the data type (value, gradient, Hessian) to be extracted.
+ *
+ * Afterwards, you will need to consider UpdateFlags for FEValues
+ * objects. A good start is initialize_update_flags(), which looks at
+ * the selectors filled before and adds all the flags needed to get
+ * the selection. Additional flags can be set with add_update_flags().
+ *
+ * Finally, we need to choose quadrature formulas. If you choose to
+ * use Gauss formulas only, use initialize_gauss_quadrature() with
+ * appropriate values. Otherwise, you can fill the variables
+ * #cell_quadrature, #bdry_quadrature and #face_quadrature directly.
+ *
+ * In order to save time, you can set the variables #boundary_fluxes
+ * and #interior_fluxes of the base class to false, thus telling the
+ * Meshworker::loop() not to loop over those faces.
+ *
+ * All the information in here is used to set up IntegrationInfo
+ * objects correctly, typically in an IntegrationInfoBox.
+ *
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
@@ -211,17 +237,8 @@ namespace MeshWorker
 					* add UpdateFlags to the
 					* flags stored in this class.
 					*/
-      void initialize_selectors(const VectorSelector& cell_selector,
-				const VectorSelector& bdry_selector,
-				const VectorSelector& face_selector);
-
-				       /**
-					* Add a vector to some or
-					* all selectors.
-					*/
-      void add_selector(const std::string& name, bool values, bool gradients, bool hessians,
-			bool cell, bool bdry, bool face);
-
+      void initialize_update_flags();
+      
 				       /**
 					* Add additional values for update.
 					*/
