@@ -11,6 +11,8 @@
 //---------------------------------------------------------------------------
 
 #include <numerics/newton.h>
+#include <iomanip>
+
 
 DEAL_II_NAMESPACE_OPEN
 

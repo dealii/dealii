@@ -21,6 +21,16 @@
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 
+#ifdef DEAL_II_USE_PETSC
+#  include <lac/petsc_vector.h>
+#  include <lac/petsc_block_vector.h>
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+#  include <lac/trilinos_vector.h>
+#  include <lac/trilinos_block_vector.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 using namespace Algorithms;
