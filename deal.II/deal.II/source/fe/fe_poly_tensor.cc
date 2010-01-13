@@ -64,20 +64,7 @@ namespace
 	Triangulation<dim,spacedim>::face_iterator face = cell->face (f);
 	if (!face->at_boundary ())
 	  {
-	    const unsigned int neighbor_level = cell->neighbor (f)->level ();
-	    const unsigned int cell_level = cell->level ();
-
-					     // check of neighbor is more
-					     // refined (this case should
-					     // never be encountered)
-	    Assert (neighbor_level <= cell_level,
-		    ExcMessage ("neighbor_level is larger than cell level!"));
-
-	    const unsigned int nn = (neighbor_level == cell_level
-				     ?
-				     cell->neighbor_of_neighbor (f)
-				     :
-				     cell->neighbor_of_coarser_neighbor (f).first);
+	    const unsigned int nn = cell->neighbor_face_no(f);
 	      
 	    if (nn < GeometryInfo<dim>::faces_per_cell / 2)
 	      for (unsigned int j = 0; j < dofs_per_face; ++j)
