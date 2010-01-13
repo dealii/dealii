@@ -38,6 +38,13 @@
 #include <algorithm>
 #include <memory>
 
+				// dummy include in order to have the
+				// definition of PetscScalar available
+				// without including other PETSc stuff
+#ifdef DEAL_II_USE_PETSC
+#  include <petsc.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim>   class Quadrature;
@@ -47,15 +54,10 @@ template <typename Number> class Vector;
 template <typename Number> class BlockVector;
 
 #ifdef DEAL_II_USE_PETSC
-namespace PetscWrappers
+namespace PETScWrappers
 {
   class Vector;
   class BlockVector;
-  namespace MPI
-  {
-    class Vector;
-    class BlockVector;
-  }
 }
 #endif
 
