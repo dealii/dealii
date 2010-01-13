@@ -361,6 +361,14 @@ namespace TrilinosWrappers
                                           */
         void swap (BlockVector &v);
 
+				     /**
+				      * Print to a stream.
+				      */
+	void print (std::ostream       &out,
+		    const unsigned int  precision = 3,
+		    const bool          scientific = true,
+		    const bool          across = true) const;
+
                                          /**
                                           * Exception
                                           */
@@ -826,6 +834,14 @@ namespace TrilinosWrappers
                                           * to standard functions.
                                           */
       void swap (BlockVector &v);
+
+				     /**
+				      * Print to a stream.
+				      */
+      void print (std::ostream       &out,
+		  const unsigned int  precision = 3,
+		  const bool          scientific = true,
+		  const bool          across = true) const;
 
                                          /**
                                           * Exception

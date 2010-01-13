@@ -181,6 +181,23 @@ namespace TrilinosWrappers
 	components[i].compress();
     }
 
+
+
+    void BlockVector::print (std::ostream       &out,
+			     const unsigned int  precision,
+			     const bool          scientific,
+			     const bool          across) const
+    {
+      for (unsigned int i=0;i<this->n_blocks();++i)
+	{
+	  if (across)
+	    out << 'C' << i << ':';
+	  else
+	    out << "Component " << i << std::endl;
+	  this->components[i].print(out, precision, scientific, across);
+	}
+    }
+
   } /* end of namespace MPI */
 
 
@@ -332,6 +349,23 @@ namespace TrilinosWrappers
     collect_sizes();
 
     return *this;
+  }
+
+
+
+  void BlockVector::print (std::ostream       &out,
+			   const unsigned int  precision,
+			   const bool          scientific,
+			   const bool          across) const
+  {
+    for (unsigned int i=0;i<this->n_blocks();++i)
+      {
+	if (across)
+	  out << 'C' << i << ':';
+	else
+	  out << "Component " << i << std::endl;
+	this->components[i].print(out, precision, scientific, across);
+      }
   }
 
 }
