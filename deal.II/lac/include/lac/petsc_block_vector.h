@@ -291,6 +291,14 @@ namespace PETScWrappers
                                         */
       void swap (BlockVector &v);    
 
+				     /**
+				      * Print to a stream.
+				      */
+      void print (std::ostream       &out,
+		  const unsigned int  precision = 3,
+		  const bool          scientific = true,
+		  const bool          across = true) const;
+
 				       /** @addtogroup Exceptions
 					* @{ */
 
@@ -460,6 +468,23 @@ namespace PETScWrappers
     for (unsigned int i=0; i<this->n_blocks(); ++i)
       this->components[i].swap (v.components[i]);
     ::dealii::swap (this->block_indices, v.block_indices);
+  }
+
+
+
+  void BlockVector::print (std::ostream       &out,
+			   const unsigned int  precision,
+			   const bool          scientific,
+			   const bool          across) const
+  {
+    for (unsigned int i=0;i<this->n_blocks();++i)
+      {
+	if (across)
+	  out << 'C' << i << ':';
+	else
+	  out << "Component " << i << std::endl;
+	this->components[i].print(out, precision, scientific, across);
+      }
   }
 
 
