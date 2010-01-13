@@ -472,10 +472,12 @@ namespace PETScWrappers
 
 
 
-  void BlockVector::print (std::ostream       &out,
-			   const unsigned int  precision,
-			   const bool          scientific,
-			   const bool          across) const
+  inline
+  void 
+  BlockVector::print (std::ostream       &out,
+		      const unsigned int  precision,
+		      const bool          scientific,
+		      const bool          across) const
   {
     for (unsigned int i=0;i<this->n_blocks();++i)
       {
