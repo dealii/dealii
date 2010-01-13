@@ -23,12 +23,6 @@
 #include <base/vector_slice.h>
 #include <base/quadrature.h>
 #include <base/table.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_block_vector.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
@@ -49,7 +43,34 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>   class Quadrature;
 template <int dim, int spacedim=dim> class FEValuesBase;
 
+template <typename Number> class Vector;
+template <typename Number> class BlockVector;
 
+#ifdef DEAL_II_USE_PETSC
+namespace PetscWrappers
+{
+  class Vector;
+  class BlockVector;
+  namespace MPI
+  {
+    class Vector;
+    class BlockVector;
+  }
+}
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+namespace TrilinosWrappers
+{
+  class Vector;
+  class BlockVector;
+  namespace MPI
+  {
+    class Vector;
+    class BlockVector;
+  }
+}
+#endif
 
 /**
  * A namespace in which we declare "extractors", i.e. classes that when used

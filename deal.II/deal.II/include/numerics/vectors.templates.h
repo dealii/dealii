@@ -18,6 +18,10 @@
 #include <base/quadrature.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
+#include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
+#include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
 #include <lac/precondition.h>

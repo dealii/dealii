@@ -19,6 +19,7 @@
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
 #include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary.h>
