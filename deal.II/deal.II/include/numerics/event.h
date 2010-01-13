@@ -137,12 +137,14 @@ namespace Algorithms
 /// Events used by library operators  
   namespace Events
   {
+/// The program has just started and everything should be new
+    extern const Event initial;
 /// The current derivative leads to slow convergence of Newton's method
     extern const Event bad_derivative;
 /// The time stepping scheme starts a new time step
     extern const Event new_time;
 /// The time stepping scheme has changed the time step size
-    extern const Event new_time_step_size;
+    extern const Event new_timestep_size;
   }
   
 

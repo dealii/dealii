@@ -34,6 +34,26 @@ namespace Algorithms
   {
     notifications.clear();
   }
+
+
+  template <class VECTOR>
+  OutputOperator<VECTOR>::~OutputOperator()
+  {}
+  
+  
+  template <class VECTOR>
+  OutputOperator<VECTOR>&
+  OutputOperator<VECTOR>::operator<< (const NamedData<VECTOR*> vectors)
+  {
+    std::cout << ' ' << step;
+    for (unsigned int i=0;i<vectors.size();++i)
+      vectors(i)->print(std::cout);
+    std::cout << std::endl;
+    return *this;
+  }
+  
+  
+  
 }
 
 DEAL_II_NAMESPACE_CLOSE

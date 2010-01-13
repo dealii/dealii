@@ -15,6 +15,7 @@
 
 #include <base/smartpointer.h>
 #include <lac/solver_control.h>
+#include <numerics/operator.h>
 
 DEAL_II_NAMESPACE_OPEN
 

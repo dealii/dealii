@@ -70,7 +70,41 @@ namespace Algorithms
 					*/
       Event notifications;      
   };
+  
+/**
+ * An unary operator base class, intended to output the vectors in
+ * NamedData in each step of an iteration.
+ *
+ * @author Guido Kanschat, 2010
+ */
+  template <class VECTOR>
+  class OutputOperator : public Subscriptor
+  {
+    public:
+				       /**
+					* Empty virtual destructor.
+					*/
+      virtual ~OutputOperator();
+				       /**
+					* Set the current step.
+					*/
+      OutputOperator<VECTOR>& operator<< (unsigned int step);
 
+				       /**
+					* Output all the vectors in NamedData.
+					*/
+      virtual OutputOperator<VECTOR>& operator<< (const NamedData<VECTOR*> vectors);
+    protected:
+      unsigned int step;
+  };
+
+  template <class VECTOR>
+  OutputOperator<VECTOR>&
+  OutputOperator<VECTOR>::operator<< (unsigned int s)
+  {
+    step = s;
+    return *this;
+  }
 }
 
 
