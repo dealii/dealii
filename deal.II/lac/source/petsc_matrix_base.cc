@@ -253,10 +253,6 @@ namespace PETScWrappers
 
     ierr = MatAssemblyEnd (matrix,MAT_FINAL_ASSEMBLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-                                     // try to compress the representation
-    ierr = MatCompress (matrix);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 
