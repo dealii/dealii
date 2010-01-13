@@ -15,7 +15,7 @@
 
 #include <base/smartpointer.h>
 #include <numerics/operator.h>
-#include <numerics/time_step_control.h>
+#include <numerics/timestep_control.h>
 
 DEAL_II_NAMESPACE_OPEN
 
