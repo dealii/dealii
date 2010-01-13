@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: timestepping.cc 822 2010-01-11 08:57:30Z kanschat $
+//    $Id$
 //
 //    Copyright (C) 2010 by the deal.II authors
 //
@@ -10,8 +10,8 @@
 //
 //---------------------------------------------------------------------------
 
-#ifndef __deal2__newton_step_control_h
-#define __deal2__newton_step_control_h
+#ifndef __deal2__newton_h
+#define __deal2__newton_h
 
 #include <base/smartpointer.h>
 #include <lac/solver_control.h>
