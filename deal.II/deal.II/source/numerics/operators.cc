@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: vectors.cc 18474 2009-03-10 16:55:43Z kronbichler $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2010 by the deal.II authors

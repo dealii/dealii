@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: vectors.all_dimensions.cc 14038 2006-10-23 02:46:34Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2010 by the deal.II authors
