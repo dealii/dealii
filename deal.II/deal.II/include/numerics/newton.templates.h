@@ -11,6 +11,11 @@
 //---------------------------------------------------------------------------
 
 #include <numerics/newton.h>
+
+#include <base/parameter_handler.h>
+#include <base/logstream.h>
+#include <lac/vector_memory.h>
+
 #include <iomanip>
 
 
@@ -40,7 +45,7 @@ namespace Algorithms
     param.declare_entry("Stepsize iterations", "21", Patterns::Integer());
     param.declare_entry("Debug level", "0", Patterns::Integer());
     param.declare_entry("Debug vectors", "false", Patterns::Bool());
-    param.leave_subsection();    
+    param.leave_subsection();
   }
 
   template <class VECTOR>
@@ -54,7 +59,7 @@ namespace Algorithms
     debug_vectors = param.get_bool("Debug vectors");
     param.leave_subsection ();
   }
-  
+
 
   template <class VECTOR>
   void
@@ -63,8 +68,8 @@ namespace Algorithms
     residual->notify(e);
     inverse_derivative->notify(e);
   }
-  
-  
+
+
   template <class VECTOR>
   void
   Newton<VECTOR>::operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in)
@@ -73,14 +78,14 @@ namespace Algorithms
     deallog.push ("Newton");
 
     VECTOR& u = *out(0);
-  
+
     if (debug>2)
       deallog << "u: " << u.l2_norm() << std::endl;
 
     GrowingVectorMemory<VECTOR> mem;
     typename VectorMemory<VECTOR>::Pointer Du(mem);
     typename VectorMemory<VECTOR>::Pointer res(mem);
-  
+
     res->reinit(u);
     NamedData<VECTOR*> src1;
     NamedData<VECTOR*> src2;
@@ -95,21 +100,21 @@ namespace Algorithms
     p = Du;
     NamedData<VECTOR*> out2;
     out2.add(p, "Update");
-  
+
     unsigned int step = 0;
 				     // fill res with (f(u), v)
     (*residual)(out1, src1);
     double resnorm = res->l2_norm();
     double old_residual = resnorm / assemble_threshold + 1;
-  
+
     while (control.check(step++, resnorm) == SolverControl::iterate)
       {
 					 // assemble (Df(u), v)
 	if (resnorm/old_residual >= assemble_threshold)
 	  inverse_derivative->notify (Events::bad_derivative);
-	
+
 	Du->reinit(u);
-	try 
+	try
 	  {
 	    (*inverse_derivative)(out2, src2);
 	  }
@@ -119,12 +124,12 @@ namespace Algorithms
 		    << e.last_step << " steps with residual "
 		    << e.last_residual << std::endl;
 	  }
-	
+
 	u.add(-1., *Du);
 	old_residual = resnorm;
 	(*residual)(out1, src1);
 	resnorm = res->l2_norm();
-	
+
 					 // Step size control
 	unsigned int step_size = 0;
 	while (resnorm >= old_residual)
@@ -142,7 +147,7 @@ namespace Algorithms
 	    (*residual)(out1, src1);
 	    resnorm = res->l2_norm();
 	  }
-	
+
 	if (debug_vectors)
 	  {
 	    std::ostringstream streamOut;
@@ -151,11 +156,11 @@ namespace Algorithms
 	    NamedData<VECTOR*> out;
 	    out.add(&u, "solution");
 	    out.add(Du, "update");
-	    out.add(res, "residual");	    
+	    out.add(res, "residual");
 //TODO: Implement!
 //	    app->data_out(name, out);
 	  }
-      }  
+      }
     deallog.pop();
 
 				     // in case of failure: throw
