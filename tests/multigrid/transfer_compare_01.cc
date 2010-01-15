@@ -45,6 +45,37 @@ template <int dim, typename number, int spacedim>
 void
 reinit_vector_by_blocks (
   const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+  MGLevelObject<dealii::Vector<number> > &v,
+  const unsigned int selected_block,
+  std::vector<std::vector<unsigned int> >& ndofs)
+{
+  const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+  Assert(selected_block < n_blocks, ExcIndexRange(selected_block, 0, n_blocks));
+
+  std::vector<bool> selected(n_blocks, false);
+  selected[selected_block] = true;
+
+  if (ndofs.size() == 0)
+    {
+      std::vector<std::vector<unsigned int> >
+	new_dofs(mg_dof.get_tria().n_levels(),
+		 std::vector<unsigned int>(selected.size()));
+      std::swap(ndofs, new_dofs);
+      MGTools::count_dofs_per_block (mg_dof, ndofs);
+    }
+
+  for (unsigned int level=v.get_minlevel();
+       level<=v.get_maxlevel();++level)
+    {
+      v[level].reinit(ndofs[level][selected_block]);
+    }
+}
+
+
+template <int dim, typename number, int spacedim>
+void
+reinit_vector_by_blocks (
+  const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<BlockVector<number> > &v,
   const std::vector<bool> &sel,
   std::vector<std::vector<unsigned int> >& ndofs)
@@ -82,6 +113,8 @@ reinit_vector_by_blocks (
 }
 
 
+
+
 template <int dim>
 void check_block(const FiniteElement<dim>& fe)
 {
@@ -112,7 +145,8 @@ void check_block(const FiniteElement<dim>& fe)
 				   // Store sizes
   vector<unsigned int> ndofs(fe.n_blocks());
   DoFTools::count_dofs_per_block(mgdof, ndofs);
-  std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels());
+  std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels(),
+						   std::vector<unsigned int>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mgdof, mg_ndofs);
 
   MGTransferPrebuilt<BlockVector<double> > transfer;
