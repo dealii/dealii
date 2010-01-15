@@ -54,7 +54,7 @@ void check_simple(const FiniteElement<dim>& fe)
   transfer.build_matrices(mgdof);
 
   MGLevelObject<Vector<double> > u(0, tr.n_levels()-1);
-  MGTools::reinit_vector(mgdof, u);
+  reinit_vector(mgdof, u);
 				   // First prolongate the constant
 				   // vector.  For Lagrange elements,
 				   // the values are just the number

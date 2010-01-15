@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 - 2007 by the deal.II authors
+//    Copyright (C) 2000 - 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,8 +34,49 @@
 #include <iomanip>
 #include <iomanip>
 #include <algorithm>
+#include <numeric>
 
 using namespace std;
+
+template <int dim, typename number, int spacedim>
+void
+reinit_vector_by_blocks (
+  const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+  MGLevelObject<BlockVector<number> > &v,
+  const std::vector<bool> &sel,
+  std::vector<std::vector<unsigned int> >& ndofs)
+{
+  std::vector<bool> selected=sel;
+				   // Compute the number of blocks needed
+  const unsigned int n_selected
+    = std::accumulate(selected.begin(),
+		      selected.end(),
+		      0U);
+
+  if (ndofs.size() == 0)
+    {
+      std::vector<std::vector<unsigned int> >
+	new_dofs(mg_dof.get_tria().n_levels(),
+		 std::vector<unsigned int>(selected.size()));
+      std::swap(ndofs, new_dofs);
+      MGTools::count_dofs_per_block (mg_dof, ndofs);
+    }
+
+  for (unsigned int level=v.get_minlevel();
+       level<=v.get_maxlevel();++level)
+    {
+      v[level].reinit(n_selected, 0);
+      unsigned int k=0;
+      for (unsigned int i=0;i<selected.size() && (k<v[level].n_blocks());++i)
+	{
+	  if (selected[i])
+	    {
+	      v[level].block(k++).reinit(ndofs[level][i]);
+	    }
+	  v[level].collect_sizes();
+	}
+    }
+}
 
 template <int dim>
 void check_block(const FiniteElement<dim>& fe,
@@ -47,21 +88,22 @@ void check_block(const FiniteElement<dim>& fe,
     if (selected[i])
       deallog << ' ' << i;
   deallog << std::endl;
-  
+
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  
+
   MGDoFHandler<dim> mgdof(tr);
   DoFHandler<dim>& dof=mgdof;
   mgdof.distribute_dofs(fe);
   DoFRenumbering::component_wise(mgdof);
   vector<unsigned int> ndofs(fe.n_blocks());
   DoFTools::count_dofs_per_block(mgdof, ndofs);
-  
+
   for (unsigned int l=0;l<tr.n_levels();++l)
     DoFRenumbering::component_wise(mgdof, l);
-  std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels());
+  std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels(),
+						   std::vector<unsigned int>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mgdof, mg_ndofs);
 
   deallog << "Global  dofs:";
@@ -74,8 +116,8 @@ void check_block(const FiniteElement<dim>& fe,
       for (unsigned int i=0;i<mg_ndofs[l].size();++i)
 	deallog << ' ' << mg_ndofs[l][i];
       deallog << std::endl;
-    }  
-  
+    }
+
   PrimitiveVectorMemory<Vector<double> > mem;
   MGTransferBlock<double> transfer;
   transfer.build_matrices(dof, mgdof, selected);
@@ -83,8 +125,8 @@ void check_block(const FiniteElement<dim>& fe,
     transfer.initialize(factors, mem);
 
   MGLevelObject< BlockVector<double> > u(0, tr.n_levels()-1);
-  
-  MGTools::reinit_vector_by_blocks(mgdof, u, selected, mg_ndofs);
+
+  reinit_vector_by_blocks(mgdof, u, selected, mg_ndofs);
 
 				   // Prolongate a constant function
 				   // twice
@@ -103,7 +145,7 @@ void check_block(const FiniteElement<dim>& fe,
   for (unsigned int b=0;b<u[2].n_blocks();++b)
     deallog << '\t' << (int) (u[2].block(b)*u[2].block(b)+.4);
   deallog << std::endl;
-  
+
   u[1] = 0.;
   u[0] = 0.;
   transfer.restrict_and_add(2,u[1],u[2]);
@@ -117,7 +159,7 @@ void check_block(const FiniteElement<dim>& fe,
   for (unsigned int b=0;b<u[0].n_blocks();++b)
     deallog << '\t' << (int) (u[0].block(b)*u[0].block(b)+.5);
   deallog << std::endl;
-  
+
 				   // Check copy to mg and back
 				   // Fill a global vector by counting
 				   // from one up
@@ -125,11 +167,11 @@ void check_block(const FiniteElement<dim>& fe,
   v.reinit (ndofs);
   for (unsigned int i=0;i<v.size();++i)
     v(i) = i+1;
-  
+
 				   // See what part gets copied to mg
   u.resize(0, tr.n_levels()-1);
-  MGTools::reinit_vector_by_blocks(mgdof, u, selected, mg_ndofs);
-  
+  reinit_vector_by_blocks(mgdof, u, selected, mg_ndofs);
+
   transfer.copy_to_mg(mgdof, u, v);
   for (unsigned int i=0; i<u[2].size();++i)
     deallog << ' ' << (int) u[2](i);
@@ -158,25 +200,25 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   std::vector<double> factors;
 
   FE_DGQ<2> q0(0);
   FE_DGQ<2> q1(1);
   FE_RaviartThomasNodal<2> rt0(0);
   FE_RaviartThomasNodal<2> rt1(1);
-  
+
   FESystem<2> fe0(rt1, 1, q1, 1);
   FESystem<2> fe1(rt0, 2, q0, 2);
-  
+
   vector<bool> s1(2, true);
   deallog << "All" << std::endl;
   check_block(fe0, s1, factors);
- 
+
   s1[1] = false;
   deallog << "Velocity" << std::endl;
   check_block(fe0, s1, factors);
-  
+
   s1[1] = true;
   s1[0] = false;
   deallog << "Pressure" << std::endl;
