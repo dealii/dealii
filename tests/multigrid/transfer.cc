@@ -41,7 +41,6 @@ using namespace std;
 template <int dim, typename number, int spacedim>
 void
 reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
-	       std::vector<unsigned int> ,
 	       MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.get_minlevel();
