@@ -37,7 +37,7 @@ namespace Algorithms
  * Since assembling matrices, depending on the implementation, tends
  * to be costly, this method applies an adaptive reassembling
  * strategy. Only if the reduction factor for the residual is more
- * than #threshold, the event #bad_derivative is submitted to
+ * than #threshold, the event Algorithms::bad_derivative is submitted to
  * #inverse_derivative. It is up to this object to implement
  * reassembling accordingly.
  *

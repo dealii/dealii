@@ -33,7 +33,7 @@ namespace Algorithms
  * of the step. For an implicit scheme, it is usually the time at the
  * end.
  */
-  struct TimeStepData
+  struct TimestepData
   {
 /// The current time
       double time;
@@ -73,7 +73,7 @@ namespace Algorithms
  * implicit Euler step with modified step size (right hand side
  * given). Thus, the implementation of the theta scheme will use two
  * Operator objects, one for the explicit, one for the implicit
- * part. Each of these will use its own TimeStepData to account for
+ * part. Each of these will use its own TimestepData to account for
  * the modified step sizes (and different times if the problem is not
  * autonomous).
  *
@@ -134,7 +134,7 @@ namespace Algorithms
 
 				       /**
 					* The data handed to the
-					* #explicit time stepping
+					* #op_explicit time stepping
 					* operator.
 					*
 					* The time in here is the time
@@ -143,11 +143,11 @@ namespace Algorithms
 					* is (1-#theta) times the
 					* actual time step.
 					*/
-      const TimeStepData& explicit_data() const;
+      const TimestepData& explicit_data() const;
       
 				       /**
 					* The data handed to the
-					* #implicit time stepping
+					* #op_implicit time stepping
 					* operator.
 					*
 					* The time in here is the time
@@ -156,7 +156,7 @@ namespace Algorithms
 					* is #theta times the
 					* actual time step.
 					*/
-      const TimeStepData& implicit_data() const;
+      const TimestepData& implicit_data() const;
 
 				       /**
 					* Allow access to the control object.
@@ -186,13 +186,13 @@ namespace Algorithms
 					* The data for the explicit
 					* part of the scheme.
 					*/
-      TimeStepData d_explicit;
+      TimestepData d_explicit;
       
 				       /**
 					* The data for the implicit
 					* part of the scheme.
 					*/
-      TimeStepData d_implicit;
+      TimestepData d_implicit;
       
       
 				       /**
@@ -247,6 +247,25 @@ namespace Algorithms
 					*/
       SmartPointer<OutputOperator<VECTOR> > output;
   };
+
+
+  template <class VECTOR>
+  inline
+  const TimestepData&
+  ThetaTimestepping<VECTOR>::explicit_data () const
+  {
+    return d_explicit;
+  }
+  
+
+  template <class VECTOR>
+  inline
+  const TimestepData&
+  ThetaTimestepping<VECTOR>::implicit_data () const
+  {
+    return d_implicit;
+  }
+  
 }
 
 DEAL_II_NAMESPACE_CLOSE

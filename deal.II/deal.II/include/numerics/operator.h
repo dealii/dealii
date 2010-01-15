@@ -23,7 +23,7 @@ namespace Algorithms
 {
 /**
  * The abstract base class of all algorithms in this library. An
- * operator is an object with an #operator(), which transforms a set
+ * operator is an object with an operator(), which transforms a set
  * of named vectors into another set of named vectors.
  *
  * Furthermore, an operator can be notified of parameter changes by
