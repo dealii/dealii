@@ -11,6 +11,8 @@
 //---------------------------------------------------------------------------
 
 #include <numerics/theta_timestepping.h>
+
+#include <base/parameter_handler.h>
 #include <lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -22,7 +24,7 @@ namespace Algorithms
 		  : op_explicit(&e), op_implicit(&i)
   {}
 
-  
+
   template <class VECTOR>
   void
   ThetaTimestepping<VECTOR>::notify(const Event& e)
@@ -59,14 +61,14 @@ namespace Algorithms
   ThetaTimestepping<VECTOR>::operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in)
   {
     Assert(!adaptive, ExcNotImplemented());
-  
+
     deallog.push ("Theta");
     GrowingVectorMemory<VECTOR> mem;
     typename VectorMemory<VECTOR>::Pointer aux(mem);
     aux->reinit(*out(0));
-    
+
     control.restart();
-  
+
     bool first = true;
     d_explicit.time = control.now();
 
@@ -85,12 +87,12 @@ namespace Algorithms
     NamedData<VECTOR*> src2;
     src2.add(p, "Previous time data");
     src2.merge(in);
-    
+
     if (output != 0)
       (*output) << 0U << out;
-    
+
     for (unsigned int count = 1; d_explicit.time < control.final(); ++count)
-      {      
+      {
 	const bool step_change = control.advance();
 	d_implicit.time = control.now();
 	d_explicit.step = (1.-vtheta)*control.step();
@@ -104,15 +106,15 @@ namespace Algorithms
 	    op_explicit->notify(Events::new_timestep_size);
 	    op_implicit->notify(Events::new_timestep_size);
 	  }
-      
+
 					 // Compute
 					 // (I + (1-theta)dt A) u
 	(*op_explicit)(out1, src1);
 	(*op_implicit)(out, src2);
-      
+
 	if (output != 0 && control.print())
 	  (*output) << count << out;
-	
+
 	first = false;
 	d_explicit.time = control.now();
       }
