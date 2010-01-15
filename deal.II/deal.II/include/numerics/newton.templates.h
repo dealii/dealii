@@ -137,7 +137,7 @@ namespace Algorithms
 	      }
 	    if (control.log_history())
 	      deallog << "Trying step size: 1/" << (1<<step_size)
-		      << " since residual was " << residual << std::endl;
+		      << " since residual was " << resnorm << std::endl;
 	    u.add(1./(1<<step_size), *Du);
 	    (*residual)(out1, src1);
 	    resnorm = res->l2_norm();
