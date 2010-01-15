@@ -42,16 +42,15 @@ template <int dim, typename number, int spacedim>
 void
 reinit_vector_by_blocks (
   const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
-  MGLevelObject<BlockVector<number> > &v,
-  const std::vector<bool> &sel,
+  MGLevelObject<dealii::Vector<number> > &v,
+  const unsigned int selected_block,
   std::vector<std::vector<unsigned int> >& ndofs)
 {
-  std::vector<bool> selected=sel;
-				   // Compute the number of blocks needed
-  const unsigned int n_selected
-    = std::accumulate(selected.begin(),
-		      selected.end(),
-		      0U);
+  const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+  Assert(selected_block < n_blocks, ExcIndexRange(selected_block, 0, n_blocks));
+
+  std::vector<bool> selected(n_blocks, false);
+  selected[selected_block] = true;
 
   if (ndofs.size() == 0)
     {
@@ -65,16 +64,7 @@ reinit_vector_by_blocks (
   for (unsigned int level=v.get_minlevel();
        level<=v.get_maxlevel();++level)
     {
-      v[level].reinit(n_selected, 0);
-      unsigned int k=0;
-      for (unsigned int i=0;i<selected.size() && (k<v[level].n_blocks());++i)
-	{
-	  if (selected[i])
-	    {
-	      v[level].block(k++).reinit(ndofs[level][i]);
-	    }
-	  v[level].collect_sizes();
-	}
+      v[level].reinit(ndofs[level][selected_block]);
     }
 }
 
@@ -98,7 +88,8 @@ void check_select(const FiniteElement<dim>& fe, unsigned int selected)
 
   for (unsigned int l=0;l<tr.n_levels();++l)
     DoFRenumbering::component_wise(mgdof, l);
-  std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels());
+  std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels(),
+						   std::vector<unsigned int>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mgdof, mg_ndofs);
 
   deallog << "Global  dofs:";
