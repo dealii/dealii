@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------------
 //    transfer.cc,v 1.13 2005/12/30 16:07:03 guido Exp
-//    Version: 
+//    Version:
 //
-//    Copyright (C) 2000 - 2007, 2009 by the deal.II authors
+//    Copyright (C) 2000 - 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,15 +38,31 @@
 
 using namespace std;
 
+template <int dim, typename number, int spacedim>
+void
+reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+	       std::vector<unsigned int> ,
+	       MGLevelObject<dealii::Vector<number> > &v)
+{
+  for (unsigned int level=v.get_minlevel();
+       level<=v.get_maxlevel();++level)
+    {
+      unsigned int n = mg_dof.n_dofs (level);
+      v[level].reinit(n);
+    }
+
+}
+
+
 template <int dim>
 void check_simple(const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
-  
+
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  
+
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
 
@@ -72,7 +88,7 @@ void check_simple(const FiniteElement<dim>& fe)
   transfer.restrict_and_add(1,u[0],u[1]);
   deallog << "u1\t" <<  (u[1]*u[1]+.5) << std::endl
 	  << "u0\t" <<  (u[0]*u[0]+.5) << std::endl;
-  
+
 				   // Now the same for a non-constant
 				   // vector
   for (unsigned int i=0;i<u[0].size();++i)
@@ -96,7 +112,7 @@ void check_simple(const FiniteElement<dim>& fe)
   v.reinit (mgdof.n_dofs());
   for (unsigned int i=0;i<v.size();++i)
     v(i) = i+1;
-  
+
   transfer.copy_to_mg(mgdof, u, v);
   for (unsigned int i=0; i<u[2].size();++i)
     deallog << ' ' << (int) u[2](i);
@@ -111,10 +127,10 @@ void check_simple(const FiniteElement<dim>& fe)
   transfer.copy_from_mg(mgdof, v, u);
   for (unsigned int i=0; i<v.size();++i)
     deallog << ' ' << (int) v(i);
-  deallog << std::endl;  
+  deallog << std::endl;
   v.equ(-1., v);
   transfer.copy_from_mg_add(mgdof, v, u);
-  deallog << "diff " << v.l2_norm() << std::endl;  
+  deallog << "diff " << v.l2_norm() << std::endl;
 }
 
 
@@ -125,7 +141,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   check_simple (FE_DGP<2>(0));
   check_simple (FE_DGP<2>(1));
   check_simple (FE_DGQ<2>(1));
@@ -137,7 +153,7 @@ int main()
 
   check_simple (FE_RaviartThomasNodal<2>(1));
 //  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2));
-  
+
   check_simple (FE_DGQ<3>(1));
   check_simple (FE_Q<3>(2));
 }
