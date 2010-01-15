@@ -31,6 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 
 using namespace Algorithms;
 
-#include "operators.inst"
+#include "operator.inst"
 
 DEAL_II_NAMESPACE_CLOSE
