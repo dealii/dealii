@@ -15,7 +15,7 @@
 
 #include <base/config.h>
 #include <base/named_data.h>
-#include <numerics/event.h>
+#include <base/event.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -68,9 +68,9 @@ namespace Algorithms
 					* application must take care
 					* of reassembling the matrix.
 					*/
-      Event notifications;      
+      Event notifications;
   };
-  
+
 /**
  * An unary operator base class, intended to output the vectors in
  * NamedData in each step of an iteration.
