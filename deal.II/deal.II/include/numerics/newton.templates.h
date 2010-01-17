@@ -55,7 +55,7 @@ namespace Algorithms
     param.enter_subsection("Newton");
     control.parse_parameters (param);
     assemble_threshold = param.get_double("Assemble threshold");
-    n_stepsize_iterations = param.get_double("Stepsize iterations");
+    n_stepsize_iterations = param.get_integer("Stepsize iterations");
     debug_vectors = param.get_bool("Debug vectors");
     param.leave_subsection ();
   }
