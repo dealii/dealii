@@ -317,12 +317,15 @@ if test "x$enableshared" = "xyes" ; then
 	   ;;
   esac
 
-  dnl Check if the linker supports -rpath
-  DEAL_II_CHECK_RPATH
-
   dnl See if we can use -Wl,-soname,... for linking
   DEAL_II_CHECK_LINK_SONAME
 fi
+
+dnl Check if the linker supports -rpath. Do so independently whether we
+dnl actually build deal.II as shared libs since, for example, the TBB
+dnl library is always shared
+DEAL_II_CHECK_RPATH
+
 
 AC_SUBST(enableshared)
 AC_SUBST(static_lib_suffix)
