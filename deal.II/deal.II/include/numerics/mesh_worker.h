@@ -56,58 +56,18 @@ template<int,int> class MGDoFHandler;
  * integration_loop() is available, which is a wrapper around loop()
  * with a simplified interface.
  *
- * This integration_loop() is complemented by a class
- * AssemblingIntegrator, which separates local integration from
- * assembling. In order to use it, follow this recipe: fist, create a
- * class responsible for the local integration:
- *
- * @code
- * template <int dim>
- * class LocalIntegrator
- * {
- *   void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const;
- *   void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const;
- *   void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
- *             typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const;
- * };
- * @endcode
- * The three functions in there must have exactly this signature and
- * should do the integration on cells, boundary and interior faces,
- * respectively.
- *
- * Then, create the AssemblingIntegrator object, where the second
- * template argument decides on what kind of global data is
- * assembled. In the following, we decide to assemble a simple
- * SparseMatrix with no block structure:
- *
- * @code
- * MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> >>
- *   integrator(&LocalIntegrator<dim>::integrate_cell_term,
- *              &LocalIntegrator<dim>::integrate_boundary_term,
- *              &LocalIntegrator<dim>::integrate_face_term);
- * @endcode
+ * The integration_loop() function loop takes most of the information
+ * that it needs to pass to loop() from an IntegrationInfoBox
+ * object. Its use is explained in @ref step_38 "step-38", but in
+ * short it requires functions that do the local integration on a
+ * cell, interior or boundary face, and it needs an object (called
+ * "assembler") that copies these local contributions into the global
+ * matrix and right hand side objects.
  *
  * Before we can run the integration loop, we have to initialize
- * several data structures in our AssemblingIntegrator. For instance,
- * we have to decide on the quadrature rule or we may need more than
- * the default update flags.
- *
- * @code
- * integrator.initialize_gauss_quadrature(2,2,2);
- * integrator.add_update_flags(update_values | update_gradients, true, true, true, true);
- * integrator.initialize(system_matrix);
- * @endcode
- *
- * Finally, we set up the structures needed by the integration_loop()
- * and run it.
- *
- * @code
- * MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
- * info_box.initialize(integrator, fe, mapping);
- *
- * MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(),
- *                              info_box, integrator);
- * @endcode
+ * several data structures in our IntegrationWorker and assembler
+ * objects. For instance, we have to decide on the quadrature rule or
+ * we may need more than the default update flags.
  *
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
