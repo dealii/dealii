@@ -158,7 +158,6 @@ void DGIntegrator<dim>::cell(CellInfo& info)
 				   // might seem necessary.
   const FEValuesBase<dim>& fe_v = info.fe();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
-  Vector<double>& local_vector = info.R[0].block(0);
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
 
 				   // With these objects, we continue
