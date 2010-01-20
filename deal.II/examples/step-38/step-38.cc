@@ -124,12 +124,9 @@ class DGIntegrator : public Subscriptor
 				     // cells and faces. They are the
 				     // ones doing the actual
 				     // integration.
-    void cell(CellInfo& info) const;
-    void bdry(FaceInfo& info) const;
-    void face(FaceInfo& info1, FaceInfo& info2) const;
-
-  private:
-    BoundaryValues<dim> boundary_function;
+    static void cell(CellInfo& info);
+    static void bdry(FaceInfo& info);
+    static void face(FaceInfo& info1, FaceInfo& info2);
 };
 
 				 // @sect4{The local integrators}
@@ -150,7 +147,7 @@ class DGIntegrator : public Subscriptor
 				 // added soon).
 
 template <int dim>
-void DGIntegrator<dim>::cell(CellInfo& info) const
+void DGIntegrator<dim>::cell(CellInfo& info)
 {
 				   // First, let us retrieve some of
 				   // the objects used here from
@@ -163,7 +160,7 @@ void DGIntegrator<dim>::cell(CellInfo& info) const
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
   Vector<double>& local_vector = info.R[0].block(0);
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
-  
+
 				   // With these objects, we continue
 				   // local integration like
 				   // always. First, we loop over the
@@ -176,14 +173,14 @@ void DGIntegrator<dim>::cell(CellInfo& info) const
       beta(0) = -fe_v.quadrature_point(point)(1);
       beta(1) = fe_v.quadrature_point(point)(0);
       beta /= beta.norm();
-      
+
 				       // We solve a homogeneous
 				       // equation, thus no right
 				       // hand side shows up in
 				       // the cell term.
 				       // What's left is
 				       // integrating the matrix entries.
-      for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
+      for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	  local_matrix(i,j) -= beta*fe_v.shape_grad(i,point)*
 			       fe_v.shape_value(j,point) *
@@ -197,7 +194,7 @@ void DGIntegrator<dim>::cell(CellInfo& info) const
 				 // FESubfaceValues, in order to get access to
 				 // normal vectors.
 template <int dim>
-void DGIntegrator<dim>::bdry(FaceInfo& info) const
+void DGIntegrator<dim>::bdry(FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe_v = info.fe();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
@@ -205,9 +202,10 @@ void DGIntegrator<dim>::bdry(FaceInfo& info) const
 
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
-  
+
   std::vector<double> g(fe_v.n_quadrature_points);
-  
+
+  static BoundaryValues<dim> boundary_function;
   boundary_function.value_list (fe_v.get_quadrature_points(), g);
 
   for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
@@ -216,8 +214,8 @@ void DGIntegrator<dim>::bdry(FaceInfo& info) const
       beta(0) = -fe_v.quadrature_point(point)(1);
       beta(1) = fe_v.quadrature_point(point)(0);
       beta /= beta.norm();
-      
-      const double beta_n=beta * normals[point];      
+
+      const double beta_n=beta * normals[point];
       if (beta_n>0)
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
@@ -242,7 +240,7 @@ void DGIntegrator<dim>::bdry(FaceInfo& info) const
 				 // for each cell and two for coupling
 				 // back and forth.
 template <int dim>
-void DGIntegrator<dim>::face(FaceInfo& info1, FaceInfo& info2) const
+void DGIntegrator<dim>::face(FaceInfo& info1, FaceInfo& info2)
 {
 				   // For quadrature points, weights,
 				   // etc., we use the
@@ -254,7 +252,7 @@ void DGIntegrator<dim>::face(FaceInfo& info1, FaceInfo& info2) const
 				   // we have to ask the neighbors
 				   // FEFaceValuesBase.
   const FEFaceValuesBase<dim>& fe_v_neighbor = info2.fe();
-  
+
 				   // Then we get references to the
 				   // four local matrices. The letters
 				   // u and v refer to trial and test
@@ -272,7 +270,7 @@ void DGIntegrator<dim>::face(FaceInfo& info1, FaceInfo& info2) const
   FullMatrix<double>& u2_v1_matrix = info1.M2[0].matrix;
   FullMatrix<double>& u1_v2_matrix = info2.M2[0].matrix;
   FullMatrix<double>& u2_v2_matrix = info2.M1[0].matrix;
-  
+
 				   // Here, following the previous
 				   // functions, we would have the
 				   // local right hand side
@@ -280,17 +278,17 @@ void DGIntegrator<dim>::face(FaceInfo& info1, FaceInfo& info2) const
 				   // interface terms only involve the
 				   // solution and the right hand side
 				   // does not receive any contributions.
-  
+
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
-  
+
   for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
     {
       Point<dim> beta;
       beta(0) = -fe_v.quadrature_point(point)(1);
       beta(1) = fe_v.quadrature_point(point)(0);
       beta /= beta.norm();
-      
+
       const double beta_n=beta * normals[point];
       if (beta_n>0)
 	{
@@ -359,17 +357,17 @@ class DGMethod
     ~DGMethod ();
 
     void run ();
-    
+
   private:
     void setup_system ();
     void assemble_system ();
     void solve (Vector<double> &solution);
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
-    
+
     Triangulation<dim>   triangulation;
     const MappingQ1<dim> mapping;
-    
+
 				     // Furthermore we want to use DG
 				     // elements of degree 1 (but this
 				     // is only specified in the
@@ -399,7 +397,7 @@ class DGMethod
 				     // single <code>assemble_system</code>
 				     // function declared above:
     Vector<double>       solution;
-    Vector<double>       right_hand_side;    
+    Vector<double>       right_hand_side;
 };
 
 
@@ -418,7 +416,7 @@ DGMethod<dim>::DGMethod ()
 
 
 template <int dim>
-DGMethod<dim>::~DGMethod () 
+DGMethod<dim>::~DGMethod ()
 {
   dof_handler.clear ();
 }
@@ -446,7 +444,7 @@ void DGMethod<dim>::setup_system ()
 			    GeometryInfo<dim>::max_children_per_face
 			    +
 			    1)*fe.dofs_per_cell);
-  
+
 				   // To build the sparsity pattern for DG
 				   // discretizations, we can call the
 				   // function analogue to
@@ -454,11 +452,11 @@ void DGMethod<dim>::setup_system ()
 				   // is called
 				   // DoFTools::make_flux_sparsity_pattern:
   DoFTools::make_flux_sparsity_pattern (dof_handler, sparsity_pattern);
-  
+
 				   // All following function calls are
 				   // already known.
   sparsity_pattern.compress();
-  
+
   system_matrix.reinit (sparsity_pattern);
 
   solution.reinit (dof_handler.n_dofs());
@@ -476,7 +474,7 @@ void DGMethod<dim>::setup_system ()
 				 // classes in namespace MeshWorker::Assembler
 				 // to build the global system.
 template <int dim>
-void DGMethod<dim>::assemble_system () 
+void DGMethod<dim>::assemble_system ()
 {
 				   // Here we generate an object of
 				   // our own integration class, which
@@ -518,7 +516,7 @@ void DGMethod<dim>::assemble_system ()
                                          Vector<double> >,
      DGIntegrator<dim> >
     integrator(dg);
-  
+
 				   // First, we initialize the
 				   // quadrature formulae and the
 				   // update flags in the worker base
@@ -596,7 +594,7 @@ void DGMethod<dim>::assemble_system ()
 				 // PreconditionBlockSOR class with
 				 // relaxation=1) does a much better job.
 template <int dim>
-void DGMethod<dim>::solve (Vector<double> &solution) 
+void DGMethod<dim>::solve (Vector<double> &solution)
 {
   SolverControl           solver_control (1000, 1e-12, false, false);
   SolverRichardson<>      solver (solver_control);
@@ -705,31 +703,31 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   std::string filename = "grid-";
   filename += ('0' + cycle);
   Assert (cycle < 10, ExcInternalError());
-  
+
   filename += ".eps";
   std::cout << "Writing grid to <" << filename << ">..." << std::endl;
   std::ofstream eps_output (filename.c_str());
 
   GridOut grid_out;
   grid_out.write_eps (triangulation, eps_output);
-  
+
 				   // Output of the solution in
 				   // gnuplot format.
   filename = "sol-";
   filename += ('0' + cycle);
   Assert (cycle < 10, ExcInternalError());
-  
+
   filename += ".gnuplot";
   std::cout << "Writing solution to <" << filename << ">..."
 	    << std::endl << std::endl;
   std::ofstream gnuplot_output (filename.c_str());
-  
+
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "u");
 
   data_out.build_patches ();
-  
+
   data_out.write_gnuplot(gnuplot_output);
 }
 
@@ -737,7 +735,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 				 // The following <code>run</code> function is
 				 // similar to previous examples.
 template <int dim>
-void DGMethod<dim>::run () 
+void DGMethod<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
@@ -751,7 +749,7 @@ void DGMethod<dim>::run ()
 	}
       else
 	refine_grid ();
-      
+
 
       std::cout << "   Number of active cells:       "
 		<< triangulation.n_active_cells()
@@ -773,7 +771,7 @@ void DGMethod<dim>::run ()
 				 // The following <code>main</code> function is
 				 // similar to previous examples as well, and
 				 // need not be commented on.
-int main () 
+int main ()
 {
   try
     {
@@ -792,7 +790,7 @@ int main ()
 		<< std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"
@@ -803,7 +801,7 @@ int main ()
 		<< std::endl;
       return 1;
     };
-  
+
   return 0;
 }
 
