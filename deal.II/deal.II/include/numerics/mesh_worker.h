@@ -14,6 +14,7 @@
 #define __deal2__mesh_worker_h
 
 #include <base/config.h>
+#include <base/std_cxx1x/function.h>
 #include <base/geometry_info.h>
 #include <base/named_data.h>
 #include <lac/block_indices.h>
@@ -62,7 +63,7 @@ template<int,int> class MGDoFHandler;
  *
  * @code
  * template <int dim>
- * class LocalIntegrator : public Subscriptor
+ * class LocalIntegrator
  * {
  *   void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const;
  *   void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const;
@@ -80,9 +81,10 @@ template<int,int> class MGDoFHandler;
  * SparseMatrix with no block structure:
  *
  * @code
- * LocalIntegrator<dim> loc;
- * MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> >, LocalIntegrator<dim> >
- *   integrator(loc);
+ * MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> >>
+ *   integrator(&LocalIntegrator<dim>::integrate_cell_term,
+ *              &LocalIntegrator<dim>::integrate_boundary_term,
+ *              &LocalIntegrator<dim>::integrate_face_term);
  * @endcode
  *
  * Before we can run the integration loop, we have to initialize
@@ -238,7 +240,7 @@ namespace MeshWorker
 					* flags stored in this class.
 					*/
       void initialize_update_flags();
-      
+
 				       /**
 					* Add additional values for update.
 					*/
@@ -383,45 +385,71 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template <int dim, class ASSEMBLER, class INTEGRATOR>
-  class AssemblingIntegrator :
-      public IntegrationWorker<dim>,
-      public ASSEMBLER
+  template <int dim, class ASSEMBLER>
+  class AssemblingIntegrator : public IntegrationWorker<dim>,
+			       public ASSEMBLER
   {
     public:
+      typedef
+      typename IntegrationWorker<dim>::CellInfo
+      CellInfo;
+
+      typedef
+      typename IntegrationWorker<dim>::FaceInfo
+      FaceInfo;
+
 				       /**
 					* Constructor, initializing
 					* the local data.
+					*
+					* The three arguments are
+					* objects that that will do
+					* the local computations on
+					* cells, boundary and interior
+					* faces. They may be specified
+					* as pointers to global or
+					* static functions, pointers
+					* to objects with an
+					* operator() that takes the
+					* required number of
+					* arguments, or functions with
+					* bound arguments.
 					*/
-      AssemblingIntegrator(const INTEGRATOR& local);
+      AssemblingIntegrator(const std_cxx1x::function<void (CellInfo &)> &cell_worker,
+			   const std_cxx1x::function<void (FaceInfo &)> &boundary_worker,
+			   const std_cxx1x::function<void (FaceInfo &, FaceInfo &)> &face_worker);
 
 				       /**
 					* The cell operator called by
 					* integration_loop().
 					*/
-      void cell(typename IntegrationWorker<dim>::CellInfo& info);
+      void cell(CellInfo& info);
 
 				       /**
 					* The local boundary operator
 					* called by
 					* integration_loop().
 					*/
-      void bdry(typename IntegrationWorker<dim>::FaceInfo& info);
+      void bdry(FaceInfo& info);
 
 				       /**
 					* The interior face operator
 					* called by
 					* integration_loop().
 					*/
-      void face(typename IntegrationWorker<dim>::FaceInfo& info1,
-		typename IntegrationWorker<dim>::FaceInfo& info2);
+      void face(FaceInfo& info1,
+		FaceInfo& info2);
 
     private:
 				       /**
-					* Pointer to the object doing
-					* local integration.
+					* Pointers to the three
+					* functions that will do the
+					* local computations on cells,
+					* boundary and interior faces.
 					*/
-      SmartPointer<const INTEGRATOR, AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR> > local;
+      const std_cxx1x::function<void (CellInfo &)> cell_worker;
+      const std_cxx1x::function<void (FaceInfo &)> boundary_worker;
+      const std_cxx1x::function<void (FaceInfo &, FaceInfo &)> face_worker;
   };
 
 //----------------------------------------------------------------------//
@@ -434,41 +462,43 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-  template <int dim, class ASSEMBLER, class INTEGRATOR>
+  template <int dim, class ASSEMBLER>
   inline
-  AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR>::AssemblingIntegrator(const INTEGRATOR& local)
+  AssemblingIntegrator<dim,ASSEMBLER>::
+  AssemblingIntegrator(const std_cxx1x::function<void (CellInfo &)> &cell_worker,
+		       const std_cxx1x::function<void (FaceInfo &)> &boundary_worker,
+		       const std_cxx1x::function<void (FaceInfo &, FaceInfo &)> &face_worker)
 		  :
-		  local(&local, typeid(*this).name())
+		  cell_worker (cell_worker),
+		  boundary_worker (boundary_worker),
+		  face_worker (face_worker)
   {}
 
 
-  template <int dim, class ASSEMBLER, class INTEGRATOR>
+  template <int dim, class ASSEMBLER>
   inline void
-  AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR>::cell(
-    typename IntegrationWorker<dim>::CellInfo& info)
+  AssemblingIntegrator<dim,ASSEMBLER>::cell(CellInfo& info)
   {
-    local->cell(info);
+    cell_worker(info);
     ASSEMBLER::assemble(info);
   }
 
 
-  template <int dim, class ASSEMBLER, class INTEGRATOR>
+  template <int dim, class ASSEMBLER>
   inline void
-  AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR>::bdry(
-    typename IntegrationWorker<dim>::FaceInfo& info)
+  AssemblingIntegrator<dim,ASSEMBLER>::bdry(FaceInfo& info)
   {
-    local->bdry(info);
+    boundary_worker(info);
     ASSEMBLER::assemble(info);
   }
 
 
-  template <int dim, class ASSEMBLER, class INTEGRATOR>
+  template <int dim, class ASSEMBLER>
   inline void
-  AssemblingIntegrator<dim,ASSEMBLER,INTEGRATOR>::face(
-    typename IntegrationWorker<dim>::FaceInfo& info1,
-    typename IntegrationWorker<dim>::FaceInfo& info2)
+  AssemblingIntegrator<dim,ASSEMBLER>::face(FaceInfo& info1,
+					    FaceInfo& info2)
   {
-    local->face(info1, info2);
+    face_worker(info1, info2);
     ASSEMBLER::assemble(info1, info2);
   }
 }
