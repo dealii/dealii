@@ -569,11 +569,11 @@ namespace MeshWorker
 //      private:
 
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
-      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > bdry_data;
+      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
 
       CellInfo cell_info;
-      FaceInfo bdry_info;
+      FaceInfo boundary_info;
       FaceInfo face_info;
       FaceInfo subface_info;
       FaceInfo neighbor_info;
@@ -841,7 +841,7 @@ namespace MeshWorker
   IntegrationInfoBox<dim,sdim>::IntegrationInfoBox(const T& t)
 		  :
 		  cell_info(t),
-		  bdry_info(t),
+		  boundary_info(t),
 		  face_info(t),
 		  subface_info(t),
 		  neighbor_info(t)
@@ -858,21 +858,21 @@ namespace MeshWorker
 	     const Mapping<dim,sdim>& mapping)
   {
     assembler.initialize_info(cell_info, false);
-    assembler.initialize_info(bdry_info, false);
+    assembler.initialize_info(boundary_info, false);
     assembler.initialize_info(face_info, true);
     assembler.initialize_info(subface_info, true);
     assembler.initialize_info(neighbor_info, true);
 
     cell_info.initialize<FEValues<dim,sdim> >(el, mapping, integrator.cell_quadrature,
 			 integrator.cell_flags);
-    bdry_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.bdry_quadrature,
-			 integrator.bdry_flags);
+    boundary_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.boundary_quadrature,
+			 integrator.boundary_flags);
     face_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 			 integrator.face_flags);
     subface_info.initialize<FESubfaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 			    integrator.face_flags);
     neighbor_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
-						      integrator.ngbr_flags);
+						      integrator.neighbor_flags);
   }
 
 
@@ -893,10 +893,10 @@ namespace MeshWorker
     cell_data = p;
     cell_info.initialize_data(p);
 
-    p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.bdry_selector));
+    p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.boundary_selector));
     p->initialize(data);
-    bdry_data = p;
-    bdry_info.initialize_data(p);
+    boundary_data = p;
+    boundary_info.initialize_data(p);
 
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.face_selector));
     p->initialize(data);

@@ -109,7 +109,7 @@ namespace MeshWorker
 				       /**
 					* Do the work on a boundary face.
 					*/
-      void bdry(DoFInfo<dim>& face);
+      void boundary(DoFInfo<dim>& face);
 
 				       /**
 					* Do the work on an interior face.
@@ -138,7 +138,7 @@ namespace MeshWorker
  *
  * First, you should consider if you need values from any vectors in a
  * NamedData object. If so, fill the VectorSelector objects
- * #cell_selector, #bdry_selector and #face_selector with their names
+ * #cell_selector, #boundary_selector and #face_selector with their names
  * and the data type (value, gradient, Hessian) to be extracted.
  *
  * Afterwards, you will need to consider UpdateFlags for FEValues
@@ -149,7 +149,7 @@ namespace MeshWorker
  * Finally, we need to choose quadrature formulas. If you choose to
  * use Gauss formulas only, use initialize_gauss_quadrature() with
  * appropriate values. Otherwise, you can fill the variables
- * #cell_quadrature, #bdry_quadrature and #face_quadrature directly.
+ * #cell_quadrature, #boundary_quadrature and #face_quadrature directly.
  *
  * In order to save time, you can set the variables #boundary_fluxes
  * and #interior_fluxes of the base class to false, thus telling the
@@ -185,7 +185,7 @@ namespace MeshWorker
 					* Initialize the
 					* VectorSelector objects
 					* #cell_selector,
-					* #bdry_selector and
+					* #boundary_selector and
 					* #face_selector in order to
 					* save computational
 					* eeffort. If no selectors
@@ -205,8 +205,8 @@ namespace MeshWorker
 					* Add additional values for update.
 					*/
       void add_update_flags(const UpdateFlags flags, bool cell = true,
-			    bool bdry = true, bool face = true,
-			    bool ngbr = true);
+			    bool boundary = true, bool face = true,
+			    bool neighbor = true);
 
 				       /** Assign n-point Gauss
 					* quadratures to each of the
@@ -217,7 +217,7 @@ namespace MeshWorker
 					* performed.
 					*/
       void initialize_gauss_quadrature(unsigned int n_cell_points,
-				       unsigned int n_bdry_points,
+				       unsigned int n_boundary_points,
 				       unsigned int n_face_points);
 
 				       /**
@@ -235,7 +235,7 @@ namespace MeshWorker
 					* the quadrature points on
 					* boundary faces.
 					*/
-      MeshWorker::VectorSelector bdry_selector;
+      MeshWorker::VectorSelector boundary_selector;
 
 				       /**
 					* Select the vectors from
@@ -262,7 +262,7 @@ namespace MeshWorker
 					* #update_JxW_values and
 					* #update_normal_vectors.
 					*/
-      UpdateFlags bdry_flags;
+      UpdateFlags boundary_flags;
 
 				       /**
 					* The set of update flags
@@ -283,7 +283,7 @@ namespace MeshWorker
 					* quadrature weights are
 					* taken from the other cell.
 					*/
-      UpdateFlags ngbr_flags;
+      UpdateFlags neighbor_flags;
 
 				       /**
 					* The quadrature rule used
@@ -295,7 +295,7 @@ namespace MeshWorker
 					* The quadrature rule used
 					* on boundary faces.
 					*/
-      Quadrature<dim-1> bdry_quadrature;
+      Quadrature<dim-1> boundary_quadrature;
 
 				       /**
 					* The quadrature rule used

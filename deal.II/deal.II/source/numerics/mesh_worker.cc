@@ -23,9 +23,9 @@ template <int dim>
 IntegrationWorker<dim>::IntegrationWorker ()
 {
   cell_flags = update_JxW_values;
-  bdry_flags = UpdateFlags(update_JxW_values | update_normal_vectors);
-  face_flags = bdry_flags;
-  ngbr_flags = update_default;
+  boundary_flags = UpdateFlags(update_JxW_values | update_normal_vectors);
+  face_flags = boundary_flags;
+  neighbor_flags = update_default;
 }
 
 
@@ -37,29 +37,29 @@ IntegrationWorker<dim>::initialize_update_flags ()
   if (cell_selector.has_gradients() != 0) cell_flags |= update_gradients;
   if (cell_selector.has_hessians() != 0) cell_flags |= update_hessians;
   
-  if (bdry_selector.has_values() != 0) bdry_flags |= update_values;
-  if (bdry_selector.has_gradients() != 0) bdry_flags |= update_gradients;
-  if (bdry_selector.has_hessians() != 0) bdry_flags |= update_hessians;
+  if (boundary_selector.has_values() != 0) boundary_flags |= update_values;
+  if (boundary_selector.has_gradients() != 0) boundary_flags |= update_gradients;
+  if (boundary_selector.has_hessians() != 0) boundary_flags |= update_hessians;
   
   if (face_selector.has_values() != 0) face_flags |= update_values;
   if (face_selector.has_gradients() != 0) face_flags |= update_gradients;
   if (face_selector.has_hessians() != 0) face_flags |= update_hessians;
   
-  if (face_selector.has_values() != 0) ngbr_flags |= update_values;
-  if (face_selector.has_gradients() != 0) ngbr_flags |= update_gradients;
-  if (face_selector.has_hessians() != 0) ngbr_flags |= update_hessians;  
+  if (face_selector.has_values() != 0) neighbor_flags |= update_values;
+  if (face_selector.has_gradients() != 0) neighbor_flags |= update_gradients;
+  if (face_selector.has_hessians() != 0) neighbor_flags |= update_hessians;  
 }
 
 
 template<int dim>
 void
 IntegrationWorker<dim>::add_update_flags(
-  const UpdateFlags flags, bool cell, bool bdry, bool face, bool ngbr)
+  const UpdateFlags flags, bool cell, bool boundary, bool face, bool neighbor)
 {
   if (cell) cell_flags |= flags;
-  if (bdry) bdry_flags |= flags;
+  if (boundary) boundary_flags |= flags;
   if (face) face_flags |= flags;
-  if (ngbr) ngbr_flags |= flags;  
+  if (neighbor) neighbor_flags |= flags;  
 }
 
   
@@ -71,7 +71,7 @@ IntegrationWorker<dim>::initialize_gauss_quadrature(
   unsigned int fp)
 {
   cell_quadrature = QGauss<dim>(cp);
-  bdry_quadrature = QGauss<dim-1>(bp);
+  boundary_quadrature = QGauss<dim-1>(bp);
   face_quadrature = QGauss<dim-1>(fp);
 
 }

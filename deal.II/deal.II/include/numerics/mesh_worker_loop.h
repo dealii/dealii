@@ -206,7 +206,7 @@ namespace MeshWorker
   {
     loop<CELLINFO,FACEINFO>
       (begin, end,
-       box.cell_info, box.bdry_info,
+       box.cell_info, box.boundary_info,
        box.face_info,
        box.subface_info, box.neighbor_info,
        cell_worker,
