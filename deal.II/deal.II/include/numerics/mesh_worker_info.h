@@ -47,7 +47,7 @@ namespace MeshWorker
       void initialize_local(MatrixBlock<FullMatrix<number> >& M,
 			    const unsigned int row,
 			    const unsigned int col);
-      
+
     public:
       void initialize_numbers(const unsigned int n);
       void initialize_vectors(const unsigned int n);
@@ -67,7 +67,7 @@ namespace MeshWorker
 					* provide row and column info.
 					*/
       void initialize_matrices(unsigned int n, bool both);
-	
+
 				       /**
 					* Allocate a local matrix
 					* for each of the global
@@ -87,7 +87,7 @@ namespace MeshWorker
       template <class MatrixPtr>
       void initialize_matrices(const std::vector<MatrixPtr>& matrices,
 			       bool both);
-	
+
 				       /**
 					* Reinitialize matrices for
 					* new cell. Resizes the
@@ -95,14 +95,14 @@ namespace MeshWorker
 					* them to zero.
 					*/
       void reinit(const BlockIndices& local_sizes);
-	
+
 				       /**
 					* The local numbers,
 					* computed on a cell or on a
 					* face.
 					*/
       std::vector<number> J;
-	
+
 				       /**
 					* The local vectors. This
 					* field is public, so that
@@ -110,7 +110,7 @@ namespace MeshWorker
 					* write to it.
 					*/
       std::vector<BlockVector<number> > R;
-	
+
 				       /**
 					* The local matrices
 					* coupling degrees of
@@ -119,7 +119,7 @@ namespace MeshWorker
 					* first cell on a face.
 					*/
       std::vector<MatrixBlock<FullMatrix<number> > > M1;
-	
+
 				       /**
 					* The local matrices
 					* coupling test functions on
@@ -133,7 +133,7 @@ namespace MeshWorker
       std::vector<MatrixBlock<FullMatrix<number> > > M2;
   };
 
-    
+
 /**
  * Basic info class only containing information on geometry and
  * degrees of freedom of the mesh object.
@@ -175,13 +175,13 @@ namespace MeshWorker
   template<int dim, int spacedim = dim>
   class DoFInfo : public LocalResults<double>
   {
-    public:	
+    public:
 				       /// The current cell
       typename Triangulation<dim>::cell_iterator cell;
-	
+
 				       /// The current face
       typename Triangulation<dim>::face_iterator face;
-	
+
 				       /**
 					* The number of the current
 					* face on the current cell.
@@ -191,7 +191,7 @@ namespace MeshWorker
 					* if the info object was
 					* initialized with a cell.
 					*/
-					  
+
       unsigned int face_number;
 				       /**
 					* The number of the current
@@ -207,7 +207,7 @@ namespace MeshWorker
 
 				       /// The DoF indices of the current cell
       std::vector<unsigned int> indices;
-	
+
 				       /**
 					* Constructor setting the
 					* #block_info pointer.
@@ -222,7 +222,7 @@ namespace MeshWorker
 					*/
       template <class DH>
       DoFInfo(const DH& dof_handler);
-	
+
 				       /**
 					* Set the current cell and
 					* fill #indices.
@@ -239,7 +239,7 @@ namespace MeshWorker
       void reinit(const DHCellIterator& c,
 		  const DHFaceIterator& f,
 		  const unsigned int n);
-	
+
 				       /**
 					* Set the current subface
 					* and fill #indices if the
@@ -252,21 +252,21 @@ namespace MeshWorker
 		  const unsigned int s);
 
       const BlockIndices& local_indices() const;
-      
-	
+
+
 				       /// The block structure of the system
       SmartPointer<const BlockInfo,DoFInfo<dim,spacedim> > block_info;
-      
+
     private:
 				       /// Fill index vector
       void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator c);
-	
+
 				       /// Fill index vector with level indices
       void get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator c);
-	
+
 				       /// Auxiliary vector
       std::vector<unsigned int> indices_org;
-	
+
 				       /**
 					* An auxiliary local
 					* BlockIndices object created
@@ -277,7 +277,7 @@ namespace MeshWorker
 					*/
       BlockIndices aux_local_indices;
   };
-    
+
 /**
  * Class for objects handed to local integration functions.
  *
@@ -340,14 +340,14 @@ namespace MeshWorker
 					* information to DoFInfo.
 					*/
       IntegrationInfo(const BlockInfo& block_info);
-	
+
 				       /**
 					* Constructor forwarding
 					* information to DoFInfo.
 					*/
       template <class DH>
       IntegrationInfo(const DH& dof_handler);
-	
+
 				       /**
 					* Build all internal
 					* structures, in particular
@@ -384,12 +384,12 @@ namespace MeshWorker
 					* selector.
 					*/
       void initialize_data(const boost::shared_ptr<VectorDataBase<dim,spacedim> > data);
-	
+
 				       /**
 					* Delete the data created by initialize().
 					*/
       void clear();
-	
+
 				       /// This is true if we are assembling for multigrid
       bool multigrid;
 				       /// Access to finite element
@@ -403,7 +403,7 @@ namespace MeshWorker
 					* vector of elements.
 					*/
       const FEVALUESBASE& fe() const;
-	
+
 				       /// Access to finite elements
 				       /**
 					* This access function must
@@ -414,7 +414,7 @@ namespace MeshWorker
 					* @see DGBlockSplitApplication
 					*/
       const FEVALUESBASE& fe(const unsigned int i) const;
-	
+
 				       /**
 					* The vector containing the
 					* values of finite element
@@ -430,7 +430,7 @@ namespace MeshWorker
 					* point.
 					*/
      std::vector<std::vector<std::vector<double> > > values;
-	
+
 				       /**
 					* The vector containing the
 					* derivatives of finite
@@ -446,7 +446,7 @@ namespace MeshWorker
 					* point.
 					*/
       std::vector<std::vector<std::vector<Tensor<1,dim> > > > gradients;
-      
+
 				       /**
 					* The vector containing the
 					* second derivatives of finite
@@ -462,7 +462,7 @@ namespace MeshWorker
 					* point.
 					*/
       std::vector<std::vector<std::vector<Tensor<2,dim> > > > hessians;
-	
+
 				       /**
 					* Reinitialize internal data
 					* structures for use on a cell.
@@ -478,7 +478,7 @@ namespace MeshWorker
       void reinit(const DHCellIterator& c,
 		  const DHFaceIterator& f,
 		  const unsigned int fn);
-	
+
 				       /**
 					* Reinitialize internal data
 					* structures for use on a subface.
@@ -553,9 +553,10 @@ namespace MeshWorker
 					*/
       template <typename T>
       IntegrationInfoBox(const T&);
-      
-      template <class WORKER>
+
+      template <class WORKER, class ASSEMBLER>
       void initialize(const WORKER&,
+		      ASSEMBLER &assembler,
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping);
 
@@ -564,20 +565,20 @@ namespace MeshWorker
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
 		      const NamedData<VECTOR*>& data);
-	
+
 //      private:
 
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > bdry_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
-      
+
       CellInfo cell_info;
       FaceInfo bdry_info;
       FaceInfo face_info;
       FaceInfo subface_info;
       FaceInfo neighbor_info;
   };
-    
+
 
 //----------------------------------------------------------------------//
 
@@ -588,7 +589,7 @@ namespace MeshWorker
     J.resize(n);
   }
 
-    
+
   template <typename number>
   inline void
   LocalResults<number>::initialize_vectors(const unsigned int n)
@@ -596,7 +597,7 @@ namespace MeshWorker
     R.resize(n);
   }
 
-    
+
   template <typename number>
   template <class MatrixPtr>
   inline void
@@ -621,8 +622,8 @@ namespace MeshWorker
 	  }
       }
   }
-    
-    
+
+
   template <typename number>
   inline void
   LocalResults<number>::initialize_matrices(const unsigned int n,
@@ -642,8 +643,8 @@ namespace MeshWorker
 	  }
       }
   }
-    
-    
+
+
   template <typename number>
   inline void
   LocalResults<number>::reinit(const BlockIndices& bi)
@@ -658,11 +659,11 @@ namespace MeshWorker
     for (unsigned int i=0;i<M2.size();++i)
       M2[i].matrix.reinit(bi.block_size(M2[i].row),
 			  bi.block_size(M2[i].column));
-  }   
-   
+  }
+
 
 //----------------------------------------------------------------------//
-    
+
   template <int dim, int spacedim>
   template <class DH>
   DoFInfo<dim,spacedim>::DoFInfo(const DH& dof_handler)
@@ -671,8 +672,8 @@ namespace MeshWorker
     aux[0] = dof_handler.get_fe().dofs_per_cell;
     aux_local_indices.reinit(aux);
   }
-  
-  
+
+
   template <int dim, int spacedim>
   template <class DHCellIterator>
   inline void
@@ -685,17 +686,17 @@ namespace MeshWorker
     if (block_info)
       LocalResults<double>::reinit(block_info->local());
     else
-      LocalResults<double>::reinit(aux_local_indices);	
+      LocalResults<double>::reinit(aux_local_indices);
   }
-  
-  
+
+
   template<int dim, int spacedim>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
   DoFInfo<dim, spacedim>::reinit(const DHCellIterator& c,
 				 const DHFaceIterator& f,
 				 unsigned int n)
-  {  
+  {
     if ((cell.state() != IteratorState::valid)
 	||  cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
       get_indices(c);
@@ -706,10 +707,10 @@ namespace MeshWorker
     if (block_info)
       LocalResults<double>::reinit(block_info->local());
     else
-      LocalResults<double>::reinit(aux_local_indices);	
+      LocalResults<double>::reinit(aux_local_indices);
   }
-  
-  
+
+
   template<int dim, int spacedim>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
@@ -728,10 +729,10 @@ namespace MeshWorker
     if (block_info)
       LocalResults<double>::reinit(block_info->local());
     else
-      LocalResults<double>::reinit(aux_local_indices);	
+      LocalResults<double>::reinit(aux_local_indices);
   }
-  
-  
+
+
   template<int dim, int spacedim>
   inline const BlockIndices&
   DoFInfo<dim, spacedim>::local_indices() const
@@ -740,10 +741,10 @@ namespace MeshWorker
       return block_info->local();
     return aux_local_indices;
   }
-    
+
 
 //----------------------------------------------------------------------//
-    
+
   template <int dim, class FVB, int spacedim>
   template <class DH>
   IntegrationInfo<dim,FVB,spacedim>::IntegrationInfo(const DH& dof_handler)
@@ -754,7 +755,7 @@ namespace MeshWorker
 		  global_data(boost::shared_ptr<VectorDataBase<dim, spacedim> >(new VectorDataBase<dim, spacedim>))
   {}
 
-    
+
   template <int dim, class FVB, int spacedim>
   inline const FVB&
   IntegrationInfo<dim,FVB,spacedim>::fe() const
@@ -789,8 +790,8 @@ namespace MeshWorker
     const bool split_fevalues = this->block_info != 0;
     fill_local_data(split_fevalues);
   }
-    
-    
+
+
   template <int dim, class FVB, int spacedim>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
@@ -806,12 +807,12 @@ namespace MeshWorker
 	FEFaceValues<dim>& fe = dynamic_cast<FEFaceValues<dim>&> (febase);
 	fe.reinit(this->cell, fn);
       }
-      
+
     const bool split_fevalues = this->block_info != 0;
     fill_local_data(split_fevalues);
   }
-    
-    
+
+
   template <int dim, class FVB, int spacedim>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
@@ -828,7 +829,7 @@ namespace MeshWorker
 	FESubfaceValues<dim>& fe = dynamic_cast<FESubfaceValues<dim>&> (febase);
 	fe.reinit(this->cell, fn, sn);
       }
-      
+
     const bool split_fevalues = this->block_info != 0;
     fill_local_data(split_fevalues);
   }
@@ -845,22 +846,23 @@ namespace MeshWorker
 		  subface_info(t),
 		  neighbor_info(t)
   {}
-  
-  
+
+
   template <int dim, int sdim>
-  template <class WORKER>
+  template <class WORKER, class ASSEMBLER>
   void
-  IntegrationInfoBox<dim,sdim>::initialize(
-    const WORKER& integrator,
-    const FiniteElement<dim,sdim>& el,
-    const Mapping<dim,sdim>& mapping)
+  IntegrationInfoBox<dim,sdim>::
+  initialize(const WORKER& integrator,
+	     ASSEMBLER &assembler,
+	     const FiniteElement<dim,sdim>& el,
+	     const Mapping<dim,sdim>& mapping)
   {
-    integrator.initialize_info(cell_info, false);
-    integrator.initialize_info(bdry_info, false);
-    integrator.initialize_info(face_info, true);
-    integrator.initialize_info(subface_info, true);
-    integrator.initialize_info(neighbor_info, true);
-      
+    assembler.initialize_info(cell_info, false);
+    assembler.initialize_info(bdry_info, false);
+    assembler.initialize_info(face_info, true);
+    assembler.initialize_info(subface_info, true);
+    assembler.initialize_info(neighbor_info, true);
+
     cell_info.initialize<FEValues<dim,sdim> >(el, mapping, integrator.cell_quadrature,
 			 integrator.cell_flags);
     bdry_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.bdry_quadrature,
@@ -885,17 +887,17 @@ namespace MeshWorker
   {
     initialize(integrator, el, mapping);
     boost::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
-    
+
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.cell_selector));
     p->initialize(data);
     cell_data = p;
     cell_info.initialize_data(p);
-    
+
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.bdry_selector));
     p->initialize(data);
     bdry_data = p;
     bdry_info.initialize_data(p);
-        
+
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.face_selector));
     p->initialize(data);
     face_data = p;

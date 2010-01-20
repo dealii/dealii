@@ -66,7 +66,7 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class CELLINFO, class FACEINFO, class ITERATOR>
+  template<class CELLINFO, class FACEINFO, class ITERATOR, typename ASSEMBLER>
   void loop(ITERATOR begin,
 	    typename identity<ITERATOR>::type end,
 	    CELLINFO& cell_info, FACEINFO& boundary_info,
@@ -74,6 +74,7 @@ namespace MeshWorker
 	    const std_cxx1x::function<void (CELLINFO &)> &cell_worker,
 	    const std_cxx1x::function<void (FACEINFO &)> &boundary_worker,
 	    const std_cxx1x::function<void (FACEINFO &, FACEINFO &)> &face_worker,
+	    ASSEMBLER &assembler,
 	    bool cells_first = true)
   {
     const bool integrate_cell          = (cell_worker != 0);
@@ -93,6 +94,7 @@ namespace MeshWorker
 	  {
 	    cell_info.reinit(cell);
 	    cell_worker(cell_info);
+	    assembler.assemble (cell_info);
 	  }
 
 	if (integrate_interior_face || integrate_boundary)
@@ -108,6 +110,7 @@ namespace MeshWorker
 		    {
 		      boundary_info.reinit(cell, face, face_no);
 		      boundary_worker(boundary_info);
+		      assembler.assemble (boundary_info);
 		    }
 		}
 	      else if (integrate_interior_face)
@@ -144,6 +147,7 @@ namespace MeshWorker
 						       // conform to
 						       // old version
 		      face_worker(face_info, subface_info);
+		      assembler.assemble (face_info, subface_info);
 		    }
 		  else
 		    {
@@ -168,9 +172,9 @@ namespace MeshWorker
 					   neighbor_face_no);
 
 		      face_worker(face_info, neighbor_info);
+		      assembler.assemble (face_info, neighbor_info);
 		      neighbor->face(neighbor_face_no)->set_user_flag ();
 		    }
-
 		}
 	    } // faces
 					 // Execute this, if faces
@@ -179,6 +183,7 @@ namespace MeshWorker
 	  {
 	    cell_info.reinit(cell);
 	    cell_worker(cell_info);
+	    assembler.assemble (cell_info);
 	  }
       }
   }
@@ -189,13 +194,14 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class CELLINFO, class FACEINFO, int dim, class ITERATOR>
+  template<class CELLINFO, class FACEINFO, int dim, class ITERATOR, typename ASSEMBLER>
   void integration_loop(ITERATOR begin,
 			typename identity<ITERATOR>::type end,
 			IntegrationInfoBox<dim, dim>& box,
 			const std_cxx1x::function<void (CELLINFO &)> &cell_worker,
 			const std_cxx1x::function<void (FACEINFO &)> &boundary_worker,
 			const std_cxx1x::function<void (FACEINFO &, FACEINFO &)> &face_worker,
+			ASSEMBLER &assembler,
 			bool cells_first = true)
   {
     loop<CELLINFO,FACEINFO>
@@ -206,6 +212,7 @@ namespace MeshWorker
        cell_worker,
        boundary_worker,
        face_worker,
+       assembler,
        cells_first);
   }
 }

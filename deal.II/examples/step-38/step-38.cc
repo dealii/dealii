@@ -327,15 +327,7 @@ void DGMethod<dim>::assemble_system ()
 				   // result of std::bind if the local
 				   // integrators were, for example,
 				   // non-static member functions.
-  typedef
-  MeshWorker::AssemblingIntegrator
-    <dim,
-     MeshWorker::Assembler::SystemSimple<SparseMatrix<double>,
-                                         Vector<double> > >
-    Integrator;
-  Integrator integrator(&DGMethod<dim>::integrate_cell_term,
-			&DGMethod<dim>::integrate_boundary_term,
-			&DGMethod<dim>::integrate_face_term);
+  MeshWorker::IntegrationWorker<dim> integration_worker;
 
 				   // First, we initialize the
 				   // quadrature formulae and the
@@ -350,9 +342,9 @@ void DGMethod<dim>::assemble_system ()
 				   // independently, we have to hand
 				   // over this value three times.
   const unsigned int n_gauss_points = dof_handler.get_fe().degree+1;
-  integrator.initialize_gauss_quadrature(n_gauss_points,
-					 n_gauss_points,
-					 n_gauss_points);
+  integration_worker.initialize_gauss_quadrature(n_gauss_points,
+						 n_gauss_points,
+						 n_gauss_points);
 
 				   // These are the types of values we
 				   // need for integrating our
@@ -364,14 +356,16 @@ void DGMethod<dim>::assemble_system ()
   UpdateFlags update_flags = update_quadrature_points |
 			     update_values            |
 			     update_gradients;
-  integrator.add_update_flags(update_flags, true, true, true, true);
+  integration_worker.add_update_flags(update_flags, true, true, true, true);
 
 				   // Finally, we have to tell the
 				   // assembler base class where to
 				   // put the local data. These will
 				   // be our system matrix and the
 				   // right hand side.
-  integrator.initialize(system_matrix, right_hand_side);
+  MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >
+    assembler;
+  assembler.initialize(system_matrix, right_hand_side);
 
 				   // We are now ready to get to the
 				   // integration loop. @p info_box is
@@ -384,7 +378,7 @@ void DGMethod<dim>::assemble_system ()
 				   // receives all the stuff we
 				   // created so far.
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integrator, fe, mapping);
+  info_box.initialize(integration_worker, assembler, fe, mapping);
 
 				   // Finally, the integration loop
 				   // over all active cells
@@ -393,9 +387,10 @@ void DGMethod<dim>::assemble_system ()
   MeshWorker::integration_loop<CellInfo,FaceInfo>
     (dof_handler.begin_active(), dof_handler.end(),
      info_box,
-     std_cxx1x::bind (&Integrator::cell, integrator, _1),
-     std_cxx1x::bind (&Integrator::bdry, integrator, _1),
-     std_cxx1x::bind (&Integrator::face, integrator, _1, _2));
+     &DGMethod<dim>::integrate_cell_term,
+     &DGMethod<dim>::integrate_boundary_term,
+     &DGMethod<dim>::integrate_face_term,
+     assembler);
 }
 
 
