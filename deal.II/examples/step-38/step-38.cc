@@ -327,13 +327,15 @@ void DGMethod<dim>::assemble_system ()
 				   // result of std::bind if the local
 				   // integrators were, for example,
 				   // non-static member functions.
+  typedef
   MeshWorker::AssemblingIntegrator
     <dim,
      MeshWorker::Assembler::SystemSimple<SparseMatrix<double>,
                                          Vector<double> > >
-    integrator(&DGMethod<dim>::integrate_cell_term,
-	       &DGMethod<dim>::integrate_boundary_term,
-	       &DGMethod<dim>::integrate_face_term);
+    Integrator;
+  Integrator integrator(&DGMethod<dim>::integrate_cell_term,
+			&DGMethod<dim>::integrate_boundary_term,
+			&DGMethod<dim>::integrate_face_term);
 
 				   // First, we initialize the
 				   // quadrature formulae and the
@@ -388,7 +390,12 @@ void DGMethod<dim>::assemble_system ()
 				   // over all active cells
 				   // (determined by the first
 				   // argument, which is an active iterator).
-  MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
+  MeshWorker::integration_loop<CellInfo,FaceInfo>
+    (dof_handler.begin_active(), dof_handler.end(),
+     info_box,
+     std_cxx1x::bind (&Integrator::cell, integrator, _1),
+     std_cxx1x::bind (&Integrator::bdry, integrator, _1),
+     std_cxx1x::bind (&Integrator::face, integrator, _1, _2));
 }
 
 

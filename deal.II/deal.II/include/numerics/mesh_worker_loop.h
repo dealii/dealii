@@ -189,24 +189,23 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<int dim, class ITERATOR, class LOCALWORKER>
+  template<class CELLINFO, class FACEINFO, int dim, class ITERATOR>
   void integration_loop(ITERATOR begin,
 			typename identity<ITERATOR>::type end,
 			IntegrationInfoBox<dim, dim>& box,
-			LOCALWORKER& localworker,
+			const std_cxx1x::function<void (CELLINFO &)> &cell_worker,
+			const std_cxx1x::function<void (FACEINFO &)> &boundary_worker,
+			const std_cxx1x::function<void (FACEINFO &, FACEINFO &)> &face_worker,
 			bool cells_first = true)
   {
-    typedef typename IntegrationInfoBox<dim, dim>::CellInfo CELLINFO;
-    typedef typename IntegrationInfoBox<dim, dim>::FaceInfo FACEINFO;
-
     loop<CELLINFO,FACEINFO>
       (begin, end,
        box.cell_info, box.bdry_info,
        box.face_info,
        box.subface_info, box.neighbor_info,
-       std_cxx1x::bind (&LOCALWORKER::cell, localworker, _1),
-       std_cxx1x::bind (&LOCALWORKER::bdry, localworker, _1),
-       std_cxx1x::bind (&LOCALWORKER::face, localworker, _1, _2),
+       cell_worker,
+       boundary_worker,
+       face_worker,
        cells_first);
   }
 }
