@@ -512,9 +512,10 @@ void DGMethod<dim>::assemble_system ()
   MeshWorker::AssemblingIntegrator
     <dim,
      MeshWorker::Assembler::SystemSimple<SparseMatrix<double>,
-                                         Vector<double> >,
-     DGIntegrator<dim> >
-    integrator(dg);
+                                         Vector<double> > >
+    integrator(&DGIntegrator<dim>::cell,
+	       &DGIntegrator<dim>::bdry,
+	       &DGIntegrator<dim>::face);
 
 				   // First, we initialize the
 				   // quadrature formulae and the
