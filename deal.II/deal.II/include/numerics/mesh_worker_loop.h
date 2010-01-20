@@ -66,7 +66,7 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class ITERATOR, class CELLINFO, class FACEINFO>
+  template<class CELLINFO, class FACEINFO, class ITERATOR>
   void loop(ITERATOR begin,
 	    typename identity<ITERATOR>::type end,
 	    CELLINFO& cellinfo, FACEINFO& bdryinfo,
@@ -199,17 +199,15 @@ namespace MeshWorker
     typedef typename IntegrationInfoBox<dim, dim>::CellInfo CELLINFO;
     typedef typename IntegrationInfoBox<dim, dim>::FaceInfo FACEINFO;
 
-    loop<ITERATOR,
-      CELLINFO,
-      FACEINFO>
+    loop<CELLINFO,FACEINFO>
       (begin, end,
-	  box.cell_info, box.bdry_info,
-	  box.face_info,
-	  box.subface_info, box.neighbor_info,
-	  std_cxx1x::bind (&LOCALWORKER::cell, localworker, _1),
-	  std_cxx1x::bind (&LOCALWORKER::bdry, localworker, _1),
-	  std_cxx1x::bind (&LOCALWORKER::face, localworker, _1, _2),
-	  cells_first);
+       box.cell_info, box.bdry_info,
+       box.face_info,
+       box.subface_info, box.neighbor_info,
+       std_cxx1x::bind (&LOCALWORKER::cell, localworker, _1),
+       std_cxx1x::bind (&LOCALWORKER::bdry, localworker, _1),
+       std_cxx1x::bind (&LOCALWORKER::face, localworker, _1, _2),
+       cells_first);
   }
 }
 
