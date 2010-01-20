@@ -51,17 +51,17 @@ namespace MeshWorker
  *
  * First, a loop over all cells in the iterator range is performed, in
  * each step updating the CellInfo object, then calling
- * LocalWorker::cell() with this object.
+ * cell_worker() with this object.
  *
- * In the second loop, we work through all the faces of cells in the
- * iterator range. The functions LocalWorker::bdry() and
- * LocalWorker::face() are called for each boundary and interior face,
+ * In the second loop, we walk through all the faces of cells in the
+ * iterator range. The functions boundary_worker() and
+ * face_worker() are called for each boundary and interior face,
  * respectively. Unilaterally refined interior faces are handled
  * automatically by the loop.
  *
- * The extend of the second loop will be determined by the two control
- * variables LocalWorker::boundary_fluxes and
- * LocalWorker::interior_fluxes.
+ * If you don't want integration on cells, interior or boundary faces
+ * to happen, simply pass the Null pointer to one of the function
+ * arguments.
  *
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
@@ -69,8 +69,8 @@ namespace MeshWorker
   template<class CELLINFO, class FACEINFO, class ITERATOR>
   void loop(ITERATOR begin,
 	    typename identity<ITERATOR>::type end,
-	    CELLINFO& cellinfo, FACEINFO& bdryinfo,
-	    FACEINFO& faceinfo, FACEINFO& subfaceinfo, FACEINFO& ngbrinfo,
+	    CELLINFO& cell_info, FACEINFO& boundary_info,
+	    FACEINFO& face_info, FACEINFO& subface_info, FACEINFO& neighbor_info,
 	    const std_cxx1x::function<void (CELLINFO &)> &cell_worker,
 	    const std_cxx1x::function<void (FACEINFO &)> &boundary_worker,
 	    const std_cxx1x::function<void (FACEINFO &, FACEINFO &)> &face_worker,
@@ -91,8 +91,8 @@ namespace MeshWorker
 					 // before faces
 	if (integrate_cell && cells_first)
 	  {
-	    cellinfo.reinit(cell);
-	    cell_worker(cellinfo);
+	    cell_info.reinit(cell);
+	    cell_worker(cell_info);
 	  }
 
 	if (integrate_interior_face || integrate_boundary)
@@ -106,8 +106,8 @@ namespace MeshWorker
 		{
 		  if (integrate_boundary)
 		    {
-		      bdryinfo.reinit(cell, face, face_no);
-		      boundary_worker(bdryinfo);
+		      boundary_info.reinit(cell, face, face_no);
+		      boundary_worker(boundary_info);
 		    }
 		}
 	      else if (integrate_interior_face)
@@ -137,13 +137,13 @@ namespace MeshWorker
 			= cell->neighbor_of_coarser_neighbor(face_no);
 		      typename ITERATOR::AccessorType::Container::face_iterator nface
 			= neighbor->face(neighbor_face_no.first);
-		      faceinfo.reinit(cell, face, face_no);
-		      subfaceinfo.reinit(neighbor, nface, neighbor_face_no.first, neighbor_face_no.second);
+		      face_info.reinit(cell, face, face_no);
+		      subface_info.reinit(neighbor, nface, neighbor_face_no.first, neighbor_face_no.second);
 						       // Neighbor
 						       // first to
 						       // conform to
 						       // old version
-		      face_worker(faceinfo, subfaceinfo);
+		      face_worker(face_info, subface_info);
 		    }
 		  else
 		    {
@@ -163,11 +163,11 @@ namespace MeshWorker
 		      unsigned int neighbor_face_no = cell->neighbor_of_neighbor(face_no);
 		      Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
 						       // Regular interior face
-		      faceinfo.reinit(cell, face, face_no);
-		      ngbrinfo.reinit(neighbor, neighbor->face(neighbor_face_no),
-				      neighbor_face_no);
+		      face_info.reinit(cell, face, face_no);
+		      neighbor_info.reinit(neighbor, neighbor->face(neighbor_face_no),
+					   neighbor_face_no);
 
-		      face_worker(faceinfo, ngbrinfo);
+		      face_worker(face_info, neighbor_info);
 		      neighbor->face(neighbor_face_no)->set_user_flag ();
 		    }
 
@@ -177,8 +177,8 @@ namespace MeshWorker
 					 // have to be handled first
 	if (integrate_cell && !cells_first)
 	  {
-	    cellinfo.reinit(cell);
-	    cell_worker(cellinfo);
+	    cell_info.reinit(cell);
+	    cell_worker(cell_info);
 	  }
       }
   }
