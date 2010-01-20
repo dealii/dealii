@@ -71,9 +71,9 @@ namespace MeshWorker
 	    typename identity<ITERATOR>::type end,
 	    CELLINFO& cellinfo, FACEINFO& bdryinfo,
 	    FACEINFO& faceinfo, FACEINFO& subfaceinfo, FACEINFO& ngbrinfo,
-	    std_cxx1x::function<void (CELLINFO &)> cell_worker,
-	    std_cxx1x::function<void (FACEINFO &)> boundary_worker,
-	    std_cxx1x::function<void (FACEINFO &, FACEINFO &)> face_worker,
+	    const std_cxx1x::function<void (CELLINFO &)> &cell_worker,
+	    const std_cxx1x::function<void (FACEINFO &)> &boundary_worker,
+	    const std_cxx1x::function<void (FACEINFO &, FACEINFO &)> &face_worker,
 	    bool cells_first = true)
   {
     const bool integrate_cell          = (cell_worker != 0);
