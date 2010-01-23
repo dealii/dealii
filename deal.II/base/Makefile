@@ -97,7 +97,7 @@ $(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ Makefile.dep
+	-rm -f *~ include/*~ include/*/*~ Makefile.dep source/*.inst
 
 
 # Rule to generate the dependency file. This file is

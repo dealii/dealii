@@ -218,7 +218,7 @@ include Makefile.dep
 ################### some clean-up rules
 
 clean:
-	-rm -f *~ */*~ */*/*~ Makefile.dep
+	-rm -f *~ */*~ */*/*~ Makefile.dep source/*/*.inst
 
 
 ###################
