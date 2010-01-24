@@ -1509,7 +1509,8 @@ SparseMatrix<number>::TSOR (Vector<somenumber>& dst,
 
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
-  for (unsigned int row=m(); row!=0; --row)
+  unsigned int row=m()-1;
+  while (true)
     {
       somenumber s = dst(row);
       for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
@@ -1517,6 +1518,11 @@ SparseMatrix<number>::TSOR (Vector<somenumber>& dst,
 	  s -= val[j] * dst(cols->colnums[j]);
 
       dst(row) = s * om / val[cols->rowstart[row]];
+
+      if (row == 0)
+	break;
+
+      --row;
     }
 }
 
