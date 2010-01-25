@@ -424,8 +424,6 @@ Step39<dim>::assemble_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
   info_box.initialize(integrator, fe, mapping);
   MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
-  
-//  matrix.print_formatted(std::cout, 2, false, 5, "*");
 }
 
 
@@ -446,19 +444,6 @@ Step39<dim>::assemble_mg_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box(mg_dof_handler);
   info_box.initialize(integrator, fe, mapping);
   MeshWorker::integration_loop(mg_dof_handler.begin(), mg_dof_handler.end(), info_box, integrator);
-
-//   for (unsigned int l=0;l<triangulation.n_levels();++l)
-//     {
-//       std::cout << "level matrix " << l << std::endl;
-//       mg_matrix[l].print_formatted(std::cout, 2, false, 5, "*");
-//     }
-//   for (unsigned int l=1;l<triangulation.n_levels();++l)
-//     {
-//       std::cout << "up matrix " << l << std::endl;
-//       mg_matrix_dg_up[l].print_formatted(std::cout, 2, false, 5, "*");
-//       std::cout << "down matrix " << l << std::endl;
-//       mg_matrix_dg_down[l].print_formatted(std::cout, 2, false, 5, "*");
-//     }
 }
 
 
@@ -504,7 +489,6 @@ Step39<dim>::solve()
   MGSmootherRelaxation<SparseMatrix<double>, RELAXATION, Vector<double> >
     mg_smoother(mem);
   RELAXATION::AdditionalData smoother_data(1.);
-//  RELAXATION::AdditionalData smoother_data(fe.dofs_per_cell, 1.);
   mg_smoother.initialize(mg_matrix, smoother_data);
   
 				   // Do two smoothing steps per level
@@ -576,7 +560,6 @@ Step39<dim>::estimate()
   integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
   UpdateFlags update_flags = update_values | update_gradients;
   integrator.add_update_flags(update_flags | update_hessians, true, true, true, true);
-//  integrator.add_update_flags(update_hessians, true, false, false, false);
   integrator.add_update_flags(update_quadrature_points, false, true, false, false);
 
   NamedData<BlockVector<double>* > out_data;
