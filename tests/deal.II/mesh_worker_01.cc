@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,7 @@
 #include <numerics/mesh_worker_assembler.h>
 #include <numerics/mesh_worker_loop.h>
 
+#include <base/std_cxx1x/function.h>
 #include <base/logstream.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/sparse_matrix.h>
@@ -120,20 +121,6 @@ Local<dim>::face(FaceInfo& info1, FaceInfo& info2) const
 }
 
 
-template <int dim, class WORKER>
-void
-assemble(const DoFHandler<dim>& dof_handler, WORKER& worker)
-{
-  const FiniteElement<dim>& fe = dof_handler.get_fe();
-  MappingQ1<dim> mapping;
-
-  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(worker, fe, mapping);
-
-  MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, worker);
-}
-
-
 template <int dim>
 void
 test_simple(MGDoFHandler<dim>& mgdofs)
@@ -156,14 +143,32 @@ test_simple(MGDoFHandler<dim>& mgdofs)
   local.cells = true;
   local.faces = false;
 
-  MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >, Local<dim> >
-    integrator(local);
+  MeshWorker::IntegrationWorker<dim> integrator;
   integrator.initialize_gauss_quadrature(1, 1, 1);
-  integrator.initialize(matrix, v);
   integrator.boundary_fluxes = local.faces;
   integrator.interior_fluxes = local.faces;
 
-  assemble(dofs, integrator);
+  MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >
+    assembler;
+  assembler.initialize(matrix, v);
+
+  {
+    MappingQ1<dim> mapping;
+
+    MeshWorker::IntegrationInfoBox<dim> info_box(mgdofs);
+    info_box.initialize(integrator, assembler, fe, mapping);
+
+    MeshWorker::integration_loop
+      <typename Local<dim>::CellInfo,
+      typename Local<dim>::FaceInfo>
+      (mgdofs.begin_active(), mgdofs.end(),
+       info_box,
+       std_cxx1x::bind (&Local<dim>::cell, local, _1),
+       std_cxx1x::bind (&Local<dim>::bdry, local, _1),
+       std_cxx1x::bind (&Local<dim>::face, local, _1, _2),
+       assembler);
+  }
+
   for (unsigned int i=0;i<v.size();++i)
     deallog << ' ' << std::setprecision(3) << v(i);
   deallog << std::endl;
