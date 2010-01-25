@@ -1,6 +1,6 @@
 
 DEAL::Size 32 Unknowns 961
 DEAL::Solver type: N6dealii14SolverBicgstabINS_13PETScWrappers6VectorEEE
-DEAL:Bicgstab::Starting value 31.0000
-DEAL:Bicgstab::Convergence step 29 value 0.000873501
+DEAL:Bicgstab::Starting value 31.00
+DEAL:Bicgstab::Convergence step 29 value 0.0008735
 DEAL::Solver stopped after 29 iterations
