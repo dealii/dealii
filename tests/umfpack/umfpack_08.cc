@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,8 +44,8 @@ template <int dim>
 void test ()
 {
   deallog << dim << 'd' << std::endl;
-  
-  Triangulation<dim> tria;  
+
+  Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria,0,1);
   tria.refine_global (1);
 
@@ -58,9 +58,9 @@ void test ()
   FE_Q<dim> fe (1);
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
-    
+
   deallog << "Number of dofs = " << dof_handler.n_dofs() << std::endl;
-  
+
   BlockSparsityPattern sparsity_pattern;
   sparsity_pattern.reinit (3, 3);
   for (unsigned int i=0; i<3; ++i)
@@ -76,10 +76,10 @@ void test ()
   sparsity_pattern.collect_sizes();
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress ();
-  
+
   BlockSparseMatrix<float> B;
-  B.reinit (sparsity_pattern);  
-  
+  B.reinit (sparsity_pattern);
+
   {
 				     // for some reason, we can't
 				     // create block matrices directly
@@ -90,10 +90,10 @@ void test ()
 			      dof_handler.max_couplings_between_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, xsparsity_pattern);
     xsparsity_pattern.compress ();
-  
+
     SparseMatrix<double> xB;
-    xB.reinit (xsparsity_pattern);  
-    
+    xB.reinit (xsparsity_pattern);
+
     QGauss<dim> qr (2);
     MatrixTools::create_mass_matrix (dof_handler, qr, xB);
 
@@ -118,8 +118,8 @@ void test ()
     for (SparseMatrix<double>::const_iterator i = xB.begin(); i != xB.end(); ++i)
       B.set (i->row(), i->column(), i->value());
   }
-  
-  
+
+
                                    // for a number of different solution
                                    // vectors, make up a matching rhs vector
                                    // and check what the UMFPACK solver finds
@@ -163,7 +163,7 @@ int main ()
   std::ofstream logfile("umfpack_08/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-9);
+  deallog.threshold_double(1.e-8);
 
   test<1> ();
   test<2> ();
