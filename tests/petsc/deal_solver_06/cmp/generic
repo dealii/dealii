@@ -1,9 +1,7 @@
 
 DEAL::Size 32 Unknowns 961
 DEAL::Solver type: N6dealii16SolverRichardsonINS_13PETScWrappers6VectorEEE
-DEAL:Richardson::Starting value 31.00
+DEAL:Richardson::Starting value 31.0000
 DEAL:Richardson::Failure step 372 value nan
 DEAL::Iterative method reported convergence failure in step 372 with residual nan
 DEAL::Solver stopped after 372 iterations
-DEAL::GrowingVectorMemory:Overall allocated vectors: 2
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2

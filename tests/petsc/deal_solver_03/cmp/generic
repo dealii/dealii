@@ -1,8 +1,6 @@
 
 DEAL::Size 32 Unknowns 961
 DEAL::Solver type: N6dealii11SolverGMRESINS_13PETScWrappers6VectorEEE
-DEAL:GMRES::Starting value 31.00
-DEAL:GMRES::Convergence step 75 value 0.0008096
+DEAL:GMRES::Starting value 31.0000
+DEAL:GMRES::Convergence step 75 value 0.000809583
 DEAL::Solver stopped after 75 iterations
-DEAL::GrowingVectorMemory:Overall allocated vectors: 30
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 30
