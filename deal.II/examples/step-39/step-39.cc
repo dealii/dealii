@@ -453,7 +453,7 @@ Step39<dim>::assemble_mg_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box(mg_dof_handler);
   info_box.initialize(integration_worker, assembler, fe, mapping);
   MeshWorker::integration_loop<CellInfo, FaceInfo>(
-    dof_handler.begin_active(), dof_handler.end(),
+    mg_dof_handler.begin(), mg_dof_handler.end(),
     info_box,
     &MatrixIntegrator<dim>::cell,
     &MatrixIntegrator<dim>::bdry,
@@ -600,7 +600,7 @@ Step39<dim>::estimate()
   out_data.add(est, "cells");
   assembler.initialize(out_data, false);
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integration_worker, assembler, fe, mapping);
+  info_box.initialize(integration_worker, assembler, fe, mapping, solution_data);
   MeshWorker::integration_loop<CellInfo, FaceInfo> (
     dof_handler.begin_active(), dof_handler.end(),
     info_box,
