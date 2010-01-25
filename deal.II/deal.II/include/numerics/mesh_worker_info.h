@@ -560,8 +560,9 @@ namespace MeshWorker
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping);
 
-      template <class WORKER, typename VECTOR>
+      template <class WORKER, class ASSEMBLER, typename VECTOR>
       void initialize(const WORKER&,
+		      ASSEMBLER &assembler,
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
 		      const NamedData<VECTOR*>& data);
@@ -877,15 +878,16 @@ namespace MeshWorker
 
 
   template <int dim, int sdim>
-  template <class WORKER, typename VECTOR>
+  template <class WORKER, class ASSEMBLER, typename VECTOR>
   void
   IntegrationInfoBox<dim,sdim>::initialize(
     const WORKER& integrator,
+    ASSEMBLER &assembler,
     const FiniteElement<dim,sdim>& el,
     const Mapping<dim,sdim>& mapping,
     const NamedData<VECTOR*>& data)
   {
-    initialize(integrator, el, mapping);
+    initialize(integrator, assembler, el, mapping);
     boost::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
 
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.cell_selector));

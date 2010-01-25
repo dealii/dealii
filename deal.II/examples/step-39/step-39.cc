@@ -97,10 +97,10 @@ template <int dim>
 class MatrixIntegrator : public Subscriptor
 {
   public:
-    void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const;
-    void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const;
-    void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-	      typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const;
+    static void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+    static void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
 };
 
 
@@ -112,7 +112,7 @@ class MatrixIntegrator : public Subscriptor
 				 // degrees of freedom associated
 				 // with the shape functions.
 template <int dim>
-void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const
+void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
   const FEValuesBase<dim>& fe = info.fe();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
@@ -127,7 +127,7 @@ void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::Ce
 				 // On boundary faces, we use the
 				 // Nitsche boundary condition
 template <int dim>
-void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const
+void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe = info.fe();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
@@ -147,7 +147,7 @@ void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::Fa
 
 template <int dim>
 void MatrixIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const
+				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
   const FEFaceValuesBase<dim>& fe1 = info1.fe();
   const FEFaceValuesBase<dim>& fe2 = info2.fe();
@@ -196,20 +196,20 @@ template <int dim>
 class RHSIntegrator : public Subscriptor
 {
   public:
-    void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const;
-    void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const;
-    void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-	      typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const;
+    static void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+    static void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
 };
 
 
 template <int dim>
-void RHSIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo&) const
+void RHSIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo&)
 {}
 
 
 template <int dim>
-void RHSIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const
+void RHSIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe = info.fe();
   Vector<double>& local_vector = info.R[0].block(0);
@@ -230,7 +230,7 @@ void RHSIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceI
 
 template <int dim>
 void RHSIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo&,
-			      typename MeshWorker::IntegrationWorker<dim>::FaceInfo&) const
+			      typename MeshWorker::IntegrationWorker<dim>::FaceInfo&)
 {}
 
 
@@ -238,15 +238,15 @@ template <int dim>
 class Estimator : public Subscriptor
 {
   public:
-    void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const;
-    void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const;
-    void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-	      typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const;
+    static void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+    static void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
 };
 
 
 template <int dim>
-void Estimator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const
+void Estimator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
   const FEValuesBase<dim>& fe = info.fe();
   
@@ -260,7 +260,7 @@ void Estimator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo&
 
 
 template <int dim>
-void Estimator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const
+void Estimator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe = info.fe();
   
@@ -280,7 +280,7 @@ void Estimator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo&
 
 template <int dim>
 void Estimator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const
+			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
   const FEFaceValuesBase<dim>& fe = info1.fe();
   const std::vector<double>& uh1 = info1.values[0][0];
@@ -310,6 +310,9 @@ template <int dim>
 class Step39
 {
   public:
+    typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
+    typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
+    
     Step39(const FiniteElement<dim>& fe);
 
     void run(unsigned int n_steps);
@@ -412,18 +415,24 @@ template <int dim>
 void
 Step39<dim>::assemble_matrix()
 {
-  const MatrixIntegrator<dim> local;
-  MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> >, MatrixIntegrator<dim> >
-    integrator(local);
+  MeshWorker::IntegrationWorker<dim> integration_worker;
+  MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > assembler;
+  
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
-  integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
+  integration_worker.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
   UpdateFlags update_flags = update_values | update_gradients;
-  integrator.add_update_flags(update_flags, true, true, true, true);
+  integration_worker.add_update_flags(update_flags, true, true, true, true);
 
-  integrator.initialize(matrix);
+  assembler.initialize(matrix);
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integrator, fe, mapping);
-  MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
+  info_box.initialize(integration_worker, assembler, fe, mapping);
+  MeshWorker::integration_loop<CellInfo, FaceInfo>(
+    dof_handler.begin_active(), dof_handler.end(),
+    info_box,
+    &MatrixIntegrator<dim>::cell,
+    &MatrixIntegrator<dim>::bdry,
+    &MatrixIntegrator<dim>::face,
+    assembler);
 }
 
 
@@ -431,19 +440,25 @@ template <int dim>
 void
 Step39<dim>::assemble_mg_matrix()
 {
-  const MatrixIntegrator<dim> local;
-  MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> >, MatrixIntegrator<dim> >
-    integrator(local);
+  MeshWorker::IntegrationWorker<dim> integration_worker;
+  MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
+  
   const unsigned int n_gauss_points = mg_dof_handler.get_fe().tensor_degree()+1;
-  integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
+  integration_worker.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
   UpdateFlags update_flags = update_values | update_gradients;
-  integrator.add_update_flags(update_flags, true, true, true, true);
+  integration_worker.add_update_flags(update_flags, true, true, true, true);
 
-  integrator.initialize(mg_matrix);
-  integrator.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
+  assembler.initialize(mg_matrix);
+  assembler.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
   MeshWorker::IntegrationInfoBox<dim> info_box(mg_dof_handler);
-  info_box.initialize(integrator, fe, mapping);
-  MeshWorker::integration_loop(mg_dof_handler.begin(), mg_dof_handler.end(), info_box, integrator);
+  info_box.initialize(integration_worker, assembler, fe, mapping);
+  MeshWorker::integration_loop<CellInfo, FaceInfo>(
+    dof_handler.begin_active(), dof_handler.end(),
+    info_box,
+    &MatrixIntegrator<dim>::cell,
+    &MatrixIntegrator<dim>::bdry,
+    &MatrixIntegrator<dim>::face,
+    assembler);
 }
 
 
@@ -451,21 +466,28 @@ template <int dim>
 void
 Step39<dim>::assemble_right_hand_side()
 {
-  const RHSIntegrator<dim> local;
-  MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::ResidualSimple<Vector<double> >, RHSIntegrator<dim> >
-  integrator(local);
+  MeshWorker::IntegrationWorker<dim> integration_worker;
+  MeshWorker::Assembler::ResidualSimple<Vector<double> > assembler;
+  
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
-  integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
+  integration_worker.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
   UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
-  integrator.add_update_flags(update_flags, true, true, true, true);
+  integration_worker.add_update_flags(update_flags, true, true, true, true);
 
   NamedData<Vector<double>* > data;
   Vector<double>* rhs = &right_hand_side;
   data.add(rhs, "RHS");
-  integrator.initialize(data);
+  assembler.initialize(data);
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integrator, fe, mapping);
-  MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
+  info_box.initialize(integration_worker, assembler, fe, mapping);
+  
+  MeshWorker::integration_loop<CellInfo, FaceInfo>(
+    dof_handler.begin_active(), dof_handler.end(),
+    info_box,
+    &RHSIntegrator<dim>::cell,
+    &RHSIntegrator<dim>::bdry,
+    &RHSIntegrator<dim>::face,
+    assembler);
   
   right_hand_side *= -1.;
 }
@@ -553,23 +575,39 @@ Step39<dim>::estimate()
        cell != triangulation.end();++cell,++i)
     cell->set_user_index(i);
   
-  const Estimator<dim> local;
-  MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::CellsAndFaces<double>, Estimator<dim> >
-  integrator(local);
+  MeshWorker::IntegrationWorker<dim> integration_worker;
+  MeshWorker::Assembler::CellsAndFaces<double> assembler;
+  
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
-  integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
-  UpdateFlags update_flags = update_values | update_gradients;
-  integrator.add_update_flags(update_flags | update_hessians, true, true, true, true);
-  integrator.add_update_flags(update_quadrature_points, false, true, false, false);
+  integration_worker.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
+  
+  NamedData<Vector<double>* > solution_data;
+  solution_data.add(&solution, "solution");
+  
+  MeshWorker::VectorSelector cs;
+  MeshWorker::VectorSelector fs;
+  cs.add("solution", true, true, true);
+  fs.add("solution", true, true, false);
+  
+  integration_worker.cell_selector = cs;
+  integration_worker.boundary_selector = fs;
+  integration_worker.face_selector = fs;
+  integration_worker.initialize_update_flags();
+  integration_worker.add_update_flags(update_quadrature_points, false, true, false, false);
 
   NamedData<BlockVector<double>* > out_data;
   BlockVector<double>* est = &estimates;
   out_data.add(est, "cells");
-  integrator.initialize(out_data, false);
+  assembler.initialize(out_data, false);
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize_data(&solution, std::string("solution"), true, true, true);
-  info_box.initialize(integrator, fe, mapping);
-  MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
+  info_box.initialize(integration_worker, assembler, fe, mapping);
+  MeshWorker::integration_loop<CellInfo, FaceInfo> (
+    dof_handler.begin_active(), dof_handler.end(),
+    info_box,
+    &Estimator<dim>::cell,
+    &Estimator<dim>::bdry,
+    &Estimator<dim>::face,
+    assembler);
   return estimates.block(0).l2_norm();
 }
 
