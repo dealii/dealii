@@ -353,6 +353,28 @@ class ConstraintMatrix : public Subscriptor
 				      */
     void reinit (const IndexSet & local_constraints = IndexSet());
 
+
+				     /**
+				      * This function copies the content of @p
+				      * constraints_in with DoFs that are
+				      * element of the IndexSet @p
+				      * filter. Constrained dofs are
+				      * transformed to local index space of
+				      * the filter, and elements not present
+				      * in the IndexSet are ignored. 
+				      *
+				      * This function provides an easy way to
+				      * create a ConstraintMatrix for certain
+				      * vector components in a vector-valued
+				      * problem from a full ConstraintMatrix,
+				      * i.e. extracting a diagonal subblock
+				      * from a larger ConstraintMatrix. The
+				      * block is specified by the IndexSet
+				      * argument.
+				      */
+    void add_selected_constraints (const ConstraintMatrix &constraints_in,
+				   const IndexSet         &filter);
+
 				     /**
 				      * @name Adding constraints
 				      * @{

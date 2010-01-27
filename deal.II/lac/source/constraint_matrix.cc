@@ -160,6 +160,28 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
 
 
 
+void ConstraintMatrix::add_selected_constraints 
+  (const ConstraintMatrix &constraints,
+   const IndexSet         &filter)
+{
+  Assert (filter.size() > constraints.lines.back().line,
+	  ExcMessage ("Filter needs to be larger than constraint matrix size."));
+  for (std::vector<ConstraintLine>::const_iterator line=constraints.lines.begin();
+       line!=constraints.lines.end(); ++line)
+    if (filter.is_element(line->line))
+      {
+	const unsigned int row = filter.index_within_set (line->line);
+	add_line (row);
+	set_inhomogeneity (row, line->inhomogeneity);
+	for (unsigned int i=0; i<line->entries.size(); ++i)
+	  if (filter.is_element(line->entries[i].first))
+	    add_entry (row, filter.index_within_set (line->entries[i].first),
+		       line->entries[i].second);
+      }
+}
+
+
+
 void ConstraintMatrix::close ()
 {
   if (sorted == true)
