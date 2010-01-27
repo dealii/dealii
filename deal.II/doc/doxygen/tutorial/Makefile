@@ -4,11 +4,13 @@
 # include paths and global variables
 include ../../../common/Make.global_options
 
-# plain names of those files that we shall treat
-example-names = $(notdir $(shell echo $D/examples/step-? \
-                                      $D/examples/step-?? ; \
-				 if test -d $D/examples/MADDs-1 ; then \
-					echo $D/examples/MADDs-* ; fi))
+# plain names of those files that we shall treat. simply take all those
+# directories in examples/ that have a /doc subdirectory
+example-names = $(subst $D/examples/,,    \
+                        $(subst /doc,,    \
+                                $(shell echo $D/examples/*/doc)))
+
+
 
 # prefix names for generated intermediate files
 gen-example-names = $(addprefix generated/, $(example-names))
