@@ -627,9 +627,9 @@ FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
 				   // embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation);
 
-				   // Fill restriction matrices with
-				   // L2-projection
-  FETools::compute_projection_matrices (*this, this->restriction);
+				   // Fill restriction matrices 
+  initialize_restriction();
+
   initialize_quad_dof_index_permutation();
 }
 
@@ -1708,15 +1708,15 @@ FE_Q<dim,spacedim>::initialize_restriction ()
 {
                                    // for these Lagrange interpolation
                                    // polynomials, construction of the
-                                   // restriction matrices is
-                                   // relatively simple. the reason is
-                                   // that the interpolation points on
-                                   // the mother cell are always also
-                                   // interpolation points for some
-                                   // shape function on one or the
-                                   // other child, because we have
-                                   // chosen equidistant Lagrange
-                                   // interpolation points for the
+                                   // restriction matrices is relatively
+                                   // simple. the reason is that the
+                                   // interpolation points on the mother cell
+                                   // are (except for the case with arbitrary
+                                   // nonequidistant nodes) always also
+                                   // interpolation points for some shape
+                                   // function on one or the other child,
+                                   // because we have chosen equidistant
+                                   // Lagrange interpolation points for the
                                    // polynomials
                                    //
                                    // so the only thing we have to
@@ -1753,12 +1753,11 @@ FE_Q<dim,spacedim>::initialize_restriction ()
                                    // we don't have to care about this
 
   const double eps = 2e-13*this->degree*this->degree*dim;
-
+  const std::vector<unsigned int> &index_map_inverse=
+    this->poly_space.get_numbering_inverse();
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
-      const Point<dim> p_cell
-	= FE_Q_Helper::generate_unit_point (i, this->dofs_per_cell,
-					    dealii::internal::int2type<dim>());
+      const Point<dim> p_cell = this->unit_support_points[index_map_inverse[i]];
       unsigned int mother_dof = 0;
       for (; mother_dof<this->dofs_per_cell; ++mother_dof)
         {
@@ -1775,7 +1774,7 @@ FE_Q<dim,spacedim>::initialize_restriction ()
             Assert (std::fabs(val) < eps, ExcInternalError());
         }
                                        // check also the shape
-                                       // functions after tat
+                                       // functions after that
       for (unsigned int j=mother_dof+1; j<this->dofs_per_cell; ++j)
         Assert (std::fabs (this->poly_space.compute_value(j, p_cell))
                 < eps,
@@ -1799,33 +1798,32 @@ FE_Q<dim,spacedim>::initialize_restriction ()
 	      = GeometryInfo<dim>::cell_to_child_coordinates (p_cell, child, RefinementCase<dim>(ref));
 	    if (GeometryInfo<dim>::is_inside_unit_cell (p_subcell))
 	      {
-						 // find the one child
-						 // shape function
-						 // corresponding to
-						 // this point. do it in
-						 // the same way as
-						 // above
-		unsigned int child_dof = 0;
-		for (; child_dof<this->dofs_per_cell; ++child_dof)
+						 // find the child shape
+						 // function(s) corresponding
+						 // to this point. Usually
+						 // this is just one function;
+						 // however, when we use FE_Q
+						 // on arbitrary nodes a
+						 // parent support point might
+						 // not be a child support
+						 // point, and then we will
+						 // get more than one nonzero
+						 // value per row. Still, the
+						 // values should sum up to 1
+		double sum_check = 0;
+		for (unsigned int child_dof = 0; child_dof<this->dofs_per_cell; 
+		     ++child_dof)
 		  {
 		    const double val
 		      = this->poly_space.compute_value(child_dof, p_subcell);
 		    if (std::fabs (val-1.) < eps)
-		      break;
-		    else
-		      Assert (std::fabs(val) < eps,
-			      ExcInternalError());
-		  }
-		for (unsigned int j=child_dof+1; j<this->dofs_per_cell; ++j)
-		  Assert (std::fabs (this->poly_space.compute_value(j, p_subcell))
-			  < eps,
-			  ExcInternalError());
+		      this-> restriction[ref-1][child](mother_dof,child_dof)=1.;
+		    else if(std::fabs(val) > eps)
+		      this->restriction[ref-1][child](mother_dof,child_dof)= val;
 
-						 // so now that we have
-						 // it, set the
-						 // corresponding value
-						 // in the matrix
-		this->restriction[ref-1][child](mother_dof, child_dof) = 1.;
+		    sum_check += val;
+		  }
+		Assert (std::fabs(sum_check-1) < eps, ExcInternalError());
 	      }
 	  }
     }
