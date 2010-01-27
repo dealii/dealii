@@ -1,6 +1,6 @@
 //----------------------------  q_3.cc  ---------------------------
 //    q_3.cc,v 1.1 2003/05/05 13:49:41 wolf Exp
-//    Version: 
+//    Version:
 //
 //    Copyright (C) 2003, 2004, 2005, 2008 by the deal.II authors
 //
@@ -19,6 +19,7 @@
 
 #include "../tests.h"
 #include <base/logstream.h>
+#include <base/quadrature_lib.h>
 #include <fe/fe_q.h>
 
 #include <fstream>
@@ -30,12 +31,10 @@
 
 template<int dim>
 void
-test(const unsigned int degree)
+test(const FE_Q<dim> &fe_q)
 {
-  deallog << "FE_Q<" << dim << "> (" << degree << ")"
+  deallog << fe_q.get_name()
 	  << std::endl;
-  
-  FE_Q<dim> fe_q(degree);
 
   for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     {
@@ -43,12 +42,12 @@ test(const unsigned int degree)
 
       for (unsigned int i=0; i<m.m(); ++i)
         for (unsigned int j=0; j<m.n(); ++j)
-          if (m(i,j)!=0)
+          if (std::fabs(m(i,j))>1.e-10)
             deallog << '[' << i << ',' << j << ',' << m(i,j) << ']';
-      
+
       deallog << std::endl;
     }
-  
+
   deallog << std::endl;
 }
 
@@ -58,22 +57,32 @@ main()
 {
   std::ofstream logfile ("q_3/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
+				// Test the non-equidistant version as
+				// well
+  const QGaussLobatto<1> quad(5);
+
                                    // we had the matrices precomputed
                                    // up to Q4 for 1d, 2d and 3d
   for (unsigned int degree=1; degree<=4; ++degree)
-    test<1>(degree);
+    test<1>(FE_Q<1>(degree));
+
+  test<1>(FE_Q<1>(quad));
 
   for (unsigned int degree=1; degree<=4; ++degree)
-    test<2>(degree);
+    test<2>(FE_Q<2>(degree));
+
+  test<2>(FE_Q<2>(quad));
 
   for (unsigned int degree=1; degree<=4; ++degree)
-    test<3>(degree);
-  
+    test<3>(FE_Q<3>(degree));
+
+  test<3>(FE_Q<3>(quad));
+
   return 0;
 }
 
