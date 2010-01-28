@@ -246,8 +246,8 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
-  <li><p>Fixed: The PolynomialsBDM had a race condition in multithreaded
-  programs. This now fixed.
+  <li><p>Fixed: The PolynomialsBDM and PolynomialsABF classes had a race
+  condition in multithreaded programs. This now fixed.
   <br>
   (WB 2010/01/27)
   </p></li>

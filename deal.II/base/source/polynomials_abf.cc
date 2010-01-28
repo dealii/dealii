@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,10 +60,17 @@ PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
 	 ExcDimensionMismatch(grad_grads.size(), n_pols));
 
   const unsigned int n_sub = polynomial_space->n();
+				   // guard access to the scratch
+				   // arrays in the following block
+				   // using a mutex to make sure they
+				   // are not used by multiple threads
+				   // at once
+  Threads::Mutex::ScopedLock lock(mutex);
+
   p_values.resize((values.size() == 0) ? 0 : n_sub);
   p_grads.resize((grads.size() == 0) ? 0 : n_sub);
   p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
-  
+
   for (unsigned int d=0;d<dim;++d)
     {
 				       // First we copy the point. The
@@ -80,16 +87,16 @@ PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
       Point<dim> p;
       for (unsigned int c=0;c<dim;++c)
 	p(c) = unit_point((c+d)%dim);
-      
+
       polynomial_space->compute (p, p_values, p_grads, p_grad_grads);
-      
+
       for (unsigned int i=0;i<p_values.size();++i)
-	  values[i+d*n_sub][d] = p_values[i];
-      
+	values[i+d*n_sub][d] = p_values[i];
+
       for (unsigned int i=0;i<p_grads.size();++i)
 	for (unsigned int d1=0;d1<dim;++d1)
 	  grads[i+d*n_sub][d][(d1+d)%dim] = p_grads[i][d1];
-      
+
       for (unsigned int i=0;i<p_grad_grads.size();++i)
 	for (unsigned int d1=0;d1<dim;++d1)
 	  for (unsigned int d2=0;d2<dim;++d2)
@@ -107,7 +114,7 @@ PolynomialsABF<dim>::compute_n_pols(unsigned int k)
   if (dim == 2) return 2*(k+1)*(k+3);
   //TODO:Check what are the correct numbers ...
   if (dim == 3) return 3*(k+1)*(k+1)*(k+2);
-  
+
   Assert(false, ExcNotImplemented());
   return 0;
 }

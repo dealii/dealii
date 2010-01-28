@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,7 @@
 #include <base/polynomial_space.h>
 #include <base/tensor_product_polynomials.h>
 #include <base/table.h>
+#include <base/thread_management.h>
 
 #include <vector>
 
@@ -70,7 +71,7 @@ class PolynomialsABF
 				      * Destructor deleting the polynomials.
 				      */
     ~PolynomialsABF ();
-    
+
 				     /**
 				      * Computes the value and the
 				      * first and second derivatives
@@ -98,20 +99,20 @@ class PolynomialsABF
     void compute (const Point<dim>            &unit_point,
                   std::vector<Tensor<1,dim> > &values,
                   std::vector<Tensor<2,dim> > &grads,
-                  std::vector<Tensor<3,dim> > &grad_grads) const;    
-    
+                  std::vector<Tensor<3,dim> > &grad_grads) const;
+
 				     /**
 				      * Returns the number of ABF polynomials.
 				      */
     unsigned int n () const;
-    
+
 				     /**
 				      * Returns the degree of the ABF
 				      * space, which is two less than
 				      * the highest polynomial degree.
 				      */
     unsigned int degree () const;
-    
+
 				     /**
 				      * Return the number of
 				      * polynomials in the space
@@ -122,14 +123,14 @@ class PolynomialsABF
 				      * classes.
 				      */
     static unsigned int compute_n_pols(unsigned int degree);
-    
+
   private:
 				     /**
 				      * The degree of this object as
 				      * given to the constructor.
 				      */
     const unsigned int my_degree;
-    
+
 				     /**
 				      * An object representing the
 				      * polynomial space for a single
@@ -144,17 +145,23 @@ class PolynomialsABF
 				      * polynomials.
 				      */
     unsigned int n_pols;
-    
+
+				     /**
+				      * A mutex that guards the
+				      * following scratch arrays.
+				      */
+    mutable Threads::Mutex mutex;
+
 				     /**
 				      * Auxiliary memory.
 				      */
-    mutable std::vector<double> p_values;    
-    
+    mutable std::vector<double> p_values;
+
 				     /**
 				      * Auxiliary memory.
 				      */
     mutable std::vector<Tensor<1,dim> > p_grads;
-    
+
 				     /**
 				      * Auxiliary memory.
 				      */
