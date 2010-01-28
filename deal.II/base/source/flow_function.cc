@@ -24,18 +24,6 @@ using namespace std;
 DEAL_II_NAMESPACE_OPEN
 
 
-// in strict ANSI C mode, the following constants are not defined by
-// default, so we do it ourselves
-#ifndef M_PI
-#  define	M_PI		3.14159265358979323846
-#endif
-
-#ifndef M_PI_2
-#  define	M_PI_2		1.57079632679489661923
-#endif
-
-
-
 namespace Functions
 {
 
@@ -559,7 +547,7 @@ namespace Functions
 
 	if ((x<0) || (y<0))
 	  {
-	    const double phi = std::atan2(y,-x)+M_PI;
+	    const double phi = std::atan2(y,-x)+numbers::PI;
 	    const double r2 = x*x+y*y;
 	    const double rl = pow(r2,lambda/2.);
 	    const double rl1 = pow(r2,lambda/2.-.5);
@@ -595,7 +583,7 @@ namespace Functions
 
 	if ((x<0) || (y<0))
 	  {
-	    const double phi = std::atan2(y,-x)+M_PI;
+	    const double phi = std::atan2(y,-x)+numbers::PI;
 	    const double r2 = x*x+y*y;
 	    const double r = sqrt(r2);
 	    const double rl = pow(r2,lambda/2.);
@@ -656,7 +644,7 @@ namespace Functions
 		  stokes(stokes)
   {
     long double r2 = Reynolds/2.;
-    long double b = 4*M_PI*M_PI;
+    long double b = 4*numbers::PI*numbers::PI;
     long double l = -b/(r2+std::sqrt(r2*r2+b));
     lbda = l;
 				     // mean pressure for a domain
@@ -710,13 +698,13 @@ namespace Functions
 	const double y = points[i](1);
 
 	const double elx = std::exp(lbda*x);
-	const double cy = cos(2*M_PI*y);
-	const double sy = sin(2*M_PI*y);
+	const double cy = cos(2*numbers::PI*y);
+	const double sy = sin(2*numbers::PI*y);
 
 					 // u
 	gradients[0][i][0] = -lbda*elx*cy;
 	gradients[0][i][1] = 2. * numbers::PI*elx*sy;
-	gradients[1][i][0] = lbda*lbda/(2*M_PI)*elx*sy;
+	gradients[1][i][0] = lbda*lbda/(2*numbers::PI)*elx*sy;
 	gradients[1][i][1] =lbda*elx*cy;
 					 // p
 	gradients[2][i][0] = -lbda*elx*elx;
