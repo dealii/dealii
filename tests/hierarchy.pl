@@ -45,6 +45,7 @@ $hierarchy{"i686-pc-linux-gnu+icc7.1"}        = "i686-pc-linux-gnu+icc7";
 $hierarchy{"i686-pc-linux-gnu+icc8"}          = "i686-pc-linux-gnu+icc7.1";
 $hierarchy{"i686-pc-linux-gnu+icc9"}          = "i686-pc-linux-gnu+icc8";
 $hierarchy{"i686-pc-linux-gnu+icc10"}         = "i686-pc-linux-gnu+icc9";
+$hierarchy{"i686-pc-linux-gnu+icc11"}         = "i686-pc-linux-gnu+icc10";
 
 $hierarchy{"mips-sgi-irix6.5+MIPSpro7.4"}     = "generic";
 
@@ -58,6 +59,7 @@ $hierarchy{"x86_64-unknown-linux-gnu+gcc4.4"} = "x86_64-unknown-linux-gnu+gcc4.3
 
 $hierarchy{"x86_64-unknown-linux-gnu+icc9"}   = "x86_64-unknown-linux-gnu+gcc3.3";
 $hierarchy{"x86_64-unknown-linux-gnu+icc10"}  = "x86_64-unknown-linux-gnu+icc9";
+$hierarchy{"x86_64-unknown-linux-gnu+icc11"}  = "x86_64-unknown-linux-gnu+icc10";
 
 $hierarchy{"powerpc-apple-darwin8.8.0+gcc4.0"}  = "generic";
 $hierarchy{"powerpc-apple-darwin8.10.0+gcc4.0"} = "powerpc-apple-darwin8.8.0+gcc4.0";
