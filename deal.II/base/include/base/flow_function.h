@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/function.h>
 #include <base/point.h>
+#include <base/thread_management.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -55,7 +56,7 @@ namespace Functions
 					* Virtual destructor.
 					*/
       virtual ~FlowFunction();
-      
+
 				       /**
 					* Store an adjustment for the
 					* pressure function, such that
@@ -113,7 +114,7 @@ namespace Functions
 					*/
       virtual void vector_laplacian_list (const std::vector<Point<dim> > &points,
 					  std::vector<Vector<double> >   &values) const;
-      
+
       unsigned int memory_consumption () const;
 
     protected:
@@ -124,13 +125,20 @@ namespace Functions
 					*/
       double mean_pressure;
 
-    private:  
+    private:
+
+				       /**
+					* A mutex that guards the
+					* following scratch arrays.
+					*/
+      mutable Threads::Mutex mutex;
+
 				       /**
 					* Auxiliary values for the usual
 					* Function interface.
 					*/
       mutable std::vector<std::vector<double> > aux_values;
-      
+
 				       /**
 					* Auxiliary values for the usual
 					* Function interface.
@@ -160,7 +168,7 @@ namespace Functions
       PoisseuilleFlow<dim> (const double r,
 			    const double Re);
       virtual ~PoisseuilleFlow();
-      
+
       virtual void vector_values (const std::vector<Point<dim> >& points,
 				  std::vector<std::vector<double> >& values) const;
       virtual void vector_gradients (const std::vector<Point<dim> >& points,
@@ -172,8 +180,8 @@ namespace Functions
       const double radius;
       const double Reynolds;
   };
-  
-  
+
+
 /**
  * Artificial divergence free function with homogeneous boundary
  * conditions on the cube [-1,1]<sup>dim</sup>.
@@ -205,22 +213,22 @@ namespace Functions
 					*/
       void set_parameters (const double viscosity, const double reaction);
       virtual ~StokesCosine();
-      
+
       virtual void vector_values (const std::vector<Point<dim> >& points,
 				  std::vector<std::vector<double> >& values) const;
       virtual void vector_gradients (const std::vector<Point<dim> >& points,
 				     std::vector<std::vector<Tensor<1,dim> > >& gradients) const;
       virtual void vector_laplacians (const std::vector<Point<dim> > &points,
 				      std::vector<std::vector<double> >   &values) const;
-      
+
     private:
 				       /// The viscosity
       double viscosity;
 				       /// The reaction parameter
       double reaction;
   };
-  
-  
+
+
 /**
  * The solution to Stokes' equations on an L-shaped domain.
  *
@@ -234,7 +242,7 @@ namespace Functions
     public:
 				       /// Constructor setting upsome data.
       StokesLSingularity();
-      
+
       virtual void vector_values (const std::vector<Point<2> >& points,
 				  std::vector<std::vector<double> >& values) const;
       virtual void vector_gradients (const std::vector<Point<2> >& points,
@@ -263,7 +271,7 @@ namespace Functions
 				       /// Auxiliary variable 1-lambda
       const double lm;
   };
-  
+
 /**
  * Flow solution in 2D by Kovasznay (1947).
  *
@@ -292,7 +300,7 @@ namespace Functions
 					*/
       Kovasznay (const double Re, bool Stokes = false);
       virtual ~Kovasznay();
-      
+
       virtual void vector_values (const std::vector<Point<2> >& points,
 				  std::vector<std::vector<double> >& values) const;
       virtual void vector_gradients (const std::vector<Point<2> >& points,
@@ -308,7 +316,7 @@ namespace Functions
       double p_average;
       const bool stokes;
   };
-  
+
 }
 
 DEAL_II_NAMESPACE_CLOSE
