@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,7 @@
 #include <base/polynomial.h>
 #include <base/polynomial_space.h>
 #include <base/table.h>
+#include <base/thread_management.h>
 
 #include <vector>
 
@@ -46,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
  * <dt> In 2D:
  * <dd> The 2D-curl of the functions <i>x<sup>k+1</sup>y</i>
  * and <i>xy<sup>k+1</sup></i>.
- * <dt>In 3D: 
+ * <dt>In 3D:
  * <dd> For any <i>i=0,...,k</i> the curls of
  * <i>(0,0,xy<sup>i+1</sup>z<sup>k-i</sup>)</i>,
  * <i>(x<sup>k-i</sup>yz<sup>i+1</sup>,0,0)</i> and
@@ -102,20 +103,20 @@ class PolynomialsBDM
     void compute (const Point<dim>            &unit_point,
                   std::vector<Tensor<1,dim> > &values,
                   std::vector<Tensor<2,dim> > &grads,
-                  std::vector<Tensor<3,dim> > &grad_grads) const;    
-    
+                  std::vector<Tensor<3,dim> > &grad_grads) const;
+
 				     /**
 				      * Returns the number of BDM polynomials.
 				      */
     unsigned int n () const;
-    
+
 				     /**
 				      * Returns the degree of the BDM
 				      * space, which is one less than
 				      * the highest polynomial degree.
 				      */
     unsigned int degree () const;
-    
+
 				     /**
 				      * Return the number of
 				      * polynomials in the space
@@ -126,7 +127,7 @@ class PolynomialsBDM
 				      * classes.
 				      */
     static unsigned int compute_n_pols(unsigned int degree);
-    
+
   private:
 				     /**
 				      * An object representing the
@@ -144,23 +145,29 @@ class PolynomialsBDM
 				      * degree zero to <i>k</i>.
 				      */
     std::vector<Polynomials::Polynomial<double> > monomials;
-    
+
 				     /**
 				      * Number of BDM
 				      * polynomials.
 				      */
     unsigned int n_pols;
-    
+
+				     /**
+				      * A mutex that guards the
+				      * following scratch arrays.
+				      */
+    mutable Threads::Mutex mutex;
+
 				     /**
 				      * Auxiliary memory.
 				      */
     mutable std::vector<double> p_values;
-    
+
 				     /**
 				      * Auxiliary memory.
 				      */
     mutable std::vector<Tensor<1,dim> > p_grads;
-    
+
 				     /**
 				      * Auxiliary memory.
 				      */

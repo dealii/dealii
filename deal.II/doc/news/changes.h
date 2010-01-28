@@ -246,6 +246,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li><p>Fixed: The PolynomialsBDM had a race condition in multithreaded
+  programs. This now fixed.
+  <br>
+  (WB 2010/01/27)
+  </p></li>
+
   <li><p>New: The new class IndexSet can represent sets and ranges of indices.
   <br>
   (WB 2009/10/09)

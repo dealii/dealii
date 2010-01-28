@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,40 +60,41 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
 	 ExcDimensionMismatch(grad_grads.size(), n_pols));
 
   const unsigned int n_sub = polynomial_space.n();
-  p_values.resize((values.size() == 0) ? 0 : n_sub);
-  p_grads.resize((grads.size() == 0) ? 0 : n_sub);
-  p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
 
-				   // Compute values of complete space
-				   // and insert into tensors.  Result
-				   // will have first all polynomials
-				   // in the x-component, then y and
-				   // z.
-  polynomial_space.compute (unit_point, p_values, p_grads, p_grad_grads);
-  
-  std::fill(values.begin(), values.end(), Tensor<1,dim>());
-  for (unsigned int i=0;i<p_values.size();++i)
-    {
+				   // guard access to the scratch
+				   // arrays in the following block
+				   // using a mutex to make sure they
+				   // are not used by multiple threads
+				   // at once
+  {
+    Threads::Mutex::ScopedLock lock(mutex);
+
+    p_values.resize((values.size() == 0) ? 0 : n_sub);
+    p_grads.resize((grads.size() == 0) ? 0 : n_sub);
+    p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
+
+				     // Compute values of complete space
+				     // and insert into tensors.  Result
+				     // will have first all polynomials
+				     // in the x-component, then y and
+				     // z.
+    polynomial_space.compute (unit_point, p_values, p_grads, p_grad_grads);
+
+    std::fill(values.begin(), values.end(), Tensor<1,dim>());
+    for (unsigned int i=0;i<p_values.size();++i)
       for (unsigned int j=0;j<dim;++j)
-	{
-	  values[i+j*n_sub][j] = p_values[i];
-	}
-      
-    }
-  
-  std::fill(grads.begin(), grads.end(), Tensor<2,dim>());
-  for (unsigned int i=0;i<p_grads.size();++i)
-    {
+	values[i+j*n_sub][j] = p_values[i];
+
+    std::fill(grads.begin(), grads.end(), Tensor<2,dim>());
+    for (unsigned int i=0;i<p_grads.size();++i)
       for (unsigned int j=0;j<dim;++j)
 	grads[i+j*n_sub][j] = p_grads[i];
-    }
-  
-  std::fill(grad_grads.begin(), grad_grads.end(), Tensor<3,dim>());
-  for (unsigned int i=0;i<p_grad_grads.size();++i)
-    {
+
+    std::fill(grad_grads.begin(), grad_grads.end(), Tensor<3,dim>());
+    for (unsigned int i=0;i<p_grad_grads.size();++i)
       for (unsigned int j=0;j<dim;++j)
 	grad_grads[i+j*n_sub][j] = p_grad_grads[i];
-    }
+  }
 
 				   // This is the first polynomial not
 				   // covered by the P_k subspace
@@ -104,7 +105,7 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
 				   // derivatives
   std::vector<std::vector<double> > monovali(dim, std::vector<double>(4));
   std::vector<std::vector<double> > monovalk(dim, std::vector<double>(4));
-  
+
   if (dim == 2)
     {
       for (unsigned int d=0;d<dim;++d)
@@ -252,7 +253,7 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
       double orientation = 1.;
       if ((face==0) || (face==3))
 	orientation = -1.;
-      
+
       for (unsigned int k=0;k<qface.size();++k)
 	{
 	  const double w = qface.weight(k) * orientation;
@@ -269,15 +270,15 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
 		p(0) = 1.;
 	      case 3:
 		p(1) = x;
-		break;	      
+		break;
 	    }
 //	std::cerr << p
 //		  << '\t' << moment_weight[0].value(x)
 //		  << '\t' << moment_weight[1].value(x)
 //	  ;
-	  
+
 	  compute (p, values, grads, grad_grads);
-	  
+
 	  for (unsigned int i=0;i<n();++i)
 	    {
 //	    std::cerr << '\t' << std::setw(6) << values[i][1-face%2];
@@ -290,7 +291,7 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
 //	std::cerr << std::endl;
 	}
     }
-  
+
 				   // Volume integrals are missing
 				   //
 				   // This degree is one larger
