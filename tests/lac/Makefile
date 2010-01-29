@@ -25,6 +25,7 @@ tests_x = vector-vector vector_memory \
 	householder \
 	tridiagonal_matrix \
 	tridiagonal_matrix_sym \
+	sparsity_tools_* \
 	sparsity_pattern \
 	sparsity_pattern_* \
 	chunk_sparsity_pattern_* \
