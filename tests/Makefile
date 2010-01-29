@@ -31,14 +31,14 @@ do-%:
 
 
 report:
-	@$(MAKE) -k nofail
+	-@$(MAKE) -k nofail
 	@for i in $(nofail-dirs) fail all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
 
 report+mail:
-	@$(MAKE) -k nofail
+	-@$(MAKE) -k nofail
 	@for i in $(nofail-dirs) fail all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report+mail ; cd .. ; \
