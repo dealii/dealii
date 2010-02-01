@@ -2065,7 +2065,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
 	(my_indices.make_trilinos_map (mpi_comm->Comm(), true));
 #else
       TrilinosWrappers::MPI::Vector vec_distribute 
-	(my_indices.make_trilinos_map (MPI_COMM_WORLD, true)));
+	(my_indices.make_trilinos_map (MPI_COMM_WORLD, true));
 #endif
 
 				   // here we import the data
