@@ -122,7 +122,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
     {
       --level;
 
-      typedef std::map<unsigned int, unsigned int>::const_iterator IT;
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
       for (IT i= copy_indices[level].begin();
 	   i != copy_indices[level].end();++i)
 	dst[level](i->second) = src(i->first);
@@ -181,6 +181,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   std::vector<unsigned int> dof_indices_parent (dofs_per_cell);
   std::vector<unsigned int> dof_indices_child (dofs_per_cell);
 
+  copy_indices.resize(mg_dof.get_tria().n_levels());
+  find_dofs_on_refinement_edges (mg_dof);
+
 				   // for each level: first build the sparsity
 				   // pattern of the matrices and then build the
 				   // matrices themselves. note that we only
@@ -238,6 +241,11 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 
+      copy_indices[level+1].clear();
+      if (level == 0)
+	copy_indices[0].clear();
+      std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+
 				       // now actually build the matrices
       for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -260,82 +268,109 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 						 // now set the entries in the
 						 // matrix
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  for (unsigned int j=0; j<dofs_per_cell; ++j)
-		    if (prolongation(i,j) != 0)
-		      prolongation_matrices[level]->set (dof_indices_child[i],
-							 dof_indices_parent[j],
-							 prolongation(i,j));
+		  prolongation_matrices[level]->set (dof_indices_child[i],
+						     dofs_per_cell,
+						     &dof_indices_parent[0],
+						     &prolongation(i,0),
+						     true);
+
+		if (cell->child(child)->has_children()==false)
+		  {
+		    DoFCellAccessor<DoFHandler<dim,spacedim> >& global_cell
+		      = *cell->child(child);
+		    global_cell.get_dof_indices(global_dof_indices);
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      {
+			if(!dofs_on_refinement_edge[level+1][dof_indices_child[i]])
+			  copy_indices[level+1].push_back
+			    (std::make_pair(global_dof_indices[i], dof_indices_child[i]));
+		      }
+		  }
+	      }
+	  }
+	else
+	  {
+	    DoFCellAccessor<DoFHandler<dim,spacedim> >& global_cell = *cell;
+
+					   // get the dof numbers of
+					   // this cell for the global
+					   // and the level-wise
+					   // numbering
+	    global_cell.get_dof_indices(global_dof_indices);
+	    cell->get_mg_dof_indices (dof_indices_parent);
+
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      {
+		if(!dofs_on_refinement_edge[level][dof_indices_parent[i]])
+		  copy_indices[level].push_back
+		    (std::make_pair(global_dof_indices[i], dof_indices_parent[i]));
 	      }
 	  }
     }
+
+				// sort the list of dof numbers and compress
+				// out duplicates
+  for (int level=n_levels-1; level>=0; --level)
+    {
+      if (copy_indices[level].size() > 0)
+	{
+	  std::sort (copy_indices[level].begin(), copy_indices[level].end());
+
+	  std::vector<std::pair<unsigned int,unsigned int> >::iterator
+	    it1 = copy_indices[level].begin(), it2 = it1, it3 = it1;
+	  it2++, it1++;
+	  for ( ; it2!=copy_indices[level].end(); ++it2, ++it3)
+	    if (*it2 > *it3)
+	      *it1++ = *it2;
+	  copy_indices[level].erase(it1,copy_indices[level].end());
+	}
+    }
+				// if we have only one single level, we did
+				// not enter the above code. Need to create
+				// the respective vector manually
+  if (n_levels == 1)
+    {
+      copy_indices[0].resize (sizes[0]);
+      for (unsigned int i=0; i<sizes[0]; ++i)
+	copy_indices[0][i] = std::make_pair<unsigned int,unsigned int>(i,i);
+    }
+
   // impose boundary conditions
   // but only in the column of
   // the prolongation matrix
-  //TODO: this way is not very efficient
-  std::vector<std::set<unsigned int> > boundary_indices (mg_dof.get_tria().n_levels());
+  std::vector<std::set<unsigned int> > boundary_indices (n_levels);
   typename FunctionMap<dim>::type boundary;
   ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
   boundary[0] = &homogeneous_dirichlet_bc;
   MGTools::make_boundary_list(mg_dof, boundary, boundary_indices);
 
-  for (unsigned int level=0; level<n_levels-1; ++level)
-  {
-    if (boundary_indices[level].size() == 0)
-      continue;
-
-    const unsigned int n_dofs = prolongation_matrices[level]->m();
-    for (unsigned int i=0; i<n_dofs; ++i)
+  std::vector<unsigned int> constrain_indices;
+  for (int level=n_levels-2; level>=0; --level)
     {
-      SparseMatrix<double>::iterator anfang = prolongation_matrices[level]->begin(i),
-        ende = prolongation_matrices[level]->end(i);
-      for(; anfang != ende; ++anfang)
-      {
-        std::set<unsigned int>::const_iterator dof = boundary_indices[level].begin(),
-          endd = boundary_indices[level].end();
-        for (; dof != endd; ++dof)
-        {
-          const unsigned int column_number = anfang->column();
-          const unsigned int dof_number = *dof;
-          if(dof_number == column_number)
-            prolongation_matrices[level]->set(i,dof_number,0);
-        }
-      }
-    }
-  }
+      if (boundary_indices[level].size() == 0)
+	continue;
 
-  find_dofs_on_refinement_edges (mg_dof);
-				   // Prepare indices to copy from a
-				   // global vector to the parts of an
-				   // MGVector corresponding to active
-				   // cells.
-  copy_indices.resize(mg_dof.get_tria().n_levels());
-  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-  std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
-  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
-    {
-      copy_indices[level].clear();
-      typename MGDoFHandler<dim,spacedim>::active_cell_iterator
-	level_cell = mg_dof.begin_active(level);
-      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
-	level_end  = mg_dof.end_active(level);
+				// need to delete all the columns in the
+				// matrix that are on the boundary. to fix
+				// this, create an array as long as there are
+				// matrix columns, and find which columns we
+				// need to filter away.
+      constrain_indices.resize (0);
+      constrain_indices.resize (prolongation_matrices[level]->n(), 0);
+      std::set<unsigned int>::const_iterator dof = boundary_indices[level].begin(),
+	endd = boundary_indices[level].end();
+      for (; dof != endd; ++dof)
+	constrain_indices[*dof] = 1;
 
-				       // Compute coarse level right hand side
-				       // by restricting from fine level.
-      for (; level_cell!=level_end; ++level_cell)
+      const unsigned int n_dofs = prolongation_matrices[level]->m();
+      for (unsigned int i=0; i<n_dofs; ++i)
 	{
-	  DoFAccessor<dim, DoFHandler<dim,spacedim> >& global_cell = *level_cell;
-					   // get the dof numbers of
-					   // this cell for the global
-					   // and the level-wise
-					   // numbering
-	  global_cell.get_dof_indices(global_dof_indices);
-	  level_cell->get_mg_dof_indices (level_dof_indices);
-
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  SparseMatrix<double>::iterator start_row = prolongation_matrices[level]->begin(i),
+	    end_row = prolongation_matrices[level]->end(i);
+	  for(; start_row != end_row; ++start_row)
 	    {
-              if(!dofs_on_refinement_edge[level][level_dof_indices[i]])
-	      copy_indices[level].insert(
-		std::make_pair(global_dof_indices[i], level_dof_indices[i]));
+	      if (constrain_indices[start_row->column()] == 1)
+		start_row->value() = 0;
 	    }
 	}
     }

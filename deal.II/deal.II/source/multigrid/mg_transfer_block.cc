@@ -447,9 +447,28 @@ void MGTransferBlockSelect<number>::build_matrices (
 	    {
 	      const unsigned int block = fe.system_to_block_index(i).first;
 	      if (selected[block])
-		copy_indices[block][level].insert(
+		copy_indices[block][level].push_back(
 		  std::make_pair(global_dof_indices[i] - block_start[block],
 				 level_dof_indices[i] - mg_block_start[level][block]));
+	    }
+	}
+      				// sort the list of dof numbers and compress
+				// out duplicates
+      for (unsigned int block=0; block<n_blocks; ++block)
+	{
+	  if (selected[block] &&
+	      copy_indices[block][level].size() > 0)
+	    {
+	      std::sort (copy_indices[block][level].begin(), 
+			 copy_indices[block][level].end());
+
+	      std::vector<std::pair<unsigned int,unsigned int> >::iterator
+		it1 = copy_indices[block][level].begin(), it2 = it1, it3 = it1;
+	      it2++, it1++;
+	      for ( ; it2!=copy_indices[block][level].end(); ++it2, ++it3)
+		if (*it2 > *it3)
+		  *it1++ = *it2;
+	      copy_indices[block][level].erase(it1,copy_indices[block][level].end());
 	    }
 	}
     }
@@ -504,9 +523,27 @@ void MGTransferBlock<number>::build_matrices (
 	    {
 	      const unsigned int block = fe.system_to_block_index(i).first;
 	      if (selected[block])
-		copy_indices[block][level].insert(
+		copy_indices[block][level].push_back(
 		  std::make_pair(global_dof_indices[i] - block_start[block],
 				 level_dof_indices[i] - mg_block_start[level][block]));
+	    }
+	}
+
+      for (unsigned int block=0; block<n_blocks; ++block)
+	{
+	  if (selected[block] &&
+	      copy_indices[block][level].size() > 0)
+	    {
+	      std::sort (copy_indices[block][level].begin(), 
+			 copy_indices[block][level].end());
+
+	      std::vector<std::pair<unsigned int,unsigned int> >::iterator
+		it1 = copy_indices[block][level].begin(), it2 = it1, it3 = it1;
+	      it2++, it1++;
+	      for ( ; it2!=copy_indices[block][level].end(); ++it2, ++it3)
+		if (*it2 > *it3)
+		  *it1++ = *it2;
+	      copy_indices[block][level].erase(it1,copy_indices[block][level].end());
 	    }
 	}
     }

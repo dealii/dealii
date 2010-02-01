@@ -158,8 +158,8 @@ class MGTransferBlockBase
 				      * then the level index inside
 				      * the block.
 				     */
-    std::vector<std::vector<std::map<unsigned int, unsigned int> > >
-    copy_indices;
+    std::vector<std::vector<std::vector<std::pair<unsigned int, unsigned int> > > >
+      copy_indices;
 };
 
 /**

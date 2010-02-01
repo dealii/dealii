@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 /* --------------------- MGTransferBlockSelect -------------- */
 
 // Simplify some things below
-typedef std::map<unsigned int, unsigned int>::const_iterator IT;
+typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
 
 
 
