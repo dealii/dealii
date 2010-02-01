@@ -1077,7 +1077,7 @@ namespace internals
 				    // specialized sort and insert functions.
   struct GlobalRowsFromLocal
   {
-    GlobalRowsFromLocal (const unsigned int n_local_rows) 
+    GlobalRowsFromLocal (const unsigned int n_local_rows)
       :
       total_row_indices (n_local_rows), n_active_rows (n_local_rows),
       n_inhomogeneous_rows (0){};
@@ -1110,9 +1110,9 @@ namespace internals
 		[index_in_constraint]).second; };
     bool have_indirect_rows () const { return data_cache.element_size; };
     void insert_constraint (const unsigned int constrained_local_dof)
-      { --n_active_rows; 
+      { --n_active_rows;
 	total_row_indices[n_active_rows].local_row = constrained_local_dof; }
-    unsigned int last_constrained_local_row () 
+    unsigned int last_constrained_local_row ()
       { Assert (total_row_indices.back().global_row == numbers::invalid_unsigned_int,
 		ExcInternalError());
 	return total_row_indices.back().local_row; };
@@ -1447,7 +1447,7 @@ namespace internals
   {
     if (value != 0.)
       {
-	Assert (col_ptr != 0, 
+	Assert (col_ptr != 0,
 		typename SparseMatrix<number>::ExcInvalidIndex (row, column));
 	if (are_on_diagonal)
 	  {
@@ -1491,7 +1491,7 @@ namespace internals
     const unsigned int loc_row = global_rows.local_row(i);
 
 #ifdef DEBUG
-    const unsigned int * col_ptr = sparsity.n_nonzero_elements() == 0 ? 0 : 
+    const unsigned int * col_ptr = sparsity.n_nonzero_elements() == 0 ? 0 :
       &sparsity_struct[row_start[row]];
     number * val_ptr = sparsity.n_nonzero_elements() == 0 ? 0 :
       &sparse_matrix->global_entry (row_start[row]);

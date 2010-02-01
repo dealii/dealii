@@ -154,6 +154,15 @@ IndexSet::operator & (const IndexSet &is) const
 
 
 
+unsigned int
+IndexSet::n_intervals () const
+{
+  compress ();
+  return ranges.size();
+}
+
+
+
 IndexSet
 IndexSet::get_view (const unsigned int begin,
 		    const unsigned int end) const

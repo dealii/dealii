@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,6 +41,12 @@ namespace PETScWrappers
  * basically all the actual solver calls happen in this class, and derived
  * classes simply set the right flags to select one solver or another, or to
  * set certain parameters for individual solvers.
+ *
+ * Note: Repeated calls to solve() on a solver object with a Preconditioner
+ * must be used with care. The preconditioner is initialized in the first call
+ * to solve() and subsequent calls reuse the solver and preconditioner
+ * object. This is done for performance reasons. The solver and preconditioner
+ * can be reset by calling reset().
  *
  * One of the gotchas of PETSc is that -- in particular in MPI mode -- it
  * often does not produce very helpful error messages. In order to save
@@ -101,7 +107,10 @@ namespace PETScWrappers
                                         * classes and the object passed as a
                                         * preconditioner, one of the linear
                                         * solvers and preconditioners of PETSc
-                                        * is chosen.
+                                        * is chosen.  Repeated calls to
+                                        * solve() do not reconstruct the
+                                        * preconditioner for performance
+                                        * reasons. See class Documentation.
                                         */
       void
       solve (const MatrixBase         &A,
@@ -110,6 +119,14 @@ namespace PETScWrappers
              const PreconditionerBase &preconditioner);
 
 
+				       /**
+					* Resets the contained preconditioner
+					* and solver object. See class
+					* description for more details.
+					*/
+      virtual void reset();
+					
+      
                                        /**
                                         * Access to object that controls
                                         * convergence.

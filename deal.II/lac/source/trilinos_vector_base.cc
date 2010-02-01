@@ -272,17 +272,9 @@ namespace TrilinosWrappers
   {
                                      // get a representation of the vector and
                                      // loop over all the elements
-    TrilinosScalar *start_ptr;
-    int leading_dimension;
-    int ierr = vector->ExtractView (&start_ptr, &leading_dimension);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-				       // TODO: This
-				       // won't work in parallel like
-				       // this. Find out a better way to
-				       // this in that case.
+    TrilinosScalar *start_ptr = (*vector)[0];
     const TrilinosScalar *ptr  = start_ptr,
-                         *eptr = start_ptr + size();
+                         *eptr = start_ptr + local_size();
     bool flag = true;
     while (ptr != eptr)
       {

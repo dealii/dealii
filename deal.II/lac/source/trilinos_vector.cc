@@ -17,8 +17,10 @@
 #ifdef DEAL_II_USE_TRILINOS
 
 #  include <lac/trilinos_sparse_matrix.h>
+#  include <lac/trilinos_block_vector.h>
 #  include <cmath>
 #  include <Epetra_Import.h>
+#  include <Epetra_Vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -209,6 +211,73 @@ namespace TrilinosWrappers
 
 
 
+    void
+    Vector::reinit (const BlockVector &v,
+		    const bool         import_data)
+    {
+					// In case we do not allow to
+					// have different maps, this
+					// call means that we have to
+					// reset the vector. So clear
+					// the vector, initialize our
+					// map with the map in v, and
+					// generate the vector.
+      if (v.n_blocks() == 0)
+	return;
+
+				// create a vector that holds all the elements
+				// contained in the block vector. need to
+				// manually create an Epetra_Map.
+      unsigned int n_elements = 0, added_elements = 0, block_offset = 0;
+      for (unsigned int block=0; block<v.n_blocks();++block)
+	n_elements += v.block(block).local_size();
+      std::vector<int> global_ids (n_elements, -1);
+      for (unsigned int block=0; block<v.n_blocks();++block)
+	{
+	  int * glob_elements = v.block(block).vector_partitioner().MyGlobalElements();
+	  for (unsigned int i=0; i<v.block(block).local_size(); ++i)
+	    global_ids[added_elements++] = glob_elements[i] + block_offset;
+	  block_offset += v.block(block).size();
+	}
+
+      Assert (n_elements == added_elements, ExcInternalError());
+      Epetra_Map new_map (v.size(), n_elements, &global_ids[0], 0,
+			  v.block(0).vector_partitioner().Comm());
+
+      if (import_data == false)
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (new_map));
+
+      Teuchos::RCP<Epetra_FEVector> actual_vec = (import_data == true) ? 
+	Teuchos::rcp (new Epetra_FEVector (new_map), true) : 
+	Teuchos::rcp (&*vector, false);
+
+      TrilinosScalar* entries = (*actual_vec)[0];
+      block_offset = 0;
+      for (unsigned int block=0; block<v.n_blocks();++block)
+	{
+	  v.block(block).trilinos_vector().ExtractCopy (entries, 0);
+	  entries += v.block(block).local_size();
+	}
+
+      if (import_data == true)
+        {
+	  AssertThrow (static_cast<unsigned int>(actual_vec->GlobalLength()) 
+		       == v.size(),
+		       ExcDimensionMismatch (actual_vec->GlobalLength(), 
+					     v.size()));
+
+	  Epetra_Import data_exchange (vector->Map(), actual_vec->Map());
+
+	  const int ierr = vector->Import(*actual_vec, data_exchange, Insert);
+	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	  last_action = Insert;
+	}
+
+    }
+
+
+
     Vector &
     Vector::operator = (const Vector &v)
     {
@@ -226,8 +295,9 @@ namespace TrilinosWrappers
 	{
 	  Assert (vector->Map().SameAs(v.vector->Map()) == true,
 		  ExcMessage ("The Epetra maps in the assignment operator ="
-			      " do not match, even though the local_range "
-			      " seems to be the same. Check vector setup!"));
+			      " do not match, even though the local_range"
+			      " seems to be the same. Check vector setup or"
+			      " use reinit()!"));
 
 	  const int ierr = vector->Update(1.0, *v.vector, 0.0);
 	  Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -240,7 +310,21 @@ namespace TrilinosWrappers
 	{
 	  Epetra_Import data_exchange (vector->Map(), v.vector->Map());
 	  const int ierr = vector->Import(*v.vector, data_exchange, Insert);
-	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	  Assert (ierr == 0, ExcTrilinosError(ierr));
+	}
+      else if (size() == v.size() && local_range().first>=v.local_range().first &&
+	       local_range().second<=v.local_range().second &&
+	       vector->Map().UniqueGIDs())
+	{
+	  for (unsigned int i=0; i<local_size(); ++i)
+	    {
+	      Assert (v.trilinos_vector().Map().MyGID(vector->Map().GID(i)),
+		      ExcMessage ("The right hand side vector does not contain "
+				  "all local elements present in the left hand "
+				  "side vector in the assignment operation =, "
+				  "which is not allowed. Use reinit()."));
+	      (*vector)[0][i] = v(vector->Map().GID(i));
+	    }
 	}
       else
 	{

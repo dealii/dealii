@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be distributed
 //    without copyright and license information. Please refer
@@ -488,6 +488,8 @@ namespace TrilinosWrappers
   PreconditionAMG::AdditionalData::
   AdditionalData (const bool                             elliptic,
 		  const bool                             higher_order_elements,
+		  const unsigned int                     n_cycles,
+		  const bool                             w_cycle,
 		  const double                           aggregation_threshold,
 		  const std::vector<std::vector<bool> > &constant_modes,
 		  const unsigned int                     smoother_sweeps,
@@ -496,6 +498,8 @@ namespace TrilinosWrappers
                   :
                   elliptic (elliptic),
 		  higher_order_elements (higher_order_elements),
+		  n_cycles (n_cycles),
+		  w_cycle (w_cycle),
 		  aggregation_threshold (aggregation_threshold),
 		  constant_modes (constant_modes),
 		  smoother_sweeps (smoother_sweeps),
@@ -513,8 +517,6 @@ namespace TrilinosWrappers
     multilevel_operator.release();
 
     const unsigned int n_rows = matrix.m();
-    const unsigned int constant_modes_dimension =
-      additional_data.constant_modes.size();
 
 				        // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
@@ -559,6 +561,13 @@ namespace TrilinosWrappers
 
     parameter_list.set("smoother: sweeps",
 		       static_cast<int>(additional_data.smoother_sweeps));
+    parameter_list.set("cycle applications", 
+		       static_cast<int>(additional_data.n_cycles));
+    if (additional_data.w_cycle == true)
+      parameter_list.set("prec type", "MGW");
+    else
+      parameter_list.set("prec type", "MGV");
+      
     parameter_list.set("smoother: Chebyshev alpha",10.);
     parameter_list.set("smoother: ifpack overlap",
 		       static_cast<int>(additional_data.smoother_overlap));
@@ -572,22 +581,25 @@ namespace TrilinosWrappers
 
     const Epetra_Map & domain_map = matrix.domain_partitioner();
 
+    const unsigned int constant_modes_dimension =
+      additional_data.constant_modes.size();
     Epetra_MultiVector distributed_constant_modes (domain_map,
 						   constant_modes_dimension);
 
     if (constant_modes_dimension > 1)
       {
-	Assert (n_rows == additional_data.constant_modes[0].size(),
-		ExcDimensionMismatch(n_rows,
-				     additional_data.constant_modes[0].size()));
+	const bool constant_modes_are_global =
+	  additional_data.constant_modes[0].size() == n_rows;
+	const unsigned int n_relevant_rows =
+	  constant_modes_are_global ? n_rows : additional_data.constant_modes[0].size();
+	const unsigned int my_size = domain_map.NumMyElements();
+	if (constant_modes_are_global == false)
+	  Assert (n_relevant_rows == my_size,
+		  ExcDimensionMismatch(n_relevant_rows, my_size));
 	Assert (n_rows ==
 		static_cast<unsigned int>(distributed_constant_modes.GlobalLength()),
 		ExcDimensionMismatch(n_rows,
 				     distributed_constant_modes.GlobalLength()));
-
-	const unsigned int my_size = domain_map.NumMyElements();
-	Assert (my_size == static_cast<unsigned int>(domain_map.MaxLID()+1),
-		ExcDimensionMismatch (my_size, domain_map.MaxLID()+1));
 
 				        // Reshape null space as a
 				        // contiguous vector of
@@ -596,7 +608,7 @@ namespace TrilinosWrappers
 	for (unsigned int d=0; d<constant_modes_dimension; ++d)
 	  for (unsigned int row=0; row<my_size; ++row)
 	    {
-	      int global_row_id = domain_map.GID(row);
+	      int global_row_id = constant_modes_are_global ? domain_map.GID(row) : row;
 	      distributed_constant_modes.ReplaceMyValue(row, d,
 		static_cast<double>(additional_data.constant_modes[d][global_row_id]));
 	    }

@@ -264,10 +264,19 @@ void ConstraintMatrix::close ()
 					   // this line (including
 					   // ones that we have
 					   // appended in this go
-					   // around)
+					   // around) and see whether
+					   // they are further
+					   // constrained. ignore
+					   // elements that we don't
+					   // store on the current
+					   // processor
 	  unsigned int entry = 0;
 	  while (entry < line->entries.size())
-	    if (is_constrained (line->entries[entry].first))
+	    if (((local_lines.size() == 0)
+		 ||
+		 (local_lines.is_element(line->entries[entry].first)))
+		&&
+		is_constrained (line->entries[entry].first))
 	      {
 						 // ok, this entry is
 						 // further
@@ -504,20 +513,27 @@ void ConstraintMatrix::close ()
 #ifdef DEBUG
 				   // if in debug mode: check that no
 				   // dof is constraint to another dof
-				   // that is also constrained
+				   // that is also
+				   // constrained. exclude dofs from
+				   // this check whose constraint
+				   // lines would not be store on the
+				   // local processor
   for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
        line!=lines.end(); ++line)
     for (std::vector<std::pair<unsigned int,double> >::const_iterator
 	   entry=line->entries.begin();
 	 entry!=line->entries.end(); ++entry)
-      {
-					 // make sure that
-					 // entry->first is not the
-					 // index of a line itself
-	const bool is_circle = is_constrained(entry->first);
-	Assert (is_circle == false,
-		ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
-      };
+      if ((local_lines.size() == 0)
+	  ||
+	  (local_lines.is_element(entry->first)))
+	{
+					   // make sure that
+					   // entry->first is not the
+					   // index of a line itself
+	  const bool is_circle = is_constrained(entry->first);
+	  Assert (is_circle == false,
+		  ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
+	}
 #endif
 
   sorted = true;
@@ -1919,6 +1935,7 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 				   // on the local range of the vector. But
 				   // we need access to values that the
 				   // local nodes are constrained to.
+
 template<>
 void
 ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
@@ -1989,6 +2006,98 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 	new_value += ((*vec_distribute)(it->entries[i].first) *
                       it->entries[i].second);
       vec(it->line) = new_value;
+    }
+}
+
+
+
+template<>
+void
+ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
+{
+  IndexSet my_indices (vec.size());
+  for (unsigned int block=0; block<vec.n_blocks(); ++block)
+    {
+      typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
+      ConstraintLine index_comparison;
+      index_comparison.line = vec.block(block).local_range().first
+	+vec.get_block_indices().block_start(block);
+      const constraint_iterator begin_my_constraints =
+	std::lower_bound (lines.begin(),lines.end(),index_comparison);
+
+      index_comparison.line = vec.block(block).local_range().second
+	+vec.get_block_indices().block_start(block);
+
+      const constraint_iterator end_my_constraints
+	= std::lower_bound(lines.begin(),lines.end(),index_comparison);
+
+				   // Here we search all the indices that we
+				   // need to have read-access to - the local
+				   // nodes and all the nodes that the
+				   // constraints indicate. No caching done
+				   // yet. would need some more clever data
+				   // structures for doing that.
+      const std::pair<unsigned int, unsigned int>
+	local_range = vec.block(block).local_range();
+
+      my_indices.add_range (local_range.first, local_range.second);
+
+      std::set<unsigned int> individual_indices;
+      for (constraint_iterator it = begin_my_constraints;
+	   it != end_my_constraints; ++it)
+	for (unsigned int i=0; i<it->entries.size(); ++i)
+	  if ((it->entries[i].first < local_range.first)
+	      ||
+	      (it->entries[i].first >= local_range.second))
+	    individual_indices.insert (it->entries[i].first);
+
+      my_indices.add_indices (individual_indices.begin(),
+			      individual_indices.end());
+    }
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      const Epetra_MpiComm *mpi_comm
+	= dynamic_cast<const Epetra_MpiComm*>(&vec.block(0).trilinos_vector().Comm());
+
+      Assert (mpi_comm != 0, ExcInternalError());
+
+      TrilinosWrappers::MPI::Vector vec_distribute 
+	(my_indices.make_trilinos_map (mpi_comm->Comm(), true));
+#else
+      TrilinosWrappers::MPI::Vector vec_distribute 
+	(my_indices.make_trilinos_map (MPI_COMM_WORLD, true)));
+#endif
+
+				   // here we import the data
+  vec_distribute.reinit(vec,true);
+
+  for (unsigned int block=0; block<vec.n_blocks(); ++block)
+    {
+      typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
+      ConstraintLine index_comparison;
+      index_comparison.line = vec.block(block).local_range().first
+	+vec.get_block_indices().block_start(block);
+      const constraint_iterator begin_my_constraints =
+	std::lower_bound (lines.begin(),lines.end(),index_comparison);
+
+      index_comparison.line = vec.block(block).local_range().second
+	+vec.get_block_indices().block_start(block);
+
+      const constraint_iterator end_my_constraints
+	= std::lower_bound(lines.begin(),lines.end(),index_comparison);
+
+      for (constraint_iterator it = begin_my_constraints;
+	   it != end_my_constraints; ++it)
+	{
+				       // fill entry in line
+				       // next_constraint.line by adding the
+				       // different contributions
+	  double new_value = it->inhomogeneity;
+	  for (unsigned int i=0; i<it->entries.size(); ++i)
+	    new_value += (vec_distribute(it->entries[i].first) *
+			  it->entries[i].second);
+	  vec(it->line) = new_value;
+	}
     }
 }
 

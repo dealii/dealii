@@ -1308,9 +1308,11 @@ namespace TrilinosWrappers
 					*/
 	AdditionalData (const bool                             elliptic = true,
 			const bool                             higher_order_elements = false,
+			const unsigned int                     n_cycles = 1,
+			const bool                             w_cyle = false,
 			const double                           aggregation_threshold = 1e-4,
 			const std::vector<std::vector<bool> > &constant_modes = std::vector<std::vector<bool> > (1),
-			const unsigned int                     smoother_sweeps = 3,
+			const unsigned int                     smoother_sweeps = 2,
 			const unsigned int                     smoother_overlap = 0,
 			const bool                             output_details = false);
 
@@ -1334,6 +1336,20 @@ namespace TrilinosWrappers
 					* higher-order elements.
 					*/
 	bool higher_order_elements;
+
+				       /**
+					* Defines how many multigrid cycles
+					* should be performed by the
+					* preconditioner.
+					*/
+	unsigned int n_cycles;
+
+				       /**
+					* Defines whether a w-cycle should be
+					* used instead of the standard setting
+					* of a v-cycle.
+					*/
+	bool w_cycle;
 
 				       /**
 					* This threshold tells the AMG setup

@@ -620,7 +620,7 @@ namespace PETScWrappers
 	std::cout << "*** PETSC-Matrix: num-allocs = "
 		  << info.mallocs << " ***" << std::endl;
 
-      return sizeof(*this) + info.memory;
+      return sizeof(*this) + static_cast<unsigned int>(info.memory);
   }
 
 }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -151,6 +151,24 @@ class IndexSet
     unsigned int index_within_set (const unsigned int n) const;
 
 				     /**
+				      * Each index set can be
+				      * represented as the union of a
+				      * number of contiguous intervals
+				      * of indices, where if necessary
+				      * intervals may only consist of
+				      * individual elements to
+				      * represent isolated members of
+				      * the index set.
+				      *
+				      * This function returns the
+				      * minimal number of such
+				      * intervals that are needed to
+				      * represent the index set under
+				      * consideration.
+				      */
+    unsigned int n_intervals () const;
+    
+				     /**
 				      * Compress the internal
 				      * representation by merging
 				      * individual elements with
@@ -206,6 +224,14 @@ class IndexSet
     IndexSet get_view (const unsigned int begin,
 		       const unsigned int end) const;
 
+				     /**
+				      * Outputs a text representation of this
+				      * IndexSet to the given stream. Used for
+				      * testing.
+				      */
+    template <class STREAM>
+    void print(STREAM &out) const;
+    
 #ifdef DEAL_II_USE_TRILINOS
 				     /**
 				      * Given an MPI communicator,
@@ -655,6 +681,26 @@ IndexSet::operator != (const IndexSet &is) const
   return ranges != is.ranges;
 }
 
+template <class STREAM>
+inline
+void
+IndexSet::print (STREAM &out) const
+{
+  compress();
+  out << "{";
+  std::vector<Range>::const_iterator p;
+  for (p = ranges.begin(); p != ranges.end(); ++p)
+    {
+      if (p->end-p->begin==1)
+	out << p->begin;
+      else
+	out << "[" << p->begin << "," << p->end-1 << "]";
+
+      if (p !=--ranges.end())
+	out << ", ";
+    }
+  out << "}" << std::endl;
+}
 
 
 DEAL_II_NAMESPACE_CLOSE

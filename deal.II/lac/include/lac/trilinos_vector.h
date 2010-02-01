@@ -51,6 +51,7 @@ namespace TrilinosWrappers
  */
   namespace MPI
   {
+    class BlockVector;
 
 /**
  * This class implements a wrapper to use the Trilinos distributed
@@ -231,6 +232,9 @@ namespace TrilinosWrappers
 	void reinit (const VectorBase &v,
 		     const bool        fast = false,
 	             const bool        allow_different_maps = false);
+
+	void reinit (const BlockVector &v,
+	             const bool         import_data = false);
 
                                        /**
 					* Set all components of the

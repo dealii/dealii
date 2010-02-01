@@ -1546,6 +1546,17 @@ class ConstraintMatrix : public Subscriptor
 		    << "to another DoF with number " << arg1
 		    << ", which however is constrained by this object. This is not"
 		    << " allowed.");
+				     /**
+				      * Exception
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException1 (ExcRowNotStoredHere,
+		    int,
+		    << "The index set given to this constraint matrix indicates "
+		    << "constraints for degree of freedom " << arg1
+		    << " should not be stored by this object, but a constraint "
+		    << "is being added.");
 
   private:
 
@@ -2075,7 +2086,8 @@ ConstraintMatrix::calculate_line_index (const unsigned int line) const
   if (!local_lines.size())
     return line;
 
-  Assert(local_lines.is_element(line), ExcInternalError());
+  Assert(local_lines.is_element(line),
+	 ExcRowNotStoredHere(line));
 
   return local_lines.index_within_set(line);
 }
