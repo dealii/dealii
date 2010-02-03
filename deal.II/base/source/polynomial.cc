@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//      $Id$   
+//      $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 // to be a problem since we only need it on very rare occasions. if
 // someone finds this is a bottleneck, feel free to replace it by a
 // more fine-grained solution
-namespace 
+namespace
 {
   Threads::ThreadMutex coefficients_lock;
 }
@@ -68,8 +68,8 @@ namespace Polynomials
     Assert (coefficients.size() > 0, ExcEmptyObject());
     Assert (values.size() > 0, ExcZero());
     const unsigned int values_size=values.size();
-  
-  
+
+
                                      // if we only need the value, then
                                      // call the other function since
                                      // that is significantly faster
@@ -124,7 +124,7 @@ namespace Polynomials
       {
         *c *= f;
         f *= factor;
-      }  
+      }
   }
 
 
@@ -160,7 +160,7 @@ namespace Polynomials
     return *this;
   }
 
-  
+
   template <typename number>
   Polynomial<number>&
   Polynomial<number>::operator *= (const Polynomial<number>& p)
@@ -169,16 +169,16 @@ namespace Polynomials
     unsigned int new_degree = this->degree() + p.degree();
 
     std::vector<number> new_coefficients(new_degree+1, 0.);
-    
+
     for (unsigned int i=0; i<p.coefficients.size(); ++i)
       for (unsigned int j=0; j<this->coefficients.size(); ++j)
       new_coefficients[i+j] += this->coefficients[j]*p.coefficients[i];
     this->coefficients = new_coefficients;
-    
+
     return *this;
   }
 
-  
+
   template <typename number>
   Polynomial<number>&
   Polynomial<number>::operator += (const Polynomial<number>& p)
@@ -194,7 +194,7 @@ namespace Polynomials
     return *this;
   }
 
-  
+
   template <typename number>
   Polynomial<number>&
   Polynomial<number>::operator -= (const Polynomial<number>& p)
@@ -210,13 +210,13 @@ namespace Polynomials
     return *this;
   }
 
-  
+
   template <typename number>
   template <typename number2>
   void
   Polynomial<number>::shift(std::vector<number>& coefficients,
                             const number2 offset)
-  {  
+  {
 #ifdef DEAL_II_LONG_DOUBLE_LOOP_BUG
     AssertThrow (false,
                  ExcMessage("Sorry, but the compiler you are using has a bug that disallows "
@@ -228,12 +228,12 @@ namespace Polynomials
                                      // args. note that this code is
                                      // actually unreachable
     coefficients[0] = offset;
-#else  
+#else
                                      // Copy coefficients to a vector of
                                      // accuracy given by the argument
     std::vector<number2> new_coefficients(coefficients.begin(),
                                           coefficients.end());
-  
+
                                      // Traverse all coefficients from
                                      // c_1. c_0 will be modified by
                                      // higher degrees, only.
@@ -250,7 +250,7 @@ namespace Polynomials
                                          // needed and computed
                                          // successively.
         number2 offset_power = offset;
-      
+
                                          // Compute (x+offset)^d
                                          // and modify all values c_k
                                          // with k<d.
@@ -291,7 +291,7 @@ namespace Polynomials
   }
 
 
-  
+
   template <typename number>
   Polynomial<number>
   Polynomial<number>::derivative () const
@@ -305,7 +305,7 @@ namespace Polynomials
 
     return Polynomial<number> (newcoefficients);
   }
-  
+
 
   template <typename number>
   Polynomial<number>
@@ -318,7 +318,7 @@ namespace Polynomials
 
     return Polynomial<number> (newcoefficients);
   }
-  
+
 
   template <typename number>
   void
@@ -343,15 +343,15 @@ namespace Polynomials
     result[n] = coefficient;
     return result;
   }
-  
-  
+
+
   template <typename number>
   Monomial<number>::Monomial (unsigned int n,
 			      double coefficient)
 		  : Polynomial<number>(make_vector(n, coefficient))
   {}
-  
-  
+
+
   template <typename number>
   std::vector<Polynomial<number> >
   Monomial<number>::generate_complete_basis (const unsigned int degree)
@@ -378,7 +378,7 @@ namespace Polynomials
 					 // up to degree 10. For
 					 // higher order, we have to
 					 // compute by hand.
-	
+
 					 // Start with the constant one
 	this->coefficients.resize(1);
 	this->coefficients[0] = 1.;
@@ -387,7 +387,7 @@ namespace Polynomials
 					 // polynomial as the product
 					 // of linear factors
 	std::vector<double> two (2, 1.);
-	
+
 	for (unsigned int k=0;k<=n;++k)
 	  {
 	    if (k != support_point)
@@ -397,10 +397,10 @@ namespace Polynomials
 		factor.scale(1.*n/(support_point - k));
 		(*this) *= factor;
 	      }
-	  }  
+	  }
       }
   }
-  
+
 
   void
   LagrangeEquidistant::compute_coefficients (const unsigned int n,
@@ -413,7 +413,7 @@ namespace Polynomials
     Assert(support_point<n_functions,
            ExcIndexRange(support_point, 0, n_functions));
     double const *x=0;
-  
+
     switch (n)
       {
         case 1:
@@ -424,7 +424,7 @@ namespace Polynomials
                   0.0, 1.0
             };
           x=&x1[0];
-          break;	
+          break;
         }
         case 2:
         {
@@ -460,7 +460,7 @@ namespace Polynomials
                   0.0, -1.0, 22.0/3.0, -16.0, 32.0/3.0
             };
           x=&x4[0];
-          break;	
+          break;
         }
         case 5:
         {
@@ -644,7 +644,7 @@ namespace Polynomials
 
 //----------------------------------------------------------------------//
 
-  
+
   std::vector<Polynomial<double> >
   Lagrange::generate_complete_basis (const std::vector<Point<1> >& points)
   {
@@ -657,7 +657,7 @@ namespace Polynomials
     std::vector<double> linear(2, 1.);
 				     // We start with a constant polynomial
     std::vector<double> one(1, 1.);
-    
+
     for (unsigned int i=0;i<p.size();++i)
       {
 					 // Construct interpolation formula
@@ -694,10 +694,10 @@ namespace Polynomials
 	      }
 	  }
       }
-    
+
     return p;
   }
-  
+
 
 // ------------------ class Legendre --------------- //
 
@@ -726,7 +726,30 @@ namespace Polynomials
   {}
 
 
-  
+
+  Legendre::~Legendre ()
+  {
+				// need to free the memory that was allocated
+				// when recursive coefficients are calculated.
+    Threads::ThreadMutex::ScopedLock lock(coefficients_lock);
+    for (unsigned int i=0; i<recursive_coefficients.size(); ++i)
+      if (recursive_coefficients[i] != 0)
+	{
+	  const std::vector<double> *c0 = 0;
+	  std::swap (recursive_coefficients[i], c0);
+	  delete c0;
+	}
+    for (unsigned int i=0; i<shifted_coefficients.size(); ++i)
+      if (shifted_coefficients[i] != 0)
+	{
+	  const std::vector<double> *c0 = 0;
+	  std::swap (shifted_coefficients[i], c0);
+	  delete c0;
+	}
+  }
+
+
+
   void
   Legendre::compute_coefficients (const unsigned int k_)
   {
@@ -740,7 +763,7 @@ namespace Polynomials
 #else
     typedef long double SHIFT_TYPE;
 #endif
-    
+
     unsigned int k = k_;
 
                                      // first make sure that no other
@@ -762,7 +785,7 @@ namespace Polynomials
                                        // respective coefficients
       {
         recursive_coefficients.resize (k+1, 0);
-      
+
         if (k<=1)
           {
                                              // create coefficients
@@ -782,20 +805,21 @@ namespace Polynomials
 
                                              // now make these arrays
                                              // const
-            recursive_coefficients[0] = c0;
-            recursive_coefficients[1] = c1;
+	    recursive_coefficients[0] = c0;
+	    recursive_coefficients[1] = c1;
+
                                              // Compute polynomials
                                              // orthogonal on [0,1]
-            c0 = new std::vector<double>(*c0);
-            c1 = new std::vector<double>(*c1);
-	  
-            Polynomial<double>::shift<SHIFT_TYPE> (*c0, -1.);
-            Polynomial<double>::scale(*c0, 2.);
-            Polynomial<double>::shift<SHIFT_TYPE> (*c1, -1.);
-            Polynomial<double>::scale(*c1, 2.);
-            Polynomial<double>::multiply(*c1, std::sqrt(3.));
-            shifted_coefficients[0]=c0;
-            shifted_coefficients[1]=c1;
+            std::vector<double> *d0 = new std::vector<double>(*c0);
+            std::vector<double> *d1 = new std::vector<double>(*c1);
+
+            Polynomial<double>::shift<SHIFT_TYPE> (*d0, -1.);
+            Polynomial<double>::scale(*d0, 2.);
+            Polynomial<double>::shift<SHIFT_TYPE> (*d1, -1.);
+            Polynomial<double>::scale(*d1, 2.);
+            Polynomial<double>::multiply(*d1, std::sqrt(3.));
+            shifted_coefficients[0]=d0;
+            shifted_coefficients[1]=d1;
           }
         else
           {
@@ -812,11 +836,11 @@ namespace Polynomials
             coefficients_lock.acquire ();
 
             std::vector<double> *ck = new std::vector<double>(k+1);
-	  
+
             const double a = 1./(k);
             const double b = a*(2*k-1);
             const double c = a*(k-1);
-	  
+
             (*ck)[k]   = b*(*recursive_coefficients[k-1])[k-1];
             (*ck)[k-1] = b*(*recursive_coefficients[k-1])[k-2];
             for (unsigned int i=1 ; i<= k-2 ; ++i)
@@ -902,20 +926,20 @@ namespace Polynomials
                                      // until we quit this function
     Threads::ThreadMutex::ScopedLock lock(coefficients_lock);
 
-                                     // The first 2 coefficients 
+                                     // The first 2 coefficients
                                      // are hard-coded
     if (k==0)
       k=1;
                                      // check: does the information
                                      // already exist?
     if (  (recursive_coefficients.size() < k+1) ||
-	  ((recursive_coefficients.size() >= k+1) && 
+	  ((recursive_coefficients.size() >= k+1) &&
            (recursive_coefficients[k] == 0)) )
 				           // no, then generate the
 				           // respective coefficients
       {
 	recursive_coefficients.resize (k+1, 0);
-      
+
 	if (k<=1)
 	  {
                                              // create coefficients
@@ -952,7 +976,7 @@ namespace Polynomials
 	    (*c2)[0] =   0.*a;
 	    (*c2)[1] =  -4.*a;
 	    (*c2)[2] =   4.*a;
-	    
+
 	    recursive_coefficients[2] = c2;
 	  }
 	else
@@ -970,15 +994,15 @@ namespace Polynomials
 	    coefficients_lock.acquire ();
 
 	    std::vector<double> *ck = new std::vector<double>(k+1);
-	   
+
 	    const double a = 1.; //1./(2.*k);
 
 	    (*ck)[0] = - a*(*recursive_coefficients[k-1])[0];
-	  
+
 	    for (unsigned int i=1; i<=k-1; ++i)
 		(*ck)[i] = a*( 2.*(*recursive_coefficients[k-1])[i-1]
 			       - (*recursive_coefficients[k-1])[i] );
-	  
+
 	    (*ck)[k] = a*2.*(*recursive_coefficients[k-1])[k-1];
 	                                  // for even degrees, we need
 	                                  // to add a multiple of
@@ -991,7 +1015,7 @@ namespace Polynomials
 
 		(*ck)[1] += b*(*recursive_coefficients[2])[1];
 		(*ck)[2] += b*(*recursive_coefficients[2])[2];
-	      }	  
+	      }
                                              // finally assign the newly
                                              // created vector to the
                                              // const pointer in the

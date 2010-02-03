@@ -404,6 +404,11 @@ namespace Polynomials
                                         */
       Legendre (const unsigned int p);
 
+				       /**
+					* Destructor.
+					*/
+      ~Legendre();
+
                                        /**
                                         * Return a vector of Legendre
                                         * polynomial objects of degrees
