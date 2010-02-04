@@ -176,7 +176,7 @@ SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
       return;
     }
 
-  const unsigned int N = cols->n_nonzero_elements();
+  const std::size_t N = cols->n_nonzero_elements();
   if (N > max_len || max_len == 0)
     {
       if (val != 0)
@@ -1885,10 +1885,10 @@ SparseMatrix<number>::block_read (std::istream &in)
 
 
 template <typename number>
-unsigned int
+std::size_t
 SparseMatrix<number>::memory_consumption () const
 {
-  return sizeof(*this) + max_len*sizeof(number);
+  return max_len*static_cast<std::size_t>(sizeof(number)) + sizeof(*this);
 }
 
 

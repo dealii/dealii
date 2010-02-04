@@ -797,7 +797,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * of this object. See
 				      * MemoryConsumption.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 //@}
 /**
@@ -2100,7 +2100,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * object, using the reinit()
 				      * function.
 				      */
-    unsigned int max_len;
+    std::size_t max_len;
 
 				     // make all other sparse matrices
 				     // friends
