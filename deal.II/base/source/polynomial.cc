@@ -702,22 +702,12 @@ namespace Polynomials
 // ------------------ class Legendre --------------- //
 
 
-//TODO:[?] This class leaks memory, but only at the very end of a program.
-// Since it expands the Legendre<number>::coefficients array, the elements
-// of this static variable are not destroyed at the end of the program
-// run. While this is not a problem (since the returned memory could
-// not be used anyway then), it is a little confusing when looking at
-// a memory checker such as "purify". Maybe, this should be handled somehow
-// to avoid this confusion in future.
-
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  std::vector<const std::vector<double> *>
-  Legendre::recursive_coefficients(20,
-				   static_cast<const std::vector<double>*>(0));
-  std::vector<const std::vector<double> *>
-  Legendre::shifted_coefficients(20,
-				 static_cast<const std::vector<double>*>(0));
+  std::vector<std_cxx1x::shared_ptr<const std::vector<double> > >
+  Legendre::recursive_coefficients(20);
+  std::vector<std_cxx1x::shared_ptr<const std::vector<double> > >
+  Legendre::shifted_coefficients(20);
 
 
   Legendre::Legendre (const unsigned int k)
@@ -761,7 +751,7 @@ namespace Polynomials
                                        // no, then generate the
                                        // respective coefficients
       {
-        recursive_coefficients.resize (k+1, 0);
+        recursive_coefficients.resize (k+1);
 
         if (k<=1)
           {
@@ -781,9 +771,15 @@ namespace Polynomials
             (*c1)[1] = 1.;
 
                                              // now make these arrays
-                                             // const
-	    recursive_coefficients[0] = c0;
-	    recursive_coefficients[1] = c1;
+                                             // const. use shared_ptr for
+                                             // recursive_coefficients because
+                                             // that avoids a memory leak that
+                                             // would appear if we used plain
+                                             // pointers.
+	    recursive_coefficients[0] =
+	      std_cxx1x::shared_ptr<const std::vector<double> >(c0);
+	    recursive_coefficients[1] =
+	      std_cxx1x::shared_ptr<const std::vector<double> >(c1);
 
                                              // Compute polynomials
                                              // orthogonal on [0,1]
@@ -795,8 +791,8 @@ namespace Polynomials
             Polynomial<double>::shift<SHIFT_TYPE> (*c1, -1.);
             Polynomial<double>::scale(*c1, 2.);
             Polynomial<double>::multiply(*c1, std::sqrt(3.));
-            shifted_coefficients[0]=c0;
-            shifted_coefficients[1]=c1;
+            shifted_coefficients[0]=std_cxx1x::shared_ptr<const std::vector<double> >(c0);
+            shifted_coefficients[1]=std_cxx1x::shared_ptr<const std::vector<double> >(c1);
           }
         else
           {
@@ -830,14 +826,16 @@ namespace Polynomials
                                              // created vector to the
                                              // const pointer in the
                                              // coefficients array
-            recursive_coefficients[k] = ck;
+            recursive_coefficients[k] =
+	      std_cxx1x::shared_ptr<const std::vector<double> >(ck);
                                              // and compute the
                                              // coefficients for [0,1]
             ck = new std::vector<double>(*ck);
             Polynomial<double>::shift<SHIFT_TYPE> (*ck, -1.);
             Polynomial<double>::scale(*ck, 2.);
             Polynomial<double>::multiply(*ck, std::sqrt(2.*k+1.));
-            shifted_coefficients[k] = ck;
+            shifted_coefficients[k] =
+	      std_cxx1x::shared_ptr<const std::vector<double> >(ck);
           };
       };
   }
