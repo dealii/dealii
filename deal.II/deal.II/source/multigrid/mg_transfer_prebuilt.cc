@@ -181,9 +181,6 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   std::vector<unsigned int> dof_indices_parent (dofs_per_cell);
   std::vector<unsigned int> dof_indices_child (dofs_per_cell);
 
-  copy_indices.resize(mg_dof.get_tria().n_levels());
-  find_dofs_on_refinement_edges (mg_dof);
-
 				   // for each level: first build the sparsity
 				   // pattern of the matrices and then build the
 				   // matrices themselves. note that we only
@@ -191,6 +188,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				   // level which have children
   for (unsigned int level=0; level<n_levels-1; ++level)
     {
+
 				       // reset the dimension of the structure.
 				       // note that for the number of entries
 				       // per row, the number of parent dofs
@@ -241,11 +239,6 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 
-      copy_indices[level+1].clear();
-      if (level == 0)
-	copy_indices[0].clear();
-      std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-
 				       // now actually build the matrices
       for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -273,66 +266,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 						     &dof_indices_parent[0],
 						     &prolongation(i,0),
 						     true);
-
-		if (cell->child(child)->has_children()==false)
-		  {
-		    DoFCellAccessor<DoFHandler<dim,spacedim> >& global_cell
-		      = *cell->child(child);
-		    global_cell.get_dof_indices(global_dof_indices);
-		    for (unsigned int i=0; i<dofs_per_cell; ++i)
-		      {
-			if(!dofs_on_refinement_edge[level+1][dof_indices_child[i]])
-			  copy_indices[level+1].push_back
-			    (std::make_pair(global_dof_indices[i], dof_indices_child[i]));
-		      }
-		  }
 	      }
 	  }
-	else
-	  {
-	    DoFCellAccessor<DoFHandler<dim,spacedim> >& global_cell = *cell;
-
-					   // get the dof numbers of
-					   // this cell for the global
-					   // and the level-wise
-					   // numbering
-	    global_cell.get_dof_indices(global_dof_indices);
-	    cell->get_mg_dof_indices (dof_indices_parent);
-
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      {
-		if(!dofs_on_refinement_edge[level][dof_indices_parent[i]])
-		  copy_indices[level].push_back
-		    (std::make_pair(global_dof_indices[i], dof_indices_parent[i]));
-	      }
-	  }
-    }
-
-				// sort the list of dof numbers and compress
-				// out duplicates
-  for (int level=n_levels-1; level>=0; --level)
-    {
-      if (copy_indices[level].size() > 0)
-	{
-	  std::sort (copy_indices[level].begin(), copy_indices[level].end());
-
-	  std::vector<std::pair<unsigned int,unsigned int> >::iterator
-	    it1 = copy_indices[level].begin(), it2 = it1, it3 = it1;
-	  it2++, it1++;
-	  for ( ; it2!=copy_indices[level].end(); ++it2, ++it3)
-	    if (*it2 > *it3)
-	      *it1++ = *it2;
-	  copy_indices[level].erase(it1,copy_indices[level].end());
-	}
-    }
-				// if we have only one single level, we did
-				// not enter the above code. Need to create
-				// the respective vector manually
-  if (n_levels == 1)
-    {
-      copy_indices[0].resize (sizes[0]);
-      for (unsigned int i=0; i<sizes[0]; ++i)
-	copy_indices[0][i] = std::make_pair<unsigned int,unsigned int>(i,i);
     }
 
   // impose boundary conditions
@@ -373,6 +308,66 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 		start_row->value() = 0;
 	    }
 	}
+    }
+
+				// to find the indices that describe the
+				// relation between global dofs and local
+				// numbering on the individual level, first
+				// create a temp vector where the ith level
+				// entry contains the respective global
+				// entry. this gives a neat way to find those
+				// indices. in a second step, actually build
+				// the std::vector<std::pair<uint,uint> > that
+				// only contains the active dofs on the
+				// levels.
+  copy_indices.resize(n_levels);
+  std::vector<unsigned int> temp_copy_indices;
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
+  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
+    {
+      copy_indices[level].clear();
+      typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+	level_cell = mg_dof.begin_active(level);
+      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+	level_end  = mg_dof.end_active(level);
+
+      temp_copy_indices.resize (0);
+      temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_unsigned_int);
+
+				       // Compute coarse level right hand side
+				       // by restricting from fine level.
+      for (; level_cell!=level_end; ++level_cell)
+	{
+	  DoFAccessor<dim, DoFHandler<dim,spacedim> >& global_cell = *level_cell;
+					   // get the dof numbers of
+					   // this cell for the global
+					   // and the level-wise
+					   // numbering
+	  global_cell.get_dof_indices(global_dof_indices);
+	  level_cell->get_mg_dof_indices (level_dof_indices);
+
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
+	}
+
+				// now all the active dofs got a valid entry,
+				// the other ones have an invalid entry. Count
+				// the invalid entries and then resize the
+				// copy_indices object. Then, insert the pairs
+				// of global index and level index into
+				// copy_indices.
+      const unsigned int n_active_dofs =
+	std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
+		       std::bind2nd(std::not_equal_to<unsigned int>(),
+				    numbers::invalid_unsigned_int));
+      copy_indices[level].resize (n_active_dofs);
+      unsigned int counter = 0;
+      for (unsigned int i=0; i<temp_copy_indices.size(); ++i)
+	if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
+	  copy_indices[level][counter++] =
+	    std::make_pair<unsigned int,unsigned int> (temp_copy_indices[i], i);
+      Assert (counter == n_active_dofs, ExcInternalError());
     }
 }
 
