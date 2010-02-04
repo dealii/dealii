@@ -640,9 +640,10 @@ namespace TrilinosWrappers
 
 
 
+  template <typename number>
   void
   PreconditionAMG::
-  initialize (const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
+  initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
 	      const AdditionalData                 &additional_data,
 	      const double                          drop_tolerance)
   {
@@ -668,6 +669,15 @@ namespace TrilinosWrappers
   {
     multilevel_operator->ReComputePreconditioner();
   }
+
+
+
+
+				// explicit instantiations
+  template void PreconditionAMG::initialize (const ::dealii::SparseMatrix<double> &,
+					     const AdditionalData &, const double);
+  template void PreconditionAMG::initialize (const ::dealii::SparseMatrix<float> &,
+					     const AdditionalData &, const double);
 
 }
 

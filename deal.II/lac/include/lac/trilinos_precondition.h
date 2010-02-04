@@ -1462,7 +1462,8 @@ namespace TrilinosWrappers
 					* the function can be considered
 					* rather inefficient.
 					*/
-      void initialize (const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
+      template <typename number>
+      void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
 		       const AdditionalData                 &additional_data = AdditionalData(),
 		       const double                          drop_tolerance = 1e-13);
 
