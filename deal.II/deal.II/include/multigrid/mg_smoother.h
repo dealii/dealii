@@ -954,8 +954,8 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::smooth(
 
   try
     {
-      r->reinit(u);
-      d->reinit(u);
+      r->reinit(u,true);
+      d->reinit(u,true);
 
       bool T = this->transpose;
       if (this->symmetric && (steps2 % 2 == 0))
@@ -980,7 +980,7 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::smooth(
 	    if (this->debug > 0)
 	      deallog << 'N';
 	    matrices[level].vmult(*r,u);
-	    r->sadd(-1.,1.,rhs);
+	    r->sadd(-1.,rhs);
 	    if (this->debug > 2)
 	      deallog << ' ' << r->l2_norm() << ' ';
 	    smoothers[level].vmult(*d, *r);
