@@ -1030,11 +1030,11 @@ SparsityPattern::block_read (std::istream &in)
 
 
 
-unsigned int
+std::size_t
 SparsityPattern::memory_consumption () const
 {
-  return (sizeof(*this) +
-	  max_dim * sizeof(unsigned int) +
+  return (max_dim * static_cast<size_t>(sizeof(unsigned int)) +
+	  sizeof(*this) +
 	  max_vec_len * sizeof(unsigned int));
 }
 

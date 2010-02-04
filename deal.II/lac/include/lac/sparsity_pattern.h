@@ -1161,7 +1161,7 @@ class SparsityPattern : public Subscriptor
 				      * matrix struct is compressed. It does not
 				      * make too much sense otherwise anyway.
 				      */
-    unsigned int n_nonzero_elements () const;
+    std::size_t n_nonzero_elements () const;
 
 				     /**
 				      * Return whether the structure is
@@ -1379,7 +1379,7 @@ class SparsityPattern : public Subscriptor
 				      * of this object. See
 				      * MemoryConsumption.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * This is kind of an expert mode. Get
@@ -2010,7 +2010,7 @@ SparsityPattern::column_number (const unsigned int row,
 
 
 inline
-unsigned int
+std::size_t
 SparsityPattern::n_nonzero_elements () const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
