@@ -735,7 +735,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * This function is made virtual,
 				      * since a dof handler object
 				      * might be accessed through a
-				      * pointers to thisr base class,
+				      * pointers to this base class,
 				      * although the actual object
 				      * might be a derived class.
 				      */

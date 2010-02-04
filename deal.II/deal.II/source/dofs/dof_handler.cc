@@ -70,7 +70,7 @@ namespace internal
 				     // dealii::DoFHandler instead of
 				     // namespace internal::DoFHandler
     using dealii::DoFHandler;
-    
+
 /**
  * A class with the same purpose as the similarly named class of the
  * Triangulation class. See there for more information.
@@ -116,7 +116,7 @@ namespace internal
 		    if (neighbor->user_flag_set())
 						       // copy dofs
 		      {
-			if (v==0) 
+			if (v==0)
 			  for (unsigned int d=0;
 			       d<dof_handler.selected_fe->dofs_per_vertex; ++d)
 			    cell->set_vertex_dof_index (0, d,
@@ -131,13 +131,13 @@ namespace internal
 			continue;
 		      }
 		  }
-            
+
 						 // otherwise: create dofs newly
 		for (unsigned int d=0;
 		     d<dof_handler.selected_fe->dofs_per_vertex; ++d)
 		  cell->set_vertex_dof_index (v, d, next_free_dof++);
 	      }
-  
+
 					     // dofs of line
 	    for (unsigned int d=0;
 		 d<dof_handler.selected_fe->dofs_per_line; ++d)
@@ -146,7 +146,7 @@ namespace internal
 					     // note that this cell has been
 					     // processed
 	    cell->set_user_flag ();
-  
+
 	    return next_free_dof;
 	  }
 
@@ -168,21 +168,21 @@ namespace internal
 		if (cell->vertex_dof_index(vertex, 0) == DoFHandler<2,spacedim>::invalid_dof_index)
 		  for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_vertex; ++d)
 		    cell->set_vertex_dof_index (vertex, d, next_free_dof++);
-    
+
 					     // for the four sides
 	    if (dof_handler.selected_fe->dofs_per_line > 0)
 	      for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
 		{
 		  typename DoFHandler<2,spacedim>::line_iterator
 		    line = cell->line(side);
-	
+
 						   // distribute dofs if necessary:
 						   // check whether line dof is already
 						   // numbered (check only first dof)
 		  if (line->dof_index(0) == DoFHandler<2,spacedim>::invalid_dof_index)
 						     // if not: distribute dofs
 		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_line; ++d)
-		      line->set_dof_index (d, next_free_dof++);	    
+		      line->set_dof_index (d, next_free_dof++);
 		}
 
 
@@ -194,10 +194,10 @@ namespace internal
 
 					     // note that this cell has been processed
 	    cell->set_user_flag ();
-  
+
 	    return next_free_dof;
 	  }
-    
+
 
 	template <int spacedim>
 	static
@@ -215,21 +215,21 @@ namespace internal
 		if (cell->vertex_dof_index(vertex, 0) == DoFHandler<3,spacedim>::invalid_dof_index)
 		  for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_vertex; ++d)
 		    cell->set_vertex_dof_index (vertex, d, next_free_dof++);
-    
+
 					     // for the lines
 	    if (dof_handler.selected_fe->dofs_per_line > 0)
 	      for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
 		{
 		  typename DoFHandler<3,spacedim>::line_iterator
 		    line = cell->line(l);
-	
+
 						   // distribute dofs if necessary:
 						   // check whether line dof is already
 						   // numbered (check only first dof)
 		  if (line->dof_index(0) == DoFHandler<3,spacedim>::invalid_dof_index)
 						     // if not: distribute dofs
 		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_line; ++d)
-		      line->set_dof_index (d, next_free_dof++);	    
+		      line->set_dof_index (d, next_free_dof++);
 		}
 
 					     // for the quads
@@ -238,14 +238,14 @@ namespace internal
 		{
 		  typename DoFHandler<3,spacedim>::quad_iterator
 		    quad = cell->quad(q);
-	
+
 						   // distribute dofs if necessary:
 						   // check whether quad dof is already
 						   // numbered (check only first dof)
 		  if (quad->dof_index(0) == DoFHandler<3,spacedim>::invalid_dof_index)
 						     // if not: distribute dofs
 		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_quad; ++d)
-		      quad->set_dof_index (d, next_free_dof++);	    
+		      quad->set_dof_index (d, next_free_dof++);
 		}
 
 
@@ -258,7 +258,7 @@ namespace internal
 					     // note that this cell has been
 					     // processed
 	    cell->set_user_flag ();
-  
+
 	    return next_free_dof;
 	  }
 
@@ -297,15 +297,15 @@ namespace internal
 				      dof_handler.selected_fe->dofs_per_vertex)
 			== false,
 			ExcInternalError ());
-  
-	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
+
+	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
 	      for (std::vector<unsigned int>::iterator
 		     i=dof_handler.levels[level]->lines.dofs.begin();
 		   i!=dof_handler.levels[level]->lines.dofs.end(); ++i)
 		if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
 		  *i = new_numbers[*i];
 	  }
-    
+
 
 
 	template <int spacedim>
@@ -337,14 +337,14 @@ namespace internal
 				      dof_handler.selected_fe->dofs_per_vertex)
 			== false,
 			ExcInternalError ());
-  
+
 	    for (std::vector<unsigned int>::iterator
 		   i=dof_handler.faces->lines.dofs.begin();
 		 i!=dof_handler.faces->lines.dofs.end(); ++i)
 	      if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
 		*i = new_numbers[*i];
 
-	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
+	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
 	      {
 		for (std::vector<unsigned int>::iterator
 		       i=dof_handler.levels[level]->quads.dofs.begin();
@@ -384,7 +384,7 @@ namespace internal
 				      dof_handler.selected_fe->dofs_per_vertex)
 			== false,
 			ExcInternalError ());
-  
+
 	    for (std::vector<unsigned int>::iterator
 		   i=dof_handler.faces->lines.dofs.begin();
 		 i!=dof_handler.faces->lines.dofs.end(); ++i)
@@ -395,8 +395,8 @@ namespace internal
 		 i!=dof_handler.faces->quads.dofs.end(); ++i)
 	      if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
 		*i = new_numbers[*i];
-  
-	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
+
+	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
 	      {
 		for (std::vector<unsigned int>::iterator
 		       i=dof_handler.levels[level]->hexes.dofs.begin();
@@ -533,7 +533,7 @@ namespace internal
 				    114*dof_handler.selected_fe->dofs_per_line +
 				    32*dof_handler.selected_fe->dofs_per_quad;
 		      break;
-		      
+
 		default:
 		      Assert (false, ExcNotImplemented());
 		      max_couplings=0;
@@ -547,7 +547,7 @@ namespace internal
 	unsigned int
 	max_couplings_between_dofs (const DoFHandler<3,spacedim> &dof_handler)
 	  {
-//TODO:[?] Invent significantly better estimates than the ones in this function  
+//TODO:[?] Invent significantly better estimates than the ones in this function
 
 					     // doing the same thing here is a
 					     // rather complicated thing, compared
@@ -574,13 +574,13 @@ namespace internal
 		Assert (false, ExcNotImplemented());
 		max_couplings=0;
 	      }
-  
+
 	    return std::min(max_couplings,dof_handler.n_dofs());
 	  }
 
 
 					 /**
-					  * Reserve enough space in the 
+					  * Reserve enough space in the
 					  * <tt>levels[]</tt> objects to store the
 					  * numbers of the degrees of freedom
 					  * needed for the given element. The
@@ -591,13 +591,13 @@ namespace internal
 	template <int spacedim>
 	static
 	void reserve_space (DoFHandler<1,spacedim> &dof_handler)
-	  {  
+	  {
 	    dof_handler.vertex_dofs
 	      .resize(dof_handler.tria->n_vertices() *
 		      dof_handler.selected_fe->dofs_per_vertex,
 		      DoFHandler<1,spacedim>::invalid_dof_index);
-    
-	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
+
+	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
 	      {
 		dof_handler.levels
 		  .push_back (new internal::DoFHandler::DoFLevel<1>);
@@ -614,7 +614,7 @@ namespace internal
 	      }
 	  }
 
-    
+
 	template <int spacedim>
 	static
 	void reserve_space (DoFHandler<2,spacedim> &dof_handler)
@@ -624,7 +624,7 @@ namespace internal
 		      dof_handler.selected_fe->dofs_per_vertex,
 		      DoFHandler<2,spacedim>::invalid_dof_index);
 
-	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
+	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
 	      {
 		dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
@@ -646,7 +646,7 @@ namespace internal
 		       DoFHandler<2,spacedim>::invalid_dof_index);
 	  }
 
-    
+
 	template <int spacedim>
 	static
 	void reserve_space (DoFHandler<3,spacedim> &dof_handler)
@@ -656,7 +656,7 @@ namespace internal
 		      dof_handler.selected_fe->dofs_per_vertex,
 		      DoFHandler<3,spacedim>::invalid_dof_index);
 
-	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
+	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
 	      {
 		dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
@@ -671,7 +671,7 @@ namespace internal
 			   DoFHandler<3,spacedim>::invalid_dof_index);
 	      }
 	    dof_handler.faces = new internal::DoFHandler::DoFFaces<3>;
-  
+
 	    dof_handler.faces->lines.dofs
 	      .resize (dof_handler.tria->n_raw_lines() *
 		       dof_handler.selected_fe->dofs_per_line,
@@ -1332,7 +1332,7 @@ DoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
 
 	if (tria->n_raw_quads(level) == 0)
 	  return end_quad();
-  
+
 	return raw_quad_iterator (tria,
 				  level,
 				  0,
@@ -1348,11 +1348,11 @@ DoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
 				  0,
 				  this);
       }
-      
-      
+
+
       default:
 	    Assert (false, ExcNotImplemented());
-	    return raw_hex_iterator();	    
+	    return raw_hex_iterator();
     }
 }
 
@@ -1415,7 +1415,7 @@ DoFHandler<dim, spacedim>::end_quad (const unsigned int level) const
 	    quad_iterator(end_quad()) :
 	    begin_quad (level+1));
   else
-    return quad_iterator(end_quad());  
+    return quad_iterator(end_quad());
 }
 
 
@@ -1473,7 +1473,7 @@ DoFHandler<dim,spacedim>::last_raw_quad (const unsigned int level) const
       default:
 	    Assert (false, ExcNotImplemented());
 	    return raw_quad_iterator();
-    }      
+    }
 }
 
 
@@ -1564,16 +1564,16 @@ DoFHandler<dim,spacedim>::begin_raw_hex (const unsigned int level) const
 
 	if (tria->n_raw_hexs(level) == 0)
 	  return end_hex();
-  
+
 	return raw_hex_iterator (tria,
 				 level,
 				 0,
 				 this);
       }
-      
+
       default:
 	    Assert (false, ExcNotImplemented());
-	    return raw_hex_iterator();	    
+	    return raw_hex_iterator();
     }
 }
 
@@ -1716,7 +1716,7 @@ DoFHandler<dim, spacedim>::last_hex () const
 }
 
 
- 
+
 template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_hex_iterator
 DoFHandler<dim, spacedim>::last_active_hex (const unsigned int level) const
@@ -1843,7 +1843,7 @@ template<int dim, int spacedim>
 unsigned int DoFHandler<dim,spacedim>::n_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
-  
+
   std::set<int> boundary_dofs;
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
@@ -1880,7 +1880,7 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicator
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (boundary_indicators.find(255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
-  
+
   std::set<int> boundary_dofs;
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
@@ -1907,7 +1907,7 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<unsigned char> &bounda
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
-  
+
   std::set<int> boundary_dofs;
 
   const unsigned int dofs_per_face = selected_fe->dofs_per_face;
@@ -1928,6 +1928,7 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<unsigned char> &bounda
 }
 
 
+
 template<int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::memory_consumption () const
@@ -1942,18 +1943,19 @@ DoFHandler<dim,spacedim>::memory_consumption () const
   for (unsigned int i=0; i<levels.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*levels[i]);
   mem += MemoryConsumption::memory_consumption (*faces);
-  
+
   return mem;
 }
 
 
 
 template<int dim, int spacedim>
-void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &ff,
-				       const unsigned int        offset)
+void DoFHandler<dim,spacedim>::
+  distribute_dofs (const FiniteElement<dim,spacedim> &ff,
+		   const unsigned int                 offset)
 {
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
-  
+
   selected_fe = &ff;
 
                                    // delete all levels and set them up
@@ -1974,14 +1976,15 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
   std::vector<bool> user_flags;
   tria->save_user_flags(user_flags);
   const_cast<Triangulation<dim,spacedim> &>(*tria).clear_user_flags ();
-  
-  unsigned int next_free_dof = offset;   
+
+  unsigned int next_free_dof = offset;
   active_cell_iterator cell = begin_active(),
 		       endc = end();
 
-  for (; cell != endc; ++cell) 
+  for (; cell != endc; ++cell)
     next_free_dof
-      = internal::DoFHandler::Implementation::distribute_dofs_on_cell (*this, cell, next_free_dof);
+      = internal::DoFHandler::Implementation::
+        distribute_dofs_on_cell (*this, cell, next_free_dof);
 
   used_dofs = next_free_dof;
 
@@ -1989,7 +1992,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 				   // for cell dof indices
   for (cell_iterator cell = begin(); cell != end(); ++cell)
     cell->update_cell_dof_indices_cache ();
-  
+
 				   // finally restore the user flags
   const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);
 }
@@ -2029,14 +2032,14 @@ renumber_dofs (const std::vector<unsigned int> &new_numbers)
     }
 #endif
 
-  
+
   internal::DoFHandler::Implementation::renumber_dofs (new_numbers, *this);
 
 				   // update the cache used for cell dof
 				   // indices
   for (cell_iterator cell = begin(); cell != end(); ++cell)
     cell->update_cell_dof_indices_cache ();
-  
+
 }
 
 
@@ -2099,10 +2102,10 @@ void DoFHandler<dim,spacedim>::clear_space ()
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
   levels.resize (0);
-    
+
   delete faces;
   faces = 0;
-  
+
   std::vector<unsigned int> tmp;
   std::swap (vertex_dofs, tmp);
 }

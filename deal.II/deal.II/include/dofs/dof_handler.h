@@ -41,7 +41,7 @@ namespace internal
   {
     struct Implementation;
   }
-  
+
   namespace DoFCellAccessor
   {
     struct Implementation;
@@ -81,7 +81,7 @@ namespace internal
  * so that this class can be used to solve problems in the finite
  * element method formulation.
  *
- * 
+ *
  * <h3>Distribution of indices for degrees of freedom</h3>
  *
  * The degrees of freedom (`dofs') are distributed on the given triangulation
@@ -204,18 +204,18 @@ class DoFHandler  :  public Subscriptor
 				      * value.
 				      */
     static const unsigned int default_fe_index = 0;
-    
+
 				     /**
 				      * Constructor. Take @p tria as the
 				      * triangulation to work on.
 				      */
-    DoFHandler ( const Triangulation<dim,spacedim> &tria);    
+    DoFHandler ( const Triangulation<dim,spacedim> &tria);
 
 				     /**
 				      * Destructor.
 				      */
     virtual ~DoFHandler ();
-    
+
 				     /**
 				      * Go through the triangulation and
 				      * distribute the degrees of freedoms
@@ -257,7 +257,7 @@ class DoFHandler  :  public Subscriptor
 				      * time when @p distribute_dofs was called.
 				      */
     virtual void clear ();
-    
+
                                        /**
                                         * Renumber degrees of freedom based on
                                         * a list of new dof numbers for all the
@@ -349,7 +349,7 @@ class DoFHandler  :  public Subscriptor
 				      * dimension less.
 				      */
     unsigned int max_couplings_between_boundary_dofs () const;
-				     
+
 				     /**
 				      *  @name Cell iterator functions
 				      */
@@ -401,7 +401,7 @@ class DoFHandler  :  public Subscriptor
 				      * <tt>end()</tt>.
 				      */
     cell_iterator        end (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
@@ -615,7 +615,7 @@ class DoFHandler  :  public Subscriptor
 				      * <tt>end()</tt>.
 				      */
     line_iterator        end_line (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
@@ -669,7 +669,7 @@ class DoFHandler  :  public Subscriptor
 				      *  active line on level @p level.
 				      */
     active_line_iterator last_active_line (const unsigned int level) const;
-				     /*@}*/	  
+				     /*@}*/
 
 				     /*---------------------------------------*/
 
@@ -712,7 +712,7 @@ class DoFHandler  :  public Subscriptor
 				      * <tt>end()</tt>.
 				      */
     quad_iterator        end_quad (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
@@ -813,7 +813,7 @@ class DoFHandler  :  public Subscriptor
 				      * <tt>end()</tt>.
 				      */
     hex_iterator        end_hex (const unsigned int level) const;
-    
+
 				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
@@ -931,7 +931,7 @@ class DoFHandler  :  public Subscriptor
 				      * this object.
 				      */
     const Triangulation<dim,spacedim> & get_tria () const;
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -940,7 +940,7 @@ class DoFHandler  :  public Subscriptor
 				      * This function is made virtual,
 				      * since a dof handler object
 				      * might be accessed through a
-				      * pointers to thisr base class,
+				      * pointers to this base class,
 				      * although the actual object
 				      * might be a derived class.
 				      */
@@ -1000,7 +1000,7 @@ class DoFHandler  :  public Subscriptor
 		    << ", but this level is empty.");
 
   protected:
-    
+
 				     /**
 				      * Address of the triangulation to
 				      * work on.
@@ -1049,7 +1049,7 @@ class DoFHandler  :  public Subscriptor
 				      * Free all used memory.
 				      */
     void clear_space ();
-           
+
 				     /**
 				      * Space to store the DoF numbers
 				      * for the different
@@ -1082,7 +1082,7 @@ class DoFHandler  :  public Subscriptor
 				      */
     std::vector<unsigned int>      vertex_dofs;
 
-				     /*
+				     /**
 				      * Make accessor objects friends.
 				      */
     template <int, class> friend class DoFAccessor;
@@ -1090,7 +1090,7 @@ class DoFHandler  :  public Subscriptor
     friend class internal::DoFAccessor::Implementation;
     friend class internal::DoFCellAccessor::Implementation;
 
-    friend class internal::DoFHandler::Implementation;    
+    friend class internal::DoFHandler::Implementation;
 };
 
 

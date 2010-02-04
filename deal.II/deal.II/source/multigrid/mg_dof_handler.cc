@@ -838,11 +838,13 @@ MGDoFHandler<dim,spacedim>::MGDoFHandler (const Triangulation<dim,spacedim> &tri
 {}
 
 
+
 template <int dim, int spacedim>
 MGDoFHandler<dim,spacedim>::~MGDoFHandler ()
 {
   clear ();
 }
+
 
 
 template <int dim, int spacedim>
@@ -1948,6 +1950,7 @@ set_dof_index (const unsigned int obj_level,
 }
 
 
+
 template <int dim, int spacedim>
 void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &fe,
 					 const unsigned int        offset)
@@ -1991,6 +1994,8 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
     .load_user_flags(user_flags);
 }
 
+
+
 template <int dim, int spacedim>
 void
 MGDoFHandler<dim,spacedim>::clear ()
@@ -2004,12 +2009,14 @@ MGDoFHandler<dim,spacedim>::clear ()
 }
 
 
+
 template <int dim, int spacedim>
 unsigned int MGDoFHandler<dim,spacedim>::n_dofs (const unsigned int level) const {
   Assert (level < mg_used_dofs.size(), ExcInvalidLevel(level));
 
   return mg_used_dofs[level];
 }
+
 
 
 #if deal_II_dimension == 1
@@ -2048,6 +2055,7 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 }
 
 #endif
+
 
 
 #if deal_II_dimension == 2
@@ -2112,6 +2120,7 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 }
 
 #endif
+
 
 
 #if deal_II_dimension == 3
@@ -2214,11 +2223,14 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 #endif
 
 
+
 template <int dim, int spacedim>
 void MGDoFHandler<dim,spacedim>::reserve_space ()
 {
   internal::MGDoFHandler::Implementation::reserve_space (*this);
 }
+
+
 
 template <int dim, int spacedim>
 void MGDoFHandler<dim,spacedim>::clear_space ()
