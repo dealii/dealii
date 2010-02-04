@@ -727,29 +727,6 @@ namespace Polynomials
 
 
 
-  Legendre::~Legendre ()
-  {
-				// need to free the memory that was allocated
-				// when recursive coefficients are calculated.
-    Threads::ThreadMutex::ScopedLock lock(coefficients_lock);
-    for (unsigned int i=0; i<recursive_coefficients.size(); ++i)
-      if (recursive_coefficients[i] != 0)
-	{
-	  const std::vector<double> *c0 = 0;
-	  std::swap (recursive_coefficients[i], c0);
-	  delete c0;
-	}
-    for (unsigned int i=0; i<shifted_coefficients.size(); ++i)
-      if (shifted_coefficients[i] != 0)
-	{
-	  const std::vector<double> *c0 = 0;
-	  std::swap (shifted_coefficients[i], c0);
-	  delete c0;
-	}
-  }
-
-
-
   void
   Legendre::compute_coefficients (const unsigned int k_)
   {
@@ -810,16 +787,16 @@ namespace Polynomials
 
                                              // Compute polynomials
                                              // orthogonal on [0,1]
-            std::vector<double> *d0 = new std::vector<double>(*c0);
-            std::vector<double> *d1 = new std::vector<double>(*c1);
+            c0 = new std::vector<double>(*c0);
+            c1 = new std::vector<double>(*c1);
 
-            Polynomial<double>::shift<SHIFT_TYPE> (*d0, -1.);
-            Polynomial<double>::scale(*d0, 2.);
-            Polynomial<double>::shift<SHIFT_TYPE> (*d1, -1.);
-            Polynomial<double>::scale(*d1, 2.);
-            Polynomial<double>::multiply(*d1, std::sqrt(3.));
-            shifted_coefficients[0]=d0;
-            shifted_coefficients[1]=d1;
+            Polynomial<double>::shift<SHIFT_TYPE> (*c0, -1.);
+            Polynomial<double>::scale(*c0, 2.);
+            Polynomial<double>::shift<SHIFT_TYPE> (*c1, -1.);
+            Polynomial<double>::scale(*c1, 2.);
+            Polynomial<double>::multiply(*c1, std::sqrt(3.));
+            shifted_coefficients[0]=c0;
+            shifted_coefficients[1]=c1;
           }
         else
           {
