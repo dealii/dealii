@@ -1071,7 +1071,7 @@ MGTools::count_dofs_per_block (
       std::vector<std::vector<bool> >
 	dofs_in_block (n_blocks, std::vector<bool>(dof_handler.n_dofs(l), false));
       std::vector<std::vector<bool> >
-	dofs_in_block (n_blocks, std::vector<bool>(n_blocks, false));
+	block_select (n_blocks, std::vector<bool>(n_blocks, false));
       Threads::TaskGroup<> tasks;
       for (unsigned int i=0; i<n_blocks; ++i)
 	{
