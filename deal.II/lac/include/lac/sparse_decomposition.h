@@ -256,17 +256,13 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 					  * causing this sparsity to
 					  * be used.
 					  *
-					  * Note that the sparsity
-					  * structures of
-					  * <tt>*use_this_sparsity</tt> and
+					  * Note that the sparsity structures
+					  * of <tt>*use_this_sparsity</tt> and
 					  * the matrix passed to the
-					  * initialize function need
-					  * not be equal, but that the
-					  * pattern used by this
-					  * matrix needs to contain
-					  * all elements used by the
-					  * matrix to be decomposed.
-					  * Fill-in is thus allowed.
+					  * initialize function need not be
+					  * equal. Fill-in is allowed, as well
+					  * as filtering out some elements in
+					  * the matrix.
 					  */
 	const SparsityPattern *use_this_sparsity;
     };

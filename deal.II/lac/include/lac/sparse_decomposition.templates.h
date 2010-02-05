@@ -12,9 +12,12 @@
 #ifndef __deal2__sparse_decomposition_templates_h
 #define __deal2__sparse_decomposition_templates_h
 
+
 #include <base/memory_consumption.h>
+#include <base/template_constraints.h>
 #include <lac/sparse_decomposition.h>
 #include <algorithm>
+#include <cstring>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -185,8 +188,11 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber>& matrix
       const somenumber * input_ptr = matrix.val;
       number * this_ptr = this->val;
       const number * const end_ptr = this_ptr + this->n_nonzero_elements();
-      for ( ; this_ptr != end_ptr; ++input_ptr, ++this_ptr)
-	*this_ptr = *input_ptr;
+      if (types_are_equal<somenumber, number>::value == true)
+	std::memcpy (this_ptr, input_ptr, this->n_nonzero_elements()*sizeof(number));
+      else
+	for ( ; this_ptr != end_ptr; ++input_ptr, ++this_ptr)
+	  *this_ptr = *input_ptr;
       return;
     }
 
@@ -197,16 +203,33 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber>& matrix
 
                                    // note: pointers to the sparsity
                                    // pattern of the old matrix!
-  const std::size_t * const rowstart_indices
+  const std::size_t * const in_rowstart_indices
     = matrix.get_sparsity_pattern().get_rowstart_indices();
-
-  const unsigned int * const column_numbers
+  const unsigned int * const in_cols
     = matrix.get_sparsity_pattern().get_column_numbers();
+  const unsigned int * cols = this->get_sparsity_pattern().get_column_numbers();
+  const std::size_t * rowstart_indices = 
+    this->get_sparsity_pattern().get_rowstart_indices();
 
+				   // both allow more and less entries 
+				   // in the new matrix
+  std::size_t in_index = in_rowstart_indices[0], index;
   for (unsigned int row=0; row<this->m(); ++row)
-    this->set (row, rowstart_indices[row+1]-rowstart_indices[row],
-	       &column_numbers[rowstart_indices[row]],
-	       &matrix.val[rowstart_indices[row]], false);
+    {
+      index = rowstart_indices[row];
+      in_index = in_rowstart_indices[row];
+      this->val[index++] = matrix.val[in_index++];
+      while (in_index < in_rowstart_indices[row+1] && 
+	     index < rowstart_indices[row+1])
+	{
+	  while (cols[index] < in_cols[in_index] && index < rowstart_indices[row+1])
+	    ++index;
+	  while (in_cols[in_index] < cols[index] && in_index < in_rowstart_indices[row+1])
+	    ++in_index;
+
+	  this->val[index++] = matrix.val[in_index++];
+	}
+    }
 }
 
 
