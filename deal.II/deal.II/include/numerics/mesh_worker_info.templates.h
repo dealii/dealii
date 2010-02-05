@@ -27,7 +27,7 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   void
-  DoFInfo<dim,spacedim>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator c)
+  DoFInfo<dim,spacedim>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c)
   {
     indices.resize(c->get_fe().dofs_per_cell);
   
@@ -45,7 +45,7 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   void
-  DoFInfo<dim,spacedim>::get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator c)
+  DoFInfo<dim,spacedim>::get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c)
   {
     indices.resize(c->get_fe().dofs_per_cell);
   

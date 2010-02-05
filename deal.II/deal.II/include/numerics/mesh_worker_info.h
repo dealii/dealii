@@ -259,10 +259,10 @@ namespace MeshWorker
 
     private:
 				       /// Fill index vector
-      void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator c);
+      void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c);
 
 				       /// Fill index vector with level indices
-      void get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator c);
+      void get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c);
 
 				       /// Auxiliary vector
       std::vector<unsigned int> indices_org;

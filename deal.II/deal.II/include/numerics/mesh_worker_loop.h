@@ -81,9 +81,6 @@ namespace MeshWorker
     const bool integrate_boundary      = (boundary_worker != 0);
     const bool integrate_interior_face = (face_worker != 0);
 
-    const_cast<Triangulation<ITERATOR::AccessorType::Container::dimension>&>(
-      begin->get_triangulation()).clear_user_flags();
-
 				     // Loop over all cells
     for (ITERATOR cell = begin; cell != end; ++cell)
       {
@@ -101,9 +98,6 @@ namespace MeshWorker
 	  for (unsigned int face_no=0; face_no < GeometryInfo<ITERATOR::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
 	    {
 	      typename ITERATOR::AccessorType::Container::face_iterator face = cell->face(face_no);
-					       // Treat every face only once
-	      if (face->user_flag_set ()) continue;
-
 	      if (cell->at_boundary(face_no))
 		{
 		  if (integrate_boundary)
@@ -115,8 +109,6 @@ namespace MeshWorker
 		}
 	      else if (integrate_interior_face)
 		{
-		  if (face->user_flag_set ()) continue;
-		  face->set_user_flag ();
 						   // Interior face
 		  typename ITERATOR::AccessorType::Container::cell_iterator
 		    neighbor = cell->neighbor(face_no);
@@ -153,8 +145,11 @@ namespace MeshWorker
 		    {
 						       // Neighbor is
 						       // on same
-						       // level
-
+						       // level, but
+						       // only do this
+						       // from one side.
+		      if (neighbor < cell) continue;
+		      
 						       // If iterator
 						       // is active
 						       // and neighbor
@@ -173,7 +168,6 @@ namespace MeshWorker
 
 		      face_worker(face_info, neighbor_info);
 		      assembler.assemble (face_info, neighbor_info);
-		      neighbor->face(neighbor_face_no)->set_user_flag ();
 		    }
 		}
 	    } // faces
