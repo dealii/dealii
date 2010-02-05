@@ -465,7 +465,7 @@ namespace TrilinosWrappers
 	  const int row_length = sparsity_pattern.row_length(row);
 	  row_indices.resize (row_length, -1);
 
-	  typename SparsityType::row_iterator col_num = 
+	  typename SparsityType::row_iterator col_num =
 	    sparsity_pattern.row_begin (row),
 	    row_end = sparsity_pattern.row_end(row);
 	  for (unsigned int col = 0; col_num != row_end; ++col_num, ++col)
@@ -563,7 +563,7 @@ namespace TrilinosWrappers
     const Epetra_Map columns (dealii_sparse_matrix.n(),
 			      0,
 			      Utilities::Trilinos::comm_self());
-    reinit (rows, columns, dealii_sparse_matrix, drop_tolerance, 
+    reinit (rows, columns, dealii_sparse_matrix, drop_tolerance,
 	    copy_values, use_this_sparsity);
   }
 
@@ -592,8 +592,6 @@ namespace TrilinosWrappers
 			const bool                            copy_values,
 			const ::dealii::SparsityPattern      *use_this_sparsity)
   {
-    matrix.reset();
-
     if (copy_values == false)
       {
 				   // in case we do not copy values, just
@@ -616,114 +614,74 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (input_col_map.NumGlobalElements(),
 				  dealii_sparse_matrix.n()));
 
-    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
-
-    const ::dealii::SparsityPattern & sparsity_pattern = 
-      (use_this_sparsity!=0)? *use_this_sparsity : 
+    const ::dealii::SparsityPattern & sparsity_pattern =
+      (use_this_sparsity!=0)? *use_this_sparsity :
       dealii_sparse_matrix.get_sparsity_pattern();
 
-    std::vector<int> n_entries_per_row(n_rows);
+    if (&*matrix != 0 && m() == n_rows && 
+	n_nonzero_elements() == sparsity_pattern.n_nonzero_elements())
+      goto set_matrix_values;
 
-    unsigned int maximum_row_length = 0;
-    for (unsigned int row=0; row<n_rows; ++row)
-      {
-	const unsigned int row_length = sparsity_pattern.row_length(row);
-	if (row_length > maximum_row_length)
-	  maximum_row_length = row_length;
-	n_entries_per_row[row] = row_length;
-      }
+    {
+      std::auto_ptr<SparsityPattern> trilinos_sparsity;
+      trilinos_sparsity = std::auto_ptr<SparsityPattern> (new SparsityPattern());
+      trilinos_sparsity->reinit (input_row_map, input_col_map, sparsity_pattern);
+      reinit (*trilinos_sparsity);
+    }
 
-    std::auto_ptr<Epetra_CrsGraph> graph;
-    if (input_row_map.Comm().NumProc() > 1)
-      graph = std::auto_ptr<Epetra_CrsGraph>
-	(new Epetra_CrsGraph (Copy, input_row_map,
-			      &n_entries_per_row[input_row_map.MinMyGID()], false));
-    else
-      graph = std::auto_ptr<Epetra_CrsGraph>
-	(new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
-			      &n_entries_per_row[input_row_map.MinMyGID()], false));
+  set_matrix_values:
+				// fill the values. the same as above: go
+				// through all rows of the matrix, and then
+				// all columns. since the sparsity patterns of
+				// the input matrix and the specified sparsity
+				// pattern might be different, need to go
+				// through the row for both these sparsity
+				// structures simultaneously in order to
+				// really set the correct values.
+    const std::size_t * const in_rowstart_indices
+      = dealii_sparse_matrix.get_sparsity_pattern().get_rowstart_indices();
+    const unsigned int * const in_cols
+      = dealii_sparse_matrix.get_sparsity_pattern().get_column_numbers();
+    const unsigned int * cols = sparsity_pattern.get_column_numbers();
+    const std::size_t * rowstart_indices =
+      sparsity_pattern.get_rowstart_indices();
 
-    Assert (graph->NumGlobalRows() == static_cast<int>(n_rows),
-    	    ExcDimensionMismatch (graph->NumGlobalRows(), n_rows));
-
-				   // now insert the indices
-    std::vector<int>   row_indices (maximum_row_length);
-    for (unsigned int row=0; row<n_rows; ++row)
-      if (input_row_map.MyGID(row))
-	{
-	  typename ::dealii::SparsityPattern::row_iterator 
-	    col_num = sparsity_pattern.row_begin (row),
-	    row_end = sparsity_pattern.row_end(row);
-	  typename ::dealii::SparseMatrix<number>::const_iterator
-	    matrix_col_num = dealii_sparse_matrix.begin(row),
-	    matrix_row_end = dealii_sparse_matrix.end(row);
-
-	  unsigned int col = 0;
-	  if (sparsity_pattern.optimize_diagonal())
-	    {
-	      row_indices[col++] = row;
-	      ++col_num;
-	      ++ matrix_col_num;
-	    }
-	  while (col_num != row_end && matrix_col_num != matrix_row_end)
-	    {
-	      while (*col_num < matrix_col_num->column() && col_num != row_end)
-		++col_num;
-	      while (*col_num > matrix_col_num->column() && matrix_col_num != matrix_row_end)
-		++matrix_col_num;
-
-	      if (std::fabs(matrix_col_num->value()) > drop_tolerance)
-		row_indices[col++] = *col_num;
-	      ++col_num;
-	      ++matrix_col_num;
-	    }
-
-	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, col,
-						       &row_indices[0]);
-	}
-    graph->FillComplete(input_col_map, input_row_map);
-    graph->OptimizeStorage();
-
-    matrix =  std::auto_ptr<Epetra_FECrsMatrix>
-                       (new Epetra_FECrsMatrix(Copy, *graph, false));
-    compress();
-
+    unsigned int maximum_row_length = matrix->MaxNumEntries();
+    std::vector<unsigned int> row_indices (maximum_row_length);
     std::vector<TrilinosScalar> values (maximum_row_length);
+    std::size_t in_index, index;
 
     for (unsigned int row=0; row<n_rows; ++row)
       if (input_row_map.MyGID(row))
 	{
-	  typename ::dealii::SparsityPattern::row_iterator 
-	    col_num = sparsity_pattern.row_begin (row),
-	    row_end = sparsity_pattern.row_end(row);
-	  typename ::dealii::SparseMatrix<number>::const_iterator
-	    matrix_col_num = dealii_sparse_matrix.begin(row),
-	    matrix_row_end = dealii_sparse_matrix.end(row);
-
+	  index = rowstart_indices[row];
+	  in_index = in_rowstart_indices[row];
 	  unsigned int col = 0;
 	  if (sparsity_pattern.optimize_diagonal())
 	    {
-	      values[col] = matrix_col_num->value();
+	      values[col] = dealii_sparse_matrix.global_entry(in_index);
 	      row_indices[col++] = row;
-	      ++col_num;
-	      ++ matrix_col_num;
+	      ++index;
+	      ++in_index;
 	    }
-	  while (col_num != row_end && matrix_col_num != matrix_row_end)
-	    {
-	      while (*col_num < matrix_col_num->column() && col_num != row_end)
-		++col_num;
-	      while (*col_num > matrix_col_num->column() && matrix_col_num != matrix_row_end)
-		++matrix_col_num;
 
-	      if (std::fabs(matrix_col_num->value()) > drop_tolerance)
+	  while (in_index < in_rowstart_indices[row+1] &&
+		 index < rowstart_indices[row+1])
+	    {
+	      while (cols[index] < in_cols[in_index] && index < rowstart_indices[row+1])
+		++index;
+	      while (in_cols[in_index] < cols[index] && in_index < in_rowstart_indices[row+1])
+		++in_index;
+
+	      if (std::fabs(dealii_sparse_matrix.global_entry(in_index)) > drop_tolerance)
 		{
-		  values[col] = matrix_col_num->value();
-		  row_indices[col++] = *col_num;
+		  values[col] = dealii_sparse_matrix.global_entry(in_index);
+		  row_indices[col++] = in_cols[in_index];
 		}
-	      ++col_num;
-	      ++matrix_col_num;
+	      ++index;
+	      ++in_index;
 	    }
-	  set (row, col, reinterpret_cast<unsigned int*>(&row_indices[0]), 
+	  set (row, col, reinterpret_cast<unsigned int*>(&row_indices[0]),
 	       &values[0], false);
 	}
 

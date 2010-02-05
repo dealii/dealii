@@ -213,7 +213,7 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber>& matrix
 
 				   // both allow more and less entries 
 				   // in the new matrix
-  std::size_t in_index = in_rowstart_indices[0], index;
+  std::size_t in_index, index;
   for (unsigned int row=0; row<this->m(); ++row)
     {
       index = rowstart_indices[row];
