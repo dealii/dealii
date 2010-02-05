@@ -163,22 +163,25 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
 				   // contain the global defect, the
 				   // refined parts its restriction.
   for (unsigned int l = level;l>minlevel;--l)
+  {
+    t[l-1] = 0.;
+    if (l==level && edge_out != 0)
     {
-      t[l-1] = 0.;
-      if (l==level && edge_out != 0)
-      {
-        edge_out->vmult_add(level, t[level], solution[level]);
+      edge_out->vmult_add(level, t[level], solution[level]);
+      if(debug>2)
         deallog << "Norm t[" << level << "] " << t[level].l2_norm() << std::endl;
-      }
-
-      if (l==level && edge_down != 0)
- 	edge_down->vmult(level, t[level-1], solution[level]);
-      
-      transfer->restrict_and_add (l, t[l-1], t[l]);
-      deallog << "restrict t[" << l-1 << "] " << t[l-1].l2_norm() << std::endl;
-      defect[l-1] -= t[l-1];
-      deallog << "defect d[" << l-1 << "] " << defect[l-1].l2_norm() << std::endl;
     }
+
+    if (l==level && edge_down != 0)
+      edge_down->vmult(level, t[level-1], solution[level]);
+
+    transfer->restrict_and_add (l, t[l-1], t[l]);
+    if(debug>2)
+      deallog << "restrict t[" << l-1 << "] " << t[l-1].l2_norm() << std::endl;
+    defect[l-1] -= t[l-1];
+    if(debug>2)
+      deallog << "defect d[" << l-1 << "] " << defect[l-1].l2_norm() << std::endl;
+  }
   
 				   // do recursion
   solution[level-1] = 0.;
