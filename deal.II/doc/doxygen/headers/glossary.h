@@ -307,7 +307,7 @@ Article{BK07,
   volume = 	 36,
   number = 	 1,
   pages = 	 {4/1--4/31}
-} 
+}
  * @endcode
  * It is available as Technical Report ISC-07-04-MATH from the
  * <a href="http://www.isc.tamu.edu/publications-reports/technical_reports">Institute
@@ -336,6 +336,29 @@ Article{BK07,
  * <dt class="glossary">@anchor GlossLagrange Lagrange elements</dt>
  * <dd>Finite elements based on Lagrangian interpolation at
  * @ref GlossSupport "support points".</dd>
+ *
+ *
+ * <dt class="glossary">@anchor mg_paper Multigrid paper</dt>
+ * <dd>The "multigrid paper" is a paper by B. Janssen and G. Kanschat, titled
+ * "Adaptive multilevel methods with local smoothing", that
+ * describes many of the algorithms and data structures used in the implementation
+ * of the multigrid framework of deal.II. It underlies the implementation of
+ * the classes that are used in @ref step_16 "step-16" for multigrid
+ * methods.
+ *
+ * The full reference for this paper is as follows:
+ * @code
+Article{JK10,
+  author = 	 {B. Janssen and G. Kanschat},
+  title = 	 {Adaptive multilevel methods with local smoothing},
+  journal = 	 {submitted},
+  year = 	 2010
+}
+ * @endcode
+ * It is available as Technical Report IAMCS-2009-131 from the
+ * <a href="http://iamcs.tamu.edu/research_sub.php?tab_sub=research&cms_id=8">Institute
+ * for Applied Mathematics and Computational Science, Texas A&amp;M University</a>.
+ * </dd>
  *
  *
  * <dt class="glossary">@anchor GlossNodes Node values or node functionals</dt>
@@ -385,7 +408,7 @@ Article{BK07,
  * FESystem class from other primitive (for example scalar) elements
  * as shown in @ref step_8 "step-8", @ref step_29 "step_29", @ref
  * step_22 "step-22" and several others. On the other hand,
- * the FE_RaviartThomas class used 
+ * the FE_RaviartThomas class used
  * in @ref step_20 "step-20" and @ref step_21 "step-21", or the
  * FE_Nedelec class provide non-primitive finite elements because
  * there, each vector-value shape function may have several non-zero
