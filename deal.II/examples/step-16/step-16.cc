@@ -41,7 +41,7 @@
 #include <numerics/vectors.h>
 #include <numerics/data_out.h>
 
-//These are the same include files 
+//These are the same include files
 //as in step-16 necessary for the
 //multi-level methods
 #include <multigrid/multigrid.h>
@@ -62,12 +62,12 @@
 using namespace dealii;
 
 
-//This class is basically the same 
-//class as in step-16. The only 
-//difference is that here we solve Laplace's 
+//This class is basically the same
+//class as in step-16. The only
+//difference is that here we solve Laplace's
 //problem on an adaptively refined grid.
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     LaplaceProblem (const unsigned int deg);
@@ -90,14 +90,14 @@ class LaplaceProblem
     SparseMatrix<double> system_matrix;
 
 				     //This object holds the information f
-				     //or the hanging nodes. 
+				     //or the hanging nodes.
     ConstraintMatrix     constraints;
 
     MGLevelObject<SparsityPattern> mg_sparsity;
     MGLevelObject<SparseMatrix<double> > mg_matrices;
 
-				     /* The matrices at the interface 
-				      * between two refinement levels, 
+				     /* The matrices at the interface
+				      * between two refinement levels,
 				      * coupling coarse to fine.*/
     MGLevelObject<SparseMatrix<double> > mg_interface_matrices_up;
 
@@ -109,7 +109,8 @@ class LaplaceProblem
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg) :
+LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg)
+		:
 		triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
 		fe (deg),
 		mg_dof_handler (triangulation),
@@ -198,8 +199,8 @@ void LaplaceProblem<dim>::setup_system ()
 	}
     }
 
-//And the same for the mg matrices 
-//for the interface. Note that there 
+//And the same for the mg matrices
+//for the interface. Note that there
 //is no such interface on the coarsest level
   for(unsigned int level=0; level<nlevels; ++level)
     {
@@ -213,11 +214,11 @@ void LaplaceProblem<dim>::setup_system ()
 				 // for the Poisson equation you have seen a
 				 // lot of times before.
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
-{  
+void LaplaceProblem<dim>::assemble_system ()
+{
   QGauss<dim>  quadrature_formula(1+degree);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values   | update_gradients |
 			   update_quadrature_points | update_JxW_values);
 
@@ -263,20 +264,20 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // the same as above. Only the loop
 				 // goes over all existing cells now
 				 // and the results must be entered
-				 // into the correct matrix. Here comes 
-                                 // the difference to global refinement 
-                                 // into play. We have to fill the interface 
+				 // into the correct matrix. Here comes
+                                 // the difference to global refinement
+                                 // into play. We have to fill the interface
                                  // matrices correctly.
 
 				 // Since we only do multi-level
 				 // preconditioning, no right-hand
 				 // side is assembled here.
 template <int dim>
-void LaplaceProblem<dim>::assemble_multigrid () 
-{  
+void LaplaceProblem<dim>::assemble_multigrid ()
+{
   QGauss<dim>  quadrature_formula(1+degree);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values   | update_gradients |
 			   update_quadrature_points | update_JxW_values);
 
@@ -319,7 +320,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 	.add_lines (boundary_interface_dofs[level]);
       boundary_interface_constraints[level].close ();
     }
-  
+
   typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
 					    endc = mg_dof_handler.end();
 
@@ -359,10 +360,10 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 	.distribute_local_to_global (cell_matrix,
 				     local_dof_indices,
 				     mg_matrices[level]);
-    
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if( !(interface_dofs[level][local_dof_indices[i]]==true && 
+	  if( !(interface_dofs[level][local_dof_indices[i]]==true &&
 		interface_dofs[level][local_dof_indices[j]]==false))
 	    cell_matrix(i,j) = 0;
 
@@ -374,7 +375,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 }
 
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void LaplaceProblem<dim>::solve ()
 {
 				   // Create a memory handler for
 				   // regular vectors. Note, that
@@ -564,7 +565,7 @@ void LaplaceProblem<dim>::refine_local ()
 		}
 	    }
 	}
-      else //erster Quadrant 
+      else //erster Quadrant
 	{
 	  const Point<dim> p = cell->center();
 	  bool positive = p(0) > 0;
@@ -609,7 +610,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 }
 
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<9; ++cycle)
     {
@@ -635,7 +636,7 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main () 
+int main ()
 {
   try
     {
@@ -657,7 +658,7 @@ int main ()
 
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"
