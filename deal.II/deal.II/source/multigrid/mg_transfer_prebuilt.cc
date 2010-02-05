@@ -321,6 +321,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				// the std::vector<std::pair<uint,uint> > that
 				// only contains the active dofs on the
 				// levels.
+
+  find_dofs_on_refinement_edges (mg_dof);
+
   copy_indices.resize(n_levels);
   std::vector<unsigned int> temp_copy_indices;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
@@ -349,7 +352,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 	  level_cell->get_mg_dof_indices (level_dof_indices);
 
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
+	    if(!dofs_on_refinement_edge[level][level_dof_indices[i]])
+	      temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
 	}
 
 				// now all the active dofs got a valid entry,
