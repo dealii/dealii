@@ -28,7 +28,6 @@ DEAL_II_NAMESPACE_OPEN
 
 /* --------------------- MGTransferPrebuilt -------------- */
 
-typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
 
 
 
@@ -50,6 +49,7 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   dst = 0;
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
   {
+    typedef std::map<unsigned int, unsigned int>::const_iterator IT;
     for (IT i= copy_indices[level].begin();
 	 i != copy_indices[level].end();++i)
       dst(i->first) = src[level](i->second);
@@ -76,9 +76,12 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
 				       // have fine level basis
 				       // functions
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
+  {
+    typedef std::map<unsigned int, unsigned int>::const_iterator IT;
     for (IT i= copy_indices[level].begin();
 	 i != copy_indices[level].end();++i)
       dst(i->first) += src[level](i->second);
+  }
 }
 
 
@@ -89,70 +92,6 @@ MGTransferPrebuilt<VECTOR>::
 set_component_to_block_map (const std::vector<unsigned int> &map)
 {
   component_to_block_map = map;
-}
-
-
-
-template <class VECTOR>
-template <int dim, int spacedim>
-void MGTransferPrebuilt<VECTOR>::find_dofs_on_refinement_edges (
-    const MGDoFHandler<dim,spacedim>& mg_dof)
-{
-  for (unsigned int level = 0; level<mg_dof.get_tria().n_levels(); ++level)
-  {
-    std::vector<bool> tmp (mg_dof.n_dofs(level));
-    dofs_on_refinement_edge.push_back (tmp);
-    dofs_on_refinement_boundary.push_back (tmp);
-  }
-
-  const unsigned int   dofs_per_cell   = mg_dof.get_fe().dofs_per_cell;
-  const unsigned int   dofs_per_face   = mg_dof.get_fe().dofs_per_face;
-
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  std::vector<unsigned int> face_dof_indices (dofs_per_face);
-
-  typename MGDoFHandler<dim>::cell_iterator cell = mg_dof.begin(),
-           endc = mg_dof.end();
-
-  for (; cell!=endc; ++cell)
-  {
-    std::vector<bool> cell_dofs(dofs_per_cell);
-    std::vector<bool> boundary_cell_dofs(dofs_per_cell);
-    const unsigned int level = cell->level();
-    cell->get_mg_dof_indices (local_dof_indices);
-    for (unsigned int face_nr=0;
-        face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
-    {
-      typename DoFHandler<dim>::face_iterator face = cell->face(face_nr);
-      if(!cell->at_boundary(face_nr))
-      {
-        //interior face
-        typename MGDoFHandler<dim>::cell_iterator neighbor
-          = cell->neighbor(face_nr);
-        // Do refinement face
-        // from the coarse side
-        if (neighbor->level() < cell->level())
-        {
-          for(unsigned int j=0; j<dofs_per_face; ++j)
-            cell_dofs[mg_dof.get_fe().face_to_cell_index(j,face_nr)] = true;
-        }
-      }
-      //boundary face
-      else
-        for(unsigned int j=0; j<dofs_per_face; ++j)
-          boundary_cell_dofs[mg_dof.get_fe().face_to_cell_index(j,face_nr)] = true;
-    }//faces
-    for(unsigned int i=0; i<dofs_per_cell; ++i)
-    {
-      if(cell_dofs[i])
-      {
-        dofs_on_refinement_edge[level][local_dof_indices[i]] = true;
-        dofs_on_refinement_boundary[level][local_dof_indices[i]] = true;
-      }
-      if(boundary_cell_dofs[i])
-        dofs_on_refinement_boundary[level][local_dof_indices[i]] = true;
-    }
-  }
 }
 
 template <class VECTOR>

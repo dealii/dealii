@@ -16,6 +16,7 @@
 #include <base/config.h>
 
 #include <lac/block_vector.h>
+#include <lac/constraint_matrix.h>
 #ifdef DEAL_PREFER_MATRIX_EZ
 #  include <lac/sparse_matrix_ez.h>
 #  include <lac/block_sparse_matrix_ez.h>
@@ -135,13 +136,13 @@ class MGTransferComponentBase
 				    * Start index of each component.
 				    */
     std::vector<unsigned int> component_start;
-  
+
 				   /**
 				    * Start index of each component on
 				    * all levels.
 				    */
     std::vector<std::vector<unsigned int> > mg_component_start;
-    
+
 				     /**
 				      * Call build_matrices()
 				      * function first.
@@ -164,12 +165,21 @@ class MGTransferComponentBase
     std::vector<std_cxx1x::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
     
 				     /**
-				      * Unused now, but intended to
-				      * hold the mapping for the
+				      * Holds the mapping for the
 				      * <tt>copy_to/from_mg</tt>-functions.
+				      * The data is first the global
+				      * index, then the level index.
 				      */
     std::vector<std::map<unsigned int, unsigned int> >
     copy_to_and_from_indices;
+
+				     /**
+                                      * Store the boundary_indices. 
+                                      * These are needed for the 
+                                      * boundary values in the 
+                                      * restriction matrix.
+				      */
+    std::vector<std::set<unsigned int> > boundary_indices;
 };
 
 //TODO:[GK] Update documentation for copy_* functions
@@ -191,6 +201,20 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 			 private MGTransferComponentBase
 {
   public:
+				     /**
+				      * Constructor without constraint
+				      * matrices. Use this constructor
+				      * only with discontinuous finite
+				      * elements or with no local
+				      * refinement.
+				      */
+    MGTransferSelect ();
+
+				     /**
+				      * Constructor with constraint matrices.
+				      */
+    MGTransferSelect (const ConstraintMatrix& constraints);
+
 				     /**
 				      * Destructor.
 				      */
@@ -233,6 +257,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * DoFRenumbering::component_wise). It
 				      * also affects the behavior of
 				      * the <tt>selected</tt> argument
+                                      *
+                                      * @arg boundary_indices: holds the
+                                      * boundary indices on each level.
 				      */
     template <int dim, int spacedim>
     void build_matrices (const DoFHandler<dim,spacedim> &dof,
@@ -242,7 +269,10 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 			 const std::vector<unsigned int>& target_component
 			 = std::vector<unsigned int>(),
 			 const std::vector<unsigned int>& mg_target_component
-			 = std::vector<unsigned int>());
+			 = std::vector<unsigned int>(),
+			 const std::vector<std::set<unsigned int> >& boundary_indices
+			 = std::vector<std::set<unsigned int> >()
+                         );
 
 				     /**
 				      * Change selected
@@ -352,8 +382,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     void
     do_copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
 		     OutVector                            &dst,
-		     const MGLevelObject<Vector<number> > &src,
-		     const unsigned int offset) const;
+		     const MGLevelObject<Vector<number> > &src) const;
 
 				     /**
 				      * Implementation of the public
@@ -363,8 +392,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     void
     do_copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
 			 OutVector                            &dst,
-			 const MGLevelObject<Vector<number> > &src,
-			 const unsigned int offset) const;
+			 const MGLevelObject<Vector<number> > &src) const;
 
 				     /**
 				      * Actual implementation of
@@ -374,8 +402,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     void
     do_copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
 		   MGLevelObject<Vector<number> > &dst,
-		   const InVector                 &src,
-		   const unsigned int              offset) const;
+		   const InVector                 &src) const;
                                      /**
                                       * Selected component of global vector.
                                       */
@@ -384,6 +411,25 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
                                       * Selected component inside multigrid.
                                       */
     unsigned int mg_selected_component;
+
+				     /**
+				      * The degrees of freedom on the
+				      * the refinement edges. For each
+				      * level (outer vector) and each
+				      * dof index (inner vector), this
+				      * bool is true if the level
+				      * degree of freedom is on the
+				      * refinement edge towards the
+				      * lower level excluding boundary dofs.
+				      */
+    std::vector<std::vector<bool> > interface_dofs;
+
+				     /**
+				      * The constraints of the global
+				      * system.
+				      */
+  public:
+    SmartPointer<const ConstraintMatrix> constraints;
 };
 
 /*@}*/

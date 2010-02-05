@@ -16,7 +16,7 @@
 
 #include <base/logstream.h>
 
-#include "iostream"
+#include <iostream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -141,8 +141,11 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
     deallog << "Smoothing on     level " << level << std::endl;
 				   // smoothing of the residual by
 				   // modifying s
+//  defect[level].print(std::cout, 2,false);
+//  std::cout<<std::endl;
   pre_smooth->smooth(level, solution[level], defect[level]);
-  
+//  solution[level].print(std::cout, 2,false);
+
   if (debug>2)
     deallog << "Solution norm          " << solution[level].l2_norm()
 	    << std::endl;
@@ -151,6 +154,8 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
     deallog << "Residual on      level " << level << std::endl;
 				   // t = A*solution[level]
   matrix->vmult(level, t[level], solution[level]);
+//  std::cout<<std::endl;
+//  t[level].print(std::cout, 2,false);
   
 				   // make t rhs of lower level The
 				   // non-refined parts of the
@@ -161,13 +166,18 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
     {
       t[l-1] = 0.;
       if (l==level && edge_out != 0)
-	edge_out->vmult_add(level, t[level], solution[level]);
-      
+      {
+        edge_out->vmult_add(level, t[level], solution[level]);
+        deallog << "Norm t[" << level << "] " << t[level].l2_norm() << std::endl;
+      }
+
       if (l==level && edge_down != 0)
  	edge_down->vmult(level, t[level-1], solution[level]);
       
       transfer->restrict_and_add (l, t[l-1], t[l]);
+      deallog << "restrict t[" << l-1 << "] " << t[l-1].l2_norm() << std::endl;
       defect[l-1] -= t[l-1];
+      deallog << "defect d[" << l-1 << "] " << defect[l-1].l2_norm() << std::endl;
     }
   
 				   // do recursion
@@ -198,14 +208,19 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
    }
   
   if (debug>2)
-    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
+    deallog << "V-cycle  Defect norm hier  " << defect[level].l2_norm()
 	    << std::endl;
   
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
 				   // post-smoothing
+
+//  std::cout<<std::endl;
+//  defect[level].print(std::cout, 2,false);
   post_smooth->smooth(level, solution[level], defect[level]);
-  
+//  solution[level].print(std::cout, 2,false);
+//  std::cout<<std::endl;
+
   if (debug>2)
     deallog << "Solution norm          " << solution[level].l2_norm()
 	    << std::endl;

@@ -243,6 +243,7 @@ class MGTools
       std::vector<std::set<unsigned int> >& boundary_indices,
       const std::vector<bool>& component_mask = std::vector<bool>());
                                       /**
+                                       * Maybe no longer needed.
                                        */
 
     template <typename number>
@@ -282,6 +283,16 @@ class MGTools
     extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 				  std::vector<std::vector<bool> >  &interface_dofs,
 				  std::vector<std::vector<bool> >  &boundary_interface_dofs);
+
+				     /**
+                                      * Does the same as the function above, 
+                                      * but fills only the interface_dofs.
+				      */
+    template <int dim, int spacedim>
+    static
+    void
+    extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+				  std::vector<std::vector<bool> >  &interface_dofs);
 };
 
 /*@}*/

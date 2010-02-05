@@ -22,8 +22,11 @@
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_tools.h>
 #include <multigrid/mg_transfer_component.h>
+#include <numerics/data_out.h>
 
 #include <algorithm>
+#include <sstream>
+#include <fstream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -39,7 +42,7 @@ MGTransferSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const BlockVector<number2>     &src) const
 {
-  do_copy_to_mg (mg_dof_handler, dst, src, 0);
+  do_copy_to_mg (mg_dof_handler, dst, src);
 }
 
 
@@ -52,7 +55,7 @@ MGTransferSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const Vector<number2>          &src) const
 {
-  do_copy_to_mg (mg_dof_handler, dst, src, component_start[selected_component]);
+  do_copy_to_mg (mg_dof_handler, dst, src);
 }
 
 
@@ -65,7 +68,9 @@ MGTransferSelect<number>::copy_from_mg (
   BlockVector<number2>&                 dst,
   const MGLevelObject<Vector<number> >& src) const
 {
-  do_copy_from_mg (mg_dof_handler, dst, src, 0);
+  do_copy_from_mg (mg_dof_handler, dst, src);
+  if (constraints != 0)
+    constraints->condense(dst);
 }
 
 
@@ -78,8 +83,30 @@ MGTransferSelect<number>::copy_from_mg (
   Vector<number2>&                      dst,
   const MGLevelObject<Vector<number> >& src) const
 {
-  do_copy_from_mg (mg_dof_handler, dst, src,
-		   component_start[selected_component]);
+  do_copy_from_mg (mg_dof_handler, dst, src);
+  if (constraints != 0)
+  {
+    //If we were given constraints 
+    //apply them to the dst that goes 
+    //back now to the linear solver.
+    //Since constraints are globally
+    //defined create a global vector here
+    //and copy dst to the right component, 
+    //apply the constraints then and copy 
+    //the block back to dst.
+    const unsigned int n_blocks = 
+      *std::max_element(target_component.begin(), target_component.end()) + 1;
+    std::vector<unsigned int> dofs_per_block (n_blocks);
+    DoFTools::count_dofs_per_block (mg_dof_handler, dofs_per_block, target_component);
+    BlockVector<number> tmp;
+    tmp.reinit(n_blocks);
+    for(unsigned int b=0; b<n_blocks; ++b)
+      tmp.block(b).reinit(dofs_per_block[b]);
+    tmp.collect_sizes ();
+    tmp.block(target_component[selected_component]) = dst;
+    constraints->condense(tmp);
+    dst = tmp.block(target_component[selected_component]);
+  }
 }
 
 
@@ -92,7 +119,7 @@ MGTransferSelect<number>::copy_from_mg_add (
   BlockVector<number2>&                 dst,
   const MGLevelObject<Vector<number> >& src) const
 {
-  do_copy_from_mg_add (mg_dof_handler, dst, src, 0);
+  do_copy_from_mg_add (mg_dof_handler, dst, src);
 }
 
 
@@ -105,8 +132,7 @@ MGTransferSelect<number>::copy_from_mg_add (
   Vector<number2>&                      dst,
   const MGLevelObject<Vector<number> >& src) const
 {
-  do_copy_from_mg_add (mg_dof_handler, dst, src,
-		       component_start[selected_component]);
+  do_copy_from_mg_add (mg_dof_handler, dst, src);
 }
 
 
@@ -117,14 +143,13 @@ void
 MGTransferSelect<number>::do_copy_from_mg (
   const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
   OutVector                            &dst,
-  const MGLevelObject<Vector<number> > &src,
-  const unsigned int offset) const
+  const MGLevelObject<Vector<number> > &src) const
 {
-  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+//  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
+//  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+//  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+//  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
   typename MGDoFHandler<dim,spacedim>::active_cell_iterator
     level_cell = mg_dof_handler.begin_active();
@@ -137,34 +162,16 @@ MGTransferSelect<number>::do_copy_from_mg (
 
 				   // Note that the level is
 				   // monotonuosly increasing
+  dst = 0;
   for (; level_cell != endc; ++level_cell)
-    {
-      const unsigned int level = level_cell->level();
-
-				       // get the dof numbers of
-				       // this cell for the global
-				       // and the level-wise
-				       // numbering
-      level_cell->get_dof_indices (global_dof_indices);
-      level_cell->get_mg_dof_indices(level_dof_indices);
-
-				       // copy level-wise data to
-				       // global vector
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  const unsigned int component
-	    = mg_target_component[fe.system_to_component_index(i).first];
-	if (mg_selected[component])
-	  {
-	    const unsigned int level_start
-	      = mg_component_start[level][component];
-	    dst(global_dof_indices[i] - offset)
-	      = src[level](level_dof_indices[i]-level_start);
-	  }
-	}
-    }
+  {
+    const unsigned int level = level_cell->level();
+    typedef std::map<unsigned int, unsigned int>::const_iterator IT;
+    for (IT i=copy_to_and_from_indices[level].begin();
+        i != copy_to_and_from_indices[level].end(); ++i)
+      dst(i->first) = src[level](i->second);
+  }
 }
-
 
 
 template <typename number>
@@ -173,8 +180,7 @@ void
 MGTransferSelect<number>::do_copy_from_mg_add (
   const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
   OutVector                            &dst,
-  const MGLevelObject<Vector<number> > &src,
-  const unsigned int offset) const
+  const MGLevelObject<Vector<number> > &src) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
@@ -193,30 +199,14 @@ MGTransferSelect<number>::do_copy_from_mg_add (
 
 				   // Note that the level is
 				   // monotonuosly increasing
+  dst = 0;
   for (; level_cell != endc; ++level_cell)
     {
       const unsigned int level = level_cell->level();
-
-				       // get the dof numbers of
-				       // this cell for the global
-				       // and the level-wise
-				       // numbering
-      level_cell->get_dof_indices (global_dof_indices);
-      level_cell->get_mg_dof_indices(level_dof_indices);
-				       // copy level-wise data to
-				       // global vector
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  const unsigned int component
-	    = mg_target_component[fe.system_to_component_index(i).first];
-	  if (mg_selected[component])
-	    {
-	      const unsigned int level_start
-		= mg_component_start[level][component];
-	      dst(global_dof_indices[i] - offset)
-		+= src[level](level_dof_indices[i] - level_start);
-	    }
-	}
+      typedef std::map<unsigned int, unsigned int>::const_iterator IT;
+      for (IT i=copy_to_and_from_indices[level].begin();
+        i != copy_to_and_from_indices[level].end(); ++i)
+	      dst(i->first) += src[level](i->second);
     }
 }
 

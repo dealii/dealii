@@ -86,7 +86,9 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * matrices for each level.
 				      */
     template <int dim, int spacedim>
-    void build_matrices (const MGDoFHandler<dim,spacedim> &mg_dof);
+    void build_matrices (const MGDoFHandler<dim,spacedim> &mg_dof,
+    const std::vector<std::set<unsigned int> >&boundary_indices
+        );
 
     virtual void prolongate (const unsigned int    to_level,
 			     VECTOR       &dst,
@@ -220,7 +222,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * The data is first the global
 				      * index, then the level index.
 				     */
-    std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+    std::vector<std::map<unsigned int, unsigned int> >
       copy_indices;
 
 				     /**
@@ -232,35 +234,11 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
     std::vector<unsigned int> component_to_block_map;
 
 				     /**
-				      * Fill the two boolean vectors
-				      * #dofs_on_refinement_edge and
-				      * #dofs_on_refinement_boundary.
-				      */
-    template <int dim, int spacedim>
-    void find_dofs_on_refinement_edges (
-        const MGDoFHandler<dim,spacedim>& mg_dof);
-
-				     /**
 				      * Degrees of freedom on the
 				      * refinement edge excluding
 				      * those on the boundary.
-				      *
-				      * @todo Clean up names
 				      */
-    std::vector<std::vector<bool> > dofs_on_refinement_edge;
-				     /**
-				      * The degrees of freedom on the
-				      * the refinement edges. For each
-				      * level (outer vector) and each
-				      * dof index (inner vector), this
-				      * bool is true if the level
-				      * degree of freedom is on the
-				      * refinement edge towards the
-				      * lower level.
-				      *
-				      * @todo Clean up names
-				      */
-    std::vector<std::vector<bool> > dofs_on_refinement_boundary;
+    std::vector<std::vector<bool> > interface_dofs;
 				     /**
 				      * The constraints of the global
 				      * system.
