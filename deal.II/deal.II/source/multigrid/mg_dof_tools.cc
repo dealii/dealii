@@ -63,7 +63,6 @@ MGTools::compute_row_length_vector(
   Assert(false, ExcNotImplemented());
 }
 
-
 #else
 
 // Template for 2D and 3D. For 1D see specialization above
@@ -1299,6 +1298,31 @@ MGTools::make_boundary_list(
 #endif
 
 
+#if deal_II_dimension == 1
+
+template <int dim, int spacedim>
+void
+MGTools::
+extract_inner_interface_dofs (
+  const MGDoFHandler<dim,spacedim>&,
+  std::vector<std::vector<bool> > &,
+  std::vector<std::vector<bool> > &)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+template <int dim, int spacedim>
+void
+MGTools::
+extract_inner_interface_dofs (
+  const MGDoFHandler<dim,spacedim>&,
+  std::vector<std::vector<bool> > &)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+#else
 
 template <int dim, int spacedim>
 void
@@ -1459,6 +1483,7 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
     }
 }
 
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE
@@ -1530,7 +1555,6 @@ template void MGTools::make_boundary_list(
   std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&);
 
-#if deal_II_dimension > 1
 template
 void
 MGTools::
@@ -1542,6 +1566,5 @@ void
 MGTools::
 extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
 			      std::vector<std::vector<bool> >  &interface_dofs);
-#endif
 
 DEAL_II_NAMESPACE_CLOSE
