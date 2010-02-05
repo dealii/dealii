@@ -1,3 +1,12 @@
+<br>
+
+<i>This program has evolved from a version originally written by Guido
+Kanschat in 2003. It has undergone significant revisions by B&auml;rbel
+Janssen, Guido Kanschat and Wolfgang Bangerth in 2009 and 2010 to demonstrate
+multigrid algorithms on adaptively refined meshes.
+</i>
+
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
