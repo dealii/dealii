@@ -30,7 +30,6 @@
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>
 
-#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -1072,7 +1071,10 @@ MGTools::count_dofs_per_block (
       std::vector<std::vector<bool> >
 	dofs_in_block (n_blocks, std::vector<bool>(dof_handler.n_dofs(l), false));
       std::vector<std::vector<bool> >
-	block_select (n_blocks, std::vector<bool>(n_blocks, false));
+	block_select;
+     block_select.resize(n_blocks);
+     for (int iii=0;iii<n_blocks;++iii)
+       block_select[iii].resize(n_blocks, false);
       Threads::TaskGroup<> tasks;
       for (unsigned int i=0; i<n_blocks; ++i)
 	{
@@ -1301,6 +1303,68 @@ MGTools::make_boundary_list(
 
 
 
+template <int dim, int spacedim>
+void
+MGTools::
+extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+			      std::vector<std::vector<bool> >  &interface_dofs)
+{
+  Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
+	  ExcDimensionMismatch (interface_dofs.size(),
+				mg_dof_handler.get_tria().n_levels()));
+
+  for (unsigned int l=0; l<mg_dof_handler.get_tria().n_levels(); ++l)
+    {
+      Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
+	      ExcDimensionMismatch (interface_dofs[l].size(),
+				    mg_dof_handler.n_dofs(l)));
+
+      std::fill (interface_dofs[l].begin(),
+		 interface_dofs[l].end(),
+		 false);
+    }
+
+  const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
+
+  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+  const unsigned int   dofs_per_face   = fe.dofs_per_face;
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<bool> cell_dofs(dofs_per_cell, false);
+
+  typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+					    endc = mg_dof_handler.end();
+
+  for (; cell!=endc; ++cell)
+    {
+      std::fill (cell_dofs.begin(), cell_dofs.end(), false);
+
+      for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
+	{
+	  const typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_nr);
+	  if (!face->at_boundary())
+	    {
+					       //interior face
+	      const typename MGDoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face_nr);
+
+	      if (neighbor->level() < cell->level())
+		{
+		  for (unsigned int j=0; j<dofs_per_face; ++j)
+		    cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+
+		}
+	    }
+	}
+
+      const unsigned int level = cell->level();
+      cell->get_mg_dof_indices (local_dof_indices);
+
+      for(unsigned int i=0; i<dofs_per_cell; ++i)
+	  if (cell_dofs[i])
+	    interface_dofs[level][local_dof_indices[i]] = true;
+    }
+}
 
 
 template <int dim, int spacedim>
@@ -1380,7 +1444,7 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 	for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
 	  if(cell->at_boundary(face_nr))
 	    for(unsigned int j=0; j<dofs_per_face; ++j)
-	      if (cell_dofs[fe.face_to_cell_index(j,face_nr)] == true)
+	      if (cell_dofs[fe.face_to_cell_index(j,face_nr)] == true) //is this necessary?
 		boundary_cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
 
 
@@ -1476,6 +1540,11 @@ MGTools::
 extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
 			      std::vector<std::vector<bool> >  &interface_dofs,
 			      std::vector<std::vector<bool> >  &boundary_interface_dofs);
+template
+void
+MGTools::
+extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
+			      std::vector<std::vector<bool> >  &interface_dofs);
 #endif
 
 DEAL_II_NAMESPACE_CLOSE
