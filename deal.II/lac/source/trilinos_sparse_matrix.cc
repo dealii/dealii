@@ -465,12 +465,14 @@ namespace TrilinosWrappers
 	  const int row_length = sparsity_pattern.row_length(row);
 	  row_indices.resize (row_length, -1);
 
-	  for (int col=0; col < row_length; ++col)
-	    row_indices[col] = sparsity_pattern.column_number (row, col);
+	  typename SparsityType::row_iterator col_num = 
+	    sparsity_pattern.row_begin (row),
+	    row_end = sparsity_pattern.row_end(row);
+	  for (unsigned int col = 0; col_num != row_end; ++col_num, ++col)
+	    row_indices[col] = *col_num;
 
-	  graph->InsertGlobalIndices (static_cast<int>(row),
-				      row_length, &row_indices[0]);
-
+	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
+						       &row_indices[0]);
 	}
 
 				  // Eventually, optimize the graph
@@ -514,93 +516,6 @@ namespace TrilinosWrappers
 
 
 
-				   // The CompressedSetSparsityPattern
-				   // class stores the columns
-				   // differently, so we need to
-				   // explicitly rewrite this function
-				   // in that case.
-  template<>
-  void
-  SparseMatrix::reinit (const Epetra_Map                    &input_row_map,
-			const Epetra_Map                    &input_col_map,
-			const CompressedSetSparsityPattern  &sparsity_pattern,
-			const bool                           exchange_data)
-  {
-				   // this function is similar to the other
-				   // reinit function with sparsity pattern
-				   // argument. See there for additional
-				   // comments.
-    matrix.reset();
-
-    const unsigned int n_rows = sparsity_pattern.n_rows();
-
-    Assert (exchange_data == false, ExcInternalError());
-    if (input_row_map.Comm().MyPID() == 0)
-      {
-	Assert (input_row_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
-		ExcDimensionMismatch (input_row_map.NumGlobalElements(),
-				      sparsity_pattern.n_rows()));
-	Assert (input_col_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
-		ExcDimensionMismatch (input_col_map.NumGlobalElements(),
-				      sparsity_pattern.n_cols()));
-      }
-
-    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
-
-    std::vector<int> n_entries_per_row(n_rows);
-
-    for (unsigned int row=0; row<n_rows; ++row)
-      n_entries_per_row[row] = sparsity_pattern.row_length(row);
-
-    std::auto_ptr<Epetra_CrsGraph> graph;
-    if (input_row_map.Comm().NumProc() > 1)
-      graph = std::auto_ptr<Epetra_CrsGraph>
-	(new Epetra_CrsGraph (Copy, input_row_map,
-			      &n_entries_per_row[input_row_map.MinMyGID()], true));
-    else
-      graph = std::auto_ptr<Epetra_CrsGraph>
-	(new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
-			      &n_entries_per_row[input_row_map.MinMyGID()], true));
-
-    Assert (graph->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
-    	    ExcDimensionMismatch (graph->NumGlobalRows(),
-    				  sparsity_pattern.n_rows()));
-
-    std::vector<int>   row_indices;
-
-    for (unsigned int row=0; row<n_rows; ++row)
-      if (input_row_map.MyGID(row))
-	{
-	  const int row_length = sparsity_pattern.row_length(row);
-	  row_indices.resize (row_length, -1);
-
-	  CompressedSetSparsityPattern::row_iterator col_num =
-	    sparsity_pattern.row_begin (row);
-
-	  for (unsigned int col = 0;
-	       col_num != sparsity_pattern.row_end (row);
-	       ++col_num, ++col)
-	    row_indices[col] = *col_num;
-
-	  graph->InsertGlobalIndices (row, row_length, &row_indices[0]);
-	}
-
-    graph->FillComplete(input_col_map, input_row_map);
-    graph->OptimizeStorage();
-
-    Assert (graph->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
-	    ExcDimensionMismatch (graph->NumGlobalCols(),
-				  sparsity_pattern.n_cols()));
-
-    matrix =  std::auto_ptr<Epetra_FECrsMatrix>
-                       (new Epetra_FECrsMatrix(Copy, *graph, false));
-
-    last_action = Zero;
-    compress();
-  }
-
-
-
   void
   SparseMatrix::reinit (const SparsityPattern &sparsity_pattern)
   {
@@ -639,7 +554,8 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
 			const double                          drop_tolerance,
-			const bool                            copy_values)
+			const bool                            copy_values,
+			const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     const Epetra_Map rows (dealii_sparse_matrix.m(),
 			   0,
@@ -647,7 +563,8 @@ namespace TrilinosWrappers
     const Epetra_Map columns (dealii_sparse_matrix.n(),
 			      0,
 			      Utilities::Trilinos::comm_self());
-    reinit (rows, columns, dealii_sparse_matrix, drop_tolerance, copy_values);
+    reinit (rows, columns, dealii_sparse_matrix, drop_tolerance, 
+	    copy_values, use_this_sparsity);
   }
 
 
@@ -657,10 +574,11 @@ namespace TrilinosWrappers
   SparseMatrix::reinit (const Epetra_Map                     &input_map,
 			const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
 			const double                          drop_tolerance,
-			const bool                            copy_values)
+			const bool                            copy_values,
+			const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     reinit (input_map, input_map, dealii_sparse_matrix, drop_tolerance,
-	    copy_values);
+	    copy_values, use_this_sparsity);
   }
 
 
@@ -671,7 +589,8 @@ namespace TrilinosWrappers
 			const Epetra_Map                     &input_col_map,
 			const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
 			const double                          drop_tolerance,
-			const bool                            copy_values)
+			const bool                            copy_values,
+			const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     matrix.reset();
 
@@ -679,8 +598,12 @@ namespace TrilinosWrappers
       {
 				   // in case we do not copy values, just
 				   // call the other function.
-	reinit (input_row_map, input_col_map,
-		dealii_sparse_matrix.get_sparsity_pattern());
+	if (use_this_sparsity == 0)
+	  reinit (input_row_map, input_col_map,
+		  dealii_sparse_matrix.get_sparsity_pattern());
+	else
+	  reinit (input_row_map, input_col_map,
+		  *use_this_sparsity);
 	return;
       }
 
@@ -695,39 +618,114 @@ namespace TrilinosWrappers
 
     column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
 
+    const ::dealii::SparsityPattern & sparsity_pattern = 
+      (use_this_sparsity!=0)? *use_this_sparsity : 
+      dealii_sparse_matrix.get_sparsity_pattern();
+
     std::vector<int> n_entries_per_row(n_rows);
 
-    for (unsigned int row=0; row<n_rows; ++row)
-      n_entries_per_row[(int)row] =
-	  dealii_sparse_matrix.get_sparsity_pattern().row_length(row);
-
-    matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	        (new Epetra_FECrsMatrix(Copy, input_row_map,
-					&n_entries_per_row[input_row_map.MinMyGID()],
-					false));
-
-    std::vector<TrilinosScalar> values;
-    std::vector<unsigned int>   row_indices;
-
+    unsigned int maximum_row_length = 0;
     for (unsigned int row=0; row<n_rows; ++row)
       {
-	values.resize (n_entries_per_row[row],0.);
-	row_indices.resize (n_entries_per_row[row],
-			    numbers::invalid_unsigned_int);
+	const unsigned int row_length = sparsity_pattern.row_length(row);
+	if (row_length > maximum_row_length)
+	  maximum_row_length = row_length;
+	n_entries_per_row[row] = row_length;
+      }
 
-	unsigned int index = 0;
-	for (typename ::dealii::SparseMatrix<number>::const_iterator
-	      p  = dealii_sparse_matrix.begin(row);
-	      p != dealii_sparse_matrix.end(row); ++p)
-	  if (std::fabs(p->value()) > drop_tolerance)
+    std::auto_ptr<Epetra_CrsGraph> graph;
+    if (input_row_map.Comm().NumProc() > 1)
+      graph = std::auto_ptr<Epetra_CrsGraph>
+	(new Epetra_CrsGraph (Copy, input_row_map,
+			      &n_entries_per_row[input_row_map.MinMyGID()], false));
+    else
+      graph = std::auto_ptr<Epetra_CrsGraph>
+	(new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
+			      &n_entries_per_row[input_row_map.MinMyGID()], false));
+
+    Assert (graph->NumGlobalRows() == static_cast<int>(n_rows),
+    	    ExcDimensionMismatch (graph->NumGlobalRows(), n_rows));
+
+				   // now insert the indices
+    std::vector<int>   row_indices (maximum_row_length);
+    for (unsigned int row=0; row<n_rows; ++row)
+      if (input_row_map.MyGID(row))
+	{
+	  typename ::dealii::SparsityPattern::row_iterator 
+	    col_num = sparsity_pattern.row_begin (row),
+	    row_end = sparsity_pattern.row_end(row);
+	  typename ::dealii::SparseMatrix<number>::const_iterator
+	    matrix_col_num = dealii_sparse_matrix.begin(row),
+	    matrix_row_end = dealii_sparse_matrix.end(row);
+
+	  unsigned int col = 0;
+	  if (sparsity_pattern.optimize_diagonal())
 	    {
-	      row_indices[index] = p->column();
-	      values[index]      = p->value();
-	      ++index;
+	      row_indices[col++] = row;
+	      ++col_num;
+	      ++ matrix_col_num;
+	    }
+	  while (col_num != row_end && matrix_col_num != matrix_row_end)
+	    {
+	      while (*col_num < matrix_col_num->column() && col_num != row_end)
+		++col_num;
+	      while (*col_num > matrix_col_num->column() && matrix_col_num != matrix_row_end)
+		++matrix_col_num;
+
+	      if (std::fabs(matrix_col_num->value()) > drop_tolerance)
+		row_indices[col++] = *col_num;
+	      ++col_num;
+	      ++matrix_col_num;
 	    }
 
-	set (row, index, &row_indices[0], &values[0], false);
-      }
+	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, col,
+						       &row_indices[0]);
+	}
+    graph->FillComplete(input_col_map, input_row_map);
+    graph->OptimizeStorage();
+
+    matrix =  std::auto_ptr<Epetra_FECrsMatrix>
+                       (new Epetra_FECrsMatrix(Copy, *graph, false));
+    compress();
+
+    std::vector<TrilinosScalar> values (maximum_row_length);
+
+    for (unsigned int row=0; row<n_rows; ++row)
+      if (input_row_map.MyGID(row))
+	{
+	  typename ::dealii::SparsityPattern::row_iterator 
+	    col_num = sparsity_pattern.row_begin (row),
+	    row_end = sparsity_pattern.row_end(row);
+	  typename ::dealii::SparseMatrix<number>::const_iterator
+	    matrix_col_num = dealii_sparse_matrix.begin(row),
+	    matrix_row_end = dealii_sparse_matrix.end(row);
+
+	  unsigned int col = 0;
+	  if (sparsity_pattern.optimize_diagonal())
+	    {
+	      values[col] = matrix_col_num->value();
+	      row_indices[col++] = row;
+	      ++col_num;
+	      ++ matrix_col_num;
+	    }
+	  while (col_num != row_end && matrix_col_num != matrix_row_end)
+	    {
+	      while (*col_num < matrix_col_num->column() && col_num != row_end)
+		++col_num;
+	      while (*col_num > matrix_col_num->column() && matrix_col_num != matrix_row_end)
+		++matrix_col_num;
+
+	      if (std::fabs(matrix_col_num->value()) > drop_tolerance)
+		{
+		  values[col] = matrix_col_num->value();
+		  row_indices[col++] = *col_num;
+		}
+	      ++col_num;
+	      ++matrix_col_num;
+	    }
+	  set (row, col, reinterpret_cast<unsigned int*>(&row_indices[0]), 
+	       &values[0], false);
+	}
 
     compress();
   }
@@ -1467,54 +1465,73 @@ namespace TrilinosWrappers
 			const Epetra_Map &,
 			const CompressedSparsityPattern &,
 			const bool);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const Epetra_Map &,
+			const CompressedSimpleSparsityPattern &,
+			const bool);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const Epetra_Map &,
+			const CompressedSetSparsityPattern &,
+			const bool);
 
   template void
   SparseMatrix::reinit (const dealii::SparseMatrix<float> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
   template void
   SparseMatrix::reinit (const dealii::SparseMatrix<double> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
   template void
   SparseMatrix::reinit (const dealii::SparseMatrix<long double> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
 
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const dealii::SparseMatrix<float> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const dealii::SparseMatrix<double> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const dealii::SparseMatrix<long double> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
 
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const Epetra_Map &,
 			const dealii::SparseMatrix<float> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const Epetra_Map &,
 			const dealii::SparseMatrix<double> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const Epetra_Map &,
 			const dealii::SparseMatrix<long double> &,
 			const double,
-			const bool);
+			const bool,
+			const dealii::SparsityPattern *);
 
 
 }

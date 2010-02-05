@@ -645,7 +645,8 @@ namespace TrilinosWrappers
   PreconditionAMG::
   initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
 	      const AdditionalData                 &additional_data,
-	      const double                          drop_tolerance)
+	      const double                          drop_tolerance,
+	      const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
 
@@ -658,11 +659,12 @@ namespace TrilinosWrappers
     Matrix.reset();
     Matrix = std_cxx1x::shared_ptr<SparseMatrix> (new SparseMatrix());
 
-    Matrix->reinit (*map, deal_ii_sparse_matrix, drop_tolerance);
-    Matrix->compress();
+    Matrix->reinit (*map, *map, deal_ii_sparse_matrix, drop_tolerance, true,
+		    use_this_sparsity);
 
     initialize (*Matrix, additional_data);
   }
+
 
 
   void PreconditionAMG::reinit ()
@@ -671,13 +673,27 @@ namespace TrilinosWrappers
   }
 
 
+  unsigned int PreconditionAMG::memory_consumption() const
+  {
+    unsigned int memory = sizeof(this);
+
+				// todo: find a way to read out ML's data
+				// sizes
+    if (Matrix != 0)
+      memory += Matrix->memory_consumption();
+    return memory;
+  }
+
+
 
 
 				// explicit instantiations
   template void PreconditionAMG::initialize (const ::dealii::SparseMatrix<double> &,
-					     const AdditionalData &, const double);
+					     const AdditionalData &, const double,
+					     const ::dealii::SparsityPattern*);
   template void PreconditionAMG::initialize (const ::dealii::SparseMatrix<float> &,
-					     const AdditionalData &, const double);
+					     const AdditionalData &, const double,
+					     const ::dealii::SparsityPattern*);
 
 }
 

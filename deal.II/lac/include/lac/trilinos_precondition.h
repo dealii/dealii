@@ -49,6 +49,7 @@ DEAL_II_NAMESPACE_OPEN
 // forward declarations
 template <typename number> class SparseMatrix;
 template <typename number> class Vector;
+class SparsityPattern;
 
 /*! @addtogroup TrilinosWrappers
  *@{
@@ -1465,7 +1466,8 @@ namespace TrilinosWrappers
       template <typename number>
       void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
 		       const AdditionalData                 &additional_data = AdditionalData(),
-		       const double                          drop_tolerance = 1e-13);
+		       const double                          drop_tolerance = 1e-13,
+		       const ::dealii::SparsityPattern      *use_this_sparsity = 0);
 
 				       /**
 					* This function can be used for a
@@ -1491,6 +1493,12 @@ namespace TrilinosWrappers
 				        * preconditioner.
 					*/
       void reinit ();
+
+				       /**
+					* Prints an estimate of the memory
+					* consumption of this class.
+					*/
+      unsigned int memory_consumption () const;
 
     private:
 

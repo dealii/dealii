@@ -45,6 +45,7 @@ DEAL_II_NAMESPACE_OPEN
 template <typename MatrixType> class BlockMatrixBase;
 
 template <typename number> class SparseMatrix;
+class SparsityPattern;
 
 namespace TrilinosWrappers
 {
@@ -474,7 +475,8 @@ namespace TrilinosWrappers
       template <typename number>
       void reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
 		   const double                          drop_tolerance=1e-13,
-		   const bool                            copy_values=true);
+		   const bool                            copy_values=true,
+		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 
                                        /**
 					* This reinit function takes as
@@ -485,93 +487,6 @@ namespace TrilinosWrappers
 					*/
       void reinit (const Epetra_CrsMatrix &input_matrix,
 		   const bool              copy_values = true);
-
-                                       /**
-                                        * This operator assigns a scalar to
-                                        * a matrix. Since this does usually
-                                        * not make much sense (should we set
-                                        * all matrix entries to this value?
-                                        * Only the nonzero entries of the
-                                        * sparsity pattern?), this operation
-                                        * is only allowed if the actual
-                                        * value to be assigned is zero. This
-                                        * operator only exists to allow for
-                                        * the obvious notation
-                                        * <tt>matrix=0</tt>, which sets all
-                                        * elements of the matrix to zero,
-                                        * but keeps the sparsity pattern
-                                        * previously used.
-                                        */
-      SparseMatrix &
-	operator = (const double d);
-
-                                       /**
-                                        * Release all memory and return to a
-                                        * state just like after having
-                                        * called the default constructor.
-					*
-					* This is a collective operation
-				        * that needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
-                                        */
-      void clear ();
-
-                                       /**
-					* This command does two things:
-					* <ul>
-					* <li> If the matrix was initialized
-					* without a sparsity pattern,
-					* elements have been added manually
-					* using the set() command. When this
-					* process is completed, a call to
-					* compress() reorganizes the
-					* internal data structures (aparsity
-					* pattern) so that a fast access to
-					* data is possible in matrix-vector
-					* products.
-					* <li> If the matrix structure has
-					* already been fixed (either by
-					* initialization with a sparsity
-					* pattern or by calling compress()
-					* during the setup phase), this
-					* command does the %parallel
-					* exchange of data. This is
-					* necessary when we perform assembly
-					* on more than one (MPI) process,
-					* because then some non-local row
-					* data will accumulate on nodes that
-					* belong to the current's processor
-					* element, but are actually held by
-					* another. This command is usually
-					* called after all elements have
-					* been traversed.
-					* </ul>
-					*
-                                        * In both cases, this function
-                                        * compresses the data structures and
-                                        * allows the resulting matrix to be
-                                        * used in all other operations like
-                                        * matrix-vector products. This is a
-                                        * collective operation, i.e., it
-                                        * needs to be run on all processors
-                                        * when used in %parallel.
-					*
-					* See @ref GlossCompress "Compressing distributed objects"
-					* for more information.
-                                        */
-      void compress ();
-
-				       /**
-					* Returns the state of the matrix,
-					* i.e., whether compress() needs to
-					* be called after an operation
-					* requiring data exchange. A call to
-					* compress() is also needed when the
-					* method set() has been called (even
-					* when working in serial).
-					*/
-      bool is_compressed () const;
 //@}
 /**
  * @name Constructors and initialization using an Epetra_Map description
@@ -787,7 +702,8 @@ namespace TrilinosWrappers
       void reinit (const Epetra_Map                     &parallel_partitioning,
 		   const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
 		   const double                          drop_tolerance=1e-13,
-		   const bool                            copy_values=true);
+		   const bool                            copy_values=true,
+		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 
  				       /**
                                         * This function is similar to the
@@ -815,7 +731,8 @@ namespace TrilinosWrappers
 		   const Epetra_Map                      &col_parallel_partitioning,
 		   const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
 		   const double                           drop_tolerance=1e-13,
-		   const bool                             copy_values=true);
+		   const bool                             copy_values=true,
+		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 //@}
 /**
  * @name Constructors and initialization using an IndexSet description
@@ -1039,7 +956,8 @@ namespace TrilinosWrappers
 		   const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
 		   const MPI_Comm                       &communicator = MPI_COMM_WORLD,
 		   const double                          drop_tolerance=1e-13,
-		   const bool                            copy_values=true);
+		   const bool                            copy_values=true,
+		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 
  				       /**
                                         * This function is similar to the
@@ -1068,7 +986,8 @@ namespace TrilinosWrappers
 		   const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
 		   const MPI_Comm                        &communicator = MPI_COMM_WORLD,
 		   const double                           drop_tolerance=1e-13,
-		   const bool                             copy_values=true);
+		   const bool                             copy_values=true,
+		   const ::dealii::SparsityPattern      *use_this_sparsity=0);
 //@}
 /**
  * @name Information on the matrix
@@ -1142,6 +1061,17 @@ namespace TrilinosWrappers
       unsigned int row_length (const unsigned int row) const;
 
 				       /**
+					* Returns the state of the matrix,
+					* i.e., whether compress() needs to
+					* be called after an operation
+					* requiring data exchange. A call to
+					* compress() is also needed when the
+					* method set() has been called (even
+					* when working in serial).
+					*/
+      bool is_compressed () const;
+
+				       /**
 					* Determine an estimate for the memory
 					* consumption (in bytes) of this
 					* object. Note that only the memory
@@ -1156,6 +1086,83 @@ namespace TrilinosWrappers
  * @name Modifying entries
  */
 //@{
+
+                                       /**
+                                        * This operator assigns a scalar to
+                                        * a matrix. Since this does usually
+                                        * not make much sense (should we set
+                                        * all matrix entries to this value?
+                                        * Only the nonzero entries of the
+                                        * sparsity pattern?), this operation
+                                        * is only allowed if the actual
+                                        * value to be assigned is zero. This
+                                        * operator only exists to allow for
+                                        * the obvious notation
+                                        * <tt>matrix=0</tt>, which sets all
+                                        * elements of the matrix to zero,
+                                        * but keeps the sparsity pattern
+                                        * previously used.
+                                        */
+      SparseMatrix &
+	operator = (const double d);
+
+                                       /**
+                                        * Release all memory and return to a
+                                        * state just like after having
+                                        * called the default constructor.
+					*
+					* This is a collective operation
+				        * that needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
+                                        */
+      void clear ();
+
+                                       /**
+					* This command does two things:
+					* <ul>
+					* <li> If the matrix was initialized
+					* without a sparsity pattern,
+					* elements have been added manually
+					* using the set() command. When this
+					* process is completed, a call to
+					* compress() reorganizes the
+					* internal data structures (aparsity
+					* pattern) so that a fast access to
+					* data is possible in matrix-vector
+					* products.
+					* <li> If the matrix structure has
+					* already been fixed (either by
+					* initialization with a sparsity
+					* pattern or by calling compress()
+					* during the setup phase), this
+					* command does the %parallel
+					* exchange of data. This is
+					* necessary when we perform assembly
+					* on more than one (MPI) process,
+					* because then some non-local row
+					* data will accumulate on nodes that
+					* belong to the current's processor
+					* element, but are actually held by
+					* another. This command is usually
+					* called after all elements have
+					* been traversed.
+					* </ul>
+					*
+                                        * In both cases, this function
+                                        * compresses the data structures and
+                                        * allows the resulting matrix to be
+                                        * used in all other operations like
+                                        * matrix-vector products. This is a
+                                        * collective operation, i.e., it
+                                        * needs to be run on all processors
+                                        * when used in %parallel.
+					*
+					* See @ref GlossCompress "Compressing distributed objects"
+					* for more information.
+                                        */
+      void compress ();
+
                                        /**
                                         * Set the element (<i>i,j</i>)
                                         * to @p value.
@@ -3091,10 +3098,12 @@ namespace TrilinosWrappers
 			     const ::dealii::SparseMatrix<number> &sparse_matrix,
 			     const MPI_Comm      &communicator,
 			     const double         drop_tolerance,
-			     const bool           copy_values)
+			     const bool           copy_values,
+			     const ::dealii::SparsityPattern *use_this_sparsity)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, false);
-    reinit (map, map, sparse_matrix, drop_tolerance, copy_values);
+    reinit (map, map, sparse_matrix, drop_tolerance, copy_values, 
+	    use_this_sparsity);
   }
 
 
@@ -3106,13 +3115,15 @@ namespace TrilinosWrappers
 			     const ::dealii::SparseMatrix<number> &sparse_matrix,
 			     const MPI_Comm      &communicator,
 			     const double         drop_tolerance,
-			     const bool           copy_values)
+			     const bool           copy_values,
+			     const ::dealii::SparsityPattern *use_this_sparsity)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
     Epetra_Map col_map =
       col_parallel_partitioning.make_trilinos_map (communicator, false);
-    reinit (row_map, col_map, sparse_matrix, drop_tolerance, copy_values);
+    reinit (row_map, col_map, sparse_matrix, drop_tolerance, copy_values,
+	    use_this_sparsity);
   }
 
 
