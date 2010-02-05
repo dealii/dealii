@@ -114,7 +114,7 @@ class MatrixIntegrator : public Subscriptor
 template <int dim>
 void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
-  const FEValuesBase<dim>& fe = info.fe();
+  const FEValuesBase<dim>& fe = info.fe_values();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
   
   for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
@@ -129,7 +129,7 @@ void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::Ce
 template <int dim>
 void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe = info.fe();
+  const FEFaceValuesBase<dim>& fe = info.fe_values();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
   
   const unsigned int deg = fe.get_fe().tensor_degree();
@@ -149,8 +149,8 @@ template <int dim>
 void MatrixIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
-  const FEFaceValuesBase<dim>& fe1 = info1.fe();
-  const FEFaceValuesBase<dim>& fe2 = info2.fe();
+  const FEFaceValuesBase<dim>& fe1 = info1.fe_values();
+  const FEFaceValuesBase<dim>& fe2 = info2.fe_values();
   FullMatrix<double>& matrix_v1u1 = info1.M1[0].matrix;
   FullMatrix<double>& matrix_v1u2 = info1.M2[0].matrix;
   FullMatrix<double>& matrix_v2u1 = info2.M2[0].matrix;
@@ -211,7 +211,7 @@ void RHSIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellI
 template <int dim>
 void RHSIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe = info.fe();
+  const FEFaceValuesBase<dim>& fe = info.fe_values();
   Vector<double>& local_vector = info.R[0].block(0);
   
   std::vector<double> boundary_values(fe.n_quadrature_points);
@@ -248,7 +248,7 @@ class Estimator : public Subscriptor
 template <int dim>
 void Estimator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
-  const FEValuesBase<dim>& fe = info.fe();
+  const FEValuesBase<dim>& fe = info.fe_values();
   
   const std::vector<Tensor<2,dim> >& DDuh = info.hessians[0][0];
   for (unsigned k=0;k<fe.n_quadrature_points;++k)
@@ -262,7 +262,7 @@ void Estimator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo&
 template <int dim>
 void Estimator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe = info.fe();
+  const FEFaceValuesBase<dim>& fe = info.fe_values();
   
   std::vector<double> boundary_values(fe.n_quadrature_points);
   exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
@@ -282,7 +282,7 @@ template <int dim>
 void Estimator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
-  const FEFaceValuesBase<dim>& fe = info1.fe();
+  const FEFaceValuesBase<dim>& fe = info1.fe_values();
   const std::vector<double>& uh1 = info1.values[0][0];
   const std::vector<double>& uh2 = info2.values[0][0];
   const std::vector<Tensor<1,dim> >& Duh1 = info1.gradients[0][0];

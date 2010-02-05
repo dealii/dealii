@@ -421,7 +421,7 @@ void DGMethod<dim>::integrate_cell_term (CellInfo& info)
 				   // structures, thus the access here
 				   // looks more complicated than
 				   // might seem necessary.
-  const FEValuesBase<dim>& fe_v = info.fe();
+  const FEValuesBase<dim>& fe_v = info.fe_values();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
 
@@ -460,7 +460,7 @@ void DGMethod<dim>::integrate_cell_term (CellInfo& info)
 template <int dim>
 void DGMethod<dim>::integrate_boundary_term (FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe_v = info.fe();
+  const FEFaceValuesBase<dim>& fe_v = info.fe_values();
   FullMatrix<double>& local_matrix = info.M1[0].matrix;
   Vector<double>& local_vector = info.R[0].block(0);
 
@@ -511,12 +511,12 @@ void DGMethod<dim>::integrate_face_term (FaceInfo& info1,
 				   // etc., we use the
 				   // FEFaceValuesBase object of the
 				   // first argument.
-  const FEFaceValuesBase<dim>& fe_v = info1.fe();
+  const FEFaceValuesBase<dim>& fe_v = info1.fe_values();
 
 				   // For additional shape functions,
 				   // we have to ask the neighbors
 				   // FEFaceValuesBase.
-  const FEFaceValuesBase<dim>& fe_v_neighbor = info2.fe();
+  const FEFaceValuesBase<dim>& fe_v_neighbor = info2.fe_values();
 
 				   // Then we get references to the
 				   // four local matrices. The letters

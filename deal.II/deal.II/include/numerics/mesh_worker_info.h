@@ -402,7 +402,7 @@ namespace MeshWorker
 					* exception, if applied to a
 					* vector of elements.
 					*/
-      const FEVALUESBASE& fe() const;
+      const FEVALUESBASE& fe_values () const;
 
 				       /// Access to finite elements
 				       /**
@@ -413,7 +413,7 @@ namespace MeshWorker
 					*
 					* @see DGBlockSplitApplication
 					*/
-      const FEVALUESBASE& fe(const unsigned int i) const;
+      const FEVALUESBASE& fe_values (const unsigned int i) const;
 
 				       /**
 					* The vector containing the
@@ -759,7 +759,7 @@ namespace MeshWorker
 
   template <int dim, class FVB, int spacedim>
   inline const FVB&
-  IntegrationInfo<dim,FVB,spacedim>::fe() const
+  IntegrationInfo<dim,FVB,spacedim>::fe_values() const
   {
     AssertDimension(fevalv.size(), 1);
     return *fevalv[0];
@@ -768,7 +768,7 @@ namespace MeshWorker
 
   template <int dim, class FVB, int spacedim>
   inline const FVB&
-  IntegrationInfo<dim,FVB,spacedim>::fe(unsigned int i) const
+  IntegrationInfo<dim,FVB,spacedim>::fe_values(unsigned int i) const
   {
     Assert (i<fevalv.size(), ExcIndexRange(i,0,fevalv.size()));
     return *fevalv[i];

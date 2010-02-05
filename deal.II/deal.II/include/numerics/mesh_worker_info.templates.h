@@ -174,7 +174,7 @@ namespace MeshWorker
 	for (unsigned int b=0;b<this->block_info->local().size();++b)
 	  {
 	    const unsigned int fe_no = this->block_info->base_element(b);
-	    const FEValuesBase<dim>& fe = this->fe(fe_no);
+	    const FEValuesBase<dim>& fe = this->fe_values(fe_no);
 	    const unsigned int n_comp = fe.get_fe().n_components();
 	    const unsigned int block_start = this->block_info->local().block_start(b);
 	    const unsigned int block_size = this->block_info->local().block_size(b);
@@ -186,7 +186,7 @@ namespace MeshWorker
        }
      else
        {
-	 const FEValuesBase<dim>& fe = this->fe(0);
+	 const FEValuesBase<dim>& fe = this->fe_values(0);
 	 const unsigned int n_comp = fe.get_fe().n_components();
 	 this->global_data->fill(values, gradients, hessians, fe, this->indices,
 				 0, n_comp, 0, this->indices.size());
