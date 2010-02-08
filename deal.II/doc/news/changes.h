@@ -577,6 +577,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The class MGTransferSelect is prepared for use on adaptively refined meshes.
+  <br>
+  (Bärbel Janssen 2010/02/05)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The function Cuthill_McKee in namespace DoFRenumbering is now also compiled for
   MGDoFHandler as well as the make_sparsity_pattern functions in DoFTools.
   <br>
