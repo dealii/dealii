@@ -127,6 +127,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
       for (IT i= copy_indices[level].begin();
 	   i != copy_indices[level].end();++i)
 	dst_level(i->second) = src(i->first);
+
 				       // For non-DG: degrees of
 				       // freedom in the refinement
 				       // face may need special
@@ -145,11 +146,10 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 template <typename VECTOR>
 template <int dim, int spacedim>
 void MGTransferPrebuilt<VECTOR>::build_matrices (
-  const MGDoFHandler<dim,spacedim> &mg_dof,
-  const std::vector<std::set<unsigned int> >&boundary_indices
+  const MGDoFHandler<dim,spacedim>           &mg_dof,
+  const std::vector<std::set<unsigned int> > &boundary_indices
   )
 {
-  //start building the matrices here
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
 
@@ -172,10 +172,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
-      prolongation_sparsities
-	.push_back (std_cxx1x::shared_ptr<SparsityPattern> (new SparsityPattern));
-      prolongation_matrices
-	.push_back (std_cxx1x::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
+      prolongation_sparsities.push_back
+	(std_cxx1x::shared_ptr<SparsityPattern> (new SparsityPattern));
+      prolongation_matrices.push_back
+	(std_cxx1x::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
     }
 
 				   // two fields which will store the
@@ -220,7 +220,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 						 // prolongation matrix for
 						 // this child
 		const FullMatrix<double> &prolongation
-		  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
+		  = mg_dof.get_fe().get_prolongation_matrix (child,
+							     cell->refinement_case());
 
 		Assert (prolongation.n() != 0, ExcNoProlongation());
 
@@ -232,12 +233,11 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    if (prolongation(i,j) != 0)
-		      {
-			prolongation_sparsities[level]->add (dof_indices_child[i],
-							     dof_indices_parent[j]);
-		      };
-	      };
-	  };
+		      prolongation_sparsities[level]->add (dof_indices_child[i],
+							   dof_indices_parent[j]);
+	      }
+	  }
+
       prolongation_sparsities[level]->compress ();
 
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
@@ -257,7 +257,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 						 // prolongation matrix for
 						 // this child
 		const FullMatrix<double> &prolongation
-		  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
+		  = mg_dof.get_fe().get_prolongation_matrix (child,
+							     cell->refinement_case());
 
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -273,51 +274,44 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 	  }
     }
 
-  // impose boundary conditions
-  // but only in the column of
-  // the prolongation matrix
 
-  if(boundary_indices.size() != 0)
-  {
-    std::vector<unsigned int> constrain_indices;
-    for (int level=n_levels-2; level>=0; --level)
-//    for (unsigned int level=0; level<n_levels-1; ++level)
+				// impose boundary conditions
+				// but only in the column of
+				// the prolongation matrix
+  if (boundary_indices.size() != 0)
     {
-      if (boundary_indices[level].size() == 0)
-        continue;
+      std::vector<unsigned int> constrain_indices;
+      for (int level=n_levels-2; level>=0; --level)
+	{
+	  if (boundary_indices[level].size() == 0)
+	    continue;
 
-      // need to delete all the columns in the
-      // matrix that are on the boundary. to fix
-      // this, create an array as long as there are
-      // matrix columns, and find which columns we
-      // need to filter away.
-      constrain_indices.resize (0);
-      constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-      std::set<unsigned int>::const_iterator dof = boundary_indices[level].begin(),
-        endd = boundary_indices[level].end();
-      for (; dof != endd; ++dof)
-        constrain_indices[*dof] = 1;
+				// need to delete all the columns in the
+				// matrix that are on the boundary. to achive
+				// this, create an array as long as there are
+				// matrix columns, and find which columns we
+				// need to filter away.
+	  constrain_indices.resize (0);
+	  constrain_indices.resize (prolongation_matrices[level]->n(), 0);
+	  std::set<unsigned int>::const_iterator dof = boundary_indices[level].begin(),
+	    endd = boundary_indices[level].end();
+	  for (; dof != endd; ++dof)
+	    constrain_indices[*dof] = 1;
 
-      const unsigned int n_dofs = prolongation_matrices[level]->m();
-      for (unsigned int i=0; i<n_dofs; ++i)
-      {
-        SparseMatrix<double>::iterator start_row = prolongation_matrices[level]->begin(i),
-          end_row = prolongation_matrices[level]->end(i);
-        for(; start_row != end_row; ++start_row)
-        {
-          std::set<unsigned int>::const_iterator dof = boundary_indices[level].begin(),
-            endd = boundary_indices[level].end();
-          for (; dof != endd; ++dof)
-          {
-            const unsigned int column_number = start_row->column();
-            const unsigned int dof_number = *dof;
-            if(dof_number == column_number)
-              prolongation_matrices[level]->set(i,dof_number,0);
-          }
-        }
-      }
+	  const unsigned int n_dofs = prolongation_matrices[level]->m();
+	  for (unsigned int i=0; i<n_dofs; ++i)
+	    {
+	      SparseMatrix<double>::iterator
+		start_row = prolongation_matrices[level]->begin(i),
+		end_row   = prolongation_matrices[level]->end(i);
+	      for(; start_row != end_row; ++start_row)
+		{
+		  if (constrain_indices[start_row->column()] == 1)
+		    start_row->value() = 0;
+		}
+	    }
+	}
     }
-  }
 
 				// to find the indices that describe the
 				// relation between global dofs and local
