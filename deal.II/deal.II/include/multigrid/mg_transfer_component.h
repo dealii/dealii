@@ -170,7 +170,7 @@ class MGTransferComponentBase
 				      * The data is first the global
 				      * index, then the level index.
 				      */
-    std::vector<std::map<unsigned int, unsigned int> >
+    std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
     copy_to_and_from_indices;
 
 				     /**

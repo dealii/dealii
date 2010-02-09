@@ -86,15 +86,15 @@ MGTransferSelect<number>::copy_from_mg (
   do_copy_from_mg (mg_dof_handler, dst, src);
   if (constraints != 0)
   {
-    //If we were given constraints 
-    //apply them to the dst that goes 
+    //If we were given constraints
+    //apply them to the dst that goes
     //back now to the linear solver.
     //Since constraints are globally
     //defined create a global vector here
-    //and copy dst to the right component, 
-    //apply the constraints then and copy 
+    //and copy dst to the right component,
+    //apply the constraints then and copy
     //the block back to dst.
-    const unsigned int n_blocks = 
+    const unsigned int n_blocks =
       *std::max_element(target_component.begin(), target_component.end()) + 1;
     std::vector<unsigned int> dofs_per_block (n_blocks);
     DoFTools::count_dofs_per_block (mg_dof_handler, dofs_per_block, target_component);
@@ -166,7 +166,7 @@ MGTransferSelect<number>::do_copy_from_mg (
   for (; level_cell != endc; ++level_cell)
   {
     const unsigned int level = level_cell->level();
-    typedef std::map<unsigned int, unsigned int>::const_iterator IT;
+    typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
     for (IT i=copy_to_and_from_indices[level].begin();
         i != copy_to_and_from_indices[level].end(); ++i)
       dst(i->first) = src[level](i->second);
@@ -203,7 +203,7 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   for (; level_cell != endc; ++level_cell)
     {
       const unsigned int level = level_cell->level();
-      typedef std::map<unsigned int, unsigned int>::const_iterator IT;
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
       for (IT i=copy_to_and_from_indices[level].begin();
         i != copy_to_and_from_indices[level].end(); ++i)
 	      dst(i->first) += src[level](i->second);

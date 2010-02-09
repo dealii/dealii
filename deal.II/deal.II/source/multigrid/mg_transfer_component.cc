@@ -247,19 +247,20 @@ MGTransferSelect<number>::do_copy_to_mg (
   for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level!=0;)
     {
       --level;
+      Vector<number> &dst_level = dst[level];
 
-      typedef std::map<unsigned int, unsigned int>::const_iterator IT;
-	  for (IT i=copy_to_and_from_indices[level].begin();
-	       i != copy_to_and_from_indices[level].end(); ++i)
-              dst[level](i->second) = src(i->first);
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
+      for (IT i=copy_to_and_from_indices[level].begin();
+	   i != copy_to_and_from_indices[level].end(); ++i)
+	dst_level(i->second) = src(i->first);
 				       // for that part of the level
 				       // which is further refined:
 				       // get the defect by
 				       // restriction of the defect on
 				       // one level higher
-          if(!first)
-            restrict_and_add (level+1, dst[level], dst[level+1]);
-          first = false;
+      if(!first)
+	restrict_and_add (level+1, dst[level], dst[level+1]);
+      first = false;
     }
 }
 
@@ -610,6 +611,9 @@ void MGTransferSelect<number>::build_matrices (
     interface_dofs[l].resize(mg_dof.n_dofs(l));
   MGTools::extract_inner_interface_dofs(mg_dof, interface_dofs);
 
+				// use a temporary vector to create the
+				// relation between global and level dofs
+  std::vector<unsigned int> temp_copy_indices;
   std::vector<unsigned int> global_dof_indices (fe.dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (fe.dofs_per_cell);
   for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
@@ -619,6 +623,9 @@ void MGTransferSelect<number>::build_matrices (
 	level_cell = mg_dof.begin_active(level);
       const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_end  = mg_dof.end_active(level);
+
+      temp_copy_indices.resize (0);
+      temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_unsigned_int);
 
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
@@ -644,10 +651,8 @@ void MGTransferSelect<number>::build_matrices (
 		    = mg_component_start[level][mg_target_component[component]];
 		  const unsigned int global_start
 		    = component_start[target_component[component]];
-		  copy_to_and_from_indices[level].insert(
-		    std::make_pair(global_dof_indices[i] - global_start
-				   /*- component_start[target_component[selected_component]]*/,
-				   level_dof_indices[i]-level_start));
+		  temp_copy_indices[level_dof_indices[i]-level_start] = 
+		    global_dof_indices[i]-global_start;
                   deallog << "global " << global_dof_indices[i]
                     - component_start[target_component[selected_component]] <<
                     " lokal " << level_dof_indices[i]-level_start << std::endl;
@@ -659,6 +664,20 @@ void MGTransferSelect<number>::build_matrices (
 		}
 	    }
 	}
+
+				// write indices from vector into the map from
+				// global to level dofs
+      const unsigned int n_active_dofs =
+	std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
+		       std::bind2nd(std::not_equal_to<unsigned int>(),
+				    numbers::invalid_unsigned_int));
+      copy_to_and_from_indices[level].resize (n_active_dofs);
+      unsigned int counter = 0;
+      for (unsigned int i=0; i<temp_copy_indices.size(); ++i)
+	if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
+	  copy_to_and_from_indices[level][counter++] =
+	    std::make_pair<unsigned int,unsigned int> (temp_copy_indices[i], i);
+      Assert (counter == n_active_dofs, ExcInternalError());
     }
 }
 

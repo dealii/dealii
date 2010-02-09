@@ -121,12 +121,12 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
     {
       --level;
-//      VECTOR& dst_level = dst[level];
+      VECTOR& dst_level = dst[level];
 
-      typedef std::map<unsigned int, unsigned int>::const_iterator IT;
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
       for (IT i= copy_indices[level].begin();
 	   i != copy_indices[level].end();++i)
-	dst[level](i->second) = src(i->first);
+	dst_level(i->second) = src(i->first);
 
 				       // For non-DG: degrees of
 				       // freedom in the refinement
@@ -329,7 +329,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   MGTools::extract_inner_interface_dofs (mg_dof, interface_dofs);
 
   copy_indices.resize(n_levels);
-//  std::vector<unsigned int> temp_copy_indices;
+  std::vector<unsigned int> temp_copy_indices;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
   for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
@@ -340,8 +340,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_end  = mg_dof.end_active(level);
 
-//      temp_copy_indices.resize (0);
-//      temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_unsigned_int);
+      temp_copy_indices.resize (0);
+      temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_unsigned_int);
 
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
@@ -357,12 +357,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
-              if(!interface_dofs[level][level_dof_indices[i]])
-	      copy_indices[level].insert(
-		std::make_pair(global_dof_indices[i], level_dof_indices[i]));
-//	    temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
-//	    if(!interface_dofs[level][level_dof_indices[i]])
-//	      temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
+	    if(!interface_dofs[level][level_dof_indices[i]])
+	      temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
           }
 	}
 
@@ -372,17 +368,17 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				// copy_indices object. Then, insert the pairs
 				// of global index and level index into
 				// copy_indices.
-//      const unsigned int n_active_dofs =
-//	std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
-//		       std::bind2nd(std::not_equal_to<unsigned int>(),
-//				    numbers::invalid_unsigned_int));
-//      copy_indices[level].resize (n_active_dofs);
-//      unsigned int counter = 0;
-//      for (unsigned int i=0; i<temp_copy_indices.size(); ++i)
-//	if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
-//	  copy_indices[level][counter++] =
-//	    std::make_pair<unsigned int,unsigned int> (temp_copy_indices[i], i);
-//      Assert (counter == n_active_dofs, ExcInternalError());
+      const unsigned int n_active_dofs =
+	std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
+		       std::bind2nd(std::not_equal_to<unsigned int>(),
+				    numbers::invalid_unsigned_int));
+      copy_indices[level].resize (n_active_dofs);
+      unsigned int counter = 0;
+      for (unsigned int i=0; i<temp_copy_indices.size(); ++i)
+	if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
+	  copy_indices[level][counter++] =
+	    std::make_pair<unsigned int,unsigned int> (temp_copy_indices[i], i);
+      Assert (counter == n_active_dofs, ExcInternalError());
     }
 }
 
