@@ -635,16 +635,27 @@ void MGTransferSelect<number>::build_matrices (
 	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	    {
 	      const unsigned int component
-		= fe.system_to_component_index(i).first;
-	      if (mg_selected[component] && 
+                = fe.system_to_component_index(i).first;
+              deallog << "comp " << component << std::endl;
+	      if (selected[component] && 
                   !interface_dofs[level][level_dof_indices[i]])
 		{
 		  const unsigned int level_start
 		    = mg_component_start[level][mg_target_component[component]];
+		  const unsigned int global_start
+		    = component_start[target_component[component]];
 		  copy_to_and_from_indices[level].insert(
-		    std::make_pair(global_dof_indices[i]
-				   - component_start[target_component[selected_component]],
+		    std::make_pair(global_dof_indices[i] - global_start
+				   /*- component_start[target_component[selected_component]]*/,
 				   level_dof_indices[i]-level_start));
+                  deallog << "global " << global_dof_indices[i]
+                    - component_start[target_component[selected_component]] <<
+                    " lokal " << level_dof_indices[i]-level_start << std::endl;
+                  deallog << "index global " << global_dof_indices[i] <<
+                    " index lokal " << level_dof_indices[i] << std::endl;
+                  deallog << "offset global "
+                    << component_start[target_component[selected_component]] <<
+                    " offset lokal " << level_start << std::endl;
 		}
 	    }
 	}

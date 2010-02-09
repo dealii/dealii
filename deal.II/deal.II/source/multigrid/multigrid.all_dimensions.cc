@@ -283,6 +283,17 @@ MGTransferBlockBase::memory_consumption () const
 
 //----------------------------------------------------------------------//
 
+template<typename number>
+MGTransferSelect<number>::MGTransferSelect ()
+{} 
+
+
+template<typename number>
+MGTransferSelect<number>::MGTransferSelect (const ConstraintMatrix &c)
+ :
+   constraints(&c)
+{} 
+
 template <typename number>
 MGTransferSelect<number>::~MGTransferSelect () 
 {}
@@ -297,8 +308,8 @@ void MGTransferSelect<number>::prolongate (
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
 
-      prolongation_matrices[to_level-1]->block(mg_selected_component,
-					       mg_selected_component)
+      prolongation_matrices[to_level-1]->block(mg_target_component[mg_selected_component],
+					       mg_target_component[mg_selected_component])
 	.vmult (dst, src);
 }
 
@@ -312,8 +323,8 @@ void MGTransferSelect<number>::restrict_and_add (
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
 
-  prolongation_matrices[from_level-1]->block(mg_selected_component,
-					     mg_selected_component)
+  prolongation_matrices[from_level-1]->block(mg_target_component[mg_selected_component],
+					     mg_target_component[mg_selected_component])
     .Tvmult_add (dst, src);
 }
 

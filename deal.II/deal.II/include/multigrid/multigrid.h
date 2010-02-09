@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
+#include <numerics/data_out.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <multigrid/mg_base.h>
@@ -670,6 +671,23 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
   transfer->copy_from_mg(*mg_dof_handler,
 			 dst,
 			 multigrid->solution);
+
+  /*
+  DataOut<dim> data_out;
+  data_out.attach_dof_handler (*mg_dof_handler);
+  VECTOR2 tmp;
+  tmp.reinit(dst);
+  tmp = dst;
+  transfer->constraints->distribute(tmp);
+  data_out.add_data_vector (tmp, "mg");
+  data_out.build_patches ();
+
+  std::ostringstream filename;
+  filename << "mg.gpl";
+
+  std::ofstream output (filename.str().c_str());
+  data_out.write_gnuplot (output);
+  */
 }
 
 

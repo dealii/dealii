@@ -176,10 +176,10 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
       edge_down->vmult(level, t[level-1], solution[level]);
 
     transfer->restrict_and_add (l, t[l-1], t[l]);
-    if(debug>2)
+    if(debug>3)
       deallog << "restrict t[" << l-1 << "] " << t[l-1].l2_norm() << std::endl;
     defect[l-1] -= t[l-1];
-    if(debug>2)
+    if(debug>3)
       deallog << "defect d[" << l-1 << "] " << defect[l-1].l2_norm() << std::endl;
   }
   
@@ -211,7 +211,7 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
    }
   
   if (debug>2)
-    deallog << "V-cycle  Defect norm hier  " << defect[level].l2_norm()
+    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
 	    << std::endl;
   
   if (debug>1)
