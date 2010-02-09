@@ -63,6 +63,7 @@ void check_select(const FiniteElement<dim>& fe,
   
   for (unsigned int l=0;l<tr.n_levels();++l)
     DoFRenumbering::component_wise(mgdof, l, mg_target_component);
+
   std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels());
   MGTools::count_dofs_per_component(mgdof, mg_ndofs, true, mg_target_component);
 
@@ -106,9 +107,10 @@ void check_select(const FiniteElement<dim>& fe,
   for (unsigned int i=0;i<u.size();++i)
     u(i) = i;
   
-  MGLevelObject<Vector<double> > v;
-  v.resize(2,2);
-  v[2].reinit(mg_ndofs[2][mg_selected]);
+  MGLevelObject<Vector<double> > v(0,tr.n_levels()-1);
+  for(unsigned int l=0; l<tr.n_levels()-1; ++l)
+    v[l].reinit(mg_ndofs[l][mg_target_component[mg_selected]]);
+
 
   transfer.copy_to_mg(mgdof, v, u);
   for (unsigned int i=0; i<v[2].size();++i)
