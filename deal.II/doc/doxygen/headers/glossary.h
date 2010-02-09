@@ -338,7 +338,7 @@ Article{BK07,
  * @ref GlossSupport "support points".</dd>
  *
  *
- * <dt class="glossary">@anchor mg_paper Multigrid paper</dt>
+ * <dt class="glossary">@anchor mg_paper %Multigrid paper</dt>
  * <dd>The "multigrid paper" is a paper by B. Janssen and G. Kanschat, titled
  * "Adaptive multilevel methods with local smoothing", that
  * describes many of the algorithms and data structures used in the implementation
