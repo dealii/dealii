@@ -31,6 +31,8 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_generator.h>
+#include <grid/grid_refinement.h>
+#include <grid/tria_boundary_lib.h>
 
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
@@ -40,6 +42,7 @@
 
 #include <numerics/vectors.h>
 #include <numerics/data_out.h>
+#include <numerics/error_estimator.h>
 
 //These are the same include files
 //as in step-16 necessary for the
@@ -78,8 +81,7 @@ class LaplaceProblem
     void assemble_system ();
     void assemble_multigrid ();
     void solve ();
-    void refine_local ();
-    void test_get_coarse_cell ();
+    void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
@@ -461,133 +463,35 @@ void LaplaceProblem<dim>::solve ()
     MGTransferPrebuilt<Vector<double> > >
   preconditioner(mg_dof_handler, mg, mg_transfer);
 
-				 // Finally, create the solver
-				 // object and solve the system
-ReductionControl solver_control (100, 1.e-20, 1.e-10, true, true);
-SolverCG<>    cg (solver_control);
+				   // Finally, create the solver
+				   // object and solve the system
+  ReductionControl solver_control (100, 1.e-20, 1.e-10, true, true);
+  SolverCG<>    cg (solver_control);
 
-solution = 0;
+  solution = 0;
 
-cg.solve (system_matrix, solution, system_rhs,
-	  preconditioner);
-constraints.distribute (solution);
+  cg.solve (system_matrix, solution, system_rhs,
+	    preconditioner);
+  constraints.distribute (solution);
 
-std::cout << "   " << solver_control.last_step()
-<< " CG iterations needed to obtain convergence."
-<< std::endl;
+  std::cout << "   " << solver_control.last_step()
+	    << " CG iterations needed to obtain convergence."
+	    << std::endl;
 }
 
 template <int dim>
-void LaplaceProblem<dim>::refine_local ()
+void LaplaceProblem<dim>::refine_grid ()
 {
-  bool cell_refined = false;
-  for (typename Triangulation<dim>::active_cell_iterator
-	 cell = triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    {
-      if(false)
-	{
-	  for (unsigned int vertex=0;
-	       vertex < GeometryInfo<dim>::vertices_per_cell;
-	       ++vertex)
-	    {
-	      if(cell->vertex(vertex)[dim-1]==0 && cell->vertex(vertex)[0]==0 && cell->vertex(vertex)[dim-2]==0)
-		{
-		  cell->set_refine_flag ();
-		  cell_refined = true;
-		  break;
-		}
-	    }
-	}
-      else if(true) //Kreis
-	{
-	  for (unsigned int vertex=0;
-	       vertex < GeometryInfo<dim>::vertices_per_cell;
-	       ++vertex)
-	    {
-	      const Point<dim> p = cell->vertex(vertex);
-	      const Point<dim> origin = (dim == 2 ?
-					 Point<dim>(0,0) :
-					 Point<dim>(0,0,0));
-	      const double dist = p.distance(origin);
-	      if(dist<0.25/M_PI)
-		{
-		  cell->set_refine_flag ();
-		  cell_refined = true;
-		  break;
-		}
-	    }
-	}
-      else if(false) //linke Diagonale
-	{
-	  for (unsigned int vertex=0;
-	       vertex < GeometryInfo<dim>::vertices_per_cell;
-	       ++vertex)
-	    {
-	      const Point<dim> p = cell->vertex(vertex);
-	      if(p[0]==p[1])
-		{
-		  cell->set_refine_flag ();
-		  cell_refined = true;
-		  break;
-		}
-	    }
-	}
-      else if(false) //inneres Quadrat
-	{
-	  for (unsigned int vertex=0;
-	       vertex < GeometryInfo<dim>::vertices_per_cell;
-	       ++vertex)
-	    {
-	      const Point<dim> p = cell->vertex(vertex);
-	      const double dist = std::max(std::fabs(p[0]),std::fabs(p[1]));
-	      if(dist<0.5)
-		{
-		  cell->set_refine_flag ();
-		  cell_refined = true;
-		  break;
-		}
-	    }
-	}
-      else if(false) //Raute
-	{
-	  for (unsigned int vertex=0;
-	       vertex < GeometryInfo<dim>::vertices_per_cell;
-	       ++vertex)
-	    {
-	      const Point<dim> p = cell->vertex(vertex);
-	      const double dist = std::fabs(p[0])+std::fabs(p[1]);
-	      if(dist<0.5)
-		{
-		  cell->set_refine_flag ();
-		  cell_refined = true;
-		  break;
-		}
-	    }
-	}
-      else //erster Quadrant
-	{
-	  const Point<dim> p = cell->center();
-	  bool positive = p(0) > 0;
-	  if (dim>1 && p(1) <= 0)
-	    positive = false;
-	  if (dim>2 && p(2) <= 0)
-	    positive = false;
-	  if (positive)
-	    {
-	      cell->set_refine_flag();
-	      cell_refined = true;
-	    }
-	}
-    }
-				   //Wenn nichts verfeinert wurde bisher, global verfeinern!
-  if(!cell_refined)
-    for (typename Triangulation<dim>::active_cell_iterator
-	   cell = triangulation.begin_active();
-	 cell != triangulation.end(); ++cell)
-      cell->set_refine_flag();
+  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-
+  KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
+				      QGauss<dim-1>(3),
+				      typename FunctionMap<dim>::type(),
+				      solution,
+				      estimated_error_per_cell);
+  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						   estimated_error_per_cell,
+						   0.3, 0.03);
   triangulation.execute_coarsening_and_refinement ();
 }
 
@@ -612,26 +516,39 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 template <int dim>
 void LaplaceProblem<dim>::run ()
 {
-  for (unsigned int cycle=0; cycle<9; ++cycle)
+  for (unsigned int cycle=0; cycle<8; ++cycle)
     {
+      std::cout << "Cycle " << cycle << ':' << std::endl;
+
       if (cycle == 0)
 	{
-	  GridGenerator::hyper_cube(triangulation, -1, 1);
+	  GridGenerator::hyper_ball (triangulation);
+
+	  static const HyperBallBoundary<dim> boundary;
+	  triangulation.set_boundary (0, boundary);
+
 	  triangulation.refine_global (1);
 	}
-      refine_local ();
+      else
+	refine_grid ();
 
-      std::cout << "Cycle " << cycle
-		<< " with " << triangulation.n_active_cells()
-		<< " cells."
+
+      std::cout << "   Number of active cells:       "
+		<< triangulation.n_active_cells()
 		<< std::endl;
 
       setup_system ();
+
+      std::cout << "   Number of degrees of freedom: "
+		<< mg_dof_handler.n_dofs()
+		<< std::endl;
+
       assemble_system ();
       assemble_multigrid ();
+
       solve ();
       output_results (cycle);
-    };
+    }
 }
 
 
