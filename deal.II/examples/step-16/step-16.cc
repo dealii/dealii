@@ -365,7 +365,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
   ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
 
-  std::vector<std::set<unsigned int> > boundary_indices(triangulation.n_levels());
+  std::vector<std::set<unsigned int> > boundary_indices (triangulation.n_levels());
   MGTools::make_boundary_list (mg_dof_handler, dirichlet_boundary,
 			       boundary_indices);
 
@@ -485,7 +485,7 @@ void LaplaceProblem<dim>::solve ()
   mg_smoother.initialize(mg_matrices, smoother_data);
 
 				   // Do two smoothing steps per level
-  mg_smoother.set_steps(1);
+  mg_smoother.set_steps(2);
 				   // Since the SOR method is not
 				   // symmetric, but we use conjugate
 				   // gradient iteration below, here
@@ -494,8 +494,6 @@ void LaplaceProblem<dim>::solve ()
 				   // symmetric operator even for
 				   // nonsymmetric smoothers.
   mg_smoother.set_symmetric(true);
-  mg_smoother.set_variable(true);
-
 
 				   // We must wrap our matrices in an
 				   // object having the required
