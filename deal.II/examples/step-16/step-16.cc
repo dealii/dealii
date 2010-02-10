@@ -110,6 +110,65 @@ class LaplaceProblem
 };
 
 
+
+                                 // @sect3{Nonconstant coefficients}
+
+				 // The implementation of nonconstant
+				 // coefficients is copied verbatim
+				 // from step-5:
+
+template <int dim>
+class Coefficient : public Function<dim>
+{
+  public:
+    Coefficient () : Function<dim>() {}
+
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<double>            &values,
+			     const unsigned int              component = 0) const;
+};
+
+
+
+template <int dim>
+double Coefficient<dim>::value (const Point<dim> &p,
+				const unsigned int) const
+{
+  if (p.square() < 0.5*0.5)
+    return 20;
+  else
+    return 1;
+}
+
+
+
+template <int dim>
+void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+				   std::vector<double>            &values,
+				   const unsigned int              component) const
+{
+  const unsigned int n_points = points.size();
+
+  Assert (values.size() == n_points,
+	  ExcDimensionMismatch (values.size(), n_points));
+
+  Assert (component == 0,
+	  ExcIndexRange (component, 0, 1));
+
+  for (unsigned int i=0; i<n_points; ++i)
+    {
+      if (points[i].square() < 0.5*0.5)
+	values[i] = 20;
+      else
+	values[i] = 1;
+    }
+}
+
+
+
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg)
 		:
