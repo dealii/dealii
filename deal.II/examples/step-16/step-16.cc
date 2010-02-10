@@ -600,7 +600,12 @@ void LaplaceProblem<dim>::run ()
 
       std::cout << "   Number of degrees of freedom: "
 		<< mg_dof_handler.n_dofs()
-		<< std::endl;
+		<< " (by level: ";
+      for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+	std::cout << mg_dof_handler.n_dofs(level)
+		  << (level == triangulation.n_levels()-1
+		      ? ")" : ", ");
+      std::cout << std::endl;
 
       assemble_system ();
       assemble_multigrid ();
@@ -611,7 +616,10 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-
+				 // @sect3{The main() function}
+				 //
+				 // This is again the same function as
+				 // in step-6:
 int main ()
 {
   try
