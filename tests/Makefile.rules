@@ -83,7 +83,7 @@ endif
 
 ############################################################
 # Postprocessing the output: compare with precomputed
-# files. In default mode, do not show diffs as they are 
+# files. In default mode, do not show diffs as they are
 # usually overly verbose. Only if user calls `make' with
 # flag `verbose=on' show the diffs. Also note that we
 # usually let the call to `make' continue even if we
@@ -157,7 +157,8 @@ report:
 
 report+mail:
 	@$(MAKE) report | tee testresults
-	@cat testresults | mail -s Regression regression-tests@dealii.org
+	@cat testresults | \
+	 mail -s "Regression results from `id -un` on `hostname`" regression-tests@dealii.org
 	@rm testresults
 
 
