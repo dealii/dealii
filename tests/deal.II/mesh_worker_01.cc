@@ -44,9 +44,10 @@ class Local : public Subscriptor
     typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
     typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
 
-    void cell(CellInfo& info) const;
-    void bdry(FaceInfo& info) const;
-    void face(FaceInfo& info1, FaceInfo& info2) const;
+    void cell(MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info) const;
+    void bdry(MeshWorker::DoFInfo<dim>& dinfo, FaceInfo& info) const;
+    void face(MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
+	      FaceInfo& info1, FaceInfo& info2) const;
 
     bool cells;
     bool faces;
@@ -65,7 +66,7 @@ class Local : public Subscriptor
 
 template <int dim>
 void
-Local<dim>::cell(CellInfo& info) const
+Local<dim>::cell(MeshWorker::DoFInfo<dim>& info, CellInfo&) const
 {
   if (!cells) return;
   const unsigned int cell = info.cell->user_index();
@@ -76,19 +77,19 @@ Local<dim>::cell(CellInfo& info) const
   deallog << std::endl;
 
 				   // Fill local residuals
-  for (unsigned int k=0;k<info.R.size();++k)
-    for (unsigned int b=0;b<info.R[k].n_blocks();++b)
-      for (unsigned int i=0;i<info.R[k].block(b).size();++i)
+  for (unsigned int k=0;k<info.n_vectors();++k)
+    for (unsigned int b=0;b<info.vector(k).n_blocks();++b)
+      for (unsigned int i=0;i<info.vector(k).block(b).size();++i)
 	{
 	  const double x = cell + 0.1 * b + 0.001 * i;
-	  info.R[k].block(b)(i) = x;
+	  info.vector(k).block(b)(i) = x;
 	}
 
-  for (unsigned int k=0;k<info.M1.size();++k)
+  for (unsigned int k=0;k<info.n_matrices();++k)
     {
-      const unsigned int block_row = info.M1[k].row;
-      const unsigned int block_col = info.M1[k].column;
-      FullMatrix<double>& M1 = info.M1[k].matrix;
+      const unsigned int block_row = info.matrix(k).row;
+      const unsigned int block_col = info.matrix(k).column;
+      FullMatrix<double>& M1 = info.matrix(k).matrix;
       for (unsigned int i=0;i<M1.m();++i)
 	for (unsigned int j=0;j<M1.n();++j)
 	  {
@@ -102,7 +103,7 @@ Local<dim>::cell(CellInfo& info) const
 
 template <int dim>
 void
-Local<dim>::bdry(FaceInfo& info) const
+Local<dim>::bdry(MeshWorker::DoFInfo<dim>& info, FaceInfo&) const
 {
   const unsigned int cell = info.cell->user_index();
   deallog << "Bdry " << std::setw(2) << cell;
@@ -112,7 +113,8 @@ Local<dim>::bdry(FaceInfo& info) const
 
 template <int dim>
 void
-Local<dim>::face(FaceInfo& info1, FaceInfo& info2) const
+Local<dim>::face(MeshWorker::DoFInfo<dim>& info1, MeshWorker::DoFInfo<dim>& info2,
+		 FaceInfo&, FaceInfo&) const
 {
   const unsigned int cell1 = info1.cell->user_index();
   const unsigned int cell2 = info2.cell->user_index();
@@ -156,17 +158,16 @@ test_simple(MGDoFHandler<dim>& mgdofs)
     MappingQ1<dim> mapping;
 
     MeshWorker::IntegrationInfoBox<dim> info_box(dofs);
-    info_box.initialize(integrator, assembler, fe, mapping);
-
+    info_box.initialize(integrator, fe, mapping);
+    
     MeshWorker::integration_loop
-      <typename Local<dim>::CellInfo,
-      typename Local<dim>::FaceInfo>
+      <typename Local<dim>::CellInfo, typename Local<dim>::FaceInfo, dim>
       (dofs.begin_active(), dofs.end(),
        info_box,
-       std_cxx1x::bind (&Local<dim>::cell, local, _1),
-       std_cxx1x::bind (&Local<dim>::bdry, local, _1),
-       std_cxx1x::bind (&Local<dim>::face, local, _1, _2),
-       assembler);
+       std_cxx1x::bind (&Local<dim>::cell, local, _1, _2),
+       std_cxx1x::bind (&Local<dim>::bdry, local, _1, _2),
+       std_cxx1x::bind (&Local<dim>::face, local, _1, _2, _3, _4),
+       assembler, true);
   }
 
   for (unsigned int i=0;i<v.size();++i)
