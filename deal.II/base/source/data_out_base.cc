@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -989,7 +989,7 @@ template <int dim, int spacedim>
 bool
 DataOutBase::Patch<dim,spacedim>::operator == (const Patch &patch) const
 {
-//TODO: make tolerance relative  
+//TODO: make tolerance relative
   const double epsilon=3e-16;
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     if (vertices[i].distance(patch.vertices[i]) > epsilon)
@@ -3474,14 +3474,14 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert ((patch->data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
-	  (patch->data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
+  Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
+	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
 	  ExcDimensionMismatch (patches[0].points_are_available
 				?
 				(n_data_sets + spacedim)
 				:
 				n_data_sets,
-				patch->data.n_rows()));
+				patches[0].data.n_rows()));
 
 				   // first count the number of cells
 				   // and cells for later use
