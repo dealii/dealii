@@ -1,24 +1,78 @@
 <h1>Results</h1>
 
 The output that this program generates is, of course, the same as that
-of @ref step_6 "step-6", so you may see there for more results.
+of @ref step_6 "step-6", so you may see there for more results. On the
+other hand, since no tutorial program is a good one unless it has at
+least one colorful picture, here is, again, the solution:
 
+<p align="center">
+  @image html step-16.solution.png
+</p>
 
+When run, the output of this program is
+<pre>
+Cycle 0:
+   Number of active cells:       20
+   Number of degrees of freedom: 25 (by level: 8, 25)
+   6 CG iterations needed to obtain convergence.
+Cycle 1:
+   Number of active cells:       44
+   Number of degrees of freedom: 57 (by level: 8, 25, 48)
+   7 CG iterations needed to obtain convergence.
+Cycle 2:
+   Number of active cells:       92
+   Number of degrees of freedom: 117 (by level: 8, 25, 80, 60)
+   8 CG iterations needed to obtain convergence.
+Cycle 3:
+   Number of active cells:       188
+   Number of degrees of freedom: 221 (by level: 8, 25, 80, 200)
+   11 CG iterations needed to obtain convergence.
+Cycle 4:
+   Number of active cells:       416
+   Number of degrees of freedom: 485 (by level: 8, 25, 89, 288, 280)
+   11 CG iterations needed to obtain convergence.
+Cycle 5:
+   Number of active cells:       800
+   Number of degrees of freedom: 925 (by level: 8, 25, 89, 288, 784, 132)
+   13 CG iterations needed to obtain convergence.
+Cycle 6:
+   Number of active cells:       1604
+   Number of degrees of freedom: 1833 (by level: 8, 25, 89, 304, 1000, 1116, 72)
+   13 CG iterations needed to obtain convergence.
+Cycle 7:
+   Number of active cells:       3164
+   Number of degrees of freedom: 3581 (by level: 8, 25, 89, 328, 1032, 2176, 1392)
+   15 CG iterations needed to obtain convergence.
+</pre>
+That's not perfect &mdash; we would have hoped for a constant number
+of iterations rather than one that increases as we get more and more
+degrees of freedom &mdash; but it is also not far away. The reason for
+this is easy enough to understand, however: since we have a strongly
+varying coefficient, the operators that we assembly by quadrature on
+the lower levels become worse and worse approximations of the operator
+on the finest level. Consequently, even if we had perfect solvers on
+the coarser levels, they would not be good preconditioners on the
+finest level. This theory is easily tested by comparing results when
+we use a constant coefficient: in that case, the number of iterations
+remains constant at 9 after the first three or four refinement steps.
 
 Let us compare the iteration steps needed to obtain convergence for the two methods:
 <table>
 <tr><th>cells</th><th>step-5</th><th>step-16</th></tr>
 <tr><td>20</td>   <td>13</td> <td>6</td> </tr>
-<tr><td>80</td>   <td>18</td> <td>8</td> </tr>
+<tr><td>80</td>   <td>17</td> <td>7</td> </tr>
 <tr><td>320</td>  <td>29</td> <td>9</td> </tr>
-<tr><td>1280</td> <td>52</td> <td>9</td> </tr>
-<tr><td>5120</td> <td>95</td> <td>9</td> </tr>
-<tr><td>20480</td><td>182</td><td>10</td></tr>
+<tr><td>1280</td> <td>51</td> <td>10</td> </tr>
+<tr><td>5120</td> <td>94</td> <td>11</td> </tr>
+<tr><td>20480</td><td>180</td><td>13</td></tr>
 </table>
-This isn't only less iterations than in @ref step_5 "step-5" (each of which
+This isn't only fewer iterations than in @ref step_5 "step-5" (each of which
 is, however, much more expensive) but more importantly, the number of
-iterations stays roughly constant under mesh refinement.  Therefore, whenever
-possible, multigrid methods should be used for second order problems.
+iterations also grows much more slowly under mesh refinement (again,
+it would be almost constant if the coefficient was constant rather
+than strongly varying as chosen here). This justifies the common
+observation that, whenever possible, multigrid methods should be used
+for second order problems.
 
 
 The output produced by this program is the following:
