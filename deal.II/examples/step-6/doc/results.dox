@@ -44,7 +44,7 @@ refinement.
 
 
 The final solution, as written by the program at the end of the
-<code>run()</code> function, looks as follows:
+<code>%run()</code> function, looks as follows:
 
 
 
@@ -118,11 +118,11 @@ from this example.
 --------------------------------------------------------
 An error occurred in line <79> of file <source/subscriptor.cc> in function
     virtual Subscriptor::~Subscriptor()
-The violated condition was: 
+The violated condition was:
     counter == 0
 The name and call sequence of the exception was:
     ExcInUse(counter, object_info->name(), infostring)
-Additional Information: 
+Additional Information:
 Object of class 4FE_QILi2EE is still used by 1 other objects.
   from Subscriber 10DoFHandlerILi2EE
 
@@ -155,7 +155,7 @@ The one object that still uses the finite element is the
 
 
 The stacktrace gives an indication of where the problem happened. We
-see that the exception was triggered in the 
+see that the exception was triggered in the
 destructor of the <code>FiniteElement</code> class that was called
 through a few more functions from the destructor of the
 <code>LaplaceProblem</code> class, exactly where we have commented out
