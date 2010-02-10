@@ -97,9 +97,13 @@ template <int dim>
 class MatrixIntegrator : public Subscriptor
 {
   public:
-    static void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
-    static void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
-    static void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+    static void cell(MeshWorker::DoFInfo<dim>& dinfo,
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+    static void bdry(MeshWorker::DoFInfo<dim>& dinfo,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void face(MeshWorker::DoFInfo<dim>& dinfo1,
+		     MeshWorker::DoFInfo<dim>& dinfo2,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
 };
 
@@ -112,10 +116,12 @@ class MatrixIntegrator : public Subscriptor
 				 // degrees of freedom associated
 				 // with the shape functions.
 template <int dim>
-void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
+void MatrixIntegrator<dim>::cell(
+  MeshWorker::DoFInfo<dim>& dinfo,
+  typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
-  FullMatrix<double>& local_matrix = info.M1[0].matrix;
+  FullMatrix<double>& local_matrix = dinfo.matrix(0,false).matrix;
   
   for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -127,13 +133,15 @@ void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::Ce
 				 // On boundary faces, we use the
 				 // Nitsche boundary condition
 template <int dim>
-void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
+void MatrixIntegrator<dim>::bdry(
+  MeshWorker::DoFInfo<dim>& dinfo,
+  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe = info.fe_values();
-  FullMatrix<double>& local_matrix = info.M1[0].matrix;
+  FullMatrix<double>& local_matrix = dinfo.matrix(0,false).matrix;
   
   const unsigned int deg = fe.get_fe().tensor_degree();
-  const double penalty = 2. * deg * (deg+1) * info.face->measure() / info.cell->measure();
+  const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
   
   for (unsigned k=0;k<fe.n_quadrature_points;++k)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -146,24 +154,27 @@ void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::Fa
 
 
 template <int dim>
-void MatrixIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
+void MatrixIntegrator<dim>::face(
+  MeshWorker::DoFInfo<dim>& dinfo1,
+  MeshWorker::DoFInfo<dim>& dinfo2,
+  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
   const FEFaceValuesBase<dim>& fe1 = info1.fe_values();
   const FEFaceValuesBase<dim>& fe2 = info2.fe_values();
-  FullMatrix<double>& matrix_v1u1 = info1.M1[0].matrix;
-  FullMatrix<double>& matrix_v1u2 = info1.M2[0].matrix;
-  FullMatrix<double>& matrix_v2u1 = info2.M2[0].matrix;
-  FullMatrix<double>& matrix_v2u2 = info2.M1[0].matrix;
+  FullMatrix<double>& matrix_v1u1 = dinfo1.matrix(0,false).matrix;
+  FullMatrix<double>& matrix_v1u2 = dinfo1.matrix(0,true).matrix;
+  FullMatrix<double>& matrix_v2u1 = dinfo2.matrix(0,true).matrix;
+  FullMatrix<double>& matrix_v2u2 = dinfo2.matrix(0,false).matrix;
   
   const unsigned int deg = fe1.get_fe().tensor_degree();
-  double penalty1 = deg * (deg+1) * info1.face->measure() / info1.cell->measure();
-  double penalty2 = deg * (deg+1) * info2.face->measure() / info2.cell->measure();
-  if (info1.cell->has_children() ^ info2.cell->has_children())
+  double penalty1 = deg * (deg+1) * dinfo1.face->measure() / dinfo1.cell->measure();
+  double penalty2 = deg * (deg+1) * dinfo2.face->measure() / dinfo2.cell->measure();
+  if (dinfo1.cell->has_children() ^ dinfo2.cell->has_children())
     {
-      Assert (info1.face == info2.face, ExcInternalError());
-      Assert (info1.face->has_children(), ExcInternalError());
-//      Assert (info1.cell->has_children(), ExcInternalError());
+      Assert (dinfo1.face == dinfo2.face, ExcInternalError());
+      Assert (dinfo1.face->has_children(), ExcInternalError());
+//      Assert (dinfo1.cell->has_children(), ExcInternalError());
       penalty1 *= 2;
     }
 const double penalty = penalty1 + penalty2;
@@ -196,29 +207,31 @@ template <int dim>
 class RHSIntegrator : public Subscriptor
 {
   public:
-    static void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
-    static void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
-    static void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+    static void cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+    static void bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void face(MeshWorker::DoFInfo<dim>& dinfo1,
+		     MeshWorker::DoFInfo<dim>& dinfo2,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
 };
 
 
 template <int dim>
-void RHSIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo&)
+void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>&, typename MeshWorker::IntegrationWorker<dim>::CellInfo&)
 {}
 
 
 template <int dim>
-void RHSIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
+void RHSIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe = info.fe_values();
-  Vector<double>& local_vector = info.R[0].block(0);
+  Vector<double>& local_vector = dinfo.vector(0).block(0);
   
   std::vector<double> boundary_values(fe.n_quadrature_points);
   exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
   
   const unsigned int deg = fe.get_fe().tensor_degree();
-  const double penalty = 2. * deg * (deg+1) * info.face->measure() / info.cell->measure();
+  const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
   
   for (unsigned k=0;k<fe.n_quadrature_points;++k)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -229,7 +242,9 @@ void RHSIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceI
 
 
 template <int dim>
-void RHSIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo&,
+void RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim>&,
+			      MeshWorker::DoFInfo<dim>&,
+			      typename MeshWorker::IntegrationWorker<dim>::FaceInfo&,
 			      typename MeshWorker::IntegrationWorker<dim>::FaceInfo&)
 {}
 
@@ -238,29 +253,31 @@ template <int dim>
 class Estimator : public Subscriptor
 {
   public:
-    static void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
-    static void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
-    static void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+    static void cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+    static void bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void face(MeshWorker::DoFInfo<dim>& dinfo1,
+		     MeshWorker::DoFInfo<dim>& dinfo2,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
 };
 
 
 template <int dim>
-void Estimator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
+void Estimator<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   
   const std::vector<Tensor<2,dim> >& DDuh = info.hessians[0][0];
   for (unsigned k=0;k<fe.n_quadrature_points;++k)
     {
-      const double t = info.cell->diameter() * trace(DDuh[k]);
-      info.J[0] +=  t*t * fe.JxW(k);
+      const double t = dinfo.cell->diameter() * trace(DDuh[k]);
+      dinfo.value(0) +=  t*t * fe.JxW(k);
     }
 }
 
 
 template <int dim>
-void Estimator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
+void Estimator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe = info.fe_values();
   
@@ -270,16 +287,18 @@ void Estimator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo&
   const std::vector<double>& uh = info.values[0][0];
   
   const unsigned int deg = fe.get_fe().tensor_degree();
-  const double penalty = 2. * deg * (deg+1) * info.face->measure() / info.cell->measure();
+  const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
   
   for (unsigned k=0;k<fe.n_quadrature_points;++k)
-    info.J[0] += penalty * (boundary_values[k] - uh[k]) * (boundary_values[k] - uh[k])
+    dinfo.value(0) += penalty * (boundary_values[k] - uh[k]) * (boundary_values[k] - uh[k])
 		 * fe.JxW(k);
 }
 
 
 template <int dim>
-void Estimator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+void Estimator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
+			  MeshWorker::DoFInfo<dim>& dinfo2,
+			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
   const FEFaceValuesBase<dim>& fe = info1.fe_values();
@@ -289,19 +308,19 @@ void Estimator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo&
   const std::vector<Tensor<1,dim> >& Duh2 = info2.gradients[0][0];
   
   const unsigned int deg = fe.get_fe().tensor_degree();
-  const double penalty1 = deg * (deg+1) * info1.face->measure() / info1.cell->measure();
-  const double penalty2 = deg * (deg+1) * info2.face->measure() / info2.cell->measure();
+  const double penalty1 = deg * (deg+1) * dinfo1.face->measure() / dinfo1.cell->measure();
+  const double penalty2 = deg * (deg+1) * dinfo2.face->measure() / dinfo2.cell->measure();
   const double penalty = penalty1 + penalty2;
-  const double h = info1.face->measure();
+  const double h = dinfo1.face->measure();
   
   for (unsigned k=0;k<fe.n_quadrature_points;++k)
     {
       double diff1 = uh1[k] - uh2[k];
       double diff2 = fe.normal_vector(k) * Duh1[k] - fe.normal_vector(k) * Duh2[k];
-      info1.J[0] += (penalty * diff1*diff1 + h * diff2*diff2)
+      dinfo1.value(0) += (penalty * diff1*diff1 + h * diff2*diff2)
 		    * fe.JxW(k);
     }
-  info2.J[0] = info1.J[0];
+  dinfo2.value(0) = dinfo1.value(0);
 }
 
 
@@ -425,8 +444,8 @@ Step39<dim>::assemble_matrix()
 
   assembler.initialize(matrix);
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integration_worker, assembler, fe, mapping);
-  MeshWorker::integration_loop<CellInfo, FaceInfo>(
+  info_box.initialize(integration_worker, fe, mapping);
+  MeshWorker::integration_loop<CellInfo, FaceInfo, dim>(
     dof_handler.begin_active(), dof_handler.end(),
     info_box,
     &MatrixIntegrator<dim>::cell,
@@ -451,8 +470,8 @@ Step39<dim>::assemble_mg_matrix()
   assembler.initialize(mg_matrix);
   assembler.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
   MeshWorker::IntegrationInfoBox<dim> info_box(mg_dof_handler);
-  info_box.initialize(integration_worker, assembler, fe, mapping);
-  MeshWorker::integration_loop<CellInfo, FaceInfo>(
+  info_box.initialize(integration_worker, fe, mapping);
+  MeshWorker::integration_loop<CellInfo, FaceInfo, dim>(
     mg_dof_handler.begin(), mg_dof_handler.end(),
     info_box,
     &MatrixIntegrator<dim>::cell,
@@ -479,9 +498,9 @@ Step39<dim>::assemble_right_hand_side()
   data.add(rhs, "RHS");
   assembler.initialize(data);
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integration_worker, assembler, fe, mapping);
+  info_box.initialize(integration_worker, fe, mapping);
   
-  MeshWorker::integration_loop<CellInfo, FaceInfo>(
+  MeshWorker::integration_loop<CellInfo, FaceInfo, dim>(
     dof_handler.begin_active(), dof_handler.end(),
     info_box,
     &RHSIntegrator<dim>::cell,
@@ -600,8 +619,8 @@ Step39<dim>::estimate()
   out_data.add(est, "cells");
   assembler.initialize(out_data, false);
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integration_worker, assembler, fe, mapping, solution_data);
-  MeshWorker::integration_loop<CellInfo, FaceInfo> (
+  info_box.initialize(integration_worker, fe, mapping, solution_data);
+  MeshWorker::integration_loop<CellInfo, FaceInfo, dim> (
     dof_handler.begin_active(), dof_handler.end(),
     info_box,
     &Estimator<dim>::cell,

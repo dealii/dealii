@@ -66,14 +66,15 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class CELLINFO, class FACEINFO, class ITERATOR, typename ASSEMBLER>
+  template<class DOFINFO, class CELLINFO, class FACEINFO, class ITERATOR, typename ASSEMBLER>
   void loop(ITERATOR begin,
 	    typename identity<ITERATOR>::type end,
+	    DOFINFO cell_dof_info,
 	    CELLINFO& cell_info, FACEINFO& boundary_info,
 	    FACEINFO& face_info, FACEINFO& subface_info, FACEINFO& neighbor_info,
-	    const std_cxx1x::function<void (CELLINFO &)> &cell_worker,
-	    const std_cxx1x::function<void (FACEINFO &)> &boundary_worker,
-	    const std_cxx1x::function<void (FACEINFO &, FACEINFO &)> &face_worker,
+	    const std_cxx1x::function<void (DOFINFO&, CELLINFO &)> &cell_worker,
+	    const std_cxx1x::function<void (DOFINFO&, FACEINFO &)> &boundary_worker,
+	    const std_cxx1x::function<void (DOFINFO&, DOFINFO&, FACEINFO &, FACEINFO &)> &face_worker,
 	    ASSEMBLER &assembler,
 	    bool cells_first = true)
   {
@@ -81,6 +82,13 @@ namespace MeshWorker
     const bool integrate_boundary      = (boundary_worker != 0);
     const bool integrate_interior_face = (face_worker != 0);
 
+    ;
+    DOFINFO face_dof_info = cell_dof_info;
+    DOFINFO neighbor_dof_info = cell_dof_info;
+    assembler.initialize_info(cell_dof_info, false);
+    assembler.initialize_info(face_dof_info, true);
+    assembler.initialize_info(neighbor_dof_info, true);
+    
 				     // Loop over all cells
     for (ITERATOR cell = begin; cell != end; ++cell)
       {
@@ -89,9 +97,10 @@ namespace MeshWorker
 					 // before faces
 	if (integrate_cell && cells_first)
 	  {
-	    cell_info.reinit(cell);
-	    cell_worker(cell_info);
-	    assembler.assemble (cell_info);
+	    cell_dof_info.reinit(cell);
+	    cell_info.reinit(cell_dof_info);
+	    cell_worker(cell_dof_info, cell_info);
+	    assembler.assemble(cell_dof_info);
 	  }
 
 	if (integrate_interior_face || integrate_boundary)
@@ -102,9 +111,10 @@ namespace MeshWorker
 		{
 		  if (integrate_boundary)
 		    {
-		      boundary_info.reinit(cell, face, face_no);
-		      boundary_worker(boundary_info);
-		      assembler.assemble (boundary_info);
+		      cell_dof_info.reinit(cell, face, face_no);
+		      boundary_info.reinit(cell_dof_info);
+		      boundary_worker(cell_dof_info, boundary_info);
+		      assembler.assemble(cell_dof_info);
 		    }
 		}
 	      else if (integrate_interior_face)
@@ -132,14 +142,18 @@ namespace MeshWorker
 			= cell->neighbor_of_coarser_neighbor(face_no);
 		      typename ITERATOR::AccessorType::Container::face_iterator nface
 			= neighbor->face(neighbor_face_no.first);
-		      face_info.reinit(cell, face, face_no);
-		      subface_info.reinit(neighbor, nface, neighbor_face_no.first, neighbor_face_no.second);
+		      
+		      face_dof_info.reinit(cell, face, face_no);
+		      face_info.reinit(face_dof_info);
+		      neighbor_dof_info.reinit(neighbor, nface,
+					       neighbor_face_no.first, neighbor_face_no.second);
+		      subface_info.reinit(neighbor_dof_info);
 						       // Neighbor
 						       // first to
 						       // conform to
 						       // old version
-		      face_worker(face_info, subface_info);
-		      assembler.assemble (face_info, subface_info);
+		      face_worker(face_dof_info, neighbor_dof_info, face_info, subface_info);
+		      assembler.assemble (face_dof_info, neighbor_dof_info);
 		    }
 		  else
 		    {
@@ -162,12 +176,13 @@ namespace MeshWorker
 		      unsigned int neighbor_face_no = cell->neighbor_of_neighbor(face_no);
 		      Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
 						       // Regular interior face
-		      face_info.reinit(cell, face, face_no);
-		      neighbor_info.reinit(neighbor, neighbor->face(neighbor_face_no),
-					   neighbor_face_no);
-
-		      face_worker(face_info, neighbor_info);
-		      assembler.assemble (face_info, neighbor_info);
+		      face_dof_info.reinit(cell, face, face_no);
+		      face_info.reinit(face_dof_info);
+		      neighbor_dof_info.reinit(neighbor, neighbor->face(neighbor_face_no),
+					       neighbor_face_no);
+		      neighbor_info.reinit(neighbor_dof_info);
+		      face_worker(face_dof_info, neighbor_dof_info, face_info, neighbor_info);
+		      assembler.assemble(face_dof_info, neighbor_dof_info);
 		    }
 		}
 	    } // faces
@@ -175,9 +190,10 @@ namespace MeshWorker
 					 // have to be handled first
 	if (integrate_cell && !cells_first)
 	  {
-	    cell_info.reinit(cell);
-	    cell_worker(cell_info);
-	    assembler.assemble (cell_info);
+	    cell_dof_info.reinit(cell);
+	    cell_info.reinit(cell_dof_info);
+	    cell_worker(cell_dof_info, cell_info);
+	    assembler.assemble (cell_dof_info);
 	  }
       }
   }
@@ -192,14 +208,15 @@ namespace MeshWorker
   void integration_loop(ITERATOR begin,
 			typename identity<ITERATOR>::type end,
 			IntegrationInfoBox<dim, dim>& box,
-			const std_cxx1x::function<void (CELLINFO &)> &cell_worker,
-			const std_cxx1x::function<void (FACEINFO &)> &boundary_worker,
-			const std_cxx1x::function<void (FACEINFO &, FACEINFO &)> &face_worker,
+			const std_cxx1x::function<void (DoFInfo<dim>&, CELLINFO &)> &cell_worker,
+			const std_cxx1x::function<void (DoFInfo<dim>&, FACEINFO &)> &boundary_worker,
+			const std_cxx1x::function<void (DoFInfo<dim>&, DoFInfo<dim>&, FACEINFO &, FACEINFO &)> &face_worker,
 			ASSEMBLER &assembler,
 			bool cells_first = true)
   {
-    loop<CELLINFO,FACEINFO>
+    loop<DoFInfo<dim>,CELLINFO,FACEINFO>
       (begin, end,
+       box.dof_info,
        box.cell_info, box.boundary_info,
        box.face_info,
        box.subface_info, box.neighbor_info,

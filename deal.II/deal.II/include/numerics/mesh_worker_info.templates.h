@@ -63,9 +63,8 @@ namespace MeshWorker
 //----------------------------------------------------------------------//
 
   template<int dim, class FVB, int sdim>
-  IntegrationInfo<dim,FVB,sdim>::IntegrationInfo(const BlockInfo& block_info)
+  IntegrationInfo<dim,FVB,sdim>::IntegrationInfo()
 		  :
-		  DoFInfo<dim,sdim>(block_info),
 		  fevalv(0),
 		  multigrid(false),
 		  global_data(boost::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>))
@@ -79,9 +78,10 @@ namespace MeshWorker
     const FiniteElement<dim,sdim>& el,
     const Mapping<dim,sdim>& mapping,
     const Quadrature<FEVALUES::integral_dimension>& quadrature,
-    const UpdateFlags flags)
+    const UpdateFlags flags,
+    const BlockInfo* block_info)
   {
-    if (this->block_info == 0 || this->block_info->local().size() == 0)
+    if (block_info == 0 || block_info->local().size() == 0)
       {
 	fevalv.resize(1);	      
 	fevalv[0] = boost::shared_ptr<FVB> (
@@ -165,21 +165,21 @@ namespace MeshWorker
 
   template<int dim, class FVB, int sdim>
   void
-  IntegrationInfo<dim,FVB,sdim>::fill_local_data(bool split_fevalues)
+  IntegrationInfo<dim,FVB,sdim>::fill_local_data(const DoFInfo<dim, sdim>& info, bool split_fevalues)
   {
      if (split_fevalues)
        {
 	unsigned int comp = 0;
 					 // Loop over all blocks
-	for (unsigned int b=0;b<this->block_info->local().size();++b)
+	for (unsigned int b=0;b<info.block_info->local().size();++b)
 	  {
-	    const unsigned int fe_no = this->block_info->base_element(b);
+	    const unsigned int fe_no = info.block_info->base_element(b);
 	    const FEValuesBase<dim>& fe = this->fe_values(fe_no);
 	    const unsigned int n_comp = fe.get_fe().n_components();
-	    const unsigned int block_start = this->block_info->local().block_start(b);
-	    const unsigned int block_size = this->block_info->local().block_size(b);
+	    const unsigned int block_start = info.block_info->local().block_start(b);
+	    const unsigned int block_size = info.block_info->local().block_size(b);
 	    
-	    this->global_data->fill(values, gradients, hessians, fe, this->indices,
+	    this->global_data->fill(values, gradients, hessians, fe, info.indices,
 				    comp, n_comp, block_start, block_size);
  	    comp += n_comp;
 	  }
@@ -188,8 +188,8 @@ namespace MeshWorker
        {
 	 const FEValuesBase<dim>& fe = this->fe_values(0);
 	 const unsigned int n_comp = fe.get_fe().n_components();
-	 this->global_data->fill(values, gradients, hessians, fe, this->indices,
-				 0, n_comp, 0, this->indices.size());
+	 this->global_data->fill(values, gradients, hessians, fe, info.indices,
+				 0, n_comp, 0, info.indices.size());
        }
   }
 }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,15 +34,15 @@ namespace MeshWorker
   template void IntegrationInfo<deal_II_dimension, FEValuesBase<deal_II_dimension> >
   ::initialize<FEValues<deal_II_dimension> >(
     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
-    const Quadrature<FEValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags);
+    const Quadrature<FEValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);
   template void IntegrationInfo<deal_II_dimension, FEFaceValuesBase<deal_II_dimension> >
   ::initialize<FEFaceValues<deal_II_dimension> >(
     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
-    const Quadrature<FEFaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags);
+    const Quadrature<FEFaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);
   template void IntegrationInfo<deal_II_dimension, FEFaceValuesBase<deal_II_dimension> >
   ::initialize<FESubfaceValues<deal_II_dimension> >(
     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
-    const Quadrature<FESubfaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags);
+    const Quadrature<FESubfaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);
 }
 
 #endif

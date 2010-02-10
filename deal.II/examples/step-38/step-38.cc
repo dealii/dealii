@@ -39,6 +39,7 @@
 				 // Here come the new include files
 				 // for using the MeshWorker framework:
 #include <numerics/mesh_worker.h>
+#include <numerics/mesh_worker_info.h>
 #include <numerics/mesh_worker_loop.h>
 
 #include <iostream>
@@ -200,9 +201,10 @@ class DGMethod
 				     // types of arguments, but have
 				     // in fact other arguments
 				     // already bound.
-    static void integrate_cell_term (CellInfo& info);
-    static void integrate_boundary_term (FaceInfo& info);
-    static void integrate_face_term (FaceInfo& info1,
+    static void integrate_cell_term (MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info);
+    static void integrate_boundary_term (MeshWorker::DoFInfo<dim>& dinfo, FaceInfo& info);
+    static void integrate_face_term (MeshWorker::DoFInfo<dim>& dinfo1,
+				     MeshWorker::DoFInfo<dim>& dinfo2, FaceInfo& info1,
 				     FaceInfo& info2);
 };
 
@@ -378,19 +380,20 @@ void DGMethod<dim>::assemble_system ()
 				   // receives all the stuff we
 				   // created so far.
   MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integration_worker, assembler, fe, mapping);
+  info_box.initialize(integration_worker, fe, mapping);
 
 				   // Finally, the integration loop
 				   // over all active cells
 				   // (determined by the first
-				   // argument, which is an active iterator).
-  MeshWorker::integration_loop<CellInfo,FaceInfo>
+				   // argument, which is an active
+				   // iterator).
+  MeshWorker::integration_loop<CellInfo, FaceInfo, dim>
     (dof_handler.begin_active(), dof_handler.end(),
      info_box,
      &DGMethod<dim>::integrate_cell_term,
      &DGMethod<dim>::integrate_boundary_term,
      &DGMethod<dim>::integrate_face_term,
-     assembler);
+     assembler, true);
 }
 
 
@@ -412,7 +415,7 @@ void DGMethod<dim>::assemble_system ()
 				 // added soon).
 
 template <int dim>
-void DGMethod<dim>::integrate_cell_term (CellInfo& info)
+void DGMethod<dim>::integrate_cell_term (MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info)
 {
 				   // First, let us retrieve some of
 				   // the objects used here from
@@ -422,7 +425,7 @@ void DGMethod<dim>::integrate_cell_term (CellInfo& info)
 				   // looks more complicated than
 				   // might seem necessary.
   const FEValuesBase<dim>& fe_v = info.fe_values();
-  FullMatrix<double>& local_matrix = info.M1[0].matrix;
+  FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
 
 				   // With these objects, we continue
@@ -458,11 +461,11 @@ void DGMethod<dim>::integrate_cell_term (CellInfo& info)
 				 // FESubfaceValues, in order to get access to
 				 // normal vectors.
 template <int dim>
-void DGMethod<dim>::integrate_boundary_term (FaceInfo& info)
+void DGMethod<dim>::integrate_boundary_term (MeshWorker::DoFInfo<dim>& dinfo, FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe_v = info.fe_values();
-  FullMatrix<double>& local_matrix = info.M1[0].matrix;
-  Vector<double>& local_vector = info.R[0].block(0);
+  FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
+  Vector<double>& local_vector = dinfo.vector(0).block(0);
 
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
@@ -504,7 +507,9 @@ void DGMethod<dim>::integrate_boundary_term (FaceInfo& info)
 				 // for each cell and two for coupling
 				 // back and forth.
 template <int dim>
-void DGMethod<dim>::integrate_face_term (FaceInfo& info1,
+void DGMethod<dim>::integrate_face_term (MeshWorker::DoFInfo<dim>& dinfo1,
+					 MeshWorker::DoFInfo<dim>& dinfo2,
+					 FaceInfo& info1,
 					 FaceInfo& info2)
 {
 				   // For quadrature points, weights,
@@ -531,10 +536,10 @@ void DGMethod<dim>::integrate_face_term (FaceInfo& info1,
 				   // interior couplings of that cell,
 				   // while the second contains the
 				   // couplings between cells.
-  FullMatrix<double>& u1_v1_matrix = info1.M1[0].matrix;
-  FullMatrix<double>& u2_v1_matrix = info1.M2[0].matrix;
-  FullMatrix<double>& u1_v2_matrix = info2.M2[0].matrix;
-  FullMatrix<double>& u2_v2_matrix = info2.M1[0].matrix;
+  FullMatrix<double>& u1_v1_matrix = dinfo1.matrix(0,false).matrix;
+  FullMatrix<double>& u2_v1_matrix = dinfo1.matrix(0,true).matrix;
+  FullMatrix<double>& u1_v2_matrix = dinfo2.matrix(0,true).matrix;
+  FullMatrix<double>& u2_v2_matrix = dinfo2.matrix(0,false).matrix;
 
 				   // Here, following the previous
 				   // functions, we would have the

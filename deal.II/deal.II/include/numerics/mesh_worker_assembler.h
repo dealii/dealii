@@ -995,7 +995,7 @@ namespace MeshWorker
     Functional<number>::assemble(const DoFInfo<dim>& info)
     {
       for (unsigned int i=0;i<results.size();++i)
-	results[i] += info.J[i];
+	results[i] += info.value(i);
     }
     
 
@@ -1007,8 +1007,8 @@ namespace MeshWorker
     {
       for (unsigned int i=0;i<results.size();++i)
 	{
-	  results[i] += info1.J[i];
-	  results[i] += info2.J[i];
+	  results[i] += info1.value(i);
+	  results[i] += info2.value(i);
 	}
     }
 
@@ -1053,13 +1053,13 @@ namespace MeshWorker
     inline void
     CellsAndFaces<number>::assemble(const DoFInfo<dim>& info)
     {
-      for (unsigned int i=0;i<info.J.size();++i)
+      for (unsigned int i=0;i<info.n_values();++i)
 	{
 	  if (separate_faces &&
 	      info.face_number != deal_II_numbers::invalid_unsigned_int)
-	    results(1)->block(i)(info.face->user_index()) += info.J[i];
+	    results(1)->block(i)(info.face->user_index()) += info.value(i);
 	  else
-	    results(0)->block(i)(info.cell->user_index()) += info.J[i];
+	    results(0)->block(i)(info.cell->user_index()) += info.value(i);
 	}
     }
     
@@ -1070,19 +1070,19 @@ namespace MeshWorker
     CellsAndFaces<number>::assemble(const DoFInfo<dim>& info1,
 				    const DoFInfo<dim>& info2)
     {
-      for (unsigned int i=0;i<info1.J.size();++i)
+      for (unsigned int i=0;i<info1.n_values();++i)
 	{
 	  if (separate_faces)
 	    {
-	      const double J = info1.J[i] + info2.J[i];
+	      const double J = info1.value(i) + info2.value(i);
 	      results(1)->block(i)(info1.face->user_index()) += J;
 	      if (info2.face != info1.face)
 		results(1)->block(i)(info2.face->user_index()) += J;
 	    }
 	  else
 	    {
-	      results(0)->block(i)(info1.cell->user_index()) += .5*info1.J[i];
-	      results(0)->block(i)(info2.cell->user_index()) += .5*info2.J[i];
+	      results(0)->block(i)(info1.cell->user_index()) += .5*info1.value(i);
+	      results(0)->block(i)(info2.cell->user_index()) += .5*info2.value(i);
 	    }
 	}
     }
@@ -1114,8 +1114,8 @@ namespace MeshWorker
     ResidualSimple<VECTOR>::assemble(const DoFInfo<dim>& info)
     {
       for (unsigned int k=0;k<residuals.size();++k)
-	for (unsigned int i=0;i<info.R[k].block(0).size();++i)
-	  (*residuals(k))(info.indices[i]) += info.R[k].block(0)(i);
+	for (unsigned int i=0;i<info.vector(k).block(0).size();++i)
+	  (*residuals(k))(info.indices[i]) += info.vector(k).block(0)(i);
     }
 
     
@@ -1127,10 +1127,10 @@ namespace MeshWorker
     {
       for (unsigned int k=0;k<residuals.size();++k)
 	{
-	  for (unsigned int i=0;i<info1.R[k].block(0).size();++i)
-	    (*residuals(k))(info1.indices[i]) += info1.R[k].block(0)(i);
-	  for (unsigned int i=0;i<info2.R[k].block(0).size();++i)
-	    (*residuals(k))(info2.indices[i]) += info2.R[k].block(0)(i);
+	  for (unsigned int i=0;i<info1.vector(k).block(0).size();++i)
+	    (*residuals(k))(info1.indices[i]) += info1.vector(k).block(0)(i);
+	  for (unsigned int i=0;i<info2.vector(k).block(0).size();++i)
+	    (*residuals(k))(info2.indices[i]) += info2.vector(k).block(0)(i);
 	}
     }
 
@@ -1187,7 +1187,7 @@ namespace MeshWorker
       const DoFInfo<dim>& info)
     {
       for (unsigned int i=0;i<residuals.size();++i)
-	assemble(*residuals(i), info.R[i], info.indices);
+	assemble(*residuals(i), info.vector(i), info.indices);
     }
 
     
@@ -1200,8 +1200,8 @@ namespace MeshWorker
     {
       for (unsigned int i=0;i<residuals.size();++i)
 	{
-	  assemble(*residuals(i), info1.R[i], info1.indices);
-	  assemble(*residuals(i), info2.R[i], info2.indices);
+	  assemble(*residuals(i), info1.vector(i), info1.indices);
+	  assemble(*residuals(i), info2.vector(i), info2.indices);
 	}
     }
 
@@ -1256,7 +1256,7 @@ namespace MeshWorker
     inline void
     MatrixSimple<MATRIX>::assemble(const DoFInfo<dim>& info)
     {
-      assemble(info.M1[0].matrix, info.indices, info.indices);
+      assemble(info.matrix(0,false).matrix, info.indices, info.indices);
     }
     
 
@@ -1266,10 +1266,10 @@ namespace MeshWorker
     MatrixSimple<MATRIX>::assemble(const DoFInfo<dim>& info1,
 				   const DoFInfo<dim>& info2)
     {
-      assemble(info1.M1[0].matrix, info1.indices, info1.indices);
-      assemble(info1.M2[0].matrix, info1.indices, info2.indices);
-      assemble(info2.M1[0].matrix, info2.indices, info2.indices);
-      assemble(info2.M2[0].matrix, info2.indices, info1.indices);
+      assemble(info1.matrix(0,false).matrix, info1.indices, info1.indices);
+      assemble(info1.matrix(0,true).matrix, info1.indices, info2.indices);
+      assemble(info2.matrix(0,false).matrix, info2.indices, info2.indices);
+      assemble(info2.matrix(0,true).matrix, info2.indices, info1.indices);
     }
     
     
@@ -1354,7 +1354,7 @@ namespace MeshWorker
     MGMatrixSimple<MATRIX>::assemble(const DoFInfo<dim>& info)
     {
       const unsigned int level = info.cell->level();
-      assemble((*matrix)[level], info.M1[0].matrix, info.indices, info.indices);
+      assemble((*matrix)[level], info.matrix(0,false).matrix, info.indices, info.indices);
     }
     
 
@@ -1369,10 +1369,10 @@ namespace MeshWorker
       
       if (level1 == level2)
 	{
-	  assemble((*matrix)[level1], info1.M1[0].matrix, info1.indices, info1.indices);
-	  assemble((*matrix)[level1], info1.M2[0].matrix, info1.indices, info2.indices);
-	  assemble((*matrix)[level1], info2.M1[0].matrix, info2.indices, info2.indices);
-	  assemble((*matrix)[level1], info2.M2[0].matrix, info2.indices, info1.indices);
+	  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
+	  assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices);
+	  assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices);
+	  assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
 	}
       else
 	{
@@ -1380,9 +1380,9 @@ namespace MeshWorker
 					   // Do not add info2.M1,
 					   // which is done by
 					   // the coarser cell
-	  assemble((*matrix)[level1], info1.M1[0].matrix, info1.indices, info1.indices);
-	  assemble_transpose((*flux_up)[level1],info1.M2[0].matrix, info2.indices, info1.indices);
-	  assemble((*flux_down)[level1], info2.M2[0].matrix, info2.indices, info1.indices);
+	  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
+	  assemble_transpose((*flux_up)[level1],info1.matrix(0,true).matrix, info2.indices, info1.indices);
+	  assemble((*flux_down)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
 	}
     }
     
@@ -1474,7 +1474,7 @@ namespace MeshWorker
 	  const unsigned int row = matrices[i]->row;
 	  const unsigned int col = matrices[i]->column;
 
-	  assemble(matrices[i]->matrix, info.M1[i].matrix, row, col, info.indices, info.indices);
+	  assemble(matrices[i]->matrix, info.matrix(i,false).matrix, row, col, info.indices, info.indices);
 	}
     }
 
@@ -1493,10 +1493,10 @@ namespace MeshWorker
 	  const unsigned int row = matrices[i]->row;
 	  const unsigned int col = matrices[i]->column;
 
-	  assemble(matrices[i]->matrix, info1.M1[i].matrix, row, col, info1.indices, info1.indices);
-	  assemble(matrices[i]->matrix, info1.M2[i].matrix, row, col, info1.indices, info2.indices);
-	  assemble(matrices[i]->matrix, info2.M1[i].matrix, row, col, info2.indices, info2.indices);
-	  assemble(matrices[i]->matrix, info2.M2[i].matrix, row, col, info2.indices, info1.indices);
+	  assemble(matrices[i]->matrix, info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices);
+	  assemble(matrices[i]->matrix, info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices);
+	  assemble(matrices[i]->matrix, info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices);
+	  assemble(matrices[i]->matrix, info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices);
 	}
     }
 
@@ -1607,7 +1607,7 @@ namespace MeshWorker
 	  const unsigned int row = matrices[i]->row;
 	  const unsigned int col = matrices[i]->column;
 
-	  assemble(matrices[i]->matrix[level], info.M1[i].matrix, row, col,
+	  assemble(matrices[i]->matrix[level], info.matrix(i,false).matrix, row, col,
 		   info.indices, info.indices, level, level);
 	}
     }
@@ -1632,10 +1632,10 @@ namespace MeshWorker
 
 	  if (level1 == level2)
 	    {
-	      assemble(matrices[i]->matrix[level1], info1.M1[i].matrix, row, col, info1.indices, info1.indices, level1, level1);
-	      assemble(matrices[i]->matrix[level1], info1.M2[i].matrix, row, col, info1.indices, info2.indices, level1, level2);
-	      assemble(matrices[i]->matrix[level1], info2.M1[i].matrix, row, col, info2.indices, info2.indices, level2, level2);
-	      assemble(matrices[i]->matrix[level1], info2.M2[i].matrix, row, col, info2.indices, info1.indices, level2, level1);
+	      assemble(matrices[i]->matrix[level1], info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices, level1, level1);
+	      assemble(matrices[i]->matrix[level1], info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices, level1, level2);
+	      assemble(matrices[i]->matrix[level1], info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices, level2, level2);
+	      assemble(matrices[i]->matrix[level1], info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices, level2, level1);
 	    }
 	  else
 	    {
@@ -1645,11 +1645,11 @@ namespace MeshWorker
 						   // Do not add M22,
 						   // which is done by
 						   // the coarser cell
-		  assemble(matrices[i]->matrix[level1], info1.M1[i].matrix, row, col,
+		  assemble(matrices[i]->matrix[level1], info1.matrix(i,false).matrix, row, col,
 			   info1.indices, info1.indices, level1, level1);	      
-		  assemble(flux_up[i]->matrix[level1], info1.M2[i].matrix, row, col,
+		  assemble(flux_up[i]->matrix[level1], info1.matrix(i,true).matrix, row, col,
 			   info1.indices, info2.indices, level1, level2, true);
-		  assemble(flux_down[i]->matrix[level1], info2.M2[i].matrix, row, col,
+		  assemble(flux_down[i]->matrix[level1], info2.matrix(i,true).matrix, row, col,
 			   info2.indices, info1.indices, level2, level1);
 		}
 	    }
