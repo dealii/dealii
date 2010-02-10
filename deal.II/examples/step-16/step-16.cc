@@ -277,11 +277,11 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system ()
 {
-  QGauss<dim>  quadrature_formula(1+degree);
+  const QGauss<dim>  quadrature_formula(degree+1);
 
   FEValues<dim> fe_values (fe, quadrature_formula,
-			   update_values   | update_gradients |
-			   update_quadrature_points | update_JxW_values);
+			   update_values    |  update_gradients |
+			   update_quadrature_points  |  update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.size();
@@ -291,7 +291,10 @@ void LaplaceProblem<dim>::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
+  const Coefficient<dim> coefficient;
+  std::vector<double>    coefficient_values (n_q_points);
+
+  typename MGDoFHandler<dim>::active_cell_iterator
     cell = mg_dof_handler.begin_active(),
     endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -300,16 +303,22 @@ void LaplaceProblem<dim>::assemble_system ()
       cell_rhs = 0;
 
       fe_values.reinit (cell);
+
+      coefficient.value_list (fe_values.get_quadrature_points(),
+			      coefficient_values);
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point)
-				   * fe_values.shape_grad(j,q_point))
-				  * fe_values.JxW(q_point);
+	      cell_matrix(i,j) += (coefficient_values[q_point] *
+				   fe_values.shape_grad(i,q_point) *
+				   fe_values.shape_grad(j,q_point) *
+				   fe_values.JxW(q_point));
 
-	    cell_rhs(i) += (fe_values.shape_value(i,q_point)
-			    * 1.0 * fe_values.JxW(q_point));
+	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
+			    1.0 *
+			    fe_values.JxW(q_point));
 	  }
 
       cell->get_dof_indices (local_dof_indices);
@@ -382,6 +391,9 @@ void LaplaceProblem<dim>::assemble_multigrid ()
       boundary_interface_constraints[level].close ();
     }
 
+  const Coefficient<dim> coefficient;
+  std::vector<double>    coefficient_values (n_q_points);
+
   typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
 					    endc = mg_dof_handler.end();
 
@@ -393,17 +405,19 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 				       // by update flags above.
       fe_values.reinit (cell);
 
+      coefficient.value_list (fe_values.get_quadrature_points(),
+			      coefficient_values);
+
 				       // This is exactly the
 				       // integration loop of the cell
 				       // matrix above.
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  {
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point)
-				   * fe_values.shape_grad(j,q_point))
-				  * fe_values.JxW(q_point);
-	  }
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    cell_matrix(i,j) += (coefficient_values[q_point] *
+				 fe_values.shape_grad(i,q_point) *
+				 fe_values.shape_grad(j,q_point) *
+				 fe_values.JxW(q_point));
 
 				       // Oops! This is a tiny
 				       // difference easily
@@ -536,6 +550,8 @@ void LaplaceProblem<dim>::solve ()
 	    << std::endl;
 }
 
+
+
 template <int dim>
 void LaplaceProblem<dim>::refine_grid ()
 {
@@ -551,6 +567,8 @@ void LaplaceProblem<dim>::refine_grid ()
 						   0.3, 0.03);
   triangulation.execute_coarsening_and_refinement ();
 }
+
+
 
 template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
@@ -569,6 +587,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   std::ofstream output (filename.str().c_str());
   data_out.write_vtk (output);
 }
+
+
 
 template <int dim>
 void LaplaceProblem<dim>::run ()
