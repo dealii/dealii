@@ -246,6 +246,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li><p>Fixed: The file <code>data_out_base.cc</code> could not be compiled
+  when Tecplot was available. This should now be fixed.
+  <br>
+  (WB 2010/02/10)
+  </p></li>
+
   <li><p>Fixed: The PolynomialsBDM, PolynomialsABF and Functions::FlowFunction
   classes had a race condition in multithreaded programs. This now fixed.
   <br>
