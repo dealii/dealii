@@ -4,7 +4,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2007, 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 2007, 2008, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -2544,7 +2544,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 		      ExcInternalError());
 	      Assert (joint_fe.system_to_base_index(i).second
 		      <
-		      local_stokes_dof_indices.size(),
+		      local_temperature_dof_indices.size(),
 		      ExcInternalError());
 	      joint_solution(local_joint_dof_indices[i])
 		= temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
