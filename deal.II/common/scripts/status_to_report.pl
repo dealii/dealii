@@ -12,25 +12,25 @@ $contents =~ s/\s+//g;
 
 if ($contents eq 'diffok')
 {
-    print '   + ';
+    print '  + ';
 }
 elsif ($contents eq 'Compiling')
 {
-    print ' 0   ';
+    print ' 0  ';
 }
 elsif ($contents eq 'Linking')
 {
-    print ' 1   ';
+    print ' 1  ';
 }
 elsif ($contents eq 'Running')
 {
-    print ' 2   ';
+    print ' 2  ';
 }
 elsif ($contents eq 'Checking')
 {
-    print ' 3   ';
+    print ' 3  ';
 }
 else
 {
-    print ' ??? ';
+    print ' ?? ';
 }
