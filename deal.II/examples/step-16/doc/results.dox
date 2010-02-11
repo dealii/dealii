@@ -75,35 +75,6 @@ observation that, whenever possible, multigrid methods should be used
 for second order problems.
 
 
-The output produced by this program is the following:
-<pre>
-DEAL::Cycle 0
-DEAL::Number of degrees of freedom: 25   L0: 8   L1: 25
-DEAL:cg::Starting value 0.486247
-DEAL:cg::Convergence step 6 value 9.08594e-16
-DEAL::Cycle 1
-DEAL::Number of degrees of freedom: 89   L0: 8   L1: 25   L2: 89
-DEAL:cg::Starting value 0.321015
-DEAL:cg::Convergence step 8 value 2.13127e-13
-DEAL::Cycle 2
-DEAL::Number of degrees of freedom: 337   L0: 8   L1: 25   L2: 89   L3: 337
-DEAL:cg::Starting value 0.182585
-DEAL:cg::Convergence step 9 value 6.84845e-14
-DEAL::Cycle 3
-DEAL::Number of degrees of freedom: 1313   L0: 8   L1: 25   L2: 89   L3: 337   L4: 1313
-DEAL:cg::Starting value 0.0970681
-DEAL:cg::Convergence step 9 value 2.34606e-13
-DEAL::Cycle 4
-DEAL::Number of degrees of freedom: 5185   L0: 8   L1: 25   L2: 89   L3: 337   L4: 1313   L5: 5185
-DEAL:cg::Starting value 0.0500007
-DEAL:cg::Convergence step 9 value 7.22130e-13
-DEAL::Cycle 5
-DEAL::Number of degrees of freedom: 20609   L0: 8   L1: 25   L2: 89   L3: 337   L4: 1313   L5: 5185   L6: 20609
-DEAL:cg::Starting value 0.0253688
-DEAL:cg::Convergence step 10 value 9.41828e-14
-</pre>
-
-
 <h3> Possible extensions </h3>
 
 A close inspection of this program's performance shows that it is mostly
