@@ -57,7 +57,7 @@ we use a constant coefficient: in that case, the number of iterations
 remains constant at 9 after the first three or four refinement steps.
 
 Let us compare the iteration steps needed to obtain convergence for the two methods:
-<table>
+<table align="center">
 <tr><th>cells</th><th>step-5</th><th>step-16</th></tr>
 <tr><td>20</td>   <td>13</td> <td>6</td> </tr>
 <tr><td>80</td>   <td>17</td> <td>7</td> </tr>
