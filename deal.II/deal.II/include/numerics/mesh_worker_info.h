@@ -419,6 +419,15 @@ namespace MeshWorker
 					* UpdateFlags used in
 					* the constructor of the
 					* FEVALUES objects.
+					*
+					* @param local_block_info is
+					* an optional parameter for
+					* systems of PDE. If it is
+					* provided with reasonable
+					* data, then the degrees of
+					* freedom on the cells will be
+					* re-ordered to reflect the
+					* block structure of the system.
 					*/
       template <class FEVALUES>
       void initialize(const FiniteElement<dim,spacedim>& el,
