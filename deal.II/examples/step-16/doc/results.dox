@@ -90,7 +90,7 @@ how this can be avoided by working with matrix-free methods.
 Another avenue would be to use algebraic multigrid methods. The
 geometric multigrid method used here can at times be a bit awkward to
 implement because it needs all those additional data structures, and
-it becomes even more difficult if the program is to run in parallel on
+it becomes even more difficult if the program is to run in %parallel on
 machines coupled through MPI, for example. In that case, it would be
 simpler if one could use a black-box preconditioner that uses some
 sort of multigrid hierarchy for good performance but can figure out
