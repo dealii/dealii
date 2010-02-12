@@ -6,7 +6,7 @@
 This example is devoted to the MeshWorker framework and the <em>discontinuous
 Galerkin method</em>, or in short: DG method. It includes the following topics.
 <ol>
-  <li> Discretization of the linear transport equation with the DG method.
+  <li> Discretization of the linear advection equation with the DG method.
   <li> Assembling of the system matrix using the MeshWorker::loop().
 </ol>
 
@@ -25,92 +25,51 @@ goal.
 <h3>Problem</h3>
 
 The model problem solved in this example is the linear advection equation
-<a name="step-12.transport-equation">@f[
-  \nabla\cdot \left({\mathbf \beta} u\right)=f  \qquad\mbox{in }\Omega,
-\qquad\qquad\qquad\mathrm{[transport-equation]}@f]</a>
+@f[
+  \nabla\cdot \left({\mathbf \beta} u\right)=0 \qquad\mbox{in }\Omega,
+@f]
 subject to the boundary conditions
 @f[
 u=g\quad\mbox{on }\Gamma_-,
 @f]
 on the inflow part $\Gamma_-$ of the boundary $\Gamma=\partial\Omega$
 of the domain.  Here, ${\mathbf \beta}={\mathbf \beta}({\bf x})$ denotes a
-vector field, $f$ a source function, $u$ the (scalar) solution
+vector field, $u$ the (scalar) solution
 function, $g$ a boundary value function,
 @f[
 \Gamma_-:=\{{\bf x}\in\Gamma, {\mathbf \beta}({\bf x})\cdot{\bf n}({\bf x})<0\}
 @f]
 the inflow part of the boundary of the domain and ${\bf n}$ denotes
-the unit outward normal to the boundary $\Gamma$. Equation
-<a href="#step-12.transport-equation">[transport-equation]</a> is the conservative version of the
-transport equation already considered in step 9 of this tutorial.
-
-In particular, we consider problem <a href="#step-12.transport-equation">[transport-equation]</a> on
+the unit outward normal to the boundary $\Gamma$. This equation is the
+conservative version of the advection equation already considered in
+@ref step_9 "step-9" of this tutorial.
+In particular, we solve the advection equation on
 $\Omega=[0,1]^2$ with ${\mathbf \beta}=\frac{1}{|x|}(-x_2, x_1)$
-representing a circular counterclockwise flow field, $f=0$ and $g=1$
+representing a circular counterclockwise flow field, and $g=1$
 on ${\bf x}\in\Gamma_-^1:=[0,0.5]\times\{0\}$ and $g=0$ on ${\bf x}\in
 \Gamma_-\setminus \Gamma_-^1$.
 
-
-<h3>Discretization</h3>
-
-For deriving the DG
-discretization we start with a variational, mesh-dependent
-formulation of the problem,
-@f[
-  \sum_\kappa\left\{-\beta u,\nabla v)_\kappa+(u^+ \beta\cdot{\bf n}, v)_{\partial\kappa}\right\}=(f,v)_\Omega,
-@f]
-
-that originates from <a
-href="#step-12.transport-equation">[transport-equation]</a> by
-multiplication with a test function $v$ and integration by parts on
-each cell $\kappa$ of the triangulation. Here $(\cdot, \cdot)_\kappa$
-and $(\cdot, \cdot)_{\partial\kappa}$ denote the
-<i>L<sup>2</sup></i>-inner products on the cell $\kappa$ and the
-boundary $\partial\kappa$ of the cell, respectively. $u^+$ is the
-value of <i>u</i> taken from the upwind cell with respect to $\beta$
-of the face, that is, the cell $\beta$ points away from. To discretize
-the problem, the functions $u$ and $v$ are replaced by discrete
-functions $u_h$ and $v_h$ that in the case of discontinuous Galerkin
-methods belong to the space $V_h$ of discontinuous piecewise
-polynomial functions of some degree $p$.
-
-Hence, the discontinuous Galerkin
-scheme for the <a href="#step-12.transport-equation">[transport-equation]</a> is given
-by: find $u_h\in V_h$ such that for all $v_h\in V_h$ following
-equation holds:
-<a name="step-12.dg-transport1">@f[
-  \sum_\kappa\left\{-(u_h,{\mathbf \beta}\cdot\nabla v_h)_\kappa
-  +({\mathbf \beta}\cdot{\bf n}\, u_h, v_h)_{\partial\kappa_+}
-  +({\mathbf \beta}\cdot{\bf n}\, u_h^-, v_h)_{\partial\kappa_-\setminus\Gamma}\right\}
-  =(f,v_h)_\Omega-({\mathbf \beta}\cdot{\bf n}\, g, v_h)_{\Gamma_-},
-\qquad\qquad\qquad\mathrm{[dg-transport1]}@f]</a>
-where $\partial\kappa_-:=\{{\bf x}\in\partial\kappa,
-{\mathbf \beta}({\bf x})\cdot{\bf n}({\bf x})<0\}$ denotes the inflow boundary
-and $\partial\kappa_+=\partial\kappa\setminus \partial \kappa_-$ the
-outflow part of cell $\kappa$. Below, this equation will be referred
-to as <em>first version</em> of the DG method. We note that after a
-second integration by parts, we obtain: find $u_h\in V_h$ such that
-@f[
-  \sum_\kappa\left\{(\nabla\cdot\{{\mathbf \beta} u_h\},v_h)_\kappa
-  -({\mathbf \beta}\cdot{\bf n} [u_h], v_h)_{\partial\kappa_-}\right\}
-  =(f,v_h)_\Omega, \quad\forall v_h\in V_h,
-@f]
-where $[u_h]=u_h^+-u_h^-$ denotes the jump of the discrete function
-between two neighboring cells and is defined to be $[u_h]=u_h^+-g$ on
-the boundary of the domain. This is the discontinuous Galerkin scheme
-for the transport equation given in its original notation.
-Nevertheless, we will base the implementation of the scheme on the
-form given by <a href="#step-12.dg-general1">[dg-general1]</a> and <a href="#step-12.upwind-flux">[upwind-flux]</a>,
-or <a href="#step-12.dg-transport1">[dg-transport1]</a>, respectively.
-
-Finally, we rewrite <a href="#step-12.dg-general1">[dg-general1]</a> in terms of a summation over all
-faces where each face $e=\partial \kappa\cap\partial \kappa'$
-between two neighboring cells $\kappa$ and $\kappa'$ occurs twice, obtaining
+We apply the well-known upwind discontinuous Galerkin method. To this
+end, we introduce the mesh dependent bilinear form
 
 @f[
-  -\sum_\kappa(u_h,{\mathbf \beta}\cdot\nabla v_h)_\kappa
-  +\sum_{E\in\mathbb E_h^i} (u_h^-, \beta\cdot[v_h\mathbf n])_{E}
-  =(f,v_h)_\Omega-(g, \beta\cdot\mathbf n v_h)_{\Gamma_-}.
+  -\sum_{T\in \mathbb T_h}\bigl(u_h,{\mathbf \beta}\cdot\nabla v_h\bigr)_T
+  +\sum_{F\in\mathbb F_h^i} \bigl<u_h^-, \beta\cdot[v_h\mathbf n]\bigr>_{F}
+  + \bigl<u_h, v_h \beta\cdot \mathbf n\bigr>_{\Gamma_+}
+  =-\bigl<g, v_h \beta\cdot\mathbf n\bigr>_{\Gamma_-}.
 @f]
 
-In this form, we need to implement a 
+Here, $\mathbb T_h$ is the set of all active cells of the triangulation
+and $\mathbb F_h^i$ is the set of all active interior faces.
+$(\cdot, \cdot)_T$ and $\left<\cdot, \cdot\right>_{F}$ denote the
+<i>L<sup>2</sup></i>-inner products on the cell $T$ and a face $F$,
+respectively.  The jump is defined as $[v\mathbf n] = v^+\mathbf n^+ +
+v^-\mathbf n^-$, where the superscripts refer to the upwind ('+') and
+downwind ('-') values at the face.
+
+In order to implement this bilinear form, we need to compute the cell
+terms $\bigl(u_h,{\mathbf \beta}\cdot\nabla v_h\bigr)_T$, the internal fluxes
+$\bigl<u_h^-, \beta\cdot[v_h\mathbf n]\bigr>_{F}$, and the boundary terms $\bigl<u_h,
+v_h \beta\cdot \mathbf n]\bigr>_{\Gamma_+}$ and $\bigl<g, \beta\cdot\mathbf n
+v_h\bigr>_{\Gamma_-}$. The summation of all those is done by MeshWorker::integration_loop().
+
