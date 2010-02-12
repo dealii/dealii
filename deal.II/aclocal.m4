@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -5791,7 +5791,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     DEAL_II_CONFIGURE_PETSC_COMPLEX
 
     DEAL_II_EXPAND_PETSC_VECTOR="PETScWrappers::Vector"
+    DEAL_II_EXPAND_PETSC_MPI_VECTOR="PETScWrappers::MPI::Vector"
     DEAL_II_EXPAND_PETSC_BLOCKVECTOR="PETScWrappers::BlockVector"
+    DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR="PETScWrappers::MPI::BlockVector"
 
     dnl Finally set with_petsc if this hasn't happened yet
     if test "x$with_petsc" = "x" ; then
@@ -5802,7 +5804,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   dnl Make sure that the right values for PETSC vectors are written into
   dnl common/template-arguments.in
   AC_SUBST(DEAL_II_EXPAND_PETSC_VECTOR)
+  AC_SUBST(DEAL_II_EXPAND_PETSC_MPI_VECTOR)
   AC_SUBST(DEAL_II_EXPAND_PETSC_BLOCKVECTOR)
+  AC_SUBST(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR)
 ])
 
 
