@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -732,41 +732,29 @@ namespace internal
  *     It can be shown, that degradation of approximation occurs if the
  *     triangulation contains vertices which are member of cells with levels
  *     differing by more than one. One such example is the following:
- *     @verbatim
- *       |     |     |     |
- *       x-----x-----x--x--x--
- *       |     |     |  |  |
- *       |     |     x--x--x
- *       |     |     |  |  |
- *       x-----x-----x--x--x--
- *       |           |     |
- *       |           |     |
- *       |           |     |
- *       |           x-----x--
- *       |           |     |
- *       |           |     |
- *       |           |     |
- *       x-----------x-----x--
- *     @endverbatim
- *     It seems that in two space dimensions, the maximum jump in levels between
- *     cells sharing a common vertex is two (as in the example above). This is
- *     not true if more than four cells meet at a vertex. It is not uncommon
- *     that a coarse (initial) mesh contains vertices at which six or even eight
- *     cells meet, when small features of the domain have to be resolved even on
- *     the coarsest mesh. In that case, the maximum difference in levels is
- *     three or four, respectively. The problem gets even worse in three space
- *     dimensions.
+ *
+ *     @image html limit_level_difference_at_vertices.png ""
+ *
+ *     It would seem that in two space dimensions, the maximum jump in levels
+ *     between cells sharing a common vertex is two (as in the example
+ *     above). However, this is not true if more than four cells meet at a
+ *     vertex. It is not uncommon that a coarse (initial) mesh contains
+ *     vertices at which six or even eight cells meet, when small features of
+ *     the domain have to be resolved even on the coarsest mesh. In that case,
+ *     the maximum difference in levels is three or four, respectively. The
+ *     problem gets even worse in three space dimensions.
  *
  *     Looking at an interpolation of the second derivative of the finite
  *     element solution (assuming bilinear finite elements), one sees that the
- *     numerical solution is almost totally wrong, compared with the true second
- *     derivative. Indeed, on regular meshes, there exist sharp estimations that
- *     the $H^2$-error is only $O(1)$, so we should not be surprised; however, the
- *     numerical solution may show a value for the second derivative which may
- *     be a factor of ten away from the true value. These problems are located
- *     on the small cell adjacent to the center vertex, where cells of
- *     non-subsequent levels meet, as well as on the upper and right neighbor
- *     of this cell (but with a less degree of deviation from the true value).
+ *     numerical solution is almost totally wrong, compared with the true
+ *     second derivative. Indeed, on regular meshes, there exist sharp
+ *     estimations that the $H^2$-error is only $O(1)$, so we should not be
+ *     surprised; however, the numerical solution may show a value for the
+ *     second derivative which may be a factor of ten away from the true
+ *     value. These problems are located on the small cell adjacent to the
+ *     center vertex, where cells of non-subsequent levels meet, as well as on
+ *     the upper and right neighbor of this cell (but with a less degree of
+ *     deviation from the true value).
  *
  *     If the smoothing indicator given to the constructor contains the bit for
  *     @p limit_level_difference_at_vertices, situations as the above one are
@@ -774,11 +762,13 @@ namespace internal
  *
  *     In case of anisotropic refinement, the level of a cell is not linked to
  *     the refinement of a cell as directly as in case of isotropic
- *     refinement. Furthermore, a cell can be strongly refined in one direction
- *     and not or at least much less refined in another. Therefore, it is very
- *     difficult to decide, which cases should be excluded from the refinement
- *     process. As a consequence, when using anisotropic refinement, the @p
- *     limit_level_difference_at_vertices flag must not be set.
+ *     refinement. Furthermore, a cell can be strongly refined in one
+ *     direction and not or at least much less refined in another. Therefore,
+ *     it is very difficult to decide, which cases should be excluded from the
+ *     refinement process. As a consequence, when using anisotropic
+ *     refinement, the @p limit_level_difference_at_vertices flag must not be
+ *     set. On the other hand, the implementation of multigrid methods in
+ *     deal.II requires that this bit be set.
  *
  *   <li> @p eliminate_unrefined_islands:
  *     Single cells which are not refined and are surrounded by cells which are
