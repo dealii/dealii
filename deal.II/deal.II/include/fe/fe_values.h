@@ -2834,27 +2834,27 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
         get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
                                      Vector<PetscScalar>              &out) const = 0;
 
-				     /**
-				      * Call
-				      * @p get_interpolated_dof_values
-				      * of the iterator with the
-				      * given arguments.
-				      */
-    virtual
-    void
-    get_interpolated_dof_values (const PETScWrappers::MPI::Vector &in,
-				 Vector<PetscScalar>         &out) const;
+					 /**
+					  * Call
+					  * @p get_interpolated_dof_values
+					  * of the iterator with the
+					  * given arguments.
+					  */
+	virtual
+	void
+	get_interpolated_dof_values (const PETScWrappers::MPI::Vector &in,
+				     Vector<PetscScalar>         &out) const = 0;
 
-				     /**
-				      * Call
-				      * @p get_interpolated_dof_values
-				      * of the iterator with the
-				      * given arguments.
-				      */
-    virtual
-    void
-    get_interpolated_dof_values (const PETScWrappers::MPI::BlockVector &in,
-				 Vector<PetscScalar>              &out) const;
+					 /**
+					  * Call
+					  * @p get_interpolated_dof_values
+					  * of the iterator with the
+					  * given arguments.
+					  */
+	virtual
+	void
+	get_interpolated_dof_values (const PETScWrappers::MPI::BlockVector &in,
+				     Vector<PetscScalar>              &out) const = 0;
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
