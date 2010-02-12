@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1246,6 +1246,28 @@ class FEValuesBase<dim,spacedim>::CellIterator : public FEValuesBase<dim,spacedi
     void
     get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
 				 Vector<PetscScalar>              &out) const;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const PETScWrappers::MPI::Vector &in,
+				 Vector<PetscScalar>         &out) const;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const PETScWrappers::MPI::BlockVector &in,
+				 Vector<PetscScalar>              &out) const;
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -1478,6 +1500,28 @@ class FEValuesBase<dim,spacedim>::TriaCellIterator : public FEValuesBase<dim,spa
     void
     get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
 				 Vector<PetscScalar>              &out) const;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const PETScWrappers::MPI::Vector &in,
+				 Vector<PetscScalar>         &out) const;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const PETScWrappers::MPI::BlockVector &in,
+				 Vector<PetscScalar>              &out) const;
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -1671,6 +1715,28 @@ get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
   cell->get_interpolated_dof_values (in, out);
 }
 
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim,spacedim>::CellIterator<CI>::
+get_interpolated_dof_values (const PETScWrappers::MPI::Vector &in,
+			     Vector<PetscScalar>         &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim,spacedim>::CellIterator<CI>::
+get_interpolated_dof_values (const PETScWrappers::MPI::BlockVector &in,
+			     Vector<PetscScalar>              &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -1845,6 +1911,26 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const PETScWrappers::BlockVector &,
+			     Vector<PetscScalar>              &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim,spacedim>::TriaCellIterator::
+get_interpolated_dof_values (const PETScWrappers::MPI::Vector &,
+			     Vector<PetscScalar>         &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim,spacedim>::TriaCellIterator::
+get_interpolated_dof_values (const PETScWrappers::MPI::BlockVector &,
 			     Vector<PetscScalar>              &) const
 {
   Assert (false, ExcMessage (message_string));
