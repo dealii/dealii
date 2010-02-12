@@ -257,6 +257,13 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
 {}
 
 
+
+                                 // @sect4{LaplaceProblem::setup_system}
+
+				 // The following function extends what the
+				 // corresponding one in step-6 did. The top
+				 // part, apart from the additional output,
+				 // does the same:
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
@@ -284,6 +291,28 @@ void LaplaceProblem<dim>::setup_system ()
   solution.reinit (mg_dof_handler.n_dofs());
   system_rhs.reinit (mg_dof_handler.n_dofs());
 
+				   // But it starts to be a wee bit different
+				   // here, although this still doesn't have
+				   // anything to do with multigrid
+				   // methods. step-6 took care of boundary
+				   // values and hanging nodes in a separate
+				   // step after assembling the global matrix
+				   // from local contributions. This works,
+				   // but the same can be done in a slightly
+				   // simpler way if we already take care of
+				   // these constraints at the time of copying
+				   // local contributions into the global
+				   // matrix. To this end, we here do not just
+				   // compute the constraints do to hanging
+				   // nodes, but also due to zero boundary
+				   // conditions. Both kinds of constraints
+				   // can be put into the same object
+				   // (<code>constraints</code>), and we will
+				   // use this set of constraints later on to
+				   // help us copy local contributions
+				   // correctly into the global linear system
+				   // right away, without the need for a later
+				   // clean-up stage:
   constraints.clear ();
   DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
   VectorTools::interpolate_boundary_values (mg_dof_handler,
@@ -295,66 +324,81 @@ void LaplaceProblem<dim>::setup_system ()
   sparsity_pattern.compress();
   system_matrix.reinit (sparsity_pattern);
 
-				   // The multi-level objects are
-				   // resized to hold matrices for
-				   // every level. The coarse level is
-				   // zero (this is mandatory right
-				   // now but may change in a future
-				   // revision). Remark, that the
-				   // finest level is nlevels-1.
-				   // We first have to resize the
-				   // container holding the
-				   // SparseMatrix classes, since they
-				   // have to release their
-				   // SparsityPattern before it can be
-				   // destroyed.
-  const unsigned int nlevels = triangulation.n_levels();
+				   // Now for the things that concern the
+				   // multigrid data structures. First, we
+				   // resize the multi-level objects to hold
+				   // matrices and sparsity patterns for every
+				   // level. The coarse level is zero (this is
+				   // mandatory right now but may change in a
+				   // future revision). Note that these
+				   // functions take a complete, inclusive
+				   // range here (not a starting index and
+				   // size), so the finest level is
+				   // <code>n_levels-1</code>.  We first have
+				   // to resize the container holding the
+				   // SparseMatrix classes, since they have to
+				   // release their SparsityPattern before the
+				   // can be destroyed upon resizing.
+  const unsigned int n_levels = triangulation.n_levels();
 
-  mg_interface_matrices.resize(0, nlevels-1);
+  mg_interface_matrices.resize(0, n_levels-1);
   mg_interface_matrices.clear ();
-  mg_matrices.resize(0, nlevels-1);
+  mg_matrices.resize(0, n_levels-1);
   mg_matrices.clear ();
-  mg_sparsity_patterns.resize(0, nlevels-1);
+  mg_sparsity_patterns.resize(0, n_levels-1);
 
-				   // Now, we have to build a matrix
-				   // on each level. Technically, we
-				   // could use the matrix initialized
-				   // above on the finest
-				   // level. Beware that this is not
-				   // true anymore with local
-				   // refinement!
-  for (unsigned int level=0;level<nlevels;++level)
+				   // Now, we have to provide a matrix on each
+				   // level. To this end, we first use the
+				   // MGTools::make_sparsity_pattern function
+				   // to first generate a preliminary
+				   // compressed sparsity pattern on each
+				   // level (see the @ref Sparsity module for
+				   // more information on this topic) and then
+				   // copy it over to the one we really
+				   // want. The next step is to initialize
+				   // both kinds of level matrices with these
+				   // sparsity patterns.
+				   //
+				   // It may be worth pointing out that the
+				   // interface matrices only have entries for
+				   // degrees of freedom that sit at or next
+				   // to the interface between coarser and
+				   // finer levels of the mesh. They are
+				   // therefore even sparser than the matrices
+				   // on the individual levels of our
+				   // multigrid hierarchy. If we were more
+				   // concerned about memory usage (and
+				   // possibly the speed with which we can
+				   // multiply with these matrices), we should
+				   // use separate and different sparsity
+				   // patterns for these two kinds of
+				   // matrices.
+  for (unsigned int level=0; level<n_levels; ++level)
     {
-      mg_sparsity_patterns[level]
-	.reinit (mg_dof_handler.n_dofs(level),
-		 mg_dof_handler.n_dofs(level),
-		 mg_dof_handler.max_couplings_between_dofs());
-      MGTools::make_sparsity_pattern (mg_dof_handler,
-				      mg_sparsity_patterns[level],
-				      level);
-      CompressedSparsityPattern ci_sparsity;
-      if(level>0)
-	{
-	  ci_sparsity.reinit(mg_dof_handler.n_dofs(level),
-			     mg_dof_handler.n_dofs(level));
-	  MGTools::make_sparsity_pattern(mg_dof_handler, ci_sparsity, level);
-	}
-    }
+      CompressedSparsityPattern csp;
+      csp.reinit(mg_dof_handler.n_dofs(level),
+		 mg_dof_handler.n_dofs(level));
+      MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
 
-//And the same for the mg matrices
-//for the interface. Note that there
-//is no such interface on the coarsest level
-  for(unsigned int level=0; level<nlevels; ++level)
-    {
-      mg_sparsity_patterns[level].compress();
+      mg_sparsity_patterns[level].copy_from (csp);
+      
       mg_matrices[level].reinit(mg_sparsity_patterns[level]);
       mg_interface_matrices[level].reinit(mg_sparsity_patterns[level]);
     }
 }
 
-				 // This is the standard assemble function
-				 // for the Poisson equation you have seen a
-				 // lot of times before.
+
+                                 // @sect4{LaplaceProblem::assemble_system}
+
+				 // The following function assembles the
+				 // linear system on the finesh level of the
+				 // mesh. It is almost exactly the same as in
+				 // step-6, with the exception that we don't
+				 // eliminate hanging nodes and boundary
+				 // values after assembling, but while copying
+				 // local contributions into the global
+				 // matrix. This is not only simpler but also
+				 // more efficient for large problems.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system ()
 {
@@ -410,19 +454,23 @@ void LaplaceProblem<dim>::assemble_system ()
 }
 
 
-				 // Here is another assemble
-				 // function. The integration core is
-				 // the same as above. Only the loop
-				 // goes over all existing cells now
-				 // and the results must be entered
-				 // into the correct matrix. Here comes
-                                 // the difference to global refinement
-                                 // into play. We have to fill the interface
-                                 // matrices correctly.
+                                 // @sect4{LaplaceProblem::assemble_multigrid}
 
-				 // Since we only do multi-level
-				 // preconditioning, no right-hand
-				 // side is assembled here.
+				 // The next function is the one that builds
+				 // the linear operators (matrices) that
+				 // define the multigrid method on each level
+				 // of the mesh. The integration core is the
+				 // same as above, but the loop below will go
+				 // over all existing cells instead of just
+				 // the active ones, and the results must be
+				 // entered into the correct matrix. Note also
+				 // that since we only do multi-level
+				 // preconditioning, no right-hand side needs
+				 // to be assembled here.
+				 //
+				 // Before we go there, however, we have to
+				 // take care of a significant amount of book
+				 // keeping:
 template <int dim>
 void LaplaceProblem<dim>::assemble_multigrid ()
 {
@@ -439,13 +487,20 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
+				   // Next a few things that are specific to
+				   // building the multigrid data structures
+				   // (since we only need them in the current
+				   // function, rather than also elsewhere, we
+				   // build them here instead of the
+				   // <code>setup_system</code> function). 
   std::vector<std::vector<bool> > interface_dofs;
   std::vector<std::vector<bool> > boundary_interface_dofs;
   for (unsigned int level = 0; level<triangulation.n_levels(); ++level)
     {
-      std::vector<bool> tmp (mg_dof_handler.n_dofs(level));
-      interface_dofs.push_back (tmp);
-      boundary_interface_dofs.push_back (tmp);
+      interface_dofs.push_back (std::vector<bool>
+				(mg_dof_handler.n_dofs(level)));
+      boundary_interface_dofs.push_back (std::vector<bool>
+					 (mg_dof_handler.n_dofs(level)));
     }
   MGTools::extract_inner_interface_dofs (mg_dof_handler,
 					 interface_dofs,
