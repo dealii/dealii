@@ -11,12 +11,13 @@
 /*    further information on this license.                        */
 
 				 // The first few files have already
-				 // been covered in step-12
+				 // been covered in previous examples
 				 // and will thus not be further
 				 // commented on:
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <lac/vector.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <lac/sparse_matrix.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -30,11 +31,32 @@
 #include <dofs/dof_tools.h>
 #include <numerics/data_out.h>
 #include <fe/mapping_q1.h>
+				 // Here the discontinuous finite
+				 // elements are defined. They are
+				 // used in the same way as all other
+				 // finite elements, though -- as you
+				 // have seen in previous tutorial
+				 // programs -- there isn't much user
+				 // interaction with finite element
+				 // classes at all: the are passed to
+				 // <code>DoFHandler</code> and <code>FEValues</code>
+				 // objects, and that is about it.
 #include <fe/fe_dgq.h>
+				 // We are going to use the simplest
+				 // possible solver, called Richardson
+				 // iteration, that represents a
+				 // simple defect correction. This, in
+				 // combination with a block SSOR
+				 // preconditioner (defined in
+				 // precondition_block.h), that uses
+				 // the special block matrix structure
+				 // of system matrices arising from DG
+				 // discretizations.
 #include <lac/solver_richardson.h>
 #include <lac/precondition_block.h>
+				 // We are going to use gradients as
+				 // refinement indicator.
 #include <numerics/derivative_approximation.h>
-#include <base/timer.h>
 
 				 // Here come the new include files
 				 // for using the MeshWorker framework:
@@ -42,19 +64,24 @@
 #include <numerics/mesh_worker_info.h>
 #include <numerics/mesh_worker_loop.h>
 
+				 // Like in all programs, we finish
+				 // this section by including the
+				 // needed C++ headers and declaring
+				 // we want to use objects in the
+				 // dealii namespace without prefix.
 #include <iostream>
 #include <fstream>
 
-				 // The last step is as in all
-				 // previous programs:
 using namespace dealii;
 
 				 // @sect3{Equation data}
 				 //
-				 // First, we need to describe the
-				 // coefficients in the equation. Here, this
-				 // concerns the boundary values, which we
-				 // choose in the same way as for step-12:
+				 // First, we define a class
+				 // describing the inhomogeneous
+				 // boundary data. Since only its
+				 // values are used, we implement
+				 // value_list(), but leave all other
+				 // functions of Function undefined.
 template <int dim>
 class BoundaryValues:  public Function<dim>
 {
@@ -89,27 +116,29 @@ void BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
 	values[i]=0.;
     }
 }
-
-
-				 // @sect3{Integrating cell and face matrices}
-				 // @sect3{Class: DGMethod}
+				 // @sect3{Class: Step12}
 				 //
-				 // After these preparations, we
-				 // proceed with the main part of this
-				 // program. The main class, here
-				 // called <code>DGMethod</code> is basically
-				 // the main class of step-6. One of
-				 // the differences is that there's no
-				 // ConstraintMatrix object. This is,
+				 // After this preparations, we
+				 // proceed with the main class of
+				 // this program,
+				 // called Step12. It is basically
+				 // the main class of step-6. We do
+				 // not have a ConstraintMatrix,
 				 // because there are no hanging node
 				 // constraints in DG discretizations.
+
+				 // Major differences will only come
+				 // up in the implementation of the
+				 // assemble functions, since here, we
+				 // not only need to cover the flux
+				 // integrals over faces, we also use
+				 // the MeshWorker interface to
+				 // simplify the loops involved.
 template <int dim>
-class DGMethod
+class Step12
 {
   public:
-    DGMethod ();
-    ~DGMethod ();
-
+    Step12 ();
     void run ();
 
   private:
@@ -134,22 +163,19 @@ class DGMethod
     FE_DGQ<dim>          fe;
     DoFHandler<dim>      dof_handler;
 
+				     // The next four members
+				     // represent the linear system to
+				     // be solved. #system_matrix and
+				     // #right_hand_side are generated
+				     // by assemble_system(), the
+				     // #solution is computed in
+				     // solve(). The #sparsity_pattern
+				     // is used to determine the
+				     // location of nonzero elements
+				     // in #system_matrix.
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
-
-				     // In step-12 we had two solution vectors
-				     // that stored the solutions to the
-				     // problems corresponding to the two
-				     // different assembling routines
-				     // <code>assemble_system1</code> and
-				     // <code>assemble_system2</code>. In this
-				     // program, the goal is only to show the
-				     // MeshWorker framework, so we only
-				     // assemble the system in one of the two
-				     // ways, and consequently we have only
-				     // one solution vector along with the
-				     // single <code>assemble_system</code>
-				     // function declared above:
+    
     Vector<double>       solution;
     Vector<double>       right_hand_side;
 
@@ -166,10 +192,11 @@ class DGMethod
 				     // then work on intermediate
 				     // objects for which first, we
 				     // here define typedefs to the
-				     // two info objects handed to the
+				     // info objects handed to the
 				     // local integration functions in
 				     // order to make our life easier
 				     // below.
+    typedef MeshWorker::DoFInfo<dim> DoFInfo;
     typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
     typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
 
@@ -201,22 +228,18 @@ class DGMethod
 				     // types of arguments, but have
 				     // in fact other arguments
 				     // already bound.
-    static void integrate_cell_term (MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info);
-    static void integrate_boundary_term (MeshWorker::DoFInfo<dim>& dinfo, FaceInfo& info);
-    static void integrate_face_term (MeshWorker::DoFInfo<dim>& dinfo1,
-				     MeshWorker::DoFInfo<dim>& dinfo2, FaceInfo& info1,
-				     FaceInfo& info2);
+    static void integrate_cell_term (DoFInfo& dinfo, CellInfo& info);
+    static void integrate_boundary_term (DoFInfo& dinfo, FaceInfo& info);
+    static void integrate_face_term (DoFInfo& dinfo1, DoFInfo& dinfo2,
+				     FaceInfo& info1, FaceInfo& info2);
 };
 
 
-						 // We start with the
-						 // constructor. This is the
-						 // place to change the
-						 // polynomial degree of the
-						 // finite element shape
-						 // functions.
+				 // We start with the constructor. The
+				 // 1 in the constructor call of #fe
+				 // is the polynomial degree.
 template <int dim>
-DGMethod<dim>::DGMethod ()
+Step12<dim>::Step12 ()
 		:
                 fe (1),
 		dof_handler (triangulation)
@@ -224,49 +247,37 @@ DGMethod<dim>::DGMethod ()
 
 
 template <int dim>
-DGMethod<dim>::~DGMethod ()
+void Step12<dim>::setup_system ()
 {
-  dof_handler.clear ();
-}
-
-
 				 // In the function that sets up the usual
 				 // finite element data structures, we first
 				 // need to distribute the DoFs.
-template <int dim>
-void DGMethod<dim>::setup_system ()
-{
   dof_handler.distribute_dofs (fe);
 
-				   // The DoFs of a cell are coupled with all
-				   // DoFs of all neighboring cells, along
-				   // with all of its siblings on the current
-				   // cell.  Therefore the maximum number of
-				   // matrix entries per row is needed when
-				   // all neighbors of a cell are once more
-				   // refined than the cell under
-				   // consideration.
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   (GeometryInfo<dim>::faces_per_cell *
-			    GeometryInfo<dim>::max_children_per_face
-			    +
-			    1)*fe.dofs_per_cell);
-
+				   // We start by generating the
+				   // sparsity pattern. To this end,
+				   // we first fill an intermediate
+				   // object of type
+				   // CompressedSparsityPattern with
+				   // the couplings appearing in the
+				   // system. After building the
+				   // pattern, this object is copied
+				   // to #sparsity_pattern and can be
+				   // discarded.
+  
 				   // To build the sparsity pattern for DG
 				   // discretizations, we can call the
 				   // function analogue to
 				   // DoFTools::make_sparsity_pattern, which
 				   // is called
 				   // DoFTools::make_flux_sparsity_pattern:
-  DoFTools::make_flux_sparsity_pattern (dof_handler, sparsity_pattern);
+  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DoFTools::make_flux_sparsity_pattern (dof_handler, c_sparsity);
+  sparsity_pattern.copy_from(c_sparsity);
 
-				   // All following function calls are
-				   // already known.
-  sparsity_pattern.compress();
-
+				   // Finally, we set up the structure
+				   // of all components of the linear system.
   system_matrix.reinit (sparsity_pattern);
-
   solution.reinit (dof_handler.n_dofs());
   right_hand_side.reinit (dof_handler.n_dofs());
 }
@@ -278,11 +289,11 @@ void DGMethod<dim>::setup_system ()
 				 // loops over cells and faces, we leave all
 				 // this to the MeshWorker framework. In order
 				 // to do so, we just have to define local
-				 // integration objects and use one of the
+				 // integration functions and use one of the
 				 // classes in namespace MeshWorker::Assembler
 				 // to build the global system.
 template <int dim>
-void DGMethod<dim>::assemble_system ()
+void Step12<dim>::assemble_system ()
 {
 				   // This is the magic object, which
 				   // knows everything about the data
@@ -299,36 +310,6 @@ void DGMethod<dim>::assemble_system ()
 				   // object distributes these into
 				   // the global sparse matrix and the
 				   // right hand side vector.
-				   //
-				   // MeshWorker::AssemblingIntegrator
-				   // is not all that clever by
-				   // itself, but its capabilities are
-				   // provided the arguments provided
-				   // to the constructor and by its
-				   // second template argument. By
-				   // exchanging
-				   // MeshWorker::Assembler::SystemSimple,
-				   // we could for instance assemble a
-				   // BlockMatrix or just a Vector
-				   // instead.
-				   //
-				   // As noted in the discussion when
-				   // declaring the local integration
-				   // functions in the class
-				   // declaration, the arguments
-				   // expected by the assembling
-				   // integrator class are not
-				   // actually function
-				   // pointers. Rather, they are
-				   // objects that can be called like
-				   // functions with a certain number
-				   // of arguments. Consequently, we
-				   // could also pass objects with
-				   // appropriate operator()
-				   // implementations here, or the
-				   // result of std::bind if the local
-				   // integrators were, for example,
-				   // non-static member functions.
   MeshWorker::IntegrationWorker<dim> integration_worker;
 
 				   // First, we initialize the
@@ -387,12 +368,30 @@ void DGMethod<dim>::assemble_system ()
 				   // (determined by the first
 				   // argument, which is an active
 				   // iterator).
+				   //
+  				   // As noted in the discussion when
+				   // declaring the local integration
+				   // functions in the class
+				   // declaration, the arguments
+				   // expected by the assembling
+				   // integrator class are not
+				   // actually function
+				   // pointers. Rather, they are
+				   // objects that can be called like
+				   // functions with a certain number
+				   // of arguments. Consequently, we
+				   // could also pass objects with
+				   // appropriate operator()
+				   // implementations here, or the
+				   // result of std::bind if the local
+				   // integrators were, for example,
+				   // non-static member functions.
   MeshWorker::integration_loop<CellInfo, FaceInfo, dim>
     (dof_handler.begin_active(), dof_handler.end(),
      info_box,
-     &DGMethod<dim>::integrate_cell_term,
-     &DGMethod<dim>::integrate_boundary_term,
-     &DGMethod<dim>::integrate_face_term,
+     &Step12<dim>::integrate_cell_term,
+     &Step12<dim>::integrate_boundary_term,
+     &Step12<dim>::integrate_face_term,
      assembler, true);
 }
 
@@ -415,7 +414,7 @@ void DGMethod<dim>::assemble_system ()
 				 // added soon).
 
 template <int dim>
-void DGMethod<dim>::integrate_cell_term (MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info)
+void Step12<dim>::integrate_cell_term (DoFInfo& dinfo, CellInfo& info)
 {
 				   // First, let us retrieve some of
 				   // the objects used here from
@@ -461,7 +460,7 @@ void DGMethod<dim>::integrate_cell_term (MeshWorker::DoFInfo<dim>& dinfo, CellIn
 				 // FESubfaceValues, in order to get access to
 				 // normal vectors.
 template <int dim>
-void DGMethod<dim>::integrate_boundary_term (MeshWorker::DoFInfo<dim>& dinfo, FaceInfo& info)
+void Step12<dim>::integrate_boundary_term (DoFInfo& dinfo, FaceInfo& info)
 {
   const FEFaceValuesBase<dim>& fe_v = info.fe_values();
   FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
@@ -507,10 +506,8 @@ void DGMethod<dim>::integrate_boundary_term (MeshWorker::DoFInfo<dim>& dinfo, Fa
 				 // for each cell and two for coupling
 				 // back and forth.
 template <int dim>
-void DGMethod<dim>::integrate_face_term (MeshWorker::DoFInfo<dim>& dinfo1,
-					 MeshWorker::DoFInfo<dim>& dinfo2,
-					 FaceInfo& info1,
-					 FaceInfo& info2)
+void Step12<dim>::integrate_face_term (DoFInfo& dinfo1, DoFInfo& dinfo2,
+				       FaceInfo& info1, FaceInfo& info2)
 {
 				   // For quadrature points, weights,
 				   // etc., we use the
@@ -628,7 +625,7 @@ void DGMethod<dim>::integrate_face_term (MeshWorker::DoFInfo<dim>& dinfo1,
 				 // PreconditionBlockSOR class with
 				 // relaxation=1) does a much better job.
 template <int dim>
-void DGMethod<dim>::solve (Vector<double> &solution)
+void Step12<dim>::solve (Vector<double> &solution)
 {
   SolverControl           solver_control (1000, 1e-12, false, false);
   SolverRichardson<>      solver (solver_control);
@@ -688,7 +685,7 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				 // (to be more precise, in $H^1_\beta$)
 				 // only.
 template <int dim>
-void DGMethod<dim>::refine_grid ()
+void Step12<dim>::refine_grid ()
 {
 				   // The <code>DerivativeApproximation</code>
 				   // class computes the gradients to
@@ -731,7 +728,7 @@ void DGMethod<dim>::refine_grid ()
 				 // in previous examples and will not
 				 // be further commented on.
 template <int dim>
-void DGMethod<dim>::output_results (const unsigned int cycle) const
+void Step12<dim>::output_results (const unsigned int cycle) const
 {
 				   // Write the grid in eps format.
   std::string filename = "grid-";
@@ -769,7 +766,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 				 // The following <code>run</code> function is
 				 // similar to previous examples.
 template <int dim>
-void DGMethod<dim>::run ()
+void Step12<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
@@ -809,7 +806,7 @@ int main ()
 {
   try
     {
-      DGMethod<2> dgmethod;
+      Step12<2> dgmethod;
       dgmethod.run ();
     }
   catch (std::exception &exc)
