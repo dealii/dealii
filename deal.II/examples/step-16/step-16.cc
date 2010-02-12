@@ -547,6 +547,24 @@ void LaplaceProblem<dim>::solve ()
 
 
 
+                                 // @sect4{Postprocessing}
+
+				 // The following two functions postprocess a
+				 // solution once it is computed. In
+				 // particular, the first one refines the mesh
+				 // at the beginning of each cycle while the
+				 // second one outputs results at the end of
+				 // each such cycle. The functions are almost
+				 // unchanged from those in step-6, with the
+				 // exception of two minor differences: The
+				 // KellyErrorEstimator::estimate function
+				 // wants an argument of type DoFHandler, not
+				 // MGDoFHandler, and so we have to cast from
+				 // derived to base class; and we generate
+				 // output in VTK format, to use the more
+				 // modern visualization programs available
+				 // today compared to those that were
+				 // available when step-6 was written.
 template <int dim>
 void LaplaceProblem<dim>::refine_grid ()
 {
@@ -562,7 +580,6 @@ void LaplaceProblem<dim>::refine_grid ()
 						   0.3, 0.03);
   triangulation.execute_coarsening_and_refinement ();
 }
-
 
 
 template <int dim>
@@ -584,7 +601,16 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 }
 
 
+                                 // @sect4{LaplaceProblem::run}
 
+				 // Like several of the functions above, this
+				 // is almost exactly a copy of of the
+				 // corresponding function in step-6. The only
+				 // difference is the call to
+				 // <code>assemble_multigrid</code> that takes
+				 // care of forming the matrices on every
+				 // level that we need in the multigrid
+				 // method.
 template <int dim>
 void LaplaceProblem<dim>::run ()
 {
