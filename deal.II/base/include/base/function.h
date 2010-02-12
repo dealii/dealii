@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -340,20 +340,6 @@ class Function : public FunctionTime,
 				      * value.
 				      */
     unsigned int memory_consumption () const;
-
-				     /** @addtogroup Exceptions
-				      * @{ */
-
-                                     /**
-                                      * Number of components does not match.
-                                      */
-    DeclException2 (ExcNumberOfComponents,
-                    int, int,
-                    << "You can only assign function objects with the same "
-                    << "number of components. However, here the left operand "
-                    << "has " << arg1 << " components, and the right operand "
-                    << arg2 << " components.");
-				     //@}
 };
 
 
