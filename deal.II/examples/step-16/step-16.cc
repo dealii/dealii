@@ -12,6 +12,22 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+				 // As discussed in the introduction, most of
+				 // this program is copied almost verbatim
+				 // from step-6, which itself is only a slight
+				 // modification of step-5. Consequently, a
+				 // significant part of this program is not
+				 // new if you've read all the material up to
+				 // step-6, and we won't comment on that part
+				 // of the functionality that is
+				 // unchanged. Rather, we will focus on those
+				 // aspects of the program that have to do
+				 // with the multigrid functionality which
+				 // forms the new aspect of this tutorial
+				 // program.
+
+                                 // @sect3{Include files}
+
 				 // Again, the first few include files
 				 // are already known, so we won't
 				 // comment on them:
@@ -44,12 +60,22 @@
 #include <numerics/data_out.h>
 #include <numerics/error_estimator.h>
 
-//These are the same include files
-//as in step-16 necessary for the
-//multi-level methods
-#include <multigrid/multigrid.h>
+				 // These, now, are the include necessary for
+				 // the multi-level methods. The first two
+				 // declare classes that allow us to enumerate
+				 // degrees of freedom not only on the finest
+				 // mesh level, but also on intermediate
+				 // levels (that's what the MGDoFHandler class
+				 // does) as well as allow to access this
+				 // information (iterators and accessors over
+				 // these cells).
+				 //
+				 // The rest of the include files deals with
+				 // the mechanics of multigrid as a linear
+				 // operator (solver or preconditioner).
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
+#include <multigrid/multigrid.h>
 #include <multigrid/mg_transfer.h>
 #include <multigrid/mg_tools.h>
 #include <multigrid/mg_coarse.h>
@@ -65,10 +91,15 @@
 using namespace dealii;
 
 
-//This class is basically the same
-//class as in step-16. The only
-//difference is that here we solve Laplace's
-//problem on an adaptively refined grid.
+                                 // @sect3{The <code>LaplaceProblem</code> class template}
+
+				 // This main class is basically the same
+				 // class as in step-6. As far as member
+				 // functions is concerned, the only addition
+				 // is the <code>assemble_multigrid</code>
+				 // function that assembles the matrices that
+				 // correspond to the discrete operators on
+				 // intermediate levels:
 template <int dim>
 class LaplaceProblem
 {
@@ -91,22 +122,47 @@ class LaplaceProblem
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-				     //This object holds the information f
-				     //or the hanging nodes.
     ConstraintMatrix     constraints;
-
-    MGLevelObject<SparsityPattern> mg_sparsity;
-    MGLevelObject<SparseMatrix<double> > mg_matrices;
-
-				     /* The matrices at the interface
-				      * between two refinement levels,
-				      * coupling coarse to fine.*/
-    MGLevelObject<SparseMatrix<double> > mg_interface_matrices_up;
 
     Vector<double>       solution;
     Vector<double>       system_rhs;
 
     const unsigned int degree;
+
+				     // The following three objects are the
+				     // only additional member variables,
+				     // compared to step-6. They represent the
+				     // operators that act on individual
+				     // levels of the multilevel hierarchy,
+				     // rather than on the finest mesh as do
+				     // the objects above.
+				     //
+				     // To facilitate having objects on each
+				     // level of a multilevel hierarchy,
+				     // deal.II has the MGLevelObject class
+				     // template that provides storage for
+				     // objects on each level. What we need
+				     // here are matrices on each level, which
+				     // implies that we also need sparsity
+				     // patterns on each level. As outlined in
+				     // the @ref mg_paper, the operators
+				     // (matrices) that we need are actually
+				     // twofold: one on the interior of each
+				     // level, and one at the interface
+				     // between each level and that part of
+				     // the domain where the mesh is
+				     // coarser. In fact, we will need the
+				     // latter in two versions: for the
+				     // direction from coarse to fine mesh and
+				     // from fine to coarse. Fortunately,
+				     // however, we here have a self-adjoint
+				     // problem for which one of these is the
+				     // transpose of the other, and so we only
+				     // have to build one; we choose the one
+				     // from coarse to fine.
+    MGLevelObject<SparsityPattern>       mg_sparsity_patterns;
+    MGLevelObject<SparseMatrix<double> > mg_matrices;
+    MGLevelObject<SparseMatrix<double> > mg_interface_matrices;
 };
 
 
@@ -115,7 +171,7 @@ class LaplaceProblem
 
 				 // The implementation of nonconstant
 				 // coefficients is copied verbatim
-				 // from step-5:
+				 // from step-5 and step-6:
 
 template <int dim>
 class Coefficient : public Function<dim>
@@ -163,14 +219,41 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
+                                 // @sect3{The <code>LaplaceProblem</code> class implementation}
 
+                                 // @sect4{LaplaceProblem::LaplaceProblem}
+
+				 // The constructor is left mostly
+				 // unchanged. We take the polynomial degree
+				 // of the finite elements to be used as a
+				 // constructor argument and store it in a
+				 // member variable.
+				 //
+				 // By convention, all adaptively refined
+				 // triangulations in deal.II never change by
+				 // more than one level across a face between
+				 // cells. For our multigrid algorithms,
+				 // however, we need a slightly stricter
+				 // guarantee, namely that the mesh also does
+				 // not change by more than refinement level
+				 // across vertices that might connect two
+				 // cells. In other words, we must prevent the
+				 // following situation:
+				 //
+				 // @image html limit_level_difference_at_vertices.png ""
+				 //
+				 // This is achieved by passing the
+				 // Triangulation::limit_level_difference_at_vertices
+				 // flag to the constructor of the
+				 // triangulation class.
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg)
+LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
 		:
-		triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
-		fe (deg),
+		triangulation (Triangulation<dim>::
+			       limit_level_difference_at_vertices),
+		fe (degree),
 		mg_dof_handler (triangulation),
-		degree(deg)
+		degree(degree)
 {}
 
 
@@ -227,11 +310,11 @@ void LaplaceProblem<dim>::setup_system ()
 				   // destroyed.
   const unsigned int nlevels = triangulation.n_levels();
 
-  mg_interface_matrices_up.resize(0, nlevels-1);
-  mg_interface_matrices_up.clear ();
+  mg_interface_matrices.resize(0, nlevels-1);
+  mg_interface_matrices.clear ();
   mg_matrices.resize(0, nlevels-1);
   mg_matrices.clear ();
-  mg_sparsity.resize(0, nlevels-1);
+  mg_sparsity_patterns.resize(0, nlevels-1);
 
 				   // Now, we have to build a matrix
 				   // on each level. Technically, we
@@ -242,10 +325,13 @@ void LaplaceProblem<dim>::setup_system ()
 				   // refinement!
   for (unsigned int level=0;level<nlevels;++level)
     {
-      mg_sparsity[level].reinit (mg_dof_handler.n_dofs(level),
-				 mg_dof_handler.n_dofs(level),
-				 mg_dof_handler.max_couplings_between_dofs());
-      MGTools::make_sparsity_pattern (mg_dof_handler, mg_sparsity[level], level);
+      mg_sparsity_patterns[level]
+	.reinit (mg_dof_handler.n_dofs(level),
+		 mg_dof_handler.n_dofs(level),
+		 mg_dof_handler.max_couplings_between_dofs());
+      MGTools::make_sparsity_pattern (mg_dof_handler,
+				      mg_sparsity_patterns[level],
+				      level);
       CompressedSparsityPattern ci_sparsity;
       if(level>0)
 	{
@@ -260,9 +346,9 @@ void LaplaceProblem<dim>::setup_system ()
 //is no such interface on the coarsest level
   for(unsigned int level=0; level<nlevels; ++level)
     {
-      mg_sparsity[level].compress();
-      mg_matrices[level].reinit(mg_sparsity[level]);
-      mg_interface_matrices_up[level].reinit(mg_sparsity[level]);
+      mg_sparsity_patterns[level].compress();
+      mg_matrices[level].reinit(mg_sparsity_patterns[level]);
+      mg_interface_matrices[level].reinit(mg_sparsity_patterns[level]);
     }
 }
 
@@ -440,9 +526,11 @@ void LaplaceProblem<dim>::assemble_multigrid ()
       boundary_interface_constraints[level]
 	.distribute_local_to_global (cell_matrix,
 				     local_dof_indices,
-				     mg_interface_matrices_up[level]);
+				     mg_interface_matrices[level]);
     }
 }
+
+
 
 template <int dim>
 void LaplaceProblem<dim>::solve ()
@@ -511,9 +599,9 @@ void LaplaceProblem<dim>::solve ()
     mg_matrix(&mg_matrices);
 				   //do the same for the interface matrices
   MGMatrix<SparseMatrix<double>, Vector<double> >
-    mg_interface_up(&mg_interface_matrices_up);
+    mg_interface_up(&mg_interface_matrices);
   MGMatrix<SparseMatrix<double>, Vector<double> >
-    mg_interface_down(&mg_interface_matrices_up);
+    mg_interface_down(&mg_interface_matrices);
 				   // Now, we are ready to set up the
 				   // V-cycle operator and the
 				   // multilevel preconditioner.
@@ -580,6 +668,7 @@ void LaplaceProblem<dim>::refine_grid ()
 						   0.3, 0.03);
   triangulation.execute_coarsening_and_refinement ();
 }
+
 
 
 template <int dim>
