@@ -236,9 +236,9 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 				      * initialization function of the
 				      * relaxation method.
 				      */
-    template <class MATRIX2, class DATA>
+    template <class MATRIX2>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const DATA& additional_data = RELAX::AdditionalData());
+		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
 
 				     /**
 				      * Initialize for matrices. This
@@ -405,9 +405,9 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      * initialization function of the
 				      * relaxation method.
 				      */
-    template <class MATRIX2, class DATA>
+    template <class MATRIX2>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const DATA& additional_data = PRECONDITIONER::AdditionalData());
+		     const typename PRECONDITIONER::AdditionalData& additional_data = typename PRECONDITIONER::AdditionalData());
 
 				     /**
 				      * Initialize for matrices. This
@@ -613,11 +613,11 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::clear ()
 
 
 template <class MATRIX, class RELAX, class VECTOR>
-template <class MATRIX2, class DATA>
+template <class MATRIX2>
 inline void
 MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
   const MGLevelObject<MATRIX2>& m,
-  const DATA& data)
+  const typename RELAX::AdditionalData& data)
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
@@ -829,6 +829,7 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::MGSmootherPrecondition(
 {}
 
 
+
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
 inline void
 MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::clear ()
@@ -842,12 +843,13 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::clear ()
 }
 
 
+
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
-template <class MATRIX2, class DATA>
+template <class MATRIX2>
 inline void
 MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const MGLevelObject<MATRIX2>& m,
-  const DATA& data)
+  const typename PRECONDITIONER::AdditionalData& data)
 {
   const unsigned int min = m.get_minlevel();
   const unsigned int max = m.get_maxlevel();
@@ -861,6 +863,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
       smoothers[i].initialize(m[i], data);
     }
 }
+
+
 
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
 template <class MATRIX2, class DATA>
@@ -887,6 +891,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
     }
 }
 
+
+
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
 template <class MATRIX2, class DATA>
 inline void
@@ -908,6 +914,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
       smoothers[i].initialize(m[i].block(row, col), data);
     }
 }
+
+
 
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
 template <class MATRIX2, class DATA>
@@ -935,6 +943,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
       smoothers[i].initialize(m[i].block(row, col), data[i]);
     }
 }
+
+
 
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
 inline void
@@ -1007,6 +1017,7 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
       throw;
     }
 }
+
 
 
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
