@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,7 @@
 #define __deal2__mg_matrix_h
 
 #include <lac/vector.h>
+#include <lac/sparse_matrix.h>
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
 
@@ -29,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2002
  */
-template <class MATRIX, class VECTOR>
+template <class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
 class MGMatrix : public MGMatrixBase<VECTOR>
 {
   public:
