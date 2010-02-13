@@ -56,13 +56,15 @@ finest level. This theory is easily tested by comparing results when
 we use a constant coefficient: in that case, the number of iterations
 remains constant at 9 after the first three or four refinement steps.
 
-We can also compare what this program produces with how
-@ref step_5 "step-5" performed. To solve the same problem as in
-step-5, the only change that is necessary is to replace the body of
-the function <code>LaplaceProblem::refine_grid</code> by a call to
-<code>triangulation.refine_global(1)</code> &mdash; the rest of the
+We can also compare what this program produces with how @ref step_5
+"step-5" performed. To solve the same problem as in step-5, the only
+two changes that are necessary are (i) to replace the body of the
+function <code>LaplaceProblem::refine_grid</code> by a call to
+<code>triangulation.refine_global(1)</code>, and (ii) to use the same
+SolverControl object and tolerance as in step-5 &mdash; the rest of the
 program remains unchanged. In that case, here is how the solvers used
-in step-5 and the multigrid solver used in the current program compare:
+in step-5 and the multigrid solver used in the current program
+compare:
 <table align="center">
 <tr><th>cells</th><th>step-5</th><th>step-16</th></tr>
 <tr><td>20</td>   <td>13</td> <td>6</td> </tr>
