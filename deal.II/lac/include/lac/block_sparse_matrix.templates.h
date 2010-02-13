@@ -52,9 +52,11 @@ BlockSparseMatrix<number> &
 BlockSparseMatrix<number>::
 operator = (const BlockSparseMatrix<number> &m) 
 {
-  AssertDimension (this->row_block_indices, m.row_block_indices);
-  AssertDimension (this->column_block_indices, m.column_block_indices);
-  
+  Assert (this->row_block_indices == m.row_block_indices,
+          ExcBlockDimensionMismatch());
+  Assert (this->column_block_indices == m.column_block_indices,
+          ExcBlockDimensionMismatch());
+
                                    // this operator does not do
 				   // anything except than checking
 				   // whether the base objects want to
