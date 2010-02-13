@@ -96,7 +96,7 @@ inconvenience this causes.
    <p>
    Improved:
           Over the last few months, the multigrid implementation has seen
-          significant rewrites, with much of the work done by B&auml;rber
+          significant rewrites, with much of the work done by B&auml;rbel
           Janssen. The goal &mdash; now achieved &mdash; was to finally fully
           support multigrid also for continuous finite elements on adaptively
           refined meshes (uniformly refined meshes and discontinuous elements
@@ -106,7 +106,7 @@ inconvenience this causes.
 	  @ref step_6 "step-6" solves, just
           with a multigrid solver.
    <br>
-   (B&auml;rber Janssen, WB 2010/02/13)
+   (B&auml;rbel Janssen, WB 2010/02/13)
    </p>
    </li>
 
