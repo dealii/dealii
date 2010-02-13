@@ -111,6 +111,15 @@ ConstraintMatrix::add_lines (const std::vector<bool> &lines)
 
 
 void
+ConstraintMatrix::add_lines (const IndexSet &lines)
+{
+  for (unsigned int i=0; i<lines.n_elements(); ++i)
+    add_line (lines.nth_index_in_set(i));
+}
+
+
+
+void
 ConstraintMatrix::add_entries (const unsigned int                        line,
                                const std::vector<std::pair<unsigned int,double> > &col_val_pairs)
 {

@@ -434,6 +434,28 @@ class ConstraintMatrix : public Subscriptor
     void add_lines (const std::set<unsigned int> &lines);
 
 				     /**
+				      * Call the first add_line() function for
+				      * every index <code>i</code> that
+				      * appears in the argument.
+				      *
+				      * This function essentially exists to
+				      * allow adding several constraints of
+				      * the form $x_i=0$ all at once, where
+				      * the set of indices $i$ for which these
+				      * constraints should be added are given
+				      * by the argument of this function. On
+				      * the other hand, just as if the
+				      * single-argument add_line() function
+				      * were called repeatedly, the
+				      * constraints can later be modified to
+				      * include linear dependencies using the
+				      * add_entry() function as well as
+				      * inhomogeneities using
+				      * set_inhomogeneity().
+				      */
+    void add_lines (const IndexSet &lines);
+    
+				     /**
 				      * Add an entry to a given
 				      * line. The list of lines is
 				      * searched from the back to the
