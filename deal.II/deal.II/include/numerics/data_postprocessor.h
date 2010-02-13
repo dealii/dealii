@@ -33,8 +33,8 @@ DEAL_II_NAMESPACE_OPEN
  * and possibly the first and second derivates of the solution. Examples are
  * the calculation Mach numbers from velocity and density in supersonic flow
  * computations, or the computation of the magnitude of a complex-valued
- * solution as demonstrated in @ref step_29 "step-29". Other uses are shown in
- * @ref step_33 "step-33". This class offers the interface to perform such
+ * solution as demonstrated in step-29. Other uses are shown in
+ * step-33. This class offers the interface to perform such
  * postprocessing. Given the values and derivatives of the solution at those
  * points where we want to generated output, the functions of this class can
  * be overloaded to compute new quantities.

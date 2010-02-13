@@ -204,7 +204,7 @@ DEAL_II_NAMESPACE_OPEN
  * sparsity patterns produced by the various algorithms when using the
  * $Q_2^d\times Q_1$ element combination typically employed in the
  * discretization of Stokes equations, when used on the mesh obtained
- * in @ref step_22 "step-22" after one adaptive mesh refinement in
+ * in step-22 after one adaptive mesh refinement in
  * 3d. The space dimension together with the coupled finite element
  * leads to a rather dense system matrix with, on average around 180
  * nonzero entries per row. After applying each of the reordering
@@ -216,7 +216,7 @@ DEAL_II_NAMESPACE_OPEN
  * right and bottom left.
  *
  * The goal of reordering strategies is to improve the
- * preconditioner. In @ref step_22 "step-22" we use a SparseILU to
+ * preconditioner. In step-22 we use a SparseILU to
  * preconditioner for the velocity-velocity block at the top left. The
  * quality of the preconditioner can then be measured by the number of
  * CG iterations required to solve a linear system with this
@@ -312,7 +312,7 @@ DEAL_II_NAMESPACE_OPEN
  *     of iterations is only slightly less than with BOOST's Cuthill-McKee
  *     implementation, runtime is significantly less. This, again, may be due
  *     to cache effects. As a consequence, this is the algorithm best suited
- *     to the testcase, and is in fact used in @ref step_22 "step-22".
+ *     to the testcase, and is in fact used in step-22.
  *   </td>
  *   <td>
  *     Minimum degree enumeration as produced by calling the BOOST implementation
@@ -491,7 +491,7 @@ namespace DoFRenumbering
 				      * DoFRenumbering namespace.
 				      *
 				      * This algorithm is used in
-				      * @ref step_22 "step-22".
+				      * step-22.
 				      */
     template <class DH>
     void 
@@ -662,7 +662,7 @@ namespace DoFRenumbering
 				    * possible and results in a
 				    * blocking of several components
 				    * into one. This is discussed in
-				    * @ref step_22 "step-22". If you
+				    * step-22. If you
 				    * omit this argument, the same
 				    * order as given by the finite
 				    * element is used.

@@ -943,8 +943,8 @@ class MatrixTools : public MatrixCreator
  				      * an MPI system.
  				      *
  				      * This function is used in
-				      * @ref step_17 "step-17" and
-				      * @ref step_18 "step-18".
+				      * step-17 and
+				      * step-18.
  				      */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,

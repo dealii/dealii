@@ -27,13 +27,13 @@ follows below.
 Currently, the geodynamics testsuite contains the following
 programs:
 
-- @ref step_8 "step-8": Elasticity
-- @ref step_16 "step-16": A %parallel elasticity solver
-- @ref step_20 "step-20": Porous media flow
-- @ref step_21 "step-21": Multiphase flow through porous media
-- @ref step_22 "step-22": Stokes flow
-- @ref step_31 "step-31": Thermal convection (Boussinesq flow)
-- @ref step_32 "step-32": A %parallel Boussinesq solver for mantle convection
+- step-8: Elasticity
+- step-16: A %parallel elasticity solver
+- step-20: Porous media flow
+- step-21: Multiphase flow through porous media
+- step-22: Stokes flow
+- step-31: Thermal convection (Boussinesq flow)
+- step-32: A %parallel Boussinesq solver for mantle convection
 
 Some of these programs were developed under contract from the California
 Institute of Technology with support by the National Science Foundation
@@ -131,7 +131,7 @@ problems. In particular, they are aimed at the following goals:
   run on larger scale machines. For example, a small mantle convection code
   built on deal.II may be used to determine whether second order elements are
   useful for this purpose (see, for example, the results shown in
-  @ref step_31 "step-31"). If so, then one may use this result to implement
+  step-31). If so, then one may use this result to implement
   second, rather than first, order elements in dedicated, large-scale mantle
   convection codes such as that which
   Ghattas and Zhong are building and that may run on 10,000s of processors, a

@@ -2,7 +2,7 @@
 <h1>Introduction</h1>
 
 
-In @ref step_18 "step-18", we saw a need to write
+In step-18, we saw a need to write
 output files in an intermediate format: in a parallel program, it doesn't scale
 well if all processors participate in computing a result, and then only a
 single processor generates the graphical output. Rather, each of them should

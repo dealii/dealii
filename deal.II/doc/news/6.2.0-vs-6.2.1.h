@@ -17,7 +17,7 @@ deal.II version 6.2.0 and version 6.2.1:
 
   <li>
   <p>
-  When running in parallel, the @ref step_18 "step-18" tutorial program
+  When running in parallel, the step-18 tutorial program
   produced an error indicating that resetting user pointers was not
   possible. This is now fixed.
   </p>

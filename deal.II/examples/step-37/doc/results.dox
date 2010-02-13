@@ -2,7 +2,7 @@
 
 <h3>Program output</h3>
 
-Since this example solves the same problem as @ref step_5 "step-5" (except for
+Since this example solves the same problem as step-5 (except for
 a different coefficient), we refer to the graphical output there. Here, we
 evaluate some aspects of the multigrid solver.
 

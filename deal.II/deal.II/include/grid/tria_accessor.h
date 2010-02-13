@@ -2038,7 +2038,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)</tt>.
 				      * This case in 3d and how it can happen
 				      * is discussed in the introduction of the
-				      * @ref step_30 "step-30" tutorial program.
+				      * step-30 tutorial program.
 				      *
 				      * This function is impossible
 				      * for <tt>dim==1</tt>.

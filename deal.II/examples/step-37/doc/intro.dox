@@ -512,7 +512,7 @@ be parallelized by working on diagonal sub-blocks of the matrix, which
 decreases efficiency.
 
 The implementation into the multigrid framework is then straightforward. We
-will only need some minor modifications compared to @ref step_16 "step-16".
+will only need some minor modifications compared to step-16.
 
 <h3>The test case</h3>
 

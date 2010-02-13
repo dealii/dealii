@@ -1262,7 +1262,7 @@ namespace TrilinosWrappers
  * preconditioner to be based on. A call of the respective
  * <code>vmult</code> function does call the respective operation in the
  * Trilinos package, where it is called <code>ApplyInverse</code>. Use of
- * this class is explained in the @ref step_31 "step-31" tutorial program.
+ * this class is explained in the step-31 tutorial program.
  *
  * Since the Trilinos objects we want to use are heavily dependent on Epetra
  * objects, we recommend using this class in conjunction with Trilinos

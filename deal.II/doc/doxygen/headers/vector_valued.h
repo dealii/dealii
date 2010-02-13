@@ -20,19 +20,19 @@
  * solution variable is not a scalar function, but a vector-valued function or
  * a set of functions. This includes, for example:
  * <ul>
- *   <li>The elasticity equation discussed in @ref step_8 "step-8",
- *       @ref step_17 "step-17", and @ref step_18 "step-18" in which the
+ *   <li>The elasticity equation discussed in step-8,
+ *       step-17, and step-18 in which the
  *       solution is the vector-valued displacement at each point.
  *   <li>The mixed Laplace equation and its extensions discussed in
- *       @ref step_20 "step-20", and @ref step_21 "step-21" in which the
+ *       step-20, and step-21 in which the
  *       solution is the scalar pressure and the vector-valued velocity
  *       at each point.
  *   <li>The Stokes equation and its extensions discussed in
- *       @ref step_22 "step-22", and @ref step_31 "step-31" in which again
+ *       step-22, and step-31 in which again
  *       the solution is the scalar pressure and the vector-valued velocity
  *       at each point.
  *   <li>Complex-valued solutions consisting of real and imaginary parts, as
- *       discussed for example in @ref step_29 "step-29".
+ *       discussed for example in step-29.
  * </ul>
  * 
  * This page gives an overview of how to implement such vector-valued problems
@@ -60,7 +60,7 @@
  * first with a weak (variational) formulation of the problem that takes into
  * account all the solution variables. To understand how to do that, let us
  * consider a simple example, the mixed Laplace equations discussed in
- * @ref step_20 "step-20":
+ * step-20:
 @f{eqnarray*}
   \textbf{u} + \nabla p &=& 0,
   \\
@@ -209,7 +209,7 @@
  * component.
  *
  * As it turns out these (equivalent) choices do not lead to a stable scheme
- * for the mixed Laplace equation. In @ref step_20 "step-20", we therefore use
+ * for the mixed Laplace equation. In step-20, we therefore use
  * a Raviart-Thomas element for the velocities. What exactly this means may be
  * of less concern for now except that the FE_RaviartThomas class describes
  * elements that already have <code>dim</code> components. For the pressure,
@@ -248,7 +248,7 @@
  *
  * The next step is to assemble the linear system. How to do this for the
  * simple case of a scalar problem has been shown in many tutorial programs,
- * starting with @ref step_3 "step-3". Here we will show how to do it for
+ * starting with step-3. Here we will show how to do it for
  * vector problems.
  *
  * How to do this is possibly best explained by showing an example
@@ -369,9 +369,9 @@
  *        divergence $\sum_{d=0}^{dim-1} \frac{\partial\phi_d}{\partial x_d}$.
  * </ul>
  * Other examples of using extractors and views are shown in tutorial programs
- * @ref step_21 "step-21",
- * @ref step_22 "step-22",
- * @ref step_31 "step-31" and a few other programs.
+ * step-21,
+ * step-22,
+ * step-31 and a few other programs.
  *
  *
  * @anchor VVAlternative
@@ -380,7 +380,7 @@
  * There are situations in which one can optimize the assembly of a matrix or
  * right hand side vector a bit, using knowledge of the finite element in
  * use. Consider, for example, the bilinear form of the elasticity equations
- * which we are concerned with first in @ref step_8 "step-8":
+ * which we are concerned with first in step-8:
  *
 @f[
   a({\mathbf u}, {\mathbf v}) =
@@ -458,7 +458,7 @@ scalar_product (const Tensor<2,dim> &u,
 }
  * @endcode 
  *
- * Now, this is not the code used in @ref step_8 "step-8". In fact,
+ * Now, this is not the code used in step-8. In fact,
  * if one used the above code over the one implemented in that program,
  * it would run about 8 per cent slower. It can be improved (bringing
  * down the penalty to about 4 per cent) by taking a close look at the
@@ -551,7 +551,7 @@ scalar_product (const Tensor<2,dim> &u,
 	  }
  * @endcode 
  *
- * So if, again, this is not the code we use in @ref step_8 "step-8", what do
+ * So if, again, this is not the code we use in step-8, what do
  * we do there? The answer rests on the finite element we use. There, we use the
  * following element:
  * @code
@@ -598,7 +598,7 @@ scalar_product (const Tensor<2,dim> &u,
  * component is going to be nonzero. This information is provided by the
  * FiniteElement::system_to_component_index function. What can be done with
  * it, using the example above, is explained in detail in
- * @ref step_8 "step-8".
+ * step-8.
  *
  *
  * @anchor VVBlockSolvers
@@ -609,8 +609,8 @@ scalar_product (const Tensor<2,dim> &u,
  * vector-valued problem. However, then it also has to be solved. This is more
  * complicated. Naively, one could just consider the matrix as a whole. For
  * most problems, this matrix is not going to be definite (except for special
- * cases like the elasticity equations covered in @ref step_8 "step-8" and
- * @ref step_17 "step-17"). It will, often, also not be symmetric. This rather
+ * cases like the elasticity equations covered in step-8 and
+ * step-17). It will, often, also not be symmetric. This rather
  * general class of matrices presents problems for iterative solvers: the lack
  * of structural properties prevents the use of most efficient methods and
  * preconditioners. While it can be done, the solution process will therefore
@@ -654,12 +654,12 @@ scalar_product (const Tensor<2,dim> &u,
  * What is needed is to re-enumerate degrees of freedom so that velocities
  * come first and pressures last. This can be done using the
  * DoFRenumbering::component_wise function, as explained in @ref step_20
- * "step-20", @ref step_21 "step-21", @ref step_22 "step-22", and @ref step_31
+ * "step-20", step-21, step-22, and @ref step_31
  * "step-31". After this, at least the degrees of freedom are partitioned
  * properly.
  *
  * But then we still have to make use of it, i.e. we have to come up with a
- * solver that uses the structure. For example, in @ref step_20 "step-20", we
+ * solver that uses the structure. For example, in step-20, we
  * do a block elimination of the linear system
 @f{eqnarray*}
   \left(
@@ -696,7 +696,7 @@ scalar_product (const Tensor<2,dim> &u,
  * large whole matrix we had before.
  *
  * How a solver like this is implemented is explained in more detail in @ref
- * step_20 "step-20", @ref step_31 "step-31", and a few other tutorial
+ * step_20 "step-20", step-31, and a few other tutorial
  * programs. What we would like to point out here is that we now need a way to
  * extract certain parts of a matrix or vector: if we are to multiply, say,
  * the $U$ part of the solution vector by the $M$ part of the global matrix,
@@ -716,7 +716,7 @@ scalar_product (const Tensor<2,dim> &u,
  *
  * To show how to do this, let us consider the second equation $MU=F-BP$ to be
  * solved above. This can be achieved using the following sequence similar to
- * what we have in @ref step_20 "step-20":
+ * what we have in step-20:
  * @code
     Vector<double> tmp (solution.block(0).size());
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
@@ -789,7 +789,7 @@ scalar_product (const Tensor<2,dim> &u,
  * allocation for the outer vector as well as for all the inner vectors.
  * Secondly, maybe we are only interested in the velocities,
  * for example to solve an advection problem in a second stage (as, for
- * example, in @ref step_21 "step-21" or @ref step_31 "step-31"). In that
+ * example, in step-21 or step-31). In that
  * case, one would have to hand-extract these values like so:
  * @code
    for (unsigned int q=0; q<n_q_points; ++q)

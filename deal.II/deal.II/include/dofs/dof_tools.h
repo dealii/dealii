@@ -409,7 +409,7 @@ class DoFTools
 				      * function. No call to
 				      * ConstraintMatrix::condense() is then
 				      * necessary. This process is explained
-				      * in @ref step_27 "step-27".
+				      * in step-27.
 				      *
 				      * In case the constraints are
 				      * already taken care of in this
@@ -446,7 +446,7 @@ class DoFTools
 				      * pattern that corresponds to the
 				      * subdomain_id for which it is
 				      * responsible. This feature is
-				      * @ref step_32 "step-32".
+				      * step-32.
 				      */
     template <class DH, class SparsityPattern>
     static
@@ -602,7 +602,7 @@ class DoFTools
 				      * pattern that corresponds to the
 				      * subdomain_id for which it is
 				      * responsible. This feature is
-				      * @ref step_32 "step-32".
+				      * step-32.
 				      */
     template <class DH, class SparsityPattern>
     static
@@ -1383,9 +1383,9 @@ class DoFTools
 				      * case, an assertion is thrown.
 				      *
 				      * This function is used in the
-				      * @ref step_22 "step-22",
-				      * @ref step_31 "step-31", and
-				      * @ref step_32 "step-32" tutorial
+				      * step-22,
+				      * step-31, and
+				      * step-32 tutorial
 				      * programs.
 				      */
     template <int dim, int spacedim>
@@ -1795,7 +1795,7 @@ class DoFTools
 				      * Make a constraint matrix for the
 				      * constraints that result from zero
 				      * boundary values. This function is used
-				      * in @ref step_36 "step-36", for
+				      * in step-36, for
 				      * example.
 				      */
     template <int dim, int spacedim, template <int, int> class DH>

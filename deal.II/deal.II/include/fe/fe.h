@@ -1240,7 +1240,7 @@ class FiniteElement : public Subscriptor,
 				      *
 				      * The use of this function is
 				      * explained extensively in the
-				      * @ref step_8 "step-8" and @ref
+				      * step-8 and @ref
 				      * step_20 "step-20" tutorial
 				      * programs as well as in the
 				      * @ref vector_valued module.

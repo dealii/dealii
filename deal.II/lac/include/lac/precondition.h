@@ -44,7 +44,7 @@ template <typename number> class SparseMatrix;
 	    PreconditionIdentity());
  @endverbatim
  *
- * See the @ref step_3 "step-3" tutorial program for an example and
+ * See the step-3 tutorial program for an example and
  * additional explanations.
  *
  * Alternatively, the IdentityMatrix class can be used to precondition

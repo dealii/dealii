@@ -51,7 +51,7 @@ template <typename number> class SparseMatrix;
  * module.
  *
  * This class is an example of the "dynamic" type of @ref Sparsity. It
- * is discussed in the @ref step_27 "step-27" and @ref step_22
+ * is discussed in the step-27 and @ref step_22
  * "step-22" tutorial programs.
  *
  * <h3>Interface</h3>
@@ -76,9 +76,9 @@ template <typename number> class SparseMatrix;
  * sp.copy_from (compressed_pattern);
  * @endverbatim
  *
- * See also @ref step_11 "step-11" and @ref step_18 "step-18" for usage
+ * See also step-11 and step-18 for usage
  * patterns of the related CompressedSparsityPattern class, and
- * @ref step_27 "step-27" of the current class.
+ * step-27 of the current class.
  *
  * <h3>Notes</h3>
  *
@@ -91,7 +91,7 @@ template <typename number> class SparseMatrix;
  * container is used. This solution might not be the fastest in all
  * situations, but seems to work much better than the
  * CompressedSparsityPattern in the context of hp-adaptivity (see for
- * example @ref step_27 "step-27"), or generally when there are many
+ * example step-27), or generally when there are many
  * nonzero entries in each row of a matrix (see @ref step_22
  * "step-22").  On the other hand, a benchmark where nonzero entries
  * were randomly inserted into the sparsity pattern revealed that this

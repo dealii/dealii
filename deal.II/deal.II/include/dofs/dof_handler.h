@@ -332,7 +332,7 @@ class DoFHandler  :  public Subscriptor
 				      * problem is to use an intermediate
 				      * compressed sparsity pattern that only
 				      * allocates memory on demand. Refer to
-				      * the @ref step_11 "step-11" example
+				      * the step-11 example
 				      * program on how to do this. The problem
 				      * is also discussed in the documentation
 				      * of the module on @ref Sparsity.

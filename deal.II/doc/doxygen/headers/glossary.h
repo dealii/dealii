@@ -48,8 +48,8 @@
  * by creating one block for each vector component. However, this is not
  * always so, and the DoFRenumbering::component_wise function allows to group
  * several vector components into the same block (see, for example, the @ref
- * step_22 "step-22" or @ref step_31 "step-31" tutorial programs, as opposed
- * to @ref step_20 "step-20").  </dd>
+ * step_22 "step-22" or step-31 tutorial programs, as opposed
+ * to step-20).  </dd>
  *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
  *
@@ -160,7 +160,7 @@
  *
  * The function Triangulation::create_triangulation, which is called
  * by the various functions in GridGenerator and GridIn (but can also
- * be called from user code, see @ref step_14 "step-14" will signal
+ * be called from user code, see step-14 will signal
  * the creation of coarse meshes with distorted cells by throwing an
  * exception of type Triangulation::DistortedCellList. There are
  * legitimate cases for creating meshes with distorted cells (in
@@ -315,7 +315,7 @@ Article{BK07,
  * from http://www.math.tamu.edu/~bangerth/publications.html .
  *
  * The numerical examples shown in that paper are generated with a slightly
- * modified version of @ref step_27 "step-27". The main difference to that
+ * modified version of step-27. The main difference to that
  * tutorial program is that various operations in the program were timed for
  * the paper to compare different options and show that $hp$ methods are
  * really not all that expensive.
@@ -343,7 +343,7 @@ Article{BK07,
  * "Adaptive multilevel methods with local smoothing", that
  * describes many of the algorithms and data structures used in the implementation
  * of the multigrid framework of deal.II. It underlies the implementation of
- * the classes that are used in @ref step_16 "step-16" for multigrid
+ * the classes that are used in step-16 for multigrid
  * methods.
  *
  * The full reference for this paper is as follows:
@@ -406,10 +406,10 @@ Article{JK10,
  * element is primitive. This includes, in particular, all scalar
  * elements as well as vector-valued elements assembled via the
  * FESystem class from other primitive (for example scalar) elements
- * as shown in @ref step_8 "step-8", @ref step_29 "step_29", @ref
+ * as shown in step-8, @ref step_29 "step_29", @ref
  * step_22 "step-22" and several others. On the other hand,
  * the FE_RaviartThomas class used
- * in @ref step_20 "step-20" and @ref step_21 "step-21", or the
+ * in step-20 and step-21, or the
  * FE_Nedelec class provide non-primitive finite elements because
  * there, each vector-value shape function may have several non-zero
  * components.</dd>
@@ -434,8 +434,8 @@ Article{JK10,
  * cell is associated with.
  *
  * For programs that are parallelized based on MPI but where each processor
- * stores the entire triangulation (as in, for example, @ref step_18 "step-18"
- * or @ref step_32 "step-32", subdomain ids are assigned to cells by
+ * stores the entire triangulation (as in, for example, step-18
+ * or step-32, subdomain ids are assigned to cells by
  * partitioning a mesh, and each MPI process then only works on those cells it
  * "owns", i.e. that belong to a subdomain that it is associated with
  * (traditionally, this is the case for the subdomain id whose numerical value

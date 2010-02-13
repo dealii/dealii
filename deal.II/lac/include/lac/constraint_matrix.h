@@ -85,7 +85,7 @@ namespace internals
  * constraints occur as hanging nodes even if all used finite elements are
  * identical. While they are most frequent for hanging nodes, constraints of
  * the given form appear also in other contexts, see for example the
- * application the @ref step_11 "step-11" tutorial program.
+ * application the step-11 tutorial program.
  *
  * Homogenous constraints of this form also arise in the context of vector-valued
  * fields, for example if one wants to enforce boundary conditions of the form
@@ -113,7 +113,7 @@ namespace internals
  * the constraint. This is exactly the form we need for hanging node
  * constraints, where we need to constrain one degree of freedom in terms of
  * others. There are other conditions of this form possible, for example for
- * implementing mean value conditions as is done in the @ref step_11 "step-11"
+ * implementing mean value conditions as is done in the step-11
  * tutorial program. The name of the class stems from the fact that these
  * constraints can be represented in matrix form as $X x = b$, and this object
  * then describes the matrix $X$ (as well as, incidentally, the vector $b$ --
@@ -121,7 +121,7 @@ namespace internals
  * constraints where $b=0$, thus the name). The most frequent way to
  * create/fill objects of this type is using the
  * DoFTools::make_hanging_node_constraints() function. The use of these
- * objects is first explained in @ref step_6 "step-6".
+ * objects is first explained in step-6.
  *
  * Matrices of the present type are organized in lines (rows), but only those
  * lines are stored where constraints are present. New constraints are added
@@ -265,7 +265,7 @@ namespace internals
  * before).
  *
  * The use of ConstraintMatrix for implementing Dirichlet boundary conditions
- * is discussed in the @ref step_22 "step-22" tutorial program.
+ * is discussed in the step-22 tutorial program.
  *
  *
  * <h3>Avoiding explicit condensation</h3>
@@ -281,7 +281,7 @@ namespace internals
  * is typically the case for 3d, or high polynomial degree computations, as
  * well as for hp finite element methods, see for example the @ref hp_paper
  * "hp paper". This is the case discussed in the hp tutorial program, @ref
- * step_27 "step-27", as well as in @ref step_22 "step-22" and @ref step_31
+ * step_27 "step-27", as well as in step-22 and @ref step_31
  * "step-31".
  *
  * <li>
@@ -289,8 +289,8 @@ namespace internals
  * is, for example, the case for the PETSc and Trilinos wrapper classes,
  * where we have no access to the underlying representation of the matrix,
  * and therefore cannot efficiently implement the condense()
- * operation). This is the case discussed in @ref step_17 "step-17", @ref
- * step_18 "step-18", @ref step_31 "step-31", and @ref step_32 "step-32".
+ * operation). This is the case discussed in step-17, @ref
+ * step_18 "step-18", step-31, and step-32.
  * </ul>
  *
  * In this case, one possibility is to distribute local entries to the final
@@ -1340,7 +1340,7 @@ class ConstraintMatrix : public Subscriptor
 				      *
 				      * As explained in the
 				      * @ref hp_paper "hp paper"
-				      * and in @ref step_27 "step-27",
+				      * and in step-27,
 				      * first allocating a sparsity pattern
 				      * and later coming back and allocating
 				      * additional entries for those matrix

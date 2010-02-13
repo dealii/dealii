@@ -861,7 +861,7 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
  * There are several, exchangeable variations of this class, see @ref Sparsity,
  * section 'Dynamic block sparsity patterns' for more information.
  *
- * This class is used in @ref step_22 "step-22" and @ref step_31 "step-31".
+ * This class is used in step-22 and step-31.
  *
  * @author Timo Heister, 2008
  */
@@ -953,7 +953,7 @@ class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<Com
  * (in the sense that the method compress() needs to be called before the
  * pattern can be used).
  *
- * This class is used in @ref step_32 "step-32".
+ * This class is used in step-32.
  *
  * @author Martin Kronbichler, 2008, 2009
  */

@@ -39,7 +39,7 @@ The above equations can be derived from Navier-Stokes equations
 assuming that the effects due to viscosity are negligible compared to
 those due to the pressure gradient, inertial forces and the external
 forces. This is the opposite case of the Stokes equations discussed in
-@ref step_22 "step-22" which are the limit case of dominant viscosity,
+step-22 which are the limit case of dominant viscosity,
 i.e. where the velocity is so small that inertia forces can be
 neglected. On the other hand, owing to the assumed incompressibility,
 the equations are not suited for very high speed gas flows where

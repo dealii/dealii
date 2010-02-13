@@ -18,7 +18,7 @@ two solution components, $x$-displacement and $y$-displacement, are in
 fact not two independent scalar fields, but the components of a vector
 field. Depending on what graphical file format we use, we could as
 well have specified this in the program already and then written into
-the output file. The @ref step_22 "step-22" shows how to do this in
+the output file. The step-22 shows how to do this in
 the output_results() function.
 
 The next image shows the final grid after eight steps of refinement:

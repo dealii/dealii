@@ -48,7 +48,7 @@ namespace DataComponentInterpretation
 				    * DataOut_DoFData::add_data_vector
 				    * functions, this can be achieved.
 				    *
-				    * See the @ref step_22 "step-22" tutorial
+				    * See the step-22 tutorial
 				    * program for an example on how this
 				    * information can be used in practice.
 				    *

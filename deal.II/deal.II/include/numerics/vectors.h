@@ -107,7 +107,7 @@ class ConstraintMatrix;
  * \phi_i(x) \phi_j(x) dx$ and $f_i = \int_\Omega f(x) \phi_i(x)
  * dx$. The solution vector $v$ then is the nodal representation of
  * the projection <i>f<sub>h</sub></i>. The project() functions are
- * used in the @ref step_21 "step-21" and @ref step_23 "step-23"
+ * used in the step-21 and step-23
  * tutorial programs.
  *
  *   In order to get proper results, it be may necessary to treat
@@ -970,7 +970,7 @@ class VectorTools
 				      *
 				      * The use of this function is
 				      * explained in more detail in
-				      * @ref step_31 "step-31". It
+				      * step-31. It
 				      * doesn't make much sense in 1d,
 				      * so the function throws an
 				      * exception in that case.

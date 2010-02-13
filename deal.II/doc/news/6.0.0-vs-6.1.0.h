@@ -101,7 +101,7 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li> <p>New: @ref step_33 "step-33", written mainly by David Neckels,
+<li> <p>New: step-33, written mainly by David Neckels,
   illustrates how the Euler equations of compressible inviscid gas
   dynamics can be solved. More generally, the program also provides
   a framework for the solution of arbitrary hyperbolic, nonlinear
@@ -110,13 +110,13 @@ inconvenience this causes.
   (WB, 2008/05/23)
   </p>
 
-<li> <p>Improved: @ref step_16 "step-16" has been updated to show the
+<li> <p>Improved: step-16 has been updated to show the
   use of Multigrid with Dirichlet boundary conditions.
   <br>
   (GK, 2007/05/13)
   </p>
 
-<li> <p>New: @ref step_22 "step-22", written by Martin Kronbichler and Wolfgang
+<li> <p>New: step-22, written by Martin Kronbichler and Wolfgang
      Bangerth, shows how to solve, and in particular how to solve
      efficiently, the Stokes equations that describe viscous
      incompressible fluid flow.
@@ -124,7 +124,7 @@ inconvenience this causes.
   (WB, 2008/03/28)
   </p>  
 
-<li> <p>New: @ref step_29 "step-29" demonstrates how problems involving
+<li> <p>New: step-29 demonstrates how problems involving
   complex %numbers can be implemented by viewing real and imaginary parts
   of a complex-valued solution as the two components of a vector-valued
   function. 
@@ -135,7 +135,7 @@ inconvenience this causes.
 <li> <p>New: A significantly simpler way to code the assembly of linear
   systems for problems with more than one solution variable has been
   implemented. This is explained in detail in the report on @ref vector_valued
-  and tutorial programs @ref step_20 "step-20" and @ref step_21 "step-21"
+  and tutorial programs step-20 and step-21
   have been converted as well.
   <br>
   (WB, 2008/02/23)
@@ -240,8 +240,8 @@ an integer id of the current thread.
   only the VTK reader in DataOutBase::write_vtk as well as the deal.II
   intermediate format writer make use of it.
   <p>
-  The use of this ability is explained in the @ref step_22 "step-22" and
-  @ref step_33 "step-33" tutorial programs. 
+  The use of this ability is explained in the step-22 and
+  step-33 tutorial programs. 
   <br>
   (WB 2007/10/11)
   </p> </li>
@@ -488,8 +488,8 @@ constraints individually.
   that may be used to indicate that certain components of the data
   logically form a vector field. The output formats for which this
   is presently implemented then indicate this fact in the output file. The
-  mechanism is shown in action in @ref step_22 "step-22" and
-  @ref step_33 "step-33".
+  mechanism is shown in action in step-22 and
+  step-33.
   <br>
   (WB 2007/10/14)
   </p></li>

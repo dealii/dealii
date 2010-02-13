@@ -47,7 +47,7 @@ template <typename> class Vector;
  * from the fparser.txt file that comes with the fparser library. Please refer
  * also to that file both for clarifications on how this wrapper works, as
  * well as for any issue regarding the licence that applies to this class.
- * This class is used in the @ref step_33 "step-33" and @ref step_36 "step-36"
+ * This class is used in the step-33 and step-36
  * tutorial programs (the latter being much simpler to understand).
  *
  * By using this class you indicate that you accept the terms of the licence

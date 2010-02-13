@@ -565,7 +565,7 @@ class FETools
                                       * quadrature points.
                                       *
                                       * A use for this function is described
-                                      * in the introduction to the @ref step_18 "step-18"
+                                      * in the introduction to the step-18
                                       * example program.
                                       *
                                       * The opposite of this function,

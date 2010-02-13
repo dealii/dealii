@@ -1712,7 +1712,7 @@ class DataOutBase
  * generate a single output file from it, which may be again in
  * intermediate format or any of the final formats. This latter option
  * is most helpful for parallel programs: as demonstrated in the
- * @ref step_17 "step-17" example program, it is possible to let only one processor
+ * step-17 example program, it is possible to let only one processor
  * generate the graphical output for the entire parallel program, but
  * this can become vastly inefficient if many processors are involved,
  * because the load is no longer balanced. The way out is to let each
@@ -2556,10 +2556,10 @@ class DataOutInterface : private DataOutBase
  * be merged, while this is almost impossible once the data has been
  * written out in any of the supported established graphics formats.
  *
- * This second use scenario is explained in some detail in the @ref step_18 "step-18"
+ * This second use scenario is explained in some detail in the step-18
  * example program.
  *
- * Both these applications are implemented in the @ref step_19 "step-19" example program.
+ * Both these applications are implemented in the step-19 example program.
  * There, a slight complication is also explained: in order to read data back
  * into this object, you have to know the template parameters for the space
  * dimension which were used when writing the data. If this knowledge is
@@ -2567,7 +2567,7 @@ class DataOutInterface : private DataOutBase
  * (such as in a simple format converter), then it needs to be figured out at
  * run time, even though the compiler already needs it at compile time. A way
  * around using the DataOutBase::determine_intermediate_format_dimensions()
- * function is explained in @ref step_19 "step-19".
+ * function is explained in step-19.
  *
  * Note that the intermediate format is what its name suggests: a
  * direct representation of internal data. It isn't standardized and
@@ -2636,7 +2636,7 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
                                       * patches.
 				      *
 				      * The use of this function is
-				      * demonstrated in @ref step_19 "step-19".
+				      * demonstrated in step-19.
                                       */
     void merge (const DataOutReader<dim,spacedim> &other);
     

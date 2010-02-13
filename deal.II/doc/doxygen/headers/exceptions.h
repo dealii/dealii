@@ -50,7 +50,7 @@
  *
  *   Rather, one has to check them every time during execution of a
  *   program. Within deal.II, this is done using the AssertThrow macro
- *   introduced in @ref step_9 "step-9", @ref step_13 "step-13", and
+ *   introduced in step-9, step-13, and
  *   following tutorial programs. The macro checks a condition, and if
  *   violated throws an exception of one of the types declared in this
  *   module, using the C++ <code>throw</code> mechanism. Since these
@@ -201,7 +201,7 @@
  *  @code
  *    Assert (false, ExcInternalError());
  *  @endcode
- *  See the @ref step_7 "step-7" and several other of the tutorial programs for
+ *  See the step-7 and several other of the tutorial programs for
  *  a use of this construct.
  *
  *  As mentioned above, the program is terminated once a call to

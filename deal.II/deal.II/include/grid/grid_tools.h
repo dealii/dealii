@@ -719,7 +719,7 @@ class GridTools
 				     /**
 				      * Return the diamater of the smallest
 				      * active cell of a triangulation. See
-				      * @ref step_24 "step-24" for an example
+				      * step-24 for an example
 				      * of use of this function.
 				      */
     template <int dim, int spacedim>

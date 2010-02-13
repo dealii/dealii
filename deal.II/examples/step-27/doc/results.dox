@@ -41,7 +41,7 @@ of freedom is on the order of 20-25% of the total number of degrees of
 freedom, at least on the later grids when we have elements of relatively
 high order (in 3d, the fraction of constrained degrees of freedom can be up
 to 30%). This is, in fact, on the same order of magnitude as for non-$hp$
-discretizations. For example, in the last step of the @ref step_6 "step-6"
+discretizations. For example, in the last step of the step-6
 program, we have 18401 degrees of freedom, 4104 of which are
 constrained. The difference is that in the latter program, each constrained
 hanging node is constrained against only the two adjacent degrees of

@@ -25,7 +25,7 @@ viewing a single complex valued equation as a system of two real valued
 equations. This short example demonstrates how this can be implemented in
 deal.II by using an <code>FE_system</code> object to stack two finite element
 fields representing real and imaginary parts. We also revisit the
-ParameterHandler class first used in @ref step_19 "step-19", which provides a
+ParameterHandler class first used in step-19, which provides a
 convenient way for reading parameters from a configuration file at runtime
 without the need to recompile the program code.  
 
@@ -102,7 +102,7 @@ If we are willing to accept this as a suffient approximation to an absorbing bou
 c (n\cdot\nabla u) + i\,\omega\,u &=&0, \qquad x\in\Gamma_2,\\
 u &=& 1,  \qquad x\in\Gamma_1. 
 @f}
-This is a Helmholtz equation (similar to the one in @ref step_7 "step-7", but this time with ''the bad sign'') with Dirichlet data on $\Gamma_1$ and mixed boundary conditions on $\Gamma_2$. Because of the condition on $\Gamma_2$, we cannot just treat the equations for real and imaginary parts of $u$ separately. What we can do however is to view the PDE for $u$ as a system of two PDEs for the real and imaginary parts of $u$, with the boundary condition on $\Gamma_2$ representing the coupling terms between the two components of the system. This works along the following lines: Let $v=\textrm{Re}\;u,\; w=\textrm{Im}\;u$, then in terms of $v$ and $w$ we have the following system:
+This is a Helmholtz equation (similar to the one in step-7, but this time with ''the bad sign'') with Dirichlet data on $\Gamma_1$ and mixed boundary conditions on $\Gamma_2$. Because of the condition on $\Gamma_2$, we cannot just treat the equations for real and imaginary parts of $u$ separately. What we can do however is to view the PDE for $u$ as a system of two PDEs for the real and imaginary parts of $u$, with the boundary condition on $\Gamma_2$ representing the coupling terms between the two components of the system. This works along the following lines: Let $v=\textrm{Re}\;u,\; w=\textrm{Im}\;u$, then in terms of $v$ and $w$ we have the following system:
 @f{eqnarray*}
   \left.\begin{array}{ccc}
     -\omega^2 v - c^2\Delta v &=& 0 \quad\\ 

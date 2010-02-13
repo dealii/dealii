@@ -772,8 +772,8 @@ namespace Patterns
  *
  *   The ParameterHandler class is discussed in detail in the @ref
  *   step_19 "step-19" example program, and is used in more realistic
- *   situations in @ref step_29 "step-29", @ref step_33 "step-33"
- *   and @ref step_34 "step-34".
+ *   situations in step-29, step-33
+ *   and step-34.
  *   
  *   <h3>Declaring entries</h3>
  *   

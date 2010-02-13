@@ -190,7 +190,7 @@ namespace internal
  * it allows to attach DataPostprocessor arguments to compute derived
  * information from a data vector at each quadrature point (for example, the
  * Mach number in hypersonic flow can be computed from density and velocities;
- * @ref step_29 "step-29" also shows an example); another piece of information
+ * step-29 also shows an example); another piece of information
  * specified through arguments with default values is how certain output
  * components should be interpreted, i.e. whether each component of the data
  * is logically an independent scalar field, or whether some of them together
@@ -1176,7 +1176,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * By default, this class produces patches for all active cells. Sometimes,
  * this is not what you want, maybe because they are simply too many (and too
  * small to be seen individually) or because you only want to see a certain
- * region of the domain (for example in parallel programs such as the @ref step_18 "step-18"
+ * region of the domain (for example in parallel programs such as the step-18
  * example program), or for some other reason.
  *
  * For this, internally build_patches() does not generate

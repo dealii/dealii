@@ -123,7 +123,7 @@
  * a common strategy is to first build and intermediate sparsity pattern that
  * uses a less efficient storage scheme during construction of the sparsity
  * pattern and later copy it directly into the static, compressed form (see,
- * for example the @ref step_11 "step-11", @ref step_18 "step-18", and @ref
+ * for example the step-11, step-18, and @ref
  * step_27 "step-27" tutorial programs).
  *
  *
@@ -158,8 +158,8 @@
  * up to twice the memory in the worst case) for additional speed which is
  * noticeable in cases with many nonzero entries. CompressedSetSparsityPattern
  * on the other hand uses a lot more memory but may perform better in cases with
- * many nonzero entries per row. See for example the @ref step_27 "step-27"
- * and @ref step_22 "step-22" tutorial programs.
+ * many nonzero entries per row. See for example the step-27
+ * and step-22 tutorial programs.
  *
  * As a guideline you should start using CompressedSparsityPattern and try the
  * other variants if you run into problems. Switching between them should be as
@@ -189,7 +189,7 @@
  *
  * These classes inherit the same tradeoffs regarding their efficiency from
  * their non-block classes (see above). See their documentation and
- * @ref step_22 "step-22" for more information.
+ * step-22 for more information.
  *
  * @ingroup Matrices
  */

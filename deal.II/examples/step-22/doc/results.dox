@@ -330,7 +330,7 @@ in the early tutorial programs. The improvements are still rather
 unsatisfactory, if one compares with an elliptic problem of similar
 size. Either way, we will introduce below a number of improvements to the
 linear solver, a discussion that we will re-consider again with additional
-options in the @ref step_31 "step-31" program.
+options in the step-31 program.
 
 <a name="improved-ilu">
 <h5>Better ILU decomposition by smart reordering</h5>
@@ -357,7 +357,7 @@ unknowns.
 Another idea to improve the situation even more would be to choose a 
 preconditioner that makes CG for the (0,0) matrix $A$ converge in a 
 mesh-independent number of iterations, say 10 to 30. We have seen such a
-canditate in @ref step_16 "step-16": multigrid.
+canditate in step-16: multigrid.
 
 <h5>Block Schur complement preconditioner</h5>
 Even with a good preconditioner for $A$, we still 
@@ -735,7 +735,7 @@ sizes is quite impressive.
 An ultimate linear solver for this problem could be imagined as a 
 combination of an optimal
 preconditioner for $A$ (e.g. multigrid) and the block preconditioner
-described above, which is the approach taken in the @ref step_31 "step-31"
+described above, which is the approach taken in the step-31
 tutorial program.
 
 <h5>No block matrices and vectors</h5>

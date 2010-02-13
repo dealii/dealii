@@ -1,7 +1,7 @@
 <h1>Results</h1>
 
 When run, the program simulates convection in 3d in much the same way
-as @ref step_31 "step-31" did, though with an entirely different testcase.
+as step-31 did, though with an entirely different testcase.
 
 
 <h3>Comparison of results with step-31</h3>
@@ -295,7 +295,7 @@ quite within the physically expected region.
 <h3>Possibilities for extensions</h3>
 
 Apart from the various possibilities for extensions already outlined
-in the @ref step_31 "step-31", here are a few more ideas:
+in the step-31, here are a few more ideas:
 
 <ul>
   <li> The temperature field we get in our simulations after a while

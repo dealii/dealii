@@ -59,7 +59,7 @@ DEAL_II_NAMESPACE_OPEN
  * Alternatively, you can also restart the timer instead of resetting
  * it. The times between successive calls to start()/ stop() will then be
  * accumulated. The usage of this class is also explained in the
- * @ref step_12 "step-12" and @ref step_29 "step-29" tutorial programs.
+ * step-12 and step-29 tutorial programs.
  *
  * @note Implementation of this class is system
  * dependent. Unfortunately, it does not work with multithreading
@@ -262,7 +262,7 @@ class Timer
  * object. In this case, we did a lot of other stuff, so that the time
  * proportions of the functions we measured are far away from 100 precent.
  *
- * See the @ref step_32 "step-32" tutorial program for usage of this class.
+ * See the step-32 tutorial program for usage of this class.
  *
  * @ingroup utilities
  * @author M. Kronbichler, 2009.

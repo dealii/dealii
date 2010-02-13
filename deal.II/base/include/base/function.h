@@ -577,7 +577,7 @@ class ConstantFunction : public ZeroFunction<dim>
  * components are zero.  It is especially useful as a weight function
  * for <tt>VectorTools::integrate_difference</tt>, where it allows to
  * integrate only one or a few vector components, rather than the
- * entire vector-valued solution. See the @ref step_20 "step-20"
+ * entire vector-valued solution. See the step-20
  * tutorial program for a detailed explanation.
  *
  * @ingroup functions

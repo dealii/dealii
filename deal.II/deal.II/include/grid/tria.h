@@ -899,7 +899,7 @@ namespace internal
  *     surprising fact may lead to programs that do the wrong thing
  *     since they are not written for the additional cases that can
  *     happen with anisotropic meshes, see the discussion in the
- *     introduction to @ref step_30 "step-30".
+ *     introduction to step-30.
  *
  *   <li> @p none:
  *     Select no smoothing at all.
@@ -918,7 +918,7 @@ namespace internal
  *   This material_id may be set upon construction of a
  *   triangulation (through the CellData data structure), or later
  *   through use of cell iterators. For a typical use of this
- *   functionality, see the @ref step_28 "step-28" tutorial
+ *   functionality, see the step-28 tutorial
  *   program. The functions of the GridGenerator namespace typically
  *   set the material ID of all cells to zero. When reading a
  *   triangulation, the material id must be specified in the input

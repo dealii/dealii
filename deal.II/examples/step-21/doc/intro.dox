@@ -11,7 +11,7 @@ program (besides the somewhat strange time-dependence of @ref step_18
 "step-18").  
 
 The equations covered here are an extension of the material already covered in
-@ref step_20 "step-20". In particular, they fall into the class of
+step-20. In particular, they fall into the class of
 vector-valued problems. A toplevel overview of this topic can be found in the
 @ref vector_valued module.
 
@@ -72,7 +72,7 @@ is the total mobility.
 
 So far, this looks like an ordinary stationary, Poisson-like equation that we
 can solve right away with the techniques of the first few tutorial programs
-(take a look at @ref step_6 "step-6", for example, for something very
+(take a look at step-6, for example, for something very
 similar). However, we have not said anything yet about the saturation, which
 of course is going to change as the fluids move around.
 
@@ -133,7 +133,7 @@ as well as the time dependent Maxwell equations (here, the algebraic
 constraint is that the divergence of the electric displacement field
 equals the charge density, $\textrm{div}\ \mathbf D = \rho$ and that the
 divergence of the magnetic flux density is zero: $\textrm{div}\ \mathbf
-B = 0$); even the quasistatic model of @ref step_18 "step-18" falls into this
+B = 0$); even the quasistatic model of step-18 falls into this
 category. We will see that the different character of the two equations 
 will inform our discretization strategy for the two equations.
 
@@ -153,7 +153,7 @@ This formulation has the additional benefit that we do not have to express the
 total velocity $\mathbf u$ appearing in the transport equation as a function
 of the pressure, but can rather take the primary variable for it. Given the
 saddle point structure of the first two equations and their similarity to the
-mixed Laplace formulation we have introduced in @ref step_20 "step-20", it
+mixed Laplace formulation we have introduced in step-20, it
 will come as no surprise that we will use a mixed discretization again. 
                                   
 But let's postpone this for a moment. The first business we have with these
@@ -256,13 +256,13 @@ The quantities $S_+,\mathbf{u}_+$ then correspond to the values of these
 variables on the present cell, whereas $S_-,\mathbf{u}_-$ (needed on the
 inflow part of the boundary of $K$) are quantities taken from the neighboring
 cell. Some more context on discontinuous element techniques and evaluation of
-fluxes can also be found in @ref step_12 "step-12".
+fluxes can also be found in step-12.
 
 
 <h3>Linear solvers</h3>
 
 The linear solvers used in this program are a straightforward extension of the
-ones used in @ref step_20 "step-20". Essentially, we simply have to extend
+ones used in step-20. Essentially, we simply have to extend
 everything from 
 two to three solution components. If we use the discrete spaces
 mentioned above and put shape functions into the bilinear forms, we
@@ -328,10 +328,10 @@ have solved for the velocities.
 The solution scheme then involves the following steps:
 <ol>
   <li>Solve for the pressure $p^{n+1}$ using the Schur complement
-  technique introduced in @ref step_20 "step-20".
+  technique introduced in step-20.
 
   <li>Solve for the velocity $\mathbf u^{n+1}$ as also discussed in
-  @ref step_20 "step-20".
+  step-20.
 
   <li>Compute the term $F_3-\triangle t\; H \mathbf u^{n+1}$, using
   the just computed velocities. 
@@ -384,7 +384,7 @@ physical outside this range, and we should not expect the program to do
 anything useful once we have negative saturations or ones larger than one.
 
 Note that we will have similar restrictions on the time step also in @ref
-step_23 "step-23" and @ref step_24 "step-24" where we solve the time dependent
+step_23 "step-23" and step-24 where we solve the time dependent
 wave equation, another hyperbolic problem. We will also come back to the issue
 of time step choice below in the section on <a href="#extensions">possible
 extensions to this program</a>.
@@ -459,7 +459,7 @@ functions introduced at the end of the results section of @ref step_20
 "step-20":
 <ul>
   <li>A function that models a single, winding crack that snakes through the
-  domain. In analgy to @ref step_20 "step-20", but taking care of the slightly
+  domain. In analgy to step-20, but taking care of the slightly
   different geometry we have here, we describe this by the following function:
   @f[
     k(\mathbf x) 

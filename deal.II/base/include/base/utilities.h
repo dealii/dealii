@@ -367,7 +367,7 @@ namespace Utilities
    * implementations of Trilinos, sets up the MPI communicator in case the
    * programs are run in %parallel, and correctly terminates all processes
    * when the destructor is called. An example usage of this class is shown
-   * in the tutorial program @ref step_32 "step-32".
+   * in the tutorial program step-32.
    */
 #ifdef DEAL_II_USE_TRILINOS
   namespace Trilinos

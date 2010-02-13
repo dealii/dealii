@@ -105,7 +105,7 @@ examples/step-18> ls -l *.d2
 
 Let us convert these files in deal.II intermediate format to gmv
 format (this assumes that you have already compiled the 
-@ref step_19 "step-19" example program):
+step-19 example program):
 @code
 examples/step-18> ../step-19/step-19
 

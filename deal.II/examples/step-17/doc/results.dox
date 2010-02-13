@@ -111,8 +111,8 @@ Here is some output generated in the 12th cycle of the program, i.e. with roughl
 
 
 As one would hope for, the x- (left) and y-displacements (right) shown here
-closely match what we already saw in @ref step_8 "step-8". As shown
-there and in @ref step_22 "step-22", we could as well have produced a
+closely match what we already saw in step-8. As shown
+there and in step-22, we could as well have produced a
 vector plot of the displacement field, rather than plotting it as two
 separate scalar fields. What may be more interesting,
 though, is to look at the mesh and partition at this step:

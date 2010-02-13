@@ -6,7 +6,7 @@
 
 This example is devoted to <em>anisotropic refinement</em>, which extends to
 possibilities of local refinement. In most parts, this is a modification of the
-@ref step_12 "step-12" tutorial program, we use the same DG method for a linear transport
+step-12 tutorial program, we use the same DG method for a linear transport
 equation. This program will cover the following topics:
 <ol>
   <li> <em>Anisotropic refinement</em>: What is the meaning of anisotropic refinement?
@@ -16,7 +16,7 @@ equation. This program will cover the following topics:
 </ol>
 The discretization itself will not be discussed, and neither will
 implementation techniques not specific to anisotropic refinement used
-here. Please refer to @ref step_12 "step-12" for this.
+here. Please refer to step-12 for this.
 
 Please note, at the moment of writing this tutorial program, anisotropic
 refinement is only fully implemented for discontinuous Galerkin Finite
@@ -208,7 +208,7 @@ depending on the context.
 Another important aspect, and the most important one in this tutorial, is
 the treatment of neighbor-relations when assembling jump terms on the
 faces between cells. Looking at the documentation of the
-assemble_system functions in @ref step_12 "step-12" we notice, that we need to decide if a
+assemble_system functions in step-12 we notice, that we need to decide if a
 neighboring cell is coarser, finer or on the same (refinement) level as our
 current cell. These decisions do not work in the same way for anisotropic
 refinement as the information given by the <em>level</em> of a cell is not
@@ -341,7 +341,7 @@ write code that works for both isotropic and anisotropic refinement:
   use <code>else if (!cell->coarser_neighbor(face_no))</code>. The code inside this
   block can be left untouched. However, there is one thing to mention here: If
   we want to use a rule, which cell should assemble certain terms on a given
-  face we might think of the rule presented in @ref step_12 "step-12". We know that we have to
+  face we might think of the rule presented in step-12. We know that we have to
   leave out the part about comparing our cell's level with that of the neighbor
   and replace it with the test for a coarser neighbor presented above. However,
   we also have to consider the possibility that neighboring cells of same
@@ -421,7 +421,7 @@ steps:
   <li> Call Triangulation<dim>::execute_coarsening_and_refinement to perform the
   requested refinement, using the requested isotropic and anisotropic flags.
 </ol>
-This approach is similar to the one we have used in @ref step_27 "step-27" 
+This approach is similar to the one we have used in step-27 
 for hp refinement and
 has the great advantage of flexibility: Any error indicator can be
 used in the anisotropic process, i.e. if you have quite involved a posteriori
@@ -470,12 +470,12 @@ the vector-valued jump.
 
 <h3>The problem</h3>
 
-We solve the linear transport equation presented in @ref step_12 "step-12". The domain is
+We solve the linear transport equation presented in step-12. The domain is
 extended to cover $[-1,1]\times[0,1]$ in 2D, where the flow field $\beta$ describes a
 counterclockwise quarter circle around the origin in the right half of the
 domain and is parallel to the x-axis in the left part of the domain. The inflow
 boundary is again located at $x=1$ and along the positive part of the x-axis,
-and the boundary conditions are chosen as in @ref step_12 "step-12". Compared to @ref step_12 "step-12" we
+and the boundary conditions are chosen as in step-12. Compared to step-12 we
 only use the more effective second assembling technique. In order to make
 comparisons more effective, we decided to keep function names like @p
 assemble_system2 even if there is only one of these routines in this tutorial

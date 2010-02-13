@@ -170,7 +170,7 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Updated: The @ref step_22 "step-22" tutorial program now uses some 
+  Updated: The step-22 tutorial program now uses some 
   advanced features of the ConstraintMatrix such as imhomogeneities 
   for implementing Dirichlet boundary condition and condensation of 
   constraints on the fly.
@@ -200,7 +200,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: A new tutorial program  @ref step_34 "step-34" was added to the 
+  New: A new tutorial program  step-34 was added to the 
   library that shows the usage of the new codimension one functionality
   recently added to the library. In this tutorial we show the use of 
   bondary element methods on piecewise constant functions defined over
@@ -248,7 +248,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Updated: The @ref step_33 "step-33" tutorial program now uses the
+  Updated: The step-33 tutorial program now uses the
   Trilinos wrapper 
   classes for accessing Trilinos linear algebra routines instead of
   implementing that by hand.
@@ -293,7 +293,7 @@ inconvenience this causes.
   if you intend two-dimensional triangulations of two-dimensional
   domains.
   <br>
-  The new functionality is described in the @ref step_34 "step-34"
+  The new functionality is described in the step-34
   tutorial program.
   <br>
   (Cataldo Manigrasso, Luca Heltai 2008/12/05)
@@ -332,7 +332,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: A new  tutorial program, @ref step_31 "step-31", is contributed by
+  New: A new  tutorial program, step-31, is contributed by
   Martin Kronbichler and Wolfgang Bangerth and shows the
   solution of the Boussinesq approximation to thermally driven
   convection in an incompressible fluid.
@@ -343,7 +343,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Updated: In the @ref step_22 "step-22" tutorial program the generation of
+  Updated: In the step-22 tutorial program the generation of
   the sparsity pattern using the class BlockCompressedSetSparsityPattern has 
   been replaced by a pattern of the class BlockCompressedSimpleSparsityPattern, 
   which uses far less memory and is slightly faster.
@@ -374,7 +374,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Fixed: In the @ref step_23 "step-23" tutorial program the terms corresponding
+  Fixed: In the step-23 tutorial program the terms corresponding
   to the external force were computed incorrectly. The error wasn't visible
   right away since in the program the right hand side is assumed to be zero.
   This has now been fixed.
@@ -385,7 +385,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: A new  tutorial program, @ref step_28 "step-28", is contributed by
+  New: A new  tutorial program, step-28, is contributed by
   Yaqi Wang. It illustrates the solution
   of a coupled system of diffusion equations relevant to
   nuclear reactor physics where we use different meshes for
@@ -399,7 +399,7 @@ inconvenience this causes.
   <p>
   New: Contributed by Tobias Leicht as well as Ralf Hartmann, deal.II
   now supports anisotropic refinement of meshes. This functionality
-  is explained in the @ref step_30 "step-30" tutorial program.
+  is explained in the step-30 tutorial program.
   <br>
   (Tobias Leicht, RH 2008/07/08)
   </p>
@@ -407,7 +407,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Fixed: In the new @ref step_33 "step-33" tutorial program there was
+  Fixed: In the new step-33 tutorial program there was
   a place where we incorrectly passed the diameter of a cell, rather
   than a face, to a function. This is now fixed.
   <br>
@@ -417,7 +417,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Fixed: The new @ref step_33 "step-33" tutorial program had a place where
+  Fixed: The new step-33 tutorial program had a place where
   we didn't release some memory. This is now fixed.
   <br>
   (Chih-Che Chueh, WB 2008/06/02)
@@ -933,7 +933,7 @@ inconvenience this causes.
   New: FEValues objects can now directly calculate the Laplacians of
   solution functions at quadrature points. This is equivalent to the 
   trace of the Hessians, but faster and more convenient in user code.
-  @ref step_31 "step-31" program has also been updated to use this.
+  step-31 program has also been updated to use this.
   <br>
   (Martin Kronbichler 2008/12/15)
   </p>
@@ -947,7 +947,7 @@ inconvenience this causes.
   <code>fe_values[velocities].get_function_values (global_solution,
   local_velocity_values)</code>. See the new section at the end of the
   @ref vector_valued module for an overview of this facility. The
-  @ref step_31 "step-31" program has also been updated to use this.
+  step-31 program has also been updated to use this.
   <br>
   (WB 2008/12/13)
   </p>

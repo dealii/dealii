@@ -3,8 +3,8 @@
 
 This tutorial program attempts to show how to use $hp$ finite element methods
 with deal.II. It solves the Laplace equation and so builds only on the first
-few tutorial programs, in particular on @ref step_4 "step-4" for dimension
-independent programming and @ref step_6 "step-6" for adaptive mesh
+few tutorial programs, in particular on step-4 for dimension
+independent programming and step-6 for adaptive mesh
 refinement. 
 
 The $hp$ finite element method was proposed in the early 1980s by
@@ -123,7 +123,7 @@ used elements can then be created as follows:
 
 The next task we have to consider is what to do with the list of
 finite element objects we want to use. In previous tutorial programs,
-starting with @ref step_2 "step-2", we have seen that the DoFHandler
+starting with step-2, we have seen that the DoFHandler
 class is responsible for making the connection between a mesh
 (described by a Triangulation object) and a finite element, by
 allocating the correct number of degrees of freedom for each vertex,
@@ -189,7 +189,7 @@ same way as for the non-$hp$ case. Assembling requires a bit more thought.
 
 The main idea is of course unchanged: we have to loop over all cells, assemble
 local contributions, and then copy them into the global objects. As discussed
-in some detail first in @ref step_3 "step-3", deal.II has the FEValues class
+in some detail first in step-3, deal.II has the FEValues class
 that pulls finite element description, mapping, and quadrature formula
 together and aids in evaluating values and gradients of shape functions as
 well as other information on each of the quadrature points mapped to the real
@@ -267,7 +267,7 @@ inspect the computed solution (a posteriori) with an indicator that tells us
 which are the cells where the error is largest, and then refine them. In many
 of the other tutorial programs, we use the KellyErrorEstimator class to get an
 indication of the size of the error on a cell, although we also discuss more
-complicated strategies in some programs, most importantly in @ref step_14 "step-14". 
+complicated strategies in some programs, most importantly in step-14. 
 
 In any case, as long as the decision is only "refine this cell" or "do not
 refine this cell", the actual refinement step is not particularly
@@ -636,8 +636,8 @@ SparsityPattern exceeds the actual need by a factor of 10 or larger, and can
 lead to a program running out of memory when in fact there would be plenty of
 memory for all computations.
 
-A solution to the problem has already been discussed in @ref step_11 "step-11"
-and @ref step_18 "step-18". It used an intermediate object of type
+A solution to the problem has already been discussed in step-11
+and step-18. It used an intermediate object of type
 CompressedSparsityPattern. This class uses a different memory storage scheme
 that is optimized to <i>creating</i> a sparsity pattern when maximal numbers
 of entries per row are not accurately available, but is unsuitable for use as
@@ -696,7 +696,7 @@ solution to this problem is to use the ConstraintMatrix object already at the
 time of creating the sparsity pattern, or while copying local contributions
 into the global matrix object (or global vector). 
 
-So, instead of the code snippet (taken from @ref step_6 "step-6")
+So, instead of the code snippet (taken from step-6)
 @code
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
@@ -750,7 +750,7 @@ we have always used a process like this:
   hanging_node_constraints.condense (system_rhs);
 @endcode
 We now replace copying and later condensing into one step, as already shown in
-@ref step_17 "step-17", @ref step_18 "step-18", and @ref step_22 "step-22":
+step-17, step-18, and step-22:
 @code
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -783,13 +783,13 @@ those as well. All we have to do for this is to call the function that
 interpolates the Dirichlet boundary conditions already in the setup phase in
 order to tell the ConstraintMatrix object about them, and then do the
 transfer from local to global data on matrix and vector simultaneously. This
-is exactly what we've shown in the @ref step_22 "step-22" tutorial program.
+is exactly what we've shown in the step-22 tutorial program.
 
 
 <h3>The test case</h3>
 
 The test case we will solve with this program is a re-take of the one we
-already look at in @ref step_14 "step-14": we solve the Laplace equation
+already look at in step-14: we solve the Laplace equation
 @f[
 	-\Delta u = f
 @f]
@@ -797,7 +797,7 @@ in 2d, with $f=(x+1)(y+1)$, and with zero Dirichlet boundary values for
 $u$. We do so on the domain $[-1,1]^2\backslash[-\frac 12,\frac 12]^2$, i.e. a
 square with a square hole in the middle.
 
-The difference to @ref step_14 "step-14" is of course that we use $hp$ finite
+The difference to step-14 is of course that we use $hp$ finite
 elements for the solution. The testcase is of interest because it has
 re-entrant corners in the corners of the hole, at which the solution has
 singularities. We therefore expect that the solution will be smooth in the

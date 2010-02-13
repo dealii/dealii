@@ -40,7 +40,7 @@ consists of the following equations:
   u(x,t_0) &=& u_0(x).
 \f}
 It is a nonlinear equation similar to the wave equation we
-discussed in @ref step_23 "step-23" and @ref step_24 "step-24".
+discussed in step-23 and step-24.
 We have chosen to enforce zero Neumann boundary conditions in order for waves
 to reflect off the boundaries of our domain. It should be noted, however, that
 Dirichlet boundary conditions are not appropriate for this problem. Even
@@ -53,7 +53,7 @@ discretization. If we were to discretize the second-order time
 derivative directly and accurately, then  we would need a large
 stencil (i.e., several time steps would need to be kept in the
 memory), which could become expensive. Therefore, in complete analogy
-to what we did in @ref step_23 "step-23" and @ref step_24 "step-24",
+to what we did in step-23 and step-24,
 we split the 
 second-order (in time) sine-Gordon equation into a system of two
 first-order (in time) equations, which we call the split, or velocity,
@@ -195,10 +195,10 @@ linear systems, but it is also a slow one. Possibly better would be a solver
 that utilizes the symmetry, such as, for example, SymmLQ, which is also
 implemented in deal.II.
 
-This program uses a clever optimization over @ref step_23 "step-23" and @ref
+This program uses a clever optimization over step-23 and @ref
 step_24 "step-24": If you read the above formulas closely, it becomes clear
 that the velocity $V$ only ever appears in products with the mass matrix. In
-@ref step_23 "step-23" and @ref step_24 "step-24", we were, therefore, a bit
+step-23 and step-24, we were, therefore, a bit
 wasteful: in each time step, we would solve a linear system with the mass
 matrix, only to multiply the solution of that system by $M$ again in the next
 time step. This can, of course, be avoided, and we do so in this program.

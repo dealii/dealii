@@ -15,16 +15,16 @@ California Institute of Technology.
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-This program does pretty much exactly what @ref step_31 "step-31" already
+This program does pretty much exactly what step-31 already
 does: it solves the Boussinesq equations that describe the motion of a fluid
 whose temperature is not in equilibrium. As such, all the equations we have
-described in @ref step_31 "step-31" still hold: we solve the same partial
+described in step-31 still hold: we solve the same partial
 differential equation, using the same finite element scheme, the same time
 stepping algorithm, and the same stabilization method for the temperature
 advection-diffusion equation. As a consequence, you may first want to
 understand that program before you work on the current one.
 
-The difference between @ref step_31 "step-31" and the current program is that
+The difference between step-31 and the current program is that
 here we want to do things in %parallel, using both the availability of many
 machines in a cluster (with parallelization based on MPI) as well as many
 processor cores within a single machine (with parallelization based on
@@ -44,7 +44,7 @@ parallelize things, and finally the actual testcase we will consider.
 
 <h3> Using the "right" pressure </h3>
 
-In @ref step_31 "step-31", we used the following Stokes model for the
+In step-31, we used the following Stokes model for the
 velocity and pressure field:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
@@ -88,7 +88,7 @@ with which the Stokes equations would read:
   \\
   \nabla \cdot {\mathbf u} &=& 0.
 @f}
-This is exactly the form we used in @ref step_31 "step-31", and it was
+This is exactly the form we used in step-31, and it was
 appropriate to do so because all changes in the fluid flow are only
 driven by the dynamic pressure that results from temperature
 differences.
@@ -138,7 +138,7 @@ Remember that we want to solve the following set of equations:
   \nabla \cdot \kappa \nabla T &=& \gamma,
 @f}
 augmented by appropriate boundary and initial conditions. As discussed
-in @ref step_31 "step-31", we will solve this set of equations by
+in step-31, we will solve this set of equations by
 solving for a Stokes problem first in each time step, and then moving
 the temperature equation forward by one time interval.
 
@@ -188,7 +188,7 @@ $\text{m}^{\text{dim}-1} \sqrt{\left(\text{Pa}\right)^2 +
 quite obviously, does not make sense, and we should not be surprised
 that doing so is eventually going to come back hurting us.
 
-So why is this an issue here, but not in @ref step_31 "step-31"? The
+So why is this an issue here, but not in step-31? The
 reason back there is that everything was nicely balanced: velocities
 were on the order of one, the pressure likewise, the viscosity was
 one, and the domain had a diameter of $\sqrt{2}$. As a result, while
@@ -251,7 +251,7 @@ matrix and preconditioner. We will recover the unscaled pressure in the
 <h3> Changes to the Stokes preconditioner </h3>
 
 In this tutorial program, we apply a variant of the preconditioner used in
-@ref step_31 "step-31". That preconditioner was built to operate on the
+step-31. That preconditioner was built to operate on the
 system matrix <i>M</i> in block form such that the product matrix
 @f{eqnarray*}
   P^{-1} M
@@ -300,11 +300,11 @@ possible option for a saddle point system like the Stokes
 equations. BiCGStab harmonizes nicely with the ILU preconditioner on a
 pressure mass matrix as approximation for $S^{-1}$, so it is at least as
 good as GMRES in this example. Keep in mind the discussion in the results
-section of the @ref step_22 "step-22" tutorial program, where we observed
+section of the step-22 tutorial program, where we observed
 that BiCGStab does <i>not</i> like inner solves with CG, which made us
 prefer GMRES in step-31.
 
-As a final note, let us remark that in @ref step_31 "step-31" we computed the
+As a final note, let us remark that in step-31 we computed the
 Schur complement $S=B A^{-1} B^T$ by approximating
 $-\text{div}(-\eta\Delta)^{-1}\nabla \approx \frac 1{\eta} \mathbf{1}$. Now,
 however, we have re-scaled the $B$ and $B^T$ operators. So $S$ should now
@@ -317,7 +317,7 @@ This is exactly the operator we use to approximate $S$.
 
 <h3> Changes to the artificial viscosity stabilization </h3>
 
-As in @ref step_31 "step-31", we will use an artificial viscosity of
+As in step-31, we will use an artificial viscosity of
 the form
 @f{eqnarray*}
   \nu_\alpha(T)|_K
@@ -334,7 +334,7 @@ in this problem, where
 $c(\mathbf{u},T) =
  c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
  \ |\mathrm{diam}(\Omega)|^{\alpha-2}$ (for the meaning of the various
-terms in these formulas, see @ref step_31 "step-31". In the results
+terms in these formulas, see step-31. In the results
 section of that program, we have discussed our choice for $c_R$ and
 how we arrived at the value used there mostly by accident, and in more
 detail how $\beta$ was chosen. For the
@@ -406,7 +406,7 @@ Consequently, $c_R=0.1$ would appear to be the right value.
 Parallelization of scientific codes across multiple machines in a cluster of
 computers is almost always done using the Message Passing Interface
 (MPI). This program is no exception to that, and it follows the
-@ref step_17 "step-17" and @ref step_18 "step-18" programs in this.
+step-17 and step-18 programs in this.
 
 MPI is a rather awkward interface to program with, and so we usually try to
 not use it directly but through an interface layer that abstracts most of the
@@ -422,7 +422,7 @@ interfaces to Trilinos, a library similar to PETSc in its aims and with a lot
 of the same functionality. It is, however, a project that is several years
 younger, is written in C++ and by people who generally have put a significant
 emphasis on software design. We have already used Trilinos in
-@ref step_31 "step-31", and will do so again here, with the difference that we
+step-31, and will do so again here, with the difference that we
 will use its %parallel capabilities.
 
 deal.II's Trilinos interfaces encapsulate pretty much everything Trilinos
@@ -636,7 +636,7 @@ point and is, in fact, deallocated again immediately.
 <h3> The testcase </h3>
 
 The setup for this program is mildly reminiscent of the problem we wanted to
-solve in the first place (see the introduction of @ref step_31 "step-31"):
+solve in the first place (see the introduction of step-31):
 convection in the earth mantle. As a consequence, we choose the following
 data, all of which appears in the program in units of meters and seconds (the
 SI system) even if we list them here in other units.

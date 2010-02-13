@@ -177,7 +177,7 @@ turn to the actual implementation.
 <h3>The software</h3>
 
 The step-14 example program builds heavily on the techniques already used in
-the @ref step_13 "step-13" program. Its implementation of the dual weighted residual error
+the step-13 program. Its implementation of the dual weighted residual error
 estimator explained above is done by deriving a second class, properly called
 <code>DualSolver</code>, from the <code>Solver</code> base class, and having a class
 (<code>WeightedResidual</code>) that joins the two again and controls the solution

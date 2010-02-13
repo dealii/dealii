@@ -146,7 +146,7 @@ suggestions:
 
   <li>
   Observe convergence: We will only discuss computing errors in norms in
-  @ref step_7 "step-7", but it is easy to check that computations converge
+  step-7, but it is easy to check that computations converge
   already here. For example, we could evaluate the value of the solution in a
   single point and compare the value for different %numbers of global
   refinement (the number of global refinement steps is set in

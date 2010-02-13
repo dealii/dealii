@@ -204,7 +204,7 @@ Using these various different preconditioners, we can compare the
 number of CG iterations needed (available through the
 <code>solver_control.last_step()</code> call, see @ref step_4
 "step-4") as well as CPU time needed (using the Timer class,
-discussed, for example, in @ref step_12 "step-12") and get the
+discussed, for example, in step-12) and get the
 following results (left: iterations; right: CPU time):
 
 <TABLE WIDTH="60%" ALIGN="center">
@@ -251,8 +251,8 @@ operations it has to perform.
 The message to take away from this is not that simplicity in
 preconditioners is always best. While this may be true for the current
 problem, it definitely is not once we move to more complicated
-problems (elasticity or Stokes, for examples @ref step_8 "step-8" or
-@ref step_22 "step-22"). Secondly, all of these preconditioners still
+problems (elasticity or Stokes, for examples step-8 or
+step-22). Secondly, all of these preconditioners still
 lead to an increase in the number of iterations as the number $N$ of
 degrees of freedom grows, for example ${\cal O}(N^\alpha)$; this, in
 turn, leads to a total growth in effort as ${\cal O}(N^{1+\alpha})$
@@ -260,7 +260,7 @@ since each iteration takes ${\cal O}(N)$ work. This behavior is
 undesirable, we would really like to solve linear systems with $N$
 unknowns in a total of ${\cal O}(N)$ work; there is a class
 of preconditioners that can achieve this, namely geometric (@ref
-step_16 "step-16") or algebraic (@ref step_31 "step-31") multigrid
+step_16 "step-16") or algebraic (step-31) multigrid
 preconditioners. They are, however, significantly more complex than
 the preconditioners outlined above. Finally, the last message to take
 home is that today (in 2008), linear systems with 100,000 unknowns are

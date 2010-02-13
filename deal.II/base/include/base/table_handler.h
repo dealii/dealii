@@ -140,7 +140,7 @@ class TableEntry : public TableEntryBase
  * to prescribe the format and the captions the columns are written
  * with in tex mode.
  *
- * A detailed explanation of this class is also given in the @ref step_13 "step-13" tutorial
+ * A detailed explanation of this class is also given in the step-13 tutorial
  * program.
  * 
  * 

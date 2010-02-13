@@ -117,7 +117,7 @@
  * Interfaces to Trilinos exist in the TrilinosWrappers namespace,
  * making matrices, vectors, and solvers look like the corresponding
  * deal.II classes. Their use is explained in the @ref step_31
- * "step-31", @ref step_32 "step-32", and @ref step_33 "step-33"
+ * "step-31", step-32, and step-33
  * tutorial programs.  The <a
  * href="../../readme-petsc-trilinos.html">PETSc and Trilinos
  * ReadMe</a> file explains how to configure deal.II to use this

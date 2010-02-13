@@ -30,8 +30,8 @@ DEAL_II_NAMESPACE_OPEN
  * finite element object, which is composed of several other finite elements
  * that are possibly of different type. The result is then a vector-valued
  * finite element. Vector valued elements are discussed in a number of
- * tutorial programs, for example @ref step_8 "step-8", @ref step_20
- * "step-20", @ref step_21 "step-21", and in particular in the @ref vector_valued
+ * tutorial programs, for example step-8, @ref step_20
+ * "step-20", step-21, and in particular in the @ref vector_valued
  * module.
  *
  * The overall numbering of degrees of freedom is as follows: for each

@@ -3,7 +3,7 @@
 
 
 This program does not introduce any new mathematical ideas; in fact, all it
-does is to do the exact same computations that @ref step_8 "step-8"
+does is to do the exact same computations that step-8
 already does, but it does so in a different manner: instead of using deal.II's
 own linear algebra classes, we build everything on top of classes deal.II
 provides that wrap around the linear algebra implementation of the <a

@@ -20,7 +20,7 @@ it, this introduction will cover the use of block matrices and vectors, the
 definition of solvers and preconditioners, and finally the actual test case we
 are going to solve.
 
-We are going to extend this tutorial program in @ref step_21 "step-21" to
+We are going to extend this tutorial program in step-21 to
 solve not only the mixed Laplace equation, but add another equation that
 describes the transport of a mixture of two fluids.
 
@@ -117,14 +117,14 @@ functions to accommodate for the fact that the flow velocity is vector-valued.
 The necessary question then is: how do we do this in a program?
 
 Vector-valued elements have already been discussed in previous tutorial
-programs, the first time and in detail in @ref step_8 "step-8". The main difference there
+programs, the first time and in detail in step-8. The main difference there
 was that the vector-valued space $V_h$ is uniform in all its components: the
 $dim$ components of the displacement vector are all equal and from the same
 function space. What we could therefore do was to build $V_h$ as the outer
 product of the $dim$ times the usual $Q(1)$ finite element space, and by this
 make sure that all our shape functions have only a single non-zero vector
 component. Instead of dealing with vector-valued shape functions, all we did
-in @ref step_8 "step-8" was therefore to look at the (scalar) only non-zero component and
+in step-8 was therefore to look at the (scalar) only non-zero component and
 use the <code>fe.system_to_component_index(i).first</code> call to figure out
 which component this actually is.
 
@@ -146,7 +146,7 @@ learned that we use the <code>FEValues</code> class to determine the values and
 gradients of shape functions at quadrature points. For example, we would call
 <code>fe_values.shape_value(i,q_point)</code> to obtain the value of the
 <code>i</code>th shape function on the quadrature point with number
-<code>q_point</code>. Later, in @ref step_8 "step-8" and other tutorial programs, we learned
+<code>q_point</code>. Later, in step-8 and other tutorial programs, we learned
 that this function call also works for vector-valued shape functions (of
 primitive finite elements), and that it returned the value of the only
 non-zero component of shape function <code>i</code> at quadrature point
@@ -249,7 +249,7 @@ functions, their gradients and divergences only once per outermost loop, and
 store the result, as this saves us a few otherwise repeated computations (it is
 possible to save even more repeated operations by calculating all relevant
 quantities in advance and then only inserting the results in the actual loop,
-see @ref step_22 "step-22" for a realization of that approach).
+see step-22 for a realization of that approach).
 The final result then looks like this, working in every space dimension:
 
 @code
@@ -298,7 +298,7 @@ the bilinear form and right hand side.
 There is one final term that we have to take care of: the right hand side
 contained the term $(g,{\mathbf v}\cdot {\mathbf n})_{\partial\Omega}$, constituting the
 weak enforcement of pressure boundary conditions. We have already seen in
-@ref step_7 "step-7" how to deal with face integrals: essentially exactly the same as with
+step-7 how to deal with face integrals: essentially exactly the same as with
 domain integrals, except that we have to use the FEFaceValues class
 instead of <code>FEValues</code>. To compute the boundary term we then simply have
 to loop over all boundary faces and integrate there. The mechanism works in
@@ -464,7 +464,7 @@ void SchurComplement::vmult (Vector<double>       &dst,
 In this code, the constructor takes a reference to a block sparse matrix for
 the entire system, and a reference to an object representing the inverse of
 the mass matrix. It stores these using <code>SmartPointer</code> objects (see
-@ref step_7 "step-7"), and additionally allocates two temporary vectors <code>tmp1</code> and
+step-7), and additionally allocates two temporary vectors <code>tmp1</code> and
 <code>tmp2</code> for the vectors labeled $w,y$ in the list above.
 
 In the matrix-vector multiplication function, the product $Sv$ is performed in

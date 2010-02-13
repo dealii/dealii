@@ -31,8 +31,8 @@ DEAL_II_NAMESPACE_OPEN
  * Transfers a discrete FE function (like a solution vector) by interpolation
  * while refining and/or coarsening a grid. During interpolation the
  * vector is reinitialized to the new size and filled with the interpolated
- * values. This class is used in the @ref step_15 "step-15",
- * @ref step_31 "step-31", and @ref step_33 "step-33" tutorial programs.
+ * values. This class is used in the step-15,
+ * step-31, and step-33 tutorial programs.
  * 
  * <h3>Usage</h3>
  *
@@ -84,7 +84,7 @@ DEAL_II_NAMESPACE_OPEN
  * soltrans.refine_interpolate(solutions_old, solutions);
  * @endverbatim
  * This is used in several of the tutorial programs, for example
- * @ref step_31 "step-31".
+ * step-31.
  *
  * <li> If the grid will be refined AND coarsened
  * then use @p SolutionTransfer as follows

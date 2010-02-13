@@ -101,9 +101,9 @@ inconvenience this causes.
           support multigrid also for continuous finite elements on adaptively
           refined meshes (uniformly refined meshes and discontinuous elements
           have worked for a long time). As part of this process,
-	  @ref step_16 "step-16" has
+	  step-16 has
           been rewritten and now solves the same problem
-	  @ref step_6 "step-6" solves, just
+	  step-6 solves, just
           with a multigrid solver.
    <br>
    (B&auml;rbel Janssen, WB 2010/02/13)
@@ -123,7 +123,7 @@ inconvenience this causes.
 
    <li>
    <p>
-   New: There is now a new tutorial program, @ref step_35 "step-35",
+   New: There is now a new tutorial program, step-35,
    contributed by Abner Salgado-Gonzalez, that implements a solver
    for the Navier-Stokes equations using a decoupled projection
    scheme.
@@ -160,7 +160,7 @@ inconvenience this causes.
 
    <li>
    <p>
-   Fixed: @ref step_31 "step-31" had a bug in the computation of the
+   Fixed: step-31 had a bug in the computation of the
    global scaling parameter in the function that evaluates the artificial
    viscosity: we computed
    $c(\mathbf{u},T) =
@@ -172,7 +172,7 @@ inconvenience this causes.
     \ |\mathrm{diam}(\Omega)|^{\alpha-2}$. This didn't matter much in this
    program because $\mathrm{diam}(\Omega)=2^{1/\textrm{dim}}$ and so is close
    to one. It would matter, however, if the domain had been different, as
-   it is, for example, in @ref step_32 "step-32".
+   it is, for example, in step-32.
    <br>
    (WB 2009/08/19)
    </p>
@@ -192,7 +192,7 @@ inconvenience this causes.
 
    <li>
    <p>
-   New: There is now a new tutorial program, @ref step_36 "step-36",
+   New: There is now a new tutorial program, step-36,
    contributed by Toby D. Young and Wolfgang Bangerth, that demonstrates
    solving eigenvalue problems.
    <br>

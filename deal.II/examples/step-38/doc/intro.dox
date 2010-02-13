@@ -42,7 +42,7 @@ function, $g$ a boundary value function,
 the inflow part of the boundary of the domain and ${\bf n}$ denotes
 the unit outward normal to the boundary $\Gamma$. This equation is the
 conservative version of the advection equation already considered in
-@ref step_9 "step-9" of this tutorial.
+step-9 of this tutorial.
 In particular, we solve the advection equation on
 $\Omega=[0,1]^2$ with ${\mathbf \beta}=\frac{1}{|x|}(-x_2, x_1)$
 representing a circular counterclockwise flow field, and $g=1$

@@ -6,7 +6,7 @@ s/\$/\@f\$/g;
 # however, undo that change if the dollar sign was escaped with a backslash
 s/\\\@f\$/\$/g;
 
-# we don't let doxygen put everything into a namespace
+# We don't let doxygen put everything into a namespace
 # dealii. consequently, doxygen can't link references that contain an
 # explicit dealii:: qualification. remove it and replace it by the
 # global scope
@@ -15,3 +15,12 @@ s/\\\@f\$/\$/g;
 # that's not our fault. This is reported here:
 #    http://bugzilla.gnome.org/show_bug.cgi?id=365053
 s/dealii::/::/g;
+
+# Replace all occurrences of something like step-xx by
+#    @ref step_xx "step-xx"
+# so that doxygen properly cross references them. Before we had
+# this rule, we actually had to write this sequence out in our
+# documentation. Unfortunately, as a consequence, there are vestiges
+# of this style, so we can't substitute things that look like
+# "step-xx".
+s/(?<!\")step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi;

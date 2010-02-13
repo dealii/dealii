@@ -87,7 +87,7 @@ If you want to explore a bit, try out some of the following things:
   <li>More complicated domains or more refined meshes. Remember that the time
   step needs to be bounded by the mesh width, so changing the mesh should
   always involve also changing the time step. We will come back to this issue
-  in @ref step_24 "step-24".
+  in step-24.
 
   <li>Variable coefficients: In real media, the wave speed is often
   variable. In particular, the "real" wave equation in realistic media would

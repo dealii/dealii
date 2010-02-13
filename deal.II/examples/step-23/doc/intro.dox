@@ -3,8 +3,8 @@
 
 This is the first of a number of tutorial programs that will finally
 cover "real" time-dependent problems, not the slightly odd form of time
-dependence found in @ref step_18 "step-18" or the DAE model of @ref step_21 "step-21". In particular, this program introduces
-the wave equation in a bounded domain. Later, @ref step_24 "step-24"
+dependence found in step-18 or the DAE model of step-21. In particular, this program introduces
+the wave equation in a bounded domain. Later, step-24
 will consider an example of absorbing boundary conditions, and @ref
 step_25 "step-25" a kind of nonlinear wave equation producing
 solutions called solitons.
@@ -312,7 +312,7 @@ $M^n=M^{n,n-1}=M$ and $A^n=A^{n,n-1}=A$. On the other hand, if we had
 used different shape functions, then we would have to compute
 integrals that contain shape functions defined on two meshes. This is a
 somewhat messy process that we omit here, but that is treated in some
-detail in @ref step_28 "step-28".
+detail in step-28.
 
 Under these conditions (i.e. a mesh that doesn't change), one can optimize the
 solution procedure a bit by basically eliminating the solution of the second

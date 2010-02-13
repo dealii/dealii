@@ -46,7 +46,7 @@ the temperature of the fluid. $\varepsilon ({\mathbf u}) = \frac 12
 [(\nabla{\mathbf u}) + (\nabla {\mathbf u})^T]$ is the symmetric
 gradient of the velocity. As can be seen, velocity and pressure
 solve a Stokes equation describing the motion of an incompressible
-fluid, an equation we have previously considered in @ref step_22 "step-22"; we
+fluid, an equation we have previously considered in step-22; we
 will draw extensively on the experience we have gained in that program, in
 particular with regard to efficient linear Stokes solvers.
 
@@ -55,7 +55,7 @@ fluid, expressed as the product of the density $\rho$, the thermal expansion
 coefficient $\beta$,
 the temperature <i>T</i> and the gravity vector <b>g</b> pointing
 downward. (A derivation of why the right hand side looks like it looks
-is given in the introduction of @ref step_32 "step-32".)
+is given in the introduction of step-32.)
 While the first two equations describe how the fluid reacts to
 temperature differences by moving around, the third equation states
 how the fluid motion affects the temperature field: it is an advection
@@ -148,13 +148,13 @@ use no normal flux conditions.
 
 <h3>Solution approach</h3>
 
-Like the equations solved in @ref step_21 "step-21", we here have a
+Like the equations solved in step-21, we here have a
 system of differential-algebraic equations (DAE): with respect to the time
 variable, only the temperature equation is a differential equation
 whereas the Stokes system for <b>u</b> and <i>p</i> has no
 time-derivatives and is therefore of the sort of an algebraic
 constraint that has to hold at each time instant. The main difference
-to @ref step_21 "step-21" is that the algebraic constraint there was a
+to step-21 is that the algebraic constraint there was a
 mixed Laplace system of the form
 @f{eqnarray*}
   \mathbf u + {\mathbf K}\lambda \nabla p &=& 0, \\
@@ -168,7 +168,7 @@ where now we have a Stokes system
 where $\nabla \cdot \eta \varepsilon (\cdot)$ is an operator similar to the
 Laplacian $\Delta$ applied to a vector field.
 
-Given the similarity to what we have done in @ref step_21 "step-21",
+Given the similarity to what we have done in step-21,
 it may not come as a surprise that we choose a similar approach,
 although we will have to make adjustments for the change in operator
 in the top-left corner of the differential operator.
@@ -177,7 +177,7 @@ in the top-left corner of the differential operator.
 <h4>Time stepping</h4>
 
 The structure of the problem as a DAE allows us to use the same strategy as
-we have already used in @ref step_21 "step-21", i.e. we use a time lag
+we have already used in step-21, i.e. we use a time lag
 scheme: we first solve the temperature equation (using an extrapolated
 velocity field), and then insert the new temperature solution into the right
 hand side of the velocity equation. The way we implement this in our code
@@ -195,7 +195,7 @@ time step <i>n-1</i> as
 and then the temperature equation with an extrapolated velocity field to
 time <i>n</i>.
 
-In contrast to @ref step_21 "step-21", we'll use a higher order time
+In contrast to step-21, we'll use a higher order time
 stepping scheme here, namely the <a
 href="http://en.wikipedia.org/wiki/Backward_differentiation_formula">Backward
 Differentiation Formula scheme of order 2 (BDF-2 in short)</a> that replaces
@@ -297,7 +297,7 @@ the opportunity to use a higher order scheme.
 Like solving the mixed Laplace equations, solving the Stokes equations
 requires us to choose particular pairs of finite elements for
 velocities and pressure variables. Because this has already been discussed in
-@ref step_22 "step-22", we only cover this topic briefly:
+step-22, we only cover this topic briefly:
 Here, we use the
 stable pair $Q_{p+1}^d \times Q_p, p\ge 1$. These are continuous
 elements, so we can form the weak form of the Stokes equation without
@@ -333,7 +333,7 @@ that we implement is
 @f}
 
 This is exactly the same as what we already discussed in
-@ref step_22 "step-22" and there is not much more to say about this here.
+step-22 and there is not much more to say about this here.
 
 
 <h4>Stabilization, weak form and space discretization for the temperature equation</h4>
@@ -344,8 +344,8 @@ this equation are equally stable unless we either do something like
 upwinding, stabilization, or all of this. One way to achieve this is
 to use discontinuous elements (i.e. the FE_DGQ class that we used, for
 example, in the discretization of the transport equation in
-@ref step_12 "step-12", or in discretizing the pressure in
-@ref step_20 "step-20" and @ref step_21 "step-21") and to define a
+step-12, or in discretizing the pressure in
+step-20 and step-21) and to define a
 flux at the interface between cells that takes into account
 upwinding. If we had a pure advection problem this would probably be
 the simplest way to go. However, here we have some diffusion as well,
@@ -654,7 +654,7 @@ temperature field using the just computed velocity field.
 <h5>Linear solvers for the Stokes problem</h5>
 
 Solving the linear equations coming from the Stokes system has been
-discussed in great detail in @ref step_22 "step-22". In particular, in
+discussed in great detail in step-22. In particular, in
 the results section of that program, we have discussed a number of
 alternative linear solver strategies that turned out to be more
 efficient than the original approach. The best alternative
@@ -697,7 +697,7 @@ where $\tilde A^{-1},\tilde S^{-1}$ are approximations to the inverse
 matrices. In particular, it turned out that <i>S</i> is spectrally
 equivalent to the mass matrix and consequently replacing $\tilde
 S^{-1}$ by a CG solver applied to the mass matrix on the pressure
-space was a good choice. In a small deviation from @ref step_22 "step-22", we
+space was a good choice. In a small deviation from step-22, we
 here have a coefficient $\eta$ in the momentum equation, and by the same
 derivation as there we should arrive at the conclusion that it is the weighted
 mass matrix with entries $\tilde S_{ij}=(\eta^{-1}\varphi_i,\varphi_j)$ that
@@ -708,7 +708,7 @@ A^{-1}$, which corresponds to the discretized symmetric Laplacian of
 the vector-valued velocity field, i.e.
 $A_{ij} = (\varepsilon {\mathbf v}_i, 2\eta \varepsilon ({\mathbf
 v}_j))$.
-In @ref step_22 "step-22" we used a sparse LU decomposition (using the
+In step-22 we used a sparse LU decomposition (using the
 SparseDirectUMFPACK class) of <i>A</i> for $\tilde A^{-1}$ &mdash; the
 perfect preconditioner &mdash; in 2d, but for 3d memory and compute
 time is not usually sufficient to actually compute this decomposition;
@@ -783,7 +783,7 @@ almost all the benefits of what we hoped to get.
 To sum this whole story up, we can observe:
 <ul>
   <li> Compared to building a preconditioner from the original matrix <i>A</i>
-  resulting from the symmetric gradient as we did in @ref step_22 "step-22",
+  resulting from the symmetric gradient as we did in step-22,
   we have to expect that the preconditioner based on the Laplace bilinear form
   performs worse since it does not take into account the coupling between
   vector components.
@@ -840,7 +840,7 @@ vector_valued "vector-valued problems" we have always only used a single
 finite element with several vector components, and a single DoFHandler object.
 Sometimes, we have substructured the resulting matrix into blocks to
 facilitate particular solver schemes; this was, for example, the case in the
-@ref step_22 "step-22" program for the Stokes equations upon which the current
+step-22 program for the Stokes equations upon which the current
 program is based.
 
 We could of course do the same here. The linear system that we would get would
@@ -947,7 +947,7 @@ multigrid have been removed.
 <h4>Using Trilinos</h4>
 
 In much the same way as we used PETSc to support our linear algebra needs in
-@ref step_17 "step-17" and @ref step_18 "step-18", we use interfaces to the <a
+step-17 and step-18, we use interfaces to the <a
 href="http://trilinos.sandia.gov">Trilinos</a> library (see @ref
 SoftwareTrilinos) in this program. Trilinos is a very large collection of
 everything that has to do with linear and nonlinear algebra, as well as all
@@ -962,7 +962,7 @@ the latter class, one of the most interesting capabilities is the existence of
 the Trilinos ML package that implements an Algebraic Multigrid (AMG)
 method. We will use this preconditioner to precondition the second order
 operator part of the momentum equation. The ability to solve problems in
-%parallel will be explored in @ref step_32 "step-32", using the same problem as
+%parallel will be explored in step-32, using the same problem as
 discussed here.
 
 
@@ -976,7 +976,7 @@ conductivity and transports heat mainly through convection. On the
 boundary, we will require no-normal flux for the velocity
 ($\mathrm{n}\cdot\mathrm{u}=0$) and for the temperature
 ($\mathrm{n}\cdot\nabla T=0$). This is one of the cases discussed in the
-introduction of @ref step_22 "step-22" and fixes one component of the velocity
+introduction of step-22 and fixes one component of the velocity
 while allowing flow to be %parallel to the boundary. There remain
 <code>dim-1</code> components to be fixed, namely the tangential components of
 the normal stress; for these, we choose homogenous conditions which means that

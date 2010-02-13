@@ -12,7 +12,7 @@ multigrid algorithms on adaptively refined meshes.
 
 
 This example shows the basic usage of the multilevel functions in
-deal.II. It solves the same problem as used in @ref step_6 "step-6",
+deal.II. It solves the same problem as used in step-6,
 but demonstrating the things one has to provide when using multigrid
 as a preconditioner. In particular, this requires that we define a
 hierarchy of levels, provide transfer operators from one level to the
@@ -72,7 +72,7 @@ the implementation in deal.II.
 <h3>The testcase</h3>
 
 The problem we solve here is exactly the same as in
-@ref step_6 "step-6", the only difference being the solver we use
+step-6, the only difference being the solver we use
 here. You may want to look there for a definition of what we solve,
 right hand side and boundary conditions. Obviously, the program would
 also work if we changed the geometry and other pieces of data that

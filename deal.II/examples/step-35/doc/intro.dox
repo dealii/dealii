@@ -38,8 +38,8 @@ and
 where $n$ is the outer unit normal. The boundary conditions on $\Gamma_2$ are often
 used to model outflow conditions.
 
-In previous tutorial programs (see for instance @ref step_20 "step-20" and
-@ref step_22 "step-22") we have seen
+In previous tutorial programs (see for instance step-20 and
+step-22) we have seen
 how to solve the time-independent Stokes equations using a Schur complement approach. For the
 time-dependent case, after time discretization, we would arrive at a system like
 @f{align*}

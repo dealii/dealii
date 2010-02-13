@@ -344,7 +344,7 @@ $c_R=\left(2^{1/d}\right)^{4-2\alpha}=2^{\frac{4-2\alpha}{d}}$. Since
 this value for $c_R$ appears to work just fine for the current
 program, we corrected the formula in the program and set $c_R$ to a
 value that reproduces exactly the results we had before. We will,
-however, revisit this issue again in @ref step_32 "step-32".
+however, revisit this issue again in step-32.
 
 Now, however, back to the discussion of what values of $c_k$ and
 $\beta$ to choose:
@@ -587,7 +587,7 @@ despite the penalty we pay in terms of smaller time steps.
 
 There are various ways to extend the current program. Of particular interest
 is, of course, to make it faster and/or increase the resolution of the
-program, in particular in 3d. This is the topic of the @ref step_32 "step-32"
+program, in particular in 3d. This is the topic of the step-32
 tutorial program which will implement strategies to solve this problem in
 %parallel on a cluster.
 

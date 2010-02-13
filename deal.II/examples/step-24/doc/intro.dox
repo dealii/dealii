@@ -112,7 +112,7 @@ condition, but it is one of the very few that are reasonably simple to implement
 
 <h3>Weak form and discretization</h3>
 
-As in @ref step_23 "step-23", one first introduces a second variable, which is
+As in step-23, one first introduces a second variable, which is
 defined as the derivative of the pressure potential:
 @f[ 
 v = \frac{\partial\bar{p}}{\partial t} 
@@ -134,7 +134,7 @@ how to derive these formulas in the general case, although in the application
 to the thermoacoustic problem $f=0$.
 
 The semi-discretized, weak version of this model, using the general $\theta$ scheme
-introduced in @ref step_23 "step-23" is then:
+introduced in step-23 is then:
 @f{eqnarray*}
 \left(\frac{\bar{p}^n-\bar{p}^{n-1}}{k},\phi\right)_\Omega-
 \left(\theta v^{n}+(1-\theta)v^{n-1},\phi\right)_\Omega & = & 0   \\
@@ -160,7 +160,7 @@ M\bar{p}^{n}-k \theta M v^n & = & M\bar{p}^{n-1}+k (1-\theta)Mv^{n-1},\\
 (-c_0^2k \theta A-c_0 B)\bar{p}^n-Mv^{n} & = & 
 (c_0^2k(1-\theta)A-c_0B)\bar{p}^{n-1}-Mv^{n-1}+c_0^2k(\theta F^{n}+(1-\theta)F^{n-1}).
 @f}
-The matrices $M$ and $A$ are here as in @ref step_23 "step-23", and the
+The matrices $M$ and $A$ are here as in step-23, and the
 boundary mass matrix
 @f[
 	B_{ij} = \left(\varphi_i,\varphi_j\right)_{\partial\Omega}
@@ -208,7 +208,7 @@ c_0^2k(\theta F^{n}+(1-\theta)F^{n-1})
 
 <h3>What the program does</h3>
 
-Compared to @ref step_23 "step-23", this programs adds the treatment of a
+Compared to step-23, this programs adds the treatment of a
 simple absorbing boundary conditions. In addition, it deals with data obtained
 from actual experimental measurements. To this end, we need to evaluate the
 solution at points at which the experiment also evaluates a real pressure

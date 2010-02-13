@@ -317,7 +317,7 @@ function spaces above satisfy them. However, when we discretize the equations by
 replacing the continuous variables and test functions by finite element
 functions in finite dimensional spaces $\textbf V_{g,h}\subset \textbf V_g,
 Q_h\subset Q$, we have to make sure that $\textbf V_h,Q_h$ also satisfy the LBB
-conditions. This is similar to what we had to do in @ref step_20 "step-20".
+conditions. This is similar to what we had to do in step-20.
 
 For the Stokes equations, there are a number of possible choices to ensure
 that the finite element spaces are compatible with the LBB condition. A simple
@@ -339,7 +339,7 @@ that
 @f}
 for all test functions $\textbf v_h, q_h$. Assembling the linear system
 associated with this problem follows the same lines used in @ref step_20
-"step-20", @ref step_21 "step-21", and explained in detail in the @ref
+"step-20", step-21, and explained in detail in the @ref
 vector_valued module.
 
 
@@ -360,7 +360,7 @@ linear system for the nodal values of the velocity and pressure fields:
     F \\ G
   \end{array}\right),
 @f}
-Like in @ref step_20 "step-20" and @ref step_21 "step-21", we will solve this
+Like in step-20 and step-21, we will solve this
 system of equations by forming the Schur complement, i.e. we will first find
 the solution $P$ of 
 @f{eqnarray*}
@@ -463,7 +463,7 @@ $M_p$ stored in the $(1,1)$ block.
 
 <li>
 While the outer preconditioner has become simpler compared to the
-mixed Laplace case discussed in @ref step_20 "step-20", the issue of
+mixed Laplace case discussed in step-20, the issue of
 the inner solver has become more complicated. In the mixed Laplace
 discretization, the Schur complement has the form $B^TM^{-1}B$. Thus,
 every time we multiplied with the Schur complement, we had to solve a
@@ -645,7 +645,7 @@ into the global matrix, by using the call
                                           system_matrix, system_rhs);
 @endcode
 
-This technique is further discussed in the @ref step_27 "step-27" tutorial
+This technique is further discussed in the step-27 tutorial
 program. All we need to know here is that this functions does three things
 at once: it writes the local data into the global matrix and right hand
 side, it distributes the hanging node constraints and additionally

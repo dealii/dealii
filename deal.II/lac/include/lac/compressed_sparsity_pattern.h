@@ -76,7 +76,7 @@ template <typename number> class SparseMatrix;
  * sp.copy_from (compressed_pattern);
  * @endverbatim
  *
- * See also @ref step_11 "step-11" and @ref step_18 "step-18" for usage
+ * See also step-11 and step-18 for usage
  * patterns.
  *
  * <h3>Notes</h3>
@@ -382,7 +382,7 @@ class CompressedSparsityPattern : public Subscriptor
                                       * CompressedSetSparsityPattern class, as
                                       * this turned out to be more efficient
                                       * for hp finite element programs such as
-                                      * @ref step_27 "step-27"). Using the
+                                      * step-27). Using the
                                       * present scheme, we only need to
                                       * allocate memory once for every 8 added
                                       * entries, and we waste a lot less

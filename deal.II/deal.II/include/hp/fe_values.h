@@ -200,7 +200,7 @@ namespace hp
 {
   
 /**
- * An hp equivalent of the ::FEValues class. See the @ref step_27 "step-27"
+ * An hp equivalent of the ::FEValues class. See the step-27
  * tutorial program for examples of use.
  *
  * The idea of this class is as follows: when one assembled matrices in the hp

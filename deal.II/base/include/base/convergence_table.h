@@ -50,8 +50,8 @@ DEAL_II_NAMESPACE_OPEN
  * that are not signed to be omitted.
  * </ol>
  *
- * A detailed discussion of this class can also be found in the @ref step_7 "step-7" and
- * @ref step_13 "step-13" example programs.
+ * A detailed discussion of this class can also be found in the step-7 and
+ * step-13 example programs.
  *
  * @ingroup textoutput
  * @author Ralf Hartmann, 1999
