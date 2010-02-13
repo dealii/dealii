@@ -26,5 +26,6 @@ s/dealii::/::/g;
 #
 # There is another exception: the scripts in doc/doxygen/tutorial
 # produce files that have table of contents entries. We don't
-# want these cross-linked to itself.
-s/(?<!\")step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi if !m/\@page/;
+# want these cross-linked to itself. Also excempt things like
+# step_12.solution.png that typically appear in @image commands.
+s/(?<!\")step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi if !m/\@(page|image)/;
