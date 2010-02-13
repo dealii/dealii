@@ -22,10 +22,10 @@
  *
  * <dl>
  *
- * <dt class="glossary">@anchor GlossActive Active cells</dt>
+ * <dt class="glossary">@anchor GlossActive <b>Active cells</b></dt>
  * <dd>Mesh cells not refined any further in the hierarchy.</dd>
  *
- * <dt class="glossary">@anchor GlossBlock block</dt>
+ * <dt class="glossary">@anchor GlossBlock <b>Block</b></dt>
  * <dd>Blocks were introduced in BlockVector,
  * BlockSparseMatrix and related classes. These are used to reflect the
  * structure of a PDE system in linear algebra, in particular allowing
@@ -51,7 +51,7 @@
  * step_22 "step-22" or @ref step_31 "step-31" tutorial programs, as opposed
  * to @ref step_20 "step-20").  </dd>
  *
- * <dt class="glossary">@anchor GlossComponent component</dt>
+ * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
  *
  * <dd>For vector functions, component denotes the index in the
  * vector. For instance, in the mixed Laplacian system, the first
@@ -65,8 +65,8 @@
  * FiniteElement</dd>
  *
  *
- * <dt class="glossary">@anchor GlossCompress Compressing distributed
- *                                              vectors and matrices</dt>
+ * <dt class="glossary">@anchor GlossCompress <b>Compressing distributed
+ *                                              vectors and matrices</b></dt>
  *
  * <dd>
  * For %parallel computations, deal.II uses the vector and matrix
@@ -126,7 +126,7 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossDistorted Distorted cells</dt>
+ * <dt class="glossary">@anchor GlossDistorted <b>Distorted cells</b></dt>
  *
  * <dd>A <i>distorted cell</i> is a cell for which the mapping from
  * the reference cell to real cell has a Jacobian whose determinant is
@@ -231,7 +231,7 @@
  * the center of the cell.
  *
  *
- * <dt class="glossary">@anchor GlossFaceOrientation Face orientation</dt>
+ * <dt class="glossary">@anchor GlossFaceOrientation <b>Face orientation</b></dt>
  * <dd>In a triangulation, the normal vector to a face
  * can be deduced from the face orientation by
  * applying the right hand side rule (x,y -> normal).  We note, that
@@ -269,7 +269,7 @@
  * the QProjector class and its users.
  *
  *
- * <dt class="glossary">@anchor GlossGeneralizedSupport Generalized support points</dt>
+ * <dt class="glossary">@anchor GlossGeneralizedSupport <b>Generalized support points</b></dt>
  * <dd>While @ref GlossSupport "support points" allow very simple interpolation
  * into the finite element space, their concept is restricted to
  * @ref GlossLagrange "Lagrange elements". For other elements, more general
@@ -288,7 +288,7 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor hp_paper %hp paper</dt>
+ * <dt class="glossary">@anchor hp_paper <b>%hp paper</b></dt>
  * <dd>The "hp paper" is a paper by W. Bangerth and O. Kayser-Herold, titled
  * "Data Structures and Requirements for hp Finite Element Software", that
  * describes many of the algorithms and data structures used in the implementation
@@ -322,7 +322,7 @@ Article{BK07,
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossInterpolation Interpolation with finite elements</dt>
+ * <dt class="glossary">@anchor GlossInterpolation <b>Interpolation with finite elements</b></dt>
  * <dd>The purpose of interpolation with finite elements is computing
  * a vector of coefficients representing a finite element function,
  * such that the @ref GlossNodes "node values" of the original
@@ -333,12 +333,12 @@ Article{BK07,
  * vector.
  *
  *
- * <dt class="glossary">@anchor GlossLagrange Lagrange elements</dt>
+ * <dt class="glossary">@anchor GlossLagrange <b>Lagrange elements</b></dt>
  * <dd>Finite elements based on Lagrangian interpolation at
  * @ref GlossSupport "support points".</dd>
  *
  *
- * <dt class="glossary">@anchor mg_paper %Multigrid paper</dt>
+ * <dt class="glossary">@anchor mg_paper <b>%Multigrid paper</b></dt>
  * <dd>The "multigrid paper" is a paper by B. Janssen and G. Kanschat, titled
  * "Adaptive multilevel methods with local smoothing", that
  * describes many of the algorithms and data structures used in the implementation
@@ -361,7 +361,7 @@ Article{JK10,
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossNodes Node values or node functionals</dt>
+ * <dt class="glossary">@anchor GlossNodes <b>Node values or node functionals</b></dt>
  *
  * <dd>It is customary to define a FiniteElement as a pair consisting
  * of a local function space and a set of node values $N_i$ on the
@@ -398,8 +398,8 @@ Article{JK10,
  * <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
  *
- * <dt class="glossary">@anchor GlossPrimitive Primitive finite
- * elements</dt> <dd>Finite element shape function sets with a unique
+ * <dt class="glossary">@anchor GlossPrimitive <b>Primitive finite
+ * elements</b></dt> <dd>Finite element shape function sets with a unique
  * relation from shape function number to vector @ref GlossComponent
  * "component". What this means is that each shape function of a
  * vector-valued element has exactly one-nonzero component if an
@@ -414,16 +414,16 @@ Article{JK10,
  * there, each vector-value shape function may have several non-zero
  * components.</dd>
  *
- * <dt class="glossary">@anchor GlossReferenceCell Reference cell</dt>
+ * <dt class="glossary">@anchor GlossReferenceCell <b>Reference cell</b></dt>
  * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
  * element shape functions are defined.</dd>
  *
  *
- * <dt class="glossary">@anchor GlossShape Shape functions</dt> <dd>The restriction of
+ * <dt class="glossary">@anchor GlossShape <b>Shape functions</b></dt> <dd>The restriction of
  * the finite element basis functions to a single grid cell.</dd>
  *
  *
- * <dt class="glossary">@anchor SubdomainId Subdomain id</dt>
+ * <dt class="glossary">@anchor SubdomainId <b>Subdomain id</b></dt>
  * <dd>Each cell of a triangulation has associated with it a property called
  * the "subdomain id" that can be queried using a call like
  * <code>cell-@>subdomain_id()</code> and that can be set for example by using
@@ -447,7 +447,7 @@ Article{JK10,
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossSupport Support points</dt> <dd>Support points are
+ * <dt class="glossary">@anchor GlossSupport <b>Support points</b></dt> <dd>Support points are
  * by definition those points $p_i$, such that for the shape functions
  * $v_j$ holds $v_j(p_i) = \delta_{ij}$. Therefore, a finite element
  * interpolation can be defined uniquely by the values in the support
@@ -468,18 +468,18 @@ Article{JK10,
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossTargetComponent Target component</dt> <dd>When
+ * <dt class="glossary">@anchor GlossTargetComponent <b>Target component</b></dt> <dd>When
  * vectors and matrices are grouped into blocks by component, it is
  * often desirable to collect several of the original components into
  * a single one. This could be for instance, grouping the velocities
  * of a Stokes system into a single block.</dd>
  *
  *
- * <dt class="glossary">@anchor GlossUnitCell Unit cell</dt>
+ * <dt class="glossary">@anchor GlossUnitCell <b>Unit cell</b></dt>
  * <dd>See @ref GlossReferenceCell "Reference cell".</dd>
  *
  *
- * <dt class="glossary">@anchor GlossUnitSupport Unit support points</dt>
+ * <dt class="glossary">@anchor GlossUnitSupport <b>Unit support points</b></dt>
  * <dd>These are the @ref GlossSupport "support points" on the reference cell, defined in
  * FiniteElementBase. For example, the usual Q1 element in 1d has support
  * points  at <tt>x=0</tt> and <tt>x=1</tt> (and similarly, in higher
