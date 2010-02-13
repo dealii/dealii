@@ -238,7 +238,7 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 				      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const DATA& additional_data);
+		     const DATA& additional_data = RELAX::AdditionalData());
 
 				     /**
 				      * Initialize for matrices. This
@@ -376,7 +376,7 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
  *
  * @author Guido Kanschat, 2009
  */
-template<class MATRIX, class RELAX, class VECTOR>
+template<class MATRIX, class PRECONDITIONER, class VECTOR>
 class MGSmootherPrecondition : public MGSmoother<VECTOR>
 {
   public:
@@ -400,14 +400,14 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      *
 				      * @p additional_data is an
 				      * object of type
-				      * @p RELAX::AdditionalData and
+				      * @p PRECONDITIONER::AdditionalData and
 				      * is handed to the
 				      * initialization function of the
 				      * relaxation method.
 				      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
-		     const DATA& additional_data);
+		     const DATA& additional_data = PRECONDITIONER::AdditionalData());
 
 				     /**
 				      * Initialize for matrices. This
@@ -419,7 +419,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      *
 				      * @p additional_data is an
 				      * object of type
-				      * @p RELAX::AdditionalData and
+				      * @p PRECONDITIONER::AdditionalData and
 				      * is handed to the
 				      * initialization function of the
 				      * relaxation method.
@@ -443,7 +443,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      *
 				      * @p additional_data is an
 				      * object of type
-				      * @p RELAX::AdditionalData and
+				      * @p PRECONDITIONER::AdditionalData and
 				      * is handed to the
 				      * initialization function of the
 				      * relaxation method.
@@ -469,7 +469,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      *
 				      * @p additional_data is an
 				      * object of type
-				      * @p RELAX::AdditionalData and
+				      * @p PRECONDITIONER::AdditionalData and
 				      * is handed to the
 				      * initialization function of the
 				      * relaxation method.
@@ -496,7 +496,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 				      * Object containing relaxation
 				      * methods.
 				      */
-    MGLevelObject<RELAX> smoothers;
+    MGLevelObject<PRECONDITIONER> smoothers;
 
     				     /**
 				      * Memory used by this object.
@@ -816,9 +816,9 @@ memory_consumption () const
 
 //----------------------------------------------------------------------//
 
-template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
 inline
-MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::MGSmootherPrecondition(
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::MGSmootherPrecondition(
   VectorMemory<VECTOR>& mem,
   const unsigned int steps,
   const bool variable,
@@ -829,9 +829,9 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::MGSmootherPrecondition(
 {}
 
 
-template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
 inline void
-MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::clear ()
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::clear ()
 {
   smoothers.clear();
 
@@ -842,10 +842,10 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::clear ()
 }
 
 
-template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
 template <class MATRIX2, class DATA>
 inline void
-MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const MGLevelObject<MATRIX2>& m,
   const DATA& data)
 {
@@ -862,10 +862,10 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
-template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
 template <class MATRIX2, class DATA>
 inline void
-MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const MGLevelObject<MATRIX2>& m,
   const MGLevelObject<DATA>& data)
 {
@@ -887,10 +887,10 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
-template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
 template <class MATRIX2, class DATA>
 inline void
-MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const MGLevelObject<MATRIX2>& m,
   const DATA& data,
   const unsigned int row,
@@ -909,10 +909,10 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
-template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
 template <class MATRIX2, class DATA>
 inline void
-MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const MGLevelObject<MATRIX2>& m,
   const MGLevelObject<DATA>& data,
   const unsigned int row,
@@ -936,9 +936,9 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::initialize (
     }
 }
 
-template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
 inline void
-MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::smooth(
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
   const unsigned int level,
   VECTOR& u,
   const VECTOR& rhs) const
@@ -1009,9 +1009,9 @@ MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::smooth(
 }
 
 
-template <class MATRIX, class RELAX, class VECTOR>
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
 inline unsigned int
-MGSmootherPrecondition<MATRIX, RELAX, VECTOR>::
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::
 memory_consumption () const
 {
   return sizeof(*this)
