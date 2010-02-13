@@ -1298,6 +1298,26 @@ MGTools::make_boundary_list(
 #endif
 
 
+template <int dim, int spacedim>
+void
+MGTools::
+make_boundary_list(const MGDoFHandler<dim,spacedim>& dof,
+		   const typename FunctionMap<dim>::type& function_map,
+		   std::vector<IndexSet>& boundary_indices,
+		   const std::vector<bool>& component_mask)
+{
+  std::vector<std::set<unsigned int> >
+    my_boundary_indices (boundary_indices.size());
+  make_boundary_list (dof, function_map, my_boundary_indices, component_mask);
+  for (unsigned int i=0; i<boundary_indices.size(); ++i)
+    {
+      boundary_indices[i] = IndexSet (my_boundary_indices[i].size());
+      boundary_indices[i].add_indices (my_boundary_indices[i].begin(),
+				       my_boundary_indices[i].end());
+    }
+}
+
+
 #if deal_II_dimension == 1
 
 template <int dim, int spacedim>
@@ -1553,6 +1573,12 @@ template void MGTools::make_boundary_list(
   const MGDoFHandler<deal_II_dimension>&,
   const FunctionMap<deal_II_dimension>::type&,
   std::vector<std::set<unsigned int> >&,
+  const std::vector<bool>&);
+
+template void MGTools::make_boundary_list(
+  const MGDoFHandler<deal_II_dimension>&,
+  const FunctionMap<deal_II_dimension>::type&,
+  std::vector<IndexSet>&,
   const std::vector<bool>&);
 
 template

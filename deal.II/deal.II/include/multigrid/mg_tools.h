@@ -13,14 +13,14 @@
 #ifndef __deal2__mg_tools_h
 #define __deal2__mg_tools_h
 
-// This file moved here from mg_dof_tools.h Revision 1.36
-
 #include <base/config.h>
+#include <base/index_set.h>
 #include <dofs/dof_tools.h>
 #include <multigrid/mg_dof_handler.h>
 
 #include <vector>
 #include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -237,14 +237,29 @@ class MGTools
 				      * of levels.
 				      */
     template <int dim, int spacedim>
-    static void make_boundary_list(
-      const MGDoFHandler<dim,spacedim>& mg_dof,
-      const typename FunctionMap<dim>::type& function_map,
-      std::vector<std::set<unsigned int> >& boundary_indices,
-      const std::vector<bool>& component_mask = std::vector<bool>());
-                                      /**
-                                       * Maybe no longer needed.
-                                       */
+    static
+    void
+    make_boundary_list (const MGDoFHandler<dim,spacedim>      &mg_dof,
+			const typename FunctionMap<dim>::type &function_map,
+			std::vector<std::set<unsigned int> >  &boundary_indices,
+			const std::vector<bool>               &component_mask = std::vector<bool>());
+
+				     /**
+				      * The same function as above, but return
+				      * an IndexSet rather than a
+				      * std::set<unsigned int> on each level.
+				      */
+    template <int dim, int spacedim>
+    static
+    void
+    make_boundary_list (const MGDoFHandler<dim,spacedim>      &mg_dof,
+			const typename FunctionMap<dim>::type &function_map,
+			std::vector<IndexSet>                 &boundary_indices,
+			const std::vector<bool>               &component_mask = std::vector<bool>());
+    
+				     /**
+				      * Maybe no longer needed.
+				      */
 
     template <typename number>
     static void apply_boundary_values (
