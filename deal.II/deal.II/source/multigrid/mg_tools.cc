@@ -1150,10 +1150,12 @@ MGTools::make_boundary_list(
                                    // field to store the indices
   std::vector<unsigned int> face_dofs;
   face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
-  std::fill (face_dofs.begin (), face_dofs.end (), DoFHandler<dim,spacedim>::invalid_dof_index);
+  std::fill (face_dofs.begin (), face_dofs.end (),
+	     DoFHandler<dim,spacedim>::invalid_dof_index);
 
-  typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(),
-					    endc = dof.end();
+  typename MGDoFHandler<dim,spacedim>::cell_iterator
+    cell = dof.begin(),
+    endc = dof.end();
   for (; cell!=endc; ++cell)
     for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
          ++face_no)
@@ -1306,12 +1308,16 @@ make_boundary_list(const MGDoFHandler<dim,spacedim>& dof,
 		   std::vector<IndexSet>& boundary_indices,
 		   const std::vector<bool>& component_mask)
 {
+  Assert (boundary_indices.size() == dof.get_tria().n_levels(),
+	  ExcDimensionMismatch (boundary_indices.size(),
+				dof.get_tria().n_levels()));
+
   std::vector<std::set<unsigned int> >
-    my_boundary_indices (boundary_indices.size());
+    my_boundary_indices (dof.get_tria().n_levels());
   make_boundary_list (dof, function_map, my_boundary_indices, component_mask);
-  for (unsigned int i=0; i<boundary_indices.size(); ++i)
+  for (unsigned int i=0; i<dof.get_tria().n_levels(); ++i)
     {
-      boundary_indices[i] = IndexSet (my_boundary_indices[i].size());
+      boundary_indices[i] = IndexSet (dof.n_dofs(i));
       boundary_indices[i].add_indices (my_boundary_indices[i].begin(),
 				       my_boundary_indices[i].end());
     }
