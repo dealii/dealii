@@ -16,7 +16,7 @@ them are:
        algorithms where iterative solution on successively refined
        grids is at the heart of algorithms. Although adaptive grids
        are not used in this example, the foundations for them is laid
-       here. 
+       here.
   <li> In practical applications, the domains are often subdivided
        into triangulations by automatic mesh generators. In order to
        use them, it is important to read coarse grids from a file. In
@@ -28,7 +28,7 @@ them are:
   <li> On the other side, finite element programs tend to be rather
        complex, so debugging is an important aspect. We support safe
        programming by using assertions that check the validity of
-       parameters and internal states in a debug mode, but are removed
+       parameters and %internal states in a debug mode, but are removed
        in optimized mode.
   <li> Regarding the mathematical side, we show how to support a
        variable coefficient in the elliptic operator and how to use
