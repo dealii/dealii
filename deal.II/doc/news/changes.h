@@ -94,6 +94,25 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
+   Improved:
+          Over the last few months, the multigrid implementation has seen
+          significant rewrites, with much of the work done by B&auml;rber
+          Janssen. The goal &mdash; now achieved &mdash; was to finally fully
+          support multigrid also for continuous finite elements on adaptively
+          refined meshes (uniformly refined meshes and discontinuous elements
+          have worked for a long time). As part of this process,
+	  @ref step_16 "step-16" has
+          been rewritten and now solves the same problem
+	  @ref step_6 "step-6" solves, just
+          with a multigrid solver.
+   <br>
+   (B&auml;rber Janssen, WB 2010/02/13)
+   </p>
+   </li>
+
+
+   <li>
+   <p>
    New: The version of <a href="http://www.boost.org/">boost</a>
    included in the <code>contrib/</code> directory has been updated
    to 1.41.0.
