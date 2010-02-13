@@ -3,7 +3,7 @@
 
 
 In step-18, we saw a need to write
-output files in an intermediate format: in a parallel program, it doesn't scale
+output files in an intermediate format: in a %parallel program, it doesn't scale
 well if all processors participate in computing a result, and then only a
 single processor generates the graphical output. Rather, each of them should
 generate output for its share of the domain, and later on merge all these
@@ -102,7 +102,7 @@ by traversing the subsections of the parameter tree and using the
 string, whereas <code>ParameterHandler::get_integer</code>,
 <code>ParameterHandler::get_double</code>, and
 <code>ParameterHandler::get_bool</code> already convert them to the indicated
-type. 
+type.
 
 
 
