@@ -23,4 +23,8 @@ s/dealii::/::/g;
 # documentation. Unfortunately, as a consequence, there are vestiges
 # of this style, so we can't substitute things that look like
 # "step-xx".
-s/(?<!\")step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi;
+#
+# There is another exception: the scripts in doc/doxygen/tutorial
+# produce files that have table of contents entries. We don't
+# want these cross-linked to itself.
+s/(?<!\")step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi if !m/\@page/;
