@@ -814,16 +814,23 @@ void LaplaceProblem<dim>::solve ()
   mg_smoother.set_steps(2);
   mg_smoother.set_symmetric(true);
 
-				   // We must wrap our matrices in an
-				   // object having the required
-				   // multiplication functions.
-  MGMatrix<SparseMatrix<double>, Vector<double> >
-    mg_matrix(&mg_matrices);
-				   //do the same for the interface matrices
-  MGMatrix<SparseMatrix<double>, Vector<double> >
-    mg_interface_up(&mg_interface_matrices);
-  MGMatrix<SparseMatrix<double>, Vector<double> >
-    mg_interface_down(&mg_interface_matrices);
+				   // The next preparatory step is that we
+				   // must wrap our level and interface
+				   // matrices in an object having the
+				   // required multiplication functions. We
+				   // will create two objects for the
+				   // interface objects going from coarse to
+				   // fine and the other way around; the
+				   // multigrid algorithm will later use the
+				   // transpose operator for the latter
+				   // operation, allowing us to initialize
+				   // both up and down versions of the
+				   // operator with the matrices we already
+				   // built:
+  MGMatrix<> mg_matrix(&mg_matrices);
+  MGMatrix<> mg_interface_up(&mg_interface_matrices);
+  MGMatrix<> mg_interface_down(&mg_interface_matrices);
+
 				   // Now, we are ready to set up the
 				   // V-cycle operator and the
 				   // multilevel preconditioner.
@@ -835,13 +842,13 @@ void LaplaceProblem<dim>::solve ()
 				mg_smoother);
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
-  PreconditionMG<dim, Vector<double>,
-    MGTransferPrebuilt<Vector<double> > >
+  PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >
   preconditioner(mg_dof_handler, mg, mg_transfer);
 
-				   // Finally, create the solver
-				   // object and solve the system
-  ReductionControl solver_control (100, 1.e-20, 1.e-10, true, true);
+				   // With all this together, we can finally
+				   // get about solving the linear system in
+				   // the usual way:
+  SolverControl solver_control (1000, 1e-12);
   SolverCG<>    cg (solver_control);
 
   solution = 0;
