@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II news page</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="keywords" content="deal.II">
   <meta name="svn_id" content="$Id$">
@@ -32,6 +32,21 @@
     <a href="../doxygen/deal.II/changes_after_6.2.html">here.</a></p>
 
     <dl>
+      <dt>
+          <strong>2010/02/13: New multigrid, new step-16</strong>
+      </dt>
+      <dd>
+          Over the last few months, the multigrid implementation has seen
+          significant rewrites, with much of the work done by B&auml;rber
+          Janssen. The goal &mdash; now achieved &mdash; was to finally fully
+          support multigrid also for continuous finite elements on adaptively
+          refined meshes (uniformly refined meshes and discontinuous elements
+          have worked for a long time). As part of this process, step-16 has
+          been rewritten and now solves the same problem step-6 solves, just
+          with a multigrid solver.
+      </dd>
+
+
       <dt>
           <strong>2009/10/07: step-35 shows the solution of the
           Navier-Stokes equations</strong>
