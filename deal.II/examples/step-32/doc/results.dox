@@ -4,7 +4,7 @@ When run, the program simulates convection in 3d in much the same way
 as step-31 did, though with an entirely different testcase.
 
 
-<h3>Comparison of results with step 31</h3>
+<h3>Comparison of results with step-31</h3>
 
 Before we go to this testcase, however, let us show a few results from a
 slightly earlier version of this program that was solving exactly the
