@@ -1351,7 +1351,7 @@ FEValuesBase<dim,spacedim>::CellIterator<CI>::n_dofs_for_dof_handler () const
 
 
 
-#include "fe_values.impl.inst"
+#include "fe_values.impl.1.inst"
 
 
 /* ---------------- FEValuesBase<dim,spacedim>::TriaCellIterator --------- */
