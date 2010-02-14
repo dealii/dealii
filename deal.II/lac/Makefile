@@ -37,7 +37,8 @@ $(LIBDIR)/lac/%.$(OBJEXT) :
 	@echo "=====lac==============optimized==$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
-source/%.inst : source/%.inst.in $D/common/template-arguments
+source/%.inst : source/%.inst.in $D/common/template-arguments \
+		$D/common/scripts/expand_instantiations
 	@echo "=====lac============================= $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
 
