@@ -1103,6 +1103,183 @@ namespace internal
 /* ---------------- FEValuesBase<dim,spacedim>::CellIteratorBase --------- */
 
 template <int dim, int spacedim>
+class FEValuesBase<dim,spacedim>::CellIteratorBase
+{
+  public:
+				     /**
+				      * Destructor. Made virtual
+				      * since we store only
+				      * pointers to the base
+				      * class.
+				      */
+    virtual ~CellIteratorBase ();
+
+				     /**
+				      * Conversion operator to an
+				      * iterator for
+				      * triangulations. This
+				      * conversion is implicit for
+				      * the original iterators,
+				      * since they are derived
+				      * classes. However, since
+				      * here we have kind of a
+				      * parallel class hierarchy,
+				      * we have to have a
+				      * conversion operator.
+				      */
+    virtual
+    operator const typename Triangulation<dim,spacedim>::cell_iterator () const = 0;
+
+				     /**
+				      * Return the number of
+				      * degrees of freedom the DoF
+				      * handler object has to
+				      * which the iterator belongs
+				      * to.
+				      */
+    virtual
+    unsigned int
+    n_dofs_for_dof_handler () const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const Vector<double> &in,
+				 Vector<double>       &out) const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const Vector<float> &in,
+				 Vector<float>       &out) const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const Vector<long double> &in,
+				 Vector<long double>       &out) const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const BlockVector<double> &in,
+				 Vector<double>       &out) const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const BlockVector<float> &in,
+				 Vector<float>       &out) const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const BlockVector<long double> &in,
+				 Vector<long double>       &out) const = 0;
+
+#ifdef DEAL_II_USE_PETSC
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const PETScWrappers::Vector &in,
+				 Vector<PetscScalar>         &out) const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
+				 Vector<PetscScalar>              &out) const = 0;
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
+				 Vector<TrilinosScalar>         &out) const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+				 Vector<TrilinosScalar>              &out) const = 0;
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+
+    virtual
+    void
+    get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &in,
+				 Vector<TrilinosScalar>              &out) const = 0;
+
+				     /**
+				      * Call
+				      * @p get_interpolated_dof_values
+				      * of the iterator with the
+				      * given arguments.
+				      */
+    virtual
+    void
+    get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &in,
+				 Vector<TrilinosScalar>                   &out) const = 0;
+#endif
+};
+
+
+template <int dim, int spacedim>
 FEValuesBase<dim,spacedim>::CellIteratorBase::~CellIteratorBase ()
 {}
 
