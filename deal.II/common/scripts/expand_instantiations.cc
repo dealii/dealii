@@ -58,17 +58,46 @@ std::map<std::string, std::list<std::string> >  expansion_lists;
 
 /* ======================== auxiliary functions ================= */
 
+
+// replace all occurrences of 'pattern' by 'substitute' in 'in', and
+// return the result
+std::string
+replace_all (const std::string &in,
+	     const std::string &pattern,
+	     const std::string &substitute)
+{
+  std::string x = in;
+  while (x.find(pattern) != std::string::npos)
+    x.replace (x.find(pattern),
+	       pattern.size(),
+	       substitute);
+  return x;
+}
+
+
 // extract from the start of #in the part of the string that ends with one of
 // the characters in #delim_list. The extracted part is deleted from #in
+// and returned. We skip characters in delim_list if they are preceded
+// by a backslash
 std::string
 get_substring_with_delim (std::string       &in,
 			  const std::string &delim_list)
 {
   std::string x;
-  while ((in.size() != 0)
-	 &&
-	 (delim_list.find (in[0]) == std::string::npos))
+  while (in.size() != 0)
     {
+				       // stop copying to the result
+				       // if the current character is
+				       // a delimiter, but only if the
+				       // previous character was not a
+				       // backslash
+      if ((delim_list.find (in[0]) != std::string::npos)
+	  &&
+	  !((x.size() > 0)
+	    &&
+	    (x[x.size()-1] == '\\')))
+	break;
+
       x += in[0];
       in.erase (0, 1);
     }
@@ -377,8 +406,8 @@ void process_instantiations ()
       const std::list<std::string>
 	substitutions_list
 	= split_string_list (get_substring_with_delim (whole_file,
-								     ")"),
-					   ';');
+						       ")"),
+			     ';');
       if (whole_file.find (")") != 0)
 	{
 	  std::cerr << "Invalid instantiation list: missing ')'" << std::endl;
@@ -426,8 +455,13 @@ void process_instantiations ()
       whole_file.erase (0,1);
       skip_space (whole_file);
 
-				       // now produce the substitutions
-      substitute (text_to_substitute, substitutions);
+				       // now produce the
+				       // substitutions. first replace
+				       // all occurrences of "\{" by
+				       // "{"
+      substitute (replace_all(replace_all(text_to_substitute, "\\{", "{"),
+			      "\\}", "}"),
+		  substitutions);
     }
 }
 
