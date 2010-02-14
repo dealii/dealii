@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -203,7 +203,7 @@ std::string substitute_tokens (const std::string &text,
   while ((pos = x_text.find(token, pos)) != std::string::npos)
     {
       if (is_real_token (x_text, pos, token.size()))
-	{  
+	{
 	  x_text.replace (pos, token.size(),
 			  std::string(" ")+substitute+std::string(" "));
 	  pos += substitute.size()+2;
@@ -211,7 +211,7 @@ std::string substitute_tokens (const std::string &text,
       else
 	++pos;
     }
-  
+
   return x_text;
 }
 
@@ -297,7 +297,7 @@ void substitute (const std::string &text,
 		 const std::list<std::pair<std::string, std::string> > &substitutions)
 {
 				   // do things recursively: if the list of
-				   // substiutions has a single entry, then
+				   // substitutions has a single entry, then
 				   // process all of them. otherwise, process
 				   // the first in the list and call the
 				   // function recursively with the rest of
@@ -329,7 +329,7 @@ void substitute (const std::string &text,
 				       // do the substitutions
       const std::string name    = substitutions.front().first,
 			pattern = substitutions.front().second;
-      
+
       for (std::list<std::string>::const_iterator
 	     expansion = expansion_lists[pattern].begin();
 	   expansion != expansion_lists[pattern].end();
@@ -390,7 +390,7 @@ void process_instantiations ()
 				       // process the header
       std::list<std::pair<std::string, std::string> >
 	substitutions;
-      
+
       for (std::list<std::string>::const_iterator
 	     s = substitutions_list.begin();
 	   s != substitutions_list.end(); ++s)
@@ -402,7 +402,7 @@ void process_instantiations ()
 	      std::cerr << "Invalid instantiation header" << std::endl;
 	      std::exit (1);
 	    }
-	  
+
 	  const std::list<std::string>
 	    names = split_string_list (names_and_type.front(), ',');
 
