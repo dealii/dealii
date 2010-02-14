@@ -19,17 +19,17 @@ estimation and adaptivity for general functional output for the Laplace
 equation, while the second gives many examples of applications of these
 concepts to a large number of other, more complicated equations. For
 applications to individual types of equations, see also the publications by
-Becker @ref step_14_Bec95 "[Bec95]", @ref step_14_Bec98 "[Bec98]", 
+Becker @ref step_14_Bec95 "[Bec95]", @ref step_14_Bec98 "[Bec98]",
 Kanschat @ref step_14_Kan96 "[Kan96]", @ref step_14_FK97 "[FK97]",
 Suttmeier @ref step_14_Sut96 "[Sut96]", @ref step_14_RS97 "[RS97]", @ref step_14_RS98c "[RS98c]",
-@ref step_14_RS99 "[RS99]", 
-Bangerth @ref step_14_BR99b "[BR99b]", @ref step_14_Ban00w "[Ban00w]", 
-@ref step_14_BR01a "[BR01a]", @ref step_14_Ban02 "[Ban02]", and 
-Hartmann @ref step_14_Har02 "[Har02]", @ref step_14_HH01 "[HH01]", 
+@ref step_14_RS99 "[RS99]",
+Bangerth @ref step_14_BR99b "[BR99b]", @ref step_14_Ban00w "[Ban00w]",
+@ref step_14_BR01a "[BR01a]", @ref step_14_Ban02 "[Ban02]", and
+Hartmann @ref step_14_Har02 "[Har02]", @ref step_14_HH01 "[HH01]",
 @ref step_14_HH01b "[HH01b]".
 All of these works, from the original introduction by Becker and Rannacher to
 individual contributions to particular equations, have later been summarized
-in a book by Bangerth and Rannacher that covers all of these topics, see 
+in a book by Bangerth and Rannacher that covers all of these topics, see
 @ref step_14_BR03 "[BR03]".
 
 
@@ -97,7 +97,7 @@ with which this term could cancel, the weight $z-\varphi_h$ can be chosen as
 zero, since $z$ has zero boundary values, and $\varphi_h$ can be chosen to
 have the same.
 
-Thus, we have 
+Thus, we have
 @f{eqnarray*}
   J(e)
   &=&
@@ -114,7 +114,7 @@ with the neighbor cell $K'$, to obtain
   &=&
   \sum_K (f+\Delta u_h, z-\varphi_h)_K
   - \frac 12 (\partial_n u_h|_K + \partial_{n'} u_h|_{K'},
-              z-\varphi_h)_{\partial K\backslash \partial\Omega}.  
+              z-\varphi_h)_{\partial K\backslash \partial\Omega}.
 @f}
 Using that for the normal vectors $n'=-n$ holds, we define the jump of the
 normal derivative by
@@ -131,7 +131,7 @@ $\varphi_h=I_h z$:
   &=&
   \sum_K (f+\Delta u_h, z-I_h z)_K
   - \frac 12 ([\partial_n u_h],
-              z-I_h z)_{\partial K\backslash \partial\Omega}.  
+              z-I_h z)_{\partial K\backslash \partial\Omega}.
 @f}
 
 With this, we have obtained an exact representation of the error of the finite
@@ -316,7 +316,7 @@ example program.
 <dd>Roland Becker and Rolf Rannacher.
 <br> Weighted a posteriori error control in FE methods.
 <br> In H. G. Bock et al., ed.s, <em>ENUMATH 95</em>, pages 621&ndash;637,
-  Paris, September 1998. World Scientific Publ., Singapure.
+  Paris, September 1998. World Scientific Publ., Singapore.
 <br> in @ref step_14_enumath97 "[enumath97]".
 
 
