@@ -204,7 +204,7 @@ clean:
                */obj.g.$(OBJEXT) */output *~
 
 distclean: clean
-	-rm -f */exe *.testcase *.inp *.gpl *.eps *.gnuplot
+	-rm -f */exe *.testcase *.gpl *.eps *.gnuplot
 
 
 show-tests:
