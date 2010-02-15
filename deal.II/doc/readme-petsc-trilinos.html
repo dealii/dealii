@@ -5,7 +5,7 @@
   <title>The deal.II Readme on interfacing to PETSc and Trilinos</title>
   <link href="screen.css" rel="StyleSheet">
   <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2008, 2009 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2008, 2009, 2010 by the deal.II authors">
   <meta name="date" content="$Date: 2008-10-14 05:36:48 -0500 (Tue, 14 Oct 2008) $">
   <meta name="svn_id" content="$Id: readme.html 17202 2008-10-14 10:36:48Z heister $">
   <meta name="keywords" content="deal.II">
@@ -97,6 +97,14 @@
       <a
       href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2007/001820.html">in
       this posting to the mailing list</a>. 
+      </p>
+
+      <p>
+      There is an additional caveat: PETSc appears not to co-operate well when using
+      threads and some programs crash when deal.II is compiled in its usual mode
+      supporting multithreading. If you see this sort of behavior, we
+      recommend to try disabling multithreading upon configuration of deal.II using the
+      <code>--disable-threads</code> switch to <code>./configure</code>.
       </p>
 
 
