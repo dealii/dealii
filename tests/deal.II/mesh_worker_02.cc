@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,18 +40,23 @@ template <int dim>
 class MatrixIntegrator : public Subscriptor
 {
   public:
-    void cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const;
-    void bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const;
-    void face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-	      typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const;
+    static void cell(MeshWorker::DoFInfo<dim>& dinfo,
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+    static void bdry(MeshWorker::DoFInfo<dim>& dinfo,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void face(MeshWorker::DoFInfo<dim>& dinfo1,
+		     MeshWorker::DoFInfo<dim>& dinfo2,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
 };
 
 
 template <int dim>
-void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::CellInfo& info) const
+void MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo,
+				 typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
-  const FEValuesBase<dim>& fe = info.fe();
-  FullMatrix<double>& local_matrix = info.M1[0].matrix;
+  const FEValuesBase<dim>& fe = info.fe_values();
+  FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
   
   for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -62,13 +67,14 @@ void MatrixIntegrator<dim>::cell(typename MeshWorker::IntegrationWorker<dim>::Ce
 
 
 template <int dim>
-void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info) const
+void MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo,
+				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe = info.fe();
-  FullMatrix<double>& local_matrix = info.M1[0].matrix;
+  const FEFaceValuesBase<dim>& fe = info.fe_values();
+  FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
   
   const unsigned int deg = fe.get_fe().tensor_degree();
-  const double penalty = 2. * deg * (deg+1) * info.face->measure() / info.cell->measure();
+  const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
   
   for (unsigned k=0;k<fe.n_quadrature_points;++k)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -81,19 +87,21 @@ void MatrixIntegrator<dim>::bdry(typename MeshWorker::IntegrationWorker<dim>::Fa
 
 
 template <int dim>
-void MatrixIntegrator<dim>::face(typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2) const
+void MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
+				 MeshWorker::DoFInfo<dim>& dinfo2,
+				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
+				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
-  const FEFaceValuesBase<dim>& fe1 = info1.fe();
-  const FEFaceValuesBase<dim>& fe2 = info2.fe();
-  FullMatrix<double>& matrix_v1u1 = info1.M1[0].matrix;
-  FullMatrix<double>& matrix_v1u2 = info1.M2[0].matrix;
-  FullMatrix<double>& matrix_v2u1 = info2.M2[0].matrix;
-  FullMatrix<double>& matrix_v2u2 = info2.M1[0].matrix;
+  const FEFaceValuesBase<dim>& fe1 = info1.fe_values();
+  const FEFaceValuesBase<dim>& fe2 = info2.fe_values();
+  FullMatrix<double>& matrix_v1u1 = dinfo1.matrix(0, false).matrix;
+  FullMatrix<double>& matrix_v1u2 = dinfo1.matrix(0, true).matrix;
+  FullMatrix<double>& matrix_v2u1 = dinfo2.matrix(0, true).matrix;
+  FullMatrix<double>& matrix_v2u2 = dinfo2.matrix(0, false).matrix;
   
   const unsigned int deg = fe1.get_fe().tensor_degree();
-  const double penalty1 = deg * (deg+1) * info1.face->measure() / info1.cell->measure();
-  const double penalty2 = deg * (deg+1) * info2.face->measure() / info2.cell->measure();
+  const double penalty1 = deg * (deg+1) * dinfo1.face->measure() / dinfo1.cell->measure();
+  const double penalty2 = deg * (deg+1) * dinfo2.face->measure() / dinfo2.cell->measure();
   const double penalty = penalty1 + penalty2;
   
   for (unsigned k=0;k<fe1.n_quadrature_points;++k)
@@ -127,18 +135,30 @@ assemble(const DoFHandler<dim>& dof_handler, SparseMatrix<double>& matrix)
   const FiniteElement<dim>& fe = dof_handler.get_fe();
   MappingQ1<dim> mapping;
   
-  const MatrixIntegrator<dim> local;
-  MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> >, MatrixIntegrator<dim> >
-    integrator(local);
+  MeshWorker::IntegrationWorker<dim> integration_worker;
+  MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > assembler;
+  
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
-  integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
+  integration_worker.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
   UpdateFlags update_flags = update_values | update_gradients;
-  integrator.add_update_flags(update_flags, true, true, true, true);
+  integration_worker.add_update_flags(update_flags, true, true, true, true);
 
-  integrator.initialize(matrix);
-  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integrator, fe, mapping);
-  MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
+  assembler.initialize(matrix);
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  info_box.initialize(integration_worker, fe, mapping);
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+  
+  info_box.initialize(integration_worker, fe, mapping);
+  MeshWorker::loop
+    <MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
+    (dof_handler.begin_active(),
+     dof_handler.end(),
+     dof_info,
+     info_box,
+     &MatrixIntegrator<dim>::cell,
+     &MatrixIntegrator<dim>::bdry,
+     &MatrixIntegrator<dim>::face,
+     assembler);
 }
 
 
@@ -152,19 +172,28 @@ assemble(const MGDoFHandler<dim>& dof_handler,
   const FiniteElement<dim>& fe = dof_handler.get_fe();
   MappingQ1<dim> mapping;
   
-  const MatrixIntegrator<dim> local;
-  MeshWorker::AssemblingIntegrator<dim, MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> >, MatrixIntegrator<dim> >
-    integrator(local);
-  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
-  integrator.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
-  UpdateFlags update_flags = update_values | update_gradients;
-  integrator.add_update_flags(update_flags, true, true, true, true);
+  MeshWorker::IntegrationWorker<dim> integration_worker;
+  MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
 
-  integrator.initialize(matrix);
-  integrator.initialize_fluxes(dg_up, dg_down);
-  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
-  info_box.initialize(integrator, fe, mapping);
-  MeshWorker::integration_loop(dof_handler.begin_active(), dof_handler.end(), info_box, integrator);
+  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
+  integration_worker.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
+  UpdateFlags update_flags = update_values | update_gradients;
+  integration_worker.add_update_flags(update_flags, true, true, true, true);
+
+  assembler.initialize(matrix);
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  info_box.initialize(integration_worker, fe, mapping);
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+
+  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
+    (dof_handler.begin(),
+     dof_handler.end(),
+     dof_info,
+     info_box,
+     &MatrixIntegrator<dim>::cell,
+     &MatrixIntegrator<dim>::bdry,
+     &MatrixIntegrator<dim>::face,
+     assembler);
 }
 
 
