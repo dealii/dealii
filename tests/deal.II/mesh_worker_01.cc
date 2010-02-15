@@ -157,13 +157,14 @@ test_simple(MGDoFHandler<dim>& mgdofs)
   {
     MappingQ1<dim> mapping;
 
-    MeshWorker::IntegrationInfoBox<dim> info_box(dofs);
+    MeshWorker::IntegrationInfoBox<dim> info_box;
     info_box.initialize(integrator, fe, mapping);
+    MeshWorker::DoFInfo<dim> dof_info(dofs);
     
-    MeshWorker::integration_loop
-      <typename Local<dim>::CellInfo, typename Local<dim>::FaceInfo, dim>
+    MeshWorker::loop
+      <MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
       (dofs.begin_active(), dofs.end(),
-       info_box,
+       dof_info, info_box,
        std_cxx1x::bind (&Local<dim>::cell, local, _1, _2),
        std_cxx1x::bind (&Local<dim>::bdry, local, _1, _2),
        std_cxx1x::bind (&Local<dim>::face, local, _1, _2, _3, _4),
