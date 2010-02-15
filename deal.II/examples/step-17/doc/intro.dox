@@ -23,6 +23,12 @@ together with these two additional libraries is described in the <a
 href="../../readme.html" target="body">README</a> file.
 
 
+There is an additional caveat: PETSc appears not to co-operate well when using
+threads and the program crashes when deal.II is compiled it its usual mode
+supporting multithreading. The program can therefore only be compiled and run
+if multithreading is disabled upon configuration of deal.II using the
+<code>--disable-threads</code> switch to <code>./configure</code>.
+
 
 Now, for the details: as mentioned, the program does not compute anything new,
 so the use of finite element classes etc. is exactly the same as before. The
