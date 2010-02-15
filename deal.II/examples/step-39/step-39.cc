@@ -443,11 +443,12 @@ Step39<dim>::assemble_matrix()
   integration_worker.add_update_flags(update_flags, true, true, true, true);
 
   assembler.initialize(matrix);
-  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
-  MeshWorker::integration_loop<CellInfo, FaceInfo, dim>(
+  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >(
     dof_handler.begin_active(), dof_handler.end(),
-    info_box,
+    dof_info, info_box,
     &MatrixIntegrator<dim>::cell,
     &MatrixIntegrator<dim>::bdry,
     &MatrixIntegrator<dim>::face,
@@ -469,11 +470,12 @@ Step39<dim>::assemble_mg_matrix()
 
   assembler.initialize(mg_matrix);
   assembler.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
-  MeshWorker::IntegrationInfoBox<dim> info_box(mg_dof_handler);
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  MeshWorker::DoFInfo<dim> dof_info(mg_dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
-  MeshWorker::integration_loop<CellInfo, FaceInfo, dim>(
+  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> > (
     mg_dof_handler.begin(), mg_dof_handler.end(),
-    info_box,
+    dof_info, info_box,
     &MatrixIntegrator<dim>::cell,
     &MatrixIntegrator<dim>::bdry,
     &MatrixIntegrator<dim>::face,
@@ -497,12 +499,13 @@ Step39<dim>::assemble_right_hand_side()
   Vector<double>* rhs = &right_hand_side;
   data.add(rhs, "RHS");
   assembler.initialize(data);
-  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
   
-  MeshWorker::integration_loop<CellInfo, FaceInfo, dim>(
+  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >(
     dof_handler.begin_active(), dof_handler.end(),
-    info_box,
+    dof_info, info_box,
     &RHSIntegrator<dim>::cell,
     &RHSIntegrator<dim>::bdry,
     &RHSIntegrator<dim>::face,
@@ -618,11 +621,12 @@ Step39<dim>::estimate()
   BlockVector<double>* est = &estimates;
   out_data.add(est, "cells");
   assembler.initialize(out_data, false);
-  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping, solution_data);
-  MeshWorker::integration_loop<CellInfo, FaceInfo, dim> (
+  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> > (
     dof_handler.begin_active(), dof_handler.end(),
-    info_box,
+    dof_info, info_box,
     &Estimator<dim>::cell,
     &Estimator<dim>::bdry,
     &Estimator<dim>::face,

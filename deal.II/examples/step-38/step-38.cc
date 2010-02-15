@@ -360,7 +360,8 @@ void Step12<dim>::assemble_system ()
 				   // this is a handy shortcut. It
 				   // receives all the stuff we
 				   // created so far.
-  MeshWorker::IntegrationInfoBox<dim> info_box(dof_handler);
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
 
 				   // Finally, the integration loop
@@ -386,9 +387,9 @@ void Step12<dim>::assemble_system ()
 				   // result of std::bind if the local
 				   // integrators were, for example,
 				   // non-static member functions.
-  MeshWorker::integration_loop<CellInfo, FaceInfo, dim>
+  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dof_handler.begin_active(), dof_handler.end(),
-     info_box,
+     dof_info, info_box,
      &Step12<dim>::integrate_cell_term,
      &Step12<dim>::integrate_boundary_term,
      &Step12<dim>::integrate_face_term,
@@ -627,7 +628,7 @@ void Step12<dim>::integrate_face_term (DoFInfo& dinfo1, DoFInfo& dinfo2,
 template <int dim>
 void Step12<dim>::solve (Vector<double> &solution)
 {
-  SolverControl           solver_control (1000, 1e-12, false, false);
+  SolverControl           solver_control (1000, 1e-12);
   SolverRichardson<>      solver (solver_control);
 
 				   // Here we create the
@@ -736,7 +737,7 @@ void Step12<dim>::output_results (const unsigned int cycle) const
   Assert (cycle < 10, ExcInternalError());
 
   filename += ".eps";
-  std::cout << "Writing grid to <" << filename << ">..." << std::endl;
+  deallog << "Writing grid to <" << filename << ">" << std::endl;
   std::ofstream eps_output (filename.c_str());
 
   GridOut grid_out;
@@ -749,8 +750,7 @@ void Step12<dim>::output_results (const unsigned int cycle) const
   Assert (cycle < 10, ExcInternalError());
 
   filename += ".gnuplot";
-  std::cout << "Writing solution to <" << filename << ">..."
-	    << std::endl << std::endl;
+  deallog << "Writing solution to <" << filename << ">" << std::endl;
   std::ofstream gnuplot_output (filename.c_str());
 
   DataOut<dim> data_out;
@@ -770,7 +770,7 @@ void Step12<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
-      std::cout << "Cycle " << cycle << ':' << std::endl;
+      deallog << "Cycle " << cycle << std::endl;
 
       if (cycle == 0)
 	{
@@ -782,15 +782,15 @@ void Step12<dim>::run ()
 	refine_grid ();
 
 
-      std::cout << "   Number of active cells:       "
-		<< triangulation.n_active_cells()
-		<< std::endl;
+      deallog << "Number of active cells:       "
+	      << triangulation.n_active_cells()
+	      << std::endl;
 
       setup_system ();
 
-      std::cout << "   Number of degrees of freedom: "
-		<< dof_handler.n_dofs()
-		<< std::endl;
+      deallog << "Number of degrees of freedom: "
+	      << dof_handler.n_dofs()
+	      << std::endl;
 
       assemble_system ();
       solve (solution);
