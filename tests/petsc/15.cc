@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,9 +41,9 @@ void test (PETScWrappers::Vector &v)
                                    // check that they are ok, and this time
                                    // all of them
   for (unsigned int i=0; i<v.size(); ++i)
-    Assert (((pattern[i] == true) && (v(i) == 2*i)
+    Assert ( ( (pattern[i] == true) && (v(i) == 2*i) )
              ||
-             (pattern[i] == false) && (v(i) == 0)),
+             ( (pattern[i] == false) && (v(i) == 0) ),
              ExcInternalError());
 
   deallog << "OK" << std::endl;
