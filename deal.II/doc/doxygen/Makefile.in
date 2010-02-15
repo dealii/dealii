@@ -36,7 +36,7 @@ deal.II deal.tag: tutorial \
 tutorial:
 	@cd tutorial ; $(MAKE)
 
-deal.dox: Makefile
+deal.dox: Makefile $(shell echo images ../../examples/*/doc)
 	@echo "=== Making $@"
 	@echo "INPUT=`echo headers ../../{base,lac,deal.II}/include/* tutorial/doxygen ../news/*.h`" > $@
 	@echo "IMAGE_PATH=`echo images ../../examples/*/doc`" >> $@
@@ -46,7 +46,7 @@ deal.dox: Makefile
 # validate cross references. there are so many html files in these
 # directories that we can just call
 #    $(PERL) $D/common/scripts/validate-xrefs.pl deal.II/*.html
-# as this leads to error messages of the kind "/usr/bin/perl: Argument 
+# as this leads to error messages of the kind "/usr/bin/perl: Argument
 # list too long". Instead, use a loop over all html files
 validate-xrefs:
 	@echo "--- Validating xrefs in doxygen/deal.II/ ---"
