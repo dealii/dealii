@@ -48,7 +48,11 @@ include $D/common/Make.global_options
 ################################################################ 
 # This example program will only work if PETSc is installed. If this
 # is not the case, then simply redefine the main targets to do nothing
-ifneq ($(USE_CONTRIB_PETSC),yes)
+#
+# The same holds true if we use threads: PETSc and threads doesn't
+# seem to work well together...
+ifneq ($(USE_CONTRIB_PETSC)$(enable-threads),yesno)
+  ifneq ($(USE_CONTRIB_PETSC),yes)
 default run clean:
 	@echo
 	@echo "===========================================================" 
@@ -57,7 +61,16 @@ default run clean:
 	@echo "=   configuration of deal.II                              ="
 	@echo "==========================================================="
 	@echo
-
+  else
+default run clean:
+	@echo
+	@echo "===========================================================" 
+	@echo "=   PETSc can not be used when running programs on        ="
+	@echo "=   multiple threads. Make sure you have specified the    ="
+	@echo "=   --disable-threads flag upon configuration of deal.II  ="
+	@echo "==========================================================="
+	@echo
+  endif
 else
 #
 ################################################################
