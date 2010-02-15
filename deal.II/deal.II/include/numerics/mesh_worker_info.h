@@ -568,7 +568,14 @@ namespace MeshWorker
 
 /**
  * A simple container collecting the five info objects required by the
- * integration loops.
+ * integration loops. In addition to providing these objects, this
+ * class offers two functions to initialize them with reasonable
+ * contents all at once.
+ *
+ * MeshWorker::loop() requires five info objects collected into a
+ * single class. These are the data members #cell, #boundary, #face,
+ * #subface, and #neighbor. The names of those are expected by
+ * MeshWorker::loop().
  *
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
@@ -577,16 +584,13 @@ namespace MeshWorker
   class IntegrationInfoBox
   {
     public:
+
+/// The type of the info object for cells
       typedef IntegrationInfo<dim, FEValuesBase<dim, spacedim>, spacedim> CellInfo;
+
+/// The type of the info objects for faces.
       typedef IntegrationInfo<dim, FEFaceValuesBase<dim, spacedim>, spacedim> FaceInfo;
-
-				       /**
-					* Initialize all members
-					* with the same argument.
-					*/
-      template <typename T>
-      IntegrationInfoBox(const T&);
-
+      
       template <class WORKER>
       void initialize(const WORKER&,
 		      const FiniteElement<dim, spacedim>& el,
@@ -598,18 +602,20 @@ namespace MeshWorker
 		      const Mapping<dim, spacedim>& mapping,
 		      const NamedData<VECTOR*>& data);
 
-//      private:
-
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
 
-      DoFInfo<dim, spacedim> dof_info;
-      CellInfo cell_info;
-      FaceInfo boundary_info;
-      FaceInfo face_info;
-      FaceInfo subface_info;
-      FaceInfo neighbor_info;
+/// The info object for a cell
+      CellInfo cell;
+/// The info object for a boundary face
+      FaceInfo boundary;
+/// The info object for a regular interior face, seen from the first cell
+      FaceInfo face;
+/// The info object for the refined side of an interior face seen from the first cell
+      FaceInfo subface;
+/// The info object for an interior face, seen from the other cell
+      FaceInfo neighbor;
   };
 
 
@@ -926,14 +932,6 @@ namespace MeshWorker
 //----------------------------------------------------------------------//
 
   template <int dim, int sdim>
-  template <typename T>
-  IntegrationInfoBox<dim,sdim>::IntegrationInfoBox(const T& t)
-		  :
-		  dof_info(t)
-  {}
-
-
-  template <int dim, int sdim>
   template <class WORKER>
   void
   IntegrationInfoBox<dim,sdim>::
@@ -941,15 +939,15 @@ namespace MeshWorker
 	     const FiniteElement<dim,sdim>& el,
 	     const Mapping<dim,sdim>& mapping)
   {
-    cell_info.initialize<FEValues<dim,sdim> >(el, mapping, integrator.cell_quadrature,
+    cell.initialize<FEValues<dim,sdim> >(el, mapping, integrator.cell_quadrature,
 			 integrator.cell_flags);
-    boundary_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.boundary_quadrature,
+    boundary.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.boundary_quadrature,
 			 integrator.boundary_flags);
-    face_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
+    face.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 			 integrator.face_flags);
-    subface_info.initialize<FESubfaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
+    subface.initialize<FESubfaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 			    integrator.face_flags);
-    neighbor_info.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
+    neighbor.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
 						      integrator.neighbor_flags);
   }
 
@@ -969,19 +967,19 @@ namespace MeshWorker
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.cell_selector));
     p->initialize(data);
     cell_data = p;
-    cell_info.initialize_data(p);
+    cell.initialize_data(p);
 
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.boundary_selector));
     p->initialize(data);
     boundary_data = p;
-    boundary_info.initialize_data(p);
+    boundary.initialize_data(p);
 
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.face_selector));
     p->initialize(data);
     face_data = p;
-    face_info.initialize_data(p);
-    subface_info.initialize_data(p);
-    neighbor_info.initialize_data(p);
+    face.initialize_data(p);
+    subface.initialize_data(p);
+    neighbor.initialize_data(p);
   }
 }
 
