@@ -423,7 +423,7 @@ Article{JK10,
  * the finite element basis functions to a single grid cell.</dd>
  *
  *
- * <dt class="glossary">@anchor SubdomainId <b>Subdomain id</b></dt>
+ * <dt class="glossary">@anchor GlossSubdomainId <b>Subdomain id</b></dt>
  * <dd>Each cell of a triangulation has associated with it a property called
  * the "subdomain id" that can be queried using a call like
  * <code>cell-@>subdomain_id()</code> and that can be set for example by using
