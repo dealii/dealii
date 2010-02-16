@@ -3038,7 +3038,7 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
       cell_similarity = CellSimilarity::none;
     else
       cell_similarity = (cell->is_translation_of
-			 (static_cast<const typename Triangulation<dim,spacedim>::cell_iterator>(*this->present_cell))
+			 (static_cast<const typename Triangulation<dim,spacedim>::cell_iterator &>(*this->present_cell))
 			 ?
 			 CellSimilarity::translation
 			 :
