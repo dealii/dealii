@@ -14,7 +14,7 @@ s/\\\@f\$/\$/g;
 # Now, as of doxygen 1.5, this still produces the wrong result, but
 # that's not our fault. This is reported here:
 #    http://bugzilla.gnome.org/show_bug.cgi?id=365053
-s/dealii::/::/g;
+s/(::)?dealii::/::/g;
 
 # Replace all occurrences of something like step-xx by
 #    @ref step_xx "step-xx"
