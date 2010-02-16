@@ -161,8 +161,7 @@ test_simple(MGDoFHandler<dim>& mgdofs)
     info_box.initialize(integrator, fe, mapping);
     MeshWorker::DoFInfo<dim> dof_info(dofs);
     
-    MeshWorker::loop
-      <MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
+    MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim>
       (dofs.begin_active(), dofs.end(),
        dof_info, info_box,
        std_cxx1x::bind (&Local<dim>::cell, local, _1, _2),
