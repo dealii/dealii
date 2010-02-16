@@ -193,6 +193,7 @@ namespace MeshWorker
       std::vector<MatrixBlock<FullMatrix<number> > > M2;
   };
 
+  template <int dim, int spacedim> class DoFInfoBox;
 
 /**
  * A class containing information on geometry and degrees of freedom
@@ -277,8 +278,8 @@ namespace MeshWorker
 					* the #aux_local_indices.
 					*/
       template <class DH>
-      DoFInfo(const DH& dof_handler);
-
+      DoFInfo (const DH& dof_handler);
+      
 				       /**
 					* Set the current cell and
 					* fill #indices.
@@ -314,7 +315,18 @@ namespace MeshWorker
       SmartPointer<const BlockInfo,DoFInfo<dim,spacedim> > block_info;
 
     private:
-				       /// Fill index vector with active indices
+				       /**
+					* Standard constructor, not
+					* setting any block
+					* indices. Use of this
+					* constructor is not
+					* recommended, but it is
+					* needed for the arrays in
+					* DoFInfoBox.
+					*/
+      DoFInfo ();
+      
+      				       /// Fill index vector with active indices
       void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c);
 
 				       /// Fill index vector with level indices
@@ -332,7 +344,65 @@ namespace MeshWorker
 					* degrees of freedom per cell.
 					*/
       BlockIndices aux_local_indices;
+      
+      friend class DoFInfoBox<dim, spacedim>;
   };
+
+
+  /**
+ * A class bundling the MeshWorker::DoFInfo objects used on a cell.
+ *
+ * @todo Currently, we are storing an object for the cells and two for
+ * each face. We could gather all face data pertaining to the cell
+ * itself in one object, saving a bit of memory and a few operations,
+ * but sacrificing some cleanliness.
+ *
+ * @author Guido Kanschat, 2010
+ */
+  template < int dim, int spacedim=dim>
+  class DoFInfoBox
+  {
+    public:
+				       /**
+					* Constructor copying the seed
+					* into all other objects.
+					*/
+      DoFInfoBox(const MeshWorker::DoFInfo<dim, spacedim>& seed);
+
+				       /**
+					* Reset all the availability flags.
+					*/
+      void reset();
+      
+				       /**
+					* The data for the cell.
+					*/
+      MeshWorker::DoFInfo<dim> cell;
+				       /**
+					* The data for the faces from inside.
+					*/
+      MeshWorker::DoFInfo<dim> interior[GeometryInfo<dim>::faces_per_cell];
+				       /**
+					* The data for the faces from outside.
+					*/
+      MeshWorker::DoFInfo<dim> exterior[GeometryInfo<dim>::faces_per_cell];
+
+				       /**
+					* A set of flags, indicating
+					* whether data on an interior
+					* face is available.
+					*/
+      bool interior_face_available[GeometryInfo<dim>::faces_per_cell];
+				       /**
+					* A set of flags, indicating
+					* whether data on an exterior
+					* face is available.
+					*/
+      bool exterior_face_available[GeometryInfo<dim>::faces_per_cell];
+  };
+
+
+  
 
 /**
  * Class for objects handed to local integration functions.
@@ -876,7 +946,35 @@ namespace MeshWorker
     return aux_local_indices;
   }
 
+//----------------------------------------------------------------------//
+  
+  template < int dim, int spacedim>
+  inline
+  DoFInfoBox<dim, spacedim>::DoFInfoBox(const DoFInfo<dim, spacedim>& seed)
+		  :
+		  cell(seed)
+  {
+    for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+      {
+	exterior[i] = seed;
+	interior[i] = seed;
+	interior_face_available[i] = false;
+	exterior_face_available[i] = false;
+      }
+  }
 
+
+  template < int dim, int spacedim>
+  inline void
+  DoFInfoBox<dim, spacedim>::reset ()
+  {
+    for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+      {
+    	interior_face_available[i] = false;
+	exterior_face_available[i] = false;
+      }
+  }
+  
 //----------------------------------------------------------------------//
 
   template <int dim, class FVB, int spacedim>

@@ -446,7 +446,7 @@ Step39<dim>::assemble_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box;
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >(
+  MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim>(
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &MatrixIntegrator<dim>::cell,
@@ -473,7 +473,7 @@ Step39<dim>::assemble_mg_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box;
   MeshWorker::DoFInfo<dim> dof_info(mg_dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> > (
+  MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim> (
     mg_dof_handler.begin(), mg_dof_handler.end(),
     dof_info, info_box,
     &MatrixIntegrator<dim>::cell,
@@ -503,7 +503,7 @@ Step39<dim>::assemble_right_hand_side()
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
   
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >(
+  MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim>(
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &RHSIntegrator<dim>::cell,
@@ -529,7 +529,7 @@ Step39<dim>::solve()
   coarse_matrix.copy_from (mg_matrix[0]);
   MGCoarseGridHouseholder<double, Vector<double> > mg_coarse;
   mg_coarse.initialize(coarse_matrix);
-  typedef PreconditionSOR<SparseMatrix<double> > RELAXATION;
+  typedef PreconditionSSOR<SparseMatrix<double> > RELAXATION;
   MGSmootherRelaxation<SparseMatrix<double>, RELAXATION, Vector<double> >
     mg_smoother(mem);
   RELAXATION::AdditionalData smoother_data(1.);
@@ -624,7 +624,7 @@ Step39<dim>::estimate()
   MeshWorker::IntegrationInfoBox<dim> info_box;
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping, solution_data);
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> > (
+  MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim> (
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &Estimator<dim>::cell,

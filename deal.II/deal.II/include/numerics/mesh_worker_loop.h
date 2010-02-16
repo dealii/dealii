@@ -68,14 +68,14 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class DOFINFO, class INFOBOX, class ITERATOR, typename ASSEMBLER>
+  template<class INFOBOX, int dim, int spacedim, typename ASSEMBLER, class ITERATOR>
   void loop(ITERATOR begin,
 	    typename identity<ITERATOR>::type end,
-	    DOFINFO cell_dof_info,
+	    DoFInfo<dim, spacedim> dinfo,
 	    INFOBOX& info,
-	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo &)> &cell_worker,
-	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::FaceInfo &)> &boundary_worker,
-	    const std_cxx1x::function<void (DOFINFO&, DOFINFO&,
+	    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::CellInfo &)> &cell_worker,
+	    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::FaceInfo &)> &boundary_worker,
+	    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, DoFInfo<dim, spacedim>&,
 					    typename INFOBOX::FaceInfo &,
 					    typename INFOBOX::FaceInfo &)> &face_worker,
 	    ASSEMBLER &assembler,
@@ -85,12 +85,14 @@ namespace MeshWorker
     const bool integrate_boundary      = (boundary_worker != 0);
     const bool integrate_interior_face = (face_worker != 0);
 
-    ;
-    DOFINFO face_dof_info = cell_dof_info;
-    DOFINFO neighbor_dof_info = cell_dof_info;
-    assembler.initialize_info(cell_dof_info, false);
-    assembler.initialize_info(face_dof_info, true);
-    assembler.initialize_info(neighbor_dof_info, true);
+    DoFInfoBox<dim, spacedim> dof_info(dinfo);
+    
+    assembler.initialize_info(dof_info.cell, false);
+    for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+      {
+	assembler.initialize_info(dof_info.interior[i], true);
+	assembler.initialize_info(dof_info.exterior[i], true);
+      }
     
 				     // Loop over all cells
     for (ITERATOR cell = begin; cell != end; ++cell)
@@ -100,10 +102,10 @@ namespace MeshWorker
 					 // before faces
 	if (integrate_cell && cells_first)
 	  {
-	    cell_dof_info.reinit(cell);
-	    info.cell.reinit(cell_dof_info);
-	    cell_worker(cell_dof_info, info.cell);
-	    assembler.assemble(cell_dof_info);
+	    dof_info.cell.reinit(cell);
+	    info.cell.reinit(dof_info.cell);
+	    cell_worker(dof_info.cell, info.cell);
+	    assembler.assemble(dof_info.cell);
 	  }
 
 	if (integrate_interior_face || integrate_boundary)
@@ -114,10 +116,11 @@ namespace MeshWorker
 		{
 		  if (integrate_boundary)
 		    {
-		      cell_dof_info.reinit(cell, face, face_no);
-		      info.boundary.reinit(cell_dof_info);
-		      boundary_worker(cell_dof_info, info.boundary);
-		      assembler.assemble(cell_dof_info);
+		      dof_info.interior_face_available[face_no] = true;
+		      dof_info.interior[face_no].reinit(cell, face, face_no);
+		      info.boundary.reinit(dof_info.interior[face_no]);
+		      boundary_worker(dof_info.interior[face_no], info.boundary);
+		      assembler.assemble(dof_info.interior[face_no]);
 		    }
 		}
 	      else if (integrate_interior_face)
@@ -146,17 +149,21 @@ namespace MeshWorker
 		      typename ITERATOR::AccessorType::Container::face_iterator nface
 			= neighbor->face(neighbor_face_no.first);
 		      
-		      face_dof_info.reinit(cell, face, face_no);
-		      info.face.reinit(face_dof_info);
-		      neighbor_dof_info.reinit(neighbor, nface,
-					       neighbor_face_no.first, neighbor_face_no.second);
-		      info.subface.reinit(neighbor_dof_info);
+		      dof_info.interior_face_available[face_no] = true;
+		      dof_info.exterior_face_available[face_no] = true;
+		      dof_info.interior[face_no].reinit(cell, face, face_no);
+		      info.face.reinit(dof_info.interior[face_no]);
+		      dof_info.exterior[face_no].reinit(
+			neighbor, nface, neighbor_face_no.first, neighbor_face_no.second);
+		      info.subface.reinit(dof_info.exterior[face_no]);
+		      
 						       // Neighbor
 						       // first to
 						       // conform to
 						       // old version
-		      face_worker(face_dof_info, neighbor_dof_info, info.face, info.subface);
-		      assembler.assemble (face_dof_info, neighbor_dof_info);
+		      face_worker(dof_info.interior[face_no], dof_info.exterior[face_no],
+				  info.face, info.subface);
+		      assembler.assemble (dof_info.interior[face_no], dof_info.exterior[face_no]);
 		    }
 		  else
 		    {
@@ -179,13 +186,17 @@ namespace MeshWorker
 		      unsigned int neighbor_face_no = cell->neighbor_of_neighbor(face_no);
 		      Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
 						       // Regular interior face
-		      face_dof_info.reinit(cell, face, face_no);
-		      info.face.reinit(face_dof_info);
-		      neighbor_dof_info.reinit(neighbor, neighbor->face(neighbor_face_no),
-					       neighbor_face_no);
-		      info.neighbor.reinit(neighbor_dof_info);
-		      face_worker(face_dof_info, neighbor_dof_info, info.face, info.neighbor);
-		      assembler.assemble(face_dof_info, neighbor_dof_info);
+		      dof_info.interior_face_available[face_no] = true;
+		      dof_info.exterior_face_available[face_no] = true;
+		      dof_info.interior[face_no].reinit(cell, face, face_no);
+		      info.face.reinit(dof_info.interior[face_no]);
+		      dof_info.exterior[face_no].reinit(
+			neighbor, neighbor->face(neighbor_face_no), neighbor_face_no);
+		      info.neighbor.reinit(dof_info.exterior[face_no]);
+		      
+		      face_worker(dof_info.interior[face_no], dof_info.exterior[face_no],
+				  info.face, info.neighbor);
+		      assembler.assemble(dof_info.interior[face_no], dof_info.exterior[face_no]);
 		    }
 		}
 	    } // faces
@@ -193,10 +204,10 @@ namespace MeshWorker
 					 // have to be handled first
 	if (integrate_cell && !cells_first)
 	  {
-	    cell_dof_info.reinit(cell);
-	    info.cell.reinit(cell_dof_info);
-	    cell_worker(cell_dof_info, info.cell);
-	    assembler.assemble (cell_dof_info);
+	    dof_info.cell.reinit(cell);
+	    info.cell.reinit(dof_info.cell);
+	    cell_worker(dof_info.cell, info.cell);
+	    assembler.assemble(dof_info.cell);
 	  }
       }
   }

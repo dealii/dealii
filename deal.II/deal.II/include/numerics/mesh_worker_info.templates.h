@@ -26,6 +26,11 @@ namespace MeshWorker
 
 
   template <int dim, int spacedim>
+  DoFInfo<dim,spacedim>::DoFInfo()
+  {}
+
+
+  template <int dim, int spacedim>
   void
   DoFInfo<dim,spacedim>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c)
   {
