@@ -65,6 +65,31 @@ class MyBoundary : public Boundary<dim>
 
 	return Point<dim>(0,0,1.25);
       }
+
+    Point<dim>
+    project_to_surface (const typename Triangulation<dim>::line_iterator &line,
+			const Point<dim> &p) const
+      {
+	deallog << "Projecting line point " << p << std::endl;
+
+	if (dim == 2)
+	  return Point<dim>(p[0], 1.25-2.25*std::fabs(p[0]));
+	else
+	  return p;
+      }
+
+    Point<dim>
+    project_to_surface (const typename Triangulation<dim>::quad_iterator &line,
+			const Point<dim> &p) const
+      {
+	deallog << "Projecting quad point " << p << std::endl;
+
+	Assert (dim == 3, ExcInternalError());
+
+	return Point<dim>(p[0], p[1],
+			  1.25-2.25*std::max(std::fabs(p[0]),
+					     std::fabs(p[1])));
+      }
 };
 
 
@@ -114,7 +139,7 @@ int main ()
   std::ofstream logfile("distorted_cells_05/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-8);
 
   check<2> ();
   check<3> ();
