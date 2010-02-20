@@ -60,31 +60,6 @@ inconvenience this causes.
   <br>
   (GK 2009/08/04)
   </p>
-
-  <li>
-  <p>
-  Changed: Previously, the Triangulation::create_triangulation
-  function silently accepted input meshes with inverted cells
-  (i.e. cells with a zero or negative determinant of the Jacobian of
-  the mapping from the reference cell to the real cell). This has been
-  changed now: The function checks whether cells are distorted or
-  inverted, and may throw an exception containing a list of cells
-  for which this is the case. If you know that this is harmless, for
-  example if you have cells with collapsed vertices in your mesh but
-  you do not intend to integrate on them, then you can catch and
-  ignore this message. In all other cases, the output of your
-  computations are likely to be wrong anyway.
-  <br>
-  The same is true for the Triangulation::execute_coarsening_and_refinement
-  function: if it creates cells that are distorted, it throws a list of cells
-  whose children are distorted.
-  <br>
-  The whole issue is described in some detail in the entry on
-  @ref GlossDistorted "distorted cells" in the glossary.
-  <br>
-  (WB 2009/06/29)
-  </p>
-  </li>
 </ol>
 
 
@@ -604,7 +579,7 @@ inconvenience this causes.
   <p>
   New: The class MGTransferSelect is prepared for use on adaptively refined meshes.
   <br>
-  (Bärbel Janssen 2010/02/05)
+  (B&auml;rbel Janssen 2010/02/05)
   </p>
   </li>
 
@@ -613,7 +588,7 @@ inconvenience this causes.
   New: The function Cuthill_McKee in namespace DoFRenumbering is now also compiled for
   MGDoFHandler as well as the make_sparsity_pattern functions in DoFTools.
   <br>
-  (Bärbel Janssen 2010/01/08)
+  (B&auml;rbel Janssen 2010/01/08)
   </p>
   </li>
 
@@ -736,6 +711,34 @@ inconvenience this causes.
   (WB 2009/07/10)
   </p>
   </li>
+
+  <li>
+  <p>
+  New: Previously, the Triangulation::create_triangulation
+  function silently accepted input meshes with inverted cells
+  (i.e. cells with a zero or negative determinant of the Jacobian of
+  the mapping from the reference cell to the real cell). This can been
+  changed now: By passing the appropriate flag to the constructor of
+  the Triangulation class, the Triangulation::create_triangulation
+  function checks whether cells are distorted or
+  inverted, and may throw an exception containing a list of cells
+  for which this is the case. If you know that this is harmless, for
+  example if you have cells with collapsed vertices in your mesh but
+  you do not intend to integrate on them, then you can catch and
+  ignore this message. In all other cases, the output of your
+  computations are likely to be wrong anyway.
+  <br>
+  The same is true for the Triangulation::execute_coarsening_and_refinement
+  function: if it creates cells that are distorted, it throws a list of cells
+  whose children are distorted.
+  <br>
+  The whole issue is described in some detail in the entry on
+  @ref GlossDistorted "distorted cells" in the glossary.
+  <br>
+  (WB 2009/06/29)
+  </p>
+  </li>
+
 
   <li>
   <p>

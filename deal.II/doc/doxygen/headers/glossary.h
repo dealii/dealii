@@ -158,9 +158,10 @@
  * as the result of mesh refinement if the boundary description in use
  * is sufficiently irregular.
  *
- * The function Triangulation::create_triangulation, which is called
+ * If the appropriate flag is given upon creation of a triangulation,
+ * the function Triangulation::create_triangulation, which is called
  * by the various functions in GridGenerator and GridIn (but can also
- * be called from user code, see step-14 will signal
+ * be called from user code, see step-14, will signal
  * the creation of coarse meshes with distorted cells by throwing an
  * exception of type Triangulation::DistortedCellList. There are
  * legitimate cases for creating meshes with distorted cells (in
@@ -229,6 +230,13 @@
  * GridTools::fix_up_distorted_child_cells function that attempts to
  * fix up exactly these cells if possible by moving around the node at
  * the center of the cell.
+ *
+ * Note that the Triangulation class does not test for the presence of
+ * distorted cells by default, since the determination whether a cell
+ * is distorted or not is not a cheap operation. If you want a
+ * Triangulation object to test for distortion of cells, you need to
+ * specify this upon creation of the object by passing the appropriate
+ * flag.
  *
  *
  * <dt class="glossary">@anchor GlossFaceOrientation <b>Face orientation</b></dt>

@@ -1119,8 +1119,8 @@ namespace internal
  *   Therefore if your new boundary vertex is too near the center of
  *   the old quadrilateral or hexahedron, the distance to the midpoint
  *   vertex will become too small, thus generating distorted
- *   cells. Remedy: take care of such situations when defining the
- *   coarse grid.
+ *   cells. This issue is discussed extensively in
+ *   @ref GlossDistorted "distorted cells".
  *
  *
  *   <h3>Technical details</h3>
@@ -1388,7 +1388,13 @@ class Triangulation : public Subscriptor
 				      * execute_coarsening_and_refinement()
 				      * functions, and they can be
 				      * caught in user code if this
-				      * condition is to be ignored.
+				      * condition is to be
+				      * ignored. Note, however, that
+				      * such exceptions are only
+				      * produced if the necessity for
+				      * this check was indicated when
+				      * calling the constructor of the
+				      * Triangulation class.
 				      *
 				      * A cell is called
 				      * <i>deformed</i> if the
@@ -1443,8 +1449,30 @@ class Triangulation : public Subscriptor
 				      *  Create an empty
 				      *  triangulation. Do not create
 				      *  any cells.
+				      *
+				      * @param smooth_grid Determines
+				      * the level of smoothness of the
+				      * mesh size function that should
+				      * be enforced upon mesh
+				      * refinement.
+				      *
+				      * @param
+				      * check_for_distorted_cells
+				      * Determines whether the
+				      * triangulation should check
+				      * whether any of the cells that
+				      * are created by
+				      * create_triangulation() or
+				      * execute_coarsening_and_refinement()
+				      * are distorted (see @ref
+				      * GlossDistorted "distorted
+				      * cells"). If set, these two
+				      * functions may throw an
+				      * exception if they encounter
+				      * distorted cells.
 				      */
-    Triangulation (const MeshSmoothing smooth_grid = none);
+    Triangulation (const MeshSmoothing smooth_grid = none,
+		   const bool check_for_distorted_cells = false);
 
 				     /**
 				      *  Copy constructor.
@@ -1672,19 +1700,24 @@ class Triangulation : public Subscriptor
 				      * and the GridIn and
 				      * GridReordering class.
 				      *
-				      * At the very end of its
-				      * operation, this function walks
+				      * If the
+				      * <code>check_for_distorted_cells</code>
+				      * flag was specified upon
+				      * creation of this object, at
+				      * the very end of its operation,
+				      * the current function walks
 				      * over all cells and verifies
 				      * that none of the cells is
-				      * deformed (see
-				      * the entry on @ref GlossDistorted in
-				      * the glossary), where we call a cell
-				      * deformed if the determinant of
-				      * the Jacobian of the mapping
-				      * from reference cell to real
-				      * cell is negative at least at
-				      * one of the vertices (this
-				      * computation is done using the
+				      * deformed (see the entry on
+				      * @ref GlossDistorted "distorted
+				      * cells" in the glossary), where
+				      * we call a cell deformed if the
+				      * determinant of the Jacobian of
+				      * the mapping from reference
+				      * cell to real cell is negative
+				      * at least at one of the
+				      * vertices (this computation is
+				      * done using the
 				      * GeometryInfo::jacobian_determinants_at_vertices
 				      * function). If there are
 				      * deformed cells, this function
@@ -1829,6 +1862,12 @@ class Triangulation : public Subscriptor
 				      * does not create such an
 				      * exception if no cells have
 				      * created distorted children.
+				      * Note that for the check for
+				      * distorted cells to happen, the
+				      * <code>check_for_distorted_cells</code>
+				      * flag has to be specified upon
+				      * creation of a triangulation
+				      * object.
 				      *
                                       * See the general docs for more
                                       * information.
@@ -3202,7 +3241,11 @@ class Triangulation : public Subscriptor
 				      *  of cells that have produced
 				      *  children that satisfy the
 				      *  criteria of
-				      *  @ref GlossDistorted "distorted cells".
+				      *  @ref GlossDistorted "distorted cells"
+				      * if the
+				      * <code>check_for_distorted_cells</code>
+				      * flag was specified upon
+				      * creation of this object, at
 				      */
     DistortedCellList execute_refinement ();
 
@@ -3288,6 +3331,14 @@ class Triangulation : public Subscriptor
 				      *  more information about this.
 				      */
     MeshSmoothing                    smooth_grid;
+
+				     /**
+				      * A flag that determines whether
+				      * we are to check for distorted
+				      * cells upon creation and
+				      * refinement of a mesh.
+				      */
+    const bool check_for_distorted_cells;
 
 				     /**
 				      * Cache to hold the numbers of lines,

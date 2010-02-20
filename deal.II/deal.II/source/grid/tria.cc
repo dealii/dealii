@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -4063,7 +4063,8 @@ namespace internal
 	template <int spacedim>
 	static
 	typename Triangulation<1,spacedim>::DistortedCellList
-	execute_refinement (Triangulation<1,spacedim> &triangulation)
+	execute_refinement (Triangulation<1,spacedim> &triangulation,
+			    const bool check_for_distorted_cells)
 	  {
 	    const unsigned int dim = 1;
 
@@ -4333,7 +4334,8 @@ namespace internal
 	template <int spacedim>
 	static
 	typename Triangulation<2,spacedim>::DistortedCellList
-	execute_refinement (Triangulation<2,spacedim> &triangulation)
+	execute_refinement (Triangulation<2,spacedim> &triangulation,
+			    const bool check_for_distorted_cells)
 	  {
 	    const unsigned int dim = 2;
 
@@ -4717,7 +4719,9 @@ namespace internal
 				       next_unused_cell,
 				       cell);
 
-		      if (has_distorted_children (cell,
+		      if ((check_for_distorted_cells == true)
+			  &&
+			  has_distorted_children (cell,
 						  internal::int2type<dim>(),
 						  internal::int2type<spacedim>()))
 			cells_with_distorted_children.distorted_cells.push_back (cell);
@@ -4735,7 +4739,8 @@ namespace internal
 	template <int spacedim>
 	static
 	typename Triangulation<3,spacedim>::DistortedCellList
-	execute_refinement (Triangulation<3,spacedim> &triangulation)
+	execute_refinement (Triangulation<3,spacedim> &triangulation,
+			    const bool check_for_distorted_cells)
 	  {
 	    const unsigned int dim = 3;
 
@@ -8680,7 +8685,9 @@ namespace internal
 						       // and if so
 						       // add them to
 						       // our list
-		      if (has_distorted_children (hex,
+		      if ((check_for_distorted_cells == true)
+			  &&
+			  has_distorted_children (hex,
 						  internal::int2type<dim>(),
 						  internal::int2type<spacedim>()))
 			cells_with_distorted_children.distorted_cells.push_back (hex);
@@ -9148,11 +9155,14 @@ Triangulation<dim, spacedim>::dimension;
 
 
 template <int dim, int spacedim>
-Triangulation<dim, spacedim>::Triangulation (const MeshSmoothing smooth_grid)
+Triangulation<dim, spacedim>::
+Triangulation (const MeshSmoothing smooth_grid,
+	       const bool check_for_distorted_cells)
 		:
 		faces(NULL),
 		anisotropic_refinement(false),
-		smooth_grid(smooth_grid)
+		smooth_grid(smooth_grid),
+		check_for_distorted_cells(check_for_distorted_cells)
 {
 				   // set default boundary for all
 				   // possible components
@@ -9162,12 +9172,14 @@ Triangulation<dim, spacedim>::Triangulation (const MeshSmoothing smooth_grid)
 
 
 template <int dim, int spacedim>
-Triangulation<dim, spacedim>::Triangulation (const Triangulation<dim, spacedim> &)
+Triangulation<dim, spacedim>::
+Triangulation (const Triangulation<dim, spacedim> &)
 				   // do not set any subscriptors;
 				   // anyway, calling this constructor
 				   // is an error!
 		:
-		Subscriptor()
+		Subscriptor(),
+		check_for_distorted_cells(check_for_distorted_cells)
 {
   Assert (false, ExcInternalError());
 }
@@ -9365,14 +9377,17 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
 				   // first collect all distorted
 				   // cells and then throw an
 				   // exception if there are any
-  DistortedCellList distorted_cells = collect_distorted_coarse_cells (*this);
-				   // throw the array (and fill the
-				   // various location fields) if
-				   // there are distorted
-				   // cells. otherwise, just fall off
-				   // the end of the function
-  AssertThrow (distorted_cells.distorted_cells.size() == 0,
-	       distorted_cells);
+  if (check_for_distorted_cells == true)
+    {
+      DistortedCellList distorted_cells = collect_distorted_coarse_cells (*this);
+				       // throw the array (and fill the
+				       // various location fields) if
+				       // there are distorted
+				       // cells. otherwise, just fall off
+				       // the end of the function
+      AssertThrow (distorted_cells.distorted_cells.size() == 0,
+		   distorted_cells);
+    }
 }
 
 
@@ -12114,7 +12129,9 @@ Triangulation<dim,spacedim>::execute_refinement ()
 {
   const DistortedCellList
     cells_with_distorted_children
-    = internal::Triangulation::Implementation::execute_refinement (*this);
+    =
+    internal::Triangulation::Implementation::
+    execute_refinement (*this,check_for_distorted_cells);
 
 
 
