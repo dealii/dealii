@@ -1,8 +1,8 @@
 //----------------------------  distorted_cells_06.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,15 +60,15 @@ template <int dim>
 void check ()
 {
   MyBoundary<dim> my_boundary;
-  
+
 				   // create two cubes
-  Triangulation<dim> coarse_grid;
+  Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
 
   std::vector<unsigned int> sub(dim, 1);
   sub[0] = 2;
   Point<dim> p1 (-1,0,0), p2(1,1,1);
   GridGenerator::subdivided_hyper_rectangle(coarse_grid, sub, p1, p2, true);
-  
+
 				   // set bottom middle edge to use MyBoundary
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     for (unsigned int e=0; e<GeometryInfo<dim-1>::faces_per_cell; ++e)
@@ -91,7 +91,7 @@ void check ()
 
       Assert (dcv.distorted_cells.size() == 2,
 	      ExcInternalError());
-      
+
       typename Triangulation<dim>::DistortedCellList
 	subset = GridTools::fix_up_distorted_child_cells (dcv,
 							  coarse_grid);
@@ -112,7 +112,7 @@ void check ()
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("distorted_cells_06/output");
   deallog.attach(logfile);
@@ -122,5 +122,5 @@ int main ()
   check<3> ();
 }
 
-  
-  
+
+

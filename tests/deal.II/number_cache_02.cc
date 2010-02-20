@@ -1,8 +1,8 @@
 //----------------------------  number_cache_02.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,7 +38,7 @@ std::ofstream logfile("number_cache_02/output");
 template <int dim>
 void output (const Triangulation<dim> &tria)
 {
-  
+
   deallog << "  " << tria.n_active_cells() << std::endl;
   deallog << "  " << tria.n_cells() << std::endl;
   deallog << "  " << tria.n_active_lines() << std::endl;
@@ -57,13 +57,13 @@ void output (const Triangulation<dim> &tria)
 	  deallog << "  " << tria.n_active_lines(i) << std::endl;
 	  deallog << "  " << tria.n_lines(i) << std::endl;
 	}
-      
+
       if (dim == 2)
 	{
 	  deallog << "  " << tria.n_active_quads(i) << std::endl;
 	  deallog << "  " << tria.n_quads(i) << std::endl;
 	}
-      
+
       if (dim == 3)
 	{
 	  deallog << "  " << tria.n_active_hexs(i) << std::endl;
@@ -77,8 +77,8 @@ template <int dim>
 void test (const char *filename)
 {
   deallog << "Reading " << filename << std::endl;
-  
-  Triangulation<dim> tria;
+
+  Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in (filename);
@@ -104,7 +104,7 @@ void test (const char *filename)
     }
 
   output (tria);
-  
+
 				   // now refine a few cells and output again
   deallog << "  Refining..." << std::endl;
   typename Triangulation<dim>::active_cell_iterator
@@ -126,7 +126,7 @@ int main ()
   deallog.threshold_double(1.e-10);
 
   test<2> ("grid_in/2d.xda");
-  
+
   test<3> ("grid_in_3d/1.in");
   test<3> ("grid_in_3d/2.in");
   test<3> ("grid_in_3d/3.in");

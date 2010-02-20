@@ -1,8 +1,8 @@
 //----------------------------  grid_in_02.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,7 +49,7 @@ void test2 ()
                                    // available, program was killed
                                    // before), with the new one it
                                    // takes less than 8 seconds
-  Triangulation<dim> tria;
+  Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in ("grid_in_02/2d.xda");

@@ -1,6 +1,6 @@
 //----------------------------  grid_in.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008, 2009 by the deal.II authors
 //
@@ -33,13 +33,13 @@ std::ofstream logfile("grid_in/output");
 
 template <int dim>
 void test1 ()
-{  
+{
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in ("grid_in/2d.inp");
   gi.read_ucd (in);
-  
+
   GridOut grid_out;
   grid_out.set_flags (GridOutFlags::Ucd(true));
   grid_out.write_ucd (tria, logfile);
@@ -65,7 +65,7 @@ void test2 ()
 				   // grid_in_02 testcase fail when using this
 				   // input file, but grid_in_02/2d.xda is a
 				   // corrected input file.
-  Triangulation<dim> tria;
+  Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in ("grid_in/2d.xda");
@@ -81,7 +81,7 @@ void test2 ()
       deallog << dcv.distorted_cells.size() << " cells are distorted."
 	      << std::endl;
     }
-      
+
 
   int hash = 0;
   int index = 0;
@@ -102,7 +102,7 @@ void test3 ()
   gi.read ("grid_in/2d.nc");
 
   GridOut grid_out;
-  std::ofstream gnufile("grid_in_2d.gnuplot");  
+  std::ofstream gnufile("grid_in_2d.gnuplot");
   grid_out.write_gnuplot (tria, gnufile);
 }
 
@@ -111,7 +111,7 @@ template<int dim>
 void check_file (const std::string name,
 		 typename GridIn<dim>::Format format)
 {
-  Triangulation<dim> tria;
+  Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   try
@@ -124,7 +124,7 @@ void check_file (const std::string name,
       deallog << dcv.distorted_cells.size() << " cells are distorted."
 	      << std::endl;
     }
-      
+
   deallog << name
 	  << '\t' << tria.n_vertices()
 	  << '\t' << tria.n_cells()

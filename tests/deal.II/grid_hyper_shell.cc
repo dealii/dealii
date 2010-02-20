@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,7 @@ template<int dim>
 void check (double r1, double r2, unsigned int n, bool)
 {
   Point<dim> center;
-  Triangulation<dim> tria;
+  Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridGenerator::hyper_shell (tria, center, r1, r2, n, true);
   static const HyperShellBoundary<dim> boundary(center);
   tria.set_boundary(0, boundary);
@@ -50,7 +50,7 @@ void check (double r1, double r2, unsigned int n, bool)
 	{
 	  deallog << "Found " << dcv.distorted_cells.size()
 		  << " distorted cells" << std::endl;
-      
+
 	  typename Triangulation<dim>::DistortedCellList
 	    subset = GridTools::fix_up_distorted_child_cells (dcv,
 							      tria);
@@ -58,7 +58,7 @@ void check (double r1, double r2, unsigned int n, bool)
 		  ExcInternalError());
 	}
     }
-  
+
   GridOut grid_out;
   GridOutFlags::DX flags;
   flags.write_faces = true;

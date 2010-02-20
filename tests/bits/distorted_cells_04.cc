@@ -1,8 +1,8 @@
 //----------------------------  distorted_cells_04.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,9 +71,9 @@ template <int dim>
 void check ()
 {
   MyBoundary<dim> my_boundary;
-  
+
 				   // create a single square/cube
-  Triangulation<dim> coarse_grid;
+  Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
   GridGenerator::hyper_cube (coarse_grid, -1, 1);
 
 				   // set bottom face to use MyBoundary
@@ -107,7 +107,7 @@ void check ()
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("distorted_cells_04/output");
   deallog.attach(logfile);
@@ -118,5 +118,5 @@ int main ()
   check<3> ();
 }
 
-  
-  
+
+

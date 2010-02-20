@@ -1,8 +1,8 @@
 //----------------------------  distorted_cells_01.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,7 +52,7 @@ void check (const unsigned int testcase)
       default:
 	    Assert (false, ExcNotImplemented());
     }
-  
+
 
   std::vector<CellData<dim> > cells;
   {
@@ -62,7 +62,7 @@ void check (const unsigned int testcase)
     cells.push_back (cell);
   }
 
-  Triangulation<dim> coarse_grid;
+  Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
 
   bool flag = false;
   try
@@ -72,7 +72,7 @@ void check (const unsigned int testcase)
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
       flag = true;
-      
+
       deallog << dcv.distorted_cells.size() << " distorted cells"
 	      << std::endl;
       Assert (dcv.distorted_cells.front() == coarse_grid.begin(0),
@@ -83,7 +83,7 @@ void check (const unsigned int testcase)
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("distorted_cells_01/output");
   deallog.attach(logfile);
@@ -98,5 +98,5 @@ int main ()
     }
 }
 
-  
-  
+
+
