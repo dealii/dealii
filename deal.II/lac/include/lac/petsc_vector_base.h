@@ -118,7 +118,7 @@ namespace PETScWrappers
 					  * operator for non-const objects.
 					  */
         VectorReference & operator = (const VectorReference &r);
-	
+
                                          /**
                                           * Set the referenced element of the
                                           * vector to <tt>s</tt>.
@@ -825,13 +825,17 @@ namespace PETScWrappers
 
     inline
     VectorReference &
-    VectorReference::operator = (const VectorReference &r) 
+    VectorReference::operator = (const VectorReference &r)
     {
-				       // simply call the other operator
-      static_cast<const VectorReference &>(*this)> = r;
-      return this;
+                                       // as explained in the class
+                                       // documentation, this is not the copy
+                                       // operator. so simply pass on to the
+                                       // "correct" assignment operator
+      *this = static_cast<PetscScalar> (r);
+
+      return *this;
     }
-    
+
 
 
     inline
