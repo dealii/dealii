@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -109,6 +109,16 @@ namespace PETScWrappers
                                           */
         const VectorReference & operator = (const VectorReference &r) const;
 
+					 /**
+					  * The same function as above, but
+					  * for non-const reference
+					  * objects. The function is needed
+					  * since the compiler might otherwise
+					  * automatically generate a copy
+					  * operator for non-const objects.
+					  */
+        VectorReference & operator = (const VectorReference &r);
+	
                                          /**
                                           * Set the referenced element of the
                                           * vector to <tt>s</tt>.
@@ -811,6 +821,17 @@ namespace PETScWrappers
       return *this;
     }
 
+
+
+    inline
+    VectorReference &
+    VectorReference::operator = (const VectorReference &r) 
+    {
+				       // simply call the other operator
+      static_cast<const VectorReference &>(*this)> = r;
+      return this;
+    }
+    
 
 
     inline
