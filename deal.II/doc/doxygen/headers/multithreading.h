@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -683,8 +683,7 @@
    template <int dim>
    void MyClass<dim>::assemble_system ()
    {
-     WorkStream work_stream;
-     work_stream.run (dof_handler.begin_active(),
+     WorkStream::run (dof_handler.begin_active(),
 	              dof_handler.end(),
 		      *this,
 		      &MyClass<dim>::assemble_on_one_cell);
@@ -850,8 +849,7 @@
      PerTaskData per_task_data;
      ...initialize members of per_task_data to the correct sizes...
 
-     WorkStream work_stream;
-     work_stream.run (dof_handler.begin_active(),
+     WorkStream::run (dof_handler.begin_active(),
 	              dof_handler.end(),
 		      *this,
 		      &MyClass<dim>::assemble_on_one_cell,
@@ -982,14 +980,14 @@
  * respectively. So, in other words, the following two calls are exactly
  * identical:
  * @code
-     work_stream.run (dof_handler.begin_active(),
+     WorkStream::run (dof_handler.begin_active(),
 	              dof_handler.end(),
 		      *this,
 		      &MyClass<dim>::assemble_on_one_cell,
 		      &MyClass<dim>::copy_local_to_global,
 		      per_task_data);
      // ...is the same as:
-     work_stream.run (dof_handler.begin_active(),
+     WorkStream::run (dof_handler.begin_active(),
 	              dof_handler.end(),
 		      boost::bind(&MyClass<dim>::assemble_on_one_cell, *this, _1, _2, _3),
 		      boost::bind(&MyClass<dim>::copy_local_to_global, *this, _1),
@@ -1023,7 +1021,7 @@
  * and third the ScratchData and PerTaskData objects, we need to pass the following
  * to it:
  * @code
-     work_stream.run (dof_handler.begin_active(),
+     WorkStream::run (dof_handler.begin_active(),
 	              dof_handler.end(),
 		      boost::bind(&MyClass<dim>::assemble_on_one_cell,
 		                  *this,
