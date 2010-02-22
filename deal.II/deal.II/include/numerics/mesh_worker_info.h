@@ -373,6 +373,19 @@ namespace MeshWorker
 					* Reset all the availability flags.
 					*/
       void reset();
+
+				       /**
+					* After all info objects have
+					* been filled appropriately,
+					* use the ASSEMBLER object
+					* to assemble them into the
+					* global data. See
+					* MeshWorker::Assembler for
+					* available classes.
+					*/
+      template <class ASSEMBLER>
+      void assemble(ASSEMBLER& ass) const;
+      
       
 				       /**
 					* The data for the cell.
@@ -974,7 +987,31 @@ namespace MeshWorker
 	exterior_face_available[i] = false;
       }
   }
+
   
+  template < int dim, int spacedim>
+  template <class ASSEMBLER>
+  inline void
+  DoFInfoBox<dim, spacedim>::assemble (ASSEMBLER& assembler) const
+  {
+    assembler.assemble(cell);
+    for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+      {
+					 // Only do something if data available
+	if (interior_face_available[i])
+	  {
+					     // If both data
+					     // available, it is an
+					     // interior face
+	    if (exterior_face_available[i])
+	      assembler.assemble(interior[i], exterior[i]);
+	    else
+	      assembler.assemble(interior[i]);
+	  }
+      }
+  }
+  
+
 //----------------------------------------------------------------------//
 
   template <int dim, class FVB, int spacedim>
