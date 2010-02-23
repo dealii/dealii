@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -120,6 +120,7 @@ DEAL_II_NAMESPACE_OPEN
  * during deal.II configuration. Otherwise it simply works on each item
  * sequentially.
  *
+ * @ingroup threads
  * @author Wolfgang Bangerth, 2007, 2008, 2009
  */
 namespace WorkStream
@@ -467,6 +468,17 @@ namespace WorkStream
 				    * DoFHandler::active_cell_iterator
 				    * whereas the second is of type
 				    * DoFHandler::raw_cell_iterator.
+				    *
+				    * The two data types
+				    * <tt>ScratchData</tt> and
+				    * <tt>CopyData</tt> need to have a
+				    * working copy
+				    * constructor. <tt>ScratchData</tt>
+				    * is only used in the
+				    * <tt>worker</tt> function, while
+				    * <tt>CopyData</tt> is the object
+				    * passed from the <tt>worker</tt>
+				    * to the <tt>copier</tt>.
 				    *
 				    * The @p queue_length argument indicates
 				    * the number of items that can be live
