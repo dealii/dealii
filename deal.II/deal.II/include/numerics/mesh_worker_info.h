@@ -359,7 +359,7 @@ namespace MeshWorker
  *
  * @author Guido Kanschat, 2010
  */
-  template < int dim, int spacedim=dim>
+  template <int dim, int spacedim=dim>
   class DoFInfoBox
   {
     public:
@@ -367,8 +367,15 @@ namespace MeshWorker
 					* Constructor copying the seed
 					* into all other objects.
 					*/
-      DoFInfoBox(const MeshWorker::DoFInfo<dim, spacedim>& seed);
+      DoFInfoBox(const DoFInfo<dim, spacedim>& seed);
 
+				       /**
+					* Copy constructor, taking
+					* #cell and using it as a seed
+					* in the other constructor.
+					*/
+      DoFInfoBox(const DoFInfoBox<dim, spacedim>&);
+      
 				       /**
 					* Reset all the availability flags.
 					*/
@@ -390,15 +397,15 @@ namespace MeshWorker
 				       /**
 					* The data for the cell.
 					*/
-      MeshWorker::DoFInfo<dim> cell;
+      DoFInfo<dim> cell;
 				       /**
 					* The data for the faces from inside.
 					*/
-      MeshWorker::DoFInfo<dim> interior[GeometryInfo<dim>::faces_per_cell];
+      DoFInfo<dim> interior[GeometryInfo<dim>::faces_per_cell];
 				       /**
 					* The data for the faces from outside.
 					*/
-      MeshWorker::DoFInfo<dim> exterior[GeometryInfo<dim>::faces_per_cell];
+      DoFInfo<dim> exterior[GeometryInfo<dim>::faces_per_cell];
 
 				       /**
 					* A set of flags, indicating
@@ -474,11 +481,21 @@ namespace MeshWorker
 				       /// vector of FEValues objects
       std::vector<boost::shared_ptr<FEVALUESBASE> > fevalv;
     public:
+      static const unsigned int dimension = FEVALUESBASE::dimension;
+      static const unsigned int space_dimension = FEVALUESBASE::space_dimension;
+      
 				       /**
 					* Constructor.
 					*/
       IntegrationInfo();
-
+      
+				       /**
+					* Copy constructor, creating a
+					* clone to be used by
+					* WorksTream::run().
+					*/
+      IntegrationInfo(const IntegrationInfo<dim, FEVALUESBASE, spacedim>& other);
+      
 				       /**
 					* Build all internal
 					* structures, in particular
@@ -971,6 +988,22 @@ namespace MeshWorker
       {
 	exterior[i] = seed;
 	interior[i] = seed;
+	interior_face_available[i] = false;
+	exterior_face_available[i] = false;
+      }
+  }
+
+
+  template < int dim, int spacedim>
+  inline
+  DoFInfoBox<dim, spacedim>::DoFInfoBox(const DoFInfoBox<dim, spacedim>& other)
+		  :
+		  cell(other.cell)
+  {
+    for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+      {
+	exterior[i] = other.exterior[i];
+	interior[i] = other.interior[i];
 	interior_face_available[i] = false;
 	exterior_face_available[i] = false;
       }

@@ -15,6 +15,7 @@
 
 #include <base/config.h>
 #include <base/std_cxx1x/function.h>
+#include <base/work_stream.h>
 #include <base/template_constraints.h>
 #include <grid/tria.h>
 #include <numerics/mesh_worker_info.h>
@@ -41,6 +42,11 @@ namespace internal
     return true;
   }
 
+  template<int dim, int sdim, class A>
+  void assemble(const MeshWorker::DoFInfoBox<dim, sdim>& dinfo, A& assembler)
+  {
+    dinfo.assemble(assembler);
+  }
 }
 
 
@@ -242,11 +248,17 @@ namespace MeshWorker
       }
     
 				     // Loop over all cells
-    for (ITERATOR cell = begin; cell != end; ++cell)
-      {
-	cell_action(cell, dof_info, info, cell_worker, boundary_worker, face_worker, cells_first);
-	dof_info.assemble(assembler);
-      }
+    WorkStream::run(begin, end,
+		    std_cxx1x::bind(cell_action<INFOBOX, dim, spacedim, ITERATOR>, _1, _3, _2,
+				    cell_worker, boundary_worker, face_worker, cells_first),
+		    std_cxx1x::bind(internal::assemble<dim,spacedim,ASSEMBLER>, _1, assembler),
+		    info, dof_info);
+    
+//     for (ITERATOR cell = begin; cell != end; ++cell)
+//       {
+// 	cell_action(cell, dof_info, info, cell_worker, boundary_worker, face_worker, cells_first);
+// 	dof_info.assemble(assembler);
+//       }
   }
 
 /**

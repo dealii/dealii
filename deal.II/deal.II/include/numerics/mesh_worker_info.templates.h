@@ -75,6 +75,40 @@ namespace MeshWorker
 		  global_data(boost::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>))
   {}
 
+  
+  template<int dim, class FVB, int sdim>
+  IntegrationInfo<dim,FVB,sdim>::IntegrationInfo(const IntegrationInfo<dim,FVB,sdim>& other)
+		  :
+		  multigrid(other.multigrid),
+		  values(other.values),
+		  gradients(other.gradients),
+		  hessians(other.hessians),
+		  global_data(other.global_data),
+		  n_components(other.n_components)
+  {
+    fevalv.resize(other.fevalv.size());
+    for (unsigned int i=0;i<other.fevalv.size();++i)
+      {
+	const FVB& p = *other.fevalv[i];
+	const FEValues<dim,sdim>* pc = dynamic_cast<const FEValues<dim,sdim>*>(&p);
+	const FEFaceValues<dim,sdim>* pf = dynamic_cast<const FEFaceValues<dim,sdim>*>(&p);
+	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
+	
+	if (pc != 0)
+	  fevalv[i] = typename boost::shared_ptr<FVB> (
+	    reinterpret_cast<FVB*>(new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
+							   pc->get_quadrature(), pc->get_update_flags())));
+	else if (pf != 0)
+	  fevalv[i] = typename boost::shared_ptr<FVB> (
+	    new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
+	else if (ps != 0)
+	  fevalv[i] = typename boost::shared_ptr<FVB> (
+	    new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags()));
+	else
+	  Assert(false, ExcInternalError());
+      }
+  }
+  
 
   template<int dim, class FVB, int sdim>
   template <class FEVALUES>
