@@ -3059,14 +3059,18 @@ FEValuesBase<dim,spacedim>::get_cell_similarity () const
 }
 
 
-/*------------------------------- FEValues -------------------------------*/
+template <int dim, int spacedim>
+const unsigned int FEValuesBase<dim,spacedim>::dimension;
 
 
 template <int dim, int spacedim>
-const unsigned int FEValues<dim,spacedim>::dimension;
+const unsigned int FEValuesBase<dim,spacedim>::space_dimension;
+
+/*------------------------------- FEValues -------------------------------*/
 
 template <int dim, int spacedim>
 const unsigned int FEValues<dim,spacedim>::integral_dimension;
+
 
 
 

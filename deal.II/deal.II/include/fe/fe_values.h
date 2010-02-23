@@ -1474,6 +1474,18 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
                      public Subscriptor
 {
   public:
+                                     /**
+                                      * Dimension in which this object
+                                      * operates.
+                                      */
+    static const unsigned int dimension = dim;
+
+                                     /**
+                                      * Dimension of the space in
+                                      * which this object operates.
+                                      */
+    static const unsigned int space_dimension = spacedim;
+
 				     /**
 				      * Number of quadrature points.
 				      */
@@ -2812,18 +2824,6 @@ template <int dim, int spacedim=dim>
 class FEValues : public FEValuesBase<dim,spacedim>
 {
   public:
-                                     /**
-                                      * Dimension in which this object
-                                      * operates.
-                                      */
-    static const unsigned int dimension = dim;
-
-                                     /**
-                                      * Dimension of the space in
-                                      * which this object operates.
-                                      */
-    static const unsigned int space_dimension = spacedim;
-
                                      /**
                                       * Dimension of the object over
                                       * which we integrate. For the
