@@ -270,10 +270,16 @@ namespace SLEPcWrappers
                                     * Exceptions.
                                     */
       DeclException0 (ExcSLEPcWrappersUsageError);
+
       DeclException1 (ExcSLEPcError,
 		      int,
-		      << "An error with error number " << arg1
+		      << "    An error with error number " << arg1
 		      << " occured while calling a SLEPc function");
+
+      DeclException2 (ExcSLEPcEigenvectorConvergenceMismatchError,
+		      int, int,
+		      << "    The number of converged eigenvectors is " << arg1
+		      << " but " << arg2 << " were requested. ");
 
     protected:
 
@@ -534,7 +540,8 @@ namespace SLEPcWrappers
 
       if (n_converged > n_eigenvectors)
 	n_converged = n_eigenvectors;
-      AssertThrow (n_converged == n_eigenvectors, ExcSLEPcWrappersUsageError());
+      AssertThrow (n_converged == n_eigenvectors, 
+		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
 
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
       vr.resize (n_converged, vr.front());
@@ -561,8 +568,10 @@ namespace SLEPcWrappers
       if (n_converged >= n_eigenvectors)
 	n_converged = n_eigenvectors;
 
-      AssertThrow (n_converged == n_eigenvectors, ExcSLEPcWrappersUsageError());
+      AssertThrow (n_converged == n_eigenvectors, 
+		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
+
       vr.resize (n_converged, vr.front());
       kr.resize (n_converged);
 
