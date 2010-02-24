@@ -78,6 +78,10 @@ namespace MeshWorker
  * @param face_worker defines the local action on interior faces.
  * @param cells_first determines, whether faces or cells are to be
  * dealt with first.
+ * @param unique_faces_only determines, that a face between two cells
+ * of the same level is processed only from the cell which is less
+ * than its neighbor. If this parameter is <tt>false</tt> these faces
+ * are processed from both cells.
  *
  * @author Guido Kanschat, 2010
  */
@@ -91,7 +95,8 @@ namespace MeshWorker
     const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, DoFInfo<dim, spacedim>&,
 				    typename INFOBOX::FaceInfo &,
 				    typename INFOBOX::FaceInfo &)> &face_worker,
-    bool cells_first = true)
+    const bool cells_first,
+    const bool unique_faces_only)
   {
     const bool integrate_cell          = (cell_worker != 0);
     const bool integrate_boundary      = (boundary_worker != 0);
@@ -166,7 +171,7 @@ namespace MeshWorker
 						   // level, but
 						   // only do this
 						   // from one side.
-		  if (neighbor < cell) continue;
+		  if (unique_faces_only && (neighbor < cell)) continue;
 		  
 						   // If iterator
 						   // is active
@@ -250,7 +255,7 @@ namespace MeshWorker
 				     // Loop over all cells
     WorkStream::run(begin, end,
 		    std_cxx1x::bind(cell_action<INFOBOX, dim, spacedim, ITERATOR>, _1, _3, _2,
-				    cell_worker, boundary_worker, face_worker, cells_first),
+				    cell_worker, boundary_worker, face_worker, cells_first, true),
 		    std_cxx1x::bind(internal::assemble<dim,spacedim,ASSEMBLER>, _1, assembler),
 		    info, dof_info);
     
