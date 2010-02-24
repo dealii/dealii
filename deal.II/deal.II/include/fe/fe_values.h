@@ -1282,14 +1282,6 @@ class FEValuesData
 				      */
     std::vector<Point<spacedim> >  normal_vectors;
 
-				     /**
-				      * List of outward vectors normal to the cell
-				      * surface (line) at the quadrature points
-				      * for the codimension 1 case,
-				      * when spacedim=3 (=2).
-				      */
-    std::vector<Point<spacedim> >  cell_normal_vectors;
-
                                      /**
 				      * List of boundary forms at the
 				      * quadrature points. This field is filled
@@ -2550,21 +2542,54 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      */
     const typename Triangulation<dim,spacedim>::cell_iterator get_cell () const;
 
-				     /**
-				      * Returns the vectors normal to
-				      * the cell in each of the
-				      * quadrature points.
+    				     /**
+				      * For a face, return the outward
+				      * normal vector to the cell at
+				      * the <tt>i</tt>th quadrature
+				      * point.
+				      *
+				      * For a cell of codimension one,
+				      * return the normal vector, as
+				      * it is specified by the
+				      * numbering of the vertices.
+				      *
+				      * The length of the vector
+				      * is normalized to one.
 				      */
+    const Point<spacedim> & normal_vector (const unsigned int i) const;
 
-    const std::vector<Point<spacedim> > & get_cell_normal_vectors () const;
+				     /**
+				      * Return the normal vectors at
+				      * the quadrature points. For a
+				      * face, these are the outward
+				      * normal vectors to the
+				      * cell. For a cell of
+				      * codimension one, the
+				      * orientation is given by the
+				      * numbering of vertices.
+				      */
+    const std::vector<Point<spacedim> > & get_normal_vectors () const;
 
     				     /**
+				      * @deprecated Use
+				      * normal_vector() instead.
+				      *
 				      * Return the outward normal vector to
 				      * the cell at the <tt>i</tt>th quadrature
 				      * point. The length of the vector
 				      * is normalized to one.
 				      */
     const Point<spacedim> & cell_normal_vector (const unsigned int i) const;
+
+				     /**
+				      * @deprecated Use
+				      * get_normal_vectors() instead.
+				      *
+				      * Returns the vectors normal to
+				      * the cell in each of the
+				      * quadrature points.
+				      */
+    const std::vector<Point<spacedim> > & get_cell_normal_vectors () const;
 
 				     /**
 				      * Return the relation of the current
@@ -2998,7 +3023,7 @@ class FEValues : public FEValuesBase<dim,spacedim>
  * when evaluating something on the surface of a cell. All the data
  * that is available in the interior of cells is also available here.
  *
- * On surfaces of mesh cells, normal vectors and boundary forms are
+ * On surfaces of mesh cells, boundary forms are
  * additional values that can be computed. This class provides the
  * interface to access those. Implementations are in derived classes
  * FEFaceValues and FESubfaceValues.
@@ -3051,14 +3076,6 @@ class FEFaceValuesBase : public FEValuesBase<dim,spacedim>
 		      const Quadrature<dim-1>&           quadrature);
 
     				     /**
-				      * Return the outward normal vector to
-				      * the cell at the <tt>i</tt>th quadrature
-				      * point. The length of the vector
-				      * is normalized to one.
-				      */
-    const Point<dim> & normal_vector (const unsigned int i) const;
-
-    				     /**
 				      * Boundary form of the
 				      * transformation of the cell at
 				      * the <tt>i</tt>th quadrature point.
@@ -3076,13 +3093,6 @@ class FEFaceValuesBase : public FEValuesBase<dim,spacedim>
 				      * <tt>n.ds</tt>.
 				      */
     const Tensor<1,spacedim> & boundary_form (const unsigned int i) const;
-
-				     /**
-				      * Return the list of outward normal
-				      * vectors to the cell at the
-				      * quadrature points.
-				      */
-    const std::vector<Point<dim> > & get_normal_vectors () const;
 
 				     /**
 				      * Return the list of outward
@@ -4497,15 +4507,25 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 template <int dim, int spacedim>
 inline
 const Point<spacedim> &
-FEValuesBase<dim,spacedim>::cell_normal_vector (const unsigned int i) const
+FEValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
 {
   typedef FEValuesBase<dim,spacedim> FVB;
-  Assert (i<this->cell_normal_vectors.size(),
-	  ExcIndexRange(i, 0, this->cell_normal_vectors.size()));
-  Assert (this->update_flags & update_cell_normal_vectors,
+  Assert (this->update_flags & update_normal_vectors,
 	  typename FVB::ExcAccessToUninitializedField());
+  Assert (i<this->normal_vectors.size(),
+	  ExcIndexRange(i, 0, this->normal_vectors.size()));
 
-  return this->cell_normal_vectors[i];
+  return this->normal_vectors[i];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const Point<spacedim> &
+FEValuesBase<dim,spacedim>::cell_normal_vector (const unsigned int i) const
+{
+  return this->normal_vector(i);
 }
 
 
@@ -4534,21 +4554,6 @@ FEValues<dim,spacedim>::get_present_fe_values () const
 
 
 /*------------------------ Inline functions: FEFaceValuesBase --------------------*/
-
-
-template <int dim, int spacedim>
-inline
-const Point<dim> &
-FEFaceValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
-{
-  typedef FEValuesBase<dim,spacedim> FVB;
-  Assert (i<this->normal_vectors.size(),
-	  ExcIndexRange(i, 0, this->normal_vectors.size()));
-  Assert (this->update_flags & update_normal_vectors,
-	  typename FVB::ExcAccessToUninitializedField());
-
-  return this->normal_vectors[i];
-}
 
 
 template <int dim, int spacedim>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -113,7 +113,7 @@ enum UpdateFlags
 					* the real cell.
 					*/
       update_hessians                     = 0x0004,
-				       //! Outter normal vector, not normalized
+				       //! Outer normal vector, not normalized
 				       /**
 					* Vector product of tangential
 					* vectors, yielding a normal
@@ -143,21 +143,24 @@ enum UpdateFlags
 					* reference to realcell.
 					*/
       update_JxW_values                   = 0x0020,
-				       //! Normal vectors to the faces
+                                       //! Normal vectors
 				       /**
-					* Compute the unit outer
-					* normal vector on the face of
-					* a cell.
+					* Compute the normal vectors,
+					* either for a face or for a
+					* cell of codimension
+					* one. Setting this flag for
+					* any other object will raise
+					* an error.
 					*/
-      update_face_normal_vectors          = 0x0040,
-				       //! Normal vectors to the cells
+      update_normal_vectors               = 0x0040,
 				       /**
-					* Compute the unit outer
-					* normal vector on the cell
-					* itself. Only possible if
-					* dim=spacedim-1
+					* @deprecated Use #update_normal_vectors
+					*/
+      update_face_normal_vectors          = update_normal_vectors,
+				       /**
+					* @deprecated Use #update_normal_vectors
 					*/      
-      update_cell_normal_vectors          = 0x20000,
+      update_cell_normal_vectors          = update_normal_vectors,
 				       //! Volume element
 				       /**
 					* Compute the Jacobian of the
@@ -255,13 +258,6 @@ enum UpdateFlags
 					* derivatives.
 					*/
       update_second_derivatives = update_hessians,
-                                       //! Normal vectors
-				       /**
-					* @deprecated Update normal
-					* vectors. Use
-					* update_face_normal_vectors
-					*/
-      update_normal_vectors               = update_face_normal_vectors,
 				       //! Values needed for Piola transform
 				       /**
 					* Combination of the flags

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -366,7 +366,6 @@ MappingQ1<dim,spacedim>::update_once (const UpdateFlags in) const
   if (in & (update_covariant_transformation
 	    | update_contravariant_transformation
 	    | update_JxW_values
-	    | update_cell_normal_vectors
 	    | update_boundary_forms
 	    | update_normal_vectors
 	    | update_jacobians
@@ -389,7 +388,6 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 				      | update_covariant_transformation
 				      | update_contravariant_transformation
 				      | update_JxW_values
-				      | update_cell_normal_vectors
 				      | update_boundary_forms
 				      | update_normal_vectors
 				      | update_volume_elements
@@ -423,7 +421,6 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
   
       if (out & (update_covariant_transformation
 		 | update_JxW_values
-		 | update_cell_normal_vectors
 		 | update_jacobians
 		 | update_jacobian_grads
 		 | update_boundary_forms
@@ -442,8 +439,8 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
       if (out & update_contravariant_transformation)
 	out |= update_JxW_values;
 
-      if (out & update_cell_normal_vectors)
-	out |= update_JxW_values | update_cell_normal_vectors;
+      if (out & update_normal_vectors)
+	out |= update_JxW_values;
 
     }
   
@@ -744,7 +741,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   std::vector<Tensor<2,spacedim> >                          &jacobians,
   std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
   std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
-  std::vector<Point<spacedim> >                             &cell_normal_vectors,
+  std::vector<Point<spacedim> >                             &normal_vectors,
   CellSimilarity::Similarity                           &cell_similarity) const
 {
   // ensure that the following cast is really correct:
@@ -767,15 +764,15 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 				   // columns of the Jacobian and
 				   // store the cell normal vectors in
 				   // the case <2,3>
-  if (update_flags & (update_cell_normal_vectors
+  if (update_flags & (update_normal_vectors
 		      | update_JxW_values))
     {      
       Assert (JxW_values.size() == n_q_points,
 	       ExcDimensionMismatch(JxW_values.size(), n_q_points));
 
-      Assert( !(update_flags & update_cell_normal_vectors ) ||
-	      (cell_normal_vectors.size() == n_q_points),
-	     ExcDimensionMismatch(cell_normal_vectors.size(), n_q_points));
+      Assert( !(update_flags & update_normal_vectors ) ||
+	      (normal_vectors.size() == n_q_points),
+	     ExcDimensionMismatch(normal_vectors.size(), n_q_points));
 
       if (cell_similarity != CellSimilarity::translation)
 	for (unsigned int point=0; point<n_q_points; ++point)
@@ -790,11 +787,11 @@ MappingQ1<dim,spacedim>::fill_fe_values (
    	        data.contravariant[point]=transpose(data.contravariant[point]);
 		JxW_values[point]
 		  = data.contravariant[point][0].norm()*weights[point];
-		if(update_flags & update_cell_normal_vectors) 
+		if(update_flags & update_normal_vectors) 
 		{
-		  cell_normal_vectors[point][0]=-data.contravariant[point][0][1]
+		  normal_vectors[point][0]=-data.contravariant[point][0][1]
 		      /data.contravariant[point][0].norm();
-		  cell_normal_vectors[point][1]=data.contravariant[point][0][0]
+		  normal_vectors[point][1]=data.contravariant[point][0][0]
 		      /data.contravariant[point][0].norm();
 		}
 	      }
@@ -812,8 +809,8 @@ MappingQ1<dim,spacedim>::fill_fe_values (
                                           //is stored in the 3d
 		                          //subtensor of the contravariant tensor
 		data.contravariant[point][2]/=data.contravariant[point][2].norm();
-		if(update_flags & update_cell_normal_vectors) 
-		  cell_normal_vectors[point]=data.contravariant[point][2];
+		if(update_flags & update_normal_vectors) 
+		  normal_vectors[point]=data.contravariant[point][2];
 	      }
 	    
 	  }

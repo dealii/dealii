@@ -1463,9 +1463,6 @@ FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_p
 
   if (flags & update_normal_vectors)
     this->normal_vectors.resize(n_quadrature_points);
-
-  if (flags & update_cell_normal_vectors)
-    this->cell_normal_vectors.resize(n_quadrature_points);
 }
 
 
@@ -2959,12 +2956,21 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 template <int dim, int spacedim>
 const std::vector<Point<spacedim> > &
-FEValuesBase<dim,spacedim>::get_cell_normal_vectors () const
+FEValuesBase<dim,spacedim>::get_normal_vectors () const
 {
   typedef FEValuesBase<dim,spacedim> FEVB;
-  Assert (this->update_flags & update_cell_normal_vectors,
+  Assert (this->update_flags & update_normal_vectors,
 	  typename FEVB::ExcAccessToUninitializedField());
-  return this->cell_normal_vectors;
+  return this->normal_vectors;
+}
+
+
+
+template <int dim, int spacedim>
+const std::vector<Point<spacedim> > &
+FEValuesBase<dim,spacedim>::get_cell_normal_vectors () const
+{
+  return this->get_normal_vectors ();
 }
 
 
@@ -3114,20 +3120,14 @@ template <int dim, int spacedim>
 void
 FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 {
-				   // you can't compute normal vectors
-				   // on cells, only on faces
-  typedef FEValuesBase<dim,spacedim> FEVB;
-  Assert ((update_flags & update_normal_vectors) == false,
-	  typename FEVB::ExcInvalidUpdateFlag());
-
 				   // You can compute normal vectors
 				   // to the cells only in the
 				   // codimension one case.
-  if(dim == spacedim)
-    Assert ( (update_flags & update_cell_normal_vectors) == false,
-	     typename FEVB::ExcInvalidUpdateFlag());
-
-
+  typedef FEValuesBase<dim,spacedim> FEVB;
+  if (dim != spacedim-1)
+    Assert ((update_flags & update_normal_vectors) == false,
+	    typename FEVB::ExcInvalidUpdateFlag());
+  
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
 				   // then get objects into which the
@@ -3304,7 +3304,7 @@ void FEValues<dim,spacedim>::do_reinit ()
 				     this->jacobians,
 				     this->jacobian_grads,
 				     this->inverse_jacobians,
-				     this->cell_normal_vectors,
+				     this->normal_vectors,
 				     this->cell_similarity);
 
   this->get_fe().fill_fe_values(this->get_mapping(),
@@ -3348,18 +3348,6 @@ FEFaceValuesBase<dim,spacedim>::FEFaceValuesBase (const unsigned int n_q_points,
 					    fe),
 		quadrature(quadrature)
 {}
-
-
-
-template <int dim, int spacedim>
-const std::vector<Point<dim> > &
-FEFaceValuesBase<dim,spacedim>::get_normal_vectors () const
-{
-  typedef FEValuesBase<dim,spacedim> FEVB;
-  Assert (this->update_flags & update_normal_vectors,
-	  typename FEVB::ExcAccessToUninitializedField());
-  return this->normal_vectors;
-}
 
 
 

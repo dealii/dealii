@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -126,7 +126,7 @@ MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
   std::vector<Tensor<2,spacedim> >                          &jacobians,
   std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
   std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
-  std::vector<Point<spacedim> >                             &cell_normal_vectors,
+  std::vector<Point<spacedim> >                             &normal_vectors,
   CellSimilarity::Similarity                           &cell_similarity) const
 {
 				   // disable any previously detected
@@ -136,7 +136,7 @@ MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
   MappingQ1<dim,spacedim>::fill_fe_values (cell, q, mapping_data,
 					   quadrature_points, JxW_values, jacobians,
 					   jacobian_grads, inverse_jacobians,
-					   cell_normal_vectors, cell_similarity);
+					   normal_vectors, cell_similarity);
 }
 
 
