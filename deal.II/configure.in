@@ -686,6 +686,26 @@ AH_BOTTOM(
 #  define DEAL_VOLATILE
 #endif
 
+
+/**
+ * Have macros that should make testing for PETSc versions
+ * much simpler.
+ */
+#define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
+  ((PETSC_VERSION_MAJOR * 10000 + \
+    PETSC_VERSION_MINOR * 100) + \
+    PETSC_VERSION_SUBMINOR \
+    <  \
+    major*10000 + minor*100 + subminor)
+
+#define DEAL_II_PETSC_VERSION_GE(major,minor,subminor) \
+  ((PETSC_VERSION_MAJOR * 10000 + \
+    PETSC_VERSION_MINOR * 100) + \
+    PETSC_VERSION_SUBMINOR \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
+
+
 #include <base/numbers.h>
 
 /**
