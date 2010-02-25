@@ -601,7 +601,7 @@
     PETSC_VERSION_MINOR * 100) + \
     PETSC_VERSION_SUBMINOR \
     >=  \
-    major*10000 + minor*100 + subminor)
+    (major)*10000 + (minor)*100 + (subminor))
 
 
 #include <base/numbers.h>
