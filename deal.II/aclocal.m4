@@ -2206,7 +2206,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 [
-  AC_ARG_WITH(threads,
+  AC_ARG_ENABLE(threads,
               [AS_HELP_STRING([--enable-threads],
               [Use multiple threads inside deal.II])],
     [
@@ -2453,7 +2453,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_COMPAT_BLOCKER, dnl
 [
-  AC_ARG_WITH(compat-blocker,
+  AC_ARG_ENABLE(compat-blocker,
               [AS_HELP_STRING([--enable-compat-blocker=mapping],
               [Block functions that implicitely assume a Q1 mapping])],
       enable_compat_blocker="$enableval",
