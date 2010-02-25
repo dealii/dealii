@@ -39,7 +39,7 @@ namespace PETScWrappers
 
                                      // and destroy the solver object if we
                                      // are in old PETSc mode
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
+#if DEAL_II_PETSC_VERSION_LT(2,2,0)
     ierr = SLESDestroy (sles);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
