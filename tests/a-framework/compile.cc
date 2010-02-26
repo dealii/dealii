@@ -23,7 +23,7 @@
 
 int main ()
 {
-  std::ofstream logfile("run/output");
+  std::ofstream logfile("compile/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
