@@ -6,7 +6,8 @@ include Makefile.paths
 include $D/common/Make.global_options
 
 # first define the directories we should work on
-nofail-dirs = base      \
+nofail-dirs = a-framework \
+	      base      \
               lac       \
               fe        \
               deal.II   \
