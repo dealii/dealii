@@ -54,8 +54,8 @@ void check (double r1, double r2, unsigned int n, bool)
 	  typename Triangulation<dim>::DistortedCellList
 	    subset = GridTools::fix_up_distorted_child_cells (dcv,
 							      tria);
-	  Assert (subset.distorted_cells.size() == 0,
-		  ExcInternalError());
+	  deallog << subset.distorted_cells.size()
+		  << " distorted cells remaining" << std::endl;
 	}
     }
 
@@ -69,6 +69,12 @@ void check (double r1, double r2, unsigned int n, bool)
 
 int main()
 {
+  std::ofstream logfile("grid_hyper_shell/output");
+  deallog << std::setprecision(3);
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
+  
   check<2> (4., 5., 10, true);
   check<3> (3., 5., 6, true);
 }
