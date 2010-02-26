@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -78,7 +78,7 @@ namespace TrilinosWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {};
 
@@ -102,7 +102,7 @@ namespace TrilinosWrappers
                                         * Destructor.
                                         */
       ~PreconditionBase ();
-      
+
 				       /**
 					* Apply the preconditioner.
 					*/
@@ -158,10 +158,10 @@ namespace TrilinosWrappers
 					* case the matrix needs to be
 					* copied from deal.II format.
 					*/
-      std::auto_ptr<Epetra_Map>   map;
+      std::auto_ptr<Epetra_Map>   vector_distributor;
   };
 
-  
+
 /**
  * A wrapper class for a (pointwise) Jacobi preconditioner for
  * Trilinos matrices. This preconditioner works both in serial and in
@@ -175,8 +175,8 @@ namespace TrilinosWrappers
  * settings are 1 for the damping parameter and zero for the diagonal
  * augmentation.
  *
- * @ingroup TrilinosWrappers 
- * @ingroup Preconditioners 
+ * @ingroup TrilinosWrappers
+ * @ingroup Preconditioners
  * @author Martin Kronbichler, 2008
  */
   class PreconditionJacobi : public PreconditionBase
@@ -207,7 +207,7 @@ namespace TrilinosWrappers
                                         * is not too far away from the
                                         * one we want to
                                         * treat.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                        /**
@@ -218,7 +218,7 @@ namespace TrilinosWrappers
 					*/
 	AdditionalData (const double       omega = 1,
 			const double       min_diagonal = 0);
-	
+
                                        /**
 					* This specifies the
 					* relaxation parameter in the
@@ -259,10 +259,10 @@ namespace TrilinosWrappers
 					*/
       Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
-  
 
-  
-  
+
+
+
 /**
  * A wrapper class for a (pointwise) SSOR preconditioner for Trilinos
  * matrices. This preconditioner works both in serial and in parallel,
@@ -294,7 +294,7 @@ namespace TrilinosWrappers
   class PreconditionSSOR : public PreconditionBase
   {
     public:
- 
+
                                        /**
                                         * Standardized data struct to
                                         * pipe additional flags to the
@@ -325,7 +325,7 @@ namespace TrilinosWrappers
                                         * in parallel, forming a
                                         * so-called additive Schwarz
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                        /**
@@ -342,7 +342,7 @@ namespace TrilinosWrappers
 	AdditionalData (const double       omega = 1,
 			const double       min_diagonal = 0,
 			const unsigned int overlap = 0);
-	
+
                                        /**
 					* This specifies the (over-)
 					* relaxation parameter in the
@@ -372,7 +372,7 @@ namespace TrilinosWrappers
 					* processor in a parallel
 					* application should be.
 					*/
-	unsigned int overlap; 
+	unsigned int overlap;
       };
 
                                        /**
@@ -395,10 +395,10 @@ namespace TrilinosWrappers
 					*/
       Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
-  
 
-  
-  
+
+
+
 /**
  * A wrapper class for a (pointwise) SOR preconditioner for Trilinos
  * matrices. This preconditioner works both in serial and in parallel,
@@ -413,7 +413,7 @@ namespace TrilinosWrappers
  * if and how much overlap there should be between the matrix
  * partitions on the various MPI processes. The default settings are 1
  * for the relaxation parameter, 0 for the diagonal augmentation and 0
- * for the overlap. 
+ * for the overlap.
  *
  * Note that a parallel applicatoin of the SOR preconditioner is
  * actually a block-Jacobi preconditioner with block size equal to the
@@ -461,7 +461,7 @@ namespace TrilinosWrappers
                                         * in parallel, forming a
                                         * so-called additive Schwarz
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                        /**
@@ -508,7 +508,7 @@ namespace TrilinosWrappers
 					* processor in a parallel
 					* application should be.
 					*/
-	unsigned int overlap; 
+	unsigned int overlap;
       };
 
                                        /**
@@ -521,7 +521,7 @@ namespace TrilinosWrappers
                                         * are any.
 					*/
       void initialize (const SparseMatrix   &matrix,
-		       const AdditionalData &additional_data = AdditionalData()); 
+		       const AdditionalData &additional_data = AdditionalData());
 
     private:
 				       /**
@@ -613,7 +613,7 @@ namespace TrilinosWrappers
                                         * partitions when the
                                         * preconditioner runs in
                                         * parallel.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                        /**
@@ -687,7 +687,7 @@ namespace TrilinosWrappers
 					* processor in a parallel
 					* application should be.
 					*/
-	unsigned int overlap; 
+	unsigned int overlap;
       };
 
                                        /**
@@ -790,7 +790,7 @@ namespace TrilinosWrappers
                                         * partitions when the
                                         * preconditioner runs in
                                         * parallel.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                        /**
@@ -863,7 +863,7 @@ namespace TrilinosWrappers
 					* processor in a parallel
 					* application should be.
 					*/
-	unsigned int overlap; 
+	unsigned int overlap;
       };
 
                                        /**
@@ -964,7 +964,7 @@ namespace TrilinosWrappers
                                         * parameter specifies the overlap of
                                         * the partitions when the
                                         * preconditioner runs in parallel.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                        /**
@@ -1045,7 +1045,7 @@ namespace TrilinosWrappers
 					* processor in a parallel
 					* application should be.
 					*/
-	unsigned int overlap; 
+	unsigned int overlap;
       };
 
                                        /**
@@ -1096,14 +1096,14 @@ namespace TrilinosWrappers
                                         * Standardized data struct to
                                         * pipe additional parameters
                                         * to the preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                        /**
 					* Constructor.
 					*/
 	AdditionalData (const unsigned int overlap  = 0);
-	
+
 
                                        /**
 					* This determines how large
@@ -1133,7 +1133,7 @@ namespace TrilinosWrappers
 					*/
       Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
-  
+
 
 
 
@@ -1156,7 +1156,7 @@ namespace TrilinosWrappers
                                         * Standardized data struct to
                                         * pipe additional parameters
                                         * to the preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                        /**
@@ -1168,7 +1168,7 @@ namespace TrilinosWrappers
 			const double       min_eigenvalue   = 1.,
 			const double       min_diagonal     = 1e-12,
 			const bool         nonzero_starting = false);
-	
+
                                        /**
 					* This determines the degree of the
 					* Chebyshev polynomial. The degree
@@ -1250,7 +1250,7 @@ namespace TrilinosWrappers
 					*/
       Teuchos::RCP<Ifpack_Chebyshev> ifpack;
   };
-  
+
 
 
 /**
@@ -1531,8 +1531,8 @@ namespace TrilinosWrappers
 	    ExcNonMatchingMaps("dst"));
     Assert (src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
 	    ExcNonMatchingMaps("src"));
-    
-    const int ierr = preconditioner->ApplyInverse (src.trilinos_vector(), 
+
+    const int ierr = preconditioner->ApplyInverse (src.trilinos_vector(),
 						   dst.trilinos_vector());
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
@@ -1570,7 +1570,7 @@ namespace TrilinosWrappers
 		       dst.begin());
     Epetra_Vector RHS (View, preconditioner->OperatorRangeMap(),
 		       const_cast<double*>(src.begin()));
-  
+
     const int ierr = preconditioner->ApplyInverse (RHS, LHS);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }

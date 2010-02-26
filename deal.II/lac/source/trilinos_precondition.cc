@@ -49,7 +49,7 @@ namespace TrilinosWrappers
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                     communicator (base.communicator),
 #endif
-		    map (new Epetra_Map(*base.map))
+		    vector_distributor (new Epetra_Map(*base.vector_distributor))
   {}
 
 
@@ -561,13 +561,13 @@ namespace TrilinosWrappers
 
     parameter_list.set("smoother: sweeps",
 		       static_cast<int>(additional_data.smoother_sweeps));
-    parameter_list.set("cycle applications", 
+    parameter_list.set("cycle applications",
 		       static_cast<int>(additional_data.n_cycles));
     if (additional_data.w_cycle == true)
       parameter_list.set("prec type", "MGW");
     else
       parameter_list.set("prec type", "MGV");
-      
+
     parameter_list.set("smoother: Chebyshev alpha",10.);
     parameter_list.set("smoother: ifpack overlap",
 		       static_cast<int>(additional_data.smoother_overlap));
@@ -654,12 +654,13 @@ namespace TrilinosWrappers
 				        // equidistributed map; avoid
 				        // storing the nonzero
 				        // elements.
-    map.reset (new Epetra_Map(n_rows, 0, communicator));
+    vector_distributor.reset (new Epetra_Map(n_rows, 0, communicator));
 
     if (Matrix==0)
       Matrix = std_cxx1x::shared_ptr<SparseMatrix> (new SparseMatrix());
 
-    Matrix->reinit (*map, *map, deal_ii_sparse_matrix, drop_tolerance, true,
+    Matrix->reinit (*vector_distributor, *vector_distributor,
+		    deal_ii_sparse_matrix, drop_tolerance, true,
 		    use_this_sparsity);
 
     initialize (*Matrix, additional_data);
