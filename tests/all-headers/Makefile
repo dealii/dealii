@@ -32,6 +32,8 @@ endif
 %.cc :
 	@echo "=================== $@"
 	@echo "#include <$^>" > $@
+	@echo "// make sure we include config.h somehow:" >> $@
+	@echo "DEAL_II_NAMESPACE_OPEN DEAL_II_NAMESPACE_CLOSE" >> $@
 
 %.OK : %.g.$(OBJEXT)
 	@echo "=================== $@"
