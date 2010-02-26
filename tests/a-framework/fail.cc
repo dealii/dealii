@@ -12,8 +12,8 @@
 //----------------------------  timer.cc  ---------------------------
 
 
-// test the testsuite framework. this test is supposed to compile successfully
-// but not run
+// test the testsuite framework. this test is supposed to compile and link
+// successfully but not run
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -23,10 +23,12 @@
 
 int main ()
 {
-  std::ofstream logfile("miscompare/output");
+  std::ofstream logfile("fail/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  deallog << "FAIL!" << std::endl;
+  compile error;
+  
+  deallog << "OK" << std::endl;
 }
 

@@ -12,13 +12,15 @@
 //----------------------------  timer.cc  ---------------------------
 
 
-// test the testsuite framework. this test is supposed to compile successfully
-// but not run
+// test the testsuite framework. this test is supposed to compile
+// successfully but not link
 
 #include "../tests.h"
 #include <base/logstream.h>
 #include <fstream>
 #include <cstdlib>
+
+void function_that_does_not_exist ();
 
 
 int main ()
@@ -27,7 +29,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  std::abort ();
+  function_that_does_not_exist ();
   
   deallog << "OK" << std::endl;
 }

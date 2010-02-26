@@ -21,7 +21,7 @@ default: run-tests
 
 ############################################################
 
-tests_x = run compile link fail
+tests_x = run miscompare compile link fail
 
 # from above list of regular expressions, generate the real set of
 # tests
