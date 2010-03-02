@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -64,9 +64,9 @@ class MGTransferComponentBase
 				      * Memory used by this object.
 				      */
     unsigned int memory_consumption () const;
-    
 
-  protected:  
+
+  protected:
 				     /**
 				      * Actually build the prolongation
 				      * matrices for each level.
@@ -119,19 +119,19 @@ class MGTransferComponentBase
 				      * renumbering is required.
 				      */
     std::vector<unsigned int> target_component;
-    
+
 				     /**
 				      * Target component if
 				      * renumbering of level vectors
 				      * is required.
 				      */
     std::vector<unsigned int> mg_target_component;
-    
+
 				   /**
 				    * Sizes of the multi-level vectors.
 				    */
     mutable std::vector<std::vector<unsigned int> > sizes;
-  
+
 				   /**
 				    * Start index of each component.
 				    */
@@ -148,12 +148,12 @@ class MGTransferComponentBase
 				      * function first.
 				      */
     DeclException0(ExcMatricesNotBuilt);
-    
+
   private:
     std::vector<std_cxx1x::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
-    
+
   protected:
-    
+
 				     /**
 				      * The actual prolongation matrix.
 				      * column indices belong to the
@@ -163,7 +163,7 @@ class MGTransferComponentBase
 				      * child cell, i.e. the fine level.
 				      */
     std::vector<std_cxx1x::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
-    
+
 				     /**
 				      * Holds the mapping for the
 				      * <tt>copy_to/from_mg</tt>-functions.
@@ -174,15 +174,17 @@ class MGTransferComponentBase
     copy_to_and_from_indices;
 
 				     /**
-                                      * Store the boundary_indices. 
-                                      * These are needed for the 
-                                      * boundary values in the 
+                                      * Store the boundary_indices.
+                                      * These are needed for the
+                                      * boundary values in the
                                       * restriction matrix.
 				      */
     std::vector<std::set<unsigned int> > boundary_indices;
 };
 
 //TODO:[GK] Update documentation for copy_* functions
+
+//TODO: Use same kind of template argument as MGTransferSelect
 
 /**
  * Implementation of the MGTransferBase interface for block
@@ -219,7 +221,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Destructor.
 				      */
     virtual ~MGTransferSelect ();
-    
+
 				     /**
 				      * Actually build the prolongation
 				      * matrices for grouped components.
@@ -249,7 +251,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * renumbering of components in
 				      * the fine-level vector (see
 				      * DoFRenumbering::component_wise).
-				      * 
+				      *
 				      * @arg mg_target_component: this
 				      * argument allows grouping and
 				      * renumbering of components in
@@ -280,7 +282,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     void select (const unsigned int component,
 		 const unsigned int mg_component = numbers::invalid_unsigned_int);
-    
+
     virtual void prolongate (const unsigned int    to_level,
 			     Vector<number>       &dst,
 			     const Vector<number> &src) const;
@@ -288,7 +290,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     virtual void restrict_and_add (const unsigned int    from_level,
 				   Vector<number>       &dst,
 				   const Vector<number> &src) const;
-    
+
     				     /**
 				      * Transfer from a vector on the
 				      * global grid to a multilevel vector.
@@ -372,7 +374,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Memory used by this object.
 				      */
     unsigned int memory_consumption () const;
-    
+
   private:
 				     /**
 				      * Implementation of the public
