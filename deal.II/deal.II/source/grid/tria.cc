@@ -4064,7 +4064,7 @@ namespace internal
 	static
 	typename Triangulation<1,spacedim>::DistortedCellList
 	execute_refinement (Triangulation<1,spacedim> &triangulation,
-			    const bool check_for_distorted_cells)
+			    const bool /*check_for_distorted_cells*/)
 	  {
 	    const unsigned int dim = 1;
 
