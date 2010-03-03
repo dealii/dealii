@@ -222,6 +222,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      */
     virtual ~MGTransferSelect ();
 
+//TODO: rewrite docs; make sure defaulted args are actually allowed
 				     /**
 				      * Actually build the prolongation
 				      * matrices for grouped components.
@@ -231,14 +232,14 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * MGTransferComponentBase.
 				      *
 				      * @arg selected: Number of the
-				      * component of the global vector
+				      * block of the global vector
 				      * to be copied from and to the
 				      * multilevel vector. This number
 				      * refers to the renumbering by
 				      * <tt>target_component</tt>.
 				      *
 				      * @arg mg_selected: Number
-				      * of the component for which the
+				      * of the block for which the
 				      * transfer matrices should be
 				      * built.
 				      *
