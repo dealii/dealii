@@ -651,7 +651,7 @@ void MGTransferSelect<number>::build_matrices (
 		  const unsigned int global_start
 		    = component_start[target_component[component]];
 		  temp_copy_indices[level_dof_indices[i]-level_start] = 
-		    global_dof_indices[i]-global_start;
+		    global_dof_indices[i];//-global_start;
 		}
 	    }
 	}
