@@ -196,7 +196,7 @@ namespace
     for (unsigned int i=0; i<target_component.size(); ++i)
       if(selected[i])
         selected_block = target_component[i];
-    
+
     if (ndofs.size() == 0)
       {
 	std::vector<std::vector<unsigned int> >
@@ -247,18 +247,17 @@ MGTransferSelect<number>::do_copy_to_mg (
   for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level!=0;)
     {
       --level;
-      Vector<number> &dst_level = dst[level];
 
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
       for (IT i=copy_to_and_from_indices[level].begin();
 	   i != copy_to_and_from_indices[level].end(); ++i)
-	dst_level(i->second) = src(i->first);
+	dst[level](i->second) = src(i->first);
 				       // for that part of the level
 				       // which is further refined:
 				       // get the defect by
 				       // restriction of the defect on
 				       // one level higher
-      if(!first)
+      if (!first)
 	restrict_and_add (level+1, dst[level], dst[level+1]);
       first = false;
     }
@@ -504,10 +503,10 @@ void MGTransferComponentBase::build_matrices (
   // but only in the column of
   // the prolongation matrix
   //TODO: this way is not very efficient
-       
+
   if(boundary_indices.size() != 0)
   {
-    std::vector<std::vector<unsigned int> > 
+    std::vector<std::vector<unsigned int> >
       dofs_per_component(mg_dof.get_tria().n_levels(),
           std::vector<unsigned int>(n_components));
 
@@ -534,7 +533,7 @@ void MGTransferComponentBase::build_matrices (
                 const BlockIndices block_indices_coarse (dofs_per_component[level]);
                 const unsigned int global_j = block_indices_coarse.local_to_global(iblock, column_number);
 
-                std::set<unsigned int>::const_iterator found_dof = 
+                std::set<unsigned int>::const_iterator found_dof =
                   boundary_indices[level].find(global_j);
 
                 const bool is_boundary_index =
@@ -643,14 +642,14 @@ void MGTransferSelect<number>::build_matrices (
 	    {
 	      const unsigned int component
                 = fe.system_to_component_index(i).first;
-	      if (selected[component] && 
+	      if (selected[component] &&
                   !interface_dofs[level][level_dof_indices[i]])
 		{
 		  const unsigned int level_start
 		    = mg_component_start[level][mg_target_component[component]];
 		  const unsigned int global_start
 		    = component_start[target_component[component]];
-		  temp_copy_indices[level_dof_indices[i]-level_start] = 
+		  temp_copy_indices[level_dof_indices[i]-level_start] =
 		    global_dof_indices[i];//-global_start;
 		}
 	    }
