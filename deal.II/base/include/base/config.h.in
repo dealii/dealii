@@ -584,25 +584,31 @@
 #  define DEAL_VOLATILE
 #endif
 
-
 /**
- * Have macros that should make testing for PETSc versions
- * much simpler.
+ * These macros are defined to make testing for PETSc versions within
+ * the deal.II main code as simple as possible. In brief they are used
+ * like this: (i) DEAL_II_PETSC_VERSION_LT is used to advance the
+ * PETScWrappers to newer versions of PETSc while preserving backward
+ * compatibility; and (ii) DEAL_II_PETSC_VERSION_GTE is used to add
+ * functionality to the PETScWrappers that does not exist in previous
+ * versions of PETSc.  Examples of usage can be found in
+ * lac/source/petsc_matrix_base.h.  Note: SLEPcWrappers do not need
+ * their own anological macros, since SLEPc and PETSc must have
+ * identical version numbers anyways.
  */
 #define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
   ((PETSC_VERSION_MAJOR * 10000 + \
-    PETSC_VERSION_MINOR * 100) + \
-    PETSC_VERSION_SUBMINOR \
+    PETSC_VERSION_MINOR   * 100 + \
+    PETSC_VERSION_SUBMINOR)       \
     <  \
-    major*10000 + minor*100 + subminor)
-
-#define DEAL_II_PETSC_VERSION_GE(major,minor,subminor) \
-  ((PETSC_VERSION_MAJOR * 10000 + \
-    PETSC_VERSION_MINOR * 100) + \
-    PETSC_VERSION_SUBMINOR \
-    >=  \
     (major)*10000 + (minor)*100 + (subminor))
 
+#define DEAL_II_PETSC_VERSION_GTE(major,minor,subminor) \
+  ((PETSC_VERSION_MAJOR * 10000 + \
+    PETSC_VERSION_MINOR   * 100 + \
+    PETSC_VERSION_SUBMINOR)       \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
 
 #include <base/numbers.h>
 
