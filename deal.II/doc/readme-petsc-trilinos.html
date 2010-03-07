@@ -44,7 +44,6 @@
       on MPI since the native deal.II linear algebra classes lack this ability.
       </p>
 
-
       <h3>Configuring the interfaces to PETSc and Trilinos</h3>
 
       <p>
@@ -55,7 +54,6 @@
       packages: 
       </p>
 
-
       <h5>PETSc</h5>
       
       <p>
@@ -63,18 +61,18 @@
       environment variables <code>PETSC_DIR</code> and <code>PETSC_ARCH</code>
       to a path to PETSc and denoting the architecture for which PETSc is
       compiled. If these environment variables are set, then
-      <acronym>deal.II</acronym> will pick them up during configuration, and
-      store them. It will then also recognize that PETSc shall be used, and
-      enable the wrapper classes. 
+      <acronym>deal.II</acronym> will pick them up during
+      configuration, and store them. It will then also recognize that
+      PETSc shall be used, and enable the wrapper classes.
       </p>
 
       <p>
       Alternatively, the <code>--with-petsc=DIR</code> and
       <code>--with-petsc-arch=ARCH</code> switches to
       <code>./configure</code> can be used to override the values
-      of <code>PETSC_DIR</code> and <code>PETSC_ARCH</code> or if these
-      environment variables are not set at all. If you do have a PETSc installation
-      and have set the <code>PETSC_DIR</code> and
+      of <code>PETSC_DIR</code> and <code>PETSC_ARCH</code> or if
+      these environment variables are not set at all. If you do have a
+      PETSc installation and have set the <code>PETSC_DIR</code> and
       <code>PETSC_ARCH</code> environment variables but do not wish
       <acronym>deal.II</acronym> to be configured for PETSc use, you
       should specify <code>--with-petsc=no</code> as a flag during
@@ -83,30 +81,28 @@
 
       <p>
       Note that in order to use PETSc with <acronym>deal.II</acronym>
-      with the current version of <acronym>deal.II</acronym>, you
-      need to have at least PETSc version 2.3.1
-      installed. <acronym>deal.II</acronym> version 6.0 has been
-      tested up to PETSc release 2.3.3-p4.
+      with the current version of <acronym>deal.II</acronym> you will
+      need to have at least PETSc version 2.3.0 installed, earlier
+      releases are no longer supported. <acronym>deal.II</acronym>
+      version 6.2 has been tested up to PETSc release 3.0.0-p11.
       </p>
 
       <p>
-      Installing both PETSc and deal.II together can be a bit of a challenge. A
-      good summary of the relevant steps can be found on the <a
-      href="http://www-dimat.unipv.it/heltai/wikideal/index.php/Deal.II_Questions_and_Answers"
-      target="_top">Frequently Asked Questions page</a>, as well as
-      <a
-      href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2007/001820.html">in
-      this posting to the mailing list</a>. 
-      </p>
-
-      <p>
-      There is an additional caveat: PETSc appears not to co-operate well when using
-      threads and some programs crash when deal.II is compiled in its usual mode
-      supporting multithreading. If you see this sort of behavior, we
-      recommend to try disabling multithreading upon configuration of deal.II using the
+      There is an additional caveat: PETSc appears not to co-operate
+      well when using threads and some programs crash when deal.II is
+      compiled in its usual mode supporting multithreading. If you see
+      this sort of behavior, we recommend to try disabling
+      multithreading upon configuration of <acronym>deal.II</acronym>
+      using the
       <code>--disable-threads</code> switch to <code>./configure</code>.
       </p>
 
+      <p>
+      Installing both PETSc and deal.II together can be a bit of a
+      challenge. A good summary of the relevant steps can be found on
+      the <a href="http://www-dimat.unipv.it/heltai/wikideal/index.php/Deal.II_Questions_and_Answers"
+      target="_top">Frequently Asked Questions</a> page.
+      </p>
 
       <h5>Trilinos</h5>
 
@@ -151,7 +147,6 @@ make install
       Obviously the path names in the first line and at the end of the
       configure line need to be adjusted.
       </p>
-      
 
       <h6>Trilinos starting with version 10.0</h6>
 
@@ -162,7 +157,7 @@ make install
       the following slightly longish set of commands:
       <code>
       <pre>
-cd trilinos-9.0.2
+cd trilinos-10.0.2
 mkdir build
 cd build
 cmake \
@@ -205,7 +200,6 @@ make install
       want to use Trilinos with MPI on parallel machines, you also need to
       flip the value of the <code>TPL_ENABLE_MPI</code> flag above.
       </p>
-
 
       <h3>Configuring for installed Trilinos packages</h3>
 

@@ -32,6 +32,20 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Removed: The interface to PETSc has been simplified to better handle
+  incremental changes in PETSc versions and accomodate changes in
+  functionality between versions. As a part of this process, the
+  deal.II configure script no longer handles PETSc versions
+  <2.3.0. Attempting to configure deal.II with PETSc versions that are
+  not supported will result in the error message, "Unknown PETSc
+  version". The usage of the PETScWrappers are otherwise not affected
+  by this change.
+  <br>
+  (Toby D. Young 2010/03/06)
+  </p>
+
+  <li>
+  <p>
   Removed: The class TrilinosWrappers::PreconditionStokes has been deleted
   because it did not work properly, and it is too specific to be part of
   the general library. A preconditioner that has the same properties is
