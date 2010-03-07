@@ -21,8 +21,8 @@
 #  include <lac/petsc_precondition.h>
 #  include <cmath>
 
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
-#  include <petscsles.h>
+#if DEAL_II_PETSC_VERSION_LT(2,2,0)
+#include <petscsles.h>
 #endif
 #include <petscversion.h>
 
@@ -75,7 +75,8 @@ namespace PETScWrappers
                                      // us to work around this by offering two
                                      // completely different
                                      // implementations. sigh...
-#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR < 2)
+#if DEAL_II_PETSC_VERSION_LT(2,2,0)
+
                                      // first create a solver object
     SLES sles;
     ierr = SLESCreate (mpi_communicator, &sles);
@@ -163,7 +164,7 @@ namespace PETScWrappers
                                          // checks with the solver_control
                                          // object we have in this object for
                                          // convergence
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
         KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                reinterpret_cast<void *>(&solver_control));
 #else
@@ -179,7 +180,7 @@ namespace PETScWrappers
                                      // system. unfortunately, the call
                                      // sequence is different between PETSc
                                      // versions 2.2.0 and 2.2.1
-#  if (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)
+#if DEAL_II_PETSC_VERSION_LT(2,2,1)
     ierr = KSPSetRhs(solver_data->ksp,b);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     ierr = KSPSetSolution(solver_data->ksp, x);

@@ -192,7 +192,7 @@ namespace PETScWrappers
                                        // set symmetric flag, if so requested
       if (is_symmetric == true)
         {
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
           const int ierr
             = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
@@ -258,7 +258,7 @@ namespace PETScWrappers
                                        // set symmetric flag, if so requested
       if (is_symmetric == true)
         {
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
           const int ierr
             = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
@@ -368,9 +368,7 @@ namespace PETScWrappers
                                        // available. if we don't have this, we
                                        // have to somehow clumsily work around
                                        // the whole thing:
-#if (PETSC_VERSION_MAJOR <= 2) && \
-    ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+#if DEAL_II_PETSC_VERSION_LT(2,2,1)
 
 #ifdef PETSC_USE_64BIT_INDICES
           std::vector<PetscInt>
@@ -489,7 +487,7 @@ namespace PETScWrappers
 				           // further entries, so PETSc can
 				           // internally optimize some data
 				           // structures.
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
           const int ierr =
 	    MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
 #else

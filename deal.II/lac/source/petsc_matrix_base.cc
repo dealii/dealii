@@ -48,9 +48,7 @@ namespace PETScWrappers
 
                                        // get a representation of the present
                                        // row
-#if (PETSC_VERSION_MAJOR <= 2) && \
-    ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+#if DEAL_II_PETSC_VERSION_LT(2,2,1)
       int          ncols;
       int         *colnums;
       PetscScalar *values;
@@ -141,9 +139,7 @@ namespace PETScWrappers
 
                                      // now set all the entries of this row to
                                      // zero
-#if (PETSC_VERSION_MAJOR <= 2) && \
-    ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+#if DEAL_II_PETSC_VERSION_LT(2,2,1)
     const int petsc_row      = row;
 #else
     const PetscInt petsc_row = row;
@@ -152,7 +148,7 @@ namespace PETScWrappers
     IS index_set;
     ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr
       = MatZeroRows(matrix, index_set, &new_diag_value);
 #else
@@ -177,9 +173,7 @@ namespace PETScWrappers
 
                                      // now set all the entries of these rows
                                      // to zero
-#if (PETSC_VERSION_MAJOR <= 2) && \
-    ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+#if DEAL_II_PETSC_VERSION_LT(2,2,1)
     const std::vector<int>      petsc_rows (rows.begin(), rows.end());
 #else
     const std::vector<PetscInt> petsc_rows (rows.begin(), rows.end());
@@ -192,7 +186,7 @@ namespace PETScWrappers
     ISCreateGeneral (get_mpi_communicator(), rows.size(),
                      &petsc_rows[0], &index_set);
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr
       = MatZeroRows(matrix, index_set, &new_diag_value);
 #else
@@ -353,9 +347,7 @@ namespace PETScWrappers
 
                                      // get a representation of the present
                                      // row
- #if (PETSC_VERSION_MAJOR <= 2) && \
-    ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+#if DEAL_II_PETSC_VERSION_LT(2,2,1)
     int ncols;
     int         *colnums;
     PetscScalar *values;
@@ -426,7 +418,7 @@ namespace PETScWrappers
   MatrixBase &
   MatrixBase::operator *= (const PetscScalar a)
   {
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = MatScale (&a, matrix);
 #else
     const int ierr = MatScale (matrix, a);
@@ -443,7 +435,7 @@ namespace PETScWrappers
   {
     const PetscScalar factor = 1./a;
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = MatScale (&factor, matrix);
 #else
     const int ierr = MatScale (matrix, factor);
@@ -551,7 +543,7 @@ namespace PETScWrappers
   {
     int ierr;
 
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
     ierr = MatTranspose(matrix, PETSC_NULL);
 #else
     ierr = MatTranspose(matrix, MAT_REUSE_MATRIX, &matrix);
@@ -577,7 +569,7 @@ namespace PETScWrappers
 				     // First flush PETSc caches
     compress ();
 
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
 				     // avoid warning about unused variables
     (void) tolerance;
 
@@ -595,7 +587,7 @@ namespace PETScWrappers
     compress ();
 
                                        // Set options
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
     PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
 			  PETSC_VIEWER_ASCII_DEFAULT);
 #else

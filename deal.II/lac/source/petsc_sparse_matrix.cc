@@ -149,7 +149,7 @@ namespace PETScWrappers
                                      // set symmetric flag, if so requested
     if (is_symmetric == true)
       {
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
         const int ierr
           = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
@@ -194,7 +194,7 @@ namespace PETScWrappers
                                      // set symmetric flag, if so requested
     if (is_symmetric == true)
       {
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
         const int ierr
           = MatSetOption (matrix, MAT_SYMMETRIC);
 #else
@@ -264,7 +264,7 @@ namespace PETScWrappers
 				        // In the end, tell the matrix that
 				        // it should not expect any new
 				        // entries.
-#if (PETSC_VERSION_MAJOR <= 2)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
 	const int ierr =
 	  MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
 #else

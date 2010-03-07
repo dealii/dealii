@@ -1096,6 +1096,7 @@ namespace PETScWrappers
 					 */
       PetscTruth is_symmetric (const double tol = 0.0);
 
+#if DEAL_II_PETSC_VERSION_GTE(2,3,0)
                                         /**
 					 * Test whether a matrix is Hermitian,
 					 * i.e. it is the complex conjugate
@@ -1103,6 +1104,7 @@ namespace PETScWrappers
 					 * is zero.
 					 */
       PetscTruth is_hermitian (const double tol = 0.0);
+#endif
 
                                         /*
 					 * Abstract PETSc object that helps view

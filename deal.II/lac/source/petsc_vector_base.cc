@@ -138,7 +138,7 @@ namespace PETScWrappers
                                      // (see test bits/petsc_65)
     compress ();
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecSet (&s, vector);
 #else
     const int ierr = VecSet (vector, s);
@@ -597,7 +597,7 @@ namespace PETScWrappers
     Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecScale (&a, vector);
 #else
     const int ierr = VecScale (vector, a);
@@ -622,7 +622,7 @@ namespace PETScWrappers
     Assert (numbers::is_finite(factor),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecScale (&factor, vector);
 #else
     const int ierr = VecScale (vector, factor);
@@ -638,7 +638,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator += (const VectorBase &v)
   {
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const PetscScalar one = 1.0;
     const int ierr = VecAXPY (&one, v, vector);
 #else
@@ -655,7 +655,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator -= (const VectorBase &v)
   {
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const PetscScalar minus_one = -1.0;
     const int ierr = VecAXPY (&minus_one, v, vector);
 #else
@@ -676,7 +676,7 @@ namespace PETScWrappers
     Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecShift (&s, vector);
 #else
     const int ierr = VecShift (vector, s);
@@ -703,7 +703,7 @@ namespace PETScWrappers
     Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecAXPY (&a, v, vector);
 #else
     const int ierr = VecAXPY (vector, a, v);
@@ -729,7 +729,7 @@ namespace PETScWrappers
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector, w.vector};
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecMAXPY (2, weights, vector, addends);
 #else
     const int ierr = VecMAXPY (vector, 2, weights, addends);
@@ -748,7 +748,7 @@ namespace PETScWrappers
     Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecAYPX (&s, v, vector);
 #else
     const int ierr = VecAYPX (vector, s, v);
@@ -801,7 +801,7 @@ namespace PETScWrappers
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector,w.vector};
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecMAXPY (2, weights, vector, addends);
 #else
     const int ierr = VecMAXPY (vector, 2, weights, addends);
@@ -838,7 +838,7 @@ namespace PETScWrappers
     const PetscScalar weights[3] = {a,b,c};
     Vec               addends[3] = {v.vector, w.vector, x.vector};
 
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecMAXPY (3, weights, vector, addends);
 #else
     const int ierr = VecMAXPY (vector, 3, weights, addends);
@@ -911,7 +911,7 @@ namespace PETScWrappers
   VectorBase::ratio (const VectorBase &a,
                      const VectorBase &b)
   {
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+#if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr = VecPointwiseDivide (a, b, vector);
 #else
     const int ierr = VecPointwiseDivide (vector, a, b);
