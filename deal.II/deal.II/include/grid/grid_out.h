@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,22 +52,22 @@ namespace GridOutFlags
 					* Write cells.
 					*/
       bool write_cells;
-      
+
 				       /**
 					* Write faces.
 					*/
       bool write_faces;
-      
+
 				       /**
 					* Write field with diameters.
 					*/
       bool write_diameter;
-      
+
 				       /**
 					* Write field with area/volume.
 					*/
-      bool write_measure;      
-      
+      bool write_measure;
+
 				       /**
 					* Write all faces, including
 					* interior faces. If
@@ -75,7 +75,7 @@ namespace GridOutFlags
 					* boundary faces are written.
 					*/
       bool write_all_faces;
-      
+
 				       /**
 					* Constructor.
 					*/
@@ -96,15 +96,15 @@ namespace GridOutFlags
 					* ParameterHandler.
 					*/
       void parse_parameters (ParameterHandler& param);
-  };			   
-     
+  };
+
 				   /**
 				    * Flags describing the details of
 				    * output in MSH format.
 				    *
 				    * @ingroup output
 				    */
-  struct Msh 
+  struct Msh
   {
 				       /**
 					* When writing a mesh, write boundary
@@ -138,7 +138,7 @@ namespace GridOutFlags
 					* It is not necessary if you only want
 					* to write the triangulation to
 					* view or print it.
-					* 
+					*
 					* This is used only if
 					* <tt>dim==3</tt>, and ignored
 					* in all other cases.
@@ -146,11 +146,11 @@ namespace GridOutFlags
 					* Default: @p false.
 					*/
       bool write_lines;
-      
+
 				       /**
 					* Constructor.
 					*/
-    Msh (const bool write_faces    = false, 
+    Msh (const bool write_faces    = false,
 	 const bool write_lines	   = false);
       				       /**
 					* Declare parameters in
@@ -164,15 +164,15 @@ namespace GridOutFlags
 					*/
       void parse_parameters (ParameterHandler& param);
   };
-  
- 
+
+
 				   /**
 				    * Flags describing the details of
 				    * output in UCD format.
 				    *
 				    * @ingroup output
 				    */
-  struct Ucd 
+  struct Ucd
   {
 				       /**
 					* Write a comment at the
@@ -192,7 +192,7 @@ namespace GridOutFlags
 					* Default: <code>false</code>.
 					*/
       bool write_preamble;
-      
+
 				       /**
 					* When writing a mesh, write boundary
 					* faces explicitly if their boundary
@@ -211,7 +211,7 @@ namespace GridOutFlags
 					* Default: @p false.
 					*/
       bool write_faces;
-      
+
 				       /**
 					* When writing a mesh, write boundary
 					* lines explicitly if their boundary
@@ -233,7 +233,7 @@ namespace GridOutFlags
 					*  Default: @p false.
 					*/
       bool write_lines;
-      
+
 				       /**
 					* Constructor.
 					*/
@@ -253,8 +253,8 @@ namespace GridOutFlags
 					*/
       void parse_parameters (ParameterHandler& param);
   };
-  
-  
+
+
 				   /**
 				    * Flags describing the details of
 				    * output in GNUPLOT format.
@@ -301,7 +301,7 @@ namespace GridOutFlags
 					* <code>n_boundary_face_points>0</code>.
 					*/
       bool curved_inner_cells;
-      
+
 				       /**
 					* Constructor.
 					*/
@@ -348,12 +348,12 @@ namespace GridOutFlags
       enum SizeType {
 	    width, height
       };
-      
+
 				       /**
 					* See above. Default is @p width.
 					*/
       SizeType size_type;
-      
+
 				       /**
 					* Width or height of the output
 					* as given in postscript units
@@ -366,20 +366,20 @@ namespace GridOutFlags
 					* Default is 300.
 					*/
       unsigned int size;
-      
+
 				       /**
 					* Width of a line in postscript
 					* units. Default is 0.5.
 					*/
       double line_width;
-      
+
 				       /**
 					* Should lines with a set
 					* @p user_flag be drawn in a
 					* different color (red)?
 					*/
       bool color_lines_on_user_flag;
-      
+
 				       /**
 					* This is the number of
 					* points on a boundary face,
@@ -393,7 +393,7 @@ namespace GridOutFlags
 					* mapping.
 					*/
       unsigned int n_boundary_face_points;
-      
+
 				       /**
 					* Should lines be colored
 					* according to their
@@ -406,7 +406,7 @@ namespace GridOutFlags
 					* from blue to red.
 					*/
       bool color_lines_level;
-      
+
 				       /**
 					* Constructor.
 					*/
@@ -428,8 +428,8 @@ namespace GridOutFlags
 					*/
       void parse_parameters (ParameterHandler& param);
   };
-  
-  
+
+
 				   /**
 				    * Flags describing the details of
 				    * output for encapsulated postscript
@@ -448,7 +448,7 @@ namespace GridOutFlags
   template <int dim>
   struct Eps
   {};
-    
+
 				   /**
 				    * Flags specific to the output of
 				    * grids in one space dimensions.
@@ -456,7 +456,7 @@ namespace GridOutFlags
 				    * @ingroup output
 				    */
   template <>
-  struct Eps<1> : public EpsFlagsBase 
+  struct Eps<1> : public EpsFlagsBase
   {
 				       /**
 					* Constructor.
@@ -479,7 +479,7 @@ namespace GridOutFlags
       void parse_parameters (ParameterHandler& param);
   };
 
-    
+
 				   /**
 				    * Flags specific to the output of
 				    * grids in two space dimensions.
@@ -487,7 +487,7 @@ namespace GridOutFlags
 				    * @ingroup output
 				    */
   template <>
-  struct Eps<2> : public EpsFlagsBase 
+  struct Eps<2> : public EpsFlagsBase
   {
 				       /**
 					* If this flag is set, then we
@@ -529,7 +529,7 @@ namespace GridOutFlags
 					* flag. Default is @p false.
 					*/
       bool write_vertex_numbers;
-      
+
 				       /**
 					* Constructor.
 					*/
@@ -554,7 +554,7 @@ namespace GridOutFlags
 					*/
       void parse_parameters (ParameterHandler& param);
   };
-  
+
 				   /**
 				    * Flags specific to the output of
 				    * grids in three space dimensions.
@@ -572,7 +572,7 @@ namespace GridOutFlags
 					* of 60.
 					*/
       double azimut_angle;
-      
+
 				       /**
 					* Angle by which the viewers
 					* position projected onto the
@@ -587,7 +587,7 @@ namespace GridOutFlags
 					* of 30.
 					*/
       double turn_angle;
-      
+
 				       /**
 					* Constructor.
 					*/
@@ -672,7 +672,7 @@ namespace GridOutFlags
 					* is forwarded to XFig.
 					*/
       int line_style;
-      
+
 				       /**
 					* Thickness of border lines of
 					* polygons. Default is 1.
@@ -682,19 +682,19 @@ namespace GridOutFlags
 					* meshes.
 					*/
       int line_thickness;
-      
+
 				       /**
 					* Style for drawing lines at the
 					* boundary. Defaults to solid (0).
 					*/
       int boundary_style;
-      
+
 				       /**
 					* Thickness of boundary
 					* lines. Default is 3.
 					*/
       int boundary_thickness;
-      
+
 				       /**
 					* Constructor.
 					*/
@@ -711,7 +711,7 @@ namespace GridOutFlags
 					*/
       void parse_parameters (ParameterHandler& param);
   };
-  
+
 }
 
 
@@ -789,7 +789,7 @@ namespace GridOutFlags
  * @ingroup output
  * @author Wolfgang Bangerth, Guido Kanschat, Luca Heltai, 1999, 2003, 2006; postscript format based on an implementation by Stefan Nauber, 1999
  */
-class GridOut 
+class GridOut
 {
   public:
 				     /**
@@ -813,11 +813,16 @@ class GridOut
 					   /// write() calls write_ucd()
 	  ucd,
 					   /// write() calls write_xfig()
-	  xfig,	    
+	  xfig,
 					   /// write() calls write_msh()
 	  msh
     };
-    
+
+				     /**
+				      * Constructor.
+				      */
+    GridOut ();
+
 				     /**
 				      * Write triangulation in OpenDX
 				      * format.
@@ -826,7 +831,7 @@ class GridOut
 				      * together with their level and
 				      * their material id or boundary
 				      * indicator, resp.
-				      * 
+				      *
 				      * Not implemented for the
 				      * codimension one case.
 				      */
@@ -900,12 +905,12 @@ class GridOut
     void write_gnuplot (const Triangulation<dim> &tria,
 			std::ostream           &out,
 			const Mapping<dim>       *mapping=0) const;
-    
+
 				     /**
 				      * Write the triangulation in the
 				      * msh format.
 				      *
-				      * Msh 
+				      * Msh
 				      * is the format used by Gmsh and it is
 				      * described in the gmsh
 				      * user's guide. Besides the
@@ -1014,7 +1019,7 @@ class GridOut
 				      * the extension of the picture,
 				      * of which the default is 300.
 				      *
-				      * The flag 
+				      * The flag
 				      * @p color_lines_on_user_flag
 				      * allows to draw lines with the
 				      * @p user_flag set to be drawn in
@@ -1079,7 +1084,7 @@ class GridOut
     void write_xfig (const Triangulation<dim> &tria,
 		    std::ostream              &out,
 		    const Mapping<dim>        *mapping=0) const;
-    
+
 				     /**
 				      * Write grid to @p out according
 				      * to the given data format. This
@@ -1092,7 +1097,7 @@ class GridOut
 		std::ostream             &out,
 		const OutputFormat        output_format,
 		const Mapping<dim,spacedim>       *mapping=0) const;
-    
+
 				     /**
 				      * Write mesh in default format
 				      * set by ParameterHandler.
@@ -1101,7 +1106,7 @@ class GridOut
     void write (const Triangulation<dim,spacedim> &tria,
 		std::ostream             &out,
 		const Mapping<dim,spacedim>       *mapping=0) const;
-    
+
 				     /**
 				      * Set flags for DX output
 				      */
@@ -1171,7 +1176,7 @@ class GridOut
 				      * ParameterHandler.
 				      */
     std::string default_suffix () const;
-    
+
 				     /**
 				      * Return the @p OutputFormat value
 				      * corresponding to the given string. If
@@ -1208,13 +1213,13 @@ class GridOut
 				      * ParameterHandler.
 				      */
     static void declare_parameters (ParameterHandler& param);
-    
+
 				     /**
 				      * Parse parameters of
 				      * ParameterHandler.
 				      */
     void parse_parameters (ParameterHandler& param);
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -1233,19 +1238,19 @@ class GridOut
 				      * by a ParameterHandler.
 				      */
     OutputFormat default_format;
-    
+
 				     /**
 				      * Flags for OpenDX output.
 				      */
     GridOutFlags::DX dx_flags;
-  
+
 				     /**
 				      * Flags for GMSH output. Can be
 				      * changed by using the
 				      * @p set_flags function.
 				      */
     GridOutFlags::Msh     msh_flags;
-  
+
 				     /**
 				      * Flags for UCD output. Can be
 				      * changed by using the
@@ -1283,12 +1288,12 @@ class GridOut
 				      * function.
 				      */
     GridOutFlags::Eps<3>  eps_flags_3;
-    
+
 				     /**
 				      * Flags used for XFig output.
 				      */
     GridOutFlags::XFig xfig_flags;
-     
+
 				     /**
 				      * Write the grid information about
 				      * faces to @p out. Only those faces
@@ -1334,7 +1339,7 @@ class GridOut
     void write_msh_faces (const Triangulation<1,2> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
-   
+
 				     /**
 				      * Write the grid information about
 				      * lines to @p out. Only those lines
@@ -1377,7 +1382,7 @@ class GridOut
     void write_msh_lines (const Triangulation<1,1> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
-   
+
 				     /**
 				      * Declaration of the specialization
 				      * of above function for 1d, 2sd. Does
@@ -1428,7 +1433,7 @@ class GridOut
 				      * the function for <tt>dim==1</tt>. Bad luck.
 				      */
 
-   
+
     template <int dim, int spacedim>
     void write_ucd_faces (const Triangulation<dim,spacedim> &tria,
 			  const unsigned int        starting_index,
@@ -1479,7 +1484,7 @@ class GridOut
 				      * the function for <tt>dim==1/2</tt>. Bad luck.
 				      */
 
-   
+
     template <int dim, int spacedim>
     void write_ucd_lines (const Triangulation<dim,spacedim> &tria,
 			  const unsigned int        starting_index,
@@ -1519,7 +1524,7 @@ class GridOut
     void write_ucd_lines (const Triangulation<2,3> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
-    
+
 				     /**
 				      * Return the number of faces in the
 				      * triangulation which have a boundary
