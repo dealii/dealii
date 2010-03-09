@@ -167,7 +167,7 @@ class IndexSet
 				      * consideration.
 				      */
     unsigned int n_intervals () const;
-    
+
 				     /**
 				      * Compress the internal
 				      * representation by merging
@@ -231,7 +231,7 @@ class IndexSet
 				      */
     template <class STREAM>
     void print(STREAM &out) const;
-    
+
 #ifdef DEAL_II_USE_TRILINOS
 				     /**
 				      * Given an MPI communicator,
@@ -330,12 +330,12 @@ class IndexSet
 		     &&
 		     (range_1.end < range_2.end)));
 	  }
-	
+
 	static bool end_compare(const IndexSet::Range & x, const IndexSet::Range & y)
 	  {
 	    return x.end < y.end;
 	  }
-	
+
 	friend
 	inline bool operator== (const Range &range_1,
 				const Range &range_2)
@@ -427,7 +427,7 @@ inline
 void
 IndexSet::set_size (const unsigned int sz)
 {
-  Assert (ranges.size() == 0,
+  Assert (ranges.empty(),
 	  ExcMessage ("This function can only be called if the current "
 		      "object does not yet contain any elements."));
   index_space_size = sz;
@@ -532,7 +532,7 @@ inline
 bool
 IndexSet::is_element (const unsigned int index) const
 {
-  if (ranges.size() > 0)
+  if (ranges.empty() == false)
     {
       compress ();
 
