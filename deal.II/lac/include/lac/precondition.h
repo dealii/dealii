@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -136,7 +136,7 @@ class PreconditionRichardson : public Subscriptor
 				     /**
 				      * Change the relaxaton parameter.
 				      */
-    void initialize (const AdditionalData parameters);
+    void initialize (const AdditionalData &parameters);
 
 				     /**
 				      * Change the relaxaton parameter
@@ -148,7 +148,7 @@ class PreconditionRichardson : public Subscriptor
 				      */
     template <class MATRIX>
     void initialize (const MATRIX&,
-		     const AdditionalData parameters);
+		     const AdditionalData &parameters);
 
 				     /**
 				      * Apply preconditioner.
@@ -180,7 +180,7 @@ class PreconditionRichardson : public Subscriptor
 				      */
     template<class VECTOR>
     void Tvmult_add (VECTOR&, const VECTOR&) const;
-    
+
   private:
 				     /**
 				      * The relaxation parameter
@@ -241,7 +241,7 @@ class PreconditionUseMatrix : public Subscriptor
 				      * function of the matrix.
 				      */
     typedef void ( MATRIX::* function_ptr)(VECTOR&, const VECTOR&) const;
-    
+
 				     /**
 				      * Constructor.
 				      * This constructor stores a
@@ -253,7 +253,7 @@ class PreconditionUseMatrix : public Subscriptor
 				      */
     PreconditionUseMatrix(const MATRIX      &M,
 			  const function_ptr method);
-    
+
 				     /**
 				      * Execute preconditioning. Calls the
 				      * function passed to the constructor
@@ -268,7 +268,7 @@ class PreconditionUseMatrix : public Subscriptor
 				      * Pointer to the matrix in use.
 				      */
     const MATRIX &matrix;
-    
+
 				     /**
 				      * Pointer to the preconditioning
 				      * function.
@@ -303,9 +303,9 @@ class PreconditionRelaxation : public Subscriptor
 					 /**
 					  * Relaxation parameter.
 					  */
-	double relaxation;	
+	double relaxation;
     };
-    
+
 				     /**
 				      * Initialize matrix and
 				      * relaxation parameter. The
@@ -317,14 +317,14 @@ class PreconditionRelaxation : public Subscriptor
 				      * reasons. It defaults to 1.
 				      */
     void initialize (const MATRIX &A,
-		     AdditionalData parameters = AdditionalData());
-    
+		     const AdditionalData & parameters = AdditionalData());
+
 				     /**
 				      * Release the matrix and reset
 				      * its pointer.
 				      */
     void clear();
-    
+
   protected:
 				     /**
 				      * Pointer to the matrix object.
@@ -519,7 +519,7 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 				      */
     typedef PreconditionRelaxation<MATRIX> BaseClass;
 
-	
+
 				     /**
 				      * Initialize matrix and
 				      * relaxation parameter. The
@@ -531,7 +531,7 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 				      * reasons. It defaults to 1.
 				      */
     void initialize (const MATRIX &A,
-		     typename BaseClass::AdditionalData parameters = typename BaseClass::AdditionalData());
+		     const typename BaseClass::AdditionalData &parameters = typename BaseClass::AdditionalData());
 
 				     /**
 				      * Apply preconditioner.
@@ -633,9 +633,9 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
     void initialize (const MATRIX &A,
 		     const std::vector<unsigned int> &permutation,
 		     const std::vector<unsigned int> &inverse_permutation,
-		     typename PreconditionRelaxation<MATRIX>::AdditionalData
+		     const typename PreconditionRelaxation<MATRIX>::AdditionalData &
 		     parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
-    
+
 				     /**
 				      * Apply preconditioner.
 				      */
@@ -729,7 +729,7 @@ class PreconditionLACSolver : public Subscriptor
     void initialize (SOLVER&,
 		     const MATRIX&,
 		     const PRECONDITION&);
-    
+
 				     /**
 				      * Execute preconditioning.
 				      */
@@ -746,7 +746,7 @@ class PreconditionLACSolver : public Subscriptor
 				      * The matrix in use.
 				      */
     SmartPointer<const MATRIX,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > matrix;
-    
+
 				     /**
 				      * The preconditioner to use.
 				      */
@@ -833,192 +833,192 @@ class PreconditionedMatrix : public Subscriptor
 template <class MATRIX=SparseMatrix<double>, class VECTOR=Vector<double> >
 class PreconditionChebyshev : public Subscriptor
 {
-public:
-                                       /**
-                                        * Standardized data struct to
-                                        * pipe additional parameters
-                                        * to the preconditioner.
-                                        */      
-  struct AdditionalData
-  {
-                                       /**
-					* Constructor.
-					*/
-    AdditionalData (const unsigned int degree              = 0,
-		    const double       smoothing_range     = 0.,
-		    const bool         nonzero_starting    = false,
-		    const unsigned int eig_cg_n_iterations = 8,
-		    const double       eig_cg_residual     = 1e-2);
+  public:
+				     /**
+				      * Standardized data struct to
+				      * pipe additional parameters
+				      * to the preconditioner.
+				      */
+    struct AdditionalData
+    {
+					 /**
+					  * Constructor.
+					  */
+	AdditionalData (const unsigned int degree              = 0,
+			const double       smoothing_range     = 0.,
+			const bool         nonzero_starting    = false,
+			const unsigned int eig_cg_n_iterations = 8,
+			const double       eig_cg_residual     = 1e-2);
 
-                                       /**
-					* This determines the degree of the
-					* Chebyshev polynomial. The degree
-					* of the polynomial gives the number
-					* of matrix-vector products to be
-					* performed for one application of
-					* the vmult() operation. Degree zero
-					* corresponds to a damped Jacobi
-					* method.
-					*/
-    unsigned int degree;
+					 /**
+					  * This determines the degree of the
+					  * Chebyshev polynomial. The degree
+					  * of the polynomial gives the number
+					  * of matrix-vector products to be
+					  * performed for one application of
+					  * the vmult() operation. Degree zero
+					  * corresponds to a damped Jacobi
+					  * method.
+					  */
+	unsigned int degree;
 
-                                       /**
-					* This sets the range between the
-					* largest eigenvalue in the matrix
-					* and the smallest eigenvalue to be
-					* treated. If the parameter is zero,
-					* an estimate for the largest and
-					* for the smallest eigenvalue will
-					* be calculated
-					* internally. Otherwise, the
-					* Chebyshev polynomial will act in
-					* the interval
-					* $[\lambda_\mathrm{max}/
-					* \tt{smoothing\_range},
-					* \lambda_\mathrm{max}]$, where
-					* $\lambda_\mathrm{max}$ is an
-					* estimate of the maximum eigenvalue
-					* of the matrix. A choice of
-					* <tt>smoothing_range</tt> between 5
-					* and 20 is useful in case the
-					* preconditioner is used as a
-					* smoother in multigrid.
-					*/
-    double smoothing_range;
+					 /**
+					  * This sets the range between the
+					  * largest eigenvalue in the matrix
+					  * and the smallest eigenvalue to be
+					  * treated. If the parameter is zero,
+					  * an estimate for the largest and
+					  * for the smallest eigenvalue will
+					  * be calculated
+					  * internally. Otherwise, the
+					  * Chebyshev polynomial will act in
+					  * the interval
+					  * $[\lambda_\mathrm{max}/
+					  * \tt{smoothing\_range},
+					  * \lambda_\mathrm{max}]$, where
+					  * $\lambda_\mathrm{max}$ is an
+					  * estimate of the maximum eigenvalue
+					  * of the matrix. A choice of
+					  * <tt>smoothing_range</tt> between 5
+					  * and 20 is useful in case the
+					  * preconditioner is used as a
+					  * smoother in multigrid.
+					  */
+	double smoothing_range;
 
-                                       /**
-					* When this flag is set to
-					* <tt>true</tt>, it enables the
-					* method <tt>vmult(dst, src)</tt> to
-					* use non-zero data in the vector
-					* <tt>dst</tt>, appending to it the
-					* Chebyshev corrections. This can be
-					* useful in some situations
-					* (e.g. when used for high-frequency
-					* error smoothing in a multigrid
-					* algorithm), but not the way the
-					* solver classes expect a
-					* preconditioner to work (where one
-					* ignores the content in
-					* <tt>dst</tt> for the
-					* preconditioner application).
-					*/
-    bool nonzero_starting;
+					 /**
+					  * When this flag is set to
+					  * <tt>true</tt>, it enables the
+					  * method <tt>vmult(dst, src)</tt> to
+					  * use non-zero data in the vector
+					  * <tt>dst</tt>, appending to it the
+					  * Chebyshev corrections. This can be
+					  * useful in some situations
+					  * (e.g. when used for high-frequency
+					  * error smoothing in a multigrid
+					  * algorithm), but not the way the
+					  * solver classes expect a
+					  * preconditioner to work (where one
+					  * ignores the content in
+					  * <tt>dst</tt> for the
+					  * preconditioner application).
+					  */
+	bool nonzero_starting;
 
-				       /**
-					* Maximum number of CG iterations
-					* performed for finding the maximum
-					* eigenvalue.
-					*/
-    unsigned int eig_cg_n_iterations;
+					 /**
+					  * Maximum number of CG iterations
+					  * performed for finding the maximum
+					  * eigenvalue.
+					  */
+	unsigned int eig_cg_n_iterations;
 
-				       /**
-					* Tolerance for CG iterations
-					* performed for finding the maximum
-					* eigenvalue.
-					*/
-    double eig_cg_residual;
+					 /**
+					  * Tolerance for CG iterations
+					  * performed for finding the maximum
+					  * eigenvalue.
+					  */
+	double eig_cg_residual;
 
-				       /**
-					* Stores the inverse of the diagonal
-					* of the underlying matrix.
-					*/
-    VECTOR matrix_diagonal_inverse;
-  };
+					 /**
+					  * Stores the inverse of the diagonal
+					  * of the underlying matrix.
+					  */
+	VECTOR matrix_diagonal_inverse;
+    };
 
-  PreconditionChebyshev ();
+    PreconditionChebyshev ();
 
-                                       /**
-                                        * Initialize function. Takes the
-                                        * matrix which is used to form the
-                                        * preconditioner, and additional
-                                        * flags if there are any. This
-                                        * function works only if the input
-                                        * matrix has an operator
-                                        * <tt>el(i,i)</tt> for accessing all
-                                        * the elements in the
-                                        * diagonal. Alternatively, the
-                                        * diagonal can be supplied with the
-                                        * help of the AdditionalData field.
-					*
-					* This function calculates an
-					* estimate of the eigenvalue range
-					* of the matrix weighted by its
-					* diagonal using a modified CG
-					* iteration.
-                                        */
-  void initialize (const MATRIX         &matrix,
-		   const AdditionalData &additional_data = AdditionalData());
+				     /**
+				      * Initialize function. Takes the
+				      * matrix which is used to form the
+				      * preconditioner, and additional
+				      * flags if there are any. This
+				      * function works only if the input
+				      * matrix has an operator
+				      * <tt>el(i,i)</tt> for accessing all
+				      * the elements in the
+				      * diagonal. Alternatively, the
+				      * diagonal can be supplied with the
+				      * help of the AdditionalData field.
+				      *
+				      * This function calculates an
+				      * estimate of the eigenvalue range
+				      * of the matrix weighted by its
+				      * diagonal using a modified CG
+				      * iteration.
+				      */
+    void initialize (const MATRIX         &matrix,
+		     const AdditionalData &additional_data = AdditionalData());
 
-				       /** 
-					* Computes the action of the
-					* preconditioner on <tt>src</tt>,
-					* storing the result in
-					* <tt>dst</tt>.
-					*/
-  void vmult (VECTOR       &dst,
-	      const VECTOR &src) const;
+				     /**
+				      * Computes the action of the
+				      * preconditioner on <tt>src</tt>,
+				      * storing the result in
+				      * <tt>dst</tt>.
+				      */
+    void vmult (VECTOR       &dst,
+		const VECTOR &src) const;
 
-				       /** 
-					* Computes the action of the
-					* transposed preconditioner on
-					* <tt>src</tt>, storing the result
-					* in <tt>dst</tt>.
-					*/
-  void Tvmult (VECTOR       &dst,
-	       const VECTOR &src) const;
+				     /**
+				      * Computes the action of the
+				      * transposed preconditioner on
+				      * <tt>src</tt>, storing the result
+				      * in <tt>dst</tt>.
+				      */
+    void Tvmult (VECTOR       &dst,
+		 const VECTOR &src) const;
 
-				       /**
-					* Resets the preconditioner.
-					*/
-  void clear ();
+				     /**
+				      * Resets the preconditioner.
+				      */
+    void clear ();
 
-private:
+  private:
 
-				       /**
-					* A pointer to the underlying
-					* matrix.
-					*/
+				     /**
+				      * A pointer to the underlying
+				      * matrix.
+				      */
     SmartPointer<const MATRIX,PreconditionChebyshev<MATRIX,VECTOR> > matrix_ptr;
 
-				       /**
-					* Internal vector used for the
-					* <tt>vmult</tt> operation.
-					*/
-  mutable VECTOR update1;
+				     /**
+				      * Internal vector used for the
+				      * <tt>vmult</tt> operation.
+				      */
+    mutable VECTOR update1;
 
-				       /**
-					* Internal vector used for the
-					* <tt>vmult</tt> operation.
-					*/
-  mutable VECTOR update2;
+				     /**
+				      * Internal vector used for the
+				      * <tt>vmult</tt> operation.
+				      */
+    mutable VECTOR update2;
 
-				       /**
-					* Stores the additional data
-					* provided to the initialize
-					* function.
-					*/
-  AdditionalData data;
+				     /**
+				      * Stores the additional data
+				      * provided to the initialize
+				      * function.
+				      */
+    AdditionalData data;
 
-				       /**
-					* Average of the largest and
-					* smallest eigenvalue under
-					* consideration.
-					*/
-  double theta;
+				     /**
+				      * Average of the largest and
+				      * smallest eigenvalue under
+				      * consideration.
+				      */
+    double theta;
 
-				       /**
-					* Half the interval length between
-					* the largest and smallest
-					* eigenvalue under consideration.
-					*/
-  double delta;
+				     /**
+				      * Half the interval length between
+				      * the largest and smallest
+				      * eigenvalue under consideration.
+				      */
+    double delta;
 
-				       /**
-					* Stores whether the preconditioner
-					* has been set up.
-					*/
-  bool is_initialized;
+				     /**
+				      * Stores whether the preconditioner
+				      * has been set up.
+				      */
+    bool is_initialized;
 };
 
 
@@ -1084,7 +1084,7 @@ PreconditionRichardson::PreconditionRichardson ()
 
 inline void
 PreconditionRichardson::initialize (
-  const PreconditionRichardson::AdditionalData parameters)
+  const PreconditionRichardson::AdditionalData &parameters)
 {
   relaxation = parameters.relaxation;
 }
@@ -1095,7 +1095,7 @@ template <class MATRIX>
 inline void
 PreconditionRichardson::initialize (
   const MATRIX&,
-  const PreconditionRichardson::AdditionalData parameters)
+  const PreconditionRichardson::AdditionalData &parameters)
 {
   relaxation = parameters.relaxation;
 }
@@ -1139,7 +1139,7 @@ PreconditionRichardson::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 template <class MATRIX>
 inline void
 PreconditionRelaxation<MATRIX>::initialize (const MATRIX &rA,
-					    AdditionalData parameters)
+					    const AdditionalData &parameters)
 {
   A = &rA;
   relaxation = parameters.relaxation;
@@ -1250,23 +1250,23 @@ PreconditionSOR<MATRIX>::Tstep (VECTOR &dst, const VECTOR &src) const
 template <class MATRIX>
 inline void
 PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
-				      typename BaseClass::AdditionalData parameters)
+				      const typename BaseClass::AdditionalData &parameters)
 {
   this->PreconditionRelaxation<MATRIX>::initialize (rA, parameters);
 
 				   // in case we have a SparseMatrix class,
 				   // we can extract information about the
 				   // diagonal.
-  const SparseMatrix<typename MATRIX::value_type> * mat = 
-    dynamic_cast<const SparseMatrix<typename MATRIX::value_type> *>(&*this->A);   
+  const SparseMatrix<typename MATRIX::value_type> * mat =
+    dynamic_cast<const SparseMatrix<typename MATRIX::value_type> *>(&*this->A);
 
 				   // calculate the positions first after
 				   // the diagonal.
   if (mat != 0)
     {
-      const std::size_t  * rowstart_ptr = 
+      const std::size_t  * rowstart_ptr =
 	mat->get_sparsity_pattern().get_rowstart_indices();
-      const unsigned int * const colnums = 
+      const unsigned int * const colnums =
 	mat->get_sparsity_pattern().get_column_numbers();
       const unsigned int n = this->A->n();
       pos_right_of_diagonal.resize(n);
@@ -1279,7 +1279,7 @@ PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
 				       // note: the first entry in each
 				       // line denotes the diagonal element,
 				       // which we need not check.
-	  pos_right_of_diagonal[row] = 
+	  pos_right_of_diagonal[row] =
 	    std::lower_bound (&colnums[*rowstart_ptr+1],
 			      &colnums[*(rowstart_ptr+1)],
 			      row)
@@ -1340,7 +1340,7 @@ PreconditionPSOR<MATRIX>::initialize (
   const MATRIX &rA,
   const std::vector<unsigned int> &p,
   const std::vector<unsigned int> &ip,
-  typename PreconditionRelaxation<MATRIX>::AdditionalData parameters)
+  const typename PreconditionRelaxation<MATRIX>::AdditionalData &parameters)
 {
   permutation = &p;
   inverse_permutation = &ip;
@@ -1434,7 +1434,7 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::vmult (VECTOR &dst,
 {
   Assert (solver !=0 && matrix != 0 && precondition != 0,
 	  ExcNotInitialized());
-  
+
   solver->solve(*matrix, dst, src, *precondition);
 }
 
@@ -1530,7 +1530,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::PreconditionChebyshev ()
 
 template <class MATRIX, class VECTOR>
 inline
-void 
+void
 PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 						  const AdditionalData &additional_data)
 {
@@ -1549,10 +1549,10 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 
 				 // calculate largest eigenvalue using a
 				 // hand-tuned CG iteration on the matrix
-				 // weighted by its diagonal. we start 
-				 // with a vector that consists of ones 
+				 // weighted by its diagonal. we start
+				 // with a vector that consists of ones
 				 // only, weighted by the length.
-				 // 
+				 //
 				 // TODO: can we obtain this with the
 				 // regular CG implementation? we would need
 				 // to read the logfile in that case, which
@@ -1615,7 +1615,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 				 // include a safety factor since the CG
 				 // method will in general not be converged
   const double beta = 1.2 * max_eigenvalue;
-  const double alpha = (data.smoothing_range > 0 ? 
+  const double alpha = (data.smoothing_range > 0 ?
 			max_eigenvalue / data.smoothing_range :
 			max_eigenvalue / min_eigenvalue);
   delta = (beta-alpha)*0.5;
@@ -1627,7 +1627,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 
 template <class MATRIX, class VECTOR>
 inline
-void 
+void
 PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
 					     const VECTOR &src) const
 {
@@ -1665,7 +1665,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
 
 template <class MATRIX, class VECTOR>
 inline
-void 
+void
 PreconditionChebyshev<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
 					      const VECTOR &src) const
 {
