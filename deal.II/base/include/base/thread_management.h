@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -179,7 +179,7 @@ namespace Threads
 					* this function of course does
 					* nothing.
 					*/
-      inline void signal () {}
+      inline void signal () const {}
 
 				       /**
 					* Signal to multiple listener
@@ -190,7 +190,7 @@ namespace Threads
 					* this function of course does
 					* nothing.
 					*/
-      inline void broadcast () {}
+      inline void broadcast () const {}
 
 				       /**
 					* Wait for the condition to be
@@ -206,7 +206,7 @@ namespace Threads
 					* of course does nothing, but
 					* returns immediately.
 					*/
-      inline void wait (DummyThreadMutex &) {}
+      inline void wait (DummyThreadMutex &) const {}
   };
 
 
@@ -251,13 +251,13 @@ namespace Threads
 					* i.e. this function is a
 					* no-op.
 					*/
-      int wait () { return 0; }
+      int wait () const { return 0; }
 
 				       /**
 					* Dump the state of this
 					* object. Here: do nothing.
 					*/
-      void dump () {}
+      void dump () const {}
 
 				       /** @addtogroup Exceptions
 					* @{ */
