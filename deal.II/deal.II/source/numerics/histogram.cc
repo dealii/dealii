@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,7 +65,7 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 
 				   // store y_values
   y_values = y_values_;
-  
+
 				   // first find minimum and maximum value
 				   // in the indicators
   number min_value=0, max_value=0;
@@ -77,7 +77,7 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 				      values[0].end());
 	max_value = *std::max_element(values[0].begin(),
 				      values[0].end());
-	
+
 	for (unsigned int i=1; i<values.size(); ++i)
 	  {
 	    min_value = std::min (min_value,
@@ -87,24 +87,24 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 				  *std::max_element(values[i].begin(),
 						    values[i].end()));
 	  };
-	
+
 	break;
       };
-       
+
       case logarithmic:
       {
 	typedef bool (*comparator) (const number, const number);
 	const comparator logarithmic_less_function
 	  = &Histogram::template logarithmic_less<number>;
-	
+
 	min_value = *std::min_element(values[0].begin(),
 				      values[0].end(),
 				      logarithmic_less_function);
-	
+
 	max_value = *std::max_element(values[0].begin(),
 				      values[0].end(),
 				      logarithmic_less_function);
-	
+
 	for (unsigned int i=1; i<values.size(); ++i)
 	  {
 	    min_value = std::min (min_value,
@@ -112,17 +112,17 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 						    values[i].end(),
 						    logarithmic_less_function),
 				  logarithmic_less_function);
-	    
+
 	    max_value = std::max (max_value,
 				  *std::max_element(values[i].begin(),
 						    values[i].end(),
 						    logarithmic_less_function),
 				  logarithmic_less_function);
 	  };
-	
+
 	break;
       };
-       
+
       default:
 	    Assert (false, ExcInternalError());
     };
@@ -145,7 +145,7 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 				   // for the other data vectors by
 				   // copying
   intervals.push_back (std::vector<Interval>());
-  
+
   switch (interval_spacing)
     {
       case linear:
@@ -166,7 +166,7 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 	for (unsigned int n=0; n<n_intervals; ++n)
 	  intervals[0].push_back (Interval(std::exp(std::log(min_value)+n*delta),
 					   std::exp(std::log(min_value)+(n+1)*delta)));
-	
+
 	break;
       };
 
@@ -204,7 +204,7 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 template <typename number>
 void Histogram::evaluate (const Vector<number>    &values,
 			  const unsigned int       n_intervals,
-			  const IntervalSpacing    interval_spacing) 
+			  const IntervalSpacing    interval_spacing)
 {
   std::vector<Vector<number> > values_list (1,
 				       values);
@@ -216,7 +216,7 @@ void Histogram::evaluate (const Vector<number>    &values,
 void Histogram::write_gnuplot (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
-  Assert (intervals.size() > 0, ExcEmptyData());
+  Assert (!intervals.empty(), ExcEmptyData());
 
 				   // do a simple 2d plot, if only
 				   // one data set is available
@@ -275,9 +275,9 @@ void Histogram::write_gnuplot (std::ostream &out) const
 	      << ' '
 	      << intervals[i][n].content
 	      << std::endl;
-	
+
 	out << std::endl;
-	
+
       };
 
   AssertThrow (out, ExcIO());
@@ -285,7 +285,7 @@ void Histogram::write_gnuplot (std::ostream &out) const
 
 
 
-std::string Histogram::get_interval_spacing_names () 
+std::string Histogram::get_interval_spacing_names ()
 {
   return "linear|logarithmic";
 }
@@ -322,7 +322,7 @@ Histogram::memory_consumption () const
 // explicit instantiations for float
 template
 void Histogram::evaluate<float> (const std::vector<Vector<float> > &values,
-				 const std::vector<double>                  &y_values, 
+				 const std::vector<double>                  &y_values,
 				 const unsigned int                          n_intervals,
 				 const IntervalSpacing                       interval_spacing);
 template
@@ -334,7 +334,7 @@ void Histogram::evaluate<float> (const Vector<float>   &values,
 // explicit instantiations for double
 template
 void Histogram::evaluate<double> (const std::vector<Vector<double> >  &values,
-				  const std::vector<double>                    &y_values, 
+				  const std::vector<double>                    &y_values,
 				  const unsigned int                            n_intervals,
 				  const IntervalSpacing                         interval_spacing);
 template
