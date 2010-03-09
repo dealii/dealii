@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,7 +72,7 @@ class Subscriptor
 				      * is zero.
 				      */
     virtual ~Subscriptor();
-    
+
 				     /**
 				      * Assignment operator.
 				      *
@@ -83,7 +83,7 @@ class Subscriptor
 				      * <tt>*this</tt>.
 				      */
     Subscriptor& operator = (const Subscriptor&);
-        
+
 				     /**
 				      * Subscribes a user of the
 				      * object. The subscriber may be
@@ -91,7 +91,7 @@ class Subscriptor
 				      * <tt>identifier</tt>.
 				      */
     void subscribe (const char* identifier = 0) const;
-      
+
 				     /**
 				      * Unsubscribes a user from the
 				      * object.
@@ -119,17 +119,17 @@ class Subscriptor
 				      * List the subscribers to #deallog.
 				      */
     void list_subscribers () const;
-    
+
     				     /** @addtogroup Exceptions
 				      * @{ */
-    
+
 				     /**
 				      * Exception:
 				      * Object may not be deleted, since
 				      * it is used.
 				      */
     DeclException3(ExcInUse,
-		   int, char*, std::string&,
+		   int, char*, std::string &,
 		   << "Object of class " << arg2
 		   << " is still used by " << arg1 << " other objects."
 		   << arg3);
@@ -143,7 +143,7 @@ class Subscriptor
     DeclException2(ExcNoSubscriber, char*, char*,
 		   << "No subscriber with identifier \"" << arg2
 		   << "\" did subscribe to this object of class " << arg1);
-    
+
 				     /**
 				      * Exception: object should be
 				      * used when
@@ -160,28 +160,28 @@ class Subscriptor
 				      * subscribe() in debug mode.
 				      */
     void do_subscribe(const char* id) const;
-    
+
 				     /**
 				      * Deregister a subscriber for
 				      * debugging purposes. Called by
 				      * unsubscribe() in debug mode.
 				      */
     void do_unsubscribe(const char* id) const;
-    
+
 				     /**
 				      * The data type used in
 				      * #counter_map.
 				      */
     typedef std::map<const char*, unsigned int>::value_type
     map_value_type;
-    
+
 				     /**
 				      * The iterator type used in
 				      * #counter_map.
 				      */
     typedef std::map<const char*, unsigned int>::iterator
     map_iterator;
-    
+
     				     /**
 				      * Store the number of objects
 				      * which subscribed to this
@@ -213,7 +213,7 @@ class Subscriptor
 				      * add volatility.
 				      */
     mutable DEAL_VOLATILE unsigned int counter;
-    
+
 				     /**
 				      * In this map, we count
 				      * subscriptions for each
@@ -221,7 +221,7 @@ class Subscriptor
 				      * supplied to subscribe().
 				      */
     mutable std::map<const char*, unsigned int> counter_map;
-    
+
 				     /**
 				      * Pointer to the typeinfo object
 				      * of this object, from which we
