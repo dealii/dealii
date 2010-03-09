@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -422,7 +422,7 @@ namespace TrilinosWrappers
 					* sparsity pattern with non-trivial
 					* content.
 					*/
-      void operator = (const SparsityPattern &input_sparsity_pattern);
+      SparsityPattern & operator = (const SparsityPattern &input_sparsity_pattern);
 
                                        /**
                                         * Release all memory and return to a
@@ -1698,8 +1698,10 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern  (const IndexSet     &parallel_partitioning,
 				     const MPI_Comm     &communicator,
 				     const unsigned int  n_entries_per_row)
+		  :
+		  compressed (false)
   {
-    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, 
+    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
 							      false);
     reinit (map, map, n_entries_per_row);
   }
@@ -1710,8 +1712,10 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern  (const IndexSet     &parallel_partitioning,
 				     const MPI_Comm     &communicator,
 				     const std::vector<unsigned int> &n_entries_per_row)
+		  :
+		  compressed (false)
   {
-    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, 
+    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
 							      false);
     reinit (map, map, n_entries_per_row);
   }
@@ -1723,6 +1727,8 @@ namespace TrilinosWrappers
 				     const IndexSet     &col_parallel_partitioning,
 				     const MPI_Comm     &communicator,
 				     const unsigned int  n_entries_per_row)
+		  :
+		  compressed (false)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -1735,10 +1741,12 @@ namespace TrilinosWrappers
 
   inline
   SparsityPattern::
-    SparsityPattern  (const IndexSet     &row_parallel_partitioning,
-		      const IndexSet     &col_parallel_partitioning,
-		      const MPI_Comm     &communicator,
-		      const std::vector<unsigned int> &n_entries_per_row)
+  SparsityPattern  (const IndexSet     &row_parallel_partitioning,
+		    const IndexSet     &col_parallel_partitioning,
+		    const MPI_Comm     &communicator,
+		    const std::vector<unsigned int> &n_entries_per_row)
+		  :
+		  compressed (false)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -1750,12 +1758,12 @@ namespace TrilinosWrappers
 
 
   inline
-  void 
+  void
   SparsityPattern::reinit (const IndexSet     &parallel_partitioning,
 			   const MPI_Comm     &communicator,
 			   const unsigned int  n_entries_per_row)
   {
-    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, 
+    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
 							      false);
     reinit (map, map, n_entries_per_row);
   }
@@ -1767,7 +1775,7 @@ namespace TrilinosWrappers
 				const MPI_Comm     &communicator,
 				const std::vector<unsigned int> &n_entries_per_row)
   {
-    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, 
+    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
 							      false);
     reinit (map, map, n_entries_per_row);
   }
@@ -1830,7 +1838,7 @@ namespace TrilinosWrappers
 			   const MPI_Comm     &communicator,
 			   const bool          exchange_data)
   {
-    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, 
+    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
 							      false);
     reinit (map, map, nontrilinos_sparsity_pattern, exchange_data);
   }
