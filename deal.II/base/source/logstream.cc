@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -383,11 +383,11 @@ LogStream::memory_consumption () const
 				   // stack since we can't access
 				   // elements from further below
   std::stack<std::string> tmp;
-  while (tmp.size() > 0)
+  while (tmp.empty() == false)
     {
       mem += MemoryConsumption::memory_consumption (tmp.top());
       tmp.pop ();
-    };
+    }
 
   return mem;
 }
