@@ -1148,7 +1148,7 @@ void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::GnuplotFlags::parse_parameters (const ParameterHandler &/*prm*/)
+void DataOutBase::GnuplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -1457,7 +1457,7 @@ void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::GmvFlags::parse_parameters (const ParameterHandler &/*prm*/)
+void DataOutBase::GmvFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -1486,7 +1486,7 @@ void DataOutBase::TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::TecplotFlags::parse_parameters (const ParameterHandler &/*prm*/)
+void DataOutBase::TecplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -1510,7 +1510,7 @@ void DataOutBase::VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::VtkFlags::parse_parameters (const ParameterHandler &/*prm*/)
+void DataOutBase::VtkFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -1530,7 +1530,7 @@ void DataOutBase::Deal_II_IntermediateFlags::declare_parameters (ParameterHandle
 
 
 
-void DataOutBase::Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler &/*prm*/)
+void DataOutBase::Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 

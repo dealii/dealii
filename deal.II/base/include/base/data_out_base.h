@@ -82,7 +82,7 @@ class ParameterHandler;
  * concept, the following two sections are kept from a previous
  * version of this documentation.
  *
- * 
+ *
  * <h4>Patches</h4>
  *
  * Grids can be thought of as a collection of cells; if you want to write out
@@ -164,7 +164,7 @@ class ParameterHandler;
  * entirely free applications from knowledge which formats the library
  * presently allows to output; several of the example programs show how to do
  * this.
- * 
+ *
  * <h3>Output parameters</h3>
  *
  * All functions take a parameter which is a structure of type
@@ -214,7 +214,7 @@ class ParameterHandler;
  * @ingroup output
  * @author Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001, 2002, 2005, 2006.
  */
-class DataOutBase 
+class DataOutBase
 {
   public:
 				     /**
@@ -258,7 +258,7 @@ class DataOutBase
 					  * parameter available.
 					  */
 	static const unsigned int space_dim=spacedim;
-	
+
 					 /**
 					  * Corner points of a patch.
 					  * Inner points are computed by
@@ -293,7 +293,7 @@ class DataOutBase
 					  * we better store this.
 					  */
 	unsigned int patch_index;
-	
+
 					 /**
 					  * Number of subdivisions with
 					  * which this patch is to be
@@ -303,7 +303,7 @@ class DataOutBase
 					  * etc.
 					  */
 	unsigned int n_subdivisions;
-	
+
 					 /**
 					  * Data vectors. The format is
 					  * as follows:
@@ -366,7 +366,7 @@ class DataOutBase
 					  * output stream.
 					  */
 	bool points_are_available;
-	
+
 					 /**
 					  * Default constructor. Sets
 					  * <tt>n_subdivisions</tt> to one.
@@ -381,7 +381,7 @@ class DataOutBase
 					  * our testsuite.
 					  */
 	bool operator == (const Patch &patch) const;
-	
+
 					 /**
 					  * Determine an estimate for
 					  * the memory consumption (in
@@ -399,7 +399,7 @@ class DataOutBase
 					  * value.
 					  */
 	unsigned int memory_consumption () const;
-	
+
 					 /**
 					  * Value to be used if this
 					  * patch has no neighbor on
@@ -408,7 +408,7 @@ class DataOutBase
 	static const unsigned int no_neighbor = numbers::invalid_unsigned_int;
 					 /** @addtogroup Exceptions
 					  * @{ */
-	
+
 					 /**
 					  * Exception
 					  */
@@ -426,7 +426,7 @@ class DataOutBase
 				      *
 				      * @ingroup output
 				      */
-    struct DXFlags 
+    struct DXFlags
     {
 					 /**
 					  * Write neighbor
@@ -451,20 +451,20 @@ class DataOutBase
 					  * binary format.
 					  */
 	bool coordinates_binary;
-	
+
 					 /**
 					  * Write data vectors in
 					  * binary format.
 					  */
 	bool data_binary;
-	
+
 					 /**
 					  * Write binary coordinate
 					  * vectors as double (64 bit)
 					  * numbers instead of float (32 bit).
 					  */
 	bool data_double;
-	
+
 					 /**
 					  * Constructor.
 					  */
@@ -472,7 +472,7 @@ class DataOutBase
 		 const bool int_binary = false,
 		 const bool coordinates_binary = false,
 		 const bool data_binary = false);
-        
+
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
@@ -507,7 +507,7 @@ class DataOutBase
 				      *
 				      * @ingroup output
 				      */
-    struct UcdFlags 
+    struct UcdFlags
     {
 					 /**
 					  * Write a comment at the
@@ -528,7 +528,7 @@ class DataOutBase
 					  * Default: <code>false</code>.
 					  */
 	bool write_preamble;
-	
+
 					 /**
 					  * Constructor.
 					  */
@@ -578,7 +578,7 @@ class DataOutBase
 				      *
 				      * @ingroup output
 				      */
-    struct GnuplotFlags 
+    struct GnuplotFlags
     {
       private:
 					 /**
@@ -608,7 +608,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (const ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm) const;
 
 					 /**
 					  * Determine an estimate for
@@ -638,7 +638,7 @@ class DataOutBase
 				      *
 				      * @ingroup output
 				      */
-    struct PovrayFlags 
+    struct PovrayFlags
     {
 					 /**
 					  * Normal vector interpolation,
@@ -647,7 +647,7 @@ class DataOutBase
 					  * default = false
 					  */
 	bool smooth;
-	
+
 					 /**
 					  * Use bicubic patches (b-splines)
 					  * instead of triangles.
@@ -665,14 +665,14 @@ class DataOutBase
 					  * default = false
 					  */
 	bool external_data;
-	
+
 					 /**
 					  * Constructor.
 					  */
 	PovrayFlags (const bool smooth = false,
 		     const bool bicubic_patch = false,
 		     const bool external_data = false);
-	
+
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
@@ -718,7 +718,7 @@ class DataOutBase
 				      *
 				      * @ingroup output
 				      */
-    struct EpsFlags 
+    struct EpsFlags
     {
 					 /**
 					  * This denotes the number of the
@@ -740,7 +740,7 @@ class DataOutBase
 					  * <tt>height_vector</tt>.
 					  */
 	unsigned int color_vector;
-	
+
 					 /**
 					  * Enum denoting the possibilities
 					  * whether the scaling should be done
@@ -759,7 +759,7 @@ class DataOutBase
 					  * See above. Default is <tt>width</tt>.
 					  */
 	SizeType size_type;
-	
+
 					 /**
 					  * Width or height of the output
 					  * as given in postscript units
@@ -779,7 +779,7 @@ class DataOutBase
 					  * units. Default is 0.5.
 					  */
 	double line_width;
-	
+
 					 /**
 					  * Angle of the line origin-viewer
 					  * against the z-axis in degrees.
@@ -806,11 +806,11 @@ class DataOutBase
 					  * the following:
 					  *
 					  * @verbatim
-					  *  
+					  *
 					  *          3________7
 					  *          /       /|
 					  *         /       / |
-					  *       2/______6/  |   
+					  *       2/______6/  |
 					  *       |   |   |   |
 					  * O-->  |   0___|___4
 					  *       |  /    |  /
@@ -964,7 +964,7 @@ class DataOutBase
         grey_scale_color_function (const double value,
                                    const double min_value,
                                    const double max_value);
-	
+
 					 /**
 					  * This is one more
 					  * alternative color function
@@ -983,7 +983,7 @@ class DataOutBase
         reverse_grey_scale_color_function (const double value,
                                            const double min_value,
                                            const double max_value);
-	
+
 					 /**
 					  * Constructor.
 					  */
@@ -1049,7 +1049,7 @@ class DataOutBase
 				      *
 				      * @ingroup output
 				      */
-    struct GmvFlags 
+    struct GmvFlags
     {
       private:
 					 /**
@@ -1067,7 +1067,7 @@ class DataOutBase
 					  * Default constructor.
 					  */
 	GmvFlags ();
-	
+
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
@@ -1084,7 +1084,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (const ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm) const;
 
 					 /**
 					  * Determine an estimate for
@@ -1112,7 +1112,7 @@ class DataOutBase
 				      *
 				      * @ingroup output
 				      */
-    struct TecplotFlags 
+    struct TecplotFlags
     {
 
       public:
@@ -1134,13 +1134,13 @@ class DataOutBase
 					  * variable stores this name.
 					  */
 	const char* zone_name;
-	
+
 	                                 /**
 	                                  * Constructor
 	                                  **/
 	TecplotFlags (const char* tecplot_binary_file_name = NULL,
 		      const char* zone_name = NULL);
-      
+
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
@@ -1157,7 +1157,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (const ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm) const;
 
 					 /**
 					  * Determine an estimate for
@@ -1186,7 +1186,7 @@ class DataOutBase
 				      *
 				      * @ingroup output
 				      */
-    struct VtkFlags 
+    struct VtkFlags
     {
       private:
 					 /**
@@ -1221,7 +1221,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (const ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm) const;
 
 					 /**
 					  * Determine an estimate for
@@ -1297,7 +1297,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (const ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm) const;
 
 					 /**
 					  * Determine an estimate for
@@ -1317,7 +1317,7 @@ class DataOutBase
 					  */
 	unsigned int memory_consumption () const;
     };
-    
+
 				     /**
 				      * Provide a data type specifying
 				      * the presently supported output
@@ -1368,7 +1368,7 @@ class DataOutBase
 					    * SoftwareTecplot in text
 					    * format.
 					    */
-	  
+
 	  tecplot,
 					   /**
 					    * Output for @ref
@@ -1378,13 +1378,13 @@ class DataOutBase
 					    * format.
 					    */
 	  tecplot_binary,
-          
+
 					   /**
 					    * Output in @ref
 					    * SoftwareVTK format.
 					    */
 	  vtk,
-          
+
 					   /**
 					    * Output in deal.II
 					    * intermediate format.
@@ -1392,7 +1392,7 @@ class DataOutBase
 	  deal_II_intermediate
     };
 
-    
+
 /**
  * Write the given list of patches to the output stream in @ref
  * SoftwareOpenDX format.
@@ -1561,22 +1561,22 @@ class DataOutBase
  * A <tt>bicubic_patch</tt> is a 3-dimensional Bezier patch. It consists of 16 Points
  * describing the surface. The 4 corner points are touched by the object,
  * while the other 12 points pull and stretch the patch into shape.
- * One <tt>bicubic_patch</tt> is generated on each patch. Therefor the number of 
+ * One <tt>bicubic_patch</tt> is generated on each patch. Therefor the number of
  * subdivisions has to be 3 to provide the patch with 16 points.
  * A bicubic patch is not exact but generates very smooth images.
  *
  * <li> <tt>MESH</tt>
  * The mesh object is used to store large number of triangles.
- * Every square of the patch data is split into one upper-left and one 
+ * Every square of the patch data is split into one upper-left and one
  * lower-right triangle. If the number of subdivisions is three, 32 triangle
  * are generated for every patch.
- * 
+ *
  * Using the smooth flag povray interpolates the normals on the triangles,
  * imitating a curved surface
  * </ul>
  *
  * All objects get one texture definition called Tex. This texture has to be
- * declared somewhere before the object data. This may be in an external 
+ * declared somewhere before the object data. This may be in an external
  * data file or at the beginning of the output file.
  * Setting the <tt>external_data</tt> flag to false, an standard camera, light and
  * texture (scaled to fit the scene) is added to the outputfile. Set to true
@@ -1650,7 +1650,7 @@ class DataOutBase
  * several subdivisions of each cell. These subcells will then,
  * however, also appear as different cells by programs which
  * understand the UCD format.
- * 
+ *
  * No use is made of the possibility to give model data since these
  * are not supported by all UCD aware programs. You may give cell data
  * in derived classes by setting all values of a given data set on a
@@ -1754,7 +1754,7 @@ class DataOutBase
     static
     std::pair<unsigned int, unsigned int>
     determine_intermediate_format_dimensions (std::istream &input);
-    
+
 				     /**
 				      * Return the <tt>OutputFormat</tt>
 				      * value corresponding to the
@@ -1811,7 +1811,7 @@ class DataOutBase
 				      * </ul>
 				      */
     static std::string default_suffix (const OutputFormat output_format);
-    
+
 				     /**
 				      * Determine an estimate for
 				      * the memory consumption (in
@@ -1829,10 +1829,10 @@ class DataOutBase
 				      * value.
 				      */
     static unsigned int memory_consumption ();
-    
+
 				     /** @addtogroup Exceptions
 				      * @{ */
-    
+
 				     /**
 				      * Exception
 				      */
@@ -1857,8 +1857,8 @@ class DataOutBase
 		    char*,
 		    << "There was an error opening Tecplot file " << arg1
 		    << " for output");
-    
-				     //@}  
+
+				     //@}
   private:
 				     /**
 				      * Write the coordinates of nodes
@@ -1898,12 +1898,12 @@ class DataOutBase
     class EpsCell2d
     {
       public:
-	
+
 					 /**
 					  * Vector of vertices of this cell.
 					  */
 	Point<2> vertices[4];
-	
+
 					 /**
 					  * Data value from which the actual
 					  * colors will be computed by
@@ -1911,7 +1911,7 @@ class DataOutBase
 					  * in the <tt>EpsFlags</tt> class.
 					  */
 	float color_value;
-	
+
 					 /**
 					  * Depth into the picture, which
 					  * is defined as the distance from
@@ -1919,7 +1919,7 @@ class DataOutBase
 					  * direction of the line of sight.
 					  */
 	float depth;
-	
+
 					 /**
 					  * Comparison operator for
 					  * sorting.
@@ -2017,7 +2017,7 @@ class DataOutBase
  * Likewise, there is a function <tt>parse_parameters</tt> which reads
  * these parameters and stores them in the flags associated with
  * this object (see above).
- * 
+ *
  * Using these functions, you do not have to track which formats are
  * presently implemented.
  *
@@ -2099,12 +2099,12 @@ class DataOutInterface : private DataOutBase
     using DataOutBase::parse_output_format;
     using DataOutBase::get_output_format_names;
     using DataOutBase::determine_intermediate_format_dimensions;
-    
+
 				     /**
 				      * Constructor.
 				      */
     DataOutInterface ();
-    
+
                                      /**
                                       * Destructor. Does nothing, but is
                                       * declared virtual since this class has
@@ -2151,7 +2151,7 @@ class DataOutInterface : private DataOutBase
 				      * DataOut::write_povray.
 				      */
     void write_povray (std::ostream &out) const;
-    
+
     				     /**
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
@@ -2209,7 +2209,7 @@ class DataOutInterface : private DataOutBase
 				      * that was used for writing.
 				      */
     void write_deal_II_intermediate (std::ostream &out) const;
-    
+
 				     /**
 				      * Write data and grid to <tt>out</tt>
 				      * according to the given data
@@ -2288,7 +2288,7 @@ class DataOutInterface : private DataOutBase
 				      * Set the flags to be used for output in
 				      * deal.II intermediate format.
 				      */
-    void set_flags (const Deal_II_IntermediateFlags &deal_II_intermediate_flags);    
+    void set_flags (const Deal_II_IntermediateFlags &deal_II_intermediate_flags);
 
 				     /**
 				      * A function that returns the same
@@ -2342,7 +2342,7 @@ class DataOutInterface : private DataOutBase
 				      * by the set_flags() function.
 				      */
     void parse_parameters (ParameterHandler &prm);
-    
+
 				     /**
 				      * Determine an estimate for
 				      * the memory consumption (in
@@ -2427,7 +2427,7 @@ class DataOutInterface : private DataOutBase
     virtual
     std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const;
-    
+
 				     /**
 				      * The default number of
 				      * subdivisions for patches. This
@@ -2448,7 +2448,7 @@ class DataOutInterface : private DataOutBase
 				      * or in a parameter file.
 				      */
     OutputFormat default_fmt;
-    
+
 				     /**
 				      * Flags to be used upon output
 				      * of OpenDX data. Can be changed by
@@ -2488,7 +2488,7 @@ class DataOutInterface : private DataOutBase
 				      * using the <tt>set_flags</tt>
 				      * function.
 				      */
-    EpsFlags     eps_flags;    
+    EpsFlags     eps_flags;
 
 				     /**
 				      * Flags to be used upon output
@@ -2639,7 +2639,7 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
 				      * demonstrated in step-19.
                                       */
     void merge (const DataOutReader<dim,spacedim> &other);
-    
+
                                      /**
                                       * Exception
                                       */
@@ -2661,7 +2661,7 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
 		    << arg2 << "> or the space dimensions <"
 		    << arg3 << "> and <" << arg4
 		    << "> do not match!");
-    
+
   protected:
 				     /**
 				      * This is the function
@@ -2692,7 +2692,7 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
 				      * time we read a file.
 				      */
     virtual std::vector<std::string> get_dataset_names () const;
-    
+
 				     /**
 				      * This functions returns
 				      * information about how the
