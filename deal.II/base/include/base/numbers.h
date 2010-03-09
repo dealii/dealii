@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,7 @@ namespace numbers
 				    * array size, and the
 				    * like.
 				    */
-  static const unsigned int 
+  static const unsigned int
   invalid_unsigned_int = static_cast<unsigned int> (-1);
 
 				   /**
@@ -126,32 +126,32 @@ namespace numbers
   bool is_finite (const double x);
 
 				   /**
-				    * Return @p true if real and 
+				    * Return @p true if real and
 				    * imaginary parts of the given
 				    * complex number are finite.
 				    */
-  bool is_finite (const std::complex<double> x);
+  bool is_finite (const std::complex<double> &x);
 
 				   /**
-				    * Return @p true if real and 
+				    * Return @p true if real and
 				    * imaginary parts of the given
 				    * complex number are finite.
 				    */
-  bool is_finite (const std::complex<float> x);
-  
+  bool is_finite (const std::complex<float> &x);
+
 				   /**
-				    * Return @p true if real and 
+				    * Return @p true if real and
 				    * imaginary parts of the given
 				    * complex number are finite.
 				    *
 				    * Again may not work correctly if
-				    * real or imaginary parts are very	
-				    * large numbers that are infinite in 
-				    * terms of <code>double</code>, but 
-				    * finite with respect to 
+				    * real or imaginary parts are very
+				    * large numbers that are infinite in
+				    * terms of <code>double</code>, but
+				    * finite with respect to
 				    * <code>long double</code>.
 				    */
-  bool is_finite (const std::complex<long double> x);
+  bool is_finite (const std::complex<long double> &x);
 
 				   /**
 				    * A structure that, together with
@@ -182,7 +182,7 @@ namespace numbers
 					* <code>false</code>.
 					*/
       static const bool is_complex = false;
-      
+
 				       /**
 					* For this data type, typedef the
 					* corresponding real type. Since the
@@ -247,7 +247,7 @@ namespace numbers
 					* <code>true</code>.
 					*/
       static const bool is_complex = true;
-      
+
 				       /**
 					* For this data type, typedef the
 					* corresponding real type. Since this
@@ -287,7 +287,7 @@ namespace numbers
       static
       real_type abs (const std::complex<number> &x);
   };
-  
+
 }
 
 
@@ -357,10 +357,10 @@ namespace numbers
   {
     return std::norm (x);
   }
-  
+
 }
 
-  
+
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,9 +19,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace numbers 
+namespace numbers
 {
-  bool is_finite (const double x) 
+  bool is_finite (const double x)
   {
 #ifdef DEAL_II_HAVE_ISFINITE
     return std::isfinite (x);
@@ -37,33 +37,33 @@ namespace numbers
 
 
 
-  bool is_finite (const std::complex<double> x) 
+  bool is_finite (const std::complex<double> &x)
   {
 					// Check complex numbers for infinity
 					// by testing real and imaginary part
-    return ( is_finite (x.real()) 
-             && 
+    return ( is_finite (x.real())
+             &&
              is_finite (x.imag()) );
   }
 
 
 
-  bool is_finite (const std::complex<float> x) 
+  bool is_finite (const std::complex<float> &x)
   {
 					// Check complex numbers for infinity
 					// by testing real and imaginary part
-    return ( is_finite (x.real()) 
-             && 
+    return ( is_finite (x.real())
+             &&
              is_finite (x.imag()) );
   }
 
 
 
-  bool is_finite (const std::complex<long double> x) 
+  bool is_finite (const std::complex<long double> &x)
   {
 					// Same for std::complex<long double>
-    return ( is_finite (x.real()) 
-             && 
+    return ( is_finite (x.real())
+             &&
              is_finite (x.imag()) );
   }
 
@@ -78,7 +78,7 @@ namespace numbers
   template struct NumberTraits<double>;
   template struct NumberTraits<float>;
   template struct NumberTraits<long double>;
-    
+
   template struct NumberTraits<std::complex<double> >;
   template struct NumberTraits<std::complex<float> >;
   template struct NumberTraits<std::complex<long double> >;
