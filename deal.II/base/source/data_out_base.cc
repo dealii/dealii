@@ -1143,6 +1143,13 @@ DataOutBase::UcdFlags::memory_consumption () const
 
 
 
+DataOutBase::GnuplotFlags::GnuplotFlags ()
+		:
+		dummy (0)
+{}
+
+
+
 void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 {}
 
@@ -1522,6 +1529,13 @@ DataOutBase::VtkFlags::memory_consumption () const
 				   // use sizeof operator
   return sizeof (*this);
 }
+
+
+
+DataOutBase::Deal_II_IntermediateFlags::Deal_II_IntermediateFlags ()
+		:
+		dummy (0)
+{}
 
 
 
