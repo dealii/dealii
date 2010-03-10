@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,7 @@ class LogStream;
  * integer value", etc.
  *
  * @ingroup input
- */ 
+ */
 namespace Patterns
 {
 				   /**
@@ -68,19 +68,19 @@ namespace Patterns
 					* derived classes virtual.
 					*/
       virtual ~PatternBase ();
-	
+
 				       /**
 					* Return <tt>true</tt> if the given string
 					* matches the pattern.
 					*/
       virtual bool match (const std::string &test_string) const = 0;
-	
+
 				       /**
 					* Return a string describing the
 					* pattern.
 					*/
       virtual std::string description () const = 0;
-	
+
 				       /**
 					* Return a pointer to an
 					* exact copy of the
@@ -140,7 +140,7 @@ namespace Patterns
 					*/
       virtual unsigned int memory_consumption () const;
   };
-    
+
 				   /**
                                     * Test for the string being an
                                     * integer. If bounds are given
@@ -201,7 +201,7 @@ namespace Patterns
 					* are allowed.
 					*/
       static const int max_int_value;
-      
+
 				       /**
 					* Constructor. Bounds can be
 					* specified within which a
@@ -216,7 +216,7 @@ namespace Patterns
 					*/
       Integer (const int lower_bound = min_int_value,
 	       const int upper_bound = max_int_value);
-	
+
 				       /**
 					* Return <tt>true</tt> if the
 					* string is an integer and
@@ -247,7 +247,7 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
     private:
 				       /**
 					* Value of the lower
@@ -273,7 +273,7 @@ namespace Patterns
 					*/
       const int upper_bound;
   };
-    
+
 				   /**
                                     * Test for the string being a
                                     * <tt>double</tt>. If bounds are
@@ -323,7 +323,7 @@ namespace Patterns
 					* are allowed.
 					*/
       static const double min_double_value;
-      
+
 				       /**
 					* Maximal double value. If the
 					* numeric_limits class is
@@ -335,7 +335,7 @@ namespace Patterns
 					* are allowed.
 					*/
       static const double max_double_value;
-      
+
 				       /**
 					* Constructor. Bounds can be
 					* specified within which a
@@ -350,7 +350,7 @@ namespace Patterns
 					*/
       Double (const double lower_bound = min_double_value,
 	      const double upper_bound = max_double_value);
-	
+
 				       /**
 					* Return <tt>true</tt> if the
 					* string is a number and its
@@ -381,7 +381,7 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-	
+
     private:
 				       /**
 					* Value of the lower
@@ -407,7 +407,7 @@ namespace Patterns
 					*/
       const double upper_bound;
   };
-    
+
 				   /**
                                     * Test for the string being one
                                     * of a sequence of values given
@@ -526,7 +526,7 @@ namespace Patterns
                                         * Destructor.
                                         */
       virtual ~List ();
-      
+
 				       /**
 					* Return <tt>true</tt> if the
 					* string is a comma-separated
@@ -540,7 +540,7 @@ namespace Patterns
 					* Return a description of
 					* the pattern that valid
 					* strings are expected to
-					* match. 
+					* match.
 					*/
       virtual std::string description () const;
 
@@ -564,7 +564,7 @@ namespace Patterns
 
 				       /** @addtogroup Exceptions
 					* @{ */
-      
+
                                        /**
                                         * Exception.
                                         */
@@ -711,7 +711,7 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
   };
-        
+
 				   /**
                                     * Always returns <tt>true</tt> when testing a
                                     * string.
@@ -774,13 +774,13 @@ namespace Patterns
  *   step_19 "step-19" example program, and is used in more realistic
  *   situations in step-29, step-33
  *   and step-34.
- *   
+ *
  *   <h3>Declaring entries</h3>
- *   
+ *
  *   In order to use the facilities of a ParameterHandler object, one first has
  *   to make known the different entries the input file may or may not contain. This
  *   is done in the following way:
- *   
+ *
  *   @code
  *     ...
  *     ParameterHandler prm;
@@ -867,7 +867,7 @@ namespace Patterns
  *       eq2.declare_parameters (prm);
  *       prm.leave_subsection ();
  *       prm.leave_subsection ();
- *     }	
+ *     }
  *   @endcode
  *
  *
@@ -890,19 +890,19 @@ namespace Patterns
  *   only one. Since the latter applies also to the name of an entry, an entry name will not
  *   be recognised if in the declaration multiple whitespace is used.
  *
- *   In entry names and values the following characters are not allowed: <tt>\#</tt>, <tt>{</tt>, 
+ *   In entry names and values the following characters are not allowed: <tt>\#</tt>, <tt>{</tt>,
  *   <tt>}</tt>, <tt>|</tt>. Their use is reserved for the MultipleParameterLoop class.
- *   
+ *
  *   Comments starting with \# are skipped.
- *   
+ *
  *   We propose to use the following
  *   scheme to name entries: start the first word with a capital letter and use lowercase
  *   letters further on. The same applies to the possible entry values to the right of the
  *   <tt>=</tt> sign.
  *
- *   
+ *
  *   <h3>Reading data from input sources</h3>
- *   
+ *
  *   In order to read input you can use three possibilities: reading from an <tt>std::istream</tt> object,
  *   reading from a file of which the name is given and reading from a string in memory in
  *   which the lines are separated by <tt>@\n</tt> characters. These possibilites are used as follows:
@@ -930,9 +930,9 @@ namespace Patterns
  *   If an error occurs upon reading the input, error messages are
  *   written to <tt>std::cerr</tt>.
  *
- *   
+ *
  *   <h3>Getting entry values out of a ParameterHandler object</h3>
- *   
+ *
  *   Each class gets its data out of a ParameterHandler object by
  *   calling the get()  member functions like this:
  *   @code
@@ -953,7 +953,7 @@ namespace Patterns
  *
  *   You can use get() to retrieve the parameter in text form, get_integer() to get an integer
  *   or get_double() to get a double. You can also use get_bool().
- *   It will cause an internal error if the string could not be 
+ *   It will cause an internal error if the string could not be
  *   converted to an integer, double or a bool. This should, though, not
  *   happen if you correctly specified the regular expression for this entry; you should not
  *   try to get out an integer or a double from an entry for which no according regular
@@ -968,10 +968,10 @@ namespace Patterns
  *   thus set to default values; since default values may change in the process of
  *   program development, you cannot know the values of parameters not specified in the
  *   input file.
- *   
- *   
+ *
+ *
  *   <h3>Style guide for data retrieval</h3>
- *   
+ *
  *   We propose that every class which gets data out of a
  *   ParameterHandler object provides a function named
  *   <tt>get_parameters</tt>. This should be declared
@@ -980,7 +980,7 @@ namespace Patterns
  *
  *
  *   <h3>Experience with large parameter lists</h3>
- *  
+ *
  *   Experience has shown that in programs defining larger numbers of parameters (more than,
  *   say, fifty) it is advantageous to define an additional class holding these parameters.
  *   This class is more like a C-style structure, having a large number of variables,
@@ -993,7 +993,7 @@ namespace Patterns
  *   up your main class with dozens or more variables denoting the parameters.
  *
  *
- *   
+ *
  *   <h3>Worked Example</h3>
  *
  *   This is the code:
@@ -1002,7 +1002,7 @@ namespace Patterns
  *     #include "../include/parameter_handler.h"
  *
  DEAL_II_NAMESPACE_OPEN
- *     
+ *
  *     class LinEq {
  *       public:
  *         static void declare_parameters (ParameterHandler &prm);
@@ -1011,8 +1011,8 @@ namespace Patterns
  *         std::string Method;
  *         int    MaxIterations;
  *     };
- *     
- *     
+ *
+ *
  *     class Problem {
  *       private:
  *         LinEq eq1, eq2;
@@ -1022,9 +1022,9 @@ namespace Patterns
  *         static void declare_parameters (ParameterHandler &prm);
  *         void get_parameters (ParameterHandler &prm);
  *     };
- *     
- *     
- *     
+ *
+ *
+ *
  *     void LinEq::declare_parameters (ParameterHandler &prm) {
  *                                        // declare parameters for the linear
  *                                        // solver in a subsection
@@ -1038,8 +1038,8 @@ namespace Patterns
  *                          Patterns::Integer());
  *       prm.leave_subsection ();
  *     }
- *           
- *           
+ *
+ *
  *     void LinEq::get_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Linear solver");
  *       Method        = prm.get ("Solver");
@@ -1047,9 +1047,9 @@ namespace Patterns
  *       prm.leave_subsection ();
  *       std::cout << "  LinEq: Method=" << Method << ", MaxIterations=" << MaxIterations << std::endl;
  *     }
- *           
- *           
- *           
+ *
+ *
+ *
  *     void Problem::declare_parameters (ParameterHandler &prm) {
  *                                        // first some global parameter entries
  *       prm.declare_entry ("Output file",
@@ -1064,7 +1064,7 @@ namespace Patterns
  *       prm.declare_entry ("Equation 2",
  *                          "Elasticity",
  *                          Patterns::Anything());
- *     
+ *
  *                                        // declare parameters for the
  *                                        // first equation
  *       prm.enter_subsection ("Equation 1");
@@ -1075,7 +1075,7 @@ namespace Patterns
  *                          "sparse, or diagonal");
  *       LinEq::declare_parameters (prm);  // for eq1
  *       prm.leave_subsection ();
- *           
+ *
  *                                        // declare parameters for the
  *                                        // second equation
  *       prm.enter_subsection ("Equation 2");
@@ -1085,51 +1085,51 @@ namespace Patterns
  *       LinEq::declare_parameters (prm);  // for eq2
  *       prm.leave_subsection ();
  *     }
- *           
- *           
+ *
+ *
  *     void Problem::get_parameters (ParameterHandler &prm) {
  *                                        // entries of the problem class
  *       outfile = prm.get ("Output file");
- *     
+ *
  *       std::string equation1 = prm.get ("Equation 1"),
  *              equation2 = prm.get ("Equation 2");
- *       
+ *
  *                                        // get parameters for the
  *                                        // first equation
  *       prm.enter_subsection ("Equation 1");
  *       Matrix1 = prm.get ("Matrix type");
  *       eq1.get_parameters (prm);         // for eq1
  *       prm.leave_subsection ();
- *           
+ *
  *                                        // get parameters for the
  *                                        // second equation
  *       prm.enter_subsection ("Equation 2");
  *       Matrix2 = prm.get ("Matrix type");
  *       eq2.get_parameters (prm);         // for eq2
  *       prm.leave_subsection ();
- *     
+ *
  *       std::cout << "  Problem: outfile=" << outfile << std::endl
  *            << "           eq1="     << equation1 << ", eq2=" << equation2 << std::endl
  *            << "           Matrix1=" << Matrix1 << ", Matrix2=" << Matrix2 << std::endl;
  *     }
- *          
- *           
- *           
- *           
+ *
+ *
+ *
+ *
  *     void main () {
  *       ParameterHandler prm;
  *       Problem p;
- *           
+ *
  *       p.declare_parameters (prm);
- *           
+ *
  *                                        // read input from "prmtest.prm"; giving
  *                                        // argv[1] would also be a good idea
  *       prm.read_input ("prmtest.prm");
- *           
+ *
  *                                        // print parameters to std::cout as ASCII text
  *       std::cout << std::endl << std::endl;
  *       prm.print_parameters (std::cout, ParameterHandler::Text);
- *           
+ *
  *                                        // get parameters into the program
  *       std::cout << std::endl << std::endl
  *                 << "Getting parameters:" << std::endl;
@@ -1141,7 +1141,7 @@ namespace Patterns
  *     }
  *   @endcode
  *
- *   
+ *
  *   This is the input file (named "prmtest.prm"):
  *   @verbatim
  *                                 # first declare the types of equations
@@ -1227,7 +1227,7 @@ class ParameterHandler : public Subscriptor
 				      * assignment operator.
 				      */
     ParameterHandler& operator= (const ParameterHandler&);
-    
+
   public:
 				     /**
 				      * List of possible output
@@ -1269,7 +1269,7 @@ class ParameterHandler : public Subscriptor
     };
 
 
-    
+
 				     /**
 				      * Constructor.
 				      */
@@ -1284,7 +1284,7 @@ class ParameterHandler : public Subscriptor
 				      * spectacular.
 				      */
     virtual ~ParameterHandler ();
-    
+
 				     /**
 				      * Read input from a stream until
 				      * stream returns <tt>eof</tt>
@@ -1294,7 +1294,7 @@ class ParameterHandler : public Subscriptor
 				      * successful.
 				      */
     virtual bool read_input (std::istream &input);
-    
+
     				     /**
 				      * Read input from a file the
 				      * name of which is given. The
@@ -1317,7 +1317,7 @@ class ParameterHandler : public Subscriptor
     virtual bool read_input (const std::string &filename,
 			     const bool optional = false,
 			     const bool write_stripped_file = false);
-    
+
     				     /**
 				      * Read input from a string in
 				      * memory. The lines in memory
@@ -1365,13 +1365,13 @@ class ParameterHandler : public Subscriptor
                         const std::string           &default_value,
                         const Patterns::PatternBase &pattern = Patterns::Anything(),
                         const std::string           &documentation = std::string());
-    
+
 				     /**
 				      * Enter a subsection; if not yet
 				      * existent, declare it.
 				      */
     void enter_subsection (const std::string &subsection);
-    
+
 				     /**
 				      * Leave present subsection.
 				      * Return <tt>false</tt> if there is
@@ -1395,7 +1395,7 @@ class ParameterHandler : public Subscriptor
 				      * exception may be thrown).
 				      */
     const std::string & get (const std::string &entry_string) const;
-    
+
 				     /**
 				      * Return value of entry
 				      * <tt>entry_string</tt> as <tt>long
@@ -1404,7 +1404,7 @@ class ParameterHandler : public Subscriptor
 				      * can be returned by this function.)
 				      */
     long int       get_integer (const std::string &entry_string) const;
-    
+
 				     /**
 				      * Return value of entry
 				      * <tt>entry_name</tt> as
@@ -1415,7 +1415,7 @@ class ParameterHandler : public Subscriptor
 				     /**
 				      * Return value of entry
 				      * <tt>entry_name</tt> as <tt>bool</tt>.
-                                      * The entry may be "true" or "yes" 
+                                      * The entry may be "true" or "yes"
                                       * for <tt>true</tt>, "false" or
                                       * "no" for <tt>false</tt> respectively.
                                       */
@@ -1445,7 +1445,7 @@ class ParameterHandler : public Subscriptor
                                       */
     void           set (const std::string &entry_name,
                         const char        *new_value);
-    
+
                                      /**
                                       * Change the value presently stored for
                                       * <tt>entry_name</tt> to the one given
@@ -1486,8 +1486,8 @@ class ParameterHandler : public Subscriptor
                                       */
     void           set (const std::string &entry_name,
                         const bool        &new_value);
-    
-    
+
+
 				     /**
 				      * Print all parameters with the
 				      * given style to
@@ -1571,7 +1571,7 @@ class ParameterHandler : public Subscriptor
 				      * recursively by the previous
 				      * function.
 				      */
-    void log_parameters_section (LogStream& out);    
+    void log_parameters_section (LogStream& out);
 
 				     /**
 				      * Determine an estimate for
@@ -1580,7 +1580,7 @@ class ParameterHandler : public Subscriptor
 				      * object.
 				      */
     unsigned int memory_consumption () const;
-    
+
 				     /** @addtogroup Exceptions
 				      * @{ */
 
@@ -1596,7 +1596,7 @@ class ParameterHandler : public Subscriptor
     DeclException2 (ExcDefaultDoesNotMatchPattern,
 		    std::string, std::string,
 		    << "The default string <" << arg1
-		    << "> does not match the given pattern <" << arg2 << ">");  
+		    << "> does not match the given pattern <" << arg2 << ">");
 				     /**
 				      * Exception
 				      */
@@ -1606,7 +1606,7 @@ class ParameterHandler : public Subscriptor
 				      */
     DeclException1 (ExcEntryUndeclared,
 		    std::string,
-		    << "You can't ask for entry <" << arg1 << "> you have not yet declared");  
+		    << "You can't ask for entry <" << arg1 << "> you have not yet declared");
     				     /**
 				      * Exception
 				      */
@@ -1621,7 +1621,7 @@ class ParameterHandler : public Subscriptor
 				      * entry content and regexp, and
 				      * list of subsections.
 				      */
-    struct Section 
+    struct Section
     {
                                          /**
                                           * Destructor
@@ -1653,7 +1653,7 @@ class ParameterHandler : public Subscriptor
                                               */
             bool has_documentation () const;
         };
-        
+
                                          /**
                                           * Typedef for a type
                                           * describing all the entries
@@ -1712,7 +1712,7 @@ class ParameterHandler : public Subscriptor
 				      * subsections
 				      */
     Section defaults;
-    
+
 				     /**
 				      * Analogue list of changed
 				      * entries. The tree of
@@ -1758,10 +1758,10 @@ class ParameterHandler : public Subscriptor
 				      * in.
 				      */
     Section*       get_present_defaults_subsection ();
-    
+
 				     /**
 				      * Same, <tt>const</tt> version.
-				      */ 
+				      */
     const Section* get_present_defaults_subsection () const;
 
 				     /**
@@ -1770,7 +1770,7 @@ class ParameterHandler : public Subscriptor
 				      * for the subsection we are presently in.
 				      */
     Section* get_present_changed_subsection ();
-    
+
     				     /**
 				      * Same, <tt>const</tt> version.
 				      */
@@ -1817,7 +1817,7 @@ class ParameterHandler : public Subscriptor
  *   difficult to guess the mapping between the different variants and the appropriate
  *   entry in an array. You will have to check the order of declaration, or use
  *   only one variant entry.
- *   
+ *
  *   It is guaranteed that only selections which match the regular expression given
  *   upon declaration of an entry are given back to the program. If a variant value
  *   does not match the regular expression, the default value is stored and an error
@@ -1825,9 +1825,9 @@ class ParameterHandler : public Subscriptor
  *   for their conformance, so that the error is issued at the very beginning of the
  *   program.
  *
- *   
+ *
  *   <h3>Usage</h3>
- *   
+ *
  *   The usage of this class is similar to the ParameterHandler class. First the
  *   entries and subsections have to be declared, then a loop is performed in which
  *   the different parameter sets are set, a new instance of a user class is created
@@ -1837,48 +1837,48 @@ class ParameterHandler : public Subscriptor
  *     class HelperClass : public MultipleParameterLoop::UserClass {
  *       public:
  *         HelperClass ();
- *                     
+ *
  *         virtual void create_new (unsigned int runNo);
- *         virtual void declare_parameters (ParameterHandler &prm); 
+ *         virtual void declare_parameters (ParameterHandler &prm);
  *         virtual void run (ParameterHandler &prm);
  *       private:
  *         Problem *p;
  *     };
- *           
- *           
+ *
+ *
  *     HelperClass::HelperClass () : p(0) {}
- *           
- *           
+ *
+ *
  *     void HelperClass::create_new (unsigned int runNo) {
  *       if (p) delete p;
  *       p = new Problem;
  *     }
- *                    
- *           
+ *
+ *
  *     void HelperClass::declare_parameters (ParameterHandler &prm) {
  *           				   // entries of the problem class
  *             			   // note: must be static member!
  *       Problem::declare_parameters (prm);
  *     }
- *           
- *           
+ *
+ *
  *     void HelperClass::run (ParameterHandler &prm) {
  *       p->get_parameters (prm);
  *       p->do_useful_work ();
  *     }
- *               
- *           
- *           
+ *
+ *
+ *
  *     void main () {
  *       class MultipleParameterLoop prm;
  *       HelperClass h;
- *           
+ *
  *       h.declare_parameters (prm);
  *       prm.read_input ("prmtest.prm");
  *       prm.loop (h);
- *     }    
+ *     }
  *   @endcode
- *         
+ *
  *   As can be seen, first a new helper class has to be set up. This must contain
  *   a virtual constructor for a problem class. You can also derive your problem
  *   class from MultipleParameterLoop::UserClass and let <tt>create_new</tt> clear all
@@ -1904,7 +1904,7 @@ class ParameterHandler : public Subscriptor
  *         UserObject.create_new (runNo);
  *
  *         // set parameters for this run
- *  
+ *
  *         UserObject.run (*this);
  *       }
  *   @endcode
@@ -1912,9 +1912,9 @@ class ParameterHandler : public Subscriptor
  *   of the run (starting from one) to enable naming output files differently for each
  *   run.
  *
- *   
+ *
  *   <h3>Syntax for variant and array entry values</h3>
- *   
+ *
  *   Variant values are specified like <tt>prefix{ v1 | v2 | v3 | ... }postfix</tt>. Whitespace
  *   to the right of the opening brace <tt>{</tt> is ignored as well as to the left of the
  *   closing brace <tt>}</tt> while whitespace on the respectively other side is not ignored.
@@ -1924,10 +1924,10 @@ class ParameterHandler : public Subscriptor
  *
  *   The syntax for array values is equal, apart from the double braces:
  *   <tt>prefix{{ v1 | v2 | v3 }}postfix</tt>.
- *   
+ *
  *
  *   <h3>Worked example</h3>
- *   
+ *
  *   Given the above extensions to the example program for the ParameterHandler and the
  *   following input file
  *   @verbatim
@@ -1937,7 +1937,7 @@ class ParameterHandler : public Subscriptor
  *
  *     subsection Equation 1
  *       set Matrix type = Sparse
- *       subsection Linear solver 
+ *       subsection Linear solver
  *         set Solver                       = CG
  *         set Maximum number of iterations = { 10 | 20 | 30 }
  *       end
@@ -1986,8 +1986,8 @@ class ParameterHandler : public Subscriptor
  *   @endverbatim
  *   Since <tt>create_new</tt> gets the number of the run it would also be possible to output
  *   the number of the run.
- *   
- *   
+ *
+ *
  *   <h3>References</h3>
  *
  *   This class is inspired by the <tt>Multipleloop</tt> class of <tt>DiffPack</tt>.
@@ -2003,7 +2003,7 @@ class MultipleParameterLoop : public ParameterHandler
 				      * This is the class the helper class or the
 				      * problem class has to be derived of.
 				      */
-    class UserClass 
+    class UserClass
     {
       public:
                                          /**
@@ -2013,21 +2013,21 @@ class MultipleParameterLoop : public ParameterHandler
                                           * destructor.
                                           */
         virtual ~UserClass ();
-        
+
 					 /**
 					  * <tt>create_new</tt> must provide a clean
 					  * object, either by creating a new one
 					  * or by cleaning an old one.
 					  */
 	virtual void create_new (const unsigned int runNo) = 0;
-	
+
 					 /**
 					  * This should declare parameters and call
 					  * the <tt>declare_parameters</tt> function of the
 					  * problem class.
 					  */
 	virtual void declare_parameters (ParameterHandler &prm) = 0;
-	
+
 					 /**
 					  * Get the parameters and run any
 					  * necessary action.
@@ -2048,11 +2048,11 @@ class MultipleParameterLoop : public ParameterHandler
 				      */
     virtual ~MultipleParameterLoop ();
 
-    virtual bool read_input (std::istream &Input);    
+    virtual bool read_input (std::istream &Input);
     virtual bool read_input (const std::string &FileName,
 			     const bool optional = false,
 			     const bool write_stripped_file = false);
-    
+
     				     /**
 				      * Read input from a string in memory. The
 				      *  lines in memory have to be separated by
@@ -2079,7 +2079,7 @@ class MultipleParameterLoop : public ParameterHandler
 				      * An object in the list of entries with
 				      * multiple values.
 				      */
-    class Entry 
+    class Entry
     {
       public:
                                          /**
@@ -2089,7 +2089,7 @@ class MultipleParameterLoop : public ParameterHandler
                                           * array (in double curly braces
                                           * <tt>{{</tt>, <tt>}}</tt>).
                                           */
-        enum MultipleEntryType 
+        enum MultipleEntryType
         {
               variant, array
         };
@@ -2097,8 +2097,8 @@ class MultipleParameterLoop : public ParameterHandler
 					 /**
 					  * Constructor
 					  */
-	Entry () {}
-	
+	Entry () : type (array) {}
+
 					 /**
 					  * Construct an object with given subsection
 					  * path, name and value. The splitting up
@@ -2129,7 +2129,7 @@ class MultipleParameterLoop : public ParameterHandler
 					  * Original variant value.
 					  */
 	std::string         entry_value;
-	
+
 					 /**
 					  * List of entry values constructed out of
 					  * what was given in the input file (that
@@ -2156,7 +2156,7 @@ class MultipleParameterLoop : public ParameterHandler
 				      * List of variant entry values.
 				      */
     std::vector<Entry> multiple_choices;
-    
+
 				     /**
 				      * Number of branches constructed
 				      * from the different
@@ -2173,13 +2173,13 @@ class MultipleParameterLoop : public ParameterHandler
 				      * combinations.
 				      */
     void init_branches ();
-    
+
 				     /**
 				      * Initialize the branches in the
 				      * given section.
 				      */
     void init_branches_section (const ParameterHandler::Section &sec);
-    
+
 				     /**
 				      * Transfer the entry values for one run
 				      * to the entry tree.
