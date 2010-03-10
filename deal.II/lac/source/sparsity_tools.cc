@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -262,7 +262,7 @@ namespace SparsityTools
 				     // now if no valid points remain:
 				     // find dof with lowest coordination
 				     // number
-    if (last_round_dofs.size() == 0)
+    if (last_round_dofs.empty())
       last_round_dofs
 	.push_back (internal::find_unnumbered_starting_index (sparsity,
 							      new_indices));
@@ -318,7 +318,7 @@ namespace SparsityTools
 					 // components of the graph
 					 // that we would then have to
 					 // do next
-	if (next_round_dofs.size() == 0)
+	if (next_round_dofs.empty())
 	  {
 	    if (std::find (new_indices.begin(), new_indices.end(),
 			   numbers::invalid_unsigned_int)
@@ -343,7 +343,7 @@ namespace SparsityTools
 					     // an error if we got
 					     // here and starting
 					     // indices were given
-	    Assert (starting_indices.size() == 0,
+	    Assert (starting_indices.empty(),
 		    ExcMessage ("The input graph appears to have more than one "
 				"component, but as stated in the documentation "
 				"we only want to reorder such graphs if no "
