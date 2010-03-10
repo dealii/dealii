@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,7 @@
 // on SunOS 4.x, getrusage is stated in the man pages and exists, but
 // is not declared in resource.h. declare it ourselves
 #ifdef NO_HAVE_GETRUSAGE
-extern "C" { 
+extern "C" {
   int getrusage(int who, struct rusage* ru);
 }
 #endif
@@ -105,7 +105,7 @@ double Timer::stop ()
 
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
-      cumulative_wall_time += wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec 
+      cumulative_wall_time += wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
 	- start_wall_time;
     }
   return cumulative_time;
@@ -120,7 +120,7 @@ double Timer::operator() () const
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-      
+
       rusage usage_children;
       getrusage (RUSAGE_CHILDREN, &usage_children);
       const double dtime_children =
@@ -133,7 +133,7 @@ double Timer::operator() () const
 				   // of a single thread, since then the
 				   // communicator is MPI_COMM_SELF
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      double local_time = dtime - start_time + dtime_children 
+      double local_time = dtime - start_time + dtime_children
 	- start_time_children + cumulative_time;
 
       int mpiInitialized;
@@ -142,7 +142,7 @@ double Timer::operator() () const
       if ( mpiInitialized )
 	{
 	  double global_time = 0.;
-	  MPI_Allreduce (&local_time, &global_time, 1, MPI_DOUBLE, MPI_SUM, 
+	  MPI_Allreduce (&local_time, &global_time, 1, MPI_DOUBLE, MPI_SUM,
 			 mpi_communicator);
 	  return global_time;
 	}
@@ -162,7 +162,7 @@ double Timer::operator() () const
 	{
 	  double local_time = cumulative_time;
 	  double global_time = 0.;
-	  MPI_Allreduce (&local_time, &global_time, 1, MPI_DOUBLE, MPI_SUM, 
+	  MPI_Allreduce (&local_time, &global_time, 1, MPI_DOUBLE, MPI_SUM,
 			 mpi_communicator);
 	  return global_time;
 	}
@@ -182,7 +182,7 @@ double Timer::wall_time () const
     {
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
-      return wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec - start_wall_time + 
+      return wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec - start_wall_time +
 	cumulative_wall_time;
     }
   else
@@ -202,7 +202,7 @@ void Timer::reset ()
 
 /* ---------------------------- TimerOutput -------------------------- */
 
-TimerOutput::TimerOutput (std::ostream &stream, 
+TimerOutput::TimerOutput (std::ostream &stream,
 			  const enum OutputFrequency output_frequency,
 			  const enum OutputType output_type)
                           :
@@ -234,14 +234,14 @@ TimerOutput::TimerOutput (ConditionalOStream &stream,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
 TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
-			  std::ostream &stream, 
+			  std::ostream &stream,
 			  const enum OutputFrequency output_frequency,
 			  const enum OutputType output_type)
                           :
                           output_frequency (output_frequency),
 			  output_type (output_type),
                           out_stream (stream, true),
-			  output_is_enabled (true), 
+			  output_is_enabled (true),
 			  mpi_communicator (mpi_communicator)
 {}
 
@@ -273,7 +273,7 @@ TimerOutput::~TimerOutput()
 
 
 
-void 
+void
 TimerOutput::enter_subsection (const std::string &section_name)
 {
   Threads::ThreadMutex::ScopedLock lock (mutex);
@@ -284,7 +284,7 @@ TimerOutput::enter_subsection (const std::string &section_name)
   Assert (std::find (active_sections.begin(), active_sections.end(),
 		     section_name) == active_sections.end(),
 	  ExcMessage ("Cannot enter the already active section."));
-  
+
   if (sections.find (section_name) == sections.end())
     {
       sections[section_name].total_cpu_time = 0;
@@ -301,10 +301,10 @@ TimerOutput::enter_subsection (const std::string &section_name)
 
 
 
-void 
+void
 TimerOutput::leave_subsection (const std::string &section_name)
 {
-  Assert (active_sections.size() > 0,
+  Assert (!active_sections.empty(),
 	  ExcMessage("Cannot exit any section because none has been entered!"));
 
   Threads::ThreadMutex::ScopedLock lock (mutex);
@@ -325,7 +325,7 @@ TimerOutput::leave_subsection (const std::string &section_name)
 					   section_name);
 
   sections[actual_section_name].timer.stop();
-  sections[actual_section_name].total_wall_time 
+  sections[actual_section_name].total_wall_time
     += sections[actual_section_name].timer.wall_time();
 
 				       // get cpu time. on MPI systems, add
@@ -343,9 +343,9 @@ TimerOutput::leave_subsection (const std::string &section_name)
     int mpiInitialized;
     MPI_Initialized(&mpiInitialized);
 
-    if( mpiInitialized ) 
+    if( mpiInitialized )
       {
-	MPI_Allreduce (&cpu_time, &total_cpu_time, 1, MPI_DOUBLE, MPI_SUM, 
+	MPI_Allreduce (&cpu_time, &total_cpu_time, 1, MPI_DOUBLE, MPI_SUM,
 		       mpi_communicator);
 	cpu_time = total_cpu_time;
       }
@@ -382,7 +382,7 @@ TimerOutput::leave_subsection (const std::string &section_name)
 
 
 
-void 
+void
 TimerOutput::print_summary () const
 {
 				// in case we want to write CPU times
@@ -396,9 +396,9 @@ TimerOutput::print_summary () const
 	int mpiInitialized;
 	MPI_Initialized(&mpiInitialized);
 
-	if( mpiInitialized ) 
+	if( mpiInitialized )
 	  {
-	    MPI_Allreduce (&my_cpu_time, &total_cpu_time, 1, MPI_DOUBLE, 
+	    MPI_Allreduce (&my_cpu_time, &total_cpu_time, 1, MPI_DOUBLE,
 			   MPI_SUM, mpi_communicator);
 	  }
 	else
@@ -417,10 +417,10 @@ TimerOutput::print_summary () const
       for (std::map<std::string, Section>::const_iterator
 	     i = sections.begin(); i!=sections.end(); ++i)
 	check_time += i->second.total_cpu_time;
-	
+
       if (check_time > total_cpu_time)
 	total_cpu_time = check_time;
-      
+
 				       // generate a nice table
       out_stream << "\n\n"
 		 << "+---------------------------------------------+------------"
@@ -485,7 +485,7 @@ TimerOutput::print_summary () const
       for (std::map<std::string, Section>::const_iterator
 	     i = sections.begin(); i!=sections.end(); ++i)
 	check_time += i->second.total_wall_time;
-      
+
       if (check_time > total_wall_time)
 	total_wall_time = check_time;
 
@@ -542,7 +542,7 @@ TimerOutput::print_summary () const
 
 
 
-void 
+void
 TimerOutput::disable_output ()
 {
   output_is_enabled = false;
