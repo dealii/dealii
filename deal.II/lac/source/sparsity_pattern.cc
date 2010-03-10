@@ -1008,7 +1008,7 @@ SparsityPattern::block_read (std::istream &in)
   if (rowstart)
     delete[] rowstart;
   if (colnums)
-  delete[] colnums;
+    delete[] colnums;
 
   rowstart = new std::size_t[max_dim+1];
   colnums  = new unsigned int[max_vec_len];
