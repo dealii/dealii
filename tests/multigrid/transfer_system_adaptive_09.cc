@@ -11,7 +11,7 @@
 //
 //----------------------------------------------------------------------------
 
-// like _04, but checks the copy_to_mg and copy_from_mg of MGTransferSelect
+// like _08, but checks the copy_to_mg and copy_from_mg of MGTransferSelect
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -19,6 +19,9 @@
 #include <lac/block_vector.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <grid/grid_out.h>
 #include <dofs/dof_renumbering.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
@@ -37,14 +40,54 @@
 using namespace std;
 
 
+template<int dim>
+void refine_mesh (Triangulation<dim> &triangulation)
+{
+    bool cell_refined = false;
+  for (typename Triangulation<dim>::active_cell_iterator
+      cell = triangulation.begin_active();
+      cell != triangulation.end(); ++cell)
+  {
+      const Point<dim> p = cell->center();
+      bool positive = p(0) > 0;
+      if (positive)
+      {
+        cell->set_refine_flag();
+        cell_refined = true;
+      }
+  }
+  if(!cell_refined)//if no cell was selected for refinement, refine global
+    for (typename Triangulation<dim>::active_cell_iterator
+        cell = triangulation.begin_active();
+        cell != triangulation.end(); ++cell)
+      cell->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement ();
+}
+
 template <int dim>
 void check (const FiniteElement<dim>& fe, const unsigned int selected_block)
 {
   deallog << fe.get_name() << std::endl;
 
   Triangulation<dim> tr;
-  GridGenerator::hyper_cube(tr);
-  tr.refine_global(2);
+  std::vector<unsigned int> subdivisions (dim, 1);
+  subdivisions[0] = 2;
+
+  const Point<dim> bottom_left = (dim == 2 ?
+      Point<dim>(-1,-1) : Point<dim>(-1,-1,-1));
+  const Point<dim> top_right   = (dim == 2 ?
+      Point<dim>(1,1) : Point<dim>(1,1,1));
+  GridGenerator::subdivided_hyper_rectangle (tr,
+      subdivisions, bottom_left, top_right, true);
+  refine_mesh(tr);
+
+  std::ostringstream out_filename;
+  out_filename << "gitter.eps";
+
+  std::ofstream grid_output (out_filename.str().c_str());
+  GridOut grid_out;
+  grid_out.write_eps (tr, grid_output);
+
 
   MGDoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
@@ -119,7 +162,7 @@ void check (const FiniteElement<dim>& fe, const unsigned int selected_block)
 
 int main()
 {
-  std::ofstream logfile("transfer_system_05/output");
+  std::ofstream logfile("transfer_system_adaptive_09/output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

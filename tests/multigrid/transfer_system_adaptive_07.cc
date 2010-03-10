@@ -11,13 +11,17 @@
 //
 //----------------------------------------------------------------------------
 
-// like _03, but with a TransferSelect that selects the first two vector components as the first block
+// test like _05 but with a TransferSelect that selects the first two vector 
+// components as the first block
 
 #include "../tests.h"
+#include <base/function.h>
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <grid/tria.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
 #include <grid/grid_generator.h>
 #include <dofs/dof_renumbering.h>
 #include <dofs/dof_tools.h>
@@ -82,6 +86,30 @@ void print_matrix (const FullMatrix<double> &m)
 }
 
 
+template<int dim>
+void refine_mesh (Triangulation<dim> &triangulation)
+{
+    bool cell_refined = false;
+  for (typename Triangulation<dim>::active_cell_iterator
+      cell = triangulation.begin_active();
+      cell != triangulation.end(); ++cell)
+  {
+      const Point<dim> p = cell->center();
+      bool positive = p(0) > 0;
+      if (positive)
+      {
+        cell->set_refine_flag();
+        cell_refined = true;
+      }
+  }
+  if(!cell_refined)//if no cell was selected for refinement, refine global
+    for (typename Triangulation<dim>::active_cell_iterator
+        cell = triangulation.begin_active();
+        cell != triangulation.end(); ++cell)
+      cell->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement ();
+}
+
 
 
 template <int dim>
@@ -90,47 +118,59 @@ void check (const FiniteElement<dim>& fe)
   deallog << fe.get_name() << std::endl;
 
   Triangulation<dim> tr;
-  GridGenerator::hyper_cube(tr);
-  tr.refine_global(2);
+
+  std::vector<unsigned int> subdivisions (dim, 1);
+  subdivisions[0] = 2;
+
+  const Point<dim> bottom_left = (dim == 2 ?
+      Point<dim>(-1,-1) : Point<dim>(-1,-1,-1));
+  const Point<dim> top_right   = (dim == 2 ?
+      Point<dim>(1,1) : Point<dim>(1,1,1));
+  GridGenerator::subdivided_hyper_rectangle (tr,
+      subdivisions, bottom_left, top_right, true);
+  refine_mesh(tr);
 
   MGDoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
 
-  std::vector<unsigned int> block_component(3,0);
-  block_component[2]=1;
+  std::vector<unsigned int> block_selected(3,0);
+  block_selected[2] = 1;
 
-  DoFRenumbering::component_wise (mg_dof_handler, block_component);
+  deallog << "Global  dofs: " << mg_dof_handler.n_dofs() << std::endl;
+  for(unsigned int l=0; l<tr.n_levels(); ++l)
+    {
+      deallog << "Level " << l << " dofs:";
+	deallog << ' ' << mg_dof_handler.n_dofs(l);
+      deallog << std::endl;
+    }
+
+  DoFRenumbering::component_wise (mg_dof_handler, 
+      block_selected);
   for (unsigned int level=0; level<tr.n_levels(); ++level)
-    DoFRenumbering::component_wise (mg_dof_handler, level, block_component);
+    DoFRenumbering::component_wise (mg_dof_handler, 
+        level, block_selected);
 
   MGTransferSelect<double> transfer;
+  transfer.build_matrices(mg_dof_handler, mg_dof_handler, 
+      0, 0, block_selected, block_selected);
 
-  transfer.build_matrices(mg_dof_handler, mg_dof_handler,
-			  0, 0,
-			  block_component, block_component);
+  std::vector<std::vector<unsigned int> > 
+    dofs_per_block(tr.n_levels(), std::vector<unsigned int>(2));
+  MGTools::count_dofs_per_block(mg_dof_handler, 
+      dofs_per_block, block_selected);
 
-  std::vector<std::vector<unsigned int> > dofs_per_block(tr.n_levels(), std::vector<unsigned int>(2));
-  MGTools::count_dofs_per_block(mg_dof_handler, dofs_per_block, block_component);
   FullMatrix<double> prolong_0_1 (dofs_per_block[1][0],
                                   dofs_per_block[0][0]);
-  FullMatrix<double> prolong_1_2 (dofs_per_block[2][0],
-                                  dofs_per_block[1][0]);
 
   deallog << "Level 0->1" << std::endl;
   make_matrix (transfer, 1, prolong_0_1);
   print_matrix (prolong_0_1);
-
-  deallog << std::endl;
-
-  deallog << "Level 1->2" << std::endl;
-  make_matrix (transfer, 2, prolong_1_2);
-  print_matrix (prolong_1_2);
 }
 
 
 int main()
 {
-  std::ofstream logfile("transfer_system_04/output");
+  std::ofstream logfile("transfer_system_adaptive_07/output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

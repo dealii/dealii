@@ -22,7 +22,6 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_generator.h>
-#include <grid/grid_out.h>
 #include <dofs/dof_renumbering.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
@@ -88,25 +87,20 @@ void print_matrix (const FullMatrix<double> &m)
 template<int dim>
 void refine_mesh (Triangulation<dim> &triangulation)
 {
-    bool cell_refined = false;
+  bool cell_refined = false;
   for (typename Triangulation<dim>::active_cell_iterator
       cell = triangulation.begin_active();
       cell != triangulation.end(); ++cell)
   {
       const Point<dim> p = cell->center();
       bool positive = p(0) > 0;
-      //if (dim>1 && p(1) <= 0)
-      //  positive = false;
-      //if (dim>2 && p(2) <= 0)
-      //  positive = false;
       if (positive)
       {
         cell->set_refine_flag();
         cell_refined = true;
       }
   }
-  //Wenn nichts verfeinert wurde bisher, global verfeinern!
-  if(!cell_refined)
+  if(!cell_refined)//if no cell was selected for refinement, refine global
     for (typename Triangulation<dim>::active_cell_iterator
         cell = triangulation.begin_active();
         cell != triangulation.end(); ++cell)
@@ -133,13 +127,6 @@ void check (const FiniteElement<dim>& fe)
   GridGenerator::subdivided_hyper_rectangle (tr,
       subdivisions, bottom_left, top_right, true);
   refine_mesh(tr);
-//  tr.refine_global(1);
-  std::ostringstream out_filename;
-  out_filename<< "gitter.eps";
-  std::ofstream grid_output(out_filename.str().c_str());
-  GridOut grid_out;
-  grid_out.write_eps (tr, grid_output);
-
 
   MGDoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
@@ -156,29 +143,15 @@ void check (const FiniteElement<dim>& fe)
   for (unsigned int level=0; level<tr.n_levels(); ++level)
     DoFRenumbering::component_wise (mg_dof_handler, level);
 
-  std::vector<std::set<unsigned int> > boundary_indices(tr.n_levels());
-  typename FunctionMap<dim>::type      dirichlet_boundary;
-  ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
-  dirichlet_boundary[0] =             &dirichlet_bc;
-
-  MGTools::make_boundary_list (mg_dof_handler, dirichlet_boundary,
-			       boundary_indices);
-
   MGTransferPrebuilt<Vector<double> > transfer;
-  transfer.build_matrices(mg_dof_handler);//, boundary_indices);
+  transfer.build_matrices(mg_dof_handler);
 
   FullMatrix<double> prolong_0_1 (mg_dof_handler.n_dofs(1),
 				  mg_dof_handler.n_dofs(0));
-//  FullMatrix<double> prolong_1_2 (mg_dof_handler.n_dofs(2),
-//				  mg_dof_handler.n_dofs(1));
 
   deallog << "Level 0->1" << std::endl;
   make_matrix (transfer, 1, prolong_0_1);
   print_matrix (prolong_0_1);
-
-  //deallog << "Level 1->2" << std::endl;
-  //make_matrix (transfer, 2, prolong_1_2);
-  //print_matrix (prolong_1_2);
 }
 
 
