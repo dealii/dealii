@@ -169,7 +169,7 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
 
 
 
-void ConstraintMatrix::add_selected_constraints 
+void ConstraintMatrix::add_selected_constraints
   (const ConstraintMatrix &constraints,
    const IndexSet         &filter)
 {
@@ -786,12 +786,12 @@ void ConstraintMatrix::shift (const unsigned int offset)
 		      numbers::invalid_unsigned_int);
 
   for (std::vector<ConstraintLine>::iterator i = lines.begin();
-       i != lines.end(); i++)
+       i != lines.end(); ++i)
     {
       i->line += offset;
       for (std::vector<std::pair<unsigned int,double> >::iterator
 	     j = i->entries.begin();
-	   j != i->entries.end(); j++)
+	   j != i->entries.end(); ++j)
 	j->first += offset;
     }
 }
@@ -2070,10 +2070,10 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
 
       Assert (mpi_comm != 0, ExcInternalError());
 
-      TrilinosWrappers::MPI::Vector vec_distribute 
+      TrilinosWrappers::MPI::Vector vec_distribute
 	(my_indices.make_trilinos_map (mpi_comm->Comm(), true));
 #else
-      TrilinosWrappers::MPI::Vector vec_distribute 
+      TrilinosWrappers::MPI::Vector vec_distribute
 	(my_indices.make_trilinos_map (MPI_COMM_WORLD, true));
 #endif
 
