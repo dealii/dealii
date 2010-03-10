@@ -11,6 +11,8 @@
 //
 //----------------------------------------------------------------------------
 
+// like _01 but on adaptively refined grid
+
 //TODO:[GK] Add checks for RT again!
 
 #include "../tests.h"
@@ -19,6 +21,8 @@
 #include <lac/block_vector.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
 #include <dofs/dof_renumbering.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_dgp.h>
@@ -53,6 +57,31 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 }
 
 
+template<int dim>
+void refine_mesh (Triangulation<dim> &triangulation)
+{
+  bool cell_refined = false;
+  for (typename Triangulation<dim>::active_cell_iterator
+      cell = triangulation.begin_active();
+      cell != triangulation.end(); ++cell)
+  {
+      const Point<dim> p = cell->center();
+      bool positive = p(0) > 0;
+      if (positive)
+      {
+        cell->set_refine_flag();
+        cell_refined = true;
+      }
+  }
+  if(!cell_refined)//if no cell was selected for refinement, refine global
+    for (typename Triangulation<dim>::active_cell_iterator
+        cell = triangulation.begin_active();
+        cell != triangulation.end(); ++cell)
+      cell->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement ();
+}
+
+
 template <int dim>
 void check_simple(const FiniteElement<dim>& fe)
 {
@@ -60,7 +89,8 @@ void check_simple(const FiniteElement<dim>& fe)
 
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
-  tr.refine_global(2);
+  refine_mesh(tr);
+  refine_mesh(tr);
 
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
@@ -135,7 +165,7 @@ void check_simple(const FiniteElement<dim>& fe)
 
 int main()
 {
-  std::ofstream logfile("transfer/output");
+  std::ofstream logfile("transfer_02/output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -153,6 +183,6 @@ int main()
   check_simple (FE_RaviartThomasNodal<2>(1));
 //  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2));
 
-  check_simple (FE_DGQ<3>(1));
-  check_simple (FE_Q<3>(2));
+  //check_simple (FE_DGQ<3>(1));
+  //check_simple (FE_Q<3>(2));
 }
