@@ -55,6 +55,33 @@ template <typename number> class SparseMatrix;
 class PreconditionIdentity : public Subscriptor
 {
   public:
+
+				     /**
+				      * This function is only 
+                                      * present to 
+                                      * provide the interface of
+                                      * a precondtioner to be 
+                                      * handed to a smoother.
+                                      * This does nothing.
+				      */
+  struct AdditionalData
+  {
+                                       /**
+					* Constructor.
+					*/
+    AdditionalData (){}
+  };
+
+				     /**
+				      * The matrix
+				      * argument is ignored and here
+				      * just for compatibility with
+				      * more complex preconditioners.
+				      */
+  template <class MATRIX>
+  void initialize (const MATRIX         &matrix,
+		   const AdditionalData &additional_data = AdditionalData());
+
 				     /**
 				      * Apply preconditioner.
 				      */
@@ -86,6 +113,16 @@ class PreconditionIdentity : public Subscriptor
 				      */
     template<class VECTOR>
     void Tvmult_add (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * This function is only 
+                                      * present to 
+                                      * provide the interface of
+                                      * a precondtioner to be 
+                                      * handed to a smoother.
+                                      * This does nothing.
+				      */
+    void clear (){}
 };
 
 
@@ -1027,6 +1064,13 @@ class PreconditionChebyshev : public Subscriptor
 /* ---------------------------------- Inline functions ------------------- */
 
 #ifndef DOXYGEN
+
+template <class MATRIX>
+inline void
+PreconditionIdentity::initialize (
+  const MATRIX&,
+  const PreconditionIdentity::AdditionalData&)
+{}
 
 
 template<class VECTOR>
