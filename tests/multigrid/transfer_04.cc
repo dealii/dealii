@@ -13,12 +13,13 @@
 
 // like _01 but on adaptively refined grid
 
-
 //TODO:[GK] Add checks for RT again!
+
 #include "../tests.h"
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
+#include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
@@ -35,6 +36,7 @@
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_transfer.h>
 #include <multigrid/mg_tools.h>
+#include <multigrid/mg_smoother.h>
 #include <multigrid/mg_level_object.h>
 
 #include <fstream>
@@ -43,6 +45,97 @@
 #include <algorithm>
 
 using namespace std;
+
+
+template <typename number>
+class ScalingMatrix : public Subscriptor
+{
+  public:
+				     /**
+				      * Constructor setting the
+				      * scaling factor. Default is
+				      * constructing the identity
+				      * matrix.
+				      */
+    ScalingMatrix(number scaling_factor = 1.);
+    				     /**
+				      * Apply preconditioner.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Apply transpose
+				      * preconditioner. Since this is
+				      * the identity, this function is
+				      * the same as
+				      * vmult().
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR&, const VECTOR&) const;
+				     /**
+				      * Apply preconditioner, adding to the previous value.
+				      */
+    template<class VECTOR>
+    void vmult_add (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Apply transpose
+				      * preconditioner, adding. Since this is
+				      * the identity, this function is
+				      * the same as
+				      * vmult_add().
+				      */
+    template<class VECTOR>
+    void Tvmult_add (VECTOR&, const VECTOR&) const;
+
+  private:
+    number factor;
+};
+
+
+//----------------------------------------------------------------------//
+
+template<typename number>
+ScalingMatrix<number>::ScalingMatrix(number factor)
+		:
+		factor(factor)
+{}
+
+
+template<typename number>
+template<class VECTOR>
+inline void
+ScalingMatrix<number>::vmult (VECTOR &dst, const VECTOR &src) const
+{
+  dst.equ(factor, src);
+}
+
+template<typename number>
+template<class VECTOR>
+inline void
+ScalingMatrix<number>::Tvmult (VECTOR &dst, const VECTOR &src) const
+{
+  dst.equ(factor, src);
+}
+
+template<typename number>
+template<class VECTOR>
+inline void
+ScalingMatrix<number>::vmult_add (VECTOR &dst, const VECTOR &src) const
+{
+  dst.add(factor, src);
+}
+
+
+
+template<typename number>
+template<class VECTOR>
+inline void
+ScalingMatrix<number>::Tvmult_add (VECTOR &dst, const VECTOR &src) const
+{
+  dst.add(factor, src);
+}
 
 template <int dim, typename number, int spacedim>
 void
@@ -167,19 +260,20 @@ void print_diff (const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
 }
 
 template <int dim>
-void check_simple(const FiniteElement<dim>& fe)
+void check_smoother(const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
-  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr,-1,1);
-  tr.refine_global (1);
   refine_mesh(tr);
   refine_mesh(tr);
-  refine_mesh(tr);
-  refine_mesh(tr);
-  refine_mesh(tr);
-  refine_mesh(tr);
+
+  //std::ostringstream out_filename;
+  //out_filename << "gitter.eps";
+  //std::ofstream grid_output (out_filename.str().c_str());
+  //GridOut grid_out;
+  //grid_out.write_eps (tr, grid_output);
 
 
   MGDoFHandler<dim> mgdof(tr);
@@ -188,29 +282,38 @@ void check_simple(const FiniteElement<dim>& fe)
   MGDoFHandler<dim> mgdof_renumbered(tr);
   mgdof_renumbered.distribute_dofs(fe);
 
-  std::vector<unsigned int> block_component (4,0);
-  block_component[2] = 1;
-  block_component[3] = 1;
+  std::vector<unsigned int> block_component (2,0);
+  block_component[1] = 1;
 
   DoFRenumbering::component_wise (mgdof_renumbered, block_component);
   for (unsigned int level=0;level<tr.n_levels();++level)
     DoFRenumbering::component_wise (mgdof_renumbered, level, block_component);
 
-  MGTransferPrebuilt<Vector<double> > transfer;
-  transfer.build_matrices(mgdof);
+  ScalingMatrix<double> s1(-1);
+  ScalingMatrix<double> s2(2.);
+  ScalingMatrix<double> s8(8.);
+  
+  MGLevelObject<ScalingMatrix<double> > matrices(0, tr.n_levels()-1);
+  matrices[0] = s1;
+  matrices[1] = s2;
+  matrices[2] = s8;
 
-  MGTransferPrebuilt<Vector<double> > transfer_renumbered;
-  transfer_renumbered.build_matrices(mgdof_renumbered); 
+  typedef PreconditionJacobi<ScalingMatrix<double> > RELAX;
+  MGSmootherPrecondition<ScalingMatrix, RELAX, Vector<double> > smoother(mem);
+  RELAX::AdditionalData smoother_data;
+  smoother.initialize(matrices, smoother_data);
+  smoother.set_steps(1);
+
+  smoother.smooth(level,u,rhs);
 
   Vector<double> u(mgdof.n_dofs());
   initialize(mgdof,u);
-  deallog << "initialize " << u.l2_norm() << std::endl;
 
   MGLevelObject<Vector<double> > v(0, tr.n_levels()-1);
   reinit_vector(mgdof, v);
 
   transfer.copy_to_mg(mgdof, v, u);
-  //print(mgdof, v);
+  print(mgdof, v);
 
   u=0;
   initialize(mgdof, v);
@@ -221,12 +324,9 @@ void check_simple(const FiniteElement<dim>& fe)
   Vector<double> diff = u;
 
   initialize(mgdof_renumbered,u);
-  deallog << "initialize " << u.l2_norm() << std::endl;
-
   reinit_vector(mgdof_renumbered, v);
   transfer_renumbered.copy_to_mg(mgdof_renumbered, v, u);
-  deallog << "copy_to_mg" << std::endl;
-  //print(mgdof_renumbered, v);
+  print(mgdof_renumbered, v);
 
   u=0;
   initialize(mgdof_renumbered, v);
@@ -240,12 +340,11 @@ void check_simple(const FiniteElement<dim>& fe)
 
 int main()
 {
-  std::ofstream logfile("transfer_03/output");
+  std::ofstream logfile("transfer_04/output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  //check_simple (FESystem<2>(FE_Q<2>(1), 2));
-  check_simple (FESystem<2>(FE_Q<2>(1), 4));
+  check_simple (FESystem<2>(FE_Q<2>(1), 2));
 }

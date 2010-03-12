@@ -13,10 +13,12 @@
 
 // like _01 but on adaptively refined grid
 
-
 //TODO:[GK] Add checks for RT again!
+
 #include "../tests.h"
 #include <base/logstream.h>
+#include <base/function.h>
+#include <lac/constraint_matrix.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <grid/tria.h>
@@ -55,7 +57,6 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
       unsigned int n = mg_dof.n_dofs (level);
       v[level].reinit(n);
     }
-
 }
 
 
@@ -113,14 +114,35 @@ template <int dim>
 void initialize (const MGDoFHandler<dim> &dof,
     MGLevelObject<Vector<double> > &u)
 {
-  unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+  const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
   std::vector<unsigned int> dof_indices(dofs_per_cell);
-  typename MGDoFHandler<dim>::cell_iterator
-      cell = dof.begin(0);
-    cell->get_mg_dof_indices(dof_indices);
-    for(unsigned int i=0; i<dofs_per_cell; ++i)
-      u[0](dof_indices[i]) = ++counter;
+  std::vector<unsigned int> face_indices(dofs_per_face);
+
+  for(unsigned int l=0; l<dof.get_tria().n_levels(); ++l)
+  {
+    for (typename MGDoFHandler<dim>::cell_iterator
+        cell = dof.begin(l);
+        cell != dof.end(l); ++cell)
+    {
+      cell->get_mg_dof_indices(dof_indices);
+      for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      {
+        cell->face(f)->get_mg_dof_indices(cell->level(),face_indices);
+        if(cell->face(f)->at_boundary())
+        {
+          for(unsigned int i=0; i<dofs_per_face; ++i)
+            u[cell->level()](face_indices[i]) = 1;
+        }
+        else
+        {
+          for(unsigned int i=0; i<dofs_per_face; ++i)
+            if(u[cell->level()](face_indices[i]) != 1)
+              u[cell->level()](face_indices[i]) = 0;
+        }
+      }
+    }
+  }
 }
 
 template <int dim>
@@ -181,12 +203,32 @@ void check_simple(const FiniteElement<dim>& fe)
   refine_mesh(tr);
   refine_mesh(tr);
 
+  std::ostringstream out_filename;
+  out_filename << "gitter.eps";
+  std::ofstream grid_output (out_filename.str().c_str());
+  GridOut grid_out;
+  grid_out.write_eps (tr, grid_output);
+
 
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
 
   MGDoFHandler<dim> mgdof_renumbered(tr);
   mgdof_renumbered.distribute_dofs(fe);
+
+  ConstraintMatrix     hnc, hnc_renumbered;
+  hnc.clear ();
+  hnc_renumbered.clear ();
+  DoFTools::make_hanging_node_constraints (
+      mgdof, 
+      hnc);
+
+  DoFTools::make_hanging_node_constraints (
+      mgdof_renumbered, 
+      hnc_renumbered);
+  hnc.close ();
+  hnc_renumbered.close ();
+
 
   std::vector<unsigned int> block_component (4,0);
   block_component[2] = 1;
@@ -196,21 +238,20 @@ void check_simple(const FiniteElement<dim>& fe)
   for (unsigned int level=0;level<tr.n_levels();++level)
     DoFRenumbering::component_wise (mgdof_renumbered, level, block_component);
 
-  MGTransferPrebuilt<Vector<double> > transfer;
+  MGTransferPrebuilt<Vector<double> > transfer(hnc);
   transfer.build_matrices(mgdof);
 
-  MGTransferPrebuilt<Vector<double> > transfer_renumbered;
-  transfer_renumbered.build_matrices(mgdof_renumbered); 
+  MGTransferPrebuilt<Vector<double> > transfer_renumbered(hnc_renumbered);
+  transfer_renumbered.build_matrices(mgdof_renumbered);
 
   Vector<double> u(mgdof.n_dofs());
   initialize(mgdof,u);
-  deallog << "initialize " << u.l2_norm() << std::endl;
 
   MGLevelObject<Vector<double> > v(0, tr.n_levels()-1);
   reinit_vector(mgdof, v);
 
   transfer.copy_to_mg(mgdof, v, u);
-  //print(mgdof, v);
+  print(mgdof, v);
 
   u=0;
   initialize(mgdof, v);
@@ -221,12 +262,10 @@ void check_simple(const FiniteElement<dim>& fe)
   Vector<double> diff = u;
 
   initialize(mgdof_renumbered,u);
-  deallog << "initialize " << u.l2_norm() << std::endl;
-
   reinit_vector(mgdof_renumbered, v);
   transfer_renumbered.copy_to_mg(mgdof_renumbered, v, u);
   deallog << "copy_to_mg" << std::endl;
-  //print(mgdof_renumbered, v);
+  print(mgdof_renumbered, v);
 
   u=0;
   initialize(mgdof_renumbered, v);
@@ -240,7 +279,7 @@ void check_simple(const FiniteElement<dim>& fe)
 
 int main()
 {
-  std::ofstream logfile("transfer_03/output");
+  std::ofstream logfile("mg_output/output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
