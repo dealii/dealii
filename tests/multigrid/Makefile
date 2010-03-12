@@ -24,7 +24,8 @@ default: run-tests
 tests_x = cycles dof_* count_* boundary_* renumbering_* \
 	transfer* \
 	smoother_block \
-	mg_output
+	mg_output \
+	mg_renumbered*
 
 # from above list of regular expressions, generate the real set of
 # tests
