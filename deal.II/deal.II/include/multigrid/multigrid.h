@@ -664,14 +664,30 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
   VECTOR2& dst,
   const VECTOR2& src) const
 {
+#ifdef baerbel_mg_test
+  const unsigned int min_l = multigrid->solution.get_minlevel();
+  const unsigned int max_l = multigrid->solution.get_maxlevel();
+  deallog << "PreconditionMG in " << src.l2_norm() << std::endl;
+#endif
   transfer->copy_to_mg(*mg_dof_handler,
 		       multigrid->defect,
 		       src);
+#ifdef baerbel_mg_test
+  for(unsigned int l=min_l; l<max_l; ++l)
+  deallog << "defect [" << l << "] " << multigrid->defect[l].l2_norm() << std::endl;
+#endif
   multigrid->cycle();
+
+#ifdef baerbel_mg_test
+  for(unsigned int l=min_l; l<max_l; ++l)
+  deallog << "solution [" << l << "] " << multigrid->solution[l].l2_norm() << std::endl;
+#endif
   transfer->copy_from_mg(*mg_dof_handler,
 			 dst,
 			 multigrid->solution);
-
+#ifdef baerbel_mg_test
+  deallog << "PreconditionMG out " << dst.l2_norm() << std::endl;
+#endif
   /*
   DataOut<dim> data_out;
   data_out.attach_dof_handler (*mg_dof_handler);
