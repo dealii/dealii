@@ -59,8 +59,6 @@ my %attribute = (
     23 => $timeapplication,
     24 => $timeapplication,
     25 => $timeapplication,
-
-    38 => $unfinished
     );
 
 # Print a preamble setting common attributes
@@ -118,8 +116,6 @@ Step06 -> Step16;
 Step16 -> Step37;
 Step05 -> Step37;
 
-Step12 -> Step38;
-Step38 -> Step12;
 Step12 -> Step33;
 
 Step06 -> Step13;
