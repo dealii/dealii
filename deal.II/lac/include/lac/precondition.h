@@ -218,6 +218,16 @@ class PreconditionRichardson : public Subscriptor
     template<class VECTOR>
     void Tvmult_add (VECTOR&, const VECTOR&) const;
 
+				     /**
+				      * This function is only 
+				      * present to 
+				      * provide the interface of
+				      * a precondtioner to be 
+				      * handed to a smoother.
+				      * This does nothing.
+				      */
+    void clear (){}
+
   private:
 				     /**
 				      * The relaxation parameter
