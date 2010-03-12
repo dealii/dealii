@@ -16,6 +16,7 @@
 #include <base/named_data.h>
 #include <base/tensor.h>
 #include <base/smartpointer.h>
+#include <multigrid/mg_level_object.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -276,6 +277,29 @@ namespace MeshWorker
 	unsigned int n_comp,
 	unsigned int start,
 	unsigned int size) const;
+
+				       /**
+					* Fill the local data vector
+					* from level vectors. Performs
+					* exactly what the other
+					* fill() does, but uses the
+					* cell level to access a
+					* single level out of a
+					* hierarchy of level vectors,
+					* instead of a global data
+					* vector on the active cells.
+					*/
+       virtual void mg_fill(
+	std::vector<std::vector<std::vector<double> > >& values,
+	std::vector<std::vector<std::vector<Tensor<1,dim> > > >& gradients,
+	std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
+	const FEValuesBase<dim,spacedim>& fe,
+	unsigned int level,
+	const std::vector<unsigned int>& index,
+	unsigned int component,
+	unsigned int n_comp,
+	unsigned int start,
+	unsigned int size) const;     
   };
 
   
@@ -341,6 +365,72 @@ namespace MeshWorker
 	unsigned int size) const;
     private:
       NamedData<SmartPointer<const VECTOR,VectorData<VECTOR,dim,spacedim> > > data;
+  };
+
+  
+/**
+ * Based on VectorSelector, this is the class that implements the
+ * function VectorDataBase::fill() for a certain type of multilevel vectors, using
+ * NamedData to identify vectors by name.
+ *
+ * @author Guido Kanschat, 2009
+ */
+  template <class VECTOR, int dim, int spacedim = dim>
+  class MGVectorData :
+      public VectorDataBase<dim, spacedim>
+  {
+    public:
+				       /**
+					* Constructor.
+					*/
+      MGVectorData();
+				       /**
+					* Constructor using a
+					* prefilled VectorSelector
+					*/
+      MGVectorData(const VectorSelector&);
+
+				       /**
+					* Initialize with a NamedData
+					* object and cache the indices
+					* in the VectorSelector base
+					* class.
+					*
+					* @note Make sure the
+					* VectorSelector base class
+					* was filled with reasonable
+					* data before calling this
+					* function.
+					*/
+      void initialize(const NamedData<MGLevelObject<VECTOR>*>&);
+
+				       /**
+					* Initialize with a single
+					* vector and cache the indices
+					* in the VectorSelector base
+					* class.
+					*
+					* @note Make sure the
+					* VectorSelector base class
+					* was filled with reasonable
+					* data before calling this
+					* function.
+					*/
+      void initialize(const MGLevelObject<VECTOR>*, const std::string& name);
+      
+      virtual void mg_fill(
+	std::vector<std::vector<std::vector<double> > >& values,
+	std::vector<std::vector<std::vector<Tensor<1,dim> > > >& gradients,
+	std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
+	const FEValuesBase<dim,spacedim>& fe,
+	unsigned int level,
+	const std::vector<unsigned int>& index,
+	unsigned int component,
+	unsigned int n_comp,
+	unsigned int start,
+	unsigned int size) const;
+    private:
+      NamedData<SmartPointer<const MGLevelObject<VECTOR>,MGVectorData<VECTOR,dim,spacedim> > > data;
   };
 
   
