@@ -72,8 +72,8 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-  template<int dim, class FVB, int sdim>
-  IntegrationInfo<dim,FVB,sdim>::IntegrationInfo()
+  template<int dim, int sdim>
+  IntegrationInfo<dim,sdim>::IntegrationInfo()
 		  :
 		  fevalv(0),
 		  multigrid(false),
@@ -81,8 +81,8 @@ namespace MeshWorker
   {}
 
   
-  template<int dim, class FVB, int sdim>
-  IntegrationInfo<dim,FVB,sdim>::IntegrationInfo(const IntegrationInfo<dim,FVB,sdim>& other)
+  template<int dim, int sdim>
+  IntegrationInfo<dim,sdim>::IntegrationInfo(const IntegrationInfo<dim,sdim>& other)
 		  :
 		  multigrid(other.multigrid),
 		  values(other.values),
@@ -94,20 +94,21 @@ namespace MeshWorker
     fevalv.resize(other.fevalv.size());
     for (unsigned int i=0;i<other.fevalv.size();++i)
       {
-	const FVB& p = *other.fevalv[i];
+	const FEValuesBase<dim,sdim>& p = *other.fevalv[i];
 	const FEValues<dim,sdim>* pc = dynamic_cast<const FEValues<dim,sdim>*>(&p);
 	const FEFaceValues<dim,sdim>* pf = dynamic_cast<const FEFaceValues<dim,sdim>*>(&p);
 	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
 	
 	if (pc != 0)
-	  fevalv[i] = typename boost::shared_ptr<FVB> (
-	    reinterpret_cast<FVB*>(new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
-							   pc->get_quadrature(), pc->get_update_flags())));
+	  fevalv[i] = typename boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
+	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
+				      pc->get_quadrature(), pc->get_update_flags())));
 	else if (pf != 0)
-	  fevalv[i] = typename boost::shared_ptr<FVB> (
+	  fevalv[i] = typename boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	    new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
 	else if (ps != 0)
-	  fevalv[i] = typename boost::shared_ptr<FVB> (
+	  fevalv[i] = typename boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	    new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags()));
 	else
 	  Assert(false, ExcInternalError());
@@ -115,10 +116,10 @@ namespace MeshWorker
   }
   
 
-  template<int dim, class FVB, int sdim>
+  template<int dim, int sdim>
   template <class FEVALUES>
   void
-  IntegrationInfo<dim,FVB,sdim>::initialize(
+  IntegrationInfo<dim,sdim>::initialize(
     const FiniteElement<dim,sdim>& el,
     const Mapping<dim,sdim>& mapping,
     const Quadrature<FEVALUES::integral_dimension>& quadrature,
@@ -128,7 +129,7 @@ namespace MeshWorker
     if (block_info == 0 || block_info->local().size() == 0)
       {
 	fevalv.resize(1);	      
-	fevalv[0] = boost::shared_ptr<FVB> (
+	fevalv[0] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	  new FEVALUES (mapping, el, quadrature, flags));
       }
     else
@@ -136,7 +137,7 @@ namespace MeshWorker
 	fevalv.resize(el.n_base_elements());
 	for (unsigned int i=0;i<fevalv.size();++i)
 	  {
-	    fevalv[i] = boost::shared_ptr<FVB> (
+	    fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	      new FEVALUES (mapping, el.base_element(i), quadrature, flags));
 	  }
       }
@@ -144,9 +145,9 @@ namespace MeshWorker
   }
   
 
-  template<int dim, class FVB, int sdim>
+  template<int dim, int sdim>
   void
-  IntegrationInfo<dim,FVB,sdim>::initialize_data(
+  IntegrationInfo<dim,sdim>::initialize_data(
     const boost::shared_ptr<VectorDataBase<dim,sdim> > data)
   {
     global_data = data;
@@ -198,18 +199,18 @@ namespace MeshWorker
   }
 
 
-  template<int dim, class FVB, int sdim>
+  template<int dim, int sdim>
   void
-  IntegrationInfo<dim,FVB,sdim>::clear()
+  IntegrationInfo<dim,sdim>::clear()
   {
     fevalv.resize(0);
   }
 
 
 
-  template<int dim, class FVB, int sdim>
+  template<int dim, int sdim>
   void
-  IntegrationInfo<dim,FVB,sdim>::fill_local_data(const DoFInfo<dim, sdim>& info, bool split_fevalues)
+  IntegrationInfo<dim,sdim>::fill_local_data(const DoFInfo<dim, sdim>& info, bool split_fevalues)
   {
      if (split_fevalues)
        {

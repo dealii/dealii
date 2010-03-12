@@ -463,7 +463,7 @@ void Step12<dim>::integrate_cell_term (DoFInfo& dinfo, CellInfo& info)
 template <int dim>
 void Step12<dim>::integrate_boundary_term (DoFInfo& dinfo, FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe_v = info.fe_values();
+  const FEValuesBase<dim>& fe_v = info.fe_values();
   FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
   Vector<double>& local_vector = dinfo.vector(0).block(0);
 
@@ -514,12 +514,12 @@ void Step12<dim>::integrate_face_term (DoFInfo& dinfo1, DoFInfo& dinfo2,
 				   // etc., we use the
 				   // FEFaceValuesBase object of the
 				   // first argument.
-  const FEFaceValuesBase<dim>& fe_v = info1.fe_values();
+  const FEValuesBase<dim>& fe_v = info1.fe_values();
 
 				   // For additional shape functions,
 				   // we have to ask the neighbors
 				   // FEFaceValuesBase.
-  const FEFaceValuesBase<dim>& fe_v_neighbor = info2.fe_values();
+  const FEValuesBase<dim>& fe_v_neighbor = info2.fe_values();
 
 				   // Then we get references to the
 				   // four local matrices. The letters

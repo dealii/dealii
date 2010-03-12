@@ -28,18 +28,17 @@ namespace MeshWorker
 {
   template class LocalResults<double>;
   template class DoFInfo<deal_II_dimension,deal_II_dimension>;
+  template class IntegrationInfo<deal_II_dimension>;
   
-#include "mesh_worker_info.inst"
-  
-  template void IntegrationInfo<deal_II_dimension, FEValuesBase<deal_II_dimension> >
+  template void IntegrationInfo<deal_II_dimension>
   ::initialize<FEValues<deal_II_dimension> >(
     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
     const Quadrature<FEValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);
-  template void IntegrationInfo<deal_II_dimension, FEFaceValuesBase<deal_II_dimension> >
+  template void IntegrationInfo<deal_II_dimension>
   ::initialize<FEFaceValues<deal_II_dimension> >(
     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
     const Quadrature<FEFaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);
-  template void IntegrationInfo<deal_II_dimension, FEFaceValuesBase<deal_II_dimension> >
+  template void IntegrationInfo<deal_II_dimension>
   ::initialize<FESubfaceValues<deal_II_dimension> >(
     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
     const Quadrature<FESubfaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);

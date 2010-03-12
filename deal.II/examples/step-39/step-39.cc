@@ -137,7 +137,7 @@ void MatrixIntegrator<dim>::bdry(
   MeshWorker::DoFInfo<dim>& dinfo,
   typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe = info.fe_values();
+  const FEValuesBase<dim>& fe = info.fe_values();
   FullMatrix<double>& local_matrix = dinfo.matrix(0,false).matrix;
   
   const unsigned int deg = fe.get_fe().tensor_degree();
@@ -160,8 +160,8 @@ void MatrixIntegrator<dim>::face(
   typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
   typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
-  const FEFaceValuesBase<dim>& fe1 = info1.fe_values();
-  const FEFaceValuesBase<dim>& fe2 = info2.fe_values();
+  const FEValuesBase<dim>& fe1 = info1.fe_values();
+  const FEValuesBase<dim>& fe2 = info2.fe_values();
   FullMatrix<double>& matrix_v1u1 = dinfo1.matrix(0,false).matrix;
   FullMatrix<double>& matrix_v1u2 = dinfo1.matrix(0,true).matrix;
   FullMatrix<double>& matrix_v2u1 = dinfo2.matrix(0,true).matrix;
@@ -224,7 +224,7 @@ void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>&, typename MeshWorker::In
 template <int dim>
 void RHSIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe = info.fe_values();
+  const FEValuesBase<dim>& fe = info.fe_values();
   Vector<double>& local_vector = dinfo.vector(0).block(0);
   
   std::vector<double> boundary_values(fe.n_quadrature_points);
@@ -279,7 +279,7 @@ void Estimator<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::
 template <int dim>
 void Estimator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe = info.fe_values();
+  const FEValuesBase<dim>& fe = info.fe_values();
   
   std::vector<double> boundary_values(fe.n_quadrature_points);
   exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
@@ -301,7 +301,7 @@ void Estimator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
 			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
-  const FEFaceValuesBase<dim>& fe = info1.fe_values();
+  const FEValuesBase<dim>& fe = info1.fe_values();
   const std::vector<double>& uh1 = info1.values[0][0];
   const std::vector<double>& uh2 = info2.values[0][0];
   const std::vector<Tensor<1,dim> >& Duh1 = info1.gradients[0][0];
@@ -708,7 +708,8 @@ Step39<dim>::run(unsigned int n_steps)
 
 int main()
 {
+  deallog.log_execution_time(true);
   FE_DGQ<2> fe1(3);
   Step39<2> test1(fe1);
-  test1.run(13);
+  test1.run(20);
 }

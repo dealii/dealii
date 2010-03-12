@@ -169,13 +169,13 @@ namespace MeshWorker
 					* The info type expected by a
 					* cell integrator.
 					*/
-      typedef IntegrationInfo<dim, FEValuesBase<dim, dim>, dim> CellInfo;
+      typedef IntegrationInfo<dim, dim> CellInfo;
 
 				       /**
 					* The info type expected by a
 					* face integrator.
 					*/
-      typedef IntegrationInfo<dim, FEFaceValuesBase<dim, dim>, dim> FaceInfo;
+      typedef IntegrationInfo<dim, dim> FaceInfo;
 
 				       /**
 					* Initialize default values.

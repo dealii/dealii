@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id: fe_field_function.inst.in 19046 2009-07-08 19:30:23Z bangerth $
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,6 @@
 
 for (FEV : FEVALUES_BASES)
 {
-  template class IntegrationInfo<deal_II_dimension, FEV>;
 }
 
 for (FEV : FEVALUES_BASES)

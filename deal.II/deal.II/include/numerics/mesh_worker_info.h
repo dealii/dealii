@@ -474,15 +474,15 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<int dim, class FEVALUESBASE, int spacedim = dim>
+  template<int dim, int spacedim = dim>
   class IntegrationInfo
   {
     private:
 				       /// vector of FEValues objects
-      std::vector<boost::shared_ptr<FEVALUESBASE> > fevalv;
+      std::vector<boost::shared_ptr<FEValuesBase<dim, spacedim> > > fevalv;
     public:
-      static const unsigned int dimension = FEVALUESBASE::dimension;
-      static const unsigned int space_dimension = FEVALUESBASE::space_dimension;
+      static const unsigned int dimension = dim;
+      static const unsigned int space_dimension = spacedim;
       
 				       /**
 					* Constructor.
@@ -494,7 +494,7 @@ namespace MeshWorker
 					* clone to be used by
 					* WorksTream::run().
 					*/
-      IntegrationInfo(const IntegrationInfo<dim, FEVALUESBASE, spacedim>& other);
+      IntegrationInfo(const IntegrationInfo<dim, spacedim>& other);
       
 				       /**
 					* Build all internal
@@ -560,7 +560,7 @@ namespace MeshWorker
 					* exception, if applied to a
 					* vector of elements.
 					*/
-      const FEVALUESBASE& fe_values () const;
+      const FEValuesBase<dim, spacedim>& fe_values () const;
 
 				       /// Access to finite elements
 				       /**
@@ -571,7 +571,7 @@ namespace MeshWorker
 					*
 					* @see DGBlockSplitApplication
 					*/
-      const FEVALUESBASE& fe_values (const unsigned int i) const;
+      const FEValuesBase<dim, spacedim>& fe_values (const unsigned int i) const;
 
 				       /**
 					* The vector containing the
@@ -686,10 +686,10 @@ namespace MeshWorker
     public:
 
 /// The type of the info object for cells
-      typedef IntegrationInfo<dim, FEValuesBase<dim, spacedim>, spacedim> CellInfo;
+      typedef IntegrationInfo<dim, spacedim> CellInfo;
 
 /// The type of the info objects for faces.
-      typedef IntegrationInfo<dim, FEFaceValuesBase<dim, spacedim>, spacedim> FaceInfo;
+      typedef IntegrationInfo<dim, spacedim> FaceInfo;
       
       template <class WORKER>
       void initialize(const WORKER&,
@@ -1047,31 +1047,31 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-  template <int dim, class FVB, int spacedim>
-  inline const FVB&
-  IntegrationInfo<dim,FVB,spacedim>::fe_values() const
+  template <int dim, int spacedim>
+  inline const FEValuesBase<dim, spacedim>&
+  IntegrationInfo<dim,spacedim>::fe_values() const
   {
     AssertDimension(fevalv.size(), 1);
     return *fevalv[0];
   }
 
 
-  template <int dim, class FVB, int spacedim>
-  inline const FVB&
-  IntegrationInfo<dim,FVB,spacedim>::fe_values(unsigned int i) const
+  template <int dim, int spacedim>
+  inline const FEValuesBase<dim, spacedim>&
+  IntegrationInfo<dim,spacedim>::fe_values(unsigned int i) const
   {
     Assert (i<fevalv.size(), ExcIndexRange(i,0,fevalv.size()));
     return *fevalv[i];
   }
 
 
-  template <int dim, class FVB, int spacedim>
+  template <int dim, int spacedim>
   inline void
-  IntegrationInfo<dim,FVB,spacedim>::reinit(const DoFInfo<dim, spacedim>& info)
+  IntegrationInfo<dim,spacedim>::reinit(const DoFInfo<dim, spacedim>& info)
   {
     for (unsigned int i=0;i<fevalv.size();++i)
       {
-	FVB& febase = *fevalv[i];
+	FEValuesBase<dim, spacedim>& febase = *fevalv[i];
 	if (info.sub_number != deal_II_numbers::invalid_unsigned_int)
 	  {
 					     // This is a subface
