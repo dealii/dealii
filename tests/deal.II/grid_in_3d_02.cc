@@ -29,6 +29,10 @@
 #include <grid/grid_generator.h>
 #include <base/logstream.h>
 
+// #include <fe/fe_q.h>
+// #include <numerics/data_out.h>
+
+
 #include <fstream>
 #include <iomanip>
 
@@ -68,9 +72,17 @@ void test (const char *filename)
       hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells()+1);
   deallog << "  hash=" << hash << std::endl;
 
-  GridOut grid_out;
-  std::ofstream gnufile("square.gnuplot");
-  grid_out.write_gnuplot (tria, gnufile);
+//   DoFHandler<dim> dh (tria);
+//   FE_Q<dim> fe(1);
+//   dh.distribute_dofs (fe);
+
+//   DataOut<dim> d_o;
+//   d_o.attach_dof_handler (dh);
+//   Vector<double> zero (dh.n_dofs());
+//   d_o.add_data_vector (zero, "Zero");
+//   d_o.build_patches ();
+//   std::ofstream gnufile("xx.vtk");
+//   d_o.write_vtk (gnufile);
 }
 
 
