@@ -138,7 +138,7 @@ void print(const MGDoFHandler<dim> &dof, std::vector<std::vector<bool> > &interf
 
 
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     LaplaceProblem (const unsigned int deg);
@@ -146,9 +146,9 @@ class LaplaceProblem
 
   private:
     void setup_system ();
-    void assemble_multigrid (const MGDoFHandler<dim> &mg_dof, 
+    void assemble_multigrid (const MGDoFHandler<dim> &mg_dof,
         MGLevelObject<SparseMatrix<double> > &matrices,
-        std::vector<std::set<unsigned int> > 
+        std::vector<std::set<unsigned int> >
         &boundary_indices);
     void test ();
     void test_renumber ();
@@ -167,10 +167,10 @@ class LaplaceProblem
 
     const unsigned int degree;
 
-    std::vector<std::set<unsigned int> > 
+    std::vector<std::set<unsigned int> >
     boundary_indices;
 
-    std::vector<std::set<unsigned int> > 
+    std::vector<std::set<unsigned int> >
     boundary_indices_renumbered;
 };
 
@@ -233,7 +233,7 @@ void LaplaceProblem<dim>::setup_system ()
         mg_dof_handler_renumbered.n_dofs(level),
         mg_dof_handler_renumbered.max_couplings_between_dofs());
     MGTools::make_sparsity_pattern (mg_dof_handler, mg_sparsity[level], level);
-    MGTools::make_sparsity_pattern (mg_dof_handler_renumbered, 
+    MGTools::make_sparsity_pattern (mg_dof_handler_renumbered,
         mg_sparsity_renumbered[level], level);
     mg_sparsity[level].compress();
     mg_sparsity_renumbered[level].compress();
@@ -245,11 +245,11 @@ void LaplaceProblem<dim>::setup_system ()
   template <int dim>
 void LaplaceProblem<dim>::assemble_multigrid (const MGDoFHandler<dim> &mgdof,
     MGLevelObject<SparseMatrix<double> > &mgmatrices,
-    std::vector<std::set<unsigned int> > &boundaryindices) 
-{  
+    std::vector<std::set<unsigned int> > &boundaryindices)
+{
   QGauss<dim>  quadrature_formula(1+degree);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
       update_values   | update_gradients |
       update_quadrature_points | update_JxW_values);
 
@@ -272,7 +272,7 @@ void LaplaceProblem<dim>::assemble_multigrid (const MGDoFHandler<dim> &mgdof,
     boundary_interface_dofs.push_back (tmp);
   }
 
-  MGTools::extract_inner_interface_dofs(mgdof, 
+  MGTools::extract_inner_interface_dofs(mgdof,
       interface_dofs, boundary_interface_dofs);
 
   typename FunctionMap<dim>::type      dirichlet_boundary;
@@ -286,7 +286,7 @@ void LaplaceProblem<dim>::assemble_multigrid (const MGDoFHandler<dim> &mgdof,
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     {
       for (unsigned int i=0; i<boundary_interface_dofs[level].size(); ++i)
-        if(!(boundary_interface_dofs[level][i] && 
+        if(!(boundary_interface_dofs[level][i] &&
             boundaryindices[level].find(i) != boundaryindices[level].end()))
           boundary_interface_dofs[level][i] = false;
 
@@ -328,11 +328,11 @@ void LaplaceProblem<dim>::assemble_multigrid (const MGDoFHandler<dim> &mgdof,
 
 
   template <int dim>
-void LaplaceProblem<dim>::test () 
+void LaplaceProblem<dim>::test ()
 {
-  assemble_multigrid(mg_dof_handler, mg_matrices, 
+  assemble_multigrid(mg_dof_handler, mg_matrices,
       boundary_indices);
-  assemble_multigrid(mg_dof_handler_renumbered, 
+  assemble_multigrid(mg_dof_handler_renumbered,
       mg_matrices_renumbered, boundary_indices_renumbered);
 
   MGLevelObject<Vector<double> > v(0, triangulation.n_levels()-1);
@@ -341,15 +341,15 @@ void LaplaceProblem<dim>::test ()
   {
     deallog << "Level " << l << std::endl;
     v = 1;
-    MGTools::apply_boundary_values(boundary_indices[l], mg_matrices[l])
+    MGTools::apply_boundary_values(boundary_indices[l], mg_matrices[l]);
     MGTools::apply_boundary_values(boundary_indices_renumbered[l], mg_matrices[l])
 
       /*
-  for(std::set<unsigned int>::const_iterator b=boundary_indices[l].begin(); 
+  for(std::set<unsigned int>::const_iterator b=boundary_indices[l].begin();
       b!=boundary_indices[l].end(); ++b)
     deallog << ' ' << *b;
   deallog << std::endl;
-  for(std::set<unsigned int>::const_iterator b=boundary_indices_renumbered[l].begin(); 
+  for(std::set<unsigned int>::const_iterator b=boundary_indices_renumbered[l].begin();
       b!=boundary_indices_renumbered[l].end(); ++b)
     deallog << ' ' << *b;
   deallog << std::endl;
@@ -397,7 +397,7 @@ void LaplaceProblem<dim>::refine_local ()
 }
 
   template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<7; ++cycle)
   {
@@ -425,7 +425,7 @@ void LaplaceProblem<dim>::run ()
   };
 }
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mg_renumbered_02/output");
   deallog << std::setprecision(4);
