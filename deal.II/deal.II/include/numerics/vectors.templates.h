@@ -72,7 +72,7 @@ void VectorTools::interpolate (const Mapping<DH::dimension,DH::space_dimension> 
 
 				   // For FESystems many of the
 				   // unit_support_points will appear
-				   // multiply, as a point may be
+				   // multiple times, as a point may be
 				   // unit_support_point for several of the
 				   // components of the system.  The following
 				   // is rather complicated, but at least
@@ -94,17 +94,15 @@ void VectorTools::interpolate (const Mapping<DH::dimension,DH::space_dimension> 
     }
 
 
-				   // Find the support points
-				   // on a cell that
-				   // are multiply mentioned in
-				   // unit_support_points.
-				   // Mark the first representative
-				   // of each multiply mentioned
-				   // support point by appending its
-				   // dof index to dofs_of_rep_points.
-				   // Each multiple point gets to know
-				   // the dof index of its representative
-				   // point by the dof_to_rep_dof_table.
+				   // Find the support points on a cell that
+				   // are mentioned multiple times in
+				   // unit_support_points.  Mark the first
+				   // representative of each support point
+				   // mentioned multiple times by appending
+				   // its dof index to dofs_of_rep_points.
+				   // Each multiple point gets to know the dof
+				   // index of its representative point by the
+				   // dof_to_rep_dof_table.
 
 				   // the following vector collects all dofs i,
 				   // 0<=i<fe.dofs_per_cell, for that
