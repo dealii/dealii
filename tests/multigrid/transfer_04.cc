@@ -292,14 +292,14 @@ void check_smoother(const FiniteElement<dim>& fe)
   ScalingMatrix<double> s1(-1);
   ScalingMatrix<double> s2(2.);
   ScalingMatrix<double> s8(8.);
-  
+
   MGLevelObject<ScalingMatrix<double> > matrices(0, tr.n_levels()-1);
   matrices[0] = s1;
   matrices[1] = s2;
   matrices[2] = s8;
 
   typedef PreconditionJacobi<ScalingMatrix<double> > RELAX;
-  MGSmootherPrecondition<ScalingMatrix, RELAX, Vector<double> > smoother(mem);
+  MGSmootherPrecondition<ScalingMatrix<double>, RELAX, Vector<double> > smoother(mem);
   RELAX::AdditionalData smoother_data;
   smoother.initialize(matrices, smoother_data);
   smoother.set_steps(1);
