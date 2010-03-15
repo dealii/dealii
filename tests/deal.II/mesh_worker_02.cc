@@ -70,7 +70,7 @@ template <int dim>
 void MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo,
 				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe = info.fe_values();
+  const FEValuesBase<dim>& fe = info.fe_values();
   FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
   
   const unsigned int deg = fe.get_fe().tensor_degree();
@@ -92,8 +92,8 @@ void MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
 				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
 				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
 {
-  const FEFaceValuesBase<dim>& fe1 = info1.fe_values();
-  const FEFaceValuesBase<dim>& fe2 = info2.fe_values();
+  const FEValuesBase<dim>& fe1 = info1.fe_values();
+  const FEValuesBase<dim>& fe2 = info2.fe_values();
   FullMatrix<double>& matrix_v1u1 = dinfo1.matrix(0, false).matrix;
   FullMatrix<double>& matrix_v1u2 = dinfo1.matrix(0, true).matrix;
   FullMatrix<double>& matrix_v2u1 = dinfo2.matrix(0, true).matrix;
