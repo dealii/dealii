@@ -702,6 +702,12 @@ namespace MeshWorker
 		      const Mapping<dim, spacedim>& mapping,
 		      const NamedData<VECTOR*>& data);
 
+      template <class WORKER, typename VECTOR>
+      void initialize(const WORKER&,
+		      const FiniteElement<dim, spacedim>& el,
+		      const Mapping<dim, spacedim>& mapping,
+		      const NamedData<MGLevelObject<VECTOR>*>& data);
+
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
@@ -1143,6 +1149,37 @@ namespace MeshWorker
     boundary.initialize_data(p);
 
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.face_selector));
+    p->initialize(data);
+    face_data = p;
+    face.initialize_data(p);
+    subface.initialize_data(p);
+    neighbor.initialize_data(p);
+  }
+
+
+  template <int dim, int sdim>
+  template <class WORKER, typename VECTOR>
+  void
+  IntegrationInfoBox<dim,sdim>::initialize(
+    const WORKER& integrator,
+    const FiniteElement<dim,sdim>& el,
+    const Mapping<dim,sdim>& mapping,
+    const NamedData<MGLevelObject<VECTOR>*>& data)
+  {
+    initialize(integrator, el, mapping);
+    boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> > p;
+
+    p = boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (integrator.cell_selector));
+    p->initialize(data);
+    cell_data = p;
+    cell.initialize_data(p);
+
+    p = boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (integrator.boundary_selector));
+    p->initialize(data);
+    boundary_data = p;
+    boundary.initialize_data(p);
+
+    p = boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (integrator.face_selector));
     p->initialize(data);
     face_data = p;
     face.initialize_data(p);
