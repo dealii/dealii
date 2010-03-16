@@ -351,6 +351,7 @@ namespace MeshWorker
 				       /// The block structure of the system
       SmartPointer<const BlockInfo,DoFInfo<dim,spacedim> > block_info;
 
+      bool level_cell;
     private:
 				       /**
 					* Standard constructor, not

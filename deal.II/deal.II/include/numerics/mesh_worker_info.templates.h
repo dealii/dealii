@@ -50,6 +50,8 @@ namespace MeshWorker
       }
     else
       indices.resize(0);
+
+    level_cell = false;
   }
 
 
@@ -68,6 +70,7 @@ namespace MeshWorker
 	for (unsigned int i=0;i<indices.size();++i)
 	  indices[this->block_info->renumber(i)] = indices_org[i];
       }
+    level_cell = true;
   }
 
 //----------------------------------------------------------------------//
@@ -224,6 +227,10 @@ namespace MeshWorker
 	    const unsigned int block_start = info.block_info->local().block_start(b);
 	    const unsigned int block_size = info.block_info->local().block_size(b);
 	    
+            if(info.level_cell)
+	    this->global_data->mg_fill(values, gradients, hessians, fe, info.cell->level(), info.indices,
+				    comp, n_comp, block_start, block_size);
+            else
 	    this->global_data->fill(values, gradients, hessians, fe, info.indices,
 				    comp, n_comp, block_start, block_size);
  	    comp += n_comp;
@@ -233,6 +240,10 @@ namespace MeshWorker
        {
 	 const FEValuesBase<dim>& fe = this->fe_values(0);
 	 const unsigned int n_comp = fe.get_fe().n_components();
+         if(info.level_cell)
+	 this->global_data->mg_fill(values, gradients, hessians, fe, info.cell->level(), info.indices,
+				 0, n_comp, 0, info.indices.size());
+         else
 	 this->global_data->fill(values, gradients, hessians, fe, info.indices,
 				 0, n_comp, 0, info.indices.size());
        }

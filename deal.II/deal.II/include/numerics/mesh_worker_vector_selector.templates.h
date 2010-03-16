@@ -48,7 +48,9 @@ namespace MeshWorker
 	unsigned int,
 	unsigned int,
 	unsigned int) const
-  {}
+  {
+    Assert(false, ExcNotImplemented());
+  }
 
 
   template <int dim, int spacedim>
@@ -64,7 +66,9 @@ namespace MeshWorker
 	unsigned int,
 	unsigned int,
 	unsigned int) const
-  {}
+  {
+    Assert(false, ExcNotImplemented());
+  }
 //----------------------------------------------------------------------//
 
   template <class VECTOR, int dim, int spacedim>
