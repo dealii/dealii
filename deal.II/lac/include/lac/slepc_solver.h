@@ -35,9 +35,23 @@ DEAL_II_NAMESPACE_OPEN
  * Base class for solver classes using the SLEPc solvers which are
  * selected based on flags passed to the eigenvalue problem solver
  * context. Derived classes set the right flags to set the right
- * solver. On the other hand, note that: the AdditionalData structure
- * is a dummy structure and exisats for backward/forward
- * compatibility.
+ * solver. On the other hand, note that: the
+ * <code>AdditionalData</code> structure is a dummy structure that
+ * currently exists for backward/forward compatibility only. 
+ *
+ * The SLEPc solvers are intended to be used for solving the
+ * generalized eigenspectrum problem $(A-\lamda M)x=0$, for $x\neq0$;
+ * where $A$ is a system matrix, $M$ is a mass matrix, and $\lambda,
+ * x$ are a set of eigenvalues and eigenvectors respectively. The
+ * emphasis is on methods and techniques appropriate for problems in
+ * which the associated matrices are sparse and therefore, most of the
+ * methods offered by the SLEPc library are projection methods or
+ * other methods with similar properties. SLEPc implements these basic
+ * methods as well as more sophisticated algorithms. On the other
+ * hand, SLEPc is a general library in the sense that it covers
+ * standard and generalized eigenvalue problems, and wrappers are
+ * provided to interface to SLEPc solvers that handle both of these
+ * problem sets.
  *
  * SLEPcWrappers can be implemented in application codes in the
  * following way:
@@ -77,7 +91,10 @@ DEAL_II_NAMESPACE_OPEN
  * "PETScWrappers", on which they depend.
  *
  * @ingroup SLEPcWrappers
- * @author Toby D. Young 2008, 2009; and Rickard Armiento 2008
+ * @author Toby D. Young 2008, 2009, 2010; and Rickard Armiento 2008
+ * 
+ * Various tweaks to the SLEPcWrappers have been contributed by Eloy
+ * Romeoro and Jose Roman.
  */
 namespace SLEPcWrappers
 {
@@ -312,9 +329,11 @@ namespace SLEPcWrappers
 				    * eigenproblem solver context.
                                     */
       EPSWhich                           set_which;
+
       const PETScWrappers::MatrixBase   *opA;
       const PETScWrappers::MatrixBase   *opB;
       const PETScWrappers::VectorBase   *ini_vec;
+
       SLEPcWrappers::TransformationBase *transform;
 
     private:
