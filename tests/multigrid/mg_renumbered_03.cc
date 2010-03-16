@@ -325,75 +325,40 @@ void LaplaceProblem<dim>::test ()
   mg_transfer.build_matrices(mg_dof_handler, boundary_indices);
   MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered;
   mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered, boundary_indices_renumbered);
-  FullMatrix<double> coarse_matrix;
-  coarse_matrix.copy_from (mg_matrices[0]);
-  MGCoarseGridHouseholder<double, Vector<double> > mg_coarse;
-  mg_coarse.initialize(coarse_matrix);
 
-  FullMatrix<double> coarse_matrix_renumbered;
-  coarse_matrix_renumbered.copy_from (mg_matrices_renumbered[0]);
-  MGCoarseGridHouseholder<double, Vector<double> > mg_coarse_renumbered;
-  mg_coarse_renumbered.initialize(coarse_matrix_renumbered);
+  Vector<double> u(mg_dof_handler.n_dofs());
+  initialize(mg_dof_handler,u);
+  deallog << "initialize " << u.l2_norm() << std::endl;
 
-  typedef PreconditionIdentity RELAXATION;
-  MGSmootherPrecondition<SparseMatrix<double>, RELAXATION, Vector<double> >
-    mg_smoother(vector_memory);
+  MGLevelObject<Vector<double> > v(0, triangulation.n_levels()-1);
+  reinit_vector(mg_dof_handler, v);
 
-  MGSmootherPrecondition<SparseMatrix<double>, RELAXATION, Vector<double> >
-    mg_smoother_renumbered(vector_memory_renumbered);
+  mg_transfer.copy_to_mg(mg_dof_handler, v, u);
+  //print(mg_dof_handler, v);
 
-  RELAXATION::AdditionalData smoother_data;
-  mg_smoother.initialize(mg_matrices, smoother_data);
-  mg_smoother_renumbered.initialize(mg_matrices_renumbered, smoother_data);
+  u=0;
+  initialize(mg_dof_handler, v);
+  for(unsigned int l=0; l<triangulation.n_levels()-1; ++l)
+    mg_transfer.prolongate (l+1, v[l+1], v[l]);
 
-  mg_smoother.set_steps(1);
-  mg_smoother_renumbered.set_steps(1);
+  mg_transfer.copy_from_mg(mg_dof_handler, u, v);
+  Vector<double> diff = u;
 
-  MGMatrix<SparseMatrix<double>, Vector<double> >
-    mg_matrix(&mg_matrices);
+  initialize(mg_dof_handler_renumbered,u);
+  deallog << "initialize " << u.l2_norm() << std::endl;
 
-  MGMatrix<SparseMatrix<double>, Vector<double> >
-    mg_matrix_renumbered(&mg_matrices_renumbered);
+  reinit_vector(mg_dof_handler_renumbered, v);
+  mg_transfer_renumbered.copy_to_mg(mg_dof_handler_renumbered, v, u);
+  deallog << "copy_to_mg" << std::endl;
+  //print(mg_dof_handler_renumbered, v);
 
-  Multigrid<Vector<double> > mg(mg_dof_handler,
-      mg_matrix,
-      mg_coarse,
-      mg_transfer,
-      mg_smoother,
-      mg_smoother);
+  u=0;
+  initialize(mg_dof_handler_renumbered, v);
+  for(unsigned int l=0; l<triangulation.n_levels()-1; ++l)
+    mg_transfer_renumbered.prolongate (l+1, v[l+1], v[l]);
 
-  Multigrid<Vector<double> > mg_renumbered(mg_dof_handler_renumbered,
-      mg_matrix_renumbered,
-      mg_coarse_renumbered,
-      mg_transfer_renumbered,
-      mg_smoother_renumbered,
-      mg_smoother_renumbered);
-
-  PreconditionMG<dim, Vector<double>,
-    MGTransferPrebuilt<Vector<double> > >
-      preconditioner(mg_dof_handler, mg, mg_transfer);
-
-  PreconditionMG<dim, Vector<double>,
-    MGTransferPrebuilt<Vector<double> > >
-      preconditioner_renumbered(mg_dof_handler_renumbered, 
-          mg_renumbered, mg_transfer_renumbered);
-
-  Vector<double> test, dst, dst_renumbered;
-  test.reinit(mg_dof_handler.n_dofs());
-  dst.reinit(test);
-  dst_renumbered.reinit(test);
-
-  initialize(mg_dof_handler, test);
-  deallog << "1. Test " << test.l2_norm() << std::endl;
-  preconditioner.vmult(dst, test);
-  deallog << "1. Test " << dst.l2_norm() << std::endl;
-
-  initialize(mg_dof_handler_renumbered, test);
-  deallog << "2. Test " << test.l2_norm() << std::endl;
-  preconditioner_renumbered.vmult(dst_renumbered, test);
-  deallog << "2. Test " << dst_renumbered.l2_norm() << std::endl;
-
-  print_diff (mg_dof_handler_renumbered, mg_dof_handler, dst_renumbered, dst);
+  mg_transfer_renumbered.copy_from_mg(mg_dof_handler_renumbered, u, v);
+  print_diff(mg_dof_handler_renumbered, mg_dof_handler, u, diff);
 }
 
 
@@ -456,7 +421,7 @@ void LaplaceProblem<dim>::run ()
 
 int main () 
 {
-  std::ofstream logfile("mg_renumbered_01/output");
+  std::ofstream logfile("mg_renumbered_03/output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
