@@ -37,6 +37,7 @@ namespace MeshWorker
  */
     class GnuplotPatch
     {
+      public:
 					 /**
 					  * Constructor.
 					  */
@@ -98,11 +99,6 @@ namespace MeshWorker
 	void assemble(const DoFInfo<dim>& info1,
 		      const DoFInfo<dim>& info2);
 
-					 /**
-					  * The value of the ith entry
-					  * in #results.
-					  */
-	number operator() (unsigned int i) const;
       private:
 					 /**
 					  * Write the object T either
@@ -113,6 +109,8 @@ namespace MeshWorker
 					  */
 	template<typename T>
 	void write(const T& t) const;
+
+        void write_endl () const;
 	
 	unsigned int patch_dimension;
 	unsigned int n_vectors;
@@ -123,7 +121,7 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
     
-    template<typename T>
+    template <typename T>
     inline void
     GnuplotPatch::write(const T& d) const
     {
@@ -132,9 +130,18 @@ namespace MeshWorker
       else
 	(*os) << d;
     }
-    
-    
+
     inline void
+    GnuplotPatch::write_endl() const
+    {
+      if (os == 0)
+	deallog << std::endl;
+      else
+	(*os) << std::endl;
+    }
+    
+    
+    inline 
     GnuplotPatch::GnuplotPatch()
 		    :
 		    os(0)
@@ -142,10 +149,10 @@ namespace MeshWorker
     
     
     inline void
-    GnuplotPatch::initialize(unsigned int dim, unsigned int nv, unsigned int np)
+    GnuplotPatch::initialize(unsigned int dim, unsigned int np, unsigned int nv)
     {
       patch_dimension = dim;
-      n_vectors = n;
+      n_vectors = nv;
       n_points = np;
     }
 
@@ -159,8 +166,7 @@ namespace MeshWorker
 
     template <int dim>
     inline void
-    GnuplotPatch::initialize_info(DoFInfo<dim>& info,
-				  bool interior_face)
+    GnuplotPatch::initialize_info(DoFInfo<dim>& info, bool)
     {
       AssertDimension(patch_dimension,dim);
       info.initialize_quadrature(n_points, n_vectors);
@@ -171,17 +177,35 @@ namespace MeshWorker
     inline void
     GnuplotPatch::assemble(const DoFInfo<dim>& info)
     {
-      
+      const unsigned int n_q_points = info.n_quadrature_points();
+      const unsigned int nv = info.n_quadrature_values();
+      const unsigned int square_root = std::pow(n_q_points, 1./dim)+.5;
+      for (unsigned int k1=0; k1<square_root; ++k1)
+      {
+        for (unsigned int k2=0; k2<square_root; ++k2)
+        {
+          for(unsigned int i=0; i<nv; ++i)
+          {
+            write(info.quadrature_value(k1*square_root+k2,i));
+            write('\t');
+          }
+          write_endl();
+        }
+        write_endl();
+      }
+      write_endl();
     }
     
     
     template <int dim>
     inline void
-    GnuplotPatch::assemble(const DoFInfo<dim>& info1, const DoFInfo<dim>& info2)
+    GnuplotPatch::assemble(const DoFInfo<dim>& /*info1*/, const DoFInfo<dim>& /*info2*/)
     {
-      
+      Assert(false, ExcNotImplemented());
     }
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
