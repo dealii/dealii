@@ -19,20 +19,20 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
-  template <int dim, int spacedim>
-  DoFInfo<dim,spacedim>::DoFInfo(const BlockInfo& info)
+  template <int dim, int spacedim, typename number>
+  DoFInfo<dim,spacedim,number>::DoFInfo(const BlockInfo& info)
 		  : block_info(&info, typeid(*this).name())
   {}
 
 
-  template <int dim, int spacedim>
-  DoFInfo<dim,spacedim>::DoFInfo()
+  template <int dim, int spacedim, typename number>
+  DoFInfo<dim,spacedim,number>::DoFInfo()
   {}
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   void
-  DoFInfo<dim,spacedim>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c)
+  DoFInfo<dim,spacedim,number>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c)
   {
     if (!c->has_children())
       {
@@ -53,9 +53,9 @@ namespace MeshWorker
   }
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   void
-  DoFInfo<dim,spacedim>::get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c)
+  DoFInfo<dim,spacedim,number>::get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c)
   {
     indices.resize(c->get_fe().dofs_per_cell);
   

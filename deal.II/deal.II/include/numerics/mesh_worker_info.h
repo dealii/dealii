@@ -89,6 +89,13 @@ namespace MeshWorker
 			       bool both);
 
 				       /**
+					* Initialize quadrature values
+					* to <tt>nv</tt> values in
+					* <tt>np</tt> quadrature points.
+					*/
+      void initialize_quadrature(unsigned int np, unsigned int nv);
+      
+				       /**
 					* Reinitialize matrices for
 					* new cell. Resizes the
 					* matrices for hp and sets
@@ -110,6 +117,19 @@ namespace MeshWorker
 					* The number of matrices.
 					*/
       unsigned int n_matrices () const;
+      
+				       /**
+					* The number of quadrature
+					* points in #quadrature_values.
+					*/
+      unsigned int n_quadrature_points() const;
+      
+				       /**
+					* The number of values in each
+					* quadrature point in
+					* #quadrature_values.
+					*/
+      unsigned int n_quadrature_values() const;
       
 				       /**
 					* Access scalar value at index
@@ -155,6 +175,18 @@ namespace MeshWorker
 					*/
       const MatrixBlock<FullMatrix<number> >& matrix(unsigned int i, bool external = false) const;
       
+				       /**
+					* Access the <i>i</i>th value
+					* at quadrature point <i>k</i>
+					*/
+      number& quadrature_value(unsigned int k, unsigned int i);
+      
+				       /**
+					* Read the <i>i</i>th value
+					* at quadrature point <i>k</i>
+					*/
+      number quadrature_value(unsigned int k, unsigned int i) const;
+      
     private:
 				       /**
 					* The local numbers,
@@ -191,6 +223,11 @@ namespace MeshWorker
 					* faces.
 					*/
       std::vector<MatrixBlock<FullMatrix<number> > > M2;
+
+				       /**
+					* Values in quadrature points.
+					*/
+      std::vector<std::vector<number> > quadrature_values;
   };
 
   template <int dim, int spacedim> class DoFInfoBox;
@@ -229,8 +266,8 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<int dim, int spacedim = dim>
-  class DoFInfo : public LocalResults<double>
+  template<int dim, int spacedim = dim, typename number = double>
+  class DoFInfo : public LocalResults<number>
   {
     public:
 				       /// The current cell
@@ -788,8 +825,16 @@ namespace MeshWorker
 	  }
       }
   }
+  
 
-
+  template <typename number>
+  inline void
+  LocalResults<number>::initialize_quadrature(unsigned int np, unsigned int nv)
+  {
+    quadrature_values.resize(np, std::vector<number>(nv));
+  }
+  
+  
   template <typename number>
   inline void
   LocalResults<number>::reinit(const BlockIndices& bi)
@@ -836,6 +881,25 @@ namespace MeshWorker
 
   template <typename number>
   inline
+  unsigned int
+  LocalResults<number>::n_quadrature_points() const
+  {
+    return quadrature_values.size();
+  }
+
+  
+  template <typename number>
+  inline
+  unsigned int
+  LocalResults<number>::n_quadrature_values() const
+  {
+    Assert(quadrature_values.size() != 0, ExcNotInitialized());
+    return quadrature_values[0].size();
+  }
+  
+  
+  template <typename number>
+  inline
   number&
   LocalResults<number>::value(unsigned int i)
   {
@@ -867,6 +931,18 @@ namespace MeshWorker
     AssertIndexRange(i,M1.size());
     return M1[i];
   }
+  
+  
+  template <typename number>
+  inline
+  number&
+  LocalResults<number>::quadrature_value(unsigned int k, unsigned int i)
+  {
+    AssertIndexRange(k,quadrature_values.size());
+    AssertIndexRange(i,quadrature_values[0].size());
+    return quadrature_values[k][i];
+  }
+  
   
   template <typename number>
   inline
@@ -902,11 +978,23 @@ namespace MeshWorker
     return M1[i];
   }
   
+  
+  template <typename number>
+  inline
+  number
+  LocalResults<number>::quadrature_value(unsigned int k, unsigned int i) const
+  {
+    AssertIndexRange(k,quadrature_values.size());
+    AssertIndexRange(i,quadrature_values[0].size());
+    return quadrature_values[k][i];
+  }
+  
+  
 //----------------------------------------------------------------------//
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   template <class DH>
-  DoFInfo<dim,spacedim>::DoFInfo(const DH& dof_handler)
+  DoFInfo<dim,spacedim,number>::DoFInfo(const DH& dof_handler)
   {
     std::vector<unsigned int> aux(1);
     aux[0] = dof_handler.get_fe().dofs_per_cell;
@@ -914,28 +1002,28 @@ namespace MeshWorker
   }
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   template <class DHCellIterator>
   inline void
-  DoFInfo<dim,spacedim>::reinit(const DHCellIterator& c)
+  DoFInfo<dim,spacedim,number>::reinit(const DHCellIterator& c)
   {
     get_indices(c);
     cell = static_cast<typename Triangulation<dim,spacedim>::cell_iterator> (c);
     face_number = deal_II_numbers::invalid_unsigned_int;
     sub_number = deal_II_numbers::invalid_unsigned_int;
     if (block_info)
-      LocalResults<double>::reinit(block_info->local());
+      LocalResults<number>::reinit(block_info->local());
     else
-      LocalResults<double>::reinit(aux_local_indices);
+      LocalResults<number>::reinit(aux_local_indices);
   }
 
 
-  template<int dim, int spacedim>
+  template<int dim, int spacedim, typename number>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
-  DoFInfo<dim, spacedim>::reinit(const DHCellIterator& c,
-				 const DHFaceIterator& f,
-				 unsigned int n)
+  DoFInfo<dim,spacedim,number>::reinit(const DHCellIterator& c,
+				       const DHFaceIterator& f,
+				       unsigned int n)
   {
     if ((cell.state() != IteratorState::valid)
 	||  cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
@@ -945,19 +1033,19 @@ namespace MeshWorker
     face_number = n;
     sub_number = deal_II_numbers::invalid_unsigned_int;
     if (block_info)
-      LocalResults<double>::reinit(block_info->local());
+      LocalResults<number>::reinit(block_info->local());
     else
-      LocalResults<double>::reinit(aux_local_indices);
+      LocalResults<number>::reinit(aux_local_indices);
   }
 
 
-  template<int dim, int spacedim>
+  template<int dim, int spacedim, typename number>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
-  DoFInfo<dim, spacedim>::reinit(const DHCellIterator& c,
-				 const DHFaceIterator& f,
-				 unsigned int n,
-				 const unsigned int s)
+  DoFInfo<dim,spacedim,number>::reinit(const DHCellIterator& c,
+				       const DHFaceIterator& f,
+				       unsigned int n,
+				       const unsigned int s)
   {
     if (cell.state() != IteratorState::valid
 	|| cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
@@ -967,15 +1055,15 @@ namespace MeshWorker
     face_number = n;
     sub_number = s;
     if (block_info)
-      LocalResults<double>::reinit(block_info->local());
+      LocalResults<number>::reinit(block_info->local());
     else
-      LocalResults<double>::reinit(aux_local_indices);
+      LocalResults<number>::reinit(aux_local_indices);
   }
 
 
-  template<int dim, int spacedim>
+  template<int dim, int spacedim, typename number>
   inline const BlockIndices&
-  DoFInfo<dim, spacedim>::local_indices() const
+  DoFInfo<dim,spacedim,number>::local_indices() const
   {
     if (block_info)
       return block_info->local();
