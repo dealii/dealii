@@ -1,5 +1,3 @@
-#define baerbel_mg_test 1
-
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
@@ -33,6 +31,9 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
+#include <numerics/mesh_worker.h>
+#include <numerics/mesh_worker_loop.h>
+#include <numerics/mesh_worker_output.h>
 
 #include <multigrid/multigrid.h>
 #include <multigrid/mg_dof_handler.h>
@@ -46,6 +47,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <boost/bind.hpp>
 
 using namespace dealii;
 
@@ -67,7 +69,6 @@ template <int dim>
 void initialize (const MGDoFHandler<dim> &dof,
     Vector<double> &u)
 {
-  unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dof_indices(dofs_per_cell);
   for (typename MGDoFHandler<dim>::active_cell_iterator
@@ -76,7 +77,10 @@ void initialize (const MGDoFHandler<dim> &dof,
   {
     cell->get_dof_indices(dof_indices);
     for(unsigned int i=0; i<dofs_per_cell; ++i)
-      u(dof_indices[i]) = ++counter;
+    {
+      const unsigned int comp = dof.get_fe().system_to_component_index(i).first;
+      u(dof_indices[i]) = comp+1;
+    }
   }
 }
 
@@ -98,25 +102,22 @@ void initialize (const MGDoFHandler<dim> &dof,
 
 
 template <int dim>
-void print_diff (const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
-    const Vector<double> &u, const Vector<double> &v)
+void diff (Vector<double> &diff, const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
+    const Vector<double> &u, const Vector<double> &v, const unsigned int level)
 {
-  Vector<double> diff;
   diff.reinit (u);
   const unsigned int dofs_per_cell = dof_1.get_fe().dofs_per_cell;
   std::vector<unsigned int> dof_indices_1(dofs_per_cell);
   std::vector<unsigned int> dof_indices_2(dofs_per_cell);
-  for (typename MGDoFHandler<dim>::active_cell_iterator
-      cell_1 = dof_1.begin_active(), cell_2 = dof_2.begin_active();
-      cell_1 != dof_1.end(); ++cell_1, ++cell_2)
+  for (typename MGDoFHandler<dim>::cell_iterator
+      cell_1 = dof_1.begin(level), cell_2 = dof_2.begin(level);
+      cell_1 != dof_1.end(level); ++cell_1, ++cell_2)
   {
-    cell_1->get_dof_indices(dof_indices_1);
-    cell_2->get_dof_indices(dof_indices_2);
+    cell_1->get_mg_dof_indices(dof_indices_1);
+    cell_2->get_mg_dof_indices(dof_indices_2);
     for(unsigned int i=0; i<dofs_per_cell; ++i)
       diff(dof_indices_1[i]) = u(dof_indices_1[i]) - v(dof_indices_2[i]);
   }
-  deallog << std::endl;
-  deallog << "diff " << diff.l2_norm() << std::endl;
 }
 
 template <int dim>
@@ -139,37 +140,68 @@ void print(const MGDoFHandler<dim> &dof, std::vector<std::vector<bool> > &interf
   }
 }
 
+template <int dim>
+class OutputCreator : public Subscriptor
+{
+  public:
+    void cell(MeshWorker::DoFInfo<dim>& dinfo,
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+
+};
+
+template <int dim>
+void OutputCreator<dim>::cell(
+  MeshWorker::DoFInfo<dim>& dinfo,
+  typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
+{
+  const FEValuesBase<dim>& fe = info.fe_values();
+  const std::vector<std::vector<double> >& uh = info.values[0];
+  
+  const unsigned int square_root = std::pow(fe.n_quadrature_points, 1./dim)+.5;
+  for (unsigned int k1=0; k1<square_root; ++k1)
+  {
+    for (unsigned int k2=0; k2<square_root; ++k2)
+    {
+      for(unsigned int d=0; d<dim; ++d)
+        dinfo.quadrature_value(k1*square_root+k2, d) = fe.quadrature_point(k1*square_root+k2)[d];
+      for(unsigned int i=0; i<uh.size(); ++i)
+        dinfo.quadrature_value(k1*square_root+k2, i+dim) = uh[i][k1*square_root+k2];
+    }
+  }
+}
+
 
 template <int dim>
 class LaplaceProblem 
 {
   public:
+    typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
+    typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
+
     LaplaceProblem (const unsigned int deg);
     void run ();
 
   private:
     void setup_system ();
     void test ();
-    void test_renumber ();
-    void test_interface_dofs ();
+    void output_gpl(const MGDoFHandler<dim> &dof, 
+        MGLevelObject<Vector<double> > &v,
+        const bool renumbered);
     void refine_local ();
 
     Triangulation<dim>   triangulation;
+    const MappingQ1<dim>      mapping;
     FESystem<dim>            fe;
+    //FE_Q<dim>        fe;
     MGDoFHandler<dim>    mg_dof_handler;
     MGDoFHandler<dim>    mg_dof_handler_renumbered;
 
-    MGLevelObject<SparsityPattern> mg_sparsity_renumbered;
-    MGLevelObject<SparseMatrix<double> > mg_matrices_renumbered;
-    MGLevelObject<SparsityPattern> mg_sparsity;
-    MGLevelObject<SparseMatrix<double> > mg_matrices;
-
     const unsigned int degree;
 
-    std::vector<std::set<unsigned int> > 
+    std::vector<std::set<unsigned int> >
     boundary_indices;
 
-    std::vector<std::set<unsigned int> > 
+    std::vector<std::set<unsigned int> >
     boundary_indices_renumbered;
 };
 
@@ -177,7 +209,9 @@ class LaplaceProblem
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg) :
   triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
-  fe (FE_Q<dim> (deg),2, FE_Q<dim> (deg),2),
+  //fe (deg),
+  //fe (FE_Q<dim> (deg),2, FE_Q<dim> (deg),2),
+  fe (FE_Q<dim> (deg),2),
   mg_dof_handler (triangulation),
   mg_dof_handler_renumbered (triangulation),
   degree(deg)
@@ -197,11 +231,11 @@ void LaplaceProblem<dim>::setup_system ()
   const unsigned int nlevels = triangulation.n_levels();
 
   DoFHandler<dim> &dof = mg_dof_handler_renumbered;
-  DoFRenumbering::component_wise (dof, block_component);
+  DoFRenumbering::component_wise (dof);//, block_component);
   //DoFRenumbering::Cuthill_McKee (dof);
   for (unsigned int level=0;level<nlevels;++level)
   {
-    DoFRenumbering::component_wise (mg_dof_handler_renumbered, level, block_component);
+    DoFRenumbering::component_wise (mg_dof_handler_renumbered, level);//, block_component);
     //DoFRenumbering::Cuthill_McKee (mg_dof_handler_renumbered, level);
   }
 
@@ -215,93 +249,60 @@ void LaplaceProblem<dim>::setup_system ()
 
   boundary_indices.resize(triangulation.n_levels());
   boundary_indices_renumbered.resize(triangulation.n_levels());
-
-  mg_matrices.resize(0, nlevels-1);
-  mg_matrices.clear ();
-  mg_matrices_renumbered.resize(0, nlevels-1);
-  mg_matrices_renumbered.clear ();
-  mg_sparsity.resize(0, nlevels-1);
-  mg_sparsity_renumbered.resize(0, nlevels-1);
-
-  for (unsigned int level=0;level<nlevels;++level)
-  {
-    mg_sparsity[level].reinit (mg_dof_handler.n_dofs(level),
-        mg_dof_handler.n_dofs(level),
-        mg_dof_handler.max_couplings_between_dofs());
-    mg_sparsity_renumbered[level].reinit (mg_dof_handler_renumbered.n_dofs(level),
-        mg_dof_handler_renumbered.n_dofs(level),
-        mg_dof_handler_renumbered.max_couplings_between_dofs());
-    MGTools::make_sparsity_pattern (mg_dof_handler, mg_sparsity[level], level);
-    MGTools::make_sparsity_pattern (mg_dof_handler_renumbered, 
-        mg_sparsity_renumbered[level], level);
-    mg_sparsity[level].compress();
-    mg_sparsity_renumbered[level].compress();
-    mg_matrices[level].reinit(mg_sparsity[level]);
-    mg_matrices_renumbered[level].reinit(mg_sparsity_renumbered[level]);
-  }
 }
 
-
-  template <int dim>
-void LaplaceProblem<dim>::test_interface_dofs () 
+template <int dim>
+void
+LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof, 
+    MGLevelObject<Vector<double> > &v,
+    const bool renumbered)
 {
-  std::vector<std::vector<bool> > interface_dofs;
-  std::vector<std::vector<bool> > boundary_interface_dofs;
-  for (unsigned int level = 0; level<triangulation.n_levels(); ++level)
-  {
-    std::vector<bool> tmp (mg_dof_handler.n_dofs(level));
-    interface_dofs.push_back (tmp);
-    boundary_interface_dofs.push_back (tmp);
-  }
+  MeshWorker::IntegrationWorker<dim> integration_worker;
+  MeshWorker::Assembler::GnuplotPatch assembler;
 
-  MGTools::extract_inner_interface_dofs(mg_dof_handler_renumbered, 
-      interface_dofs, boundary_interface_dofs);
-  deallog << "1. Test" << std::endl;
-  print(mg_dof_handler_renumbered, interface_dofs);
+  const unsigned int n_gauss_points = dof.get_fe().tensor_degree()+1;
+  QTrapez<1> trapez;
+  QIterated<dim> quadrature(trapez, n_gauss_points);
+  integration_worker.cell_quadrature = quadrature;
+  UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
+  integration_worker.add_update_flags(update_flags, true, true, true, true);
 
-  deallog << std::endl;
+  NamedData<MGLevelObject<Vector<double> >* > data;
+  data.add(&v, "mg_vector");
+  MeshWorker::VectorSelector cs;
+  cs.add("mg_vector");
+  integration_worker.cell_selector = cs;
 
-  MGTools::extract_inner_interface_dofs(mg_dof_handler, 
-      interface_dofs, boundary_interface_dofs);
+  assembler.initialize(dim, quadrature.size(), dim+mg_dof_handler.get_fe().n_components());
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  MeshWorker::DoFInfo<dim> dof_info(dof);
+  info_box.initialize(integration_worker, fe, mapping, data);
 
-  deallog << "2. Test" << std::endl;
-  print(mg_dof_handler, interface_dofs);
-}
-
-  template <int dim>
-void LaplaceProblem<dim>::test_renumber () 
-{
-  std::vector<std::vector<bool> > v(triangulation.n_levels());
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
-    v[l].resize(mg_dof_handler_renumbered.n_dofs(l));
-    std::fill (v[l].begin(), v[l].end(), false);
-  }
-
-  const unsigned int dofs_per_cell = 
-    mg_dof_handler_renumbered.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices(dofs_per_cell);
-  for (typename MGDoFHandler<dim>::cell_iterator
-      cell = mg_dof_handler_renumbered.begin();
-      cell != mg_dof_handler_renumbered.end(); ++cell)
-  {
-    cell->get_mg_dof_indices(dof_indices);
-    for(unsigned int i=0; i<dofs_per_cell; ++i)
-      v[cell->level()][dof_indices[i]] = true;
-  }
-  for(unsigned int l=0; l<triangulation.n_levels(); ++l)
-  {
-    deallog << "Level " << l << std::endl;
-    for(unsigned int dof=0; dof<mg_dof_handler_renumbered.n_dofs(l);
-        ++dof)
-      if(!v[l][dof])
-        deallog << "FALSE " << dof << std::endl;
+    std::ostringstream filename;
+    if(renumbered)
+    filename << "mg_renumbered-" << l << ".gpl";
+    else
+    filename << "mg-" << l << ".gpl";
+    std::ofstream file (filename.str().c_str()); 
+    assembler.initialize_stream (file);
+    OutputCreator<dim> matrix_integrator;
+    MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim> (
+      dof.begin(l), dof.end(l),
+      dof_info, info_box,
+      std_cxx1x::bind(&OutputCreator<dim>::cell, &matrix_integrator, _1, _2),
+      0,
+      0,
+      assembler);
   }
 }
 
 
+
+
   template <int dim>
-void LaplaceProblem<dim>::test () 
+void LaplaceProblem<dim>::test ()
 {
   typename FunctionMap<dim>::type      dirichlet_boundary;
   ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
@@ -310,57 +311,36 @@ void LaplaceProblem<dim>::test ()
 			       boundary_indices);
   MGTools::make_boundary_list (mg_dof_handler_renumbered, dirichlet_boundary,
 			       boundary_indices_renumbered);
-  const unsigned int min_l = mg_matrices.get_minlevel();
-  const unsigned int max_l = mg_matrices.get_maxlevel();
-  for(unsigned int l=min_l; l<max_l; ++l)
-  {
-    mg_matrices[l] = IdentityMatrix(mg_dof_handler.n_dofs(l));
-    mg_matrices_renumbered[l] = IdentityMatrix(mg_dof_handler.n_dofs(l));
-  }
-
-  GrowingVectorMemory<>   vector_memory;
-  GrowingVectorMemory<>   vector_memory_renumbered;
-
   MGTransferPrebuilt<Vector<double> > mg_transfer;
   mg_transfer.build_matrices(mg_dof_handler, boundary_indices);
   MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered;
   mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered, boundary_indices_renumbered);
 
-  Vector<double> u(mg_dof_handler.n_dofs());
-  initialize(mg_dof_handler,u);
-  deallog << "initialize " << u.l2_norm() << std::endl;
+  Vector<double> test;
+  test.reinit(mg_dof_handler.n_dofs());
 
   MGLevelObject<Vector<double> > v(0, triangulation.n_levels()-1);
-  reinit_vector(mg_dof_handler, v);
+  MGLevelObject<Vector<double> > u(0, triangulation.n_levels()-1);
+  MGLevelObject<Vector<double> > d(0, triangulation.n_levels()-1);
 
-  mg_transfer.copy_to_mg(mg_dof_handler, v, u);
-  //print(mg_dof_handler, v);
+  initialize(mg_dof_handler, test);
+  mg_transfer.copy_to_mg(mg_dof_handler, v, test);
+  //output_gpl(mg_dof_handler, v, false);
 
-  u=0;
-  initialize(mg_dof_handler, v);
-  for(unsigned int l=0; l<triangulation.n_levels()-1; ++l)
-    mg_transfer.prolongate (l+1, v[l+1], v[l]);
-
-  mg_transfer.copy_from_mg(mg_dof_handler, u, v);
-  Vector<double> diff = u;
-
-  initialize(mg_dof_handler_renumbered,u);
-  deallog << "initialize " << u.l2_norm() << std::endl;
-
-  reinit_vector(mg_dof_handler_renumbered, v);
-  mg_transfer_renumbered.copy_to_mg(mg_dof_handler_renumbered, v, u);
-  deallog << "copy_to_mg" << std::endl;
-  //print(mg_dof_handler_renumbered, v);
-
-  u=0;
-  initialize(mg_dof_handler_renumbered, v);
-  for(unsigned int l=0; l<triangulation.n_levels()-1; ++l)
-    mg_transfer_renumbered.prolongate (l+1, v[l+1], v[l]);
-
-  mg_transfer_renumbered.copy_from_mg(mg_dof_handler_renumbered, u, v);
-  print_diff(mg_dof_handler_renumbered, mg_dof_handler, u, diff);
+  initialize(mg_dof_handler_renumbered, test);
+  mg_transfer_renumbered.copy_to_mg(mg_dof_handler_renumbered, u, test);
+  //output_gpl(mg_dof_handler_renumbered, u, true);
+  for(unsigned int l=0; l<triangulation.n_levels(); ++l)
+  {
+    diff(d[l], mg_dof_handler, mg_dof_handler_renumbered, v[l],u[l],l);
+    deallog << l << " " << u[l].l2_norm() << '\t' << v[l].l2_norm() << '\t' 
+      << d[l].l2_norm()<< std::endl;
+    for(unsigned int i=0; i<d[l].size(); ++i)
+      if(d[l](i)!=0)
+        deallog << i << " " << d[l](i) << std::endl;
+  }
+  output_gpl(mg_dof_handler, d, false);
 }
-
 
 
 
@@ -401,9 +381,9 @@ void LaplaceProblem<dim>::refine_local ()
 }
 
   template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
-  for (unsigned int cycle=0; cycle<7; ++cycle)
+  for (unsigned int cycle=0; cycle<6; ++cycle)
   {
     deallog << "Cycle " << cycle << std::endl;
 
@@ -419,7 +399,7 @@ void LaplaceProblem<dim>::run ()
   };
 }
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mg_renumbered_03/output");
   deallog << std::setprecision(4);
@@ -429,5 +409,4 @@ int main ()
 
   LaplaceProblem<2> laplace_problem_2d(1);
   laplace_problem_2d.run ();
-
 }

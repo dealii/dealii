@@ -1,4 +1,4 @@
-#define baerbel_mg_test 1
+#define BAERBEL_MG_TEST 1
 
 #include <base/quadrature_lib.h>
 #include <base/function.h>
@@ -104,21 +104,28 @@ void initialize (const MGDoFHandler<dim> &dof,
 
 
 template <int dim>
-void diff (Vector<double> &diff, const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
-    const Vector<double> &u, const Vector<double> &v, const unsigned int level)
+void diff (Vector<double> &diff, const MGDoFHandler<dim> &dof,
+    const Vector<double> &v, const unsigned int level)
 {
-  diff.reinit (u);
-  const unsigned int dofs_per_cell = dof_1.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices_1(dofs_per_cell);
-  std::vector<unsigned int> dof_indices_2(dofs_per_cell);
+  diff.reinit (v);
+  const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+  std::vector<unsigned int> mg_dof_indices(dofs_per_cell);
+  const unsigned int n_comp = dof.get_fe().n_components();
   for (typename MGDoFHandler<dim>::cell_iterator
-      cell_1 = dof_1.begin(level), cell_2 = dof_2.begin(level);
-      cell_1 != dof_1.end(level); ++cell_1, ++cell_2)
+      cell= dof.begin(level);
+      cell != dof.end(level); ++cell)
   {
-    cell_1->get_mg_dof_indices(dof_indices_1);
-    cell_2->get_mg_dof_indices(dof_indices_2);
-    for(unsigned int i=0; i<dofs_per_cell; ++i)
-      diff(dof_indices_1[i]) = u(dof_indices_1[i]) - v(dof_indices_2[i]);
+    cell->get_mg_dof_indices(mg_dof_indices);
+    for(unsigned int i=0; i<dofs_per_cell/n_comp; ++i)
+    {
+      const unsigned int ni = n_comp* i;
+      const unsigned int i0 = mg_dof_indices[ni]; 
+      const unsigned int i1 = mg_dof_indices[ni+1]; 
+      const unsigned int i2 = mg_dof_indices[ni+2]; 
+      diff(i0) = 2*v(i0) - v(i1);
+      diff(i1) = 3*v(i1) - 2*v(i2);
+      diff(i2) = v(i2) - 3*v(i0);
+    }
   }
 }
 
@@ -159,12 +166,6 @@ void OutputCreator<dim>::cell(
   const FEValuesBase<dim>& fe = info.fe_values();
   const std::vector<std::vector<double> >& uh = info.values[0];
   
-  if(dinfo.cell->level() == 3)
-  {
-    for(unsigned int i=0; i<dinfo.indices.size(); ++i)
-      if(dinfo.indices[i]==38)  
-        deallog << "irgendwas" <<std::endl;
-  }
   const unsigned int square_root = std::pow(fe.n_quadrature_points, 1./dim)+.5;
   for (unsigned int k1=0; k1<square_root; ++k1)
   {
@@ -201,21 +202,15 @@ class LaplaceProblem
     const MappingQ1<dim>      mapping;
     FESystem<dim>            fe;
     //FE_Q<dim>        fe;
-    MGDoFHandler<dim>    mg_dof_handler;
     MGDoFHandler<dim>    mg_dof_handler_renumbered;
-
-    MGLevelObject<SparsityPattern> mg_sparsity_renumbered;
-    MGLevelObject<SparseMatrix<double> > mg_matrices_renumbered;
-    MGLevelObject<SparsityPattern> mg_sparsity;
-    MGLevelObject<SparseMatrix<double> > mg_matrices;
 
     const unsigned int degree;
 
-    std::vector<std::set<unsigned int> >
-    boundary_indices;
+    //std::vector<std::set<unsigned int> >
+    //boundary_indices;
 
-    std::vector<std::set<unsigned int> >
-    boundary_indices_renumbered;
+    //std::vector<std::set<unsigned int> >
+    //boundary_indices_renumbered;
 };
 
 
@@ -224,8 +219,7 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg) :
   triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
   //fe (deg),
   //fe (FE_Q<dim> (deg),2, FE_Q<dim> (deg),2),
-  fe (FE_Q<dim> (deg),4),
-  mg_dof_handler (triangulation),
+  fe (FE_Q<dim> (deg),3),
   mg_dof_handler_renumbered (triangulation),
   degree(deg)
 {}
@@ -234,7 +228,6 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg) :
   template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-  mg_dof_handler.distribute_dofs (fe);
   mg_dof_handler_renumbered.distribute_dofs (fe);
 
   std::vector<unsigned int> block_component (2*dim,0);
@@ -253,39 +246,12 @@ void LaplaceProblem<dim>::setup_system ()
   }
 
   deallog << "Number of degrees of freedom: "
-    << mg_dof_handler.n_dofs();
+    << mg_dof_handler_renumbered.n_dofs();
 
   for (unsigned int l=0;l<triangulation.n_levels();++l)
     deallog << "   " << 'L' << l << ": "
-      << mg_dof_handler.n_dofs(l);
+      << mg_dof_handler_renumbered.n_dofs(l);
   deallog  << std::endl;
-
-  boundary_indices.resize(triangulation.n_levels());
-  boundary_indices_renumbered.resize(triangulation.n_levels());
-
-  mg_matrices.resize(0, nlevels-1);
-  mg_matrices.clear ();
-  mg_matrices_renumbered.resize(0, nlevels-1);
-  mg_matrices_renumbered.clear ();
-  mg_sparsity.resize(0, nlevels-1);
-  mg_sparsity_renumbered.resize(0, nlevels-1);
-
-  for (unsigned int level=0;level<nlevels;++level)
-  {
-    mg_sparsity[level].reinit (mg_dof_handler.n_dofs(level),
-        mg_dof_handler.n_dofs(level),
-        mg_dof_handler.max_couplings_between_dofs());
-    mg_sparsity_renumbered[level].reinit (mg_dof_handler_renumbered.n_dofs(level),
-        mg_dof_handler_renumbered.n_dofs(level),
-        mg_dof_handler_renumbered.max_couplings_between_dofs());
-    MGTools::make_sparsity_pattern (mg_dof_handler, mg_sparsity[level], level);
-    MGTools::make_sparsity_pattern (mg_dof_handler_renumbered,
-        mg_sparsity_renumbered[level], level);
-    mg_sparsity[level].compress();
-    mg_sparsity_renumbered[level].compress();
-    mg_matrices[level].reinit(mg_sparsity[level]);
-    mg_matrices_renumbered[level].reinit(mg_sparsity_renumbered[level]);
-  }
 }
 
 template <int dim>
@@ -297,7 +263,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   MeshWorker::IntegrationWorker<dim> integration_worker;
   MeshWorker::Assembler::GnuplotPatch assembler;
 
-  const unsigned int n_gauss_points = dof.get_fe().tensor_degree()+1;
+  const unsigned int n_gauss_points = dof.get_fe().tensor_degree();
   QTrapez<1> trapez;
   QIterated<dim> quadrature(trapez, n_gauss_points);
   integration_worker.cell_quadrature = quadrature;
@@ -310,7 +276,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   cs.add("mg_vector");
   integration_worker.cell_selector = cs;
 
-  assembler.initialize(dim, quadrature.size(), dim+mg_dof_handler.get_fe().n_components());
+  assembler.initialize(dim, quadrature.size(), dim+dof.get_fe().n_components());
   MeshWorker::IntegrationInfoBox<dim> info_box;
   MeshWorker::DoFInfo<dim> dof_info(dof);
   info_box.initialize(integration_worker, fe, mapping, data);
@@ -341,42 +307,28 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   template <int dim>
 void LaplaceProblem<dim>::test ()
 {
-  typename FunctionMap<dim>::type      dirichlet_boundary;
-  ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
-  dirichlet_boundary[0] =             &dirichlet_bc;
-  MGTools::make_boundary_list (mg_dof_handler, dirichlet_boundary,
-			       boundary_indices);
-  MGTools::make_boundary_list (mg_dof_handler_renumbered, dirichlet_boundary,
-			       boundary_indices_renumbered);
-  MGTransferPrebuilt<Vector<double> > mg_transfer;
-  mg_transfer.build_matrices(mg_dof_handler, boundary_indices);
   MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered;
-  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered, boundary_indices_renumbered);
+  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered);
 
   Vector<double> test;
-  test.reinit(mg_dof_handler.n_dofs());
+  test.reinit(mg_dof_handler_renumbered.n_dofs());
 
-  MGLevelObject<Vector<double> > v(0, triangulation.n_levels()-1);
   MGLevelObject<Vector<double> > u(0, triangulation.n_levels()-1);
   MGLevelObject<Vector<double> > d(0, triangulation.n_levels()-1);
 
-  initialize(mg_dof_handler, test);
-  mg_transfer.copy_to_mg(mg_dof_handler, v, test);
-  //output_gpl(mg_dof_handler, v, false);
-
   initialize(mg_dof_handler_renumbered, test);
   mg_transfer_renumbered.copy_to_mg(mg_dof_handler_renumbered, u, test);
-  //output_gpl(mg_dof_handler_renumbered, u, true);
+
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
-    diff(d[l], mg_dof_handler, mg_dof_handler_renumbered, v[l],u[l],l);
-    deallog << l << " " << u[l].l2_norm() << '\t' << v[l].l2_norm() << '\t' 
+    diff(d[l], mg_dof_handler_renumbered, u[l],l);
+    deallog << l << " " << u[l].l2_norm() << '\t' 
       << d[l].l2_norm()<< std::endl;
     for(unsigned int i=0; i<d[l].size(); ++i)
       if(d[l](i)!=0)
         deallog << i << " " << d[l](i) << std::endl;
   }
-  output_gpl(mg_dof_handler, d, false);
+  output_gpl(mg_dof_handler_renumbered, d, false);
 }
 
 
