@@ -1447,9 +1447,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
 
   	      dnl Sun Forte?
               is_sun_forte_cc="`($CC -V 2>&1) | grep 'Forte'`"
-              if test "x$is_sun_forte_cc" != "x" ; then
-                AC_MSG_RESULT(C compiler is Sun Forte compiler)
-                CC_VERSION=sun_forte
+              is_sun_cc="`($CC -V 2>&1) | grep 'Sun C'`"
+              if test "x$is_sun_forte_cc$is_sun_cc" != "x" ; then
+                AC_MSG_RESULT(C compiler is Sun C compiler)
+                CC_VERSION=sun_cc
               else
 
   	        dnl Portland Group C?
@@ -1627,6 +1628,12 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 	  dnl message about unreliable floating point comparisons
 	  DEAL_II_ICC_C_WD_1572
 
+          ;;
+
+      sun_cc*)
+          CFLAGS="$CFLAGS -g"
+          CFLAGSO="$CFLAGS -fast -O2"
+	  CFLAGSPIC="-fPIC"
           ;;
 
       *)
