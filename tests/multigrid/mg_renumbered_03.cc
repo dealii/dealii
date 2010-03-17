@@ -102,6 +102,32 @@ void initialize (const MGDoFHandler<dim> &dof,
 
 
 template <int dim>
+void diff (Vector<double> &diff, const MGDoFHandler<dim> &dof,
+    const Vector<double> &v, const unsigned int level)
+{
+  diff.reinit (v);
+  const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+  std::vector<unsigned int> mg_dof_indices(dofs_per_cell);
+  const unsigned int n_comp = dof.get_fe().n_components();
+  for (typename MGDoFHandler<dim>::cell_iterator
+      cell= dof.begin(level);
+      cell != dof.end(level); ++cell)
+  {
+    cell->get_mg_dof_indices(mg_dof_indices);
+    for(unsigned int i=0; i<dofs_per_cell/n_comp; ++i)
+    {
+      const unsigned int ni = n_comp* i;
+      const unsigned int i0 = mg_dof_indices[ni]; 
+      const unsigned int i1 = mg_dof_indices[ni+1]; 
+      const unsigned int i2 = mg_dof_indices[ni+2]; 
+      diff(i0) = 2*v(i0) - v(i1);
+      diff(i1) = 3*v(i1) - 2*v(i2);
+      diff(i2) = v(i2) - 3*v(i0);
+    }
+  }
+}
+
+template <int dim>
 void diff (Vector<double> &diff, const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
     const Vector<double> &u, const Vector<double> &v, const unsigned int level)
 {
@@ -197,12 +223,9 @@ class LaplaceProblem
     MGDoFHandler<dim>    mg_dof_handler_renumbered;
 
     const unsigned int degree;
-
     std::vector<std::set<unsigned int> >
-    boundary_indices;
+      boundary_indices, boundary_indices_renumbered;
 
-    std::vector<std::set<unsigned int> >
-    boundary_indices_renumbered;
 };
 
 
@@ -211,7 +234,7 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg) :
   triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
   //fe (deg),
   //fe (FE_Q<dim> (deg),2, FE_Q<dim> (deg),2),
-  fe (FE_Q<dim> (deg),2),
+  fe (FE_Q<dim> (deg),3),
   mg_dof_handler (triangulation),
   mg_dof_handler_renumbered (triangulation),
   degree(deg)
@@ -239,6 +262,9 @@ void LaplaceProblem<dim>::setup_system ()
     //DoFRenumbering::Cuthill_McKee (mg_dof_handler_renumbered, level);
   }
 
+  boundary_indices.resize(nlevels);
+  boundary_indices_renumbered.resize(nlevels);
+
   deallog << "Number of degrees of freedom: "
     << mg_dof_handler.n_dofs();
 
@@ -247,8 +273,6 @@ void LaplaceProblem<dim>::setup_system ()
       << mg_dof_handler.n_dofs(l);
   deallog  << std::endl;
 
-  boundary_indices.resize(triangulation.n_levels());
-  boundary_indices_renumbered.resize(triangulation.n_levels());
 }
 
 template <int dim>
@@ -260,7 +284,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   MeshWorker::IntegrationWorker<dim> integration_worker;
   MeshWorker::Assembler::GnuplotPatch assembler;
 
-  const unsigned int n_gauss_points = dof.get_fe().tensor_degree()+1;
+  const unsigned int n_gauss_points = dof.get_fe().tensor_degree();
   QTrapez<1> trapez;
   QIterated<dim> quadrature(trapez, n_gauss_points);
   integration_worker.cell_quadrature = quadrature;
@@ -273,7 +297,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   cs.add("mg_vector");
   integration_worker.cell_selector = cs;
 
-  assembler.initialize(dim, quadrature.size(), dim+mg_dof_handler.get_fe().n_components());
+  assembler.initialize(dim, quadrature.size(), dim+dof.get_fe().n_components());
   MeshWorker::IntegrationInfoBox<dim> info_box;
   MeshWorker::DoFInfo<dim> dof_info(dof);
   info_box.initialize(integration_worker, fe, mapping, data);
@@ -332,14 +356,15 @@ void LaplaceProblem<dim>::test ()
   //output_gpl(mg_dof_handler_renumbered, u, true);
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
-    diff(d[l], mg_dof_handler, mg_dof_handler_renumbered, v[l],u[l],l);
+    diff(d[l], mg_dof_handler_renumbered, u[l],l);
+    //diff(d[l], mg_dof_handler, mg_dof_handler_renumbered, v[l],u[l],l);
     deallog << l << " " << u[l].l2_norm() << '\t' << v[l].l2_norm() << '\t' 
       << d[l].l2_norm()<< std::endl;
     for(unsigned int i=0; i<d[l].size(); ++i)
       if(d[l](i)!=0)
         deallog << i << " " << d[l](i) << std::endl;
   }
-  output_gpl(mg_dof_handler, d, false);
+  output_gpl(mg_dof_handler_renumbered, d, false);
 }
 
 

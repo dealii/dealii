@@ -87,7 +87,6 @@ void initialize (const MGDoFHandler<dim> &dof,
 }
 
 
-
 template <int dim>
 void initialize (const MGDoFHandler<dim> &dof,
     MGLevelObject<Vector<double> > &u)
@@ -193,6 +192,7 @@ class LaplaceProblem
   private:
     void setup_system ();
     void test ();
+    void test_boundary ();
     void output_gpl(const MGDoFHandler<dim> &dof, 
         MGLevelObject<Vector<double> > &v,
         const bool renumbered);
@@ -205,12 +205,9 @@ class LaplaceProblem
     MGDoFHandler<dim>    mg_dof_handler_renumbered;
 
     const unsigned int degree;
+    std::vector<std::set<unsigned int> >
+      boundary_indices_renumbered;
 
-    //std::vector<std::set<unsigned int> >
-    //boundary_indices;
-
-    //std::vector<std::set<unsigned int> >
-    //boundary_indices_renumbered;
 };
 
 
@@ -244,6 +241,8 @@ void LaplaceProblem<dim>::setup_system ()
     DoFRenumbering::component_wise (mg_dof_handler_renumbered, level);//, block_component);
     //DoFRenumbering::Cuthill_McKee (mg_dof_handler_renumbered, level);
   }
+
+  boundary_indices_renumbered.resize(nlevels);
 
   deallog << "Number of degrees of freedom: "
     << mg_dof_handler_renumbered.n_dofs();
@@ -302,13 +301,16 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
 }
 
 
-
-
   template <int dim>
 void LaplaceProblem<dim>::test ()
 {
+  typename FunctionMap<dim>::type      dirichlet_boundary;
+  ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
+  dirichlet_boundary[0] =             &dirichlet_bc;
+  MGTools::make_boundary_list (mg_dof_handler_renumbered, dirichlet_boundary,
+			       boundary_indices_renumbered);
   MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered;
-  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered);
+  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered, boundary_indices_renumbered);
 
   Vector<double> test;
   test.reinit(mg_dof_handler_renumbered.n_dofs());
@@ -329,6 +331,33 @@ void LaplaceProblem<dim>::test ()
         deallog << i << " " << d[l](i) << std::endl;
   }
   output_gpl(mg_dof_handler_renumbered, d, false);
+}
+
+
+  template <int dim>
+void LaplaceProblem<dim>::test_boundary ()
+{
+  typename FunctionMap<dim>::type      dirichlet_boundary;
+  ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
+  dirichlet_boundary[0] =             &dirichlet_bc;
+  MGTools::make_boundary_list (mg_dof_handler_renumbered, dirichlet_boundary,
+			       boundary_indices_renumbered);
+
+  MGLevelObject<Vector<double> > u(0, triangulation.n_levels()-1);
+  MGLevelObject<Vector<double> > d(0, triangulation.n_levels()-1);
+
+  for(unsigned int l=0; l<triangulation.n_levels(); ++l)
+  {
+    u[l].reinit(mg_dof_handler_renumbered.n_dofs(l));
+    u[l] = 1.;
+
+    for(std::set<unsigned int>::const_iterator i = boundary_indices_renumbered[l].begin();
+      i!=boundary_indices_renumbered[l].end(); ++i)
+    {
+      u[l](*i) = 0;
+    }
+  }
+  output_gpl(mg_dof_handler_renumbered, u, false);
 }
 
 
@@ -384,7 +413,7 @@ void LaplaceProblem<dim>::run ()
     //triangulation.refine_global (1);
     refine_local ();
     setup_system ();
-    test();
+    test_boundary();
   };
 }
 
