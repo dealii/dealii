@@ -289,8 +289,11 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
     unsigned int mg_vertex_dof_index (const int level,
 				      const unsigned int vertex,
 				      const unsigned int i) const;
-
+//TODO: This function is broken for faces
 				     /**
+				      * @todo This function is broken
+				      * for faces.
+				      *
 				      * Return the index of the @p ith
 				      * degree of freedom of this line
 				      * on the level this line lives
