@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/smartpointer.h>
+#include <dofs/block_info.h>
 #include <dofs/dof_iterator_selector.h>
 #include <dofs/function_map.h>
 
@@ -250,6 +251,19 @@ class DoFHandler  :  public Subscriptor
     virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe,
 				  const unsigned int        offset = 0);
 
+				     /**
+				      * After disatribute_dofs() with
+				      * an FESystem element, the block
+				      * structure of global and level
+				      * vectors is stored in a
+				      * BlockInfo object accessible
+				      * with block_info(). This
+				      * function initializes the local
+				      * block structure on each cell
+				      * in the same object.
+				      */
+    void initialize_local_block_info();
+    
 				     /**
 				      * Clear all data of this object and
 				      * especially delete the lock this object
@@ -919,6 +933,34 @@ class DoFHandler  :  public Subscriptor
     n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const;
 
 				     /**
+				      * Access to an object informing
+				      * of the block structure of the
+				      * dof handler.
+				      *
+				      * If an FESystem is used in
+				      * distribute_dofs(), degrees ofd
+				      * freedom naturally split into
+				      * several @ref GlossBlock
+				      * blocks. For each base element
+				      * as many blocks appear as its
+				      * multiplicity.
+				      *
+				      * At the end of
+				      * distribute_dofs(), the number
+				      * of degrees of freedom in each
+				      * block is counted, and stored
+				      * in a BlockInfo object, which
+				      * can be accessed here. In an
+				      * MGDoFHandler, the same is done
+				      * on each level. Additionally,
+				      * the block structure on each
+				      * cell can be generated in this
+				      * object by calling
+				      * initialize_local_block_indices().
+				      */
+    const BlockInfo& block_info() const;
+    
+				     /**
 				      * Return a constant reference to
 				      * the selected finite element
 				      * object.
@@ -951,11 +993,16 @@ class DoFHandler  :  public Subscriptor
 				      */
     DeclException0 (ExcInvalidTriangulation);
 				     /**
-				      * Exception
+				      * No finite element has been
+				      * assigned to this
+				      * DoFHandler. Call the function
+				      * DoFHandler::distribute_dofs()
+				      * before you attemped to do what
+				      * raised this exception.
 				      */
     DeclException0 (ExcNoFESelected);
     				     /**
-				      * Exception
+				      * @todo Replace by ExcInternalError.
 				      */
     DeclException0 (ExcRenumberingIncomplete);
 				     /**
@@ -1020,7 +1067,8 @@ class DoFHandler  :  public Subscriptor
 				      * this object as well, though).
 				      */
     SmartPointer<const FiniteElement<dim,spacedim>,DoFHandler<dim,spacedim> > selected_fe;
-
+    
+    BlockInfo block_info_object;
   private:
 
 				     /**
@@ -1134,6 +1182,15 @@ const Triangulation<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_tria () const
 {
   return *tria;
+}
+
+
+template <int dim, int spacedim>
+inline
+const BlockInfo&
+DoFHandler<dim,spacedim>::block_info () const
+{
+  return block_info_object;
 }
 
 

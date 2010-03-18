@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2114,6 +2114,10 @@ void FETools::interpolate<deal_II_dimension>
  Vector<double> &);
 
 #if deal_II_dimension != 3
+template
+void FETools::compute_block_renumbering (
+  const FiniteElement<deal_II_dimension,deal_II_dimension+1>& element,
+  std::vector<unsigned int>&, std::vector<unsigned int>&_indices, bool);
 template
 void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<double> &,

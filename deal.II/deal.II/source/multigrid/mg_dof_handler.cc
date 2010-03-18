@@ -1992,6 +1992,8 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
 				   // finally restore the user flags
   const_cast<Triangulation<dim,spacedim> &>(*(this->tria))
     .load_user_flags(user_flags);
+
+  this->block_info_object.initialize(*this, true);
 }
 
 

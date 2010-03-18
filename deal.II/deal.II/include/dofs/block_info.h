@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,13 +58,17 @@ class BlockInfo : public Subscriptor
 				     /**
 				      * @brief Fill the object with values
 				      * describing level block
-				      * structure of the MGDoFHandler.
+				      * structure of the
+				      * MGDoFHandler. If
+				      * <tt>levels_only</tt> is false,
+				      * the other initialize() is
+				      * called as well.
 				      *
 				      * This function will also clear
 				      * the local() indices.
 				      */
     template <int dim, int spacedim>
-    void initialize(const MGDoFHandler<dim, spacedim>&);
+    void initialize(const MGDoFHandler<dim, spacedim>&, bool levels_only = false);
     
 				     /**
 				      * @brief Initialize block structure

@@ -589,6 +589,13 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+<li><p> Improved: DoFHandler now has a BlockInfo object, automatically updated after DoFHandler::distribute_dofs() and accessible by DoFHandler::block_info(). This object can be used to initialize block vectors and obliterates the necessity to count dofs per block (or dofs per component in legacy code) in application programs.
+<br>
+(GK 2010/03/18)
+</p>
+</li>
+
   <li>
   <p>
   New: The class MGTransferSelect is prepared for use on adaptively refined meshes.

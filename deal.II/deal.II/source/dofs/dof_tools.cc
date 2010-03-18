@@ -5751,6 +5751,10 @@ DoFTools::count_dofs_per_component<deal_II_dimension> (
   std::vector<unsigned int>&, bool, std::vector<unsigned int>);
 
 #if deal_II_dimension < 3
+template void DoFTools::extract_level_dofs<deal_II_dimension, deal_II_dimension+1>
+(const unsigned int level, const MGDoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+ const std::vector<bool>&, std::vector<bool>&, bool);
+
 template
 void
 DoFTools::count_dofs_per_component<deal_II_dimension, deal_II_dimension+1> (
@@ -5841,6 +5845,12 @@ DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
 (const Mapping<deal_II_dimension,deal_II_dimension+1>&,
  const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
  std::vector<Point<deal_II_dimension+1> >&);
+
+template
+void
+DoFTools::count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (
+  const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
 
 #endif
 

@@ -1024,7 +1024,7 @@ MGTools::count_dofs_per_block (
   std::vector<std::vector<unsigned int> >& dofs_per_block,
   std::vector<unsigned int>  target_block)
 {
-  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
   const unsigned int n_blocks = fe.n_blocks();
   const unsigned int n_levels = dof_handler.get_tria().n_levels();
 
@@ -1638,5 +1638,13 @@ void
 MGTools::
 extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
 			      std::vector<std::vector<bool> >  &interface_dofs);
+
+#if deal_II_dimension < 3
+
+template void MGTools::count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (
+  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+  std::vector<std::vector<unsigned int> >&, std::vector<unsigned int>);
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

@@ -56,9 +56,10 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim>& dof)
 
 template <int dim, int spacedim>
 void
-BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof)
+BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof, bool levels_only)
 {
-  initialize((DoFHandler<dim, spacedim>&) dof);
+  if (!levels_only)
+    initialize((DoFHandler<dim, spacedim>&) dof);
 
   std::vector<std::vector<unsigned int> > sizes (dof.get_tria().n_levels());
   for (unsigned int i=0; i<sizes.size(); ++i)
@@ -72,8 +73,14 @@ BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof)
 
 
 template void BlockInfo::initialize(const DoFHandler<deal_II_dimension,deal_II_dimension>&);
-template void BlockInfo::initialize(const MGDoFHandler<deal_II_dimension,deal_II_dimension>&);
+template void BlockInfo::initialize(const MGDoFHandler<deal_II_dimension,deal_II_dimension>&, bool);
 template void BlockInfo::initialize_local(const DoFHandler<deal_II_dimension,deal_II_dimension>&);
+
+#if deal_II_dimension==1 || deal_II_dimension==2
+template void BlockInfo::initialize(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&);
+template void BlockInfo::initialize(const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&, bool);
+template void BlockInfo::initialize_local(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&);
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE
