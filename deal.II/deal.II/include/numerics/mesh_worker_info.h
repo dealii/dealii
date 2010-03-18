@@ -309,7 +309,7 @@ namespace MeshWorker
       DoFInfo(const BlockInfo& block_info);
 
 				       /**
-					* Default constructor
+					* Constructor
 					* leaving the #block_info
 					* pointer empty, but setting
 					* the #aux_local_indices.
@@ -733,19 +733,22 @@ namespace MeshWorker
       template <class WORKER>
       void initialize(const WORKER&,
 		      const FiniteElement<dim, spacedim>& el,
-		      const Mapping<dim, spacedim>& mapping);
+		      const Mapping<dim, spacedim>& mapping,
+		      const BlockInfo* block_info = 0);
 
       template <class WORKER, typename VECTOR>
       void initialize(const WORKER&,
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
-		      const NamedData<VECTOR*>& data);
+		      const NamedData<VECTOR*>& data,
+		      const BlockInfo* block_info = 0);
 
       template <class WORKER, typename VECTOR>
       void initialize(const WORKER&,
 		      const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
-		      const NamedData<MGLevelObject<VECTOR>*>& data);
+		      const NamedData<MGLevelObject<VECTOR>*>& data,
+		      const BlockInfo* block_info = 0);
 
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
@@ -851,6 +854,9 @@ namespace MeshWorker
     for (unsigned int i=0;i<M2.size();++i)
       M2[i].matrix.reinit(bi.block_size(M2[i].row),
 			  bi.block_size(M2[i].column));
+    for (unsigned int k=0;k<quadrature_values.size();++k)
+      for (unsigned int i=0;i<quadrature_values[k].size();++i)
+	quadrature_values[k][i] = 0.;
   }
 
 
@@ -1218,7 +1224,8 @@ namespace MeshWorker
       }
 
     const bool split_fevalues = info.block_info != 0;
-    fill_local_data(info, split_fevalues);
+    if (!global_data->empty())
+      fill_local_data(info, split_fevalues);
   }
 
 
@@ -1230,18 +1237,19 @@ namespace MeshWorker
   IntegrationInfoBox<dim,sdim>::
   initialize(const WORKER& integrator,
 	     const FiniteElement<dim,sdim>& el,
-	     const Mapping<dim,sdim>& mapping)
+	     const Mapping<dim,sdim>& mapping,
+	     const BlockInfo* block_info)
   {
     cell.initialize<FEValues<dim,sdim> >(el, mapping, integrator.cell_quadrature,
-			 integrator.cell_flags);
+					 integrator.cell_flags, block_info);
     boundary.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.boundary_quadrature,
-			 integrator.boundary_flags);
+			 integrator.boundary_flags, block_info);
     face.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
-			 integrator.face_flags);
+			 integrator.face_flags, block_info);
     subface.initialize<FESubfaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
-			    integrator.face_flags);
+			    integrator.face_flags, block_info);
     neighbor.initialize<FEFaceValues<dim,sdim> >(el, mapping, integrator.face_quadrature,
-						      integrator.neighbor_flags);
+						      integrator.neighbor_flags, block_info);
   }
 
 
@@ -1252,9 +1260,10 @@ namespace MeshWorker
     const WORKER& integrator,
     const FiniteElement<dim,sdim>& el,
     const Mapping<dim,sdim>& mapping,
-    const NamedData<VECTOR*>& data)
+    const NamedData<VECTOR*>& data,
+    const BlockInfo* block_info)
   {
-    initialize(integrator, el, mapping);
+    initialize(integrator, el, mapping, block_info);
     boost::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
 
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (integrator.cell_selector));
@@ -1283,9 +1292,10 @@ namespace MeshWorker
     const WORKER& integrator,
     const FiniteElement<dim,sdim>& el,
     const Mapping<dim,sdim>& mapping,
-    const NamedData<MGLevelObject<VECTOR>*>& data)
+    const NamedData<MGLevelObject<VECTOR>*>& data,
+    const BlockInfo* block_info)
   {
-    initialize(integrator, el, mapping);
+    initialize(integrator, el, mapping, block_info);
     boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> > p;
 
     p = boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (integrator.cell_selector));

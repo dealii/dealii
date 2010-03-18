@@ -37,6 +37,7 @@ namespace MeshWorker
  * determine which values, derivatives or second derivatives are
  * actually computed.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat 2009
  */
   class VectorSelector :
@@ -177,6 +178,7 @@ namespace MeshWorker
  * Based on VectorSelector, this is the class used by IntegrationInfo
  * to compute values of source vectors in quadrature points.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   template <int dim, int spacedim = dim>
@@ -308,6 +310,7 @@ namespace MeshWorker
  * function VectorDataBase::fill() for a certain type of vector, using
  * NamedData to identify vectors by name.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
   template <class VECTOR, int dim, int spacedim = dim>
@@ -373,7 +376,8 @@ namespace MeshWorker
  * function VectorDataBase::fill() for a certain type of multilevel vectors, using
  * NamedData to identify vectors by name.
  *
- * @author Guido Kanschat, 2009
+ * @ingroup MeshWorker
+ * @author Guido Kanschat, 2010
  */
   template <class VECTOR, int dim, int spacedim = dim>
   class MGVectorData :
