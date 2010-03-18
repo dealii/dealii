@@ -2,70 +2,56 @@
 DEAL::Cycle 0
 DEAL::Number of degrees of freedom: 100   L0: 16   L1: 36   L2: 100
 DEAL::1. Test 1676.
-DEAL::Prebuilt copy_to_mg
 DEAL::1. Test 7958.
 DEAL::2. Test 1676.
-DEAL::Prebuilt copy_to_mg
 DEAL::2. Test 7412.
 DEAL::
 DEAL::diff 1758.
 DEAL::Cycle 1
 DEAL::Number of degrees of freedom: 164   L0: 16   L1: 36   L2: 100   L3: 100
 DEAL::1. Test 3626.
-DEAL::Prebuilt copy_to_mg
 DEAL::1. Test 1.097e+04
 DEAL::2. Test 3626.
-DEAL::Prebuilt copy_to_mg
 DEAL::2. Test 1.096e+04
 DEAL::
 DEAL::diff 123.9
 DEAL::Cycle 2
 DEAL::Number of degrees of freedom: 228   L0: 16   L1: 36   L2: 100   L3: 100   L4: 100
 DEAL::1. Test 5984.
-DEAL::Prebuilt copy_to_mg
 DEAL::1. Test 1.688e+04
 DEAL::2. Test 5984.
-DEAL::Prebuilt copy_to_mg
 DEAL::2. Test 1.688e+04
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 3
 DEAL::Number of degrees of freedom: 292   L0: 16   L1: 36   L2: 100   L3: 100   L4: 100   L5: 100
 DEAL::1. Test 8689.
-DEAL::Prebuilt copy_to_mg
 DEAL::1. Test 2.286e+04
 DEAL::2. Test 8689.
-DEAL::Prebuilt copy_to_mg
 DEAL::2. Test 2.286e+04
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 4
 DEAL::Number of degrees of freedom: 804   L0: 16   L1: 36   L2: 100   L3: 260   L4: 260   L5: 260   L6: 260
 DEAL::1. Test 4.396e+04
-DEAL::Prebuilt copy_to_mg
 DEAL::1. Test 1.442e+05
 DEAL::2. Test 4.396e+04
-DEAL::Prebuilt copy_to_mg
 DEAL::2. Test 1.442e+05
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 5
 DEAL::Number of degrees of freedom: 1428   L0: 16   L1: 36   L2: 100   L3: 324   L4: 324   L5: 324   L6: 324   L7: 612
 DEAL::1. Test 1.095e+05
-DEAL::Prebuilt copy_to_mg
 DEAL::1. Test 4.692e+05
 DEAL::2. Test 1.095e+05
-DEAL::Prebuilt copy_to_mg
 DEAL::2. Test 4.692e+05
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 6
 DEAL::Number of degrees of freedom: 3044   L0: 16   L1: 36   L2: 100   L3: 324   L4: 324   L5: 324   L6: 484   L7: 836   L8: 1860
 DEAL::1. Test 3.516e+05
-DEAL::Prebuilt copy_to_mg
 DEAL::1. Test 1.776e+06
 DEAL::2. Test 3.516e+05
-DEAL::Prebuilt copy_to_mg
 DEAL::2. Test 1.776e+06
 DEAL::
 DEAL::diff 0

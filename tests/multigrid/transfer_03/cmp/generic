@@ -1,9 +1,7 @@
 
 DEAL::FESystem<2>[FE_Q<2>(1)^4]
 DEAL::initialize 1.095e+05
-DEAL::Prebuilt copy_to_mg
 DEAL::initialize 1.095e+05
-DEAL::Prebuilt copy_to_mg
 DEAL::copy_to_mg
 DEAL::
 DEAL::diff 0
