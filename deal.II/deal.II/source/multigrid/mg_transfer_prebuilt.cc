@@ -135,9 +135,18 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 				       // to the coarse level, but
 				       // have fine level basis
 				       // functions
+#ifdef BAERBEL_MG_TEST
+      deallog << "dst [" << level << "] " 
+        << dst[level].l2_norm() << std::endl; 
+#endif
+
       if (!first)
 	restrict_and_add (level+1, dst[level], dst[level+1]);
       first = false;
+#ifdef BAERBEL_MG_TEST
+      deallog << "dst [" << level << "] " 
+        << dst[level].l2_norm() << std::endl; 
+#endif
     }
 }
 
