@@ -216,6 +216,12 @@ void LaplaceProblem<dim>::setup_system ()
   boundary_indices.resize(triangulation.n_levels());
   boundary_indices_renumbered.resize(triangulation.n_levels());
 
+  for(unsigned int l=0; l<triangulation.n_levels(); ++l)
+  {
+    boundary_indices_renumbered[l].clear();
+    boundary_indices[l].clear();
+  }
+
   mg_matrices.resize(0, nlevels-1);
   mg_matrices.clear ();
   mg_matrices_renumbered.resize(0, nlevels-1);

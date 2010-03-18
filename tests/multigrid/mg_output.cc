@@ -203,13 +203,6 @@ void check_simple(const FiniteElement<dim>& fe)
   refine_mesh(tr);
   refine_mesh(tr);
 
-  std::ostringstream out_filename;
-  out_filename << "gitter.eps";
-  std::ofstream grid_output (out_filename.str().c_str());
-  GridOut grid_out;
-  grid_out.write_eps (tr, grid_output);
-
-
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
 

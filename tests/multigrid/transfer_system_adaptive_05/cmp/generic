@@ -1,0 +1,15 @@
+
+DEAL::FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Global  dofs: 22
+DEAL::Level 0 dofs: 12
+DEAL::Level 1 dofs: 18
+DEAL::Level 0->1
+DEAL::0 1.000 0 0 0 0 
+DEAL::0 0.5000 0 0 0.5000 0 
+DEAL::0 0.5000 0 0.5000 0 0 
+DEAL::0 0.2500 0 0.2500 0.2500 0.2500 
+DEAL::0 0 0 0 1.000 0 
+DEAL::0 0 0 0 0.5000 0.5000 
+DEAL::0 0 0 1.000 0 0 
+DEAL::0 0 0 0.5000 0 0.5000 
+DEAL::0 0 0 0 0 1.000 

@@ -265,6 +265,12 @@ void LaplaceProblem<dim>::setup_system ()
   boundary_indices.resize(nlevels);
   boundary_indices_renumbered.resize(nlevels);
 
+  for(unsigned int l=0; l<nlevels; ++l)
+  {
+    boundary_indices_renumbered[l].clear();
+    boundary_indices[l].clear();
+  }
+
   deallog << "Number of degrees of freedom: "
     << mg_dof_handler.n_dofs();
 

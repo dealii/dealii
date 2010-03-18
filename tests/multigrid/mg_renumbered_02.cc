@@ -194,14 +194,12 @@ class LaplaceProblem
     void test ();
     void test_boundary ();
     void output_gpl(const MGDoFHandler<dim> &dof, 
-        MGLevelObject<Vector<double> > &v,
-        const bool renumbered);
+        MGLevelObject<Vector<double> > &v);
     void refine_local ();
 
     Triangulation<dim>   triangulation;
     const MappingQ1<dim>      mapping;
     FESystem<dim>            fe;
-    //FE_Q<dim>        fe;
     MGDoFHandler<dim>    mg_dof_handler_renumbered;
 
     const unsigned int degree;
@@ -214,8 +212,6 @@ class LaplaceProblem
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg) :
   triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
-  //fe (deg),
-  //fe (FE_Q<dim> (deg),2, FE_Q<dim> (deg),2),
   fe (FE_Q<dim> (deg),3),
   mg_dof_handler_renumbered (triangulation),
   degree(deg)
@@ -227,22 +223,16 @@ void LaplaceProblem<dim>::setup_system ()
 {
   mg_dof_handler_renumbered.distribute_dofs (fe);
 
-  std::vector<unsigned int> block_component (2*dim,0);
-  for(unsigned int c=dim; c<2*dim; ++c)
-    block_component[c] = 1;
-
   const unsigned int nlevels = triangulation.n_levels();
 
   DoFHandler<dim> &dof = mg_dof_handler_renumbered;
-  DoFRenumbering::component_wise (dof);//, block_component);
-  //DoFRenumbering::Cuthill_McKee (dof);
+  DoFRenumbering::component_wise (dof);
   for (unsigned int level=0;level<nlevels;++level)
-  {
-    DoFRenumbering::component_wise (mg_dof_handler_renumbered, level);//, block_component);
-    //DoFRenumbering::Cuthill_McKee (mg_dof_handler_renumbered, level);
-  }
+    DoFRenumbering::component_wise (mg_dof_handler_renumbered, level);
 
   boundary_indices_renumbered.resize(nlevels);
+  for(unsigned int l=0; l<nlevels; ++l)
+    boundary_indices_renumbered[l].clear();
 
   deallog << "Number of degrees of freedom: "
     << mg_dof_handler_renumbered.n_dofs();
@@ -256,8 +246,7 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void
 LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof, 
-    MGLevelObject<Vector<double> > &v,
-    const bool renumbered)
+    MGLevelObject<Vector<double> > &v)
 {
   MeshWorker::IntegrationWorker<dim> integration_worker;
   MeshWorker::Assembler::GnuplotPatch assembler;
@@ -282,13 +271,6 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
 
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
-    std::ostringstream filename;
-    if(renumbered)
-    filename << "mg_renumbered-" << l << ".gpl";
-    else
-    filename << "mg-" << l << ".gpl";
-    std::ofstream file (filename.str().c_str()); 
-    assembler.initialize_stream (file);
     OutputCreator<dim> matrix_integrator;
     MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim> (
       dof.begin(l), dof.end(l),
@@ -330,7 +312,7 @@ void LaplaceProblem<dim>::test ()
       if(d[l](i)!=0)
         deallog << i << " " << d[l](i) << std::endl;
   }
-  output_gpl(mg_dof_handler_renumbered, d, false);
+  output_gpl(mg_dof_handler_renumbered, d);
 }
 
 
@@ -357,7 +339,7 @@ void LaplaceProblem<dim>::test_boundary ()
       u[l](*i) = 0;
     }
   }
-  output_gpl(mg_dof_handler_renumbered, u, false);
+  output_gpl(mg_dof_handler_renumbered, u);
 }
 
 
