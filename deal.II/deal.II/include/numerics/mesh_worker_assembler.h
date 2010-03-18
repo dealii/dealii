@@ -662,9 +662,6 @@ namespace MeshWorker
     class MatrixLocalBlocksToGlobalBlocks
     {
       public:
-					 /// The object that is stored
-	typedef boost::shared_ptr<MatrixBlock<MATRIX> > MatrixPtr;
-	
 					 /**
 					  * Constructor, initializing
 					  * the #threshold, which
@@ -681,7 +678,7 @@ namespace MeshWorker
 					  * cell matrix vectors.
 					  */
       void initialize(const BlockInfo* block_info,
-		      std::vector<MatrixPtr>& matrices);
+		      MatrixBlockVector<MATRIX>& matrices);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -737,7 +734,8 @@ namespace MeshWorker
 					  * stored as a vector of
 					  * pointers.
 					  */
-	std::vector<MatrixPtr> matrices;
+	SmartPointer<MatrixBlockVector<MATRIX>,
+		     MatrixLocalBlocksToGlobalBlocks<MATRIX, number> > matrices;
       
       /**
        * A pointer to the object containing the block structure.
@@ -1400,10 +1398,12 @@ namespace MeshWorker
     
     template <class MATRIX, typename number>
     inline void
-    MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(const BlockInfo* b, std::vector<MatrixPtr>& m)
+    MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(
+      const BlockInfo* b,
+      MatrixBlockVector<MATRIX>& m)
     {
       block_info = b;
-      matrices = m;
+      matrices = &m;
     }
     
 
@@ -1415,7 +1415,7 @@ namespace MeshWorker
       DoFInfo<dim>& info,
       bool interior_face) const
     {
-      info.initialize_matrices(matrices, interior_face);
+      info.initialize_matrices(*matrices, interior_face);
     }
 
 
@@ -1467,14 +1467,14 @@ namespace MeshWorker
     MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble(
       const DoFInfo<dim>& info)
     {
-      for (unsigned int i=0;i<matrices.size();++i)
+      for (unsigned int i=0;i<matrices->size();++i)
 	{
 					   // Row and column index of
 					   // the block we are dealing with
-	  const unsigned int row = matrices[i]->row;
-	  const unsigned int col = matrices[i]->column;
+	  const unsigned int row = matrices->block(i).row;
+	  const unsigned int col = matrices->block(i).column;
 
-	  assemble(matrices[i]->matrix, info.matrix(i,false).matrix, row, col, info.indices, info.indices);
+	  assemble(matrices->matrix(i), info.matrix(i,false).matrix, row, col, info.indices, info.indices);
 	}
     }
 
@@ -1486,17 +1486,17 @@ namespace MeshWorker
       const DoFInfo<dim>& info1,
       const DoFInfo<dim>& info2)
     {
-      for (unsigned int i=0;i<matrices.size();++i)
+      for (unsigned int i=0;i<matrices->size();++i)
 	{
 					   // Row and column index of
 					   // the block we are dealing with
-	  const unsigned int row = matrices[i]->row;
-	  const unsigned int col = matrices[i]->column;
+	  const unsigned int row = matrices->block(i).row;
+	  const unsigned int col = matrices->block(i).column;
 
-	  assemble(matrices[i]->matrix, info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices);
-	  assemble(matrices[i]->matrix, info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices);
-	  assemble(matrices[i]->matrix, info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices);
-	  assemble(matrices[i]->matrix, info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices);
+	  assemble(matrices->matrix(i), info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices);
+	  assemble(matrices->matrix(i), info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices);
+	  assemble(matrices->matrix(i), info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices);
+	  assemble(matrices->matrix(i), info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices);
 	}
     }
 

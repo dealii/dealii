@@ -84,8 +84,8 @@ namespace MeshWorker
 					* instantiation in order to
 					* provide row and column info.
 					*/
-      template <class MatrixPtr>
-      void initialize_matrices(const std::vector<MatrixPtr>& matrices,
+      template <class MATRIX>
+      void initialize_matrices(const MatrixBlockVector<MATRIX>& matrices,
 			       bool both);
 
 				       /**
@@ -672,7 +672,8 @@ namespace MeshWorker
 					* #values, #gradients and
 					* #hessians.
 					*/
-      void fill_local_data(const DoFInfo<dim, spacedim>& info, const bool split_fevalues);
+      template<typename number>
+      void fill_local_data(const DoFInfo<dim, spacedim, number>& info, bool split_fevalues);
 
 				       /**
 					* The global data vector
@@ -782,10 +783,10 @@ namespace MeshWorker
 
 
   template <typename number>
-  template <class MatrixPtr>
+  template <class MATRIX>
   inline void
   LocalResults<number>::initialize_matrices(
-    const std::vector<MatrixPtr>& matrices,
+    const MatrixBlockVector<MATRIX>& matrices,
     bool both)
   {
     M1.resize(matrices.size());
@@ -793,8 +794,8 @@ namespace MeshWorker
       M2.resize(matrices.size());
     for (unsigned int i=0;i<matrices.size();++i)
       {
-	const unsigned int row = matrices[i]->row;
-	const unsigned int col = matrices[i]->column;
+	const unsigned int row = matrices.block(i).row;
+	const unsigned int col = matrices.block(i).column;
 
 	M1[i].row = row;
 	M1[i].column = col;
@@ -1141,6 +1142,35 @@ namespace MeshWorker
   
 
 //----------------------------------------------------------------------//
+
+  template<int dim, int sdim>
+  template <class FEVALUES>
+  inline void
+  IntegrationInfo<dim,sdim>::initialize(
+    const FiniteElement<dim,sdim>& el,
+    const Mapping<dim,sdim>& mapping,
+    const Quadrature<FEVALUES::integral_dimension>& quadrature,
+    const UpdateFlags flags,
+    const BlockInfo* block_info)
+  {
+    if (block_info == 0 || block_info->local().size() == 0)
+      {
+	fevalv.resize(1);	      
+	fevalv[0] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  new FEVALUES (mapping, el, quadrature, flags));
+      }
+    else
+      {
+	fevalv.resize(el.n_base_elements());
+	for (unsigned int i=0;i<fevalv.size();++i)
+	  {
+	    fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	      new FEVALUES (mapping, el.base_element(i), quadrature, flags));
+	  }
+      }
+    n_components = el.n_components();
+  }
+  
 
   template <int dim, int spacedim>
   inline const FEValuesBase<dim, spacedim>&

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,9 @@
 #define __deal2__matrix_block_h
 
 #include <base/config.h>
+#include <base/named_data.h>
+
+#include <boost/shared_ptr.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -90,6 +93,41 @@ struct MatrixBlock
 };
 
 
+/**
+ * A vector of MatrixBlock, which is implemented using shared
+ * pointers, in order to allow for copying and rearranging. Each
+ * matrix block can be identified by name.
+ *
+ * @author Baerbel Janssen, Guido Kanschat, 2010
+ */
+template <class MATRIX>
+class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX> > >
+{
+  public:
+				     /**
+				      * Add a new matrix block at the
+				      * position <tt(row,column)</tt>
+				      * in the block system.
+				      */
+    void add(unsigned int row, unsigned int column, const std::string& name);
+				     /**
+				      * Access a constant reference to
+				      * the block at position <i>i</i>.
+				      */
+    const MatrixBlock<MATRIX>& block(unsigned int i) const;
+				     /**
+				      * Access the matrix at position
+				      * <i>i</i> for read and write
+				      * access.
+				      */
+    MATRIX& matrix(unsigned int i);
+    
+    
+};
+
+
+//----------------------------------------------------------------------//
+
 template <class MATRIX>
 MatrixBlock<MATRIX>::MatrixBlock()
 		:
@@ -112,6 +150,33 @@ MatrixBlock<MATRIX>::MatrixBlock(unsigned int i, unsigned int j)
 		:
 		row(i), column(j)
 {}
+
+//----------------------------------------------------------------------//
+
+template <class MATRIX>
+inline void
+MatrixBlockVector<MATRIX>::add(unsigned int row, unsigned int column, const std::string& name)
+{
+  boost::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column));
+  NamedData<boost::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
+}
+
+
+template <class MATRIX>
+inline const MatrixBlock<MATRIX>&
+MatrixBlockVector<MATRIX>::block(unsigned int i) const
+{
+  return *this->read(i);
+}
+
+
+template <class MATRIX>
+inline MATRIX&
+MatrixBlockVector<MATRIX>::matrix(unsigned int i)
+{
+  return (*this)(i)->matrix;
+}
+
 
 
 DEAL_II_NAMESPACE_CLOSE

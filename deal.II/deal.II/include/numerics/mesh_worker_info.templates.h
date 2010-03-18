@@ -120,35 +120,6 @@ namespace MeshWorker
   
 
   template<int dim, int sdim>
-  template <class FEVALUES>
-  void
-  IntegrationInfo<dim,sdim>::initialize(
-    const FiniteElement<dim,sdim>& el,
-    const Mapping<dim,sdim>& mapping,
-    const Quadrature<FEVALUES::integral_dimension>& quadrature,
-    const UpdateFlags flags,
-    const BlockInfo* block_info)
-  {
-    if (block_info == 0 || block_info->local().size() == 0)
-      {
-	fevalv.resize(1);	      
-	fevalv[0] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
-	  new FEVALUES (mapping, el, quadrature, flags));
-      }
-    else
-      {
-	fevalv.resize(el.n_base_elements());
-	for (unsigned int i=0;i<fevalv.size();++i)
-	  {
-	    fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
-	      new FEVALUES (mapping, el.base_element(i), quadrature, flags));
-	  }
-      }
-    n_components = el.n_components();
-  }
-  
-
-  template<int dim, int sdim>
   void
   IntegrationInfo<dim,sdim>::initialize_data(
     const boost::shared_ptr<VectorDataBase<dim,sdim> > data)
@@ -212,8 +183,9 @@ namespace MeshWorker
 
 
   template<int dim, int sdim>
+  template <typename number>
   void
-  IntegrationInfo<dim,sdim>::fill_local_data(const DoFInfo<dim, sdim>& info, bool split_fevalues)
+  IntegrationInfo<dim,sdim>::fill_local_data(const DoFInfo<dim, sdim, number>& info, bool split_fevalues)
   {
      if (split_fevalues)
        {
