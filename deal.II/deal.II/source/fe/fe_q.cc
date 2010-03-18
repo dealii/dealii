@@ -778,10 +778,12 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   cell_interpolation.mmult (interpolation_matrix,
                             source_interpolation);
 
+  const double eps = 2e-13*this->degree*dim;
+
                                    // cut off very small values
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
-      if (std::fabs(interpolation_matrix(i,j)) < 1e-15)
+      if (std::fabs(interpolation_matrix(i,j)) < eps)
         interpolation_matrix(i,j) = 0.;
 
 				   // make sure that the row sum of
@@ -795,8 +797,7 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
       for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
         sum += interpolation_matrix(i,j);
 
-      Assert (std::fabs(sum-1) < 2e-13*this->degree*dim,
-              ExcInternalError());
+      Assert (std::fabs(sum-1) < eps, ExcInternalError());
     }
 }
 
@@ -1577,7 +1578,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
   const std::vector<unsigned int> &index_map=
     this->poly_space.get_numbering();
 
-  const double eps = 2e-13*this->degree*this->degree*dim;
+  const double eps = 1e-13*this->degree*this->degree*this->degree*this->degree*dim;
 
   unsigned n_ones = 0;
 				   // precompute subcell interpolation
@@ -1694,8 +1695,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 	    double sum = 0;
 	    for (unsigned int col=0; col<this->dofs_per_cell; ++col)
 	      sum += this->prolongation[ref][child](row,col);
-	    Assert (std::fabs(sum-1.) < eps,
-		    ExcInternalError());
+	    Assert (std::fabs(sum-1.) < this->degree*eps, ExcInternalError());
 	  }
       }
 }
@@ -1752,7 +1752,7 @@ FE_Q<dim,spacedim>::initialize_restriction ()
                                    // (compute on a later child), so
                                    // we don't have to care about this
 
-  const double eps = 2e-13*this->degree*this->degree*dim;
+  const double eps = 1e-13*this->degree*this->degree*this->degree*this->degree*dim;
   const std::vector<unsigned int> &index_map_inverse=
     this->poly_space.get_numbering_inverse();
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
@@ -1823,7 +1823,8 @@ FE_Q<dim,spacedim>::initialize_restriction ()
 
 		    sum_check += val;
 		  }
-		Assert (std::fabs(sum_check-1) < eps, ExcInternalError());
+		Assert (std::fabs(sum_check-1) < this->degree*eps, 
+			ExcInternalError());
 	      }
 	  }
     }
