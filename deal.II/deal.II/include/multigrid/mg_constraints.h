@@ -21,6 +21,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int dim, int spacedim> class MGDoFHandler;
+template <int dim> class FunctionMap;
+
 /**
  * Collection of boundary constraints and refinement edge constraints
  * for level vectors.
@@ -41,7 +44,7 @@ class MGConstraints : public Subscriptor
 				      */
     template <int dim, int spacedim>
     void initialize(const MGDoFHandler<dim,spacedim>& dof);
-    
+
 				     /**
 				      * Fill the internal data
 				      * structures with values
@@ -65,26 +68,27 @@ class MGConstraints : public Subscriptor
 				      * constraint.
 				      */
     bool at_boundary(unsigned int level, unsigned int index) const;
-    
+
 				     /**
 				      * Determine whether a dof index
 				      * is at the refinement edge.
 				      */
     bool at_refinement_edge(unsigned int level, unsigned int index) const;
-    
+
   private:
 				     /**
 				      * The indices of boundary dofs
 				      * for each level.
 				      */
     std::vector<std::set<unsigned int> > boundary_indices;
+
 				     /**
 				      * The degrees of freedom on the
 				      * refinement edge between a
 				      * level and coarser cells.
 				      */
     std::vector<std::vector<bool> > refinement_edge_indices;
-    
+
 				     /**
 				      * The degrees of freedom on the
 				      * refinement edge between a
@@ -99,10 +103,10 @@ class MGConstraints : public Subscriptor
 
 
 bool
-MGConstraints::at_boundary(unsigned int level, unsigned int index)
+MGConstraints::at_boundary(unsigned int level, unsigned int index) const
 {
   AssertIndexRange(level, boundary_indices.size());
-  AssertIndexRange(level, boundary_indices.size());  
+  AssertIndexRange(level, boundary_indices.size());
 }
 
 
