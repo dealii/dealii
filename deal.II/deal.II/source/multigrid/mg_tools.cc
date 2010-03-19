@@ -1119,7 +1119,7 @@ MGTools::make_boundary_list(
   const MGDoFHandler<dim,spacedim>& dof,
   const typename FunctionMap<dim>::type& function_map,
   std::vector<std::set<unsigned int> >& boundary_indices,
-  const std::vector<bool>& component_mask_)
+  const std::vector<bool>& component_mask)
 {
                                    // if for whatever reason we were
                                    // passed an empty map, return
@@ -1129,19 +1129,22 @@ MGTools::make_boundary_list(
 
   const unsigned int n_levels = dof.get_tria().n_levels();
 
-  
-  
+
+
   const unsigned int n_components = DoFTools::n_components(dof);
   const bool          fe_is_system = (n_components != 1);
 
   AssertDimension (boundary_indices.size(), n_levels);
 
   std::vector<unsigned int> local_dofs;
-  
+  local_dofs.reserve (DoFTools::max_dofs_per_face(dof));
+  std::fill (local_dofs.begin (), local_dofs.end (),
+	     DoFHandler<dim,spacedim>::invalid_dof_index);
+
 				   // First, deal with the simpler
 				   // case when we have to identify
 				   // all boundary dofs
-  if (component_mask_.size() == 0)
+  if (component_mask.size() == 0)
     {
       typename MGDoFHandler<dim,spacedim>::cell_iterator
 	cell = dof.begin(),
@@ -1151,47 +1154,30 @@ MGTools::make_boundary_list(
 	  const FiniteElement<dim> &fe = cell->get_fe();
 	  const unsigned int level = cell->level();
 	  local_dofs.resize(fe.dofs_per_face);
-	  
+
 	  for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
 	       ++face_no)
-	    {
-	      const typename MGDoFHandler<dim,spacedim>::face_iterator
-		face = cell->face(face_no);
-	      face->get_mg_dof_indices(level, local_dofs);
-	      const unsigned char bi = face->boundary_indicator();
-					       // Face is listed in
-					       // boundary map
-	      if (function_map.find(bi) != function_map.end())
-		{
-		  for (unsigned int i=0;i<fe.dofs_per_face;++i)
-		    boundary_indices[level].insert(i);
-		}
-	    }
+	    if (cell->at_boundary(face_no) == true)
+	      {
+		const typename MGDoFHandler<dim,spacedim>::face_iterator
+		  face = cell->face(face_no);
+		const unsigned char bi = face->boundary_indicator();
+						 // Face is listed in
+						 // boundary map
+		if (function_map.find(bi) != function_map.end())
+		  {
+		    face->get_mg_dof_indices(level, local_dofs);
+		    for (unsigned int i=0;i<fe.dofs_per_face;++i)
+		      boundary_indices[level].insert(local_dofs[i]);
+		  }
+	      }
 	}
     }
   else
     {
-      
-//    for (typename FunctionMap<dim>::type::const_iterator i=function_map.begin();
-//         i!=function_map.end(); ++i)
-//      Assert (n_components == i->second->n_components,
-//           ExcInvalidFE());
-      
-				       // set the component mask to either
-				       // the original value or a vector
-				       // of @p{true}s
-      const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-					      std::vector<bool> (n_components, true) :
-					      component_mask_);
-//   Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-//        ExcComponentMismatch());
-      
-				       // field to store the indices
-      std::vector<unsigned int> local_dofs;
-      local_dofs.reserve (DoFTools::max_dofs_per_face(dof));
-      std::fill (local_dofs.begin (), local_dofs.end (),
-		 DoFHandler<dim,spacedim>::invalid_dof_index);
-      
+      Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+	      ExcMessage("It's probably worthwhile to select at least one component."));
+
       typename MGDoFHandler<dim,spacedim>::cell_iterator
 	cell = dof.begin(),
 	endc = dof.end();
@@ -1199,9 +1185,12 @@ MGTools::make_boundary_list(
 	for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
 	     ++face_no)
 	  {
+	    if (cell->at_boundary(face_no) == false)
+	      continue;
+
 	    const FiniteElement<dim> &fe = cell->get_fe();
 	    const unsigned int level = cell->level();
-	    
+
 					     // we can presently deal only with
 					     // primitive elements for boundary
 					     // values. this does not preclude
@@ -1225,7 +1214,7 @@ MGTools::make_boundary_list(
 					"values that correspond to primitive (scalar) base "
 					"elements"));
 	      }
-	    
+
 	    typename MGDoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
 	    const unsigned char boundary_component = face->boundary_indicator();
 	    if (function_map.find(boundary_component) != function_map.end())
@@ -1274,7 +1263,7 @@ MGTools::make_boundary_list(
 							     // face dof
 							     // index to
 							     // cell dof
-			    
+
 							     // index
 			    const unsigned int cell_i
 			      = (dim == 1 ?
