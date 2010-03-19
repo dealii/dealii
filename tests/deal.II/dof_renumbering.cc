@@ -1,6 +1,6 @@
 //----------------------------  dof_renumbering.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2000, 2001, 2003, 2004 by the deal.II authors
 //
@@ -78,7 +78,7 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
 {
   const FiniteElement<dim>& element = mgdof.get_fe();
   DoFHandler<dim>& dof = mgdof;
-  
+
 				   // Prepare a reordering of
 				   // components for later use
   std::vector<unsigned int> order(element.n_components());
@@ -87,10 +87,10 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
   Point<dim> direction;
   for (unsigned int i=0;i<dim;++i)
     direction(i) = std::pow(10.,static_cast<double>(i));
-  
+
 				   // Check global ordering
   print_dofs (dof);
-  
+
   if (discontinuous)
     {
       DoFRenumbering::downstream_dg(dof, direction);
@@ -104,8 +104,8 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
       DoFRenumbering::Cuthill_McKee (dof, true, true);
       print_dofs (dof);
     }
-  
-  
+
+
   DoFRenumbering::component_wise (dof, order);
   print_dofs (dof);
 
@@ -149,7 +149,7 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -161,12 +161,12 @@ check ()
     tr.refine_global(2);
 
   MGDoFHandler<dim> mgdof(tr);
-  
+
   FESystem<dim> e1 (FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
   mgdof.distribute_dofs(e1);
   check_renumbering(mgdof, false);
   mgdof.clear();
-  
+
   FESystem<dim> e2 (FE_DGP<dim>(2), 2, FE_DGQ<dim>(1), 1);
   mgdof.distribute_dofs(e2);
   check_renumbering(mgdof, true);
@@ -178,7 +178,7 @@ int main ()
 {
   std::ofstream logfile ("dof_renumbering/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

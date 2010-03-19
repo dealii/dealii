@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008 by the deal.II authors
 //
@@ -43,20 +43,20 @@ print_dofs (const DoFHandler<dim> &dof)
   const FiniteElement<dim>& fe = dof.get_fe();
   std::vector<unsigned int> v (fe.dofs_per_cell);
   boost::shared_ptr<FEValues<dim> > fevalues;
-  
+
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
       fevalues = boost::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_q_points));
     }
-  
+
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
     {
       Point<dim> p = cell->center();
       if (fevalues != 0)
 	fevalues->reinit(cell);
-      
+
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
 	if (fevalues != 0)
@@ -76,20 +76,20 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
   const FiniteElement<dim>& fe = dof.get_fe();
   std::vector<unsigned int> v (fe.dofs_per_cell);
   boost::shared_ptr<FEValues<dim> > fevalues;
-  
+
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
       fevalues = boost::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_q_points));
     }
-  
+
   for (typename MGDoFHandler<dim>::cell_iterator cell=dof.begin(level);
        cell != dof.end(level); ++cell)
     {
       Point<dim> p = cell->center();
       if (fevalues != 0)
 	fevalues->reinit(cell);
-      
+
       cell->get_mg_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
 	if (fevalues != 0)
@@ -108,7 +108,7 @@ check_renumbering(MGDoFHandler<dim>& mgdof)
   const FiniteElement<dim>& element = mgdof.get_fe();
   DoFHandler<dim>& dof = mgdof;
   deallog << element.get_name() << std::endl;
-  
+
 				   // Prepare a reordering of
 				   // components for later use
   std::vector<unsigned int> order(element.n_components());
@@ -117,7 +117,8 @@ check_renumbering(MGDoFHandler<dim>& mgdof)
   Point<dim> direction;
   for (unsigned int i=0;i<dim;++i)
     direction(i) = -5.+i;
-  
+
+  deallog << std::endl << "Downstream numbering cell-wise" << std::endl;
   DoFRenumbering::downstream(dof, direction);
   print_dofs (dof);
 				   // Check level ordering
@@ -128,6 +129,17 @@ check_renumbering(MGDoFHandler<dim>& mgdof)
       print_dofs (mgdof, level);
     }
 
+  deallog << std::endl << "Downstream numbering dof-wise" << std::endl;
+  DoFRenumbering::downstream(dof, direction, true);
+  print_dofs (dof);
+				   // Check level ordering
+  for (unsigned int level=0;level<dof.get_tria().n_levels();++level)
+    {
+      deallog << "Level " << level << std::endl;
+      DoFRenumbering::downstream(mgdof, level, direction, true);
+      print_dofs (mgdof, level);
+    }
+
 }
 
 
@@ -135,7 +147,7 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, -1., 1.);
   tr.refine_global (1);
   tr.begin_active()->set_refine_flag ();
@@ -146,13 +158,19 @@ check ()
 
   FE_Q<dim> q2(2);
   FE_DGQ<dim> dgq1(1);
+  FESystem<dim> system (q2, 2, dgq1, 1);
+
   mgdof.distribute_dofs(q2);
   check_renumbering(mgdof);
   mgdof.clear();
-  
+
   mgdof.distribute_dofs(dgq1);
   check_renumbering(mgdof);
-  mgdof.clear();  
+  mgdof.clear();
+
+  mgdof.distribute_dofs(system);
+  check_renumbering(mgdof);
+  mgdof.clear();
 }
 
 
@@ -160,7 +178,7 @@ int main ()
 {
   std::ofstream logfile ("dof_renumbering_02/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 
