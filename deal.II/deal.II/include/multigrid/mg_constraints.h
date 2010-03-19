@@ -24,6 +24,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim> class MGDoFHandler;
 template <int dim> class FunctionMap;
 
+
 /**
  * Collection of boundary constraints and refinement edge constraints
  * for level vectors.
@@ -107,6 +108,9 @@ MGConstraints::at_boundary(unsigned int level, unsigned int index) const
 {
   AssertIndexRange(level, boundary_indices.size());
   AssertIndexRange(level, boundary_indices.size());
+
+  Assert (false, ExcNotImplemented());
+  return false;
 }
 
 
