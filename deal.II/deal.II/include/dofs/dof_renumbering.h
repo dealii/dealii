@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,7 +72,7 @@ DEAL_II_NAMESPACE_OPEN
  * published in 1984), but certainly not with those used in this
  * library, featuring several 10,000 to a few 100,000 elements.
  *
- * 
+ *
  * <h4>Implementation of renumbering schemes</h4>
  *
  * The renumbering algorithms need quite a lot of memory, since they
@@ -92,7 +92,7 @@ DEAL_II_NAMESPACE_OPEN
  * function. This will then give inferior results, since knots in the
  * graph (representing dofs) are not found to be neighbors even if
  * they would be after condensation.
- * 
+ *
  * The renumbering algorithms work on a purely algebraic basis, due to
  * the isomorphism between the graph theoretical groundwork underlying
  * the algorithms and binary matrices (matrices of which the entries
@@ -109,7 +109,7 @@ DEAL_II_NAMESPACE_OPEN
  * deleted. If no index is allowed, the algorithm will search for its
  * own starting point.
  *
- * 
+ *
  * <h4>Results of renumbering</h4>
  *
  * The renumbering schemes mentioned above do not lead to optimal
@@ -364,7 +364,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup dofs
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2004, 2007, 2008
  */
-namespace DoFRenumbering 
+namespace DoFRenumbering
 {
 				   /**
 				    * Direction based comparator for
@@ -383,7 +383,7 @@ namespace DoFRenumbering
 					*/
       CompareDownstream (const Point<dim> &dir)
 		      :
-		      dir(dir) 
+		      dir(dir)
 	{}
 				       /**
 					* Return true if c1 less c2.
@@ -393,14 +393,52 @@ namespace DoFRenumbering
 	  const Point<dim> diff = c2->center() - c1->center();
 	  return (diff*dir > 0);
 	}
-      
+
     private:
 				       /**
 					* Flow direction.
 					*/
       const Point<dim> dir;
   };
-  
+
+
+				   /**
+				    * Point based comparator for downstream
+				    * directions: it returns @p true if the
+				    * second point is downstream of the first
+				    * one with respect to the direction given
+				    * to the constructor. If the points are
+				    * the same with respect to the downstream
+				    * direction, the point with the lower DoF
+				    * number is considered smaller.
+				    */
+  template <int dim>
+  struct ComparePointwiseDownstream
+  {
+				       /**
+					* Constructor.
+					*/
+      ComparePointwiseDownstream (const Point<dim> &dir)
+		      :
+		      dir(dir)
+	{}
+				       /**
+					* Return true if c1 less c2.
+					*/
+      bool operator () (const std::pair<Point<dim>,unsigned int> &c1,
+			const std::pair<Point<dim>,unsigned int> &c2) const
+        {
+	  const Point<dim> diff = c2.first-c1.first;
+	  return (diff*dir > 0 || (diff*dir==0 && c1.second<c2.second));
+	}
+
+    private:
+				       /**
+					* Flow direction.
+					*/
+      const Point<dim> dir;
+  };
+
 				   /**
 				    * A namespace for the
 				    * implementation of some
@@ -447,7 +485,7 @@ namespace DoFRenumbering
 				      * DoFRenumbering namespace.
 				      */
     template <class DH>
-    void 
+    void
     Cuthill_McKee (DH&                              dof_handler,
 		   const bool                       reversed_numbering = false,
 		   const bool                       use_constraints    = false);
@@ -460,7 +498,7 @@ namespace DoFRenumbering
 				      * the DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
-				      */    
+				      */
     template <class DH>
     void
     compute_Cuthill_McKee (std::vector<unsigned int>& new_dof_indices,
@@ -494,7 +532,7 @@ namespace DoFRenumbering
 				      * step-22.
 				      */
     template <class DH>
-    void 
+    void
     king_ordering (DH&                              dof_handler,
 		   const bool                       reversed_numbering = false,
 		   const bool                       use_constraints    = false);
@@ -539,7 +577,7 @@ namespace DoFRenumbering
 				      * DoFRenumbering namespace.
 				      */
     template <class DH>
-    void 
+    void
     minimum_degree (DH&                              dof_handler,
 		    const bool                       reversed_numbering = false,
 		    const bool                       use_constraints    = false);
@@ -559,7 +597,7 @@ namespace DoFRenumbering
 			    const bool reversed_numbering = false,
 			    const bool use_constraints    = false);
   }
-    
+
 				   /**
 				    * Renumber the degrees of
 				    * freedom according to the
@@ -579,7 +617,7 @@ namespace DoFRenumbering
 				    * DoFRenumbering namespace.
 				    */
   template <class DH>
-  void 
+  void
   Cuthill_McKee (DH&                              dof_handler,
 		 const bool                       reversed_numbering = false,
 		 const bool                       use_constraints    = false,
@@ -593,7 +631,7 @@ namespace DoFRenumbering
 				    * the DoFHandler dofs but
 				    * returns the renumbering
 				    * vector.
-				    */    
+				    */
   template <class DH>
   void
   compute_Cuthill_McKee (std::vector<unsigned int>& new_dof_indices,
@@ -626,7 +664,7 @@ namespace DoFRenumbering
 				    * the different methods.
 				    */
   template <int dim>
-  void 
+  void
   Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
 		 const unsigned int          level,
 		 const bool                  reversed_numbering = false,
@@ -681,7 +719,7 @@ namespace DoFRenumbering
 				    * are associated with the first
 				    * vector component to which they
 				    * belong.
-				    * 
+				    *
 				    * For finite elements with only
 				    * one component, or a single
 				    * non-primitive base element,
@@ -737,7 +775,7 @@ namespace DoFRenumbering
   void
   component_wise (MGDoFHandler<dim>&               dof_handler,
 		  const std::vector<unsigned int>& target_component = std::vector<unsigned int>());
-    
+
 				   /**
 				    * Computes the renumbering
 				    * vector needed by the
@@ -746,7 +784,7 @@ namespace DoFRenumbering
 				    * the renumbering on the
 				    * DoFHandler dofs but returns
 				    * the renumbering vector.
-				    */    
+				    */
   template <int dim, class ITERATOR, class ENDITERATOR>
   static unsigned int
   compute_component_wise (std::vector<unsigned int>& new_dof_indices,
@@ -830,7 +868,7 @@ namespace DoFRenumbering
   cell_wise (MGDoFHandler<dim>   &dof_handler,
 	     const unsigned int   level,
 	     const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
-    
+
 				   /**
 				    * @deprecated Use cell_wise() instead.
 				    *
@@ -844,7 +882,7 @@ namespace DoFRenumbering
   cell_wise_dg (MGDoFHandler<dim>   &dof_handler,
 		const unsigned int   level,
 		const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
-    
+
 				   /**
 				    * Computes the renumbering
 				    * vector needed by the
@@ -882,9 +920,18 @@ namespace DoFRenumbering
 
 
 				   /**
-				    * Cell-wise downstream numbering
-				    * with respect to a constant
-				    * flow direction.
+				    * Downstream numbering with respect to a
+				    * constant flow direction. If the
+				    * additional argument @p
+				    * dof_wise_renumbering is set to @p false,
+				    * the numbering is performed cell-wise. If
+				    * it is set to @p true, the dofs are
+				    * renumbered for finite elements that are
+				    * based on support points. Note that in
+				    * this case, the numbering of points will
+				    * be unaffected in case two points are
+				    * located the same with respect to the
+				    * downstream direction.
 				    *
 				    * The cells are sorted such that
 				    * the centers of higher numbers
@@ -911,7 +958,8 @@ namespace DoFRenumbering
   template <class DH, int dim>
   void
   downstream (DH&               dof_handler,
-	      const Point<dim>& direction);
+	      const Point<dim>& direction,
+	      const bool        dof_wise_renumbering = false);
 
 				   /**
 				    * @deprecated Use downstream() instead.
@@ -930,18 +978,20 @@ namespace DoFRenumbering
 				    */
   template <int dim>
   void
-  downstream (MGDoFHandler<dim>  &dof_handler,
+  downstream (MGDoFHandler<dim> &dof_handler,
 	      const unsigned int level,
-	      const Point<dim> &direction);
+	      const Point<dim>  &direction,
+	      const bool         dof_wise_renumbering = false);
+
 				   /**
 				    * @deprecated Use downstream()
 				    * instead.
 				    */
   template <int dim>
   void
-  downstream_dg (MGDoFHandler<dim>  &dof_handler,
+  downstream_dg (MGDoFHandler<dim> &dof_handler,
 		 const unsigned int level,
-		 const Point<dim> &direction);
+		 const Point<dim>  &direction);
 
 				   /**
 				    * @deprecated The new function
@@ -979,8 +1029,9 @@ namespace DoFRenumbering
   compute_downstream (std::vector<unsigned int>& new_dof_indices,
 		      std::vector<unsigned int>& reverse,
 		      const DH&                  dof_handler,
-		      const Point<dim>&          direction);
-    
+		      const Point<dim>&          direction,
+		      const bool                 dof_wise_renumbering);
+
 				   /**
 				    * @deprecated Use
 				    * compute_downstream() instead
@@ -1007,8 +1058,9 @@ namespace DoFRenumbering
 		      std::vector<unsigned int>& reverse,
 		      const MGDoFHandler<dim>&   dof_handler,
 		      const unsigned int         level,
-		      const Point<dim>&          direction);
-    
+		      const Point<dim>&          direction,
+		      const bool                 dof_wise_renumbering);
+
 				   /**
 				    * @deprecated Use
 				    * compute_downstream() instead
@@ -1117,7 +1169,7 @@ namespace DoFRenumbering
 				    * renumbering on the DoFHandler
 				    * dofs but returns the
 				    * renumbering vector.
-				    */   
+				    */
   template <class DH>
   void
   compute_random (std::vector<unsigned int> &new_dof_indices,
@@ -1170,12 +1222,12 @@ namespace DoFRenumbering
 				    * renumbering on the @p
 				    * DoFHandler dofs but returns
 				    * the renumbering vector.
-				    */   
+				    */
   template <class DH>
   void
   compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
 			  const DH                  &dof_handler);
-    
+
 				   /**
 				    * Exception
 				    *

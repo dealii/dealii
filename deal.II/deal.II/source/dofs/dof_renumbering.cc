@@ -2,7 +2,7 @@
 //    $id$
 //    Version: $name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,19 +14,25 @@
 
 #include <base/thread_management.h>
 #include <base/utilities.h>
+#include <base/quadrature_lib.h>
+
 #include <lac/sparsity_pattern.h>
 #include <lac/sparsity_tools.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
 #include <lac/constraint_matrix.h>
+
 #include <dofs/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_tools.h>
+#include <dofs/dof_renumbering.h>
+
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
-#include <dofs/dof_handler.h>
+
+#include <fe/fe.h>
 #include <hp/dof_handler.h>
 #include <hp/fe_collection.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe.h>
-#include <dofs/dof_renumbering.h>
+#include <hp/fe_values.h>
 
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
@@ -1154,11 +1160,13 @@ namespace DoFRenumbering
 
   template <class DH, int dim>
   void
-  downstream (DH& dof, const Point<dim>& direction)
+  downstream (DH& dof, const Point<dim>& direction,
+	      const bool dof_wise_renumbering)
   {
     std::vector<unsigned int> renumbering(dof.n_dofs());
     std::vector<unsigned int> reverse(dof.n_dofs());
-    compute_downstream(renumbering, reverse, dof, direction);
+    compute_downstream(renumbering, reverse, dof, direction,
+		       dof_wise_renumbering);
 
     dof.renumber_dofs(renumbering);
   }
@@ -1216,19 +1224,82 @@ namespace DoFRenumbering
     std::vector<unsigned int>& new_indices,
     std::vector<unsigned int>& reverse,
     const DH& dof,
-    const Point<dim>& direction)
+    const Point<dim>& direction,
+    const bool dof_wise_renumbering)
   {
-    std::vector<typename DH::cell_iterator>
-      ordered_cells(dof.get_tria().n_active_cells());
-    const CompareDownstream<typename DH::cell_iterator, dim> comparator(direction);
+    if (dof_wise_renumbering == false)
+      {
+	std::vector<typename DH::cell_iterator>
+	  ordered_cells(dof.get_tria().n_active_cells());
+	const CompareDownstream<typename DH::cell_iterator, dim> comparator(direction);
 
-    typename DH::active_cell_iterator begin = dof.begin_active();
-    typename DH::active_cell_iterator end = dof.end();
+	typename DH::active_cell_iterator begin = dof.begin_active();
+	typename DH::active_cell_iterator end = dof.end();
 
-    copy (begin, end, ordered_cells.begin());
-    std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+	copy (begin, end, ordered_cells.begin());
+	std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
-    compute_cell_wise(new_indices, reverse, dof, ordered_cells);
+	compute_cell_wise(new_indices, reverse, dof, ordered_cells);
+      }
+    else
+      {
+				// similar code as for
+				// DoFTools::map_dofs_to_support_points, but
+				// need to do this for general DH classes and
+				// want to be able to sort the result
+				// (otherwise, could use something like
+				// DoFTools::map_support_points_to_dofs)
+	const unsigned int n_dofs = dof.n_dofs();
+	std::vector<std::pair<Point<dim>,unsigned int> > support_point_list
+	  (n_dofs);
+
+	const hp::FECollection<dim> fe_collection (dof.get_fe ());
+	Assert (fe_collection[0].has_support_points(),
+		DoFTools::ExcFEHasNoSupportPoints());
+	hp::QCollection<dim> quadrature_collection;
+	for (unsigned int comp=0; comp<fe_collection.size(); ++comp)
+	  {
+	    Assert (fe_collection[comp].has_support_points(),
+		    DoFTools::ExcFEHasNoSupportPoints());
+	    quadrature_collection.push_back
+	      (Quadrature<DH::dimension> (fe_collection[comp].
+					  get_unit_support_points()));
+	  }
+	hp::FEValues<DH::dimension,DH::space_dimension>
+	  hp_fe_values (fe_collection, quadrature_collection,
+			update_quadrature_points);
+
+	std::vector<bool> already_touched (n_dofs, false);
+
+	std::vector<unsigned int> local_dof_indices;
+	typename DH::active_cell_iterator begin = dof.begin_active();
+	typename DH::active_cell_iterator end = dof.end();
+	for ( ; begin != end; ++begin)
+	  {
+	    const unsigned int dofs_per_cell = begin->get_fe().dofs_per_cell;
+	    local_dof_indices.resize (dofs_per_cell);
+	    hp_fe_values.reinit (begin);
+	    const FEValues<dim> &fe_values =
+	      hp_fe_values.get_present_fe_values ();
+	    begin->get_dof_indices(local_dof_indices);
+	    const std::vector<Point<DH::space_dimension> > & points
+	      = fe_values.get_quadrature_points ();
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      if (!already_touched[local_dof_indices[i]])
+		{
+		  support_point_list[local_dof_indices[i]].first = points[i];
+		  support_point_list[local_dof_indices[i]].second =
+		    local_dof_indices[i];
+		  already_touched[local_dof_indices[i]] = true;
+		}
+	  }
+
+	ComparePointwiseDownstream<dim> comparator (direction);
+	std::sort (support_point_list.begin(), support_point_list.end(),
+		   comparator);
+	for (unsigned int i=0; i<n_dofs; ++i)
+	  new_indices[support_point_list[i].second] = i;
+      }
   }
 
 
@@ -1236,7 +1307,7 @@ namespace DoFRenumbering
   template <int dim>
   void downstream_dg (MGDoFHandler<dim>& dof,
 		      const unsigned int level,
-		      const Point<dim>& direction)
+		      const Point<dim>&  direction)
   {
     std::vector<unsigned int> renumbering(dof.n_dofs(level));
     std::vector<unsigned int> reverse(dof.n_dofs(level));
@@ -1250,11 +1321,13 @@ namespace DoFRenumbering
   template <int dim>
   void downstream (MGDoFHandler<dim>& dof,
 		   const unsigned int level,
-		   const Point<dim>& direction)
+		   const Point<dim>&  direction,
+		   const bool         dof_wise_renumbering)
   {
     std::vector<unsigned int> renumbering(dof.n_dofs(level));
     std::vector<unsigned int> reverse(dof.n_dofs(level));
-    compute_downstream(renumbering, reverse, dof, level, direction);
+    compute_downstream(renumbering, reverse, dof, level, direction,
+		       dof_wise_renumbering);
 
     dof.renumber_dofs(level, renumbering);
   }
@@ -1272,7 +1345,8 @@ namespace DoFRenumbering
   {
     std::vector<typename MGDoFHandler<dim>::cell_iterator>
       ordered_cells(dof.get_tria().n_cells(level));
-    const CompareDownstream<typename MGDoFHandler<dim>::cell_iterator, dim> comparator(direction);
+    const CompareDownstream<typename MGDoFHandler<dim>::cell_iterator, dim>
+      comparator(direction);
 
     typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
     typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
@@ -1292,19 +1366,63 @@ namespace DoFRenumbering
     std::vector<unsigned int>& reverse,
     const MGDoFHandler<dim>& dof,
     const unsigned int level,
-    const Point<dim>& direction)
+    const Point<dim>& direction,
+    const bool dof_wise_renumbering)
   {
-    std::vector<typename MGDoFHandler<dim>::cell_iterator>
-      ordered_cells(dof.get_tria().n_cells(level));
-    const CompareDownstream<typename MGDoFHandler<dim>::cell_iterator, dim> comparator(direction);
+    if (dof_wise_renumbering == false)
+      {
+	std::vector<typename MGDoFHandler<dim>::cell_iterator>
+	  ordered_cells(dof.get_tria().n_cells(level));
+	const CompareDownstream<typename MGDoFHandler<dim>::cell_iterator, dim> comparator(direction);
 
-    typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
-    typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
+	typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
+	typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
 
-    std::copy (begin, end, ordered_cells.begin());
-    std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+	std::copy (begin, end, ordered_cells.begin());
+	std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
-    compute_cell_wise(new_indices, reverse, dof, level, ordered_cells);
+	compute_cell_wise(new_indices, reverse, dof, level, ordered_cells);
+      }
+    else
+      {
+	Assert (dof.get_fe().has_support_points(),
+		DoFTools::ExcFEHasNoSupportPoints());
+	const unsigned int n_dofs = dof.n_dofs(level);
+	std::vector<std::pair<Point<dim>,unsigned int> > support_point_list
+	  (n_dofs);
+
+	Quadrature<dim>   q_dummy(dof.get_fe().get_unit_support_points());
+	FEValues<dim,dim> fe_values (dof.get_fe(), q_dummy,
+				     update_quadrature_points);
+
+	std::vector<bool> already_touched (dof.n_dofs(), false);
+
+	const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+	std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+	typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
+	typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
+	for ( ; begin != end; ++begin)
+	  {
+	    begin->get_mg_dof_indices(local_dof_indices);
+	    fe_values.reinit (begin);
+	    const std::vector<Point<dim> > & points
+	      = fe_values.get_quadrature_points ();
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      if (!already_touched[local_dof_indices[i]])
+		{
+		  support_point_list[local_dof_indices[i]].first = points[i];
+		  support_point_list[local_dof_indices[i]].second =
+		    local_dof_indices[i];
+		  already_touched[local_dof_indices[i]] = true;
+		}
+	  }
+
+	ComparePointwiseDownstream<dim> comparator (direction);
+	std::sort (support_point_list.begin(), support_point_list.end(),
+		   comparator);
+	for (unsigned int i=0; i<n_dofs; ++i)
+	  new_indices[support_point_list[i].second] = i;
+      }
   }
 
 
@@ -1693,12 +1811,14 @@ namespace DoFRenumbering
 
   template void
   downstream<DoFHandler<deal_II_dimension> >
-  (DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&);
+  (DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&,
+   const bool);
 
   template void
   compute_downstream<DoFHandler<deal_II_dimension> >
   (std::vector<unsigned int>&,std::vector<unsigned int>&,
-   const DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&);
+   const DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&,
+   const bool);
 
   template
   void
@@ -1755,13 +1875,15 @@ namespace DoFRenumbering
   template void
   downstream<hp::DoFHandler<deal_II_dimension> >
   (hp::DoFHandler<deal_II_dimension>&,
-   const Point<deal_II_dimension>&);
+   const Point<deal_II_dimension>&,
+   const bool);
 
   template void
   compute_downstream<hp::DoFHandler<deal_II_dimension> >
   (std::vector<unsigned int>&,std::vector<unsigned int>&,
    const hp::DoFHandler<deal_II_dimension>&,
-   const Point<deal_II_dimension>&);
+   const Point<deal_II_dimension>&,
+   const bool);
 
   template
   void
@@ -1787,7 +1909,8 @@ namespace DoFRenumbering
   template
   void downstream<deal_II_dimension>
   (MGDoFHandler<deal_II_dimension>&, const unsigned int,
-   const Point<deal_II_dimension>&);
+   const Point<deal_II_dimension>&,
+   const bool);
 
   template
   void clockwise_dg<deal_II_dimension>

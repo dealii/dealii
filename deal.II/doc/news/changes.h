@@ -589,12 +589,26 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  New: The function DoFRenumbering::downstream has now an additional bool
+  argument. If enabled, the downstream comparison is performed on a DoF
+  basis, as opposed to the cell-based comparison that is used with a false
+  argument.
+  <br>
+  (Martin Kronbichler 2010/03/19)
+  </p>
+  </li>
 
-<li><p> Improved: DoFHandler now has a BlockInfo object, automatically updated after DoFHandler::distribute_dofs() and accessible by DoFHandler::block_info(). This object can be used to initialize block vectors and obliterates the necessity to count dofs per block (or dofs per component in legacy code) in application programs.
-<br>
-(GK 2010/03/18)
-</p>
-</li>
+  <li><p> Improved: DoFHandler now has a BlockInfo object, automatically
+  updated after DoFHandler::distribute_dofs() and accessible by
+  DoFHandler::block_info(). This object can be used to initialize block
+  vectors and obliterates the necessity to count dofs per block (or dofs
+  per component in legacy code) in application programs.
+  <br>
+  (GK 2010/03/18)
+  </p>
+  </li>
 
   <li>
   <p>
