@@ -252,7 +252,7 @@ class DoFHandler  :  public Subscriptor
 				  const unsigned int        offset = 0);
 
 				     /**
-				      * After disatribute_dofs() with
+				      * After distribute_dofs() with
 				      * an FESystem element, the block
 				      * structure of global and level
 				      * vectors is stored in a
@@ -941,7 +941,7 @@ class DoFHandler  :  public Subscriptor
 				      * distribute_dofs(), degrees ofd
 				      * freedom naturally split into
 				      * several @ref GlossBlock
-				      * blocks. For each base element
+				      * "blocks". For each base element
 				      * as many blocks appear as its
 				      * multiplicity.
 				      *
