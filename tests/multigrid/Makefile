@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2010 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -17,7 +17,7 @@ libraries = $(lib-deal2-1d.g) \
             $(lib-lac.g)  \
             $(lib-base.g)
 
-default: run-tests 
+default: run-tests
 
 ############################################################
 
@@ -25,7 +25,8 @@ tests_x = cycles dof_* count_* boundary_* renumbering_* \
 	transfer* \
 	smoother_block \
 	mg_output \
-	mg_renumbered*
+	mg_renumbered* \
+	step-16
 
 # from above list of regular expressions, generate the real set of
 # tests
