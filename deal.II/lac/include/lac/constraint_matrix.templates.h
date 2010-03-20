@@ -2022,13 +2022,13 @@ ConstraintMatrix::
 				   // standard (non-block) matrices
 template <typename MatrixType, typename VectorType>
 void
-ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-			    const Vector<double>            &local_vector,
-                            const std::vector<unsigned int> &local_dof_indices,
-                            MatrixType                      &global_matrix,
-			    VectorType                      &global_vector,
-			    internal::bool2type<false>) const
+ConstraintMatrix::distribute_local_to_global (
+  const FullMatrix<double>        &local_matrix,
+  const Vector<double>            &local_vector,
+  const std::vector<unsigned int> &local_dof_indices,
+  MatrixType                      &global_matrix,
+  VectorType                      &global_vector,
+  internal::bool2type<false>) const
 {
 				   // check whether we work on real vectors
 				   // or we just used a dummy when calling

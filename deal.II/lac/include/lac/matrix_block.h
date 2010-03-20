@@ -15,6 +15,9 @@
 
 #include <base/config.h>
 #include <base/named_data.h>
+#include <base/smartpointer.h>
+#include <lac/block_indices.h>
+#include <lac/full_matrix.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -51,8 +54,9 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2006
  */
 template <class MATRIX>
-struct MatrixBlock
+class MatrixBlock
 {
+  public:
 				     /**
 				      * Constructor rendering an
 				      * uninitialized object.
@@ -70,7 +74,124 @@ struct MatrixBlock
 				      * initializing the matrix.
 				      */
     
-    MatrixBlock(unsigned int i, unsigned int j);
+    MatrixBlock(unsigned int i, unsigned int j,
+		const BlockIndices* block_indices = 0);
+
+				     /**
+				      * Add <tt>value</tt> to the
+				      * element (<i>i,j</i>).  Throws
+				      * an error if the entry does not
+				      * exist or if <tt>value</tt> is
+				      * not a finite number. Still, it
+				      * is allowed to store zero
+				      * values in non-existent fields.
+				      */
+    void add (const unsigned int i,
+              const unsigned int j,
+	      const typename MATRIX::value_type value);
+
+                                       /**
+                                        * Add all elements given in a
+                                        * FullMatrix<double> into sparse
+                                        * matrix locations given by
+                                        * <tt>indices</tt>. In other words,
+                                        * this function adds the elements in
+                                        * <tt>full_matrix</tt> to the
+                                        * respective entries in calling
+                                        * matrix, using the local-to-global
+                                        * indexing specified by
+                                        * <tt>indices</tt> for both the rows
+                                        * and the columns of the
+                                        * matrix. This function assumes a
+                                        * quadratic sparse matrix and a
+                                        * quadratic full_matrix, the usual
+                                        * situation in FE calculations.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    template <typename number>
+    void add (const std::vector<unsigned int>& indices,
+	      const FullMatrix<number>&        full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Same function as before, but now
+                                        * including the possibility to use
+                                        * rectangular full_matrices and
+                                        * different local-to-global indexing
+                                        * on rows and columns, respectively.
+					*/
+    template <typename number>
+    void add (const std::vector<unsigned int>& row_indices,
+	      const std::vector<unsigned int>& col_indices,
+	      const FullMatrix<number>&        full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    template <typename number>
+    void add (const unsigned int               row,
+	      const std::vector<unsigned int>& col_indices,
+	      const std::vector<number>&       values,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Add an array of values given by
+                                        * <tt>values</tt> in the given
+                                        * global matrix row at columns
+                                        * specified by col_indices in the
+                                        * sparse matrix.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    template <typename number>
+    void add (const unsigned int  row,
+	      const unsigned int  n_cols,
+	      const unsigned int *col_indices,
+	      const number       *values,
+	      const bool          elide_zero_values = true,
+	      const bool          col_indices_are_sorted = false);
+
+				     /**
+				      * The block number computed from
+				      * an index by using
+				      * #block_indices does not match
+				      * the block coordinates stored
+				      * in this object.
+				      */
+    DeclException2(ExcBlockIndexMismatch, unsigned int, unsigned int,
+		   << "Block index " << arg1 << " does not match " << arg2);
     
 				     /**
 				      * Row coordinate.  This is the
@@ -90,6 +211,16 @@ struct MatrixBlock
 				      * The matrix itself
 				      */
     MATRIX matrix;
+
+				     /**
+				      * The BlockIndices of the whole
+				      * system. Using row() and
+				      * column(), this allows us to
+				      * find the index of the first
+				      * row and column degrees of
+				      * freedom for this block. 
+				      */
+    SmartPointer<const BlockIndices, MatrixBlock<MATRIX> > block_indices;
 };
 
 
@@ -109,7 +240,9 @@ class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX>
 				      * position <tt(row,column)</tt>
 				      * in the block system.
 				      */
-    void add(unsigned int row, unsigned int column, const std::string& name);
+    void add(unsigned int row, unsigned int column,
+	     const std::string& name,
+	     const BlockIndices* block_indices);
 				     /**
 				      * Access a constant reference to
 				      * the block at position <i>i</i>.
@@ -129,6 +262,7 @@ class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX>
 //----------------------------------------------------------------------//
 
 template <class MATRIX>
+inline
 MatrixBlock<MATRIX>::MatrixBlock()
 		:
 		row(deal_II_numbers::invalid_unsigned_int),
@@ -137,27 +271,147 @@ MatrixBlock<MATRIX>::MatrixBlock()
 
 
 template <class MATRIX>
+inline
 MatrixBlock<MATRIX>::MatrixBlock(const MatrixBlock<MATRIX>& M)
 		:
 		row(M.row),
 		column(M.column),
-		matrix(M.matrix)
+		matrix(M.matrix),
+		block_indices(M.block_indices)
 {}
 
 
 template <class MATRIX>
-MatrixBlock<MATRIX>::MatrixBlock(unsigned int i, unsigned int j)
+inline
+MatrixBlock<MATRIX>::MatrixBlock(unsigned int i, unsigned int j,
+				 const BlockIndices* block_indices)
 		:
-		row(i), column(j)
+		row(i), column(j), block_indices(block_indices)
 {}
+
+
+template <class MATRIX>
+inline void
+MatrixBlock<MATRIX>::add (
+  const unsigned int gi,
+  const unsigned int gj,
+  const typename MATRIX::value_type value)
+{
+  Assert(block_indices != 0, ExcNotInitialized());
+  
+  const std::pair<unsigned int, unsigned int> bi
+    = block_indices->global_to_local(gi);
+  const std::pair<unsigned int, unsigned int> bj
+    = block_indices->global_to_local(gj);
+  
+  Assert (bi.first == row, ExcBlockIndexMismatch(bi.first, row));
+  Assert (bj.first == column, ExcBlockIndexMismatch(bj.first, column));
+  
+  matrix.add(bi.second, bj.second, value);
+}
+
+
+template <class MATRIX>
+template <typename number>
+inline
+void
+MatrixBlock<MATRIX>::add (const std::vector<unsigned int>&         row_indices,
+				  const std::vector<unsigned int>& col_indices,
+				  const FullMatrix<number>&        values,
+				  const bool                       elide_zero_values)
+{
+  AssertDimension (row_indices.size(), values.m());
+  AssertDimension (col_indices.size(), values.n());
+  
+  for (unsigned int i=0; i<row_indices.size(); ++i)
+    add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <class MATRIX>
+template <typename number>
+inline
+void
+MatrixBlock<MATRIX>::add (const std::vector<unsigned int> &indices,
+			  const FullMatrix<number>        &values,
+			  const bool                       elide_zero_values)
+{
+  AssertDimension (indices.size(), values.m());
+  Assert (values.n() == values.m(), ExcNotQuadratic());
+  
+  for (unsigned int i=0; i<indices.size(); ++i)
+    add (indices[i], indices.size(), &indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <class MATRIX>
+template <typename number>
+inline
+void
+MatrixBlock<MATRIX>::add (const unsigned int               row,
+			  const std::vector<unsigned int> &col_indices,
+			  const std::vector<number>       &values,
+			  const bool                       elide_zero_values)
+{
+  AssertDimension (col_indices.size(), values.size());
+  add (row, col_indices.size(), &col_indices[0], &values[0],
+       elide_zero_values);
+}
+
+
+template <class MATRIX>
+template <typename number>
+inline
+void
+MatrixBlock<MATRIX>::add (const unsigned int   b_row,
+			  const unsigned int   n_cols,
+			  const unsigned int  *col_indices,
+			  const number        *values,
+			  const bool,
+			  const bool)
+{
+  const std::pair<unsigned int, unsigned int> bi
+    = block_indices->global_to_local(b_row);
+
+				   // In debug mode, we check whether
+				   // all indices are in the correct
+				   // block.
+
+				   // Actually, for the time being, we
+				   // leave it at this. While it may
+				   // not be the most efficient way,
+				   // it is at least thread safe.
+//#ifdef DEBUG
+  Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
+
+  for (unsigned int j=0;j<n_cols;++j)
+    {
+      const std::pair<unsigned int, unsigned int> bj
+	= block_indices->global_to_local(col_indices[j]);
+      Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
+      
+      matrix.add(bi.second, bj.second, values[j]);
+    }
+  
+//#endif
+
+}
+
 
 //----------------------------------------------------------------------//
 
 template <class MATRIX>
 inline void
-MatrixBlockVector<MATRIX>::add(unsigned int row, unsigned int column, const std::string& name)
+MatrixBlockVector<MATRIX>::add(
+  unsigned int row, unsigned int column,
+  const std::string& name,
+  const BlockIndices* block_indices)
 {
-  boost::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column));
+  boost::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column, block_indices));
   NamedData<boost::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
 }
 
