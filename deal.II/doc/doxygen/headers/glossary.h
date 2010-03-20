@@ -31,7 +31,8 @@
  * structure of a PDE system in linear algebra, in particular allowing
  * for modular solvers for problems with multiple solution components.
  * How to implement this is described in more detail in the
- * @ref vector_valued report and the tutorial programs referenced
+ * documentation of FESystem, the
+ * @ref vector_valued module and the tutorial programs referenced
  * therein.
  *
  * Originally, this concept was intermixed with the idea of the vector

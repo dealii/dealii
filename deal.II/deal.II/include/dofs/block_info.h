@@ -32,9 +32,30 @@ namespace hp
  * @brief A small class collecting the different BlockIndices involved in
  * global, multilevel and local computations.
  *
- * In addition to grouping all the block indices into a single
- * instance, this class also provides functions to fill them
- * automatically.
+ * Once a DoFHandler has been initialized with an FESystem, a data
+ * object of type BlockInfo (accessed by DoFHandler::block_info() ) is
+ * filled, which reflects the block structure of the degrees of
+ * freedom.
+ *
+ * BlockInfo consists of deveral BlockIndices objects. The member
+ * global() reflects the block structure of the system on the active
+ * cell level, usually referred to as the global system. As soon as
+ * DoFHandler::distribute_dofs() has been called, the function
+ * BlockIndices::block_size() in global() will return the correct
+ * sizes of each block. After DoFRenumbering::block_wise(),
+ * BlockIndices::block_start() will return the start index for each of
+ * the blocks.
+ *
+ * When an MGDoFHandler is used, the same structure is automatically
+ * generated for each level. The level blocks can be accessed through
+ * level().
+ *
+ * Finally, there are local() BlockIndices, which describe the block
+ * structure on a single cell. This is used for instance by
+ * MeshWorker::Assembler::MatrixLocalBlocksToGlobalBlocks. The local
+ * indices are not filled automatically, since they change the
+ * behavior of the MeshWorker::Assembler classes relying on
+ * BlockInfo. They must be initialized by hand through initialize_local().
  *
  * @todo Extend the functions local() and renumber() to the concept to
  * hpDoFHandler.
