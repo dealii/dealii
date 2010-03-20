@@ -1444,19 +1444,8 @@ namespace MeshWorker
 					       // our local matrices
 	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
 	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
-
-					       // The global dof
-					       // indices to assemble
-					       // in. Since we may
-					       // have face matrices
-					       // coupling two
-					       // different cells, we
-					       // provide two sets of
-					       // dof indices.
-	      const unsigned int jglobal = this->block_info->global().global_to_local(dof1[jcell]).second;
-	      const unsigned int kglobal = this->block_info->global().global_to_local(dof2[kcell]).second;
 	      
-	      global.add(jglobal, kglobal, local(j,k));
+	      global.add(dof1[jcell], dof2[kcell], local(j,k));
 	    }
     }
 

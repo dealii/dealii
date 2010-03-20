@@ -320,6 +320,8 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int>&         row_indices,
 				  const FullMatrix<number>&        values,
 				  const bool                       elide_zero_values)
 {
+  Assert(block_indices != 0, ExcNotInitialized());
+  
   AssertDimension (row_indices.size(), values.m());
   AssertDimension (col_indices.size(), values.n());
   
@@ -338,6 +340,8 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int> &indices,
 			  const FullMatrix<number>        &values,
 			  const bool                       elide_zero_values)
 {
+  Assert(block_indices != 0, ExcNotInitialized());
+  
   AssertDimension (indices.size(), values.m());
   Assert (values.n() == values.m(), ExcNotQuadratic());
   
@@ -356,7 +360,8 @@ MatrixBlock<MATRIX>::add (const unsigned int               row,
 			  const std::vector<unsigned int> &col_indices,
 			  const std::vector<number>       &values,
 			  const bool                       elide_zero_values)
-{
+{ 
+  Assert(block_indices != 0, ExcNotInitialized());
   AssertDimension (col_indices.size(), values.size());
   add (row, col_indices.size(), &col_indices[0], &values[0],
        elide_zero_values);
@@ -374,6 +379,7 @@ MatrixBlock<MATRIX>::add (const unsigned int   b_row,
 			  const bool,
 			  const bool)
 {
+  Assert(block_indices != 0, ExcNotInitialized());
   const std::pair<unsigned int, unsigned int> bi
     = block_indices->global_to_local(b_row);
 
