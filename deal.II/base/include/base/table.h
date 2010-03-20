@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -347,17 +347,6 @@ namespace internal
                                           */
         iterator end () const;
       
-                                         /**
-                                          * Exception for range
-                                          * check. Do not use global
-                                          * exception since this way we
-                                          * can output which index is
-                                          * the wrong one.
-                                          */
-        DeclException3 (ExcIndexRange, int, int, int,
-                        << "The " << N << "th index has a value of "
-                        << arg1 << " but needs to be in the range ["
-                        << arg2 << "," << arg3 << "[");
       private:
                                          /**
                                           * Store the data given to the
