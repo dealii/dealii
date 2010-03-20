@@ -14,35 +14,35 @@ When run, the output of this program is
 Cycle 0:
    Number of active cells:       20
    Number of degrees of freedom: 25 (by level: 8, 25)
-   6 CG iterations needed to obtain convergence.
+   7 CG iterations needed to obtain convergence.
 Cycle 1:
    Number of active cells:       44
    Number of degrees of freedom: 57 (by level: 8, 25, 48)
-   6 CG iterations needed to obtain convergence.
+   8 CG iterations needed to obtain convergence.
 Cycle 2:
    Number of active cells:       92
    Number of degrees of freedom: 117 (by level: 8, 25, 80, 60)
-   7 CG iterations needed to obtain convergence.
+   9 CG iterations needed to obtain convergence.
 Cycle 3:
    Number of active cells:       188
    Number of degrees of freedom: 221 (by level: 8, 25, 80, 200)
-   9 CG iterations needed to obtain convergence.
+   12 CG iterations needed to obtain convergence.
 Cycle 4:
    Number of active cells:       416
    Number of degrees of freedom: 485 (by level: 8, 25, 89, 288, 280)
-   10 CG iterations needed to obtain convergence.
+   13 CG iterations needed to obtain convergence.
 Cycle 5:
    Number of active cells:       800
    Number of degrees of freedom: 925 (by level: 8, 25, 89, 288, 784, 132)
-   11 CG iterations needed to obtain convergence.
+   14 CG iterations needed to obtain convergence.
 Cycle 6:
    Number of active cells:       1628
    Number of degrees of freedom: 1865 (by level: 8, 25, 89, 304, 1000, 1164, 72)
-   11 CG iterations needed to obtain convergence.
+   14 CG iterations needed to obtain convergence.
 Cycle 7:
    Number of active cells:       3194
    Number of degrees of freedom: 3603 (by level: 8, 25, 89, 328, 1032, 2200, 1392)
-   12 CG iterations needed to obtain convergence.
+   16 CG iterations needed to obtain convergence.
 </pre>
 That's not perfect &mdash; we would have hoped for a constant number
 of iterations rather than one that increases as we get more and more
