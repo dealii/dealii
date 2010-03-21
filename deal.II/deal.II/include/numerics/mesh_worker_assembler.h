@@ -722,7 +722,7 @@ namespace MeshWorker
 					  * matrix into a global one.
 					  */
 	void assemble(
-	  MATRIX& global,
+	  MatrixBlock<MATRIX>& global,
 	  const FullMatrix<number>& local,
 	  unsigned int block_row,
 	  unsigned int block_col,
@@ -1423,7 +1423,7 @@ namespace MeshWorker
     template <class MATRIX, typename number>
     inline void
     MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble(
-      MATRIX& global,
+      MatrixBlock<MATRIX>& global,
       const FullMatrix<number>& local,
       unsigned int block_row,
       unsigned int block_col,
@@ -1463,7 +1463,7 @@ namespace MeshWorker
 	  const unsigned int row = matrices->block(i).row;
 	  const unsigned int col = matrices->block(i).column;
 
-	  assemble(matrices->matrix(i), info.matrix(i,false).matrix, row, col, info.indices, info.indices);
+	  assemble(matrices->block(i), info.matrix(i,false).matrix, row, col, info.indices, info.indices);
 	}
     }
 
@@ -1482,10 +1482,10 @@ namespace MeshWorker
 	  const unsigned int row = matrices->block(i).row;
 	  const unsigned int col = matrices->block(i).column;
 
-	  assemble(matrices->matrix(i), info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices);
-	  assemble(matrices->matrix(i), info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices);
-	  assemble(matrices->matrix(i), info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices);
-	  assemble(matrices->matrix(i), info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices);
+	  assemble(matrices->block(i), info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices);
+	  assemble(matrices->block(i), info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices);
+	  assemble(matrices->block(i), info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices);
+	  assemble(matrices->block(i), info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices);
 	}
     }
 

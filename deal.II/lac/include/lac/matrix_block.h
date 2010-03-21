@@ -249,6 +249,11 @@ class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX>
 				      */
     const MatrixBlock<MATRIX>& block(unsigned int i) const;
 				     /**
+				      * Access a reference to
+				      * the block at position <i>i</i>.
+				      */
+    MatrixBlock<MATRIX>& block(unsigned int i);
+				     /**
 				      * Access the matrix at position
 				      * <i>i</i> for read and write
 				      * access.
@@ -427,6 +432,14 @@ inline const MatrixBlock<MATRIX>&
 MatrixBlockVector<MATRIX>::block(unsigned int i) const
 {
   return *this->read(i);
+}
+
+
+template <class MATRIX>
+inline MatrixBlock<MATRIX>&
+MatrixBlockVector<MATRIX>::block(unsigned int i)
+{
+  return *(*this)(i);
 }
 
 
