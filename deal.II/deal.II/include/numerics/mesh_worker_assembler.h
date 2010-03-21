@@ -17,7 +17,7 @@
 #include <base/named_data.h>
 #include <base/smartpointer.h>
 #include <lac/block_vector.h>
-#include <multigrid/mg_level_object.h>
+#include <base/mg_level_object.h>
 
 
 DEAL_II_NAMESPACE_OPEN

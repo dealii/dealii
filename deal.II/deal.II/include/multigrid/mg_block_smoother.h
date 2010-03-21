@@ -20,7 +20,7 @@
 #include <lac/vector_memory.h>
 #include <lac/block_vector.h>
 #include <multigrid/mg_base.h>
-#include <multigrid/mg_level_object.h>
+#include <base/mg_level_object.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

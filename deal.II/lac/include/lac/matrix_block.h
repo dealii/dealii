@@ -27,30 +27,52 @@ DEAL_II_NAMESPACE_OPEN
  * A wrapper around a matrix object, storing the coordinates in a
  * block matrix as well.
  *
- * @note They are the position in the global matrix, where we don't use
- * BlockSparseMatrix. Matrices may have the same coordinates for the
- * following reason: A preconditioner for the Oseen system can be
- * built as a block system, where the pressure block is of the form
- * M^-1 F A^-1 with m the mass matrix (u,v), A the Laplacian and F the
- * advection diffusion operator. So, I need to build three matrices
- * for a single block in my system + in some cases a pressure
- * stabilization.
+ * This class is an alternative to BlockMatrixBase, if you only want
+ * to generate a single block of the system, not the whole
+ * system. Using the add() functions of this class, it is possible to
+ * use the standard assembling functions used for block matrices, but
+ * only enter in one of the blocks and still avoiding the index
+ * computations innvolved.
+
+ * The reason for this class is, that we may need a different number
+ * of matrices for different blocks in a block system. For example, a
+ * preconditioner for the Oseen system can be built as a block system,
+ * where the pressure block is of the form
+ * <b>M</b><sup>-1</sup><b>FA</b><sup>-1</sup> with <b>M</b> the
+ * pressure mass matrix, <b>A</b> the pressure Laplacian and <b>F</b>
+ * the advection diffusion operator applied to the pressure
+ * space. Since only a single matrix is needed for the other blocks,
+ * using BlockSparseMatrix or similar would be a waste of memory.
+ *
+ * While the add() functions make a MatrixBlock appear like a block
+ * matrix for assembling, the functions vmult(), Tvmult(),
+ * vmult_add(), and Tvmult_add() make it behave like a MATRIX, when it
+ * comes to applying it to a vector. This behavior allows us to store
+ * MatrixBlock objects in vectors, for instance in MGLevelObject
+ * without extracting the #matrix first. 
  *
  * MatrixBlock comes handy when using BlockMatrixArray. Once the
  * MatrixBlock has been properly initalized and filled, it can be used
- * as:
+ * in the simplest case as:
  * @code
- * std::vector<MatrixBlock<SparseMatrix<double> > > blocks;
+ * MatrixBlockVector<SparseMatrix<double> > > blocks;
  *
  * ...
  *
  * BlockMatrixArray matrix (n_blocks, n_blocks);
  *
  * for (unsigned int i=0;i<blocks.size;++i)
- *   matrix.enter(blocks[i].row, blocks[i].column, blocks[i].matrix);
+ *   matrix.enter(blocks.block(i).row, blocks.block(i).column, blocks.matrix(i));
  * @endcode
  *
+ * Here, we have not gained very much, except that we do not need to
+ * set up empty blocks in the block system.
  *
+ * @todo Example for the product preconditioner of the pressure Schur
+ * complement.
+ *
+ * @ingroup Matrix2
+ * @ingroup vector_valued
  * @author Guido Kanschat, 2006
  */
 template <class MATRIX>
@@ -79,33 +101,34 @@ class MatrixBlock
 
 				     /**
 				      * Add <tt>value</tt> to the
-				      * element (<i>i,j</i>).  Throws
+				      * element (<i>i,j</i>). Throws
 				      * an error if the entry does not
-				      * exist or if <tt>value</tt> is
-				      * not a finite number. Still, it
-				      * is allowed to store zero
-				      * values in non-existent fields.
+				      * exist or if it is in a
+				      * different block.
 				      */
     void add (const unsigned int i,
               const unsigned int j,
 	      const typename MATRIX::value_type value);
 
                                        /**
-                                        * Add all elements given in a
-                                        * FullMatrix<double> into sparse
+                                        * Add all elements in a
+                                        * FullMatrix into sparse
                                         * matrix locations given by
-                                        * <tt>indices</tt>. In other words,
-                                        * this function adds the elements in
-                                        * <tt>full_matrix</tt> to the
-                                        * respective entries in calling
-                                        * matrix, using the local-to-global
-                                        * indexing specified by
-                                        * <tt>indices</tt> for both the rows
-                                        * and the columns of the
-                                        * matrix. This function assumes a
-                                        * quadratic sparse matrix and a
-                                        * quadratic full_matrix, the usual
-                                        * situation in FE calculations.
+                                        * <tt>indices</tt>. This function
+                                        * assumes a quadratic sparse
+                                        * matrix and a quadratic
+                                        * full_matrix.  The global
+                                        * locations are translated
+                                        * into locations in this block
+                                        * and ExcBlockIndexMismatch is
+                                        * thrown, if the global index
+                                        * does not point into the
+                                        * block refered to by #row and
+                                        * #column.
+					*
+					* @todo
+					* <tt>elide_zero_values<tt> is
+					* currently ignored.
 					*
 					* The optional parameter
 					* <tt>elide_zero_values</tt> can be
@@ -123,24 +146,23 @@ class MatrixBlock
 	      const bool                       elide_zero_values = true);
 
                                        /**
-                                        * Same function as before, but now
-                                        * including the possibility to use
-                                        * rectangular full_matrices and
-                                        * different local-to-global indexing
-                                        * on rows and columns, respectively.
-					*/
-    template <typename number>
-    void add (const std::vector<unsigned int>& row_indices,
-	      const std::vector<unsigned int>& col_indices,
-	      const FullMatrix<number>&        full_matrix,
-	      const bool                       elide_zero_values = true);
-
-                                       /**
-                                        * Set several elements in the
-                                        * specified row of the matrix with
-                                        * column indices as given by
-                                        * <tt>col_indices</tt> to the
-                                        * respective value.
+					* Add all elements in a
+                                        * FullMatrix into global
+                                        * locations given by
+                                        * <tt>row_indices</tt> and
+                                        * <tt>col_indices</tt>,
+                                        * respectively. The global
+                                        * locations are translated
+                                        * into locations in this block
+                                        * and ExcBlockIndexMismatch is
+                                        * thrown, if the global index
+                                        * does not point into the
+                                        * block refered to by #row and
+                                        * #column.
+					*
+					* @todo
+					* <tt>elide_zero_values<tt> is
+					* currently ignored.
 					*
 					* The optional parameter
 					* <tt>elide_zero_values</tt> can be
@@ -153,7 +175,47 @@ class MatrixBlock
 					* into the matrix.
 					*/
     template <typename number>
-    void add (const unsigned int               row,
+    void add (const std::vector<unsigned int>& row_indices,
+	      const std::vector<unsigned int>& col_indices,
+	      const FullMatrix<number>&        full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix
+                                        * with column indices as given
+                                        * by <tt>col_indices</tt> to
+                                        * the respective value. This
+                                        * is the function doing thye
+                                        * actual work for the ones
+                                        * adding full matrices. The
+                                        * global locations
+                                        * <tt>row_index</tt> and
+                                        * <tt>col_indices</tt> are
+                                        * translated into locations in
+                                        * this block and
+                                        * ExcBlockIndexMismatch is
+                                        * thrown, if the global index
+                                        * does not point into the
+                                        * block refered to by #row and
+                                        * #column.
+					*
+					* @todo
+					* <tt>elide_zero_values<tt> is
+					* currently ignored.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    template <typename number>
+    void add (const unsigned int               row_index,
 	      const std::vector<unsigned int>& col_indices,
 	      const std::vector<number>&       values,
 	      const bool                       elide_zero_values = true);
@@ -182,6 +244,50 @@ class MatrixBlock
 	      const number       *values,
 	      const bool          elide_zero_values = true,
 	      const bool          col_indices_are_sorted = false);
+
+				     /**
+				      * Matrix-vector-multiplication,
+				      * forwarding to the same
+				      * function in MATRIX. No index
+				      * computations are done, thus,
+				      * the vectors need to have sizes
+				      * matching #matrix.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR& w, const VECTOR& v) const;
+    
+				     /**
+				      * Matrix-vector-multiplication,
+				      * forwarding to the same
+				      * function in MATRIX. No index
+				      * computations are done, thus,
+				      * the vectors need to have sizes
+				      * matching #matrix.
+				      */
+    template<class VECTOR>
+    void vmult_add (VECTOR& w, const VECTOR& v) const;
+    
+				     /**
+				      * Matrix-vector-multiplication,
+				      * forwarding to the same
+				      * function in MATRIX. No index
+				      * computations are done, thus,
+				      * the vectors need to have sizes
+				      * matching #matrix.
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR& w, const VECTOR& v) const;
+
+				     /**
+				      * Matrix-vector-multiplication,
+				      * forwarding to the same
+				      * function in MATRIX. No index
+				      * computations are done, thus,
+				      * the vectors need to have sizes
+				      * matching #matrix.
+				      */
+    template<class VECTOR>
+    void Tvmult_add (VECTOR& w, const VECTOR& v) const;
 
 				     /**
 				      * The block number computed from
@@ -229,10 +335,54 @@ class MatrixBlock
  * pointers, in order to allow for copying and rearranging. Each
  * matrix block can be identified by name.
  *
+ * @relates MatrixBlock
+ * @ingroup vector_valued
  * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <class MATRIX>
 class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX> > >
+{
+  public:
+				     /**
+				      * Add a new matrix block at the
+				      * position <tt(row,column)</tt>
+				      * in the block system.
+				      */
+    void add(unsigned int row, unsigned int column,
+	     const std::string& name,
+	     const BlockIndices* block_indices);
+				     /**
+				      * Access a constant reference to
+				      * the block at position <i>i</i>.
+				      */
+    const MatrixBlock<MATRIX>& block(unsigned int i) const;
+				     /**
+				      * Access a reference to
+				      * the block at position <i>i</i>.
+				      */
+    MatrixBlock<MATRIX>& block(unsigned int i);
+				     /**
+				      * Access the matrix at position
+				      * <i>i</i> for read and write
+				      * access.
+				      */
+    MATRIX& matrix(unsigned int i);
+    
+    
+};
+
+
+/**
+ * A vector of MGLevelObject<MatrixBlock>, which is implemented using shared
+ * pointers, in order to allow for copying and rearranging. Each
+ * matrix block can be identified by name.
+ *
+ * @relates MatrixBlock
+ * @ingroup vector_valued
+ * @author Baerbel Janssen, Guido Kanschat, 2010
+ */
+template <class MATRIX>
+class MGMatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX> > >
 {
   public:
 				     /**
@@ -336,6 +486,43 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int>&         row_indices,
 }
 
 
+template <class MATRIX>
+template <typename number>
+inline
+void
+MatrixBlock<MATRIX>::add (const unsigned int   b_row,
+			  const unsigned int   n_cols,
+			  const unsigned int  *col_indices,
+			  const number        *values,
+			  const bool,
+			  const bool)
+{
+  Assert(block_indices != 0, ExcNotInitialized());
+  const std::pair<unsigned int, unsigned int> bi
+    = block_indices->global_to_local(b_row);
+
+				   // In debug mode, we check whether
+				   // all indices are in the correct
+				   // block.
+
+				   // Actually, for the time being, we
+				   // leave it at this. While it may
+				   // not be the most efficient way,
+				   // it is at least thread safe.
+//#ifdef DEBUG
+  Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
+
+  for (unsigned int j=0;j<n_cols;++j)
+    {
+      const std::pair<unsigned int, unsigned int> bj
+	= block_indices->global_to_local(col_indices[j]);
+      Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
+      
+      matrix.add(bi.second, bj.second, values[j]);
+    }
+//#endif
+}
+
 
 template <class MATRIX>
 template <typename number>
@@ -374,43 +561,44 @@ MatrixBlock<MATRIX>::add (const unsigned int               row,
 
 
 template <class MATRIX>
-template <typename number>
+template <class VECTOR>
 inline
 void
-MatrixBlock<MATRIX>::add (const unsigned int   b_row,
-			  const unsigned int   n_cols,
-			  const unsigned int  *col_indices,
-			  const number        *values,
-			  const bool,
-			  const bool)
+MatrixBlock<MATRIX>::vmult (VECTOR& w, const VECTOR& v) const
 {
-  Assert(block_indices != 0, ExcNotInitialized());
-  const std::pair<unsigned int, unsigned int> bi
-    = block_indices->global_to_local(b_row);
-
-				   // In debug mode, we check whether
-				   // all indices are in the correct
-				   // block.
-
-				   // Actually, for the time being, we
-				   // leave it at this. While it may
-				   // not be the most efficient way,
-				   // it is at least thread safe.
-//#ifdef DEBUG
-  Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
-
-  for (unsigned int j=0;j<n_cols;++j)
-    {
-      const std::pair<unsigned int, unsigned int> bj
-	= block_indices->global_to_local(col_indices[j]);
-      Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
-      
-      matrix.add(bi.second, bj.second, values[j]);
-    }
-  
-//#endif
-
+  matrix.vmult(w,v);
 }
+
+
+template <class MATRIX>
+template <class VECTOR>
+inline
+void
+MatrixBlock<MATRIX>::vmult_add (VECTOR& w, const VECTOR& v) const
+{
+  matrix.vmult_add(w,v);
+}
+
+
+template <class MATRIX>
+template <class VECTOR>
+inline
+void
+MatrixBlock<MATRIX>::Tvmult (VECTOR& w, const VECTOR& v) const
+{
+  matrix.Tvmult(w,v);
+}
+
+
+template <class MATRIX>
+template <class VECTOR>
+inline
+void
+MatrixBlock<MATRIX>::Tvmult_add (VECTOR& w, const VECTOR& v) const
+{
+  matrix.Tvmult_add(w,v);
+}
+
 
 
 //----------------------------------------------------------------------//

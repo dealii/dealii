@@ -1827,6 +1827,18 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Internal helper function for
+				      * distribute_local_to_global
+				      * function.
+				      *
+				      * Creates a list of affected
+				      * rows for sistribution.
+				      */
+    void
+    make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
+			  internals::GlobalRowsFromLocal  &global_rows) const;
+
+				     /**
+				      * Internal helper function for
 				      * distribute_local_to_global function.
 				      */
     template <typename MatrixType>

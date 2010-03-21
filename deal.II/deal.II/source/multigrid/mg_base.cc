@@ -17,7 +17,7 @@
 #include <fe/fe.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_base.h>
-#include <multigrid/mg_level_object.h>
+#include <base/mg_level_object.h>
 #include <multigrid/mg_tools.h>
 
 

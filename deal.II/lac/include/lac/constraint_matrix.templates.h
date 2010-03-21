@@ -1722,6 +1722,85 @@ namespace internals
 } // end of namespace internals
 
 
+void
+ConstraintMatrix::
+make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
+		      internals::GlobalRowsFromLocal  &global_rows) const
+{
+  const unsigned int n_local_dofs = local_dof_indices.size();
+				   // when distributing the local data to
+				   // the global matrix, we can quite
+				   // cheaply sort the indices (obviously,
+				   // this introduces the need for
+				   // allocating some memory on the way, but
+				   // we need to do this only for rows,
+				   // whereas the distribution process
+				   // itself goes over rows and
+				   // columns). This has the advantage that
+				   // when writing into the global matrix,
+				   // we can make use of the sortedness.
+
+				   // so the first step is to create a
+				   // sorted list of all row values that are
+				   // possible. these values are either the
+				   // rows from unconstrained dofs, or some
+				   // indices introduced by dofs constrained
+				   // to a combination of some other
+				   // dofs. regarding the data type, choose
+				   // an STL vector of a pair of unsigned
+				   // ints (for global columns) and internal
+				   // data (containing local columns +
+				   // possible jumps from
+				   // constraints). Choosing an STL map or
+				   // anything else M.K. knows of would be
+				   // much more expensive here!
+
+				   // cache whether we have to resolve any
+				   // indirect rows generated from resolving
+				   // constrained dofs.
+  unsigned int added_rows = 0;
+
+				   // first add the indices in an unsorted
+				   // way and only keep track of the
+				   // constraints that appear. They are
+				   // resolved in a second step.
+  for (unsigned int i = 0; i<n_local_dofs; ++i)
+    {
+      if (is_constrained(local_dof_indices[i]) == false)
+	{
+	  global_rows.global_row(added_rows)  = local_dof_indices[i];
+	  global_rows.local_row(added_rows++) = i;
+	  continue;
+	}
+      global_rows.insert_constraint(i);
+    }
+  global_rows.sort();
+
+  const unsigned int n_constrained_rows = n_local_dofs-added_rows;
+  for (unsigned int i=0; i<n_constrained_rows; ++i)
+    {
+      const unsigned int local_row = global_rows.last_constrained_local_row();
+      Assert (local_row < n_local_dofs, ExcIndexRange(local_row, 0, n_local_dofs));
+      const unsigned int global_row = local_dof_indices[local_row];
+      Assert (is_constrained(global_row), ExcInternalError());
+      const ConstraintLine & position =
+	lines[lines_cache[calculate_line_index(global_row)]];
+      if (position.inhomogeneity != 0)
+	global_rows.set_last_row_inhomogeneous();
+      else
+	global_rows.pop_back();
+      for (unsigned int q=0; q<position.entries.size(); ++q)
+	global_rows.insert_index (position.entries[q].first,
+				  local_row,
+				  position.entries[q].second);
+    }
+}
+
+
+
+
+//TODO: This function is DANGEROUS, because it does more than it claims!
+
 
 				// Basic idea of setting up a list of
 				// all global dofs: first find all rows and columns

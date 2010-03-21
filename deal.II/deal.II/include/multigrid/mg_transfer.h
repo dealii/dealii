@@ -27,7 +27,7 @@
 #include <lac/vector_memory.h>
 
 #include <multigrid/mg_base.h>
-#include <multigrid/mg_level_object.h>
+#include <base/mg_level_object.h>
 
 
 

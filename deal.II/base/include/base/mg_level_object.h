@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,9 +21,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup mg */
-/*@{*/
-
 /**
  * An array with an object for each level.  The purpose of this class
  * is mostly to store objects and allow access by level number, even
@@ -34,7 +31,9 @@ DEAL_II_NAMESPACE_OPEN
  * In most cases, the objects which are stored on each levels, are
  * either matrices or vectors.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2005
+ * @ingroup mg
+ * @ingroup data
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2005, 2010
  */
 template<class Object>
 class MGLevelObject : public Subscriptor
@@ -116,7 +115,6 @@ class MGLevelObject : public Subscriptor
     std::vector<std_cxx1x::shared_ptr<Object> > objects;
 };
 
-/*@}*/
 
 /* ------------------------------------------------------------------- */
 

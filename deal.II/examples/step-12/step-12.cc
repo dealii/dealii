@@ -456,14 +456,14 @@ void Step12<dim>::integrate_cell_term (DoFInfo& dinfo, CellInfo& info)
 }
 
 				 // Now the same for the boundary terms. Note
-				 // that now we use FEFaceValuesBase, the base
+				 // that now we use FEValuesBase, the base
 				 // class for both FEFaceValues and
 				 // FESubfaceValues, in order to get access to
 				 // normal vectors.
 template <int dim>
 void Step12<dim>::integrate_boundary_term (DoFInfo& dinfo, FaceInfo& info)
 {
-  const FEFaceValuesBase<dim>& fe_v = info.fe_values();
+  const FEValuesBase<dim>& fe_v = info.fe_values();
   FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
   Vector<double>& local_vector = dinfo.vector(0).block(0);
 
@@ -512,14 +512,14 @@ void Step12<dim>::integrate_face_term (DoFInfo& dinfo1, DoFInfo& dinfo2,
 {
 				   // For quadrature points, weights,
 				   // etc., we use the
-				   // FEFaceValuesBase object of the
+				   // FEValuesBase object of the
 				   // first argument.
-  const FEFaceValuesBase<dim>& fe_v = info1.fe_values();
+  const FEValuesBase<dim>& fe_v = info1.fe_values();
 
 				   // For additional shape functions,
 				   // we have to ask the neighbors
-				   // FEFaceValuesBase.
-  const FEFaceValuesBase<dim>& fe_v_neighbor = info2.fe_values();
+				   // FEValuesBase.
+  const FEValuesBase<dim>& fe_v_neighbor = info2.fe_values();
 
 				   // Then we get references to the
 				   // four local matrices. The letters

@@ -16,7 +16,7 @@
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 #include <multigrid/mg_base.h>
-#include <multigrid/mg_level_object.h>
+#include <base/mg_level_object.h>
 
 DEAL_II_NAMESPACE_OPEN
 

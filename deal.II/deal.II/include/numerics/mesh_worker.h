@@ -18,7 +18,7 @@
 #include <base/geometry_info.h>
 #include <base/named_data.h>
 #include <lac/block_indices.h>
-#include <multigrid/mg_level_object.h>
+#include <base/mg_level_object.h>
 #include <numerics/mesh_worker_vector_selector.h>
 #include <numerics/mesh_worker_info.h>
 #include <numerics/mesh_worker_assembler.h>
