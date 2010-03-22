@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -947,9 +947,20 @@ namespace StandardExceptions
  *
  * @ingroup Exceptions
  * @author Guido Kanschat 2007
-*/
+ */
 #define AssertDimension(dim1,dim2) Assert((dim1) == (dim2), \
   ExcDimensionMismatch((dim1),(dim2)))
+
+/**
+ * Special assertion, testing whether <tt>vec</tt> has size
+ * <tt>dim1</tt>, and each entry of the vector has the
+ * size <tt>dim2</tt>
+ *
+ * @ingroup Exceptions
+ * @author Guido Kanschat 2010
+*/
+#define AssertVectorVectorDimension(vec,dim1,dim2) AssertDimension((vec).size(), (dim1)) \
+  for (unsigned int i=0;i<dim1;++i) { AssertDimension((vec)[i].size(), (dim2)); }
 
 /**
  * Special assertion for index range of nonnegative indices.
