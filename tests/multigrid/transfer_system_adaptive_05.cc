@@ -16,6 +16,7 @@
 #include "../tests.h"
 #include <base/function.h>
 #include <base/logstream.h>
+#include <base/mg_level_object.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <grid/tria.h>
@@ -30,7 +31,6 @@
 #include <multigrid/mg_transfer.h>
 #include <multigrid/mg_transfer_component.h>
 #include <multigrid/mg_tools.h>
-#include <multigrid/mg_level_object.h>
 
 #include <fstream>
 #include <iomanip>

@@ -14,10 +14,10 @@
 
 #include "../tests.h"
 #include <base/logstream.h>
+#include <base/mg_level_object.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <lac/block_matrix_array.h>
-#include <multigrid/mg_level_object.h>
 #include <multigrid/mg_block_smoother.h>
 #include <fstream>
 #include <iomanip>

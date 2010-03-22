@@ -19,11 +19,11 @@
 
 #include "../tests.h"
 #include <base/logstream.h>
+#include <base/mg_level_object.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <multigrid/mg_base.h>
 #include <multigrid/multigrid.h>
-#include <multigrid/mg_level_object.h>
 #include <multigrid/mg_matrix.h>
 
 #include <fstream>
