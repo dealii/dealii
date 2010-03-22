@@ -1325,6 +1325,7 @@ namespace internals
 				   // constraints are really empty.
     const unsigned int length = size();
 #ifdef DEBUG
+    //make sure that we are in the range of the vector
     AssertIndexRange (length, total_row_indices.size()+1);
     for (unsigned int i=0; i<length; ++i)
       Assert (total_row_indices[i].constraint_position ==
@@ -1938,11 +1939,11 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
 template <typename MatrixType>
 inline
 void
-ConstraintMatrix::
-make_sorted_row_list (const FullMatrix<double>        &local_matrix,
-		      const std::vector<unsigned int> &local_dof_indices,
-		      MatrixType                      &global_matrix,
-		      internals::GlobalRowsFromLocal  &global_rows) const
+ConstraintMatrix:: make_sorted_row_list (
+    const FullMatrix<double>        &local_matrix,
+    const std::vector<unsigned int> &local_dof_indices,
+    MatrixType                      &global_matrix,
+    internals::GlobalRowsFromLocal  &global_rows) const
 {
   const unsigned int n_local_dofs = local_dof_indices.size();
 

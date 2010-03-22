@@ -1108,11 +1108,11 @@ class ConstraintMatrix : public Subscriptor
 				      * sure that only on process at a time
 				      * calls this function.
                                       */
-    template <typename VectorType>
+    template <class InVector, class OutVector>
     void
-    distribute_local_to_global (const Vector<double>            &local_vector,
+    distribute_local_to_global (const InVector                  &local_vector,
                                 const std::vector<unsigned int> &local_dof_indices,
-                                VectorType                      &global_vector) const;
+                                OutVector                       &global_vector) const;
 
                                      /**
                                       * This function takes a vector of
@@ -2044,13 +2044,13 @@ ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) cons
 
 
 
-template <class VectorType>
+template <class InVector, class OutVector>
 inline
 void
 ConstraintMatrix::
-distribute_local_to_global (const Vector<double>            &local_vector,
+distribute_local_to_global (const InVector                  &local_vector,
                             const std::vector<unsigned int> &local_dof_indices,
-                            VectorType                      &global_vector) const
+                            OutVector                       &global_vector) const
 {
   Assert (local_vector.size() == local_dof_indices.size(),
           ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
