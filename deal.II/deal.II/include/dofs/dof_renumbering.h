@@ -924,14 +924,9 @@ namespace DoFRenumbering
 				    * constant flow direction. If the
 				    * additional argument @p
 				    * dof_wise_renumbering is set to @p false,
-				    * the numbering is performed cell-wise. If
-				    * it is set to @p true, the dofs are
-				    * renumbered for finite elements that are
-				    * based on support points. Note that in
-				    * this case, the numbering of points will
-				    * be unaffected in case two points are
-				    * located the same with respect to the
-				    * downstream direction.
+				    * the numbering is performed cell-wise,
+				    * otherwise it is performed based on the
+				    * location of the support points.
 				    *
 				    * The cells are sorted such that
 				    * the centers of higher numbers
@@ -945,15 +940,27 @@ namespace DoFRenumbering
 				    * grids, this might not be
 				    * guaranteed for all meshes.
 				    *
-				    * This function produces a
-				    * downstream ordering of the
+				    * If the @p dof_wise_renumbering argument
+				    * is set to @p false, this function
+				    * produces a downstream ordering of the
 				    * mesh cells and calls
-				    * cell_wise_dg().  Therefore, it
-				    * only works with Discontinuous
-				    * Galerkin Finite Elements,
-				    * i.e. all degrees of freedom
-				    * have to be associated with the
-				    * interior of the cell.
+				    * cell_wise(). Therefore, the output only
+				    * makes sense for Discontinuous Galerkin
+				    * Finite Elements (all degrees of freedom
+				    * have to be associated with the interior
+				    * of the cell in that case) in that case.
+				    *
+				    * If @p dof_wise_renumbering is set to @p
+				    * true, the degrees of freedom are
+				    * renumbered based on the support point
+				    * location of the individual degrees of
+				    * freedom (obviously, the finite element
+				    * needs to define support points for this
+				    * to work). The numbering of points with
+				    * the same position in downstream location
+				    * (e.g. those parallel to the flow
+				    * direction, or several dofs within a
+				    * FESystem) will be unaffected.
 				    */
   template <class DH, int dim>
   void
