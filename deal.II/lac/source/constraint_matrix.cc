@@ -35,6 +35,7 @@
 #include <lac/trilinos_block_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_sparse_matrix.h>
+#include <lac/matrix_block.h>
 
 #include <algorithm>
 #include <numeric>
@@ -2372,6 +2373,7 @@ template void ConstraintMatrix::distribute_local_to_global<SparseMatrix<float>,V
  SparseMatrix<float>             &,
  Vector<double>                  &) const;
 
+
 MATRIX_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
 MATRIX_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
 template void ConstraintMatrix::distribute_local_to_global<BlockSparseMatrix<float>,BlockVector<double> >
@@ -2436,5 +2438,17 @@ SPARSITY_FUNCTIONS(BlockCompressedSimpleSparsityPattern);
 SPARSITY_FUNCTIONS(TrilinosWrappers::SparsityPattern);
 SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
 #endif
+
+#define ONLY_MATRIX_FUNCTIONS(MatrixType) \
+  template void ConstraintMatrix::distribute_local_to_global<MatrixType > (\
+  const FullMatrix<double>        &, \
+  const std::vector<unsigned int> &, \
+  const std::vector<unsigned int> &, \
+  MatrixType                      &) const
+
+ONLY_MATRIX_FUNCTIONS(SparseMatrix<float>);
+ONLY_MATRIX_FUNCTIONS(SparseMatrix<double>);
+ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<float> >);
+ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<double> >);
 
 DEAL_II_NAMESPACE_CLOSE
