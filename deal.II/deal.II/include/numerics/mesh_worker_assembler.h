@@ -341,6 +341,10 @@ namespace MeshWorker
 	void initialize(const BlockInfo* block_info,
 			NamedData<VECTOR*>& residuals);
 					 /**
+					  * Initialize the constraints. 
+					  */
+        void initialize(const ConstraintMatrix& constraints);
+					 /**
 					  * Initialize the local data
 					  * in the
 					  * DoFInfo
@@ -396,6 +400,10 @@ namespace MeshWorker
        * A pointer to the object containing the block structure.
        */
       SmartPointer<const BlockInfo> block_info;
+      /**
+       * A pointer to the object containing constraints.
+       */
+      SmartPointer<const ConstraintMatrix, VECTOR> constraints;
    };
 
 
@@ -1154,6 +1162,14 @@ namespace MeshWorker
       residuals = m;      
     }
 
+    template <class VECTOR>
+    inline void
+    ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(
+      const ConstraintMatrix& c)
+    {
+      constraints = &c;
+    }
+
 
     template <class VECTOR>
     template <int dim>
@@ -1171,6 +1187,8 @@ namespace MeshWorker
       const BlockVector<double>& local,
       const std::vector<unsigned int>& dof)
     {
+        if(constraints == 0)
+        {
       for (unsigned int b=0;b<local.n_blocks();++b)
 	for (unsigned int j=0;j<local.block(b).size();++j)
 	  {
@@ -1185,6 +1203,9 @@ namespace MeshWorker
 	    const unsigned int jcell = this->block_info->local().local_to_global(b, j);
 	    global(dof[jcell]) += local.block(b)(j);
 	  }
+        }
+        else
+          constraints->distribute_local_to_global(local, dof, global);
     }
 
     
