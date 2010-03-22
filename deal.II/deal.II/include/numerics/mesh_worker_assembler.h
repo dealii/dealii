@@ -679,6 +679,11 @@ namespace MeshWorker
 					  */
       void initialize(const BlockInfo* block_info,
 		      MatrixBlockVector<MATRIX>& matrices);
+
+					 /**
+					  * Initialize the constraints. 
+					  */
+      void initialize(const ConstraintMatrix& constraints);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -741,6 +746,11 @@ namespace MeshWorker
        * A pointer to the object containing the block structure.
        */
       SmartPointer<const BlockInfo> block_info;
+      /**
+       * A pointer to the object containing constraints.
+       */
+      SmartPointer<const ConstraintMatrix, 
+       MatrixBlockVector<MATRIX> > constraints;
       
 					 /**
 					  * The smallest positive
@@ -1405,6 +1415,16 @@ namespace MeshWorker
       block_info = b;
       matrices = &m;
     }
+
+
+
+    template <class MATRIX, typename number>
+    inline void
+    MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(
+      const ConstraintMatrix& c)
+    {
+      constraints = &c;
+    }
     
 
     
@@ -1430,23 +1450,40 @@ namespace MeshWorker
       const std::vector<unsigned int>& dof1,
       const std::vector<unsigned int>& dof2)
     {
-      for (unsigned int j=0;j<local.n_rows();++j)
-	for (unsigned int k=0;k<local.n_cols();++k)
-	  if (std::fabs(local(j,k)) >= threshold)
-	    {
-					       // The coordinates of
-					       // the current entry in
-					       // DoFHandler
-					       // numbering, which
-					       // differs from the
-					       // block-wise local
-					       // numbering we use in
-					       // our local matrices
-	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
-	      
-	      global.add(dof1[jcell], dof2[kcell], local(j,k));
-	    }
+      if(constraints == 0)
+      {
+        for (unsigned int j=0;j<local.n_rows();++j)
+          for (unsigned int k=0;k<local.n_cols();++k)
+            if (std::fabs(local(j,k)) >= threshold)
+            {
+              // The coordinates of
+              // the current entry in
+              // DoFHandler
+              // numbering, which
+              // differs from the
+              // block-wise local
+              // numbering we use in
+              // our local matrices
+              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+
+              global.add(dof1[jcell], dof2[kcell], local(j,k));
+            }
+      }
+      else
+      {
+        const BlockIndices &bi = this->block_info->local();
+        std::vector<unsigned int> sliced_row_indices (bi.block_size(block_row));
+        for(unsigned int i=0; i<sliced_row_indices.size(); ++i)
+          sliced_row_indices[i] = dof1[bi.block_start(block_row)+i];
+
+        std::vector<unsigned int> sliced_col_indices (bi.block_size(block_col));
+        for(unsigned int i=0; i<sliced_col_indices.size(); ++i)
+          sliced_col_indices[i] = dof2[bi.block_start(block_col)+i];
+        
+        constraints->distribute_local_to_global(local,
+            sliced_row_indices, sliced_col_indices, global);
+      }
     }
 
     
