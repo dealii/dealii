@@ -1307,6 +1307,18 @@ class ConstraintMatrix : public Subscriptor
                                 const std::vector<unsigned int> &local_dof_indices,
                                 MatrixType                      &global_matrix) const;
 
+                                     /**
+                                      * Does the same as the function above
+                                      * but can treat
+                                      * non quadratic matrices.
+                                      */    
+    template <typename MatrixType>
+    void
+    distribute_local_to_global (const FullMatrix<double>        &local_matrix,
+                                const std::vector<unsigned int> &row_indices,
+                                const std::vector<unsigned int> &col_indices,
+                                MatrixType                      &global_matrix) const;
+
 				     /**
 				      * This function simultaneously writes
 				      * elements into matrix and vector,
