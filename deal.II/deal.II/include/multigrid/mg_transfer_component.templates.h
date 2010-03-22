@@ -68,7 +68,9 @@ MGTransferSelect<number>::copy_from_mg (
   BlockVector<number2>&                 dst,
   const MGLevelObject<Vector<number> >& src) const
 {
-  do_copy_from_mg (mg_dof_handler, dst, src);
+  dst = 0;
+  do_copy_from_mg (mg_dof_handler,
+      dst.block(target_component[selected_component]), src);
   if (constraints != 0)
     constraints->condense(dst);
 }
@@ -83,6 +85,7 @@ MGTransferSelect<number>::copy_from_mg (
   Vector<number2>&                      dst,
   const MGLevelObject<Vector<number> >& src) const
 {
+  dst = 0;
   do_copy_from_mg (mg_dof_handler, dst, src);
   if (constraints != 0)
   {

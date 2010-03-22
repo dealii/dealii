@@ -163,6 +163,7 @@ class MGSmootherIdentity : public MGSmootherBase<VECTOR>
     virtual void smooth (const unsigned int level,
 			 VECTOR&            u,
 			 const VECTOR&      rhs) const;
+    virtual void clear ();
 };
 
 
@@ -523,6 +524,11 @@ inline void
 MGSmootherIdentity<VECTOR>::smooth (
   const unsigned int, VECTOR&,
   const VECTOR&) const
+{}
+
+template <class VECTOR>
+inline void
+MGSmootherIdentity<VECTOR>::clear () 
 {}
 
 //---------------------------------------------------------------------------
