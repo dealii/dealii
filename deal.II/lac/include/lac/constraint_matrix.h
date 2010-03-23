@@ -1843,7 +1843,7 @@ class ConstraintMatrix : public Subscriptor
 				      * function.
 				      *
 				      * Creates a list of affected
-				      * rows for sistribution.
+				      * rows for distribution.
 				      */
     void
     make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,

@@ -33,6 +33,20 @@ namespace Algorithms
  * method, which would then trigger reassembling of a matrix or
  * similar things.
  *
+ * <h3>Usage for nested iterations</h3>
+ *
+ * This is probably the most prominent use for Operator, where an
+ * outer iterative method calls an inner solver and so on. Typically,
+ * the innermost method in such a nested system will have to compute a
+ * residual using values from all outer iterations. Since the depth
+ * and order of such a nesting is hardly predictable when designing a
+ * general tool, we use NamedData to access these vectors. Typically,
+ * the first vector in <tt>out</tt> contains the start vector when
+ * operator()() is called, and the solution when the function
+ * returns. The object <tt>in</tt> is providing additional information
+ * and forwarded to the inner Operator objects of the nested
+ * iteration.
+ *
  * @author Guido Kanschat, 2010
  */
   template <class VECTOR>

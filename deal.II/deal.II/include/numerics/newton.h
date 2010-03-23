@@ -41,6 +41,23 @@ namespace Algorithms
  * #inverse_derivative. It is up to this object to implement
  * reassembling accordingly.
  *
+ * <h3>Contents of the NamedData objects</h3>
+ *
+ * The only value used by the Newton method is the first vector in the
+ * parameter <tt>out</tt> of operator()(). It serves as the start
+ * vector of Newton's method and in the end contains the solution. All
+ * other vectors of <tt>out</tt> are ignored by Newton's method and
+ * its inner Operator objects. All vectors of <tt>in</tt> are forwarded to
+ * the inner Operator objects, with additional information added as follows.
+ *
+ * When calling (*#residual)(), the NamedData <tt>in</tt> given to the
+ * Newton iteration is prepended by a vector <tt>"Newton iterate"</tt>,
+ * the current value of the Newton iterate, which can be used to
+ * evaluate the residual at this point.
+ *
+ * For the call to (*#inverse_derivative), the vector <tt>"Newton
+ * residual"</tt> is inserted before <tt>"Newton iterate"<tt>.
+ *
  * @author Guido Kanschat, 2006, 2010
  */
   template <class VECTOR>
@@ -49,14 +66,14 @@ namespace Algorithms
     public:
 				       /**
 					* Constructor, receiving the
-					* application computing the
+					* applications computing the
 					* residual and solving the
-					* linear problem.
+					* linear problem, respectively.
 					*/
       Newton (Operator<VECTOR>& residual, Operator<VECTOR>& inverse_derivative);
       
 				       /**
-					* Declare the parameter
+					* Declare the parameters
 					* applicable to Newton's method.
 					*/
       void declare_parameters (ParameterHandler& param);
@@ -67,7 +84,15 @@ namespace Algorithms
       void initialize (ParameterHandler& param);
       
       				       /**
-					* The actual Newton iteration.
+					* The actual Newton
+					* iteration. The initial value
+					* is in <tt>out(0)</tt>, which
+					* also contains the result
+					* after convergence. Values in
+					* <tt>in</tt> are not used by
+					* Newton, but will be handed
+					* down to the objects
+					* #residual and #inverse_derivative.
 					*/
       virtual void operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in);
       
