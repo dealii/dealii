@@ -5,7 +5,7 @@
   <title>The deal.II Readme</title>
   <link href="screen.css" rel="StyleSheet">
   <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal.II">
@@ -636,6 +636,15 @@
       of <code>/usr</code> or <code>/opt</code>, instead of local directories
       in a home directory for example, you can use configure
       switches <code>--with-metis-include, --with-metis-libs</code>.
+      </p>
+
+      <p>
+	On some systems, when using shared libraries for deal.II, you may get
+	warnings of the kind <code>libmetis.a(pmetis.o): relocation R_X86_64_32
+	  against `a local symbol' can not be used when making a shared
+	  object; recompile with -fPIC</code> when linking. This can be
+	avoided by recompiling METIS with <code>-fPIC</code> as a compiler
+	flag.
       </p>
     </dd>
 
