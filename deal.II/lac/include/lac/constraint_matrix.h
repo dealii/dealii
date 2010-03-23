@@ -1093,7 +1093,11 @@ class ConstraintMatrix : public Subscriptor
                                       * global object, one saves the call to
                                       * the condense function after the
                                       * vectors and matrices are fully
-                                      * assembled.
+                                      * assembled. On the other hand, by
+                                      * consequence, the function does not
+                                      * only write into the entries enumerated
+                                      * by the @p local_dof_indices array, but
+                                      * also (possibly) others as necessary.
 				      *
 				      * Note that this function will apply all
                                       * constraints as if they were
@@ -1149,7 +1153,15 @@ class ConstraintMatrix : public Subscriptor
                                       * global object, one saves the call to
                                       * the condense function after the
                                       * vectors and matrices are fully
-                                      * assembled.
+                                      * assembled. On the other hand, by
+                                      * consequence, the function does not
+                                      * only write into the entries enumerated
+                                      * by the @p local_dof_indices array, but
+                                      * also (possibly) others as
+                                      * necessary. This includes writing into
+                                      * diagonal elements of the matrix if the
+                                      * corresponding degree of freedom is
+                                      * constrained.
 				      *
 				      * The fourth argument
 				      * <tt>local_matrix</tt> is intended to
