@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -145,9 +145,8 @@ void Function<dim>::vector_gradient_list (const std::vector<Point<dim> >        
     {
       Assert (gradients[i].size() == n_components,
 	      ExcDimensionMismatch(gradients[i].size(), n_components));
-      for (unsigned int component=0; component<n_components; ++component)
-	gradients[i][component] = gradient(points[i], component);
-    };
+      vector_gradient (points[i], gradients[i]);
+    }
 }
 
 

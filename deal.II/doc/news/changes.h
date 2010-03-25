@@ -254,6 +254,14 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li><p>Changed: The Function::vector_gradient_list function was previously
+  implemented by calling Function::gradient on each point and each component.
+  It has been changed to now call Function::vector_gradient on each point
+  only, and derived classes should implement this function accordingly.
+  <br>
+  (WB 2010/02/10)
+  </p></li>
+
   <li><p>Fixed: The file <code>data_out_base.cc</code> could not be compiled
   when Tecplot was available. This should now be fixed.
   <br>
