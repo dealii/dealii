@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -389,6 +389,24 @@ class TriaRawIterator :
     TriaRawIterator & operator = (const TriaRawIterator &);
     
 				     /**
+				      *  Assignment operator.
+				      */
+//    template <class OtherAccessor>
+//    TriaRawIterator & operator = (const TriaRawIterator<OtherAccessor>&);
+    
+				     /**
+				      *  Assignment operator.
+				      */
+//    template <class OtherAccessor>
+//    TriaRawIterator & operator = (const TriaIterator<OtherAccessor>&);
+    
+				     /**
+				      *  Assignment operator.
+				      */
+//    template <class OtherAccessor>
+//    TriaRawIterator & operator = (const TriaActiveIterator<OtherAccessor>&);
+    
+				     /**
 				      *  Compare for equality.
 				      */
     bool operator == (const TriaRawIterator &) const;
@@ -671,8 +689,8 @@ class TriaIterator : public TriaRawIterator<Accessor>
 				      *  Assignment operator.
 				      */
     TriaIterator<Accessor> &
-    operator = (const TriaIterator<Accessor> &);
-
+    operator = (const TriaIterator<Accessor>&);
+    
     				     /**
 				      *  Cross assignment operator. This
 				      *  assignment is only valid if the
@@ -680,7 +698,29 @@ class TriaIterator : public TriaRawIterator<Accessor>
 				      *  element.
 				      */
     TriaIterator<Accessor> &
-    operator = (const TriaRawIterator<Accessor> &);
+    operator = (const TriaRawIterator<Accessor>&);
+    
+    				     /**
+				      *  Assignment
+				      *  operator. Requires, that
+				      *  Accessor can be copied from
+				      *  OtherAccessor.
+				      */
+    template <class OtherAccessor>
+    TriaIterator<Accessor> &
+    operator = (const TriaIterator<OtherAccessor>&);
+
+    				     /**
+				      *  Cross assignment operator. This
+				      *  assignment is only valid if the
+				      *  given iterator points to a used
+				      *  element. Requires, that
+				      *  Accessor can be copied from
+				      *  OtherAccessor.
+				      */
+   template <class OtherAccessor>
+   TriaIterator<Accessor> &
+   operator = (const TriaRawIterator<OtherAccessor>&);
 
 				     /**@name Advancement of iterators*/
 				     /*@{*/
@@ -839,19 +879,52 @@ class TriaActiveIterator : public TriaIterator<Accessor>
 				      *  Cross assignment operator. This
 				      *  assignment is only valid if the
 				      *  given iterator points to an active
-				      *  element or past the end.
+				      *  element.
 				      */
     TriaActiveIterator<Accessor> &
-    operator = (const TriaRawIterator<Accessor> &);
+    operator = (const TriaIterator<Accessor> &);
 
-				     /**
+    				     /**
 				      *  Cross assignment operator. This
 				      *  assignment is only valid if the
 				      *  given iterator points to an active
 				      *  element or past the end.
 				      */
     TriaActiveIterator<Accessor> &
-    operator = (const TriaIterator<Accessor> &);
+    operator = (const TriaRawIterator<Accessor> &);
+
+    				     /**
+				      *  Assignment operator. Requires, that
+				      *  Accessor can be copied from
+				      *  OtherAccessor.
+				      */
+    template <class OtherAccessor>
+    TriaActiveIterator<Accessor> &
+    operator = (const TriaActiveIterator<OtherAccessor> &);
+
+    				     /**
+				      *  Cross assignment operator. This
+				      *  assignment is only valid if the
+				      *  given iterator points to an active
+				      *  element or past the end. Requires, that
+				      *  Accessor can be copied from
+				      *  OtherAccessor.
+				      */
+   template <class OtherAccessor>
+   TriaActiveIterator<Accessor> &
+   operator = (const TriaRawIterator<OtherAccessor> &);
+
+				     /**
+				      *  Cross assignment operator. This
+				      *  assignment is only valid if the
+				      *  given iterator points to an active
+				      *  element. Requires, that
+				      *  Accessor can be copied from
+				      *  OtherAccessor.
+				      */
+   template <class OtherAccessor>
+   TriaActiveIterator<Accessor> &
+   operator = (const TriaIterator<OtherAccessor> &);
 
 				     /**
 				      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This

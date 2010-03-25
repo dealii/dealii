@@ -589,6 +589,14 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li>
+  <p> Improved: DoFHandler iterators now can be assigned from a Triangulation iterator
+  after the dof handler was set once.
+  <br>
+  (GK 2010/03/25)
+  </p></li>
+  
   <li>
   <p>
   New: The function DoFRenumbering::downstream has now an additional bool

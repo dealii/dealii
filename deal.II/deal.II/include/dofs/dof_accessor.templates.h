@@ -33,8 +33,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int structdim, class DH>
-DoFAccessor<structdim,DH>::
-DoFAccessor ()
+inline
+DoFAccessor<structdim,DH>::DoFAccessor ()
 {
   Assert (false, ExcInvalidObject());
 }
@@ -43,11 +43,11 @@ DoFAccessor ()
 
 template <int structdim, class DH>
 inline
-DoFAccessor<structdim,DH>::
-DoFAccessor (const Triangulation<DH::dimension,DH::space_dimension> *tria,
-	     const int                 level,
-	     const int                 index,
-	     const DH                 *dof_handler)
+DoFAccessor<structdim,DH>::DoFAccessor (
+  const Triangulation<DH::dimension,DH::space_dimension> *tria,
+  const int                 level,
+  const int                 index,
+  const DH                 *dof_handler)
 		:
 		internal::DoFAccessor::Inheritance<structdim,DH::dimension,
                                                    DH::space_dimension>::BaseClass (tria,
@@ -60,8 +60,7 @@ DoFAccessor (const Triangulation<DH::dimension,DH::space_dimension> *tria,
 
 template <int structdim, class DH>
 template <int structdim2, int dim2, int spacedim2>
-DoFAccessor<structdim,DH>::
-DoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+DoFAccessor<structdim,DH>::DoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
 {
   Assert (false, ExcInvalidObject());
 }
@@ -70,8 +69,8 @@ DoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
 
 template <int structdim, class DH>
 template <int dim2, class DH2>
-DoFAccessor<structdim,DH>::
-DoFAccessor (const DoFAccessor<dim2, DH2> &)
+inline
+DoFAccessor<structdim,DH>::DoFAccessor (const DoFAccessor<dim2, DH2> &)
 {
   Assert (false, ExcInvalidObject());
 }
@@ -98,6 +97,8 @@ DoFAccessor<structdim,DH>::get_dof_handler () const
 }
 
 
+//TODO: This seems to set only the DH, not the other data.
+
 template <int structdim, class DH>
 inline
 DoFAccessor<structdim,DH> &
@@ -105,6 +106,18 @@ DoFAccessor<structdim,DH>::operator = (const DoFAccessor<structdim,DH> &da)
 {
   this->set_dof_handler (da.dof_handler);
   return *this;
+}
+
+
+
+template <int structdim, class DH>
+inline
+void
+DoFAccessor<structdim,DH>::copy_from (
+  const TriaAccessorBase<structdim, DH::dimension, DH::space_dimension> &da)
+{
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  BaseClass::copy_from(da);
 }
 
 

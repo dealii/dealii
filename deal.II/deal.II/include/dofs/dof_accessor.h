@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -280,6 +280,15 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				      */
     void copy_from (const DoFAccessor<structdim, DH> &a);
 
+				     /**
+				      * Copy operator used by the
+				      * iterator class. Keeps the
+				      * previously set dof handler,
+				      * but sets the object
+				      * coordinates of the TriaAccessor.
+				      */
+    void copy_from (const TriaAccessorBase<structdim, DH::dimension, DH::space_dimension> &da);
+    
 				     /**
 				      *  @name Accessing sub-objects
 				      */

@@ -78,13 +78,6 @@ namespace TriaAccessorExceptions
 				   /**
 				    * @ingroup Exceptions
 				    */
-  DeclException1 (ExcInvalidNeighbor,
-		  int,
-		  << "Neighbor indices must be between 0 and 2^dim-1, but "
-		  << "yours was " << arg1);
-				   /**
-				    * @ingroup Exceptions
-				    */
   DeclException0 (ExcCellHasNoChildren);
 				   /**
 				    * @ingroup Exceptions
@@ -676,6 +669,7 @@ class TriaAccessorBase<dim,dim,spacedim>
  * for syntactic correctness, none of the functions do anything but
  * generate errors.
  *
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 2008
  */
 template <int structdim, int dim, int spacedim=dim>
@@ -779,6 +773,7 @@ class InvalidAccessor :  public TriaAccessorBase<structdim,dim,spacedim>
  * <code>spacedim@>dim</code> the triangulation is of a manifold
  * embedded in a higher dimensional space).
  *
+ * @ingroup Accessors
  * @author Wolfgang Bangerth and others, 1998, 2000, 2008
  */
 template <int structdim, int dim, int spacedim>
