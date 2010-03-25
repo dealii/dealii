@@ -36,25 +36,11 @@ void test (PETScWrappers::FullMatrix &m)
 
   m.compress ();
 
-				   // prior to and including PETSc 2.3.0,
-				   // n_nonzero_elements returns the actual
-				   // number of nonzeros. after that, PETSc
-				   // returns the *total* number of entries of
-				   // this matrix. check both (in the case
-				   // post 2.3.0, output a dummy number
-#if (DEAL_II_PETSC_VERSION_MAJOR == 2) &&\
-    ((DEAL_II_PETSC_VERSION_MINOR < 3)   \
-     ||\
-     ((DEAL_II_PETSC_VERSION_MINOR == 3) &&\
-      (DEAL_II_PETSC_VERSION_SUBMINOR == 0)))
-  deallog << m.n_nonzero_elements() << std::endl;
-  Assert (m.n_nonzero_elements() == counter,
-          ExcInternalError());
-#else
+				   // check n_nonzero_elements then
+				   // output a dummy number.
   deallog << counter << std::endl;
   Assert (m.m() * m.m(), ExcInternalError());
-#endif
-                                      				   
+                                     				   
   deallog << "OK" << std::endl;
 }
 
