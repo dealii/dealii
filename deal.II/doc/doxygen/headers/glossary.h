@@ -222,7 +222,7 @@
  * create such meshes, but it keeps a list of cells whose children are
  * distorted. If this list is non-empty at the end of a refinement
  * step, it will throw an exception of type
- * Triangualtion::DistortedCellList that contains those cells that
+ * Triangulation::DistortedCellList that contains those cells that
  * have distorted children. The caller of
  * Triangulation::execute_coarsening_and_refinement can then decide
  * what to do with this situation.
