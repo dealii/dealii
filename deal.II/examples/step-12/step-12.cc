@@ -387,7 +387,7 @@ void Step12<dim>::assemble_system ()
 				   // result of std::bind if the local
 				   // integrators were, for example,
 				   // non-static member functions.
-  MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim>
+  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>, dim, dim>
     (dof_handler.begin_active(), dof_handler.end(),
      dof_info, info_box,
      &Step12<dim>::integrate_cell_term,
