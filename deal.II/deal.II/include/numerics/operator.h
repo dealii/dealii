@@ -16,6 +16,9 @@
 #include <base/config.h>
 #include <base/named_data.h>
 #include <base/event.h>
+#include <dofs/dof_handler.h>
+
+#include <fstream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -94,11 +97,21 @@ namespace Algorithms
   template <class VECTOR>
   class OutputOperator : public Subscriptor
   {
+    OutputOperator(const OutputOperator<VECTOR>&);
     public:
+    OutputOperator ();
 				       /**
 					* Empty virtual destructor.
 					*/
       virtual ~OutputOperator();
+      /**
+       * Set the stream #os to
+       * which data is written. If
+       * no stream is selected with
+       * this function, data goes
+       * to #deallog.
+       */
+      void initialize_stream(std::ostream& stream);
 				       /**
 					* Set the current step.
 					*/
@@ -107,9 +120,11 @@ namespace Algorithms
 				       /**
 					* Output all the vectors in NamedData.
 					*/
-      virtual OutputOperator<VECTOR>& operator<< (const NamedData<VECTOR*> vectors);
+      virtual OutputOperator<VECTOR>& operator<< (const NamedData<VECTOR*>& vectors);
     protected:
       unsigned int step;
+    private:
+      std::ostream* os;
   };
 
   template <class VECTOR>
@@ -118,6 +133,27 @@ namespace Algorithms
   {
     step = s;
     return *this;
+  }
+
+  template <class VECTOR, int dim, int spacedim=dim>
+  class DoFOutputOperator : public OutputOperator<VECTOR>
+  {
+    public:
+      void initialize (DoFHandler<dim, spacedim>& dof_handler);
+
+      virtual OutputOperator<VECTOR>& 
+        operator<<(const NamedData<VECTOR*>& vectors);
+
+    private:
+      SmartPointer<DoFHandler<dim, spacedim>,
+        DoFOutputOperator<VECTOR, dim, spacedim> > dof;
+  };
+
+  template <class VECTOR, int dim, int spacedim>
+  void DoFOutputOperator<VECTOR, dim, spacedim>::initialize(
+      DoFHandler<dim, spacedim>& dof_handler)
+  {
+    dof = &dof_handler;  
   }
 }
 

@@ -266,6 +266,10 @@ namespace MeshWorker
       public:
 	void initialize(NamedData<VECTOR*>& results);
 					 /**
+					  * Initialize the constraints. 
+					  */
+        void initialize(const ConstraintMatrix& constraints);
+					 /**
 					  * Initialize the local data
 					  * in the
 					  * DoFInfo
@@ -306,6 +310,10 @@ namespace MeshWorker
 					  * filled by assemble().
 					  */
 	NamedData<SmartPointer<VECTOR,ResidualSimple<VECTOR> > > residuals;
+      /**
+       * A pointer to the object containing constraints.
+       */
+      SmartPointer<const ConstraintMatrix,ResidualSimple<VECTOR> > constraints;
     };
     
 /**
@@ -394,16 +402,19 @@ namespace MeshWorker
 					  * stored as a vector of
 					  * pointers.
 					  */
-	NamedData<SmartPointer<VECTOR,ResidualLocalBlocksToGlobalBlocks<VECTOR> > > residuals;
+	NamedData<SmartPointer<VECTOR,
+          ResidualLocalBlocksToGlobalBlocks<VECTOR> > > residuals;
        
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo> block_info;
+      SmartPointer<const BlockInfo,
+        ResidualLocalBlocksToGlobalBlocks<VECTOR> > block_info;
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix, VECTOR> constraints;
+      SmartPointer<const ConstraintMatrix,
+        ResidualLocalBlocksToGlobalBlocks<VECTOR> > constraints;
    };
 
 
@@ -440,6 +451,10 @@ namespace MeshWorker
 					  * for later assembling.
 					  */
 	void initialize(MATRIX& m);
+					 /**
+					  * Initialize the constraints. 
+					  */
+        void initialize(const ConstraintMatrix& constraints);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -492,6 +507,10 @@ namespace MeshWorker
 					  * assembled.
 					  */
 	SmartPointer<MATRIX,MatrixSimple<MATRIX> > matrix;
+      /**
+       * A pointer to the object containing constraints.
+       */
+        SmartPointer<const ConstraintMatrix,MatrixSimple<MATRIX> > constraints;
 	
 					 /**
 					  * The smallest positive
@@ -753,12 +772,13 @@ namespace MeshWorker
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo> block_info;
+      SmartPointer<const BlockInfo, 
+        MatrixLocalBlocksToGlobalBlocks<MATRIX, number> > block_info;
       /**
        * A pointer to the object containing constraints.
        */
       SmartPointer<const ConstraintMatrix, 
-       MatrixBlockVector<MATRIX> > constraints;
+       MatrixLocalBlocksToGlobalBlocks<MATRIX,number> > constraints;
       
 					 /**
 					  * The smallest positive
@@ -911,7 +931,7 @@ namespace MeshWorker
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo> block_info;
+      SmartPointer<const BlockInfo, MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number> > block_info;
       
 					 /**
 					  * The smallest positive
@@ -1114,6 +1134,13 @@ namespace MeshWorker
       residuals = results;
     }
 
+    template <class VECTOR>
+    inline void
+    ResidualSimple<VECTOR>::initialize(const ConstraintMatrix& c)
+    {
+      constraints = &c;
+    }
+
     
     template <class VECTOR>
     template<int dim>
@@ -1130,8 +1157,16 @@ namespace MeshWorker
     ResidualSimple<VECTOR>::assemble(const DoFInfo<dim>& info)
     {
       for (unsigned int k=0;k<residuals.size();++k)
-	for (unsigned int i=0;i<info.vector(k).block(0).size();++i)
-	  (*residuals(k))(info.indices[i]) += info.vector(k).block(0)(i);
+      {
+        if(constraints == 0)
+        {
+          for (unsigned int i=0;i<info.vector(k).block(0).size();++i)
+            (*residuals(k))(info.indices[i]) += info.vector(k).block(0)(i);
+        }
+        else
+          constraints->distribute_local_to_global(
+              info.vector(k).block(0), info.indices, (*residuals(k)));
+      }
     }
 
     
@@ -1143,10 +1178,20 @@ namespace MeshWorker
     {
       for (unsigned int k=0;k<residuals.size();++k)
 	{
-	  for (unsigned int i=0;i<info1.vector(k).block(0).size();++i)
-	    (*residuals(k))(info1.indices[i]) += info1.vector(k).block(0)(i);
-	  for (unsigned int i=0;i<info2.vector(k).block(0).size();++i)
-	    (*residuals(k))(info2.indices[i]) += info2.vector(k).block(0)(i);
+          if(constraints == 0)
+          {
+            for (unsigned int i=0;i<info1.vector(k).block(0).size();++i)
+              (*residuals(k))(info1.indices[i]) += info1.vector(k).block(0)(i);
+            for (unsigned int i=0;i<info2.vector(k).block(0).size();++i)
+              (*residuals(k))(info2.indices[i]) += info2.vector(k).block(0)(i);
+          }
+          else
+          {
+            constraints->distribute_local_to_global(
+              info1.vector(k).block(0), info1.indices, (*residuals(k)));
+            constraints->distribute_local_to_global(
+              info2.vector(k).block(0), info2.indices, (*residuals(k)));
+          }
 	}
     }
 
@@ -1189,20 +1234,20 @@ namespace MeshWorker
     {
         if(constraints == 0)
         {
-      for (unsigned int b=0;b<local.n_blocks();++b)
-	for (unsigned int j=0;j<local.block(b).size();++j)
-	  {
-					     // The coordinates of
-					     // the current entry in
-					     // DoFHandler
-					     // numbering, which
-					     // differs from the
-					     // block-wise local
-					     // numbering we use in
-					     // our local vectors
-	    const unsigned int jcell = this->block_info->local().local_to_global(b, j);
-	    global(dof[jcell]) += local.block(b)(j);
-	  }
+          for (unsigned int b=0;b<local.n_blocks();++b)
+            for (unsigned int j=0;j<local.block(b).size();++j)
+            {
+              // The coordinates of
+              // the current entry in
+              // DoFHandler
+              // numbering, which
+              // differs from the
+              // block-wise local
+              // numbering we use in
+              // our local vectors
+              const unsigned int jcell = this->block_info->local().local_to_global(b, j);
+              global(dof[jcell]) += local.block(b)(j);
+            }
         }
         else
           constraints->distribute_local_to_global(local, dof, global);
@@ -1251,6 +1296,14 @@ namespace MeshWorker
     {
       matrix = &m;
     }
+
+
+    template <class MATRIX>
+    inline void
+    MatrixSimple<MATRIX>::initialize(const ConstraintMatrix& c)
+    {
+      constraints = &c;
+    }
     
 
     template <class MATRIX >
@@ -1272,11 +1325,17 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-      
+     
+     if(constraints == 0)
+     { 
       for (unsigned int j=0; j<i1.size(); ++j)
 	for (unsigned int k=0; k<i2.size(); ++k)
 	  if (std::fabs(M(j,k)) >= threshold)
 	    matrix->add(i1[j], i2[k], M(j,k));
+     }
+     else
+       constraints->distribute_local_to_global(
+           M, i1, i2, *matrix);
     }
     
     

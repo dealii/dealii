@@ -69,6 +69,18 @@ namespace MeshWorker
 	       bool hessians = false);
 
 				       /**
+					* Does the same as the function
+                                        * above but it is possible to 
+                                        * select a block of the global
+                                        * vector.
+					*/
+//      void add(const std::string& name,
+//               const unsigned int selected_block,
+//	       bool values = true,
+//	       bool gradients = false,
+//	       bool hessians = false);
+
+				       /**
 					* Initialize the selection
 					* field with a data
 					* vector. While add() only
@@ -447,6 +459,17 @@ namespace MeshWorker
     if (gradients) gradient_selection.add(name);
     if (hessians) hessian_selection.add(name);  
   }
+
+
+  //inline void
+  //VectorSelector::add(const std::string& name,
+  //   const unsigned int block,
+  //   bool values, bool gradients, bool hessians)
+  //{
+  //  if (values) value_selection.add(name, block);
+  //  if (gradients) gradient_selection.add(name, block);
+  //  if (hessians) hessian_selection.add(name, block);  
+  //}
 
 
   template <typename DATA>

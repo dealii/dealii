@@ -13,5 +13,8 @@
 
 for (VEC : SERIAL_VECTORS)
 {  
-  template class DoFOutputOperator<VEC, deal_II_dimension, deal_II_dimension>;
+  template class Operator<VEC>;
+  template class OutputOperator<VEC>;
+  template class Newton<VEC>;
+  template class ThetaTimestepping<VEC>;
 }

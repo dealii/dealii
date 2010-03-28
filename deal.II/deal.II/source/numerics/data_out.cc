@@ -1130,7 +1130,9 @@ add_data_vector<V > (const V                  &, \
     INSTANTIATE(DH,D0,D1,D2,D3,Vector<double>); \
     INSTANTIATE(DH,D0,D1,D2,D3,Vector<float>); \
     INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<double>) ; \
-    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<float>)
+    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<float>); \
+    INSTANTIATE(DH,D0,D1,D2,D3,Vector<long double>); \
+    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<long double>)
 #else
 # define INSTANTIATE_VECTORS(DH,D0,D1,D2,D3)	 \
     INSTANTIATE(DH,D0,D1,D2,D3,Vector<double>); \

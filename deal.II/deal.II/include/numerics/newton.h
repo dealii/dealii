@@ -82,6 +82,12 @@ namespace Algorithms
 					* Read the parameters.
 					*/
       void initialize (ParameterHandler& param);
+
+				       /**
+					* Initialize the pointer 
+                                        * data_out for debugging.
+					*/
+      void initialize (OutputOperator<VECTOR>& output);
       
       				       /**
 					* The actual Newton
@@ -116,13 +122,20 @@ namespace Algorithms
 				       /**
 					* The operator computing the residual.
 					*/
-      SmartPointer<Operator<VECTOR> > residual;
+      SmartPointer<Operator<VECTOR>, Newton<VECTOR> > residual;
 
 				       /**
 					* The operator applying the
 					* inverse derivative to the residual.
 					*/
-      SmartPointer<Operator<VECTOR> > inverse_derivative;
+      SmartPointer<Operator<VECTOR>, Newton<VECTOR> > inverse_derivative;
+
+				       /**
+					* The operator handling the output 
+                                        * in case the debug_vectors is true.
+                                        * Call the initialize function first.
+					*/
+      SmartPointer<OutputOperator<VECTOR>, Newton<VECTOR> > data_out;
       
 				       /**
 					* This flag is set by the
@@ -166,6 +179,8 @@ namespace Algorithms
 					* every Newton step.
 					*/
       double assemble_threshold;
+
+    public:
 				       /**
 					* Print residual, update and
 					* updated solution after each

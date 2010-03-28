@@ -60,6 +60,12 @@ namespace Algorithms
     param.leave_subsection ();
   }
 
+  template <class VECTOR>
+  void
+  Newton<VECTOR>::initialize (OutputOperator<VECTOR>& output)
+  {
+    data_out = &output;  
+  }
 
   template <class VECTOR>
   void
@@ -125,6 +131,16 @@ namespace Algorithms
 		    << e.last_residual << std::endl;
 	  }
 
+	if (debug_vectors)
+	  {
+	    NamedData<VECTOR*> out;
+            VECTOR* p = &u; out.add(p, "solution");
+	    p = Du; out.add(p, "update");
+	    p = res; out.add(p, "residual");
+            *data_out << step;
+	    *data_out << out;
+	  }
+
 	u.add(-1., *Du);
 	old_residual = resnorm;
 	(*residual)(out1, src1);
@@ -146,19 +162,6 @@ namespace Algorithms
 	    u.add(1./(1<<step_size), *Du);
 	    (*residual)(out1, src1);
 	    resnorm = res->l2_norm();
-	  }
-
-	if (debug_vectors)
-	  {
-	    std::ostringstream streamOut;
-	    streamOut << "Newton_" << std::setw(3) << std::setfill('0') << step;
-	    std::string name = streamOut.str();
-	    NamedData<VECTOR*> out;
-	    out.add(&u, "solution");
-	    out.add(Du, "update");
-	    out.add(res, "residual");
-//TODO: Implement!
-//	    app->data_out(name, out);
 	  }
       }
     deallog.pop();
