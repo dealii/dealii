@@ -42,8 +42,8 @@ namespace internal
     return true;
   }
 
-  template<int dim, int sdim, class A>
-  void assemble(const MeshWorker::DoFInfoBox<dim, sdim>& dinfo, A& assembler)
+  template<int dim, class DOFINFO, class A>
+  void assemble(const MeshWorker::DoFInfoBox<dim, DOFINFO>& dinfo, A& assembler)
   {
     dinfo.assemble(assembler);
   }
@@ -85,10 +85,10 @@ namespace MeshWorker
  *
  * @author Guido Kanschat, 2010
  */
-  template<class INFOBOX, int dim, int spacedim, class ITERATOR>
+  template<class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
   void cell_action(
     ITERATOR cell,
-    DoFInfoBox<dim, spacedim>& dof_info,
+    DoFInfoBox<dim, DOFINFO>& dof_info,
     INFOBOX& info,
     const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::CellInfo &)> &cell_worker,
     const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::FaceInfo &)> &boundary_worker,
@@ -230,10 +230,10 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class INFOBOX, int dim, int spacedim, typename ASSEMBLER, class ITERATOR>
+  template<class DOFINFO, class INFOBOX, int dim, int spacedim, typename ASSEMBLER, class ITERATOR>
   void loop(ITERATOR begin,
 	    typename identity<ITERATOR>::type end,
-	    DoFInfo<dim, spacedim> dinfo,
+	    DOFINFO& dinfo,
 	    INFOBOX& info,
 	    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::CellInfo &)> &cell_worker,
 	    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::FaceInfo &)> &boundary_worker,
@@ -243,7 +243,7 @@ namespace MeshWorker
 	    ASSEMBLER &assembler,
 	    bool cells_first = true)
   {
-    DoFInfoBox<dim, spacedim> dof_info(dinfo);
+    DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
     
     assembler.initialize_info(dof_info.cell, false);
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
@@ -272,10 +272,10 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class CELLINFO, class FACEINFO, int dim, class ITERATOR, typename ASSEMBLER>
+  template<class CELLINFO, class FACEINFO, class DOFINFO, int dim, class ITERATOR, typename ASSEMBLER>
   void integration_loop(ITERATOR begin,
 			typename identity<ITERATOR>::type end,
-			DoFInfo<dim>& dof_info,
+			DOFINFO& dof_info,
 			IntegrationInfoBox<dim, dim>& box,
 			const std_cxx1x::function<void (DoFInfo<dim>&, CELLINFO &)> &cell_worker,
 			const std_cxx1x::function<void (DoFInfo<dim>&, FACEINFO &)> &boundary_worker,
@@ -283,7 +283,7 @@ namespace MeshWorker
 			ASSEMBLER &assembler,
 			bool cells_first = true)
   {
-    loop<DoFInfo<dim>,IntegrationInfoBox<dim, dim> >
+    loop<DoFInfo<dim>, IntegrationInfoBox<dim, dim> >
       (begin, end,
        dof_info,
        box,

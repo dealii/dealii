@@ -24,6 +24,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
+  template <int dim, class DOFINFO> class DoFInfoBox;
+  
 /**
  * The class providing the scrapbook to fill with local integration
  * results. These can be values, local contributions to forms or cell
@@ -230,7 +232,7 @@ namespace MeshWorker
       std::vector<std::vector<number> > quadrature_values;
   };
 
-  template <int dim, int spacedim> class DoFInfoBox;
+  template <int dim, class DOFINFO> class DoFInfoBox;
 
 /**
  * A class containing information on geometry and degrees of freedom
@@ -271,10 +273,10 @@ namespace MeshWorker
   {
     public:
 				       /// The current cell
-      typename Triangulation<dim>::cell_iterator cell;
+      typename Triangulation<dim, spacedim>::cell_iterator cell;
 
 				       /// The current face
-      typename Triangulation<dim>::face_iterator face;
+      typename Triangulation<dim, spacedim>::face_iterator face;
 
 				       /**
 					* The number of the current
@@ -383,7 +385,7 @@ namespace MeshWorker
 					*/
       BlockIndices aux_local_indices;
       
-      friend class DoFInfoBox<dim, spacedim>;
+      friend class DoFInfoBox<dim, DoFInfo<dim, spacedim, number> >;
   };
 
 
@@ -395,9 +397,10 @@ namespace MeshWorker
  * itself in one object, saving a bit of memory and a few operations,
  * but sacrificing some cleanliness.
  *
+ * @ingroup MeshWorker
  * @author Guido Kanschat, 2010
  */
-  template <int dim, int spacedim=dim>
+  template <int dim, class DOFINFO>
   class DoFInfoBox
   {
     public:
@@ -405,14 +408,14 @@ namespace MeshWorker
 					* Constructor copying the seed
 					* into all other objects.
 					*/
-      DoFInfoBox(const DoFInfo<dim, spacedim>& seed);
+      DoFInfoBox(const DOFINFO& seed);
 
 				       /**
 					* Copy constructor, taking
 					* #cell and using it as a seed
 					* in the other constructor.
 					*/
-      DoFInfoBox(const DoFInfoBox<dim, spacedim>&);
+      DoFInfoBox(const DoFInfoBox<dim, DOFINFO>&);
       
 				       /**
 					* Reset all the availability flags.
@@ -435,15 +438,15 @@ namespace MeshWorker
 				       /**
 					* The data for the cell.
 					*/
-      DoFInfo<dim> cell;
+      DOFINFO cell;
 				       /**
 					* The data for the faces from inside.
 					*/
-      DoFInfo<dim> interior[GeometryInfo<dim>::faces_per_cell];
+      DOFINFO interior[GeometryInfo<dim>::faces_per_cell];
 				       /**
 					* The data for the faces from outside.
 					*/
-      DoFInfo<dim> exterior[GeometryInfo<dim>::faces_per_cell];
+      DOFINFO exterior[GeometryInfo<dim>::faces_per_cell];
 
 				       /**
 					* A set of flags, indicating
@@ -1080,9 +1083,9 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
   
-  template < int dim, int spacedim>
+  template <int dim, class DOFINFO>
   inline
-  DoFInfoBox<dim, spacedim>::DoFInfoBox(const DoFInfo<dim, spacedim>& seed)
+  DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DOFINFO& seed)
 		  :
 		  cell(seed)
   {
@@ -1096,9 +1099,9 @@ namespace MeshWorker
   }
 
 
-  template < int dim, int spacedim>
+  template <int dim, class DOFINFO>
   inline
-  DoFInfoBox<dim, spacedim>::DoFInfoBox(const DoFInfoBox<dim, spacedim>& other)
+  DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DoFInfoBox<dim, DOFINFO>& other)
 		  :
 		  cell(other.cell)
   {
@@ -1112,9 +1115,9 @@ namespace MeshWorker
   }
 
 
-  template < int dim, int spacedim>
+  template <int dim, class DOFINFO>
   inline void
-  DoFInfoBox<dim, spacedim>::reset ()
+  DoFInfoBox<dim, DOFINFO>::reset ()
   {
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
       {
@@ -1124,10 +1127,10 @@ namespace MeshWorker
   }
 
   
-  template < int dim, int spacedim>
+  template <int dim, class DOFINFO>
   template <class ASSEMBLER>
   inline void
-  DoFInfoBox<dim, spacedim>::assemble (ASSEMBLER& assembler) const
+  DoFInfoBox<dim, DOFINFO>::assemble (ASSEMBLER& assembler) const
   {
     assembler.assemble(cell);
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
