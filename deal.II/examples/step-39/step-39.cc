@@ -446,7 +446,7 @@ Step39<dim>::assemble_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box;
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>, dim, dim>(
+  MeshWorker::integration_loop<dim, dim>(
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &MatrixIntegrator<dim>::cell,
@@ -473,7 +473,7 @@ Step39<dim>::assemble_mg_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box;
   MeshWorker::DoFInfo<dim> dof_info(mg_dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>, dim, dim> (
+  MeshWorker::integration_loop<dim, dim> (
     mg_dof_handler.begin(), mg_dof_handler.end(),
     dof_info, info_box,
     &MatrixIntegrator<dim>::cell,
@@ -503,7 +503,7 @@ Step39<dim>::assemble_right_hand_side()
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping);
   
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>, dim, dim>(
+  MeshWorker::integration_loop<dim, dim>(
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &RHSIntegrator<dim>::cell,
@@ -624,7 +624,7 @@ Step39<dim>::estimate()
   MeshWorker::IntegrationInfoBox<dim> info_box;
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   info_box.initialize(integration_worker, fe, mapping, solution_data);
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>, dim, dim> (
+  MeshWorker::integration_loop<dim, dim> (
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &Estimator<dim>::cell,

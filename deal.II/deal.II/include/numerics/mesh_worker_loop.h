@@ -230,14 +230,14 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class DOFINFO, class INFOBOX, int dim, int spacedim, typename ASSEMBLER, class ITERATOR>
+  template<int dim, int spacedim, class DOFINFO, class INFOBOX, typename ASSEMBLER, class ITERATOR>
   void loop(ITERATOR begin,
 	    typename identity<ITERATOR>::type end,
 	    DOFINFO& dinfo,
 	    INFOBOX& info,
-	    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::CellInfo &)> &cell_worker,
-	    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::FaceInfo &)> &boundary_worker,
-	    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, DoFInfo<dim, spacedim>&,
+	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo &)> &cell_worker,
+	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::FaceInfo &)> &boundary_worker,
+	    const std_cxx1x::function<void (DOFINFO&, DOFINFO&,
 					    typename INFOBOX::FaceInfo &,
 					    typename INFOBOX::FaceInfo &)> &face_worker,
 	    ASSEMBLER &assembler,
@@ -272,18 +272,20 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<class CELLINFO, class FACEINFO, class DOFINFO, int dim, class ITERATOR, typename ASSEMBLER>
+  template<int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void integration_loop(ITERATOR begin,
 			typename identity<ITERATOR>::type end,
-			DOFINFO& dof_info,
-			IntegrationInfoBox<dim, dim>& box,
-			const std_cxx1x::function<void (DoFInfo<dim>&, CELLINFO &)> &cell_worker,
-			const std_cxx1x::function<void (DoFInfo<dim>&, FACEINFO &)> &boundary_worker,
-			const std_cxx1x::function<void (DoFInfo<dim>&, DoFInfo<dim>&, FACEINFO &, FACEINFO &)> &face_worker,
+			DoFInfo<dim, spacedim>& dof_info,
+			IntegrationInfoBox<dim, spacedim>& box,
+			const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &cell_worker,
+			const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &boundary_worker,
+			const std_cxx1x::function<void (DoFInfo<dim>&, DoFInfo<dim>&,
+							IntegrationInfo<dim, spacedim>&,
+							IntegrationInfo<dim, spacedim>&)> &face_worker,
 			ASSEMBLER &assembler,
 			bool cells_first = true)
   {
-    loop<DoFInfo<dim>, IntegrationInfoBox<dim, dim> >
+    loop<dim, dim>
       (begin, end,
        dof_info,
        box,
