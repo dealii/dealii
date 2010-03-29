@@ -32,6 +32,10 @@ DOFHANDLERS := { DoFHandler<deal_II_dimension>;
                  hp::DoFHandler<deal_II_dimension>;
 		 MGDoFHandler<deal_II_dimension> }
 
+DOFHANDLER_TEMPLATES := { DoFHandler;
+                          hp::DoFHandler;
+		          MGDoFHandler }
+
 TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension>;
                                    DoFHandler<deal_II_dimension>;
                                    hp::DoFHandler<deal_II_dimension>;
