@@ -58,7 +58,7 @@ template<int,int> class MGDoFHandler;
  *
  * The integration_loop() function loop takes most of the information
  * that it needs to pass to loop() from an IntegrationInfoBox
- * object. Its use is explained in step-38, but in
+ * object. Its use is explained in step-12, but in
  * short it requires functions that do the local integration on a
  * cell, interior or boundary face, and it needs an object (called
  * "assembler") that copies these local contributions into the global
