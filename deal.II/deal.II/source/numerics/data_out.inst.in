@@ -1,0 +1,74 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES)
+{
+// codim=0
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension,deal_II_dimension>::
+  add_data_vector<VEC> (const VEC            &, 
+                       const std::string   &, 
+                       const DataVectorType,  
+	  	     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); 
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension,deal_II_dimension>::
+  add_data_vector<VEC> (const VEC                       &, 
+                     const std::vector<std::string> &, 
+                     const DataVectorType,  
+		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); 
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension,deal_II_dimension>::
+  add_data_vector<VEC> (const VEC                 &, 
+		      const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
+
+// codim=1
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension+1,deal_II_dimension+1>::
+  add_data_vector<VEC> (const VEC            &, 
+                       const std::string   &, 
+                       const DataVectorType,  
+	  	     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); 
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension+1,deal_II_dimension+1>::
+  add_data_vector<VEC> (const VEC                       &, 
+                     const std::vector<std::string> &, 
+                     const DataVectorType,  
+		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); 
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension+1,deal_II_dimension+1>::
+  add_data_vector<VEC> (const VEC                 &, 
+		      const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
+
+}
+
+
+for (DH : DOFHANDLER_TEMPLATES)
+{
+  template class DataOut_DoFData<DH<deal_II_dimension>,deal_II_dimension>;
+  template class DataOut_DoFData<DH<deal_II_dimension>,deal_II_dimension+1>;
+
+  #if deal_II_dimension < 3
+  template class DataOut_DoFData<DH<deal_II_dimension>,deal_II_dimension,deal_II_dimension+1>;
+  #endif
+
+  template class DataOut<deal_II_dimension, DH<deal_II_dimension> >;
+  #if deal_II_dimension < 3
+  template class DataOut<deal_II_dimension, DH<deal_II_dimension,deal_II_dimension+1> >;
+  #endif
+}

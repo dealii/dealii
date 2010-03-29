@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,8 @@
 #include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
+#include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <numerics/data_out.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
@@ -1104,87 +1106,6 @@ DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell)
 
 
 // explicit instantiations
-
-#define INSTANTIATE(DH,D0,D1,D2,D3,V)		\
-template void \
-DataOut_DoFData<DH<D0,D1>,D2,D3>::	    \
-add_data_vector<V > (const V             &, \
-                     const std::string   &, \
-                     const DataVectorType,  \
-		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); \
-\
-template void \
- DataOut_DoFData<DH<D0,D1>,D2,D3>::		       \
-add_data_vector<V > (const V                        &, \
-                     const std::vector<std::string> &, \
-                     const DataVectorType,  \
-		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); \
-\
-template void \
- DataOut_DoFData<DH<D0,D1>,D2,D3>::		 \
-add_data_vector<V > (const V                  &, \
-		     const DataPostprocessor<DH<D0,D1>::space_dimension> &)
-
-#ifndef DEAL_II_USE_PETSC
-# define INSTANTIATE_VECTORS(DH,D0,D1,D2,D3)	\
-    INSTANTIATE(DH,D0,D1,D2,D3,Vector<double>); \
-    INSTANTIATE(DH,D0,D1,D2,D3,Vector<float>); \
-    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<double>) ; \
-    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<float>); \
-    INSTANTIATE(DH,D0,D1,D2,D3,Vector<long double>); \
-    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<long double>)
-#else
-# define INSTANTIATE_VECTORS(DH,D0,D1,D2,D3)	 \
-    INSTANTIATE(DH,D0,D1,D2,D3,Vector<double>); \
-    INSTANTIATE(DH,D0,D1,D2,D3,Vector<float>); \
-    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<double>) ; \
-    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<float>); \
-    INSTANTIATE(DH,D0,D1,D2,D3,PETScWrappers::Vector);		\
-    INSTANTIATE(DH,D0,D1,D2,D3,PETScWrappers::BlockVector)
-#endif
-
-// now do actual instantiations, first for DoFHandler...
-template class DataOut_DoFData<DoFHandler<deal_II_dimension>,deal_II_dimension>;
-template class DataOut_DoFData<DoFHandler<deal_II_dimension>,deal_II_dimension+1>;
-INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension,deal_II_dimension);
-INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension+1,deal_II_dimension+1);
-
-// for 3d, also generate an extra class
-#if deal_II_dimension >= 2
-template class DataOut_DoFData<DoFHandler<deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>;
-INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension-1,deal_II_dimension);
-#endif
-
-template class DataOut<deal_II_dimension, DoFHandler<deal_II_dimension> >;
-
-
-// ...and now for hp::DoFHandler
-template class DataOut_DoFData<hp::DoFHandler<deal_II_dimension>,deal_II_dimension>;
-template class DataOut_DoFData<hp::DoFHandler<deal_II_dimension>,deal_II_dimension+1>;
-INSTANTIATE_VECTORS(hp::DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension,deal_II_dimension);
-INSTANTIATE_VECTORS(hp::DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension+1,deal_II_dimension+1);
-
-#if deal_II_dimension >= 2
-template class DataOut_DoFData<hp::DoFHandler<deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>;
-INSTANTIATE_VECTORS(hp::DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension-1,deal_II_dimension);
-#endif
-
-template class DataOut<deal_II_dimension, hp::DoFHandler<deal_II_dimension> >;
-
-
-#if deal_II_dimension == 2 || deal_II_dimension ==1
-// now do actual instantiations, first for DoFHandler...
-template class DataOut_DoFData<DoFHandler<deal_II_dimension,deal_II_dimension+1>,deal_II_dimension, deal_II_dimension+1>;
-template class DataOut_DoFData<DoFHandler<deal_II_dimension,deal_II_dimension+1>,deal_II_dimension+1, deal_II_dimension+1>;
-
-INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension+1,deal_II_dimension,deal_II_dimension+1);
-INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension+1,deal_II_dimension+1,deal_II_dimension+1);
-
-template class DataOut<deal_II_dimension, DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
-#endif
-
-
-#undef INSTANTIATE
-#undef INSTANTIATE_VECTORS
+#include "data_out.inst"
 
 DEAL_II_NAMESPACE_CLOSE
