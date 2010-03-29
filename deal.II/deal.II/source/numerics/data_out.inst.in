@@ -34,6 +34,27 @@ for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES)
   add_data_vector<VEC> (const VEC                 &, 
 		      const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
 
+// stuff needed for face data
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>::
+  add_data_vector<VEC> (const VEC            &, 
+                       const std::string   &, 
+                       const DataVectorType,  
+	  	     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); 
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>::
+  add_data_vector<VEC> (const VEC                       &, 
+                     const std::vector<std::string> &, 
+                     const DataVectorType,  
+		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); 
+
+  template void 
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>::
+  add_data_vector<VEC> (const VEC                 &, 
+		      const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
+
 // codim=1
 
   template void 
@@ -65,6 +86,10 @@ for (DH : DOFHANDLER_TEMPLATES)
 
   #if deal_II_dimension < 3
   template class DataOut_DoFData<DH<deal_II_dimension>,deal_II_dimension,deal_II_dimension+1>;
+  #endif
+
+  #if deal_II_dimension >= 2
+  template class DataOut_DoFData<DH<deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>;
   #endif
 
   template class DataOut<deal_II_dimension, DH<deal_II_dimension> >;
