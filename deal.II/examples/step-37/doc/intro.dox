@@ -1,7 +1,16 @@
 <br>
 
-<i>This program was contributed by Katharina Kormann and Martin
-Kronbichler.</i>
+<i>
+This program was contributed by Katharina Kormann and Martin
+Kronbichler.
+
+This program is currently under construction.
+
+The algorithm for the matrix-vector product is built upon the report &quot;MPI
+parallelization of a cell-based matrix-vector product for finite elements. An
+application from quantum dynamics&quot; by Katharina Kormann, Uppsala
+University, June 2009.  
+</i>
 
 
 <a name="Intro"></a>
@@ -13,102 +22,6 @@ second-order Poisson equation with variable coefficients on a fairly
 unstructured mesh representing a circle.
 
 <h3>Matrix-vector product implementation</h3>
-
-<h4>Philosophical view on usual matrix-vector products</h4>
-
-In most deal.II tutorial programs the code is built around assembling
-some sparse matrix and solving a linear system of equations based on that
-matrix. The run time of such programs is mostly spent in the construction of
-the sparse matrix (assembling) and in performing some matrix-vector products
-(possibly together with some substitutions like in SSOR preconditioners) in
-an iterative Krylov method. This is a general concept in finite element
-programs. Depending on the quality of the linear solver and the complexity
-of the equation to be solved, between 40 and 95 per cent of the computational
-time is spent in performing sparse matrix-vector products.
-
-Let us briefly look at a simplified version of code for the matrix-vector
-product when the matrix is stored in the usual sparse compressed row storage
-&mdash; in short CRS &mdash; format implemented by the SparsityPattern and
-SparseMatrix classes (the actual implementation in deal.II uses a slightly
-different structure for the innermost loop, thereby avoiding the counter
-variable), also used by Trilinos and PETSc matrices:
-@code
-// y = A * x
-// variables: double * A_values;  unsigned int * A_column_indices;
-//            std::size_t * A_row_indices, unsigned int n_rows;
-std::size_t element_index = A_row_indices[0];
-for (unsigned int row=0; row<n_rows; ++row)
-  {
-    const std::size_t row_ends = A_row_indices[row+1];
-    double sum = 0;
-    while (element_index != row_ends)
-      {
-        sum += A_values[element_index] *
-               x[A_column_indices[element_index]];
-        element_index++;
-      }
-    y[row] = sum;
-  }
-@endcode
-
-The matrix-vector product basically goes through the @p A_values array,
-multiplies the current element <code>A_values[element_index]</code> with the
-entry in the vector that corresponds to that element, and then accumulates
-this product to the sum along the current row. Each matrix element thus
-involves two floating-point operations, a multiplication and an
-addition. Assume now we have a matrix with a billion (10<sup>9</sup>)
-entries. Then, a matrix-vector product requires two billion floating point
-operations, 2 GFLOP. One core of a processor of 2009's standard (Intel's
-'Nehalem' processor, 3 GHz) has a peak performance of about 12 billion
-floating point operations per second, 12 GFLOP/s. Now we might be tempted to
-hope for getting a matrix-vector product done in about one sixth of a second
-on such a machine.
-
-However, that is usually not the case &mdash; because of memory. Each matrix
-element corresponds to 12 bytes of data, 8 bytes for the actual data in @p
-A_values and 4 bytes for the unsigned integer column position of that element,
-which we need to find the correct vector element. For our one-billion-sized
-matrix, these two arrays make up 12 GB of data, which we need to stream into
-the processor. Looking again at which hardware is available in 2009, we will
-hardly get more than 10 GB/s of data read. This means that the matrix-vector
-product will take more than one second to complete, giving a rate of 1.7
-GFLOP/s at the best. This is quite far away from the theoretical peak
-performance of 12 GFLOP/s. Here, we neglect the additional storage required by
-the additional array @p A_row_indices that tells us the range of the
-individual rows for simplicity, and assumed that the vector data is stored in
-some fast (cache) memory. In practice, the rate is often considerably lower
-because, for example, the vectors do not fit into cache. A usual value on a
-2009's machine is 0.5 to 1.1 GFLOP/s.
-
-What makes things worse is that today's processors have multiple cores, and
-multiple cores have to compete for memory bandwidth. Imagine we have 8 cores
-available with a theoretical peak performance of 96 GFLOP/s. However, these
-cores will at best sit on a machine with about 35 GB/s of memory
-bandwidth. For our matrix-vector product, we would get a performance of about
-6 GFLOP/s, which is a nightmarish 6 per cent of the system's peak
-performance. And this is the theoretical maximum!
-
-Things won't get better in the future, rather worse: Memory bandwidth will
-most likely continue to grow more slowly than the number of cores (i.e., the
-computing power). Consequently, we will probably not see that much of an
-improvement in the speed of our programs even though computers do become
-faster if we accumulate their speed over all of their cores.
-
-In essence, one may ask how this can be avoided. The basic fact that
-precipitates this is that matrices just consume a lot of memory &mdash;
-sometimes too much, if it limits the number of computations that can
-be done with them. A billion matrix entries might seem like an enormous
-problem, but in fact, already a Laplace problem in 3D with cubic elements
-and 6 million unknowns results in a matrix of that size, or even at 2
-million unknowns for sixth order polynomial interpolation.
-
-This tutorial shows an alternative that is less memory demanding. This comes
-at the cost of more operations to be performed in an actual matrix-vector
-product. However, one can hope that because the speed with which
-computations can be done increases faster than the speed with which memory
-can be streamed into a processor, this trade-off will be worthwhile.
-
-<h4>Avoid forming the matrix explicitly</h4>
 
 In order to find out how we can write a code that performs a matrix-vector
 product, but does not need to store the matrix elements, let us start at
@@ -439,42 +352,6 @@ linear and quadratic elements, but on par with third order elements and faster
 for even higher order elements. An additional gain with this implementation is
 that we do not have to build the sparse matrix itself, which can also be quite
 expensive depending on the underlying differential equation.
-
-
-<h4>Parallelization issues</h4>
-
-We mentioned in the philosophical section above that parallelization with
-multiple cores in a shared memory machine is an issue where sparse
-matrix-vector products are not particularly well suited because processors are
-memory bandwidth limited. There is a lot of data traffic involved, and the
-access patterns in the source vector are not very regular. Also, different
-rows might have different %numbers of nonzero elements. The matrix-free
-implementation, however, is more favorable in this respect. It does not need
-to save all the elements (only the product of transposed Jacobian, weights,
-and Jacobian, for all quadrature points on all cells, which is about 4 times
-the size of the solution vector in 2D and 9 times the size of the solution
-vector in 3D), whereas the number of nonzeros grows with the element
-order. Moreover, most of the work is done on a very regular pattern with
-stride-one access to data: Performing matrix-vector products with the same
-matrix, performing (equally many) transformations on the vector related
-quadrature points, and doing one more matrix-vector product. Only the read
-operation from the global vector @p src and the write operation to @p dst in
-the end perform more random access to a vector. This kind of rather uniform
-data access should make it not too difficult to implement a matrix-free
-matrix-vector product on a <a
-href="http://en.wikipedia.org/wiki/GPGPU">graphics processing unit
-(GP-GPU)</a>, for example. On the contrary, it would be quite complex to make
-a sparse matrix-vector product implementation efficient on a GPU.
-
-For our program, we choose to follow a simple strategy to make the code
-%parallel: We let several processors work together by splitting the complete
-set of all active cells on which we have to assemble into
-several chunks. The threading building blocks implementation of a %parallel
-pipeline implements this concept using the WorkStream::run() function. What
-the pipeline does closely resembles the work done by a for loop. However, it
-can be instructed to do some part of the loop body by just one process at a
-time and in natural order. We need to use this for writing the local
-contributions into the global vector, in order to avoid a race condition.
 
 
 <h3>Combination with multigrid</h3>

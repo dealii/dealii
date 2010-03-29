@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Author: Martin Kronbichler, Uppsala University, 2009 */
+/* Author: Katharina Kormann, Martin Kronbichler, Uppsala University, 2009 */
 
 /*    $Id$       */
 /*                                                                */
