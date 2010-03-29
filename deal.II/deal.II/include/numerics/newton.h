@@ -56,7 +56,7 @@ namespace Algorithms
  * evaluate the residual at this point.
  *
  * For the call to (*#inverse_derivative), the vector <tt>"Newton
- * residual"</tt> is inserted before <tt>"Newton iterate"<tt>.
+ * residual"</tt> is inserted before <tt>"Newton iterate"</tt>.
  *
  * @author Guido Kanschat, 2006, 2010
  */
