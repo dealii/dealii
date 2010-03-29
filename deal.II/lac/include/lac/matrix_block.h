@@ -345,7 +345,7 @@ class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX>
   public:
 				     /**
 				      * Add a new matrix block at the
-				      * position <tt(row,column)</tt>
+				      * position <tt>(row,column)</tt>
 				      * in the block system.
 				      */
     void add(unsigned int row, unsigned int column,
@@ -387,7 +387,7 @@ class MGMatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRI
   public:
 				     /**
 				      * Add a new matrix block at the
-				      * position <tt(row,column)</tt>
+				      * position <tt>(row,column)</tt>
 				      * in the block system.
 				      */
     void add(unsigned int row, unsigned int column,
