@@ -149,7 +149,7 @@ assemble(const DoFHandler<dim>& dof_handler, SparseMatrix<double>& matrix)
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   
   info_box.initialize(integration_worker, fe, mapping);
-  MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim>
+  MeshWorker::integration_loop<dim, dim>
     (dof_handler.begin_active(),
      dof_handler.end(),
      dof_info,
