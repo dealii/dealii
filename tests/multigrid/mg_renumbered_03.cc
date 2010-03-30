@@ -298,7 +298,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
     OutputCreator<dim> matrix_integrator;
-    MeshWorker::loop<MeshWorker::IntegrationInfoBox<dim>, dim, dim> (
+    MeshWorker::integration_loop<dim, dim> (
       dof.begin(l), dof.end(l),
       dof_info, info_box,
       std_cxx1x::bind(&OutputCreator<dim>::cell, &matrix_integrator, _1, _2),
