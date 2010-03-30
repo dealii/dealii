@@ -320,8 +320,10 @@ namespace PETScWrappers
                                      // set flags as given
 #if DEAL_II_PETSC_VERSION_LT(2,3,1)
     ierr = PCLUSetPivoting (pc, additional_data.pivoting);
-#else
+#elif DEAL_II_PETSC_VERSION_LT(3,0,1)
     ierr = PCFactorSetPivoting (pc, additional_data.pivoting);
+#else
+    ierr = PCFactorSetColumnPivot (pc, additional_data.pivoting);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -335,8 +337,10 @@ namespace PETScWrappers
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,0)
     ierr = PCLUSetDamping (pc, additional_data.damping);
-#else
+#elif DEAL_II_PETSC_VERSION_LT(3,0,1)
     ierr = PCFactorSetShiftNonzero (pc, additional_data.damping);
+#else
+    ierr = PCFactorSetShiftAmount (pc, additional_data.damping);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
