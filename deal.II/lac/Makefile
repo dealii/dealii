@@ -42,7 +42,6 @@ source/%.inst : source/%.inst.in $D/common/template-arguments \
 	@echo "=====lac============================= $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
 
-
 # rules
 lib: $(LIBDIR)/liblac.g$(lib-suffix) $(LIBDIR)/liblac$(lib-suffix)
 libg: $(LIBDIR)/liblac.g$(lib-suffix)

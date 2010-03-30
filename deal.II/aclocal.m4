@@ -5834,7 +5834,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
           AC_MSG_ERROR([PETSc has not been compiled for the architecture specified with --with-petsc-arch])
         fi
         ;;
-      3.0*) dnl
+      3.*) dnl
         if test ! -d $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib \
            ; then
           AC_MSG_ERROR([PETSc has not been compiled for the architecture specified with --with-petsc-arch])
@@ -5874,8 +5874,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
   dnl Here is where we check if the PETSc version we have is a
   dnl release but do nothing about it.
   PETSC_RELEASE=`cat $DEAL_II_PETSC_DIR/include/petscversion.h \
-               | grep "#define PETSC_VERSION_RELEASE" \
-               | perl -pi -e 's/.*RELEASE\s+//g;'`
+                     | grep "#define PETSC_VERSION_RELEASE" \
+                     | perl -pi -e 's/.*RELEASE\s+//g;'`
   if test "$PETSC_VERSION_RELEASE" = "0" ; then
     PETSC_VERSION+="-dev"
   else
@@ -5904,7 +5904,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
         DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a" 
       fi 
       ;;
-    3.0*) dnl
+    3.*.0) dnl
       if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a ; then
         DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a" 
       fi 
@@ -5935,7 +5935,7 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_PETSC_COMPLEX, dnl
 [
   case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-    3.0.1)
+    3.1*)
       AC_MSG_CHECKING([for PETSc scalar complex])
       DEAL_II_PETSC_COMPLEX=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h \
                                | grep "#define PETSC_USE_COMPLEX" \

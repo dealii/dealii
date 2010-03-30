@@ -43,17 +43,38 @@ ifeq ($(DEAL_II_PETSC_VERSION_MINOR),1)
 else
   xlib-ksp=libpetscksp
 endif
-
-  xlib.g = $(lib-contrib-petsc-path.g)/$(xlib-ksp)$(lib-suffix) \
-           $(lib-contrib-petsc-path.g)/libpetscdm$(lib-suffix) \
+  # This is how it is done. Starting with PETSc versions 2.3.*:
+ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
+  xlib.g = $(lib-contrib-petsc-path.g)/libpetscksp$(lib-suffix) \
+           $(lib-contrib-petsc-path.g)/libpetscdm$(lib-suffix)  \
            $(lib-contrib-petsc-path.g)/libpetscmat$(lib-suffix) \
            $(lib-contrib-petsc-path.g)/libpetscvec$(lib-suffix) \
            $(lib-contrib-petsc-path.g)/libpetsc$(lib-suffix)
-  xlib.o = $(lib-contrib-petsc-path.o)/$(xlib-ksp)$(lib-suffix) \
-           $(lib-contrib-petsc-path.o)/libpetscdm$(lib-suffix) \
+  xlib.o = $(lib-contrib-petsc-path.o)/libpetscksp$(lib-suffix) \
+           $(lib-contrib-petsc-path.o)/libpetscdm$(lib-suffix)  \
            $(lib-contrib-petsc-path.o)/libpetscmat$(lib-suffix) \
            $(lib-contrib-petsc-path.o)/libpetscvec$(lib-suffix) \
            $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
+else
+  # which is the same for PETSc 3.0.0:
+  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30) 
+    xlib.g = $(lib-contrib-petsc-path.g)/libpetscksp$(lib-suffix) \
+             $(lib-contrib-petsc-path.g)/libpetscdm$(lib-suffix)  \
+             $(lib-contrib-petsc-path.g)/libpetscmat$(lib-suffix) \
+             $(lib-contrib-petsc-path.g)/libpetscvec$(lib-suffix) \
+             $(lib-contrib-petsc-path.g)/libpetsc$(lib-suffix)
+    xlib.o = $(lib-contrib-petsc-path.o)/libpetscksp$(lib-suffix) \
+             $(lib-contrib-petsc-path.o)/libpetscdm$(lib-suffix)  \
+             $(lib-contrib-petsc-path.o)/libpetscmat$(lib-suffix) \
+             $(lib-contrib-petsc-path.o)/libpetscvec$(lib-suffix) \
+             $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
+  else 
+    # but after that (petsc-3.1++), we can use the simpler PETSc
+    # default "--with-single-library=1" like this:
+    xlib.g = $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
+    xlib.o = $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
+  endif
+endif
 
 ifeq ($(enable-shared),yes)
 
