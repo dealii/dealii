@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * vmult_add(), and Tvmult_add() make it behave like a MATRIX, when it
  * comes to applying it to a vector. This behavior allows us to store
  * MatrixBlock objects in vectors, for instance in MGLevelObject
- * without extracting the #matrix first. 
+ * without extracting the #matrix first.
  *
  * MatrixBlock comes handy when using BlockMatrixArray. Once the
  * MatrixBlock has been properly initalized and filled, it can be used
@@ -84,18 +84,18 @@ class MatrixBlock
 				      * uninitialized object.
 				      */
     MatrixBlock();
-    
+
 				     /**
 				      * Copy constructor.
 				      */
     MatrixBlock(const MatrixBlock<MATRIX>& M);
-    
+
 				     /**
 				      * Constructor setting block
 				      * coordinates, but not
 				      * initializing the matrix.
 				      */
-    
+
     MatrixBlock(unsigned int i, unsigned int j,
 		const BlockIndices* block_indices = 0);
 
@@ -127,7 +127,7 @@ class MatrixBlock
                                         * #column.
 					*
 					* @todo
-					* <tt>elide_zero_values<tt> is
+					* <tt>elide_zero_values</tt> is
 					* currently ignored.
 					*
 					* The optional parameter
@@ -161,7 +161,7 @@ class MatrixBlock
                                         * #column.
 					*
 					* @todo
-					* <tt>elide_zero_values<tt> is
+					* <tt>elide_zero_values</tt> is
 					* currently ignored.
 					*
 					* The optional parameter
@@ -201,7 +201,7 @@ class MatrixBlock
                                         * #column.
 					*
 					* @todo
-					* <tt>elide_zero_values<tt> is
+					* <tt>elide_zero_values</tt> is
 					* currently ignored.
 					*
 					* The optional parameter
@@ -255,7 +255,7 @@ class MatrixBlock
 				      */
     template<class VECTOR>
     void vmult (VECTOR& w, const VECTOR& v) const;
-    
+
 				     /**
 				      * Matrix-vector-multiplication,
 				      * forwarding to the same
@@ -266,7 +266,7 @@ class MatrixBlock
 				      */
     template<class VECTOR>
     void vmult_add (VECTOR& w, const VECTOR& v) const;
-    
+
 				     /**
 				      * Matrix-vector-multiplication,
 				      * forwarding to the same
@@ -298,7 +298,7 @@ class MatrixBlock
 				      */
     DeclException2(ExcBlockIndexMismatch, unsigned int, unsigned int,
 		   << "Block index " << arg1 << " does not match " << arg2);
-    
+
 				     /**
 				      * Row coordinate.  This is the
 				      * position of the data member
@@ -312,7 +312,7 @@ class MatrixBlock
 				      * matrix.
 				      */
     unsigned int column;
-    
+
 				     /**
 				      * The matrix itself
 				      */
@@ -324,7 +324,7 @@ class MatrixBlock
 				      * column(), this allows us to
 				      * find the index of the first
 				      * row and column degrees of
-				      * freedom for this block. 
+				      * freedom for this block.
 				      */
     SmartPointer<const BlockIndices, MatrixBlock<MATRIX> > block_indices;
 };
@@ -367,8 +367,8 @@ class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX>
 				      * access.
 				      */
     MATRIX& matrix(unsigned int i);
-    
-    
+
+
 };
 
 
@@ -409,8 +409,8 @@ class MGMatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRI
 				      * access.
 				      */
     MATRIX& matrix(unsigned int i);
-    
-    
+
+
 };
 
 
@@ -453,15 +453,15 @@ MatrixBlock<MATRIX>::add (
   const typename MATRIX::value_type value)
 {
   Assert(block_indices != 0, ExcNotInitialized());
-  
+
   const std::pair<unsigned int, unsigned int> bi
     = block_indices->global_to_local(gi);
   const std::pair<unsigned int, unsigned int> bj
     = block_indices->global_to_local(gj);
-  
+
   Assert (bi.first == row, ExcBlockIndexMismatch(bi.first, row));
   Assert (bj.first == column, ExcBlockIndexMismatch(bj.first, column));
-  
+
   matrix.add(bi.second, bj.second, value);
 }
 
@@ -476,10 +476,10 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int>&         row_indices,
 				  const bool                       elide_zero_values)
 {
   Assert(block_indices != 0, ExcNotInitialized());
-  
+
   AssertDimension (row_indices.size(), values.m());
   AssertDimension (col_indices.size(), values.n());
-  
+
   for (unsigned int i=0; i<row_indices.size(); ++i)
     add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
 	 elide_zero_values);
@@ -517,7 +517,7 @@ MatrixBlock<MATRIX>::add (const unsigned int   b_row,
       const std::pair<unsigned int, unsigned int> bj
 	= block_indices->global_to_local(col_indices[j]);
       Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
-      
+
       matrix.add(bi.second, bj.second, values[j]);
     }
 //#endif
@@ -533,10 +533,10 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int> &indices,
 			  const bool                       elide_zero_values)
 {
   Assert(block_indices != 0, ExcNotInitialized());
-  
+
   AssertDimension (indices.size(), values.m());
   Assert (values.n() == values.m(), ExcNotQuadratic());
-  
+
   for (unsigned int i=0; i<indices.size(); ++i)
     add (indices[i], indices.size(), &indices[0], &values(i,0),
 	 elide_zero_values);
@@ -552,7 +552,7 @@ MatrixBlock<MATRIX>::add (const unsigned int               row,
 			  const std::vector<unsigned int> &col_indices,
 			  const std::vector<number>       &values,
 			  const bool                       elide_zero_values)
-{ 
+{
   Assert(block_indices != 0, ExcNotInitialized());
   AssertDimension (col_indices.size(), values.size());
   add (row, col_indices.size(), &col_indices[0], &values[0],
