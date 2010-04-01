@@ -25,11 +25,63 @@
  * <dt class="glossary">@anchor GlossActive <b>Active cells</b></dt>
  * <dd>Mesh cells not refined any further in the hierarchy.</dd>
  *
+ *
+ * <dt class="glossary">@anchor GlossBlockLA <b>Block (linear algebra)</b></dt>
+
+ * <dd>It is often convenient to treat a matrix or vector as a collection of
+ * individual blocks. For example, in step-20 (and other tutorial
+ * programs), we want to consider the global linear system $Ax=b$ in
+ * the form
+ * @f{eqnarray*}
+  \left(\begin{array}{cc}
+    M & B^T \\ B & 0
+  \end{array}\right)
+  \left(\begin{array}{cc}
+    U \\ P
+  \end{array}\right)
+  =
+  \left(\begin{array}{cc}
+    F \\ G
+  \end{array}\right),
+ * @f}
+ * where $U,P$ are the values of velocity and pressure degrees of freedom,
+ * respectively, $M$ is the mass matrix on the velocity space, $B$ corresponds to
+ * the negative divergence operator, and $B^T$ is its transpose and corresponds
+ * to the negative gradient.
+ *
+ * Using such a decomposition into blocks, one can then define
+ * preconditioners that are based on the individual operators that are
+ * present in a system of equations (for example the Schur complement,
+ * in the case of step-20), rather than the entire matrix. In essence,
+ * blocks are used to reflect the structure of a PDE system in linear
+ * algebra, in particular allowing for modular solvers for problems
+ * with multiple solution components. On the other hand, the matrix
+ * and right hand side vector can also treated as a unit, which is
+ * convenient for example during assembly of the linear system when
+ * one may not want to make a distinction between the individual
+ * components, or for an outer Krylov space solver that doesn't care
+ * about the block structure (e.g. if only the preconditioner needs
+ * the block structure).
+ *
+ * Splitting matrices and vectors into blocks is supported by the
+ * BlockSparseMatrix, BlockVector, and related classes. See the
+ * overview of the various linear algebra classes in the @ref LAC
+ * module. The objects present two interfaces: one that makes the
+ * object look like a matrix or vector with global indexing
+ * operations, and one that makes the object look like a collection of
+ * sub-blocks that can be individually addressed. Depending on
+ * context, one may wish to use one or the other interface.
+ *
+ * Typically, one defines the sub-structure of a matrix or vector by
+ * grouping the degrees of freedom that make up groups of physical
+ * quantities (for example all velocities) into individual blocks of
+ * the linear system. This is defined in more detail below in the
+ * glossary entry on @ref GlossBlock "Block (finite element)".
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossBlock <b>Block</b></dt>
- * <dd>Blocks were introduced in BlockVector,
- * BlockSparseMatrix and related classes. These are used to reflect the
- * structure of a PDE system in linear algebra, in particular allowing
- * for modular solvers for problems with multiple solution components.
+ * <dd>
  * How to implement this is described in more detail in the
  * documentation of FESystem, the
  * @ref vector_valued module and the tutorial programs referenced
