@@ -104,18 +104,49 @@
  * step_22 "step-22" or step-31 tutorial programs, as opposed
  * to step-20).  </dd>
  *
+ *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
  *
- * <dd>For vector functions, component denotes the index in the
- * vector. For instance, in the mixed Laplacian system, the first
- * <tt>dim</tt> components are the derivatives in each coordinate
- * direction and the last component is the primal function <i>u</i>.
+ * <dd> When considering systems of equations in which the solution is not
+ * just a single scalar function, we say that we have a <i>vector system</i>
+ * with a <i>vector-valued solution</i>. For example, the vector solution in
+ * the elasticity equation considered in step-8 is $u=(u_x,u_y,u_z)^T$
+ * consisting of the displacements in each of the three coordinate
+ * directions. The solution then has three elements. Similarly, the 3d Stokes
+ * equation considered in step-22 has four elements: $u=(v_x,v_y,v_z,p)^T$. We
+ * call the elements of the vector-valued solution <i>components</i> in
+ * deal.II. To be well-posed, for the solution to have $n$ components, there
+ * need to be $n$ partial differential equations to describe them.
  *
- * Originally, components were not distinguished from @ref GlossBlock
- * "blocks", but since the introduction of non-@ref GlossPrimitive
- * "primitive" elements, they have to be distinguished. See
- * FiniteElementData::n_components() and the documentation of
- * FiniteElement</dd>
+ * In finite element programs, one frequently wants to address individual
+ * elements (components) of this vector-valued solution, or sets of
+ * components. For example, we do this extensively in step-8, and a lot
+ * of documentation is also provided in the module on
+ * @ref vector_valued "Handling vector valued problems". If you are thinking
+ * only in terms of the partial differential equation (not in terms of
+ * its discretization), then the concept of <i>components</i> is the natural
+ * one.
+ *
+ * On the other hand, when talking about finite elements and degrees of
+ * freedom, <i>components</i> are not always the correct concept because
+ * components are not always individually addressable. In particular, this is
+ * the case for @refGlossPrimitive "non-primitive finite elements". Similarly,
+ * one may not always <i>want</i> to address individual components but rather
+ * sets of components &mdash; e.g. all velocity components together, and
+ * separate from the pressure in the Stokes system, without further splitting
+ * the velocities into their individual components. In either case, the
+ * correct concept to think in is that of a @ref GlossBlockFE "block".  Since
+ * each component, if individually addressable, is also a block, thinking in
+ * terms of blocks is most frequently the better strategy.
+ *
+ * For a given finite element, the number of components can be queried using
+ * the FiniteElementData::n_components() function. Individual components of a
+ * shape function (if the element is primitive) can be queried using the
+ * FiniteElement::shape_value_component() and
+ * FiniteElement::shape_grad_component() functions on the reference cell. The
+ * FEValues::shape_value_component() and FEValues::shape_grad_component()
+ * functions do the same on a real cell. See also the documentation of the
+ * FiniteElement and FEValues classes.</dd>
  *
  *
  * <dt class="glossary">@anchor GlossCompress <b>Compressing distributed
@@ -460,20 +491,18 @@ Article{JK10,
  * </table>
  *
  * <dt class="glossary">@anchor GlossPrimitive <b>Primitive finite
- * elements</b></dt> <dd>Finite element shape function sets with a unique
- * relation from shape function number to vector @ref GlossComponent
- * "component". What this means is that each shape function of a
- * vector-valued element has exactly one-nonzero component if an
- * element is primitive. This includes, in particular, all scalar
- * elements as well as vector-valued elements assembled via the
- * FESystem class from other primitive (for example scalar) elements
- * as shown in step-8, @ref step_29 "step_29", @ref
- * step_22 "step-22" and several others. On the other hand,
- * the FE_RaviartThomas class used
- * in step-20 and step-21, or the
- * FE_Nedelec class provide non-primitive finite elements because
- * there, each vector-value shape function may have several non-zero
- * components.</dd>
+ * elements</b></dt>
+ * <dd>A finite element (described by its shape functions) is primitive if
+ * there is a unique relation from shape function number to vector @ref
+ * GlossComponent "component". What this means is that each shape function of
+ * a vector-valued element has exactly one nonzero component if an element is
+ * primitive. This includes, in particular, all scalar elements as well as
+ * vector-valued elements assembled via the FESystem class from other
+ * primitive (for example scalar) elements as shown in step-8, 
+ * step-29, step-22 and several others. On the other hand,
+ * the FE_RaviartThomas class used in step-20 and step-21, or the FE_Nedelec
+ * class provide non-primitive finite elements because there, each
+ * vector-value shape function may have several non-zero components.</dd>
  *
  * <dt class="glossary">@anchor GlossReferenceCell <b>Reference cell</b></dt>
  * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
