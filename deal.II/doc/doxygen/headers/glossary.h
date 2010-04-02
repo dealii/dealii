@@ -80,29 +80,97 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossBlock <b>Block</b></dt>
+ * <dt class="glossary">@anchor GlossBlock <b>Block (finite element)</b></dt>
  * <dd>
- * How to implement this is described in more detail in the
- * documentation of FESystem, the
- * @ref vector_valued module and the tutorial programs referenced
- * therein.
+ * <i>Intent:</i>
+ * Blocks are a generalization of @ref GlossComponent "components" in that
+ * they group together one or more components of a vector-valued finite
+ * element that one would like to consider jointly. One often wants to do this
+ * to define operators that correspond to the structure of a (part of a)
+ * differential operator acting on the vector-valued solution, such as the
+ * Schur complement solver in step-20, or the block solvers and
+ * preconditioners of step-22.
  *
- * Originally, this concept was intermixed with the idea of the vector
- * @ref GlossComponent "component". Since the introduction of
- * non-@ref GlossPrimitive "primitive" elements, they became different. Take
- * for instance the solution of the mixed Laplacian system with
- * FE_RaviartThomas. There, the first <tt>dim</tt> components are the
- * directional derivatives. Since the shape functions are linear
- * combinations of those, they constitute only a single block. The
- * primal function <i>u</i> would be in the second block, but in the
- * <tt>dim+1</tt>st component.
+ * For the purpose of a discretization, blocks are the better concept to use
+ * since it is not always possible to address individual components of a
+ * solution. This is, in particular, the case for non-@ref GlossPrimitive
+ * "primitive" elements. Take for instance the solution of the mixed Laplacian
+ * system with the FE_RaviartThomas element (see step-20). There, the first
+ * <tt>dim</tt> components are the directional velocities. Since the shape
+ * functions are linear combinations of those, these <tt>dim</tt> components
+ * constitute only a single block. On the other hand, the pressure variable is
+ * scalar and would form a the second block, but in the <tt>dim+1</tt>st
+ * component.
  *
- * In most cases, when you subdivide a matrix or vector into blocks, you do so
- * by creating one block for each vector component. However, this is not
- * always so, and the DoFRenumbering::component_wise function allows to group
- * several vector components into the same block (see, for example, the @ref
- * step_22 "step-22" or step-31 tutorial programs, as opposed
- * to step-20).  </dd>
+ * The minimal size of each block is dictated by the underlying finite element
+ * (a blocks consists of a single component for scalar elements, but in the
+ * case of the FE_RaviartThomas, for example, a block consists of <tt>dim</tt>
+ * components). However, several such minimal blocks can be grouped together
+ * into user defined blocks at will, and in accordance with the
+ * application. For instance, for the $Q_2^d\times Q^1$ (Taylor-Hood) Stokes
+ * element, there are $d+1$ components each of which could in principle form
+ * its own block. But we are typically more interested in having only two
+ * blocks, one of which consists of all the velocity vector components
+ * (i.e. this block would have $d$ components) and the other having only the
+ * single pressure component.
+ *
+ * <i>Implementation:</i>
+ * deal.II has a number of different finite element classes, all of which are
+ * derived from the FiniteElement base class (see the @ref feall "module on
+ * finite element classes"). With one exception, whether they are scalar or
+ * vector valued, they all define a single block: all vector components the
+ * finite element defines through its FiniteElement::n_components() function
+ * form a single block, i.e. FiniteElement::n_blocks() returns one.
+ *
+ * The exception is the FESystem class that takes multiple simpler elements
+ * and connects them into more complicated ones. Consequently, it can have
+ * more than one block. A FESystem has as many blocks as it has base elements
+ * times their multiplicity (see the constructors of FESystem to understand
+ * this statement). In other words, it does not care how many blocks each base
+ * element has, and consequently you can produce a Stokes element that has
+ * only two blocks by creating the object
+ * @code
+ *    FESystem<dim> (FESystem<dim> (FE_Q<dim>(2), dim), 1,
+ *                   FE_Q<dim>(1), 1);
+ * @endcode
+ * On the other hand, we could have produced a similar object with dim+1
+ * blocks using
+ * @code
+ *    FESystem<dim> (FE_Q<dim>(2), dim,
+ *                   FE_Q<dim>(1), 1);
+ * @endcode
+ * With the exception of the number of blocks, the two objects are the
+ * same for all practical purposes, however.
+ *
+ * <i>Global degrees of freedom:</i>
+ * While we have defined blocks above in terms of the vector components of a
+ * vector-valued solution function (or, equivalently, in terms of the
+ * vector-valued finite element space), every shape function of a finite
+ * element is part of one block or another. Consequently, we can partition all
+ * degrees of freedom defined on a DoFHandler into individual blocks. Since by
+ * default the DoFHandler class enumerates degrees of freedom in a more or
+ * less random way, you will first want to call the
+ * DoFRenumbering::component_wise function to make sure that all degrees of
+ * freedom that correspond to a single block are enumerated consecutively.
+ *
+ * If you do this, you naturally partition matrices and vectors into blocks as
+ * well (see @ref GlossBlockLA "block (linear algebra)).  In most cases, when
+ * you subdivide a matrix or vector into blocks, you do so by creating one
+ * block for each block defined by the finite element (i.e. in most practical
+ * cases the FESystem object). However, this needs not be so: the
+ * DoFRenumbering::component_wise function allows to group several vector
+ * components or finite element blocks into the same logical block (see, for
+ * example, the @ref step_22 "step-22" or step-31 tutorial programs, as
+ * opposed to step-20). As a consequence, using this feature, we can achieve
+ * the same result, i.e. subdividing matrices into $2\times 2$ blocks and
+ * vectors into 2 blocks, for the second way of creating a Stokes element
+ * outlined above using an extra argument as we would have using the first way
+ * of creating the Stokes element with two blocks right away.
+ *
+ * More information on this topic can be found in the documentation of
+ * FESystem, the @ref vector_valued module and the tutorial programs
+ * referenced therein.
+ * </dd>
  *
  *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
