@@ -52,6 +52,7 @@ namespace PETScWrappers
  * of these blocks to be stored on the local process.
  *
  * @ingroup Vectors
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2004
  */
     class BlockVector : public BlockVectorBase<Vector>

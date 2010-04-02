@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,6 +46,7 @@ template <typename number>     class BlockSparseMatrixEZ;
  * want to do things differently depending on whether a template type
  * denotes a regular or a block matrix type.
  *
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2009
  */
 template <typename MatrixType>
@@ -428,6 +429,7 @@ namespace BlockMatrixIterators
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
  *
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename MatrixType>

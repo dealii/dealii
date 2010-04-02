@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,6 +36,7 @@ DEAL_II_NAMESPACE_OPEN
  * apply the @p vmult of the original matrix (or preconditioner) to a
  * block vector.
  *
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX>

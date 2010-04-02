@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -91,7 +91,7 @@ template <typename> class Vector;
  * GrowingVectorMemory type, since it remembers the vector and avoids
  * reallocating.
  *
- * @ line Growing
+ * @line Growing
  *
  * Now, we are ready to build a <i>2x2</i> BlockMatrixArray.
  * @line Block
@@ -116,7 +116,8 @@ template <typename> class Vector;
  * and is described in the documentation of
  * BlockTrianglePrecondition.
  *
- * @author Guido Kanschat, 2000 - 2005
+ * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @author Guido Kanschat, 2000-2005
  */
 template <typename number = double>
 class BlockMatrixArray : public Subscriptor

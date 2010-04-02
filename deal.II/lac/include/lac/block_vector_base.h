@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -649,6 +649,7 @@ namespace internal
  * debug version does not check consistency here for performance
  * reasons!
  *
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <class VectorType>

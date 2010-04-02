@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -39,6 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * the calls to the individual blocks to the functions implemented in the base
  * class. See there also for a description of when this class is useful.
  *
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename number>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,6 +65,7 @@ namespace TrilinosWrappers
  * the same reason as is documented with the BlockSparsityPattern class.
  *
  * @ingroup Matrix1
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
   class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,6 +73,7 @@ namespace TrilinosWrappers
  * You will in general not want to use this class, but one of the
  * derived classes.
  *
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2000, 2001
  */
 template <class SparsityPatternBase>

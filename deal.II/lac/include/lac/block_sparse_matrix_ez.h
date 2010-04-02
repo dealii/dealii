@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,6 +41,7 @@ template <typename Number> class BlockVector;
  * are functions for the multiplication with BlockVector and
  * access to the individual blocks.
  *
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2002, 2003
  */
 template<typename Number>

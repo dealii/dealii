@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,6 +57,7 @@ namespace PETScWrappers
  * the same reason as is documented with the BlockSparsityPattern class.
  *
  * @ingroup Matrix1
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2004
  */
     class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>

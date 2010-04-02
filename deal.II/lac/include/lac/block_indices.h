@@ -31,6 +31,7 @@ DEAL_II_NAMESPACE_OPEN
  * translate global row and column indices to local ones.
  *
  * @ingroup data
+ * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2007
  */
 class BlockIndices : public Subscriptor
