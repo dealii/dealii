@@ -1,6 +1,6 @@
 //----------------------------  data_out_04.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2004, 2004, 2007 by the deal.II authors
 //
@@ -38,7 +38,7 @@ class XDataOut : public DataOut<dim>
       { return DataOut<dim>::get_patches(); }
 
     std::vector<std::string>
-    get_dataset_names () const    
+    get_dataset_names () const
       { return DataOut<dim>::get_dataset_names();  }
 
     std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
@@ -70,7 +70,7 @@ class XDataOutReader : public DataOutReader<dim>
       { return DataOutReader<dim>::get_patches(); }
 
     std::vector<std::string>
-    get_dataset_names () const    
+    get_dataset_names () const
       { return DataOutReader<dim>::get_dataset_names();  }
 
     std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
@@ -92,7 +92,7 @@ check_this (const DoFHandler<dim> &dof_handler,
   data_out.add_data_vector (v_node, "node_data");
   data_out.add_data_vector (v_cell, "cell_data");
   data_out.build_patches ();
-  
+
   {
     std::ofstream tmp ("data_out_04.tmp");
     data_out.write_deal_II_intermediate (tmp);
@@ -102,14 +102,14 @@ check_this (const DoFHandler<dim> &dof_handler,
   {
     std::ifstream tmp ("data_out_04.tmp");
     reader.read (tmp);
-  }  
+  }
 
 				   // finally make sure that we have
 				   // read everything back in
 				   // correctly
   Assert (data_out.get_dataset_names() == reader.get_dataset_names(),
 	  ExcInternalError());
-  
+
   Assert (data_out.get_patches().size() == reader.get_patches().size(),
  	  ExcInternalError());
 
@@ -124,29 +124,29 @@ check_this (const DoFHandler<dim> &dof_handler,
 	  ExcInternalError());
   for (unsigned int i=0; i<data_out.get_vector_data_ranges().size(); ++i)
     {
-      deallog << data_out.get_vector_data_ranges()[i].template get<0>()
+      deallog << std::get<0>(data_out.get_vector_data_ranges()[i])
 	      << ' '
-	      << data_out.get_vector_data_ranges()[i].template get<1>()
+	      << std::get<1>(data_out.get_vector_data_ranges()[i])
 	      << ' '
-	      << data_out.get_vector_data_ranges()[i].template get<2>()
+	      << std::get<2>(data_out.get_vector_data_ranges()[i])
 	      << std::endl;
-      Assert (data_out.get_vector_data_ranges()[i].template get<0>()
+      Assert (std::get<0>(data_out.get_vector_data_ranges()[i])
 	      ==
-	      reader.get_vector_data_ranges()[i].template get<0>(),
+	      std::get<0>(reader.get_vector_data_ranges()[i]),
 	      ExcInternalError());
-      Assert (data_out.get_vector_data_ranges()[i].template get<1>()
+      Assert (std::get<1>(data_out.get_vector_data_ranges()[i])
 	      ==
-	      reader.get_vector_data_ranges()[i].template get<1>(),
+	      std::get<1>(reader.get_vector_data_ranges()[i]),
 	      ExcInternalError());
-      Assert (data_out.get_vector_data_ranges()[i].template get<2>()
+      Assert (std::get<2>(data_out.get_vector_data_ranges()[i])
 	      ==
-	      reader.get_vector_data_ranges()[i].template get<2>(),
+	      std::get<2>(reader.get_vector_data_ranges()[i]),
 	      ExcInternalError());
     }
-  
+
 				   // for good measure, delete tmp file
   remove ("data_out_04.tmp");
-  
+
   deallog << "OK" << std::endl;
 }
 
