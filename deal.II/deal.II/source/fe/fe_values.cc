@@ -1054,7 +1054,7 @@ namespace internal
       for (unsigned int component=0; component<n_scalars; ++component)
 	{
 	  typedef dealii::FEValuesViews::Scalar<dim,spacedim> ScalarView;
-	  scalars[component].ScalarView::~ScalarView ();
+	  scalars[component].ScalarView::~Scalar ();
 	  new (&scalars[component])
 	    dealii::FEValuesViews::Scalar<dim,spacedim>(fe_values,
 							component);
@@ -1074,7 +1074,7 @@ namespace internal
       for (unsigned int component=0; component<n_vectors; ++component)
 	{
 	  typedef dealii::FEValuesViews::Vector<dim,spacedim> VectorView;
-	  vectors[component].VectorView::~VectorView ();
+	  vectors[component].VectorView::~Vector ();
 	  new (&vectors[component])
 	    dealii::FEValuesViews::Vector<dim,spacedim>(fe_values,
 							component);
@@ -1090,7 +1090,7 @@ namespace internal
       for (unsigned int component = 0; component < n_symmetric_second_order_tensors; ++component)
 	{
 	  typedef dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim> SymmetricTensorView;
-	  symmetric_second_order_tensors[component].SymmetricTensorView::~SymmetricTensorView();
+	  symmetric_second_order_tensors[component].SymmetricTensorView::~SymmetricTensor();
 	  new (&symmetric_second_order_tensors[component])
 	    dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim > (fe_values,
 								       component);
@@ -3127,7 +3127,7 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   if (dim != spacedim-1)
     Assert ((update_flags & update_normal_vectors) == false,
 	    typename FEVB::ExcInvalidUpdateFlag());
-  
+
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
 				   // then get objects into which the
