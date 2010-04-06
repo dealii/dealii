@@ -41,16 +41,16 @@ class XDataOut : public DataOut<dim>
     get_dataset_names () const    
       { return DataOut<dim>::get_dataset_names();  }
 
-    std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const
       {
 					 // if we have enough components for a
 					 // vector solution, make the last dim
 					 // components a vector
-	std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+	std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
 	  retval;
 	if (get_dataset_names().size() >= dim)
-	  retval.push_back (boost::tuple
+	  retval.push_back (std_cxx1x::tuple
 			    <unsigned int, unsigned int, std::string>
 			    (get_dataset_names().size()-dim,
 			     get_dataset_names().size()-1,
@@ -73,7 +73,7 @@ class XDataOutReader : public DataOutReader<dim>
     get_dataset_names () const    
       { return DataOutReader<dim>::get_dataset_names();  }
 
-    std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const
       {
 	return DataOutReader<dim>::get_vector_data_ranges ();

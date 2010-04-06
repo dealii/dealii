@@ -41,7 +41,7 @@ class XDataOut : public DataOutFaces<dim>
     get_dataset_names () const    
       { return DataOutFaces<dim>::get_dataset_names();  }
 
-    std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const
       {
 	return DataOutFaces<dim>::get_vector_data_ranges ();
@@ -62,7 +62,7 @@ class XDataOutReader : public DataOutReader<dim-1,dim>
     get_dataset_names () const    
       { return DataOutReader<dim-1,dim>::get_dataset_names();  }
 
-    std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const
       {
 	return DataOutReader<dim-1,dim>::get_vector_data_ranges ();

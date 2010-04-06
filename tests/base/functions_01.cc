@@ -203,7 +203,7 @@ check_function(const Functions::FlowFunction<dim>& f,
   DataOutBase dout;
   DataOutBase::DXFlags dxflags;
   DataOutBase::GnuplotFlags gflags;
-  std::vector<boost::tuple<unsigned int, unsigned int, std::string> > vectors;
+  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
   if (dim==2)
     dout.write_gnuplot(patches, names, vectors, gflags, out);
   else

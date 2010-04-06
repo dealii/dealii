@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,8 +44,8 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
   DataOutBase::VtkFlags vtkflags;
   DataOutBase::Deal_II_IntermediateFlags deal_II_intermediateflags;
 
-  std::vector<boost::tuple<unsigned int, unsigned int, std::string> > vectors;
-  
+  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
+
   WRITE(dx);
   if (dim==2)
     WRITE(eps);
@@ -110,7 +110,7 @@ int PatchInfo<2>::neighbors[4][4]
 = {{-1,  1,  2, -1}
   ,{-1, -1,  3,  0}
   ,{ 0,  3, -1, -1}
-  ,{ 1, -1, -1,  2}  
+  ,{ 1, -1, -1,  2}
 };
 
 
@@ -124,7 +124,7 @@ int PatchInfo<3>::neighbors[8][6]
   ,{-1, -1, -1, -1, -1, -1}
   ,{-1, -1, -1, -1, -1, -1}
   ,{-1, -1, -1, -1, -1, -1}
-  ,{-1, -1, -1, -1, -1, -1}  
+  ,{-1, -1, -1, -1, -1, -1}
 };
 
 
@@ -164,7 +164,7 @@ create_patches(std::vector<DataOutBase::Patch<dim,spacedim> >& patches)
 {
   const unsigned int ncells = GeometryInfo<dim>::vertices_per_cell;
   const unsigned int nsub = 3;
-  
+
   patches.resize(ncells);
 
   for (unsigned int c = 0; c < ncells;++c)
@@ -211,10 +211,10 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-//TODO: write_eps says ExcNotImplemented  
+//TODO: write_eps says ExcNotImplemented
 //  test<1,1>(logfile);
   test<1,2>(logfile);
-//TODO: Instantiations missing (linker error)  
+//TODO: Instantiations missing (linker error)
 //  test<1,3>(logfile);
   test<2,2>(logfile);
   test<2,3>(logfile);
