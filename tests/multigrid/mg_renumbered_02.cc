@@ -49,7 +49,7 @@
 
 #include <fstream>
 #include <sstream>
-#include <boost/bind.hpp>
+#include <base/std_cxx1x/bind.h>
 
 using namespace dealii;
 
@@ -118,9 +118,9 @@ void diff (Vector<double> &diff, const MGDoFHandler<dim> &dof,
     for(unsigned int i=0; i<dofs_per_cell/n_comp; ++i)
     {
       const unsigned int ni = n_comp* i;
-      const unsigned int i0 = mg_dof_indices[ni]; 
-      const unsigned int i1 = mg_dof_indices[ni+1]; 
-      const unsigned int i2 = mg_dof_indices[ni+2]; 
+      const unsigned int i0 = mg_dof_indices[ni];
+      const unsigned int i1 = mg_dof_indices[ni+1];
+      const unsigned int i2 = mg_dof_indices[ni+2];
       diff(i0) = 2*v(i0) - v(i1);
       diff(i1) = 3*v(i1) - 2*v(i2);
       diff(i2) = v(i2) - 3*v(i0);
@@ -164,7 +164,7 @@ void OutputCreator<dim>::cell(
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   const std::vector<std::vector<double> >& uh = info.values[0];
-  
+
   const unsigned int square_root = std::pow(fe.n_quadrature_points, 1./dim)+.5;
   for (unsigned int k1=0; k1<square_root; ++k1)
   {
@@ -180,7 +180,7 @@ void OutputCreator<dim>::cell(
 
 
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
@@ -193,7 +193,7 @@ class LaplaceProblem
     void setup_system ();
     void test ();
     void test_boundary ();
-    void output_gpl(const MGDoFHandler<dim> &dof, 
+    void output_gpl(const MGDoFHandler<dim> &dof,
         MGLevelObject<Vector<double> > &v);
     void refine_local ();
 
@@ -245,7 +245,7 @@ void LaplaceProblem<dim>::setup_system ()
 
 template <int dim>
 void
-LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof, 
+LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
     MGLevelObject<Vector<double> > &v)
 {
   MeshWorker::IntegrationWorker<dim> integration_worker;
@@ -306,7 +306,7 @@ void LaplaceProblem<dim>::test ()
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
     diff(d[l], mg_dof_handler_renumbered, u[l],l);
-    deallog << l << " " << u[l].l2_norm() << '\t' 
+    deallog << l << " " << u[l].l2_norm() << '\t'
       << d[l].l2_norm()<< std::endl;
     for(unsigned int i=0; i<d[l].size(); ++i)
       if(d[l](i)!=0)
