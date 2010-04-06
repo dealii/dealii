@@ -141,7 +141,7 @@ LogStream::get_stream()
   const unsigned int id = Threads::this_thread_id();
 
   std_cxx1x::shared_ptr<std::ostringstream>& sptr = outstreams[id];
-  if (sptr == 0)
+  if (sptr == std_cxx1x::shared_ptr<std::ostringstream>())
     {
       sptr = std_cxx1x::shared_ptr<std::ostringstream> (new std::ostringstream());
       sptr->setf(std::ios::showpoint | std::ios::left);
