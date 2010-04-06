@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,6 +34,7 @@
 #ifdef HAVE_SYS_SYSCALL_H
 #  include <sys/syscall.h>
 #endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -68,21 +69,36 @@ namespace Threads
 
     void handle_std_exception (const std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
-                << "---------------------------------------------------------"
-                << std::endl
-                << "In one of the sub-threads of this program, an exception\n"
-                << "was thrown and not caught. Since exceptions do not\n"
-                << "propagate to the main thread, the library has caught it.\n"
-                << "The information carried by this exception is given below.\n"
-                << std::endl
-                << "---------------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "---------------------------------------------------------"
-                << std::endl;
+				       // lock the following context
+				       // to ensure that we don't
+				       // print things over each other
+				       // if we have trouble from
+				       // multiple threads. release
+				       // the lock before calling
+				       // std::abort, though
+      static Mutex mutex;
+      {
+	Mutex::ScopedLock lock(mutex);
+
+	std::cerr << std::endl << std::endl
+		  << "---------------------------------------------------------"
+		  << std::endl
+		  << "In one of the sub-threads of this program, an exception\n"
+		  << "was thrown and not caught. Since exceptions do not\n"
+		  << "propagate to the main thread, the library has caught it.\n"
+		  << "The information carried by this exception is given below.\n"
+		  << std::endl
+		  << "---------------------------------------------------------"
+		  << std::endl;
+	std::cerr << "Exception message: " << std::endl
+		  << "  " << exc.what() << std::endl
+		  << "Exception type: " << std::endl
+		  << "  " << typeid(exc).name() << std::endl;
+	std::cerr << "Aborting!" << std::endl
+		  << "---------------------------------------------------------"
+		  << std::endl;
+      }
+
       std::abort ();
     }
 
@@ -90,20 +106,31 @@ namespace Threads
 
     void handle_unknown_exception ()
     {
-      std::cerr << std::endl << std::endl
-                << "---------------------------------------------------------"
-                << std::endl
-                << "In one of the sub-threads of this program, an exception\n"
-                << "was thrown and not caught. Since exceptions do not\n"
-                << "propagate to the main thread, the library has caught it.\n"
-                << "The information carried by this exception is given below.\n"
-                << std::endl
-                << "---------------------------------------------------------"
-                << std::endl;
-      std::cerr << "Type of exception is unknown, but not std::exception.\n"
-                << "No additional information is available.\n"
-                << "---------------------------------------------------------"
-                << std::endl;
+				       // lock the following context
+				       // to ensure that we don't
+				       // print things over each other
+				       // if we have trouble from
+				       // multiple threads. release
+				       // the lock before calling
+				       // std::abort, though
+      static Mutex mutex;
+      {
+	Mutex::ScopedLock lock(mutex);
+
+	std::cerr << std::endl << std::endl
+		  << "---------------------------------------------------------"
+		  << std::endl
+		  << "In one of the sub-threads of this program, an exception\n"
+		  << "was thrown and not caught. Since exceptions do not\n"
+		  << "propagate to the main thread, the library has caught it.\n"
+		  << std::endl
+		  << "---------------------------------------------------------"
+		  << std::endl;
+	std::cerr << "Type of exception is unknown, but not std::exception.\n"
+		  << "No additional information is available.\n"
+		  << "---------------------------------------------------------"
+		  << std::endl;
+      }
       std::abort ();
     }
   }
