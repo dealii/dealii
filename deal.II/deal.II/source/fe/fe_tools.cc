@@ -51,7 +51,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace 
+namespace
 {
                                    // a shared pointer to factory
                                    // objects, to ensure that they get
@@ -62,7 +62,7 @@ namespace
   typedef
   std_cxx1x::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> >
   FEFactoryPointer;
-  
+
                                    // a function that returns the
                                    // default set of finite element
                                    // names and factory objects for
@@ -70,7 +70,7 @@ namespace
                                    // fe_name_map below
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
     static
-#endif  
+#endif
   std::map<std::string,FEFactoryPointer>
   get_default_fe_names ()
   {
@@ -101,9 +101,9 @@ namespace
 
     return default_map;
   }
-  
 
-  
+
+
                                    // have a lock that guarantees that
                                    // at most one thread is changing
                                    // and accessing the fe_name_map
@@ -152,7 +152,7 @@ namespace
 
 
 
-namespace 
+namespace
 {
 
                                    // forwarder function for
@@ -176,7 +176,7 @@ namespace
     fe2.get_interpolation_matrix (fe1, interpolation_matrix);
   }
 
-  
+
   template <int dim, typename number, int spacedim>
   inline
   void gim_forwarder (const FiniteElement<dim,spacedim> &fe1,
@@ -221,7 +221,7 @@ namespace
 
     Assert (dim<10, ExcNotImplemented());
     const char dim_char = '0'+dim;
-    
+
     if ((position+3 < name.size())
 	&&
 	(name[position] == '<')
@@ -252,23 +252,23 @@ void FETools::compute_component_wise(
   Assert(renumbering.size() == element.dofs_per_cell,
 	 ExcDimensionMismatch(renumbering.size(),
 			      element.dofs_per_cell));
-  
+
   comp_start.resize(element.n_base_elements());
-  
+
   unsigned int k=0;
   for (unsigned int i=0;i<comp_start.size();++i)
     {
       comp_start[i].resize(element.element_multiplicity(i));
       const unsigned int increment
 	= element.base_element(i).dofs_per_cell;
-      
+
       for (unsigned int j=0;j<comp_start[i].size();++j)
 	{
 	  comp_start[i][j] = k;
 	  k += increment;
 	}
     }
-  
+
 				   // For each index i of the
 				   // unstructured cellwise
 				   // numbering, renumbering
@@ -298,7 +298,7 @@ void FETools::compute_block_renumbering (
   Assert(block_data.size() == element.n_blocks(),
 	 ExcDimensionMismatch(block_data.size(),
 			      element.n_blocks()));
-  
+
   unsigned int k=0;
   unsigned int i=0;
   for (unsigned int b=0;b<element.n_base_elements();++b)
@@ -310,7 +310,7 @@ void FETools::compute_block_renumbering (
 	k += element.base_element(b).n_dofs_per_cell();
       }
   Assert (i == element.n_blocks(), ExcInternalError());
-  
+
   std::vector<unsigned int> start_indices(block_data.size());
   k = 0;
   for (unsigned int i=0;i<block_data.size();++i)
@@ -321,8 +321,8 @@ void FETools::compute_block_renumbering (
 	start_indices[i] = k;
 	k += block_data[i];
       }
-  
-//TODO:[GK] This does not work for a single RT  
+
+//TODO:[GK] This does not work for a single RT
   for (unsigned int i=0;i<element.dofs_per_cell;++i)
     {
       std::pair<unsigned int, unsigned int>
@@ -352,7 +352,7 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim,spacedim> &fe1,
 				   // the FE wants to implement things
 				   // itself:
   bool fe_implements_interpolation = true;
-  try 
+  try
     {
       gim_forwarder (fe1, fe2, interpolation_matrix);
     }
@@ -382,7 +382,7 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim,spacedim> &fe1,
   Assert(fe2_support_points.size()==fe2.dofs_per_cell,
 	 typename FEL::ExcFEHasNoSupportPoints());
 
-  for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)	
+  for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)
     {
       const unsigned int i1 = fe2.system_to_component_index(i).first;
       for (unsigned int j=0; j<fe1.dofs_per_cell; ++j)
@@ -392,7 +392,7 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim,spacedim> &fe1,
 	    interpolation_matrix(i,j) = fe1.shape_value (j,fe2_support_points[i]);
 	  else
 	    interpolation_matrix(i,j)=0.;
-	}  
+	}
     }
 }
 
@@ -406,15 +406,15 @@ void FETools::get_back_interpolation_matrix(const FiniteElement<dim,spacedim> &f
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
   Assert(interpolation_matrix.m()==fe1.dofs_per_cell &&
-	 interpolation_matrix.n()==fe1.dofs_per_cell, 
+	 interpolation_matrix.n()==fe1.dofs_per_cell,
 	 ExcMatrixDimensionMismatch(interpolation_matrix.m(),
 				    interpolation_matrix.n(),
 				    fe1.dofs_per_cell,
 				    fe1.dofs_per_cell));
-    
+
   FullMatrix<number> first_matrix (fe2.dofs_per_cell, fe1.dofs_per_cell);
   FullMatrix<number> second_matrix(fe1.dofs_per_cell, fe2.dofs_per_cell);
-  
+
   get_interpolation_matrix(fe1, fe2, first_matrix);
   get_interpolation_matrix(fe2, fe1, second_matrix);
 
@@ -432,18 +432,18 @@ void FETools::get_interpolation_difference_matrix (const FiniteElement<dim,space
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
   Assert(difference_matrix.m()==fe1.dofs_per_cell &&
-	 difference_matrix.n()==fe1.dofs_per_cell, 
+	 difference_matrix.n()==fe1.dofs_per_cell,
 	 ExcMatrixDimensionMismatch(difference_matrix.m(),
 				    difference_matrix.n(),
 				    fe1.dofs_per_cell,
 				    fe1.dofs_per_cell));
-   
+
   FullMatrix<number> interpolation_matrix(fe1.dofs_per_cell);
   get_back_interpolation_matrix(fe1, fe2, interpolation_matrix);
-  
+
   for (unsigned int i=0; i<fe1.dofs_per_cell; ++i)
     difference_matrix(i,i) = 1.;
-  
+
 				   // compute difference
   difference_matrix.add (-1, interpolation_matrix);
 }
@@ -463,7 +463,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim,spacedim> &fe1,
 				    fe2.dofs_per_cell,
 				    fe1.dofs_per_cell));
   matrix = 0;
-  
+
   unsigned int n1 = fe1.dofs_per_cell;
   unsigned int n2 = fe2.dofs_per_cell;
 
@@ -471,13 +471,13 @@ void FETools::get_projection_matrix (const FiniteElement<dim,spacedim> &fe1,
   				   // the unit cell
   Triangulation<dim,spacedim> tr;
   GridGenerator::hyper_cube(tr);
-  
+
 				   // Choose a quadrature rule
 				   // Gauss is exact up to degree 2n-1
   const unsigned int degree = std::max(fe1.tensor_degree(), fe2.tensor_degree());
   Assert (degree != numbers::invalid_unsigned_int,
 	  ExcNotImplemented());
-  
+
   QGauss<dim> quadrature(degree+1);
 				   // Set up FEValues.
   const UpdateFlags flags = update_values | update_quadrature_points | update_JxW_values;
@@ -505,14 +505,14 @@ void FETools::get_projection_matrix (const FiniteElement<dim,spacedim> &fe1,
 				   // mass matrix to be
 				   // well-conditioned
   mass.gauss_jordan();
-  
+
 				   // Now, test every function of fe1
 				   // with test functions of fe2 and
 				   // compute the projection of each
 				   // unit vector.
   Vector<double> b(n2);
   Vector<double> x(n2);
-  
+
   for (unsigned int j=0;j<n1;++j)
     {
       b = 0.;
@@ -524,7 +524,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim,spacedim> &fe1,
             const double v = val2.shape_value(i,k);
             b(i) += u*v*w;
           }
-      
+
 				       // Multiply by the inverse
       mass.vmult(x,b);
       for (unsigned int i=0;i<n2;++i)
@@ -545,17 +545,17 @@ FETools::compute_node_matrix(
   Assert (N.m()==n_dofs, ExcDimensionMismatch(N.m(), n_dofs));
 
   const std::vector<Point<dim> >& points = fe.get_generalized_support_points();
-  
+
 				   // We need the values of the
 				   // polynomials in all generalized
 				   // support points.
   std::vector<std::vector<double> >
     values (dim, std::vector<double>(points.size()));
-  
+
 				   // In this vector, we store the
 				   // result of the interpolation
   std::vector<double> local_dofs(n_dofs);
-  
+
 				   // One row per shape
 				   // function. Remember that these
 				   // are the 'raw' shape functions
@@ -613,7 +613,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
   unsigned int ref_case = (isotropic_only)
 			  ? RefinementCase<dim>::isotropic_refinement
 			  : RefinementCase<dim>::cut_x;
-  
+
   for (;ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
     {
       const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
@@ -622,7 +622,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 	  Assert(matrices[ref_case-1][i].n() == n, ExcDimensionMismatch(matrices[ref_case-1][i].n(),n));
 	  Assert(matrices[ref_case-1][i].m() == n, ExcDimensionMismatch(matrices[ref_case-1][i].m(),n));
 	}
-  
+
                                    // Set up meshes, one with a single
                                    // reference cell and refine it once
       Triangulation<dim,spacedim> tria;
@@ -633,21 +633,21 @@ FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
       MappingCartesian<dim> mapping;
       QGauss<dim> q_fine(degree+1);
       const unsigned int nq = q_fine.size();
-  
+
       FEValues<dim> fine (mapping, fe, q_fine,
 			  update_quadrature_points | update_JxW_values | update_values);
-  
+
 				       // We search for the polynomial on
 				       // the small cell, being equal to
 				       // the coarse polynomial in all
 				       // quadrature points.
-				    
+
 				       // First build the matrix for this
 				       // least squares problem. This
 				       // contains the values of the fine
 				       // cell polynomials in the fine
 				       // cell grid points.
-				    
+
 				       // This matrix is the same for all
 				       // children.
       fine.reinit(tria.begin_active());
@@ -658,10 +658,10 @@ FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 	    A(k*nd+d,j) = fine.shape_value_component(j,k,d);
 
       Householder<double> H(A);
-  
+
       Vector<number> v_coarse(nq*nd);
       Vector<number> v_fine(n);
-  
+
       unsigned int cell_number = 0;
       for (typename Triangulation<dim>::active_cell_iterator fine_cell
 	     = tria.begin_active();
@@ -680,7 +680,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 
 	  FullMatrix<double> &this_matrix = matrices[ref_case-1][cell_number];
 	  v_coarse = 0;
-      
+
 					   // Compute this once for each
 					   // coarse grid basis function
 	  for (unsigned int i=0;i<n;++i)
@@ -707,7 +707,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 					       // problem.
 	      const double result = H.least_squares(v_fine, v_coarse);
 	      Assert (result < 1.e-12, ExcLeastSquaresError(result));
-	    
+
 					       // Copy into the result
 					       // matrix. Since the matrix
 					       // maps a coarse grid
@@ -744,13 +744,13 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
   const unsigned int n  = fe.dofs_per_face;
   const unsigned int nd = fe.n_components();
   const unsigned int degree = fe.degree;
-  
+
   for (unsigned int i=0;i<nc;++i)
     {
       Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n(),n));
       Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
     }
-  
+
                                    // Set up meshes, one with a single
                                    // reference cell and refine it once
   Triangulation<dim,spacedim> tria;
@@ -760,7 +760,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
   MappingCartesian<dim> mapping;
   QGauss<dim-1> q_gauss(degree+1);
   const Quadrature<dim> q_fine = QProjector<dim>::project_to_face(q_gauss, face_fine);
-  
+
   const unsigned int nq = q_fine.size();
 
 				   // In order to make the loops below
@@ -815,21 +815,21 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 	}
     }
   Assert (k == fe.dofs_per_face, ExcInternalError());
-  
+
   FEValues<dim> fine (mapping, fe, q_fine,
 		      update_quadrature_points | update_JxW_values | update_values);
-  
+
 				   // We search for the polynomial on
 				   // the small cell, being equal to
 				   // the coarse polynomial in all
 				   // quadrature points.
-				    
+
 				   // First build the matrix for this
 				   // least squares problem. This
 				   // contains the values of the fine
 				   // cell polynomials in the fine
 				   // cell grid points.
-				    
+
 				   // This matrix is the same for all
 				   // children.
   fine.reinit(tria.begin_active());
@@ -840,27 +840,27 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 	A(k*nd+d,j) = fine.shape_value_component(face_f_dofs[j],k,d);
 
   Householder<double> H(A);
-  
+
   Vector<number> v_coarse(nq*nd);
   Vector<number> v_fine(n);
-  
-  
-  
+
+
+
   for (unsigned int cell_number = 0; cell_number < GeometryInfo<dim>::max_children_per_face;
        ++cell_number)
     {
       const Quadrature<dim> q_coarse
 	= QProjector<dim>::project_to_subface(q_gauss, face_coarse, cell_number);
       FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
-      
+
       typename Triangulation<dim,spacedim>::active_cell_iterator fine_cell
 	= tria.begin(0)->child(GeometryInfo<dim>::child_cell_on_face(
 	  tria.begin(0)->refinement_case(), face_coarse, cell_number));
       fine.reinit(fine_cell);
       coarse.reinit(tria.begin(0));
-      
+
       FullMatrix<double> &this_matrix = matrices[cell_number];
-      
+
 				       // Compute this once for each
 				       // coarse grid basis function
       for (unsigned int i=0;i<n;++i)
@@ -879,7 +879,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 					   // problem.
 	  const double result = H.least_squares(v_fine, v_coarse);
 	  Assert (result < 1.e-12, ExcLeastSquaresError(result));
-	    
+
 					   // Copy into the result
 					   // matrix. Since the matrix
 					   // maps a coarse grid
@@ -1005,11 +1005,11 @@ FETools::compute_projection_matrices(const FiniteElement<dim,spacedim>& fe,
 
       Vector<number> v_coarse(n);
       Vector<number> v_fine(n);
-  
+
       for (unsigned int cell_number=0;cell_number<nc;++cell_number)
 	{
 	  FullMatrix<double> &this_matrix = matrices[ref_case-1][cell_number];
-      
+
 					   // Compute right hand side,
 					   // which is a fine level basis
 					   // function tested with the
@@ -1019,7 +1019,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim,spacedim>& fe,
 				    fine.get_JxW_values());
 	  FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
 	  coarse.reinit(coarse_cell);
-      
+
 					   // Build RHS
 
 	  const std::vector<double> & JxW = fine.get_JxW_values();
@@ -1045,7 +1045,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim,spacedim>& fe,
 		      double update = 0;
 		      for (unsigned int d=0; d<nd; ++d)
 			for (unsigned int k=0; k<nq; ++k)
-			  update += JxW[k] * coarse.shape_value_component(i,k,d) 
+			  update += JxW[k] * coarse.shape_value_component(i,k,d)
 				           * fine.shape_value_component(j,k,d);
 		      v_fine(i) = update;
 		    }
@@ -1058,7 +1058,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim,spacedim>& fe,
 	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 		this_matrix(i,j) = v_coarse(i);
 	    }
-      
+
 					   // Remove small entries from
 					   // the matrix
 	  for (unsigned int i=0; i<this_matrix.m(); ++i)
@@ -1083,13 +1083,13 @@ FETools::interpolate(const DH1<dim, spacedim> &dof1,
   ConstraintMatrix dummy;
   dummy.close();
   interpolate(dof1, u1, dof2, dummy, u2);
-}  
+}
 
 
 
 template <int dim, int spacedim,
           template <int, int> class DH1,
-          template <int, int> class DH2,              
+          template <int, int> class DH2,
           class InVector, class OutVector>
 void
 FETools::interpolate (const DH1<dim, spacedim> &dof1,
@@ -1101,7 +1101,7 @@ FETools::interpolate (const DH1<dim, spacedim> &dof1,
   Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
 
   Assert(u1.size()==dof1.n_dofs(),
-         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
   Assert(u2.size()==dof2.n_dofs(),
          ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
@@ -1120,7 +1120,7 @@ FETools::interpolate (const DH1<dim, spacedim> &dof1,
            std::map<const FiniteElement<dim,spacedim> *,
                     std_cxx1x::shared_ptr<FullMatrix<double> > > >
     interpolation_matrices;
-  
+
   typename DH1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
                                                    endc1 = dof1.end();
   typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
@@ -1131,7 +1131,7 @@ FETools::interpolate (const DH1<dim, spacedim> &dof1,
   dofs.reserve (DoFTools::max_dofs_per_cell (dof2));
   u2 = 0;
 
-  for (; cell1!=endc1; ++cell1, ++cell2) 
+  for (; cell1!=endc1; ++cell1, ++cell2)
     {
       Assert(cell1->get_fe().n_components() == cell2->get_fe().n_components(),
              ExcDimensionMismatch (cell1->get_fe().n_components(),
@@ -1147,14 +1147,14 @@ FETools::interpolate (const DH1<dim, spacedim> &dof1,
       const bool hanging_nodes_not_allowed
         = ((cell2->get_fe().dofs_per_vertex != 0) &&
            (constraints.n_constraints() == 0));
-  
+
       if (hanging_nodes_not_allowed)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  Assert (cell1->at_boundary(face) ||
 		  cell1->neighbor(face)->level() == cell1->level(),
 		  ExcHangingNodesNotAllowed(0));
-      
-      
+
+
       const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
       const unsigned int dofs_per_cell2 = cell2->get_fe().dofs_per_cell;
       u1_local.reinit (dofs_per_cell1);
@@ -1164,19 +1164,20 @@ FETools::interpolate (const DH1<dim, spacedim> &dof1,
                                        // matrix for this particular
                                        // pair of elements is already
                                        // there
-      if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()] == 0)
+      if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get() ==
+	  0)
         {
           std_cxx1x::shared_ptr<FullMatrix<double> >
             interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
                                                           dofs_per_cell1));
           interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
             = interpolation_matrix;
-            
+
           FETools::get_interpolation_matrix(cell1->get_fe(),
                                             cell2->get_fe(),
                                             *interpolation_matrix);
         }
-      
+
       cell1->get_dof_values(u1, u1_local);
       interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
         ->vmult(u2_local, u1_local);
@@ -1218,10 +1219,10 @@ FETools::back_interpolate(const DoFHandler<dim,spacedim>    &dof1,
 {
   Assert(dof1.get_fe().n_components() == fe2.n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
-  Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+  Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
   Assert(u1_interpolated.size()==dof1.n_dofs(),
 	 ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
-  
+
 				   // For continuous elements on grids
 				   // with hanging nodes we need
 				   // hanging node
@@ -1236,14 +1237,14 @@ FETools::back_interpolate(const DoFHandler<dim,spacedim>    &dof1,
 
   Vector<typename OutVector::value_type> u1_local(dofs_per_cell1);
   Vector<typename OutVector::value_type> u1_int_local(dofs_per_cell1);
-  
+
   typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
 						 endc = dof1.end();
 
   FullMatrix<double> interpolation_matrix(dofs_per_cell1, dofs_per_cell1);
   FETools::get_back_interpolation_matrix(dof1.get_fe(), fe2,
 					 interpolation_matrix);
-  for (; cell!=endc; ++cell) 
+  for (; cell!=endc; ++cell)
     {
       if (hanging_nodes_not_allowed)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1258,7 +1259,7 @@ FETools::back_interpolate(const DoFHandler<dim,spacedim>    &dof1,
 }
 
 
-  
+
 template <int dim,
           template <int> class DH,
           class InVector, class OutVector, int spacedim>
@@ -1269,13 +1270,13 @@ FETools::back_interpolate(const DH<dim>            &dof1,
                           OutVector                &u1_interpolated)
 {
   Assert(u1.size() == dof1.n_dofs(),
-         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
   Assert(u1_interpolated.size() == dof1.n_dofs(),
 	 ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
-  
+
   Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
   Vector<typename OutVector::value_type> u1_int_local(DoFTools::max_dofs_per_cell(dof1));
-  
+
   typename DH<dim>::active_cell_iterator cell = dof1.begin_active(),
                                          endc = dof1.end();
 
@@ -1284,13 +1285,13 @@ FETools::back_interpolate(const DH<dim>            &dof1,
                                    // matrices
   std::map<const FiniteElement<dim> *,
            std_cxx1x::shared_ptr<FullMatrix<double> > > interpolation_matrices;
-  
-  for (; cell!=endc; ++cell) 
+
+  for (; cell!=endc; ++cell)
     {
       Assert(cell->get_fe().n_components() == fe2.n_components(),
              ExcDimensionMismatch(cell->get_fe().n_components(),
                                   fe2.n_components()));
-      
+
                                        // For continuous elements on
                                        // grids with hanging nodes we
                                        // need hanging node
@@ -1300,7 +1301,7 @@ FETools::back_interpolate(const DH<dim>            &dof1,
                                        // constraints are allowed.
       const bool hanging_nodes_not_allowed=
         (cell->get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
-      
+
       if (hanging_nodes_not_allowed)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  Assert (cell->at_boundary(face) ||
@@ -1308,7 +1309,7 @@ FETools::back_interpolate(const DH<dim>            &dof1,
 		  ExcHangingNodesNotAllowed(0));
 
       const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
-      
+
                                        // make sure back_interpolation
                                        // matrix is available
       if (interpolation_matrices[&cell->get_fe()] != 0)
@@ -1318,11 +1319,11 @@ FETools::back_interpolate(const DH<dim>            &dof1,
             (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
           get_back_interpolation_matrix(dof1.get_fe(), fe2,
                                         *interpolation_matrices[&cell->get_fe()]);
-        }      
-      
+        }
+
       u1_local.reinit (dofs_per_cell1);
       u1_int_local.reinit (dofs_per_cell1);
-      
+
       cell->get_dof_values(u1, u1_local);
       interpolation_matrices[&cell->get_fe()]->vmult(u1_int_local, u1_local);
       cell->set_dof_values(u1_int_local, u1_interpolated);
@@ -1330,7 +1331,7 @@ FETools::back_interpolate(const DH<dim>            &dof1,
 }
 
 
-  
+
 template <int dim, class InVector, class OutVector, int spacedim>
 void FETools::back_interpolate(const DoFHandler<dim,spacedim> &dof1,
 			       const ConstraintMatrix &constraints1,
@@ -1350,10 +1351,10 @@ void FETools::back_interpolate(const DoFHandler<dim,spacedim> &dof1,
     {
       Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
 	     ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
-      Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+      Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
       Assert(u1_interpolated.size()==dof1.n_dofs(),
 	     ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
-      
+
 				       // For continuous elements
 				       // first interpolate to dof2,
 				       // taking into account
@@ -1368,7 +1369,7 @@ void FETools::back_interpolate(const DoFHandler<dim,spacedim> &dof1,
 }
 
 
-  
+
 template <int dim, class InVector, class OutVector, int spacedim>
 void FETools::interpolation_difference (const DoFHandler<dim,spacedim> &dof1,
 					const InVector &u1,
@@ -1377,10 +1378,10 @@ void FETools::interpolation_difference (const DoFHandler<dim,spacedim> &dof1,
 {
   Assert(dof1.get_fe().n_components() == fe2.n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
-  Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+  Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
   Assert(u1_difference.size()==dof1.n_dofs(),
 	 ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
-  
+
 				   // For continuous elements on grids
 				   // with hanging nodes we need
 				   // hnaging node
@@ -1395,14 +1396,14 @@ void FETools::interpolation_difference (const DoFHandler<dim,spacedim> &dof1,
 
   Vector<typename OutVector::value_type> u1_local(dofs_per_cell);
   Vector<typename OutVector::value_type> u1_diff_local(dofs_per_cell);
-  
+
   FullMatrix<double> difference_matrix(dofs_per_cell, dofs_per_cell);
   FETools::get_interpolation_difference_matrix(dof1.get_fe(), fe2,
 					       difference_matrix);
-  
+
   typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
 						 endc = dof1.end();
-  
+
   for (; cell!=endc; ++cell)
     {
       if (hanging_nodes_not_allowed)
@@ -1441,7 +1442,7 @@ void FETools::interpolation_difference(const DoFHandler<dim,spacedim> &dof1,
     }
 }
 
-  
+
 template <int dim, class InVector, class OutVector, int spacedim>
 void FETools::project_dg(const DoFHandler<dim,spacedim> &dof1,
 			 const InVector &u1,
@@ -1451,7 +1452,7 @@ void FETools::project_dg(const DoFHandler<dim,spacedim> &dof1,
   Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
   Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
-  Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
+  Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
   Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
   typename DoFHandler<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active();
@@ -1460,14 +1461,14 @@ void FETools::project_dg(const DoFHandler<dim,spacedim> &dof1,
 
   const unsigned int n1 = dof1.get_fe().dofs_per_cell;
   const unsigned int n2 = dof2.get_fe().dofs_per_cell;
-  
+
   Vector<double> u1_local(n1);
   Vector<double> u2_local(n2);
   std::vector<unsigned int> dofs(n2);
-  
+
   FullMatrix<double> matrix(n2,n1);
   get_projection_matrix(dof1.get_fe(), dof2.get_fe(), matrix);
-  
+
   while (cell2 != end)
     {
       cell1->get_dof_values(u1, u1_local);
@@ -1477,13 +1478,13 @@ void FETools::project_dg(const DoFHandler<dim,spacedim> &dof1,
 	{
 	  u2(dofs[i])+=u2_local(i);
 	}
-     
+
       ++cell1;
       ++cell2;
     }
 }
 
-  
+
 template <int dim, class InVector, class OutVector, int spacedim>
 void FETools::extrapolate(const DoFHandler<dim,spacedim> &dof1,
 			  const InVector &u1,
@@ -1527,7 +1528,7 @@ void FETools::extrapolate(const DoFHandler<dim,spacedim> &dof1,
 					    endc = dof2.end(0);
     for (; cell!=endc; ++cell)
       Assert (cell->has_children(), ExcGridNotRefinedAtLeastOnce());
-  } 
+  }
 
 				   // then traverse grid bottom up
   for (unsigned int level=0; level<dof1.get_tria().n_levels()-1; ++level)
@@ -1587,10 +1588,10 @@ FETools::add_fe_name(const std::string& parameter_name,
 				   // for this, acquire the lock
 				   // until we quit this function
   Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
-  
+
   Assert(fe_name_map.find(name) == fe_name_map.end(),
 	 ExcMessage("Cannot change existing element in finite element name list"));
-  
+
 				   // Insert the normalized name into
 				   // the map
   fe_name_map[name] = FEFactoryPointer(factory);
@@ -1613,7 +1614,7 @@ namespace internal
 	name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
       const std::string name_part(name, 0, name_end);
       name.erase(0, name_part.size());
-  
+
 				       // now things get a little more
 				       // complicated: FESystem. it's
 				       // more complicated, since we
@@ -1658,7 +1659,7 @@ namespace internal
 						       // and read this
 						       // multiplicity
 		      name.erase(0,1);
-		  
+
 		      const std::pair<int,unsigned int> tmp
 			= Utilities::get_integer_at_position (name, 0);
 		      name.erase(0, tmp.second);
@@ -1671,7 +1672,7 @@ namespace internal
 						     // multiplicity is
 						     // 1
 		    base_multiplicities.push_back (1);
-	      
+
 						   // so that's it for
 						   // this base
 						   // element. base
@@ -1684,7 +1685,7 @@ namespace internal
 						   // '-'
 		}
 	      while (name[0] == '-');
-	  
+
 					       // so we got to the end
 					       // of the '-' separated
 					       // list. make sure that
@@ -1698,7 +1699,7 @@ namespace internal
 		      &&
 		      (base_fes.size() > 0),
 		      ExcInternalError());
-	    
+
 					       // ok, apparently
 					       // everything went ok. so
 					       // generate the composed
@@ -1721,7 +1722,7 @@ namespace internal
 						       base_multiplicities[1]);
 		    break;
 		  }
-		
+
 		  case 3:
 		  {
 		    system_element = new FESystem<dim>(*base_fes[0],
@@ -1742,13 +1743,13 @@ namespace internal
 					       // any more
 	      for (unsigned int i=0; i<base_fes.size(); ++i)
 		delete base_fes[i];
-	    
+
 					       // finally return our
 					       // findings
 					       // Add the closing ']' to
 					       // the length
 	      return system_element;
-	    
+
 	    }
 	  catch (...)
 	    {
@@ -1777,7 +1778,7 @@ namespace internal
 					   // Make sure no other thread
 					   // is just adding an element
 	  Threads::ThreadMutex::ScopedLock lock (fe_name_map_lock);
-	
+
 	  AssertThrow (fe_name_map.find(name_part) != fe_name_map.end(),
 		       FETools::ExcInvalidFEName(name));
 					   // Now, just the (degree)
@@ -1798,7 +1799,7 @@ namespace internal
 	      unsigned int position = name.find('(');
 	      const std::string quadrature_name(name, 0, position-1);
 	      name.erase(0,position);
-	      if (quadrature_name.compare("QGaussLobatto") == 0)		
+	      if (quadrature_name.compare("QGaussLobatto") == 0)
 		{
 		  const std::pair<int,unsigned int> tmp
 		    = Utilities::get_integer_at_position (name, 0);
@@ -1807,14 +1808,14 @@ namespace internal
 //return fe_name_map.find(name_part)->second->get(QGaussLobatto<1>(tmp.first));
 		  AssertThrow (false, ExcNotImplemented());
 		}
-	      else 
+	      else
 		{
 		  AssertThrow (false,ExcNotImplemented());
 		}
 	    }
 	}
-  
-    
+
+
 				       // hm, if we have come thus far, we
 				       // didn't know what to do with the
 				       // string we got. so do as the docs
@@ -1831,7 +1832,7 @@ namespace internal
 
 
 
-    
+
 
 template <int dim>
 FiniteElement<dim, dim> *
@@ -1845,7 +1846,7 @@ FETools::get_fe_from_name (const std::string &parameter_name)
        pos1 < name.size();
        pos1 = name.find('<'))
     {
-      
+
       const unsigned int pos2 = name.find('>');
 				       // If there is only a single
 				       // character between those two,
@@ -1860,7 +1861,7 @@ FETools::get_fe_from_name (const std::string &parameter_name)
 	}
       else
         Assert(pos2-pos1 == 4, ExcInvalidFEName(name));
-      
+
 				       // If pos1==pos2, then we are
 				       // probably at the end of the
 				       // string
@@ -1874,16 +1875,16 @@ FETools::get_fe_from_name (const std::string &parameter_name)
        pos < name.size();
        pos = name.find("^dim"))
     name.erase(pos+2, 2);
-  
+
 				   // Replace all occurences of "^d"
 				   // by using the actual dimension
   for (unsigned int pos = name.find("^d");
        pos < name.size();
        pos = name.find("^d"))
     name.at(pos+1) = '0' + dim;
-  
+
   try
-    {    
+    {
       FiniteElement<dim,dim> *fe = internal::get_fe_from_name<dim,dim> (name);
 
                                        // Make sure the auxiliary function
@@ -1996,7 +1997,7 @@ compute_projection_from_face_quadrature_points_matrix (const FiniteElement<dim, 
   {
 				// need an FEFaceValues object to evaluate shape function
 				// values on the specified face.
-    FEFaceValues <dim> fe_face_values (fe, lhs_quadrature, update_values); 
+    FEFaceValues <dim> fe_face_values (fe, lhs_quadrature, update_values);
     fe_face_values.reinit (cell, face); // setup shape_value on this face.
 
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -2012,7 +2013,7 @@ compute_projection_from_face_quadrature_points_matrix (const FiniteElement<dim, 
   }
 
   {
-    FEFaceValues <dim> fe_face_values (fe, rhs_quadrature, update_values); 
+    FEFaceValues <dim> fe_face_values (fe, rhs_quadrature, update_values);
     fe_face_values.reinit (cell, face); // setup shape_value on this face.
 
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -2473,11 +2474,11 @@ template FiniteElement<deal_II_dimension,deal_II_dimension> *
 FETools::get_fe_from_name<deal_II_dimension> (const std::string &);
 
 
-template 
+template
 void FETools::add_fe_name<deal_II_dimension>(
   const std::string& name,
   const FEFactoryBase<deal_II_dimension>* factory);
-  
+
 template
 void
 FETools::
