@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -63,7 +63,7 @@ namespace internal
 				       // see if we need to fill this
 				       // entry, or whether it already
 				       // exists
-      if (identities == 0)
+      if (identities.get() == 0)
 	{
 	  switch (structdim)
 	    {
@@ -74,7 +74,7 @@ namespace internal
 		  (new DoFIdentities(fe1.hp_vertex_dof_identities(fe2)));
 		break;
 	      }
-	      
+
 	      case 1:
 	      {
 		identities =
@@ -82,7 +82,7 @@ namespace internal
 		  (new DoFIdentities(fe1.hp_line_dof_identities(fe2)));
 		break;
 	      }
-	      
+
 	      case 2:
 	      {
 		identities =
@@ -90,7 +90,7 @@ namespace internal
 		  (new DoFIdentities(fe1.hp_quad_dof_identities(fe2)));
 		break;
 	      }
-	      
+
 	      default:
 		    Assert (false, ExcNotImplemented());
 	    }
@@ -127,7 +127,7 @@ namespace internal
         {
           const FiniteElement<dim, spacedim> &this_fe
             = object->get_fe (object->nth_active_fe_index(dominating_fe_index));
-			
+
           FiniteElementDomination::Domination
             domination = FiniteElementDomination::either_element_can_dominate;
           for (unsigned int other_fe_index=0;
@@ -138,11 +138,11 @@ namespace internal
                 const FiniteElement<dim, spacedim>
 		  &that_fe
                   = object->get_fe (object->nth_active_fe_index(other_fe_index));
-			      
+
                 domination = domination &
                              this_fe.compare_for_face_domination(that_fe);
               }
-			
+
                                            // see if this element is
                                            // able to dominate all the
                                            // other ones, and if so
@@ -167,7 +167,7 @@ namespace internal
   }
 }
 
-  
+
 
 namespace internal
 {
@@ -197,7 +197,7 @@ namespace internal
 	  static
 	  void
 	  reserve_space_vertices (DoFHandler<dim,spacedim> &dof_handler)
-	    { 
+	    {
 					       // The final step is allocating
 					       // memory is to set up vertex dof
 					       // information. since vertices
@@ -213,13 +213,13 @@ namespace internal
 	      std::vector<std::vector<bool> >
 		vertex_fe_association (dof_handler.finite_elements->size(),
 				       std::vector<bool> (dof_handler.tria->n_vertices(), false));
-      
+
 	      for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 		     cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
 		for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
 		  vertex_fe_association[cell->active_fe_index()][cell->vertex_index(v)]
 		    = true;
-      
+
 					       // in debug mode, make sure
 					       // that each vertex is
 					       // associated with at least one
@@ -252,13 +252,13 @@ namespace internal
 					       // vertex_dofs_offsets field
 	      dof_handler.vertex_dofs_offsets.resize (dof_handler.tria->n_vertices(),
 						      numbers::invalid_unsigned_int);
-      
+
 	      unsigned int vertex_slots_needed = 0;
 	      for (unsigned int v=0; v<dof_handler.tria->n_vertices(); ++v)
 		if (dof_handler.tria->vertex_used(v) == true)
 		  {
 		    dof_handler.vertex_dofs_offsets[v] = vertex_slots_needed;
-	    
+
 		    for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
 		      if (vertex_fe_association[fe][v] == true)
 			vertex_slots_needed += (*dof_handler.finite_elements)[fe].dofs_per_vertex + 1;
@@ -293,8 +293,8 @@ namespace internal
 		  }
 	    }
 
-      
-    
+
+
 					   /**
 					    * Distribute dofs on the given cell,
 					    * with new dofs starting with index
@@ -316,10 +316,10 @@ namespace internal
 				   unsigned int          next_free_dof)
 	    {
 	      const unsigned int dim = 1;
-	      
+
 	      const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
 	      const unsigned int                 fe_index = cell->active_fe_index ();
-    
+
 					       // number dofs on vertices. to do
 					       // so, check whether dofs for
 					       // this vertex have been
@@ -334,7 +334,7 @@ namespace internal
 		      DoFHandler<dim,spacedim>::invalid_dof_index)
 		    for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
 		      cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
-    
+
 					       // finally for the line. this one
 					       // shouldn't be numbered yet
 	      if (fe.dofs_per_line > 0)
@@ -342,14 +342,14 @@ namespace internal
 		  Assert ((cell->dof_index(0, fe_index) ==
 			   DoFHandler<dim,spacedim>::invalid_dof_index),
 			  ExcInternalError());
-	
+
 		  for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
 		    cell->set_dof_index (d, next_free_dof, fe_index);
 		}
 
 					       // note that this cell has been processed
 	      cell->set_user_flag ();
-  
+
 	      return next_free_dof;
 	    }
 
@@ -364,7 +364,7 @@ namespace internal
 
 	      const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
 	      const unsigned int                 fe_index = cell->active_fe_index ();
-    
+
 					       // number dofs on vertices. to do
 					       // so, check whether dofs for
 					       // this vertex have been
@@ -379,7 +379,7 @@ namespace internal
 		      DoFHandler<dim,spacedim>::invalid_dof_index)
 		    for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
 		      cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
-    
+
 					       // next the sides. do the
 					       // same as above: check whether
 					       // the line is already numbered
@@ -405,14 +405,14 @@ namespace internal
 		  Assert ((cell->dof_index(0, fe_index) ==
 			   DoFHandler<dim,spacedim>::invalid_dof_index),
 			  ExcInternalError());
-	
+
 		  for (unsigned int d=0; d<fe.dofs_per_quad; ++d, ++next_free_dof)
 		    cell->set_dof_index (d, next_free_dof, fe_index);
 		}
 
 					       // note that this cell has been processed
 	      cell->set_user_flag ();
-  
+
 	      return next_free_dof;
 	    }
 
@@ -427,7 +427,7 @@ namespace internal
 
 	      const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
 	      const unsigned int                 fe_index = cell->active_fe_index ();
-    
+
 					       // number dofs on vertices. to do
 					       // so, check whether dofs for
 					       // this vertex have been
@@ -442,7 +442,7 @@ namespace internal
 		      DoFHandler<dim,spacedim>::invalid_dof_index)
 		    for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
 		      cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
-    
+
 					       // next the four lines. do the
 					       // same as above: check whether
 					       // the line is already numbered
@@ -481,20 +481,20 @@ namespace internal
 		  Assert ((cell->dof_index(0, fe_index) ==
 			   DoFHandler<dim,spacedim>::invalid_dof_index),
 			  ExcInternalError());
-	
+
 		  for (unsigned int d=0; d<fe.dofs_per_hex; ++d, ++next_free_dof)
 		    cell->set_dof_index (d, next_free_dof, fe_index);
 		}
 
 					       // note that this cell has been processed
 	      cell->set_user_flag ();
-  
+
 	      return next_free_dof;
 	    }
-      
-      
+
+
 					   /**
-					    * Reserve enough space in the 
+					    * Reserve enough space in the
 					    * <tt>levels[]</tt> objects to store the
 					    * numbers of the degrees of freedom
 					    * needed for the given element. The
@@ -510,7 +510,7 @@ namespace internal
 	      const unsigned int dim = 1;
 
 	      typedef DoFHandler<dim,spacedim> BaseClass;
-	      
+
 	      Assert (dof_handler.finite_elements != 0,
 		      typename BaseClass::ExcNoFESelected());
 	      Assert (dof_handler.finite_elements->size() > 0,
@@ -535,8 +535,8 @@ namespace internal
 						 // troublesome if you want to change
 						 // their size
 		dof_handler.clear_space ();
-  
-		for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level) 
+
+		for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
 		  {
 		    dof_handler.levels.push_back (new internal::hp::DoFLevel<dim>);
 		    std::swap (active_fe_backup[level],
@@ -545,7 +545,7 @@ namespace internal
 	      }
 
 					       // LINE (CELL) DOFs
-    
+
 					       // count how much space we need
 					       // on each level for the cell
 					       // dofs and set the
@@ -560,7 +560,7 @@ namespace internal
 					       // other (lower dimensional)
 					       // objects since exactly one
 					       // finite element is used for it
-	      for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level) 
+	      for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
 		{
 		  dof_handler.levels[level]->lines.dof_offsets
 		    = std::vector<unsigned int> (dof_handler.tria->n_raw_lines(level),
@@ -597,7 +597,7 @@ namespace internal
 		       cell!=dof_handler.end_active(level); ++cell)
 		    if (!cell->has_children())
 		      counter += cell->get_fe().dofs_per_line;
-        
+
 		  Assert (dof_handler.levels[level]->lines.dofs.size() == counter,
 			  ExcInternalError());
 		  Assert (static_cast<unsigned int>
@@ -609,12 +609,12 @@ namespace internal
 			  ExcInternalError());
 		}
 #endif
-    
-    
+
+
 					       // VERTEX DOFS
 	      reserve_space_vertices (dof_handler);
 	    }
-      
+
 
 	  template <int spacedim>
 	  static
@@ -624,7 +624,7 @@ namespace internal
 	      const unsigned int dim = 2;
 
 	      typedef DoFHandler<dim,spacedim> BaseClass;
-	      
+
 	      Assert (dof_handler.finite_elements != 0,
 		      typename BaseClass::ExcNoFESelected());
 	      Assert (dof_handler.finite_elements->size() > 0,
@@ -649,8 +649,8 @@ namespace internal
 						 // troublesome if you want to change
 						 // their size
 		dof_handler.clear_space ();
-  
-		for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level) 
+
+		for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
 		  {
 		    dof_handler.levels.push_back (new internal::hp::DoFLevel<dim>);
 		    std::swap (active_fe_backup[level],
@@ -659,9 +659,9 @@ namespace internal
 		dof_handler.faces = new internal::hp::DoFFaces<2>;
 	      }
 
-    
+
 					       // QUAD (CELL) DOFs
-    
+
 					       // count how much space we need
 					       // on each level for the cell
 					       // dofs and set the
@@ -676,7 +676,7 @@ namespace internal
 					       // other (lower dimensional)
 					       // objects since exactly one
 					       // finite element is used for it
-	      for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level) 
+	      for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
 		{
 		  dof_handler.levels[level]->quads.dof_offsets
 		    = std::vector<unsigned int> (dof_handler.tria->n_raw_quads(level),
@@ -713,7 +713,7 @@ namespace internal
 		       cell!=dof_handler.end_active(level); ++cell)
 		    if (!cell->has_children())
 		      counter += cell->get_fe().dofs_per_quad;
-        
+
 		  Assert (dof_handler.levels[level]->quads.dofs.size() == counter,
 			  ExcInternalError());
 		  Assert (static_cast<unsigned int>
@@ -725,8 +725,8 @@ namespace internal
 			  ExcInternalError());
 		}
 #endif
-    
-    
+
+
 					       // LINE DOFS
 					       //
 					       // same here: count line dofs,
@@ -765,7 +765,7 @@ namespace internal
 						 // class) we will have to store
 						 // on each level
 		unsigned int n_line_slots = 0;
-    
+
 		for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 		       cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
 		  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -815,7 +815,7 @@ namespace internal
 				.dofs_per_line
 				+
 				3);
-            
+
 							 // mark this face as
 							 // visited
 			cell->face(face)->set_user_flag ();
@@ -835,7 +835,7 @@ namespace internal
 		dof_handler.faces->lines.dofs
 		  = std::vector<unsigned int> (n_line_slots,
 					       DoFHandler<dim,spacedim>::invalid_dof_index);
-      
+
 						 // with the memory now
 						 // allocated, loop over the
 						 // dof_handler.cells again and prime the
@@ -845,7 +845,7 @@ namespace internal
 		  .clear_user_flags_line ();
 
 		unsigned int next_free_line_slot = 0;
-      
+
 		for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 		       cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
 		  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -890,7 +890,7 @@ namespace internal
 							     // does not have to
 							     // be explicitly
 							     // set
-                  
+
 							     // finally, mark
 							     // those slots as
 							     // used
@@ -917,7 +917,7 @@ namespace internal
 							     // unset for the
 							     // moment (i.e. at
 							     // invalid_dof_index).
-							     // 
+							     //
 							     // then comes the
 							     // fe_index for the
 							     // neighboring
@@ -933,7 +933,7 @@ namespace internal
 							     // of dofs that we
 							     // need not set
 							     // right now
-							     // 
+							     //
 							     // following this
 							     // comes the stop
 							     // index, which
@@ -943,7 +943,7 @@ namespace internal
 							     // does not have to
 							     // be explicitly
 							     // set
-                  
+
 							     // finally, mark
 							     // those slots as
 							     // used
@@ -955,30 +955,30 @@ namespace internal
 				  +
 				  3);
 			  }
-              
+
 							 // mark this face as
 							 // visited
 			cell->face(face)->set_user_flag ();
 		      }
-      
+
 						 // we should have moved the
 						 // cursor for each level to the
 						 // total number of dofs on that
 						 // level. check that
 		Assert (next_free_line_slot == n_line_slots,
 			ExcInternalError());
-      
+
 						 // at the end, restore the user
 						 // flags for the lines
 		const_cast<dealii::Triangulation<dim,spacedim>&>(*dof_handler.tria)
 		  .load_user_flags_line (saved_line_user_flags);
 	      }
-    
+
 
 					       // VERTEX DOFS
 	      reserve_space_vertices (dof_handler);
 	    }
-      
+
 
 	  template <int spacedim>
 	  static
@@ -988,7 +988,7 @@ namespace internal
 	      const unsigned int dim = 3;
 
 	      typedef DoFHandler<dim,spacedim> BaseClass;
-	      
+
 	      Assert (dof_handler.finite_elements != 0,
 		      typename BaseClass::ExcNoFESelected());
 	      Assert (dof_handler.finite_elements->size() > 0,
@@ -1013,8 +1013,8 @@ namespace internal
 						 // troublesome if you want to change
 						 // their size
 		dof_handler.clear_space ();
-  
-		for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level) 
+
+		for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
 		  {
 		    dof_handler.levels.push_back (new internal::hp::DoFLevel<dim>);
 		    std::swap (active_fe_backup[level],
@@ -1023,9 +1023,9 @@ namespace internal
 		dof_handler.faces = new internal::hp::DoFFaces<3>;
 	      }
 
-    
+
 					       // HEX (CELL) DOFs
-    
+
 					       // count how much space we need
 					       // on each level for the cell
 					       // dofs and set the
@@ -1040,7 +1040,7 @@ namespace internal
 					       // other (lower dimensional)
 					       // objects since exactly one
 					       // finite element is used for it
-	      for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level) 
+	      for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
 		{
 		  dof_handler.levels[level]->hexes.dof_offsets
 		    = std::vector<unsigned int> (dof_handler.tria->n_raw_hexs(level),
@@ -1077,7 +1077,7 @@ namespace internal
 		       cell!=dof_handler.end_active(level); ++cell)
 		    if (!cell->has_children())
 		      counter += cell->get_fe().dofs_per_hex;
-        
+
 		  Assert (dof_handler.levels[level]->hexes.dofs.size() == counter,
 			  ExcInternalError());
 		  Assert (static_cast<unsigned int>
@@ -1089,8 +1089,8 @@ namespace internal
 			  ExcInternalError());
 		}
 #endif
-    
-    
+
+
 					       // QUAD DOFS
 					       //
 					       // same here: count quad dofs,
@@ -1128,7 +1128,7 @@ namespace internal
 						 // slots (see the hp::DoFLevel
 						 // class) we will have to store
 		unsigned int n_quad_slots = 0;
-    
+
 		for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 		       cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
 		  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1181,7 +1181,7 @@ namespace internal
 				.dofs_per_quad
 				+
 				3);
-            
+
 							 // mark this face as
 							 // visited
 			cell->face(face)->set_user_flag ();
@@ -1195,14 +1195,14 @@ namespace internal
 						 // quads, though only the
 						 // active ones will have a
 						 // non-invalid value later on
-		if (true) 
+		if (true)
 		  {
 		    dof_handler.faces->quads.dof_offsets
 		      = std::vector<unsigned int> (dof_handler.tria->n_raw_quads(),
 						   DoFHandler<dim,spacedim>::invalid_dof_index);
 		    dof_handler.faces->quads.dofs
 		      = std::vector<unsigned int> (n_quad_slots,
-						   DoFHandler<dim,spacedim>::invalid_dof_index);        
+						   DoFHandler<dim,spacedim>::invalid_dof_index);
 		  }
 
 						 // with the memory now
@@ -1214,7 +1214,7 @@ namespace internal
 		  .clear_user_flags_quad ();
 
 		unsigned int next_free_quad_slot = 0;
-      
+
 		for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 		       cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
 		  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1259,7 +1259,7 @@ namespace internal
 							     // does not have to
 							     // be explicitly
 							     // set
-                  
+
 							     // finally, mark
 							     // those slots as
 							     // used
@@ -1286,7 +1286,7 @@ namespace internal
 							     // unset for the
 							     // moment (i.e. at
 							     // invalid_dof_index).
-							     // 
+							     //
 							     // then comes the
 							     // fe_index for the
 							     // neighboring
@@ -1302,7 +1302,7 @@ namespace internal
 							     // of dofs that we
 							     // need not set
 							     // right now
-							     // 
+							     //
 							     // following this
 							     // comes the stop
 							     // index, which
@@ -1312,7 +1312,7 @@ namespace internal
 							     // does not have to
 							     // be explicitly
 							     // set
-                  
+
 							     // finally, mark
 							     // those slots as
 							     // used
@@ -1324,7 +1324,7 @@ namespace internal
 				  +
 				  3);
 			  }
-              
+
 							 // mark this face as
 							 // visited
 			cell->face(face)->set_user_flag ();
@@ -1335,7 +1335,7 @@ namespace internal
 						 // of dofs. check that
 		Assert (next_free_quad_slot == n_quad_slots,
 			ExcInternalError());
-      
+
 						 // at the end, restore the user
 						 // flags for the quads
 		const_cast<dealii::Triangulation<dim,spacedim>&>(*dof_handler.tria)
@@ -1349,7 +1349,7 @@ namespace internal
 					       // much like with vertices: there
 					       // can be an arbitrary number of
 					       // finite elements associated
-					       // with each line. 
+					       // with each line.
 					       //
 					       // the algorithm we use is
 					       // somewhat similar to what we do
@@ -1368,7 +1368,7 @@ namespace internal
 		    line_fe_association (dof_handler.finite_elements->size(),
 					 std::vector<bool> (dof_handler.tria->n_raw_lines(),
 							    false));
-      
+
 		  for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 			 cell=dof_handler.begin_active();
 		       cell!=dof_handler.end(); ++cell)
@@ -1393,7 +1393,7 @@ namespace internal
 			  line_is_used[line] = true;
 			  break;
 			}
-	
+
 						   // next count how much memory
 						   // we actually need. for each
 						   // line, we need one slot per
@@ -1408,13 +1408,13 @@ namespace internal
 		  dof_handler.faces->lines.dof_offsets
 		    .resize (dof_handler.tria->n_raw_lines(),
 			     numbers::invalid_unsigned_int);
-	
+
 		  unsigned int line_slots_needed = 0;
 		  for (unsigned int line=0; line<dof_handler.tria->n_raw_lines(); ++line)
 		    if (line_is_used[line] == true)
 		      {
 			dof_handler.faces->lines.dof_offsets[line] = line_slots_needed;
-	    
+
 			for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
 			  if (line_fe_association[fe][line] == true)
 			    line_slots_needed += (*dof_handler.finite_elements)[fe].dofs_per_line + 1;
@@ -1449,7 +1449,7 @@ namespace internal
 		      }
 		}
 
-    
+
 
 					       // VERTEX DOFS
 	      reserve_space_vertices (dof_handler);
@@ -1538,7 +1538,7 @@ namespace internal
 	  unsigned int
 	  max_couplings_between_dofs (const DoFHandler<3,spacedim> &dof_handler)
 	    {
-//TODO:[?] Invent significantly better estimates than the ones in this function  
+//TODO:[?] Invent significantly better estimates than the ones in this function
 					       // doing the same thing here is a rather
 					       // complicated thing, compared to the 2d
 					       // case, since it is hard to draw pictures
@@ -1561,7 +1561,7 @@ namespace internal
 		  Assert (false, ExcNotImplemented());
 		  max_couplings=0;
 		}
-  
+
 	      return std::min(max_couplings,dof_handler.n_dofs());
 	    }
       };
@@ -1580,7 +1580,7 @@ namespace hp
 
   template<int dim, int spacedim>
   const unsigned int DoFHandler<dim,spacedim>::default_fe_index;
-  
+
 
 
   template<int dim, int spacedim>
@@ -1601,7 +1601,7 @@ namespace hp
                                      // unsubscribe as a listener to refinement
                                      // of the underlying triangulation
     tria->remove_refinement_listener (*this);
-  
+
                                      // ...and release allocated memory
     clear ();
   }
@@ -2235,7 +2235,7 @@ namespace hp
 
 	  if (tria->n_raw_quads(level) == 0)
 	    return end_quad();
-  
+
 	  return raw_quad_iterator (tria,
 				    level,
 				    0,
@@ -2251,11 +2251,11 @@ namespace hp
 				    0,
 				    this);
 	}
-      
-      
+
+
 	default:
 	      Assert (false, ExcNotImplemented());
-	      return raw_hex_iterator();	    
+	      return raw_hex_iterator();
       }
   }
 
@@ -2318,7 +2318,7 @@ namespace hp
 	      quad_iterator(end_quad()) :
 	      begin_quad (level+1));
     else
-      return quad_iterator(end_quad());  
+      return quad_iterator(end_quad());
   }
 
 
@@ -2376,7 +2376,7 @@ namespace hp
 	default:
 	      Assert (false, ExcNotImplemented());
 	      return raw_quad_iterator();
-      }      
+      }
   }
 
 
@@ -2467,16 +2467,16 @@ namespace hp
 
 	  if (tria->n_raw_hexs(level) == 0)
 	    return end_hex();
-  
+
 	  return raw_hex_iterator (tria,
 				   level,
 				   0,
 				   this);
 	}
-      
+
 	default:
 	      Assert (false, ExcNotImplemented());
-	      return raw_hex_iterator();	    
+	      return raw_hex_iterator();
       }
   }
 
@@ -2619,7 +2619,7 @@ namespace hp
   }
 
 
- 
+
   template <int dim, int spacedim>
   typename DoFHandler<dim, spacedim>::active_hex_iterator
   DoFHandler<dim, spacedim>::last_active_hex (const unsigned int level) const
@@ -2659,13 +2659,13 @@ namespace hp
 
     DoFHandler<1>::cell_iterator cell;
     unsigned int n = 0;
-  
+
                                      // search left-most cell
     cell = this->begin_active();
     while (!cell->at_boundary(0))
       cell = cell->neighbor(0);
     n += cell->get_fe().dofs_per_vertex;
-  
+
                                      // same with right-most cell
     cell = this->begin_active();
     while (!cell->at_boundary(1))
@@ -2689,10 +2689,10 @@ namespace hp
          i!=boundary_indicators.end(); ++i)
       Assert ((i->first == 0) || (i->first == 1),
               ExcInvalidBoundaryIndicator());
-  
+
     DoFHandler<1>::active_cell_iterator cell;
     unsigned int n = 0;
-  
+
                                      // search left-most cell
     if (boundary_indicators.find (0) != boundary_indicators.end())
       {
@@ -2701,7 +2701,7 @@ namespace hp
           cell = cell->neighbor(0);
         n += cell->get_fe().dofs_per_vertex;
       }
-  
+
                                      // same with right-most cell
     if (boundary_indicators.find (1) != boundary_indicators.end())
       {
@@ -2710,7 +2710,7 @@ namespace hp
           cell = cell->neighbor(1);
         n += cell->get_fe().dofs_per_vertex;
       }
-  
+
     return n;
   }
 
@@ -2728,10 +2728,10 @@ namespace hp
          i!=boundary_indicators.end(); ++i)
       Assert ((*i == 0) || (*i == 1),
               ExcInvalidBoundaryIndicator());
-  
+
     DoFHandler<1>::active_cell_iterator cell;
     unsigned int n = 0;
-  
+
                                      // search left-most cell
     if (boundary_indicators.find (0) != boundary_indicators.end())
       {
@@ -2740,7 +2740,7 @@ namespace hp
           cell = cell->neighbor(0);
         n += cell->get_fe().dofs_per_vertex;
       }
-  
+
                                      // same with right-most cell
     if (boundary_indicators.find (1) != boundary_indicators.end())
       {
@@ -2749,7 +2749,7 @@ namespace hp
           cell = cell->neighbor(1);
         n += cell->get_fe().dofs_per_vertex;
       }
-  
+
     return n;
   }
 
@@ -2807,13 +2807,13 @@ namespace hp
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
             dofs_on_face.resize (dofs_per_face);
-          
+
             cell->face(f)->get_dof_indices (dofs_on_face,
 					    cell->active_fe_index());
             for (unsigned int i=0; i<dofs_per_face; ++i)
               boundary_dofs.insert(dofs_on_face[i]);
           };
-    return boundary_dofs.size();  
+    return boundary_dofs.size();
   }
 
 
@@ -2825,7 +2825,7 @@ namespace hp
     Assert (finite_elements != 0, ExcNoFESelected());
     Assert (boundary_indicators.find(255) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
-  
+
                                      // same as above, but with
                                      // additional checks for set of
                                      // boundary indicators
@@ -2843,7 +2843,7 @@ namespace hp
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
             dofs_on_face.resize (dofs_per_face);
-          
+
             cell->face(f)->get_dof_indices (dofs_on_face,
 					    cell->active_fe_index());
             for (unsigned int i=0; i<dofs_per_face; ++i)
@@ -2879,7 +2879,7 @@ namespace hp
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
             dofs_on_face.resize (dofs_per_face);
-          
+
             cell->face(f)->get_dof_indices (dofs_on_face);
             for (unsigned int i=0; i<dofs_per_face; ++i)
               boundary_dofs.insert(dofs_on_face[i]);
@@ -2888,8 +2888,8 @@ namespace hp
   }
 
 
-#if deal_II_dimension == 2  
-  
+#if deal_II_dimension == 2
+
   template <>
   unsigned int DoFHandler<2,3>::n_boundary_dofs () const
   {
@@ -2931,7 +2931,7 @@ namespace hp
     for (unsigned int i=0; i<levels.size(); ++i)
       mem += MemoryConsumption::memory_consumption (*levels[i]);
     mem += MemoryConsumption::memory_consumption (*faces);
-  
+
     return mem;
   }
 
@@ -3041,7 +3041,7 @@ namespace hp
 			    (new_dof_indices[higher_dof_index] ==
 			     lower_dof_index),
 			    ExcInternalError());
-		      
+
 		    new_dof_indices[higher_dof_index] = lower_dof_index;
 		  }
 	      }
@@ -3108,7 +3108,7 @@ namespace hp
     Table<2,std_cxx1x::shared_ptr<internal::hp::DoFIdentities> >
       line_dof_identities (finite_elements->size(),
 			   finite_elements->size());
-	
+
     for (line_iterator line=begin_line(); line!=end_line(); ++line)
       {
 	unsigned int unique_sets_of_dofs
@@ -3122,7 +3122,7 @@ namespace hp
 	    {
 	      const unsigned int fe_index_1 = line->nth_active_fe_index (f),
 				 fe_index_2 = line->nth_active_fe_index (g);
-	      
+
 	      if (((*finite_elements)[fe_index_1].dofs_per_line
 		   ==
 		   (*finite_elements)[fe_index_2].dofs_per_line)
@@ -3139,7 +3139,7 @@ namespace hp
 						   // indeed there are n
 						   // identities
 		  if (line_dof_identities[fe_index_1][fe_index_2]->size()
-		      == 
+		      ==
 		      (*finite_elements)[fe_index_1].dofs_per_line)
 		    {
 		      unsigned int i=0;
@@ -3168,7 +3168,7 @@ namespace hp
 				  ==
 				  FiniteElementDomination::either_element_can_dominate,
 				  ExcInternalError());
-			
+
 			  --unique_sets_of_dofs;
 
 			  for (unsigned int j=0; j<(*finite_elements)[fe_index_1].dofs_per_line; ++j)
@@ -3193,7 +3193,7 @@ namespace hp
 				  Assert (new_dof_indices[new_dof_indices[master_dof_index]] ==
 					  numbers::invalid_unsigned_int,
 					  ExcInternalError());
-				
+
 				  new_dof_indices[slave_dof_index]
 				    = new_dof_indices[master_dof_index];
 				}
@@ -3205,15 +3205,15 @@ namespace hp
 					  (new_dof_indices[slave_dof_index] ==
 					   master_dof_index),
 					  ExcInternalError());
-				
+
 				  new_dof_indices[slave_dof_index] = master_dof_index;
 				}
-			    } 
+			    }
 			}
 		    }
 		}
 	    }
-	
+
 					 // if at this point, there is only
 					 // one unique set of dofs left, then
 					 // we have taken care of everything
@@ -3271,7 +3271,7 @@ namespace hp
 			      (new_dof_indices[slave_dof_index] ==
 			       master_dof_index),
 			      ExcInternalError());
-		      
+
 		      new_dof_indices[slave_dof_index] = master_dof_index;
 		    }
 		}
@@ -3314,7 +3314,7 @@ namespace hp
 
 #endif
 
-  
+
   template<int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
@@ -3343,7 +3343,7 @@ namespace hp
     Table<2,std_cxx1x::shared_ptr<internal::hp::DoFIdentities> >
       quad_dof_identities (finite_elements->size(),
 			   finite_elements->size());
-	
+
     for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
       if (quad->n_active_fe_indices() == 2)
 	{
@@ -3390,15 +3390,15 @@ namespace hp
                             (new_dof_indices[slave_dof_index] ==
                              master_dof_index),
                             ExcInternalError());
-		      
+
                     new_dof_indices[slave_dof_index] = master_dof_index;
 		}
 	    }
 	}
   }
-  
 
-  
+
+
   template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::set_active_fe_indices (const std::vector<unsigned int>& active_fe_indices)
   {
@@ -3419,7 +3419,7 @@ namespace hp
       cell->set_active_fe_index(active_fe_indices[i]);
   }
 
-  
+
 
   template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::get_active_fe_indices (std::vector<unsigned int>& active_fe_indices) const
@@ -3435,9 +3435,9 @@ namespace hp
     for (unsigned int i=0; cell!=endc; ++cell, ++i)
       active_fe_indices[i]=cell->active_fe_index();
   }
-  
 
-  
+
+
   template<int dim, int spacedim>
   void DoFHandler<dim,spacedim>::distribute_dofs (const hp::FECollection<dim,spacedim> &ff)
   {
@@ -3454,7 +3454,7 @@ namespace hp
 				     // collection is large enough to
 				     // cover all fe indices presently
 				     // in use on the mesh
-    for (active_cell_iterator cell = begin_active(); cell != end(); ++cell) 
+    for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
       Assert (cell->active_fe_index() < finite_elements->size(),
 	      ExcInvalidFEIndex (cell->active_fe_index(),
 				 finite_elements->size()));
@@ -3486,17 +3486,17 @@ namespace hp
       active_cell_iterator cell = begin_active(),
 			   endc = end();
 
-      for (; cell != endc; ++cell) 
+      for (; cell != endc; ++cell)
 	next_free_dof
 	  = internal::hp::DoFHandler::Implementation::template distribute_dofs_on_cell<spacedim> (cell,
 							       next_free_dof);
 
       used_dofs = next_free_dof;
     }
-    
+
 
 				     /////////////////////////////////
-    
+
 				     // Step 2: identify certain dofs
 				     // if the finite element tells us
 				     // that they should have the same
@@ -3522,7 +3522,7 @@ namespace hp
 	  new_dof_indices[i] = next_free_dof;
 	  ++next_free_dof;
 	}
-    
+
 				     // then loop over all those that
 				     // are constrained and record the
 				     // new dof number for those:
@@ -3532,7 +3532,7 @@ namespace hp
 	  Assert (new_dof_indices[constrained_indices[i]] !=
 		  numbers::invalid_unsigned_int,
 		  ExcInternalError());
-	  
+
 	  new_dof_indices[i] = new_dof_indices[constrained_indices[i]];
 	}
 
@@ -3543,15 +3543,15 @@ namespace hp
 	Assert (new_dof_indices[i] < next_free_dof,
 		ExcInternalError());
       }
-    
+
 				     // finally, do the renumbering
 				     // and set the number of actually
 				     // used dof indices
     renumber_dofs_internal (new_dof_indices, internal::int2type<dim>());
 
     used_dofs = next_free_dof;
-    
-    
+
+
                                      // finally restore the user flags
     const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);
   }
@@ -3644,7 +3644,7 @@ namespace hp
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
     renumber_dofs_internal (new_numbers, internal::int2type<0>());
-    
+
     for (line_iterator line=begin_line(); line!=end_line(); ++line)
       {
 	const unsigned int n_active_fe_indices
@@ -3675,7 +3675,7 @@ namespace hp
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
     renumber_dofs_internal (new_numbers, internal::int2type<1>());
-    
+
     for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
       {
 	const unsigned int n_active_fe_indices
@@ -3707,7 +3707,7 @@ namespace hp
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
     renumber_dofs_internal (new_numbers, internal::int2type<2>());
-    
+
     for (hex_iterator hex=begin_hex(); hex!=end_hex(); ++hex)
       {
 	const unsigned int n_active_fe_indices
@@ -3777,7 +3777,7 @@ namespace hp
   }
 
 
-  
+
   template<int dim, int spacedim>
   void DoFHandler<dim,spacedim>::create_active_fe_table ()
   {
@@ -3920,7 +3920,7 @@ namespace hp
                                      // Coarsening can lead to the loss
                                      // of levels. Hence remove them.
     while (levels.size () > tria.n_levels ())
-      { 
+      {
 	delete levels[levels.size ()-1];
 	levels.pop_back ();
       }
@@ -3974,7 +3974,7 @@ namespace hp
               }
           }
       }
-    
+
                                      // Free buffer objects
     std::vector<std::vector<bool> *>::iterator children_level;
     for (children_level = has_children.begin ();
@@ -3992,7 +3992,7 @@ namespace hp
 
   template<int dim, int spacedim>
   void DoFHandler<dim,spacedim>::clear_space ()
-  {  
+  {
     for (unsigned int i=0; i<levels.size(); ++i)
       delete levels[i];
     levels.resize (0);
@@ -4003,7 +4003,7 @@ namespace hp
       std::vector<unsigned int> tmp;
       std::swap (vertex_dofs, tmp);
     }
-    
+
     {
       std::vector<unsigned int> tmp;
       std::swap (vertex_dofs_offsets, tmp);
