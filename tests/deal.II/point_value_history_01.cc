@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors and Michael Rapson
+//    Copyright (C) 2009, 2010 by the deal.II authors and Michael Rapson
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -149,7 +149,7 @@ void TestPointValueHistory<dim>::run()
 
     // check that the assignment operator is valid
     test_copy = node_monitor;
-    test_copy.add_point(Point<2>::Point(1, 0.2));
+    test_copy.add_point(Point<2>(1, 0.2));
     test_copy.add_field_name("Solution");
     std::vector < std::vector <Point <dim> > > selected_locations;
     test_copy.get_points(selected_locations);
@@ -170,15 +170,15 @@ void TestPointValueHistory<dim>::run()
 
         // two alternatives here, adding a point at a time or a vector of points
         // 2d points
-        std::vector <Point < 2 > > point_vector(5, Point < 2 > ::Point());
-        point_vector[0] = Point < 2 > ::Point(0, 0); // some of these points will hit a node, others won't
-        point_vector[1] = Point < 2 > ::Point(0.25, 0);
-        point_vector[2] = Point < 2 > ::Point(0.25, 0.45);
-        point_vector[3] = Point < 2 > ::Point(0.45, 0.45);
-        point_vector[4] = Point < 2 > ::Point(0.8, 0.8);
+        std::vector <Point < 2 > > point_vector(5, Point < 2 > ());
+        point_vector[0] = Point < 2 > (0, 0); // some of these points will hit a node, others won't
+        point_vector[1] = Point < 2 > (0.25, 0);
+        point_vector[2] = Point < 2 > (0.25, 0.45);
+        point_vector[3] = Point < 2 > (0.45, 0.45);
+        point_vector[4] = Point < 2 > (0.8, 0.8);
 
         node_monitor.add_points(point_vector);
-        node_monitor.add_point(Point<2>::Point(1, 0.2)); // add a single point
+        node_monitor.add_point(Point<2>(1, 0.2)); // add a single point
 
         // MonitorNode requires that the instance is 'closed' before any data is added
         // this ensures that points are not added once time starts.

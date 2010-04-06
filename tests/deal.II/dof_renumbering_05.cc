@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,24 +42,24 @@ print_dofs (const DoFHandler<dim> &dof)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
   std::vector<unsigned int> v (fe.dofs_per_cell);
-  boost::shared_ptr<FEValues<dim> > fevalues;
+  std_cxx1x::shared_ptr<FEValues<dim> > fevalues;
 
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
-      fevalues = boost::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_q_points));
+      fevalues = std_cxx1x::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_q_points));
     }
 
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
     {
       Point<dim> p = cell->center();
-      if (fevalues != 0)
+      if (fevalues.get() != 0)
 	fevalues->reinit(cell);
 
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-	if (fevalues != 0)
+	if (fevalues.get() != 0)
 	  deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
 	else
 	  deallog << p << '\t' << v[i] << std::endl;
