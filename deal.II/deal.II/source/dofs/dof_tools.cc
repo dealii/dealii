@@ -1329,7 +1329,7 @@ namespace internal
 					   const FullMatrix<double> &face_interpolation_matrix,
 					   std_cxx1x::shared_ptr<std::vector<bool> > &master_dof_mask)
       {
-	if (master_dof_mask == 0)
+	if (master_dof_mask == std_cxx1x::shared_ptr<std::vector<bool> >())
 	  {
 	    master_dof_mask = std_cxx1x::shared_ptr<std::vector<bool> >
 			      (new std::vector<bool> (fe1.dofs_per_face));
@@ -1356,7 +1356,7 @@ namespace internal
                                        const FiniteElement<dim,spacedim> &fe2,
                                        std_cxx1x::shared_ptr<FullMatrix<double> > &matrix)
       {
-        if (matrix == 0)
+        if (matrix == std_cxx1x::shared_ptr<FullMatrix<double> >())
           {
             matrix = std_cxx1x::shared_ptr<FullMatrix<double> >
                      (new FullMatrix<double> (fe2.dofs_per_face,
@@ -1379,7 +1379,7 @@ namespace internal
                                           const unsigned int        subface,
                                           std_cxx1x::shared_ptr<FullMatrix<double> > &matrix)
       {
-        if (matrix == 0)
+        if (matrix == std_cxx1x::shared_ptr<FullMatrix<double> >())
           {
             matrix = std_cxx1x::shared_ptr<FullMatrix<double> >
                      (new FullMatrix<double> (fe2.dofs_per_face,
@@ -1412,7 +1412,8 @@ namespace internal
 		static_cast<signed int>(face_interpolation_matrix.n()),
 		ExcInternalError());
 
-        if (split_matrix == 0)
+        if (split_matrix ==
+	    std_cxx1x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > >())
           {
             split_matrix
 	      = std_cxx1x::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > >
@@ -2915,7 +2916,7 @@ namespace internal
 			     const bool                  sort_by_blocks,
 			     std::vector<unsigned char> &dofs_by_component)
   {
-    const dealii::hp::FECollection<DH::dimension,DH::space_dimension> 
+    const dealii::hp::FECollection<DH::dimension,DH::space_dimension>
       fe_collection (dof.get_fe());
     Assert (fe_collection.n_components() < 256, ExcNotImplemented());
     Assert(dofs_by_component.size() == dof.n_dofs(),
@@ -2929,7 +2930,7 @@ namespace internal
       (fe_collection.size());
     for (unsigned int f=0; f<fe_collection.size(); ++f)
       {
-	const FiniteElement<DH::dimension,DH::space_dimension> &fe = 
+	const FiniteElement<DH::dimension,DH::space_dimension> &fe =
 	  fe_collection[f];
 	local_component_association[f].resize(fe.dofs_per_cell);
 	if (sort_by_blocks == true)
@@ -2987,7 +2988,7 @@ namespace internal
                                    // then loop over all cells and do
                                    // the work
     std::vector<unsigned int> indices;
-    for (typename DH::active_cell_iterator c=dof.begin_active(); 
+    for (typename DH::active_cell_iterator c=dof.begin_active();
 	 c!=dof.end(); ++ c)
       {
 	const unsigned int fe_index = c->active_fe_index();
