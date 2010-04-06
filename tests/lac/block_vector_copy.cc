@@ -1,8 +1,8 @@
 //--------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,21 +38,21 @@ void test ()
   unsigned int			size = 0;
   for (unsigned int i = 0; i < b.n_blocks(); ++i)
     {
-      assert (b.block(i).size() == partition[i]);
+      Assert (b.block(i).size() == partition[i], ExcInternalError());
       size += b.block(i).size();
     }
-  assert (b.size() == size);
+  Assert (b.size() == size, ExcInternalError());
 
   for (unsigned int i = 0; i < b.size(); ++i)
     {
       b(i) = v[i];
-      assert (b(i) == v[i]);
+      Assert (b(i) == v[i], ExcInternalError());
     }
 
   dealii::BlockVector<double>	c;
   c = b;
-  assert (c == b);
-  assert (c.n_blocks() == b.n_blocks());
+  Assert (c == b, ExcInternalError());
+  Assert (c.n_blocks() == b.n_blocks(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -77,7 +77,7 @@ int main ()
   streambuf *old_cerr_buf = std::cerr.rdbuf();
 #endif
   std::cerr.rdbuf(logfile.rdbuf());
-  
+
   try
     {
       test ();
@@ -94,7 +94,7 @@ int main ()
 				       // abort
       return 0;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
@@ -106,7 +106,7 @@ int main ()
 				       // abort
       return 0;
     };
-  
+
   std::cerr.rdbuf(old_cerr_buf);
 }
 
