@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,7 @@
 #include <boost/lambda/lambda.hpp>
 
 #include <cstdio>
+#include <cstring>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1066,7 +1067,7 @@ namespace internal
 		       dealii::Vector<T> &dst)
     {
       if (s == T())
-	memset ((dst.begin()+begin),0,(end-begin)*sizeof(T));
+	std::memset ((dst.begin()+begin),0,(end-begin)*sizeof(T));
       else
 	std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
     }
@@ -1125,7 +1126,7 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
 #ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
 template <>
 inline
-Vector<std::complex<float> > & 
+Vector<std::complex<float> > &
 Vector<std::complex<float> >::operator = (const std::complex<float> s)
 {
   Assert (numbers::is_finite(s),
@@ -1154,7 +1155,7 @@ Vector<Number>::operator = (const Vector<Number>& v)
     parallel::apply_to_subranges (0U, vec_size,
 				  std_cxx1x::bind(&internal::Vector::template
 						  copy_subrange<Number>,
-						  std_cxx1x::cref(v), _1, _2, 
+						  std_cxx1x::cref(v), _1, _2,
 						  std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
@@ -1177,7 +1178,7 @@ Vector<Number>::operator = (const Vector<Number2>& v)
     parallel::apply_to_subranges (0U, vec_size,
 				  std_cxx1x::bind(&internal::Vector::template
 						  copy_subrange_ext<Number2,Number>,
-						  std_cxx1x::cref(v), _1, _2, 
+						  std_cxx1x::cref(v), _1, _2,
 						  std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
@@ -1302,7 +1303,7 @@ Vector<Number>::scale (const Number factor)
 		       (factor*boost::lambda::_1),
 		       internal::Vector::minimum_parallel_grain_size);
 }
- 
+
 
 
 template <typename Number>
@@ -1350,7 +1351,7 @@ Vector<Number>::add (const unsigned int  n_indices,
       val[indices[i]] += values[i];
     }
 }
- 
+
 
 
 template <typename Number>
