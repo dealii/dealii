@@ -4083,7 +4083,9 @@ namespace Threads
                                         */
       void join () const
 	{
-	  AssertThrow (task_descriptor != 0, ExcNoTask());
+	  AssertThrow (task_descriptor !=
+		       std_cxx1x::shared_ptr<internal::TaskDescriptor<RT> >(),
+		       ExcNoTask());
 	  task_descriptor->join ();
 	}
 
@@ -4113,7 +4115,9 @@ namespace Threads
                                         */
       bool operator == (const Task &t)
 	{
-	  AssertThrow (task_descriptor != 0, ExcNoTask());
+	  AssertThrow (task_descriptor !=
+		       std_cxx1x::shared_ptr<internal::TaskDescriptor<RT> >(),
+		       ExcNoTask());
 	  return task_descriptor == t.task_descriptor;
 	}
 
