@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
+#include <utility>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -473,7 +474,7 @@ void MGTransferBlockSelect<number>::build_matrices (
       for (unsigned int i=0; i<temp_copy_indices.size(); ++i)
 	if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
 	  copy_indices[selected_block][level][counter++] =
-	    std::make_pair<unsigned int,unsigned int> (temp_copy_indices[i], i);
+	    std::pair<unsigned int, unsigned int> (temp_copy_indices[i], i);
       Assert (counter == n_active_dofs, ExcInternalError());
     }
 }
@@ -554,7 +555,7 @@ void MGTransferBlock<number>::build_matrices (
 	    for (unsigned int i=0; i<temp_copy_indices[block].size(); ++i)
 	      if (temp_copy_indices[block][i] != numbers::invalid_unsigned_int)
 		copy_indices[block][level][counter++] =
-		  std::make_pair<unsigned int,unsigned int>
+		  std::pair<unsigned int, unsigned int>
 		  (temp_copy_indices[block][i], i);
 	    Assert (counter == n_active_dofs, ExcInternalError());
 	  }

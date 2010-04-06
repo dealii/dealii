@@ -386,7 +386,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       for (unsigned int i=0; i<temp_copy_indices.size(); ++i)
 	if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
 	  copy_indices[level][counter++] =
-	    std::make_pair<unsigned int,unsigned int> (temp_copy_indices[i], i);
+	    std::pair<unsigned int, unsigned int> (temp_copy_indices[i], i);
       Assert (counter == n_active_dofs, ExcInternalError());
     }
 }
