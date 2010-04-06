@@ -15,7 +15,7 @@
 
 #if (DEAL_II_USE_MT == 1) && !defined(DEAL_II_CAN_USE_CXX1X)
 
-// of the C++ compiler doesn't completely support the C++1x standard (and
+// if the C++ compiler doesn't completely support the C++1x standard (and
 // consequently we can't use std::thread, std::mutex, etc), then include all
 // the files that form BOOST's thread implementation so that we don't have to
 // build BOOST itself only to get at this small part of it. it also ensures
