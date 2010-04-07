@@ -97,7 +97,8 @@ $(target) : $(libraries)
 run: $(target)
 	@echo ============================ Running $<
 	@./$(target)$(EXEEXT)
-
+	@echo ============================ Postprocessing to step-39.dat
+	@$(PERL) postprocess.pl step-39.log > step-39.dat
 
 # As a last rule to the `make' program, we define what to do when
 # cleaning up a directory. This usually involves deleting object files

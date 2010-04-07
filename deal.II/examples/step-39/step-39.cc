@@ -69,7 +69,7 @@ using namespace dealii;
 				 // This is the function we use to set
 				 // the boundary values and also the
 				 // exact solution we compare to.
-Functions::LSingularityFunction exact_solution;
+Functions::SlitSingularityFunction<2> exact_solution;
 
 				 // @sect3{The local integrators}
 
@@ -273,6 +273,7 @@ void Estimator<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::
       const double t = dinfo.cell->diameter() * trace(DDuh[k]);
       dinfo.value(0) +=  t*t * fe.JxW(k);
     }
+  dinfo.value(0) = std::sqrt(dinfo.value(0));
 }
 
 
@@ -291,7 +292,8 @@ void Estimator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::
   
   for (unsigned k=0;k<fe.n_quadrature_points;++k)
     dinfo.value(0) += penalty * (boundary_values[k] - uh[k]) * (boundary_values[k] - uh[k])
-		 * fe.JxW(k);
+		      * fe.JxW(k);
+  dinfo.value(0) = std::sqrt(dinfo.value(0));  
 }
 
 
@@ -320,6 +322,7 @@ void Estimator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
       dinfo1.value(0) += (penalty * diff1*diff1 + h * diff2*diff2)
 		    * fe.JxW(k);
     }
+  dinfo1.value(0) = std::sqrt(dinfo1.value(0));
   dinfo2.value(0) = dinfo1.value(0);
 }
 
@@ -375,7 +378,7 @@ Step39<dim>::Step39(const FiniteElement<dim>& fe)
 		dof_handler(mg_dof_handler),
 		estimates(1)
 {
-  GridGenerator::hyper_L(triangulation, -1, 1);
+  GridGenerator::hyper_cube_slit(triangulation, -1, 1);
 }
 
 
@@ -582,7 +585,7 @@ Step39<dim>::error()
   
   QGauss<dim> quadrature(n_gauss_points);
   VectorTools::integrate_difference(mapping, dof_handler, solution, exact_solution,
-				    cell_errors, quadrature, VectorTools::L2_norm);
+				    cell_errors, quadrature, VectorTools::H1_norm);
   deallog << "Error    " << cell_errors.l2_norm() << std::endl;
 }
 
@@ -645,8 +648,8 @@ void Step39<dim>::output_results (const unsigned int cycle) const
 
   std::string filename(fn);
   filename += ".gnuplot";
-  std::cout << "Writing solution to <" << filename << ">..."
-	    << std::endl << std::endl;
+  deallog << "Writing solution to <" << filename << ">..."
+	  << std::endl << std::endl;
   std::ofstream gnuplot_output (filename.c_str());
   
   DataOut<dim> data_out;
@@ -708,7 +711,8 @@ Step39<dim>::run(unsigned int n_steps)
 
 int main()
 {
-  deallog.log_execution_time(true);
+  std::ofstream logfile("step-39.log");
+  deallog.attach(logfile);
   FE_DGQ<2> fe1(3);
   Step39<2> test1(fe1);
   test1.run(20);
