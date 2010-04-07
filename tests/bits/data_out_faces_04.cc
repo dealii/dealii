@@ -125,23 +125,23 @@ my_check_this (const DoFHandler<dim> &dof_handler,
 	  ExcInternalError());
   for (unsigned int i=0; i<data_out.get_vector_data_ranges().size(); ++i)
     {
-      deallog << std::get<0>(data_out.get_vector_data_ranges()[i])
+      deallog << std_cxx1x::get<0>(data_out.get_vector_data_ranges()[i])
 	      << ' '
-	      << std::get<1>(data_out.get_vector_data_ranges()[i])
+	      << std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
 	      << ' '
-	      << std::get<2>(data_out.get_vector_data_ranges()[i])
+	      << std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
 	      << std::endl;
-      Assert (std::get<0>(data_out.get_vector_data_ranges()[i])
+      Assert (std_cxx1x::get<0>(data_out.get_vector_data_ranges()[i])
 	      ==
-	      std::get<0>(reader.get_vector_data_ranges()[i]),
+	      std_cxx1x::get<0>(reader.get_vector_data_ranges()[i]),
 	      ExcInternalError());
-      Assert (std::get<1>(data_out.get_vector_data_ranges()[i])
+      Assert (std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
 	      ==
-	      std::get<1>(reader.get_vector_data_ranges()[i]),
+	      std_cxx1x::get<1>(reader.get_vector_data_ranges()[i]),
 	      ExcInternalError());
-      Assert (std::get<2>(data_out.get_vector_data_ranges()[i])
+      Assert (std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
 	      ==
-	      std::get<2>(reader.get_vector_data_ranges()[i]),
+	      std_cxx1x::get<2>(reader.get_vector_data_ranges()[i]),
 	      ExcInternalError());
     }
 
