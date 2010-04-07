@@ -142,6 +142,17 @@ void dsyev_ (const char *jobz, const char *uplo, const int *n,
 void ssyev_ (const char *jobz, const char *uplo, const int *n,
 	     float *A, const int *lda, float *w,
 	     float *work, const int *lwork, int *info);
+// General eigenvalues and eigenvectors of 
+// 1: A*x = lambda*B*x; 2: A*B*x = lambda*x; 3: B*A*x = lambda*x
+// A and B are symmetric and B is definite
+void dsygv_ (const int* itype, const char* jobz, const char* uplo,
+             const int* n, double* A, const int* lda, double* B,
+             const int* ldb, double* w, double* work,
+             const int* lwork, int* info);
+void ssygv_ (const int* itype, const char* jobz, const char* uplo,
+             const int* n, float* A, const int* lda, float* B,
+             const int* ldb, float* w, float* work,
+             const int* lwork, int* info);
 // Compute singular value decomposition
 void dgesvd_ (int* jobu, int* jobvt,
 	      const int* n, const int* m, double* A, const int* lda,
@@ -558,6 +569,36 @@ inline void
 syev (const char *, const char *, const int *, float *, const int *, float *, float *, const int *, int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("ssyev"));
+}
+#endif
+
+
+#ifdef HAVE_DSYGV_
+inline void
+sygv (const int* itype, const char* jobz, const char* uplo, const int* n, double* A, const int* lda, double* B, const int* ldb, double* w, double* work, const int* lwork, int* info)
+{
+  dsygv_(itype, jobz, uplo, n, A, lda, B, ldb, w, work, lwork, info);
+}
+#else
+inline void
+sygv (const int*, const char*, const char*, const int*, double*, const int*, double*, const int*, double*, double*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dsygv"));
+}
+#endif
+
+
+#ifdef HAVE_SSYGV_
+inline void
+sygv (const int* itype, const char* jobz, const char* uplo, const int* n, float* A, const int* lda, float* B, const int* ldb, float* w, float* work, const int* lwork, int* info)
+{
+  ssygv_(itype, jobz, uplo, n, A, lda, B, ldb, w, work, lwork, info);
+}
+#else
+inline void
+sygv (const int*, const char*, const char*, const int*, float*, const int*, float*, const int*, float*, float*, const int*, int*)
+{
+  Assert (false, LAPACKSupport::ExcMissing("ssygv"));
 }
 #endif
 
