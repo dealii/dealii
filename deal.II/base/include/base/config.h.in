@@ -308,6 +308,9 @@
 /* Define to 1 if you have the `dstev_' function. */
 #undef HAVE_DSTEV_
 
+/* Define to 1 if you have the `dsygv_' function. */
+#undef HAVE_DSYGV_
+
 /* Define to 1 if you have the `dtrtrs_' function. */
 #undef HAVE_DTRTRS_
 
@@ -429,6 +432,9 @@
 
 /* Define to 1 if you have the `sstev_' function. */
 #undef HAVE_SSTEV_
+
+/* Define to 1 if you have the `ssygv_' function. */
+#undef HAVE_SSYGV_
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -598,15 +604,15 @@
  */
 #define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
   ((PETSC_VERSION_MAJOR * 10000 + \
-    PETSC_VERSION_MINOR   * 100 + \
-    PETSC_VERSION_SUBMINOR)       \
+    PETSC_VERSION_MINOR * 100 + \
+    PETSC_VERSION_SUBMINOR) \
     <  \
     (major)*10000 + (minor)*100 + (subminor))
 
 #define DEAL_II_PETSC_VERSION_GTE(major,minor,subminor) \
   ((PETSC_VERSION_MAJOR * 10000 + \
-    PETSC_VERSION_MINOR   * 100 + \
-    PETSC_VERSION_SUBMINOR)       \
+    PETSC_VERSION_MINOR * 100 + \
+    PETSC_VERSION_SUBMINOR) \
     >=  \
     (major)*10000 + (minor)*100 + (subminor))
 
