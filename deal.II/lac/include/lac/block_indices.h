@@ -23,12 +23,12 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * Class that manages the conversion of global indices into a block
- * vector or matrix to the local indices within this block. This is
- * required when you address a global element in a block vector and
- * want to know which element within which block this is. It is also
- * useful if a matrix is composed of several blocks, where you have to
- * translate global row and column indices to local ones.
+ * Class that manages the conversion of global indices into a block vector or
+ * matrix to the local indices within this block. This is required, for
+ * example, when you address a global element in a block vector and want to
+ * know which element within which block this is. It is also useful if a
+ * matrix is composed of several blocks, where you have to translate global
+ * row and column indices to local ones.
  *
  * @ingroup data
  * @see @ref GlossBlockLA "Block (linear algebra)"
