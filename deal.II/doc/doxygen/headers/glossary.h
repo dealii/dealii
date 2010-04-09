@@ -198,12 +198,12 @@
  * On the other hand, when talking about finite elements and degrees of
  * freedom, <i>components</i> are not always the correct concept because
  * components are not always individually addressable. In particular, this is
- * the case for @refGlossPrimitive "non-primitive finite elements". Similarly,
+ * the case for @ref GlossPrimitive "non-primitive finite elements". Similarly,
  * one may not always <i>want</i> to address individual components but rather
  * sets of components &mdash; e.g. all velocity components together, and
  * separate from the pressure in the Stokes system, without further splitting
  * the velocities into their individual components. In either case, the
- * correct concept to think in is that of a @ref GlossBlockFE "block".  Since
+ * correct concept to think in is that of a @ref GlossBlock "block".  Since
  * each component, if individually addressable, is also a block, thinking in
  * terms of blocks is most frequently the better strategy.
  *
