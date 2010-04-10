@@ -230,7 +230,7 @@ namespace MeshWorker
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
  */
-  template<int dim, int spacedim, class DOFINFO, class INFOBOX, typename ASSEMBLER, class ITERATOR>
+  template<int dim, int spacedim, class DOFINFO, class INFOBOX, class ASSEMBLER, class ITERATOR>
   void loop(ITERATOR begin,
 	    typename identity<ITERATOR>::type end,
 	    DOFINFO& dinfo,
@@ -285,7 +285,7 @@ namespace MeshWorker
 			ASSEMBLER &assembler,
 			bool cells_first = true)
   {
-    loop<dim, dim>
+    loop<dim, spacedim>
       (begin, end,
        dof_info,
        box,
