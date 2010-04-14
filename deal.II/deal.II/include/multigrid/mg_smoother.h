@@ -134,7 +134,7 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				     /**
 				      * Memory for auxiliary vectors.
 				      */
-    VectorMemory<VECTOR>& mem;
+    SmartPointer<VectorMemory<VECTOR>, MGSmoother<VECTOR> > mem;
 };
 
 
@@ -547,7 +547,7 @@ MGSmoother<VECTOR>::MGSmoother(
 		symmetric(symmetric),
 		transpose(transpose),
 		debug(0),
-		mem(mem)
+		mem(&mem)
 {}
 
 
@@ -726,9 +726,10 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
 
   if (this->variable)
     steps2 *= (1<<(maxlevel-level));
-
-  VECTOR* r = this->mem.alloc();
-  VECTOR* d = this->mem.alloc();
+  
+  GrowingVectorMemory<VECTOR> mem2;
+  typename VectorMemory<VECTOR>::Pointer r((this->mem) ? *this->mem : mem2);
+  typename VectorMemory<VECTOR>::Pointer d((this->mem) ? *this->mem : mem2);
   r->reinit(u);
   d->reinit(u);
 
@@ -768,9 +769,6 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
     }
   if (this->debug > 0)
     deallog << std::endl;
-
-  this->mem.free(r);
-  this->mem.free(d);
 }
 
 #else
@@ -816,7 +814,7 @@ memory_consumption () const
   return sizeof(*this)
     + matrices.memory_consumption()
     + smoothers.memory_consumption()
-    + this->mem.memory_consumption();
+    + this->mem->memory_consumption();
 }
 
 
@@ -965,63 +963,49 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
   if (this->variable)
     steps2 *= (1<<(maxlevel-level));
 
-  VECTOR* r = this->mem.alloc();
-  VECTOR* d = this->mem.alloc();
+  GrowingVectorMemory<VECTOR> mem2;
+  typename VectorMemory<VECTOR>::Pointer r((this->mem) ? *this->mem : mem2);
+  typename VectorMemory<VECTOR>::Pointer d((this->mem) ? *this->mem : mem2);
 
-  try
+  r->reinit(u,true);
+  d->reinit(u,true);
+  
+  bool T = this->transpose;
+  if (this->symmetric && (steps2 % 2 == 0))
+    T = false;
+  if (this->debug > 0)
+    deallog << 'S' << level << ' ';
+  
+  for (unsigned int i=0; i<steps2; ++i)
     {
-      r->reinit(u,true);
-      d->reinit(u,true);
-
-      bool T = this->transpose;
-      if (this->symmetric && (steps2 % 2 == 0))
-	T = false;
-      if (this->debug > 0)
-	deallog << 'S' << level << ' ';
-
-      for (unsigned int i=0; i<steps2; ++i)
+      if (T)
 	{
-	  if (T)
-	    {
-	      if (this->debug > 0)
-		deallog << 'T';
-	      matrices[level].Tvmult(*r,u);
-	      r->sadd(-1.,1.,rhs);
-	      if (this->debug > 2)
-		deallog << ' ' << r->l2_norm() << ' ';
-	      smoothers[level].Tvmult(*d, *r);
-	      if (this->debug > 1)
-		deallog << ' ' << d->l2_norm() << ' ';
-	    } else {
-	    if (this->debug > 0)
-	      deallog << 'N';
-	    matrices[level].vmult(*r,u);
-	    r->sadd(-1.,rhs);
-	    if (this->debug > 2)
-	      deallog << ' ' << r->l2_norm() << ' ';
-	    smoothers[level].vmult(*d, *r);
-	    if (this->debug > 1)
-	      deallog << ' ' << d->l2_norm() << ' ';
-	  }
-	  u += *d;
-	  if (this->symmetric)
-	    T = !T;
-	}
-      if (this->debug > 0)
-	deallog << std::endl;
-
-      this->mem.free(r);
-      this->mem.free(d);
+	  if (this->debug > 0)
+	    deallog << 'T';
+	  matrices[level].Tvmult(*r,u);
+	  r->sadd(-1.,1.,rhs);
+	  if (this->debug > 2)
+	    deallog << ' ' << r->l2_norm() << ' ';
+	  smoothers[level].Tvmult(*d, *r);
+	  if (this->debug > 1)
+	    deallog << ' ' << d->l2_norm() << ' ';
+	} else {
+	if (this->debug > 0)
+	  deallog << 'N';
+	matrices[level].vmult(*r,u);
+	r->sadd(-1.,rhs);
+	if (this->debug > 2)
+	  deallog << ' ' << r->l2_norm() << ' ';
+	smoothers[level].vmult(*d, *r);
+	if (this->debug > 1)
+	  deallog << ' ' << d->l2_norm() << ' ';
+      }
+      u += *d;
+      if (this->symmetric)
+	T = !T;
     }
-  catch (...)
-    {
-				       // make sure we don't produce a
-				       // memory leak
-      this->mem.free(r);
-      this->mem.free(d);
-
-      throw;
-    }
+  if (this->debug > 0)
+    deallog << std::endl;
 }
 
 
@@ -1034,7 +1018,7 @@ memory_consumption () const
   return sizeof(*this)
     + matrices.memory_consumption()
     + smoothers.memory_consumption()
-    + this->mem.memory_consumption();
+    + this->mem->memory_consumption();
 }
 
 
