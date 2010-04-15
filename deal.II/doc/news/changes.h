@@ -83,6 +83,17 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
+   Improved: We now compile all files with their full path name on the command
+   line. This makes it simpler for tools like debuggers or profilers (e.g.
+   valgrind) to find the source files that corresponds to an executable.
+   <br>
+   (WB 2010/04/15)
+   </p>
+   </li>
+
+
+   <li>
+   <p>
    Improved:
           Over the last few months, the multigrid implementation has seen
           significant rewrites, with much of the work done by B&auml;rbel
@@ -604,7 +615,7 @@ inconvenience this causes.
   <br>
   (GK 2010/03/25)
   </p></li>
-  
+
   <li>
   <p>
   New: The function DoFRenumbering::downstream has now an additional bool

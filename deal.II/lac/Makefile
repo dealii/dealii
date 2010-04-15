@@ -10,8 +10,8 @@ include $D/common/Make.global_options
 
 
 # create lists of file names
-cc-files     = $(shell echo source/*.cc)
-o-files-base = $(sort $(addprefix $(LIBDIR)/lac/, $(patsubst source/%,%,$(cc-files:.cc=.$(OBJEXT)))))
+cc-files     = $(shell echo $D/lac/source/*.cc)
+o-files-base = $(sort $(addprefix $(LIBDIR)/lac/, $(patsubst $D/lac/source/%,%,$(cc-files:.cc=.$(OBJEXT)))))
 o-files      = $(o-files-base)
 go-files     = $(o-files-base:.$(OBJEXT)=.g.$(OBJEXT))
 h-files      = $(sort $(shell echo include/lac/*.h))

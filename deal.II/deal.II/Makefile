@@ -26,8 +26,8 @@ debug: 2dg 3dg 1dg
 
 # create lists of file names. compile vectors.cc first because it is
 # one of the files that takes the longest
-cc-files     = source/numerics/vectors.cc \
-               $(filter-out source/numerics/vectors.cc, $(shell echo source/*/*.cc))
+cc-files     = $D/deal.II/source/numerics/vectors.cc \
+               $(filter-out $D/deal.II/source/numerics/vectors.cc, $(shell echo $D/deal.II/source/*/*.cc))
 h-files      = $(sort $(shell echo include/*/*.h))
 
 inst-in-files= $(shell echo source/*/*.inst.in)
@@ -36,7 +36,7 @@ inst-files   = $(inst-in-files:%.in=%)
 
 # replace subdirectories in cc file names by a prefix, preprend a "lib/[g]o"
 # and change the suffix
-tmp1        = $(shell echo $(cc-files) | $(PERL) -pi -e 's,source/,,g; s,/,_,g;')
+tmp1        = $(shell echo $(cc-files) | $(PERL) -pi -e 's,$D/deal.II/source/,,g; s,/,_,g;')
 o-files-1d  = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.$(OBJEXT)) )
 go-files-1d = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.g.$(OBJEXT)))
 o-files-2d  = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.$(OBJEXT)) )
@@ -201,7 +201,8 @@ Makefile.dep: $(cc-files) $(h-files) \
 		$(inst-files) \
 		Makefile $D/common/Make.global_options
 	@echo "===================================== Remaking deal.II/Makefile"
-	@(for dir in dofs fe grid hp multigrid numerics ; do $D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" `echo source/$$dir/*cc` \
+	@(for dir in dofs fe grid hp multigrid numerics ; do \
+		$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" `echo $D/deal.II/source/$$dir/*cc` \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!((\.g)?.$(OBJEXT)):!_DIM_PLACEHOLDER$$1:!g;' \
 	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/DIRPLACEHOLDER_$$2_1d$$3 $$1/2d/DIRPLACEHOLDER_$$2_2d$$3 $$1/3d/DIRPLACEHOLDER_$$2_3d$$3:!g;'\

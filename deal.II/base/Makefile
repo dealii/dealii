@@ -8,8 +8,8 @@ D=..
 
 
 # create lists of file names
-cc-files     = $(shell echo source/*.cc)
-o-files-base = $(addprefix $(LIBDIR)/base/, $(patsubst source/%,%,$(cc-files:.cc=.$(OBJEXT))))
+cc-files     = $(shell echo $D/base/source/*.cc)
+o-files-base = $(addprefix $(LIBDIR)/base/, $(patsubst $D/base/source/%,%,$(cc-files:.cc=.$(OBJEXT))))
 o-files      = $(sort $(o-files-base))
 go-files     = $(o-files:.$(OBJEXT)=.g.$(OBJEXT))
 h-files      = $(sort $(shell echo include/base/*.h))
