@@ -52,24 +52,24 @@ go-files = $(go-files-1d) $(go-files-2d) $(go-files-3d)
 # there are some files which needs exceptional rules; these are
 # listed immediately below
 $(LIBDIR)/1d/%.g.$(OBJEXT) :
-	@echo "=====deal.II====1d====debug======$(MT)== $(<:source/%=%)"
+	@echo "=====deal.II====1d====debug======$(MT)== $(<:$D/deal.II/source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
 $(LIBDIR)/1d/%.$(OBJEXT) :
-	@echo "=====deal.II====1d====optimized==$(MT)== $(<:source/%=%)"
+	@echo "=====deal.II====1d====optimized==$(MT)== $(<:$D/deal.II/source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
 $(LIBDIR)/2d/%.g.$(OBJEXT) :
-	@echo "=====deal.II====2d====debug======$(MT)== $(<:source/%=%)"
+	@echo "=====deal.II====2d====debug======$(MT)== $(<:$D/deal.II/source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
 $(LIBDIR)/2d/%.$(OBJEXT) :
-	@echo "=====deal.II====2d====optimized==$(MT)== $(<:source/%=%)"
+	@echo "=====deal.II====2d====optimized==$(MT)== $(<:$D/deal.II/source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
 $(LIBDIR)/3d/%.g.$(OBJEXT) :
-	@echo "=====deal.II====3d====debug======$(MT)== $(<:source/%=%)"
+	@echo "=====deal.II====3d====debug======$(MT)== $(<:$D/deal.II/source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
 $(LIBDIR)/3d/%.$(OBJEXT) :
-	@echo "=====deal.II====3d====optimized==$(MT)== $(<:source/%=%)"
+	@echo "=====deal.II====3d====optimized==$(MT)== $(<:$D/deal.II/source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
 source/%.inst : source/%.inst.in $D/common/template-arguments \
