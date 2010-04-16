@@ -101,122 +101,11 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   if test "$GXX" = yes ; then
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-    case "$GXX_VERSION_STRING" in
-      *version\ 3.2*)
-  	GXX_VERSION=gcc3.2
-        case "$GXX_VERSION_STRING" in
-	  *version\ 3.2.0*) GXX_VERSION_DETAILED=gcc3.2.0 ;;
-	  *version\ 3.2.1*) GXX_VERSION_DETAILED=gcc3.2.1 ;;
-	  *version\ 3.2.2*) GXX_VERSION_DETAILED=gcc3.2.2 ;;
-	  *version\ 3.2.3*) GXX_VERSION_DETAILED=gcc3.2.3 ;;
-	  *)                GXX_VERSION_DETAILED=gcc3.2.x ;;
-        esac
-  	;;
-      *version\ 3.3*)
-  	GXX_VERSION=gcc3.3
-        case "$GXX_VERSION_STRING" in
-	  *version\ 3.3.0*) GXX_VERSION_DETAILED=gcc3.3.0 ;;
-	  *version\ 3.3.1*) GXX_VERSION_DETAILED=gcc3.3.1 ;;
-	  *version\ 3.3.2*) GXX_VERSION_DETAILED=gcc3.3.2 ;;
-	  *version\ 3.3.3*) GXX_VERSION_DETAILED=gcc3.3.3 ;;
-	  *version\ 3.3.4*) GXX_VERSION_DETAILED=gcc3.3.4 ;;
-	  *version\ 3.3.5*) GXX_VERSION_DETAILED=gcc3.3.5 ;;
-	  *version\ 3.3.6*) GXX_VERSION_DETAILED=gcc3.3.6 ;;
-	  *version\ 3.3.7*) GXX_VERSION_DETAILED=gcc3.3.7 ;;
-	  *)                GXX_VERSION_DETAILED=gcc3.3.x ;;
-        esac
-  	;;
-      *version\ 3.4*)
-        case "$GXX_VERSION_STRING" in
-	  *version\ 3.4.0*) GXX_VERSION_DETAILED=gcc3.4.0 ;;
-	  *version\ 3.4.1*) GXX_VERSION_DETAILED=gcc3.4.1 ;;
-	  *version\ 3.4.2*) GXX_VERSION_DETAILED=gcc3.4.2 ;;
-	  *version\ 3.4.3*) GXX_VERSION_DETAILED=gcc3.4.3 ;;
-	  *version\ 3.4.4*) GXX_VERSION_DETAILED=gcc3.4.4 ;;
-	  *version\ 3.4.5*) GXX_VERSION_DETAILED=gcc3.4.5 ;;
-	  *version\ 3.4.6*) GXX_VERSION_DETAILED=gcc3.4.6 ;;
-	  *)                GXX_VERSION_DETAILED=gcc3.4.x ;;
-        esac
-  	GXX_VERSION=gcc3.4
-  	;;
-      *version\ 4.0*)
-  	GXX_VERSION=gcc4.0
-        case "$GXX_VERSION_STRING" in
-	  *version\ 4.0.0*) GXX_VERSION_DETAILED=gcc4.0.0 ;;
-	  *version\ 4.0.1*) GXX_VERSION_DETAILED=gcc4.0.1 ;;
-	  *version\ 4.0.2*) GXX_VERSION_DETAILED=gcc4.0.2 ;;
-	  *version\ 4.0.3*) GXX_VERSION_DETAILED=gcc4.0.3 ;;
-	  *version\ 4.0.4*) GXX_VERSION_DETAILED=gcc4.0.4 ;;
-	  *version\ 4.0.5*) GXX_VERSION_DETAILED=gcc4.0.5 ;;
-	  *)                GXX_VERSION_DETAILED=gcc4.0.x ;;
-        esac
-  	;;
-      *version\ 4.1*)
-  	GXX_VERSION=gcc4.1
-        case "$GXX_VERSION_STRING" in
-	  *version\ 4.1.0*) GXX_VERSION_DETAILED=gcc4.1.0 ;;
-	  *version\ 4.1.1*) GXX_VERSION_DETAILED=gcc4.1.1 ;;
-	  *version\ 4.1.2*) GXX_VERSION_DETAILED=gcc4.1.2 ;;
-	  *version\ 4.1.3*) GXX_VERSION_DETAILED=gcc4.1.3 ;;
-	  *)                GXX_VERSION_DETAILED=gcc4.1.x ;;
-        esac
-  	;;
-      *version\ 4.2*)
-  	GXX_VERSION=gcc4.2
-        case "$GXX_VERSION_STRING" in
-	  *version\ 4.2.0*) GXX_VERSION_DETAILED=gcc4.2.0 ;;
-	  *version\ 4.2.1*) GXX_VERSION_DETAILED=gcc4.2.1 ;;
-	  *version\ 4.2.2*) GXX_VERSION_DETAILED=gcc4.2.2 ;;
-	  *)                GXX_VERSION_DETAILED=gcc4.2.x ;;
-        esac
-  	;;
-      *version\ 4.3*)
-  	GXX_VERSION=gcc4.3
-        case "$GXX_VERSION_STRING" in
-	  *version\ 4.3.0*) GXX_VERSION_DETAILED=gcc4.3.0 ;;
-	  *version\ 4.3.1*) GXX_VERSION_DETAILED=gcc4.3.1 ;;
-	  *version\ 4.3.2*) GXX_VERSION_DETAILED=gcc4.3.2 ;;
-	  *)                GXX_VERSION_DETAILED=gcc4.3.x ;;
-        esac
-  	;;
-      *version\ 4.4*)
-  	GXX_VERSION=gcc4.4
-        case "$GXX_VERSION_STRING" in
-	  *version\ 4.4.0*) GXX_VERSION_DETAILED=gcc4.4.0 ;;
-	  *version\ 4.4.1*) GXX_VERSION_DETAILED=gcc4.4.1 ;;
-	  *version\ 4.4.2*) GXX_VERSION_DETAILED=gcc4.4.2 ;;
-	  *)                GXX_VERSION_DETAILED=gcc4.4.x ;;
-        esac
-  	;;
-      *version\ 4.5*)
-  	GXX_VERSION=gcc4.5
-        case "$GXX_VERSION_STRING" in
-	  *version\ 4.5.0*) GXX_VERSION_DETAILED=gcc4.5.0 ;;
-	  *version\ 4.5.1*) GXX_VERSION_DETAILED=gcc4.5.1 ;;
-	  *version\ 4.5.2*) GXX_VERSION_DETAILED=gcc4.5.2 ;;
-	  *)                GXX_VERSION_DETAILED=gcc4.5.x ;;
-        esac
-  	;;
-      *version\ 4.6*)
-  	GXX_VERSION=gcc4.6
-        case "$GXX_VERSION_STRING" in
-	  *version\ 4.6.0*) GXX_VERSION_DETAILED=gcc4.6.0 ;;
-	  *version\ 4.6.1*) GXX_VERSION_DETAILED=gcc4.6.1 ;;
-	  *version\ 4.6.2*) GXX_VERSION_DETAILED=gcc4.6.2 ;;
-	  *)                GXX_VERSION_DETAILED=gcc4.6.x ;;
-        esac
-  	;;
-      *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-  	dnl These compilers are too old to support a useful subset
-  	dnl of modern C++, so we don't support them
-  	AC_MSG_RESULT(C++ compiler is $GXX_VERSION_STRING)
-  	AC_MSG_ERROR(C++ compiler is not supported)
-  	;;
-      *)
-  	AC_MSG_RESULT(C++ compiler is unknown but accepted gcc version)
-  	GXX_VERSION=gcc-other
-  	;;
-    esac
+
+    full_version=`echo "$GXX_VERSION_STRING" | perl -pi -e 's/.*version (\d\.\d\.\d).*/\1/g;'`
+    GXX_VERSION=gcc`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
+    GXX_VERSION_DETAILED=gcc$full_version
+
     AC_MSG_RESULT([C++ compiler is $GXX_VERSION (subversion $GXX_VERSION_DETAILED)])
 
 
@@ -1168,80 +1057,11 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
   if test "$GCC" = yes ; then
     dnl find out the right version
     CC_VERSION_STRING=`($CC -v 2>&1) | grep "gcc version"`
-    case "$CC_VERSION_STRING" in
-      *2.95*)
-  	AC_MSG_RESULT(C compiler is gcc-2.95)
-  	CC_VERSION=gcc2.95
-  	;;
-      *2.96*)
-  	AC_MSG_ERROR(C compiler reports faulty gcc 2.96. Please install a new compiler)
-  	CC_VERSION=gcc2.96
-  	;;
-      *2.97*)
-  	AC_MSG_RESULT(C compiler is gcc-2.97)
-  	CC_VERSION=gcc2.97
-  	;;
-      *version\ 3.0*)
-  	AC_MSG_RESULT(C compiler is gcc-3.0)
-  	CC_VERSION=gcc3.0
-  	;;
-      *version\ 3.1*)
-  	AC_MSG_RESULT(C compiler is gcc-3.1)
-  	CC_VERSION=gcc3.1
-  	;;
-      *version\ 3.2*)
-  	AC_MSG_RESULT(C compiler is gcc-3.2)
-  	CC_VERSION=gcc3.2
-  	;;
-      *version\ 3.3*)
-  	AC_MSG_RESULT(C compiler is gcc-3.3)
-  	CC_VERSION=gcc3.3
-  	;;
-      *version\ 3.4*)
-  	AC_MSG_RESULT(C compiler is gcc-3.4)
-  	CC_VERSION=gcc3.4
-  	;;
-      *version\ 3.5*)
-  	AC_MSG_RESULT(C compiler is gcc-3.5)
-  	CC_VERSION=gcc3.5
-  	;;
-      *version\ 4.0*)
-  	AC_MSG_RESULT(C compiler is gcc-4.0)
-  	CC_VERSION=gcc4.0
-  	;;
-      *version\ 4.1*)
-  	AC_MSG_RESULT(C compiler is gcc-4.1)
-  	CC_VERSION=gcc4.1
-  	;;
-      *version\ 4.2*)
-  	AC_MSG_RESULT(C compiler is gcc-4.2)
-  	CC_VERSION=gcc4.2
-  	;;
-      *version\ 4.3*)
-  	AC_MSG_RESULT(C compiler is gcc-4.3)
-  	CC_VERSION=gcc4.3
-  	;;
-      *version\ 4.4*)
-  	AC_MSG_RESULT(C compiler is gcc-4.4)
-  	CC_VERSION=gcc4.4
-  	;;
-      *version\ 4.5*)
-  	AC_MSG_RESULT(C compiler is gcc-4.5)
-  	CC_VERSION=gcc4.5
-  	;;
-      *version\ 4.6*)
-  	AC_MSG_RESULT(C compiler is gcc-4.6)
-  	CC_VERSION=gcc4.6
-  	;;
-      *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-  	AC_MSG_RESULT(C compiler is $CC_VERSION_STRING)
-  	AC_MSG_ERROR(C compiler is not supported)
-  	;;
-      *)
-  	AC_MSG_RESULT(C compiler is unknown but accepted gcc version)
-  	CC_VERSION=gcc-other
-  	;;
-    esac
+
+    full_version=`echo "$CC_VERSION_STRING" | perl -pi -e 's/.*version (\d\.\d\.\d).*/\1/g;'`
+    CC_VERSION=gcc`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
+
+    AC_MSG_RESULT(C compiler is $CC_VERSION)
   else
     dnl Check other (non-gcc) compilers
 
