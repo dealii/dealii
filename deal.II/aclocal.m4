@@ -5486,7 +5486,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
         fi
         ;;
       *)    dnl
-        AC_MSG_ERROR([Unknown PETSc version])
+        AC_MSG_ERROR([Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}])
 	;;
     esac
   fi
