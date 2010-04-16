@@ -102,44 +102,6 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
-      *2.95*)
-  	GXX_VERSION=gcc2.95
-        case "$GXX_VERSION_STRING" in
-	  *version\ 2.95.0*) GXX_VERSION_DETAILED=gcc2.95.0 ;;
-	  *version\ 2.95.1*) GXX_VERSION_DETAILED=gcc2.95.1 ;;
-	  *version\ 2.95.2*) GXX_VERSION_DETAILED=gcc2.95.2 ;;
-	  *version\ 2.95.3*) GXX_VERSION_DETAILED=gcc2.95.3 ;;
-	  *version\ 2.95.4*) GXX_VERSION_DETAILED=gcc2.95.4 ;;
-	  *)                 GXX_VERSION_DETAILED=gcc2.95.x ;;
-        esac
-  	;;
-      *2.96*)
-  	AC_MSG_ERROR(C++ compiler reports faulty gcc 2.96. Please install a new compiler)
-  	GXX_VERSION=gcc2.96
-  	;;
-      *2.97*)
-  	AC_MSG_RESULT(C++ compiler is gcc-2.97)
-  	GXX_VERSION=gcc2.97
-  	;;
-      *version\ 3.0*)
-  	GXX_VERSION=gcc3.0
-        case "$GXX_VERSION_STRING" in
-	  *version\ 3.0.0*) GXX_VERSION_DETAILED=gcc3.0.0 ;;
-	  *version\ 3.0.1*) GXX_VERSION_DETAILED=gcc3.0.1 ;;
-	  *version\ 3.0.2*) GXX_VERSION_DETAILED=gcc3.0.2 ;;
-	  *version\ 3.0.3*) GXX_VERSION_DETAILED=gcc3.0.3 ;;
-	  *version\ 3.0.4*) GXX_VERSION_DETAILED=gcc3.0.4 ;;
-	  *)                GXX_VERSION_DETAILED=gcc3.0.x ;;
-        esac
-  	;;
-      *version\ 3.1*)
-  	GXX_VERSION=gcc3.1
-        case "$GXX_VERSION_STRING" in
-	  *version\ 3.1.0*) GXX_VERSION_DETAILED=gcc3.1.0 ;;
-	  *version\ 3.1.1*) GXX_VERSION_DETAILED=gcc3.1.1 ;;
-	  *)                GXX_VERSION_DETAILED=gcc3.1.x ;;
-        esac
-  	;;
       *version\ 3.2*)
   	GXX_VERSION=gcc3.2
         case "$GXX_VERSION_STRING" in
@@ -505,7 +467,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
-    CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
+    CXXFLAGSO="$CXXFLAGS -O2 -funroll-loops -funroll-all-loops -fstrict-aliasing -Wuninitialized -felide-constructors -ftemplate-depth-128"
     CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Woverloaded-virtual -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
 
     dnl BOOST uses long long, so don't warn about this
@@ -593,51 +555,6 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	;;
     esac
 
-    dnl set some flags that are specific to some versions of the
-    dnl compiler:
-    dnl - egcs1.1 yielded incorrect code with some loop unrolling
-    dnl - after egcs1.1, the optimization flag -fstrict-aliasing was
-    dnl   introduced, which enables better optimizations for
-    dnl   well-written C++ code. we believe that deal.II falls into that
-    dnl   category and thus enable the flag
-    dnl - egcs1.1 yielded incorrect code with vtable-thunks. thus disable
-    dnl   them for egcs1.1. however, if on Linux, disabling them
-    dnl   prevents programs from being linked, so take the risk of broken
-    dnl   thunks on this platform
-
-    case "$GXX_VERSION" in
-      egcs1.1)
-          case "$target" in
-            *linux*)
-                ;;
-
-            *)
-                CXXFLAGSG="$CXXFLAGSG -fno-vtable-thunks"
-                CXXFLAGSO="$CXXFLAGSO -fno-vtable-thunks"
-                ;;
-          esac
-          ;;
-
-      dnl All other gcc versions
-      *)
-          CXXFLAGSO="$CXXFLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
-          ;;
-    esac
-
-    dnl - after gcc2.95, some flags were deemed obsolete for C++
-    dnl   (and are only supported for C any more), so only define them for
-    dnl   previous compilers
-
-    case "$GXX_VERSION" in
-      egcs1.1 | gcc2.95)
-          CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs -Wno-non-template-friend"
-          CXXFLAGSO="$CXXFLAGSO -fnonnull-objects -Wno-non-template-friend"
-          ;;
-
-      *)
-          ;;
-    esac
-
     dnl Some gcc compiler versions have a problem when using an unsigned count
     dnl in the std::advance function. Unfortunately, this also happens
     dnl occasionally from within the standard library, so we can't prevent the
@@ -707,13 +624,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
         ;;
     esac
 
-    dnl In order to link shared libraries, almost all versions of gcc can
-    dnl use CXX, i.e. the C++ compiler. The exception is gcc2.95, for which
-    dnl we have to use the C compiler, unless we want to get linker errors
     SHLIBLD="$CXX"
-    if test "$GXX_VERSION" = "gcc2.95"; then
-      SHLIBLD="$CC"
-    fi
 
   else
     dnl Non-gcc compilers. By default, use the C++ compiler also for linking
@@ -1258,10 +1169,6 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
     dnl find out the right version
     CC_VERSION_STRING=`($CC -v 2>&1) | grep "gcc version"`
     case "$CC_VERSION_STRING" in
-      *"egcs-1.1"*)
-  	AC_MSG_RESULT(C compiler is egcs-1.1)
-  	CC_VERSION=egcs1.1
-  	;;
       *2.95*)
   	AC_MSG_RESULT(C compiler is gcc-2.95)
   	CC_VERSION=gcc2.95
@@ -1670,10 +1577,6 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
       dnl Yes, this is a GNU g77 version. find out the right version
       G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
       case "$G77_VERSION_STRING" in
-        *"egcs-1.1"*)
-          AC_MSG_RESULT(F77 compiler is egcs-1.1)
-          F77_VERSION=egcs1.1
-          ;;
         *version\ 2.95*)
           AC_MSG_RESULT(F77 compiler is gcc-2.95)
   	  F77_VERSION=gcc2.95
@@ -1815,16 +1718,9 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 [
   case "$F77_VERSION" in
-    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc[[34]].*)
+    gcc*)
         F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
-        F77FLAGSO="$FFLAGS -O2"
-
-        dnl Some flags can only be set for some compilers as others either
-        dnl did not accept them or were buggy on them (see the explanation
-        dnl for CXXFLAGS for an explanation of some of these cases)
-        if test "x$F77_VERSION" != "xegcs1.1" ; then
-          F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
-        fi
+        F77FLAGSO="$FFLAGS -O2 -funroll-loops -funroll-all-loops -fstrict-aliasing"
 
         case "$target" in
            *cygwin* )
@@ -2247,12 +2143,6 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 
       CXXFLAGSG="$CXXFLAGSG -D_REENTRANT"
       CXXFLAGSO="$CXXFLAGSO -D_REENTRANT"
-      if test "$GXX_VERSION" = "gcc2.95" \
-              -o "$GXX_VERSION" = "gcc2.96" \
-	      -o "$GXX_VERSION" = "gcc3.0" ; then
-        CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC"
-        CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
-      fi
     else
       case "$GXX_VERSION" in
 	ibm_xlc)
@@ -4596,7 +4486,7 @@ dnl Check for boost option and find pre-installed boost
 dnl -------------------------------------------------------------
 
 AC_DEFUN(DEAL_II_CHECK_BOOST, dnl
-[ 
+[
   AC_ARG_WITH(boost,
               [AS_HELP_STRING([--with-boost=/path/to/boost],
               [Use an installed boost library instead of the contributed one. The optional argument points to the directory containing the boost subdirectory for header files.])],
@@ -5797,7 +5687,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
 
 
 dnl ------------------------------------------------------------
-dnl Figure out the architecture used for PETSc, since that 
+dnl Figure out the architecture used for PETSc, since that
 dnl determines where object and configuration files will be found.
 dnl
 dnl Usage: DEAL_II_CONFIGURE_PETSC_ARCH
@@ -5888,9 +5778,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
 
 dnl ------------------------------------------------------------
 dnl See if there is a library libmpiuni.a/so available. We need
-dnl to link with it on some systems where PETSc is built without 
+dnl to link with it on some systems where PETSc is built without
 dnl a real MPI and we need to handle trivial (one process) MPI
-dnl functionality. 
+dnl functionality.
 dnl
 dnl Usage: DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
 dnl
@@ -5901,13 +5791,13 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
   case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
     2.3*) dnl
       if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a ; then
-        DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a" 
-      fi 
+        DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a"
+      fi
       ;;
     3.*.0) dnl
       if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a ; then
-        DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a" 
-      fi 
+        DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a"
+      fi
       ;;
     *)    dnl
       AC_MSG_ERROR([Unknown PETSc version])
@@ -5923,10 +5813,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
 
 
 dnl ------------------------------------------------------------
-dnl Figure out PETSc was compiled with --scalar-type=complex by 
+dnl Figure out PETSc was compiled with --scalar-type=complex by
 dnl scanning PETSc configuration file.
 dnl
-dnl Warning: Up tp now, PETSc>3.0.0 is being supported and 
+dnl Warning: Up tp now, PETSc>3.0.0 is being supported and
 dnl deal.II will not safely compile if this option is "yes".
 dnl
 dnl Usage: DEAL_II_CONFIGURE_PETSC_COMPLEX
@@ -5944,7 +5834,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_COMPLEX, dnl
          AC_MSG_RESULT(yes)
       else
          AC_MSG_RESULT(no)
-      fi  
+      fi
 
       dnl If we have previously found PETSc and here with a complex
       dnl scalar type then set the DEAL_II_USE_COMPLEX macro
@@ -6074,7 +5964,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_VERSION, dnl
   AC_MSG_RESULT($SLEPC_VERSION)
 
   dnl Then check that PETSc and SLEPc versions are compatible ie. that
-  dnl they are equivalent. Patch numbers don't count for anything, 
+  dnl they are equivalent. Patch numbers don't count for anything,
   dnl but, we do include whether PETSc and SLEPc are both release
   dnl versions in the check.
   if test "${PETSC_VERSION}" != "${SLEPC_VERSION}" \
