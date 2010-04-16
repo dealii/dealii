@@ -1396,76 +1396,11 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
 	    -n "`echo $F77_VERSION_STRING | grep \"gcc version\"`" ; then
       dnl Yes, this is a GNU g77 version. find out the right version
       G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
-      case "$G77_VERSION_STRING" in
-        *version\ 2.95*)
-          AC_MSG_RESULT(F77 compiler is gcc-2.95)
-  	  F77_VERSION=gcc2.95
-  	  ;;
-        *version\ 2.96*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-2.96)
-  	  F77_VERSION=gcc2.96
-  	  ;;
-        *version\ 2.97*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-2.97)
-  	  F77_VERSION=gcc2.97
-  	  ;;
-        *version\ 3.0*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-3.0)
-  	  F77_VERSION=gcc3.0
-  	  ;;
-        *version\ 3.1*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-3.1)
-  	  F77_VERSION=gcc3.1
-  	  ;;
-        *version\ 3.2*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-3.2)
-  	  F77_VERSION=gcc3.2
-  	  ;;
-        *version\ 3.3*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-3.3)
-  	  F77_VERSION=gcc3.3
-  	  ;;
-        *version\ 3.4*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-3.4)
-  	  F77_VERSION=gcc3.4
-  	  ;;
-        *version\ 3.5*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-3.5)
-  	  F77_VERSION=gcc3.5
-  	  ;;
-        *version\ 4.0*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-4.0)
-  	  F77_VERSION=gcc4.0
-  	  ;;
-        *version\ 4.1*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-4.1)
-  	  F77_VERSION=gcc4.1
-  	  ;;
-        *version\ 4.2*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-4.2)
-  	  F77_VERSION=gcc4.2
-  	  ;;
-        *version\ 4.3*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-4.3)
-  	  F77_VERSION=gcc4.3
-  	  ;;
-        *version\ 4.4*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-4.4)
-  	  F77_VERSION=gcc4.4
-  	  ;;
-        *version\ 4.5*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-4.5)
-  	  F77_VERSION=gcc4.5
-  	  ;;
-        *version\ 4.6*)
-  	  AC_MSG_RESULT(F77 compiler is gcc-4.6)
-  	  F77_VERSION=gcc4.6
-  	  ;;
-        *)
-  	  AC_MSG_RESULT(F77 compiler is unknown but accepted gcc version)
-  	  F77_VERSION=gcc-other
-  	  ;;
-      esac
+
+      full_version=`echo "$G77_VERSION_STRING" | perl -pi -e 's/.*version (\d\.\d\.\d).*/\1/g;'`
+      F77_VERSION=gcc`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
+
+      AC_MSG_RESULT(F77 compiler is $CC_VERSION)
 
     else
 
