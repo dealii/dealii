@@ -16,67 +16,74 @@
 #include <numerics/mesh_worker.h>
 #include <base/quadrature_lib.h>
 
-using namespace dealii;
-using namespace MeshWorker;
+DEAL_II_NAMESPACE_OPEN
 
-template <int dim>
-IntegrationWorker<dim>::IntegrationWorker ()
+namespace MeshWorker
 {
-  cell_flags = update_JxW_values;
-  boundary_flags = UpdateFlags(update_JxW_values | update_normal_vectors);
-  face_flags = boundary_flags;
-  neighbor_flags = update_default;
-}
+
+  template <int dim>
+  IntegrationWorker<dim>::IntegrationWorker ()
+  {
+    cell_flags = update_JxW_values;
+    boundary_flags = UpdateFlags(update_JxW_values | update_normal_vectors);
+    face_flags = boundary_flags;
+    neighbor_flags = update_default;
+  }
 
 
-template<int dim>
-void
-IntegrationWorker<dim>::initialize_update_flags ()
-{
-  if (cell_selector.has_values() != 0) cell_flags |= update_values;
-  if (cell_selector.has_gradients() != 0) cell_flags |= update_gradients;
-  if (cell_selector.has_hessians() != 0) cell_flags |= update_hessians;
+  template<int dim>
+  void
+  IntegrationWorker<dim>::initialize_update_flags ()
+  {
+    if (cell_selector.has_values() != 0) cell_flags |= update_values;
+    if (cell_selector.has_gradients() != 0) cell_flags |= update_gradients;
+    if (cell_selector.has_hessians() != 0) cell_flags |= update_hessians;
   
-  if (boundary_selector.has_values() != 0) boundary_flags |= update_values;
-  if (boundary_selector.has_gradients() != 0) boundary_flags |= update_gradients;
-  if (boundary_selector.has_hessians() != 0) boundary_flags |= update_hessians;
+    if (boundary_selector.has_values() != 0) boundary_flags |= update_values;
+    if (boundary_selector.has_gradients() != 0) boundary_flags |= update_gradients;
+    if (boundary_selector.has_hessians() != 0) boundary_flags |= update_hessians;
   
-  if (face_selector.has_values() != 0) face_flags |= update_values;
-  if (face_selector.has_gradients() != 0) face_flags |= update_gradients;
-  if (face_selector.has_hessians() != 0) face_flags |= update_hessians;
+    if (face_selector.has_values() != 0) face_flags |= update_values;
+    if (face_selector.has_gradients() != 0) face_flags |= update_gradients;
+    if (face_selector.has_hessians() != 0) face_flags |= update_hessians;
   
-  if (face_selector.has_values() != 0) neighbor_flags |= update_values;
-  if (face_selector.has_gradients() != 0) neighbor_flags |= update_gradients;
-  if (face_selector.has_hessians() != 0) neighbor_flags |= update_hessians;  
-}
+    if (face_selector.has_values() != 0) neighbor_flags |= update_values;
+    if (face_selector.has_gradients() != 0) neighbor_flags |= update_gradients;
+    if (face_selector.has_hessians() != 0) neighbor_flags |= update_hessians;  
+  }
 
 
-template<int dim>
-void
-IntegrationWorker<dim>::add_update_flags(
-  const UpdateFlags flags, bool cell, bool boundary, bool face, bool neighbor)
-{
-  if (cell) cell_flags |= flags;
-  if (boundary) boundary_flags |= flags;
-  if (face) face_flags |= flags;
-  if (neighbor) neighbor_flags |= flags;  
-}
+  template<int dim>
+  void
+  IntegrationWorker<dim>::add_update_flags(
+    const UpdateFlags flags, bool cell, bool boundary, bool face, bool neighbor)
+  {
+    if (cell) cell_flags |= flags;
+    if (boundary) boundary_flags |= flags;
+    if (face) face_flags |= flags;
+    if (neighbor) neighbor_flags |= flags;  
+  }
 
   
-template<int dim>
-void
-IntegrationWorker<dim>::initialize_gauss_quadrature(
-  unsigned int cp,
-  unsigned int bp,
-  unsigned int fp)
-{
-  cell_quadrature = QGauss<dim>(cp);
-  boundary_quadrature = QGauss<dim-1>(bp);
-  face_quadrature = QGauss<dim-1>(fp);
+  template<int dim>
+  void
+  IntegrationWorker<dim>::initialize_gauss_quadrature(
+    unsigned int cp,
+    unsigned int bp,
+    unsigned int fp)
+  {
+    cell_quadrature = QGauss<dim>(cp);
+    boundary_quadrature = QGauss<dim-1>(bp);
+    face_quadrature = QGauss<dim-1>(fp);
 
+  }
 }
 
 #if deal_II_dimension > 1
-template class IntegrationWorker<deal_II_dimension>;
+namespace MeshWorker
+{
+  template class IntegrationWorker<deal_II_dimension>;
+}
 #endif
 
+DEAL_II_NAMESPACE_CLOSE
