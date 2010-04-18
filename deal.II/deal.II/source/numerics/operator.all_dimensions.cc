@@ -29,8 +29,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-using namespace Algorithms;
-
+namespace Algorithms
+{
 #include "operator.all_dimensions.inst"
+}
 
 DEAL_II_NAMESPACE_CLOSE
