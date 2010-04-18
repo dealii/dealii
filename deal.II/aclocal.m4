@@ -1901,8 +1901,8 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
     else
       case "$GXX_VERSION" in
 	ibm_xlc)
-            CXXFLAGSG="$CXXFLAGSG -threaded"
-            CXXFLAGSO="$CXXFLAGSO -threaded"
+            CXXFLAGSG="$CXXFLAGSG -qthreaded"
+            CXXFLAGSO="$CXXFLAGSO -qthreaded"
             ;;
 
 	compaq_cxx)
