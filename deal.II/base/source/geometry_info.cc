@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1747,10 +1747,10 @@ GeometryInfo<1>::
 alternating_form_at_vertices
 #ifndef DEAL_II_ARRAY_ARG_BUG
 (const Point<1> (&vertices)[vertices_per_cell],
- Tensor<1-1,1> (&forms)[vertices_per_cell])
+ Tensor<0,1> (&forms)[vertices_per_cell])
 #else
   (const Point<1> *vertices,
-   Tensor<1-1,1> *forms)
+   Tensor<0,1> *forms)
 #endif
   ;
 
@@ -1760,10 +1760,10 @@ GeometryInfo<1>::
 alternating_form_at_vertices
 #ifndef DEAL_II_ARRAY_ARG_BUG
 (const Point<2> (&vertices)[vertices_per_cell],
- Tensor<2-1,2> (&forms)[vertices_per_cell])
+ Tensor<1,2> (&forms)[vertices_per_cell])
 #else
   (const Point<2> *vertices,
-   Tensor<2-1,2> *forms)
+   Tensor<1,2> *forms)
 #endif
   ;
 
@@ -1773,10 +1773,10 @@ GeometryInfo<2>::
 alternating_form_at_vertices
 #ifndef DEAL_II_ARRAY_ARG_BUG
 (const Point<2> (&vertices)[vertices_per_cell],
- Tensor<2-2,2> (&forms)[vertices_per_cell])
+ Tensor<0,2> (&forms)[vertices_per_cell])
 #else
   (const Point<2> *vertices,
-   Tensor<2-2,2> *forms)
+   Tensor<0,2> *forms)
 #endif
   ;
 
@@ -1786,10 +1786,10 @@ GeometryInfo<2>::
 alternating_form_at_vertices
 #ifndef DEAL_II_ARRAY_ARG_BUG
 (const Point<3> (&vertices)[vertices_per_cell],
- Tensor<3-2,3> (&forms)[vertices_per_cell])
+ Tensor<1,3> (&forms)[vertices_per_cell])
 #else
 (const Point<3> *vertices,
- Tensor<3-2,3> *forms)
+ Tensor<1,3> *forms)
 #endif
   ;
 
@@ -1800,10 +1800,10 @@ GeometryInfo<3>::
 alternating_form_at_vertices
 #ifndef DEAL_II_ARRAY_ARG_BUG
 (const Point<3> (&vertices)[vertices_per_cell],
- Tensor<3-3,3> (&forms)[vertices_per_cell])
+ Tensor<0,3> (&forms)[vertices_per_cell])
 #else
 (const Point<3> *vertices,
- Tensor<3-3,3> *forms)
+ Tensor<0,3> *forms)
 #endif
  ;
 
