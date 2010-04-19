@@ -5633,8 +5633,8 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
     else
       case "$GXX_VERSION" in
 	ibm_xlc)
-            CXXFLAGSG="$CXXFLAGSG -threaded"
-            CXXFLAGSO="$CXXFLAGSO -threaded"
+            CXXFLAGSG="$CXXFLAGSG -qthreaded"
+            CXXFLAGSO="$CXXFLAGSO -qthreaded"
             ;;
 
 	compaq_cxx)
@@ -13063,8 +13063,8 @@ $as_echo "$as_me: error: PETSc has not been compiled for the architecture specif
    { (exit 1); exit 1; }; }
         fi
         ;;
-      *)            { { $as_echo "$as_me:$LINENO: error: Unknown PETSc version" >&5
-$as_echo "$as_me: error: Unknown PETSc version" >&2;}
+      *)            { { $as_echo "$as_me:$LINENO: error: Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" >&5
+$as_echo "$as_me: error: Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" >&2;}
    { (exit 1); exit 1; }; }
 	;;
     esac
@@ -13078,12 +13078,12 @@ $as_echo_n "checking for PETSc libmpiuni library... " >&6; }
         DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a"
       fi
       ;;
-    3.*.0)       if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a ; then
+    3.*)       if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a ; then
         DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a"
       fi
       ;;
-    *)          { { $as_echo "$as_me:$LINENO: error: Unknown PETSc version" >&5
-$as_echo "$as_me: error: Unknown PETSc version" >&2;}
+    *)          { { $as_echo "$as_me:$LINENO: error: Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" >&5
+$as_echo "$as_me: error: Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" >&2;}
    { (exit 1); exit 1; }; }
     ;;
   esac
