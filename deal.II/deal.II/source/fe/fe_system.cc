@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -248,6 +248,50 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
   initialize ();
 }
 
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
+				  const unsigned int        n1,
+				  const FiniteElement<dim,spacedim> &fe2,
+				  const unsigned int        n2,
+				  const FiniteElement<dim,spacedim> &fe3,
+				  const unsigned int        n3,
+				  const FiniteElement<dim,spacedim> &fe4,
+				  const unsigned int        n4,
+				  const FiniteElement<dim,spacedim> &fe5,
+				  const unsigned int        n5) :
+  FiniteElement<dim,spacedim> (multiply_dof_numbers(fe1, n1,
+						    fe2, n2,
+						    fe3, n3,
+						    fe4, n4,
+						    fe5, n5),
+			       compute_restriction_is_additive_flags (fe1, n1,
+								      fe2, n2,
+								      fe3, n3,
+								      fe4, n4,
+								      fe5, n5),
+			       compute_nonzero_components(fe1, n1,
+							  fe2, n2,
+							  fe3, n3,
+							  fe4 ,n4,
+							  fe5, n5)),
+  base_elements(5)
+{
+  base_elements[0] = ElementPair(fe1.clone(), n1);  
+  base_elements[0].first->subscribe (typeid(*this).name());
+  base_elements[1] = ElementPair(fe2.clone(), n2);
+  base_elements[1].first->subscribe (typeid(*this).name());
+  base_elements[2] = ElementPair(fe3.clone(), n3);
+  base_elements[2].first->subscribe (typeid(*this).name());
+  base_elements[3] = ElementPair(fe4.clone(), n4);
+  base_elements[3].first->subscribe (typeid(*this).name());
+  base_elements[4] = ElementPair(fe5.clone(), n5);
+  base_elements[4].first->subscribe (typeid(*this).name());
+  this->first_block_of_base_table.push_back(n1);
+  this->first_block_of_base_table.push_back(n1+n2);
+  this->first_block_of_base_table.push_back(n1+n2+n3);
+  this->first_block_of_base_table.push_back(n1+n2+n3+n4);
+  initialize ();
+}
 
 
 template <int dim, int spacedim>
@@ -324,6 +368,17 @@ FESystem<dim,spacedim>::clone() const
 			  element_multiplicity(2),
 			  base_element(3),
 			  element_multiplicity(3));
+    case 5:
+      return new FESystem(base_element(0),
+			  element_multiplicity(0),
+			  base_element(1),
+			  element_multiplicity(1),
+			  base_element(2),
+			  element_multiplicity(2),
+			  base_element(3),
+			  element_multiplicity(3),
+			  base_element(4),
+			  element_multiplicity(4));
       default:
 			  Assert(false, ExcNotImplemented());
     }
@@ -2614,6 +2669,57 @@ FESystem<dim,spacedim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 }
 
 
+template <int dim, int spacedim>
+FiniteElementData<dim>
+FESystem<dim,spacedim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+					      const unsigned int            N1,
+					      const FiniteElementData<dim> &fe2,
+					      const unsigned int            N2,
+					      const FiniteElementData<dim> &fe3,
+					      const unsigned int            N3,
+					      const FiniteElementData<dim> &fe4,
+					      const unsigned int            N4,
+					      const FiniteElementData<dim> &fe5,
+					      const unsigned int            N5)
+{
+  std::vector<unsigned int> dpo;
+  dpo.push_back(fe1.dofs_per_vertex * N1 +
+		fe2.dofs_per_vertex * N2 +
+		fe3.dofs_per_vertex * N3 +
+		fe4.dofs_per_vertex * N4 +
+		fe5.dofs_per_vertex * N5);
+  dpo.push_back(fe1.dofs_per_line * N1 +
+		fe2.dofs_per_line * N2 +
+		fe3.dofs_per_line * N3 +
+		fe4.dofs_per_line * N4 +
+		fe5.dofs_per_line * N5);
+  if (dim>1) dpo.push_back(fe1.dofs_per_quad * N1 +
+			   fe2.dofs_per_quad * N2 +
+			   fe3.dofs_per_quad * N3 +
+			   fe4.dofs_per_quad * N4 +
+			   fe5.dofs_per_quad * N5);
+  if (dim>2) dpo.push_back(fe1.dofs_per_hex * N1 +
+			   fe2.dofs_per_hex * N2 +
+			   fe3.dofs_per_hex * N3 +
+			   fe4.dofs_per_hex * N4 +
+			   fe5.dofs_per_hex * N5);
+				   // degree is the maximal degree of the components
+  const unsigned int
+    degree = std::max(std::max(std::max (std::max(fe1.tensor_degree(),fe2.tensor_degree()),fe3.tensor_degree()), fe4.tensor_degree()), fe5.tensor_degree());
+		       
+  return FiniteElementData<dim> (
+    dpo,
+    fe1.n_components() * N1 + fe2.n_components() * N2 + fe3.n_components() * N3 +
+    fe4.n_components() * N4 + fe5.n_components() * N5,
+    degree,
+    typename FiniteElementData<dim>::Conformity(fe1.conforming_space
+						& fe2.conforming_space
+						& fe3.conforming_space
+						& fe4.conforming_space
+						& fe5.conforming_space),
+    N1 + N2 + N3 + N4 + N5);
+}
+
 
 template <int dim, int spacedim>
 std::vector<bool>
@@ -2706,6 +2812,39 @@ FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteEleme
   return compute_restriction_is_additive_flags (fe_list, multiplicities);
 }
 
+
+template <int dim, int spacedim>
+std::vector<bool>
+FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> &fe1,
+							       const unsigned int        N1,
+							       const FiniteElement<dim,spacedim> &fe2,
+							       const unsigned int        N2,
+							       const FiniteElement<dim,spacedim> &fe3,
+							       const unsigned int        N3,
+							       const FiniteElement<dim,spacedim> &fe4,
+							       const unsigned int        N4,
+							       const FiniteElement<dim,spacedim> &fe5,
+							       const unsigned int        N5) 
+{
+  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
+  std::vector<unsigned int>              multiplicities;
+
+  fe_list.push_back (&fe1);
+  multiplicities.push_back (N1);
+
+  fe_list.push_back (&fe2);
+  multiplicities.push_back (N2);
+
+  fe_list.push_back (&fe3);
+  multiplicities.push_back (N3);
+
+  fe_list.push_back (&fe4);
+  multiplicities.push_back (N4);
+  
+  fe_list.push_back (&fe5);
+  multiplicities.push_back (N5);
+  return compute_restriction_is_additive_flags (fe_list, multiplicities);
+}
 
 
 template <int dim, int spacedim>
@@ -2928,6 +3067,42 @@ FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spac
 
   fe_list.push_back (&fe4);
   multiplicities.push_back (N4);
+  
+  return compute_nonzero_components (fe_list, multiplicities);
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<std::vector<bool> >
+FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
+						    const unsigned int        N1,
+						    const FiniteElement<dim,spacedim> &fe2,
+						    const unsigned int        N2,
+						    const FiniteElement<dim,spacedim> &fe3,
+						    const unsigned int        N3,
+						    const FiniteElement<dim,spacedim> &fe4,
+						    const unsigned int        N4,
+						    const FiniteElement<dim,spacedim> &fe5,
+						    const unsigned int        N5)
+{
+  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
+  std::vector<unsigned int>              multiplicities;
+
+  fe_list.push_back (&fe1);
+  multiplicities.push_back (N1);
+
+  fe_list.push_back (&fe2);
+  multiplicities.push_back (N2);
+
+  fe_list.push_back (&fe3);
+  multiplicities.push_back (N3);
+
+  fe_list.push_back (&fe4);
+  multiplicities.push_back (N4);
+  
+  fe_list.push_back (&fe5);
+  multiplicities.push_back (N5);
   
   return compute_nonzero_components (fe_list, multiplicities);
 }

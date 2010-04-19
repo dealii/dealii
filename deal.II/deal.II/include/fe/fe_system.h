@@ -207,6 +207,19 @@ class FESystem : public FiniteElement<dim,spacedim>
 	      const FiniteElement<dim,spacedim> &fe3, const unsigned int n3,
 	      const FiniteElement<dim,spacedim> &fe4, const unsigned int n4);
 
+				     /** 
+				      * Constructor for mixed
+				      * discretizations with five
+				      * base elements.
+				      *
+				      * See the other constructor.
+				      */
+    FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
+	      const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
+	      const FiniteElement<dim,spacedim> &fe3, const unsigned int n3,
+	      const FiniteElement<dim,spacedim> &fe4, const unsigned int n4,
+	      const FiniteElement<dim,spacedim> &fe5, const unsigned int n5);
+
 				     /**
 				      * Destructor.
 				      */
@@ -864,16 +877,31 @@ class FESystem : public FiniteElement<dim,spacedim>
 				   /**
 				    * with 4 different sub-elements
 				    */
-  static FiniteElementData<dim>
-  multiply_dof_numbers (const FiniteElementData<dim> &fe1,
-			const unsigned int            N1,
-			const FiniteElementData<dim> &fe2,
-			const unsigned int            N2,
-			const FiniteElementData<dim> &fe3,
-			const unsigned int            N3,
-			const FiniteElementData<dim> &fe4,
-			const unsigned int            N4);
+    static FiniteElementData<dim>
+    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+			  const unsigned int            N1,
+			  const FiniteElementData<dim> &fe2,
+			  const unsigned int            N2,
+			  const FiniteElementData<dim> &fe3,
+			  const unsigned int            N3,
+			  const FiniteElementData<dim> &fe4,
+			  const unsigned int            N4);
 
+
+				   /**
+				    * and with 5 different sub-elements
+				    */
+    static FiniteElementData<dim>
+    multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+			  const unsigned int            N1,
+			  const FiniteElementData<dim> &fe2,
+			  const unsigned int            N2,
+			  const FiniteElementData<dim> &fe3,
+			  const unsigned int            N3,
+			  const FiniteElementData<dim> &fe4,
+			  const unsigned int            N4,
+			  const FiniteElementData<dim> &fe5,
+			  const unsigned int            N5);
 
 				     /**
 				      * Helper function used in the
@@ -928,6 +956,22 @@ class FESystem : public FiniteElement<dim,spacedim>
       const unsigned int        N3,
       const FiniteElement<dim,spacedim> &fe4,
       const unsigned int        N4);
+
+				   /**
+				    *  and with five different sub-elements
+				    */
+    static std::vector<bool>
+    compute_restriction_is_additive_flags (
+      const FiniteElement<dim,spacedim> &fe1,
+      const unsigned int        N1,
+      const FiniteElement<dim,spacedim> &fe2,
+      const unsigned int        N2,
+      const FiniteElement<dim,spacedim> &fe3,
+      const unsigned int        N3,
+      const FiniteElement<dim,spacedim> &fe4,
+      const unsigned int        N4,
+      const FiniteElement<dim,spacedim> &fe5,
+      const unsigned int        N5);
 
 				     /**
 				      * Compute the named flags for a
@@ -990,6 +1034,21 @@ class FESystem : public FiniteElement<dim,spacedim>
 				const unsigned int        N3,
 				const FiniteElement<dim,spacedim> &fe4,
 				const unsigned int        N4);
+
+				     /**
+				      * With 5 elements.
+				      */
+   static std::vector<std::vector<bool> >
+    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
+				const unsigned int        N1,
+				const FiniteElement<dim,spacedim> &fe2,
+				const unsigned int        N2,
+				const FiniteElement<dim,spacedim> &fe3,
+				const unsigned int        N3,
+				const FiniteElement<dim,spacedim> &fe4,
+				const unsigned int        N4,
+				const FiniteElement<dim,spacedim> &fe5,
+				const unsigned int        N5);
 
 				     /**
 				      * Compute the nonzero components
