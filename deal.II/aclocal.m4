@@ -5549,7 +5549,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
         DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a"
       fi
       ;;
-    3.*.0) dnl
+    3.*) dnl
       if test -f $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a ; then
         DEAL_II_PETSC_MPIUNI_LIB="$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/lib/libmpiuni.a"
       fi
