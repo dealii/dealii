@@ -95,6 +95,11 @@
    constructors. */
 #undef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
+/* Define if we have to work around a bug where the compiler doesn't accept an
+   explicit destructor call. See the aclocal.m4 file in the top-level
+   directory for a description of this bug. */
+#undef DEAL_II_EXPLICIT_DESTRUCTOR_BUG
+
 /* Defined if the compiler needs a workaround for certain problems with taking
    the address of template template functions. For the details, look at
    aclocal.m4 in the top-level directory. */

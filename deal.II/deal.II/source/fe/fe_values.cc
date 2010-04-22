@@ -1053,8 +1053,12 @@ namespace internal
       scalars.resize (n_scalars);
       for (unsigned int component=0; component<n_scalars; ++component)
 	{
+#ifndef DEAL_II_EXPLICIT_DESTRUCTOR_BUG
+	  scalars[component].dealii::FEValuesViews::Scalar<dim,spacedim>::~Scalar ();
+#else
 	  typedef dealii::FEValuesViews::Scalar<dim,spacedim> ScalarView;
-	  scalars[component].ScalarView::~Scalar ();
+	  scalars[component].ScalarView::~ScalarView ();
+#endif
 	  new (&scalars[component])
 	    dealii::FEValuesViews::Scalar<dim,spacedim>(fe_values,
 							component);
@@ -1073,8 +1077,12 @@ namespace internal
       vectors.resize (n_vectors);
       for (unsigned int component=0; component<n_vectors; ++component)
 	{
+#ifndef DEAL_II_EXPLICIT_DESTRUCTOR_BUG
+	  vectors[component].dealii::FEValuesViews::Vector<dim,spacedim>::~Vector ();
+#else
 	  typedef dealii::FEValuesViews::Vector<dim,spacedim> VectorView;
-	  vectors[component].VectorView::~Vector ();
+	  vectors[component].VectorView::~VectorView ();
+#endif
 	  new (&vectors[component])
 	    dealii::FEValuesViews::Vector<dim,spacedim>(fe_values,
 							component);
@@ -1089,8 +1097,13 @@ namespace internal
       symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
       for (unsigned int component = 0; component < n_symmetric_second_order_tensors; ++component)
 	{
+#ifndef DEAL_II_EXPLICIT_DESTRUCTOR_BUG
+	  symmetric_second_order_tensors[component]
+	    .dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim>::~SymmetricTensor();
+#else
 	  typedef dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim> SymmetricTensorView;
 	  symmetric_second_order_tensors[component].SymmetricTensorView::~SymmetricTensor();
+#endif
 	  new (&symmetric_second_order_tensors[component])
 	    dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim > (fe_values,
 								       component);

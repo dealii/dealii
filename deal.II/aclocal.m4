@@ -2816,6 +2816,59 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Some compiler versions, notably ICC, have trouble with the
+dnl following code in which we explicitly call a destructor.
+dnl This has to be worked around with a typedef. The problem is
+dnl that the workaround fails with some other compilers, so that
+dnl we can not unconditionally use the workaround...
+dnl
+dnl Usage: DEAL_II_CHECK_EXPLICIT_DESTRUCTOR_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_EXPLICIT_DESTRUCTOR_BUG, dnl
+[
+  AC_MSG_CHECKING(for explicit destructor call bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      namespace dealii
+      {
+        namespace FEValuesViews
+        {
+          template <int dim, int spacedim> struct Scalar {};
+        }
+
+        template <int dim, int spacedim>
+        struct X
+        {
+            FEValuesViews::Scalar<dim,spacedim> scalars[dim*spacedim];
+
+            void f()
+              {
+                scalars[0].dealii::FEValuesViews::Scalar<dim,spacedim>::~Scalar ();
+              }
+        };
+
+        template struct X<2,2>;
+      }
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE_UNQUOTED(DEAL_II_EXPLICIT_DESTRUCTOR_BUG, 1,
+                         [Define if we have to work around a bug where the
+			  compiler doesn't accept an explicit destructor call.
+                          See the aclocal.m4 file in the top-level directory
+                          for a description of this bug.])
+    ])
+])
+
+
+dnl -------------------------------------------------------------
 dnl Versions of GCC before 3.0 had a problem with the following
 dnl code:
 dnl
