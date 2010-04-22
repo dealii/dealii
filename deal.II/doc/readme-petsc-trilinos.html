@@ -19,7 +19,7 @@
     <h3>About PETSc, Trilinos, and the <acronym>deal.II</acronym>
     interfaces</h3>
 
-    <p>    
+    <p>
       <acronym>deal.II</acronym> can interface to the <a
       href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> and
       <a href="http://trilinos.sandia.gov" target="_top">Trilinos</a> software
@@ -51,11 +51,11 @@
       you first have to install these packages and
       point <acronym>deal.II</acronym>'s <code>./configure</code> to the
       installation directories. This happens in similar ways for the two
-      packages: 
+      packages:
       </p>
 
       <h5>PETSc</h5>
-      
+
       <p>
       PETSc usually requires you to set the
       environment variables <code>PETSC_DIR</code> and <code>PETSC_ARCH</code>
@@ -76,7 +76,7 @@
       <code>PETSC_ARCH</code> environment variables but do not wish
       <acronym>deal.II</acronym> to be configured for PETSc use, you
       should specify <code>--with-petsc=no</code> as a flag during
-      configuration. 
+      configuration.
       </p>
 
       <p>
@@ -100,7 +100,7 @@
       <p>
       Installing both PETSc and deal.II together can be a bit of a
       challenge. A good summary of the relevant steps can be found on
-      the <a href="http://www-dimat.unipv.it/heltai/wikideal/index.php/Deal.II_Questions_and_Answers"
+      the <a href="http://sourceforge.net/apps/mediawiki/dealii/index.php?title=Deal.II_Questions_and_Answers"
       target="_top">Frequently Asked Questions</a> page.
       </p>
 
@@ -111,8 +111,8 @@
       environment variable to the path to an existing Trilinos installation,
       or use the <code>--with-trilinos=/path/to/trilinos</code> switch of
       the deal.II <code>./configure</code> script. It should point to the path
-      of which the include and lib directories are subdirs. The Trilinos 
-      installation needs to provide the same kind of libraries that 
+      of which the include and lib directories are subdirs. The Trilinos
+      installation needs to provide the same kind of libraries that
       <acronym>deal.II</acronym> is configured for, i.e. if you want deal.II
       to use shared libraries, then Trilinos needs to use shared libraries as
       well.
@@ -122,7 +122,7 @@
       <acronym>deal.II</acronym> and its tutorial programs use several of the
       Trilinos sub-packages.
       </p>
-      
+
       <h6>Trilinos up to and including version 9.0.x</h6>
 
       <p>
@@ -206,23 +206,23 @@ make install
       <p>
 	The above scheme works if Trilinos is installed in its own directory
 	and header and library files are in subdirectories of the directory
-	given to <code>--with-trilinos</code>. This scheme doesn't work, 
+	given to <code>--with-trilinos</code>. This scheme doesn't work,
 	however, if Trilinos has been installed as a regular package on a
 	system, for example into the <code>/usr</code> or <code>/opt</code>
-	directories. 
+	directories.
       </p>
 
       <p>
 	In that case, paths to include and library files may be specified
 	separately using the <code>--with-trilinos-include</code>
-	and <code>--with-trilinos-libs</code> switches 
+	and <code>--with-trilinos-libs</code> switches
 	to <code>./configure</code>. Alternatively, this information can also
 	be passed to the configuration script by setting the environment
 	variables <code>TRILINOS_INCDIR, TRILINOS_LIBDIR</code>.
       </p>
 
     <hr>
-    
+
     <address>
       <a href="mail.html" target="body">The deal.II mailing list</a>
       $Date: 2008-10-14 05:36:48 -0500 (Tue, 14 Oct 2008) $
