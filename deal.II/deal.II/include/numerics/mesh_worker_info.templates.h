@@ -103,15 +103,15 @@ namespace MeshWorker
 	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
 	
 	if (pc != 0)
-	  fevalv[i] = typename boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
 	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
 				      pc->get_quadrature(), pc->get_update_flags())));
 	else if (pf != 0)
-	  fevalv[i] = typename boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	    new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
 	else if (ps != 0)
-	  fevalv[i] = typename boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	    new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags()));
 	else
 	  Assert(false, ExcInternalError());
