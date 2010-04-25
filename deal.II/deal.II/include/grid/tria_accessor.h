@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,22 +67,36 @@ template <int dim, int spacedim>		class TriaAccessor<0, dim, spacedim>;
  */
 namespace TriaAccessorExceptions
 {
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcCellNotUsed);
 				   /**
+				    * The cell is not an @ref
+				    * GlossActive "active" cell, but
+				    * it already has children. Some
+				    * operations, like setting
+				    * refinement flags or accessing
+				    * degrees of freedom are only
+				    * possible on active cells.
+				    *
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcCellNotActive);
 				   /**
+				    * Trying to access the children of
+				    * a cell which is in fact active.
+				    *
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcCellHasNoChildren);
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcUnusedCellAsChild);
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
@@ -91,34 +105,49 @@ namespace TriaAccessorExceptions
 		  << "You can only set the child index if the cell has no "
 		  << "children, or clear it. The given "
 		  << "index was " << arg1 << " (-1 means: clear children)");
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcUnusedCellAsNeighbor);
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcUncaughtCase);
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcDereferenceInvalidObject);
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcCantCompareIterators);
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcNeighborIsCoarser);
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcNeighborIsNotCoarser);
 				   /**
+				    * You are trying to access the
+				    * level of a face, but faces have
+				    * no inherent level. The level of
+				    * a face can only be determined by
+				    * the level of an adjacent face,
+				    * which in turn implies that a
+				    * face can have several levels.
+				    *
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcFacesHaveNoLevel);
+//TODO: Write documentation!  
 				   /**
 				    * @ingroup Exceptions
 				    */
@@ -138,19 +167,21 @@ namespace TriaAccessorExceptions
  * operators and the like), but has no functionality to actually
  * dereference data. This is done in the derived classes.
  *
- * This template is used for faces and edges, which have no level in
- * the triangulation hierarchy associated with them. There exists a
- * partial specialization of the current class template where
- * <tt>structdim</tt> (the dimensionality of the object represented,
- * for example 1 for a line) equals <tt>dim</tt> (the dimensionality
- * of the space the object lives in, for example 3 if we solve
- * three-dimensional problems).
+ * In the implementation, the behavior of this class differs between
+ * the cases where <tt>structdim==dim</tt> (cells of a mesh) and
+ * <tt>structdim&lt;dim</tt> (faces and edges). For the latter,
+ * #present_level is always equal to zero and the constructors may not
+ * receive a positive value there. For cells, any level is
+ * possible, but only those within the range of the levels of the
+ * Triangulation are reasonable. Furthermore, the function objects()
+ * returns either the container with all cells on the same level or
+ * the container with all objects of this dimension (<tt>structdim&lt;dim</tt>).
  *
  * Some internals of this class are discussed in @ref IteratorAccessorInternals .
  *
  * @ingroup grid
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2010
  */
 template <int structdim, int dim, int spacedim=dim>
 class TriaAccessorBase
@@ -329,264 +360,6 @@ class TriaAccessorBase
 				      *  pointed to belongs to.
 				      *  This is only valid for cells.
 				      */
-    static int level ();
-    
-				     /**
-				      *  Return the index of the
-				      *  element presently pointed to
-				      *  on the present level.
-				      */
-    int index () const;
-    
-				     /**
-				      *  Return the state of the
-				      *  iterator.  For the different
-				      *  states an accessor can be in,
-				      *  refer to the
-				      *  TriaRawIterator
-				      *  documentation.
-				      */
-    IteratorState::IteratorStates state () const;
-
-				     /**
-				      * Return a pointer to the
-				      * triangulation which the object
-				      * pointed to by this class
-				      * belongs to.
-				      */
-    const Triangulation<dim,spacedim> & get_triangulation () const;
-    
-				     /**
-				      * @}
-				      */
-  protected:
-
-				     /**
-				      *  Used to store the index of
-				      *  the element presently pointed
-				      *  to on the level presentl
-				      *  used.
-				      */
-    int present_index;
-    
-				     /**
-				      *  Pointer to the triangulation
-				      *  which we act on.
-				      */
-    const Triangulation<dim,spacedim> *tria;
-    
-  private:
-    
-    template <typename Accessor> friend class TriaRawIterator;
-    template <typename Accessor> friend class TriaIterator;
-    template <typename Accessor> friend class TriaActiveIterator;
-};
-
-
-
-/**
- * A base class for the accessor classes used by TriaRawIterator and
- * derived classes.
- *
- * This class offers only the basic functionality required by the
- * iterators (stores the necessary data members, offers comparison
- * operators and the like), but has no functionality to actually
- * dereference data. This is done in the derived classes.
- *
- * This template is a partial specialization of the general template
- * used for cells only, i.e. for the case where <tt>structdim</tt>
- * (the dimensionality of the object represented, for example 1 for a
- * line) equals <tt>dim</tt> (the dimensionality of the triangulation
- * the object lives in, for example 2 if we solve problems on a
- * two-dimensional manifold -- whether this manifold is itself the
- * space $R^2$ or embedded in a higher-dimensional space whose
- * dimensionality is determined by the <code>spacedim</code> template
- * argument). The reason for using a partial specialization rather
- * than the general template is that cells have a level in the
- * triangulation hierarchy associated with them, whereas faces and
- * edges do not.
- *
- * Some internals of this class are discussed in @ref IteratorAccessorInternals .
- *
- * @ingroup grid
- * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998
- */
-template <int dim, int spacedim>
-class TriaAccessorBase<dim,dim,spacedim>
-{
-  public:
-				     /**
-				      *  Dimension of the space the
-				      *  object represented by this
-				      *  accessor lives in. For
-				      *  example, if this accessor
-				      *  represents a quad that is
-				      *  part of a two-dimensional
-				      *  surface in four-dimensional
-				      *  space, then this value is
-				      *  four.
-				      */  
-    static const unsigned int space_dimension = spacedim; 
-
-				     /**
-				      * Dimensionality of the object
-				      * that the thing represented by
-				      * this accessopr is part of. For
-				      * example, if this accessor
-				      * represents a line that is part
-				      * of a hexahedron, then this
-				      * value will be three.
-				      */
-    static const unsigned int dimension = dim;
-
-				     /**
-				      * Dimensionality of the current
-				      * object represented by this
-				      * accessor. For example, if it
-				      * is line (irrespective of
-				      * whether it is part of a quad
-				      * or hex, and what dimension we
-				      * are in), then this value
-				      * equals 1.
-				      */
-    static const unsigned int structure_dimension = dim;
-    
-  protected:
-				     /**
-				      * Declare the data type that
-				      * this accessor class expects to
-				      * get passed from the iterator
-				      * classes. Since the pure
-				      * triangulation iterators need
-				      * no additional data, this data
-				      * type is @p void.
-				      */
-    typedef void AccessorData;
-
-				     /**
-				      *  Constructor. Protected, thus
-				      *  only callable from friend
-				      *  classes.
-				      */
-    TriaAccessorBase (const Triangulation<dim,spacedim> *parent =  0,
-		      const int                 level  = -1,
-		      const int                 index  = -1,
-		      const AccessorData       *       =  0);
-
-				     /**
-				      *  Copy operator. Since this is
-				      *  only called from iterators,
-				      *  do not return anything, since
-				      *  the iterator will return
-				      *  itself.
-				      *
-				      *  This method is protected,
-				      *  since it is only to be called
-				      *  from the iterator class.
-				      */
-    void copy_from (const TriaAccessorBase &);
-
-				     /**
-				      *  Copy operator. This is normally
-				      *  used in a context like
-				      *  <tt>iterator a,b;  *a=*b;</tt>. Since
-				      *  the meaning is to copy the object
-				      *  pointed to by @p b to the object
-				      *  pointed to by @p a and since
-				      *  accessors are not real but
-				      *  virtual objects, this operation
-				      *  is not useful for iterators on
-				      *  triangulations. We declare this
-				      *  function here private, thus it may
-				      *  not be used from outside.
-				      *  Furthermore it is not implemented
-				      *  and will give a linker error if
-				      *  used anyway.
-				      */
-    void operator = (const TriaAccessorBase *);
-        
-				     /**
-				      *  Same as above.
-				      */
-    TriaAccessorBase & operator = (const TriaAccessorBase &);
-
-				     /**
-				      * @name Advancement of iterators
-				      */
-				     /**
-				      * @{
-				      */
-    
-				     /**
-				      *  This operator advances the
-				      *  iterator to the next element.
-				      *
-				      *  For cells only:
-				      *  The next element is next on
-				      *  this level if there are
-				      *  more. If the present element
-				      *  is the last on this level,
-				      *  the first on the next level
-				      *  is accessed.
-				      */
-    void operator ++ ();
-
-    				     /**
-				      *  This operator moves the
-				      *  iterator to the previous
-				      *  element.
-				      *
-				      *  For cells only:
-				      *  The previous element is
-				      *  previous on this level if
-				      *  <tt>index>0</tt>. If the present
-				      *  element is the first on this
-				      *  level, the last on the
-				      *  previous level is accessed.
-				      */
-    void operator -- ();
-
-				     /**
-				      * Access to the other objects of
-				      * a Triangulation with same
-				      * dimension.
-				      */
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<dim> > &
-    objects () const;
-
-  protected:
-    
-				     /**
-				      *  Compare for equality.            
-				      */
-    bool operator == (const TriaAccessorBase &) const;
-	
-				     /**
-				      * Compare for inequality.
-				      */
-    bool operator != (const TriaAccessorBase &) const;
-
-  public:
-				     /**
-				      * Data type to be used for passing
-				      * parameters from iterators to the
-				      * accessor classes in a unified
-				      * way, no matter what the type of
-				      * number of these parameters is.
-				      */
-    typedef void * LocalData;
-    
-				     /** @name Iterator address and state
-				      */
-				     /**
-				      * @{
-				      */
-				     /**
-				      *  Return the level the element
-				      *  pointed to belongs to.
-				      *  This is only valid for cells.
-				      */
     int level () const;
     
 				     /**
@@ -619,10 +392,9 @@ class TriaAccessorBase<dim,dim,spacedim>
 				      */
   protected:
 				     /**
-				      *  Used to store the level
-				      *  presently pointed to. For
-				      *  faces this should always be
-				      *  0.
+				      * The level if this is a cell
+				      * (<tt>structdim==dim</tt>). Else,
+				      * contains zero.
 				      */
     int present_level;
     
@@ -639,15 +411,14 @@ class TriaAccessorBase<dim,dim,spacedim>
 				      *  which we act on.
 				      */
     const Triangulation<dim,spacedim> *tria;
-
+    
   private:
     
     template <typename Accessor> friend class TriaRawIterator;
     template <typename Accessor> friend class TriaIterator;
     template <typename Accessor> friend class TriaActiveIterator;
-
-    template <int, int, int> friend class TriaAccessor;
 };
+
 
 
 /**

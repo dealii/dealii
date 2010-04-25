@@ -32,22 +32,27 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int structdim, int dim, int spacedim>
 inline
-TriaAccessorBase<structdim,dim,spacedim>::TriaAccessorBase (const Triangulation<dim,spacedim> *parent,
-					   const int                 level,
-					   const int                 index,
-					   const AccessorData       *)
+TriaAccessorBase<structdim,dim,spacedim>::TriaAccessorBase (
+  const Triangulation<dim,spacedim>* tria,
+  const int                          level,
+  const int                          index,
+  const AccessorData*)
                 :
+		present_level((structdim==dim) ? level : 0),
                 present_index (index),
-                tria (parent)
+                tria (tria)
 {
-
+  
 				   // non-cells have no level, so a 0
 				   // should have been passed, or a -1
 				   // for an end-iterator, or -2 for
 				   // an invalid (default constructed)
 				   // iterator
-  Assert ((level == 0) || (level == -1) || (level == -2),
-	  ExcInternalError());
+  if (structdim != dim)
+    {
+      Assert ((level == 0) || (level == -1) || (level == -2),
+	      ExcInternalError());
+    }
 }
 
 
@@ -57,8 +62,34 @@ inline
 void
 TriaAccessorBase<structdim,dim,spacedim>::copy_from (const TriaAccessorBase<structdim,dim,spacedim> &a)
 {
+  present_level = a.present_level;
   present_index = a.present_index;
   tria = a.tria;
+  
+  if (structdim != dim)
+    {
+      Assert ((present_level == 0) || (present_level == -1) || (present_level == -2),
+	      ExcInternalError());
+    }
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+inline
+TriaAccessorBase<structdim,dim,spacedim>&
+TriaAccessorBase<structdim,dim,spacedim>::operator= (const TriaAccessorBase<structdim,dim,spacedim> &a)
+{
+  present_level = a.present_level;
+  present_index = a.present_index;
+  tria = a.tria;
+  
+  if (structdim != dim)
+    {
+      Assert ((present_level == 0) || (present_level == -1) || (present_level == -2),
+	      ExcInternalError());
+    }
+  return *this;
 }
 
 
@@ -69,7 +100,8 @@ bool
 TriaAccessorBase<structdim,dim,spacedim>::operator == (const TriaAccessorBase<structdim,dim,spacedim> &a) const
 {
   Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
-  return (present_index == a.present_index);
+  return ((present_level == a.present_level) &&
+	  (present_index == a.present_index));
 }
 
 
@@ -80,7 +112,8 @@ bool
 TriaAccessorBase<structdim,dim,spacedim>::operator != (const TriaAccessorBase<structdim,dim,spacedim> &a) const
 {
   Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
-  return (present_index != a.present_index);
+  return ((present_level != a.present_level) ||
+	  (present_index != a.present_index));
 }
 
 
@@ -88,9 +121,11 @@ TriaAccessorBase<structdim,dim,spacedim>::operator != (const TriaAccessorBase<st
 template <int structdim, int dim, int spacedim>
 inline
 int
-TriaAccessorBase<structdim,dim,spacedim>::level ()
+TriaAccessorBase<structdim,dim,spacedim>::level () const
 {
-  return 0;
+				   // This is always zero or invalid
+				   // if the object is not a cell
+  return present_level;
 }
 
 
@@ -110,7 +145,7 @@ inline
 IteratorState::IteratorStates
 TriaAccessorBase<structdim,dim,spacedim>::state () const
 {
-  if (present_index>=0)
+  if ((present_level>=0) && (present_index>=0))
     return IteratorState::valid;
   else
     if (present_index==-1)
@@ -139,15 +174,38 @@ TriaAccessorBase<structdim,dim,spacedim>::operator ++ ()
 				   // this iterator is used for
 				   // objects without level
   ++this->present_index;
-				   // is index still in the range of
-				   // the vector? (note that we don't
-				   // have to set the level, since
-				   // dim!=1 and the object therefore
-				   // has no level)
-  if (this->present_index
-      >=
-      static_cast<int>(objects().cells.size()))
-    this->present_index = -1;
+
+  if (structdim != dim)
+    {
+				       // is index still in the range of
+				       // the vector? (note that we don't
+				       // have to set the level, since
+				       // dim!=1 and the object therefore
+				       // has no level)
+      if (this->present_index
+	  >=
+	  static_cast<int>(objects().cells.size()))
+	this->present_index = -1;
+    }
+  else
+    {
+      while (this->present_index
+	     >=
+	     static_cast<int>(this->tria->levels[this->present_level]->cells.cells.size()))
+	{
+					   // no -> go one level up until we find
+					   // one with more than zero cells
+	  ++this->present_level;
+	  this->present_index = 0;
+					   // highest level reached?
+	  if (this->present_level >= static_cast<int>(this->tria->levels.size()))
+	    {
+					       // return with past the end pointer
+	      this->present_level = this->present_index = -1;
+	      return;
+	    }
+	}
+    }
 }
 
 
@@ -159,8 +217,28 @@ TriaAccessorBase<structdim,dim,spacedim>::operator -- ()
 				   // same as operator++
   --this->present_index;
 
-  if (this->present_index < 0) 
-    this->present_index = -1;
+  if (structdim != dim)
+    {
+      if (this->present_index < 0) 
+	this->present_index = -1;
+    }
+  else
+    {
+      while (this->present_index < 0) 
+	{
+					   // no -> go one level down
+	  --this->present_level;
+					   // lowest level reached?
+	  if (this->present_level == -1) 
+	    {
+					       // return with past the end pointer
+	      this->present_level = this->present_index = -1;
+	      return;
+	    }
+					   // else
+	  this->present_index = this->tria->levels[this->present_level]->cells.cells.size()-1;
+	}
+    }
 }
 
 
@@ -175,26 +253,90 @@ namespace internal
 				      */
     template <int dim>
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> > &
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> >*
     get_objects (internal::Triangulation::TriaFaces<dim> *faces,
 		 const internal::int2type<1>)
     {
-      return faces->lines;
+      return &faces->lines;
     }
 
 
     template <int dim>
     inline
-    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> > &
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> >*
     get_objects (internal::Triangulation::TriaFaces<dim> *faces,
 		 const internal::int2type<2>)
     {
-      return faces->quads;
+      return &faces->quads;
+    }
+    
+    inline
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> >*
+    get_objects (internal::Triangulation::TriaFaces<1>*,
+		 const internal::int2type<1>)
+    {
+      Assert (false, ExcInternalError());
+      return 0;
+    }
+    
+    inline
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> >*
+    get_objects (internal::Triangulation::TriaFaces<2>*,
+		 const internal::int2type<2>)
+    {
+      Assert (false, ExcInternalError());
+      return 0;
+    }
+    
+    inline
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<3> >*
+    get_objects (internal::Triangulation::TriaFaces<3>*,
+		 const internal::int2type<3>)
+    {
+      Assert (false, ExcInternalError());
+      return 0;
+    }
+    
+				     /**
+				      * This function should never be
+				      * used, but we need it for the
+				      * template instantiation of TriaAccessorBase<dim,dim,spacedim>::objects() const
+				      */
+    template <int dim>
+    inline
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<3> >*
+    get_objects (internal::Triangulation::TriaFaces<dim> *faces,
+		 const internal::int2type<3>)
+    {
+      Assert (false, ExcInternalError());
+      return 0;
+    }
+
+				     /**
+				      * Copy the above functions for
+				      * cell objects.
+				      */
+    template <int structdim, int dim>
+    inline
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<structdim> >*
+    get_objects (internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<dim> >*,
+		 const internal::int2type<structdim>)
+    {
+      Assert (false, ExcInternalError());
+      return 0;
+    }
+
+    template <int dim>
+    inline
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<dim> >*
+    get_objects (internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<dim> >* cells,
+		 const internal::int2type<dim>)
+    {
+      return cells;
     }
   }
 }
 
-  
 
 
 template <int structdim, int dim, int spacedim>
@@ -202,179 +344,16 @@ inline
 internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<structdim> > &
 TriaAccessorBase<structdim,dim,spacedim>::objects() const
 {
-				   // get sub-objects. note that the
-				   // current class is only used for
-				   // objects that are *not* cells
-  return internal::TriaAccessorBase::get_objects (this->tria->faces,
-					      internal::int2type<structdim> ());
-}
-
-
-
-
-/*------------------------ Functions: TriaAccessorBase<dim,dim> ---------------------------*/
-
-template <int dim, int spacedim>
-inline
-TriaAccessorBase<dim,dim,spacedim>::TriaAccessorBase (const Triangulation<dim,spacedim> *parent,
-				     const int                 level,
-				     const int                 index,
-				     const AccessorData       *)
-                :
-                present_level (level),
-                present_index (index),
-                tria (parent)
-{}
-
-
-
-template <int dim, int spacedim>
-inline
-void
-TriaAccessorBase<dim,dim,spacedim>::copy_from (const TriaAccessorBase<dim,dim,spacedim> &a)
-{
-  present_level = a.present_level;
-  present_index = a.present_index;
-  tria = a.tria;
-}
-
-
-
-template <int dim, int spacedim>
-inline
-bool
-TriaAccessorBase<dim,dim,spacedim>::operator == (const TriaAccessorBase<dim,dim,spacedim> &a) const
-{
-  Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
-  return ((present_index == a.present_index) &&
-	  (present_level == a.present_level));
-}
-
-
-
-template <int dim, int spacedim>
-inline
-bool
-TriaAccessorBase<dim,dim,spacedim>::operator != (const TriaAccessorBase<dim,dim,spacedim> &a) const
-{
-  Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
-  return ((present_index != a.present_index) ||
-	  (present_level != a.present_level));
-}
-
-
-
-template <int dim, int spacedim>
-inline
-int
-TriaAccessorBase<dim,dim,spacedim>::level () const
-{
-  return present_level;
-}
-
-
-
-template <int dim, int spacedim>
-inline
-int
-TriaAccessorBase<dim,dim,spacedim>::index () const
-{
-  return present_index;
-}
-
-
-
-template <int dim, int spacedim>
-inline
-IteratorState::IteratorStates
-TriaAccessorBase<dim,dim,spacedim>::state () const
-{
-  if ((present_level>=0) && (present_index>=0))
-    return IteratorState::valid;
+  if (structdim != dim)
+				     // get sub-objects. note that the
+				     // current class is only used for
+				     // objects that are *not* cells
+    return *internal::TriaAccessorBase::get_objects (this->tria->faces,
+						     internal::int2type<structdim> ());
   else
-    if ((present_index==-1) && (present_index==-1))
-      return IteratorState::past_the_end;
-    else
-      return IteratorState::invalid;
+    return *internal::TriaAccessorBase::get_objects (&this->tria->levels[this->present_level]->cells,
+						     internal::int2type<structdim> ());
 }
-
-
-
-template <int dim, int spacedim>
-inline
-const Triangulation<dim,spacedim> &
-TriaAccessorBase<dim,dim,spacedim>::get_triangulation () const
-{
-  return *tria;
-}
-
-
-
-template <int dim, int spacedim>
-inline
-void
-TriaAccessorBase<dim,dim,spacedim>::operator ++ ()
-{
-				   // in structdim == dim, so we have
-				   // cells here. these have levels
-  ++this->present_index;
-				   // is index still in the range of
-				   // the vector?
-  while (this->present_index
-	 >=
-	 static_cast<int>(this->tria->levels[this->present_level]->cells.cells.size()))
-    {
-				       // no -> go one level up until we find
-				       // one with more than zero cells
-      ++this->present_level;
-      this->present_index = 0;
-				       // highest level reached?
-      if (this->present_level >= static_cast<int>(this->tria->levels.size()))
-	{
-					   // return with past the end pointer
-	  this->present_level = this->present_index = -1;
-	  return;
-	}
-    }
-}
-
-
-template <int dim, int spacedim>
-inline
-void
-TriaAccessorBase<dim,dim,spacedim>::operator -- ()
-{
-				   // same as operator++
-  --this->present_index;
-				   // is index still in the range of
-				   // the vector?
-  while (this->present_index < 0) 
-    {
-				       // no -> go one level down
-      --this->present_level;
-				       // lowest level reached?
-      if (this->present_level == -1) 
-	{
-					   // return with past the end pointer
-	  this->present_level = this->present_index = -1;
-	  return;
-	}
-				       // else
-      this->present_index = this->tria->levels[this->present_level]->cells.cells.size()-1;
-    }
-}
-
-
-
-template <int dim, int spacedim>
-inline
-internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<dim> > &
-TriaAccessorBase<dim,dim,spacedim>::objects() const
-{
-  return this->tria->levels[this->present_level]->cells;
-}
-
-
 
 
 
