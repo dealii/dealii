@@ -51,6 +51,66 @@ namespace internal
   namespace TriaAccessor
   {
     struct Implementation;
+
+				     /**
+				      * Implementation of a type with
+				      * which to store the level of an
+				      * accessor object. We only need
+				      * it for the case that
+				      * <tt>structdim ==
+				      * dim</tt>. Otherwise, an empty
+				      * object is sufficient.
+				      */
+    template <int structdim, int dim> struct PresentLevelType
+    {
+	struct type {
+					     /**
+					      * Dummy
+					      * constructor. Only
+					      * level zero is allowed.
+					      */
+	    type (const int level)
+	      {
+		Assert (level == 0, ExcInternalError());
+	      }
+
+					     /**
+					      * Dummy conversion
+					      * operator. Returns
+					      * level zero.
+					      */
+	    operator int () const
+	      {
+		return 0;
+	      }
+
+	    void operator ++ () const
+	      {
+		Assert (false, ExcInternalError());
+	      }
+
+	    void operator -- () const
+	      {
+		Assert (false, ExcInternalError());
+	      }
+	};
+    };
+
+
+				     /**
+				      * Implementation of a type with
+				      * which to store the level of an
+				      * accessor object. We only need
+				      * it for the case that
+				      * <tt>structdim ==
+				      * dim</tt>. Otherwise, an empty
+				      * object is sufficient.
+				      */
+    template <int dim> struct PresentLevelType<dim,dim>
+    {
+	typedef int type;
+    };
+
   }
 }
 template <int celldim, int dim, int spacedim>	class TriaAccessor;
@@ -67,7 +127,7 @@ template <int dim, int spacedim>		class TriaAccessor<0, dim, spacedim>;
  */
 namespace TriaAccessorExceptions
 {
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
@@ -91,12 +151,12 @@ namespace TriaAccessorExceptions
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcCellHasNoChildren);
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcUnusedCellAsChild);
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
@@ -105,32 +165,32 @@ namespace TriaAccessorExceptions
 		  << "You can only set the child index if the cell has no "
 		  << "children, or clear it. The given "
 		  << "index was " << arg1 << " (-1 means: clear children)");
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcUnusedCellAsNeighbor);
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcUncaughtCase);
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcDereferenceInvalidObject);
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcCantCompareIterators);
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcNeighborIsCoarser);
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
@@ -147,14 +207,14 @@ namespace TriaAccessorExceptions
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcFacesHaveNoLevel);
-//TODO: Write documentation!  
+//TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
 				    */
   DeclException1 (ExcSetOnlyEvenChildren,
 		  int,
 		  << "You can only set the child index of an even numbered child."
-		  << "The number of the child given was " << arg1 << ".");    
+		  << "The number of the child given was " << arg1 << ".");
 }
 
 
@@ -197,8 +257,8 @@ class TriaAccessorBase
 				      *  surface in four-dimensional
 				      *  space, then this value is
 				      *  four.
-				      */  
-    static const unsigned int space_dimension = spacedim; 
+				      */
+    static const unsigned int space_dimension = spacedim;
 
 				     /**
 				      * Dimensionality of the object
@@ -222,7 +282,7 @@ class TriaAccessorBase
 				      * equals 1.
 				      */
     static const unsigned int structure_dimension = structdim;
-    
+
 				     /**
 				      * Declare the data type that
 				      * this accessor class expects to
@@ -262,7 +322,7 @@ class TriaAccessorBase
 				      *  from the iterator class.
 				      */
     void copy_from (const TriaAccessorBase &);
-    
+
 				     /**
 				      *  Copy operator. Creates an
 				      *  object with exactly the same data.
@@ -289,12 +349,12 @@ class TriaAccessorBase
 				      *  used anyway.
 				      */
     void operator = (const TriaAccessorBase *);
-    
+
 				     /**
-				      *  Compare for equality.            
+				      *  Compare for equality.
 				      */
     bool operator == (const TriaAccessorBase &) const;
-	
+
 				     /**
 				      * Compare for inequality.
 				      */
@@ -337,7 +397,7 @@ class TriaAccessorBase
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      * Access to the other objects of
 				      * a Triangulation with same
@@ -345,7 +405,7 @@ class TriaAccessorBase
 				      */
     internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<structdim> > &
     objects () const;
-    
+
   public:
 				     /**
 				      * Data type to be used for passing
@@ -355,7 +415,7 @@ class TriaAccessorBase
 				      * number of these parameters is.
 				      */
     typedef void * LocalData;
-    
+
 				     /**
 				      * @name Iterator address and state
 				      */
@@ -369,14 +429,14 @@ class TriaAccessorBase
 				      *  This is only valid for cells.
 				      */
     int level () const;
-    
+
 				     /**
 				      *  Return the index of the
 				      *  element presently pointed to
 				      *  on the present level.
 				      */
     int index () const;
-    
+
 				     /**
 				      *  Return the state of the
 				      *  iterator.  For the different
@@ -394,7 +454,7 @@ class TriaAccessorBase
 				      * belongs to.
 				      */
     const Triangulation<dim,spacedim> & get_triangulation () const;
-    
+
 				     /**
 				      * @}
 				      */
@@ -404,8 +464,8 @@ class TriaAccessorBase
 				      * (<tt>structdim==dim</tt>). Else,
 				      * contains zero.
 				      */
-    int present_level;
-    
+    typename internal::TriaAccessor::PresentLevelType<structdim,dim>::type present_level;
+
 				     /**
 				      *  Used to store the index of
 				      *  the element presently pointed
@@ -413,15 +473,15 @@ class TriaAccessorBase
 				      *  used.
 				      */
     int present_index;
-    
+
 				     /**
 				      *  Pointer to the triangulation
 				      *  which we act on.
 				      */
     const Triangulation<dim,spacedim> *tria;
-    
+
   private:
-    
+
     template <typename Accessor> friend class TriaRawIterator;
     template <typename Accessor> friend class TriaIterator;
     template <typename Accessor> friend class TriaActiveIterator;
@@ -478,7 +538,7 @@ class InvalidAccessor :  public TriaAccessorBase<structdim,dim,spacedim>
 		     const int                 level      = -1,
 		     const int                 index      = -1,
 		     const AccessorData       *local_data =  0);
-    
+
 				     /**
 				      * Copy constructor.  This class
 				      * is used for iterators that
@@ -503,7 +563,7 @@ class InvalidAccessor :  public TriaAccessorBase<structdim,dim,spacedim>
 				      */
     template <typename OtherAccessor>
     InvalidAccessor (const OtherAccessor &);
-    
+
 				     /**
 				      * Dummy copy operation.
 				      */
@@ -521,7 +581,7 @@ class InvalidAccessor :  public TriaAccessorBase<structdim,dim,spacedim>
 				      */
     void operator ++ () const;
     void operator -- () const;
-    
+
 				     /**
 				      * Dummy function representing
 				      * whether the accessor points to
@@ -574,7 +634,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 		  const int                 level      = -1,
 		  const int                 index      = -1,
 		  const AccessorData       *local_data =  0);
-    
+
 				     /**
 				      * Conversion constructor. This
 				      * constructor exists to make certain
@@ -607,7 +667,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     template <int structdim2, int dim2, int spacedim2>
     TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &);
-    
+
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
@@ -630,7 +690,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				     /**
 				      * @{
 				      */
-    
+
 				     /**
 				      *  Return the global index of i-th
 				      *  vertex of the current object. The
@@ -646,7 +706,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *  associated with it. For this, see the
 				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
-				      */ 
+				      */
     unsigned int vertex_index (const unsigned int i) const;
 
 				     /**
@@ -672,7 +732,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * generated.
 				      */
     unsigned int line_index (const unsigned int i) const;
-    
+
     				     /**
 				      * Pointer to the @p ith quad
 				      * bounding this object.
@@ -766,7 +826,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       * otherwise. In 1d and 2d, this is always
                                       * @p true, but in 3d it may be different,
                                       * see the respective discussion in the
-                                      * documentation of the 
+                                      * documentation of the
                                       * GeometryInfo classe.
                                       *
                                       * This function is really only
@@ -778,7 +838,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      *  @name Accessing children
 				      */
@@ -848,7 +908,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * zero.
 				      */
     unsigned int max_refinement_depth () const;
-    
+
 				     /**
 				      *  Return an iterator to the @p ith
 				      *  child.
@@ -898,7 +958,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *  the child does not exist, -1 is
 				      *  returned.
 				      */
-    int isotropic_child_index (const unsigned int i) const;    
+    int isotropic_child_index (const unsigned int i) const;
 				     /**
 				      * @}
 				      */
@@ -909,7 +969,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				     /**
 				      * @{
 				      */
-    
+
 				     /**
 				      * Boundary indicator of this
 				      * object.
@@ -979,7 +1039,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * current function.
 				      */
     void set_all_boundary_indicators (const unsigned char) const;
-    
+
 				     /**
 				      * Return whether this object is at the
 				      * boundary. Obviously, the use of this
@@ -1004,11 +1064,11 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * for the boundary object.
 				      */
     const Boundary<dim,spacedim> & get_boundary () const;
-    
+
 				     /**
 				      * @}
 				      */
-    
+
 
 				     /**
 				      * @name User data
@@ -1039,7 +1099,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 
     				     /**
 				      *  Clear the user flag for this
-				      * and all descendants. 
+				      * and all descendants.
 				      */
     void recursively_clear_user_flag () const;
 
@@ -1048,7 +1108,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * independent if pointer or index.
 				      */
     void clear_user_data () const;
-    
+
 				     /**
 				      * Set the user pointer
 				      * to @p p.
@@ -1060,7 +1120,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * to a @p NULL pointer.
 				      */
     void clear_user_pointer () const;
-    
+
 				     /**
 				      * Access the value of the user
 				      * pointer. It is in the
@@ -1103,7 +1163,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * the triangulation.
 				      */
     void recursively_set_user_pointer (void *p) const;
-    
+
 				     /**
 				      * Clear the user pointer of this
 				      * object and all of its
@@ -1113,18 +1173,18 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * function.
 				      */
     void recursively_clear_user_pointer () const;
-    
+
 				     /**
 				      * Set the user index
 				      * to @p p.
 				      */
     void set_user_index (const unsigned int p) const;
-    
+
 				     /**
 				      * Reset the user index to 0.
 				      */
     void clear_user_index () const;
-    
+
 				     /**
 				      * Access the value of the user
 				      * index.
@@ -1163,7 +1223,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      * @name Geometric information about an object
 				      */
@@ -1240,12 +1300,12 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     bool
     is_translation_of (const TriaIterator<TriaAccessor<structdim,dim,spacedim> > &o) const;
-    
+
 				     /**
 				      * @}
 				      */
-    
-    
+
+
   private:
 				     /**
 				      *  Copy the data of the given
@@ -1254,7 +1314,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *  triangulation.
 				      */
     void set (const internal::Triangulation::TriaObject<structdim> &o) const;
-    
+
                                      /**
                                       * Set the flag indicating, what
                                       * <code>line_orientation()</code> will
@@ -1267,7 +1327,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       */
     void set_line_orientation (const unsigned int line,
                                const bool         orientation) const;
-    
+
                                      /**
                                       * Set whether the quad with
                                       * index @p face has its normal
@@ -1315,7 +1375,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
                                       */
     void set_face_rotation (const unsigned int face,
 			    const bool         rotation) const;
-    
+
 				     /**
 				      *  Set the @p used flag. Only
 				      *  for internal use in the
@@ -1374,14 +1434,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *  not allowed.
 				      */
     void set_children (const unsigned int i, const int index) const;
-	
+
 				     /**
 				      *  Clear the child field,
 				      *  i.e. set it to a value which
 				      *  indicates that this cell has
 				      *  no children.
 				      */
-    void clear_children () const;    
+    void clear_children () const;
 
   private:
     				     /**
@@ -1402,7 +1462,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *  anyway.
 				      */
     void operator = (const TriaAccessor &);
-    
+
     template <int, int> friend class Triangulation;
 
     friend class internal::Triangulation::Implementation;
@@ -1466,7 +1526,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	Assert (false, ExcInternalError());
       }
-    
+
 				     /**
     				      * Boundary indicator of this
 				      * object.
@@ -1505,7 +1565,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
  * in two dimension, etc.
  *
  * The following refers to any dimension:
- * 
+ *
  * This class allows access to a <tt>cell</tt>, which is a line in 1D
  * and a quad in 2D. Cells have more functionality than lines or quads
  * by themselves, for example they can be flagged for refinement, they
@@ -1531,7 +1591,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * container this is part of.
 				      */
     typedef Triangulation<dim, spacedim> Container;
-    
+
 				     /**
 				      *  @name Constructors
 				      */
@@ -1588,7 +1648,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      *  @name Accessing sub-objects and neighbors
 				      */
@@ -1722,13 +1782,13 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
     TriaIterator<CellAccessor<dim, spacedim> >
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
-    
+
 				     /**
 				      *  Return a pointer to the
 				      *  @p ith neighbor.  If the
 				      *  neighbor does not exist, an
 				      *  invalid iterator is returned.
-				      *  
+				      *
 				      *  <b>Note</b> (cf. TriaLevel<0>):
 				      *  The neighbor of a cell has at most the
 				      *  same level as this cell, i.e. it may
@@ -1798,7 +1858,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * face.
 				      */
     bool neighbor_is_coarser (const unsigned int neighbor) const;
-    
+
 				     /**
 				      * This function is a generalization of the
 				      * @p neighbor_of_neighbor function for the
@@ -1819,7 +1879,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      */
     std::pair<unsigned int, unsigned int>
     neighbor_of_coarser_neighbor (const unsigned int neighbor) const;
-    
+
 				     /**
 				      * This function is a generalization of the
 				      * @p neighbor_of_neighbor and the @p
@@ -1830,7 +1890,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * the face_no is returned.
 				      */
     unsigned int neighbor_face_no (const unsigned int neighbor) const;
-    
+
 				     /**
 				      * @}
 				      */
@@ -1957,7 +2017,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * cells in 2d and 3d.
 				      */
     internal::SubfaceCase<dim> subface_case(const unsigned int face_no) const;
-    
+
 				     /**
 				      *  Return whether the coarsen flag
 				      *  is set or not.
@@ -1986,7 +2046,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				     /**
 				      * @{
 				      */
-    
+
 				     /**
 				      * Return the material id of this
 				      * cell.
@@ -2091,12 +2151,12 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      */
     void set_neighbor (const unsigned int i,
 		       const TriaIterator<CellAccessor<dim, spacedim> > &pointer) const;
-    
+
 				     /**
 				      * @}
 				      */
-    
-    
+
+
 				     /**
 				      * @ingroup Exceptions
 				      */
@@ -2109,7 +2169,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCellFlaggedForCoarsening);
-    
+
   protected:
     				     /**
 				      * This function assumes that the
@@ -2145,9 +2205,9 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * neighbors.
 				      */
     unsigned int neighbor_of_neighbor_internal (const unsigned int neighbor) const;
-    
+
   private:
-    
+
     				     /**
 				      *  Copy operator. This is
 				      *  normally used in a context
