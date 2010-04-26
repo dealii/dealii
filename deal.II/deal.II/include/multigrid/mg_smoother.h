@@ -47,6 +47,24 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 {
   public:
 				     /**
+				      * Constructor. Sets smoothing
+				      * parameters and creates a
+				      * private GrowingVectorMemory
+				      * object to be used to retrieve vectors.
+				      */
+    MGSmoother(const unsigned int steps = 1,
+	       const bool variable = false,
+	       const bool symmetric = false,
+	       const bool transpose = false);
+
+				     /**
+				      * @deprecated Since
+				      * GrowingVectorMemory now uses a
+				      * joint memory pool, it is
+				      * recommended to use the
+				      * constructor without the memory
+				      * object.
+				      *
 				      * Constructor. Sets memory and
 				      * smoothing parameters.
 				      */
@@ -130,11 +148,13 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				      * nonzero.
 				      */
     unsigned int debug;
-
 				     /**
 				      * Memory for auxiliary vectors.
 				      */
     SmartPointer<VectorMemory<VECTOR>, MGSmoother<VECTOR> > mem;
+
+  private:
+    GrowingVectorMemory<VECTOR> my_memory;
 };
 
 
@@ -536,6 +556,23 @@ MGSmootherIdentity<VECTOR>::clear ()
 template <class VECTOR>
 inline
 MGSmoother<VECTOR>::MGSmoother(
+  const unsigned int steps,
+  const bool variable,
+  const bool symmetric,
+  const bool transpose)
+		:
+		steps(steps),
+		variable(variable),
+		symmetric(symmetric),
+		transpose(transpose),
+		debug(0),
+		mem(&my_memory)
+{}
+
+
+template <class VECTOR>
+inline
+MGSmoother<VECTOR>::MGSmoother(
   VectorMemory<VECTOR>& mem,
   const unsigned int steps,
   const bool variable,
@@ -727,9 +764,8 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   if (this->variable)
     steps2 *= (1<<(maxlevel-level));
   
-  GrowingVectorMemory<VECTOR> mem2;
-  typename VectorMemory<VECTOR>::Pointer r((this->mem) ? *this->mem : mem2);
-  typename VectorMemory<VECTOR>::Pointer d((this->mem) ? *this->mem : mem2);
+  typename VectorMemory<VECTOR>::Pointer r(*this->mem);
+  typename VectorMemory<VECTOR>::Pointer d(*this->mem);
   r->reinit(u);
   d->reinit(u);
 
@@ -963,9 +999,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
   if (this->variable)
     steps2 *= (1<<(maxlevel-level));
 
-  GrowingVectorMemory<VECTOR> mem2;
-  typename VectorMemory<VECTOR>::Pointer r((this->mem) ? *this->mem : mem2);
-  typename VectorMemory<VECTOR>::Pointer d((this->mem) ? *this->mem : mem2);
+  typename VectorMemory<VECTOR>::Pointer r(*this->mem);
+  typename VectorMemory<VECTOR>::Pointer d(*this->mem);
 
   r->reinit(u,true);
   d->reinit(u,true);
