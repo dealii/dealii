@@ -44,7 +44,7 @@ namespace internal
  * At present, multilevel algorithms are not fully functional, so this
  * documentation is still very brief.
  *
- * This class has not yet been implemented for the use in the codimension
+ * @todo This class has not yet been implemented for the use in the codimension
  * one case (<tt>spacedim != dim </tt>).
  *
 //TODO:[WB] Extend MGDoFHandler doc
@@ -54,26 +54,30 @@ namespace internal
 template <int dim, int spacedim=dim>
 class MGDoFHandler : public DoFHandler<dim,spacedim>
 {
+    typedef internal::MGDoFHandler::Iterators<dim,spacedim> IteratorSelector;
   public:
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_line_iterator raw_line_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator line_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_line_iterator active_line_iterator;
+    typedef typename IteratorSelector::CellAccessor cell_accessor;
+    typedef typename IteratorSelector::FaceAccessor face_accessor;
+    
+    typedef typename IteratorSelector::raw_line_iterator raw_line_iterator;
+    typedef typename IteratorSelector::line_iterator line_iterator;
+    typedef typename IteratorSelector::active_line_iterator active_line_iterator;
 
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_quad_iterator raw_quad_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::quad_iterator quad_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_quad_iterator active_quad_iterator;
+    typedef typename IteratorSelector::raw_quad_iterator raw_quad_iterator;
+    typedef typename IteratorSelector::quad_iterator quad_iterator;
+    typedef typename IteratorSelector::active_quad_iterator active_quad_iterator;
 
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_hex_iterator raw_hex_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::hex_iterator hex_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_hex_iterator active_hex_iterator;
+    typedef typename IteratorSelector::raw_hex_iterator raw_hex_iterator;
+    typedef typename IteratorSelector::hex_iterator hex_iterator;
+    typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
 
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_cell_iterator raw_cell_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::cell_iterator cell_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_cell_iterator active_cell_iterator;
+    typedef typename IteratorSelector::raw_cell_iterator raw_cell_iterator;
+    typedef typename IteratorSelector::cell_iterator cell_iterator;
+    typedef typename IteratorSelector::active_cell_iterator active_cell_iterator;
 
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_face_iterator raw_face_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator face_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_face_iterator active_face_iterator;
+    typedef typename IteratorSelector::raw_face_iterator raw_face_iterator;
+    typedef typename IteratorSelector::face_iterator face_iterator;
+    typedef typename IteratorSelector::active_face_iterator active_face_iterator;
 
 				     /**
 				      * Make the dimension and the space_dimension available

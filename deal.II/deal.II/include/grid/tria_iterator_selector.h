@@ -66,9 +66,12 @@ namespace internal
     template <int spacedim>
     struct Iterators<1,spacedim>
     {
-        typedef TriaRawIterator   <dealii::CellAccessor<1,spacedim> > raw_line_iterator;
-        typedef TriaIterator      <dealii::CellAccessor<1,spacedim> > line_iterator;
-        typedef TriaActiveIterator<dealii::CellAccessor<1,spacedim> > active_line_iterator;
+	typedef dealii::CellAccessor<1,spacedim> CellAccessor;
+	typedef InvalidAccessor<0,1,spacedim> FaceAccessor;
+	
+        typedef TriaRawIterator   <CellAccessor> raw_line_iterator;
+        typedef TriaIterator      <CellAccessor> line_iterator;
+        typedef TriaActiveIterator<CellAccessor> active_line_iterator;
 
         typedef TriaRawIterator   <InvalidAccessor<2,1,spacedim> > raw_quad_iterator;
         typedef TriaIterator      <InvalidAccessor<2,1,spacedim> > quad_iterator;
@@ -82,9 +85,9 @@ namespace internal
         typedef line_iterator        cell_iterator;
         typedef active_line_iterator active_cell_iterator;
 
-        typedef TriaRawIterator   <InvalidAccessor<0,1,spacedim> > raw_face_iterator;
-        typedef TriaIterator      <InvalidAccessor<0,1,spacedim> > face_iterator;
-        typedef TriaActiveIterator<InvalidAccessor<0,1,spacedim> > active_face_iterator;
+        typedef TriaRawIterator   <FaceAccessor> raw_face_iterator;
+        typedef TriaIterator      <FaceAccessor> face_iterator;
+        typedef TriaActiveIterator<FaceAccessor> active_face_iterator;
     };
 
 
@@ -127,13 +130,16 @@ namespace internal
     template <int spacedim>
     struct Iterators<2,spacedim>
     {
-        typedef TriaRawIterator   <dealii::TriaAccessor<1, 2, spacedim> > raw_line_iterator;
-        typedef TriaIterator      <dealii::TriaAccessor<1, 2, spacedim> > line_iterator;
-        typedef TriaActiveIterator<dealii::TriaAccessor<1, 2, spacedim> > active_line_iterator;
+	typedef dealii::CellAccessor<2, spacedim> CellAccessor;
+	typedef dealii::TriaAccessor<1, 2, spacedim> FaceAccessor;
+	
+        typedef TriaRawIterator   <FaceAccessor> raw_line_iterator;
+        typedef TriaIterator      <FaceAccessor> line_iterator;
+        typedef TriaActiveIterator<FaceAccessor> active_line_iterator;
     
-        typedef TriaRawIterator   <dealii::CellAccessor<2, spacedim> > raw_quad_iterator;
-        typedef TriaIterator      <dealii::CellAccessor<2, spacedim> > quad_iterator;
-        typedef TriaActiveIterator<dealii::CellAccessor<2, spacedim> > active_quad_iterator;
+        typedef TriaRawIterator   <CellAccessor> raw_quad_iterator;
+        typedef TriaIterator      <CellAccessor> quad_iterator;
+        typedef TriaActiveIterator<CellAccessor> active_quad_iterator;
 
         typedef TriaRawIterator   <InvalidAccessor<3,2,spacedim> > raw_hex_iterator;
         typedef TriaIterator      <InvalidAccessor<3,2,spacedim> > hex_iterator;
@@ -172,17 +178,20 @@ namespace internal
     template <int spacedim>
     struct Iterators<3,spacedim>
     {
+	typedef dealii::CellAccessor<3, spacedim> CellAccessor;
+	typedef dealii::TriaAccessor<2, 3, spacedim> FaceAccessor;
+	
         typedef TriaRawIterator   <dealii::TriaAccessor<1, 3, spacedim> > raw_line_iterator;
         typedef TriaIterator      <dealii::TriaAccessor<1, 3, spacedim> > line_iterator;
         typedef TriaActiveIterator<dealii::TriaAccessor<1, 3, spacedim> > active_line_iterator;
     
-        typedef TriaRawIterator   <dealii::TriaAccessor<2, 3, spacedim> > raw_quad_iterator;
-        typedef TriaIterator      <dealii::TriaAccessor<2, 3, spacedim> > quad_iterator;
-        typedef TriaActiveIterator<dealii::TriaAccessor<2, 3, spacedim> > active_quad_iterator;
+        typedef TriaRawIterator   <FaceAccessor> raw_quad_iterator;
+        typedef TriaIterator      <FaceAccessor> quad_iterator;
+        typedef TriaActiveIterator<FaceAccessor> active_quad_iterator;
 
-        typedef TriaRawIterator   <dealii::CellAccessor<3, spacedim> > raw_hex_iterator;
-        typedef TriaIterator      <dealii::CellAccessor<3, spacedim> > hex_iterator;
-        typedef TriaActiveIterator<dealii::CellAccessor<3, spacedim> > active_hex_iterator;
+        typedef TriaRawIterator   <CellAccessor> raw_hex_iterator;
+        typedef TriaIterator      <CellAccessor> hex_iterator;
+        typedef TriaActiveIterator<CellAccessor> active_hex_iterator;
 
         typedef raw_hex_iterator    raw_cell_iterator;
         typedef hex_iterator        cell_iterator;

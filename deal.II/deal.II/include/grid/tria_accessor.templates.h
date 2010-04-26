@@ -56,6 +56,15 @@ TriaAccessorBase<structdim,dim,spacedim>::TriaAccessorBase (
 }
 
 
+template <int structdim, int dim, int spacedim>
+inline
+TriaAccessorBase<structdim,dim,spacedim>::TriaAccessorBase (const TriaAccessorBase<structdim,dim,spacedim> &a)
+		:
+		present_level(a.present_level),
+		present_index(a.present_index),
+		tria(a.tria)
+{}
+
 
 template <int structdim, int dim, int spacedim>
 inline

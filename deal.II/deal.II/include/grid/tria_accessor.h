@@ -223,7 +223,6 @@ class TriaAccessorBase
 				      */
     static const unsigned int structure_dimension = structdim;
     
-  protected:
 				     /**
 				      * Declare the data type that
 				      * this accessor class expects to
@@ -246,6 +245,12 @@ class TriaAccessorBase
 		      const AccessorData       *       =  0);
 
 				     /**
+				      *  Copy constructor. Creates an
+				      *  object with exactly the same data.
+				      */
+    TriaAccessorBase (const TriaAccessorBase &);
+
+				     /**
 				      *  Copy operator. Since this is
 				      *  only called from iterators,
 				      *  do not return anything, since
@@ -257,7 +262,15 @@ class TriaAccessorBase
 				      *  from the iterator class.
 				      */
     void copy_from (const TriaAccessorBase &);
+    
+				     /**
+				      *  Copy operator. Creates an
+				      *  object with exactly the same data.
+				      */
+    TriaAccessorBase & operator = (const TriaAccessorBase &);
 
+  protected:
+//TODO: Wolfgang, is this constructor EVER even asked for?
 				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
@@ -277,11 +290,6 @@ class TriaAccessorBase
 				      */
     void operator = (const TriaAccessorBase *);
     
-				     /**
-				      *  Same as above.
-				      */
-    TriaAccessorBase & operator = (const TriaAccessorBase &);
-
 				     /**
 				      *  Compare for equality.            
 				      */
@@ -566,7 +574,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 		  const int                 level      = -1,
 		  const int                 index      = -1,
 		  const AccessorData       *local_data =  0);
-
+    
 				     /**
 				      * Conversion constructor. This
 				      * constructor exists to make certain

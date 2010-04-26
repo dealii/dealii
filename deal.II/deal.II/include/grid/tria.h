@@ -1279,7 +1279,9 @@ class Triangulation : public Subscriptor
 	  maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
     };
 
-
+    typedef typename IteratorSelector::CellAccessor         cell_accessor;
+    typedef typename IteratorSelector::FaceAccessor         face_accessor;
+    
     typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
     typedef typename IteratorSelector::active_line_iterator active_line_iterator;
