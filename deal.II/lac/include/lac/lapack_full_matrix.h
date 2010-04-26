@@ -291,6 +291,56 @@ class LAPACKFullMatrix : public TransposeTable<number>
 			      const bool left_eigenvectors = false);
 
 				     /**
+				      * Compute generalized eigenvalues 
+				      * and (optionally) eigenvectors of
+				      * a real generalized symmetric
+				      * eigenproblem of the form
+				      * itype = 1: A*x=\lambda*B*x
+				      * itype = 2: A*B*x=\lambda*x
+				      * itype = 3: B*A*x=\lambda*x,
+				      * where A is this matrix.
+				      * A and B are assumed to be symmetric,
+				      * and B has to be positive definite.
+				      * After this routine has
+				      * been called, eigenvalues can
+				      * be retrieved using the
+				      * eigenvalue() function. The
+				      * matrix itself will be
+				      * LAPACKSupport::unusable after
+				      * this operation. The number of
+				      * computed eigenvectors is equal
+				      * to eigenvectors.size()
+				      *
+				      * Note that the function does
+				      * not return the computed
+				      * eigenvalues right away since
+				      * that involves copying data
+				      * around between the output
+				      * arrays of the LAPACK functions
+				      * and any return array. This is
+				      * often unnecessary since one
+				      * may not be interested in all
+				      * eigenvalues at once, but for
+				      * example only the extreme
+				      * ones. In that case, it is
+				      * cheaper to just have this
+				      * function compute the
+				      * eigenvalues and have a
+				      * separate function that returns
+				      * whatever eigenvalue is
+				      * requested.
+				      * 
+				      * @note Calls the LAPACK
+				      * function Xsygv. For this to
+				      * work, ./configure has to
+				      * be told to use LAPACK.
+				      */
+    void compute_generalized_eigenvalues_symmetric (
+                              LAPACKFullMatrix<number> & B,
+                              std::vector<Vector<number> > & eigenvectors,
+			      const int itype = 1);
+
+				     /**
 				      * Retrieve eigenvalue after
 				      * compute_eigenvalues() was
 				      * called.
