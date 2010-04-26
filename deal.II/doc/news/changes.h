@@ -83,6 +83,19 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
+   Improved: Exception classes declared locally to another class using
+   DeclException0 through DeclException5 were previously shown as local
+   classes in the class overview of the library. This was annoying since
+   they were not really of interest but made up most of the list.
+   The documentation now shows them in one central place in the
+   @ref Exceptions module.
+   <br>
+   (WB 2010/04/26)
+   </p>
+   </li>
+
+   <li>
+   <p>
    Improved: We now compile all files with their full path name on the command
    line. This makes it simpler for tools like debuggers or profilers (e.g.
    valgrind) to find the source files that corresponds to an executable.
@@ -90,7 +103,6 @@ inconvenience this causes.
    (WB 2010/04/15)
    </p>
    </li>
-
 
    <li>
    <p>
