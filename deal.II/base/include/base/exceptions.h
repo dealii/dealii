@@ -16,7 +16,7 @@
 /**
  * @file
  * Here, the deal.II exception handling is located.
- */ 
+ */
 
 #include <base/config.h>
 
@@ -52,7 +52,7 @@ class ExceptionBase : public std::exception
 				      * Default constructor.
 				      */
     ExceptionBase ();
-    
+
 				     /**
 				      *  The constructor takes the file in which the
 				      *  error happened, the line and the violated
@@ -66,7 +66,7 @@ class ExceptionBase : public std::exception
                                       * Copy constructor.
                                       */
     ExceptionBase (const ExceptionBase &exc);
-    
+
 				     /**
 				      * Destructor. Empty, but needed
 				      * for the sake of exception
@@ -79,7 +79,7 @@ class ExceptionBase : public std::exception
 				      * objects.
 				      */
     virtual ~ExceptionBase () throw();
-    
+
 				     /**
 				      *  Set the file name and line of where the
 				      *  exception appeared as well as the violated
@@ -91,7 +91,7 @@ class ExceptionBase : public std::exception
 		     const char *func,
 		     const char *c,
 		     const char *e);
-    
+
 				     /**
 				      *  Print out the general part of the error
 				      *  information.
@@ -180,7 +180,7 @@ class ExceptionBase : public std::exception
 /**
  * In this namespace functions in connection with the Assert and
  * AssertThrow mechanism are declared.
- * 
+ *
  * @ingroup Exceptions
  */
 namespace deal_II_exceptions
@@ -236,7 +236,7 @@ namespace deal_II_exceptions
 				    * exact setup of a machine.
 				    */
   void suppress_stacktrace_in_exceptions ();
-  
+
 				   /**
 				    * Calling this function switches off
 				    * the use of std::abort() when an
@@ -262,7 +262,7 @@ namespace deal_II_exceptions
  * and AssertThrow mechanism but are solely for internal purposes and
  * are not for use outside the exception handling and throwing
  * mechanism.
- * 
+ *
  *  @ingroup Exceptions
  */
   namespace internals
@@ -281,7 +281,7 @@ namespace deal_II_exceptions
 			     const char *cond,
 			     const char *exc_name,
 			     ExceptionBase &e);
-  
+
 
 /**
  *  This routine does the main work for the
@@ -303,7 +303,7 @@ namespace deal_II_exceptions
       e.set_fields (file, line, function, cond, exc_name);
       throw e;
     }
-    
+
 
 /**
  *  Relay exceptions from the <tt>Assert</tt> macro to the
@@ -326,7 +326,7 @@ namespace deal_II_exceptions
     {
       issue_error_assert (file,line,function,cond,exc_name,e);
     }
-    
+
 
 
 /**
@@ -338,7 +338,7 @@ namespace deal_II_exceptions
     void abort ();
 
   }
-  
+
 }
 
 
@@ -424,6 +424,7 @@ namespace deal_II_exceptions
 
 
 
+#ifndef DOXYGEN
 
 /**
  * Declare an exception class derived from ExceptionBase without parameters.
@@ -544,6 +545,67 @@ class Exception5 : public dealii::ExceptionBase {                             \
       const type5 arg5;                                               \
 }
 
+#else // ifndef DOXYGEN
+
+
+/**
+ * Declare an exception class derived from ExceptionBase without parameters.
+ * @author Wolfgang Bangerth, November 1997
+ * @ingroup Exceptions
+ */
+#define DeclException0(Exception0)  \
+  static dealii::ExceptionBase& Exception0 ()
+
+
+
+/**
+  *  Declare an exception class derived from ExceptionBase with
+  *  one additional parameter.
+ *  @ingroup Exceptions
+  */
+#define DeclException1(Exception1, type1, outsequence)                \
+  static dealii::ExceptionBase& Exception1 (type1 arg1) throw (errortext outsequence)
+
+
+
+/**
+ *  Declare an exception class derived from ExceptionBase with
+ *  two additional parameters.
+ *  @ingroup Exceptions
+ */
+#define DeclException2(Exception2, type1, type2, outsequence)         \
+  static dealii::ExceptionBase& Exception2 (type1 arg1, type2 arg2) throw (errortext outsequence)
+
+
+
+/**
+ *  Declare an exception class derived from ExceptionBase with
+ *  three additional parameters.
+ *  @ingroup Exceptions
+ */
+#define DeclException3(Exception3, type1, type2, type3, outsequence)  \
+  static dealii::ExceptionBase& Exception3 (type1 arg1, type2 arg2, type3 arg3) throw (errortext outsequence)
+
+
+
+/**
+ *  Declare an exception class derived from ExceptionBase with
+ *  four additional parameters.
+ *  @ingroup Exceptions
+ */
+#define DeclException4(Exception4, type1, type2, type3, type4, outsequence) \
+  static dealii::ExceptionBase& Exception4 (type1 arg1, type2 arg2, type3 arg3, type4 arg4) throw (errortext outsequence)
+
+
+/**
+ *  Declare an exception class derived from ExceptionBase with
+ *  five additional parameters.
+ *  @ingroup Exceptions
+ */
+#define DeclException5(Exception5, type1, type2, type3, type4, type5, outsequence) \
+  static dealii::ExceptionBase& Exception5 (type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) throw (errortext outsequence)
+
+#endif
 
 
 /**
@@ -557,13 +619,13 @@ class Exception5 : public dealii::ExceptionBase {                             \
  *
  * @ingroup Exceptions
  */
-namespace StandardExceptions 
+namespace StandardExceptions
 {
 				   /**
 				    * @addtogroup Exceptions
 				    */
 				   //@{
-  
+
 				   /**
 				    * Exception denoting a division by
 				    * zero.
@@ -595,7 +657,7 @@ namespace StandardExceptions
   DeclException1 (ExcMemoryLeak, int,
 		  << "Destroying memory handler while " << arg1
 		  << " objects are still allocated");
-  
+
 				   /**
 				    * An error occurred reading or
 				    * writing a file.
@@ -710,7 +772,7 @@ namespace StandardExceptions
                                     * suitable for this operation.
                                     */
   DeclException0 (ExcInvalidState);
-    
+
 				   /**
 				    * This exception is raised if a
 				    * functionality is not possible in
@@ -730,14 +792,14 @@ namespace StandardExceptions
 				    * not be here.
 				    */
   DeclException0(ExcZero);
-  
+
 				   /**
 				    * The object should have been
 				    * filled with something before
 				    * this member function is called.
 				    */
   DeclException0(ExcEmptyObject);
-  
+
 				   /**
 				    * This exception is raised
 				    * whenever the sizes of two
@@ -788,7 +850,7 @@ namespace StandardExceptions
   DeclException2 (ExcLowerRange, int, int,
 		  << "Number " << arg1
 		  << " must be larger or equal " << arg2);
-  
+
 				   /**
 				    * This exception indicates that
 				    * the first argument should be an
@@ -799,7 +861,7 @@ namespace StandardExceptions
 		  << "Division " << arg1
 		  << " by " << arg2
 		  << " has remainder different from zero");
-		  
+
 				   /**
 				    * This exception is thrown if the
 				    * iterator you access has
@@ -816,7 +878,7 @@ namespace StandardExceptions
 				    * yield an invalid iterator.
 				    */
   DeclException0 (ExcInvalidIterator);
-  
+
 				   /**
 				    * This exception is thrown if the
 				    * iterator you incremented or
@@ -824,7 +886,7 @@ namespace StandardExceptions
 				    * final state.
 				    */
   DeclException0 (ExcIteratorPastEnd);
-  
+
 				   /**
 				    * This exception works around a
 				    * design flaw in the
@@ -880,7 +942,7 @@ namespace StandardExceptions
 				    * if it is actually included.
 				    */
   DeclException0 (ExcNeedsBLAS);
-  
+
 				   /**
 				    * This function requires the LAPACK
 				    * library. Please reconfigure
@@ -889,7 +951,7 @@ namespace StandardExceptions
 				    * if it is actually included.
 				    */
   DeclException0 (ExcNeedsLAPACK);
-  
+
 				   /**
 				    * This function requires the UMFPack
 				    * library. Please reconfigure
@@ -898,7 +960,7 @@ namespace StandardExceptions
 				    * if it is actually included.
 				    */
   DeclException0 (ExcNeedsUMFPACK);
-  
+
 				   /**
 				    * This function requires the METIS
 				    * library. Please reconfigure
@@ -907,7 +969,7 @@ namespace StandardExceptions
 				    * if it is actually included.
 				    */
   DeclException0 (ExcNeedsMETIS);
-  
+
 				   /**
 				    * This function requires the Petsc
 				    * library. Please reconfigure
@@ -916,7 +978,7 @@ namespace StandardExceptions
 				    * if it is actually included.
 				    */
   DeclException0 (ExcNeedsPETSC);
-  
+
 				   /**
 				    * This function requires the
 				    * NetCDF library, which is neither
@@ -934,7 +996,7 @@ namespace StandardExceptions
 		  << "This feature was disabled by the "
 		  "configuration option --disable-"
 		  << arg1 << ". Reconfigure to use it!");
-  
+
 //@}
 }
 

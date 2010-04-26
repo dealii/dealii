@@ -33,3 +33,6 @@ s/(::)?dealii::/::/g;
 # - things in headings
 s/(?<!\")step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi
   if !m/(\@page|\@image|<h\d>)/i;
+
+
+s#(static dealii::ExceptionBase\&)#\n//\! \@ingroup Exceptions\n \1#g;
