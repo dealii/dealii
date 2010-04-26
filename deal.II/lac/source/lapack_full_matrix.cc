@@ -99,7 +99,8 @@ LAPACKFullMatrix<number>::vmult (
   const Vector<number> &v,
   const bool            adding) const
 {
-  Assert (state == matrix, ExcState(state));
+  Assert ((state == matrix) || (state == inverse_matrix),
+          ExcState(state));
   
   const int mm = this->n_rows();
   const int nn = this->n_cols();
@@ -304,6 +305,99 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
   if (info != 0)
     std::cerr << "LAPACK error in geev" << std::endl;
 
+  state = LAPACKSupport::State(eigenvalues | unusable);
+}
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
+  LAPACKFullMatrix<number> & B,
+  std::vector<Vector<number> > & eigenvectors,
+  const int itype)
+{
+  Assert(state == matrix, ExcState(state));
+  const int nn = this->n_cols();
+  Assert(nn == this->n_rows(), ExcNotQuadratic());
+  Assert(B.n_rows() == B.n_cols(), ExcNotQuadratic());
+  Assert(nn == B.n_cols(), ExcDimensionMismatch (nn, B.n_cols()));
+  Assert(eigenvectors.size() <= nn, ExcMessage ("eigenvectors.size() > matrix.n_cols()"));
+  
+  wr.resize(nn);
+  wi.resize(nn); //This is set purley for consistency reasons with the 
+                 //eigenvalues() function.
+  
+  number* values_A = const_cast<number*> (this->data());
+  number* values_B = const_cast<number*> (B.data());
+  
+  int info  = 0;
+  int lwork = 1;
+  const char * const jobz = (eigenvectors.size() > 0) ? (&V) : (&N);
+  const char * const uplo = (&U);
+  
+				   // Optimal workspace query:
+
+				   // The LAPACK routine DSYGV requires
+				   // a sufficient large workspace variable,
+				   // minimum requirement is
+				   //    work.size>=3*nn-1.
+				   // However, to improve performance, a
+				   // somewhat larger workspace may be needed.
+  
+				   // SOME implementations of the LAPACK routine
+				   // provide a workspace query call,
+				   //   info:=0, lwork:=-1
+				   // which returns an optimal value for the
+				   // size of the workspace array
+				   // (the PETSc 2.3.0 implementation does NOT
+				   // provide this functionality!).
+
+				   // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to
+				   // disable the workspace query.
+#ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
+  lwork = -1;
+  work.resize(1);
+  
+  sygv (&itype, jobz, uplo, &nn, values_A, &nn,
+        values_B, &nn,
+        &wr[0], &work[0], &lwork, &info);
+				   // sygv returns info=0 on
+				   // success. Since we only queried
+				   // the optimal size for work,
+				   // everything else would not be
+				   // acceptable.
+  Assert (info == 0, ExcInternalError());
+				   // Allocate working array according
+				   // to suggestion.
+  lwork = (int) (work[0]+.1);
+#else
+  lwork = 3*nn-1 > 1 ? 3*nn-1 : 1; // no query mode
+#endif
+				   // resize workspace array
+  work.resize((unsigned int) lwork);
+
+				   // Finally compute the generalized
+				   // eigenvalues.
+  sygv (&itype, jobz, uplo, &nn, values_A, &nn,
+        values_B, &nn,
+        &wr[0], &work[0], &lwork, &info);
+				   // Negative return value implies a
+				   // wrong argument. This should be
+				   // internal.
+
+  Assert (info >=0, ExcInternalError());
+  if (info != 0)
+    std::cerr << "LAPACK error in sygv" << std::endl;
+
+  for (unsigned int i=0; i < eigenvectors.size(); ++i)
+  {
+    unsigned int col_begin(i*nn);
+    eigenvectors[i].reinit(nn, true);
+    for (unsigned int j=0; j < nn; ++j)
+    {
+      eigenvectors[i](j) = values_A[col_begin+j];
+    }
+  }
   state = LAPACKSupport::State(eigenvalues | unusable);
 }
 
