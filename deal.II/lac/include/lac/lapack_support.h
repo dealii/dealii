@@ -100,6 +100,10 @@ namespace LAPACKSupport
 				    */
   static const char N = 'N';
 				   /**
+				    * Character constant.
+				    */
+  static const char U = 'U';
+				   /**
 				    * Integer constant.
 				    */
   static const int zero = 0;
