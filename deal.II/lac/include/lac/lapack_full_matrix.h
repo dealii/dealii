@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -64,7 +64,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * allocated.
 				      */
     explicit LAPACKFullMatrix (const unsigned int n = 0);
-    
+
 				     /**
 				      * Constructor. Initialize the
 				      * matrix as a rectangular
@@ -72,8 +72,8 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      */
     LAPACKFullMatrix (const unsigned int rows,
 		      const unsigned int cols);
-    
-				     /** 
+
+				     /**
 				      * Copy constructor. This
 				      * constructor does a deep copy
 				      * of the matrix. Therefore, it
@@ -99,7 +99,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      */
     LAPACKFullMatrix<number> &
     operator = (const LAPACKFullMatrix<number>&);
-    
+
 				     /**
 				      * Assignment operator for a
 				      * regular FullMatrix.
@@ -107,7 +107,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
     template <typename number2>
     LAPACKFullMatrix<number> &
     operator = (const FullMatrix<number2>&);
-    
+
 				     /**
 				      * This operator assigns a scalar
 				      * to a matrix. To avoid
@@ -128,7 +128,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      */
     template <class MATRIX>
     void copy_from (const MATRIX&);
-    
+
 				     /**
 				      * Fill rectangular block.
 				      *
@@ -159,7 +159,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 	       const unsigned int src_offset_j = 0,
 	       const number factor = 1.,
 	       const bool transpose = false);
-    
+
 				     /**
 				      * Matrix-vector-multiplication.
 				      *
@@ -189,7 +189,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      */
     void vmult_add (Vector<number>       &w,
 		    const Vector<number> &v) const;
-    
+
 				     /**
 				      * Transpose
 				      * matrix-vector-multiplication.
@@ -250,7 +250,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      */
     void apply_lu_factorization (Vector<number>& v,
 				 const bool transposed) const;
-    
+
 				     /**
 				      * Compute eigenvalues of the
 				      * matrix. After this routine has
@@ -283,7 +283,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * separate function that returns
 				      * whatever eigenvalue is
 				      * requested.
-				      * 
+				      *
 				      * @note Calls the LAPACK
 				      * function Xgeev.
 				      */
@@ -291,13 +291,13 @@ class LAPACKFullMatrix : public TransposeTable<number>
 			      const bool left_eigenvectors = false);
 
 				     /**
-				      * Compute generalized eigenvalues 
+				      * Compute generalized eigenvalues
 				      * and (optionally) eigenvectors of
 				      * a real generalized symmetric
 				      * eigenproblem of the form
-				      * itype = 1: A*x=\lambda*B*x
-				      * itype = 2: A*B*x=\lambda*x
-				      * itype = 3: B*A*x=\lambda*x,
+				      * itype = 1: $Ax=\lambda B x$
+				      * itype = 2: $ABx=\lambda x$
+				      * itype = 3: $BAx=\lambda x$,
 				      * where A is this matrix.
 				      * A and B are assumed to be symmetric,
 				      * and B has to be positive definite.
@@ -329,7 +329,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * separate function that returns
 				      * whatever eigenvalue is
 				      * requested.
-				      * 
+				      *
 				      * @note Calls the LAPACK
 				      * function Xsygv. For this to
 				      * work, ./configure has to
@@ -347,7 +347,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      */
     std::complex<number>
     eigenvalue (const unsigned int i) const;
-    
+
 				     /**
 				      * Print the matrix and allow
 				      * formatting of entries.
@@ -396,7 +396,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 			  const char         *zero_string = " ",
 			  const double        denominator = 1.,
 			  const double        threshold   = 0.) const;
-    
+
   private:
 				     /**
 				      * Since LAPACK operations
@@ -427,34 +427,34 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * LU-factorization.
 				      */
     std::vector<int> ipiv;
-    
+
 				     /**
 				      * Workspace for calculating the
 				      * inverse matrix from an LU
 				      * factorization.
 				      */
     std::vector<number> inv_work;
-    
+
 				     /**
 				      * Real parts of
 				      * eigenvalues. Filled by
 				      * compute_eigenvalues.
 				      */
     std::vector<number> wr;
-    
+
 				     /**
 				      * Imaginary parts of
 				      * eigenvalues. Filled by
 				      * compute_eigenvalues.
 				      */
     std::vector<number> wi;
-    
+
 				     /**
 				      * Space where left eigenvectors
 				      * can be stored.
 				      */
     std::vector<number> vl;
-    
+
 				     /**
 				      * Space where right eigenvectors
 				      * can be stored.
@@ -502,7 +502,7 @@ LAPACKFullMatrix<number>::copy_from (const MATRIX& M)
   for (typename MATRIX::const_iterator entry = M.begin();
        entry != end; ++entry)
     this->el(entry->row(), entry->column()) = entry->value();
-  
+
   state = LAPACKSupport::matrix;
 }
 
@@ -526,13 +526,13 @@ LAPACKFullMatrix<number>::fill (
     {
       const unsigned int i = transpose ? entry->column() : entry->row();
       const unsigned int j = transpose ? entry->row() : entry->column();
-      
+
       const unsigned int dst_i=dst_offset_i+i-src_offset_i;
       const unsigned int dst_j=dst_offset_j+j-src_offset_j;
       if (dst_i<this->n_rows() && dst_j<this->n_cols())
 	(*this)(dst_i, dst_j) = factor * entry->value();
     }
-  
+
   state = LAPACKSupport::matrix;
 }
 
@@ -545,7 +545,7 @@ LAPACKFullMatrix<number>::eigenvalue (const unsigned int i) const
   Assert (wr.size() == this->n_rows(), ExcInternalError());
   Assert (wi.size() == this->n_rows(), ExcInternalError());
   Assert (i<this->n_rows(), ExcIndexRange(i,0,this->n_rows()));
-  
+
   return std::complex<number>(wr[i], wi[i]);
 }
 
