@@ -70,6 +70,13 @@ void dgeevx_ (const char* balanc, const char* jobvl, const char* jobvr,
 void dsyev_ (const char *jobz, const char *uplo, const int *n,
 	     double *A, const int *lda, double *w,
 	     double *work, const int *lwork, int *info);
+// General eigenvalues and eigenvectors of
+// 1: A*x = lambda*B*x; 2: A*B*x = lambda*x; 3: B*A*x = lambda*x
+// A and B are symmetric and B is definite
+void dsygv_ (const int* itype, const char* jobz, const char* uplo,
+             const int* n, double* A, const int* lda, double* B,
+             const int* ldb, double* w, double* work,
+             const int* lwork, int* info);
 // Compute singular value decomposition
 void dgesvd_ (int* jobu, int* jobvt,
 	      const int* n, const int* m, double* A, const int* lda,

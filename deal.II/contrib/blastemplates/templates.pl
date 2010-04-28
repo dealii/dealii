@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal authors
+#    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -17,8 +17,6 @@ my $double;
 
 print << 'EOT'
 //---------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
 //
 //    This file was automatically generated from lapack_templates.h.in
 //    See blastemplates in the deal.II contrib directory
@@ -35,9 +33,8 @@ print << 'EOT'
 #ifndef __LAPACK_TEMPLATES_H
 #define __LAPACK_TEMPLATES_H
 
+#include <base/config.h>
 #include <lac/lapack_support.h>
-
-using namespace dealii;
 
 extern "C"
 {
@@ -103,6 +100,6 @@ while(<>)
     }
 }
 
-print "\n}\n";
+print "\n}\n\nDEAL_II_NAMESPACE_OPEN\n";
 
-print "\n$templates\n\n#endif\n";
+print "$templates\n\nDEAL_II_NAMESPACE_CLOSE\n\n#endif\n";
