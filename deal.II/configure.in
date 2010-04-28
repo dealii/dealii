@@ -549,7 +549,9 @@ AC_SUBST(UMFPACK_LIB)
 AC_SUBST(UMFPACK_INCLUDE_DIR)
 AC_SUBST(USE_CONTRIB_UMFPACK)
 
-dnl Check for LAPACK
+dnl -------------------------------------------------------------
+dnl Check for LAPACK and the LAPACK functions being used
+dnl -------------------------------------------------------------
 AC_ARG_WITH(lapack,
   [  --with-lapack=lapacklib Use the lapack library lapacklib. Make sure the
 	                  path to the libary is searched by ld, since it is
@@ -564,6 +566,11 @@ dnl MAC OSX links BLAS functions in a different way
 if test "x$with_blas" != "x" -a "x$with_blas" != "xno" ; then
   AC_CHECK_FUNC(daxpy_,,[AC_MSG_ERROR([BLAS library not installed correctly($with_blas)])])
 fi
+
+dnl Since we might have an incomplete LAPACK installation, check all
+dnl the functions we may want to use. If any of them is missing,
+dnl deal.II will not attempt to call it and rather throw and
+dnl exception.
 
 AC_CHECK_FUNCS([daxpy_ saxpy_ dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_])
 AC_CHECK_FUNCS([dgesvd_ sgesvd_ dgemm_ sgemm_ dgetrf_ sgetrf_ dgetri_ sgetri_])

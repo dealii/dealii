@@ -1,6 +1,4 @@
 //---------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
 //
 //    This file was automatically generated from lapack_templates.h.in
 //    See blastemplates in the deal.II contrib directory
@@ -142,7 +140,7 @@ void dsyev_ (const char *jobz, const char *uplo, const int *n,
 void ssyev_ (const char *jobz, const char *uplo, const int *n,
 	     float *A, const int *lda, float *w,
 	     float *work, const int *lwork, int *info);
-// General eigenvalues and eigenvectors of 
+// General eigenvalues and eigenvectors of
 // 1: A*x = lambda*B*x; 2: A*B*x = lambda*x; 3: B*A*x = lambda*x
 // A and B are symmetric and B is definite
 void dsygv_ (const int* itype, const char* jobz, const char* uplo,
@@ -180,8 +178,8 @@ void sstev_ (const char* jobz, const int* n,
 
 }
 
-
 DEAL_II_NAMESPACE_OPEN
+
 
 #ifdef HAVE_DAXPY_
 inline void
@@ -577,7 +575,7 @@ syev (const char *, const char *, const int *, float *, const int *, float *, fl
 inline void
 sygv (const int* itype, const char* jobz, const char* uplo, const int* n, double* A, const int* lda, double* B, const int* ldb, double* w, double* work, const int* lwork, int* info)
 {
-  dsygv_(itype, jobz, uplo, n, A, lda, B, ldb, w, work, lwork, info);
+  dsygv_ (itype,jobz,uplo,n,A,lda,B,ldb,w,work,lwork,info);
 }
 #else
 inline void
@@ -592,7 +590,7 @@ sygv (const int*, const char*, const char*, const int*, double*, const int*, dou
 inline void
 sygv (const int* itype, const char* jobz, const char* uplo, const int* n, float* A, const int* lda, float* B, const int* ldb, float* w, float* work, const int* lwork, int* info)
 {
-  ssygv_(itype, jobz, uplo, n, A, lda, B, ldb, w, work, lwork, info);
+  ssygv_ (itype,jobz,uplo,n,A,lda,B,ldb,w,work,lwork,info);
 }
 #else
 inline void
@@ -661,6 +659,7 @@ stev (const char*, const int*, float*, float*, float*, const int*, float*, int*)
   Assert (false, LAPACKSupport::ExcMissing("sstev"));
 }
 #endif
+
 
 DEAL_II_NAMESPACE_CLOSE
 

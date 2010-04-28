@@ -11,6 +11,27 @@
 #
 #---------------------------------------------------------------------------
 
+#---------------------------------------------------------------------------
+# This perl script translates lapack_templates.h.in to lapack_templates.h
+#
+# In the *.in file, every BLAS/LAPACK function which is defined for
+# double precision, i.e. having a name like 'dfoo_', is expanded to
+# itself plus the same function for single precision, namely
+# 'sfoo_'. Additionally, a C++ function 'foo' without the prefix
+# letter and the trailing underscore is generated, such that the
+# fortran functions can easily be called from templates. The
+# implementation of this function is modified due to the configure
+# variables 'HAVE_DFOO_' and 'HAVE_DFOO_': if these are set, then the
+# lapack functions 'dfoo_' and 'sfoo_' will be called, if not, an
+# exception will be thrown.
+#
+# Therefore, in order to be able to call a LAPACK function, the
+# functions have to be tested by configure. Search for the section
+# "Check for LAPACK..." in deal.II/configure.in and add the functions
+# 'dfoo_' and 'sfoo_' to the tests at the end of that section.
+#
+
+
 my $templates;
 my $double;
 
@@ -21,7 +42,7 @@ print << 'EOT'
 //    This file was automatically generated from lapack_templates.h.in
 //    See blastemplates in the deal.II contrib directory
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal authors
 //
 //    This file is subject to QPL and may not be distributed
 //    without copyright and license information. Please refer
