@@ -1290,26 +1290,6 @@ class FEValuesData
     std::vector<Tensor<1,spacedim> >  boundary_forms;
 
 				     /**
-				      * Array of the mapped support
-				      * points, filled by Mapping.
-				      */
-    std::vector<Point<spacedim> > support_points;
-
-				     /**
-				      * Array of the Jacobian of the
-				      * mapping in the support points,
-				      * filled by Mapping.
-				      */
-    HessianVector support_jacobians;
-
-				     /**
-				      * Array of the inverse Jacobian of the
-				      * mapping in the support points,
-				      * filled by Mapping.
-				      */
-    HessianVector support_inverse_jacobians;
-
-				     /**
 				      * Indicate the first row which a
 				      * given shape function occupies
 				      * in the #shape_values,
