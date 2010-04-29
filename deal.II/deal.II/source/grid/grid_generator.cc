@@ -169,11 +169,11 @@ GridGenerator::colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria)
 
 template <int dim, int spacedim>
 void GridGenerator::hyper_cube (Triangulation<dim,spacedim> &tria,
-			        const double        left,
-			        const double        right)
+			        const double                 left,
+			        const double                 right)
 {
   Assert (left < right,
-	  ExcMessage ("Invalid left and right bounds of hypercube"));
+	  ExcMessage ("Invalid left-to-right bounds of hypercube"));
 
   Point<spacedim> p1;
   Point<spacedim> p2;
@@ -287,7 +287,7 @@ GridGenerator::subdivided_hyper_cube (Triangulation<dim> &tria,
 {
   Assert (repetitions >= 1, ExcInvalidRepetitions(repetitions));
   Assert (left < right,
-	  ExcMessage ("Invalid left and right bounds of hypercube"));
+	  ExcMessage ("Invalid left-to-right bounds of hypercube"));
 
                                    // first generate the necessary
                                    // points
@@ -1267,17 +1267,20 @@ GridGenerator::half_hyper_shell (Triangulation<dim>&,
 // Implementation for 2D only
 template <int dim>
 void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
-					 const double      l,
-					 const double      r,
-					 const double      d,
-					 const bool        colorize)
+					 const double        left,
+					 const double        right,
+					 const double        thickness,
+					 const bool          colorize)
 {
+  Assert(left<right,
+	 ExcMessage ("Invalid left-to-right bounds of enclosed hypercube"));
+
   std::vector<Point<dim> > vertices(16);
   double coords[4];
-  coords[0] = l-d;
-  coords[1] = l;
-  coords[2] = r;
-  coords[3] = r+d;
+  coords[0] = left-thickness;
+  coords[1] = left;
+  coords[2] = right;
+  coords[3] = right+thickness;
 
   unsigned int k=0;
   for (unsigned int i0=0;i0<4;++i0)
@@ -1806,17 +1809,20 @@ void GridGenerator::hyper_cube_slit (Triangulation<dim>& tria,
 // Implementation for 3D only
 template <int dim>
 void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
-					 const double      l,
-					 const double      r,
-					 const double      d,
-					 const bool        colorize)
+					 const double        left,
+					 const double        right,
+					 const double        thickness,
+					 const bool          colorize)
 {
+  Assert(left<right,
+	 ExcMessage ("Invalid left-to-right bounds of enclosed hypercube"));
+
   std::vector<Point<dim> > vertices(64);
   double coords[4];
-  coords[0] = l-d;
-  coords[1] = l;
-  coords[2] = r;
-  coords[3] = r+d;
+  coords[0] = left-thickness;
+  coords[1] = left;
+  coords[2] = right;
+  coords[3] = right+thickness;
 
   unsigned int k=0;
   for (unsigned int z=0;z<4;++z)
