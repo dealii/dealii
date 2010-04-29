@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,7 +57,6 @@ namespace internal
  * setter functions. Knowledge of the actual data format is therefore encapsulated to the
  * present hierarchy of classes as well as the dealii::DoFHandler class.
  *
- * @ingroup dofs
  * @author Tobias Leicht, 2006
  */    
     template<int dim>
@@ -76,7 +75,6 @@ namespace internal
  * Store the indices of degrees of freedom on faces in 1D. As these would be vertices, which
  * are treted seperately, don't do anything.
  *
- * @ingroup dofs
  * @author Tobias Leicht, 2006
  */
     template<>
@@ -94,7 +92,6 @@ namespace internal
 /**
  * Store the indices of degrees of freedom on faces in 2D, which are lines.
  *
- * @ingroup dofs
  * @author Tobias Leicht, 2006
  */
     template<>
@@ -118,7 +115,6 @@ namespace internal
 /**
  * Store the indices of degrees of freedom on faces in 3D, which are quads, additionaly also on lines.
  *
- * @ingroup dofs
  * @author Tobias Leicht, 2006
  */
     template<>

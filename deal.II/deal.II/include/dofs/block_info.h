@@ -37,7 +37,7 @@ namespace hp
  * filled, which reflects the block structure of the degrees of
  * freedom.
  *
- * BlockInfo consists of deveral BlockIndices objects. The member
+ * BlockInfo consists of several BlockIndices objects. The member
  * global() reflects the block structure of the system on the active
  * cell level, usually referred to as the global system. As soon as
  * DoFHandler::distribute_dofs() has been called, the function
@@ -57,9 +57,31 @@ namespace hp
  * behavior of the MeshWorker::Assembler classes relying on
  * BlockInfo. They must be initialized by hand through initialize_local().
  *
+ * <h3>Usage</h3>
+ *
+ * The most common usage for this object is initializing vectors as in
+ * the following code:
+ *
+ * <code>
+ * MGDofHandler<dim> dof_handler(triangulation);
+ * dof_handler.distribute_dofs(fesystem);
+ * DoFRenumbering::block_wise(dof_handler);
+ *
+ * BlockVector<double> solution(dof_handler.block_info().global());
+ *
+ * MGLevelObject<BlockVector<double> > mg_vector(0, triangulation.n_levels()-1);
+ * for (unsigned int i=0;i<triangulation.n_levels();++i)
+ *   mg_vector[i].reinit(dof_handler.block_info().level(i));
+ *</code>
+ * In this example, <tt>solution</tt> obtains the block structure needed to
+ * represent a finite element function on the DoFHandler. Similarly,
+ * all levels of <tt>mg_vector</tt> will have the block structure
+ * needed on that level.
+ *
  * @todo Extend the functions local() and renumber() to the concept to
  * hpDoFHandler.
  *
+ * @ingroup dofs
  * @author Guido Kanschat, 2009
  */
 class BlockInfo : public Subscriptor

@@ -32,9 +32,6 @@ namespace internal
 {
   namespace MGDoFHandler
   {
-/*!@addtogroup mg */
-/*@{*/
-
     template <int dim, int spacedim>
     class Iterators;
 

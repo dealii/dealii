@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -75,7 +75,6 @@ namespace internal
  * encapsulated to the present hierarchy of classes as well as the
  * dealii::DoFHandler class.
  *
- * @ingroup dofs
  * @author Wolfgang Bangerth, 1998, 2006
  */
     template <int N>
@@ -124,7 +123,6 @@ namespace internal
  * Store the indices of the degrees of freedom which are located on
  * lines. See the general template DoFLevel for more information.
  *
- * @ingroup dofs
  * @author Wolfgang Bangerth, 1998, 2006
  */
     template <>
@@ -150,7 +148,6 @@ namespace internal
  * Store the indices of the degrees of freedom which are located on
  * quads. See the general template DoFLevel for more information.
  *
- * @ingroup dofs
  * @author Wolfgang Bangerth, 1998, 2006
  */
     template <>
@@ -176,7 +173,6 @@ namespace internal
  * Store the indices of the degrees of freedom which are located on
  * hexhedra. See the general template DoFLevel for more information.
  *
- * @ingroup dofs
  * @author Wolfgang Bangerth, 1998, 2006
  */
     template <>
