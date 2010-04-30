@@ -569,7 +569,7 @@ fi
 
 dnl Since we might have an incomplete LAPACK installation, check all
 dnl the functions we may want to use. If any of them is missing,
-dnl deal.II will not attempt to call it and rather throw and
+dnl deal.II will not attempt to call it and rather throw an
 dnl exception.
 
 AC_CHECK_FUNCS([daxpy_ saxpy_ dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_])
