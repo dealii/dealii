@@ -120,6 +120,12 @@ $(LIBDIR)/liblac.g$(shared-lib-suffix): $(go-files)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,lac.g) $@
 
 
+# generate a file that contains prototypes for BLAS and LAPACK functions
+include/lac/lapack_templates.h: include/lac/lapack_templates.h.in $D/common/scripts/lapack_templates.pl
+	@echo ===================================== Remaking $@
+	@$(PERL) $D/common/scripts/lapack_templates.pl include/lac/lapack_templates.h.in > $@
+
+
 clean:
 	-rm -f *~ include/*~ include/*/*~ Makefile.dep source/*.inst
 
@@ -131,7 +137,8 @@ clean:
 # of this file.
 #
 # If the command fails, then remove Makefile.dep again and fail
-Makefile.dep: $(cc-files) $(h-files) \
+Makefile.dep: include/lac/lapack_templates.h \
+	      $(cc-files) $(h-files) \
 		$(inst-files) \
 		Makefile $D/common/Make.global_options
 	@echo ===================================== Remaking lac/Makefile
