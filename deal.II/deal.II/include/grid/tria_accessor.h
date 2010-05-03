@@ -113,7 +113,7 @@ namespace internal
 
   }
 }
-template <int celldim, int dim, int spacedim>	class TriaAccessor;
+template <int structdim, int dim, int spacedim>	class TriaAccessor;
 template <int dim, int spacedim>		class TriaAccessor<0, dim, spacedim>;
 
 // note: the file tria_accessor.templates.h is included at the end of
@@ -1045,7 +1045,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * boundary. Obviously, the use of this
 				      * function is only possible for
 				      * <tt>dim@>structdim</tt>; however, for
-				      * <tt>dim==celldim</tt>, an object is a
+				      * <tt>dim==structdim</tt>, an object is a
 				      * cell and the CellAccessor class offers
 				      * another possibility to determine
 				      * whether a cell is at the boundary or
@@ -1322,7 +1322,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *
 				      * It is only possible to set the
 				      * line_orientation of faces in 3d
-				      * (i.e. <code>celldim==2 &&
+				      * (i.e. <code>structdim==2 &&
 				      * dim==3</code>).
                                       */
     void set_line_orientation (const unsigned int line,
@@ -1357,7 +1357,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *
 				      * It is only possible to set the
 				      * face_orientation of cells in 3d
-				      * (i.e. <code>celldim==3 &&
+				      * (i.e. <code>structdim==3 &&
 				      * dim==3</code>).
                                       */
     void set_face_flip (const unsigned int face,
@@ -1370,7 +1370,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *
 				      * It is only possible to set the
 				      * face_orientation of cells in 3d
-				      * (i.e. <code>celldim==3 &&
+				      * (i.e. <code>structdim==3 &&
 				      * dim==3</code>).
                                       */
     void set_face_rotation (const unsigned int face,
@@ -1394,7 +1394,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * Set the @p RefinementCase<dim> this
 				      * TriaObject is refined with.
 				      * Not defined for
-				      * <tt>celldim=1</tt> as lines
+				      * <tt>structdim=1</tt> as lines
 				      * are always refined resulting
 				      * in 2 children lines (isotropic
 				      * refinement).

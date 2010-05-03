@@ -66,11 +66,11 @@ namespace internal
 /**
  * This is a switch class which only declares a @p typedef. It is meant to
  * determine which class a DoFAccessor class is to be derived from. By
- * default, <tt>DoFAccessor@<celldim,dim,spacedim@></tt> derives from the
+ * default, <tt>DoFAccessor@<structdim,dim,spacedim@></tt> derives from the
  * typedef in the general
- * <tt>Inheritance@<celldim,dim,spacedim@></tt> class, which is
- * <tt>TriaAccessor@<celldim,dim,spacedim@></tt>, but if
- * <tt>celldim==dim</tt>, then the specialization
+ * <tt>Inheritance@<structdim,dim,spacedim@></tt> class, which is
+ * <tt>TriaAccessor@<structdim,dim,spacedim@></tt>, but if
+ * <tt>structdim==dim</tt>, then the specialization
  * <tt>Inheritance@<dim,dim,spacedim@></tt> is used which declares
  * its local type to be <tt>CellAccessor@<dim,spacedim@></tt>. Therefore, the
  * inheritance is automatically chosen to be from CellAccessor if the object
@@ -80,7 +80,7 @@ namespace internal
  * @ingroup Accessors 
  * @author Wolfgang Bangerth, 1999
  */
-    template <int celldim, int dim, int spacedim>
+    template <int structdim, int dim, int spacedim>
     struct Inheritance 
     {
 					 /**
@@ -88,7 +88,7 @@ namespace internal
 					  * See the full documentation for
 					  * more information.
 					  */
-	typedef dealii::TriaAccessor<celldim,dim,spacedim> BaseClass;
+	typedef dealii::TriaAccessor<structdim,dim,spacedim> BaseClass;
     };
 
 

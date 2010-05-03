@@ -19,7 +19,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int celldim, int dim, int spacedim> class MGDoFAccessor;
+template <int structdim, int dim, int spacedim> class MGDoFAccessor;
 template <int dim, int spacedim> class MGDoFCellAccessor;
 template <int, int, int> class InvalidAccessor;
 

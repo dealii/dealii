@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim> class MGDoFHandler;
 
-template <int celldim, int dim, int spacedim=dim> class MGDoFAccessor;
+template <int structdim, int dim, int spacedim=dim> class MGDoFAccessor;
 
 namespace internal
 {
@@ -44,17 +44,17 @@ namespace internal
 /**
  * This is a switch class which only declares a @p typedef. It is meant to
  * determine which class aMGDoFAccessor class is to be derived
- * from. By default, <tt>MGDoFAccessor<celldim,dim></tt> derives from
- * the @p typedef in the general <tt>MGDoFAccessor_Inheritance<celldim,dim></tt>
- * class, which is <tt>DoFAccessor<celldim,dim></tt>,
- * but if <tt>celldim==dim</tt>, then the specialization <tt>MGDoFAccessor_Inheritance<dim,dim></tt>
+ * from. By default, <tt>MGDoFAccessor<structdim,dim></tt> derives from
+ * the @p typedef in the general <tt>MGDoFAccessor_Inheritance<structdim,dim></tt>
+ * class, which is <tt>DoFAccessor<structdim,dim></tt>,
+ * but if <tt>structdim==dim</tt>, then the specialization <tt>MGDoFAccessor_Inheritance<dim,dim></tt>
  * is used which declares its local type to be <tt>DoFCellAccessor<dim></tt>. Therefore,
  * the inheritance is automatically chosen to be from @p DoFCellAccessor if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @author Wolfgang Bangerth, 1999
  */
-    template <int celldim, int dim, int spacedim>
+    template <int structdim, int dim, int spacedim>
     struct Inheritance
     {
 					 /**
@@ -62,7 +62,7 @@ namespace internal
 					  * See the full documentation for
 					  * more information.
 					  */
-	typedef dealii::DoFAccessor<celldim, dealii::DoFHandler<dim,spacedim> > BaseClass;
+	typedef dealii::DoFAccessor<structdim, dealii::DoFHandler<dim,spacedim> > BaseClass;
     };
 
 
@@ -71,9 +71,9 @@ namespace internal
  * meant to determine which class a DoFAccessor class is to be
  * derived from. By default, DoFAccessor<structdim,dim>
  * derives from the @p typedef in the general
- * <tt>DoFAccessor_Inheritance<celldim,dim></tt> class, which is
- * <tt>TriaAccessor<celldim,dim></tt>, but if
- * <tt>celldim==dim</tt>, then the specialization
+ * <tt>DoFAccessor_Inheritance<structdim,dim></tt> class, which is
+ * <tt>TriaAccessor<structdim,dim></tt>, but if
+ * <tt>structdim==dim</tt>, then the specialization
  * <tt>TriaAccessor<dim,dim></tt> is used which declares its
  * local type to be <tt>CellAccessor<dim></tt>. Therefore, the
  * inheritance is automatically chosen to be from @p CellAccessor if
