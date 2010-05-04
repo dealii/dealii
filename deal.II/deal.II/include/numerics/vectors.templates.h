@@ -1301,7 +1301,9 @@ VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space
 
   for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
     if (component_mask[fe.face_system_to_component_index(i).first])
-      boundary_values[outermost_cell->vertex_dof_index(direction,i)]
+      boundary_values[outermost_cell->
+		      vertex_dof_index(direction,i,
+				       outermost_cell->active_fe_index())]
 	= function_values(fe.face_system_to_component_index(i).first);
 }
 
@@ -1818,7 +1820,8 @@ VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space
       {
 				   // TODO: should we clear the other
 				   // entries in the line here?
-	const unsigned int row = outermost_cell->vertex_dof_index(direction,i);
+	const unsigned int row = outermost_cell->vertex_dof_index(direction,i,
+								  outermost_cell->active_fe_index());
 	constraints.add_line (row);
 	constraints.set_inhomogeneity (row,
 		    function_values(fe.face_system_to_component_index(i).first));
