@@ -732,6 +732,74 @@ namespace MeshWorker
 
 /// The type of the info objects for faces.
       typedef IntegrationInfo<dim, spacedim> FaceInfo;
+
+				       /**
+					* A callback function which is
+					* called in the loop over all
+					* cells, after the action on a
+					* cell has been performed and
+					* before the faces are dealt
+					* with.
+					*
+					* In order for this function
+					* to have this effect,
+					* at least either of the
+					* arguments
+					* <tt>boundary_worker</tt> or
+					* <tt>face_worker</tt>
+					* arguments of loop() should
+					* be nonzero. Additionally,
+					* <tt>cells_first</tt> should
+					* be true. If
+					* <tt>cells_first</tt> is
+					* false, this function is
+					* called before any action on
+					* a cell is taken.
+					*
+					* And empty function in this
+					* class, but can be replaced
+					* in other classes given to
+					* loop() instead.
+					*
+					* See loop() and cell_action()
+					* for more details of how this
+					* function can be used.
+					*/
+      template <class DOFINFO>
+      void post_cell(const DoFInfoBox<dim, DOFINFO>&);
+      
+				       /**
+					* A callback function which is
+					* called in the loop over all
+					* cells, after the action on
+					* the faces of a cell has been
+					* performed and before the
+					* cell itself is dealt with
+					* (assumes
+					* <tt>cells_first</tt> is false).
+					*
+					* In order for this function
+					* to have a reasonable effect,
+					* at least either of the
+					* arguments
+					* <tt>boundary_worker</tt> or
+					* <tt>face_worker</tt>
+					* arguments of loop() should
+					* be nonzero. Additionally,
+					* <tt>cells_first</tt> should
+					* be false.
+					*
+					* And empty function in this
+					* class, but can be replaced
+					* in other classes given to
+					* loop() instead.
+					*
+					* See loop() and cell_action()
+					* for more details of how this
+					* function can be used.
+					*/
+      template <class DOFINFO>
+      void post_faces(const DoFInfoBox<dim, DOFINFO>&);
       
       template <class WORKER>
       void initialize(const WORKER&,
@@ -752,7 +820,7 @@ namespace MeshWorker
 		      const Mapping<dim, spacedim>& mapping,
 		      const NamedData<MGLevelObject<VECTOR>*>& data,
 		      const BlockInfo* block_info = 0);
-
+      
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
@@ -1318,6 +1386,22 @@ namespace MeshWorker
     subface.initialize_data(p);
     neighbor.initialize_data(p);
   }
+
+
+  template <int dim, int sdim>
+  template <class DOFINFO>
+  void
+  IntegrationInfoBox<dim,sdim>::post_cell(const DoFInfoBox<dim, DOFINFO>&)
+  {}
+  
+
+  template <int dim, int sdim>
+  template <class DOFINFO>
+  void
+  IntegrationInfoBox<dim,sdim>::post_faces(const DoFInfoBox<dim, DOFINFO>&)
+  {}
+  
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

@@ -112,6 +112,12 @@ namespace MeshWorker
 	info.cell.reinit(dof_info.cell);
 	cell_worker(dof_info.cell, info.cell);
       }
+
+				     // Call the callback function in
+				     // the info box to do
+				     // computations between cell and
+				     // face action.
+    info.post_cell(dof_info);
     
     if (integrate_interior_face || integrate_boundary)
       for (unsigned int face_no=0; face_no < GeometryInfo<ITERATOR::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
@@ -198,6 +204,12 @@ namespace MeshWorker
 		}
 	    }
 	} // faces
+				     // Call the callback function in
+				     // the info box to do
+				     // computations between face and
+				     // cell action.
+    info.post_faces(dof_info);
+    
 				     // Execute this, if faces
 				     // have to be handled first
     if (integrate_cell && !cells_first)
@@ -210,18 +222,14 @@ namespace MeshWorker
   
   
 /**
- * The main work function of this namespace. Its action consists of two
- * loops.
- *
- * First, a loop over all cells in the iterator range is performed, in
- * each step updating the CellInfo object, then calling
- * cell_worker() with this object.
- *
- * In the second loop, we walk through all the faces of cells in the
- * iterator range. The functions boundary_worker() and
- * face_worker() are called for each boundary and interior face,
- * respectively. Unilaterally refined interior faces are handled
+ * The main work function of this namespace. It is a loop over all
+ * cells in an iterator range, in which cell_action() is called for
+ * each cell. Unilaterally refined interior faces are handled
  * automatically by the loop.
+ *
+ * Most of the work in this loop is done in cell_action(), whic halso
+ * reeived most of the parameters of this function. See the
+ * documentation there for mor details.
  *
  * If you don't want integration on cells, interior or boundary faces
  * to happen, simply pass the Null pointer to one of the function
