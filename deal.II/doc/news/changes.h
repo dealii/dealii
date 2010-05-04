@@ -620,6 +620,12 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>Fixed: The GridIn::read_msh function got into trouble if the mesh file
+  had a section that listed physical names for variables. This is now fixed.
+  <br>
+  (WB 2010/05/03)
+  </p></li>
 
   <li>
   <p> Improved: DoFHandler iterators now can be assigned from a Triangulation iterator

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
-  
+
 				   // skip comments at start of file
   skip_comment_lines (in, '#');
 
@@ -73,8 +73,8 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
 				   // in ucd-file (key) and in the
 				   // vertices vector
   std::map<int,int> vertex_indices;
-  
-  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
     {
       int vertex_number;
       double x[3];
@@ -97,7 +97,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
   std::vector<CellData<dim> > cells;
   SubCellData                 subcelldata;
 
-  for (unsigned int cell=0; cell<n_cells; ++cell) 
+  for (unsigned int cell=0; cell<n_cells; ++cell)
     {
 				       // note that since in the input
 				       // file we found the number of
@@ -105,10 +105,10 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
 				       // should still be input here,
 				       // so check this:
       AssertThrow (in, ExcIO());
-      
+
       std::string cell_type;
       int material_id;
-      
+
       in >> dummy          // cell number
 	 >> material_id;
       in >> cell_type;
@@ -130,7 +130,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
 	    if (vertex_indices.find (cells.back().vertices[i]) != vertex_indices.end())
 					       // vertex with this index exists
 	      cells.back().vertices[i] = vertex_indices[cells.back().vertices[i]];
-	    else 
+	    else
 	      {
 						 // no such vertex index
 		AssertThrow (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
@@ -154,7 +154,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
 						 // vertex with this index exists
 		subcelldata.boundary_lines.back().vertices[i]
 		  = vertex_indices[subcelldata.boundary_lines.back().vertices[i]];
-	      else 
+	      else
 		{
 						   // no such vertex index
 		  AssertThrow (false,
@@ -173,9 +173,9 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
  	         >> subcelldata.boundary_quads.back().vertices[1]
  		 >> subcelldata.boundary_quads.back().vertices[2]
  		 >> subcelldata.boundary_quads.back().vertices[3];
-	      
+
  	      subcelldata.boundary_quads.back().material_id = material_id;
-	      
+
 					       // transform from ucd to
 					       // consecutive numbering
  	      for (unsigned int i=0; i<4; ++i)
@@ -193,14 +193,14 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
  		    subcelldata.boundary_quads.back().vertices[i] =
 		      numbers::invalid_unsigned_int;
  		  };
-	      
+
 	    }
 	  else
 					     // cannot read this
 	    AssertThrow (false, ExcUnknownIdentifier(cell_type));
     };
 
-  
+
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
@@ -224,7 +224,7 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
   Assert (dim==2, ExcNotImplemented());
 
   AssertThrow (in, ExcIO());
-  
+
 				   // skip comments at start of file
   skip_comment_lines (in, '#');
 
@@ -265,10 +265,10 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
 				   // now read vertices
   getline (in, line);
   AssertThrow (line=="Vertices", ExcInvalidDBMESHInput(line));
-  
+
   unsigned int n_vertices;
   double dummy;
-  
+
   in >> n_vertices;
   std::vector<Point<spacedim> >     vertices (n_vertices);
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
@@ -288,7 +288,7 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
 				   // discard the input
   getline (in, line);
   AssertThrow (line=="Edges", ExcInvalidDBMESHInput(line));
-  
+
   unsigned int n_edges;
   in >> n_edges;
   for (unsigned int edge=0; edge<n_edges; ++edge)
@@ -310,7 +310,7 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
 				   // discard the input
   getline (in, line);
   AssertThrow (line=="CrackedEdges", ExcInvalidDBMESHInput(line));
-  
+
   in >> n_edges;
   for (unsigned int edge=0; edge<n_edges; ++edge)
     {
@@ -333,7 +333,7 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
   SubCellData            subcelldata;
   unsigned int n_cells;
   in >> n_cells;
-  for (unsigned int cell=0; cell<n_cells; ++cell) 
+  for (unsigned int cell=0; cell<n_cells; ++cell)
     {
 				       // read in vertex numbers. they
 				       // are 1-based, so subtract one
@@ -341,12 +341,12 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
       for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	{
 	  in >> cells.back().vertices[i];
-	  
+
 	  AssertThrow ((cells.back().vertices[i] >= 1)
 		       &&
 		       (static_cast<unsigned int>(cells.back().vertices[i]) <= vertices.size()),
 		       ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
-		  
+
 	  --cells.back().vertices[i];
 	};
 
@@ -356,7 +356,7 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
   AssertThrow (in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
-  
+
 
 				   // then there are again a whole lot
 				   // of fields of which I have no
@@ -368,7 +368,7 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
 				   // ok, so we are not at the end of
 				   // the file, that's it, mostly
 
-  
+
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
@@ -424,7 +424,7 @@ void GridIn<2>::read_xda (std::istream &in)
   std::vector<CellData<2> > cells (n_cells);
   SubCellData subcelldata;
 
-  for (unsigned int cell=0; cell<n_cells; ++cell) 
+  for (unsigned int cell=0; cell<n_cells; ++cell)
     {
 				       // note that since in the input
 				       // file we found the number of
@@ -434,16 +434,16 @@ void GridIn<2>::read_xda (std::istream &in)
       AssertThrow (in, ExcIO());
       Assert (GeometryInfo<2>::vertices_per_cell == 4,
 	      ExcInternalError());
-      
+
       for (unsigned int i=0; i<4; ++i)
 	in >> cells[cell].vertices[i];
     };
 
 
-   
+
 				   // set up array of vertices
   std::vector<Point<2> > vertices (n_vertices);
-  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
     {
       double x[3];
 
@@ -478,7 +478,7 @@ void GridIn<3>::read_xda (std::istream &in)
   AssertThrow (in, ExcIO());
 
   static const unsigned int xda_to_dealII_map[] = {0,1,5,4,3,2,6,7};
-  
+
   std::string line;
 				   // skip comments at start of file
   getline (in, line);
@@ -502,7 +502,7 @@ void GridIn<3>::read_xda (std::istream &in)
   std::vector<CellData<3> > cells (n_cells);
   SubCellData subcelldata;
 
-  for (unsigned int cell=0; cell<n_cells; ++cell) 
+  for (unsigned int cell=0; cell<n_cells; ++cell)
     {
 				       // note that since in the input
 				       // file we found the number of
@@ -512,9 +512,9 @@ void GridIn<3>::read_xda (std::istream &in)
       AssertThrow (in, ExcIO());
       Assert(GeometryInfo<3>::vertices_per_cell == 8,
 	     ExcInternalError());
-      
+
       unsigned int xda_ordered_nodes[8];
-      
+
       for (unsigned int i=0; i<8; ++i)
 	in >> xda_ordered_nodes[i];
 
@@ -523,10 +523,10 @@ void GridIn<3>::read_xda (std::istream &in)
     };
 
 
-  
+
 				   // set up array of vertices
   std::vector<Point<3> > vertices (n_vertices);
-  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
     {
       double x[3];
 
@@ -561,7 +561,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
   unsigned int n_cells;
   unsigned int dummy;
   std::string line;
-  
+
   in >> line;
 
 				   // first determine file format
@@ -598,10 +598,25 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 		   ExcInvalidGMSHInput(line));
 
       in >> line;
+				       // if the next block is of kind
+				       // $PhysicalNames, ignore it
+      if (line == "$PhysicalNames")
+	{
+	  do
+	    {
+	      in >> line;
+	    }
+	  while (line != "$EndPhysicalNames");
+	  in >> line;
+	}
+
+				       // but the next thing should,
+				       // in any case, be the list of
+				       // nodes:
       AssertThrow (line == "$Nodes",
 		   ExcInvalidGMSHInput(line));
     }
-  
+
 				   // now read the nodes list
   in >> n_vertices;
   std::vector<Point<spacedim> >     vertices (n_vertices);
@@ -609,8 +624,8 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 				   // in msh-file (nod) and in the
 				   // vertices vector
   std::map<int,int> vertex_indices;
-  
-  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
     {
       int vertex_number;
       double x[3];
@@ -618,7 +633,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 				       // read vertex
       in >> vertex_number
 	 >> x[0] >> x[1] >> x[2];
-     
+
       for (unsigned int d=0; d<spacedim; ++d)
 	vertices[vertex](d) = x[d];
 				       // store mapping
@@ -630,7 +645,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
   static const std::string end_nodes_marker[] = {"$ENDNOD", "$EndNodes" };
   AssertThrow (line==end_nodes_marker[gmsh_file_format-1],
 	       ExcInvalidGMSHInput(line));
-  
+
 				   // Now read in next bit
   in >> line;
   static const std::string begin_elements_marker[] = {"$ELM", "$Elements" };
@@ -638,12 +653,12 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 	       ExcInvalidGMSHInput(line));
 
   in >> n_cells;
-  
+
 				   // set up array of cells
   std::vector<CellData<dim> > cells;
   SubCellData                 subcelldata;
 
-  for (unsigned int cell=0; cell<n_cells; ++cell) 
+  for (unsigned int cell=0; cell<n_cells; ++cell)
     {
 				       // note that since in the input
 				       // file we found the number of
@@ -651,7 +666,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 				       // should still be input here,
 				       // so check this:
       AssertThrow (in, ExcIO());
-      
+
       unsigned int cell_type;
       unsigned int material_id;
       unsigned int nod_num;
@@ -668,7 +683,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
   (version 1) or the first tag (version 2, if any tag is given at all) as
   material id.
 */
-      
+
       in >> dummy          // ELM-NUMBER
 	 >> cell_type;	   // ELM-TYPE
 
@@ -681,7 +696,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 	       >> nod_num;
 	    break;
 	  }
-	  
+
 	  case 2:
 	  {
 					     // read the tags; ignore
@@ -692,7 +707,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 	      in >> material_id;
 	    else
 	      material_id = 0;
-	    
+
 	    for (unsigned int i=1; i<n_tags; ++i)
 	      in >> dummy;
 
@@ -704,23 +719,23 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 	  default:
 		AssertThrow (false, ExcNotImplemented());
 	}
-	  
-      
+
+
 /*       `ELM-TYPE'
 	 defines the geometrical type of the N-th element:
 	 `1'
 	 Line (2 nodes, 1 edge).
-                                                                                                
+
 	 `3'
 	 Quadrangle (4 nodes, 4 edges).
-                                                                                                
+
 	 `5'
 	 Hexahedron (8 nodes, 12 edges, 6 faces).
-                                                                                    
+
 	 `15'
 	 Point (1 node).
 */
-      
+
       if (((cell_type == 1) && (dim == 1)) ||
 	  ((cell_type == 3) && (dim == 2)) ||
 	  ((cell_type == 5) && (dim == 3)))
@@ -729,7 +744,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 	  AssertThrow (nod_num == GeometryInfo<dim>::vertices_per_cell,
 		       ExcMessage ("Number of nodes does not coincide with the "
 				   "number required for this object"));
-	  
+
 					   // allocate and read indices
 	  cells.push_back (CellData<dim>());
 	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -743,7 +758,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 	      AssertThrow (vertex_indices.find (cells.back().vertices[i]) !=
 			   vertex_indices.end(),
 			   ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
-	      
+
 					       // vertex with this index exists
 	      cells.back().vertices[i] = vertex_indices[cells.back().vertices[i]];
 	    }
@@ -765,7 +780,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 						 // vertex with this index exists
 		subcelldata.boundary_lines.back().vertices[i]
 		  = vertex_indices[subcelldata.boundary_lines.back().vertices[i]];
-	      else 
+	      else
 		{
 						   // no such vertex index
 		  AssertThrow (false,
@@ -784,9 +799,9 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
  	         >> subcelldata.boundary_quads.back().vertices[1]
  		 >> subcelldata.boundary_quads.back().vertices[2]
  		 >> subcelldata.boundary_quads.back().vertices[3];
-	      
+
  	      subcelldata.boundary_quads.back().material_id = material_id;
-	      
+
 					       // transform from gmsh to
 					       // consecutive numbering
  	      for (unsigned int i=0; i<4; ++i)
@@ -804,7 +819,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
  		    subcelldata.boundary_quads.back().vertices[i] =
 		      numbers::invalid_unsigned_int;
  		  };
-	      
+
 	    }
 	  else
 	    if (cell_type == 15)
@@ -838,7 +853,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
   static const std::string end_elements_marker[] = {"$ENDELM", "$EndElements" };
   AssertThrow (line==end_elements_marker[gmsh_file_format-1],
 	       ExcInvalidGMSHInput(line));
-  
+
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
@@ -847,7 +862,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 				   // check that we actually read some
 				   // cells.
   AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
-  
+
 				   // do some clean-up on
 				   // vertices...
   GridTools::delete_unused_vertices (vertices, cells, subcelldata);
@@ -933,7 +948,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 				   // to find the right value for
 				   // coord, and setting x2d and y2d
 				   // accordingly.
-  
+
 				   // First, open the file
   NcFile nc (filename.c_str());
   AssertThrow(nc.is_valid(), ExcIO());
@@ -959,7 +974,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 				   // use &* to convert
 				   // vector<int>::iterator to int *
   marker_var->get(&*marker.begin(), n_markers);
-  
+
   if (output)
     {
       std::cout << "n_cell=" << n_cells << std::endl;
@@ -995,7 +1010,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 				       // different
       AssertThrow(n_bquads_per_bmarker.find(marker[i])==
 		  n_bquads_per_bmarker.end(), ExcIO());
-      
+
       n_bquads_per_bmarker[marker[i]]=
 	count(bmarker.begin(), bmarker.end(), marker[i]);
     }
@@ -1029,7 +1044,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   AssertThrow(quad_vertices_dim->is_valid(), ExcIO());
   const unsigned int vertices_per_quad=quad_vertices_dim->size();
   AssertThrow(vertices_per_quad==GeometryInfo<dim>::vertices_per_cell, ExcIO());
-  
+
   NcVar *vertex_indices_var=nc.get_var("points_of_surfacequadrilaterals");
   AssertThrow(vertex_indices_var->is_valid(), ExcIO());
   AssertThrow(vertex_indices_var->num_dims()==2, ExcIO());
@@ -1107,7 +1122,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 	    zero_plane=false;
 	    break;
 	  }
-      
+
       if (zero_plane)
 	zero_plane_markers[bmarker[quad]]=true;
     }
@@ -1135,7 +1150,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 	    zero_plane=true;
 	    break;
 	  }
-      
+
       if (zero_plane)
 	{
 	  for (unsigned int i=0; i<vertices_per_quad; ++i)
@@ -1151,7 +1166,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   SubCellData subcelldata;
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   GridReordering<dim,spacedim>::reorder_cells (cells);
-  tria->create_triangulation_compatibility (vertices, cells, subcelldata);  
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 #endif
 }
 
@@ -1175,7 +1190,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   Assert (tria != 0, ExcNoTriangulationSelected());
 				   // this function assumes the TAU
 				   // grid format.
-  
+
 				   // First, open the file
   NcFile nc (filename.c_str());
   AssertThrow(nc.is_valid(), ExcIO());
@@ -1183,7 +1198,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 				   // then read n_cells
   NcDim *elements_dim=nc.get_dim("no_of_elements");
   AssertThrow(elements_dim->is_valid(), ExcIO());
-  const unsigned int n_cells=elements_dim->size();  
+  const unsigned int n_cells=elements_dim->size();
   if (output)
     std::cout << "n_cell=" << n_cells << std::endl;
 				   // and n_hexes
@@ -1192,7 +1207,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   const unsigned int n_hexes=hexes_dim->size();
   AssertThrow(n_hexes==n_cells,
 	      ExcMessage("deal.II can handle purely hexaedral grids, only."));
-  
+
 				   // next we read
 				   // int points_of_hexaeders(
 				   //   no_of_hexaeders,
@@ -1201,7 +1216,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   AssertThrow(hex_vertices_dim->is_valid(), ExcIO());
   const unsigned int vertices_per_hex=hex_vertices_dim->size();
   AssertThrow(vertices_per_hex==GeometryInfo<dim>::vertices_per_cell, ExcIO());
-  
+
   NcVar *vertex_indices_var=nc.get_var("points_of_hexaeders");
   AssertThrow(vertex_indices_var->is_valid(), ExcIO());
   AssertThrow(vertex_indices_var->num_dims()==2, ExcIO());
@@ -1289,7 +1304,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 				   // we read the vertex indices of
 				   // the boundary quadrilaterals and
 				   // their boundary markers
-  
+
 				   // first we read
 				   // int points_of_surfacequadrilaterals(
 				   //   no_of_surfacequadrilaterals,
@@ -1298,7 +1313,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   AssertThrow(quad_vertices_dim->is_valid(), ExcIO());
   const unsigned int vertices_per_quad=quad_vertices_dim->size();
   AssertThrow(vertices_per_quad==GeometryInfo<dim>::vertices_per_face, ExcIO());
-  
+
   NcVar *bvertex_indices_var=nc.get_var("points_of_surfacequadrilaterals");
   AssertThrow(bvertex_indices_var->is_valid(), ExcIO());
   AssertThrow(bvertex_indices_var->num_dims()==2, ExcIO());
@@ -1361,7 +1376,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   GridReordering<dim,spacedim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim,spacedim>::reorder_cells (cells);
-  tria->create_triangulation_compatibility (vertices, cells, subcelldata);  
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 #endif
 }
 
@@ -1394,20 +1409,20 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
     }
   structured=true;
   blocked=false;
-  
+
 				   // convert the string to upper case
   std::transform(header.begin(),header.end(),header.begin(),::toupper);
-  
+
 				   // replace all tabs, commas, newlines by
 				   // whitespaces
   std::replace(header.begin(),header.end(),'\t',' ');
   std::replace(header.begin(),header.end(),',',' ');
   std::replace(header.begin(),header.end(),'\n',' ');
-  
+
 				   // now remove whitespace in front of and
 				   // after '='
   std::string::size_type pos=header.find("=");
-  
+
   while(pos!=static_cast<std::string::size_type>(std::string::npos))
     if(header[pos+1]==' ')
       header.erase(pos+1,1);
@@ -1418,7 +1433,7 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
       }
     else
       pos=header.find("=",++pos);
-  
+
 				   // split the string into individual entries
   std::vector<std::string> entries=Utilities::break_text_into_lines(header,1,' ');
 
@@ -1461,7 +1476,7 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
 					   // set i back, so that the next
 					   // string is treated correctly
 	  --i;
-	  
+
 	  AssertThrow(n_vars>=dim,
 		      ExcMessage("Tecplot file must contain at least one variable for each dimension"));
 	  for (unsigned int i=1; i<dim; ++i)
@@ -1533,7 +1548,7 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
       else if (Utilities::match_at_string_start(entries[i],"E="))
 	n_cells=Utilities::get_integer_at_position(entries[i],2).first;
     }
-  
+
 				   // now we have read all the fields we are
 				   // interested in. do some checks and
 				   // calculate the variables
@@ -1575,13 +1590,13 @@ void GridIn<2>::read_tecplot (std::istream &in)
   const unsigned int spacedim=2;
   Assert (tria != 0, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
-  
+
 				   // skip comments at start of file
   skip_comment_lines (in, '#');
 
 				   // some strings for parsing the header
   std::string line, header;
-				   
+
 				   // first, concatenate all header lines
 				   // create a searchstring with almost all
 				   // letters. exclude e and E from the letters
@@ -1595,7 +1610,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
       header+=" "+line;
       getline(in,line);
     }
-  
+
 				   // now create some variables holding
 				   // important information on the mesh, get
 				   // this information from the header string
@@ -1610,7 +1625,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
   parse_tecplot_header(header,
 		       tecplot2deal,n_vars,n_vertices,n_cells,IJK,
 		       structured,blocked);
-  
+
 				   // reserve space for vertices. note, that in
 				   // tecplot vertices are ordered beginning
 				   // with 1, whereas in deal all indices start
@@ -1637,7 +1652,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
 				       // which is the first index to read in
 				       // the loop (see below)
       unsigned int next_index=0;
-      
+
       				       // note, that we have already read the
 				       // first line containing the first variable
       if (tecplot2deal[0]==0)
@@ -1671,7 +1686,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
 					     // variables)
 	  if (next_index==dim && structured)
 	    break;
-	  
+
 	  if (i==tecplot2deal[next_index])
 	    {
 					       // we need this line, read it in
@@ -1696,7 +1711,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
 				       // next and so on. create a vector to
 				       // hold these components
       std::vector<double> vars(n_vars);
-      
+
 				       // now fill the first vertex. note, that we
 				       // have already read the first line
 				       // containing the first vertex
@@ -1704,7 +1719,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
       char *endptr;
       for (unsigned int d=0; d<dim; ++d)
 	  vertices[1](d) = std::strtod (first_vertex[tecplot2deal[d]].c_str(), &endptr);
-      
+
 				       // read the remaining vertices from the
 				       // list
       for (unsigned int v=2; v<n_vertices+1; ++v)
@@ -1719,17 +1734,17 @@ void GridIn<2>::read_tecplot (std::istream &in)
 	       vertices[v](i)=vars[tecplot2deal[i]];
 	}
     }
-  
+
   if (structured)
     {
 				       // this is the part of the code that only
 				       // works in 2d
       unsigned int I=IJK[0],
 		   J=IJK[1];
-      
+
       unsigned int cell=0;
       // set up array of cells
-      for (unsigned int j=0; j<J-1; ++j) 
+      for (unsigned int j=0; j<J-1; ++j)
 	for (unsigned int i=1; i<I; ++i)
 	  {
 	    cells[cell].vertices[0]=i+  j    *I;
@@ -1768,14 +1783,14 @@ void GridIn<2>::read_tecplot (std::istream &in)
 				       // set up array of cells, unstructured
 				       // mode, so the connectivity is
 				       // explicitly given
-      for (unsigned int i=0; i<n_cells; ++i) 
+      for (unsigned int i=0; i<n_cells; ++i)
 	{
 					   // note that since in the input file
 					   // we found the number of cells at
 					   // the top, there should still be
 					   // input here, so check this:
 	  AssertThrow (in, ExcIO());
-	  
+
 					   // get the connectivity from the
 					   // input file. the vertices are
 					   // ordered like in the ucd format
@@ -1785,7 +1800,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
 				       // do some clean-up on vertices
       GridTools::delete_unused_vertices (vertices, cells, subcelldata);
     }
-  
+
 				   // check that no forbidden arrays are
 				   // used. as we do not read in any
 				   // subcelldata, nothing should happen here.
@@ -1809,9 +1824,9 @@ void GridIn<dim, spacedim>::read_tecplot(std::istream &)
 
 template <int dim, int spacedim>
 void GridIn<dim, spacedim>::skip_empty_lines (std::istream &in)
-{    
+{
   std::string line;
-  while (in) 
+  while (in)
     {
 				       // get line
       getline (in, line);
@@ -1848,8 +1863,8 @@ void GridIn<dim, spacedim>::skip_comment_lines (std::istream &in,
 				     // the comment starter
     while (in.get() != '\n')
       ;
-  
-  
+
+
 				   // put back first character of
 				   // first non-comment line
   in.putback (c);
@@ -1881,13 +1896,13 @@ GridIn<2>::debug_output_grid (const std::vector<CellData<2> > &cells,
 	 max_x = vertices[cells[0].vertices[0]](0),
 	 min_y = vertices[cells[0].vertices[0]](1),
 	 max_y = vertices[cells[0].vertices[0]](1);
-  
+
   for (unsigned int i=0; i<cells.size(); ++i)
     {
       for (unsigned int v=0; v<4; ++v)
 	{
 	  const Point<2> &p = vertices[cells[i].vertices[v]];
-	  
+
 	  if (p(0) < min_x)
 	    min_x = p(0);
 	  if (p(0) > max_x)
@@ -1912,24 +1927,24 @@ GridIn<2>::debug_output_grid (const std::vector<CellData<2> > &cells,
 				       // first two line right direction
       for (unsigned int f=0; f<2; ++f)
 	out << "set arrow from "
-	    << vertices[cells[i].vertices[f]](0) << ',' 
+	    << vertices[cells[i].vertices[f]](0) << ','
 	    << vertices[cells[i].vertices[f]](1)
 	    << " to "
-	    << vertices[cells[i].vertices[(f+1)%4]](0) << ',' 
+	    << vertices[cells[i].vertices[(f+1)%4]](0) << ','
 	    << vertices[cells[i].vertices[(f+1)%4]](1)
 	    << std::endl;
 				       // other two lines reverse direction
       for (unsigned int f=2; f<4; ++f)
 	out << "set arrow from "
-	    << vertices[cells[i].vertices[(f+1)%4]](0) << ',' 
+	    << vertices[cells[i].vertices[(f+1)%4]](0) << ','
 	    << vertices[cells[i].vertices[(f+1)%4]](1)
 	    << " to "
-	    << vertices[cells[i].vertices[f]](0) << ',' 
+	    << vertices[cells[i].vertices[f]](0) << ','
 	    << vertices[cells[i].vertices[f]](1)
 	    << std::endl;
       out << std::endl;
     };
-  
+
 
   out << std::endl
       << "set nokey" << std::endl
@@ -2031,7 +2046,7 @@ void GridIn<dim, spacedim>::read (const std::string& filename,
     name = search.find(filename, default_suffix(format));
 
   std::ifstream in(name.c_str());
-  
+
   if (format == Default)
     {
       const std::string::size_type slashpos = name.find_last_of('/');
@@ -2056,21 +2071,21 @@ void GridIn<dim, spacedim>::read (std::istream& in,
 {
   if (format == Default)
     format = default_format;
-  
+
   switch (format)
     {
       case dbmesh:
 	read_dbmesh (in);
 	return;
-	
+
       case msh:
 	read_msh (in);
 	return;
-	
+
       case ucd:
 	read_ucd (in);
 	return;
-	
+
       case xda:
 	read_xda (in);
 	return;
@@ -2084,7 +2099,7 @@ void GridIn<dim, spacedim>::read (std::istream& in,
       case tecplot:
 	read_tecplot (in);
 	return;
-	
+
       case Default:
 	break;
    }
@@ -2095,15 +2110,15 @@ void GridIn<dim, spacedim>::read (std::istream& in,
 
 template <int dim, int spacedim>
 std::string
-GridIn<dim, spacedim>::default_suffix (const Format format) 
+GridIn<dim, spacedim>::default_suffix (const Format format)
 {
-  switch (format) 
+  switch (format)
     {
       case dbmesh:
         return ".dbmesh";
-      case msh: 
+      case msh:
 	return ".msh";
-      case ucd: 
+      case ucd:
 	return ".inp";
       case xda:
 	return ".xda";
@@ -2111,8 +2126,8 @@ GridIn<dim, spacedim>::default_suffix (const Format format)
 	return ".nc";
       case tecplot:
 	return ".dat";
-      default: 
-	Assert (false, ExcNotImplemented()); 
+      default:
+	Assert (false, ExcNotImplemented());
 	return ".unknown_format";
     }
 }
@@ -2128,7 +2143,7 @@ GridIn<dim, spacedim>::parse_format (const std::string &format_name)
 
   if (format_name == "msh")
     return msh;
-  
+
   if (format_name == "inp")
     return ucd;
 
@@ -2170,7 +2185,7 @@ GridIn<dim, spacedim>::parse_format (const std::string &format_name)
 
 
 template <int dim, int spacedim>
-std::string GridIn<dim, spacedim>::get_format_names () 
+std::string GridIn<dim, spacedim>::get_format_names ()
 {
   return "dbmesh|msh|ucd|xda|netcdf|tecplot";
 }
