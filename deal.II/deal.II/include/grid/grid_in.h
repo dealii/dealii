@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -142,11 +142,10 @@ class SubCellData;
  * Cubit at this time. However, Cubit can export in UCD format using a simple
  * plugin, and the resulting UCD file can then be read by this class. The
  * plugin script can be found on the deal.II wiki page,
- * http://www-dimat.unipv.it/heltai/wikideal/, in the
- * section on external tools.
+ * http://sourceforge.net/apps/mediawiki/dealii/index.php?title=Mesh_Input_and_Output_Interfaces .
  *
  * There is also a little program, written by Jean-Paul Pelteret, that
- * can be found in the contrib/mesh_conversion directory and that can
+ * can be found in the <code>contrib/mesh_conversion</code> directory and that can
  * convert Cubit ABAQUS files into UCD format that can be read in as
  * discussed above. The program was designed with the intention of
  * exporting geometries with complex boundary condition surfaces and
