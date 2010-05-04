@@ -621,6 +621,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: VectorTools::interpolate_boundary_values inadvertently produces
+  an exception when used with hp::DoFHandler objects in 1d. This is now fixed.
+  <br>
+  (WB 2010/05/04)
+  </p></li>
+
+  <li>
   <p>Fixed: The GridIn::read_msh function got into trouble if the mesh file
   had a section that listed physical names for variables. This is now fixed.
   <br>
