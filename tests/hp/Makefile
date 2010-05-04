@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -42,7 +42,8 @@ tests_x = hp_dof_handler \
 	  get_active_fe_indices \
 	  create_* \
 	  renumber_* \
-	  dof_renumbering_*
+	  dof_renumbering_* \
+	  compare*
 
 # from above list of regular expressions, generate the real set of
 # tests
