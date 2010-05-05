@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
-#include <fe/mapping_q.h> 
+#include <fe/mapping_q.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -36,20 +36,20 @@ DEAL_II_NAMESPACE_OPEN
  * when one wants to calculate shape function information on
  * a domain that is deforming as the computation proceeds.
  *
- * <h3>Usage</h3> 
+ * <h3>Usage</h3>
  *
  * The constructor of this class takes three arguments: the polynomial
  * degree of the desire Qp mapping, a reference to
  * the vector that defines the mapping from the initial
  * configuration to the current configuration, and a reference to the
- * DoFHandler. The most common case is to use the solution 
- * vector for the problem under consideration as the shift vector.  
- * The key reqirement is that the number of components 
- * of the given vector field be equal to (or possibly greater than) the 
- * number of space dimensions. If there are more components than space 
+ * DoFHandler. The most common case is to use the solution
+ * vector for the problem under consideration as the shift vector.
+ * The key reqirement is that the number of components
+ * of the given vector field be equal to (or possibly greater than) the
+ * number of space dimensions. If there are more components than space
  * dimensions (for example, if one is working with a coupled problem
  * where there are additional solution variables), the
- * first <tt>dim</tt> components are assumed to represent the displacement 
+ * first <tt>dim</tt> components are assumed to represent the displacement
  * field, and the remaining components are ignored.  If this assumption
  * does not hold one may need to set up a separate DoFHandler on
  * the triangulation and associate the desired shift vector to it.
@@ -125,6 +125,16 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
     virtual
     Mapping<dim,spacedim> * clone () const;
 
+				     /**
+				      * Always returns @p false because
+				      * MappingQ1Eulerian does not in general
+				      * preserve vertex locations (unless the
+				      * translation vector happens to provide
+				      * for zero displacements at vertex
+				      * locations).
+				      */
+    bool preserves_vertex_locations () const;
+
                                      /**
                                       * Exception
                                       */
@@ -136,7 +146,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       */
 
     DeclException0 (ExcInactiveCell);
-    
+
 				     /**
                                       * Exception
                                       */
@@ -170,7 +180,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       */
 
     const VECTOR &euler_vector;
-    
+
                                      /**
                                       * Pointer to the DoFHandler to
                                       * which the mapping vector is
@@ -180,8 +190,8 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
     const SmartPointer<const DoFHandler<dim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
 
 
-  private:   
- 
+  private:
+
                                      /**
                                       * Special quadrature rule used
                                       * to define the support points
@@ -189,7 +199,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       */
 
     class SupportQuadrature : public Quadrature<dim>
-    { 
+    {
       public:
 					 /**
 					  * Constructor, with an argument
@@ -197,7 +207,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
 					  * degree.
 					  */
 
-        SupportQuadrature (const unsigned int map_degree); 
+        SupportQuadrature (const unsigned int map_degree);
 
     };
 
@@ -227,7 +237,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
 				      * the fe_values variable.
 				      */
     mutable Threads::ThreadMutex fe_values_mutex;
-    
+
                                      /**
                                       * Compute the positions of the
                                       * support points in the current
@@ -236,10 +246,25 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
     virtual void compute_mapping_support_points(
       const typename Triangulation<dim>::cell_iterator &cell,
       std::vector<Point<dim> > &a) const;
-    
+
 };
 
 /*@}*/
+
+
+/*----------------------------------------------------------------------*/
+
+#ifndef DOXYGEN
+
+template <int dim, class VECTOR, int spacedim>
+inline
+bool
+MappingQEulerian<dim,VECTOR,spacedim>::preserves_vertex_locations () const
+{
+  return false;
+}
+
+#endif // DOXYGEN
 
 
 DEAL_II_NAMESPACE_CLOSE
