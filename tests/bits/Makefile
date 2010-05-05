@@ -1,6 +1,6 @@
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -56,8 +56,7 @@ tests_x = grid_generator_?? \
 	  normals_* \
 	  q_point_sum_* \
 	  volume_* \
-	  mapping_cartesian_1 \
-	  mapping_q4_3d \
+	  mapping_* \
 	  q_points \
 	  find_closest_vertex_* \
 	  find_cells_adjacent_to_vertex_* \
