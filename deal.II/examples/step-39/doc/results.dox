@@ -1,3 +1,90 @@
 <h1>Results</h1>
 
+<h2>Logfile output</h2>
+First, the program produces the usual logfile here stored in <tt>deallog</tt>. It reads (with ommission of intermediate steps)
+<pre>
+DEAL::Element: FE_DGQ<2>(3)
+DEAL::Step 0
+DEAL::Triangulation 4 cells, 1 levels
+DEAL::DoFHandler 64 dofs, level dofs 64
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 27.1275
+DEAL:cg::Convergence step 1 value 1.97998e-14
+DEAL::Error    0.161536
+DEAL::Estimate 1.35839
+DEAL::Writing solution to <sol-00.gnuplot>...
+DEAL::
+DEAL::Step 1
+DEAL::Triangulation 10 cells, 2 levels
+DEAL::DoFHandler 160 dofs, level dofs 64 128
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 35.5356
+DEAL:cg::Convergence step 10 value 1.24790e-13
+DEAL::Error    0.164997
+DEAL::Estimate 1.08528
+DEAL::Writing solution to <sol-01.gnuplot>...
+DEAL::
+DEAL::Step 2
+DEAL::Triangulation 16 cells, 2 levels
+DEAL::DoFHandler 256 dofs, level dofs 64 256
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 37.0552
+DEAL:cg::Convergence step 10 value 4.74024e-14
+DEAL::Error    0.113596
+DEAL::Estimate 0.990460
+DEAL::Writing solution to <sol-02.gnuplot>...
 
+...
+
+DEAL::Step 10
+DEAL::Triangulation 124 cells, 9 levels
+DEAL::DoFHandler 1984 dofs, level dofs 64 256 512 512 256 256 256 256 256
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 38.5798
+DEAL:cg::Convergence step 12 value 7.56337e-14
+DEAL::Error    0.0101279
+DEAL::Estimate 0.0957571
+DEAL::Writing solution to <sol-10.gnuplot>...
+DEAL::
+DEAL::Step 11
+DEAL::Triangulation 163 cells, 10 levels
+DEAL::DoFHandler 2608 dofs, level dofs 64 256 768 576 512 256 256 256 256 256
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 44.1721
+DEAL:cg::Convergence step 12 value 9.49720e-14
+DEAL::Error    0.00716966
+DEAL::Estimate 0.0681646
+DEAL::Writing solution to <sol-11.gnuplot>...
+</pre>
+
+This log for instance shows that the number of conjugate gradient
+iteration steps is constant at approximately 12.
+
+<h2>Postprocessing of the logfile</h2>
+
+<img align="right" alt="Convergence graphs" src="step-39-convergence.png">
+Using the perl script <tt>postprocess.pl</tt>, we extract relevant
+data into <tt>output.dat</tt>, which can be used to plot graphs with
+<tt>gnuplot</tt>. The graph on the right for instance was produced with
+<pre>
+set style data linespoints
+set logscale
+set xrange [50:3000]
+plot "output.dat" using 2:3 title "error", "" using 2:4 title "estimate", \
+     "" using 2:(3000*$2**-1.5) title "3rd order"
+</pre>

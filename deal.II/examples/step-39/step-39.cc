@@ -711,9 +711,9 @@ Step39<dim>::run(unsigned int n_steps)
 
 int main()
 {
-  std::ofstream logfile("step-39.log");
+  std::ofstream logfile("deallog");
   deallog.attach(logfile);
   FE_DGQ<2> fe1(3);
   Step39<2> test1(fe1);
-  test1.run(20);
+  test1.run(12);
 }
