@@ -1226,13 +1226,8 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
 			new_col = lines[distribute[column]].entries[q].first;
 
 		      sparsity.add (row, new_col);
-
-		      const unsigned int new_rowlength = sparsity.row_length(row);
-		      //		      if ((new_col < column) && (old_rowlength != new_rowlength))
-		      //		++col_num;
-		      old_rowlength = new_rowlength;
-		    };
-		};
+		    }
+		}
 	    }
 	}
       else
