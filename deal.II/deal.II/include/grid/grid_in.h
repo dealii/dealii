@@ -281,8 +281,8 @@ class GridIn
 
 				     /**
 				      * Read from the given stream. If
-				      * no format is given, the
-				      * #default_format variable is
+				      * no format is given,
+				      * GridIn::Format::Default is
 				      * used.
 				      */
     void read (std::istream &in, Format format=Default);
