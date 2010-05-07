@@ -1058,6 +1058,44 @@ class DoFTools
 			   const std::vector<bool>    &component_select,
 			   std::vector<bool>          &selected_dofs,
 			   const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+
+				     /**
+				      * This function is similar to
+				      * the extract_boundary_dofs()
+				      * function but it extracts those
+				      * degrees of freedom whose shape
+				      * functions are nonzero on at
+				      * least part of the selected
+				      * boundary. For continuous
+				      * elements, this is exactly the
+				      * set of shape functions whose
+				      * degrees of freedom are defined
+				      * on boundary faces. On the
+				      * other hand, if the finite
+				      * element in used is a
+				      * discontinuous element, all
+				      * degrees of freedom are defined
+				      * in the inside of cells and
+				      * consequently none would be
+				      * boundary degrees of
+				      * freedom. Several of those
+				      * would have shape functions
+				      * that are nonzero on the
+				      * boundary, however. This
+				      * function therefore extracts
+				      * all those for which the
+				      * FiniteElement::has_support_on_face
+				      * function says that it is
+				      * nonzero on any face on one of
+				      * the selected boundary parts.
+				      */
+    template <class DH>
+    static void
+    extract_dofs_with_support_on_boundary (const DH                   &dof_handler,
+					   const std::vector<bool>    &component_select,
+					   std::vector<bool>          &selected_dofs,
+					   const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+
 				     /**
 				      * @name Hanging Nodes
 				      * @{

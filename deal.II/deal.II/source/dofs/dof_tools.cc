@@ -3462,6 +3462,113 @@ DoFTools::extract_boundary_dofs (const DH                      &dof_handler,
 }
 
 
+
+template <class DH>
+void
+DoFTools::extract_dofs_with_support_on_boundary (const DH                      &dof_handler,
+						 const std::vector<bool>       &component_select,
+						 std::vector<bool>             &selected_dofs,
+						 const std::set<unsigned char> &boundary_indicators)
+{
+  Assert (component_select.size() == n_components(dof_handler),
+	  ExcWrongSize (component_select.size(),
+			n_components(dof_handler)));
+  Assert (boundary_indicators.find (255) == boundary_indicators.end(),
+	  ExcInvalidBoundaryIndicator());
+
+				   // let's see whether we have to
+				   // check for certain boundary
+				   // indicators or whether we can
+				   // accept all
+  const bool check_boundary_indicator = (boundary_indicators.size() != 0);
+
+                                   // also see whether we have to
+                                   // check whether a certain vector
+                                   // component is selected, or all
+  const bool check_vector_component
+    = (component_select != std::vector<bool>(component_select.size(),
+                                             true));
+
+				   // clear and reset array by default
+				   // values
+  selected_dofs.clear ();
+  selected_dofs.resize (dof_handler.n_dofs(), false);
+  std::vector<unsigned int> cell_dof_indices;
+  cell_dof_indices.reserve (max_dofs_per_cell(dof_handler));
+
+				   // now loop over all cells and
+				   // check whether their faces are at
+				   // the boundary. note that we need
+				   // not take special care of single
+				   // lines being at the boundary
+				   // (using
+				   // @p{cell->has_boundary_lines}),
+				   // since we do not support
+				   // boundaries of dimension dim-2,
+				   // and so every isolated boundary
+				   // line is also part of a boundary
+				   // face which we will be visiting
+				   // sooner or later
+  for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
+       cell!=dof_handler.end(); ++cell)
+    for (unsigned int face=0;
+	 face<GeometryInfo<DH::dimension>::faces_per_cell; ++face)
+      if (cell->at_boundary(face))
+	if (! check_boundary_indicator ||
+	    (boundary_indicators.find (cell->face(face)->boundary_indicator())
+	     != boundary_indicators.end()))
+	  {
+            const FiniteElement<DH::dimension> &fe = cell->get_fe();
+
+            const unsigned int dofs_per_cell = fe.dofs_per_cell;
+            cell_dof_indices.resize (dofs_per_cell);
+	    cell->get_dof_indices (cell_dof_indices);
+
+ 	    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	      if (fe.has_support_on_face(i,face))
+		{
+		  if (!check_vector_component)
+		    selected_dofs[cell_dof_indices[i]] = true;
+		  else
+						     // check for
+						     // component is
+						     // required. somewhat
+						     // tricky as usual
+						     // for the case that
+						     // the shape function
+						     // is non-primitive,
+						     // but use usual
+						     // convention (see
+						     // docs)
+		    {
+		      if (fe.is_primitive (i))
+			selected_dofs[cell_dof_indices[i]]
+			  = (component_select[fe.system_to_component_index(i).first]
+			     == true);
+		      else // not primitive
+			{
+			  const unsigned int first_nonzero_comp
+			    = (std::find (fe.get_nonzero_components(i).begin(),
+					  fe.get_nonzero_components(i).end(),
+					  true)
+			       -
+			       fe.get_nonzero_components(i).begin());
+			  Assert (first_nonzero_comp < fe.n_components(),
+				  ExcInternalError());
+
+			  selected_dofs[cell_dof_indices[i]]
+			    = (component_select[first_nonzero_comp]
+			       == true);
+			}
+		    }
+		}
+	  }
+}
+
+
+
+
+
 #else  // 1d
 
 
@@ -3580,7 +3687,128 @@ DoFTools::extract_boundary_dofs (const DH                      &dof_handler,
 }
 
 
+
+template <class DH>
+void
+DoFTools::extract_dofs_with_support_on_boundary (const DH                      &dof_handler,
+						 const std::vector<bool>       &component_select,
+						 std::vector<bool>             &selected_dofs,
+						 const std::set<unsigned char> &boundary_indicators)
+{
+  Assert (component_select.size() == n_components(dof_handler),
+	  ExcWrongSize (component_select.size(),
+			n_components(dof_handler)));
+
+				   // clear and reset array by default
+				   // values
+  selected_dofs.clear ();
+  selected_dofs.resize (dof_handler.n_dofs(), false);
+
+				   // let's see whether we have to
+				   // check for certain boundary
+				   // indicators or whether we can
+				   // accept all
+  const bool check_left_vertex  = ((boundary_indicators.size() == 0) ||
+				   (boundary_indicators.find(0) !=
+				    boundary_indicators.end()));
+  const bool check_right_vertex = ((boundary_indicators.size() == 0) ||
+				   (boundary_indicators.find(1) !=
+				    boundary_indicators.end()));
+
+                                   // see whether we have to check
+                                   // whether a certain vector
+                                   // component is selected, or all
+  const bool check_vector_component
+    = (component_select != std::vector<bool>(component_select.size(),
+                                             true));
+
+  std::vector<unsigned int> dof_indices;
+
+				   // loop over cells
+  for (typename DH::active_cell_iterator cell=dof_handler.begin_active(0);
+       cell!=dof_handler.end(0); ++cell)
+    {
+      const FiniteElement<1> &fe = cell->get_fe();
+
+				       // check left-most vertex
+      if (check_left_vertex)
+	if (cell->neighbor(0) == dof_handler.end())
+          {
+	    dof_indices.resize (fe.dofs_per_cell);
+	    cell->get_dof_indices(dof_indices);
+            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	      if (cell->get_fe().has_support_on_face (i,0) == true)
+		{
+		  if (!check_vector_component)
+		    selected_dofs[dof_indices[i]] = true;
+		  else
+						     // check
+						     // component. make sure
+						     // we don't ask the
+						     // wrong question
+						     // (leading to an
+						     // exception) in case
+						     // the shape function
+						     // is non-primitive. note
+						     // that the face dof
+						     // index i is also the
+						     // cell dof index of a
+						     // corresponding dof in 1d
+		    {
+		      const unsigned int component =
+			(fe.is_primitive(i) ?
+			 fe.system_to_component_index(i).first :
+			 (std::find (fe.get_nonzero_components(i).begin(),
+				     fe.get_nonzero_components(i).end(),
+				     true)
+			  -
+			  fe.get_nonzero_components(i).begin()));
+		      Assert (component < fe.n_components(),
+			      ExcInternalError());
+
+		      if (component_select[component] == true)
+			selected_dofs[dof_indices[i]] = true;
+		    }
+		}
+          }
+
+				       // check right-most
+				       // vertex. same procedure here
+				       // as above
+      if (check_right_vertex)
+	if (cell->neighbor(1) == dof_handler.end())
+          {
+	    dof_indices.resize (fe.dofs_per_cell);
+	    cell->get_dof_indices (dof_indices);
+            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	      if (cell->get_fe().has_support_on_face (i,1) == true)
+		{
+		  if (!check_vector_component)
+		    selected_dofs[dof_indices[i]] = true;
+		  else
+		    {
+		      const unsigned int component =
+			(fe.is_primitive(i) ?
+			 fe.face_system_to_component_index(i).first :
+			 (std::find (fe.get_nonzero_components(i).begin(),
+				     fe.get_nonzero_components(i).end(),
+				     true)
+			  -
+			  fe.get_nonzero_components(i).begin()));
+		      Assert (component < fe.n_components(),
+			      ExcInternalError());
+
+		      if (component_select[component] == true)
+			selected_dofs[dof_indices[i]] = true;
+		    }
+		}
+	  }
+    }
+}
+
+
 #endif
+
 
 
 namespace internal
@@ -5638,6 +5866,21 @@ DoFTools::extract_boundary_dofs<DoFHandler<deal_II_dimension> >
 template
 void
 DoFTools::extract_boundary_dofs<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const std::vector<bool>                  &,
+ std::vector<bool>                        &,
+ const std::set<unsigned char> &);
+
+template
+void
+DoFTools::extract_dofs_with_support_on_boundary<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const std::vector<bool>                  &,
+ std::vector<bool>                        &,
+ const std::set<unsigned char> &);
+template
+void
+DoFTools::extract_dofs_with_support_on_boundary<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
  const std::vector<bool>                  &,
  std::vector<bool>                        &,

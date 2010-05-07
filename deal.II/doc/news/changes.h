@@ -621,6 +621,12 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>New: There is a new function DoFTools::extract_dofs_with_support_on_boundary().
+  fixed.
+  <br>
+  (WB 2010/05/07)
+  </p></li>
+
   <p>Fixed: FE_DGQ::has_support_on_face() returned the wrong value in 1d if the
   polynomial degree of the finite element equals zero (i.e. for piecewise
   constants) where the lone shape function is nonzero on all faces. This is now
