@@ -8294,15 +8294,6 @@ namespace internal
 							     // quad, whereas for odd lines the
 							     // first vertex is the same middle
 							     // vertex.
-							     // DEBUG
-			    typename Triangulation<dim,spacedim>::face_iterator
-			      face_0=hex->face(0);
-			    typename Triangulation<dim,spacedim>::face_iterator
-			      face_0_child_0=face_0->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]));
-			    typename Triangulation<dim,spacedim>::line_iterator
-			      face_0_child_0_line_1=face_0_child_0
-			      ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[0],f_fl[0],f_ro[0]));
-							     // END DEBUG
 			    for (unsigned int i=0; i<24; ++i)
 			      if (lines[i]->vertex_index((i+1)%2)==vertex_indices[i/4])
 				line_orientation_xyz[i]=true;
