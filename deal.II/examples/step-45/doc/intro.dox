@@ -1,0 +1,63 @@
+<br>
+
+<i>This program was contributed by Markus B&uuml;rg.</i>
+<br>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+In this example we consider how to use periodic boundary conditions in
+deal.II. Periodic boundary conditions often occur in computations of photonic
+crystals, because they have a lattice-like structure and, thus, it often
+suffices to do the actual computation on only one cell. To be able to proceed
+this way one has to assume that the computation can be periodically extended
+to the other cells. This requires the solution to be periodic w.r.t. the
+cells. Hence the solution has to obtain the same values on the parts of the
+boundary, which are facing each other. In the figure below we show this
+concept in two space-dimensions. There, all faces with the same color should
+have the same boundary values:
+
+@image html step-45.periodic_cells.png
+
+To keep things simple, in this tutorial we will consider an academic problem,
+which is a little bit easier: We solve the Poisson problem on a domain, where
+the left and right parts of the boundary are identified. Let $\Omega=(0,1)^2$
+and consider the problem 
+@f{align*}
+   -\Delta u &=
+   \pi^2\sin(\pi x)\sin(\pi y)  \qquad &\text{in }\Omega
+  \\ 
+   u(0,y) &= 0 \qquad &\text{for }y\in(0,1)
+  \\
+   u(1,y) &= 0 \qquad &\text{for }y\in(0,1)
+  \\
+   u(x,0) &= u(x,1) \qquad &\text{for }x\in(0,1) 
+@f}
+
+The way one has to see these periodic boundary conditions $u(x,0) = u(x,1)$ is
+as follows: Assume for a moment (as we do in this program) that we have a
+uniformly refined mesh. Then, after discretization there are a number of nodes
+(degrees of freedom) with indices $i \in {\cal I}_b$ on the bottom boundary of
+the domain, and  a second set of nodes at the top boundary $j \in {\cal
+I}_t$. Since we have assumed that the mesh is uniformly refined, there is
+exactly one node $j \in {\cal I}_t$ for each $i \in {\cal I}_b$ so that
+${\mathrm x}_j = {\mathrm x}_i + (0,1)^T$, i.e. the two of them match with
+respect to the periodicity. We will then write that $j=\text{periodic}(i)$
+(and, if you want, $i=\text{periodic}(j)$).
+If now $U_k, k=0,\ldots,N-1$ are the unknowns of our discretized problem, then
+the periodic boundary condition boils down to the following set of
+constraints:
+@f{align*}
+  U_{\text{periodic}(i)} = U_i, \qquad \forall i \in {\cal I}_b. 
+@f}
+Now, this is exactly the sort of constraint that the ConstraintMatrix class
+handles and can enforce in linear system. Consequently, the main point of this
+program is how we fill the ConstraintMatrix object that stores these
+constraints, and how this is applied to the resulting linear system.
+
+The code for solving this problem is simple and based on step-3 since we want
+to focus on the implementation of the periodic boundary conditions. The code
+could be much more sophisticated, of course. For example, we could want to
+enforce periodic boundary conditions for adaptively refined meshes in which
+there is no longer a one-to-one relationship between degrees of freedom. We
+will discuss this at the end of the results section of this program.

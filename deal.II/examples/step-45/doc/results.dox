@@ -1,0 +1,20 @@
+<h1>Results</h1>
+
+The textual output the program generates is not very surprising. It just
+prints out the usual information on degrees of freedom, active cells and
+iteration steps of the solver: 
+
+@code
+============================ Running step-45
+Number of active cells: 1024
+Degrees of freedom: 1089
+DEAL:cg::Starting value 0.153970
+DEAL:cg::Convergence step 54 value 7.73356e-16
+@endcode
+
+The plot of the solution can be found in the figure below. We can see that the
+solution is constantly zero on the upper and the lower part of the boundary as
+required by the homogeneous Dirichlet boundary conditions. On the left and
+right parts the values coincide with each other, just as we wanted:
+
+@image html step-45.solution.png
