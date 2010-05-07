@@ -3,7 +3,7 @@
 //    Version: $Name$
 //    Author: Toby D. Young, Polish Academy of Sciences, 2008, 2009
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,10 +37,10 @@ DEAL_II_NAMESPACE_OPEN
  * context. Derived classes set the right flags to set the right
  * solver. On the other hand, note that: the
  * <code>AdditionalData</code> structure is a dummy structure that
- * currently exists for backward/forward compatibility only. 
+ * currently exists for backward/forward compatibility only.
  *
  * The SLEPc solvers are intended to be used for solving the
- * generalized eigenspectrum problem $(A-\lamda M)x=0$, for $x\neq0$;
+ * generalized eigenspectrum problem $(A-\lambda M)x=0$, for $x\neq0$;
  * where $A$ is a system matrix, $M$ is a mass matrix, and $\lambda,
  * x$ are a set of eigenvalues and eigenvectors respectively. The
  * emphasis is on methods and techniques appropriate for problems in
@@ -92,7 +92,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup SLEPcWrappers
  * @author Toby D. Young 2008, 2009, 2010; and Rickard Armiento 2008
- * 
+ *
  * Various tweaks to the SLEPcWrappers have been contributed by Eloy
  * Romeoro and Jose Roman.
  */
@@ -559,7 +559,7 @@ namespace SLEPcWrappers
 
       if (n_converged > n_eigenvectors)
 	n_converged = n_eigenvectors;
-      AssertThrow (n_converged == n_eigenvectors, 
+      AssertThrow (n_converged == n_eigenvectors,
 		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
 
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
@@ -587,7 +587,7 @@ namespace SLEPcWrappers
       if (n_converged >= n_eigenvectors)
 	n_converged = n_eigenvectors;
 
-      AssertThrow (n_converged == n_eigenvectors, 
+      AssertThrow (n_converged == n_eigenvectors,
 		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
       AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
 
