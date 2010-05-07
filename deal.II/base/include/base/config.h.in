@@ -254,6 +254,9 @@
 /* Defined if a Trilinos installation was found and is going to be used */
 #undef DEAL_II_USE_TRILINOS
 
+/* Defined if a MUMPS installation was found and is going to be used */
+#undef DEAL_II_USE_MUMPS
+
 /* Define if vector iterators are just plain pointers */
 #undef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 
@@ -603,9 +606,10 @@
  * compatibility; and (ii) DEAL_II_PETSC_VERSION_GTE is used to add
  * functionality to the PETScWrappers that does not exist in previous
  * versions of PETSc.  Examples of usage can be found in
- * lac/source/petsc_matrix_base.h.  Note: SLEPcWrappers do not need
- * their own anological macros, since SLEPc and PETSc must have
- * identical version numbers anyways.
+ * lac/source/petsc_matrix_base.h.  
+ *
+ * Note: SLEPcWrappers do not need their own anological macros, since 
+ * SLEPc and PETSc must have identical version numbers anyways.
  */
 #define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
   ((PETSC_VERSION_MAJOR * 10000 + \

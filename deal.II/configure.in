@@ -403,7 +403,6 @@ dnl -------------------------------------------------------------
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring additional libs ----------------)
 
-
 DEAL_II_CONFIGURE_PETSC
 AC_SUBST(USE_CONTRIB_PETSC)
 AC_SUBST(DEAL_II_PETSC_DIR)
@@ -429,6 +428,13 @@ AC_SUBST(DEAL_II_TRILINOS_LIBDIR)
 AC_SUBST(DEAL_II_TRILINOS_SHARED)
 AC_SUBST(DEAL_II_TRILINOS_STATIC)
 
+DEAL_II_CONFIGURE_MUMPS
+AC_SUBST(USE_CONTRIB_MUMPS)
+AC_SUBST(DEAL_II_MUMPS_DIR)
+AC_SUBST(DEAL_II_SCALAPACK_DIR) dnl MUMPS dependency
+AC_SUBST(DEAL_II_BLACS_DIR)     dnl MUMPS dependency
+AC_SUBST(DEAL_II_BLACS_ARCH)  
+AC_SUBST(DEAL_II_DEFINE_DEAL_II_USE_MUMPS)
 
 dnl Make sure we configure for libraries used by other libraries. For
 dnl example, UMFPACK needs blas, and so does LAPACK

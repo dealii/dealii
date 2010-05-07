@@ -105,6 +105,12 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.o += $(lib-contrib-slepc)
   endif
 
+  # same with MUMPS
+  ifeq ($(USE_CONTRIB_MUMPS),yes)
+    deplibs.g += $(lib-contrib-mumps)
+    deplibs.o += $(lib-contrib-mumps)
+  endif
+
   # and METIS
   ifeq ($(USE_CONTRIB_METIS),yes)
     deplibs.g += $(lib-contrib-metis)

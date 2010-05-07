@@ -5412,7 +5412,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   AC_MSG_CHECKING([for PETSc library directory])
 
   AC_ARG_WITH(petsc,
-              [AS_HELP_STRING([--with-petsc=path/to/slepc],
+              [AS_HELP_STRING([--with-petsc=path/to/petsc],
               [Specify the path to the PETSc installation, of which the include and library directories are subdirs; use this if you want to override the PETSC_DIR environment variable.])],
      [
         dnl Special case when someone does --with-petsc=no
@@ -6152,6 +6152,119 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
   CXXFLAGS="${OLD_CXXFLAGS}"
 ])
 
+
+dnl ------------------------------------------------------------
+dnl Check whether MUMPS is installed; and, if so, then check for 
+dnl two known dependecies, namely, SCALAPACK and BLACS.
+dnl
+dnl Usage: DEAL_II_CONFIGURE_MUMPS
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_MUMPS, dnl
+[
+  AC_MSG_CHECKING([for MUMPS library directory])
+  AC_ARG_WITH(mumps,
+    [AS_HELP_STRING([--with-mumps=path/to/mumps],
+    [Specify the path to the MUMPS installation, for which the include directory and lib directory are subdirs; use this if you want to override the MUMPS_DIR environment variable.])],
+    [dnl action-if-given
+     if test "x$withval" = "xno" ; then
+       AC_MSG_RESULT([explicitly disabled])
+       USE_CONTRIB_MUMPS=no
+     else
+       USE_CONTRIB_MUMPS=yes
+       DEAL_II_MUMPS_DIR="$withval"
+       AC_MSG_RESULT($DEAL_II_MUMPS_DIR)
+       dnl Make sure that what was specified is actually correct
+       if test ! -d $DEAL_II_MUMPS_DIR         \
+            -o ! -d $DEAL_II_MUMPS_DIR/include \
+            -o ! -d $DEAL_II_MUMPS_DIR/lib     \
+          ; then
+         AC_MSG_ERROR([Path to MUMPS specified with --with-mumps does not point to a complete MUMPS installation])
+       fi
+     fi
+    ],
+    [dnl action-if-not-given (do nothing)
+     USE_CONTRIB_MUMPS=no
+    ])
+
+  dnl ------------------------------------------------------------
+  dnl If MUMPS was requested and found, we had better check for
+  dnl dependencies right here. First, SCALAPACK and then BLACS.
+  if test "$USE_CONTRIB_MUMPS" = "yes" ; then
+
+    dnl ------------------------------------------------------------
+    dnl Check whether SCALAPACK is installed
+    AC_MSG_CHECKING([for SCALAPACK library directory])
+    AC_ARG_WITH(scalapack,
+      [AS_HELP_STRING([--with-scalapack=path/to/scalapack],
+      [Specify the path to the scalapack installation; use this if you want to override the SCALAPACK_DIR environment variable.])],
+      [dnl action-if-given (test)
+       DEAL_II_SCALAPACK_DIR="$withval"
+       AC_MSG_RESULT($DEAL_II_SCALAPACK_DIR) 
+       dnl Make sure that what was specified is actually correct
+       if test ! -d $DEAL_II_SCALAPCK_DIR ; then
+         AC_MSG_ERROR([The path to SCALAPACK specified with --with-scalapack does t point to a complete SCALAPACK installation])
+       fi
+      ],
+      [dnl action-if-not-given (bail out)
+       AC_MSG_ERROR([If MUMPS is used, the path to SCALAPACK must be specified with --with-scalapack])
+      ])
+    dnl ------------------------------------------------------------
+
+    dnl ------------------------------------------------------------
+    dnl Check whether BLACS is installed and BLAS architecture type
+    AC_MSG_CHECKING([for BLACS library directory])
+    AC_ARG_WITH(blacs,
+      [AS_HELP_STRING([--with-blacs=path/to/blacs],
+      [Specify the path to the BLACS installation; use this if you want to override the BLACS_DIR environment variable.])],
+      [dnl action-if-given
+       DEAL_II_BLACS_DIR="$withval"
+       AC_MSG_RESULT($DEAL_II_BLACS_DIR)
+       dnl Make sure that what was specified is actually correct
+       if test ! -d $DEAL_II_BLACS_DIR     \
+            -o ! -d $DEAL_II_BLACS_DIR/LIB ; then
+       AC_MSG_ERROR([The path to BLACS specified with --with-blacs does not point to a complete BLACS installation])
+       fi
+      ],
+      [dnl action-if-not-given (bail out)
+       AC_MSG_ERROR([If MUMPS is used, the path to BLACS must be specified with --with-blacs])
+      ])
+
+    dnl BLACS labels libraries with "communications library",
+    dnl "platform type" and "debug level" (see BlACS Bmake.inc for
+    dnl details of the meaning of these terms). Finally, determine what
+    dnl these are:
+    AC_MSG_CHECKING([for BLACS library architecture])
+    BLACS_COMM=`cat $DEAL_II_BLACS_DIR/Bmake.inc \
+              | grep "COMMLIB = " \
+              | perl -pi -e 's/.*LIB =\s+//g;'`
+    BLACS_PLAT=`cat $DEAL_II_BLACS_DIR/Bmake.inc \
+              | grep "PLAT = " \
+              | perl -pi -e 's/.*PLAT =\s+//g;'`
+    BLACS_DEBUG=`cat $DEAL_II_BLACS_DIR/Bmake.inc \
+              | grep "BLACSDBGLVL = " \
+              | perl -pi -e 's/.*DBGLVL =\s+//g;'`
+    dnl and patch that together to make the BLACS architecture type:
+    DEAL_II_BLACS_ARCH="$BLACS_COMM-$BLACS_PLAT-$BLACS_DEBUG"
+    AC_MSG_RESULT($DEAL_II_BLACS_ARCH)
+    dnl ------------------------------------------------------------
+
+  fi 
+  dnl End check for MUMPS dependencies
+  dnl ------------------------------------------------------------
+
+  dnl If we do get this far then define a macro that says so:
+  if test "$USE_CONTRIB_MUMPS" = "yes" ; then
+    AC_DEFINE([DEAL_II_USE_MUMPS], [1],
+              [Defined if a MUMPS installation was found and is going to be used              ])
+    dnl and set an additional variable:
+    DEAL_II_DEFINE_DEAL_II_USE_MUMPS=DEAL_II_USE_MUMPS 
+    dnl and finally set with_mumps if this hasn't happened yet:
+    if test "x$with_mumps" = "x" ; then
+      with_mumps="yes"
+    fi 
+  fi
+])
 
 
 dnl ------------------------------------------------------------

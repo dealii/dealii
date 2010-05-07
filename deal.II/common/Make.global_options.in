@@ -65,8 +65,14 @@ DEAL_II_TRILINOS_LIBDIR = @DEAL_II_TRILINOS_LIBDIR@
 DEAL_II_TRILINOS_SHARED = @DEAL_II_TRILINOS_SHARED@
 DEAL_II_TRILINOS_STATIC = @DEAL_II_TRILINOS_STATIC@
 
+USE_CONTRIB_MUMPS  = @USE_CONTRIB_MUMPS@
+DEAL_II_MUMPS_DIR  = @DEAL_II_MUMPS_DIR@
+DEAL_II_SCALAPACK_DIR = @DEAL_II_SCALAPACK_DIR@
+DEAL_II_BLACS_DIR  = @DEAL_II_BLACS_DIR@
+DEAL_II_BLACS_ARCH = @DEAL_II_BLACS_ARCH@
+
 USE_CONTRIB_METIS    = @USE_CONTRIB_METIS@
-DEAL_II_METIS_LIBDIR    = @DEAL_II_METIS_LIBDIR@
+DEAL_II_METIS_LIBDIR = @DEAL_II_METIS_LIBDIR@
 
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
@@ -206,6 +212,18 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
   endif
 endif
 
+# Using dealii with MUMPS means we need to link the MUMPS library as
+# well as its dependencies, ie, SCALAPCK and BLACS
+ifeq ($(USE_CONTRIB_MUMPS),yes)
+  lib-contrib-mumps  = $(DEAL_II_MUMPS_DIR)/lib/libdmumps.a \
+                       $(DEAL_II_MUMPS_DIR)/lib/libmumps_common.a \
+                       $(DEAL_II_MUMPS_DIR)/lib/libpord.a 
+  lib-contrib-mumps += $(DEAL_II_SCALAPACK_DIR)/libscalapack.a
+  lib-contrib-mumps += $(DEAL_II_BLACS_DIR)/LIB/blacsCinit_$(DEAL_II_BLACS_ARCH).a \
+                       $(DEAL_II_BLACS_DIR)/LIB/blacsF77init_$(DEAL_II_BLACS_ARCH).a \
+                       $(DEAL_II_BLACS_DIR)/LIB/blacs_$(DEAL_II_BLACS_ARCH).a
+endif
+
 # deal with HSL; this should have been $(lib-contrib-hsl) but for a long time we
 # accidentally had $(lib-hsl) -- so we simply make both symbols available
 ifeq ($(USE_CONTRIB_HSL),yes)
@@ -219,7 +237,6 @@ ifeq ($(enable-threads),yes)
   lib-contrib-tbb.o = $D/lib/libtbb$(shared-lib-suffix)
 endif
 
-
 # set paths to all the libraries we need:
 lib-base.o     = $(LIBDIR)/libbase$(lib-suffix) \
 		 $(lib-contrib-trilinos) \
@@ -230,11 +247,15 @@ lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix) \
 
 lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) \
 		 $(lib-hsl) \
-		 $(lib-contrib-petsc.o) $(lib-contrib-slepc) $(DEAL_II_PETSC_MPIUNI_LIB) \
+		 $(lib-contrib-petsc.o) $(DEAL_II_PETSC_MPIUNI_LIB) \
+                 $(lib-contrib-slepc) \
+                 $(lib-contrib-mumps) \
 		 $(lib-contrib-metis)
 lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) \
 		 $(lib-hsl) \
-		 $(lib-contrib-petsc.g) $(lib-contrib-slepc) $(DEAL_II_PETSC_MPIUNI_LIB) \
+		 $(lib-contrib-petsc.g) $(DEAL_II_PETSC_MPIUNI_LIB) \
+                 $(lib-contrib-slepc) \
+                 $(lib-contrib-mumps) \
 		 $(lib-contrib-metis)
 
 lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
@@ -258,6 +279,7 @@ endif
 include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
 include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
+include-path-mumps           = $(DEAL_II_MUMPS_DIR)/include
 
 # include paths as command line flags. while compilers allow a space between
 # the '-I' and the actual path, we also send these flags to the
@@ -273,7 +295,7 @@ INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
 # (and thus import all of its variables), but rather set up a scheme to
 # extract these values upon configuration
 #
-# note also that this only works for PETSc before 2.3 :-]
+# also, note that this only works for PETSc before 2.3 :-]
 ifeq ($(USE_CONTRIB_PETSC),yes)
   ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
     include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
@@ -288,6 +310,10 @@ endif
 
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
   INCLUDE += -I$(include-path-trilinos)
+endif
+
+ifeq ($(USE_CONTRIB_MUMPS),yes)
+  INCLUDE += -I$(include-path-mumps)
 endif
 
 ifeq ($(enable-threads),yes)
