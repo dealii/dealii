@@ -153,7 +153,7 @@ clean:
 .PHONY: validate-xrefs clean
 
 
-Makefile.dep: $(shell echo $D/examples/*/*.cc) Makefile
+Makefile.dep: $(shell echo $D/examples/*/*.cc $D/examples/*/doc/*.dox) Makefile
 	@echo ================== Generating $@
 	@for i in $(example-names) ; do \
 		echo generated/$${i}_prog.html generated/$${i}_plain.html \
