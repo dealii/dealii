@@ -114,7 +114,6 @@ namespace Algorithms
 	if (output != 0 && control.print())
 	  (*output) << count << out;
 
-	first = false;
 	d_explicit.time = control.now();
       }
     deallog.pop();
