@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,8 +72,8 @@ namespace
         return Point<1>(i*h);
       }
   }
-  
-    
+
+
 				   // given N, generate i=0...N-1
 				   // equidistant points in the domain
 				   // [0,1]^2
@@ -83,7 +83,7 @@ namespace
 		       const dealii::internal::int2type<2>  )
   {
     Assert (i<N, ExcInternalError());
-    
+
     if (N==1)
       return Point<2> (.5, .5);
     else
@@ -91,14 +91,14 @@ namespace
         Assert (N>=4, ExcInternalError());
         const unsigned int N1d = int_sqrt(N);
         const double h = 1./(N1d-1);
-        
+
         return Point<2> (i%N1d * h,
                          i/N1d * h);
       }
   }
-  
 
-  
+
+
 
 				   // given N, generate i=0...N-1
 				   // equidistant points in the domain
@@ -114,7 +114,7 @@ namespace
     else
       {
         Assert (N>=8, ExcInternalError());
-    
+
         const unsigned int N1d = int_cuberoot(N);
         const double h = 1./(N1d-1);
 
@@ -148,8 +148,8 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
 				   // Fill restriction matrices with L2-projection
   if (dim ==spacedim)
   FETools::compute_projection_matrices (*this, this->restriction);
-			      
-  
+
+
 				   // finally fill in support points
   if (degree == 0)
     {
@@ -165,12 +165,12 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
       unsigned int n = degree+1;
       for (unsigned int i=1; i<dim; ++i)
 	n *= degree+1;
-      
+
       this->unit_support_points.resize(n);
-      
+
       const double step = 1./degree;
       Point<dim> p;
-      
+
       unsigned int k=0;
       for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
 	for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
@@ -181,7 +181,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
 		p(1) = iy * step;
 	      if (dim>2)
 		p(2) = iz * step;
-	      
+
 	      this->unit_support_points[k++] = p;
 	    };
     };
@@ -210,7 +210,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1>& points)
   FETools::compute_embedding_matrices (*this, this->prolongation);
 				   // Fill restriction matrices with L2-projection
   FETools::compute_projection_matrices (*this, this->restriction);
-  
+
 				   // Compute support points, which
 				   // are the tensor product of the
 				   // Lagrange interpolation points in
@@ -232,7 +232,7 @@ FE_DGQ<dim, spacedim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-  std::ostringstream namebuf;  
+  std::ostringstream namebuf;
   namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
   return namebuf.str();
 }
@@ -275,7 +275,7 @@ FE_DGQ<dim, spacedim>::rotate_indices (std::vector<unsigned int> &numbers,
   for (unsigned int i=1;i<dim;++i)
     s *= n;
   numbers.resize (s);
-  
+
   unsigned int l = 0;
 
   if (dim==1)
@@ -356,7 +356,7 @@ get_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
                ||
                (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                 typename FE::ExcInterpolationNotImplemented() );
-  
+
 				   // ok, source is a Q element, so
 				   // we will be able to do the work
   const FE_DGQ<dim, spacedim> &source_fe
@@ -368,8 +368,8 @@ get_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
   Assert (interpolation_matrix.n() == source_fe.dofs_per_cell,
 	  ExcDimensionMismatch (interpolation_matrix.n(),
 				source_fe.dofs_per_cell));
-  
-  
+
+
 				   // compute the interpolation
 				   // matrices in much the same way as
 				   // we do for the embedding matrices
@@ -445,7 +445,7 @@ get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
                ||
                (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
-  
+
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				0));
@@ -474,7 +474,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_f
                ||
                (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
-  
+
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				0));
@@ -571,7 +571,7 @@ FE_DGQ<dim, spacedim>::compare_for_face_domination (const FiniteElement<dim, spa
 template <int dim, int spacedim>
 bool
 FE_DGQ<dim, spacedim>::has_support_on_face (const unsigned int shape_index,
-				  const unsigned int face_index) const
+					    const unsigned int face_index) const
 {
   Assert (shape_index < this->dofs_per_cell,
 	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
@@ -579,62 +579,69 @@ FE_DGQ<dim, spacedim>::has_support_on_face (const unsigned int shape_index,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
   unsigned int n = this->degree+1;
+
+				   // for DGQ(0) elements, the single
+				   // shape functions is constant and
+				   // therefore lives on the boundary
+  if (this->degree == 0)
+    return true;
+
   unsigned int n2 = n*n;
-  
+
   switch (dim)
     {
       case 1:
-    {
-				       // in 1d, things are simple. since
-				       // there is only one degree of
-				       // freedom per vertex in this
-				       // class, the first is on vertex 0
-				       // (==face 0 in some sense), the
-				       // second on face 1:
-      return (((shape_index == 0) && (face_index == 0)) ||
-	      ((shape_index == 1) && (face_index == 1)));
-    };
-      
+      {
+					 // in 1d, things are simple. since
+					 // there is only one degree of
+					 // freedom per vertex in this
+					 // class, the first is on vertex 0
+					 // (==face 0 in some sense), the
+					 // second on face 1:
+	return (((shape_index == 0) && (face_index == 0)) ||
+		((shape_index == 1) && (face_index == 1)));
+      };
+
       case 2:
-    {
-      if (face_index==0 && (shape_index % n) == 0)
-	return true;
-      if (face_index==1 && (shape_index % n) == this->degree)
-	return true;
-      if (face_index==2 && shape_index < n)
-	return true;
-      if (face_index==3 && shape_index >= this->dofs_per_cell-n)
-	return true;
-      return false;
-    };
-      
+      {
+	if (face_index==0 && (shape_index % n) == 0)
+	  return true;
+	if (face_index==1 && (shape_index % n) == this->degree)
+	  return true;
+	if (face_index==2 && shape_index < n)
+	  return true;
+	if (face_index==3 && shape_index >= this->dofs_per_cell-n)
+	  return true;
+	return false;
+      };
+
       case 3:
-    {
-      const unsigned int in2 = shape_index % n2;
-	
-				       // x=0
-      if (face_index==0 && (shape_index % n) == 0)
-	return true;
-				       // x=1
-      if (face_index==1 && (shape_index % n) == n-1)
-	return true;
-				       // y=0
-      if (face_index==2 && in2 < n )
-	return true;
-				       // y=1
-      if (face_index==3 && in2 >= n2-n)
-	return true;
-				       // z=0
-      if (face_index==4 && shape_index < n2)
-	return true;
-				       // z=1
-      if (face_index==5 && shape_index >= this->dofs_per_cell - n2)
-	return true;
-      return false;
-    };
+      {
+	const unsigned int in2 = shape_index % n2;
+
+					 // x=0
+	if (face_index==0 && (shape_index % n) == 0)
+	  return true;
+					 // x=1
+	if (face_index==1 && (shape_index % n) == n-1)
+	  return true;
+					 // y=0
+	if (face_index==2 && in2 < n )
+	  return true;
+					 // y=1
+	if (face_index==3 && in2 >= n2-n)
+	  return true;
+					 // z=0
+	if (face_index==4 && shape_index < n2)
+	  return true;
+					 // z=1
+	if (face_index==5 && shape_index >= this->dofs_per_cell - n2)
+	  return true;
+	return false;
+      };
 
       default:
-	Assert (false, ExcNotImplemented());
+	    Assert (false, ExcNotImplemented());
     }
   return true;
 }
@@ -670,7 +677,7 @@ FE_DGQArbitraryNodes<dim>::get_name () const
 				   // a degree value.
   std::ostringstream namebuf;
 
-  bool type = true;  
+  bool type = true;
   const unsigned int n_points = this->degree +1;
   std::vector<double> points(n_points);
   const unsigned int dofs_per_cell = this->dofs_per_cell;
@@ -681,7 +688,7 @@ FE_DGQArbitraryNodes<dim>::get_name () const
 				   // in one coordinate direction.
   for (unsigned int j=0;j<dofs_per_cell;j++)
     {
-      if ((dim>1) ? (unit_support_points[j](1)==0 && 
+      if ((dim>1) ? (unit_support_points[j](1)==0 &&
 	   ((dim>2) ? unit_support_points[j](2)==0: true)) : true)
 	{
 	  points[index++] = unit_support_points[j](0);
@@ -699,7 +706,7 @@ FE_DGQArbitraryNodes<dim>::get_name () const
 	break;
       }
 
-  if (type == true)    
+  if (type == true)
     namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
   else
     {
@@ -732,14 +739,14 @@ FE_DGQArbitraryNodes<dim>::clone() const
 				   // TODO[Prill] : There must be a better way
 				   // to extract 1D quadrature points from the
 				   // tensor product FE.
-  
+
 				   // Construct a dummy quadrature formula
 				   // containing the FE's nodes:
   std::vector<Point<1> > qpoints(this->degree+1);
   for (unsigned int i=0; i<=this->degree; ++i)
     qpoints[i] = Point<1>(this->unit_support_points[i][0]);
   Quadrature<1> pquadrature(qpoints);
-  
+
   return new FE_DGQArbitraryNodes<dim>(pquadrature);
 }
 

@@ -621,6 +621,15 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: FE_DGQ::has_support_on_face() returned the wrong value in 1d if the
+  polynomial degree of the finite element equals zero (i.e. for piecewise
+  constants) where the lone shape function is nonzero on all faces. This is now
+  fixed.
+  <br>
+  (WB 2010/05/07)
+  </p></li>
+
+  <li>
   <p>Fixed: VectorTools::interpolate_boundary_values inadvertently produces
   an exception when used with hp::DoFHandler objects in 1d. This is now fixed.
   <br>
