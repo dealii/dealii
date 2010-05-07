@@ -2,7 +2,7 @@
 //    rt_8.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,7 +33,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 2
+#define PRECISION 5
 
 
 std::ofstream logfile ("rt_8/output");
