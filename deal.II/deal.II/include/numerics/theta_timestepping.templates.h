@@ -69,7 +69,6 @@ namespace Algorithms
 
     control.restart();
 
-    bool first = true;
     d_explicit.time = control.now();
 
 				     // The data used to compute the

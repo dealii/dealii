@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by Michael Rapson and the deal.II authors
+//    Copyright (C) 2009, 2010 by Michael Rapson and the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -517,8 +517,6 @@ void PointValueHistory<dim>
       to_gnuplot << "# Data independent of mesh location\n";
 
 				       // write column headings
-      std::map <std::string, std::vector <std::vector <double> > >::iterator
-	data_store_begin = data_store.begin ();
       to_gnuplot << "# <Key> ";
 
       for (unsigned int component = 0; component < n_indep; component++)
@@ -530,8 +528,6 @@ void PointValueHistory<dim>
 				       // write general data stored
       for (unsigned int key = 0; key < dataset_key.size (); key++)
         {
-          std::map <std::string, std::vector <std::vector <double> > >::iterator
-	    data_store_begin = data_store.begin ();
           to_gnuplot << dataset_key[key];
 
           for (unsigned int component = 0; component < n_indep; component++)

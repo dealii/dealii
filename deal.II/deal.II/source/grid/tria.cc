@@ -5227,8 +5227,7 @@ namespace internal
 		  quad = triangulation.begin_quad(),
 		  endq = triangulation.end_quad();
 		typename Triangulation<dim,spacedim>::raw_line_iterator
-		  next_unused_line = triangulation.begin_raw_line (),
-		  endl = triangulation.end_line();
+		  next_unused_line = triangulation.begin_raw_line ();
 		typename Triangulation<dim,spacedim>::raw_quad_iterator
 		  next_unused_quad = triangulation.begin_raw_quad ();
 
@@ -6059,10 +6058,6 @@ namespace internal
 		typename Triangulation<dim,spacedim>::active_hex_iterator
 		  hex  = triangulation.begin_active_hex(level),
 		  endh = triangulation.begin_active_hex(level+1);
-		typename Triangulation<dim,spacedim>::raw_line_iterator
-		  next_unused_line = triangulation.begin_raw_line ();
-		typename Triangulation<dim,spacedim>::raw_quad_iterator
-		  next_unused_quad = triangulation.begin_raw_quad ();
 		typename Triangulation<dim,spacedim>::raw_hex_iterator
 		  next_unused_hex  = triangulation.begin_raw_hex (level+1);
 

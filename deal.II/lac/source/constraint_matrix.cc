@@ -1218,7 +1218,6 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
 	      if (distribute[column] != numbers::invalid_unsigned_int)
 		{
 		  // row
-		  unsigned int old_rowlength = sparsity.row_length(row);
 		  for (unsigned int q=0;
 		       q!=lines[distribute[column]].entries.size();
 		       ++q)

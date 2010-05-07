@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,7 @@ Boundary<dim, spacedim>::~Boundary ()
 template <int dim, int spacedim>
 Point<spacedim>
 Boundary<dim, spacedim>::
-get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &) const 
+get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &) const
 {
   Assert (false, ExcPureFunctionCalled());
   return Point<spacedim>();
@@ -80,7 +80,7 @@ get_new_point_on_face (const typename Triangulation<dim,spacedim>::face_iterator
       case 3:
 	    return get_new_point_on_quad (face);
     }
-  
+
   return Point<spacedim>();
 }
 
@@ -224,7 +224,7 @@ StraightBoundary<dim, spacedim>::StraightBoundary ()
 template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
-get_new_point_on_line (const typename Triangulation<dim, spacedim>::line_iterator &line) const 
+get_new_point_on_line (const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
   return (line->vertex(0) + line->vertex(1)) / 2;
 }
@@ -315,7 +315,7 @@ namespace
 template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
-get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &) const 
+get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &) const
 {
   Assert (false, ExcImpossibleInDim(dim));
   return Point<spacedim>();
@@ -325,7 +325,7 @@ get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterato
 template <>
 Point<3>
 StraightBoundary<2,3>::
-get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const 
+get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
 {
   return compute_new_point_on_quad<2> (quad);
 }
@@ -336,7 +336,7 @@ get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
 template <>
 Point<3>
 StraightBoundary<3>::
-get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const 
+get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
   return compute_new_point_on_quad<3> (quad);
 }
@@ -375,13 +375,13 @@ get_intermediate_points_on_line (const typename Triangulation<dim, spacedim>::li
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
-  
+
   const double dx=1./(n+1);
   double x=dx;
 
   const Point<spacedim> vertices[2] = { line->vertex(0),
 				   line->vertex(1) };
-  
+
   for (unsigned int i=0; i<n; ++i, x+=dx)
     points[i] = (1-x)*vertices[0] + x*vertices[1];
 }
@@ -410,7 +410,7 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 				 std::vector<Point<3> > &points) const
 {
   const unsigned int spacedim = 3;
-  
+
   const unsigned int n=points.size(),
 		     m=static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
 				   // is n a square number
@@ -622,7 +622,7 @@ namespace internal
       x_k += object->vertex(i) *
 	     GeometryInfo<dim>::d_linear_shape_function (xi, i);
 
-    do 
+    do
       {
 	Tensor<1,dim> F_k;
 	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -643,7 +643,6 @@ namespace internal
 	const Point<dim> delta_xi = - invert(H_k) * F_k;
 	xi += delta_xi;
 
-	Point<spacedim> old_xk = x_k;
 	x_k = Point<spacedim>();
 	for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	  x_k += object->vertex(i) *
@@ -653,7 +652,7 @@ namespace internal
 	  break;
       }
     while (true);
-    
+
     return x_k;
   }
 
