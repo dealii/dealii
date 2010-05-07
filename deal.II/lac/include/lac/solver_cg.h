@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -376,7 +376,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	print_vectors(it, x, g, d);
 
 	conv = this->control().check(it,res);
-	if (conv)
+	if (conv != SolverControl::iterate)
 	  break;
 
 	precondition.vmult(h,g);
