@@ -70,6 +70,10 @@ test (const unsigned int degree)
             += (fe.shape_value_component(i,q_point,d) *
                 fe.shape_value_component(j,q_point,d) *
                 fe.JxW(q_point));
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    for (unsigned int j=0; j<dofs_per_cell; ++j)
+      if (std::fabs(mass_matrix(i,j)) < 1e-16)
+	mass_matrix(i,j) = 0;
   mass_matrix.print_formatted (logfile, 3, false, 0, " ", 1);
 
   SolverControl           solver_control (dofs_per_cell,
