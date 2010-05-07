@@ -8,7 +8,7 @@
 
 use strict;
 
-my $laststep = 38;
+my $laststep = 45;
 
 my $essential = ',fillcolor="red"';
 my $technique = ',fillcolor="orange"';
@@ -43,6 +43,7 @@ my %attribute = (
     30 => $technique,
     36 => $technique,
     37 => $technique,
+    45 => $technique,
 
     17 => $solidsapplication,
     18 => $solidsapplication,
@@ -150,6 +151,7 @@ Step04 -> Step34;
 Step22 -> Step35;
 
 Step04 -> Step36;
+Step03 -> Step45;
 }
 
 EOT
