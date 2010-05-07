@@ -1520,7 +1520,7 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 	for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
 	  if(cell->at_boundary(face_nr))
 	    for(unsigned int j=0; j<dofs_per_face; ++j)
-	      if (cell_dofs[fe.face_to_cell_index(j,face_nr)] == true) //is this necessary?
+//	      if (cell_dofs[fe.face_to_cell_index(j,face_nr)] == true) //is this necessary?
 		boundary_cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
 
 

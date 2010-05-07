@@ -566,6 +566,16 @@ namespace MeshWorker
 			       MGLevelObject<MATRIX>& flux_down);
 	
 					 /**
+					  * Initialize the matrices
+					  * #interface_up and #interface_down
+					  * used for local refinement
+					  * with continuous
+					  * Galerkin methods.
+					  */
+
+	void initialize_interfaces(MGLevelObject<MATRIX>& interface_up,
+			       MGLevelObject<MATRIX>& interface_down);
+					 /**
 					  * Initialize the local data
 					  * in the
 					  * DoFInfo
@@ -643,6 +653,24 @@ namespace MeshWorker
 					  * fine to coarse.
 					  */
 	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > flux_down;
+
+					 /**
+					  * The matrix used for face
+					  * contributions for continuous
+                                          * elements across the
+					  * refinement edge, coupling
+					  * coarse to fine.
+					  */
+	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_up;
+	
+					 /**
+					  * The matrix used for face
+					  * contributions for continuous
+                                          * elements across the
+					  * refinement edge, coupling
+					  * fine to coarse.
+					  */
+	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_down;
 	
 					 /**
 					  * The smallest positive
@@ -927,6 +955,20 @@ namespace MeshWorker
 					  * level at refinement edges.
 					  */
 	std::vector<MatrixPtr> flux_up;	
+
+					 /**
+					  * The interface matrix between
+					  * the fine and the coarse
+					  * level at refinement edges.
+					  */
+	std::vector<MatrixPtr> interface_down;
+	
+					 /**
+					  * The interface matrix between
+					  * the coarse and the fine
+					  * level at refinement edges.
+					  */
+	std::vector<MatrixPtr> interface_up;	
       
       /**
        * A pointer to the object containing the block structure.
@@ -1388,6 +1430,16 @@ namespace MeshWorker
       flux_down = &down;
     }
     
+
+    template <class MATRIX>
+    inline void
+    MGMatrixSimple<MATRIX>::initialize_interfaces(
+      MGLevelObject<MATRIX>& up, MGLevelObject<MATRIX>& down)
+    {
+      interface_up = &up;
+      interface_down = &down;
+    }
+
 
     template <class MATRIX >
     template <int dim>
