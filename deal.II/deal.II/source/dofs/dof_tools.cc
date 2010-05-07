@@ -3725,8 +3725,8 @@ DoFTools::extract_dofs_with_support_on_boundary (const DH                      &
   std::vector<unsigned int> dof_indices;
 
 				   // loop over cells
-  for (typename DH::active_cell_iterator cell=dof_handler.begin_active(0);
-       cell!=dof_handler.end(0); ++cell)
+  for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
+       cell!=dof_handler.end(); ++cell)
     {
       const FiniteElement<1> &fe = cell->get_fe();
 
@@ -3789,7 +3789,7 @@ DoFTools::extract_dofs_with_support_on_boundary (const DH                      &
 		    {
 		      const unsigned int component =
 			(fe.is_primitive(i) ?
-			 fe.face_system_to_component_index(i).first :
+			 fe.system_to_component_index(i).first :
 			 (std::find (fe.get_nonzero_components(i).begin(),
 				     fe.get_nonzero_components(i).end(),
 				     true)
