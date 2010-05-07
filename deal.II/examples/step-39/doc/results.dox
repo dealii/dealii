@@ -2,7 +2,8 @@
 
 <h2>Logfile output</h2>
 First, the program produces the usual logfile here stored in <tt>deallog</tt>. It reads (with ommission of intermediate steps)
-<pre>
+
+@code
 DEAL::Element: FE_DGQ<2>(3)
 DEAL::Step 0
 DEAL::Triangulation 4 cells, 1 levels
@@ -70,21 +71,22 @@ DEAL:cg::Convergence step 12 value 9.49720e-14
 DEAL::Error    0.00716966
 DEAL::Estimate 0.0681646
 DEAL::Writing solution to <sol-11.gnuplot>...
-</pre>
+@endcode
 
 This log for instance shows that the number of conjugate gradient
 iteration steps is constant at approximately 12.
 
 <h2>Postprocessing of the logfile</h2>
 
-<img align="right" alt="Convergence graphs" src="step-39-convergence.png">
+@image html "step-39-convergence.png"
 Using the perl script <tt>postprocess.pl</tt>, we extract relevant
 data into <tt>output.dat</tt>, which can be used to plot graphs with
 <tt>gnuplot</tt>. The graph on the right for instance was produced with
-<pre>
+
+@code
 set style data linespoints
 set logscale
 set xrange [50:3000]
 plot "output.dat" using 2:3 title "error", "" using 2:4 title "estimate", \
      "" using 2:(3000*$2**-1.5) title "3rd order"
-</pre>
+@endcode
