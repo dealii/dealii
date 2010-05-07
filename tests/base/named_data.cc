@@ -53,17 +53,17 @@ test_selector(const NamedData<DATA>& data)
 void
 test_shared_pointer()
 {
-  NamedData<boost::shared_ptr<double> > data;
+  NamedData<std_cxx1x::shared_ptr<double> > data;
   deallog << "const" << data.is_const() << std::endl;
-  boost::shared_ptr<double> p = boost::shared_ptr<double>(new double);
+  std_cxx1x::shared_ptr<double> p = std_cxx1x::shared_ptr<double>(new double);
   data.add(p, "P1");
-  p = boost::shared_ptr<double>(new double);
+  p = std_cxx1x::shared_ptr<double>(new double);
   data.add(p, "P2");
-  p = boost::shared_ptr<double>(new double);
+  p = std_cxx1x::shared_ptr<double>(new double);
   data.add(p, "P3");
-  p = boost::shared_ptr<double>(new double);
+  p = std_cxx1x::shared_ptr<double>(new double);
   data.add(p, "P4");
-  p = boost::shared_ptr<double>(new double);
+  p = std_cxx1x::shared_ptr<double>(new double);
   data.add(p, "P5");
 
   for (unsigned int i=0;i<data.size();++i)
