@@ -1910,11 +1910,13 @@ void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix,
                          // number of nonzero elements in matrix
       nz  = matrix.n_actually_nonzero_elements ();
 
-                         // matrix
+                         // representation of the matrix 
       a   = new double[nz];
 
-                         // vector indices pointing to the first and
-                         // last elements of the vector respectively
+                         // matrix indices pointing to the row and
+                         // column dimensions of the matrix
+                         // respectively: iw. a[k] is the matrix
+                         // element (irn[k],jcn[k])
       irn = new unsigned int[nz];
       jcn = new unsigned int[nz];
       
