@@ -23,8 +23,12 @@
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 
-DEAL_II_NAMESPACE_OPEN
+#ifdef DEAL_II_USE_MUMPS
+#  include <base/utilities.h>
+#  include <dmumps_c.h>
+#endif 
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class provides an interface to the sparse direct solver MA27
@@ -354,6 +358,10 @@ class SparseDirectMA27 : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcInitializeAlreadyCalled);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInitializeNotCalled);
 				     /**
 				      * Exception
 				      */
@@ -1260,8 +1268,79 @@ class SparseDirectUMFPACK : public Subscriptor
 };
 
 
+#ifdef DEAL_II_USE_MUMPS
+/**
+ * This class provides an interface to the parallel sparse direct
+ * solver <a href="http://mumps.enseeiht.fr">MUMPS</a>. MUMPS is
+ * direct method based on a multifrontal approach, which performs a
+ * direct LU factorization. The matrix coming in may have either
+ * symmetric or nonsymmetric sparsity pattern.
+ *
+ * @note This class is useable if and only if a working installation
+ * of <a href="http://mumps.enseeiht.fr">MUMPS</a> exists on your
+ * system and was detected during configuration of
+ * <code>deal.II</code>.
+ *
+ * <h4>Instantiations</h4>
+ *
+ * There are instantiations of this class for SparseMatrix<double>,
+ * SparseMatrix<float>, BlockSparseMatrix<double>, and
+ * BlockSparseMatrix<float>.
+ *
+ * @author Markus Buerg, 2010
+ */
+class SparseDirectMUMPS 
+{
+ private:
+  
+  DMUMPS_STRUC_C id;
 
+  double *a;
+  double *rhs;
+
+  unsigned int *irn;
+  unsigned int *jcn;
+  unsigned int  n;
+  unsigned int  nz;
+
+                        /**
+			 * Flags storing whether the function
+			 * <tt>initialize ()</tt> has already been
+			 * called.
+			 */
+  bool initialize_called;  
+
+ public:
+  
+                        /**
+			 * Constructor
+			 */
+  SparseDirectMUMPS ();
+  
+                        /**
+			 * Destructor
+			 */
+  ~SparseDirectMUMPS ();
+  
+                        /**
+                         * This function initializes a MUMPS instance
+			 * and hands over the system's matrix
+			 * <tt>matrix</tt> and right-hand side
+			 * <tt>vector</tt> to the solver.
+			 */
+  template <class Matrix>
+    void initialize (const SparseMatrix<double>& matrix, 
+		     const Vector<double>      & vector);
+  
+                        /**
+                         * A function in which the linear system is
+			 * solved and the solution vector is copied
+			 * into the given <tt>vector</tt>.
+			 */      
+  void solve (Vector<double>& vector);
+};
+#endif // DEAL_II_USE_MUMPS
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
+#endif // __deal2__sparse_direct_h

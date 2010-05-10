@@ -23,7 +23,6 @@
 #include <list>
 #include <typeinfo>
 
-
 // this is a weird hack: on newer linux systems, some system headers
 // include /usr/include/linux/compiler.h which explicitly checks which
 // gcc is in use. in that file is also a comment that explains that
@@ -1878,6 +1877,105 @@ SparseDirectUMFPACK::Tvmult_add (
   Assert(false, ExcNotImplemented());
 }
 
+#ifdef DEAL_II_USE_MUMPS
+SparseDirectMUMPS::SparseDirectMUMPS () 
+{}
+
+SparseDirectMUMPS::~SparseDirectMUMPS () 
+{}
+
+template <class Matrix>
+void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix, 
+				    const Vector<double>      & vector) 
+{
+
+                         // Initialize MUMPS instance:
+  id.job = -1;
+  id.par =  1;
+  id.sym =  0;
+
+                         // Use MPI_COMM_WORLD as communicator
+  id.comm_fortran = -987654;
+  dmumps_c (&id);
+   
+                         // Hand over matrix and right-hand side
+  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0) 
+    {
+
+                         // Objects denoting a MUMPS data structure:
+                         //
+                         // Set number of unknowns
+      n   = vector.size ();
+
+                         // number of nonzero elements in matrix
+      nz  = matrix.n_actually_nonzero_elements ();
+
+                         // matrix
+      a   = new double[nz];
+
+                         // vector indices pointing to the first and
+                         // last elements of the vector respectively
+      irn = new unsigned int[nz];
+      jcn = new unsigned int[nz];
+      
+      unsigned int index = 0;
+      
+      for (SparseMatrix<double>::const_iterator ptr = matrix.begin (); 
+	   ptr != matrix.end (); ++ptr)
+	if (std::abs (ptr->value ()) > 0.0) 
+	  {
+	    a[index]   = ptr->value ();
+	    irn[index] = ptr->row () + 1;
+	    jcn[index] = ptr->column () + 1;
+	    ++index;
+	  }
+      
+      rhs = new double[n];
+      
+      for (unsigned int i = 0; i < n; ++i)
+	rhs[i] = vector (i);
+      
+      id.n   = n;
+      id.nz  = nz;
+      id.irn = irn;
+      id.jcn = jcn;
+      id.a   = a;
+      id.rhs = rhs;
+    }
+  
+                         // No outputs   
+  id.icntl[0] = -1;
+  id.icntl[1] = -1;
+  id.icntl[2] = -1;
+  id.icntl[3] =  0;
+
+                        // Exit by setting this flag:
+  initialize_called = true;
+}
+
+void SparseDirectMUMPS::solve (Vector<double>& vector) 
+{
+
+                        // Start solver
+  id.job = 6;
+  dmumps_c (&id);
+
+  id.job = -2;
+  dmumps_c (&id);
+
+                        // Copy solution into the given vector
+  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0) 
+    {
+      for (unsigned int i=0; i<n; ++i)
+	vector(i) = rhs[i];
+      
+      delete[] a;
+      delete[] irn;
+      delete[] jcn;
+      delete[] rhs;
+    }
+}
+#endif // DEAL_II_USE_MUMPS
 
 // explicit instantiations for SparseMatrixMA27 
 template
@@ -1910,5 +2008,14 @@ InstantiateUMFPACK(SparseMatrix<double>);
 InstantiateUMFPACK(SparseMatrix<float>);
 InstantiateUMFPACK(BlockSparseMatrix<double>);
 InstantiateUMFPACK(BlockSparseMatrix<float>);
+
+#ifdef DEAL_II_USE_MUMPS
+// explicit instantiations for SparseDirectMUMPS
+template <class Matrix>
+void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix, 
+				    const Vector<double>      & vector);
+
+void SparseDirectMUMPS::solve (Vector<double>& vector); 
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
