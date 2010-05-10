@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"                  
+	  "http://www.w3.org/TR/html4/loose.dtd">                        
+
+<html>                                                                          
+  <head>                            
+    <title>The deal.II Readme on interfacing to PETSc and Trilinos</title>
+    <link href="screen.css" rel="StyleSheet">
+    <meta name="author" content="the deal.II authors <authors @ dealii.org>"> 
+    <meta name="copyright" content="Copyright (C) 2010 by the deal.II authors">
+    <meta name="date" content="$Date: 2010-05-05 (Thu, 05 May 2010) $">
+    <meta name="svn_id" content="$Id: readme-mumps.html$">
+    <meta name="keywords" content="deal.II"> 
+  </head>                                                                      
+  <body> 
+
+    <h1>Interfacing <acronym>deal.II</acronym>
+      to <acronym>MUMPS</acronym></h1>
+    
+    <p> This documentation describes the compilation process
+      of <acronym>MUMPS</acronym> and its dependencies starting with
+      <acronym>BLACS</acronym> and following
+      with <acronym>SCALAPACK</acronym>. The compilation
+      of <acronym>MUMPS</acronym> and its dependencies is not as
+      straightforward is we would like, however, it is not so
+      difficult that we can not talk about it. That said, we cannot
+      discuss every possible choice of parameters, because this is too
+      involved and we would much rather be doing something productive
+      with the interface in <acronym>deal.II</acronym>. Thus we give
+      only a short walk-through mentioning the most important
+      parameters needed for successful compliation and linking.
+    </p>
+    
+    <p> The compilation scheme involves repeating the same three steps
+      for each piece of software we want installed: (i) Selecting an
+      appropriate makefile; (ii) Modifying symbols in this makefile to
+      suit the environment; and (iii) running make to actually compile
+      the software.
+    </p>
+    
+    <p> Note: If you are using a system, which provides
+      Intel's <acronym>MKL</acronym>, you should only have to compile
+      <acronym>MUMPS</acronym>, since <acronym>BLACS</acronym> and
+      <acronym>SCALPACK</acronym> are already included in the
+      <acronym>MKL</acronym>. Therefore you can jump directly to
+      section 3, where the compilation of <acronym>MUMPS</acronym> is
+      considered. Otherwise start right below with the installation
+      of <acronym>BLACS</acronym>.
+    </p>
+    
+    <h2>1. BLACS</h2>
+    
+    <p> The <a href='http://www.netlib.org/blacs/'>BLACS</a> library
+      provides basic linear algebra routines together with a
+      communication model such that they can be used in parallel. The
+      compilation of this library is highly dependent on the system
+      and software used and we can only give a general guide through
+      the configuration process.
+    </p>
+    
+    <p> The library can be found on the
+      official <a href='http://www.netlib.org/blacs/'>BLACS
+	webpage</a>. We require the three
+      files <b><code>mpiblacs.tgz</code></b>,
+      <b><code>mpiblacs-patch03.tgz</code></b>, and
+      <b><code>blacstester.tgz</code></b>. After extraction of these
+      three files <i>in the same directory</i>, we find a subfolder
+      named <code>BMAKES</code> in that directory. Inside this
+      subfolder there are lots of different Bmake-files for
+      different architectures. The naming of the files are
+      conventional: <code>Bmake.XXX-YYY</code>,
+      where <code>XXX</code> stands for the message passing software
+      of your system
+      (<i>eg..</i> <acronym>MPI</acronym>, <acronym>PVM</acronym>)
+      and
+      <code>YYY</code> for the system architecture (<i>eg.</i> LINUX,
+      SUN4, SUN4SOL). Pick the corresponding file for your combination
+      of message passing software and system architecture, copy it to
+      the root directory of <acronym>BLACS</acronym>, and rename it
+      <code>Bmake.inc</code>. Now that we have the correct makefile,
+      we have to adapt it to the system we are using.
+    </p>
+    
+    <p> We start by opening Bamke.inc in our favourite text editor and
+      taking a look at the following three sections:
+      
+      <ul>
+	<li> In <code>SECTION 1: PATHS AND LIBRARIES</code> set the
+	  MPI environment correctly by changing the
+	  variable <code>MPIDIR</code> to the directory, where your
+	  <acronym>MPI</acronym> installation is located
+	  in. Furthermore you will probably have to adjust the
+	  variables <code>MPILIBdir</code>,
+	  <code>MPIINCdir</code> and <code>MPILIB</code>. 
+	</li>
+	
+	<li> In the section <code>SECTION 2: BLACS INTERNALS</code>
+	  the most important variables are <code>INTFACE</code> and
+	  <code>TRANSCOMM</code>. If you are using OpenMPI, then set
+	  these as follows: <code>INTFACE = -DAdd</code>
+	  and <code>TRANSCOMM = -DUseMpi2</code>. Otherwise, consult
+	  the
+	  <a ref='http://www.netlib.org/blacs/BLACS/Install.html'>BLACS
+	    webpage</a> for details on how to set these values
+	    correctly.
+	</li>
+	
+	<li> The last section is named <code>SECTION 3:
+	    Compilers</code>. Here we set the
+	    variables <code>F77</code> and <code>CC</code> to
+	  correspond to the <acronym>MPI</acronym> Fortran and CC
+	  compiler respectively, <i>eg.</i>
+	  <code>mpif77</code> and <code>mpicc</code>. An important
+	  issue here are the variables <code>F77FLAGS</code>
+	  and <code>CCFLAGS</code>. It is absolutely vital to add the
+	  flag <code>-fPIC</code> to both of them, otherwise it will
+	  not be possible to link <acronym>deal.II</acronym> with the
+	  <acronym>BLACS</acronym> library correctly when shared
+	  libraries are enabled.
+	</li>
+      </ul>
+    </p>      
+    
+    <p> Assuming we have done all of that correctly, we go back to
+      the <acronym>BLACS</acronym> root directory and compile the
+      library with the command <code>make mpi</code>.
+    </p>
+    
+    <h2>2. SCALAPACK</h2>
+    
+    <p> The <a href='http://www.netlib.org/scalapack'>SCALAPACK</a>
+      library provides high-performance linear algebra routines for
+      distributed-memory message-passing <acronym>MIMD</acronym>
+      computers. The library can be found on the
+      official <a href='http://www.netlib.org/scalapack'>SCALAPACK
+      webpage</a>. We require the
+      file <b><code>scalapack.tgz</code></b> only.
+    </p>
+    
+    <p> After extracting the file and changing to the directory which
+      was created, we find a file
+      called <code>SLmake.inc.example</code> and rename it
+      to <code>SLmake.inc</code>. In this file we have to set a few
+      parameters as we did before with <acronym>BLACS</acronym>'
+      own <code>Bmake.inc</code>.
+      
+      <ul>    
+	<li> The first important variable is the
+	  variable <code>home</code>. Here you have to take care, that
+	  this points to the <acronym>SCALAPACK</acronym> directory
+	  (<i>ie.</i> where you are right now). Next, the variable
+	  <code>BLACSdir</code> points to the directory, where your
+	  <acronym>BLACS</acronym> libraries are located. Then set the
+	  variable <code>SMPLIB</code> to the <acronym>MPI</acronym>
+	  library.
+	</li>
+	
+	<li>Now we have to get <acronym>SCALAPACK</acronym> to know
+	  about the location of the <acronym>BLACS</acronym> library,
+	  which we installed first. This is done by editing the
+	  following bunch of variables <code>BLACSFINIT</code>,
+	  <code>BLACSCINIT</code>, and
+	  <code>BLACSLIB</code>. 
+	  
+	  <ul>
+	    <li> <code>BLACSFINIT</code> has to point to your
+	      F77init-library of <acronym>BLACS</acronym>. Check the
+	      name of the <acronym>BLACS</acronym> library file
+	      containing <code>F77init</code> in its name and put in
+	      this name here;
+	    </li>
+	    <li> <code>BLACSCINIT</code> has to point to
+	      the <acronym>BLACS</acronym> library file
+	      containing <code>Cinit</code> in its name;
+	    </li>
+	    <li> Finally, <code>BLACSLIB</code> points to the remaining
+	      <acronym>BLACS</acronym> library file.
+	    </li>
+	  </ul>
+	</li>
+	
+	<li> Next we set the compilers correctly
+	  again. <code>F77</code> and <code>CC</code> should point to
+	  your <acronym>MPI</acronym> Fortran and CC compiler
+	  respectively. Also at this place we have to add the
+	  flag <code>-fPIC</code> to the <code>F77FLAGS</code> and to
+	  the <code>CCFLAGS</code>. To the variable <code>CDEFS</code>
+	  you have to add the value of the
+	  variable <code>INTFACE</code> in the configuration
+	  file <code>Bmake.inc</code> in <acronym>BLACS</acronym>.
+	</li>
+	
+	<li> Finally, we should check that the variables
+	  named <code>BLAS</code> and
+	  <code>LAPACK</code> point to your <acronym>BLAS</acronym>
+	  and <acronym>LAPACK</acronym> libraries compiled on your
+	  system.
+	</li>
+      </ul>
+    </p>
+    
+    <p> If all variables are set correctly we can go ahead and compile
+      the <acronym>SCALAPACK</acronym> library with the
+      command <code>make</code>.
+    </p>
+    
+    <h2>3. MUMPS</h2>
+    
+    <p> Now we come to the main program for which we are doing all
+      this. We want to install the parallel sparse direct
+      solver <a href='http://graal.ens-lyon.fr/MUMPS'>MUMPS</a>.
+    </p>
+    
+    <p> After downloading the solver from its
+      official <a href='http://graal.ens-lyon.fr/MUMPS'>webpage</a>,
+      extracting it, and changing to the directory which was created, we
+      find a subfolder named
+      <code>Make.inc</code> where there are bunch of different
+      Makefiles for different machine architecture. Here it is
+      important to realize that for each architecture there are two
+      different files &mdash; one with the ending <code>.SEQ</code>
+      and one without. The makefiles with the extension
+      <code>.SEQ</code> are the ones required for the sequential
+      version of MUMPS. Since we want to use <acronym>MUMPS</acronym>
+      in parallel, we take the file
+      <i>without this extension</i> which looks suitable for the
+      architecture we are building on and copy this into
+      the <acronym>MUMPS</acronym> root directory and rename it
+      as <code>Makefile.inc</code>.
+    </p>
+    
+    <p> As before, we open the makefile <code>Makefile.inc</code> in
+      our favourite text editor and start modifying variables:
+      
+      <ul>
+	<li> The first variables we have to edit are the compilers
+	  again. As usual the variable <code>CC</code> should point to
+	  your <acronym>MPI</acronym> CC
+	  compiler, <i>eg.</i> <code>mpicc</code>. The
+	  variables <code>FC</code> and <code>FL</code> should both
+	  point to your <acronym>MPI</acronym> Fortran90 compiler,
+	  <i>eg.</i> <code>mpif90</code>.
+	</li>
+	
+	<li> Now let us consider the
+	  variable <code>SCALAP</code>. This one should point to your
+	  <acronym>SCALAPACK</acronym>0 and <acronym>BLACS</acronym>
+	  installations as follows:
+	  <code>-L/XXX -lscalapack -L/YYY -lblacs -lblacsCinit
+	    -lblacsF77init -lblacs -lblacsCinit</code>;
+	    where <code>XXX</code> stands for the directory containing
+	    the <acronym>SCALAPACK</acronym> library
+	    and <code>YYY</code> for the directory containing the
+	    <acronym>BLACS</acronym> library.  The
+	    variable <code>INCPAR</code> should point to
+	    the <acronym>MPI</acronym> include directory.
+	</li>
+	
+	<li> Now we turn to the variable <code>LIBPAR</code> which
+	  should contain the same value as the
+	  variable <code>SCALAP</code> plus a pointer to
+	  the <acronym>MPI</acronym> library. Therefore we propose to
+	  set it to the following value: <code>$(SCALAP) -L/XXX
+	  -lmpi</code>, where <code>XXX</code> stands for the
+	  directory containing your <acronym>MPI</acronym>
+	  libraries. Please check, if the
+	  variable <code>LIBBLAS</code> points to your BLAS
+	  installation. The variable
+	  <code>CDEFS</code> has to contain the same value as the variable
+	  <code>INTFACE</code> of 
+	  <acronym>BLACS</acronym>' own <code>Bmake.inc</code>. If you
+	  are using OpenMPI this should be the
+	  value <code>-DAdd_</code>. Further we have to add to all
+	  three compiler flag variables <code>OPTF</code>,
+	  <code>OPTC</code>, and <code>OPTL</code> the flag
+	  <code>-fPIC</code>. Without adding this last flag it will
+	  not be possible to link deal.II with MUMPS as a shared
+	  library.
+	</li>
+      </ul>
+    </p>
+    
+    <p> Now we are done with configuration and can
+      compile <acronym>MUMPS</acronym> with the
+      command <code>make</code>.
+    </p>
+    
+    <h2>4. Linking with deal.II</h2>
+    
+    <p> To be able to use the interface of <acronym>deal.II</acronym>
+      for the MUMPS solver we then
+      configure <acronym>deal.II</acronym> with the following
+      additional options:
+      <pre>
+	<code>--with-mumps=path/to/mumps
+	  --with-blacs=path/to/blacs
+	  --with-scalapack=path/to/scalpack
+	</code>
+      </pre>
+    </p>
+    
+  </body>
+</html>

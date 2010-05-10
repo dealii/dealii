@@ -429,6 +429,15 @@ inconvenience this causes.
 <ol>
   <li>
     <p>
+    New: A class SparseDirectMumps that provides an interface to 
+    the MUltifrontal Massively Parallel sparse direct Solver (MUMPS). 
+    </p>
+  <br>
+  (Markus Buerg 2010/05/10)
+  </li>
+
+  <li>
+    <p>
     Fixed: BlockSparsityPattern::copy_from accidentally only copied
     n_block_rows times n_block_rows blocks, instead of n_block_rows
     times n_block_cols. This is now fixed.
