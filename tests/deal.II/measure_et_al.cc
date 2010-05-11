@@ -1,5 +1,5 @@
 // $Id$
-// Copyright (C) 2005, 2006, 2008 by the deal.II authors
+// Copyright (C) 2005, 2006, 2008, 2010 by the deal.II authors
 //
 // Computes measure, center and barycenter on a variety of cells
 
@@ -12,8 +12,6 @@
 #include <iomanip>
 
 #define PRECISION 5
-
-char fname[50];
 
 
 template<int dim>
