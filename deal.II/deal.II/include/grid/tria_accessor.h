@@ -1243,6 +1243,24 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     double diameter () const;
 
+				     /** 
+				      * Length of an object in the direction
+				      * of the given axis, specified in the
+				      * local coordinate system. See the
+				      * documentation of GeometryInfo for the
+				      * meaning and enumeration of the local
+				      * axes.
+				      *
+				      * Note that the "length" of an object
+				      * can be interpreted in a variety of
+				      * ways. Here, we choose it as the
+				      * maximal length of any of the edges of
+				      * the object that are parallel to the
+				      * chosen axis on the reference cell.
+				      */
+    double extent_in_direction (const unsigned int axis) const;
+
+
     				     /**
 				      * Center of the object. The center of an
 				      * object is defined to be the average of
@@ -1255,6 +1273,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * object if higher order mappings are
 				      * used.
 				      */
+
+
     Point<spacedim> center () const;
 
 				     /**

@@ -1013,6 +1013,56 @@ measure () const
 }
 
 
+#if deal_II_dimension == 1
+
+template <>
+double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
+{
+  Assert (axis == 0, ExcIndexRange (axis, 0, 1));  
+
+  return this->diameter();
+}
+
+#elsif deal_II_dimension == 2
+
+template <>
+double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
+{
+  const unsigned int lines[2][2] = {{2,3}, /// Lines along x-axis, see GeometryInfo
+				    {0,1}};/// Lines along y-axis
+
+  Assert (axis < 2, ExcIndexRange (axis, 0, 2));
+  
+  return std::max(this->line(lines[axis][0])->diameter(),
+		  this->line(lines[axis][1])->diameter());
+}
+
+#elsif deal_II_dimension == 3
+
+template <>
+double TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
+{
+  const unsigned int lines[3][4] = {{2,3,6,7},	   /// Lines along x-axis, see GeometryInfo
+				    {0,1,4,5},    /// Lines along y-axis
+				    {8,9,10,11}}; /// Lines along z-axis
+  
+  Assert (axis < 3, ExcIndexRange (axis, 0, 3));
+
+  double lengths[4] = { this->line(lines[axis][0])->diameter(),
+			this->line(lines[axis][1])->diameter(),
+			this->line(lines[axis][2])->diameter(),
+			this->line(lines[axis][3])->diameter() };
+
+  return std::max(std::max(lengths[0], lengths[1]),
+		  std::max(lengths[2], lengths[3]));
+}
+
+#else
+
+// Not implemented for higher dimensions
+
+#endif
+
 
 /*------------------------ Functions: CellAccessor<1> -----------------------*/
 

@@ -630,8 +630,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>New: TriaAccessor::extent_in_direction() returns the length
+  of an object in a given direction.
+  <br>
+  (James Avery 2010/05/10)
+  </p></li>
+
+  <li>
   <p>New: There is a new function DoFTools::extract_dofs_with_support_on_boundary().
-  fixed.
   <br>
   (WB 2010/05/07)
   </p></li>
