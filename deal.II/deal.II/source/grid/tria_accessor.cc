@@ -56,7 +56,7 @@ namespace
 				       // not active. In this case, simply
 				       // return the subface_no.
       return subface_no;
-    
+
     const bool first_child_has_children=face->child(0)->has_children();
 				     // if the first child has children
 				     // (FaceRefineCase case_x1y or case_y1x),
@@ -70,7 +70,7 @@ namespace
   }
 
 
-  
+
 				   // given the number of face's child
 				   // (subface_no) and grandchild
 				   // (subsubface_no), return the number of the
@@ -90,11 +90,11 @@ namespace
 				     // This can only be an anisotropic refinement case
     Assert(face->refinement_case() < RefinementCase<2>::isotropic_refinement,
 	   ExcInternalError());
-    
+
     const bool first_child_has_children=face->child(0)->has_children();
 
     static const unsigned int e = deal_II_numbers::invalid_unsigned_int;
-    
+
 				     // array containing the translation of the
 				     // numbers,
 				     //
@@ -107,7 +107,7 @@ namespace
 	{e,1}},      // first  subface, second subsubface, first_child_has_children==no and yes
        {{1,2},       // second subface, first  subsubface, first_child_has_children==no and yes
 	{2,3}}};     // second subface, second subsubface, first_child_has_children==no and yes
-    
+
     Assert(translated_subface_no[subface_no][subsubface_no][first_child_has_children]!=e,
 	   ExcInternalError());
 
@@ -143,7 +143,7 @@ namespace
   = 1/|K| \int_{\hat K} \vec x(xi,eta) |det J| d(xi) d(eta)
 
   # x and y are arrays holding the x- and y-values of the four vertices
-  # of this cell in real space. 
+  # of this cell in real space.
   x := array(0..3);
   y := array(0..3);
   tphi[0] := (1-xi)*(1-eta):
@@ -211,9 +211,9 @@ namespace
   detJ should be the same, as a matrix and the matrix created from it
   by exchanging two consecutive lines and two neighboring columns have
   the same determinant.
-  
+
   # x, y and z are arrays holding the x-, y- and z-values of the four vertices
-  # of this cell in real space. 
+  # of this cell in real space.
   x := array(0..7):
   y := array(0..7):
   z := array(0..7):
@@ -231,7 +231,7 @@ namespace
   with (linalg):
   J := matrix(3,3, [[diff(x_real, xi), diff(x_real, eta), diff(x_real, zeta)],
   [diff(y_real, xi), diff(y_real, eta), diff(y_real, zeta)],
-  [diff(z_real, xi), diff(z_real, eta), diff(z_real, zeta)]]): 
+  [diff(z_real, xi), diff(z_real, eta), diff(z_real, zeta)]]):
   detJ := det (J):
 
   measure := simplify ( int ( int ( int (detJ, xi=0..1), eta=0..1), zeta=0..1)):
@@ -254,7 +254,7 @@ namespace
 
   For the case, someone is willing to rerun the maple script, he/she
   should use following ordering of shape functions:
-  
+
   tphi[0] := (1-xi)*(1-eta)*(1-zeta):
   tphi[1] :=     xi*(1-eta)*(1-zeta):
   tphi[2] := (1-xi)*    eta*(1-zeta):
@@ -294,7 +294,7 @@ namespace
 			  accessor.vertex(6)(2)   };
 
     double s1, s2, s3, s4, s5, s6, s7, s8;
-  
+
     s1 = 1.0/6.0;
     s8 = -x[2]*x[2]*y[0]*z[3]-2.0*z[6]*x[7]*x[7]*y[4]-z[5]*x[7]*x[7]*y[4]-z
 	 [6]*x[7]*x[7]*y[5]+2.0*y[6]*x[7]*x[7]*z[4]-z[5]*x[6]*x[6]*y[4]+x[6]*x[6]*y[4]*z
@@ -914,7 +914,7 @@ namespace
   \int_K 1 dx dy  = \int_{\hat K} |det J| d(xi) d(eta)
 
   # x and y are arrays holding the x- and y-values of the four vertices
-  # of this cell in real space. 
+  # of this cell in real space.
   x := array(0..3);
   y := array(0..3);
   tphi[0] := (1-xi)*(1-eta):
@@ -947,7 +947,7 @@ namespace
 
 #endif
 
-#if deal_II_dimension == 3  
+#if deal_II_dimension == 3
 
   double
   measure (const TriaAccessor<3, 3, 3> &accessor)
@@ -961,7 +961,7 @@ namespace
   }
 
 #endif
-  
+
 
   template <int structdim, int dim, int spacedim>
   double
@@ -1018,12 +1018,12 @@ measure () const
 template <>
 double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
 {
-  Assert (axis == 0, ExcIndexRange (axis, 0, 1));  
+  Assert (axis == 0, ExcIndexRange (axis, 0, 1));
 
   return this->diameter();
 }
 
-#elsif deal_II_dimension == 2
+#elif deal_II_dimension == 2
 
 template <>
 double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
@@ -1032,12 +1032,12 @@ double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
 				    {0,1}};/// Lines along y-axis
 
   Assert (axis < 2, ExcIndexRange (axis, 0, 2));
-  
+
   return std::max(this->line(lines[axis][0])->diameter(),
 		  this->line(lines[axis][1])->diameter());
 }
 
-#elsif deal_II_dimension == 3
+#elif deal_II_dimension == 3
 
 template <>
 double TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
@@ -1045,7 +1045,7 @@ double TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
   const unsigned int lines[3][4] = {{2,3,6,7},	   /// Lines along x-axis, see GeometryInfo
 				    {0,1,4,5},    /// Lines along y-axis
 				    {8,9,10,11}}; /// Lines along z-axis
-  
+
   Assert (axis < 3, ExcIndexRange (axis, 0, 3));
 
   double lengths[4] = { this->line(lines[axis][0])->diameter(),
@@ -1170,7 +1170,7 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
 {
 				   // original implementation by Joerg
 				   // Weimar
-  
+
                                    // we first eliminate points based
                                    // on the maximum and minumum of
                                    // the corner coordinates, then
@@ -1318,9 +1318,9 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const un
 
   if (dim==1)
     return GeometryInfo<dim>::opposite_face[neighbor];
-  
+
   const TriaIterator<CellAccessor<dim, spacedim> > neighbor_cell = this->neighbor(neighbor);
-  
+
 				   // usually, on regular patches of
 				   // the grid, this cell is just on
 				   // the opposite side of the
@@ -1336,10 +1336,10 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const un
 				   // GeometryInfo and try it
 
   const unsigned int this_face_index=face_index(neighbor);
-  
+
   const unsigned int neighbor_guess
     = GeometryInfo<dim>::opposite_face[neighbor];
-  
+
   if (neighbor_cell->face_index (neighbor_guess) == this_face_index)
     return neighbor_guess;
   else
@@ -1394,14 +1394,14 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 				   // on a coarser level
   Assert (neighbor_is_coarser(neighbor),
 	  TriaAccessorExceptions::ExcNeighborIsNotCoarser());
-  
+
   switch (dim)
     {
       case 2:
       {
 	const int this_face_index=face_index(neighbor);
 	const TriaIterator<CellAccessor<2,spacedim> > neighbor_cell = this->neighbor(neighbor);
-  
+
 					 // usually, on regular patches of
 					 // the grid, this cell is just on
 					 // the opposite side of the
@@ -1420,7 +1420,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 
 	const TriaIterator<TriaAccessor<1, 2, spacedim> > face_guess
 	  =neighbor_cell->face(face_no_guess);
-  
+
 	if (face_guess->has_children())
 	  for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
 	    if (face_guess->child_index(subface_no)==this_face_index)
@@ -1442,7 +1442,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 		      return std::make_pair (face_no, subface_no);
 	      }
 	  }
-  
+
 					 // we should never get here,
 					 // since then we did not find
 					 // our way back...
@@ -1456,7 +1456,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 	const int this_face_index=face_index(neighbor);
 	const TriaIterator<CellAccessor<3, spacedim> >
 	  neighbor_cell = this->neighbor(neighbor);
-  
+
 					 // usually, on regular patches of
 					 // the grid, this cell is just on
 					 // the opposite side of the
@@ -1475,7 +1475,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 
 	const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face_guess
 	  =neighbor_cell->face(face_no_guess);
-  
+
 	if (face_guess->has_children())
 	  for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
 	    if (face_guess->child_index(subface_no)==this_face_index)
@@ -1493,8 +1493,8 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 						   // a subface number for the current
 						   // FaceRefineCase
 		  return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no, subsub_no));
-	  
-  
+
+
 
 					 // if the guess was false, then
 					 // we need to loop over all faces
@@ -1525,13 +1525,13 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 			  return std::make_pair (face_no, translate_subface_no(face, subface_no, subsub_no));
 	      }
 	  }
-  
+
 					 // we should never get here,
 					 // since then we did not find
 					 // our way back...
 	Assert (false, ExcInternalError());
 	return std::make_pair (numbers::invalid_unsigned_int,
-			       numbers::invalid_unsigned_int);	
+			       numbers::invalid_unsigned_int);
       }
 
       default:
@@ -1551,7 +1551,7 @@ bool CellAccessor<dim, spacedim>::at_boundary (const unsigned int i) const
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (i<GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (i,0,GeometryInfo<dim>::faces_per_cell));
-  
+
   return (neighbor_index(i) == -1);
 }
 
@@ -1567,7 +1567,7 @@ bool CellAccessor<dim, spacedim>::has_boundary_lines () const
       for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
 	if (this->line(l)->at_boundary())
 	  return true;
-  
+
       return false;
     }
 }
@@ -1612,9 +1612,9 @@ neighbor_child_on_subface (const unsigned int face,
 		    ExcInternalError());
 	    sub_neighbor = sub_neighbor->child(GeometryInfo<dim>::child_cell_on_face(
 						 sub_neighbor->refinement_case(),neighbor_neighbor,0));
-      
+
 	  }
-  
+
 	return sub_neighbor;
       }
 
@@ -1623,7 +1623,7 @@ neighbor_child_on_subface (const unsigned int face,
       {
 					 // this function returns the neighbor's
 					 // child on a given face and
-					 // subface. 
+					 // subface.
 
 					 // we have to consider one other aspect here:
 					 // The face might be refined
@@ -1663,7 +1663,7 @@ neighbor_child_on_subface (const unsigned int face,
 					 //
 					 // *---*---*      *-------*
 					 // |   |   |	     |   1   |
-					 // | 0 | 1 |  or  *-------* 
+					 // | 0 | 1 |  or  *-------*
 					 // |   |   |	     |   0   |
 					 // *---*---*	     *-------*
 					 //
@@ -1680,13 +1680,13 @@ neighbor_child_on_subface (const unsigned int face,
 	const unsigned int total_children=mother_face->number_of_children();
 	Assert (subface<total_children,ExcIndexRange(subface,0,total_children));
 	Assert (total_children<=GeometryInfo<3>::max_children_per_face, ExcInternalError());
-  
+
 	unsigned int neighbor_neighbor;
 	TriaIterator<CellAccessor<3,spacedim> > neighbor_child;
 	const TriaIterator<CellAccessor<3,spacedim> > neighbor
 	  = this->neighbor(face);
 
-  
+
 	const RefinementCase<2> mother_face_ref_case
 	  = mother_face->refinement_case();
 	if (mother_face_ref_case==RefinementCase<2>::cut_xy) // total_children==4
@@ -1698,7 +1698,7 @@ neighbor_child_on_subface (const unsigned int face,
 					     // face and the neighbor
 	    neighbor_neighbor
 	      = this->neighbor_of_neighbor (face);
-      
+
 					     // now use the info provided by GeometryInfo
 					     // to extract the neighbors child number
 	    const unsigned int neighbor_child_index
@@ -1708,7 +1708,7 @@ neighbor_child_on_subface (const unsigned int face,
 						      neighbor->face_flip(neighbor_neighbor),
 						      neighbor->face_rotation(neighbor_neighbor));
 	    neighbor_child = neighbor->child(neighbor_child_index);
-      
+
 					     // make sure that the neighbor child cell we
 					     // have found shares the desired subface.
 	    Assert((this->face(face)->child(subface) ==
@@ -1726,7 +1726,7 @@ neighbor_child_on_subface (const unsigned int face,
 	    unsigned int neighbor_child_index;
 	    if (total_children==2)
 	      first_child_to_find=subface;
-	    else 
+	    else
 	      {
 		first_child_to_find=subface/2;
 		if (total_children==3 &&
@@ -1739,7 +1739,7 @@ neighbor_child_on_subface (const unsigned int face,
 		std::pair<unsigned int, unsigned int> indices=neighbor_of_coarser_neighbor(face);
 		neighbor_neighbor=indices.first;
 
-	  
+
 						 // we have to translate our
 						 // subface_index according to the
 						 // RefineCase and subface index of
@@ -1811,7 +1811,7 @@ neighbor_child_on_subface (const unsigned int face,
 							  neighbor->face_rotation(neighbor_neighbor),
 							  mother_face_ref_case);
 	      }
-      
+
 	    neighbor_child=neighbor->child(neighbor_child_index);
 					     // it might be, that the neighbor_child
 					     // has children, which are not refined
@@ -1940,13 +1940,13 @@ neighbor_child_on_subface (const unsigned int face,
 #endif
 
 	return neighbor_child;
-  
+
       }
 
       default:
 					     // 1d or more than 3d
 	    Assert (false, ExcNotImplemented());
-	    return TriaIterator<CellAccessor<dim,spacedim> >();      
+	    return TriaIterator<CellAccessor<dim,spacedim> >();
     }
 }
 
