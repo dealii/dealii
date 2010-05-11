@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -17,7 +17,7 @@ libraries = $(lib-deal2-1d.g) \
             $(lib-lac.g)  \
             $(lib-base.g)
 
-default: run-tests 
+default: run-tests
 
 ############################################################
 
@@ -46,6 +46,7 @@ tests_x = block_info block_matrices \
 	grid_transform_3d \
 	grid_hyper_* \
 	measure_et_al \
+	extent_in_direction \
 	normals_at_vertices \
 	intergrid_constraints \
 	intergrid_map \
