@@ -277,6 +277,13 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li><p>New: The DataOutBase class (and all derived classes such as DataOut,
+  MatrixOut, etc) can now produce the XML-based version of the VTK file format
+  (the so-called VTU format).
+  <br>
+  (Scott Miller 2010/05/12)
+  </p></li>
+
   <li><p>Changed: The Function::vector_gradient_list function was previously
   implemented by calling Function::gradient on each point and each component.
   It has been changed to now call Function::vector_gradient on each point
