@@ -358,18 +358,17 @@ class SparseDirectMA27 : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcInitializeAlreadyCalled);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInitializeNotCalled);
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcFactorizeNotCalled);
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcDifferentSparsityPatterns);
+
 				     /**
 				      * Exception
 				      */
@@ -829,14 +828,17 @@ class SparseDirectMA47 : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcInitializeAlreadyCalled);
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcFactorizeNotCalled);
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcCantFactorizeAgain);
+
 				     /**
 				      * Exception
 				      */
@@ -1295,9 +1297,8 @@ class SparseDirectMUMPS
   
   DMUMPS_STRUC_C id;
 
-  double *a;
-  double *rhs;
-
+  double       *a;
+  double       *rhs;
   unsigned int *irn;
   unsigned int *jcn;
   unsigned int  n;
@@ -1311,7 +1312,7 @@ class SparseDirectMUMPS
   bool initialize_called;  
 
  public:
-  
+
                         /**
 			 * Constructor
 			 */
@@ -1321,6 +1322,11 @@ class SparseDirectMUMPS
 			 * Destructor
 			 */
   ~SparseDirectMUMPS ();
+
+                        /**
+                         * Exception
+                         */
+  DeclException0 (ExcInitializeAlreadyCalled);
   
                         /**
                          * This function initializes a MUMPS instance

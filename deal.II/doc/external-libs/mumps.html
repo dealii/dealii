@@ -24,10 +24,11 @@
       straightforward is we would like, however, it is not so
       difficult that we can not talk about it. That said, we cannot
       discuss every possible choice of parameters, because this is too
-      involved and we would much rather be doing something productive
-      with the interface in <acronym>deal.II</acronym>. Thus we give
-      only a short walk-through mentioning the most important
-      parameters needed for successful compliation and linking.
+      involved (and we would probably much rather be doing something
+      productive with the interface and
+      <acronym>deal.II</acronym>). Thus we give only a short
+      walk-through mentioning the most important parameters needed for
+      successful compliation and linking.
     </p>
     
     <p> The compilation scheme involves repeating the same three steps
@@ -269,12 +270,15 @@
 	  <code>INTFACE</code> of 
 	  <acronym>BLACS</acronym>' own <code>Bmake.inc</code>. If you
 	  are using OpenMPI this should be the
-	  value <code>-DAdd_</code>. Further we have to add to all
+	  value <code>-DAdd_</code>. 
+	</li>
+
+	<li> Finally we add the flag <code>-fPIC</code> to the
 	  three compiler flag variables <code>OPTF</code>,
-	  <code>OPTC</code>, and <code>OPTL</code> the flag
-	  <code>-fPIC</code>. Without adding this last flag it will
-	  not be possible to link deal.II with MUMPS as a shared
-	  library.
+	  <code>OPTC</code>, and <code>OPTL</code> which follow
+	  imediately after the above. Without adding this last flag it
+	  will not be possible to link <acronym>deal.II</acronym> with
+	  <acronym>MUMPS</acronym> as a shared library.
 	</li>
       </ul>
     </p>
@@ -291,12 +295,25 @@
       configure <acronym>deal.II</acronym> with the following
       additional options:
       <pre>
-	<code>--with-mumps=path/to/mumps
-	  --with-blacs=path/to/blacs
-	  --with-scalapack=path/to/scalpack
+	<code>
+          --with-mumps=path/to/mumps
+          --with-blacs=path/to/blacs
+          --with-scalapack=path/to/scalpack
 	</code>
       </pre>
     </p>
     
+    <p>
+      Note: Throughout this description of the compilation process
+      of <acronym>MUMPS</acronym> we have emphasised adding the
+      compiler flag <code>-fPIC</code>. This is a definate requirement
+      if we are compiling <acronym>deal.II</acronym> with shared
+      libraries (which is the default). If we had preferred to be
+      compiling <acronym>deal.II</acronym> without shared libraries,
+      that's ok too; in that case we would do exactly the same thing
+      as described above, but this time omitting
+      the <code>-fPIC</code> flag from the scheme.
+    </p>
+
   </body>
 </html>

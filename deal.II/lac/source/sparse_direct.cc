@@ -454,6 +454,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                        // stdin
       pipe(detached_mode_data->server_client_pipe);
       pipe(detached_mode_data->client_server_pipe);      
+
                                        // fflush(NULL) is said to be a
                                        // good idea before fork()
       std::fflush(NULL);
@@ -462,7 +463,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                        // process
       detached_mode_data->child_pid = fork();
       if (detached_mode_data->child_pid == 0)
-                                         // child process starts here
+                                           // child process starts here
         {
                                            // copy read end of input
                                            // pipe to stdin, and
@@ -1879,6 +1880,8 @@ SparseDirectUMFPACK::Tvmult_add (
 
 #ifdef DEAL_II_USE_MUMPS
 SparseDirectMUMPS::SparseDirectMUMPS () 
+  :
+  initialize_called (false)
 {}
 
 SparseDirectMUMPS::~SparseDirectMUMPS () 
@@ -1888,6 +1891,8 @@ template <class Matrix>
 void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix, 
 				    const Vector<double>      & vector) 
 {
+                         // Check we haven't been here before:
+  Assert (initialize_called == false, ExcInitializeAlreadyCalled());
 
                          // Initialize MUMPS instance:
   id.job = -1;
@@ -1914,9 +1919,9 @@ void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix,
       a   = new double[nz];
 
                          // matrix indices pointing to the row and
-                         // column dimensions of the matrix
-                         // respectively: iw. a[k] is the matrix
-                         // element (irn[k],jcn[k])
+                         // column dimensions respectively of the
+                         // matrix representation above (a): ie. a[k]
+                         // is the matrix element (irn[k], jcn[k])
       irn = new unsigned int[nz];
       jcn = new unsigned int[nz];
       
@@ -1957,11 +1962,17 @@ void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix,
 
 void SparseDirectMUMPS::solve (Vector<double>& vector) 
 {
+                        // Check that the solver has been initialized
+                        // by the routine above:
+  Assert (initialize_called == true, ExcNotInitialized());
+
+                        // and that the matrix has at least one
+                        // nonzero element:
+  Assert (nz != 0, ExcNotInitialized());
 
                         // Start solver
   id.job = 6;
   dmumps_c (&id);
-
   id.job = -2;
   dmumps_c (&id);
 
@@ -2011,8 +2022,8 @@ InstantiateUMFPACK(SparseMatrix<float>);
 InstantiateUMFPACK(BlockSparseMatrix<double>);
 InstantiateUMFPACK(BlockSparseMatrix<float>);
 
-#ifdef DEAL_II_USE_MUMPS
 // explicit instantiations for SparseDirectMUMPS
+#ifdef DEAL_II_USE_MUMPS
 template <class Matrix>
 void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix, 
 				    const Vector<double>      & vector);
