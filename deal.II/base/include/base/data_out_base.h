@@ -1246,9 +1246,6 @@ class DataOutBase
 					  */
 	unsigned int memory_consumption () const;
     };
-
-
-
     				     /**
 				      * Flags controlling the details
 				      * of output in deal.II
@@ -1395,6 +1392,12 @@ class DataOutBase
 					    */
 	  vtk,
 
+					   /**
+					    * Output in @ref
+					    * SoftwareVTU format.
+					    */
+	  vtu,
+	  
 					   /**
 					    * Output in deal.II
 					    * intermediate format.
@@ -1674,11 +1677,9 @@ class DataOutBase
 			   std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in @ref
- * SoftwareVTK format.
- *
- * This is the file format used by @ref SoftwareVTK, as described in
- * their manual, section 14.3.
+ * Write the given list of patches to the output stream in @ref SoftwareVTK
+ * format. The data is written in the traditional VTK format as opposed to the
+ * XML-based format that write_vtu() produces.
  *
  * The vector_data_ranges argument denotes ranges of components in the
  * output that are considered a vector, rather than simply a
@@ -1693,6 +1694,26 @@ class DataOutBase
 			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			   const VtkFlags                          &flags,
 			   std::ostream                            &out);
+			   
+
+/**
+ * Write the given list of patches to the output stream in @ref SoftwareVTK
+ * format. The data is written in the XML-based VTK format as opposed to the
+ * traditional format that write_vtk() produces.
+ *
+ * The vector_data_ranges argument denotes ranges of components in the
+ * output that are considered a vector, rather than simply a
+ * collection of scalar fields. The VTK output format has special
+ * provisions that allow these components to be output by a single
+ * name rather than having to group several scalar fields into a
+ * vector later on in the visualization program.
+ */
+    template <int dim, int spacedim>
+    static void write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
+			   const std::vector<std::string>          &data_names,
+			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+			   const VtkFlags                          &flags,
+			   std::ostream                            &out);		   
 
 /**
  * Write the given list of patches to the output stream in deal.II
@@ -1816,7 +1837,7 @@ class DataOutBase
 				      * <li> <tt>povray</tt>: <tt>.pov</tt>
 				      * <li> <tt>eps</tt>: <tt>.eps</tt>
 				      * <li> <tt>gmv</tt>: <tt>.gmv</tt>
-				      * <li> <tt>vtk</tt>: <tt>.vtk</tt>.
+				      * <li> <tt>vtk</tt>: <tt>.vtk</tt>
 				      * <li> <tt>deal_II_intermediate</tt>: <tt>.d2</tt>.
 				      * </ul>
 				      */
@@ -2105,6 +2126,7 @@ class DataOutInterface : private DataOutBase
     using DataOutBase::tecplot;
     using DataOutBase::tecplot_binary;
     using DataOutBase::vtk;
+    using DataOutBase::vtu;
     using DataOutBase::deal_II_intermediate;
     using DataOutBase::parse_output_format;
     using DataOutBase::get_output_format_names;
@@ -2197,6 +2219,14 @@ class DataOutInterface : private DataOutBase
 				      * DataOut::write_vtk.
 				      */
     void write_vtk (std::ostream &out) const;
+    
+				     /**
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in Vtu (VTK's XML) format. See
+				      * DataOut::write_vtu.
+				      */
+    void write_vtu (std::ostream &out) const;
 
     				     /**
 				      * Obtain data through get_patches()
