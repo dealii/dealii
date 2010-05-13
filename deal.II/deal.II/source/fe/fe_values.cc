@@ -755,9 +755,168 @@ namespace FEValuesViews
       }
   }
 
-
-
   template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim,spacedim>::get_function_curls (const InputVector &fe_function,
+					    std::vector<curl_type> &curls) const {
+     typedef FEValuesBase<dim,spacedim> FVB;
+
+     Assert (fe_values.update_flags & update_gradients,
+	     typename FVB::ExcAccessToUninitializedField());
+     Assert (curls.size() == fe_values.n_quadrature_points,
+	     ExcDimensionMismatch (curls.size(), fe_values.n_quadrature_points));
+     Assert (fe_values.present_cell.get () != 0,
+	     ExcMessage ("FEValues object is not reinit'ed to any cell"));
+     Assert (fe_function.size () == fe_values.present_cell->n_dofs_for_dof_handler (),
+	     ExcDimensionMismatch (fe_function.size (), fe_values.present_cell->n_dofs_for_dof_handler ()));
+				      // get function values of dofs on this
+				      // cell
+     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+     fe_values.present_cell->get_interpolated_dof_values (fe_function, dof_values);
+
+     std::fill (curls.begin (), curls.end (), curl_type ());
+
+     switch (dim) {
+        case 2: {
+           for (unsigned int shape_function = 0; shape_function < fe_values.fe->dofs_per_cell; ++shape_function) {
+              const int snc = shape_function_data[shape_function].single_nonzero_component;
+
+              if (snc == -2)
+                 // shape function is zero for the selected components
+                 continue;
+
+              const double value = dof_values (shape_function);
+
+              if (value == 0.)
+                 continue;
+
+              if (snc != -1) {
+                 const unsigned int comp = shape_function_data[shape_function].single_nonzero_component_index;
+                 const Tensor<1, spacedim> *shape_gradient_ptr = &fe_values.shape_gradients[snc][0];
+
+                 switch (shape_function_data[shape_function].single_nonzero_component_index) {
+                    case 0: {
+                       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+                          curls[q_point][0] = -1.0 * value * (*shape_gradient_ptr++)[1];
+
+                       break;
+                    }
+
+                    default:
+                       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+                          curls[q_point][0] = value * (*shape_gradient_ptr)[0];
+                 }
+              }
+
+              else {
+                 for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+                    curls[q_point][0] = 0;
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[0]) {
+                    const Tensor<1,spacedim> *shape_gradient_ptr = &fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][0];
+
+                    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+                       curls[q_point][0] -= value * (*shape_gradient_ptr++)[1];
+                 }
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[1]) {
+                    const Tensor<1,spacedim> *shape_gradient_ptr = &fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][0];
+
+                    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+                       curls[q_point][0] += value * (*shape_gradient_ptr++)[0];
+                 }
+              }
+           }
+           break;
+        }
+
+        case 3: {
+           for (unsigned int shape_function = 0; shape_function < fe_values.fe->dofs_per_cell; ++shape_function) {
+              const int snc = shape_function_data[shape_function].single_nonzero_component;
+
+              if (snc == -2)
+                 // shape function is zero for the selected components
+                 continue;
+
+              const double value = dof_values (shape_function);
+
+              if (value == 0.)
+                 continue;
+
+              if (snc != -1) {
+                 const unsigned int comp = shape_function_data[shape_function].single_nonzero_component_index;
+                 const Tensor<1, spacedim> *shape_gradient_ptr = &fe_values.shape_gradients[snc][0];
+
+                 switch (shape_function_data[shape_function].single_nonzero_component_index) {
+                    case 0: {
+                       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point) {
+                          curls[q_point][0] = 0;
+                          curls[q_point][1] = value * (*shape_gradient_ptr)[2];
+                          curls[q_point][2] = -1.0 * value * (*shape_gradient_ptr++)[1];
+                       }
+
+                       break;
+                    }
+
+                    case 1: {
+                       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point) {
+                          curls[q_point][0] = -1.0 * value * (*shape_gradient_ptr)[2];
+                          curls[q_point][1] = 0;
+                          curls[q_point][2] = value * (*shape_gradient_ptr++)[0];
+                       }
+
+                       break;
+                    }
+
+                    default:
+                       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point) {
+                          curls[q_point][0] = value * (*shape_gradient_ptr)[1];
+                          curls[q_point][1] = -1.0 * value * (*shape_gradient_ptr++)[0];
+                          curls[q_point][2] = 0;
+                       }
+                 }
+              }
+
+              else {
+                 for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+                    for (unsigned int d = 0; d < dim; ++d)
+                       curls[q_point][d] = 0;
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[0]) {
+                    const Tensor<1,spacedim> *shape_gradient_ptr = &fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][0];
+
+                    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point) {
+                       curls[q_point][1] += value * (*shape_gradient_ptr++)[2];
+                       curls[q_point][2] -= value * (*shape_gradient_ptr++)[1];
+                    }
+                 }
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[1]) {
+                    const Tensor<1,spacedim> *shape_gradient_ptr = &fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][0];
+
+                    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point) {
+                       curls[q_point][0] -= value * (*shape_gradient_ptr++)[2];
+                       curls[q_point][2] += value * (*shape_gradient_ptr++)[0];
+                    }
+                 }
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[2]) {
+                    const Tensor<1,spacedim> *shape_gradient_ptr = &fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][0];
+
+                    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point) {
+                       curls[q_point][0] += value * (*shape_gradient_ptr++)[1];
+                       curls[q_point][1] -= value * (*shape_gradient_ptr++)[0];
+                    }
+                 }
+              }
+           }
+        }
+     }
+  }
+
+
+  template <int dim, int spacedim>  
   template <class InputVector>
   void
   Vector<dim,spacedim>::

@@ -637,6 +637,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>New: The FEValuesViews::Vector class now has functions
+  FEValuesViews::Vector::curl and FEValuesViews::Vector::get_function_curls.
+  <br>
+  (Markus B&uuml;rg 2010/05/13)
+  </p></li>
+
+  <li>
   <p>New: TriaAccessor::extent_in_direction() returns the length
   of an object in a given direction.
   <br>

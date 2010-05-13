@@ -501,6 +501,19 @@ namespace FEValuesViews
       typedef double                 divergence_type;
 
 				       /**
+					* A typedef for the type of the curl
+					* of the view this class
+					* represents. Here, for a set of
+					* <code>dim</code> components of the
+					* finite element, the curl is of type
+					* <code>Tensor@<1, 1@></code> (i.e. a
+					* scalar) in 2d, and of type
+					* <code>Tensor@<1, 3@></code> (i.e. a
+					* vector) in 3d.
+					*/
+      typedef Tensor<1, (spacedim == 3)? 3 : 1>     curl_type;
+
+				       /**
 					* A typedef for the type of second
 					* derivatives of the view this class
 					* represents. Here, for a set of
@@ -599,6 +612,17 @@ namespace FEValuesViews
 		  const unsigned int q_point) const;
 
 				       /**
+					* Return the vector curl of
+					* the vector components selected by
+					* this view, for the shape function
+					* and quadrature point selected by the
+					* arguments.
+					*/
+      curl_type
+      curl (const unsigned int shape_function,
+	    const unsigned int q_point) const;
+
+				       /**
 					* Return the Hessian (the tensor of
 					* rank 2 of all second derivatives) of
 					* the vector components selected by
@@ -689,7 +713,7 @@ namespace FEValuesViews
 					*
 					* There is no equivalent function such
 					* as
-					* FEValuesBase::get_function_gradients
+					* FEValuesBase::get_function_divergences
 					* in the FEValues classes but the
 					* information can be obtained from
 					* FEValuesBase::get_function_gradients,
@@ -698,6 +722,29 @@ namespace FEValuesViews
       template <class InputVector>
       void get_function_divergences (const InputVector& fe_function,
 				     std::vector<divergence_type>& divergences) const;
+
+				       /**
+					* Return the curl of the selected
+					* vector components of the finite
+					* element function characterized by
+					* <tt>fe_function</tt> at the
+					* quadrature points of the cell, face
+					* or subface selected the last time
+					* the <tt>reinit</tt> function of the
+					* FEValues object was called, at the
+					* quadrature points.
+					*
+					* There is no equivalent function such
+					* as
+					* FEValuesBase::get_function_curls
+					* in the FEValues classes but the
+					* information can be obtained from
+					* FEValuesBase::get_function_gradients,
+					* of course.
+					*/
+      template <class InputVector>
+      void get_function_curls (const InputVector& fe_function,
+			       std::vector<curl_type>& curls) const;
 
 				       /**
 					* Return the Hessians of the selected
@@ -3729,6 +3776,120 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
+  inline
+  typename Vector<dim,spacedim>::curl_type
+  Vector<dim,spacedim>::curl (const unsigned int shape_function,
+			      const unsigned int q_point) const
+  {
+				     // this function works like in the case
+				     // above
+     typedef FEValuesBase<dim,spacedim> FVB;
+
+     Assert (shape_function < fe_values.fe->dofs_per_cell,
+	     ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+     Assert (fe_values.update_flags & update_gradients,
+	     typename FVB::ExcAccessToUninitializedField());
+				      // same as for the scalar case except
+				      // that we have one more index
+     const int snc = shape_function_data[shape_function].single_nonzero_component;
+
+     if (snc == -2)
+        return curl_type ();
+
+     else
+        switch (dim) {
+           case 1:
+              return curl_type ();
+
+           case 2: {
+              if (snc != -1) {
+                 curl_type return_value;
+
+                 switch (shape_function_data[shape_function].single_nonzero_component_index) {
+                    case 0: {
+                       return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
+                       return return_value;
+                    }
+
+                    default: {
+                       return_value[0] = fe_values.shape_gradients[snc][q_point][2];
+                       return return_value;
+                    }
+                 }
+              }
+
+              else {
+                 curl_type return_value;
+
+                 return_value[0] = 0.0;
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
+                    return_value[0] -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[1])
+                    return_value[0] += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+
+                 return return_value;
+              }
+           }
+
+           case 3: {
+              if (snc != -1) {
+                 curl_type return_value;
+
+                 switch (shape_function_data[shape_function].single_nonzero_component_index) {
+                    case 0: {
+                       return_value[0] = 0;
+                       return_value[1] = fe_values.shape_gradients[snc][q_point][2];
+                       return_value[2] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
+                       return return_value;
+                    }
+
+                    case 1: {
+                       return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][2];
+                       return_value[1] = 0;
+                       return_value[2] = fe_values.shape_gradients[snc][q_point][0];
+                       return return_value;
+                    }
+
+                    default: {
+                       return_value[0] = fe_values.shape_gradients[snc][q_point][1];
+                       return_value[1] = -1.0 * fe_values.shape_gradients[snc][q_point][0];
+                       return_value[2] = 0;
+                       return return_value;
+                    }
+                 }
+              }
+
+              else {
+                 curl_type return_value;
+
+                 for (unsigned int i = 0; i < dim; ++i)
+                    return_value[i] = 0.0;
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[0]) {
+                    return_value[1] += fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
+                    return_value[2] -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+                 }
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[1]) {
+                    return_value[0] -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
+                    return_value[2] += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+                 }
+
+                 if (shape_function_data[shape_function].is_nonzero_shape_function_component[2]) {
+                    return_value[0] += fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
+                    return_value[1] -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
+                 }
+
+                 return return_value;
+              }
+           }
+        }
+  }
+
+  
+  template <int dim, int spacedim>  
   inline
   typename Vector<dim,spacedim>::hessian_type
   Vector<dim,spacedim>::hessian (const unsigned int shape_function,
