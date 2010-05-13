@@ -2148,7 +2148,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in OpenDX format. See
-				      * DataOut::write_dx.
+				      * DataOutBase::write_dx.
 				      */
     void write_dx (std::ostream &out) const;
 
@@ -2156,7 +2156,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in EPS format. See
-				      * DataOut::write_eps.
+				      * DataOutBase::write_eps.
 				      */
     void write_eps (std::ostream &out) const;
 
@@ -2164,7 +2164,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in GMV format. See
-				      * DataOut::write_gmv.
+				      * DataOutBase::write_gmv.
 				      */
     void write_gmv (std::ostream &out) const;
 
@@ -2172,7 +2172,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in GNUPLOT format. See
-				      * DataOut::write_gnuplot.
+				      * DataOutBase::write_gnuplot.
 				      */
     void write_gnuplot (std::ostream &out) const;
 
@@ -2180,7 +2180,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in POVRAY format. See
-				      * DataOut::write_povray.
+				      * DataOutBase::write_povray.
 				      */
     void write_povray (std::ostream &out) const;
 
@@ -2188,7 +2188,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in Tecplot format. See
-				      * DataOut::write_tecplot.
+				      * DataOutBase::write_tecplot.
 				      */
     void write_tecplot (std::ostream &out) const;
 
@@ -2208,7 +2208,7 @@ class DataOutInterface : private DataOutBase
 				      * get_patches() and write it to
 				      * <tt>out</tt> in UCD format for
 				      * @ref SoftwareAVS. See
-				      * DataOut::write_ucd.
+				      * DataOutBase::write_ucd.
 				      */
     void write_ucd (std::ostream &out) const;
 
@@ -2216,7 +2216,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in Vtk format. See
-				      * DataOut::write_vtk.
+				      * DataOutBase::write_vtk.
 				      */
     void write_vtk (std::ostream &out) const;
     
@@ -2224,7 +2224,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in Vtu (VTK's XML) format. See
-				      * DataOut::write_vtu.
+				      * DataOutBase::write_vtu.
 				      */
     void write_vtu (std::ostream &out) const;
 
@@ -2233,7 +2233,7 @@ class DataOutInterface : private DataOutBase
 				      * and write it to <tt>out</tt>
 				      * in deal.II intermediate
 				      * format. See
-				      * DataOut::write_deal_II_intermediate.
+				      * DataOutBase::write_deal_II_intermediate.
 				      *
 				      * Note that the intermediate
 				      * format is what its name
