@@ -1723,7 +1723,7 @@ parse_output_format (const std::string &format_name)
 std::string
 DataOutBase::get_output_format_names ()
 {
-  return "none|dx|ucd|gnuplot|povray|eps|gmv|tecplot|tecplot_binary|vtk|deal.II intermediate";
+  return "none|dx|ucd|gnuplot|povray|eps|gmv|tecplot|tecplot_binary|vtk|vtu|deal.II intermediate";
 }
 
 
@@ -1754,6 +1754,8 @@ default_suffix (const OutputFormat output_format)
 	    return ".plt";
       case vtk:
 	    return ".vtk";
+      case vtu:
+	    return ".vtu";
       case deal_II_intermediate:
 	    return ".d2";
       default:
@@ -4652,7 +4654,7 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
 	    write_vtk (out);
 	    break;
 	    
-	  case vtu:
+      case vtu:
 	    write_vtu (out);
 	    break;  
 
