@@ -82,7 +82,7 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std::auto_ptr<Epetra_LinearProblem> 
+    linear_problem = std_cxx1x::shared_ptr<Epetra_LinearProblem> 
       (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), 
 				&x.trilinos_vector(),
 				const_cast<Epetra_MultiVector*>(&b.trilinos_vector())));
@@ -177,7 +177,7 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std::auto_ptr<Epetra_LinearProblem> 
+    linear_problem = std_cxx1x::shared_ptr<Epetra_LinearProblem> 
       (new Epetra_LinearProblem
        (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), &ep_x, &ep_b));
 
@@ -401,14 +401,14 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std::auto_ptr<Epetra_LinearProblem>
+    linear_problem = std_cxx1x::shared_ptr<Epetra_LinearProblem>
       (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), 
 				&x.trilinos_vector(),
 				const_cast<Epetra_MultiVector*>(&b.trilinos_vector())));
 
 					// Next we can allocate the
 					// AztecOO solver...
-    solver = std::auto_ptr<Amesos_BaseSolver> (Amesos().Create("Amesos_Klu",
+    solver = std_cxx1x::shared_ptr<Amesos_BaseSolver> (Amesos().Create("Amesos_Klu",
 							       *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
@@ -468,13 +468,13 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std::auto_ptr<Epetra_LinearProblem> 
+    linear_problem = std_cxx1x::shared_ptr<Epetra_LinearProblem> 
       (new Epetra_LinearProblem
        (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), &ep_x, &ep_b));
 
 					// Next we can allocate the
 					// AztecOO solver...
-    solver = std::auto_ptr<Amesos_BaseSolver> (Amesos().Create("Amesos_Klu",
+    solver = std_cxx1x::shared_ptr<Amesos_BaseSolver> (Amesos().Create("Amesos_Klu",
 							       *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
