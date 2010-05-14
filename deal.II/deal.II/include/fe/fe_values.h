@@ -501,15 +501,14 @@ namespace FEValuesViews
       typedef double                 divergence_type;
 
 				       /**
-					* A typedef for the type of the curl
-					* of the view this class
+					* A typedef for the type of the
+					* curl of the view this class
 					* represents. Here, for a set of
-					* <code>dim</code> components of the
-					* finite element, the curl is of type
-					* <code>Tensor@<1, 1@></code> (i.e. a
-					* scalar) in 2d, and of type
-					* <code>Tensor@<1, 3@></code> (i.e. a
-					* vector) in 3d.
+					* <code>spacedim=2</code> components
+					* of the finite element, the curl is
+					* a <code>Tensor@<1, 1@></code>. For
+					* <code>spacedim=3</code> it is a
+					* <code>Tensor@<1, dim@></code>.
 					*/
       typedef Tensor<1, (spacedim == 3)? 3 : 1>     curl_type;
 
@@ -616,11 +615,28 @@ namespace FEValuesViews
 					* the vector components selected by
 					* this view, for the shape function
 					* and quadrature point selected by the
-					* arguments.
+					* arguments. For 1d this function does
+					* not make any sense. Thus it is not
+					* implemented for <code>spacedim=1</code>.
+					* In 2d the curl is defined as
+					* \begin{equation*}
+					* \operatorname{curl}(u):=\frac{du_2}{dx}
+					* -\frac{du_1}{dy},
+					* \end{equation*}
+					* whereas in 3d it is given by
+					* \begin{equation*}
+					* \operatorname{curl}(u):=\left(
+					* \begin{array}{c}
+					* \frac{du_3}{dy}-\frac{du_2}{dz}\\
+					* \frac{du_1}{dz}-\frac{du_3}{dx}\\
+					* \frac{du_2}{dx}-\frac{du_1}{dy}
+					* \end{array}
+					* \right).
+					* \end{equation*}
 					*/
       curl_type
       curl (const unsigned int shape_function,
-	    const unsigned int q_point) const;
+		  const unsigned int q_point) const;
 
 				       /**
 					* Return the Hessian (the tensor of
@@ -713,7 +729,7 @@ namespace FEValuesViews
 					*
 					* There is no equivalent function such
 					* as
-					* FEValuesBase::get_function_divergences
+					* FEValuesBase::get_function_gradients
 					* in the FEValues classes but the
 					* information can be obtained from
 					* FEValuesBase::get_function_gradients,
@@ -736,7 +752,7 @@ namespace FEValuesViews
 					*
 					* There is no equivalent function such
 					* as
-					* FEValuesBase::get_function_curls
+					* FEValuesBase::get_function_gradients
 					* in the FEValues classes but the
 					* information can be obtained from
 					* FEValuesBase::get_function_gradients,
@@ -744,7 +760,7 @@ namespace FEValuesViews
 					*/
       template <class InputVector>
       void get_function_curls (const InputVector& fe_function,
-			       std::vector<curl_type>& curls) const;
+				     std::vector<curl_type>& curls) const;
 
 				       /**
 					* Return the Hessians of the selected
@@ -3778,19 +3794,15 @@ namespace FEValuesViews
   template <int dim, int spacedim>
   inline
   typename Vector<dim,spacedim>::curl_type
-  Vector<dim,spacedim>::curl (const unsigned int shape_function,
-			      const unsigned int q_point) const
-  {
-				     // this function works like in the case
-				     // above
+  Vector<dim,spacedim>::curl (const unsigned int shape_function, const unsigned int q_point) const {
+     // this function works like in the case above
      typedef FEValuesBase<dim,spacedim> FVB;
 
      Assert (shape_function < fe_values.fe->dofs_per_cell,
-	     ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+         ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
      Assert (fe_values.update_flags & update_gradients,
-	     typename FVB::ExcAccessToUninitializedField());
-				      // same as for the scalar case except
-				      // that we have one more index
+         typename FVB::ExcAccessToUninitializedField());
+     // same as for the scalar case except that we have one more index
      const int snc = shape_function_data[shape_function].single_nonzero_component;
 
      if (snc == -2)
@@ -3798,8 +3810,10 @@ namespace FEValuesViews
 
      else
         switch (dim) {
-           case 1:
+           case 1: {
+           	  Assert (false, ExcMessage("Computing the curl in 1d is not a useful operation"));
               return curl_type ();
+           }
 
            case 2: {
               if (snc != -1) {
@@ -3824,10 +3838,12 @@ namespace FEValuesViews
                  return_value[0] = 0.0;
 
                  if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
-                    return_value[0] -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+                    return_value[0]
+                      -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
 
                  if (shape_function_data[shape_function].is_nonzero_shape_function_component[1])
-                    return_value[0] += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+                    return_value[0]
+                      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
 
                  return return_value;
               }
@@ -3868,27 +3884,32 @@ namespace FEValuesViews
                     return_value[i] = 0.0;
 
                  if (shape_function_data[shape_function].is_nonzero_shape_function_component[0]) {
-                    return_value[1] += fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
-                    return_value[2] -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+                    return_value[1]
+                      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
+                    return_value[2]
+                      -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
                  }
 
                  if (shape_function_data[shape_function].is_nonzero_shape_function_component[1]) {
-                    return_value[0] -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
-                    return_value[2] += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+                    return_value[0]
+                      -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
+                    return_value[2]
+                      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
                  }
 
                  if (shape_function_data[shape_function].is_nonzero_shape_function_component[2]) {
-                    return_value[0] += fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
-                    return_value[1] -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
+                    return_value[0]
+                      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
+                    return_value[1]
+                      -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
                  }
 
                  return return_value;
               }
            }
         }
-  }
+}
 
-  
   template <int dim, int spacedim>  
   inline
   typename Vector<dim,spacedim>::hessian_type
