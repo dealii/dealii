@@ -960,7 +960,7 @@ namespace TrilinosWrappers
                                         * type. Requires an existing
                                         * Epetra_Map for storing data.
                                         */
-      std::auto_ptr<Epetra_FEVector> vector;
+      std_cxx1x::shared_ptr<Epetra_FEVector> vector;
 
 
                                        /**
@@ -1112,7 +1112,7 @@ namespace TrilinosWrappers
 	    ExcMessage("Vector has not been constructed properly."));
 
     if (fast == false || local_range() != v.local_range())
-      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+      vector = std_cxx1x::shared_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
   }
 
 

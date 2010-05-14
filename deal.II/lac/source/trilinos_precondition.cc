@@ -656,7 +656,7 @@ namespace TrilinosWrappers
 				        // elements.
     vector_distributor.reset (new Epetra_Map(n_rows, 0, communicator));
 
-    if (Matrix==0)
+    if (&*Matrix==0)
       Matrix = std_cxx1x::shared_ptr<SparseMatrix> (new SparseMatrix());
 
     Matrix->reinit (*vector_distributor, *vector_distributor,
@@ -680,7 +680,7 @@ namespace TrilinosWrappers
 
 				// todo: find a way to read out ML's data
 				// sizes
-    if (Matrix != 0)
+    if (&*Matrix != 0)
       memory += Matrix->memory_consumption();
     return memory;
   }

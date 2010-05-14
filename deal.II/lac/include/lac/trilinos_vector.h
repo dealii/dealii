@@ -504,7 +504,7 @@ namespace TrilinosWrappers
 			 const dealii::Vector<number> &v)
     {
       if (&*vector != 0 && vector->Map().SameAs(parallel_partitioner))
-	vector = std::auto_ptr<Epetra_FEVector>
+	vector = std_cxx1x::shared_ptr<Epetra_FEVector>
 	  (new Epetra_FEVector(parallel_partitioner));
 
       const int size = parallel_partitioner.NumMyElements();
@@ -533,7 +533,7 @@ namespace TrilinosWrappers
     {
       if (size() != v.size())
 	{
-	  vector = std::auto_ptr<Epetra_FEVector>
+	  vector = std_cxx1x::shared_ptr<Epetra_FEVector>
 	  (new Epetra_FEVector(Epetra_Map (v.size(), 0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 					   Epetra_MpiComm(MPI_COMM_SELF)
@@ -753,7 +753,7 @@ namespace TrilinosWrappers
   Vector::Vector (const dealii::Vector<number> &v)
   {
     Epetra_LocalMap map ((int)v.size(), 0, Utilities::Trilinos::comm_self());
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     *this = v;
   }
 
@@ -776,11 +776,11 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-	vector.release();
+	vector.reset();
 
 	Epetra_LocalMap map ((int)v.size(), 0,
 			     Utilities::Trilinos::comm_self());
-	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 
     const Epetra_Map & map = vector_partitioner();

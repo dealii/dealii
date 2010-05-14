@@ -57,11 +57,11 @@ namespace TrilinosWrappers
                         last_action (Zero),
 			compressed  (true),
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-			vector(std::auto_ptr<Epetra_FEVector>
+			vector(std_cxx1x::shared_ptr<Epetra_FEVector>
 			  (new Epetra_FEVector(
 				 Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF)))))
 #else
-			vector(std::auto_ptr<Epetra_FEVector>
+			vector(std_cxx1x::shared_ptr<Epetra_FEVector>
                           (new Epetra_FEVector(
 				 Epetra_Map(0,0,Epetra_SerialComm()))))
 #endif
@@ -74,7 +74,7 @@ namespace TrilinosWrappers
 			Subscriptor(),
 			last_action (Zero),
 			compressed (true),
-			vector(std::auto_ptr<Epetra_FEVector>
+			vector(std_cxx1x::shared_ptr<Epetra_FEVector>
 			       (new Epetra_FEVector(*v.vector)))
   {}
 
@@ -99,7 +99,7 @@ namespace TrilinosWrappers
     Epetra_Map map (0, 0, Epetra_SerialComm());
 #endif
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     last_action = Zero;
   }
 
@@ -115,7 +115,7 @@ namespace TrilinosWrappers
       {
 	vector.reset();
 	last_action = Zero;
-	vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+	vector = std_cxx1x::shared_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
       }
     else
       {

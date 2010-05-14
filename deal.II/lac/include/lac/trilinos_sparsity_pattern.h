@@ -1343,7 +1343,7 @@ namespace TrilinosWrappers
 				        * assigns parts of the matrix
 				        * to the individual processes.
 				        */
-      std::auto_ptr<Epetra_Map> column_space_map;
+      std_cxx1x::shared_ptr<Epetra_Map> column_space_map;
 
 				       /**
 					* A boolean variable to hold
@@ -1359,7 +1359,7 @@ namespace TrilinosWrappers
                                         * allows for adding non-local
                                         * elements to the pattern.
                                         */
-      std::auto_ptr<Epetra_FECrsGraph> graph;
+      std_cxx1x::shared_ptr<Epetra_FECrsGraph> graph;
 
       friend class SparsityPatternIterators::const_iterator;
       friend class SparsityPatternIterators::const_iterator::Accessor;

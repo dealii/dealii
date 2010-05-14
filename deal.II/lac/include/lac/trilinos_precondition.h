@@ -158,7 +158,7 @@ namespace TrilinosWrappers
 					* case the matrix needs to be
 					* copied from deal.II format.
 					*/
-      std::auto_ptr<Epetra_Map>   vector_distributor;
+      std_cxx1x::shared_ptr<Epetra_Map>   vector_distributor;
   };
 
 

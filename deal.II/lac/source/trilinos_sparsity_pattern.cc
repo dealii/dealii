@@ -86,9 +86,9 @@ namespace TrilinosWrappers
 		  :
 		  compressed (true)
   {
-    column_space_map = std::auto_ptr<Epetra_Map>
+    column_space_map = std_cxx1x::shared_ptr<Epetra_Map>
       (new Epetra_Map (0, 0, Utilities::Trilinos::comm_self()));
-    graph = std::auto_ptr<Epetra_FECrsGraph>
+    graph = std_cxx1x::shared_ptr<Epetra_FECrsGraph>
       (new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0));
     graph->FillComplete();
   }
@@ -150,10 +150,10 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern (const SparsityPattern &input_sparsity)
   		  :
                   Subscriptor(),
-                  column_space_map (std::auto_ptr<Epetra_Map>
+                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
 				    (new Epetra_Map(0, 0, Utilities::Trilinos::comm_self()))),
                   compressed (false),
-                  graph (std::auto_ptr<Epetra_FECrsGraph>
+                  graph (std_cxx1x::shared_ptr<Epetra_FECrsGraph>
 			 (new Epetra_FECrsGraph(View, *column_space_map,
 						*column_space_map, 0)))
   {
@@ -193,7 +193,7 @@ namespace TrilinosWrappers
 			   const Epetra_Map   &input_col_map,
 			   const unsigned int  n_entries_per_row)
   {
-    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
+    column_space_map = std_cxx1x::shared_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
     graph.reset();
     compressed = false;
 
@@ -208,10 +208,10 @@ namespace TrilinosWrappers
 				   // processor, we can directly assign the
 				   // columns as well.
     if (input_row_map.Comm().NumProc() > 1)
-      graph = std::auto_ptr<Epetra_FECrsGraph>
+      graph = std_cxx1x::shared_ptr<Epetra_FECrsGraph>
 	(new Epetra_FECrsGraph(Copy, input_row_map, n_entries_per_row, false));
     else
-      graph = std::auto_ptr<Epetra_FECrsGraph>
+      graph = std_cxx1x::shared_ptr<Epetra_FECrsGraph>
 	(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
 			       n_entries_per_row, false));
   }
@@ -250,17 +250,17 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (n_entries_per_row.size(),
 				  input_row_map.NumGlobalElements()));
 
-    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
+    column_space_map = std_cxx1x::shared_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
     graph.reset();
     compressed = false;
 
     if (input_row_map.Comm().NumProc() > 1)
-      graph = std::auto_ptr<Epetra_FECrsGraph>
+      graph = std_cxx1x::shared_ptr<Epetra_FECrsGraph>
 	(new Epetra_FECrsGraph(Copy, input_row_map,
 			       n_entries_per_row[input_row_map.MinMyGID()],
 			       false));
     else
-      graph = std::auto_ptr<Epetra_FECrsGraph>
+      graph = std_cxx1x::shared_ptr<Epetra_FECrsGraph>
 	(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
 			       n_entries_per_row[input_row_map.MinMyGID()],
 			       false));
@@ -295,7 +295,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (sp.n_cols(),
 				  input_col_map.NumGlobalElements()));
 
-    column_space_map = std::auto_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
+    column_space_map = std_cxx1x::shared_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
     graph.reset();
     compressed = false;
 
@@ -311,12 +311,12 @@ namespace TrilinosWrappers
       n_entries_per_row[row-input_row_map.MinMyGID()] = sp.row_length(row);
 
     if (input_row_map.Comm().NumProc() > 1)
-      graph = std::auto_ptr<Epetra_FECrsGraph>
+      graph = std_cxx1x::shared_ptr<Epetra_FECrsGraph>
 	(new Epetra_FECrsGraph(Copy, input_row_map,
 			       n_entries_per_row[0],
 			       false));
     else
-      graph = std::auto_ptr<Epetra_FECrsGraph>
+      graph = std_cxx1x::shared_ptr<Epetra_FECrsGraph>
 	(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
 			       n_entries_per_row[0],
 			       false));
@@ -399,9 +399,9 @@ namespace TrilinosWrappers
     column_space_map.reset();
     graph.reset();
 
-     column_space_map = std::auto_ptr<Epetra_Map>
+     column_space_map = std_cxx1x::shared_ptr<Epetra_Map>
        (new Epetra_Map (0, 0, Utilities::Trilinos::comm_self()));
-    graph = std::auto_ptr<Epetra_FECrsGraph>
+    graph = std_cxx1x::shared_ptr<Epetra_FECrsGraph>
       (new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0));
     graph->FillComplete();
 

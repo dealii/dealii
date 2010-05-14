@@ -2225,7 +2225,7 @@ namespace TrilinosWrappers
 				        * assigns parts of the matrix
 				        * to the individual processes.
 				        */
-      std::auto_ptr<Epetra_Map> column_space_map;
+      std_cxx1x::shared_ptr<Epetra_Map> column_space_map;
 
                                        /**
                                         * A sparse matrix object in
@@ -2237,7 +2237,7 @@ namespace TrilinosWrappers
                                         * a sparse matrix, is set in
                                         * the constructor.
                                         */
-      std::auto_ptr<Epetra_FECrsMatrix> matrix;
+      std_cxx1x::shared_ptr<Epetra_FECrsMatrix> matrix;
 
                                        /**
                                         * Trilinos doesn't allow to mix

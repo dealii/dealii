@@ -133,7 +133,7 @@ namespace PETScWrappers
 
                                      // first create a solver object if this
                                      // is necessary
-    if (solver_data == 0)
+    if (&*solver_data == 0)
       {
         solver_data.reset (new SolverData());
 

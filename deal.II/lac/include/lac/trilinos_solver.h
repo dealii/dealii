@@ -219,7 +219,7 @@ namespace TrilinosWrappers
 					* which is passed down to the
 					* Trilinos solver.
 					*/
-      std::auto_ptr<Epetra_LinearProblem> linear_problem;
+      std_cxx1x::shared_ptr<Epetra_LinearProblem> linear_problem;
 
                                        /**
                                         * A structure that contains
@@ -637,14 +637,14 @@ namespace TrilinosWrappers
 					* which is passed down to the
 					* Trilinos solver.
 					*/
-      std::auto_ptr<Epetra_LinearProblem> linear_problem;
+      std_cxx1x::shared_ptr<Epetra_LinearProblem> linear_problem;
 
                                        /**
                                         * A structure that contains
                                         * the Trilinos solver and
                                         * preconditioner objects.
                                         */
-      std::auto_ptr<Amesos_BaseSolver> solver;
+      std_cxx1x::shared_ptr<Amesos_BaseSolver> solver;
 
                                        /**
                                         * Store a copy of the flags for this
