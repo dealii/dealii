@@ -20,7 +20,7 @@
 
 #ifdef DEAL_II_USE_SLEPC
 
-#  include <base/std_cxx1x/shared_ptr.hpp>
+#  include <base/std_cxx1x/shared_ptr.h>
 #  include <lac/exceptions.h>
 #  include <lac/solver_control.h>
 #  include <lac/petsc_matrix_base.h>

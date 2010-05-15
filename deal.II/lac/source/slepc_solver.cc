@@ -53,7 +53,7 @@ namespace SLEPcWrappers
 
   SolverBase::~SolverBase ()
   {
-    if (solver_data != 0)
+    if (&*solver_data != 0)
       solver_data.reset ();
   }
 
@@ -95,7 +95,7 @@ namespace SLEPcWrappers
   {
     int ierr;
 
-    AssertThrow (solver_data == 0, ExcSLEPcWrappersUsageError());
+    AssertThrow (&*solver_data == 0, ExcSLEPcWrappersUsageError());
     solver_data.reset (new SolverData());
 
                                     // create eigensolver context and
@@ -158,7 +158,7 @@ namespace SLEPcWrappers
 #endif
 			     PETScWrappers::VectorBase &vr)
   {
-    AssertThrow (solver_data != 0, ExcSLEPcWrappersUsageError());
+    AssertThrow (&*solver_data != 0, ExcSLEPcWrappersUsageError());
 
                                     // get converged eigenpair
     int ierr = EPSGetEigenpair(solver_data->eps, index,
@@ -170,7 +170,7 @@ namespace SLEPcWrappers
   void
   SolverBase::reset ()
   {
-    AssertThrow (solver_data != 0, ExcSLEPcWrappersUsageError());
+    AssertThrow (&*solver_data != 0, ExcSLEPcWrappersUsageError());
 
                                     // destroy solver object.
     solver_data.reset ();
@@ -179,7 +179,7 @@ namespace SLEPcWrappers
   EPS *
   SolverBase::get_EPS ()
   {
-    if( solver_data == 0 )
+    if( &*solver_data == 0 )
       return NULL;
     return &solver_data->eps;
   }

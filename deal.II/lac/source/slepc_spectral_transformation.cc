@@ -45,7 +45,7 @@ namespace SLEPcWrappers
 
   void TransformationBase::set_context (EPS &eps)
   {
-    AssertThrow (transformation_data == 0,
+    AssertThrow (&*transformation_data == 0,
 		 SolverBase::ExcSLEPcWrappersUsageError());
     transformation_data.reset (new TransformationData());
 
