@@ -34,8 +34,7 @@ namespace TrilinosWrappers
     Vector::Vector ()
     {
       last_action = Zero;
-      vector = std_cxx1x::shared_ptr<Epetra_FEVector>
-	(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())));
+      vector.reset(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())));
     }
 
 
@@ -60,7 +59,7 @@ namespace TrilinosWrappers
                     VectorBase()
     {
       last_action = Zero;
-      vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
+      vector.reset (new Epetra_FEVector(*v.vector));
     }
 
 
@@ -77,10 +76,10 @@ namespace TrilinosWrappers
       last_action = Zero;
 
       if (input_map.SameAs(v.vector->Map()) == true)
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
+	vector.reset (new Epetra_FEVector(*v.vector));
       else
 	{
-	  vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(input_map));
+	  vector.reset (new Epetra_FEVector(input_map));
 	  reinit (v, false, true);
 	}
     }
@@ -99,9 +98,9 @@ namespace TrilinosWrappers
 
       last_action = Zero;
 
-      vector = std_cxx1x::shared_ptr<Epetra_FEVector>
-	(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,
-								    true)));
+      vector.reset (new Epetra_FEVector
+		    (parallel_partitioner.make_trilinos_map(communicator,
+							    true)));
       reinit (v, false, true);
     }
 
@@ -117,7 +116,7 @@ namespace TrilinosWrappers
 		    const bool        fast)
     {
       if (!vector->Map().SameAs(input_map))
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(input_map));
+	vector.reset (new Epetra_FEVector(input_map));
       else if (fast == false)
 	{
 	  const int ierr = vector->PutScalar(0.);
@@ -157,10 +156,7 @@ namespace TrilinosWrappers
         {
 	  if (vector->Map().SameAs(v.vector->Map()) == false)
 	    {
-	      vector.reset();
-
-	      vector = std_cxx1x::shared_ptr<Epetra_FEVector>
-		(new Epetra_FEVector(v.vector->Map()));
+	      vector.reset (new Epetra_FEVector(v.vector->Map()));
 	      last_action = Zero;
 	    }
 	  else if (fast == false)
@@ -245,10 +241,10 @@ namespace TrilinosWrappers
 			  v.block(0).vector_partitioner().Comm());
 
       if (import_data == false)
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector (new_map));
+	vector.reset (new Epetra_FEVector (new_map));
 
-      Teuchos::RCP<Epetra_FEVector> actual_vec = (import_data == true) ? 
-	Teuchos::rcp (new Epetra_FEVector (new_map), true) : 
+      Teuchos::RCP<Epetra_FEVector> actual_vec = (import_data == true) ?
+	Teuchos::rcp (new Epetra_FEVector (new_map), true) :
 	Teuchos::rcp (&*vector, false);
 
       TrilinosScalar* entries = (*actual_vec)[0];
@@ -261,9 +257,9 @@ namespace TrilinosWrappers
 
       if (import_data == true)
         {
-	  AssertThrow (static_cast<unsigned int>(actual_vec->GlobalLength()) 
+	  AssertThrow (static_cast<unsigned int>(actual_vec->GlobalLength())
 		       == v.size(),
-		       ExcDimensionMismatch (actual_vec->GlobalLength(), 
+		       ExcDimensionMismatch (actual_vec->GlobalLength(),
 					     v.size()));
 
 	  Epetra_Import data_exchange (vector->Map(), actual_vec->Map());
@@ -328,9 +324,7 @@ namespace TrilinosWrappers
 	}
       else
 	{
-	  vector.reset();
-	  vector = std_cxx1x::shared_ptr<Epetra_FEVector>
-	                    (new Epetra_FEVector(*v.vector));
+	  vector.reset (new Epetra_FEVector(*v.vector));
 	  last_action = Zero;
 	}
 
@@ -370,7 +364,7 @@ namespace TrilinosWrappers
       if (vector->Map().SameAs(m.col_partitioner()) == false)
 	{
 	  Epetra_Map map = m.col_partitioner();
-	  vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	  vector.reset (new Epetra_FEVector(map));
 	}
 
       Epetra_Import data_exchange (vector->Map(), v.vector->Map());
@@ -390,7 +384,7 @@ namespace TrilinosWrappers
   {
     last_action = Zero;
     Epetra_LocalMap map (0, 0, Utilities::Trilinos::comm_self());
-    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    vector.reset (new Epetra_FEVector(map));
   }
 
 
@@ -399,7 +393,7 @@ namespace TrilinosWrappers
   {
     last_action = Zero;
     Epetra_LocalMap map ((int)n, 0, Utilities::Trilinos::comm_self());
-    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
+    vector.reset (new Epetra_FEVector (map));
   }
 
 
@@ -410,7 +404,7 @@ namespace TrilinosWrappers
     Epetra_LocalMap map (input_map.NumGlobalElements(),
 			 input_map.IndexBase(),
 			 input_map.Comm());
-    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    vector.reset (new Epetra_FEVector(map));
   }
 
 
@@ -427,7 +421,7 @@ namespace TrilinosWrappers
                          Epetra_SerialComm());
     (void)communicator;
 #endif
-    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    vector.reset (new Epetra_FEVector(map));
   }
 
 
@@ -438,7 +432,7 @@ namespace TrilinosWrappers
     Epetra_LocalMap map (v.vector->Map().NumGlobalElements(),
 			 v.vector->Map().IndexBase(),
 			 v.vector->Map().Comm());
-    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    vector.reset (new Epetra_FEVector(map));
 
     if (vector->Map().SameAs(v.vector->Map()) == true)
       {
@@ -458,11 +452,9 @@ namespace TrilinosWrappers
   {
     if (size() != n)
       {
-	vector.reset();
-
 	Epetra_LocalMap map ((int)n, 0,
 			     Utilities::Trilinos::comm_self());
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
+	vector.reset (new Epetra_FEVector (map));
       }
     else if (fast == false)
       {
@@ -485,11 +477,10 @@ namespace TrilinosWrappers
   {
     if (vector->Map().NumGlobalElements() != input_map.NumGlobalElements())
       {
-	vector.reset();
 	Epetra_LocalMap map (input_map.NumGlobalElements(),
 			     input_map.IndexBase(),
 			     input_map.Comm());
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
+	vector.reset (new Epetra_FEVector (map));
       }
     else if (fast == false)
       {
@@ -514,7 +505,6 @@ namespace TrilinosWrappers
     if (vector->Map().NumGlobalElements() !=
 	static_cast<int>(partitioning.size()))
       {
-	vector.reset();
 	Epetra_LocalMap map (partitioning.size(),
 			     0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
@@ -523,7 +513,7 @@ namespace TrilinosWrappers
                              Epetra_SerialComm());
         (void)communicator;
 #endif
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	vector.reset (new Epetra_FEVector(map));
       }
     else if (fast == false)
       {
@@ -556,11 +546,10 @@ namespace TrilinosWrappers
       {
 	if (local_range() != v.local_range())
 	  {
-	    vector.reset();
 	    Epetra_LocalMap map (v.vector->GlobalLength(),
 				 v.vector->Map().IndexBase(),
 				 v.vector->Comm());
-	    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	    vector.reset (new Epetra_FEVector(map));
 	  }
 	else
 	  {
@@ -612,11 +601,10 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-	vector.reset();
 	Epetra_LocalMap map (v.vector->Map().NumGlobalElements(),
 			     v.vector->Map().IndexBase(),
 			     v.vector->Comm());
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	vector.reset (new Epetra_FEVector(map));
       }
 
     reinit (v, false, true);
@@ -633,7 +621,7 @@ namespace TrilinosWrappers
 	Epetra_LocalMap map (v.vector->Map().NumGlobalElements(),
 			     v.vector->Map().IndexBase(),
 			     v.vector->Comm());
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	vector.reset (new Epetra_FEVector(map));
       }
 
     const int ierr = vector->Update(1.0, *v.vector, 0.0);

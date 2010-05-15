@@ -657,7 +657,7 @@ namespace TrilinosWrappers
     vector_distributor.reset (new Epetra_Map(n_rows, 0, communicator));
 
     if (&*Matrix==0)
-      Matrix = std_cxx1x::shared_ptr<SparseMatrix> (new SparseMatrix());
+      Matrix.reset (new SparseMatrix());
 
     Matrix->reinit (*vector_distributor, *vector_distributor,
 		    deal_ii_sparse_matrix, drop_tolerance, true,

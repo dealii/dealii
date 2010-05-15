@@ -18,6 +18,7 @@
 
 #ifdef DEAL_II_USE_TRILINOS
 
+#  include <base/std_cxx1x/shared_ptr.h>
 #  include <base/subscriptor.h>
 #  include <base/index_set.h>
 #  include <lac/full_matrix.h>

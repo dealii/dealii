@@ -20,11 +20,11 @@
 
 #ifdef DEAL_II_USE_SLEPC
 
+#  include <base/std_cxx1x/shared_ptr.hpp>
 #  include <lac/exceptions.h>
 #  include <lac/solver_control.h>
 #  include <lac/petsc_matrix_base.h>
 #  include <lac/slepc_spectral_transformation.h>
-#  include <boost/shared_ptr.hpp>
 
 #  include <petscksp.h>
 #  include <slepceps.h>
@@ -387,7 +387,7 @@ namespace SLEPcWrappers
 	EPS eps;
       };
 
-      boost::shared_ptr<SolverData> solver_data;
+      std_cxx1x::shared_ptr<SolverData> solver_data;
     };
 
 /**

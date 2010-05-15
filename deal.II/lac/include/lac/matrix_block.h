@@ -16,10 +16,10 @@
 #include <base/config.h>
 #include <base/named_data.h>
 #include <base/smartpointer.h>
+#include <base/std_cxx1x/shared_ptr.h>
 #include <lac/block_indices.h>
 #include <lac/full_matrix.h>
 
-#include <boost/shared_ptr.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -341,7 +341,7 @@ class MatrixBlock
  * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <class MATRIX>
-class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX> > >
+class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >
 {
   public:
 				     /**
@@ -383,7 +383,7 @@ class MatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX>
  * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <class MATRIX>
-class MGMatrixBlockVector : public NamedData<boost::shared_ptr<MatrixBlock<MATRIX> > >
+class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >
 {
   public:
 				     /**
@@ -611,8 +611,8 @@ MatrixBlockVector<MATRIX>::add(
   const std::string& name,
   const BlockIndices* block_indices)
 {
-  boost::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column, block_indices));
-  NamedData<boost::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
+  std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column, block_indices));
+  NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
 }
 
 

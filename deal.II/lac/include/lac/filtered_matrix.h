@@ -808,8 +808,7 @@ inline
 void
 FilteredMatrix<VECTOR>::initialize (const MATRIX &m, bool ecs)
 {
-  matrix = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (
-    new_pointer_matrix_base(m, VECTOR()));
+  matrix.reset (new_pointer_matrix_base(m, VECTOR()));
   
   expect_constrained_source = ecs;
 }

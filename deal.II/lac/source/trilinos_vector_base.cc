@@ -57,13 +57,11 @@ namespace TrilinosWrappers
                         last_action (Zero),
 			compressed  (true),
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-			vector(std_cxx1x::shared_ptr<Epetra_FEVector>
-			  (new Epetra_FEVector(
-				 Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF)))))
+			vector(new Epetra_FEVector(
+				 Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF))))
 #else
-			vector(std_cxx1x::shared_ptr<Epetra_FEVector>
-                          (new Epetra_FEVector(
-				 Epetra_Map(0,0,Epetra_SerialComm()))))
+			vector(new Epetra_FEVector(
+				 Epetra_Map(0,0,Epetra_SerialComm())))
 #endif
   {}
 
@@ -74,8 +72,7 @@ namespace TrilinosWrappers
 			Subscriptor(),
 			last_action (Zero),
 			compressed (true),
-			vector(std_cxx1x::shared_ptr<Epetra_FEVector>
-			       (new Epetra_FEVector(*v.vector)))
+			vector(new Epetra_FEVector(*v.vector))
   {}
 
 
@@ -91,15 +88,13 @@ namespace TrilinosWrappers
                                      // When we clear the vector,
 				     // reset the pointer and generate
 				     // an empty vector.
-    vector.reset();
-
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     Epetra_Map map (0, 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
     Epetra_Map map (0, 0, Epetra_SerialComm());
 #endif
 
-    vector = std_cxx1x::shared_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    vector.reset (new Epetra_FEVector(map));
     last_action = Zero;
   }
 
@@ -113,9 +108,8 @@ namespace TrilinosWrappers
 
     if (local_range() != v.local_range())
       {
-	vector.reset();
 	last_action = Zero;
-	vector = std_cxx1x::shared_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+	vector.reset (new Epetra_FEVector(*v.vector));
       }
     else
       {

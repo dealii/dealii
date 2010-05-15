@@ -20,8 +20,8 @@
 
 #ifdef DEAL_II_USE_SLEPC
 
+#  include <base/std_cxx1x/shared_ptr.hpp>
 #  include <lac/exceptions.h>
-#  include <boost/shared_ptr.hpp>
 
 #  include <petscksp.h>
 #  include <slepceps.h>
@@ -96,7 +96,7 @@ namespace SLEPcWrappers
 	ST st;
       };
 
-      boost::shared_ptr<TransformationData> transformation_data;
+      std_cxx1x::shared_ptr<TransformationData> transformation_data;
     };
 
 /**

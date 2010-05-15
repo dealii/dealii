@@ -74,7 +74,7 @@ namespace TrilinosWrappers
                      const PreconditionBase &preconditioner)
   {
     int ierr;
-    
+
     linear_problem.reset();
 
 					// We need an
@@ -82,8 +82,8 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std_cxx1x::shared_ptr<Epetra_LinearProblem> 
-      (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), 
+    linear_problem.reset
+      (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()),
 				&x.trilinos_vector(),
 				const_cast<Epetra_MultiVector*>(&b.trilinos_vector())));
 
@@ -122,12 +122,12 @@ namespace TrilinosWrappers
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 					// ... set some options, ...
-    solver.SetAztecOption (AZ_output, additional_data.output_solver_details ? 
+    solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?
 			              AZ_all : AZ_none);
     solver.SetAztecOption (AZ_conv, AZ_noscaled);
 
 					// ... and then solve!
-    ierr = solver.Iterate (solver_control.max_steps(), 
+    ierr = solver.Iterate (solver_control.max_steps(),
 			   solver_control.tolerance());
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
 
@@ -154,7 +154,7 @@ namespace TrilinosWrappers
                      const PreconditionBase       &preconditioner)
   {
     int ierr;
-    
+
     linear_problem.reset();
 
 				        // In case we call the solver with
@@ -177,9 +177,9 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std_cxx1x::shared_ptr<Epetra_LinearProblem> 
-      (new Epetra_LinearProblem
-       (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), &ep_x, &ep_b));
+    linear_problem.reset (new Epetra_LinearProblem
+			  (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()),
+			   &ep_x, &ep_b));
 
 					// Next we can allocate the
 					// AztecOO solver...
@@ -216,12 +216,12 @@ namespace TrilinosWrappers
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 					// ... set some options, ...
-    solver.SetAztecOption (AZ_output, additional_data.output_solver_details ? 
+    solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?
 			              AZ_all : AZ_none);
     solver.SetAztecOption (AZ_conv, AZ_noscaled);
 
 					// ... and then solve!
-    ierr = solver.Iterate (solver_control.max_steps(), 
+    ierr = solver.Iterate (solver_control.max_steps(),
 			   solver_control.tolerance());
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
 
@@ -238,11 +238,11 @@ namespace TrilinosWrappers
       throw SolverControl::NoConvergence (solver_control.last_step(),
                                           solver_control.last_value());
   }
-  
-    
 
 
-  
+
+
+
 /* ---------------------- SolverCG ------------------------ */
 
   SolverCG::AdditionalData::
@@ -261,7 +261,7 @@ namespace TrilinosWrappers
   {
     solver_name = cg;
   }
-  
+
 
 /* ---------------------- SolverGMRES ------------------------ */
 
@@ -273,8 +273,8 @@ namespace TrilinosWrappers
                   restart_parameter (restart_parameter)
   {}
 
-  
-  
+
+
   SolverGMRES::SolverGMRES (SolverControl        &cn,
                             const AdditionalData &data)
                   :
@@ -284,7 +284,7 @@ namespace TrilinosWrappers
   {
     solver_name = gmres;
   }
-  
+
 
 /* ---------------------- SolverBicgstab ------------------------ */
 
@@ -306,7 +306,7 @@ namespace TrilinosWrappers
     solver_name = bicgstab;
   }
 
-  
+
 /* ---------------------- SolverCGS ------------------------ */
 
   SolverCGS::AdditionalData::
@@ -326,7 +326,7 @@ namespace TrilinosWrappers
   {
     solver_name = cgs;
   }
-  
+
 
 /* ---------------------- SolverTFQMR ------------------------ */
 
@@ -367,12 +367,12 @@ namespace TrilinosWrappers
                   additional_data (data.output_solver_details)
   {}
 
-  
+
 
   SolverDirect::~SolverDirect ()
   {}
 
-  
+
 
   SolverControl &
   SolverDirect::control() const
@@ -390,7 +390,7 @@ namespace TrilinosWrappers
 				       // First set whether we want to print
 				       // the solver information to screen
 				       // or not.
-    ConditionalOStream  verbose_cout (std::cout, 
+    ConditionalOStream  verbose_cout (std::cout,
 				      additional_data.output_solver_details);
 
     linear_problem.reset();
@@ -401,15 +401,14 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std_cxx1x::shared_ptr<Epetra_LinearProblem>
-      (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), 
+    linear_problem.reset
+      (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()),
 				&x.trilinos_vector(),
 				const_cast<Epetra_MultiVector*>(&b.trilinos_vector())));
 
 					// Next we can allocate the
 					// AztecOO solver...
-    solver = std_cxx1x::shared_ptr<Amesos_BaseSolver> (Amesos().Create("Amesos_Klu",
-							       *linear_problem));
+    solver.reset (Amesos().Create("Amesos_Klu", *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     solver->SymbolicFactorization();
@@ -444,7 +443,7 @@ namespace TrilinosWrappers
 				       // First set whether we want to print
 				       // the solver information to screen
 				       // or not.
-    ConditionalOStream  verbose_cout (std::cout, 
+    ConditionalOStream  verbose_cout (std::cout,
 				      additional_data.output_solver_details);
 
     linear_problem.reset();
@@ -468,14 +467,13 @@ namespace TrilinosWrappers
 					// to let the AztecOO solver
 					// know about the matrix and
 					// vectors.
-    linear_problem = std_cxx1x::shared_ptr<Epetra_LinearProblem> 
-      (new Epetra_LinearProblem
-       (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()), &ep_x, &ep_b));
+    linear_problem.reset (new Epetra_LinearProblem
+			  (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()),
+			   &ep_x, &ep_b));
 
 					// Next we can allocate the
 					// AztecOO solver...
-    solver = std_cxx1x::shared_ptr<Amesos_BaseSolver> (Amesos().Create("Amesos_Klu",
-							       *linear_problem));
+    solver.reset (Amesos().Create("Amesos_Klu", *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     solver->SymbolicFactorization();
@@ -499,8 +497,8 @@ namespace TrilinosWrappers
       throw SolverControl::NoConvergence (solver_control.last_step(),
                                           solver_control.last_value());
   }
-  
-    
+
+
 
 
 }

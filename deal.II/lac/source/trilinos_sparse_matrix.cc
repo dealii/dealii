@@ -100,12 +100,10 @@ namespace TrilinosWrappers
 				  // interface.
   SparseMatrix::SparseMatrix ()
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (0, 0,
-						     Utilities::Trilinos::comm_self()))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(View, *column_space_map,
-						  *column_space_map, 0))),
+                  column_space_map (new Epetra_Map (0, 0,
+						     Utilities::Trilinos::comm_self())),
+		  matrix (new Epetra_FECrsMatrix(View, *column_space_map,
+						  *column_space_map, 0)),
 		  last_action (Zero),
 		  compressed (true)
   {
@@ -117,11 +115,9 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix (const Epetra_Map  &input_map,
 			      const unsigned int n_max_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (input_map))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, *column_space_map,
-							int(n_max_entries_per_row), false))),
+                  column_space_map (new Epetra_Map (input_map)),
+		  matrix (new Epetra_FECrsMatrix(Copy, *column_space_map,
+						  int(n_max_entries_per_row), false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -131,12 +127,11 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix (const Epetra_Map                &input_map,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (input_map))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, *column_space_map,
-		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-							false))),
+                  column_space_map (new Epetra_Map (input_map)),
+		  matrix (new Epetra_FECrsMatrix
+			  (Copy, *column_space_map,
+			   (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
+			   false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -147,11 +142,9 @@ namespace TrilinosWrappers
 			      const Epetra_Map  &input_col_map,
 			      const unsigned int n_max_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (input_col_map))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, input_row_map,
-							int(n_max_entries_per_row), false))),
+                  column_space_map (new Epetra_Map (input_col_map)),
+		  matrix (new Epetra_FECrsMatrix(Copy, input_row_map,
+						 int(n_max_entries_per_row), false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -162,12 +155,10 @@ namespace TrilinosWrappers
 			      const Epetra_Map                &input_col_map,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (input_col_map))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, input_row_map,
+                  column_space_map (new Epetra_Map (input_col_map)),
+		  matrix (new Epetra_FECrsMatrix(Copy, input_row_map,
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-							false))),
+						 false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -178,9 +169,8 @@ namespace TrilinosWrappers
 			      const unsigned int n,
 			      const unsigned int n_max_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (n, 0,
-						     Utilities::Trilinos::comm_self()))),
+                  column_space_map (new Epetra_Map (n, 0,
+						    Utilities::Trilinos::comm_self())),
 
 				   // on one processor only, we know how the
 				   // columns of the matrix will be
@@ -190,13 +180,12 @@ namespace TrilinosWrappers
 				   // can't do so in parallel, where the
 				   // information from columns is only
 				   // available when entries have been added
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(Copy,
-						  Epetra_Map (m, 0,
-							      Utilities::Trilinos::comm_self()),
-						  *column_space_map,
-						  n_max_entries_per_row,
-						  false))),
+		  matrix (new Epetra_FECrsMatrix(Copy,
+						 Epetra_Map (m, 0,
+							     Utilities::Trilinos::comm_self()),
+						 *column_space_map,
+						 n_max_entries_per_row,
+						 false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -207,16 +196,14 @@ namespace TrilinosWrappers
 			      const unsigned int               n,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (n, 0,
-						     Utilities::Trilinos::comm_self()))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(Copy,
-						  Epetra_Map (m, 0,
-							      Utilities::Trilinos::comm_self()),
-						  *column_space_map,
+                  column_space_map (new Epetra_Map (n, 0,
+						    Utilities::Trilinos::comm_self())),
+		  matrix (new Epetra_FECrsMatrix(Copy,
+						 Epetra_Map (m, 0,
+							     Utilities::Trilinos::comm_self()),
+						 *column_space_map,
 			   (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-						  false))),
+						 false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -227,14 +214,12 @@ namespace TrilinosWrappers
 			      const MPI_Comm     &communicator,
 			      const unsigned int n_max_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map(parallel_partitioning.
-						    make_trilinos_map(communicator, false)))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(Copy,
-						  *column_space_map,
-						  n_max_entries_per_row,
-						  false))),
+                  column_space_map (new Epetra_Map(parallel_partitioning.
+						   make_trilinos_map(communicator, false))),
+		  matrix (new Epetra_FECrsMatrix(Copy,
+						 *column_space_map,
+						 n_max_entries_per_row,
+						 false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -245,14 +230,12 @@ namespace TrilinosWrappers
 			      const MPI_Comm     &communicator,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map(parallel_partitioning.
-						    make_trilinos_map(communicator, false)))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(Copy,
-						  *column_space_map,
+                  column_space_map (new Epetra_Map(parallel_partitioning.
+						   make_trilinos_map(communicator, false))),
+		  matrix (new Epetra_FECrsMatrix(Copy,
+						 *column_space_map,
 			   (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-						  false))),
+						 false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -264,15 +247,13 @@ namespace TrilinosWrappers
 			      const MPI_Comm     &communicator,
 			      const unsigned int n_max_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map(col_parallel_partitioning.
-						    make_trilinos_map(communicator, false)))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(Copy,
-						  row_parallel_partitioning.
-						  make_trilinos_map(communicator, false),
-						  n_max_entries_per_row,
-						  false))),
+                  column_space_map (new Epetra_Map(col_parallel_partitioning.
+						   make_trilinos_map(communicator, false))),
+		  matrix (new Epetra_FECrsMatrix(Copy,
+						 row_parallel_partitioning.
+						 make_trilinos_map(communicator, false),
+						 n_max_entries_per_row,
+						 false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -284,15 +265,13 @@ namespace TrilinosWrappers
 			      const MPI_Comm     &communicator,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-                  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map(col_parallel_partitioning.
-						    make_trilinos_map(communicator, false)))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(Copy,
-						  row_parallel_partitioning.
-						  make_trilinos_map(communicator, false),
+                  column_space_map (new Epetra_Map(col_parallel_partitioning.
+						   make_trilinos_map(communicator, false))),
+		  matrix (new Epetra_FECrsMatrix(Copy,
+						 row_parallel_partitioning.
+						 make_trilinos_map(communicator, false),
 			   (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-						  false))),
+						 false)),
 		  last_action (Zero),
 		  compressed (false)
   {}
@@ -301,12 +280,10 @@ namespace TrilinosWrappers
 
   SparseMatrix::SparseMatrix (const SparsityPattern &sparsity_pattern)
 		  :
-		  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (sparsity_pattern.domain_partitioner()))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(Copy,
-						  sparsity_pattern.trilinos_sparsity_pattern(),
-						  false))),
+		  column_space_map (new Epetra_Map (sparsity_pattern.domain_partitioner())),
+		  matrix (new Epetra_FECrsMatrix(Copy,
+						 sparsity_pattern.trilinos_sparsity_pattern(),
+						 false)),
 		  last_action (Zero),
 		  compressed (true)
   {
@@ -320,10 +297,8 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix (const SparseMatrix &input_matrix)
 		  :
                   Subscriptor(),
-		  column_space_map (std_cxx1x::shared_ptr<Epetra_Map>
-				    (new Epetra_Map (input_matrix.domain_partitioner()))),
-		  matrix (std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-			  (new Epetra_FECrsMatrix(*input_matrix.matrix))),
+		  column_space_map (new Epetra_Map (input_matrix.domain_partitioner())),
+		  matrix (new Epetra_FECrsMatrix(*input_matrix.matrix)),
 		  last_action (Zero),
 		  compressed (true)
   {}
@@ -347,10 +322,8 @@ namespace TrilinosWrappers
       *matrix = *m.matrix;
     else
       {
-	column_space_map = std_cxx1x::shared_ptr<Epetra_Map>
-	  (new Epetra_Map (m.domain_partitioner()));
-	matrix = std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-	  (new Epetra_FECrsMatrix(*m.matrix));
+	column_space_map.reset (new Epetra_Map (m.domain_partitioner()));
+	matrix.reset (new Epetra_FECrsMatrix(*m.matrix));
       }
 
     compress();
@@ -407,7 +380,7 @@ namespace TrilinosWrappers
 				      sparsity_pattern.n_cols()));
       }
 
-    column_space_map = std_cxx1x::shared_ptr<Epetra_Map> (new Epetra_Map (input_col_map));
+    column_space_map.reset (new Epetra_Map (input_col_map));
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -438,14 +411,13 @@ namespace TrilinosWrappers
 				   // columns as well. Compare this with bug
 				   // # 4123 in the Sandia Bugzilla.
     std_cxx1x::shared_ptr<Epetra_CrsGraph> graph;
+    int * first_row_length = &n_entries_per_row[input_row_map.MinMyGID()];
     if (input_row_map.Comm().NumProc() > 1)
-      graph = std_cxx1x::shared_ptr<Epetra_CrsGraph>
-	(new Epetra_CrsGraph (Copy, input_row_map,
-			      &n_entries_per_row[input_row_map.MinMyGID()], true));
+      graph.reset (new Epetra_CrsGraph (Copy, input_row_map, first_row_length, 
+					true));
     else
-      graph = std_cxx1x::shared_ptr<Epetra_CrsGraph>
-	(new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
-			      &n_entries_per_row[input_row_map.MinMyGID()], true));
+      graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
+					first_row_length, true));
 
 				  // This functions assumes that the
 				  // sparsity pattern sits on all processors
@@ -488,8 +460,7 @@ namespace TrilinosWrappers
 				  sparsity_pattern.n_cols()));
 
 				  // And now finally generate the matrix.
-    matrix =  std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-                       (new Epetra_FECrsMatrix(Copy, *graph, false));
+    matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
 
     last_action = Zero;
 
@@ -521,13 +492,10 @@ namespace TrilinosWrappers
   {
 				   // reinit with a (parallel) Trilinos
 				   // sparsity pattern.
-    matrix.reset();
-
-    column_space_map = std_cxx1x::shared_ptr<Epetra_Map>
-      (new Epetra_Map (sparsity_pattern.domain_partitioner()));
-    matrix = std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-      (new Epetra_FECrsMatrix(Copy, sparsity_pattern.trilinos_sparsity_pattern(),
-			      false));
+    column_space_map.reset (new Epetra_Map 
+			    (sparsity_pattern.domain_partitioner()));
+    matrix.reset (new Epetra_FECrsMatrix
+		  (Copy, sparsity_pattern.trilinos_sparsity_pattern(), false));
     compress();
   }
 
@@ -536,14 +504,10 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const SparseMatrix &sparse_matrix)
   {
-    matrix.reset();
+    column_space_map.reset (new Epetra_Map (sparse_matrix.domain_partitioner()));
 
-    column_space_map = std_cxx1x::shared_ptr<Epetra_Map>
-      (new Epetra_Map (sparse_matrix.domain_partitioner()));
-
-    matrix = std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-      (new Epetra_FECrsMatrix(Copy, sparse_matrix.trilinos_sparsity_pattern(),
-			      false));
+    matrix.reset (new Epetra_FECrsMatrix
+		  (Copy, sparse_matrix.trilinos_sparsity_pattern(), false));
 
     compress();
   }
@@ -623,10 +587,9 @@ namespace TrilinosWrappers
       goto set_matrix_values;
 
     {
-      std_cxx1x::shared_ptr<SparsityPattern> trilinos_sparsity;
-      trilinos_sparsity = std_cxx1x::shared_ptr<SparsityPattern> (new SparsityPattern());
-      trilinos_sparsity->reinit (input_row_map, input_col_map, sparsity_pattern);
-      reinit (*trilinos_sparsity);
+      SparsityPattern trilinos_sparsity;
+      trilinos_sparsity.reinit (input_row_map, input_col_map, sparsity_pattern);
+      reinit (trilinos_sparsity);
     }
 
   set_matrix_values:
@@ -694,18 +657,14 @@ namespace TrilinosWrappers
   SparseMatrix::reinit (const Epetra_CrsMatrix &input_matrix,
 			const bool              copy_values)
   {
-    matrix.reset();
-
     Assert (input_matrix.Filled()==true,
 	    ExcMessage("Input CrsMatrix has not called FillComplete()!"));
 
-    column_space_map = std_cxx1x::shared_ptr<Epetra_Map>
-      (new Epetra_Map (input_matrix.DomainMap()));
+    column_space_map.reset (new Epetra_Map (input_matrix.DomainMap()));
 
     const Epetra_CrsGraph *graph = &input_matrix.Graph();
 
-    matrix = std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-                      (new Epetra_FECrsMatrix(Copy, *graph, false));
+    matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
 
     matrix->FillComplete (*column_space_map, input_matrix.RangeMap(), true);
 
@@ -729,13 +688,9 @@ namespace TrilinosWrappers
 				  // When we clear the matrix, reset
 				  // the pointer and generate an
 				  // empty matrix.
-    matrix.reset();
-    column_space_map.reset();
-
-    column_space_map = std_cxx1x::shared_ptr<Epetra_Map>
-      (new Epetra_Map (0, 0, Utilities::Trilinos::comm_self()));
-    matrix = std_cxx1x::shared_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(View, *column_space_map, 0));
+    column_space_map.reset (new Epetra_Map (0, 0, 
+					    Utilities::Trilinos::comm_self()));
+    matrix.reset (new Epetra_FECrsMatrix(View, *column_space_map, 0));
 
     matrix->FillComplete();
 

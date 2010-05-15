@@ -18,6 +18,7 @@
 
 #ifdef DEAL_II_USE_TRILINOS
 
+#  include <base/std_cxx1x/shared_ptr.h>
 #  include <base/subscriptor.h>
 #  include <lac/exceptions.h>
 #  include <lac/vector.h>
@@ -846,7 +847,7 @@ namespace TrilinosWrappers
 					*  class.
 					*/
       void print (const char* format = 0) const;
-      
+
                                        /**
                                         * Print to a stream. @p
                                         * precision denotes the desired
@@ -1112,7 +1113,7 @@ namespace TrilinosWrappers
 	    ExcMessage("Vector has not been constructed properly."));
 
     if (fast == false || local_range() != v.local_range())
-      vector = std_cxx1x::shared_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+      vector.reset (new Epetra_FEVector(*v.vector));
   }
 
 
@@ -1803,8 +1804,8 @@ namespace TrilinosWrappers
   {
     return static_cast<const Epetra_Map&>(vector->Map());
   }
-  
-  
+
+
 #endif // DOXYGEN
 
 }
