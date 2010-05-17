@@ -105,15 +105,14 @@ namespace MeshWorker
     const bool integrate_interior_face = (face_worker != 0);
     
     dof_info.reset();
+    
+    dof_info.cell.reinit(cell);
+    info.cell.reinit(dof_info.cell);
 				     // Execute this, if cells
 				     // have to be dealt with
 				     // before faces
     if (integrate_cell && cells_first)
-      {
-	dof_info.cell.reinit(cell);
-	info.cell.reinit(dof_info.cell);
-	cell_worker(dof_info.cell, info.cell);
-      }
+      cell_worker(dof_info.cell, info.cell);
 
 				     // Call the callback function in
 				     // the info box to do
@@ -215,11 +214,7 @@ namespace MeshWorker
 				     // Execute this, if faces
 				     // have to be handled first
     if (integrate_cell && !cells_first)
-      {
-	dof_info.cell.reinit(cell);
-	info.cell.reinit(dof_info.cell);
-	cell_worker(dof_info.cell, info.cell);
-      }  
+      cell_worker(dof_info.cell, info.cell);
   }
   
   
@@ -270,7 +265,7 @@ namespace MeshWorker
     
     for (ITERATOR cell = begin; cell != end; ++cell)
       {
-	cell_action(cell, dof_info, info, cell_worker, boundary_worker, face_worker, cells_first, true);
+	cell_action<INFOBOX,DOFINFO,dim,spacedim>(cell, dof_info, info, cell_worker, boundary_worker, face_worker, cells_first, true);
 	dof_info.assemble(assembler);
       }
   }
