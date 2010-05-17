@@ -83,18 +83,20 @@ namespace MeshWorker
  * than its neighbor. If this parameter is <tt>false</tt> these faces
  * are processed from both cells.
  *
- * @author Guido Kanschat, 2010
+ * @ingroup MeshWorker
+ * @author Guido Kanschat
+ * @date 2010
  */
   template<class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
   void cell_action(
     ITERATOR cell,
     DoFInfoBox<dim, DOFINFO>& dof_info,
     INFOBOX& info,
-    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::CellInfo &)> &cell_worker,
-    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, typename INFOBOX::FaceInfo &)> &boundary_worker,
-    const std_cxx1x::function<void (DoFInfo<dim, spacedim>&, DoFInfo<dim, spacedim>&,
-				    typename INFOBOX::FaceInfo &,
-				    typename INFOBOX::FaceInfo &)> &face_worker,
+    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& cell_worker,
+    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& boundary_worker,
+    const std_cxx1x::function<void (DOFINFO&, DOFINFO&,
+				    typename INFOBOX::CellInfo&,
+				    typename INFOBOX::CellInfo&)>& face_worker,
     const bool cells_first,
     const bool unique_faces_only)
   {
@@ -226,12 +228,11 @@ namespace MeshWorker
  * cells in an iterator range, in which cell_action() is called for
  * each cell. Unilaterally refined interior faces are handled
  * automatically by the loop.
- *
- * Most of the work in this loop is done in cell_action(), whic halso
- * reeived most of the parameters of this function. See the
+ * Most of the work in this loop is done in cell_action(), which also
+ * receives most of the parameters of this function. See the
  * documentation there for mor details.
  *
- * If you don't want integration on cells, interior or boundary faces
+ * If you don't want anything to be done on cells, interior or boundary faces
  * to happen, simply pass the Null pointer to one of the function
  * arguments.
  *
@@ -243,11 +244,11 @@ namespace MeshWorker
 	    typename identity<ITERATOR>::type end,
 	    DOFINFO& dinfo,
 	    INFOBOX& info,
-	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo &)> &cell_worker,
-	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::FaceInfo &)> &boundary_worker,
+	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)> &cell_worker,
+	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)> &boundary_worker,
 	    const std_cxx1x::function<void (DOFINFO&, DOFINFO&,
-					    typename INFOBOX::FaceInfo &,
-					    typename INFOBOX::FaceInfo &)> &face_worker,
+					    typename INFOBOX::CellInfo&,
+					    typename INFOBOX::CellInfo&)> &face_worker,
 	    ASSEMBLER &assembler,
 	    bool cells_first = true)
   {

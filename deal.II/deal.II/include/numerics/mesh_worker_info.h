@@ -730,7 +730,7 @@ namespace MeshWorker
 /// The type of the info object for cells
       typedef IntegrationInfo<dim, spacedim> CellInfo;
 
-/// The type of the info objects for faces.
+/// @deprecated The type of the info objects for faces.
       typedef IntegrationInfo<dim, spacedim> FaceInfo;
 
 				       /**
@@ -828,13 +828,13 @@ namespace MeshWorker
 /// The info object for a cell
       CellInfo cell;
 /// The info object for a boundary face
-      FaceInfo boundary;
+      CellInfo boundary;
 /// The info object for a regular interior face, seen from the first cell
-      FaceInfo face;
+      CellInfo face;
 /// The info object for the refined side of an interior face seen from the first cell
-      FaceInfo subface;
+      CellInfo subface;
 /// The info object for an interior face, seen from the other cell
-      FaceInfo neighbor;
+      CellInfo neighbor;
   };
 
 
