@@ -118,7 +118,7 @@ namespace TrilinosWrappers
 					// Introduce the
 					// preconditioner, ...
     ierr = solver.SetPrecOperator (const_cast<Epetra_Operator*>
-				     (&*preconditioner.preconditioner));
+				   (preconditioner.preconditioner.get()));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 					// ... set some options, ...
@@ -212,7 +212,7 @@ namespace TrilinosWrappers
 					// Introduce the
 					// preconditioner, ...
     ierr = solver.SetPrecOperator (const_cast<Epetra_Operator*>
-				     (&*preconditioner.preconditioner));
+				   (preconditioner.preconditioner.get()));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 					// ... set some options, ...

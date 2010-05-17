@@ -245,7 +245,7 @@ namespace TrilinosWrappers
 
       Teuchos::RCP<Epetra_FEVector> actual_vec = (import_data == true) ?
 	Teuchos::rcp (new Epetra_FEVector (new_map), true) :
-	Teuchos::rcp (&*vector, false);
+	Teuchos::rcp (vector.get(), false);
 
       TrilinosScalar* entries = (*actual_vec)[0];
       block_offset = 0;

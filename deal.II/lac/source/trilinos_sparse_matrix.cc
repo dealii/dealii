@@ -413,7 +413,7 @@ namespace TrilinosWrappers
     std_cxx1x::shared_ptr<Epetra_CrsGraph> graph;
     int * first_row_length = &n_entries_per_row[input_row_map.MinMyGID()];
     if (input_row_map.Comm().NumProc() > 1)
-      graph.reset (new Epetra_CrsGraph (Copy, input_row_map, first_row_length, 
+      graph.reset (new Epetra_CrsGraph (Copy, input_row_map, first_row_length,
 					true));
     else
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
@@ -492,7 +492,7 @@ namespace TrilinosWrappers
   {
 				   // reinit with a (parallel) Trilinos
 				   // sparsity pattern.
-    column_space_map.reset (new Epetra_Map 
+    column_space_map.reset (new Epetra_Map
 			    (sparsity_pattern.domain_partitioner()));
     matrix.reset (new Epetra_FECrsMatrix
 		  (Copy, sparsity_pattern.trilinos_sparsity_pattern(), false));
@@ -582,7 +582,7 @@ namespace TrilinosWrappers
       (use_this_sparsity!=0)? *use_this_sparsity :
       dealii_sparse_matrix.get_sparsity_pattern();
 
-    if (&*matrix != 0 && m() == n_rows && 
+    if (matrix.get() != 0 && m() == n_rows &&
 	n_nonzero_elements() == sparsity_pattern.n_nonzero_elements())
       goto set_matrix_values;
 
@@ -688,7 +688,7 @@ namespace TrilinosWrappers
 				  // When we clear the matrix, reset
 				  // the pointer and generate an
 				  // empty matrix.
-    column_space_map.reset (new Epetra_Map (0, 0, 
+    column_space_map.reset (new Epetra_Map (0, 0,
 					    Utilities::Trilinos::comm_self()));
     matrix.reset (new Epetra_FECrsMatrix(View, *column_space_map, 0));
 
@@ -974,13 +974,14 @@ namespace TrilinosWrappers
       Teuchos::RCP<Epetra_CrsMatrix> mod_B;
       if (use_vector == false)
 	{
-	  mod_B = Teuchos::rcp(const_cast<Epetra_CrsMatrix*>(&inputright.trilinos_matrix()),
+	  mod_B = Teuchos::rcp(const_cast<Epetra_CrsMatrix*>
+			       (&inputright.trilinos_matrix()),
 			       false);
 	}
       else
 	{
-	  mod_B = Teuchos::rcp(new Epetra_CrsMatrix (Copy,
-						     inputright.trilinos_sparsity_pattern()),
+	  mod_B = Teuchos::rcp(new Epetra_CrsMatrix
+			       (Copy, inputright.trilinos_sparsity_pattern()),
 			       true);
 	  mod_B->FillComplete(inputright.domain_partitioner(),
 			      inputright.range_partitioner());
@@ -1015,15 +1016,17 @@ namespace TrilinosWrappers
 
       if (transpose_left == false)
 	ML_Operator_WrapEpetraCrsMatrix
-	  (const_cast<Epetra_CrsMatrix*>(&inputleft.trilinos_matrix()),A_,false);
+	  (const_cast<Epetra_CrsMatrix*>(&inputleft.trilinos_matrix()),A_,
+	   false);
       else
 	{
 	  ML_Operator_WrapEpetraCrsMatrix
-	    (const_cast<Epetra_CrsMatrix*>(&inputleft.trilinos_matrix()),Anotrans_,false);
+	    (const_cast<Epetra_CrsMatrix*>(&inputleft.trilinos_matrix()),
+	     Anotrans_,false);
 	  ML_Operator_Transpose_byrow(Anotrans_,A_);
 	}
 
-      ML_Operator_WrapEpetraCrsMatrix(&*mod_B,B_,false);
+      ML_Operator_WrapEpetraCrsMatrix(mod_B.get(),B_,false);
 
 				   // We implement the multiplication by
 				   // hand in a similar way as is done in

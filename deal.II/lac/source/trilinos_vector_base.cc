@@ -103,7 +103,7 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator = (const VectorBase &v)
   {
-    Assert (&*vector != 0,
+    Assert (vector.get() != 0,
 	    ExcMessage("Vector is not constructed properly."));
 
     if (local_range() != v.local_range())

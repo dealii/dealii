@@ -133,7 +133,7 @@ namespace PETScWrappers
 
                                      // first create a solver object if this
                                      // is necessary
-    if (&*solver_data == 0)
+    if (solver_data.get() == 0)
       {
         solver_data.reset (new SolverData());
 
@@ -218,7 +218,7 @@ namespace PETScWrappers
     solver_data.reset ();
   }
 
-  
+
 
   SolverControl &
   SolverBase::control() const

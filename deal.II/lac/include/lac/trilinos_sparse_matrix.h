@@ -3103,7 +3103,7 @@ namespace TrilinosWrappers
 			     const ::dealii::SparsityPattern *use_this_sparsity)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, false);
-    reinit (map, map, sparse_matrix, drop_tolerance, copy_values, 
+    reinit (map, map, sparse_matrix, drop_tolerance, copy_values,
 	    use_this_sparsity);
   }
 

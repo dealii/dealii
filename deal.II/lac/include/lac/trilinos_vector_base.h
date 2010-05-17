@@ -1109,7 +1109,7 @@ namespace TrilinosWrappers
   VectorBase::reinit (const VectorBase &v,
 		      const bool        fast)
   {
-    Assert (&*vector != 0,
+    Assert (vector.get() != 0,
 	    ExcMessage("Vector has not been constructed properly."));
 
     if (fast == false || local_range() != v.local_range())

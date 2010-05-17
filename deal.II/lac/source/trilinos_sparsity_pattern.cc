@@ -398,7 +398,7 @@ namespace TrilinosWrappers
   SparsityPattern::compress ()
   {
     int ierr;
-    Assert (&* column_space_map != 0, ExcInternalError());
+    Assert (column_space_map.get() != 0, ExcInternalError());
     ierr = graph->GlobalAssemble (*column_space_map,
 				  static_cast<const Epetra_Map&>(graph->RangeMap()),
 				  true);
