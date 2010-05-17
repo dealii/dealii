@@ -87,9 +87,7 @@ Functions::SlitSingularityFunction<2> exact_solution;
 				 // interior faces, respectively. All
 				 // the information needed for the
 				 // local integration is provided by
-				 // MeshWorker::IntegrationWorker<dim>::CellInfo
-				 // and
-				 // MeshWorker::IntegrationWorker<dim>::FaceInfo. Note
+				 // MeshWorker::IntegrationWorker<dim>::CellInfo. Note
 				 // that this public interface cannot
 				 // be changed, because it is expected
 				 // by MeshWorker::integration_loop().
@@ -100,11 +98,11 @@ class MatrixIntegrator : public Subscriptor
     static void cell(MeshWorker::DoFInfo<dim>& dinfo,
 		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
     static void bdry(MeshWorker::DoFInfo<dim>& dinfo,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
     static void face(MeshWorker::DoFInfo<dim>& dinfo1,
 		     MeshWorker::DoFInfo<dim>& dinfo2,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info1,
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info2);
 };
 
 
@@ -135,7 +133,7 @@ void MatrixIntegrator<dim>::cell(
 template <int dim>
 void MatrixIntegrator<dim>::bdry(
   MeshWorker::DoFInfo<dim>& dinfo,
-  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
+  typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   FullMatrix<double>& local_matrix = dinfo.matrix(0,false).matrix;
@@ -157,8 +155,8 @@ template <int dim>
 void MatrixIntegrator<dim>::face(
   MeshWorker::DoFInfo<dim>& dinfo1,
   MeshWorker::DoFInfo<dim>& dinfo2,
-  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
+  typename MeshWorker::IntegrationWorker<dim>::CellInfo& info1,
+  typename MeshWorker::IntegrationWorker<dim>::CellInfo& info2)
 {
   const FEValuesBase<dim>& fe1 = info1.fe_values();
   const FEValuesBase<dim>& fe2 = info2.fe_values();
@@ -208,11 +206,11 @@ class RHSIntegrator : public Subscriptor
 {
   public:
     static void cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
-    static void bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
     static void face(MeshWorker::DoFInfo<dim>& dinfo1,
 		     MeshWorker::DoFInfo<dim>& dinfo2,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info1,
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info2);
 };
 
 
@@ -222,7 +220,7 @@ void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>&, typename MeshWorker::In
 
 
 template <int dim>
-void RHSIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
+void RHSIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   Vector<double>& local_vector = dinfo.vector(0).block(0);
@@ -244,8 +242,8 @@ void RHSIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWork
 template <int dim>
 void RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim>&,
 			      MeshWorker::DoFInfo<dim>&,
-			      typename MeshWorker::IntegrationWorker<dim>::FaceInfo&,
-			      typename MeshWorker::IntegrationWorker<dim>::FaceInfo&)
+			      typename MeshWorker::IntegrationWorker<dim>::CellInfo&,
+			      typename MeshWorker::IntegrationWorker<dim>::CellInfo&)
 {}
 
 
@@ -254,11 +252,11 @@ class Estimator : public Subscriptor
 {
   public:
     static void cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
-    static void bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+    static void bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
     static void face(MeshWorker::DoFInfo<dim>& dinfo1,
 		     MeshWorker::DoFInfo<dim>& dinfo2,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info1,
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info2);
 };
 
 
@@ -278,7 +276,7 @@ void Estimator<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::
 
 
 template <int dim>
-void Estimator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
+void Estimator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   
@@ -300,8 +298,8 @@ void Estimator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::
 template <int dim>
 void Estimator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
 			  MeshWorker::DoFInfo<dim>& dinfo2,
-			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-			  typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
+			  typename MeshWorker::IntegrationWorker<dim>::CellInfo& info1,
+			  typename MeshWorker::IntegrationWorker<dim>::CellInfo& info2)
 {
   const FEValuesBase<dim>& fe = info1.fe_values();
   const std::vector<double>& uh1 = info1.values[0][0];
@@ -333,7 +331,6 @@ class Step39
 {
   public:
     typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
-    typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
     
     Step39(const FiniteElement<dim>& fe);
 

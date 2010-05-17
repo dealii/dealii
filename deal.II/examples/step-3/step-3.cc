@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -218,8 +218,7 @@ void LaplaceProblem::make_grid_and_dofs ()
   std::cout << "Number of active cells: "
 	    << triangulation.n_active_cells()
 	    << std::endl;
-                                   // Here, by active we mean the cells on the
-				   // finest level, i.e. cells that aren't
+                                   // Here, by active we mean the cells that aren't
 				   // refined any further.  We stress the
 				   // adjective `active', since there are more
 				   // cells, namely the parent cells of the
@@ -597,8 +596,10 @@ void LaplaceProblem::assemble_system ()
 				       // quadrature points of the
 				       // value of the shape function
 				       // at that point times the
-				       // right hand side function
-				       // (i.e. 1) times the Jacobian
+				       // right hand side function,
+				       // here the constant function
+				       // equal to one,
+				       // times the Jacobian
 				       // determinant times the weight
 				       // of that quadrature point:
       for (unsigned int i=0; i<dofs_per_cell; ++i)

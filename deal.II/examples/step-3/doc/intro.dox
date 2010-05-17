@@ -4,9 +4,9 @@
 
 This is the first example where we actually use finite elements to compute
 something. We 
-will solve a simple version of Laplace's equation with zero boundary
-values, but a nonzero right hand side. This example is still quite
-simple, but it already shows the basic structure of most finite
+will solve a simple version of Poisson's equation with zero boundary
+values, but a nonzero right hand side (here equal to the constant one).
+This example shows the basic structure of most finite
 element programs, which are along the following lines:
 <ul>
   <li> Grid generation;

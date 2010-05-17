@@ -200,8 +200,7 @@ class Step12
 				     // below.
     typedef MeshWorker::DoFInfo<dim> DoFInfo;
     typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
-    typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
-
+    
 				     // The following three functions
 				     // are then the ones that get called
 				     // inside the generic loop over all
@@ -231,9 +230,9 @@ class Step12
 				     // in fact other arguments
 				     // already bound.
     static void integrate_cell_term (DoFInfo& dinfo, CellInfo& info);
-    static void integrate_boundary_term (DoFInfo& dinfo, FaceInfo& info);
+    static void integrate_boundary_term (DoFInfo& dinfo, CellInfo& info);
     static void integrate_face_term (DoFInfo& dinfo1, DoFInfo& dinfo2,
-				     FaceInfo& info1, FaceInfo& info2);
+				     CellInfo& info1, CellInfo& info2);
 };
 
 
@@ -461,7 +460,7 @@ void Step12<dim>::integrate_cell_term (DoFInfo& dinfo, CellInfo& info)
 				 // FESubfaceValues, in order to get access to
 				 // normal vectors.
 template <int dim>
-void Step12<dim>::integrate_boundary_term (DoFInfo& dinfo, FaceInfo& info)
+void Step12<dim>::integrate_boundary_term (DoFInfo& dinfo, CellInfo& info)
 {
   const FEValuesBase<dim>& fe_v = info.fe_values();
   FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
@@ -508,7 +507,7 @@ void Step12<dim>::integrate_boundary_term (DoFInfo& dinfo, FaceInfo& info)
 				 // back and forth.
 template <int dim>
 void Step12<dim>::integrate_face_term (DoFInfo& dinfo1, DoFInfo& dinfo2,
-				       FaceInfo& info1, FaceInfo& info2)
+				       CellInfo& info1, CellInfo& info2)
 {
 				   // For quadrature points, weights,
 				   // etc., we use the
