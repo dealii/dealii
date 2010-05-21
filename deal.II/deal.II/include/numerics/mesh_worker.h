@@ -175,61 +175,6 @@ template<int,int> class MGDoFHandler;
 namespace MeshWorker
 {
 /**
- * Template for a class for the objects doing the actual work on cells
- * and faces.
- *
- * This class can serve as a base class for the actual worker class,
- * since, while we do not use virtual functions, we provide the
- * necessary interface for the mesh loops and the DoFInfo
- * class here. Thus, they do not have to be reprogrammed.
- *
- * In particular, the mesh loops will require data elements
- * #interior_fluxes and #boundary_fluxes to determine whether the
- * loop over faces will be started at all.
- *
- * @author Guido Kanschat, 2009
- */
-  template <int dim>
-  class LocalWorker
-  {
-    public:
-				       /**
-					* Constructor, setting
-					* #interior_fluxes and
-					* #boundary_fluxes to @p
-					* true.
-					*/
-      LocalWorker ();
-
-				       /**
-					* Do the work on a cell.
-					*/
-      void cell(DoFInfo<dim>& cell);
-
-				       /**
-					* Do the work on a boundary face.
-					*/
-      void boundary(DoFInfo<dim>& face);
-
-				       /**
-					* Do the work on an interior face.
-					*/
-      void face(DoFInfo<dim>& face1, DoFInfo<dim>& face2);
-
-				       /**
-					* Computations on interior
-					* faces are necessary.
-					*/
-      bool interior_fluxes;
-
-				       /**
-					* Computations on interior
-					* faces are necessary.
-					*/
-      bool boundary_fluxes;
-  };
-
-/**
  * Worker object for integration of functionals, residuals or matrices.
  *
  * In order to allow for sufficient generality, a few steps have to be
@@ -262,7 +207,7 @@ namespace MeshWorker
  * @author Guido Kanschat, 2009
  */
   template <int dim>
-  class IntegrationWorker : public LocalWorker<dim>
+  class IntegrationWorker
   {
     public:
 				       /**
@@ -397,15 +342,6 @@ namespace MeshWorker
 					*/
       Quadrature<dim-1> face_quadrature;
   };
-
-
-//----------------------------------------------------------------------//
-  template <int dim>
-  inline
-  LocalWorker<dim>::LocalWorker()
-		  :
-		  interior_fluxes(true), boundary_fluxes(true)
-  {}
 }
 
 
