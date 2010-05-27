@@ -457,6 +457,18 @@ namespace PETScWrappers
   }
 
 
+  VectorBase::real_type
+  VectorBase::min ()  const
+  {
+    PetscInt  p;
+    real_type d;
+
+    const int ierr = VecMin (vector, &p, &d);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return d;
+  }
+
 
   VectorBase::real_type
   VectorBase::max ()  const
@@ -469,7 +481,6 @@ namespace PETScWrappers
 
     return d;
   }
-
 
 
   VectorBase &

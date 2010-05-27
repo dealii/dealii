@@ -477,9 +477,16 @@ namespace PETScWrappers
 
                                        /**
                                         * Return vector component with
+                                        * the minimal magnitude.
+                                        */
+      real_type min () const;
+
+                                       /**
+                                        * Return vector component with
                                         * the maximal magnitude.
                                         */
       real_type max () const;
+
 
                                        /**
                                         * Replace every element in a
