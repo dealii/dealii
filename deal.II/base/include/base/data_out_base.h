@@ -1394,7 +1394,7 @@ class DataOutBase
 
 					   /**
 					    * Output in @ref
-					    * SoftwareVTU format.
+					    * SoftwareVTK format.
 					    */
 	  vtu,
 	  
