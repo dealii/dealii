@@ -1707,6 +1707,11 @@ class DataOutBase
  * provisions that allow these components to be output by a single
  * name rather than having to group several scalar fields into a
  * vector later on in the visualization program.
+ *
+ * Some visualization programs, such as ParaView, can read several separate
+ * VTU files to parallelize visualization. In that case, you need a
+ * <code>.pvtu</code> file that describes which VTU files form a group. The
+ * DataOutInterface::write_pvtu() function can generate such a master record.
  */
     template <int dim, int spacedim>
     static void write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
@@ -2225,8 +2230,55 @@ class DataOutInterface : private DataOutBase
 				      * and write it to <tt>out</tt>
 				      * in Vtu (VTK's XML) format. See
 				      * DataOutBase::write_vtu.
+				      *
+				      * Some visualization programs, such as
+				      * ParaView, can read several separate
+				      * VTU files to parallelize
+				      * visualization. In that case, you need
+				      * a <code>.pvtu</code> file that
+				      * describes which VTU files form a
+				      * group. The
+				      * DataOutInterface::write_pvtu()
+				      * function can generate such a master
+				      * record.
 				      */
     void write_vtu (std::ostream &out) const;
+    
+				     /**
+				      * Some visualization programs, such as
+				      * ParaView, can read several separate
+				      * VTU files to parallelize
+				      * visualization. In that case, you need
+				      * a <code>.pvtu</code> file that
+				      * describes which VTU files (written,
+				      * for example, through the write_vtu()
+				      * function) form a group. The current
+				      * function can generate such a master
+				      * record.
+				      *
+				      * The file so written contains a list of
+				      * (scalar or vector) fields whose values
+				      * are described by the individual files
+				      * that comprise the set of parallel VTU
+				      * files along with the names of these
+				      * files. This function gets the names
+				      * and types of fields through the
+				      * get_patches() function of this class
+				      * like all the other write_xxx()
+				      * functions. The second argument to this
+				      * function specifies the names of the
+				      * files that form the parallel set.
+				      *
+				      * @note See DataOutBase::write_vtu for
+				      * writing each piece. Also note that
+				      * only one parallel process needs to
+				      * call the current function, listing the
+				      * names of the files written by all
+				      * parallel processes.
+				      */
+    void write_pvtu_record (std::ostream &out, 
+			    const std::vector<std::string> &piece_names) const;    
+    
 
     				     /**
 				      * Obtain data through get_patches()

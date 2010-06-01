@@ -279,9 +279,11 @@ inconvenience this causes.
 <ol>
   <li><p>New: The DataOutBase class (and all derived classes such as DataOut,
   MatrixOut, etc) can now produce the XML-based version of the VTK file format
-  (the so-called VTU format).
+  (the so-called VTU format). Furthermore, the
+  DataOutInterfaces::write_pvtu_record function can be used to describe a set
+  of parallel VTU files as part of a single visualization set.
   <br>
-  (Scott Miller 2010/05/12)
+  (Scott Miller 2010/06/01)
   </p></li>
 
   <li><p>Changed: The Function::vector_gradient_list function was previously
