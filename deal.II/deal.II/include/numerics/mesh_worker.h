@@ -115,7 +115,7 @@ template<int,int> class MGDoFHandler;
  *   public:
  *     template <int dim, class DOFINFO>
  *     void post_cell(const DoFInfoBox<dim, DOFINFO>&);
- *     
+ *
  *     template <int dim, class DOFINFO>
  *     void post_faces(const DoFInfoBox<dim, DOFINFO>&);
  *
@@ -196,8 +196,8 @@ namespace MeshWorker
  * appropriate values. Otherwise, you can fill the variables
  * #cell_quadrature, #boundary_quadrature and #face_quadrature directly.
  *
- * In order to save time, you can set the variables #boundary_fluxes
- * and #interior_fluxes of the base class to false, thus telling the
+ * In order to save time, you can set the variables boundary_fluxes
+ * and interior_fluxes of the base class to false, thus telling the
  * Meshworker::loop() not to loop over those faces.
  *
  * All the information in here is used to set up IntegrationInfo
