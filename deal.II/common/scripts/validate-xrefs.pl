@@ -58,8 +58,8 @@ foreach $filename (@ARGV)
 	        open IN2, $filename;
 	        $found = 0;
 	        while ( <IN2> ) {
-		    while ( /<a[^>]* name=\"?(.*?)[\s\"]/gi ) {
-		        if ( $1 eq $internal_ref) {
+		    while ( /<a[^>]* (name=|class=\"anchor\" id=)\"?(.*?)[\s\"]/gi ) {
+		        if ( $2 eq $internal_ref) {
 			    print "                    found.\n" if $debug;
 			    $found = 1;
 			    last;
@@ -87,8 +87,8 @@ foreach $filename (@ARGV)
 		open IN2, $external_file;
 		$found = 0;
 		while ( <IN2> ) {
-		    while ( /<a[^>]* name=\"?(.*?)[\s\"]/gi ) {
-			if ( $1 eq $external_ref) {
+		    while ( /<a[^>]* (name=|class=\"anchor\" id=)\"?(.*?)[\s\"]/gi ) {
+			if ( $2 eq $external_ref) {
 			    print "                    found.\n" if $debug;
 			    $found = 1;
 			    last;
