@@ -32,14 +32,14 @@ namespace Algorithms
  * Event is organized as an extensible binary enumerator. Every class
  * can add its own events using assign(). A typical code example is
  *
- * <pre>
+ * @code
  * class A
  * {
  *   static Event event;
  * };
  *
  * Event A::event = Event::assign("Event for A");
- * </pre>
+ * @endcode
  */
   class Event
   {
@@ -61,7 +61,7 @@ namespace Algorithms
 					* the name.
 					*/
 //      static Event find(const std::string& name);
-      
+
 				       /**
 					* Constructor, generating a
 					* clear Event.
@@ -112,7 +112,7 @@ namespace Algorithms
 					*/
       template <class OS>
       static void print_assigned (OS& os);
-      
+
     private:
 				       /**
 					* Sometimes, actions have to
@@ -122,31 +122,49 @@ namespace Algorithms
 					* returns true.
 					*/
       bool all_true;
-      
+
 				       /**
 					* The actual list of events
 					*/
       std::vector<bool> flags;
-      
+
 				       /**
 					* The names of registered events
 					*/
       static std::vector<std::string> names;
   };
 
-/// Events used by library operators  
+/**
+ * Events used by library operators
+ */
   namespace Events
   {
-/// The program has just started and everything should be new
+				     /**
+				      * The program has just started
+				      * and everything should be
+				      * new.
+				      */
     extern const Event initial;
-/// The current derivative leads to slow convergence of Newton's method
+
+				     /**
+				      * The current derivative leads
+				      * to slow convergence of
+				      * Newton's method.
+				      */
     extern const Event bad_derivative;
-/// The time stepping scheme starts a new time step
+
+				     /**
+				      * The time stepping scheme
+				      * starts a new time step.
+				      */
     extern const Event new_time;
-/// The time stepping scheme has changed the time step size
+
+				     /**
+				      * The time stepping scheme has changed the time step size.
+				      */
     extern const Event new_timestep_size;
   }
-  
+
 
 //----------------------------------------------------------------------//
 
@@ -167,14 +185,14 @@ namespace Algorithms
   bool
   Event::test (const Event& event) const
   {
-    
+
 				     // First, test all_true in this
     if (all_true) return true;
-    
+
     const unsigned int n = flags.size();
     const unsigned int m = event.flags.size();
     const unsigned int n_min = std::min(n, m);
-    
+
 				     // Now, if all_true set in the
 				     // other, then all must be true
 				     // in this
@@ -205,15 +223,15 @@ namespace Algorithms
 	return false;
     return true;
   }
-  
 
-  
+
+
   inline
   Event& Event::operator += (const Event& event)
   {
     all_true |= event.all_true;
     if (all_true) return *this;
-    
+
     if (flags.size() < event.flags.size())
       flags.resize(event.flags.size());
     for (unsigned int i=0;i<flags.size();++i)
@@ -221,13 +239,13 @@ namespace Algorithms
 
     return *this;
   }
-  
+
 
   inline
   Event& Event::operator -= (const Event& event)
   {
     if (!event.any()) return *this;
-    
+
     all_true = false;
     if(event.all_true)
       {
@@ -236,15 +254,15 @@ namespace Algorithms
 	  *i = false;
 	return *this;
       }
-    
+
     if (flags.size() < event.flags.size())
       flags.resize(event.flags.size());
     for (unsigned int i=0;i<flags.size();++i)
       if (event.flags[i]) flags[i] = false;
-    
+
     return *this;
   }
-  
+
 
   template <class OS>
   inline
@@ -253,13 +271,13 @@ namespace Algorithms
   {
     if (all_true)
       os << " ALL";
-    
+
     for (unsigned int i=0;i<flags.size();++i)
       if (flags[i])
 	os << ' ' << names[i];
   }
-  
-  
+
+
   template <class OS>
   inline
   void
@@ -268,8 +286,8 @@ namespace Algorithms
     for (unsigned int i=0;i<names.size();++i)
       os << i << '\t' << names[i] << std::endl;
   }
-  
-  
+
+
 				   /**
 				    * Output shift operator for
 				    * events. Calls Event::print().
