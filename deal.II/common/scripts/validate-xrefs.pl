@@ -59,7 +59,8 @@ foreach $filename (@ARGV)
 	        $found = 0;
 	        while ( <IN2> ) {
 		    while ( /<a[^>]* (name=|class=\"anchor\" id=)\"?(.*?)[\s\"]/gi ) {
-		        if ( $2 eq $internal_ref) {
+		        if ( $2 eq $internal_ref)
+			{
 			    print "                    found.\n" if $debug;
 			    $found = 1;
 			    last;
@@ -68,7 +69,10 @@ foreach $filename (@ARGV)
 		}
 
 		die "---Internal reference `$internal_ref' not found in file $filename\n This line is: $this_line.\n"
-		    unless $found;
+		    unless $found
+                            # work around a bug in doxygen 1.6.3:
+			    #   https://bugzilla.gnome.org/show_bug.cgi?id=620372
+                            || ($internal_ref =~ /^index_[:_~]/) ;
 		next;
 	    }
 	    elsif ( $link =~ /^(.*?)#(.*)/ )
@@ -88,7 +92,8 @@ foreach $filename (@ARGV)
 		$found = 0;
 		while ( <IN2> ) {
 		    while ( /<a[^>]* (name=|class=\"anchor\" id=)\"?(.*?)[\s\"]/gi ) {
-			if ( $2 eq $external_ref) {
+			if ( $2 eq $external_ref)
+			{
 			    print "                    found.\n" if $debug;
 			    $found = 1;
 			    last;
@@ -97,7 +102,10 @@ foreach $filename (@ARGV)
 		}
 
 		die "---External reference `$external_file#$external_ref' not found in file $filename\n This line is: $this_line.\n"
-		    unless $found;
+		    unless $found
+                            # work around a bug in doxygen 1.6.3:
+			    #   https://bugzilla.gnome.org/show_bug.cgi?id=620372
+                            || ($external_ref =~ /^index_[:_~]/) ;
 		next;
 	    }
 	    else {
