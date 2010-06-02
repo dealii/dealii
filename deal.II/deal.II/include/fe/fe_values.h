@@ -619,12 +619,12 @@ namespace FEValuesViews
 					* not make any sense. Thus it is not
 					* implemented for <code>spacedim=1</code>.
 					* In 2d the curl is defined as
-					* \begin{equation*}
+					* @f{equation*}
 					* \operatorname{curl}(u):=\frac{du_2}{dx}
 					* -\frac{du_1}{dy},
-					* \end{equation*}
+					* @f}
 					* whereas in 3d it is given by
-					* \begin{equation*}
+					* @f{equation*}
 					* \operatorname{curl}(u):=\left(
 					* \begin{array}{c}
 					* \frac{du_3}{dy}-\frac{du_2}{dz}\\
@@ -632,7 +632,7 @@ namespace FEValuesViews
 					* \frac{du_2}{dx}-\frac{du_1}{dy}
 					* \end{array}
 					* \right).
-					* \end{equation*}
+					* @f}
 					*/
       curl_type
       curl (const unsigned int shape_function,
@@ -3910,7 +3910,7 @@ namespace FEValuesViews
         }
 }
 
-  template <int dim, int spacedim>  
+  template <int dim, int spacedim>
   inline
   typename Vector<dim,spacedim>::hessian_type
   Vector<dim,spacedim>::hessian (const unsigned int shape_function,
