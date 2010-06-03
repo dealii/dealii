@@ -47,10 +47,6 @@ template <int dim, int spacedim> class MappingQ;
  * Future work will involve writing projection--interpolation operators
  * that can interpolate onto the higher order bubble functions.
  *
- * The various constraint, prolongation, and restriction matrices are 
- * now available in all dimensions for all degrees @p p, currently up to 
- * order 19.
- *
  * The constructor of this class takes the degree @p p of this finite
  * element.
  *
