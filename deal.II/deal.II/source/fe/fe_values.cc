@@ -782,7 +782,7 @@ namespace FEValuesViews
            Assert (false, ExcMessage("Computing the curl in 1d is not a useful operation"));
      	   break;
      	}
-     	
+
         case 2: {
            for (unsigned int shape_function = 0;
             shape_function < fe_values.fe->dofs_per_cell; ++shape_function) {
@@ -935,7 +935,7 @@ namespace FEValuesViews
   }
 
 
-  template <int dim, int spacedim>  
+  template <int dim, int spacedim>
   template <class InputVector>
   void
   Vector<dim,spacedim>::
@@ -1280,7 +1280,7 @@ namespace internal
 	    .dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim>::~SymmetricTensor();
 #else
 	  typedef dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim> SymmetricTensorView;
-	  symmetric_second_order_tensors[component].SymmetricTensorView::~SymmetricTensor();
+	  symmetric_second_order_tensors[component].SymmetricTensorView::~SymmetricTensorView();
 #endif
 	  new (&symmetric_second_order_tensors[component])
 	    dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim > (fe_values,
