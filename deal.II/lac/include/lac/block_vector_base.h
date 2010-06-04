@@ -24,6 +24,7 @@
 #include <vector>
 #include <iterator>
 #include <cmath>
+#include <cstddef>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -55,7 +56,7 @@ namespace internal
     };
 
 
-  
+
                                      /**
                                       * Declaration of a specialized
                                       * template of a structure which is
@@ -103,7 +104,7 @@ namespace internal
     };
 
 
-  
+
                                      /**
                                       * Declaration of a specialized
                                       * template of a structure which is
@@ -217,12 +218,12 @@ namespace internal
                                       */
     template <class BlockVectorType, bool constness>
     class Iterator :
-#ifdef HAVE_STD_ITERATOR_CLASS  
+#ifdef HAVE_STD_ITERATOR_CLASS
         public std::iterator<std::random_access_iterator_tag,
                              typename Types<BlockVectorType,constness>::value_type>
 #else
     random_access_iterator<typename Types<BlockVectorType,constness>::value_type,int>
-#endif      
+#endif
     {
       private:
                                          /**
@@ -246,7 +247,7 @@ namespace internal
         typedef
         typename Types<BlockVectorType,constness>::value_type
         value_type;
-	
+
                                          /**
                                           * Declare some typedefs which
                                           * are standard for iterators
@@ -256,14 +257,14 @@ namespace internal
                                           * they work on.
                                           */
         typedef std::random_access_iterator_tag               iterator_type;
-        typedef ptrdiff_t                                     difference_type;
+        typedef std::ptrdiff_t                                difference_type;
         typedef typename BlockVectorType::reference           reference;
         typedef value_type                                   *pointer;
 
         typedef
         typename Types<BlockVectorType,constness>::dereference_type
         dereference_type;
-        
+
                                          /**
                                           * Typedef the type of the
                                           * block vector (which differs
@@ -291,7 +292,7 @@ namespace internal
                                           */
         Iterator (BlockVector    &parent,
                   const unsigned int  global_index);
-	
+
                                          /**
                                           * Copy constructor.
                                           */
@@ -323,9 +324,9 @@ namespace internal
                   const unsigned int  index_within_block,
                   const unsigned int  next_break_forward,
                   const unsigned int  next_break_backward);
-      
+
       public:
-      
+
                                          /**
                                           * Copy operator.
                                           */
@@ -348,7 +349,7 @@ namespace internal
                                           * presently pointed to.
                                           */
         dereference_type operator [] (const difference_type d) const;
-      
+
                                          /**
                                           * Prefix increment operator. This
                                           * operator advances the iterator to
@@ -394,7 +395,7 @@ namespace internal
                                           * exception.
                                           */
         bool operator == (const Iterator &i) const;
-      
+
                                          /**
                                           * Same, but compare with an
                                           * iterator of different
@@ -417,7 +418,7 @@ namespace internal
                                           * iterator of different
                                           * constness.
                                           */
-        bool operator != (const InverseConstnessIterator &i) const;      
+        bool operator != (const InverseConstnessIterator &i) const;
 
                                          /**
                                           * Check whether this
@@ -437,7 +438,7 @@ namespace internal
                                           * iterator of different
                                           * constness.
                                           */
-        bool operator < (const InverseConstnessIterator &i) const;      
+        bool operator < (const InverseConstnessIterator &i) const;
 
                                          /**
                                           * Comparison operator alike
@@ -450,7 +451,7 @@ namespace internal
                                           * iterator of different
                                           * constness.
                                           */
-        bool operator <= (const InverseConstnessIterator &i) const;      
+        bool operator <= (const InverseConstnessIterator &i) const;
 
                                          /**
                                           * Comparison operator alike
@@ -463,7 +464,7 @@ namespace internal
                                           * iterator of different
                                           * constness.
                                           */
-        bool operator > (const InverseConstnessIterator &i) const;      
+        bool operator > (const InverseConstnessIterator &i) const;
 
                                          /**
                                           * Comparison operator alike
@@ -497,7 +498,7 @@ namespace internal
                                           * in front of the present one.
                                           */
         Iterator operator + (const difference_type &d) const;
-      
+
                                          /**
                                           * Return an iterator which is
                                           * the given number of elements
@@ -518,10 +519,10 @@ namespace internal
                                           * and return the result.
                                           */
         Iterator & operator -= (const difference_type &d);
-      
+
 					 /** @addtogroup Exceptions
 					  * @{ */
-	
+
                                          /**
                                           * Exception.
                                           */
@@ -530,7 +531,7 @@ namespace internal
                                           * Exception.
                                           */
         DeclException0 (ExcCastingAwayConstness);
-					 //@}	
+					 //@}
       private:
                                          /**
                                           * Pointer to the block
@@ -585,7 +586,7 @@ namespace internal
                                           */
         void move_backward ();
 
-      
+
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
                                          /**
                                           * Mark all other instances of
@@ -634,7 +635,7 @@ namespace internal
  * operators and reinit() functions of derived classes are responsible. This
  * class only handles the common part that is independent of the actual vector
  * type the block vector is built on.
- * 
+ *
  *
  * <h3>Accessing individual blocks, and resizing vectors</h3>
  *
@@ -661,7 +662,7 @@ class BlockVectorBase : public Subscriptor
                                       * vector.
                                       */
     typedef VectorType BlockType;
-    
+
 				     /*
 				      * Declare standard types used in
 				      * all containers. These types
@@ -702,7 +703,7 @@ class BlockVectorBase : public Subscriptor
 				      * norms.
 				      */
     typedef typename BlockType::real_type real_type;
-    
+
                                      /**
                                       * Default constructor.
                                       */
@@ -720,7 +721,7 @@ class BlockVectorBase : public Subscriptor
 				      * size.
 				      */
     void collect_sizes ();
-    
+
                                      /**
                                       * Call the compress() function on all
                                       * the subblocks of the matrix.
@@ -732,7 +733,7 @@ class BlockVectorBase : public Subscriptor
 				      */
     BlockType &
     block (const unsigned int i);
-    
+
 				     /**
 				      * Read-only access to a single block.
 				      */
@@ -750,13 +751,13 @@ class BlockVectorBase : public Subscriptor
 				      * versions
 				      */
     const BlockIndices &
-    get_block_indices () const;    
+    get_block_indices () const;
 
 				     /**
 				      * Number of blocks.
 				      */
     unsigned int n_blocks () const;
-  
+
   				     /**
   				      * Return dimension of the vector. This
   				      * is the sum of the dimensions of all
@@ -776,7 +777,7 @@ class BlockVectorBase : public Subscriptor
 				      * constant block vector.
 				      */
     const_iterator begin () const;
-    
+
 				     /**
 				      * Return an iterator pointing to
 				      * the element past the end.
@@ -788,13 +789,13 @@ class BlockVectorBase : public Subscriptor
 				      * the element past the end of a
 				      * constant block vector.
 				      */
-    const_iterator end () const;    
+    const_iterator end () const;
 
 				     /**
 				      * Access components, returns U(i).
 				      */
     value_type operator() (const unsigned int i) const;
-    
+
 				     /**
 				      * Access components, returns U(i)
 				      * as a writeable reference.
@@ -829,7 +830,7 @@ class BlockVectorBase : public Subscriptor
                                       */
     BlockVectorBase &
     operator = (const VectorType &v);
-    
+
                                      /**
                                       * Check for equality of two block vector
                                       * types. This operation is only allowed
@@ -839,7 +840,7 @@ class BlockVectorBase : public Subscriptor
     template <class VectorType2>
     bool
     operator == (const BlockVectorBase<VectorType2> &v) const;
-    
+
     				     /**
 				      * $U = U * V$: scalar product.
 				      */
@@ -885,7 +886,7 @@ class BlockVectorBase : public Subscriptor
 				      * some time.
 				      */
     bool all_zero () const;
-    
+
                                      /**
                                       * Return @p true if the vector has no
                                       * negative entries, i.e. all entries are
@@ -955,39 +956,39 @@ class BlockVectorBase : public Subscriptor
 				      * vector.
 				      */
     void add (const value_type s);
-    
+
 				     /**
 				      * U+=V.
 				      * Simple vector addition, equal to the
 				      * <tt>operator +=</tt>.
 				      */
     void add (const BlockVectorBase& V);
-    
+
 				     /**
 				      * U+=a*V.
 				      * Simple addition of a scaled vector.
 				      */
     void add (const value_type a, const BlockVectorBase& V);
-    
+
 				     /**
 				      * U+=a*V+b*W.
 				      * Multiple addition of scaled vectors.
 				      */
     void add (const value_type a, const BlockVectorBase& V,
 	      const value_type b, const BlockVectorBase& W);
-    
+
 				     /**
 				      * U=s*U+V.
 				      * Scaling and simple vector addition.
 				      */
     void sadd (const value_type s, const BlockVectorBase& V);
-    
+
 				     /**
 				      * U=s*U+a*V.
 				      * Scaling and simple addition.
 				      */
     void sadd (const value_type s, const value_type a, const BlockVectorBase& V);
-    
+
 				     /**
 				      * U=s*U+a*V+b*W.
 				      * Scaling and multiple addition.
@@ -995,16 +996,16 @@ class BlockVectorBase : public Subscriptor
     void sadd (const value_type s, const value_type a,
 	       const BlockVectorBase& V,
 	       const value_type b, const BlockVectorBase& W);
-    
+
 				     /**
 				      * U=s*U+a*V+b*W+c*X.
 				      * Scaling and multiple addition.
 				      */
     void sadd (const value_type s, const value_type a,
 	       const BlockVectorBase& V,
-	       const value_type b, const BlockVectorBase& W, 
+	       const value_type b, const BlockVectorBase& W,
 	       const value_type c, const BlockVectorBase& X);
-    
+
 				     /**
 				      * Scale each element of the
 				      * vector by a constant
@@ -1018,7 +1019,7 @@ class BlockVectorBase : public Subscriptor
 				      * given value.
 				      */
     BlockVectorBase & operator /= (const value_type factor);
-    
+
 				     /**
 				      * Multiply each element of this
 				      * vector by the corresponding
@@ -1026,13 +1027,13 @@ class BlockVectorBase : public Subscriptor
 				      */
     template <class BlockVector2>
     void scale (const BlockVector2 &v);
-    
+
 				     /**
 				      *  U=a*V. Assignment.
 				      */
     template <class BlockVector2>
     void equ (const value_type a, const BlockVector2 &V);
-    
+
 				     /**
 				      * U=a*V+b*W.
 				      * Replacing by sum.
@@ -1046,7 +1047,7 @@ class BlockVectorBase : public Subscriptor
 				      * of this object.
 				      */
     unsigned int memory_consumption () const;
-      
+
   protected:
 				     /**
 				      * Pointer to the array of components.
@@ -1073,7 +1074,7 @@ class BlockVectorBase : public Subscriptor
     friend class iterator;
     friend class const_iterator;
 #endif
-    
+
     template <typename> friend class BlockVectorBase;
 };
 
@@ -1123,7 +1124,7 @@ namespace internal
                                        // constness. disallow this
       Assert (constness==true, ExcCastingAwayConstness());
     }
-  
+
 
 
     template <class BlockVectorType, bool constness>
@@ -1144,7 +1145,7 @@ namespace internal
                     next_break_backward (next_break_backward)
     {
     }
-  
+
 
 
     template <class BlockVectorType, bool constness>
@@ -1188,7 +1189,7 @@ namespace internal
       if ((global_index+d >= next_break_backward) &&
           (global_index+d <= next_break_forward))
         return parent->block(current_block)(index_within_block + d);
-    
+
                                        // if the index is not within the
                                        // block of the block vector into
                                        // which we presently point, then
@@ -1270,7 +1271,7 @@ namespace internal
 
       return (global_index == i.global_index);
     }
-  
+
 
 
     template <class BlockVectorType, bool constness>
@@ -1296,7 +1297,7 @@ namespace internal
 
       return (global_index != i.global_index);
     }
-  
+
 
 
     template <class BlockVectorType, bool constness>
@@ -1387,7 +1388,7 @@ namespace internal
 
       return (global_index >= i.global_index);
     }
-  
+
 
 
     template <class BlockVectorType, bool constness>
@@ -1556,7 +1557,7 @@ namespace internal
             indices = parent.block_indices.global_to_local(global_index);
           current_block      = indices.first;
           index_within_block = indices.second;
-	
+
           next_break_backward
             = parent.block_indices.local_to_global (current_block, 0);
           next_break_forward
@@ -1575,7 +1576,7 @@ namespace internal
         };
     }
 
-  
+
 
     template <class BlockVectorType, bool constness>
     void
@@ -1605,7 +1606,7 @@ namespace internal
                                              // away
             next_break_forward = numbers::invalid_unsigned_int;
         };
-  
+
       ++global_index;
     }
 
@@ -1624,11 +1625,11 @@ namespace internal
                                              // between blocks:
             --current_block;
             index_within_block = parent->block_indices.block_size(current_block)-1;
-	
+
                                              // break forwards is now old
                                              // break backward
             next_break_forward = next_break_backward-1;
-	
+
                                              // compute new break forward
             next_break_backward
               -= parent->block_indices.block_size (current_block);
@@ -1642,11 +1643,11 @@ namespace internal
             next_break_forward = 0;
             next_break_backward = 0;
           };
-  
+
       --global_index;
     }
 
-    
+
   } // namespace BlockVectorIterators
 
 } //namespace internal
@@ -1809,11 +1810,11 @@ operator * (const BlockVectorBase<VectorType>& v) const
 {
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   value_type sum = 0.;
   for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i]*v.components[i];
-    
+
   return sum;
 }
 
@@ -1825,7 +1826,7 @@ BlockVectorBase<VectorType>::norm_sqr () const
   real_type sum = 0.;
   for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i].norm_sqr();
-    
+
   return sum;
 }
 
@@ -1838,7 +1839,7 @@ BlockVectorBase<VectorType>::mean_value () const
   value_type sum = 0.;
   for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i].mean_value() * components[i].size();
-  
+
   return sum/size();
 }
 
@@ -1851,7 +1852,7 @@ BlockVectorBase<VectorType>::l1_norm () const
   real_type sum = 0.;
   for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i].l1_norm();
-    
+
   return sum;
 }
 
@@ -1898,14 +1899,14 @@ BlockVectorBase<VectorType>::operator -= (const BlockVectorBase<VectorType>& v)
 {
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i] -= v.components[i];
     }
   return *this;
 }
- 
+
 
 
 template <class VectorType>
@@ -1955,7 +1956,7 @@ BlockVectorBase<VectorType>::add (const unsigned int  n_indices,
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a)
 {
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   for (unsigned int i=0;i<n_blocks();++i)
@@ -1971,7 +1972,7 @@ void BlockVectorBase<VectorType>::add (const BlockVectorBase<VectorType>& v)
 {
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].add(v.components[i]);
@@ -1985,12 +1986,12 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType>& v)
 {
 
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].add(a, v.components[i]);
@@ -2006,17 +2007,17 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType>& w)
 {
 
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b), 
+  Assert (numbers::is_finite(b),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
-  
-  
+
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].add(a, v.components[i], b, w.components[i]);
@@ -2030,12 +2031,12 @@ void BlockVectorBase<VectorType>::sadd (const value_type x,
                                         const BlockVectorBase<VectorType>& v)
 {
 
-  Assert (numbers::is_finite(x), 
+  Assert (numbers::is_finite(x),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, v.components[i]);
@@ -2049,14 +2050,14 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType>& v)
 {
 
-  Assert (numbers::is_finite(x), 
+  Assert (numbers::is_finite(x),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, a, v.components[i]);
@@ -2072,18 +2073,18 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType>& w)
 {
 
-  Assert (numbers::is_finite(x), 
+  Assert (numbers::is_finite(x),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b), 
+  Assert (numbers::is_finite(b),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, a, v.components[i], b, w.components[i]);
@@ -2101,22 +2102,22 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType>& y)
 {
 
-  Assert (numbers::is_finite(x), 
+  Assert (numbers::is_finite(x),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b), 
+  Assert (numbers::is_finite(b),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(c), 
+  Assert (numbers::is_finite(c),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));  
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
   Assert (n_blocks() == y.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), y.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, a, v.components[i],
@@ -2145,16 +2146,16 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
                                        const BlockVectorBase<VectorType>& w)
 {
 
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b), 
+  Assert (numbers::is_finite(b),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));  
-  
+	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].equ( a, v.components[i], b, w.components[i]);
@@ -2181,12 +2182,12 @@ void BlockVectorBase<VectorType>::equ (const value_type    a,
                                        const BlockVector2 &v)
 {
 
-  Assert (numbers::is_finite(a), 
+  Assert (numbers::is_finite(a),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     components[i].equ( a, v.components[i]);
 }
@@ -2198,12 +2199,12 @@ BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const value_type s)
 {
 
-  Assert (numbers::is_finite(s), 
+  Assert (numbers::is_finite(s),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] = s;
-    
+
   return *this;
 }
 
@@ -2214,7 +2215,7 @@ BlockVectorBase<VectorType>::operator = (const BlockVectorBase<VectorType>& v)
 {
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] = v.components[i];
 
@@ -2229,10 +2230,10 @@ BlockVectorBase<VectorType>::operator = (const BlockVectorBase<VectorType2> &v)
 {
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] = v.components[i];
-  
+
   return *this;
 }
 
@@ -2264,7 +2265,7 @@ operator == (const BlockVectorBase<VectorType2> &v) const
 {
   Assert (block_indices == v.block_indices,
           ExcDifferentBlockIndices());
-  
+
   for (unsigned int i=0;i<n_blocks();++i)
     if ( ! (components[i] == v.components[i]))
       return false;
@@ -2280,7 +2281,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator *= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   for (unsigned int i=0;i<n_blocks();++i)
@@ -2297,7 +2298,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator /= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor),
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
   Assert (factor > 0., ExcZero() );
 
