@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2370,7 +2370,7 @@ number SparseMatrix<number>::operator () (const unsigned int i,
 					  const unsigned int j) const
 {
   Assert (cols != 0, ExcNotInitialized());
-  AssertThrow (cols->operator()(i,j) != SparsityPattern::invalid_entry,
+  Assert (cols->operator()(i,j) != SparsityPattern::invalid_entry,
                ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
 }
