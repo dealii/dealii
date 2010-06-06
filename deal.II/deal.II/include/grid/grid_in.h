@@ -30,13 +30,13 @@ class SubCellData;
 
 
 /**
- * This class implements an input mechanism for grid data. It allows to
- * read a grid structure into a triangulation object. At present, UCD
- * (unstructured cell data), DB Mesh, XDA, Gmsh, Tecplot, NetCDF and Cubit
- * are supported as input format for grid data. Any numerical data after
- * the block of topological information is ignored. Notice also that at
- * the moment in the codimension 1 case only UCD and Gmsh format are
- * accepted.
+ * This class implements an input mechanism for grid data. It allows to read a
+ * grid structure into a triangulation object. At present, UCD (unstructured
+ * cell data), DB Mesh, XDA, Gmsh, Tecplot, NetCDF and Cubit are supported as
+ * input format for grid data. Any numerical data after the block of geometric
+ * (vertex locations) and topological (how vertices form cells) information is
+ * ignored. Notice also that at the moment in the codimension 1 case only UCD
+ * and Gmsh format are accepted.
  *
  * Since the coarse mesh fed into a @p Triangulation object cannot
  * have hanging nodes, strange things will happen if the input file
