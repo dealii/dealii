@@ -224,6 +224,24 @@ class IndexSet
     IndexSet get_view (const unsigned int begin,
 		       const unsigned int end) const;
 
+
+				     /**
+				      * Removes all elements contained in @p
+				      * other from this set. In other words,
+				      * if $x$ is the current object and $o$
+				      * the argument, then we compute $x
+				      * \leftarrow x \backslash o$.
+				      */
+    void subtract_set (const IndexSet & other);
+
+
+				     /**
+				      * Fills the given vector with all
+				      * indices contained in this IndexSet.
+				      */
+    void fill_index_vector(std::vector<unsigned int> & indices) const;
+
+
 				     /**
 				      * Outputs a text representation of this
 				      * IndexSet to the given stream. Used for

@@ -33,6 +33,69 @@ DEAL_II_NAMESPACE_OPEN
  *@{
  */
 
+template <typename> class BlockVectorBase;
+
+
+/**
+ * A class that can be used to determine whether a given type is a block
+ * vector type or not. For example,
+ * @code
+ *   IsBlockVector<Vector<double> >::value
+ * @endcode
+ * has the value false, whereas
+ * @code
+ *   IsBlockVector<BlockVector<double> >::value
+ * @endcode
+ * is true. This is sometimes useful in template contexts where we may
+ * want to do things differently depending on whether a template type
+ * denotes a regular or a block vector type.
+ *
+ * @author Wolfgang Bangerth, 2010
+ */
+template <typename VectorType>
+struct IsBlockVector
+{
+  private:
+    struct yes_type { char c[1]; };
+    struct no_type  { char c[2]; };
+
+				     /**
+				      * Overload returning true if the class
+				      * is derived from BlockVectorBase,
+				      * which is what block vectors do.
+				      */
+    template <typename T>
+    static yes_type check_for_block_vector (const BlockVectorBase<T> *);
+
+				     /**
+				      * Catch all for all other potential
+				      * vector types that are not block
+				      * matrices.
+				      */
+    static no_type check_for_block_vector (...);
+
+  public:
+				     /**
+				      * A statically computable value that
+				      * indicates whether the template
+				      * argument to this class is a block
+				      * vector (in fact whether the type is
+				      * derived from BlockVectorBase<T>).
+				      */
+    static const bool value = (sizeof(check_for_block_vector
+				      ((VectorType*)0))
+			       ==
+			       sizeof(yes_type));
+};
+
+
+// instantiation of the static member
+template <typename VectorType>
+const bool IsBlockVector<VectorType>::value;
+
+
+
+
 namespace internal
 {
 

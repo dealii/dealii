@@ -18,6 +18,13 @@
 
 #include <algorithm>
 
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#include <base/utilities.h>
+#include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_set_sparsity_pattern.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
+#endif
+
 #ifdef DEAL_II_USE_METIS
 // This is sorta stupid. what we really would like to do here is this:
 //   extern "C" {
@@ -406,6 +413,149 @@ namespace SparsityTools
 	    (next_free_number == sparsity.n_rows()),
 	    ExcInternalError());
   }
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  template <class CSP_t>
+  void distribute_sparsity_pattern(CSP_t & csp,
+				   const std::vector<unsigned int> & rows_per_cpu,
+				   const MPI_Comm & mpi_comm,
+				   const IndexSet & myrange)
+  {
+    unsigned int myid = Utilities::System::get_this_mpi_process(mpi_comm);
+    std::vector<unsigned int> start_index(rows_per_cpu.size()+1);
+    start_index[0]=0;
+    for (unsigned int i=0;i<rows_per_cpu.size();++i)
+      start_index[i+1]=start_index[i]+rows_per_cpu[i];
+
+    typedef std::map<unsigned int, std::vector<unsigned int> > map_vec_t;
+
+    map_vec_t send_data;
+
+    {
+      unsigned int dest_cpu=0;
+
+      unsigned int n_local_rel_rows = myrange.n_elements();
+      for (unsigned int row_idx=0;row_idx<n_local_rel_rows;++row_idx)
+	{
+	  unsigned int row=myrange.nth_index_in_set(row_idx);
+
+					   //calculate destination CPU
+	  while (row>=start_index[dest_cpu+1])
+	    ++dest_cpu;
+
+					   //skip myself
+	  if (dest_cpu==myid)
+	    {
+	      row_idx+=rows_per_cpu[myid]-1;
+	      continue;
 }
+
+	  unsigned int rlen = csp.row_length(row);
+
+					   //skip empty lines
+	  if (!rlen)
+	    continue;
+
+					   //save entries
+	  std::vector<unsigned int> & dst = send_data[dest_cpu];
+
+	  dst.push_back(rlen); // number of entries
+	  dst.push_back(row); // row index
+	  for (unsigned int c=0; c<rlen; ++c)
+	    {
+					       //columns
+	      unsigned int column = csp.column_number(row, c);
+	      dst.push_back(column);
+	    }
+	}
+
+    }
+
+    unsigned int num_receive=0;
+    {
+      std::vector<unsigned int> send_to;
+      send_to.reserve(send_data.size());
+      for (map_vec_t::iterator it=send_data.begin();it!=send_data.end();++it)
+	  send_to.push_back(it->first);
+
+      num_receive =
+	Utilities::System::
+	compute_point_to_point_communication_pattern(mpi_comm, send_to).size();
+    }
+
+    std::vector<MPI_Request> requests(send_data.size());
+
+
+				     // send data
+    {
+      unsigned int idx=0;
+      for (map_vec_t::iterator it=send_data.begin();it!=send_data.end();++it, ++idx)
+	MPI_Isend(&(it->second[0]),
+		  it->second.size(),
+		  MPI_INT,
+		  it->first,
+		  124,
+		  mpi_comm,
+		  &requests[idx]);
+    }
+
+    {
+				       //receive
+      std::vector<unsigned int> recv_buf;
+      for (unsigned int index=0;index<num_receive;++index)
+	{
+	  MPI_Status status;
+	  int len;
+	  MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
+	  Assert (status.MPI_TAG==124, ExcInternalError());
+
+	  MPI_Get_count(&status, MPI_BYTE, &len);
+	  Assert( len%sizeof(unsigned int)==0, ExcInternalError());
+
+	  recv_buf.resize(len/sizeof(unsigned int));
+
+	  MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
+		   status.MPI_TAG, mpi_comm, &status);
+
+	  unsigned int *ptr=&recv_buf[0];
+	  unsigned int *end=&*(--recv_buf.end());
+	  while (ptr<end)
+	    {
+	      unsigned int num=*(ptr++);
+	      unsigned int row=*(ptr++);
+	      for (unsigned int c=0;c<num;++c)
+		{
+		  csp.add(row, *ptr);
+		  ptr++;
+		}
+	    }
+	  Assert(ptr-1==end, ExcInternalError());
+
+	}
+    }
+
+				     // complete all sends, so that we can
+				     // safely destroy the buffers.
+    MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+
+  }
+#endif
+}
+
+
+//explicit instantiations
+
+#define SPARSITY_FUNCTIONS(SparsityType) \
+template void SparsityTools::distribute_sparsity_pattern<SparsityType> (SparsityType & csp, \
+const std::vector<unsigned int> & rows_per_cpu,\
+const MPI_Comm & mpi_comm,\
+const IndexSet & myrange)
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+SPARSITY_FUNCTIONS(CompressedSparsityPattern);
+SPARSITY_FUNCTIONS(CompressedSimpleSparsityPattern);
+#endif
+
+#undef SPARSITY_FUNCTIONS
 
 DEAL_II_NAMESPACE_CLOSE

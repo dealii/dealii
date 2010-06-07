@@ -25,6 +25,7 @@
 #  include <utility>
 
 #  include <petscvec.h>
+#  include <base/index_set.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -657,6 +658,14 @@ namespace PETScWrappers
                   const VectorBase &b);
 
                                        /**
+					* Updates the ghost values of this
+					* vector. This is necessary after any
+					* modification before reading ghost
+					* values.
+					*/
+      void update_ghost_values() const;
+
+                                       /**
                                         * Print to a
                                         * stream. @p precision denotes
                                         * the desired precision with
@@ -728,6 +737,23 @@ namespace PETScWrappers
                                         */
       Vec vector;
 
+				       /**
+					* Denotes if this vector has ghost
+					* indices associated with it. This
+					* means that at least one of the
+					* processes in a parallel programm has
+					* at least one ghost index.
+					*/
+      bool ghosted;
+
+                                       /**
+					* This vector contains the global
+					* indices of the ghost values. The
+					* location in this vector denotes the
+					* local numbering, which is used in
+					* PETSc.
+					*/
+      IndexSet ghost_indices;
 
                                        /**
                                         * PETSc doesn't allow to mix additions
@@ -783,6 +809,8 @@ namespace PETScWrappers
 				 const unsigned int *indices,
 				 const PetscScalar  *values,
 				 const bool add_values);
+
+
   };
 
 

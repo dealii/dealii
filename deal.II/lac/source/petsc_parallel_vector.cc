@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,6 +65,28 @@ namespace PETScWrappers
 
   
 
+    Vector::Vector (const MPI_Comm     &communicator,
+		    const IndexSet &  local,
+		    const IndexSet & ghost)
+                    :
+                    communicator (communicator)
+    {
+      Assert(local.is_contiguous(), ExcNotImplemented());
+      
+      IndexSet ghost_set = ghost;
+      ghost_set.subtract_set(local);
+      
+				       //possible optmization: figure out if
+				       //there are ghost indices (collective
+				       //operation!) and then create a
+				       //non-ghosted vector.
+//      Vector::create_vector (local.size(), local.n_elements());
+      
+      Vector::create_vector(local.size(), local.n_elements(), ghost_set);    
+    }
+    
+
+
     void
     Vector::reinit (const MPI_Comm    &comm,
                     const unsigned int n,
@@ -115,6 +137,23 @@ namespace PETScWrappers
     }
 
 
+
+    void
+    Vector::reinit (const MPI_Comm     &comm,
+		    const IndexSet &  local,
+		    const IndexSet & ghost)
+    {
+      communicator = comm;
+
+      Assert(local.is_contiguous(), ExcNotImplemented());
+      
+      IndexSet ghost_set = ghost;
+      ghost_set.subtract_set(local);
+
+      create_vector(local.size(), local.n_elements(), ghost_set); 
+    }
+
+	
 
     Vector &
     Vector::operator = (const PETScWrappers::Vector &v)
@@ -169,7 +208,74 @@ namespace PETScWrappers
 	      ExcDimensionMismatch (size(), n));
     }
 
+
+    
+    void
+    Vector::create_vector (const unsigned int  n,
+                           const unsigned int  local_size,
+			   const IndexSet & ghostnodes)
+    {
+      Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
+      ghosted = true;
+      ghost_indices = ghostnodes;
+      
+				       //64bit indices won't work yet:
+      Assert (sizeof(unsigned int)==sizeof(PetscInt), ExcInternalError());
+
+      
+      std::vector<unsigned int> ghostindices;
+      ghostnodes.fill_index_vector(ghostindices);
+      
+      const PetscInt * ptr= (const PetscInt*)(&(ghostindices[0]));
+
+      int ierr
+	= VecCreateGhost(communicator,
+			 local_size,
+			 PETSC_DETERMINE,
+			 ghostindices.size(),
+			 ptr,
+			 &vector);
+      
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      Assert (size() == n,
+	      ExcDimensionMismatch (size(), n));
+
+#if DEBUG
+				       // test ghost allocation in debug mode
+
+#ifdef PETSC_USE_64BIT_INDICES
+      PetscInt
+#else
+	int
+#endif
+	begin, end;
+
+      ierr = VecGetOwnershipRange (vector, &begin, &end);
+
+      Assert(local_size==(unsigned int)(end-begin), ExcInternalError());
+
+      Vec l;
+      ierr = VecGhostGetLocalForm(vector, &l);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      PetscInt lsize;
+      ierr = VecGetSize(l, &lsize);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+	      
+      ierr = VecGhostRestoreLocalForm(vector, &l);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      
+      Assert( lsize==end-begin+(PetscInt)ghost_indices.n_elements() ,ExcInternalError());
+
+#endif
+
+      
   }
+
+    
+
+}
 
 }
 

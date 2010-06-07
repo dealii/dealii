@@ -37,13 +37,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/**
- * A namespace in which we define a few algorithms that can run in parallel
- * when deal.II is configured to use multiple threads.
- *
- * @ingroup threads
- * @author Wolfgang Bangerth, 2008, 2009
- */
 namespace parallel
 {
   namespace internal

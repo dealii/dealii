@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -302,6 +302,13 @@ namespace PETScWrappers
         }
       const unsigned int
         local_row_end = local_row_start + local_rows_per_process[this_process];
+
+#if DEAL_II_PETSC_VERSION_LT(2,3,3)
+				       //old version to create the matrix, we
+				       //can skip calculating the row length
+				       //at least starting from 2.3.3 (tested,
+				       //see below)
+
       const unsigned int
         local_col_end = local_col_start + local_columns_per_process[this_process];
 
@@ -345,6 +352,27 @@ namespace PETScWrappers
                           &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+#else //PETSC_VERSION>=2.3.3
+				       // new version to create the matrix. We
+				       // do not set row length but set the
+				       // correct SparsityPattern later.
+      int ierr;
+      
+      ierr = MatCreate(communicator,&matrix);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      
+      ierr = MatSetSizes(matrix,
+			 local_rows_per_process[this_process],
+			 local_columns_per_process[this_process],
+			 sparsity_pattern.n_rows(),
+			 sparsity_pattern.n_cols());
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      
+      ierr = MatSetType(matrix,MATMPIAIJ);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+#endif
+      
+      
                                        // next preset the exact given matrix
                                        // entries with zeros, if the user
                                        // requested so. this doesn't avoid any
@@ -422,13 +450,24 @@ namespace PETScWrappers
                                            // now copy over the information
                                            // from the sparsity pattern.
           {
-            unsigned int index=0;
+#ifdef PETSC_USE_64BIT_INDICES
+	    PetscInt
+#else
+	    int
+#endif
+	      * ptr = & colnums_in_window[0];
+	      
             for (unsigned int i=local_row_start; i<local_row_end; ++i)
-              for (unsigned int j=0; j<sparsity_pattern.row_length(i);
-                   ++j, ++index)
-              colnums_in_window[index] = sparsity_pattern.column_number(i,j);
-            Assert (index == colnums_in_window.size()-1, ExcInternalError());
+	      {
+		typename SparsityType::row_iterator
+		  row_start = sparsity_pattern.row_begin(i),
+		  row_end = sparsity_pattern.row_end(i);
+
+		std::copy(row_start, row_end, ptr);
+		ptr += row_end - row_start;
           }
+	  }
+
 
                                            // then call the petsc function
                                            // that summarily allocates these
@@ -438,6 +477,10 @@ namespace PETScWrappers
                                         &colnums_in_window[0],
                                         0);
 
+#if DEAL_II_PETSC_VERSION_LT(2,3,3)
+					   // this is only needed for old
+					   // PETSc versions:
+	  
                                            // for some reason, it does not
                                            // seem to be possible to force
                                            // actual allocation of actual
@@ -479,23 +522,34 @@ namespace PETScWrappers
                                            // set the dummy entries set above
                                            // back to zero
           *this = 0;
+#endif // version <=2.3.3
           compress ();
 
 #endif
 
-				           // Now we won't insert any
-				           // further entries, so PETSc can
-				           // internally optimize some data
-				           // structures.
+				           // Tell PETSc that we are not
+				           // planning on adding new entries
+				           // to the matrix. Generate errors
+				           // in debugmode.
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
-          const int ierr =
-	    MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
-#else
-          const int ierr =
-	    MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
-#endif
-
+          int ierr;
+#ifdef DEBUG
+	  ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
 	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+#else
+	  ierr = MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+#endif
+#else
+          int ierr;
+#ifdef DEBUG
+	  ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+#else
+	  ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+#endif
+#endif
         }
     }
 

@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -516,6 +516,74 @@ namespace Utilities
     }
 
 
+    std::vector<unsigned int>
+    compute_point_to_point_communication_pattern (const MPI_Comm & mpi_comm,
+						  const std::vector<unsigned int> & destinations)
+    {
+      unsigned int myid = Utilities::System::get_this_mpi_process(mpi_comm);
+      unsigned int n_procs = Utilities::System::get_n_mpi_processes(mpi_comm);
+
+      for (unsigned int i=0; i<destinations.size(); ++i)
+	{
+	  Assert (destinations[i] < n_procs,
+		  ExcIndexRange (destinations[i], 0, n_procs));
+	  Assert (destinations[i] != myid,
+		  ExcMessage ("There is no point in communicating with ourselves."));
+	}
+
+
+				       // let all processors
+				       // communicate the maximal
+				       // number of destinations they
+				       // have
+      unsigned int my_n_destinations = destinations.size();
+      unsigned int max_n_destinations = 0;
+
+      MPI_Allreduce (&my_n_destinations, &max_n_destinations, 1, MPI_UNSIGNED,
+		    MPI_MAX, mpi_comm);
+
+				       // now that we know the number
+				       // of data packets every
+				       // processor wants to send, set
+				       // up a buffer with the maximal
+				       // size and copy our
+				       // destinations in there,
+				       // padded with -1's
+      std::vector<unsigned int> my_destinations(max_n_destinations,
+						numbers::invalid_unsigned_int);
+      std::copy (destinations.begin(), destinations.end(),
+		 my_destinations.begin());
+
+				       // now exchange these (we could
+				       // communicate less data if we
+				       // used MPI_Allgatherv, but
+				       // we'd have to communicate
+				       // my_n_destinations to all
+				       // processors in this case,
+				       // which is more expensive than
+				       // the reduction operation
+				       // above in MPI_Allreduce)
+      std::vector<unsigned int> all_destinations (max_n_destinations * n_procs);
+      MPI_Allgather (&my_destinations[0], max_n_destinations, MPI_UNSIGNED,
+		     &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
+		     mpi_comm);
+
+				       // now we know who is going to
+				       // communicate with
+				       // whom. collect who is going
+				       // to communicate with us!
+      std::vector<unsigned int> origins;
+      for (unsigned int i=0; i<n_procs; ++i)
+	for (unsigned int j=0; j<max_n_destinations; ++j)
+	  if (all_destinations[i*max_n_destinations + j] == myid)
+	    origins.push_back (i);
+	  else if (all_destinations[i*max_n_destinations + j] ==
+		   numbers::invalid_unsigned_int)
+	    break;
+
+      return origins;
+    }
+
 #else
 
     bool job_supports_mpi ()
@@ -742,16 +810,28 @@ namespace Utilities
     duplicate_map (const Epetra_BlockMap &map,
 		   const Epetra_Comm     &comm)
     {
-				       // assume that each processor stores a
-				       // contiguous range of elements in the
-				       // following constructor call
-      Assert (map.LinearMap() == true,
-	      ExcNotImplemented());
-      return
-	Epetra_Map (map.NumGlobalElements(),
-		    map.NumMyElements(),
-		    map.IndexBase(),
-		    comm);
+      if (map.LinearMap() == true)
+	{
+					   // each processor stores a
+					   // contiguous range of
+					   // elements in the
+					   // following constructor
+					   // call
+	  return Epetra_Map (map.NumGlobalElements(),
+			     map.NumMyElements(),
+			     map.IndexBase(),
+			     comm);
+	}
+      else
+	{
+					   // the range is not
+					   // contiguous
+	  return Epetra_Map (map.NumGlobalElements(),
+			     map.NumMyElements(),
+			     map.MyGlobalElements (),
+			     0,
+			     comm);
+	}
     }
   }
 

@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,7 @@
 
 
 #include <base/index_set.h>
+#include <list>
 
 #ifdef DEAL_II_USE_TRILINOS
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
@@ -75,6 +76,8 @@ IndexSet::do_compress () const
        i != ranges.end();
        ++i)
     {
+      Assert(i->begin < i->end, ExcInternalError());
+
       i->nth_index_in_set = next_index;
       next_index += (i->end - i->begin);
     }
@@ -197,6 +200,103 @@ IndexSet::get_view (const unsigned int begin,
 }
 
 
+void
+IndexSet::subtract_set (const IndexSet & other)
+{
+  compress();
+  other.compress();
+  is_compressed = false;
+
+
+				   // we save new ranges to be added to our
+				   // IndexSet in an temporary list and add
+				   // all of them in one go at the end. This
+				   // is necessary because a growing ranges
+				   // vector invalidates iterators.
+  std::list<Range> temp_list;
+
+  std::vector<Range>::iterator own_it = ranges.begin();
+  std::vector<Range>::iterator other_it = other.ranges.begin();
+
+  while (own_it != ranges.end() && other_it != other.ranges.end())
+    {
+				       //advance own iterator until we get an
+				       //overlap
+      if (own_it->end <= other_it->begin)
+	{
+	  ++own_it;
+	  continue;
+	}
+				       //we are done with other_it, so advance
+      if (own_it->begin >= other_it->end)
+	{
+	  ++other_it;
+	  continue;
+	}
+
+				       //Now own_it and other_it overlap.
+				       //First save the part of own_it that is
+				       //before other_it (if not empty).
+      if (own_it->begin < other_it->begin)
+	{
+	  Range r(own_it->begin, other_it->begin);
+	  r.nth_index_in_set = 0; //fix warning of unused variable
+	  temp_list.push_back(r);
+	}
+				       // change own_it to the sub range
+				       // behind other_it. Do not delete
+				       // own_it in any case. As removal would
+				       // invalidate iterators, we just shrink
+				       // the range to an empty one.
+      own_it->begin = other_it->end;
+      if (own_it->begin > own_it->end)
+	{
+	  own_it->begin = own_it->end;
+	  ++own_it;
+	}
+
+				       // continue without advancing
+				       // iterators, the right one will be
+				       // advanced next.
+    }
+
+				   // Now delete all empty ranges we might
+				   // have created.
+  for (std::vector<Range>::iterator it = ranges.begin();
+       it != ranges.end(); )
+    {
+      if (it->begin >= it->end)
+	it = ranges.erase(it);
+      else
+	++it;
+    }
+
+				   // done, now add the temporary ranges
+  for (std::list<Range>::iterator it = temp_list.begin();
+       it != temp_list.end();
+       ++it)
+    add_range(it->begin, it->end);
+
+  compress();
+}
+
+
+void IndexSet::fill_index_vector(std::vector<unsigned int> & indices) const
+{
+  compress();
+
+  indices.clear();
+  indices.reserve(n_elements());
+
+  for (std::vector<Range>::iterator it = ranges.begin();
+       it != ranges.end();
+       ++it)
+    for (unsigned int i=it->begin; i<it->end; ++i)
+      indices.push_back (i);
+
+  Assert (indices.size() == n_elements(), ExcInternalError());
+}
+
 
 #ifdef DEAL_II_USE_TRILINOS
 
@@ -217,19 +317,14 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 #endif
   else
     {
-      std::vector<int> indices;
-      indices.reserve(n_elements());
-      for (std::vector<Range>::iterator
-	     i = ranges.begin();
-	   i != ranges.end();
-	   ++i)
-	for (unsigned int j=i->begin; j<i->end; ++j)
-	  indices.push_back (j);
-      Assert (indices.size() == n_elements(), ExcInternalError());
+      std::vector<unsigned int> indices;
+      fill_index_vector(indices);
+
+      int * indices_ptr = reinterpret_cast<int*>(&indices[0]);
 
       return Epetra_Map (-1,
 			 n_elements(),
-			 &indices[0],
+			 indices_ptr,
 			 0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 			 Epetra_MpiComm(communicator));
@@ -242,6 +337,5 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 
 
 #endif
-
 
 DEAL_II_NAMESPACE_CLOSE

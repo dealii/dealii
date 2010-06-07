@@ -344,15 +344,28 @@ class ConstraintMatrix : public Subscriptor
     ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
 
 				     /**
-				      * Reinit the ConstraintMatrix
-				      * object. This function is only relevant
-				      * in the distributed case, to supply a
-				      * different IndexSet. Otherwise this
-				      * routine is equivalent to calling
-				      * clear().
+				      * Reinit the ConstraintMatrix object and
+				      * supply an IndexSet with lines that may
+				      * be constrained. This function is only
+				      * relevant in the distributed case, to
+				      * supply a different IndexSet. Otherwise
+				      * this routine is equivalent to calling
+				      * clear(). Normally an IndexSet with all
+				      * locally_active_dofs should be supplied
+				      * here.
 				      */
     void reinit (const IndexSet & local_constraints = IndexSet());
 
+				     /**
+				      * Determines if we can store a
+				      * constraint for the given @p
+				      * line_index. This routine only matters
+				      * in the distributed case and checks if
+				      * the IndexSet allows storage of this
+				      * line. Always returns true if not in
+				      * the distributed case.
+				      */
+    bool can_store_line(unsigned int line_index) const;
 
 				     /**
 				      * This function copies the content of @p
@@ -2093,7 +2106,9 @@ void ConstraintMatrix::
 	    lines[lines_cache[calculate_line_index(*local_indices_begin)]];
 	  for (unsigned int j=0; j<position.entries.size(); ++j)
 	    {
-	      Assert (is_constrained(position.entries[j].first) == false,
+	      Assert (!(!local_lines.size()
+			|| local_lines.is_element(position.entries[j].first))
+		      || is_constrained(position.entries[j].first) == false,
 		      ExcMessage ("Tried to distribute to a fixed dof."));
 	      global_vector(position.entries[j].first)
 		+= *local_vector_begin * position.entries[j].second;
@@ -2149,6 +2164,13 @@ ConstraintMatrix::calculate_line_index (const unsigned int line) const
 
   return local_lines.index_within_set(line);
 }
+
+inline bool
+ConstraintMatrix::can_store_line(unsigned int line_index) const
+{
+  return !local_lines.size() || local_lines.is_element(line_index);
+}
+
 
 
 DEAL_II_NAMESPACE_CLOSE

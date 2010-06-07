@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,7 @@
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #include <mpi.h>
+#include <base/utilities.h>
 #endif
 
 #include <string>
@@ -89,11 +90,89 @@ class Timer
 				      *
 				      * Starts the timer at 0 sec.
 				      *
+				      * If @p sync_wall_time is true, the wall
+				      * time is synchronized between all CPUs
+				      * using a MPI_Barrier() and a collective
+				      * operation. Note that this only works
+				      * if you stop() the timer before
+				      * querying for the wall time. The time
+				      * for the MPI operations are not
+				      * included in the timing but may slow
+				      * down your program.
+				      *
 				      * This constructor is only available
 				      * if the deal.II compiler is an MPI
 				      * compiler.
 				      */
-    Timer (MPI_Comm mpi_communicator);
+    Timer (MPI_Comm mpi_communicator,
+	   bool sync_wall_time = false);
+
+
+				     /**
+				      * Structure to save collective data
+				      * measured by this timer class. Queried
+				      * by get_data() or printed with
+				      * print_data() after calling stop().
+				      */
+    struct TimeMinMaxAvg
+    {
+	double sum;
+	double min;
+	double max;
+	unsigned int min_index;
+	unsigned int max_index;
+	double avg;
+
+					 /**
+					  * Set the time values to @p
+					  * val, and the MPI rank to
+					  * the given @p rank.
+					  */
+	void set(const double val,
+		 const unsigned int rank)
+	  {
+	    sum = min = max = val;
+	    min_index = max_index = rank;
+	  }
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+					 /**
+					  * Given two structures
+					  * indicating timer
+					  * information, do the
+					  * reduction by choosing the
+					  * one with the longer time
+					  * interval. This is a max
+					  * operation and therefore a
+					  * reduction.
+					  *
+					  * Arguments are passed as
+					  * void pointers to satisfy
+					  * the MPI requirement of
+					  * reduction operations.
+					  */
+	static void max_reduce ( const void * in_lhs_,
+				 void * inout_rhs_,
+				 int * len,
+				 MPI_Datatype * );
+#endif
+    };
+
+				     /**
+				      * Returns a reference to the data
+				      * structure with global timing
+				      * information. Filled after calling
+				      * stop().
+				      */
+    const TimeMinMaxAvg & get_data() const;
+
+				     /**
+				      * Prints the data to the given stream.
+				      */
+    template <class STREAM>
+    void print_data(STREAM & stream) const;
+
+
 #endif
 
 				     /**
@@ -200,6 +279,14 @@ class Timer
 				      * running.
 				      */
     MPI_Comm            mpi_communicator;
+
+				     /**
+				      * Store whether the wall time is
+				      * synchronized between machines.
+				      */
+    bool sync_wall_time;
+
+    TimeMinMaxAvg mpi_data;
 #endif
 };
 
@@ -333,6 +420,10 @@ class TimerOutput
 		 ConditionalOStream        &stream,
 		 const enum OutputFrequency output_frequency,
 		 const enum OutputType      output_type);
+
+
+
+
 #endif
 
 				     /**
@@ -471,6 +562,27 @@ class TimerOutput
 
 
 /* ---------------- inline functions ----------------- */
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+
+const Timer::TimeMinMaxAvg & Timer::get_data() const
+{
+  return mpi_data;
+}
+
+template <class STREAM>
+void Timer::print_data(STREAM & stream) const
+{
+  unsigned int my_id = dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
+  if (my_id==0)
+    stream << mpi_data.max << " wall,"
+	   << " max @" << mpi_data.max_index
+	   << ", min=" << mpi_data.min << " @" << mpi_data.min_index
+	   << ", avg=" << mpi_data.avg
+	   << std::endl;
+}
+
+#endif
 
 inline
 void

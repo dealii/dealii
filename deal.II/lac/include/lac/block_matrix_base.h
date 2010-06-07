@@ -97,7 +97,7 @@ struct IsBlockMatrix
 				      * indicates whether the template
 				      * argument to this class is a block
 				      * matrix (in fact whether the type is
-				      * derived from BlockMatrix<T>).
+				      * derived from BlockMatrixBase<T>).
 				      */
     static const bool value = (sizeof(check_for_block_matrix
 				      ((MatrixType*)0))

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,11 @@
 #include <base/exceptions.h>
 
 #include <vector>
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#include <mpi.h>
+#include <base/index_set.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -190,6 +195,33 @@ namespace SparsityTools
 			 std::vector<unsigned int> &new_indices,
 			 const std::vector<unsigned int> &starting_indices = std::vector<unsigned int>());
 
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+				   /**
+				    * Communciate rows in a compressed
+				    * sparsity pattern over MPI. The @param
+				    * csp is modified inline. All entries in
+				    * rows that belong to a different
+				    * processor are send to them and added
+				    * there. The ownership is determined by
+				    * parameter @param rows_per_cpu. The
+				    * IndexSet @param myrange should be the
+				    * one used in the constructor of the
+				    * CompressedSimpleSparsityPattern. All
+				    * rows contained in @param myrange are
+				    * checked in @param csp.  This function
+				    * needs to be used with
+				    * PETScWrappers::MPI::SparseMatrix for it
+				    * to work correctly.
+				    */
+  template <class CSP_t>
+  void distribute_sparsity_pattern(CSP_t & csp,
+				   const std::vector<unsigned int> & rows_per_cpu,
+				   const MPI_Comm & mpi_comm,
+				   const IndexSet & myrange);
+#endif
+
+  
 				   /**
 				    * Exception
 				    */

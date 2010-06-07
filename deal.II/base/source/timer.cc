@@ -14,10 +14,12 @@
 
 #include <base/timer.h>
 #include <base/exceptions.h>
+#include <base/utilities.h>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <stddef.h>
 
 // these includes should probably be properly
 // ./configure'd using the AC_HEADER_TIME macro:
@@ -46,6 +48,7 @@ Timer::Timer()
 		cumulative_wall_time (0.)
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 		, mpi_communicator (MPI_COMM_SELF)
+		, sync_wall_time (false)
 #endif
 {
   start();
@@ -56,11 +59,13 @@ Timer::Timer()
 				   // in case we use an MPI compiler, use
 				   // the communicator given from input
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-Timer::Timer(MPI_Comm mpi_communicator)
+Timer::Timer(MPI_Comm mpi_communicator,
+	     bool sync_wall_time_)
                 :
                 cumulative_time (0.),
 		cumulative_wall_time (0.),
-		mpi_communicator (mpi_communicator)
+		mpi_communicator (mpi_communicator),
+		sync_wall_time(sync_wall_time_)
 {
   start();
 }
@@ -71,6 +76,11 @@ Timer::Timer(MPI_Comm mpi_communicator)
 void Timer::start ()
 {
   running    = true;
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  if (sync_wall_time)
+    MPI_Barrier(mpi_communicator);
+#endif
 
   struct timeval wall_timer;
   gettimeofday(&wall_timer, NULL);
@@ -86,6 +96,33 @@ void Timer::start ()
 }
 
 
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+
+void Timer::TimeMinMaxAvg::max_reduce ( const void * in_lhs_,
+					void * inout_rhs_,
+					int * len,
+					MPI_Datatype * )
+{
+  const Timer::TimeMinMaxAvg * in_lhs = static_cast<const Timer::TimeMinMaxAvg*>(in_lhs_);
+  Timer::TimeMinMaxAvg * inout_rhs = static_cast<Timer::TimeMinMaxAvg*>(inout_rhs_);
+
+  Assert(*len==1, ExcInternalError());
+
+  inout_rhs->sum += in_lhs->sum;
+  if (inout_rhs->min>in_lhs->min)
+    {
+      inout_rhs->min = in_lhs->min;
+      inout_rhs->min_index = in_lhs->min_index;
+    }
+  if (inout_rhs->max<in_lhs->max)
+    {
+      inout_rhs->max = in_lhs->max;
+      inout_rhs->max_index = in_lhs->max_index;
+    }
+}
+
+
+#endif
 
 double Timer::stop ()
 {
@@ -105,8 +142,50 @@ double Timer::stop ()
 
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
-      cumulative_wall_time += wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
-	- start_wall_time;
+      double time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
+			      - start_wall_time;
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      if (sync_wall_time)
+	{
+	  unsigned int my_id = dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
+
+	  MPI_Op op;
+	  int ierr = MPI_Op_create((MPI_User_function *)&Timer::TimeMinMaxAvg::max_reduce,
+				   false, &op);
+	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+	  TimeMinMaxAvg in;
+	  in.set(time, my_id);
+
+	  MPI_Datatype type;
+	  int lengths[]={3,2};
+	  MPI_Aint displacements[]={0,offsetof(TimeMinMaxAvg, min_index)};
+	  MPI_Datatype types[]={MPI_DOUBLE, MPI_INT};
+
+	  ierr = MPI_Type_struct(2, lengths, displacements, types, &type);
+	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+	  ierr = MPI_Type_commit(&type);
+
+	  ierr = MPI_Reduce ( &in, &this->mpi_data, 1, type, op, 0, mpi_communicator );
+	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+	  ierr = MPI_Type_free (&type);
+	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+	  ierr = MPI_Op_free(&op);
+	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+	  this->mpi_data.avg = this->mpi_data.sum / dealii::Utilities::System::get_n_mpi_processes(mpi_communicator);
+
+	  cumulative_wall_time += this->mpi_data.max;
+	}
+      else
+	cumulative_wall_time += time;
+#else
+      cumulative_wall_time += time;
+#endif
     }
   return cumulative_time;
 }

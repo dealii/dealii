@@ -18,12 +18,35 @@
  * documentation of classes of deal.II. The glossary often only gives
  * a microscopic view of a particular concept; if you struggle with
  * the bigger picture, it may therefore also be worth to consult the
- * global overview of classes on the main/@ref index page.
+ * global overview of classes on the @ref index page.
  *
  * <dl>
  *
  * <dt class="glossary">@anchor GlossActive <b>Active cells</b></dt>
  * <dd>Mesh cells not refined any further in the hierarchy.</dd>
+ *
+ *
+ *
+ * <dt class="glossary">@anchor GlossArtificialCell <b>Artificial cells</b></dt>
+ * <dd>
+ * If a mesh is distributed across multiple MPI processes using the
+ * parallel::distributed::Triangulation class, each processor stores
+ * only the cells it owns, one layer of adjacent cells that are owned
+ * by other processors (called @ref GlossGhostCell "ghost cells"), all coarse level
+ * cells, and all cells that are necessary to maintain the invariant
+ * that adjacent cells must differ by at most one refinement
+ * level. The cells stored on each process that are not owned by this
+ * process and that are not ghost cells are called "artificial cells",
+ * and for these cells the predicate
+ * <code>cell-@>is_artificial()</code> returns true. Artificial cells
+ * are guaranteed to exist in the globally distributed mesh but they
+ * may be further refined on other processors. See the
+ * @ref distributed_paper "Distributed Computing paper" for more
+ * information.
+ *
+ * The concept of artificial cells has no meaning for triangulations
+ * that store the entire mesh on each processor, i.e. the
+ * dealii::Triangulation class.  </dd>
  *
  *
  * <dt class="glossary">@anchor GlossBlockLA <b>Block (linear algebra)</b></dt>
@@ -267,10 +290,14 @@
  *
  * The way out of a situation like this is to use one of the two following
  * ways:
+ *
  * - You tell the object that you want to compress what operation is
- *   intended. The TrilinosWrappers::VectorBase::compress() can take such an
- *   additional argument. Or,
- * - You do a fake addition or set operation on the object in question.
+ *   intended. The TrilinosWrappers::VectorBase::compress() can take
+ *   such an additional argument.
+ * - You do a fake addition or set operation on the object in question. For
+ *   example, you can add a zero to an element of the matrix or vector,
+ *   which has no effect other than telling the object that the next
+ *   compress operation should be in <code>Add</code> mode.
  *
  * Some of the objects are also indifferent and can figure out what to
  * do without being told. The TrilinosWrappers::SparseMatrix can do that,
@@ -391,6 +418,22 @@
  * flag.
  *
  *
+ * <dt class="glossary">@anchor distributed_paper
+ *                           <b>Distributed computing paper</b></dt>
+
+ * <dd>The "distributed computing paper" is a paper by W. Bangerth,
+ * C. Burstedde, T. Heister and M. Kronbichler titled "Algorithms and Data
+ * Structures for Massively Parallel Generic Finite Element Codes" that
+ * described the implementation of parallel distributed computing in deal.II,
+ * i.e. computations where not only the linear system is split onto different
+ * machines as in, for example, step-18, but also the Triangulation and
+ * DoFHandler objects. In essence, it is a guide to the parallel::distributed
+ * namespace.
+ *
+ * The paper is currently in preparation.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossFaceOrientation <b>Face orientation</b></dt>
  * <dd>In a triangulation, the normal vector to a face
  * can be deduced from the face orientation by
@@ -446,6 +489,28 @@
  * If a finite element is Lagrangian, generalized support points
  * and support points coincide.
  * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossGhostCell <b>Ghost cells</b></dt>
+ * <dd>
+ * If a mesh is distributed across multiple MPI processes using the
+ * parallel::distributed::Triangulation class, each processor stores
+ * only the cells it owns, one layer of adjacent cells that are owned
+ * by other processors, all coarse level cells, and all cells that are
+ * necessary to maintain the invariant that adjacent cells must differ
+ * by at most one refinement level. The cells stored on each process
+ * that are not owned by this process but that are adjacent to the
+ * ones owned by this process are called "ghost cells", and for these
+ * cells the predicate <code>cell-@>is_ghost()</code> returns
+ * true. Ghost cells are guaranteed to exist in the globally
+ * distributed mesh, i.e. these cells are actually owned by another
+ * process and are not further refined there. See the
+ * @ref distributed_paper "Distributed Computing paper" for more
+ * information.
+ *
+ * The concept of ghost cells has no meaning for triangulations that
+ * store the entire mesh on each processor, i.e. the
+ * dealii::Triangulation class.  </dd>
  *
  *
  * <dt class="glossary">@anchor hp_paper <b>%hp paper</b></dt>
@@ -577,8 +642,9 @@ Article{JK10,
  * element shape functions are defined.</dd>
  *
  *
- * <dt class="glossary">@anchor GlossShape <b>Shape functions</b></dt> <dd>The restriction of
- * the finite element basis functions to a single grid cell.</dd>
+ * <dt class="glossary">@anchor GlossShape <b>Shape functions</b></dt>
+ * <dd>The restriction of the finite element basis functions to a single
+ * grid cell.</dd>
  *
  *
  * <dt class="glossary">@anchor GlossSubdomainId <b>Subdomain id</b></dt>
@@ -600,8 +666,26 @@ Article{JK10,
  * coincides with the rank of the MPI process within the MPI
  * communicator). Partitioning is typically done using the
  * GridTools::partition() function, but any other method can also be used to
- * do this though most other ideas will likely lead to less well balanced
+ * do this though most simple ideas will likely lead to less well balanced
  * numbers of degrees of freedom on the various subdomains.
+ *
+ * On the other hand, for programs that are parallelized using MPI but
+ * where meshes are held distributed across several processors using
+ * the parallel::distributed::Triangulation and
+ * parallel::distributed::DoFHandler classes, the subdomain id of
+ * cells are tied to the processor that owns the cell. In other words,
+ * querying the subdomain id of a cell tells you if the cell is owned
+ * by the current processor (i.e. if <code>cell-@>subdomain_id() ==
+ * triangulation.parallel::distributed::Triangulation::locally_owned_subdomain()</code>)
+ * or by another processor. In the parallel distributed case,
+ * subdomain ids are only assigned to cells that the current processor
+ * owns as well as the immediately adjacent @ref GlossGhostCell "ghost cells".
+ * Cells further away are held on each processor to ensure
+ * that every MPI process has access to the full coarse grid as well
+ * as to ensure the invariant that neighboring cells differ by at most
+ * one refinement level. These cells are called "artificial" (see
+ * @ref GlossArtificialCell "here") and have the special subdomain id value
+ * types::artificial_subdomain_id.
  * </dd>
  *
  *

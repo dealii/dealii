@@ -277,6 +277,19 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li><p>New: The Timer class can now accumulate and average run times of
+  pieces of code across multiple MPI processes.
+  <br>
+  (Timo Heister 2010/06/07)
+  </p></li>
+
+  <li><p>New: The Utilities::System::compute_point_to_point_communication_pattern
+  function can be used to compute who wants to send messages to the
+  current processor in unstructured point-to-point MPI communications.
+  <br>
+  (WB 2010/06/07)
+  </p></li>
+
   <li><p>New: The DataOutBase class (and all derived classes such as DataOut,
   MatrixOut, etc) can now produce the XML-based version of the VTK file format
   (the so-called VTU format). Furthermore, the
@@ -436,10 +449,30 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li><p>New: The ConstraintMatrix class can now handle storing only
+  a subset of all constraints, for example only for degrees of
+  freedom that are relevant for the subdomain that is owned by one
+  process in an MPI universe.
+  <br>
+  (Timo Heister, Martin Kronbichler 2010/06/07)
+  </p></li>
+
+  <li><p>New: The PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector
+  classes can now handle ghost elements, i.e. elements that are not
+  owned by the current processor but are available for reading
+  anyway. The simplest form of ghosting would be to simply import
+  an entire vector to local memory, but the new function allow to
+  select the elements we need to support the case of computations
+  where importing all elements of even a single vector would
+  exceed available memory.
+  <br>
+  (Timo Heister 2010/06/07)
+  </p></li>
+
   <li>
     <p>
-    New: A class SparseDirectMumps that provides an interface to 
-    the MUltifrontal Massively Parallel sparse direct Solver (MUMPS). 
+    New: A class SparseDirectMumps that provides an interface to
+    the MUltifrontal Massively Parallel sparse direct Solver (MUMPS).
     </p>
   <br>
   (Markus Buerg 2010/05/10)

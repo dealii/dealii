@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,63 +31,139 @@ namespace PETScWrappers
       Assert (index < vector.size(),
               ExcIndexRange (index, 0, vector.size()));
 
-                                       // this is clumsy: there is no simple
-                                       // way in PETSc to read an element from
-                                       // a vector, i.e. there is no function
-                                       // VecGetValue or so. The only way is
-                                       // to obtain a pointer to a contiguous
+				       // old versions of PETSc appear to be
+                                       // missing the function VecGetValues(),
+                                       // so the workaround consists of
+                                       // obtaining a pointer to a contiguous
                                        // representation of the vector and
-                                       // read from it. Subsequently, the
-                                       // vector representation has to be
-                                       // restored. In addition, we can only
-                                       // get access to the local part of the
-                                       // vector, so we have to guard against
-                                       // that
+                                       // read from it.  In addition, we can
+                                       // only get access to the local part of
+                                       // the vector, so we have to guard
+                                       // against that
       if (dynamic_cast<const PETScWrappers::Vector *>(&vector) != 0)
         {
+ #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
           PetscScalar *ptr;
           int ierr
-            = VecGetArray (static_cast<const Vec &>(vector), &ptr);
+            = VecGetArray (vector.vector, &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           const PetscScalar value = *(ptr+index);
 
-          ierr = VecRestoreArray (static_cast<const Vec &>(vector), &ptr);
+          ierr = VecRestoreArray (vector.vector, &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-
           return value;
+#else
+	  PetscInt idx = index;
+	  PetscScalar value;
+	  int ierr = VecGetValues(vector.vector, 1, &idx, &value);
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+	  return value;
+#endif
         }
       else if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&vector) != 0)
         {
+	  int ierr;
+
+	  if (vector.ghosted)
+	    {
+#ifdef PETSC_USE_64BIT_INDICES
+	      PetscInt
+#else
+		int
+#endif
+		begin, end;
+	      ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
+	      AssertThrow (ierr == 0, ExcPETScError(ierr)); 
+
+	      Vec l;
+	      ierr = VecGhostGetLocalForm(vector.vector, &l);
+	      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+	      PetscInt lsize;
+	      ierr = VecGetSize(l, &lsize);
+	      AssertThrow (ierr == 0, ExcPETScError(ierr));
+ 
+	      PetscScalar *ptr;
+	      ierr = VecGetArray(l, &ptr);
+	      AssertThrow (ierr == 0, ExcPETScError(ierr));
+ 
+	      PetscScalar value;
+
+	      if ( index>=static_cast<unsigned int>(begin)
+		  && index<static_cast<unsigned int>(end) )
+		{
+						   //local entry
+		  value=*(ptr+index-begin);
+		}
+	      else
+		{
+						   //ghost entry
+		  unsigned ghostidx
+		    = vector.ghost_indices.index_within_set(index);
+		  
+		  Assert(ghostidx+end-begin<(unsigned int)lsize, ExcInternalError());
+		  value=*(ptr+ghostidx+end-begin);
+		  
+		  
+		}
+	      
+	      
+	      ierr = VecRestoreArray(l, &ptr);
+	      AssertThrow (ierr == 0, ExcPETScError(ierr));
+	      
+	      ierr = VecGhostRestoreLocalForm(vector.vector, &l);
+	      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+	      return value;
+	    }
+
+
                                            // first verify that the requested
                                            // element is actually locally
                                            // available
-          int ierr;
+          
 #ifdef PETSC_USE_64BIT_INDICES
 	  PetscInt
 #else
 	  int
 #endif
 	    begin, end;
-          ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
-                                       &begin, &end);
+          ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+
+	  
           AssertThrow ((index >= static_cast<unsigned int>(begin)) &&
                        (index < static_cast<unsigned int>(end)),
                        ExcAccessToNonlocalElement (index, begin, end-1));
 
+					   // old version which only work with
+					   // VecGetArray()...
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+	  
                                            // then access it
           PetscScalar *ptr;
-          ierr = VecGetArray (static_cast<const Vec &>(vector), &ptr);
+          ierr = VecGetArray (vector.vector, &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           const PetscScalar value = *(ptr+index-begin);
 
-          ierr = VecRestoreArray (static_cast<const Vec &>(vector), &ptr);
+          ierr = VecRestoreArray (vector.vector, &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           return value;
+	  
+#else
+					   //new version with VecGetValues()
+	  PetscInt idx = index;
+	  PetscScalar value;
+	  ierr = VecGetValues(vector.vector, 1, &idx, &value);
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+	  
+	  return value;
+#endif
+	  
         }
       else
                                          // what? what other kind of vector
@@ -99,6 +175,7 @@ namespace PETScWrappers
 
   VectorBase::VectorBase ()
                   :
+		  ghosted(false),
                   last_action (LastAction::none)
   {}
 
@@ -107,6 +184,8 @@ namespace PETScWrappers
   VectorBase::VectorBase (const VectorBase &v)
                   :
 		  Subscriptor (),
+		  ghosted(v.ghosted),
+		  ghost_indices(v.ghost_indices),
                   last_action (LastAction::none)
   {
     int ierr = VecDuplicate (v.vector, &vector);
@@ -1041,6 +1120,25 @@ namespace PETScWrappers
     last_action = LastAction::insert;
   }
 
+
+  void 
+  VectorBase::update_ghost_values() const
+  {
+				     // generate an error for not ghosted
+				     // vectors
+    if (!ghosted)
+	throw ExcInternalError();
+
+    int ierr;
+
+    ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+}
+
+
+  
 }
 
 DEAL_II_NAMESPACE_CLOSE

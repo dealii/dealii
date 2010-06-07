@@ -433,7 +433,7 @@ AC_SUBST(USE_CONTRIB_MUMPS)
 AC_SUBST(DEAL_II_MUMPS_DIR)
 AC_SUBST(DEAL_II_SCALAPACK_DIR) dnl MUMPS dependency
 AC_SUBST(DEAL_II_BLACS_DIR)     dnl MUMPS dependency
-AC_SUBST(DEAL_II_BLACS_ARCH)  
+AC_SUBST(DEAL_II_BLACS_ARCH)
 AC_SUBST(DEAL_II_DEFINE_DEAL_II_USE_MUMPS)
 
 dnl Make sure we configure for libraries used by other libraries. For
@@ -727,6 +727,7 @@ AH_BOTTOM(
     (major)*10000 + (minor)*100 + (subminor))
 
 #include <base/numbers.h>
+#include <base/types.h>
 
 /**
  * If the compiler supports the upcoming C++1x standard, allow us to refer

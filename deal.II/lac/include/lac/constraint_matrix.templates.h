@@ -777,7 +777,9 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 		  lines[lines_cache[calculate_line_index(local_dof_indices[j])]];
 		for (unsigned int q=0; q<position_j.entries.size(); ++q)
 		  {
-		    Assert (is_constrained(position_j.entries[q].first) == false,
+		    Assert (!(!local_lines.size()
+			      || local_lines.is_element(position_j.entries[q].first))
+			    || is_constrained(position_j.entries[q].first) == false,
 			    ExcMessage ("Tried to distribute to a fixed dof."));
 		    global_vector(position_j.entries[q].first)
 		      -= val * position_j.entries[q].second * matrix_entry;
@@ -789,7 +791,9 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 				   // the entries of fixed dofs
 	for (unsigned int j=0; j<position->entries.size(); ++j)
 	  {
-	    Assert (is_constrained(position->entries[j].first) == false,
+	    Assert (!(!local_lines.size()
+		      || local_lines.is_element(position->entries[j].first))
+		    || is_constrained(position->entries[j].first) == false,
 		    ExcMessage ("Tried to distribute to a fixed dof."));
 	    global_vector(position->entries[j].first)
 	      += local_vector(i) * position->entries[j].second;

@@ -1944,6 +1944,16 @@ template<>
 void
 ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 {
+				   //TODO: not implemented yet, we need to fix
+				   //LocalRange() first to only include
+				   //"owned" indices. For this we need to keep
+				   //track of the owned indices, because
+				   //Trilinos doesn't. Use same constructor
+				   //interface as in PETSc with two IndexSets!
+  AssertThrow (vec.vector_partitioner().IsOneToOne(),
+	       ExcMessage ("Distribute does not work on vectors with overlapping parallel partitioning."));
+
+  
   typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
   ConstraintLine index_comparison;
   index_comparison.line = vec.local_range().first;
@@ -2011,6 +2021,8 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
                       it->entries[i].second);
       vec(it->line) = new_value;
     }
+
+  vec.compress ();
 }
 
 
@@ -2103,9 +2115,97 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
 	  vec(it->line) = new_value;
 	}
     }
+
+  vec.compress ();
 }
 
 #endif
+
+#ifdef DEAL_II_USE_PETSC
+
+				   // this is a specialization for a
+				   // parallel (non-block) PETSc
+				   // vector. The basic idea is to just work
+				   // on the local range of the vector. But
+				   // we need access to values that the
+				   // local nodes are constrained to.
+
+template<>
+void
+ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
+{
+  typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
+  ConstraintLine index_comparison;
+  index_comparison.line = vec.local_range().first;
+  const constraint_iterator begin_my_constraints =
+    std::lower_bound (lines.begin(),lines.end(),index_comparison);
+
+  index_comparison.line = vec.local_range().second;
+  const constraint_iterator end_my_constraints
+    = std::lower_bound(lines.begin(),lines.end(),index_comparison);
+
+				   // all indices we need to read from
+  IndexSet my_indices (vec.size());
+
+  const std::pair<unsigned int, unsigned int>
+    local_range = vec.local_range();
+
+  my_indices.add_range (local_range.first, local_range.second);
+
+  std::set<unsigned int> individual_indices;
+  for (constraint_iterator it = begin_my_constraints;
+       it != end_my_constraints; ++it)
+    for (unsigned int i=0; i<it->entries.size(); ++i)
+      if ((it->entries[i].first < local_range.first)
+	  ||
+	  (it->entries[i].first >= local_range.second))
+	individual_indices.insert (it->entries[i].first);
+
+  my_indices.add_indices (individual_indices.begin(),
+			  individual_indices.end());
+
+  IndexSet local_range_is (vec.size());
+  local_range_is.add_range(local_range.first, local_range.second);
+
+  
+				   // create a vector and import those indices
+  PETScWrappers::MPI::Vector ghost_vec(vec.get_mpi_communicator(),
+				       local_range_is,
+				       my_indices);
+  ghost_vec = vec;
+  ghost_vec.update_ghost_values();
+
+				   // finally do the distribution on own
+				   // constraints
+  for (constraint_iterator it = begin_my_constraints;
+       it != end_my_constraints; ++it)
+    {
+				       // fill entry in line
+				       // next_constraint.line by adding the
+				       // different contributions
+      double new_value = it->inhomogeneity;
+      for (unsigned int i=0; i<it->entries.size(); ++i)
+	new_value += (ghost_vec(it->entries[i].first) *
+                      it->entries[i].second);
+      vec(it->line) = new_value;
+    }
+
+				   // force every processor to write something
+  vec(local_range.first) = vec(local_range.first);
+
+  vec.compress ();
+}
+
+
+template<>
+void
+ConstraintMatrix::distribute (PETScWrappers::MPI::BlockVector &/*vec*/) const
+{
+  AssertThrow (false, ExcNotImplemented());
+}
+
+#endif
+
 
 
 unsigned int ConstraintMatrix::n_constraints () const

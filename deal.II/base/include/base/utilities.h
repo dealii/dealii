@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -245,7 +245,7 @@ namespace Utilities
 				      * MPI.
 				      */
     bool job_supports_mpi ();
-    
+
 				     /**
 				      * Return the number of MPI processes
 				      * there exist in the given communicator
@@ -265,6 +265,51 @@ namespace Utilities
 				      * get_n_mpi_processes()).
 				      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
+
+
+				     /**
+				      * Consider an unstructured
+				      * communication pattern where
+				      * every process in an MPI
+				      * universe wants to send some
+				      * data to a subset of the other
+				      * processors. To do that, the
+				      * other processors need to know
+				      * who to expect messages
+				      * from. This function computes
+				      * this information.
+				      *
+				      * @param mpi_comm A communicator
+				      * that describes the processors
+				      * that are going to communicate
+				      * with each other.
+				      *
+				      * @param destinations The list
+				      * of processors the current
+				      * process wants to send
+				      * information to. This list need
+				      * not be sorted in any way. If
+				      * it contains duplicate entries
+				      * that means that multiple
+				      * messages are intended for a
+				      * given destination.
+				      *
+				      * @return A list of processors
+				      * that have indicated that they
+				      * want to send something to the
+				      * current processor. The
+				      * resulting list is not
+				      * sorted. It may contain
+				      * duplicate entries if
+				      * processors enter the same
+				      * destination more than once in
+				      * their destinations list.
+				      */
+    std::vector<unsigned int>
+    compute_point_to_point_communication_pattern (const MPI_Comm & mpi_comm,
+						  const std::vector<unsigned int> & destinations);
+
+
 
 				     /**
 				      * Given a communicator, generate a new
@@ -502,7 +547,7 @@ namespace Utilities
 				      */
     void
     destroy_communicator (Epetra_Comm &communicator);
-    
+
 				     /**
 				      * Return the number of MPI processes
 				      * there exist in the given communicator

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,7 @@
 #  include <lac/exceptions.h>
 #  include <lac/vector.h>
 #  include <lac/petsc_vector_base.h>
+#  include <base/index_set.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -29,6 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
 template <typename> class Vector;
+class IndexSet;
 
 
 /*! @addtogroup PETScWrappers
@@ -186,6 +188,7 @@ namespace PETScWrappers
                          const unsigned int  n,
                          const unsigned int  local_size);
     
+	
                                          /**
                                           * Copy-constructor from deal.II
                                           * vectors. Sets the dimension to that
@@ -206,6 +209,7 @@ namespace PETScWrappers
                          const dealii::Vector<Number> &v,
                          const unsigned int      local_size);
 
+	
                                          /**
                                           * Copy-constructor the
                                           * values from a PETSc wrapper vector
@@ -224,6 +228,29 @@ namespace PETScWrappers
                          const VectorBase   &v,
                          const unsigned int  local_size);
 
+
+                                         /**
+					  * Constructs a new parallel PETSc
+					  * vector from an Indexset. Note that
+					  * @p local must be contiguous and
+					  * the global size of the vector is
+					  * determined by local.size(). The
+					  * global indices in @p ghost are
+					  * sluppied as ghost indices that can
+					  * also be read locally. Note that
+					  * the @p ghost IndexSet may be empty
+					  * and that any indices already
+					  * contained in @p local are ignored
+					  * during construction. That way you
+					  * can construct with
+					  * locally_relevent_dofs() for
+					  * example.
+					  */
+	explicit Vector (const MPI_Comm     &communicator,
+                         const IndexSet &  local,
+                         const IndexSet & ghost = IndexSet(0));
+	
+	
                                          /**
                                           * Copy the given vector. Resize the
                                           * present vector if necessary. Also
@@ -232,6 +259,7 @@ namespace PETScWrappers
                                           */
         Vector & operator = (const Vector &v);
 
+	
                                          /**
 					  * Copy the given sequential
 					  * (non-distributed) vector
@@ -347,6 +375,16 @@ namespace PETScWrappers
                      const bool    fast = false);
 
                                          /**
+					  * Reinit as a ghosted vector. See
+					  * constructor with same signature
+					  * for more details.
+					  */
+	void reinit (const MPI_Comm     &communicator,
+                     const IndexSet &  local,
+                     const IndexSet & ghost = IndexSet(0));
+
+	
+                                         /**
                                           * Return a reference to the MPI
                                           * communicator object in use with
                                           * this vector.
@@ -365,6 +403,21 @@ namespace PETScWrappers
                                           */
         virtual void create_vector (const unsigned int n,
                                     const unsigned int local_size);
+
+
+
+					 /**
+					  * Create a vector of global length
+					  * @p n, local size @p local_size and
+					  * with the specified ghost
+					  * indices. Note that you need to
+					  * call update_ghost_values() before
+					  * accessing those.
+					  */
+	virtual void create_vector (const unsigned int  n,
+				    const unsigned int  local_size,
+				    const IndexSet & ghostnodes);
+	
 
       private:
                                          /**
