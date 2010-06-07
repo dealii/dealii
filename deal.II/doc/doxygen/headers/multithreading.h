@@ -12,7 +12,7 @@
 //-------------------------------------------------------------------------
 
 /**
- * @defgroup threads Parallel computing with multiple processors accessing the shared memory
+ * @defgroup threads Parallel computing with multiple processors accessing shared memory
  * @ingroup Parallel
  *
  * @brief A module discussing the use of parallelism on shared memory
