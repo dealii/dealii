@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,8 @@ void check(DataOutBase::TecplotFlags flags,
   names[2] = "x3";
   names[3] = "x4";
   names[4] = "i";
-  DataOutBase::write_tecplot_binary(patches, names, flags, out);
+  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
+  DataOutBase::write_tecplot_binary(patches, names, vectors, flags, out);
 }
 
 
