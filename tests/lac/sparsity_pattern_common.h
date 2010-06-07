@@ -1,8 +1,8 @@
 //---------------------------  sparsity_pattern_common.h  -------------------------
 //    $Id: sparsity_pattern_01.cc 15674 2008-01-24 17:40:56Z kanschat $
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2009 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,10 +13,9 @@
 
 
 
-// check
-
 #include "../tests.h"
 #include <base/logstream.h>
+#include <base/index_set.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
@@ -57,9 +56,10 @@ void do_reinit (CompressedSparsityPattern &sp)
   sp.reinit((N-1)*(N-1), (N-1)*(N-1));
 }
 
-void do_reinit (CompressedSimpleSparsityPattern &sp)
+void do_reinit (CompressedSimpleSparsityPattern &sp,
+		const IndexSet &index_set = IndexSet())
 {
-  sp.reinit((N-1)*(N-1), (N-1)*(N-1));
+  sp.reinit((N-1)*(N-1), (N-1)*(N-1), index_set);
 }
 
 void do_reinit (CompressedSetSparsityPattern &sp)
@@ -90,7 +90,7 @@ void row_length ()
 {
   SP sparsity_pattern;
   build_sparsity (sparsity_pattern);
-  
+
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     deallog << sparsity_pattern.row_length(i) << std::endl;
 
@@ -266,7 +266,7 @@ void
 do_copy_from (const std::list<std::set<unsigned int,std::greater<unsigned int> > > &sparsity,
 	      ChunkSparsityPattern &sp4)
 {
-  sp4.copy_from ((N-1)*(N-1), (N-1)*(N-1), 
+  sp4.copy_from ((N-1)*(N-1), (N-1)*(N-1),
 		 sparsity.begin(), sparsity.end(),
 		 chunk_size);
 }
@@ -282,12 +282,12 @@ do_copy_from (const CompressedSparsityPattern &sparsity,
     {
       sparsity_x.push_back
 	(std::set<unsigned int,std::greater<unsigned int> >());
-      
+
       for (unsigned int j=0; j<sparsity.n_cols(); ++j)
 	if (sparsity.exists(i,j))
 	  sparsity_x.back().insert (j);
     }
-  
+
   do_copy_from (sparsity_x, sp4);
 }
 
@@ -322,12 +322,12 @@ do_copy_from (const CompressedSetSparsityPattern &sparsity,
     {
       sparsity_x.push_back
 	(std::set<unsigned int,std::greater<unsigned int> >());
-      
+
       for (unsigned int j=0; j<sparsity.n_cols(); ++j)
 	if (sparsity.exists(i,j))
 	  sparsity_x.back().insert (j);
     }
-  
+
   do_copy_from (sparsity_x, sp4);
 }
 
@@ -514,7 +514,7 @@ void matrix_position<ChunkSparsityPattern> ()
   deallog << "OK" << std::endl;
 }
 
-  
+
 template <>
 void matrix_position<CompressedSparsityPattern> ()
 {
@@ -556,7 +556,7 @@ void block_read_write ()
   sparsity_pattern.block_write (tmp_write);
 
   SP sp5;
-  
+
   std::istringstream tmp_read(tmp_write.str());
   sp5.block_read (tmp_read);
 
@@ -565,7 +565,7 @@ void block_read_write ()
   deallog << sparsity_pattern.n_rows() - sp5.n_rows() << ' '
 	  << sparsity_pattern.n_cols() - sp5.n_cols() << ' '
 	  << std::endl;
-  
+
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
       Assert (sparsity_pattern.exists(i,j) == sp5.exists (i,j),
@@ -605,4 +605,50 @@ void block_read_write<CompressedSetSparsityPattern> ()
 }
 
 
-  
+
+template <typename SP>
+void test_index_set (const bool contiguous)
+{
+  SP sp1, sp2;
+
+  IndexSet index_set ((N-1)*(N-1));
+  index_set.add_range (5,10);
+
+  if (!contiguous)
+    for (unsigned int i=3*(N-1); i<4*(N-1); i += 3)
+      index_set.add_index (i);
+
+  do_reinit (sp1);
+  do_reinit (sp2, index_set);
+
+  FDMatrix(N,N).five_point_structure (sp1);
+  FDMatrix(N,N).five_point_structure (sp2);
+
+  sp1.compress ();
+  sp2.compress ();
+
+
+  for (unsigned int i=0; i<sp1.n_rows(); ++i)
+    {
+      deallog << sp1.row_length(i) << ' '
+	      << (index_set.is_element(i) ? (int)sp2.row_length(i) : -1)
+	      << std::endl;
+      if (index_set.is_element(i))
+	Assert (sp2.row_length(i) == sp1.row_length(i), ExcInternalError());
+
+      if (index_set.is_element(i))
+	{
+	  deallog << "      columns=";
+	  for (unsigned int j=0; j<sp2.row_length(i); ++j)
+	    {
+	      deallog << sp1.column_number(i,j) << ' ';
+	      Assert (sp1.column_number(i,j) ==
+		      sp2.column_number(i,j),
+		      ExcInternalError());
+	    }
+	  deallog << std::endl;
+	}
+    }
+
+  deallog << "OK" << std::endl;
+}

@@ -42,6 +42,7 @@ tests_x = vector-vector vector_memory \
 	block_vector_* \
 	block_matrices \
 	is_block_matrix \
+	is_block_vector \
 	matrix_lib \
 	matrix_out \
 	pointer_matrix \
