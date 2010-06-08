@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,11 +24,16 @@ DEAL_II_NAMESPACE_OPEN
  * This class provides information about the system which may be of
  * use in multithreaded programs.  At the moment this is just the
  * number of cpus. If deal.II is compiled with multithreading support,
- * some functions will use multiple threads for their action, and will
- * use the member variable <tt>n_default_threads</tt> of this class as the
- * default number of threads to start.  This variable
- * <tt>n_default_threads</tt> is set to the number of CPUs by default, but
- * can be adjusted by the user to fit the requirements.
+ * some functions will use multiple threads for their action. Currently
+ * the library supports both thread-based and task-based parallelism. @ref threads
+ * describes the different uses of each. Thread-based parallel methods will
+ * use the member variable n_default_threads of this class as a guide to the
+ * number of threads to start.  This variable
+ * n_default_threads is set to the number of CPUs by default, but
+ * can be adjusted by the user to fit the requirements. The default number of 
+ * threads used for task-based parallel methods is selected automatically
+ * by the Threading Building
+ * Blocks library. See @ref threads for more information on this.
  *
  * @ingroup threads
  * @author Thomas Richter, Wolfgang Bangerth, 2000

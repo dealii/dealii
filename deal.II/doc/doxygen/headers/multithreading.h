@@ -58,6 +58,7 @@
  *  <li> @ref MTComplexLoops "Abstractions for tasks: More complex loops"
  *  <li> @ref MTWorkStream "Abstractions for tasks: Work streams"
  *  <li> @ref MTThreads "Thread-based parallelism"
+ *  <li> @ref MTTaskThreads "Controlling the number of threads used for tasks"
  * </ol> </td> </tr> </table>
  *
  *
@@ -1101,4 +1102,40 @@
  * return value of a finished thread using Threads::Thread::return_value(),
  * and you can group threads into a Threads::ThreadGroup object and wait for
  * all of them to finish.
+ *
+ *
+ * @anchor MTTaskThreads
+ * <h3>Controlling the number of threads used for tasks</h3>
+ * As mentioned earlier, deal.II does not implement scheduling tasks to
+ * threads or even starting threads itself. The TBB library does a good job at
+ * deciding how many threads to use and they do not recommend setting the
+ * number of threads explicitly. However, on large symmetric multiprocessing
+ * (SMP) machines, especially ones with a resource/job manager or on systems
+ * on which access to some parts of the memory is possible but very expensive
+ * for processors far away (e.g. large NUMA SMP machines), it may be necessary
+ * to explicitly set the number of threads to prevent the TBB from using too
+ * many CPUs. In this case the following commands can be used:
+ * @code
+   #include <tbb/task_scheduler_init.h>
+
+   // In the program, before any task-based parallelism is reached.
+   // Early in the main method is a good place to call this:
+   tbb::task_scheduler_init init(n_desired_threads + 1); 
+ * @endcode
+ * The method of setting the number of threads relies on this call to
+ * <code>task_scheduler_init</code> occurring before any other calls to the
+ * TBB functions.  If this call is first, it will set the number of threads
+ * used by TBB for the remainder of the program.  Notice that the call starts
+ * one less thread than the argument, since the main thread is counted. If
+ * this method does not seem successful (gdb can be used to see when and how
+ * many threads are started), ensure that the call is early enough in the
+ * program (for example right at the start of <code>main()</code>), and check
+ * that there are no other libraries starting threads.
+ *
+ * Note that a small number of places inside deal.II also uses thread-based
+ * parallelism controlled by MultithreadInfo::n_default_threads
+ * generally. Under some circumstances, deal.II also calls the BLAS library
+ * which may sometimes also start threads of its own. You will have to consult
+ * the documentation of your BLAS installation to determine how to set the
+ * number of threads for these operations.
  */
