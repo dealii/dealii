@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,13 +57,6 @@ namespace types
 				    * distributed on many
 				    * processors. Such cells are
 				    * called "artificial".
-				    *
-				    * See the glossary entries on @ref
-				    * GlossSubdomainId "subdomain ids"
-				    * and @ref GlossArtificialCell
-				    * "artificial cells" as well as
-				    * the @ref distributed module for
-				    * more information.
 				    */
   const unsigned int artificial_subdomain_id = static_cast<subdomain_id_t>(-2);
 }
