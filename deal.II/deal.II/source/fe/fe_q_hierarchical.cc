@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <fe/fe_q_hierarchical.h>
+#include <fe/fe_nothing.h>
 
 #include <cmath>
 #include <sstream>
@@ -119,6 +120,49 @@ FE_Q_Hierarchical<dim>::clone() const
   return new FE_Q_Hierarchical<dim>(*this);
 }
 
+
+
+template <int dim>
+bool
+FE_Q_Hierarchical<dim>::hp_constraints_are_implemented () const
+{
+  return true;
+}
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Q_Hierarchical<dim>::
+hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+				   // we can presently only compute
+				   // these identities if both FEs are
+				   // FE_Q_Hierarchicals or if the other
+				   // one is an FE_Nothing. in the first
+				   // case, there should be exactly one
+				   // single DoF of each FE at a
+				   // vertex, and they should have
+				   // identical value
+  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != 0)
+    {
+      return
+	std::vector<std::pair<unsigned int, unsigned int> >
+	(1, std::make_pair (0U, 0U));
+    }
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+    {
+				       // the FE_Nothing has no
+				       // degrees of freedom, so there
+				       // are no equivalencies to be
+				       // recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
 
 //---------------------------------------------------------------------------
 // Auxiliary functions

@@ -47,6 +47,10 @@ template <int dim, int spacedim> class MappingQ;
  * Future work will involve writing projection--interpolation operators
  * that can interpolate onto the higher order bubble functions.
  *
+ * The various constraint, prolongation, and restriction matrices are 
+ * now available in all dimensions for all degrees @p p, currently up to 
+ * order 19.
+ *
  * The constructor of this class takes the degree @p p of this finite
  * element.
  *
@@ -264,6 +268,64 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
+
+				     /**
+				      * @name Functions to support hp
+				      * @{
+				      */
+
+                     /**
+                      * Return whether this element
+                      * implements its hanging node
+                      * constraints in the new way,
+				      * which has to be used to make
+				      * elements "hp compatible".
+                                      *
+				      * For the FE_Q_Hierarchical class the
+				      * result is always true (independent of
+				      * the degree of the element), as it
+				      * implements the complete set of
+				      * functions necessary for hp capability.
+                      */
+    virtual bool hp_constraints_are_implemented () const;
+
+				     /**
+				      * If, on a vertex, several
+				      * finite elements are active,
+				      * the hp code first assigns the
+				      * degrees of freedom of each of
+				      * these FEs different global
+				      * indices. It then calls this
+				      * function to find out which of
+				      * them should get identical
+				      * values, and consequently can
+				      * receive the same global DoF
+				      * index. This function therefore
+				      * returns a list of identities
+				      * between DoFs of the present
+				      * finite element object with the
+				      * DoFs of @p fe_other, which is
+				      * a reference to a finite
+				      * element object representing
+				      * one of the other finite
+				      * elements active on this
+				      * particular vertex. The
+				      * function computes which of the
+				      * degrees of freedom of the two
+				      * finite element objects are
+				      * equivalent, and returns a list
+				      * of pairs of global dof indices
+				      * in @p identities. The first
+				      * index of each pair denotes one
+				      * of the vertex dofs of the
+				      * present element, whereas the
+				      * second is the corresponding
+				      * index of the other finite
+				      * element.
+				      */
+    virtual
+    std::vector<std::pair<unsigned int, unsigned int> >
+    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
 
 				     /**
 				      * Determine an estimate for the
