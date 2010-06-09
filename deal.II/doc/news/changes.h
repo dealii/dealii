@@ -672,6 +672,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>New: The FE_Q_Hierarchical class now has functions
+  FE_Q_Hierarchical::hp_constraints_are_implemented and
+  FE_Q_Hierarchical::hp_vertex_dof_identities.
+  <br>
+  (Markus B&uuml;rg 2010/06/08)
+  </p></li>
+
+  <li>
   <p>New: The FEValuesViews::Vector class now has functions
   FEValuesViews::Vector::curl and FEValuesViews::Vector::get_function_curls.
   <br>
