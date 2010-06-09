@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II Testsuite</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
@@ -192,8 +192,12 @@
     </pre>
     You should be aware that because of the number of tests we have,
     running the entire testsuite can easily take an hour, even on a
-    fast system. On the other hand, only a large testsuite can offer
-    comprehensive coverage of a software as big as deal.II.
+    fast system. (On the other hand, only a large testsuite can offer
+    comprehensive coverage of a software as big as deal.II.) This time
+    can be reduced, however, on multicore machines if you use the command
+    <code>make -jN</code> where <code>N</code> is an integer equal to or
+    slight larger than the number of processor cores you have, as this
+    instructs <code>make</code> to run several tests at the same time.
     </p>
 
     <p>
@@ -207,7 +211,9 @@
     that fails, but will want to run all tests first and then inspect
     the output to find any fails. There are make targets for this
     as well. The usual way we use the testsuite is to run all tests
-    like so:
+    like so
+    (the same applies as above: <code>make -jN</code> can be used on multicore
+    machines): 
     <pre>
       deal.II/tests> make report | tee report
       =======Report: base =======
