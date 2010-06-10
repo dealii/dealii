@@ -219,8 +219,8 @@ struct FE_Q<xdim,xspacedim>::Implementation
 					 // coincide. i.e. if a and b are
 					 // expansion coefficients for the
 					 // shape functions from both sides,
-					 // we seek a relation between x and
-					 // y such that
+					 // we seek a relation between a and
+					 // b such that
 					 //   sum_j a_j phi^c_j(x)
 					 //   == sum_j b_j phi_j(x)
 					 // for all points x on the
