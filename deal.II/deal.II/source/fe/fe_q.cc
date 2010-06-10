@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -213,7 +213,7 @@ struct FE_Q<xdim,xspacedim>::Implementation
 					 // mother and cell face.
 
 					 // the interpolation process works
-					 // as followings: on each subface,
+					 // as follows: on each subface,
 					 // we want that finite element
 					 // solutions from both sides
 					 // coincide. i.e. if a and b are
