@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,7 +42,7 @@ DEAL_II_NAMESPACE_OPEN
  * The constructor creates a TensorProductPolynomials object that includes the
  * tensor product of @p LagrangeEquidistant polynomials of degree @p p. This
  * @p TensorProductPolynomials object provides all values and derivatives of
- * the shape functions.  In case a quadrature rule is given, the constructure
+ * the shape functions.  In case a quadrature rule is given, the constructor
  * creates a TensorProductPolynomials object that includes the tensor product
  * of @p Lagrange polynomials with the support points from @p points.
  *
