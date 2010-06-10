@@ -126,7 +126,7 @@ template <int dim>
 bool
 FE_Q_Hierarchical<dim>::hp_constraints_are_implemented () const
 {
-  return true;
+  return false;
 }
 
 
