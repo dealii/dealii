@@ -42,7 +42,7 @@ MGTransferSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const BlockVector<number2>     &src) const
 {
-  do_copy_to_mg (mg_dof_handler, dst, src);
+  do_copy_to_mg (mg_dof_handler, dst, src.block(target_component[selected_component]));
 }
 
 
