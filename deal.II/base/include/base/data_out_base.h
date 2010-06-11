@@ -1397,7 +1397,7 @@ class DataOutBase
 					    * SoftwareVTK format.
 					    */
 	  vtu,
-	  
+
 					   /**
 					    * Output in deal.II
 					    * intermediate format.
@@ -1694,7 +1694,7 @@ class DataOutBase
 			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			   const VtkFlags                          &flags,
 			   std::ostream                            &out);
-			   
+
 
 /**
  * Write the given list of patches to the output stream in @ref SoftwareVTK
@@ -1711,14 +1711,14 @@ class DataOutBase
  * Some visualization programs, such as ParaView, can read several separate
  * VTU files to parallelize visualization. In that case, you need a
  * <code>.pvtu</code> file that describes which VTU files form a group. The
- * DataOutInterface::write_pvtu() function can generate such a master record.
+ * DataOutInterface::write_pvtu_record() function can generate such a master record.
  */
     template <int dim, int spacedim>
     static void write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			   const VtkFlags                          &flags,
-			   std::ostream                            &out);		   
+			   std::ostream                            &out);
 
 /**
  * Write the given list of patches to the output stream in deal.II
@@ -2224,7 +2224,7 @@ class DataOutInterface : private DataOutBase
 				      * DataOutBase::write_vtk.
 				      */
     void write_vtk (std::ostream &out) const;
-    
+
 				     /**
 				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
@@ -2238,12 +2238,12 @@ class DataOutInterface : private DataOutBase
 				      * a <code>.pvtu</code> file that
 				      * describes which VTU files form a
 				      * group. The
-				      * DataOutInterface::write_pvtu()
+				      * DataOutInterface::write_pvtu_record()
 				      * function can generate such a master
 				      * record.
 				      */
     void write_vtu (std::ostream &out) const;
-    
+
 				     /**
 				      * Some visualization programs, such as
 				      * ParaView, can read several separate
@@ -2276,9 +2276,9 @@ class DataOutInterface : private DataOutBase
 				      * names of the files written by all
 				      * parallel processes.
 				      */
-    void write_pvtu_record (std::ostream &out, 
-			    const std::vector<std::string> &piece_names) const;    
-    
+    void write_pvtu_record (std::ostream &out,
+			    const std::vector<std::string> &piece_names) const;
+
 
     				     /**
 				      * Obtain data through get_patches()
