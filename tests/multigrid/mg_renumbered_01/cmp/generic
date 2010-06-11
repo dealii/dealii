@@ -2,224 +2,56 @@
 DEAL::Cycle 0
 DEAL::Number of degrees of freedom: 100   L0: 16   L1: 36   L2: 100
 DEAL::1. Test 1676.
-DEAL::PreconditionMG in 1676.
-DEAL::defect [0] 0
-DEAL::defect [1] 1364.
-DEAL::solution [0] 0
-DEAL::solution [1] 1364.
-DEAL::PreconditionMG out 4781.
 DEAL::1. Test 4781.
 DEAL::2. Test 1676.
-DEAL::PreconditionMG in 1676.
-DEAL::defect [0] 0
-DEAL::defect [1] 1364.
-DEAL::solution [0] 0
-DEAL::solution [1] 1364.
-DEAL::PreconditionMG out 4781.
 DEAL::2. Test 4781.
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 1
 DEAL::Number of degrees of freedom: 164   L0: 16   L1: 36   L2: 100   L3: 100
 DEAL::1. Test 3626.
-DEAL::PreconditionMG in 3626.
-DEAL::defect [0] 0
-DEAL::defect [1] 6526.
-DEAL::defect [2] 4508.
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 4508.
-DEAL::PreconditionMG out 1.097e+04
 DEAL::1. Test 1.097e+04
 DEAL::2. Test 3626.
-DEAL::PreconditionMG in 3626.
-DEAL::defect [0] 0
-DEAL::defect [1] 6526.
-DEAL::defect [2] 4508.
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 4508.
-DEAL::PreconditionMG out 1.097e+04
 DEAL::2. Test 1.097e+04
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 2
 DEAL::Number of degrees of freedom: 228   L0: 16   L1: 36   L2: 100   L3: 100   L4: 100
 DEAL::1. Test 5984.
-DEAL::PreconditionMG in 5984.
-DEAL::defect [0] 0
-DEAL::defect [1] 1.568e+04
-DEAL::defect [2] 1.133e+04
-DEAL::defect [3] 6760.
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 1978.
-DEAL::solution [3] 6760.
-DEAL::PreconditionMG out 1.688e+04
 DEAL::1. Test 1.688e+04
 DEAL::2. Test 5984.
-DEAL::PreconditionMG in 5984.
-DEAL::defect [0] 0
-DEAL::defect [1] 1.568e+04
-DEAL::defect [2] 1.133e+04
-DEAL::defect [3] 6760.
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 1978.
-DEAL::solution [3] 6760.
-DEAL::PreconditionMG out 1.688e+04
 DEAL::2. Test 1.688e+04
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 3
 DEAL::Number of degrees of freedom: 292   L0: 16   L1: 36   L2: 100   L3: 100   L4: 100   L5: 100
 DEAL::1. Test 8689.
-DEAL::PreconditionMG in 8689.
-DEAL::defect [0] 0
-DEAL::defect [1] 2.868e+04
-DEAL::defect [2] 2.267e+04
-DEAL::defect [3] 1.547e+04
-DEAL::defect [4] 9126.
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 1978.
-DEAL::solution [3] 2798.
-DEAL::solution [4] 9126.
-DEAL::PreconditionMG out 2.286e+04
 DEAL::1. Test 2.286e+04
 DEAL::2. Test 8689.
-DEAL::PreconditionMG in 8689.
-DEAL::defect [0] 0
-DEAL::defect [1] 2.868e+04
-DEAL::defect [2] 2.267e+04
-DEAL::defect [3] 1.547e+04
-DEAL::defect [4] 9126.
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 1978.
-DEAL::solution [3] 2798.
-DEAL::solution [4] 9126.
-DEAL::PreconditionMG out 2.286e+04
 DEAL::2. Test 2.286e+04
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 4
 DEAL::Number of degrees of freedom: 804   L0: 16   L1: 36   L2: 100   L3: 260   L4: 260   L5: 260   L6: 260
 DEAL::1. Test 4.396e+04
-DEAL::PreconditionMG in 4.396e+04
-DEAL::defect [0] 0
-DEAL::defect [1] 2.915e+05
-DEAL::defect [2] 2.337e+05
-DEAL::defect [3] 1.630e+05
-DEAL::defect [4] 9.881e+04
-DEAL::defect [5] 5.409e+04
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 2917.
-DEAL::solution [3] 9045.
-DEAL::solution [4] 1.432e+04
-DEAL::solution [5] 5.409e+04
-DEAL::PreconditionMG out 1.442e+05
 DEAL::1. Test 1.442e+05
 DEAL::2. Test 4.396e+04
-DEAL::PreconditionMG in 4.396e+04
-DEAL::defect [0] 0
-DEAL::defect [1] 2.915e+05
-DEAL::defect [2] 2.337e+05
-DEAL::defect [3] 1.630e+05
-DEAL::defect [4] 9.881e+04
-DEAL::defect [5] 5.409e+04
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 2917.
-DEAL::solution [3] 9045.
-DEAL::solution [4] 1.432e+04
-DEAL::solution [5] 5.409e+04
-DEAL::PreconditionMG out 1.442e+05
 DEAL::2. Test 1.442e+05
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 5
 DEAL::Number of degrees of freedom: 1428   L0: 16   L1: 36   L2: 100   L3: 324   L4: 324   L5: 324   L6: 324   L7: 612
 DEAL::1. Test 1.095e+05
-DEAL::PreconditionMG in 1.095e+05
-DEAL::defect [0] 0
-DEAL::defect [1] 1.179e+06
-DEAL::defect [2] 1.012e+06
-DEAL::defect [3] 7.822e+05
-DEAL::defect [4] 5.179e+05
-DEAL::defect [5] 3.099e+05
-DEAL::defect [6] 1.647e+05
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 0
-DEAL::solution [3] 1.339e+04
-DEAL::solution [4] 2.086e+04
-DEAL::solution [5] 2.891e+04
-DEAL::solution [6] 1.647e+05
-DEAL::PreconditionMG out 4.692e+05
 DEAL::1. Test 4.692e+05
 DEAL::2. Test 1.095e+05
-DEAL::PreconditionMG in 1.095e+05
-DEAL::defect [0] 0
-DEAL::defect [1] 1.179e+06
-DEAL::defect [2] 1.012e+06
-DEAL::defect [3] 7.822e+05
-DEAL::defect [4] 5.179e+05
-DEAL::defect [5] 3.099e+05
-DEAL::defect [6] 1.647e+05
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 0
-DEAL::solution [3] 1.339e+04
-DEAL::solution [4] 2.086e+04
-DEAL::solution [5] 2.891e+04
-DEAL::solution [6] 1.647e+05
-DEAL::PreconditionMG out 4.692e+05
 DEAL::2. Test 4.692e+05
 DEAL::
 DEAL::diff 0
 DEAL::Cycle 6
 DEAL::Number of degrees of freedom: 3044   L0: 16   L1: 36   L2: 100   L3: 324   L4: 324   L5: 324   L6: 484   L7: 836   L8: 1860
 DEAL::1. Test 3.516e+05
-DEAL::PreconditionMG in 3.516e+05
-DEAL::defect [0] 0
-DEAL::defect [1] 6.516e+06
-DEAL::defect [2] 5.926e+06
-DEAL::defect [3] 4.924e+06
-DEAL::defect [4] 3.466e+06
-DEAL::defect [5] 2.145e+06
-DEAL::defect [6] 1.178e+06
-DEAL::defect [7] 6.110e+05
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 0
-DEAL::solution [3] 1.339e+04
-DEAL::solution [4] 2.011e+04
-DEAL::solution [5] 3.017e+04
-DEAL::solution [6] 4.722e+04
-DEAL::solution [7] 6.110e+05
-DEAL::PreconditionMG out 1.776e+06
 DEAL::1. Test 1.776e+06
 DEAL::2. Test 3.516e+05
-DEAL::PreconditionMG in 3.516e+05
-DEAL::defect [0] 0
-DEAL::defect [1] 6.516e+06
-DEAL::defect [2] 5.926e+06
-DEAL::defect [3] 4.924e+06
-DEAL::defect [4] 3.466e+06
-DEAL::defect [5] 2.145e+06
-DEAL::defect [6] 1.178e+06
-DEAL::defect [7] 6.110e+05
-DEAL::solution [0] 0
-DEAL::solution [1] 0
-DEAL::solution [2] 0
-DEAL::solution [3] 1.339e+04
-DEAL::solution [4] 2.011e+04
-DEAL::solution [5] 3.017e+04
-DEAL::solution [6] 4.722e+04
-DEAL::solution [7] 6.110e+05
-DEAL::PreconditionMG out 1.776e+06
 DEAL::2. Test 1.776e+06
 DEAL::
 DEAL::diff 0

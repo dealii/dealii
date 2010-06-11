@@ -202,7 +202,6 @@ class LaplaceProblem
 {
   public:
     typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
-    typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
 
     LaplaceProblem (const unsigned int deg);
     void run ();
