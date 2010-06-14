@@ -236,15 +236,16 @@ namespace PETScWrappers
 					  * the global size of the vector is
 					  * determined by local.size(). The
 					  * global indices in @p ghost are
-					  * sluppied as ghost indices that can
-					  * also be read locally. Note that
-					  * the @p ghost IndexSet may be empty
-					  * and that any indices already
-					  * contained in @p local are ignored
-					  * during construction. That way you
-					  * can construct with
-					  * locally_relevent_dofs() for
-					  * example.
+					  * supplied as ghost indices that can
+					  * also be read locally.
+					  *
+					  * Note that the @p ghost IndexSet
+					  * may be empty and that any indices
+					  * already contained in @p local are
+					  * ignored during construction. That
+					  * way, the ghost parameter can equal
+					  * the set of locally relevant
+					  * degrees of freedom, see step-32.
 					  */
 	explicit Vector (const MPI_Comm     &communicator,
                          const IndexSet &  local,
