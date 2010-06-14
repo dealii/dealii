@@ -65,7 +65,9 @@ tests_x =  geometry_info_* \
 	   logstream_end \
 	   log_* \
 	   reference \
-	   quadrature_* qprojector \
+	   quadrature_* \
+	   qprojector \
+	   gauss_lobatto \
 	   path_search \
 	   named_data \
 	   slice_vector \
