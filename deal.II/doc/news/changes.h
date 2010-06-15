@@ -31,12 +31,24 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Changed: The SparseMatrix::operator() used to always check that an entry
+  exists when accessing it. If it didn't, it would throw an exception that
+  could be caught in a user program. Since these accesses are very frequent,
+  this check now only happens in debug mode when the program aborts if a
+  nonexistent element is accessed. If you access a nonexistent element in
+  optimized mode, anything might happen (as in many other functions if
+  input arguments do not satisfy their constraints).
+  <br>
+  (WB 2010/06/04)
+  </p>
+
+  <li>
   <p>
   Removed: The interface to PETSc has been simplified to better handle
   incremental changes in PETSc versions and accomodate changes in
   functionality between versions. As a part of this process, the
   deal.II configure script no longer handles PETSc versions
-  <2.3.0. Attempting to configure deal.II with PETSc versions that are
+  &lt;2.3.0. Attempting to configure deal.II with PETSc versions that are
   not supported will result in the error message, "Unknown PETSc
   version". The usage of the PETScWrappers are otherwise not affected
   by this change.
