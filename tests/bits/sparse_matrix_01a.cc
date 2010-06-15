@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,8 @@
 
 // check setting elements in a sparse matrix using SparseMatrix::set(). make
 // sure they are correct, and make sure that for the nonexisting entries
-// SparseMatrix::el() returns zero and operator() throws an exception
+// SparseMatrix::el() returns zero (operator() terminates with an exception
+// since sometime in the first half of 2010).
 
 #include "../tests.h"
 #include <lac/sparse_matrix.h>    
@@ -50,17 +51,6 @@ void test ()
       else
         {
           Assert (m.el(i,j) == 0, ExcInternalError());
-          bool exc_thrown = false;
-          double d;
-          try
-            {
-              d = m(i,j);
-            }
-          catch (const std::exception &)
-            {
-              exc_thrown = true;
-            }
-          Assert (exc_thrown == true, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
