@@ -22,10 +22,6 @@
 #include <string>
 #include <stdio.h>
 
-#ifdef HAVE_LIBZ
-#  include <zlib.h>
-#endif
-
 #include "patches.h"
 
 // Output data on repetitions of the unit hypercube
@@ -54,24 +50,13 @@ void check(DataOutBase::TecplotFlags flags,
 template<int dim, int spacedim>
 void check_all()
 {
-  std::ostringstream out;
-  
   char name[100];
   DataOutBase::TecplotFlags flags;
   if (true) {
     sprintf(name, "data_out_base_tecplot_bin/%d%d.tecplot", dim, spacedim);
     flags.tecplot_binary_file_name=name;
     
-    check<dim,spacedim>(flags, out);
-#ifdef HAVE_LIBZ
-    uLong crc = crc32(0L, Z_NULL, 0);
-    const Bytef* bytes = (const Bytef*) (out.str().c_str());
-    crc = crc32(crc, bytes, out.str().size());
-    deallog << "check_all<" << dim << ',' << spacedim
-	    << "> checksum " << crc << std::endl;
-#else
-    deallog << "zlib missing" << std::endl;
-#endif
+    check<dim,spacedim>(flags, deallog.get_file_stream());
   }
 }
 
