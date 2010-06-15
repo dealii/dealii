@@ -43,11 +43,11 @@ class MatrixIntegrator : public Subscriptor
     static void cell(MeshWorker::DoFInfo<dim>& dinfo,
 		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
     static void bdry(MeshWorker::DoFInfo<dim>& dinfo,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info);
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
     static void face(MeshWorker::DoFInfo<dim>& dinfo1,
 		     MeshWorker::DoFInfo<dim>& dinfo2,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-		     typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2);
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info1,
+		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info2);
 };
 
 
@@ -68,7 +68,7 @@ void MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo,
 
 template <int dim>
 void MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo,
-				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info)
+				 typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
@@ -89,8 +89,8 @@ void MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo,
 template <int dim>
 void MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
 				 MeshWorker::DoFInfo<dim>& dinfo2,
-				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info1,
-				 typename MeshWorker::IntegrationWorker<dim>::FaceInfo& info2)
+				 typename MeshWorker::IntegrationWorker<dim>::CellInfo& info1,
+				 typename MeshWorker::IntegrationWorker<dim>::CellInfo& info2)
 {
   const FEValuesBase<dim>& fe1 = info1.fe_values();
   const FEValuesBase<dim>& fe2 = info2.fe_values();

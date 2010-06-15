@@ -42,12 +42,11 @@ class Local : public Subscriptor
 {
   public:
     typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
-    typedef typename MeshWorker::IntegrationWorker<dim>::FaceInfo FaceInfo;
-
+    
     void cell(MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info) const;
-    void bdry(MeshWorker::DoFInfo<dim>& dinfo, FaceInfo& info) const;
+    void bdry(MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info) const;
     void face(MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
-	      FaceInfo& info1, FaceInfo& info2) const;
+	      CellInfo& info1, CellInfo& info2) const;
 
     bool cells;
     bool faces;
@@ -103,7 +102,7 @@ Local<dim>::cell(MeshWorker::DoFInfo<dim>& info, CellInfo&) const
 
 template <int dim>
 void
-Local<dim>::bdry(MeshWorker::DoFInfo<dim>& info, FaceInfo&) const
+Local<dim>::bdry(MeshWorker::DoFInfo<dim>& info, CellInfo&) const
 {
   const unsigned int cell = info.cell->user_index();
   deallog << "Bdry " << std::setw(2) << cell;
@@ -114,7 +113,7 @@ Local<dim>::bdry(MeshWorker::DoFInfo<dim>& info, FaceInfo&) const
 template <int dim>
 void
 Local<dim>::face(MeshWorker::DoFInfo<dim>& info1, MeshWorker::DoFInfo<dim>& info2,
-		 FaceInfo&, FaceInfo&) const
+		 CellInfo&, CellInfo&) const
 {
   const unsigned int cell1 = info1.cell->user_index();
   const unsigned int cell2 = info2.cell->user_index();
@@ -147,9 +146,7 @@ test_simple(MGDoFHandler<dim>& mgdofs)
 
   MeshWorker::IntegrationWorker<dim> integrator;
   integrator.initialize_gauss_quadrature(1, 1, 1);
-  integrator.boundary_fluxes = local.faces;
-  integrator.interior_fluxes = local.faces;
-
+  
   MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >
     assembler;
   assembler.initialize(matrix, v);
