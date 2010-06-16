@@ -199,7 +199,7 @@ class Step12
 				     // order to make our life easier
 				     // below.
     typedef MeshWorker::DoFInfo<dim> DoFInfo;
-    typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
+    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
     
 				     // The following three functions
 				     // are then the ones that get called
@@ -309,8 +309,8 @@ void Step12<dim>::assemble_system ()
 				   // object distributes these into
 				   // the global sparse matrix and the
 				   // right hand side vector.
-  MeshWorker::IntegrationWorker<dim> integration_worker;
-
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  
 				   // First, we initialize the
 				   // quadrature formulae and the
 				   // update flags in the worker base
@@ -324,45 +324,46 @@ void Step12<dim>::assemble_system ()
 				   // independently, we have to hand
 				   // over this value three times.
   const unsigned int n_gauss_points = dof_handler.get_fe().degree+1;
-  integration_worker.initialize_gauss_quadrature(n_gauss_points,
+  info_box.initialize_gauss_quadrature(n_gauss_points,
 						 n_gauss_points,
 						 n_gauss_points);
-
+  
 				   // These are the types of values we
 				   // need for integrating our
 				   // system. They are added to the
 				   // flags used on cells, boundary
 				   // and interior faces, as well as
 				   // interior neighbor faces, which is
-				   // forced by the four @p true values.
+				   // forced by the four @p true
+				   // values.
+  info_box.initialize_update_flags();
   UpdateFlags update_flags = update_quadrature_points |
 			     update_values            |
 			     update_gradients;
-  integration_worker.add_update_flags(update_flags, true, true, true, true);
+  info_box.add_update_flags(update_flags, true, true, true, true);
 
-				   // Finally, we have to tell the
-				   // assembler base class where to
-				   // put the local data. These will
-				   // be our system matrix and the
-				   // right hand side.
+				   // After preparing all data in
+				   // <tt>info_box</tt>, we initialize
+				   // the FEValus objects in there.
+  info_box.initialize(fe, mapping);
+
+				   // The object created so far helps
+				   // us do the local integration on
+				   // each cell and face. Now, we need
+				   // an object which receives the
+				   // integrated (local) data and
+				   // forwards them to the assembler.
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+
+				   // Now, we have to create the
+				   // assembler object and tell it,
+				   // where to put the local
+				   // data. These will be our system
+				   // matrix and the right hand side.
   MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >
     assembler;
   assembler.initialize(system_matrix, right_hand_side);
-
-				   // We are now ready to get to the
-				   // integration loop. @p info_box is
-				   // an object that generates the
-				   // extended iterators for cells and
-				   // faces of type
-				   // MeshWorker::IntegrationInfo. Since
-				   // we need five different of them,
-				   // this is a handy shortcut. It
-				   // receives all the stuff we
-				   // created so far.
-  MeshWorker::IntegrationInfoBox<dim> info_box;
-  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
-  info_box.initialize(integration_worker, fe, mapping);
-
+  
 				   // Finally, the integration loop
 				   // over all active cells
 				   // (determined by the first

@@ -27,6 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
   template class IntegrationInfo<deal_II_dimension, deal_II_dimension>;
+  template class IntegrationInfoBox<deal_II_dimension, deal_II_dimension>;
   
   template class LocalResults<float>;
   template class DoFInfo<deal_II_dimension,deal_II_dimension,float>;
