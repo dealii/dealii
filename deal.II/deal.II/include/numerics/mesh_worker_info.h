@@ -709,15 +709,22 @@ namespace MeshWorker
   };
 
 /**
- * A simple container collecting the five info objects required by the
- * integration loops. In addition to providing these objects, this
- * class offers two functions to initialize them with reasonable
- * contents all at once.
+ * The object holding the scratch data for integrating over cells and
+ * faces. IntegrationInfoBox serves three main purposes:
  *
- * MeshWorker::loop() requires five info objects collected into a
- * single class. These are the data members #cell, #boundary, #face,
- * #subface, and #neighbor. The names of those are expected by
- * MeshWorker::loop().
+ * <ol>
+ * <li> It provides the interface needed by MeshWorker::loop(), namely
+ * the two functions post_cell() and post_faces(), as well as 
+ * the data members #cell, #boundary, #face,
+ * #subface, and #neighbor.
+ *
+ * <li> It contains all information needed to initialize the FEValues
+ * and FEFaceValues objects in the IntegrationInfo data members.
+ *
+ * <li> It stores information on finite element vectors and whether
+ * their data should be used to compute values or derivatives of
+ * functions at quadrature points.
+ * </ol>
  *
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
@@ -730,9 +737,45 @@ namespace MeshWorker
 /// The type of the info object for cells
       typedef IntegrationInfo<dim, spacedim> CellInfo;
 
-/// @deprecated The type of the info objects for faces.
-      typedef IntegrationInfo<dim, spacedim> FaceInfo;
+				       /**
+					* @name FEValues setup
+					*/
+				       /* @{ */
+      template <class WORKER>
+      void initialize(const WORKER&,
+		      const FiniteElement<dim, spacedim>& el,
+		      const Mapping<dim, spacedim>& mapping,
+		      const BlockInfo* block_info = 0);
 
+      template <class WORKER, typename VECTOR>
+      void initialize(const WORKER&,
+		      const FiniteElement<dim, spacedim>& el,
+		      const Mapping<dim, spacedim>& mapping,
+		      const NamedData<VECTOR*>& data,
+		      const BlockInfo* block_info = 0);
+
+      template <class WORKER, typename VECTOR>
+      void initialize(const WORKER&,
+		      const FiniteElement<dim, spacedim>& el,
+		      const Mapping<dim, spacedim>& mapping,
+		      const NamedData<MGLevelObject<VECTOR>*>& data,
+		      const BlockInfo* block_info = 0);
+				       /* @} */
+      
+				       /**
+					* @name Data vectors
+					*/
+      				       /* @{ */
+
+      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
+      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
+      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
+				       /* @} */
+
+				       /**
+					* @name Interface for MeshWorker::loop()
+					*/
+				       /* @{ */
 				       /**
 					* A callback function which is
 					* called in the loop over all
@@ -801,30 +844,6 @@ namespace MeshWorker
       template <class DOFINFO>
       void post_faces(const DoFInfoBox<dim, DOFINFO>&);
       
-      template <class WORKER>
-      void initialize(const WORKER&,
-		      const FiniteElement<dim, spacedim>& el,
-		      const Mapping<dim, spacedim>& mapping,
-		      const BlockInfo* block_info = 0);
-
-      template <class WORKER, typename VECTOR>
-      void initialize(const WORKER&,
-		      const FiniteElement<dim, spacedim>& el,
-		      const Mapping<dim, spacedim>& mapping,
-		      const NamedData<VECTOR*>& data,
-		      const BlockInfo* block_info = 0);
-
-      template <class WORKER, typename VECTOR>
-      void initialize(const WORKER&,
-		      const FiniteElement<dim, spacedim>& el,
-		      const Mapping<dim, spacedim>& mapping,
-		      const NamedData<MGLevelObject<VECTOR>*>& data,
-		      const BlockInfo* block_info = 0);
-      
-      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
-      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
-      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
-
 /// The info object for a cell
       CellInfo cell;
 /// The info object for a boundary face
@@ -835,6 +854,8 @@ namespace MeshWorker
       CellInfo subface;
 /// The info object for an interior face, seen from the other cell
       CellInfo neighbor;
+
+				       /* @} */
   };
 
 
