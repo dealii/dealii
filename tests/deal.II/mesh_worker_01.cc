@@ -41,7 +41,7 @@ template <int dim>
 class Local : public Subscriptor
 {
   public:
-    typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
+    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
     
     void cell(MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info) const;
     void bdry(MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info) const;
@@ -144,29 +144,27 @@ test_simple(MGDoFHandler<dim>& mgdofs)
   local.cells = true;
   local.faces = false;
 
-  MeshWorker::IntegrationWorker<dim> integrator;
-  integrator.initialize_gauss_quadrature(1, 1, 1);
+  MappingQ1<dim> mapping;
+  
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  info_box.initialize_gauss_quadrature(1, 1, 1);
+  info_box.initialize_update_flags();
+  info_box.initialize(fe, mapping);
+  
+  MeshWorker::DoFInfo<dim> dof_info(dofs);
   
   MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >
     assembler;
   assembler.initialize(matrix, v);
-
-  {
-    MappingQ1<dim> mapping;
-
-    MeshWorker::IntegrationInfoBox<dim> info_box;
-    info_box.initialize(integrator, fe, mapping);
-    MeshWorker::DoFInfo<dim> dof_info(dofs);
-    
-    MeshWorker::integration_loop<dim, dim>
-      (dofs.begin_active(), dofs.end(),
-       dof_info, info_box,
-       std_cxx1x::bind (&Local<dim>::cell, local, _1, _2),
+  
+  MeshWorker::integration_loop<dim, dim>
+    (dofs.begin_active(), dofs.end(),
+     dof_info, info_box,
+     std_cxx1x::bind (&Local<dim>::cell, local, _1, _2),
        std_cxx1x::bind (&Local<dim>::bdry, local, _1, _2),
        std_cxx1x::bind (&Local<dim>::face, local, _1, _2, _3, _4),
        assembler, true);
-  }
-
+  
   for (unsigned int i=0;i<v.size();++i)
     deallog << ' ' << std::setprecision(3) << v(i);
   deallog << std::endl;
