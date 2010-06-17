@@ -254,7 +254,7 @@ class Multigrid : public Subscriptor
 				      * matrices originate from
 				      * discontinuous Galerkin methods
 				      * (see FE_DGQ etc.), where they
-				      * correspond tu the edge fluxes
+				      * correspond to the edge fluxes
 				      * at the refinement edge between
 				      * two levels.
 				      *

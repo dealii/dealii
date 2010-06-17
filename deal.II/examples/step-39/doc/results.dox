@@ -14,7 +14,7 @@ DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 27.1275
 DEAL:cg::Convergence step 1 value 1.97998e-14
-DEAL::Error    0.161536
+DEAL::Error    0.161172
 DEAL::Estimate 1.35839
 DEAL::Writing solution to <sol-00.gnuplot>...
 DEAL::
@@ -26,8 +26,8 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 35.5356
-DEAL:cg::Convergence step 10 value 1.24790e-13
-DEAL::Error    0.164997
+DEAL:cg::Convergence step 14 value 3.21479e-13
+DEAL::Error    0.164760
 DEAL::Estimate 1.08528
 DEAL::Writing solution to <sol-01.gnuplot>...
 DEAL::
@@ -39,8 +39,8 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 37.0552
-DEAL:cg::Convergence step 10 value 4.74024e-14
-DEAL::Error    0.113596
+DEAL:cg::Convergence step 14 value 6.05416e-13
+DEAL::Error    0.113503
 DEAL::Estimate 0.990460
 DEAL::Writing solution to <sol-02.gnuplot>...
 
@@ -54,8 +54,8 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 38.5798
-DEAL:cg::Convergence step 12 value 7.56337e-14
-DEAL::Error    0.0101279
+DEAL:cg::Convergence step 17 value 2.64999e-13
+DEAL::Error    0.0101278
 DEAL::Estimate 0.0957571
 DEAL::Writing solution to <sol-10.gnuplot>...
 DEAL::
@@ -67,21 +67,22 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 44.1721
-DEAL:cg::Convergence step 12 value 9.49720e-14
-DEAL::Error    0.00716966
+DEAL:cg::Convergence step 17 value 3.18657e-13
+DEAL::Error    0.00716962
 DEAL::Estimate 0.0681646
 DEAL::Writing solution to <sol-11.gnuplot>...
+DEAL::
 @endcode
 
 This log for instance shows that the number of conjugate gradient
-iteration steps is constant at approximately 12.
+iteration steps is constant at approximately 17.
 
 <h2>Postprocessing of the logfile</h2>
 
 @image html "step-39-convergence.png"
 Using the perl script <tt>postprocess.pl</tt>, we extract relevant
 data into <tt>output.dat</tt>, which can be used to plot graphs with
-<tt>gnuplot</tt>. The graph on the right for instance was produced with
+<tt>gnuplot</tt>. The graph above for instance was produced with
 
 @code
 set style data linespoints
