@@ -171,14 +171,14 @@ class OutputCreator : public Subscriptor
 {
   public:
     void cell(MeshWorker::DoFInfo<dim>& dinfo,
-		     typename MeshWorker::IntegrationWorker<dim>::CellInfo& info);
+		     MeshWorker::IntegrationInfo<dim>& info);
 
 };
 
 template <int dim>
 void OutputCreator<dim>::cell(
   MeshWorker::DoFInfo<dim>& dinfo,
-  typename MeshWorker::IntegrationWorker<dim>::CellInfo& info)
+  MeshWorker::IntegrationInfo<dim>& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   const std::vector<std::vector<double> >& uh = info.values[0];
@@ -201,7 +201,7 @@ template <int dim>
 class LaplaceProblem
 {
   public:
-    typedef typename MeshWorker::IntegrationWorker<dim>::CellInfo CellInfo;
+    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
 
     LaplaceProblem (const unsigned int deg);
     void run ();
@@ -273,26 +273,23 @@ void
 LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
     MGLevelObject<Vector<double> > &v)
 {
-  MeshWorker::IntegrationWorker<dim> integration_worker;
-  MeshWorker::Assembler::GnuplotPatch assembler;
-
+  MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof.get_fe().tensor_degree();
   QTrapez<1> trapez;
   QIterated<dim> quadrature(trapez, n_gauss_points);
-  integration_worker.cell_quadrature = quadrature;
-  UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
-  integration_worker.add_update_flags(update_flags, true, true, true, true);
-
+  info_box.cell_quadrature = quadrature;
   NamedData<MGLevelObject<Vector<double> >* > data;
   data.add(&v, "mg_vector");
-  MeshWorker::VectorSelector cs;
-  cs.add("mg_vector");
-  integration_worker.cell_selector = cs;
-
-  assembler.initialize(dim, quadrature.size(), dim+dof.get_fe().n_components());
-  MeshWorker::IntegrationInfoBox<dim> info_box;
+  info_box.cell_selector.add("mg_vector");
+  info_box.initialize_update_flags();
+  UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
+  info_box.add_update_flags(update_flags, true, true, true, true);
+  info_box.initialize(fe, mapping, data);  
+  
   MeshWorker::DoFInfo<dim> dof_info(dof);
-  info_box.initialize(integration_worker, fe, mapping, data);
+
+  MeshWorker::Assembler::GnuplotPatch assembler;
+  assembler.initialize(dim, quadrature.size(), dim+dof.get_fe().n_components());
 
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
