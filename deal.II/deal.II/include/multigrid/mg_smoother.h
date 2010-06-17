@@ -107,6 +107,14 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				      */
     void set_debug (const unsigned int level);
 
+  private:
+				     /**
+				      * The memory object to be used
+				      * if none is given to the
+				      * constructor.
+				      */
+    GrowingVectorMemory<VECTOR> my_memory;
+    
   protected:
 				     /**
 				      * Number of smoothing steps on
@@ -153,8 +161,6 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 				      */
     SmartPointer<VectorMemory<VECTOR>, MGSmoother<VECTOR> > mem;
 
-  private:
-    GrowingVectorMemory<VECTOR> my_memory;
 };
 
 
