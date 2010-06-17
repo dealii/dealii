@@ -10,12 +10,33 @@
 //
 //---------------------------------------------------------------------------
 
-#include <multigrid/mg_tools.h>
-#include <fe/fe.h>
-#include <fe/fe_tools.h>
 #include <numerics/mesh_worker.h>
-#include <base/quadrature_lib.h>
+#include <lac/block_indices.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+using namespace MeshWorker;
+
+template <typename number>
+void
+LocalResults<number>::reinit(const BlockIndices& bi)
+{
+  for (unsigned int i=0;i<J.size();++i)
+      J[i] = 0.;
+  for (unsigned int i=0;i<R.size();++i)
+    R[i].reinit(bi);
+  for (unsigned int i=0;i<M1.size();++i)
+    M1[i].matrix.reinit(bi.block_size(M1[i].row),
+			bi.block_size(M1[i].column));
+  for (unsigned int i=0;i<M2.size();++i)
+    M2[i].matrix.reinit(bi.block_size(M2[i].row),
+			bi.block_size(M2[i].column));
+  for (unsigned int k=0;k<quadrature_values.size();++k)
+    for (unsigned int i=0;i<quadrature_values[k].size();++i)
+      quadrature_values[k][i] = 0.;
+}
+
+template class LocalResults<float>;
+template class LocalResults<double>;
 
 DEAL_II_NAMESPACE_CLOSE

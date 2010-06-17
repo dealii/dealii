@@ -38,6 +38,8 @@
 				 // The include files for using the
 				 // MeshWorker framework
 #include <numerics/mesh_worker.h>
+#include <numerics/mesh_worker_info.h>
+#include <numerics/mesh_worker_assembler.h>
 #include <numerics/mesh_worker_loop.h>
 
 				 // Support for multigrid methods
@@ -850,6 +852,7 @@ Step39<dim>::estimate()
 				   // solution we just computed.
   NamedData<Vector<double>* > solution_data;
   solution_data.add(&solution, "solution");
+  
 				   // Then, we tell the Meshworker::VectorSelector
 				   // for cells, that we need the
 				   // second derivatives of this

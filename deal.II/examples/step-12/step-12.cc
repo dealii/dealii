@@ -62,6 +62,7 @@
 				 // for using the MeshWorker framework:
 #include <numerics/mesh_worker.h>
 #include <numerics/mesh_worker_info.h>
+#include <numerics/mesh_worker_assembler.h>
 #include <numerics/mesh_worker_loop.h>
 
 				 // Like in all programs, we finish
