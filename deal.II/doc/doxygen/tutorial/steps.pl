@@ -14,7 +14,7 @@ my @steps = (1,2,3,4,5,6,7,8,9,
 	     30,31,   33,34,35,36,      39);
 ;
 
-my $essential = ',fillcolor="red"';
+my $essential = ',height=.7,width=.7,shape="octagon",fillcolor="green"';
 my $technique = ',fillcolor="orange"';
 my $fluidapplication = ',fillcolor="yellow"';
 my $solidsapplication = ',fillcolor="lightblue"';
@@ -72,7 +72,7 @@ my %attribute = (
 print << 'EOT'
 digraph StepsMap
 {
-    overlap=false;
+  overlap=false;
   edge [fontname="FreeSans",
         fontsize="10",
         labelfontname="FreeSans",
@@ -81,7 +81,7 @@ digraph StepsMap
         style="solid"];
   node [fontname="FreeSans",
         fontsize="10",
-        shape=record,
+        shape="rectangle",
         height=0.2,
         width=0.4,
         color="black",
