@@ -94,7 +94,7 @@ EOT
 
 foreach (@steps)
 {
-    printf 'Step%02d [label="%d", URL="step_%d.html", tooltip="@step%d@"', $_, $_, $_, $_;
+    printf 'Step%02d [label="%d", URL="../deal.II/step_%d.html", tooltip="@step%d@"', $_, $_, $_, $_;
     print $attribute{$_};
     print "];\n";
 }
