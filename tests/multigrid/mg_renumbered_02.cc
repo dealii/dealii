@@ -252,6 +252,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   QTrapez<1> trapez;
   QIterated<dim> quadrature(trapez, n_gauss_points);
   info_box.cell_quadrature = quadrature;
+  info_box.initialize_update_flags();
   UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
   info_box.add_update_flags(update_flags, true, true, true, true);
   
