@@ -8,7 +8,11 @@
 
 use strict;
 
-my $laststep = 45;
+my @steps = (1,2,3,4,5,6,7,8,9,
+	     10,11,12,13,14,15,16,17,18,19,
+	     20,21,22,23,24,25,   27,28,29,
+	     30,31,   33,34,35,36,      39);
+;
 
 my $essential = ',fillcolor="red"';
 my $technique = ',fillcolor="orange"';
@@ -88,10 +92,10 @@ EOT
 
 # print all nodes
 
-for (my $i=1; $i<=$laststep;++$i)
+foreach (@steps)
 {
-    printf 'Step%02d [label="%d", URL="step_%d.html", tooltip="@step%d@"', $i, $i, $i, $i;
-    print $attribute{$i};
+    printf 'Step%02d [label="%d", URL="step_%d.html", tooltip="@step%d@"', $_, $_, $_, $_;
+    print $attribute{$_};
     print "];\n";
 }
 

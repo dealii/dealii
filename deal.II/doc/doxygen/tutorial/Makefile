@@ -40,15 +40,14 @@ get_basename = $(shell echo $(1) | $(PERL) -pi -e 's/(generated|doxygen).//g; s/
 all: $(example-doxygen)
 
 toc.html: steps.cmapx toc.html.in
-	@perl make_toc.pl > toc.html
-#	@perl -p -e '$/=undef; open FH, "steps.cmapx"; $map=<FH>; s/@@MAP@@/<img src="steps.png" usemap="#StepsMap"\/>\n$map"' toc.html.in > toc.html
+	perl make_toc.pl > toc.html
 # generate dot file
 steps.dot: steps.pl
 	perl $< > $@
 
 steps.cmapx: steps.dot
 	neato -Tpng -Tcmapx -O $<
-	@mv steps.dot.png ../images/steps.png
+	@mv steps.dot.png steps.png
 	@mv steps.dot.cmapx steps.cmapx
 
 

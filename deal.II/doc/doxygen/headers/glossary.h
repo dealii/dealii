@@ -130,11 +130,12 @@
  * case of the FE_RaviartThomas, for example, a block consists of <tt>dim</tt>
  * components). However, several such minimal blocks can be grouped together
  * into user defined blocks at will, and in accordance with the
- * application. For instance, for the $Q_2^d\times Q^1$ (Taylor-Hood) Stokes
- * element, there are $d+1$ components each of which could in principle form
+ * application. For instance, for the
+ * <b>Q</b><sub>2</sub><sup><i>d</i></sup>-<b>Q</b><sub>1</sub> (Taylor-Hood) Stokes
+ * element, there are <i>d</i>+1 components each of which could in principle form
  * its own block. But we are typically more interested in having only two
  * blocks, one of which consists of all the velocity vector components
- * (i.e. this block would have $d$ components) and the other having only the
+ * (i.e. this block would have <i>d</i> components) and the other having only the
  * single pressure component.
  *
  * <i>Implementation:</i>
