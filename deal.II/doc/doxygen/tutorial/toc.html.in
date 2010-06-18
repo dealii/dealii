@@ -4,7 +4,7 @@
 <head>
 <title>Step-by-Step</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2007, 2008, 2009 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2007, 2008, 2009, 2010 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal.II,deal.II tutorial,deal II">
@@ -57,6 +57,10 @@ the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
   demonstration suite</a>.
 </p>
 
+<h2>Map of tutorial programs</h2>
+
+<img src="steps.png" usemap="#StepsMap"\/>
+@@MAP@@
 
 <a name="bynumber"></a>
 <h2>Tutorial programs listed by number</h2>

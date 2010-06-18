@@ -66,7 +66,7 @@ my %attribute = (
 # Print a preamble setting common attributes
 
 print << 'EOT'
-digraph G
+digraph StepsMap
 {
     overlap=false;
   edge [fontname="FreeSans",
