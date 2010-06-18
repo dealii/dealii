@@ -43,6 +43,7 @@ my %attribute = (
     30 => $technique,
     36 => $technique,
     37 => $technique,
+    39 => $technique,
     45 => $technique,
 
     17 => $solidsapplication,
@@ -67,6 +68,7 @@ my %attribute = (
 print << 'EOT'
 digraph G
 {
+    overlap=false;
   edge [fontname="FreeSans",
         fontsize="10",
         labelfontname="FreeSans",
@@ -98,7 +100,7 @@ for (my $i=1; $i<=$laststep;++$i)
 
 print << 'EOT'
 
-    Step01 -> Step02;
+Step01 -> Step02;
 Step02 -> Step03;
 Step03 -> Step04;
 Step04 -> Step05;
@@ -142,16 +144,22 @@ Step06 -> Step27;
 
 Step06 -> Step28;
 
+Step06 -> Step39;
+
 Step04 -> Step29;
 
 Step12 -> Step30;
+Step12 -> Step39;
 
 Step04 -> Step34;
 
+Step21 -> Step22;
 Step22 -> Step35;
 
 Step04 -> Step36;
 Step03 -> Step45;
+
+Step39 -> Step12;
 }
 
 EOT

@@ -43,9 +43,9 @@ all: $(example-doxygen)
 steps.dot: steps.pl
 	perl $< > $@
 steps.png: steps.dot
-	neato -Tpng -Timap -O $<
+	neato -Tpng -Tcmapx -O $<
 	@mv steps.dot.png steps.png
-	@mv steps.dot.imap steps.imap
+	@mv steps.dot.cmapx steps.cmapx
 
 
 $(example-toc-prog):
