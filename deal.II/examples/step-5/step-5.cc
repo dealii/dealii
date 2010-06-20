@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -21,6 +21,7 @@
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
@@ -382,14 +383,12 @@ void LaplaceProblem<dim>::setup_system ()
 	    << dof_handler.n_dofs()
 	    << std::endl;
 
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  sparsity_pattern.compress();
-
+  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+  sparsity_pattern.copy_from(c_sparsity);
+  
   system_matrix.reinit (sparsity_pattern);
-
+  
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 }

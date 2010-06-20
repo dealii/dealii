@@ -80,6 +80,7 @@
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 
@@ -259,25 +260,16 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // As we have seen in the previous example,
 				   // we set up a sparsity pattern for the
 				   // system matrix and tag those entries that
-				   // might be nonzero. Compared to what we
-				   // did in step-2, the only change is that
-				   // instead of giving a magically obtained
-				   // maximal number of nonzero entries per
-				   // row, we now use a function in the
-				   // <code>DoFHandler</code> class that can compute
-				   // this number for us:
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  sparsity_pattern.compress();
+				   // might be nonzero.  
+  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+  sparsity_pattern.copy_from(c_sparsity);
 
 				   // Now the sparsity pattern is
-				   // built and fixed (after
-				   // `compress' has been called, you
+				   // built, you
 				   // can't add nonzero entries
-				   // anymore; the sparsity pattern is
-				   // `sealed', so to say), we can
+				   // anymore. The sparsity pattern is
+				   // `sealed', so to say, and we can
 				   // initialize the matrix itself
 				   // with it. Note that the
 				   // SparsityPattern object does

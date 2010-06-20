@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -22,6 +22,7 @@
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
@@ -409,11 +410,6 @@ void LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 
@@ -467,6 +463,15 @@ void LaplaceProblem<dim>::setup_system ()
 				   // added any more:
   hanging_node_constraints.close ();
 
+				   // Now we first build our
+				   // compressed sparsity pattern like
+				   // we did in the previous
+				   // examples. Nevertheless, we do
+				   // not copy it to the final
+				   // sparsity pattern immediately.
+  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+  
 				   // The constrained hanging nodes
 				   // will later be eliminated from
 				   // the linear system of
@@ -483,17 +488,17 @@ void LaplaceProblem<dim>::setup_system ()
 				   // the system matrix and right hand
 				   // side, as well as for the
 				   // sparsity pattern.
-  hanging_node_constraints.condense (sparsity_pattern);
+  hanging_node_constraints.condense (c_sparsity);
 
 				   // Now all non-zero entries of the
 				   // matrix are known (i.e. those
 				   // from regularly assembling the
 				   // matrix and those that were
 				   // introduced by eliminating
-				   // constraints). We can thus close
-				   // the sparsity pattern and remove
-				   // unneeded space:
-  sparsity_pattern.compress();
+				   // constraints). We can thus copy
+				   // our intermediate object to
+				   // the sparsity pattern:
+  sparsity_pattern.copy_from(c_sparsity);
 
 				   // Finally, the so-constructed
 				   // sparsity pattern serves as the
