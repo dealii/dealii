@@ -152,8 +152,7 @@ the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
 
   <tr valign="top">
       <td><a href="../../doxygen/deal.II/step_12.html">Step-12</a></td>
-      <td> General framework for
-      discontinuous Galerkin methods. Use of Timer class.
+      <td> Discontinuous Galerkin methods for linear advection problems.
       </td></tr>
 
   <tr valign="top">
