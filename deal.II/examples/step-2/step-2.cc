@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -50,6 +50,12 @@
 				 // on the grid. That class can be
 				 // found here:
 #include <lac/sparse_matrix.h>
+				 // We will also need to use an
+				 // intermediate sparsity patter
+				 // structure, which is found in this
+				 // file:
+#include <lac/compressed_sparsity_pattern.h>
+
 				 // We will want to use a special
 				 // algorithm to renumber degrees of
 				 // freedom. It is declared here:
@@ -237,58 +243,42 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // First we have to create a
 				   // structure which we use to store
 				   // the places of nonzero
-				   // elements. We have to give it the
-				   // size of the matrix, which in our
-				   // case will be square with as
-				   // many rows and columns as there
-				   // are degrees of freedom on the
-				   // grid:
-  SparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-				    dof_handler.n_dofs(),
-                                    20);
-                                   // The last argument to the constructor
-                                   // indicates the maximum number of entries
-                                   // we expect per row. If this were a
-                                   // uniformly refined square, then we know
-                                   // that each vertex degree of freedom would
-                                   // couple with itself and the eight degrees
-                                   // of freedom around it. However, our mesh
-                                   // is more complicated, and it may well be
-                                   // that more couplings will occur. The
-                                   // value 20 we use here is on the safe side
-                                   // of that, though it may actually be too
-                                   // large. In the step-3 tutorial program,
-                                   // we will see a way to compute a
-                                   // reasonable upper bound to the number of
-                                   // nonzero entries, and later programs will
-                                   // show several other methods to compute
-                                   // the numbers of zeros per row.
+				   // elements. As it turns out, the
+				   // class SparsityPattern, that we
+				   // want to use later, has severe
+				   // drawbacks when we try to fill
+				   // it. Namely in three dimensions,
+				   // it needs to be initialized with
+				   // a lot of wasted memory,
+				   // sometimes too much for the
+				   // machine used, even if the unused
+				   // memory can be released
+				   // immediately after computing the
+				   // sparsity pattern. In order
+				   // to avoid this, we use an
+				   // intermediate object of type
+				   // CompressedSparsityPattern. We
+				   // have to give it the size of the
+				   // matrix, which in our case will
+				   // be square with as many rows and
+				   // columns as there are degrees of
+				   // freedom on the grid:
+  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
 
 				   // We then fill this object with the
 				   // places where nonzero elements will be
 				   // located given the present numbering of
 				   // degrees of freedom:
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-				   // Before further work can be done
-				   // on the object, we have to allow
-				   // for some internal
-				   // reorganization:
-  sparsity_pattern.compress ();
-                                   // What actually happens in this call is
-                                   // the following: upon creation of a
-                                   // <code>SparsityPattern</code> object, memory is
-                                   // allocated for a maximum number of
-                                   // entries per row (20 in our case). The
-                                   // call to
-                                   // <code>DoFTools::make_sparsity_pattern</code> then
-                                   // actually allocates entries as necessary,
-                                   // but the number of nonzero entries in any
-                                   // given row may be less than the 20 we
-                                   // have allocated memory for. To save
-                                   // memory and to simplify some other
-                                   // operations, one then needs to
-                                   // <code>compress</code> the sparsity pattern before
-                                   // anything else.
+  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+
+				   // Now we are ready to create the
+				   // actual sparsity pattern that we
+				   // will use for our matrix. It will
+				   // just contain the data already
+				   // assembled in the
+				   // CompressedSparsityPattern.
+  SparsityPattern sparsity_pattern;
+  sparsity_pattern.copy_from(c_sparsity);
 
 				   // With this, we can now write the results
 				   // to a file:
