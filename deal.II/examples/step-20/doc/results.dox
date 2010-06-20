@@ -170,6 +170,7 @@ The result concerning the convergence order is the same here.
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
+<h4>More realistic permeability fields</h4>
 
 Realistic flow computations for ground water or oil reservoir simulations will
 not use a constant permeability. Here's a first, rather simple way to change
@@ -291,3 +292,16 @@ follows:
 @image html step-20.p-random.png
 
 We will use these permeability fields again in step-21.
+
+
+<h4>Better linear solvers</h4>
+
+As mentioned in the introduction, the Schur complement solver used here is not
+the best one conceivable (nor is it intended to be a particularly good
+one). Better ones can be found in the literture and can be built using the
+same block matrix techniques that were introduced here. We pick up on this
+theme again in step-22, where we first build a Schur complement solver for the
+Stokes equation as we did here, and then in the <a
+href="step_22#improved-solver">Improved Solvers</a> section discuss better
+ways based on solving the system as a whole but preconditioning based on
+individual blocks.
