@@ -43,11 +43,13 @@ toc.html: steps.cmapx toc.html.in $D/examples/step-*/doc/tooltip
 	perl make_toc.pl > toc.html
 
 # generate dot file
-steps.dot: steps.pl
-	perl $< > $@
+steps.dot: steps.pl $D/examples/*/doc/tooltip
+	@echo ================== Making $@
+	@perl $< > $@
 
 steps.cmapx: steps.dot
-	neato -Tpng -Tcmapx -O $<
+	@echo ================== Making $@
+	@neato -Tpng -Tcmapx -O $<
 	@mv steps.dot.png steps.png
 	@mv steps.dot.cmapx steps.cmapx
 
