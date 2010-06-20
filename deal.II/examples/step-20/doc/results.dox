@@ -302,6 +302,6 @@ one). Better ones can be found in the literture and can be built using the
 same block matrix techniques that were introduced here. We pick up on this
 theme again in step-22, where we first build a Schur complement solver for the
 Stokes equation as we did here, and then in the <a
-href="step_22#improved-solver">Improved Solvers</a> section discuss better
+href="step_22.html#improved-solver">Improved Solvers</a> section discuss better
 ways based on solving the system as a whole but preconditioning based on
 individual blocks.
