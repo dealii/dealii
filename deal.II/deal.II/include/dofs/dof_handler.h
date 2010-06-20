@@ -309,6 +309,12 @@ class DoFHandler  :  public Subscriptor
     void renumber_dofs (const std::vector<unsigned int> &new_numbers);
 
 				     /**
+				      * @deprecated Use
+				      * CompressedSparsityPattern
+				      * instead of initializing
+				      * SparsityPattern with this
+				      * value.
+				      *
 				      * Return the maximum number of
 				      * degrees of freedom a degree of freedom
 				      * in the given triangulation with the
@@ -357,6 +363,12 @@ class DoFHandler  :  public Subscriptor
     unsigned int max_couplings_between_dofs () const;
 
 				     /**
+				      * @deprecated Use
+				      * CompressedSparsityPattern
+				      * instead of initializing
+				      * SparsityPattern with this
+				      * value.
+				      *
 				      * Return the number of degrees of freedom
 				      * located on the boundary another dof on
 				      * the boundary can couple with.
