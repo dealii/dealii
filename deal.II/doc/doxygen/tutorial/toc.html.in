@@ -131,7 +131,7 @@ the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
 
   <tr valign="top">
       <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a></td>
-      <td> Transport equation, assembling
+      <td> Linear advection equation, assembling
       the system of equations in parallel using multi-threading,
       implementing a refinement criterion based on a finite difference
       approximation of the gradient.

@@ -37,10 +37,11 @@ get_basename = $(shell echo $(1) | $(PERL) -pi -e 's/(generated|doxygen).//g; s/
 
 
 
-all: $(example-doxygen)
+all: $(example-doxygen) toc.html
 
-toc.html: steps.cmapx toc.html.in
+toc.html: steps.cmapx toc.html.in $D/examples/step-*/doc/tooltip
 	perl make_toc.pl > toc.html
+
 # generate dot file
 steps.dot: steps.pl
 	perl $< > $@
