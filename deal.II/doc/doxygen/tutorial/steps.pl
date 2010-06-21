@@ -14,55 +14,16 @@ my @steps = (1,2,3,4,5,6,7,8,9,
 	     30,31,   33,34,35,36,      39);
 ;
 
-my $essential = ',height=.7,width=.7,shape="octagon",fillcolor="green"';
-my $technique = ',fillcolor="orange"';
-my $fluidapplication = ',fillcolor="yellow"';
-my $solidsapplication = ',fillcolor="lightblue"';
-my $timeapplication = ',fillcolor="blue"';
-my $unfinished = ',style="dashed"';
-
 # List of additional node attributes to highlight purpose and state of the example
-
-my %attribute = (
-    1 => $essential,
-    2 => $essential,
-    3 => $essential,
-    4 => $essential,
-    5 => $essential,
-    6 => $essential,
-
-    7 => $technique,
-    8 => $technique,
-    9 => $technique,
-    10 => $technique,
-    11 => $technique,
-    12 => $technique,
-    13 => $technique,
-    14 => $technique,
-    15 => $technique,
-    16 => $technique,
-    19 => $technique,
-    27 => $technique,
-    28 => $technique,
-    29 => $technique,
-    30 => $technique,
-    36 => $technique,
-
-    17 => $solidsapplication,
-    18 => $solidsapplication,
-
-    20 => $fluidapplication,
-    21 => $fluidapplication,
-    22 => $fluidapplication,
-    31 => $fluidapplication,
-    33 => $fluidapplication,
-    34 => $fluidapplication,
-    35 => $fluidapplication,
-
-    23 => $timeapplication,
-    24 => $timeapplication,
-    25 => $timeapplication,
+my %style = (
+ "basic" => ',height=.7,width=.7,shape="octagon",fillcolor="green"',
+ "techniques" => ',fillcolor="orange"',
+ "fluids" => ',fillcolor="yellow"',
+ "solids" => ',fillcolor="lightblue"',
+ "time dependent" => ',fillcolor="blue"',
+ "unfinished" => ',style="dashed"'
     );
+
 
 # Print a preamble setting common attributes
 
@@ -99,7 +60,16 @@ foreach (@steps)
     chop $tooltip;
 
     printf "Step%02d [label=\"$_\", URL=\"../deal.II/step_$_.html\", tooltip=\"$tooltip\"", $_;
-    print $attribute{$_};
+
+    open KF, "../../../examples/step-$_/doc/kind"
+	or die "Can't open kind file step-$_/doc/kind";
+    my $kind = <KF>;
+    close KF;
+    chop $kind;
+
+    die "Unknown kind '$kind' in file step-$_/doc/kind" if (! defined $style{$kind});
+    print "$style{$kind}";
+
     print "];\n";
 }
 
