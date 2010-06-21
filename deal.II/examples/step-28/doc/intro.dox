@@ -3,10 +3,22 @@
 <i>This program was contributed by Yaqi Wang and Wolfgang
 Bangerth. Results from this program are used and discussed in the publication
 "Three-dimensional $h$-adaptivity for the multigroup neutron diffusion
-equations" by Yaqi Wang, Wolfgang Bangerth and Jean Ragusa. The paper is
-accepted for publication in Progress in Nuclear Energy. A preprint is
+equations" by Yaqi Wang, Wolfgang Bangerth and Jean Ragusa. The paper's full
+biographic details are as follows:
+@code
+@Article{WBR09,
+  author = 	 {Yaqi Wang and Wolfgang Bangerth and Jean Ragusa},
+  title = 	 {Three-dimensional $h$-adaptivity for the multigroup
+                  neutron diffusion equations},
+  journal = 	 {Progr. Nucl. Energy},
+  year = 	 2009,
+  volume = 	 51,
+  pages = 	 {543--555}
+}
+@endcode
+A preprint that mostly matches the final version of the paper is
 available <a
-href="http://iamcs.tamu.edu/research/preprint-series/three-dimensional.pdf">here</a>. 
+href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=19">here</a>. 
 </i>
 
 <br>
