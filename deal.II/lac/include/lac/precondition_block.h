@@ -814,6 +814,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     typedef typename MATRIX::value_type number;
     
 				     /**
+				      * Make type publicly available.
+				      */
+    PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
+    
+				     /**
 				      * Make initialization function
 				      * publicly available.
 				      */
@@ -1008,6 +1013,12 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				      * Constructor.
 				      */
     PreconditionBlockSSOR ();
+
+				     /**
+				      * Make type publicly available.
+				      */
+    PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
+    
 				     /**
 				      * Make initialization function
 				      * publicly available.
