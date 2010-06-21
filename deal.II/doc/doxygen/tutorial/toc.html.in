@@ -57,7 +57,13 @@ the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
   demonstration suite</a>.
 </p>
 
+
 <h2>Map of tutorial programs</h2>
+
+The following graphic shows the connections between tutorial programs.
+Click on any of the boxes to go to one of the programs. If you hover
+your mouse pointer over a box, a brief description of the program
+should appear.
 
 <img src="steps.png" usemap="#StepsMap"\/>
 @@MAP@@
