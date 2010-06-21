@@ -91,7 +91,13 @@ EOT
 
 foreach (@steps)
 {
-    printf 'Step%02d [label="%d", URL="../deal.II/step_%d.html", tooltip="@step%d@"', $_, $_, $_, $_;
+    # read first line of tooltip file
+    open TF, "../../../examples/step-$_/doc/tooltip";
+    my $tooltip = <TF>;
+    close TF;
+    chop $tooltip;
+
+    printf "Step%02d [label=\"$_\", URL=\"../deal.II/step_$_.html\", tooltip=\"$tooltip\"", $_;
     print $attribute{$_};
     print "];\n";
 }
