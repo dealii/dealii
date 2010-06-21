@@ -171,6 +171,13 @@ class BlockInfo : public Subscriptor
 				      */
     unsigned int base_element(unsigned int i) const;
     
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
   private:
 				     /**
 				      * @brief The block structure

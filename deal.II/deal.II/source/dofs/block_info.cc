@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 
+#include <base/memory_consumption.h>
 #include <dofs/block_info.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_tools.h>
@@ -70,6 +71,20 @@ BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof, bool levels_only)
   for (unsigned int i=0;i<sizes.size();++i)
     levels[i].reinit(sizes[i]);
 }
+
+
+unsigned int
+BlockInfo::memory_consumption () const
+{
+  unsigned int mem = (MemoryConsumption::memory_consumption (bi_global) +
+		      MemoryConsumption::memory_consumption (levels) +
+		      MemoryConsumption::memory_consumption (bi_local) +
+		      MemoryConsumption::memory_consumption (base_elements)
+  );
+
+  return mem;
+}
+
 
 
 template void BlockInfo::initialize(const DoFHandler<deal_II_dimension,deal_II_dimension>&);
