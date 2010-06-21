@@ -176,8 +176,8 @@ the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
 
   <tr valign="top">
       <td><a href="../../doxygen/deal.II/step_16.html">Step-16</a></td>
-      <td> Based on step 5, a multilevel
-      preconditioner is implemented.
+      <td> Multigrid preconditioning of the Laplace equation on adaptive
+      meshes.
       </td></tr>
 
   <tr valign="top">
