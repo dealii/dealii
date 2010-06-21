@@ -59,8 +59,10 @@ foreach (@steps)
     close TF;
     chop $tooltip;
 
-    printf "Step%02d [label=\"$_\", URL=\"../deal.II/step_$_.html\", tooltip=\"$tooltip\"", $_;
+    printf "Step$_ [label=\"$_\", URL=\"../deal.II/step_$_.html\", tooltip=\"$tooltip\"";
 
+
+    # read first line of 'kind' file
     open KF, "../../../examples/step-$_/doc/kind"
 	or die "Can't open kind file step-$_/doc/kind";
     my $kind = <KF>;
@@ -76,66 +78,22 @@ foreach (@steps)
 # Print all edges
 # Keep sorted by second node on edge!
 
-print << 'EOT'
+my $target;
+foreach $target (@steps)
+{
+    # read first line of dependency file
+    open BF, "../../../examples/step-$target/doc/builds-on"
+	or die "Can't open builds-on file step-$target/doc/builds-on";
+    my $buildson = <BF>;
+    close BF;
+    chop $buildson;
 
-Step01 -> Step02;
-Step02 -> Step03;
-Step03 -> Step04;
-Step04 -> Step05;
-Step05 -> Step06;
-
-Step06 -> Step07;
-Step06 -> Step08;
-Step06 -> Step09;
-
-Step04 -> Step10;
-Step10 -> Step11;
-
-Step07 -> Step12;
-
-Step06 -> Step16;
-
-Step12 -> Step33;
-
-Step06 -> Step13;
-Step13 -> Step14;
-
-Step04 -> Step15;
-
-Step08 -> Step17;
-Step17 -> Step18;
-
-Step04 -> Step20;
-Step20 -> Step21;
-
-Step06 -> Step22;
-Step22 -> Step31;
-
-Step04 -> Step23;
-Step23 -> Step24;
-Step24 -> Step25;
-
-Step06 -> Step27;
-
-Step06 -> Step28;
-
-Step06 -> Step39;
-
-Step04 -> Step29;
-
-Step12 -> Step30;
-Step12 -> Step39;
-
-Step04 -> Step34;
-
-Step21 -> Step22;
-Step22 -> Step35;
-
-Step04 -> Step36;
-
-Step39 -> Step12;
+    my $source;
+    foreach $source (split ' ', $buildson) {
+	$source =~ s/step-/Step/g;
+	print "$source -> Step$target\n";
+    }
 }
 
-EOT
-    ;
+print "}\n";
 
