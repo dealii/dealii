@@ -92,7 +92,8 @@ EOT
 foreach (@steps)
 {
     # read first line of tooltip file
-    open TF, "../../../examples/step-$_/doc/tooltip";
+    open TF, "../../../examples/step-$_/doc/tooltip"
+	or die "Can't open tooltip file step-$_/doc/tooltip";
     my $tooltip = <TF>;
     close TF;
     chop $tooltip;
