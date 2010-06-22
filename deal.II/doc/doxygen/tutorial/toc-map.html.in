@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Step-by-Step</title>
+  <meta name="author" content="the deal.II authors <authors@dealii.org>">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2007, 2008, 2009, 2010 by the deal.II authors">
+  <meta name="date" content="$Date$">
+  <meta name="svn_id" content="$Id$">
+  <meta name="keywords" content="deal.II,deal.II tutorial,deal II">
+</head>
+
+<!-- Page Body -->
+<body lang="en">
+
+
+<h2>Map of tutorial programs</h2>
+
+The following graph shows the connections between tutorial programs.
+Click on any of the boxes to go to one of the programs. If you hover
+your mouse pointer over a box, a brief description of the program
+should appear.
+
+<img src="steps.png" usemap="#StepsMap"\/>
+@@MAP@@
+
+
+<!-- Page Foot -->
+<hr>
+<address>
+<a href="../../mail.html">The deal.II group</a></address>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Step-by-Step</title>
+  <meta name="author" content="the deal.II authors <authors@dealii.org>">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2007, 2008, 2009, 2010 by the deal.II authors">
+  <meta name="date" content="$Date$">
+  <meta name="svn_id" content="$Id$">
+  <meta name="keywords" content="deal.II,deal.II tutorial,deal II">
+</head>
+
+<!-- Page Body -->
+<body lang="en">
+
+<a name="overview"></a>
+<h2>Overview</h2>
+
+<p>
+The <acronym>deal.II</acronym> tutorial contains a collection of
+programs, each more
+or less built atop of previous ones, which demonstrate various
+aspects of the library. Each such example has the following structure
+follows:</p>
+<ol>
+  <li> <b>Introduction:</b> A brief description of what the program does and
+       what is new compared to the previous programs. This also includes a
+       discussion of the mathematical model and its formulation.
+  <li> <b>The commented program:</b> A listing of the program, interspersed
+       with many comments that explain what is going on, how things are done
+       and why.
+  <li> <b>Results:</b> The output of the program, with some comments and
+       interpretation.
+  <li> <b>The plain program:</b> Since the program itself usually is a little
+       bit unreadable with all the comments intertwingled, we present the
+       program again, with all comments stripped off, to allow getting an
+       overview of it.
+</ol>
+
+<p>
+You can browse through the list of currently available tutorial programs in
+three different ways:
+<ul>
+  <li>In the <a href="toc-map.html">form of a graph</a> that shows how
+  tutorial programs build upon each other.
+
+  <li>In the <a href="toc-list.html">form of a list</a> that provides a short
+  synopsis of what each program does and which new concepts it introduces.
+
+  <li>In the <a href="toc-topics.html">form of groups of topics</a> such as
+  solvers or the kind of equations that different sets of tutorial program
+  address. 
+</ul>
+Some of the programs also jointly form
+the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
+  demonstration suite</a>.
+</p>
+
+
+
+<h3>Usage</h3>
+
+<p>
+The programs are in the <code>examples/</code> directory of your local deal.II
+installation. If you go into one of the tutorial directories, you can compile
+the program by typing <strong>make</strong>, and run it
+using <strong>make run</strong>. The latter command also compiles the program
+if that has not already been done. The Makefiles in the different
+directories are based on the small program Makefile template described
+<a href="../../development/index.html" target="_top">in this section</a>.
+</p>
+
+
+
+<!-- Page Foot -->
+<hr>
+<address>
+<a href="../../mail.html">The deal.II group</a></address>
+</body>
+</html>

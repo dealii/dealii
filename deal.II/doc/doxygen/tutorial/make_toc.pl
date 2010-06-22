@@ -5,7 +5,7 @@
 $/ = undef;
 
 # Read source for web page
-open TOC, "<toc.html.in";
+open TOC, "<toc-map.html.in";
 $toc = <TOC>;
 close TOC;
 
