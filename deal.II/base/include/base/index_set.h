@@ -312,6 +312,14 @@ class IndexSet
 				  const bool      overlapping  = false) const;
 #endif
 
+    
+				     /**
+                                      * Determine an estimate for the memory
+                                      * consumption (in bytes) of this
+                                      * object.
+				      */
+    unsigned int memory_consumption () const;
+
   private:
 				     /**
 				      * A type that denotes the half
@@ -362,6 +370,12 @@ class IndexSet
 		    ||
 		    (range_1.begin == range_2.begin));
 	  }
+
+	unsigned int memory_consumption () const
+	  {
+	    return sizeof(Range);
+	  }
+	
     };
 
 				     /**

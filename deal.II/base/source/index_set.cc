@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 
+#include <base/memory_consumption.h>
 #include <base/index_set.h>
 #include <list>
 
@@ -337,5 +338,16 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 
 
 #endif
+
+
+unsigned int
+IndexSet::memory_consumption () const
+{
+  return MemoryConsumption::memory_consumption (ranges) +
+    MemoryConsumption::memory_consumption (is_compressed) +
+    MemoryConsumption::memory_consumption (index_space_size);
+}
+
+
 
 DEAL_II_NAMESPACE_CLOSE
