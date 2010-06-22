@@ -250,6 +250,22 @@ class IndexSet
     template <class STREAM>
     void print(STREAM &out) const;
 
+				     /**
+				      * Writes the IndexSet into a text based
+				      * file format, that can be read in again
+				      * using the read() function.
+				      */
+    void write(std::ostream & out) const;
+
+				     /**
+				      * Constructs the IndexSet from a text
+				      * based representation given by the
+				      * stream @param in written by the
+				      * write() function.
+				      */
+    void read(std::istream & in);
+    
+    
 #ifdef DEAL_II_USE_TRILINOS
 				     /**
 				      * Given an MPI communicator,

@@ -201,6 +201,38 @@ IndexSet::get_view (const unsigned int begin,
 }
 
 
+
+void
+IndexSet::write(std::ostream & out) const
+{
+  compress();
+  out << size() << " ";
+  out << ranges.size() << std::endl;
+  std::vector<Range>::const_iterator r = ranges.begin();
+  for ( ;r!=ranges.end(); ++r)
+    {
+      out << r->begin << " " << r->end << std::endl;
+    }
+}
+
+
+
+void
+IndexSet::read(std::istream & in)
+{
+  unsigned int s, numranges, b, e;
+  in >> s >> numranges;
+  ranges.clear();
+  set_size(s);
+  for (unsigned int i=0;i<numranges;++i)
+    {
+      in >> b >> e;
+      add_range(b,e);
+    }
+}
+
+
+
 void
 IndexSet::subtract_set (const IndexSet & other)
 {
@@ -297,6 +329,9 @@ void IndexSet::fill_index_vector(std::vector<unsigned int> & indices) const
 
   Assert (indices.size() == n_elements(), ExcInternalError());
 }
+
+
+
 
 
 #ifdef DEAL_II_USE_TRILINOS
