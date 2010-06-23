@@ -207,15 +207,14 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // Now that we have associated a degree of
 				   // freedom with a global number to each
 				   // vertex, we wonder how to visualize this?
-				   // Unfortunately, presently no way is
-				   // implemented to directly show the DoF
-				   // number associated with each
-				   // vertex. However, such information would
-				   // hardly ever be truly important, since
-				   // the numbering itself is more or less
-				   // arbitrary. There are more important
-				   // factors, of which we will visualize one
-				   // in the following.
+				   // There is no simple way to directly
+				   // visualize the DoF number associated with
+				   // each vertex. However, such information
+				   // would hardly ever be truly important,
+				   // since the numbering itself is more or
+				   // less arbitrary. There are more important
+				   // factors, of which we will demonstrate
+				   // one in the following.
 				   //
 				   // Associated with each vertex of the
 				   // triangulation is a shape
@@ -229,7 +228,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // they are associated to, matrix entries
 				   // will be nonzero only if the supports of
 				   // the shape functions associated to that
-				   // column and row numbers intersect. This
+				   // column and row %numbers intersect. This
 				   // is only the case for adjacent shape
 				   // functions, and therefore only for
 				   // adjacent vertices. Now, since the
@@ -240,29 +239,46 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // will be somewhat ragged, and we will
 				   // take a look at it now.
 				   //
-				   // First we have to create a
-				   // structure which we use to store
-				   // the places of nonzero
-				   // elements. As it turns out, the
-				   // class SparsityPattern, that we
-				   // want to use later, has severe
-				   // drawbacks when we try to fill
-				   // it. Namely in three dimensions,
-				   // it needs to be initialized with
-				   // a lot of wasted memory,
-				   // sometimes too much for the
-				   // machine used, even if the unused
-				   // memory can be released
-				   // immediately after computing the
-				   // sparsity pattern. In order
-				   // to avoid this, we use an
-				   // intermediate object of type
-				   // CompressedSparsityPattern. We
-				   // have to give it the size of the
-				   // matrix, which in our case will
-				   // be square with as many rows and
-				   // columns as there are degrees of
-				   // freedom on the grid:
+				   // First we have to create a structure
+				   // which we use to store the places of
+				   // nonzero elements. This can then later be
+				   // used by one or more sparse matrix
+				   // objects that store the values of the
+				   // entries in the locations stored by this
+				   // sparsity pattern. The class that stores
+				   // the locations is the SparsityPattern
+				   // class. As it turns out, however, this
+				   // class has some drawbacks when we try to
+				   // fill it right away: its data structures
+				   // are set up in such a way that we need to
+				   // have an estimate for the maximal number
+				   // of entries we may wish to have in each
+				   // row. In two space dimensions, reasonable
+				   // values for this estimate are available
+				   // through the
+				   // DoFHandler::max_couplings_between_dofs()
+				   // function, but in three dimensions the
+				   // function almost always severely
+				   // overestimates the true number, leading
+				   // to a lot of wasted memory, sometimes too
+				   // much for the machine used, even if the
+				   // unused memory can be released
+				   // immediately after computing the sparsity
+				   // pattern. In order to avoid this, we use
+				   // an intermediate object of type
+				   // CompressedSparsityPattern that uses a
+				   // different %internal data structure and
+				   // that we can later copy into the
+				   // SparsityPattern object without much
+				   // overhead. (Some more information on
+				   // these data structures can be found in
+				   // the @ref Sparsity module.) In order to
+				   // initialize this intermediate data
+				   // structure, we have to give it the size
+				   // of the matrix, which in our case will be
+				   // square with as many rows and columns as
+				   // there are degrees of freedom on the
+				   // grid:
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
 
 				   // We then fill this object with the
@@ -271,11 +287,10 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // degrees of freedom:
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
 
-				   // Now we are ready to create the
-				   // actual sparsity pattern that we
-				   // will use for our matrix. It will
-				   // just contain the data already
-				   // assembled in the
+				   // Now we are ready to create the actual
+				   // sparsity pattern that we could later use
+				   // for our matrix. It will just contain the
+				   // data already assembled in the
 				   // CompressedSparsityPattern.
   SparsityPattern sparsity_pattern;
   sparsity_pattern.copy_from(c_sparsity);
