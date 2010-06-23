@@ -10,22 +10,33 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
-				 // The include files are already known.
+
+                                 // @sect3{Include files}
+
+				 // The include files are already known. The
+				 // one critical for the current program is
+				 // the one that contains the ConstraintMatrix
+				 // in the <code>lac/<code> directory:
 #include <base/function.h>
 #include <base/quadrature_lib.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
-#include <grid/grid_generator.h>
-#include <grid/tria.h>
+
 #include <lac/constraint_matrix.h>
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/solver_control.h>
 #include <lac/sparse_matrix.h>
 #include <lac/sparsity_pattern.h>
+
+#include <grid/grid_generator.h>
+#include <grid/tria.h>
+
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_tools.h>
+
+#include <fe/fe_q.h>
+#include <fe/fe_values.h>
+
 #include <numerics/data_out.h>
 #include <numerics/vectors.h>
 
@@ -33,6 +44,40 @@
 
 
 using namespace dealii;
+
+                                 // @sect3{The <code>LaplaceProblem</code> class template}
+
+				 // The class <code>LaplaceProblem</code> is
+				 // the main class of this problem. As
+				 // mentioned in the introduction, it is
+				 // fashioned after the corresponding class in
+				 // step-3.
+class LaplaceProblem
+{
+  public:
+    LaplaceProblem ();
+    void run ();
+
+  private:
+    Triangulation<2> triangulation;
+
+    FE_Q<2> fe;
+    DoFHandler<2> dof_handler;
+
+    ConstraintMatrix constraints;
+
+    SparsityPattern sparsity_pattern;
+    SparseMatrix<double> system_matrix;
+    Vector<double> system_rhs;
+    Vector<double> solution;
+
+    void assemble_system ();
+    void output_results ();
+    void setup_system ();
+    void solve ();   
+};
+
+
 				 // The RightHandSide class is a function
 				 // object representing the right-hand side of
 				 // the problem.
@@ -51,37 +96,19 @@ double RightHandSide::value (const Point<2>&p, const unsigned int) const {
 
 				 // Here comes the constructor of the class
 				 // <code>RightHandSide</code>.
-RightHandSide::RightHandSide (): Function<2> () {
-}
-
-				 // The class <code>LaplaceProblem</code> is
-				 // the main class, which solves the problem.
-class LaplaceProblem {
-  private:
-    ConstraintMatrix constraints;
-    const RightHandSide right_hand_side;
-    Triangulation<2> triangulation;
-    DoFHandler<2> dof_handler;
-    FE_Q<2> fe;
-    SparseMatrix<double> A;
-    SparsityPattern sparsity_pattern;
-    Vector<double> b;
-    Vector<double> u;
-    void assemble_system ();
-    void output_results ();
-    void setup_system ();
-    void solve ();
-   
-  public:
-    LaplaceProblem ();
-    void run ();
-};
+RightHandSide::RightHandSide ()
+		:
+		Function<2> ()
+{}
 
 				 // The constructor of the class, where the
 				 // <code>DoFHandler</code> and the finite
 				 // element object are initialized.
-LaplaceProblem::LaplaceProblem (): dof_handler (triangulation), fe (1) {
-}
+LaplaceProblem::LaplaceProblem ()
+		:
+		fe (1),
+		dof_handler (triangulation)
+{}
 
 				 //Assembling the system matrix and the
 				 //right-hand side vector is done as in other
@@ -96,7 +123,9 @@ void LaplaceProblem::assemble_system () {
   std::vector<Point<2> > quadrature_points;
   std::vector<unsigned int> cell_dof_indices (dofs_per_cell);
   Vector<double> cell_rhs (dofs_per_cell);
-   
+
+  const RightHandSide right_hand_side;
+
   for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active (); cell != dof_handler.end (); ++cell) {
     cell_rhs = 0;
     fe_values.reinit (cell);
@@ -112,7 +141,7 @@ void LaplaceProblem::assemble_system () {
       }
       
     cell->get_dof_indices (cell_dof_indices);
-    constraints.distribute_local_to_global (cell_matrix, cell_rhs, cell_dof_indices, A, b);
+    constraints.distribute_local_to_global (cell_matrix, cell_rhs, cell_dof_indices, system_matrix, system_rhs);
   }
 }
 
@@ -232,9 +261,9 @@ void LaplaceProblem::setup_system () {
   sparsity_pattern.reinit (n_dofs, n_dofs, dof_handler.max_couplings_between_dofs ());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern, constraints, false);
   sparsity_pattern.compress ();
-  A.reinit (sparsity_pattern);
-  b.reinit (n_dofs);
-  u.reinit (n_dofs);
+  system_matrix.reinit (sparsity_pattern);
+  system_rhs.reinit (n_dofs);
+  solution.reinit (n_dofs);
 }
 				 // To solve the linear system of equations
 				 // $Au=b$ we use the CG solver with an
@@ -243,12 +272,12 @@ void LaplaceProblem::solve () {
   SolverControl solver_control (dof_handler.n_dofs (), 1e-15);
   PreconditionSSOR<SparseMatrix<double> > precondition;
    
-  precondition.initialize (A);
+  precondition.initialize (system_matrix);
    
   SolverCG<> cg (solver_control);
    
-  cg.solve (A, u, b, precondition);
-  constraints.distribute (u);
+  cg.solve (system_matrix, solution, system_rhs, precondition);
+  constraints.distribute (solution);
 }
 
 void LaplaceProblem::output_results () {
@@ -257,7 +286,7 @@ void LaplaceProblem::output_results () {
   DataOut<2> data_out;
    
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (u, "u");
+  data_out.add_data_vector (solution, "u");
   data_out.build_patches ();
    
   std::ofstream output ("solution.vtk");
