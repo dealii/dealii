@@ -7,22 +7,27 @@
 <h1>Introduction</h1>
 
 In this example we consider how to use periodic boundary conditions in
-deal.II. Periodic boundary conditions often occur in computations of photonic
+deal.II. Periodic boundary conditions are a typical approach when one wants to
+solve some equation on a representative piece of a larger domain that repeats
+in one or more direction; an example is the simulation of the electronic
+structure of photonic
 crystals, because they have a lattice-like structure and, thus, it often
 suffices to do the actual computation on only one cell. To be able to proceed
 this way one has to assume that the computation can be periodically extended
 to the other cells. This requires the solution to be periodic w.r.t. the
-cells. Hence the solution has to obtain the same values on the parts of the
-boundary, which are facing each other. In the figure below we show this
-concept in two space-dimensions. There, all faces with the same color should
+cells. Hence the solution has to obtain the same nodal values on opposite parts of the
+boundary. In the figure below we show this
+concept in two space-dimensions. There, all dashed faces with the same color should
 have the same boundary values:
 
 @image html step-45.periodic_cells.png
 
-To keep things simple, in this tutorial we will consider an academic problem,
-which is a little bit easier: We solve the Poisson problem on a domain, where
-the left and right parts of the boundary are identified. Let $\Omega=(0,1)^2$
-and consider the problem 
+To keep things simple, in this tutorial we will consider an academic,
+simplified problem that allows us to focus on only that part that we are
+interested in here, namely how to set up periodic boundary
+conditions. Specifically, we solve the Poisson problem on a domain, where the
+left and right parts of the boundary are identified. Let $\Omega=(0,1)^2$ and
+consider the problem
 @f{align*}
    -\Delta u &=
    \pi^2\sin(\pi x)\sin(\pi y)  \qquad &\text{in }\Omega
@@ -51,7 +56,7 @@ constraints:
   U_{\text{periodic}(i)} = U_i, \qquad \forall i \in {\cal I}_b. 
 @f}
 Now, this is exactly the sort of constraint that the ConstraintMatrix class
-handles and can enforce in linear system. Consequently, the main point of this
+handles and can enforce in a linear system. Consequently, the main point of this
 program is how we fill the ConstraintMatrix object that stores these
 constraints, and how this is applied to the resulting linear system.
 
