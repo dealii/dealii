@@ -55,7 +55,8 @@ constraints:
 @f{align*}
   U_{\text{periodic}(i)} = U_i, \qquad \forall i \in {\cal I}_b. 
 @f}
-Now, this is exactly the sort of constraint that the ConstraintMatrix class
+Now, this is exactly the sort of constraint that the ConstraintMatrix class,
+first introduced in step-6,
 handles and can enforce in a linear system. Consequently, the main point of this
 program is how we fill the ConstraintMatrix object that stores these
 constraints, and how this is applied to the resulting linear system.
