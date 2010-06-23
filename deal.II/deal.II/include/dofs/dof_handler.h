@@ -355,8 +355,8 @@ class DoFHandler  :  public Subscriptor
 				      * problem is to use an intermediate
 				      * compressed sparsity pattern that only
 				      * allocates memory on demand. Refer to
-				      * the step-11 example
-				      * program on how to do this. The problem
+				      * the step-2 and step-11 example
+				      * programs on how to do this. The problem
 				      * is also discussed in the documentation
 				      * of the module on @ref Sparsity.
 				      */
