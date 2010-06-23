@@ -310,10 +310,10 @@ class DoFHandler  :  public Subscriptor
 
 				     /**
 				      * @deprecated Use
-				      * CompressedSparsityPattern
-				      * instead of initializing
-				      * SparsityPattern with this
-				      * value.
+				      * CompressedSparsityPattern instead of
+				      * initializing SparsityPattern with this
+				      * value, see the discussion in step-2
+				      * and the @ref Sparsity module.
 				      *
 				      * Return the maximum number of
 				      * degrees of freedom a degree of freedom
