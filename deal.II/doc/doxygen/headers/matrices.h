@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -122,9 +122,9 @@
  * difficult to estimate the maximal number of entries per row. Consequently,
  * a common strategy is to first build and intermediate sparsity pattern that
  * uses a less efficient storage scheme during construction of the sparsity
- * pattern and later copy it directly into the static, compressed form (see,
- * for example the step-11, step-18, and @ref
- * step_27 "step-27" tutorial programs).
+ * pattern and later copy it directly into the static, compressed form. Most
+ * tutorial programs do this, starting at step-2 (see also, for example the
+ * step-11, step-18, and step-27 tutorial programs).
  *
  *
  * <h4>"Dynamic" or "compressed" sparsity patterns</h4>
