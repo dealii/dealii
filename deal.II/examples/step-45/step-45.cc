@@ -29,6 +29,9 @@
 #include <numerics/data_out.h>
 #include <numerics/vectors.h>
 
+#include <fstream>
+
+
 using namespace dealii;
 				 // The RightHandSide class is a function
 				 // object representing the right-hand side of
@@ -130,7 +133,11 @@ void LaplaceProblem::setup_system () {
 				   // Here the degrees of freedom are
 				   // distributed.
   dof_handler.distribute_dofs (fe);
-  std::cout << "Number of active cells: " << triangulation.n_active_cells () << std::endl << "Degrees of freedom: " << dof_handler.n_dofs () << std::endl;
+  std::cout << "Number of active cells: "
+	    << triangulation.n_active_cells ()
+	    << std::endl
+	    << "Degrees of freedom: " << dof_handler.n_dofs ()
+	    << std::endl;
 				   // Now it is the time for the constraint
 				   // matrix. The first constraints we put in
 				   // are the periodic boundary
@@ -162,8 +169,7 @@ void LaplaceProblem::setup_system () {
   std::vector<std::pair<unsigned int, double> > dof_locations;
    
   dof_locations.reserve (dof_handler.n_boundary_dofs ());
-   
-  unsigned int dofs_per_face = fe.dofs_per_face;
+
 				   // Then we loop over all active cells and
 				   // check, whether the cell is located at
 				   // the boundary. If this is the case, we
