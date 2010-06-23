@@ -45,13 +45,20 @@
 
 using namespace dealii;
 
-                                 // @sect3{The <code>LaplaceProblem</code> class template}
+                                 // @sect3{The <code>LaplaceProblem</code> class}
 
 				 // The class <code>LaplaceProblem</code> is
 				 // the main class of this problem. As
 				 // mentioned in the introduction, it is
 				 // fashioned after the corresponding class in
-				 // step-3.
+				 // step-3. Correspondingly, the documentation
+				 // from that tutorial program applies here as
+				 // well. The only new member variable is the
+				 // <code>constraints</code> variables that
+				 // will hold the constraints from the
+				 // periodic boundary condition. We will
+				 // initialize it in the
+				 // <code>setup_system()</code> function.
 class LaplaceProblem
 {
   public:
@@ -78,74 +85,52 @@ class LaplaceProblem
 };
 
 
-				 // The RightHandSide class is a function
-				 // object representing the right-hand side of
-				 // the problem.
-class RightHandSide: public Function<2> {
+                                 // @sect3{The <code>RightHandSide</code> class}
+
+				 // The following implements the right hand
+				 // side function discussed in the
+				 // introduction. Its implementation is
+				 // obvious given what has been shown in
+				 // step-4 before:
+class RightHandSide: public Function<2>
+{
   public:
     RightHandSide ();
-    virtual double value (const Point<2>& p, const unsigned int component = 0) const;
+
+    virtual double value (const Point<2>& p,
+			  const unsigned int component = 0) const;
 };
 
-				 // This function returns the value of the
-				 // right-hand side at a given point
-				 // <code>p</code>.
-double RightHandSide::value (const Point<2>&p, const unsigned int) const {
-  return numbers::PI * numbers::PI * std::sin (numbers::PI * p (0)) * std::sin (numbers::PI * p (1));
-}
 
-				 // Here comes the constructor of the class
-				 // <code>RightHandSide</code>.
 RightHandSide::RightHandSide ()
 		:
 		Function<2> ()
 {}
 
-				 // The constructor of the class, where the
-				 // <code>DoFHandler</code> and the finite
-				 // element object are initialized.
+
+double
+RightHandSide::value (const Point<2>&p,
+		      const unsigned int) const
+{
+  return (numbers::PI * numbers::PI *
+	  std::sin (numbers::PI * p (0)) *
+	  std::sin (numbers::PI * p (1)));
+}
+
+                                 // @sect3{Implementation of the <code>LaplaceProblem</code> class}
+
+				 // The first part of implementing the main
+				 // class is the constructor. It is unchanged
+				 // from step-3 and step-4:
 LaplaceProblem::LaplaceProblem ()
 		:
 		fe (1),
 		dof_handler (triangulation)
 {}
 
-				 //Assembling the system matrix and the
-				 //right-hand side vector is done as in other
-				 //tutorials before.
-void LaplaceProblem::assemble_system () {
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  QGauss<2> quadrature (2);
-  const unsigned int n_quadrature_points = quadrature.size ();
-  double JxW;
-  FEValues<2> fe_values (fe, quadrature, update_gradients | update_JxW_values | update_quadrature_points | update_values);
-  FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-  std::vector<Point<2> > quadrature_points;
-  std::vector<unsigned int> cell_dof_indices (dofs_per_cell);
-  Vector<double> cell_rhs (dofs_per_cell);
 
-  const RightHandSide right_hand_side;
-
-  for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active (); cell != dof_handler.end (); ++cell) {
-    cell_rhs = 0;
-    fe_values.reinit (cell);
-    quadrature_points = fe_values.get_quadrature_points ();
-      
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point) {
-	JxW = fe_values.JxW (q_point);
-	cell_rhs (i) += JxW * fe_values.shape_value (i, q_point) * right_hand_side.value (quadrature_points[q_point]);
-            
-	for (unsigned int j = 0; j < dofs_per_cell; ++j)
-	  cell_matrix (i, j) += JxW * fe_values.shape_grad (i, q_point) * fe_values.shape_grad (j, q_point);
-      }
-      
-    cell->get_dof_indices (cell_dof_indices);
-    constraints.distribute_local_to_global (cell_matrix, cell_rhs, cell_dof_indices, system_matrix, system_rhs);
-  }
-}
-
-void LaplaceProblem::setup_system () {
+void LaplaceProblem::setup_system ()
+{
   GridGenerator::hyper_cube (triangulation);
 				   // We change the boundary indicator on the
 				   // parts of the boundary, where we have
@@ -265,11 +250,73 @@ void LaplaceProblem::setup_system () {
   system_rhs.reinit (n_dofs);
   solution.reinit (n_dofs);
 }
+
+
+                                 // @sect4{LaplaceProblem::assemble_system}
+
+				 // Assembling the system matrix and the
+				 // right-hand side vector is done as in other
+				 // tutorials before.
+void LaplaceProblem::assemble_system ()
+{
+  QGauss<2>  quadrature_formula(2);
+  FEValues<2> fe_values (fe, quadrature_formula, 
+			   update_values   | update_gradients |
+                           update_quadrature_points | update_JxW_values);
+
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.size();
+
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+  const RightHandSide right_hand_side;
+
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
+				      endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      cell_matrix = 0;
+      cell_rhs = 0;
+
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  {
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
+	      cell_matrix(i,j) += (fe_values.shape_grad (i, q_point) *
+				   fe_values.shape_grad (j, q_point) *
+				   fe_values.JxW (q_point));
+
+	    cell_rhs(i) += (fe_values.shape_value (i, q_point) *
+			    right_hand_side.value (fe_values.quadrature_point (q_point)) *
+			    fe_values.JxW (q_point));
+	  }
+      
+      cell->get_dof_indices (local_dof_indices);
+      constraints.distribute_local_to_global (cell_matrix, cell_rhs,
+					      local_dof_indices,
+					      system_matrix, system_rhs);
+    }
+}
+
+
+                                 // @sect4{LaplaceProblem::solve}
+
 				 // To solve the linear system of equations
 				 // $Au=b$ we use the CG solver with an
-				 // SSOR-preconditioner.
-void LaplaceProblem::solve () {
-  SolverControl solver_control (dof_handler.n_dofs (), 1e-15);
+				 // SSOR-preconditioner. This is, again,
+				 // copied almost verbatim from step-4, with
+				 // the exception of the preconditioner. As in
+				 // step-6, we need to make sure that
+				 // constrained degrees of freedom get their
+				 // correct values after solving by calling
+				 // the ConstraintMatrix::distribute function:
+void LaplaceProblem::solve ()
+{
+  SolverControl solver_control (dof_handler.n_dofs (), 1e-12);
   PreconditionSSOR<SparseMatrix<double> > precondition;
    
   precondition.initialize (system_matrix);
@@ -280,9 +327,14 @@ void LaplaceProblem::solve () {
   constraints.distribute (solution);
 }
 
-void LaplaceProblem::output_results () {
-				   // As graphical output we create vtk-file
-				   // of the computed solution.
+
+                                 // @sect4{LaplaceProblem::output_results}
+
+				 // This is another function copied from
+				 // previous tutorial programs. It generates
+				 // graphical output in VTK format:
+void LaplaceProblem::output_results ()
+{
   DataOut<2> data_out;
    
   data_out.attach_dof_handler (dof_handler);
@@ -293,18 +345,57 @@ void LaplaceProblem::output_results () {
    
   data_out.write_vtk (output);
 }
-				 // This function manages the solving process
-				 // of the problem.
+
+
+
+                                 // @sect4{LaplaceProblem::run}
+
+				 // And another function copied from previous
+				 // programs:
 void LaplaceProblem::run () {
   setup_system ();
   assemble_system ();
   solve ();
   output_results ();
 }
+
+                                 // @sect3{The <code>main</code> function}
+
 				 // And at the end we have the main function
-				 // as usual.
-int main () {
-  LaplaceProblem laplace_problem;
-   
-  laplace_problem.run ();
+				 // as usual, this time copied from step-6:
+int main ()
+{
+  try
+    {
+      deallog.depth_console (0);
+
+      LaplaceProblem laplace_problem;
+      laplace_problem.run ();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+
+      return 1;
+    }
+  catch (...) 
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
+
+  return 0;
 }
