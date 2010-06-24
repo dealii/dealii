@@ -59,7 +59,9 @@ using namespace dealii;
 				 // will hold the constraints from the
 				 // periodic boundary condition. We will
 				 // initialize it in the
-				 // <code>setup_system()</code> function.
+				 // <code>make_periodicity_constraints()</code>
+				 // function which we call from
+				 // <code>make_grid_and_dofs()</code>.
 class LaplaceProblem
 {
   public:
@@ -82,6 +84,7 @@ class LaplaceProblem
     void assemble_system ();
     void output_results ();
     void make_grid_and_dofs ();
+    void make_periodicity_constraints ();
     void solve ();   
 };
 
@@ -129,6 +132,8 @@ LaplaceProblem::LaplaceProblem ()
 		dof_handler (triangulation)
 {}
 
+
+                                 // @sect4{LaplaceProblem::make_grid_and_dofs}
 
 void LaplaceProblem::make_grid_and_dofs ()
 {
@@ -265,6 +270,18 @@ void LaplaceProblem::make_grid_and_dofs ()
 				 // Assembling the system matrix and the
 				 // right-hand side vector is done as in other
 				 // tutorials before.
+				 //
+				 // The only difference here is that we don't
+				 // copy elements from local contributions
+				 // into the global matrix and later fix up
+				 // constrained degrees of freedom, but that
+				 // we let the ConstraintMatrix do this job in
+				 // one swoop for us using the
+				 // ConstraintMatrix::distribute_local_to_global
+				 // function(). This was previously already
+				 // demonstrated in step-16, step-22, for
+				 // example, along with a discussion in the
+				 // introduction of step-27.
 void LaplaceProblem::assemble_system ()
 {
   QGauss<2>  quadrature_formula(2);
