@@ -7,8 +7,6 @@ iteration steps of the solver, in much the same way as step-3 did:
 @code
 Number of active cells: 1024
 Degrees of freedom: 1089
-DEAL:cg::Starting value 0.153970
-DEAL:cg::Convergence step 54 value 7.73356e-16
 @endcode
 
 The plot of the solution can be found in the figure below. We can see that the
