@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1510,9 +1510,8 @@ double &
 SymmetricTensor<2,1>::operator () (const TableIndices<2> &indices)
 {
   const unsigned int rank = 2;
-  const unsigned int dim  = 1;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < 1, ExcIndexRange (indices[r], 0, 1));
 
   return data[0];
 }
