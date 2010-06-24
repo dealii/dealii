@@ -330,7 +330,7 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
 
   const unsigned int blocking = 1<<BLOCK_LEVEL;
   Number sum1, sum2, sum3, sum = Number();
-  const Number * X = val, *X_end = X + vec_size, 
+  const Number * X = val, *X_end = X + vec_size,
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
     *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
@@ -341,25 +341,25 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
 				   // the result vector. this is necessary
 				   // because
 				   // operator*(complex<float>,complex<double>)
-				   // is not defined by default. do the 
+				   // is not defined by default. do the
 				   // operations block-wise with post-update.
-				   // use three nested loops, which should make 
-				   // the roundoff error very small up to 
+				   // use three nested loops, which should make
+				   // the roundoff error very small up to
 				   // about 20m entries. in the
-				   // end do extra loops with the remainders. 
+				   // end do extra loops with the remainders.
 				   // this blocked algorithm has been proposed
 				   // by Castaldo, Whaley and Chronopoulos
-				   // (SIAM J. Sci. Comput. 31, 1156-1174, 
+				   // (SIAM J. Sci. Comput. 31, 1156-1174,
 				   // 2008)
   while (X != X_end1)
     {
-      sum1 = 0.;
+      sum1 = Number();
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum2 = 0;
+	  sum2 = Number();
 	  for (unsigned int k=0; k<blocking; ++k)
 	    {
-	      sum3 = 0;
+	      sum3 = Number();
 	      for (unsigned int i=0; i<blocking; ++i)
 		sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
 	      sum2 += sum3;
@@ -370,10 +370,10 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
     }
   while (X != X_end2)
     {
-      sum2 = 0.;
+      sum2 = Number();
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum3 = 0;
+	  sum3 = Number();
 	  for (unsigned int i=0; i<blocking; ++i)
 	    sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
 	  sum2 += sum3;
@@ -382,14 +382,14 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
     }
   while (X != X_end3)
     {
-      sum3 = 0;
+      sum3 = Number();
       for (unsigned int i=0; i<blocking; ++i)
 	sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
       sum += sum3;
     }
 
-  sum3 = 0;
-  while (X != X_end) 
+  sum3 = Number();
+  while (X != X_end)
     sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
   sum += sum3;
 
@@ -405,7 +405,7 @@ Vector<Number>::norm_sqr () const
 
   const unsigned int blocking = 1<<BLOCK_LEVEL;
   real_type sum1, sum2, sum3, sum = 0.;
-  const Number * X = val, *X_end = X + vec_size, 
+  const Number * X = val, *X_end = X + vec_size,
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
     *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
@@ -415,10 +415,10 @@ Vector<Number>::norm_sqr () const
       sum1 = 0.;
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum2 = 0;
+	  sum2 = 0.;
 	  for (unsigned int k=0; k<blocking; ++k)
 	    {
-	      sum3 = 0;
+	      sum3 = 0.;
 	      for (unsigned int i=0; i<blocking; ++i)
 		sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
 	      sum2 += sum3;
@@ -432,7 +432,7 @@ Vector<Number>::norm_sqr () const
       sum2 = 0.;
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum3 = 0;
+	  sum3 = 0.;
 	  for (unsigned int i=0; i<blocking; ++i)
 	    sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
 	  sum2 += sum3;
@@ -441,14 +441,14 @@ Vector<Number>::norm_sqr () const
     }
   while (X != X_end3)
     {
-      sum3 = 0;
+      sum3 = 0.;
       for (unsigned int i=0; i<blocking; ++i)
 	sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
       sum += sum3;
     }
 
-  sum3 = 0;
-  while (X != X_end) 
+  sum3 = 0.;
+  while (X != X_end)
     sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
   sum += sum3;
 
@@ -462,21 +462,21 @@ Number Vector<Number>::mean_value () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   const unsigned int blocking = 1<<BLOCK_LEVEL;
-  Number sum1, sum2, sum3, sum = 0.;
-  const Number * X = val, *X_end = X + vec_size, 
+  Number sum1, sum2, sum3, sum = Number();
+  const Number * X = val, *X_end = X + vec_size,
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
     *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
 
   while (X != X_end1)
     {
-      sum1 = 0.;
+      sum1 = Number();
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum2 = 0;
+	  sum2 = Number();
 	  for (unsigned int k=0; k<blocking; ++k)
 	    {
-	      sum3 = 0;
+	      sum3 = Number();
 	      for (unsigned int i=0; i<blocking; ++i)
 		sum3 += *X++;
 	      sum2 += sum3;
@@ -487,10 +487,10 @@ Number Vector<Number>::mean_value () const
     }
   while (X != X_end2)
     {
-      sum2 = 0.;
+      sum2 = Number();
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum3 = 0;
+	  sum3 = Number();
 	  for (unsigned int i=0; i<blocking; ++i)
 	    sum3 += *X++;
 	  sum2 += sum3;
@@ -499,14 +499,14 @@ Number Vector<Number>::mean_value () const
     }
   while (X != X_end3)
     {
-      sum3 = 0;
+      sum3 = Number();
       for (unsigned int i=0; i<blocking; ++i)
 	sum3 += *X++;
       sum += sum3;
     }
 
-  sum3 = 0;
-  while (X != X_end) 
+  sum3 = Number();
+  while (X != X_end)
     sum3 += *X++;
   sum += sum3;
 
@@ -520,10 +520,10 @@ typename Vector<Number>::real_type
 Vector<Number>::l1_norm () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
- 
+
   const unsigned int blocking = 1<<BLOCK_LEVEL;
   real_type sum1, sum2, sum3, sum = 0.;
-  const Number * X = val, *X_end = X + vec_size, 
+  const Number * X = val, *X_end = X + vec_size,
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
     *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
@@ -533,10 +533,10 @@ Vector<Number>::l1_norm () const
       sum1 = 0.;
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum2 = 0;
+	  sum2 = 0.;
 	  for (unsigned int k=0; k<blocking; ++k)
 	    {
-	      sum3 = 0;
+	      sum3 = 0.;
 	      for (unsigned int i=0; i<blocking; ++i)
 		sum3 += numbers::NumberTraits<Number>::abs(*X++);
 	      sum2 += sum3;
@@ -550,7 +550,7 @@ Vector<Number>::l1_norm () const
       sum2 = 0.;
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum3 = 0;
+	  sum3 = 0.;
 	  for (unsigned int i=0; i<blocking; ++i)
 	    sum3 += numbers::NumberTraits<Number>::abs(*X++);
 	  sum2 += sum3;
@@ -559,14 +559,14 @@ Vector<Number>::l1_norm () const
     }
   while (X != X_end3)
     {
-      sum3 = 0;
+      sum3 = 0.;
       for (unsigned int i=0; i<blocking; ++i)
 	sum3 += numbers::NumberTraits<Number>::abs(*X++);
       sum += sum3;
     }
 
-  sum3 = 0;
-  while (X != X_end) 
+  sum3 = 0.;
+  while (X != X_end)
     sum3 += numbers::NumberTraits<Number>::abs(*X++);
   sum += sum3;
 
@@ -597,7 +597,7 @@ Vector<Number>::lp_norm (const real_type p) const
 
   const unsigned int blocking = 1<<BLOCK_LEVEL;
   real_type sum1, sum2, sum3, sum = 0.;
-  const Number * X = val, *X_end = X + vec_size, 
+  const Number * X = val, *X_end = X + vec_size,
     *X_end3 = X + ((vec_size>>(BLOCK_LEVEL))<<(BLOCK_LEVEL)),
     *X_end2 = X + ((vec_size>>(2*BLOCK_LEVEL))<<(2*BLOCK_LEVEL)),
     *X_end1 = X + ((vec_size>>(3*BLOCK_LEVEL))<<(3*BLOCK_LEVEL));
@@ -607,10 +607,10 @@ Vector<Number>::lp_norm (const real_type p) const
       sum1 = 0.;
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum2 = 0;
+	  sum2 = 0.;
 	  for (unsigned int k=0; k<blocking; ++k)
 	    {
-	      sum3 = 0;
+	      sum3 = 0.;
 	      for (unsigned int i=0; i<blocking; ++i)
 		sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
 	      sum2 += sum3;
@@ -624,7 +624,7 @@ Vector<Number>::lp_norm (const real_type p) const
       sum2 = 0.;
       for (unsigned int j=0; j<blocking; ++j)
 	{
-	  sum3 = 0;
+	  sum3 = 0.;
 	  for (unsigned int i=0; i<blocking; ++i)
 	    sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
 	  sum2 += sum3;
@@ -633,14 +633,14 @@ Vector<Number>::lp_norm (const real_type p) const
     }
   while (X != X_end3)
     {
-      sum3 = 0;
+      sum3 = 0.;
       for (unsigned int i=0; i<blocking; ++i)
 	sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
       sum += sum3;
     }
 
-  sum3 = 0;
-  while (X != X_end) 
+  sum3 = 0.;
+  while (X != X_end)
     sum3 += std::pow(numbers::NumberTraits<Number>::abs(*X++),p);
   sum += sum3;
 
@@ -655,7 +655,7 @@ Vector<Number>::linfty_norm () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  real_type max = 0;
+  real_type max = 0.;
 
   for (unsigned int i=0; i<vec_size; ++i)
     max = std::max (numbers::NumberTraits<Number>::abs(val[i]), max);

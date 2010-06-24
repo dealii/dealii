@@ -31,6 +31,18 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>
+  Removed: The class TrilinosWrappers::SolverBlock and 
+  TrilinosWrappers::PreconditionBlock have been deleted for compatibility 
+  reasons with Trilinos 10.2. These solvers can be exchanged by deal.II's 
+  own iterative solvers with block matrices and vectors without loss in
+  performance.
+  <br>
+  (Martin Kronbichler 2010/06/24)
+  </p>
+
+  <li>
+  <p>
   Changed: The SparseMatrix::operator() used to always check that an entry
   exists when accessing it. If it didn't, it would throw an exception that
   could be caught in a user program. Since these accesses are very frequent,

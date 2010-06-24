@@ -13825,21 +13825,7 @@ for ac_header in Amesos.h \
                     Sacado.hpp \
                     Teuchos_ParameterList.hpp \
                     Teuchos_RCP.hpp \
-                    Teuchos_RefCountPtr.hpp \
-                    Thyra_AztecOOLinearOpWithSolveFactory.hpp \
-                    Thyra_DefaultBlockedLinearOp.hpp \
-                    Thyra_DefaultInverseLinearOp.hpp \
-                    Thyra_EpetraLinearOp.hpp \
-                    Thyra_EpetraThyraWrappers.hpp \
-                    Thyra_InverseLinearOperator.hpp \
-                    Thyra_LinearOperatorDecl.hpp \
-                    Thyra_LinearOperatorImpl.hpp \
-                    Thyra_LinearOpWithSolveFactoryHelpers.hpp \
-                    Thyra_MultiVectorBase.hpp \
-                    Thyra_MultiVectorDefaultBase.hpp \
-                    Thyra_VectorDecl.hpp \
-                    Thyra_VectorImpl.hpp \
-                    Thyra_VectorSpaceImpl.hpp
+                    Teuchos_RefCountPtr.hpp
 
 do
 as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`

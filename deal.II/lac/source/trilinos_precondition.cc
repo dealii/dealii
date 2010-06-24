@@ -513,8 +513,8 @@ namespace TrilinosWrappers
   PreconditionAMG:: initialize (const SparseMatrix   &matrix,
 				const AdditionalData &additional_data)
   {
-    preconditioner.release();
-    multilevel_operator.release();
+    preconditioner.reset ();
+    multilevel_operator.reset ();
 
     const unsigned int n_rows = matrix.m();
 
@@ -632,10 +632,9 @@ namespace TrilinosWrappers
   PreconditionAMG::initialize (const SparseMatrix           &matrix,
 			       const Teuchos::ParameterList &ml_parameters)
   {
-    multilevel_operator = Teuchos::rcp (new ML_Epetra::MultiLevelPreconditioner(
-					matrix.trilinos_matrix(), ml_parameters,
-					true));
-    preconditioner = Teuchos::rcp (multilevel_operator.get(), false);
+    multilevel_operator.reset (new ML_Epetra::MultiLevelPreconditioner
+			       (matrix.trilinos_matrix(), ml_parameters));
+    preconditioner.reset (multilevel_operator.get(), false);
   }
 
 
@@ -648,6 +647,8 @@ namespace TrilinosWrappers
 	      const double                          drop_tolerance,
 	      const ::dealii::SparsityPattern      *use_this_sparsity)
   {
+    preconditioner.reset();
+    multilevel_operator.reset ();
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
 
 				        // Init Epetra Matrix using an

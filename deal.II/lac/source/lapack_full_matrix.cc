@@ -318,10 +318,12 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
 {
   Assert(state == matrix, ExcState(state));
   const int nn = this->n_cols();
-  Assert(nn == this->n_rows(), ExcNotQuadratic());
+  Assert(static_cast<unsigned int>(nn) == this->n_rows(), ExcNotQuadratic());
   Assert(B.n_rows() == B.n_cols(), ExcNotQuadratic());
-  Assert(nn == B.n_cols(), ExcDimensionMismatch (nn, B.n_cols()));
-  Assert(eigenvectors.size() <= nn, ExcMessage ("eigenvectors.size() > matrix.n_cols()"));
+  Assert(static_cast<unsigned int>(nn) == B.n_cols(), 
+	 ExcDimensionMismatch (nn, B.n_cols()));
+  Assert(eigenvectors.size() <= static_cast<unsigned int>(nn), 
+	 ExcMessage ("eigenvectors.size() > matrix.n_cols()"));
   
   wr.resize(nn);
   wi.resize(nn); //This is set purley for consistency reasons with the 
@@ -393,7 +395,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   {
     unsigned int col_begin(i*nn);
     eigenvectors[i].reinit(nn, true);
-    for (unsigned int j=0; j < nn; ++j)
+    for (unsigned int j=0; j < static_cast<unsigned int>(nn); ++j)
     {
       eigenvectors[i](j) = values_A[col_begin+j];
     }

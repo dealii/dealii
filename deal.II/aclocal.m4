@@ -6124,21 +6124,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
                     Sacado.hpp \
                     Teuchos_ParameterList.hpp \
                     Teuchos_RCP.hpp \
-                    Teuchos_RefCountPtr.hpp \
-                    Thyra_AztecOOLinearOpWithSolveFactory.hpp \
-                    Thyra_DefaultBlockedLinearOp.hpp \
-                    Thyra_DefaultInverseLinearOp.hpp \
-                    Thyra_EpetraLinearOp.hpp \
-                    Thyra_EpetraThyraWrappers.hpp \
-                    Thyra_InverseLinearOperator.hpp \
-                    Thyra_LinearOperatorDecl.hpp \
-                    Thyra_LinearOperatorImpl.hpp \
-                    Thyra_LinearOpWithSolveFactoryHelpers.hpp \
-                    Thyra_MultiVectorBase.hpp \
-                    Thyra_MultiVectorDefaultBase.hpp \
-                    Thyra_VectorDecl.hpp \
-                    Thyra_VectorImpl.hpp \
-                    Thyra_VectorSpaceImpl.hpp
+                    Teuchos_RefCountPtr.hpp
                    ],
                    [],
                    [
