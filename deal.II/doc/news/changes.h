@@ -175,7 +175,7 @@ inconvenience this causes.
    and Cataldo Manigrasso, SISSA, Trieste, Italy). It
    explains in detail how to use the
    library for the solution of problems defined on codimension
-   one manifolds, such as, for example, Boundary Element Methods.
+   one manifolds, such as, for example, %Boundary Element Methods.
    <br>
    (Luca Heltai, 2009/09/23)
    </p>
@@ -206,7 +206,7 @@ inconvenience this causes.
     \ |\mathrm{diam}(\Omega)|^{\alpha-2}$. This didn't matter much in this
    program because $\mathrm{diam}(\Omega)=2^{1/\textrm{dim}}$ and so is close
    to one. It would matter, however, if the domain had been different, as
-   it is, for example, in step-32.
+   it is, for example, in the future step 32.
    <br>
    (WB 2009/08/19)
    </p>
