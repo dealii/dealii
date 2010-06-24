@@ -6107,6 +6107,20 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
 
   CPPFLAGS="-I$DEAL_II_TRILINOS_INCDIR $CPPFLAGS"
   CXXFLAGS="-I$DEAL_II_TRILINOS_INCDIR $CXXFLAGS"
+
+  dnl This is a subtle problem: Trilinos ML's ml_config.h has a
+  dnl   #define HAVE_INTTYPES_H
+  dnl without giving it a value. On the other hand, the previous
+  dnl autoconf test for this header file will have put a
+  dnl   #define HAVE_INTTYPES_H 1
+  dnl into confdefs.h, which will lead to an error. Avoid this
+  dnl problem by #undefining HAVE_INTTYPES_H for now and undoing
+  dnl this later on again.
+  cp confdefs.h confdefs.h.bak
+  echo "#ifdef HAVE_INTTYPES_H" >> confdefs.h
+  echo "#undef HAVE_INTTYPES_H" >> confdefs.h
+  echo "#endif" >> confdefs.h
+
   AC_CHECK_HEADERS([Amesos.h \
                     AztecOO.h \
                     AztecOO_Operator.h \
@@ -6134,13 +6148,15 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
                                    Trilinos sub-packages enabled.])
                    ],
                    [])
+  mv confdefs.h.bak confdefs.h
+
   CPPFLAGS="${OLD_CPPFLAGS}"
   CXXFLAGS="${OLD_CXXFLAGS}"
 ])
 
 
 dnl ------------------------------------------------------------
-dnl Check whether MUMPS is installed; and, if so, then check for 
+dnl Check whether MUMPS is installed; and, if so, then check for
 dnl two known dependecies, namely, SCALAPACK and BLACS.
 dnl
 dnl Usage: DEAL_II_CONFIGURE_MUMPS
@@ -6186,7 +6202,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_MUMPS, dnl
       [Specify the path to the scalapack installation; use this if you want to override the SCALAPACK_DIR environment variable.])],
       [dnl action-if-given (test)
        DEAL_II_SCALAPACK_DIR="$withval"
-       AC_MSG_RESULT($DEAL_II_SCALAPACK_DIR) 
+       AC_MSG_RESULT($DEAL_II_SCALAPACK_DIR)
        dnl Make sure that what was specified is actually correct
        if test ! -d $DEAL_II_SCALAPCK_DIR ; then
          AC_MSG_ERROR([The path to SCALAPACK specified with --with-scalapack does t point to a complete SCALAPACK installation])
@@ -6235,7 +6251,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_MUMPS, dnl
     AC_MSG_RESULT($DEAL_II_BLACS_ARCH)
     dnl ------------------------------------------------------------
 
-  fi 
+  fi
   dnl End check for MUMPS dependencies
   dnl ------------------------------------------------------------
 
@@ -6244,11 +6260,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_MUMPS, dnl
     AC_DEFINE([DEAL_II_USE_MUMPS], [1],
               [Defined if a MUMPS installation was found and is going to be used              ])
     dnl and set an additional variable:
-    DEAL_II_DEFINE_DEAL_II_USE_MUMPS=DEAL_II_USE_MUMPS 
+    DEAL_II_DEFINE_DEAL_II_USE_MUMPS=DEAL_II_USE_MUMPS
     dnl and finally set with_mumps if this hasn't happened yet:
     if test "x$with_mumps" = "x" ; then
       with_mumps="yes"
-    fi 
+    fi
   fi
 ])
 
