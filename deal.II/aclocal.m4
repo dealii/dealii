@@ -6116,6 +6116,10 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
   dnl into confdefs.h, which will lead to an error. Avoid this
   dnl problem by #undefining HAVE_INTTYPES_H for now and undoing
   dnl this later on again.
+  dnl
+  dnl Note that we have to do essentially the same trick as
+  dnl well during compile time; see the block in AH_BOTTOM in
+  dnl configure.in that goes into base/include/base/config.h
   cp confdefs.h confdefs.h.bak
   echo "#ifdef HAVE_INTTYPES_H" >> confdefs.h
   echo "#undef HAVE_INTTYPES_H" >> confdefs.h
