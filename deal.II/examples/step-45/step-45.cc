@@ -16,7 +16,7 @@
 				 // The include files are already known. The
 				 // one critical for the current program is
 				 // the one that contains the ConstraintMatrix
-				 // in the <code>lac/<code> directory:
+				 // in the <code>lac/</code> directory:
 #include <base/function.h>
 #include <base/quadrature_lib.h>
 
