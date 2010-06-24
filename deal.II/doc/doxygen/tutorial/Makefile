@@ -39,6 +39,15 @@ get_basename = $(shell echo $(1) | $(PERL) -pi -e 's/(generated|doxygen).//g; s/
 
 all: $(example-doxygen) toc.html
 
+# Generation of the map of the example programs. Note, that the
+# following command only merges the map into toc.html. The map itself
+# is not generated automatically, but requires to call
+#
+# make steps.png
+#
+#  by hand. This way, we avoid testing for neato during
+#  configuration. The map only needs to be generated after changes in
+#  the structure of the tutorials.
 toc.html: steps.cmapx toc.html.in
 	@echo ================== Making $@
 	@perl make_toc.pl > toc.html
