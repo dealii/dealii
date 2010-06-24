@@ -80,9 +80,9 @@ programmed in the same way.
 
 This program is related to step-12, in that it uses MeshWorker and
 discontinuous Galerkin methods. While there, we solved an advection
-problem, here it is a diffusion problem. Here, we also use mutligrid
+problem, here it is a diffusion problem. Here, we also use multigrid
 preconditioning and a theoretically justified error estimator, see
-Karakashian an Pascal (2003). The multilevel scheme was discussed in
+Karakashian and Pascal (2003). The multilevel scheme was discussed in
 detail in Kanschat (2004). The adaptive iteration and its convergence
 have been discussed (for triangular meshes) in Hoppe, Kanschat, and
 Warburton (2009).
