@@ -49,9 +49,10 @@ for a face <i>F</i> of a cell <i>K</i>, compute the value
 \sigma_{F,K} = p(p+1) \frac{|F|_{d-1}}{|K|_d},
 @f]
 where <i>p</i> is the polynomial degree of the finite element
-functions and $|.|$ denotes the Hausdorff measure of the corresponding
-dimension of the object. If the face is at the boundary, choose $\sigma_F = \sigma_{F,K}$.
-For an interior face, take the average of the two values at this face.
+functions and $|\cdot|_d$ and $|\cdot|_{d-1}$ denote the $d$ and $d-1$
+dimensional Hausdorff measure of the corresponding
+object. If the face is at the boundary, choose $\sigma_F = \sigma_{F,K}$.
+For an interior face, we take the average of the two values at this face.
 
 In our finite element program, we distinguish three different
 integrals, corresponding to the sums over cells, interior faces and
