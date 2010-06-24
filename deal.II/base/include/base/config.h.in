@@ -495,54 +495,6 @@
 /* Define to 1 if you have the <Teuchos_RefCountPtr.hpp> header file. */
 #undef HAVE_TEUCHOS_REFCOUNTPTR_HPP
 
-/* Define to 1 if you have the <Thyra_AztecOOLinearOpWithSolveFactory.hpp>
-   header file. */
-#undef HAVE_THYRA_AZTECOOLINEAROPWITHSOLVEFACTORY_HPP
-
-/* Define to 1 if you have the <Thyra_DefaultBlockedLinearOp.hpp> header file.
-   */
-#undef HAVE_THYRA_DEFAULTBLOCKEDLINEAROP_HPP
-
-/* Define to 1 if you have the <Thyra_DefaultInverseLinearOp.hpp> header file.
-   */
-#undef HAVE_THYRA_DEFAULTINVERSELINEAROP_HPP
-
-/* Define to 1 if you have the <Thyra_EpetraLinearOp.hpp> header file. */
-#undef HAVE_THYRA_EPETRALINEAROP_HPP
-
-/* Define to 1 if you have the <Thyra_EpetraThyraWrappers.hpp> header file. */
-#undef HAVE_THYRA_EPETRATHYRAWRAPPERS_HPP
-
-/* Define to 1 if you have the <Thyra_InverseLinearOperator.hpp> header file.
-   */
-#undef HAVE_THYRA_INVERSELINEAROPERATOR_HPP
-
-/* Define to 1 if you have the <Thyra_LinearOperatorDecl.hpp> header file. */
-#undef HAVE_THYRA_LINEAROPERATORDECL_HPP
-
-/* Define to 1 if you have the <Thyra_LinearOperatorImpl.hpp> header file. */
-#undef HAVE_THYRA_LINEAROPERATORIMPL_HPP
-
-/* Define to 1 if you have the <Thyra_LinearOpWithSolveFactoryHelpers.hpp>
-   header file. */
-#undef HAVE_THYRA_LINEAROPWITHSOLVEFACTORYHELPERS_HPP
-
-/* Define to 1 if you have the <Thyra_MultiVectorBase.hpp> header file. */
-#undef HAVE_THYRA_MULTIVECTORBASE_HPP
-
-/* Define to 1 if you have the <Thyra_MultiVectorDefaultBase.hpp> header file.
-   */
-#undef HAVE_THYRA_MULTIVECTORDEFAULTBASE_HPP
-
-/* Define to 1 if you have the <Thyra_VectorDecl.hpp> header file. */
-#undef HAVE_THYRA_VECTORDECL_HPP
-
-/* Define to 1 if you have the <Thyra_VectorImpl.hpp> header file. */
-#undef HAVE_THYRA_VECTORIMPL_HPP
-
-/* Define to 1 if you have the <Thyra_VectorSpaceImpl.hpp> header file. */
-#undef HAVE_THYRA_VECTORSPACEIMPL_HPP
-
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
@@ -596,6 +548,24 @@
 #  define DEAL_VOLATILE volatile
 #else
 #  define DEAL_VOLATILE
+#endif
+
+/**
+ * There is an annoying problem in the Trilinos header ml_config.h: It
+ * #define's HAVE_INTTYPES_H but doesn't give the symbol a value. This
+ * conflicts with the result of running deal.II's ./configure which
+ * #define's it and gives it the value "1". The result is a compiler
+ * warning. So if we use Trilinos and if the symbol is already
+ * #define'd, then #undef it again here. deal.II doesn't use the
+ * #define anyway and this way if we include any of the Trilinos
+ * headers they can feel free to set it again to whatever they wish.
+ *
+ * The form of the #undef with the comment in the middle is necessary
+ * to avoid that the pattern substitution of ./configure turns the
+ * #undef into a #define again.
+ */
+#if defined(DEAL_II_USE_TRILINOS) && defined(HAVE_INTTYPES_H)
+#  undef /**/ HAVE_INTTYPES_H
 #endif
 
 /**

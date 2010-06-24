@@ -701,6 +701,24 @@ AH_BOTTOM(
 #endif
 
 /**
+ * There is an annoying problem in the Trilinos header ml_config.h: It
+ * #define's HAVE_INTTYPES_H but doesn't give the symbol a value. This
+ * conflicts with the result of running deal.II's ./configure which
+ * #define's it and gives it the value "1". The result is a compiler
+ * warning. So if we use Trilinos and if the symbol is already
+ * #define'd, then #undef it again here. deal.II doesn't use the
+ * #define anyway and this way if we include any of the Trilinos
+ * headers they can feel free to set it again to whatever they wish.
+ *
+ * The form of the #undef with the comment in the middle is necessary
+ * to avoid that the pattern substitution of ./configure turns the
+ * #undef into a #define again.
+ */
+#if defined(DEAL_II_USE_TRILINOS) && defined(HAVE_INTTYPES_H)
+#  undef /**/ HAVE_INTTYPES_H
+#endif
+
+/**
  * These macros are defined to make testing for PETSc versions within
  * the deal.II main code as simple as possible. In brief they are used
  * like this: (i) DEAL_II_PETSC_VERSION_LT is used to advance the
