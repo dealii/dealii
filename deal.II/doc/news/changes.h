@@ -214,7 +214,7 @@ inconvenience this causes.
 
    <li>
    <p>
-   Changed: When using Trilinos wrapper objects in parallel through MPI, each
+   Changed: When using Trilinos wrapper objects in %parallel through MPI, each
    object now uses a separate and distinct MPI communicator object. This
    ensures that different objects (such as different matrices, or different
    vectors) communicate on separate channels, thereby simplifying debugging
@@ -236,7 +236,7 @@ inconvenience this causes.
 
    <li>
    <p>
-   Changed: When configuring to use METIS for partitioning meshes in parallel,
+   Changed: When configuring to use METIS for partitioning meshes in %parallel,
    the METIS header files had to be modified by hand. In addition, with some
    MPI implementations one would get into trouble if <code>mpi.h</code>
    included <code>mpicxx.h</code>. These two problems have now been
@@ -270,7 +270,7 @@ inconvenience this causes.
    <p>
    Changed: The support for threading has been completely re-written. In
    particular, the Threads::spawn functions have been deprecated, and
-   new functions Threads::new_threads have been introduced.
+   new functions Threads::new_thread have been introduced.
    Threading is now discussed in a lot of detail in the
    @ref threads "Parallel computing with multiple processors" module.
    <br>
@@ -316,7 +316,7 @@ inconvenience this causes.
   MatrixOut, etc) can now produce the XML-based version of the VTK file format
   (the so-called VTU format). Furthermore, the
   DataOutInterfaces::write_pvtu_record function can be used to describe a set
-  of parallel VTU files as part of a single visualization set.
+  of %parallel VTU files as part of a single visualization set.
   <br>
   (Scott Miller 2010/06/01)
   </p></li>
@@ -396,7 +396,7 @@ inconvenience this causes.
   <li>
   <p>
   New: The Utilities::Trilinos::duplicate_communicator function allows to duplicate
-  an Epetra_Comm object to get a unique parallel MPI communicator out of an
+  an Epetra_Comm object to get a unique %parallel MPI communicator out of an
   existing one. Utilities::Trilinos::duplicate_map creates a map that has
   the same members as the given template but uses a separate communicator.
   <br>
@@ -494,7 +494,7 @@ inconvenience this causes.
   <li>
     <p>
     New: A class SparseDirectMumps that provides an interface to
-    the MUltifrontal Massively Parallel sparse direct Solver (MUMPS).
+    the MUltifrontal Massively Parallel sparse direct %Solver (MUMPS).
     </p>
   <br>
   (Markus Buerg 2010/05/10)
@@ -573,7 +573,7 @@ inconvenience this causes.
 
   <li>
     <p>
-    Fixed: When using the TrilinosWrappers::MPI::Vector::reinit() function with a parallel
+    Fixed: When using the TrilinosWrappers::MPI::Vector::reinit() function with a %parallel
     vector, and if the vector initialized and the vector given had a local range on one of
     the processors that exactly matched, the program would freeze if the local ranges on
     the other processors did not also match exactly. This is now fixed.
@@ -658,7 +658,7 @@ inconvenience this causes.
   features of SLEPc (Scalable Library for Eigenvalue Problem
   Computations): (1) The SLEPcWrappers::SolverBase class can be used
   for specifying an eigenvalue problem, either in standard or
-  generalized form, on serial or parallel architectures with support
+  generalized form, on serial or %parallel architectures with support
   for a few solver types; and (2) The
   SLEPcWrappers::TransformationBase class encapsulates a variety of
   spectral transformations providing some functionality required for
@@ -721,6 +721,7 @@ inconvenience this causes.
   (WB 2010/05/07)
   </p></li>
 
+  <li>
   <p>Fixed: FE_DGQ::has_support_on_face() returned the wrong value in 1d if the
   polynomial degree of the finite element equals zero (i.e. for piecewise
   constants) where the lone shape function is nonzero on all faces. This is now
@@ -1018,7 +1019,7 @@ inconvenience this causes.
    <li>
    <p>
    Fixed: The DoFRenumbering::component_wise function for MGDoFHandler objects
-   did a few things in parallel that weren't thread-safe. This is now fixed.
+   did a few things in %parallel that weren't thread-safe. This is now fixed.
    <br>
    (WB, 2009/01/20)
    </p>
