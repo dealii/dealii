@@ -48,7 +48,7 @@ steps.dot: steps.pl $D/examples/*/doc/tooltip
 	@echo ================== Making $@
 	@perl $< > $@
 
-steps.cmapx: steps.dot
+steps.png: steps.dot
 	@echo ================== Making $@
 	@neato -Tpng -Tcmapx -O $<
 	@mv steps.dot.png steps.png
