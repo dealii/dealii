@@ -705,6 +705,12 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+<li> <p> New: The namespace MeshWorker contains a generic MeshWorker::loop() over all cells and faces as well as auciliary classes, which allow to program integrals over mesh cells and faces in a very generic and local way. In particular, an application programmer will not have to distinguish between regular faces and faces with hanging nodes anymore. Two tutorial programs (step-12 and step-39) highlight the functionality of this framework.
+<br>
+(GK 2010/06/24)
+</p></li>
+
   <li>
   <p>New: The FE_Q_Hierarchical class now has functions
   FE_Q_Hierarchical::hp_constraints_are_implemented and
