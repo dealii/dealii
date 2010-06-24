@@ -446,7 +446,7 @@ class DoFTools
 				      * pattern that corresponds to the
 				      * subdomain_id for which it is
 				      * responsible. This feature is
-				      * step-32.
+				      * used in step-32.
 				      */
     template <class DH, class SparsityPattern>
     static
