@@ -80,7 +80,7 @@ class LaplaceProblem
 
     void assemble_system ();
     void output_results ();
-    void setup_system ();
+    void make_grid_and_dofs ();
     void solve ();   
 };
 
@@ -129,7 +129,7 @@ LaplaceProblem::LaplaceProblem ()
 {}
 
 
-void LaplaceProblem::setup_system ()
+void LaplaceProblem::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation);
 				   // We change the boundary indicator on the
@@ -352,8 +352,9 @@ void LaplaceProblem::output_results ()
 
 				 // And another function copied from previous
 				 // programs:
-void LaplaceProblem::run () {
-  setup_system ();
+void LaplaceProblem::run ()
+{
+  make_grid_and_dofs();
   assemble_system ();
   solve ();
   output_results ();
