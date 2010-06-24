@@ -63,7 +63,7 @@ right.
 
 As we will see below, even the error estimate is of the same
 structure, since it can be written as
-@f{align*}{
+@f{align*}
   \eta^2 &= \eta_K^2 + \eta_F^2 + \eta_B^2
   \\
   \eta_K^2 &= \sum_{K\in \mathbb T_h} h^2 \|f + \Delta u_h\|^2
