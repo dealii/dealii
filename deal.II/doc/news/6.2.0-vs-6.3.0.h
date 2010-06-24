@@ -107,7 +107,7 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
-   New: The new tutorial program step-37,
+   New: The new tutorial program step-45,
    contributed by Markus B&uuml;rg, shows how to implement periodic boundary
    conditions.
    <br>
