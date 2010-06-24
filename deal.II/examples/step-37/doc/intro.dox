@@ -367,8 +367,8 @@ hand, most of the more frequently used preconditioners such as SSOR, ILU or
 algebraic multigrid (AMG) can now no longer be used here because their
 implementation requires knowledge of the elements of the system matrix.
 
-One solution is to use multigrid methods as shown in @ref step_16
-"step-16". They are known to be very fast, and they are suitable for our
+One solution is to use multigrid methods as shown in
+step-16. They are known to be very fast, and they are suitable for our
 purpose since they can be designed based purely on matrix-vector products. All
 one needs to do is to find a smoother that works with matrix-vector products
 only (our choice requires knowledge of the diagonal entries of the matrix,
@@ -388,8 +388,11 @@ SOR/Gauss&ndash;Seidel smoothing relies on substitutions, which can often only
 be parallelized by working on diagonal sub-blocks of the matrix, which
 decreases efficiency.
 
-The implementation into the multigrid framework is then straightforward. We
-will only need some minor modifications compared to step-16.
+The implementation into the multigrid framework is then straightforward. This
+program is based on an earlier version of step-16 that demonstrated multigrid
+on uniformly refined grids. However, the present matrix-free techniques would
+obviously also apply to the adaptive meshes the current step-16 uses.
+
 
 <h3>The test case</h3>
 
