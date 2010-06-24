@@ -1,8 +1,8 @@
 <h1>Results</h1>
 
 The textual output the program generates is not very surprising. It just
-prints out the usual information on degrees of freedom, active cells and
-iteration steps of the solver, in much the same way as step-3 did:
+prints out the usual information on degrees of freedom and active cells,
+in much the same way as step-3 did:
 
 @code
 Number of active cells: 1024

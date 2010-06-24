@@ -12,11 +12,11 @@ solve some equation on a representative piece of a larger domain that repeats
 in one or more direction; an example is the simulation of the electronic
 structure of photonic
 crystals, because they have a lattice-like structure and, thus, it often
-suffices to do the actual computation on only one cell. To be able to proceed
-this way one has to assume that the computation can be periodically extended
-to the other cells. This requires the solution to be periodic w.r.t. the
-cells. Hence the solution has to obtain the same nodal values on opposite parts of the
-boundary. In the figure below we show this
+suffices to do the actual computation on only one cell of the lattice. To be
+able to proceed this way one has to assume that the computation can be periodically
+extended to the other cells. This requires the solution to be periodic with respect
+to the cells. Hence the solution has to obtain the same nodal values on opposite
+parts of the boundary. In the figure below we show this
 concept in two space-dimensions. There, all dashed faces with the same color should
 have the same boundary values:
 
@@ -45,14 +45,14 @@ periodic unless this is explicitly enforced.
 The way one has to see these periodic boundary conditions $u(x,0) = u(x,1)$ is
 as follows: Assume for a moment (as we do in this program) that we have a
 uniformly refined mesh. Then, after discretization there are a number of nodes
-(degrees of freedom) with indices $i \in {\cal I}_b$ on the bottom boundary of
-the domain, and  a second set of nodes at the top boundary $j \in {\cal
+(degrees of freedom) with indices $i \in {\cal I}_b$ on the left boundary of
+the domain, and  a second set of nodes at the right boundary $j \in {\cal
 I}_t$. Since we have assumed that the mesh is uniformly refined, there is
 exactly one node $j \in {\cal I}_t$ for each $i \in {\cal I}_b$ so that
 ${\mathrm x}_j = {\mathrm x}_i + (0,1)^T$, i.e. the two of them match with
 respect to the periodicity. We will then write that $j=\text{periodic}(i)$
 (and, if you want, $i=\text{periodic}(j)$).
-If now $U_k, k=0,\ldots,N-1$ are the unknowns of our discretized problem, then
+If now $U_k, k=0,\ldots,N-1,$ are the unknowns of our discretized problem, then
 the periodic boundary condition boils down to the following set of
 constraints:
 @f{align*}
