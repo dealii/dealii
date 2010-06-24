@@ -1,1 +1,11 @@
 <a name="Intro"></a>
+
+In this program, we use the interior penalty method and Nitsche's weak
+boundary conditions to solve Poisson's equation. We use multigrid
+methods on locally refined meshes, which are generated using a bulk
+criterion and a standard error estimator based on cell and face
+residuals. All operators are implemented using the MeshWorker interface.
+
+Like in step-12, the discretization relies on finite element spaces,
+which are polynomial inside the mesh cells, but have no continuity
+between cells. For such functions, we define the mean value and jump operators
