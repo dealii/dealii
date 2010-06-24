@@ -189,7 +189,7 @@ cmake \
           -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE       \
           -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE   \
           -D BUILD_SHARED_LIBS:BOOL=ON \
-          -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/x86_64/trilinos-10.0.2-mpi \
+          -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/x86_64/trilinos-10.0.2 \
           `pwd`/../
 make
 make install
@@ -200,15 +200,6 @@ make install
       want to use Trilinos with MPI on parallel machines, you also need to
       flip the value of the <code>TPL_ENABLE_MPI</code> flag above.
       </p>
-    <p>
-      Note: if the deal.II ./configure reports an error related to
-      HAVE_INTTYPES_H, edit <trilinos>/include/ml_config.h and comment out the
-      line
-	<code>
-	<pre>
-#define HAVE_INTTYPES_H
-	</pre>
-	</code>
     </p>
 
       <h3>Configuring for installed Trilinos packages</h3>
