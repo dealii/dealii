@@ -26,6 +26,7 @@
 #include <lac/solver_control.h>
 #include <lac/sparse_matrix.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
 
 #include <grid/grid_generator.h>
 #include <grid/tria.h>
@@ -236,16 +237,23 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // upper and lower parts of the boundary
 				   // and close the
 				   // <code>ConstraintMatrix</code> object.
-  VectorTools::interpolate_boundary_values (dof_handler, 1, ZeroFunction<2> (), constraints);
+  VectorTools::interpolate_boundary_values (dof_handler, 1,
+					    ZeroFunction<2> (),
+					    constraints);
   constraints.close ();
 				   // Then we create the sparsity pattern and
 				   // the system matrix and initialize the
 				   // solution and right-hand side vectors.
   const unsigned int n_dofs = dof_handler.n_dofs ();
-   
-  sparsity_pattern.reinit (n_dofs, n_dofs, dof_handler.max_couplings_between_dofs ());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern, constraints, false);
-  sparsity_pattern.compress ();
+
+  CompressedSparsityPattern c_sparsity_pattern (n_dofs, n_dofs);
+  DoFTools::make_sparsity_pattern (dof_handler,
+				   c_sparsity_pattern,
+				   constraints,
+				   false);
+  c_sparsity_pattern.compress ();
+  sparsity_pattern.copy_from (c_sparsity_pattern);
+  
   system_matrix.reinit (sparsity_pattern);
   system_rhs.reinit (n_dofs);
   solution.reinit (n_dofs);
