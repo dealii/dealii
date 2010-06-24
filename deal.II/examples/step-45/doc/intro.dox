@@ -45,18 +45,18 @@ periodic unless this is explicitly enforced.
 The way one has to see these periodic boundary conditions $u(x,0) = u(x,1)$ is
 as follows: Assume for a moment (as we do in this program) that we have a
 uniformly refined mesh. Then, after discretization there are a number of nodes
-(degrees of freedom) with indices $i \in {\cal I}_b$ on the left boundary of
+(degrees of freedom) with indices $i \in {\cal I}_l$ on the left boundary of
 the domain, and  a second set of nodes at the right boundary $j \in {\cal
-I}_t$. Since we have assumed that the mesh is uniformly refined, there is
-exactly one node $j \in {\cal I}_t$ for each $i \in {\cal I}_b$ so that
-${\mathrm x}_j = {\mathrm x}_i + (0,1)^T$, i.e. the two of them match with
+I}_r$. Since we have assumed that the mesh is uniformly refined, there is
+exactly one node $j \in {\cal I}_r$ for each $i \in {\cal I}_l$ so that
+${\mathrm x}_j = {\mathrm x}_i + (1,0)^T$, i.e. the two of them match with
 respect to the periodicity. We will then write that $j=\text{periodic}(i)$
 (and, if you want, $i=\text{periodic}(j)$).
 If now $U_k, k=0,\ldots,N-1,$ are the unknowns of our discretized problem, then
 the periodic boundary condition boils down to the following set of
 constraints:
 @f{align*}
-  U_{\text{periodic}(i)} = U_i, \qquad \forall i \in {\cal I}_b. 
+  U_{\text{periodic}(i)} = U_i, \qquad \forall i \in {\cal I}_l. 
 @f}
 Now, this is exactly the sort of constraint that the ConstraintMatrix class,
 first introduced in step-6,
