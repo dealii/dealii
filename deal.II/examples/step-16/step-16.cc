@@ -399,6 +399,13 @@ void LaplaceProblem<dim>::setup_system ()
 				 // local contributions into the global
 				 // matrix. This is not only simpler but also
 				 // more efficient for large problems.
+				 //
+				 // This latter trick is something that only
+				 // found its way into deal.II over time and
+				 // wasn't used in the initial version of this
+				 // tutorial program. There is, however, a
+				 // discussion of this function in the
+				 // introduction of step-27.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system ()
 {
