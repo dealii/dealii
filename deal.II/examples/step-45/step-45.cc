@@ -116,9 +116,10 @@ double
 RightHandSide::value (const Point<2>&p,
 		      const unsigned int) const
 {
-  return (numbers::PI * numbers::PI *
-	  std::sin (numbers::PI * p (0)) *
-	  std::sin (numbers::PI * p (1)));
+  return (std::cos (2 * numbers::PI * p(0)) *
+	  std::exp (- 2 * p(0)) *
+	  std::cos (2 * numbers::PI * p(1)) *
+	  std::exp (- 2 * p(1)));
 }
 
                                  // @sect3{Implementation of the <code>LaplaceProblem</code> class}
@@ -213,85 +214,151 @@ void LaplaceProblem::make_grid_and_dofs ()
 
                                  // @sect4{LaplaceProblem::make_periodicity_constraints}
 
+				 // This is the function that provides the new
+				 // material of this tutorial program. The
+				 // general outline of the algorithm is as
+				 // follows: we first loop over all the
+				 // degrees of freedom on the right boundary
+				 // and record their $y$-locations in a map
+				 // together with their global indices. Then
+				 // we go along the left boundary, find
+				 // matching $y$-locations for each degree of
+				 // freedom, and then add constraints that
+				 // identify these matched degrees of freedom.
+				 //
+				 // In this function, we make use of the fact
+				 // that we have a scalar element (i.e. the
+				 // only valid vector component that can be
+				 // passed to DoFAccessor::vertex_dof_index is
+				 // zero) and that we have a $Q_1$ element for
+				 // which all degrees of freedom live in the
+				 // vertices of the cell. Furthermore, we have
+				 // assumed that we are in 2d and that meshes
+				 // were not refined adaptively &mdash; the
+				 // latter assumption would imply that there
+				 // may be vertices that aren't matched
+				 // one-to-one and for which we won't be able
+				 // to compute constraints this easily. We
+				 // will discuss in the "outlook" part of the
+				 // results section below other strategies to
+				 // write the current function that can work
+				 // in cases like this as well.
 void LaplaceProblem::make_periodicity_constraints ()
 {
-				   // matrix. The first constraints we put in
-				   // are the periodic boundary
-				   // conditions. For this let us consider the
-				   // constraints we have to take care of in
-				   // more detail first: We want to identify
-				   // all degrees of freedom located on the
-				   // right part of the boundary with the ones
-				   // located on the left part. Thus, first we
-				   // select a degree of freedom on the right
-				   // part of the boundary. Then we look for
-				   // the corresponding one the left-hand side
-				   // and identify these two. Since we are
-				   // using finite elements of order 1 here,
-				   // finding the corresponding degree of
-				   // freedom on the other side is quite easy:
-				   // All degrees of freedom are located on
-				   // vertices and thus we simply can take the
-				   // degree of freedom on the other side,
-				   // which is located on the vertex with the
-				   // same y-component.  Here starts the
-				   // implementation: First we declare a
-				   // vector, which stores the global index of
-				   // the boundary degree of freedom together
-				   // with the y-component of the vertex on
-				   // which it is located.
-   
-  std::vector<std::pair<unsigned int, double> > dof_locations;
-   
-  dof_locations.reserve (dof_handler.n_boundary_dofs ());
+				   // To start with the actual implementation,
+				   // we loop over all active cells and check
+				   // whether the cell is located at the right
+				   // boundary (i.e. face 1 &mdash; the one at
+				   // the right end of the cell &mdash; is at
+				   // the boundary). If that is so, then we
+				   // use that for the currently used finite
+				   // element, each degree of freedom of the
+				   // face is located on one vertex, and store
+				   // their $y$-coordinate along with the
+				   // global number of this degree of freedom
+				   // in the following map:
+  std::map<unsigned int, double> dof_locations;
 
-				   // Then we loop over all active cells and
-				   // check, whether the cell is located at
-				   // the boundary. If this is the case, we
-				   // check, if it is located on the right
-				   // part of the boundary, hence, if face 1
-				   // is at the boundary.
-  for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active (); cell != dof_handler.end (); ++cell)
-    if (cell->at_boundary () && cell->face (1)->at_boundary ()) {
-				       // Since each degree of freedom of the
-				       // face is located on one vertex, we
-				       // can access them directly and store
-				       // the global index of the degree of
-				       // freedom togehter with the
-				       // y-component of the vertex on which
-				       // it is located.
-      dof_locations.push_back (std::pair<unsigned int, double> (cell->vertex_dof_index (1, 0), cell->vertex (1) (1)));
-      dof_locations.push_back (std::pair<unsigned int, double> (cell->vertex_dof_index (3, 0), cell->vertex (3) (1)));
-    }
+  for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active ();
+       cell != dof_handler.end (); ++cell)
+    if (cell->at_boundary ()
+	&&
+	cell->face(1)->at_boundary ())
+      {
+	dof_locations[cell->face(1)->vertex_dof_index(0, 0)]
+	  = cell->face(1)->vertex(0)[1];
+	dof_locations[cell->face(1)->vertex_dof_index(1, 0)]
+	  = cell->face(1)->vertex(1)[1];
+      }
+				   // Note that in the above block, we add
+				   // vertices zero and one of the affected
+				   // face to the map. This means that we will
+				   // add each vertex twice, once from each of
+				   // the two adjacent cells (unless the
+				   // vertex is a corner of the domain). Since
+				   // the coordinates of the vertex are the
+				   // same both times of course, there is no
+				   // harm: we replace one value in the map
+				   // with itself the second time we visit an
+				   // entry.
+				   //
+				   // The same will be true below where we add
+				   // the same constraint twice to the
+				   // ConstraintMatrix &mdash; again, we will
+				   // overwrite the constraint with itself,
+				   // and no harm is done.
+  
 				   // Now we have to find the corresponding
 				   // degrees of freedom on the left part of
 				   // the boundary. Therefore we loop over all
-				   // cells again and choose the ones, where
-				   // face 0 is at the boundary.
-  for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active (); cell != dof_handler.end (); ++cell)
-    if (cell->at_boundary () && cell->face (0)->at_boundary ()) {
-				       // For every degree of freedom on this
-				       // face we add a new line to the
-				       // constraint matrix. Then we identify
-				       // it with the corresponding degree of
-				       // freedom on the right part of the
-				       // boundary.
-      constraints.add_line (cell->vertex_dof_index (0, 0));
-         
-      for (unsigned int i = 0; i < dof_locations.size (); ++i)
-	if (dof_locations[i].second == cell->vertex (0) (1)) {
-	  constraints.add_entry (cell->vertex_dof_index (0, 0), dof_locations[i].first, 1.0);
-	  break;
-	}
-         
-      constraints.add_line (cell->vertex_dof_index (2, 0));
-         
-      for (unsigned int i = 0; i < dof_locations.size (); ++i)
-	if (dof_locations[i].second == cell->vertex (2) (1)) {
-	  constraints.add_entry (cell->vertex_dof_index (2, 0), dof_locations[i].first, 1.0);
-	  break;
-	}
-    }
+				   // cells again and choose the ones where
+				   // face 0 is at the boundary:
+  for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active ();
+       cell != dof_handler.end (); ++cell)
+    if (cell->at_boundary ()
+	&&
+	cell->face (0)->at_boundary ())
+      {
+					 // Every degree of freedom on this
+					 // face needs to have a corresponding
+					 // one on the right side of the face,
+					 // and our goal is to add a
+					 // constraint for the one on the left
+					 // in terms of the one on the
+					 // right. To this end we first add a
+					 // new line to the constraint matrix
+					 // for this one degree of
+					 // freedom. Then we identify it with
+					 // the corresponding degree of
+					 // freedom on the right part of the
+					 // boundary by constraining the
+					 // degree of freedom on the left with
+					 // the one on the right times a
+					 // weight of 1.0.
+					 //
+					 // Consequently, we loop over the two
+					 // vertices of each face we find and
+					 // then loop over all the
+					 // $y$-locations we've previously
+					 // recorded to find which degree of
+					 // freedom on the right boundary
+					 // corresponds to the one we
+					 // currently look at. Note that we
+					 // have entered these into a map, and
+					 // when looping over the iterators
+					 // <code>p</code> of this map,
+					 // <code>p-@>first</code> corresponds
+					 // to the "key" of an entry (the
+					 // global number of the degree of
+					 // freedom), whereas
+					 // <code>p-@>second</code> is the
+					 // "value" (the $y$-location we have
+					 // entered above).
+					 //
+					 // We are quite sure here that we
+					 // should be finding such a
+					 // corresponding degree of
+					 // freedom. However, sometimes stuff
+					 // happens and so the bottom of the
+					 // block contains an assertion that
+					 // our assumption was indeed correct
+					 // and that a vertex was found.
+	for (unsigned int face_vertex = 0; face_vertex<2; ++face_vertex)
+	  {
+	    constraints.add_line (cell->face(0)->vertex_dof_index (face_vertex, 0));
+
+	    std::map<unsigned int, double>::const_iterator p = dof_locations.begin();
+	    for (; p != dof_locations.end(); ++p)
+	      if (std::fabs(p->second - cell->face(0)->vertex(face_vertex)[1]) < 1e-8)
+		{
+		  constraints.add_entry (cell->face(0)->vertex_dof_index (face_vertex, 0),
+					 p->first, 1.0);
+		  break;
+		}
+	    Assert (p != dof_locations.end(),
+		    ExcMessage ("No corresponding degree of freedom was found!"));
+	  }
+      }
 }
 
 

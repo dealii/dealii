@@ -30,7 +30,7 @@ left and right parts of the boundary are identified. Let $\Omega=(0,1)^2$ and
 consider the problem
 @f{align*}
    -\Delta u &=
-   \pi^2\sin(\pi x)\sin(\pi y)  \qquad &\text{in }\Omega
+   \cos(2\pi x)e^{-2x}\cos(2\pi y)e^{-2y}  \qquad &\text{in }\Omega
   \\ 
    u(x,0) &= 0 \qquad &\text{for }x\in(0,1)\qquad &&\text{(bottom boundary)}
   \\
@@ -39,6 +39,8 @@ consider the problem
    u(0,y) &= u(1,y) \qquad &\text{for }y\in(0,1) 
    \qquad && \text{(left and right boundaries)}
 @f}
+Note that the source term is not symmetric and so the solution would not be
+periodic unless this is explicitly enforced.
 
 The way one has to see these periodic boundary conditions $u(x,0) = u(x,1)$ is
 as follows: Assume for a moment (as we do in this program) that we have a
