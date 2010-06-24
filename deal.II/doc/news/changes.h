@@ -95,6 +95,16 @@ inconvenience this causes.
 <ol>
    <li>
    <p>
+   New: The new tutorial program step-37,
+   contributed by Markus B&uuml;rg, shows how to implement periodic boundary
+   conditions.
+   <br>
+   (Markus B&uuml;rg, 2010/06/23)
+   </p>
+   </li>
+
+   <li>
+   <p>
    Improved: Exception classes declared locally to another class using
    DeclException0 through DeclException5 were previously shown as local
    classes in the class overview of the library. This was annoying since
