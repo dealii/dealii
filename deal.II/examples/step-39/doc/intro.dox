@@ -8,4 +8,29 @@ residuals. All operators are implemented using the MeshWorker interface.
 
 Like in step-12, the discretization relies on finite element spaces,
 which are polynomial inside the mesh cells, but have no continuity
-between cells. For such functions, we define the mean value and jump operators
+between cells. Since such functions have two values on each face, one
+from each side, we define mean value and jump operators as follows:
+let <i>K</i><sub>1</sub> and <i>K</i><sub>2</sub> be the two cells
+sharing a face, and let the traces of functions <i>u<sub>i</sub></i>
+and the outer normal vectors <b>n<sub>i</sub></i> be labeled
+accordingly. Then, on the face, we let
+@f[
+  \{\!\{ u \}\!\} = \frac{u_1 + u_2}2
+@f]
+
+Note, that if such an expression contains a normal vector, the
+averaging operator turns into a jump. The interior penalty method for the problem
+@f[
+  -\Delta u = f \;\;\;\; u|_{\partial \Omega} = u^D
+@f]
+becomes
+@f[
+  \sum_{K\in T_h} (\nabla u, \nabla v)_K
+  \\
+  + \sum_{F \in F_h^i} \biggl\{4\sigma_F (\{\!\{ u \mathbf n\}\!\}, \{\!\{ v \mathbf n \}\!\})_F
+  - 2 (\{\!\{ \nabla u \}\!\},\{\!\{ v\mathbf n \}\!\})_F
+  - 2 (\{\!\{ \nabla v \}\!\},\{\!\{ u\mathbf n \}\!\})_F
+  \biggr\}
+  \\
+  = ???
+@f]
