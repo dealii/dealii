@@ -135,30 +135,86 @@ LaplaceProblem::LaplaceProblem ()
 
                                  // @sect4{LaplaceProblem::make_grid_and_dofs}
 
+				 // The following is the first function to be
+				 // called in <code>run()</code>. It sets up
+				 // the mesh and degrees of freedom.
+				 //
+				 // We start by creating the usual square mesh
+				 // and changing the boundary indicator on the
+				 // parts of the boundary where we have
+				 // Dirichlet boundary conditions (top and
+				 // bottom, i.e. faces two and three of the
+				 // reference cell as defined by
+				 // GeometryInfo), so that we can distinguish
+				 // between the parts of the boundary where
+				 // periodic and where Dirichlet boundary
+				 // conditions hold. We then refine the mesh a
+				 // fixed number of times, with child faces
+				 // inheriting the boundary indicators
+				 // previously set on the coarse mesh from
+				 // their parents.
 void LaplaceProblem::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation);
-				   // We change the boundary indicator on the
-				   // parts of the boundary, where we have
-				   // Dirichlet boundary conditions, to one
-				   // such that we can distinguish between the
-				   // parts of the boundary, where periodic
-				   // and where Dirichlet boundary conditions
-				   // hold.
-  Triangulation<2>::active_cell_iterator cell = triangulation.begin_active ();
-   
-  cell->face (2)->set_boundary_indicator (1);
-  cell->face (3)->set_boundary_indicator (1);   
+  triangulation.begin_active ()->face (2)->set_boundary_indicator (1);
+  triangulation.begin_active ()->face (3)->set_boundary_indicator (1);   
   triangulation.refine_global (5);
-				   // Here the degrees of freedom are
-				   // distributed.
+  
+				   // The next step is to distribute the
+				   // degrees of freedom and produce a little
+				   // bit of graphical output:
   dof_handler.distribute_dofs (fe);
   std::cout << "Number of active cells: "
 	    << triangulation.n_active_cells ()
 	    << std::endl
 	    << "Degrees of freedom: " << dof_handler.n_dofs ()
 	    << std::endl;
-				   // Now it is the time for the constraint
+  
+				   // Now it is the time for the constraints
+				   // that come from the periodicity
+				   // constraints. We do this in the
+				   // following, separate function, after
+				   // clearing any possible prior content from
+				   // the constraints object:
+  constraints.clear ();
+  make_periodicity_constraints ();
+
+				   // We also incorporate the homogeneous
+				   // Dirichlet boundary conditions on the
+				   // upper and lower parts of the boundary
+				   // (i.e. the ones with boundary indicator
+				   // 1) and close the
+				   // <code>ConstraintMatrix</code> object:
+  VectorTools::interpolate_boundary_values (dof_handler, 1,
+					    ZeroFunction<2> (),
+					    constraints);
+  constraints.close ();
+  
+				   // Then we create the sparsity pattern and
+				   // the system matrix and initialize the
+				   // solution and right-hand side
+				   // vectors. This is again as in step-3 or
+				   // step-6, for example:
+  CompressedSparsityPattern c_sparsity_pattern (dof_handler.n_dofs(),
+						dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler,
+				   c_sparsity_pattern,
+				   constraints,
+				   false);
+  c_sparsity_pattern.compress ();
+  sparsity_pattern.copy_from (c_sparsity_pattern);
+  
+  system_matrix.reinit (sparsity_pattern);
+  system_rhs.reinit (dof_handler.n_dofs());
+  solution.reinit (dof_handler.n_dofs());
+}
+
+
+
+                                 // @sect4{LaplaceProblem::make_periodicity_constraints}
+
+void LaplaceProblem::make_periodicity_constraints ()
+{
 				   // matrix. The first constraints we put in
 				   // are the periodic boundary
 				   // conditions. For this let us consider the
@@ -184,7 +240,6 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // the boundary degree of freedom together
 				   // with the y-component of the vertex on
 				   // which it is located.
-  constraints.clear ();
    
   std::vector<std::pair<unsigned int, double> > dof_locations;
    
@@ -237,32 +292,8 @@ void LaplaceProblem::make_grid_and_dofs ()
 	  break;
 	}
     }
-				   // Finally we have to set the homogeneous
-				   // Dirichlet boundary conditions on the
-				   // upper and lower parts of the boundary
-				   // and close the
-				   // <code>ConstraintMatrix</code> object.
-  VectorTools::interpolate_boundary_values (dof_handler, 1,
-					    ZeroFunction<2> (),
-					    constraints);
-  constraints.close ();
-				   // Then we create the sparsity pattern and
-				   // the system matrix and initialize the
-				   // solution and right-hand side vectors.
-  const unsigned int n_dofs = dof_handler.n_dofs ();
-
-  CompressedSparsityPattern c_sparsity_pattern (n_dofs, n_dofs);
-  DoFTools::make_sparsity_pattern (dof_handler,
-				   c_sparsity_pattern,
-				   constraints,
-				   false);
-  c_sparsity_pattern.compress ();
-  sparsity_pattern.copy_from (c_sparsity_pattern);
-  
-  system_matrix.reinit (sparsity_pattern);
-  system_rhs.reinit (n_dofs);
-  solution.reinit (n_dofs);
 }
+
 
 
                                  // @sect4{LaplaceProblem::assemble_system}
