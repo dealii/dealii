@@ -36,7 +36,7 @@ deal.II deal.tag: tutorial \
 tutorial:
 	@cd tutorial ; $(MAKE)
 
-deal.dox: Makefile $(shell echo images ../../examples/*/doc)
+deal.dox: Makefile $(shell echo images ../../examples/*/doc ../news/*.h)
 	@echo "=== Making $@"
 	@echo "INPUT=`echo headers ../../{base,lac,deal.II}/include/* tutorial/doxygen ../news/*.h`" > $@
 	@echo "IMAGE_PATH=`echo images ../../examples/*/doc`" >> $@
