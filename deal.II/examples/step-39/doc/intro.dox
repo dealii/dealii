@@ -25,7 +25,7 @@ averaging operator turns into a jump. The interior penalty method for the proble
   -\Delta u = f \text{ in }\Omega \qquad u = u^D \text{ on } \partial\Omega
 @f]
 becomes
-@f{multline*}{
+@f{multline*}
   \sum_{K\in \mathbb T_h} (\nabla u, \nabla v)_K
   \\
   + \sum_{F \in F_h^i} \biggl\{4\sigma_F (\{\!\{ u \mathbf n\}\!\}, \{\!\{ v \mathbf n \}\!\})_F
