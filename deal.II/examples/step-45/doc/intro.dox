@@ -32,11 +32,12 @@ consider the problem
    -\Delta u &=
    \pi^2\sin(\pi x)\sin(\pi y)  \qquad &\text{in }\Omega
   \\ 
-   u(0,y) &= 0 \qquad &\text{for }y\in(0,1)
+   u(x,0) &= 0 \qquad &\text{for }x\in(0,1)\qquad &&\text{(bottom boundary)}
   \\
-   u(1,y) &= 0 \qquad &\text{for }y\in(0,1)
+   u(x,1) &= 0 \qquad &\text{for }x\in(0,1)\qquad &&\text{(top boundary)}
   \\
-   u(x,0) &= u(x,1) \qquad &\text{for }x\in(0,1) 
+   u(0,y) &= u(1,y) \qquad &\text{for }y\in(0,1) 
+   \qquad && \text{(left and right boundaries)}
 @f}
 
 The way one has to see these periodic boundary conditions $u(x,0) = u(x,1)$ is
