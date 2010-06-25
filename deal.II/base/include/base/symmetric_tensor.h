@@ -1524,9 +1524,8 @@ double
 SymmetricTensor<2,1>::operator () (const TableIndices<2> &indices) const
 {
   const unsigned int rank = 2;
-  const unsigned int dim  = 1;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
   return data[0];
 }
@@ -1539,9 +1538,8 @@ double &
 SymmetricTensor<2,2>::operator () (const TableIndices<2> &indices)
 {
   const unsigned int rank = 2;
-  const unsigned int dim  = 2;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
                                    // first treat the main diagonal
                                    // elements, which are stored
@@ -1566,9 +1564,8 @@ double
 SymmetricTensor<2,2>::operator () (const TableIndices<2> &indices) const
 {
   const unsigned int rank = 2;
-  const unsigned int dim  = 2;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
                                    // first treat the main diagonal
                                    // elements, which are stored
@@ -1593,9 +1590,8 @@ double &
 SymmetricTensor<2,3>::operator () (const TableIndices<2> &indices)
 {
   const unsigned int rank = 2;
-  const unsigned int dim  = 3;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
                                    // first treat the main diagonal
                                    // elements, which are stored
@@ -1630,9 +1626,8 @@ double
 SymmetricTensor<2,3>::operator () (const TableIndices<2> &indices) const
 {
   const unsigned int rank = 2;
-  const unsigned int dim  = 3;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
                                    // first treat the main diagonal
                                    // elements, which are stored
@@ -1667,9 +1662,8 @@ double &
 SymmetricTensor<4,1>::operator () (const TableIndices<4> &indices)
 {
   const unsigned int rank = 4;
-  const unsigned int dim  = 1;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
   return data[0][0];
 }
@@ -1682,9 +1676,8 @@ double
 SymmetricTensor<4,1>::operator () (const TableIndices<4> &indices) const
 {
   const unsigned int rank = 4;
-  const unsigned int dim  = 1;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
   return data[0][0];
 }
@@ -1697,9 +1690,8 @@ double &
 SymmetricTensor<4,2>::operator () (const TableIndices<4> &indices)
 {
   const unsigned int rank = 4;
-  const unsigned int dim  = 2;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
 				   // each entry of the tensor can be
 				   // thought of as an entry in a
@@ -1736,9 +1728,8 @@ double
 SymmetricTensor<4,2>::operator () (const TableIndices<4> &indices) const
 {
   const unsigned int rank = 4;
-  const unsigned int dim  = 2;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
 				   // each entry of the tensor can be
 				   // thought of as an entry in a
@@ -1775,9 +1766,8 @@ double &
 SymmetricTensor<4,3>::operator () (const TableIndices<4> &indices)
 {
   const unsigned int rank = 4;
-  const unsigned int dim  = 3;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
 				   // each entry of the tensor can be
 				   // thought of as an entry in a
@@ -1840,9 +1830,8 @@ double
 SymmetricTensor<4,3>::operator () (const TableIndices<4> &indices) const
 {
   const unsigned int rank = 4;
-  const unsigned int dim  = 3;
   for (unsigned int r=0; r<rank; ++r)
-    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+    Assert (indices[r] < dimension, ExcIndexRange (indices[r], 0, dimension));
 
 				   // each entry of the tensor can be
 				   // thought of as an entry in a
@@ -2039,9 +2028,8 @@ inline
 unsigned int
 SymmetricTensor<2,1>::component_to_unrolled_index (const TableIndices<2> &indices)
 {
-  const unsigned int dim = 1;
-  Assert (indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
-  Assert (indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
+  Assert (indices[0] < dimension, ExcIndexRange(indices[0], 0, dimension));
+  Assert (indices[1] < dimension, ExcIndexRange(indices[1], 0, dimension));
 
   return 0;
 }
@@ -2053,12 +2041,11 @@ inline
 unsigned int
 SymmetricTensor<2,2>::component_to_unrolled_index (const TableIndices<2> &indices)
 {
-  const unsigned int dim = 2;
-  Assert (indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
-  Assert (indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
+  Assert (indices[0] < dimension, ExcIndexRange(indices[0], 0, dimension));
+  Assert (indices[1] < dimension, ExcIndexRange(indices[1], 0, dimension));
 
-  static const unsigned int table[dim][dim] = {{0, 2},
-					       {2, 1}};
+  static const unsigned int table[dimension][dimension] = {{0, 2},
+							   {2, 1}};
 
   return table[indices[0]][indices[1]];
 }
