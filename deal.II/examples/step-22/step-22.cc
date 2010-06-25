@@ -948,16 +948,17 @@ void StokesProblem<dim>::assemble_system ()
 				   // linear system, we generate a
 				   // preconditioner for the
 				   // velocity-velocity matrix, i.e.,
-				   // <code>block(0,0)</code> in the system
-				   // matrix. As mentioned above, this
-				   // depends on the spatial
-				   // dimension. Since the two classes
-				   // described by the
-				   // <code>InnerPreconditioner@<dim@> ::
-				   // type</code> typedef have the same
-				   // interface, we do not have to do
-				   // anything different whether we want to
-				   // use a sparse direct solver or an ILU:
+				   // <code>block(0,0)</code> in the
+				   // system matrix. As mentioned
+				   // above, this depends on the
+				   // spatial dimension. Since the two
+				   // classes described by the
+				   // <code>InnerPreconditioner::type</code>
+				   // typedef have the same interface,
+				   // we do not have to do anything
+				   // different whether we want to use
+				   // a sparse direct solver or an
+				   // ILU:
   std::cout << "   Computing preconditioner..." << std::endl << std::flush;
 
   A_preconditioner
@@ -983,7 +984,7 @@ void StokesProblem<dim>::assemble_system ()
 				 // introduction, the inverse is generated
 				 // with the help of an inner preconditioner
 				 // of type
-				 // <code>InnerPreconditioner@<dim@>::type</code>.
+				 // <code>InnerPreconditioner::type</code>.
 template <int dim>
 void StokesProblem<dim>::solve ()
 {

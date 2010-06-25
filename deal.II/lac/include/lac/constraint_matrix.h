@@ -374,7 +374,7 @@ class ConstraintMatrix : public Subscriptor
 				      * filter. Constrained dofs are
 				      * transformed to local index space of
 				      * the filter, and elements not present
-				      * in the IndexSet are ignored. 
+				      * in the IndexSet are ignored.
 				      *
 				      * This function provides an easy way to
 				      * create a ConstraintMatrix for certain
@@ -467,7 +467,7 @@ class ConstraintMatrix : public Subscriptor
 				      * set_inhomogeneity().
 				      */
     void add_lines (const IndexSet &lines);
-    
+
 				     /**
 				      * Add an entry to a given
 				      * line. The list of lines is
@@ -1336,7 +1336,7 @@ class ConstraintMatrix : public Subscriptor
                                       * Does the same as the function above
                                       * but can treat
                                       * non quadratic matrices.
-                                      */    
+                                      */
     template <typename MatrixType>
     void
     distribute_local_to_global (const FullMatrix<double>        &local_matrix,
@@ -1649,7 +1649,7 @@ class ConstraintMatrix : public Subscriptor
 					  * vector instead of a map and the
 					  * consequences thereof, the same
 					  * applies as what is said for
-					  * ConstraintMatrix@p ::lines.
+					  * ConstraintMatrix::lines.
 					  */
 	Entries entries;
 

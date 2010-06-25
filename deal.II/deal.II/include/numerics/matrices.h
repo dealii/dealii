@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -112,7 +112,7 @@ namespace TrilinosWrappers
  * want to add several matrices and could then condense afterwards
  * only once, instead of for every matrix. To actually do computations
  * with these matrices, you have to condense the matrix using the
- * ConstraintMatrix@p ::condense function; you also have to
+ * ConstraintMatrix::condense function; you also have to
  * condense the right hand side accordingly and distribute the
  * solution afterwards.
  *
@@ -186,9 +186,9 @@ namespace TrilinosWrappers
  * top of a corresponding sparsity pattern. Since we only work on a subset of
  * the degrees of freedom, we can't use the matrices and sparsity patterns
  * that are created for the entire set of degrees of freedom. Rather, you
- * should use the DoFHandler@p ::make_boundary_sparsity_pattern() function to
+ * should use the DoFHandler::make_boundary_sparsity_pattern() function to
  * create the correct sparsity pattern, and build a matrix on top of it.
- * 
+ *
  * Note that at present there is no function that computes the mass matrix for
  * <em>all</em> shape functions, though such a function would be trivial to
  * implement.
@@ -213,7 +213,7 @@ class MatrixCreator
 {
   public:
 				     /**
-				      * Assemble the mass matrix. If no 
+				      * Assemble the mass matrix. If no
 				      * coefficient is given, it is assumed
 				      * to be unity.
 				      *
@@ -322,7 +322,7 @@ class MatrixCreator
 				    Vector<double>           &rhs_vector,
 				    const Function<spacedim> * const a = 0);
 
-    
+
 				     /**
 				      * Assemble the mass matrix and a
 				      * right hand side vector along
@@ -465,7 +465,7 @@ class MatrixCreator
 				      * matrix. If no coefficient is
 				      * given, it is assumed to be
 				      * constant one.
-				      * 
+				      *
 				      * If the library is configured
 				      * to use multithreading, this
 				      * function works in parallel.
@@ -479,7 +479,7 @@ class MatrixCreator
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
 				       const Function<spacedim> * const a = 0);
-    
+
 				     /**
 				      * Calls the
 				      * create_laplace_matrix()
@@ -498,7 +498,7 @@ class MatrixCreator
 				      * vector. If no coefficient is
 				      * given, it is assumed to be
 				      * constant one.
-				      * 
+				      *
 				      * If the library is configured
 				      * to use multithreading, this
 				      * function works in parallel.
@@ -540,7 +540,7 @@ class MatrixCreator
 				       const hp::QCollection<dim>    &q,
 				       SparseMatrix<double>     &matrix,
 				       const Function<spacedim> * const a = 0);
-    
+
 				     /**
 				      * Like the functions above, but for hp
 				      * dof handlers, mappings, and quadrature
@@ -582,7 +582,7 @@ class MatrixCreator
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcComponentMismatch);    
+    DeclException0 (ExcComponentMismatch);
   private:
 				     /**
 				      * Convenience abbreviation for
@@ -594,7 +594,7 @@ class MatrixCreator
 				      * dof handler that shouls be used.
 				      */
     template <typename DH>
-    struct IteratorRange 
+    struct IteratorRange
     {
 					 /**
 					  * Typedef for the iterator type.
@@ -606,7 +606,7 @@ class MatrixCreator
 					  * iterators.
 					  */
 	typedef std::pair<active_cell_iterator,active_cell_iterator> iterator_pair;
-	
+
 					 /**
 					  * Constructor. Initialize
 					  * the two values by the
@@ -621,14 +621,14 @@ class MatrixCreator
 					  * initialization.
 					  */
 	IteratorRange (const iterator_pair &ip);
-	
+
 					 /**
 					  * Pair of iterators denoting
 					  * a half-open range.
 					  */
 	active_cell_iterator first, second;
     };
-    
+
 				     /**
 				      * Version of the same function
 				      * (without suffix @p _1) with
@@ -690,7 +690,7 @@ class MatrixCreator
  *
  * There are two ways to incorporate fixed degrees of freedom such as boundary
  * nodes into a linear system, as discussed below.
- * 
+ *
  *
  * <h3>Global elimination</h3>
  *
@@ -761,7 +761,7 @@ class MatrixCreator
  * processed node is zero, the Gauss step does not change the right
  * hand side. We need therefore not take special care of other
  * boundary nodes.
- * 
+ *
  * To make solving faster, we preset the solution vector with the right
  * boundary values (as to why this is necessary, see the discussion below in
  * the description of local elimination). It it not clear whether the deletion
@@ -870,7 +870,7 @@ class MatrixCreator
  * In conclusion, local elimination of boundary nodes only works if
  * there are no hanging nodes and even then doesn't always work fully
  * satisfactorily.
- * 
+ *
  * @ingroup numerics
  * @author Wolfgang Bangerth, 1998, 2000, 2004, 2005
  */
@@ -916,7 +916,7 @@ class MatrixTools : public MatrixCreator
 				      * documentation. This function works on
 				      * the classes that are used to wrap
 				      * PETSc objects.
-				      * 
+				      *
  				      * Note that this function is not very
  				      * efficient: it needs to alternatingly
  				      * read and write into the matrix, a
@@ -995,17 +995,17 @@ class MatrixTools : public MatrixCreator
 			   PETScWrappers::Vector       &solution,
 			   PETScWrappers::MPI::Vector  &right_hand_side,
 			   const bool             eliminate_columns = true);
-    
+
                                     /**
                                       * Same as above but for BlockSparseMatrix.
-				      */    					
+				      */
     static void
     apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
                        PETScWrappers::MPI::BlockSparseMatrix  &matrix,
                        PETScWrappers::MPI::BlockVector        &solution,
                        PETScWrappers::MPI::BlockVector        &right_hand_side,
                        const bool       eliminate_columns = true);
-    
+
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -1017,7 +1017,7 @@ class MatrixTools : public MatrixCreator
 				      * function works on the classes
 				      * that are used to wrap Trilinos
 				      * objects.
-				      * 
+				      *
  				      * Note that this function is not
  				      * very efficient: it needs to
  				      * alternatingly read and write
@@ -1053,7 +1053,7 @@ class MatrixTools : public MatrixCreator
 			   TrilinosWrappers::Vector        &solution,
 			   TrilinosWrappers::Vector        &right_hand_side,
 			   const bool             eliminate_columns = true);
-    
+
 				     /**
 				      * This function does the same as
 				      * the one above, except now
@@ -1074,7 +1074,7 @@ class MatrixTools : public MatrixCreator
 				      * function works on the classes
 				      * that are used to wrap Trilinos
 				      * objects.
-				      * 
+				      *
  				      * Note that this function is not
  				      * very efficient: it needs to
  				      * alternatingly read and write
@@ -1108,7 +1108,7 @@ class MatrixTools : public MatrixCreator
 			   TrilinosWrappers::MPI::Vector   &solution,
 			   TrilinosWrappers::MPI::Vector   &right_hand_side,
 			   const bool             eliminate_columns = true);
-    
+
 				     /**
 				      * This function does the same as
 				      * the one above, except now working
@@ -1121,7 +1121,7 @@ class MatrixTools : public MatrixCreator
 			   TrilinosWrappers::MPI::BlockVector   &right_hand_side,
 			   const bool                eliminate_columns = true);
 #endif
-    
+
                                      /**
                                       * Rather than applying boundary
                                       * values to the global matrix
@@ -1164,7 +1164,7 @@ class MatrixTools : public MatrixCreator
                                  FullMatrix<double> &local_matrix,
                                  Vector<double>     &local_rhs,
                                  const bool          eliminate_columns);
-    
+
 				     /**
 				      * Exception
 				      */

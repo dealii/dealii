@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2002, 2003, 2004, 2006, 2007, 2008, 2009 by the deal.II authors                   */
+/*    Copyright (C) 2002, 2003, 2004, 2006, 2007, 2008, 2009, 2010 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -119,11 +119,11 @@ double gradient_power (const Tensor<1,dim> &v,
                                  // for 1d. If the program is to be extended
                                  // to higher space dimensions, so has to be
                                  // this class.
-class InitializationValues : public Function<1> 
+class InitializationValues : public Function<1>
 {
   public:
     InitializationValues () : Function<1>() {}
-    
+
     virtual double value (const Point<1>     &p,
 			  const unsigned int  component = 0) const;
 };
@@ -150,7 +150,7 @@ class InitializationValues : public Function<1>
                                  // and return it, unless it is less than
                                  // zero, in which case we take zero.
 double InitializationValues::value (const Point<1> &p,
-                                    const unsigned int) const 
+                                    const unsigned int) const
 {
   const double base = std::pow(p(0), 1./3.);
   const double random = 2.*rand()/RAND_MAX-1;
@@ -191,12 +191,12 @@ double InitializationValues::value (const Point<1> &p,
                                  // step, as well as the present approximation
                                  // of the solution.
 template <int dim>
-class MinimizationProblem 
+class MinimizationProblem
 {
   public:
     MinimizationProblem  (const unsigned int run_number);
     void run ();
-    
+
   private:
     void initialize_solution ();
     void setup_system_on_mesh ();
@@ -208,17 +208,17 @@ class MinimizationProblem
 
     static double energy (const DoFHandler<dim> &dof_handler,
                           const Vector<double>  &function);
- 
+
 
     const unsigned int run_number;
-    
+
     Triangulation<dim>   triangulation;
 
     FE_Q<dim>            fe;
     DoFHandler<dim>      dof_handler;
 
     ConstraintMatrix     hanging_node_constraints;
-    
+
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> matrix;
 
@@ -258,7 +258,7 @@ MinimizationProblem<dim>::MinimizationProblem (const unsigned int run_number)
                                  // from erroneously compiling this function
                                  // for other space dimensions, then.
 template <>
-void MinimizationProblem<1>::initialize_solution () 
+void MinimizationProblem<1>::initialize_solution ()
 {
                                    // The first part is to assign the correct
                                    // size to the vector, and use library
@@ -408,7 +408,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // the appropriate quadrature formula is
                                    // the one we have chosen here.
   QGauss<dim>  quadrature_formula(4);
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values   | update_gradients |
                            update_quadrature_points | update_JxW_values);
 
@@ -534,7 +534,7 @@ void MinimizationProblem<dim>::assemble_step ()
                               fe_values.shape_value(i,q_point)
                               *
                               (x_minus_u3 *
-                               (u_prime * 
+                               (u_prime *
                                 fe_values.shape_grad(i,q_point))
                                -
                                (u_prime*u_prime) * u * u *
@@ -543,7 +543,7 @@ void MinimizationProblem<dim>::assemble_step ()
                              *
                              fe_values.JxW(q_point));
         }
-      
+
                                        // After summing up all the
                                        // contributions, we have to transfer
                                        // them to the global objects. This is
@@ -556,7 +556,7 @@ void MinimizationProblem<dim>::assemble_step ()
 	    matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
-	  
+
 	  residual(local_dof_indices[i]) += cell_rhs(i);
 	}
     }
@@ -705,7 +705,7 @@ MinimizationProblem<dim>::line_search (const Vector<double> &update) const
                                        // <code>alpha-dalpha</code> along the search
                                        // direction:
       const double dalpha = (alpha != 0 ? alpha/100 : 0.01);
-      
+
       tmp = present_solution;
       tmp.add (alpha+dalpha, update);
       const double f_a_plus = energy (dof_handler, tmp);
@@ -763,7 +763,7 @@ MinimizationProblem<dim>::line_search (const Vector<double> &update) const
           tmp = present_solution;
           tmp.add (alpha+step_length, update);
           const double e = energy (dof_handler, tmp);
-          
+
           if (e >= f_a)
             step_length /= 2;
           else
@@ -791,7 +791,7 @@ MinimizationProblem<dim>::line_search (const Vector<double> &update) const
                                  // the solution of a linear system before.
 template <int dim>
 void MinimizationProblem<dim>::do_step ()
-{          
+{
   assemble_step ();
 
   Vector<double> update (present_solution.size());
@@ -799,7 +799,7 @@ void MinimizationProblem<dim>::do_step ()
     SolverControl           solver_control (residual.size(),
                                             1e-2*residual.l2_norm());
     SolverCG<>              solver (solver_control);
-    
+
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(matrix);
 
@@ -859,7 +859,7 @@ template <>
 void MinimizationProblem<1>::refine_grid ()
 {
   const unsigned int dim = 1;
-  
+
   Vector<float> error_indicators (triangulation.n_active_cells());
 
                                    // Then define the quadrature formula, and
@@ -954,7 +954,7 @@ void MinimizationProblem<1>::refine_grid ()
                 5*(x-u*u*u)*u_doubleprime
                 +
                 2*u_prime*(1-3*u*u*u_prime)));
-          
+
           cell_residual_norm += (local_residual_value * local_residual_value *
                                  fe_values.JxW(q));
         }
@@ -1108,7 +1108,7 @@ void MinimizationProblem<1>::refine_grid ()
           DoFHandler<dim>::cell_iterator right_neighbor = cell->neighbor(1);
           while (right_neighbor->has_children())
             right_neighbor = right_neighbor->child(0);
-          
+
           neighbor_fe_values.reinit (right_neighbor);
           neighbor_fe_values.get_function_grads (present_solution, local_gradients);
 
@@ -1119,8 +1119,8 @@ void MinimizationProblem<1>::refine_grid ()
                                     std::pow(u_prime_right,5));
           error_indicators(cell_index) += right_jump * right_jump *
                                           cell->diameter();
-        }      
-    } 
+        }
+    }
 
                                    // Now we have all the refinement
                                    // indicators computed, and want to refine
@@ -1150,7 +1150,7 @@ void MinimizationProblem<1>::refine_grid ()
                                    // situations, the library will silently
                                    // also have to refine the neighbor cell
                                    // once. It does so by calling the
-                                   // <code>Triangulation@<dim@>::prepare_coarsening_and_refinement</code>
+                                   // <code>Triangulation::prepare_coarsening_and_refinement</code>
                                    // function before actually doing the
                                    // refinement and coarsening. This function
                                    // flags a set of additional cells for
@@ -1210,7 +1210,7 @@ void MinimizationProblem<1>::refine_grid ()
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
-  hanging_node_constraints.close ();  
+  hanging_node_constraints.close ();
   hanging_node_constraints.distribute (present_solution);
                                    // This is wasteful, since we create a
                                    // <code>ConstraintMatrix</code> object that will be
@@ -1251,7 +1251,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
                                    // degree six, so a 4-point Gauss formula
                                    // is appropriate:
   QGauss<dim>  quadrature_formula(4);
-  FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
+  FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula,
 			   update_values   | update_gradients |
                            update_quadrature_points | update_JxW_values);
 
@@ -1319,7 +1319,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
                                  // converged somewhere, we output the
                                  // results.
 template <int dim>
-void MinimizationProblem<dim>::run () 
+void MinimizationProblem<dim>::run ()
 {
   GridGenerator::hyper_cube (triangulation, 0., 1.);
   triangulation.refine_global (4);
@@ -1327,11 +1327,11 @@ void MinimizationProblem<dim>::run ()
   initialize_solution ();
 
   double last_energy = energy (dof_handler, present_solution);
-  
+
   while (true)
     {
       setup_system_on_mesh ();
-      
+
       for (unsigned int iteration=0; iteration<5; ++iteration)
         do_step ();
 
@@ -1345,9 +1345,9 @@ void MinimizationProblem<dim>::run ()
 
       refine_grid ();
     }
-  
+
   output_results ();
-  
+
   std::cout << std::endl;
 }
 
@@ -1367,7 +1367,7 @@ void MinimizationProblem<dim>::run ()
                                  // time, all these runs are actually
                                  // different, although it may seem that they
                                  // are independent of each other.
-int main () 
+int main ()
 {
   try
     {
@@ -1377,7 +1377,7 @@ int main ()
       for (unsigned int realization=0; realization<n_realizations; ++realization)
         {
           std::cout << "Realization " << realization << ":" << std::endl;
-  
+
           MinimizationProblem<1> minimization_problem_1d (realization);
           minimization_problem_1d.run ();
         }
@@ -1394,7 +1394,7 @@ int main ()
 		<< std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

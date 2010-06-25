@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -86,13 +86,13 @@ using namespace dealii;
 				 // previous examples, so we again
 				 // only comment on the differences.
 template <int dim>
-class AdvectionProblem 
+class AdvectionProblem
 {
   public:
     AdvectionProblem ();
     ~AdvectionProblem ();
     void run ();
-    
+
   private:
     void setup_system ();
 				     // The next function will be used
@@ -135,7 +135,7 @@ class AdvectionProblem
     void assemble_system ();
     void assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
 			 	   const typename DoFHandler<dim>::active_cell_iterator &end);
-    
+
 				     // The following functions again
 				     // are as in previous examples,
 				     // as are the subsequent
@@ -245,9 +245,9 @@ class AdvectionField : public TensorFunction<1,dim>
 {
   public:
     AdvectionField () : TensorFunction<1,dim> () {}
-    
+
     virtual Tensor<1,dim> value (const Point<dim> &p) const;
-    
+
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<Tensor<1,dim> >    &values) const;
 
@@ -334,8 +334,8 @@ class AdvectionField : public TensorFunction<1,dim>
 				 // assertion as in this case can
 				 // eliminate many of these problems.
 template <int dim>
-Tensor<1,dim> 
-AdvectionField<dim>::value (const Point<dim> &p) const 
+Tensor<1,dim>
+AdvectionField<dim>::value (const Point<dim> &p) const
 {
   Point<dim> value;
   value[0] = 2;
@@ -350,11 +350,11 @@ AdvectionField<dim>::value (const Point<dim> &p) const
 template <int dim>
 void
 AdvectionField<dim>::value_list (const std::vector<Point<dim> > &points,
-				 std::vector<Tensor<1,dim> >    &values) const 
+				 std::vector<Tensor<1,dim> >    &values) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
-  
+
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = AdvectionField<dim>::value (points[i]);
 }
@@ -387,14 +387,14 @@ class RightHandSide : public Function<dim>
 {
   public:
     RightHandSide () : Function<dim>() {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
-    
+
   private:
     static const Point<dim> center_point;
 };
@@ -434,7 +434,7 @@ const Point<3> RightHandSide<3>::center_point = Point<3> (-0.75, -0.75, -0.75);
 template <int dim>
 double
 RightHandSide<dim>::value (const Point<dim>   &p,
-			   const unsigned int  component) const 
+			   const unsigned int  component) const
 {
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   const double diameter = 0.1;
@@ -449,11 +449,11 @@ template <int dim>
 void
 RightHandSide<dim>::value_list (const std::vector<Point<dim> > &points,
 				std::vector<double>            &values,
-				const unsigned int              component) const 
+				const unsigned int              component) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
-  
+
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = RightHandSide<dim>::value (points[i], component);
 }
@@ -472,7 +472,7 @@ class BoundaryValues : public Function<dim>
 
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
@@ -483,7 +483,7 @@ class BoundaryValues : public Function<dim>
 template <int dim>
 double
 BoundaryValues<dim>::value (const Point<dim>   &p,
-			    const unsigned int  component) const 
+			    const unsigned int  component) const
 {
   Assert (component == 0, ExcIndexRange (component, 0, 1));
 
@@ -498,11 +498,11 @@ template <int dim>
 void
 BoundaryValues<dim>::value_list (const std::vector<Point<dim> > &points,
 				 std::vector<double>            &values,
-				 const unsigned int              component) const 
+				 const unsigned int              component) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch (values.size(), points.size()));
-  
+
   for (unsigned int i=0; i<points.size(); ++i)
     values[i] = BoundaryValues<dim>::value (points[i], component);
 }
@@ -631,7 +631,7 @@ class GradientEstimation
     static void estimate_interval (const DoFHandler<dim> &dof,
 				   const Vector<double>  &solution,
 				   const IndexInterval   &index_interval,
-				   Vector<float>         &error_per_cell);    
+				   Vector<float>         &error_per_cell);
 };
 
 
@@ -655,7 +655,7 @@ AdvectionProblem<dim>::AdvectionProblem () :
 
 
 template <int dim>
-AdvectionProblem<dim>::~AdvectionProblem () 
+AdvectionProblem<dim>::~AdvectionProblem ()
 {
   dof_handler.clear ();
 }
@@ -701,7 +701,7 @@ void AdvectionProblem<dim>::setup_system ()
 				 // same size and assembling on each
 				 // of these chunks in parallel.
 template <int dim>
-void AdvectionProblem<dim>::assemble_system () 
+void AdvectionProblem<dim>::assemble_system ()
 {
 				   // First, we want to find out how
 				   // many threads shall assemble the
@@ -824,7 +824,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // only for a range of cell
 				   // iterators, but for iterators in
 				   // general, so you could use it for
-				   // <code>std::vector@<T@>::iterator</code> or
+				   // <code>std::vector::iterator</code> or
 				   // usual pointers as well.
 				   //
 				   // The function returns a vector of
@@ -857,7 +857,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // an alias.
   typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-    thread_ranges 
+    thread_ranges
     = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
 						  dof_handler.end (),
 						  n_threads);
@@ -925,7 +925,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // multi-threading, then no threads
 				   // can run in parallel and the
 				   // function returns immediately.
-  threads.join_all ();  
+  threads.join_all ();
 
 
 				   // After the matrix has been
@@ -948,7 +948,7 @@ void AdvectionProblem<dim>::assemble_system ()
 }
 
 
- 
+
 				 // Now, this is the function that
 				 // does the actual work. It is not
 				 // very different from the
@@ -962,7 +962,7 @@ template <int dim>
 void
 AdvectionProblem<dim>::
 assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
-			  const typename DoFHandler<dim>::active_cell_iterator &end) 
+			  const typename DoFHandler<dim>::active_cell_iterator &end)
 {
 				   // First of all, we will need some
 				   // objects that describe boundary
@@ -978,7 +978,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
   const AdvectionField<dim> advection_field;
   const RightHandSide<dim>  right_hand_side;
   const BoundaryValues<dim> boundary_values;
-  
+
 				   // Next we need quadrature formula
 				   // for the cell terms, but also for
 				   // the integral over the inflow
@@ -989,7 +989,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				   // direction are sufficient.
   QGauss<dim>   quadrature_formula(2);
   QGauss<dim-1> face_quadrature_formula(2);
-  
+
 				   // Finally, we need objects of type
 				   // <code>FEValues</code> and
 				   // <code>FEFaceValues</code>. For the cell
@@ -1006,7 +1006,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				   // integrals, we don't need the
 				   // gradients, but rather the normal
 				   // vectors to the cells.
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values   | update_gradients |
                            update_quadrature_points | update_JxW_values);
   FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
@@ -1140,7 +1140,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 					     // FEFaceValues object
 					     // for the present face:
 	    fe_face_values.reinit (cell, face);
-	    
+
 					     // For the quadrature
 					     // points at hand, we ask
 					     // for the values of the
@@ -1151,7 +1151,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 					face_boundary_values);
 	    advection_field.value_list (fe_face_values.get_quadrature_points(),
 					face_advection_directions);
-	    
+
 					     // Now loop over all
 					     // quadrature points and
 					     // see whether it is on
@@ -1203,7 +1203,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 					   fe_face_values.shape_value(i,q_point) *
 					   fe_face_values.shape_value(j,q_point) *
 					   fe_face_values.JxW(q_point));
-		    
+
 		    cell_rhs(i) -= (face_advection_directions[q_point] *
 				    fe_face_values.normal_vector(q_point) *
 				    face_boundary_values[q_point]         *
@@ -1211,7 +1211,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				    fe_face_values.JxW(q_point));
 		  };
 	  };
-      
+
 
 				       // Now go on by transferring
 				       // the local contributions to
@@ -1282,7 +1282,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 	    system_matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
-	  
+
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	};
       assembler_lock.release ();
@@ -1341,7 +1341,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				 // method. As preconditioner, we use
 				 // the Jacobi method.
 template <int dim>
-void AdvectionProblem<dim>::solve () 
+void AdvectionProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverBicgstab<>        bicgstab (solver_control);
@@ -1393,7 +1393,7 @@ void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
   std::string filename = "grid-";
   filename += ('0' + cycle);
   Assert (cycle < 10, ExcInternalError());
-  
+
   filename += ".eps";
   std::ofstream output (filename.c_str());
 
@@ -1405,7 +1405,7 @@ void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
 				 // ... as is the main loop (setup --
 				 // solve -- refine)
 template <int dim>
-void AdvectionProblem<dim>::run () 
+void AdvectionProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
@@ -1420,7 +1420,7 @@ void AdvectionProblem<dim>::run ()
 	{
 	  refine_grid ();
 	};
-      
+
 
       std::cout << "   Number of active cells:       "
 		<< triangulation.n_active_cells()
@@ -1431,7 +1431,7 @@ void AdvectionProblem<dim>::run ()
       std::cout << "   Number of degrees of freedom: "
 		<< dof_handler.n_dofs()
 		<< std::endl;
-      
+
       assemble_system ();
       solve ();
       output_results (cycle);
@@ -1441,7 +1441,7 @@ void AdvectionProblem<dim>::run ()
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
-  
+
   std::ofstream output ("final-solution.gmv");
   data_out.write_gmv (output);
 }
@@ -1456,7 +1456,7 @@ void AdvectionProblem<dim>::run ()
 				 // except for delegating work to the
 				 // other function:
 template <int dim>
-void 
+void
 GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 			      const Vector<double>  &solution,
 			      Vector<float>         &error_per_cell)
@@ -1587,7 +1587,7 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				 //
 				 // Now for the details:
 template <int dim>
-void 
+void
 GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       const Vector<double>  &solution,
 				       const IndexInterval   &index_interval,
@@ -1614,7 +1614,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
   FEValues<dim>  fe_midpoint_value (dof_handler.get_fe(),
 				    midpoint_rule,
 				    update_values | update_quadrature_points);
-  
+
 				   // Then we need space foe the
 				   // tensor <code>Y</code>, which is the sum
 				   // of outer products of the
@@ -1657,7 +1657,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				   // element for this iterator.
   Vector<float>::iterator
     error_on_this_cell = error_per_cell.begin() + index_interval.first;
-  
+
 
 				   // Then we allocate a vector to
 				   // hold iterators to all active
@@ -1747,9 +1747,9 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 					     // abbreviation for the
 					     // iterator to the face
 					     // and the neighbor
-	    const typename DoFHandler<dim>::face_iterator 
+	    const typename DoFHandler<dim>::face_iterator
 	      face = cell->face(face_no);
-	    const typename DoFHandler<dim>::cell_iterator 
+	    const typename DoFHandler<dim>::cell_iterator
 	      neighbor = cell->neighbor(face_no);
 
 					     // Then check whether the
@@ -1792,7 +1792,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 		      neighbor_child = neighbor;
 		    while (neighbor_child->has_children())
 		      neighbor_child = neighbor_child->child (face_no==0 ? 1 : 0);
-		    
+
 						     // As this used
 						     // some
 						     // non-trivial
@@ -1876,7 +1876,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 						     // here.
 		    Assert (neighbor_child->neighbor(face_no==0 ? 1 : 0)==cell,
 			    ExcInternalError());
-		    
+
 						     // If the check
 						     // succeeded, we
 						     // push the
@@ -1922,7 +1922,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 
       std::vector<double> this_midpoint_value(1);
       fe_midpoint_value.get_function_values (solution, this_midpoint_value);
-		
+
 
 				       // Now loop over all active neighbors
 				       // and collect the data we
@@ -1947,7 +1947,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 					   // neighbor cell:
 	  const typename DoFHandler<dim>::active_cell_iterator
 	    neighbor = *neighbor_ptr;
-	    
+
 					   // Then get the center of
 					   // the neighbor cell and
 					   // the value of the finite
@@ -1976,14 +1976,14 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 	  Point<dim>   y        = neighbor_center - this_center;
 	  const double distance = std::sqrt(y.square());
 	  y /= distance;
-	  
+
 					   // Then add up the
 					   // contribution of this
 					   // cell to the Y matrix...
 	  for (unsigned int i=0; i<dim; ++i)
 	    for (unsigned int j=0; j<dim; ++j)
 	      Y[i][j] += y[i] * y[j];
-	  
+
 					   // ... and update the sum
 					   // of difference quotients:
 	  projected_gradient += (neighbor_midpoint_value[0] -
@@ -2056,10 +2056,10 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       // right powers of the mesh
 				       // width:
       const Tensor<2,dim> Y_inverse = invert(Y);
-      
+
       Point<dim> gradient;
       contract (gradient, Y_inverse, projected_gradient);
-      
+
       *error_on_this_cell = (std::pow(cell->diameter(),
 				      1+1.0*dim/2) *
 			     std::sqrt(gradient.square()));
@@ -2074,7 +2074,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				 // the only difference in the name of
 				 // the main class that actually does
 				 // the computation.
-int main () 
+int main ()
 {
   try
     {
@@ -2095,7 +2095,7 @@ int main ()
 		<< std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

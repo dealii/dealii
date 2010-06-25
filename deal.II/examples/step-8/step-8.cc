@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -83,13 +83,13 @@ using namespace dealii;
 				 // below in the constructor of this
 				 // class.
 template <int dim>
-class ElasticProblem 
+class ElasticProblem
 {
   public:
     ElasticProblem ();
     ~ElasticProblem ();
     void run ();
-    
+
   private:
     void setup_system ();
     void assemble_system ();
@@ -137,11 +137,11 @@ class ElasticProblem
 				 // the scalar function used in
 				 // previous programs.
 template <int dim>
-class RightHandSide :  public Function<dim> 
+class RightHandSide :  public Function<dim>
 {
   public:
     RightHandSide ();
-    
+
 				     // The next change is that we
 				     // want a replacement for the
 				     // <code>value</code> function of the
@@ -248,12 +248,12 @@ RightHandSide<dim>::RightHandSide ()
 template <int dim>
 inline
 void RightHandSide<dim>::vector_value (const Point<dim> &p,
-				       Vector<double>   &values) const 
+				       Vector<double>   &values) const
 {
-  Assert (values.size() == dim, 
+  Assert (values.size() == dim,
 	  ExcDimensionMismatch (values.size(), dim));
   Assert (dim >= 2, ExcNotImplemented());
-  
+
 				   // The rest of the function
 				   // implements computing force
 				   // values. We will use a constant
@@ -275,7 +275,7 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
   Point<dim> point_1, point_2;
   point_1(0) = 0.5;
   point_2(0) = -0.5;
-  
+
 				   // If now the point <code>p</code> is in a
 				   // circle (sphere) of radius 0.2
 				   // around one of these points, then
@@ -286,7 +286,7 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
     values(0) = 1;
   else
     values(0) = 0;
-  
+
 				   // Likewise, if <code>p</code> is in the
 				   // vicinity of the origin, then set
 				   // the y-force to 1, otherwise to
@@ -294,7 +294,7 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
   if (p.square() < 0.2*0.2)
     values(1) = 1;
   else
-    values(1) = 0;    
+    values(1) = 0;
 }
 
 
@@ -314,9 +314,9 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
 				 // make some things simpler below.
 template <int dim>
 void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-					    std::vector<Vector<double> >   &value_list) const 
+					    std::vector<Vector<double> >   &value_list) const
 {
-  Assert (value_list.size() == points.size(), 
+  Assert (value_list.size() == points.size(),
 	  ExcDimensionMismatch (value_list.size(), points.size()));
 
   const unsigned int n_points = points.size();
@@ -338,7 +338,7 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   //
 				   // We can prevent this situation by
 				   // calling
-				   // <code>RightHandSide@<dim@>::vector_valued</code>
+				   // <code>RightHandSide::vector_value</code>
 				   // on each point in the input
 				   // list. Note that by giving the
 				   // full name of the function,
@@ -449,7 +449,7 @@ ElasticProblem<dim>::ElasticProblem ()
 				 // The destructor, on the other hand,
 				 // is exactly as in step-6:
 template <int dim>
-ElasticProblem<dim>::~ElasticProblem () 
+ElasticProblem<dim>::~ElasticProblem ()
 {
   dof_handler.clear ();
 }
@@ -534,11 +534,11 @@ void ElasticProblem<dim>::setup_system ()
 				 // this is not explicit knowledge we
 				 // need to care about:
 template <int dim>
-void ElasticProblem<dim>::assemble_system () 
-{  
+void ElasticProblem<dim>::assemble_system ()
+{
   QGauss<dim>  quadrature_formula(2);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values   | update_gradients |
                            update_quadrature_points | update_JxW_values);
 
@@ -601,7 +601,7 @@ void ElasticProblem<dim>::assemble_system ()
       cell_rhs = 0;
 
       fe_values.reinit (cell);
-      
+
 				       // Next we get the values of
 				       // the coefficients at the
 				       // quadrature points. Likewise
@@ -611,7 +611,7 @@ void ElasticProblem<dim>::assemble_system ()
 
       right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
 					 rhs_values);
-      
+
 				       // Then assemble the entries of
 				       // the local stiffness matrix
 				       // and right hand side
@@ -661,19 +661,19 @@ void ElasticProblem<dim>::assemble_system ()
 				       // contributions:
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
-	  const unsigned int 
+	  const unsigned int
 	    component_i = fe.system_to_component_index(i).first;
-	  
-	  for (unsigned int j=0; j<dofs_per_cell; ++j) 
+
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    {
-	      const unsigned int 
+	      const unsigned int
 		component_j = fe.system_to_component_index(j).first;
-	      
+
 	      for (unsigned int q_point=0; q_point<n_q_points;
 		   ++q_point)
 		{
-		  cell_matrix(i,j) 
-		    += 
+		  cell_matrix(i,j)
+		    +=
 						     // The first term
 						     // is (lambda d_i
 						     // u_i, d_j v_j)
@@ -773,9 +773,9 @@ void ElasticProblem<dim>::assemble_system ()
 				       // introduction:
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
-	  const unsigned int 
+	  const unsigned int
 	    component_i = fe.system_to_component_index(i).first;
-	  
+
 	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	    cell_rhs(i) += fe_values.shape_value(i,q_point) *
 			   rhs_values[q_point](component_i) *
@@ -802,7 +802,7 @@ void ElasticProblem<dim>::assemble_system ()
 	    system_matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
-	  
+
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	}
     }
@@ -854,7 +854,7 @@ void ElasticProblem<dim>::assemble_system ()
 				 // the system indeed is. Therefore,
 				 // we need not change anything.
 template <int dim>
-void ElasticProblem<dim>::solve () 
+void ElasticProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -932,14 +932,14 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
   std::string filename = "solution-";
   filename += ('0' + cycle);
   Assert (cycle < 10, ExcInternalError());
-  
+
   filename += ".gmv";
   std::ofstream output (filename.c_str());
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
 
- 
+
 
 				   // As said above, we need a
 				   // different name for each
@@ -988,18 +988,18 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 	    solution_names.push_back ("displacement");
 	    break;
       case 2:
-	    solution_names.push_back ("x_displacement");	    
+	    solution_names.push_back ("x_displacement");
 	    solution_names.push_back ("y_displacement");
 	    break;
       case 3:
-	    solution_names.push_back ("x_displacement");	    
+	    solution_names.push_back ("x_displacement");
 	    solution_names.push_back ("y_displacement");
 	    solution_names.push_back ("z_displacement");
 	    break;
       default:
 	    Assert (false, ExcNotImplemented());
     }
-	     
+
 				   // After setting up the names for
 				   // the different components of the
 				   // solution vector, we can add the
@@ -1104,7 +1104,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				 // cells without actually refining
 				 // the grid.)
 template <int dim>
-void ElasticProblem<dim>::run () 
+void ElasticProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<8; ++cycle)
     {
@@ -1127,7 +1127,7 @@ void ElasticProblem<dim>::run ()
       std::cout << "   Number of degrees of freedom: "
 		<< dof_handler.n_dofs()
 		<< std::endl;
-      
+
       assemble_system ();
       solve ();
       output_results (cycle);
@@ -1139,7 +1139,7 @@ void ElasticProblem<dim>::run ()
 				 // The main function is again exactly
 				 // like in step-6 (apart from the
 				 // changed class names, of course).
-int main () 
+int main ()
 {
   try
     {
@@ -1158,10 +1158,10 @@ int main ()
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

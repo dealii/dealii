@@ -603,10 +603,10 @@ inconvenience this causes.
   New: There is now a new RefinementCase
   GeometryInfo::isotropic_refinement representing the isotropic
   refinement case in <code>dim</code> dimensions,
-  i.e. <tt>GeometryInfo<1>::isotropic_refinement=RefinementCase::cut_x</tt>,
-  <tt>GeometryInfo<2>::isotropic_refinement=RefinementCase::cut_xy</tt>
+  i.e. GeometryInfo<1>::isotropic_refinement = RefinementCase::cut_x,
+  GeometryInfo<2>::isotropic_refinement = RefinementCase::cut_xy
   and
-  <tt>GeometryInfo<3>::isotropic_refinement=RefinementCase::cut_xyz</tt>.
+  GeometryInfo<3>::isotropic_refinement = RefinementCase::cut_xyz.
   <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/03/03)
   </p>

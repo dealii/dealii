@@ -77,11 +77,11 @@ namespace internal
  * under consideration has full dimension, i.e. constitutes a cell.
  *
  * @ingroup dofs
- * @ingroup Accessors 
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 1999
  */
     template <int structdim, int dim, int spacedim>
-    struct Inheritance 
+    struct Inheritance
     {
 					 /**
 					  * Declaration of the @p typedef.
@@ -148,7 +148,7 @@ namespace internal
  * since they are more secure to changes in the class naming and
  * template interface as well as providing easier typing (much less
  * complicated names!).
- * 
+ *
  *
  * <h3>Inheritance</h3>
  *
@@ -207,14 +207,14 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				     /**
 				      * @{
 				      */
-    
+
 				     /**
 				      * Default constructor. Provides
 				      * an accessor that can't be
 				      * used.
 				      */
     DoFAccessor ();
-    
+
 				     /**
 				      * Constructor
 				      */
@@ -259,7 +259,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      * Return a handle on the
 				      * DoFHandler object which we
@@ -273,7 +273,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				      */
     DoFAccessor<structdim,DH> &
     operator = (const DoFAccessor<structdim,DH> &da);
-    
+
 				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.
@@ -288,7 +288,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				      * coordinates of the TriaAccessor.
 				      */
     void copy_from (const TriaAccessorBase<structdim, DH::dimension, DH::space_dimension> &da);
-    
+
 				     /**
 				      *  @name Accessing sub-objects
 				      */
@@ -327,7 +327,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				     /**
 				      * @{
 				      */
-    
+
     				     /**
 				      * Return the indices of the dofs of this
 				      * object in the standard ordering: dofs
@@ -490,7 +490,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				     /**
 				      * @{
 				      */
-    
+
                                      /**
                                       * Return the number of finite
                                       * elements that are active on a
@@ -530,7 +530,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				      */
     unsigned int
     nth_active_fe_index (const unsigned int n) const;
-    
+
 				     /**
 				      * Return true if the finite
 				      * element with given index is
@@ -565,7 +565,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				     /**
 				      * @}
 				      */
-    
+
                                      /**
 				      * Exceptions for child classes
 				      *
@@ -600,12 +600,12 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
     DeclException0 (ExcNotActive);
 				     /**
 				      * Exception
-				      * 
+				      *
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCantCompareIterators);
 
-  protected:    
+  protected:
 
 				     /**
 				      * Store the address of the DoFHandler object
@@ -614,10 +614,10 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
     DH *dof_handler;
 
 				     /**
-				      *  Compare for equality.            
+				      *  Compare for equality.
 				      */
     bool operator == (const DoFAccessor &) const;
-	
+
 				     /**
 				      * Compare for inequality.
 				      */
@@ -708,7 +708,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 			       const unsigned int i,
 			       const unsigned int index,
 			       const unsigned int fe_index = DH::default_fe_index) const;
-    
+
                                      /**
                                       * Iterator classes need to be friends
                                       * because they need to access operator==
@@ -758,7 +758,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * Extract space dimension from DH.
 				      */
     static const unsigned int spacedim = DH::space_dimension;
-    
+
 				     /**
 				      * Declare the data type that
 				      * this accessor class expects to
@@ -839,7 +839,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				     /**
 				      * @{
 				      */
-    
+
 				     /**
 				      * Return the @p ith neighbor as
 				      * a DoF cell iterator. This
@@ -869,8 +869,8 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * of this cell.
 				      *
 				      * This function is not implemented in
-				      * 1D, and maps to DoFAccessor<2,
-				      * dim>::line in 2D.
+				      * 1D, and maps to DoFAccessor::line
+				      * in 2D.
 				      */
     typename internal::DoFHandler::Iterators<DH>::face_iterator
     face (const unsigned int i) const;
@@ -1040,7 +1040,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
     template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
-    
+
                                      /**
 				      * Return the interpolation of
 				      * the given finite element
@@ -1250,7 +1250,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
     void
     distribute_local_to_global (const FullMatrix<number> &local_source,
                                 OutputMatrix             &global_destination) const;
-    
+
 				     /**
 				      * This function does what the two
 				      * <tt>distribute_local_to_global</tt>
@@ -1263,7 +1263,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				const Vector<number>     &local_vector,
                                 OutputMatrix             &global_matrix,
 				OutputVector             &global_vector) const;
-    
+
 				     /**
 				      * @}
 				      */
@@ -1274,7 +1274,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				     /**
 				      * @{
 				      */
-    
+
     				     /**
 				      * Return the indices of the dofs of this
 				      * quad in the standard ordering: dofs
@@ -1362,7 +1362,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				     /**
 				      * @}
 				      */
-    
+
   private:
 				     /**
 				      * Update the cache in which we

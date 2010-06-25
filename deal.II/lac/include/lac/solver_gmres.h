@@ -303,7 +303,8 @@ class SolverGMRES : public Solver<VECTOR>
  * Krylov space method inside the preconditioner.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total
- * of <tt>2*AdditionalData::max_basis_size+1</tt> auxiliary vectors.
+ * of <tt>2 * SolverFGMRESAdditionalData::max_basis_size+1</tt>
+ * auxiliary vectors.
  *
  * Caveat: documentation of this class is not up to date. There are
  * also a few parameters of GMRES we would like to introduce here.
@@ -707,7 +708,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 	  const double s = vv.l2_norm();
 	  h(inner_iteration+1) = s;
 //TODO: s=0 is a lucky breakdown. Handle this somehow decently
-	  
+
 	  vv *= 1./s;
 
 					   /*  Transformation into

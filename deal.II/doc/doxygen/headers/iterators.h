@@ -20,7 +20,7 @@ Conceptually, this type represents something like a pointer to an object
 represented by the <code>Accessor</code> class.  Usually, you will not use the
 actual class names spelled out directly, but employ one of the typedefs
 provided by the container classes, such as <code>typename
-Triangulation@<dim@>::cell_iterator</code>. Before going into this, let us
+Triangulation::cell_iterator</code>. Before going into this, let us
 first discuss the concept of iterators, before delving into what the accessors
 do.
 
@@ -267,28 +267,28 @@ MGDoFHandler, as well as the function that generate such objects:
     <th>cell_iterator type</th>
     <th>function call</th>
   </tr>
-  
+
   <tr>
     <th>Triangulation</th>
-    <td>typename Triangulation@<dim,spacedim@>::cell_iterator</td>
+    <td>typename Triangulation::cell_iterator</td>
     <td>triangulation.begin()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
-    <td>typename DoFHandler@<dim,spacedim@>::cell_iterator</td>
+    <td>typename DoFHandler::cell_iterator</td>
     <td>dof_handler.begin()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
-    <td>typename hp::DoFHandler@<dim,spacedim@>::cell_iterator</td>
+    <td>typename hp::DoFHandler::cell_iterator</td>
     <td>hp_dof_handler.begin()</td>
   </tr>
 
   <tr>
     <th>MGDoFHandler</th>
-    <td>typename MGDoFHandler@<dim,spacedim@>::cell_iterator</td>
+    <td>typename MGDoFHandler::cell_iterator</td>
     <td>mg_dof_handler.begin()</td>
   </tr>
 </table>
@@ -300,28 +300,28 @@ MGDoFHandler, as well as the function that generate such objects:
     <th>face_iterator type</th>
     <th>function call</th>
   </tr>
-  
+
   <tr>
     <th>Triangulation</th>
-    <td>typename Triangulation@<dim,spacedim@>::face_iterator</td>
+    <td>typename Triangulation::face_iterator</td>
     <td>triangulation.begin_face()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
-    <td>typename DoFHandler@<dim,spacedim@>::face_iterator</td>
+    <td>typename DoFHandler::face_iterator</td>
     <td>dof_handler.begin_face()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
-    <td>typename hp::DoFHandler@<dim,spacedim@>::face_iterator</td>
+    <td>typename hp::DoFHandler::face_iterator</td>
     <td>hp_dof_handler.begin_face()</td>
   </tr>
 
   <tr>
     <th>MGDoFHandler</th>
-    <td>typename MGDoFHandler@<dim,spacedim@>::face_iterator</td>
+    <td>typename MGDoFHandler::face_iterator</td>
     <td>mg_dof_handler.begin_face()</td>
   </tr>
 </table>
@@ -335,28 +335,28 @@ Likewise, active iterators have the following properties:
     <th>cell_iterator type</th>
     <th>function call</th>
   </tr>
-  
+
   <tr>
     <th>Triangulation</th>
-    <td>typename Triangulation@<dim,spacedim@>::active_cell_iterator</td>
+    <td>typename Triangulation::active_cell_iterator</td>
     <td>triangulation.begin_active()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
-    <td>typename DoFHandler@<dim,spacedim@>::active_cell_iterator</td>
+    <td>typename DoFHandler::active_cell_iterator</td>
     <td>dof_handler.begin_active()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
-    <td>typename hp::DoFHandler@<dim,spacedim@>::active_cell_iterator</td>
+    <td>typename hp::DoFHandler::active_cell_iterator</td>
     <td>hp_dof_handler.begin_active()</td>
   </tr>
 
   <tr>
     <th>MGDoFHandler</th>
-    <td>typename MGDoFHandler@<dim,spacedim@>::active_cell_iterator</td>
+    <td>typename MGDoFHandler::active_cell_iterator</td>
     <td>mg_dof_handler.begin_active()</td>
   </tr>
 </table>
@@ -368,28 +368,28 @@ Likewise, active iterators have the following properties:
     <th>face_iterator type</th>
     <th>function call</th>
   </tr>
-  
+
   <tr>
     <th>Triangulation</th>
-    <td>typename Triangulation@<dim,spacedim@>::active_face_iterator</td>
+    <td>typename Triangulation::active_face_iterator</td>
     <td>triangulation.begin_active_face()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
-    <td>typename DoFHandler@<dim,spacedim@>::active_face_iterator</td>
+    <td>typename DoFHandler::active_face_iterator</td>
     <td>dof_handler.begin_active_face()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
-    <td>typename hp::DoFHandler@<dim,spacedim@>::active_face_iterator</td>
+    <td>typename hp::DoFHandler::active_face_iterator</td>
     <td>hp_dof_handler.begin_active_face()</td>
   </tr>
 
   <tr>
     <th>MGDoFHandler</th>
-    <td>typename MGDoFHandler@<dim,spacedim@>::active_face_iterator</td>
+    <td>typename MGDoFHandler::active_face_iterator</td>
     <td>mg_dof_handler.begin_active_face()</td>
   </tr>
 </table>
@@ -419,8 +419,8 @@ stated in the
   internal::MGDoFHandler::Iterators<2,spacedim>, and
   internal::MGDoFHandler::Iterators<3,spacedim> classes for MGDoFHandler
   iterators.
-  
-  
+
+
 @section IteratorAccessorInternals Iterator and accessor internals
 
 Iterators, being like pointers, act as if they pointed to an actual

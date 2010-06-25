@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * version 5.2. That is, the vertex and face ordering in 2d is assumed
  * to be
  * @verbatim
- *          2    
+ *          2
  *      3--->---2
  *      |       |
  *     3^       ^1
@@ -76,7 +76,7 @@ DEAL_II_NAMESPACE_OPEN
  * Triangulation::create_triangulation_compatibility() (and not the
  * Triangulation::create_triangulation()) function must be used.  For
  * a typical use of the reorder_cells() function see the
- * implementation of the GridIn <tt>::read_*()</tt> functions.
+ * implementation of the GridIn <code>read_*()</code> functions.
  *
  *
  * <h3>Statement of problems</h3>
@@ -124,9 +124,9 @@ DEAL_II_NAMESPACE_OPEN
  * @verbatim
  *       o
  *     /   \
- *   o       o 
+ *   o       o
  *   | \   / |
- *   |   o   |    
+ *   |   o   |
  *   |   |   |
  *   o---o---o
  * @endverbatim
@@ -134,7 +134,7 @@ DEAL_II_NAMESPACE_OPEN
  * directions; it will soon be obvious that there can't exists such a
  * thing, even if we allow that there might be cells with clockwise
  * and counterclockwise orientation of the lines at the same time.)
- * 
+ *
  * One might argue that the definition of unique directions for faces
  * and edges, and the definition of directions relative to the cells
  * they bound, is a misfeature of deal.II. In fact, it makes reading
@@ -171,7 +171,7 @@ DEAL_II_NAMESPACE_OPEN
  * ends of the string of cells, the string is twisted by 180 degrees,
  * then no such orientation is possible any more, as can easily be
  * checked. In effect, some meshes could not be used in deal.II.
- * In order to overcome this problem, the <code>face_rotation</code>, 
+ * In order to overcome this problem, the <code>face_rotation</code>,
  * <code>face_flip</code> and <code>line_orientation</code> flags have
  * been introduced. With these, it is possible to treat all purely hexahedral
  * meshes. However, in order to reduce the effect of possible bugs, it should
@@ -234,7 +234,7 @@ DEAL_II_NAMESPACE_OPEN
  *   0->-1------2
  * @endverbatim
  *
- * The point here is the following: assume we wanted to prolong the grid to 
+ * The point here is the following: assume we wanted to prolong the grid to
  * the left like this:
  * @verbatim
  *   o---o---o---o---o------o
@@ -494,7 +494,7 @@ DEAL_II_NAMESPACE_OPEN
  * implemented in 2000 by Wolfgang Bangerth. Although it is no longer used
  * here is how it works, and why it doesn't always work for large meshes since
  * its run-time can exponential in bad cases.
- * 
+ *
  * The first observation is that although there are counterexamples,
  * problems are usually local. For example, in the second example
  * mentioned above, if we had numbered the cells in a way that
@@ -647,7 +647,7 @@ template <int dim, int spacedim=dim>
 class GridReordering
 {
   public:
-    
+
 				     /**
 				      *  This is the main function,
 				      *  doing what is announced in
@@ -693,7 +693,7 @@ class GridReordering
 				      */
     static void invert_all_cells_of_negative_grid(
       const std::vector<Point<spacedim> > &all_vertices,
-      std::vector<CellData<dim> > &original_cells);    
+      std::vector<CellData<dim> > &original_cells);
 };
 
 

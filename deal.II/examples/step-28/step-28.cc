@@ -1,7 +1,7 @@
 /*    $Id$       */
 /*    Version: $Name:  $                                          */
 /*                                                                */
-/*    Copyright (C) 2006, 2007, 2008, 2009 by the deal.II authors and Yaqi Wang     */
+/*    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors and Yaqi Wang     */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -152,7 +152,7 @@ class MaterialData
 {
   public:
     MaterialData (const unsigned int n_groups);
- 
+
     double get_diffusion_coefficient (const unsigned int group,
 				      const unsigned int material_id) const;
     double get_removal_XS (const unsigned int group,
@@ -167,7 +167,7 @@ class MaterialData
 			      const unsigned int material_id) const;
     double get_fission_spectrum (const unsigned int group,
 				 const unsigned int material_id) const;
-    
+
   private:
     const unsigned int n_groups;
     const unsigned int n_materials;
@@ -223,15 +223,15 @@ MaterialData::MaterialData (const unsigned int n_groups)
               for (unsigned int group_2=0; group_2<n_groups; ++ group_2)
                 sigma_s[m][group_1][group_2]   = 0.0;
           }
-    
-  
+
+
         diffusion[5][1]  = 0.2;
-  
+
         sigma_r[4][0]    = 0.026;
         sigma_r[5][0]    = 0.051;
         sigma_r[6][0]    = 0.026;
         sigma_r[7][0]    = 0.050;
-  
+
         sigma_r[0][1]    = 0.100;
         sigma_r[1][1]    = 0.200;
         sigma_r[2][1]    = 0.250;
@@ -240,7 +240,7 @@ MaterialData::MaterialData (const unsigned int n_groups)
         sigma_r[5][1]    = 0.040;
         sigma_r[6][1]    = 0.020;
         sigma_r[7][1]    = 0.800;
-  
+
         nu_sigma_f[0][0] = 0.0050;
         nu_sigma_f[1][0] = 0.0075;
         nu_sigma_f[2][0] = 0.0075;
@@ -249,7 +249,7 @@ MaterialData::MaterialData (const unsigned int n_groups)
         nu_sigma_f[5][0] = 0.000;
         nu_sigma_f[6][0] = 1e-7;
         nu_sigma_f[7][0] = 0.00;
-  
+
         nu_sigma_f[0][1] = 0.125;
         nu_sigma_f[1][1] = 0.300;
         nu_sigma_f[2][1] = 0.375;
@@ -258,7 +258,7 @@ MaterialData::MaterialData (const unsigned int n_groups)
         nu_sigma_f[5][1] = 0.000;
         nu_sigma_f[6][1] = 3e-6;
         nu_sigma_f[7][1] = 0.00;
-    
+
         sigma_s[0][0][1] = 0.020;
         sigma_s[1][0][1] = 0.015;
         sigma_s[2][0][1] = 0.015;
@@ -275,7 +275,7 @@ MaterialData::MaterialData (const unsigned int n_groups)
       default:
             Assert (false,
                     ExcMessage ("Presently, only data for 2 groups is implemented"));
-    }          
+    }
 }
 
 
@@ -291,9 +291,9 @@ double
 MaterialData::get_diffusion_coefficient (const unsigned int group,
 					 const unsigned int material_id) const
 {
-  Assert (group < n_groups, 
+  Assert (group < n_groups,
 	  ExcIndexRange (group, 0, n_groups));
-  Assert (material_id < n_materials, 
+  Assert (material_id < n_materials,
 	  ExcIndexRange (material_id, 0, n_materials));
 
   return diffusion[material_id][group];
@@ -305,9 +305,9 @@ double
 MaterialData::get_removal_XS (const unsigned int group,
                               const unsigned int material_id) const
 {
-  Assert (group < n_groups, 
+  Assert (group < n_groups,
 	  ExcIndexRange (group, 0, n_groups));
-  Assert (material_id < n_materials, 
+  Assert (material_id < n_materials,
 	  ExcIndexRange (material_id, 0, n_materials));
 
   return sigma_r[material_id][group];
@@ -318,9 +318,9 @@ double
 MaterialData::get_fission_XS (const unsigned int group,
                               const unsigned int material_id) const
 {
-  Assert (group < n_groups, 
+  Assert (group < n_groups,
 	  ExcIndexRange (group, 0, n_groups));
-  Assert (material_id < n_materials, 
+  Assert (material_id < n_materials,
 	  ExcIndexRange (material_id, 0, n_materials));
 
   return nu_sigma_f[material_id][group];
@@ -333,11 +333,11 @@ MaterialData::get_scattering_XS (const unsigned int group_1,
                                  const unsigned int group_2,
                                  const unsigned int material_id) const
 {
-  Assert (group_1 < n_groups, 
+  Assert (group_1 < n_groups,
 	  ExcIndexRange (group_1, 0, n_groups));
-  Assert (group_2 < n_groups, 
+  Assert (group_2 < n_groups,
 	  ExcIndexRange (group_2, 0, n_groups));
-  Assert (material_id < n_materials, 
+  Assert (material_id < n_materials,
 	  ExcIndexRange (material_id, 0, n_materials));
 
   return sigma_s[material_id][group_1][group_2];
@@ -347,11 +347,11 @@ MaterialData::get_scattering_XS (const unsigned int group_1,
 
 double
 MaterialData::get_fission_spectrum (const unsigned int group,
-                                    const unsigned int material_id) const 
+                                    const unsigned int material_id) const
 {
-  Assert (group < n_groups, 
+  Assert (group < n_groups,
 	  ExcIndexRange (group, 0, n_groups));
-  Assert (material_id < n_materials, 
+  Assert (material_id < n_materials,
 	  ExcIndexRange (material_id, 0, n_materials));
 
   return chi[material_id][group];
@@ -371,7 +371,7 @@ MaterialData::get_fission_spectrum (const unsigned int group,
 double
 MaterialData::get_fission_dist_XS (const unsigned int group_1,
                                    const unsigned int group_2,
-                                   const unsigned int material_id) const 
+                                   const unsigned int material_id) const
 {
   return (get_fission_spectrum(group_1, material_id) *
 	  get_fission_XS(group_2, material_id));
@@ -441,7 +441,7 @@ MaterialData::get_fission_dist_XS (const unsigned int group_1,
 				 // include right hand side terms
 				 // involving $\phi_g$. What one
 				 // typically does in such situations
-				 // is to iterate: compute 
+				 // is to iterate: compute
 				 // @f{eqnarray*}
 				 // -\nabla \cdot(D_g(x) \nabla \phi^{(n)}_g(x))
 				 // &+&
@@ -556,7 +556,7 @@ class EnergyGroup
 
     unsigned int n_active_cells () const;
     unsigned int n_dofs () const;
-    
+
                                      // Then there are functions that
                                      // assemble the linear system for
                                      // each iteration and the present
@@ -616,13 +616,13 @@ class EnergyGroup
 				     // problem involving the neutron
 				     // flux equations:
     void   solve ();
-    
+
     double get_fission_source () const;
-    
+
     void   output_results (const unsigned int cycle) const;
-    
+
     void   estimate_errors (Vector<float> &error_indicators) const;
-    
+
     void   refine_grid (const Vector<float> &error_indicators,
                         const double         refine_threshold,
                         const double         coarsen_threshold);
@@ -643,7 +643,7 @@ class EnergyGroup
 				     // by the present guess of the
 				     // eigenvalue we are looking for:
   public:
-    
+
     Vector<double> solution;
     Vector<double> solution_old;
 
@@ -675,22 +675,22 @@ class EnergyGroup
                                      // store them along with all the
                                      // other data of this class:
   private:
-    
+
     const unsigned int            group;
     const MaterialData           &material_data;
-        
+
     Triangulation<dim>            triangulation;
     const FiniteElement<dim>     &fe;
     DoFHandler<dim>               dof_handler;
 
     SparsityPattern               sparsity_pattern;
     SparseMatrix<double>          system_matrix;
-    
+
     Vector<double>                system_rhs;
-    
+
     std::map<unsigned int,double> boundary_values;
     ConstraintMatrix              hanging_node_constraints;
-    
+
 
 				     // @sect5{Private member functionss}
 				     //
@@ -801,14 +801,14 @@ void
 EnergyGroup<dim>::setup_linear_system ()
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
-      
+
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
                                            hanging_node_constraints);
   hanging_node_constraints.close ();
 
   system_matrix.clear ();
-      
+
   sparsity_pattern.reinit (n_dofs, n_dofs,
                            dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
@@ -879,7 +879,7 @@ EnergyGroup<dim>::setup_linear_system ()
                                    // first clear the boundary value
                                    // map):
   boundary_values.clear();
-    
+
   for (unsigned int i=0; i<dim; ++i)
     VectorTools::interpolate_boundary_values (dof_handler,
                                               2*i+1,
@@ -917,37 +917,37 @@ EnergyGroup<dim>::setup_linear_system ()
                                  // information is available.
 template <int dim>
 void
-EnergyGroup<dim>::assemble_system_matrix () 
+EnergyGroup<dim>::assemble_system_matrix ()
 {
   const QGauss<dim>  quadrature_formula(fe.degree + 1);
-      
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values    |  update_gradients |
                            update_JxW_values);
-      
+
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
-      
+
   FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs (dofs_per_cell);
-      
+
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-      
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-      
+
   for (; cell!=endc; ++cell)
     {
       cell_matrix = 0;
-	  
+
       fe_values.reinit (cell);
 
       const double diffusion_coefficient
 	= material_data.get_diffusion_coefficient (group, cell->material_id());
       const double removal_XS
 	= material_data.get_removal_XS (group,cell->material_id());
-	  
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -960,7 +960,7 @@ EnergyGroup<dim>::assemble_system_matrix ()
                                   fe_values.shape_value(j,q_point))
                                  *
                                  fe_values.JxW(q_point));
-      
+
       cell->get_dof_indices (local_dof_indices);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -969,7 +969,7 @@ EnergyGroup<dim>::assemble_system_matrix ()
 			     local_dof_indices[j],
 			     cell_matrix(i,j));
     }
-  
+
   hanging_node_constraints.condense (system_matrix);
 }
 
@@ -1013,27 +1013,27 @@ void EnergyGroup<dim>::assemble_ingroup_rhs (const Function<dim> &extraneous_sou
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points = quadrature_formula.size();
-  
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values    |  update_quadrature_points  |
                            update_JxW_values);
-  
+
   Vector<double>            cell_rhs (dofs_per_cell);
   std::vector<double>       extraneous_source_values (n_q_points);
   std::vector<double>       solution_old_values (n_q_points);
-  
+
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-  
+
   for (; cell!=endc; ++cell)
     {
       cell_rhs = 0;
-      
+
       fe_values.reinit (cell);
-      
+
       const double fission_dist_XS
 	= material_data.get_fission_dist_XS (group, group, cell->material_id());
 
@@ -1041,9 +1041,9 @@ void EnergyGroup<dim>::assemble_ingroup_rhs (const Function<dim> &extraneous_sou
 				    extraneous_source_values);
 
       fe_values.get_function_values (solution_old, solution_old_values);
-      
+
       cell->get_dof_indices (local_dof_indices);
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  cell_rhs(i) += ((extraneous_source_values[q_point]
@@ -1052,9 +1052,9 @@ void EnergyGroup<dim>::assemble_ingroup_rhs (const Function<dim> &extraneous_sou
                            solution_old_values[q_point]) *
 			  fe_values.shape_value(i,q_point) *
 			  fe_values.JxW(q_point));
-      
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	system_rhs(local_dof_indices[i]) += cell_rhs(i);      
+	system_rhs(local_dof_indices[i]) += cell_rhs(i);
     }
 }
 
@@ -1090,18 +1090,18 @@ void EnergyGroup<dim>::assemble_cross_group_rhs (const EnergyGroup<dim> &g_prime
 {
   if (group == g_prime.group)
     return;
-  
-  const std::list<std::pair<typename DoFHandler<dim>::cell_iterator, 
+
+  const std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
     typename DoFHandler<dim>::cell_iterator> >
     cell_list
-    = GridTools::get_finest_common_cells (dof_handler, 
+    = GridTools::get_finest_common_cells (dof_handler,
 					  g_prime.dof_handler);
-      
-  typename std::list<std::pair<typename DoFHandler<dim>::cell_iterator, 
+
+  typename std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
                                typename DoFHandler<dim>::cell_iterator> >
-    ::const_iterator 
+    ::const_iterator
     cell_iter = cell_list.begin();
-      
+
   for (; cell_iter!=cell_list.end(); ++cell_iter)
     {
       FullMatrix<double> unit_matrix (fe.dofs_per_cell);
@@ -1192,8 +1192,8 @@ assemble_cross_group_rhs_recursive (const EnergyGroup<dim>                      
     {
       const QGauss<dim>  quadrature_formula (fe.degree+1);
       const unsigned int n_q_points = quadrature_formula.size();
-    
-      FEValues<dim> fe_values (fe, quadrature_formula, 
+
+      FEValues<dim> fe_values (fe, quadrature_formula,
                                update_values  |  update_JxW_values);
 
       if (cell_g->level() > cell_g_prime->level())
@@ -1226,7 +1226,7 @@ assemble_cross_group_rhs_recursive (const EnergyGroup<dim>                      
                                            fe_values.shape_value(i,q_point) *
                                            fe_values.shape_value(j,q_point) *
                                            fe_values.JxW(q_point));
-            }    
+            }
 
                                        // Now we have all the
                                        // interpolation (prolongation)
@@ -1263,7 +1263,7 @@ assemble_cross_group_rhs_recursive (const EnergyGroup<dim>                      
       Vector<double>       g_prime_old_values (fe.dofs_per_cell);
       cell_g_prime->get_dof_values (g_prime.solution_old, g_prime_old_values);
       cell_g_prime->get_dof_values (g_prime.solution,     g_prime_new_values);
-      
+
       Vector<double>       cell_rhs (fe.dofs_per_cell);
       Vector<double>       tmp (fe.dofs_per_cell);
 
@@ -1282,11 +1282,11 @@ assemble_cross_group_rhs_recursive (const EnergyGroup<dim>                      
 
 	  local_mass_matrix_g.vmult (tmp, g_prime_new_values);
 	  prolongation_matrix.Tvmult_add (cell_rhs, tmp);
-	}      
+	}
 
       std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
       cell_g->get_dof_indices (local_dof_indices);
-      
+
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	system_rhs(local_dof_indices[i]) += cell_rhs(i);
     }
@@ -1339,14 +1339,14 @@ double EnergyGroup<dim>::get_fission_source () const
 {
   const QGauss<dim>  quadrature_formula (fe.degree + 1);
   const unsigned int n_q_points    = quadrature_formula.size();
-      
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values  |  update_JxW_values);
-      
+
   std::vector<double>       solution_values (n_q_points);
 
   double fission_source = 0;
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -1358,13 +1358,13 @@ double EnergyGroup<dim>::get_fission_source () const
 	= material_data.get_fission_XS(group, cell->material_id());
 
       fe_values.get_function_values (solution, solution_values);
-	  
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	fission_source += (fission_XS *
 			   solution_values[q_point] *
 			   fe_values.JxW(q_point));
     }
-      
+
   return fission_source;
 }
 
@@ -1382,21 +1382,21 @@ double EnergyGroup<dim>::get_fission_source () const
                                  // hand side vector.
 template <int dim>
 void
-EnergyGroup<dim>::solve () 
+EnergyGroup<dim>::solve ()
 {
   hanging_node_constraints.condense (system_rhs);
   MatrixTools::apply_boundary_values (boundary_values,
 				      system_matrix,
 				      solution,
 				      system_rhs);
-  
+
   SolverControl           solver_control (system_matrix.m(),
                                           1e-12*system_rhs.l2_norm());
   SolverCG<>              cg (solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
-  
+
   cg.solve (system_matrix, solution, system_rhs, preconditioner);
 
   hanging_node_constraints.distribute (solution);
@@ -1420,7 +1420,7 @@ template <int dim>
 void EnergyGroup<dim>::estimate_errors (Vector<float> &error_indicators) const
 {
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      QGauss<dim-1> (fe.degree + 1), 
+				      QGauss<dim-1> (fe.degree + 1),
 				      typename FunctionMap<dim>::type(),
 				      solution,
 				      error_indicators);
@@ -1458,13 +1458,13 @@ void EnergyGroup<dim>::refine_grid (const Vector<float> &error_indicators,
   typename Triangulation<dim>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
-            
+
   for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
     if (error_indicators(cell_index) > refine_threshold)
       cell->set_refine_flag ();
     else if (error_indicators(cell_index) < coarsen_threshold)
       cell->set_coarsen_flag ();
-      
+
   SolutionTransfer<dim> soltrans(dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
@@ -1509,7 +1509,7 @@ EnergyGroup<dim>::output_results (const unsigned int cycle) const
                                  Utilities::int_to_string(cycle,1) +
                                  ".eps";
     std::ofstream output (filename.c_str());
-      
+
     GridOut grid_out;
     grid_out.write_eps (triangulation, output);
   }
@@ -1520,13 +1520,13 @@ EnergyGroup<dim>::output_results (const unsigned int cycle) const
                                  "." +
                                  Utilities::int_to_string(cycle,1) +
                                  ".gmv";
-	
+
     DataOut<dim> data_out;
 
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
-  
+
     std::ofstream output (filename.c_str());
     data_out.write_gmv (output);
   }
@@ -1587,14 +1587,14 @@ EnergyGroup<dim>::output_results (const unsigned int cycle) const
                                  // parameters from a ParameterHandler
                                  // object.
 template <int dim>
-class NeutronDiffusionProblem 
+class NeutronDiffusionProblem
 {
   public:
     class Parameters
     {
       public:
 	Parameters ();
-	
+
 	static void declare_parameters (ParameterHandler &prm);
 	void get_parameters (ParameterHandler &prm);
 
@@ -1602,20 +1602,20 @@ class NeutronDiffusionProblem
 	unsigned int n_refinement_cycles;
 
 	unsigned int fe_degree;
-	
+
 	double convergence_tolerance;
     };
-    
 
-    
+
+
     NeutronDiffusionProblem (const Parameters &parameters);
     ~NeutronDiffusionProblem ();
 
     void run ();
-    
+
   private:
                                      // @sect5{Private member functions}
-    
+
                                      // There are not that many member
                                      // functions in this class since
                                      // most of the functionality has
@@ -1738,7 +1738,7 @@ get_parameters (ParameterHandler &prm)
 
 
 
-		
+
                                  // @sect4{Implementation of the <code>NeutronDiffusionProblem</code> class}
 
                                  // Now for the
@@ -1758,7 +1758,7 @@ NeutronDiffusionProblem (const Parameters &parameters)
 
 
 template <int dim>
-NeutronDiffusionProblem<dim>::~NeutronDiffusionProblem () 
+NeutronDiffusionProblem<dim>::~NeutronDiffusionProblem ()
 {
   for (unsigned int group=0; group<energy_groups.size(); ++group)
     delete energy_groups[group];
@@ -1813,7 +1813,7 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
 				  :
 				  Point<dim> (assemblies_x*rods_per_assembly_x*pin_pitch_x,
 					      assemblies_y*rods_per_assembly_y*pin_pitch_y,
-					      assemblies_z*assembly_height));     
+					      assemblies_z*assembly_height));
 
   std::vector<unsigned int> n_subdivisions;
   n_subdivisions.push_back (assemblies_x*rods_per_assembly_x);
@@ -1821,7 +1821,7 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
     n_subdivisions.push_back (assemblies_y*rods_per_assembly_y);
   if (dim >= 3)
     n_subdivisions.push_back (assemblies_z);
-     
+
   Triangulation<dim> coarse_grid;
   GridGenerator::subdivided_hyper_rectangle (coarse_grid,
                                              n_subdivisions,
@@ -1829,7 +1829,7 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
                                              upper_right,
                                              true);
 
-  
+
                                    // The second part of the function
                                    // deals with material numbers of
                                    // pin cells of each type of
@@ -1888,7 +1888,7 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
 		{ 1, 1, 1, 1, 1, 5, 1, 1, 5, 1, 1, 5, 1, 1, 1, 1, 1 },
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-	  },	  
+	  },
 	  {
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -1924,9 +1924,9 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
 		{ 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 2 },
 		{ 2, 3, 3, 5, 3, 4, 4, 4, 4, 4, 4, 4, 3, 5, 3, 3, 2 },
 		{ 2, 3, 3, 3, 3, 5, 3, 3, 5, 3, 3, 5, 3, 3, 3, 3, 2 },
-		{ 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2 },        
+		{ 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2 },
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }
-	  },	  
+	  },
 	  {
 		{ 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 },
 		{ 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 },
@@ -1957,7 +1957,7 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
                                    // the 'UX' and 'PX' assemblies:
   const unsigned int core[assemblies_x][assemblies_y][assemblies_z]
     =  {{{0}, {2}}, {{2}, {0}}};
-  
+
 				   // We are now in a position to
 				   // actually set material IDs for
 				   // each cell. To this end, we loop
@@ -1978,7 +1978,7 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
        ++cell)
     {
       const Point<dim> cell_center = cell->center();
-	 
+
       const unsigned int tmp_x = int(cell_center[0]/pin_pitch_x);
       const unsigned int ax = tmp_x/rods_per_assembly_x;
       const unsigned int cx = tmp_x - ax * rods_per_assembly_x;
@@ -2001,7 +2001,7 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
 
       Assert (cx < rods_per_assembly_x, ExcInternalError());
       Assert (cy < rods_per_assembly_y, ExcInternalError());
-      
+
       cell->set_material_id(assembly_materials[core[ax][ay][az]][cx][cy] - 1);
     }
 
@@ -2045,7 +2045,7 @@ void NeutronDiffusionProblem<dim>::initialize_problem()
 				 // spawned returns a double. We can then later
 				 // ask this object for the returned value
 				 // (when doing so, the
-				 // Threads::Thread@<double@>::return_value
+				 // Threads::Thread::return_value
 				 // function first waits for the thread to
 				 // finish if it hasn't done so already).
 				 //
@@ -2062,7 +2062,7 @@ double NeutronDiffusionProblem<dim>::get_total_fission_source () const
   for (unsigned int group=0; group<parameters.n_groups; ++group)
     threads.push_back (Threads::new_thread (&EnergyGroup<dim>::get_fission_source,
 					    *energy_groups[group]));
-  
+
   double fission_source = 0;
   for (unsigned int group=0; group<parameters.n_groups; ++group)
     fission_source += threads[group].return_value ();
@@ -2099,7 +2099,7 @@ void NeutronDiffusionProblem<dim>::refine_grid ()
 
   BlockVector<float>  group_error_indicators(n_cells);
 
-  {  
+  {
     Threads::ThreadGroup<> threads;
     for (unsigned int group=0; group<parameters.n_groups; ++group)
       threads += Threads::new_thread (&EnergyGroup<dim>::estimate_errors,
@@ -2107,16 +2107,16 @@ void NeutronDiffusionProblem<dim>::refine_grid ()
 				      group_error_indicators.block(group));
     threads.join_all ();
   }
-  
+
   const float max_error         = group_error_indicators.linfty_norm();
   const float refine_threshold  = 0.3*max_error;
   const float coarsen_threshold = 0.01*max_error;
 
-  {  
+  {
     Threads::ThreadGroup<> threads;
     for (unsigned int group=0; group<parameters.n_groups; ++group)
       threads += Threads::new_thread (&EnergyGroup<dim>::refine_grid,
-				      *energy_groups[group], 
+				      *energy_groups[group],
 				      group_error_indicators.block(group),
 				      refine_threshold,
 				      coarsen_threshold);
@@ -2138,7 +2138,7 @@ void NeutronDiffusionProblem<dim>::refine_grid ()
 				 // there is actually not much to
 				 // comment on:
 template <int dim>
-void NeutronDiffusionProblem<dim>::run () 
+void NeutronDiffusionProblem<dim>::run ()
 {
   std::cout << std::setprecision (12) << std::fixed;
 
@@ -2146,11 +2146,11 @@ void NeutronDiffusionProblem<dim>::run ()
 
   Timer timer;
   timer.start ();
-  
+
   for (unsigned int cycle=0; cycle<parameters.n_refinement_cycles; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
-      
+
       if (cycle == 0)
 	initialize_problem();
       else
@@ -2158,7 +2158,7 @@ void NeutronDiffusionProblem<dim>::run ()
 	  refine_grid ();
 	  for (unsigned int group=0; group<parameters.n_groups; ++group)
 	    energy_groups[group]->solution *= k_eff;
-	} 
+	}
 
       for (unsigned int group=0; group<parameters.n_groups; ++group)
 	energy_groups[group]->setup_linear_system ();
@@ -2173,8 +2173,8 @@ void NeutronDiffusionProblem<dim>::run ()
 	std::cout << energy_groups[group]->n_dofs()
 		  << ' ';
       std::cout << std::endl << std::endl;
-      
-      
+
+
       Threads::ThreadGroup<> threads;
       for (unsigned int group=0; group<parameters.n_groups; ++group)
 	threads += Threads::new_thread
@@ -2189,10 +2189,10 @@ void NeutronDiffusionProblem<dim>::run ()
 	  for (unsigned int group=0; group<parameters.n_groups; ++group)
 	    {
 	      energy_groups[group]->assemble_ingroup_rhs (ZeroFunction<dim>());
-	      
+
 	      for (unsigned int bgroup=0; bgroup<parameters.n_groups; ++bgroup)
 		energy_groups[group]->assemble_cross_group_rhs (*energy_groups[bgroup]);
-	      
+
 	      energy_groups[group]->solve ();
 	    }
 
@@ -2214,7 +2214,7 @@ void NeutronDiffusionProblem<dim>::run ()
       while((error > parameters.convergence_tolerance)
 	    &&
 	    (iteration < 500));
-	      
+
       for (unsigned int group=0; group<parameters.n_groups; ++group)
         energy_groups[group]->output_results (cycle);
 
@@ -2225,7 +2225,7 @@ void NeutronDiffusionProblem<dim>::run ()
 		<< ", time=" << timer()
 		<< std::endl;
 
-      
+
       std::cout << std::endl << std::endl;
     }
 }
@@ -2263,10 +2263,10 @@ void NeutronDiffusionProblem<dim>::run ()
 				 // of type
 				 // <code>NeutronDiffusionProblem</code>
 				 // for computation of the eigenvalue:
-int main (int argc, char ** argv) 
+int main (int argc, char ** argv)
 {
   const unsigned int dim = 2;
-  
+
   try
     {
       deallog.depth_console (0);
@@ -2277,17 +2277,17 @@ int main (int argc, char ** argv)
       else
 	filename = argv[1];
 
-      
+
       ParameterHandler parameter_handler;
-      
+
       NeutronDiffusionProblem<dim>::Parameters parameters;
       parameters.declare_parameters (parameter_handler);
 
       parameter_handler.read_input (filename);
-      
+
       parameters.get_parameters (parameter_handler);
 
-      
+
       NeutronDiffusionProblem<dim> neutron_diffusion_problem (parameters);
       neutron_diffusion_problem.run ();
     }
@@ -2304,7 +2304,7 @@ int main (int argc, char ** argv)
 
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

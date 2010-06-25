@@ -64,7 +64,7 @@ template <typename> class TriaActiveIterator;
  * @code
  * i->set_refine_flag ();
  * @endcode
- *   
+ *
  * Iterators are used whenever a loop over all lines, quads, cells
  * etc.  is to be performed. These loops can then be coded like this:
  * @code
@@ -80,7 +80,7 @@ template <typename> class TriaActiveIterator;
  * a fixed value <tt>end</tt> inside the loop instead of
  * <tt>tria.end()</tt>, since the creation and copying of these
  * iterators is rather expensive compared to normal pointers.
- *   
+ *
  * The objects pointed to are accessors, derived from
  * TriaAccessorBase. Which kind of accessor is determined by the template
  * argument <em>Accessor</em>. These accessors are not so much data
@@ -132,7 +132,7 @@ template <typename> class TriaActiveIterator;
  * functions from the algorithm section of the C++ standard,
  * e.g. <em>count_if</em> (see the documentation for Triangulation for
  * an example) and several others.
- *   
+ *
  * <h3>Implementation</h3>
  *
  * The iterator class itself does not have much functionality. It only
@@ -174,7 +174,7 @@ template <typename> class TriaActiveIterator;
  * TriaAccessor, DoFAccessor and MGDoFAccessor,
  * respectively. In each group, there is an accessor to cells, which
  * have more functionality.
- * 
+ *
  * @attention It seems impossible to preserve constness of a
  * triangulation through iterator usage. Thus, if you declare pointers
  * to a <tt>const</tt> triangulation object, you should be well aware
@@ -185,9 +185,9 @@ template <typename> class TriaActiveIterator;
  * in the documentation of TriaAccessorBase, where the iterator states are
  * checked and implemented.
  *
- * 
+ *
  * <h3>Past-the-end iterators</h3>
- *   
+ *
  * There is a representation of past-the-end-pointers, denoted by special
  * values of the member variables @p present_level and @p present_index:
  * If <tt>present_level>=0</tt> and <tt>present_index>=0</tt>, then the object is valid
@@ -217,7 +217,7 @@ template <typename> class TriaActiveIterator;
  * Past-the-end iterators may also be used to compare an iterator with the
  * <i>before-the-start</i> value, when running backwards. There is no
  * distiction between the iterators pointing past the two ends of a vector.
- *   
+ *
  * By defining only one value to be past-the-end and making all other values
  * invalid provides a second track of security: if we should have forgotten
  * a check in the library when an iterator is incremented or decremented,
@@ -233,7 +233,7 @@ template <typename> class TriaActiveIterator;
  */
 template <typename Accessor>
 class TriaRawIterator :
-#ifdef HAVE_STD_ITERATOR_CLASS  
+#ifdef HAVE_STD_ITERATOR_CLASS
                public std::iterator<std::bidirectional_iterator_tag,Accessor>
 #else
                public bidirectional_iterator<Accessor,int>
@@ -248,7 +248,7 @@ class TriaRawIterator :
 				      * implementation actually is.
 				      */
     typedef Accessor AccessorType;
-    
+
 				     /**
 				      *  Empty constructor. Such an object
 				      *  is not usable!
@@ -286,7 +286,7 @@ class TriaRawIterator :
 				      */
     template <typename OtherAccessor>
     TriaRawIterator (const OtherAccessor &a);
-    
+
 				     /**
 				      *  Proper constructor, initialized
 				      *  with the triangulation, the
@@ -310,8 +310,8 @@ class TriaRawIterator :
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a Triangulation@p ::raw_cell_iterator from
-				      * a DoFHandler@p ::raw_cell_iterator, since
+				      * a Triangulation::raw_cell_iterator from
+				      * a DoFHandler::raw_cell_iterator, since
 				      * the DoFAccessor class is derived from
 				      * the TriaAccessorBase class.
 				      */
@@ -337,7 +337,7 @@ class TriaRawIterator :
 				      */
     template <typename OtherAccessor>
     TriaRawIterator (const TriaActiveIterator<OtherAccessor> &i);
-    
+
 				     /**
 				      *  @name Dereferencing
 				      */
@@ -359,13 +359,13 @@ class TriaRawIterator :
 				      *  past the end iterators.
 				      */
     const Accessor & operator * () const;
-    
+
 				     /**
 				      *  Dereferencing operator, non-@p const
 				      *  version.
 				      */
     Accessor & operator * ();
-        
+
 				     /**
 				      *  Dereferencing operator, returns a
 				      *  reference of the cell pointed to.
@@ -375,42 +375,42 @@ class TriaRawIterator :
 				      *  version.
 				      */
     const Accessor * operator -> () const;
-        
+
 				     /**
 				      *  Dereferencing operator, non-@p const
 				      *  version.
 				      */
     Accessor * operator -> ();
 				     /*@}*/
-    
+
 				     /**
 				      *  Assignment operator.
 				      */
     TriaRawIterator & operator = (const TriaRawIterator &);
-    
+
 				     /**
 				      *  Assignment operator.
 				      */
 //    template <class OtherAccessor>
 //    TriaRawIterator & operator = (const TriaRawIterator<OtherAccessor>&);
-    
+
 				     /**
 				      *  Assignment operator.
 				      */
 //    template <class OtherAccessor>
 //    TriaRawIterator & operator = (const TriaIterator<OtherAccessor>&);
-    
+
 				     /**
 				      *  Assignment operator.
 				      */
 //    template <class OtherAccessor>
 //    TriaRawIterator & operator = (const TriaActiveIterator<OtherAccessor>&);
-    
+
 				     /**
 				      *  Compare for equality.
 				      */
     bool operator == (const TriaRawIterator &) const;
-    
+
 				     /**
 				      *  Compare for inequality.
 				      */
@@ -434,7 +434,7 @@ class TriaRawIterator :
 				      * is returned in that case.
 				      */
     bool operator < (const TriaRawIterator &) const;
-    
+
 				     /**@name Advancement of iterators*/
 				     /*@{*/
 				     /**
@@ -452,7 +452,7 @@ class TriaRawIterator :
 				      *  faces have no level.
 				      */
     TriaRawIterator & operator ++ ();
-    
+
 				     /**
 				      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
 				      *  operator advances the iterator to
@@ -487,7 +487,7 @@ class TriaRawIterator :
 				      *  faces have no level.
 				      */
     TriaRawIterator & operator -- ();
-    
+
 				     /**
 				      *  Postfix @p -- operator: @p i--. This
 				      *  operator advances the iterator to
@@ -507,7 +507,7 @@ class TriaRawIterator :
 				      */
     TriaRawIterator operator -- (int);
 				     /*@}*/
-    
+
 				     /**
 				      *  Return the state of the iterator.
 				      */
@@ -560,7 +560,7 @@ class TriaRawIterator :
 		    << (arg1.state() == IteratorState::valid ? "valid" :
 			(arg1.state() == IteratorState::past_the_end ?
 			 "past_the_end" : "invalid")));
-    
+
 				     /**
 				      *  Exception
 				      */
@@ -569,7 +569,7 @@ class TriaRawIterator :
 				      * Exception
 				      */
     DeclException0 (ExcInvalidComparison);
-    
+
 				     /*@}*/
   protected:
 				     /**
@@ -605,7 +605,7 @@ class TriaRawIterator :
  * @ingroup Iterators
  */
 template <typename Accessor>
-class TriaIterator : public TriaRawIterator<Accessor> 
+class TriaIterator : public TriaRawIterator<Accessor>
 {
   public:
 				     /**
@@ -648,7 +648,7 @@ class TriaIterator : public TriaRawIterator<Accessor>
 		  const int                 level,
 		  const int                 index,
 		  const typename Accessor::AccessorData *local_data = 0);
-    
+
 				     /**
 				      * This is a conversion operator
 				      * (constructor) which takes another
@@ -659,8 +659,8 @@ class TriaIterator : public TriaRawIterator<Accessor>
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a Triangulation@p ::cell_iterator from
-				      * a DoFHandler@p ::cell_iterator, since
+				      * a Triangulation::cell_iterator from
+				      * a DoFHandler::cell_iterator, since
 				      * the DoFAccessor class is derived from
 				      * the TriaAccessorBase class.
 				      */
@@ -684,13 +684,13 @@ class TriaIterator : public TriaRawIterator<Accessor>
 				      */
     template <typename OtherAccessor>
     TriaIterator (const TriaActiveIterator<OtherAccessor> &i);
-    
+
     				     /**
 				      *  Assignment operator.
 				      */
     TriaIterator<Accessor> &
     operator = (const TriaIterator<Accessor>&);
-    
+
     				     /**
 				      *  Cross assignment operator. This
 				      *  assignment is only valid if the
@@ -699,7 +699,7 @@ class TriaIterator : public TriaRawIterator<Accessor>
 				      */
     TriaIterator<Accessor> &
     operator = (const TriaRawIterator<Accessor>&);
-    
+
     				     /**
 				      *  Assignment
 				      *  operator. Requires, that
@@ -764,7 +764,7 @@ class TriaIterator : public TriaRawIterator<Accessor>
 				      */
     TriaIterator<Accessor> operator -- (int);
 				     /*@}*/
-    
+
 				     /**
 				      *  Exception
 				      */
@@ -782,7 +782,7 @@ class TriaIterator : public TriaRawIterator<Accessor>
  * @ingroup Iterators
  */
 template <typename Accessor>
-class TriaActiveIterator : public TriaIterator<Accessor> 
+class TriaActiveIterator : public TriaIterator<Accessor>
 {
   public:
 				     /**
@@ -848,8 +848,8 @@ class TriaActiveIterator : public TriaIterator<Accessor>
 				      * class of this object. One such path
 				      * would be derived class to base class,
 				      * which for example may be used to get
-				      * a Triangulation@p ::active_cell_iterator from
-				      * a DoFHandler@p ::active_cell_iterator, since
+				      * a Triangulation::active_cell_iterator from
+				      * a DoFHandler::active_cell_iterator, since
 				      * the DoFAccessor class is derived from
 				      * the TriaAccessorBase class.
 				      */
@@ -968,7 +968,7 @@ class TriaActiveIterator : public TriaIterator<Accessor>
 				      */
     TriaActiveIterator<Accessor> operator -- (int);
 				     /*@}*/
-    
+
 				     /**
 				      *  Exception
 				      */
@@ -1044,7 +1044,7 @@ TriaRawIterator<Accessor>::operator * () const
   Assert (Accessor::structure_dimension==Accessor::dimension ||
 	  state() == IteratorState::valid,
 	  ExcDereferenceInvalidObject(accessor));
-  
+
   return accessor;
 }
 
@@ -1251,7 +1251,7 @@ TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaRawIterator<OtherAcc
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (this->state() != IteratorState::past_the_end) 
+  if (this->state() != IteratorState::past_the_end)
     Assert (this->accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif

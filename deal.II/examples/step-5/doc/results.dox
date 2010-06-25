@@ -38,11 +38,11 @@ Cycle 5:
 An error occurred in line <273> of file <step-5.cc> in function
     void Coefficient<dim>::value_list(const std::vector<Point<dim>, std::allocator<Point<dim> > >&, std::vector<double, std::allocator<double> >&, unsigned int)
  const [with int dim = 2]
-The violated condition was: 
+The violated condition was:
     values.size() == points.size()
 The name and call sequence of the exception was:
     ExcDimensionMismatch (values.size(), points.size())
-Additional Information: 
+Additional Information:
 Dimension 1 not equal to 2
 
 Stacktrace:
@@ -110,11 +110,11 @@ As for the error &mdash; let's look at it again:
 An error occurred in line <273> of file <step-5.cc> in function
     void Coefficient<dim>::value_list(const std::vector<Point<dim>, std::allocator<Point<dim> > >&, std::vector<double, std::allocator<double> >&, unsigned int)
  const [with int dim = 2]
-The violated condition was: 
+The violated condition was:
     values.size() == points.size()
 The name and call sequence of the exception was:
     ExcDimensionMismatch (values.size(), points.size())
-Additional Information: 
+Additional Information:
 Dimension 1 not equal to 2
 
 Stacktrace:
@@ -150,13 +150,13 @@ output again.
 So now we know pretty exactly where the error happened and what went
 wrong. What we don't know yet is how exactly we got there. The
 stacktrace at the bottom actually tells us what happened: the problem
-happened in 
+happened in
 <code>Coefficient::value_list</code> (stackframe 0) and that it was
 called from <code>main()</code> (stackframe 1). In realistic programs,
 there would be many more functions in between these two. For example,
 we might have made the mistake in the <code>assemble_system</code>
 function, in which case stack frame 1 would be
-<code>LaplaceProblem&lt;2&gt;::assemble_system</code>, stack frame 2
-would be <code>LaplaceProblem&lt;2&gt;::run</code>, and stack frame 3
+<code>LaplaceProblem::assemble_system</code>, stack frame 2
+would be <code>LaplaceProblem::run</code>, and stack frame 3
 would be <code>main()</code> &mdash; you get the idea.
 

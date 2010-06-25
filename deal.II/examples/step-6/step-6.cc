@@ -122,14 +122,14 @@ using namespace dealii;
 				 // clear when we discuss its
 				 // implementation.
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     LaplaceProblem ();
     ~LaplaceProblem ();
 
     void run ();
-    
+
   private:
     void setup_system ();
     void assemble_system ();
@@ -164,14 +164,14 @@ class LaplaceProblem
 				 // from step-5:
 
 template <int dim>
-class Coefficient : public Function<dim> 
+class Coefficient : public Function<dim>
 {
   public:
     Coefficient () : Function<dim>() {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;
@@ -181,7 +181,7 @@ class Coefficient : public Function<dim>
 
 template <int dim>
 double Coefficient<dim>::value (const Point<dim> &p,
-				const unsigned int) const 
+				const unsigned int) const
 {
   if (p.square() < 0.5*0.5)
     return 20;
@@ -194,16 +194,16 @@ double Coefficient<dim>::value (const Point<dim> &p,
 template <int dim>
 void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
-				   const unsigned int              component) const 
+				   const unsigned int              component) const
 {
   const unsigned int n_points = points.size();
 
-  Assert (values.size() == n_points, 
+  Assert (values.size() == n_points,
 	  ExcDimensionMismatch (values.size(), n_points));
-  
-  Assert (component == 0, 
+
+  Assert (component == 0,
 	  ExcIndexRange (component, 0, 1));
-  
+
   for (unsigned int i=0; i<n_points; ++i)
     {
       if (points[i].square() < 0.5*0.5)
@@ -361,7 +361,7 @@ LaplaceProblem<dim>::LaplaceProblem ()
 				 // destructor, to the end of the
 				 // results section of this example.
 template <int dim>
-LaplaceProblem<dim>::~LaplaceProblem () 
+LaplaceProblem<dim>::~LaplaceProblem ()
 {
   dof_handler.clear ();
 }
@@ -413,7 +413,7 @@ void LaplaceProblem<dim>::setup_system ()
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 
-  
+
 				   // After setting up all the degrees
 				   // of freedoms, here are now the
 				   // differences compared to step-5,
@@ -471,7 +471,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // sparsity pattern immediately.
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
-  
+
 				   // The constrained hanging nodes
 				   // will later be eliminated from
 				   // the linear system of
@@ -550,11 +550,11 @@ void LaplaceProblem<dim>::setup_system ()
 				 // code and nothing that you have to
 				 // worry about.
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
-{  
+void LaplaceProblem<dim>::assemble_system ()
+{
   const QGauss<dim>  quadrature_formula(3);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values    |  update_gradients |
 			   update_quadrature_points  |  update_JxW_values);
 
@@ -581,7 +581,7 @@ void LaplaceProblem<dim>::assemble_system ()
 
       coefficient.value_list (fe_values.get_quadrature_points(),
 			      coefficient_values);
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -603,7 +603,7 @@ void LaplaceProblem<dim>::assemble_system ()
 	    system_matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
-	  
+
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	}
     }
@@ -693,7 +693,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // find at the end of this function:
 
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -798,7 +798,7 @@ void LaplaceProblem<dim>::solve ()
 				 // corresponding Neumann values. This
 				 // information is represented by an
 				 // object of type
-				 // <code>FunctionMap@<dim@>::type</code> that is
+				 // <code>FunctionMap::type</code> that is
 				 // essentially a map from boundary
 				 // indicators to function objects
 				 // describing Neumann boundary values
@@ -973,7 +973,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   std::string filename = "grid-";
   filename += ('0' + cycle);
   filename += ".eps";
-  
+
   std::ofstream output (filename.c_str());
 
   GridOut grid_out;
@@ -1034,7 +1034,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				 // The rest of the loop looks as
 				 // before:
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<8; ++cycle)
     {
@@ -1051,7 +1051,7 @@ void LaplaceProblem<dim>::run ()
 	}
       else
 	refine_grid ();
-      
+
 
       std::cout << "   Number of active cells:       "
 		<< triangulation.n_active_cells()
@@ -1062,7 +1062,7 @@ void LaplaceProblem<dim>::run ()
       std::cout << "   Number of degrees of freedom: "
 		<< dof_handler.n_dofs()
 		<< std::endl;
-      
+
       assemble_system ();
       solve ();
       output_results (cycle);
@@ -1082,14 +1082,14 @@ void LaplaceProblem<dim>::run ()
 				   // factor of four.
   DataOutBase::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
-  
+
   DataOut<dim> data_out;
   data_out.set_flags (eps_flags);
 
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
-  
+
   std::ofstream output ("final-solution.eps");
   data_out.write_eps (output);
 }
@@ -1136,7 +1136,7 @@ void LaplaceProblem<dim>::run ()
 				 // actually encodes the functionality
 				 // particular to the present
 				 // application.
-int main () 
+int main ()
 {
 
 				   // The general idea behind the
@@ -1160,7 +1160,7 @@ int main ()
 				   // use the <code>what</code> member function
 				   // to get a string which describes
 				   // the reason why the exception was
-				   // thrown. 
+				   // thrown.
 				   //
 				   // The deal.II exception classes
 				   // are all derived from the
@@ -1205,7 +1205,7 @@ int main ()
 				   // can't do anything at all. We
 				   // then simply print an error
 				   // message and exit.
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

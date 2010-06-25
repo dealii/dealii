@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -82,7 +82,7 @@ template <int dim, int spacedim> class Triangulation;
  *      for i=0 to n_timesteps-1
  *        initialize timestep i for this sweep, e.g. for setting up
  *        data structures, creating temporary files, etc.
- *   
+ *
  *      for i=0 to n_timesteps-1
  *        prepare timestep i for loop 0
  *      for i=0 to n_timesteps-1
@@ -192,43 +192,43 @@ template <int dim, int spacedim> class Triangulation;
  *   void TimeDependent_Wave<dim>::run_sweep (const unsigned int sweep_no)
  *   {
  *     start_sweep (sweep_no);
- *   
+ *
  *     solve_primal_problem ();
- *   
+ *
  *     if (compute_dual_problem)
  *       solve_dual_problem ();
- *     
+ *
  *     postprocess ();
- *   
+ *
  *     if (sweep_no != number_of_sweeps-1)
  *       refine_grids ();
- *   
+ *
  *     write_statistics ();
- *   
+ *
  *     end_sweep ();
  *   };
- *   
- *   
- *   
+ *
+ *
+ *
  *   template <int dim>
- *   void WaveProblem<dim>::run () 
+ *   void WaveProblem<dim>::run ()
  *   {
  *     for (unsigned int sweep=0; sweep<number_of_sweeps; ++sweep)
  *       timestep_manager.run_sweep (sweep);
  *   };
  * @endverbatim
  * Here, @p timestep_manager is an object of type TimeDependent_Wave(), which
- * is a class derived from TimeDependent. @p start_sweep, 
+ * is a class derived from TimeDependent. @p start_sweep,
  * @p solve_primal_problem, @p solve_dual_problem, @p postprocess and @p end_sweep
- * are functions inherited from this class. They all do a loop over all 
+ * are functions inherited from this class. They all do a loop over all
  * timesteps within this object and call the respective function on each of
  * these objects. For example, here are two of the functions as they are
  * implemented by the library:
  * @verbatim
- *   void TimeDependent::start_sweep (const unsigned int s) 
+ *   void TimeDependent::start_sweep (const unsigned int s)
  *   {
  *     sweep_no = s;
- *   
+ *
  *   				   // reset the number each
  *   				   // time step has, since some time
  *   				   // steps might have been added since
@@ -241,14 +241,14 @@ template <int dim, int spacedim> class Triangulation;
  *         timesteps[step]->set_timestep_no (step);
  *         timesteps[step]->set_sweep_no (sweep_no);
  *       };
- *   
+ *
  *     for (unsigned int step=0; step<timesteps.size(); ++step)
  *       timesteps[step]->start_sweep ();
  *   };
- *   
- *   
+ *
+ *
  *   void
- *   TimeDependent::solve_primal_problem () 
+ *   TimeDependent::solve_primal_problem ()
  *   {
  *     do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
  *              mem_fun(&TimeStepBase::solve_primal_problem),
@@ -260,7 +260,7 @@ template <int dim, int spacedim> class Triangulation;
  * invoked (@p solve_primal_problem, @p solve_dual_problem, @p postprocess,
  * @p refine_grids and @p write_statistics all have this form, where the
  * latter two give functions of the derived timestep class, rather than
- * from the base class). The function TimeStepBase@p ::init_for_primal_problem
+ * from the base class). The function TimeStepBase::init_for_primal_problem
  * and the respective ones for the other operations defined by that class
  * are only used to store the type of operation which the loop presently
  * performed will do.
@@ -312,13 +312,13 @@ template <int dim, int spacedim> class Triangulation;
  *     for (unsigned int step=0; step<n_timesteps; ++step)
  *       init_function (static_cast<typename InitFunctionObject::argument_type>
  *   		   (timesteps[step]));
- *   
+ *
  *   				   // wake up the first few time levels
  *     for (int step=-timestepping_data.look_ahead; step<0; ++step)
  *       for (int look_ahead=0; look_ahead<=timestepping_data.look_ahead; ++look_ahead)
  *         timesteps[step+look_ahead]->wake_up(look_ahead);
- *     
- *     
+ *
+ *
  *     for (unsigned int step=0; step<n_timesteps; ++step)
  *       {
  *   				       // first thing: wake up the
@@ -326,17 +326,17 @@ template <int dim, int spacedim> class Triangulation;
  *         for (unsigned int look_ahead=0;
  *   	   look_ahead<=timestepping_data.look_ahead; ++look_ahead)
  *   	timesteps[step+look_ahead]->wake_up(look_ahead);
- *         
- *         
+ *
+ *
  *   				       // actually do the work
  *         loop_function (static_cast<typename LoopFunctionObject::argument_type>
  *   		     (timesteps[step]));
- *         
+ *
  *   				       // let the timesteps behind sleep
  *         for (unsigned int look_back=0; look_back<=timestepping_data.look_back; ++look_back)
  *   	timesteps[step-look_back]->sleep(look_back);
  *       };
- *   
+ *
  *   				   // make the last few timesteps sleep
  *     for (int step=n_timesteps; n_timesteps+timestepping_data.look_back; ++step)
  *       for (int look_back=0; look_back<=timestepping_data.look_back; ++look_back)
@@ -347,7 +347,7 @@ template <int dim, int spacedim> class Triangulation;
  *
  * @author Wolfgang Bangerth, 1999
  */
-class TimeDependent 
+class TimeDependent
 {
   public:
 				     /**
@@ -369,7 +369,7 @@ class TimeDependent
 					  */
 	TimeSteppingData (const unsigned int look_ahead,
 			  const unsigned int look_back);
-	
+
 					 /**
 					  * This denotes the number of timesteps
 					  * the timestepping algorithm needs to
@@ -400,7 +400,7 @@ class TimeDependent
 					  * time step.
 					  */
 	const unsigned int look_ahead;
-	
+
 					 /**
 					  * This is the opposite variable to the
 					  * above one. It denotes the number of
@@ -524,7 +524,7 @@ class TimeDependent
 				      * used in the previous sweep.
 				      */
     void delete_timestep (const unsigned int position);
-    
+
 				     /**
 				      * Solve the primal problem; uses the
 				      * functions @p init_for_primal_problem
@@ -563,7 +563,7 @@ class TimeDependent
 				      * object given to the constructor.
 				      */
     void postprocess ();
-    
+
 				     /**
 				      * Do a loop over all timesteps, call the
 				      * @p init_function at the beginning and
@@ -595,7 +595,7 @@ class TimeDependent
 				      *
 				      * Instead of using the above form, you can
 				      * equally well use
-				      * <tt>bind2nd(mem_fun1(&X::unary_function), arg)</tt> 
+				      * <tt>bind2nd(mem_fun1(&X::unary_function), arg)</tt>
 				      * which lets the @p do_loop
 				      * function call teh given function with
 				      * the specified parameter. Note that you
@@ -684,12 +684,12 @@ class TimeDependent
 				      * of this object.
 				      */
     unsigned int memory_consumption () const;
-    
+
 				     /**
 				      * Exception.
 				      */
     DeclException0 (ExcInvalidPosition);
-    
+
   protected:
 				     /**
 				      * Vector holding pointers to the time
@@ -730,7 +730,7 @@ class TimeDependent
 				      * do. See the documentation of this struct
 				      * for more information.
 				      */
-    const TimeSteppingData timestepping_data_postprocess;  
+    const TimeSteppingData timestepping_data_postprocess;
 
   private:
 
@@ -766,7 +766,7 @@ class TimeStepBase : public Subscriptor
 	  dual_problem   = 0x1,
 	  postprocess    = 0x2
     };
-    
+
 				     /**
 				      * Constructor. Does nothing here apart
 				      * from setting the time.
@@ -861,7 +861,7 @@ class TimeStepBase : public Subscriptor
 				      * and the like.
 				      */
     virtual void end_sweep ();
-    
+
 				     /**
 				      * Before the primal problem is
 				      * solved on each time level, this
@@ -952,7 +952,7 @@ class TimeStepBase : public Subscriptor
 				      * are added or deleted.
 				      */
     unsigned int get_timestep_no () const;
-    
+
 				     /**
 				      * Compute the time difference to the
 				      * last time step. If this timestep is
@@ -987,7 +987,7 @@ class TimeStepBase : public Subscriptor
 				      * above.
 				      */
     double get_forward_timestep () const;
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -1007,15 +1007,15 @@ class TimeStepBase : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcCantComputeTimestep);
-    
+
   protected:
-				     /**				      
+				     /**
 				      * Pointer to the previous time step object
 				      * in the list.
 				      */
     const TimeStepBase *previous_timestep;
 
-				     /**				      
+				     /**
 				      * Pointer to the next time step object
 				      * in the list.
 				      */
@@ -1054,7 +1054,7 @@ class TimeStepBase : public Subscriptor
 				      * functions.
 				      */
     unsigned int next_action;
-    
+
   private:
 				     /**
 				      * Reset the pointer to the previous time
@@ -1155,7 +1155,7 @@ namespace TimeStepBase_Tria_Flags
 					* really usable.
 					*/
       Flags ();
-      
+
 				       /**
 					* Constructor; see the different
 					* fields for a description of the
@@ -1164,7 +1164,7 @@ namespace TimeStepBase_Tria_Flags
       Flags (const bool         delete_and_rebuild_tria,
 	     const unsigned int wakeup_level_to_build_grid,
 	     const unsigned int sleep_level_to_delete_grid);
-      
+
 				       /**
 					* This flag determines whether
 					* the @p sleep and
@@ -1207,7 +1207,7 @@ namespace TimeStepBase_Tria_Flags
 					* has no meaning.
 					*/
       const unsigned int wakeup_level_to_build_grid;
-      
+
 				       /**
 					* This is the opposite flag to
 					* the one above: it determines
@@ -1215,7 +1215,7 @@ namespace TimeStepBase_Tria_Flags
 					* the grid shall be deleted.
 					*/
       const unsigned int sleep_level_to_delete_grid;
-      
+
 				       /**
 					* Exception
 					*/
@@ -1358,13 +1358,13 @@ namespace TimeStepBase_Tria_Flags
 					* information.
 					*/
       typedef std::vector<std::vector<std::pair<unsigned int, double> > >   CorrectionRelaxations;
-      
+
 				       /**
 					* Default values for the relaxations:
 					* no relaxations.
 					*/
       static CorrectionRelaxations default_correction_relaxations;
-      
+
 				       /**
 					* Constructor. The default
 					* values are chosen such that
@@ -1380,7 +1380,7 @@ namespace TimeStepBase_Tria_Flags
 		       const unsigned int cell_number_correction_steps = 0,
 		       const bool mirror_flags_to_previous_grid        = false,
 		       const bool adapt_grids                          = false);
-      
+
 				       /**
 					* Maximum level of a cell in
 					* the triangulation of a time
@@ -1399,7 +1399,7 @@ namespace TimeStepBase_Tria_Flags
 					* refinements.
 					*/
       const unsigned int  max_refinement_level;
-      
+
 				       /**
 					* First sweep to perform cell
 					* number correction steps on;
@@ -1418,7 +1418,7 @@ namespace TimeStepBase_Tria_Flags
 					* this number of cells.
 					*/
       const unsigned int  min_cells_for_correction;
-    
+
 				       /**
 					* Fraction by which the number
 					* of cells on a time level may
@@ -1428,7 +1428,7 @@ namespace TimeStepBase_Tria_Flags
 					* second: bottom deviation).
 					*/
       const double        cell_number_corridor_top;
-      
+
 				       /**
 					* @ref cell_number_corridor_top
 					*/
@@ -1439,7 +1439,7 @@ namespace TimeStepBase_Tria_Flags
 					* correction step.
 					*/
       const std::vector<std::vector<std::pair<unsigned int,double> > > correction_relaxations;
-    
+
 				       /**
 					* Number of iterations to be
 					* performed to adjust the
@@ -1490,7 +1490,7 @@ namespace TimeStepBase_Tria_Flags
 					* previous one.
 					*/
       const bool          adapt_grids;
-    
+
 				       /**
 					* Exception
 					*/
@@ -1508,14 +1508,14 @@ namespace TimeStepBase_Tria_Flags
  * @p get_tria_refinement_criteria.
  */
   template <int dim>
-  struct RefinementData 
+  struct RefinementData
   {
 				       /**
 					* Constructor
 					*/
       RefinementData (const double         refinement_threshold,
 		      const double         coarsening_threshold=0);
-      
+
 				       /**
 					* Threshold for refinement:
 					* cells having a larger value
@@ -1528,7 +1528,7 @@ namespace TimeStepBase_Tria_Flags
 					* higher than this threshold).
 					*/
       const double         refinement_threshold;
-      
+
 				       /**
 					* Same threshold for
 					* coarsening: cells with a
@@ -1578,8 +1578,8 @@ class TimeStepBase_Tria : public TimeStepBase
     typedef typename TimeStepBase_Tria_Flags::Flags<dim>           Flags;
     typedef typename TimeStepBase_Tria_Flags::RefinementFlags<dim> RefinementFlags;
     typedef typename TimeStepBase_Tria_Flags::RefinementData<dim>  RefinementData;
-    
-    
+
+
 				     /**
 				      * Extension of the enum in the base
 				      * class denoting the next action to be
@@ -1604,7 +1604,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * terminal.
 				      */
     TimeStepBase_Tria ();
-    
+
 				     /**
 				      * Constructor. Takes a coarse
 				      * grid from which the grids on this
@@ -1736,7 +1736,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * be overloaded.
 				      */
     virtual void init_for_refinement ();
-    
+
 				     /**
 				      * Virtual function that should fill
 				      * the vector with the refinement
@@ -1749,7 +1749,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * the time step management object.
 				      */
     virtual void get_tria_refinement_criteria (Vector<float> &criteria) const = 0;
-    
+
 				     /**
 				      * The refinement
 				      * flags of the triangulation are stored
@@ -1780,7 +1780,7 @@ class TimeStepBase_Tria : public TimeStepBase
     DeclException0 (ExcGridNotDeleted);
 
   protected:
-    
+
 				     /**
 				      * Triangulation used at this
 				      * time level. Since this is
@@ -1807,7 +1807,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * management object.
 				      */
     SmartPointer<const Triangulation<dim, dim>,TimeStepBase_Tria<dim> > coarse_grid;
-    
+
 				     /**
 				      * Some flags about how this time level
 				      * shall behave. See the documentation
@@ -1870,7 +1870,7 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 				   // some code at one place when it needs
 				   // to be changed at a second place, here
 				   // for the other direction, also.
-  
+
   const unsigned int n_timesteps = timesteps.size();
 
 				   // initialize the time steps for
@@ -1937,7 +1937,7 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 			       (&*timesteps[n_timesteps-step-1]));
 		break;
 	};
-      
+
 				       // let the timesteps behind sleep
       for (unsigned int look_back=0;
 	   look_back<=timestepping_data.look_back; ++look_back)
