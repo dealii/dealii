@@ -1128,7 +1128,7 @@ UML_LOOK               = NO
 # If set to YES, the inheritance and collaboration graphs will show the 
 # relations between templates and their instances.
 
-TEMPLATE_RELATIONS     = YES
+TEMPLATE_RELATIONS     = NO
 
 # If the ENABLE_PREPROCESSING, SEARCH_INCLUDES, INCLUDE_GRAPH, and HAVE_DOT 
 # tags are set to YES then doxygen will generate a graph for each documented 
@@ -1197,7 +1197,7 @@ DOTFILE_DIRS           =
 # code bases. Also note that the size of a graph can be further restricted by 
 # DOT_GRAPH_MAX_NODES. Using a depth of 0 means no depth restriction.
 
-MAX_DOT_GRAPH_DEPTH    = 3
+MAX_DOT_GRAPH_DEPTH    = 2
 
 # Set the DOT_TRANSPARENT tag to YES to generate images with a transparent 
 # background. This is disabled by default, which results in a white background. 
