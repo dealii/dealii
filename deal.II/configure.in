@@ -700,7 +700,7 @@ AH_BOTTOM(
 #  define DEAL_VOLATILE
 #endif
 
-/**
+/*
  * There is an annoying problem in the Trilinos header ml_config.h: It
  * #define's HAVE_INTTYPES_H but doesn't give the symbol a value. This
  * conflicts with the result of running deal.II's ./configure which
@@ -715,7 +715,7 @@ AH_BOTTOM(
  * #undef into a #define again.
  */
 #if defined(DEAL_II_USE_TRILINOS) && defined(HAVE_INTTYPES_H)
-#  undef /**/ HAVE_INTTYPES_H
+#  undef /*   */ HAVE_INTTYPES_H
 #endif
 
 /**
