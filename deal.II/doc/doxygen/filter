@@ -36,3 +36,12 @@ s/(?<!\")step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi
 
 
 s#(static dealii::ExceptionBase\&)#\n//\! \@ingroup Exceptions\n \1#g;
+
+# doxygen version 1.7.1 and later have the habit of thinking that
+# everything that starts with "file:" is the beginning of a link,
+# but we occasionally use this in our tutorials in the form
+# "...this functionality is declared in the following header file:",
+# where it leads to a non-functional link. We can avoid the problem
+# by replacing a "file:" at the end of a line with the text
+# "file :", which doxygen doesn't recognize:
+s#file:[ \t]*$#file :#g;
