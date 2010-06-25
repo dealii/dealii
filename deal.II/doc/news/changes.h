@@ -1,5 +1,5 @@
 /**
- * @page changes_after_6.3 Changes after Version 6.3
+ * @page changes_after_6_3 Changes after Version 6.3
 
 <p>
 This is the list of changes made after the release of

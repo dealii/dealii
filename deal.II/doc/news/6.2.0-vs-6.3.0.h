@@ -1,5 +1,5 @@
 /**
- * @page changes_between_6.2_and_6.3 Changes between Version 6.2 and 6.3
+ * @page changes_between_6_2_and_6_3 Changes between Version 6.2 and 6.3
 
 <p>
 This is the list of changes made between the release of

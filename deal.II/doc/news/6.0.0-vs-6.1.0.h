@@ -1,10 +1,10 @@
 /**
- * @page changes_between_6.0_and_6.1 Changes between Version 6.0 and 6.1
+ * @page changes_between_6_0_and_6_1 Changes between Version 6.0 and 6.1
 
 <p>
-This is the list of changes made between the release of 
+This is the list of changes made between the release of
 deal.II version 6.0 and version 6.1. It is subdivided into changes
-made to the three sub-libraries <a href="#base">base</a>, 
+made to the three sub-libraries <a href="#base">base</a>,
 <a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
 documentation, etc</a>.
@@ -87,7 +87,7 @@ inconvenience this causes.
   </p>
 
   <li> <p>Changed: The deprecated typedefs
-  <code>internal::Triangulation::Line</code>, 
+  <code>internal::Triangulation::Line</code>,
   <code>internal::Triangulation::Quad</code>, and
   <code>internal::Triangulation::Hexahedron</code> have been removed.
   <br>
@@ -122,12 +122,12 @@ inconvenience this causes.
      incompressible fluid flow.
   <br>
   (WB, 2008/03/28)
-  </p>  
+  </p>
 
 <li> <p>New: step-29 demonstrates how problems involving
   complex %numbers can be implemented by viewing real and imaginary parts
   of a complex-valued solution as the two components of a vector-valued
-  function. 
+  function.
   <br>
   (Moritz Allmaras, 2007/10/31)
   </p>
@@ -169,7 +169,7 @@ default names for variables in the given space dimension. For example, in
 </p> </li>
 
 <li> <p>New: ConvergenceTable::evaluate_convergence_rates has been incomplete
-for a long time. An implementation for reduction_rate and 
+for a long time. An implementation for reduction_rate and
 reduction_rate_log2 has been added in the case where one specifies
 a reference column that allows to compute error rates also for local
 refinement.
@@ -178,7 +178,7 @@ refinement.
 </p></li>
 
 <li> <p> Fixed: The Utilities::int_to_string function did not work for 5 or 6
-digits, while its counterpart Utilities::needed_digits does. This is now fixed, 
+digits, while its counterpart Utilities::needed_digits does. This is now fixed,
 and the two are coherent.
 <br>
 (Luca Heltai 2008/04/16)
@@ -191,7 +191,7 @@ an object from an array consisting its independent components.
 </p> </li>
 
 <li> <p> New: There are now output operators (i.e. <code>operator@<@<</code>)
-for the SymmetricTensor class. 
+for the SymmetricTensor class.
 <br>
 (WB 2008/02/12)
 </p> </li>
@@ -241,7 +241,7 @@ an integer id of the current thread.
   intermediate format writer make use of it.
   <p>
   The use of this ability is explained in the step-22 and
-  step-33 tutorial programs. 
+  step-33 tutorial programs.
   <br>
   (WB 2007/10/11)
   </p> </li>
@@ -260,9 +260,9 @@ an integer id of the current thread.
 <h3>lac</h3>
 
 <ol>
-  <li> <p>Changed: A few simple PETSc wrappers for helper functions 
-  PETScWrappers::MatrixBase::transpose, 
-  PETScWrappers::MatrixBase::is_symmetric, 
+  <li> <p>Changed: A few simple PETSc wrappers for helper functions
+  PETScWrappers::MatrixBase::transpose,
+  PETScWrappers::MatrixBase::is_symmetric,
   PETScWrappers::MatrixBase::is_hermitian, and
   PETScWrappers::MatrixBase::write_ascii have been added.
   <br>
@@ -353,7 +353,7 @@ constraints individually.
   </p></li>
 
   <li> <p>Fixed: Functions::FEFieldFunction<dim>.set_active_cell was declared
-  inline in the declaration but not in the implementation. This is now fixed. 
+  inline in the declaration but not in the implementation. This is now fixed.
   <br>
   (Luca Heltai 2008/04/16)
   </p></li>
@@ -525,7 +525,7 @@ constraints individually.
   GridIn functions, would not yield the same mesh upon
   refinement.
   <br>
-  (Luca Heltai 2007/09/10) 
+  (Luca Heltai 2007/09/10)
   </p>
   </li>
 
@@ -539,8 +539,8 @@ constraints individually.
   calculation of new data based on the values and possibly derivatives
   of the original data at each point of the patch.
   <br>
-  (Tobias Leicht 2007/09/10) 
-  </p> 
+  (Tobias Leicht 2007/09/10)
+  </p>
   </li>
 
 </ol>

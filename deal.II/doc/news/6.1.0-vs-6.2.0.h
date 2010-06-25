@@ -1,10 +1,10 @@
 /**
- * @page changes_between_6.1_and_6.2 Changes between Version 6.1 and 6.2
+ * @page changes_between_6_1_and_6_2 Changes between Version 6.1 and 6.2
 
 <p>
-This is the list of changes made between the release of 
+This is the list of changes made between the release of
 deal.II version 6.1 and version 6.2. It is subdivided into changes
-made to the three sub-libraries <a href="#base">base</a>, 
+made to the three sub-libraries <a href="#base">base</a>,
 <a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
 documentation, etc</a>.
@@ -31,9 +31,9 @@ inconvenience this causes.
 
 <ol>
   <li>
-  <p> 
+  <p>
   Changed: The implementation of the reordering algorithms in the boost
-  namespace created multiple edges between two nodes. The new implementation 
+  namespace created multiple edges between two nodes. The new implementation
   submits not more than one edge, but that affects the ordering of the
   degrees of freedom and deviates from previous behavior.
   <br>
@@ -41,7 +41,7 @@ inconvenience this causes.
   </p>
 
   <li>
-  <p> 
+  <p>
   Changed: The files implementing the class ConstraintMatrix are now
   saved in the lac/ subdirectory, named <code>constraint_matrix.h</code>
   and included by the line <code>\#include
@@ -57,7 +57,7 @@ inconvenience this causes.
   </p>
 
   <li>
-  <p> 
+  <p>
   Changed: The function DoFTools::get_subdomain_association function used
   to assign degrees of freedom to the subdomain of the last cell on which
   the degree of freedom is a part. This introduced a bias for degrees of
@@ -72,12 +72,12 @@ inconvenience this causes.
   </p>
 
   <li>
-  <p> 
+  <p>
   Changed: The way we set up threads in the Threads::spawn functions
   and friends has been completely written, using the boost::bind and
   boost::function libraries. This has made things significantly simpler
   and allowed us to remove some 4,100 lines of code. The only
-  user-visible side effect is that you can now no longer spawn 
+  user-visible side effect is that you can now no longer spawn
   functions with 10 arguments (this was the maximum before) whereas 9
   arguments continues to work; the reason for this is a limitation in
   the boost::bind library. This limit will be lifted with the next
@@ -87,7 +87,7 @@ inconvenience this causes.
   </p>
 
   <li>
-  <p> 
+  <p>
   Changed: The SolutionTransfer class used to take a type as second
   template argument that denoted the scalar upon which Vector objects
   were built, in order to allow interpolating Vector@<float@> objects,
@@ -103,7 +103,7 @@ inconvenience this causes.
   </p>
 
   <li>
-  <p> 
+  <p>
   Changed: The FiniteElement::get_prolongation_matrix and
   FiniteElement::get_restriction_matrix functions now have an
   additional argument of type RefinementCase to enable a
@@ -115,7 +115,7 @@ inconvenience this causes.
   <br>
   (Tobias Leicht 2008/07/08 as of branch_anisotropic at 2006/07/04)
   </p>
-  
+
   <li>
   <p>
   Changed: <code>GeometryInfo::children_per_cell</code> has been
@@ -148,7 +148,7 @@ inconvenience this causes.
   <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/02/26)
   </p>
-       
+
   <li>
   <p>
   Changed: The GeometryInfo::child_cell_on_face function is
@@ -170,9 +170,9 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Updated: The step-22 tutorial program now uses some 
-  advanced features of the ConstraintMatrix such as imhomogeneities 
-  for implementing Dirichlet boundary condition and condensation of 
+  Updated: The step-22 tutorial program now uses some
+  advanced features of the ConstraintMatrix such as imhomogeneities
+  for implementing Dirichlet boundary condition and condensation of
   constraints on the fly.
   <br>
   (Martin Kronbichler 2009/04/20)
@@ -191,7 +191,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Updated: Configure mechanism and a few PETSc functions in the lac directory 
+  Updated: Configure mechanism and a few PETSc functions in the lac directory
   have been upgraded to support migration to PETSc version >=3.0.0 in anaology
   to the existing interface.
   <br>
@@ -200,9 +200,9 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: A new tutorial program  step-34 was added to the 
+  New: A new tutorial program  step-34 was added to the
   library that shows the usage of the new codimension one functionality
-  recently added to the library. In this tutorial we show the use of 
+  recently added to the library. In this tutorial we show the use of
   bondary element methods on piecewise constant functions defined over
   a surface, and we solve the irrotational flow problem, or exterior
   Neumann Laplace problem.
@@ -224,7 +224,7 @@ inconvenience this causes.
   <p>
   Changed: The subversion repository for deal.II development is now
   located on commercially hosted space at <a
-  href="http://www.dealii.org/svn/dealii/">http://www.dealii.org/svn/dealii/</a>. 
+  href="http://www.dealii.org/svn/dealii/">http://www.dealii.org/svn/dealii/</a>.
   <br>
   (GK 2009/01/20)
   </p>
@@ -249,7 +249,7 @@ inconvenience this causes.
   <li>
   <p>
   Updated: The step-33 tutorial program now uses the
-  Trilinos wrapper 
+  Trilinos wrapper
   classes for accessing Trilinos linear algebra routines instead of
   implementing that by hand.
   <br>
@@ -300,7 +300,7 @@ inconvenience this causes.
   </p>
 
   <li>
-  <p> 
+  <p>
   Changed: The various accessor classes have been rewritten entirely.
   Where previously we had these accessor classes as separate
   specializations for 1d, 2d, and 3d, each implementing the same
@@ -312,18 +312,18 @@ inconvenience this causes.
   <br>
   (WB 2008/12/05)
   </p>
-  
+
   <li>
-  <p> 
+  <p>
   New: In analogy to the existing interfaces to the PETSc library, there
   are now also interfaces to much of the linear algebra part of the
   Trilinos library.
   <br>
   (Martin Kronbichler 2008/12/01)
   </p>
-  
+
   <li>
-  <p> 
+  <p>
   New: The deal.II configure script now autodetects SLEPc, an eigenvalue
   solver. Currently on SLEPc versions >=3.0.0 are supported.
   <br>
@@ -344,14 +344,14 @@ inconvenience this causes.
   <li>
   <p>
   Updated: In the step-22 tutorial program the generation of
-  the sparsity pattern using the class BlockCompressedSetSparsityPattern has 
-  been replaced by a pattern of the class BlockCompressedSimpleSparsityPattern, 
+  the sparsity pattern using the class BlockCompressedSetSparsityPattern has
+  been replaced by a pattern of the class BlockCompressedSimpleSparsityPattern,
   which uses far less memory and is slightly faster.
   <br>
   (Martin Kronbichler, WB 2008/11/12)
   </p>
   </li>
-  
+
   <li>
   <p>
   New: The shared libraries we create are now versioned, i.e. they have
@@ -448,17 +448,17 @@ inconvenience this causes.
   New: There is now a new QGaussOneOverR class, that allows for integration
   on the two dimensional reference element of arbitrary polynomial functions
   with weight 1/R. This class is only instantiated for dim=2, and it is intended
-  for use with collocation type boundary element methods of order 1, where the 
-  singularities are collocated on the vertices of the quadrilaterals. 
-  <br> 
+  for use with collocation type boundary element methods of order 1, where the
+  singularities are collocated on the vertices of the quadrilaterals.
+  <br>
   (Luca Heltai 2009/03/11)
   </p>
 
   <li>
   <p>
-  New: There is now a new QGaussLogR class, that generalizes the QGaussLog class to 
+  New: There is now a new QGaussLogR class, that generalizes the QGaussLog class to
   allow for arbitrary location of singularities, and singularity factors.
-  <br> 
+  <br>
   (Luca Heltai 2009/03/11)
   </p>
 
@@ -467,7 +467,7 @@ inconvenience this causes.
   New: The FunctionParser class now supports the fparser library's interface to use
   units (like cm, or km) in expressions. An example is given in the documentation of
   that class.
-  <br> 
+  <br>
   (Victor Prosolin 2009/03/01)
   </p>
 
@@ -476,24 +476,24 @@ inconvenience this causes.
   Changed: The classes Threads::ThreadMutex and Threads::ThreadCondition have
   been renamed Threads::Mutex and Threads::ConditionVariable. The old names
   were somewhat redundant but have been retained as typedefs for compatibility.
-  <br> 
+  <br>
   (WB 2009/01/14)
   </p>
-  
+
   <li>
   <p>
   New: There is now a class TimerOutput that allows to neatly measure computing
   times in different sections of a program and write that information to screen.
-  <br> 
+  <br>
   (Martin Kronbichler 2009/01/12)
   </p>
 
   <li>
   <p>
-  New: The Timer class can now also return the wall time using the method 
-  Timer::wall_time(), as opposed to the CPU time returned by 
+  New: The Timer class can now also return the wall time using the method
+  Timer::wall_time(), as opposed to the CPU time returned by
   Timer::operator ().
-  <br> 
+  <br>
   (Martin Kronbichler 2009/01/07)
   </p>
 
@@ -503,7 +503,7 @@ inconvenience this causes.
   efficient by allowing to figure out whether certain template types are,
   for example, equal to double or float (in which case we can use
   BLAS functions, or could do something else special).
-  <br> 
+  <br>
   (WB 2008/10/31)
   </p>
 
@@ -511,7 +511,7 @@ inconvenience this causes.
   <p>
   New: The Utilities::reverse_permutation and Utilities::invert_permutation
   compute the reverse and inverse of a given permutation of indices.
-  <br> 
+  <br>
   (WB 2008/10/31)
   </p>
 
@@ -520,7 +520,7 @@ inconvenience this causes.
   Fixed: The PolynomialsRaviartThomas class had a bug that led to random
   results when used from multiple threads. As a consequence the FE_RaviartThomas
   class was unusable in a multithreaded context. This has now been fixed.
-  <br> 
+  <br>
   (WB 2008/10/13)
   </p>
 
@@ -529,7 +529,7 @@ inconvenience this causes.
   New: There is a new function scalar_product(const Tensor<2,dim> &,
   const Tensor<2,dim> &) that computes the scalar product
   $a:b=\sum_{i,j} a_{ij}b_{ij}$ between two tensors of rank 2.
-  <br> 
+  <br>
   (WB 2008/08/15)
   </p>
 
@@ -540,7 +540,7 @@ inconvenience this causes.
   <code>base/include/base/config.h</code>. This also fixes a problem in
   <code>base/include/base/utilities.h</code> if a compiler capable of
   including <code>mpi.h</code> was used but not PETSc.
-  <br> 
+  <br>
   (WB 2008/08/15)
   </p>
 
@@ -549,7 +549,7 @@ inconvenience this causes.
   Fixed: A misplaced <code>\#include</code> directive prevented the file
   <code>base/source/data_out_base.cc</code> from being compilable by
   the PGI C++ compiler. This is now fixed.
-  <br> 
+  <br>
   (WB 2008/08/05)
   </p>
 
@@ -565,7 +565,7 @@ inconvenience this causes.
   (line 0) shall be refined. Another refinement possibility for
   the cell would be <code>RefinementCase::cut_xy</code>, but that
   is not the minimal case.
-  <br> 
+  <br>
   (Tobias Leicht 2008/07/08 as of branch_anisotropic at 2006/06/28)
   </p>
 
@@ -575,7 +575,7 @@ inconvenience this causes.
   function which returns the RefinementCase representing the
   refinement case of a line for a given refinement case of the
   corresponding cell.
-  <br> 
+  <br>
   (Tobias Leicht 2008/07/08 as of branch_anisotropic at 2006/06/28)
   </p>
 
@@ -585,7 +585,7 @@ inconvenience this causes.
   <tt>GeometryInfo::n_children(refinement_case)</tt>
   function returns the number of children a cell/face has when
   refined with the RefinementCase <tt>refinement_case</tt>.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/11/07)
   </p>
 
@@ -607,7 +607,7 @@ inconvenience this causes.
   <tt>GeometryInfo<2>::isotropic_refinement=RefinementCase::cut_xy</tt>
   and
   <tt>GeometryInfo<3>::isotropic_refinement=RefinementCase::cut_xyz</tt>.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/03/03)
   </p>
 
@@ -615,7 +615,7 @@ inconvenience this causes.
   <p>
   New: The class QGaussLog allows the quadrature of integrals with logarithmic
   kernels.
-  <br> 
+  <br>
   (Cataldo Manigrasso 2008/05/28)
   </p>
 
@@ -629,9 +629,9 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Updated: The SparseMatrix::precondition_SSOR function was implemented 
-  inefficiently. The new implementation uses about half the instruction 
-  count and reduces execution times on typical applications by ten to 
+  Updated: The SparseMatrix::precondition_SSOR function was implemented
+  inefficiently. The new implementation uses about half the instruction
+  count and reduces execution times on typical applications by ten to
   thirty percent.
   <br>
   (Martin Kronbichler 2009/04/21)
@@ -639,7 +639,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Updated: The SparseILU::vmult kernel has been re-written to use similar 
+  Updated: The SparseILU::vmult kernel has been re-written to use similar
   data structures as SparseMatrix::vmult, which reduces the count of
   operations by one third and the execution times on typical applications
   by ten to twenty percent.
@@ -650,12 +650,12 @@ inconvenience this causes.
   <li>
   <p>
   New: There is now a new class VectorView<Number> that allows views of
-  arbitrary areas of memory to be seen as a Vector<Number>, simplifying 
-  a lot of works for portability issues between different libraries, and 
-  allowing for subviews of Vector<Number> classes without the need to 
+  arbitrary areas of memory to be seen as a Vector<Number>, simplifying
+  a lot of works for portability issues between different libraries, and
+  allowing for subviews of Vector<Number> classes without the need to
   copy back and forth large chunk of memories.
   <br>
-  To be used with EXTREME caution, and only when you know exactly what you 
+  To be used with EXTREME caution, and only when you know exactly what you
   are doing, and speed is a necessity.
   <br>
   (Luca Heltai 2009/04/05)
@@ -664,7 +664,7 @@ inconvenience this causes.
   <li>
   <p>
   Updated: The local_to_global functions in ConstraintMatrix got smarter,
-  which accelerates sparsity pattern generation and makes writing into 
+  which accelerates sparsity pattern generation and makes writing into
   sparse matrices using distribute_local_to_global faster.
   <br>
   (Martin Kronbichler 2009/03/16)
@@ -681,8 +681,8 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: Added a few simple helper functions (to VectorBase) that allow 
-  some manipulation of PETSc vectors. These functions do what they say 
+  New: Added a few simple helper functions (to VectorBase) that allow
+  some manipulation of PETSc vectors. These functions do what they say
   in the documentation.
   <br>
   (Toby D. Young 2009/01/08)
@@ -690,10 +690,10 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: There is now a class TrilinosWrappers::SparsityPattern that allows to 
-  construct distributed sparsity patterns that can be used for initializing 
-  Trilinos sparse matrices. This means that for large problems on several 
-  MPI processors the memory requirements are reduced and the initialization 
+  New: There is now a class TrilinosWrappers::SparsityPattern that allows to
+  construct distributed sparsity patterns that can be used for initializing
+  Trilinos sparse matrices. This means that for large problems on several
+  MPI processors the memory requirements are reduced and the initialization
   speed is increased.
   <br>
   (Martin Kronbichler 2008/12/29)
@@ -712,8 +712,8 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: The class LAPACKFullMatrix can now invert full matrices using 
-  the (optimized) LAPACK functions getrf and getri. The speedup over 
+  New: The class LAPACKFullMatrix can now invert full matrices using
+  the (optimized) LAPACK functions getrf and getri. The speedup over
   the FullMatrix::gauss_jordan() function is a factor of two for matrices
   with 100 rows and columns, and grows with matrix size.
   <br>
@@ -766,8 +766,8 @@ inconvenience this causes.
 
   <li>
   <p>
-  Changed: The SparseDirectUMFPACK class now calls the umfpack_dl_* routines 
-  instead of umfpack_di_*. On machines with 64-bit longs this allows the 
+  Changed: The SparseDirectUMFPACK class now calls the umfpack_dl_* routines
+  instead of umfpack_di_*. On machines with 64-bit longs this allows the
   UMFPACK solver to allocate more than 2GB of memory for large problems.
   <br>
   (Moritz Allmaras 2008/10/16)
@@ -786,7 +786,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: Added the CompressedSimpleSparsityPattern as an alternative to 
+  New: Added the CompressedSimpleSparsityPattern as an alternative to
   CompressedSparsityPattern and CompressedSetSparsityPattern, which
   should be faster in most cases but its memory usage is somewhere
   inbetween.
@@ -822,7 +822,7 @@ inconvenience this causes.
   </p>
 
 
-  <li> New: Added two new functions to calculate the left or the right inverse of a given 
+  <li> New: Added two new functions to calculate the left or the right inverse of a given
   rectangular matrix (FullMatrix::left_invert, FullMatrix::right_invert).
   They throw an exception if the matrices are not invertible.
   <br>
@@ -845,14 +845,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Fixed: VectorTools::integrate_difference now works also on codimension one grids. 
+  Fixed: VectorTools::integrate_difference now works also on codimension one grids.
   <br>
   (Luca Heltai 2009/04/10)
   </p>
 
   <li>
   <p>
-  Changed: The ConstraintMatrix class can now also handle inhomogeneous 
+  Changed: The ConstraintMatrix class can now also handle inhomogeneous
   constraints. This means that e.g. Dirichlet boundary conditions are now a
   special case of algebraic constraints. There are new condense functions
   that simultaneously act on matrices and vectors for use of this feature.
@@ -931,7 +931,7 @@ inconvenience this causes.
   <li>
   <p>
   New: FEValues objects can now directly calculate the Laplacians of
-  solution functions at quadrature points. This is equivalent to the 
+  solution functions at quadrature points. This is equivalent to the
   trace of the Hessians, but faster and more convenient in user code.
   step-31 program has also been updated to use this.
   <br>
@@ -971,7 +971,7 @@ inconvenience this causes.
   <li>
   <p>
   Upgraded: The FunctionParser classes now use version 2.83 of the fparser
-  library. 
+  library.
   <br>
   (Luca Heltai 2008/12/08)
   </p>
@@ -990,7 +990,7 @@ inconvenience this causes.
   <p>
   New: The function DoFTools::make_zero_boundary_constraints() computes the
   constraints that result from requiring the degrees of freedom at the
-  boundary to be zero. Use cases are when the sparsity pattern is not known 
+  boundary to be zero. Use cases are when the sparsity pattern is not known
   / not wanted / not inaccessible.
   <br>
   (Toby D. Young 2008/12/04)
@@ -1043,7 +1043,7 @@ inconvenience this causes.
   New: When calling function DoFTools::make_sparsity_pattern with a ConstraintMatrix, it is now possible to set a bool argument keep_constrained_dofs. When this flag is set to false, constrained rows and columns will not be part of the sparsity pattern, which increases the performance of matrix operations and decrease memory consumption in case there are many constraints.
   <br>
   (Martin Kronbichler 2008/10/21)
-  </p> 
+  </p>
 
   <li>
   <p>
@@ -1053,7 +1053,7 @@ inconvenience this causes.
   function is needed when splitting block matrices in parallel computations.
   <br>
   (WB 2008/10/07)
-  </p> 
+  </p>
 
   <li>
   <p>
@@ -1069,7 +1069,7 @@ inconvenience this causes.
   <a target="_top" href="http://www.geuz.org/gmsh/doc/texinfo/gmsh_10.html">here</a>.
   <br>
   (WB 2008/10/07)
-  </p> 
+  </p>
 
   <li>
   <p>
@@ -1082,11 +1082,11 @@ inconvenience this causes.
 
   <li>
   <p>
-  New: The class FE_Q can now alternatively be constructed based on 
+  New: The class FE_Q can now alternatively be constructed based on
   support points from a given one-dimensional quadrature rule.
   <br>
   (Katharina Kormann, Martin Kronbichler, 2008/09/07)
-  </p> 
+  </p>
 
   <li>
   <p>
@@ -1106,7 +1106,7 @@ inconvenience this causes.
   <br>
   (Martin Kronbichler 2008/08/13)
   </p>
-  
+
   <li>
   <p>
   New: There is a second GridTools::partition_triangulation
@@ -1119,9 +1119,9 @@ inconvenience this causes.
 
   <li>
   <p>
-  Fixed: GridTools::find_cells_adjacent_to_vertex had a bug that 
-  prevented its correct functioning in three dimensions. Some 
-  cases were left out due to uncorrect assumptions on the various 
+  Fixed: GridTools::find_cells_adjacent_to_vertex had a bug that
+  prevented its correct functioning in three dimensions. Some
+  cases were left out due to uncorrect assumptions on the various
   refinement possibilities.
   <br>
   (Luca Heltai 2008/07/17)
@@ -1154,7 +1154,7 @@ inconvenience this causes.
   need to use this function in user_codes. Calling
   Triangulation::execute_coarsening_and_refinement will be all
   you need.
-  <br> 
+  <br>
   (Tobias Leicht 2008/07/08 as of branch_anisotropic at 2006/06/29)
   </p>
 
@@ -1165,12 +1165,12 @@ inconvenience this causes.
   depending on the refinement situation of all a cells neighbors, if the
   cell may be coarsened, in which case the bool value <code>true</code> is
   returned. This is a functionality which is partly dimension dependend.
-  <br>	
+  <br>
   However, there should never be any reason to use this function in user codes.
-  <br> 
+  <br>
   (Tobias Leicht 2008/07/08 as of branch_anisotropic at 2006/06/28)
   </p>
-  
+
   <li>
   <p>
   New: There is now a new CellAccessor::neighbor_is_coarser function,
@@ -1184,7 +1184,7 @@ inconvenience this causes.
   refinement, where the level of the cell and its neighbor is all
   the information needed. In case of aniostropic refinement, this
   new function can be used.
-  <br> 
+  <br>
   (Tobias Leicht 2008/07/08 as of branch_anisotropic at 2006/06/28)
   </p>
 
@@ -1211,15 +1211,15 @@ inconvenience this causes.
   Note, that for reasons of backwards compatibility this flag is
   NOT included in the general <code>MeshSmoothing::maximum_smoothing</code>
   flag.
-  <br> 
+  <br>
   (Tobias Leicht 2008/07/08 as of branch_anisotropic at 2006/06/28)
   </p>
-  
+
   <li>
   <p>
   New: There is now a new
   TriaObjectAccessor::clear_refinement_case function.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/12/19)
   </p>
 
@@ -1227,7 +1227,7 @@ inconvenience this causes.
   <p>
   Extended: The CellAccessor::neighbor_of_neighbor function is
   now extended to anisotropic refinement.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/12/15)
   </p>
 
@@ -1241,7 +1241,7 @@ inconvenience this causes.
   parameter which allows to create new single as well as pairs
   for lines <code>n_consecutive_lines=1</code> or
   <code>n_consecutive_lines=2</code>, respectively.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/12/15)
   </p>
 
@@ -1260,10 +1260,10 @@ inconvenience this causes.
   index shall be set. This function can only be called for even
   numbered children. The same applies to the respective function
   for faces.
-  <br> 
+  <br>
   Finally, we note that these functions are for internal use,
   only.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/03/03)
   </p>
 
@@ -1294,7 +1294,7 @@ inconvenience this causes.
   <code>geometry_info.h</code>, which allows to describe all
   possible (anisotropic and isotropic) refinement cases in (1,) 2
   and 3 dimensions.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/02/26)
   </p>
 
@@ -1303,7 +1303,7 @@ inconvenience this causes.
   New: There is now a new TriaObjectAccessor::n_children function
   which returns the number of children of the cell or face it was
   invoked for.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/02/26)
   </p>
 
@@ -1312,7 +1312,7 @@ inconvenience this causes.
   New: There is now a new TriaObjectAccessor::refinement_case
   function which returns the RefinementCase a cell or face is
   refined with.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/02/26)
   </p>
 
@@ -1340,7 +1340,7 @@ inconvenience this causes.
   efficiency (but with a penalty on run-time) they might be
   replaced by <code>vector@<vector@<bool@> @> (dim, vector@<bool@>
   (n_quads/n_hexes))</code>, later.
-  <br> 
+  <br>
   (RH 2008/07/08 as of branch_anisotropic at 2005/02/26)
   </p>
 

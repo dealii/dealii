@@ -1,8 +1,8 @@
 /**
- * @page changes_between_6.2.0_and_6.2.1 Changes between Version 6.2.0 and 6.2.1
+ * @page changes_between_6_2_0_and_6_2_1 Changes between Version 6.2.0 and 6.2.1
 
 <p>
-This is the list of changes made between the release of 
+This is the list of changes made between the release of
 deal.II version 6.2.0 and version 6.2.1:
 </p>
 
