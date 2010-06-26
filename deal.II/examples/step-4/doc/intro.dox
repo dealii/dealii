@@ -7,7 +7,7 @@ deal.II has a unique feature which we call
 previous examples that many classes had a number in angle brackets
 suffixed to them. This is to indicate that for example the
 triangulation in two and three space dimensions are different, but
-related data types. We could as well have called them 
+related data %types. We could as well have called them 
 <code>Triangulation2d</code> and <code>Triangulation3d</code> instead
 of <code>Triangulation@<2@></code> and
 <code>Triangulation@<3@></code> to name the two classes, but this
