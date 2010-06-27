@@ -43,7 +43,7 @@ deal.II deal.tag: tutorial \
 	cat @DOXYGEN_OPTIONS@ deal.dox | @DOXYGEN@ - > doxygen.log
 	@if test -f deal.II/step__1.html ; then \
 	   for i in deal.II/*__*html ; do \
-	     j="`echo $i | sed s/__/_/g`" ; \
+	     j="`echo $$i | sed s/__/_/g`" ; \
 	     cp $$i $$j ; \
 	   done ; \
 	  fi
