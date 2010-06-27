@@ -17,9 +17,20 @@ private:
 	perl -pi -e 's/(EXTRACT_PRIVATE\s*=\s*)NO/$$1YES/;s/(INTERNAL_DOCS\s*=\s*)NO/$$1YES/;' options.dox
 	$(MAKE) html
 
-# generate documentation. write the output to a file so as not to hide the
+# Generate documentation. write the output to a file so as not to hide the
 # important message to impatient observers that this process can take quite
 # a while
+#
+# We have to fix up one case after doxygen runs: doxygen versions
+# 1.6.2 and 1.6.3 (and only these versions) create output files for
+# @page commands that contain underscores where the underscore is
+# escaped by a second underscore (e.g. "step__1.html" instead of
+# "step_1.html"). While all internal links from the doxygen output are
+# correct, the links we have from the handwritten html files won't
+# work any more this way. The simplest way to avoid this is to simply
+# copy all such files to their alternative (traditional) name so that
+# the external links still work (they will link to a different but
+# equal file).
 deal.II deal.tag: tutorial \
           deal.dox \
 	  $D/base/include/*/*.h \
@@ -30,6 +41,12 @@ deal.II deal.tag: tutorial \
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
 	cat @DOXYGEN_OPTIONS@ deal.dox | @DOXYGEN@ - > doxygen.log
+	@if test -f deal.II/step__1.html ; then \
+	   for i in deal.II/*__*html ; do \
+	     j="`echo $i | sed s/__/_/g`" ; \
+	     cp $i $j ; \
+	   done ; \
+	  fi
 	@cp deal.css deal.II
 
 
