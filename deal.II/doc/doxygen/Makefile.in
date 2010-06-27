@@ -44,7 +44,7 @@ deal.II deal.tag: tutorial \
 	@if test -f deal.II/step__1.html ; then \
 	   for i in deal.II/*__*html ; do \
 	     j="`echo $i | sed s/__/_/g`" ; \
-	     cp $i $j ; \
+	     cp $$i $$j ; \
 	   done ; \
 	  fi
 	@cp deal.css deal.II
