@@ -29,7 +29,6 @@ namespace MeshWorker
   template class IntegrationInfo<deal_II_dimension, deal_II_dimension>;
   template class IntegrationInfoBox<deal_II_dimension, deal_II_dimension>;
   
-  template class LocalResults<float>;
   template class DoFInfo<deal_II_dimension,deal_II_dimension,float>;
   template class DoFInfoBox<deal_II_dimension,
 			    DoFInfo<deal_II_dimension,deal_II_dimension,float> >;
@@ -37,7 +36,6 @@ namespace MeshWorker
   template void IntegrationInfo<deal_II_dimension>::fill_local_data(
     const DoFInfo<deal_II_dimension, deal_II_dimension, float>&, bool);
   
-  template class LocalResults<double>;
   template class DoFInfo<deal_II_dimension,deal_II_dimension,double>;
   template class DoFInfoBox<deal_II_dimension,
 			    DoFInfo<deal_II_dimension,deal_II_dimension,double> >;
