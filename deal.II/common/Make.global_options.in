@@ -64,6 +64,9 @@ DEAL_II_TRILINOS_INCDIR = @DEAL_II_TRILINOS_INCDIR@
 DEAL_II_TRILINOS_LIBDIR = @DEAL_II_TRILINOS_LIBDIR@
 DEAL_II_TRILINOS_SHARED = @DEAL_II_TRILINOS_SHARED@
 DEAL_II_TRILINOS_STATIC = @DEAL_II_TRILINOS_STATIC@
+DEAL_II_TRILINOS_VERSION_MAJOR    = @DEAL_II_TRILINOS_VERSION_MAJOR@
+DEAL_II_TRILINOS_VERSION_MINOR    = @DEAL_II_TRILINOS_VERSION_MINOR@
+DEAL_II_TRILINOS_VERSION_SUBMINOR = @DEAL_II_TRILINOS_VERSION_SUBMINOR@
 
 USE_CONTRIB_MUMPS  = @USE_CONTRIB_MUMPS@
 DEAL_II_MUMPS_DIR  = @DEAL_II_MUMPS_DIR@
@@ -156,7 +159,7 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
           lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
           lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libpetsc$(lib-suffix))
         endif
-      endif # if PETSC_VERSION 
+      endif # if PETSC_VERSION
     else
       # and finally this goes for static libraries
       lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
@@ -217,7 +220,7 @@ endif
 ifeq ($(USE_CONTRIB_MUMPS),yes)
   lib-contrib-mumps  = $(DEAL_II_MUMPS_DIR)/lib/libdmumps.a \
                        $(DEAL_II_MUMPS_DIR)/lib/libmumps_common.a \
-                       $(DEAL_II_MUMPS_DIR)/lib/libpord.a 
+                       $(DEAL_II_MUMPS_DIR)/lib/libpord.a
   lib-contrib-mumps += $(DEAL_II_SCALAPACK_DIR)/libscalapack.a
   lib-contrib-mumps += $(DEAL_II_BLACS_DIR)/LIB/blacsCinit_$(DEAL_II_BLACS_ARCH).a \
                        $(DEAL_II_BLACS_DIR)/LIB/blacsF77init_$(DEAL_II_BLACS_ARCH).a \
@@ -358,4 +361,29 @@ ifneq ($(enable-threads),no)
   MT = MT
 else
   MT = ==
+endif
+
+
+
+ifeq ($(BUILDTEST),yes)
+  print-summary:
+	@echo "dealii-feature: revision=`svn info .. | grep Revision | sed 's/Revision: //'`"
+	@echo "dealii-feature: user=$(USER)"
+	@echo "dealii-feature: host=`hostname`"
+	@echo "dealii-feature: target=$(TARGET)"
+	@echo "dealii-feature: compiler=$(GXX-VERSION-DETAILED)"
+	@echo "dealii-feature: BUILDTESTFLAGS=$(BUILDTESTFLAGS)"
+	@echo "dealii-feature: BUILDTESTNOTE=$(BUILDTESTNOTE)"
+	@echo "dealii-feature: multithreading=$(enable-threads)"
+	@echo "dealii-feature: shared_libs=$(enable-shared)"
+	@echo "dealii-feature: parser=$(subst no,,$(enable-parser))"
+	@echo "dealii-feature: PETSc=$(subst ..,,$(DEAL_II_PETSC_VERSION_MAJOR).$(DEAL_II_PETSC_VERSION_MINOR).$(DEAL_II_PETSC_VERSION_SUBMINOR))"
+	@echo "dealii-feature: SLEPc=$(subst no,,$(USE_CONTRIB_SLEPC))"
+	@echo "dealii-feature: Trilinos=$(subst ..,,$(DEAL_II_TRILINOS_VERSION_MAJOR).$(DEAL_II_TRILINOS_VERSION_MINOR).$(DEAL_II_TRILINOS_VERSION_SUBMINOR))"
+	@echo "dealii-feature: MUMPS=$(subst no,,$(USE_CONTRIB_MUMPS))"
+	@echo "dealii-feature: METIS=$(subst no,,$(USE_CONTRIB_METIS))"
+	@echo "dealii-feature: UMFPACK=$(USE_CONTRIB_UMFPACK)"
+	@echo "dealii-feature: HSL=$(subst no,,$(USE_CONTRIB_METIS))"
+	@echo "dealii-feature: BLAS=@DEAL_II_USE_BLAS@"
+	@echo "dealii-feature: LAPACK=@DEAL_II_USE_BLAS@"
 endif

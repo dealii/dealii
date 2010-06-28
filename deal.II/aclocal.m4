@@ -5951,6 +5951,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
     dnl we don't have no Trilinos, then it does not define this string.
     DEAL_II_DEFINE_DEAL_II_USE_TRILINOS=DEAL_II_USE_TRILINOS
 
+    DEAL_II_CONFIGURE_TRILINOS_VERSION
     DEAL_II_CHECK_TRILINOS_SHARED_STATIC
     DEAL_II_CHECK_TRILINOS_WARNINGS
     DEAL_II_CHECK_TRILINOS_HEADER_FILES
@@ -5976,6 +5977,34 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
   AC_SUBST(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR)
   AC_SUBST(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN)
   AC_SUBST(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN)
+])
+
+
+
+dnl ------------------------------------------------------------
+dnl Figure out the version numbers of Trilinos.
+dnl
+dnl Usage: DEAL_II_CONFIGURE_TRILINOS_VERSION
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS_VERSION, dnl
+[
+  AC_MSG_CHECKING([for Trilinos version])
+  DEAL_II_TRILINOS_VERSION_MAJOR=`cat $DEAL_II_TRILINOS_DIR/include/Trilinos_version.h \
+                               | grep "#define TRILINOS_MAJOR_VERSION" \
+                               | perl -pi -e 's/.*VERSION\s+//g;'`
+  DEAL_II_TRILINOS_VERSION_MINOR=`cat $DEAL_II_TRILINOS_DIR/include/Trilinos_version.h \
+                               | grep "#define TRILINOS_MAJOR_MINOR_VERSION" \
+                               | perl -pi -e 's/.*VERSION\s+\d?\d(\d\d)\d\d/\1/g;' \
+			       | perl -pi -e 's/0(\d)/\1/g;'`
+  DEAL_II_TRILINOS_VERSION_SUBMINOR=`cat $DEAL_II_TRILINOS_DIR/include/Trilinos_version.h \
+                               | grep "#define TRILINOS_MAJOR_MINOR_VERSION" \
+                               | perl -pi -e 's/.*VERSION\s+\d?\d\d\d(\d\d)/\1/g;' \
+			       | perl -pi -e 's/0(\d)/\1/g;'`
+  AC_MSG_RESULT([$DEAL_II_TRILINOS_VERSION_MAJOR.$DEAL_II_TRILINOS_VERSION_MINOR.$DEAL_II_TRILINOS_VERSION_SUBMINOR])
+  AC_SUBST(DEAL_II_TRILINOS_VERSION_MAJOR)
+  AC_SUBST(DEAL_II_TRILINOS_VERSION_MINOR)
+  AC_SUBST(DEAL_II_TRILINOS_VERSION_SUBMINOR)
 ])
 
 
@@ -6626,6 +6655,7 @@ AC_DEFUN(DEAL_II_WITH_LAPACK, dnl
       [ DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$lapack)
         AC_DEFINE([HAVE_LIBLAPACK], [1],
                   [Defined if deal.II was configured with LAPACK support])
+        AC_SUBST(DEAL_II_USE_LAPACK, "yes")
       ],
       [AC_MSG_ERROR([LAPACK library $lapack not found])]
     )
@@ -6730,6 +6760,7 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
                      AC_DEFINE([HAVE_LIBBLAS], [1],
                                [Defined if deal.II was configured with BLAS support])
                    ],,$F77LIBS)
+      AC_SUBST(DEAL_II_USE_BLAS, "yes")
       AC_SUBST(NEEDS_F77LIBS, "yes")
     else
       DEAL_II_CHECK_BLAS_FRAMEWORK
@@ -6742,6 +6773,7 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
                                  [Defined if deal.II was configured with BLAS support])
                      ],,$F77LIBS)
 
+        AC_SUBST(DEAL_II_USE_BLAS, "yes")
         AC_SUBST(NEEDS_F77LIBS, "yes")
       fi
     fi

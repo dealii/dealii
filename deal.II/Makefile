@@ -204,23 +204,11 @@ distclean: clean
 # whole thing over to the server
 build-test:
 	echo AUTOMATED DEAL.II BUILD TEST          | tee    build-test-log
-	echo SUBVERSION INFO `svn info . | grep Revision` | tee -a build-test-log
-	echo BEGIN HEADER `date -u '+%Y-%m-%d %T'`        | tee -a build-test-log
-	echo USER=$(USER)                          | tee -a build-test-log
-	echo HOST=`hostname`                       | tee -a build-test-log
-	echo BUILDTESTFLAGS=$(BUILDTESTFLAGS)      | tee -a build-test-log
-	echo BUILDTESTNOTE=$(BUILDTESTNOTE)        | tee -a build-test-log
 	-(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
-	if test -f common/Make.global_options ; then \
-	   grep '^enable-shared' common/Make.global_options | grep = ; \
-	   grep enable-threads common/Make.global_options | grep = ; \
-	   grep USE_CONTRIB_PETSC common/Make.global_options | grep = ; \
-	   grep USE_CONTRIB_SLEPC common/Make.global_options | grep = ; \
-	   grep USE_CONTRIB_METIS common/Make.global_options | grep = ; \
-	   grep USE_CONTRIB_HSL common/Make.global_options | grep = ; \
-	   grep USE_CONTRIB_UMFPACK common/Make.global_options | grep = ; \
-	 fi    | tee -a build-test-log
+	echo BEGIN HEADER `date -u '+%Y-%m-%d %T'`        | tee -a build-test-log
+	@cd common ; make BUILDTEST=yes -f Make.global_options print-summary | tee -a build-test-log
 	echo END HEADER `date -u '+%Y-%m-%d %T'`             | tee -a build-test-log
+	false
 	echo                                  | tee -a build-test-log
 	echo BEGIN CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'` | tee -a build-test-log
 	cat build-test-config                 | tee -a build-test-log
@@ -236,15 +224,15 @@ build-test-do:
 	@echo BEGIN MAKE LIB OUTPUT `date -u '+%Y-%m-%d %T'`
 	$(MAKE) all
 	@echo END MAKE LIB OUTPUT `date -u '+%Y-%m-%d %T'`
-	@echo 
+	@echo
 	@echo BEGIN MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
 	cd examples ; $(MAKE)
 	@echo END MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
-	@echo 
+	@echo
 	@echo BEGIN MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
 	cd examples/doxygen ; $(MAKE)
 	@echo END MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
-	@echo 
+	@echo
 #	if test -d tests ; then \
 #	   @echo BEGIN MAKE TESTS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
 #	   cd tests ; $(MAKE) report+mail ; \
