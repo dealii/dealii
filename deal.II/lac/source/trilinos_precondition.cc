@@ -513,8 +513,8 @@ namespace TrilinosWrappers
   PreconditionAMG:: initialize (const SparseMatrix   &matrix,
 				const AdditionalData &additional_data)
   {
-    preconditioner.reset ();
-    multilevel_operator.reset ();
+    preconditioner.reset (static_cast<const Epetra_Operator*>(0));
+    multilevel_operator.reset (static_cast<ML_Epetra::MultiLevelPreconditioner*>(0));
 
     const unsigned int n_rows = matrix.m();
 
@@ -647,8 +647,8 @@ namespace TrilinosWrappers
 	      const double                          drop_tolerance,
 	      const ::dealii::SparsityPattern      *use_this_sparsity)
   {
-    preconditioner.reset();
-    multilevel_operator.reset ();
+    preconditioner.reset(static_cast<const Epetra_Operator*>(0));
+    multilevel_operator.reset (static_cast<ML_Epetra::MultiLevelPreconditioner*>(0));
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
 
 				        // Init Epetra Matrix using an
