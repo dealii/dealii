@@ -1484,11 +1484,11 @@ FE_Q<3>::initialize_quad_dof_index_permutation ()
 				       // face_orientation=false, face_flip=false, face_rotation=false
       data(local,0)=j       + i      *n - local;
 				       // face_orientation=false, face_flip=false, face_rotation=true
-      data(local,1)=(n-1-i) + j      *n - local;
+      data(local,1)=i       + (n-1-j)*n - local;
 				       // face_orientation=false, face_flip=true,  face_rotation=false
       data(local,2)=(n-1-j) + (n-1-i)*n - local;
 				       // face_orientation=false, face_flip=true,  face_rotation=true
-      data(local,3)=i       + (n-1-j)*n - local;
+      data(local,3)=(n-1-i) + j      *n - local;
 				       // face_orientation=true,  face_flip=false, face_rotation=false
       data(local,4)=0;
 				       // face_orientation=true,  face_flip=false, face_rotation=true
