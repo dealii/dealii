@@ -206,9 +206,8 @@ build-test:
 	echo AUTOMATED DEAL.II BUILD TEST          | tee    build-test-log
 	-(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
 	echo BEGIN HEADER `date -u '+%Y-%m-%d %T'`        | tee -a build-test-log
-	@cd common ; make BUILDTEST=yes -f Make.global_options print-summary | tee -a build-test-log
+	(cd common ; $(MAKE) BUILDTEST=yes -f Make.global_options print-summary) | tee -a build-test-log
 	echo END HEADER `date -u '+%Y-%m-%d %T'`             | tee -a build-test-log
-	false
 	echo                                  | tee -a build-test-log
 	echo BEGIN CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'` | tee -a build-test-log
 	cat build-test-config                 | tee -a build-test-log
