@@ -63,7 +63,14 @@ namespace internal
 				      */
     template <int structdim, int dim> struct PresentLevelType
     {
-	struct type {
+	struct type
+	{
+					     /**
+					      * Default constructor.
+					      */
+	    type ()
+	      {}
+	    
 					     /**
 					      * Dummy
 					      * constructor. Only
