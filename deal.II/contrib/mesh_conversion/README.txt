@@ -21,11 +21,12 @@ How to use:
 1.3. Select an output file. I have found that in Cubit version 11.0 and 12.0 that it is necessary to click on the browse button and type it in the dialogue that pops up.
 1.4. Select the dimension to output in. 
 1.5. Tick the overwrite box.
-1.6. Click apply.
-1.7. IMPORTANT NOTE: From v12.0 onwards, the format of the Abaqus file that Cubit outputted changed. This has been accounted for but an requires a flag to be passed to the conversion program.
-                     I describe outputs from before v12.0 as "Abaqus OLD" and v12.0 an on (up to v12.1 at this point) as "Abaqus NEW".
+1.6. If using Cubit v12.0 onwards, uncheck the box "Export using Cubit ID's". The conversion process will encounter errors if box if left checked.
+1.7. Click apply.
 
 2. Converting the mesh
+IMPORTANT NOTE: From v12.0 onwards, the format of the Abaqus file that Cubit outputted changed. This has been accounted for but an requires a flag to be passed to the conversion program.
+                I describe outputs from before v12.0 as "Abaqus OLD" and v12.0 an on (up to v12.1 at this point) as "Abaqus NEW".
 2.1. Compile the program using 'make' or another suitable tool
 2.2. Run the program with the following command line arguments:
        './convert_mesh <spatial_dimension> <ABAQUS input_file_type> /path/to/input_file.inp /path/to/output_file.ucd'
@@ -38,11 +39,11 @@ e.g.  './convert_mesh 3 0 mesh/3d/test_in.inp mesh/3d/test_out.ucd'
 Notes:
 ------
 1. This tool was made with the specific intention of the output file being used as a mesh for deal.II.
-2. It has been tested with the deal.II 6.2-pre subversion as distributed on 12 Jan 2009.
+2. It has been tested with the deal.II 6.2-pre subversion as distributed on 2009-10-16.
 3. Testing...
    Abaqus OLD: It has been tested for both 2d and 3d meshes, although more thoroughly for the latter. The 2d grids that were tested were drawn in the X-Y plane.
-   Abaqus NEW: Has been tested only for 3d meshes (on a complex mesh, which is not provided as an example, but this hopefully covers all the possible problems one may encounter).
-4. A few example / test meshes are provided in the directory "mesh". These are all of the Abaqus OLD format.
+   Abaqus NEW: As of yet, this has been tested only for 3d meshes (on a single simple mesh and a complex mesh, which is not provided as an example - but this hopefully covers all the possible problems one may encounter).
+4. A few example / test meshes are provided in the directory "mesh". The .inp files that have been generated are all of the Abaqus OLD format except for one - CC.cub has been converted into both the "new" and "old" formats and both subsequently converted into deal.II readable meshes.
 
 Copyright:
 ----------
