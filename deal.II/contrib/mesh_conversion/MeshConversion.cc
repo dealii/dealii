@@ -1,13 +1,14 @@
 #include "MeshConversion.h"
 
-#include <cstdlib>
-
-
 //--------------------------------------------------------------------------------
 
-MeshConversion::MeshConversion (const unsigned int dimension):
-tolerance (5e-16), // Used to offset Cubit tolerance error when outputting value close to zero
-dimension (dimension)
+MeshConversion::MeshConversion (const unsigned int dimension, const int input_type, const std::string input_file, const std::string output_file)
+:
+dimension (dimension),
+input_file_type (input_type),
+input_file_name (input_file), 
+output_file_name (output_file),
+tolerance (5e-16) // Used to offset Cubit tolerance error when outputting value close to zero
 {
 	greeting ();
 	
@@ -25,7 +26,7 @@ dimension (dimension)
 	}
 	else
 	{
-		std::cout << "ERROR: Chosen spatial dimension is invalid!" << std::endl;
+		std::cerr << "ERROR: Chosen spatial dimension is invalid!" << std::endl;
 	}
 }
 
@@ -37,6 +38,28 @@ MeshConversion::~MeshConversion ()
 }
 
 //--------------------------------------------------------------------------------
+
+bool MeshConversion::convert_mesh (void) 
+{
+	bool readin_successul = false;
+	if (input_file_type == MeshConversion::abaqus_old)
+		readin_successul = read_in_abaqus_inp_old ();
+	else if (input_file_type == MeshConversion::abaqus_new)
+		readin_successul = read_in_abaqus_inp_new ();
+	else 
+		std::cerr << "ERROR: File input type invalid." << std::endl;
+
+	bool writeout_successul = false;
+	if (readin_successul == true)
+		writeout_successul = write_out_avs_ucd();
+	else
+		std::cerr << "ERROR: Input file not found." << std::endl;
+		
+	return readin_successul && writeout_successul;
+}
+
+//--------------------------------------------------------------------------------
+
 
 // ========================================================
 // http://www.codeguru.com/forum/showthread.php?t=231054
@@ -55,7 +78,7 @@ void MeshConversion::greeting () {
 	std::cout << "***                         FEM Mesh conversion tool                             ***" << std::endl;
 	std::cout << "************************************************************************************" << std::endl;
 	std::cout << "*** Author: Jean-Paul Pelteret                                                   ***" << std::endl;
-	std::cout << "*** Date:   December 2008                                                        ***" << std::endl;
+	std::cout << "*** Date:   June 2010                                                            ***" << std::endl;
 	std::cout << "*** References:                                                                  ***" << std::endl;
 	std::cout << "***    http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html   ***" << std::endl;
 	std::cout << "***    http://people.scs.fsu.edu/~burkardt/html/ucd_format.html                  ***" << std::endl;
@@ -65,7 +88,7 @@ void MeshConversion::greeting () {
 	std::cout << "************************************************************************************" << std::endl;
 	std::cout << "*** FEATURES:                                                                    ***" << std::endl;
 	std::cout << "*** Read-in file types:                                                          ***" << std::endl;
-	std::cout << "***      - Abaqus inp                                                            ***" << std::endl;
+	std::cout << "***      - Abaqus inp (from Cubit)                                               ***" << std::endl;
 	std::cout << "*** Write-out file types:                                                        ***" << std::endl;
 	std::cout << "***      - AVS UCD                                                               ***" << std::endl;
 	std::cout << "************************************************************************************" << std::endl;
@@ -74,15 +97,14 @@ void MeshConversion::greeting () {
 
 //--------------------------------------------------------------------------------
 
-bool MeshConversion::read_in_abaqus_inp (const std::string filename) 
+bool MeshConversion::read_in_abaqus_inp_old (void) 
 {
-	input_file_name = filename;
 	bool read_in_successful = true;
 	std::cout << "Reading in ABAQUS .inp FILE: " << input_file_name << std::endl;
 	
 	std::ifstream input_stream;
 	
-	input_stream.open(filename.c_str(), std::ifstream::in);
+	input_stream.open(input_file_name.c_str(), std::ifstream::in);
 	
 	// Check to see if file exists
 	if (input_stream.good() == true)
@@ -93,7 +115,7 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 		// Loop over all the contents of the fibre data file and read it into buffer
 		while (input_stream >> buffer)
 		{
-			for(unsigned int i = 0; i < buffer.length(); ++i)
+			for(int i = 0; i < buffer.length(); ++i)
 				if (buffer[i] == ',')	// Get rid of the .inp file's useless comma's
 				{
 					buffer.erase(i);
@@ -111,14 +133,14 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 			std::ofstream output;
 			output.open(filename_out.c_str());
 			
-			for (unsigned int ii = 0; ii < temp_data.size(); ii++ )
+			for (int ii = 0; ii < temp_data.size(); ii++ )
 				output << temp_data[ii] << std::endl;
 			
 			output.close();
 			// =========== TEMP ===========
 		}
 		
-		for (unsigned int k = 0; k < temp_data.size(); ++k)
+		for (int k = 0; k < temp_data.size(); ++k)
 		{
 			// ================================ NODES ===================================
 			// ABAQUS formatting
@@ -131,18 +153,18 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 				int j = 0;
 				float temp_float;
 				
-				while (from_string<float> (temp_float, temp_data[k + 1 + j*(dimension+1)], std::dec) == true)
+				while (from_string<float> (temp_float, temp_data[k + 1 + j*(dimension+1+(dimension==2 ? 1 : 0))], std::dec) == true)
 				{
 					// Initilise storage variables
 					std::vector <double> node (dimension+1);
 					
 					// Convert from string to the variable types
-					for (unsigned int i = 0; i < dimension+1; ++i)
-						from_string<double> (node[i], temp_data[k + 1 + j*(dimension+1) + i], std::dec);
+					for (int i = 0; i < dimension+1; ++i)
+						from_string<double> (node[i], temp_data[k + 1 + j*(dimension+1+(dimension==2 ? 1 : 0)) + i], std::dec);
 						
 					// Add to the global node number vector
 					node_list.push_back(node);
-
+					
 					++j;
 				}
 			}
@@ -162,26 +184,24 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 				// Get material id
 				std::string material_id_line = temp_data[k+ 2];
 				std::string material_id_temp;
-				for (unsigned int ll = 8 /*Characters in "ELSET=EB" */; ll < material_id_line.length(); ++ll)
+				for (int ll = 8 /*Characters in "ELSET=EB" */; ll < material_id_line.length(); ++ll)
 					material_id_temp += material_id_line[ll];
 				
 				int material_id = 0;
-				for (unsigned int ll = 0; ll < material_id_temp.length(); ++ll)
+				for (int ll = 0; ll < material_id_temp.length(); ++ll)
 					material_id += (material_id_temp[material_id_temp.length() - ll - 1] - 48 /* ASCII TRICKS */) * pow(10.0,ll);
 				
-				while ((k + 3 + j*(data_per_cell) < temp_data.size())
-				       &&
-				       (from_string<float> (temp_float, temp_data[k + 3 + j*(data_per_cell)], std::dec) == true))
+				while (from_string<float> (temp_float, temp_data[k + 3 + j*(data_per_cell)], std::dec) == true)
 				{
 					// Initilise storage variables
-					std::vector <int> cell (data_per_cell);
+					std::vector <double> cell (data_per_cell);
 					
 					// Material id
 					cell[0] = material_id;
 					
 					// Convert from string to the variable types
 					for (int i = 1; i < data_per_cell; ++i)
-						from_string<int> (cell[i], temp_data[k + 3 + j*(data_per_cell) + i], std::dec);
+						from_string<double> (cell[i], temp_data[k + 3 + j*(data_per_cell) + i], std::dec);
 						
 					// Add to the global node number vector
 					cell_list.push_back(cell);
@@ -204,11 +224,11 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 				// Get sideset id
 				std::string sideset_id_line = temp_data[k + 1];
 				std::string sideset_id_temp;
-				for (unsigned int m = 7 /*Characters in "NAME=SS" */; m < sideset_id_line.length(); ++m)
+				for (int m = 7 /*Characters in "NAME=SS" */; m < sideset_id_line.length(); ++m)
 					sideset_id_temp += sideset_id_line[m];
 				
 				int sideset_id = 0;
-				for (unsigned int m = 0; m < sideset_id_temp.length(); ++m)
+				for (int m = 0; m < sideset_id_temp.length(); ++m)
 					sideset_id += (sideset_id_temp[sideset_id_temp.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
 				
 				const int data_per_face = 2;
@@ -218,22 +238,22 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 					// Get cell to which the face belongs
 					std::string face_cell_no_line = temp_data[(k + 2) + j * data_per_face];
 					int face_cell_no = 0;
-					for (unsigned int m = 0; m < face_cell_no_line.length(); ++m)
+					for (int m = 0; m < face_cell_no_line.length(); ++m)
 						face_cell_no += (face_cell_no_line[face_cell_no_line.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
 					
 					// Get ABAQUS cell face number
 					std::string face_cell_face_no_line = temp_data[(k + 2) + j * data_per_face + 1];
 					std::string face_cell_face_no_temp;
-					for (unsigned int m = 1 /*Characters in "S" */; m < face_cell_face_no_line.length(); ++m)
+					for (int m = 1 /*Characters in "S" */; m < face_cell_face_no_line.length(); ++m)
 						face_cell_face_no_temp += face_cell_face_no_line[m];
 					
 					int face_cell_face_no = 0;
-					for (unsigned int m = 0; m < face_cell_face_no_temp.length(); ++m)
+					for (int m = 0; m < face_cell_face_no_temp.length(); ++m)
 						face_cell_face_no += (face_cell_face_no_temp[face_cell_face_no_temp.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
 					
 					// Initilise storage variables
-					std::vector <int> quad (data_per_quad);
-					std::vector <int> quad_node_list (node_per_face);
+					std::vector <double> quad (data_per_quad);
+					std::vector <double> quad_node_list (node_per_face);
 					
 					quad_node_list = get_global_node_numbers(face_cell_no, face_cell_face_no);
 					
@@ -241,7 +261,7 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 					quad[0] = sideset_id;
 					
 					// Global node numbers
-					for (unsigned int m = 0; m < node_per_face; ++m)
+					for (int m = 0; m < node_per_face; ++m)
 						quad[m + 1] = quad_node_list[m];
 					
 					// Add to the global quad vector
@@ -262,9 +282,167 @@ bool MeshConversion::read_in_abaqus_inp (const std::string filename)
 
 //--------------------------------------------------------------------------------
 
-std::vector <int> MeshConversion::get_global_node_numbers (const int face_cell_no, const int face_cell_face_no) 
+bool MeshConversion::read_in_abaqus_inp_new (void) 
 {
-	std::vector <int> quad_node_list (node_per_face);
+	bool read_in_successful = true;
+	std::cout << "Reading in ABAQUS .inp FILE: " << input_file_name << std::endl;
+	
+	std::ifstream input_stream;
+	
+	input_stream.open(input_file_name.c_str(), std::ifstream::in);
+
+	// Check to see if file exists
+	if (input_stream.good() == true) {
+		std::vector <std::string> temp_data;
+		std::string buffer;
+		
+		// Read all input data into a temp vector 
+		while (input_stream >> buffer) {
+			if (buffer.compare(buffer.size()-1,buffer.size()-1, ",") == 0) buffer.erase(buffer.size() -1);
+			temp_data.push_back(buffer);
+		}
+		
+		// Sort the data into node, element and surface data_per_cell
+		for (unsigned int k=0; k < temp_data.size(); ++k) {
+			// Nodes
+			if (temp_data[k] == "*NODE") {
+				int j = 0;
+				float temp_float;
+				const int header_size = 2; // *NODE, NSET=
+			
+				while (from_string<float> (temp_float, temp_data[k + header_size + j*(dimension+1+(dimension==2 ? 1 : 0))], std::dec) == true)
+				{
+					// Initilise storage variables
+					std::vector <double> node (dimension+1);
+				
+					// Convert from string to the variable types
+					for (int i = 0; i < dimension+1; ++i)
+						from_string<double> (node[i], temp_data[k + header_size + j*(dimension+1+(dimension==2 ? 1 : 0)) + i], std::dec);
+					
+					// Add to the global node number vector
+					node_list.push_back(node);
+				
+					++j;
+				}
+			
+			}
+			if (temp_data[k] == "*ELEMENT") {
+				int j = 0;
+				float temp_float;
+				const int data_per_cell = node_per_cell + 1;
+				const int header_size = 3; // *ELEMENT, TYPE=C3D8R, ELSET=
+				const int mat_id_line = 2;
+				
+				// Get material id
+				std::string material_id_line = temp_data[k+mat_id_line];
+				std::string material_id_temp;
+				for (int ll = 8 /*Characters in "ELSET=EB" */; ll < material_id_line.length(); ++ll)
+					material_id_temp += material_id_line[ll];
+				
+				int material_id = 0;
+				for (int ll = 0; ll < material_id_temp.length(); ++ll)
+					material_id += (material_id_temp[material_id_temp.length() - ll - 1] - 48 /* ASCII TRICKS */) * pow(10.0,ll);
+				
+				while (from_string<float> (temp_float, temp_data[k + header_size + j*(data_per_cell)], std::dec) == true)
+				{
+					// Initilise storage variables
+					std::vector <double> cell (data_per_cell);
+					
+					// Material id
+					cell[0] = material_id;
+					
+					// Convert from string to the variable types
+					for (int i = 1; i < data_per_cell; ++i)
+						from_string<double> (cell[i], temp_data[k + 3 + j*(data_per_cell) + i], std::dec);
+						
+					// Add to the global node number vector
+					cell_list.push_back(cell);
+					
+					++j;
+				}
+			
+			}
+			if (temp_data[k] == "*ELSET") {
+				float temp_float;
+				const int data_per_quad = node_per_face + 1;
+				const int header_size = 2; // *ELSET, ELSET=
+				const std::string elset_name = temp_data[k+1].substr(6, temp_data[k+1].size()); // Take out subset name to extract Abaqus face side from later
+				
+				// Find the surface to which this element set belongs - this is the next line on which "*SURFACE" appears as multiple elsets can be attached to one surface
+				int surface_line_offset = 0;
+				while (temp_data[k + surface_line_offset] != "*SURFACE") 
+					++surface_line_offset;
+				
+				// Get sideset id
+				const int face_name_from_surface = 1;
+				std::string sideset_id_line = temp_data[k + surface_line_offset + face_name_from_surface]; // Name on next line
+				std::string sideset_id_temp;
+				for (int m = 7 /*Characters in "NAME=SS" */; m < sideset_id_line.length(); ++m)
+					sideset_id_temp += sideset_id_line[m];
+					
+				// Get ABAQUS cell face number
+				std::string face_cell_face_no_temp;
+				for (unsigned int s=k + surface_line_offset; s < temp_data.size(); ++ s) {
+					if (temp_data[s] == elset_name) {
+						face_cell_face_no_temp = temp_data[s+1].substr(1, temp_data[s+1].size()); // Next line contains cell side face number
+					}
+				}
+				
+				int face_cell_face_no = 0;
+				for (int m = 0; m < face_cell_face_no_temp.length(); ++m)
+					face_cell_face_no += (face_cell_face_no_temp[face_cell_face_no_temp.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
+				
+				int sideset_id = 0;
+				for (int m = 0; m < sideset_id_temp.length(); ++m)
+					sideset_id += (sideset_id_temp[sideset_id_temp.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
+				
+				const int data_per_face = 1;
+				int j = 0;
+				while (( (k + header_size) + j * data_per_face ) < temp_data.size() && from_string<float> (temp_float, temp_data[(k + header_size) + j * data_per_face], std::dec) == true)
+				{
+					// Get cell to which the face belongs
+					std::string face_cell_no_line = temp_data[(k + header_size) + j * data_per_face];
+					int face_cell_no = 0;
+					for (int m = 0; m < face_cell_no_line.length(); ++m)
+						face_cell_no += (face_cell_no_line[face_cell_no_line.length() - m - 1] - 48 /* ASCII TRICKS */) * pow(10.0,m);
+					
+					// Initilise storage variables
+					std::vector <double> quad (data_per_quad);
+					std::vector <double> quad_node_list (node_per_face);
+					
+					quad_node_list = get_global_node_numbers(face_cell_no, face_cell_face_no);
+					
+					// Sideset id
+					quad[0] = sideset_id;
+					
+					// Global node numbers
+					for (int m = 0; m < node_per_face; ++m)
+						quad[m + 1] = quad_node_list[m];
+					
+					// Add to the global quad vector
+					face_list.push_back(quad);
+					
+					++j;
+				}
+			
+			}
+		}
+		
+      		input_stream.close();
+	}
+	else
+	{
+		return false;
+	}
+		
+	return read_in_successful;
+}
+
+//--------------------------------------------------------------------------------
+
+std::vector <double> MeshConversion::get_global_node_numbers (const int face_cell_no, const int face_cell_face_no) 
+{
+	std::vector <double> quad_node_list (node_per_face);
 	
 	if (dimension == 2)
 	{
@@ -350,14 +528,13 @@ std::vector <int> MeshConversion::get_global_node_numbers (const int face_cell_n
 
 //--------------------------------------------------------------------------------
 
-bool MeshConversion::write_out_avs_ucd (const std::string filename) 
+bool MeshConversion::write_out_avs_ucd (void) 
 {
-	output_file_name = filename;
 	bool write_out_successful = true;
 	std::cout << "Writing out AVS .ucd FILE:   " << output_file_name << std::endl;
 	
 	std::ofstream output;
-	output.open(filename.c_str());
+	output.open(output_file_name.c_str());
 	
 	// Write out title - Note: No other commented text can be inserted below the title in a UCD file
 	output << "# FEM Mesh Converter" << std::endl;
@@ -382,9 +559,9 @@ bool MeshConversion::write_out_avs_ucd (const std::string filename)
 	output << node_list.size() << "\t" << (cell_list.size() + face_list.size()) << "\t0\t0\t0" << std::endl;
 	
 	// Write out node numbers
-	for (unsigned int ii = 0; ii < node_list.size(); ++ii) // Loop over all nodes
+	for (int ii = 0; ii < node_list.size(); ++ii) // Loop over all nodes
 	{
-		for (unsigned int jj = 0; jj < dimension + 1; ++jj) // Loop over entries to be outputted
+		for (int jj = 0; jj < dimension + 1; ++jj) // Loop over entries to be outputted
 		{
 			if (jj == 0) 	// Node number
 			{
@@ -410,20 +587,20 @@ bool MeshConversion::write_out_avs_ucd (const std::string filename)
 	}
 	
 	// Write out cell node numbers
-	for (unsigned int ii = 0; ii < cell_list.size(); ++ii)
+	for (int ii = 0; ii < cell_list.size(); ++ii)
 	{
-	  output << ii + 1 << "\t" << cell_list[ii][0] << "\t" << (dimension==2 ? "quad" : "hex") << "\t";
-		for (unsigned int jj = 1; jj < node_per_cell + 1; ++jj)
+		output << ii + 1 << "\t" << cell_list[ii][0] << "\t" << (dimension==2 ? "quad" : "hex") << "\t";
+		for (int jj = 1; jj < node_per_cell + 1; ++jj)
 			output << cell_list[ii][jj] << "\t";
 		
 		output << std::endl;
 	}
 	
 	// Write out quad node numbers
-	for (unsigned int ii = 0; ii < face_list.size(); ++ii)
+	for (int ii = 0; ii < face_list.size(); ++ii)
 	{
-	  output << ii + 1 << "\t" << (int)face_list[ii][0] << "\t" << (dimension==2 ? "line" : "quad") << "\t";
-		for (unsigned int jj = 1; jj < node_per_face + 1; ++jj)
+		output << ii + 1 << "\t" << face_list[ii][0] << "\t" << (dimension==2 ? "line" : "quad") << "\t";
+		for (int jj = 1; jj < node_per_face + 1; ++jj)
 			output << face_list[ii][jj] << "\t";
 		
 		output << std::endl;
