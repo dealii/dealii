@@ -30,7 +30,6 @@
 #  endif
 #  include <Epetra_Map.h>
 
-#  include <Teuchos_RCP.hpp>
 #  include <Teuchos_ParameterList.hpp>
 #  include <Epetra_Operator.h>
 #  include <Epetra_Vector.h>
@@ -104,6 +103,13 @@ namespace TrilinosWrappers
       ~PreconditionBase ();
 
 				       /**
+					* Destroys the preconditioner, leaving
+					* an object like just after having
+					* called the constructor.
+					*/
+      void clear ();
+
+				       /**
 					* Apply the preconditioner.
 					*/
       void vmult (VectorBase       &dst,
@@ -139,7 +145,7 @@ namespace TrilinosWrappers
 					* is used when applying the
 					* preconditioner.
 					*/
-      Teuchos::RCP<const Epetra_Operator> preconditioner;
+      std_cxx1x::shared_ptr<Epetra_Operator> preconditioner;
 
                                        /**
 					* Internal communication
@@ -250,14 +256,6 @@ namespace TrilinosWrappers
 					*/
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-
-    private:
-				       /**
-					* This is a pointer to the
-					* Ifpack data contained in
-					* this preconditioner.
-					*/
-      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -386,14 +384,6 @@ namespace TrilinosWrappers
 					*/
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-
-    private:
-				       /**
-					* This is a pointer to the
-					* Ifpack data contained in
-					* this preconditioner.
-					*/
-      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -522,14 +512,6 @@ namespace TrilinosWrappers
 					*/
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-
-    private:
-				       /**
-					* This is a pointer to the
-					* Ifpack data contained in
-					* this preconditioner.
-					*/
-      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -699,14 +681,6 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-
-    private:
-				       /**
-					* This is a pointer to the
-					* Ifpack data contained in
-					* this preconditioner.
-					*/
-      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -875,14 +849,6 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-
-    private:
-				       /**
-					* This is a pointer to the
-					* Ifpack data contained in
-					* this preconditioner.
-					*/
-      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -1057,14 +1023,6 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-
-    private:
-				       /**
-					* This is a pointer to the
-					* Ifpack data contained in
-					* this preconditioner.
-					*/
-      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -1124,14 +1082,6 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-
-    private:
-				       /**
-					* This is a pointer to the
-					* Ifpack data contained in
-					* this preconditioner.
-					*/
-      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -1241,14 +1191,6 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-
-    private:
-				       /**
-					* This is a pointer to the
-					* Ifpack data contained in
-					* this preconditioner.
-					*/
-      Teuchos::RCP<Ifpack_Chebyshev> ifpack;
   };
 
 
@@ -1495,24 +1437,24 @@ namespace TrilinosWrappers
       void reinit ();
 
 				       /**
+					* Destroys the preconditioner, leaving
+					* an object like just after having
+					* called the constructor.
+					*/
+      void clear ();
+
+				       /**
 					* Prints an estimate of the memory
 					* consumption of this class.
 					*/
       unsigned int memory_consumption () const;
 
     private:
-
-				       /**
-					* A pointer to the preconditioner
-					* object.
-					*/
-      Teuchos::RCP<ML_Epetra::MultiLevelPreconditioner> multilevel_operator;
-
 				       /**
 					* A copy of the deal.II matrix into
 					* Trilinos format.
 					*/
-      std_cxx1x::shared_ptr<SparseMatrix> Matrix;
+      std_cxx1x::shared_ptr<SparseMatrix> trilinos_matrix;
   };
 
 
