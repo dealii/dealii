@@ -91,6 +91,16 @@ inconvenience this causes.
   <br>
   (WB 2010/06/28)
   </p>  
+
+  <li>
+  <p>
+  Fixed: The output of the function
+  FE_Q::adjust_quad_dof_index_for_face_orientation
+  was wrong in 3d for polynomial orders of three or greater. This is now
+  fixed.
+  <br>
+  (WB 2010/06/28)
+  </p>  
 </ol>
 
 
