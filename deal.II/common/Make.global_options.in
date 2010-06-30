@@ -364,7 +364,7 @@ else
 endif
 
 
-
+ifeq ($(BUILDTEST),yes)
 print-summary:
 	@echo "dealii-feature: revision=`svn info .. | grep Revision | sed 's/Revision: //'`"
 	@echo "dealii-feature: user=$(USER)"
@@ -382,3 +382,4 @@ print-summary:
 	@echo "dealii-feature: MUMPS=$(subst no,,$(USE_CONTRIB_MUMPS))"
 	@echo "dealii-feature: METIS=$(subst no,,$(USE_CONTRIB_METIS))"
 	@cd $D/common/scripts ; make report_features && ./report_features
+endif
