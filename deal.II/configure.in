@@ -214,13 +214,6 @@ AC_CHECK_FUNCS_ONCE([gethostname getpid])
 AC_CHECK_HEADERS_ONCE([sys/syscall.h])
 DEAL_II_CHECK_BROKEN_SOCKETS
 
-dnl Check for boost option and make sure we get all files
-BOOST_INCLUDE_DIR="-I$DEAL_II_PATH/contrib/boost/include"
-
-DEAL_II_CHECK_BOOST
-
-AC_SUBST(BOOST_INCLUDE_DIR)
-
 
 dnl -------------------------------------------------------------
 dnl                        Fortran 77 compilers
@@ -402,6 +395,14 @@ dnl -------------------------------------------------------------
 
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring additional libs ----------------)
+
+dnl Check for boost option and make sure we get all files.
+dnl Since we may want to use an external boost installation
+dnl this test needs to run after we determine whether -rpath
+dnl works
+BOOST_INCLUDE_DIR="-I$DEAL_II_PATH/contrib/boost/include"
+DEAL_II_CHECK_BOOST
+AC_SUBST(BOOST_INCLUDE_DIR)
 
 DEAL_II_CONFIGURE_PETSC
 AC_SUBST(USE_CONTRIB_PETSC)

@@ -699,6 +699,7 @@ DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR
 DEAL_II_EXPAND_PETSC_BLOCKVECTOR
 DEAL_II_EXPAND_PETSC_MPI_VECTOR
 DEAL_II_EXPAND_PETSC_VECTOR
+BOOST_INCLUDE_DIR
 DEAL_II_DISABLE_PARSER
 enableparser
 RANLIB
@@ -714,7 +715,6 @@ F77FLAGSG
 F77FLAGSO
 F77_VERSION
 F77
-BOOST_INCLUDE_DIR
 EGREP
 GREP
 CXXCPP
@@ -796,11 +796,11 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_threads
-with_boost
 enable_shared
 enable_parser
 enable_mgcompatibility
 enable_compat_blocker
+with_boost
 with_petsc
 with_petsc_arch
 with_slepc
@@ -11517,523 +11517,6 @@ fi
 
 
 
-BOOST_INCLUDE_DIR="-I$DEAL_II_PATH/contrib/boost/include"
-
-
-
-# Check whether --with-boost was given.
-if test "${with_boost+set}" = set; then
-  withval=$with_boost;
-  if test "x$withval" != "xyes" ; then
-    BOOST_INCLUDE_DIR="-I$withval"
-    if test "$LD_PATH_OPTION" != "no" ; then
-      BOOST_LIB_DIR="$LD_PATH_OPTION$withval/lib"
-    fi
-  else
-    BOOST_INCLUDE_DIR=''
-    BOOST_LIB_DIR=''
-  fi
-
-fi
-
-
-  CPPFLAGS="$BOOST_INCLUDE_DIR $CPPFLAGS"
-  LDFLAGS="$BOOST_LIB_DIR $LDFLAGS"
-
-  if test "${ac_cv_header_boost_shared_ptr_hpp+set}" = set; then
-  { $as_echo "$as_me:$LINENO: checking for boost/shared_ptr.hpp" >&5
-$as_echo_n "checking for boost/shared_ptr.hpp... " >&6; }
-if test "${ac_cv_header_boost_shared_ptr_hpp+set}" = set; then
-  $as_echo_n "(cached) " >&6
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_shared_ptr_hpp" >&5
-$as_echo "$ac_cv_header_boost_shared_ptr_hpp" >&6; }
-else
-  # Is the header compilable?
-{ $as_echo "$as_me:$LINENO: checking boost/shared_ptr.hpp usability" >&5
-$as_echo_n "checking boost/shared_ptr.hpp usability... " >&6; }
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-#include <boost/shared_ptr.hpp>
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ac_header_compiler=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_header_compiler=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
-$as_echo "$ac_header_compiler" >&6; }
-
-# Is the header present?
-{ $as_echo "$as_me:$LINENO: checking boost/shared_ptr.hpp presence" >&5
-$as_echo_n "checking boost/shared_ptr.hpp presence... " >&6; }
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <boost/shared_ptr.hpp>
-_ACEOF
-if { (ac_try="$ac_cpp conftest.$ac_ext"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null && {
-	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       }; then
-  ac_header_preproc=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  ac_header_preproc=no
-fi
-
-rm -f conftest.err conftest.$ac_ext
-{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
-$as_echo "$ac_header_preproc" >&6; }
-
-# So?  What about this header?
-case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
-  yes:no: )
-    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: accepted by the compiler, rejected by the preprocessor!" >&5
-$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: proceeding with the compiler's result" >&5
-$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: proceeding with the compiler's result" >&2;}
-    ac_header_preproc=yes
-    ;;
-  no:yes:* )
-    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: present but cannot be compiled" >&5
-$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: present but cannot be compiled" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp:     check for missing prerequisite headers?" >&5
-$as_echo "$as_me: WARNING: boost/shared_ptr.hpp:     check for missing prerequisite headers?" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: see the Autoconf documentation" >&5
-$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: see the Autoconf documentation" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp:     section \"Present But Cannot Be Compiled\"" >&5
-$as_echo "$as_me: WARNING: boost/shared_ptr.hpp:     section \"Present But Cannot Be Compiled\"" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: proceeding with the preprocessor's result" >&5
-$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: proceeding with the preprocessor's result" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: in the future, the compiler will take precedence" >&5
-$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: in the future, the compiler will take precedence" >&2;}
-    ( cat <<\_ASBOX
-## -------------------------------- ##
-## Report this to dealii@dealii.org ##
-## -------------------------------- ##
-_ASBOX
-     ) | sed "s/^/$as_me: WARNING:     /" >&2
-    ;;
-esac
-{ $as_echo "$as_me:$LINENO: checking for boost/shared_ptr.hpp" >&5
-$as_echo_n "checking for boost/shared_ptr.hpp... " >&6; }
-if test "${ac_cv_header_boost_shared_ptr_hpp+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_cv_header_boost_shared_ptr_hpp=$ac_header_preproc
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_shared_ptr_hpp" >&5
-$as_echo "$ac_cv_header_boost_shared_ptr_hpp" >&6; }
-
-fi
-if test "x$ac_cv_header_boost_shared_ptr_hpp" = x""yes; then
-  :
-else
-  { { $as_echo "$as_me:$LINENO: error: Your boost installation is incomplete!" >&5
-$as_echo "$as_me: error: Your boost installation is incomplete!" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-
-  if test "${ac_cv_header_boost_type_traits_hpp+set}" = set; then
-  { $as_echo "$as_me:$LINENO: checking for boost/type_traits.hpp" >&5
-$as_echo_n "checking for boost/type_traits.hpp... " >&6; }
-if test "${ac_cv_header_boost_type_traits_hpp+set}" = set; then
-  $as_echo_n "(cached) " >&6
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_type_traits_hpp" >&5
-$as_echo "$ac_cv_header_boost_type_traits_hpp" >&6; }
-else
-  # Is the header compilable?
-{ $as_echo "$as_me:$LINENO: checking boost/type_traits.hpp usability" >&5
-$as_echo_n "checking boost/type_traits.hpp usability... " >&6; }
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-#include <boost/type_traits.hpp>
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ac_header_compiler=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_header_compiler=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
-$as_echo "$ac_header_compiler" >&6; }
-
-# Is the header present?
-{ $as_echo "$as_me:$LINENO: checking boost/type_traits.hpp presence" >&5
-$as_echo_n "checking boost/type_traits.hpp presence... " >&6; }
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <boost/type_traits.hpp>
-_ACEOF
-if { (ac_try="$ac_cpp conftest.$ac_ext"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null && {
-	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       }; then
-  ac_header_preproc=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  ac_header_preproc=no
-fi
-
-rm -f conftest.err conftest.$ac_ext
-{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
-$as_echo "$ac_header_preproc" >&6; }
-
-# So?  What about this header?
-case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
-  yes:no: )
-    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: accepted by the compiler, rejected by the preprocessor!" >&5
-$as_echo "$as_me: WARNING: boost/type_traits.hpp: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: proceeding with the compiler's result" >&5
-$as_echo "$as_me: WARNING: boost/type_traits.hpp: proceeding with the compiler's result" >&2;}
-    ac_header_preproc=yes
-    ;;
-  no:yes:* )
-    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: present but cannot be compiled" >&5
-$as_echo "$as_me: WARNING: boost/type_traits.hpp: present but cannot be compiled" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp:     check for missing prerequisite headers?" >&5
-$as_echo "$as_me: WARNING: boost/type_traits.hpp:     check for missing prerequisite headers?" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: see the Autoconf documentation" >&5
-$as_echo "$as_me: WARNING: boost/type_traits.hpp: see the Autoconf documentation" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp:     section \"Present But Cannot Be Compiled\"" >&5
-$as_echo "$as_me: WARNING: boost/type_traits.hpp:     section \"Present But Cannot Be Compiled\"" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: proceeding with the preprocessor's result" >&5
-$as_echo "$as_me: WARNING: boost/type_traits.hpp: proceeding with the preprocessor's result" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: in the future, the compiler will take precedence" >&5
-$as_echo "$as_me: WARNING: boost/type_traits.hpp: in the future, the compiler will take precedence" >&2;}
-    ( cat <<\_ASBOX
-## -------------------------------- ##
-## Report this to dealii@dealii.org ##
-## -------------------------------- ##
-_ASBOX
-     ) | sed "s/^/$as_me: WARNING:     /" >&2
-    ;;
-esac
-{ $as_echo "$as_me:$LINENO: checking for boost/type_traits.hpp" >&5
-$as_echo_n "checking for boost/type_traits.hpp... " >&6; }
-if test "${ac_cv_header_boost_type_traits_hpp+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_cv_header_boost_type_traits_hpp=$ac_header_preproc
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_type_traits_hpp" >&5
-$as_echo "$ac_cv_header_boost_type_traits_hpp" >&6; }
-
-fi
-if test "x$ac_cv_header_boost_type_traits_hpp" = x""yes; then
-  :
-else
-  { { $as_echo "$as_me:$LINENO: error: Your boost installation is incomplete!" >&5
-$as_echo "$as_me: error: Your boost installation is incomplete!" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-
-  if test "${ac_cv_header_boost_tuple_tuple_hpp+set}" = set; then
-  { $as_echo "$as_me:$LINENO: checking for boost/tuple/tuple.hpp" >&5
-$as_echo_n "checking for boost/tuple/tuple.hpp... " >&6; }
-if test "${ac_cv_header_boost_tuple_tuple_hpp+set}" = set; then
-  $as_echo_n "(cached) " >&6
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_tuple_tuple_hpp" >&5
-$as_echo "$ac_cv_header_boost_tuple_tuple_hpp" >&6; }
-else
-  # Is the header compilable?
-{ $as_echo "$as_me:$LINENO: checking boost/tuple/tuple.hpp usability" >&5
-$as_echo_n "checking boost/tuple/tuple.hpp usability... " >&6; }
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-#include <boost/tuple/tuple.hpp>
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ac_header_compiler=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_header_compiler=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
-$as_echo "$ac_header_compiler" >&6; }
-
-# Is the header present?
-{ $as_echo "$as_me:$LINENO: checking boost/tuple/tuple.hpp presence" >&5
-$as_echo_n "checking boost/tuple/tuple.hpp presence... " >&6; }
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <boost/tuple/tuple.hpp>
-_ACEOF
-if { (ac_try="$ac_cpp conftest.$ac_ext"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null && {
-	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       }; then
-  ac_header_preproc=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  ac_header_preproc=no
-fi
-
-rm -f conftest.err conftest.$ac_ext
-{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
-$as_echo "$ac_header_preproc" >&6; }
-
-# So?  What about this header?
-case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
-  yes:no: )
-    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: accepted by the compiler, rejected by the preprocessor!" >&5
-$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: proceeding with the compiler's result" >&5
-$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: proceeding with the compiler's result" >&2;}
-    ac_header_preproc=yes
-    ;;
-  no:yes:* )
-    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: present but cannot be compiled" >&5
-$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: present but cannot be compiled" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp:     check for missing prerequisite headers?" >&5
-$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp:     check for missing prerequisite headers?" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: see the Autoconf documentation" >&5
-$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: see the Autoconf documentation" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp:     section \"Present But Cannot Be Compiled\"" >&5
-$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp:     section \"Present But Cannot Be Compiled\"" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: proceeding with the preprocessor's result" >&5
-$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: proceeding with the preprocessor's result" >&2;}
-    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: in the future, the compiler will take precedence" >&5
-$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: in the future, the compiler will take precedence" >&2;}
-    ( cat <<\_ASBOX
-## -------------------------------- ##
-## Report this to dealii@dealii.org ##
-## -------------------------------- ##
-_ASBOX
-     ) | sed "s/^/$as_me: WARNING:     /" >&2
-    ;;
-esac
-{ $as_echo "$as_me:$LINENO: checking for boost/tuple/tuple.hpp" >&5
-$as_echo_n "checking for boost/tuple/tuple.hpp... " >&6; }
-if test "${ac_cv_header_boost_tuple_tuple_hpp+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_cv_header_boost_tuple_tuple_hpp=$ac_header_preproc
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_tuple_tuple_hpp" >&5
-$as_echo "$ac_cv_header_boost_tuple_tuple_hpp" >&6; }
-
-fi
-if test "x$ac_cv_header_boost_tuple_tuple_hpp" = x""yes; then
-  :
-else
-  { { $as_echo "$as_me:$LINENO: error: Your boost installation is incomplete!" >&5
-$as_echo "$as_me: error: Your boost installation is incomplete!" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-
-
-  if test "x$GXX" = "xyes" ; then
-    { $as_echo "$as_me:$LINENO: checking for boost::shared_ptr assignment operator= template buglet" >&5
-$as_echo_n "checking for boost::shared_ptr assignment operator= template buglet... " >&6; }
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-    CXXFLAGS="-Wsynth -Werror"
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#       include <boost/shared_ptr.hpp>
-
-int
-main ()
-{
-
-        boost::shared_ptr<int> a,b;
-        a = b;
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-
-        { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-
-        { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
-	CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-Wsynth\s*//g;'`"
-
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  fi
-
-
-
-
-
 
 
 { $as_echo "$as_me:$LINENO: result: " >&5
@@ -13039,6 +12522,521 @@ $as_echo "$as_me: error: Backward compatibility feature \"$i\" unknown" >&2;}
 $as_echo "" >&6; }
 { $as_echo "$as_me:$LINENO: result: ---------------- configuring additional libs ----------------" >&5
 $as_echo "---------------- configuring additional libs ----------------" >&6; }
+
+BOOST_INCLUDE_DIR="-I$DEAL_II_PATH/contrib/boost/include"
+
+
+# Check whether --with-boost was given.
+if test "${with_boost+set}" = set; then
+  withval=$with_boost;
+  if test "x$withval" != "xyes" ; then
+    BOOST_INCLUDE_DIR="-I$withval"
+    if test "$LD_PATH_OPTION" != "no" ; then
+      BOOST_LIB_DIR="$LD_PATH_OPTION$withval/lib"
+    fi
+  else
+    BOOST_INCLUDE_DIR=''
+    BOOST_LIB_DIR=''
+  fi
+
+fi
+
+
+  CPPFLAGS="$BOOST_INCLUDE_DIR $CPPFLAGS"
+  LDFLAGS="$BOOST_LIB_DIR $LDFLAGS"
+
+  if test "${ac_cv_header_boost_shared_ptr_hpp+set}" = set; then
+  { $as_echo "$as_me:$LINENO: checking for boost/shared_ptr.hpp" >&5
+$as_echo_n "checking for boost/shared_ptr.hpp... " >&6; }
+if test "${ac_cv_header_boost_shared_ptr_hpp+set}" = set; then
+  $as_echo_n "(cached) " >&6
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_shared_ptr_hpp" >&5
+$as_echo "$ac_cv_header_boost_shared_ptr_hpp" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:$LINENO: checking boost/shared_ptr.hpp usability" >&5
+$as_echo_n "checking boost/shared_ptr.hpp usability... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <boost/shared_ptr.hpp>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:$LINENO: checking boost/shared_ptr.hpp presence" >&5
+$as_echo_n "checking boost/shared_ptr.hpp presence... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <boost/shared_ptr.hpp>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: boost/shared_ptr.hpp:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: boost/shared_ptr.hpp:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: proceeding with the preprocessor's result" >&5
+$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: proceeding with the preprocessor's result" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/shared_ptr.hpp: in the future, the compiler will take precedence" >&5
+$as_echo "$as_me: WARNING: boost/shared_ptr.hpp: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## -------------------------------- ##
+## Report this to dealii@dealii.org ##
+## -------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ $as_echo "$as_me:$LINENO: checking for boost/shared_ptr.hpp" >&5
+$as_echo_n "checking for boost/shared_ptr.hpp... " >&6; }
+if test "${ac_cv_header_boost_shared_ptr_hpp+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_header_boost_shared_ptr_hpp=$ac_header_preproc
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_shared_ptr_hpp" >&5
+$as_echo "$ac_cv_header_boost_shared_ptr_hpp" >&6; }
+
+fi
+if test "x$ac_cv_header_boost_shared_ptr_hpp" = x""yes; then
+  :
+else
+  { { $as_echo "$as_me:$LINENO: error: Your boost installation is incomplete!" >&5
+$as_echo "$as_me: error: Your boost installation is incomplete!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+  if test "${ac_cv_header_boost_type_traits_hpp+set}" = set; then
+  { $as_echo "$as_me:$LINENO: checking for boost/type_traits.hpp" >&5
+$as_echo_n "checking for boost/type_traits.hpp... " >&6; }
+if test "${ac_cv_header_boost_type_traits_hpp+set}" = set; then
+  $as_echo_n "(cached) " >&6
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_type_traits_hpp" >&5
+$as_echo "$ac_cv_header_boost_type_traits_hpp" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:$LINENO: checking boost/type_traits.hpp usability" >&5
+$as_echo_n "checking boost/type_traits.hpp usability... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <boost/type_traits.hpp>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:$LINENO: checking boost/type_traits.hpp presence" >&5
+$as_echo_n "checking boost/type_traits.hpp presence... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <boost/type_traits.hpp>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: boost/type_traits.hpp: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: boost/type_traits.hpp: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: boost/type_traits.hpp: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: boost/type_traits.hpp:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: boost/type_traits.hpp: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: boost/type_traits.hpp:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: proceeding with the preprocessor's result" >&5
+$as_echo "$as_me: WARNING: boost/type_traits.hpp: proceeding with the preprocessor's result" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/type_traits.hpp: in the future, the compiler will take precedence" >&5
+$as_echo "$as_me: WARNING: boost/type_traits.hpp: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## -------------------------------- ##
+## Report this to dealii@dealii.org ##
+## -------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ $as_echo "$as_me:$LINENO: checking for boost/type_traits.hpp" >&5
+$as_echo_n "checking for boost/type_traits.hpp... " >&6; }
+if test "${ac_cv_header_boost_type_traits_hpp+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_header_boost_type_traits_hpp=$ac_header_preproc
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_type_traits_hpp" >&5
+$as_echo "$ac_cv_header_boost_type_traits_hpp" >&6; }
+
+fi
+if test "x$ac_cv_header_boost_type_traits_hpp" = x""yes; then
+  :
+else
+  { { $as_echo "$as_me:$LINENO: error: Your boost installation is incomplete!" >&5
+$as_echo "$as_me: error: Your boost installation is incomplete!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+  if test "${ac_cv_header_boost_tuple_tuple_hpp+set}" = set; then
+  { $as_echo "$as_me:$LINENO: checking for boost/tuple/tuple.hpp" >&5
+$as_echo_n "checking for boost/tuple/tuple.hpp... " >&6; }
+if test "${ac_cv_header_boost_tuple_tuple_hpp+set}" = set; then
+  $as_echo_n "(cached) " >&6
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_tuple_tuple_hpp" >&5
+$as_echo "$ac_cv_header_boost_tuple_tuple_hpp" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:$LINENO: checking boost/tuple/tuple.hpp usability" >&5
+$as_echo_n "checking boost/tuple/tuple.hpp usability... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <boost/tuple/tuple.hpp>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:$LINENO: checking boost/tuple/tuple.hpp presence" >&5
+$as_echo_n "checking boost/tuple/tuple.hpp presence... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <boost/tuple/tuple.hpp>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: proceeding with the preprocessor's result" >&5
+$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: proceeding with the preprocessor's result" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: boost/tuple/tuple.hpp: in the future, the compiler will take precedence" >&5
+$as_echo "$as_me: WARNING: boost/tuple/tuple.hpp: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## -------------------------------- ##
+## Report this to dealii@dealii.org ##
+## -------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ $as_echo "$as_me:$LINENO: checking for boost/tuple/tuple.hpp" >&5
+$as_echo_n "checking for boost/tuple/tuple.hpp... " >&6; }
+if test "${ac_cv_header_boost_tuple_tuple_hpp+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_header_boost_tuple_tuple_hpp=$ac_header_preproc
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_boost_tuple_tuple_hpp" >&5
+$as_echo "$ac_cv_header_boost_tuple_tuple_hpp" >&6; }
+
+fi
+if test "x$ac_cv_header_boost_tuple_tuple_hpp" = x""yes; then
+  :
+else
+  { { $as_echo "$as_me:$LINENO: error: Your boost installation is incomplete!" >&5
+$as_echo "$as_me: error: Your boost installation is incomplete!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+
+  if test "x$GXX" = "xyes" ; then
+    { $as_echo "$as_me:$LINENO: checking for boost::shared_ptr assignment operator= template buglet" >&5
+$as_echo_n "checking for boost::shared_ptr assignment operator= template buglet... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    CXXFLAGS="-Wsynth -Werror"
+    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#       include <boost/shared_ptr.hpp>
+
+int
+main ()
+{
+
+        boost::shared_ptr<int> a,b;
+        a = b;
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+
+        { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+        { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+	CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-Wsynth\s*//g;'`"
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  fi
+
+
+
 
 
     { $as_echo "$as_me:$LINENO: checking for PETSc library directory" >&5
