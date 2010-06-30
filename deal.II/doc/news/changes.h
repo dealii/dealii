@@ -83,7 +83,14 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
-  <li>None so far.
+  <li>
+  <p>
+  Fixed: On some systems and compilers, the library could not be compiled
+  because of a duplicate symbol in <code>MeshWorker::LocalResults</code>.
+  This is now fixed.
+  <br>
+  (WB 2010/06/28)
+  </p>  
 </ol>
 
 
