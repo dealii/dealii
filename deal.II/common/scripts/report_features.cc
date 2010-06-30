@@ -26,6 +26,9 @@ extern "C" {
 #  include <dmumps_c.h>
 #endif 
 
+#ifdef DEAL_II_USE_SLEPC
+#  include <slepcversion.h>
+#endif
 
 int main()
 {
@@ -44,6 +47,18 @@ int main()
 	    << UMFPACK_SUBSUB_VERSION << std::endl;
 #endif
 
+#ifdef DEAL_II_USE_MUMPS
+  std::cout << "dealii-feature: MUMPS=yes" << std::endl;
+#endif
+
+#ifdef DEAL_II_USE_SLEPC
+  std::cout << "dealii-feature: SLEPc="
+	    << SLEPC_VERSION_MAJOR << '.'
+	    << SLEPC_VERSION_MINOR << '.'
+	    << SLEPC_VERSION_SUBMINOR << 'p'
+	    << SLEPC_VERSION_PATCH << std::endl;
+#endif
+  
 #if defined(HAVE_HSL_MA27) || defined(HAVE_HSL_MA47)
   std::cout << "dealii-feature: HSL=";
 #ifdef HAVE_HSL_MA27

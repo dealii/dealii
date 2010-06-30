@@ -371,15 +371,11 @@ print-summary:
 	@echo "dealii-feature: host=`hostname`"
 	@echo "dealii-feature: target=$(TARGET)"
 	@echo "dealii-feature: compiler=$(GXX-VERSION-DETAILED)"
-	@echo "dealii-feature: BUILDTESTFLAGS=$(BUILDTESTFLAGS)"
-	@echo "dealii-feature: BUILDTESTNOTE=$(BUILDTESTNOTE)"
 	@echo "dealii-feature: multithreading=$(enable-threads)"
 	@echo "dealii-feature: shared_libs=$(enable-shared)"
 	@echo "dealii-feature: parser=$(subst no,,$(enable-parser))"
 	@echo "dealii-feature: PETSc=$(subst ..,,$(DEAL_II_PETSC_VERSION_MAJOR).$(DEAL_II_PETSC_VERSION_MINOR).$(DEAL_II_PETSC_VERSION_SUBMINOR))"
-	@echo "dealii-feature: SLEPc=$(subst no,,$(USE_CONTRIB_SLEPC))"
 	@echo "dealii-feature: Trilinos=$(subst ..,,$(DEAL_II_TRILINOS_VERSION_MAJOR).$(DEAL_II_TRILINOS_VERSION_MINOR).$(DEAL_II_TRILINOS_VERSION_SUBMINOR))"
-	@echo "dealii-feature: MUMPS=$(subst no,,$(USE_CONTRIB_MUMPS))"
 	@echo "dealii-feature: METIS=$(subst no,,$(USE_CONTRIB_METIS))"
 	@cd $D/common/scripts ; make report_features && ./report_features
 endif
