@@ -57,6 +57,20 @@ inconvenience this causes.
 </ol>
 
 
+<a name="lac"></a>
+<h3>base</h3>
+
+<ol>
+  <li>
+  <p>
+  Fixed: deal.II release 6.3.0 did not compile with Trilinos versions 9.x and
+  10.0. This is now fixed.
+  <br>
+  (Martin Kronbichler, WB 2010/06/28)
+  </p>  
+</ol>
+
+
 <a name="deal.II"></a>
 <h3>deal.II</h3>
 
