@@ -77,6 +77,35 @@ namespace Algorithms
  * the modified step sizes (and different times if the problem is not
  * autonomous).
  *
+ * <h3>Usage of vectors in NamedData</h3>
+ *
+ * ThetaTimestepping uses NamedData for communicating vectors. With
+ * outer or inner Operator objects. It does not use itself the input
+ * vectors provided, but forwards them to the explicit and implicit
+ * operators.
+ *
+ * The explicit Operator #op_explicit receives in its input in first
+ * place the vector <tt>"Previous time"</tt>, which is the solution
+ * value after the previous timestep. It is followed by all vectors
+ * provided to ThetaTimestepping::operator() as input
+ * argument. #op_explicit is supposed to write its result into the
+ * first position of its output argument, labeled <tt>"Result"</tt>.
+ *
+ * The implicit Operator #op_implicit receives the result of
+ * #op_explicit in its first input vector labeled <tt>"Previous
+ * time"</tt>. It is followed by all vectors provided to
+ * ThetaTimestepping::operator() as input argument. The output of
+ * #op_implicit is directly written into the output argument given to
+ * ThetaTimestepping.
+ *
+ * <h3>Setup</h3>
+ * The use ThetaTimestepping is more complicated than for instance
+ * Newton, since the inner operators will usually need to access the
+ * TimeStepData. Thus, we have a circular dependency of information,
+ * and we include the following example for its use. First, we define
+ * the two operators 
+ *
+ * 
  * @author Guido Kanschat, 2010
  */
   template <class VECTOR>

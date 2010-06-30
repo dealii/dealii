@@ -21,7 +21,7 @@ namespace Algorithms
 {
   template <class VECTOR>
   ThetaTimestepping<VECTOR>::ThetaTimestepping (Operator<VECTOR>& e, Operator<VECTOR>& i)
-		  : op_explicit(&e), op_implicit(&i)
+		  : vtheta(0.5), adaptive(false), op_explicit(&e), op_implicit(&i)
   {}
 
 
@@ -84,7 +84,7 @@ namespace Algorithms
 				     // The data provided to the inner
 				     // solver
     NamedData<VECTOR*> src2;
-    src2.add(p, "Previous time data");
+    src2.add(p, "Previous time");
     src2.merge(in);
 
     if (output != 0)
