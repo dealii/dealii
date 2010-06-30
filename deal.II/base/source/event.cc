@@ -60,6 +60,7 @@ namespace Algorithms
 
   namespace Events
   {
+    const Event initial = Event::assign("Initial");
     const Event bad_derivative = Event::assign("Bad Derivative");
     const Event new_time = Event::assign("New Time");
     const Event new_timestep_size = Event::assign("New Time Step Size");
