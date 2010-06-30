@@ -381,4 +381,4 @@ print-summary:
 	@echo "dealii-feature: Trilinos=$(subst ..,,$(DEAL_II_TRILINOS_VERSION_MAJOR).$(DEAL_II_TRILINOS_VERSION_MINOR).$(DEAL_II_TRILINOS_VERSION_SUBMINOR))"
 	@echo "dealii-feature: MUMPS=$(subst no,,$(USE_CONTRIB_MUMPS))"
 	@echo "dealii-feature: METIS=$(subst no,,$(USE_CONTRIB_METIS))"
-	@cd scripts ; make report_features && ./report_features
+	@cd $D/common/scripts ; make report_features && ./report_features
