@@ -365,8 +365,7 @@ endif
 
 
 
-ifeq ($(BUILDTEST),yes)
-  print-summary:
+print-summary:
 	@echo "dealii-feature: revision=`svn info .. | grep Revision | sed 's/Revision: //'`"
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
@@ -382,8 +381,4 @@ ifeq ($(BUILDTEST),yes)
 	@echo "dealii-feature: Trilinos=$(subst ..,,$(DEAL_II_TRILINOS_VERSION_MAJOR).$(DEAL_II_TRILINOS_VERSION_MINOR).$(DEAL_II_TRILINOS_VERSION_SUBMINOR))"
 	@echo "dealii-feature: MUMPS=$(subst no,,$(USE_CONTRIB_MUMPS))"
 	@echo "dealii-feature: METIS=$(subst no,,$(USE_CONTRIB_METIS))"
-	@echo "dealii-feature: UMFPACK=$(USE_CONTRIB_UMFPACK)"
-	@echo "dealii-feature: HSL=$(subst no,,$(USE_CONTRIB_METIS))"
-	@echo "dealii-feature: BLAS=@DEAL_II_USE_BLAS@"
-	@echo "dealii-feature: LAPACK=@DEAL_II_USE_BLAS@"
-endif
+	@cd scripts ; make report_features && ./report_features

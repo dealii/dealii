@@ -24,6 +24,10 @@ expand_instantiations : expand_instantiations.cc $D/common/Make.global_options
 	@echo ============================ Compiling $@
 	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
+report_features: report_features.cc $D/common/Make.global_options
+	@echo ============================ Compiling $@
+	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
+
 clean:
 	-rm -f make_dependencies
 	-rm -f make_dependencies.o
