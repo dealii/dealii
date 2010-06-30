@@ -38,7 +38,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-  <li>None so far.
+  <li>
+  <p>Fixed: Configuring with an external BOOST version did not work when
+  using shared libraries since the test ran in the wrong order with respect
+  to another configure test. This is now fixed.
+  <br>
+  (Bradley Froehle 2010/06/29)
+  </p>  
 </ol>
 
 
