@@ -45,6 +45,14 @@ inconvenience this causes.
   <br>
   (Bradley Froehle 2010/06/29)
   </p>  
+
+  <li>
+  <p>Updated: The conversion tool in <code>contrib/mesh_conversion</code> that
+  can read CUBIT output and convert it into something that is readable by
+  deal.II has been updated.
+  <br>
+  (Jean-Paul Pelteret 2010/06/28)
+  </p>  
 </ol>
 
 
