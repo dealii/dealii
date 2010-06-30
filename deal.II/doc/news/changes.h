@@ -39,6 +39,16 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: GCC version 4.0.1 had a bug that prevented it from compiling
+  release 6.3.0 because it apparently had an infinite loop allocating
+  memory when compiling <code>fe_values.cc</code> in optimized mode. This
+  had been fixed in GCC 4.0.2, but some versions of Mac OS X still use
+  this GCC version in their Xcode environment.
+  <br>
+  (WB 2010/06/30)
+  </p>  
+
+  <li>
   <p>Fixed: Configuring with an external BOOST version did not work when
   using shared libraries since the test ran in the wrong order with respect
   to another configure test. This is now fixed.

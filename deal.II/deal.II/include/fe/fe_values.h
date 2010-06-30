@@ -54,6 +54,58 @@ template <typename Number> class Vector;
 template <typename Number> class BlockVector;
 
 
+namespace internal
+{
+				   /**
+				    * A class whose specialization is
+				    * used to define what type the
+				    * curl of a vector valued function
+				    * corresponds to.
+				    */
+  template <int dim>
+  struct CurlType;
+
+				   /**
+				    * A class whose specialization is
+				    * used to define what type the
+				    * curl of a vector valued function
+				    * corresponds to.
+				    *
+				    * In 1d, the curl is a scalar.
+				    */
+  template <>
+  struct CurlType<1>{
+      typedef Tensor<1,1>     type;
+  };
+
+				   /**
+				    * A class whose specialization is
+				    * used to define what type the
+				    * curl of a vector valued function
+				    * corresponds to.
+				    *
+				    * In 2d, the curl is a scalar.
+				    */
+  template <>
+  struct CurlType<2>{
+      typedef Tensor<1,1>     type;
+  };
+
+				   /**
+				    * A class whose specialization is
+				    * used to define what type the
+				    * curl of a vector valued function
+				    * corresponds to.
+				    *
+				    * In 3d, the curl is a vector.
+				    */
+  template <>
+  struct CurlType<3>{
+      typedef Tensor<1,3>     type;
+  };
+}
+
+
 /**
  * A namespace in which we declare "extractors", i.e. classes that when used
  * as subscripts in operator[] expressions on FEValues, FEFaceValues, and
@@ -510,7 +562,7 @@ namespace FEValuesViews
 					* <code>spacedim=3</code> it is a
 					* <code>Tensor@<1, dim@></code>.
 					*/
-      typedef Tensor<1, (spacedim == 3)? 3 : 1>     curl_type;
+      typedef typename internal::CurlType<spacedim>::type   curl_type;
 
 				       /**
 					* A typedef for the type of second
