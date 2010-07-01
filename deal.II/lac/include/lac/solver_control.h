@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,6 +56,8 @@ class ParameterHandler;
  *       could not be achieved or at least was not achieved within the given
  *       maximal number of iterations.
  * </ul>
+ *
+ * @author Guido Kanschat
  */
 class SolverControl : public Subscriptor
 {
@@ -452,7 +454,9 @@ class SolverControl : public Subscriptor
  * of iterations is 20, the reduction factor is 1% und the tolerance
  * is 0.1%. The initial residual is 2.5. The process will break if 20
  * iteration are comleted or the new residual is less then 2.5*1% or
- * if it is less then 0.1%. 
+ * if it is less then 0.1%.
+ *
+ * @author Guido Kanschat
  */
 class ReductionControl : public SolverControl
 {
@@ -469,6 +473,15 @@ class ReductionControl : public SolverControl
 		      const bool     log_history = false,
 		      const bool     log_result  = true);
 
+				     /**
+				      * Assign a SolverControl object
+				      * to ReductionControl. The
+				      * result of the assignment will
+				      * emulate SolverControl by
+				      * setting #reduce to zero.
+				      */
+    ReductionControl& operator= (const SolverControl& c);
+    
 				     /**
 				      * Virtual destructor is needed
 				      * as there are virtual functions
@@ -611,6 +624,15 @@ SolverControl::log_result () const
   return m_log_result;
 }
 
+
+inline
+ReductionControl&
+ReductionControl::operator= (const SolverControl& c)
+{
+  SolverControl::operator=(c);
+  set_reduction(0.);
+  return *this;
+}
 
 
 inline double

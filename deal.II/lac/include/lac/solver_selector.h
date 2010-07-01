@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -98,9 +98,19 @@ class SolverSelector : public Subscriptor
   public:
 
 				     /**
+				      * Constructor, filling in
+				      * default values
+				      */
+    SolverSelector ();
+  
+				     /**
+				      * @deprecated Use deafult
+				      * constructor and select.
+				      *
 				      * Constructor. Use the arguments
 				      * to initialize actual solver
-				      * objects.
+				      * objects. The VectorMemory
+				      * argument is ignored.
 				      */
     SolverSelector (const std::string    &solvername,
 		    SolverControl        &control,
@@ -123,6 +133,13 @@ class SolverSelector : public Subscriptor
 	       VECTOR &x,
 	       const VECTOR &b,
 	       const Preconditioner &precond) const;
+
+				     /**
+				      * Select a new solver. Note that
+				      * all solver names used in this
+				      * class are all lower case.
+				      */
+    void select(const std::string& name);
     
 				     /**
 				      * Set the additional data. For more
@@ -172,26 +189,32 @@ class SolverSelector : public Subscriptor
 		    std::string, << "Solver " << arg1 << " does not exist. Use one of "
 		    << std::endl << get_solver_names());
 
+				     /**
+				      * Stores the @p ReductionControl that
+				      * is needed in the constructor of
+				      * each @p Solver class. This
+				      * data member is public, so that
+				      * it can easily be changed from
+				      * its default values. If you
+				      * create a SolverControl or
+				      * ReductionControl object with
+				      * the values needed, you can
+				      * simply use <tt>solver.control
+				      * = my_control</tt> to set the
+				      * values here.
+				      *
+				      * This object is updated in
+				      * solve(), thus declared mutable
+				      * here.
+				      */
+    mutable ReductionControl control;
+
   protected:
 				     /**
-				      * Stores the Name of the solver.
+				      * Stores the name of the solver.
 				      */
     std::string solver_name;
     
-				     /**
-				      * Stores the @p SolverControl that
-				      * is needed in the constructor of
-				      * each @p Solver class.
-				      */
-    SmartPointer<SolverControl,SolverSelector<VECTOR> > control;
-
-				     /**
-				      * Stores the @p VectorMemory that
-				      * is needed in the constructor of
-				      * each @p Solver class.
-				      */
-    SmartPointer<VectorMemory<VECTOR>,SolverSelector<VECTOR> > vector_memory;
-
   private:
 				     /**
 				      * Stores the additional data.
@@ -224,18 +247,31 @@ class SolverSelector : public Subscriptor
 
 
 template <class VECTOR>
+SolverSelector<VECTOR>::SolverSelector()
+{}
+
+
+template <class VECTOR>
 SolverSelector<VECTOR>::SolverSelector(const std::string    &solver_name,
 				       SolverControl        &control,
-				       VectorMemory<VECTOR> &vector_memory) :
+				       VectorMemory<VECTOR> &) :
 		solver_name(solver_name),
-		control(&control),
-		vector_memory(&vector_memory)
+		control(control)
 {}
 
 
 template <class VECTOR>
 SolverSelector<VECTOR>::~SolverSelector()
 {}
+
+
+template <class VECTOR>
+void
+SolverSelector<VECTOR>::select(const std::string& name)
+{
+  solver_name = name;
+}
+
 
 
 template <class VECTOR>
@@ -246,33 +282,35 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
 			      const VECTOR &b,
 			      const Preconditioner &precond) const
 {
+  GrowingVectorMemory<VECTOR> vector_memory;
+  
   if (solver_name=="richardson")
     {
-      SolverRichardson<VECTOR> solver(*control,*vector_memory,
+      SolverRichardson<VECTOR> solver(control,vector_memory,
 				      richardson_data);
       solver.solve(A,x,b,precond);
     }       
   else if (solver_name=="cg")
     {
-      SolverCG<VECTOR> solver(*control,*vector_memory,
+      SolverCG<VECTOR> solver(control,vector_memory,
 			      cg_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="bicgstab")
     {
-      SolverBicgstab<VECTOR> solver(*control,*vector_memory,
+      SolverBicgstab<VECTOR> solver(control,vector_memory,
 				    bicgstab_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="gmres")
     {
-      SolverGMRES<VECTOR> solver(*control,*vector_memory,
+      SolverGMRES<VECTOR> solver(control,vector_memory,
 				 gmres_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="fgmres")
     {
-      SolverFGMRES<VECTOR> solver(*control,*vector_memory,
+      SolverFGMRES<VECTOR> solver(control,vector_memory,
 				  fgmres_data);
       solver.solve(A,x,b,precond);
     }
