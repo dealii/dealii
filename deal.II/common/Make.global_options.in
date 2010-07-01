@@ -375,7 +375,6 @@ print-summary:
 	@echo "dealii-feature: shared_libs=$(enable-shared)"
 	@echo "dealii-feature: parser=$(subst no,,$(enable-parser))"
 	@echo "dealii-feature: PETSc=$(subst ..,,$(DEAL_II_PETSC_VERSION_MAJOR).$(DEAL_II_PETSC_VERSION_MINOR).$(DEAL_II_PETSC_VERSION_SUBMINOR))"
-	@echo "dealii-feature: Trilinos=$(subst ..,,$(DEAL_II_TRILINOS_VERSION_MAJOR).$(DEAL_II_TRILINOS_VERSION_MINOR).$(DEAL_II_TRILINOS_VERSION_SUBMINOR))"
 	@echo "dealii-feature: METIS=$(subst no,,$(USE_CONTRIB_METIS))"
 	@cd $D/common/scripts ; make report_features && ./report_features
 endif

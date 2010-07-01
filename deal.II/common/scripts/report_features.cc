@@ -25,6 +25,10 @@ extern "C" {
 #include <mpi.h>
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+#  include <Trilinos_version.h>
+#endif
+
 #ifdef DEAL_II_USE_MUMPS
 #  include <base/utilities.h>
 #  include <dmumps_c.h>
@@ -62,6 +66,19 @@ int main()
   std::cout << "dealii-feature: MPI="
 	    << MPI__VERSION << '.'
 	    << MPI_SUBVERSION << std::endl;  
+#  endif
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+#  ifdef TRILINOS_VERSION_STRING
+  std::cout << "dealii-feature: Trilinos=" << TRILINOS_VERSION_STRING << std::endl;
+#  else
+  const unsigned int trilinos_subminor = TRILINOS_MAJOR_MINOR_VERSION % 100;
+  const unsigned int trilinos_minor = (TRILINOS_MAJOR_MINOR_VERSION/100) % 100;
+  std::cout << "dealii-feature: Trilinos="
+	    << TRILINOS_MAJOR_VERSION << '.'
+	    << trilinos_minor << '.'
+	    << trilinos_subminor << std::endl;
 #  endif
 #endif
 
