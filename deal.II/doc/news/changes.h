@@ -39,6 +39,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Updated: The version of <a href="http://www.boost.org/">boost</a>
+   included in the <code>contrib/</code> directory has been updated
+   to 1.43.0.
+  <br>
+  (WB 2010/06/30)
+  </p>  
+
+  <li>
   <p>Fixed: GCC version 4.0.1 had a bug that prevented it from compiling
   release 6.3.0 because it apparently had an infinite loop allocating
   memory when compiling <code>fe_values.cc</code> in optimized mode. This
