@@ -39,12 +39,22 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: Linking with more than one of the deal.II 1d, 2d, or 3d libraries
+  when using static libraries did not work. This is now fixed. However, due to
+  GCC bug <a href="http://gcc.gnu.org/bugzilla/show_bug.cgi?id=10591"
+  target="_top">10591</a>, GCC versions prior to and including 4.1.x will
+  still not work.
+  <br>
+  (WB 2010/07/01)
+  </p>
+
+  <li>
   <p>Updated: The version of <a href="http://www.boost.org/">boost</a>
    included in the <code>contrib/</code> directory has been updated
    to 1.43.0.
   <br>
   (WB 2010/06/30)
-  </p>  
+  </p>
 
   <li>
   <p>Fixed: GCC version 4.0.1 had a bug that prevented it from compiling
@@ -54,7 +64,7 @@ inconvenience this causes.
   this GCC version in their Xcode environment.
   <br>
   (WB 2010/06/30)
-  </p>  
+  </p>
 
   <li>
   <p>Fixed: Configuring with an external BOOST version did not work when
@@ -62,7 +72,7 @@ inconvenience this causes.
   to another configure test. This is now fixed.
   <br>
   (Bradley Froehle 2010/06/29)
-  </p>  
+  </p>
 
   <li>
   <p>Updated: The conversion tool in <code>contrib/mesh_conversion</code> that
@@ -70,7 +80,7 @@ inconvenience this causes.
   deal.II has been updated.
   <br>
   (Jean-Paul Pelteret 2010/06/28)
-  </p>  
+  </p>
 </ol>
 
 
@@ -93,7 +103,7 @@ inconvenience this causes.
   10.0. This is now fixed.
   <br>
   (Martin Kronbichler, WB 2010/06/28)
-  </p>  
+  </p>
 </ol>
 
 
@@ -115,7 +125,7 @@ inconvenience this causes.
   This is now fixed.
   <br>
   (WB 2010/06/28)
-  </p>  
+  </p>
 
   <li>
   <p>
@@ -125,7 +135,7 @@ inconvenience this causes.
   fixed.
   <br>
   (WB 2010/06/28)
-  </p>  
+  </p>
 </ol>
 
 

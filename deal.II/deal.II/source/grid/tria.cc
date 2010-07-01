@@ -11458,6 +11458,7 @@ namespace internal
 {
   namespace Triangulation
   {
+    inline
     unsigned int
     n_cells (const internal::Triangulation::NumberCache<1> &c)
     {
@@ -11465,6 +11466,7 @@ namespace internal
     }
 
 
+    inline
     unsigned int
     n_active_cells (const internal::Triangulation::NumberCache<1> &c)
     {
@@ -11472,6 +11474,7 @@ namespace internal
     }
 
 
+    inline
     unsigned int
     n_cells (const internal::Triangulation::NumberCache<2> &c)
     {
@@ -11479,6 +11482,7 @@ namespace internal
     }
 
 
+    inline
     unsigned int
     n_active_cells (const internal::Triangulation::NumberCache<2> &c)
     {
@@ -11486,6 +11490,7 @@ namespace internal
     }
 
 
+    inline
     unsigned int
     n_cells (const internal::Triangulation::NumberCache<3> &c)
     {
@@ -11493,6 +11498,7 @@ namespace internal
     }
 
 
+    inline
     unsigned int
     n_active_cells (const internal::Triangulation::NumberCache<3> &c)
     {

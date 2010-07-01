@@ -14,6 +14,7 @@
 #define __deal2__block_info_h
 
 #include <base/subscriptor.h>
+#include <base/memory_consumption.h>
 #include <lac/block_indices.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -97,7 +98,7 @@ class BlockInfo : public Subscriptor
 				      */
     template <int dim, int spacedim>
     void initialize(const DoFHandler<dim, spacedim>&);
-    
+
 				     /**
 				      * @brief Fill the object with values
 				      * describing level block
@@ -112,7 +113,7 @@ class BlockInfo : public Subscriptor
 				      */
     template <int dim, int spacedim>
     void initialize(const MGDoFHandler<dim, spacedim>&, bool levels_only = false);
-    
+
 				     /**
 				      * @brief Initialize block structure
 				      * on cells and compute
@@ -121,20 +122,20 @@ class BlockInfo : public Subscriptor
 				      */
     template <int dim, int spacedim>
     void initialize_local(const DoFHandler<dim, spacedim>&);
-    
+
 				     /**
 				      * Access the BlockIndices
 				      * structure of the global
 				      * system.
 				      */
     const BlockIndices& global() const;
-    
+
 				     /**
 				      * Access BlockIndices for the
 				      * local system on a cell.
 				      */
     const BlockIndices& local() const;
-    
+
 				     /**
 				      * Access the BlockIndices
 				      * structure of a level in the
@@ -164,13 +165,13 @@ class BlockInfo : public Subscriptor
 				      * The number of base elements.
 				      */
     unsigned int n_base_elements() const;
-    
+
 				     /**
 				      * Return the base element of
 				      * this index.
 				      */
     unsigned int base_element(unsigned int i) const;
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -188,19 +189,19 @@ class BlockInfo : public Subscriptor
 				      * @brief The multilevel block structure.
 				      */
     std::vector<BlockIndices> levels;
-    
+
 				     /**
 				      * @brief The block structure
 				      * of the cell systems.
 				      */
     BlockIndices bi_local;
-    
+
 				     /**
 				      * The base element associated
 				      * with each block.
 				      */
     std::vector<unsigned int> base_elements;
-    
+
 				     /**
 				      * A vector containing the
 				      * renumbering from the
@@ -267,6 +268,20 @@ BlockInfo::n_base_elements() const
   return base_elements.size();
 }
 
+
+
+inline
+unsigned int
+BlockInfo::memory_consumption () const
+{
+  unsigned int mem = (MemoryConsumption::memory_consumption (bi_global) +
+		      MemoryConsumption::memory_consumption (levels) +
+		      MemoryConsumption::memory_consumption (bi_local) +
+		      MemoryConsumption::memory_consumption (base_elements)
+  );
+
+  return mem;
+}
 
 
 DEAL_II_NAMESPACE_CLOSE
