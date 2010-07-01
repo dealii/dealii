@@ -39,6 +39,15 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: Some older 3.x versions of GCC crashed compiling the functions in
+  namespace DoFRenumbering::boost. There is now a configuration time test
+  that checks that the compiler accepts the constructs in question. If the
+  compiler does not, then these functions are disabled.
+  <br>
+  (WB 2010/07/01)
+  </p>
+
+  <li>
   <p>Fixed: Linking with more than one of the deal.II 1d, 2d, or 3d libraries
   when using static libraries did not work. This is now fixed. However, due to
   GCC bug <a href="http://gcc.gnu.org/bugzilla/show_bug.cgi?id=10591"

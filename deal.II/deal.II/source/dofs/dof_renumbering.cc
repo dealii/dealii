@@ -122,6 +122,7 @@ namespace DoFRenumbering
 
   namespace boost
   {
+#ifndef DEAL_II_BOOST_GRAPH_COMPILER_BUG
     namespace types
     {
       using namespace ::boost;
@@ -168,9 +169,9 @@ namespace DoFRenumbering
 	graph_degree = get(::boost::vertex_degree, graph);
 	for (::boost::tie(ui, ui_end) = vertices(graph); ui != ui_end; ++ui)
 	  graph_degree[*ui] = degree(*ui, graph);
-
-      }
+       }
     }
+#endif
 
 
     template <class DH>
@@ -198,6 +199,16 @@ namespace DoFRenumbering
 			   const bool       reversed_numbering,
 			   const bool       use_constraints)
     {
+#ifdef DEAL_II_BOOST_GRAPH_COMPILER_BUG
+      (void)new_dof_indices;
+      (void)dof_handler;
+      (void)reversed_numbering;
+      (void)use_constraints;
+      Assert (false,
+	      ExcMessage ("Due to a bug in your compiler, this function triggers an internal "
+			  "compiler error and has been disabled. If you need to use the "
+			  "function, you need to upgrade to a newer version of the compiler."));
+#else
       types::Graph
 	graph(dof_handler.n_dofs());
       types::property_map<types::Graph,types::vertex_degree_t>::type
@@ -226,6 +237,7 @@ namespace DoFRenumbering
       Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
 			 DH::invalid_dof_index) == new_dof_indices.end(),
 	      ExcInternalError());
+#endif
     }
 
 
@@ -255,6 +267,16 @@ namespace DoFRenumbering
 			   const bool       reversed_numbering,
 			   const bool       use_constraints)
     {
+#ifdef DEAL_II_BOOST_GRAPH_COMPILER_BUG
+      (void)new_dof_indices;
+      (void)dof_handler;
+      (void)reversed_numbering;
+      (void)use_constraints;
+      Assert (false,
+	      ExcMessage ("Due to a bug in your compiler, this function triggers an internal "
+			  "compiler error and has been disabled. If you need to use the "
+			  "function, you need to upgrade to a newer version of the compiler."));
+#else
       types::Graph
 	graph(dof_handler.n_dofs());
       types::property_map<types::Graph,types::vertex_degree_t>::type
@@ -279,6 +301,7 @@ namespace DoFRenumbering
       Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
 			 DH::invalid_dof_index) == new_dof_indices.end(),
 	      ExcInternalError());
+#endif
     }
 
 

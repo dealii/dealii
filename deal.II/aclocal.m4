@@ -4290,6 +4290,54 @@ void bug_function (number test)
 
 
 dnl -------------------------------------------------------------
+dnl Some older versions of GCC (3.x series) have trouble with a
+dnl certain part of the BOOST GRAPH library, yielding errors of
+dnl the kind "sorry, unimplemented: use of `enumeral_type' in
+dnl template type unification".
+dnl
+dnl Usage: DEAL_II_CHECK_BOOST_GRAPH_COMPILER_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_BOOST_GRAPH_COMPILER_BUG, dnl
+[
+  if test "x$GXX" = "xyes" ; then
+    AC_MSG_CHECKING(for boost::graph compiler internal error)
+    AC_LANG(C++)
+    CXXFLAGS="$CXXFLAGSO -I./contrib/boost/include"
+    AC_TRY_COMPILE(
+      [
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/properties.hpp>
+
+namespace types
+{
+  using namespace boost;
+
+  typedef adjacency_list<vecS, vecS, undirectedS,
+			 property<vertex_color_t, default_color_type,
+				  property<vertex_degree_t,int> > > Graph;
+}
+
+void create_graph (types::Graph)
+{}
+      ],
+      [
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ],
+      [
+        AC_MSG_RESULT(yes)
+	AC_DEFINE(DEAL_II_BOOST_GRAPH_COMPILER_BUG, 1,
+	          [Defined if the compiler gets an internal error compiling
+		   some code that involves boost::graph])
+      ])
+  fi
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Check for boost option and find pre-installed boost
 dnl -------------------------------------------------------------
 
