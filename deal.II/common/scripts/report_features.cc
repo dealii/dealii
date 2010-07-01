@@ -21,6 +21,10 @@ extern "C" {
 }
 #endif
 
+#if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
+#include <mpi.h>
+#endif
+
 #ifdef DEAL_II_USE_MUMPS
 #  include <base/utilities.h>
 #  include <dmumps_c.h>
@@ -29,6 +33,7 @@ extern "C" {
 #ifdef DEAL_II_USE_SLEPC
 #  include <slepcversion.h>
 #endif
+
 
 int main()
 {
@@ -45,6 +50,19 @@ int main()
 	    << UMFPACK_MAIN_VERSION << '.'
 	    << UMFPACK_SUB_VERSION << '.'
 	    << UMFPACK_SUBSUB_VERSION << std::endl;
+#endif
+
+#if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
+#  ifdef OMPI_MAJOR_VERSION
+  std::cout << "dealii-feature: MPI=OpenMPI<br>"
+	    << OMPI_MAJOR_VERSION << '.'
+	    << OMPI_MINOR_VERSION << '.'
+	    << OMPI_RELEASE_VERSION << std::endl;
+#  else
+  std::cout << "dealii-feature: MPI="
+	    << MPI__VERSION << '.'
+	    << MPI_SUBVERSION << std::endl;  
+#  endif
 #endif
 
 #ifdef DEAL_II_USE_MUMPS
