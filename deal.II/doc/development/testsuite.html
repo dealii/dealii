@@ -45,9 +45,9 @@
     <pre>
 
     cd dealtest
-    make clean
+    make distclean
     svn update
-    make build-test BUILDTESTFLAGS='-with-umfpack -with-lapack'
+    make build-test BUILDTESTFLAGS='--with-umfpack --with-lapack'
     mail build-tests@dealii.org < build-test-log
 
     </pre>
