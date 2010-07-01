@@ -102,6 +102,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>New: The multilevel matrices for continuous elements
+  can be built with the MeshWorker now.
+  <br>
+  (Bärbel Janssen 2010/07/01)
+  </p></li>
+
+  <li>
   <p>
   Fixed: On some systems and compilers, the library could not be compiled
   because of a duplicate symbol in <code>MeshWorker::LocalResults</code>.
