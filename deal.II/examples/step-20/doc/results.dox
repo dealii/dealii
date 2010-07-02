@@ -13,7 +13,7 @@ examples/step-20> make run
 Number of active cells: 64
 Total number of cells: 85
 Number of degrees of freedom: 208 (144+64)
-10 CG Schur complement iterations to obtain convergence.
+15 CG Schur complement iterations to obtain convergence.
 Errors: ||e_p||_L2 = 0.178055,   ||e_u||_L2 = 0.0433435
 @endcode
 

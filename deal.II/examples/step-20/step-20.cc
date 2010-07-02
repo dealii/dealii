@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors */
+/*    Copyright (C) 2005, 2006, 2007, 2008, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -28,6 +28,13 @@
 #include <lac/block_sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
+				 // For our Schur complement solver,
+				 // we need two new objects. One is a
+				 // matrix object which acts as the
+				 // inverse of a matrix by calling an
+				 // iterative solver.
+#include <lac/iterative_inverse.h>
+
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
@@ -719,121 +726,6 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // rather only comment on
                                  // implementational aspects.
 
-                                 // @sect4{The <code>InverseMatrix</code> class template}
-
-                                 // The first component of our linear
-                                 // solver scheme was the creation of
-                                 // a class that acts like the inverse
-                                 // of a matrix, i.e. which has a
-                                 // <code>vmult</code> function that multiplies
-                                 // a vector with an inverse matrix by
-                                 // solving a linear system.
-                                 //
-                                 // While most of the code below
-                                 // should be obvious given the
-                                 // purpose of this class, two
-                                 // comments are in order. First, the
-                                 // class is derived from the
-                                 // <code>Subscriptor</code> class so that we
-                                 // can use the <code>SmartPointer</code> class
-                                 // with inverse matrix objects. The
-                                 // use of the <code>Subscriptor</code> class
-                                 // has been explained before in
-                                 // step-7 and step-20. The present
-                                 // class also sits on the receiving
-                                 // end of this
-                                 // <code>Subscriptor</code>/<code>SmartPointer</code>
-                                 // pair: it holds its pointer to the
-                                 // matrix it is supposed to be the
-                                 // inverse of through a
-                                 // <code>SmartPointer</code> to make sure that
-                                 // this matrix is not destroyed while
-                                 // we still have a pointer to it.
-                                 //
-                                 // Secondly, we realize that we will
-                                 // probably perform many
-                                 // matrix-vector products with
-                                 // inverse matrix objects. Now, every
-                                 // time we do so, we have to call the
-                                 // CG solver to solve a linear
-                                 // system. To work, the CG solver
-                                 // needs to allocate four temporary
-                                 // vectors that it will release again
-                                 // at the end of its operation. What
-                                 // this means is that through
-                                 // repeated calls to the <code>vmult</code>
-                                 // function of this class we have to
-                                 // allocate and release vectors over
-                                 // and over again.
-                                 //
-                                 // The natural question is then:
-                                 // Wouldn't it be nice if we could
-                                 // avoid this, and allocate vectors
-                                 // only once? In fact, deal.II offers
-                                 // a way to do exactly this and we
-                                 // don't even have to do anything
-                                 // special about it (so this comment
-                                 // is purely educational). What all
-                                 // the linear solvers do is not to
-                                 // allocate memory using
-                                 // <code>new</code> and
-                                 // <code>delete</code>, but rather to
-                                 // allocate them from an object
-                                 // derived from the
-                                 // <code>VectorMemory</code> class
-                                 // (see the module on Vector memory
-                                 // management in the API reference
-                                 // manual). By default, the linear
-                                 // solvers use a derived class
-                                 // <code>GrowingVectorMemory</code>
-                                 // that, every time a vector is
-                                 // requested, allocates one from a
-                                 // pool that is shared by all
-                                 // <code>GrowingVectorMemory</code>
-                                 // objects.
-template <class Matrix>
-class InverseMatrix : public Subscriptor
-{
-  public:
-    InverseMatrix (const Matrix &m);
-
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
-
-  private:
-    const SmartPointer<const Matrix> matrix;
-};
-
-
-template <class Matrix>
-InverseMatrix<Matrix>::InverseMatrix (const Matrix &m)
-                :
-                matrix (&m)
-{}
-
-
-                                 // Here now is the function that
-                                 // implements multiplication with the
-                                 // inverse matrix by calling a CG
-                                 // solver. Note that we set the solution
-                                 // vector to zero before starting the
-                                 // solve, since we do not want to use
-                                 // the possible previous and unknown
-                                 // content of that variable as
-                                 // starting vector for the linear
-                                 // solve:
-template <class Matrix>
-void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
-                                   const Vector<double> &src) const
-{
-  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
-  SolverCG<>    cg (solver_control);
-
-  dst = 0;
-  
-  cg.solve (*matrix, dst, src, PreconditionIdentity());        
-}
-
 
                                  // @sect4{The <code>SchurComplement</code> class template}
 
@@ -882,21 +774,21 @@ class SchurComplement : public Subscriptor
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
-                     const InverseMatrix<SparseMatrix<double> > &Minv);
+                     const IterativeInverse<Vector<double> > &Minv);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double> > > m_inverse;
+    const SmartPointer<const IterativeInverse<Vector<double> > > m_inverse;
     
     mutable Vector<double> tmp1, tmp2;
 };
 
 
 SchurComplement::SchurComplement (const BlockSparseMatrix<double> &A,
-                                  const InverseMatrix<SparseMatrix<double> > &Minv)
+                                  const IterativeInverse<Vector<double> > &Minv)
                 :
                 system_matrix (&A),
                 m_inverse (&Minv),
@@ -920,7 +812,7 @@ void SchurComplement::vmult (Vector<double>       &dst,
                                  // and preconditioner system is the
                                  // class that approximates the Schur
                                  // complement so we can form a
-                                 // <code>InverseMatrix@<ApproximateSchurComplement@></code>
+                                 // an InverseIterate
                                  // object that approximates the
                                  // inverse of the Schur
                                  // complement. It follows the same
@@ -932,6 +824,12 @@ void SchurComplement::vmult (Vector<double>       &dst,
                                  // step. Consequently, the class also
                                  // does not have to store a pointer
                                  // to an inverse mass matrix object.
+				 //
+				 // Since InverseIterate follows the
+				 // standard convention for matrices,
+				 // we need to provide a
+				 // <tt>Tvmult</tt> function here as
+				 // well.
 class ApproximateSchurComplement : public Subscriptor
 {
   public:
@@ -939,6 +837,8 @@ class ApproximateSchurComplement : public Subscriptor
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
+    void Tvmult (Vector<double>       &dst,
+		 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
@@ -964,6 +864,15 @@ void ApproximateSchurComplement::vmult (Vector<double>       &dst,
 }
 
 
+void ApproximateSchurComplement::Tvmult (Vector<double>       &dst,
+					 const Vector<double> &src) const
+{
+  system_matrix->block(1,0).Tvmult (dst, tmp2);
+  system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
+  system_matrix->block(0,1).Tvmult (tmp1, src);
+}
+
+
 
                                  // @sect4{MixedLaplace::solve}
 
@@ -985,8 +894,14 @@ void ApproximateSchurComplement::vmult (Vector<double>       &dst,
 template <int dim>
 void MixedLaplaceProblem<dim>::solve () 
 {
-  const InverseMatrix<SparseMatrix<double> >
-    m_inverse (system_matrix.block(0,0));
+  PreconditionIdentity identity;
+  IterativeInverse<Vector<double> >
+    m_inverse;
+  m_inverse.initialize(system_matrix.block(0,0), identity);
+  m_inverse.solver.select("cg");
+  ReductionControl inner_control(1000, 0., 1.e-13);
+  m_inverse.solver.control = inner_control;
+  
   Vector<double> tmp (solution.block(0).size());
 
                                    // Now on to the first
@@ -1016,8 +931,11 @@ void MixedLaplaceProblem<dim>::solve ()
     ApproximateSchurComplement
       approximate_schur_complement (system_matrix);
       
-    InverseMatrix<ApproximateSchurComplement>
-      preconditioner (approximate_schur_complement);
+    IterativeInverse<Vector<double> >
+      preconditioner;
+    preconditioner.initialize(approximate_schur_complement, identity);
+    preconditioner.solver.select("cg");
+    preconditioner.solver.control = inner_control;
 
     
     SolverControl solver_control (solution.block(1).size(),

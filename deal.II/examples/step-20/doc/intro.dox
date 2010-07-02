@@ -397,46 +397,7 @@ matrix-vector products with it. We can do so in steps: to compute $Sv$, we
   positive definite and symmetric mass matrix $M$;
  <li> form $z=By$ to obtain $Sv=z$.
 </ol>
-We will implement a class that does that in the program. Before showing its
-code, let us first note that we need to multiply with $M^{-1}$ in several
-places here: in multiplying with the Schur complement $S$, forming the right
-hand side of the first equation, and solving in the second equation. From a
-coding viewpoint, it is therefore appropriate to relegate such a recurring
-operation to a class of its own. We call it <code>InverseMatrix</code>. As far as
-linear solvers are concerned, this class will have all operations that solvers
-need, which in fact includes only the ability to perform matrix-vector
-products; we form them by using a CG solve (this of course requires that the
-matrix passed to this class satisfies the requirements of the CG
-solvers). Here are the relevant parts of the code that implements this:
-
-@code
-class InverseMatrix
-{
-  public:
-    InverseMatrix (const SparseMatrix<double> &m);
-
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
-
-  private:
-    const SmartPointer<const SparseMatrix<double> > matrix;
-    // ...
-};
-
-
-void InverseMatrix::vmult (Vector<double>       &dst,
-                           const Vector<double> &src) const
-{
-  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
-  SolverCG<>    cg (solver_control, vector_memory);
-
-  cg.solve (*matrix, dst, src, PreconditionIdentity());        
-}
-@endcode
-
-Once created, objects of this class can act as matrices: they perform
-matrix-vector multiplications. How this is actually done is irrelevant to the
-outside world.
+This is accomplished by using the class IterativeInverse.
 
 Using this class, we can then write a class that implements the Schur
 complement in much the same way: to act as a matrix, it only needs to offer a
