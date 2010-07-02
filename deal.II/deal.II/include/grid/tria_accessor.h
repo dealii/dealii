@@ -1119,6 +1119,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				     /**
 				      * Set the user pointer
 				      * to @p p.
+				      *
+				      * @note User pointers and user
+				      * indices are mutually
+				      * exclusive. Therefore, you can
+				      * only use one of them, unless
+				      * you call
+				      * Triangulation::clear_user_data()
+				      * in between.
 				      */
     void set_user_pointer (void *p) const;
 
@@ -1138,6 +1146,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * style cast operator to
 				      * maintain a minimum of
 				      * typesafety, e.g.
+				      *
+				      * @note User pointers and user
+				      * indices are mutually
+				      * exclusive. Therefore, you can
+				      * only use one of them, unless
+				      * you call
+				      * Triangulation::clear_user_data()
+				      * in between.
 				      * <tt>A *a=static_cast<A*>(cell->user_pointer());</tt>.
 				      */
     void * user_pointer () const;
@@ -1168,6 +1184,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * recursively set the user
 				      * pointer of all finer levels of
 				      * the triangulation.
+				      *
+				      * @note User pointers and user
+				      * indices are mutually
+				      * exclusive. Therefore, you can
+				      * only use one of them, unless
+				      * you call
+				      * Triangulation::clear_user_data()
+				      * in between.
 				      */
     void recursively_set_user_pointer (void *p) const;
 
@@ -1184,6 +1208,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				     /**
 				      * Set the user index
 				      * to @p p.
+				      *
+				      * @note User pointers and user
+				      * indices are mutually
+				      * exclusive. Therefore, you can
+				      * only use one of them, unless
+				      * you call
+				      * Triangulation::clear_user_data()
+				      * in between.
 				      */
     void set_user_index (const unsigned int p) const;
 
@@ -1195,6 +1227,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				     /**
 				      * Access the value of the user
 				      * index.
+				      *
+				      * @note User pointers and user
+				      * indices are mutually
+				      * exclusive. Therefore, you can
+				      * only use one of them, unless
+				      * you call
+				      * Triangulation::clear_user_data()
+				      * in between.
 				      */
     unsigned int user_index () const;
 
@@ -1215,6 +1255,14 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * function to recursively set
 				      * the user index of all finer
 				      * levels of the triangulation.
+				      *
+				      * @note User pointers and user
+				      * indices are mutually
+				      * exclusive. Therefore, you can
+				      * only use one of them, unless
+				      * you call
+				      * Triangulation::clear_user_data()
+				      * in between.
 				      */
     void recursively_set_user_index (const unsigned int p) const;
 

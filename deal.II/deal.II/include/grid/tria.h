@@ -1012,7 +1012,7 @@ namespace internal
  *
  *   <h3>User flags and data</h3>
  *
- *   A triangulation offers one bit per line, quad, etc for user data.
+ *   A triangulation offers one bit per line, quad, etc for user flags.
  *   This field can be
  *   accessed as all other data using iterators. Normally, this user flag is
  *   used if an algorithm walks over all cells and needs information whether
@@ -1066,6 +1066,11 @@ namespace internal
  *   The usual warning about the missing type safety of @p void pointers are
  *   obviously in place here; responsibility for correctness of types etc
  *   lies entirely with the user of the pointer.
+ *
+ *   @note User pointers and user indices are stored in the same
+ *   place. In order to avoid unwanted conversions, Triangulation
+ *   checks which one of them is in use and does not allow access to
+ *   the other one, until clear_user_data() has been called.
  *
  *   Just like the user flags, this field is not available for vertices,
  *   which does no harm since the vertices have a unique and continuous number
