@@ -710,6 +710,9 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
 
 
 /**
+ * @deprecated This class has been superseded by IterativeInverse,
+ * which is more flexible and easier to use.
+ *
  * Preconditioner using an iterative solver.  This preconditioner uses
  * a fully initialized LAC iterative solver for the approximate
  * inverse of the matrix. Naturally, this solver needs another
