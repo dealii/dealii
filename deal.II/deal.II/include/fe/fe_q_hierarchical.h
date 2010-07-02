@@ -322,6 +322,36 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+    
+				     /**
+				      * Return the matrix interpolating from a face of one
+				      * element to the face of the neighboring element. The
+				      * size of the matrix is then <tt>source.dofs_per_face</tt>
+				      * times <tt>this->dofs_per_face</tt>.
+				      *
+				      * Derived elements will have to implement this function.
+				      * They may only provide interpolation matrices for certain
+				      * source finite elements, for example those from the same
+				      * family. If they don't implement interpolation from a given
+				      * element, then they must throw an exception of type
+				      * <tt>FiniteElement<dim>::ExcInterpolationNotImplemented</tt>.
+				      */
+    virtual void get_face_interpolation_matrix (const FiniteElement<dim>& source, FullMatrix<double>& matrix) const;
+
+				     /**
+				      * Return the matrix interpolating from a face of one element
+				      * to the subface of the neighboring element. The size of
+				      * the matrix is then <tt>source.dofs_per_face</tt> times
+				      * <tt>this->dofs_per_face</tt>.
+				      *
+				      * Derived elements will have to implement this function.
+				      * They may only provide interpolation matrices for certain
+				      * source finite elements, for example those from the same
+				      * family. If they don't implement interpolation from a given
+				      * element, then they must throw an exception of type
+				      * <tt>ExcInterpolationNotImplemented</tt>.
+				      */
+    virtual void get_subface_interpolation_matrix (const FiniteElement<dim>& source, const unsigned int subface, FullMatrix<double>& matrix) const;
 
 				     /**
 				      * Determine an estimate for the
