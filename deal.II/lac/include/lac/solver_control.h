@@ -474,6 +474,15 @@ class ReductionControl : public SolverControl
 		      const bool     log_result  = true);
 
 				     /**
+				      * Initialize with a
+				      * SolverControl object. The
+				      * result will emulate
+				      * SolverControl by setting
+				      * #reduce to zero.
+				      */
+    ReductionControl(const SolverControl& c);
+    
+				     /**
 				      * Assign a SolverControl object
 				      * to ReductionControl. The
 				      * result of the assignment will
@@ -622,16 +631,6 @@ inline bool
 SolverControl::log_result () const
 {
   return m_log_result;
-}
-
-
-inline
-ReductionControl&
-ReductionControl::operator= (const SolverControl& c)
-{
-  SolverControl::operator=(c);
-  set_reduction(0.);
-  return *this;
 }
 
 

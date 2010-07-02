@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -264,6 +264,23 @@ ReductionControl::ReductionControl(const unsigned int n,
 		SolverControl (n, tol, m_log_history, m_log_result),
 		reduce(red)
 {}
+
+
+ReductionControl::ReductionControl (const SolverControl& c)
+		:
+		SolverControl(c)
+{
+  set_reduction(0.);
+}
+
+
+ReductionControl&
+ReductionControl::operator= (const SolverControl& c)
+{
+  SolverControl::operator=(c);
+  set_reduction(0.);
+  return *this;
+}
 
 
 ReductionControl::~ReductionControl()

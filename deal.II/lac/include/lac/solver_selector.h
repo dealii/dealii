@@ -255,8 +255,8 @@ template <class VECTOR>
 SolverSelector<VECTOR>::SolverSelector(const std::string    &solver_name,
 				       SolverControl        &control,
 				       VectorMemory<VECTOR> &) :
-		solver_name(solver_name),
-		control(control)
+		control(control),
+		solver_name(solver_name)
 {}
 
 
