@@ -37,7 +37,7 @@ namespace Algorithms
   {
 /// The current time
       double time;
-/// The current step size
+/// The current step size times something
       double step;
   };
   
@@ -244,7 +244,7 @@ namespace Algorithms
 					* <i>c</i> is the time step
 					* size in explicit_data().
 					*/
-      SmartPointer<Operator<VECTOR> > op_explicit;
+      SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_explicit;
       
 				       /**
 					* The operator solving the
@@ -268,13 +268,13 @@ namespace Algorithms
 					* <i>c</i> is the time step
 					* size in explicit_data().
 					*/
-      SmartPointer<Operator<VECTOR> > op_implicit;
+      SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_implicit;
 
 				       /**
 					* The operator writing the
 					* output in each time step
 					*/
-      SmartPointer<OutputOperator<VECTOR> > output;
+      SmartPointer<OutputOperator<VECTOR>, ThetaTimestepping<VECTOR> > output;
   };
 
 
@@ -295,6 +295,12 @@ namespace Algorithms
     return d_implicit;
   }
   
+  template <class VECTOR>
+  inline
+  void ThetaTimestepping<VECTOR>::set_output (OutputOperator<VECTOR>& out) 
+  {
+    output = &out;
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE
