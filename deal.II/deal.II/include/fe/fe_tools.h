@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -626,6 +626,19 @@ class FETools
 				      * has its quadrature points in
 				      * the support points of the
 				      * finite element.
+				      *
+				      * Finally, this function only defines a
+				      * cell wise projection, while one
+				      * frequently wants to apply it to all
+				      * cells in a triangulation. However, if
+				      * it is applied to one cell after the
+				      * other, the results from later cells
+				      * may overwrite nodal values computed
+				      * already from previous cells if degrees
+				      * of freedom live on the interfaces
+				      * between cells. The function is
+				      * therefore most useful for
+				      * discontinuous elements.
                                       */
     template <int dim, int spacedim>
     static
