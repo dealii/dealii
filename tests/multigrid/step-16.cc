@@ -917,8 +917,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 	   << cycle
 	   << ".vtk";
 
-  std::ofstream output (filename.str().c_str());
-  data_out.write_vtk (output);
+//  std::ofstream output (filename.str().c_str());
+//  data_out.write_vtk (output);
 }
 
 
