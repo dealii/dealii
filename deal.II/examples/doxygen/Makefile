@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 1998 - 2007 by the deal.II authors
+#    Copyright (C) 1998 - 2007, 2010 by the deal.II authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -13,7 +13,8 @@
 include ../../common/Make.global_options
 
 all: product_matrix$(EXEEXT) block_matrix_array$(EXEEXT) \
-     compressed_block_sparsity_pattern$(EXEEXT)
+     compressed_block_sparsity_pattern$(EXEEXT) \
+     theta_timestepping$(EXEEXT)
 
 ######################################################################
 # Compilation of source code
@@ -39,6 +40,10 @@ product_matrix$(EXEEXT): product_matrix.g.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
 compressed_block_sparsity_pattern$(EXEEXT): compressed_block_sparsity_pattern.g.$(OBJEXT) $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
+	@echo ============================ Linking $@
+	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
+
+theta_timestepping$(EXEEXT): theta_timestepping.g.$(OBJEXT) $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
 	@echo ============================ Linking $@
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 

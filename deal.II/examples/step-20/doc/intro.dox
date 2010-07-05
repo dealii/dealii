@@ -525,43 +525,6 @@ this looks almost as expensive as solving with $S$ right away. However, note
 that in the inner iteration, we do not have to calculate $M^{-1}$, but only
 the inverse of its diagonal, which is cheap.
 
-To implement something like this, let us first generalize the
-<code>InverseMatrix</code> class so that it can work not only with
-<code>SparseMatrix</code> objects, but with any matrix type. This looks like so:
-
-@code
-template <class Matrix>
-class InverseMatrix
-{
-  public:
-    InverseMatrix (const Matrix &m);
-
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
-
-  private:
-    const SmartPointer<const Matrix> matrix;
-
-    //...
-};
-
-
-template <class Matrix>
-void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
-                                   const Vector<double> &src) const
-{
-  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
-  SolverCG<> cg (solver_control, vector_memory);
-
-  dst = 0;
-  
-  cg.solve (*matrix, dst, src, PreconditionIdentity());        
-}
-@endcode
-
-Essentially, the only change we have made is the introduction of a template
-argument that generalizes the use of <code>SparseMatrix</code>.
-
 The next step is to define a class that represents the approximate Schur
 complement. This should look very much like the Schur complement class itself,
 except that it doesn't need the object representing $M^{-1}$ any more:
@@ -662,9 +625,7 @@ chose to introduce this material here anyway to demonstrate how to work with
 block matrices and to develop solvers and preconditioners, rather than using
 black box components from the library.
 
-For those interested in looking up the corresponding library classes: the
-<code>InverseMatrix</code> is roughly equivalent to the
-<code>PreconditionLACSolver</code> class in the library. Likewise, the Schur
+For those interested in looking up the corresponding library classes: the Schur
 complement class corresponds to the <code>SchurMatrix</code> class.
 
 
