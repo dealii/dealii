@@ -133,7 +133,7 @@
     in both cases to make sure that future changes do not break what
     we have just checked in. In addition, some machines run the tests
     every night and send the results back home; this is then converted
-    into <a href="http://www.dealii.org/testsuite.html"
+    into <a href="http://www.dealii.org/~archiver/cgi-bin/regression_quick.pl"
     target="body">a webpage showing the status of our regression
     tests</a>.
     </p>
@@ -211,40 +211,49 @@
     that fails, but will want to run all tests first and then inspect
     the output to find any fails. There are make targets for this
     as well. The usual way we use the testsuite is to run all tests
-    like so
+    like this
     (the same applies as above: <code>make -jN</code> can be used on multicore
     machines): 
     <pre>
       deal.II/tests> make report | tee report
-      =======Report: base =======
-      make[1]: Entering directory `/ices/bangerth/p/deal.II/1/deal.II/tests/base'
-      2005-03-10 21:58 + anisotropic_1
-      2005-03-10 21:58 + anisotropic_2
-      2005-03-10 21:58 + auto_derivative_function
-      2005-03-10 21:58 + data_out_base
-      2005-03-10 21:58 + hierarchical
-      2005-03-10 21:58 + logtest
-      2005-03-10 21:58 + polynomial1d
-      2005-03-10 21:58 + polynomial_test
-      2005-03-10 21:58 + quadrature_selector
-      ...
     </pre>
-    This generates a report (that we "tee" into a file called "report"
-    and show on screen at the same time). It shows the time at which
+    which produces the file report ( here in the test directory <tt>a-framework</tt>)
+    <pre>
+      =====Checking====== miscompare/output
+      +++++Error+++++++++ miscompare/OK (miscompare/cmp/generic) Use make verbose=on for the diffs
+      =====linking======= compile/exe
+      =====Running======= link/exe
+      =====debug========= fail.cc
+      make[1]: Leaving directory `/home/kanschat/deal/tests/a-framework'
+      Revision: 21455
+      Date:  2010 187 2010-07-06 27-2
+      Id:  kanschat@odin
+      2010-07-06 16:39  1   a-framework/compile
+      2010-07-06 16:39  0   a-framework/fail
+      2010-07-06 16:39  2   a-framework/link
+      2010-07-06 16:39  3   a-framework/miscompare
+      2010-07-06 16:39   +  a-framework/run
+    </pre>
+    The last lines are the ones we are looking for: they show the time at which
     the tests was run, an indicator of success, and the name of a
     test. The indicator is either a plus, which means that the test
     compiled and linked successfully and that the output compared
-    successfully against the stored results. Or it is a minus,
-    indicating that the test failed, which could mean that it didn't
-    compile, it didn't link, or the results were wrong. Since it is
-    often hard to see visually which tests have a minus (we should
-    have used a capital X instead), this command
+    successfully against the stored results. Otherwise, it is any of the
+    numbers 0 to 3, indicating failure at different levels:
+    <ul>
+      <li> 0: compiling failed
+      <li> 1: linking failed
+      <li> 2: the program crashed
+      <li> 3: output differs from stored result
+      <li> +: test succeeded
+    </ul>
+    If you only want to see the tests that failed, after the previous command,
+    issue
     <pre>
-      grep " - " report
+      grep -v + report
     </pre>
-    picks out the lines that have a minus surrounded by spaces.
-    </p>
-
+    </p>    
+    
     <p>
     If you want to do a little more than just that, you should
     consider running
@@ -254,7 +263,7 @@
     instead. This does all the same stuff, but also mails the test
     result to our central mail result server which will in regular
     intervals (at least once a day) munge these mails and present them
-    on our <a href="http://www.dealii.org/testsuite.html"
+    on our <a href="http://www.dealii.org/~archiver/cgi-bin/regression_quick.pl"
     target="body">test site</a>. This way, people can
     get an overview of what tests fail. You may even consider running
     tests nightly through a cron-job with this command, to have
@@ -337,7 +346,6 @@
     <pre>
 //----------------------------  my_new_test.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
 //
 //    Copyright (C) 2005 by the deal.II authors 
 //
