@@ -18,6 +18,8 @@
 #include <base/smartpointer.h>
 #include <base/std_cxx1x/shared_ptr.h>
 #include <lac/block_indices.h>
+#include <lac/block_sparsity_pattern.h>
+#include <lac/sparse_matrix.h>
 #include <lac/full_matrix.h>
 
 
@@ -352,16 +354,28 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
     void add(unsigned int row, unsigned int column,
 	     const std::string& name,
 	     const BlockIndices* block_indices);
+
+				     /**
+				      * For matrices using a
+				      * SparsityPattern, this function
+				      * reinitializes each matrix in
+				      * the vector with the correct
+				      * pattern from the block system.
+				      */
+    void reinit(const BlockSparsityPattern& sparsity);
+    
 				     /**
 				      * Access a constant reference to
 				      * the block at position <i>i</i>.
 				      */
     const MatrixBlock<MATRIX>& block(unsigned int i) const;
+    
 				     /**
 				      * Access a reference to
 				      * the block at position <i>i</i>.
 				      */
     MatrixBlock<MATRIX>& block(unsigned int i);
+    
 				     /**
 				      * Access the matrix at position
 				      * <i>i</i> for read and write
@@ -389,21 +403,31 @@ class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<M
 				     /**
 				      * Add a new matrix block at the
 				      * position <tt>(row,column)</tt>
-				      * in the block system.
+				      * in the block system. The third
+				      * argument allows to give the
+				      * matrix a name for later
+				      * identification.
+				      *
+				      * @deprecated The final
+				      * argument is ignored and will
+				      * be removed in a future release.
 				      */
     void add(unsigned int row, unsigned int column,
 	     const std::string& name,
-	     const BlockIndices* block_indices);
+	     const BlockIndices* block_indices = 0);
+    
 				     /**
 				      * Access a constant reference to
 				      * the block at position <i>i</i>.
 				      */
     const MatrixBlock<MATRIX>& block(unsigned int i) const;
+    
 				     /**
 				      * Access a reference to
 				      * the block at position <i>i</i>.
 				      */
     MatrixBlock<MATRIX>& block(unsigned int i);
+    
 				     /**
 				      * Access the matrix at position
 				      * <i>i</i> for read and write
@@ -416,6 +440,25 @@ class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<M
 
 
 //----------------------------------------------------------------------//
+
+namespace internal
+{
+  template <class MATRIX>
+  void
+  reinit(MatrixBlockVector<MATRIX>& v, const BlockSparsityPattern& p)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+  
+  template <typename number>
+  void
+  reinit(MatrixBlockVector<dealii::SparseMatrix<number> >& v, const BlockSparsityPattern& p)
+  {
+    for (unsigned int i=0;i<v.size();++i)
+      v(i)->matrix.reinit(p.block(v(i)->row, v(i)->column));
+  }
+  
+}
 
 template <class MATRIX>
 inline
@@ -614,6 +657,15 @@ MatrixBlockVector<MATRIX>::add(
   std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column, block_indices));
   NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
 }
+
+
+template <class MATRIX>
+inline void
+MatrixBlockVector<MATRIX>::reinit(const BlockSparsityPattern& sparsity)
+{
+  internal::reinit(*this, sparsity);
+}
+
 
 
 template <class MATRIX>
