@@ -18,6 +18,9 @@
 
 #include <numerics/operator.h>
 #include <numerics/theta_timestepping.h>
+#include <numerics/operator.h>
+
+#include <iostream>
 
 using namespace dealii;
 using namespace Algorithms;
@@ -58,11 +61,14 @@ class Implicit
 int main()
 {
   FullMatrix<double> matrix(2);
-  matrix(0,0) = -.1;
-  matrix(1,1) = -.1;
+  matrix(0,0) = 0.;
+  matrix(1,1) = 0.;
   matrix(0,1) = 31.4;
   matrix(1,0) = -31.4;
 
+  OutputOperator<Vector<double> > out;
+  out.initialize_stream(std::cout);
+  
   Explicit op_explicit(matrix);
   Implicit op_implicit(matrix);
   ThetaTimestepping<Vector<double> > solver(op_explicit, op_implicit);
@@ -71,10 +77,14 @@ int main()
   solver.notify(Events::initial);
   
   Vector<double> value(2);
+  value(0) = 1.;
+  
   NamedData<Vector<double>*> indata;
   NamedData<Vector<double>*> outdata;
   Vector<double>* p = &value;
   outdata.add(p, "value");
+  solver.set_output(out);
+  
   solver(outdata, indata);
 }
 
@@ -84,7 +94,6 @@ Explicit::Explicit(const FullMatrix<double>& M)
 		matrix(&M)
 {
   m.reinit(M.m(), M.n());
-  m = M;
 }
 
 
@@ -98,8 +107,13 @@ Explicit::initialize_timestep_data(const TimestepData& t)
 void
 Explicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<double>*>& in)
 {
-  this->notifications.print(deallog);
-  deallog << std::endl;
+  if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
+    {
+      m.equ(timestep_data->step, *matrix);
+      for (unsigned int i=0;i<m.m();++i)
+	m(i,i) += 1.;
+      m.print_formatted(std::cerr);
+    }
   this->notifications.clear();
   unsigned int i = in.find("Previous time");
   m.vmult(*out(0), *in(i));
@@ -124,14 +138,13 @@ Implicit::initialize_timestep_data(const TimestepData& t)
 void
 Implicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<double>*>& in)
 {
-  this->notifications.print(deallog);
-  deallog << std::endl;
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
       m.equ(timestep_data->step, *matrix);
       for (unsigned int i=0;i<m.m();++i)
 	m(i,i) += 1.;
       m.gauss_jordan();
+      m.print_formatted(std::cerr);
     }
   this->notifications.clear();
   

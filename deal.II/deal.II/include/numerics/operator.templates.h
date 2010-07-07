@@ -68,7 +68,7 @@ namespace Algorithms
     }
     else
     {
-      (*os) << ' ' << step;
+      (*os) << ' ' << step << ' ';
       for (unsigned int i=0;i<vectors.size();++i)
         vectors(i)->print(*os);
       (*os) << std::endl;
