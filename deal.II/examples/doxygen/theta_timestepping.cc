@@ -82,7 +82,10 @@ int main()
 Explicit::Explicit(const FullMatrix<double>& M)
 		:
 		matrix(&M)
-{}
+{
+  m.reinit(M.m(), M.n());
+  m = M;
+}
 
 
 void
@@ -97,6 +100,7 @@ Explicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<do
 {
   this->notifications.print(deallog);
   deallog << std::endl;
+  this->notifications.clear();
   unsigned int i = in.find("Previous time");
   m.vmult(*out(0), *in(i));
 }
@@ -105,7 +109,9 @@ Explicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<do
 Implicit::Implicit(const FullMatrix<double>& M)
 		:
 		matrix(&M)
-{}
+{
+  m.reinit(M.m(), M.n());
+}
 
 
 void
@@ -120,6 +126,15 @@ Implicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<do
 {
   this->notifications.print(deallog);
   deallog << std::endl;
+  if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
+    {
+      m.equ(timestep_data->step, *matrix);
+      for (unsigned int i=0;i<m.m();++i)
+	m(i,i) += 1.;
+      m.gauss_jordan();
+    }
+  this->notifications.clear();
+  
   unsigned int i = in.find("Previous time");
   m.vmult(*out(0), *in(i));
 }
