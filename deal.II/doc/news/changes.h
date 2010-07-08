@@ -52,7 +52,8 @@ inconvenience this causes.
   when using static libraries did not work. This is now fixed. However, due to
   GCC bug <a href="http://gcc.gnu.org/bugzilla/show_bug.cgi?id=10591"
   target="_top">10591</a>, GCC versions prior to and including 4.1.x will
-  still not work.
+  still not work. Working with shared libraries was not and is not affected
+  by this problem.
   <br>
   (WB 2010/07/01)
   </p>
@@ -69,8 +70,9 @@ inconvenience this causes.
   <p>Fixed: GCC version 4.0.1 had a bug that prevented it from compiling
   release 6.3.0 because it apparently had an infinite loop allocating
   memory when compiling <code>fe_values.cc</code> in optimized mode. This
-  had been fixed in GCC 4.0.2, but some versions of Mac OS X still use
-  this GCC version in their Xcode environment.
+  problem had been fixed in GCC 4.0.2, but some versions of Mac OS X still use
+  this GCC version in their Xcode environment. In any case, the code in
+  deal.II has been changed to avoid this problem.
   <br>
   (WB 2010/06/30)
   </p>
@@ -90,6 +92,14 @@ inconvenience this causes.
   <br>
   (Jean-Paul Pelteret 2010/06/28)
   </p>
+
+  <li>
+  <p>
+  Fixed: deal.II release 6.3.0 did not compile with Trilinos versions 9.x and
+  10.0. This is now fixed.
+  <br>
+  (Martin Kronbichler, WB 2010/06/28)
+  </p>
 </ol>
 
 
@@ -103,16 +113,10 @@ inconvenience this causes.
 
 
 <a name="lac"></a>
-<h3>base</h3>
+<h3>lac</h3>
 
 <ol>
-  <li>
-  <p>
-  Fixed: deal.II release 6.3.0 did not compile with Trilinos versions 9.x and
-  10.0. This is now fixed.
-  <br>
-  (Martin Kronbichler, WB 2010/06/28)
-  </p>
+  <li>None so far.
 </ol>
 
 
