@@ -61,8 +61,8 @@ class Implicit
 int main()
 {
   FullMatrix<double> matrix(2);
-  matrix(0,0) = 0.;
-  matrix(1,1) = 0.;
+  matrix(0,0) = 1.;
+  matrix(1,1) = 1.;
   matrix(0,1) = 31.4;
   matrix(1,0) = -31.4;
 
@@ -109,10 +109,9 @@ Explicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<do
 {
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
-      m.equ(timestep_data->step, *matrix);
+      m.equ(-timestep_data->step, *matrix);
       for (unsigned int i=0;i<m.m();++i)
 	m(i,i) += 1.;
-      m.print_formatted(std::cerr);
     }
   this->notifications.clear();
   unsigned int i = in.find("Previous time");
@@ -144,7 +143,6 @@ Implicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<do
       for (unsigned int i=0;i<m.m();++i)
 	m(i,i) += 1.;
       m.gauss_jordan();
-      m.print_formatted(std::cerr);
     }
   this->notifications.clear();
   

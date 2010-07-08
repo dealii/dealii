@@ -68,9 +68,10 @@ namespace Algorithms
     }
     else
     {
-      (*os) << ' ' << step << ' ';
+      (*os) << ' ' << step;
       for (unsigned int i=0;i<vectors.size();++i)
-        vectors(i)->print(*os);
+	for (unsigned int j=0;j<vectors(i)->size();++j)
+	  (*os) << ' ' << (*vectors(i))(j);
       (*os) << std::endl;
     }
     return *this;
