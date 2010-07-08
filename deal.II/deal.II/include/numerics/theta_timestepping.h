@@ -60,11 +60,11 @@ namespace Algorithms
  * error term. In order to avoid a loss of convergence order, the
  * adaptive theta scheme can be used, where <i>#theta=½+c dt</i>.
  *
- * Assume that we want to solve the equation <i>u' = Au</i> with a
+ * Assume that we want to solve the equation <i>u' + Au = 0</i> with a
  * step size <i>k</i>.  A step of the theta scheme can be written as
  *
  * @f[
- *   (M - \theta k A) u_{n+1} = (M + (1-\theta)k A) u_n.
+ *   (M + \theta k A) u_{n+1} = (M - (1-\theta)k A) u_n.
  * @f]
  *
  * Here, <i>M</i> is the mass matrix. We see, that the right hand side
@@ -98,15 +98,71 @@ namespace Algorithms
  * #op_implicit is directly written into the output argument given to
  * ThetaTimestepping.
  *
- * <h3>Setup</h3>
+ * <h3>Usage of ThetaTimestepping</h3>
+ *
  * The use ThetaTimestepping is more complicated than for instance
  * Newton, since the inner operators will usually need to access the
  * TimeStepData. Thus, we have a circular dependency of information,
- * and we include the following example for its use. First, we define
- * the two operators 
- *
+ * and we include the following example for its use. It can be found
+ * in <tt>examples/doxygen/theta_timestepping.cc</tt>
  * 
- * @author Guido Kanschat, 2010
+ * @dontinclude theta_timestepping.cc
+ *
+ * First, we define the two operators used by ThetaTimestepping and
+ * call them <code>Implicit</code> and <code>Explicit</code>. They
+ * both share the public interface of Operator, and additionally
+ * provide storage for the matrices to be used and a pointer to
+ * TimestepData. Note that we do not use a SmartPointer here, since
+ * the TimestepData will be destroyed before the operator.
+ *
+ * @skip class Explicit
+ * @until End of declarations
+ *
+ * These operators will be implemented after the main program. But let
+ * us look at how they get used. First, let us define a matrix to be
+ * used for our system and also an OutputOperator in order to write
+ * the data of each timestep to a file.
+ *
+ * @skipline main
+ * @until out.initialize
+ *
+ * Now we create objects for the implicit and explicit parts of the
+ * steps as well as the ThetaTimestepping itself. Notice how the
+ * TimestepData of ThetaTimestepping gets forwarded to the inner
+ * operators. There are two different data objects, because the
+ * timestep size is modified by #theta.
+ *
+ * @until set_output
+ *
+ * The next step is providing the vectors to be used. <tt>value</tt>
+ * is filled with the initial value and is also the vector where the
+ * solution at each timestep will be. Because the interface of
+ * Operator has to be able to handle several vectors, we need to store
+ * it in a NamedData object. Notice, that we need to create the
+ * intermediate pointer <tt>p</tt>. If we would use
+ * <code>&value</code> directly in the <code>add</code> function, the
+ * resulting object would be constant.
+ *
+ * @until add
+ *
+ * Finally, we are ready to tell the solver, that we are looknig at
+ * the initial timestep and run it.
+ *
+ * @until outdata
+ * @skip Explicit::initialize
+ *
+ * Now we need to study the application of the implicit and explicit
+ * operator. We assume that the pointer <code>matrix</code> points to
+ * the matrix created in the main program, and that
+ * <code>timestep_data</code> points to the correct data object of
+ * ThetaTimestepping.
+ *
+ * @skipline void
+ * @until vmult
+ * @until }
+ *
+ * @author Guido Kanschat
+ * @date 2010
  */
   template <class VECTOR>
   class ThetaTimestepping : public Operator<VECTOR>

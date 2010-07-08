@@ -57,7 +57,8 @@ class Implicit
     FullMatrix<double> m;
 };
 
-  
+// End of declarations
+
 int main()
 {
   FullMatrix<double> matrix(2);
@@ -74,17 +75,16 @@ int main()
   ThetaTimestepping<Vector<double> > solver(op_explicit, op_implicit);
   op_explicit.initialize_timestep_data(solver.explicit_data());
   op_implicit.initialize_timestep_data(solver.implicit_data());
-  solver.notify(Events::initial);
+  solver.set_output(out);
   
   Vector<double> value(2);
   value(0) = 1.;
-  
   NamedData<Vector<double>*> indata;
   NamedData<Vector<double>*> outdata;
   Vector<double>* p = &value;
   outdata.add(p, "value");
-  solver.set_output(out);
   
+  solver.notify(Events::initial);
   solver(outdata, indata);
 }
 
