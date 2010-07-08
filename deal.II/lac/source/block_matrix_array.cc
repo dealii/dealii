@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,8 +44,7 @@ BlockMatrixArray<number>::Entry::~Entry ()
 template <typename number>
 BlockMatrixArray<number>::BlockMatrixArray ()
 		: block_rows (0),
-		  block_cols (0),
-		  mem(0, typeid(*this).name())
+		  block_cols (0)
 {}
 
 
@@ -54,11 +52,19 @@ BlockMatrixArray<number>::BlockMatrixArray ()
 template <typename number>
 BlockMatrixArray<number>::BlockMatrixArray (
   const unsigned int n_block_rows,
-  const unsigned int n_block_cols,
-  VectorMemory<Vector<number> >& mem)
+  const unsigned int n_block_cols)
 		: block_rows (n_block_rows),
-		  block_cols (n_block_cols),
-		  mem(&mem, typeid(*this).name())
+		  block_cols (n_block_cols)
+{}
+
+
+template <typename number>
+BlockMatrixArray<number>::BlockMatrixArray (
+  const unsigned int n_block_rows,
+  const unsigned int n_block_cols,
+  VectorMemory<Vector<number> >&)
+		: block_rows (n_block_rows),
+		  block_cols (n_block_cols)
 {}
 
 
@@ -67,13 +73,22 @@ void
 BlockMatrixArray<number>::initialize (
   const unsigned int n_block_rows,
   const unsigned int n_block_cols,
-  VectorMemory<Vector<number> >& memory)
+  VectorMemory<Vector<number> >&)
 {
   block_rows = n_block_rows;
   block_cols = n_block_cols;
-  mem = &memory;
 }
 
+
+template <typename number>
+void
+BlockMatrixArray<number>::initialize (
+  const unsigned int n_block_rows,
+  const unsigned int n_block_cols)
+{
+  block_rows = n_block_rows;
+  block_cols = n_block_cols;
+}
 
 
 
@@ -83,7 +98,6 @@ BlockMatrixArray<number>::reinit (
   const unsigned int n_block_rows,
   const unsigned int n_block_cols)
 {
-  Assert (mem != 0, ExcNotInitialized());
   clear();
   block_rows = n_block_rows;
   block_cols = n_block_cols;
@@ -104,14 +118,13 @@ void
 BlockMatrixArray<number>::vmult_add (BlockVector<number>& dst,
 				     const BlockVector<number>& src) const
 {
-  Assert (mem != 0, ExcNotInitialized());
-  
+  GrowingVectorMemory<Vector<number> > mem;
   Assert (dst.n_blocks() == block_rows,
 	  ExcDimensionMismatch(dst.n_blocks(), block_rows));
   Assert (src.n_blocks() == block_cols,
 	  ExcDimensionMismatch(src.n_blocks(), block_cols));
 
-  Vector<number>* p_aux = mem->alloc();
+  typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
   
   typename std::vector<Entry>::const_iterator m = entries.begin();
@@ -126,7 +139,6 @@ BlockMatrixArray<number>::vmult_add (BlockVector<number>& dst,
 	m->matrix->vmult(aux, src.block(m->col));
       dst.block(m->row).add (m->prefix, aux);
     }
-  mem->free(p_aux);
 }
 
 
@@ -149,7 +161,7 @@ void
 BlockMatrixArray<number>::Tvmult_add (BlockVector<number>& dst,
 				      const BlockVector<number>& src) const
 {
-  Assert (mem != 0, ExcNotInitialized());
+  GrowingVectorMemory<Vector<number> > mem;
   Assert (dst.n_blocks() == block_cols,
 	  ExcDimensionMismatch(dst.n_blocks(), block_cols));
   Assert (src.n_blocks() == block_rows,
@@ -158,7 +170,7 @@ BlockMatrixArray<number>::Tvmult_add (BlockVector<number>& dst,
   typename std::vector<Entry>::const_iterator m = entries.begin();
   typename std::vector<Entry>::const_iterator end = entries.end();
   
-  Vector<number>* p_aux = mem->alloc();
+  typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
   
   for (; m != end ; ++m)
@@ -170,7 +182,6 @@ BlockMatrixArray<number>::Tvmult_add (BlockVector<number>& dst,
 	m->matrix->Tvmult(aux, src.block(m->row));
       dst.block(m->col).add (m->prefix, aux);
     }
-  mem->free(p_aux);
 }
 
 
@@ -193,13 +204,13 @@ BlockMatrixArray<number>::matrix_scalar_product (
   const BlockVector<number>& u,
   const BlockVector<number>& v) const
 {
-  Assert (mem != 0, ExcNotInitialized());
+  GrowingVectorMemory<Vector<number> > mem;
   Assert (u.n_blocks() == block_rows,
 	  ExcDimensionMismatch(u.n_blocks(), block_rows));
   Assert (v.n_blocks() == block_cols,
 	  ExcDimensionMismatch(v.n_blocks(), block_cols));
 
-  Vector<number>* p_aux = mem->alloc();
+  typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
   
   typename std::vector<Entry>::const_iterator m;
@@ -221,7 +232,6 @@ BlockMatrixArray<number>::matrix_scalar_product (
 	}
       result += u.block(i)*aux;
     }
-  mem->free(p_aux);
 
   return result;
 }
@@ -303,6 +313,7 @@ BlockTrianglePrecondition<number>::do_row (
   BlockVector<number>& dst,
   unsigned int row_num) const
 {
+  GrowingVectorMemory<Vector<number> > mem;
   typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator
     m = this->entries.begin();
   typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator
@@ -310,7 +321,7 @@ BlockTrianglePrecondition<number>::do_row (
   std::vector<typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator>
     diagonals;
   
-  Vector<number>* p_aux = this->mem->alloc();
+  typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
   
   aux.reinit(dst.block(row_num), true);
@@ -372,8 +383,6 @@ BlockTrianglePrecondition<number>::do_row (
 	}
       dst.block(row_num) = aux;
     }
-  
-  this->mem->free(p_aux);
 }
 
 

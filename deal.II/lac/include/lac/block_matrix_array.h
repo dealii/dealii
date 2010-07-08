@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
@@ -117,7 +116,8 @@ template <typename> class Vector;
  * BlockTrianglePrecondition.
  *
  * @see @ref GlossBlockLA "Block (linear algebra)"
- * @author Guido Kanschat, 2000-2005
+ * @author Guido Kanschat
+ * @date 2000-2005, 2010
  */
 template <typename number = double>
 class BlockMatrixArray : public Subscriptor
@@ -136,6 +136,29 @@ class BlockMatrixArray : public Subscriptor
 				      * dimensions.
 				      */
     BlockMatrixArray (const unsigned int n_block_rows,
+		      const unsigned int n_block_cols);
+
+				     /**
+				      * Initialize object
+				      * completely. This is the
+				      * function to call for an object
+				      * created by the default
+				      * constructor.
+				      *
+				      * @deprecated the last argument
+				      * is ignored.
+				      */
+    void initialize (const unsigned int n_block_rows,
+		     const unsigned int n_block_cols);
+    
+				     /**
+				      * Constructor fixing the
+				      * dimensions.
+				      *
+				      * @deprecated the last argument
+				      * is ignored.
+				      */
+    BlockMatrixArray (const unsigned int n_block_rows,
 		      const unsigned int n_block_cols,
 		      VectorMemory<Vector<number> >& mem);
 
@@ -145,6 +168,9 @@ class BlockMatrixArray : public Subscriptor
 				      * function to call for an object
 				      * created by the default
 				      * constructor.
+				      *
+				      * @deprecated the last argument
+				      * is ignored.
 				      */
     void initialize (const unsigned int n_block_rows,
 		     const unsigned int n_block_cols,
@@ -182,12 +208,15 @@ class BlockMatrixArray : public Subscriptor
 		const unsigned int col,
 		const double       prefix = 1.,
 		const bool         transpose = false);
-
+    
 				     /**
 				      * Add an entry like with enter,
 				      * but use PointerMatrixAux for
 				      * matrices not having functions
 				      * vmult_add() and TVmult_add().
+				      *
+				      * @deprecated the first argument
+				      * is ignored.
 				      */
     template <class MATRIX>
     void enter_aux (VectorMemory<Vector<number> >& mem,
@@ -309,19 +338,6 @@ class BlockMatrixArray : public Subscriptor
 	       double prefix, bool transpose);
 	
 					 /**
-					  * Constructor initializing
-					  * all data fields. A
-					  * PointerMatrixAux object is
-					  * generated for
-					  * <tt>matrix</tt>.
-					  */
-	template<class MATRIX> 
-	Entry (const MATRIX& matrix,
-	       unsigned row, unsigned int col,
-	       double prefix, bool transpose,
-	       VectorMemory<Vector<number> >& mem);
-	
-					 /**
 					  * Copy constructor
 					  * invalidating the old
 					  * object. Since it is only
@@ -390,12 +406,6 @@ class BlockMatrixArray : public Subscriptor
 				      * number of blocks per row.
 				      */
     unsigned int block_cols;
-  protected:
-				     /**
-				      * The memory used for auxiliary
-				      * vectors.
-				      */
-    mutable SmartPointer<VectorMemory<Vector<number> >,BlockMatrixArray<number> > mem;
 };
 
 /*@}*/
@@ -476,6 +486,9 @@ class BlockTrianglePrecondition
 				      * block-quadratic. The additional
 				      * parameter allows for backward
 				      * insertion instead of forward.
+				      *
+				      * @deprecated the second argument
+				      * is ignored.
 				      */
     BlockTrianglePrecondition (unsigned int n_block_rows,
 			       VectorMemory<Vector<number> >& mem,
@@ -487,6 +500,9 @@ class BlockTrianglePrecondition
 				      * function to call for an object
 				      * created by the default
 				      * constructor.
+				      *
+				      * @deprecated the second argument
+				      * is ignored.
 				      */
     void initialize (const unsigned int n_block_rows,
 		     VectorMemory<Vector<number> >& mem,
@@ -519,6 +535,10 @@ class BlockTrianglePrecondition
 				      * that the diagonal blocks
 				      * should actually be inverse
 				      * matrices or preconditioners.
+				      *
+				      * @deprecated The first
+				      * argument is ignored. User
+				      * enter() instead.
 				      */
     template <class MATRIX>
     void enter_aux (VectorMemory<Vector<double> >& mem,
@@ -640,26 +660,6 @@ BlockMatrixArray<number>::Entry::Entry (
 template <typename number>
 template <class MATRIX>
 inline
-BlockMatrixArray<number>::Entry::Entry (
-  const MATRIX& m,
-  unsigned row,
-  unsigned int col,
-  double prefix,
-  bool transpose,
-  VectorMemory<Vector<number> >& mem)
-		:
-		row (row),
-		col (col),
-		prefix (prefix),
-		transpose (transpose),
-		matrix (new PointerMatrixAux<MATRIX, Vector<number> >(&mem, &m, typeid(*this).name()))
-{}
-
-
-
-template <typename number>
-template <class MATRIX>
-inline
 void
 BlockMatrixArray<number>::enter (
   const MATRIX& matrix,
@@ -668,7 +668,6 @@ BlockMatrixArray<number>::enter (
   double prefix,
   bool transpose)
 {
-  Assert (mem != 0, ExcNotInitialized());
   Assert(row<n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
   Assert(col<n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
   entries.push_back(Entry(matrix, row, col, prefix, transpose));
@@ -710,7 +709,6 @@ inline
 void
 BlockMatrixArray<number>::print_latex (STREAM& out) const
 {
-  Assert (mem != 0, ExcNotInitialized());
   out << "\\begin{array}{"
       << std::string(n_block_cols(), 'c')
       << "}" << std::endl;
