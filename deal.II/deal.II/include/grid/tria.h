@@ -1471,9 +1471,9 @@ class Triangulation : public Subscriptor
 				      * are created by
 				      * create_triangulation() or
 				      * execute_coarsening_and_refinement()
-				      * are distorted (see @ref
-				      * GlossDistorted "distorted
-				      * cells"). If set, these two
+				      * are distorted (see
+				      * @ref GlossDistorted "distorted cells").
+				      * If set, these two
 				      * functions may throw an
 				      * exception if they encounter
 				      * distorted cells.
@@ -1716,8 +1716,8 @@ class Triangulation : public Subscriptor
 				      * over all cells and verifies
 				      * that none of the cells is
 				      * deformed (see the entry on
-				      * @ref GlossDistorted "distorted
-				      * cells" in the glossary), where
+				      * @ref GlossDistorted "distorted cells"
+				      in the glossary), where
 				      * we call a cell deformed if the
 				      * determinant of the Jacobian of
 				      * the mapping from reference
