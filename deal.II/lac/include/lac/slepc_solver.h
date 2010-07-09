@@ -44,14 +44,10 @@ DEAL_II_NAMESPACE_OPEN
  * where $A$ is a system matrix, $M$ is a mass matrix, and $\lambda,
  * x$ are a set of eigenvalues and eigenvectors respectively. The
  * emphasis is on methods and techniques appropriate for problems in
- * which the associated matrices are sparse and therefore, most of the
- * methods offered by the SLEPc library are projection methods or
- * other methods with similar properties. SLEPc implements these basic
- * methods as well as more sophisticated algorithms. On the other
- * hand, SLEPc is a general library in the sense that it covers
- * standard and generalized eigenvalue problems, and wrappers are
- * provided to interface to SLEPc solvers that handle both of these
- * problem sets.
+ * which the associated matrices are sparse. Most of the methods
+ * offered by the SLEPc library are projection methods or other
+ * methods with similar properties; and wrappers are provided to
+ * interface to SLEPc solvers that handle both of these problem sets.
  *
  * SLEPcWrappers can be implemented in application codes in the
  * following way:
@@ -59,14 +55,12 @@ DEAL_II_NAMESPACE_OPEN
   SolverControl solver_control (1000, 1e-9);
   SolverArnoldi system (solver_control,
                         mpi_communicator);
-  system.solve (A, B, eigenvalues, eigenvectors,
-                size_of_spectrum);
+  system.solve (A, M, lambda, x, size_of_spectrum);
  @endverbatim
-
- * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
+ * for the generalized eigenvalue problem $Ax=M\lambda x$, where the
  * variable <code>const unsigned int size_of_spectrum</code> tells
  * SLEPc the number of eigenvector/eigenvalue pairs to solve for: See
- * also step-36 for a hands-on example.
+ * also <code>step-36</code> for a hands-on example.
  *
  * An alternative implementation to the one above is to use the API
  * internals directly within the application code. In this way the
@@ -91,11 +85,13 @@ DEAL_II_NAMESPACE_OPEN
  * "PETScWrappers", on which they depend.
  *
  * @ingroup SLEPcWrappers
- * @author Toby D. Young 2008, 2009, 2010; and Rickard Armiento 2008
  *
- * Various tweaks to the SLEPcWrappers have been contributed by Eloy
- * Romeoro and Jose Roman.
+ * @author Toby D. Young 2008, 2009, 2010; and Rickard Armiento 2008.
+ *
+ * @note Various tweaks and enhancments contributed by Eloy Romero and
+ * Jose E.  Roman 2009, 2010.
  */
+
 namespace SLEPcWrappers
 {
 
@@ -210,14 +206,15 @@ namespace SLEPcWrappers
                                     * solver.
                                     */
       void
-	set_initial_vector (const PETScWrappers::VectorBase &initial_vec);
+	set_initial_vector 
+	(const PETScWrappers::VectorBase &set_initial_vector);
 
                                    /**
 				    * Set the spectral transformation
 				    * to be used.
                                     */
       void
-	set_transformation (SLEPcWrappers::TransformationBase &trans);
+	set_transformation (SLEPcWrappers::TransformationBase &set_transformation);
 
                                    /**
 				    * Indicate which part of the
@@ -332,9 +329,9 @@ namespace SLEPcWrappers
 
       const PETScWrappers::MatrixBase   *opA;
       const PETScWrappers::MatrixBase   *opB;
-      const PETScWrappers::VectorBase   *ini_vec;
+      const PETScWrappers::VectorBase   *initial_vector;
 
-      SLEPcWrappers::TransformationBase *transform;
+      SLEPcWrappers::TransformationBase *transformation;
 
     private:
 
@@ -594,8 +591,7 @@ namespace SLEPcWrappers
       vr.resize (n_converged, vr.front());
       kr.resize (n_converged);
 
-      for (unsigned int index=0; index < n_converged;
-	   ++index)
+      for (unsigned int index=0; index < n_converged; ++index)
 	get_eigenpair (index, kr[index], vr[index]);
     }
 }

@@ -46,10 +46,9 @@ namespace SLEPcWrappers
     mpi_communicator (mpi_communicator),
     set_which (EPS_LARGEST_MAGNITUDE),
     opA (NULL), opB (NULL),
-    ini_vec (NULL),
-    transform (NULL)
-  {
-  }
+    initial_vector (NULL),
+    transformation (NULL)
+  {}
 
   SolverBase::~SolverBase ()
   {}
@@ -70,15 +69,15 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::set_initial_vector (const PETScWrappers::VectorBase &initial_vec)
+  SolverBase::set_initial_vector (const PETScWrappers::VectorBase &set_initial_vector)
   {
-    ini_vec = &initial_vec;
+    initial_vector = (&set_initial_vector);
   }
 
   void
-  SolverBase::set_transformation (SLEPcWrappers::TransformationBase &trans)
+  SolverBase::set_transformation (SLEPcWrappers::TransformationBase &set_transformation)
   {
-    transform = &trans;
+    transformation = &set_transformation;
   }
 
   void
@@ -107,14 +106,21 @@ namespace SLEPcWrappers
       ierr = EPSSetOperators (solver_data->eps, *opA, PETSC_NULL);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    if (ini_vec && ini_vec->size() != 0)
+    if (initial_vector && initial_vector->size() != 0)
       {
-	ierr = EPSSetInitialVector(solver_data->eps, *ini_vec);
+
+#if DEAL_II_PETSC_VERSION_LT(3,1,0)
+	ierr = EPSSetInitialVector (solver_data->eps, *initial_vector);
+#else
+	Vec this_vector = *initial_vector;
+	ierr = EPSSetInitialSpace (solver_data->eps, 1, &this_vector);
+#endif
+
 	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
 
-    if (transform)
-      transform->set_context(solver_data->eps);
+    if (transformation)
+      transformation->set_context(solver_data->eps);
 
                                     // set runtime options.
     set_solver_type (solver_data->eps);
@@ -128,6 +134,9 @@ namespace SLEPcWrappers
 			     PETSC_DECIDE, PETSC_DECIDE);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
+                                    // set the solve options to the
+                                    // eigenvalue problem solver
+                                    // context
     ierr = EPSSetFromOptions (solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
