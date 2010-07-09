@@ -48,7 +48,8 @@ the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
 
 <p>
 The programs are in the <code>examples/</code> directory of your local deal.II
-installation. If you go into one of the tutorial directories, you can compile
+installation. After compiling the library itself, if you go into one of the 
+tutorial directories, you can compile 
 the program by typing <strong>make</strong>, and run it
 using <strong>make run</strong>. The latter command also compiles the program
 if that has not already been done. The Makefiles in the different
