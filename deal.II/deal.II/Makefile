@@ -72,8 +72,7 @@ $(LIBDIR)/3d/%.$(OBJEXT) :
 	@echo "=====deal.II====3d====optimized==$(MT)== $(<:$D/deal.II/source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
-source/%.inst : source/%.inst.in $D/common/template-arguments \
-		$D/common/scripts/expand_instantiations
+source/%.inst : source/%.inst.in $D/common/template-arguments
 	@echo "=====deal.II========================= $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
 

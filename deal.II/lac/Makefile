@@ -37,8 +37,7 @@ $(LIBDIR)/lac/%.$(OBJEXT) :
 	@echo "=====lac==============optimized==$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
-source/%.inst : source/%.inst.in $D/common/template-arguments \
-		$D/common/scripts/expand_instantiations
+source/%.inst : source/%.inst.in $D/common/template-arguments
 	@echo "=====lac============================= $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
 
@@ -144,8 +143,7 @@ clean:
 #
 # If the command fails, then remove Makefile.dep again and fail
 Makefile.dep: include/lac/lapack_templates.h \
-	      $(cc-files) $(h-files) \
-		$(inst-files) \
+	      $(cc-files) $(h-files) $(inst-files) \
 		Makefile $D/common/Make.global_options
 	@echo ===================================== Remaking lac/Makefile
 	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/lac" $(cc-files) \
