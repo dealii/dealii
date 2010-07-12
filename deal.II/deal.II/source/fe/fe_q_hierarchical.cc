@@ -11,13 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/qprojector.h>
-#include <base/quadrature_lib.h>
 #include <fe/fe_q_hierarchical.h>
 #include <fe/fe_nothing.h>
-#include <lac/precondition.h>
-#include <lac/solver_cg.h>
-#include <lac/solver_control.h>
 
 #include <cmath>
 #include <sstream>
@@ -711,121 +706,67 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
      case 2: {
      	switch (subface) {
      	   case 0: {
-     	   	  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-     	   	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 0), Point<dim> ())) > 1e-14)
-     	            interpolation_matrix (0, dof) = this->shape_value (this->face_to_cell_index (dof, 0), Point<dim> ());
-     	         
-     	   	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 0), Point<dim> (0.0, 0.5))) > 1e-14)
-     	   	        interpolation_matrix (1, dof) = this->shape_value (this->face_to_cell_index (dof, 0), Point<dim> (0.0, 0.5));
+     	   	  interpolation_matrix (0, 0) = 1.0;
+     	   	  interpolation_matrix (1, 0) = 0.5;
+     	   	  interpolation_matrix (1, 1) = 0.5;
+     	   	  
+     	   	  for (unsigned int dof = 2; dof < this->dofs_per_face;) {
+     	   	     interpolation_matrix (1, dof) = -1.0;
+     	   	     dof = dof + 2;
      	   	  }
-     	
-     	      if (this->degree > 1) {
-     	         double weight;
-     	         QGauss<dim - 1> reference_edge_quadrature (this->degree);
-     	         Quadrature<dim - 1> edge_quadrature = QProjector<dim - 1>::project_to_child (reference_edge_quadrature, subface);
-     	         const unsigned int n_edge_points = edge_quadrature.size ();
-     	         FullMatrix<double> assembling_matrix (this->degree - 1, dim * n_edge_points);
-     	         FullMatrix<double> system_matrix (this->degree - 1, this->degree - 1);
-     	         FullMatrix<double> system_matrix_inv (system_matrix.m (), system_matrix.m ());
-     	         Point<dim> point;
-       	         std::vector<Point<dim - 1> > quadrature_points = edge_quadrature.get_points ();
-     	         Tensor<1, dim> grad;
-     	         Vector<double> assembling_vector (dim * n_edge_points);
-     	         Vector<double> solution (system_matrix.m ());
-     	         Vector<double> system_rhs (system_matrix.m ());
-
-                 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-                 	point = Point<dim> (0.0, 2.0 * quadrature_points[q_point] (0));
-                 	weight = std::sqrt (edge_quadrature.weight (q_point));
-                 	
-     	            for (unsigned int i = 0; i < system_matrix.m (); ++i) {
-     	               grad = weight * this->shape_grad (i + 4, point);
-     	            
-     	               for (unsigned int d = 0; d < dim; ++d)
-     	                  assembling_matrix (i, dim * q_point + d) = grad[d];
-     	            }
-                 }
-     	   
-     	         assembling_matrix.mTmult (system_matrix, assembling_matrix);
-     	         system_matrix_inv.invert (system_matrix);
-
-     	         for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-     	            for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-     	      	       point = Point<dim> (0.0, 2.0 * quadrature_points[q_point] (0));
-     	               grad = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_grad (this->face_to_cell_index (dof, 0), Point<dim> (0.0, quadrature_points[q_point] (0))) - interpolation_matrix (dof, 0) * source_fe.shape_grad (0, point) - interpolation_matrix (dof, 1) * source_fe.shape_grad (1, point));
-     	         
-     	               for (unsigned int d = 0; d < dim; ++d)
-     	                  assembling_vector (dim * q_point + d) = grad[d];
-     	            }
-     	      
-     	            assembling_matrix.vmult (system_rhs, assembling_vector);
-     	            system_matrix_inv.vmult (solution, system_rhs);
-     	      
-     	            for (unsigned int i = 0; i < solution.size (); ++i)
-     	               if (std::abs (solution (i)) > 1e-14)
-     	                  interpolation_matrix (i + 2, dof) = solution (i);
-     	         }
-     	      }
+     	   	  
+     	   	  int faculty_i = 1;
+     	   	  int faculty_ij;
+     	   	  int faculty_j;
+     	   	  
+     	   	  for (int i = 2; i < (int) this->dofs_per_face; ++i) {
+     	   	     interpolation_matrix (i, i) = std::pow (0.5, i);
+     	   	     faculty_i *= i;
+     	   	     faculty_j = faculty_i;
+     	   	     faculty_ij = 1;
+     	   	     
+     	   	     for (int j = i + 1; j < (int) this->dofs_per_face; ++j) {
+     	   	        faculty_ij *= j - i;
+     	   	        faculty_j *= j;
+     	   	        
+     	   	        if ((i + j) & 1)
+     	   	           interpolation_matrix (i, j) = -1.0 * std::pow (0.5, j) * faculty_j / (faculty_i * faculty_ij);
+     	   	        
+     	   	        else
+     	   	           interpolation_matrix (i, j) = std::pow (0.5, j) * faculty_j / (faculty_i * faculty_ij);
+     	   	     }
+     	   	  }
      	
      	      break;
      	   }
      	   
      	   case 1: {
-     	   	  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-     	   	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 0), Point<dim> (0.0, 0.5))) > 1e-14)
-     	            interpolation_matrix (0, dof) = this->shape_value (this->face_to_cell_index (dof, 0), Point<dim> (0.0, 0.5));
-     	         
-     	         if (std::abs (this->shape_value (this->face_to_cell_index (dof, 0), Point<dim> (0.0, 1.0))) > 1e-14)
-     	            interpolation_matrix (1, dof) = this->shape_value (this->face_to_cell_index (dof, 0), Point<dim> (0.0, 1.0));
+     	   	  interpolation_matrix (0, 0) = 0.5;
+     	   	  interpolation_matrix (0, 1) = 0.5;
+     	   	  
+     	   	  for (unsigned int dof = 2; dof < this->dofs_per_face;) {
+     	   	     interpolation_matrix (0, dof) = -1.0;
+     	   	     dof = dof + 2;
      	   	  }
-     	
-     	      if (this->degree > 1) {
-     	         double weight;
-     	         QGauss<dim - 1> reference_edge_quadrature (this->degree);
-     	         Quadrature<dim - 1> edge_quadrature = QProjector<dim - 1>::project_to_child (reference_edge_quadrature, subface);
-     	         const unsigned int n_edge_points = edge_quadrature.size ();
-     	         FullMatrix<double> assembling_matrix (this->degree - 1, dim * n_edge_points);
-     	         FullMatrix<double> system_matrix (assembling_matrix.m (), assembling_matrix.m ());
-     	         FullMatrix<double> system_matrix_inv (system_matrix.m (), system_matrix.m ());
-     	         Point<dim> point;
-     	         std::vector<Point<dim - 1> > quadrature_points = edge_quadrature.get_points ();
-     	         Tensor<1, dim> grad;
-     	         Vector<double> assembling_vector (dim * n_edge_points);
-     	         Vector<double> solution (system_matrix.m ());
-     	         Vector<double> system_rhs (system_matrix.m ());
-
-                 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-                 	point = Point<dim> (0.0, 2.0 * quadrature_points[q_point] (0) - 1.0);
-                 	weight = std::sqrt (edge_quadrature.weight (q_point));
-                 	
-     	            for (unsigned int i = 0; i < system_matrix.m (); ++i) {
-     	               grad = weight * this->shape_grad (i + 4, point);
-     	            
-     	               for (unsigned int d = 0; d < dim; ++d)
-     	                  assembling_matrix (i, dim * q_point + d) = grad[d];
-     	            }
-                 }
-                 
-     	         assembling_matrix.mTmult (system_matrix, assembling_matrix);
-     	         system_matrix_inv.invert (system_matrix);
-
-     	         for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-     	            for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-     	      	       point = Point<dim> (0.0, 2.0 * quadrature_points[q_point] (0) - 1.0);
-     	               grad = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_grad (this->face_to_cell_index (dof, 0), Point<dim> (0.0, quadrature_points[q_point] (0))) - interpolation_matrix (0, dof) * source_fe.shape_grad (0, point) - interpolation_matrix (1, dof) * source_fe.shape_grad (1, point));
-     	         
-     	               for (unsigned int d = 0; d < dim; ++d)
-     	                  assembling_vector (dim * q_point + d) = grad[d];
-     	            }
-     	      
-     	            assembling_matrix.vmult (system_rhs, assembling_vector);
-     	            system_matrix_inv.vmult (solution, system_rhs);
-     	      
-     	            for (unsigned int i = 0; i < solution.size (); ++i)
-     	               if (std::abs (solution (i)) > 1e-14)
-     	                  interpolation_matrix (i + 2, dof) = solution (i);
-     	         }
-     	      }
+     	   	  
+     	   	  interpolation_matrix (1, 1) = 1.0;
+     	   	  
+     	   	  int faculty_i = 1;
+     	   	  int faculty_ij;
+     	   	  int faculty_j;
+     	   	  
+     	   	  for (int i = 2; i < (int) this->dofs_per_face; ++i) {
+     	   	     interpolation_matrix (i, i) = std::pow (0.5, i);
+     	   	     faculty_i *= i;
+     	   	     faculty_j = faculty_i;
+     	   	     faculty_ij = 1;
+     	   	     
+     	   	     for (int j = i + 1; j < (int) this->dofs_per_face; ++j) {
+     	   	        faculty_ij *= j - i;
+     	   	        faculty_j *= j;
+     	   	        interpolation_matrix (i, j) = std::pow (0.5, j) * faculty_j / (faculty_i * faculty_ij);
+     	   	     }
+     	   	  }
      	   }
      	}
      	
@@ -835,160 +776,157 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
      case 3: {
         switch (subface) {
            case 0: {
-           	  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> ())) > 1e-14)
-           	        interpolation_matrix (0, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> ());
+              interpolation_matrix (0, 0) = 1.0;
+              interpolation_matrix (1, 0) = 0.5;
+              interpolation_matrix (1, 1) = 0.5;
+              interpolation_matrix (2, 0) = 0.5;
+              interpolation_matrix (2, 2) = 0.5;
+           	  
+           	  for (unsigned int i = 0; i < this->degree - 1;) {
+           	     for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
+           	        interpolation_matrix (3, i + line * (this->degree - 1) + 4) = -0.5;
            	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.0, 0.0))) > 1e-14)
-           	        interpolation_matrix (1, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.0, 0.0));
+           	     for (unsigned int j = 0; j < this->degree - 1;) {
+           	     	interpolation_matrix (3, i + (j + 4) * this->degree - j) = 1.0;
+           	        j = j + 2;
+           	     }
            	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, 0.5, 0.0))) > 1e-14)
-           	        interpolation_matrix (2, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, 0.5, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.5, 0.0))) > 1e-14)
-           	        interpolation_matrix (3, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.5, 0.0));
+           	     interpolation_matrix (1, i + 2 * (this->degree + 1)) = -1.0;
+           	     interpolation_matrix (2, i + 4) = -1.0;
+           	     i = i + 2;
            	  }
            	  
-           	  if (this->degree > 1) {
-           	     double weight;
-           	     QGauss<dim - 2> reference_edge_quadrature (this->degree + 1);
-           	     Quadrature<dim - 2> edge_quadrature = QProjector<dim - 2>::project_to_child (reference_edge_quadrature, 0);
-           	     const unsigned int n_edge_points = reference_edge_quadrature.size ();
-           	     QGauss<dim - 1> reference_quadrature (this->degree);
-           	     Quadrature<dim - 1> quadrature = QProjector<dim - 1>::project_to_child (reference_quadrature, subface);
-           	     const unsigned int n_quadrature_points = quadrature.size ();
-           	     FullMatrix<double> assembling_matrix (this->degree - 1, n_edge_points);
-           	     FullMatrix<double> system_matrix (assembling_matrix.m (), assembling_matrix.m ());
-           	     FullMatrix<double> system_matrix_inv (assembling_matrix.m (), assembling_matrix.m ());
-           	     Point<dim> point;
-           	     PreconditionJacobi<FullMatrix<double> > precondition;
-           	     std::vector<Point<dim - 2> > edge_quadrature_points = edge_quadrature.get_points ();
-           	     std::vector<Point<dim - 1> > quadrature_points = quadrature.get_points ();
-           	     Tensor<1, dim> grad;
-           	     Vector<double> assembling_vector (n_edge_points);
-           	     Vector<double> solution (assembling_matrix.m ());
-           	     Vector<double> system_rhs (assembling_matrix.m ());
+           	  for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
+           	     interpolation_matrix (3, vertex) = 0.25;
+           	  
+           	  double tmp;
+           	  int faculty_i = 1;
+           	  int faculty_ij;
+           	  int faculty_j;
+           	  int faculty_k;
+           	  int faculty_kl;
+           	  int faculty_l;
+           	  
+           	  for (int i = 2; i <= (int) this->degree; ++i) {
+           	     tmp = std::pow (0.5, i);
+           	     interpolation_matrix (i + 2, i + 2) = tmp;
+           	     interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
+           	     tmp *= 0.5;
+           	     interpolation_matrix (i + source_fe.degree + 1, i + 2) = tmp;
+           	     interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
+           	     interpolation_matrix (i + 3 * source_fe.degree - 1, i + 2 * this->degree) = tmp;
+           	     interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
+           	     tmp *= -2.0;
            	     
-           	     for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-           	        for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	           point = Point<dim> (0.0, 2.0 * edge_quadrature_points[q_point] (0), 0.0);
-           	           weight = std::sqrt (edge_quadrature.weight (q_point));
+           	     for (unsigned int j = 0; j < this->degree - 1;) {
+           	     	interpolation_matrix (i + source_fe.degree + 1, (i + 2) * this->degree + j + 2 - i) = tmp;
+           	     	interpolation_matrix (i + 3 * source_fe.degree - 1, i + (j + 4) * this->degree - j - 2) = tmp;
+           	        j = j + 2;
+           	     }
+           	     
+           	     faculty_k = 1;
+           	     
+           	     for (int j = 2; j <= (int) this->degree; ++j) {
+           	        interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
+           	        faculty_k *= j;
+           	        faculty_kl = 1;
+           	        faculty_l = faculty_k;
+           	        
+           	        for (int k = j + 1; k < (int) this->degree; ++k) {
+           	           faculty_kl *= k - j;
+           	           faculty_l *= k;
            	           
-           	           for (unsigned int i = 0; i < system_matrix.m (); ++i)
-           	              assembling_matrix (i, q_point) = weight * this->shape_value (i + 8, point);
+           	           if ((j + k) & 1)
+           	              interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = -1.0 * std::pow (0.5, i + k) * faculty_l / (faculty_k * faculty_kl);
+           	           
+           	           else
+           	              interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * faculty_l / (faculty_k * faculty_kl);
            	        }
+           	     }
+           	     
+           	     faculty_i *= i;
+           	     faculty_j = faculty_i;
+           	     faculty_ij = 1;
+           	     
+           	     for (int j = i + 1; j <= (int) this->degree; ++j) {
+           	        faculty_ij *= j - i;
+           	        faculty_j *= j;
            	        
-           	        assembling_matrix.mTmult (system_matrix, assembling_matrix);
-           	        system_matrix_inv.invert (system_matrix);
-           	        
-           	        for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
-           	           switch (line) {
-           	              case 0: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (0.0, 2.0 * edge_quadrature_points[q_point] (0), 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, edge_quadrature_points[q_point] (0), 0.0)) - interpolation_matrix (0, dof) * source_fe.shape_value (0, point) - interpolation_matrix (2, dof) * source_fe.shape_value (2, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 4, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
+           	        if ((i + j) & 1) {
+           	           tmp = -1.0 * std::pow (0.5, j) * faculty_j / (faculty_i * faculty_ij);
+           	           interpolation_matrix (i + 2, j + 2) = tmp;
+           	           interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+           	           faculty_k = 1;
+           	           
+           	           for (int k = 2; k <= (int) this->degree; ++k) {
+           	              interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
+           	              faculty_k *= k;
+           	              faculty_l = faculty_k;
+           	              faculty_kl = 1;
            	              
-           	              case 1: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (1.0, 2.0 * edge_quadrature_points[q_point] (0), 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, edge_quadrature_points[q_point] (0), 0.0)) - interpolation_matrix (1, dof) * source_fe.shape_value (1, point) - interpolation_matrix (3, dof) * source_fe.shape_value (3, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + source_fe.degree + 3, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 2: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (2.0 * edge_quadrature_points[q_point] (0), 0.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (edge_quadrature_points[q_point] (0), 0.0, 0.0)) - interpolation_matrix (0, dof) * source_fe.shape_value (0, point) - interpolation_matrix (1, dof) * source_fe.shape_value (1, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 2 * source_fe.degree + 2, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 3: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (2.0 * edge_quadrature_points[q_point] (0), 1.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (edge_quadrature_points[q_point] (0), 0.5, 0.0)) - interpolation_matrix (2, dof) * source_fe.shape_value (2, point) - interpolation_matrix (3, dof) * source_fe.shape_value (3, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 3 * source_fe.degree + 1, dof) = solution (i);
+           	              for (int l = k + 1; l <= (int) this->degree; ++l) {
+           	                 faculty_kl *= l - k;
+           	                 faculty_l *= l;
+           	                 
+           	                 if ((k + l) & 1)
+           	                    interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = -1.0 * tmp * std::pow (0.5, l) * faculty_l / (faculty_k * faculty_kl);
+           	                 
+           	                 else
+           	                    interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * faculty_l / (faculty_k * faculty_kl);
            	              }
            	           }
-           	        
-           	        assembling_matrix.reinit ((this->degree - 1) * (this->degree - 1), dim * n_quadrature_points);
-           	        assembling_vector.reinit (assembling_matrix.n ());
-           	        
-           	        for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point) {
-           	           point = Point<dim> (2.0 * quadrature_points[q_point] (0), 2.0 * quadrature_points[q_point] (1), 0.0);
-           	           grad = this->shape_grad (this->face_to_cell_index (dof, 4), Point<dim> (quadrature_points[q_point] (0), quadrature_points[q_point] (1), 0.0));
            	           
-           	           for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_face; ++vertex)
-           	              grad -= interpolation_matrix (vertex, dof) * source_fe.shape_grad (vertex, point);
+           	           tmp *= 0.5;
+           	           interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
+           	           interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
+           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
+           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+           	           tmp *= -2.0;
            	           
-           	           for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_face; ++line)
-           	              for (unsigned int i = 0; i < this->degree - 1; ++i)
-           	                 grad -= interpolation_matrix (i + line * (source_fe.degree - 1) + 4, dof) * source_fe.shape_grad (i + line * (source_fe.degree - 1) + 8, point);
-           	           
-           	           weight = std::sqrt (quadrature.weight (q_point));
-           	           grad *= weight;
-           	           
-           	           for (unsigned int d = 0; d < dim; ++d)
-           	              assembling_vector (dim * q_point + d) = grad[d];
-           	           
-           	           for (unsigned int i = 0; i < assembling_matrix.m (); ++i) {
-           	              grad = weight * this->shape_grad (i + 4 * ((this->degree + 2) * (this->degree - 1) + 2), point);
-           	              
-           	              for (unsigned int d = 0; d < dim; ++d)
-           	                 assembling_matrix (i, dim * q_point + d) = grad[d];
+           	           for (unsigned int k = 0; k < this->degree - 1;) {
+           	              interpolation_matrix (i + source_fe.degree + 1, (j + 2) * this->degree + k + 2 - j) = tmp;
+           	              interpolation_matrix (i + 3 * source_fe.degree - 1, j + (k + 4) * this->degree - k - 2) = tmp;
+           	              k = k + 2;
            	           }
            	        }
            	        
-           	        system_matrix.reinit (assembling_matrix.m (), assembling_matrix.n ());
-           	        assembling_matrix.mTmult (system_matrix, assembling_matrix);
-           	        system_rhs.reinit (system_matrix.m ());
-           	        assembling_matrix.vmult (system_rhs, assembling_vector);
-           	        solution.reinit (system_matrix.m ());
-           	        
-           	        SolverControl solver_control (system_matrix.m (), 1e-13, false, false);
-           	        SolverCG<> cg (solver_control);
-           	        
-           	        precondition.initialize (system_matrix);
-           	        cg.solve (system_matrix, solution, system_rhs, precondition);
-           	        
-           	        for (unsigned int i = 0; i < solution.size (); ++i)
-           	           if (std::abs (solution (i)) > 1e-14)
-           	              interpolation_matrix (i + 4 * source_fe.degree, dof) = solution (i);
+           	        else {
+           	           tmp = std::pow (0.5, j) * faculty_j / (faculty_i * faculty_ij);
+           	           interpolation_matrix (i + 2, j + 2) = tmp;
+           	           interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+           	           faculty_k = 1;
+           	           
+           	           for (int k = 2; k <= (int) this->degree; ++k) {
+           	              interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
+           	              faculty_k *= k;
+           	              faculty_l = faculty_k;
+           	              faculty_kl = 1;
+           	              
+           	              for (int l = k + 1; l <= (int) this->degree; ++l) {
+           	                 faculty_kl *= l - k;
+           	                 faculty_l *= l;
+           	                 
+           	                 if ((k + l) & 1)
+           	                    interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = -1.0 * tmp * std::pow (0.5, l) * faculty_l / (faculty_k * faculty_kl);
+           	                 
+           	                 else
+           	                    interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * faculty_l / (faculty_k * faculty_kl);
+           	              }
+           	           }
+           	           
+           	           tmp *= 0.5;
+           	           interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
+           	           interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
+           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
+           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+           	           tmp *= -2.0;
+           	           
+           	           for (unsigned int k = 0; k < this->degree - 1;) {
+           	              interpolation_matrix (i + source_fe.degree + 1, (j + 2) * this->degree + k + 2 - j) = tmp;
+           	              interpolation_matrix (i + 3 * source_fe.degree - 1, j + (k + 4) * this->degree - k - 2) = tmp;
+           	              k = k + 2;
+           	           }
+           	        }
            	     }
            	  }
            	  
@@ -996,162 +934,126 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
            }
            
            case 1: {
-           	  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> ())) > 1e-14)
-           	        interpolation_matrix (0, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.0, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.0, 0.0))) > 1e-14)
-           	        interpolation_matrix (1, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (1.0, 0.0, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, 0.5, 0.0))) > 1e-14)
-           	        interpolation_matrix (2, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.5, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.5, 0.0))) > 1e-14)
-           	        interpolation_matrix (3, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (1.0, 0.5, 0.0));
+           	  interpolation_matrix (0, 0) = 0.5;
+           	  interpolation_matrix (0, 1) = 0.5;
+           	  interpolation_matrix (1, 1) = 1.0;
+           	  interpolation_matrix (3, 1) = 0.5;
+           	  interpolation_matrix (3, 3) = 0.5;
+           	  
+           	  for (unsigned int i = 0; i < this->degree - 1;) {
+           	  	 for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
+           	  	    interpolation_matrix (2, i + line * (this->degree - 1) + 4) = -0.5;
+           	  	 
+           	  	 for (unsigned int j = 0; j < this->degree - 1;) {
+           	  	 	interpolation_matrix (2, i + (j + 4) * this->degree - j) = 1.0;
+           	  	    j = j + 2;
+           	  	 }
+           	  	 
+           	     interpolation_matrix (0, i + 2 * (this->degree + 1)) = -1.0;
+           	     interpolation_matrix (3, i + this->degree + 3) = -1.0;
+           	     i = i + 2;
            	  }
            	  
-           	  if (this->degree > 1) {
-           	     double weight;
-           	     QGauss<dim - 2> reference_edge_quadrature (this->degree + 1);
-           	     Quadrature<dim - 2> edge_quadrature_x = QProjector<dim - 2>::project_to_child (reference_edge_quadrature, 1);
-           	     Quadrature<dim - 2> edge_quadrature_y = QProjector<dim - 2>::project_to_child (reference_edge_quadrature, 0);
-           	     const unsigned int n_edge_points = reference_edge_quadrature.size ();
-           	     QGauss<dim - 1> reference_quadrature (this->degree);
-           	     Quadrature<dim - 1> quadrature = QProjector<dim - 1>::project_to_child (reference_quadrature, subface);
-           	     const unsigned int n_quadrature_points = quadrature.size ();
-           	     FullMatrix<double> assembling_matrix (this->degree - 1, n_edge_points);
-           	     FullMatrix<double> system_matrix (assembling_matrix.m (), assembling_matrix.m ());
-           	     FullMatrix<double> system_matrix_inv (assembling_matrix.m (), assembling_matrix.m ());
-           	     Point<dim> point;
-           	     PreconditionJacobi<FullMatrix<double> > precondition;
-           	     std::vector<Point<dim - 2> > edge_quadrature_x_points = edge_quadrature_x.get_points ();
-           	     std::vector<Point<dim - 2> > edge_quadrature_y_points = edge_quadrature_y.get_points ();
-           	     std::vector<Point<dim - 1> > quadrature_points = quadrature.get_points ();
-           	     Tensor<1, dim> grad;
-           	     Vector<double> assembling_vector (n_edge_points);
-           	     Vector<double> solution (assembling_matrix.m ());
-           	     Vector<double> system_rhs (assembling_matrix.m ());
+           	  for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
+           	     interpolation_matrix (2, vertex) = 0.25;
+           	  
+           	  double tmp;
+           	  int faculty_i = 1;
+           	  int faculty_ij;
+           	  int faculty_j;
+           	  int faculty_k;
+           	  int faculty_kl;
+           	  int faculty_l;
+           	  
+           	  for (int i = 2; i <= (int) this->degree; ++i) {
+           	  	 tmp = std::pow (0.5, i + 1);
+           	     interpolation_matrix (i + 2, i + 2) = tmp;
+           	     interpolation_matrix (i + 2, i + this->degree + 1) = tmp;
+           	     interpolation_matrix (i + 3 * source_fe.degree - 1, i + 2 * this->degree) = tmp;
+           	     interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
+           	     tmp *= -2.0;
            	     
-           	     for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-           	        for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	           point = Point<dim> (0.0, 2.0 * edge_quadrature_y_points[q_point] (0), 0.0);
-           	           weight = std::sqrt (edge_quadrature_y.weight (q_point));
-           	           
-           	           for (unsigned int i = 0; i < system_matrix.m (); ++i)
-           	              assembling_matrix (i, q_point) = weight * this->shape_value (i + 8, point);
-           	        }
+           	  	 for (unsigned int j = 0; j < this->degree - 1;) {
+           	  	 	interpolation_matrix (i + 2, j + (i + 2) * this->degree + 2 - i) = tmp;
+           	  	 	interpolation_matrix (i + 3 * source_fe.degree - 1, i + (j + 4) * this->degree - j - 2) = tmp;
+           	  	    j = j + 2;
+           	  	 }
+           	  	 
+           	  	 tmp *= - 1.0;
+           	  	 interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
+           	  	 interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
+           	     faculty_i *= i;
+           	     faculty_j = faculty_i;
+           	     faculty_ij = 1;
+           	     
+           	     for (int j = i + 1; j <= (int) this->degree; ++j) {
+           	        faculty_ij *= j - i;
+           	        faculty_j *= j;
+           	        tmp = std::pow (0.5, j) * faculty_j / (faculty_i * faculty_ij);
+           	        interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+           	        faculty_k = 1;
            	        
-           	        assembling_matrix.mTmult (system_matrix, assembling_matrix);
-           	        system_matrix_inv.invert (system_matrix);
-           	        
-           	        for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
-           	           switch (line) {
-           	              case 0: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (0.0, 2.0 * edge_quadrature_y_points[q_point] (0), 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature_y.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, edge_quadrature_y_points[q_point] (0), 0.0)) - interpolation_matrix (0, dof) * source_fe.shape_value (0, point) - interpolation_matrix (2, dof) * source_fe.shape_value (2, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 4, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
+           	        for (int k = 2; k <= (int) this->degree; ++k) {
+           	           interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
+           	           faculty_k *= k;
+           	           faculty_l = faculty_k;
+           	           faculty_kl = 1;
+           	           
+           	           for (int l = k + 1; l <= (int) this->degree; ++l) {
+           	              faculty_kl *= l - k;
+           	              faculty_l *= l;
            	              
-           	              case 1: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (1.0, 2.0 * edge_quadrature_y_points[q_point] (0), 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature_y.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (1.0, edge_quadrature_y_points[q_point] (0), 0.0)) - interpolation_matrix (1, dof) * source_fe.shape_value (1, point) - interpolation_matrix (3, dof) * source_fe.shape_value (3, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + source_fe.degree + 3, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
+           	              if ((k + l) & 1)
+           	                 interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = -1.0 * tmp * std::pow (0.5, l) * faculty_l / (faculty_k * faculty_kl);
            	              
-           	              case 2: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (2.0 * edge_quadrature_x_points[q_point] (0) - 1.0, 0.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature_x.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (edge_quadrature_x_points[q_point] (0), 0.0, 0.0)) - interpolation_matrix (0, dof) * source_fe.shape_value (0, point) - interpolation_matrix (1, dof) * source_fe.shape_value (1, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 2 * source_fe.degree + 2, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 3: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (2.0 * edge_quadrature_x_points[q_point] (0) - 1.0, 1.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature_x.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (edge_quadrature_x_points[q_point] (0), 0.5, 0.0)) - interpolation_matrix (2, dof) * source_fe.shape_value (2, point) - interpolation_matrix (3, dof) * source_fe.shape_value (3, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 3 * source_fe.degree + 1, dof) = solution (i);
-           	              }
-           	           }
-           	        
-           	        assembling_matrix.reinit ((this->degree - 1) * (this->degree - 1), dim * n_quadrature_points);
-           	        assembling_vector.reinit (assembling_matrix.n ());
-           	        
-           	        for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point) {
-           	           point = Point<dim> (2.0 * quadrature_points[q_point] (0) - 1.0, 2.0 * quadrature_points[q_point] (1), 0.0);
-           	           grad = this->shape_grad (this->face_to_cell_index (dof, 4), Point<dim> (quadrature_points[q_point] (0), quadrature_points[q_point] (1), 0.0));
-           	           
-           	           for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_face; ++vertex)
-           	              grad -= interpolation_matrix (vertex, dof) * source_fe.shape_grad (vertex, point);
-           	           
-           	           for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_face; ++line)
-           	              for (unsigned int i = 0; i < this->degree - 1; ++i)
-           	                 grad -= interpolation_matrix (i + line * (source_fe.degree - 1) + 4, dof) * source_fe.shape_grad (i + line * (source_fe.degree - 1) + 8, point);
-           	           
-           	           weight = std::sqrt (quadrature.weight (q_point));
-           	           grad *= weight;
-           	           
-           	           for (unsigned int d = 0; d < dim; ++d)
-           	              assembling_vector (dim * q_point + d) = grad[d];
-           	           
-           	           for (unsigned int i = 0; i < assembling_matrix.m (); ++i) {
-           	              grad = weight * this->shape_grad (i + 4 * ((this->degree + 2) * (this->degree - 1) + 2), point);
-           	              
-           	              for (unsigned int d = 0; d < dim; ++d)
-           	                 assembling_matrix (i, dim * q_point + d) = grad[d];
+           	              else
+           	                 interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * faculty_l / (faculty_k * faculty_kl);
            	           }
            	        }
            	        
-           	        system_matrix.reinit (assembling_matrix.m (), assembling_matrix.n ());
-           	        assembling_matrix.mTmult (system_matrix, assembling_matrix);
-           	        system_rhs.reinit (system_matrix.m ());
-           	        assembling_matrix.vmult (system_rhs, assembling_vector);
-           	        solution.reinit (system_matrix.m ());
+           	        tmp *= -1.0;
            	        
-           	        SolverControl solver_control (system_matrix.m (), 1e-13, false, false);
-           	        SolverCG<> cg (solver_control);
+           	        for (unsigned int k = 0; k < this->degree - 1;) {
+           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + (k + 4) * this->degree - k - 2) = tmp;
+           	           k = k + 2;
+           	        }
            	        
-           	        precondition.initialize (system_matrix);
-           	        cg.solve (system_matrix, solution, system_rhs, precondition);
+           	        tmp *= -0.5;
+           	        interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
+           	        interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
            	        
-           	        for (unsigned int i = 0; i < solution.size (); ++i)
-           	           if (std::abs (solution (i)) > 1e-14)
-           	              interpolation_matrix (i + 4 * source_fe.degree, dof) = solution (i);
+           	        if ((i + j) & 1)
+           	           tmp *= -1.0;
+           	           
+           	        interpolation_matrix (i + 2, j + 2) = tmp;
+           	        interpolation_matrix (i + 2, j + this->degree + 1) = tmp;
+           	        interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = 2.0 * tmp;
+           	        tmp *= -2.0;
+           	        
+           	        for (unsigned int k = 0; k < this->degree - 1;) {
+           	           interpolation_matrix (i + 2, k + (j + 2) * this->degree + 2 - j) = tmp;
+           	           k = k + 2;
+           	        }
+           	     }
+           	     
+           	     faculty_k = 1;
+           	     
+           	     for (int j = 2; j <= (int) this->degree; ++j) {
+           	        interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
+           	        faculty_k *= j;
+           	        faculty_l = faculty_k;
+           	        faculty_kl = 1;
+           	        
+           	        for (int k = j + 1; k <= (int) this->degree; ++k) {
+           	           faculty_kl *= k - j;
+           	           faculty_l *= k;
+           	           
+           	           if ((j + k) & 1)
+           	              interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = -1.0 * std::pow (0.5, i + k) * faculty_l / (faculty_k * faculty_kl);
+           	           
+           	           else
+           	              interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * faculty_l / (faculty_k * faculty_kl);
+           	        }
            	     }
            	  }
            	  
@@ -1159,325 +1061,226 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
            }
            
            case 2: {
-           	  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> ())) > 1e-14)
-           	        interpolation_matrix (0, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, 0.5, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.0, 0.0))) > 1e-14)
-           	        interpolation_matrix (1, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.5, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, 0.5, 0.0))) > 1e-14)
-           	        interpolation_matrix (2, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, 1.0, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.5, 0.0))) > 1e-14)
-           	        interpolation_matrix (3, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 1.0, 0.0));
-           	  }
-           	  
-           	  if (this->degree > 1) {
-           	     double weight;
-           	     QGauss<dim - 2> reference_edge_quadrature (this->degree + 1);
-           	     Quadrature<dim - 2> edge_quadrature_x = QProjector<dim - 2>::project_to_child (reference_edge_quadrature, 0);
-           	     Quadrature<dim - 2> edge_quadrature_y = QProjector<dim - 2>::project_to_child (reference_edge_quadrature, 1);
-           	     const unsigned int n_edge_points = reference_edge_quadrature.size ();
-           	     QGauss<dim - 1> reference_quadrature (this->degree);
-           	     Quadrature<dim - 1> quadrature = QProjector<dim - 1>::project_to_child (reference_quadrature, subface);
-           	     const unsigned int n_quadrature_points = quadrature.size ();
-           	     FullMatrix<double> assembling_matrix (this->degree - 1, n_edge_points);
-           	     FullMatrix<double> system_matrix (assembling_matrix.m (), assembling_matrix.m ());
-           	     FullMatrix<double> system_matrix_inv (assembling_matrix.m (), assembling_matrix.m ());
-           	     Point<dim> point;
-           	     PreconditionJacobi<FullMatrix<double> > precondition;
-           	     std::vector<Point<dim - 2> > edge_quadrature_x_points = edge_quadrature_x.get_points ();
-           	     std::vector<Point<dim - 2> > edge_quadrature_y_points = edge_quadrature_y.get_points ();
-           	     std::vector<Point<dim - 1> > quadrature_points = quadrature.get_points ();
-           	     Tensor<1, dim> grad;
-           	     Vector<double> assembling_vector (n_edge_points);
-           	     Vector<double> solution (assembling_matrix.m ());
-           	     Vector<double> system_rhs (assembling_matrix.m ());
-           	     
-           	     for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-           	        for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	           point = Point<dim> (0.0, 2.0 * edge_quadrature_y_points[q_point] (0) - 1.0, 0.0);
-           	           weight = std::sqrt (edge_quadrature_y.weight (q_point));
-           	           
-           	           for (unsigned int i = 0; i < system_matrix.m (); ++i)
-           	              assembling_matrix (i, q_point) = weight * this->shape_value (i + 8, point);
-           	        }
-           	        
-           	        assembling_matrix.mTmult (system_matrix, assembling_matrix);
-           	        system_matrix_inv.invert (system_matrix);
-           	        
-           	        for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
-           	           switch (line) {
-           	              case 0: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (0.0, 2.0 * edge_quadrature_y_points[q_point] (0) - 1.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature_y.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, edge_quadrature_y_points[q_point] (0), 0.0)) - interpolation_matrix (0, dof) * source_fe.shape_value (0, point) - interpolation_matrix (2, dof) * source_fe.shape_value (2, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 4, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 1: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (1.0, 2.0 * edge_quadrature_y_points[q_point] (0) - 1.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature_y.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, edge_quadrature_y_points[q_point] (0), 0.0)) - interpolation_matrix (1, dof) * source_fe.shape_value (1, point) - interpolation_matrix (3, dof) * source_fe.shape_value (3, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + source_fe.degree + 3, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 2: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (2.0 * edge_quadrature_x_points[q_point] (0), 0.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature_x.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (edge_quadrature_x_points[q_point] (0), 0.5, 0.0)) - interpolation_matrix (0, dof) * source_fe.shape_value (0, point) - interpolation_matrix (1, dof) * source_fe.shape_value (1, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 2 * source_fe.degree + 2, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 3: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (2.0 * edge_quadrature_x_points[q_point] (0), 1.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature_x.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (edge_quadrature_x_points[q_point] (0), 1.0, 0.0)) - interpolation_matrix (2, dof) * source_fe.shape_value (2, point) - interpolation_matrix (3, dof) * source_fe.shape_value (3, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 3 * source_fe.degree + 1, dof) = solution (i);
-           	              }
-           	           }
-           	        
-           	        assembling_matrix.reinit ((this->degree - 1) * (this->degree - 1), dim * n_quadrature_points);
-           	        assembling_vector.reinit (assembling_matrix.n ());
-           	        
-           	        for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point) {
-           	           point = Point<dim> (2.0 * quadrature_points[q_point] (0), 2.0 * quadrature_points[q_point] (1) - 1.0, 0.0);
-           	           grad = this->shape_grad (this->face_to_cell_index (dof, 4), Point<dim> (quadrature_points[q_point] (0), quadrature_points[q_point] (1), 0.0));
-           	           
-           	           for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_face; ++vertex)
-           	              grad -= interpolation_matrix (vertex, dof) * source_fe.shape_grad (vertex, point);
-           	           
-           	           for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_face; ++line)
-           	              for (unsigned int i = 0; i < this->degree - 1; ++i)
-           	                 grad -= interpolation_matrix (i + line * (source_fe.degree - 1) + 4, dof) * source_fe.shape_grad (i + line * (source_fe.degree - 1) + 8, point);
-           	           
-           	           weight = std::sqrt (quadrature.weight (q_point));
-           	           grad *= weight;
-           	           
-           	           for (unsigned int d = 0; d < dim; ++d)
-           	              assembling_vector (dim * q_point + d) = grad[d];
-           	           
-           	           for (unsigned int i = 0; i < assembling_matrix.m (); ++i) {
-           	              grad = weight * this->shape_grad (i + 4 * ((this->degree + 2) * (this->degree - 1) + 2), point);
-           	              
-           	              for (unsigned int d = 0; d < dim; ++d)
-           	                 assembling_matrix (i, dim * q_point + d) = grad[d];
-           	           }
-           	        }
-           	        
-           	        system_matrix.reinit (assembling_matrix.m (), assembling_matrix.n ());
-           	        assembling_matrix.mTmult (system_matrix, assembling_matrix);
-           	        system_rhs.reinit (system_matrix.m ());
-           	        assembling_matrix.vmult (system_rhs, assembling_vector);
-           	        solution.reinit (system_matrix.m ());
-           	        
-           	        SolverControl solver_control (system_matrix.m (), 1e-13, false, false);
-           	        SolverCG<> cg (solver_control);
-           	        
-           	        precondition.initialize (system_matrix);
-           	        cg.solve (system_matrix, solution, system_rhs, precondition);
-           	        
-           	        for (unsigned int i = 0; i < solution.size (); ++i)
-           	           if (std::abs (solution (i)) > 1e-14)
-           	              interpolation_matrix (i + 4 * source_fe.degree, dof) = solution (i);
-           	     }
-           	  }
-           	  
+              interpolation_matrix (0, 0) = 0.5;
+              interpolation_matrix (0, 2) = 0.5;
+              interpolation_matrix (2, 2) = 1.0;
+              interpolation_matrix (3, 2) = 0.5;
+              interpolation_matrix (3, 3) = 0.5;
+              
+              for (unsigned int i = 0; i < this->degree - 1;) {
+                 for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
+                    interpolation_matrix (1, i + line * (this->degree - 1) + 4) = -0.5;
+                 
+                 for (unsigned int j = 0; j < this->degree - 1;) {
+                 	interpolation_matrix (1, i + (j + 4) * this->degree - j) = 1.0;
+                    j = j + 2;
+                 }
+                 
+                 interpolation_matrix (0, i + 4) = -1.0;
+                 interpolation_matrix (3, i + 3 * this->degree + 1) = -1.0;
+                 i = i + 2;
+              }
+              
+              for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
+                 interpolation_matrix (1, vertex) = 0.25;
+              
+              double tmp;
+              int faculty_i = 1;
+              int faculty_ij;
+              int faculty_j;
+              int faculty_k;
+              int faculty_kl;
+              int faculty_l;
+              
+              for (int i = 2; i <= (int) this->degree; ++i) {
+              	 tmp = std::pow (0.5, i);
+                 interpolation_matrix (i + 2, i + 2) = tmp;
+                 interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
+                 tmp *= 0.5;
+                 interpolation_matrix (i + source_fe.degree + 1, i + 2) = tmp;
+                 interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
+                 interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
+                 interpolation_matrix (i + 2 * source_fe.degree, i + 3 * this->degree - 1) = tmp;
+                 tmp *= -2.0;
+                 
+                 for (unsigned int j = 0; j < this->degree - 1;) {
+                 	interpolation_matrix (i + source_fe.degree + 1, j + (i + 2) * this->degree + 2 - i) = tmp;
+                 	interpolation_matrix (i + 2 * source_fe.degree, i + (j + 4) * this->degree - j - 2) = tmp;
+                    j = j + 2;
+                 }
+                 
+                 faculty_k = 1;
+                 
+                 for (int j = 2; j <= (int) this->degree; ++j) {
+                    interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
+                    faculty_k *= j;
+                    faculty_l = faculty_k;
+                    faculty_kl = 1;
+                    
+                    for (int k = j + 1; k <= (int) this->degree; ++k) {
+                       faculty_kl *= k - j;
+                       faculty_l *= k;
+                       interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * faculty_l / (faculty_k * faculty_kl);
+                    }
+                 }
+                 
+                 faculty_i *= i;
+                 faculty_j = faculty_i;
+                 faculty_ij = 1;
+                 
+                 for (int j = i + 1; j <= (int) this->degree; ++j) {
+                    faculty_ij *= j - i;
+                    faculty_j *= j;
+                    tmp = std::pow (0.5, j) * faculty_j / (faculty_i * faculty_ij);
+                    interpolation_matrix (i + 2, j + 2) = tmp;
+                    tmp *= -1.0;
+                    
+                    for (unsigned int k = 0; k < this->degree - 1;) {
+                       interpolation_matrix (i + source_fe.degree + 1, k + (j + 2) * this->degree + 2 - j) = tmp;
+                       k = k + 2;
+                    }
+                    
+                    tmp *= -0.5;
+                    interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
+                    interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
+                    
+                    if ((i + j) & 1)
+                       tmp *= -1.0;
+                       
+                    interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+                    interpolation_matrix (i + 2 * source_fe.degree, j + 3 * this->degree - 1) = tmp;
+                    tmp *= 2.0;
+                    interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+                    faculty_k = 1;
+                    
+                    for (int k = 2; k <= (int) this->degree; ++k) {
+                       interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
+                       faculty_k *= k;
+                       faculty_l = faculty_k;
+                       faculty_kl = 1;
+                       
+                       for (int l = k + 1; l <= (int) this->degree; ++l) {
+                          faculty_kl *= l - k;
+                          faculty_l *= l;
+                          interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * faculty_l / (faculty_k * faculty_kl);
+                       }
+                    }
+                    
+                    tmp *= -1.0;
+                       
+                    for (unsigned int k = 0; k < this->degree - 1;) {
+                       interpolation_matrix (i + 2 * source_fe.degree, j + (k + 4) * this->degree - k - 2) = tmp;
+                       k = k + 2;
+                    }
+                 }
+              }
+              
               break;
            }
            
            case 3: {
-           	  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> ())) > 1e-14)
-           	        interpolation_matrix (0, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.5, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.0, 0.0))) > 1e-14)
-           	        interpolation_matrix (1, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (1.0, 0.5, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.0, 0.5, 0.0))) > 1e-14)
-           	        interpolation_matrix (2, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 1.0, 0.0));
-           	     
-           	  	 if (std::abs (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, 0.5, 0.0))) > 1e-14)
-           	        interpolation_matrix (3, dof) = this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (1.0, 1.0, 0.0));
-           	  }
-           	  
-           	  if (this->degree > 1) {
-           	     double weight;
-           	     QGauss<dim - 2> reference_edge_quadrature (this->degree + 1);
-           	     Quadrature<dim - 2> edge_quadrature = QProjector<dim - 2>::project_to_child (reference_edge_quadrature, 1);
-           	     const unsigned int n_edge_points = reference_edge_quadrature.size ();
-           	     QGauss<dim - 1> reference_quadrature (this->degree);
-           	     Quadrature<dim - 1> quadrature = QProjector<dim - 1>::project_to_child (reference_quadrature, subface);
-           	     const unsigned int n_quadrature_points = quadrature.size ();
-           	     FullMatrix<double> assembling_matrix (this->degree - 1, n_edge_points);
-           	     FullMatrix<double> system_matrix (assembling_matrix.m (), assembling_matrix.m ());
-           	     FullMatrix<double> system_matrix_inv (assembling_matrix.m (), assembling_matrix.m ());
-           	     Point<dim> point;
-           	     PreconditionJacobi<FullMatrix<double> > precondition;
-           	     std::vector<Point<dim - 2> > edge_quadrature_points = edge_quadrature.get_points ();
-           	     std::vector<Point<dim - 1> > quadrature_points = quadrature.get_points ();
-           	     Tensor<1, dim> grad;
-           	     Vector<double> assembling_vector (n_edge_points);
-           	     Vector<double> solution (assembling_matrix.m ());
-           	     Vector<double> system_rhs (assembling_matrix.m ());
-           	     
-           	     for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof) {
-           	        for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	           point = Point<dim> (0.0, 2.0 * edge_quadrature_points[q_point] (0) - 1.0, 0.0);
-           	           weight = std::sqrt (edge_quadrature.weight (q_point));
-           	           
-           	           for (unsigned int i = 0; i < system_matrix.m (); ++i)
-           	              assembling_matrix (i, q_point) = weight * this->shape_value (i + 8, point);
-           	        }
-           	        
-           	        assembling_matrix.mTmult (system_matrix, assembling_matrix);
-           	        system_matrix_inv.invert (system_matrix);
-           	        
-           	        for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
-           	           switch (line) {
-           	              case 0: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (0.0, 2.0 * edge_quadrature_points[q_point] (0) - 1.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (0.5, edge_quadrature_points[q_point] (0), 0.0)) - interpolation_matrix (0, dof) * source_fe.shape_value (0, point) - interpolation_matrix (2, dof) * source_fe.shape_value (2, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 4, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 1: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (1.0, 2.0 * edge_quadrature_points[q_point] (0) - 1.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (1.0, edge_quadrature_points[q_point] (0), 0.0)) - interpolation_matrix (1, dof) * source_fe.shape_value (1, point) - interpolation_matrix (3, dof) * source_fe.shape_value (3, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + source_fe.degree + 3, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 2: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (2.0 * edge_quadrature_points[q_point] (0) - 1.0, 0.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (edge_quadrature_points[q_point] (0), 0.5, 0.0)) - interpolation_matrix (0, dof) * source_fe.shape_value (0, point) - interpolation_matrix (1, dof) * source_fe.shape_value (1, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 2 * source_fe.degree + 2, dof) = solution (i);
-           	              	 
-           	                 break;
-           	              }
-           	              
-           	              case 3: {
-           	              	 for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point) {
-           	              	    point = Point<dim> (2.0 * edge_quadrature_points[q_point] (0) - 1.0, 1.0, 0.0);
-           	              	    assembling_vector (q_point) = std::sqrt (edge_quadrature.weight (q_point)) * (this->shape_value (this->face_to_cell_index (dof, 4), Point<dim> (edge_quadrature_points[q_point] (0), 1.0, 0.0)) - interpolation_matrix (2, dof) * source_fe.shape_value (2, point) - interpolation_matrix (3, dof) * source_fe.shape_value (3, point));
-           	              	 }
-           	              	 
-           	              	 assembling_matrix.vmult (system_rhs, assembling_vector);
-           	              	 system_matrix_inv.vmult (solution, system_rhs);
-           	              	 
-           	              	 for (unsigned int i = 0; i < solution.size (); ++i)
-           	              	    if (std::abs (solution (i)) > 1e-14)
-           	              	       interpolation_matrix (i + 3 * source_fe.degree + 1, dof) = solution (i);
-           	              }
-           	           }
-           	        
-           	        assembling_matrix.reinit ((this->degree - 1) * (this->degree - 1), dim * n_quadrature_points);
-           	        assembling_vector.reinit (assembling_matrix.n ());
-           	        
-           	        for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point) {
-           	           point = Point<dim> (2.0 * quadrature_points[q_point] (0) - 1.0, 2.0 * quadrature_points[q_point] (1) - 1.0, 0.0);
-           	           grad = this->shape_grad (this->face_to_cell_index (dof, 4), Point<dim> (quadrature_points[q_point] (0), quadrature_points[q_point] (1), 0.0));
-           	           
-           	           for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_face; ++vertex)
-           	              grad -= interpolation_matrix (vertex, dof) * source_fe.shape_grad (vertex, point);
-           	           
-           	           for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_face; ++line)
-           	              for (unsigned int i = 0; i < this->degree - 1; ++i)
-           	                 grad -= interpolation_matrix (i + line * (source_fe.degree - 1) + 4, dof) * source_fe.shape_grad (i + line * (source_fe.degree - 1) + 8, point);
-           	           
-           	           weight = std::sqrt (quadrature.weight (q_point));
-           	           grad *= weight;
-           	           
-           	           for (unsigned int d = 0; d < dim; ++d)
-           	              assembling_vector (dim * q_point + d) = grad[d];
-           	           
-           	           for (unsigned int i = 0; i < assembling_matrix.m (); ++i) {
-           	              grad = weight * this->shape_grad (i + 4 * ((this->degree + 2) * (this->degree - 1) + 2), point);
-           	              
-           	              for (unsigned int d = 0; d < dim; ++d)
-           	                 assembling_matrix (i, dim * q_point + d) = grad[d];
-           	           }
-           	        }
-           	        
-           	        system_matrix.reinit (assembling_matrix.m (), assembling_matrix.n ());
-           	        assembling_matrix.mTmult (system_matrix, assembling_matrix);
-           	        system_rhs.reinit (system_matrix.m ());
-           	        assembling_matrix.vmult (system_rhs, assembling_vector);
-           	        solution.reinit (system_matrix.m ());
-           	        
-           	        SolverControl solver_control (system_matrix.m (), 1e-13, false, false);
-           	        SolverCG<> cg (solver_control);
-           	        
-           	        precondition.initialize (system_matrix);
-           	        cg.solve (system_matrix, solution, system_rhs, precondition);
-           	        
-           	        for (unsigned int i = 0; i < solution.size (); ++i)
-           	           if (std::abs (solution (i)) > 1e-14)
-           	              interpolation_matrix (i + 4 * source_fe.degree, dof) = solution (i);
-           	     }
-           	  }
+              for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
+                 interpolation_matrix (0, vertex) = 0.25;
+              
+              for (unsigned int i = 0; i < this->degree - 1;) {
+                 for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
+                    interpolation_matrix (0, i + line * (this->degree - 1) + 4) = -0.5;
+                 
+                 for (unsigned int j = 0; j < this->degree - 1;) {
+                 	interpolation_matrix (0, i + (j + 4) * this->degree - j) = 1.0;
+                    j = j + 2;
+                 }
+                 
+                 interpolation_matrix (1, i + 4) = -1.0;
+                 interpolation_matrix (2, i + 3 * this->degree + 1) = -1.0;
+                 i = i + 2;
+              }
+              
+              interpolation_matrix (1, 0) = 0.5;
+              interpolation_matrix (1, 1) = 0.5;
+              interpolation_matrix (2, 2) = 0.5;
+              interpolation_matrix (2, 3) = 0.5;
+              interpolation_matrix (3, 3) = 1.0;
+              
+              double tmp;
+              int faculty_i = 1;
+              int faculty_ij;
+              int faculty_j;
+              int faculty_k;
+              int faculty_kl;
+              int faculty_l;
+              
+              for (int i = 2; i <= (int) this->degree; ++i) {
+              	 tmp = std::pow (0.5, i + 1);
+                 interpolation_matrix (i + 2, i + 2) = tmp;
+                 interpolation_matrix (i + 2, i + this->degree + 1) = tmp;
+                 interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
+                 interpolation_matrix (i + 2 * source_fe.degree, i + 3 * this->degree - 1) = tmp;
+                 tmp *= -2.0;
+                 
+                 for (unsigned int j = 0; j < this->degree - 1;) {
+                 	interpolation_matrix (i + 2, j + (i + 2) * this->degree + 2 - i) = tmp;
+                 	interpolation_matrix (i + 2 * source_fe.degree, i + (j + 4) * this->degree - 2) = tmp;
+                    j = j + 2;
+                 }
+                 
+                 tmp *= -1.0;
+                 interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
+                 interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
+                 faculty_k = 1;
+                 
+                 for (int j = 2; j <= (int) this->degree; ++j) {
+                    interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
+                    faculty_k *= j;
+                    faculty_l = faculty_k;
+                    faculty_kl = 1;
+                    
+                    for (int k = j + 1; k <= (int) this->degree; ++k) {
+                       faculty_kl *= k - j;
+                       faculty_l *= k;
+                       interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * faculty_l / (faculty_k * faculty_kl);
+                    }
+                 }
+                 
+                 faculty_i *= i;
+                 faculty_j = faculty_i;
+                 faculty_ij = 1;
+                 
+                 for (int j = i + 1; j <= (int) this->degree; ++j) {
+                    faculty_ij *= j - i;
+                    faculty_j *= j;
+                    tmp = std::pow (0.5, j + 1) * faculty_j / (faculty_i * faculty_ij);
+                    interpolation_matrix (i + 2, j + 2) = tmp;
+                    interpolation_matrix (i + 2, j + this->degree + 1) = tmp;
+                    interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+                    interpolation_matrix (i + 2 * source_fe.degree, j + 3 * this->degree - 1) = tmp;
+                    tmp *= 2.0;
+                    interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
+                    interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+                    faculty_k = 1;
+                    
+                    for (int k = 2; k <= (int) this->degree; ++k) {
+                       interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
+                       faculty_k *= k;
+                       faculty_l = faculty_k;
+                       faculty_kl = 1;
+                       
+                       for (int l = k + 1; l <= (int) this->degree; ++l) {
+                          faculty_kl *= l - k;
+                          faculty_l *= l;
+                          interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * faculty_l / (faculty_k * faculty_kl);
+                       }
+                    }
+                    
+                    tmp *= -1.0;
+                    
+                    for (unsigned int k = 0; k < this->degree - 1;) {
+                       interpolation_matrix (i + 2, k + (j + 2) * this->degree + 2 - j) = tmp;
+                       interpolation_matrix (i + 2 * source_fe.degree, j + (k + 4) * this->degree - 2) = tmp;
+                       k = k + 2;
+                    }                    
+                 }
+              }
            }
         }
      }
