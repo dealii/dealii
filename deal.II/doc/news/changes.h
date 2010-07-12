@@ -39,6 +39,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: GCC version 3.3.x failed to compile the file
+  <code>lac/include/lac/precondition_block.h</code>. This problem has now been
+  worked around.
+  <br>
+  (WB 2010/07/12)
+  </p>
+
+  <li>
   <p>Fixed: Some older 3.x versions of GCC crashed compiling the functions in
   namespace DoFRenumbering::boost. There is now a configuration time test
   that checks that the compiler accepts the constructs in question. If the
