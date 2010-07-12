@@ -39,9 +39,10 @@ inconvenience this causes.
 
 <ol>
   <li>
-  <p>Fixed: GCC version 3.3.x failed to compile the file
-  <code>lac/include/lac/precondition_block.h</code>. This problem has now been
-  worked around.
+  <p>Fixed: GCC version 3.3.x failed to compile the files
+  <code>lac/include/lac/precondition_block.h</code> and
+  <code>deal.II/source/multigrid/mg_dof_handler.cc</code>. This problem has
+  now been worked around.
   <br>
   (WB 2010/07/12)
   </p>
