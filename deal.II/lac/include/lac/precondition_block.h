@@ -56,7 +56,7 @@ class PreconditionBlockJacobi;
  * only above the diagonal blocks (e.g. the matrices one gets by the
  * DG method with downstream numbering) @p BlockSOR is a direct
  * solver.
- * 
+ *
  * This first implementation of the @p PreconditionBlock assumes the
  * matrix has blocks each of the same block size. Varying block sizes
  * within the matrix must still be implemented if needed.
@@ -87,7 +87,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * Value type for inverse matrices.
 				      */
     typedef inverse_type value_type;
-    
+
   public:
 				     /**
 				      * Parameters for block preconditioners.
@@ -110,7 +110,7 @@ class PreconditionBlock : public virtual Subscriptor
 					  * Relaxation parameter.
 					  */
 	double relaxation;
-	
+
 					 /**
 					  * Block size.
 					  */
@@ -127,13 +127,13 @@ class PreconditionBlock : public virtual Subscriptor
 					  */
 	bool same_diagonal;
     };
-    
-    
+
+
 				     /**
 				      * Constructor.
 				      */
     PreconditionBlock();
-    
+
 				     /**
 				      * Destructor.
 				      */
@@ -196,7 +196,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * Replacement of
 				      * invert_diagblocks() for
 				      * permuted preconditioning.
-				      */ 
+				      */
     void invert_permuted_diagblocks(
       const std::vector<unsigned int>& permutation,
       const std::vector<unsigned int>& inverse_permutation);
@@ -224,7 +224,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     value_type el(unsigned int i,
 		  unsigned int j) const;
-    
+
 				     /**
 				      * Use only the inverse of the
 				      * first diagonal block to save
@@ -245,7 +245,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * diagonal block?
 				      */
     bool same_diagonal () const;
-    
+
     				     /**
 				      * Stores the inverse of the
 				      * diagonal blocks in
@@ -298,7 +298,7 @@ class PreconditionBlock : public virtual Subscriptor
       const Vector<number2> &prev,
       const Vector<number2> &src,
       const bool transpose_diagonal) const;
-    
+
 				     /**
 				      * Perform one block relaxation
 				      * step in backward numbering.
@@ -322,7 +322,7 @@ class PreconditionBlock : public virtual Subscriptor
       const Vector<number2> &prev,
       const Vector<number2> &src,
       const bool transpose_diagonal) const;
-    
+
 
 				     /**
 				      * Return the size of the blocks.
@@ -334,7 +334,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * matrix.
 				      */
     unsigned int n_blocks() const;
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -380,19 +380,19 @@ class PreconditionBlock : public virtual Subscriptor
     DeclException0 (ExcDiagonalsNotStored);
 
 				     //@}
-    
+
 				     /**
 				      * Access to the inverse diagonal
 				      * blocks.
 				      */
     const FullMatrix<inverse_type>& inverse (unsigned int i) const;
-    
+
 				     /**
 				      * Access to the diagonal
 				      * blocks.
 				      */
     const FullMatrix<inverse_type>& diagonal (unsigned int i) const;
-    
+
   protected:
 				     /**
 				      * Size of the blocks. Each
@@ -436,18 +436,18 @@ class PreconditionBlock : public virtual Subscriptor
 				      * The permutation vector
 				      */
     std::vector<unsigned int> permutation;
-    
+
 				     /**
 				      * The inverse permutation vector
 				      */
     std::vector<unsigned int> inverse_permutation;
-    
+
 				     /**
 				      * Flag for diagonal compression.
 				      * @ref set_same_diagonal()
 				      */
   private:
-    
+
 				     /**
 				      * Storage of the inverse
 				      * matrices of the diagonal
@@ -468,7 +468,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * Used by the blocked SSOR method.
 				      */
     std::vector<FullMatrix<inverse_type> > var_diagonal;
-				      
+
     bool var_same_diagonal;
 };
 
@@ -481,7 +481,7 @@ class PreconditionBlock : public virtual Subscriptor
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
- * 
+ *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -493,7 +493,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      * Define number type of matrix.
 				      */
     typedef typename MATRIX::value_type number;
-    
+
   public:
 				     /**
 				      * STL conforming iterator.
@@ -534,7 +534,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
                                               * Value of this matrix entry.
                                               */
             inverse_type value() const;
-	
+
           protected:
                                              /**
                                               * The matrix accessed.
@@ -546,7 +546,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 					      * for further reference.
 					      */
 	    unsigned int bs;
-	    
+
 					     /**
 					      * Current block number.
 					      */
@@ -561,21 +561,21 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 					      * End of current block.
 					      */
 	    typename FullMatrix<inverse_type>::const_iterator b_end;
-	    
+
                                              /**
                                               * Make enclosing class a
                                               * friend.
                                               */
             friend class const_iterator;
         };
-        
+
       public:
                                          /**
                                           * Constructor.
-                                          */ 
+                                          */
 	const_iterator(const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix,
 		       const unsigned int row);
-	  
+
                                          /**
                                           * Prefix increment.
                                           */
@@ -632,7 +632,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      * publicly available.
 				      */
     PreconditionBlock<MATRIX, inverse_type>::initialize;
-    
+
 				     /**
 				      * Make function of base class public again.
 				      */
@@ -657,12 +657,12 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      * Make function public.
 				      */
     PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
-    
+
 				     /**
 				      * Make function public.
 				      */
     PreconditionBlock<MATRIX, inverse_type>::block_size;
-    
+
 				     /**
 				      * Make function public.
 				      */
@@ -675,7 +675,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      * Make function accessible.
 				      */
     PreconditionBlock<MATRIX, inverse_type>::set_permutation;
-    
+
 				     /**
 				      * Execute block Jacobi
 				      * preconditioning.
@@ -724,14 +724,14 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      */
     template <typename number2>
     void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
-    
+
 				     /**
 				      * Perform one step of the Jacobi
 				      * iteration.
 				      */
     template <typename number2>
     void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
-    
+
     				     /**
 				      * STL-like iterator with the
 				      * first entry.
@@ -742,7 +742,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      * Final iterator.
 				      */
     const_iterator end () const;
-    
+
 				     /**
 				      * STL-like iterator with the
 				      * first entry of row @p r.
@@ -753,7 +753,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      * Final iterator of row @p r.
 				      */
     const_iterator end (const unsigned int r) const;
-    
+
 
   private:
 				   /**
@@ -784,7 +784,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * arbitrarily.
  *
  * See PreconditionBlock for requirements on the matrix.
- * 
+ *
  * Optionally, the entries of the source vector can be treated in the
  * order of the indices in the permutation vector set by
  * #set_permutation (or the opposite order for Tvmult()). The inverse
@@ -800,7 +800,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
- * 
+ *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -812,46 +812,46 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * Define number type of matrix.
 				      */
     typedef typename MATRIX::value_type number;
-    
+
 				     /**
 				      * Make type publicly available.
 				      */
-    PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
-    
+    using PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
+
 				     /**
 				      * Make initialization function
 				      * publicly available.
 				      */
-    PreconditionBlock<MATRIX, inverse_type>::initialize;
-    
-				     /**
-				      * Make function of base class public again.
-				      */
-    PreconditionBlock<MATRIX, inverse_type>::clear;
+    using PreconditionBlock<MATRIX, inverse_type>::initialize;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<MATRIX, inverse_type>::empty;
-    
-				     /**
-				      * Make function of base class public again.
-				      */
-    PreconditionBlock<MATRIX, inverse_type>::el;
+    using PreconditionBlock<MATRIX, inverse_type>::clear;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
+    using PreconditionBlock<MATRIX, inverse_type>::empty;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
+    using PreconditionBlock<MATRIX, inverse_type>::el;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    using PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    using PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
 				     /**
 				      * Make function accessible.
 				      */
-    PreconditionBlock<MATRIX, inverse_type>::set_permutation;
+    using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
 				     /**
 				      * Execute block SOR
@@ -935,14 +935,14 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      */
     template <typename number2>
     void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
-    
+
 				     /**
 				      * Perform one step of the
 				      * transposed SOR iteration.
 				      */
     template <typename number2>
     void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
-    
+
   protected:
 				     /**
 				      * Implementation of the forward
@@ -992,11 +992,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
  * class requires storage of the diagonal blocks and their inverses.
  *
  * See PreconditionBlock for requirements on the matrix.
- * 
+ *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
- * 
+ *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -1018,13 +1018,13 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				      * Make type publicly available.
 				      */
     PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
-    
+
 				     /**
 				      * Make initialization function
 				      * publicly available.
 				      */
     PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
-    
+
 				     /**
 				      * Make function of base class public again.
 				      */
@@ -1075,14 +1075,14 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
-    
+
 				     /**
 				      * Perform one step of the SOR
 				      * iteration.
 				      */
     template <typename number2>
     void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
-    
+
 				     /**
 				      * Perform one step of the
 				      * transposed SOR iteration.
@@ -1137,7 +1137,7 @@ PreconditionBlock<MATRIX, inverse_type>::el (
 {
   const unsigned int bs = blocksize;
   const unsigned int nb = i/bs;
-  
+
   const FullMatrix<inverse_type>& B = inverse(nb);
 
   const unsigned int ib = i % bs;
@@ -1147,7 +1147,7 @@ PreconditionBlock<MATRIX, inverse_type>::el (
     {
       return 0.;
     }
-  
+
   return B(ib, jb);
 }
 
@@ -1188,7 +1188,7 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::row() c
 {
   Assert (a_block < matrix->n_blocks(),
 	  ExcIteratorPastEnd());
-  
+
   return bs * a_block + b_iterator->row();
 }
 
@@ -1200,7 +1200,7 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::column(
 {
   Assert (a_block < matrix->n_blocks(),
 	  ExcIteratorPastEnd());
-  
+
   return bs * a_block + b_iterator->column();
 }
 
@@ -1212,7 +1212,7 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::value()
 {
   Assert (a_block < matrix->n_blocks(),
 	  ExcIteratorPastEnd());
-  
+
   return b_iterator->value();
 }
 
@@ -1233,12 +1233,12 @@ typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator &
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::operator++ ()
 {
   Assert (*this != accessor.matrix->end(), ExcIteratorPastEnd());
-  
+
   ++accessor.b_iterator;
   if (accessor.b_iterator == accessor.b_end)
     {
       ++accessor.a_block;
-      
+
       if (accessor.a_block < accessor.matrix->n_blocks())
 	{
 	  accessor.b_iterator = accessor.matrix->inverse(accessor.a_block).begin();
@@ -1279,7 +1279,7 @@ operator == (const const_iterator& other) const
 
   if (accessor.a_block != other.accessor.a_block)
     return false;
-  
+
   return (accessor.row() == other.accessor.row() &&
           accessor.column() == other.accessor.column());
 }
