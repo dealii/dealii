@@ -6,8 +6,8 @@
 D=..
 
 # get options which hold for all files of the project
+ifneq ($(CLEAN),yes)
 include $D/common/Make.global_options
-
 
 # create lists of file names
 cc-files     = $(shell echo $D/lac/source/*.cc)
@@ -130,11 +130,6 @@ include/lac/lapack_templates.h: include/lac/lapack_templates.h.in $D/common/scri
 	@echo ===================================== Remaking $@
 	@$(PERL) $D/common/scripts/lapack_templates.pl include/lac/lapack_templates.h.in > $@
 
-
-clean:
-	-rm -f *~ include/*~ include/*/*~ Makefile.dep source/*.inst
-
-
 # Rule to generate the dependency file. This file is
 # automagically remade whenever needed, i.e. whenever
 # one of the cc-/h-files changed. Make detects whether
@@ -153,6 +148,12 @@ Makefile.dep: include/lac/lapack_templates.h \
 
 # include all the dependencies
 include Makefile.dep
+endif # CLEAN
+
+
+clean:
+	-rm -f *~ include/*~ include/*/*~ Makefile.dep source/*.inst
+
 
 .PHONY: clean
 .PHONY: lib lib$(static-lib-suffix) lib.g$(static-lib-suffix)

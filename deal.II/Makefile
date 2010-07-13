@@ -2,7 +2,7 @@
 #
 # Makefile for the whole library
 
-# include global options and pathes. there's one exception where we don't want
+# include global options and paths. there's one exception where we don't want
 # that, namely for build tests: in that case, the makefile is called before we
 # have even run ./configure, so we can't include this file, but the target
 # then called doesn't need the variables defined in there doesn't need them
@@ -39,14 +39,8 @@ help:
 	@echo "=    distclean  : removes all object files, libraries, etc in subdirs  ="
 	@echo "========================================================================"
 
-
-common/scripts/make_dependencies:
-	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS) make_dependencies
-
-common/scripts/expand_instantiations:
-	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS) expand_instantiations
-
-deps: common/scripts/make_dependencies common/scripts/expand_instantiations
+deps:
+	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS)
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/lac && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
@@ -142,8 +136,7 @@ TAGS:
 	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
 
 
-clean: deps \
-       clean-contrib clean-base clean-lac clean-dealII \
+clean: clean-contrib clean-base clean-lac clean-dealII \
        clean-doc clean-examples clean-lib clean-tests
 	-rm -f TODO common/TAGS
 
@@ -151,22 +144,22 @@ clean-contrib:
 	cd $D/contrib && $(MAKE) clean
 
 clean-base:
-	cd $D/base && $(MAKE) clean
+	cd $D/base && $(MAKE) CLEAN=yes clean
 
 clean-lac:
-	cd $D/lac && $(MAKE) clean
+	cd $D/lac && $(MAKE) CLEAN=yes clean
 
 clean-dealII:
-	cd $D/deal.II && $(MAKE) clean
+	cd $D/deal.II && $(MAKE) CLEAN=yes clean
 
 clean-doc:
-	cd $D/doc && $(MAKE) clean
+	cd $D/doc && $(MAKE) CLEAN=yes clean
 
 clean-examples:
-	cd $D/examples && $(MAKE) clean
+	cd $D/examples && $(MAKE) CLEAN=yes clean
 
 clean-lib:
-	cd $D/lib && $(MAKE) clean
+	cd $D/lib && $(MAKE) CLEAN=yes clean
 
 # if that directory exists, go into 'tests' and clean up there as well
 clean-tests:

@@ -77,7 +77,7 @@ validate-xrefs:
 clean:
 	-for i in deal.II/* ; do rm $$i ; done
 	-rm *.tag
-	@cd tutorial ; $(MAKE) clean
+	@cd tutorial ; $(MAKE) CLEAN=yes clean
 
 
 .PHONY: html tutorial private deal.II \

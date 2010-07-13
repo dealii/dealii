@@ -7,9 +7,8 @@ D=..
 
 
 # get options which hold for all files of the project
+ifneq ($(CLEAN),yes)
 include $D/common/Make.global_options
-
-
 
 # top level targets
 default: 2dg 2d
@@ -219,6 +218,7 @@ Makefile.dep: $(cc-files) $(h-files) \
 # include all the dependencies
 include Makefile.dep
 
+endif
 
 
 

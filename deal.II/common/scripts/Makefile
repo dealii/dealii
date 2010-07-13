@@ -30,9 +30,9 @@ report_features$(EXEEXT) : report_features.cc $D/common/Make.global_options
 	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
 clean:
-	-rm -f make_dependencies
+	-rm -f make_dependencies$(EXEEXT)
 	-rm -f make_dependencies.o
-	-rm -f expand_instantiations
+	-rm -f expand_instantiations$(EXEEXT)
 	-rm -f expand_instantiations.o
 
 .PHONY: clean

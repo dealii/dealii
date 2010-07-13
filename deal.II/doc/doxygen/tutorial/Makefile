@@ -196,4 +196,6 @@ Makefile.dep: $(shell echo $D/examples/*/*.cc $D/examples/*/doc/*.dox) Makefile
 	 done \
 	> $@
 
+ifneq ($(CLEAN),yes)
 include Makefile.dep
+endif

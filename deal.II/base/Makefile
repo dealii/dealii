@@ -6,6 +6,9 @@
 # deal.II top level directory
 D=..
 
+# get options which hold for all files of the project
+ifneq ($(CLEAN),yes)
+include $D/common/Make.global_options
 
 # create lists of file names
 cc-files     = $(shell echo $D/base/source/*.cc)
@@ -13,10 +16,6 @@ o-files-base = $(addprefix $(LIBDIR)/base/, $(patsubst $D/base/source/%,%,$(cc-f
 o-files      = $(sort $(o-files-base))
 go-files     = $(o-files:.$(OBJEXT)=.g.$(OBJEXT))
 h-files      = $(sort $(shell echo include/base/*.h))
-
-# get options which hold for all files of the project
-include $D/common/Make.global_options
-
 
 # there's an extra .o file for the function parser that we need to link into
 # libbase. do similarly for the threading building block things if threading
@@ -94,12 +93,6 @@ $(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,base.g) $@
 
 
-
-
-clean:
-	-rm -f *~ include/*~ include/*/*~ Makefile.dep source/*.inst
-
-
 # Rule to generate the dependency file. This file is
 # automagically remade whenever needed, i.e. whenever
 # one of the cc-/h-files changed. Make detects whether
@@ -117,6 +110,11 @@ Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 
 # include all the dependencies
 include Makefile.dep
+endif
+
+clean:
+	-rm -f *~ include/*~ include/*/*~ Makefile.dep source/*.inst
+
 
 .PHONY: clean
 .PHONY: lib lib$(static-lib-suffix) lib.g$(static-lib-suffix)
