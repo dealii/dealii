@@ -46,10 +46,10 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 		  Polynomials::Hierarchical::generate_complete_basis(degree),
 		  FiniteElementData<dim>(get_dpo_vector(degree),1, degree, FiniteElementData<dim>::H1),
 		  std::vector<bool> (FiniteElementData<dim>(
-		    get_dpo_vector(degree),1, degree).dofs_per_cell, false),
+				       get_dpo_vector(degree),1, degree).dofs_per_cell, false),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
-		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true))),
-						    face_renumber(face_fe_q_hierarchical_to_hierarchic_numbering (degree))
+						    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true))),
+		face_renumber(face_fe_q_hierarchical_to_hierarchic_numbering (degree))
 {
   this->poly_space.set_numbering(
     hierarchic_to_fe_q_hierarchical_numbering(*this));
@@ -203,7 +203,7 @@ FE_Q_Hierarchical<dim>::build_dofs_cell (std::vector<FullMatrix<double> > &dofs_
 		  ((c==1) && (j==0) && ((k % 2)==0)))
 		dofs_subcell[c](j,k) = -1.;
 	    }
-	                        // lower diagonal block
+					   // lower diagonal block
 	  else if ((j>=2) && (k>=2) && (j<=k))
 	    {
 	      double factor = 1.;
@@ -221,7 +221,7 @@ FE_Q_Hierarchical<dim>::build_dofs_cell (std::vector<FullMatrix<double> > &dofs_
 		  dofs_subcell[c](j,k) = std::pow(.5,static_cast<double>(k))*factor;
 		  dofs_cell[c](j,k) = ((k+j) % 2 == 0) ? 
 				      std::pow(2.,static_cast<double>(j))*factor :
-					 -std::pow(2.,static_cast<double>(j))*factor;
+				      -std::pow(2.,static_cast<double>(j))*factor;
 		}
 	    }
 	}
@@ -271,7 +271,7 @@ initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell)
 	      dofs_subcell[0](1,i % dofs_1d) * 
 	      dofs_subcell[0](1,(i - (i % dofs_1d)) / dofs_1d);
 
-						 // boundary vertex nodes
+					     // boundary vertex nodes
 	    this->interface_constraints(1,face_renumber[i]) = 
 	      dofs_subcell[0](0, i % dofs_1d) * 
 	      dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
@@ -285,7 +285,7 @@ initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell)
 	      dofs_subcell[1](0, i % dofs_1d) * 
 	      dofs_subcell[1](1, (i - (i % dofs_1d)) / dofs_1d);
 	  
-						 // interior edges
+					     // interior edges
 	    for (unsigned int j=0; j<(degree-1); j++)
 	      {
 		this->interface_constraints(5 + j,face_renumber[i]) = 
@@ -627,31 +627,31 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   interpolation_matrix = 0;
   
   switch (dim) {
-     case 2: {
-        for (unsigned int i = 0; i < this->dofs_per_face; ++i)
-           interpolation_matrix (i, i) = 1;
+    case 2: {
+      for (unsigned int i = 0; i < this->dofs_per_face; ++i)
+	interpolation_matrix (i, i) = 1;
         
-        break;
-     }
+      break;
+    }
      
-     case 3: {
-        for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_face; ++i)
-           interpolation_matrix (i, i) = 1;
+    case 3: {
+      for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_face; ++i)
+	interpolation_matrix (i, i) = 1;
         
-        for (unsigned int i = 0; i < this->degree - 1; ++i) {
-           for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face; ++j)
-              interpolation_matrix (
-                i + j * (x_source_fe.degree - 1) + GeometryInfo<3>::vertices_per_face,
-                i + j * (this->degree - 1) + GeometryInfo<3>::vertices_per_face) = 1;
+      for (unsigned int i = 0; i < this->degree - 1; ++i) {
+	for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face; ++j)
+	  interpolation_matrix (
+	    i + j * (x_source_fe.degree - 1) + GeometryInfo<3>::vertices_per_face,
+	    i + j * (this->degree - 1) + GeometryInfo<3>::vertices_per_face) = 1;
         
-           for (unsigned int j = 0; j < this->degree - 1; ++j)
-              interpolation_matrix (
-                (i + GeometryInfo<3>::lines_per_face) * (x_source_fe.degree - 1) + j
-                + GeometryInfo<3>::vertices_per_face,
-                (i + GeometryInfo<3>::lines_per_face) * (this->degree - 1) + j
-                + GeometryInfo<3>::vertices_per_face) = 1;
-        }
-     }
+	for (unsigned int j = 0; j < this->degree - 1; ++j)
+	  interpolation_matrix (
+	    (i + GeometryInfo<3>::lines_per_face) * (x_source_fe.degree - 1) + j
+	    + GeometryInfo<3>::vertices_per_face,
+	    (i + GeometryInfo<3>::lines_per_face) * (this->degree - 1) + j
+	    + GeometryInfo<3>::vertices_per_face) = 1;
+      }
+    }
   }
 }
 
@@ -702,389 +702,433 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	  typename FEL::
 	  ExcInterpolationNotImplemented ());
   
-  switch (dim) {
-     case 2: {
-     	switch (subface) {
-     	   case 0: {
-     	   	  interpolation_matrix (0, 0) = 1.0;
-     	   	  interpolation_matrix (1, 0) = 0.5;
-     	   	  interpolation_matrix (1, 1) = 0.5;
+  switch (dim)
+    {
+      case 2:
+      {
+     	switch (subface)
+	  {
+	    case 0:
+	    {
+	      interpolation_matrix (0, 0) = 1.0;
+	      interpolation_matrix (1, 0) = 0.5;
+	      interpolation_matrix (1, 1) = 0.5;
      	   	  
-     	   	  for (unsigned int dof = 2; dof < this->dofs_per_face;) {
-     	   	     interpolation_matrix (1, dof) = -1.0;
-     	   	     dof = dof + 2;
-     	   	  }
+	      for (unsigned int dof = 2; dof < this->dofs_per_face;)
+		{
+		  interpolation_matrix (1, dof) = -1.0;
+		  dof = dof + 2;
+		}
      	   	  
-     	   	  int factorial_i = 1;
-     	   	  int factorial_ij;
-     	   	  int factorial_j;
+	      int factorial_i = 1;
+	      int factorial_ij;
+	      int factorial_j;
      	   	  
-     	   	  for (int i = 2; i < (int) this->dofs_per_face; ++i) {
-     	   	     interpolation_matrix (i, i) = std::pow (0.5, i);
-     	   	     factorial_i *= i;
-     	   	     factorial_j = factorial_i;
-     	   	     factorial_ij = 1;
+	      for (int i = 2; i < (int) this->dofs_per_face; ++i)
+		{
+		  interpolation_matrix (i, i) = std::pow (0.5, i);
+		  factorial_i *= i;
+		  factorial_j = factorial_i;
+		  factorial_ij = 1;
      	   	     
-     	   	     for (int j = i + 1; j < (int) this->dofs_per_face; ++j) {
-     	   	        factorial_ij *= j - i;
-     	   	        factorial_j *= j;
+		  for (int j = i + 1; j < (int) this->dofs_per_face; ++j)
+		    {
+		      factorial_ij *= j - i;
+		      factorial_j *= j;
      	   	        
-     	   	        if ((i + j) & 1)
-     	   	           interpolation_matrix (i, j) = -1.0 * std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
+		      if ((i + j) & 1)
+			interpolation_matrix (i, j)
+			  = -1.0 * std::pow (0.5, j) *
+			  factorial_j / (factorial_i * factorial_ij);
      	   	        
-     	   	        else
-     	   	           interpolation_matrix (i, j) = std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
-     	   	     }
-     	   	  }
+		      else
+			interpolation_matrix (i, j)
+			  = std::pow (0.5, j) *
+			  factorial_j / (factorial_i * factorial_ij);
+		    }
+		}
      	
      	      break;
-     	   }
+	    }
      	   
-     	   case 1: {
-     	   	  interpolation_matrix (0, 0) = 0.5;
-     	   	  interpolation_matrix (0, 1) = 0.5;
+	    case 1:
+	    {
+	      interpolation_matrix (0, 0) = 0.5;
+	      interpolation_matrix (0, 1) = 0.5;
      	   	  
-     	   	  for (unsigned int dof = 2; dof < this->dofs_per_face;) {
-     	   	     interpolation_matrix (0, dof) = -1.0;
-     	   	     dof = dof + 2;
-     	   	  }
+	      for (unsigned int dof = 2; dof < this->dofs_per_face;)
+		{
+		  interpolation_matrix (0, dof) = -1.0;
+		  dof = dof + 2;
+		}
      	   	  
-     	   	  interpolation_matrix (1, 1) = 1.0;
+	      interpolation_matrix (1, 1) = 1.0;
      	   	  
-     	   	  int factorial_i = 1;
-     	   	  int factorial_ij;
-     	   	  int factorial_j;
+	      int factorial_i = 1;
+	      int factorial_ij;
+	      int factorial_j;
      	   	  
-     	   	  for (int i = 2; i < (int) this->dofs_per_face; ++i) {
-     	   	     interpolation_matrix (i, i) = std::pow (0.5, i);
-     	   	     factorial_i *= i;
-     	   	     factorial_j = factorial_i;
-     	   	     factorial_ij = 1;
+	      for (int i = 2; i < (int) this->dofs_per_face; ++i)
+		{
+		  interpolation_matrix (i, i) = std::pow (0.5, i);
+		  factorial_i *= i;
+		  factorial_j = factorial_i;
+		  factorial_ij = 1;
      	   	     
-     	   	     for (int j = i + 1; j < (int) this->dofs_per_face; ++j) {
-     	   	        factorial_ij *= j - i;
-     	   	        factorial_j *= j;
-     	   	        interpolation_matrix (i, j) = std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
-     	   	     }
-     	   	  }
-     	   }
-     	}
+		  for (int j = i + 1; j < (int) this->dofs_per_face; ++j)
+		    {
+		      factorial_ij *= j - i;
+		      factorial_j *= j;
+		      interpolation_matrix (i, j)
+			= std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
+		    }
+		}
+	    }
+	  }
      	
         break;
-     }
+      }
      
-     case 3: {
-        switch (subface) {
-           case 0: {
+      case 3:
+      {
+        switch (subface)
+	  {
+	    case 0:
+	    {
               interpolation_matrix (0, 0) = 1.0;
               interpolation_matrix (1, 0) = 0.5;
               interpolation_matrix (1, 1) = 0.5;
               interpolation_matrix (2, 0) = 0.5;
               interpolation_matrix (2, 2) = 0.5;
            	  
-           	  for (unsigned int i = 0; i < this->degree - 1;) {
-           	     for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
-           	        interpolation_matrix (3, i + line * (this->degree - 1) + 4) = -0.5;
+	      for (unsigned int i = 0; i < this->degree - 1;)
+		{
+		  for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
+		    interpolation_matrix (3, i + line * (this->degree - 1) + 4) = -0.5;
            	     
-           	     for (unsigned int j = 0; j < this->degree - 1;) {
-           	     	interpolation_matrix (3, i + (j + 4) * this->degree - j) = 1.0;
-           	        j = j + 2;
-           	     }
+		  for (unsigned int j = 0; j < this->degree - 1;)
+		    {
+		      interpolation_matrix (3, i + (j + 4) * this->degree - j) = 1.0;
+		      j = j + 2;
+		    }
            	     
-           	     interpolation_matrix (1, i + 2 * (this->degree + 1)) = -1.0;
-           	     interpolation_matrix (2, i + 4) = -1.0;
-           	     i = i + 2;
-           	  }
+		  interpolation_matrix (1, i + 2 * (this->degree + 1)) = -1.0;
+		  interpolation_matrix (2, i + 4) = -1.0;
+		  i = i + 2;
+		}
            	  
-           	  for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
-           	     interpolation_matrix (3, vertex) = 0.25;
+	      for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
+		interpolation_matrix (3, vertex) = 0.25;
            	  
-           	  double tmp;
-           	  int factorial_i = 1;
-           	  int factorial_ij;
-           	  int factorial_j;
-           	  int factorial_k;
-           	  int factorial_kl;
-           	  int factorial_l;
+	      int factorial_i = 1;
+	      int factorial_ij;
+	      int factorial_j;
+	      int factorial_k;
+	      int factorial_kl;
+	      int factorial_l;
            	  
-           	  for (int i = 2; i <= (int) this->degree; ++i) {
-           	     tmp = std::pow (0.5, i);
-           	     interpolation_matrix (i + 2, i + 2) = tmp;
-           	     interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
-           	     tmp *= 0.5;
-           	     interpolation_matrix (i + source_fe.degree + 1, i + 2) = tmp;
-           	     interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
-           	     interpolation_matrix (i + 3 * source_fe.degree - 1, i + 2 * this->degree) = tmp;
-           	     interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
-           	     tmp *= -2.0;
+	      for (int i = 2; i <= (int) this->degree; ++i)
+		{
+		  double tmp = std::pow (0.5, i);
+		  interpolation_matrix (i + 2, i + 2) = tmp;
+		  interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
+		  tmp *= 0.5;
+		  interpolation_matrix (i + source_fe.degree + 1, i + 2) = tmp;
+		  interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
+		  interpolation_matrix (i + 3 * source_fe.degree - 1, i + 2 * this->degree) = tmp;
+		  interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
+		  tmp *= -2.0;
            	     
-           	     for (unsigned int j = 0; j < this->degree - 1;) {
-           	     	interpolation_matrix (i + source_fe.degree + 1, (i + 2) * this->degree + j + 2 - i) = tmp;
-           	     	interpolation_matrix (i + 3 * source_fe.degree - 1, i + (j + 4) * this->degree - j - 2) = tmp;
-           	        j = j + 2;
-           	     }
+		  for (unsigned int j = 0; j < this->degree - 1;)
+		    {
+		      interpolation_matrix (i + source_fe.degree + 1, (i + 2) * this->degree + j + 2 - i) = tmp;
+		      interpolation_matrix (i + 3 * source_fe.degree - 1, i + (j + 4) * this->degree - j - 2) = tmp;
+		      j = j + 2;
+		    }
            	     
-           	     factorial_k = 1;
+		  factorial_k = 1;
            	     
-           	     for (int j = 2; j <= (int) this->degree; ++j) {
-           	        interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
-           	        factorial_k *= j;
-           	        factorial_kl = 1;
-           	        factorial_l = factorial_k;
+		  for (int j = 2; j <= (int) this->degree; ++j)
+		    {
+		      interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
+		      factorial_k *= j;
+		      factorial_kl = 1;
+		      factorial_l = factorial_k;
            	        
-           	        for (int k = j + 1; k < (int) this->degree; ++k) {
-           	           factorial_kl *= k - j;
-           	           factorial_l *= k;
+		      for (int k = j + 1; k < (int) this->degree; ++k)
+			{
+			  factorial_kl *= k - j;
+			  factorial_l *= k;
            	           
-           	           if ((j + k) & 1)
-           	              interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = -1.0 * std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
+			  if ((j + k) & 1)
+			    interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = -1.0 * std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
            	           
-           	           else
-           	              interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
+			  else
+			    interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
            	        }
-           	     }
+		    }
            	     
-           	     factorial_i *= i;
-           	     factorial_j = factorial_i;
-           	     factorial_ij = 1;
+		  factorial_i *= i;
+		  factorial_j = factorial_i;
+		  factorial_ij = 1;
            	     
-           	     for (int j = i + 1; j <= (int) this->degree; ++j) {
-           	        factorial_ij *= j - i;
-           	        factorial_j *= j;
+		  for (int j = i + 1; j <= (int) this->degree; ++j)
+		    {
+		      factorial_ij *= j - i;
+		      factorial_j *= j;
            	        
-           	        if ((i + j) & 1) {
-           	           tmp = -1.0 * std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
-           	           interpolation_matrix (i + 2, j + 2) = tmp;
-           	           interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
-           	           factorial_k = 1;
+		      if ((i + j) & 1)
+			{
+			  tmp = -1.0 * std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
+			  interpolation_matrix (i + 2, j + 2) = tmp;
+			  interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+			  factorial_k = 1;
            	           
-           	           for (int k = 2; k <= (int) this->degree; ++k) {
+			  for (int k = 2; k <= (int) this->degree; ++k)
+			    {
            	              interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
            	              factorial_k *= k;
            	              factorial_l = factorial_k;
            	              factorial_kl = 1;
            	              
            	              for (int l = k + 1; l <= (int) this->degree; ++l) {
-           	                 factorial_kl *= l - k;
-           	                 factorial_l *= l;
+				factorial_kl *= l - k;
+				factorial_l *= l;
            	                 
-           	                 if ((k + l) & 1)
-           	                    interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = -1.0 * tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
+				if ((k + l) & 1)
+				  interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = -1.0 * tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
            	                 
-           	                 else
-           	                    interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
+				else
+				  interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
            	              }
-           	           }
+			    }
            	           
-           	           tmp *= 0.5;
-           	           interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
-           	           interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
-           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
-           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
-           	           tmp *= -2.0;
+			  tmp *= 0.5;
+			  interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
+			  interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
+			  interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
+			  interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+			  tmp *= -2.0;
            	           
-           	           for (unsigned int k = 0; k < this->degree - 1;) {
+			  for (unsigned int k = 0; k < this->degree - 1;)
+			    {
            	              interpolation_matrix (i + source_fe.degree + 1, (j + 2) * this->degree + k + 2 - j) = tmp;
            	              interpolation_matrix (i + 3 * source_fe.degree - 1, j + (k + 4) * this->degree - k - 2) = tmp;
            	              k = k + 2;
-           	           }
+			    }
            	        }
-           	        
-           	        else {
-           	           tmp = std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
-           	           interpolation_matrix (i + 2, j + 2) = tmp;
-           	           interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
-           	           factorial_k = 1;
+		      else
+			{
+			  tmp = std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
+			  interpolation_matrix (i + 2, j + 2) = tmp;
+			  interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+			  factorial_k = 1;
            	           
-           	           for (int k = 2; k <= (int) this->degree; ++k) {
+			  for (int k = 2; k <= (int) this->degree; ++k)
+			    {
            	              interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
            	              factorial_k *= k;
            	              factorial_l = factorial_k;
            	              factorial_kl = 1;
            	              
-           	              for (int l = k + 1; l <= (int) this->degree; ++l) {
-           	                 factorial_kl *= l - k;
-           	                 factorial_l *= l;
+           	              for (int l = k + 1; l <= (int) this->degree; ++l)
+				{
+				  factorial_kl *= l - k;
+				  factorial_l *= l;
            	                 
-           	                 if ((k + l) & 1)
+				  if ((k + l) & 1)
            	                    interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = -1.0 * tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
            	                 
-           	                 else
+				  else
            	                    interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
-           	              }
-           	           }
+				}
+			    }
            	           
-           	           tmp *= 0.5;
-           	           interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
-           	           interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
-           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
-           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
-           	           tmp *= -2.0;
+			  tmp *= 0.5;
+			  interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
+			  interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
+			  interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
+			  interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+			  tmp *= -2.0;
            	           
-           	           for (unsigned int k = 0; k < this->degree - 1;) {
+			  for (unsigned int k = 0; k < this->degree - 1;)
+			    {
            	              interpolation_matrix (i + source_fe.degree + 1, (j + 2) * this->degree + k + 2 - j) = tmp;
            	              interpolation_matrix (i + 3 * source_fe.degree - 1, j + (k + 4) * this->degree - k - 2) = tmp;
            	              k = k + 2;
-           	           }
+			    }
            	        }
-           	     }
-           	  }
+		    }
+		}
            	  
               break;
-           }
+	    }
            
-           case 1: {
-           	  interpolation_matrix (0, 0) = 0.5;
-           	  interpolation_matrix (0, 1) = 0.5;
-           	  interpolation_matrix (1, 1) = 1.0;
-           	  interpolation_matrix (3, 1) = 0.5;
-           	  interpolation_matrix (3, 3) = 0.5;
+	    case 1:
+	    {
+	      interpolation_matrix (0, 0) = 0.5;
+	      interpolation_matrix (0, 1) = 0.5;
+	      interpolation_matrix (1, 1) = 1.0;
+	      interpolation_matrix (3, 1) = 0.5;
+	      interpolation_matrix (3, 3) = 0.5;
            	  
-           	  for (unsigned int i = 0; i < this->degree - 1;) {
-           	  	 for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
-           	  	    interpolation_matrix (2, i + line * (this->degree - 1) + 4) = -0.5;
+	      for (unsigned int i = 0; i < this->degree - 1;)
+		{
+		  for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
+		    interpolation_matrix (2, i + line * (this->degree - 1) + 4) = -0.5;
            	  	 
-           	  	 for (unsigned int j = 0; j < this->degree - 1;) {
-           	  	 	interpolation_matrix (2, i + (j + 4) * this->degree - j) = 1.0;
-           	  	    j = j + 2;
-           	  	 }
+		  for (unsigned int j = 0; j < this->degree - 1;)
+		    {
+		      interpolation_matrix (2, i + (j + 4) * this->degree - j) = 1.0;
+		      j = j + 2;
+		    }
            	  	 
-           	     interpolation_matrix (0, i + 2 * (this->degree + 1)) = -1.0;
-           	     interpolation_matrix (3, i + this->degree + 3) = -1.0;
-           	     i = i + 2;
-           	  }
+		  interpolation_matrix (0, i + 2 * (this->degree + 1)) = -1.0;
+		  interpolation_matrix (3, i + this->degree + 3) = -1.0;
+		  i = i + 2;
+		}
            	  
-           	  for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
-           	     interpolation_matrix (2, vertex) = 0.25;
+	      for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
+		interpolation_matrix (2, vertex) = 0.25;
            	  
-           	  double tmp;
-           	  int factorial_i = 1;
-           	  int factorial_ij;
-           	  int factorial_j;
-           	  int factorial_k;
-           	  int factorial_kl;
-           	  int factorial_l;
+	      int factorial_i = 1;
+	      int factorial_ij;
+	      int factorial_j;
+	      int factorial_k;
+	      int factorial_kl;
+	      int factorial_l;
            	  
-           	  for (int i = 2; i <= (int) this->degree; ++i) {
-           	  	 tmp = std::pow (0.5, i + 1);
-           	     interpolation_matrix (i + 2, i + 2) = tmp;
-           	     interpolation_matrix (i + 2, i + this->degree + 1) = tmp;
-           	     interpolation_matrix (i + 3 * source_fe.degree - 1, i + 2 * this->degree) = tmp;
-           	     interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
-           	     tmp *= -2.0;
+	      for (int i = 2; i <= (int) this->degree; ++i)
+		{
+		  double tmp = std::pow (0.5, i + 1);
+		  interpolation_matrix (i + 2, i + 2) = tmp;
+		  interpolation_matrix (i + 2, i + this->degree + 1) = tmp;
+		  interpolation_matrix (i + 3 * source_fe.degree - 1, i + 2 * this->degree) = tmp;
+		  interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
+		  tmp *= -2.0;
            	     
-           	  	 for (unsigned int j = 0; j < this->degree - 1;) {
-           	  	 	interpolation_matrix (i + 2, j + (i + 2) * this->degree + 2 - i) = tmp;
-           	  	 	interpolation_matrix (i + 3 * source_fe.degree - 1, i + (j + 4) * this->degree - j - 2) = tmp;
-           	  	    j = j + 2;
-           	  	 }
+		  for (unsigned int j = 0; j < this->degree - 1;)
+		    {
+		      interpolation_matrix (i + 2, j + (i + 2) * this->degree + 2 - i) = tmp;
+		      interpolation_matrix (i + 3 * source_fe.degree - 1, i + (j + 4) * this->degree - j - 2) = tmp;
+		      j = j + 2;
+		    }
            	  	 
-           	  	 tmp *= - 1.0;
-           	  	 interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
-           	  	 interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
-           	     factorial_i *= i;
-           	     factorial_j = factorial_i;
-           	     factorial_ij = 1;
+		  tmp *= - 1.0;
+		  interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
+		  interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
+		  factorial_i *= i;
+		  factorial_j = factorial_i;
+		  factorial_ij = 1;
            	     
-           	     for (int j = i + 1; j <= (int) this->degree; ++j) {
-           	        factorial_ij *= j - i;
-           	        factorial_j *= j;
-           	        tmp = std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
-           	        interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
-           	        factorial_k = 1;
+		  for (int j = i + 1; j <= (int) this->degree; ++j)
+		    {
+		      factorial_ij *= j - i;
+		      factorial_j *= j;
+		      tmp = std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
+		      interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+		      factorial_k = 1;
            	        
-           	        for (int k = 2; k <= (int) this->degree; ++k) {
-           	           interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
-           	           factorial_k *= k;
-           	           factorial_l = factorial_k;
-           	           factorial_kl = 1;
+		      for (int k = 2; k <= (int) this->degree; ++k)
+			{
+			  interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
+			  factorial_k *= k;
+			  factorial_l = factorial_k;
+			  factorial_kl = 1;
            	           
-           	           for (int l = k + 1; l <= (int) this->degree; ++l) {
+			  for (int l = k + 1; l <= (int) this->degree; ++l)
+			    {
            	              factorial_kl *= l - k;
            	              factorial_l *= l;
            	              
            	              if ((k + l) & 1)
-           	                 interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = -1.0 * tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
+				interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = -1.0 * tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
            	              
            	              else
-           	                 interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
-           	           }
+				interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
+			    }
            	        }
            	        
-           	        tmp *= -1.0;
+		      tmp *= -1.0;
            	        
-           	        for (unsigned int k = 0; k < this->degree - 1;) {
-           	           interpolation_matrix (i + 3 * source_fe.degree - 1, j + (k + 4) * this->degree - k - 2) = tmp;
-           	           k = k + 2;
+		      for (unsigned int k = 0; k < this->degree - 1;)
+			{
+			  interpolation_matrix (i + 3 * source_fe.degree - 1, j + (k + 4) * this->degree - k - 2) = tmp;
+			  k = k + 2;
            	        }
            	        
-           	        tmp *= -0.5;
-           	        interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
-           	        interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+		      tmp *= -0.5;
+		      interpolation_matrix (i + 3 * source_fe.degree - 1, j + 2 * this->degree) = tmp;
+		      interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
            	        
-           	        if ((i + j) & 1)
-           	           tmp *= -1.0;
+		      if ((i + j) & 1)
+			tmp *= -1.0;
            	           
-           	        interpolation_matrix (i + 2, j + 2) = tmp;
-           	        interpolation_matrix (i + 2, j + this->degree + 1) = tmp;
-           	        interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = 2.0 * tmp;
-           	        tmp *= -2.0;
+		      interpolation_matrix (i + 2, j + 2) = tmp;
+		      interpolation_matrix (i + 2, j + this->degree + 1) = tmp;
+		      interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = 2.0 * tmp;
+		      tmp *= -2.0;
            	        
-           	        for (unsigned int k = 0; k < this->degree - 1;) {
-           	           interpolation_matrix (i + 2, k + (j + 2) * this->degree + 2 - j) = tmp;
-           	           k = k + 2;
+		      for (unsigned int k = 0; k < this->degree - 1;)
+			{
+			  interpolation_matrix (i + 2, k + (j + 2) * this->degree + 2 - j) = tmp;
+			  k = k + 2;
            	        }
-           	     }
+		    }
            	     
-           	     factorial_k = 1;
+		  factorial_k = 1;
            	     
-           	     for (int j = 2; j <= (int) this->degree; ++j) {
-           	        interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
-           	        factorial_k *= j;
-           	        factorial_l = factorial_k;
-           	        factorial_kl = 1;
+		  for (int j = 2; j <= (int) this->degree; ++j)
+		    {
+		      interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
+		      factorial_k *= j;
+		      factorial_l = factorial_k;
+		      factorial_kl = 1;
            	        
-           	        for (int k = j + 1; k <= (int) this->degree; ++k) {
-           	           factorial_kl *= k - j;
-           	           factorial_l *= k;
+		      for (int k = j + 1; k <= (int) this->degree; ++k)
+			{
+			  factorial_kl *= k - j;
+			  factorial_l *= k;
            	           
-           	           if ((j + k) & 1)
-           	              interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = -1.0 * std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
+			  if ((j + k) & 1)
+			    interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = -1.0 * std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
            	           
-           	           else
-           	              interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
+			  else
+			    interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
            	        }
-           	     }
-           	  }
+		    }
+		}
            	  
               break;
-           }
+	    }
            
-           case 2: {
+	    case 2:
+	    {
               interpolation_matrix (0, 0) = 0.5;
               interpolation_matrix (0, 2) = 0.5;
               interpolation_matrix (2, 2) = 1.0;
               interpolation_matrix (3, 2) = 0.5;
               interpolation_matrix (3, 3) = 0.5;
               
-              for (unsigned int i = 0; i < this->degree - 1;) {
-                 for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
+              for (unsigned int i = 0; i < this->degree - 1;)
+		{
+		  for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
                     interpolation_matrix (1, i + line * (this->degree - 1) + 4) = -0.5;
                  
-                 for (unsigned int j = 0; j < this->degree - 1;) {
-                 	interpolation_matrix (1, i + (j + 4) * this->degree - j) = 1.0;
-                    j = j + 2;
-                 }
+		  for (unsigned int j = 0; j < this->degree - 1;)
+		    {
+		      interpolation_matrix (1, i + (j + 4) * this->degree - j) = 1.0;
+		      j = j + 2;
+		    }
                  
-                 interpolation_matrix (0, i + 4) = -1.0;
-                 interpolation_matrix (3, i + 3 * this->degree + 1) = -1.0;
-                 i = i + 2;
-              }
+		  interpolation_matrix (0, i + 4) = -1.0;
+		  interpolation_matrix (3, i + 3 * this->degree + 1) = -1.0;
+		  i = i + 2;
+		}
               
               for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
-                 interpolation_matrix (1, vertex) = 0.25;
+		interpolation_matrix (1, vertex) = 0.25;
               
-              double tmp;
               int factorial_i = 1;
               int factorial_ij;
               int factorial_j;
@@ -1092,109 +1136,121 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
               int factorial_kl;
               int factorial_l;
               
-              for (int i = 2; i <= (int) this->degree; ++i) {
-              	 tmp = std::pow (0.5, i);
-                 interpolation_matrix (i + 2, i + 2) = tmp;
-                 interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
-                 tmp *= 0.5;
-                 interpolation_matrix (i + source_fe.degree + 1, i + 2) = tmp;
-                 interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
-                 interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
-                 interpolation_matrix (i + 2 * source_fe.degree, i + 3 * this->degree - 1) = tmp;
-                 tmp *= -2.0;
+              for (int i = 2; i <= (int) this->degree; ++i)
+		{
+		  double tmp = std::pow (0.5, i);
+		  interpolation_matrix (i + 2, i + 2) = tmp;
+		  interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
+		  tmp *= 0.5;
+		  interpolation_matrix (i + source_fe.degree + 1, i + 2) = tmp;
+		  interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
+		  interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
+		  interpolation_matrix (i + 2 * source_fe.degree, i + 3 * this->degree - 1) = tmp;
+		  tmp *= -2.0;
                  
-                 for (unsigned int j = 0; j < this->degree - 1;) {
-                 	interpolation_matrix (i + source_fe.degree + 1, j + (i + 2) * this->degree + 2 - i) = tmp;
-                 	interpolation_matrix (i + 2 * source_fe.degree, i + (j + 4) * this->degree - j - 2) = tmp;
-                    j = j + 2;
-                 }
+		  for (unsigned int j = 0; j < this->degree - 1;)
+		    {
+		      interpolation_matrix (i + source_fe.degree + 1, j + (i + 2) * this->degree + 2 - i) = tmp;
+		      interpolation_matrix (i + 2 * source_fe.degree, i + (j + 4) * this->degree - j - 2) = tmp;
+		      j = j + 2;
+		    }
                  
-                 factorial_k = 1;
+		  factorial_k = 1;
                  
-                 for (int j = 2; j <= (int) this->degree; ++j) {
-                    interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
-                    factorial_k *= j;
-                    factorial_l = factorial_k;
-                    factorial_kl = 1;
+		  for (int j = 2; j <= (int) this->degree; ++j)
+		    {
+		      interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
+		      factorial_k *= j;
+		      factorial_l = factorial_k;
+		      factorial_kl = 1;
                     
-                    for (int k = j + 1; k <= (int) this->degree; ++k) {
-                       factorial_kl *= k - j;
-                       factorial_l *= k;
-                       interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
-                    }
-                 }
+		      for (int k = j + 1; k <= (int) this->degree; ++k)
+			{
+			  factorial_kl *= k - j;
+			  factorial_l *= k;
+			  interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
+			}
+		    }
                  
-                 factorial_i *= i;
-                 factorial_j = factorial_i;
-                 factorial_ij = 1;
+		  factorial_i *= i;
+		  factorial_j = factorial_i;
+		  factorial_ij = 1;
                  
-                 for (int j = i + 1; j <= (int) this->degree; ++j) {
-                    factorial_ij *= j - i;
-                    factorial_j *= j;
-                    tmp = std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
-                    interpolation_matrix (i + 2, j + 2) = tmp;
-                    tmp *= -1.0;
+		  for (int j = i + 1; j <= (int) this->degree; ++j)
+		    {
+		      factorial_ij *= j - i;
+		      factorial_j *= j;
+		      tmp = std::pow (0.5, j) * factorial_j / (factorial_i * factorial_ij);
+		      interpolation_matrix (i + 2, j + 2) = tmp;
+		      tmp *= -1.0;
                     
-                    for (unsigned int k = 0; k < this->degree - 1;) {
-                       interpolation_matrix (i + source_fe.degree + 1, k + (j + 2) * this->degree + 2 - j) = tmp;
-                       k = k + 2;
-                    }
+		      for (unsigned int k = 0; k < this->degree - 1;)
+			{
+			  interpolation_matrix (i + source_fe.degree + 1, k + (j + 2) * this->degree + 2 - j) = tmp;
+			  k = k + 2;
+			}
                     
-                    tmp *= -0.5;
-                    interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
-                    interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
+		      tmp *= -0.5;
+		      interpolation_matrix (i + source_fe.degree + 1, j + 2) = tmp;
+		      interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
                     
-                    if ((i + j) & 1)
-                       tmp *= -1.0;
+		      if ((i + j) & 1)
+			tmp *= -1.0;
                        
-                    interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
-                    interpolation_matrix (i + 2 * source_fe.degree, j + 3 * this->degree - 1) = tmp;
-                    tmp *= 2.0;
-                    interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
-                    factorial_k = 1;
+		      interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+		      interpolation_matrix (i + 2 * source_fe.degree, j + 3 * this->degree - 1) = tmp;
+		      tmp *= 2.0;
+		      interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+		      factorial_k = 1;
                     
-                    for (int k = 2; k <= (int) this->degree; ++k) {
-                       interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
-                       factorial_k *= k;
-                       factorial_l = factorial_k;
-                       factorial_kl = 1;
+		      for (int k = 2; k <= (int) this->degree; ++k)
+			{
+			  interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
+			  factorial_k *= k;
+			  factorial_l = factorial_k;
+			  factorial_kl = 1;
                        
-                       for (int l = k + 1; l <= (int) this->degree; ++l) {
-                          factorial_kl *= l - k;
-                          factorial_l *= l;
-                          interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
-                       }
-                    }
+			  for (int l = k + 1; l <= (int) this->degree; ++l)
+			    {
+			      factorial_kl *= l - k;
+			      factorial_l *= l;
+			      interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
+			    }
+			}
                     
-                    tmp *= -1.0;
+		      tmp *= -1.0;
                        
-                    for (unsigned int k = 0; k < this->degree - 1;) {
-                       interpolation_matrix (i + 2 * source_fe.degree, j + (k + 4) * this->degree - k - 2) = tmp;
-                       k = k + 2;
-                    }
-                 }
-              }
+		      for (unsigned int k = 0; k < this->degree - 1;)
+			{
+			  interpolation_matrix (i + 2 * source_fe.degree, j + (k + 4) * this->degree - k - 2) = tmp;
+			  k = k + 2;
+			}
+		    }
+		}
               
               break;
-           }
+	    }
            
-           case 3: {
+	    case 3:
+	    {
               for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_face; ++vertex)
-                 interpolation_matrix (0, vertex) = 0.25;
+		interpolation_matrix (0, vertex) = 0.25;
               
-              for (unsigned int i = 0; i < this->degree - 1;) {
-                 for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
+              for (unsigned int i = 0; i < this->degree - 1;)
+		{
+		  for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_face; ++line)
                     interpolation_matrix (0, i + line * (this->degree - 1) + 4) = -0.5;
                  
-                 for (unsigned int j = 0; j < this->degree - 1;) {
-                 	interpolation_matrix (0, i + (j + 4) * this->degree - j) = 1.0;
-                    j = j + 2;
-                 }
+		  for (unsigned int j = 0; j < this->degree - 1;)
+		    {
+		      interpolation_matrix (0, i + (j + 4) * this->degree - j) = 1.0;
+		      j = j + 2;
+		    }
                  
-                 interpolation_matrix (1, i + 4) = -1.0;
-                 interpolation_matrix (2, i + 3 * this->degree + 1) = -1.0;
-                 i = i + 2;
-              }
+		  interpolation_matrix (1, i + 4) = -1.0;
+		  interpolation_matrix (2, i + 3 * this->degree + 1) = -1.0;
+		  i = i + 2;
+		}
               
               interpolation_matrix (1, 0) = 0.5;
               interpolation_matrix (1, 1) = 0.5;
@@ -1202,7 +1258,6 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
               interpolation_matrix (2, 3) = 0.5;
               interpolation_matrix (3, 3) = 1.0;
               
-              double tmp;
               int factorial_i = 1;
               int factorial_ij;
               int factorial_j;
@@ -1210,81 +1265,89 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
               int factorial_kl;
               int factorial_l;
               
-              for (int i = 2; i <= (int) this->degree; ++i) {
-              	 tmp = std::pow (0.5, i + 1);
-                 interpolation_matrix (i + 2, i + 2) = tmp;
-                 interpolation_matrix (i + 2, i + this->degree + 1) = tmp;
-                 interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
-                 interpolation_matrix (i + 2 * source_fe.degree, i + 3 * this->degree - 1) = tmp;
-                 tmp *= -2.0;
+              for (int i = 2; i <= (int) this->degree; ++i)
+		{
+		  double tmp = std::pow (0.5, i + 1);
+		  interpolation_matrix (i + 2, i + 2) = tmp;
+		  interpolation_matrix (i + 2, i + this->degree + 1) = tmp;
+		  interpolation_matrix (i + 2 * source_fe.degree, i + 2 * this->degree) = tmp;
+		  interpolation_matrix (i + 2 * source_fe.degree, i + 3 * this->degree - 1) = tmp;
+		  tmp *= -2.0;
                  
-                 for (unsigned int j = 0; j < this->degree - 1;) {
-                 	interpolation_matrix (i + 2, j + (i + 2) * this->degree + 2 - i) = tmp;
-                 	interpolation_matrix (i + 2 * source_fe.degree, i + (j + 4) * this->degree - 2) = tmp;
-                    j = j + 2;
-                 }
+		  for (unsigned int j = 0; j < this->degree - 1;)
+		    {
+		      interpolation_matrix (i + 2, j + (i + 2) * this->degree + 2 - i) = tmp;
+		      interpolation_matrix (i + 2 * source_fe.degree, i + (j + 4) * this->degree - 2) = tmp;
+		      j = j + 2;
+		    }
                  
-                 tmp *= -1.0;
-                 interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
-                 interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
-                 factorial_k = 1;
+		  tmp *= -1.0;
+		  interpolation_matrix (i + source_fe.degree + 1, i + this->degree + 1) = tmp;
+		  interpolation_matrix (i + 3 * source_fe.degree - 1, i + 3 * this->degree - 1) = tmp;
+		  factorial_k = 1;
                  
-                 for (int j = 2; j <= (int) this->degree; ++j) {
-                    interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
-                    factorial_k *= j;
-                    factorial_l = factorial_k;
-                    factorial_kl = 1;
+		  for (int j = 2; j <= (int) this->degree; ++j)
+		    {
+		      interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (j + 2) * this->degree - j) = std::pow (0.5, i + j);
+		      factorial_k *= j;
+		      factorial_l = factorial_k;
+		      factorial_kl = 1;
                     
-                    for (int k = j + 1; k <= (int) this->degree; ++k) {
-                       factorial_kl *= k - j;
-                       factorial_l *= k;
-                       interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
-                    }
-                 }
+		      for (int k = j + 1; k <= (int) this->degree; ++k)
+			{
+			  factorial_kl *= k - j;
+			  factorial_l *= k;
+			  interpolation_matrix (i + (j + 2) * source_fe.degree - j, i + (k + 2) * this->degree - k) = std::pow (0.5, i + k) * factorial_l / (factorial_k * factorial_kl);
+			}
+		    }
                  
-                 factorial_i *= i;
-                 factorial_j = factorial_i;
-                 factorial_ij = 1;
+		  factorial_i *= i;
+		  factorial_j = factorial_i;
+		  factorial_ij = 1;
                  
-                 for (int j = i + 1; j <= (int) this->degree; ++j) {
-                    factorial_ij *= j - i;
-                    factorial_j *= j;
-                    tmp = std::pow (0.5, j + 1) * factorial_j / (factorial_i * factorial_ij);
-                    interpolation_matrix (i + 2, j + 2) = tmp;
-                    interpolation_matrix (i + 2, j + this->degree + 1) = tmp;
-                    interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
-                    interpolation_matrix (i + 2 * source_fe.degree, j + 3 * this->degree - 1) = tmp;
-                    tmp *= 2.0;
-                    interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
-                    interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
-                    factorial_k = 1;
+		  for (int j = i + 1; j <= (int) this->degree; ++j)
+		    {
+		      factorial_ij *= j - i;
+		      factorial_j *= j;
+		      tmp = std::pow (0.5, j + 1) * factorial_j / (factorial_i * factorial_ij);
+		      interpolation_matrix (i + 2, j + 2) = tmp;
+		      interpolation_matrix (i + 2, j + this->degree + 1) = tmp;
+		      interpolation_matrix (i + 2 * source_fe.degree, j + 2 * this->degree) = tmp;
+		      interpolation_matrix (i + 2 * source_fe.degree, j + 3 * this->degree - 1) = tmp;
+		      tmp *= 2.0;
+		      interpolation_matrix (i + source_fe.degree + 1, j + this->degree + 1) = tmp;
+		      interpolation_matrix (i + 3 * source_fe.degree - 1, j + 3 * this->degree - 1) = tmp;
+		      factorial_k = 1;
                     
-                    for (int k = 2; k <= (int) this->degree; ++k) {
-                       interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
-                       factorial_k *= k;
-                       factorial_l = factorial_k;
-                       factorial_kl = 1;
+		      for (int k = 2; k <= (int) this->degree; ++k)
+			{
+			  interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (k + 2) * this->degree - k) = tmp * std::pow (0.5, k);
+			  factorial_k *= k;
+			  factorial_l = factorial_k;
+			  factorial_kl = 1;
                        
-                       for (int l = k + 1; l <= (int) this->degree; ++l) {
-                          factorial_kl *= l - k;
-                          factorial_l *= l;
-                          interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
-                       }
-                    }
+			  for (int l = k + 1; l <= (int) this->degree; ++l)
+			    {
+			      factorial_kl *= l - k;
+			      factorial_l *= l;
+			      interpolation_matrix (i + (k + 2) * source_fe.degree - k, j + (l + 2) * this->degree - l) = tmp * std::pow (0.5, l) * factorial_l / (factorial_k * factorial_kl);
+			    }
+			}
                     
-                    tmp *= -1.0;
+		      tmp *= -1.0;
                     
-                    for (unsigned int k = 0; k < this->degree - 1;) {
-                       interpolation_matrix (i + 2, k + (j + 2) * this->degree + 2 - j) = tmp;
-                       interpolation_matrix (i + 2 * source_fe.degree, j + (k + 4) * this->degree - 2) = tmp;
-                       k = k + 2;
-                    }                    
-                 }
-              }
-           }
-        }
-     }
-  }
+		      for (unsigned int k = 0; k < this->degree - 1;)
+			{
+			  interpolation_matrix (i + 2, k + (j + 2) * this->degree + 2 - j) = tmp;
+			  interpolation_matrix (i + 2 * source_fe.degree, j + (k + 4) * this->degree - 2) = tmp;
+			  k = k + 2;
+			}                    
+		    }
+		}
+	    }
+	  }
+      }
+    }
 }
 
 #endif
