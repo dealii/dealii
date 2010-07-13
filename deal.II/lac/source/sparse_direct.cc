@@ -2025,7 +2025,7 @@ InstantiateUMFPACK(BlockSparseMatrix<float>);
 // explicit instantiations for SparseDirectMUMPS
 #ifdef DEAL_II_USE_MUMPS
 template <class Matrix>
-void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix, 
+void SparseDirectMUMPS::initialize (const Matrix& matrix, 
 				    const Vector<double>      & vector);
 
 void SparseDirectMUMPS::solve (Vector<double>& vector); 
