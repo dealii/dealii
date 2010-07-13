@@ -1335,7 +1335,7 @@ class SparseDirectMUMPS
 			 * <tt>vector</tt> to the solver.
 			 */
   template <class Matrix>
-    void initialize (const SparseMatrix<double>& matrix, 
+    void initialize (const Matrix& matrix, 
 		     const Vector<double>      & vector);
   
                         /**

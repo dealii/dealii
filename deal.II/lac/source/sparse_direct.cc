@@ -1888,7 +1888,7 @@ SparseDirectMUMPS::~SparseDirectMUMPS ()
 {}
 
 template <class Matrix>
-void SparseDirectMUMPS::initialize (const SparseMatrix<double>& matrix, 
+void SparseDirectMUMPS::initialize (const Matrix& matrix, 
 				    const Vector<double>      & vector) 
 {
                          // Check we haven't been here before:
