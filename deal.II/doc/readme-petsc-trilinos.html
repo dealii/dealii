@@ -162,9 +162,9 @@ mkdir build
 cd build
 cmake \
           -D CMAKE_BUILD_TYPE:STRING=RELEASE \
-          -D CMAKE_CXX_FLAGS:STRING="-ggdb -O2 -march=native" \
-          -D CMAKE_C_FLAGS:STRING="-ggdb -O3 -march=native" \
-          -D CMAKE_FORTRAN_FLAGS:STRING="-ggdb -O5 -march=native" \
+          -D CMAKE_CXX_FLAGS:STRING="-g -O3" \
+          -D CMAKE_C_FLAGS:STRING="-g -O3" \
+          -D CMAKE_FORTRAN_FLAGS:STRING="-g -O5" \
           -D Trilinos_ENABLE_DEFAULT_PACKAGES:BOOL=OFF \
           -D Trilinos_ENABLE_Epetra:BOOL=ON \
           -D Trilinos_ENABLE_Tpetra:BOOL=ON \
