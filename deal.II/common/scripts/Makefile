@@ -7,7 +7,8 @@ D=../..
 
 include $D/common/Make.global_options
 
-default: make_dependencies expand_instantiations
+default: make_dependencies$(EXEEXT) expand_instantiations$(EXEEXT) \
+         report_features$(EXEEXT)
 
 
 # rules to generate the program. let is be dependent on the global flags for
@@ -16,15 +17,15 @@ default: make_dependencies expand_instantiations
 # deleted by "make clean"; following this, we generate empty Makefile.dep's
 # because we can't run the executable. So better be careful and regenerate
 # make_dependencies whenever we think it may be beneficial
-make_dependencies : make_dependencies.cc $D/common/Make.global_options
+make_dependencies$(EXEEXT) : make_dependencies.cc $D/common/Make.global_options
 	@echo ============================ Compiling $@
 	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
-expand_instantiations : expand_instantiations.cc $D/common/Make.global_options
+expand_instantiations$(EXEEXT) : expand_instantiations.cc $D/common/Make.global_options
 	@echo ============================ Compiling $@
 	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
-report_features: report_features.cc $D/common/Make.global_options
+report_features$(EXEEXT) : report_features.cc $D/common/Make.global_options
 	@echo ============================ Compiling $@
 	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
