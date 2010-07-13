@@ -1017,43 +1017,43 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				     /**
 				      * Make type publicly available.
 				      */
-    PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
 
 				     /**
 				      * Make initialization function
 				      * publicly available.
 				      */
-    PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<MATRIX,inverse_type>::clear;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::clear;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<MATRIX, inverse_type>::empty;
+    using PreconditionBlockSOR<MATRIX, inverse_type>::empty;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<MATRIX, inverse_type>::el;
+    using PreconditionBlockSOR<MATRIX, inverse_type>::el;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
 
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlockSOR<MATRIX,inverse_type>::invert_diagblocks;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::invert_diagblocks;
 
 				     /**
 				      * Execute block SSOR
