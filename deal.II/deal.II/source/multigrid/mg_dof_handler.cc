@@ -489,8 +489,8 @@ namespace internal
 	  {
 	    const unsigned int dim = 1;
 
-	    Assert (mg_dof_handler.selected_fe != 0, DoFHandler<dim>::ExcNoFESelected());
-	    Assert (mg_dof_handler.tria->n_levels() > 0, DoFHandler<dim>::ExcInvalidTriangulation());
+	    Assert (mg_dof_handler.selected_fe != 0, DoFHandler<1>::ExcNoFESelected());
+	    Assert (mg_dof_handler.tria->n_levels() > 0, DoFHandler<1>::ExcInvalidTriangulation());
 
 					     //////////////////////////
 					     // DESTRUCTION
