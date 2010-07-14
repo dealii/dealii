@@ -47,8 +47,9 @@ inconvenience this causes.
 
   <li>
   <p>Fixed: GCC version 3.3.x failed to compile the files
-  <code>lac/include/lac/precondition_block.h</code> and
-  <code>deal.II/source/multigrid/mg_dof_handler.cc</code>. This problem has
+  <code>lac/include/lac/precondition_block.h</code>,
+  <code>deal.II/source/multigrid/mg_dof_handler.cc</code> and
+  <code>examples/step-34/step-34.cc</code>. These problems have
   now been worked around.
   <br>
   (WB 2010/07/12)

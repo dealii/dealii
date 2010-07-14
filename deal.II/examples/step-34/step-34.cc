@@ -1,8 +1,8 @@
 //----------------------------  step-34.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors 
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -89,16 +89,16 @@ namespace LaplaceKernel
       {
       case 2:
 	return (-std::log(R.norm()) / (2*numbers::PI) );
-	
+
       case 3:
 	return (1./( R.norm()*4*numbers::PI ) );
-	
+
       default:
 	Assert(false, ExcInternalError());
 	return 0.;
       }
   }
-        
+
 
 
   template <int dim>
@@ -110,7 +110,7 @@ namespace LaplaceKernel
 	return R / ( -2*numbers::PI * R.square());
       case 3:
 	return R / ( -4*numbers::PI * R.square() * R.norm() );
-	
+
       default:
 	Assert(false, ExcInternalError());
 	return Point<dim>();
@@ -137,8 +137,8 @@ namespace LaplaceKernel
 				 // methods, and we won't comment too
 				 // much on them, except on the
 				 // differences.
-template <int dim> 
-class BEMProblem 
+template <int dim>
+class BEMProblem
 {
   public:
     BEMProblem();
@@ -146,13 +146,13 @@ class BEMProblem
     void run();
 
   private:
-    
+
     void read_parameters (const std::string &filename);
-    
+
     void read_domain();
 
     void refine_and_resize();
-    
+
 				     // The only really different
 				     // function that we find here is
 				     // the assembly routine. We wrote
@@ -260,7 +260,7 @@ class BEMProblem
 				     // edges and $\frac 78$ on the 8
 				     // nodes of the vertices.
     void compute_errors(const unsigned int cycle);
-    
+
 				     // Once we obtained a solution on
 				     // the codimension one domain, we
 				     // want to interpolate it to the
@@ -293,9 +293,9 @@ class BEMProblem
 				     // output_results() function, of
 				     // course.
     void compute_exterior_solution();
-    
+
     void output_results(const unsigned int cycle);
-    
+
 				     // The usual deal.II classes can
 				     // be used for boundary element
 				     // methods by specifying the
@@ -336,7 +336,7 @@ class BEMProblem
 				     // is non trivial, and we don't
 				     // treat this subject here.
 
-    FullMatrix<double>    system_matrix;    
+    FullMatrix<double>    system_matrix;
     Vector<double>        system_rhs;
 
 				     // The next two variables will
@@ -350,13 +350,13 @@ class BEMProblem
 				     // shape functions.
     Vector<double>              phi;
     Vector<double>              alpha;
-    
+
 				     // The convergence table is used
 				     // to output errors in the exact
 				     // solution and in the computed
 				     // alphas.
     ConvergenceTable	convergence_table;
-    
+
 				     // The following variables are
 				     // the ones that we fill through
 				     // a parameter file.  The new
@@ -411,7 +411,7 @@ class BEMProblem
 
     std_cxx1x::shared_ptr<Quadrature<dim-1> > quadrature;
     unsigned int singular_quadrature_order;
-    
+
     SolverControl solver_control;
 
     unsigned int n_cycles;
@@ -459,14 +459,14 @@ BEMProblem<dim>::BEMProblem()
 {}
 
 
-template <int dim> 
+template <int dim>
 void BEMProblem<dim>::read_parameters (const std::string &filename)
 {
   deallog << std::endl << "Parsing parameter file " << filename << std::endl
 	  << "for a " << dim << " dimensional simulation. " << std::endl;
-    
+
   ParameterHandler prm;
-    
+
   prm.declare_entry("Number of cycles", "4",
 		    Patterns::Integer());
   prm.declare_entry("External refinement", "5",
@@ -477,16 +477,16 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
 		    Patterns::Bool());
   prm.declare_entry("Run 3d simulation", "true",
 		    Patterns::Bool());
-    
+
   prm.enter_subsection("Quadrature rules");
   {
-    prm.declare_entry("Quadrature type", "gauss", 
+    prm.declare_entry("Quadrature type", "gauss",
 		      Patterns::Selection(QuadratureSelector<(dim-1)>::get_quadrature_names()));
     prm.declare_entry("Quadrature order", "4", Patterns::Integer());
     prm.declare_entry("Singular quadrature order", "5", Patterns::Integer());
   }
   prm.leave_subsection();
-    
+
 				   // For both two and three
 				   // dimensions, we set the default
 				   // input data to be such that the
@@ -503,7 +503,7 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
 				   // solution we pass to the program
 				   // needs to have the same value at
 				   // infinity for the error to be
-				   // computed correctly. 
+				   // computed correctly.
 				   //
 				   // The use of the
 				   // Functions::ParsedFunction object
@@ -555,7 +555,7 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
     prm.set("Function expression", "1; 1; 1");
   }
   prm.leave_subsection();
-  
+
   prm.enter_subsection("Exact solution 2d");
   {
     Functions::ParsedFunction<2>::declare_parameters(prm);
@@ -590,10 +590,10 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
 				   // ParameterHandler object:
   prm.read_input(filename);
 
-  n_cycles = prm.get_integer("Number of cycles");                   
+  n_cycles = prm.get_integer("Number of cycles");
   external_refinement = prm.get_integer("External refinement");
   extend_solution = prm.get_bool("Extend solution on the -2,2 box");
-    
+
   prm.enter_subsection("Quadrature rules");
   {
     quadrature =
@@ -603,7 +603,7 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
     singular_quadrature_order = prm.get_integer("Singular quadrature order");
   }
   prm.leave_subsection();
-    
+
   prm.enter_subsection(std::string("Wind function ")+
 		       Utilities::int_to_string(dim)+std::string("d"));
   {
@@ -632,14 +632,14 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
 				   // setting the corresponding "Run
 				   // 2d simulation" or "Run 3d
 				   // simulation" flag to false:
-  run_in_this_dimension = prm.get_bool("Run " + 
+  run_in_this_dimension = prm.get_bool("Run " +
 				       Utilities::int_to_string(dim) +
 				       "d simulation");
 }
 
 
 				 // @sect4{BEMProblem::read_domain}
-    
+
 				 // A boundary element method
 				 // triangulation is basically the
 				 // same as a (dim-1) dimensional
@@ -691,11 +691,12 @@ void BEMProblem<dim>::read_parameters (const std::string &filename)
 				 // still has to be static to live at
 				 // least as long as the triangulation
 				 // object to which it is attached.
-        
+
 template <int dim>
 void BEMProblem<dim>::read_domain()
 {
-  static HyperBallBoundary<dim-1, dim> boundary(Point<dim>(),1.);    
+  static const Point<dim> center = Point<dim>();
+  static const HyperBallBoundary<dim-1, dim> boundary(center,1.);
 
   std::ifstream in;
   switch (dim)
@@ -703,7 +704,7 @@ void BEMProblem<dim>::read_domain()
       case 2:
 	    in.open ("coarse_circle.inp");
 	    break;
-	      
+
       case 3:
 	    in.open ("coarse_sphere.inp");
 	    break;
@@ -730,17 +731,17 @@ template <int dim>
 void BEMProblem<dim>::refine_and_resize()
 {
   tria.refine_global(1);
-    
+
   dh.distribute_dofs(fe);
-    
+
   const unsigned int n_dofs =  dh.n_dofs();
-  
+
   system_matrix.reinit(n_dofs, n_dofs);
-    
+
   system_rhs.reinit(n_dofs);
   phi.reinit(n_dofs);
   alpha.reinit(n_dofs);
-}    
+}
 
 
 				 // @sect4{BEMProblem::assemble_system}
@@ -773,13 +774,13 @@ void BEMProblem<dim>::refine_and_resize()
 				 // dimensional case.
 template <int dim>
 void BEMProblem<dim>::assemble_system()
-{    
-  std::vector<QGaussOneOverR<2> > sing_quadratures_3d; 
+{
+  std::vector<QGaussOneOverR<2> > sing_quadratures_3d;
   for(unsigned int i=0; i<4; ++i)
     sing_quadratures_3d.push_back
       (QGaussOneOverR<2>(singular_quadrature_order, i, true));
-  
-    
+
+
 				   // Next, we initialize an FEValues
 				   // object with the quadrature
 				   // formula for the integration of
@@ -795,14 +796,14 @@ void BEMProblem<dim>::assemble_system()
 			   update_cell_normal_vectors |
 			   update_quadrature_points |
 			   update_JxW_values);
-    
+
   const unsigned int n_q_points = fe_v.n_quadrature_points;
-    
+
   std::vector<unsigned int> local_dof_indices(fe.dofs_per_cell);
 
   std::vector<Vector<double> > cell_wind(n_q_points, Vector<double>(dim) );
   double normal_wind;
-    
+
 				   // Unlike in finite element
 				   // methods, if we use a collocation
 				   // boundary element method, then in
@@ -820,7 +821,7 @@ void BEMProblem<dim>::assemble_system()
 				   // object will hold this
 				   // information:
   Vector<double>      local_matrix_row_i(fe.dofs_per_cell);
-    
+
 				   // The index $i$ runs on the
 				   // collocation points, which are
 				   // the support points of the $i$th
@@ -836,7 +837,7 @@ void BEMProblem<dim>::assemble_system()
   AssertThrow(fe.dofs_per_cell == GeometryInfo<dim-1>::vertices_per_cell,
 	      ExcMessage("The code in this function can only be used for "
 			 "the usual Q1 elements."));
-    
+
 				   // Now that we have checked that
 				   // the number of vertices is equal
 				   // to the number of degrees of
@@ -859,17 +860,17 @@ void BEMProblem<dim>::assemble_system()
   typename DoFHandler<dim-1,dim>::active_cell_iterator
     cell = dh.begin_active(),
     endc = dh.end();
-    
+
   for(cell = dh.begin_active(); cell != endc; ++cell)
     {
       fe_v.reinit(cell);
       cell->get_dof_indices(local_dof_indices);
-        
+
       const std::vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
       const std::vector<Point<dim> > &normals = fe_v.get_cell_normal_vectors();
       wind.vector_value_list(q_points, cell_wind);
-        
-        
+
+
 				       // We then form the integral over
 				       // the current cell for all
 				       // degrees of freedom (note that
@@ -888,13 +889,13 @@ void BEMProblem<dim>::assemble_system()
 				       // one is the singular index:
       for(unsigned int i=0; i<dh.n_dofs() ; ++i)
 	{
-            
+
 	  local_matrix_row_i = 0;
-            
-	  bool is_singular = false; 
+
+	  bool is_singular = false;
 	  unsigned int singular_index = numbers::invalid_unsigned_int;
-            
-	  for(unsigned int j=0; j<fe.dofs_per_cell; ++j) 
+
+	  for(unsigned int j=0; j<fe.dofs_per_cell; ++j)
 	    if(local_dof_indices[j] == i)
 	      {
 		singular_index = j;
@@ -916,18 +917,18 @@ void BEMProblem<dim>::assemble_system()
 	      for(unsigned int q=0; q<n_q_points; ++q)
 		{
 		  normal_wind = 0;
-		  for(unsigned int d=0; d<dim; ++d) 
+		  for(unsigned int d=0; d<dim; ++d)
 		    normal_wind += normals[q][d]*cell_wind[q](d);
-                    
+
 		  const Point<dim> R = q_points[q] - support_points[i];
-                        
-		  system_rhs(i) += ( LaplaceKernel::single_layer(R)   * 
+
+		  system_rhs(i) += ( LaplaceKernel::single_layer(R)   *
 				     normal_wind                      *
 				     fe_v.JxW(q) );
-                        
+
 		  for(unsigned int j=0; j<fe.dofs_per_cell; ++j)
-                        
-		    local_matrix_row_i(j) -= ( ( LaplaceKernel::double_layer(R)     * 
+
+		    local_matrix_row_i(j) -= ( ( LaplaceKernel::double_layer(R)     *
 						 normals[q] )            *
 					       fe_v.shape_value(j,q)     *
 					       fe_v.JxW(q)       );
@@ -1055,7 +1056,7 @@ void BEMProblem<dim>::assemble_system()
 				     	     // integral alltogether
 				     	     // that needs to be
 				     	     // evaluated:
-				     	     // 
+				     	     //
 				     	     // \f[
 				     	     //  \int_0^1 f(x)\ln(x/\alpha) dx =
 				     	     //  \int_0^1 f(x)\ln(x) dx - \int_0^1 f(x) \ln(\alpha) dx.
@@ -1067,7 +1068,7 @@ void BEMProblem<dim>::assemble_system()
 				     	     // quadrature points and weights to
 				     	     // take into consideration also the
 				     	     // second part of the integral.
-				     	     // 
+				     	     //
 				     	     // A similar reasoning
 				     	     // should be done in the
 				     	     // three dimensional
@@ -1164,23 +1165,23 @@ void BEMProblem<dim>::assemble_system()
 		  :
 		  0));
 	    Assert(singular_quadrature, ExcInternalError());
-                        
-	    FEValues<dim-1,dim> fe_v_singular (fe, *singular_quadrature, 
+
+	    FEValues<dim-1,dim> fe_v_singular (fe, *singular_quadrature,
 					       update_jacobians |
 					       update_values |
 					       update_cell_normal_vectors |
 					       update_quadrature_points );
 
 	    fe_v_singular.reinit(cell);
-                    
-	    std::vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(), 
+
+	    std::vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(),
 							     Vector<double>(dim) );
-        
+
 	    const std::vector<Point<dim> > &singular_normals = fe_v_singular.get_cell_normal_vectors();
 	    const std::vector<Point<dim> > &singular_q_points = fe_v_singular.get_quadrature_points();
-        
+
 	    wind.vector_value_list(singular_q_points, singular_cell_wind);
-                    
+
 	    for(unsigned int q=0; q<singular_quadrature->size(); ++q)
 	      {
 		const Point<dim> R = singular_q_points[q] - support_points[i];
@@ -1188,11 +1189,11 @@ void BEMProblem<dim>::assemble_system()
 		for(unsigned int d=0; d<dim; ++d)
 		  normal_wind += (singular_cell_wind[q](d)*
 				  singular_normals[q][d]);
-                        
+
 		system_rhs(i) += ( LaplaceKernel::single_layer(R) *
 				   normal_wind                         *
 				   fe_v_singular.JxW(q) );
-                        
+
 		for(unsigned int j=0; j<fe.dofs_per_cell; ++j) {
 		    local_matrix_row_i(j) -= (( LaplaceKernel::double_layer(R) *
 						singular_normals[q])                *
@@ -1200,16 +1201,16 @@ void BEMProblem<dim>::assemble_system()
 					      fe_v_singular.JxW(q)       );
 		}
 	      }
-	    if(dim==2) 
+	    if(dim==2)
 	      delete singular_quadrature;
 	  }
-            
+
 					   // Finally, we need to add
 					   // the contributions of the
 					   // current cell to the
 					   // global matrix.
-	  for(unsigned int j=0; j<fe.dofs_per_cell; ++j) 
-	      system_matrix(i,local_dof_indices[j]) 
+	  for(unsigned int j=0; j<fe.dofs_per_cell; ++j)
+	      system_matrix(i,local_dof_indices[j])
 		  += local_matrix_row_i(j);
 	}
     }
@@ -1223,7 +1224,7 @@ void BEMProblem<dim>::assemble_system()
 				   // and the corresponding matrix is
 				   // a diagonal one with entries
 				   // equal to $\alpha(\mathbf{x}_i)$.
-    
+
 				   // One quick way to compute this
 				   // diagonal matrix of the solid
 				   // angles, is to use the Neumann
@@ -1240,7 +1241,7 @@ void BEMProblem<dim>::assemble_system()
 				   // matrix:
   Vector<double> ones(dh.n_dofs());
   ones.add(-1.);
-  
+
   system_matrix.vmult(alpha, ones);
   alpha.add(1);
   for(unsigned int i = 0; i<dh.n_dofs(); ++i)
@@ -1280,7 +1281,7 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle)
 				     VectorTools::L2_norm);
   const double L2_error = difference_per_cell.l2_norm();
 
-    
+
 				   // The error in the alpha vector
 				   // can be computed directly using
 				   // the Vector::linfty_norm()
@@ -1293,12 +1294,12 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle)
 				   // rates:
   Vector<double> difference_per_node(alpha);
   difference_per_node.add(-.5);
-    
+
   const double alpha_error = difference_per_node.linfty_norm();
   const unsigned int n_active_cells=tria.n_active_cells();
   const unsigned int n_dofs=dh.n_dofs();
-    
-  deallog << "Cycle " << cycle << ':' 
+
+  deallog << "Cycle " << cycle << ':'
 	  << std::endl
 	  << "   Number of active cells:       "
 	  << n_active_cells
@@ -1306,7 +1307,7 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle)
 	  << "   Number of degrees of freedom: "
 	  << n_dofs
 	  << std::endl;
-    
+
   convergence_table.add_value("cycle", cycle);
   convergence_table.add_value("cells", n_active_cells);
   convergence_table.add_value("dofs", n_dofs);
@@ -1353,12 +1354,12 @@ void BEMProblem<dim>::compute_exterior_solution()
 
   FE_Q<dim>           external_fe(1);
   DoFHandler<dim>     external_dh (external_tria);
-  Vector<double>      external_phi;    
-  
+  Vector<double>      external_phi;
+
   external_tria.refine_global(external_refinement);
   external_dh.distribute_dofs(external_fe);
   external_phi.reinit(external_dh.n_dofs());
-    
+
   typename DoFHandler<dim-1,dim>::active_cell_iterator
     cell = dh.begin_active(),
     endc = dh.end();
@@ -1369,15 +1370,15 @@ void BEMProblem<dim>::compute_exterior_solution()
 			   update_cell_normal_vectors |
 			   update_quadrature_points |
 			   update_JxW_values);
-    
+
   const unsigned int n_q_points = fe_v.n_quadrature_points;
-    
+
   std::vector<unsigned int> dofs(fe.dofs_per_cell);
-    
+
   std::vector<double> local_phi(n_q_points);
   std::vector<double> normal_wind(n_q_points);
   std::vector<Vector<double> > local_wind(n_q_points, Vector<double>(dim) );
-    
+
   typename DoFHandler<dim>::active_cell_iterator
     external_cell = external_dh.begin_active(),
     external_endc = external_dh.end();
@@ -1385,47 +1386,47 @@ void BEMProblem<dim>::compute_exterior_solution()
   std::vector<Point<dim> > external_support_points(external_dh.n_dofs());
   DoFTools::map_dofs_to_support_points<dim>( StaticMappingQ1<dim>::mapping,
 					     external_dh, external_support_points);
-    
+
   for(cell = dh.begin_active(); cell != endc; ++cell)
     {
       fe_v.reinit(cell);
-                    
+
       const std::vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
       const std::vector<Point<dim> > &normals = fe_v.get_cell_normal_vectors();
-        
+
       cell->get_dof_indices(dofs);
       fe_v.get_function_values(phi, local_phi);
-        
+
       wind.vector_value_list(q_points, local_wind);
-        
+
       for(unsigned int q=0; q<n_q_points; ++q){
 	normal_wind[q] = 0;
-	for(unsigned int d=0; d<dim; ++d) 
+	for(unsigned int d=0; d<dim; ++d)
 	  normal_wind[q] += normals[q][d]*local_wind[q](d);
       }
-            
-      for(unsigned int i=0; i<external_dh.n_dofs(); ++i)     
+
+      for(unsigned int i=0; i<external_dh.n_dofs(); ++i)
 	for(unsigned int q=0; q<n_q_points; ++q)
 	  {
-                
+
 	    const Point<dim> R =  q_points[q] - external_support_points[i];
-                        
-	    external_phi(i) += ( ( LaplaceKernel::single_layer(R) * 
+
+	    external_phi(i) += ( ( LaplaceKernel::single_layer(R) *
 				   normal_wind[q]
 				   +
-				   (LaplaceKernel::double_layer(R) * 
+				   (LaplaceKernel::double_layer(R) *
 				    normals[q] )            *
 				   local_phi[q] )           *
 				 fe_v.JxW(q) );
 	  }
     }
-    
+
   DataOut<dim> data_out;
-    
+
   data_out.attach_dof_handler(external_dh);
   data_out.add_data_vector(external_phi, "external_phi");
   data_out.build_patches();
-    
+
   const std::string
     filename = Utilities::int_to_string(dim) + "d_external.vtk";
   std::ofstream file(filename.c_str());
@@ -1445,28 +1446,28 @@ template <int dim>
 void BEMProblem<dim>::output_results(const unsigned int cycle)
 {
   DataOut<dim-1, DoFHandler<dim-1, dim> > dataout;
-    
+
   dataout.attach_dof_handler(dh);
   dataout.add_data_vector(phi, "phi");
   dataout.add_data_vector(alpha, "alpha");
   dataout.build_patches();
-    
-  std::string filename = ( Utilities::int_to_string(dim) + 
+
+  std::string filename = ( Utilities::int_to_string(dim) +
 			   "d_boundary_solution_" +
 			   Utilities::int_to_string(cycle) +
 			   ".vtk" );
   std::ofstream file(filename.c_str());
-    
+
   dataout.write_vtk(file);
-    
+
   if(cycle == n_cycles-1)
     {
       convergence_table.set_precision("L2(phi)", 3);
       convergence_table.set_precision("Linfty(alpha)", 3);
-	
+
       convergence_table.set_scientific("L2(phi)", true);
       convergence_table.set_scientific("Linfty(alpha)", true);
-	
+
       convergence_table
 	.evaluate_convergence_rates("L2(phi)", ConvergenceTable::reduction_rate_log2);
       convergence_table
@@ -1485,19 +1486,19 @@ void BEMProblem<dim>::output_results(const unsigned int cycle)
 template <int dim>
 void BEMProblem<dim>::run()
 {
-    
+
   read_parameters("parameters.prm");
 
   if(run_in_this_dimension == false)
     {
-      deallog << "Run in dimension " << dim 
-	      << " explicitly disabled in parameter file. " 
+      deallog << "Run in dimension " << dim
+	      << " explicitly disabled in parameter file. "
 	      << std::endl;
       return;
     }
-    
+
   read_domain();
-        
+
   for(unsigned int cycle=0; cycle<n_cycles; ++cycle)
     {
       refine_and_resize();
@@ -1506,7 +1507,7 @@ void BEMProblem<dim>::run()
       compute_errors(cycle);
       output_results(cycle);
     }
-    
+
   if(extend_solution == true)
     compute_exterior_solution();
 }
@@ -1525,7 +1526,7 @@ int main ()
       BEMProblem<2> laplace_problem_2d;
       laplace_problem_2d.run();
 
-      BEMProblem<3> laplace_problem_3d;      
+      BEMProblem<3> laplace_problem_3d;
       laplace_problem_3d.run();
     }
   catch (std::exception &exc)
@@ -1538,10 +1539,10 @@ int main ()
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
                 << "----------------------------------------------------"
