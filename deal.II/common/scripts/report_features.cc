@@ -64,7 +64,7 @@ int main()
 	    << OMPI_RELEASE_VERSION << std::endl;
 #  else
   std::cout << "dealii-feature: MPI="
-	    << MPI__VERSION << '.'
+	    << MPI_VERSION << '.'
 	    << MPI_SUBVERSION << std::endl;  
 #  endif
 #endif
