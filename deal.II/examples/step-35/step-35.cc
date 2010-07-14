@@ -1,7 +1,7 @@
 /* $Id$ */
 /* Version: $Name:  $ */
 /*      */
-/*    Copyright (C) 2007, 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 2007, 2008, 2009, 2010 by the deal.II authors */
 /*    Author: Abner Salgado, Texas A&M University 2009 */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
@@ -241,7 +241,7 @@ namespace RunTimeParameters
 
     prm.enter_subsection ("Data solve velocity");
     {
-      vel_max_iterations = prm.get_double ("max_iterations");
+      vel_max_iterations = prm.get_integer ("max_iterations");
       vel_eps            = prm.get_double ("eps");
       vel_Krylov_size    = prm.get_integer ("Krylov_size");
       vel_off_diagonals  = prm.get_integer ("off_diagonals");
@@ -1033,7 +1033,7 @@ NavierStokesProjection<dim>::run (const bool verbose,
 {
   ConditionalOStream verbose_cout (std::cout, verbose);
 
-  unsigned int n_steps =  (T - t_0)/dt;
+  const unsigned int n_steps =  static_cast<unsigned int>((T - t_0)/dt);
   vel_exact.set_time (2.*dt);
   output_results(1);
   for (unsigned int n = 2; n<=n_steps; ++n)
