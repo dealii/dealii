@@ -1704,11 +1704,16 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &m
   copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
   copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
 
+  void (*copy_local_to_global) (const internal::MatrixCreator::AssemblerData::CopyData &,
+				SparseMatrix<double> *,
+				Vector<double> *)
+    = &internal::MatrixCreator::
+    copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+
   WorkStream::run (dof.begin_active(),
 		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
 		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (&internal::MatrixCreator::
-				    copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+		   std_cxx1x::bind (copy_local_to_global,
 				    _1, &matrix, (Vector<double>*)0),
 		   assembler_data,
 		   copy_data);
@@ -1753,11 +1758,17 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &m
 			 assembler_data.fe_collection.max_dofs_per_cell());
   copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
   copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+
+  void (*copy_local_to_global) (const internal::MatrixCreator::AssemblerData::CopyData &,
+				SparseMatrix<double> *,
+				Vector<double> *)
+    = &internal::MatrixCreator::
+    copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+
   WorkStream::run (dof.begin_active(),
 		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
 		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (&internal::MatrixCreator::
-				    copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+		   std_cxx1x::bind (copy_local_to_global,
 				    _1, &matrix, &rhs_vector),
 		   assembler_data,
 		   copy_data);
@@ -1804,11 +1815,16 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,space
   copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
   copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
 
+  void (*copy_local_to_global) (const internal::MatrixCreator::AssemblerData::CopyData &,
+				SparseMatrix<double> *,
+				Vector<double> *)
+    = &internal::MatrixCreator::
+    copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+
   WorkStream::run (dof.begin_active(),
 		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
 		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (&internal::MatrixCreator::
-				    copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+		   std_cxx1x::bind (copy_local_to_global,
 				    _1, &matrix, (Vector<double>*)0),
 		   assembler_data,
 		   copy_data);
@@ -1854,11 +1870,16 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,space
   copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
   copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
 
+  void (*copy_local_to_global) (const internal::MatrixCreator::AssemblerData::CopyData &,
+				SparseMatrix<double> *,
+				Vector<double> *)
+    = &internal::MatrixCreator::
+    copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+
   WorkStream::run (dof.begin_active(),
 		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
 		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (&internal::MatrixCreator::
-				    copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+		   std_cxx1x::bind (copy_local_to_global,
 				    _1, &matrix, &rhs_vector),
 		   assembler_data,
 		   copy_data);

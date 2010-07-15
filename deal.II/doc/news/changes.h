@@ -39,6 +39,15 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: GCC version 3.4.0 failed to compile the file
+  <code>deal.II/source/numerics/matrices.cc</code> with
+  an internal compiler error. This has
+  now been worked around.
+  <br>
+  (WB 2010/07/15)
+  </p>
+
+  <li>
   <p>Fixed: A problem in the Makefiles caused error messages when
   building under CygWin.
   <br>
