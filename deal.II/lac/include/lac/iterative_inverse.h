@@ -91,7 +91,7 @@ class IterativeInverse : public Subscriptor
 				      * and preconditioner.
 				      */
     void clear();
-    
+
 				     /**
 				      * Solve for right hand side <tt>src</tt>.
 				      */
@@ -111,13 +111,13 @@ class IterativeInverse : public Subscriptor
 				      * parameters.
 				      */
     SolverSelector<VECTOR> solver;
-    
+
   private:
 				     /**
 				      * The matrix in use.
 				      */
     std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
-    
+
 				     /**
 				      * The preconditioner to use.
 				      */
@@ -126,7 +126,7 @@ class IterativeInverse : public Subscriptor
 				      * The transpose of the matrix in use.
 				      */
     std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_matrix;
-    
+
 				     /**
 				      * The transpose of the preconditioner to use.
 				      */
@@ -161,8 +161,8 @@ template <class VECTOR>
 inline void
 IterativeInverse<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
 {
-  Assert(matrix != 0, ExcNotInitialized());
-  Assert(preconditioner != 0, ExcNotInitialized());
+  Assert(matrix.get() != 0, ExcNotInitialized());
+  Assert(preconditioner.get() != 0, ExcNotInitialized());
   solver.solve(*matrix, dst, src, *preconditioner);
 }
 
