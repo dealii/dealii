@@ -141,7 +141,7 @@ void
 IterativeInverse<VECTOR>::initialize(const MATRIX& m, const PRECONDITION& p)
 {
 				   // dummy variable
-  VECTOR* v;
+  VECTOR* v = 0;
   matrix = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(m, *v));
   preconditioner = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(p, *v));
 }
