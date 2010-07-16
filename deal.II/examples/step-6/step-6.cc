@@ -941,7 +941,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				 // little hack that makes it simpler
 				 // if we know that we have less than
 				 // 10 iterations: assume that the
-				 // numbers `0' through `9' are
+				 // %numbers `0' through `9' are
 				 // represented consecutively in the
 				 // character set used on your machine
 				 // (this is in fact the case in all
