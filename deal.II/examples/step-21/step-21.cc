@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2006, 2007, 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -70,7 +70,7 @@ using namespace dealii;
 
 
                                  // @sect3{The <code>TwoPhaseFlowProblem</code> class}
-                                 
+
                                  // This is the main class of the program. It
                                  // is close to the one of step-20, but with a
                                  // few additional functions:
@@ -101,12 +101,12 @@ using namespace dealii;
                                  // several of the formulas in the nonlinear
                                  // equations.
 template <int dim>
-class TwoPhaseFlowProblem 
+class TwoPhaseFlowProblem
 {
   public:
     TwoPhaseFlowProblem (const unsigned int degree);
     void run ();
-    
+
   private:
     void make_grid_and_dofs ();
     void assemble_system ();
@@ -115,9 +115,9 @@ class TwoPhaseFlowProblem
     void solve ();
     void project_back_saturation ();
     void output_results () const;
-    
+
     const unsigned int   degree;
-    
+
     Triangulation<dim>   triangulation;
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
@@ -126,11 +126,11 @@ class TwoPhaseFlowProblem
     BlockSparseMatrix<double> system_matrix;
 
     const unsigned int n_refinement_steps;
-    
+
     double time_step;
     unsigned int timestep_number;
-    double viscosity;    
- 
+    double viscosity;
+
     BlockVector<double> solution;
     BlockVector<double> old_solution;
     BlockVector<double> system_rhs;
@@ -146,11 +146,11 @@ class TwoPhaseFlowProblem
                                  // is fully equipped to deal with anything
                                  // else, if this is desired:
 template <int dim>
-class PressureRightHandSide : public Function<dim> 
+class PressureRightHandSide : public Function<dim>
 {
   public:
     PressureRightHandSide () : Function<dim>(1) {}
-    
+
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
 };
@@ -160,7 +160,7 @@ class PressureRightHandSide : public Function<dim>
 template <int dim>
 double
 PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
-                                   const unsigned int /*component*/) const 
+                                   const unsigned int /*component*/) const
 {
   return 0;
 }
@@ -171,11 +171,11 @@ PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
                                  // mentioned in the introduction, we choose a
                                  // linear pressure field:
 template <int dim>
-class PressureBoundaryValues : public Function<dim> 
+class PressureBoundaryValues : public Function<dim>
 {
   public:
     PressureBoundaryValues () : Function<dim>(1) {}
-    
+
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
 };
@@ -184,7 +184,7 @@ class PressureBoundaryValues : public Function<dim>
 template <int dim>
 double
 PressureBoundaryValues<dim>::value (const Point<dim>  &p,
-                                    const unsigned int /*component*/) const 
+                                    const unsigned int /*component*/) const
 {
   return 1-p[0];
 }
@@ -201,11 +201,11 @@ PressureBoundaryValues<dim>::value (const Point<dim>  &p,
                                  // values. This is as explained in the
                                  // introduction:
 template <int dim>
-class SaturationBoundaryValues : public Function<dim> 
+class SaturationBoundaryValues : public Function<dim>
 {
   public:
     SaturationBoundaryValues () : Function<dim>(1) {}
-    
+
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
 };
@@ -215,7 +215,7 @@ class SaturationBoundaryValues : public Function<dim>
 template <int dim>
 double
 SaturationBoundaryValues<dim>::value (const Point<dim> &p,
-                                      const unsigned int /*component*/) const 
+                                      const unsigned int /*component*/) const
 {
   if (p[0] == 0)
     return 1;
@@ -245,15 +245,15 @@ SaturationBoundaryValues<dim>::value (const Point<dim> &p,
                                  // later go back and choose a different
                                  // function for initial values.
 template <int dim>
-class InitialValues : public Function<dim> 
+class InitialValues : public Function<dim>
 {
   public:
     InitialValues () : Function<dim>(dim+2) {}
-    
+
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
 
-    virtual void vector_value (const Point<dim> &p, 
+    virtual void vector_value (const Point<dim> &p,
                                Vector<double>   &value) const;
 
 };
@@ -262,7 +262,7 @@ class InitialValues : public Function<dim>
 template <int dim>
 double
 InitialValues<dim>::value (const Point<dim>  &p,
-                           const unsigned int component) const 
+                           const unsigned int component) const
 {
   return ZeroFunction<dim>(dim+2).value (p, component);
 }
@@ -271,7 +271,7 @@ InitialValues<dim>::value (const Point<dim>  &p,
 template <int dim>
 void
 InitialValues<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &values) const 
+                                  Vector<double>   &values) const
 {
   ZeroFunction<dim>(dim+2).vector_value (p, values);
 }
@@ -312,7 +312,7 @@ namespace SingleCurvingCrack
 		      :
 		      TensorFunction<2,dim> ()
 	{}
-      
+
       virtual void value_list (const std::vector<Point<dim> > &points,
                                std::vector<Tensor<2,dim> >    &values) const;
   };
@@ -332,12 +332,12 @@ namespace SingleCurvingCrack
 
         const double distance_to_flowline
           = std::fabs(points[p][1]-0.5-0.1*std::sin(10*points[p][0]));
-      
+
         const double permeability = std::max(std::exp(-(distance_to_flowline*
                                                         distance_to_flowline)
                                                       / (0.1 * 0.1)),
                                              0.01);
-      
+
         for (unsigned int d=0; d<dim; ++d)
           values[p][d][d] = 1./permeability;
       }
@@ -406,7 +406,7 @@ namespace RandomMedium
 		      :
 		      TensorFunction<2,dim> ()
 	{}
-      
+
       virtual void value_list (const std::vector<Point<dim> > &points,
                                std::vector<Tensor<2,dim> >    &values) const;
 
@@ -432,7 +432,7 @@ namespace RandomMedium
                             (dim == 3 ?
                              100 :
                              throw ExcNotImplemented()));
-  
+
     std::vector<Point<dim> > centers_list (N);
     for (unsigned int i=0; i<N; ++i)
       for (unsigned int d=0; d<dim; ++d)
@@ -459,10 +459,10 @@ namespace RandomMedium
         for (unsigned int i=0; i<centers.size(); ++i)
           permeability += std::exp(-(points[p]-centers[i]).square()
                                    / (0.05 * 0.05));
-      
+
         const double normalized_permeability
           = std::min (std::max(permeability, 0.01), 4.);
-      
+
         for (unsigned int d=0; d<dim; ++d)
           values[p][d][d] = 1./normalized_permeability;
       }
@@ -486,7 +486,7 @@ double mobility_inverse (const double S,
 
 double f_saturation (const double S,
                      const double viscosity)
-{   
+{
   return S*S /( S * S +viscosity * (1-S) * (1-S));
 }
 
@@ -521,7 +521,7 @@ InverseMatrix<Matrix>::InverseMatrix (const Matrix &m)
 {}
 
 
-                                 
+
 template <class Matrix>
 void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                    const Vector<double> &src) const
@@ -530,8 +530,8 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
   SolverCG<>    cg (solver_control);
 
   dst = 0;
-  
-  cg.solve (*matrix, dst, src, PreconditionIdentity());        
+
+  cg.solve (*matrix, dst, src, PreconditionIdentity());
 }
 
 
@@ -548,7 +548,7 @@ class SchurComplement : public Subscriptor
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
     const SmartPointer<const InverseMatrix<SparseMatrix<double> > > m_inverse;
-    
+
     mutable Vector<double> tmp1, tmp2;
 };
 
@@ -585,7 +585,7 @@ class ApproximateSchurComplement : public Subscriptor
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    
+
     mutable Vector<double> tmp1, tmp2;
 };
 
@@ -653,14 +653,14 @@ TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
 template <int dim>
 void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
 {
-  GridGenerator::hyper_cube (triangulation, 0, 1);  
+  GridGenerator::hyper_cube (triangulation, 0, 1);
   triangulation.refine_global (n_refinement_steps);
-  
-  dof_handler.distribute_dofs (fe); 
+
+  dof_handler.distribute_dofs (fe);
   DoFRenumbering::component_wise (dof_handler);
-                                  
+
   std::vector<unsigned int> dofs_per_component (dim+2);
-  DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);  
+  DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
   const unsigned int n_u = dofs_per_component[0],
                      n_p = dofs_per_component[dim],
                      n_s = dofs_per_component[dim+1];
@@ -673,10 +673,10 @@ void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
             << " (" << n_u << '+' << n_p << '+'<< n_s <<')'
             << std::endl
             << std::endl;
-  
+
   const unsigned int
     n_couplings = dof_handler.max_couplings_between_dofs();
-  
+
   sparsity_pattern.reinit (3,3);
   sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
   sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
@@ -687,28 +687,28 @@ void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
   sparsity_pattern.block(0,2).reinit (n_u, n_s, n_couplings);
   sparsity_pattern.block(1,2).reinit (n_p, n_s, n_couplings);
   sparsity_pattern.block(2,2).reinit (n_s, n_s, n_couplings);
-  
+
   sparsity_pattern.collect_sizes();
-  
+
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
 
-  
+
   system_matrix.reinit (sparsity_pattern);
 
-                                   
+
   solution.reinit (3);
   solution.block(0).reinit (n_u);
   solution.block(1).reinit (n_p);
   solution.block(2).reinit (n_s);
   solution.collect_sizes ();
-  
+
   old_solution.reinit (3);
   old_solution.block(0).reinit (n_u);
   old_solution.block(1).reinit (n_p);
   old_solution.block(2).reinit (n_s);
   old_solution.collect_sizes ();
-  
+
   system_rhs.reinit (3);
   system_rhs.block(0).reinit (n_u);
   system_rhs.block(1).reinit (n_p);
@@ -742,23 +742,23 @@ void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
 				 // crack permeability function is as simple
 				 // as just changing the namespace name.
 template <int dim>
-void TwoPhaseFlowProblem<dim>::assemble_system () 
-{  
+void TwoPhaseFlowProblem<dim>::assemble_system ()
+{
   system_matrix=0;
   system_rhs=0;
 
-  QGauss<dim>   quadrature_formula(degree+2); 
+  QGauss<dim>   quadrature_formula(degree+2);
   QGauss<dim-1> face_quadrature_formula(degree+2);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values    | update_gradients |
                            update_quadrature_points  | update_JxW_values);
-  FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula, 
+  FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
                                     update_values    | update_normal_vectors |
                                     update_quadrature_points  | update_JxW_values);
 
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-  
+
   const unsigned int   n_q_points      = quadrature_formula.size();
   const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
@@ -766,15 +766,15 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
   Vector<double>       local_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  
+
   const PressureRightHandSide<dim>  pressure_right_hand_side;
   const PressureBoundaryValues<dim> pressure_boundary_values;
-  const RandomMedium::KInverse<dim> k_inverse;   
-  
+  const RandomMedium::KInverse<dim> k_inverse;
+
   std::vector<double>               pressure_rhs_values (n_q_points);
   std::vector<double>               boundary_values (n_face_q_points);
   std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
-  
+
   std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
   std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
                                                                 std::vector<Tensor<1,dim> > (dim+2));
@@ -787,7 +787,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
-    { 
+    {
       fe_values.reinit (cell);
       local_matrix = 0;
       local_rhs = 0;
@@ -830,7 +830,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
                                        // self-explanatory given the explicit
                                        // form of the bilinear form stated in
                                        // the introduction:
-      for (unsigned int q=0; q<n_q_points; ++q)            
+      for (unsigned int q=0; q<n_q_points; ++q)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             const double old_s = old_solution_values[q](dim+1);
@@ -838,28 +838,27 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
             const Tensor<1,dim> phi_i_u      = fe_values[velocities].value (i, q);
             const double        div_phi_i_u  = fe_values[velocities].divergence (i, q);
             const double        phi_i_p      = fe_values[pressure].value (i, q);
-            const double        phi_i_s      = fe_values[saturation].value (i, q); 
-            const Tensor<1,dim> grad_phi_i_s = fe_values[saturation].gradient(i, q);
-            
+            const double        phi_i_s      = fe_values[saturation].value (i, q);
+
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               {
                 const Tensor<1,dim> phi_j_u     = fe_values[velocities].value (j, q);
                 const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
                 const double        phi_j_p     = fe_values[pressure].value (j, q);
                 const double        phi_j_s     = fe_values[saturation].value (j, q);
-                
+
                 local_matrix(i,j) += (phi_i_u * k_inverse_values[q] *
                                       mobility_inverse(old_s,viscosity) * phi_j_u
                                       - div_phi_i_u * phi_j_p
                                       - phi_i_p * div_phi_j_u
                                       + phi_i_s * phi_j_s)
-                                     * fe_values.JxW(q);     
+                                     * fe_values.JxW(q);
               }
 
             local_rhs(i) += (-phi_i_p * pressure_rhs_values[q])*
                             fe_values.JxW(q);
           }
-      
+
 
                                        // Next, we also have to deal with the
                                        // pressure boundary values. This,
@@ -870,12 +869,12 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
         if (cell->at_boundary(face_no))
           {
             fe_face_values.reinit (cell, face_no);
-            
+
             pressure_boundary_values
               .value_list (fe_face_values.get_quadrature_points(),
                            boundary_values);
 
-            for (unsigned int q=0; q<n_face_q_points; ++q) 
+            for (unsigned int q=0; q<n_face_q_points; ++q)
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   const Tensor<1,dim>
@@ -899,7 +898,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
 	  system_matrix.add (local_dof_indices[i],
 			     local_dof_indices[j],
 			     local_matrix(i,j));
-      
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);
     }
@@ -921,23 +920,23 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
                                  // been computed. We therefore have this
                                  // separate function to this end.
 template <int dim>
-void TwoPhaseFlowProblem<dim>::assemble_rhs_S () 
-{  
-  QGauss<dim>   quadrature_formula(degree+2); 
-  QGauss<dim-1> face_quadrature_formula(degree+2);  
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
+{
+  QGauss<dim>   quadrature_formula(degree+2);
+  QGauss<dim-1> face_quadrature_formula(degree+2);
+  FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values    | update_gradients |
                            update_quadrature_points  | update_JxW_values);
-  FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula, 
+  FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
                                     update_values    | update_normal_vectors |
                                     update_quadrature_points  | update_JxW_values);
-  FEFaceValues<dim> fe_face_values_neighbor (fe, face_quadrature_formula, 
+  FEFaceValues<dim> fe_face_values_neighbor (fe, face_quadrature_formula,
                                              update_values);
- 
+
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
   const unsigned int   n_q_points      = quadrature_formula.size();
   const unsigned int   n_face_q_points = face_quadrature_formula.size();
-  
+
   Vector<double>       local_rhs (dofs_per_cell);
 
   std::vector<Vector<double> > old_solution_values(n_q_points, Vector<double>(dim+2));
@@ -952,7 +951,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
   SaturationBoundaryValues<dim> saturation_boundary_values;
 
   const FEValuesExtractors::Scalar saturation (dim+1);
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -970,7 +969,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
                                        // \mathbf{v}^{n+1},\nabla sigma)$,
                                        // where $\sigma$ is the saturation
                                        // component of the test function:
-      for (unsigned int q=0; q<n_q_points; ++q) 
+      for (unsigned int q=0; q<n_q_points; ++q)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             const double old_s = old_solution_values[q](dim+1);
@@ -980,7 +979,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
 
             const double        phi_i_s      = fe_values[saturation].value (i, q);
             const Tensor<1,dim> grad_phi_i_s = fe_values[saturation].gradient (i, q);
-                     
+
             local_rhs(i) += (time_step *
                              f_saturation(old_s,viscosity) *
                              present_u *
@@ -1027,15 +1026,15 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
                 neighbor_face = cell->neighbor_of_neighbor(face_no);
 
               fe_face_values_neighbor.reinit (neighbor, neighbor_face);
-             
+
               fe_face_values_neighbor
                 .get_function_values (old_solution,
                                       old_solution_values_face_neighbor);
-             
+
               for (unsigned int q=0; q<n_face_q_points; ++q)
                 neighbor_saturation[q] = old_solution_values_face_neighbor[q](dim+1);
             }
-          
+
 
           for (unsigned int q=0; q<n_face_q_points; ++q)
             {
@@ -1047,7 +1046,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
                                          fe_face_values.normal_vector(q);
 
               const bool is_outflow_q_point = (normal_flux >= 0);
-                                     
+
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 local_rhs(i) -= time_step *
                                 normal_flux *
@@ -1061,12 +1060,12 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
                                 fe_face_values.JxW(q);
             }
         }
-  
+
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-        system_rhs(local_dof_indices[i]) += local_rhs(i);       
+        system_rhs(local_dof_indices[i]) += local_rhs(i);
     }
-} 
+}
 
 
 
@@ -1078,14 +1077,14 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
                                  // step-20. After that, we have to deal with
                                  // the saturation equation (see below):
 template <int dim>
-void TwoPhaseFlowProblem<dim>::solve () 
+void TwoPhaseFlowProblem<dim>::solve ()
 {
   const InverseMatrix<SparseMatrix<double> >
     m_inverse (system_matrix.block(0,0));
   Vector<double> tmp (solution.block(0).size());
   Vector<double> schur_rhs (solution.block(1).size());
   Vector<double> tmp2 (solution.block(2).size());
-  
+
 
                                    // First the pressure, using the pressure
                                    // Schur complement of the first two
@@ -1095,24 +1094,24 @@ void TwoPhaseFlowProblem<dim>::solve ()
     system_matrix.block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= system_rhs.block(1);
 
-    
+
     SchurComplement
       schur_complement (system_matrix, m_inverse);
-    
+
     ApproximateSchurComplement
       approximate_schur_complement (system_matrix);
-      
+
     InverseMatrix<ApproximateSchurComplement>
       preconditioner (approximate_schur_complement);
 
-    
+
     SolverControl solver_control (solution.block(1).size(),
                                   1e-12*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
     cg.solve (schur_complement, solution.block(1), schur_rhs,
               preconditioner);
-  
+
     std::cout << "   "
               << solver_control.last_step()
               << " CG Schur complement iterations for pressure."
@@ -1124,7 +1123,7 @@ void TwoPhaseFlowProblem<dim>::solve ()
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     tmp *= -1;
     tmp += system_rhs.block(0);
-    
+
     m_inverse.vmult (solution.block(0), tmp);
   }
 
@@ -1160,25 +1159,25 @@ void TwoPhaseFlowProblem<dim>::solve ()
                                    // reasonable range:
   assemble_rhs_S ();
   {
-    
+
     SolverControl solver_control (system_matrix.block(2,2).m(),
                                   1e-8*system_rhs.block(2).l2_norm());
     SolverCG<>   cg (solver_control);
     cg.solve (system_matrix.block(2,2), solution.block(2), system_rhs.block(2),
               PreconditionIdentity());
-                
+
     project_back_saturation ();
-        
+
     std::cout << "   "
               << solver_control.last_step()
               << " CG iterations for saturation."
-              << std::endl;             
-  } 
+              << std::endl;
+  }
 
-   
-  old_solution = solution; 
+
+  old_solution = solution;
 }
-                                 
+
 
                                  // @sect4{TwoPhaseFlowProblem::output_results}
 
@@ -1191,7 +1190,7 @@ void TwoPhaseFlowProblem<dim>::output_results ()  const
 {
   if (timestep_number % 5 != 0)
     return;
-  
+
   std::vector<std::string> solution_names;
   switch (dim)
     {
@@ -1201,7 +1200,7 @@ void TwoPhaseFlowProblem<dim>::output_results ()  const
             solution_names.push_back ("p");
             solution_names.push_back ("S");
             break;
-            
+
       case 3:
             solution_names.push_back ("u");
             solution_names.push_back ("v");
@@ -1209,18 +1208,18 @@ void TwoPhaseFlowProblem<dim>::output_results ()  const
             solution_names.push_back ("p");
             solution_names.push_back ("S");
             break;
-            
+
       default:
             Assert (false, ExcNotImplemented());
     }
-  
+
   DataOut<dim> data_out;
 
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, solution_names);
 
   data_out.build_patches (degree+1);
-  
+
   std::ostringstream filename;
   filename << "solution-" << timestep_number << ".vtk";
 
@@ -1281,16 +1280,16 @@ template <int dim>
 double
 TwoPhaseFlowProblem<dim>::get_maximal_velocity () const
 {
-  QGauss<dim>   quadrature_formula(degree+2); 
+  QGauss<dim>   quadrature_formula(degree+2);
   const unsigned int   n_q_points
     = quadrature_formula.size();
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values);
   std::vector<Vector<double> > solution_values(n_q_points,
                                                Vector<double>(dim+2));
   double max_velocity = 0;
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -1303,8 +1302,8 @@ TwoPhaseFlowProblem<dim>::get_maximal_velocity () const
         {
           Tensor<1,dim> velocity;
           for (unsigned int i=0; i<dim; ++i)
-            velocity[i] = solution_values[q](i);          
-          
+            velocity[i] = solution_values[q](i);
+
           max_velocity = std::max (max_velocity,
                                    velocity.norm());
         }
@@ -1347,33 +1346,33 @@ TwoPhaseFlowProblem<dim>::get_maximal_velocity () const
                                  // end time of a time step only at the end of
                                  // the time step.
 template <int dim>
-void TwoPhaseFlowProblem<dim>::run () 
+void TwoPhaseFlowProblem<dim>::run ()
 {
   make_grid_and_dofs();
-  
+
   {
     ConstraintMatrix constraints;
     constraints.close();
-    
+
     VectorTools::project (dof_handler,
                           constraints,
                           QGauss<dim>(degree+2),
                           InitialValues<dim>(),
                           old_solution);
   }
-  
+
   timestep_number = 1;
   double time = 0;
-  
+
   do
-    { 
+    {
       std::cout << "Timestep " << timestep_number
-                << std::endl; 
+                << std::endl;
 
       assemble_system ();
 
       solve ();
-      
+
       output_results ();
 
       time += time_step;
@@ -1386,7 +1385,7 @@ void TwoPhaseFlowProblem<dim>::run ()
   while (time <= 250);
 }
 
-    
+
                                  // @sect3{The <code>main</code> function}
 
                                  // That's it. In the main function, we pass
@@ -1396,7 +1395,7 @@ void TwoPhaseFlowProblem<dim>::run ()
                                  // elements, i.e. $RT_0\times DQ_0 \times
                                  // DQ_0$. The rest is as in all the other
                                  // programs.
-int main () 
+int main ()
 {
   try
     {
@@ -1415,10 +1414,10 @@ int main ()
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
                 << "----------------------------------------------------"
