@@ -1379,10 +1379,6 @@ void BEMProblem<dim>::compute_exterior_solution()
   std::vector<double> normal_wind(n_q_points);
   std::vector<Vector<double> > local_wind(n_q_points, Vector<double>(dim) );
 
-  typename DoFHandler<dim>::active_cell_iterator
-    external_cell = external_dh.begin_active(),
-    external_endc = external_dh.end();
-
   std::vector<Point<dim> > external_support_points(external_dh.n_dofs());
   DoFTools::map_dofs_to_support_points<dim>( StaticMappingQ1<dim>::mapping,
 					     external_dh, external_support_points);
