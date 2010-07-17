@@ -3146,6 +3146,15 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 
 template <int dim, int spacedim>
+const typename Triangulation<dim,spacedim>::cell_iterator
+FEValuesBase<dim,spacedim>::get_cell () const
+{
+  return *present_cell;
+}
+
+
+
+template <int dim, int spacedim>
 const std::vector<Point<spacedim> > &
 FEValuesBase<dim,spacedim>::get_normal_vectors () const
 {

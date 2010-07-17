@@ -4510,14 +4510,6 @@ FEValuesBase<dim,spacedim>::get_update_flags () const
 
 
 template <int dim, int spacedim>
-const typename Triangulation<dim,spacedim>::cell_iterator
-FEValuesBase<dim,spacedim>::get_cell () const
-{
-  return *present_cell;
-}
-
-
-template <int dim, int spacedim>
 inline
 const std::vector<Point<spacedim> > &
 FEValuesBase<dim,spacedim>::get_quadrature_points () const

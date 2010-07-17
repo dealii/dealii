@@ -151,6 +151,16 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>
+  Fixed: The FEValues::get_cell() function was unusable from user code
+  since its implementation used a class that was only forward declared
+  and not visible at the point of instantiations in user code. This is now
+  fixed.
+  <br>
+  (WB 2010/07/16)
+  </p>
+
+  <li>
   <p>New: The multilevel matrices for continuous elements
   can be built with the MeshWorker now.
   <br>
