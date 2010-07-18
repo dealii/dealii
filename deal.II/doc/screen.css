@@ -233,6 +233,11 @@ td.build {
 	font-weight: bold;
 }
 
+.weak {
+	color: #404040;
+	text-decoration: line-through;
+}
+
 .shout {
 	color: #e000ff;
 	text-decoration: blink;
