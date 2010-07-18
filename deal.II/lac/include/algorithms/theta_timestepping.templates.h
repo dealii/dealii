@@ -10,7 +10,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <numerics/theta_timestepping.h>
+#include <algorithms/theta_timestepping.h>
 
 #include <base/parameter_handler.h>
 #include <lac/vector_memory.h>

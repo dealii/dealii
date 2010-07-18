@@ -16,7 +16,6 @@
 #include <base/config.h>
 #include <base/named_data.h>
 #include <base/event.h>
-#include <dofs/dof_handler.h>
 
 #include <fstream>
 
@@ -133,27 +132,6 @@ namespace Algorithms
   {
     step = s;
     return *this;
-  }
-
-  template <class VECTOR, int dim, int spacedim=dim>
-  class DoFOutputOperator : public OutputOperator<VECTOR>
-  {
-    public:
-      void initialize (DoFHandler<dim, spacedim>& dof_handler);
-
-      virtual OutputOperator<VECTOR>& 
-        operator<<(const NamedData<VECTOR*>& vectors);
-
-    private:
-      SmartPointer<DoFHandler<dim, spacedim>,
-        DoFOutputOperator<VECTOR, dim, spacedim> > dof;
-  };
-
-  template <class VECTOR, int dim, int spacedim>
-  void DoFOutputOperator<VECTOR, dim, spacedim>::initialize(
-      DoFHandler<dim, spacedim>& dof_handler)
-  {
-    dof = &dof_handler;  
   }
 }
 

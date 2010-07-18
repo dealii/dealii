@@ -10,7 +10,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <numerics/newton.h>
+#include <algorithms/newton.h>
 
 #include <base/parameter_handler.h>
 #include <base/logstream.h>

@@ -14,8 +14,8 @@
 #define __deal2__theta_timestepping_h
 
 #include <base/smartpointer.h>
-#include <numerics/operator.h>
-#include <numerics/timestep_control.h>
+#include <algorithms/operator.h>
+#include <algorithms/timestep_control.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -15,9 +15,9 @@
 #include <base/logstream.h>
 #include <lac/vector_memory.h>
 
-#include <numerics/operator.templates.h>
-#include <numerics/newton.templates.h>
-#include <numerics/theta_timestepping.templates.h>
+#include <algorithms/operator.templates.h>
+#include <algorithms/newton.templates.h>
+#include <algorithms/theta_timestepping.templates.h>
 
 #include <lac/vector.h>
 #include <lac/block_vector.h>
@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Algorithms
 {
-#include "operator.all_dimensions.inst"
+#include "operator.inst"
 }
 
 DEAL_II_NAMESPACE_CLOSE
