@@ -150,6 +150,12 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li><p> New: Brezzi-Douglas-Marini elements of arbitrary order in FE_BDM.
+  <br>
+  (GK 2010/07/19)
+  </p>
+  
   <li>
   <p>
   Fixed: The FEValues::get_cell() function was unusable from user code
