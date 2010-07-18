@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,11 +24,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
 {
-
-  using namespace std;
-
-
-  
   template<int dim>
   CutOffFunctionBase<dim>::CutOffFunctionBase (const double r,
 					       const Point<dim> p,
@@ -58,7 +53,7 @@ namespace Functions
   }
 
 //////////////////////////////////////////////////////////////////////
-  
+
   template<int dim>
   CutOffFunctionLinfty<dim>::CutOffFunctionLinfty (const double r,
 						   const Point<dim> p,
@@ -83,7 +78,7 @@ namespace Functions
 
 
   template<int dim>
-  void 
+  void
   CutOffFunctionLinfty<dim>::value_list (const std::vector<Point<dim> > &points,
 					 std::vector<double>            &values,
 					 const unsigned int component) const
@@ -92,7 +87,7 @@ namespace Functions
 	    ExcDimensionMismatch(values.size(), points.size()));
     Assert (component < this->n_components,
 	    ExcIndexRange(component,0,this->n_components));
-    
+
 
     if (this->selected==CutOffFunctionBase<dim>::no_component
 	||
@@ -103,7 +98,7 @@ namespace Functions
       std::fill (values.begin(), values.end(), 0.);
   }
 
-  
+
   template<int dim>
   void
   CutOffFunctionLinfty<dim>::vector_value_list (
@@ -126,7 +121,7 @@ namespace Functions
 	  }
       }
   }
-  
+
 
   template<int dim>
   CutOffFunctionW1<dim>::CutOffFunctionW1 (const double     r,
@@ -150,19 +145,19 @@ namespace Functions
 	const double d = this->center.distance(p);
 	return ((d<this->radius) ? (this->radius-d) : 0.);
       }
-    return 0.;  
+    return 0.;
   }
 
 
   template<int dim>
-  void 
+  void
   CutOffFunctionW1<dim>::value_list (const std::vector<Point<dim> > &points,
 				     std::vector<double>            &values,
 				     const unsigned int component) const
   {
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
-    
+
     if (this->selected==CutOffFunctionBase<dim>::no_component
 	||
 	component==this->selected)
@@ -200,7 +195,7 @@ namespace Functions
 	  }
       }
   }
-  
+
 
   template<int dim>
   CutOffFunctionCinfty<dim>::CutOffFunctionCinfty (const double     r,
@@ -230,17 +225,17 @@ namespace Functions
       }
     return 0.;
   }
-  
+
 
   template<int dim>
-  void 
+  void
   CutOffFunctionCinfty<dim>::value_list (const std::vector<Point<dim> > &points,
 					 std::vector<double>            &values,
 					 const unsigned int component) const
   {
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
-    
+
     const double r = this->radius;
 
     if (this->selected==CutOffFunctionBase<dim>::no_component
@@ -293,7 +288,7 @@ namespace Functions
 	  }
       }
   }
-  
+
 
 
   template<int dim>
@@ -310,17 +305,17 @@ namespace Functions
 	     Point<dim>() :
 	     (p-this->center)/d*(-2.0*r*r/pow(-r*r+d*d,2.0)*d*exp(e)));
   }
-  
 
-// explicit instantiations  
+
+// explicit instantiations
   template class CutOffFunctionLinfty <1>;
   template class CutOffFunctionLinfty <2>;
   template class CutOffFunctionLinfty <3>;
-  
+
   template class CutOffFunctionW1 <1>;
   template class CutOffFunctionW1 <2>;
   template class CutOffFunctionW1 <3>;
-  
+
   template class CutOffFunctionCinfty <1>;
   template class CutOffFunctionCinfty <2>;
   template class CutOffFunctionCinfty <3>;

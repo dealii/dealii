@@ -19,7 +19,6 @@
 
 #include <cmath>
 
-using namespace std;
 
 DEAL_II_NAMESPACE_OPEN
 
