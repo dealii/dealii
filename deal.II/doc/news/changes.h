@@ -39,6 +39,18 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: The step-33 tutorial program can not be built with GCC versions
+  4.5.x. There are in fact two problems, on that pertains to uses of
+  <code>std::make_pair</code> that don't work any more with the upcoming
+  C++ 1x standard that GCC 4.5.x already follows, and some in which the
+  Trilinos package Sacado is incompatible with GCC 4.5.x, at least up to
+  Trilinos version 10.4.0. While the latter problem can only be fixed in
+  future Trilinos versions, at least the former problem is solved in step-33.
+  <br>
+  (WB 2010/07/18)
+  </p>
+
+  <li>
   <p>Fixed: GCC version 3.4.0 failed to compile the file
   <code>deal.II/source/numerics/matrices.cc</code> with
   an internal compiler error. This has
@@ -155,7 +167,7 @@ inconvenience this causes.
   <br>
   (GK 2010/07/19)
   </p>
-  
+
   <li>
   <p>
   Fixed: The FEValues::get_cell() function was unusable from user code
