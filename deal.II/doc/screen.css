@@ -228,14 +228,18 @@ td.build {
     background-color: #C030D0;
 }
 
-.attention {
-	color: #f00080;
-	font-weight: bold;
-}
-
 .weak {
 	color: #808080;
 	text-decoration: line-through;
+}
+
+.deprecated {
+	text-decoration: line-through;
+}
+
+.attention {
+	color: #f00080;
+	font-weight: bold;
 }
 
 .shout {
