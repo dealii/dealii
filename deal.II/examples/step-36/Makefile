@@ -48,7 +48,8 @@ include $D/common/Make.global_options
 ################################################################ 
 # This example program will only work if PETSc and SLEPc are both installed.
 # If this is not the case, then simply redefine the main targets to do nothing
-ifneq ($(USE_CONTRIB_PETSC)$(USE_CONTRIB_SLEPC),yesyes)
+ifneq ($(USE_CONTRIB_PETSC)$(USE_CONTRIB_SLEPC)$(enable-threads),yesyesno)
+  ifneq ($(USE_CONTRIB_PETSC)$(USE_CONTRIB_SLEPC),yesyes)
 default run clean:
 	@echo
 	@echo "===========================================================" 
@@ -57,7 +58,16 @@ default run clean:
 	@echo "=   and detected during configuration of deal.II          ="
 	@echo "==========================================================="
 	@echo
-
+  else
+default run clean:
+	@echo
+	@echo "===========================================================" 
+	@echo "=   PETSc can not be used when running programs on        ="
+	@echo "=   multiple threads. Make sure you have specified the    ="
+	@echo "=   --disable-threads flag upon configuration of deal.II  ="
+	@echo "==========================================================="
+	@echo
+  endif
 else
 #
 ################################################################
