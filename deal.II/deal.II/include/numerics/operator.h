@@ -16,4 +16,4 @@
  */
 
 #include <algorithms/operator.h>
-#include <numerics/dof_operator.h>
+#include <numerics/dof_output_operator.h>
