@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2007, 2008, 2009 by the deal.II authors and David Neckels */
+/*    Copyright (C) 2007, 2008, 2009, 2010 by the deal.II authors and David Neckels */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -2619,14 +2619,14 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
       case Parameters::Solver::direct:
       {
 	SolverControl solver_control (1,0);
-	TrilinosWrappers::SolverDirect direct (solver_control, 
-					       parameters.output == 
+	TrilinosWrappers::SolverDirect direct (solver_control,
+					       parameters.output ==
 					       Parameters::Solver::verbose);
 
 	direct.solve (system_matrix, newton_update, right_hand_side);
 
-	return std::make_pair<unsigned int, double> (solver_control.last_step(), 
-						     solver_control.last_value());
+	return std::pair<unsigned int, double> (solver_control.last_step(),
+						solver_control.last_value());
       }
 
 				       // Likewise, if we are to use an
@@ -2645,7 +2645,7 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 				       // solver and set a bunch of options
 				       // that can be changed from the
 				       // parameter file.
-				       // 
+				       //
                                        // There are two more practicalities:
 				       // Since we have built our right hand
 				       // side and solution vector as
@@ -2678,9 +2678,9 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 				       // constantness using a const_cast.
       case Parameters::Solver::gmres:
       {
-	Epetra_Vector x(View, system_matrix.domain_partitioner(), 
+	Epetra_Vector x(View, system_matrix.domain_partitioner(),
 			newton_update.begin());
-	Epetra_Vector b(View, system_matrix.range_partitioner(), 
+	Epetra_Vector b(View, system_matrix.range_partitioner(),
 			right_hand_side.begin());
 
 	AztecOO solver;
@@ -2710,13 +2710,13 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 
 	solver.Iterate(parameters.max_iterations, parameters.linear_residual);
 
-	return std::make_pair<unsigned int, double> (solver.NumIters(),
-						     solver.TrueResidual());
+	return std::pair<unsigned int, double> (solver.NumIters(),
+						solver.TrueResidual());
       }
     }
 
   Assert (false, ExcNotImplemented());
-  return std::make_pair<unsigned int, double> (0,0);
+  return std::pair<unsigned int, double> (0,0);
 }
 
 
