@@ -26,7 +26,7 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li>None so far.
+  <li>None.
 </ol>
 
 
