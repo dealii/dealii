@@ -46,34 +46,65 @@ deps:
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/lib && $(MAKE) $(MAKEOPTIONS) external-links
 
-baseg: deps contrib
+# Targets for object files of sublibraries
+baseog: deps
+	cd $D/base && $(MAKE) $(MAKEOPTIONS) objg
+baseoo: deps
+	cd $D/base && $(MAKE) $(MAKEOPTIONS) objo
+
+lacog: deps
+	cd $D/lac && $(MAKE) $(MAKEOPTIONS) objg
+lacoo: deps
+	cd $D/lac && $(MAKE) $(MAKEOPTIONS) objo
+
+1dog: deps
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj1dg
+2dog: deps
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj2dg
+3dog: deps
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj3dg
+
+1doo: deps
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj1do
+2doo: deps
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj2do
+3doo: deps
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj3do
+
+adog: deps
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) objg
+adoo: deps
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) objo
+
+baseg: baseog contrib
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) libg
 
-baseo: deps contrib
+baseo: baseoo contrib
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) libo
 
-lacg: deps baseg
+	
+lacg: lacog baseg
 	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libg
 
-laco: deps baseo
+laco: lacoo baseo
 	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libo
 
-1dg: deps baseg lacg
+1dg:  1dog lacg baseg
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1dg
 
-2dg: deps baseg lacg
+2dg:  2dog lacg baseg
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2dg
 
-3dg: deps baseg lacg
+3dg:  3dog lacg baseg
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3dg
 
-1do: deps baseo laco
+1do:  1doo laco baseo
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1d
 
-2do: deps baseo laco
+2do:  2doo baseo laco
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2d
 
-3do: deps baseo laco
+3do:  3doo baseo laco
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3d
 
 
@@ -89,8 +120,8 @@ $(LIBDIR):
 baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib functionparser : $(LIBDIR) deps
 
 all: debug optimized
-debug: contrib baseg lacg 2dg 1dg 3dg
-optimized: contrib baseo laco 2do 1do 3do
+debug: adog lacog baseog contrib baseg lacg 2dg 1dg 3dg
+optimized: adoo lacoo baseoo contrib baseo laco 2do 1do 3do
 
 
 # when HSL functions are used, we also compile the detached_ma27

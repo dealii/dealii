@@ -22,10 +22,13 @@ inst-files   = $(inst-in-files:%.in=%)
 # if umfpack was configured, simply link all the umfpack files into liblac.
 # these object files should have been generated before we got to the present
 # directory
+libo-files = $(o-files)
+libgo-files = $(go-files)
+
 ifeq ($(USE_CONTRIB_UMFPACK),yes)
   umfpack-files = $(sort $(shell echo $(LIBDIR)/contrib/umfpack/*.$(OBJEXT)))
-  o-files += $(umfpack-files)
-  go-files += $(umfpack-files)
+  libo-files += $(umfpack-files)
+  libgo-files += $(umfpack-files)
 endif
 
 
@@ -40,6 +43,10 @@ $(LIBDIR)/lac/%.$(OBJEXT) :
 source/%.inst : source/%.inst.in $D/common/template-arguments
 	@echo "=====lac============================= $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
+
+# targets for object code without linking into library
+objg: $(go-files)
+objo: $(o-files)
 
 # rules
 lib: $(LIBDIR)/liblac.g$(lib-suffix) $(LIBDIR)/liblac$(lib-suffix)
@@ -103,25 +110,25 @@ else
 endif
 
 
-$(LIBDIR)/liblac$(static-lib-suffix): $(o-files)
+$(LIBDIR)/liblac$(static-lib-suffix): $(libo-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
-	@$(AR) ru $@ $(o-files)
+	@$(AR) ru $@ $(libo-files)
 	@$(RANLIB) $@
 
-$(LIBDIR)/liblac.g$(static-lib-suffix): $(go-files)
+$(LIBDIR)/liblac.g$(static-lib-suffix): $(libgo-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
-	@$(AR) ru $@ $(go-files)
+	@$(AR) ru $@ $(libgo-files)
 	@$(RANLIB) $@
 
 
-$(LIBDIR)/liblac$(shared-lib-suffix): $(o-files)
+$(LIBDIR)/liblac$(shared-lib-suffix): $(libo-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,lac) $(call DEAL_II_ADD_SONAME,lac) $(o-files) $(deplibs.o)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,lac) $(call DEAL_II_ADD_SONAME,lac) $(libo-files) $(deplibs.o)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,lac) $@
 
-$(LIBDIR)/liblac.g$(shared-lib-suffix): $(go-files)
+$(LIBDIR)/liblac.g$(shared-lib-suffix): $(libgo-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,lac.g) $(call DEAL_II_ADD_SONAME,lac.g) $(go-files) $(deplibs.g)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,lac.g) $(call DEAL_II_ADD_SONAME,lac.g) $(libgo-files) $(deplibs.g)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,lac.g) $@
 
 

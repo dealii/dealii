@@ -127,7 +127,16 @@ else
   deplibs.o =
 endif
 
+# targets for object code without linking into libraries
+objg: $(go-files)
+objo: $(o-files)
 
+obj1dg: $(go-files-1d)
+obj2dg: $(go-files-2d)
+obj3dg: $(go-files-3d)
+obj1do: $(o-files-1d)
+obj2do: $(o-files-2d)
+obj3do: $(o-files-3d)
 
 # rules how to make the libraries themselves
 $(LIBDIR)/libdeal_II_1d.g$(static-lib-suffix): $(go-files-1d)

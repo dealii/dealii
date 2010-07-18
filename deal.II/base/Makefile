@@ -65,6 +65,9 @@ else
   deplibs.o =
 endif
 
+# targets for object code without linking into library
+objg: $(go-files)
+objo: $(o-files)
 
 # rules for libraries
 lib: $(LIBDIR)/libbase.g$(lib-suffix) $(LIBDIR)/libbase$(lib-suffix)
