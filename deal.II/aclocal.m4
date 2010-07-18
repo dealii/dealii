@@ -6268,6 +6268,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_MUMPS, dnl
     ],
     [dnl action-if-not-given (do nothing)
      USE_CONTRIB_MUMPS=no
+     AC_MSG_RESULT([no])
     ])
 
   dnl ------------------------------------------------------------
