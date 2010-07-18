@@ -3,7 +3,7 @@
 
 <p>
 This is the list of changes made after the release of
-deal.II version 6.3. It is subdivided into changes
+deal.II version 6.3.0. It is subdivided into changes
 made to the three sub-libraries <a href="#base">base</a>,
 <a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
