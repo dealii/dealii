@@ -30,7 +30,7 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li>None so far.
+  <li>None.
 </ol>
 
 
@@ -146,7 +146,7 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
-  <li>None so far.
+  <li>None.
 </ol>
 
 
@@ -154,7 +154,7 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
-  <li>None so far.
+  <li>None.
 </ol>
 
 
