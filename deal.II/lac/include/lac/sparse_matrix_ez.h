@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,7 +89,8 @@ template<typename number> class FullMatrix;
  * some other aliens will appreciate it. By the way, the suffix makes
  * sense by pronouncing it the American way.
  *
- * @author Guido Kanschat, 2002
+ * @author Guido Kanschat
+ * @date 2002, 2010
  */
 template <typename number>
 class SparseMatrixEZ : public Subscriptor
