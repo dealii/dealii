@@ -36,17 +36,17 @@ DEAL:rich:GMRES::Convergence step 3 value 0
 DEAL:rich:QMRS::Starting value 3.000
 DEAL:rich:QMRS::Convergence step 3 value 0
 DEAL:ssor:RichardsonT::Starting value 3.000
-DEAL:ssor:RichardsonT::Convergence step 10 value 0.0004418
+DEAL:ssor:RichardsonT::Convergence step 7 value 0.0006128
 DEAL:ssor:Richardson::Starting value 3.000
-DEAL:ssor:Richardson::Convergence step 10 value 0.0004418
+DEAL:ssor:Richardson::Convergence step 7 value 0.0006128
 DEAL:ssor:cg::Starting value 3.000
 DEAL:ssor:cg::Convergence step 4 value 6.018e-05
 DEAL:ssor:Bicgstab::Starting value 3.000
 DEAL:ssor:Bicgstab::Convergence step 2 value 0.0003670
-DEAL:ssor:GMRES::Starting value 1.600
-DEAL:ssor:GMRES::Convergence step 3 value 0.0002978
-DEAL:ssor:GMRES::Starting value 1.600
-DEAL:ssor:GMRES::Convergence step 3 value 0.0002978
+DEAL:ssor:GMRES::Starting value 1.920
+DEAL:ssor:GMRES::Convergence step 3 value 0.0003574
+DEAL:ssor:GMRES::Starting value 1.920
+DEAL:ssor:GMRES::Convergence step 3 value 0.0003574
 DEAL:ssor:QMRS::Starting value 3.000
 DEAL:ssor:QMRS::Convergence step 4 value 0.0001345
 DEAL:sor:RichardsonT::Starting value 3.000
@@ -118,17 +118,17 @@ DEAL:rich:GMRES::Convergence step 42 value 0.0007803
 DEAL:rich:QMRS::Starting value 11.00
 DEAL:rich:QMRS::Convergence step 16 value 0.0002583
 DEAL:ssor:RichardsonT::Starting value 11.00
-DEAL:ssor:RichardsonT::Convergence step 59 value 0.0008892
+DEAL:ssor:RichardsonT::Convergence step 48 value 0.0009502
 DEAL:ssor:Richardson::Starting value 11.00
-DEAL:ssor:Richardson::Convergence step 59 value 0.0008892
+DEAL:ssor:Richardson::Convergence step 48 value 0.0009502
 DEAL:ssor:cg::Starting value 11.00
 DEAL:ssor:cg::Convergence step 8 value 0.0005816
 DEAL:ssor:Bicgstab::Starting value 11.00
 DEAL:ssor:Bicgstab::Convergence step 4 value 0.0003834
-DEAL:ssor:GMRES::Starting value 11.05
-DEAL:ssor:GMRES::Convergence step 7 value 0.0006838
-DEAL:ssor:GMRES::Starting value 11.05
-DEAL:ssor:GMRES::Convergence step 7 value 0.0006838
+DEAL:ssor:GMRES::Starting value 13.27
+DEAL:ssor:GMRES::Convergence step 7 value 0.0008206
+DEAL:ssor:GMRES::Starting value 13.27
+DEAL:ssor:GMRES::Convergence step 7 value 0.0008206
 DEAL:ssor:QMRS::Starting value 11.00
 DEAL:ssor:QMRS::Convergence step 9 value 0.0004140
 DEAL:sor:RichardsonT::Starting value 11.00

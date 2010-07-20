@@ -47,7 +47,7 @@ tests_x = vector-vector vector_memory \
 	matrix_out \
 	pointer_matrix \
 	pointer_matrix_vector \
-	solver solver_selector_* \
+	solver solver_selector_* solver_relaxation_* \
 	eigen \
 	filtered_matrix \
 	sparse_ilu* \

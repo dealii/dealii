@@ -1,23 +1,21 @@
-//----------------------------  solver.cc  ---------------------------
+//----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
 //
-//    Copyright (C) 1998 - 2005 by the deal.II authors
+//    Copyright (C) 1998 - 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  solver.cc  ---------------------------
+//----------------------------------------------------------------------
 
 
 #include "../tests.h"
+#include "testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iomanip>
-#include <iomanip>
-#include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>

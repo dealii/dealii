@@ -1,6 +1,5 @@
-//----------------------------  full_matrix.cc,v  ---------------------------
+//----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
 //
 //    Copyright (C) 2005 by the deal.II authors
 //
@@ -9,7 +8,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  full_matrix.cc,v  ---------------------------
+//----------------------------------------------------------------------
 
 // Test copying between matrices (copy_from and fill)
 

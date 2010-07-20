@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -83,7 +83,7 @@ int main()
 {
   std::ofstream logfile("filtered_matrix/output");
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
   
   PreconditionIdentity identity;
   ScaledMatrix<Vector<double> > s(identity, 3.);
