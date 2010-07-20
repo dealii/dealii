@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,12 +35,15 @@ using namespace dealii;
  *
  * @todo Transformation works only for uniform, Cartesian meshes
  *
+ * The matching pressure psace for FE_BDM of order <i>k</i> is the
+ * element FE_DGP of order <i>k</i>.
+ *
  * The BDM element of order @p p has <i>p+1</i> degrees of freedom on
  * each face. These are implemented as the function values in the
  * <i>p+1</i> Gauss points on each face.
  *
  * Additionally, for order greater or equal 2, we have additional
- * <i>p(p-1)<i>, the number of vector valued polynomials in
+ * <i>p(p-1)</i>, the number of vector valued polynomials in
  * <i>P<sub>p</sub></i>, interior degrees of freedom. These are the
  * vector function values in the first <i>p(p-1)/2<i> of the
  * <i>p<sup>2</sup></i> Gauss points in the cell.
