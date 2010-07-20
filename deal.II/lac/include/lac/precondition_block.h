@@ -18,13 +18,11 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
+#include <lac/precondition_block_base.h>
 
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-
-template <typename number> class FullMatrix;
-template <typename number> class Vector;
 
 template<class MATRIX, typename inverse_type>
 class PreconditionBlockJacobi;
@@ -35,15 +33,14 @@ class PreconditionBlockJacobi;
 
 
 /**
- * Base class for @p PreconditionBlockJacobi, @p PreconditionBlockSOR,
- * ...  This class assumes the <tt>MATRIX</tt> consisting of
- * invertible blocks of @p blocksize on the diagonal and provides the
- * inversion of the diagonal blocks of the matrix. NOT only block
- * diagonal matrices are allowed but all matrices of arbitrary
- * structure with the minimal property of having invertible blocks on
- * the diagonal! Still the matrix must have access to single matrix
- * entries. therefore, BlockMatrixArray is not a possible matrix
- * class.
+ * Base class for actual block preconditioners. This class assumes the
+ * <tt>MATRIX</tt> consisting of invertible blocks of @p blocksize on
+ * the diagonal and provides the inversion of the diagonal blocks of
+ * the matrix. NOT only block diagonal matrices are allowed but all
+ * matrices of arbitrary structure with the minimal property of having
+ * invertible blocks on the diagonal! Still the matrix must have
+ * access to single matrix entries. therefore, BlockMatrixArray is not
+ * a possible matrix class.
  *
  * This block matrix structure is given e.g. for the DG method for the
  * transport equation. For a downstream numbering the matrices even
@@ -72,10 +69,13 @@ class PreconditionBlockJacobi;
  * choice.
  *
  * @see @ref GlossBlockLA "Block (linear algebra)"
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
+ * @author Ralf Hartmann, Guido Kanschat
+ * @date 1999, 2000, 2010
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
-class PreconditionBlock : public virtual Subscriptor
+class PreconditionBlock
+  : public virtual Subscriptor,
+    protected PreconditionBlockBase<inverse_type>
 {
   private:
 				     /**
@@ -132,7 +132,7 @@ class PreconditionBlock : public virtual Subscriptor
 				     /**
 				      * Constructor.
 				      */
-    PreconditionBlock();
+    PreconditionBlock(bool store_diagonals = false);
 
 				     /**
 				      * Destructor.
@@ -224,27 +224,6 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     value_type el(unsigned int i,
 		  unsigned int j) const;
-
-				     /**
-				      * Use only the inverse of the
-				      * first diagonal block to save
-				      * memory and computation time.
-				      *
-				      * Possible applications:
-				      * computing on a cartesian grid,
-				      * all diagonal blocks are the
-				      * same or all diagonal blocks
-				      * are at least similar and
-				      * inversion of one of them still
-				      * yields a preconditioner.
-				      */
-    void set_same_diagonal ();
-
-				     /**
-				      * Does the matrix use only one
-				      * diagonal block?
-				      */
-    bool same_diagonal () const;
 
     				     /**
 				      * Stores the inverse of the
@@ -342,12 +321,6 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     unsigned int memory_consumption () const;
 
-				     /**
-				      * Determine, whether inverses
-				      * have been computed.
-				      */
-    bool inverses_ready () const;
-
     				     /** @addtogroup Exceptions
 				      * @{ */
 
@@ -363,35 +336,9 @@ class PreconditionBlock : public virtual Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcWrongNumberOfInverses,
-		    int, int,
-		    << "There are " << arg1
-		    << " inverse matrices but " << arg2
-		    << " cells.");
-
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInverseMatricesAlreadyExist);
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcDiagonalsNotStored);
-
 				     //@}
-
-				     /**
-				      * Access to the inverse diagonal
-				      * blocks.
-				      */
-    const FullMatrix<inverse_type>& inverse (unsigned int i) const;
-
-				     /**
-				      * Access to the diagonal
-				      * blocks.
-				      */
-    const FullMatrix<inverse_type>& diagonal (unsigned int i) const;
 
   protected:
 				     /**
@@ -419,14 +366,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * used by derived classes.
 				      */
     double relaxation;
-
-
-				     /**
-				      * Flag for storing the diagonal
-				      * blocks of the matrix.
-				      */
-    bool store_diagonals;
-
+    
 				     /**
 				      * Number of blocks.
 				      */
@@ -446,30 +386,6 @@ class PreconditionBlock : public virtual Subscriptor
 				      * Flag for diagonal compression.
 				      * @ref set_same_diagonal()
 				      */
-  private:
-
-				     /**
-				      * Storage of the inverse
-				      * matrices of the diagonal
-				      * blocks matrices as
-				      * <tt>FullMatrix<inverse_type></tt>
-				      * matrices. Using
-				      * <tt>inverse_type=float</tt> saves
-				      * memory in comparison with
-				      * <tt>inverse_type=double</tt>.
-				      */
-    std::vector<FullMatrix<inverse_type> > var_inverse;
-
-				     /**
-				      * Storage of the original diagonal blocks.
-				      * These are only filled if @p store_diagonals
-				      * is @p true.
-				      *
-				      * Used by the blocked SSOR method.
-				      */
-    std::vector<FullMatrix<inverse_type> > var_diagonal;
-
-    bool var_same_diagonal;
 };
 
 
@@ -809,6 +725,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 {
   public:
 				     /**
+				      * Default constructor.
+				      */
+    PreconditionBlockSOR();
+    
+				     /**
 				      * Define number type of matrix.
 				      */
     typedef typename MATRIX::value_type number;
@@ -944,6 +865,12 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
 
   protected:
+				     /**
+				      * Constructor to be used by
+				      * PreconditionBlockSSOR.
+				      */
+    PreconditionBlockSOR(bool store);
+    
 				     /**
 				      * Implementation of the forward
 				      * substitution loop called by
@@ -1138,7 +1065,7 @@ PreconditionBlock<MATRIX, inverse_type>::el (
   const unsigned int bs = blocksize;
   const unsigned int nb = i/bs;
 
-  const FullMatrix<inverse_type>& B = inverse(nb);
+  const FullMatrix<inverse_type>& B = this->inverse(nb);
 
   const unsigned int ib = i % bs;
   const unsigned int jb = j % bs;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,33 +27,23 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <class MATRIX, typename inverse_type>
-PreconditionBlock<MATRIX,inverse_type>::PreconditionBlock ():
-		blocksize(0),
-		A(0, typeid(*this).name()),
-		store_diagonals(false),
-		var_same_diagonal(false)
+PreconditionBlock<MATRIX,inverse_type>::PreconditionBlock (bool store)
+		: PreconditionBlockBase<inverse_type>(store),
+		  blocksize(0),
+		  A(0, typeid(*this).name())
 {}
 
 
 template <class MATRIX, typename inverse_type>
 PreconditionBlock<MATRIX,inverse_type>::~PreconditionBlock ()
-{
-  if (var_inverse.size()!=0)
-    var_inverse.erase(var_inverse.begin(), var_inverse.end());
-  if (var_diagonal.size()!=0)
-    var_diagonal.erase(var_diagonal.begin(), var_diagonal.end());
-}
+{}
 
 
 template <class MATRIX, typename inverse_type>
 void PreconditionBlock<MATRIX,inverse_type>::clear ()
 {
-  if (var_inverse.size()!=0)
-    var_inverse.erase(var_inverse.begin(), var_inverse.end());
-  if (var_diagonal.size()!=0)
-    var_diagonal.erase(var_diagonal.begin(), var_diagonal.end());
+  PreconditionBlockBase<inverse_type>::clear();
   blocksize     = 0;
-  var_same_diagonal = false;
   A = 0;
 }
 
@@ -72,12 +62,13 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));
   blocksize=bsize;
   relaxation = parameters.relaxation;
-  var_same_diagonal = parameters.same_diagonal;
   nblocks = A->m()/bsize;
+  this->reinit(nblocks, blocksize, parameters.same_diagonal);
   
   if (parameters.invert_diagonal)
     invert_diagblocks();
 }
+
 
 template <class MATRIX, typename inverse_type>
 void PreconditionBlock<MATRIX,inverse_type>::initialize (
@@ -96,8 +87,8 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));
   blocksize=bsize;
   relaxation = parameters.relaxation;
-  var_same_diagonal = parameters.same_diagonal;
   nblocks = A->m()/bsize;
+  this->reinit(nblocks, blocksize, parameters.same_diagonal);
   
   if (parameters.invert_diagonal)
     invert_permuted_diagblocks(permutation, inverse_permutation);
@@ -113,21 +104,14 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
   Assert (blocksize!=0, ExcNotInitialized());
 
   const MATRIX &M=*A;
-  Assert (var_inverse.size()==0, ExcInverseMatricesAlreadyExist());
+  Assert (this->inverses_ready()==0, ExcInverseMatricesAlreadyExist());
 
   FullMatrix<inverse_type> M_cell(blocksize);
 
-  if (same_diagonal())
+  if (this->same_diagonal())
     {
       deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
-				       // Invert only the first block
-				       // This is a copy of the code in the
-				       // 'else' part, stripped of the outer loop
-      if (store_diagonals)
-	var_diagonal.resize(1);
-      var_inverse.resize(1);
-      var_inverse[0].reinit(blocksize, blocksize);
-
+      
       for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
 	{
 	  typename MATRIX::const_iterator entry = M.begin(row_cell);
@@ -139,9 +123,9 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 	      ++entry;
 	    }
 	}
-      if (store_diagonals)
-	var_diagonal[0] = M_cell;
-      var_inverse[0].invert(M_cell);
+      if (this->store_diagonals())
+ 	this->diagonal(0) = M_cell;
+      this->inverse(0).invert(M_cell);
     }
   else
     {
@@ -152,32 +136,6 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 				       // blocks.
 				       // row, column are the global numbering
 				       // of the unkowns.
-
-				       // set the var_inverse array to the right
-				       // size. we could do it like this:
-				       // var_inverse = vector<>(nblocks,FullMatrix<>())
-				       // but this would involve copying many
-				       // FullMatrix objects.
-				       //
-				       // the following is a neat trick which
-				       // avoids copying
-      if (store_diagonals)
-	{
-	  std::vector<FullMatrix<inverse_type> >
-	    tmp(nblocks, FullMatrix<inverse_type>(blocksize));
-	  var_diagonal.swap (tmp);
-	}
-
-      if (true)
-	{
-	  std::vector<FullMatrix<inverse_type> >
-	    tmp(nblocks, FullMatrix<inverse_type>(blocksize));
-	  var_inverse.swap (tmp);
-					   // make sure the tmp object
-					   // goes out of scope as
-					   // soon as possible
-	};
-
       M_cell = 0;
       
       for (unsigned int cell=0; cell<nblocks; ++cell)
@@ -204,12 +162,13 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 		  M_cell(row_cell, column_cell) = entry->value();
 		}
 	    }
-
-	  if (store_diagonals)
-	    var_diagonal[cell] = M_cell;
-	  var_inverse[cell].invert(M_cell);
+	  
+ 	  if (this->store_diagonals())
+ 	    this->diagonal(cell) = M_cell;
+	  this->inverse(cell).invert(M_cell);
 	}
     }
+  this->inverses_computed(true);
 }
 
 
@@ -406,60 +365,9 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
 
 
 template <class MATRIX, typename inverse_type>
-const FullMatrix<inverse_type>&
-PreconditionBlock<MATRIX,inverse_type>::inverse(unsigned int i) const
-{
-  if (same_diagonal())
-    return var_inverse[0];
-  
-  Assert (i < var_inverse.size(), ExcIndexRange(i,0,var_inverse.size()));
-  return var_inverse[i];
-}
-
-
-template <class MATRIX, typename inverse_type>
-const FullMatrix<inverse_type>&
-PreconditionBlock<MATRIX,inverse_type>::diagonal(unsigned int i) const
-{
-  Assert(store_diagonals, ExcDiagonalsNotStored());
-  
-  if (same_diagonal())
-    return var_diagonal[0];
-  
-  Assert (i < var_diagonal.size(), ExcIndexRange(i,0,var_diagonal.size()));
-  return var_diagonal[i];
-}
-
-
-template <class MATRIX, typename inverse_type>
 unsigned int PreconditionBlock<MATRIX,inverse_type>::block_size() const
 {
   return blocksize;
-}
-
-
-template <class MATRIX, typename inverse_type>
-void
-PreconditionBlock<MATRIX,inverse_type>::set_same_diagonal()
-{
-  Assert(var_inverse.size()==0, ExcInverseMatricesAlreadyExist());
-  var_same_diagonal = true;
-}
-
-
-template <class MATRIX, typename inverse_type>
-bool
-PreconditionBlock<MATRIX,inverse_type>::same_diagonal() const
-{
-  return var_same_diagonal;
-}
-
-
-template <class MATRIX, typename inverse_type>
-bool
-PreconditionBlock<MATRIX,inverse_type>::inverses_ready() const
-{
-  return (var_inverse.size() != 0);
 }
 
 
@@ -470,21 +378,13 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
   Assert (blocksize!=0, ExcNotInitialized());
 
   const MATRIX &M=*A;
-  Assert (var_inverse.size()==0, ExcInverseMatricesAlreadyExist());
-
+  Assert (this->inverses_ready()==0, ExcInverseMatricesAlreadyExist());
+  
   FullMatrix<inverse_type> M_cell(blocksize);
 
-  if (same_diagonal())
+  if (this->same_diagonal())
     {
       deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
-				       // Invert only the first block
-				       // This is a copy of the code in the
-				       // 'else' part, stripped of the outer loop
-      if (store_diagonals)
-	var_diagonal.resize(1);
-      var_inverse.resize(1);
-      var_inverse[0].reinit(blocksize, blocksize);
-
       for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
 	{
 	  typename MATRIX::const_iterator entry = M.begin(row_cell);
@@ -496,45 +396,12 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 	      ++entry;
 	    }
 	}
-      if (store_diagonals)
-	var_diagonal[0] = M_cell;
-      var_inverse[0].invert(M_cell);
+      if (this->store_diagonals())
+	this->diagonal(0) = M_cell;
+      this->inverse(0).invert(M_cell);
     }
   else
     {
-				       // cell_row, cell_column are the
-				       // numbering of the blocks (cells).
-				       // row_cell, column_cell are the local
-				       // numbering of the unknowns in the
-				       // blocks.
-				       // row, column are the global numbering
-				       // of the unkowns.
-
-				       // set the @p var_inverse array to the right
-				       // size. we could do it like this:
-				       // var_inverse = vector<>(nblocks,FullMatrix<>())
-				       // but this would involve copying many
-				       // FullMatrix objects.
-				       //
-				       // the following is a neat trick which
-				       // avoids copying
-      if (store_diagonals)
-	{
-	  std::vector<FullMatrix<inverse_type> >
-	    tmp(nblocks, FullMatrix<inverse_type>(blocksize));
-	  var_diagonal.swap (tmp);
-	}
-
-      if (true)
-	{
-	  std::vector<FullMatrix<inverse_type> >
-	    tmp(nblocks, FullMatrix<inverse_type>(blocksize));
-	  var_inverse.swap (tmp);
-					   // make sure the tmp object
-					   // goes out of scope as
-					   // soon as possible
-	};
-
       M_cell = 0;
       
       for (unsigned int cell=0; cell<nblocks; ++cell)
@@ -558,11 +425,12 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 		}
 	    }
 
-	  if (store_diagonals)
-	    var_diagonal[cell] = M_cell;
-	  var_inverse[cell].invert(M_cell);
+	  if (this->store_diagonals())
+	    this->diagonal(cell) = M_cell;
+	  this->inverse(cell).invert(M_cell);
 	}
     }
+  this->inverses_computed(true);
 }
 
 
@@ -587,11 +455,8 @@ template <class MATRIX, typename inverse_type>
 unsigned int
 PreconditionBlock<MATRIX,inverse_type>::memory_consumption () const
 {
-  unsigned int mem = sizeof(*this);
-  for (unsigned int i=0; i<var_inverse.size(); ++i)
-    mem += MemoryConsumption::memory_consumption(var_inverse[i]);
-  for (unsigned int i=0; i<var_diagonal.size(); ++i)
-    mem += MemoryConsumption::memory_consumption(var_diagonal[i]);
+  unsigned int mem = sizeof(*this) - sizeof(PreconditionBlockBase<inverse_type>);
+  mem += PreconditionBlockBase<inverse_type>::memory_consumption();
   return mem;
 }
 
@@ -767,6 +632,18 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 
 /*--------------------- PreconditionBlockSOR -----------------------*/
 
+
+template <class MATRIX, typename inverse_type>
+PreconditionBlockSOR<MATRIX,inverse_type>::PreconditionBlockSOR ()
+		: PreconditionBlock<MATRIX,inverse_type> (false)
+		
+{}
+
+template <class MATRIX, typename inverse_type>
+PreconditionBlockSOR<MATRIX,inverse_type>::PreconditionBlockSOR (bool store)
+		: PreconditionBlock<MATRIX,inverse_type> (store)
+		
+{}
 
 template <class MATRIX, typename inverse_type>
 template <typename number2>
@@ -1059,9 +936,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 
 template <class MATRIX, typename inverse_type>
 PreconditionBlockSSOR<MATRIX,inverse_type>::PreconditionBlockSSOR ()
-{
-  this->store_diagonals = 1;
-}
+		: PreconditionBlockSOR<MATRIX,inverse_type> (true)
+		
+{}
 
 
 template <class MATRIX, typename inverse_type>
