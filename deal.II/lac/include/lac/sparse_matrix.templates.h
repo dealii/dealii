@@ -1357,7 +1357,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
       rowstart_ptr = &cols->rowstart[0];
       dst_ptr      = &dst(0);
       for ( ; rowstart_ptr!=&cols->rowstart[n]; ++rowstart_ptr, ++dst_ptr)
-	*dst_ptr *= (2.-om)*val[*rowstart_ptr];
+	*dst_ptr *= om*(2.-om)*val[*rowstart_ptr];
 
 				   // backward sweep
       rowstart_ptr = &cols->rowstart[n-1];
@@ -1709,6 +1709,9 @@ void
 SparseMatrix<number>::SSOR (Vector<somenumber>& dst,
                             const number om) const
 {
+//TODO: Is this called anywhere? If so, multiplication with om(2-om)D is missing
+  Assert(false, ExcNotImplemented());
+  
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
   Assert (cols->optimize_diagonal(),
