@@ -45,7 +45,7 @@ using namespace dealii;
  * Additionally, for order greater or equal 2, we have additional
  * <i>p(p-1)</i>, the number of vector valued polynomials in
  * <i>P<sub>p</sub></i>, interior degrees of freedom. These are the
- * vector function values in the first <i>p(p-1)/2<i> of the
+ * vector function values in the first <i>p(p-1)/2</i> of the
  * <i>p<sup>2</sup></i> Gauss points in the cell.
  */
 template <int dim>
