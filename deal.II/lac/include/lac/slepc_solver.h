@@ -546,7 +546,7 @@ namespace SLEPcWrappers
     };
 
 /**
- * An implementation of the solver interface using the SLEPc Lanczos
+ * An implementation of the solver interface using the SLEPc Power
  * solver. Usage: Largest values of spectrum only, all problem types,
  * complex.
  *
@@ -595,6 +595,56 @@ namespace SLEPcWrappers
 
     };
 
+#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
+/**
+ * An implementation of the solver interface using the SLEPc Davidson
+ * solver. Usage (incomplete/untested): All problem types.
+ *
+ * @ingroup SLEPcWrappers
+ * @author Toby D. Young 2010
+ */
+  class SolverDavidson : public SolverBase
+    {
+    public:
+                                   /**
+                                    * Standardized data struct to pipe
+                                    * additional data to the solver,
+                                    * should it be needed.
+                                    */
+      struct AdditionalData
+      {};
+
+                                   /**
+                                    * SLEPc solvers will want to have
+                                    * an MPI communicator context over
+                                    * which computations are
+                                    * parallelized. By default, this
+                                    * carries the same behaviour has
+                                    * the PETScWrappers, but you can
+                                    * change that.
+                                    */
+      SolverDavidson (SolverControl        &cn,
+		      const MPI_Comm       &mpi_communicator = PETSC_COMM_WORLD,
+		      const AdditionalData &data = AdditionalData());
+
+    protected:
+
+                                   /**
+                                    * Store a copy of the flags for
+                                    * this particular solver.
+                                    */
+      const AdditionalData additional_data;
+
+                                   /**
+                                    * Function that takes a Eigenvalue
+                                    * Problem Solver context object,
+                                    * and sets the type of solver that
+                                    * is appropriate for this class.
+                                    */
+      virtual void set_solver_type (EPS &eps) const;
+
+    };
+#endif
 
   // --------------------------- inline and template functions -----------
   /**
@@ -638,7 +688,7 @@ namespace SLEPcWrappers
     {
       unsigned int n_converged;
 
-      set_matrices (A,B);
+      set_matrices (A, B);
       solve (n_eigenvectors, &n_converged);
 
       if (n_converged >= n_eigenvectors)

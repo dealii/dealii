@@ -45,9 +45,7 @@ namespace SLEPcWrappers
     public:
 
                                    /**
-                                    * Constructor. Takes the MPI
-                                    * communicator over which parallel
-                                    * computations are to happen.
+                                    * Constructor. 
                                     */
       TransformationBase ();
 

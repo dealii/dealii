@@ -246,6 +246,7 @@ namespace SLEPcWrappers
   }
 
   /* ---------------------- SolverKrylovSchur ------------------------ */
+
   SolverKrylovSchur::SolverKrylovSchur (SolverControl        &cn,
 					const MPI_Comm       &mpi_communicator,
 					const AdditionalData &data)
@@ -272,6 +273,7 @@ namespace SLEPcWrappers
   }
 
   /* ---------------------- SolverArnoldi ------------------------ */
+
   SolverArnoldi::SolverArnoldi (SolverControl        &cn,
 				const MPI_Comm       &mpi_communicator,
 				const AdditionalData &data)
@@ -350,6 +352,35 @@ namespace SLEPcWrappers
 			    this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
+
+  /* ---------------------- Davidson ----------------------- */
+
+#if DEAL_II_PETSC_VERSION_LT(3,1,0)
+  SolverDavidson::SolverDavidson (SolverControl        &cn,
+				  const MPI_Comm       &mpi_communicator,
+				  const AdditionalData &data)
+  :
+    SolverBase (cn, mpi_communicator),
+    additional_data (data)
+  {}
+
+  void
+  SolverDavidson::set_solver_type (EPS &eps) const
+  {
+    int ierr;
+    ierr = EPSSetType (eps, const_cast<char *>(EPSDAVIDSON));
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+                                    // hand over the absolute
+                                    // tolerance and the maximum
+                                    // number of iteration steps to
+                                    // the SLEPc convergence
+                                    // criterion.
+    ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
+			    this->solver_control.max_steps());
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+  }
+#endif
 
 }
 
