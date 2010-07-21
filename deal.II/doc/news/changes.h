@@ -158,9 +158,15 @@ inconvenience this causes.
 <a name="lac"></a>
 <h3>lac</h3>
 
-<ol>
-  <li>None.
+<ol> <li><p>Fixed: SparseMatrix::precondition_SSOR and
+  SparseMatrixEZ::precondition_SSOR had a bug, which made the SSOR
+  method inaccurate for relaxation parameters different from unity.
+  <br>
+  (GK 2010/07/20)
+  </p></li>
+
 </ol>
+  
 
 
 <a name="deal.II"></a>
