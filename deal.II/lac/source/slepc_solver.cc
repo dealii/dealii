@@ -56,6 +56,7 @@ namespace SLEPcWrappers
   void
   SolverBase::set_matrices (const PETScWrappers::MatrixBase &A)
   {
+                                   // standard eigenspectrum problem
     opA = &A;
     opB = NULL;
   }
@@ -64,6 +65,7 @@ namespace SLEPcWrappers
   SolverBase::set_matrices (const PETScWrappers::MatrixBase &A,
 			    const PETScWrappers::MatrixBase &B)
   {
+                                   // generalized eigenspectrum problem
     opA = &A;
     opB = &B;
   }
@@ -95,10 +97,12 @@ namespace SLEPcWrappers
     solver_data.reset (new SolverData());
 
                                     // create eigensolver context and
-                                    // set operators.
+                                    // set operators
     ierr = EPSCreate (mpi_communicator, &solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
+                                    // set eigenspectrum problem type
+                                    // (general/standard)
     AssertThrow (opA, ExcSLEPcWrappersUsageError());
     if (opB)
       ierr = EPSSetOperators (solver_data->eps, *opA, *opB);
@@ -106,6 +110,7 @@ namespace SLEPcWrappers
       ierr = EPSSetOperators (solver_data->eps, *opA, PETSC_NULL);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
+                                    // set the initial vector(s) if any
     if (initial_vector && initial_vector->size() != 0)
       {
 
@@ -119,12 +124,15 @@ namespace SLEPcWrappers
 	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
 
+                                    // set transformation type if any
     if (transformation)
       transformation->set_context(solver_data->eps);
 
-                                    // set runtime options.
+                                    // set runtime options
     set_solver_type (solver_data->eps);
 
+                                    // set which portion of the
+                                    // eigenspectrum to solve for
     ierr = EPSSetWhichEigenpairs (solver_data->eps, set_which);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
@@ -304,6 +312,33 @@ namespace SLEPcWrappers
   {
     int ierr;
     ierr = EPSSetType (eps, const_cast<char *>(EPSLANCZOS));
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+                                    // hand over the absolute
+                                    // tolerance and the maximum
+                                    // number of iteration steps to
+                                    // the SLEPc convergence
+                                    // criterion.
+    ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
+			    this->solver_control.max_steps());
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+  }
+
+  /* ----------------------- Power ------------------------- */
+
+  SolverPower::SolverPower (SolverControl        &cn,
+			    const MPI_Comm       &mpi_communicator,
+			    const AdditionalData &data)
+    :
+    SolverBase (cn, mpi_communicator),
+    additional_data (data)
+  {}
+
+  void
+  SolverPower::set_solver_type (EPS &eps) const
+  {
+    int ierr;
+    ierr = EPSSetType (eps, const_cast<char *>(EPSPOWER));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
                                     // hand over the absolute

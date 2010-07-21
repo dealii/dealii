@@ -35,13 +35,13 @@ DEAL_II_NAMESPACE_OPEN
  * Base class for solver classes using the SLEPc solvers which are
  * selected based on flags passed to the eigenvalue problem solver
  * context. Derived classes set the right flags to set the right
- * solver. On the other hand, note that: the
- * <code>AdditionalData</code> structure is a dummy structure that
- * currently exists for backward/forward compatibility only.
+ * solver. Note that: the <code>AdditionalData</code> structure is a
+ * dummy structure that currently exists for backward/forward
+ * compatibility only.
  *
  * The SLEPc solvers are intended to be used for solving the
- * generalized eigenspectrum problem $(A-\lambda M)x=0$, for $x\neq0$;
- * where $A$ is a system matrix, $M$ is a mass matrix, and $\lambda,
+ * generalized eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$;
+ * where $A$ is a system matrix, $B$ is a mass matrix, and $\lambda,
  * x$ are a set of eigenvalues and eigenvectors respectively. The
  * emphasis is on methods and techniques appropriate for problems in
  * which the associated matrices are sparse. Most of the methods
@@ -53,11 +53,10 @@ DEAL_II_NAMESPACE_OPEN
  * following way:
  @verbatim
   SolverControl solver_control (1000, 1e-9);
-  SolverArnoldi system (solver_control,
-                        mpi_communicator);
-  system.solve (A, M, lambda, x, size_of_spectrum);
+  SolverArnoldi system (solver_control, mpi_communicator);
+  system.solve (A, B, lambda, x, size_of_spectrum);
  @endverbatim
- * for the generalized eigenvalue problem $Ax=M\lambda x$, where the
+ * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>const unsigned int size_of_spectrum</code> tells
  * SLEPc the number of eigenvector/eigenvalue pairs to solve for: See
  * also <code>step-36</code> for a hands-on example.
@@ -89,7 +88,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Toby D. Young 2008, 2009, 2010; and Rickard Armiento 2008.
  *
  * @note Various tweaks and enhancments contributed by Eloy Romero and
- * Jose E.  Roman 2009, 2010.
+ * Jose E. Roman 2009, 2010.
  */
 
 namespace SLEPcWrappers
@@ -320,10 +319,15 @@ namespace SLEPcWrappers
                                     */
       virtual void set_solver_type (EPS &eps) const = 0;
 
-                                   /**
+                                   /*
                                     * Attributes that store the
 				    * relevant information for the
-				    * eigenproblem solver context.
+				    * eigenproblem solver
+				    * context. These are: which
+				    * portion of the spectrum to solve
+				    * from; and the matrices and
+				    * vectors that discribe the
+				    * problem.
                                     */
       EPSWhich                           set_which;
 
@@ -331,6 +335,12 @@ namespace SLEPcWrappers
       const PETScWrappers::MatrixBase   *opB;
       const PETScWrappers::VectorBase   *initial_vector;
 
+                                   /**
+                                    * Pointer to an an object that
+                                    * describes transformations that
+                                    * can be applied to the eigenvalue
+                                    * problem.
+                                    */
       SLEPcWrappers::TransformationBase *transformation;
 
     private:
@@ -516,6 +526,56 @@ namespace SLEPcWrappers
       SolverLanczos (SolverControl        &cn,
 		     const MPI_Comm       &mpi_communicator = PETSC_COMM_WORLD,
 		     const AdditionalData &data = AdditionalData());
+
+    protected:
+
+                                   /**
+                                    * Store a copy of the flags for
+                                    * this particular solver.
+                                    */
+      const AdditionalData additional_data;
+
+                                   /**
+                                    * Function that takes a Eigenvalue
+                                    * Problem Solver context object,
+                                    * and sets the type of solver that
+                                    * is appropriate for this class.
+                                    */
+      virtual void set_solver_type (EPS &eps) const;
+
+    };
+
+/**
+ * An implementation of the solver interface using the SLEPc Lanczos
+ * solver. Usage: Largest values of spectrum only, all problem types,
+ * complex.
+ *
+ * @ingroup SLEPcWrappers
+ * @author Toby D. Young 2010
+ */
+  class SolverPower : public SolverBase
+    {
+    public:
+                                   /**
+                                    * Standardized data struct to pipe
+                                    * additional data to the solver,
+                                    * should it be needed.
+                                    */
+      struct AdditionalData
+      {};
+
+                                   /**
+                                    * SLEPc solvers will want to have
+                                    * an MPI communicator context over
+                                    * which computations are
+                                    * parallelized. By default, this
+                                    * carries the same behaviour has
+                                    * the PETScWrappers, but you can
+                                    * change that.
+                                    */
+      SolverPower (SolverControl        &cn,
+		   const MPI_Comm       &mpi_communicator = PETSC_COMM_WORLD,
+		   const AdditionalData &data = AdditionalData());
 
     protected:
 
