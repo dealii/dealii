@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -457,11 +457,50 @@ class QGaussOneOverR : public Quadrature<dim>
 {
   public:
     /**
+     * This constructor takes three arguments: the order of the Gauss
+     * formula, the point of the reference element in which the
+     * singularity is located, and whether we include the weighting
+     * singular function inside the quadrature, or we leave it in the
+     * user function to be integrated.
+     *
+     * Traditionally, quadrature formulas include their weighting
+     * function, and the last argument is set to false by
+     * default. There are cases, however, where this is undesirable
+     * (for example when you only know that your singularity has the
+     * same order of 1/R, but cannot be written exactly in this
+     * way).
+     *
+     * In other words, you can use this function in either of
+     * the following way, obtaining the same result:
+     *
+     * @code
+     * QGaussOneOverR singular_quad(order, q_point, false);
+     * // This will produce the integral of f(x)/R
+     * for(unsigned int i=0; i<singular_quad.size(); ++i)
+     * 	 integral += f(singular_quad.point(i))*singular_quad.weight(i);
+     *
+     * // And the same here
+     * QGaussOneOverR singular_quad_noR(order, q_point, true);
+     *
+     * // This also will produce the integral of f(x)/R, but 1/R has to
+     * // be specified.
+     * for(unsigned int i=0; i<singular_quad.size(); ++i) {
+     *   double R = (singular_quad_noR.point(i)-cell->vertex(vertex_id)).norm();
+     *   integral += f(singular_quad_noR.point(i))*singular_quad_noR.weight(i)/R;
+     * }
+     * @endcode
+     */
+    QGaussOneOverR(const unsigned int n, 
+		   const Point<dim> singularity,
+		   const bool factor_out_singular_weight=false);
+    /**
      * The constructor takes three arguments: the order of the Gauss
      * formula, the index of the vertex where the singularity is
      * located, and whether we include the weighting singular function
      * inside the quadrature, or we leave it in the user function to
-     * be integrated.
+     * be integrated. Notice that this is a specialized version of the
+     * previous constructor which works only for the vertices of the
+     * quadrilateral.
      *
      * Traditionally, quadrature formulas include their weighting
      * function, and the last argument is set to false by
@@ -493,6 +532,13 @@ class QGaussOneOverR : public Quadrature<dim>
     QGaussOneOverR(const unsigned int n, 
 		   const unsigned int vertex_index,
 		   const bool factor_out_singular_weight=false);
+  private:
+   /** Given a quadrature point and a degree n, this function returns
+     * the size of the singular quadrature rule, considering whether
+     * the point is inside the cell, on an edge of the cell, or on a
+     * corner of the cell. */
+    static unsigned int quad_size(const Point<dim> singularity,
+				  const unsigned int n);
 };
 
 

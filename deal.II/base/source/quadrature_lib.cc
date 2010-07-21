@@ -990,6 +990,75 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 }
 
 
+template<>
+unsigned int QGaussOneOverR<2>::quad_size(const Point<2> singularity,
+						 const unsigned int n)
+{
+  double eps=1e-8;
+  bool on_edge=false;
+  bool on_vertex=false;
+  for(unsigned int i=0; i<2; ++i)
+    if( ( std::abs(singularity[i]  ) < eps ) ||
+	( std::abs(singularity[i]-1) < eps ) )
+      on_edge = true;
+  if(on_edge && (std::abs( (singularity-Point<2>(.5, .5)).square()-.5)
+		 < eps) )
+    on_vertex = true;
+  if(on_vertex) return (2*n*n);
+  if(on_edge) return (4*n*n);
+  return (8*n*n);
+}
+
+template<>
+QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
+				  const Point<2> singularity,
+				  const bool factor_out_singularity) :
+		Quadrature<2>(quad_size(singularity, n))
+{
+				   // We treat all the cases in the
+				   // same way. Split the element in 4
+				   // pieces, measure the area, if
+				   // it's relevant, add the
+				   // quadrature connected to that
+				   // singularity.
+  std::vector<QGaussOneOverR<2> > quads;
+  std::vector<Point<2> > origins;
+				   // Id of the corner with a
+				   // singularity
+  quads.push_back(QGaussOneOverR(n, 3, factor_out_singularity));
+  quads.push_back(QGaussOneOverR(n, 2, factor_out_singularity));
+  quads.push_back(QGaussOneOverR(n, 1, factor_out_singularity));
+  quads.push_back(QGaussOneOverR(n, 0, factor_out_singularity));
+
+  origins.push_back(Point<2>(0.,0.));
+  origins.push_back(Point<2>(singularity[0],0.));
+  origins.push_back(Point<2>(0.,singularity[1]));
+  origins.push_back(singularity);
+  
+				   // Lexycographical ordering.
+      
+  double eps = 1e-8;
+  unsigned int q_id = 0; // Current quad point index.
+  double area = 0;
+  Point<2> dist;
+
+  for(unsigned int box=0; box<4; ++box) 
+    {
+      dist = (singularity-GeometryInfo<2>::unit_cell_vertex(box));
+      dist = Point<2>(std::abs(dist[0]), std::abs(dist[1]));      
+      area = dist[0]*dist[1];
+      if(area > eps) 
+	for(unsigned int q=0; q<quads[box].size(); ++q, ++q_id) 
+	  {
+	    const Point<2> &qp = quads[box].point(q);
+	    this->quadrature_points[q_id] =
+	      origins[box]+
+	      Point<2>(dist[0]*qp[0], dist[1]*qp[1]);
+	    this->weights[q_id] = quads[box].weight(q)*area;
+	  }
+    }
+}
+
 
 template<>
 QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,

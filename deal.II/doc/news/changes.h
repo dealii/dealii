@@ -145,8 +145,13 @@ inconvenience this causes.
 <a name="base"></a>
 <h3>base</h3>
 
+
 <ol>
-  <li>None.
+  <li><p> New: QGaussOneOverR now has a new constructor for arbitrary quadrature
+  points and not only the vertices of the reference cell.
+  <br>
+  (Luca Heltai 2010/07/21)
+  </p>
 </ol>
 
 
