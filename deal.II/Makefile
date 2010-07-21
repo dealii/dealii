@@ -120,8 +120,8 @@ $(LIBDIR):
 baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib functionparser : $(LIBDIR) deps
 
 all: debug optimized
-debug: adog lacog baseog contrib baseg lacg 2dg 1dg 3dg
-optimized: adoo lacoo baseoo contrib baseo laco 2do 1do 3do
+debug: contrib baseg lacg 2dg 1dg 3dg
+optimized: contrib baseo laco 2do 1do 3do
 
 
 # when HSL functions are used, we also compile the detached_ma27
