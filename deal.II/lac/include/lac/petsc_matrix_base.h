@@ -1091,19 +1091,25 @@ namespace PETScWrappers
       void transpose ();
 
                                         /**
-					 * Test whether a matrix is symmetric.
-					 * Default tolerance is zero.
+					 * Test whether a matrix is
+					 * symmetric.  Default
+					 * tolerance is
+					 * $1000\times32$-bit machine
+					 * precision.
 					 */
-      PetscTruth is_symmetric (const double tol = 0.0);
+      PetscTruth is_symmetric (const double tolerance = 1.e-12);
 
 #if DEAL_II_PETSC_VERSION_GTE(2,3,0)
                                         /**
-					 * Test whether a matrix is Hermitian,
-					 * i.e. it is the complex conjugate
-					 * of its transpose. Default tolerance
-					 * is zero.
+					 * Test whether a matrix is
+					 * Hermitian, i.e. it is the
+					 * complex conjugate of its
+					 * transpose. Default
+					 * tolerance is
+					 * $1000\times32$-bit machine
+					 * precision.
 					 */
-      PetscTruth is_hermitian (const double tol = 0.0);
+      PetscTruth is_hermitian (const double tolerance = 1.e-12);
 #endif
 
                                         /*
