@@ -353,9 +353,9 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
+#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
   /* ---------------------- Davidson ----------------------- */
 
-#if DEAL_II_PETSC_VERSION_LT(3,1,0)
   SolverDavidson::SolverDavidson (SolverControl        &cn,
 				  const MPI_Comm       &mpi_communicator,
 				  const AdditionalData &data)
