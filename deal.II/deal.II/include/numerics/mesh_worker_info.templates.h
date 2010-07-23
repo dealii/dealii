@@ -290,16 +290,16 @@ namespace MeshWorker
 	     const Mapping<dim,sdim>& mapping,
 	     const BlockInfo* block_info)
   {
-    cell.initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
-					 cell_flags, block_info);
-    boundary.initialize<FEFaceValues<dim,sdim> >(el, mapping, boundary_quadrature,
-						 boundary_flags, block_info);
-    face.initialize<FEFaceValues<dim,sdim> >(el, mapping, face_quadrature,
-					     face_flags, block_info);
-    subface.initialize<FESubfaceValues<dim,sdim> >(el, mapping, face_quadrature,
-						   face_flags, block_info);
-    neighbor.initialize<FEFaceValues<dim,sdim> >(el, mapping, face_quadrature,
-						 neighbor_flags, block_info);
+    cell.template initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
+						  cell_flags, block_info);
+    boundary.template initialize<FEFaceValues<dim,sdim> >(el, mapping, boundary_quadrature,
+							  boundary_flags, block_info);
+    face.template initialize<FEFaceValues<dim,sdim> >(el, mapping, face_quadrature,
+						      face_flags, block_info);
+    subface.template initialize<FESubfaceValues<dim,sdim> >(el, mapping, face_quadrature,
+							    face_flags, block_info);
+    neighbor.template initialize<FEFaceValues<dim,sdim> >(el, mapping, face_quadrature,
+							  neighbor_flags, block_info);
   }
 }
 
