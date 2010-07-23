@@ -39,8 +39,17 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: On all non-linux platforms, if static libraries were selected
+  and <code>./configure</code> was instructed to use Trilinos (which also
+  was compiled with static libraries), a failure would occur. This should
+  now be fixed.
+  <br>
+  (WB 2010/07/23)
+  </p>
+
+  <li>
   <p>Fixed: The step-33 tutorial program can not be built with GCC versions
-  4.5.x. There are in fact two problems, on that pertains to uses of
+  4.5.x. There are in fact two problems, one that pertains to uses of
   <code>std::make_pair</code> that don't work any more with the upcoming
   C++ 1x standard that GCC 4.5.x already follows, and some in which the
   Trilinos package Sacado is incompatible with GCC 4.5.x, at least up to
@@ -166,7 +175,7 @@ inconvenience this causes.
   </p></li>
 
 </ol>
-  
+
 
 
 <a name="deal.II"></a>

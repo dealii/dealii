@@ -12032,14 +12032,17 @@ case "$target" in
    *-aix4* | alpha*-linux* | alpha*-osf45* | hppa64-unknown-linux-gnu )
 	   { $as_echo "$as_me:$LINENO: WARNING: Shared libraries not supported on $target. Using static libs instead" >&5
 $as_echo "$as_me: WARNING: Shared libraries not supported on $target. Using static libs instead" >&2;}
+           static_lib_suffix=".a"
 	   enableshared=no
 	   ;;
    *cygwin )
            shared_lib_suffix=".dll"
+           static_lib_suffix=".a"
            cygwin_shared_lib="yes"
            ;;
    *-apple-darwin* )
            shared_lib_suffix=".dylib"
+           static_lib_suffix=".a"
            darwin_shared_lib="yes"
            ;;
    * )

@@ -275,14 +275,17 @@ dnl on Mac OS X it is .dylib.
 case "$target" in
    *-aix4* | alpha*-linux* | alpha*-osf[45]* | hppa64-unknown-linux-gnu )
 	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
+           static_lib_suffix=".a"
 	   enableshared=no
 	   ;;
    *cygwin )
            shared_lib_suffix=".dll"
+           static_lib_suffix=".a"
            cygwin_shared_lib="yes"
            ;;
    *-apple-darwin* )
            shared_lib_suffix=".dylib"
+           static_lib_suffix=".a"
            darwin_shared_lib="yes"
            ;;
    * )
