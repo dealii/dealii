@@ -13077,8 +13077,7 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 
 		  if (unrefined_neighbors < refined_neighbors)
 		    {
-		      if (cell->coarsen_flag_set())
-			cell->clear_coarsen_flag();
+		      cell->clear_coarsen_flag();
 		      cell->set_refine_flag ();
 		    }
 		}
