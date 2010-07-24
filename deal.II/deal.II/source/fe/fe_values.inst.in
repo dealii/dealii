@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,11 +100,11 @@ for (VEC : SERIAL_VECTORS)
 	(const dealii::VEC&, std::vector<Tensor<1,deal_II_dimension+1> >&) const;
 
     template
-	void FEValuesViews::SymmetricTensor<2,deal_II_dimension+1>
+	void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_values<dealii::VEC>
 	(const dealii::VEC&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension+1> >&) const;
     template
-	void FEValuesViews::SymmetricTensor<2,deal_II_dimension+1>
+	void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_divergences<dealii::VEC>
 	(const dealii::VEC&, std::vector<Tensor<1,deal_II_dimension+1> >&) const;
 

@@ -39,6 +39,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>Fixed: When using Trilinos and deal.II both with static libraries,
+  a linker error would occur whenever a program linked both the 2d and
+  3d libraries of deal.II. This is now fixed.
+  <br>
+  (WB 2010/07/23)
+  </p>
+
+  <li>
   <p>Fixed: On all non-linux platforms, if static libraries were selected
   and <code>./configure</code> was instructed to use Trilinos (which also
   was compiled with static libraries), a failure would occur. This should
