@@ -140,7 +140,7 @@ namespace
 
     if (neighbor->has_children())
       {
-					 // if the neighbor is refined, he may be
+					 // if the neighbor is refined, it may be
 					 // coarsened. if so, then it won't refine
 					 // the face, no matter what else happens
 	if (cell_will_be_coarsened(neighbor))
@@ -12544,6 +12544,208 @@ bool Triangulation<1,2>::prepare_coarsening_and_refinement ()
 #endif
 
 
+namespace
+{
+				   // see if the current cell needs to
+				   // be refined to avoid unrefined
+				   // islands.
+				   //
+				   // there are sometimes chains of
+				   // cells that induce refinement of
+				   // each other. to avoid running the
+				   // loop in
+				   // prepare_coarsening_and_refinement
+				   // over and over again for each one
+				   // of them, at least for the
+				   // isotropic refinement case we
+				   // seek to flag neighboring
+				   // elements as well as
+				   // necessary. this takes care of
+				   // (slightly pathological) cases
+				   // like deal.II/mesh_smoothing_03
+  template <int dim, int spacedim>
+  void
+  possibly_refine_unrefined_island
+  (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+   const bool allow_anisotropic_smoothing)
+  {
+    Assert (cell->has_children() == false, ExcInternalError());
+    Assert (cell->refine_flag_set() == false, ExcInternalError());
+
+
+				     // now we provide two
+				     // algorithms. the first one is
+				     // the standard one, coming from
+				     // the time, where only isotropic
+				     // refinement was possible. it
+				     // simply counts the neighbors
+				     // that are or will be refined
+				     // and compares to the number of
+				     // other ones. the second one
+				     // does this check independently
+				     // for each direction: if all
+				     // neighbors in one direction
+				     // (normally two, at the boundary
+				     // only one) are refined, the
+				     // current cell is flagged to be
+				     // refined in an according
+				     // direction.
+
+    if (allow_anisotropic_smoothing == false)
+      {
+					 // use first algorithm
+	unsigned int refined_neighbors = 0,
+		   unrefined_neighbors = 0;
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (!cell->at_boundary(face))
+	    {
+	      if (face_will_be_refined_by_neighbor(cell,face))
+		++refined_neighbors;
+	      else
+		++unrefined_neighbors;
+	    }
+
+	if (unrefined_neighbors < refined_neighbors)
+	  {
+	    cell->clear_coarsen_flag();
+	    cell->set_refine_flag ();
+
+					     // ok, so now we have
+					     // flagged this cell. if
+					     // we know that there
+					     // were any unrefined
+					     // neighbors at all, see
+					     // if any of those will
+					     // have to be refined as
+					     // well
+	    if (unrefined_neighbors > 0)
+	      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+		if (!cell->at_boundary(face)
+		    &&
+		    (face_will_be_refined_by_neighbor(cell,face) == false)
+		    &&
+		    (cell->neighbor(face)->has_children() == false)
+		    &&
+		    (cell->neighbor(face)->refine_flag_set() == false))
+		  possibly_refine_unrefined_island<dim,spacedim>
+		    (cell->neighbor(face),
+		     allow_anisotropic_smoothing);
+ 	  }
+      }
+    else
+      {
+					 // variable to store the cell
+					 // refine case needed to
+					 // fulfill all smoothing
+					 // requirements
+	RefinementCase<dim> smoothing_cell_refinement_case
+	  = RefinementCase<dim>::no_refinement;
+
+					 // use second algorithm, do
+					 // the check individually for
+					 // each direction
+	for (unsigned int face_pair=0;
+	     face_pair<GeometryInfo<dim>::faces_per_cell/2; ++face_pair)
+	  {
+					     // variable to store the
+					     // cell refine case
+					     // needed to refine at
+					     // the current face pair
+					     // in the same way as the
+					     // neighbors do...
+	    RefinementCase<dim> directional_cell_refinement_case
+	      = RefinementCase<dim>::isotropic_refinement;
+
+	    for (unsigned int face_index=0; face_index<2; ++face_index)
+	      {
+		unsigned int face=2*face_pair+face_index;
+						 // variable to store
+						 // the refine case
+						 // (to come) of the
+						 // face under
+						 // consideration
+		RefinementCase<dim-1> expected_face_ref_case
+		  = RefinementCase<dim-1>::no_refinement;
+
+		if (cell->neighbor(face).state() == IteratorState::valid)
+		  face_will_be_refined_by_neighbor<dim,spacedim>(cell,face,expected_face_ref_case);
+						 // now extract which
+						 // refine case would
+						 // be necessary to
+						 // achive the same
+						 // face
+						 // refinement. set
+						 // the intersection
+						 // with other
+						 // requirements for
+						 // the same
+						 // direction.
+
+						 // note: using the
+						 // intersection is
+						 // not an obvious
+						 // decision, we could
+						 // also argue that it
+						 // is more natural to
+						 // use the
+						 // union. however,
+						 // intersection is
+						 // the less
+						 // aggressive tactic
+						 // and favours a
+						 // smaller number of
+						 // refined cells over
+						 // an intensive
+						 // smoothing. this
+						 // way we try not to
+						 // loose too much of
+						 // the effort we put
+						 // in anisotropic
+						 // refinement
+						 // indicators due to
+						 // overly aggressive
+						 // smoothing...
+		directional_cell_refinement_case
+		  = (directional_cell_refinement_case &
+		     GeometryInfo<dim>::min_cell_refinement_case_for_face_refinement(
+		       expected_face_ref_case,
+		       face,
+		       cell->face_orientation(face),
+		       cell->face_flip(face),
+		       cell->face_rotation(face)));
+	      }//for both face indices
+					     // if both requirements
+					     // sum up to something
+					     // useful, add this to
+					     // the refine case for
+					     // smoothing. note: if
+					     // directional_cell_refinement_case
+					     // is isotropic still,
+					     // then something went
+					     // wrong...
+	    Assert(directional_cell_refinement_case <
+		   RefinementCase<dim>::isotropic_refinement,
+		   ExcInternalError());
+	    smoothing_cell_refinement_case = smoothing_cell_refinement_case |
+					     directional_cell_refinement_case;
+	  }//for all face_pairs
+					 // no we collected
+					 // contributions from all
+					 // directions. combine the
+					 // new flags with the
+					 // existing refine case, but
+					 // only if smoothing is
+					 // required
+	if (smoothing_cell_refinement_case)
+	  {
+	    cell->clear_coarsen_flag();
+	    cell->set_refine_flag(cell->refine_flag_set() |
+				  smoothing_cell_refinement_case);
+	  }
+      }
+  }
+}
+
 
 template <int dim, int spacedim>
 bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
@@ -13030,162 +13232,28 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 				       //    not only of the unrefined
 				       //    island, but also of the
 				       //    surrounding patch.
+				       //
+				       //    do the loop from finest
+				       //    to coarsest cells since
+				       //    we may trigger a cascade
+				       //    by marking cells for
+				       //    refinement which may
+				       //    trigger more cells
+				       //    further down below
       if (smooth_grid & eliminate_unrefined_islands)
 	{
-	  active_cell_iterator cell = begin_active(),
-			       endc = end();
-	  for (; cell!=endc; ++cell)
-	    {
-					       // if cell is already
-					       // flagged for (isotropic)
-					       // refinement: nothing
-					       // to do anymore
-	      if (cell->refine_flag_set()==RefinementCase<dim>::isotropic_refinement)
-		continue;
+	  active_cell_iterator cell=last_active(),
+			       endc=end();
 
-					       // now we provide two
-					       // algorithms. the first one is
-					       // the standard one, coming from
-					       // the time, where only isotropic
-					       // refinement was possible. it
-					       // simply counts the neighbors
-					       // that are or will be refined
-					       // and compares to the number of
-					       // other ones. the second one
-					       // does this check independently
-					       // for each direction: if all
-					       // neighbors in one direction
-					       // (normally two, at the boundary
-					       // only one) are refined, the
-					       // current cell is flagged to be
-					       // refined in an according
-					       // direction.
-
-	      if (!(smooth_grid & allow_anisotropic_smoothing))
-		{
-						   // use first algorithm
-		  unsigned int refined_neighbors = 0,
-			     unrefined_neighbors = 0;
-		  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-		    if (!cell->at_boundary(face))
-		      {
-			if (face_will_be_refined_by_neighbor(cell,face))
-			  ++refined_neighbors;
-			else
-			  ++unrefined_neighbors;
-		      }
-
-		  if (unrefined_neighbors < refined_neighbors)
-		    {
-		      cell->clear_coarsen_flag();
-		      cell->set_refine_flag ();
-		    }
-		}
-	      else
-		{
-						   // variable to store the cell
-						   // refine case needed to
-						   // fulfill all smoothing
-						   // requirements
-		  RefinementCase<dim> smoothing_cell_refinement_case=RefinementCase<dim>::no_refinement;
-
-						   // use second algorithm, do
-						   // the check individually for
-						   // each direction
-		  for (unsigned int face_pair=0; face_pair<GeometryInfo<dim>::faces_per_cell/2; ++face_pair)
-		    {
-						       // variable to store the
-						       // cell refine case
-						       // needed to refine at
-						       // the current face pair
-						       // in the same way as the
-						       // neighbors do...
-		      RefinementCase<dim> directional_cell_refinement_case=RefinementCase<dim>::isotropic_refinement;
-
-		      for (unsigned int face_index=0; face_index<2; ++face_index)
-			{
-			  unsigned int face=2*face_pair+face_index;
-							   // variable to store
-							   // the refine case
-							   // (to come) of the
-							   // face under
-							   // consideration
-			  RefinementCase<dim-1> expected_face_ref_case=RefinementCase<dim-1>::no_refinement;
-
-			  if (cell->neighbor(face).state() == IteratorState::valid)
-			    face_will_be_refined_by_neighbor(cell,face,expected_face_ref_case);
-							   // now extract which
-							   // refine case would
-							   // be necessary to
-							   // achive the same
-							   // face
-							   // refinement. set
-							   // the intersection
-							   // with other
-							   // requirements for
-							   // the same
-							   // direction.
-
-							   // note: using the
-							   // intersection is
-							   // not an obvious
-							   // decision, we could
-							   // also argue that it
-							   // is more natural to
-							   // use the
-							   // union. however,
-							   // intersection is
-							   // the less
-							   // aggressive tactic
-							   // and favours a
-							   // smaller number of
-							   // refined cells over
-							   // an intensive
-							   // smoothing. this
-							   // way we try not to
-							   // loose too much of
-							   // the effort we put
-							   // in anisotropic
-							   // refinement
-							   // indicators due to
-							   // overly aggressive
-							   // smoothing...
-			  directional_cell_refinement_case = directional_cell_refinement_case &
-							 GeometryInfo<dim>::min_cell_refinement_case_for_face_refinement(
-							   expected_face_ref_case,
-							   face,
-							   cell->face_orientation(face),
-							   cell->face_flip(face),
-							   cell->face_rotation(face));
-			}//for both face indices
-						       // if both requirements
-						       // sum up to something
-						       // useful, add this to
-						       // the refine case for
-						       // smoothing. note: if
-						       // directional_cell_refinement_case
-						       // is isotropic still,
-						       // then something went
-						       // wrong...
-		      Assert(directional_cell_refinement_case < RefinementCase<dim>::isotropic_refinement,
-			     ExcInternalError());
-		      smoothing_cell_refinement_case = smoothing_cell_refinement_case |
-						   directional_cell_refinement_case;
-		    }//for all face_pairs
-						   // no we collected
-						   // contributions from all
-						   // directions. combine the
-						   // new flags with the
-						   // existing refine case, but
-						   // only if smoothing is
-						   // required
-		  if (smoothing_cell_refinement_case)
-		    {
-		      cell->clear_coarsen_flag();
-		      cell->set_refine_flag(cell->refine_flag_set() | smoothing_cell_refinement_case);
-		    }
-		}//else -> allow_anisotropic_smoothing
-	    }// for all cells
+	  for (; cell != endc; --cell)
+					     // only do something if
+					     // cell is not already
+					     // flagged for
+					     // (isotropic) refinement
+	    if (cell->refine_flag_set() != RefinementCase<dim>::isotropic_refinement)
+	      possibly_refine_unrefined_island<dim,spacedim>
+		(cell,
+		 (smooth_grid & allow_anisotropic_smoothing) != 0);
 	}
 
 				       /////////////////////////////////

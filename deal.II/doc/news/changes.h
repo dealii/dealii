@@ -196,6 +196,17 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  Fixed: In some rather pathological cases, the function
+  Triangulation::prepare_coarsening_and_refinement (which is called from
+  Triangulation::execute_coarsening_and_refinement) could take very long
+  if the flag Triangulation::eliminate_unrefined_islands was given in
+  the mesh smoothing flags upon construction of the triangulation. This is
+  now fixed.
+  <br>
+  (WB 2010/07/27)
+  </p>
 
   <li><p> New: Brezzi-Douglas-Marini elements of arbitrary order in FE_BDM.
   <br>
