@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -698,6 +698,40 @@ HyperBallBoundary<3>::get_intermediate_points_on_quad (
 
 #endif
 
+
+#if deal_II_dimension == 2
+
+template <>
+void
+HyperBallBoundary<2,3>::get_intermediate_points_on_quad (
+  const Triangulation<2,3>::quad_iterator &quad,
+  std::vector<Point<3> > &points) const
+{
+  if (points.size()==1)
+    points[0]=get_new_point_on_quad(quad);
+  else
+    {
+      unsigned int m=static_cast<unsigned int> (std::sqrt(static_cast<double>(points.size())));
+      Assert(points.size()==m*m, ExcInternalError());
+
+      std::vector<Point<3> > lp0(m);
+      std::vector<Point<3> > lp1(m);
+
+      get_intermediate_points_on_line(quad->line(0), lp0);
+      get_intermediate_points_on_line(quad->line(1), lp1);
+
+      std::vector<Point<3> > lps(m);
+      for (unsigned int i=0; i<m; ++i)
+	{
+	  get_intermediate_points_between_points(lp0[i], lp1[i], lps);
+
+	  for (unsigned int j=0; j<m; ++j)
+	    points[i*m+j]=lps[j];
+	}
+    }
+}
+
+#endif
 
 template <int dim, int spacedim>
 void

@@ -59,7 +59,7 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 #if deal_II_dimension == 1
 
 // in 1d, it is irrelevant which polynomial degree to use, since all
-// cells are scaled linearly
+// cells are scaled linearly. Unless codimension is equal to two
 template<>
 MappingQ<1>::MappingQ (const unsigned int,
 		       const bool /*use_mapping_q_on_all_cells*/)
@@ -87,7 +87,6 @@ MappingQ<1>::MappingQ (const MappingQ<1> &m):
 		use_mapping_q_on_all_cells (m.use_mapping_q_on_all_cells),
 		feq(degree)
 {}
-
 
 template<>
 MappingQ<1>::~MappingQ ()
@@ -119,7 +118,8 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
                 :
 		degree(p),
 		n_inner(Utilities::fixed_power<dim>(degree-1)),
-		n_outer((dim==2) ? 4+4*(degree-1)
+		n_outer((dim==1) ? 2 :
+			(dim==2) ? 4+4*(degree-1)
 			:8+12*(degree-1)+6*(degree-1)*(degree-1)),
 		tensor_pols(0),
 		n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
@@ -127,7 +127,8 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
 			 lexicographic_to_hierarchic_numbering (
 			   FiniteElementData<dim> (get_dpo_vector<dim>(degree), 1,
 						   degree))),
-		use_mapping_q_on_all_cells (use_mapping_q_on_all_cells),
+		use_mapping_q_on_all_cells (use_mapping_q_on_all_cells
+					    || (dim != spacedim)),
 		feq(degree)
 {
 				   // Construct the tensor product
@@ -373,7 +374,7 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
   std::vector<Point<dim> >     &quadrature_points,
   std::vector<double>          &JxW_values,
   std::vector<Tensor<1,dim> >  &exterior_forms,
-  std::vector<Point<dim> >     &normal_vectors) const
+  std::vector<Point<spacedim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -435,7 +436,7 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
 				       std::vector<Point<dim> >     &quadrature_points,
 				       std::vector<double>          &JxW_values,
 				       std::vector<Tensor<1,dim> >  &exterior_forms,
-				       std::vector<Point<dim> >     &normal_vectors) const
+				       std::vector<Point<spacedim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -842,7 +843,7 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::apply_laplace_vector(const Table<2,double> &lvs,
-				    std::vector<Point<dim> > &a) const
+					     std::vector<Point<spacedim> > &a) const
 {
                                    // check whether the data we need
                                    // is really available. if you fail
@@ -873,7 +874,7 @@ MappingQ<dim,spacedim>::apply_laplace_vector(const Table<2,double> &lvs,
   for (unsigned int unit_point=0; unit_point<n_inner_apply; ++unit_point)
     {
       Assert(lvs.n_cols()==n_outer_apply, ExcInternalError());
-      Point<dim> p;
+      Point<spacedim> p;
       for (unsigned int k=0; k<n_outer_apply; ++k)
 	p+=lvs[unit_point][k]*a[k];
 
@@ -886,7 +887,7 @@ template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  std::vector<Point<dim> > &a) const
+  std::vector<Point<spacedim> > &a) const
 {
 				   // if this is a cell for which we
 				   // want to compute the full
@@ -912,7 +913,7 @@ MappingQ<dim,spacedim>::compute_mapping_support_points(
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-					      std::vector<Point<dim> > &a) const
+					      std::vector<Point<spacedim> > &a) const
 {
 				   // in any case, we need the
 				   // vertices first
@@ -923,6 +924,10 @@ MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulat
   if (degree>1)
     switch (dim)
       {
+	case 1:
+	      Assert(spacedim == 2, ExcInternalError());
+	      add_line_support_points(cell, a);
+	      break;
 	case 2:
 					   // in 2d, add the
 					   // points on the four
@@ -930,7 +935,10 @@ MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulat
 					   // the exterior (outer)
 					   // points
 	  add_line_support_points (cell, a);
-	  apply_laplace_vector (laplace_on_quad_vector,a);
+	  if(dim != spacedim)
+	    add_quad_support_points(cell, a);
+	  else
+	    apply_laplace_vector (laplace_on_quad_vector,a);
 	  break;
 
 	case 3:
@@ -966,15 +974,47 @@ MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
   Assert (dim > 1, ExcImpossibleInDim(dim));
 }
 
+
+template <>
+void
+MappingQ<1,2>::add_line_support_points (const Triangulation<1,2>::cell_iterator &cell,
+					std::vector<Point<2> > &a) const
+{
+  const unsigned int dim=1, spacedim=2;
+				   // Ask for the mid point, if that's
+				   // the only thing we need.
+  if (degree==2)
+    {
+      const Boundary<dim,spacedim> * const boundary
+	= &(cell->get_triangulation().get_boundary(cell->material_id()));
+      a.push_back(boundary->get_new_point_on_line(cell));
+    }
+  else
+				     // otherwise call the more
+				     // complicated functions and ask
+				     // for inner points from the
+				     // boundary description
+    {
+      std::vector<Point<spacedim> > line_points (degree-1);
+      
+      const Boundary<dim,spacedim> * const boundary
+	= &(cell->get_triangulation().get_boundary(cell->material_id()));
+      
+      boundary->get_intermediate_points_on_line (cell, line_points);
+				       // Append all points
+      a.insert (a.end(), line_points.begin(), line_points.end());
+    }
+}
+
 #endif
 
 
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-					std::vector<Point<dim> > &a) const
+						 std::vector<Point<spacedim> > &a) const
 {
-  static const StraightBoundary<dim> straight_boundary;
+  static const StraightBoundary<dim,spacedim> straight_boundary;
 				   // if we only need the midpoint,
 				   // then ask for it.
   if (degree==2)
@@ -982,9 +1022,11 @@ MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<di
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
 	{
 	  const typename Triangulation<dim,spacedim>::line_iterator line = cell->line(line_no);
-	  const Boundary<dim> * const boundary
-	    = (line->at_boundary() ?
-	       &line->get_triangulation().get_boundary(line->boundary_indicator()) :
+	  const Boundary<dim,spacedim> * const boundary
+	    = (line->at_boundary()?
+	       &line->get_triangulation().get_boundary(line->boundary_indicator()):
+	       (dim != spacedim) ?
+	       &line->get_triangulation().get_boundary(cell->material_id()):
 	       &straight_boundary);
 	  
 	  a.push_back(boundary->get_new_point_on_line(line));
@@ -996,7 +1038,7 @@ MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<di
 				     // for inner points from the
 				     // boundary description
     {
-      std::vector<Point<dim> > line_points (degree-1);
+      std::vector<Point<spacedim> > line_points (degree-1);
       
 				       // loop over each of the lines,
 				       // and if it is at the
@@ -1008,9 +1050,11 @@ MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<di
 	{
 	  const typename Triangulation<dim,spacedim>::line_iterator line = cell->line(line_no);
 	  
-	  const Boundary<dim> * const boundary
-	    = (line->at_boundary() ?
+	  const Boundary<dim,spacedim> * const boundary
+	    = (line->at_boundary()?
 	       &line->get_triangulation().get_boundary(line->boundary_indicator()) :
+	       (dim != spacedim) ?
+	       &line->get_triangulation().get_boundary(cell->material_id()) :
 	       &straight_boundary);
 	  
 	  boundary->get_intermediate_points_on_line (line, line_points);
@@ -1208,12 +1252,30 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 
 #endif
 
+#if deal_II_dimension == 2
+
+template<>
+void
+MappingQ<2,3>::
+add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
+                        std::vector<Point<3> >                &a) const
+{
+  std::vector<Point<3> > quad_points ((degree-1)*(degree-1));
+  
+  cell->get_triangulation().get_boundary(cell->material_id())
+    .get_intermediate_points_on_quad (cell, quad_points);
+  for (unsigned int i=0; i<quad_points.size(); ++i)
+    a.push_back(quad_points[i]);
+}
+
+#endif
+
 
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
 add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &,
-                        std::vector<Point<dim> > &) const
+                        std::vector<Point<spacedim> > &) const
 {
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
@@ -1312,8 +1374,8 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
     mdata (dynamic_cast<InternalData *> (
              get_data(update_transformation_values, point_quadrature)));
   
-  mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
-					    || cell->has_boundary_lines());
+  mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells ||
+					    cell->has_boundary_lines());
 
   typename MappingQ1<dim,spacedim>::InternalData
     *p_data = (mdata->use_mapping_q1_on_current_cell ?
@@ -1340,7 +1402,9 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
                                    // then a Newton iteration based on
                                    // the full MappingQ if we need
                                    // this
-  if (cell->has_boundary_lines() || use_mapping_q_on_all_cells)
+  if (cell->has_boundary_lines() ||
+      use_mapping_q_on_all_cells ||
+      (dim!=spacedim) )
     {
       const Quadrature<dim> point_quadrature(p_unit);
       std::auto_ptr<InternalData>
@@ -1351,7 +1415,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       
       mdata->use_mapping_q1_on_current_cell = false;
 
-      std::vector<Point<dim> > &points = mdata->mapping_support_points;
+      std::vector<Point<spacedim> > &points = mdata->mapping_support_points;
       compute_mapping_support_points (cell, points);
 
       this->transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
@@ -1381,5 +1445,9 @@ MappingQ<dim,spacedim>::clone () const
   
 // explicit instantiation
 template class MappingQ<deal_II_dimension>;
+
+#if deal_II_dimension < 3
+template class MappingQ<deal_II_dimension, deal_II_dimension+1>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

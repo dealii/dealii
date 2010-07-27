@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -226,7 +226,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 			 typename std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
 			 typename std::vector<Tensor<1,dim> >        &exterior_form,
-			 typename std::vector<Point<dim> >        &normal_vectors) const ;
+			 typename std::vector<Point<spacedim> >        &normal_vectors) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -241,7 +241,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 			    typename std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
 			    typename std::vector<Tensor<1,dim> >        &exterior_form,
-			    typename std::vector<Point<dim> >        &normal_vectors) const ;
+			    typename std::vector<Point<spacedim> >        &normal_vectors) const ;
 
 				     /**
 				      * For <tt>dim=2,3</tt>. Append the
@@ -268,7 +268,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      */
     virtual void
     add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			     std::vector<Point<dim> > &a) const;
+			     std::vector<Point<spacedim> > &a) const;
 
 				     /**
 				      * For <tt>dim=3</tt>. Append the
@@ -296,7 +296,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      */
     virtual void
     add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			    std::vector<Point<dim> > &a) const;
+			    std::vector<Point<spacedim> > &a) const;
 
   private:
 
@@ -396,7 +396,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * `mapping' report.
 				      */
     void apply_laplace_vector(const Table<2,double>   &lvs,
-			      std::vector<Point<dim> > &a) const;
+			      std::vector<Point<spacedim> > &a) const;
 
 				     /**
 				      * Computes the support points of
@@ -404,7 +404,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      */
     virtual void compute_mapping_support_points(
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
+      std::vector<Point<spacedim> > &a) const;
 
 				     /**
 				      * Computes all support points of
@@ -422,7 +422,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      */
     void compute_support_points_laplace(
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
+      std::vector<Point<spacedim> > &a) const;
 
 				     /**
 				      * Needed by the

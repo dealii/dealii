@@ -717,7 +717,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
       if (curved_cell_region==curved_inner_cells ||
 	  (curved_cell_region==curved_boundary && cell_and_index->first->at_boundary()))
 	{
-	  Assert(patch.space_dim==dim, ExcInternalError());
+	  Assert(patch.space_dim==DH::space_dimension, ExcInternalError());
 	  const std::vector<Point<DH::space_dimension> > & q_points=fe_patch_values.get_quadrature_points();
 					   // resize the patch.data member
 					   // in order to have enough memory
@@ -731,7 +731,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 					   // copy points to patch.data
 	  for (unsigned int i=0; i<DH::space_dimension; ++i)
 	    for (unsigned int q=0; q<n_q_points; ++q)
-	      patch.data(patch.data.size(0)-dim+i,q)=q_points[q][i];
+	      patch.data(patch.data.size(0)-DH::space_dimension+i,q)=q_points[q][i];
 	}
       else
 	{

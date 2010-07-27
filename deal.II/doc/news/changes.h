@@ -164,6 +164,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li><p> New: MappingQ and MappingQEulerian now support order > 1 also in 
+  codimension one. Step-34 has been modified to show how this works.
+  <br>
+  (Luca Heltai 2010/07/23-27)
+  </p>
+
   <li><p> New: QGaussOneOverR now has a new constructor for arbitrary quadrature
   points and not only the vertices of the reference cell.
   <br>
