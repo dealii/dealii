@@ -1178,9 +1178,9 @@ namespace internal
  *
  *     <li> @p eliminate_unrefined_islands:
  *       For each cell we count the number of neighbors which are refined or
- *       flagged for refinement. If this exceeds the total number of neighbors
- *       (which is the number of faces minus the number of faces of this cell
- *       which are located on the boundary), then this cell is flagged for
+ *       flagged for refinement. If this exceeds the number of neighbors
+ *       which are not refined and not flagged for refinement, then the current
+ *       cell is flagged for
  *       refinement. Since this may lead to cells on the same level which also
  *       will need refinement, we will need additional loops of regularization
  *       and smoothing over all cells until nothing changes any more.
@@ -1286,7 +1286,7 @@ class Triangulation : public Subscriptor
 
     typedef typename IteratorSelector::CellAccessor         cell_accessor;
     typedef typename IteratorSelector::FaceAccessor         face_accessor;
-    
+
     typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
     typedef typename IteratorSelector::active_line_iterator active_line_iterator;
