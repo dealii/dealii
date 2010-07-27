@@ -28,7 +28,6 @@
 #include <numeric>
 #include <map>
 #include <cmath>
-#include <iostream>
 #include <functional>
 
 #include <base/std_cxx1x/array.h>
