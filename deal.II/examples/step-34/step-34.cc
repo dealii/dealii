@@ -48,7 +48,7 @@
 
 #include <fe/fe_q.h>
 #include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
+#include <fe/mapping_q.h>
 
 #include <numerics/data_out.h>
 #include <numerics/vectors.h>
@@ -141,7 +141,8 @@ template <int dim>
 class BEMProblem
 {
   public:
-    BEMProblem();
+    BEMProblem(const unsigned int fe_degree = 1,
+	       const unsigned int mapping_degree = 1);
 
     void run();
 
@@ -296,6 +297,19 @@ class BEMProblem
 
     void output_results(const unsigned int cycle);
 
+				     // To allow for dimension
+				     // independent programming, we
+				     // specialize this single
+				     // function to extract the
+				     // singular quadrature formula
+				     // needed to integrate the
+				     // singular kernels in the
+				     // interior of the cells.
+    const Quadrature<dim-1> & get_singular_quadrature(
+      const typename DoFHandler<dim-1, dim>::active_cell_iterator &cell,
+      const unsigned int index) const;
+    
+
 				     // The usual deal.II classes can
 				     // be used for boundary element
 				     // methods by specifying the
@@ -317,10 +331,21 @@ class BEMProblem
 				     // usual finite element classes
 				     // that we saw in all previous
 				     // examples.
+				     //
+				     // The class is constructed in a
+				     // way to allow for arbitrary
+				     // order of approximation of both
+				     // the domain (through high order
+				     // mapping) and the finite
+				     // element space. The order of
+				     // the finite element space and
+				     // of the mapping can be selected
+				     // in the constructor of the class.
 
     Triangulation<dim-1, dim>   tria;
     FE_Q<dim-1,dim>             fe;
     DoFHandler<dim-1,dim>       dh;
+    MappingQ<dim-1, dim>	mapping;
 
 				     // In BEM methods, the matrix
 				     // that is generated is
@@ -348,6 +373,7 @@ class BEMProblem
 				     // from a point $\mathbf x$) at
 				     // the support points of our
 				     // shape functions.
+    
     Vector<double>              phi;
     Vector<double>              alpha;
 
@@ -355,6 +381,7 @@ class BEMProblem
 				     // to output errors in the exact
 				     // solution and in the computed
 				     // alphas.
+    
     ConvergenceTable	convergence_table;
 
 				     // The following variables are
@@ -390,28 +417,17 @@ class BEMProblem
 				     // to define the order of the
 				     // singular quadrature rule.
 				     //
-				     // Notice that the pointer given
-				     // below for the quadrature rule
-				     // is only used for non singular
-				     // integrals. Whenever the
-				     // integral is singular, then
-				     // only the degree of the
-				     // quadrature pointer is used,
-				     // and the integration is a
-				     // special one (see the
-				     // assemble_system() function
-				     // below for further details).
-				     //
 				     // We also define a couple of
 				     // parameters which are used in
 				     // case we wanted to extend the
 				     // solution to the entire domain.
+    
     Functions::ParsedFunction<dim> wind;
     Functions::ParsedFunction<dim> exact_solution;
 
-    std_cxx1x::shared_ptr<Quadrature<dim-1> > quadrature;
     unsigned int singular_quadrature_order;
-
+    std_cxx1x::shared_ptr<Quadrature<dim-1> > quadrature;
+    
     SolverControl solver_control;
 
     unsigned int n_cycles;
@@ -451,11 +467,13 @@ class BEMProblem
 				 // is static, and has no knowledge of
 				 // the number of components.
 template <int dim>
-BEMProblem<dim>::BEMProblem()
+BEMProblem<dim>::BEMProblem(const unsigned int fe_degree,
+			    const unsigned int mapping_degree)
 		:
-		fe(1),
+		fe(fe_degree),
 		dh(tria),
-		wind(dim)
+		wind(dim),
+		mapping(mapping_degree, true)
 {}
 
 
@@ -716,6 +734,7 @@ void BEMProblem<dim>::read_domain()
   GridIn<dim-1, dim> gi;
   gi.attach_triangulation (tria);
   gi.read_ucd (in);
+  
   tria.set_boundary(1, boundary);
 }
 
@@ -750,38 +769,11 @@ void BEMProblem<dim>::refine_and_resize()
 				 // of this program, assembling the
 				 // matrix that corresponds to the
 				 // boundary integral equation.
-				 //
-				 // At the beginning, we create the
-				 // singular quadratures for the three
-				 // dimensional problem (note that a
-				 // 3d boundary integral problem
-				 // requires a 2d quadrature
-				 // formula!), since in this case they
-				 // only depend on the reference
-				 // element. This quadrature is a
-				 // standard Gauss quadrature formula
-				 // reparametrized in such a way that
-				 // allows one to integrate
-				 // singularities of the kind $1/R$
-				 // centered at one of the
-				 // vertices. Here we define a vector
-				 // of four such quadratures (one per
-				 // vertex of the two dimensional
-				 // cells for a surface in 3d) that
-				 // will be used later on; note,
-				 // however, that these objects will
-				 // only be used in the three
-				 // dimensional case.
 template <int dim>
 void BEMProblem<dim>::assemble_system()
 {
-  std::vector<QGaussOneOverR<2> > sing_quadratures_3d;
-  for(unsigned int i=0; i<4; ++i)
-    sing_quadratures_3d.push_back
-      (QGaussOneOverR<2>(singular_quadrature_order, i, true));
 
-
-				   // Next, we initialize an FEValues
+				   // First we initialize an FEValues
 				   // object with the quadrature
 				   // formula for the integration of
 				   // the kernel in non singular
@@ -791,7 +783,7 @@ void BEMProblem<dim>::assemble_system()
 				   // precise, since the functions we
 				   // are integrating are not
 				   // polynomial functions.
-  FEValues<dim-1,dim> fe_v(fe, *quadrature,
+  FEValues<dim-1,dim> fe_v(mapping, fe, *quadrature,
 			   update_values |
 			   update_cell_normal_vectors |
 			   update_quadrature_points |
@@ -826,28 +818,15 @@ void BEMProblem<dim>::assemble_system()
 				   // collocation points, which are
 				   // the support points of the $i$th
 				   // basis function, while $j$ runs
-				   // on inner integration points. We
-				   // perform the following check to
-				   // ensure that we are not trying to
-				   // use this code for high order
-				   // elements. It will only work with
-				   // Q1 elements, that is, for
-				   // fe.dofs_per_cell ==
-				   // GeometryInfo<dim>::vertices_per_cell.
-  AssertThrow(fe.dofs_per_cell == GeometryInfo<dim-1>::vertices_per_cell,
-	      ExcMessage("The code in this function can only be used for "
-			 "the usual Q1 elements."));
-
-				   // Now that we have checked that
-				   // the number of vertices is equal
-				   // to the number of degrees of
-				   // freedom, we construct a vector
+				   // on inner integration points.
+  
+				   // We construct a vector
 				   // of support points which will be
 				   // used in the local integrations:
   std::vector<Point<dim> > support_points(dh.n_dofs());
-  DoFTools::map_dofs_to_support_points<dim-1, dim>( StaticMappingQ1<dim-1, dim>::mapping,
-						    dh, support_points);
+  DoFTools::map_dofs_to_support_points<dim-1, dim>( mapping, dh, support_points);
 
+  
 				   // After doing so, we can start the
 				   // integration loop over all cells,
 				   // where we first initialize the
@@ -869,7 +848,6 @@ void BEMProblem<dim>::assemble_system()
       const std::vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
       const std::vector<Point<dim> > &normals = fe_v.get_cell_normal_vectors();
       wind.vector_value_list(q_points, cell_wind);
-
 
 				       // We then form the integral over
 				       // the current cell for all
@@ -960,213 +938,20 @@ void BEMProblem<dim>::assemble_system()
 					     // functions against a
 					     // singular weight on the
 					     // reference cell.
-				     	     // Notice that singular
-				     	     // integration requires a
-				     	     // careful selection of
-				     	     // the quadrature
-				     	     // rules. In particular
-				     	     // the deal.II library
-				     	     // provides quadrature
-				     	     // rules which are
-				     	     // taylored for
-				     	     // logarithmic
-				     	     // singularities
-				     	     // (QGaussLog,
-				     	     // QGaussLogR), as well
-				     	     // as for 1/R
-				     	     // singularities
-				     	     // (QGaussOneOverR).
-				     	     //
-				     	     // Singular integration
-				     	     // is typically obtained
-				     	     // by constructing
-				     	     // weighted quadrature
-				     	     // formulas with singular
-				     	     // weights, so that it is
-				     	     // possible to write
-				     	     //
-				     	     // \f[
-				     	     //   \int_K f(x) s(x) dx = \sum_{i=1}^N w_i f(q_i)
-				     	     // \f]
-				     	     //
-				     	     // where $s(x)$ is a given
-				     	     // singularity, and the weights
-				     	     // and quadrature points
-				     	     // $w_i,q_i$ are carefully
-				     	     // selected to make the formula
-				     	     // above an equality for a
-				     	     // certain class of functions
-				     	     // $f(x)$.
-				     	     //
-				     	     // In all the finite
-				     	     // element examples we
-				     	     // have seen so far, the
-				     	     // weight of the
-				     	     // quadrature itself
-				     	     // (namely, the function
-				     	     // $s(x)$), was always
-				     	     // constantly equal to 1.
-				     	     // For singular
-				     	     // integration, we have
-				     	     // two choices: we can
-				     	     // use the definition
-				     	     // above, factoring out
-				     	     // the singularity from
-				     	     // the integrand (i.e.,
-				     	     // integrating $f(x)$
-				     	     // with the special
-				     	     // quadrature rule), or
-				     	     // we can ask the
-				     	     // quadrature rule to
-				     	     // "normalize" the
-				     	     // weights $w_i$ with
-				     	     // $s(q_i)$:
-				     	     //
-				     	     // \f[
-				     	     //   \int_K f(x) s(x) dx =
-				     	     //   \int_K g(x) dx = \sum_{i=1}^N \frac{w_i}{s(q_i)} g(q_i)
-				     	     // \f]
-				     	     //
-				     	     // We use this second
-				     	     // option, through the @p
-				     	     // factor_out_singularity
-				     	     // parameter of both
-				     	     // QGaussLogR and
-				     	     // QGaussOneOverR.
-				     	     //
-				     	     // These integrals are
-				     	     // somewhat delicate,
-				     	     // especially in two
-				     	     // dimensions, due to the
-				     	     // transformation from
-				     	     // the real to the
-				     	     // reference cell, where
-				     	     // the variable of
-				     	     // integration is scaled
-				     	     // with the determinant
-				     	     // of the transformation.
-				     	     //
-				     	     // In two dimensions this
-				     	     // process does not
-				     	     // result only in a
-				     	     // factor appearing as a
-				     	     // constant factor on the
-				     	     // entire integral, but
-				     	     // also on an additional
-				     	     // integral alltogether
-				     	     // that needs to be
-				     	     // evaluated:
-				     	     //
-				     	     // \f[
-				     	     //  \int_0^1 f(x)\ln(x/\alpha) dx =
-				     	     //  \int_0^1 f(x)\ln(x) dx - \int_0^1 f(x) \ln(\alpha) dx.
-				     	     // \f]
-				     	     //
-				     	     // This process is taken care of by
-				     	     // the constructor of the QGaussLogR
-				     	     // class, which adds additional
-				     	     // quadrature points and weights to
-				     	     // take into consideration also the
-				     	     // second part of the integral.
-				     	     //
-				     	     // A similar reasoning
-				     	     // should be done in the
-				     	     // three dimensional
-				     	     // case, since the
-				     	     // singular quadrature is
-				     	     // taylored on the
-				     	     // inverse of the radius
-				     	     // $r$ in the reference
-				     	     // cell, while our
-				     	     // singular function
-				     	     // lives in real space,
-				     	     // however in the three
-				     	     // dimensional case
-				     	     // everything is simpler
-				     	     // because the
-				     	     // singularity scales
-				     	     // linearly with the
-				     	     // determinant of the
-				     	     // transformation. This
-				     	     // allows us to build the
-				     	     // singular two
-				     	     // dimensional quadrature
-				     	     // rules once and for all
-				     	     // outside the loop over
-				     	     // all cells, using only
-				     	     // a pointer where needed.
 					     //
-					     // Notice that in one
-					     // dimensional
-					     // integration this is
-					     // not possible, since we
-					     // need to know the
-					     // scaling parameter for
-					     // the quadrature, which
-					     // is not known a
-					     // priori. Here, the
-					     // quadrature rule itself
-					     // depends also on the
-					     // size of the current
-					     // cell. For this reason,
-					     // it is necessary to
-					     // create a new
-					     // quadrature for each
-					     // singular
-					     // integration. Since we
-					     // create it using the
-					     // new operator of C++,
-					     // we also need to
-					     // destroy it using the
-					     // dual of new:
-					     // delete. This is done
-					     // at the end, and only
-					     // if dim == 2.
-					     //
-					     // Putting all this into a
-					     // dimension independent
-					     // framework requires a little
-					     // trick. The problem is that,
-					     // depending on dimension, we'd
-					     // like to either assign a
-					     // QGaussLogR<1> or a
-					     // QGaussOneOverR<2> to a
-					     // Quadrature<dim-1>. C++
-					     // doesn't allow this right
-					     // away, and neither is a
-					     // static_cast
-					     // possible. However, we can
-					     // attempt a dynamic_cast: the
-					     // implementation will then
-					     // look up at run time whether
-					     // the conversion is possible
-					     // (which we <em>know</em> it
-					     // is) and if that isn't the
-					     // case simply return a null
-					     // pointer. To be sure we can
-					     // then add a safety check at
-					     // the end:
+					     // The correct quadrature
+					     // formula is selected by
+					     // the
+					     // get_singular_quadrature
+					     // function, which is
+					     // explained in detail below.
 	    Assert(singular_index != numbers::invalid_unsigned_int,
 		   ExcInternalError());
+	    
+	    const Quadrature<dim-1> & singular_quadrature =
+	      get_singular_quadrature(cell, singular_index);
 
-	    const Quadrature<dim-1> *
-	      singular_quadrature
-	      = (dim == 2
-		 ?
-		 dynamic_cast<Quadrature<dim-1>*>(
-		   new QGaussLogR<1>(singular_quadrature_order,
-				     Point<1>((double)singular_index),
-				     1./cell->measure(), true))
-		 :
-		 (dim == 3
-		  ?
-		  dynamic_cast<Quadrature<dim-1>*>(
-		    &sing_quadratures_3d[singular_index])
-		  :
-		  0));
-	    Assert(singular_quadrature, ExcInternalError());
-
-	    FEValues<dim-1,dim> fe_v_singular (fe, *singular_quadrature,
+	    FEValues<dim-1,dim> fe_v_singular (mapping, fe, singular_quadrature,
 					       update_jacobians |
 					       update_values |
 					       update_cell_normal_vectors |
@@ -1174,7 +959,7 @@ void BEMProblem<dim>::assemble_system()
 
 	    fe_v_singular.reinit(cell);
 
-	    std::vector<Vector<double> > singular_cell_wind( (*singular_quadrature).size(),
+	    std::vector<Vector<double> > singular_cell_wind( singular_quadrature.size(),
 							     Vector<double>(dim) );
 
 	    const std::vector<Point<dim> > &singular_normals = fe_v_singular.get_cell_normal_vectors();
@@ -1182,7 +967,7 @@ void BEMProblem<dim>::assemble_system()
 
 	    wind.vector_value_list(singular_q_points, singular_cell_wind);
 
-	    for(unsigned int q=0; q<singular_quadrature->size(); ++q)
+	    for(unsigned int q=0; q<singular_quadrature.size(); ++q)
 	      {
 		const Point<dim> R = singular_q_points[q] - support_points[i];
 		double normal_wind = 0;
@@ -1201,8 +986,6 @@ void BEMProblem<dim>::assemble_system()
 					      fe_v_singular.JxW(q)       );
 		}
 	      }
-	    if(dim==2)
-	      delete singular_quadrature;
 	  }
 
 					   // Finally, we need to add
@@ -1274,10 +1057,10 @@ template <int dim>
 void BEMProblem<dim>::compute_errors(const unsigned int cycle)
 {
   Vector<float> difference_per_cell (tria.n_active_cells());
-  VectorTools::integrate_difference (dh, phi,
+  VectorTools::integrate_difference (mapping, dh, phi,
 				     exact_solution,
 				     difference_per_cell,
-				     QGauss<(dim-1)>(3),
+				     QGauss<(dim-1)>(2*fe.degree+1),
 				     VectorTools::L2_norm);
   const double L2_error = difference_per_cell.l2_norm();
 
@@ -1314,6 +1097,161 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle)
   convergence_table.add_value("L2(phi)", L2_error);
   convergence_table.add_value("Linfty(alpha)", alpha_error);
 }
+
+
+				 // Singular integration requires a
+				 // careful selection of the
+				 // quadrature rules. In particular
+				 // the deal.II library provides
+				 // quadrature rules which are
+				 // taylored for logarithmic
+				 // singularities (QGaussLog,
+				 // QGaussLogR), as well as for 1/R
+				 // singularities (QGaussOneOverR).
+				 //
+				 // Singular integration is typically
+				 // obtained by constructing weighted
+				 // quadrature formulas with singular
+				 // weights, so that it is possible to
+				 // write
+				 //
+				 // \f[
+				 //   \int_K f(x) s(x) dx = \sum_{i=1}^N w_i f(q_i)
+				 // \f]
+				 //
+				 // where $s(x)$ is a given
+				 // singularity, and the weights and
+				 // quadrature points $w_i,q_i$ are
+				 // carefully selected to make the
+				 // formula above an equality for a
+				 // certain class of functions $f(x)$.
+				 //
+				 // In all the finite element examples
+				 // we have seen so far, the weight of
+				 // the quadrature itself (namely, the
+				 // function $s(x)$), was always
+				 // constantly equal to 1.  For
+				 // singular integration, we have two
+				 // choices: we can use the definition
+				 // above, factoring out the
+				 // singularity from the integrand
+				 // (i.e., integrating $f(x)$ with the
+				 // special quadrature rule), or we
+				 // can ask the quadrature rule to
+				 // "normalize" the weights $w_i$ with
+				 // $s(q_i)$:
+				 //
+				 // \f[
+				 //   \int_K f(x) s(x) dx =
+				 //   \int_K g(x) dx = \sum_{i=1}^N \frac{w_i}{s(q_i)} g(q_i)
+				 // \f]
+				 //
+				 // We use this second option, through
+				 // the @p factor_out_singularity
+				 // parameter of both QGaussLogR and
+				 // QGaussOneOverR.
+				 //
+				 // These integrals are somewhat
+				 // delicate, especially in two
+				 // dimensions, due to the
+				 // transformation from the real to
+				 // the reference cell, where the
+				 // variable of integration is scaled
+				 // with the determinant of the
+				 // transformation.
+				 //
+				 // In two dimensions this process
+				 // does not result only in a factor
+				 // appearing as a constant factor on
+				 // the entire integral, but also on
+				 // an additional integral alltogether
+				 // that needs to be evaluated:
+				 //
+				 // \f[
+				 //  \int_0^1 f(x)\ln(x/\alpha) dx =
+				 //  \int_0^1 f(x)\ln(x) dx - \int_0^1 f(x) \ln(\alpha) dx.
+				 // \f]
+				 //
+				 // This process is taken care of by
+				 // the constructor of the QGaussLogR
+				 // class, which adds additional
+				 // quadrature points and weights to
+				 // take into consideration also the
+				 // second part of the integral.
+				 //
+				 // A similar reasoning should be done
+				 // in the three dimensional case,
+				 // since the singular quadrature is
+				 // taylored on the inverse of the
+				 // radius $r$ in the reference cell,
+				 // while our singular function lives
+				 // in real space, however in the
+				 // three dimensional case everything
+				 // is simpler because the singularity
+				 // scales linearly with the
+				 // determinant of the
+				 // transformation. This allows us to
+				 // build the singular two dimensional
+				 // quadrature rules only once and,
+				 // reuse them over all cells.
+				 //
+				 // In the one dimensional singular
+				 // integration this is not possible,
+				 // since we need to know the scaling
+				 // parameter for the quadrature,
+				 // which is not known a priori. Here,
+				 // the quadrature rule itself depends
+				 // also on the size of the current
+				 // cell. For this reason, it is
+				 // necessary to create a new
+				 // quadrature for each singular
+				 // integration. 
+				 //
+				 // The different quadrature rules are
+				 // built inside the
+				 // get_singular_quadrature, which is
+				 // specialized for dim=2 and dim=3,
+				 // and they are retrieved inside the
+				 // assemble_system function. The
+				 // index given as an argument is the
+				 // index of the unit support point
+				 // where the singularity is located. 
+
+template<>
+const Quadrature<2> & BEMProblem<3>::get_singular_quadrature(
+  const DoFHandler<2,3>::active_cell_iterator &,
+  const unsigned int index) const
+{
+  Assert(index < fe.dofs_per_cell,
+	 ExcIndexRange(0, fe.dofs_per_cell, index));
+  
+  static std::vector<QGaussOneOverR<2> > quadratures;
+  if(quadratures.size() == 0) 
+    for(unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      quadratures.push_back(QGaussOneOverR<2>(singular_quadrature_order,
+					      fe.get_unit_support_points()[i],
+					      true));
+  return quadratures[index];
+}
+
+
+template<>
+const Quadrature<1> & BEMProblem<2>::get_singular_quadrature(
+  const DoFHandler<1,2>::active_cell_iterator &cell,
+  const unsigned int index) const
+{
+  Assert(index < fe.dofs_per_cell,
+	 ExcIndexRange(0, fe.dofs_per_cell, index));
+  
+  static Quadrature<1> * q_pointer = NULL;
+  if(q_pointer) delete q_pointer;
+  
+  q_pointer = new QGaussLogR<1>(singular_quadrature_order,
+				fe.get_unit_support_points()[index],
+				1./cell->measure(), true);
+  return (*q_pointer);
+}
+
 
 
 				 // @sect4{BEMProblem::compute_exterior_solution}
@@ -1365,7 +1303,7 @@ void BEMProblem<dim>::compute_exterior_solution()
     endc = dh.end();
 
 
-  FEValues<dim-1,dim> fe_v(fe, *quadrature,
+  FEValues<dim-1,dim> fe_v(mapping, fe, *quadrature,
 			   update_values |
 			   update_cell_normal_vectors |
 			   update_quadrature_points |
@@ -1380,8 +1318,8 @@ void BEMProblem<dim>::compute_exterior_solution()
   std::vector<Vector<double> > local_wind(n_q_points, Vector<double>(dim) );
 
   std::vector<Point<dim> > external_support_points(external_dh.n_dofs());
-  DoFTools::map_dofs_to_support_points<dim>( StaticMappingQ1<dim>::mapping,
-					     external_dh, external_support_points);
+  DoFTools::map_dofs_to_support_points<dim>(StaticMappingQ1<dim>::mapping,
+					    external_dh, external_support_points);
 
   for(cell = dh.begin_active(); cell != endc; ++cell)
     {
@@ -1446,7 +1384,9 @@ void BEMProblem<dim>::output_results(const unsigned int cycle)
   dataout.attach_dof_handler(dh);
   dataout.add_data_vector(phi, "phi");
   dataout.add_data_vector(alpha, "alpha");
-  dataout.build_patches();
+  dataout.build_patches(mapping,
+			mapping.get_degree(),
+			DataOut<dim-1, DoFHandler<dim-1, dim> >::curved_inner_cells);
 
   std::string filename = ( Utilities::int_to_string(dim) +
 			   "d_boundary_solution_" +
@@ -1518,11 +1458,14 @@ int main ()
 {
   try
     {
+      unsigned int degree = 1;
+      unsigned int mapping_degree = 1;
+      
       deallog.depth_console (3);
-      BEMProblem<2> laplace_problem_2d;
+      BEMProblem<2> laplace_problem_2d(degree, mapping_degree);
       laplace_problem_2d.run();
 
-      BEMProblem<3> laplace_problem_3d;
+      BEMProblem<3> laplace_problem_3d(degree, mapping_degree);
       laplace_problem_3d.run();
     }
   catch (std::exception &exc)

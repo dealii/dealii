@@ -154,11 +154,41 @@ equal size generates a regular polygon with N faces, whose angles are
 exactly $\pi-\frac {2\pi}{N}$, therefore the error we commit should be
 exactly $\frac 12 - (\frac 12 -\frac 1N) = \frac 1N$. In fact this is
 a very good indicator that we are performing the singular integrals in
-an appropiate manner. 
+an appropriate manner. 
 
 The error in the approximation of the potential $\phi$ is largely due
 to approximation of the domain. A much better approximation could be
 obtained by using higher order mappings. 
+
+If we modify the main() function, setting fe_degree and mapping_degree
+to two, and raise the order of the quadrature formulas  in
+the parameter file, we obtain the following convergence table for the
+two dimensional simulation
+
+@verbatim
+cycle cells dofs  L2(phi)  Linfty(alpha) 
+    0    20   40 5.404e-05             - 2.306e-04    - 
+    1    40   80 3.578e-06          3.92 1.738e-05 3.73 
+    2    80  160 2.479e-07          3.85 1.253e-05 0.47 
+    3   160  320 1.856e-08          3.74 7.670e-06 0.71 
+@endverbatim
+
+and
+
+@verbatim
+cycle cells dofs  L2(phi)  Linfty(alpha) 
+    0    24   98 9.187e-03             - 8.956e-03    - 
+    1    96  386 3.991e-04          4.52 1.182e-03 2.92 
+    2   384 1538 2.113e-05          4.24 1.499e-04 2.98 
+    3  1536 6146 1.247e-06          4.08 1.896e-05 2.98 
+@endverbatim
+
+for the three dimensional case. As we can see, convergence results are
+much better with higher order mapping, mainly due to a better
+resolution of the curved geometry. Notice that, given the same number
+of degrees of freedom, for example in step 3 of the Q1 case and step 2
+of Q2 case in the three dimensional simulation, the error is roughly
+three orders of magnitude lower.
 
 The result of running these computations is a bunch of output files that we
 can pass to our visualization program of choice. 
