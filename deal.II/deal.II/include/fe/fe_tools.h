@@ -25,6 +25,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
+template <int rank, int dim> class SymmetricTensor;
+template <int rank, int dim> class Tensor;
 template <int dim> class Quadrature;
 template <int dim, int spacedim> class FiniteElement;
 template <int dim, int spacedim> class DoFHandler;
@@ -665,6 +667,54 @@ class FETools
     compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
                                                        const Quadrature<dim>    &quadrature,
                                                        FullMatrix<double>       &I_q);
+
+                                        /**
+                                         * Computes the projection of tensorial
+                                         * (first-order tensor)
+                                         * data stored at the quadrature points
+                                         * @p vector_of_tensors_at_qp
+                                         * to data @p vector_of_tensors_at_nodes
+                                         * at the support points of the cell.
+                                         * The data in
+                                         * @p vector_of_tensors_at_qp
+                                         * is ordered sequentially following the
+                                         * quadrature point numbering.
+                                         * The size of
+                                         * @p vector_of_tensors_at_qp
+                                         * must correspond to the number of columns
+                                         * of @p projection_matrix.
+                                         * The size of @p vector_of_tensors_at_nodes
+                                         * must correspond to the number of rows of
+                                         * @p vector_of_tensors_at_nodes .
+                                         * The projection matrix
+                                         * @p projection_matrix desribes the
+                                         * projection of scalar data from the
+                                         * quadrature points and can be obtained
+                                         * from the
+                                         * FETools::compute_projection_from_quadrature_points_matrix
+                                         * function.
+                                         */
+        template <int dim>
+        static
+        void
+        compute_projection_from_quadrature_points(
+                        const FullMatrix<double>    &projection_matrix,
+                        const std::vector< Tensor<1, dim > >    &vector_of_tensors_at_qp,
+                        std::vector< Tensor<1, dim > >          &vector_of_tensors_at_nodes);
+
+
+
+                                        /**
+                                         * same as last function but for a
+                                         * @p SymmetricTensor .
+                                         */
+        template <int dim>
+        static
+        void
+        compute_projection_from_quadrature_points(
+                        const FullMatrix<double>    &projection_matrix,
+                        const std::vector< SymmetricTensor<2, dim > >   &vector_of_tensors_at_qp,
+                        std::vector< SymmetricTensor<2, dim > >         &vector_of_tensors_at_nodes);
 
 
 

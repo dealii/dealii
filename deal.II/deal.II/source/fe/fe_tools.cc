@@ -1973,6 +1973,130 @@ compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim,space
 
 
 
+template <int dim>
+void
+FETools::compute_projection_from_quadrature_points(
+                const FullMatrix<double>                &projection_matrix,
+                const std::vector< Tensor<1, dim > >    &vector_of_tensors_at_qp,
+                std::vector< Tensor<1, dim > >          &vector_of_tensors_at_nodes)
+{
+
+                // check that the number columns of the projection_matrix
+                // matches the size of the vector_of_tensors_at_qp
+    Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
+    ExcDimensionMismatch(projection_matrix.n_cols(),
+                    vector_of_tensors_at_qp.size()));
+
+                // check that the number rows of the projection_matrix
+                // matches the size of the vector_of_tensors_at_nodes
+    Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
+    ExcDimensionMismatch(projection_matrix.n_rows(),
+                    vector_of_tensors_at_nodes.size()));
+
+                // number of support points (nodes) to project to
+    const unsigned int n_support_points = projection_matrix.n_rows();
+                // number of quadrature points to project from
+    const unsigned int n_quad_points = projection_matrix.n_cols();
+
+                 // component projected to the nodes
+    Vector<double> component_at_node(n_support_points);
+                 // component at the quadrature point
+    Vector<double> component_at_qp(n_quad_points);
+
+    for (unsigned int ii = 0; ii < dim; ++ii) {
+
+        component_at_qp = 0;
+
+                // populate the vector of components at the qps
+                // from vector_of_tensors_at_qp
+                // vector_of_tensors_at_qp data is in form:
+                //      columns:        0, 1, ...,  dim
+                //      rows:           0,1,....,  n_quad_points
+                // so extract the ii'th column of vector_of_tensors_at_qp
+        for (unsigned int q = 0; q < n_quad_points; ++q) {
+            component_at_qp(q) = vector_of_tensors_at_qp[q][ii];
+        }
+
+                // project from the qps -> nodes
+                // component_at_node = projection_matrix_u * component_at_qp
+        projection_matrix.vmult(component_at_node, component_at_qp);
+
+                // rewrite the projection of the components
+                // back into the vector of tensors
+        for (unsigned int nn =0; nn <n_support_points; ++nn) {
+            vector_of_tensors_at_nodes[nn][ii] = component_at_node(nn);
+        }
+    }
+}
+
+
+
+template <int dim>
+void
+FETools::compute_projection_from_quadrature_points(
+                const FullMatrix<double>                        &projection_matrix,
+                const std::vector< SymmetricTensor<2, dim > >   &vector_of_tensors_at_qp,
+                std::vector< SymmetricTensor<2, dim > >         &vector_of_tensors_at_nodes)
+{
+
+                // check that the number columns of the projection_matrix
+                // matches the size of the vector_of_tensors_at_qp
+    Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
+    ExcDimensionMismatch(projection_matrix.n_cols(),
+                    vector_of_tensors_at_qp.size()));
+
+                // check that the number rows of the projection_matrix
+                // matches the size of the vector_of_tensors_at_nodes
+    Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
+    ExcDimensionMismatch(projection_matrix.n_rows(),
+                    vector_of_tensors_at_nodes.size()));
+
+                // number of support points (nodes)
+    const unsigned int n_support_points = projection_matrix.n_rows();
+                // number of quadrature points to project from
+    const unsigned int n_quad_points = projection_matrix.n_cols();
+
+                // number of unique entries in a symmetric second-order tensor
+    const unsigned int n_independent_components =
+            SymmetricTensor<2, dim >::n_independent_components;
+
+                // component projected to the nodes
+    Vector<double> component_at_node(n_support_points);
+                // component at the quadrature point
+    Vector<double> component_at_qp(n_quad_points);
+
+                // loop over the number of unique dimensions of the tensor
+    for (unsigned int ii = 0; ii < n_independent_components; ++ii) {
+
+        component_at_qp = 0;
+
+                // row-column entry of tensor corresponding the unrolled index
+        TableIndices<2>  row_column_index = SymmetricTensor< 2, dim >::unrolled_to_component_indices(ii);
+        const unsigned int row = row_column_index[0];
+        const unsigned int column = row_column_index[1];
+
+        //  populate the vector of components at the qps
+        //  from vector_of_tensors_at_qp
+        //  vector_of_tensors_at_qp is in form:
+        //      columns:       0, 1, ..., n_independent_components
+        //      rows:           0,1,....,  n_quad_points
+        //  so extract the ii'th column of vector_of_tensors_at_qp
+        for (unsigned int q = 0; q < n_quad_points; ++q) {
+            component_at_qp(q) = (vector_of_tensors_at_qp[q])[row][column];
+        }
+
+            // project from the qps -> nodes
+            // component_at_node = projection_matrix_u * component_at_qp
+        projection_matrix.vmult(component_at_node, component_at_qp);
+
+            // rewrite the projection of the components back into the vector of tensors
+        for (unsigned int nn =0; nn <n_support_points; ++nn) {
+            (vector_of_tensors_at_nodes[nn])[row][column] = component_at_node(nn);
+        }
+    }
+}
+
+
 
 template <int dim, int spacedim>
 void
@@ -2486,6 +2610,22 @@ compute_projection_from_quadrature_points_matrix (const FiniteElement<deal_II_di
                                                   const Quadrature<deal_II_dimension>    &lhs_quadrature,
                                                   const Quadrature<deal_II_dimension>    &rhs_quadrature,
                                                   FullMatrix<double>       &X);
+
+template
+void
+FETools::
+compute_projection_from_quadrature_points(
+                const FullMatrix<double>                &projection_matrix,
+                const std::vector< Tensor<1, deal_II_dimension > >    &vector_of_tensors_at_qp,
+                std::vector< Tensor<1, deal_II_dimension > >          &vector_of_tensors_at_nodes);
+
+template
+void
+FETools::compute_projection_from_quadrature_points(
+               const FullMatrix<double>                      &projection_matrix,
+               const std::vector<SymmetricTensor<2, deal_II_dimension> > &vector_of_tensors_at_qp,
+               std::vector<SymmetricTensor<2, deal_II_dimension> >       &vector_of_tensors_at_nodes);
+
 
 template
 void
