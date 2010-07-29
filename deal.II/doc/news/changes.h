@@ -196,6 +196,14 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li>
+  <p>
+  New: Ability to project second-order SymmetricTensor and first-order Tensor objects from the quadrature points to the support points of the cell using  FETools::compute_projection_from_quadrature_points
+  <br>
+  (Andrew McBride 2010/07/29)
+  </p>
+  
   <li>
   <p>
   Fixed: In some rather pathological cases, the function
