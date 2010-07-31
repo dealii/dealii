@@ -115,7 +115,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
 
     MappingQEulerian (const unsigned int     degree,
                       const VECTOR  &euler_vector,
-                      const DoFHandler<dim>  &euler_dof_handler);
+                      const DoFHandler<dim,spacedim>  &euler_dof_handler);
 
                                      /**
                                       * Return a pointer to a copy of the
@@ -187,7 +187,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       * associated.
                                       */
 
-    const SmartPointer<const DoFHandler<dim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
+    const SmartPointer<const DoFHandler<dim,spacedim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
 
 
   private:
@@ -230,7 +230,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
 				      * compute_mapping_support_points,
 				      * a function that is 'const'.
                                       */
-    mutable FEValues<dim> fe_values;
+    mutable FEValues<dim,spacedim> fe_values;
 
 				     /**
 				      * A variable to guard access to
@@ -244,8 +244,8 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       * configuration
                                       */
     virtual void compute_mapping_support_points(
-      const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
+      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+      std::vector<Point<spacedim> > &a) const;
 
 };
 

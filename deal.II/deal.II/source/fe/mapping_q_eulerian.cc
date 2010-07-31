@@ -33,7 +33,7 @@ template <int dim, class EulerVectorType, int spacedim>
 MappingQEulerian<dim, EulerVectorType, spacedim>::
 MappingQEulerian (const unsigned int degree,
 		  const EulerVectorType &euler_vector,
-		  const DoFHandler<dim> &euler_dof_handler)
+		  const DoFHandler<dim,spacedim> &euler_dof_handler)
 		:
 		MappingQ<dim,spacedim>(degree, true),
 		euler_vector(euler_vector),
@@ -74,8 +74,8 @@ SupportQuadrature (const unsigned int map_degree)
   const QIterated<dim> q_iterated(q1d,map_degree);
   const unsigned int n_q_points = q_iterated.n_quadrature_points;
 
-				   // we then need to define a renumbering 
-				   // vector that allows us to go from a 
+				   // we then need to define a renumbering
+				   // vector that allows us to go from a
 				   // lexicographic numbering scheme to a hierarchic
 				   // one.  this fragment is taking almost verbatim
 				   // from the MappingQ class.
@@ -103,8 +103,8 @@ template <int dim, class EulerVectorType, int spacedim>
 void
 MappingQEulerian<dim, EulerVectorType, spacedim>::
 compute_mapping_support_points
-(const typename Triangulation<dim>::cell_iterator &cell,
- std::vector<Point<dim> > &a) const
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+ std::vector<Point<spacedim> > &a) const
 {
 
 				   // first, basic assertion
@@ -116,12 +116,12 @@ compute_mapping_support_points
   Assert (n_dofs == vector_size,ExcWrongVectorSize(vector_size,n_dofs));
 
 				   // we then transform our tria iterator
-				   // into a dof iterator so we can 
+				   // into a dof iterator so we can
 				   // access data not associated with
 				   // triangulations
 
-  typename DoFHandler<dim>::cell_iterator dof_cell 
-    (const_cast<Triangulation<dim> *> (&(cell->get_triangulation())),
+  typename DoFHandler<dim,spacedim>::cell_iterator dof_cell
+    (const_cast<Triangulation<dim,spacedim> *> (&(cell->get_triangulation())),
      cell->level(),
      cell->index(),
      euler_dof_handler);
@@ -135,7 +135,7 @@ compute_mapping_support_points
 				   // we can then query the given
 				   // displacement field at these points
 				   // to determine the shift vector that
-				   // maps the support points to the 
+				   // maps the support points to the
 				   // deformed configuration.
 
 				   // we assume that the given field contains
@@ -145,7 +145,7 @@ compute_mapping_support_points
 				   // this class therefore assumes that the
 				   // first dim components represent the
 				   // actual shift vector we need, and simply
-				   // ignores any components after that.  
+				   // ignores any components after that.
 				   // this implies that the user should order
 				   // components appropriately, or create a
 				   // separate dof handler for the displacements.
@@ -167,7 +167,7 @@ compute_mapping_support_points
   fe_values.reinit(dof_cell);
   fe_values.get_function_values(euler_vector,shift_vector);
 
-				   // and finally compute the positions of the 
+				   // and finally compute the positions of the
 				   // support points in the deformed
 				   // configuration.
 
@@ -175,7 +175,7 @@ compute_mapping_support_points
   for(unsigned int q=0; q<n_support_pts; ++q)
     {
       a[q] = fe_values.quadrature_point(q);
-      for(unsigned int d=0; d<dim; ++d) 
+      for(unsigned int d=0; d<dim; ++d)
 	a[q](d) += shift_vector[q](d);
     }
 }
