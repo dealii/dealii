@@ -76,14 +76,17 @@ namespace Algorithms
 				     // timestep
     VECTOR* p = out(0);
     NamedData<VECTOR*> src1;
-    src1.add(p, "Previous time");
+    src1.add(p, "Previous iterate");
     src1.merge(in);
+
+    NamedData<VECTOR*> src2;
+    src2.add(p, "Previous iterate");
+
     p = aux;
     NamedData<VECTOR*> out1;
     out1.add(p, "Result");
 				     // The data provided to the inner
 				     // solver
-    NamedData<VECTOR*> src2;
     src2.add(p, "Previous time");
     src2.merge(in);
 
