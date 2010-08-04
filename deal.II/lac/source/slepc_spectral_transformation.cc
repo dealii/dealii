@@ -32,16 +32,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace SLEPcWrappers
 {
   TransformationBase::TransformationData::~TransformationData ()
-  {
-  }
+  {}
 
   TransformationBase::TransformationBase ()
-  {
-  }
+  {}
 
   TransformationBase::~TransformationBase ()
-  {
-  }
+  {}
 
   void TransformationBase::set_context (EPS &eps)
   {
@@ -56,6 +53,7 @@ namespace SLEPcWrappers
   }
 
   /* ------------------- TransformationShift --------------------- */
+
   TransformationShift::AdditionalData::
   AdditionalData (const double shift_parameter)
                   :
@@ -79,6 +77,7 @@ namespace SLEPcWrappers
   }
 
   /* ---------------- TransformationShiftInvert ------------------ */
+
   TransformationShiftInvert::AdditionalData::
   AdditionalData (const double shift_parameter)
                   :
@@ -94,7 +93,11 @@ namespace SLEPcWrappers
   TransformationShiftInvert::set_transformation_type (ST &st) const
   {
     int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,1,0)
     ierr = STSetType (st, const_cast<char *>(STSINV));
+#else
+    ierr = STSetType (st, const_cast<char *>(STSINVERT));
+#endif
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STSetShift (st, additional_data.shift_parameter);
@@ -102,6 +105,7 @@ namespace SLEPcWrappers
   }
 
   /* --------------- TransformationSpectrumFolding ----------------- */
+
   TransformationSpectrumFolding::AdditionalData::
   AdditionalData (const double shift_parameter)
                   :
@@ -126,6 +130,7 @@ namespace SLEPcWrappers
   }
 
   /* ------------------- TransformationCayley --------------------- */
+
   TransformationCayley::AdditionalData::
   AdditionalData (const double shift_parameter,
 		  const double antishift_parameter)

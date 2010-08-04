@@ -71,15 +71,15 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::set_initial_vector (const PETScWrappers::VectorBase &set_initial_vector)
+  SolverBase::set_initial_vector (const PETScWrappers::VectorBase &this_initial_vector)
   {
-    initial_vector = (&set_initial_vector);
+    initial_vector = (&this_initial_vector);
   }
 
   void
-  SolverBase::set_transformation (SLEPcWrappers::TransformationBase &set_transformation)
+  SolverBase::set_transformation (SLEPcWrappers::TransformationBase &this_transformation)
   {
-    transformation = &set_transformation;
+    transformation = &this_transformation;
   }
 
   void
@@ -175,8 +175,8 @@ namespace SLEPcWrappers
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
 
                                     // get converged eigenpair
-    int ierr = EPSGetEigenpair(solver_data->eps, index,
-			       &kr, PETSC_NULL, vr, PETSC_NULL);
+    int ierr = EPSGetEigenpair (solver_data->eps, index,
+				&kr, PETSC_NULL, vr, PETSC_NULL);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -193,8 +193,9 @@ namespace SLEPcWrappers
   EPS *
   SolverBase::get_EPS ()
   {
-    if( solver_data.get() == 0 )
+    if (solver_data.get() == 0)
       return NULL;
+
     return &solver_data->eps;
   }
 
@@ -321,8 +322,8 @@ namespace SLEPcWrappers
                                     // number of iteration steps to
                                     // the SLEPc convergence
                                     // criterion.
-    ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
-			    this->solver_control.max_steps());
+    ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
+			     this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -348,8 +349,8 @@ namespace SLEPcWrappers
                                     // number of iteration steps to
                                     // the SLEPc convergence
                                     // criterion.
-    ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
-			    this->solver_control.max_steps());
+    ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
+			     this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -368,7 +369,7 @@ namespace SLEPcWrappers
   SolverDavidson::set_solver_type (EPS &eps) const
   {
     int ierr;
-    ierr = EPSSetType (eps, const_cast<char *>(EPSDAVIDSON));
+    ierr = EPSSetType (eps, const_cast<char *>(EPSGD));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
                                     // hand over the absolute
@@ -376,8 +377,8 @@ namespace SLEPcWrappers
                                     // number of iteration steps to
                                     // the SLEPc convergence
                                     // criterion.
-    ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
-			    this->solver_control.max_steps());
+    ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
+			     this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 #endif

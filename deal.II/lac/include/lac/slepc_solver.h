@@ -206,14 +206,14 @@ namespace SLEPcWrappers
                                     */
       void
 	set_initial_vector 
-	(const PETScWrappers::VectorBase &set_initial_vector);
+	(const PETScWrappers::VectorBase &this_initial_vector);
 
                                    /**
 				    * Set the spectral transformation
 				    * to be used.
                                     */
       void
-	set_transformation (SLEPcWrappers::TransformationBase &set_transformation);
+	set_transformation (SLEPcWrappers::TransformationBase &this_transformation);
 
                                    /**
 				    * Indicate which part of the
