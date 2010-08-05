@@ -4204,7 +4204,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 				   // d=1..3 dimensions
   out << "<Piece NumberOfPoints=\"" << n_nodes <<"\" NumberOfCells=\"" << n_cells << "\" > \n";
   out << "  <Points> \n";
-  out << "    <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"ascii\"> \n";
+  out << "    <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\"> \n";
   write_nodes(patches, vtu_out);
   out << "    </DataArray> \n";
   out << "  </Points> \n \n";
@@ -4284,7 +4284,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 				       // component names with double
 				       // underscores unless a vector
 				       // name has been specified
-      out << "    <DataArray type=\"Float32\" Name=\"";
+      out << "    <DataArray type=\"Float64\" Name=\"";
       
       if (std_cxx1x::get<2>(vector_data_ranges[n_th_vector]) != "")
 			out << std_cxx1x::get<2>(vector_data_ranges[n_th_vector]);
@@ -4342,13 +4342,13 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     if (data_set_written[data_set] == false)
       {
-	out << "    <DataArray type=\"Float32\" Name=\""
+	out << "    <DataArray type=\"Float64\" Name=\""
 	    << data_names[data_set]
 	    << "\" format=\"ascii\"> \n";
 	    
 	std::copy (data_vectors[data_set].begin(),
 		   data_vectors[data_set].end(),
-		   std::ostream_iterator<double>(out, " "));
+		   std::ostream_iterator<double>(out, "\n"));
 	out << '\n';
 	out << "    </DataArray> \n";
       }
@@ -4593,6 +4593,7 @@ void DataOutInterface<dim,spacedim>::write_vtu (std::ostream &out) const
 }
 
 
+
 template <int dim, int spacedim>
 void
 DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
@@ -4653,7 +4654,7 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
 				       // component names with double
 				       // underscores unless a vector
 				       // name has been specified
-      out << "    <PDataArray type=\"Float32\" Name=\"";
+      out << "    <PDataArray type=\"Float64\" Name=\"";
 		
       if (std_cxx1x::get<2>(vector_data_ranges[n_th_vector]) != "")
 	out << std_cxx1x::get<2>(vector_data_ranges[n_th_vector]);
@@ -4672,7 +4673,7 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     if (data_set_written[data_set] == false)
       {
-	out << "    <PDataArray type=\"Float32\" Name=\""
+	out << "    <PDataArray type=\"Float64\" Name=\""
 	    << data_names[data_set]
 	    << "\" format=\"ascii\"/> \n";
       }  
@@ -4680,7 +4681,7 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
   out << "    </PPointData> \n";
 
   out << "    <PPoints> \n";
-  out << "      <PDataArray type=\"Float32\" NumberOfComponents=\"3\"/> \n";
+  out << "      <PDataArray type=\"Float64\" NumberOfComponents=\"3\"/> \n";
   out << "    </PPoints> \n";
 	
   for(unsigned int i=0; i<piece_names.size(); ++i)		

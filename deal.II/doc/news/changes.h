@@ -164,6 +164,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li><p> Changed: The DataOutBase::write_vtu function now writes data
+  as 64-bit values, rather than 32-bit values.
+  <br>
+  (Scott Miller 2010/08/5)
+  </p>
+
   <li><p> New: MappingQ and MappingQEulerian now support order > 1 also in 
   codimension one. Step-34 has been modified to show how this works.
   <br>
