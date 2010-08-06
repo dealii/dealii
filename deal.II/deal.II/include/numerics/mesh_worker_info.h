@@ -15,7 +15,7 @@
 
 #include <base/config.h>
 #include <base/quadrature_lib.h>
-#include <boost/shared_ptr.hpp>
+#include <base/std_cxx1x/shared_ptr.h>
 #include <dofs/block_info.h>
 #include <fe/fe_values.h>
 #include <numerics/mesh_worker.h>
@@ -312,7 +312,7 @@ namespace MeshWorker
   {
     private:
 				       /// vector of FEValues objects
-      std::vector<boost::shared_ptr<FEValuesBase<dim, spacedim> > > fevalv;
+      std::vector<std_cxx1x::shared_ptr<FEValuesBase<dim, spacedim> > > fevalv;
     public:
       static const unsigned int dimension = dim;
       static const unsigned int space_dimension = spacedim;
@@ -374,7 +374,7 @@ namespace MeshWorker
 					* vector and cache the
 					* selector.
 					*/
-      void initialize_data(const boost::shared_ptr<VectorDataBase<dim,spacedim> > &data);
+      void initialize_data(const std_cxx1x::shared_ptr<VectorDataBase<dim,spacedim> > &data);
 
 				       /**
 					* Delete the data created by initialize().
@@ -476,7 +476,7 @@ namespace MeshWorker
 					* values in quadrature
 					* points.
 					*/
-      boost::shared_ptr<VectorDataBase<dim, spacedim> > global_data;
+      std_cxx1x::shared_ptr<VectorDataBase<dim, spacedim> > global_data;
 
     private:
 				       /**
@@ -701,9 +701,9 @@ namespace MeshWorker
 					*/
       MeshWorker::VectorSelector face_selector;
 
-      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
-      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
-      boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
+      std_cxx1x::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
+      std_cxx1x::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
+      std_cxx1x::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
 				       /* @} */
 
 				       /**
@@ -950,7 +950,7 @@ namespace MeshWorker
 		  :
 		  fevalv(0),
 		  multigrid(false),
-		  global_data(boost::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>))
+		  global_data(std_cxx1x::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>))
   {}
 
 
@@ -974,15 +974,15 @@ namespace MeshWorker
 	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
 
 	if (pc != 0)
-	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
 	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
 	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
 				      pc->get_quadrature(), pc->get_update_flags())));
 	else if (pf != 0)
-	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
 	    new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
 	else if (ps != 0)
-	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
 	    new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags()));
 	else
 	  Assert(false, ExcInternalError());
@@ -1013,7 +1013,7 @@ namespace MeshWorker
 	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
 
 	if (pc != 0)
-	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
 	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
 	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
 				      pc->get_quadrature(), pc->get_update_flags())));
@@ -1056,7 +1056,7 @@ namespace MeshWorker
 	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
 
 	if (pc != 0)
-	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	  fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
 	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
 	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
 				      pc->get_quadrature(), pc->get_update_flags())));
@@ -1090,7 +1090,7 @@ namespace MeshWorker
     if (block_info == 0 || block_info->local().size() == 0)
       {
 	fevalv.resize(1);
-	fevalv[0] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	fevalv[0] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
 	  new FEVALUES (mapping, el, quadrature, flags));
       }
     else
@@ -1098,7 +1098,7 @@ namespace MeshWorker
 	fevalv.resize(el.n_base_elements());
 	for (unsigned int i=0;i<fevalv.size();++i)
 	  {
-	    fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	    fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
 	      new FEVALUES (mapping, el.base_element(i), quadrature, flags));
 	  }
       }
@@ -1291,19 +1291,19 @@ namespace MeshWorker
     const BlockInfo* block_info)
   {
     initialize(el, mapping, block_info);
-    boost::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
+    std_cxx1x::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
 
-    p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (cell_selector));
+    p = std_cxx1x::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (cell_selector));
     p->initialize(data);
     cell_data = p;
     cell.initialize_data(p);
 
-    p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (boundary_selector));
+    p = std_cxx1x::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (boundary_selector));
     p->initialize(data);
     boundary_data = p;
     boundary.initialize_data(p);
 
-    p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (face_selector));
+    p = std_cxx1x::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (face_selector));
     p->initialize(data);
     face_data = p;
     face.initialize_data(p);
@@ -1322,19 +1322,19 @@ namespace MeshWorker
     const BlockInfo* block_info)
   {
     initialize(el, mapping, block_info);
-    boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> > p;
+    std_cxx1x::shared_ptr<MGVectorData<VECTOR, dim, sdim> > p;
 
-    p = boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (cell_selector));
+    p = std_cxx1x::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (cell_selector));
     p->initialize(data);
     cell_data = p;
     cell.initialize_data(p);
 
-    p = boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (boundary_selector));
+    p = std_cxx1x::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (boundary_selector));
     p->initialize(data);
     boundary_data = p;
     boundary.initialize_data(p);
 
-    p = boost::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (face_selector));
+    p = std_cxx1x::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (face_selector));
     p->initialize(data);
     face_data = p;
     face.initialize_data(p);

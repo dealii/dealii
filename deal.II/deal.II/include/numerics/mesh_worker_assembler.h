@@ -873,7 +873,7 @@ namespace MeshWorker
     {
       public:
 					 /// The object that is stored
-	typedef boost::shared_ptr<MatrixBlock<MGLevelObject<MATRIX> > > MatrixPtr;
+	typedef std_cxx1x::shared_ptr<MatrixBlock<MGLevelObject<MATRIX> > > MatrixPtr;
 
 					 /**
 					  * Constructor, initializing
