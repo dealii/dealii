@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,8 +22,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#if deal_II_dimension > 1
-
 namespace MeshWorker
 {
   template class VectorDataBase<deal_II_dimension>;
@@ -31,6 +29,6 @@ namespace MeshWorker
 #include "mesh_worker_vector_selector.inst"
 }
 
-#endif
+
 
 DEAL_II_NAMESPACE_CLOSE

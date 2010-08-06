@@ -14,6 +14,7 @@
 #define __deal2__mesh_worker_info_h
 
 #include <base/config.h>
+#include <base/quadrature_lib.h>
 #include <boost/shared_ptr.hpp>
 #include <dofs/block_info.h>
 #include <fe/fe_values.h>
@@ -944,6 +945,139 @@ namespace MeshWorker
 //----------------------------------------------------------------------//
 
   template<int dim, int sdim>
+  inline
+  IntegrationInfo<dim,sdim>::IntegrationInfo()
+		  :
+		  fevalv(0),
+		  multigrid(false),
+		  global_data(boost::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>))
+  {}
+
+
+  template<int dim, int sdim>
+  inline
+  IntegrationInfo<dim,sdim>::IntegrationInfo(const IntegrationInfo<dim,sdim>& other)
+		  :
+		  multigrid(other.multigrid),
+		  values(other.values),
+		  gradients(other.gradients),
+		  hessians(other.hessians),
+		  global_data(other.global_data),
+		  n_components(other.n_components)
+  {
+    fevalv.resize(other.fevalv.size());
+    for (unsigned int i=0;i<other.fevalv.size();++i)
+      {
+	const FEValuesBase<dim,sdim>& p = *other.fevalv[i];
+	const FEValues<dim,sdim>* pc = dynamic_cast<const FEValues<dim,sdim>*>(&p);
+	const FEFaceValues<dim,sdim>* pf = dynamic_cast<const FEFaceValues<dim,sdim>*>(&p);
+	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
+
+	if (pc != 0)
+	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
+	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
+				      pc->get_quadrature(), pc->get_update_flags())));
+	else if (pf != 0)
+	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	    new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
+	else if (ps != 0)
+	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	    new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags()));
+	else
+	  Assert(false, ExcInternalError());
+      }
+  }
+
+
+  template <>
+  inline
+  IntegrationInfo<1,1>::IntegrationInfo(const IntegrationInfo<1,1>& other)
+		  :
+		  multigrid(other.multigrid),
+		  values(other.values),
+		  gradients(other.gradients),
+		  hessians(other.hessians),
+		  global_data(other.global_data),
+		  n_components(other.n_components)
+  {
+    const int dim = 1;
+    const int sdim = 1;
+
+    fevalv.resize(other.fevalv.size());
+    for (unsigned int i=0;i<other.fevalv.size();++i)
+      {
+	const FEValuesBase<dim,sdim>& p = *other.fevalv[i];
+	const FEValues<dim,sdim>* pc = dynamic_cast<const FEValues<dim,sdim>*>(&p);
+	const FEFaceValues<dim,sdim>* pf = dynamic_cast<const FEFaceValues<dim,sdim>*>(&p);
+	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
+
+	if (pc != 0)
+	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
+	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
+				      pc->get_quadrature(), pc->get_update_flags())));
+	else if (pf != 0)
+	  {
+	    Assert (false, ExcImpossibleInDim(1));
+	    fevalv[i].reset ();
+	  }
+	else if (ps != 0)
+	  {
+	    Assert (false, ExcImpossibleInDim(1));
+	    fevalv[i].reset();
+	  }
+	else
+	  Assert(false, ExcInternalError());
+      }
+  }
+
+
+  template <>
+  inline
+  IntegrationInfo<1,2>::IntegrationInfo(const IntegrationInfo<1,2>& other)
+		  :
+		  multigrid(other.multigrid),
+		  values(other.values),
+		  gradients(other.gradients),
+		  hessians(other.hessians),
+		  global_data(other.global_data),
+		  n_components(other.n_components)
+  {
+    const int dim = 1;
+    const int sdim = 2;
+
+    fevalv.resize(other.fevalv.size());
+    for (unsigned int i=0;i<other.fevalv.size();++i)
+      {
+	const FEValuesBase<dim,sdim>& p = *other.fevalv[i];
+	const FEValues<dim,sdim>* pc = dynamic_cast<const FEValues<dim,sdim>*>(&p);
+	const FEFaceValues<dim,sdim>* pf = dynamic_cast<const FEFaceValues<dim,sdim>*>(&p);
+	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
+
+	if (pc != 0)
+	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
+	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
+	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
+				      pc->get_quadrature(), pc->get_update_flags())));
+	else if (pf != 0)
+	  {
+	    Assert (false, ExcImpossibleInDim(1));
+	    fevalv[i].reset();
+	  }
+	else if (ps != 0)
+	  {
+	    Assert (false, ExcImpossibleInDim(1));
+	    fevalv[i].reset();
+	  }
+	else
+	  Assert(false, ExcInternalError());
+      }
+  }
+
+
+
+  template<int dim, int sdim>
   template <class FEVALUES>
   inline void
   IntegrationInfo<dim,sdim>::initialize(
@@ -1012,7 +1146,7 @@ namespace MeshWorker
 	else
 	  {
 					     // This is a cell
-	    FEValues<dim>& fe = dynamic_cast<FEValues<dim>&> (febase);
+	    FEValues<dim,spacedim>& fe = dynamic_cast<FEValues<dim,spacedim>&> (febase);
 	    fe.reinit(info.cell);
 	  }
       }
@@ -1020,6 +1154,128 @@ namespace MeshWorker
     const bool split_fevalues = info.block_info != 0;
     if (!global_data->empty())
       fill_local_data(info, split_fevalues);
+  }
+
+
+  template <>
+  inline void
+  IntegrationInfo<1,1>::reinit(const DoFInfo<1,1>& info)
+  {
+    const int dim = 1;
+    const int spacedim = 1;
+
+    for (unsigned int i=0;i<fevalv.size();++i)
+      {
+	FEValuesBase<dim, spacedim>& febase = *fevalv[i];
+	if (info.sub_number != deal_II_numbers::invalid_unsigned_int)
+	  {
+					     // This is a subface
+	    Assert (false, ExcImpossibleInDim(1));
+	  }
+	else if (info.face_number != deal_II_numbers::invalid_unsigned_int)
+	  {
+					     // This is a face
+	    Assert (false, ExcImpossibleInDim(1));
+	  }
+	else
+	  {
+					     // This is a cell
+	    FEValues<dim,spacedim>& fe = dynamic_cast<FEValues<dim,spacedim>&> (febase);
+	    fe.reinit(info.cell);
+	  }
+      }
+
+    const bool split_fevalues = info.block_info != 0;
+    if (!global_data->empty())
+      fill_local_data(info, split_fevalues);
+  }
+
+
+  template <>
+  inline void
+  IntegrationInfo<1,2>::reinit(const DoFInfo<1,2>& info)
+  {
+    const int dim = 1;
+    const int spacedim = 2;
+
+    for (unsigned int i=0;i<fevalv.size();++i)
+      {
+	FEValuesBase<dim, spacedim>& febase = *fevalv[i];
+	if (info.sub_number != deal_II_numbers::invalid_unsigned_int)
+	  {
+					     // This is a subface
+	    Assert (false, ExcImpossibleInDim(1));
+	  }
+	else if (info.face_number != deal_II_numbers::invalid_unsigned_int)
+	  {
+					     // This is a face
+	    Assert (false, ExcImpossibleInDim(1));
+	  }
+	else
+	  {
+					     // This is a cell
+	    FEValues<dim,spacedim>& fe = dynamic_cast<FEValues<dim,spacedim>&> (febase);
+	    fe.reinit(info.cell);
+	  }
+      }
+
+    const bool split_fevalues = info.block_info != 0;
+    if (!global_data->empty())
+      fill_local_data(info, split_fevalues);
+  }
+
+
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::
+  initialize(const FiniteElement<dim,sdim>& el,
+	     const Mapping<dim,sdim>& mapping,
+	     const BlockInfo* block_info)
+  {
+    cell.template initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
+						  cell_flags, block_info);
+    boundary.template initialize<FEFaceValues<dim,sdim> >(el, mapping, boundary_quadrature,
+							  boundary_flags, block_info);
+    face.template initialize<FEFaceValues<dim,sdim> >(el, mapping, face_quadrature,
+						      face_flags, block_info);
+    subface.template initialize<FESubfaceValues<dim,sdim> >(el, mapping, face_quadrature,
+							    face_flags, block_info);
+    neighbor.template initialize<FEFaceValues<dim,sdim> >(el, mapping, face_quadrature,
+							  neighbor_flags, block_info);
+  }
+
+
+  template <>
+  inline
+  void
+  IntegrationInfoBox<1,1>::
+  initialize(const FiniteElement<1,1>& el,
+	     const Mapping<1,1>& mapping,
+	     const BlockInfo* block_info)
+  {
+    const int dim = 1;
+    const int sdim = 1;
+
+    cell.initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
+					 cell_flags, block_info);
+  }
+
+
+
+  template <>
+  inline
+  void
+  IntegrationInfoBox<1,2>::
+  initialize(const FiniteElement<1,2>& el,
+	     const Mapping<1,2>& mapping,
+	     const BlockInfo* block_info)
+  {
+    const int dim = 1;
+    const int sdim = 2;
+
+    cell.initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
+					 cell_flags, block_info);
   }
 
 
@@ -1099,6 +1355,44 @@ namespace MeshWorker
   void
   IntegrationInfoBox<dim,sdim>::post_faces(const DoFInfoBox<dim, DOFINFO>&)
   {}
+
+
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::initialize_gauss_quadrature(
+    unsigned int cp,
+    unsigned int bp,
+    unsigned int fp)
+  {
+    cell_quadrature = QGauss<dim>(cp);
+    boundary_quadrature = QGauss<dim-1>(bp);
+    face_quadrature = QGauss<dim-1>(fp);
+  }
+
+
+  template <>
+  inline
+  void
+  IntegrationInfoBox<1,1>::initialize_gauss_quadrature(
+    unsigned int cp,
+    unsigned int bp,
+    unsigned int fp)
+  {
+    cell_quadrature = QGauss<1>(cp);
+  }
+
+
+  template <>
+  inline
+  void
+  IntegrationInfoBox<1,2>::initialize_gauss_quadrature(
+    unsigned int cp,
+    unsigned int bp,
+    unsigned int fp)
+  {
+    cell_quadrature = QGauss<1>(cp);
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE

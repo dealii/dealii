@@ -77,50 +77,6 @@ namespace MeshWorker
 //----------------------------------------------------------------------//
 
   template<int dim, int sdim>
-  IntegrationInfo<dim,sdim>::IntegrationInfo()
-		  :
-		  fevalv(0),
-		  multigrid(false),
-		  global_data(boost::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>))
-  {}
-
-
-  template<int dim, int sdim>
-  IntegrationInfo<dim,sdim>::IntegrationInfo(const IntegrationInfo<dim,sdim>& other)
-		  :
-		  multigrid(other.multigrid),
-		  values(other.values),
-		  gradients(other.gradients),
-		  hessians(other.hessians),
-		  global_data(other.global_data),
-		  n_components(other.n_components)
-  {
-    fevalv.resize(other.fevalv.size());
-    for (unsigned int i=0;i<other.fevalv.size();++i)
-      {
-	const FEValuesBase<dim,sdim>& p = *other.fevalv[i];
-	const FEValues<dim,sdim>* pc = dynamic_cast<const FEValues<dim,sdim>*>(&p);
-	const FEFaceValues<dim,sdim>* pf = dynamic_cast<const FEFaceValues<dim,sdim>*>(&p);
-	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
-
-	if (pc != 0)
-	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
-	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
-	      new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
-				      pc->get_quadrature(), pc->get_update_flags())));
-	else if (pf != 0)
-	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
-	    new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
-	else if (ps != 0)
-	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
-	    new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags()));
-	else
-	  Assert(false, ExcInternalError());
-      }
-  }
-
-
-  template<int dim, int sdim>
   void
   IntegrationInfo<dim,sdim>::initialize_data(
     const boost::shared_ptr<VectorDataBase<dim,sdim> > &data)
@@ -195,7 +151,7 @@ namespace MeshWorker
 	for (unsigned int b=0;b<info.block_info->local().size();++b)
 	  {
 	    const unsigned int fe_no = info.block_info->base_element(b);
-	    const FEValuesBase<dim>& fe = this->fe_values(fe_no);
+	    const FEValuesBase<dim,sdim>& fe = this->fe_values(fe_no);
 	    const unsigned int n_comp = fe.get_fe().n_components();
 	    const unsigned int block_start = info.block_info->local().block_start(b);
 	    const unsigned int block_size = info.block_info->local().block_size(b);
@@ -211,7 +167,7 @@ namespace MeshWorker
        }
      else
        {
-	 const FEValuesBase<dim>& fe = this->fe_values(0);
+	 const FEValuesBase<dim,sdim>& fe = this->fe_values(0);
 	 const unsigned int n_comp = fe.get_fe().n_components();
          if(info.level_cell)
 	 this->global_data->mg_fill(values, gradients, hessians, fe, info.cell->level(), info.indices,
@@ -266,40 +222,6 @@ namespace MeshWorker
     if (boundary) boundary_flags |= flags;
     if (face) face_flags |= flags;
     if (neighbor) neighbor_flags |= flags;
-  }
-
-
-  template <int dim, int sdim>
-  void
-  IntegrationInfoBox<dim,sdim>::initialize_gauss_quadrature(
-    unsigned int cp,
-    unsigned int bp,
-    unsigned int fp)
-  {
-    cell_quadrature = QGauss<dim>(cp);
-    boundary_quadrature = QGauss<dim-1>(bp);
-    face_quadrature = QGauss<dim-1>(fp);
-
-  }
-
-
-  template <int dim, int sdim>
-  void
-  IntegrationInfoBox<dim,sdim>::
-  initialize(const FiniteElement<dim,sdim>& el,
-	     const Mapping<dim,sdim>& mapping,
-	     const BlockInfo* block_info)
-  {
-    cell.template initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
-						  cell_flags, block_info);
-    boundary.template initialize<FEFaceValues<dim,sdim> >(el, mapping, boundary_quadrature,
-							  boundary_flags, block_info);
-    face.template initialize<FEFaceValues<dim,sdim> >(el, mapping, face_quadrature,
-						      face_flags, block_info);
-    subface.template initialize<FESubfaceValues<dim,sdim> >(el, mapping, face_quadrature,
-							    face_flags, block_info);
-    neighbor.template initialize<FEFaceValues<dim,sdim> >(el, mapping, face_quadrature,
-							  neighbor_flags, block_info);
   }
 }
 
