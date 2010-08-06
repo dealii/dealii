@@ -187,13 +187,20 @@ inconvenience this causes.
 <a name="lac"></a>
 <h3>lac</h3>
 
-<ol> <li><p>Fixed: SparseMatrix::precondition_SSOR and
+<ol> 
+  <li><p>Updated: Changes to the <code>SLEPcWrappers</code> to preserve
+  compatibility with SLEPc version 3.1. Main new updated features are
+  new solver classes: (i) Power; and (ii) Generalized Davidson.
+  <br> 
+  (Toby D. Young 2010/08/04) 
+  </p></li>
+
+  <li><p>Fixed: SparseMatrix::precondition_SSOR and
   SparseMatrixEZ::precondition_SSOR had a bug, which made the SSOR
   method inaccurate for relaxation parameters different from unity.
   <br>
   (GK 2010/07/20)
   </p></li>
-
 </ol>
 
 
