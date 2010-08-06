@@ -109,7 +109,7 @@ namespace MeshWorker
 					*/
       template <class DH>
       DoFInfo (const DH& dof_handler);
-      
+
 				       /**
 					* Set the current cell and
 					* fill #indices.
@@ -156,7 +156,7 @@ namespace MeshWorker
 					* DoFInfoBox.
 					*/
       DoFInfo ();
-      
+
       				       /// Fill index vector with active indices
       void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c);
 
@@ -175,7 +175,7 @@ namespace MeshWorker
 					* degrees of freedom per cell.
 					*/
       BlockIndices aux_local_indices;
-      
+
       friend class DoFInfoBox<dim, DoFInfo<dim, spacedim, number> >;
   };
 
@@ -207,7 +207,7 @@ namespace MeshWorker
 					* in the other constructor.
 					*/
       DoFInfoBox(const DoFInfoBox<dim, DOFINFO>&);
-      
+
 				       /**
 					* Reset all the availability flags.
 					*/
@@ -224,8 +224,8 @@ namespace MeshWorker
 					*/
       template <class ASSEMBLER>
       void assemble(ASSEMBLER& ass) const;
-      
-      
+
+
 				       /**
 					* The data for the cell.
 					*/
@@ -254,7 +254,7 @@ namespace MeshWorker
   };
 
 
-  
+
 
 /**
  * Class for objects handed to local integration functions.
@@ -315,19 +315,19 @@ namespace MeshWorker
     public:
       static const unsigned int dimension = dim;
       static const unsigned int space_dimension = spacedim;
-      
+
 				       /**
 					* Constructor.
 					*/
       IntegrationInfo();
-      
+
 				       /**
 					* Copy constructor, creating a
 					* clone to be used by
 					* WorksTream::run().
 					*/
       IntegrationInfo(const IntegrationInfo<dim, spacedim>& other);
-      
+
 				       /**
 					* Build all internal
 					* structures, in particular
@@ -373,7 +373,7 @@ namespace MeshWorker
 					* vector and cache the
 					* selector.
 					*/
-      void initialize_data(const boost::shared_ptr<VectorDataBase<dim,spacedim> > data);
+      void initialize_data(const boost::shared_ptr<VectorDataBase<dim,spacedim> > &data);
 
 				       /**
 					* Delete the data created by initialize().
@@ -458,7 +458,7 @@ namespace MeshWorker
 					* structures for use on a cell.
 					*/
       void reinit(const DoFInfo<dim, spacedim>& i);
-      
+
 				       /**
 					* Use the finite element
 					* functions in #global_data
@@ -505,7 +505,7 @@ namespace MeshWorker
  *
  * <ol>
  * <li> It provides the interface needed by MeshWorker::loop(), namely
- * the two functions post_cell() and post_faces(), as well as 
+ * the two functions post_cell() and post_faces(), as well as
  * the data members #cell, #boundary, #face,
  * #subface, and #neighbor.
  *
@@ -650,7 +650,7 @@ namespace MeshWorker
 					*/
       Quadrature<dim-1> face_quadrature;
 				       /* @} */
-      
+
 				       /**
 					* @name Data vectors
 					*/
@@ -699,7 +699,7 @@ namespace MeshWorker
 					* interior faces.
 					*/
       MeshWorker::VectorSelector face_selector;
-      
+
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > cell_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > boundary_data;
       boost::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim> > face_data;
@@ -743,7 +743,7 @@ namespace MeshWorker
 					*/
       template <class DOFINFO>
       void post_cell(const DoFInfoBox<dim, DOFINFO>&);
-      
+
 				       /**
 					* A callback function which is
 					* called in the loop over all
@@ -776,7 +776,7 @@ namespace MeshWorker
 					*/
       template <class DOFINFO>
       void post_faces(const DoFInfoBox<dim, DOFINFO>&);
-      
+
 /// The info object for a cell
       CellInfo cell;
 /// The info object for a boundary face
@@ -873,7 +873,7 @@ namespace MeshWorker
   }
 
 //----------------------------------------------------------------------//
-  
+
   template <int dim, class DOFINFO>
   inline
   DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DOFINFO& seed)
@@ -917,7 +917,7 @@ namespace MeshWorker
       }
   }
 
-  
+
   template <int dim, class DOFINFO>
   template <class ASSEMBLER>
   inline void
@@ -939,7 +939,7 @@ namespace MeshWorker
 	  }
       }
   }
-  
+
 
 //----------------------------------------------------------------------//
 
@@ -955,7 +955,7 @@ namespace MeshWorker
   {
     if (block_info == 0 || block_info->local().size() == 0)
       {
-	fevalv.resize(1);	      
+	fevalv.resize(1);
 	fevalv[0] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	  new FEVALUES (mapping, el, quadrature, flags));
       }
@@ -970,7 +970,7 @@ namespace MeshWorker
       }
     n_components = el.n_components();
   }
-  
+
 
   template <int dim, int spacedim>
   inline const FEValuesBase<dim, spacedim>&
@@ -1007,7 +1007,7 @@ namespace MeshWorker
 	  {
 					     // This is a face
 	    FEFaceValues<dim>& fe = dynamic_cast<FEFaceValues<dim>&> (febase);
-	    fe.reinit(info.cell, info.face_number);    
+	    fe.reinit(info.cell, info.face_number);
 	  }
 	else
 	  {
@@ -1041,7 +1041,7 @@ namespace MeshWorker
     p->initialize(data);
     cell_data = p;
     cell.initialize_data(p);
-    
+
     p = boost::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (boundary_selector));
     p->initialize(data);
     boundary_data = p;
@@ -1085,15 +1085,15 @@ namespace MeshWorker
     subface.initialize_data(p);
     neighbor.initialize_data(p);
   }
-  
-  
+
+
   template <int dim, int sdim>
   template <class DOFINFO>
   void
   IntegrationInfoBox<dim,sdim>::post_cell(const DoFInfoBox<dim, DOFINFO>&)
   {}
-  
-  
+
+
   template <int dim, int sdim>
   template <class DOFINFO>
   void

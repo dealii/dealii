@@ -38,7 +38,7 @@ namespace MeshWorker
     if (!c->has_children())
       {
 	indices.resize(c->get_fe().dofs_per_cell);
-	
+
 	if (block_info == 0 || block_info->local().size() == 0)
 	  c->get_dof_indices(indices);
 	else
@@ -61,7 +61,7 @@ namespace MeshWorker
   DoFInfo<dim,spacedim,number>::get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c)
   {
     indices.resize(c->get_fe().dofs_per_cell);
-  
+
     if (block_info == 0 || block_info->local().size() == 0)
       c->get_mg_dof_indices(indices);
     else
@@ -84,7 +84,7 @@ namespace MeshWorker
 		  global_data(boost::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>))
   {}
 
-  
+
   template<int dim, int sdim>
   IntegrationInfo<dim,sdim>::IntegrationInfo(const IntegrationInfo<dim,sdim>& other)
 		  :
@@ -102,7 +102,7 @@ namespace MeshWorker
 	const FEValues<dim,sdim>* pc = dynamic_cast<const FEValues<dim,sdim>*>(&p);
 	const FEFaceValues<dim,sdim>* pf = dynamic_cast<const FEFaceValues<dim,sdim>*>(&p);
 	const FESubfaceValues<dim,sdim>* ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
-	
+
 	if (pc != 0)
 	  fevalv[i] = boost::shared_ptr<FEValuesBase<dim,sdim> > (
 	    reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
@@ -118,16 +118,16 @@ namespace MeshWorker
 	  Assert(false, ExcInternalError());
       }
   }
-  
+
 
   template<int dim, int sdim>
   void
   IntegrationInfo<dim,sdim>::initialize_data(
-    const boost::shared_ptr<VectorDataBase<dim,sdim> > data)
+    const boost::shared_ptr<VectorDataBase<dim,sdim> > &data)
   {
     global_data = data;
     const unsigned int nqp = fevalv[0]->n_quadrature_points;
-    
+
     values.resize(global_data->n_values());
 //    deallog << "values: " << values.size() << " [";
 				     // For all selected finite
@@ -145,7 +145,7 @@ namespace MeshWorker
 //	deallog << " }";
       }
 //    deallog << " ]" << std::endl;
-    
+
     gradients.resize(global_data->n_gradients());
 				     // For all selected finite
 				     // element functions
@@ -158,7 +158,7 @@ namespace MeshWorker
 	    gradients[i][j].resize(nqp);
 	  }
       }
-    
+
     hessians.resize(global_data->n_hessians());
 				     // For all selected finite
 				     // element functions
@@ -199,7 +199,7 @@ namespace MeshWorker
 	    const unsigned int n_comp = fe.get_fe().n_components();
 	    const unsigned int block_start = info.block_info->local().block_start(b);
 	    const unsigned int block_size = info.block_info->local().block_size(b);
-	    
+
             if(info.level_cell)
 	    this->global_data->mg_fill(values, gradients, hessians, fe, info.cell->level(), info.indices,
 				    comp, n_comp, block_start, block_size);
@@ -221,11 +221,11 @@ namespace MeshWorker
 				 0, n_comp, 0, info.indices.size());
        }
   }
-  
-  
+
+
 //----------------------------------------------------------------------//
-  
-  
+
+
   template<int dim, int sdim>
   void
   IntegrationInfoBox<dim,sdim>::initialize_update_flags ()
@@ -234,25 +234,25 @@ namespace MeshWorker
     boundary_flags = UpdateFlags(update_JxW_values | update_normal_vectors);
     face_flags = boundary_flags;
     neighbor_flags = update_default;
-    
+
     if (cell_selector.has_values() != 0) cell_flags |= update_values;
     if (cell_selector.has_gradients() != 0) cell_flags |= update_gradients;
     if (cell_selector.has_hessians() != 0) cell_flags |= update_hessians;
-    
+
     if (boundary_selector.has_values() != 0) boundary_flags |= update_values;
     if (boundary_selector.has_gradients() != 0) boundary_flags |= update_gradients;
     if (boundary_selector.has_hessians() != 0) boundary_flags |= update_hessians;
-    
+
     if (face_selector.has_values() != 0) face_flags |= update_values;
     if (face_selector.has_gradients() != 0) face_flags |= update_gradients;
     if (face_selector.has_hessians() != 0) face_flags |= update_hessians;
-    
+
     if (face_selector.has_values() != 0) neighbor_flags |= update_values;
     if (face_selector.has_gradients() != 0) neighbor_flags |= update_gradients;
-    if (face_selector.has_hessians() != 0) neighbor_flags |= update_hessians;  
+    if (face_selector.has_hessians() != 0) neighbor_flags |= update_hessians;
   }
-  
-  
+
+
   template <int dim, int sdim>
   void
   IntegrationInfoBox<dim,sdim>::add_update_flags(
@@ -265,10 +265,10 @@ namespace MeshWorker
     if (cell) cell_flags |= flags;
     if (boundary) boundary_flags |= flags;
     if (face) face_flags |= flags;
-    if (neighbor) neighbor_flags |= flags;  
+    if (neighbor) neighbor_flags |= flags;
   }
-  
-  
+
+
   template <int dim, int sdim>
   void
   IntegrationInfoBox<dim,sdim>::initialize_gauss_quadrature(
@@ -281,8 +281,8 @@ namespace MeshWorker
     face_quadrature = QGauss<dim-1>(fp);
 
   }
-  
-  
+
+
   template <int dim, int sdim>
   void
   IntegrationInfoBox<dim,sdim>::
