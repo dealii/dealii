@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <fstream>
 #include <cmath>
+#include <cstdio>
 #include <stdlib.h>
 
 #include <base/index_set.h>
@@ -45,8 +46,10 @@ void test ()
   is3.read(in2);
 
   Assert(is1 == is3, ExcInternalError());
- 
+
   deallog << "OK" << std::endl;
+
+  std::remove ("index_set_readwrite_01/a.idxset");
 }
 
 
