@@ -5,14 +5,14 @@
 <VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian"> 
   <PUnstructuredGrid GhostLevel="0"> 
     <PPointData Scalars="scalars"> 
-    <PDataArray type="Float32" Name="x1" format="ascii"/> 
-    <PDataArray type="Float32" Name="x2" format="ascii"/> 
-    <PDataArray type="Float32" Name="x3" format="ascii"/> 
-    <PDataArray type="Float32" Name="x4" format="ascii"/> 
-    <PDataArray type="Float32" Name="i" format="ascii"/> 
+    <PDataArray type="Float64" Name="x1" format="ascii"/> 
+    <PDataArray type="Float64" Name="x2" format="ascii"/> 
+    <PDataArray type="Float64" Name="x3" format="ascii"/> 
+    <PDataArray type="Float64" Name="x4" format="ascii"/> 
+    <PDataArray type="Float64" Name="i" format="ascii"/> 
     </PPointData> 
     <PPoints> 
-      <PDataArray type="Float32" NumberOfComponents="3"/> 
+      <PDataArray type="Float64" NumberOfComponents="3"/> 
     </PPoints> 
     <Piece Source="x1"/> 
     <Piece Source="x2"/> 
