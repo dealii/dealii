@@ -160,34 +160,21 @@ make install
 cd trilinos-10.0.2
 mkdir build
 cd build
-cmake \
-          -D CMAKE_BUILD_TYPE:STRING=RELEASE \
-          -D CMAKE_CXX_FLAGS:STRING="-g -O3" \
-          -D CMAKE_C_FLAGS:STRING="-g -O3" \
-          -D CMAKE_FORTRAN_FLAGS:STRING="-g -O5" \
-          -D Trilinos_ENABLE_DEFAULT_PACKAGES:BOOL=OFF \
-          -D Trilinos_ENABLE_Epetra:BOOL=ON \
-          -D Trilinos_ENABLE_ML:BOOL=ON \
-          -D Trilinos_ENABLE_Ifpack:BOOL=ON \
-          -D Trilinos_ENABLE_AztecOO:BOOL=ON \
-          -D Trilinos_ENABLE_Amesos:BOOL=ON \
-          -D Trilinos_ENABLE_Teuchos:BOOL=ON \
-          -D Trilinos_ENABLE_Sacado:BOOL=ON \
-          -D Trilinos_ENABLE_Thyra:BOOL=ON \
-          -D Trilinos_ENABLE_Didasko:BOOL=ON \
-          -D Trilinos_ENABLE_Stratimikos:BOOL=ON \
-          -D Trilinos_ENABLE_Belos:BOOL=ON \
-          -D Trilinos_ENABLE_EpetraExt:BOOL=ON \
-          -D Trilinos_ENABLE_Kokkos:BOOL=ON \
-          -D Trilinos_ENABLE_TESTS:BOOL=OFF \
-          -D Trilinos_ENABLE_EXAMPLES:BOOL=OFF \
-          -D TPL_ENABLE_MPI:BOOL=OFF \
-          -D Trilinos_EXTRA_LINK_FLAGS:STRING="-lgfortran" \
-          -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE       \
-          -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE   \
-          -D BUILD_SHARED_LIBS:BOOL=ON \
-          -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/x86_64/trilinos-10.0.2 \
-          `pwd`/../
+
+cmake -D Trilinos_ENABLE_OPTIONAL_PACKAGES:BOOL=ON \
+      -D Trilinos_ENABLE_Sacado:BOOL=ON \
+      -D Trilinos_ENABLE_Stratimikos:BOOL=ON \
+      -D CMAKE_BUILD_TYPE:STRING=RELEASE \
+      -D CMAKE_CXX_FLAGS:STRING="-g -O3" \
+      -D CMAKE_C_FLAGS:STRING="-g -O3" \
+      -D CMAKE_FORTRAN_FLAGS:STRING="-g -O5" \
+      -D Trilinos_EXTRA_LINK_FLAGS:STRING="-lgfortran" \
+      -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE \
+      -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE \
+      -D TPL_ENABLE_MPI:BOOL=OFF \
+      -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/x86_64/trilinos-10.4.0 \
+      -D BUILD_SHARED_LIBS:BOOL=ON `pwd`/..
+
 make
 make install
       </pre>
