@@ -90,7 +90,7 @@ QGauss<1>::QGauss (const unsigned int n)
 				   // double exists and is described
 				   // by std::numeric_limits, we may
 				   // not actually get the additional
-				   // precission. One case where this
+				   // precision. One case where this
 				   // happens is on x86, where one can
 				   // set hardware flags that disable
 				   // long double precision even for
@@ -104,7 +104,7 @@ QGauss<1>::QGauss (const unsigned int n)
                                    // a similar situation exists, btw,
                                    // when running programs under
                                    // valgrind up to and including at
-                                   // least version 3.1: valgrind's
+                                   // least version 3.3: valgrind's
                                    // emulator only supports 64 bit
                                    // arithmetic, even for 80 bit long
                                    // doubles.
@@ -1034,21 +1034,21 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   origins.push_back(Point<2>(singularity[0],0.));
   origins.push_back(Point<2>(0.,singularity[1]));
   origins.push_back(singularity);
-  
+
 				   // Lexycographical ordering.
-      
+
   double eps = 1e-8;
   unsigned int q_id = 0; // Current quad point index.
   double area = 0;
   Point<2> dist;
 
-  for(unsigned int box=0; box<4; ++box) 
+  for(unsigned int box=0; box<4; ++box)
     {
       dist = (singularity-GeometryInfo<2>::unit_cell_vertex(box));
-      dist = Point<2>(std::abs(dist[0]), std::abs(dist[1]));      
+      dist = Point<2>(std::abs(dist[0]), std::abs(dist[1]));
       area = dist[0]*dist[1];
-      if(area > eps) 
-	for(unsigned int q=0; q<quads[box].size(); ++q, ++q_id) 
+      if(area > eps)
+	for(unsigned int q=0; q<quads[box].size(); ++q, ++q_id)
 	  {
 	    const Point<2> &qp = quads[box].point(q);
 	    this->quadrature_points[q_id] =

@@ -64,10 +64,10 @@ class QGauss : public Quadrature<dim>
  *       the Gauss-Lobatto-Legendre quadrature (<i>alpha = beta = 0</i>)
  *       is a special case.
  *
- * @sa http://en.wikipedia.org/wiki/Handbook_of_Mathematical_Functions 
+ * @sa http://en.wikipedia.org/wiki/Handbook_of_Mathematical_Functions
  * @sa Karniadakis, G.E. and Sherwin, S.J.:
- *     Spectral/hp element methods for computational fluid dynamics. 
- *     Oxford: Oxford University Press, 2005 
+ *     Spectral/hp element methods for computational fluid dynamics.
+ *     Oxford: Oxford University Press, 2005
  *
  * @author Guido Kanschat, 2005, 2006; F. Prill, 2006
  */
@@ -113,7 +113,7 @@ class QGaussLobatto : public Quadrature<dim>
     compute_quadrature_weights (const std::vector<long double> &x,
 				const int alpha,
 				const int beta) const;
-    
+
 				     /**
 				      * Evaluate a Jacobi polynomial
 				      * $ P^{\alpha, \beta}_n(x) $
@@ -131,13 +131,13 @@ class QGaussLobatto : public Quadrature<dim>
 
     				     /**
 				      * Evaluate the Gamma function
-				      * $ \Gamma(n) = (n-1)! $. 
+				      * $ \Gamma(n) = (n-1)! $.
 				      * @param n  point of evaluation (integer).
 				      */
     long double gamma(const unsigned int n) const;
 };
 
-  
+
 
 /**
  * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
@@ -263,7 +263,7 @@ class QMidpoint : public Quadrature<dim>
 
 
 /**
- * Simpson quadrature rule, exact for polynomials of degree 3. 
+ * Simpson quadrature rule, exact for polynomials of degree 3.
  */
 template <int dim>
 class QSimpson : public Quadrature<dim>
@@ -329,20 +329,20 @@ class QGaussLog : public Quadrature<dim>
   public:
 				   /**
 				    * Generate a formula with
-				    * <tt>n</tt> quadrature points 
+				    * <tt>n</tt> quadrature points
 				    */
   QGaussLog(const unsigned int n,
             const bool revert=false);
-   
-  protected: 
-                                    /**  
+
+  protected:
+                                    /**
 				     * Sets the points of the
 				     * quadrature formula.
 				     */
   std::vector<double>
   set_quadrature_points(const unsigned int n) const;
 
-                                    /**  
+                                    /**
 				     * Sets the weights of the
 				     * quadrature formula.
 				     */
@@ -375,7 +375,7 @@ class QGaussLog : public Quadrature<dim>
  * alpha is 1, then this quadrature is the same as QGaussLog.
  *
  * The last argument from the constructor allows you to use this
- * quadrature rule in one of two possible ways: 
+ * quadrature rule in one of two possible ways:
  * \f[
  * \int_0^1 g(x) dx =
  * \int_0^1 f(x) \ln\left(\frac{|x-x_0|}{\alpha}\right) dx
@@ -413,8 +413,8 @@ class QGaussLogR : public Quadrature<dim>
 				      * it is factored out, to be included in
 				      * the integrand.
 				      */
-    QGaussLogR(const unsigned int n, 
-	       const Point<dim> x0 = Point<dim>(), 
+    QGaussLogR(const unsigned int n,
+	       const Point<dim> x0 = Point<dim>(),
 	       const double alpha = 1,
 	       const bool factor_out_singular_weight=false);
 
@@ -434,7 +434,7 @@ class QGaussLogR : public Quadrature<dim>
  * element $[0,1]^2$, where $f$ is a smooth function without
  * singularities, and $R$ is the distance from the point $x$ to the vertex
  * $\xi$, given at construction time by specifying its index. Notice that
- * this distance is evaluated in the reference element. 
+ * this distance is evaluated in the reference element.
  *
  * This quadrature formula is obtained from two QGauss quadrature
  * formulas, upon transforming them into polar coordinate system
@@ -450,7 +450,7 @@ class QGaussLogR : public Quadrature<dim>
  * Upon construction it is possible to specify wether we want the
  * singularity removed, or not. In other words, this quadrature can be
  * used to integrate $g(x) = 1/R\ f(x)$, or simply $f(x)$, with the $1/R$
- * factor already included in the quadrature weights. 
+ * factor already included in the quadrature weights.
  */
 template<int dim>
 class QGaussOneOverR : public Quadrature<dim>
@@ -490,7 +490,7 @@ class QGaussOneOverR : public Quadrature<dim>
      * }
      * @endcode
      */
-    QGaussOneOverR(const unsigned int n, 
+    QGaussOneOverR(const unsigned int n,
 		   const Point<dim> singularity,
 		   const bool factor_out_singular_weight=false);
     /**
@@ -529,7 +529,7 @@ class QGaussOneOverR : public Quadrature<dim>
      * }
      * @endcode
      */
-    QGaussOneOverR(const unsigned int n, 
+    QGaussOneOverR(const unsigned int n,
 		   const unsigned int vertex_index,
 		   const bool factor_out_singular_weight=false);
   private:
@@ -559,7 +559,7 @@ template <>
 long double QGaussLobatto<1>::
 JacobiP(const long double, const int, const int, const unsigned int) const;
 template <>
-long double 
+long double
 QGaussLobatto<1>::gamma(const unsigned int n) const;
 
 template <> std::vector<double> QGaussLog<1>::set_quadrature_points(const unsigned int) const;
