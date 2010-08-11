@@ -130,25 +130,25 @@ class IndexSet
     unsigned int n_elements () const;
 
 				     /**
-				      * Return the nth index stored in
-				      * this index set. @p n obviously
-				      * needs to be less than
-				      * n_elements().
+				      * Return the global index of the local
+				      * index with number @p local_index
+				      * stored in this index set. @p
+				      * local_index obviously needs to be less
+				      * than n_elements().
 				      */
-    unsigned int nth_index_in_set (const unsigned int n) const;
+    unsigned int nth_index_in_set (const unsigned int local_index) const;
 
 				     /**
-				      * Return the how-manyth element
-				      * of this set (counted in
-				      * ascending order) @p n is. @p n
-				      * needs to be less than the
-				      * size(). This function throws
-				      * an exception if the index @p n
-				      * is not actually a member of
-				      * this index set, i.e. if
-				      * is_element(n) is false.
+				      * Return the how-manyth element of this
+				      * set (counted in ascending order) @p
+				      * global_index is. @p global_index needs
+				      * to be less than the size(). This
+				      * function throws an exception if the
+				      * index @p global_index is not actually
+				      * a member of this index set, i.e. if
+				      * is_element(global_index) is false.
 				      */
-    unsigned int index_within_set (const unsigned int n) const;
+    unsigned int index_within_set (const unsigned int global_index) const;
 
 				     /**
 				      * Each index set can be
@@ -264,8 +264,8 @@ class IndexSet
 				      * write() function.
 				      */
     void read(std::istream & in);
-    
-    
+
+
 #ifdef DEAL_II_USE_TRILINOS
 				     /**
 				      * Given an MPI communicator,
@@ -328,13 +328,17 @@ class IndexSet
 				  const bool      overlapping  = false) const;
 #endif
 
-    
+
 				     /**
                                       * Determine an estimate for the memory
                                       * consumption (in bytes) of this
                                       * object.
 				      */
     unsigned int memory_consumption () const;
+
+    DeclException1 (ExcIndexNotPresent, int,
+		    << "The global index " << arg1
+		    << " is not an element of this set.");
 
   private:
 				     /**
@@ -378,6 +382,13 @@ class IndexSet
 	    return x.end < y.end;
 	  }
 
+        static bool nth_index_compare (const IndexSet::Range & x,
+				       const IndexSet::Range & y)
+          {
+	    return (x.nth_index_in_set+(x.end-x.begin) < 
+		    y.nth_index_in_set+(y.end-y.begin));
+          }
+
 	friend
 	inline bool operator== (const Range &range_1,
 				const Range &range_2)
@@ -391,7 +402,7 @@ class IndexSet
 	  {
 	    return sizeof(Range);
 	  }
-	
+
     };
 
 				     /**
@@ -663,17 +674,23 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 {
   Assert (n < n_elements(), ExcIndexRange (n, 0, n_elements()));
 
-//TODO: this could be done more efficiently by using a binary search
-  for (std::vector<Range>::const_iterator p = ranges.begin();
-       p != ranges.end(); ++p)
+				// find out which chunk the local index n
+				// belongs to by using a binary search. the
+				// comparator is based on the end of the
+				// ranges
+  Range r (0,0);
+  r.nth_index_in_set = n;
+  std::vector<Range>::const_iterator p = std::lower_bound(ranges.begin(),
+							  ranges.end(),
+							  r,
+							  Range::nth_index_compare);
+  if (p != ranges.end())
+    return p->begin + (n-p->nth_index_in_set);
+  else
     {
-      Assert (n >= p->nth_index_in_set, ExcInternalError());
-      if (n < p->nth_index_in_set + (p->end-p->begin))
-	return p->begin + (n-p->nth_index_in_set);
+      Assert (false, ExcInternalError());
+      return numbers::invalid_unsigned_int;
     }
-
-  Assert (false, ExcInternalError());
-  return numbers::invalid_unsigned_int;
 }
 
 
@@ -682,8 +699,7 @@ inline
 unsigned int
 IndexSet::index_within_set (const unsigned int n) const
 {
-  Assert (is_element(n) == true,
-	  ExcMessage ("Given number is not an element of this set."));
+  Assert (is_element(n) == true, ExcIndexNotPresent (n));
   Assert (n < size(), ExcIndexRange (n, 0, size()));
 
   Range r(n, n);
