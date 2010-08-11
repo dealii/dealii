@@ -803,63 +803,6 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 
 
 
-template <typename MatrixType>
-void
-ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-                            const std::vector<unsigned int> &local_dof_indices,
-                            MatrixType                      &global_matrix) const
-{
-				   // create a dummy and hand on to the
-				   // function actually implementing this
-				   // feature further down.
-  Vector<double> dummy(0);
-  distribute_local_to_global (local_matrix, dummy, local_dof_indices,
-			      global_matrix, dummy,
-			      internal::bool2type<IsBlockMatrix<MatrixType>::value>());
-}
-
-
-
-template <typename MatrixType, typename VectorType>
-void
-ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-			    const Vector<double>            &local_vector,
-                            const std::vector<unsigned int> &local_dof_indices,
-                            MatrixType                      &global_matrix,
-			    VectorType                      &global_vector) const
-{
-				   // enter the internal function with the
-				   // respective block information set, the
-				   // actual implementation follows further
-				   // down.
-  distribute_local_to_global (local_matrix, local_vector, local_dof_indices,
-			      global_matrix, global_vector,
-			      internal::bool2type<IsBlockMatrix<MatrixType>::value>());
-}
-
-
-
-template <typename SparsityType>
-void
-ConstraintMatrix::
-add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
-			     SparsityType                    &sparsity_pattern,
-			     const bool                       keep_constrained_entries,
-			     const Table<2,bool>             &dof_mask) const
-{
-				   // enter the internal function with the
-				   // respective block information set, the
-				   // actual implementation follows further
-				   // down.
-  add_entries_local_to_global (local_dof_indices, sparsity_pattern,
-			       keep_constrained_entries, dof_mask,
-			       internal::bool2type<IsBlockMatrix<SparsityType>::value>());
-}
-
-
-
 template<class VectorType>
 void
 ConstraintMatrix::distribute (const VectorType &condensed,
@@ -1005,7 +948,7 @@ namespace internals
     local_row = in.local_row;
 				   // the constraints pointer should not
 				   // contain any data here.
-    Assert (constraint_position == numbers::invalid_unsigned_int, 
+    Assert (constraint_position == numbers::invalid_unsigned_int,
 	    ExcInternalError());
 
     if (in.constraint_position != numbers::invalid_unsigned_int)
@@ -1123,13 +1066,13 @@ namespace internals
 				// "Distributing" structs using access via
 				// the DataCache. Provides some
 				// specialized sort and insert functions.
-				// 
+				//
 				// in case there are no constraints, this is
 				// basically a list of pairs <uint,unit> with
 				// the first index being the global index and
 				// the second index the local index. The list
 				// is sorted with respect to the global index.
-				// 
+				//
 				// in case there are constraints, a global dof
 				// might get a contribution also because it
 				// gets data from a constrained dof. This
@@ -1246,7 +1189,7 @@ namespace internals
 		   total_row_indices.back().local_row);
 	++n_inhomogeneous_rows; };
 
-				// 
+				//
     unsigned int inhomogeneity (unsigned int i) const
       { return total_row_indices[n_active_rows+i].local_row; };
 
@@ -1457,7 +1400,7 @@ namespace internals
 				   // the innermost loop. goes through the
 				   // origin of each global entry and finds
 				   // out which data we need to collect.
-  inline
+  static inline
   double resolve_matrix_entry (const GlobalRowsFromLocal&global_rows,
                                const GlobalRowsFromLocal&global_cols,
 			       const unsigned int        i,
@@ -1474,7 +1417,7 @@ namespace internals
 				   // set the value to zero.
     if (loc_row != numbers::invalid_unsigned_int)
       {
-	col_val = ((loc_col != numbers::invalid_unsigned_int) ? 
+	col_val = ((loc_col != numbers::invalid_unsigned_int) ?
 		   local_matrix(loc_row, loc_col) : 0);
 
 				   // account for indirect contributions by
@@ -1515,7 +1458,7 @@ namespace internals
 				// resulting values in val_ptr, and the
 				// corresponding column indices in col_ptr.
   template <typename number>
-  inline
+  static inline
   void
   resolve_matrix_row (const GlobalRowsFromLocal&global_rows,
                       const GlobalRowsFromLocal&global_cols,
@@ -1582,7 +1525,7 @@ namespace internals
   namespace dealiiSparseMatrix
   {
     template <typename number>
-    inline
+    static inline
     void add_value (const double value,
 		    const unsigned int row,
 		    const unsigned int column,
@@ -1616,7 +1559,7 @@ namespace internals
 				// operations just in place, i.e., in the
 				// respective matrix row
   template <typename number>
-  inline
+  static inline
   void
   resolve_matrix_row (const GlobalRowsFromLocal&global_rows,
 		      const unsigned int        i,
@@ -1668,9 +1611,9 @@ namespace internals
 	      {
 		const unsigned int loc_col = global_rows.local_row(j);
 		const double col_val = matrix_ptr[loc_col];
-		dealiiSparseMatrix::add_value (col_val, row, 
-					       global_rows.global_row(j), 
-					       col_ptr, false, counter, 
+		dealiiSparseMatrix::add_value (col_val, row,
+					       global_rows.global_row(j),
+					       col_ptr, false, counter,
 					       val_ptr);
 	      }
 	  }
@@ -1680,7 +1623,7 @@ namespace internals
 	      {
 		double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
 						       loc_row, local_matrix);
-		dealiiSparseMatrix::add_value (col_val, row, 
+		dealiiSparseMatrix::add_value (col_val, row,
 					       global_rows.global_row(j), col_ptr,
 					       false, counter, val_ptr);
 	      }
@@ -1698,7 +1641,7 @@ namespace internals
 	      {
 		const unsigned int loc_col = global_rows.local_row(j);
 		const double col_val = matrix_ptr[loc_col];
-		dealiiSparseMatrix::add_value(col_val, row, 
+		dealiiSparseMatrix::add_value(col_val, row,
 					      global_rows.global_row(j), col_ptr,
 					      false, counter, val_ptr);
 	      }
@@ -1707,7 +1650,7 @@ namespace internals
 	      {
 		const unsigned int loc_col = global_rows.local_row(j);
 		const double col_val = matrix_ptr[loc_col];
-		dealiiSparseMatrix::add_value(col_val, row, 
+		dealiiSparseMatrix::add_value(col_val, row,
 					      global_rows.global_row(j), col_ptr,
 					      false, counter, val_ptr);
 	      }
@@ -1718,7 +1661,7 @@ namespace internals
 	      {
 		double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
 						       loc_row, local_matrix);
-		dealiiSparseMatrix::add_value (col_val, row, 
+		dealiiSparseMatrix::add_value (col_val, row,
 					       global_rows.global_row(j), col_ptr,
 					       false, counter, val_ptr);
 	      }
@@ -1728,7 +1671,7 @@ namespace internals
 	      {
 		double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
 						       loc_row, local_matrix);
-		dealiiSparseMatrix::add_value (col_val, row, 
+		dealiiSparseMatrix::add_value (col_val, row,
 					       global_rows.global_row(j), col_ptr,
 					       false, counter, val_ptr);
 	      }
@@ -1746,9 +1689,9 @@ namespace internals
 	  {
 	    const unsigned int loc_col = global_rows.local_row(j);
 	    const double col_val = matrix_ptr[loc_col];
-	    dealiiSparseMatrix::add_value(col_val, row, 
+	    dealiiSparseMatrix::add_value(col_val, row,
 					  global_rows.global_row(j), col_ptr,
-					  row==global_rows.global_row(j), 
+					  row==global_rows.global_row(j),
 					  counter, val_ptr);
 	  }
       }
@@ -1758,9 +1701,9 @@ namespace internals
 	  {
 	    double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
 						   loc_row, local_matrix);
-	    dealiiSparseMatrix::add_value (col_val, row, 
+	    dealiiSparseMatrix::add_value (col_val, row,
 					   global_rows.global_row(j), col_ptr,
-					   row==global_rows.global_row(j), 
+					   row==global_rows.global_row(j),
 					   counter, val_ptr);
 	  }
       }
@@ -1772,7 +1715,7 @@ namespace internals
 				// will be added to the given global row
 				// global_rows[i] as before, now for sparsity
 				// pattern
-  inline
+  static inline
   void
   resolve_matrix_row (const GlobalRowsFromLocal     &global_rows,
 		      const unsigned int             i,
@@ -2306,8 +2249,9 @@ ConstraintMatrix::distribute_local_to_global (
 	{
 	  unsigned int * col_ptr = &cols[0];
 	  number * val_ptr = &vals[0];
-	  resolve_matrix_row (global_rows, global_rows, i, 0, n_actual_dofs,
-			      local_matrix, col_ptr, val_ptr);
+	  internals::resolve_matrix_row (global_rows, global_rows, i, 0,
+					 n_actual_dofs,
+					 local_matrix, col_ptr, val_ptr);
 	  const unsigned int n_values = col_ptr - &cols[0];
 	  Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
 		  ExcInternalError());
@@ -2315,8 +2259,8 @@ ConstraintMatrix::distribute_local_to_global (
 	    global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
 	}
       else
-	resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
-			    local_matrix, sparse_matrix);
+	internals::resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
+				       local_matrix, sparse_matrix);
 
 				   // now to the vectors. besides doing the
 				   // same job as we did above (i.e.,
@@ -2381,8 +2325,9 @@ ConstraintMatrix::distribute_local_to_global (
 				   // written into the matrix row.
 	  unsigned int * col_ptr = &cols[0];
 	  number * val_ptr = &vals[0];
-	  resolve_matrix_row (global_rows, global_cols, i, 0, n_actual_col_dofs,
-			      local_matrix, col_ptr, val_ptr);
+	  internals::resolve_matrix_row (global_rows, global_cols, i, 0,
+					 n_actual_col_dofs,
+					 local_matrix, col_ptr, val_ptr);
 	  const unsigned int n_values = col_ptr - &cols[0];
 	  Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
 		  ExcInternalError());
@@ -2476,8 +2421,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		{
 		  unsigned int * col_ptr = &cols[0];
 		  number * val_ptr = &vals[0];
-		  resolve_matrix_row (global_rows, global_rows, i, start_block,
-				      end_block, local_matrix, col_ptr, val_ptr);
+		  internals::resolve_matrix_row (global_rows, global_rows, i,
+						 start_block, end_block,
+						 local_matrix, col_ptr, val_ptr);
 		  const unsigned int n_values = col_ptr - &cols[0];
 		  Assert (n_values == (unsigned int)(val_ptr - &vals[0]),
 			  ExcInternalError());
@@ -2492,8 +2438,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 		    = dynamic_cast<SparseMatrix<number> *>(&global_matrix.block(block,
 										block_col));
 		  Assert (sparse_matrix != 0, ExcInternalError());
-		  resolve_matrix_row (global_rows, i, start_block,
-				      end_block, local_matrix, sparse_matrix);
+		  internals::resolve_matrix_row (global_rows, i, start_block,
+						 end_block, local_matrix, sparse_matrix);
 		}
 	    }
 
@@ -2580,8 +2526,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
     {
       std::vector<unsigned int>::iterator col_ptr = cols.begin();
       const unsigned int row = global_rows.global_row(i);
-      resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
-			  dof_mask, col_ptr);
+      internals::resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
+				     dof_mask, col_ptr);
 
 				   // finally, write all the information
 				   // that accumulated under the given
@@ -2693,8 +2639,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	      const unsigned int begin_block = block_starts[block_col],
 		end_block = block_starts[block_col+1];
 	      std::vector<unsigned int>::iterator col_ptr = cols.begin();
-	      resolve_matrix_row (global_rows, i, begin_block, end_block,
-				  dof_mask, col_ptr);
+	      internals::resolve_matrix_row (global_rows, i, begin_block,
+					     end_block, dof_mask, col_ptr);
 
 	      sparsity_pattern.block(block, block_col).add_entries(row,
 								   cols.begin(),

@@ -811,13 +811,6 @@ void ConstraintMatrix::clear ()
     lines_cache.swap (tmp);
   }
 
-#ifdef DEAL_II_USE_TRILINOS
-  {
-				   // reset distribute vector
-    vec_distribute.reset();
-  }
-#endif
-
   sorted = false;
 }
 
@@ -1967,47 +1960,42 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 				   // Here we search all the indices that we
 				   // need to have read-access to - the
 				   // local nodes and all the nodes that the
-				   // constraints indicate. Do this only at
-				   // the first call and provide the class
-				   // with a vector for further use.
-  if (!vec_distribute || vec_distribute->size()!=vec.size())
-    {
-      IndexSet my_indices (vec.size());
+				   // constraints indicate.
+  IndexSet my_indices (vec.size());
+  {
+    const std::pair<unsigned int, unsigned int>
+      local_range = vec.local_range();
 
-      const std::pair<unsigned int, unsigned int>
-	local_range = vec.local_range();
+    my_indices.add_range (local_range.first, local_range.second);
 
-      my_indices.add_range (local_range.first, local_range.second);
+    std::set<unsigned int> individual_indices;
+    for (constraint_iterator it = begin_my_constraints;
+	 it != end_my_constraints; ++it)
+      for (unsigned int i=0; i<it->entries.size(); ++i)
+	if ((it->entries[i].first < local_range.first)
+	    ||
+	    (it->entries[i].first >= local_range.second))
+	  individual_indices.insert (it->entries[i].first);
 
-      std::set<unsigned int> individual_indices;
-      for (constraint_iterator it = begin_my_constraints;
-	   it != end_my_constraints; ++it)
-	for (unsigned int i=0; i<it->entries.size(); ++i)
-	  if ((it->entries[i].first < local_range.first)
-	      ||
-	      (it->entries[i].first >= local_range.second))
-	    individual_indices.insert (it->entries[i].first);
-
-      my_indices.add_indices (individual_indices.begin(),
-			      individual_indices.end());
+    my_indices.add_indices (individual_indices.begin(),
+			    individual_indices.end());
+  }
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      const Epetra_MpiComm *mpi_comm
-	= dynamic_cast<const Epetra_MpiComm*>(&vec.trilinos_vector().Comm());
+  const Epetra_MpiComm *mpi_comm
+    = dynamic_cast<const Epetra_MpiComm*>(&vec.trilinos_vector().Comm());
 
-      Assert (mpi_comm != 0, ExcInternalError());
+  Assert (mpi_comm != 0, ExcInternalError());
 
-      vec_distribute.reset (new TrilinosWrappers::MPI::Vector
-			    (my_indices.make_trilinos_map (mpi_comm->Comm(),
-							   true)));
+  TrilinosWrappers::MPI::Vector vec_distribute
+    (my_indices.make_trilinos_map (mpi_comm->Comm(), true));
 #else
-      vec_distribute.reset (new TrilinosWrappers::MPI::Vector
-			    (my_indices.make_trilinos_map (MPI_COMM_WORLD,
-							   true)));
+  TrilinosWrappers::MPI::Vector vec_distribute
+    (my_indices.make_trilinos_map (MPI_COMM_WORLD, true));
 #endif
-    }
+
 				   // here we import the data
-  vec_distribute->reinit(vec,false,true);
+  vec_distribute.reinit(vec,false,true);
 
   for (constraint_iterator it = begin_my_constraints;
        it != end_my_constraints; ++it)
@@ -2017,7 +2005,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 				       // different contributions
       double new_value = it->inhomogeneity;
       for (unsigned int i=0; i<it->entries.size(); ++i)
-	new_value += ((*vec_distribute)(it->entries[i].first) *
+	new_value += (vec_distribute(it->entries[i].first) *
                       it->entries[i].second);
       vec(it->line) = new_value;
     }
@@ -2072,16 +2060,16 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
     }
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      const Epetra_MpiComm *mpi_comm
-	= dynamic_cast<const Epetra_MpiComm*>(&vec.block(0).trilinos_vector().Comm());
+  const Epetra_MpiComm *mpi_comm
+    = dynamic_cast<const Epetra_MpiComm*>(&vec.block(0).trilinos_vector().Comm());
 
-      Assert (mpi_comm != 0, ExcInternalError());
+  Assert (mpi_comm != 0, ExcInternalError());
 
-      TrilinosWrappers::MPI::Vector vec_distribute
-	(my_indices.make_trilinos_map (mpi_comm->Comm(), true));
+  TrilinosWrappers::MPI::Vector vec_distribute
+    (my_indices.make_trilinos_map (mpi_comm->Comm(), true));
 #else
-      TrilinosWrappers::MPI::Vector vec_distribute
-	(my_indices.make_trilinos_map (MPI_COMM_WORLD, true));
+  TrilinosWrappers::MPI::Vector vec_distribute
+    (my_indices.make_trilinos_map (MPI_COMM_WORLD, true));
 #endif
 
 				   // here we import the data
@@ -2446,92 +2434,106 @@ void
 ConstraintMatrix::condense<float>(BlockSparseMatrix<float> &uncondensed) const;
 
 
-#define MATRIX_FUNCTIONS(MatrixType, VectorType)	\
-template void ConstraintMatrix:: \
-distribute_local_to_global<MatrixType > (const FullMatrix<double>        &, \
-                                         const std::vector<unsigned int> &, \
-                                         MatrixType                      &) const; \
+#define MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType) \
 template void ConstraintMatrix:: \
 distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>        &, \
-						    const Vector<double>            &, \
-						    const std::vector<unsigned int> &, \
-						    MatrixType                      &, \
-						    VectorType                      &) const
+                                                    const Vector<double>            &, \
+                                                    const std::vector<unsigned int> &, \
+                                                    MatrixType                      &, \
+                                                    VectorType                      &, \
+                                                    internal::bool2type<false>) const
+#define MATRIX_FUNCTIONS(MatrixType) \
+template void ConstraintMatrix:: \
+distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>        &, \
+                                                        const Vector<double>            &, \
+                                                        const std::vector<unsigned int> &, \
+                                                        MatrixType                      &, \
+                                                        Vector<double>                  &, \
+                                                        internal::bool2type<false>) const
+#define BLOCK_MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType)   \
+template void ConstraintMatrix:: \
+distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>        &, \
+                                                    const Vector<double>            &, \
+                                                    const std::vector<unsigned int> &, \
+                                                    MatrixType                      &, \
+                                                    VectorType                      &, \
+                                                    internal::bool2type<true>) const
+#define BLOCK_MATRIX_FUNCTIONS(MatrixType)      \
+template void ConstraintMatrix:: \
+distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>        &, \
+                                                        const Vector<double>            &, \
+                                                        const std::vector<unsigned int> &, \
+                                                        MatrixType                      &, \
+                                                        Vector<double>                  &, \
+                                                        internal::bool2type<true>) const
 
-MATRIX_FUNCTIONS(SparseMatrix<double>, Vector<double>);
-MATRIX_FUNCTIONS(SparseMatrix<float>,  Vector<float>);
-template void ConstraintMatrix::distribute_local_to_global<SparseMatrix<float>,Vector<double> >
-(const FullMatrix<double>        &,
- const Vector<double>            &,
- const std::vector<unsigned int> &,
- SparseMatrix<float>             &,
- Vector<double>                  &) const;
+MATRIX_FUNCTIONS(SparseMatrix<double>);
+MATRIX_FUNCTIONS(SparseMatrix<float>);
+MATRIX_VECTOR_FUNCTIONS(SparseMatrix<float>, Vector<float>);
 
+BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
+BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
+BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
+BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
+BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<double>);
 
-MATRIX_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
-MATRIX_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
-template void ConstraintMatrix::distribute_local_to_global<BlockSparseMatrix<float>,BlockVector<double> >
-(const FullMatrix<double>        &,
- const Vector<double>            &,
- const std::vector<unsigned int> &,
- BlockSparseMatrix<float>        &,
- BlockVector<double>             &) const;
+MATRIX_FUNCTIONS(SparseMatrixEZ<double>);
+MATRIX_FUNCTIONS(SparseMatrixEZ<float>);
+MATRIX_VECTOR_FUNCTIONS(SparseMatrixEZ<float>,  Vector<float>);
 
-
-MATRIX_FUNCTIONS(SparseMatrixEZ<double>, Vector<double>);
-MATRIX_FUNCTIONS(SparseMatrixEZ<float>,  Vector<float>);
-
-// MATRIX_FUNCTIONS(BlockSparseMatrixEZ<double>, Vector<double>);
-// MATRIX_FUNCTIONS(BlockSparseMatrixEZ<float>,  Vector<float>);
-
+// BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrixEZ<double>);
+// BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrixEZ<float>,  Vector<float>);
 
 #ifdef DEAL_II_USE_PETSC
-MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix, PETScWrappers::Vector);
-MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix, PETScWrappers::BlockVector);
-MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Vector);
-MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappers::MPI::BlockVector);
+MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
+BLOCK_MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
+MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
+BLOCK_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
+MATRIX_VECTOR_FUNCTIONS(PETScWrappers::SparseMatrix, PETScWrappers::Vector);
+BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::BlockSparseMatrix, PETScWrappers::BlockVector);
+MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Vector);
+BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappers::MPI::BlockVector);
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::Vector);
-MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::BlockVector);
-template void ConstraintMatrix::distribute_local_to_global
-<TrilinosWrappers::SparseMatrix,TrilinosWrappers::MPI::Vector>
-  (const FullMatrix<double>        &,
-   const Vector<double>            &,
-   const std::vector<unsigned int> &,
-   TrilinosWrappers::SparseMatrix &,
-   TrilinosWrappers::MPI::Vector  &) const;
-template void ConstraintMatrix::distribute_local_to_global
-<TrilinosWrappers::BlockSparseMatrix,TrilinosWrappers::MPI::BlockVector>
-  (const FullMatrix<double>        &,
-   const Vector<double>            &,
-   const std::vector<unsigned int> &,
-   TrilinosWrappers::BlockSparseMatrix &,
-   TrilinosWrappers::MPI::BlockVector  &) const;
+MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
+BLOCK_MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
+MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::Vector);
+BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::BlockVector);
+MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector);
+BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::MPI::BlockVector);
 #endif
 
 
 #define SPARSITY_FUNCTIONS(SparsityType) \
   template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
     const std::vector<unsigned int> &, \
-    SparsityType &,		       \
-    const bool,			       \
-    const Table<2,bool> &) const
+    SparsityType &,                    \
+    const bool,                        \
+    const Table<2,bool> &, \
+    internal::bool2type<false>) const
+#define BLOCK_SPARSITY_FUNCTIONS(SparsityType) \
+  template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
+    const std::vector<unsigned int> &, \
+    SparsityType &,                    \
+    const bool,                        \
+    const Table<2,bool> &, \
+    internal::bool2type<true>) const
 
 SPARSITY_FUNCTIONS(SparsityPattern);
 SPARSITY_FUNCTIONS(CompressedSparsityPattern);
 SPARSITY_FUNCTIONS(CompressedSetSparsityPattern);
 SPARSITY_FUNCTIONS(CompressedSimpleSparsityPattern);
-SPARSITY_FUNCTIONS(BlockSparsityPattern);
-SPARSITY_FUNCTIONS(BlockCompressedSparsityPattern);
-SPARSITY_FUNCTIONS(BlockCompressedSetSparsityPattern);
-SPARSITY_FUNCTIONS(BlockCompressedSimpleSparsityPattern);
+BLOCK_SPARSITY_FUNCTIONS(BlockSparsityPattern);
+BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSparsityPattern);
+BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSetSparsityPattern);
+BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSimpleSparsityPattern);
 
 #ifdef DEAL_II_USE_TRILINOS
 SPARSITY_FUNCTIONS(TrilinosWrappers::SparsityPattern);
-SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
+BLOCK_SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
 #endif
+
 
 #define ONLY_MATRIX_FUNCTIONS(MatrixType) \
   template void ConstraintMatrix::distribute_local_to_global<MatrixType > (\

@@ -21,7 +21,6 @@
 #include <base/template_constraints.h>
 
 #include <lac/vector.h>
-#include <lac/trilinos_vector.h>
 
 #include <vector>
 #include <map>
@@ -47,6 +46,7 @@ class BlockCompressedSimpleSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 class BlockIndices;
+template <typename MatrixType> struct IsBlockMatrix;
 
 namespace internals
 {
@@ -371,10 +371,27 @@ class ConstraintMatrix : public Subscriptor
 				      * This function copies the content of @p
 				      * constraints_in with DoFs that are
 				      * element of the IndexSet @p
-				      * filter. Constrained dofs are
-				      * transformed to local index space of
-				      * the filter, and elements not present
-				      * in the IndexSet are ignored.
+				      * filter. Elements that are not present
+				      * in the IndexSet are ignored. All DoFs
+				      * will be transformed to local index
+				      * space of the filter, both the
+				      * constrained DoFs and the other DoFs
+				      * these entries are constrained to. The
+				      * local index space of the filter is a
+				      * contiguous numbering of all (global)
+				      * DoFs that are elements in the
+				      * filter.
+				      *
+				      * If, for example, the filter represents
+				      * the range <tt>[10,20)</tt>, and the
+				      * constraint matrix @p constraints_in
+				      * includes the global indices
+				      * <tt>{7,13,14}</tt>, the indices
+				      * <tt>{3,4}</tt> are added to the
+				      * calling constraint matrix (since 13
+				      * and 14 are elements in the filter and
+				      * element 13 is the fourth element in
+				      * the index, and 14 is the fifth).
 				      *
 				      * This function provides an easy way to
 				      * create a ConstraintMatrix for certain
@@ -743,6 +760,15 @@ class ConstraintMatrix : public Subscriptor
 				      * one inhomogeneity.
 				      */
     bool has_inhomogeneities () const;
+
+                                     /**
+                                      * Returns a pointer to the the vector of
+                                      * entries if a line is constrained, and a
+                                      * zero pointer in case the dof is not
+                                      * constrained.
+                                      */
+    const std::vector<std::pair<unsigned int,double> >*
+    get_constraint_entries (unsigned int line) const;
 
 				     /**
 				      * Print the constraint lines. Mainly
@@ -1918,15 +1944,6 @@ class ConstraintMatrix : public Subscriptor
 			  const Vector<double>                 &local_vector,
 			  const std::vector<unsigned int>      &local_dof_indices,
 			  const FullMatrix<double>             &local_matrix) const;
-
-#ifdef DEAL_II_USE_TRILINOS
-//TODO: Make use of the following member thread safe
-				      /**
-				       * This vector is used to import data
-				       * within the distribute function.
-				       */
-    mutable boost::scoped_ptr<TrilinosWrappers::MPI::Vector> vec_distribute;
-#endif
 };
 
 
@@ -1951,9 +1968,6 @@ ConstraintMatrix::ConstraintMatrix (const ConstraintMatrix &constraint_matrix)
 		 lines_cache (constraint_matrix.lines_cache),
 		 local_lines (constraint_matrix.local_lines),
 		 sorted (constraint_matrix.sorted)
-#ifdef DEAL_II_USE_TRILINOS
-		,vec_distribute ()
-#endif
 {}
 
 
@@ -2069,6 +2083,41 @@ ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) cons
 
 
 
+inline
+const std::vector<std::pair<unsigned int,double> >*
+ConstraintMatrix::get_constraint_entries (unsigned int line) const
+{
+  if (is_constrained(line))
+    return &lines[lines_cache[calculate_line_index(line)]].entries;
+  else
+    return 0;
+}
+
+
+
+inline unsigned int
+ConstraintMatrix::calculate_line_index (const unsigned int line) const
+{
+				   //IndexSet is unused (serial case)
+  if (!local_lines.size())
+    return line;
+
+  Assert(local_lines.is_element(line),
+	 ExcRowNotStoredHere(line));
+
+  return local_lines.index_within_set(line);
+}
+
+
+
+inline bool
+ConstraintMatrix::can_store_line(unsigned int line_index) const
+{
+  return !local_lines.size() || local_lines.is_element(line_index);
+}
+
+
+
 template <class InVector, class OutVector>
 inline
 void
@@ -2105,14 +2154,8 @@ void ConstraintMatrix::
 	  const ConstraintLine& position =
 	    lines[lines_cache[calculate_line_index(*local_indices_begin)]];
 	  for (unsigned int j=0; j<position.entries.size(); ++j)
-	    {
-	      Assert (!(!local_lines.size()
-			|| local_lines.is_element(position.entries[j].first))
-		      || is_constrained(position.entries[j].first) == false,
-		      ExcMessage ("Tried to distribute to a fixed dof."));
-	      global_vector(position.entries[j].first)
-		+= *local_vector_begin * position.entries[j].second;
-	    }
+	    global_vector(position.entries[j].first)
+	      += *local_vector_begin * position.entries[j].second;
 	}
     }
 }
@@ -2139,12 +2182,8 @@ void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
 	    lines[lines_cache[calculate_line_index(*local_indices_begin)]];
 	  typename VectorType::value_type value = position.inhomogeneity;
 	  for (unsigned int j=0; j<position.entries.size(); ++j)
-	    {
-	      Assert (is_constrained(position.entries[j].first) == false,
-		      ExcMessage ("Tried to distribute to a fixed dof."));
-	      value += (global_vector(position.entries[j].first) *
-			position.entries[j].second);
-	    }
+	    value += (global_vector(position.entries[j].first) *
+		      position.entries[j].second);
 	  *local_vector_begin = value;
 	}
     }
@@ -2152,25 +2191,63 @@ void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
 
 
 
-inline unsigned int
-ConstraintMatrix::calculate_line_index (const unsigned int line) const
+template <typename MatrixType>
+inline
+void
+ConstraintMatrix::
+distribute_local_to_global (const FullMatrix<double>        &local_matrix,
+                            const std::vector<unsigned int> &local_dof_indices,
+                            MatrixType                      &global_matrix) const
 {
-				   //IndexSet is unused (serial case)
-  if (!local_lines.size())
-    return line;
-
-  Assert(local_lines.is_element(line),
-	 ExcRowNotStoredHere(line));
-
-  return local_lines.index_within_set(line);
+                                   // create a dummy and hand on to the
+                                   // function actually implementing this
+                                   // feature in the cm.templates.h file.
+  Vector<double> dummy(0);
+  distribute_local_to_global (local_matrix, dummy, local_dof_indices,
+                              global_matrix, dummy,
+                              internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
 
-inline bool
-ConstraintMatrix::can_store_line(unsigned int line_index) const
+
+
+template <typename MatrixType, typename VectorType>
+inline
+void
+ConstraintMatrix::
+distribute_local_to_global (const FullMatrix<double>        &local_matrix,
+                            const Vector<double>            &local_vector,
+                            const std::vector<unsigned int> &local_dof_indices,
+                            MatrixType                      &global_matrix,
+                            VectorType                      &global_vector) const
 {
-  return !local_lines.size() || local_lines.is_element(line_index);
+                                   // enter the internal function with the
+                                   // respective block information set, the
+                                   // actual implementation follows in the
+                                   // cm.templates.h file.
+  distribute_local_to_global (local_matrix, local_vector, local_dof_indices,
+                              global_matrix, global_vector,
+                              internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
 
+
+
+template <typename SparsityType>
+inline
+void
+ConstraintMatrix::
+add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
+                             SparsityType                    &sparsity_pattern,
+                             const bool                       keep_constrained_entries,
+                             const Table<2,bool>             &dof_mask) const
+{
+                                   // enter the internal function with the
+                                   // respective block information set, the
+                                   // actual implementation follows in the
+                                   // cm.templates.h file.
+  add_entries_local_to_global (local_dof_indices, sparsity_pattern,
+                               keep_constrained_entries, dof_mask,
+                               internal::bool2type<IsBlockMatrix<SparsityType>::value>());
+}
 
 
 DEAL_II_NAMESPACE_CLOSE
