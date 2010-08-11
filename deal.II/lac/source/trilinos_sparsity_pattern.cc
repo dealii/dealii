@@ -189,6 +189,7 @@ namespace TrilinosWrappers
 			   const Epetra_Map   &input_col_map,
 			   const unsigned int  n_entries_per_row)
   {
+    graph.reset ();
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
 
@@ -239,6 +240,8 @@ namespace TrilinosWrappers
 			   const Epetra_Map   &input_col_map,
 			   const std::vector<unsigned int> &n_entries_per_row)
   {
+				// release memory before reallocation
+    graph.reset ();
     Assert (n_entries_per_row.size() ==
 	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
 	    ExcDimensionMismatch (n_entries_per_row.size(),
@@ -277,6 +280,8 @@ namespace TrilinosWrappers
 			   const SparsityType &sp,
 			   const bool          exchange_data)
   {
+    graph.reset ();
+
     Assert (sp.n_rows() ==
 	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
 	    ExcDimensionMismatch (sp.n_rows(),

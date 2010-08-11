@@ -323,6 +323,10 @@ namespace TrilinosWrappers
     else
       {
 	column_space_map.reset (new Epetra_Map (m.domain_partitioner()));
+
+				// release memory before reallocation
+	matrix.reset ();
+	temp_vector.clear ();
 	matrix.reset (new Epetra_FECrsMatrix(*m.matrix));
       }
 
@@ -365,6 +369,8 @@ namespace TrilinosWrappers
 			const SparsityType  &sparsity_pattern,
 			const bool           exchange_data)
   {
+				// release memory before reallocation
+    temp_vector.clear();
     matrix.reset();
 
     const unsigned int n_rows = sparsity_pattern.n_rows();
@@ -494,6 +500,8 @@ namespace TrilinosWrappers
 				   // sparsity pattern.
     column_space_map.reset (new Epetra_Map
 			    (sparsity_pattern.domain_partitioner()));
+    temp_vector.clear ();
+    matrix.reset ();
     matrix.reset (new Epetra_FECrsMatrix
 		  (Copy, sparsity_pattern.trilinos_sparsity_pattern(), false));
     compress();
@@ -505,7 +513,8 @@ namespace TrilinosWrappers
   SparseMatrix::reinit (const SparseMatrix &sparse_matrix)
   {
     column_space_map.reset (new Epetra_Map (sparse_matrix.domain_partitioner()));
-
+    temp_vector.clear ();
+    matrix.reset ();
     matrix.reset (new Epetra_FECrsMatrix
 		  (Copy, sparse_matrix.trilinos_sparsity_pattern(), false));
 
@@ -664,6 +673,8 @@ namespace TrilinosWrappers
 
     const Epetra_CrsGraph *graph = &input_matrix.Graph();
 
+    temp_vector.clear ();
+    matrix.reset ();
     matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
 
     matrix->FillComplete (*column_space_map, input_matrix.RangeMap(), true);
@@ -690,6 +701,7 @@ namespace TrilinosWrappers
 				  // empty matrix.
     column_space_map.reset (new Epetra_Map (0, 0,
 					    Utilities::Trilinos::comm_self()));
+    temp_vector.clear();
     matrix.reset (new Epetra_FECrsMatrix(View, *column_space_map, 0));
 
     matrix->FillComplete();
