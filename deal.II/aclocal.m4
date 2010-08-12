@@ -6398,13 +6398,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
         fi
      ])
 
-  AC_ARG_WITH(metis-include,
-              [AS_HELP_STRING([--with-metis-include=/path/to/metis],
-              [Specify the path to the METIS headers file; use this if you want to override the METIS_INCLUDE_DIR environment variable.])],
-     [
-        AC_MSG_ERROR([The --with-metis-include directive is no longer supported])
-     ])
-
   AC_ARG_WITH(metis-libs,
               [AS_HELP_STRING([--with-metis-libs=/path/to/metis],
               [Specify the path to the METIS libraries; use this if you want to override the METIS_LIBDIR environment variable.])],
