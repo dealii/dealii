@@ -678,7 +678,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 				// belongs to by using a binary search. the
 				// comparator is based on the end of the
 				// ranges
-  Range r (0,0);
+  Range r (n,n+1);
   r.nth_index_in_set = n;
   std::vector<Range>::const_iterator p = std::lower_bound(ranges.begin(),
 							  ranges.end(),
