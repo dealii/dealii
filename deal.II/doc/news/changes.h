@@ -164,13 +164,21 @@ inconvenience this causes.
 
 
 <ol>
+  <li><p> Fixed: The computation of quadrature points in the QGaussLobatto
+  class uses a Newton method that was wrongly implemented. While the
+  results were correct (at least for moderate orders), it required more
+  iterations than necessary. This is now fixed.
+  <br>
+  (Andrea Bonito 2010/08/12)
+  </p>
+
   <li><p> Changed: The DataOutBase::write_vtu function now writes data
   as 64-bit values, rather than 32-bit values.
   <br>
   (Scott Miller 2010/08/5)
   </p>
 
-  <li><p> New: MappingQ and MappingQEulerian now support order > 1 also in 
+  <li><p> New: MappingQ and MappingQEulerian now support order > 1 also in
   codimension one. Step-34 has been modified to show how this works.
   <br>
   (Luca Heltai 2010/07/23-27)
@@ -187,12 +195,12 @@ inconvenience this causes.
 <a name="lac"></a>
 <h3>lac</h3>
 
-<ol> 
+<ol>
   <li><p>Updated: Changes to the <code>SLEPcWrappers</code> to preserve
   compatibility with SLEPc version 3.1. Main new updated features are
   new solver classes: (i) Power; and (ii) Generalized Davidson.
-  <br> 
-  (Toby D. Young 2010/08/04) 
+  <br>
+  (Toby D. Young 2010/08/04)
   </p></li>
 
   <li><p>Fixed: SparseMatrix::precondition_SSOR and
@@ -216,7 +224,7 @@ inconvenience this causes.
   <br>
   (Andrew McBride 2010/07/29)
   </p>
-  
+
   <li>
   <p>
   Fixed: In some rather pathological cases, the function

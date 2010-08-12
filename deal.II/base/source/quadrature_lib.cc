@@ -230,6 +230,14 @@ compute_quadrature_points(const unsigned int q,
        double_eps * 5
        );
 
+				   // The following implementation
+				   // follows closely the one given in
+				   // the appendix of the book by
+				   // Karniadakis and Sherwin:
+				   // Spectral/hp element methods for
+				   // computational fluid dynamics
+				   // (Oxford University Press, 2005)
+
 				   // we take the zeros of the Chebyshev
 				   // polynomial (alpha=beta=-0.5) as
 				   // initial values:
@@ -237,6 +245,7 @@ compute_quadrature_points(const unsigned int q,
     x[i] = - std::cos( (long double) (2*i+1)/(2*m) * numbers::PI );
 
   long double r, s, J_x, f, delta;
+
   for (unsigned int k=0; k<m; ++k)
     {
       r = x[k];
@@ -245,9 +254,9 @@ compute_quadrature_points(const unsigned int q,
 
       do
 	{
-	  s = 1.;
+	  s = 0.;
 	  for (unsigned int i=0; i<k; ++i)
-	    s /= r - x[i];
+	    s += 1./(r - x[i]);
 
 	  J_x   =  0.5*(alpha + beta + m + 1)*JacobiP(r, alpha+1, beta+1, m-1);
 	  f     = JacobiP(r, alpha, beta, m);
