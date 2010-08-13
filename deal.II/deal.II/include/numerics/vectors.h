@@ -18,7 +18,8 @@
 #include <base/exceptions.h>
 #include <base/quadrature_lib.h>
 #include <dofs/function_map.h>
-#include <fe/mapping_q1.h>
+#include <fe/mapping_q.h>
+#include <hp/mapping_collection.h>
 
 #include <map>
 #include <vector>
@@ -943,6 +944,99 @@ class VectorTools
 				       ConstraintMatrix               &constraints,
 				       std::vector<unsigned int>       component_mapping = std::vector<unsigned int>());
 
+
+                     /**
+                      * Compute constraints that correspond to
+                      * boundary conditions of the form
+                      * $\vec{n}\times\vec{u}=\vec{n}\times\vec{f},
+                      * i.e. the tangential components of $u$
+                      * and $f$ shall coincide.
+                      *
+                      * If the ConstraintMatrix @p constraints
+				      * contained values or other
+				      * constraints before, the new ones are
+				      * added or the old ones overwritten,
+				      * if a node of the boundary part to be
+				      * used was already in the list of
+				      * constraints. This is handled by
+				      * using inhomogeneous constraints. Please
+				      * note that when combining adaptive meshes
+				      * and this kind of constraints, the
+				      * Dirichlet conditions should be set
+				      * first, and then completed by hanging
+				      * node constraints, in order to make sure
+				      * that the discretization remains
+				      * consistent.
+				      *
+				      * This function is explecitly written to
+				      * use with the FE_Nedelec elements. Thus
+				      * it throws an exception, if it is
+				      * called with other finite elements.
+				      *
+				      * The second argument of this function
+				      * denotes the first vector component in
+				      * the finite element that corresponds to
+				      * the vector function that you want to
+				      * constrain. For example, if we want to
+				      * solve Maxwell's equations in 3d and the
+				      * finite element has components
+				      * $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want
+				      * the boundary conditions
+				      * $\vec{n}\times\vec{B}=\vec{n}\times\vec{f}$,
+				      * then @p first_vector_component would
+				      * be 3. Vectors are implicitly assumed to
+				      * have exactly <code>dim</code> components
+				      * that are ordered in the same way as we
+				      * usually order the coordinate directions,
+				      * i.e. $x$-, $y$-, and finally
+				      * $z$-component.
+				      *
+				      * The parameter @p boundary_component
+				      * corresponds to the number
+				      * @p boundary_indicator of the face. 255
+				      * is an illegal value, since it is
+				      * reserved for interior faces.
+				      *
+				      * The last argument is denoted to compute
+				      * the normal vector $\vec{n}$ at the
+				      * boundary points.
+				      *
+				      * <h4>Computing constraints</h4>
+				      *
+				      * To compute the constraints we use
+				      * projection-based interpolation as proposed
+				      * in \v{S}olin, Segeth and Dole\v{z}el
+				      * (Higher order finite elements, Chapman&Hall,
+				      * 2004) on every face located at the
+				      * boundary.
+				      *
+				      * First one projects $\vec{f}$ on the
+				      * lowest-order edge shape functions. Then the
+				      * remaining part $(I-P_0)\vec{f}$ of the 
+				      * function is projected on the remaining
+				      * higher-order edge shape functions. In the
+				      * last step we project $(I-P_0-P_e)\vec{f}$
+				      * on the bubble shape functions defined on
+				      * the face.
+                      */
+   template <int dim>
+   static void project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
+     const unsigned int first_vector_component,
+     const Function<dim>& boundary_function,
+     const unsigned char boundary_component,
+     ConstraintMatrix& constraints,
+     const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
+
+                     /**
+                      * Same as above for the hp-namespace.
+                      */
+   template <int dim>
+   static void project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
+     const unsigned int first_vector_component,
+     const Function<dim>& boundary_function,
+     const unsigned char boundary_component,
+     ConstraintMatrix& constraints,
+     const hp::MappingCollection<dim, dim>& mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
 
 				     /**
 				      * Compute the constraints that

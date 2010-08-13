@@ -219,6 +219,22 @@ void VectorTools::project_boundary_values<deal_II_dimension>
 
 #if deal_II_dimension != 1
 template
+void VectorTools::project_boundary_values_curl_conforming<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const unsigned int,
+ const Function<deal_II_dimension>&,
+ const unsigned char,
+ ConstraintMatrix&,
+ const Mapping<deal_II_dimension>&);
+template
+void VectorTools::project_boundary_values_curl_conforming<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const unsigned int,
+ const Function<deal_II_dimension>&,
+ const unsigned char,
+ ConstraintMatrix&,
+ const hp::MappingCollection<deal_II_dimension>&);
+template
 void
 VectorTools::compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
 						 const unsigned int     first_vector_component,
@@ -226,6 +242,62 @@ VectorTools::compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimens
 						 ConstraintMatrix      &constraints,
 						 const Mapping<deal_II_dimension>    &mapping);
 #endif
+
+
+template
+void
+internals::VectorTools::compute_face_projection (const DoFHandler<deal_II_dimension>::cell_iterator&,
+  const unsigned int,
+  FEValues<deal_II_dimension>&,
+  const Quadrature<deal_II_dimension>&,
+  const Function<deal_II_dimension>&,
+  const unsigned int,
+  std::vector<double>&);
+template
+void
+internals::VectorTools::compute_face_projection (const hp::DoFHandler<deal_II_dimension>::cell_iterator&,
+  const unsigned int,
+  FEValues<deal_II_dimension>&,
+  const Quadrature<deal_II_dimension>&,
+  const Function<deal_II_dimension>&,
+  const unsigned int,
+  std::vector<double>&);
+template
+void
+internals::VectorTools::compute_edge_projection (const DoFHandler<deal_II_dimension>::cell_iterator&,
+  const unsigned int,
+  const unsigned int,
+  FEValues<deal_II_dimension>&,
+  const Quadrature<deal_II_dimension>&,
+  const Function<deal_II_dimension>&,
+  const unsigned int,
+  std::vector<double>&);
+template
+void
+internals::VectorTools::compute_edge_projection (const hp::DoFHandler<deal_II_dimension>::cell_iterator&,
+  const unsigned int,
+  const unsigned int,
+  FEValues<deal_II_dimension>&,
+  const Quadrature<deal_II_dimension>&,
+  const Function<deal_II_dimension>&,
+  const unsigned int,
+  std::vector<double>&);
+template
+void
+internals::VectorTools::compute_face_projection (const DoFHandler<deal_II_dimension>::cell_iterator&,
+  const unsigned int,
+  FEValues<deal_II_dimension>&,
+  const Function<deal_II_dimension>&,
+  const unsigned int,
+  std::vector<double>&);
+template
+void
+internals::VectorTools::compute_face_projection (const hp::DoFHandler<deal_II_dimension>::cell_iterator&,
+  const unsigned int,
+  FEValues<deal_II_dimension>&,
+  const Function<deal_II_dimension>&,
+  const unsigned int,
+  std::vector<double>&);
 
 
 // // Due to introducing the DoFHandler as a template parameter,

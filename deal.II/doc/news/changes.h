@@ -220,6 +220,24 @@ inconvenience this causes.
 
   <li>
   <p>
+  New: The functions VectorTools::project_boundary_values_curl_conforming
+  are added. They can compute Dirichlet boundary conditions for Nedelec
+  elements. 	
+  <br>
+  (Markus Buerg 2010/08/13)
+  </p>
+
+  <li>
+  <p>
+  Fixed: The function FEValuesViews::Vector::get_function_curls produced
+  wrong results in some cases, because it erased the given vector first.
+  This is now fixed.	
+  <br>
+  (Markus Buerg 2010/08/13)
+  </p>
+
+  <li>
+  <p>
   New: Ability to project second-order SymmetricTensor and first-order Tensor objects from the quadrature points to the support points of the cell using  FETools::compute_projection_from_quadrature_points
   <br>
   (Andrew McBride 2010/07/29)

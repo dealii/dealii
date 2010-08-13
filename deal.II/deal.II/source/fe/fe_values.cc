@@ -862,7 +862,6 @@ namespace FEValuesViews
                     case 0: {
                        for (unsigned int q_point = 0;
                         q_point < fe_values.n_quadrature_points; ++q_point) {
-                          curls[q_point][0] = 0.0;
                           curls[q_point][1] += value * (*shape_gradient_ptr)[2];
                           curls[q_point][2] -= value * (*shape_gradient_ptr++)[1];
                        }
@@ -874,7 +873,6 @@ namespace FEValuesViews
                        for (unsigned int q_point = 0;
                         q_point < fe_values.n_quadrature_points; ++q_point) {
                           curls[q_point][0] -= value * (*shape_gradient_ptr)[2];
-                          curls[q_point][1] = 0.0;
                           curls[q_point][2] += value * (*shape_gradient_ptr++)[0];
                        }
 
@@ -886,7 +884,6 @@ namespace FEValuesViews
                         q_point < fe_values.n_quadrature_points; ++q_point) {
                           curls[q_point][0] += value * (*shape_gradient_ptr)[1];
                           curls[q_point][1] -= value * (*shape_gradient_ptr++)[0];
-                          curls[q_point][2] = 0.0;
                        }
                  }
               }
