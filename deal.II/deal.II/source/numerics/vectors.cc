@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -114,7 +114,7 @@ VectorTools::create_boundary_right_hand_side<deal_II_dimension>
  const std::set<unsigned char> &);
 
 template
-void VectorTools::interpolate_boundary_values ( 
+void VectorTools::interpolate_boundary_values (
   const DoFHandler<deal_II_dimension> &,
   const unsigned char,
   const Function<deal_II_dimension>   &,
@@ -138,7 +138,7 @@ void VectorTools::interpolate_boundary_values (
   const std::vector<bool>    &);
 
 template
-void VectorTools::interpolate_boundary_values ( 
+void VectorTools::interpolate_boundary_values (
   const DoFHandler<deal_II_dimension> &,
   const unsigned char,
   const Function<deal_II_dimension>   &,
@@ -162,7 +162,7 @@ void VectorTools::interpolate_boundary_values (
   const std::vector<bool>    &);
 
 template
-void VectorTools::interpolate_boundary_values ( 
+void VectorTools::interpolate_boundary_values (
   const Mapping<deal_II_dimension>    &,
   const DoFHandler<deal_II_dimension> &,
   const FunctionMap<deal_II_dimension>::type   &,
@@ -244,67 +244,12 @@ VectorTools::compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimens
 #endif
 
 
-template
-void
-internals::VectorTools::compute_face_projection (const DoFHandler<deal_II_dimension>::cell_iterator&,
-  const unsigned int,
-  FEValues<deal_II_dimension>&,
-  const Quadrature<deal_II_dimension>&,
-  const Function<deal_II_dimension>&,
-  const unsigned int,
-  std::vector<double>&);
-template
-void
-internals::VectorTools::compute_face_projection (const hp::DoFHandler<deal_II_dimension>::cell_iterator&,
-  const unsigned int,
-  FEValues<deal_II_dimension>&,
-  const Quadrature<deal_II_dimension>&,
-  const Function<deal_II_dimension>&,
-  const unsigned int,
-  std::vector<double>&);
-template
-void
-internals::VectorTools::compute_edge_projection (const DoFHandler<deal_II_dimension>::cell_iterator&,
-  const unsigned int,
-  const unsigned int,
-  FEValues<deal_II_dimension>&,
-  const Quadrature<deal_II_dimension>&,
-  const Function<deal_II_dimension>&,
-  const unsigned int,
-  std::vector<double>&);
-template
-void
-internals::VectorTools::compute_edge_projection (const hp::DoFHandler<deal_II_dimension>::cell_iterator&,
-  const unsigned int,
-  const unsigned int,
-  FEValues<deal_II_dimension>&,
-  const Quadrature<deal_II_dimension>&,
-  const Function<deal_II_dimension>&,
-  const unsigned int,
-  std::vector<double>&);
-template
-void
-internals::VectorTools::compute_face_projection (const DoFHandler<deal_II_dimension>::cell_iterator&,
-  const unsigned int,
-  FEValues<deal_II_dimension>&,
-  const Function<deal_II_dimension>&,
-  const unsigned int,
-  std::vector<double>&);
-template
-void
-internals::VectorTools::compute_face_projection (const hp::DoFHandler<deal_II_dimension>::cell_iterator&,
-  const unsigned int,
-  FEValues<deal_II_dimension>&,
-  const Function<deal_II_dimension>&,
-  const unsigned int,
-  std::vector<double>&);
-
 
 // // Due to introducing the DoFHandler as a template parameter,
 // // the following instantiations are required in 1d
 // #if deal_II_dimension == 1
 // template
-// void VectorTools::interpolate_boundary_values<deal_II_dimension> 
+// void VectorTools::interpolate_boundary_values<deal_II_dimension>
 // (const Mapping<1>         &,
 //  const DoFHandler<1>      &,
 //  const unsigned char,
