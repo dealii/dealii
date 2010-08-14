@@ -2963,40 +2963,18 @@ namespace internals
       Point<dim> shifted_reference_point_1;
       Point<dim> shifted_reference_point_2;
 
-      unsigned int edge_coordinate_direction[4];
-
-				       // Get coordinate directions of
+				       // coordinate directions of
 				       // the edges of the face.
-      switch (face)
-	{
-	  case 0:
-	  case 1:
-	  {
-	    edge_coordinate_direction[0] = 2;
-	    edge_coordinate_direction[1] = 2;
-	    edge_coordinate_direction[2] = 1;
-	    edge_coordinate_direction[3] = 1;
-	    break;
-	  }
-
-	  case 2:
-	  case 3:
-	  {
-	    edge_coordinate_direction[0] = 0;
-	    edge_coordinate_direction[1] = 0;
-	    edge_coordinate_direction[2] = 2;
-	    edge_coordinate_direction[3] = 2;
-	    break;
-	  }
-
-	  default:
-	  {
-	    edge_coordinate_direction[0] = 1;
-	    edge_coordinate_direction[1] = 1;
-	    edge_coordinate_direction[2] = 0;
-	    edge_coordinate_direction[3] = 0;
-	  }
-	}
+      const unsigned int
+	edge_coordinate_direction
+	[GeometryInfo<dim>::faces_per_cell]
+	[GeometryInfo<dim>::lines_per_face]
+	= { { 2, 2, 1, 1 },
+	    { 2, 2, 1, 1 },
+	    { 0, 0, 2, 2 },
+	    { 0, 0, 2, 2 },
+	    { 1, 1, 0, 0 },
+	    { 1, 1, 0, 0 } };
 
 				       // The interpolation for the
 				       // lowest order edge shape
@@ -3016,8 +2994,8 @@ namespace internals
 	      shifted_reference_point_2 (d) = quadrature_points[q_point] (d);
 	    }
 
-	  shifted_reference_point_1 (edge_coordinate_direction[line]) += 1e-13;
-	  shifted_reference_point_2 (edge_coordinate_direction[line]) -= 1e-13;
+	  shifted_reference_point_1 (edge_coordinate_direction[face][line]) += 1e-13;
+	  shifted_reference_point_2 (edge_coordinate_direction[face][line]) -= 1e-13;
 	  tangentials[q_point]
 	    = (2e13 *
 	       (fe_values.get_mapping ()
@@ -3036,14 +3014,14 @@ namespace internals
 		* (values[q_point] (0) * tangentials[q_point] (0)
 		   + values[q_point] (1) * tangentials[q_point] (1)
 		   + values[q_point] (2) * tangentials[q_point] (2))
-		/ (jacobians[q_point][0][edge_coordinate_direction[line]]
-		   * jacobians[q_point][0][edge_coordinate_direction[line]]
+		/ (jacobians[q_point][0][edge_coordinate_direction[face][line]]
+		   * jacobians[q_point][0][edge_coordinate_direction[face][line]]
 		   +
-		   jacobians[q_point][1][edge_coordinate_direction[line]]
-		   * jacobians[q_point][1][edge_coordinate_direction[line]]
+		   jacobians[q_point][1][edge_coordinate_direction[face][line]]
+		   * jacobians[q_point][1][edge_coordinate_direction[face][line]]
 		   +
-		   jacobians[q_point][2][edge_coordinate_direction[line]]
-		   * jacobians[q_point][2][edge_coordinate_direction[line]]));
+		   jacobians[q_point][2][edge_coordinate_direction[face][line]]
+		   * jacobians[q_point][2][edge_coordinate_direction[face][line]]));
 	}
 
 				       // If there are also higher
@@ -3075,14 +3053,14 @@ namespace internals
 					       // above.
 	      tmp =
 		std::sqrt (fe_values.JxW (q_point)
-			   / (jacobians[q_point][0][edge_coordinate_direction[line]]
-			      * jacobians[q_point][0][edge_coordinate_direction[line]]
+			   / (jacobians[q_point][0][edge_coordinate_direction[face][line]]
+			      * jacobians[q_point][0][edge_coordinate_direction[face][line]]
 			      +
-			      jacobians[q_point][1][edge_coordinate_direction[line]]
-			      * jacobians[q_point][1][edge_coordinate_direction[line]]
+			      jacobians[q_point][1][edge_coordinate_direction[face][line]]
+			      * jacobians[q_point][1][edge_coordinate_direction[face][line]]
 			      +
-			      jacobians[q_point][2][edge_coordinate_direction[line]]
-			      * jacobians[q_point][2][edge_coordinate_direction[line]]))
+			      jacobians[q_point][2][edge_coordinate_direction[face][line]]
+			      * jacobians[q_point][2][edge_coordinate_direction[face][line]]))
 		* tangentials[q_point];
 	      shape_value
 		= fe_values[vec].value (cell->get_fe ()
@@ -3214,41 +3192,26 @@ namespace internals
       PreconditionJacobi<FullMatrix<double> > precondition;
       Tensor<1, dim> tmp;
       Tensor<1, dim> shape_value;
-      unsigned int global_face_coordinate_directions[2];
-      unsigned int local_face_coordinate_directions[2];
 
 				       // Get coordinate directions of
 				       // the face.
-      switch (face)
-	{
-	  case 0:
-	  case 1:
-	  {
-	    global_face_coordinate_directions[0] = 1;
-	    global_face_coordinate_directions[1] = 2;
-	    local_face_coordinate_directions[0] = 1;
-	    local_face_coordinate_directions[1] = 0;
-	    break;
-	  }
+      const unsigned int
+	global_face_coordinate_directions[GeometryInfo<dim>::faces_per_cell][2]
+	= { { 1, 2 },
+	    { 1, 2 },
+	    { 0, 2 },
+	    { 0, 2 },
+	    { 0, 1 },
+	    { 0, 1 } };
+      const unsigned int
+	local_face_coordinate_directions[GeometryInfo<dim>::faces_per_cell][2]
+	= { { 1, 0 },
+	    { 1, 0 },
+	    { 0, 1 },
+	    { 0, 1 },
+	    { 1, 0 },
+	    { 1, 0 } };
 
-	  case 2:
-	  case 3:
-	  {
-	    global_face_coordinate_directions[0] = 0;
-	    global_face_coordinate_directions[1] = 2;
-	    local_face_coordinate_directions[0] = 0;
-	    local_face_coordinate_directions[1] = 1;
-	    break;
-	  }
-
-	  default:
-	  {
-	    global_face_coordinate_directions[0] = 0;
-	    global_face_coordinate_directions[1] = 1;
-	    local_face_coordinate_directions[0] = 1;
-	    local_face_coordinate_directions[1] = 0;
-	  }
-	}
 
 				       // The projection is divided
 				       // into two steps. In the first
@@ -3279,29 +3242,29 @@ namespace internals
 
 	  for (unsigned int i = 0; i < 2; ++i)
 	    for (unsigned int j = 0; j <= degree; ++j)
-	      tmp -= dof_values[(i + 2 * local_face_coordinate_directions[0]) * superdegree + j]
+	      tmp -= dof_values[(i + 2 * local_face_coordinate_directions[face][0]) * superdegree + j]
 		     * fe_values[vec].value (cell->get_fe ().face_to_cell_index
-					     ((i + 2 * local_face_coordinate_directions[0]) * superdegree + j,
+					     ((i + 2 * local_face_coordinate_directions[face][0]) * superdegree + j,
 					      face), q_point);
 
 	  JxW = std::sqrt (fe_values.JxW (q_point)
-			   / ((jacobians[q_point][0][global_face_coordinate_directions[0]]
-			       * jacobians[q_point][0][global_face_coordinate_directions[0]]
+			   / ((jacobians[q_point][0][global_face_coordinate_directions[face][0]]
+			       * jacobians[q_point][0][global_face_coordinate_directions[face][0]]
 			       +
-			       jacobians[q_point][1][global_face_coordinate_directions[0]]
-			       * jacobians[q_point][1][global_face_coordinate_directions[0]]
+			       jacobians[q_point][1][global_face_coordinate_directions[face][0]]
+			       * jacobians[q_point][1][global_face_coordinate_directions[face][0]]
 			       +
-			       jacobians[q_point][2][global_face_coordinate_directions[0]]
-			       * jacobians[q_point][2][global_face_coordinate_directions[0]])
+			       jacobians[q_point][2][global_face_coordinate_directions[face][0]]
+			       * jacobians[q_point][2][global_face_coordinate_directions[face][0]])
 			      *
-			      (jacobians[q_point][0][global_face_coordinate_directions[1]]
-			       * jacobians[q_point][0][global_face_coordinate_directions[1]]
+			      (jacobians[q_point][0][global_face_coordinate_directions[face][1]]
+			       * jacobians[q_point][0][global_face_coordinate_directions[face][1]]
 			       +
-			       jacobians[q_point][1][global_face_coordinate_directions[1]]
-			       * jacobians[q_point][1][global_face_coordinate_directions[1]]
+			       jacobians[q_point][1][global_face_coordinate_directions[face][1]]
+			       * jacobians[q_point][1][global_face_coordinate_directions[face][1]]
 			       +
-			       jacobians[q_point][2][global_face_coordinate_directions[1]]
-			       * jacobians[q_point][2][global_face_coordinate_directions[1]])));
+			       jacobians[q_point][2][global_face_coordinate_directions[face][1]]
+			       * jacobians[q_point][2][global_face_coordinate_directions[face][1]])));
 
 					   // In the weak form the right
 					   // hand side function is
@@ -3366,29 +3329,29 @@ namespace internals
 	  for (unsigned int i = 0; i < 2; ++i)
 	    for (unsigned int j = 0; j <= degree; ++j)
 	      tmp
-		-= dof_values[(i + 2 * local_face_coordinate_directions[1]) * superdegree + j]
+		-= dof_values[(i + 2 * local_face_coordinate_directions[face][1]) * superdegree + j]
 		* fe_values[vec].value (cell->get_fe ().face_to_cell_index
-					((i + 2 * local_face_coordinate_directions[1]) * superdegree + j,
+					((i + 2 * local_face_coordinate_directions[face][1]) * superdegree + j,
 					 face), q_point);
 
 	  JxW = std::sqrt (fe_values.JxW (q_point)
-			   / ((jacobians[q_point][0][global_face_coordinate_directions[0]]
-			       * jacobians[q_point][0][global_face_coordinate_directions[0]]
+			   / ((jacobians[q_point][0][global_face_coordinate_directions[face][0]]
+			       * jacobians[q_point][0][global_face_coordinate_directions[face][0]]
 			       +
-			       jacobians[q_point][1][global_face_coordinate_directions[0]]
-			       * jacobians[q_point][1][global_face_coordinate_directions[0]]
+			       jacobians[q_point][1][global_face_coordinate_directions[face][0]]
+			       * jacobians[q_point][1][global_face_coordinate_directions[face][0]]
 			       +
-			       jacobians[q_point][2][global_face_coordinate_directions[0]]
-			       * jacobians[q_point][2][global_face_coordinate_directions[0]])
+			       jacobians[q_point][2][global_face_coordinate_directions[face][0]]
+			       * jacobians[q_point][2][global_face_coordinate_directions[face][0]])
 			      *
-			      (jacobians[q_point][0][global_face_coordinate_directions[1]]
-			       * jacobians[q_point][0][global_face_coordinate_directions[1]]
+			      (jacobians[q_point][0][global_face_coordinate_directions[face][1]]
+			       * jacobians[q_point][0][global_face_coordinate_directions[face][1]]
 			       +
-			       jacobians[q_point][1][global_face_coordinate_directions[1]]
-			       * jacobians[q_point][1][global_face_coordinate_directions[1]]
+			       jacobians[q_point][1][global_face_coordinate_directions[face][1]]
+			       * jacobians[q_point][1][global_face_coordinate_directions[face][1]]
 			       +
-			       jacobians[q_point][2][global_face_coordinate_directions[1]]
-			       * jacobians[q_point][2][global_face_coordinate_directions[1]])));
+			       jacobians[q_point][2][global_face_coordinate_directions[face][1]]
+			       * jacobians[q_point][2][global_face_coordinate_directions[face][1]])));
 
 	  for (unsigned int d = 0; d < dim; ++d)
 	    assembling_vector (dim * q_point + d) = JxW * tmp[d];
