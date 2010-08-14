@@ -3676,8 +3676,8 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 
 		  const unsigned int superdegree = cell->get_fe ().degree;
 
-		  QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
-		  Quadrature<dim> face_quadrature
+		  const QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
+		  const Quadrature<dim> face_quadrature
 		    = QProjector<dim>::project_to_face (reference_face_quadrature, face);
 		  FEValues<dim> fe_face_values (mapping, cell->get_fe (),
 						face_quadrature,
@@ -3739,7 +3739,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 		  const unsigned int superdegree = cell->get_fe ().degree;
 		  const unsigned int degree = superdegree - 1;
 
-		  QGauss<dim - 2> reference_edge_quadrature (2 * superdegree);
+		  const QGauss<dim - 2> reference_edge_quadrature (2 * superdegree);
 
 		  const unsigned int dofs_per_face = cell->get_fe ().dofs_per_face;
 		  dof_values.resize (dofs_per_face);
@@ -3770,7 +3770,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 			  <
 			  (int) degree)
 			{
-			  Quadrature<dim> edge_quadrature
+			  const Quadrature<dim> edge_quadrature
 			    = QProjector<dim>::project_to_face (QProjector<dim - 1>::project_to_face
 								(reference_edge_quadrature, line), face);
 			  FEValues<dim> fe_edge_values (mapping, cell->get_fe (),
@@ -3821,8 +3821,8 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 						   // left.
 		  if (degree > 0)
 		    {
-		      QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
-		      Quadrature<dim> face_quadrature
+		      const QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
+		      const Quadrature<dim> face_quadrature
 			= QProjector<dim>::project_to_face (reference_face_quadrature,
 							    face);
 		      FEValues<dim> fe_face_values (mapping, cell->get_fe (),
@@ -3914,8 +3914,9 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
 		  for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
 		    dof_values[dof] = 0.0;
 
-		  QGauss<dim - 1> reference_face_quadrature (2 * (cell->get_fe ().degree));
-		  Quadrature<dim> face_quadrature
+		  const QGauss<dim - 1>
+		    reference_face_quadrature (2 * (cell->get_fe ().degree));
+		  const Quadrature<dim> face_quadrature
 		    = QProjector<dim>::project_to_face (reference_face_quadrature, face);
 		  FEValues<dim> fe_face_values (mapping_collection[cell->active_fe_index ()],
 						cell->get_fe (), face_quadrature,
@@ -3975,7 +3976,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
 		  superdegree = cell->get_fe ().degree;
 		  degree = superdegree - 1;
 
-		  QGauss<dim - 2> reference_edge_quadrature (2 * superdegree);
+		  const QGauss<dim - 2> reference_edge_quadrature (2 * superdegree);
 
 		  const unsigned int dofs_per_face = cell->get_fe ().dofs_per_face;
 		  dof_values.resize (dofs_per_face);
@@ -3994,9 +3995,13 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
 			  <
 			  (int) degree)
 			{
-			  Quadrature<dim> edge_quadrature = QProjector<dim>::project_to_face
-							    (QProjector<dim - 1>::project_to_face (reference_edge_quadrature, line),
-							     face);
+			  const Quadrature<dim> edge_quadrature
+			    =
+			    QProjector<dim>::project_to_face
+			    (QProjector<dim - 1>::project_to_face (reference_edge_quadrature,
+								   line),
+			     face);
+
 			  FEValues<dim> fe_edge_values (mapping_collection[cell->active_fe_index ()],
 							cell->get_fe (),
 							edge_quadrature,
@@ -4028,8 +4033,8 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
 
 		  if (degree > 0)
 		    {
-		      QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
-		      Quadrature<dim> face_quadrature
+		      const QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
+		      const Quadrature<dim> face_quadrature
 			= QProjector<dim>::project_to_face (reference_face_quadrature,
 							    face);
 		      FEValues<dim> fe_face_values (mapping_collection[cell->active_fe_index ()],
