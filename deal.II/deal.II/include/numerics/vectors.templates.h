@@ -2947,16 +2947,18 @@ namespace internals
 
 				       // Initialize the required
 				       // objects.
-      std::vector<Tensor<2, dim> > jacobians = fe_values.get_jacobians ();
+      const std::vector<Tensor<2, dim> > &
+	jacobians = fe_values.get_jacobians ();
+      const std::vector<Point<dim> > &
+	quadrature_points = quadrature.get_points ();
+
       std::vector<Point<dim> > tangentials (fe_values.n_quadrature_points);
-      std::vector<Point<dim> > quadrature_points = fe_values.get_quadrature_points ();
       std::vector<Vector<double> > values (fe_values.n_quadrature_points,
 					   Vector<double> (dim));
 
 				       // Get boundary function values
 				       // at quadrature points.
       boundary_function.vector_value_list (quadrature_points, values);
-      quadrature_points = quadrature.get_points ();
 
       const unsigned int superdegree = cell->get_fe ().degree;
       const unsigned int degree = superdegree - 1;
@@ -3167,8 +3169,11 @@ namespace internals
       fe_values.reinit (cell);
 
 				       // Initialize the required objects.
-      std::vector<Tensor<2, dim> > jacobians = fe_values.get_jacobians ();
-      std::vector<Point<dim> > quadrature_points = fe_values.get_quadrature_points ();
+      const std::vector<Tensor<2, dim> > &
+	jacobians = fe_values.get_jacobians ();
+      const std::vector<Point<dim> > &
+	quadrature_points = fe_values.get_quadrature_points ();
+
       std::vector<Vector<double> > values (fe_values.n_quadrature_points,
 					   Vector<double> (dim));
 
@@ -3416,16 +3421,18 @@ namespace internals
       fe_values.reinit (cell);
 
 				       // Initialize the required objects.
+      const std::vector<Tensor<2, dim> > &
+	jacobians = fe_values.get_jacobians ();
+      const std::vector<Point<dim> > &
+	quadrature_points = quadrature.get_points ();
+
       std::vector<Point<dim> > tangentials (fe_values.n_quadrature_points);
-      std::vector<Tensor<2, dim> > jacobians = fe_values.get_jacobians ();
-      std::vector<Point<dim> > quadrature_points = fe_values.get_quadrature_points ();
       std::vector<Vector<double> > values (fe_values.n_quadrature_points,
 					   Vector<double> (dim));
 
 				       // Get boundary function values
 				       // at quadrature points.
       boundary_function.vector_value_list (quadrature_points, values);
-      quadrature_points = quadrature.get_points ();
 
       const unsigned int degree = cell->get_fe ().degree - 1;
       Point<dim> shifted_reference_point_1;
