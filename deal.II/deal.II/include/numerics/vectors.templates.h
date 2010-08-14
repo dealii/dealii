@@ -38,6 +38,7 @@
 #include <fe/fe.h>
 #include <fe/fe_tools.h>
 #include <fe/fe_values.h>
+#include <fe/fe_nedelec.h>
 #include <hp/fe_values.h>
 #include <fe/mapping_q1.h>
 #include <hp/mapping_collection.h>
@@ -3664,8 +3665,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 						   // FE is a Nedelec
 						   // element
 		  typedef FiniteElement<dim> FEL;
-
-		  AssertThrow ((cell->get_fe ().get_name ().find ("FE_Nedelec<") == 0),
+		  AssertThrow (dynamic_cast<const FE_Nedelec<dim>*>(&cell->get_fe()) == 0,
 			       typename FEL::ExcInterpolationNotImplemented ());
 
 		  const unsigned int dofs_per_face = cell->get_fe ().dofs_per_face;
@@ -3733,8 +3733,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 						   // FE is a Nedelec
 						   // element
 		  typedef FiniteElement<dim> FEL;
-
-		  AssertThrow ((cell->get_fe ().get_name ().find ("FE_Nedelec<") == 0),
+		  AssertThrow (dynamic_cast<const FE_Nedelec<dim>*>(&cell->get_fe()) == 0,
 			       typename FEL::ExcInterpolationNotImplemented ());
 
 		  const unsigned int superdegree = cell->get_fe ().degree;
