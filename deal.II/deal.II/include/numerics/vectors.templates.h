@@ -2930,17 +2930,19 @@ namespace internals
 				     // This function computes the
 				     // projection of the boundary
 				     // function on edges for 3D.
-    template<int dim, typename cell_iterator>
+    template<typename cell_iterator>
     void
     compute_edge_projection (const cell_iterator& cell,
 			     const unsigned int face,
 			     const unsigned int line,
-			     FEValues<dim>& fe_values,
-			     const Quadrature<dim>& quadrature,
-			     const Function<dim>& boundary_function,
+			     FEValues<3>& fe_values,
+			     const Quadrature<3>& quadrature,
+			     const Function<3>& boundary_function,
 			     const unsigned int first_vector_component,
 			     std::vector<double>& dof_values)
     {
+      const unsigned int dim = 3;
+
       fe_values.reinit (cell);
 
 				       // Initialize the required
@@ -3149,20 +3151,41 @@ namespace internals
     }
 
 
+				     // dummy implementation of above
+				     // function for all other
+				     // dimensions
+    template<int dim, typename cell_iterator>
+    void
+    compute_edge_projection (const cell_iterator&,
+			     const unsigned int,
+			     const unsigned int,
+			     FEValues<dim>&,
+			     const Quadrature<dim>&,
+			     const Function<dim>&,
+			     const unsigned int,
+			     std::vector<double>&)
+    {
+      Assert (false, ExcInternalError());
+    }
+
+
+
 
 				     // This function computes the
 				     // projection of the boundary
 				     // function on the interior of
 				     // faces in 3D.
-    template<int dim, typename cell_iterator>
+    template <typename cell_iterator>
     void
     compute_face_projection (const cell_iterator& cell,
 			     const unsigned int face,
-			     FEValues<dim>& fe_values,
-			     const Function<dim>& boundary_function,
+			     FEValues<3>& fe_values,
+			     const Function<3>& boundary_function,
 			     const unsigned int first_vector_component,
 			     std::vector<double>& dof_values)
     {
+      const unsigned dim = 3;
+
       fe_values.reinit (cell);
 
 				       // Initialize the required objects.
@@ -3397,20 +3420,36 @@ namespace internals
 
 
 
+				     // dummy implementation of above
+				     // function for dim != 3
+    template<int dim, typename cell_iterator>
+    void
+    compute_face_projection (const cell_iterator&,
+			     const unsigned int,
+			     FEValues<dim>&,
+			     const Function<dim>&,
+			     const unsigned int,
+			     std::vector<double>&)
+    {
+      Assert (false, ExcInternalError ());
+    }
+
 
 				     // This function computes the
 				     // projection of the boundary
 				     // function on the faces in 2D.
-    template<int dim, typename cell_iterator>
+    template<typename cell_iterator>
     void
     compute_face_projection (const cell_iterator& cell,
 			     const unsigned int face,
-			     FEValues<dim>& fe_values,
-			     const Quadrature<dim>& quadrature,
-			     const Function<dim>& boundary_function,
+			     FEValues<2>& fe_values,
+			     const Quadrature<2>& quadrature,
+			     const Function<2>& boundary_function,
 			     const unsigned int first_vector_component,
 			     std::vector<double>& dof_values)
     {
+      const unsigned int dim = 2;
+
       fe_values.reinit (cell);
 
 				       // Initialize the required objects.
@@ -3569,6 +3608,22 @@ namespace internals
 	  for (unsigned int i = 0; i < degree; ++i)
 	    dof_values[i + 1] = solution (i);
 	}
+    }
+
+
+				     // dummy implementation of above
+				     // function for dim != 2
+    template<int dim, typename cell_iterator>
+    void
+    compute_face_projection (const cell_iterator&,
+			     const unsigned int,
+			     FEValues<dim>&,
+			     const Quadrature<dim>& quadrature,
+			     const Function<dim>&,
+			     const unsigned int,
+			     std::vector<double>&)
+    {
+      Assert (false, ExcInternalError ());
     }
   }
 }
