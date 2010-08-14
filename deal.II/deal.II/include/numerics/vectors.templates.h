@@ -2960,6 +2960,7 @@ namespace internals
       const unsigned int degree = superdegree - 1;
       Point<dim> shifted_reference_point_1;
       Point<dim> shifted_reference_point_2;
+
       unsigned int edge_coordinate_direction[4];
 
 				       // Get coordinate directions of
@@ -3851,6 +3852,9 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 	      constraints.set_inhomogeneity (dof, computed_constraints[dof]);
 	    }
       }
+
+      default:
+	    Assert (false, ExcNotImplemented());
     }
 }
 
@@ -4045,6 +4049,9 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
 					     computed_constraints[dof]);
 	    }
       }
+
+      default:
+	    Assert (false, ExcNotImplemented());
     }
 }
 
