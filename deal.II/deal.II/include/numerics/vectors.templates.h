@@ -3439,21 +3439,12 @@ namespace internals
       Point<dim> shifted_reference_point_2;
       Tensor<1, dim> tmp;
       Tensor<1, dim> shape_value;
-      unsigned int face_coordinate_direction;
 
-				       // Get coordinate directions of the face.
-      switch (face)
-	{
-	  case 0:
-	  case 1:
-	  {
-	    face_coordinate_direction = 1;
-	    break;
-	  }
+				       // coordinate directions of the face.
+      const unsigned int
+	face_coordinate_direction[GeometryInfo<dim>::faces_per_cell]
+	= { 1, 1, 0, 0 };
 
-	  default:
-		face_coordinate_direction = 0;
-	}
 
 				       // The interpolation for the
 				       // lowest order face shape
@@ -3473,8 +3464,8 @@ namespace internals
 	      shifted_reference_point_2 (d) = quadrature_points[q_point] (d);
 	    }
 
-	  shifted_reference_point_1 (face_coordinate_direction) += 1e-13;
-	  shifted_reference_point_2 (face_coordinate_direction) -= 1e-13;
+	  shifted_reference_point_1 (face_coordinate_direction[face]) += 1e-13;
+	  shifted_reference_point_2 (face_coordinate_direction[face]) -= 1e-13;
 	  tangentials[q_point] = 2e13
 				 * (fe_values.get_mapping ()
 				    .transform_unit_to_real_cell (cell,
@@ -3490,10 +3481,10 @@ namespace internals
 			      * tangentials[q_point] (0)
 			      +
 			      values[q_point] (1) * tangentials[q_point] (1))
-			   / (jacobians[q_point][0][face_coordinate_direction]
-			      * jacobians[q_point][0][face_coordinate_direction]
-			      + jacobians[q_point][1][face_coordinate_direction]
-			      * jacobians[q_point][1][face_coordinate_direction]);
+			   / (jacobians[q_point][0][face_coordinate_direction[face]]
+			      * jacobians[q_point][0][face_coordinate_direction[face]]
+			      + jacobians[q_point][1][face_coordinate_direction[face]]
+			      * jacobians[q_point][1][face_coordinate_direction[face]]);
 	}
 
 				       // If there are also higher
@@ -3522,10 +3513,10 @@ namespace internals
 					       // the interpolated part
 					       // above.
 	      tmp = std::sqrt (fe_values.JxW (q_point)
-			       / std::sqrt (jacobians[q_point][0][face_coordinate_direction]
-					    * jacobians[q_point][0][face_coordinate_direction]
-					    + jacobians[q_point][1][face_coordinate_direction]
-					    * jacobians[q_point][1][face_coordinate_direction])) * tangentials[q_point];
+			       / std::sqrt (jacobians[q_point][0][face_coordinate_direction[face]]
+					    * jacobians[q_point][0][face_coordinate_direction[face]]
+					    + jacobians[q_point][1][face_coordinate_direction[face]]
+					    * jacobians[q_point][1][face_coordinate_direction[face]])) * tangentials[q_point];
 	      shape_value
 		= fe_values[vec].value (cell->get_fe ().face_to_cell_index (0, face), q_point);
 	      assembling_vector (q_point) = (values[q_point] (0)
