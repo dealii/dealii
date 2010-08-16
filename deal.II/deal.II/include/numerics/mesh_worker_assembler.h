@@ -1622,11 +1622,13 @@ namespace MeshWorker
       
       if (level1 == level2)
 	{
-	  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
-	  assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices);
-	  assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices);
-	  assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
-
+          if(mg_constraints == 0)
+          {
+            assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
+            assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices);
+            assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices);
+            assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
+          }
 	}
       else
 	{
