@@ -1374,10 +1374,10 @@ namespace MeshWorker
   template <>
   inline
   void
-  IntegrationInfoBox<1,1>::initialize_gauss_quadrature(
-    unsigned int cp,
-    unsigned int bp,
-    unsigned int fp)
+  IntegrationInfoBox<1,1>::
+  initialize_gauss_quadrature(const unsigned int cp,
+			      const unsigned int,
+			      const unsigned int)
   {
     cell_quadrature = QGauss<1>(cp);
   }
@@ -1386,10 +1386,10 @@ namespace MeshWorker
   template <>
   inline
   void
-  IntegrationInfoBox<1,2>::initialize_gauss_quadrature(
-    unsigned int cp,
-    unsigned int bp,
-    unsigned int fp)
+  IntegrationInfoBox<1,2>::
+  initialize_gauss_quadrature(const unsigned int cp,
+			      const unsigned int,
+			      const unsigned int)
   {
     cell_quadrature = QGauss<1>(cp);
   }
