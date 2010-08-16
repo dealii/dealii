@@ -3585,7 +3585,7 @@ namespace internals
     compute_face_projection (const cell_iterator&,
 			     const unsigned int,
 			     FEValues<dim>&,
-			     const Quadrature<dim>& quadrature,
+			     const Quadrature<dim>&,
 			     const Function<dim>&,
 			     const unsigned int,
 			     std::vector<double>&)
