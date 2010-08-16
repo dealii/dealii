@@ -208,17 +208,37 @@ class DoFHandler  :  public Subscriptor
 				      * value.
 				      */
     static const unsigned int default_fe_index = 0;
+    
+				     /**
+				      * Standard constructor, not
+				      * initializing any data. After
+				      * constructing an object with
+				      * this constructor, use
+				      * initialize() to make a valid
+				      * DoFHandler.
+				      */
+    DoFHandler ();
 
 				     /**
 				      * Constructor. Take @p tria as the
 				      * triangulation to work on.
 				      */
     DoFHandler ( const Triangulation<dim,spacedim> &tria);
-
+    
 				     /**
 				      * Destructor.
 				      */
     virtual ~DoFHandler ();
+    
+				     /**
+				      * Assign a Triangulation and a
+				      * FiniteElement to the
+				      * DoFHandler and compute the
+				      * distribution of degrees of
+				      * freedom over the mesh.
+				      */
+    void initialize(const Triangulation<dim,spacedim>& tria,
+		    const FiniteElement<dim,spacedim>& fe);
 
 				     /**
 				      * Go through the triangulation and
@@ -1007,15 +1027,7 @@ class DoFHandler  :  public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcInvalidTriangulation);
-				     /**
-				      * No finite element has been
-				      * assigned to this
-				      * DoFHandler. Call the function
-				      * DoFHandler::distribute_dofs()
-				      * before you attemped to do what
-				      * raised this exception.
-				      */
-    DeclException0 (ExcNoFESelected);
+    
     				     /**
 				      * @todo Replace by ExcInternalError.
 				      */
@@ -1060,8 +1072,16 @@ class DoFHandler  :  public Subscriptor
 		    int,
 		    << "You tried to do something on level " << arg1
 		    << ", but this level is empty.");
-
+    
+    
   protected:
+				     /**
+				      * The object containing
+				      * information on the block structure.
+				      */
+    BlockInfo block_info_object;
+    
+  private:
 
 				     /**
 				      * Address of the triangulation to
@@ -1082,9 +1102,6 @@ class DoFHandler  :  public Subscriptor
 				      * this object as well, though).
 				      */
     SmartPointer<const FiniteElement<dim,spacedim>,DoFHandler<dim,spacedim> > selected_fe;
-    
-    BlockInfo block_info_object;
-  private:
 
 				     /**
 				      * Copy constructor. I can see no reason
@@ -1186,7 +1203,7 @@ inline
 const FiniteElement<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe () const
 {
-  Assert(selected_fe!=0, ExcNoFESelected());
+  Assert(selected_fe!=0, ExcNotInitialized());
   return *selected_fe;
 }
 
@@ -1196,6 +1213,7 @@ inline
 const Triangulation<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_tria () const
 {
+  Assert(tria != 0, ExcNotInitialized());
   return *tria;
 }
 

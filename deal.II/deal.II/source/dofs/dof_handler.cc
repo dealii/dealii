@@ -697,11 +697,34 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
 {}
 
 
+template<int dim, int spacedim>
+DoFHandler<dim,spacedim>::DoFHandler ()
+		:
+		tria(0, typeid(*this).name()),
+		selected_fe(0, typeid(*this).name()),
+		faces(NULL),
+		used_dofs (0)
+{}
+
+
 template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::~DoFHandler ()
 {
 				   // release allocated memory
   clear ();
+}
+
+
+template<int dim, int spacedim>
+void
+DoFHandler<dim,spacedim>::initialize(
+  const Triangulation<dim,spacedim>& t,
+  const FiniteElement<dim,spacedim>& fe)
+{
+  tria = &t;
+  faces = NULL;
+  used_dofs = 0;
+  distribute_dofs(fe);
 }
 
 
@@ -911,6 +934,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_cell_iterator
 DoFHandler<dim, spacedim>::end_raw (const unsigned int level) const
 {
+  Assert(tria != 0, ExcNotInitialized());
   return (level == tria->n_levels()-1 ?
 	  end() :
 	  begin_raw (level+1));
@@ -921,6 +945,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::cell_iterator
 DoFHandler<dim, spacedim>::end (const unsigned int level) const
 {
+  Assert(tria != 0, ExcNotInitialized());
   return (level == tria->n_levels()-1 ?
 	  cell_iterator(end()) :
 	  begin (level+1));
@@ -931,6 +956,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_cell_iterator
 DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
 {
+  Assert(tria != 0, ExcNotInitialized());
   return (level == tria->n_levels()-1 ?
 	  active_cell_iterator(end()) :
 	  begin_active (level+1));
@@ -1114,6 +1140,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_line_iterator
 DoFHandler<dim, spacedim>::begin_raw_line (const unsigned int level) const
 {
+  Assert(tria != 0, ExcNotInitialized());
   switch (dim)
     {
       case 1:
@@ -1185,6 +1212,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::raw_line_iterator
 DoFHandler<dim, spacedim>::last_raw_line (const unsigned int level) const
 {
+  Assert(tria != 0, ExcNotInitialized());
   switch (dim)
     {
       case 1:
@@ -1450,6 +1478,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::raw_quad_iterator
 DoFHandler<dim,spacedim>::last_raw_quad (const unsigned int level) const
 {
+  Assert(tria != 0, ExcNotInitialized());
   switch (dim)
     {
       case 1:
@@ -1752,8 +1781,7 @@ DoFHandler<dim, spacedim>::last_active_hex () const
 template <>
 unsigned int DoFHandler<1>::n_boundary_dofs () const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-  return 2*selected_fe->dofs_per_vertex;
+  return 2*get_fe().dofs_per_vertex;
 }
 
 
@@ -1761,8 +1789,6 @@ unsigned int DoFHandler<1>::n_boundary_dofs () const
 template <>
 unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-
 				   // check that only boundary
 				   // indicators 0 and 1 are allowed
 				   // in 1d
@@ -1771,7 +1797,7 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicat
     Assert ((i->first == 0) || (i->first == 1),
 	    ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*selected_fe->dofs_per_vertex;
+  return boundary_indicators.size()*get_fe().dofs_per_vertex;
 }
 
 
@@ -1779,8 +1805,6 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicat
 template <>
 unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-
 				   // check that only boundary
 				   // indicators 0 and 1 are allowed
 				   // in 1d
@@ -1789,15 +1813,14 @@ unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &boun
     Assert ((*i == 0) || (*i == 1),
 	    ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*selected_fe->dofs_per_vertex;
+  return boundary_indicators.size()*get_fe().dofs_per_vertex;
 }
 
 
 template <>
 unsigned int DoFHandler<1,2>::n_boundary_dofs () const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-  return 2*selected_fe->dofs_per_vertex;
+  return 2*get_fe().dofs_per_vertex;
 }
 
 
@@ -1805,8 +1828,6 @@ unsigned int DoFHandler<1,2>::n_boundary_dofs () const
 template <>
 unsigned int DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-
 				   // check that only boundary
 				   // indicators 0 and 1 are allowed
 				   // in 1d
@@ -1815,7 +1836,7 @@ unsigned int DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_indic
     Assert ((i->first == 0) || (i->first == 1),
 	    ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*selected_fe->dofs_per_vertex;
+  return boundary_indicators.size()*get_fe().dofs_per_vertex;
 }
 
 
@@ -1823,8 +1844,6 @@ unsigned int DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_indic
 template <>
 unsigned int DoFHandler<1,2>::n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-
 				   // check that only boundary
 				   // indicators 0 and 1 are allowed
 				   // in 1d
@@ -1833,7 +1852,7 @@ unsigned int DoFHandler<1,2>::n_boundary_dofs (const std::set<unsigned char> &bo
     Assert ((*i == 0) || (*i == 1),
 	    ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*selected_fe->dofs_per_vertex;
+  return boundary_indicators.size()*get_fe().dofs_per_vertex;
 }
 
 #endif
@@ -1842,11 +1861,9 @@ unsigned int DoFHandler<1,2>::n_boundary_dofs (const std::set<unsigned char> &bo
 template<int dim, int spacedim>
 unsigned int DoFHandler<dim,spacedim>::n_boundary_dofs () const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-
   std::set<int> boundary_dofs;
 
-  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  const unsigned int dofs_per_face = get_fe().dofs_per_face;
   std::vector<unsigned int> dofs_on_face(dofs_per_face);
 
 				   // loop over all faces to check
@@ -1877,13 +1894,12 @@ template<int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
   Assert (boundary_indicators.find(255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
 
-  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  const unsigned int dofs_per_face = get_fe().dofs_per_face;
   std::vector<unsigned int> dofs_on_face(dofs_per_face);
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
@@ -1904,13 +1920,12 @@ template<int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
   Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	  ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
 
-  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  const unsigned int dofs_per_face = get_fe().dofs_per_face;
   std::vector<unsigned int> dofs_on_face(dofs_per_face);
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
@@ -2056,8 +2071,6 @@ template <int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::max_couplings_between_dofs () const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-
   return internal::DoFHandler::Implementation::max_couplings_between_dofs (*this);
 }
 
@@ -2067,15 +2080,13 @@ template <int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
 {
-  Assert (selected_fe != 0, ExcNoFESelected());
-
   switch (dim)
     {
       case 1:
-	    return selected_fe->dofs_per_vertex;
+	    return get_fe().dofs_per_vertex;
       case 2:
-	    return (3*selected_fe->dofs_per_vertex +
-		    2*selected_fe->dofs_per_line);
+	    return (3*get_fe().dofs_per_vertex +
+		    2*get_fe().dofs_per_line);
       case 3:
 					     // we need to take refinement of
 					     // one boundary face into
@@ -2093,9 +2104,9 @@ DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
 					     // harm since the matrix will cry
 					     // foul if its requirements are
 					     // not satisfied
-	    return (19*selected_fe->dofs_per_vertex +
-		    28*selected_fe->dofs_per_line +
-		    8*selected_fe->dofs_per_quad);
+	    return (19*get_fe().dofs_per_vertex +
+		    28*get_fe().dofs_per_line +
+		    8*get_fe().dofs_per_quad);
       default:
 	    Assert (false, ExcNotImplemented());
 	    return numbers::invalid_unsigned_int;

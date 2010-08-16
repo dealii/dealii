@@ -489,8 +489,7 @@ namespace internal
 	  {
 	    const unsigned int dim = 1;
 
-	    Assert (mg_dof_handler.selected_fe != 0, DoFHandler<1>::ExcNoFESelected());
-	    Assert (mg_dof_handler.tria->n_levels() > 0, DoFHandler<1>::ExcInvalidTriangulation());
+	    Assert (mg_dof_handler.get_tria().n_levels() > 0, DoFHandler<1>::ExcInvalidTriangulation());
 
 					     //////////////////////////
 					     // DESTRUCTION
@@ -501,12 +500,12 @@ namespace internal
 
 					     // first allocate space for the
 					     // lines on each level
-	    for (unsigned int i=0; i<mg_dof_handler.tria->n_levels(); ++i)
+	    for (unsigned int i=0; i<mg_dof_handler.get_tria().n_levels(); ++i)
 	      {
 		mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
 
-		mg_dof_handler.mg_levels.back()->lines.dofs = std::vector<unsigned int>(mg_dof_handler.tria->n_raw_lines(i) *
-											mg_dof_handler.selected_fe->dofs_per_line,
+		mg_dof_handler.mg_levels.back()->lines.dofs = std::vector<unsigned int>(mg_dof_handler.get_tria().n_raw_lines(i) *
+											mg_dof_handler.get_fe().dofs_per_line,
 											DoFHandler<1>::invalid_dof_index);
 	      }
 
@@ -522,13 +521,13 @@ namespace internal
 					     // over all cells and storing the
 					     // maximum and minimum level each
 					     // vertex we pass by  belongs to
-	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.tria->n_vertices());
+	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.get_tria().n_vertices());
 
-	    std::vector<unsigned int> min_level (mg_dof_handler.tria->n_vertices(), mg_dof_handler.tria->n_levels());
-	    std::vector<unsigned int> max_level (mg_dof_handler.tria->n_vertices(), 0);
+	    std::vector<unsigned int> min_level (mg_dof_handler.get_tria().n_vertices(), mg_dof_handler.get_tria().n_levels());
+	    std::vector<unsigned int> max_level (mg_dof_handler.get_tria().n_vertices(), 0);
 
-	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.tria->begin(),
-						       endc = mg_dof_handler.tria->end();
+	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.get_tria().begin(),
+						       endc = mg_dof_handler.get_tria().end();
 	    for (; cell!=endc; ++cell)
 	      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 		   ++vertex)
@@ -541,10 +540,10 @@ namespace internal
 		}
 
 					     // now allocate the needed space
-	    for (unsigned int vertex=0; vertex<mg_dof_handler.tria->n_vertices(); ++vertex)
-	      if (mg_dof_handler.tria->vertex_used(vertex))
+	    for (unsigned int vertex=0; vertex<mg_dof_handler.get_tria().n_vertices(); ++vertex)
+	      if (mg_dof_handler.get_tria().vertex_used(vertex))
 		{
-		  Assert (min_level[vertex] < mg_dof_handler.tria->n_levels(),   ExcInternalError());
+		  Assert (min_level[vertex] < mg_dof_handler.get_tria().n_levels(),   ExcInternalError());
 		  Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
 		  mg_dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex],
@@ -553,7 +552,7 @@ namespace internal
 		}
 	      else
 		{
-		  Assert (min_level[vertex] == mg_dof_handler.tria->n_levels(),   ExcInternalError());
+		  Assert (min_level[vertex] == mg_dof_handler.get_tria().n_levels(),   ExcInternalError());
 		  Assert (max_level[vertex] == 0, ExcInternalError());
 
 						   // reset to original state
@@ -568,9 +567,7 @@ namespace internal
 	void reserve_space (MGDoFHandler<2,spacedim> &mg_dof_handler)
 	  {
 	    const unsigned int dim = 2;
-
-	    Assert (mg_dof_handler.selected_fe != 0, DoFHandler<2>::ExcNoFESelected());
-	    Assert (mg_dof_handler.tria->n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
+	    Assert (mg_dof_handler.get_tria().n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
 
 					     ////////////////////////////
 					     // DESTRUCTION
@@ -581,18 +578,18 @@ namespace internal
 
 					     // first allocate space for the
 					     // lines and quads on each level
-	    for (unsigned int i=0; i<mg_dof_handler.tria->n_levels(); ++i)
+	    for (unsigned int i=0; i<mg_dof_handler.get_tria().n_levels(); ++i)
 	      {
 		mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
-		mg_dof_handler.mg_levels.back()->quads.dofs = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_quads(i) *
-											 mg_dof_handler.selected_fe->dofs_per_quad,
+		mg_dof_handler.mg_levels.back()->quads.dofs = std::vector<unsigned int> (mg_dof_handler.get_tria().n_raw_quads(i) *
+											 mg_dof_handler.get_fe().dofs_per_quad,
 											 DoFHandler<2>::invalid_dof_index);
 	      }
 
 	    mg_dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<2>;
-	    mg_dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_lines() *
-									     mg_dof_handler.selected_fe->dofs_per_line,
+	    mg_dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (mg_dof_handler.get_tria().n_raw_lines() *
+									     mg_dof_handler.get_fe().dofs_per_line,
 									     DoFHandler<2>::invalid_dof_index);
 
 
@@ -608,16 +605,16 @@ namespace internal
 					     // over all cells and storing the
 					     // maximum and minimum level each
 					     // vertex we pass by  belongs to
-	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.tria->n_vertices());
+	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.get_tria().n_vertices());
 
 					     // initialize these arrays with
 					     // invalid values (min>max)
-	    std::vector<unsigned int> min_level (mg_dof_handler.tria->n_vertices(),
-						 mg_dof_handler.tria->n_levels());
-	    std::vector<unsigned int> max_level (mg_dof_handler.tria->n_vertices(), 0);
+	    std::vector<unsigned int> min_level (mg_dof_handler.get_tria().n_vertices(),
+						 mg_dof_handler.get_tria().n_levels());
+	    std::vector<unsigned int> max_level (mg_dof_handler.get_tria().n_vertices(), 0);
 
-	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.tria->begin(),
-						       endc = mg_dof_handler.tria->end();
+	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.get_tria().begin(),
+						       endc = mg_dof_handler.get_tria().end();
 	    for (; cell!=endc; ++cell)
 	      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 		   ++vertex)
@@ -631,10 +628,10 @@ namespace internal
 
 
 					     // now allocate the needed space
-	    for (unsigned int vertex=0; vertex<mg_dof_handler.tria->n_vertices(); ++vertex)
-	      if (mg_dof_handler.tria->vertex_used(vertex))
+	    for (unsigned int vertex=0; vertex<mg_dof_handler.get_tria().n_vertices(); ++vertex)
+	      if (mg_dof_handler.get_tria().vertex_used(vertex))
 		{
-		  Assert (min_level[vertex] < mg_dof_handler.tria->n_levels(), ExcInternalError());
+		  Assert (min_level[vertex] < mg_dof_handler.get_tria().n_levels(), ExcInternalError());
 		  Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
 		  mg_dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex],
@@ -643,7 +640,7 @@ namespace internal
 		}
 	      else
 		{
-		  Assert (min_level[vertex] == mg_dof_handler.tria->n_levels(),   ExcInternalError());
+		  Assert (min_level[vertex] == mg_dof_handler.get_tria().n_levels(),   ExcInternalError());
 		  Assert (max_level[vertex] == 0, ExcInternalError());
 
 						   // reset to original state
@@ -659,8 +656,7 @@ namespace internal
 	  {
 	    const unsigned int dim = 3;
 
-	    Assert (mg_dof_handler.selected_fe != 0, DoFHandler<3>::ExcNoFESelected());
-	    Assert (mg_dof_handler.tria->n_levels() > 0, DoFHandler<3>::ExcInvalidTriangulation());
+	    Assert (mg_dof_handler.get_tria().n_levels() > 0, DoFHandler<3>::ExcInvalidTriangulation());
 
 					     ////////////////////////////
 					     // DESTRUCTION
@@ -671,21 +667,21 @@ namespace internal
 
 					     // first allocate space for the
 					     // lines and quads on each level
-	    for (unsigned int i=0; i<mg_dof_handler.tria->n_levels(); ++i)
+	    for (unsigned int i=0; i<mg_dof_handler.get_tria().n_levels(); ++i)
 	      {
 		mg_dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
 		mg_dof_handler.mg_levels.back()->hexes.dofs
-		  = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_hexs(i) *
-					       mg_dof_handler.selected_fe->dofs_per_hex,
+		  = std::vector<unsigned int> (mg_dof_handler.get_tria().n_raw_hexs(i) *
+					       mg_dof_handler.get_fe().dofs_per_hex,
 					       DoFHandler<3>::invalid_dof_index);
 	      }
 	    mg_dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<3>;
-	    mg_dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_lines() *
-									     mg_dof_handler.selected_fe->dofs_per_line,
+	    mg_dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (mg_dof_handler.get_tria().n_raw_lines() *
+									     mg_dof_handler.get_fe().dofs_per_line,
 									     DoFHandler<3>::invalid_dof_index);
-	    mg_dof_handler.mg_faces->quads.dofs = std::vector<unsigned int> (mg_dof_handler.tria->n_raw_quads() *
-									     mg_dof_handler.selected_fe->dofs_per_quad,
+	    mg_dof_handler.mg_faces->quads.dofs = std::vector<unsigned int> (mg_dof_handler.get_tria().n_raw_quads() *
+									     mg_dof_handler.get_fe().dofs_per_quad,
 									     DoFHandler<3>::invalid_dof_index);
 
 
@@ -701,13 +697,13 @@ namespace internal
 					     // over all cells and storing the
 					     // maximum and minimum level each
 					     // vertex we pass by  belongs to
-	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.tria->n_vertices());
+	    mg_dof_handler.mg_vertex_dofs.resize (mg_dof_handler.get_tria().n_vertices());
 
-	    std::vector<unsigned int> min_level (mg_dof_handler.tria->n_vertices(), mg_dof_handler.tria->n_levels());
-	    std::vector<unsigned int> max_level (mg_dof_handler.tria->n_vertices(), 0);
+	    std::vector<unsigned int> min_level (mg_dof_handler.get_tria().n_vertices(), mg_dof_handler.get_tria().n_levels());
+	    std::vector<unsigned int> max_level (mg_dof_handler.get_tria().n_vertices(), 0);
 
-	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.tria->begin(),
-						       endc = mg_dof_handler.tria->end();
+	    typename dealii::Triangulation<dim,spacedim>::cell_iterator cell = mg_dof_handler.get_tria().begin(),
+						       endc = mg_dof_handler.get_tria().end();
 	    for (; cell!=endc; ++cell)
 	      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 		   ++vertex)
@@ -721,10 +717,10 @@ namespace internal
 
 
 					     // now allocate the needed space
-	    for (unsigned int vertex=0; vertex<mg_dof_handler.tria->n_vertices(); ++vertex)
-	      if (mg_dof_handler.tria->vertex_used(vertex))
+	    for (unsigned int vertex=0; vertex<mg_dof_handler.get_tria().n_vertices(); ++vertex)
+	      if (mg_dof_handler.get_tria().vertex_used(vertex))
 		{
-		  Assert (min_level[vertex] < mg_dof_handler.tria->n_levels(), ExcInternalError());
+		  Assert (min_level[vertex] < mg_dof_handler.get_tria().n_levels(), ExcInternalError());
 		  Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
 		  mg_dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex],
@@ -733,7 +729,7 @@ namespace internal
 		}
 	      else
 		{
-		  Assert (min_level[vertex] == mg_dof_handler.tria->n_levels(), ExcInternalError());
+		  Assert (min_level[vertex] == mg_dof_handler.get_tria().n_levels(), ExcInternalError());
 		  Assert (max_level[vertex] == 0, ExcInternalError());
 
 						   // reset to original state
@@ -1072,7 +1068,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::raw_cell_iterator
 MGDoFHandler<dim, spacedim>::end_raw (const unsigned int level) const
 {
-  return (level == this->tria->n_levels()-1 ?
+  return (level == this->get_tria().n_levels()-1 ?
 	  end() :
 	  begin_raw (level+1));
 }
@@ -1082,7 +1078,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::cell_iterator
 MGDoFHandler<dim, spacedim>::end (const unsigned int level) const
 {
-  return (level == this->tria->n_levels()-1 ?
+  return (level == this->get_tria().n_levels()-1 ?
 	  cell_iterator(end()) :
 	  begin (level+1));
 }
@@ -1092,7 +1088,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::active_cell_iterator
 MGDoFHandler<dim, spacedim>::end_active (const unsigned int level) const
 {
-  return (level == this->tria->n_levels()-1 ?
+  return (level == this->get_tria().n_levels()-1 ?
 	  active_cell_iterator(end()) :
 	  begin_active (level+1));
 }
@@ -1278,19 +1274,19 @@ MGDoFHandler<dim, spacedim>::begin_raw_line (const unsigned int level) const
   switch (dim)
     {
       case 1:
-	    Assert (level<this->tria->n_levels(), ExcInvalidLevel(level));
+	    Assert (level<this->get_tria().n_levels(), ExcInvalidLevel(level));
 
-	    if (this->tria->n_raw_lines(level) == 0)
+	    if (this->get_tria().n_raw_lines(level) == 0)
 	      return end_line ();
 
-	    return raw_line_iterator (this->tria,
+	    return raw_line_iterator (&this->get_tria(),
 				      level,
 				      0,
 				      this);
 
       default:
 	    Assert (level == 0, ExcFacesHaveNoLevel());
-	    return raw_line_iterator (this->tria,
+	    return raw_line_iterator (&this->get_tria(),
 				      0,
 				      0,
 				      this);
@@ -1334,7 +1330,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::raw_line_iterator
 MGDoFHandler<dim, spacedim>::end_line () const
 {
-  return raw_line_iterator (this->tria,
+  return raw_line_iterator (&this->get_tria(),
 			    -1,
 			    -1,
 			    this);
@@ -1349,20 +1345,20 @@ MGDoFHandler<dim, spacedim>::last_raw_line (const unsigned int level) const
   switch (dim)
     {
       case 1:
-	    Assert (level<this->tria->n_levels(), ExcInvalidLevel(level));
-	    Assert (this->tria->n_raw_lines(level) != 0,
+	    Assert (level<this->get_tria().n_levels(), ExcInvalidLevel(level));
+	    Assert (this->get_tria().n_raw_lines(level) != 0,
 		    ExcEmptyLevel (level));
 
-	    return raw_line_iterator (this->tria,
+	    return raw_line_iterator (&this->get_tria(),
 				      level,
-				      this->tria->n_raw_lines(level)-1,
+				      this->get_tria().n_raw_lines(level)-1,
 				      this);
 
       default:
 	    Assert (level == 0, ExcFacesHaveNoLevel());
-	    return raw_line_iterator (this->tria,
+	    return raw_line_iterator (&this->get_tria(),
 				      0,
-				      this->tria->n_raw_lines()-1,
+				      this->get_tria().n_raw_lines()-1,
 				      this);
     }
 }
@@ -1374,7 +1370,7 @@ typename MGDoFHandler<dim, spacedim>::raw_line_iterator
 MGDoFHandler<dim, spacedim>::last_raw_line () const
 {
   if (dim == 1)
-    return last_raw_line (this->tria->n_levels()-1);
+    return last_raw_line (this->get_tria().n_levels()-1);
   else
     return last_raw_line (0);
 }
@@ -1400,7 +1396,7 @@ typename MGDoFHandler<dim, spacedim>::line_iterator
 MGDoFHandler<dim, spacedim>::last_line () const
 {
   if (dim == 1)
-    return last_line (this->tria->n_levels()-1);
+    return last_line (this->get_tria().n_levels()-1);
   else
     return last_line (0);
 }
@@ -1426,7 +1422,7 @@ typename MGDoFHandler<dim, spacedim>::active_line_iterator
 MGDoFHandler<dim, spacedim>::last_active_line () const
 {
   if (dim == 1)
-    return last_active_line (this->tria->n_levels()-1);
+    return last_active_line (this->get_tria().n_levels()-1);
   else
     return last_active_line (0);
 }
@@ -1438,7 +1434,7 @@ MGDoFHandler<dim, spacedim>::end_raw_line (const unsigned int level) const
 {
   Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
   if (dim == 1)
-    return (level == this->tria->n_levels()-1 ?
+    return (level == this->get_tria().n_levels()-1 ?
 	    end_line() :
 	    begin_raw_line (level+1));
   else
@@ -1452,7 +1448,7 @@ MGDoFHandler<dim, spacedim>::end_line (const unsigned int level) const
 {
   Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
   if (dim == 1)
-    return (level == this->tria->n_levels()-1 ?
+    return (level == this->get_tria().n_levels()-1 ?
 	    line_iterator(end_line()) :
 	    begin_line (level+1));
   else
@@ -1466,7 +1462,7 @@ MGDoFHandler<dim, spacedim>::end_active_line (const unsigned int level) const
 {
   Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
   if (dim == 1)
-    return (level == this->tria->n_levels()-1 ?
+    return (level == this->get_tria().n_levels()-1 ?
 	    active_line_iterator(end_line()) :
 	    begin_active_line (level+1));
   else
@@ -1489,12 +1485,12 @@ MGDoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
 	    return raw_hex_iterator();
       case 2:
       {
-	Assert (level<this->tria->n_levels(), ExcInvalidLevel(level));
+	Assert (level<this->get_tria().n_levels(), ExcInvalidLevel(level));
 
-	if (this->tria->n_raw_quads(level) == 0)
+	if (this->get_tria().n_raw_quads(level) == 0)
 	  return end_quad();
 
-	return raw_quad_iterator (this->tria,
+	return raw_quad_iterator (&this->get_tria(),
 				  level,
 				  0,
 				  this);
@@ -1504,7 +1500,7 @@ MGDoFHandler<dim,spacedim>::begin_raw_quad (const unsigned int level) const
       {
 	Assert (level == 0, ExcFacesHaveNoLevel());
 
-	return raw_quad_iterator (this->tria,
+	return raw_quad_iterator (&this->get_tria(),
 				  0,
 				  0,
 				  this);
@@ -1557,7 +1553,7 @@ MGDoFHandler<dim, spacedim>::end_raw_quad (const unsigned int level) const
 {
   Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
   if (dim == 2)
-    return (level == this->tria->n_levels()-1 ?
+    return (level == this->get_tria().n_levels()-1 ?
 	    end_quad() :
 	    begin_raw_quad (level+1));
   else
@@ -1572,7 +1568,7 @@ MGDoFHandler<dim, spacedim>::end_quad (const unsigned int level) const
 {
   Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
   if (dim == 2)
-    return (level == this->tria->n_levels()-1 ?
+    return (level == this->get_tria().n_levels()-1 ?
 	    quad_iterator(end_quad()) :
 	    begin_quad (level+1));
   else
@@ -1586,7 +1582,7 @@ MGDoFHandler<dim, spacedim>::end_active_quad (const unsigned int level) const
 {
   Assert(dim == 2 || level == 0, ExcFacesHaveNoLevel());
   if (dim == 2)
-    return (level == this->tria->n_levels()-1 ?
+    return (level == this->get_tria().n_levels()-1 ?
 	    active_quad_iterator(end_quad()) :
 	    begin_active_quad (level+1));
   else
@@ -1599,7 +1595,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim,spacedim>::raw_quad_iterator
 MGDoFHandler<dim,spacedim>::end_quad () const
 {
-  return raw_quad_iterator (this->tria,
+  return raw_quad_iterator (&this->get_tria(),
 			    -1,
 			    -1,
 			    this);
@@ -1617,19 +1613,19 @@ MGDoFHandler<dim,spacedim>::last_raw_quad (const unsigned int level) const
 	    Assert (false, ExcImpossibleInDim(1));
 	    return raw_quad_iterator();
       case 2:
-	    Assert (level<this->tria->n_levels(),
+	    Assert (level<this->get_tria().n_levels(),
 		    ExcInvalidLevel(level));
-	    Assert (this->tria->n_raw_quads(level) != 0,
+	    Assert (this->get_tria().n_raw_quads(level) != 0,
 		    ExcEmptyLevel (level));
-	    return raw_quad_iterator (this->tria,
+	    return raw_quad_iterator (&this->get_tria(),
 				      level,
-				      this->tria->n_raw_quads(level)-1,
+				      this->get_tria().n_raw_quads(level)-1,
 				      this);
       case 3:
 	    Assert (level == 0, ExcFacesHaveNoLevel());
-	    return raw_quad_iterator (this->tria,
+	    return raw_quad_iterator (&this->get_tria(),
 				      0,
-				      this->tria->n_raw_quads()-1,
+				      this->get_tria().n_raw_quads()-1,
 				      this);
       default:
 	    Assert (false, ExcNotImplemented());
@@ -1644,7 +1640,7 @@ typename MGDoFHandler<dim,spacedim>::raw_quad_iterator
 MGDoFHandler<dim,spacedim>::last_raw_quad () const
 {
   if (dim == 2)
-    return last_raw_quad (this->tria->n_levels()-1);
+    return last_raw_quad (this->get_tria().n_levels()-1);
   else
     return last_raw_quad (0);
 }
@@ -1672,7 +1668,7 @@ typename MGDoFHandler<dim,spacedim>::quad_iterator
 MGDoFHandler<dim,spacedim>::last_quad () const
 {
   if (dim == 2)
-    return last_quad (this->tria->n_levels()-1);
+    return last_quad (this->get_tria().n_levels()-1);
   else
     return last_quad (0);
 }
@@ -1700,7 +1696,7 @@ typename MGDoFHandler<dim,spacedim>::active_quad_iterator
 MGDoFHandler<dim,spacedim>::last_active_quad () const
 {
   if (dim == 2)
-    return last_active_quad (this->tria->n_levels()-1);
+    return last_active_quad (this->get_tria().n_levels()-1);
   else
     return last_active_quad (0);
 }
@@ -1721,12 +1717,12 @@ MGDoFHandler<dim,spacedim>::begin_raw_hex (const unsigned int level) const
 	    return raw_hex_iterator();
       case 3:
       {
-	Assert (level<this->tria->n_levels(), ExcInvalidLevel(level));
+	Assert (level<this->get_tria().n_levels(), ExcInvalidLevel(level));
 
-	if (this->tria->n_raw_hexs(level) == 0)
+	if (this->get_tria().n_raw_hexs(level) == 0)
 	  return end_hex();
 
-	return raw_hex_iterator (this->tria,
+	return raw_hex_iterator (&this->get_tria(),
 				 level,
 				 0,
 				 this);
@@ -1776,7 +1772,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::raw_hex_iterator
 MGDoFHandler<dim, spacedim>::end_raw_hex (const unsigned int level) const
 {
-  return (level == this->tria->n_levels()-1 ?
+  return (level == this->get_tria().n_levels()-1 ?
 	  end_hex() :
 	  begin_raw_hex (level+1));
 }
@@ -1786,7 +1782,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::hex_iterator
 MGDoFHandler<dim, spacedim>::end_hex (const unsigned int level) const
 {
-  return (level == this->tria->n_levels()-1 ?
+  return (level == this->get_tria().n_levels()-1 ?
 	  hex_iterator(end_hex()) :
 	  begin_hex (level+1));
 }
@@ -1796,7 +1792,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::active_hex_iterator
 MGDoFHandler<dim, spacedim>::end_active_hex (const unsigned int level) const
 {
-  return (level == this->tria->n_levels()-1 ?
+  return (level == this->get_tria().n_levels()-1 ?
 	  active_hex_iterator(end_hex()) :
 	  begin_active_hex (level+1));
 }
@@ -1807,7 +1803,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::raw_hex_iterator
 MGDoFHandler<dim, spacedim>::end_hex () const
 {
-  return raw_hex_iterator (this->tria,
+  return raw_hex_iterator (&this->get_tria(),
 			   -1,
 			   -1,
 			   this);
@@ -1827,14 +1823,14 @@ MGDoFHandler<dim, spacedim>::last_raw_hex (const unsigned int level) const
 	    return raw_hex_iterator();
 
       case 3:
-	    Assert (level<this->tria->n_levels(),
+	    Assert (level<this->get_tria().n_levels(),
 		    ExcInvalidLevel(level));
-	    Assert (this->tria->n_raw_hexs(level) != 0,
+	    Assert (this->get_tria().n_raw_hexs(level) != 0,
 		    ExcEmptyLevel (level));
 
-	    return raw_hex_iterator (this->tria,
+	    return raw_hex_iterator (&this->get_tria(),
 				     level,
-				     this->tria->n_raw_hexs(level)-1,
+				     this->get_tria().n_raw_hexs(level)-1,
 				     this);
       default:
 	    Assert (false, ExcNotImplemented());
@@ -1848,7 +1844,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::raw_hex_iterator
 MGDoFHandler<dim, spacedim>::last_raw_hex () const
 {
-  return last_raw_hex (this->tria->n_levels()-1);
+  return last_raw_hex (this->get_tria().n_levels()-1);
 }
 
 
@@ -1873,7 +1869,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::hex_iterator
 MGDoFHandler<dim, spacedim>::last_hex () const
 {
-  return last_hex (this->tria->n_levels()-1);
+  return last_hex (this->get_tria().n_levels()-1);
 }
 
 
@@ -1898,7 +1894,7 @@ template <int dim, int spacedim>
 typename MGDoFHandler<dim, spacedim>::active_hex_iterator
 MGDoFHandler<dim, spacedim>::last_active_hex () const
 {
-  return last_active_hex (this->tria->n_levels()-1);
+  return last_active_hex (this->get_tria().n_levels()-1);
 }
 
 
@@ -1961,7 +1957,7 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
 
 				   // reserve space for the MG dof numbers
   reserve_space ();
-  mg_used_dofs.resize (this->tria->n_levels(), 0);
+  mg_used_dofs.resize (this->get_tria().n_levels(), 0);
 
 				   // Clear user flags because we will
 				   // need them. But first we save
@@ -1972,12 +1968,12 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
 				   // same state as it was at the
 				   // beginning of this function.
   std::vector<bool> user_flags;
-  this->tria->save_user_flags(user_flags);
-  const_cast<Triangulation<dim,spacedim> &>(*(this->tria)).clear_user_flags ();
+  this->get_tria().save_user_flags(user_flags);
+  const_cast<Triangulation<dim,spacedim> &>(this->get_tria()).clear_user_flags ();
 
 				   // now distribute indices on each level
 				   // separately
-  for (unsigned int level=0; level<this->tria->n_levels(); ++level)
+  for (unsigned int level=0; level<this->get_tria().n_levels(); ++level)
     {
       unsigned int next_free_dof = offset;
       cell_iterator cell = begin(level),
@@ -1990,7 +1986,7 @@ void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spaced
     }
 
 				   // finally restore the user flags
-  const_cast<Triangulation<dim,spacedim> &>(*(this->tria))
+  const_cast<Triangulation<dim,spacedim> &>(this->get_tria())
     .load_user_flags(user_flags);
 
   this->block_info_object.initialize(*this, true);
@@ -2040,10 +2036,10 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 				     // the present level
     if ((i->get_coarsest_level() <= level) &&
 	(i->get_finest_level() >= level))
-      for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	i->set_index (level, d, this->selected_fe->dofs_per_vertex,
+      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
+	i->set_index (level, d, this->get_fe().dofs_per_vertex,
 		      new_numbers[i->get_index (level, d,
-						this->selected_fe->dofs_per_vertex)]);
+						this->get_fe().dofs_per_vertex)]);
 
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->lines.dofs.begin();
        i!=mg_levels[level]->lines.dofs.end(); ++i)
@@ -2074,17 +2070,17 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 				     // the present level
     if ((i->get_coarsest_level() <= level) &&
 	(i->get_finest_level() >= level))
-      for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	i->set_index (level, d, this->selected_fe->dofs_per_vertex,
+      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
+	i->set_index (level, d, this->get_fe().dofs_per_vertex,
 		      new_numbers[i->get_index (level, d,
-						this->selected_fe->dofs_per_vertex)]);
+						this->get_fe().dofs_per_vertex)]);
 
-  if (this->selected_fe->dofs_per_line > 0)
+  if (this->get_fe().dofs_per_line > 0)
     {
 				       // save user flags as they will be modified
       std::vector<bool> user_flags;
-      this->tria->save_user_flags(user_flags);
-      const_cast<Triangulation<2> &>(*(this->tria)).clear_user_flags ();
+      this->get_tria().save_user_flags(user_flags);
+      const_cast<Triangulation<2> &>(this->get_tria()).clear_user_flags ();
 
 				       // flag all lines adjacent to cells of the current
 				       // level, as those lines logically belong to the same
@@ -2102,12 +2098,12 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
       for( ; line != endline; ++line)
 	if (line->user_flag_set())
 	  {
-	    for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
+	    for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
 	      line->set_mg_dof_index (level, d, new_numbers[line->mg_dof_index(level, d)]);
 	    line->clear_user_flag();
 	  }
 				       // finally, restore user flags
-      const_cast<Triangulation<2> &>(*(this->tria)).load_user_flags (user_flags);
+      const_cast<Triangulation<2> &>(this->get_tria()).load_user_flags (user_flags);
     }
 
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->quads.dofs.begin();
@@ -2139,18 +2135,18 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 				     // the present level
     if ((i->get_coarsest_level() <= level) &&
 	(i->get_finest_level() >= level))
-      for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	i->set_index (level, d, this->selected_fe->dofs_per_vertex,
+      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
+	i->set_index (level, d, this->get_fe().dofs_per_vertex,
 		      new_numbers[i->get_index (level, d,
-						this->selected_fe->dofs_per_vertex)]);
+						this->get_fe().dofs_per_vertex)]);
 
 				   // LINE DoFs
-  if (this->selected_fe->dofs_per_line > 0)
+  if (this->get_fe().dofs_per_line > 0)
     {
 				       // save user flags as they will be modified
       std::vector<bool> user_flags;
-      this->tria->save_user_flags(user_flags);
-      const_cast<Triangulation<3> &>(*(this->tria)).clear_user_flags ();
+      this->get_tria().save_user_flags(user_flags);
+      const_cast<Triangulation<3> &>(this->get_tria()).clear_user_flags ();
 
 				       // flag all lines adjacent to cells of the current
 				       // level, as those lines logically belong to the same
@@ -2170,21 +2166,21 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
       for( ; line != endline; ++line)
 	if (line->user_flag_set())
 	  {
-	    for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
+	    for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
 	      line->set_mg_dof_index (level, d, new_numbers[line->mg_dof_index(level, d)]);
 	    line->clear_user_flag();
 	  }
 				       // finally, restore user flags
-      const_cast<Triangulation<3> &>(*(this->tria)).load_user_flags (user_flags);
+      const_cast<Triangulation<3> &>(this->get_tria()).load_user_flags (user_flags);
     }
 
 				   // QUAD DoFs
-  if (this->selected_fe->dofs_per_quad > 0)
+  if (this->get_fe().dofs_per_quad > 0)
     {
 				       // save user flags as they will be modified
       std::vector<bool> user_flags;
-      this->tria->save_user_flags(user_flags);
-      const_cast<Triangulation<3> &>(*(this->tria)).clear_user_flags ();
+      this->get_tria().save_user_flags(user_flags);
+      const_cast<Triangulation<3> &>(this->get_tria()).clear_user_flags ();
 
 				       // flag all quads adjacent to cells of the current
 				       // level, as those lines logically belong to the same
@@ -2202,12 +2198,12 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
       for( ; quad != endline; ++quad)
 	if (quad->user_flag_set())
 	  {
-	    for (unsigned int d=0; d<this->selected_fe->dofs_per_quad; ++d)
+	    for (unsigned int d=0; d<this->get_fe().dofs_per_quad; ++d)
 	      quad->set_mg_dof_index (level, d, new_numbers[quad->mg_dof_index(level, d)]);
 	    quad->clear_user_flag();
 	  }
 				       // finally, restore user flags
-      const_cast<Triangulation<3> &>(*(this->tria)).load_user_flags (user_flags);
+      const_cast<Triangulation<3> &>(this->get_tria()).load_user_flags (user_flags);
     }
 
 				   //HEX DoFs

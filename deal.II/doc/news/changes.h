@@ -30,7 +30,13 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li>None.
+
+<li> The fields DoFHandler::tria and DoFHandler::selected_fe are now
+private instead of protected. Inheriting classes can only access them
+through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
+<br>
+(GK 2010/08/16)</li>
+
 </ol>
 
 
@@ -217,6 +223,13 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li>
+  <p>
+  Improved: DoFHandler has a default constructor, so that it can be used in containers. 	
+  <br>
+  (GK 2010/08/16)
+  </p>
 
   <li>
   <p>
