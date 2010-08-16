@@ -383,7 +383,6 @@ class Step39
     void error ();
     double estimate ();
     void solve ();
-    void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
 				     // The member objects related to
