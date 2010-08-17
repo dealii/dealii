@@ -308,7 +308,7 @@ class BEMProblem
     const Quadrature<dim-1> & get_singular_quadrature(
       const typename DoFHandler<dim-1, dim>::active_cell_iterator &cell,
       const unsigned int index) const;
-    
+
 
 				     // The usual deal.II classes can
 				     // be used for boundary element
@@ -373,7 +373,7 @@ class BEMProblem
 				     // from a point $\mathbf x$) at
 				     // the support points of our
 				     // shape functions.
-    
+
     Vector<double>              phi;
     Vector<double>              alpha;
 
@@ -381,7 +381,7 @@ class BEMProblem
 				     // to output errors in the exact
 				     // solution and in the computed
 				     // alphas.
-    
+
     ConvergenceTable	convergence_table;
 
 				     // The following variables are
@@ -421,13 +421,13 @@ class BEMProblem
 				     // parameters which are used in
 				     // case we wanted to extend the
 				     // solution to the entire domain.
-    
+
     Functions::ParsedFunction<dim> wind;
     Functions::ParsedFunction<dim> exact_solution;
 
     unsigned int singular_quadrature_order;
     std_cxx1x::shared_ptr<Quadrature<dim-1> > quadrature;
-    
+
     SolverControl solver_control;
 
     unsigned int n_cycles;
@@ -472,8 +472,8 @@ BEMProblem<dim>::BEMProblem(const unsigned int fe_degree,
 		:
 		fe(fe_degree),
 		dh(tria),
-		wind(dim),
-		mapping(mapping_degree, true)
+		mapping(mapping_degree, true),
+		wind(dim)
 {}
 
 
@@ -734,7 +734,7 @@ void BEMProblem<dim>::read_domain()
   GridIn<dim-1, dim> gi;
   gi.attach_triangulation (tria);
   gi.read_ucd (in);
-  
+
   tria.set_boundary(1, boundary);
 }
 
@@ -819,14 +819,14 @@ void BEMProblem<dim>::assemble_system()
 				   // the support points of the $i$th
 				   // basis function, while $j$ runs
 				   // on inner integration points.
-  
+
 				   // We construct a vector
 				   // of support points which will be
 				   // used in the local integrations:
   std::vector<Point<dim> > support_points(dh.n_dofs());
   DoFTools::map_dofs_to_support_points<dim-1, dim>( mapping, dh, support_points);
 
-  
+
 				   // After doing so, we can start the
 				   // integration loop over all cells,
 				   // where we first initialize the
@@ -947,7 +947,7 @@ void BEMProblem<dim>::assemble_system()
 					     // explained in detail below.
 	    Assert(singular_index != numbers::invalid_unsigned_int,
 		   ExcInternalError());
-	    
+
 	    const Quadrature<dim-1> & singular_quadrature =
 	      get_singular_quadrature(cell, singular_index);
 
@@ -1205,7 +1205,7 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle)
 				 // cell. For this reason, it is
 				 // necessary to create a new
 				 // quadrature for each singular
-				 // integration. 
+				 // integration.
 				 //
 				 // The different quadrature rules are
 				 // built inside the
@@ -1215,7 +1215,7 @@ void BEMProblem<dim>::compute_errors(const unsigned int cycle)
 				 // assemble_system function. The
 				 // index given as an argument is the
 				 // index of the unit support point
-				 // where the singularity is located. 
+				 // where the singularity is located.
 
 template<>
 const Quadrature<2> & BEMProblem<3>::get_singular_quadrature(
@@ -1224,9 +1224,9 @@ const Quadrature<2> & BEMProblem<3>::get_singular_quadrature(
 {
   Assert(index < fe.dofs_per_cell,
 	 ExcIndexRange(0, fe.dofs_per_cell, index));
-  
+
   static std::vector<QGaussOneOverR<2> > quadratures;
-  if(quadratures.size() == 0) 
+  if(quadratures.size() == 0)
     for(unsigned int i=0; i<fe.dofs_per_cell; ++i)
       quadratures.push_back(QGaussOneOverR<2>(singular_quadrature_order,
 					      fe.get_unit_support_points()[i],
@@ -1242,10 +1242,10 @@ const Quadrature<1> & BEMProblem<2>::get_singular_quadrature(
 {
   Assert(index < fe.dofs_per_cell,
 	 ExcIndexRange(0, fe.dofs_per_cell, index));
-  
+
   static Quadrature<1> * q_pointer = NULL;
   if(q_pointer) delete q_pointer;
-  
+
   q_pointer = new QGaussLogR<1>(singular_quadrature_order,
 				fe.get_unit_support_points()[index],
 				1./cell->measure(), true);
@@ -1460,7 +1460,7 @@ int main ()
     {
       unsigned int degree = 1;
       unsigned int mapping_degree = 1;
-      
+
       deallog.depth_console (3);
       BEMProblem<2> laplace_problem_2d(degree, mapping_degree);
       laplace_problem_2d.run();
