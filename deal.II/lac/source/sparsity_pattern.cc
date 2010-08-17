@@ -568,12 +568,9 @@ SparsityPattern::copy_from (const CSP &csp,
   std::vector<unsigned int> row_lengths (csp.n_rows());
   for (unsigned int i=0; i<csp.n_rows(); ++i)
     {
-      unsigned int additional_diagonal = 0;
-      if (do_diag_optimize)
-	if (csp.exists(i,i) == false)
-	  additional_diagonal = 1;
-
-      row_lengths[i] = csp.row_length(i) + additional_diagonal;
+      row_lengths[i] = csp.row_length(i);
+      if (do_diag_optimize && !csp.exists(i,i))
+	++row_lengths[i];
     }
   reinit (csp.n_rows(), csp.n_cols(), row_lengths, do_diag_optimize);
 
@@ -583,7 +580,7 @@ SparsityPattern::copy_from (const CSP &csp,
 				   // quadratic, then we already have
 				   // the diagonal element
 				   // preallocated
-  if (n_rows() * n_cols() > 0)
+  if (n_rows() != 0 && n_cols() != 0)
     for (unsigned int row = 0; row<csp.n_rows(); ++row)
       {
 	unsigned int *cols = &colnums[rowstart[row]] + (do_diag_optimize ? 1 : 0);
