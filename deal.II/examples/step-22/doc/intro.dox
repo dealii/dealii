@@ -1,15 +1,15 @@
 <br>
 
 <i>This program was contributed by Martin Kronbichler and Wolfgang
-Bangerth. 
+Bangerth.
 <br>
 This material is based upon work partly supported by the National
-Science Foundation under Award No. EAR-0426271 and The California Institute of 
+Science Foundation under Award No. EAR-0426271 and The California Institute of
 Technology. Any opinions, findings, and conclusions or recommendations
 expressed in this publication are those of the author and do not
 necessarily reflect the views of the National Science Foundation or of The
 California Institute of Technology.
-</i> 
+</i>
 
 
 
@@ -162,7 +162,7 @@ possibilities for imposing boundary conditions:
     @f}
     In other words, as usual, strongly imposed boundary values do not
     appear in the weak form.
- 
+
     It is noteworthy that if we impose Dirichlet boundary values on the entire
     boundary, then the pressure is only determined up to a constant. An
     algorithmic realization of that would use similar tools as have been seen in
@@ -180,15 +180,15 @@ possibilities for imposing boundary conditions:
       \sum_{i,j=1}^d
       -(n_i v_j,\varepsilon(\textbf{u})_{ij})_{\Gamma_N}
       +
-      \sum_{i=1}^d 
-      (n_i v_i, p)_{\Gamma_N}	
+      \sum_{i=1}^d
+      (n_i v_i, p)_{\Gamma_N}
       \\
       &=&
       \sum_{i,j=1}^d
       -(n_i v_j,\varepsilon(\textbf{u})_{ij})_{\Gamma_N}
       +
-      \sum_{i,j=1}^d 
-      (n_i v_j, p \delta_{ij})_{\Gamma_N}	
+      \sum_{i,j=1}^d
+      (n_i v_j, p \delta_{ij})_{\Gamma_N}
       \\
       &=&
       \sum_{i,j=1}^d
@@ -206,7 +206,7 @@ possibilities for imposing boundary conditions:
     prescribe values for the total stress:
     @f{eqnarray*}
       \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})]
-      = 
+      =
       \textbf g_N \qquad\qquad \textrm{on}\ \Gamma_N.
     @f}
     If the boundary is subdivided into Dirichlet and Neumann parts
@@ -221,13 +221,13 @@ possibilities for imposing boundary conditions:
       -
       (\textbf{v}, \textbf g_N)_{\Gamma_N}.
     @f}
-    
-    
+
+
 <li>Robin-type boundary conditions: Robin boundary conditions are a mixture of
-    Dirichlet and Neumann boundary conditions. They would read 
+    Dirichlet and Neumann boundary conditions. They would read
     @f{eqnarray*}
       \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})]
-      = 
+      =
       \textbf S \textbf u \qquad\qquad \textrm{on}\ \Gamma_R,
     @f}
     with a rank-2 tensor (matrix) $\textbf S$. The associated weak form is
@@ -249,14 +249,14 @@ possibilities for imposing boundary conditions:
     boundary, i.e. the tangential component $\textbf u_{\textbf t}=(\textbf
     1-\textbf n\otimes\textbf n)\textbf u$ be zero, thereby constraining
     <code>dim</code>-1 components of the velocity. The remaining component can
-    be constrained by requiring that the normal component of the normal 
+    be constrained by requiring that the normal component of the normal
     stress be zero, yielding the following set of boundary conditions:
     @f{eqnarray*}
       \textbf u_{\textbf t} &=& 0,
       \\
       \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{1} -
       \varepsilon(\textbf{u})] \right)
-      &=& 
+      &=&
       0.
     @f}
 
@@ -269,15 +269,15 @@ possibilities for imposing boundary conditions:
     friction is exerted by the boundary on the fluid (e.g. at the interface
     between earth mantle and earth core where two fluids meet that are
     stratified by different densities but that both have small enough
-    viscosities to not introduce much tangential stress on each other). 
-    In formulas, this means that 
+    viscosities to not introduce much tangential stress on each other).
+    In formulas, this means that
     @f{eqnarray*}
       \textbf{n}\cdot\textbf u &=& 0,
       \\
       (\textbf 1-\textbf n\otimes\textbf n)
       \left(\textbf{n}\cdot [p \textbf{1} -
       \varepsilon(\textbf{u})] \right)
-      &=& 
+      &=&
       0,
     @f}
     the first condition (which needs to be imposed strongly) fixing a single
@@ -305,7 +305,7 @@ g_D\}, p\in Q=L^2(\Omega)$ so that
   -
   (\textbf{v}, \textbf g_N)_{\Gamma_N}
 @f}
-for all test functions 
+for all test functions
 $\textbf v\in \textbf V_0 = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=0\},q\in
 Q$.
 
@@ -323,7 +323,7 @@ For the Stokes equations, there are a number of possible choices to ensure
 that the finite element spaces are compatible with the LBB condition. A simple
 and accurate choice that we will use here is $\textbf u_h\in Q_{p+1}^d,
 p_h\in Q_p$, i.e. use elements one order higher for the velocities than for the
-pressures. 
+pressures.
 
 This then leads to the following discrete problem: find $\textbf u_h,p_h$ so
 that
@@ -362,7 +362,7 @@ linear system for the nodal values of the velocity and pressure fields:
 @f}
 Like in step-20 and step-21, we will solve this
 system of equations by forming the Schur complement, i.e. we will first find
-the solution $P$ of 
+the solution $P$ of
 @f{eqnarray*}
   BA^{-1}B^T P &=& BA^{-1} F - G, \\
 @f}
@@ -446,7 +446,7 @@ convenience (because it reflects the structure of the FESystem finite
 element and associated DoFHandler object) but later only operate on
 the $(0,0),(0,1)$, and $(1,0)$ blocks of this matrix. In other words,
 our algorithm so far entirely ignores the $(1,1)$ (pressure-pressure)
-block as it is empty anyway. 
+block as it is empty anyway.
 
 Now, as mentioned, we need a pressure mass matrix to precondition the
 Schur complement and that conveniently the pressure-pressure block of
@@ -537,13 +537,13 @@ template <int dim>
 struct InnerPreconditioner;
 
 template <>
-struct InnerPreconditioner<2> 
+struct InnerPreconditioner<2>
 {
     typedef SparseDirectUMFPACK type;
 };
 
 template <>
-struct InnerPreconditioner<3> 
+struct InnerPreconditioner<3>
 {
     typedef SparseILU<double> type;
 };
@@ -619,7 +619,7 @@ in the boundary values into the ConstraintMatrix object by using the call
                                             1,
                                             BoundaryValues<dim>(),
                                             constraints);
-@endcode 
+@endcode
 
 very similar to how we were making the list of boundary nodes
 before (note that we set Dirichlet conditions only on boundaries with
@@ -669,17 +669,17 @@ set them to zero. The fraction of elements that are present in the sparsity
 pattern, but do not really contain any information, can be up to one fourth
 of the total number of elements in the matrix for the 3D application
 considered in this tutorial program. Remember that matrix-vector products or
-preconditioners operate on all the elements of a sparse matrix (even those 
+preconditioners operate on all the elements of a sparse matrix (even those
 that are zero), which is an inefficiency we will avoid here.
 
 An advantage of directly resolving constrained degrees of freedom is that we
 can avoid having most of the entries that are going to be zero in our sparse
-matrix &mdash; we do not need constrained entries during matrix construction 
-(as opposed to the traditional algorithms, which first fill the matrix, and 
-only resolve constraints afterwards). This will save both memory and time 
-when forming matrix-vector products. The way we are going to do that is to 
-pass the information about constraints to the function that generates the 
-sparsity pattern, and then set a <tt>false</tt> argument specifying that we 
+matrix &mdash; we do not need constrained entries during matrix construction
+(as opposed to the traditional algorithms, which first fill the matrix, and
+only resolve constraints afterwards). This will save both memory and time
+when forming matrix-vector products. The way we are going to do that is to
+pass the information about constraints to the function that generates the
+sparsity pattern, and then set a <tt>false</tt> argument specifying that we
 do not intend to use constrained entries:
 @code
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
