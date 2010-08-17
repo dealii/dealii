@@ -1005,8 +1005,8 @@ class VectorTools
 				      *
 				      * To compute the constraints we use
 				      * projection-based interpolation as proposed
-				      * in \v{S}olin, Segeth and Dole\v{z}el
-				      * (Higher order finite elements, Chapman&Hall,
+				      * in Solin, Segeth and Dolezel
+				      * (Higher order finite elements, Chapman&amp;Hall,
 				      * 2004) on every face located at the
 				      * boundary.
 				      *
