@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -945,14 +945,14 @@ class VectorTools
 				       std::vector<unsigned int>       component_mapping = std::vector<unsigned int>());
 
 
-                     /**
-                      * Compute constraints that correspond to
-                      * boundary conditions of the form
-                      * $\vec{n}\times\vec{u}=\vec{n}\times\vec{f},
-                      * i.e. the tangential components of $u$
-                      * and $f$ shall coincide.
-                      *
-                      * If the ConstraintMatrix @p constraints
+				     /**
+				      * Compute constraints that correspond to
+				      * boundary conditions of the form
+				      * $\vec{n}\times\vec{u}=\vec{n}\times\vec{f}$,
+				      * i.e. the tangential components of $u$
+				      * and $f$ shall coincide.
+				      *
+				      * If the ConstraintMatrix @p constraints
 				      * contained values or other
 				      * constraints before, the new ones are
 				      * added or the old ones overwritten,
@@ -1012,13 +1012,13 @@ class VectorTools
 				      *
 				      * First one projects $\vec{f}$ on the
 				      * lowest-order edge shape functions. Then the
-				      * remaining part $(I-P_0)\vec{f}$ of the 
+				      * remaining part $(I-P_0)\vec{f}$ of the
 				      * function is projected on the remaining
 				      * higher-order edge shape functions. In the
 				      * last step we project $(I-P_0-P_e)\vec{f}$
 				      * on the bubble shape functions defined on
 				      * the face.
-                      */
+				      */
    template <int dim>
    static void project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
      const unsigned int first_vector_component,
@@ -1027,9 +1027,9 @@ class VectorTools
      ConstraintMatrix& constraints,
      const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
 
-                     /**
-                      * Same as above for the hp-namespace.
-                      */
+				     /**
+				      * Same as above for the hp-namespace.
+				      */
    template <int dim>
    static void project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
      const unsigned int first_vector_component,
