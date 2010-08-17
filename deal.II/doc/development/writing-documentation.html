@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>Writing documentation</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
@@ -47,7 +47,7 @@
     </p>
 
     <p>
-    This document first explains the basics of 
+    This document first explains the basics of
     <a href="#API" target="body">documenting the API</a> and then of
     <a href="#examples" target="body">writing example programs</a>.
     </p>
@@ -58,10 +58,10 @@
 
     <p>
     In order to extract documentation from the header files of the
-    project, we use 
+    project, we use
     <a href="http://www.doxygen.org/" target="_top">doxygen</a>.
     It requires that documentation is written in a form which
-    closely follows the 
+    closely follows the
     <a href="http://java.sun.com/products/jdk/javadoc/index.html" target="_top">
     JavaDoc</a> standard.
     </p>
@@ -80,13 +80,13 @@
        *
        * @author Wolfgang Bangerth, 2000
        */
-      class TestClass 
+      class TestClass
       {
         public:
                  /**
 		  * Constructor
 		  */
-          TestClass (); 
+          TestClass ();
 
                  /**
 		  * Example function
@@ -141,8 +141,8 @@
 	 <ul>
 	 <li> foo
 	 <li> bar
-	 </ul> 
-	 
+	 </ul>
+
 	 <p>
 	 In other words, one can use standard HTML tags for this
 	 task. Likewise, you can get numbered lists by using the
@@ -217,7 +217,7 @@
 	 level 3 (<tt>&lt;h3&gt;</tt>) to stay consistent with the
 	 structure of the <acronym>doxygen</acronym> output.
 	 </p>
-	 
+
 	 <p>
 	 Sections cannot be referenced, unless you add a <tt>&lt;A
 	 NAME="..."&gt;</tt> name anchor to them. If you really have
@@ -243,34 +243,6 @@
 	 </pre>
     </ul>
 
-
-
-    <a name="examples"></a>
-    <h2>Writing example programs</h2>
-
-    <h3>The Tutorial</h3>
-    <p>
-    At present, the tools that extract information from the example
-    programs are rather dumb. They are, to be precise, three Perl
-    scripts located in the directory of the
-    <code>deal.II/doc/tutorial</code> tree, where the HTML files are
-    generated. In principle, they extract plain text from all comments
-    in the programs that start with a double slash (C++ style
-    comment). Everything else is interpreted as program text and is
-    copied verbatim into the output.
-    </p>
-
-    <p>
-    In the future, it would certainly help if the scripts became a
-    little smarter. The only real functionality we presently have
-    beyond converting comments to interspersed text is that they can
-    extract section headings (take a look at how step-14 does this
-    using <tt>@sect</tt> tags), but
-    it would be interesting if one could add formulae, for example, or
-    if the tools could also generate output in a format that would
-    allow for higher quality printing than what we get from HTML.
-    </p>
-
     <h3>Code examples for the usage of single classes</h3>
     <p>
     Writing example files for classes is supported by
@@ -280,7 +252,7 @@
     documentation with <code>@include filename</code>. Take a look how
     the class <code>BlockMatrixArray</code> does this.
     </p>
-    
+
     <p>
     Larger example files should be documented using the
     <acronym>doxygen</acronym> command <code>@dotinclude</code> and
@@ -289,8 +261,180 @@
     consider converting them to a complete example program in the
     <code>step-XX</code> series.
     </p>
+
+
+
+    <a name="examples"></a>
+    <h2>Writing example programs for the tutorial</h2>
+
+    <p>
+    Tutorial programs consist of an introduction, a well documented
+    code, and a section that shows the output and numerical results
+    of running the program. These three parts are written in separate
+    files: for the <code>step-xx</code> program, for example, they
+    would be in the
+    files <code>examples/doc/step-xx/doc/intro.dox</code>,
+    <code>examples/doc/step-xx/step-xx.cc</code> and
+    <code>examples/doc/step-xx/doc/results.dox</code>. There are a
+    number of scripts that then process and concatenate these three
+    different files and send them through doxygen for generation of
+    HTML output. In general, if you want to see how certain markup
+    features can be used, it is worthwhile looking at the existing
+    tutorial program pages and the files they are generated from.
+    </p>
+
+    <h3>The introduction</h3>
+    <p>
+      The introduction, as well as the results section, will be
+      processed as if they were doxygen comments. In other words, all
+      the usual doxygen markup will work in these sections, including
+      latex formulas, though the format for the formula environment is
+      a bit awkward. Since it takes much longer to run doxygen for all
+      of deal.II than to run latex, most of the lengthier
+      introductions are just written in latex (with a minimal amount
+      of markup) and later converted into doxygen format. One thing to
+      be aware of is that you can reference formulas in doxygen, so
+      you have to work around that using text rather than formula
+      numbers.
+    </p>
+
+    <p>
+      More important is what goes into the introduction. Typically,
+      this would first be a statement of the problem that we want to
+      solve. Take a look, for example, at the step-22 or step-31
+      tutorial programs. Then come a few sections in which we would
+      discuss in mathematical terms the algorithms that we want to
+      use; this could, for example, include the time stepping,
+      discretization, or solver approaches. step-22 and step-31 are
+      again good, if lengthy, examples for this.
+    </p>
+
+    <p>
+      On the other hand, if a program is an extension of a previous
+      program, these things need not be repeated: you would just
+      reference the previous program. For example, step-16 does not
+      talk about adaptive meshes any more &mdash; it extends step-6
+      and simply refers there for details. Likewise, step-32 simply
+      refers to step-31 for the problem statement and basic algorithm
+      and simply focuses on those parts that are new compared to
+      step-31.
+    </p>
+
+    <p>
+      The purpose of the introduction is to explain what the program
+      is doing. It should set the mindset so that when you read
+      through the code you already know <i>why</i> we are doing
+      something. You may not yet know <i>how</i> this done, but this
+      is what the documentation within the code is doing. At least you
+      don't have to wonder any more why we are building up this
+      complicated preconditioner &mdash; we've already discussed this
+      in the introduction.
+    </p>
+
+    <p>
+      If it helps the understanding, the introduction can refer to
+      particular pieces of code (but doesn't have to). For example,
+      the introduction to step-20 has pretty lengthy code snippets
+      that explain how to implement a general interface of operators
+      that may or may not be matrices. This would be awkward to do
+      within the code since in the code the view is somewhat smaller
+      (you have to have complete parameter lists, follow the syntax of
+      the programming language, etc, all of which obscures the things
+      one wants to discuss when giving a broad overview related to
+      particular C++ constructs). On the other hand, showing code
+      snippets in the introduction risks duplicating code in two
+      places, which will eventually get out of synch. Consequently,
+      this intrstrument should only be used sparingly.
+    </p>
+
+
+    <h3>The actual code</h3>
+    <p>
+      At present, the tools that extract information from the actual example
+      programs code are rather dumb. They are, to be precise, three Perl
+      scripts located in the directory of the
+      <code>deal.II/doc/doxygen/tutorial</code> tree, where
+      the <code>.cc</code> files of the tutorial programs are converted
+      into doxygen input files. In essence, what these scripts do is to
+      create doxygen input that contains the comments of the program as
+      text, and the actual code of the programs as code snippets. You
+      can see this when you look at the pages for each of the tutorials
+      where the code is indendet relative to the text.
+    </p>
+
+    <p>
+      The whole thing being interpreted by doxygen means that you can
+      put anything doxygen understands into comments. This includes,
+      for example references to classes or members in the library (in
+      fact, you just need to write their name out and doxygen will
+      automatically link them), formulas, lists, etc. It all will come
+      out as if you had written comments for doxygen in the first
+      place.
+    </p>
+
+    <p>
+      The bigger question is <i>how</i> to write the comments that
+      explain what's going on in individual code blocks. Many years
+      back we wrote them so that every line or every two lines had
+      their own comment. You can still see this in some of the older
+      tutorial programs, though many of them have in the meantime been
+      converted to a newer style: it turns out that if you have
+      comments so frequently, it becomes hard to follow the flow of an
+      algorithm. In essence, you know exactly what each line does, but
+      you can't get an overview of what the function as a whole
+      does. But that's exactly the point of the tutorial programs, of
+      course!
+    </p>
+
+    <p>
+      So the way we now believe tutorial programs should be written is
+      to have comments for each logical block. For example,
+      the <code>solve()</code> function in many of the programs is
+      relatively straightforward and has at most a dozen lines of
+      code. So put a comment in front of the function that explains
+      all the things that are going on in the function, and then show
+      the function without comments in it &mdash; this way, a reader
+      will read through the half or full page of documentation
+      understanding the big picture, and can then see the whole
+      function all at once on a single screen without having to scroll
+      up and down. In the old way, the code would be spread out over a
+      couple pages, with comments between almost any two lines, making
+      it hard to see how it all fits together.
+    </p>
+
+    <p>
+      It is somewhat subjective how much code you should leave in each
+      block that you document separately. It might be a single line if
+      something really important and difficult happens there, but most
+      of the time it's probably more along the lines of 6 to 12 lines
+      &mdash; a small enough part of the code so that it's easy enough
+      to grasp by looking at it all at once, but large enough that it
+      contributes a significant part or all of an algorithm.
+    </p>
+
+
+    <h3>The results section</h3>
+
+    <p>
+      The results section should show (some of) the output of a
+      program, such as the console output and/or a visualization of
+      graphical output. It should also contain a brief discussion of
+      this output. It is intended to demonstrate what the program
+      does, so that a reader can see what happens if the program were
+      executed without actually running it. It helps to show a few
+      nice graphics there.
+    </p>
+
+    <p>
+      This section needs not be overly comprehensive. If the program
+      is the implementation of a method that's discussed in an
+      accompanying paper, it's entirely ok to say "for further
+      numerical results, see ...".
+    </p>
+
+
     <hr>
-    
+
     <address>
       <a href="../mail.html">The deal.II mailing list</a></address>
 <div class="right">
