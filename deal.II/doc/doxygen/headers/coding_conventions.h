@@ -309,7 +309,7 @@ we list here:
   as a member variable, which requires memory allocation &mdash; you don't
   want to declare these inside loops, at least not if the loop is
   traversed frequently.
-  </i>
+  </li>
 
 <li> <i>Make variables const:</i> To pick up on the example above, note
   that in most cases we will never change the variable so initialized
@@ -351,7 +351,7 @@ we list here:
   its argument as a constant value:
   <code>
   <pre>
-     template <int dim>
+     template @<int dim@>
      typename Triangulation<dim>::cell_iterator
      CellAccessor<dim>::child (const unsigned int child_no)
      {
@@ -360,7 +360,7 @@ we list here:
      }
   </pre>
   </code>
-  Here, the user calls <code>cell-@>child(3), for example. There really
+  Here, the user calls <code>cell-@>child(3)</code>, for example. There really
   is no reason why the function would ever want to change the value of
   the <code>child_no</code> argument &mdash; so mark it as constant: 
   this both helps the reader of the code understand that this is an
