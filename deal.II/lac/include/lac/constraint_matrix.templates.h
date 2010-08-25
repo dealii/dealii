@@ -1507,6 +1507,9 @@ namespace internals
 		      unsigned int *           &col_ptr,
 		      number *                 &val_ptr)
   {
+    if (column_end == column_start)
+      return;
+
     AssertIndexRange (column_end-1, global_cols.size());
     const unsigned int loc_row = global_rows.local_row(i);
 
@@ -1606,6 +1609,9 @@ namespace internals
 		      const FullMatrix<double> &local_matrix,
 		      SparseMatrix<number>     *sparse_matrix)
   {
+    if (column_end == column_start)
+      return;
+
     AssertIndexRange (column_end-1, global_rows.size());
     const SparsityPattern & sparsity = sparse_matrix->get_sparsity_pattern();
 #ifndef DEBUG
@@ -1758,6 +1764,9 @@ namespace internals
 		      const Table<2,bool>           &dof_mask,
 		      std::vector<unsigned int>::iterator &col_ptr)
   {
+    if (column_end == column_start)
+      return;
+
     const unsigned int loc_row = global_rows.local_row(i);
 
 				     // fast function if there are no indirect
