@@ -2119,6 +2119,54 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
 
 
 
+inline
+void
+ConstraintMatrix::
+make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
+		      std::vector<unsigned int>       &active_dofs) const
+{
+  const unsigned int n_local_dofs = local_dof_indices.size();
+  unsigned int added_rows = 0;
+  for (unsigned int i = 0; i<n_local_dofs; ++i)
+    {
+      if (is_constrained(local_dof_indices[i]) == false)
+	{
+	  active_dofs[added_rows++] = local_dof_indices[i];
+	  continue;
+	}
+
+      active_dofs[n_local_dofs-i+added_rows-1] = i;
+    }
+  std::sort (active_dofs.begin(), active_dofs.begin()+added_rows);
+
+  const unsigned int n_constrained_dofs = n_local_dofs-added_rows;
+  for (unsigned int i=n_constrained_dofs; i>0; --i)
+    {
+      const unsigned int local_row = active_dofs.back();
+      active_dofs.pop_back();
+      const unsigned int global_row = local_dof_indices[local_row];
+      const ConstraintLine & position =
+	lines[lines_cache[calculate_line_index(global_row)]];
+      for (unsigned int q=0; q<position.entries.size(); ++q)
+	{
+	  const unsigned int new_index = position.entries[q].first;
+	  if (active_dofs[active_dofs.size()-i] < new_index)
+	    active_dofs.insert(active_dofs.end()-i+1,new_index);
+	  else
+	    {
+	      std::vector<unsigned int>::iterator it =
+		std::lower_bound(active_dofs.begin(),
+				 active_dofs.end()-i+1,
+				 new_index);
+	      if (*it != new_index)
+		active_dofs.insert(it, new_index);
+	    }
+	}
+    }
+}
+
+
+
 template <typename SparsityType>
 inline
 void
@@ -2593,6 +2641,56 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 	sparsity_pattern.add_entries(row, cols.begin(), col_ptr,
 				     true);
     }
+}
+
+
+
+
+template <typename SparsityType>
+void
+ConstraintMatrix::
+add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
+			     const std::vector<unsigned int> &col_indices,
+			     SparsityType                    &sparsity_pattern,
+			     const bool                       keep_constrained_entries,
+			     const Table<2,bool>             &dof_mask) const
+{
+  const unsigned int n_local_rows = row_indices.size();
+  const unsigned int n_local_cols = col_indices.size();
+  bool dof_mask_is_active = false;
+  Assert (keep_constrained_entries == false, ExcNotImplemented());
+  if (dof_mask.n_rows() == n_local_rows && dof_mask.n_cols() == n_local_cols)
+    dof_mask_is_active = true;
+
+				   // if the dof mask is not active, all we
+				   // have to do is to add some indices in a
+				   // matrix format. To do this, we first
+				   // create an array of all the indices
+				   // that are to be added. these indices
+				   // are the local dof indices plus some
+				   // indices that come from constraints.
+  if (dof_mask_is_active == false)
+    {
+      std::vector<unsigned int> actual_row_indices (n_local_rows);
+      std::vector<unsigned int> actual_col_indices (n_local_cols);
+      make_sorted_row_list (row_indices, actual_row_indices);
+      make_sorted_row_list (col_indices, actual_col_indices);
+      const unsigned int n_actual_rows = actual_row_indices.size();
+
+				       // now add the indices we collected above
+				       // to the sparsity pattern. Very easy
+				       // here - just add the same array to all
+				       // the rows...
+      for (unsigned int i=0; i<n_actual_rows; ++i)
+	sparsity_pattern.add_entries(actual_row_indices[i],
+				     actual_col_indices.begin(),
+				     actual_col_indices.end(),
+				     true);
+      return;
+    }
+
+				// TODO: implement this
+  Assert (false, ExcNotImplemented());
 }
 
 

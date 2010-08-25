@@ -1359,9 +1359,9 @@ class ConstraintMatrix : public Subscriptor
                                 MatrixType                      &global_matrix) const;
 
                                      /**
-                                      * Does the same as the function above
-                                      * but can treat
-                                      * non quadratic matrices.
+                                      * Does the same as the function
+                                      * above but can treat non
+                                      * quadratic matrices.
                                       */
     template <typename MatrixType>
     void
@@ -1474,6 +1474,20 @@ class ConstraintMatrix : public Subscriptor
     template <typename SparsityType>
     void
     add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
+				 SparsityType                    &sparsity_pattern,
+				 const bool                       keep_constrained_entries = true,
+				 const Table<2,bool>             &dof_mask = default_empty_table) const;
+
+				     /**
+				      * Similar to the other function,
+				      * but for non-quadratic sparsity
+				      * patterns.
+				      */
+
+    template <typename SparsityType>
+    void
+    add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
+				 const std::vector<unsigned int> &col_indices,
 				 SparsityType                    &sparsity_pattern,
 				 const bool                       keep_constrained_entries = true,
 				 const Table<2,bool>             &dof_mask = default_empty_table) const;
@@ -1894,11 +1908,26 @@ class ConstraintMatrix : public Subscriptor
 				      * function.
 				      *
 				      * Creates a list of affected
-				      * rows for distribution.
+				      * global rows for distribution,
+				      * including the local rows where
+				      * the entries come from.
 				      */
     void
     make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
 			  internals::GlobalRowsFromLocal  &global_rows) const;
+
+				     /**
+				      * Internal helper function for
+				      * add_entries_local_to_global
+				      * function.
+				      *
+				      * Creates a list of affected
+				      * rows for distribution without
+				      * any additional information.
+				      */
+    void
+    make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
+			  std::vector<unsigned int>       &active_dofs) const;
 
 				     /**
 				      * Internal helper function for

@@ -2511,7 +2511,13 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrapp
     SparsityType &,                    \
     const bool,                        \
     const Table<2,bool> &, \
-    internal::bool2type<false>) const
+    internal::bool2type<false>) const; \
+  template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
+    const std::vector<unsigned int> &, \
+    const std::vector<unsigned int> &, \
+    SparsityType &,                    \
+    const bool,                        \
+    const Table<2,bool> &) const
 #define BLOCK_SPARSITY_FUNCTIONS(SparsityType) \
   template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
     const std::vector<unsigned int> &, \
