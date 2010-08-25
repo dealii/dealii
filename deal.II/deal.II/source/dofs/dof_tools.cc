@@ -537,9 +537,9 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
 				// current cell is owned by the calling
 				// processor. Otherwise, just continue.
   for (; cell!=endc; ++cell)
-    //    if ((subdomain_id == numbers::invalid_unsigned_int)
-    //        ||
-    //        (subdomain_id == cell->subdomain_id()))
+    if ((subdomain_id == numbers::invalid_unsigned_int)
+        ||
+        (subdomain_id == cell->subdomain_id()))
     {
       const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
       dofs_on_this_cell.resize (n_dofs_on_this_cell);
@@ -589,14 +589,22 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
 		      dofs_on_other_cell.resize (n_dofs_on_neighbor);
 		      sub_neighbor->get_dof_indices (dofs_on_other_cell);
 
-		      for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-			sparsity.add_entries (dofs_on_this_cell[i],
-					      dofs_on_other_cell.begin(),
-					      dofs_on_other_cell.end());
-		      for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
-			sparsity.add_entries (dofs_on_other_cell[j],
-					      dofs_on_this_cell.begin(),
-					      dofs_on_this_cell.end());
+      constraints.add_entries_local_to_global (dofs_on_this_cell,
+                                               dofs_on_other_cell,
+					       sparsity,
+					       keep_constrained_dofs);
+      constraints.add_entries_local_to_global (dofs_on_other_cell,
+                                               dofs_on_this_cell,
+					       sparsity,
+					       keep_constrained_dofs);
+//		      for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
+//			sparsity.add_entries (dofs_on_this_cell[i],
+//					      dofs_on_other_cell.begin(),
+//					      dofs_on_other_cell.end());
+//		      for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
+//			sparsity.add_entries (dofs_on_other_cell[j],
+//					      dofs_on_this_cell.begin(),
+//					      dofs_on_this_cell.end());
 		      sub_neighbor->face(neighbor_face)->set_user_flag ();
 		    }
 		}
@@ -613,14 +621,22 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
 
 		  neighbor->get_dof_indices (dofs_on_other_cell);
 
-		  for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-		    sparsity.add_entries (dofs_on_this_cell[i],
-					  dofs_on_other_cell.begin(),
-					  dofs_on_other_cell.end());
-		  for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
-		    sparsity.add_entries (dofs_on_other_cell[j],
-					  dofs_on_this_cell.begin(),
-					  dofs_on_this_cell.end());
+      constraints.add_entries_local_to_global (dofs_on_this_cell,
+                                               dofs_on_other_cell,
+					       sparsity,
+					       keep_constrained_dofs);
+      constraints.add_entries_local_to_global (dofs_on_other_cell,
+                                               dofs_on_this_cell,
+					       sparsity,
+					       keep_constrained_dofs);
+//		  for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
+//		    sparsity.add_entries (dofs_on_this_cell[i],
+//					  dofs_on_other_cell.begin(),
+//					  dofs_on_other_cell.end());
+//		  for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
+//		    sparsity.add_entries (dofs_on_other_cell[j],
+//					  dofs_on_this_cell.begin(),
+//					  dofs_on_this_cell.end());
 		  neighbor->face(neighbor_face)->set_user_flag ();
 		}
 	    }
