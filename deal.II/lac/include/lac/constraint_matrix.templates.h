@@ -68,9 +68,7 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 			    VectorType       &condensed) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (condensed.size()+n_constraints() == uncondensed.size(),
-	  ExcDimensionMismatch(condensed.size()+n_constraints(),
-			       uncondensed.size()));
+  AssertDimension (condensed.size()+n_constraints(), uncondensed.size());
 
 				   // store for each line of the
 				   // vector its new line number after
@@ -187,15 +185,12 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	  ExcNotQuadratic());
   Assert (condensed.n() == condensed.m(),
 	  ExcNotQuadratic());
-  Assert (condensed.n()+n_constraints() == uncondensed.n(),
-	  ExcDimensionMismatch(condensed.n()+n_constraints(), uncondensed.n()));
+  AssertDimension (condensed.n()+n_constraints(), uncondensed.n());
   if (use_vectors == true)
     {
-      Assert (condensed_vector.size()+n_constraints() == uncondensed_vector.size(),
-	      ExcDimensionMismatch(condensed_vector.size()+n_constraints(),
-				   uncondensed_vector.size()));
-      Assert (condensed_vector.size() == condensed.m(),
-	      ExcDimensionMismatch(condensed_vector.size(), condensed.m()));
+      AssertDimension (condensed_vector.size()+n_constraints(),
+		       uncondensed_vector.size());
+      AssertDimension (condensed_vector.size(), condensed.m());
     }
 
 				   // store for each line of the matrix
@@ -354,10 +349,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcNotQuadratic());
   if (use_vectors == true)
-    {
-      Assert (vec.size() == sparsity.n_rows(),
-	      ExcDimensionMismatch(vec.size(), sparsity.n_rows()));
-    }
+    AssertDimension (vec.size(), sparsity.n_rows());
 
   double average_diagonal = 0;
   for (unsigned int i=0; i<uncondensed.m(); ++i)
@@ -533,10 +525,8 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 
   if (use_vectors == true)
     {
-      Assert (vec.size() == sparsity.n_rows(),
-	      ExcDimensionMismatch(vec.size(), sparsity.n_rows()));
-      Assert (vec.n_blocks() == sparsity.n_block_rows(),
-	      ExcDimensionMismatch(vec.n_blocks(), sparsity.n_block_rows()));
+      AssertDimension (vec.size(), sparsity.n_rows());
+      AssertDimension (vec.n_blocks(), sparsity.n_block_rows());
     }
 
   double average_diagonal = 0;
@@ -730,13 +720,10 @@ distribute_local_to_global (const Vector<double>            &local_vector,
                             VectorType                      &global_vector,
 			    const FullMatrix<double>        &local_matrix) const
 {
-  Assert (local_vector.size() == local_dof_indices.size(),
-          ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (local_matrix.m() == local_dof_indices.size(),
-	  ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
-  Assert (local_matrix.n() == local_dof_indices.size(),
-	  ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
+  AssertDimension (local_vector.size(), local_dof_indices.size());
+  AssertDimension (local_matrix.m(), local_dof_indices.size());
+  AssertDimension (local_matrix.n(), local_dof_indices.size());
 
   const unsigned int n_local_dofs = local_vector.size();
   if (lines.size() == 0)
@@ -811,9 +798,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 			      VectorType       &uncondensed) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (condensed.size()+n_constraints() == uncondensed.size(),
-	  ExcDimensionMismatch(condensed.size()+n_constraints(),
-			       uncondensed.size()));
+  AssertDimension (condensed.size()+n_constraints(), uncondensed.size());
 
 				   // store for each line of the new vector
 				   // its old line number before
@@ -945,7 +930,7 @@ namespace internals
   {
     *this = (in);
   }
-  
+
   inline
   Distributing & Distributing::operator = (const Distributing &in)
   {
@@ -1032,7 +1017,7 @@ namespace internals
       void append_index (const unsigned int index,
 			 const std::pair<unsigned int,double> &pair)
 	{
-	  Assert (index < n_used_elements, ExcIndexRange (index, 0, n_used_elements));
+	  AssertIndexRange (index, n_used_elements);
 	  const unsigned int my_size = individual_size[index];
 	  if (my_size == element_size)
 	    {
@@ -1092,8 +1077,8 @@ namespace internals
 		      n_active_rows (n_local_rows),
 		      n_inhomogeneous_rows (0)
 	{}
-      
-      
+
+
 				       // implemented below
       void insert_index (const unsigned int global_row,
 			 const unsigned int local_row,
@@ -1112,32 +1097,32 @@ namespace internals
 	  os << std::endl
 	     << "Global:";
 	  for (unsigned int i=0 ; i<total_row_indices.size() ; ++i)
-	    os << ' ' << std::setw(4) << total_row_indices[i].global_row;	    
+	    os << ' ' << std::setw(4) << total_row_indices[i].global_row;
 	  os << std::endl
 	     << "ConPos:";
 	  for (unsigned int i=0 ; i<total_row_indices.size() ; ++i)
 	    os << ' ' << std::setw(4) << total_row_indices[i].constraint_position;
 	  os << std::endl;
 	}
-      
-      
+
+
 				       // return all kind of information on the
 				       // constraints
-      
+
 				       // returns the number of global indices in the
 				       // struct
       unsigned int size () const
 	{
 	  return n_active_rows;
 	}
-      
+
 				       // returns the global index of the
 				       // counter_index-th entry in the list
       unsigned int & global_row (const unsigned int counter_index)
 	{
 	  return total_row_indices[counter_index].global_row;
 	}
-      
+
 				       // returns the number of constraints that are
 				       // associated to the counter_index-th entry in
 				       // the list
@@ -1149,14 +1134,14 @@ namespace internals
 		  data_cache.get_size(total_row_indices[counter_index].
 				      constraint_position));
 	}
-      
+
 				       // returns the global row associated with the
 				       // counter_index-th entry in the list
       const unsigned int & global_row (const unsigned int counter_index) const
 	{
 	  return total_row_indices[counter_index].global_row;
 	}
-      
+
 				       // returns the local row in the cell matrix
 				       // associated with the counter_index-th entry
 				       // in the list. Returns invalid_unsigned_int
@@ -1165,13 +1150,13 @@ namespace internals
 	{
 	  return total_row_indices[counter_index].local_row;
 	}
-      
+
 				       // writable index
       unsigned int & local_row (const unsigned int counter_index)
 	{
 	  return total_row_indices[counter_index].local_row;
 	}
-      
+
 				       // returns the local row in the cell matrix
 				       // associated with the counter_index-th entry
 				       // in the list in the index_in_constraint-th
@@ -1182,7 +1167,7 @@ namespace internals
 	  return (data_cache.get_entry(total_row_indices[counter_index].constraint_position)
 		  [index_in_constraint]).first;
 	}
-      
+
 				       // returns the value of the constraint in the
 				       // counter_index-th entry in the list in the
 				       // index_in_constraint-th position of
@@ -1193,7 +1178,7 @@ namespace internals
 	  return (data_cache.get_entry(total_row_indices[counter_index].constraint_position)
 		  [index_in_constraint]).second;
 	}
-      
+
 				       // returns whether there is one row with
 				       // indirect contributions (i.e., there has
 				       // been at least one constraint with
@@ -1248,7 +1233,7 @@ namespace internals
 	{
 	  return total_row_indices[n_active_rows+i].local_row;
 	}
-      
+
 				       // a vector that contains all the global ids
 				       // and the corresponding local ids as well as
 				       // a pointer to that data where we store how
@@ -1328,7 +1313,8 @@ namespace internals
 				     // constraints are really empty.
     const unsigned int length = size();
 #ifdef DEBUG
-				     //make sure that we are in the range of the vector
+				     // make sure that we are in the
+				     // range of the vector
     AssertIndexRange (length, total_row_indices.size()+1);
     for (unsigned int i=0; i<length; ++i)
       Assert (total_row_indices[i].constraint_position ==
@@ -1380,9 +1366,7 @@ namespace internals
 		     GlobalRowsFromLocal       &global_rows,
 		     std::vector<unsigned int> &block_starts)
   {
-    Assert (block_starts.size() == block_object.n_block_rows() + 1,
-	    ExcDimensionMismatch(block_starts.size(),
-				 block_object.n_block_rows()+1));
+    AssertDimension (block_starts.size(), block_object.n_block_rows()+1);
 
     typedef std::vector<Distributing>::iterator row_iterator;
     row_iterator block_indices = global_rows.total_row_indices.begin();
@@ -1422,9 +1406,7 @@ namespace internals
 		     std::vector<unsigned int> &row_indices,
 		     std::vector<unsigned int> &block_starts)
   {
-    Assert (block_starts.size() == block_object.n_block_rows() + 1,
-	    ExcDimensionMismatch(block_starts.size(),
-				 block_object.n_block_rows()+1));
+    AssertDimension (block_starts.size(), block_object.n_block_rows()+1);
 
     typedef std::vector<unsigned int>::iterator row_iterator;
     row_iterator col_indices = row_indices.begin();
@@ -1525,8 +1507,7 @@ namespace internals
 		      unsigned int *           &col_ptr,
 		      number *                 &val_ptr)
   {
-    Assert (global_cols.size() >= column_end,
-	    ExcIndexRange (column_end, 0, global_cols.size()));
+    AssertIndexRange (column_end-1, global_cols.size());
     const unsigned int loc_row = global_rows.local_row(i);
 
 				     // fast function if there are no indirect
@@ -1624,8 +1605,7 @@ namespace internals
 		      const FullMatrix<double> &local_matrix,
 		      SparseMatrix<number>     *sparse_matrix)
   {
-    Assert (global_rows.size() >= column_end,
-	    ExcIndexRange (column_end, 0, global_rows.size()));
+    AssertIndexRange (column_end-1, global_rows.size());
     const SparsityPattern & sparsity = sparse_matrix->get_sparsity_pattern();
 #ifndef DEBUG
     if (sparsity.n_nonzero_elements() == 0)
@@ -1659,8 +1639,7 @@ namespace internals
       {
 	if (global_rows.have_indirect_rows() == false)
 	  {
-	    Assert(loc_row < local_matrix.m(),
-		   ExcIndexRange(loc_row, 0, local_matrix.m()));
+	    AssertIndexRange (loc_row, local_matrix.m());
 	    const double * matrix_ptr = &local_matrix(loc_row, 0);
 
 	    for (unsigned int j=column_start; j<column_end; ++j)
@@ -1689,8 +1668,7 @@ namespace internals
       {
 	if (global_rows.have_indirect_rows() == false)
 	  {
-	    Assert(loc_row < local_matrix.m(),
-		   ExcIndexRange(loc_row, 0, local_matrix.m()));
+	    AssertIndexRange (loc_row, local_matrix.m());
 	    const double * matrix_ptr = &local_matrix(loc_row, 0);
 
 	    for (unsigned int j=column_start; j<i; ++j)
@@ -1737,8 +1715,7 @@ namespace internals
 				     // the loop
     else if (global_rows.have_indirect_rows() == false)
       {
-	Assert(loc_row < local_matrix.m(),
-	       ExcIndexRange(loc_row, 0, local_matrix.m()));
+	AssertIndexRange (loc_row, local_matrix.m());
 	const double * matrix_ptr = &local_matrix(loc_row, 0);
 
 	for (unsigned int j=column_start; j<column_end; ++j)
@@ -2302,17 +2279,13 @@ ConstraintMatrix::distribute_local_to_global (
   const bool use_dealii_matrix =
     types_are_equal<MatrixType,SparseMatrix<number> >::value;
 
-  Assert (local_matrix.n() == local_dof_indices.size(),
-          ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
-  Assert (local_matrix.m() == local_dof_indices.size(),
-          ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
+  AssertDimension (local_matrix.n(), local_dof_indices.size());
+  AssertDimension (local_matrix.m(), local_dof_indices.size());
   Assert (global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
   if (use_vectors == true)
     {
-      Assert (local_matrix.m() == local_vector.size(),
-	      ExcDimensionMismatch(local_matrix.m(), local_vector.size()));
-      Assert (global_matrix.m() == global_vector.size(),
-	      ExcDimensionMismatch(global_matrix.m(), global_vector.size()));
+      AssertDimension (local_matrix.m(), local_vector.size());
+      AssertDimension (global_matrix.m(), global_vector.size());
     }
   Assert (sorted == true, ExcMatrixNotClosed());
 
@@ -2461,19 +2434,15 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   const bool use_dealii_matrix =
     types_are_equal<MatrixType,BlockSparseMatrix<number> >::value;
 
-  Assert (local_matrix.n() == local_dof_indices.size(),
-          ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
-  Assert (local_matrix.m() == local_dof_indices.size(),
-          ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
+  AssertDimension (local_matrix.n(), local_dof_indices.size());
+  AssertDimension (local_matrix.m(), local_dof_indices.size());
   Assert (global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
   Assert (global_matrix.n_block_rows() == global_matrix.n_block_cols(),
 	  ExcNotQuadratic());
   if (use_vectors == true)
     {
-      Assert (local_matrix.m() == local_vector.size(),
-	      ExcDimensionMismatch(local_matrix.m(), local_vector.size()));
-      Assert (global_matrix.m() == global_vector.size(),
-	      ExcDimensionMismatch(global_matrix.m(), global_vector.size()));
+      AssertDimension (local_matrix.m(), local_vector.size());
+      AssertDimension (global_matrix.m(), global_vector.size());
     }
   Assert (sorted == true, ExcMatrixNotClosed());
 
@@ -2580,8 +2549,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
   if (dof_mask.n_rows() == n_local_dofs)
     {
       dof_mask_is_active = true;
-      Assert (dof_mask.n_cols() == n_local_dofs,
-	      ExcDimensionMismatch(dof_mask.n_cols(), n_local_dofs));
+      AssertDimension (dof_mask.n_cols(), n_local_dofs);
     }
 
 				   // if the dof mask is not active, all we
@@ -2720,8 +2688,7 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
   if (dof_mask.n_rows() == n_local_dofs)
     {
       dof_mask_is_active = true;
-      Assert (dof_mask.n_cols() == n_local_dofs,
-	      ExcDimensionMismatch(dof_mask.n_cols(), n_local_dofs));
+      AssertDimension (dof_mask.n_cols(), n_local_dofs);
     }
 
   if (dof_mask_is_active == false)

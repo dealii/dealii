@@ -1946,7 +1946,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
   AssertThrow (vec.vector_partitioner().IsOneToOne(),
 	       ExcMessage ("Distribute does not work on vectors with overlapping parallel partitioning."));
 
-  
+
   typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
   ConstraintLine index_comparison;
   index_comparison.line = vec.local_range().first;
@@ -2155,7 +2155,7 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
   IndexSet local_range_is (vec.size());
   local_range_is.add_range(local_range.first, local_range.second);
 
-  
+
 				   // create a vector and import those indices
   PETScWrappers::MPI::Vector ghost_vec(vec.get_mpi_communicator(),
 				       local_range_is,
@@ -2524,7 +2524,13 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrapp
     SparsityType &,                    \
     const bool,                        \
     const Table<2,bool> &, \
-    internal::bool2type<true>) const
+    internal::bool2type<true>) const; \
+  template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
+    const std::vector<unsigned int> &, \
+    const std::vector<unsigned int> &, \
+    SparsityType &,                    \
+    const bool,                        \
+    const Table<2,bool> &) const
 
 SPARSITY_FUNCTIONS(SparsityPattern);
 SPARSITY_FUNCTIONS(CompressedSparsityPattern);
