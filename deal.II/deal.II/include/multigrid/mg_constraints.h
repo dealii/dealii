@@ -72,13 +72,15 @@ class MGConstraints : public Subscriptor
 				      * is subject to a boundary
 				      * constraint.
 				      */
-    bool is_boundary_index(unsigned int level, unsigned int index) const;
+    bool is_boundary_index (const unsigned int level,
+			    const unsigned int index) const;
 
 				     /**
 				      * Determine whether a dof index
 				      * is at the refinement edge.
 				      */
-    bool at_refinement_edge(unsigned int level, unsigned int index) const;
+    bool at_refinement_edge (const unsigned int level,
+			     const unsigned int index) const;
 
 				     /**
 				      * Determine whether a dof index
@@ -86,15 +88,44 @@ class MGConstraints : public Subscriptor
                                       * subject to a boundary
 				      * constraint .
 				      */
-    bool at_refinement_edge_boundary(unsigned int level, unsigned int index) const;
+    bool at_refinement_edge_boundary (const unsigned int level,
+				      const unsigned int index) const;
+
+				     /**
+				      * Return the indices of dofs for each
+				      * level that lie on the boundary of the
+				      * domain.
+				      */
+    const std::vector<std::set<unsigned int> > &
+      get_boundary_indices () const;
+
+				     /**
+				      * Return the indices of dofs for each
+				      * level that lie on the refinement edge
+				      * (i.e. are on faces between cells of
+				      * this level and cells on the level
+				      * below).
+				      */
+    const std::vector<std::set<unsigned int> > &
+      get_refinement_edge_indices () const;
+
+				     /**
+				      * Return the indices of dofs for each
+				      * level that are in the intersection of
+				      * the sets returned by
+				      * get_boundary_indices() and
+				      * get_refinement_edge_indices().
+				      */
+    const std::vector<std::set<unsigned int> > &
+      get_refinement_edge_boundary_indices () const;
+
+  private:
 
 				     /**
 				      * The indices of boundary dofs
 				      * for each level.
 				      */
     std::vector<std::set<unsigned int> > boundary_indices;
-
-  private:
 
 				     /**
 				      * The degrees of freedom on the
@@ -169,7 +200,8 @@ MGConstraints::clear()
 
 inline
 bool
-MGConstraints::is_boundary_index(unsigned int level, unsigned int index) const
+MGConstraints::is_boundary_index (const unsigned int level, 
+				  const unsigned int index) const
 {
   AssertIndexRange(level, boundary_indices.size());
   if(boundary_indices[level].find(index) != boundary_indices[level].end())
@@ -181,7 +213,8 @@ MGConstraints::is_boundary_index(unsigned int level, unsigned int index) const
 
 inline
 bool
-MGConstraints::at_refinement_edge(unsigned int level, unsigned int index) const
+MGConstraints::at_refinement_edge (const unsigned int level,
+				   const unsigned int index) const
 {
   AssertIndexRange(level, refinement_edge_indices.size());
   AssertIndexRange(index, refinement_edge_indices[level].size());
@@ -192,7 +225,8 @@ MGConstraints::at_refinement_edge(unsigned int level, unsigned int index) const
 
 inline
 bool
-MGConstraints::at_refinement_edge_boundary(unsigned int level, unsigned int index) const
+MGConstraints::at_refinement_edge_boundary (const unsigned int level,
+					    const unsigned int index) const
 {
   AssertIndexRange(level, refinement_edge_boundary_indices.size());
   AssertIndexRange(index, refinement_edge_boundary_indices[level].size());
