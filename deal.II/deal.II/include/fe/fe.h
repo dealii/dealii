@@ -2146,7 +2146,7 @@ class FiniteElement : public Subscriptor,
 				      * empty. In 3D it has the size of <code>
 				      * #dofs_per_quad * 8 </code>, where 8 is
 				      * the number of orientations, a face can
-				      * be in (all comibinations of the three
+				      * be in (all combinations of the three
 				      * bool flags face_orientation, face_flip
 				      * and face_rotation).
 				      *
@@ -2174,7 +2174,7 @@ class FiniteElement : public Subscriptor,
 				      * #dofs_per_line.
 				      *
 				      * The standard implementation fills this
-				      * with zeros, i.e. no permuatation at
+				      * with zeros, i.e. no permutation at
 				      * all. Derived finite element classes have
 				      * to fill this vector with the correct
 				      * values.
