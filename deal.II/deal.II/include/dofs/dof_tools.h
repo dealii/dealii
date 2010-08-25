@@ -757,6 +757,25 @@ class DoFTools
 				     /**
 				      * This function does the same as
 				      * the other with the same name,
+				      * but it gets a ConstraintMatrix 
+                                      * additionally. 
+                                      * This is for the case where you 
+                                      * have fluxes but constraints as 
+                                      * well.
+				      * Not implemented for
+				      * hp::DoFHandler.
+				      */
+    template<class DH, class SparsityPattern>
+    static void
+    make_flux_sparsity_pattern (const DH        &dof_handler,
+				SparsityPattern &sparsity_pattern,
+                                const ConstraintMatrix   &constraints,
+                                const bool                keep_constrained_dofs = true,
+                                const unsigned int        subdomain_id = numbers::invalid_unsigned_int);
+
+				     /**
+				      * This function does the same as
+				      * the other with the same name,
 				      * but it gets two additional
 				      * coefficient matrices. A matrix
 				      * entry will only be generated
