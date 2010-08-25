@@ -155,9 +155,8 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 template <typename VECTOR>
 template <int dim, int spacedim>
 void MGTransferPrebuilt<VECTOR>::build_matrices (
-  const MGDoFHandler<dim,spacedim>           &mg_dof,
-  const std::vector<std::set<unsigned int> > &boundary_indices
-  )
+  const MGDoFHandler<dim,spacedim>  &mg_dof,
+  const MGConstraints               &mg_constraints)
 {
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
@@ -287,12 +286,12 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				// impose boundary conditions
 				// but only in the column of
 				// the prolongation matrix
-  if (boundary_indices.size() != 0)
+  if (mg_constraints.get_boundary_indices().size() != 0)
     {
       std::vector<unsigned int> constrain_indices;
       for (int level=n_levels-2; level>=0; --level)
 	{
-	  if (boundary_indices[level].size() == 0)
+	  if (mg_constraints.get_boundary_indices()[level].size() == 0)
 	    continue;
 
 				// need to delete all the columns in the
@@ -302,8 +301,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				// need to filter away.
 	  constrain_indices.resize (0);
 	  constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-	  std::set<unsigned int>::const_iterator dof = boundary_indices[level].begin(),
-	    endd = boundary_indices[level].end();
+	  std::set<unsigned int>::const_iterator dof 
+            = mg_constraints.get_boundary_indices()[level].begin(),
+	    endd = mg_constraints.get_boundary_indices()[level].end();
 	  for (; dof != endd; ++dof)
 	    constrain_indices[*dof] = 1;
 
@@ -332,10 +332,6 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				// the std::vector<std::pair<uint,uint> > that
 				// only contains the active dofs on the
 				// levels.
-  interface_dofs.resize(mg_dof.get_tria().n_levels());
-  for(unsigned int l=0; l<mg_dof.get_tria().n_levels(); ++l)
-    interface_dofs[l].resize(mg_dof.n_dofs(l));
-  MGTools::extract_inner_interface_dofs (mg_dof, interface_dofs);
 
   copy_indices.resize(n_levels);
   std::vector<unsigned int> temp_copy_indices;
@@ -366,7 +362,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
-	    if(!interface_dofs[level][level_dof_indices[i]])
+	    if(!mg_constraints.at_refinement_edge(level,level_dof_indices[i]))
 	      temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
           }
 	}
@@ -397,22 +393,22 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 template
 void MGTransferPrebuilt<Vector<float> >::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- const std::vector<std::set<unsigned int> >&boundary_indices);
+ const MGConstraints& mg_constraints);
 
 template
 void MGTransferPrebuilt<Vector<double> >::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- const std::vector<std::set<unsigned int> >&boundary_indices);
+ const MGConstraints& mg_constraints);
 
 template
 void MGTransferPrebuilt<BlockVector<float> >::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- const std::vector<std::set<unsigned int> >&boundary_indices);
+ const MGConstraints& mg_constraints);
 
 template
 void MGTransferPrebuilt<BlockVector<double> >::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- const std::vector<std::set<unsigned int> >&boundary_indices);
+ const MGConstraints& mg_constraints);
 
 template void
 MGTransferPrebuilt<Vector<float> >::copy_to_mg (

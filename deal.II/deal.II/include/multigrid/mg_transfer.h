@@ -27,6 +27,7 @@
 #include <lac/vector_memory.h>
 
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_constraints.h>
 #include <base/mg_level_object.h>
 
 
@@ -87,9 +88,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      */
     template <int dim, int spacedim>
     void build_matrices (const MGDoFHandler<dim,spacedim> &mg_dof,
-    const std::vector<std::set<unsigned int> >&boundary_indices
-			 = std::vector<std::set<unsigned int> >()
-        );
+    const MGConstraints& mg_constraints);
 
     virtual void prolongate (const unsigned int    to_level,
 			     VECTOR       &dst,

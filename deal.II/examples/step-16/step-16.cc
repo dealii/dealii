@@ -767,8 +767,11 @@ void LaplaceProblem<dim>::solve ()
   MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints);
 				 // Now the prolongation matrix has to be built. 
                                  // This matrix needs to take the boundary values on 
-                                 // each level into account.
-  mg_transfer.build_matrices(mg_dof_handler, mg_constraints.get_boundary_indices());
+                                 // each level into account and needs to know about 
+                                 // the indices at the refinement egdes. The 
+                                 // <code>MGConstraints</code> knows about that so
+                                 // pass it as an argument.
+  mg_transfer.build_matrices(mg_dof_handler, mg_constraints);
 
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from (mg_matrices[0]);
