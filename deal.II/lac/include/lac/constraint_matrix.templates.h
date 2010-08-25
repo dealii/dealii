@@ -1496,7 +1496,7 @@ namespace internals
 				   // resulting values in val_ptr, and the
 				   // corresponding column indices in col_ptr.
   template <typename number>
-  static inline
+  inline
   void
   resolve_matrix_row (const GlobalRowsFromLocal&global_rows,
                       const GlobalRowsFromLocal&global_cols,
@@ -1516,7 +1516,8 @@ namespace internals
 				     // of checks). the only check we actually
 				     // need to perform is whether the matrix
 				     // element is zero.
-    if (global_rows.have_indirect_rows() == false)
+    if (global_rows.have_indirect_rows() == false &&
+	global_cols.have_indirect_rows() == false)
       {
 	AssertIndexRange(loc_row, local_matrix.m());
 	const double * matrix_ptr = &local_matrix(loc_row, 0);
@@ -1596,7 +1597,7 @@ namespace internals
 				   // operations just in place, i.e., in the
 				   // respective matrix row
   template <typename number>
-  static inline
+  inline
   void
   resolve_matrix_row (const GlobalRowsFromLocal&global_rows,
 		      const unsigned int        i,
@@ -1748,7 +1749,7 @@ namespace internals
 				   // will be added to the given global row
 				   // global_rows[i] as before, now for sparsity
 				   // pattern
-  static inline
+  inline
   void
   resolve_matrix_row (const GlobalRowsFromLocal     &global_rows,
 		      const unsigned int             i,
