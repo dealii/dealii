@@ -57,7 +57,7 @@ tests_x = block_info block_matrices \
 	boundaries \
 	sparsity_pattern* \
 	grid_tools \
-	subdomain_ids \
+	subdomain_* \
 	filtered_iterator* \
 	grid_in* \
 	grid_in_3d \
