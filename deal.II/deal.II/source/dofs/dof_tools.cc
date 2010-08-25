@@ -500,6 +500,137 @@ void DoFTools::make_boundary_sparsity_pattern (
 
 
 #if deal_II_dimension != 1
+template <class DH, class SparsityPattern>
+void
+DoFTools::make_flux_sparsity_pattern (
+  const DH        &dof,
+  SparsityPattern &sparsity,
+  const ConstraintMatrix &constraints,
+  const bool              keep_constrained_dofs,
+  const unsigned int      subdomain_id)
+{
+  const unsigned int n_dofs = dof.n_dofs();
+
+  Assert (sparsity.n_rows() == n_dofs,
+>-------  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
+  Assert (sparsity.n_cols() == n_dofs,
+>-------  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
+
+  std::vector<unsigned int> dofs_on_this_cell;
+  std::vector<unsigned int> dofs_on_other_cell;
+  dofs_on_this_cell.reserve (max_dofs_per_cell(dof));
+  dofs_on_other_cell.reserve (max_dofs_per_cell(dof));
+  typename DH::active_cell_iterator cell = dof.begin_active(),
+>------->------->------->-------    endc = dof.end();
+>------->------->------->-------   // Clear user flags because we will
+>------->------->------->-------   // need them. But first we save
+>------->------->------->-------   // them and make sure that we
+>------->------->------->-------   // restore them later such that at
+>------->------->------->-------   // the end of this function the
+>------->------->------->-------   // Triangulation will be in the
+>------->------->------->-------   // same state as it was at the
+>------->------->------->-------   // beginning of this function.
+  std::vector<bool> user_flags;
+  dof.get_tria().save_user_flags(user_flags);
+  const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).clear_user_flags ();
+  >------->------->------->-------   // In case we work with a distributed
+>------->------->------->-------   // sparsity pattern of Trilinos type, we
+>------->------->------->-------   // only have to do the work if the
+>------->------->------->-------   // current cell is owned by the calling
+>------->------->------->-------   // processor. Otherwise, just continue.
+  for (; cell!=endc; ++cell)
+//    if ((subdomain_id == numbers::invalid_unsigned_int)
+//>-----||
+//>-----(subdomain_id == cell->subdomain_id()))
+    {
+      const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
+      dofs_on_this_cell.resize (n_dofs_on_this_cell);
+      cell->get_dof_indices (dofs_on_this_cell);
+>------->------->------->-------       // make sparsity pattern for this cell
+//      for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
+//>-----for (unsigned int j=0; j<n_dofs_on_this_cell; ++j)
+//>-----  sparsity.add (dofs_on_this_cell[i],
+//>----->------->-------dofs_on_this_cell[j]);
+>------->------->------->------->------- // make sparsity pattern for this
+>------->------->------->------->------- // cell. if no constraints pattern was
+>------->------->------->------->------- // given, then the following call acts
+>------->------->------->------->------- // as if simply no constraints existed
+>-------constraints.add_entries_local_to_global (dofs_on_this_cell,
+>------->------->------->------->------->------- sparsity,
+>------->------->------->------->------->------- keep_constrained_dofs);
+
+>------->------->------->-------       // Loop over all interior neighbors
+      for (unsigned int face = 0;
+>-------   face < GeometryInfo<DH::dimension>::faces_per_cell;
+>-------   ++face)
+>-------{
+>-------  typename DH::face_iterator cell_face = cell->face(face);
+>-------  if (cell_face->user_flag_set ())
+>-------    continue;
+>-------  if (! cell_face->at_boundary() )
+>-------    {
+>-------      typename DH::cell_iterator neighbor = cell->neighbor(face);
+
+>-------      const unsigned int neighbor_face
+                = cell->neighbor_face_no(face);
+
+>-------      if (cell_face->has_children())
+>------->-------{
+>------->-------  for (unsigned int sub_nr = 0;
+>------->-------       sub_nr != cell_face->number_of_children();
+>------->-------       ++sub_nr)
+>------->-------    {
+>------->-------      const typename DH::cell_iterator
+                        sub_neighbor
+>------->------->-------= cell->neighbor_child_on_subface (face, sub_nr);
+
+                      const unsigned int n_dofs_on_neighbor
+                        = sub_neighbor->get_fe().dofs_per_cell;
+                      dofs_on_other_cell.resize (n_dofs_on_neighbor);
+>------->-------      sub_neighbor->get_dof_indices (dofs_on_other_cell);
+
+                      for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
+>------->------->-------sparsity.add_entries (dofs_on_this_cell[i],
+>------->------->------->------->-------      dofs_on_other_cell.begin(),
+>------->------->------->------->-------      dofs_on_other_cell.end());
+>------->-------      for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
+>------->------->-------sparsity.add_entries (dofs_on_other_cell[j],
+>------->------->------->------->-------      dofs_on_this_cell.begin(),
+>------->------->------->------->-------      dofs_on_this_cell.end());
+>------->-------      sub_neighbor->face(neighbor_face)->set_user_flag ();
+>------->-------    }
+>------->-------}
+              else
+                {
+>------->------->------->------->------->-------   // Refinement edges are
+>------->------->------->------->------->-------   // taken care of by
+>------->------->------->------->------->-------   // coarser cells
+>------->-------  if (cell->neighbor_is_coarser(face))
+>------->-------    continue;
+
+>------->-------  const unsigned int n_dofs_on_neighbor
+                    = neighbor->get_fe().dofs_per_cell;
+                  dofs_on_other_cell.resize (n_dofs_on_neighbor);
+
+                  neighbor->get_dof_indices (dofs_on_other_cell);
+
+>------->-------  for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
+>------->-------    sparsity.add_entries (dofs_on_this_cell[i],
+>------->------->------->------->-------  dofs_on_other_cell.begin(),
+>------->------->------->------->-------  dofs_on_other_cell.end());
+>------->-------  for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
+>------->-------    sparsity.add_entries (dofs_on_other_cell[j],
+>------->------->------->------->-------  dofs_on_this_cell.begin(),
+>------->------->------->------->-------  dofs_on_this_cell.end());
+>------->-------  neighbor->face(neighbor_face)->set_user_flag ();
+>------->-------}
+>-------    }
+>-------}
+    }
+>------->------->------->-------   // finally restore the user flags
+  const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).load_user_flags(user_flags);
+}
+
 
 template <class DH, class SparsityPattern>
 void
