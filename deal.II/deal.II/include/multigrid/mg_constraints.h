@@ -106,7 +106,7 @@ class MGConstraints : public Subscriptor
 				      * this level and cells on the level
 				      * below).
 				      */
-    const std::vector<std::set<unsigned int> > &
+    const std::vector<std::vector<bool> > &
       get_refinement_edge_indices () const;
 
 				     /**
@@ -116,7 +116,7 @@ class MGConstraints : public Subscriptor
 				      * get_boundary_indices() and
 				      * get_refinement_edge_indices().
 				      */
-    const std::vector<std::set<unsigned int> > &
+    const std::vector<std::vector<bool> > &
       get_refinement_edge_boundary_indices () const;
 
   private:
@@ -234,6 +234,26 @@ MGConstraints::at_refinement_edge_boundary (const unsigned int level,
   return refinement_edge_boundary_indices[level][index];
 }
 
+inline
+const std::vector<std::set<unsigned int> > &
+MGConstraints::get_boundary_indices () const
+{
+  return boundary_indices;
+}
+
+inline
+const std::vector<std::vector<bool> > &
+MGConstraints::get_refinement_edge_indices () const
+{
+  return refinement_edge_indices;
+}
+
+inline
+const std::vector<std::vector<bool> > &
+MGConstraints::get_refinement_edge_boundary_indices () const
+{
+  return refinement_edge_boundary_indices;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
