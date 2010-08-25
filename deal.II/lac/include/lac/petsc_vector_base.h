@@ -978,7 +978,7 @@ namespace PETScWrappers
 #else
       const signed int petsc_i = index;
 #endif
-      const PetscScalar subtractand = -value;
+      const PetscScalar subtractand = -1 * value;
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &subtractand, ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
