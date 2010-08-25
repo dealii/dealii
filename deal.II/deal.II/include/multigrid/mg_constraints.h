@@ -30,6 +30,8 @@ template <int dim> class FunctionMap;
 /**
  * Collection of boundary constraints and refinement edge constraints
  * for level vectors.
+ *
+ * @ingroup mg
  */
 class MGConstraints : public Subscriptor
 {
