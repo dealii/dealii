@@ -33,7 +33,7 @@ template <int dim> class FunctionMap;
  *
  * @ingroup mg
  */
-class MGConstraints : public Subscriptor
+class MGConstrainedDoFs : public Subscriptor
 {
   public:
 				     /**
@@ -150,8 +150,16 @@ class MGConstraints : public Subscriptor
 template <int dim, int spacedim>
 inline
 void
-MGConstraints::initialize(const MGDoFHandler<dim,spacedim>& dof)
+MGConstrainedDoFs::initialize(const MGDoFHandler<dim,spacedim>& dof)
 {
+  const unsigned int nlevels = dof.get_tria().n_levels();
+  refinement_edge_indices.resize(nlevels);
+  refinement_edge_boundary_indices.resize(nlevels);
+  for(unsigned int l=0; l<nlevels; ++l)
+    {
+      refinement_edge_indices[l].resize(dof.n_dofs(l));
+      refinement_edge_boundary_indices[l].resize(dof.n_dofs(l));
+    }
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices, 
 					 refinement_edge_boundary_indices);
 }
@@ -160,7 +168,7 @@ MGConstraints::initialize(const MGDoFHandler<dim,spacedim>& dof)
 template <int dim, int spacedim>
 inline
 void
-MGConstraints::initialize(
+MGConstrainedDoFs::initialize(
   const MGDoFHandler<dim,spacedim>& dof,
   const typename FunctionMap<dim>::type& function_map,
   const std::vector<bool>& component_mask)
@@ -185,7 +193,7 @@ MGConstraints::initialize(
 
 inline
 void
-MGConstraints::clear() 
+MGConstrainedDoFs::clear() 
 {
   for(unsigned int l=0; l<boundary_indices.size(); ++l)
     boundary_indices[l].clear();
@@ -200,7 +208,7 @@ MGConstraints::clear()
 
 inline
 bool
-MGConstraints::is_boundary_index (const unsigned int level, 
+MGConstrainedDoFs::is_boundary_index (const unsigned int level, 
 				  const unsigned int index) const
 {
   AssertIndexRange(level, boundary_indices.size());
@@ -213,7 +221,7 @@ MGConstraints::is_boundary_index (const unsigned int level,
 
 inline
 bool
-MGConstraints::at_refinement_edge (const unsigned int level,
+MGConstrainedDoFs::at_refinement_edge (const unsigned int level,
 				   const unsigned int index) const
 {
   AssertIndexRange(level, refinement_edge_indices.size());
@@ -225,7 +233,7 @@ MGConstraints::at_refinement_edge (const unsigned int level,
 
 inline
 bool
-MGConstraints::at_refinement_edge_boundary (const unsigned int level,
+MGConstrainedDoFs::at_refinement_edge_boundary (const unsigned int level,
 					    const unsigned int index) const
 {
   AssertIndexRange(level, refinement_edge_boundary_indices.size());
@@ -236,21 +244,21 @@ MGConstraints::at_refinement_edge_boundary (const unsigned int level,
 
 inline
 const std::vector<std::set<unsigned int> > &
-MGConstraints::get_boundary_indices () const
+MGConstrainedDoFs::get_boundary_indices () const
 {
   return boundary_indices;
 }
 
 inline
 const std::vector<std::vector<bool> > &
-MGConstraints::get_refinement_edge_indices () const
+MGConstrainedDoFs::get_refinement_edge_indices () const
 {
   return refinement_edge_indices;
 }
 
 inline
 const std::vector<std::vector<bool> > &
-MGConstraints::get_refinement_edge_boundary_indices () const
+MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
 {
   return refinement_edge_boundary_indices;
 }

@@ -27,7 +27,7 @@
 #include <lac/vector_memory.h>
 
 #include <multigrid/mg_base.h>
-#include <multigrid/mg_constraints.h>
+#include <multigrid/mg_constrained_dofs.h>
 #include <base/mg_level_object.h>
 
 
@@ -73,11 +73,11 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * refinement.
 				      */
     MGTransferPrebuilt ();
-
 				     /**
-				      * Constructor with constraint matrices.
+				      * Constructor with constraint matrices as well as mg_constrained_dofs.
 				      */
-    MGTransferPrebuilt (const ConstraintMatrix& constraints);
+    MGTransferPrebuilt (const ConstraintMatrix& constraints, 
+        const MGConstrainedDoFs& mg_constrained_dofs);
 				     /**
 				      * Destructor.
 				      */
@@ -87,8 +87,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * matrices for each level.
 				      */
     template <int dim, int spacedim>
-    void build_matrices (const MGDoFHandler<dim,spacedim> &mg_dof,
-    const MGConstraints& mg_constraints);
+    void build_matrices (const MGDoFHandler<dim,spacedim> &mg_dof);
 
     virtual void prolongate (const unsigned int    to_level,
 			     VECTOR       &dst,
@@ -243,7 +242,13 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * The constraints of the global
 				      * system.
 				      */
-    SmartPointer<const ConstraintMatrix> constraints;
+    SmartPointer<const ConstraintMatrix, MGTransferPrebuilt<VECTOR> > constraints;
+				     /**
+				      * The mg_constrained_dofs of the level
+				      * systems.
+				      */
+
+    SmartPointer<const MGConstrainedDoFs, MGTransferPrebuilt<VECTOR> > mg_constrained_dofs;
 };
 
 
