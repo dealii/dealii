@@ -1282,6 +1282,19 @@ CellAccessor<dim, spacedim>::set_subdomain_id (const unsigned int new_subdomain_
 }
 
 
+template <int dim, int spacedim>
+TriaIterator<CellAccessor<dim,spacedim> >
+CellAccessor<dim, spacedim>::parent () const
+{
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
+  TriaIterator<CellAccessor<dim,spacedim> >
+    q (this->tria, this->present_level-1,
+       this->tria->levels[this->present_level]->parents[this->present_index / 2]);
+  
+  return q;
+}
+
 
 template <int dim, int spacedim>
 void CellAccessor<dim, spacedim>::set_neighbor (const unsigned int i,

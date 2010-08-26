@@ -50,6 +50,11 @@ namespace internal
           subdomain_ids.insert (subdomain_ids.end(),
                                 total_cells - subdomain_ids.size(),
                                 0);
+          
+          parents.reserve ((int) (total_cells + 1) / 2);
+          parents.insert (parents.end (),
+                          (total_cells + 1) / 2 - parents.size (),
+                          -1);
       
           neighbors.reserve (total_cells*(2*dimension));
           neighbors.insert (neighbors.end(),
@@ -134,6 +139,11 @@ namespace internal
           subdomain_ids.insert (subdomain_ids.end(),
                                 total_cells - subdomain_ids.size(),
                                 0);
+          
+          parents.reserve ((int) (total_cells + 1) / 2);
+          parents.insert (parents.end (),
+                          (total_cells + 1) / 2 - parents.size (),
+                          -1);
       
           neighbors.reserve (total_cells*(2*dimension));
           neighbors.insert (neighbors.end(),

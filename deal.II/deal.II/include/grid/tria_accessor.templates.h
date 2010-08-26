@@ -1566,6 +1566,18 @@ TriaAccessor<structdim, dim, spacedim>::set_children (const unsigned int i,
 
 template <int structdim, int dim, int spacedim>
 void
+TriaAccessor<structdim, dim, spacedim>::set_parent (const unsigned int parent_index)
+{
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
+  this->tria->levels[this->present_level]->parents[this->present_index / 2]
+    = parent_index;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+void
 TriaAccessor<structdim, dim, spacedim>::clear_children () const
 {
 				   // each set of two children are stored

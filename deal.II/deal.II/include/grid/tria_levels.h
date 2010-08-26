@@ -139,6 +139,13 @@ namespace internal
                                           * number.
                                           */
         std::vector<unsigned int> subdomain_ids;
+        
+                                         /**
+                                          * One integer for every consecutive
+                                          * pair of cells to store which
+                                          * index their parent has.
+                                          */
+        std::vector<int> parents;
     
                                          /**
                                           *  Reserve enough space to accomodate
@@ -213,6 +220,7 @@ namespace internal
         std::vector<unsigned char> refine_flags;
         std::vector<bool> coarsen_flags;
         std::vector<std::pair<int,int> > neighbors;
+        std::vector<int> parents;
         std::vector<unsigned int> subdomain_ids;
         void reserve_space (const unsigned int total_cells,
                             const unsigned int dimension);

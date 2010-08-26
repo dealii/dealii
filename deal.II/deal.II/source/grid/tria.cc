@@ -4037,6 +4037,9 @@ namespace internal
 						 // properties
 		subcells[i]->set_material_id (cell->material_id());
 		subcells[i]->set_subdomain_id (cell->subdomain_id());
+		
+		if (i%2==0)
+		  subcells[i]->set_parent (cell->index ());
 	      }
 
 					     // set child index for
@@ -4229,6 +4232,7 @@ namespace internal
 							 next_unused_vertex));
 		      first_child->set_material_id (cell->material_id());
 		      first_child->set_subdomain_id (cell->subdomain_id());
+		      first_child->set_parent (cell->index ());
 
 						       // reset neighborship info (refer
 						       // to
@@ -6170,6 +6174,7 @@ namespace internal
 			{
 			  if (i%2==0)
 			    next_unused_hex=triangulation.levels[level+1]->cells.next_free_hex(triangulation,level+1);
+			  
 			  else
 			    ++next_unused_hex;
 
@@ -6185,6 +6190,9 @@ namespace internal
 							   // properties
 			  new_hexes[i]->set_material_id (hex->material_id());
 			  new_hexes[i]->set_subdomain_id (hex->subdomain_id());
+			  
+			  if (i%2)
+			    new_hexes[i]->set_parent (hex->index ());
 							   // set the face_orientation
 							   // flag to true for all faces
 							   // initially, as this is the

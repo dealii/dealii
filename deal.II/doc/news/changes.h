@@ -226,6 +226,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
   <li>
   <p>
+  New: Data structures and a function parent to get the parent of a cell.
+  <br>
+  (Markus Buerg 2010/08/26)
+  </p>
+
+  <li>
+  <p>
   Improved: DoFHandler has a default constructor, so that it can be used in containers. 	
   <br>
   (GK 2010/08/16)

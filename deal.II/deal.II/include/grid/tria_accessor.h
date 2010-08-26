@@ -158,6 +158,14 @@ namespace TriaAccessorExceptions
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcCellHasNoChildren);
+				   /**
+				    * Trying to access the parent of
+				    * a cell which is in the coarsest
+				    * level of the triangulation.
+				    *
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcCellHasNoParent);
 //TODO: Write documentation!
 				   /**
 				    * @ingroup Exceptions
@@ -1494,6 +1502,11 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * in the library.
 				      */
     void clear_refinement_case () const;
+    
+                     /**
+                      * Set the parent of a cell.
+                      */
+    void set_parent (const unsigned int parent_index);
 
 				     /**
 				      *  Set the index of the ith
@@ -2171,7 +2184,14 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * cell.
 				      */
     void set_subdomain_id (const unsigned int new_subdomain_id) const;
-
+    
+				     /**
+				      *  Return an iterator to the
+				      *  parent.
+				      */
+    TriaIterator<CellAccessor<dim,spacedim> >
+    parent () const;
+    
 				     /**
 				      * @}
 				      */
