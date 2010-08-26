@@ -597,45 +597,38 @@ FETools::compute_embedding_matrices(const FiniteElement<2,3>&,
 
 #endif
 
-// This function is tested by tests/fe/internals, since it produces the matrices printed there
-template <int dim, typename number, int spacedim>
-void
-FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
-				    std::vector<std::vector<FullMatrix<number> > >& matrices,
-				    const bool isotropic_only)
-{
 
-  const unsigned int n  = fe.dofs_per_cell;
-  const unsigned int nd = fe.n_components();
-  const unsigned int degree = fe.degree;
-
-				   // loop over all possible refinement cases
-  unsigned int ref_case = (isotropic_only)
-			  ? RefinementCase<dim>::isotropic_refinement
-			  : RefinementCase<dim>::cut_x;
-
-  for (;ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
-    {
-      const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-      for (unsigned int i=0;i<nc;++i)
-	{
-	  Assert(matrices[ref_case-1][i].n() == n, ExcDimensionMismatch(matrices[ref_case-1][i].n(),n));
-	  Assert(matrices[ref_case-1][i].m() == n, ExcDimensionMismatch(matrices[ref_case-1][i].m(),n));
-	}
+namespace {
+  template<int dim, typename number, int spacedim>
+  void
+  compute_embedding_matrices_for_refinement_case (const FiniteElement<dim, spacedim>& fe,
+                                                  std::vector<FullMatrix<number> >& matrices,
+                                                  const unsigned int ref_case)
+  {
+    const unsigned int n  = fe.dofs_per_cell;
+    const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+    for (unsigned int i = 0; i < nc; ++i)
+	  {
+	    Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n (), n));
+	    Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m (), n));
+	  }
 
                                    // Set up meshes, one with a single
                                    // reference cell and refine it once
-      Triangulation<dim,spacedim> tria;
-      GridGenerator::hyper_cube (tria, 0, 1);
-      tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
-      tria.execute_coarsening_and_refinement();
+    Triangulation<dim,spacedim> tria;
+    GridGenerator::hyper_cube (tria, 0, 1);
+    tria.begin_active()->set_refine_flag (RefinementCase<dim>(ref_case));
+    tria.execute_coarsening_and_refinement ();
 
-      MappingCartesian<dim> mapping;
-      QGauss<dim> q_fine(degree+1);
-      const unsigned int nq = q_fine.size();
+    MappingCartesian<dim> mapping;
+    const unsigned int degree = fe.degree;
+    QGauss<dim> q_fine (degree+1);
+    const unsigned int nq = q_fine.size();
 
-      FEValues<dim> fine (mapping, fe, q_fine,
-			  update_quadrature_points | update_JxW_values | update_values);
+    FEValues<dim> fine (mapping, fe, q_fine,
+			            update_quadrature_points |
+			            update_JxW_values |
+			            update_values);
 
 				       // We search for the polynomial on
 				       // the small cell, being equal to
@@ -650,63 +643,70 @@ FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 
 				       // This matrix is the same for all
 				       // children.
-      fine.reinit(tria.begin_active());
-      FullMatrix<number> A(nq*nd, n);
-      for (unsigned int j=0;j<n;++j)
-	for (unsigned int d=0;d<nd;++d)
-	  for (unsigned int k=0;k<nq;++k)
-	    A(k*nd+d,j) = fine.shape_value_component(j,k,d);
-
-      Householder<double> H(A);
-
-      Vector<number> v_coarse(nq*nd);
-      Vector<number> v_fine(n);
-
-      unsigned int cell_number = 0;
-      for (typename Triangulation<dim>::active_cell_iterator fine_cell
-	     = tria.begin_active();
-	   fine_cell != tria.end(); ++fine_cell, ++cell_number)
-	{
-	  fine.reinit(fine_cell);
+    fine.reinit (tria.begin_active ());
+    const unsigned int nd = fe.n_components ();
+    FullMatrix<number> A (nq*nd, n);
+    
+    for (unsigned int j = 0; j < n; ++j)
+	  for (unsigned int d = 0; d < nd; ++d)
+	    for (unsigned int k = 0; k < nq; ++k)
+	      A (k * nd + d, j) = fine.shape_value_component (j, k, d);
+    
+    Householder<double> H (A);
+    static Threads::Mutex mutex;
+    Vector<number> v_coarse (nq * nd);
+    Vector<number> v_fine (n);
+    unsigned int cell_number = 0;
+  
+    for (typename Triangulation<dim>::active_cell_iterator
+         fine_cell = tria.begin_active (); fine_cell != tria.end ();
+         ++fine_cell, ++cell_number)
+	  {
+	    fine.reinit (fine_cell);
 
 					   // evaluate on the coarse cell (which
 					   // is the first -- inactive -- cell on
 					   // the lowest level of the
 					   // triangulation we have created)
-	  const Quadrature<dim> q_coarse (fine.get_quadrature_points(),
-					  fine.get_JxW_values());
-	  FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
-	  coarse.reinit(tria.begin(0));
+	    const Quadrature<dim> q_coarse (fine.get_quadrature_points (),
+					                    fine.get_JxW_values ());
+	    FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
+	    
+	    coarse.reinit (tria.begin (0));
 
-	  FullMatrix<double> &this_matrix = matrices[ref_case-1][cell_number];
-	  v_coarse = 0;
+	    FullMatrix<double> &this_matrix = matrices[cell_number];
+	    
+	    v_coarse = 0;
 
 					   // Compute this once for each
 					   // coarse grid basis function
-	  for (unsigned int i=0;i<n;++i)
-	    {
+	    for (unsigned int i = 0;i < n; ++i)
+	      {
 					       // The right hand side of
 					       // the least squares
 					       // problem consists of the
 					       // function values of the
 					       // coarse grid function in
 					       // each quadrature point.
-	      if (fe.is_primitive())
-		{
-		  const unsigned int d = fe.system_to_component_index(i).first;
-		  const double * phi_i = &coarse.shape_value (i,0);
-		  for (unsigned int k=0;k<nq;++k)
-		    v_coarse(k*nd+d) = phi_i[k];
-		}
-	      else
-		for (unsigned int d=0;d<nd;++d)
-		  for (unsigned int k=0;k<nq;++k)
-		    v_coarse(k*nd+d) = coarse.shape_value_component(i,k,d);
+	        if (fe.is_primitive ())
+		      {
+		        const unsigned int
+		          d = fe.system_to_component_index (i).first;
+		        const double* phi_i = &coarse.shape_value (i, 0);
+		        
+		        for (unsigned int k = 0; k < nq; ++k)
+		          v_coarse (k * nd + d) = phi_i[k];
+		      }
+		    
+	        else
+		      for (unsigned int d = 0; d < nd; ++d)
+		        for (unsigned int k = 0; k < nq; ++k)
+		          v_coarse (k * nd + d) = coarse.shape_value_component (i, k, d);
 
 					       // solve the least squares
 					       // problem.
-	      const double result = H.least_squares(v_fine, v_coarse);
-	      Assert (result < 1.e-12, ExcLeastSquaresError(result));
+	        const double result = H.least_squares (v_fine, v_coarse);
+	        Assert (result < 1.e-12, FETools::ExcLeastSquaresError (result));
 
 					       // Copy into the result
 					       // matrix. Since the matrix
@@ -714,19 +714,50 @@ FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 					       // function to a fine grid
 					       // function, the columns
 					       // are fine grid.
-	      for (unsigned int j=0;j<n;++j)
-		this_matrix(j,i) = v_fine(j);
-	    }
+		    mutex.acquire ();
+		    
+	        for (unsigned int j = 0; j < n; ++j)
+		      this_matrix(j, i) = v_fine(j);
+		    
+		    mutex.release ();
+	      }
+	    
+	    mutex.acquire ();
 					   // Remove small entries from
 					   // the matrix
-	  for (unsigned int i=0; i<this_matrix.m(); ++i)
-	    for (unsigned int j=0; j<this_matrix.n(); ++j)
-	      if (std::fabs(this_matrix(i,j)) < 1e-12)
-		this_matrix(i,j) = 0.;
-	}
-      Assert (cell_number == GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)),
-	      ExcInternalError());
-    }
+	    for (unsigned int i = 0; i < this_matrix.m (); ++i)
+	      for (unsigned int j = 0; j < this_matrix.n (); ++j)
+	        if (std::fabs (this_matrix (i, j)) < 1e-12)
+		      this_matrix (i, j) = 0.;
+        
+        mutex.release ();
+	  }
+	  
+    Assert (cell_number == GeometryInfo<dim>::n_children (RefinementCase<dim> (ref_case)),
+	        ExcInternalError ());
+  }
+}
+
+
+// This function is tested by tests/fe/internals, since it produces the matrices printed there
+template <int dim, typename number, int spacedim>
+void
+FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
+				    std::vector<std::vector<FullMatrix<number> > >& matrices,
+				    const bool isotropic_only)
+{
+  Threads::TaskGroup<void> task_group;
+
+				   // loop over all possible refinement cases
+  unsigned int ref_case = (isotropic_only)
+			  ? RefinementCase<dim>::isotropic_refinement
+			  : RefinementCase<dim>::cut_x;
+
+  for (;ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
+    task_group += Threads::new_task (&compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
+                                     fe, matrices[ref_case-1], ref_case);
+  
+  task_group.join_all ();
 }
 
 
