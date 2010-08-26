@@ -6236,6 +6236,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
 ])
 
 
+
 dnl ------------------------------------------------------------
 dnl Check whether MUMPS is installed; and, if so, then check for
 dnl two known dependecies, namely, SCALAPACK and BLACS.
@@ -6348,6 +6349,49 @@ AC_DEFUN(DEAL_II_CONFIGURE_MUMPS, dnl
       with_mumps="yes"
     fi
   fi
+])
+
+dnl ------------------------------------------------------------
+dnl Check whether ARPACK is installed, and if so store the
+dnl respective links
+dnl
+dnl Usage: DEAL_II_CONFIGURE_ARPACK
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_ARPACK, dnl
+[
+  AC_MSG_CHECKING([for ARPACK library directory])
+  AC_ARG_WITH(arpack,
+    [AS_HELP_STRING([--with-arpack=path/to/arpack],
+    [Specify the path to the ARPACK installation, for which the include directory and lib directory are subdirs; use this if you want to override the ARPACK_DIR environment variable.])],
+    [dnl action-if-given
+     if test "x$withval" = "xno" ; then
+       AC_MSG_RESULT([explicitly disabled])
+       USE_CONTRIB_ARPACK=no
+     else
+       USE_CONTRIB_ARPACK=yes
+       DEAL_II_ARPACK_DIR="$withval"
+       AC_MSG_RESULT($DEAL_II_ARPACK_DIR)
+       dnl Make sure that what was specified is actually correct
+       if test ! -d $DEAL_II_ARPACK_DIR \
+          ; then
+         AC_MSG_ERROR([Path to ARPACK specified with --with-arpack does not point to a complete ARPACK installation])
+       fi
+
+       dnl Grab a meaningful name of the architeture ARPACK was
+       dnl compiled for
+       AC_MSG_CHECKING([for ARPACK library architecture])
+       ARPACK_ARCH=`cat $DEAL_II_ARPACK_DIR/ARmake.inc \
+                 | grep "PLAT = " \
+                 | perl -pi -e 's/.*PLAT =\s+//g;'`
+       DEAL_II_ARPACK_ARCH="$ARPACK_ARCH"
+       AC_MSG_RESULT($DEAL_II_ARPACK_ARCH)
+     fi
+    ],
+    [dnl action-if-not-given (do nothing)
+     USE_CONTRIB_ARPACK=no
+     AC_MSG_RESULT([no])
+    ])
 ])
 
 
