@@ -972,13 +972,14 @@ namespace PETScWrappers
       if (value == PetscScalar())
         return *this;
 
-                                       // use the PETSc function to add something
+                                       // use the PETSc function to
+                                       // add something
 #ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
 #else
       const signed int petsc_i = index;
 #endif
-      const PetscScalar subtractand = -1 * value;
+      const PetscScalar subtractand = -value;
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &subtractand, ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
