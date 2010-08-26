@@ -75,7 +75,7 @@
 				 // operator (solver or preconditioner).
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
-#include <multigrid/mg_constraints.h>
+#include <multigrid/mg_constrained_dofs.h>
 #include <multigrid/multigrid.h>
 #include <multigrid/mg_transfer.h>
 #include <multigrid/mg_tools.h>
@@ -179,7 +179,7 @@ class LaplaceProblem
     MGLevelObject<SparsityPattern>       mg_sparsity_patterns;
     MGLevelObject<SparseMatrix<double> > mg_matrices;
     MGLevelObject<SparseMatrix<double> > mg_interface_matrices;
-    MGConstraints                        mg_constraints;
+    MGConstrainedDoFs                    mg_constrained_dofs;
 };
 
 
@@ -349,8 +349,8 @@ void LaplaceProblem<dim>::setup_system ()
                                    // the boundary values as well, so we
                                    // pass the <code>dirichlet_boundary</code>
                                    // here as well.
-  mg_constraints.clear();
-  mg_constraints.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.clear();
+  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
 
 
 				   // Now for the things that concern the
@@ -555,9 +555,9 @@ void LaplaceProblem<dim>::assemble_multigrid ()
                                    // already computed the information for us
                                    // when we called initialize in <code>setup_system()</code>.
   std::vector<std::vector<bool> > interface_dofs 
-    = mg_constraints.get_refinement_edge_indices ();
+    = mg_constrained_dofs.get_refinement_edge_indices ();
   std::vector<std::vector<bool> > boundary_interface_dofs
-    = mg_constraints.get_refinement_edge_boundary_indices ();
+    = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
 				   // The indices just identified will later
 				   // be used to decide where the assembled value
@@ -589,7 +589,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     {
       boundary_constraints[level].add_lines (interface_dofs[level]);
-      boundary_constraints[level].add_lines (mg_constraints.get_boundary_indices()[level]);
+      boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
       boundary_constraints[level].close ();
 
       boundary_interface_constraints[level]
@@ -764,14 +764,14 @@ void LaplaceProblem<dim>::solve ()
 				 // Create the object that deals with the transfer
                                  // between different refinement levels. We need to 
                                  // pass it the hanging node constraints.
-  MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints);
+  MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints, mg_constrained_dofs);
 				 // Now the prolongation matrix has to be built. 
                                  // This matrix needs to take the boundary values on 
                                  // each level into account and needs to know about 
                                  // the indices at the refinement egdes. The 
                                  // <code>MGConstraints</code> knows about that so
                                  // pass it as an argument.
-  mg_transfer.build_matrices(mg_dof_handler, mg_constraints);
+  mg_transfer.build_matrices(mg_dof_handler);
 
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from (mg_matrices[0]);
