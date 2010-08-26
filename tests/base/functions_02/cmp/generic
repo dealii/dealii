@@ -1,0 +1,45 @@
+
+DEAL:: Functions::Q1WedgeFunction<2>
+DEAL::2.00000
+DEAL:: values checked
+DEAL::2.00000
+DEAL:: values checked
+DEAL::1.00000
+DEAL::4.00000
+DEAL::9.00000
+DEAL:: value_list checked
+DEAL::1.00000
+DEAL::4.00000
+DEAL::9.00000
+DEAL:: value_list checked
+DEAL::1.00000
+DEAL::4.00000
+DEAL::9.00000
+DEAL:: vector_value_list checked
+DEAL::1.00000
+DEAL::4.00000
+DEAL::9.00000
+DEAL:: vector_value_list checked
+DEAL::0-der: 4.00000
+DEAL::1-der: 3.00000
+DEAL:: gradients checked
+DEAL::0-der: 4.00000
+DEAL::1-der: 3.00000
+DEAL::2-der: 0
+DEAL:: gradients checked
+DEAL::1.00000 1.00000
+DEAL::2.00000 2.00000
+DEAL::3.00000 3.00000
+DEAL:: gradient_list checked
+DEAL::1.00000 1.00000 0.00000
+DEAL::2.00000 2.00000 0.00000
+DEAL::3.00000 3.00000 0.00000
+DEAL:: gradient_list checked
+DEAL::1.00000 1.00000
+DEAL::2.00000 2.00000
+DEAL::3.00000 3.00000
+DEAL:: vector_gradient_list checked
+DEAL::1.00000 1.00000 0.00000
+DEAL::2.00000 2.00000 0.00000
+DEAL::3.00000 3.00000 0.00000
+DEAL:: vector_gradient_list checked
