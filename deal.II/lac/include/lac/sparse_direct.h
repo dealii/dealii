@@ -1270,7 +1270,6 @@ class SparseDirectUMFPACK : public Subscriptor
 };
 
 
-#ifdef DEAL_II_USE_MUMPS
 /**
  * This class provides an interface to the parallel sparse direct
  * solver <a href="http://mumps.enseeiht.fr">MUMPS</a>. MUMPS is
@@ -1295,7 +1294,9 @@ class SparseDirectMUMPS
 {
  private:
   
+#ifdef DEAL_II_USE_MUMPS
   DMUMPS_STRUC_C id;
+#endif // DEAL_II_USE_MUMPS
 
   double       *a;
   double       *rhs;
@@ -1345,7 +1346,6 @@ class SparseDirectMUMPS
 			 */      
   void solve (Vector<double>& vector);
 };
-#endif // DEAL_II_USE_MUMPS
 
 DEAL_II_NAMESPACE_CLOSE
 
