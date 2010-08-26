@@ -173,7 +173,7 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
 endif # USE_CONTRIB_PETSC
 
 ifeq ($(USE_CONTRIB_SLEPC),yes)
-  lib-contrib-slepc    = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libslepc$(lib-suffix)
+  lib-contrib-slepc = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/libslepc$(lib-suffix)
 endif
 
 # same for metis, except that there is only one library in that case
@@ -220,7 +220,7 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
 endif
 
 # Using dealii with MUMPS means we need to link the MUMPS library as
-# well as its dependencies, ie, SCALAPCK and BLACS
+# well as bumping in its dependencies, ie, SCALAPCK and BLACS
 ifeq ($(USE_CONTRIB_MUMPS),yes)
   lib-contrib-mumps  = $(DEAL_II_MUMPS_DIR)/lib/libdmumps.a \
                        $(DEAL_II_MUMPS_DIR)/lib/libmumps_common.a \
@@ -229,6 +229,12 @@ ifeq ($(USE_CONTRIB_MUMPS),yes)
   lib-contrib-mumps += $(DEAL_II_BLACS_DIR)/LIB/blacsCinit_$(DEAL_II_BLACS_ARCH).a \
                        $(DEAL_II_BLACS_DIR)/LIB/blacsF77init_$(DEAL_II_BLACS_ARCH).a \
                        $(DEAL_II_BLACS_DIR)/LIB/blacs_$(DEAL_II_BLACS_ARCH).a
+endif
+
+# Using dealii with ARPACK simply means adding the libarpack library
+# with the right name
+ifeq ($(USE_CONTRIB_ARPACK),yes)
+  lib-contrib-arpack = $(DEAL_II_ARPACK_DIR)/libarpack_$(DEAL_II_ARPACK_ARCH).a
 endif
 
 # deal with HSL; this should have been $(lib-contrib-hsl) but for a long time we
@@ -257,12 +263,14 @@ lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) \
 		 $(lib-contrib-petsc.o) $(DEAL_II_PETSC_MPIUNI_LIB) \
                  $(lib-contrib-slepc) \
                  $(lib-contrib-mumps) \
+                 $(lib-contrib-arpack) \
 		 $(lib-contrib-metis)
 lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) \
 		 $(lib-hsl) \
 		 $(lib-contrib-petsc.g) $(DEAL_II_PETSC_MPIUNI_LIB) \
                  $(lib-contrib-slepc) \
                  $(lib-contrib-mumps) \
+                 $(lib-contrib-arpack) \
 		 $(lib-contrib-metis)
 
 lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
