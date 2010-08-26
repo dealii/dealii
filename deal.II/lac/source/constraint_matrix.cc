@@ -2157,9 +2157,9 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
 
 
 				   // create a vector and import those indices
-  PETScWrappers::MPI::Vector ghost_vec(vec.get_mpi_communicator(),
-				       local_range_is,
-				       my_indices);
+  PETScWrappers::MPI::Vector ghost_vec (vec.get_mpi_communicator(),
+					local_range_is,
+					my_indices);
   ghost_vec = vec;
   ghost_vec.update_ghost_values();
 
@@ -2171,9 +2171,9 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
 				       // fill entry in line
 				       // next_constraint.line by adding the
 				       // different contributions
-      double new_value = it->inhomogeneity;
+      PetscScalar new_value = it->inhomogeneity;
       for (unsigned int i=0; i<it->entries.size(); ++i)
-	new_value += (ghost_vec(it->entries[i].first) *
+	new_value += (PetscScalar(ghost_vec(it->entries[i].first)) *
                       it->entries[i].second);
       vec(it->line) = new_value;
     }
@@ -2375,12 +2375,10 @@ VECTOR_FUNCTIONS(BlockVector<float>);
 // use them. The key is to use local ranges etc., which still needs to be
 // implemented.
 #ifdef DEAL_II_USE_PETSC
-#ifndef DEAL_II_USE_PETSC_COMPLEX
 VECTOR_FUNCTIONS(PETScWrappers::Vector);
 VECTOR_FUNCTIONS(PETScWrappers::BlockVector);
 VECTOR_FUNCTIONS(PETScWrappers::MPI::Vector);
 VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockVector);
-#endif
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
