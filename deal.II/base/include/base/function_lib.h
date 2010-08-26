@@ -141,7 +141,7 @@ namespace Functions
  *
  * This is a function for testing the implementation. It has zero Dirichlet
  * boundary values on the domain $(-1,1)^d$. In the inside, it is the
- * product of $x_i^2-1$.
+ * product of $1-x_i^2$ over all space dimensions.
  *
  * Providing a non-zero argument to the constructor, the whole function
  * can be offset by a constant.
