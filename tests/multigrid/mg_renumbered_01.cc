@@ -322,10 +322,7 @@ void LaplaceProblem<dim>::test ()
   typename FunctionMap<dim>::type      dirichlet_boundary;
   ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
   dirichlet_boundary[0] =             &dirichlet_bc;
-  MGTools::make_boundary_list (mg_dof_handler, dirichlet_boundary,
-			       boundary_indices);
-  MGTools::make_boundary_list (mg_dof_handler_renumbered, dirichlet_boundary,
-			       boundary_indices_renumbered);
+
   const unsigned int min_l = mg_matrices.get_minlevel();
   const unsigned int max_l = mg_matrices.get_maxlevel();
   for(unsigned int l=min_l; l<max_l; ++l)
@@ -337,10 +334,19 @@ void LaplaceProblem<dim>::test ()
   GrowingVectorMemory<>   vector_memory;
   GrowingVectorMemory<>   vector_memory_renumbered;
 
-  MGTransferPrebuilt<Vector<double> > mg_transfer;
-  mg_transfer.build_matrices(mg_dof_handler, boundary_indices);
-  MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered;
-  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered, boundary_indices_renumbered);
+  MGConstrainedDoFs mg_constrained_dofs;
+  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  MGConstrainedDoFs mg_constrained_dofs_renumbered;
+  mg_constrained_dofs_renumbered.initialize(mg_dof_handler_renumbered, dirichlet_boundary);
+
+  ConstraintMatrix constraints;
+  constraints.close();
+
+  MGTransferPrebuilt<Vector<double> > mg_transfer (constraints, mg_constrained_dofs);
+  mg_transfer.build_matrices(mg_dof_handler);
+  MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered (constraints, mg_constrained_dofs_renumbered);
+  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered);
+
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from (mg_matrices[0]);
   MGCoarseGridHouseholder<double, Vector<double> > mg_coarse;

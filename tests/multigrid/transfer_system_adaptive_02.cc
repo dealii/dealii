@@ -148,11 +148,12 @@ void check (const FiniteElement<dim>& fe)
   ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
   dirichlet_boundary[3] =             &dirichlet_bc;
 
-  MGTools::make_boundary_list (mg_dof_handler, dirichlet_boundary,
-			       boundary_indices);
+  MGConstrainedDoFs mg_constrained_dofs;
+  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
 
-  MGTransferPrebuilt<Vector<double> > transfer;
-  transfer.build_matrices(mg_dof_handler, boundary_indices);
+  ConstraintMatrix constraints;
+  MGTransferPrebuilt<Vector<double> > transfer(constraints, mg_constrained_dofs);
+  transfer.build_matrices(mg_dof_handler);
 
   FullMatrix<double> prolong_0_1 (mg_dof_handler.n_dofs(1),
 				  mg_dof_handler.n_dofs(0));

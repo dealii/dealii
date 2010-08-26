@@ -231,10 +231,17 @@ void check_simple(const FiniteElement<dim>& fe)
   for (unsigned int level=0;level<tr.n_levels();++level)
     DoFRenumbering::component_wise (mgdof_renumbered, level, block_component);
 
-  MGTransferPrebuilt<Vector<double> > transfer(hnc);
+
+  MGConstrainedDoFs mg_constrained_dofs;
+  mg_constrained_dofs.initialize(mgdof);
+
+  MGConstrainedDoFs mg_constrained_dofs_renumbered;
+  mg_constrained_dofs_renumbered.initialize(mgdof_renumbered);
+
+  MGTransferPrebuilt<Vector<double> > transfer(hnc, mg_constrained_dofs);
   transfer.build_matrices(mgdof);
 
-  MGTransferPrebuilt<Vector<double> > transfer_renumbered(hnc_renumbered);
+  MGTransferPrebuilt<Vector<double> > transfer_renumbered(hnc_renumbered, mg_constrained_dofs_renumbered);
   transfer_renumbered.build_matrices(mgdof_renumbered);
 
   Vector<double> u(mgdof.n_dofs());
