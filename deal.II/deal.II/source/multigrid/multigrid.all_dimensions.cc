@@ -107,11 +107,11 @@ MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt ()
 
 
 template<class VECTOR>
-MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c)
+MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs& mg_c)
  :
-   constraints(&c)
+   constraints(&c),
+   mg_constrained_dofs(&mg_c)
 {} 
-
 
 template <class VECTOR>
 MGTransferPrebuilt<VECTOR>::~MGTransferPrebuilt () 
