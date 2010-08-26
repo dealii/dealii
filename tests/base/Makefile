@@ -94,7 +94,8 @@ tests_x =  geometry_info_* \
 	   task_* \
 	   parallel_* \
 	   mutex_* \
-	   scalar_*
+	   scalar_* \
+	   conditional_ostream
 
 # add threading tests. note that we have
 # to list them individually, without wildcards, because the .cc files are
