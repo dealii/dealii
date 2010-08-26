@@ -125,6 +125,7 @@ class LaplaceProblem
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
+    ConstraintMatrix     hanging_node_constraints;
     ConstraintMatrix     constraints;
 
     Vector<double>       solution;
@@ -166,6 +167,7 @@ class LaplaceProblem
     MGLevelObject<SparsityPattern>       mg_sparsity_patterns;
     MGLevelObject<SparseMatrix<double> > mg_matrices;
     MGLevelObject<SparseMatrix<double> > mg_interface_matrices;
+    MGConstrainedDoFs                    mg_constrained_dofs;
 };
 
 
@@ -317,16 +319,25 @@ void LaplaceProblem<dim>::setup_system ()
 				   // right away, without the need for a later
 				   // clean-up stage:
   constraints.clear ();
+  hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
-  VectorTools::interpolate_boundary_values (mg_dof_handler,
-					    0,
-					    ZeroFunction<dim>(),
+  DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
+  typename FunctionMap<dim>::type      dirichlet_boundary;
+  ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
+  dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
+  MappingQ1<dim> mapping;
+  VectorTools::interpolate_boundary_values (mapping,
+                                            mg_dof_handler,
+					    dirichlet_boundary,
 					    constraints);
   constraints.close ();
+  hanging_node_constraints.close ();
   constraints.condense (sparsity_pattern);
   sparsity_pattern.compress();
   system_matrix.reinit (sparsity_pattern);
 
+  mg_constrained_dofs.clear();
+  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
 				   // Now for the things that concern the
 				   // multigrid data structures. First, we
 				   // resize the multi-level objects to hold
@@ -519,18 +530,11 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 				   // which indicates whether the
 				   // corresponding degree of freedom index is
 				   // an interface DoF or not:
-  std::vector<std::vector<bool> > interface_dofs;
-  std::vector<std::vector<bool> > boundary_interface_dofs;
-  for (unsigned int level = 0; level<triangulation.n_levels(); ++level)
-    {
-      interface_dofs.push_back (std::vector<bool>
-				(mg_dof_handler.n_dofs(level)));
-      boundary_interface_dofs.push_back (std::vector<bool>
-					 (mg_dof_handler.n_dofs(level)));
-    }
-  MGTools::extract_inner_interface_dofs (mg_dof_handler,
-					 interface_dofs,
-					 boundary_interface_dofs);
+  std::vector<std::vector<bool> > interface_dofs 
+    = mg_constrained_dofs.get_refinement_edge_indices ();
+  std::vector<std::vector<bool> > boundary_interface_dofs
+    = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
+
 
 				   // The indices just identified will later
 				   // be used to impose zero boundary
@@ -547,13 +551,6 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 				   // boundary list, though we will need such
 				   // access for the interface degrees of
 				   // freedom further down below):
-  typename FunctionMap<dim>::type      dirichlet_boundary;
-  ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
-  dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-
-  std::vector<IndexSet> boundary_indices (triangulation.n_levels());
-  MGTools::make_boundary_list (mg_dof_handler, dirichlet_boundary,
-			       boundary_indices);
 
 				   // The third step is to construct
 				   // constraints on all those degrees of
@@ -576,7 +573,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     {
       boundary_constraints[level].add_lines (interface_dofs[level]);
-      boundary_constraints[level].add_lines (boundary_indices[level]);
+      boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
       boundary_constraints[level].close ();
 
       boundary_interface_constraints[level]
@@ -747,14 +744,13 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
-  MGTransferPrebuilt<Vector<double> > mg_transfer(constraints);
+  MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints, mg_constrained_dofs);
   mg_transfer.build_matrices(mg_dof_handler);
 
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from (mg_matrices[0]);
   MGCoarseGridHouseholder<> coarse_grid_solver;
   coarse_grid_solver.initialize (coarse_matrix);
-
 				   // The next component of a multilevel
 				   // solver or preconditioner is that we need
 				   // a smoother on each level. A common
