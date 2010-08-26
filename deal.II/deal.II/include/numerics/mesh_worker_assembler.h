@@ -18,7 +18,7 @@
 #include <base/mg_level_object.h>
 #include <lac/block_vector.h>
 #include <numerics/mesh_worker_info.h>
-#include <multigrid/mg_constraints.h>
+#include <multigrid/mg_constrained_dofs.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -560,7 +560,7 @@ namespace MeshWorker
 					  * Initialize the multilevel
                                           * constraints. 
 					  */
-        void initialize(const MGConstraints& mg_constraints);
+        void initialize(const MGConstrainedDoFs& mg_constrained_dofs);
 
 					 /**
 					  * Initialize the matrices
@@ -693,7 +693,7 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-        SmartPointer<const MGConstraints,MGMatrixSimple<MATRIX> > mg_constraints;
+        SmartPointer<const MGConstrainedDoFs,MGMatrixSimple<MATRIX> > mg_constrained_dofs;
 	
 					 /**
 					  * The smallest positive
@@ -1445,9 +1445,9 @@ namespace MeshWorker
     
     template <class MATRIX>
     inline void
-    MGMatrixSimple<MATRIX>::initialize(const MGConstraints& c)
+    MGMatrixSimple<MATRIX>::initialize(const MGConstrainedDoFs& c)
     {
-      mg_constraints = &c;
+      mg_constrained_dofs = &c;
     }
 
     template <class MATRIX>
@@ -1493,7 +1493,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
       
-      if(mg_constraints == 0)
+      if(mg_constrained_dofs == 0)
       {
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
@@ -1505,13 +1505,13 @@ namespace MeshWorker
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(j,k)) >= threshold)
-              if(mg_constraints->at_refinement_edge(level, i1[j])==false &&
-                  mg_constraints->at_refinement_edge(level, i2[k])==false)
-                if((mg_constraints->is_boundary_index(level, i1[j])==false &&
-                     mg_constraints->is_boundary_index(level, i2[k])==false)
+              if(mg_constrained_dofs->at_refinement_edge(level, i1[j])==false &&
+                  mg_constrained_dofs->at_refinement_edge(level, i2[k])==false)
+                if((mg_constrained_dofs->is_boundary_index(level, i1[j])==false &&
+                     mg_constrained_dofs->is_boundary_index(level, i2[k])==false)
                     ||
-                    (mg_constraints->is_boundary_index(level, i1[j])==true &&
-                     mg_constraints->is_boundary_index(level, i2[k])==true
+                    (mg_constrained_dofs->is_boundary_index(level, i1[j])==true &&
+                     mg_constrained_dofs->is_boundary_index(level, i2[k])==true
                     &&
                     i1[j] == i2[k])
                     )
@@ -1531,7 +1531,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
       
-      if(mg_constraints == 0)
+      if(mg_constrained_dofs == 0)
       {
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
@@ -1543,13 +1543,13 @@ namespace MeshWorker
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(j,k)) >= threshold)
-              if(mg_constraints->at_refinement_edge(level, i1[j])==true &&
-                  mg_constraints->at_refinement_edge(level, i2[k])==false)
-                if((mg_constraints->at_refinement_edge_boundary(level, i1[j])==false &&
-                     mg_constraints->at_refinement_edge_boundary(level, i2[k])==false)
+              if(mg_constrained_dofs->at_refinement_edge(level, i1[j])==true &&
+                  mg_constrained_dofs->at_refinement_edge(level, i2[k])==false)
+                if((mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j])==false &&
+                     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])==false)
                     ||
-                    (mg_constraints->at_refinement_edge_boundary(level, i1[j])==true &&
-                     mg_constraints->at_refinement_edge_boundary(level, i2[k])==true
+                    (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j])==true &&
+                     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])==true
                      &&
                     i1[j] == i2[k])
                     )
@@ -1569,7 +1569,7 @@ namespace MeshWorker
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
       
-      if(mg_constraints == 0)
+      if(mg_constrained_dofs == 0)
       {
       for (unsigned int j=0; j<i1.size(); ++j)
 	for (unsigned int k=0; k<i2.size(); ++k)
@@ -1581,13 +1581,13 @@ namespace MeshWorker
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(j,k)) >= threshold)
-              if(mg_constraints->at_refinement_edge(level, i1[j])==true &&
-                  mg_constraints->at_refinement_edge(level, i2[k])==false)
-                if((mg_constraints->at_refinement_edge_boundary(level, i1[j])==false &&
-                     mg_constraints->at_refinement_edge_boundary(level, i2[k])==false) 
+              if(mg_constrained_dofs->at_refinement_edge(level, i1[j])==true &&
+                  mg_constrained_dofs->at_refinement_edge(level, i2[k])==false)
+                if((mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j])==false &&
+                     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])==false) 
                     ||
-                    (mg_constraints->at_refinement_edge_boundary(level, i1[j])==true &&
-                     mg_constraints->at_refinement_edge_boundary(level, i2[k])==true
+                    (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j])==true &&
+                     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])==true
                     &&
                     i1[j] == i2[k])
                     )
@@ -1603,7 +1603,7 @@ namespace MeshWorker
     {
       const unsigned int level = info.cell->level();
       assemble((*matrix)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
-      if(mg_constraints != 0)
+      if(mg_constrained_dofs != 0)
       {
         assemble_transpose((*interface_down)[level],info.matrix(0,false).matrix, info.indices, info.indices, level);
         assemble_down((*interface_up)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
@@ -1622,7 +1622,7 @@ namespace MeshWorker
       
       if (level1 == level2)
 	{
-          if(mg_constraints == 0)
+          if(mg_constrained_dofs == 0)
           {
             assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
             assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices);
