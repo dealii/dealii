@@ -45,6 +45,12 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 <ol>
   <li>
+  <p>New: Tests for the parent relations.
+  <br>
+  (Markus Buerg 2010/08/26)
+  </p>
+
+  <li>
   <p>Fixed: When using Trilinos and deal.II both with static libraries,
   a linker error would occur whenever a program linked both the 2d and
   3d libraries of deal.II. This is now fixed.
