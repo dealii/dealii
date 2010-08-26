@@ -90,7 +90,8 @@ namespace Functions
   
   
 /**
- * The function <tt>xy</tt>. This function serves as an example for
+ * The function <tt>xy</tt> in 2d and 3d, not implemented in 1d. 
+ * This function serves as an example for
  * a vanishing Laplacian.
  *
  * @ingroup functions
