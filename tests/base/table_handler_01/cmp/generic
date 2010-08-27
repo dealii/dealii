@@ -23,4 +23,3 @@ numbers & squares & square roots\\ \hline
 \caption{This is a caption text with \LaTeX{} symbols}
 \end{table}
 \end{document}
-

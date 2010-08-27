@@ -43,14 +43,5 @@ int main ()
   table.set_tex_table_caption("This is a caption text with \\LaTeX{} symbols");
 
                                  // output
-  std::ofstream out("table_handler_01/outfile.tex");
-  table.write_tex(out);
-  std::ifstream in("table_handler_01/outfile.tex");
-  while (in)
-    {
-      std::string s;
-      std::getline(in, s);
-      deallog.get_file_stream() << s << "\n";
-    }
-
+  table.write_tex(deallog.get_file_stream());
 }
