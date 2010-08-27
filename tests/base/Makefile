@@ -72,6 +72,7 @@ tests_x =  geometry_info_* \
 	   named_data \
 	   slice_vector \
 	   table \
+	   table_handler* \
 	   tensor \
 	   tensor_* \
 	   point_* \

@@ -1,0 +1,26 @@
+
+\documentclass[10pt]{report}
+\usepackage{float}
+
+
+\begin{document}
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|} \hline
+numbers & squares & square roots\\ \hline
+1 & 1 & 1.0000\\ \hline
+2 & 4 & 1.4142\\ \hline
+3 & 9 & 1.7321\\ \hline
+4 & 16 & 2.0000\\ \hline
+5 & 25 & 2.2361\\ \hline
+6 & 36 & 2.4495\\ \hline
+7 & 49 & 2.6458\\ \hline
+8 & 64 & 2.8284\\ \hline
+9 & 81 & 3.0000\\ \hline
+10 & 100 & 3.1623\\ \hline
+\end{tabular}
+\end{center}
+\caption{This is a caption text with \LaTeX{} symbols}
+\end{table}
+\end{document}
+
