@@ -6369,7 +6369,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_ARPACK, dnl
        AC_MSG_RESULT([explicitly disabled])
        USE_CONTRIB_ARPACK=no
      else
-       USE_CONTRIB_ARPACK=yes
        DEAL_II_ARPACK_DIR="$withval"
        AC_MSG_RESULT($DEAL_II_ARPACK_DIR)
        dnl Make sure that what was specified is actually correct
@@ -6386,6 +6385,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_ARPACK, dnl
                  | perl -pi -e 's/.*PLAT =\s+//g;'`
        DEAL_II_ARPACK_ARCH="$ARPACK_ARCH"
        AC_MSG_RESULT($DEAL_II_ARPACK_ARCH)
+
+       USE_CONTRIB_ARPACK=yes
+       AC_DEFINE(DEAL_II_USE_ARPACK, 1,
+                 [Defined if an ARPACK installation was found and is
+		  going to be used])
      fi
     ],
     [dnl action-if-not-given (do nothing)

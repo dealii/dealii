@@ -222,6 +222,9 @@
    this bug. */
 #undef DEAL_II_TEMPL_SPEC_FRIEND_BUG
 
+/* Defined if an ARPACK installation was found and is going to be used */
+#undef DEAL_II_USE_ARPACK
+
 /* Define if the compiler provides a <errno.g> header file which does not
    define all error codes such as EINTR. In that case, use the system include
    file at /usr/include instead. There is probably a better way to do this,
@@ -523,6 +526,9 @@
 
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
