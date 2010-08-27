@@ -21,7 +21,7 @@ default: run-tests
 ############################################################
 
 tests_x = vector-vector vector_memory \
-	full_matrix \
+	full_matrix* \
 	householder \
 	tridiagonal_matrix \
 	tridiagonal_matrix_sym \
