@@ -1,0 +1,74 @@
+
+DEAL::Functions PillowFunction
+DEAL::1.00000
+DEAL::values checked
+DEAL::0
+DEAL::values checked
+DEAL::0
+DEAL::values checked
+DEAL::0
+DEAL::-3.00000
+DEAL::-8.00000
+DEAL::-15.0000
+DEAL::-24.0000
+DEAL:: value_list checked
+DEAL::0
+DEAL::9.00000
+DEAL::64.0000
+DEAL::225.000
+DEAL::576.000
+DEAL:: value_list checked
+DEAL::0
+DEAL::-27.0000
+DEAL::-512.000
+DEAL::-3375.00
+DEAL::-13824.0
+DEAL:: value_list checked
+DEAL::0.00000
+DEAL:: gradients checked
+DEAL::0.00000 -2.00000
+DEAL:: gradients checked
+DEAL::0.00000 6.00000 0.00000
+DEAL:: gradients checked
+DEAL::-2.00000
+DEAL::-4.00000
+DEAL::-6.00000
+DEAL::-8.00000
+DEAL::-10.0000
+DEAL:: gradient_list checked
+DEAL::0.00000 0.00000
+DEAL::12.0000 12.0000
+DEAL::48.0000 48.0000
+DEAL::120.000 120.000
+DEAL::240.000 240.000
+DEAL:: gradient_list checked
+DEAL::0.00000 0.00000 0.00000
+DEAL::-36.0000 -36.0000 -36.0000
+DEAL::-384.000 -384.000 -384.000
+DEAL::-1800.00 -1800.00 -1800.00
+DEAL::-5760.00 -5760.00 -5760.00
+DEAL:: gradient_list checked
+DEAL::-2.00000
+DEAL:: laplacians checked
+DEAL::-2.00000
+DEAL:: laplacians checked
+DEAL::6.00000
+DEAL:: laplacians checked
+DEAL::-2.00000
+DEAL::-2.00000
+DEAL::-2.00000
+DEAL::-2.00000
+DEAL::-2.00000
+DEAL:: laplacian_list checked
+DEAL::0
+DEAL::12.0000
+DEAL::32.0000
+DEAL::60.0000
+DEAL::96.0000
+DEAL:: laplacian_list checked
+DEAL::0
+DEAL::-54.0000
+DEAL::-384.000
+DEAL::-1350.00
+DEAL::-3456.00
+DEAL:: laplacian_list checked
