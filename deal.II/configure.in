@@ -460,15 +460,6 @@ if test "x$with_lapack" != "x" -a "x$with_lapack" != "xno" ; then
   fi
 fi
 
-dnl ARPACK wants to see BLAS nd LAPACK too.
-if test "x$with_arpack" != "x" -a "x$with_arpack" != "xno" ; then
-  if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
-    with_blas="yes"
-  fi
-  if test "x$with_lapack" = "x" -o "x$with_lapack" = "xno"; then
-    with_lapack="yes"
-  fi
-fi
 
 dnl Likewise, if we use PETSc and link statically, we have to add blas to the
 dnl linker line (if we use shared libs, then the PETSc libs already carry this
