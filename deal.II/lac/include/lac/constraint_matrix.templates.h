@@ -2636,7 +2636,6 @@ add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
   const unsigned int n_local_rows = row_indices.size();
   const unsigned int n_local_cols = col_indices.size();
   bool dof_mask_is_active = false;
-  Assert (keep_constrained_entries == false, ExcNotImplemented());
   if (dof_mask.n_rows() == n_local_rows && dof_mask.n_cols() == n_local_cols)
     dof_mask_is_active = true;
 
@@ -2666,6 +2665,23 @@ add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
 				     true);
       return;
     }
+
+				// if constrained entries should be
+				// kept, need to add rows and columns
+				// of those to the sparsity pattern
+  if (keep_constrained_entries == true)
+    {
+      for (unsigned int i=0; i<row_indices.size(); i++)
+	if (is_constrained(row_indices[i]))
+	  sparsity_pattern.add_entries (row_indices[i],
+					col_indices.begin(),
+					col_indices.end(), false);
+      for (unsigned int i=0; i<col_indices.size(); i++)
+	if (is_constrained(col_indices[i]))
+	  for (unsigned int j=0; j<row_indices.size(); j++)
+	    sparsity_pattern.add (row_indices[j], col_indices[i]);
+    }
+
 
 				// TODO: implement this
   Assert (false, ExcNotImplemented());
