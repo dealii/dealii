@@ -819,9 +819,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSPIC=""
           LDFLAGSPIC=""
           AC_MSG_ERROR(Attention! deal.II is not known to work with Borland C++!
-		If you intend to port it to Borland C++, please remove this message
-		from aclocal.m4 and call autoconf and configure. If you do not
-		understand this, you will NOT want to do it!)
+		If you intend to port it to Borland C++, please remove this message from aclocal.m4 and call autoconf and configure. If you do not understand this, you will NOT want to do it!)
           ;;
 
       pathscale_cc)
@@ -1559,8 +1557,7 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
         dnl Keep this line just in case we change default options
 	dnl back to error message
     *)
-	AC_MSG_ERROR(No compiler options for F77 compiler
-                     "$F77_VERSION" specified: modification of aclocal.m4 necessary)
+	AC_MSG_ERROR(No compiler options for F77 compiler "$F77_VERSION" specified: modification of aclocal.m4 necessary)
         ;;
   esac
 ])
@@ -1919,8 +1916,7 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 	    ;;
 
 	*)
-            AC_MSG_ERROR(No threading compiler options for this C++ compiler
-                         specified at present)
+            AC_MSG_ERROR(No threading compiler options for this C++ compiler specified at present)
             exit 1
 	    ;;
       esac
@@ -5820,9 +5816,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_SLEPC_VERSION, dnl
   AC_MSG_RESULT($SLEPC_VERSION)
 
   dnl Then check that PETSc and SLEPc versions are compatible ie. that
-  dnl they are equivalent. Patch numbers don't count for anything,
+  dnl they are equivalent. Patch numbers don't count for anything anymore,
   dnl but, we do include whether PETSc and SLEPc are both release
-  dnl versions in the check.
+  dnl versions in the check. If they are not, we vomit.
   if test "${PETSC_VERSION}" != "${SLEPC_VERSION}" \
        -o "${PETSC_RELEASE}" != "${SLEPC_RELEASE}" \
        ; then
@@ -5847,7 +5843,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
               [AS_HELP_STRING([--with-trilinos=/path/to/trilinos],
               [Specify the path to the Trilinos installation, of which the include and lib directories are subdirs; use this if you want to override the TRILINOS_DIR environment variable.])],
      [
-        dnl Special case when someone does --with-petsc=no
+        dnl Special case when someone does --with-trilinos=no
         if test "x$withval" = "xno" ; then
           AC_MSG_RESULT([explicitly disabled])
           USE_CONTRIB_TRILINOS=no
@@ -5876,9 +5872,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
           dnl Make sure that what this is actually correct
           if test ! -d $DEAL_II_TRILINOS_DIR/include \
                -o ! -d $DEAL_II_TRILINOS_DIR/lib ; then
-            AC_MSG_ERROR([The path to Trilinos specified in the TRILINOS_DIR
-	  		  environment variable does not
- 			  point to a complete Trilinos installation])
+            AC_MSG_ERROR([The path to Trilinos specified in the TRILINOS_DIR environment variable does not point to a complete Trilinos installation])
 	  fi
 	  DEAL_II_TRILINOS_INCDIR="$DEAL_II_TRILINOS_DIR/include"
 	  DEAL_II_TRILINOS_LIBDIR="$DEAL_II_TRILINOS_DIR/lib"
@@ -5895,7 +5889,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
               [AS_HELP_STRING([--with-trilinos-include=/path/to/trilinos],
               [Specify the path to the Trilinos include; use this if you want to override the TRILINOS_INCDIR environment variable.])],
      [
-        dnl Special case when someone does --with-petsc=no
+        dnl Special case when someone does --with-trilinos=no
         if test "x$withval" = "xno" ; then
           AC_MSG_RESULT([explicitly disabled])
           USE_CONTRIB_TRILINOS=no
@@ -5906,8 +5900,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
           dnl Make sure that what was specified is actually correct
           if test ! -d $DEAL_II_TRILINOS_INCDIR ; then
-            AC_MSG_ERROR([Path to Trilinos specified with --with-trilinos-include does not
- 		  	  point to a complete Trilinos installation])
+            AC_MSG_ERROR([Path to Trilinos specified with --with-trilinos-include does not point to a complete Trilinos installation])
 	  fi
         fi
      ],
@@ -5920,8 +5913,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
           dnl Make sure that what this is actually correct
           if test ! -d $DEAL_II_TRILINOS_INCDIR ; then
-            AC_MSG_ERROR([The path to Trilinos includes specified in the TRILINOS_INCDIR
-	  		  environment variable does not point to a valid directory])
+            AC_MSG_ERROR([The path to Trilinos includes specified in the TRILINOS_INCDIR environment variable does not point to a valid directory])
 	  fi
         else
           dnl --with-trilinos-include not explicitly specified. do
@@ -5943,7 +5935,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
               [AS_HELP_STRING([--with-trilinos-libs=/path/to/trilinos],
               [Specify the path to the Trilinos libraries; use this if you want to override the TRILINOS_LIBDIR environment variable.])],
      [
-        dnl Special case when someone does --with-petsc=no
+        dnl Special case when someone does --with-trilinos=no
         if test "x$withval" = "xno" ; then
           AC_MSG_RESULT([explicitly disabled])
           USE_CONTRIB_TRILINOS=no
@@ -5954,8 +5946,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
           dnl Make sure that what was specified is actually correct
           if test ! -d $DEAL_II_TRILINOS_LIBDIR ; then
-            AC_MSG_ERROR([Path to Trilinos libraries with --with-trilinos-libs does not
- 		  	  point to a valid directory])
+            AC_MSG_ERROR([Path to Trilinos libraries with --with-trilinos-libs does not point to a valid directory])
 	  fi
         fi
      ],
@@ -5968,9 +5959,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
           dnl Make sure that what this is actually correct
           if test ! -d $DEAL_II_TRILINOS_LIBDIR ; then
-            AC_MSG_ERROR([The path to Trilinos specified in the TRILINOS_LIBDIR
-	  		  environment variable does not
- 			  point to a complete Trilinos installation])
+            AC_MSG_ERROR([The path to Trilinos specified in the TRILINOS_LIBDIR environment variable does not point to a complete Trilinos installation])
 	  fi
         else
           dnl --with-trilinos-libs not explicitly specified. do
@@ -6087,21 +6076,18 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
 
   dnl Make sure something is set at least
   if test "x${DEAL_II_TRILINOS_SHARED}${DEAL_II_TRILINOS_STATIC}" = "x" ; then
-    AC_MSG_ERROR([Unable to determine whether Trilinos uses shared or
-                  static libraries.])
+    AC_MSG_ERROR([Unable to determine whether Trilinos uses shared or static libraries.])
   fi
 
 
   dnl Now make sure the Trilinos libs are of the same kind as the ones we
   dnl produce here
   if test "x$enableshared" = "xyes" -a "x$DEAL_II_TRILINOS_SHARED" != "xyes" ; then
-    AC_MSG_ERROR([When building deal.II with shared libraries, Trilinos also
-                  needs to be built with shared libraries])
+    AC_MSG_ERROR([When building deal.II with shared libraries, Trilinos also needs to be built with shared libraries])
   fi
 
   if test "x$enableshared" = "xno" -a "x$DEAL_II_TRILINOS_STATIC" != "xyes" ; then
-    AC_MSG_ERROR([When building deal.II with shared libraries, Trilinos also
-                  needs to be built with shared libraries])
+    AC_MSG_ERROR([When building deal.II with shared libraries, Trilinos also needs to be built with shared libraries])
   fi
 
   dnl If we use shared libs (and we've made sure above that Trilinos provides
@@ -6223,10 +6209,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
                    ],
                    [],
                    [
-                     AC_MSG_ERROR([The Trilinos installation is missing one or more
-                                   header files necessary for the deal.II Trilinos
-                                   interfaces. Please re-install Trilinos with the missing
-                                   Trilinos sub-packages enabled.])
+                     AC_MSG_ERROR([The Trilinos installation is missing one or more header files necessary for the deal.II Trilinos interfaces. Please re-install Trilinos with the missing Trilinos sub-packages enabled.])
                    ],
                    [])
   mv confdefs.h.bak confdefs.h
@@ -6276,6 +6259,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_MUMPS, dnl
   dnl If MUMPS was requested and found, we had better check for
   dnl dependencies right here. First, SCALAPACK and then BLACS.
   if test "$USE_CONTRIB_MUMPS" = "yes" ; then
+  dnl So here it goes...
 
     dnl ------------------------------------------------------------
     dnl Check whether SCALAPACK is installed
@@ -6316,7 +6300,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_MUMPS, dnl
       ])
 
     dnl BLACS labels libraries with "communications library",
-    dnl "platform type" and "debug level" (see BlACS Bmake.inc for
+    dnl "platform type" and "debug level" (see BLACS Bmake.inc for
     dnl details of the meaning of these terms). Finally, determine what
     dnl these are:
     AC_MSG_CHECKING([for BLACS library architecture])
@@ -6377,6 +6361,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_ARPACK, dnl
          AC_MSG_ERROR([Path to ARPACK specified with --with-arpack does not point to a complete ARPACK installation])
        fi
 
+       dnl ------------------------------------------------------------
        dnl Grab a meaningful name of the architeture ARPACK was
        dnl compiled for
        AC_MSG_CHECKING([for ARPACK library architecture])
@@ -6420,8 +6405,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 
         dnl Make sure that what was specified is actually correct
         if test ! -d $DEAL_II_METIS_DIR/Lib ; then
-          AC_MSG_ERROR([Path to Metis specified with --with-metis does not
- 			point to a complete Metis installation])
+          AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
 	fi
 
 	DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
@@ -6435,9 +6419,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 
           dnl Make sure that what this is actually correct
           if test ! -d $DEAL_II_METIS_DIR/Lib ; then
-            AC_MSG_ERROR([The path to Metis specified in the METIS_DIR
-	  		  environment variable does not
- 			  point to a complete Metis installation])
+            AC_MSG_ERROR([The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation])
 	  fi
 	  DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
         else
@@ -6456,8 +6438,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 
         dnl Make sure that what was specified is actually correct
         if test ! -d $DEAL_II_METIS_LIBDIR ; then
-          AC_MSG_ERROR([Path to Metis specified with --with-metis does not
- 			point to a complete Metis installation])
+          AC_MSG_ERROR([Path to Metis specified with --with-metis does not point to a complete Metis installation])
 	fi
      ],
      [
@@ -6469,9 +6450,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 
           dnl Make sure that what this is actually correct
           if test ! -d $DEAL_II_METIS_LIBDIR ; then
-            AC_MSG_ERROR([The path to Metis specified in the METIS_DIR
-	  		  environment variable does not
- 			  point to a complete Metis installation])
+            AC_MSG_ERROR([The path to Metis specified in the METIS_DIR environment variable does not point to a complete Metis installation])
 	  fi
         else
           dnl Unless --with-metis has been set before, declare that METIS
