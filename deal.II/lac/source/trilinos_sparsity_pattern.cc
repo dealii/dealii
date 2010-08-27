@@ -242,10 +242,8 @@ namespace TrilinosWrappers
   {
 				// release memory before reallocation
     graph.reset ();
-    Assert (n_entries_per_row.size() ==
-	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
-	    ExcDimensionMismatch (n_entries_per_row.size(),
-				  input_row_map.NumGlobalElements()));
+    AssertDimension (n_entries_per_row.size(),
+		     static_cast<unsigned int>(input_row_map.NumGlobalElements()));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
@@ -282,14 +280,10 @@ namespace TrilinosWrappers
   {
     graph.reset ();
 
-    Assert (sp.n_rows() ==
-	      static_cast<unsigned int>(input_row_map.NumGlobalElements()),
-	    ExcDimensionMismatch (sp.n_rows(),
-				  input_row_map.NumGlobalElements()));
-    Assert (sp.n_cols() ==
-	      static_cast<unsigned int>(input_col_map.NumGlobalElements()),
-	    ExcDimensionMismatch (sp.n_cols(),
-				  input_col_map.NumGlobalElements()));
+    AssertDimension (sp.n_rows(),
+		     static_cast<unsigned int>(input_row_map.NumGlobalElements()));
+    AssertDimension (sp.n_cols(),
+		     static_cast<unsigned int>(input_col_map.NumGlobalElements()));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
@@ -297,35 +291,32 @@ namespace TrilinosWrappers
     Assert (input_row_map.LinearMap() == true,
 	    ExcMessage ("This function is not efficient if the map is not contiguous."));
 
-    std::vector<int> n_entries_per_row(input_row_map.MaxMyGID()-
-				       input_row_map.MinMyGID() + 1);
+    const unsigned int first_row = input_row_map.MinMyGID(),
+      last_row = input_row_map.MaxMyGID()+1;
+    std::vector<int> n_entries_per_row(last_entry - first_entry);
 
-    for (unsigned int row=input_row_map.MinMyGID();
-	 row<static_cast<unsigned int>(input_row_map.MaxMyGID()+1);
-	 ++row)
-      n_entries_per_row[row-input_row_map.MinMyGID()] = sp.row_length(row);
+    for (unsigned int row=first_row; row<last_row; ++row)
+      n_entries_per_row[row-first_row] = sp.row_length(row);
 
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map,
-					n_entries_per_row[0],
+					&n_entries_per_row[0],
 					false));
     else
       graph.reset (new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
-					 n_entries_per_row[0],
+					 &n_entries_per_row[0],
 					 false));
 
-    Assert (graph->NumGlobalRows() == (int)sp.n_rows(),
-    	    ExcDimensionMismatch (graph->NumGlobalRows(),
-    				  sp.n_rows()));
+    AssertDimension (sp.n_rows(),
+		     static_cast<unsigned int>(graph->NumGlobalRows()));
 
-    const unsigned int n_rows = sp.n_rows();
     std::vector<int> row_indices;
 
 				// Include possibility to exchange data
 				// since CompressedSimpleSparsityPattern is
 				// able to do so
-    for (unsigned int row=0; row<n_rows; ++row)
-      if (input_row_map.MyGID(row) )
+    if (exchange_data==false)
+      for (unsigned int row=first_row; row<last_row; ++row)
 	{
 	  const int row_length = sp.row_length(row);
 	  if (row_length == 0)
@@ -341,7 +332,8 @@ namespace TrilinosWrappers
 	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
 						       &row_indices[0]);
 	}
-      else if ( exchange_data )
+    else
+      for (unsigned int row=0; row<sp.n_rows(); ++row)
 	{
 	  const int row_length = sp.row_length(row);
 	  if (row_length == 0)
@@ -354,7 +346,8 @@ namespace TrilinosWrappers
 	  for (unsigned int col = 0; col_num != row_end; ++col_num, ++col)
 	    row_indices[col] = *col_num;
 
-	  graph->InsertGlobalIndices (1, (int*)&row, row_length, &row_indices[0]);
+	  graph->InsertGlobalIndices (1, static_cast<int*>(&row), row_length,
+				      &row_indices[0]);
 	}
 
     compress();

@@ -373,25 +373,43 @@ namespace TrilinosWrappers
     temp_vector.clear();
     matrix.reset();
 
+				// if we want to exchange data, build
+				// a usual Trilinos sparsity pattern
+				// and let that handle the
+				// exchange. otherwise, manually
+				// create a CrsGraph, which consumes
+				// considerably less memory because it
+				// can set correct number of indices
+				// right from the start
+    if (exchange_data)
+      {
+	SparsityPattern trilinos_sparsity;
+	trilinos_sparsity.reinit (input_row_map, input_col_map,
+				  sparsity_pattern, exchange_data);
+	reinit (trilinos_sparsity);
+
+	return;
+      }
+
     const unsigned int n_rows = sparsity_pattern.n_rows();
 
     Assert (exchange_data == false, ExcNotImplemented());
     if (input_row_map.Comm().MyPID() == 0)
       {
-	Assert (input_row_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
-		ExcDimensionMismatch (input_row_map.NumGlobalElements(),
-				      sparsity_pattern.n_rows()));
-	Assert (input_col_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
-		ExcDimensionMismatch (input_col_map.NumGlobalElements(),
-				      sparsity_pattern.n_cols()));
+	AssertDimension (sparsity_pattern.n_rows(),
+			 static_cast<unsigned int>(input_row_map.NumGlobalElements()));
+	AssertDimension (sparsity_pattern.n_cols(),
+			 static_cast<unsigned int>(input_col_map.NumGlobalElements()));
       }
 
     column_space_map.reset (new Epetra_Map (input_col_map));
 
-    std::vector<int> n_entries_per_row(n_rows);
+    const unsigned int first_row = input_row_map.MinMyGID(),
+      last_row = input_row_map.MaxMyGID()+1;
+    std::vector<int> n_entries_per_row(last_entry - first_entry);
 
-    for (unsigned int row=0; row<n_rows; ++row)
-      n_entries_per_row[row] = sparsity_pattern.row_length(row);
+    for (unsigned int row=first_row; row<last_row; ++row)
+      n_entries_per_row[row-first_row] = sp.row_length(row);
 
 				  // The deal.II notation of a Sparsity
 				  // pattern corresponds to the Epetra
@@ -417,41 +435,38 @@ namespace TrilinosWrappers
 				   // columns as well. Compare this with bug
 				   // # 4123 in the Sandia Bugzilla.
     std_cxx1x::shared_ptr<Epetra_CrsGraph> graph;
-    int * first_row_length = &n_entries_per_row[input_row_map.MinMyGID()];
     if (input_row_map.Comm().NumProc() > 1)
-      graph.reset (new Epetra_CrsGraph (Copy, input_row_map, first_row_length,
-					true));
+      graph.reset (new Epetra_CrsGraph (Copy, input_row_map, 
+					&n_entries_per_row[0], true));
     else
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
-					first_row_length, true));
+					&n_entries_per_row[0], true));
 
 				  // This functions assumes that the
 				  // sparsity pattern sits on all processors
 				  // (completely). The parallel version uses
 				  // an Epetra graph that is already
 				  // distributed.
-    Assert (graph->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
-    	    ExcDimensionMismatch (graph->NumGlobalRows(),
-    				  sparsity_pattern.n_rows()));
 
-				   // now insert the indices
+				  // now insert the indices
     std::vector<int>   row_indices;
 
-    for (unsigned int row=0; row<n_rows; ++row)
-      if (input_row_map.MyGID(row))
-	{
-	  const int row_length = sparsity_pattern.row_length(row);
-	  row_indices.resize (row_length, -1);
+    for (unsigned int row=first_row; row<last_row; ++row)
+      {
+	const int row_length = sp.row_length(row);
+	if (row_length == 0)
+	  continue;
 
-	  typename SparsityType::row_iterator col_num =
-	    sparsity_pattern.row_begin (row),
-	    row_end = sparsity_pattern.row_end(row);
-	  for (unsigned int col = 0; col_num != row_end; ++col_num, ++col)
-	    row_indices[col] = *col_num;
+	row_indices.resize (row_length, -1);
 
-	  graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
-						       &row_indices[0]);
-	}
+	typename SparsityType::row_iterator col_num = sp.row_begin (row),
+	  row_end = sp.row_end(row);
+	for (unsigned int col = 0; col_num != row_end; ++col_num, ++col)
+	  row_indices[col] = *col_num;
+
+	graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
+						     &row_indices[0]);
+      }
 
 				  // Eventually, optimize the graph
 				  // structure (sort indices, make memory
@@ -461,13 +476,11 @@ namespace TrilinosWrappers
 
 				   // check whether we got the number of
 				   // columns right.
-    Assert (graph->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
-	    ExcDimensionMismatch (graph->NumGlobalCols(),
-				  sparsity_pattern.n_cols()));
+    AssertDimension (sparsity_pattern.n_cols(),
+		     static_cast<unsigned int>(graph->NumGlobalCols()));
 
 				  // And now finally generate the matrix.
     matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
-
     last_action = Zero;
 
 				  // In the end, the matrix needs to
@@ -478,30 +491,16 @@ namespace TrilinosWrappers
 
 
 
-  template <>
-  void
-  SparseMatrix::reinit (const Epetra_Map    &input_row_map,
-			const Epetra_Map    &input_col_map,
-			const CompressedSimpleSparsityPattern &sparsity_pattern,
-			const bool           exchange_data)
-  {
-    SparsityPattern trilinos_sparsity;
-    trilinos_sparsity.reinit (input_row_map, input_col_map, sparsity_pattern,
-			      exchange_data);
-    reinit (trilinos_sparsity);
-  }
-
-
-
   void
   SparseMatrix::reinit (const SparsityPattern &sparsity_pattern)
   {
+    temp_vector.clear ();
+    matrix.reset ();
+
 				   // reinit with a (parallel) Trilinos
 				   // sparsity pattern.
     column_space_map.reset (new Epetra_Map
 			    (sparsity_pattern.domain_partitioner()));
-    temp_vector.clear ();
-    matrix.reset ();
     matrix.reset (new Epetra_FECrsMatrix
 		  (Copy, sparsity_pattern.trilinos_sparsity_pattern(), false));
     compress();
