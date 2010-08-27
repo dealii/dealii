@@ -406,10 +406,10 @@ namespace TrilinosWrappers
 
     const unsigned int first_row = input_row_map.MinMyGID(),
       last_row = input_row_map.MaxMyGID()+1;
-    std::vector<int> n_entries_per_row(last_entry - first_entry);
+    std::vector<int> n_entries_per_row(last_row-first_row);
 
     for (unsigned int row=first_row; row<last_row; ++row)
-      n_entries_per_row[row-first_row] = sp.row_length(row);
+      n_entries_per_row[row-first_row] = sparsity_pattern.row_length(row);
 
 				  // The deal.II notation of a Sparsity
 				  // pattern corresponds to the Epetra
@@ -436,7 +436,7 @@ namespace TrilinosWrappers
 				   // # 4123 in the Sandia Bugzilla.
     std_cxx1x::shared_ptr<Epetra_CrsGraph> graph;
     if (input_row_map.Comm().NumProc() > 1)
-      graph.reset (new Epetra_CrsGraph (Copy, input_row_map, 
+      graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
 					&n_entries_per_row[0], true));
     else
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
@@ -453,14 +453,14 @@ namespace TrilinosWrappers
 
     for (unsigned int row=first_row; row<last_row; ++row)
       {
-	const int row_length = sp.row_length(row);
+	const int row_length = sparsity_pattern.row_length(row);
 	if (row_length == 0)
 	  continue;
 
 	row_indices.resize (row_length, -1);
 
-	typename SparsityType::row_iterator col_num = sp.row_begin (row),
-	  row_end = sp.row_end(row);
+	typename SparsityType::row_iterator col_num = sparsity_pattern.row_begin (row),
+	  row_end = sparsity_pattern.row_end(row);
 	for (unsigned int col = 0; col_num != row_end; ++col_num, ++col)
 	  row_indices[col] = *col_num;
 

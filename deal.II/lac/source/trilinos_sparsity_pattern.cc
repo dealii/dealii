@@ -293,7 +293,7 @@ namespace TrilinosWrappers
 
     const unsigned int first_row = input_row_map.MinMyGID(),
       last_row = input_row_map.MaxMyGID()+1;
-    std::vector<int> n_entries_per_row(last_entry - first_entry);
+    std::vector<int> n_entries_per_row(last_row - first_row);
 
     for (unsigned int row=first_row; row<last_row; ++row)
       n_entries_per_row[row-first_row] = sp.row_length(row);
@@ -346,7 +346,7 @@ namespace TrilinosWrappers
 	  for (unsigned int col = 0; col_num != row_end; ++col_num, ++col)
 	    row_indices[col] = *col_num;
 
-	  graph->InsertGlobalIndices (1, static_cast<int*>(&row), row_length,
+	  graph->InsertGlobalIndices (1, reinterpret_cast<int*>(&row), row_length,
 				      &row_indices[0]);
 	}
 
