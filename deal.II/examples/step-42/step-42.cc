@@ -60,6 +60,7 @@
 #include <multigrid/multigrid.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
+#include <multigrid/mg_constrained_dofs.h>
 #include <multigrid/mg_transfer.h>
 #include <multigrid/mg_tools.h>
 #include <multigrid/mg_coarse.h>
@@ -151,6 +152,7 @@ class StokesProblem
     MGLevelObject<BlockSparseMatrix<double> > mg_matrices;
 
     MGLevelObject<BlockSparseMatrix<double> > mg_interface_matrices;
+    MGConstrainedDoFs                         mg_constrained_dofs;
     std::vector<std::vector<unsigned int> >   mg_dofs_per_component;
 
     std::vector<std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> > mg_A_preconditioner;
@@ -439,15 +441,25 @@ void StokesProblem<dim>::setup_dofs ()
 
   {
     constraints.clear ();
+    typename FunctionMap<dim>::type      dirichlet_boundary;
+    ZeroFunction<dim>                    homogeneous_dirichlet_bc (dim+1); //TODO: go back to BoundaryValues
+
+    dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
+    MappingQ1<dim> mapping;
+
     std::vector<bool> component_mask (dim+1, true);
     component_mask[dim] = false;
-    VectorTools::interpolate_boundary_values (dof_handler,
-					      0,
-					      ZeroFunction<dim>(dim+1), //TODO: go back to BoundaryValues
-					      constraints,
-					      component_mask);
+    VectorTools::interpolate_boundary_values (mapping, 
+        dof_handler,
+        dirichlet_boundary,
+        constraints,
+        component_mask);
+
     DoFTools::make_hanging_node_constraints (dof_handler,
 					     constraints);
+
+    mg_constrained_dofs.clear();
+    mg_constrained_dofs.initialize(dof_handler, dirichlet_boundary);
   }
 
   constraints.close ();
@@ -647,33 +659,17 @@ void StokesProblem<dim>::assemble_multigrid ()
   std::vector<double>                  div_phi_u   (dofs_per_cell);
   std::vector<double>                  phi_p       (dofs_per_cell);
 
-  std::vector<std::vector<bool> > interface_dofs;
-  std::vector<std::vector<bool> > boundary_interface_dofs;
-  for (unsigned int level = 0; level<triangulation.n_levels(); ++level)
-    {
-      std::vector<bool> tmp (dof_handler.n_dofs(level));
-      interface_dofs.push_back (tmp);
-      boundary_interface_dofs.push_back (tmp);
-    }
-  MGTools::extract_inner_interface_dofs (dof_handler,
-					 interface_dofs, boundary_interface_dofs);
-
-  typename FunctionMap<dim>::type      dirichlet_boundary;
-  BoundaryValues<dim>                  dirichlet_bc;
-  dirichlet_boundary[0] =             &dirichlet_bc;
-
-  std::vector<std::set<unsigned int> > boundary_indices(triangulation.n_levels());
-  std::vector<bool> component_mask (dim+1, true);
-  component_mask[dim] = false;
-  MGTools::make_boundary_list (dof_handler, dirichlet_boundary,
-			       boundary_indices, component_mask);
+  std::vector<std::vector<bool> > interface_dofs 
+    = mg_constrained_dofs.get_refinement_edge_indices ();
+  std::vector<std::vector<bool> > boundary_interface_dofs
+    = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
   std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
   std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     {
       boundary_constraints[level].add_lines (interface_dofs[level]);
-      boundary_constraints[level].add_lines (boundary_indices[level]);
+      boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
       boundary_constraints[level].close ();
 
       boundary_interface_constraints[level]
@@ -898,7 +894,7 @@ void StokesProblem<dim>::solve ()
 
   GrowingVectorMemory<BlockVector<double> >  mg_vector_memory;
 
-  MGTransferPrebuilt<BlockVector<double> > mg_transfer(constraints);
+  MGTransferPrebuilt<BlockVector<double> > mg_transfer(constraints, mg_constrained_dofs);
   std::vector<unsigned int> block_component (dim+1,0);
   block_component[dim] = 1;
   mg_transfer.set_component_to_block_map (block_component);
