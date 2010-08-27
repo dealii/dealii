@@ -84,6 +84,7 @@ tests_x =  geometry_info_* \
 	   anisotropic_* \
            hierarchical \
 	   data_out_base \
+	   data_out_reader_* \
 	   data_out_base_* \
 	   function_* \
            functions_* \

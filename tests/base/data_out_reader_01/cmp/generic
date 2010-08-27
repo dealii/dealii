@@ -1,0 +1,24 @@
+
+2 2
+[deal.II intermediate format graphics data]
+[written by deal.II 6.3.pre]
+[Version: 3]
+5
+x1
+x2
+x3
+x4
+i
+1
+[deal.II intermediate Patch<2,2>]
+0 0 1 0 1 1 0 1 
+4294967295 4294967295 4294967295 4294967295 
+4294967295 1
+0
+5 4
+0 1 0 1 0 0 1 1 0 0 0 0 0 0 0 0 0 1 2 3 
+
+
+0
+
+
