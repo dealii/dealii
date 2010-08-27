@@ -2673,9 +2673,8 @@ add_entries_local_to_global (const std::vector<unsigned int> &row_indices,
     {
       for (unsigned int i=0; i<row_indices.size(); i++)
 	if (is_constrained(row_indices[i]))
-	  sparsity_pattern.add_entries (row_indices[i],
-					col_indices.begin(),
-					col_indices.end(), false);
+	  for (unsigned int j=0; j<col_indices.size(); j++)
+	    sparsity_pattern.add (row_indices[i], col_indices[j]);
       for (unsigned int i=0; i<col_indices.size(); i++)
 	if (is_constrained(col_indices[i]))
 	  for (unsigned int j=0; j<row_indices.size(); j++)
