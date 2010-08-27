@@ -87,7 +87,8 @@ tests_x = block_info block_matrices \
 	number_cache_* \
 	kelly_crash_* \
 	recursively_set_material_id \
-	point_value_history_*
+	point_value_history_* \
+	newton_*
 
 # from above list of regular expressions, generate the real set of
 # tests
