@@ -11,7 +11,7 @@
 //
 //-----------------------------------------------------------------------------
 
-// Function for dreating a set of patches with different subgrids.
+// Function for creating a set of patches with different subgrids.
 
 // To be included after all headers
 
