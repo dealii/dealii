@@ -98,7 +98,8 @@ tests_x =  geometry_info_* \
 	   parallel_* \
 	   mutex_* \
 	   scalar_* \
-	   conditional_ostream
+	   conditional_ostream \
+	   convergence_table_*
 
 # add threading tests. note that we have
 # to list them individually, without wildcards, because the .cc files are
