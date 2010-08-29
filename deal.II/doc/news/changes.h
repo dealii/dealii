@@ -227,14 +227,15 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   <li>
   <p>
   New: FETools::compute_embedding_matrices now computes the embedding matrix
-  for every refinement case in its own task.
+  for all refinement cases in parallel.
   <br>
   (Markus Buerg 2010/08/26)
   </p>
 
   <li>
   <p>
-  New: Data structures and a function parent to get the parent of a cell.
+  New: There is now a function CellAccessor::parent so that one can do
+  <code>cell-@>parent()</code>
   <br>
   (Markus Buerg 2010/08/26)
   </p>
