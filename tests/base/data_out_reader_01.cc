@@ -36,8 +36,7 @@ void cat_file(const char * filename)
 }
 
 template <int dim, int spacedim>
-void check(const char * name, DataOutBase::Deal_II_IntermediateFlags flags,
-	   std::ostream& out)
+void check()
 {
   const unsigned int np = 1;
   
@@ -53,16 +52,19 @@ void check(const char * name, DataOutBase::Deal_II_IntermediateFlags flags,
   names[4] = "i";
   std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
   
-  DataOutBase::write_deal_II_intermediate(patches, names, vectors, flags, out);
+  std::ostringstream old_data;
+  DataOutBase::write_deal_II_intermediate(patches, names, vectors, 
+					  DataOutBase::Deal_II_IntermediateFlags(),
+					  old_data);
 
   DataOutReader<dim,spacedim> data;
   {
-    std::ifstream input(name);    
+    std::istringstream input(old_data.str());
     data.read (input);
   }  
   DataOutReader<dim,spacedim> additional_data;
   {
-    std::ifstream input(name);
+    std::istringstream input(old_data.str());
     additional_data.read (input);
   }
    
@@ -77,29 +79,14 @@ void check(const char * name, DataOutBase::Deal_II_IntermediateFlags flags,
 }
 
 
-template<int dim, int spacedim>
-void check_all(std::ostream& log)
-{
-  char name[100];
-  const char* format = "data_out_reader_01/%d%d.d2";
-  DataOutBase::Deal_II_IntermediateFlags flags;
-    {
-      sprintf(name, format, dim, spacedim, "");
-
-      std::ofstream out(name);
-
-      check<dim,spacedim>(name, flags, out);
-    }
-}
-
 int main()
 {
   std::ofstream logfile("data_out_reader_01/output");
   deallog.attach(logfile);
 
-  //  check_all<1,1>(logfile);
-  //  check_all<1,2>(logfile);
-  check_all<2,2>(logfile);
-  //  check_all<2,3>(logfile);
-  //  check_all<3,3>(logfile);  
+  //  check<1,1>();
+  //  check<1,2>();
+  check<2,2>();
+  //  check<2,3>();
+  //  check<3,3>();  
 }
