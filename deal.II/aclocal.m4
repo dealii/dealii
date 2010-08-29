@@ -351,13 +351,24 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 [
+  dnl If CXXFLAGSG or CXXFLAGSO are not set, then initialize them with
+  dnl CXXFLAGS
+  if test "x$CXXFLAGSG" = "x" ; then
+    CXXFLAGSG="$CXXFLAGS" ;
+  fi
+
+  if test "x$CXXFLAGSO" = "x" ; then
+    CXXFLAGSO="$CXXFLAGS" ;
+  fi
+
   dnl In no case do we want to induce BOOST to use deprecated header files
-  CXXFLAGS="$CXXFLAGS -DBOOST_NO_HASH -DBOOST_NO_SLIST"
+  CXXFLAGSG="$CXXFLAGSG -DBOOST_NO_HASH -DBOOST_NO_SLIST"
+  CXXFLAGSO="$CXXFLAGSO -DBOOST_NO_HASH -DBOOST_NO_SLIST"
 
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
-    CXXFLAGSO="$CXXFLAGS -O2 -funroll-loops -funroll-all-loops -fstrict-aliasing -Wuninitialized -felide-constructors -ftemplate-depth-128"
-    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Woverloaded-virtual -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
+    CXXFLAGSO="$CXXFLAGSO -O2 -funroll-loops -funroll-all-loops -fstrict-aliasing -Wuninitialized -felide-constructors -ftemplate-depth-128"
+    CXXFLAGSG="$CXXFLAGSG -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Woverloaded-virtual -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
 
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
@@ -524,8 +535,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
     case "$GXX_VERSION" in
       ibm_xlc)
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907"
-          CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all -qsuppress=1540-2907"
+          CXXFLAGSG="$CXXFLAGSG -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907"
+          CXXFLAGSO="$CXXFLAGSO -O2 -w -qansialias -qrtti=all -qsuppress=1540-2907"
           CXXFLAGSPIC="-qpic"
           LDFLAGSPIC="-qpic"
           ;;
@@ -539,14 +550,14 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl The indicated enumeration value is out of "int" range.
           dnl cc-1485 CC: WARNING File = /usr/include/CC/iomanip, Line = 122
           dnl This form for taking the address of a member function is nonstandard.
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -D__sgi__ -no_auto_include -ansiW -woff 1429,1066,1485"
+          CXXFLAGSG="$CXXFLAGSG -DDEBUG -D__sgi__ -no_auto_include -ansiW -woff 1429,1066,1485"
           dnl Disable some compiler warnings, that warn about variables
           dnl which are used in Assert templates but not in optimized mode
           dnl cc-1174 CC: full_matrix.templates.h, Line = 1461
           dnl The variable "typical_diagonal_element" was declared but never referenced.
           dnl cc-1552 CC: WARNING File = source/data_out_base.cc, Line = 3493
           dnl The variable "ierr" is set but never used.
-          CXXFLAGSO="$CXXFLAGS -D__sgi__ -O2 -no_auto_include -woff 1174,1552"
+          CXXFLAGSO="$CXXFLAGSO -D__sgi__ -O2 -no_auto_include -woff 1174,1552"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"
           dnl Avoid output of prelinker (-quiet_prelink)
@@ -570,15 +581,15 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl Exception handling is also standard in later versions, as is rtti
     	  case "$GXX_VERSION" in
 	    intel_icc5 | intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
-	      CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -DDEBUG -inline_debug_info"
-              CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll"
+	      CXXFLAGSG="$CXXFLAGSG -Kc++eh -Krtti -DDEBUG -inline_debug_info"
+              CXXFLAGSO="$CXXFLAGSO -Kc++eh -Krtti -O2 -unroll"
               CXXFLAGSPIC="-KPIC"
               LDFLAGSPIC="-KPIC"
               ;;
 
 	    intel_icc*)
-	      CXXFLAGSG="$CXXFLAGS -DDEBUG"
-              CXXFLAGSO="$CXXFLAGS -O2 -unroll"
+	      CXXFLAGSG="$CXXFLAGSG -DDEBUG"
+              CXXFLAGSO="$CXXFLAGSO -O2 -unroll"
               CXXFLAGSPIC="-fPIC"
 	      LDFLAGS="$LDFLAGS -lstdc++ -lpthread"
               LDFLAGSPIC="-fPIC"
@@ -722,8 +733,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl otherwise not all templates are instantiated (also some from the
           dnl standards library are missing).
 
-          CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
-          CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -fast"
+          CXXFLAGSG="$CXXFLAGSG -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
+          CXXFLAGSO="$CXXFLAGSO -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -fast"
 
           for i in 11 175 236 237 381 487 1136 1156 111 1182 265 450 ; do
             CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
@@ -745,8 +756,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
       sun_workshop | sun_forte)
 
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -w"
-          CXXFLAGSO="$CXXFLAGS -w"
+          CXXFLAGSG="$CXXFLAGSG -DDEBUG -w"
+          CXXFLAGSO="$CXXFLAGSO -w"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-G"
 
@@ -793,29 +804,29 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl       somewhere in BOOST with BOOST_ASSERT. I have no idea
 	  dnl       what happens here
  	  dnl #284: "NULL references not allowed"
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
-          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
+	  CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
+          CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
           CXXFLAGSPIC="-Kpic"
           ;;
 
       kai_cc)
-          CXXFLAGSG="$CXXFLAGS --strict -D__KAI_STRICT --max_pending_instantiations 32 --display_error_number -g +K0 --no_implicit_typename"
-          CXXFLAGSO="$CXXFLAGS +K3 -O2 --abstract_float --abstract_pointer -w --display_error_number --max_pending_instantiations 32 --display_error_number"
+          CXXFLAGSG="$CXXFLAGSG --strict -D__KAI_STRICT --max_pending_instantiations 32 --display_error_number -g +K0 --no_implicit_typename"
+          CXXFLAGSO="$CXXFLAGSO +K3 -O2 --abstract_float --abstract_pointer -w --display_error_number --max_pending_instantiations 32 --display_error_number"
           CXXFLAGSPIC="-fPIC"
 	  ;;
 
       hp_aCC)
 	  dnl ??? disable warning 655 (about all-inlined functions) which
 	  dnl triggers for each and every of our DeclExceptionX calls ???
-          CXXFLAGSG="$CXXFLAGS -g1 -AA +p"
-          CXXFLAGSO="$CXXFLAGS -z +O2 -AA"
+          CXXFLAGSG="$CXXFLAGSG -g1 -AA +p"
+          CXXFLAGSO="$CXXFLAGSO -z +O2 -AA"
           CXXFLAGSPIC="+Z"
 	  # for linking shared libs, -b is also necessary...
           ;;
 
       borland_bcc)
-          CXXFLAGSG="$CXXFLAGS -q -DDEBUG -w -w-use -w-amp -w-prc"
-          CXXFLAGSO="$CXXFLAGS -q -O2"
+          CXXFLAGSG="$CXXFLAGSG -q -DDEBUG -w -w-use -w-amp -w-prc"
+          CXXFLAGSO="$CXXFLAGSO -q -O2"
           CXXFLAGSPIC=""
           LDFLAGSPIC=""
           AC_MSG_ERROR(Attention! deal.II is not known to work with Borland C++!
@@ -823,13 +834,13 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           ;;
 
       pathscale_cc)
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g"
-	  CXXFLAGSO="$CXXFLAGS -O3"
+	  CXXFLAGSG="$CXXFLAGSG -DDEBUG -g"
+	  CXXFLAGSO="$CXXFLAGSO -O3"
           ;;
 
       *)
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
-	  CXXFLAGSO="$CXXFLAGS -O2"
+	  CXXFLAGSG="$CXXFLAGSG -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGSO -O2"
           AC_MSG_RESULT(Unknown C++ compiler - using generic options)
           ;;
     esac

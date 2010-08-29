@@ -439,6 +439,10 @@
       setenv LDFLAGS -pg
       configure &lt;configure-options&gt;
     </pre>
+    The flags so set are used for both optimized and debug mode. If you want to
+    set flags for only one of these two cases, you should
+    set <code>CXXFLAGSO</code> or <code>CXXFLAGSG</code>, respectively.
+    </p>
 
 
     <a name="optional">
