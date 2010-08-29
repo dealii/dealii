@@ -124,11 +124,11 @@ class LaplaceProblem
     SparseMatrix<double> system_matrix;
 
 				     // We need an additional object for the
-                                     // hanging nodes constraints. They are 
-                                     // handed to the transfer object in the 
-                                     // multigrid. Since we call a compress 
-                                     // inside the multigrid these constraints 
-                                     // are not allowed to be inhomogeneous so 
+                                     // hanging nodes constraints. They are
+                                     // handed to the transfer object in the
+                                     // multigrid. Since we call a compress
+                                     // inside the multigrid these constraints
+                                     // are not allowed to be inhomogeneous so
                                      // we store them in different ConstraintMatrix
                                      // objects.
     ConstraintMatrix     hanging_node_constraints;
@@ -147,10 +147,10 @@ class LaplaceProblem
 				     // levels of the multilevel hierarchy,
 				     // rather than on the finest mesh as do
 				     // the objects above while the last object
-                                     // stores information about the boundary 
+                                     // stores information about the boundary
                                      // indices on each level and information
-                                     // about indices lying on a refinement 
-                                     // edge between two different refinement 
+                                     // about indices lying on a refinement
+                                     // edge between two different refinement
                                      // levels.
 				     //
 				     // To facilitate having objects on each
@@ -334,8 +334,7 @@ void LaplaceProblem<dim>::setup_system ()
   typename FunctionMap<dim>::type      dirichlet_boundary;
   ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  MappingQ1<dim> mapping;
-  VectorTools::interpolate_boundary_values (mapping, mg_dof_handler,
+  VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(mg_dof_handler),
 					    dirichlet_boundary,
 					    constraints);
   constraints.close ();
@@ -344,8 +343,8 @@ void LaplaceProblem<dim>::setup_system ()
   sparsity_pattern.compress();
   system_matrix.reinit (sparsity_pattern);
 
-				   // The multigrid constraints have to be 
-                                   // initialized. They need to know about 
+				   // The multigrid constraints have to be
+                                   // initialized. They need to know about
                                    // the boundary values as well, so we
                                    // pass the <code>dirichlet_boundary</code>
                                    // here as well.
@@ -410,7 +409,7 @@ void LaplaceProblem<dim>::setup_system ()
       MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
 
       mg_sparsity_patterns[level].copy_from (csp);
-      
+
       mg_matrices[level].reinit(mg_sparsity_patterns[level]);
       mg_interface_matrices[level].reinit(mg_sparsity_patterns[level]);
     }
@@ -525,7 +524,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values (n_q_points);
-  
+
 				   // Next a few things that are specific to
 				   // building the multigrid data structures
 				   // (since we only need them in the current
@@ -554,14 +553,14 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 				   // an interface DoF or not. The <code>MGConstraints</code>
                                    // already computed the information for us
                                    // when we called initialize in <code>setup_system()</code>.
-  std::vector<std::vector<bool> > interface_dofs 
+  std::vector<std::vector<bool> > interface_dofs
     = mg_constrained_dofs.get_refinement_edge_indices ();
   std::vector<std::vector<bool> > boundary_interface_dofs
     = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
 				   // The indices just identified will later
 				   // be used to decide where the assembled value
-                                   // has to be added into on each level. 
+                                   // has to be added into on each level.
                                    // On the other hand,
 				   // we also have to impose zero boundary
 				   // conditions on the external boundary of
@@ -762,13 +761,13 @@ void LaplaceProblem<dim>::solve ()
 {
 
 				 // Create the object that deals with the transfer
-                                 // between different refinement levels. We need to 
+                                 // between different refinement levels. We need to
                                  // pass it the hanging node constraints.
   MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints, mg_constrained_dofs);
-				 // Now the prolongation matrix has to be built. 
-                                 // This matrix needs to take the boundary values on 
-                                 // each level into account and needs to know about 
-                                 // the indices at the refinement egdes. The 
+				 // Now the prolongation matrix has to be built.
+                                 // This matrix needs to take the boundary values on
+                                 // each level into account and needs to know about
+                                 // the indices at the refinement egdes. The
                                  // <code>MGConstraints</code> knows about that so
                                  // pass it as an argument.
   mg_transfer.build_matrices(mg_dof_handler);
