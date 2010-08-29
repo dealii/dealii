@@ -1,5 +1,5 @@
 //---------------------------  sparsity_pattern_common.h  -------------------------
-//    $Id: sparsity_pattern_01.cc 15674 2008-01-24 17:40:56Z kanschat $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2008 by the deal.II authors

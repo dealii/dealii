@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-//    $Id: data_out_base_gnuplot.cc 20952 2010-04-06 15:02:46Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006, 2007 by the deal.II authors
