@@ -76,6 +76,7 @@ void check()
   }  
 
   cat_file("data_out_reader_01/outfile");
+  std::remove ("data_out_reader_01/outfile");
 }
 
 
