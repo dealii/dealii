@@ -84,9 +84,9 @@ int main()
   std::ofstream logfile("data_out_reader_01/output");
   deallog.attach(logfile);
 
-  //  check<1,1>();
-  //  check<1,2>();
+  check<1,1>();
+  check<1,2>();
   check<2,2>();
-  //  check<2,3>();
-  //  check<3,3>();  
+  check<2,3>();
+  check<3,3>();  
 }
