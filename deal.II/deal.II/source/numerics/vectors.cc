@@ -186,6 +186,27 @@ void VectorTools::interpolate_boundary_values (
   const std::vector<bool>    &);
 
 template
+void VectorTools::interpolate_boundary_values (
+  const DoFHandler<deal_II_dimension> &,
+  const FunctionMap<deal_II_dimension>::type   &,
+  ConstraintMatrix                    &,
+  const std::vector<bool>    &);
+
+template
+void VectorTools::interpolate_boundary_values (
+  const hp::DoFHandler<deal_II_dimension> &,
+  const FunctionMap<deal_II_dimension>::type   &,
+  ConstraintMatrix                    &,
+  const std::vector<bool>    &);
+
+template
+void VectorTools::interpolate_boundary_values (
+  const MGDoFHandler<deal_II_dimension> &,
+  const FunctionMap<deal_II_dimension>::type   &,
+  ConstraintMatrix                    &,
+  const std::vector<bool>    &);
+
+template
 void VectorTools::project_boundary_values<deal_II_dimension>
 (const Mapping<deal_II_dimension>     &,
  const DoFHandler<deal_II_dimension>  &,
