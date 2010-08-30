@@ -226,6 +226,15 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
   <li>
   <p>
+  New: Reimplementation of the parent function in the various DoFCellAccessors so
+  that one can call the parent function from a DoFIterator and also gets a
+  DoFIterator returned.
+  <br>
+  (Markus Buerg 2010/08/30)
+  </p>
+
+  <li>
+  <p>
   New: FETools::compute_embedding_matrices now computes the embedding matrix
   for all refinement cases in parallel.
   <br>

@@ -288,6 +288,13 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				      * coordinates of the TriaAccessor.
 				      */
     void copy_from (const TriaAccessorBase<structdim, DH::dimension, DH::space_dimension> &da);
+    
+				     /**
+				      * Return an iterator pointing to
+				      * the the parent.
+				      */
+    TriaIterator<DoFAccessor<structdim,DH> >
+    parent () const;
 
 				     /**
 				      *  @name Accessing sub-objects
@@ -833,6 +840,18 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * @}
 				      */
 
+    				 /**
+				      * Return the parent as a DoF
+				      * cell iterator. This
+				      * function is needed since the
+				      * parent function of the base
+				      * class returns a cell accessor
+				      * without access to the DoF
+				      * data.
+				      */
+    typename internal::DoFHandler::Iterators<DH>::cell_iterator
+    parent () const;
+    
 				     /**
 				      *  @name Accessing sub-objects and neighbors
 				      */

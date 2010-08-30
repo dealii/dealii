@@ -1305,6 +1305,19 @@ TriaAccessor<structdim, dim, spacedim>::clear_used_flag () const
 }
 
 
+template <int structdim, int dim, int spacedim>
+int
+TriaAccessor<structdim, dim, spacedim>::
+parent_index () const
+{
+  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
+  
+  					// the parent of two consecutive cells
+  					// is stored only once, since it is
+  					// the same
+  return this->tria->levels[this->present_level]->parents[this->present_index / 2];
+}
+
 
 template <int structdim, int dim, int spacedim>
 int

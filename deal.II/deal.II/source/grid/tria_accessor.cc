@@ -1289,8 +1289,7 @@ CellAccessor<dim, spacedim>::parent () const
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
   TriaIterator<CellAccessor<dim,spacedim> >
-    q (this->tria, this->present_level-1,
-       this->tria->levels[this->present_level]->parents[this->present_index / 2]);
+    q (this->tria, this->present_level-1, this->parent_index ());
   
   return q;
 }

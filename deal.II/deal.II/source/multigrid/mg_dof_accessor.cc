@@ -175,6 +175,24 @@ MGDoFAccessor<structdim, dim, spacedim>::child (const unsigned int i) const
 }
 
 
+template <int structdim, int dim, int spacedim>
+TriaIterator<MGDoFAccessor<structdim,dim,spacedim> >
+MGDoFAccessor<structdim, dim, spacedim>::parent () const
+{
+  Assert (this->level () > 0,
+          ExcMessage ("Cell is at coarsest level."));
+  
+  const TriaIterator<MGDoFAccessor<structdim,dim,spacedim> >
+    q (this->tria,
+       (structdim == dim ?
+	this->level() - 1 :
+	0),
+       this->parent_index (),
+       this->mg_dof_handler);
+
+  return q;
+}
+
 
 template <int structdim, int dim, int spacedim>
 void
@@ -514,6 +532,20 @@ MGDoFCellAccessor<dim,spacedim>::child (const unsigned int i) const
   if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsChild());
 #endif
+  return q;
+}
+
+
+template <int dim, int spacedim>
+TriaIterator<MGDoFCellAccessor<dim,spacedim> >
+MGDoFCellAccessor<dim, spacedim>::parent () const
+{
+  const TriaIterator<MGDoFCellAccessor<dim,spacedim> >
+    q (this->tria,
+	   this->level() - 1,
+       this->parent_index (),
+       this->mg_dof_handler);
+
   return q;
 }
 

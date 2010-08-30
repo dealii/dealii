@@ -698,6 +698,17 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     bool used () const;
 
+				     /**
+				      *  Index of the parent.
+				      *  The level of the parent is one
+				      *  lower than that of the
+				      *  present cell, if the parent
+				      *  of a cell is accessed. If the
+				      *  parent does not exist, -1 is
+				      *  returned.
+				      */
+    int parent_index () const;
+    
 
 				     /**
 				      *  @name Accessing sub-objects

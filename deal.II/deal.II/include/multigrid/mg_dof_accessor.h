@@ -339,6 +339,13 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
 				      */
 
 				     /**
+				      * Return an iterator pointing to
+				      * the the parent.
+				      */
+    TriaIterator<MGDoFAccessor<structdim,dim,spacedim> >
+    parent () const;
+
+				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
@@ -578,6 +585,16 @@ class MGDoFCellAccessor :  public MGDoFAccessor<dim,dim,spacedim>
 				     /**
 				      * @}
 				      */
+				      
+    				 /**
+				      * Return the parent as a MGDoF cell
+				      * iterator. This function is needed since
+				      * the parent function of the base
+				      * class returns a cell accessor without
+				      * access to the DoF data.
+				      */
+    TriaIterator<MGDoFCellAccessor<dim,spacedim> >
+    parent () const;
 };
 
 /*@}*/
