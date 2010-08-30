@@ -78,6 +78,11 @@ class IndexSet
 				      * Return the size of the index
 				      * space of which this index set
 				      * is a subset of.
+				      *
+				      * Note that the result is not equal to
+				      * the number of indices within this
+				      * set. The latter information is
+				      * returned by n_elements().
 				      */
     unsigned int size () const;
 
