@@ -447,7 +447,7 @@ AC_SUBST(DEAL_II_BLACS_ARCH)
 AC_SUBST(DEAL_II_DEFINE_DEAL_II_USE_MUMPS)
 
 dnl Make sure we configure for libraries used by other libraries. For
-dnl example, UMFPACK needs blas, and so does LAPACK. 
+dnl example, UMFPACK needs blas, and so does LAPACK.
 if test "x$with_umfpack" != "x" -a "x$with_umfpack" != "xno" ; then
   if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
     with_blas="yes"
@@ -613,7 +613,7 @@ DEAL_II_CHECK_CPU_OPTIMIZATIONS
 dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
 DEAL_II_CHECK_CXXFLAGS_CONSISTENCY
 DEAL_II_CHECK_F77FLAGS_CONSISTENCY
-
+DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY
 
 
 

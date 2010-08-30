@@ -324,6 +324,7 @@ AC_DEFUN(DEAL_II_DETERMINE_IF_SUPPORTS_MPI, dnl
           AC_MSG_RESULT(yes)
 	  AC_DEFINE(DEAL_II_COMPILER_SUPPORTS_MPI, 1,
                     [Defined if the compiler supports including <mpi.h>])
+          DEAL_II_USE_MPI=yes
         ],
         [
           AC_MSG_RESULT(no)
@@ -5194,7 +5195,7 @@ dnl    [
 dnl      AC_MSG_RESULT(yes)
 dnl    ],
 dnl    [
-dnl      AC_MSG_ERROR(invalid combination of flags!)
+dnl      AC_MSG_ERROR([invalid combination of flags!])
 dnl      exit 1;
 dnl    ])
 dnl
@@ -5207,9 +5208,86 @@ dnl    [
 dnl      AC_MSG_RESULT(yes)
 dnl    ],
 dnl    [
-dnl      AC_MSG_ERROR(invalid combination of flags!)
+dnl      AC_MSG_ERROR([invalid combination of flags!])
 dnl      exit 1;
 dnl    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Make sure that if Trilinos was built with/without MPI, then
+dnl deal.II was built with the same flags.
+dnl
+dnl Usage: DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
+[
+  if test "x$USE_CONTRIB_TRILINOS" = "xyes" ; then
+    AC_MSG_CHECKING(for consistency of Trilinos and deal.II MPI settings)
+    AC_LANG(C++)
+
+    CXXFLAGS="$CXXFLAGSG $INCLUDE -I$DEAL_II_TRILINOS_INCDIR"
+
+    if test "x$DEAL_II_USE_MPI" = "xyes" ; then
+      dnl So we support MPI. Check that our Trilinos installation
+      dnl does too. The following test fails if Trilinos wasn't
+      dnl built for MPI because in that case Trilinos installs
+      dnl a dummy MPI header file that we end up including, but
+      dnl this dummy header doesn't have prototypes for MPI_Init
+      AC_TRY_COMPILE(
+	[
+          #include <Epetra_MpiComm.h>
+        ],
+	[
+	   // autoconf doesn't appear to declare the arguments of main()
+	   // so we do it ourselves here. pack them into a separate
+	   // scope so that if autoconf at one point starts to declare
+	   // these arguments we don't get into trouble
+           {
+	     int argc; char **argv;
+	     MPI_Init (&argc, &argv);
+   	     MPI_Finalize ();
+           }
+ 	],
+    	[
+      	  AC_MSG_RESULT(yes)
+     	],
+        [
+          AC_MSG_ERROR([Trilinos was not built for MPI, but deal.II is!])
+          exit 1;
+        ])
+    else
+      dnl So we don't support MPI. Check that our Trilinos installation
+      dnl doesn't either. We can turn the above test around: if trilinos
+      dnl was built for MPI, then the Epetra_MpiComm header includes mpi.h
+      dnl which provides us with a declaration of MPI_Init. So if it
+      dnl compiles then this is an error
+      AC_TRY_COMPILE(
+	[
+          #include <Epetra_MpiComm.h>
+        ],
+	[
+	   // autoconf doesn't appear to declare the arguments of main()
+	   // so we do it ourselves here. pack them into a separate
+	   // scope so that if autoconf at one point starts to declare
+	   // these arguments we don't get into trouble
+           {
+	     int argc; char **argv;
+	     MPI_Init (&argc, &argv);
+   	     MPI_Finalize ();
+           }
+ 	],
+    	[
+          AC_MSG_ERROR([Trilinos was built for MPI, but deal.II is not!])
+          exit 1;
+     	],
+        [
+      	  AC_MSG_RESULT(yes)
+        ])
+    fi
+  fi
 ])
 
 
