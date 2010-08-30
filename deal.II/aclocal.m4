@@ -5182,7 +5182,7 @@ dnl     has a problem here: when writing the compile file, a newline is
 dnl     missing, leading to an error when executing ./configure. So:
 dnl     while this is not fixed in autoconf, disable the respective tests
 dnl
-dnl     Postface: with autoconf 2.50, AC_LANG_PROGRAM(Fortran 77) is called
+dnl     Postface: with autoconf 2.63, AC_LANG_PROGRAM(Fortran 77) is called
 dnl     internally, but this unfortunately results in a warning from
 dnl     autoconf. So still do not enable the code
 dnl  AC_LANG(Fortran 77)
