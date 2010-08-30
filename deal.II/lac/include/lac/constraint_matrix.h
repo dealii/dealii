@@ -334,7 +334,17 @@ class ConstraintMatrix : public Subscriptor
 {
   public:
 				     /**
-				      * Constructor
+				      * Constructor. The supplied IndexSet
+				      * defines which indices might be
+				      * constrained inside this
+				      * ConstraintMatrix. In a calculation
+				      * with a
+				      * parallel::distributed::DoFHandler one
+				      * should use locally_relevant_dofs. The
+				      * IndexSet allows the ConstraintMatrix
+				      * to safe memory. Otherwise internal
+				      * data structures for all possible
+				      * indices will be created.
 				      */
     ConstraintMatrix (const IndexSet & local_constraints = IndexSet());
 
@@ -347,12 +357,11 @@ class ConstraintMatrix : public Subscriptor
 				      * Reinit the ConstraintMatrix object and
 				      * supply an IndexSet with lines that may
 				      * be constrained. This function is only
-				      * relevant in the distributed case, to
+				      * relevant in the distributed case to
 				      * supply a different IndexSet. Otherwise
 				      * this routine is equivalent to calling
-				      * clear(). Normally an IndexSet with all
-				      * locally_active_dofs should be supplied
-				      * here.
+				      * clear(). See the constructor for
+				      * details.
 				      */
     void reinit (const IndexSet & local_constraints = IndexSet());
 
@@ -1904,64 +1913,31 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Internal helper function for
-				      * distribute_local_to_global
-				      * function.
-				      *
-				      * Creates a list of affected
-				      * global rows for distribution,
-				      * including the local rows where
-				      * the entries come from.
-				      */
-    void
-    make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
-			  internals::GlobalRowsFromLocal  &global_rows) const;
-
-				     /**
-				      * Internal helper function for
-				      * add_entries_local_to_global
-				      * function.
-				      *
-				      * Creates a list of affected
-				      * rows for distribution without
-				      * any additional information.
-				      */
-    void
-    make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
-			  std::vector<unsigned int>       &active_dofs) const;
-
-				     /**
-				      * Internal helper function for
 				      * distribute_local_to_global function.
+				      *
+				      * Creates a list of affected global rows
+				      * for distribution, including the local
+				      * rows where the entries come from. The
+				      * list is sorted according to the global
+				      * row indices.
 				      */
-    template <typename MatrixType>
-    void
-    make_sorted_row_list (const FullMatrix<double>        &local_matrix,
-			  const std::vector<unsigned int> &local_dof_indices,
-			  MatrixType                      &global_matrix,
-			  internals::GlobalRowsFromLocal  &global_rows) const;
-
-				     /**
-				      * Internal helper function for
-				      * add_entries_local_to_global function.
-				      */
-    template <typename SparsityType>
     void
     make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
-			  const bool                       keep_constrained_entries,
-			  SparsityType                    &sparsity_pattern,
-			  std::vector<unsigned int>       &active_dofs) const;
+			  internals::GlobalRowsFromLocal  &global_rows) const;
 
 				     /**
 				      * Internal helper function for
 				      * add_entries_local_to_global function.
+				      *
+				      * Creates a list of affected rows for
+				      * distribution without any additional
+				      * information, otherwise similar to the
+				      * other @p make_sorted_row_list
+				      * function.
 				      */
-    template <typename SparsityType>
     void
-    make_sorted_row_list (const Table<2,bool>             &dof_mask,
-			  const std::vector<unsigned int> &local_dof_indices,
-			  const bool                       keep_constrained_entries,
-			  SparsityType                    &sparsity_pattern,
-			  internals::GlobalRowsFromLocal  &global_rows) const;
+    make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
+			  std::vector<unsigned int>       &active_dofs) const;
 
 				     /**
 				      * Internal helper function for
