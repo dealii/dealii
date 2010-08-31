@@ -1,8 +1,10 @@
 # $Id$
 
 # The large projects Makefile looks much like the one for small
-# projects. Basically, only the following six parameters need to be
+# projects. Basically, only the following seven parameters need to be
 # set by you:
+
+application-name = waves
 
 # The first denotes the dimension for which the program is to be
 # compiled:
@@ -12,14 +14,14 @@ deal_II_dimension = 2
 # `lib/' to designate its destination directory. Note that the program
 # name depends on the dimension, so you can keep copies for the
 # different dimensions around:
-target   = lib/application-name-$(deal_II_dimension)d
+target   = lib/$(application-name)-$(deal_II_dimension)d
 
 # The `debug-mode' variable works as in the small projects Makefile:
-debug-mode = off
+debug-mode = on
 
 # And so does the following variable. You will have to set it to
 # something more reasonable, of course.
-clean-up-files = ...
+clean-up-files = 
 
 # Finally, here is a variable which tells the `run' rule which
 # parameters to pass to the executable. Usually, this will be the name
@@ -83,17 +85,17 @@ flags += -Ddeal_II_dimension=$(deal_II_dimension)
 # The following two rules define how to compile C++ files into object
 # files:
 lib/$(deal_II_dimension)d/%.g.$(OBJEXT) :
-	@echo =====waves=======$(deal_II_dimension)d====debug=====$(MT)== $(<F)
+	@echo =====$(application-name)=======$(deal_II_dimension)d====debug=====$(MT)== $(<F)
 	@$(CXX) $(flags) -c $< -o $@
 lib/$(deal_II_dimension)d/%.$(OBJEXT) :
-	@echo =====waves=======$(deal_II_dimension)d====optimized=$(MT)== $(<F)
+	@echo =====$(application-name)=======$(deal_II_dimension)d====optimized=$(MT)== $(<F)
 	@$(CXX) $(flags) -c $< -o $@
 
 
 
 # Next define how to link the executable
 $(target)$(EXEEXT) : $(libraries) Makefile
-	@echo =====waves=======$(deal_II_dimension)d==============$(MT)== Linking $(@F)
+	@echo =====$(application-name)=======$(deal_II_dimension)d==============$(MT)== Linking $(@F)
 	@$(CXX) -o $@ $(libraries) $(LIBS) $(LDFLAGS)
 
 
@@ -125,7 +127,7 @@ clean-data:
 # modify the output a bit. The file with the dependencies is put into
 # `lib/'.
 lib/Makefile.dep: $(cc-files) $(h-files) $(lib-h-files) Makefile
-	@echo =====waves=======$(deal_II_dimension)d================== Remaking $@
+	@echo =====$(application-name)=======$(deal_II_dimension)d================== Remaking $@
 	@$D/common/scripts/make_dependencies $(INCLUDE) -Blib $(cc-files) \
 	 | $(PERL) -p -e 's!^lib/(.*):!lib/$(deal_II_dimension)d/$$1:!g;' \
 		> $@
