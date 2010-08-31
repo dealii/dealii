@@ -5241,15 +5241,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
           #include <Epetra_MpiComm.h>
         ],
 	[
-	   // autoconf doesn't appear to declare the arguments of main()
-	   // so we do it ourselves here. pack them into a separate
-	   // scope so that if autoconf at one point starts to declare
-	   // these arguments we don't get into trouble
-           {
-	     int argc; char **argv;
-	     MPI_Init (&argc, &argv);
-   	     MPI_Finalize ();
-           }
+	     MPI_Init (0,0);
  	],
     	[
       	  AC_MSG_RESULT(yes)
@@ -5269,15 +5261,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
           #include <Epetra_MpiComm.h>
         ],
 	[
-	   // autoconf doesn't appear to declare the arguments of main()
-	   // so we do it ourselves here. pack them into a separate
-	   // scope so that if autoconf at one point starts to declare
-	   // these arguments we don't get into trouble
-           {
-	     int argc; char **argv;
-	     MPI_Init (&argc, &argv);
-   	     MPI_Finalize ();
-           }
+	     MPI_Init (0,0);
  	],
     	[
           AC_MSG_ERROR([Trilinos was built for MPI, but deal.II is not!])
