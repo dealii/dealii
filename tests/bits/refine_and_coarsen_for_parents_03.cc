@@ -31,8 +31,6 @@
 
 void do_refine (Triangulation<1> &tria)
 {
-  const int dim = 1;
-  
   tria.refine_global (2);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement ();
@@ -86,7 +84,7 @@ void check ()
 				   // holds
   tria.refine_global (1);
   
-  MGDoFHandler<dim> dof_handler (triangulation);
+  MGDoFHandler<dim> dof_handler (tria);
 
   for (typename MGDoFHandler<dim>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end (); ++cell)
