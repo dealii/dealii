@@ -576,11 +576,21 @@ namespace MeshWorker
       void initialize_update_flags();
 
 				       /**
-					* Add additional values for update.
+					* Add additional update flags
+					* to the ones already set in
+					* this program. The four
+					* boolean flags indicate
+					* wether the additional flags
+					* should be set for cell,
+					* boundary, interelement face,
+					* or neighbor integration, or
+					* any combination thereof.
 					*/
-      void add_update_flags(const UpdateFlags flags, bool cell = true,
-			    bool boundary = true, bool face = true,
-			    bool neighbor = true);
+      void add_update_flags(const UpdateFlags flags,
+			    const bool cell = true,
+			    const bool boundary = true,
+			    const bool face = true,
+			    const bool neighbor = true);
 
 				       /** Assign n-point Gauss
 					* quadratures to each of the
