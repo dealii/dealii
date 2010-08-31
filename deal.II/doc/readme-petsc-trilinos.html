@@ -182,7 +182,11 @@ make install
       Again, the path into which you want to install Trilinos in the second to
       last line of the cmake command needs to be adjusted. Obviously, if you
       want to use Trilinos with MPI on parallel machines, you also need to
-      flip the value of the <code>TPL_ENABLE_MPI</code> flag above.
+      flip the value of the <code>TPL_ENABLE_MPI</code> flag above. Finally,
+      if your computer has more than one processor core, you may want to add
+      the <code>-jN</code> flag to the calls to <code>make</code>
+      where <code>N</code> is the number of compile jobs you want to run in
+      parallel.
       </p>
     </p>
 
