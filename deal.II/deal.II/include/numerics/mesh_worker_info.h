@@ -519,7 +519,7 @@ namespace MeshWorker
  * </ol>
  *
  * In order to allow for sufficient generality, a few steps have to be
- * undertaken to use this class.
+ * undertaken to use this class.
  *
  * First, you should consider if you need values from any vectors in a
  * NamedData object. If so, fill the VectorSelector objects
@@ -551,7 +551,10 @@ namespace MeshWorker
   {
     public:
 
-/// The type of the info object for cells
+				       /**
+					* The type of the info object
+					* for cells.
+					*/
       typedef IntegrationInfo<dim, spacedim> CellInfo;
 
       void initialize(const FiniteElement<dim, spacedim>& el,
@@ -788,15 +791,33 @@ namespace MeshWorker
       template <class DOFINFO>
       void post_faces(const DoFInfoBox<dim, DOFINFO>&);
 
-/// The info object for a cell
+				       /**
+					* The info object for a cell.
+					*/
       CellInfo cell;
-/// The info object for a boundary face
+				       /**
+					* The info object for a
+					* boundary face.
+					*/
       CellInfo boundary;
-/// The info object for a regular interior face, seen from the first cell
+				       /**
+					* The info object for a
+					* regular interior face, seen
+					* from the first cell.
+					*/
       CellInfo face;
-/// The info object for the refined side of an interior face seen from the first cell
+				       /**
+					* The info object for the
+					* refined side of an interior
+					* face seen from the first
+					* cell.
+					*/
       CellInfo subface;
-/// The info object for an interior face, seen from the other cell
+				       /**
+					* The info object for an
+					* interior face, seen from the
+					* other cell.
+					*/
       CellInfo neighbor;
 
 				       /* @} */
