@@ -1,5 +1,5 @@
 //----------------------------  refine_and_coarsen_3d.cc  ---------------------------
-//    $Id: refine_and_coarsen_3d.cc 15183 2007-09-10 01:10:03Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2010 by the deal.II authors
