@@ -466,6 +466,24 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
       CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-W //g;'`"
     fi
 
+    if test "x$DEAL_II_USE_MPI" = "xyes" ; then
+      AC_MSG_CHECKING(whether MPI headers have unused parameters)
+      CXXFLAGS="-Wunused-parameter -Werror"
+      AC_TRY_COMPILE(
+        [
+          #include <mpi.h>
+        ], 
+        [;],
+        [
+  	  AC_MSG_RESULT(no)
+        ],
+        [
+          AC_MSG_RESULT(yes)
+          CXXFLAGSG="$CXXFLAGSG -Wno-unused-parameter"
+          CXXFLAGSO="$CXXFLAGSO -Wno-unused-parameter"
+        ])
+    fi
+
     dnl Some system specific things
     case "$target" in
       dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary
