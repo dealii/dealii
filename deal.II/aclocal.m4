@@ -5215,67 +5215,6 @@ dnl    ])
 
 
 
-dnl -------------------------------------------------------------
-dnl Make sure that if Trilinos was built with/without MPI, then
-dnl deal.II was built with the same flags.
-dnl
-dnl Usage: DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
-[
-  if test "x$USE_CONTRIB_TRILINOS" = "xyes" ; then
-    AC_MSG_CHECKING(for consistency of Trilinos and deal.II MPI settings)
-    AC_LANG(C++)
-
-    CXXFLAGS="$CXXFLAGSG $INCLUDE -I$DEAL_II_TRILINOS_INCDIR"
-
-    if test "x$DEAL_II_USE_MPI" = "xyes" ; then
-      dnl So we support MPI. Check that our Trilinos installation
-      dnl does too. The following test fails if Trilinos wasn't
-      dnl built for MPI because in that case Trilinos installs
-      dnl a dummy MPI header file that we end up including, but
-      dnl this dummy header doesn't have prototypes for MPI_Init
-      AC_TRY_COMPILE(
-	[
-          #include <Epetra_MpiComm.h>
-        ],
-	[
-	     MPI_Init (0,0);
- 	],
-    	[
-      	  AC_MSG_RESULT(yes)
-     	],
-        [
-          AC_MSG_ERROR([Trilinos was not built for MPI, but deal.II is!])
-          exit 1;
-        ])
-    else
-      dnl So we don't support MPI. Check that our Trilinos installation
-      dnl doesn't either. We can turn the above test around: if trilinos
-      dnl was built for MPI, then the Epetra_MpiComm header includes mpi.h
-      dnl which provides us with a declaration of MPI_Init. So if it
-      dnl compiles then this is an error
-      AC_TRY_COMPILE(
-	[
-          #include <Epetra_MpiComm.h>
-        ],
-	[
-	     MPI_Init (0,0);
- 	],
-    	[
-          AC_MSG_ERROR([Trilinos was built for MPI, but deal.II is not!])
-          exit 1;
-     	],
-        [
-      	  AC_MSG_RESULT(yes)
-        ])
-    fi
-  fi
-])
-
-
-
 
 dnl -------------------------------------------------------------
 dnl Check for Doxygen.
@@ -6062,6 +6001,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
     DEAL_II_DEFINE_DEAL_II_USE_TRILINOS=DEAL_II_USE_TRILINOS
 
     DEAL_II_CONFIGURE_TRILINOS_VERSION
+    DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY
     DEAL_II_CHECK_TRILINOS_SHARED_STATIC
     DEAL_II_CHECK_TRILINOS_WARNINGS
     DEAL_II_CHECK_TRILINOS_HEADER_FILES
@@ -6115,6 +6055,67 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS_VERSION, dnl
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MAJOR)
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MINOR)
   AC_SUBST(DEAL_II_TRILINOS_VERSION_SUBMINOR)
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Make sure that if Trilinos was built with/without MPI, then
+dnl deal.II was built with the same flags.
+dnl
+dnl Usage: DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
+[
+  if test "x$USE_CONTRIB_TRILINOS" = "xyes" ; then
+    AC_MSG_CHECKING(for consistency of Trilinos and deal.II MPI settings)
+    AC_LANG(C++)
+
+    CXXFLAGS="$CXXFLAGSG $INCLUDE -I$DEAL_II_TRILINOS_INCDIR"
+
+    if test "x$DEAL_II_USE_MPI" = "xyes" ; then
+      dnl So we support MPI. Check that our Trilinos installation
+      dnl does too. Epetra sets the variable HAVE_MPI to 1 in case
+      dnl supports MPI, and does not set it otherwise, so just read
+      dnl out that information.
+      AC_TRY_COMPILE(
+	[
+          #include <Epetra_config.h>
+        ],
+	[
+	  #ifndef HAVE_MPI
+	    compile error;
+	  #endif
+ 	],
+    	[
+      	  AC_MSG_RESULT(yes)
+     	],
+        [
+          AC_MSG_ERROR([Trilinos was not built for MPI, but deal.II is!])
+          exit 1;
+        ])
+    else
+      dnl So we don't support MPI. Check that our Trilinos installation
+      dnl doesn't either.
+      AC_TRY_COMPILE(
+      	[
+	  #include <Epetra_config.h>
+	],
+	[
+	  #ifdef HAVE_MPI
+	    compile error;
+	  #endif
+	],
+	[
+	  AC_MSG_RESULT(yes)
+	],
+	[
+	  AC_MSG_ERROR([Trilinos was built for MPI, but deal.II is not!])
+          exit 1;
+	])
+    fi
+  fi
 ])
 
 
