@@ -46,13 +46,13 @@ include $D/common/Make.global_options
 # is not the case, then simply redefine the main targets to do nothing
 ifneq ($(USE_CONTRIB_TRILINOS),yes)
 default run clean:
-        @echo
-        @echo "===========================================================" 
-        @echo "=   This program cannot be compiled without Trilinos. Make="
-        @echo "=   sure you have Trilinos installed and detected during  ="
-        @echo "=   configuration of deal.II                              ="
-        @echo "==========================================================="
-        @echo
+	@echo
+	@echo "===========================================================" 
+	@echo "=   This program cannot be compiled without Trilinos. Make="
+	@echo "=   sure you have Trilinos installed and detected during  ="
+	@echo "=   configuration of deal.II                              ="
+	@echo "==========================================================="
+	@echo
 
 else
 #
