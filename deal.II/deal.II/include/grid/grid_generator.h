@@ -56,19 +56,20 @@ class GridGenerator
 {
   public:
     				     /**
-				      * Initialize the given
-				      * triangulation with a hypercube
-				      * (line in 1D, square in 2D,
-				      * etc) consisting of exactly one
-				      * cell. The hypercube volume is
-				      * the tensor product interval
-				      * <i>[left,right]<sup>dim</sup></i>
-				      * in the present number of
-				      * dimensions, where the limits
-				      * are given as arguments. They
-				      * default to zero and unity,
-				      * then producing the unit
-				      * hypercube.
+				      * Initialize the given triangulation
+				      * with a hypercube (line in 1D, square
+				      * in 2D, etc) consisting of exactly one
+				      * cell. The hypercube volume is the
+				      * tensor product interval
+				      * <i>[left,right]<sup>dim</sup></i> in
+				      * the present number of dimensions,
+				      * where the limits are given as
+				      * arguments. They default to zero and
+				      * unity, then producing the unit
+				      * hypercube. All boundary indicators are
+				      * set to zero ("not colorized") for 2d
+				      * and 3d. In 1d the indicators are
+				      * colorized, see hyper_rectangle().
 				      *
 				      * @image html hyper_cubes.png
 				      *
@@ -199,6 +200,12 @@ class GridGenerator
 				      * adds 2<sup>i</sup>. For
 				      * instance, the center point
 				      * (1,-1,1) yields a material id 5.
+				      *
+				      * Note that the @p colorize flag is
+				      * ignored in 1d and is assumed to always
+				      * be true. That means the boundary
+				      * indicator is 0 on the left and 1 on
+				      * the right.  See step-15 for details.
 				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this
