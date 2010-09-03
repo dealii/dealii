@@ -6086,54 +6086,64 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
 [
-  if test "x$USE_CONTRIB_TRILINOS" = "xyes" ; then
-    AC_MSG_CHECKING(for consistency of Trilinos and deal.II MPI settings)
-    AC_LANG(C++)
-
-    CXXFLAGS="$CXXFLAGSG $INCLUDE -I$DEAL_II_TRILINOS_INCDIR"
-
-    if test "x$DEAL_II_USE_MPI" = "xyes" ; then
-      dnl So we support MPI. Check that our Trilinos installation
-      dnl does too. Epetra sets the variable HAVE_MPI to 1 in case
-      dnl supports MPI, and does not set it otherwise, so just read
-      dnl out that information.
-      AC_TRY_COMPILE(
-	[
-          #include <Epetra_config.h>
-        ],
-	[
-	  #ifndef HAVE_MPI
-	    compile error;
-	  #endif
- 	],
-    	[
-      	  AC_MSG_RESULT(yes)
-     	],
-        [
-          AC_MSG_ERROR([Trilinos was not built for MPI, but deal.II is!])
-          exit 1;
-        ])
-    else
-      dnl So we don't support MPI. Check that our Trilinos installation
-      dnl doesn't either.
-      AC_TRY_COMPILE(
-      	[
-	  #include <Epetra_config.h>
-	],
-	[
-	  #ifdef HAVE_MPI
-	    compile error;
-	  #endif
-	],
-	[
-	  AC_MSG_RESULT(yes)
-	],
-	[
-	  AC_MSG_ERROR([Trilinos was built for MPI, but deal.II is not!])
-          exit 1;
-	])
-    fi
+  dnl Check for presence of Epetra_config.h that we need to detect MPI 
+  dnl settings	
+  AC_MSG_CHECKING(Epetra_config.h presence)
+  if test -f $DEAL_II_TRILINOS_INCDIR/Epetra_config.h ; then
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+    exit 1;
   fi
+
+  AC_MSG_CHECKING(for consistency of Trilinos and deal.II MPI settings)
+  AC_LANG(C++)
+
+  OLD_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS -I$DEAL_II_TRILINOS_INCDIR"
+
+  if test "x$DEAL_II_USE_MPI" = "xyes" ; then
+    dnl So we support MPI. Check that our Trilinos installation
+    dnl does too. Epetra sets the variable HAVE_MPI to 1 in case
+    dnl supports MPI, and does not set it otherwise, so just read
+    dnl out that information.
+    AC_TRY_COMPILE(
+      [
+	#include <Epetra_config.h>
+      ],
+      [
+	#ifndef HAVE_MPI
+	  compile error;
+	#endif
+      ],
+      [
+        AC_MSG_RESULT(yes)
+      ],
+      [
+        AC_MSG_ERROR([Trilinos was not built for MPI, but deal.II is!])
+        exit 1;
+      ])
+  else
+    dnl So we don't support MPI. Check that our Trilinos installation
+    dnl doesn't either.
+    AC_TRY_COMPILE(
+      [
+        #include <Epetra_config.h>
+      ],
+      [
+        #ifdef HAVE_MPI
+	  compile error;
+	#endif
+      ],
+      [
+        AC_MSG_RESULT(yes)
+      ],
+      [
+	AC_MSG_ERROR([Trilinos was built for MPI, but deal.II is not!])
+	exit 1;
+      ])
+  fi
+  CXXFLAGS="${OLD_CXXFLAGS}"
 ])
 
 
