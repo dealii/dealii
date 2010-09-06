@@ -563,15 +563,22 @@ class TimerOutput
 
 /* ---------------- inline functions ----------------- */
 
+
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
-const Timer::TimeMinMaxAvg & Timer::get_data() const
+inline
+const Timer::TimeMinMaxAvg &
+Timer::get_data() const
 {
   return mpi_data;
 }
 
+
+
 template <class STREAM>
-void Timer::print_data(STREAM & stream) const
+inline
+void
+Timer::print_data(STREAM & stream) const
 {
   unsigned int my_id = dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
   if (my_id==0)
@@ -583,6 +590,8 @@ void Timer::print_data(STREAM & stream) const
 }
 
 #endif
+
+
 
 inline
 void
