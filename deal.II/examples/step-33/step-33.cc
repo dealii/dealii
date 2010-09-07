@@ -1854,7 +1854,7 @@ void ConservationLaw<dim>::assemble_system ()
                                        // is an external face, the fourth
                                        // argument denoting the degrees of
                                        // freedom indices of the neighbor is
-                                       // ignores, so we pass an empty
+                                       // ignored, so we pass an empty
                                        // vector):
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
 	   ++face_no)
