@@ -355,15 +355,26 @@ get_intermediate_points_on_line (const Triangulation<1>::line_iterator &,
   Assert(false, ExcImpossibleInDim(1));
 }
 
-
 template <>
 void
-StraightBoundary<1,2>::
-get_intermediate_points_on_line (const Triangulation<1,2>::line_iterator &,
-				 std::vector<Point<2> > &) const
+StraightBoundary<1, 2>::
+get_intermediate_points_on_line (const Triangulation<1, 2>::line_iterator &line,
+				 std::vector<Point<2> > &points) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  const unsigned int spacedim = 2;
+  const unsigned int n=points.size();
+  Assert(n>0, ExcInternalError());
+
+  const double dx=1./(n+1);
+  double x=dx;
+
+  const Point<spacedim> vertices[2] = { line->vertex(0),
+				   line->vertex(1) };
+
+  for (unsigned int i=0; i<n; ++i, x+=dx)
+    points[i] = (1-x)*vertices[0] + x*vertices[1];
 }
+
 #else
 
 
@@ -437,6 +448,41 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 
 #endif
 
+#if deal_II_dimension == 2
+
+template <>
+void
+StraightBoundary<2,3>::
+get_intermediate_points_on_quad (const Triangulation<2,3>::quad_iterator &quad,
+				 std::vector<Point<3> > &points) const
+{
+  const unsigned int spacedim = 3;
+
+  const unsigned int n=points.size(),
+		     m=static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
+				   // is n a square number
+  Assert(m*m==n, ExcInternalError());
+
+  const double ds=1./(m+1);
+  double y=ds;
+
+  const Point<spacedim> vertices[4] = { quad->vertex(0),
+					quad->vertex(1),
+					quad->vertex(2),
+					quad->vertex(3) };
+
+  for (unsigned int i=0; i<m; ++i, y+=ds)
+    {
+      double x=ds;
+      for (unsigned int j=0; j<m; ++j, x+=ds)
+	points[i*m+j]=((1-x) * vertices[0] +
+		       x     * vertices[1]) * (1-y) +
+		      ((1-x) * vertices[2] +
+		       x     * vertices[3]) * y;
+    }
+}
+#endif
+
 
 
 #if deal_II_dimension == 1
@@ -456,7 +502,7 @@ StraightBoundary<1,2>::
 get_normals_at_vertices (const Triangulation<1,2>::face_iterator &,
 			 Boundary<1,2>::FaceVertexNormals &) const
 {
-  Assert (false, ExcImpossibleInDim(1));
+  Assert (false, ExcNotImplemented());
 }
 
 #endif
