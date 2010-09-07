@@ -1,0 +1,9 @@
+
+Listing of Parameters:
+
+subsection Testing
+  set double       =   [Floating point range -1.79769e+308...1.79769e+308 (inclusive)]
+                       (docs 3)
+  set int          =   [Integer range -2147483648...2147483647 (inclusive)]
+  set string list  =   list of <a|b|c|d|e|f|g|h> of length 0...4294967295 (inclusive)
+                       (docs 1)
