@@ -112,7 +112,7 @@ namespace Utilities
                                     * width characters wide, by breaking at
                                     * positions marked by @p delimiter in the text.
                                     * If this is not possible, return the shortest
-                                    * lines than are longer than @p width.
+                                    * lines that are longer than @p width.
                                     * The default value of the delimiter is a
                                     * space character.
                                     */
