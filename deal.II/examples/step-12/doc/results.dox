@@ -70,3 +70,30 @@ And finally we show a plot of a 3d computation.
 
 @image html step-12.sol-5-3d.png
 
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+Given that the exact solution is known in this case, one interesting
+avenue for further extensions would be to confirm the order of
+convergence for this program. In the current case, the solution is
+non-smooth, and so we can not expect to get a particularly high order
+of convergence, even if we used higher order elements. But even if the
+solution is smooth, the equation is not elliptic and so it is not
+immediately clear that we should obtain a convergence order that
+equals that of the optimal interpolation estimates (i.e. for example
+that we would get $h^3$ convergence in the $L^2$ norm by using
+quadratic elements).
+
+In fact, for hyperbolic equations, theoretical predictions often
+indicate that the best one can hope for is an order one half below the
+interpolation estimate. For example, for the streamline diffusion
+method (an alternative method to the DG method used here to stabilize
+the solution of the transport equation), one can prove that for
+elements of degree $p$, the order of convergence is $p+\frac 12$ on
+arbitrary meshes. While the observed order is frequently $p+1$ on
+uniformly refined meshes, one can construct so-called Peterson meshes
+on which the worse theoretical bound is actually attained. This should
+be relatively simple to verify, for example using the
+VectorTools::integrate_difference function.
