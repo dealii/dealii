@@ -1,24 +1,7 @@
 
-# Listing of Parameters
-# ---------------------
-subsection Testing testing
-  # docs 3
-  set double_double = 3.1415926
-  set int/int       = 1
-
-  # docs 1
-  set string list   = a
-
-
-  subsection Testing%testing
-    # docs 3
-    set double+double = 3.1415926 # default: 6.1415926
-    set int*int       = 1         # default: 2
-
-    # docs 1
-    set string&list   = a         # default: a,b,c
-  end
-
-end
-
-
+DEAL:parameters:Testing testing::double_double: 3.1415926
+DEAL:parameters:Testing testing::int/int: 1
+DEAL:parameters:Testing testing::string list: a
+DEAL:parameters:Testing testing:Testing%testing::double+double: 3.1415926
+DEAL:parameters:Testing testing:Testing%testing::int*int: 1
+DEAL:parameters:Testing testing:Testing%testing::string&list: a
