@@ -1,0 +1,21 @@
+
+\subsubsection*{Listing of parameters}
+
+\begin{itemize}
+
+\item {\bf Subsection Testing}
+\begin{itemize}
+\item {\bf double:} 3.1415926 (docs 3, {\it default:} 3.1415926)
+\item {\bf int:} 1 ({\it default:} 3)
+\item {\bf string list:} a (docs 1, {\it default:} a, b, c)
+
+
+
+\item {\bf Subsection Testing 2}
+\begin{itemize}
+\item {\bf double 2:} 3.1415926 (docs 3, {\it default:} 3.1415926)
+\item {\bf int 2:} 1 ({\it default:} 1)
+\item {\bf string list 2:} a (docs 1, {\it default:} a)
+\end{itemize}
+\end{itemize}
+\end{itemize}
