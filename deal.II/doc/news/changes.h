@@ -170,6 +170,25 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 
 <ol>
+  <li><p> New: The ParameterHandler class is now built on the
+  <a href="http://www.boost.org" target="_top">boost</a>
+  <code>property_tree</code> library which provides a much better
+  foundation for extensions. In particular, the description of parameters
+  can now be exported in XML and JSON formats for processing with external
+  programs, for example graphical user interfaces. As a consequence of
+  the re-write, a bug in ParameterHandler::print_parameters_section
+  was fixed when using the LaTeX output format.
+  <br>
+  (WB 2010/09/09)
+  </p>
+
+  <li><p> Fixed: The ParameterHandler::set functions allowed to set values that
+  did not satisfy the pattern given during declaration of the parameter. This
+  is now fixed: the functions now throw an exception.
+  <br>
+  (WB 2010/09/09)
+  </p>
+
   <li><p> Fixed: The Patterns::Integer and Patterns::Double classes did
   not properly check that a value given matched the pattern because they
   ignored text after an initial match. This led to <code>"3.141"</code> and
@@ -260,7 +279,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
   <li>
   <p>
-  Improved: DoFHandler has a default constructor, so that it can be used in containers. 	
+  Improved: DoFHandler has a default constructor, so that it can be used in containers.
   <br>
   (GK 2010/08/16)
   </p>
@@ -269,7 +288,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   <p>
   New: The functions VectorTools::project_boundary_values_curl_conforming
   are added. They can compute Dirichlet boundary conditions for Nedelec
-  elements. 	
+  elements.
   <br>
   (Markus Buerg 2010/08/13)
   </p>
@@ -278,7 +297,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   <p>
   Fixed: The function FEValuesViews::Vector::get_function_curls produced
   wrong results in some cases, because it erased the given vector first.
-  This is now fixed.	
+  This is now fixed.
   <br>
   (Markus Buerg 2010/08/13)
   </p>
