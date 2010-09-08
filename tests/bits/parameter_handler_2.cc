@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors and Brent Bayley
+//    Copyright (C) 2003, 2004, 2005, 2010 by the deal.II authors and Brent Bayley
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,7 @@ int main ()
                      Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
   prm.leave_subsection ();
 
-  prm.read_input("parameter_handler_2/prm1");
+  prm.read_input("parameter_handler_2/prm");
 
   std::string list;
   prm.enter_subsection ("Testing");
