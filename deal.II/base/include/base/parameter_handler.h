@@ -1838,7 +1838,7 @@ class ParameterHandler : public Subscriptor
  *       public:
  *         HelperClass ();
  *
- *         virtual void create_new (unsigned int runNo);
+ *         virtual void create_new (const unsigned int run_no);
  *         virtual void declare_parameters (ParameterHandler &prm);
  *         virtual void run (ParameterHandler &prm);
  *       private:
@@ -1849,7 +1849,7 @@ class ParameterHandler : public Subscriptor
  *     HelperClass::HelperClass () : p(0) {}
  *
  *
- *     void HelperClass::create_new (unsigned int runNo) {
+ *     void HelperClass::create_new (const unsigned int run_no) {
  *       if (p) delete p;
  *       p = new Problem;
  *     }
@@ -1901,7 +1901,7 @@ class ParameterHandler : public Subscriptor
  *   @code
  *     for (each combination)
  *       {
- *         UserObject.create_new (runNo);
+ *         UserObject.create_new (run_no);
  *
  *         // set parameters for this run
  *
@@ -2019,7 +2019,7 @@ class MultipleParameterLoop : public ParameterHandler
 					  * object, either by creating a new one
 					  * or by cleaning an old one.
 					  */
-	virtual void create_new (const unsigned int runNo) = 0;
+	virtual void create_new (const unsigned int run_no) = 0;
 
 					 /**
 					  * This should declare parameters and call
