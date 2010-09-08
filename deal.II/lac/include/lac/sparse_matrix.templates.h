@@ -415,7 +415,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 
       const unsigned int * this_cols =
 	&cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
-      const unsigned int row_length = cols->row_length(row);
+      const unsigned int row_length_1 = cols->row_length(row)-1;
       number * val_ptr = &val[cols->get_rowstart_indices()[row]];
 
       if (cols->optimize_diagonal() == true)
@@ -439,8 +439,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 	  unsigned int counter = 1;
 	  for (unsigned int i=0; i<diag; ++i)
 	    {
-	      while (this_cols[counter] < col_indices[i] &&
-		     this_cols[counter] < row_length)
+	      while (this_cols[counter]<col_indices[i] && counter<row_length_1)
 		++counter;
 
 	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
@@ -452,8 +451,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // add indices after diagonal
 	  for (unsigned int i=post_diag; i<n_cols; ++i)
 	    {
-	      while (this_cols[counter] < col_indices[i] &&
-		     this_cols[counter] < row_length)
+	      while (this_cols[counter]<col_indices[i] && counter<row_length_1)
 		++counter;
 
 	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
@@ -470,8 +468,7 @@ SparseMatrix<number>::add (const unsigned int  row,
 	  unsigned int counter = 0;
 	  for (unsigned int i=0; i<n_cols; ++i)
 	    {
-	      while (this_cols[counter] < col_indices[i] &&
-		     this_cols[counter] < row_length)
+	      while (this_cols[counter]<col_indices[i] && counter<row_length_1)
 		++counter;
 
 	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
