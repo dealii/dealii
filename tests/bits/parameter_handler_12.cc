@@ -12,8 +12,8 @@
 //----------------------------  parameter_handler_12.cc  ---------------------------
 
 
-// testing reading a parameter that doesn't conform to its specs. this
-// incidentally also uncovered a bug in Patterns::Integer::match
+// test that using ParameterHandler::set with a parameter that doesn't conform
+// to the specs leads to an error
 
 #include "../tests.h"
 #include <base/logstream.h>
