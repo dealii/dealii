@@ -44,6 +44,7 @@ tests_x = grid_generator_?? \
           denis_1 \
 	  unit_support_points \
 	  parameter_handler_* \
+	  multiple_parameter_loop_* \
 	  parsed_function \
 	  sparse_lu_decomposition_1 \
 	  block_sparse_matrix_* \
