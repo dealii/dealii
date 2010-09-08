@@ -1,6 +1,6 @@
 //----------------------------  parameter_handler_12.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2002, 2003, 2004, 2005, 2010 by the deal.II authors
 //
@@ -25,12 +25,19 @@ void check ()
   ParameterHandler prm;
   prm.declare_entry ("test_1", "3", Patterns::Integer());
 
-  prm.set ("test_1", "3.1415");
+  try
+    {
+      prm.set ("test_1", "3.1415");
+    }
+  catch (const ParameterHandler::ExcValueDoesNotMatchPattern &)
+    {
+      deallog << "OK" << std::endl;
+    }
   deallog << "test_1=" << prm.get ("test_1") << std::endl;
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("parameter_handler_12/output");
   deallog.attach(logfile);
@@ -38,6 +45,6 @@ int main ()
   deallog.threshold_double(1.e-10);
 
   check ();
-  
+
   return 0;
 }

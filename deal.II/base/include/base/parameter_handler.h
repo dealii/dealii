@@ -17,6 +17,9 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <base/std_cxx1x/shared_ptr.h>
+
+#include <boost/property_tree/ptree.hpp>
 
 #include <map>
 #include <vector>
@@ -1212,7 +1215,7 @@ namespace Patterns
  *   @ingroup input
  *
  *   @author Wolfgang Bangerth, October 1997, revised February 1998
-  */
+ */
 class ParameterHandler : public Subscriptor
 {
   private:
@@ -1249,7 +1252,7 @@ class ParameterHandler : public Subscriptor
 					    */
 	  Text = 1,
 					   /**
-					    * Write paramteters as a
+					    * Write parameters as a
 					    * LaTeX table.
 					    */
 	  LaTeX = 2,
@@ -1259,6 +1262,21 @@ class ParameterHandler : public Subscriptor
 					    * values.
 					    */
 	  Description = 3,
+
+					   /**
+					    * Write out everything as
+					    * an <a href="http://en.wikipedia.org/wiki/XML>XML</a>
+					    * file.
+					    */
+	  XML = 4,
+
+					   /**
+					    * Write out everything as
+					    * a <a href="http://en.wikipedia.org/wiki/JSON">JSON</a>
+					    * file.
+					    */
+	  JSON = 5,
+
 					   /**
 					    * Write input for
 					    * ParameterHandler without
@@ -1388,13 +1406,9 @@ class ParameterHandler : public Subscriptor
 				      * otherwise the default
 				      * value. If the value of an
 				      * undeclared entry is required,
-				      * an empty string is returned
-				      * and <tt>assert</tt> is used to
-				      * check whether this entry was
-				      * declared (therefore an
-				      * exception may be thrown).
+				      * an exception will be thrown.
 				      */
-    const std::string & get (const std::string &entry_string) const;
+    std::string get (const std::string &entry_string) const;
 
 				     /**
 				      * Return value of entry
@@ -1428,6 +1442,13 @@ class ParameterHandler : public Subscriptor
                                       *
                                       * The parameter must already exist in
                                       * the present subsection.
+				      *
+				      * The function throws an
+				      * exception of type
+				      * ExcValueDoesNotMatchPattern
+				      * if the new value does not
+				      * conform to the pattern for
+				      * this entry.
                                       */
     void           set (const std::string &entry_name,
                         const std::string &new_value);
@@ -1442,6 +1463,13 @@ class ParameterHandler : public Subscriptor
                                       * string and a bool as arguments, which
                                       * is certainly not what is most often
                                       * intended.
+				      *
+				      * The function throws an
+				      * exception of type
+				      * ExcValueDoesNotMatchPattern
+				      * if the new value does not
+				      * conform to the pattern for
+				      * this entry.
                                       */
     void           set (const std::string &entry_name,
                         const char        *new_value);
@@ -1453,6 +1481,13 @@ class ParameterHandler : public Subscriptor
                                       *
                                       * The parameter must already exist in
                                       * the present subsection.
+				      *
+				      * The function throws an
+				      * exception of type
+				      * ExcValueDoesNotMatchPattern
+				      * if the new value does not
+				      * conform to the pattern for
+				      * this entry.
                                       */
     void           set (const std::string &entry_name,
                         const long int    &new_value);
@@ -1472,6 +1507,13 @@ class ParameterHandler : public Subscriptor
                                       * one you can get back out using
                                       * get_double() may differ in the 16th
                                       * digit.
+				      *
+				      * The function throws an
+				      * exception of type
+				      * ExcValueDoesNotMatchPattern
+				      * if the new value does not
+				      * conform to the pattern for
+				      * this entry.
                                       */
     void           set (const std::string &entry_name,
                         const double      &new_value);
@@ -1483,6 +1525,13 @@ class ParameterHandler : public Subscriptor
                                       *
                                       * The parameter must already exist in
                                       * the present subsection.
+				      *
+				      * The function throws an
+				      * exception of type
+				      * ExcValueDoesNotMatchPattern
+				      * if the new value does not
+				      * conform to the pattern for
+				      * this entry.
                                       */
     void           set (const std::string &entry_name,
                         const bool        &new_value);
@@ -1593,9 +1642,9 @@ class ParameterHandler : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcDefaultDoesNotMatchPattern,
+    DeclException2 (ExcValueDoesNotMatchPattern,
 		    std::string, std::string,
-		    << "The default string <" << arg1
+		    << "The string <" << arg1
 		    << "> does not match the given pattern <" << arg2 << ">");
 				     /**
 				      * Exception
@@ -1616,88 +1665,56 @@ class ParameterHandler : public Subscriptor
 				     //@}
   private:
 				     /**
-				      * Whatever is in a section:
-				      * map of entry names together with
-				      * entry content and regexp, and
-				      * list of subsections.
+				      * The separator used when
+				      * accessing elements of a path
+				      * into the parameter tree.
 				      */
-    struct Section
-    {
-                                         /**
-                                          * Destructor
-                                          */
-	~Section ();
+    static const char path_separator = '.';
 
-                                         /**
-                                          * Number of entries that this
-                                          * section has plus all the
-                                          * non-subsection entries of all its
-                                          * decendents.
-                                          */
-        unsigned int accumulated_no_of_entries () const;
+				     /**
+				      * The complete tree of sections
+				      * and entries. If a node in a
+				      * tree is a value, it has a
+				      * number of attributes, namely:
+				      * - its value
+				      * - its default value
+				      * - its documentation
+				      *
+				      * On the other hand, if a node
+				      * in the tree is a directory,
+				      * then none of these attributes
+				      * exist.
+				      */
+    boost::property_tree::ptree entries;
 
-                                         /**
-                                          * Value of an entry in this section,
-                                          * including documentation and the
-                                          * pattern it conforms to.
-                                          */
-        struct EntryContent
-        {
-            std::string            value;
-            std::string            documentation;
-            Patterns::PatternBase *pattern;
+				     /**
+				      * A list of patterns that are
+				      * used to describe the
+				      * parameters of this object. The
+				      * are indexed by nodes in the
+				      * property tree.
+				      */
+    std::vector<std_cxx1x::shared_ptr<const Patterns::PatternBase> > patterns;
 
-                                             /**
-                                              * Return whether this entry has
-                                              * some form of documentation.
-                                              */
-            bool has_documentation () const;
-        };
+				     /**
+				      * Mangle a string so that it
+				      * doesn't contain any special
+				      * characters or spaces.
+				      */
+    static std::string mangle (const std::string &s);
 
-                                         /**
-                                          * Typedef for a type
-                                          * describing all the entries
-                                          * in a subsection: this is a
-                                          * map from the entry keys to
-                                          * a pair of values, one for
-                                          * the default string and one
-                                          * describing the pattern
-                                          * that the entry must match.
-                                          */
-	typedef
-        std::map<std::string, EntryContent>
-        EntryType;
+				     /**
+				      * Unmangle a string into its
+				      * original form.
+				      */
+    static std::string demangle (const std::string &s);
 
-                                         /**
-                                          * List of entries for this
-                                          * section.
-                                          */
-	EntryType                       entries;
-
-                                         /**
-                                          * List of subsections of
-                                          * this section.
-                                          */
-	std::map<std::string, Section*> subsections;
-
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this
-					  * object. Since sometimes
-					  * the size of objects can
-					  * not be determined exactly
-					  * (for example: what is the
-					  * memory consumption of an
-					  * STL <tt>std::map</tt> type with a
-					  * certain number of
-					  * elements?), this is only
-					  * an estimate. however often
-					  * quite close to the true
-					  * value.
-					  */
-	unsigned int memory_consumption () const;
-    };
+				     /**
+				      * Return whether a given node is
+				      * a parameter node or a
+				      * subsection node.
+				      */
+    static bool is_parameter_node (const boost::property_tree::ptree &);
 
 				     /**
 				      * Path of presently selected
@@ -1707,24 +1724,23 @@ class ParameterHandler : public Subscriptor
     std::vector<std::string> subsection_path;
 
 				     /**
-				      * List of default values
-				      * organized as a tree of
-				      * subsections
+				      * Return the string that
+				      * identifies the current path
+				      * into the property tree. This
+				      * is only a path, i.e. it is not
+				      * terminated by the
+				      * path_separator character.
 				      */
-    Section defaults;
+    std::string get_current_path () const;
 
 				     /**
-				      * Analogue list of changed
-				      * entries. The tree of
-				      * subsections is there even if
-				      * there are no changed entry
-				      * values in a subsection;
-				      * therefore enter_subsection()
-				      * has to create the tree in both
-				      * <tt>Defaults</tt> and
-				      * <tt>changed_entries</tt>.
+				      * Given the name of an entry as
+				      * argument, the function
+				      * computes a full path into the
+				      * parameter tree using the
+				      * current subsection.
 				      */
-    Section changed_entries;
+    std::string get_current_full_path (const std::string &name) const;
 
 				     /**
 				      * Scan one line of input.
@@ -1749,32 +1765,6 @@ class ParameterHandler : public Subscriptor
 				      */
     bool scan_line (std::string         line,
 		    const unsigned int  lineno);
-
-				     /**
-				      * Get a pointer to the
-				      * <tt>Section</tt> structure in the
-				      * <tt>Defaults</tt> tree for the
-				      * subsection we are presently
-				      * in.
-				      */
-    Section*       get_present_defaults_subsection ();
-
-				     /**
-				      * Same, <tt>const</tt> version.
-				      */
-    const Section* get_present_defaults_subsection () const;
-
-				     /**
-				      * Get a pointer to the Section structure
-				      * in the <tt>changed_entries</tt> tree
-				      * for the subsection we are presently in.
-				      */
-    Section* get_present_changed_subsection ();
-
-    				     /**
-				      * Same, <tt>const</tt> version.
-				      */
-    const Section* get_present_changed_subsection () const;
 
     friend class MultipleParameterLoop;
 };
@@ -2175,10 +2165,16 @@ class MultipleParameterLoop : public ParameterHandler
     void init_branches ();
 
 				     /**
-				      * Initialize the branches in the
-				      * given section.
+				      * Traverse the section currently
+				      * set by
+				      * enter_subsection()/leave_subsection()
+				      * and see which of the entries
+				      * are variante/array
+				      * entries. Then fill the
+				      * multiple_choices variable
+				      * using this information.
 				      */
-    void init_branches_section (const ParameterHandler::Section &sec);
+    void init_branches_current_section ();
 
 				     /**
 				      * Transfer the entry values for one run

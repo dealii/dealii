@@ -6,8 +6,8 @@
 \item {\bf Subsection Testing}
 \begin{itemize}
 \item {\bf double:} 3.1415926 (docs 3, {\it default:} 3.1415926)
-\item {\bf int:} 1 ({\it default:} 3)
-\item {\bf string list:} a (docs 1, {\it default:} a, b, c)
+\item {\bf int:} 3 ({\it default:} 1)
+\item {\bf string list:} a, b, c (docs 1, {\it default:} a)
 
 
 
