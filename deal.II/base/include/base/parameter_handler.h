@@ -1793,7 +1793,7 @@ class ParameterHandler : public Subscriptor
  *   @endverbatim
  *   The loop will then perform three runs of the program, one for each value
  *   of <tt>Time step size</tt>, while all other parameters are as specified or with their
- *   default value. If there are several variant entry values in the input a loop is
+ *   default value. If there are several variant entry values in the input, a loop is
  *   performed for each combination of variant values:
  *   @verbatim
  *     set Time step size = { 0.1 | 0.2 }
@@ -1802,23 +1802,23 @@ class ParameterHandler : public Subscriptor
  *   will result in four runs of the programs, with time step 0.1 and 0.2 for each
  *   of the two solvers.
  *
- *   Opposite to a variant entry, an array entry looks like this:
+ *   In addition to variant entries, this class also supports <i>array entries</i> that look like this:
  *   @verbatim
  *     set Output file = ofile.{{ 1 | 2 | 3 | 4 }}
  *   @endverbatim
  *   This indicates that if there are variant entries producing a total of four
- *   different runs will write their results to the files <tt>ofile.1</tt>, <tt>ofile.2</tt>,
+ *   different runs, then we will write their results to the files <tt>ofile.1</tt>, <tt>ofile.2</tt>,
  *   <tt>ofile.3</tt> and <tt>ofile.4</tt>, respectively. Array entries do not generate multiple
  *   runs of the main loop themselves, but if there are variant entries, then in
  *   the <i>n</i>th run of the main loop, also the <i>n</i>th value of an array is returned.
  *
  *   Since the different variants are constructed in the order of declaration, not in
- *   the order in which the variat entries appear in the input file, it may be
+ *   the order in which the variant entries appear in the input file, it may be
  *   difficult to guess the mapping between the different variants and the appropriate
  *   entry in an array. You will have to check the order of declaration, or use
  *   only one variant entry.
  *
- *   It is guaranteed that only selections which match the regular expression given
+ *   It is guaranteed that only selections which match the regular expression (pattern) given
  *   upon declaration of an entry are given back to the program. If a variant value
  *   does not match the regular expression, the default value is stored and an error
  *   is issued. Before the first run of the loop, all possible values are checked
