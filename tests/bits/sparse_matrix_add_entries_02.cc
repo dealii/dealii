@@ -27,8 +27,8 @@ void test ()
 {
 				// set up sparse matrix
   SparsityPattern sp (5,5,3);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
+  for (unsigned int i=0; i<sp.n_rows(); ++i)
+    for (unsigned int j=0; j<sp.n_cols(); ++j)
       if ((i+2*j+1) % 3 == 0)
         sp.add (i,j);
   sp.compress ();
@@ -36,10 +36,10 @@ void test ()
   SparseMatrix<double> m(sp);
 
 				// prepare structure with indices and values
-  std::vector<unsigned int> indices (m.m());
-  for (unsigned int i=0; i<m.m(); ++i)
-    indices[i] = i;
-  std::vector<double> values (5);
+  std::vector<unsigned int> indices (m.n());
+  for (unsigned int j=0; j<m.n(); ++j)
+    indices[j] = j;
+  std::vector<double> values (m.n());
 
                                    // try to add entries from the list. Zeros
                                    // should be filtered out. list is sorted

@@ -1,4 +1,4 @@
-//----------------------------  sparse_matrix_entries_01.cc  -----------------
+//----------------------------  sparse_matrix_entries_06.cc  -----------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_matrix_add_entries_01.cc  -------------
+//----------------------------  sparse_matrix_add_entries_06.cc  -------------
 
 
 // check adding elements into a matrix using
@@ -41,16 +41,20 @@ void test ()
     indices[j] = j;
   std::vector<double> values (m.n());
 
-                                   // try to add entries from the list. Zeros
-                                   // should be filtered out. list is sorted
+                                   // try to add entries from the list. No
+                                   // zeros to be filtered. But less than 3
+                                   // elements, so the program takes another
+                                   // path
   for (unsigned int i=0; i<m.m(); ++i)
     {
+      unsigned int n_added = 0;
       for (unsigned int j=0; j<m.n(); ++j)
 	if ((i+2*j+1) % 3 == 0)
-	  values[j] = i*j*.5+.5;
-	else
-	  values[j] = 0;
-      m.add(i,m.m(),&indices[0], &values[0], false, true);
+	  {
+	    indices[n_added] = j;
+	    values[n_added++] = i*j*.5+.5;
+	  }
+      m.add(i,n_added,&indices[0], &values[0], false, true);
     }
 
                                    // then make sure we retrieve the same ones
@@ -65,15 +69,6 @@ void test ()
 	  Assert (m.el(i,j) == 0, ExcInternalError());
 	}
 
-				// try to add an invalid list of indices to
-				// first and last row, should throw an
-				// exception
-  deal_II_exceptions::disable_abort_on_exception();
-  for (unsigned int i=0; i<m.m(); ++i)
-    values[i] = 0.5*i - 1.5;
-  m.add(0,m.m(),&indices[0], &values[0], false, true);
-  m.add(m.m()-1,m.m(),&indices[0], &values[0], false, true);
-
   deallog << "OK" << std::endl;
 }
 
@@ -81,7 +76,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("sparse_matrix_add_entries_01/output");
+  std::ofstream logfile("sparse_matrix_add_entries_06/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

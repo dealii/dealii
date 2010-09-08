@@ -1,4 +1,4 @@
-//----------------------------  sparse_matrix_entries_01.cc  -----------------
+//----------------------------  sparse_matrix_entries_04.cc  -----------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,14 +9,13 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_matrix_add_entries_01.cc  -------------
+//----------------------------  sparse_matrix_add_entries_04.cc  -------------
 
 
 // check adding elements into a matrix using
 // SparseMatrix::add(row, n_cols, col_indices, values, elide_zero_values,
 //                   col_indices_are_sorted)
-// need to filter out zeros, indices are sorted and zero values should
-// not be elided
+// rectangular case, sorted
 
 #include "../tests.h"
 #include <lac/sparse_matrix.h>
@@ -26,7 +25,7 @@
 void test ()
 {
 				// set up sparse matrix
-  SparsityPattern sp (5,5,3);
+  SparsityPattern sp (5,7,3);
   for (unsigned int i=0; i<sp.n_rows(); ++i)
     for (unsigned int j=0; j<sp.n_cols(); ++j)
       if ((i+2*j+1) % 3 == 0)
@@ -50,7 +49,7 @@ void test ()
 	  values[j] = i*j*.5+.5;
 	else
 	  values[j] = 0;
-      m.add(i,m.m(),&indices[0], &values[0], false, true);
+      m.add(i,m.n(),&indices[0], &values[0], false, true);
     }
 
                                    // then make sure we retrieve the same ones
@@ -65,15 +64,6 @@ void test ()
 	  Assert (m.el(i,j) == 0, ExcInternalError());
 	}
 
-				// try to add an invalid list of indices to
-				// first and last row, should throw an
-				// exception
-  deal_II_exceptions::disable_abort_on_exception();
-  for (unsigned int i=0; i<m.m(); ++i)
-    values[i] = 0.5*i - 1.5;
-  m.add(0,m.m(),&indices[0], &values[0], false, true);
-  m.add(m.m()-1,m.m(),&indices[0], &values[0], false, true);
-
   deallog << "OK" << std::endl;
 }
 
@@ -81,7 +71,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("sparse_matrix_add_entries_01/output");
+  std::ofstream logfile("sparse_matrix_add_entries_04/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
