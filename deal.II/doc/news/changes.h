@@ -170,6 +170,15 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 
 <ol>
+  <li><p> Fixed: The Patterns::Integer and Patterns::Double classes did
+  not properly check that a value given matched the pattern because they
+  ignored text after an initial match. This led to <code>"3.141"</code> and
+  <code>"3.141..,-RXYZ"</code> to be recognized as valid integers and
+  double values, respectively. This is now fixed.
+  <br>
+  (WB 2010/09/08)
+  </p>
+
   <li><p> Fixed: The computation of quadrature points in the QGaussLobatto
   class uses a Newton method that was wrongly implemented. While the
   results were correct (at least for moderate orders), it required more

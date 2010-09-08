@@ -39,6 +39,34 @@ DEAL_II_NAMESPACE_OPEN
 namespace Patterns
 {
 
+  namespace
+  {
+				     /**
+				      * Read to the end of the stream and
+				      * return whether all there is is
+				      * whitespace or whether there are other
+				      * characters as well.
+				      */
+    bool has_only_whitespace (std::istream &in)
+    {
+      while (in)
+	{
+	  char c;
+
+					   // skip if we've reached the end of
+					   // the line
+	  if (!(in >> c))
+	    break;
+	
+	  if ((c != ' ') && (c != '\t'))
+	    return false;
+	}
+      return true;
+    }
+  }
+
+
+  
   PatternBase::~PatternBase ()
   {}
 
@@ -89,19 +117,19 @@ namespace Patterns
     std::istringstream str(test_string);
 
     int i;
-    if (str >> i)
-      {
-					 // check whether valid bounds
-					 // were specified, and if so
-					 // enforce their values
-	if (lower_bound <= upper_bound)
-	  return ((lower_bound <= i) &&
-		  (upper_bound >= i));
-	else
-	  return true;
-      };
-
-    return false;
+    if (!(str >> i))
+      return false;
+    
+    if (!has_only_whitespace (str))
+      return false;
+				     // check whether valid bounds
+				     // were specified, and if so
+				     // enforce their values
+    if (lower_bound <= upper_bound)
+      return ((lower_bound <= i) &&
+	      (upper_bound >= i));
+    else
+      return true;
   }
 
 
@@ -164,18 +192,19 @@ namespace Patterns
     std::istringstream str(test_string);
 
     double d;
-    if (str >> d)
-      {
-					 // check whether valid bounds
-					 // were specified, and if so
-					 // enforce their values
-	if (lower_bound <= upper_bound)
-	  return ((lower_bound <= d) &&
-		  (upper_bound >= d));
-	else
-	  return true;
-      };
-    return false;
+    if (!(str >> d))
+      return false;
+    
+    if (!has_only_whitespace (str))
+      return false;
+				     // check whether valid bounds
+				     // were specified, and if so
+				     // enforce their values
+    if (lower_bound <= upper_bound)
+      return ((lower_bound <= d) &&
+	      (upper_bound >= d));
+    else
+      return true;
   }
 
 
