@@ -86,7 +86,8 @@ unsigned int
 ConstraintMatrix::ConstraintLine::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (line) +
-	  MemoryConsumption::memory_consumption (entries));
+	  MemoryConsumption::memory_consumption (entries) +
+	  MemoryConsumption::memory_consumption (inhomogeneity));
 }
 
 
@@ -2316,7 +2317,8 @@ ConstraintMatrix::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (lines) +
 	  MemoryConsumption::memory_consumption (lines_cache) +
-	  MemoryConsumption::memory_consumption (sorted));
+	  MemoryConsumption::memory_consumption (sorted) +
+	  MemoryConsumption::memory_consumption (local_lines));
 }
 
 
