@@ -410,11 +410,12 @@ SparseMatrix<number>::add (const unsigned int  row,
 #ifdef DEBUG
       for (unsigned int i=1; i<n_cols; ++i)
 	Assert (col_indices[i] > col_indices[i-1],
-		ExcMessage("List of indices not sorted or with duplicates."));
+		ExcMessage("List of indices is unsorted or contains duplicates."));
 #endif
 
       const unsigned int * this_cols =
 	&cols->get_column_numbers()[cols->get_rowstart_indices()[row]];
+      const unsigned int row_length = cols->row_length(row);
       number * val_ptr = &val[cols->get_rowstart_indices()[row]];
 
       if (cols->optimize_diagonal() == true)
@@ -438,9 +439,8 @@ SparseMatrix<number>::add (const unsigned int  row,
 	  unsigned int counter = 1;
 	  for (unsigned int i=0; i<diag; ++i)
 	    {
-	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
-
-	      while (this_cols[counter] < col_indices[i])
+	      while (this_cols[counter] < col_indices[i] &&
+		     this_cols[counter] < row_length)
 		++counter;
 
 	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
@@ -452,9 +452,8 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // add indices after diagonal
 	  for (unsigned int i=post_diag; i<n_cols; ++i)
 	    {
-	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
-
-	      while (this_cols[counter] < col_indices[i])
+	      while (this_cols[counter] < col_indices[i] &&
+		     this_cols[counter] < row_length)
 		++counter;
 
 	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
@@ -463,16 +462,16 @@ SparseMatrix<number>::add (const unsigned int  row,
 	      val_ptr[counter] += values[i];
 	    }
 
-	  Assert (counter < cols->row_length(row), ExcInternalError());
+	  Assert (counter < cols->row_length(row),
+		  ExcMessage("Specified invalid column indices in add function."));
 	}
       else
 	{
 	  unsigned int counter = 0;
 	  for (unsigned int i=0; i<n_cols; ++i)
 	    {
-	      Assert (col_indices[i] >= this_cols[counter], ExcInternalError());
-
-	      while (this_cols[counter] < col_indices[i])
+	      while (this_cols[counter] < col_indices[i] &&
+		     this_cols[counter] < row_length)
 		++counter;
 
 	      Assert (this_cols[counter] == col_indices[i] || values[i] == 0,
@@ -480,7 +479,8 @@ SparseMatrix<number>::add (const unsigned int  row,
 
 	      val_ptr[counter] += values[i];
 	    }
-	  Assert (counter < cols->row_length(row), ExcInternalError());
+	  Assert (counter < cols->row_length(row),
+		  ExcMessage("Specified invalid column indices in add function."));
 	}
       return;
     }
