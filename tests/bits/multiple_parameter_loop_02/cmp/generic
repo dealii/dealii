@@ -1,0 +1,53 @@
+
+DEAL::Number of run: 1
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  # docs 3
+  set double      = 3.141592 # default: 3.1415926
+  set int         = 333      # default: 1
+
+  # docs 1
+  set string list = a
+end
+
+
+DEAL::Number of run: 2
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  # docs 3
+  set double      = 3.9999 # default: 3.1415926
+  set int         = 333    # default: 1
+
+  # docs 1
+  set string list = b      # default: a
+end
+
+
+DEAL::Number of run: 3
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  # docs 3
+  set double      = 3.141592 # default: 3.1415926
+  set int         = 393      # default: 1
+
+  # docs 1
+  set string list = c        # default: a
+end
+
+
+DEAL::Number of run: 4
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  # docs 3
+  set double      = 3.9999 # default: 3.1415926
+  set int         = 393    # default: 1
+
+  # docs 1
+  set string list = d      # default: a
+end
+
+

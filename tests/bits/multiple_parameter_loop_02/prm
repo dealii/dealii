@@ -1,0 +1,6 @@
+subsection Testing
+  set string list = {{ a | b | c | d }}
+  set int         = 3{3 | 9}3
+  set double      = 3.{ 141592 | 9999 }
+end
+
