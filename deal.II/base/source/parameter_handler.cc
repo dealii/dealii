@@ -603,7 +603,7 @@ ParameterHandler::demangle (const std::string &s)
 	Assert (i+2 < s.size(),
 		ExcMessage ("Trying to demangle an invalid string."));
 
-	unsigned char c;
+	unsigned char c = 0;
 	switch (s[i+1])
 	  {
 	    case '0':  c = 0 * 16;  break;
