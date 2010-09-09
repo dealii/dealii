@@ -824,14 +824,16 @@ namespace Patterns
  *
  *     void LinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection("Linear solver");
- *       prm.declare_entry ("Solver",
- *                          "CG",
- *		            Patterns::Selection("CG|GMRES|GaussElim"),
- *		            "Name of a linear solver for the inner iteration");
- *       prm.declare_entry ("Maximum number of iterations",
- *                          "20",
- *		            ParameterHandler::RegularExpressions::Integer());
- *       ...
+ *       {
+ *         prm.declare_entry ("Solver",
+ *                            "CG",
+ *		              Patterns::Selection("CG|GMRES|GaussElim"),
+ *		              "Name of a linear solver for the inner iteration");
+ *         prm.declare_entry ("Maximum number of iterations",
+ *                            "20",
+ *  	 	              ParameterHandler::RegularExpressions::Integer());
+ *         ...
+ *       }
  *       prm.leave_subsection ();
  *     }
  *   @endcode
@@ -842,10 +844,12 @@ namespace Patterns
  *   @code
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
- *       prm.declare_entry ("Nonlinear method",
- *                          "Newton-Raphson",
- *		            ParameterHandler::RegularExpressions::Anything());
- *       eq.declare_parameters (prm);
+ *       {
+ *         prm.declare_entry ("Nonlinear method",
+ *                            "Newton-Raphson",
+ *	  	              ParameterHandler::RegularExpressions::Anything());
+ *         eq.declare_parameters (prm);
+ *       }
  *       prm.leave_subsection ();
  *     }
  *   @endcode
@@ -862,13 +866,19 @@ namespace Patterns
  *   @code
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
- *       prm.enter_subsection ("Linear solver 1");
- *       eq1.declare_parameters (prm);
- *       prm.leave_subsection ();
+ *       {
+ *         prm.enter_subsection ("Linear solver 1");
+ *         {
+ *           eq1.declare_parameters (prm);
+ *         }
+ *         prm.leave_subsection ();
  *
- *       prm.enter_subsection ("Linear solver 2");
- *       eq2.declare_parameters (prm);
- *       prm.leave_subsection ();
+ *         prm.enter_subsection ("Linear solver 2");
+ *         {
+ *           eq2.declare_parameters (prm);
+ *         }
+ *         prm.leave_subsection ();
+ *       }
  *       prm.leave_subsection ();
  *     }
  *   @endcode
@@ -1208,13 +1218,83 @@ namespace Patterns
  *                Matrix1=Sparse, Matrix2=Full
  *   @endverbatim
  *
- *   <h3>References</h3>
  *
- *   This class is inspired by the <tt>MenuSystem</tt> class of <tt>DiffPack</tt>.
+ *
+ *   <h3>Representation of Parameters</h3>
+ *
+ *   Here is some more internal information about the repesentation of
+ *   parameters:
+ *
+ *   Logically, parameters and the nested sections they are arranged in can be
+ *   thought of as a hierarchical directory structure, or a tree. Take, for
+ *   example, the following code declaring a set of parameters and sections
+ *   they live in:
+ *   @code
+ *     ParameterHandler prm;
+ *
+ *     prm.declare_entry ("Maximal number of iterations",
+ *                        "10",
+ *                        Patterns::Integer (1, 1000),
+ *                        "A parameter that describes the maximal number of "
+ *                        "iterations the CG method is to take before giving "
+ *                        "up on a matrix.");
+ *     prm.enter_subsection ("Preconditioner");
+ *     {
+ *       prm.declare_parameter ("Kind",
+ *                              "SSOR",
+ *                              Patterns::Selection ("SSOR|Jacobi"),
+ *                              "A string that describes the kind of preconditioner "
+ *                              "to use.");
+ *       prm.declare_parameter ("Relaxation factor",
+ *                              "1.0",
+ *                              Patterns::Double (0, 1),
+ *                              "The numerical value (between zero and one) for the "
+ *                              "relaxation factor to use in the preconditioner.");
+ *     }
+ *     prm.leave_subsection ();
+ *   @endcode
+ *
+ *   We can think of the parameters so arrange as a file system in which every
+ *   parameter is a directory. The name of this directory is the name of the
+ *   parameter, and in this directory lie files that describe the
+ *   parameter. These files are:
+ *   - <code>value</code>: The content of this file is the current value of this
+ *     parameter; initially, the content of the file equals the default value of
+ *     the parameter.
+ *   - <code>default_value</code>: The content of this file is the default value
+ *     value of the parameter.
+ *   - <code>pattern</code>: A textual representation of the pattern that describes
+ *     the parameter's possible values.
+ *   - <code>pattern_index</code>: A number that indexes the Patterns::PatternBase
+ *     object that is used to to describe the parameter.
+ *   - <code>documentation</code>: The content of this file is the documentation
+ *     given for a parameter as the last argument of the
+ *     ParameterHandler::declare_entry call.
+ *   With the exception of the <code>value</code> file, the contents of files
+ *   are never changed after declaration of a parameter.
+ *
+ *   Alternatively, a directory in this file system may not have a file called
+ *   <code>value</code> in it. In that case, the directory represents a
+ *   subsection as declared above, and the directory's name will correspond to
+ *   the name of the subsection. It will then have no files in it at all, but
+ *   it may have further directories in it: some of these directories will be
+ *   parameters (indicates by the presence of files) or further nested
+ *   subsections.
+ *
+ *   Given this explanation, the code above will lead to a hierarchical
+ *   representation of data that looks like this (the content of files is
+ *   indicated at the right in a different font):
+ *     @image html parameter_handler.png
+ *   Once parameters have been read in, the contents of the <code>value</code>
+ *   "files" may be different while the other files remain untouched.
+ *
+ *   Using the ParameterHandler::print_parameters() function with
+ *   ParameterHandler::XML as second argument, we can get a complete
+ *   representation of this data structure in XML. It will look like
+ *   this:
  *
  *   @ingroup input
- *
- *   @author Wolfgang Bangerth, October 1997, revised February 1998
+ *   @author Wolfgang Bangerth, October 1997, revised February 1998, 2010
  */
 class ParameterHandler : public Subscriptor
 {
@@ -1978,13 +2058,8 @@ class ParameterHandler : public Subscriptor
  *   the number of the run.
  *
  *
- *   <h3>References</h3>
- *
- *   This class is inspired by the <tt>Multipleloop</tt> class of <tt>DiffPack</tt>.
- *
  *   @ingroup input
- *
- *   @author Wolfgang Bangerth, October 1997
+ *   @author Wolfgang Bangerth, October 1997, 2010
  */
 class MultipleParameterLoop : public ParameterHandler
 {
