@@ -254,6 +254,14 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
   <li>
   <p>
+  Fixed: The method FEValuesViews::SymmetricTensor< 2, dim, spacedim >::get_function_divergences
+  incorrectly calculated the divergence.
+  <br>
+  (Andrew McBride 2010/09/09)
+  </p>
+
+  <li>
+  <p>
   New: Reimplementation of the parent function in the various DoFCellAccessors so
   that one can call the parent function from a DoFIterator and also gets a
   DoFIterator returned.
