@@ -1121,79 +1121,90 @@ namespace FEValuesViews
   void
   SymmetricTensor<2, dim, spacedim>::
   get_function_divergences(const InputVector &fe_function,
-			   std::vector<divergence_type> &divergences) const
+                           std::vector<divergence_type> &divergences) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_gradients,
-	   typename FVB::ExcAccessToUninitializedField());
+           typename FVB::ExcAccessToUninitializedField());
     Assert(divergences.size() == fe_values.n_quadrature_points,
-	   ExcDimensionMismatch(divergences.size(), fe_values.n_quadrature_points));
+           ExcDimensionMismatch(divergences.size(), fe_values.n_quadrature_points));
     Assert(fe_values.present_cell.get() != 0,
-	   ExcMessage("FEValues object is not reinit'ed to any cell"));
+           ExcMessage("FEValues object is not reinit'ed to any cell"));
     Assert(fe_function.size() == fe_values.present_cell->n_dofs_for_dof_handler(),
-	   ExcDimensionMismatch(fe_function.size(),
-				fe_values.present_cell->n_dofs_for_dof_handler()));
+           ExcDimensionMismatch(fe_function.size(),
+                                fe_values.present_cell->n_dofs_for_dof_handler()));
 
-				     // get function values of dofs
-				     // on this cell
+                                     // get function values of dofs
+                                     // on this cell
     dealii::Vector<typename InputVector::value_type > dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill(divergences.begin(), divergences.end(), divergence_type());
 
     for (unsigned int shape_function = 0;
-	 shape_function < fe_values.fe->dofs_per_cell; ++shape_function)
+         shape_function < fe_values.fe->dofs_per_cell; ++shape_function)
       {
-	const int snc = shape_function_data[shape_function].single_nonzero_component;
+        const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-	if (snc == -2)
-					   // shape function is zero for the
-					   // selected components
-	  continue;
+        if (snc == -2)
+                                           // shape function is zero for the
+                                           // selected components
+          continue;
 
-	const double value = dof_values(shape_function);
-	if (value == 0.)
-	  continue;
+        const double value = dof_values(shape_function);
+        if (value == 0.)
+          continue;
 
-	if (snc != -1)
-	  {
-	    const unsigned int comp =
-	      shape_function_data[shape_function].single_nonzero_component_index;
+        if (snc != -1)
+          {
+            const unsigned int comp =
+              shape_function_data[shape_function].single_nonzero_component_index;
 
-	    const Tensor < 1, spacedim> * shape_gradient_ptr =
-	      &fe_values.shape_gradients[snc][0];
-	    for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-		 ++q_point, ++shape_gradient_ptr) {
-	      for (unsigned int j = 0; j < dim; ++j)
-		divergences[q_point][value_type::unrolled_to_component_indices(comp)[0]]
-		  += value * (*shape_gradient_ptr)[j];
-	    }
+            const Tensor < 1, spacedim> * shape_gradient_ptr =
+              &fe_values.shape_gradients[snc][0];
+
+            const unsigned int ii = value_type::unrolled_to_component_indices(comp)[0];
+            const unsigned int jj = value_type::unrolled_to_component_indices(comp)[1];
+
+            for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
+                 ++q_point, ++shape_gradient_ptr) {
+
+                divergences[q_point][ii] += value * (*shape_gradient_ptr)[jj];
+
+                if (ii != jj)
+                    divergences[q_point][jj] += value * (*shape_gradient_ptr)[ii];
+            }
 	  }
-	else
+        else
 	  {
-	    for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
-	      if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
-		{
+            for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+              if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+                {
 		  Assert (false, ExcNotImplemented());
 
-// the following implementation needs to be looked over -- I think it
-// can't be right, because we are in a case where there is no single
-// nonzero component
+                    // the following implementation needs to be looked over -- I think it
+                    // can't be right, because we are in a case where there is no single
+                    // nonzero component
+                    //
+                    // the following is not implemented! we need to consider the interplay between
+                    // mutliple non-zero entries in shape function and the representation
+                    // as a symmetric second-order tensor
+
 		  const unsigned int comp =
-		    shape_function_data[shape_function].single_nonzero_component_index;
+                    shape_function_data[shape_function].single_nonzero_component_index;
 
 		  const Tensor < 1, spacedim> * shape_gradient_ptr =
-		    &fe_values.shape_gradients[shape_function_data[shape_function].
-					       row_index[d]][0];
+                    &fe_values.shape_gradients[shape_function_data[shape_function].
+                                               row_index[d]][0];
 		  for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
 		       ++q_point, ++shape_gradient_ptr) {
-		    for (unsigned int j = 0; j < dim; ++j)
+                    for (unsigned int j = 0; j < dim; ++j)
 		      {
-			const unsigned int vector_component = value_type::component_to_unrolled_index (TableIndices<2>(comp,j));
-			divergences[q_point][vector_component] += value * (*shape_gradient_ptr++)[j];
+                        const unsigned int vector_component = value_type::component_to_unrolled_index (TableIndices<2>(comp,j));
+                        divergences[q_point][vector_component] += value * (*shape_gradient_ptr++)[j];
 		      }
 		  }
-		}
+                }
 	  }
       }
   }
