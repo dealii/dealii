@@ -1095,7 +1095,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 					 // (and discard sub-tree
 					 // nodes) and take the
 					 // maximum of their lengths
-        unsigned int longest_name = 0;
+        std::size_t longest_name = 0;
 	for (boost::property_tree::ptree::const_iterator
 	       p = current_section.begin();
 	     p != current_section.end(); ++p)
@@ -1108,7 +1108,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                          // make sure we can align the
                                          // default and documentation
                                          // strings
-        unsigned int longest_value = 0;
+        std::size_t longest_value = 0;
 	for (boost::property_tree::ptree::const_iterator
 	       p = current_section.begin();
 	     p != current_section.end(); ++p)
@@ -1226,7 +1226,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 					 // first find out the longest
 					 // entry name to be able to
 					 // align the equal signs
-        unsigned int longest_name = 0;
+        std::size_t longest_name = 0;
 	for (boost::property_tree::ptree::const_iterator
 	       p = current_section.begin();
 	     p != current_section.end(); ++p)
