@@ -63,8 +63,8 @@ check_solve( SOLVER& solver, const MATRIX& A,
 int main(int argc, char **argv)
 {
   std::ofstream logfile("deal_solver_02/output");
-  logfile.precision(4);
   deallog.attach(logfile);
+  deallog << std::setprecision(4);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10); 
 

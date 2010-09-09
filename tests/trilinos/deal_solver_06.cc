@@ -1,20 +1,20 @@
 //----------------------------  trilinos_deal_solver_06.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  trilinos_deal_solver_06.cc  ---------------------------
+//------------------  trilinos_deal_solver_06.cc  ---------------------------
 
 // test the Richardson solver using the Trilinos matrix and vector classes
 
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <base/utilities.h>
 #include "../lac/testmatrix.h"
 #include <cmath>
@@ -40,10 +40,10 @@ check_solve( SOLVER& solver, const MATRIX& A,
 	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
-  
+
   u = 0.;
   f = 1.;
-  try 
+  try
     {
       solver.solve(A,u,f,P);
     }
@@ -60,10 +60,10 @@ check_solve( SOLVER& solver, const MATRIX& A,
 int main(int argc, char **argv)
 {
   std::ofstream logfile("deal_solver_06/output");
-  logfile.precision(4);
   deallog.attach(logfile);
+  deallog << std::setprecision(4);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     SolverControl control(10000, 1.e-3);
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
-      
+
                                      // Make matrix
     FDMatrix testproblem(size, size);
     CompressedSimpleSparsityPattern csp (dim, dim);
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
     u.compress ();
 
     GrowingVectorMemory<TrilinosWrappers::Vector> mem;
-    SolverRichardson<TrilinosWrappers::Vector> solver(control,mem);
+    SolverRichardson<TrilinosWrappers::Vector> solver(control,mem,0.1);
     PreconditionIdentity preconditioner;
     check_solve (solver, A,u,f, preconditioner);
   }

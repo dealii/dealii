@@ -1,7 +1,6 @@
 
 DEAL::Size 32 Unknowns 961
 DEAL::Solver type: N6dealii16SolverRichardsonINS_16TrilinosWrappers6VectorEEE
-DEAL:Richardson::Starting value 31.0000
-DEAL:Richardson::Failure step 374 value nan
-DEAL::Iterative method reported convergence failure in step 374 with residual nan
-DEAL::Solver stopped after 374 iterations
+DEAL:Richardson::Starting value 31.00
+DEAL:Richardson::Convergence step 5271 value 0.0009996
+DEAL::Solver stopped after 5271 iterations
