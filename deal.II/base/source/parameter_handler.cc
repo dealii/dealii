@@ -17,6 +17,7 @@
 #include <base/memory_consumption.h>
 #include <base/utilities.h>
 
+#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -549,6 +550,8 @@ namespace Patterns
 
 
 ParameterHandler::ParameterHandler ()
+		:
+		entries (new boost::property_tree::ptree())
 {}
 
 
@@ -786,7 +789,7 @@ bool ParameterHandler::read_input_from_string (const char *s)
 
 void ParameterHandler::clear ()
 {
-  entries = boost::property_tree::ptree();
+  entries.reset (new boost::property_tree::ptree());
 }
 
 
@@ -797,18 +800,18 @@ ParameterHandler::declare_entry (const std::string           &entry,
                                  const Patterns::PatternBase &pattern,
                                  const std::string           &documentation)
 {
-  entries.put (get_current_full_path(entry) + path_separator + "value",
+  entries->put (get_current_full_path(entry) + path_separator + "value",
 	       default_value);
-  entries.put (get_current_full_path(entry) + path_separator + "default_value",
+  entries->put (get_current_full_path(entry) + path_separator + "default_value",
 	       default_value);
-  entries.put (get_current_full_path(entry) + path_separator + "documentation",
+  entries->put (get_current_full_path(entry) + path_separator + "documentation",
 	       documentation);
 
 				   // clone the pattern and store its
 				   // index in the node
   patterns.push_back (std_cxx1x::shared_ptr<const Patterns::PatternBase>
 		      (pattern.clone()));
-  entries.put (get_current_full_path(entry) + path_separator + "pattern",
+  entries->put (get_current_full_path(entry) + path_separator + "pattern",
 	       static_cast<unsigned int>(patterns.size()-1));
 				   // also store the description of
 				   // the pattern. we do so because we
@@ -819,7 +822,7 @@ ParameterHandler::declare_entry (const std::string           &entry,
 				   // case, they will have to be able
 				   // to re-create the patterns as far
 				   // as possible
-  entries.put (get_current_full_path(entry) + path_separator +
+  entries->put (get_current_full_path(entry) + path_separator +
 	       "pattern_description",
 	       patterns.back()->description());
 }
@@ -831,8 +834,8 @@ void ParameterHandler::enter_subsection (const std::string &subsection)
   const std::string current_path = get_current_path ();
 
 				   // if necessary create subsection
-  if (!entries.get_child_optional (get_current_full_path(subsection)))
-    entries.add_child (get_current_full_path(subsection),
+  if (!entries->get_child_optional (get_current_full_path(subsection)))
+    entries->add_child (get_current_full_path(subsection),
 		       boost::property_tree::ptree());
 
 				   // then enter it
@@ -866,7 +869,7 @@ ParameterHandler::get (const std::string &entry_string) const
 				   // assert that the entry is indeed
 				   // declared
   if (boost::optional<std::string> value
-      = entries.get_optional<std::string> (get_current_full_path(entry_string) + path_separator + "value"))
+      = entries->get_optional<std::string> (get_current_full_path(entry_string) + path_separator + "value"))
     return value.get();
   else
     {
@@ -925,19 +928,19 @@ ParameterHandler::set (const std::string &entry_string,
 {
 				   // assert that the entry is indeed
 				   // declared
-  if (entries.get_optional<std::string>
+  if (entries->get_optional<std::string>
       (get_current_full_path(entry_string) + path_separator + "value"))
     {
       const unsigned int pattern_index
-	= entries.get<unsigned int> (get_current_full_path(entry_string) + path_separator + "pattern");
+	= entries->get<unsigned int> (get_current_full_path(entry_string) + path_separator + "pattern");
       AssertThrow (patterns[pattern_index]->match(new_value),
 		   ExcValueDoesNotMatchPattern (new_value,
-						entries.get<std::string>
+						entries->get<std::string>
 						(get_current_full_path(entry_string) +
 						 path_separator +
 						 "pattern_description")));
 
-      entries.put (get_current_full_path(entry_string) + path_separator + "value",
+      entries->put (get_current_full_path(entry_string) + path_separator + "value",
 		   new_value);
     }
   else
@@ -1011,7 +1014,7 @@ ParameterHandler::print_parameters (std::ostream     &out,
 					     // there is nothing
 					     // further to do down in
 					     // this function
-	    write_xml (out, entries);
+	    write_xml (out, *entries);
 	    return out;
 
       case JSON:
@@ -1020,7 +1023,7 @@ ParameterHandler::print_parameters (std::ostream     &out,
 					     // there is nothing
 					     // further to do down in
 					     // this function
-	    write_json (out, entries);
+	    write_json (out, *entries);
 	    return out;
 
       case Text:
@@ -1076,7 +1079,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
   AssertThrow (out, ExcIO());
 
   const boost::property_tree::ptree &current_section
-    = entries.get_child (get_current_path());
+    = entries->get_child (get_current_path());
 
   switch (style)
     {
@@ -1396,7 +1399,7 @@ void
 ParameterHandler::log_parameters_section (LogStream &out)
 {
   const boost::property_tree::ptree &current_section
-    = entries.get_child (get_current_path());
+    = entries->get_child (get_current_path());
 
 				   // print entries one by
 				   // one. make sure they are
@@ -1461,7 +1464,7 @@ ParameterHandler::scan_line (std::string        line,
       const std::string subsection = line;
 
 				       // check whether subsection exists
-      if (!entries.get_child_optional (get_current_full_path(subsection)))
+      if (!entries->get_child_optional (get_current_full_path(subsection)))
 	{
 	  std::cerr << "Line " << lineno
                     << ": There is no such subsection to be entered:" << get_current_full_path(subsection) <<std::endl;
@@ -1512,7 +1515,7 @@ ParameterHandler::scan_line (std::string        line,
 
 				       // assert that the entry is indeed
 				       // declared
-      if (entries.get_optional<std::string> (get_current_full_path(entry_name) + path_separator + "value"))
+      if (entries->get_optional<std::string> (get_current_full_path(entry_name) + path_separator + "value"))
 	{
 					   // if entry was declared:
 					   // does it match the regex? if not,
@@ -1523,7 +1526,7 @@ ParameterHandler::scan_line (std::string        line,
 	  if (entry_value.find ('{') == std::string::npos)
 	    {
 	      const unsigned int pattern_index
-		= entries.get<unsigned int> (get_current_full_path(entry_name) + path_separator + "pattern");
+		= entries->get<unsigned int> (get_current_full_path(entry_name) + path_separator + "pattern");
 	      if (!patterns[pattern_index]->match(entry_value))
 		{
 		  std::cerr << "Line " << lineno << ":" << std::endl
@@ -1538,7 +1541,7 @@ ParameterHandler::scan_line (std::string        line,
 		}
 	    }
 
-	  entries.put (get_current_full_path(entry_name) + path_separator + "value",
+	  entries->put (get_current_full_path(entry_name) + path_separator + "value",
 		       entry_value);
 	  return true;
 	}
@@ -1681,7 +1684,7 @@ void MultipleParameterLoop::init_branches ()
 void MultipleParameterLoop::init_branches_current_section ()
 {
   const boost::property_tree::ptree &current_section
-    = entries.get_child (get_current_path());
+    = entries->get_child (get_current_path());
 
 				   // check all entries in the present
 				   // subsection whether they are

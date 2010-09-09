@@ -19,11 +19,12 @@
 #include <base/subscriptor.h>
 #include <base/std_cxx1x/shared_ptr.h>
 
-#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
 
 #include <map>
 #include <vector>
 #include <string>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1753,19 +1754,20 @@ class ParameterHandler : public Subscriptor
 
 				     /**
 				      * The complete tree of sections
-				      * and entries. If a node in a
-				      * tree is a value, it has a
-				      * number of attributes, namely:
-				      * - its value
-				      * - its default value
-				      * - its documentation
+				      * and entries. See the general
+				      * documentation of this class
+				      * for a description how data is
+				      * stored in this variable.
 				      *
-				      * On the other hand, if a node
-				      * in the tree is a directory,
-				      * then none of these attributes
-				      * exist.
+				      * The variable is a pointer so
+				      * that we can use an incomplete
+				      * type, rather than having to
+				      * include all of the
+				      * property_tree stuff from
+				      * boost. This works around a
+				      * problem with gcc 4.5.
 				      */
-    boost::property_tree::ptree entries;
+    std::auto_ptr<boost::property_tree::ptree> entries;
 
 				     /**
 				      * A list of patterns that are
