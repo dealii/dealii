@@ -597,8 +597,7 @@ class GridGenerator
 				      * exist for triangulations of
 				      * all space dimensions, but
 				      * throws an error if called in
-				      * 1d. It is also currently not
-				      * implemented in 3d.
+				      * 1d.
 				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this
@@ -642,9 +641,6 @@ class GridGenerator
 				      * computed adaptively such that
 				      * the resulting elements have
 				      * the least aspect ratio.
-				      *
-				      * At present, this function only
-				      * exists in 2d.
 				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this
