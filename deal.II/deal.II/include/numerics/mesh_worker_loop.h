@@ -20,6 +20,7 @@
 #include <grid/tria.h>
 #include <numerics/mesh_worker_info.h>
 
+#define DEAL_II_MESHWORKER_PARALLEL 1
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -257,17 +258,19 @@ namespace MeshWorker
       }
     
 				     // Loop over all cells
-//     WorkStream::run(begin, end,
-// 		    std_cxx1x::bind(cell_action<INFOBOX, dim, spacedim, ITERATOR>, _1, _3, _2,
-// 				    cell_worker, boundary_worker, face_worker, cells_first, true),
-// 		    std_cxx1x::bind(internal::assemble<dim,spacedim,ASSEMBLER>, _1, assembler),
-// 		    info, dof_info);
-    
+#ifdef DEAL_II_MESHWORKER_PARALLEL
+    WorkStream::run(begin, end,
+ 		    std_cxx1x::bind(cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>, _1, _3, _2,
+ 				    cell_worker, boundary_worker, face_worker, cells_first, true),
+ 		    std_cxx1x::bind(internal::assemble<dim,DOFINFO,ASSEMBLER>, _1, assembler),
+ 		    info, dof_info);
+#else
     for (ITERATOR cell = begin; cell != end; ++cell)
       {
 	cell_action<INFOBOX,DOFINFO,dim,spacedim>(cell, dof_info, info, cell_worker, boundary_worker, face_worker, cells_first, true);
 	dof_info.assemble(assembler);
       }
+#endif
   }
 
 /**

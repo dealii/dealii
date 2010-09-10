@@ -252,6 +252,11 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 <ol>
 
+  <li><p>Improved: MeshWorker::loop() now uses WorkStream for multithreading
+  <br>
+  (GK 2010/09/10)
+  </p>
+  
   <li>
   <p>
   Fixed: The method FEValuesViews::SymmetricTensor< 2, dim, spacedim >::get_function_divergences
