@@ -54,7 +54,7 @@ class PreconditionBlockBase
 				      * Constructor initializing
 				      * default values.
 				      */
-    PreconditionBlockBase(bool store_diagonals);
+    PreconditionBlockBase(bool store_diagonals = false);
 
     				     /**
 				      * Deletes the inverse diagonal
