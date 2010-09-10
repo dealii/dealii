@@ -802,7 +802,7 @@ namespace DoFRenumbering
 				    * index are behind all degrees
 				    * of freedom of a cell with
 				    * lower index. The order inside
-				    * a cell bloock will be the same
+				    * a cell block will be the same
 				    * as before this renumbering.
 				    *
 				    * This function only works with
