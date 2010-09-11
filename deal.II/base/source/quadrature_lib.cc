@@ -1075,6 +1075,14 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
 				  const bool factor_out_singularity) :
     Quadrature<2>(2*n*n)
 {
+				   // This version of the constructor
+				   // works only for the 4
+				   // vertices. If you need a more
+				   // general one, you should use the
+				   // one with the Point<2> in the
+				   // constructor.
+    Assert(vertex_index <4, ExcIndexRange(vertex_index, 0, 4));
+    
     // Start with the gauss quadrature formula on the (u,v) reference
     // element.
     QGauss<2> gauss(n);
