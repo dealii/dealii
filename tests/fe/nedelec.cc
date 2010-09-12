@@ -80,9 +80,9 @@ transform_grid (Triangulation<2> &tria,
 
 template<int dim>
 inline void
-plot_shape_functions()
+plot_shape_functions(const unsigned int p)
 {
-  FE_Nedelec<dim> fe_ned(1);
+  FE_Nedelec<dim> fe_ned(p);
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
 
@@ -151,9 +151,10 @@ main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
-  plot_shape_functions<2>();
-//  plot_shape_functions<3>();
+  deallog << "Degree 0: " << std::endl;
+  plot_shape_functions<2> (0);
+  deallog << "Degree 1: " << std::endl;
+  plot_shape_functions<2> (1);
   
   return 0;
 }
